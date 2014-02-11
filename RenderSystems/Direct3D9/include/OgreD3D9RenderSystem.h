@@ -44,7 +44,8 @@ namespace Ogre
     class D3D9Device;
     class D3D9DeviceManager;
     class D3D9ResourceManager;
-
+	class D3D9StereoDriverBridge;
+	
     /**
     Implementation of DirectX9 as a rendering system.
     */
@@ -170,6 +171,10 @@ namespace Ogre
         DepthStencilHash mDepthStencilHash;
 
         MultiheadUseType mMultiheadUse;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		D3D9StereoDriverBridge* mStereoDriver;
+#endif
 
     protected:
         void setClipPlanesImpl(const PlaneList& clipPlanes);        
@@ -393,6 +398,12 @@ namespace Ogre
 
         /// Returns how multihead should be activated
         MultiheadUseType getMultiheadUse() const { return mMultiheadUse; }
+		
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		/// @copydoc RenderSystem::setDrawBuffer
+		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+#endif
+
     protected:  
         /// Returns the sampler id for a given unit texture number
         DWORD getSamplerId(size_t unit);

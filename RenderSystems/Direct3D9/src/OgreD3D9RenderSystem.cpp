@@ -54,6 +54,10 @@ THE SOFTWARE.
 #include "OgreD3D9ResourceManager.h"
 #include "OgreD3D9DepthBuffer.h"
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+#include "OgreD3D9StereoDriverBridge.h"
+#endif
+
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 
 namespace Ogre 
@@ -62,9 +66,12 @@ namespace Ogre
 
     //---------------------------------------------------------------------
     D3D9RenderSystem::D3D9RenderSystem( HINSTANCE hInstance ) :
-        mMultiheadUse(mutAuto),
-        mAllowDirectX9Ex(false),
-        mIsDirectX9Ex(false)
+        mMultiheadUse(mutAuto)
+        ,mAllowDirectX9Ex(false)
+        ,mIsDirectX9Ex(false)
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		,mStereoDriver (NULL)
+#endif
     {
         LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " created." );
 
@@ -146,6 +153,11 @@ namespace Ogre
             mResourceManager = NULL;
         }
         
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		OGRE_DELETE mStereoDriver;
+		mStereoDriver = NULL;
+#endif
+
         LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " destroyed." );
 
         msD3D9RenderSystem = NULL;
@@ -201,6 +213,9 @@ namespace Ogre
         ConfigOption optResourceCeationPolicy;
         ConfigOption optMultiDeviceMemHint;
         ConfigOption optEnableFixedPipeline;
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        ConfigOption optStereoMode;
+#endif
 
         driverList = this->getDirect3DDrivers();
 
@@ -309,6 +324,16 @@ namespace Ogre
         optEnableFixedPipeline.possibleValues.push_back( "No" );
         optEnableFixedPipeline.currentValue = "Yes";
         optEnableFixedPipeline.immutable = false;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		optStereoMode.name = "Stereo Mode";
+		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
+		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+		optStereoMode.currentValue = optStereoMode.possibleValues[0];
+		optStereoMode.immutable = false;
+		
+		mOptions[optStereoMode.name] = optStereoMode;
+#endif
 
         mOptions[optDevice.name] = optDevice;
         mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
@@ -619,6 +644,12 @@ namespace Ogre
         mDriverVersion.release = HIWORD(mActiveD3DDriver->getAdapterIdentifier().DriverVersion.LowPart);
         mDriverVersion.build = LOWORD(mActiveD3DDriver->getAdapterIdentifier().DriverVersion.LowPart);
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		// Stereo driver must be created before device is created
+		StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
+		mStereoDriver = OGRE_NEW D3D9StereoDriverBridge(stereoMode);
+#endif
+
         // Create the device manager.
         mDeviceManager = OGRE_NEW D3D9DeviceManager();
 
@@ -840,6 +871,12 @@ namespace Ogre
 
         attachRenderTarget( *renderWindow );
         
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		// Must be called after device has been linked to window
+		D3D9StereoDriverBridge::getSingleton().addRenderWindow(renderWindow);
+		renderWindow->_validateStereo();
+#endif
+
         return renderWindow;
     }   
     //---------------------------------------------------------------------
@@ -1587,6 +1624,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::destroyRenderTarget(const String& name)
     {       
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		D3D9StereoDriverBridge::getSingleton().removeRenderWindow(name);
+#endif
+
         detachRenderTargetImpl(name);
 
         // Do the real removal
@@ -3073,6 +3114,10 @@ namespace Ogre
                 // also make sure we validate the device; if this never went 
                 // through update() it won't be set
                 window->_validateDevice();
+				
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+				window->_validateStereo();
+#endif
             }
 
             // Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
@@ -4464,4 +4509,12 @@ namespace Ogre
 
         fireEvent(name, &params);
     }
+	//---------------------------------------------------------------------
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	bool D3D9RenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+	{
+		return D3D9StereoDriverBridge::getSingleton().setDrawBuffer(colourBuffer);
+	}
+#endif
+	//---------------------------------------------------------------------
 }

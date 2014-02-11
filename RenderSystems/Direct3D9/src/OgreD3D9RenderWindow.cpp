@@ -39,6 +39,10 @@ THE SOFTWARE.
 #include "OgreD3D9DeviceManager.h"
 #include "OgreDepthBuffer.h"
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+#include "OgreD3D9StereoDriverBridge.h"
+#endif
+
 namespace Ogre
 {
     D3D9RenderWindow::D3D9RenderWindow(HINSTANCE instance)
@@ -959,4 +963,12 @@ namespace Ogre
         mDeviceValid = mDevice->validate(this);
         return mDeviceValid;
     }
+	//---------------------------------------------------------------------
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	void D3D9RenderWindow::_validateStereo()
+	{
+		mStereoEnabled = D3D9StereoDriverBridge::getSingleton().isStereoEnabled(this->getName());
+	}
+#endif
+	//---------------------------------------------------------------------
 }

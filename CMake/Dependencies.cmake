@@ -124,6 +124,15 @@ if(WIN32)
 	
 	find_package(DirectX11)
 	macro_log_feature(DirectX11_FOUND "DirectX11" "Support for the DirectX11 render system" "http://msdn.microsoft.com/en-us/directx/" FALSE "" "")
+
+	if(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
+		# Find DirectX Stereo Driver Libraries
+		find_package(NVAPI)
+		macro_log_feature(NVAPI_FOUND "NVAPI" "Support NVIDIA stereo with the DirectX render system" "https://developer.nvidia.com/nvapi" FALSE "" "")
+
+		find_package(AMDQBS)
+		macro_log_feature(AMDQBS_FOUND "AMDQBS" "Support AMD stereo with the DirectX render system" "http://developer.amd.com/tools-and-sdks/graphics-development/amd-quad-buffer-sdk/" FALSE "" "")
+	endif()
 endif()
 
 #######################################################################

@@ -39,7 +39,8 @@ namespace Ogre
 
     class D3D11DriverList;
     class D3D11Driver;
-
+	class D3D11StereoDriverBridge;
+	
     /**
     Implementation of DirectX11 as a rendering system.
     */
@@ -211,6 +212,11 @@ namespace Ogre
         bool mRenderSystemWasInited;
 
         IDXGIFactoryN*  mpDXGIFactory;
+		
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		D3D11StereoDriverBridge* mStereoDriver;
+#endif
+
     protected:
         void setClipPlanesImpl(const PlaneList& clipPlanes);
 
@@ -423,6 +429,9 @@ namespace Ogre
 
         /// @copydoc RenderSystem::markProfileEvent
         virtual void markProfileEvent( const String &eventName );
+		
+		/// @copydoc RenderSystem::setDrawBuffer
+		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
     };
 }
 #endif

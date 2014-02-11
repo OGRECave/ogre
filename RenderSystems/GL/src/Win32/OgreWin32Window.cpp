@@ -149,6 +149,15 @@ namespace Ogre {
             if ((opt = miscParams->find("gamma")) != end)
                 hwGamma = StringConverter::parseBool(opt->second);
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			if ((opt = miscParams->find("stereoMode")) != end)
+			{
+				StereoModeType stereoMode = StringConverter::parseStereoMode(opt->second);
+				if (SMT_NONE != stereoMode)
+					mStereoEnabled = true;
+			}
+#endif
+
             if ((opt = miscParams->find("externalWindowHandle")) != end)
             {
                 mHWnd = (HWND)StringConverter::parseSizeT(opt->second);

@@ -1368,6 +1368,9 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     // However don't call setViewport just yet (see below)
     mCurrentViewport = vp;
 
+	// Set current draw buffer (default is CBT_BACK)
+	mDestRenderSystem->setDrawBuffer(mCurrentViewport->getDrawBuffer());
+	
     // reset light hash so even if light list is the same, we refresh the content every frame
     LightList emptyLightList;
     useLights(emptyLightList, 0);

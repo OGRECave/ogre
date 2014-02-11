@@ -3832,5 +3832,42 @@ namespace Ogre {
             };
         } // isCustomAttrib
     }
+	
+	//---------------------------------------------------------------------
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	bool GLRenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+	{
+		bool result = true;
 
+		switch (colourBuffer)
+		{
+		case CBT_BACK:
+			glDrawBuffer(GL_BACK);
+			break;
+		case CBT_BACK_LEFT:
+			glDrawBuffer(GL_BACK_LEFT);
+			break;
+		case CBT_BACK_RIGHT:
+			glDrawBuffer(GL_BACK_RIGHT);
+			break;
+		default:
+			result = false;
+		}
+
+		// Check for any errors
+		GLenum error = glGetError();
+		if (result && GL_NO_ERROR != error)
+		{		
+			const GLubyte* errorCode = gluErrorString(error);
+			String errorString = "GLRenderSystem::setDrawBuffer(" 
+				+ Ogre::StringConverter::toString(colourBuffer) + "): " + (const char*)errorCode;
+
+			Ogre::LogManager::getSingleton().logMessage(errorString);			
+			result = false;
+		}
+
+		return result;
+	}
+#endif
+	//---------------------------------------------------------------------
 }

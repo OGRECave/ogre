@@ -54,6 +54,10 @@ THE SOFTWARE.
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+#include "OgreD3D11StereoDriverBridge.h"
+#endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(_WIN32_WINNT_WIN8)
 #define USE_DXERR_LIBRARY
 #endif
@@ -128,7 +132,11 @@ bail:
     }
 
     //---------------------------------------------------------------------
-    D3D11RenderSystem::D3D11RenderSystem() : mDevice(NULL)
+    D3D11RenderSystem::D3D11RenderSystem()
+		: mDevice(NULL)
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		 ,mStereoDriver(NULL)
+#endif	
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
@@ -211,8 +219,9 @@ bail:
         ConfigOption optMaxFeatureLevels;
         ConfigOption optExceptionsErrorLevel;
         ConfigOption optDriverType;
-
-
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		ConfigOption optStereoMode;
+#endif
 
         driverList = this->getDirect3DDrivers();
 
@@ -340,6 +349,15 @@ bail:
         optDriverType.currentValue = "Hardware";
         optDriverType.immutable = false;
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		optStereoMode.name = "Stereo Mode";
+		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
+		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+		optStereoMode.currentValue = optStereoMode.possibleValues[0];
+		optStereoMode.immutable = false;
+		
+		mOptions[optStereoMode.name] = optStereoMode;
+#endif
 
         mOptions[optDevice.name] = optDevice;
         mOptions[optVideoMode.name] = optVideoMode;
@@ -757,6 +775,12 @@ bail:
 
             }
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			// Stereo driver must be created before device is created
+			StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
+			D3D11StereoDriverBridge* stereoBridge = OGRE_NEW D3D11StereoDriverBridge(stereoMode);
+#endif
+
             ID3D11DeviceN * device;
             // But, if creating WARP or software, don't use a selected adapter, it will be selected automatically
             
@@ -1030,6 +1054,12 @@ bail:
         win->create( name, width, height, fullScreen, miscParams);
 
         attachRenderTarget( *win );
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		// Must be called after device has been linked to window
+		D3D11StereoDriverBridge::getSingleton().addRenderWindow(win);
+		win->_validateStereo();
+#endif
 
         // If this is the first window, get the D3D device and create the texture manager
         if( !mPrimaryWindow )
@@ -1596,6 +1626,10 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::destroyRenderTarget(const String& name)
     {
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		D3D11StereoDriverBridge::getSingleton().removeRenderWindow(name);
+#endif
+
         detachRenderTargetImpl(name);
 
         // Do the real removal
@@ -2209,6 +2243,11 @@ bail:
             //__SetRenderState(D3DRS_SRGBWRITEENABLE, target->isHardwareGammaEnabled());
             // TODO where has sRGB state gone?
             
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			D3D11RenderWindowBase* d3d11Window = static_cast<D3D11RenderWindowBase*>(target);
+			d3d11Window->_validateStereo();
+#endif
+
             vp->_clearUpdatedFlag();
         }
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
@@ -3917,6 +3956,11 @@ bail:
         mUseNVPerfHUD = false;
         mHLSLProgramFactory = NULL;
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		OGRE_DELETE mStereoDriver;
+		mStereoDriver = NULL;
+#endif
+
         mBoundVertexProgram = NULL;
         mBoundFragmentProgram = NULL;
         mBoundGeometryProgram = NULL;
@@ -4044,6 +4088,15 @@ bail:
     {
         return mBoundComputeProgram;
     }
+	//---------------------------------------------------------------------
+	bool D3D11RenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+	{
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		return D3D11StereoDriverBridge::getSingleton().setDrawBuffer(colourBuffer);
+#else
+		return false;
+#endif
+	}
     //---------------------------------------------------------------------
     void D3D11RenderSystem::beginProfileEvent( const String &eventName )
     {

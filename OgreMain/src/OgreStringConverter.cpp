@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreStringConverter.h"
+#include "OgreException.h"
 
 namespace Ogre {
 
@@ -572,6 +573,80 @@ namespace Ogre {
         str >> tst;
         return !str.fail() && str.eof();
     }
+	//-----------------------------------------------------------------------
+    String StringConverter::toString(ColourBufferType val)
+    {
+		StringStream stream;
+		switch (val)
+		{
+		case CBT_BACK:
+		  stream << "Back";
+		  break;
+		case CBT_BACK_LEFT:
+		  stream << "Back Left";
+		  break;
+		case CBT_BACK_RIGHT:
+		  stream << "Back Right";
+		  break;
+		default:
+		  OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Unsupported colour buffer value", "StringConverter::toString(const ColourBufferType& val)");
+		}
+
+		return stream.str();
+    }
+    //-----------------------------------------------------------------------
+    ColourBufferType StringConverter::parseColourBuffer(const String& val, ColourBufferType defaultValue)
+    {
+		ColourBufferType result = defaultValue;
+		if (val.compare("Back") == 0)
+		{
+			result = CBT_BACK;
+		}
+		else if (val.compare("Back Left") == 0)
+		{
+			result = CBT_BACK_LEFT;
+		}
+		else if (val.compare("Back Right") == 0)
+		{
+			result = CBT_BACK_RIGHT;
+		}		
+		
+		return result;
+    }
+    //-----------------------------------------------------------------------
+    String StringConverter::toString(StereoModeType val)
+    {
+		StringStream stream;
+		switch (val)
+		{
+		case SMT_NONE:
+		  stream << "None";
+		  break;
+		case SMT_FRAME_SEQUENTIAL:
+		  stream << "Frame Sequential";
+		  break;
+		default:
+		  OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Unsupported stereo mode value", "StringConverter::toString(const StereoModeType& val)");
+		}
+
+		return stream.str();
+    }
+    //-----------------------------------------------------------------------
+    StereoModeType StringConverter::parseStereoMode(const String& val, StereoModeType defaultValue)
+    {
+		StereoModeType result = defaultValue;
+		if (val.compare("None") == 0)
+		{
+			result = SMT_NONE;
+		}
+		else if (val.compare("Frame Sequential") == 0)
+		{
+			result = SMT_FRAME_SEQUENTIAL;
+		}
+		
+		return result;
+    }
+	//-----------------------------------------------------------------------
 }
 
 

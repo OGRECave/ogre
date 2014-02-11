@@ -93,6 +93,10 @@ namespace Ogre
         bool mHasPixelFormatARB;
         bool mHasMultisample;
         bool mHasHardwareGamma;
+		
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		StereoModeType mStereoMode;
+#endif
 
         struct DisplayMonitorInfo
         {

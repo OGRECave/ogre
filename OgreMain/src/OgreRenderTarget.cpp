@@ -48,6 +48,11 @@ namespace Ogre {
         , mAutoUpdate(true)
         , mHwGamma(false)
         , mFSAA(0)
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		, mStereoEnabled(true)
+#else
+		, mStereoEnabled(false)
+#endif
     {
         mTimer = Root::getSingleton().getTimer();
         resetStatistics();
@@ -600,6 +605,11 @@ namespace Ogre {
     {
         // RenderWindow will override and return true for the primary window
         return false;
+    }  
+	//-----------------------------------------------------------------------
+    bool RenderTarget::isStereoEnabled(void) const
+    {
+        return mStereoEnabled;
     }
     //-----------------------------------------------------------------------
     RenderTarget::Impl *RenderTarget::_getImpl()

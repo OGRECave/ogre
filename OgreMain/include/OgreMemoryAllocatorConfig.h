@@ -318,6 +318,7 @@ namespace Ogre
     typedef RenderSysAllocatedObject    ViewportAlloc;
     typedef SceneCtlAllocatedObject     LodAlloc;
     typedef GeneralAllocatedObject      FileSystemLayerAlloc;
+    typedef GeneralAllocatedObject      StereoDriverAlloc;
 
     // Containers (by-value only)
     // Will  be of the form:

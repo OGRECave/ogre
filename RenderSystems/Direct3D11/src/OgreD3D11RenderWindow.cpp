@@ -36,6 +36,10 @@ THE SOFTWARE.
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11Texture.h"
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+#include "OgreD3D11StereoDriverBridge.h"
+#endif
+
 namespace Ogre
 {
     //---------------------------------------------------------------------
@@ -400,6 +404,14 @@ namespace Ogre
         SAFE_RELEASE(pTempTexture2D);
         SAFE_RELEASE(backbuffer);
     }
+	//---------------------------------------------------------------------
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	void D3D11RenderWindowBase::_validateStereo()
+	{
+		mStereoEnabled = D3D11StereoDriverBridge::getSingleton().isStereoEnabled(this->getName());
+	}
+#endif
+	//---------------------------------------------------------------------
 #pragma endregion
     //---------------------------------------------------------------------
     // class D3D11RenderWindowSwapChainBased
@@ -1251,7 +1263,6 @@ namespace Ogre
 
         D3D11RenderWindowBase::getCustomAttribute(name, pData);
     }
-    //---------------------------------------------------------------------
 #endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 #pragma endregion
 }

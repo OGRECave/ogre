@@ -110,6 +110,11 @@ namespace Ogre
         void adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
             unsigned int* winWidth, unsigned int* winHeight);
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		/** Validate the type of stereo that is enabled for this window.*/
+		void _validateStereo();
+#endif
+
     protected:
         /** Update the window rect. */ 
         void updateWindowRect();
