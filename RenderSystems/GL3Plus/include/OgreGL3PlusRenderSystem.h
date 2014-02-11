@@ -133,6 +133,11 @@ namespace Ogre {
         vector<GLuint>::type mRenderAttribsBound;
         vector<GLuint>::type mRenderInstanceAttribsBound;
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		/// @copydoc RenderSystem::setDrawBuffer
+		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+#endif
+
         /**
             Cache the polygon mode value
         */

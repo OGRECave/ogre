@@ -2902,4 +2902,27 @@ namespace Ogre {
             attribsBound.push_back(attrib);
         }
     }
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	bool GL3PlusRenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+	{
+		bool result = true;
+
+		switch (colourBuffer)
+		{
+            case CBT_BACK:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK));
+                break;
+            case CBT_BACK_LEFT:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK_LEFT));
+                break;
+            case CBT_BACK_RIGHT:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK_RIGHT));
+//                break;
+            default:
+                result = false;
+		}
+
+		return result;
+	}
+#endif
 }
