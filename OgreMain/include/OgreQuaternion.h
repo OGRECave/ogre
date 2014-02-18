@@ -240,9 +240,16 @@ namespace Ogre {
             from -180 to 180 degrees.
 		*/
 		Radian getYaw(bool reprojectAxis = true) const;		
-		/// Equality with tolerance (tolerance is max angle difference)
-		bool equals(const Quaternion& rhs, const Radian& tolerance) const;
+		
+        /** Equality with tolerance (tolerance is max angle difference)
+        @remark Both equals() and orientationEquals() measure the exact same thing.
+                One measures the difference by angle, the other by a different, non-linear metric.
+        */
+        bool equals(const Quaternion& rhs, const Radian& tolerance) const;
+        
         /** Compare two quaternions which are assumed to be used as orientations.
+        @remark Both equals() and orientationEquals() measure the exact same thing.
+                One measures the difference by angle, the other by a different, non-linear metric.
         @return true if the two orientations are the same or very close, relative to the given tolerance.
         */
         inline bool orientationEquals( const Quaternion& other, Real tolerance = 1e-3 ) const
