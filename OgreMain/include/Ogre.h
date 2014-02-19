@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreDataStream.h"
 #include "OgreEntity.h"
 #include "OgreException.h"
+#include "OgreFrameListener.h"
 #include "OgreFrustum.h"
 #include "OgreGpuProgram.h"
 #include "OgreGpuProgramManager.h"
