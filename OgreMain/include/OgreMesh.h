@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreSharedPtr.h"
 
 
 namespace Ogre {
