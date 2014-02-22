@@ -40,7 +40,7 @@ THE SOFTWARE.
 #       if defined( __MINGW32__ )
 #           define _OgreParticleFXExport
 #       else
-#    		define _OgreParticleFXExport __declspec(dllimport)
+#           define _OgreParticleFXExport __declspec(dllimport)
 #       endif
 #   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
@@ -57,8 +57,8 @@ namespace Ogre {
     class PointEmitterFactory;
     class LinearForceAffector;
     class LinearForceAffectorFactory;
-	class DirectionRandomiserAffectorFactory;
-	class DeflectorPlaneAffectorFactory;
+    class DirectionRandomiserAffectorFactory;
+    class DeflectorPlaneAffectorFactory;
 
 
 

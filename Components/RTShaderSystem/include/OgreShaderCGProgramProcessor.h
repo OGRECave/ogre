@@ -47,30 +47,30 @@ class _OgreRTSSExport CGProgramProcessor : public ProgramProcessor
 {
 
 // Interface.
-public:	
+public: 
 
-	/** Class constructor.
-	*/
-	CGProgramProcessor();
+    /** Class constructor.
+    */
+    CGProgramProcessor();
 
-	/** Class destructor */
-	virtual ~CGProgramProcessor();
+    /** Class destructor */
+    virtual ~CGProgramProcessor();
 
-	/** Return the target language of this processor. */
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
-	
-	/** 
-	@see ProgramProcessor::preCreateGpuPrograms
-	*/
-	virtual bool preCreateGpuPrograms(ProgramSet* programSet);
+    /** Return the target language of this processor. */
+    virtual const String& getTargetLanguage() const { return TargetLanguage; }
+    
+    /** 
+    @see ProgramProcessor::preCreateGpuPrograms
+    */
+    virtual bool preCreateGpuPrograms(ProgramSet* programSet);
  
-	/** 
-	@see ProgramProcessor::postCreateGpuPrograms
-	*/
-	virtual bool postCreateGpuPrograms(ProgramSet* programSet);
+    /** 
+    @see ProgramProcessor::postCreateGpuPrograms
+    */
+    virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
-	static String TargetLanguage;
-	
+    static String TargetLanguage;
+    
 };
 
 

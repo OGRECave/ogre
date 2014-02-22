@@ -34,7 +34,7 @@ same license as the rest of the engine.
 
 
     protected:
-		Ogre::String mDebugText;
+        Ogre::String mDebugText;
 
         CompositorDemo* mMain;
         Ogre::Vector3 mTranslateVector;
@@ -67,13 +67,13 @@ same license as the rest of the engine.
         bool mMoveBck;
         bool mMoveLeft;
         bool mMoveRight;
-		Ogre::SceneNode* mSpinny;
+        Ogre::SceneNode* mSpinny;
 
         ItemSelectorViewManager* mCompositorSelectorViewManager;
 
-		OIS::Mouse    *mMouse;
-		OIS::Keyboard *mKeyboard;
-		OIS::InputManager* mInputManager;
+        OIS::Mouse    *mMouse;
+        OIS::Keyboard *mKeyboard;
+        OIS::InputManager* mInputManager;
 
         CEGUI::Renderer* mGuiRenderer;
         CEGUI::Window* mGuiAvg;
@@ -83,28 +83,28 @@ same license as the rest of the engine.
         CEGUI::Window* mGuiTris;
         CEGUI::Window* mGuiDbg;
         CEGUI::Window* mRoot;
-		CEGUI::Listbox* mDebugRTTListbox;
-		CEGUI::Window* mDebugRTTStaticImage;
-		typedef Ogre::vector<CEGUI::Imageset*>::type ImageSetList;
-		ImageSetList mDebugRTTImageSets;
+        CEGUI::Listbox* mDebugRTTListbox;
+        CEGUI::Window* mDebugRTTStaticImage;
+        typedef Ogre::vector<CEGUI::Imageset*>::type ImageSetList;
+        ImageSetList mDebugRTTImageSets;
 
         CEGUI::MouseButton convertOISButtonToCegui(int ois_button_id);
         void CheckMovementKeys( CEGUI::Key::Scan keycode, bool state );
         void updateStats(void);
         void registerCompositors(void);
-		void initDebugRTTWindow(void);
-		void updateDebugRTTWindow(void);
+        void initDebugRTTWindow(void);
+        void updateDebugRTTWindow(void);
 
     public:
         CompositorDemo_FrameListener(CompositorDemo* main);
         virtual ~CompositorDemo_FrameListener();
-		void setSpinningNode(Ogre::SceneNode* node) { mSpinny = node; }
+        void setSpinningNode(Ogre::SceneNode* node) { mSpinny = node; }
 
     private:
         void connectEventHandlers(void);
 
-		virtual bool mouseMoved(const OIS::MouseEvent &e);
-		virtual bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+        virtual bool mouseMoved(const OIS::MouseEvent &e);
+        virtual bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
         virtual bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
         virtual bool keyPressed(const OIS::KeyEvent &e);
@@ -118,7 +118,7 @@ same license as the rest of the engine.
         bool handleMouseWheelEvent(const CEGUI::EventArgs& e);
         bool handleKeyDownEvent(const CEGUI::EventArgs& e);
         bool handleKeyUpEvent(const CEGUI::EventArgs& e);
-		bool handleRttSelection(const CEGUI::EventArgs& e);
+        bool handleRttSelection(const CEGUI::EventArgs& e);
         void itemStateChanged(const size_t index, const bool state);
     };
 

@@ -35,7 +35,7 @@ origin of a camera.
 begin                : Mon Feb 26 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -55,14 +55,14 @@ namespace Ogre
     public:
         /** Standard constructor */
         PCPlane();
-		/** Alternative constructor */
-		PCPlane (const Plane & plane);
+        /** Alternative constructor */
+        PCPlane (const Plane & plane);
         /** Alternative constructor */
         PCPlane (const Vector3& rkNormal, const Vector3& rkPoint);
         /** Alternative constructor */
         PCPlane (const Vector3& rkPoint0, const Vector3& rkPoint1, const Vector3& rkPoint2);
-		/** Copy from an Ogre Plane */
-		void setFromOgrePlane(Plane & ogrePlane);
+        /** Copy from an Ogre Plane */
+        void setFromOgrePlane(Plane & ogrePlane);
 
         /** Standard destructor */
         ~PCPlane();

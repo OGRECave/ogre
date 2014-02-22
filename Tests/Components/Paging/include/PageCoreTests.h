@@ -42,22 +42,22 @@ using namespace Ogre;
 
 class PageCoreTests : public CppUnit::TestFixture
 {
-	// CppUnit macros for setting up the test suite
-	CPPUNIT_TEST_SUITE( PageCoreTests );
-	CPPUNIT_TEST(testSimpleCreateSaveLoadWorld);
-	CPPUNIT_TEST_SUITE_END();
+    // CppUnit macros for setting up the test suite
+    CPPUNIT_TEST_SUITE( PageCoreTests );
+    CPPUNIT_TEST(testSimpleCreateSaveLoadWorld);
+    CPPUNIT_TEST_SUITE_END();
 
-	Root* mRoot;
-	PageManager* mPageManager;
-	SceneManager* mSceneMgr;
+    Root* mRoot;
+    PageManager* mPageManager;
+    SceneManager* mSceneMgr;
     FileSystemLayer* mFSLayer;
 #ifdef OGRE_STATIC_LIB
-	StaticPluginLoader mStaticPluginLoader;
+    StaticPluginLoader mStaticPluginLoader;
 #endif
 
 public:
-	void setUp();
-	void tearDown();
-	void testSimpleCreateSaveLoadWorld();
-	void testLoadWorld();
+    void setUp();
+    void tearDown();
+    void testSimpleCreateSaveLoadWorld();
+    void testLoadWorld();
 };

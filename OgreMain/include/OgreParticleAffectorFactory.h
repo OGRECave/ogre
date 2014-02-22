@@ -35,13 +35,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
-	/** Abstract class defining the interface to be implemented by creators of ParticleAffector subclasses.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
+    /** Abstract class defining the interface to be implemented by creators of ParticleAffector subclasses.
     @remarks
         Plugins or 3rd party applications can add new types of particle affectors to Ogre by creating
         subclasses of the ParticleAffector class. Because multiple instances of these affectors may be
@@ -52,7 +52,7 @@ namespace Ogre {
         a name which identifies them, examples might be 'force_vector', 'attractor', or 'fader', and these can be 
         also be used from particle system scripts.
     */
-	class _OgreExport ParticleAffectorFactory : public FXAlloc
+    class _OgreExport ParticleAffectorFactory : public FXAlloc
     {
     protected:
         vector<ParticleAffector*>::type mAffectors;
@@ -72,8 +72,8 @@ namespace Ogre {
         virtual void destroyAffector(ParticleAffector* e);
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

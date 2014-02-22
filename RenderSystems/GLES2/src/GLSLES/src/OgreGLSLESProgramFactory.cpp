@@ -38,11 +38,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String GLSLESProgramFactory::sLanguageName = "glsles";
     //-----------------------------------------------------------------------
-	GLSLESProgramFactory::GLSLESProgramFactory(void)
+    GLSLESProgramFactory::GLSLESProgramFactory(void)
     {
         if (mLinkProgramManager == NULL)
         {
-		    mLinkProgramManager = new GLSLESLinkProgramManager();
+            mLinkProgramManager = new GLSLESLinkProgramManager();
         }
 
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
@@ -56,9 +56,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLESProgramFactory::~GLSLESProgramFactory(void)
     {
-		if (mLinkProgramManager)
+        if (mLinkProgramManager)
         {
-			delete mLinkProgramManager;
+            delete mLinkProgramManager;
             mLinkProgramManager = NULL;
         }
 
@@ -84,7 +84,7 @@ namespace Ogre {
         return OGRE_NEW GLSLESProgram(creator, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-	void GLSLESProgramFactory::destroy(HighLevelGpuProgram* prog)
+    void GLSLESProgramFactory::destroy(HighLevelGpuProgram* prog)
     {
         OGRE_DELETE prog;
     }

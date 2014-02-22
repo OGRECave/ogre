@@ -36,12 +36,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 /** Abstract class defining the interface to be implemented by particle affectors.
     @remarks
         Particle affectors modify particles in a particle system over their lifetime. They can be
@@ -92,7 +92,7 @@ namespace Ogre {
         @param
             pParticle Pointer to a Particle to initialize.
         */
-		virtual void _initParticle(Particle* pParticle)
+        virtual void _initParticle(Particle* pParticle)
                 {
                     /* by default do nothing */
                     (void)pParticle;
@@ -118,8 +118,8 @@ namespace Ogre {
         const String &getType(void) const { return mType; }
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

@@ -30,7 +30,7 @@ OgrePCZPrerequisites.h  -  Portal Connected Zone Scene Manager prerequisites
 begin                : Mon Feb 19 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 

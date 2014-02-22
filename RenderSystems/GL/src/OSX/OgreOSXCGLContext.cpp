@@ -32,14 +32,14 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	
-	OSXCGLContext::OSXCGLContext(CGLContextObj cglContext, CGLPixelFormatObj pixelFormat) :
+    
+    OSXCGLContext::OSXCGLContext(CGLContextObj cglContext, CGLPixelFormatObj pixelFormat) :
         mCGLContext(cglContext), mPixelFormat(pixelFormat) {}
     
-	OSXCGLContext::~OSXCGLContext()
-	{
-		_unregisterContext();
-		
+    OSXCGLContext::~OSXCGLContext()
+    {
+        _unregisterContext();
+        
         if(mPixelFormat != NULL)
         {
             CGLDestroyPixelFormat(mPixelFormat);
@@ -48,25 +48,25 @@ namespace Ogre
     }
 
     void OSXCGLContext::setCurrent()
-	{
-		CGLSetCurrentContext(mCGLContext);
+    {
+        CGLSetCurrentContext(mCGLContext);
     }
-		
-	void OSXCGLContext::endCurrent()
-	{
-		CGLSetCurrentContext(NULL);
-	}
-	
-	GLContext* OSXCGLContext::clone() const
-	{
-		CGLContextObj cglCtxShare;
+        
+    void OSXCGLContext::endCurrent()
+    {
+        CGLSetCurrentContext(NULL);
+    }
+    
+    GLContext* OSXCGLContext::clone() const
+    {
+        CGLContextObj cglCtxShare;
         CGLCreateContext(mPixelFormat, mCGLContext, &cglCtxShare);
 
-		return OGRE_NEW OSXCGLContext(cglCtxShare, mPixelFormat);
-	}
-	
-	String OSXCGLContext::getContextType()
-	{
-		return "CGL";
-	}
+        return OGRE_NEW OSXCGLContext(cglCtxShare, mPixelFormat);
+    }
+    
+    String OSXCGLContext::getContextType()
+    {
+        return "CGL";
+    }
 }

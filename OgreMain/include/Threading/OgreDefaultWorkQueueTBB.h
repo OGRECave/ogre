@@ -31,45 +31,45 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	/** Implementation of a general purpose request / response style background work queue.
-	@remarks
-		This implementation utilises tbb's task system for the WorkQueue implementation.
-	*/
-	class _OgreExport DefaultWorkQueue : public DefaultWorkQueueBase
-	{
-	public:
-		DefaultWorkQueue(const String& name = BLANKSTRING);
-		virtual ~DefaultWorkQueue();
-		/** Process the next request on the queue. 
-		@remarks
-			This method is public, but only intended for advanced users to call. 
-			The only reason you would call this, is if you were using your 
-			own thread to drive the worker processing. The thread calling this
-			method will be the thread used to call the RequestHandler.
-		*/
+    /** Implementation of a general purpose request / response style background work queue.
+    @remarks
+        This implementation utilises tbb's task system for the WorkQueue implementation.
+    */
+    class _OgreExport DefaultWorkQueue : public DefaultWorkQueueBase
+    {
+    public:
+        DefaultWorkQueue(const String& name = BLANKSTRING);
+        virtual ~DefaultWorkQueue();
+        /** Process the next request on the queue. 
+        @remarks
+            This method is public, but only intended for advanced users to call. 
+            The only reason you would call this, is if you were using your 
+            own thread to drive the worker processing. The thread calling this
+            method will be the thread used to call the RequestHandler.
+        */
 
-		/// Main function for each thread spawned.
-		virtual void _threadMain();
+        /// Main function for each thread spawned.
+        virtual void _threadMain();
 
-		/// @copydoc WorkQueue::shutdown
-		virtual void shutdown();
+        /// @copydoc WorkQueue::shutdown
+        virtual void shutdown();
 
-		/// @copydoc WorkQueue::startup
-		virtual void startup(bool forceRestart = true);
+        /// @copydoc WorkQueue::startup
+        virtual void startup(bool forceRestart = true);
 
-		/// Register the current thread with the rendersystem
-		void _registerThreadWithRenderSystem();
+        /// Register the current thread with the rendersystem
+        void _registerThreadWithRenderSystem();
 
-	protected:
-		virtual void notifyWorkers();
+    protected:
+        virtual void notifyWorkers();
 
-	private:
-		tbb::task_scheduler_init mTaskScheduler;
-		tbb::task_group mTaskGroup;
-		/// Synchronise registering threads with the RenderSystem
-		OGRE_MUTEX(mRegisterRSMutex);
-		std::set<tbb::tbb_thread::id> mRegisteredThreads;
-	};
+    private:
+        tbb::task_scheduler_init mTaskScheduler;
+        tbb::task_group mTaskGroup;
+        /// Synchronise registering threads with the RenderSystem
+        OGRE_MUTEX(mRegisterRSMutex);
+        std::set<tbb::tbb_thread::id> mRegisteredThreads;
+    };
 
 
 }

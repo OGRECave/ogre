@@ -30,7 +30,7 @@ OgrePCZoneFactory.h  -  PCZone Factory & Factory Manager
 begin                : Mon Apr 16 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -43,43 +43,43 @@ Code Style Update	 :
 
 namespace Ogre
 {
-	class PCZSceneManager;
+    class PCZSceneManager;
     class PCZone;
 
-	/// Factory for PCZones
-	class _OgrePCZPluginExport PCZoneFactory : public SceneCtlAllocatedObject
+    /// Factory for PCZones
+    class _OgrePCZPluginExport PCZoneFactory : public SceneCtlAllocatedObject
     {
-	public:
-		PCZoneFactory(const String & typeName);
-		virtual ~PCZoneFactory();
-		virtual bool supportsPCZoneType(const String& zoneType) = 0;
-		virtual PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName) = 0;
-		const String& getFactoryTypeName() const { return mFactoryTypeName; }
-		/// Factory type name
-		String mFactoryTypeName;
+    public:
+        PCZoneFactory(const String & typeName);
+        virtual ~PCZoneFactory();
+        virtual bool supportsPCZoneType(const String& zoneType) = 0;
+        virtual PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName) = 0;
+        const String& getFactoryTypeName() const { return mFactoryTypeName; }
+        /// Factory type name
+        String mFactoryTypeName;
     };
 
-	// Factory for default zone
-	class _OgrePCZPluginExport DefaultZoneFactory : public PCZoneFactory
-	{
-	public:
-		DefaultZoneFactory();
-		virtual ~DefaultZoneFactory();
-		bool supportsPCZoneType(const String& zoneType);
-		PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName);
-	};
+    // Factory for default zone
+    class _OgrePCZPluginExport DefaultZoneFactory : public PCZoneFactory
+    {
+    public:
+        DefaultZoneFactory();
+        virtual ~DefaultZoneFactory();
+        bool supportsPCZoneType(const String& zoneType);
+        PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName);
+    };
 
-	// PCZoneFactory manager class
-	class _OgrePCZPluginExport PCZoneFactoryManager : public Singleton<PCZoneFactoryManager>, public SceneCtlAllocatedObject
-	{
-	public:
-		PCZoneFactoryManager();	
-		~PCZoneFactoryManager();
-		void registerPCZoneFactory(PCZoneFactory* factory);
-		void unregisterPCZoneFactory(PCZoneFactory* factory);
-		PCZone* createPCZone(PCZSceneManager * pczsm,
-							 const String& zoneType, 
-							 const String& zoneName);
+    // PCZoneFactory manager class
+    class _OgrePCZPluginExport PCZoneFactoryManager : public Singleton<PCZoneFactoryManager>, public SceneCtlAllocatedObject
+    {
+    public:
+        PCZoneFactoryManager(); 
+        ~PCZoneFactoryManager();
+        void registerPCZoneFactory(PCZoneFactory* factory);
+        void unregisterPCZoneFactory(PCZoneFactory* factory);
+        PCZone* createPCZone(PCZSceneManager * pczsm,
+                             const String& zoneType, 
+                             const String& zoneName);
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton
@@ -112,17 +112,17 @@ namespace Ogre
         preventing link errors.
         */
         static PCZoneFactoryManager* getSingletonPtr(void);
-		/* PCZoneFactory Iterator - for querying what types of PCZone
-		factories are available */
-		typedef map<String, PCZoneFactory*>::type PCZoneFactoryMap;
-		typedef MapIterator<PCZoneFactoryMap> PCZoneFactoryIterator;
-		/** Return an iterator over the PCZone factories currently registered */
-		PCZoneFactoryIterator getPCZoneFactoryIterator(void);
+        /* PCZoneFactory Iterator - for querying what types of PCZone
+        factories are available */
+        typedef map<String, PCZoneFactory*>::type PCZoneFactoryMap;
+        typedef MapIterator<PCZoneFactoryMap> PCZoneFactoryIterator;
+        /** Return an iterator over the PCZone factories currently registered */
+        PCZoneFactoryIterator getPCZoneFactoryIterator(void);
 
-	protected:
-		PCZoneFactoryMap mPCZoneFactories;
-		DefaultZoneFactory mDefaultFactory;
-	};
+    protected:
+        PCZoneFactoryMap mPCZoneFactories;
+        DefaultZoneFactory mDefaultFactory;
+    };
 }
 
 #endif

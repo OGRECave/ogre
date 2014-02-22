@@ -35,18 +35,18 @@ THE SOFTWARE.
 namespace Ogre {
     typedef _StringBase String;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
 
     typedef vector<String>::type StringVector;
     typedef SharedPtr<StringVector> StringVectorPtr;
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

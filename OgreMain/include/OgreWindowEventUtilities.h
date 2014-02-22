@@ -38,7 +38,7 @@ THE SOFTWARE.
 #   define WIN32_LEAN_AND_MEAN
 #  endif
 #  if !defined(NOMINMAX) && defined(_MSC_VER)
-#	define NOMINMAX // required to stop windows.h messing up std::min
+#   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #  include <windows.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !defined(__LP64__)
@@ -49,141 +49,141 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/**
-	@remarks
-		Callback class used to send out window events to client app
-	*/
-	class _OgreExport WindowEventListener
-	{
-	public:
-		virtual ~WindowEventListener() {}
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /**
+    @remarks
+        Callback class used to send out window events to client app
+    */
+    class _OgreExport WindowEventListener
+    {
+    public:
+        virtual ~WindowEventListener() {}
 
-		/**
-		@remarks
-			Window has moved position
-		@param rw
-			The RenderWindow which created this events
-		*/
-		virtual void windowMoved(RenderWindow* rw)
+        /**
+        @remarks
+            Window has moved position
+        @param rw
+            The RenderWindow which created this events
+        */
+        virtual void windowMoved(RenderWindow* rw)
                 { (void)rw; }
 
-		/**
-		@remarks
-			Window has resized
-		@param rw
-			The RenderWindow which created this events
-		*/
-		virtual void windowResized(RenderWindow* rw)
+        /**
+        @remarks
+            Window has resized
+        @param rw
+            The RenderWindow which created this events
+        */
+        virtual void windowResized(RenderWindow* rw)
                 { (void)rw; }
 
-		/**
-		@remarks
-			Window is closing (Only triggered if user pressed the [X] button)
-		@param rw
-			The RenderWindow which created this events
-		@return True will close the window(default).
-		*/
-		virtual bool windowClosing(RenderWindow* rw)
-		{ (void)rw; return true; }
+        /**
+        @remarks
+            Window is closing (Only triggered if user pressed the [X] button)
+        @param rw
+            The RenderWindow which created this events
+        @return True will close the window(default).
+        */
+        virtual bool windowClosing(RenderWindow* rw)
+        { (void)rw; return true; }
 
-		/**
-		@remarks
-			Window has been closed (Only triggered if user pressed the [X] button)
-		@param rw
-			The RenderWindow which created this events
-		@note
-			The window has not actually close yet when this event triggers. It's only closed after
-			all windowClosed events are triggered. This allows apps to deinitialise properly if they
-			have services that needs the window to exist when deinitialising.
-		*/
-		virtual void windowClosed(RenderWindow* rw)
+        /**
+        @remarks
+            Window has been closed (Only triggered if user pressed the [X] button)
+        @param rw
+            The RenderWindow which created this events
+        @note
+            The window has not actually close yet when this event triggers. It's only closed after
+            all windowClosed events are triggered. This allows apps to deinitialise properly if they
+            have services that needs the window to exist when deinitialising.
+        */
+        virtual void windowClosed(RenderWindow* rw)
                 { (void)rw; }
 
-		/**
-		@remarks
-			Window has lost/gained focus
-		@param rw
-			The RenderWindow which created this events
-		*/
-		virtual void windowFocusChange(RenderWindow* rw)
+        /**
+        @remarks
+            Window has lost/gained focus
+        @param rw
+            The RenderWindow which created this events
+        */
+        virtual void windowFocusChange(RenderWindow* rw)
                 { (void)rw; }
-	};
+    };
 
-	/**
-	@remarks
-		Utility class to handle Window Events/Pumping/Messages
-	*/
-	class _OgreExport WindowEventUtilities
-	{
-	public:
-		/**
-		@remarks
-			Call this once per frame if not using Root:startRendering(). This will update all registered
-			RenderWindows (If using external Windows, you can optionally register those yourself)
-		*/
-		static void messagePump();
+    /**
+    @remarks
+        Utility class to handle Window Events/Pumping/Messages
+    */
+    class _OgreExport WindowEventUtilities
+    {
+    public:
+        /**
+        @remarks
+            Call this once per frame if not using Root:startRendering(). This will update all registered
+            RenderWindows (If using external Windows, you can optionally register those yourself)
+        */
+        static void messagePump();
 
-		/**
-		@remarks
-			Add a listener to listen to renderwindow events (multiple listener's per renderwindow is fine)
-			The same listener can listen to multiple windows, as the Window Pointer is sent along with
-			any messages.
-		@param window
-			The RenderWindow you are interested in monitoring
-		@param listener
-			Your callback listener
-		*/
-		static void addWindowEventListener( RenderWindow* window, WindowEventListener* listener );
+        /**
+        @remarks
+            Add a listener to listen to renderwindow events (multiple listener's per renderwindow is fine)
+            The same listener can listen to multiple windows, as the Window Pointer is sent along with
+            any messages.
+        @param window
+            The RenderWindow you are interested in monitoring
+        @param listener
+            Your callback listener
+        */
+        static void addWindowEventListener( RenderWindow* window, WindowEventListener* listener );
 
-		/**
-		@remarks
-			Remove previously added listener
-		@param window
-			The RenderWindow you registered with
-		@param listener
-			The listener registered
-		*/
-		static void removeWindowEventListener( RenderWindow* window, WindowEventListener* listener );
+        /**
+        @remarks
+            Remove previously added listener
+        @param window
+            The RenderWindow you registered with
+        @param listener
+            The listener registered
+        */
+        static void removeWindowEventListener( RenderWindow* window, WindowEventListener* listener );
 
-		/**
-		@remarks
-			Called by RenderWindows upon creation for Ogre generated windows. You are free to add your
-			external windows here too if needed.
-		@param window
-			The RenderWindow to monitor
-		*/
-		static void _addRenderWindow(RenderWindow* window);
+        /**
+        @remarks
+            Called by RenderWindows upon creation for Ogre generated windows. You are free to add your
+            external windows here too if needed.
+        @param window
+            The RenderWindow to monitor
+        */
+        static void _addRenderWindow(RenderWindow* window);
 
-		/**
-		@remarks
-			Called by RenderWindows upon creation for Ogre generated windows. You are free to add your
-			external windows here too if needed.
-		@param window
-			The RenderWindow to remove from list
-		*/
-		static void _removeRenderWindow(RenderWindow* window);
+        /**
+        @remarks
+            Called by RenderWindows upon creation for Ogre generated windows. You are free to add your
+            external windows here too if needed.
+        @param window
+            The RenderWindow to remove from list
+        */
+        static void _removeRenderWindow(RenderWindow* window);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		//! Internal winProc (RenderWindow's use this when creating the Win32 Window)
-		static LRESULT CALLBACK _WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+        //! Internal winProc (RenderWindow's use this when creating the Win32 Window)
+        static LRESULT CALLBACK _WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !defined __OBJC__ && !defined(__LP64__)
         //! Internal UPP Window Handler (RenderWindow's use this when creating the OS X Carbon Window
         static OSStatus _CarbonWindowHandler(EventHandlerCallRef nextHandler, EventRef event, void* wnd);
 #endif
 
-		//These are public only so GLXProc can access them without adding Xlib headers header
-		typedef multimap<RenderWindow*, WindowEventListener*>::type WindowEventListeners;
-		static WindowEventListeners _msListeners;
-		static RenderWindowList _msWindows;
-	};
-	/** @} */
-	/** @} */
+        //These are public only so GLXProc can access them without adding Xlib headers header
+        typedef multimap<RenderWindow*, WindowEventListener*>::type WindowEventListeners;
+        static WindowEventListeners _msListeners;
+        static RenderWindowList _msWindows;
+    };
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

@@ -34,53 +34,53 @@ THE SOFTWARE.
 
 namespace Ogre  {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Overlays
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Overlays
+    *  @{
+    */
 
-	/** Concrete impl. of the ProfileSessionListener which visualizes
-		the profling results using overlays.
-	*/
-	class _OgreOverlayExport OverlayProfileSessionListener : public ProfileSessionListener
-	{
-	public:
-		OverlayProfileSessionListener();
-		virtual ~OverlayProfileSessionListener();
+    /** Concrete impl. of the ProfileSessionListener which visualizes
+        the profling results using overlays.
+    */
+    class _OgreOverlayExport OverlayProfileSessionListener : public ProfileSessionListener
+    {
+    public:
+        OverlayProfileSessionListener();
+        virtual ~OverlayProfileSessionListener();
 
-		/// @see ProfileSessionListener::initializeSession
-		virtual void initializeSession();
+        /// @see ProfileSessionListener::initializeSession
+        virtual void initializeSession();
 
-		/// @see ProfileSessionListener::finializeSession
-		virtual void finializeSession();
+        /// @see ProfileSessionListener::finializeSession
+        virtual void finializeSession();
 
-		/// @see ProfileSessionListener::displayResults
-		virtual void displayResults(const ProfileInstance& instance, ulong maxTotalFrameTime);
+        /// @see ProfileSessionListener::displayResults
+        virtual void displayResults(const ProfileInstance& instance, ulong maxTotalFrameTime);
 
-		/// @see ProfileSessionListener::changeEnableState
-		virtual void changeEnableState(bool enabled);
+        /// @see ProfileSessionListener::changeEnableState
+        virtual void changeEnableState(bool enabled);
 
-		/** Set the size of the profiler overlay, in pixels. */
-		void setOverlayDimensions(Real width, Real height);
+        /** Set the size of the profiler overlay, in pixels. */
+        void setOverlayDimensions(Real width, Real height);
 
-		/** Set the position of the profiler overlay, in pixels. */
-		void setOverlayPosition(Real left, Real top);
+        /** Set the position of the profiler overlay, in pixels. */
+        void setOverlayPosition(Real left, Real top);
 
-		Real getOverlayWidth() const;
-		Real getOverlayHeight() const;
-		Real getOverlayLeft() const;
-		Real getOverlayTop() const;
+        Real getOverlayWidth() const;
+        Real getOverlayHeight() const;
+        Real getOverlayLeft() const;
+        Real getOverlayTop() const;
 
-	private:
-		typedef list<OverlayElement*>::type ProfileBarList;
+    private:
+        typedef list<OverlayElement*>::type ProfileBarList;
 
-		/** Prints the profiling results of each frame 
-		@remarks Recursive, for all the little children. */
-		void displayResults(ProfileInstance* instance, ProfileBarList::const_iterator& bIter, Real& maxTimeMillisecs, Real& newGuiHeight, int& profileCount);
+        /** Prints the profiling results of each frame 
+        @remarks Recursive, for all the little children. */
+        void displayResults(ProfileInstance* instance, ProfileBarList::const_iterator& bIter, Real& maxTimeMillisecs, Real& newGuiHeight, int& profileCount);
 
-		/** An internal function to create the container which will hold our display elements*/
+        /** An internal function to create the container which will hold our display elements*/
         OverlayContainer* createContainer();
 
         /** An internal function to create a text area */
@@ -94,7 +94,7 @@ namespace Ogre  {
         /// Holds the display bars for each profile results
         ProfileBarList mProfileBars;
 
-		/// The overlay which contains our profiler results display
+        /// The overlay which contains our profiler results display
         Overlay* mOverlay;
 
         /// The window that displays the profiler results
@@ -109,13 +109,13 @@ namespace Ogre  {
         /// The width of the stats window
         Real mGuiWidth;
 
-		/// The horz position of the stats window
-		Real mGuiLeft;
+        /// The horz position of the stats window
+        Real mGuiLeft;
 
-		/// The vertical position of the stats window
-		Real mGuiTop;
+        /// The vertical position of the stats window
+        Real mGuiTop;
 
-		/// The size of the indent for each profile display bar
+        /// The size of the indent for each profile display bar
         Real mBarIndent;
 
         /// The width of the border between the profile window and each bar
@@ -124,11 +124,11 @@ namespace Ogre  {
         /// The width of the min, avg, and max lines in a profile display
         Real mBarLineWidth;
 
-		/// The distance between bars
-		Real mBarSpacing;
+        /// The distance between bars
+        Real mBarSpacing;
 
         /// The max number of profiles we can display
         uint mMaxDisplayProfiles;
-	};
+    };
 }
 #endif

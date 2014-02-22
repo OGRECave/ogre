@@ -101,22 +101,22 @@ namespace Ogre {
     {
         // Get beginning iterator
         for (StrategyMap::iterator it = mStrategies.begin(); it != mStrategies.end(); ++it)
-		{
-			OGRE_DELETE it->second;
-		}
-		mStrategies.clear();
+        {
+            OGRE_DELETE it->second;
+        }
+        mStrategies.clear();
     }
     //-----------------------------------------------------------------------
     LodStrategy *LodStrategyManager::getStrategy(const String& name)
     {
         // If name is "default", return the default strategy instead of performing a lookup
         if (name == "default") {
-			return getDefaultStrategy();
-		} else if (name == "Distance") {
-			return getStrategy("distance_box"); // Backward compatibility for loading old meshes.
-		} else if (name == "PixelCount") {
-			return getStrategy("pixel_count"); // Backward compatibility for loading old meshes.
-		}
+            return getDefaultStrategy();
+        } else if (name == "Distance") {
+            return getStrategy("distance_box"); // Backward compatibility for loading old meshes.
+        } else if (name == "PixelCount") {
+            return getStrategy("pixel_count"); // Backward compatibility for loading old meshes.
+        }
         // Find strategy with specified name
         StrategyMap::iterator it = mStrategies.find(name);
 

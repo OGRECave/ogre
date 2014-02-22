@@ -58,17 +58,17 @@
 #   ifdef INCLUDE_RTSHADER_SYSTEM
 #       include "ShaderSystem.h"
 #   endif
-#	include "DualQuaternion.h"
+#   include "DualQuaternion.h"
 #   include "DeferredShadingDemo.h"
 #   include "Instancing.h"
 #   include "NewInstancing.h"
 #   include "TextureArray.h"
 #   include "SSAO.h"
 #   include "OceanDemo.h"
-#	ifdef OGRE_BUILD_COMPONENT_VOLUME
-#		include "VolumeCSG.h"
-#		include "VolumeTerrain.h"
-#	endif
+#   ifdef OGRE_BUILD_COMPONENT_VOLUME
+#       include "VolumeCSG.h"
+#       include "VolumeTerrain.h"
+#   endif
 #   ifdef OGRE_BUILD_COMPONENT_TERRAIN
 #       include "EndlessWorld.h"
 #       include "Terrain.h"
@@ -86,8 +86,8 @@
 #   include "DynTex.h"
 #   include "FacialAnimation.h"
 #   include "Grass.h"
-#	include "Hair.h"
-#	include "Island.h"
+#   include "Hair.h"
+#   include "Island.h"
 #   include "Lighting.h"
 #   include "MeshLod.h"
 #   include "ParticleFX.h"
@@ -99,14 +99,14 @@
 #   include "SkyPlane.h"
 #   include "Smoke.h"
 #   include "SphereMapping.h"
-#	include "Tessellation.h"
-#	include "TerrainTessellation.h"
+#   include "Tessellation.h"
+#   include "TerrainTessellation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
 #    include "PlayPen.h"
 #    include "PlayPenTestPlugin.h"
-	PlayPenPlugin* playPenPlugin = 0;
+    PlayPenPlugin* playPenPlugin = 0;
     PlaypenTestPlugin* playPenTestPlugin = 0;
 #   endif
 #   ifdef INCLUDE_RTSHADER_SYSTEM
@@ -639,7 +639,7 @@ namespace OgreBites
 
                 bool all = selectedCategory == "All";
                 Ogre::StringVector sampleTitles;
-				Ogre::MaterialPtr templateMat = Ogre::MaterialManager::getSingleton().getByName("SdkTrays/SampleThumbnail");
+                Ogre::MaterialPtr templateMat = Ogre::MaterialManager::getSingleton().getByName("SdkTrays/SampleThumbnail");
 
                 // populate the sample menu and carousel with filtered samples
                 for (SampleSet::iterator i = mLoadedSamples.begin(); i != mLoadedSamples.end(); i++)
@@ -679,7 +679,7 @@ namespace OgreBites
                 mSampleMenu->setItems(sampleTitles);
                 if (mSampleMenu->getNumItems() != 0) itemSelected(mSampleMenu);
 
-				mSampleSlider->setRange(1, static_cast<Ogre::Real>(sampleTitles.size()), static_cast<Ogre::Real>(sampleTitles.size()));
+                mSampleSlider->setRange(1, static_cast<Ogre::Real>(sampleTitles.size()), static_cast<Ogre::Real>(sampleTitles.size()));
             }
             else if (menu == mSampleMenu)    // sample changed, so update slider, label and description
             {
@@ -715,10 +715,10 @@ namespace OgreBites
                     // if the current config value is not in the menu, add it
                     if(optionMenu->containsItem(it->second.currentValue) == false)
                     {
-						optionMenu->addItem(it->second.currentValue);
+                        optionMenu->addItem(it->second.currentValue);
                     }
 
-					optionMenu->selectItem(it->second.currentValue);
+                    optionMenu->selectItem(it->second.currentValue);
                 }
 
                 windowResized(mWindow);
@@ -1087,16 +1087,16 @@ namespace OgreBites
             mPluginNameMap["Sample_DynTex"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_DynTex();
             mPluginNameMap["Sample_FacialAnimation"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_FacialAnimation();
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
-			
+            
             mPluginNameMap["Sample_DualQuaternion"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_DualQuaternion();
             mPluginNameMap["Sample_Instancing"]                 = (OgreBites::SdkSample *) OGRE_NEW Sample_Instancing();
             mPluginNameMap["Sample_NewInstancing"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
-			mPluginNameMap["Sample_Tessellation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
+            mPluginNameMap["Sample_Tessellation"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
             mPluginNameMap["Sample_PNTriangles"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_PNTriangles();
-			mPluginNameMap["Sample_Hair"]				= (OgreBites::SdkSample *) OGRE_NEW Sample_Hair();
-			mPluginNameMap["Sample_Island"]				= (OgreBites::SdkSample *) OGRE_NEW Sample_Island();
-			mPluginNameMap["Sample_TerrainTessellation"]= (OgreBites::SdkSample *) OGRE_NEW Sample_TerrainTessellation();
+            mPluginNameMap["Sample_Hair"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_Hair();
+            mPluginNameMap["Sample_Island"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_Island();
+            mPluginNameMap["Sample_TerrainTessellation"]= (OgreBites::SdkSample *) OGRE_NEW Sample_TerrainTessellation();
 #                       if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
@@ -1112,7 +1112,7 @@ namespace OgreBites
             mPluginNameMap["Sample_SkyDome"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyDome();
             mPluginNameMap["Sample_SkyPlane"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyPlane();
             mPluginNameMap["Sample_SphereMapping"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_SphereMapping();
-			mPluginNameMap["Sample_Tessellation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
+            mPluginNameMap["Sample_Tessellation"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
 
@@ -1150,7 +1150,7 @@ namespace OgreBites
             if(Ogre::GpuProgramManager::getSingleton().canGetCompiledShaderBuffer())
                 Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
 #endif
-#if	ENABLE_SHADERS_CACHE_LOAD == 1
+#if ENABLE_SHADERS_CACHE_LOAD == 1
             // Load for a package version of the shaders.
             Ogre::String path = getShaderCacheFileName();
             FILE * inFile = NULL;
@@ -1191,7 +1191,7 @@ namespace OgreBites
             Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 
             // create template material for sample thumbnails
-			Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SdkTrays/SampleThumbnail", "Essential");
+            Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SdkTrays/SampleThumbnail", "Essential");
             thumbMat->getTechnique(0)->getPass(0)->createTextureUnitState();
 
             setupWidgets();
@@ -1313,7 +1313,7 @@ namespace OgreBites
 #ifdef INCLUDE_RTSHADER_SYSTEM
             // Initialize shader generator.
             // Must be before resource loading in order to allow parsing extended material attributes.
-			bool success = initialiseRTShaderSystem(sm);
+            bool success = initialiseRTShaderSystem(sm);
             if (!success)
             {
                 OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
@@ -1325,7 +1325,7 @@ namespace OgreBites
                 //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
                 // creates shaders for base material BaseWhite using the RTSS
-				Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+                Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
                 baseWhite->setLightingEnabled(false);
                 mShaderGenerator->createShaderBasedTechnique(
                     "BaseWhite",
@@ -1348,7 +1348,7 @@ namespace OgreBites
                     Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
                 mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
                                                    "BaseWhiteNoLighting");
-				Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+                Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
                 if(baseWhite->getNumTechniques() > 1)
                 {
                     baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
@@ -1395,10 +1395,10 @@ namespace OgreBites
             sampleList.push_back("Sample_Smoke");
             sampleList.push_back("Sample_Water");
             sampleList.push_back("Sample_PNTriangles");
-			sampleList.push_back("Sample_Tessellation");
-			sampleList.push_back("Sample_Hair");
-			sampleList.push_back("Sample_Island");
-			sampleList.push_back("Sample_TerrainTessellation");
+            sampleList.push_back("Sample_Tessellation");
+            sampleList.push_back("Sample_Hair");
+            sampleList.push_back("Sample_Island");
+            sampleList.push_back("Sample_TerrainTessellation");
             sampleList.push_back("Sample_Transparency");
             sampleList.push_back("Sample_TextureFX");
 #else
@@ -1782,8 +1782,8 @@ namespace OgreBites
             unloadSamples();
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-			// Destroy the RT Shader System.
-			destroyRTShaderSystem();
+            // Destroy the RT Shader System.
+            destroyRTShaderSystem();
 #endif // INCLUDE_RTSHADER_SYSTEM
 
         }
@@ -1827,7 +1827,7 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-		| Extend to unhide all of sample's temporarily hidden overlays.
+        | Extend to unhide all of sample's temporarily hidden overlays.
           -----------------------------------------------------------------------------*/
         virtual void unpauseCurrentSample()
         {
@@ -1842,7 +1842,7 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-		| Get the name of the RTSS shader cache file
+        | Get the name of the RTSS shader cache file
           -----------------------------------------------------------------------------*/
         virtual Ogre::String getShaderCacheFileName()
         {
@@ -1858,7 +1858,7 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
           | Initialize the RT Shader system.
           -----------------------------------------------------------------------------*/
-		virtual bool initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
+        virtual bool initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
         {
             if (Ogre::RTShader::ShaderGenerator::initialize())
             {
@@ -1924,9 +1924,9 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-		| Destroy the RT Shader system.
+        | Destroy the RT Shader system.
           -----------------------------------------------------------------------------*/
-		virtual void destroyRTShaderSystem()
+        virtual void destroyRTShaderSystem()
         {
             // Restore default scheme.
             Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
@@ -1939,10 +1939,10 @@ namespace OgreBites
                 mMaterialMgrListener = NULL;
             }
 
-			// Destroy RTShader system.
+            // Destroy RTShader system.
             if (mShaderGenerator != NULL)
             {
-				Ogre::RTShader::ShaderGenerator::destroy();
+                Ogre::RTShader::ShaderGenerator::destroy();
                 mShaderGenerator = NULL;
             }
         }

@@ -53,8 +53,8 @@ namespace Ogre
     }
     extern "C" void _OgreOctreeZonePluginExport dllStopPlugin( void )
     {
-	    Root::getSingleton().uninstallPlugin(OZPlugin);
-	    OGRE_DELETE OZPlugin;
+        Root::getSingleton().uninstallPlugin(OZPlugin);
+        OGRE_DELETE OZPlugin;
     }
 }
 

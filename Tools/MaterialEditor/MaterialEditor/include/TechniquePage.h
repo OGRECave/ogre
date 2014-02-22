@@ -42,38 +42,38 @@ class TechniqueController;
 class TechniquePage : public wxWizardPageSimple
 {
 public:
-	TechniquePage(wxWizard* parent);
-	TechniquePage(wxWizard* parent, Project* project);
-	TechniquePage(wxWizard* parent, Project* project, MaterialController* mc);
-	virtual ~TechniquePage();
+    TechniquePage(wxWizard* parent);
+    TechniquePage(wxWizard* parent, Project* project);
+    TechniquePage(wxWizard* parent, Project* project, MaterialController* mc);
+    virtual ~TechniquePage();
 
-	void getName(wxString& name) const;
+    void getName(wxString& name) const;
 
-	Project* getProject() const;
-	void setProject(Project* project);
+    Project* getProject() const;
+    void setProject(Project* project);
 
-	MaterialController* getMaterial() const;
-	void setMaterial(MaterialController* mc);
+    MaterialController* getMaterial() const;
+    void setMaterial(MaterialController* mc);
 
-	void populateMaterials(const MaterialControllerList* materials);
+    void populateMaterials(const MaterialControllerList* materials);
 
-	void OnProjectSelected(wxCommandEvent& event);
+    void OnProjectSelected(wxCommandEvent& event);
 
 protected:
-	void createPage();
+    void createPage();
 
-	wxBoxSizer* mSizer;
-	wxStaticText* mProjectLabel;
-	wxComboBox* mProjectComboBox;
-	wxStaticText* mMaterialLabel;
-	wxComboBox* mMaterialComboBox;
-	wxStaticText* mNameLabel;
-	wxTextCtrl* mNameText;
+    wxBoxSizer* mSizer;
+    wxStaticText* mProjectLabel;
+    wxComboBox* mProjectComboBox;
+    wxStaticText* mMaterialLabel;
+    wxComboBox* mMaterialComboBox;
+    wxStaticText* mNameLabel;
+    wxTextCtrl* mNameText;
 
-	Project* mProject;
-	MaterialController* mMaterial;
+    Project* mProject;
+    MaterialController* mMaterial;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _TECHNIQUEPAGE_H_

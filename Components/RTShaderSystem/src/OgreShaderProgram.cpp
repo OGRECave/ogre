@@ -33,212 +33,212 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 Program::Program(GpuProgramType type)
 {
-	mType				= type;
-	mEntryPointFunction = NULL;
-	mSkeletalAnimation	= false;
-	mColumnMajorMatrices = true;
+    mType               = type;
+    mEntryPointFunction = NULL;
+    mSkeletalAnimation  = false;
+    mColumnMajorMatrices = true;
 }
 
 //-----------------------------------------------------------------------------
 Program::~Program()
 {
-	destroyParameters();
+    destroyParameters();
 
-	destroyFunctions();
+    destroyFunctions();
 }
 
 //-----------------------------------------------------------------------------
 void Program::destroyParameters()
 {
-	mParameters.clear();
+    mParameters.clear();
 }
 
 //-----------------------------------------------------------------------------
 void Program::destroyFunctions()
 {
-	ShaderFunctionIterator it;
+    ShaderFunctionIterator it;
 
-	for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
-	{
+    for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
+    {
         OGRE_DELETE *it;
-	}
-	mFunctions.clear();
+    }
+    mFunctions.clear();
 }
 
 //-----------------------------------------------------------------------------
 GpuProgramType Program::getType() const
 {
-	return mType;
+    return mType;
 }
 
 //-----------------------------------------------------------------------------
 void Program::addParameter(UniformParameterPtr parameter)
 {
-	if (getParameterByName(parameter->getName()).get() != NULL)
-	{
-		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Parameter <" + parameter->getName() + "> already declared in program.", 
-			"Program::addParameter" );
-	}
+    if (getParameterByName(parameter->getName()).get() != NULL)
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+            "Parameter <" + parameter->getName() + "> already declared in program.", 
+            "Program::addParameter" );
+    }
 
-	mParameters.push_back(parameter);
+    mParameters.push_back(parameter);
 }
 
 //-----------------------------------------------------------------------------
 void Program::removeParameter(UniformParameterPtr parameter)
 {
-	UniformParameterIterator it;
+    UniformParameterIterator it;
 
-	for (it = mParameters.begin(); it != mParameters.end(); ++it)
-	{
-		if ((*it) == parameter)
-		{
-			(*it).setNull();
-			mParameters.erase(it);
+    for (it = mParameters.begin(); it != mParameters.end(); ++it)
+    {
+        if ((*it) == parameter)
+        {
+            (*it).setNull();
+            mParameters.erase(it);
             break;
-		}
-	}
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, 
-												Real data, size_t size)
+                                                Real data, size_t size)
 {
-	UniformParameterPtr param;
+    UniformParameterPtr param;
 
-	// Check if parameter already exists.
-	param = getParameterByAutoType(autoType);
-	if (param.get() != NULL)
-	{
-		if (param->isAutoConstantRealParameter() &&
-			param->getAutoConstantRealData() == data)
-		{
-			param->setSize(std::max(size, param->getSize()));
-			return param;
-		}
-	}
-	
-	// Create new parameter.
-	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
-	addParameter(param);
+    // Check if parameter already exists.
+    param = getParameterByAutoType(autoType);
+    if (param.get() != NULL)
+    {
+        if (param->isAutoConstantRealParameter() &&
+            param->getAutoConstantRealData() == data)
+        {
+            param->setSize(std::max(size, param->getSize()));
+            return param;
+        }
+    }
+    
+    // Create new parameter.
+    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
+    addParameter(param);
 
-	return param;
+    return param;
 }
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type,
-												Real data, size_t size)
+                                                Real data, size_t size)
 {
-	UniformParameterPtr param;
+    UniformParameterPtr param;
 
-	// Check if parameter already exists.
-	param = getParameterByAutoType(autoType);
-	if (param.get() != NULL)
-	{
-		if (param->isAutoConstantRealParameter() &&
-			param->getAutoConstantRealData() == data)
-		{
-			param->setSize(std::max(size, param->getSize()));
-			return param;
-		}
-	}
-	
-	// Create new parameter.
-	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
-	addParameter(param);
+    // Check if parameter already exists.
+    param = getParameterByAutoType(autoType);
+    if (param.get() != NULL)
+    {
+        if (param->isAutoConstantRealParameter() &&
+            param->getAutoConstantRealData() == data)
+        {
+            param->setSize(std::max(size, param->getSize()));
+            return param;
+        }
+    }
+    
+    // Create new parameter.
+    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
+    addParameter(param);
 
-	return param;
+    return param;
 }
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType,
-										   size_t data, size_t size)
+                                           size_t data, size_t size)
 {
-	UniformParameterPtr param;
+    UniformParameterPtr param;
 
-	// Check if parameter already exists.
-	param = getParameterByAutoType(autoType);
-	if (param.get() != NULL)
-	{
-		if (param->isAutoConstantIntParameter() &&
-			param->getAutoConstantIntData() == data)
-		{
-			param->setSize(std::max(size, param->getSize()));
-			return param;
-		}
-	}
+    // Check if parameter already exists.
+    param = getParameterByAutoType(autoType);
+    if (param.get() != NULL)
+    {
+        if (param->isAutoConstantIntParameter() &&
+            param->getAutoConstantIntData() == data)
+        {
+            param->setSize(std::max(size, param->getSize()));
+            return param;
+        }
+    }
 
-	// Create new parameter.
-	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
-	addParameter(param);
+    // Create new parameter.
+    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
+    addParameter(param);
 
-	return param;
+    return param;
 }
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, 
-										   size_t data, size_t size)
+                                           size_t data, size_t size)
 {
-	UniformParameterPtr param;
+    UniformParameterPtr param;
 
-	// Check if parameter already exists.
-	param = getParameterByAutoType(autoType);
-	if (param.get() != NULL)
-	{
-		if (param->isAutoConstantIntParameter() &&
-			param->getAutoConstantIntData() == data)
-		{
-			param->setSize(std::max(size, param->getSize()));
-			return param;
-		}
-	}
+    // Check if parameter already exists.
+    param = getParameterByAutoType(autoType);
+    if (param.get() != NULL)
+    {
+        if (param->isAutoConstantIntParameter() &&
+            param->getAutoConstantIntData() == data)
+        {
+            param->setSize(std::max(size, param->getSize()));
+            return param;
+        }
+    }
 
-	// Create new parameter.
-	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
-	addParameter(param);
+    // Create new parameter.
+    param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
+    addParameter(param);
 
-	return param;
+    return param;
 }
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::resolveParameter(GpuConstantType type, 
-									int index, uint16 variability,
-									const String& suggestedName,
-									size_t size)
+                                    int index, uint16 variability,
+                                    const String& suggestedName,
+                                    size_t size)
 {
-	UniformParameterPtr param;
+    UniformParameterPtr param;
 
-	if (index == -1)
-	{
-		index = 0;
+    if (index == -1)
+    {
+        index = 0;
 
-		// Find the next available index of the target type.
-		UniformParameterIterator it;
+        // Find the next available index of the target type.
+        UniformParameterIterator it;
 
-		for (it = mParameters.begin(); it != mParameters.end(); ++it)
-		{
-			if ((*it)->getType() == type &&
-				(*it)->isAutoConstantParameter() == false)
-			{
-				index++;
-			}
-		}
-	}
-	else
-	{
-		// Check if parameter already exists.
-		param = getParameterByType(type, index);
-		if (param.get() != NULL)
-		{		
-			return param;		
-		}
-	}
-	
-	// Create new parameter.
-	param = ParameterFactory::createUniform(type, index, variability, suggestedName, size);
-	addParameter(param);
+        for (it = mParameters.begin(); it != mParameters.end(); ++it)
+        {
+            if ((*it)->getType() == type &&
+                (*it)->isAutoConstantParameter() == false)
+            {
+                index++;
+            }
+        }
+    }
+    else
+    {
+        // Check if parameter already exists.
+        param = getParameterByType(type, index);
+        if (param.get() != NULL)
+        {       
+            return param;       
+        }
+    }
+    
+    // Create new parameter.
+    param = ParameterFactory::createUniform(type, index, variability, suggestedName, size);
+    addParameter(param);
 
-	return param;
+    return param;
 }
 
 
@@ -246,110 +246,110 @@ UniformParameterPtr Program::resolveParameter(GpuConstantType type,
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::getParameterByName(const String& name)
 {
-	UniformParameterIterator it;
+    UniformParameterIterator it;
 
-	for (it = mParameters.begin(); it != mParameters.end(); ++it)
-	{
-		if ((*it)->getName() == name)
-		{
-			return *it;
-		}
-	}
+    for (it = mParameters.begin(); it != mParameters.end(); ++it)
+    {
+        if ((*it)->getName() == name)
+        {
+            return *it;
+        }
+    }
 
-	return UniformParameterPtr();
+    return UniformParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::getParameterByType(GpuConstantType type, int index)
 {
-	UniformParameterIterator it;
+    UniformParameterIterator it;
 
-	for (it = mParameters.begin(); it != mParameters.end(); ++it)
-	{
-		if ((*it)->getType() == type &&
-			(*it)->getIndex() == index)
-		{
-			return *it;
-		}
-	}
+    for (it = mParameters.begin(); it != mParameters.end(); ++it)
+    {
+        if ((*it)->getType() == type &&
+            (*it)->getIndex() == index)
+        {
+            return *it;
+        }
+    }
 
-	return UniformParameterPtr();
+    return UniformParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
 UniformParameterPtr Program::getParameterByAutoType(GpuProgramParameters::AutoConstantType autoType)
 {
-	UniformParameterIterator it;
+    UniformParameterIterator it;
 
-	for (it = mParameters.begin(); it != mParameters.end(); ++it)
-	{
-		if ((*it)->isAutoConstantParameter() && (*it)->getAutoConstantType() == autoType)
-		{
-			return *it;
-		}
-	}
+    for (it = mParameters.begin(); it != mParameters.end(); ++it)
+    {
+        if ((*it)->isAutoConstantParameter() && (*it)->getAutoConstantType() == autoType)
+        {
+            return *it;
+        }
+    }
 
-	return UniformParameterPtr();
+    return UniformParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
 Function* Program::createFunction(const String& name, const String& desc, const Function::FunctionType functionType)
 {
-	Function* shaderFunction;
+    Function* shaderFunction;
 
-	shaderFunction = getFunctionByName(name);
-	if (shaderFunction != NULL)
-	{
-		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Function " + name + " already declared in program.", 
-			"Program::createFunction" );
-	}
+    shaderFunction = getFunctionByName(name);
+    if (shaderFunction != NULL)
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+            "Function " + name + " already declared in program.", 
+            "Program::createFunction" );
+    }
 
-	shaderFunction = OGRE_NEW Function(name, desc, functionType);
-	mFunctions.push_back(shaderFunction);
+    shaderFunction = OGRE_NEW Function(name, desc, functionType);
+    mFunctions.push_back(shaderFunction);
 
-	return shaderFunction;
+    return shaderFunction;
 }
 
 //-----------------------------------------------------------------------------
 Function* Program::getFunctionByName(const String& name)
 {
-	ShaderFunctionIterator it;
+    ShaderFunctionIterator it;
 
-	for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
-	{
-		if ((*it)->getName() == name)
-		{
-			return *it;
-		}
-	}
+    for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
+    {
+        if ((*it)->getName() == name)
+        {
+            return *it;
+        }
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //-----------------------------------------------------------------------------
 void Program::addDependency(const String& libFileName)
 {
-	for (unsigned int i=0; i < mDependencies.size(); ++i)
-	{
-		if (mDependencies[i] == libFileName)
-		{
-			return;
-		}
-	}
-	mDependencies.push_back(libFileName);
+    for (unsigned int i=0; i < mDependencies.size(); ++i)
+    {
+        if (mDependencies[i] == libFileName)
+        {
+            return;
+        }
+    }
+    mDependencies.push_back(libFileName);
 }
 
 //-----------------------------------------------------------------------------
 size_t Program::getDependencyCount() const
 {
-	return mDependencies.size();
+    return mDependencies.size();
 }
 
 //-----------------------------------------------------------------------------
 const String& Program::getDependency(unsigned int index) const
 {
-	return mDependencies[index];
+    return mDependencies[index];
 }
 
 }

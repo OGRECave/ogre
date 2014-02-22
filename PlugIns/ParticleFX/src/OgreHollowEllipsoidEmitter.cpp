@@ -92,7 +92,7 @@ namespace Ogre {
         // ellipsoid and the outer sphere (radius 1.0)
         // with alpha and beta we select on point on this random ellipsoid
         // and calculate the 3D coordinates of this point
-		Real sinbeta ( Math::Sin(beta) );
+        Real sinbeta ( Math::Sin(beta) );
         x = a * Math::Cos(alpha) * sinbeta;
         y = b * Math::Sin(alpha) * sinbeta;
         z = c * Math::Cos(beta);

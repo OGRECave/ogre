@@ -55,13 +55,13 @@ public:
 
         void requestOptions(Terrain* terrain);
 
-		bool isLightmapEnabled() const  { return mLightmapEnabled; }
-		/** Whether to support a light map over the terrain in the shader,
-		if it's present (default true). 
-		*/
-		void setLightmapEnabled(bool enabled);
+        bool isLightmapEnabled() const  { return mLightmapEnabled; }
+        /** Whether to support a light map over the terrain in the shader,
+        if it's present (default true). 
+        */
+        void setLightmapEnabled(bool enabled);
 
-		bool mLightmapEnabled;
+        bool mLightmapEnabled;
     };
 protected:         
     Ogre::String mMaterialName; 

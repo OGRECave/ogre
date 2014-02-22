@@ -33,17 +33,17 @@ THE SOFTWARE.
 #include "OgreBone.h"
 #include "OgreMatrix4.h"
 
-namespace Ogre	{
+namespace Ogre  {
 
 
-	
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Animation
-	*  @{
-	*/
-	/** A tagged point on a skeleton, which can be used to attach entities to on specific
+    
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Animation
+    *  @{
+    */
+    /** A tagged point on a skeleton, which can be used to attach entities to on specific
         other entities.
     @remarks
         A Skeleton, like a Mesh, is shared between Entity objects and simply updated as required
@@ -58,17 +58,17 @@ namespace Ogre	{
         the objects, which creates a new TagPoint on demand.
     */
     class _OgreExport TagPoint : public Bone
-	{
+    {
 
-	public:
-		TagPoint(unsigned short handle, Skeleton* creator);
-		virtual ~TagPoint();
+    public:
+        TagPoint(unsigned short handle, Skeleton* creator);
+        virtual ~TagPoint();
 
-		Entity *getParentEntity(void) const;
+        Entity *getParentEntity(void) const;
         MovableObject* getChildObject(void) const;
-		
-		void setParentEntity(Entity *pEntity);
-		void setChildObject(MovableObject *pObject);
+        
+        void setParentEntity(Entity *pEntity);
+        void setChildObject(MovableObject *pObject);
 
         /** Tells the TagPoint whether it should inherit orientation from it's parent entity.
         @param inherit If true, this TagPoint's orientation will be affected by
@@ -90,11 +90,11 @@ namespace Ogre	{
         */
         bool getInheritParentEntityScale(void) const;
 
-		/** Gets the transform of parent entity. */
-		const Matrix4& getParentEntityTransform(void) const;
+        /** Gets the transform of parent entity. */
+        const Matrix4& getParentEntityTransform(void) const;
 
         /** Gets the transform of this node just for the skeleton (not entity) */
-		const Matrix4& _getFullLocalTransform(void) const;
+        const Matrix4& _getFullLocalTransform(void) const;
 
         /** @copydoc Node::needUpdate */
         void needUpdate(bool forceParentUpdate = false);
@@ -106,16 +106,16 @@ namespace Ogre	{
 
 
 
-	private:
-		Entity *mParentEntity;
-		MovableObject *mChildObject;
+    private:
+        Entity *mParentEntity;
+        MovableObject *mChildObject;
         mutable Matrix4 mFullLocalTransform;
         bool mInheritParentEntityOrientation;
         bool mInheritParentEntityScale;
-	};
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } //namespace
 

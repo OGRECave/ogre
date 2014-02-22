@@ -43,18 +43,18 @@ typedef std::map<int, Delegate*> DelegateMap;
 class EventContainer
 {
 public:
-	EventContainer();
-	virtual ~EventContainer();
+    EventContainer();
+    virtual ~EventContainer();
 
-	void subscribe(int eventId, EventHandler handler);
-	void unsubscribe(int eventId, EventHandler handler);
-	
+    void subscribe(int eventId, EventHandler handler);
+    void unsubscribe(int eventId, EventHandler handler);
+    
 protected:
-	void registerEvent(int eventId);
-	void fireEvent(int eventId, EventArgs& args);
-	
+    void registerEvent(int eventId);
+    void fireEvent(int eventId, EventArgs& args);
+    
 private:
-	DelegateMap mDelegates;
+    DelegateMap mDelegates;
 };
 
 #endif // _EVENTCONTAINER_H_

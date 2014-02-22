@@ -71,17 +71,17 @@ namespace Ogre {
         void writeBoneParent(TiXmlElement* boneHierarchyNode, String boneName , String parentName);
         void writeAnimation(TiXmlElement* animsNode, const Animation* anim);
         void writeAnimationTrack(TiXmlElement* tracksNode, 
-			const NodeAnimationTrack* track);
+            const NodeAnimationTrack* track);
         void writeKeyFrame(TiXmlElement* keysNode, const TransformKeyFrame* key);
-		void writeSkeletonAnimationLink(TiXmlElement* linksNode, 
-			const LinkedSkeletonAnimationSource& link);
-		
-		void readBones(Skeleton* skel, TiXmlElement* mBonesNode);
-		void readBones2(Skeleton* skel, TiXmlElement* mBonesNode);
-		void createHierarchy(Skeleton* skel, TiXmlElement* mHierNode);
-		void readKeyFrames(NodeAnimationTrack* track, TiXmlElement* mKeyfNode);
-		void readAnimations(Skeleton* skel, TiXmlElement* mAnimNode) ;
-		void readSkeletonAnimationLinks(Skeleton* skel, TiXmlElement* linksNode);
+        void writeSkeletonAnimationLink(TiXmlElement* linksNode, 
+            const LinkedSkeletonAnimationSource& link);
+        
+        void readBones(Skeleton* skel, TiXmlElement* mBonesNode);
+        void readBones2(Skeleton* skel, TiXmlElement* mBonesNode);
+        void createHierarchy(Skeleton* skel, TiXmlElement* mHierNode);
+        void readKeyFrames(NodeAnimationTrack* track, TiXmlElement* mKeyfNode);
+        void readAnimations(Skeleton* skel, TiXmlElement* mAnimNode) ;
+        void readSkeletonAnimationLinks(Skeleton* skel, TiXmlElement* linksNode);
 
     };
 

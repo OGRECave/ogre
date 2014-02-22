@@ -32,40 +32,40 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//---------------------------------------------------------------------
-	const uint32 PageContentCollection::CHUNK_ID = StreamSerialiser::makeIdentifier("PGCC");
-	const uint16 PageContentCollection::CHUNK_VERSION = 1;
-	//---------------------------------------------------------------------
-	PageContentCollection::PageContentCollection(PageContentCollectionFactory* creator)
-		: mCreator(creator), mParent(0)
-	{
+    //---------------------------------------------------------------------
+    const uint32 PageContentCollection::CHUNK_ID = StreamSerialiser::makeIdentifier("PGCC");
+    const uint16 PageContentCollection::CHUNK_VERSION = 1;
+    //---------------------------------------------------------------------
+    PageContentCollection::PageContentCollection(PageContentCollectionFactory* creator)
+        : mCreator(creator), mParent(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	PageContentCollection::~PageContentCollection()
-	{
-		// don't call destroy(), we're not the final subclass
-	}
-	//---------------------------------------------------------------------
-	PageManager* PageContentCollection::getManager() const
-	{
-		return mParent->getManager();
-	}
-	//---------------------------------------------------------------------
-	const String& PageContentCollection::getType() const
-	{
-		return mCreator->getName();
-	}
-	//---------------------------------------------------------------------
-	void PageContentCollection::_notifyAttached(Page* parent)
-	{
-		mParent = parent;
-	}
-	//---------------------------------------------------------------------
-	SceneManager* PageContentCollection::getSceneManager() const
-	{
-		return mParent->getSceneManager();
-	}	
+    }
+    //---------------------------------------------------------------------
+    PageContentCollection::~PageContentCollection()
+    {
+        // don't call destroy(), we're not the final subclass
+    }
+    //---------------------------------------------------------------------
+    PageManager* PageContentCollection::getManager() const
+    {
+        return mParent->getManager();
+    }
+    //---------------------------------------------------------------------
+    const String& PageContentCollection::getType() const
+    {
+        return mCreator->getName();
+    }
+    //---------------------------------------------------------------------
+    void PageContentCollection::_notifyAttached(Page* parent)
+    {
+        mParent = parent;
+    }
+    //---------------------------------------------------------------------
+    SceneManager* PageContentCollection::getSceneManager() const
+    {
+        return mParent->getSceneManager();
+    }   
 
 
 }

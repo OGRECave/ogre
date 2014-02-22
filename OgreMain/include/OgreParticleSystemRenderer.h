@@ -37,13 +37,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
-	/** Abstract class defining the interface required to be implemented
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
+    /** Abstract class defining the interface required to be implemented
         by classes which provide rendering capability to ParticleSystem instances.
     */
     class _OgreExport ParticleSystemRenderer : public StringInterface, public FXAlloc
@@ -55,9 +55,9 @@ namespace Ogre {
         virtual ~ParticleSystemRenderer() {}
 
         /** Gets the type of this renderer - must be implemented by subclasses */
-		virtual const String& getType(void) const = 0;
+        virtual const String& getType(void) const = 0;
 
-		/** Delegated to by ParticleSystem::_updateRenderQueue
+        /** Delegated to by ParticleSystem::_updateRenderQueue
         @remarks
             The subclass must update the render queue using whichever Renderable
             instance(s) it wishes.
@@ -87,45 +87,45 @@ namespace Ogre {
         virtual void _notifyParticleMoved(list<Particle*>::type& currentParticles) {}
         /** Optional callback notified when particles cleared */
         virtual void _notifyParticleCleared(list<Particle*>::type& currentParticles) {}
-		/** Create a new ParticleVisualData instance for attachment to a particle.
-		@remarks
-			If this renderer needs additional data in each particle, then this should
-			be held in an instance of a subclass of ParticleVisualData, and this method
-			should be overridden to return a new instance of it. The default
-			behaviour is to return null.
-		*/
-		virtual ParticleVisualData* _createVisualData(void) { return 0; }
-		/** Destroy a ParticleVisualData instance.
-		@remarks
-			If this renderer needs additional data in each particle, then this should
-			be held in an instance of a subclass of ParticleVisualData, and this method
-			should be overridden to destroy an instance of it. The default
-			behaviour is to do nothing.
-		*/
-		virtual void _destroyVisualData(ParticleVisualData* vis) { assert (vis == 0); }
+        /** Create a new ParticleVisualData instance for attachment to a particle.
+        @remarks
+            If this renderer needs additional data in each particle, then this should
+            be held in an instance of a subclass of ParticleVisualData, and this method
+            should be overridden to return a new instance of it. The default
+            behaviour is to return null.
+        */
+        virtual ParticleVisualData* _createVisualData(void) { return 0; }
+        /** Destroy a ParticleVisualData instance.
+        @remarks
+            If this renderer needs additional data in each particle, then this should
+            be held in an instance of a subclass of ParticleVisualData, and this method
+            should be overridden to destroy an instance of it. The default
+            behaviour is to do nothing.
+        */
+        virtual void _destroyVisualData(ParticleVisualData* vis) { assert (vis == 0); }
 
-		/** Sets which render queue group this renderer should target with it's
-			output.
-		*/
-		virtual void setRenderQueueGroup(uint8 queueID) = 0;
-		/** Sets which render queue group and priority this renderer should target with it's
-			output.
-		*/
-		virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority) = 0;
+        /** Sets which render queue group this renderer should target with it's
+            output.
+        */
+        virtual void setRenderQueueGroup(uint8 queueID) = 0;
+        /** Sets which render queue group and priority this renderer should target with it's
+            output.
+        */
+        virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority) = 0;
 
-		/** Setting carried over from ParticleSystem.
-		*/
-		virtual void setKeepParticlesInLocalSpace(bool keepLocal) = 0;
+        /** Setting carried over from ParticleSystem.
+        */
+        virtual void setKeepParticlesInLocalSpace(bool keepLocal) = 0;
 
         /** Gets the desired particles sort mode of this renderer */
         virtual SortMode _getSortMode(void) const = 0;
 
-		/** Required method to allow the renderer to communicate the Renderables
-			it will be using to render the system to a visitor.
-		@see MovableObject::visitRenderables
-		*/
-		virtual void visitRenderables(Renderable::Visitor* visitor, 
-			bool debugRenderables = false) = 0;
+        /** Required method to allow the renderer to communicate the Renderables
+            it will be using to render the system to a visitor.
+        @see MovableObject::visitRenderables
+        */
+        virtual void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false) = 0;
 
     };
 
@@ -135,8 +135,8 @@ namespace Ogre {
     public:
         // No methods, must just override all methods inherited from FactoryObj
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

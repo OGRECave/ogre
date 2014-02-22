@@ -35,19 +35,19 @@ THE SOFTWARE
 class PassWizard : public wxWizard
 {
 public:
-	PassWizard();
-	virtual ~PassWizard();
+    PassWizard();
+    virtual ~PassWizard();
 
-	bool Create(wxWindow* parent, int id = -1, const wxString& title = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap, const wxPoint& pos = wxDefaultPosition, long style = wxDEFAULT_DIALOG_STYLE);
+    bool Create(wxWindow* parent, int id = -1, const wxString& title = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap, const wxPoint& pos = wxDefaultPosition, long style = wxDEFAULT_DIALOG_STYLE);
 
-	PassPage* getPassPage() const;
+    PassPage* getPassPage() const;
 
-	void OnFinish(wxWizardEvent& event);
+    void OnFinish(wxWizardEvent& event);
 
 protected:
-	PassPage* mPassPage;
+    PassPage* mPassPage;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _PASSWIZARD_H_

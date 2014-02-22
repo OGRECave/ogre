@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-	D3D9VertexDeclaration::D3D9VertexDeclaration() : mLastUsedGlobalDeclaration(0), mUsedGlobalDeclaration(false)
+    D3D9VertexDeclaration::D3D9VertexDeclaration() : mLastUsedGlobalDeclaration(0), mUsedGlobalDeclaration(false)
     {
 
     }
@@ -65,79 +65,79 @@ namespace Ogre {
         VertexDeclaration::removeElement(elem_index);
         releaseDeclaration();   
     }
-	//-----------------------------------------------------------------------
-	void D3D9VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
-	{
-		VertexDeclaration::removeElement(semantic, index);
-		releaseDeclaration();   
-	}
-	//-----------------------------------------------------------------------
-	void D3D9VertexDeclaration::removeAllElements(void)
-	{
-		VertexDeclaration::removeAllElements();
-		releaseDeclaration();   
-	}
+    //-----------------------------------------------------------------------
+    void D3D9VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
+    {
+        VertexDeclaration::removeElement(semantic, index);
+        releaseDeclaration();   
+    }
+    //-----------------------------------------------------------------------
+    void D3D9VertexDeclaration::removeAllElements(void)
+    {
+        VertexDeclaration::removeAllElements();
+        releaseDeclaration();   
+    }
     //-----------------------------------------------------------------------
     void D3D9VertexDeclaration::modifyElement(unsigned short elem_index, 
         unsigned short source, size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
     {
         VertexDeclaration::modifyElement(elem_index, source, offset, theType, semantic, index);
-		releaseDeclaration();       
+        releaseDeclaration();       
     }
 
-	 //-----------------------------------------------------------------------
-	void D3D9VertexDeclaration::notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device)
-	{
-		
-	}
+     //-----------------------------------------------------------------------
+    void D3D9VertexDeclaration::notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device)
+    {
+        
+    }
 
-	 //-----------------------------------------------------------------------
-	void D3D9VertexDeclaration::notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device)
-	{
-		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+     //-----------------------------------------------------------------------
+    void D3D9VertexDeclaration::notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device)
+    {
+        D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
-		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(d3d9Device);
+        DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(d3d9Device);
 
-		if (it != mMapDeviceToDeclaration.end())	
-		{
-			SAFE_RELEASE(it->second);	
-			mMapDeviceToDeclaration.erase(it);
-		}
-	}
+        if (it != mMapDeviceToDeclaration.end())    
+        {
+            SAFE_RELEASE(it->second);   
+            mMapDeviceToDeclaration.erase(it);
+        }
+    }
 
     //-----------------------------------------------------------------------
     IDirect3DVertexDeclaration9* D3D9VertexDeclaration::getD3DVertexDeclaration(
             VertexDeclaration * globalDeclaration, bool useGlobalInstancingVertexBufferIsAvailable)
     {
-		if (mLastUsedGlobalDeclaration != globalDeclaration ||
+        if (mLastUsedGlobalDeclaration != globalDeclaration ||
             useGlobalInstancingVertexBufferIsAvailable != mUsedGlobalDeclaration )
-		{
-			releaseDeclaration();
-			mLastUsedGlobalDeclaration = globalDeclaration;
+        {
+            releaseDeclaration();
+            mLastUsedGlobalDeclaration = globalDeclaration;
             mUsedGlobalDeclaration = useGlobalInstancingVertexBufferIsAvailable;
-		}
+        }
 
-		IDirect3DDevice9* pCurDevice   = D3D9RenderSystem::getActiveD3D9Device();
-		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(pCurDevice);
-		IDirect3DVertexDeclaration9* lpVertDecl = NULL;
+        IDirect3DDevice9* pCurDevice   = D3D9RenderSystem::getActiveD3D9Device();
+        DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(pCurDevice);
+        IDirect3DVertexDeclaration9* lpVertDecl = NULL;
 
-		// Case we have to create the declaration for this device.
-		if (it == mMapDeviceToDeclaration.end() || it->second == NULL)
-		{
+        // Case we have to create the declaration for this device.
+        if (it == mMapDeviceToDeclaration.end() || it->second == NULL)
+        {
             size_t d3delemsSize = mElementList.size() + 1;
             if(mLastUsedGlobalDeclaration != NULL && mUsedGlobalDeclaration )
             {
                 d3delemsSize += globalDeclaration->getElementCount(); 
             }
-			D3DVERTEXELEMENT9* d3delems = OGRE_ALLOC_T(D3DVERTEXELEMENT9, d3delemsSize, MEMCATEGORY_RENDERSYS);
+            D3DVERTEXELEMENT9* d3delems = OGRE_ALLOC_T(D3DVERTEXELEMENT9, d3delemsSize, MEMCATEGORY_RENDERSYS);
 
-			VertexElementList::const_iterator i, iend;
-			unsigned int idx;
+            VertexElementList::const_iterator i, iend;
+            unsigned int idx;
             size_t maxSource = 0;
-			iend = mElementList.end();
-			for (idx = 0, i = mElementList.begin(); i != iend; ++i, ++idx)
-			{
+            iend = mElementList.end();
+            for (idx = 0, i = mElementList.begin(); i != iend; ++i, ++idx)
+            {
                 const VertexElement & element = *i;
                 D3DVERTEXELEMENT9 & dxElement = d3delems[idx];
                 convertElement(element, dxElement);
@@ -145,67 +145,67 @@ namespace Ogre {
                 {
                     maxSource = element.getSource();
                 }
-			}
+            }
 
             if(mLastUsedGlobalDeclaration != NULL && mUsedGlobalDeclaration )
             {
                 iend = globalDeclaration->getElements().end();
-			    for (i = globalDeclaration->getElements().begin(); i != iend; ++i, ++idx)
-			    {
+                for (i = globalDeclaration->getElements().begin(); i != iend; ++i, ++idx)
+                {
                     const VertexElement & element = *i;
                     D3DVERTEXELEMENT9 & dxElement = d3delems[idx];
                     convertElement(element, dxElement);
                     dxElement.Stream = maxSource + 1;
-			    }                
+                }                
             }
 
 
-			// Add terminator
-			d3delems[idx].Stream = 0xff;
-			d3delems[idx].Offset = 0;
-			d3delems[idx].Type = D3DDECLTYPE_UNUSED;
-			d3delems[idx].Method = 0;
-			d3delems[idx].Usage = 0;
-			d3delems[idx].UsageIndex = 0;
+            // Add terminator
+            d3delems[idx].Stream = 0xff;
+            d3delems[idx].Offset = 0;
+            d3delems[idx].Type = D3DDECLTYPE_UNUSED;
+            d3delems[idx].Method = 0;
+            d3delems[idx].Usage = 0;
+            d3delems[idx].UsageIndex = 0;
 
-			
-			HRESULT hr = pCurDevice->CreateVertexDeclaration(d3delems, &lpVertDecl);
+            
+            HRESULT hr = pCurDevice->CreateVertexDeclaration(d3delems, &lpVertDecl);
 
-			if (FAILED(hr))
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Cannot create D3D9 vertex declaration: " + 
-					Root::getSingleton().getErrorDescription(hr), 
-					"Direct3D9VertexDeclaration::getD3DVertexDeclaration");
-			}
+            if (FAILED(hr))
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                    "Cannot create D3D9 vertex declaration: " + 
+                    Root::getSingleton().getErrorDescription(hr), 
+                    "Direct3D9VertexDeclaration::getD3DVertexDeclaration");
+            }
 
-			OGRE_FREE(d3delems, MEMCATEGORY_RENDERSYS);
+            OGRE_FREE(d3delems, MEMCATEGORY_RENDERSYS);
 
-			mMapDeviceToDeclaration[pCurDevice] = lpVertDecl;
-		}
+            mMapDeviceToDeclaration[pCurDevice] = lpVertDecl;
+        }
 
-		// Declaration already exits.
-		else
-		{
-			lpVertDecl = mMapDeviceToDeclaration[pCurDevice];
-		}
-		
+        // Declaration already exits.
+        else
+        {
+            lpVertDecl = mMapDeviceToDeclaration[pCurDevice];
+        }
+        
         return lpVertDecl;
     }
     //-----------------------------------------------------------------------
-	void D3D9VertexDeclaration::releaseDeclaration()
-	{
-		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+    void D3D9VertexDeclaration::releaseDeclaration()
+    {
+        D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
-		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.begin();
+        DeviceToDeclarationIterator it = mMapDeviceToDeclaration.begin();
 
-		while (it != mMapDeviceToDeclaration.end())
-		{
-			SAFE_RELEASE(it->second);
-			++it;
-		}	
-		mMapDeviceToDeclaration.clear();
-	}
+        while (it != mMapDeviceToDeclaration.end())
+        {
+            SAFE_RELEASE(it->second);
+            ++it;
+        }   
+        mMapDeviceToDeclaration.clear();
+    }
     //-----------------------------------------------------------------------
     void D3D9VertexDeclaration::convertElement( const VertexElement & element, D3DVERTEXELEMENT9 & dxElement )
     {
@@ -229,7 +229,7 @@ namespace Ogre {
             dxElement.UsageIndex = static_cast<BYTE>(element.getIndex());
         }
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
 
 
 }

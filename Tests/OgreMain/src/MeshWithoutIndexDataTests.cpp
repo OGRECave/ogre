@@ -47,26 +47,26 @@ void MeshWithoutIndexDataTests::setUp()
     if(LogManager::getSingletonPtr() == 0)
         mLogManager = OGRE_NEW LogManager();
 
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
+    LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
     LogManager::getSingleton().setLogDetail(LL_LOW);
-	OGRE_NEW ResourceGroupManager();
-	OGRE_NEW LodStrategyManager();
+    OGRE_NEW ResourceGroupManager();
+    OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
     mMeshMgr = OGRE_NEW MeshManager();
     archiveMgr = OGRE_NEW ArchiveManager();
     archiveMgr->addArchiveFactory(OGRE_NEW FileSystemArchiveFactory());
 
-	MaterialManager* matMgr = OGRE_NEW MaterialManager();
-	matMgr->initialise();
+    MaterialManager* matMgr = OGRE_NEW MaterialManager();
+    matMgr->initialise();
 }
 void MeshWithoutIndexDataTests::tearDown()
 {
     OGRE_DELETE mMeshMgr;
     OGRE_DELETE mBufMgr;
     OGRE_DELETE archiveMgr;
-	OGRE_DELETE MaterialManager::getSingletonPtr();
-	OGRE_DELETE LodStrategyManager::getSingletonPtr();
-	OGRE_DELETE ResourceGroupManager::getSingletonPtr();
+    OGRE_DELETE MaterialManager::getSingletonPtr();
+    OGRE_DELETE LodStrategyManager::getSingletonPtr();
+    OGRE_DELETE ResourceGroupManager::getSingletonPtr();
     OGRE_DELETE mLogManager;
 }
 
@@ -454,7 +454,7 @@ void MeshWithoutIndexDataTests::testBuildTangentVectors()
     }
     catch (const InvalidParametersException&)
     {
-    	// ok
+        // ok
     }
     
     mMeshMgr->remove( fileName );
@@ -467,8 +467,8 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
-	LodConfig lodConfig(mesh);
-	lodConfig.createGeneratedLodLevel(600, 2, LodLevel::VRM_CONSTANT);
+    LodConfig lodConfig(mesh);
+    lodConfig.createGeneratedLodLevel(600, 2, LodLevel::VRM_CONSTANT);
     MeshLodGenerator().generateLodLevels(lodConfig);
     // It may be less then 2, when two levels have the same vertex count it will be optimized out and lodLevel.outSkipped=true
     CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
@@ -479,7 +479,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
         {
             if (subMesh->indexData->indexCount > 0)
             {
-				// This may not be true for all meshes, but in this test we don't have reduced to 0.
+                // This may not be true for all meshes, but in this test we don't have reduced to 0.
                 CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount > 0);
             }
             else

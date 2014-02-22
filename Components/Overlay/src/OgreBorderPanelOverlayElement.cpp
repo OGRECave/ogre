@@ -83,92 +83,92 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::initialise(void)
     {
-		bool init = !mInitialised;
+        bool init = !mInitialised;
 
         PanelOverlayElement::initialise();
 
         // superclass will handle the interior panel area 
 
         if (init)
-		{
-			// Setup render op in advance
-			mRenderOp2.vertexData = OGRE_NEW VertexData();
-			mRenderOp2.vertexData->vertexCount = 4 * 8; // 8 cells, can't necessarily share vertices cos
-														// texcoords may differ
-			mRenderOp2.vertexData->vertexStart = 0;
+        {
+            // Setup render op in advance
+            mRenderOp2.vertexData = OGRE_NEW VertexData();
+            mRenderOp2.vertexData->vertexCount = 4 * 8; // 8 cells, can't necessarily share vertices cos
+                                                        // texcoords may differ
+            mRenderOp2.vertexData->vertexStart = 0;
 
-			// Vertex declaration
-			VertexDeclaration* decl = mRenderOp2.vertexData->vertexDeclaration;
-			// Position and texture coords each have their own buffers to allow
-			// each to be edited separately with the discard flag
-			decl->addElement(POSITION_BINDING, 0, VET_FLOAT3, VES_POSITION);
-			decl->addElement(TEXCOORD_BINDING, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
+            // Vertex declaration
+            VertexDeclaration* decl = mRenderOp2.vertexData->vertexDeclaration;
+            // Position and texture coords each have their own buffers to allow
+            // each to be edited separately with the discard flag
+            decl->addElement(POSITION_BINDING, 0, VET_FLOAT3, VES_POSITION);
+            decl->addElement(TEXCOORD_BINDING, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
 
-			// Vertex buffer #1, position
-			HardwareVertexBufferSharedPtr vbuf = HardwareBufferManager::getSingleton()
-				.createVertexBuffer(
-					decl->getVertexSize(POSITION_BINDING), 
-					mRenderOp2.vertexData->vertexCount,
-					HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-			// bind position
-			VertexBufferBinding* binding = mRenderOp2.vertexData->vertexBufferBinding;
-			binding->setBinding(POSITION_BINDING, vbuf);
+            // Vertex buffer #1, position
+            HardwareVertexBufferSharedPtr vbuf = HardwareBufferManager::getSingleton()
+                .createVertexBuffer(
+                    decl->getVertexSize(POSITION_BINDING), 
+                    mRenderOp2.vertexData->vertexCount,
+                    HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+            // bind position
+            VertexBufferBinding* binding = mRenderOp2.vertexData->vertexBufferBinding;
+            binding->setBinding(POSITION_BINDING, vbuf);
 
-			// Vertex buffer #2, texcoords
-			vbuf = HardwareBufferManager::getSingleton()
-				.createVertexBuffer(
-					decl->getVertexSize(TEXCOORD_BINDING), 
-					mRenderOp2.vertexData->vertexCount,
-					HardwareBuffer::HBU_STATIC_WRITE_ONLY, true);
-			// bind texcoord
-			binding->setBinding(TEXCOORD_BINDING, vbuf);
+            // Vertex buffer #2, texcoords
+            vbuf = HardwareBufferManager::getSingleton()
+                .createVertexBuffer(
+                    decl->getVertexSize(TEXCOORD_BINDING), 
+                    mRenderOp2.vertexData->vertexCount,
+                    HardwareBuffer::HBU_STATIC_WRITE_ONLY, true);
+            // bind texcoord
+            binding->setBinding(TEXCOORD_BINDING, vbuf);
 
-			mRenderOp2.operationType = RenderOperation::OT_TRIANGLE_LIST;
-			mRenderOp2.useIndexes = true;
-			// Index data
-			mRenderOp2.indexData = OGRE_NEW IndexData();
-			mRenderOp2.indexData->indexCount = 8 * 6;
-			mRenderOp2.indexData->indexStart = 0;
+            mRenderOp2.operationType = RenderOperation::OT_TRIANGLE_LIST;
+            mRenderOp2.useIndexes = true;
+            // Index data
+            mRenderOp2.indexData = OGRE_NEW IndexData();
+            mRenderOp2.indexData->indexCount = 8 * 6;
+            mRenderOp2.indexData->indexStart = 0;
             mRenderOp2.useGlobalInstancingVertexBufferIsAvailable = false;
 
-			/* Each cell is
-				0-----2
-				|    /|
-				|  /  |
-				|/    |
-				1-----3
-			*/
-			mRenderOp2.indexData->indexBuffer = HardwareBufferManager::getSingleton().
-				createIndexBuffer(
-					HardwareIndexBuffer::IT_16BIT, 
-					mRenderOp2.indexData->indexCount, 
-					HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+            /* Each cell is
+                0-----2
+                |    /|
+                |  /  |
+                |/    |
+                1-----3
+            */
+            mRenderOp2.indexData->indexBuffer = HardwareBufferManager::getSingleton().
+                createIndexBuffer(
+                    HardwareIndexBuffer::IT_16BIT, 
+                    mRenderOp2.indexData->indexCount, 
+                    HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 
-			ushort* pIdx = static_cast<ushort*>(
-				mRenderOp2.indexData->indexBuffer->lock(
-					0, 
-					mRenderOp2.indexData->indexBuffer->getSizeInBytes(), 
-					HardwareBuffer::HBL_DISCARD) );
+            ushort* pIdx = static_cast<ushort*>(
+                mRenderOp2.indexData->indexBuffer->lock(
+                    0, 
+                    mRenderOp2.indexData->indexBuffer->getSizeInBytes(), 
+                    HardwareBuffer::HBL_DISCARD) );
 
-			for (ushort cell = 0; cell < 8; ++cell)
-			{
-				ushort base = cell * 4;
-				*pIdx++ = base;
-				*pIdx++ = base + 1;
-				*pIdx++ = base + 2;
+            for (ushort cell = 0; cell < 8; ++cell)
+            {
+                ushort base = cell * 4;
+                *pIdx++ = base;
+                *pIdx++ = base + 1;
+                *pIdx++ = base + 2;
 
-				*pIdx++ = base + 2;
-				*pIdx++ = base + 1;
-				*pIdx++ = base + 3;
-			}
+                *pIdx++ = base + 2;
+                *pIdx++ = base + 1;
+                *pIdx++ = base + 3;
+            }
 
-			mRenderOp2.indexData->indexBuffer->unlock();
+            mRenderOp2.indexData->indexBuffer->unlock();
 
-			// Create sub-object for rendering border
-			mBorderRenderable = OGRE_NEW BorderRenderable(this);
+            // Create sub-object for rendering border
+            mBorderRenderable = OGRE_NEW BorderRenderable(this);
 
-			mInitialised = true;
-		}
+            mInitialised = true;
+        }
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::addBaseParameters(void)
@@ -283,157 +283,157 @@ namespace Ogre {
     {
         if (mMetricsMode == GMM_PIXELS)
         {
-			return mPixelLeftBorderSize;
-		}
-		else
-		{
-			return mLeftBorderSize;
-		}
+            return mPixelLeftBorderSize;
+        }
+        else
+        {
+            return mLeftBorderSize;
+        }
     }
     //---------------------------------------------------------------------
     Real BorderPanelOverlayElement::getRightBorderSize(void) const
     {
         if (mMetricsMode == GMM_PIXELS)
         {
-			return mPixelRightBorderSize;
-		}
-		else
-		{
-			return mRightBorderSize;
-		}
+            return mPixelRightBorderSize;
+        }
+        else
+        {
+            return mRightBorderSize;
+        }
     }
     //---------------------------------------------------------------------
     Real BorderPanelOverlayElement::getTopBorderSize(void) const
     {
         if (mMetricsMode == GMM_PIXELS)
         {
-			return mPixelTopBorderSize;
-		}
-		else
-		{
-			return mTopBorderSize;
-		}
+            return mPixelTopBorderSize;
+        }
+        else
+        {
+            return mTopBorderSize;
+        }
     }
     //---------------------------------------------------------------------
     Real BorderPanelOverlayElement::getBottomBorderSize(void) const
     {
         if (mMetricsMode == GMM_PIXELS)
         {
-			return mPixelBottomBorderSize;
-		}
-		else
-		{
-			return mBottomBorderSize;
-		}
+            return mPixelBottomBorderSize;
+        }
+        else
+        {
+            return mBottomBorderSize;
+        }
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::updateTextureGeometry()
     {
-		PanelOverlayElement::updateTextureGeometry();
-		/* Each cell is
-			0-----2
-			|    /|
-			|  /  |
-			|/    |
-			1-----3
-		*/
-		// No choice but to lock / unlock each time here, but lock only small sections
-	    
-		HardwareVertexBufferSharedPtr vbuf = 
-			mRenderOp2.vertexData->vertexBufferBinding->getBuffer(TEXCOORD_BINDING);
-		// Can't use discard since this discards whole buffer
-		float* pUV = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
-		
-		for (uint i = 0; i < 8; ++i)
-		{
-			*pUV++ = mBorderUV[i].u1; *pUV++ = mBorderUV[i].v1;
-			*pUV++ = mBorderUV[i].u1; *pUV++ = mBorderUV[i].v2;
-			*pUV++ = mBorderUV[i].u2; *pUV++ = mBorderUV[i].v1;
-			*pUV++ = mBorderUV[i].u2; *pUV++ = mBorderUV[i].v2;
-		}
+        PanelOverlayElement::updateTextureGeometry();
+        /* Each cell is
+            0-----2
+            |    /|
+            |  /  |
+            |/    |
+            1-----3
+        */
+        // No choice but to lock / unlock each time here, but lock only small sections
+        
+        HardwareVertexBufferSharedPtr vbuf = 
+            mRenderOp2.vertexData->vertexBufferBinding->getBuffer(TEXCOORD_BINDING);
+        // Can't use discard since this discards whole buffer
+        float* pUV = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+        
+        for (uint i = 0; i < 8; ++i)
+        {
+            *pUV++ = mBorderUV[i].u1; *pUV++ = mBorderUV[i].v1;
+            *pUV++ = mBorderUV[i].u1; *pUV++ = mBorderUV[i].v2;
+            *pUV++ = mBorderUV[i].u2; *pUV++ = mBorderUV[i].v1;
+            *pUV++ = mBorderUV[i].u2; *pUV++ = mBorderUV[i].v2;
+        }
 
-		vbuf->unlock();
+        vbuf->unlock();
     }
     //---------------------------------------------------------------------
     String BorderPanelOverlayElement::getCellUVString(BorderCellIndex idx) const
     {
         String ret = StringConverter::toString(mBorderUV[idx].u1) + " " +
-		            StringConverter::toString(mBorderUV[idx].v1) + " " +
-		            StringConverter::toString(mBorderUV[idx].u2) + " " +
-		            StringConverter::toString(mBorderUV[idx].v2);
+                    StringConverter::toString(mBorderUV[idx].v1) + " " +
+                    StringConverter::toString(mBorderUV[idx].u2) + " " +
+                    StringConverter::toString(mBorderUV[idx].v2);
         return ret;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::setLeftBorderUV(Real u1, Real v1, Real u2, Real v2)
     {
-		mBorderUV[BCELL_LEFT].u1 = u1; 
-		mBorderUV[BCELL_LEFT].u2 = u2; 
-		mBorderUV[BCELL_LEFT].v1 = v1; 
-		mBorderUV[BCELL_LEFT].v2 = v2; 
-		mGeomUVsOutOfDate = true;
+        mBorderUV[BCELL_LEFT].u1 = u1; 
+        mBorderUV[BCELL_LEFT].u2 = u2; 
+        mBorderUV[BCELL_LEFT].v1 = v1; 
+        mBorderUV[BCELL_LEFT].v2 = v2; 
+        mGeomUVsOutOfDate = true;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::setRightBorderUV(Real u1, Real v1, Real u2, Real v2)
     {
-		mBorderUV[BCELL_RIGHT].u1 = u1; 
-		mBorderUV[BCELL_RIGHT].u2 = u2; 
-		mBorderUV[BCELL_RIGHT].v1 = v1; 
-		mBorderUV[BCELL_RIGHT].v2 = v2; 
-		mGeomUVsOutOfDate = true;
+        mBorderUV[BCELL_RIGHT].u1 = u1; 
+        mBorderUV[BCELL_RIGHT].u2 = u2; 
+        mBorderUV[BCELL_RIGHT].v1 = v1; 
+        mBorderUV[BCELL_RIGHT].v2 = v2; 
+        mGeomUVsOutOfDate = true;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::setTopBorderUV(Real u1, Real v1, Real u2, Real v2)
     {
-		mBorderUV[BCELL_TOP].u1 = u1; 
-		mBorderUV[BCELL_TOP].u2 = u2; 
-		mBorderUV[BCELL_TOP].v1 = v1; 
-		mBorderUV[BCELL_TOP].v2 = v2; 
-		mGeomUVsOutOfDate = true;
+        mBorderUV[BCELL_TOP].u1 = u1; 
+        mBorderUV[BCELL_TOP].u2 = u2; 
+        mBorderUV[BCELL_TOP].v1 = v1; 
+        mBorderUV[BCELL_TOP].v2 = v2; 
+        mGeomUVsOutOfDate = true;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::setBottomBorderUV(Real u1, Real v1, Real u2, Real v2)
     {
-		mBorderUV[BCELL_BOTTOM].u1 = u1; 
-		mBorderUV[BCELL_BOTTOM].u2 = u2; 
-		mBorderUV[BCELL_BOTTOM].v1 = v1; 
-		mBorderUV[BCELL_BOTTOM].v2 = v2; 
-		mGeomUVsOutOfDate = true;
+        mBorderUV[BCELL_BOTTOM].u1 = u1; 
+        mBorderUV[BCELL_BOTTOM].u2 = u2; 
+        mBorderUV[BCELL_BOTTOM].v1 = v1; 
+        mBorderUV[BCELL_BOTTOM].v2 = v2; 
+        mGeomUVsOutOfDate = true;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::setTopLeftBorderUV(Real u1, Real v1, Real u2, Real v2)
     {
-		mBorderUV[BCELL_TOP_LEFT].u1 = u1; 
-		mBorderUV[BCELL_TOP_LEFT].u2 = u2; 
-		mBorderUV[BCELL_TOP_LEFT].v1 = v1; 
-		mBorderUV[BCELL_TOP_LEFT].v2 = v2; 
-		mGeomUVsOutOfDate = true;
+        mBorderUV[BCELL_TOP_LEFT].u1 = u1; 
+        mBorderUV[BCELL_TOP_LEFT].u2 = u2; 
+        mBorderUV[BCELL_TOP_LEFT].v1 = v1; 
+        mBorderUV[BCELL_TOP_LEFT].v2 = v2; 
+        mGeomUVsOutOfDate = true;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::setTopRightBorderUV(Real u1, Real v1, Real u2, Real v2)
     {
-		mBorderUV[BCELL_TOP_RIGHT].u1 = u1; 
-		mBorderUV[BCELL_TOP_RIGHT].u2 = u2; 
-		mBorderUV[BCELL_TOP_RIGHT].v1 = v1; 
-		mBorderUV[BCELL_TOP_RIGHT].v2 = v2; 
-		mGeomUVsOutOfDate = true;
+        mBorderUV[BCELL_TOP_RIGHT].u1 = u1; 
+        mBorderUV[BCELL_TOP_RIGHT].u2 = u2; 
+        mBorderUV[BCELL_TOP_RIGHT].v1 = v1; 
+        mBorderUV[BCELL_TOP_RIGHT].v2 = v2; 
+        mGeomUVsOutOfDate = true;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::setBottomLeftBorderUV(Real u1, Real v1, Real u2, Real v2)
     {
-		mBorderUV[BCELL_BOTTOM_LEFT].u1 = u1; 
-		mBorderUV[BCELL_BOTTOM_LEFT].u2 = u2; 
-		mBorderUV[BCELL_BOTTOM_LEFT].v1 = v1; 
-		mBorderUV[BCELL_BOTTOM_LEFT].v2 = v2; 
-		mGeomUVsOutOfDate = true;
+        mBorderUV[BCELL_BOTTOM_LEFT].u1 = u1; 
+        mBorderUV[BCELL_BOTTOM_LEFT].u2 = u2; 
+        mBorderUV[BCELL_BOTTOM_LEFT].v1 = v1; 
+        mBorderUV[BCELL_BOTTOM_LEFT].v2 = v2; 
+        mGeomUVsOutOfDate = true;
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::setBottomRightBorderUV(Real u1, Real v1, Real u2, Real v2)
     {
-		mBorderUV[BCELL_BOTTOM_RIGHT].u1 = u1; 
-		mBorderUV[BCELL_BOTTOM_RIGHT].u2 = u2; 
-		mBorderUV[BCELL_BOTTOM_RIGHT].v1 = v1; 
-		mBorderUV[BCELL_BOTTOM_RIGHT].v2 = v2; 
-		mGeomUVsOutOfDate = true;
+        mBorderUV[BCELL_BOTTOM_RIGHT].u1 = u1; 
+        mBorderUV[BCELL_BOTTOM_RIGHT].u2 = u2; 
+        mBorderUV[BCELL_BOTTOM_RIGHT].v1 = v1; 
+        mBorderUV[BCELL_BOTTOM_RIGHT].v2 = v2; 
+        mGeomUVsOutOfDate = true;
     }
 
     //---------------------------------------------------------------------
@@ -487,8 +487,8 @@ namespace Ogre {
         mBorderMaterialName = name;
         mBorderMaterial = MaterialManager::getSingleton().getByName(name);
         if (mBorderMaterial.isNull())
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
-				"BorderPanelOverlayElement::setBorderMaterialName" );
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
+                "BorderPanelOverlayElement::setBorderMaterialName" );
         mBorderMaterial->load();
         // Set some prerequisites to be sure
         mBorderMaterial->setLightingEnabled(false);
@@ -503,92 +503,92 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::updatePositionGeometry(void)
     {
-		/*
-		Grid is like this:
-		+--+---------------+--+
-		|0 |       1       |2 |
-		+--+---------------+--+
-		|  |               |  |
-		|  |               |  |
-		|3 |    center     |4 |
-		|  |               |  |
-		+--+---------------+--+
-		|5 |       6       |7 |
-		+--+---------------+--+
-		*/
-		// Convert positions into -1, 1 coordinate space (homogenous clip space)
-		// Top / bottom also need inverting since y is upside down
-		Real left[8], right[8], top[8], bottom[8];
-		// Horizontal
-		left[0] = left[3] = left[5] = _getDerivedLeft() * 2 - 1;
-		left[1] = left[6] = right[0] = right[3] = right[5] = left[0] + (mLeftBorderSize * 2);
-		right[2] = right[4] = right[7] = left[0] + (mWidth * 2);
-		left[2] = left[4] = left[7] = right[1] = right[6] = right[2] - (mRightBorderSize * 2);
-		// Vertical
-		top[0] = top[1] = top[2] = -((_getDerivedTop() * 2) - 1);
-		top[3] = top[4] = bottom[0] = bottom[1] = bottom[2] = top[0] - (mTopBorderSize * 2);
-		bottom[5] = bottom[6] = bottom[7] = top[0] -  (mHeight * 2);
-		top[5] = top[6] = top[7] = bottom[3] = bottom[4] = bottom[5] + (mBottomBorderSize * 2);
+        /*
+        Grid is like this:
+        +--+---------------+--+
+        |0 |       1       |2 |
+        +--+---------------+--+
+        |  |               |  |
+        |  |               |  |
+        |3 |    center     |4 |
+        |  |               |  |
+        +--+---------------+--+
+        |5 |       6       |7 |
+        +--+---------------+--+
+        */
+        // Convert positions into -1, 1 coordinate space (homogenous clip space)
+        // Top / bottom also need inverting since y is upside down
+        Real left[8], right[8], top[8], bottom[8];
+        // Horizontal
+        left[0] = left[3] = left[5] = _getDerivedLeft() * 2 - 1;
+        left[1] = left[6] = right[0] = right[3] = right[5] = left[0] + (mLeftBorderSize * 2);
+        right[2] = right[4] = right[7] = left[0] + (mWidth * 2);
+        left[2] = left[4] = left[7] = right[1] = right[6] = right[2] - (mRightBorderSize * 2);
+        // Vertical
+        top[0] = top[1] = top[2] = -((_getDerivedTop() * 2) - 1);
+        top[3] = top[4] = bottom[0] = bottom[1] = bottom[2] = top[0] - (mTopBorderSize * 2);
+        bottom[5] = bottom[6] = bottom[7] = top[0] -  (mHeight * 2);
+        top[5] = top[6] = top[7] = bottom[3] = bottom[4] = bottom[5] + (mBottomBorderSize * 2);
 
-		// Lock the whole position buffer in discard mode
-		HardwareVertexBufferSharedPtr vbuf = 
-			mRenderOp2.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
-		float* pPos = static_cast<float*>(
-			vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
-		// Use the furthest away depth value, since materials should have depth-check off
-		// This initialised the depth buffer for any 3D objects in front
-		Real zValue = Root::getSingleton().getRenderSystem()->getMaximumDepthInputValue();
-		for (ushort cell = 0; cell < 8; ++cell)
-		{
-			/*
-				0-----2
-				|    /|
-				|  /  |
-				|/    |
-				1-----3
-			*/
-			*pPos++ = left[cell];
-			*pPos++ = top[cell];
-			*pPos++ = zValue;
+        // Lock the whole position buffer in discard mode
+        HardwareVertexBufferSharedPtr vbuf = 
+            mRenderOp2.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
+        float* pPos = static_cast<float*>(
+            vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
+        // Use the furthest away depth value, since materials should have depth-check off
+        // This initialised the depth buffer for any 3D objects in front
+        Real zValue = Root::getSingleton().getRenderSystem()->getMaximumDepthInputValue();
+        for (ushort cell = 0; cell < 8; ++cell)
+        {
+            /*
+                0-----2
+                |    /|
+                |  /  |
+                |/    |
+                1-----3
+            */
+            *pPos++ = left[cell];
+            *pPos++ = top[cell];
+            *pPos++ = zValue;
 
-			*pPos++ = left[cell];
-			*pPos++ = bottom[cell];
-			*pPos++ = zValue;
+            *pPos++ = left[cell];
+            *pPos++ = bottom[cell];
+            *pPos++ = zValue;
 
-			*pPos++ = right[cell];
-			*pPos++ = top[cell];
-			*pPos++ = zValue;
+            *pPos++ = right[cell];
+            *pPos++ = top[cell];
+            *pPos++ = zValue;
 
-			*pPos++ = right[cell];
-			*pPos++ = bottom[cell];
-			*pPos++ = zValue;
+            *pPos++ = right[cell];
+            *pPos++ = bottom[cell];
+            *pPos++ = zValue;
 
-		}
-		vbuf->unlock();
+        }
+        vbuf->unlock();
 
-		// Also update center geometry
-		// NB don't use superclass because we need to make it smaller because of border
-		vbuf = mRenderOp.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
-		pPos = static_cast<float*>(
-			vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
-		// Use cell 1 and 3 to determine positions
-		*pPos++ = left[1];
-		*pPos++ = top[3];
-		*pPos++ = zValue;
+        // Also update center geometry
+        // NB don't use superclass because we need to make it smaller because of border
+        vbuf = mRenderOp.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
+        pPos = static_cast<float*>(
+            vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
+        // Use cell 1 and 3 to determine positions
+        *pPos++ = left[1];
+        *pPos++ = top[3];
+        *pPos++ = zValue;
 
-		*pPos++ = left[1];
-		*pPos++ = bottom[3];
-		*pPos++ = zValue;
+        *pPos++ = left[1];
+        *pPos++ = bottom[3];
+        *pPos++ = zValue;
 
-		*pPos++ = right[1];
-		*pPos++ = top[3];
-		*pPos++ = zValue;
+        *pPos++ = right[1];
+        *pPos++ = top[3];
+        *pPos++ = zValue;
 
-		*pPos++ = right[1];
-		*pPos++ = bottom[3];
-		*pPos++ = zValue;
+        *pPos++ = right[1];
+        *pPos++ = bottom[3];
+        *pPos++ = zValue;
 
-		vbuf->unlock();
+        vbuf->unlock();
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::_updateRenderQueue(RenderQueue* queue)
@@ -601,18 +601,18 @@ namespace Ogre {
             // Add outer
             queue->addRenderable(mBorderRenderable, RENDER_QUEUE_OVERLAY, mZOrder);
 
-			// do inner last so the border artifacts don't overwrite the children
+            // do inner last so the border artifacts don't overwrite the children
             // Add inner
             PanelOverlayElement::_updateRenderQueue(queue);
         }
     }
-	//---------------------------------------------------------------------
-	void BorderPanelOverlayElement::visitRenderables(Renderable::Visitor* visitor, 
-		bool debugRenderables)
-	{
-		visitor->visit(mBorderRenderable, 0, false);
-		PanelOverlayElement::visitRenderables(visitor, debugRenderables);
-	}
+    //---------------------------------------------------------------------
+    void BorderPanelOverlayElement::visitRenderables(Renderable::Visitor* visitor, 
+        bool debugRenderables)
+    {
+        visitor->visit(mBorderRenderable, 0, false);
+        PanelOverlayElement::visitRenderables(visitor, debugRenderables);
+    }
     //-----------------------------------------------------------------------
     void BorderPanelOverlayElement::setMetricsMode(GuiMetricsMode gmm)
     {
@@ -637,7 +637,7 @@ namespace Ogre {
             mBottomBorderSize = mPixelBottomBorderSize * mPixelScaleY;
             mGeomPositionsOutOfDate = true;
         }
-		PanelOverlayElement::_update();
+        PanelOverlayElement::_update();
     }
     //-----------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -647,12 +647,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String BorderPanelOverlayElement::CmdBorderSize::doGet(const void* target) const
     {
-		const BorderPanelOverlayElement* t = static_cast<const BorderPanelOverlayElement*>(target);
+        const BorderPanelOverlayElement* t = static_cast<const BorderPanelOverlayElement*>(target);
         return String(
-			StringConverter::toString(t->getLeftBorderSize()) + " " +
-			StringConverter::toString(t->getRightBorderSize()) + " " +
-			StringConverter::toString(t->getTopBorderSize()) + " " +
-			StringConverter::toString(t->getBottomBorderSize())	);
+            StringConverter::toString(t->getLeftBorderSize()) + " " +
+            StringConverter::toString(t->getRightBorderSize()) + " " +
+            StringConverter::toString(t->getTopBorderSize()) + " " +
+            StringConverter::toString(t->getBottomBorderSize()) );
     }
     void BorderPanelOverlayElement::CmdBorderSize::doSet(void* target, const String& val)
     {
@@ -681,7 +681,7 @@ namespace Ogre {
     String BorderPanelOverlayElement::CmdBorderBottomLeftUV::doGet(const void* target) const
     {
         // No need right now..
-		return  static_cast<const BorderPanelOverlayElement*>(target)->getBottomLeftBorderUVString();
+        return  static_cast<const BorderPanelOverlayElement*>(target)->getBottomLeftBorderUVString();
     }
     void BorderPanelOverlayElement::CmdBorderBottomLeftUV::doSet(void* target, const String& val)
     {
@@ -698,7 +698,7 @@ namespace Ogre {
     String BorderPanelOverlayElement::CmdBorderBottomRightUV::doGet(const void* target) const
     {
         // No need right now..
-		return  static_cast<const BorderPanelOverlayElement*>(target)->getBottomRightBorderUVString();
+        return  static_cast<const BorderPanelOverlayElement*>(target)->getBottomRightBorderUVString();
     }
     void BorderPanelOverlayElement::CmdBorderBottomRightUV::doSet(void* target, const String& val)
     {
@@ -715,7 +715,7 @@ namespace Ogre {
     String BorderPanelOverlayElement::CmdBorderTopLeftUV::doGet(const void* target) const
     {
         // No need right now..
-		return  static_cast<const BorderPanelOverlayElement*>(target)->getTopLeftBorderUVString();
+        return  static_cast<const BorderPanelOverlayElement*>(target)->getTopLeftBorderUVString();
     }
     void BorderPanelOverlayElement::CmdBorderTopLeftUV::doSet(void* target, const String& val)
     {
@@ -732,7 +732,7 @@ namespace Ogre {
     String BorderPanelOverlayElement::CmdBorderTopRightUV::doGet(const void* target) const
     {
         // No need right now..
-		return  static_cast<const BorderPanelOverlayElement*>(target)->getTopRightBorderUVString();
+        return  static_cast<const BorderPanelOverlayElement*>(target)->getTopRightBorderUVString();
     }
     void BorderPanelOverlayElement::CmdBorderTopRightUV::doSet(void* target, const String& val)
     {
@@ -749,7 +749,7 @@ namespace Ogre {
     String BorderPanelOverlayElement::CmdBorderLeftUV::doGet(const void* target) const
     {
         // No need right now..
-		return  static_cast<const BorderPanelOverlayElement*>(target)->getLeftBorderUVString();
+        return  static_cast<const BorderPanelOverlayElement*>(target)->getLeftBorderUVString();
     }
     void BorderPanelOverlayElement::CmdBorderLeftUV::doSet(void* target, const String& val)
     {
@@ -766,7 +766,7 @@ namespace Ogre {
     String BorderPanelOverlayElement::CmdBorderRightUV::doGet(const void* target) const
     {
         // No need right now..
-		return  static_cast<const BorderPanelOverlayElement*>(target)->getRightBorderUVString();
+        return  static_cast<const BorderPanelOverlayElement*>(target)->getRightBorderUVString();
     }
     void BorderPanelOverlayElement::CmdBorderRightUV::doSet(void* target, const String& val)
     {
@@ -783,7 +783,7 @@ namespace Ogre {
     String BorderPanelOverlayElement::CmdBorderTopUV::doGet(const void* target) const
     {
         // No need right now..
-		return  static_cast<const BorderPanelOverlayElement*>(target)->getTopBorderUVString();
+        return  static_cast<const BorderPanelOverlayElement*>(target)->getTopBorderUVString();
     }
     void BorderPanelOverlayElement::CmdBorderTopUV::doSet(void* target, const String& val)
     {
@@ -800,7 +800,7 @@ namespace Ogre {
     String BorderPanelOverlayElement::CmdBorderBottomUV::doGet(const void* target) const
     {
         // No need right now..
-		return  static_cast<const BorderPanelOverlayElement*>(target)->getBottomBorderUVString();
+        return  static_cast<const BorderPanelOverlayElement*>(target)->getBottomBorderUVString();
     }
     void BorderPanelOverlayElement::CmdBorderBottomUV::doSet(void* target, const String& val)
     {

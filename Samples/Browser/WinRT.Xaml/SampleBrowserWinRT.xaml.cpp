@@ -1,4 +1,4 @@
-﻿//
+//
 // BlankPage.xaml.cpp
 // Implementation of the BlankPage.xaml class.
 //
@@ -23,47 +23,47 @@ using namespace Windows::UI::Xaml::Navigation;
 
 SampleBrowserWinRT::SampleBrowserWinRT()
 {
-	InitializeComponent();
+    InitializeComponent();
 
-	// setup timer at 60 FPS
-	TimeSpan span;
-	span.Duration = 10000000 / 60;   // convert to 100ns ticks
-	m_timer = ref new Windows::UI::Xaml::DispatcherTimer;
-	m_timer->Interval = span;
-	m_timer->Tick += ref new Windows::Foundation::EventHandler<Object^>(this, &SampleBrowserWinRT::DisplayCurrentFrame);
+    // setup timer at 60 FPS
+    TimeSpan span;
+    span.Duration = 10000000 / 60;   // convert to 100ns ticks
+    m_timer = ref new Windows::UI::Xaml::DispatcherTimer;
+    m_timer->Interval = span;
+    m_timer->Tick += ref new Windows::Foundation::EventHandler<Object^>(this, &SampleBrowserWinRT::DisplayCurrentFrame);
 
-	contentView->SizeChanged += 
-		ref new Windows::UI::Xaml::SizeChangedEventHandler(this, &SampleBrowserWinRT::OnContentViewSizeChanged);
+    contentView->SizeChanged += 
+        ref new Windows::UI::Xaml::SizeChangedEventHandler(this, &SampleBrowserWinRT::OnContentViewSizeChanged);
 
-	StartRendering();
+    StartRendering();
 }
 
 void SampleBrowserWinRT::StartRendering()
 {
-	m_sampleBrowser.initAppForWinRT(this->contentView, m_inputManager.GetInputContext());
-	m_sampleBrowser.initApp();
+    m_sampleBrowser.initAppForWinRT(this->contentView, m_inputManager.GetInputContext());
+    m_sampleBrowser.initApp();
 
-	m_timer->Start();
+    m_timer->Start();
 }
 
 void SampleBrowserWinRT::StopRendering()
 {
-	m_timer->Stop();
+    m_timer->Stop();
 
-	m_sampleBrowser.closeApp();
+    m_sampleBrowser.closeApp();
 }
 
 void  SampleBrowserWinRT::DisplayCurrentFrame(Platform::Object^ sender, Platform::Object^ e)
 {
-	if(m_windowClosed
-	|| Ogre::Root::getSingleton().endRenderingQueued()
-	|| !Ogre::Root::getSingleton().renderOneFrame(1.0f / 60.0f))
-		StopRendering();
+    if(m_windowClosed
+    || Ogre::Root::getSingleton().endRenderingQueued()
+    || !Ogre::Root::getSingleton().renderOneFrame(1.0f / 60.0f))
+        StopRendering();
 }
 
 void SampleBrowserWinRT::OnContentViewSizeChanged(Platform::Object^ sender, Windows::UI::Xaml::SizeChangedEventArgs^ e)
 {
-	m_sampleBrowser.windowMovedOrResized();
+    m_sampleBrowser.windowMovedOrResized();
 }
 
 
@@ -78,12 +78,12 @@ void SampleBrowserWinRT::OnNavigatedTo(NavigationEventArgs^ e)
 
 void SampleBrowserWinRT::OnKeyDown(Windows::UI::Xaml::Input::KeyRoutedEventArgs^ args)
 {
-	if(m_inputManager.OnKeyAction(args->Key, args->KeyStatus, true)) args->Handled = true;
+    if(m_inputManager.OnKeyAction(args->Key, args->KeyStatus, true)) args->Handled = true;
 }
 
 void SampleBrowserWinRT::OnKeyUp(Windows::UI::Xaml::Input::KeyRoutedEventArgs^ args)
 {
-	if(m_inputManager.OnKeyAction(args->Key, args->KeyStatus, false)) args->Handled = true;
+    if(m_inputManager.OnKeyAction(args->Key, args->KeyStatus, false)) args->Handled = true;
 }
 
 //void SampleBrowserWinRT::OnCharacterReceived(Windows::UI::Core::CharacterReceivedEventArgs^ args)

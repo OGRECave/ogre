@@ -452,7 +452,7 @@ namespace Ogre {
                                     GLES2PixelUtil::getGLOriginFormat(data.format), GLES2PixelUtil::getGLOriginDataType(data.format),
                                     NULL));
                     break;
-            }	
+            }   
             if (mUsage & TU_AUTOMIPMAP && (mTarget == GL_TEXTURE_2D_ARRAY || mTarget == GL_TEXTURE_3D))
             {
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
@@ -659,7 +659,7 @@ namespace Ogre {
             switch(mTarget)
             {
                 case GL_TEXTURE_2D:
-        		case GL_TEXTURE_CUBE_MAP:
+                case GL_TEXTURE_CUBE_MAP:
                     OGRE_CHECK_GL_ERROR(glTexSubImage2D(mFaceTarget,
                                     mLevel,
                                     dest.left, dest.top,
@@ -775,7 +775,7 @@ namespace Ogre {
     // @author W.J. van der Laan
     void GLES2TextureBuffer::blitFromTexture(GLES2TextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
-		return; // todo - add a shader attach...
+        return; // todo - add a shader attach...
 //        std::cerr << "GLES2TextureBuffer::blitFromTexture " <<
 //        src->mTextureID << ":" << srcBox.left << "," << srcBox.top << "," << srcBox.right << "," << srcBox.bottom << " " << 
 //        mTextureID << ":" << dstBox.left << "," << dstBox.top << "," << dstBox.right << "," << dstBox.bottom << std::endl;
@@ -785,7 +785,7 @@ namespace Ogre {
         
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
         rsys->_disableTextureUnitsFrom(0);
-		glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0);
 
         // Disable alpha, depth and scissor testing, disable blending, 
         // and disable culling
@@ -895,7 +895,7 @@ namespace Ogre {
             // Normalise to texture coordinate in 0.0 .. 1.0
             w = (w+0.5f) / (float)src->mDepth;
             
-            // Finally we're ready to rumble	
+            // Finally we're ready to rumble    
             getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
             OGRE_CHECK_GL_ERROR(glEnable(src->mTarget));
 

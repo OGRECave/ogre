@@ -30,7 +30,7 @@ OgreOctreeZonePrerequisites.h  -  Octree organized Zone for PCZSceneManager
 begin                : Mon Apr 16 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 

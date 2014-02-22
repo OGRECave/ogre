@@ -35,7 +35,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     ResourceManager::ResourceManager()
-		: mNextHandle(1), mMemoryUsage(0), mVerbose(true), mLoadOrder(0)
+        : mNextHandle(1), mMemoryUsage(0), mVerbose(true), mLoadOrder(0)
     {
         // Init memory limit & usage
         mMemoryBudget = std::numeric_limits<unsigned long>::max();
@@ -43,52 +43,52 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ResourceManager::~ResourceManager()
     {
-		destroyAllResourcePools();
+        destroyAllResourcePools();
         removeAll();
     }
-	//-----------------------------------------------------------------------
-	ResourcePtr ResourceManager::createResource(const String& name, const String& group,
-		bool isManual, ManualResourceLoader* loader, const NameValuePairList* params)
-	{
-		// Call creation implementation
-		ResourcePtr ret = ResourcePtr(
+    //-----------------------------------------------------------------------
+    ResourcePtr ResourceManager::createResource(const String& name, const String& group,
+        bool isManual, ManualResourceLoader* loader, const NameValuePairList* params)
+    {
+        // Call creation implementation
+        ResourcePtr ret = ResourcePtr(
             createImpl(name, getNextHandle(), group, isManual, loader, params));
         if (params)
             ret->setParameterList(*params);
 
-		addImpl(ret);
-		// Tell resource group manager
-		ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
-		return ret;
+        addImpl(ret);
+        // Tell resource group manager
+        ResourceGroupManager::getSingleton()._notifyResourceCreated(ret);
+        return ret;
 
-	}
+    }
     //-----------------------------------------------------------------------
     ResourceManager::ResourceCreateOrRetrieveResult 
-	ResourceManager::createOrRetrieve(
-		const String& name, const String& group, 
-		bool isManual, ManualResourceLoader* loader, 
-		const NameValuePairList* params)
-	{
-		// Lock for the whole get / insert
+    ResourceManager::createOrRetrieve(
+        const String& name, const String& group, 
+        bool isManual, ManualResourceLoader* loader, 
+        const NameValuePairList* params)
+    {
+        // Lock for the whole get / insert
             OGRE_LOCK_AUTO_MUTEX;
 
-		ResourcePtr res = getResourceByName(name, group);
-		bool created = false;
-		if (res.isNull())
-		{
-			created = true;
-			res = createResource(name, group, isManual, loader, params);
-		}
+        ResourcePtr res = getResourceByName(name, group);
+        bool created = false;
+        if (res.isNull())
+        {
+            created = true;
+            res = createResource(name, group, isManual, loader, params);
+        }
 
-		return ResourceCreateOrRetrieveResult(res, created);
-	}
+        return ResourceCreateOrRetrieveResult(res, created);
+    }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::prepare(const String& name, 
         const String& group, bool isManual, ManualResourceLoader* loader, 
         const NameValuePairList* loadParams, bool backgroundThread)
     {
         ResourcePtr r = createOrRetrieve(name,group,isManual,loader,loadParams).first;
-		// ensure prepared
+        // ensure prepared
         r->prepare(backgroundThread);
         return r;
     }
@@ -98,123 +98,123 @@ namespace Ogre {
         const NameValuePairList* loadParams, bool backgroundThread)
     {
         ResourcePtr r = createOrRetrieve(name,group,isManual,loader,loadParams).first;
-		// ensure loaded
+        // ensure loaded
         r->load(backgroundThread);
 
         return r;
     }
     //-----------------------------------------------------------------------
-	void ResourceManager::addImpl( ResourcePtr& res )
-	{
+    void ResourceManager::addImpl( ResourcePtr& res )
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-			std::pair<ResourceMap::iterator, bool> result;
-		if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
-		{
-			result = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
-		}
-		else
-		{
-			ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
+            std::pair<ResourceMap::iterator, bool> result;
+        if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
+        {
+            result = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
+        }
+        else
+        {
+            ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
 
-			// we will create the group if it doesn't exists in our list
-			if( itGroup == mResourcesWithGroup.end())
-			{
-				ResourceMap dummy;
-				mResourcesWithGroup.insert( ResourceWithGroupMap::value_type( res->getGroup(), dummy ) );
-				itGroup = mResourcesWithGroup.find(res->getGroup());
-			}
-			result = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
+            // we will create the group if it doesn't exists in our list
+            if( itGroup == mResourcesWithGroup.end())
+            {
+                ResourceMap dummy;
+                mResourcesWithGroup.insert( ResourceWithGroupMap::value_type( res->getGroup(), dummy ) );
+                itGroup = mResourcesWithGroup.find(res->getGroup());
+            }
+            result = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
 
-		}
+        }
 
-		if (!result.second)
-		{
-			// Attempt to resolve the collision
-			if(ResourceGroupManager::getSingleton().getLoadingListener())
-			{
-				if(ResourceGroupManager::getSingleton().getLoadingListener()->resourceCollision(res.get(), this))
-				{
-					// Try to do the addition again, no seconds attempts to resolve collisions are allowed
-					std::pair<ResourceMap::iterator, bool> insertResult;
-					if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
-					{
-						insertResult = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
-					}
-					else
-					{
-						ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
-						insertResult = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
-					}
-					if (!insertResult.second)
-					{
-						OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() + 
-							" already exists.", "ResourceManager::add");
-					}
+        if (!result.second)
+        {
+            // Attempt to resolve the collision
+            if(ResourceGroupManager::getSingleton().getLoadingListener())
+            {
+                if(ResourceGroupManager::getSingleton().getLoadingListener()->resourceCollision(res.get(), this))
+                {
+                    // Try to do the addition again, no seconds attempts to resolve collisions are allowed
+                    std::pair<ResourceMap::iterator, bool> insertResult;
+                    if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
+                    {
+                        insertResult = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
+                    }
+                    else
+                    {
+                        ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
+                        insertResult = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
+                    }
+                    if (!insertResult.second)
+                    {
+                        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() + 
+                            " already exists.", "ResourceManager::add");
+                    }
 
-					std::pair<ResourceHandleMap::iterator, bool> resultHandle = 
-						mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
-					if (!resultHandle.second)
-					{
-						OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " + 
-							StringConverter::toString((long) (res->getHandle())) + 
-							" already exists.", "ResourceManager::add");
-					}
-				}
-			}
-		}
-		else
-		{
-			// Insert the handle
-			std::pair<ResourceHandleMap::iterator, bool> resultHandle = 
-				mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
-			if (!resultHandle.second)
-			{
-				OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " + 
-					StringConverter::toString((long) (res->getHandle())) + 
-					" already exists.", "ResourceManager::add");
-			}
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::removeImpl( ResourcePtr& res )
-	{
+                    std::pair<ResourceHandleMap::iterator, bool> resultHandle = 
+                        mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
+                    if (!resultHandle.second)
+                    {
+                        OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " + 
+                            StringConverter::toString((long) (res->getHandle())) + 
+                            " already exists.", "ResourceManager::add");
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Insert the handle
+            std::pair<ResourceHandleMap::iterator, bool> resultHandle = 
+                mResourcesByHandle.insert( ResourceHandleMap::value_type( res->getHandle(), res ) );
+            if (!resultHandle.second)
+            {
+                OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the handle " + 
+                    StringConverter::toString((long) (res->getHandle())) + 
+                    " already exists.", "ResourceManager::add");
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::removeImpl( ResourcePtr& res )
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
-		{
-			ResourceMap::iterator nameIt = mResources.find(res->getName());
-			if (nameIt != mResources.end())
-			{
-				mResources.erase(nameIt);
-			}
-		}
-		else
-		{
-			ResourceWithGroupMap::iterator groupIt = mResourcesWithGroup.find(res->getGroup());
-			if (groupIt != mResourcesWithGroup.end())
-			{
-				ResourceMap::iterator nameIt = groupIt->second.find(res->getName());
-				if (nameIt != groupIt->second.end())
-				{
-					groupIt->second.erase(nameIt);
-				}
+        if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
+        {
+            ResourceMap::iterator nameIt = mResources.find(res->getName());
+            if (nameIt != mResources.end())
+            {
+                mResources.erase(nameIt);
+            }
+        }
+        else
+        {
+            ResourceWithGroupMap::iterator groupIt = mResourcesWithGroup.find(res->getGroup());
+            if (groupIt != mResourcesWithGroup.end())
+            {
+                ResourceMap::iterator nameIt = groupIt->second.find(res->getName());
+                if (nameIt != groupIt->second.end())
+                {
+                    groupIt->second.erase(nameIt);
+                }
 
-				if (groupIt->second.empty())
-				{
-					mResourcesWithGroup.erase(groupIt);
-				}
-			}
-		}
+                if (groupIt->second.empty())
+                {
+                    mResourcesWithGroup.erase(groupIt);
+                }
+            }
+        }
 
-		ResourceHandleMap::iterator handleIt = mResourcesByHandle.find(res->getHandle());
-		if (handleIt != mResourcesByHandle.end())
-		{
-			mResourcesByHandle.erase(handleIt);
-		}
-		// Tell resource group manager
-		ResourceGroupManager::getSingleton()._notifyResourceRemoved(res);
-	}
+        ResourceHandleMap::iterator handleIt = mResourcesByHandle.find(res->getHandle());
+        if (handleIt != mResourcesByHandle.end())
+        {
+            mResourcesByHandle.erase(handleIt);
+        }
+        // Tell resource group manager
+        ResourceGroupManager::getSingleton()._notifyResourceRemoved(res);
+    }
     //-----------------------------------------------------------------------
     void ResourceManager::setMemoryBudget( size_t bytes)
     {
@@ -227,62 +227,62 @@ namespace Ogre {
     {
         return mMemoryBudget;
     }
-	//-----------------------------------------------------------------------
-	void ResourceManager::unload(const String& name)
-	{
-		ResourcePtr res = getResourceByName(name);
+    //-----------------------------------------------------------------------
+    void ResourceManager::unload(const String& name)
+    {
+        ResourcePtr res = getResourceByName(name);
 
-		if (!res.isNull())
-		{
-			// Unload resource
-			res->unload();
+        if (!res.isNull())
+        {
+            // Unload resource
+            res->unload();
 
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::unload(ResourceHandle handle)
-	{
-		ResourcePtr res = getByHandle(handle);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::unload(ResourceHandle handle)
+    {
+        ResourcePtr res = getByHandle(handle);
 
-		if (!res.isNull())
-		{
-			// Unload resource
-			res->unload();
+        if (!res.isNull())
+        {
+            // Unload resource
+            res->unload();
 
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::unloadAll(bool reloadableOnly)
-	{
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::unloadAll(bool reloadableOnly)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		ResourceMap::iterator i, iend;
-		iend = mResources.end();
-		for (i = mResources.begin(); i != iend; ++i)
-		{
-			if (!reloadableOnly || i->second->isReloadable())
-			{
-				i->second->unload();
-			}
-		}
+        ResourceMap::iterator i, iend;
+        iend = mResources.end();
+        for (i = mResources.begin(); i != iend; ++i)
+        {
+            if (!reloadableOnly || i->second->isReloadable())
+            {
+                i->second->unload();
+            }
+        }
 
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::reloadAll(bool reloadableOnly)
-	{
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::reloadAll(bool reloadableOnly)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		ResourceMap::iterator i, iend;
-		iend = mResources.end();
-		for (i = mResources.begin(); i != iend; ++i)
-		{
-			if (!reloadableOnly || i->second->isReloadable())
-			{
-				i->second->reload();
-			}
-		}
+        ResourceMap::iterator i, iend;
+        iend = mResources.end();
+        for (i = mResources.begin(); i != iend; ++i)
+        {
+            if (!reloadableOnly || i->second->isReloadable())
+            {
+                i->second->reload();
+            }
+        }
 
-	}
+    }
     //-----------------------------------------------------------------------
     void ResourceManager::unloadUnreferencedResources(bool reloadableOnly)
     {
@@ -330,37 +330,37 @@ namespace Ogre {
     {
         removeImpl(res);
     }
-	//-----------------------------------------------------------------------
-	void ResourceManager::remove(const String& name)
-	{
-		ResourcePtr res = getResourceByName(name);
+    //-----------------------------------------------------------------------
+    void ResourceManager::remove(const String& name)
+    {
+        ResourcePtr res = getResourceByName(name);
 
-		if (!res.isNull())
-		{
-			removeImpl(res);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::remove(ResourceHandle handle)
-	{
-		ResourcePtr res = getByHandle(handle);
+        if (!res.isNull())
+        {
+            removeImpl(res);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::remove(ResourceHandle handle)
+    {
+        ResourcePtr res = getByHandle(handle);
 
-		if (!res.isNull())
-		{
-			removeImpl(res);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::removeAll(void)
-	{
+        if (!res.isNull())
+        {
+            removeImpl(res);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::removeAll(void)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		mResources.clear();
-		mResourcesWithGroup.clear();
-		mResourcesByHandle.clear();
-		// Notify resource group manager
-		ResourceGroupManager::getSingleton()._notifyAllResourcesRemoved(this);
-	}
+        mResources.clear();
+        mResourcesWithGroup.clear();
+        mResourcesByHandle.clear();
+        // Notify resource group manager
+        ResourceGroupManager::getSingleton()._notifyAllResourcesRemoved(this);
+    }
     //-----------------------------------------------------------------------
     void ResourceManager::removeUnreferencedResources(bool reloadableOnly)
     {
@@ -388,59 +388,59 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getResourceByName(const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
-    {		
-		ResourcePtr res;
+    {       
+        ResourcePtr res;
 
-		// if not in the global pool - get it from the grouped pool 
-		if(!ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(groupName))
-		{
+        // if not in the global pool - get it from the grouped pool 
+        if(!ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(groupName))
+        {
                     OGRE_LOCK_AUTO_MUTEX;
-			ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
+            ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(groupName);
 
-			if( itGroup != mResourcesWithGroup.end())
-			{
-				ResourceMap::iterator it = itGroup->second.find(name);
+            if( itGroup != mResourcesWithGroup.end())
+            {
+                ResourceMap::iterator it = itGroup->second.find(name);
 
-				if( it != itGroup->second.end())
-				{
-					res = it->second;
-				}
-			}
-		}
+                if( it != itGroup->second.end())
+                {
+                    res = it->second;
+                }
+            }
+        }
 
-		// if didn't find it the grouped pool - get it from the global pool 
-		if (res.isNull())
-		{
+        // if didn't find it the grouped pool - get it from the global pool 
+        if (res.isNull())
+        {
                     OGRE_LOCK_AUTO_MUTEX;
 
-			ResourceMap::iterator it = mResources.find(name);
+            ResourceMap::iterator it = mResources.find(name);
 
-			if( it != mResources.end())
-			{
-				res = it->second;
-			}
-			else
-			{
-				// this is the case when we need to search also in the grouped hash
-				if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
-				{
-					ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
-					ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
-					for ( ; iter != iterE ; ++iter )
-					{
-						ResourceMap::iterator resMapIt = iter->second.find(name);
+            if( it != mResources.end())
+            {
+                res = it->second;
+            }
+            else
+            {
+                // this is the case when we need to search also in the grouped hash
+                if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+                {
+                    ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
+                    ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
+                    for ( ; iter != iterE ; ++iter )
+                    {
+                        ResourceMap::iterator resMapIt = iter->second.find(name);
 
-						if( resMapIt != iter->second.end())
-						{
-							res = resMapIt->second;
-							break;
-						}
-					}
-				}
-			}
-		}
-	
-		return res;
+                        if( resMapIt != iter->second.end())
+                        {
+                            res = resMapIt->second;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    
+        return res;
     }
     //-----------------------------------------------------------------------
     ResourcePtr ResourceManager::getByHandle(ResourceHandle handle)
@@ -466,123 +466,123 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ResourceManager::checkUsage(void)
     {
-		if (getMemoryUsage() > mMemoryBudget)
-		{
+        if (getMemoryUsage() > mMemoryBudget)
+        {
             OGRE_LOCK_AUTO_MUTEX;
-			// unload unreferenced resources until we are within our budget again
-			ResourceMap::iterator i, iend;
-			iend = mResources.end();
-			for (i = mResources.begin(); i != iend && getMemoryUsage() > mMemoryBudget; ++i)
-			{
-				// A use count of 3 means that only RGM and RM have references
-				// RGM has one (this one) and RM has 2 (by name and by handle)
-				if (i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
-				{
-					Resource* res = i->second.get();
-					if (res->isReloadable())
-					{
-						res->unload();
-					}
-				}
-			}
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::_notifyResourceTouched(Resource* res)
-	{
-		// TODO
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::_notifyResourceLoaded(Resource* res)
-	{
-		mMemoryUsage += res->getSize();
-		checkUsage();
-	}
-	//-----------------------------------------------------------------------
-	void ResourceManager::_notifyResourceUnloaded(Resource* res)
-	{
-		mMemoryUsage -= res->getSize();
-	}
-	//---------------------------------------------------------------------
-	ResourceManager::ResourcePool* ResourceManager::getResourcePool(const String& name)
-	{
+            // unload unreferenced resources until we are within our budget again
+            ResourceMap::iterator i, iend;
+            iend = mResources.end();
+            for (i = mResources.begin(); i != iend && getMemoryUsage() > mMemoryBudget; ++i)
+            {
+                // A use count of 3 means that only RGM and RM have references
+                // RGM has one (this one) and RM has 2 (by name and by handle)
+                if (i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+                {
+                    Resource* res = i->second.get();
+                    if (res->isReloadable())
+                    {
+                        res->unload();
+                    }
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::_notifyResourceTouched(Resource* res)
+    {
+        // TODO
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::_notifyResourceLoaded(Resource* res)
+    {
+        mMemoryUsage += res->getSize();
+        checkUsage();
+    }
+    //-----------------------------------------------------------------------
+    void ResourceManager::_notifyResourceUnloaded(Resource* res)
+    {
+        mMemoryUsage -= res->getSize();
+    }
+    //---------------------------------------------------------------------
+    ResourceManager::ResourcePool* ResourceManager::getResourcePool(const String& name)
+    {
         OGRE_LOCK_AUTO_MUTEX;
 
-		ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
-		if (i == mResourcePoolMap.end())
-		{
-			i = mResourcePoolMap.insert(ResourcePoolMap::value_type(name, 
-				OGRE_NEW ResourcePool(name))).first;
-		}
-		return i->second;
+        ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
+        if (i == mResourcePoolMap.end())
+        {
+            i = mResourcePoolMap.insert(ResourcePoolMap::value_type(name, 
+                OGRE_NEW ResourcePool(name))).first;
+        }
+        return i->second;
 
-	}
-	//---------------------------------------------------------------------
-	void ResourceManager::destroyResourcePool(ResourcePool* pool)
-	{
+    }
+    //---------------------------------------------------------------------
+    void ResourceManager::destroyResourcePool(ResourcePool* pool)
+    {
         if(!pool)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ResourcePool.", "ResourceManager::destroyResourcePool");
 
         OGRE_LOCK_AUTO_MUTEX;
 
-		ResourcePoolMap::iterator i = mResourcePoolMap.find(pool->getName());
-		if (i != mResourcePoolMap.end())
-			mResourcePoolMap.erase(i);
+        ResourcePoolMap::iterator i = mResourcePoolMap.find(pool->getName());
+        if (i != mResourcePoolMap.end())
+            mResourcePoolMap.erase(i);
 
-		OGRE_DELETE pool;
-		
-	}
-	//---------------------------------------------------------------------
-	void ResourceManager::destroyResourcePool(const String& name)
-	{
+        OGRE_DELETE pool;
+        
+    }
+    //---------------------------------------------------------------------
+    void ResourceManager::destroyResourcePool(const String& name)
+    {
         OGRE_LOCK_AUTO_MUTEX;
 
-		ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
-		if (i != mResourcePoolMap.end())
-		{
-			OGRE_DELETE i->second;
-			mResourcePoolMap.erase(i);
-		}
+        ResourcePoolMap::iterator i = mResourcePoolMap.find(name);
+        if (i != mResourcePoolMap.end())
+        {
+            OGRE_DELETE i->second;
+            mResourcePoolMap.erase(i);
+        }
 
-	}
-	//---------------------------------------------------------------------
-	void ResourceManager::destroyAllResourcePools()
-	{
+    }
+    //---------------------------------------------------------------------
+    void ResourceManager::destroyAllResourcePools()
+    {
         OGRE_LOCK_AUTO_MUTEX;
 
-		for (ResourcePoolMap::iterator i = mResourcePoolMap.begin(); 
-			i != mResourcePoolMap.end(); ++i)
-			OGRE_DELETE i->second;
+        for (ResourcePoolMap::iterator i = mResourcePoolMap.begin(); 
+            i != mResourcePoolMap.end(); ++i)
+            OGRE_DELETE i->second;
 
-		mResourcePoolMap.clear();
-	}
-	//-----------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	ResourceManager::ResourcePool::ResourcePool(const String& name)
-		: mName(name)
-	{
+        mResourcePoolMap.clear();
+    }
+    //-----------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    ResourceManager::ResourcePool::ResourcePool(const String& name)
+        : mName(name)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	ResourceManager::ResourcePool::~ResourcePool()
-	{
-		clear();
-	}
-	//---------------------------------------------------------------------
-	const String& ResourceManager::ResourcePool::getName() const
-	{
-		return mName;
-	}
-	//---------------------------------------------------------------------
-	void ResourceManager::ResourcePool::clear()
-	{
+    }
+    //---------------------------------------------------------------------
+    ResourceManager::ResourcePool::~ResourcePool()
+    {
+        clear();
+    }
+    //---------------------------------------------------------------------
+    const String& ResourceManager::ResourcePool::getName() const
+    {
+        return mName;
+    }
+    //---------------------------------------------------------------------
+    void ResourceManager::ResourcePool::clear()
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ItemList::iterator i = mItems.begin(); i != mItems.end(); ++i)
-		{
-			(*i)->getCreator()->remove((*i)->getHandle());
-		}
-		mItems.clear();
-	}
+        for (ItemList::iterator i = mItems.begin(); i != mItems.end(); ++i)
+        {
+            (*i)->getCreator()->remove((*i)->getHandle());
+        }
+        mItems.clear();
+    }
 }
 
 

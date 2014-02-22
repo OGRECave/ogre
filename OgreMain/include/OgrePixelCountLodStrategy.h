@@ -35,18 +35,18 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
-	class AbsolutePixelCountLodStrategy;
-	/// Backward compatible name for Distance_Box strategy.
-	typedef AbsolutePixelCountLodStrategy PixelCountLodStrategy;
+    class AbsolutePixelCountLodStrategy;
+    /// Backward compatible name for Distance_Box strategy.
+    typedef AbsolutePixelCountLodStrategy PixelCountLodStrategy;
 
-	/** Abstract base class for level of detail strategy based on pixel count approximations from bounding sphere projection. */
+    /** Abstract base class for level of detail strategy based on pixel count approximations from bounding sphere projection. */
     class _OgreExport PixelCountLodStrategyBase : public LodStrategy
     {
     protected:
@@ -75,8 +75,8 @@ namespace Ogre {
         /// @copydoc LodStrategy::isSorted
         virtual bool isSorted(const Mesh::LodValueList& values) const;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
     class _OgreExport AbsolutePixelCountLodStrategy : public PixelCountLodStrategyBase, public Singleton<AbsolutePixelCountLodStrategy>
     {

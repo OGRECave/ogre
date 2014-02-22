@@ -41,10 +41,10 @@ namespace Ogre
         0, 0, 0, 0 );
     
     const Matrix4 Matrix4::ZEROAFFINE(
-	0, 0, 0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 0,
-	0, 0, 0, 1 );
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 1 );
 
     const Matrix4 Matrix4::IDENTITY(
         1, 0, 0, 0,
@@ -61,7 +61,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     inline static Real
         MINOR(const Matrix4& m, const size_t r0, const size_t r1, const size_t r2, 
-								const size_t c0, const size_t c1, const size_t c2)
+                                const size_t c0, const size_t c1, const size_t c2)
     {
         return m[r0][c0] * (m[r1][c1] * m[r2][c2] - m[r2][c1] * m[r1][c2]) -
             m[r0][c1] * (m[r1][c0] * m[r2][c2] - m[r2][c0] * m[r1][c2]) +
@@ -243,25 +243,25 @@ namespace Ogre
         // Set up final matrix with scale, rotation and translation
         m[0][0] = invScale.x * rot3x3[0][0]; m[0][1] = invScale.x * rot3x3[0][1]; m[0][2] = invScale.x * rot3x3[0][2]; m[0][3] = invTranslate.x;
         m[1][0] = invScale.y * rot3x3[1][0]; m[1][1] = invScale.y * rot3x3[1][1]; m[1][2] = invScale.y * rot3x3[1][2]; m[1][3] = invTranslate.y;
-        m[2][0] = invScale.z * rot3x3[2][0]; m[2][1] = invScale.z * rot3x3[2][1]; m[2][2] = invScale.z * rot3x3[2][2]; m[2][3] = invTranslate.z;		
+        m[2][0] = invScale.z * rot3x3[2][0]; m[2][1] = invScale.z * rot3x3[2][1]; m[2][2] = invScale.z * rot3x3[2][2]; m[2][3] = invTranslate.z;        
 
         // No projection term
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
     }
     //-----------------------------------------------------------------------
-	void Matrix4::decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
-	{
-		assert(isAffine());
+    void Matrix4::decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
+    {
+        assert(isAffine());
 
-		Matrix3 m3x3;
-		extract3x3Matrix(m3x3);
+        Matrix3 m3x3;
+        extract3x3Matrix(m3x3);
 
-		Matrix3 matQ;
-		Vector3 vecU;
-		m3x3.QDUDecomposition( matQ, scale, vecU ); 
+        Matrix3 matQ;
+        Vector3 vecU;
+        m3x3.QDUDecomposition( matQ, scale, vecU ); 
 
-		orientation = Quaternion( matQ );
-		position = Vector3( m[0][3], m[1][3], m[2][3] );
-	}
+        orientation = Quaternion( matQ );
+        position = Vector3( m[0][3], m[1][3], m[2][3] );
+    }
 
 }

@@ -50,41 +50,41 @@ class _OgreRTSSExport LinearSkinning : public HardwareSkinningTechnique
 {
 // Interface.
 public:
-	/** Class default constructor */
-	LinearSkinning();
+    /** Class default constructor */
+    LinearSkinning();
 
-	/**
-	@see SubRenderState::resolveParameters.
-	*/
-	virtual bool resolveParameters(ProgramSet* programSet);
+    /**
+    @see SubRenderState::resolveParameters.
+    */
+    virtual bool resolveParameters(ProgramSet* programSet);
 
-	/**
-	@see SubRenderState::resolveDependencies.
-	*/
-	virtual bool resolveDependencies(ProgramSet* programSet);
+    /**
+    @see SubRenderState::resolveDependencies.
+    */
+    virtual bool resolveDependencies(ProgramSet* programSet);
 
-	/**
-	@see SubRenderState::addFunctionInvocations.
-	*/
-	virtual bool addFunctionInvocations(ProgramSet* programSet);
+    /**
+    @see SubRenderState::addFunctionInvocations.
+    */
+    virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 protected:
-	/** Adds functions to calculate position data in world, object and projective space */
-	void addPositionCalculations(Function* vsMain, int& funcCounter);
+    /** Adds functions to calculate position data in world, object and projective space */
+    void addPositionCalculations(Function* vsMain, int& funcCounter);
 
-	/** Adds the weight of a given position for a given index */
-	void addIndexedPositionWeight(Function* vsMain, int index, int& funcCounter);
+    /** Adds the weight of a given position for a given index */
+    void addIndexedPositionWeight(Function* vsMain, int index, int& funcCounter);
 
-	/** Adds the calculations for calculating a normal related element */
-	void addNormalRelatedCalculations(Function* vsMain,
-						ParameterPtr& pNormalRelatedParam,
-						ParameterPtr& pNormalWorldRelatedParam,
-						int& funcCounter);
+    /** Adds the calculations for calculating a normal related element */
+    void addNormalRelatedCalculations(Function* vsMain,
+                        ParameterPtr& pNormalRelatedParam,
+                        ParameterPtr& pNormalWorldRelatedParam,
+                        int& funcCounter);
 
-	/** Adds the weight of a given normal related parameter for a given index */
-	void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalRelatedParam,
-						ParameterPtr& pNormalWorldRelatedParam,
-						int index, int& funcCounter);
+    /** Adds the weight of a given normal related parameter for a given index */
+    void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalRelatedParam,
+                        ParameterPtr& pNormalWorldRelatedParam,
+                        int index, int& funcCounter);
 };
 
 }

@@ -47,19 +47,19 @@ void FileSystemArchiveTests::tearDown()
 
 void FileSystemArchiveTests::testListNonRecursive()
 {
-	try {
-		FileSystemArchive arch(testPath, "FileSystem", true);
-		arch.load();
-		StringVectorPtr vec = arch.list(false);
+    try {
+        FileSystemArchive arch(testPath, "FileSystem", true);
+        arch.load();
+        StringVectorPtr vec = arch.list(false);
 
-		CPPUNIT_ASSERT_EQUAL((unsigned int)2, (unsigned int)vec->size());
-		CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), vec->at(0));
-		CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), vec->at(1));
-	}
-	catch (Exception& e)
-	{
-		std::cout << e.getFullDescription();
-	}
+        CPPUNIT_ASSERT_EQUAL((unsigned int)2, (unsigned int)vec->size());
+        CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), vec->at(0));
+        CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), vec->at(1));
+    }
+    catch (Exception& e)
+    {
+        std::cout << e.getFullDescription();
+    }
 
 }
 void FileSystemArchiveTests::testListRecursive()
@@ -280,22 +280,22 @@ void FileSystemArchiveTests::testReadInterleave()
 
 void FileSystemArchiveTests::testCreateAndRemoveFile()
 {
-	FileSystemArchive arch("./", "FileSystem", false);
-	arch.load();
+    FileSystemArchive arch("./", "FileSystem", false);
+    arch.load();
 
-	CPPUNIT_ASSERT(!arch.isReadOnly());
+    CPPUNIT_ASSERT(!arch.isReadOnly());
 
-	String fileName = "a_test_file.txt";
-	DataStreamPtr stream = arch.create(fileName);
+    String fileName = "a_test_file.txt";
+    DataStreamPtr stream = arch.create(fileName);
 
-	String testString = "Some text here";
-	size_t written = stream->write((void*)testString.c_str(), testString.size());
-	CPPUNIT_ASSERT_EQUAL(testString.size(), written);
+    String testString = "Some text here";
+    size_t written = stream->write((void*)testString.c_str(), testString.size());
+    CPPUNIT_ASSERT_EQUAL(testString.size(), written);
 
-	stream->close();
+    stream->close();
 
-	arch.remove(fileName);
+    arch.remove(fileName);
 
-	CPPUNIT_ASSERT(!arch.exists(fileName));
+    CPPUNIT_ASSERT(!arch.exists(fileName));
 
 }

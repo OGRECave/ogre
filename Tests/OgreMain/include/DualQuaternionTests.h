@@ -32,18 +32,18 @@ class DualQuaternionTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
     CPPUNIT_TEST_SUITE( DualQuaternionTests );
-	CPPUNIT_TEST(testConversion);
+    CPPUNIT_TEST(testConversion);
     CPPUNIT_TEST(testDefaultValue);
-	CPPUNIT_TEST(testMatrix);
+    CPPUNIT_TEST(testMatrix);
     CPPUNIT_TEST_SUITE_END();
 
 public:
     void setUp();
     void tearDown();
-	//Converts back and forth between a dual quaternion and a quaternion and vector
+    //Converts back and forth between a dual quaternion and a quaternion and vector
     void testConversion();
-	//Tests if the default values of a dual quaternion are the correct identity values
+    //Tests if the default values of a dual quaternion are the correct identity values
     void testDefaultValue();
-	//Converts back and forth between a dual quaternion and a transformation matrix
-	void testMatrix();
+    //Converts back and forth between a dual quaternion and a transformation matrix
+    void testMatrix();
 };

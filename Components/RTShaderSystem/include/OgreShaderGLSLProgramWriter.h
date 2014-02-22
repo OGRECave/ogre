@@ -50,69 +50,69 @@ namespace RTShader {
 */
 class _OgreRTSSExport GLSLProgramWriter : public ProgramWriter
 {
-	// Interface.
+    // Interface.
 public:
 
-	/** Class constructor. 
-	*/
-	GLSLProgramWriter();
+    /** Class constructor. 
+    */
+    GLSLProgramWriter();
 
-	/** Class destructor */
-	virtual ~GLSLProgramWriter();
-
-
-	/** 
-	@see ProgramWriter::writeSourceCode.
-	*/
-	virtual void writeSourceCode(std::ostream& os, Program* program);
-
-	/** 
-	@see ProgramWriter::getTargetLanguage.
-	*/
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
-
-	static String TargetLanguage;
+    /** Class destructor */
+    virtual ~GLSLProgramWriter();
 
 
-	// Protected methods.
+    /** 
+    @see ProgramWriter::writeSourceCode.
+    */
+    virtual void writeSourceCode(std::ostream& os, Program* program);
+
+    /** 
+    @see ProgramWriter::getTargetLanguage.
+    */
+    virtual const String& getTargetLanguage() const { return TargetLanguage; }
+
+    static String TargetLanguage;
+
+
+    // Protected methods.
 protected:
 
-	/** Initialize string maps. */
-	void initializeStringMaps();
+    /** Initialize string maps. */
+    void initializeStringMaps();
 
-	/** Write a local parameter. */
-	void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
+    /** Write a local parameter. */
+    void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
 
-	/** Write forward declarations. This is needed so that we can attach library shader at a later step. */
-	void writeForwardDeclarations(std::ostream& os, Program* program);
+    /** Write forward declarations. This is needed so that we can attach library shader at a later step. */
+    void writeForwardDeclarations(std::ostream& os, Program* program);
 
-	/** Write the input params of the function */
-	void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
-	
-	/** Write the output params of the function */
-	void writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
+    /** Write the input params of the function */
+    void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
+    
+    /** Write the output params of the function */
+    void writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
 
 protected:
-	typedef	map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
-	typedef	map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
-	typedef	map<Parameter::Content, const char*>::type	ParamContentToStringMap;
-	typedef	map<String, String>::type					StringMap;
+    typedef map<GpuConstantType, const char*>::type     GpuConstTypeToStringMap;
+    typedef map<Parameter::Semantic, const char*>::type ParamSemanticToStringMap;
+    typedef map<Parameter::Content, const char*>::type  ParamContentToStringMap;
+    typedef map<String, String>::type                   StringMap;
 
-	// Attributes.
+    // Attributes.
 protected:
-	// Map between GPU constant type to string value.
-	GpuConstTypeToStringMap mGpuConstTypeMap;
-	// Map between parameter semantic to string value.
-	ParamSemanticToStringMap mParamSemanticMap;
+    // Map between GPU constant type to string value.
+    GpuConstTypeToStringMap mGpuConstTypeMap;
+    // Map between parameter semantic to string value.
+    ParamSemanticToStringMap mParamSemanticMap;
 
-	// Map parameter name to a new parameter name (sometime renaming is required to match names between vertex and fragment shader)
-	StringMap mInputToGLStatesMap;
-	// Map parameter content to vertex attributes 
-	ParamContentToStringMap mContentToPerVertexAttributes;
-	// Holds the current glsl version
-	int mGLSLVersion;
-	// Holds the fragment input params 
-	StringVector mFragInputParams;
+    // Map parameter name to a new parameter name (sometime renaming is required to match names between vertex and fragment shader)
+    StringMap mInputToGLStatesMap;
+    // Map parameter content to vertex attributes 
+    ParamContentToStringMap mContentToPerVertexAttributes;
+    // Holds the current glsl version
+    int mGLSLVersion;
+    // Holds the fragment input params 
+    StringVector mFragInputParams;
 };
 
 /** GLSL program writer factory implementation.
@@ -121,29 +121,29 @@ protected:
 class _OgreRTSSExport ShaderProgramWriterGLSLFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterGLSLFactory() : mLanguage("glsl")
-	{
-	}
-	virtual ~ShaderProgramWriterGLSLFactory() {}
+    ShaderProgramWriterGLSLFactory() : mLanguage("glsl")
+    {
+    }
+    virtual ~ShaderProgramWriterGLSLFactory() {}
 
-	/** 
-	@see ProgramWriterFactory::getTargetLanguage
-	*/
-	virtual const String& getTargetLanguage(void) const
-	{
-		return mLanguage;
-	}
+    /** 
+    @see ProgramWriterFactory::getTargetLanguage
+    */
+    virtual const String& getTargetLanguage(void) const
+    {
+        return mLanguage;
+    }
 
-	/** 
-	@see ProgramWriterFactory::create
-	*/
-	virtual ProgramWriter* create(void)
-	{
-		return OGRE_NEW GLSLProgramWriter();
-	}
+    /** 
+    @see ProgramWriterFactory::create
+    */
+    virtual ProgramWriter* create(void)
+    {
+        return OGRE_NEW GLSLProgramWriter();
+    }
 
 private:
-	String mLanguage;
+    String mLanguage;
 
 };
 

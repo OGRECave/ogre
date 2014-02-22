@@ -30,7 +30,7 @@ OgrePCZPlugin.h  -  Portal Connected Zone Scene Manager Plugin class
 begin                : Mon Feb 19 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -47,33 +47,33 @@ namespace Ogre
     class PortalFactory;
     class AntiPortalFactory;
 
-	/** Plugin instance for PCZ Manager */
-	class PCZPlugin : public Plugin
-	{
-	public:
-		PCZPlugin();
+    /** Plugin instance for PCZ Manager */
+    class PCZPlugin : public Plugin
+    {
+    public:
+        PCZPlugin();
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		PCZSceneManagerFactory* mPCZSMFactory;
-		PCZoneFactoryManager* mPCZoneFactoryManager;
-		PCZLightFactory* mPCZLightFactory;
-		PortalFactory* mPortalFactory;
-		AntiPortalFactory* mAntiPortalFactory;
-	};
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        PCZSceneManagerFactory* mPCZSMFactory;
+        PCZoneFactoryManager* mPCZoneFactoryManager;
+        PCZLightFactory* mPCZLightFactory;
+        PortalFactory* mPortalFactory;
+        AntiPortalFactory* mAntiPortalFactory;
+    };
 }
 
 #endif

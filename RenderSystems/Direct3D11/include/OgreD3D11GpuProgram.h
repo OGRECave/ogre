@@ -34,114 +34,114 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** Direct3D implementation of a few things common to low-level vertex & fragment programs. */
-	class D3D11GpuProgram : public GpuProgram
-	{
-	protected:
-		D3D11Device & mDevice;
-	public:
-		D3D11GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+    /** Direct3D implementation of a few things common to low-level vertex & fragment programs. */
+    class D3D11GpuProgram : public GpuProgram
+    {
+    protected:
+        D3D11Device & mDevice;
+    public:
+        D3D11GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
 
-	protected:
-		/** @copydoc Resource::loadImpl */
-		void loadImpl(void);
-		/** Overridden from GpuProgram */
-		void loadFromSource(void);
-		/** Internal method to load from microcode, must be overridden by subclasses. */
-		virtual void loadFromMicrocode(ID3D10Blob *  microcode) = 0;
-
-
-	};
-
-	/** Direct3D implementation of low-level vertex programs. */
-	class D3D11GpuVertexProgram : public D3D11GpuProgram
-	{
-	protected:
-		ID3D11VertexShader * mVertexShader;
-	public:
-		D3D11GpuVertexProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
-		~D3D11GpuVertexProgram();
-		/// Gets the vertex shader
-		ID3D11VertexShader * getVertexShader(void) const;
-	protected:
-		/** @copydoc Resource::unloadImpl */
-		void unloadImpl(void);
-		void loadFromMicrocode(ID3D10Blob *  microcode);
-	};
-
-	/** Direct3D implementation of low-level fragment programs. */
-	class D3D11GpuFragmentProgram : public D3D11GpuProgram
-	{
-	protected:
-		ID3D11PixelShader * mPixelShader;
-	public:
-		D3D11GpuFragmentProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
-		~D3D11GpuFragmentProgram();
-		/// Gets the pixel shader
-		ID3D11PixelShader * getPixelShader(void) const;
-	protected:
-		/** @copydoc Resource::unloadImpl */
-		void unloadImpl(void);
-		void loadFromMicrocode(ID3D10Blob *  microcode);
-	};
-
-	/** Direct3D implementation of low-level vertex programs. */
-	class D3D11GpuDomainProgram : public D3D11GpuProgram
-	{
-	protected:
-		ID3D11DomainShader * mDomainShader;
-	public:
-		D3D11GpuDomainProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
-		~D3D11GpuDomainProgram();
-		/// Gets the vertex shader
-		ID3D11DomainShader * getDomainShader(void) const;
-	protected:
-		/** @copydoc Resource::unloadImpl */
-		void unloadImpl(void);
-		void loadFromMicrocode(ID3D10Blob *  microcode);
-	};
-
-	/** Direct3D implementation of low-level vertex programs. */
-	class D3D11GpuHullProgram : public D3D11GpuProgram
-	{
-	protected:
-		ID3D11HullShader * mHullShader;
-	public:
-		D3D11GpuHullProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
-		~D3D11GpuHullProgram();
-		/// Gets the vertex shader
-		ID3D11HullShader * getHullShader() const;
-	protected:
-		/** @copydoc Resource::unloadImpl */
-		void unloadImpl(void);
-		void loadFromMicrocode(ID3D10Blob *  microcode);
-	};
+    protected:
+        /** @copydoc Resource::loadImpl */
+        void loadImpl(void);
+        /** Overridden from GpuProgram */
+        void loadFromSource(void);
+        /** Internal method to load from microcode, must be overridden by subclasses. */
+        virtual void loadFromMicrocode(ID3D10Blob *  microcode) = 0;
 
 
-	/** 
-		Direct3D implementation of low-level geometry programs. 
-		Added due to need to accept geometry programs came from other profiles (nvgp4, for example)
-	*/
-	class D3D11GpuGeometryProgram : public D3D11GpuProgram
-	{
-	protected:
-		ID3D11GeometryShader * mGeometryShader;
-	public:
-		D3D11GpuGeometryProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
-		~D3D11GpuGeometryProgram();
-		/// Gets the geometry shader
-		ID3D11GeometryShader * getGeometryShader(void) const;
-	protected:
-		/** @copydoc Resource::unloadImpl */
-		void unloadImpl(void);
-		void loadFromMicrocode(ID3D10Blob *  microcode);
-	};
+    };
+
+    /** Direct3D implementation of low-level vertex programs. */
+    class D3D11GpuVertexProgram : public D3D11GpuProgram
+    {
+    protected:
+        ID3D11VertexShader * mVertexShader;
+    public:
+        D3D11GpuVertexProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+        ~D3D11GpuVertexProgram();
+        /// Gets the vertex shader
+        ID3D11VertexShader * getVertexShader(void) const;
+    protected:
+        /** @copydoc Resource::unloadImpl */
+        void unloadImpl(void);
+        void loadFromMicrocode(ID3D10Blob *  microcode);
+    };
+
+    /** Direct3D implementation of low-level fragment programs. */
+    class D3D11GpuFragmentProgram : public D3D11GpuProgram
+    {
+    protected:
+        ID3D11PixelShader * mPixelShader;
+    public:
+        D3D11GpuFragmentProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+        ~D3D11GpuFragmentProgram();
+        /// Gets the pixel shader
+        ID3D11PixelShader * getPixelShader(void) const;
+    protected:
+        /** @copydoc Resource::unloadImpl */
+        void unloadImpl(void);
+        void loadFromMicrocode(ID3D10Blob *  microcode);
+    };
+
+    /** Direct3D implementation of low-level vertex programs. */
+    class D3D11GpuDomainProgram : public D3D11GpuProgram
+    {
+    protected:
+        ID3D11DomainShader * mDomainShader;
+    public:
+        D3D11GpuDomainProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+        ~D3D11GpuDomainProgram();
+        /// Gets the vertex shader
+        ID3D11DomainShader * getDomainShader(void) const;
+    protected:
+        /** @copydoc Resource::unloadImpl */
+        void unloadImpl(void);
+        void loadFromMicrocode(ID3D10Blob *  microcode);
+    };
+
+    /** Direct3D implementation of low-level vertex programs. */
+    class D3D11GpuHullProgram : public D3D11GpuProgram
+    {
+    protected:
+        ID3D11HullShader * mHullShader;
+    public:
+        D3D11GpuHullProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+        ~D3D11GpuHullProgram();
+        /// Gets the vertex shader
+        ID3D11HullShader * getHullShader() const;
+    protected:
+        /** @copydoc Resource::unloadImpl */
+        void unloadImpl(void);
+        void loadFromMicrocode(ID3D10Blob *  microcode);
+    };
+
+
+    /** 
+        Direct3D implementation of low-level geometry programs. 
+        Added due to need to accept geometry programs came from other profiles (nvgp4, for example)
+    */
+    class D3D11GpuGeometryProgram : public D3D11GpuProgram
+    {
+    protected:
+        ID3D11GeometryShader * mGeometryShader;
+    public:
+        D3D11GpuGeometryProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+        ~D3D11GpuGeometryProgram();
+        /// Gets the geometry shader
+        ID3D11GeometryShader * getGeometryShader(void) const;
+    protected:
+        /** @copydoc Resource::unloadImpl */
+        void unloadImpl(void);
+        void loadFromMicrocode(ID3D10Blob *  microcode);
+    };
 }
 
 

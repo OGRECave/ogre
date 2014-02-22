@@ -48,13 +48,13 @@ namespace Ogre {
 
         virtual void getCustomAttribute(const String& name, void* pData);
 
-		/// Override needed to deal with multisample buffers
-		virtual void swapBuffers();
+        /// Override needed to deal with multisample buffers
+        virtual void swapBuffers();
 
-		/// Override so we can attach the depth buffer to the FBO
-		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
-		virtual void detachDepthBuffer();
-		virtual void _detachDepthBuffer();
+        /// Override so we can attach the depth buffer to the FBO
+        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
+        virtual void detachDepthBuffer();
+        virtual void _detachDepthBuffer();
     protected:
         GLFrameBufferObject mFB;
     };
@@ -65,7 +65,7 @@ namespace Ogre {
     {
     public:
         GLFBOManager(bool atimode);
-		~GLFBOManager();
+        ~GLFBOManager();
         
         /** Bind a certain render target if it is a FBO. If it is not a FBO, bind the
             main frame buffer.
@@ -83,11 +83,11 @@ namespace Ogre {
         /** Create a texture rendertarget object
         */
         virtual GLFBORenderTexture *createRenderTexture(const String &name, 
-			const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+            const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
 
-		/** Create a multi render target 
-		*/
-		virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
+        /** Create a multi render target 
+        */
+        virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
         
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
         */
@@ -141,7 +141,7 @@ namespace Ogre {
             GLenum format;
             size_t width;
             size_t height;
-			uint samples;
+            uint samples;
             // Overloaded comparison operator for usage in map
             bool operator < (const RBFormat &other) const
             {
@@ -159,11 +159,11 @@ namespace Ogre {
                     {
                         if(height < other.height)
                             return true;
-						else if (height == other.height)
-						{
-							if (samples < other.samples)
-								return true;
-						}
+                        else if (height == other.height)
+                        {
+                            if (samples < other.samples)
+                                return true;
+                        }
                     }
                 }
                 return false;
@@ -186,8 +186,8 @@ namespace Ogre {
          */
         GLuint mTempFBO;
         
-		/// Buggy ATI driver?
-		bool mATIMode;
+        /// Buggy ATI driver?
+        bool mATIMode;
         
         /** Detect allowed FBO formats */
         void detectFBOFormats();

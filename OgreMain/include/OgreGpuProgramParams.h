@@ -112,11 +112,11 @@ namespace Ogre {
         GCT_BOOL2 = 45,
         GCT_BOOL3 = 46,
         GCT_BOOL4 = 47,
-		GCT_SAMPLER_WRAPPER1D = 48,
-		GCT_SAMPLER_WRAPPER2D = 49,
-		GCT_SAMPLER_WRAPPER3D = 50,
-		GCT_SAMPLER_WRAPPERCUBE = 51,
-		GCT_SAMPLER_STATE = 52, //only for hlsl 4.0
+        GCT_SAMPLER_WRAPPER1D = 48,
+        GCT_SAMPLER_WRAPPER2D = 49,
+        GCT_SAMPLER_WRAPPER3D = 50,
+        GCT_SAMPLER_WRAPPERCUBE = 51,
+        GCT_SAMPLER_STATE = 52, //only for hlsl 4.0
         GCT_UNKNOWN = 99
     };
 
@@ -1349,7 +1349,7 @@ namespace Ogre {
             */
             ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,
             /** Binds custom per-light constants to the shaders. */
-			ACT_LIGHT_CUSTOM,
+            ACT_LIGHT_CUSTOM,
 
             ACT_UNKNOWN = 999
         };

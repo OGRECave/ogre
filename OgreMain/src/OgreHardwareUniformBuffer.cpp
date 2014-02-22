@@ -33,13 +33,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	HardwareUniformBuffer::HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
-									HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-		: HardwareBuffer(usage, false, useShadowBuffer)
+    HardwareUniformBuffer::HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
+                                    HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+        : HardwareBuffer(usage, false, useShadowBuffer)
         , mMgr(mgr)
-		, mName(name)
-	{
-		// Calculate the size of the vertices
+        , mName(name)
+    {
+        // Calculate the size of the vertices
         mSizeInBytes = sizeBytes;
 
         // Create a shadow buffer if required
@@ -47,111 +47,111 @@ namespace Ogre {
         {
             mShadowBuffer = OGRE_NEW DefaultHardwareUniformBuffer(mMgr, sizeBytes, HardwareBuffer::HBU_DYNAMIC, false);
         }
-	}
-	
-	HardwareUniformBuffer::~HardwareUniformBuffer()
-	{
-		if (mMgr)
-		{
-			mMgr->_notifyUniformBufferDestroyed(this);
-		}
+    }
+    
+    HardwareUniformBuffer::~HardwareUniformBuffer()
+    {
+        if (mMgr)
+        {
+            mMgr->_notifyUniformBufferDestroyed(this);
+        }
         OGRE_DELETE mShadowBuffer;
-	}
+    }
 
-	/*
-	bool HardwareUniformBuffer::writeParams(GpuProgramParametersSharedPtr params)
-	{
-		// Lock buffer
-		void* mappedData = this->lock(HardwareBuffer::HBL_DISCARD);
-		if (!mappedData)
-		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-				"Cannot update uniform buffer\nError description: error locking uniform buffer",
-				"HardwareUniformBuffer::writeParams");
-		}
+    /*
+    bool HardwareUniformBuffer::writeParams(GpuProgramParametersSharedPtr params)
+    {
+        // Lock buffer
+        void* mappedData = this->lock(HardwareBuffer::HBL_DISCARD);
+        if (!mappedData)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                "Cannot update uniform buffer\nError description: error locking uniform buffer",
+                "HardwareUniformBuffer::writeParams");
+        }
 
-		// Store temporary data address
-		void* srcData = 0;
+        // Store temporary data address
+        void* srcData = 0;
 
-		// Iterate through variables
-		ShaderVariableIterator it = mShaderVars.begin();
-		ShaderVariableIterator end = mShaderVars.end();
-		while(it != end)
-		{
-			String varName = it->name;
+        // Iterate through variables
+        ShaderVariableIterator it = mShaderVars.begin();
+        ShaderVariableIterator end = mShaderVars.end();
+        while(it != end)
+        {
+            String varName = it->name;
 
-			// hack for cg parameter with strange prefix
-			if (varName.size() > 0 && varName[0] == '_')
-			{
-				varName.erase(0,1);
-			}
+            // hack for cg parameter with strange prefix
+            if (varName.size() > 0 && varName[0] == '_')
+            {
+                varName.erase(0,1);
+            }
 
-			const GpuConstantDefinition& def = params->getConstantDefinition(varName);
-			if (def.isFloat())
-			{
-				srcData = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
-			}
-			else
-			{
-				srcData = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
-			}
+            const GpuConstantDefinition& def = params->getConstantDefinition(varName);
+            if (def.isFloat())
+            {
+                srcData = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
+            }
+            else
+            {
+                srcData = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
+            }
 
-			memcpy( &(((char *)(mappedData))[it->startOffset]), srcData , it->size);
-		}
+            memcpy( &(((char *)(mappedData))[it->startOffset]), srcData , it->size);
+        }
 
-		// Unlock buffer
-		this->unlock();
+        // Unlock buffer
+        this->unlock();
 
-		return true;
-	}
+        return true;
+    }
 
-	bool HardwareUniformBuffer::writeSharedParams(GpuSharedParametersPtr sharedParams)
-	{
-		// Lock buffer
-		void* mappedData = this->lock(HardwareBuffer::HBL_DISCARD);
-		if (!mappedData)
-		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-				"Cannot update uniform buffer\nError description: error locking uniform buffer",
-				"HardwareUniformBuffer::writeParams");
-		}
+    bool HardwareUniformBuffer::writeSharedParams(GpuSharedParametersPtr sharedParams)
+    {
+        // Lock buffer
+        void* mappedData = this->lock(HardwareBuffer::HBL_DISCARD);
+        if (!mappedData)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                "Cannot update uniform buffer\nError description: error locking uniform buffer",
+                "HardwareUniformBuffer::writeParams");
+        }
 
-		// Store temporary data address
-		void* srcData = 0;
+        // Store temporary data address
+        void* srcData = 0;
 
-		// Iterate through variables
-		ShaderVariableIterator it = mShaderVars.begin();
-		ShaderVariableIterator end = mShaderVars.end();
-		while(it != end)
-		{
-			String varName = it->name;
+        // Iterate through variables
+        ShaderVariableIterator it = mShaderVars.begin();
+        ShaderVariableIterator end = mShaderVars.end();
+        while(it != end)
+        {
+            String varName = it->name;
 
-			// hack for cg parameter with strange prefix
-			if (varName.size() > 0 && varName[0] == '_')
-			{
-				varName.erase(0,1);
-			}
+            // hack for cg parameter with strange prefix
+            if (varName.size() > 0 && varName[0] == '_')
+            {
+                varName.erase(0,1);
+            }
 
-			const GpuConstantDefinition& def = sharedParams->getConstantDefinition(varName);
-			if (def.isFloat())
-			{
-				srcData = (void *)&(*(sharedParams->getFloatConstantList().begin() + def.physicalIndex));
-			}
-			else
-			{
-				srcData = (void *)&(*(sharedParams->getIntConstantList().begin() + def.physicalIndex));
-			}
+            const GpuConstantDefinition& def = sharedParams->getConstantDefinition(varName);
+            if (def.isFloat())
+            {
+                srcData = (void *)&(*(sharedParams->getFloatConstantList().begin() + def.physicalIndex));
+            }
+            else
+            {
+                srcData = (void *)&(*(sharedParams->getIntConstantList().begin() + def.physicalIndex));
+            }
 
-			memcpy( &(((char *)(mappedData))[it->startOffset]), srcData , it->size);
-		}
+            memcpy( &(((char *)(mappedData))[it->startOffset]), srcData , it->size);
+        }
 
-		// Unlock buffer
-		this->unlock();
+        // Unlock buffer
+        this->unlock();
 
-		return true;
-	}
-	*/
-	//-----------------------------------------------------------------------------
+        return true;
+    }
+    */
+    //-----------------------------------------------------------------------------
     HardwareUniformBufferSharedPtr::HardwareUniformBufferSharedPtr(HardwareUniformBuffer* buf)
         : SharedPtr<HardwareUniformBuffer>(buf)
     {

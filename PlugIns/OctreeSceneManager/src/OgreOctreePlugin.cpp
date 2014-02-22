@@ -32,46 +32,46 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	const String sPluginName = "Octree Scene Manager";
-	//---------------------------------------------------------------------
-	OctreePlugin::OctreePlugin()
-		:mOctreeSMFactory(0)
-	{
+    const String sPluginName = "Octree Scene Manager";
+    //---------------------------------------------------------------------
+    OctreePlugin::OctreePlugin()
+        :mOctreeSMFactory(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	const String& OctreePlugin::getName() const
-	{
-		return sPluginName;
-	}
-	//---------------------------------------------------------------------
-	void OctreePlugin::install()
-	{
-		// Create objects
-		mOctreeSMFactory = OGRE_NEW OctreeSceneManagerFactory();
+    }
+    //---------------------------------------------------------------------
+    const String& OctreePlugin::getName() const
+    {
+        return sPluginName;
+    }
+    //---------------------------------------------------------------------
+    void OctreePlugin::install()
+    {
+        // Create objects
+        mOctreeSMFactory = OGRE_NEW OctreeSceneManagerFactory();
 
-	}
-	//---------------------------------------------------------------------
-	void OctreePlugin::initialise()
-	{
-		// Register
-		Root::getSingleton().addSceneManagerFactory(mOctreeSMFactory);
-	}
-	//---------------------------------------------------------------------
-	void OctreePlugin::shutdown()
-	{
-		// Unregister
-		Root::getSingleton().removeSceneManagerFactory(mOctreeSMFactory);
-	}
-	//---------------------------------------------------------------------
-	void OctreePlugin::uninstall()
-	{
-		// destroy 
-		OGRE_DELETE mOctreeSMFactory;
-		mOctreeSMFactory = 0;
+    }
+    //---------------------------------------------------------------------
+    void OctreePlugin::initialise()
+    {
+        // Register
+        Root::getSingleton().addSceneManagerFactory(mOctreeSMFactory);
+    }
+    //---------------------------------------------------------------------
+    void OctreePlugin::shutdown()
+    {
+        // Unregister
+        Root::getSingleton().removeSceneManagerFactory(mOctreeSMFactory);
+    }
+    //---------------------------------------------------------------------
+    void OctreePlugin::uninstall()
+    {
+        // destroy 
+        OGRE_DELETE mOctreeSMFactory;
+        mOctreeSMFactory = 0;
 
 
-	}
+    }
 
 
 }

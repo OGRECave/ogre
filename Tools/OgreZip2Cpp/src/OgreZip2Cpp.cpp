@@ -92,7 +92,7 @@ int main(int numargs, char** args)
 
     // open, read the data to memory and close the in file
     std::ifstream roStream;
-	roStream.open(zipFileName.c_str(),  std::ifstream::in | std::ifstream::binary);
+    roStream.open(zipFileName.c_str(),  std::ifstream::in | std::ifstream::binary);
     roStream.read((char *)inFileData, fileSize);
     roStream.close();
 
@@ -107,26 +107,26 @@ int main(int numargs, char** args)
     // ----------------------------------
 
     // add the include
-	outFileDataPos+= sprintf(outFileDataPos, "#include \"OgreZip.h\"\n\n");
+    outFileDataPos+= sprintf(outFileDataPos, "#include \"OgreZip.h\"\n\n");
     
     // start the names place
-	outFileDataPos+= sprintf(outFileDataPos, "namespace Ogre {\n");
-	
+    outFileDataPos+= sprintf(outFileDataPos, "namespace Ogre {\n");
+    
     // declare the struct 
     outFileDataPos+= sprintf(outFileDataPos, "struct %s{\n", structName.c_str());
     
     // add a data member for the file name
-	outFileDataPos+= sprintf(outFileDataPos, "\tconst char * fileName;\n");
+    outFileDataPos+= sprintf(outFileDataPos, "\tconst char * fileName;\n");
 
     //  the struct contractor
-	outFileDataPos+= sprintf(outFileDataPos, "\t%s() : fileName(\"%s\")\n", structName.c_str(), zipFileName.c_str());
-	outFileDataPos+= sprintf(outFileDataPos, "\t{\n");
+    outFileDataPos+= sprintf(outFileDataPos, "\t%s() : fileName(\"%s\")\n", structName.c_str(), zipFileName.c_str());
+    outFileDataPos+= sprintf(outFileDataPos, "\t{\n");
 
     // declare and init the content of the zip file to a static buffer
-	outFileDataPos+= sprintf(outFileDataPos, "\t\tstatic uint8 fileData[] = \n");
-	outFileDataPos+= sprintf(outFileDataPos, "\t\t{\n\t\t\t");    
-	int posCurOutInLine = 0;
-	for( std::streamsize i = 0 ;  i < fileSize ; i++ ) 
+    outFileDataPos+= sprintf(outFileDataPos, "\t\tstatic uint8 fileData[] = \n");
+    outFileDataPos+= sprintf(outFileDataPos, "\t\t{\n\t\t\t");    
+    int posCurOutInLine = 0;
+    for( std::streamsize i = 0 ;  i < fileSize ; i++ ) 
     {                
         // get the current char        
         unsigned char outChar = inFileData[i];
@@ -139,61 +139,61 @@ int main(int numargs, char** args)
         if(outChar < 10) 
             outFileDataPos+= sprintf(outFileDataPos, " ");
         if(outChar < 100)
-		    outFileDataPos+= sprintf(outFileDataPos, " ");
+            outFileDataPos+= sprintf(outFileDataPos, " ");
 
         // output the char to the out cpp file
-		outFileDataPos+= sprintf(outFileDataPos, "%d", outChar);
-	    posCurOutInLine+=3;
+        outFileDataPos+= sprintf(outFileDataPos, "%d", outChar);
+        posCurOutInLine+=3;
 
         // add a comman after every char but the last
-		if(i + 1 != fileSize) {
-			outFileDataPos+= sprintf(outFileDataPos, ", ");
-			posCurOutInLine+=2;
-		}
+        if(i + 1 != fileSize) {
+            outFileDataPos+= sprintf(outFileDataPos, ", ");
+            posCurOutInLine+=2;
+        }
 
         // cut the line every 100 chars
-		if (posCurOutInLine > 100) {
-			outFileDataPos+= sprintf(outFileDataPos, "\n\t\t\t");
-			posCurOutInLine = 0;
-		}
-	}
+        if (posCurOutInLine > 100) {
+            outFileDataPos+= sprintf(outFileDataPos, "\n\t\t\t");
+            posCurOutInLine = 0;
+        }
+    }
 
     // close the static buffer that holds the file data
-	outFileDataPos+= sprintf(outFileDataPos, "\n\t\t};\n");
+    outFileDataPos+= sprintf(outFileDataPos, "\n\t\t};\n");
 
     // register the file buffer to tEmbeddedZipArchiveFactory
-	outFileDataPos+= sprintf(outFileDataPos, "\t\tEmbeddedZipArchiveFactory::addEmbbeddedFile(fileName, fileData, sizeof(fileData), NULL);\n");
+    outFileDataPos+= sprintf(outFileDataPos, "\t\tEmbeddedZipArchiveFactory::addEmbbeddedFile(fileName, fileData, sizeof(fileData), NULL);\n");
 
     // close the contractor 
-	outFileDataPos+= sprintf(outFileDataPos, "}\n");
+    outFileDataPos+= sprintf(outFileDataPos, "}\n");
 
 // This code may be risky in some case and is not relevant in most case for this tool so I am leaving it out. 
 //     // the distractor
-// 	outFileDataPos+= sprintf(outFileDataPos, "\t~%s()\n", structName.c_str());
-// 	outFileDataPos+= sprintf(outFileDataPos, "\t{\n");
+//  outFileDataPos+= sprintf(outFileDataPos, "\t~%s()\n", structName.c_str());
+//  outFileDataPos+= sprintf(outFileDataPos, "\t{\n");
 //     // remove the file from tEmbeddedZipArchiveFactory in the distractor (for the case of dynamic plugin unload?)
-// 	outFileDataPos+= sprintf(outFileDataPos, "\t\tEmbeddedZipArchiveFactory::removeEmbbeddedFile(fileName);\n");
-// 	outFileDataPos+= sprintf(outFileDataPos, "\t}\n");
+//  outFileDataPos+= sprintf(outFileDataPos, "\t\tEmbeddedZipArchiveFactory::removeEmbbeddedFile(fileName);\n");
+//  outFileDataPos+= sprintf(outFileDataPos, "\t}\n");
 
     // close the class
-	outFileDataPos+= sprintf(outFileDataPos, "};\n");
-	outFileDataPos+= sprintf(outFileDataPos, "\n");
+    outFileDataPos+= sprintf(outFileDataPos, "};\n");
+    outFileDataPos+= sprintf(outFileDataPos, "\n");
 
     // declare a global (static) variable so the struct contractor will be called when the program starts
     // or the plugin loads.
-	outFileDataPos+= sprintf(outFileDataPos, "%s g_%s;\n", structName.c_str(), structName.c_str());
-	outFileDataPos+= sprintf(outFileDataPos, "\n");
+    outFileDataPos+= sprintf(outFileDataPos, "%s g_%s;\n", structName.c_str(), structName.c_str());
+    outFileDataPos+= sprintf(outFileDataPos, "\n");
 
     // close the Ogre name space
-	outFileDataPos+= sprintf(outFileDataPos, "}\n");
+    outFileDataPos+= sprintf(outFileDataPos, "}\n");
 
     // write out the cpp file
     std::ofstream writeStream;
-	writeStream.open(cppFileName.c_str(),  std::ifstream::out | std::ofstream::binary);
+    writeStream.open(cppFileName.c_str(),  std::ifstream::out | std::ofstream::binary);
     writeStream.write(outFileData, ((std::streamsize)(outFileDataPos - outFileData)));
     writeStream.close();
 
     // done, let go home and drink some beers
-	return 0;
+    return 0;
 }
 

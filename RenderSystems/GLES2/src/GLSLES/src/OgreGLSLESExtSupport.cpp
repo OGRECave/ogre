@@ -35,13 +35,13 @@ THE SOFTWARE.
 namespace Ogre
 {
     //-----------------------------------------------------------------------------
-	String logObjectInfo(const String& msg, const GLuint obj)
-	{
-		String logMessage = msg;
+    String logObjectInfo(const String& msg, const GLuint obj)
+    {
+        String logMessage = msg;
 
-		if (obj > 0)
-		{
-			GLint infologLength = 0;
+        if (obj > 0)
+        {
+            GLint infologLength = 0;
 
             if(glIsShader(obj))
             {
@@ -62,12 +62,12 @@ namespace Ogre
             }
 #endif
 
-			if (infologLength > 1)
-			{
-				GLint charsWritten  = 0;
+            if (infologLength > 1)
+            {
+                GLint charsWritten  = 0;
 
-				char * infoLog = new char [infologLength];
-				infoLog[0] = 0;
+                char * infoLog = new char [infologLength];
+                infoLog[0] = 0;
 
                 if(glIsShader(obj))
                 {
@@ -88,27 +88,27 @@ namespace Ogre
                 }
 #endif
 
-				if (strlen(infoLog) > 0)
-				{
-					logMessage += "\n" + String(infoLog);
-				}
+                if (strlen(infoLog) > 0)
+                {
+                    logMessage += "\n" + String(infoLog);
+                }
 
-				delete [] infoLog;
+                delete [] infoLog;
 
-				if (logMessage.size() > 0)
-				{
-					// remove ends of line in the end - so there will be no empty lines in the log.
-					while( logMessage[logMessage.size() - 1] == '\n' )
-					{
-						logMessage.erase(logMessage.size() - 1, 1);
-					}
-					LogManager::getSingleton().logMessage(logMessage);
-				}
-			}
-		}
+                if (logMessage.size() > 0)
+                {
+                    // remove ends of line in the end - so there will be no empty lines in the log.
+                    while( logMessage[logMessage.size() - 1] == '\n' )
+                    {
+                        logMessage.erase(logMessage.size() - 1, 1);
+                    }
+                    LogManager::getSingleton().logMessage(logMessage);
+                }
+            }
+        }
 
-		return logMessage;
-	}
+        return logMessage;
+    }
 
 
 } // namespace Ogre

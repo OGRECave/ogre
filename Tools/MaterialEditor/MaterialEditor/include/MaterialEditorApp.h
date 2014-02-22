@@ -35,13 +35,13 @@ using Ogre::Root;
 class MaterialEditorApp : public wxApp
 {
 public:
-	virtual ~MaterialEditorApp();
+    virtual ~MaterialEditorApp();
 
 private:
-	virtual bool OnInit();
-	virtual int OnExit();
+    virtual bool OnInit();
+    virtual int OnExit();
 
-	Root* mRoot;
+    Root* mRoot;
 };
 
 IMPLEMENT_APP(MaterialEditorApp)

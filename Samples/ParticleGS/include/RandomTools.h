@@ -6,7 +6,7 @@
 class RandomTools
 {
 public:
-	static Ogre::TexturePtr generateRandomVelocityTexture();
+    static Ogre::TexturePtr generateRandomVelocityTexture();
 };
 
 #endif

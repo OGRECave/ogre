@@ -43,26 +43,26 @@ namespace Ogre {
 
         /** See GLContext */
         virtual void setCurrent();
-		/**
+        /**
          * This is called before another context is made current. By default,
          * nothing is done here.
          */
         virtual void endCurrent();
-		/** Create a new context based on the same window/pbuffer as this
-			context - mostly useful for additional threads.
-		@note The caller is responsible for deleting the returned context.
-		*/
-		virtual GLContext* clone() const;
-		/**
-		 * Return value will be "AGL"
-		 */
-		virtual String getContextType();
+        /** Create a new context based on the same window/pbuffer as this
+            context - mostly useful for additional threads.
+        @note The caller is responsible for deleting the returned context.
+        */
+        virtual GLContext* clone() const;
+        /**
+         * Return value will be "AGL"
+         */
+        virtual String getContextType();
 
-		/** Grab the AGLContext if it exists */
-		AGLContext getContext() { return mAGLContext; }
+        /** Grab the AGLContext if it exists */
+        AGLContext getContext() { return mAGLContext; }
 
-	private:
-		AGLContext mAGLContext;
+    private:
+        AGLContext mAGLContext;
         AGLPixelFormat mPixelFormat;
     };
 }

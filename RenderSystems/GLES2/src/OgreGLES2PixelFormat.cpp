@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 
 namespace Ogre {
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLOriginFormat(PixelFormat mFormat)
     {
         switch (mFormat)
@@ -97,18 +97,18 @@ namespace Ogre {
 #endif
 
 #if OGRE_NO_ETC_CODEC == 0 
-#	ifdef GL_OES_compressed_ETC1_RGB8_texture
+#   ifdef GL_OES_compressed_ETC1_RGB8_texture
             case PF_ETC1_RGB8:
                 return GL_ETC1_RGB8_OES;
-#	endif
-#	ifdef GL_AMD_compressed_ATC_texture
-			case PF_ATC_RGB:
-				return ATC_RGB_AMD;
-			case PF_ATC_RGBA_EXPLICIT_ALPHA:
-				return ATC_RGBA_EXPLICIT_ALPHA_AMD;
-			case PF_ATC_RGBA_INTERPOLATED_ALPHA:
-				return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
-#	endif
+#   endif
+#   ifdef GL_AMD_compressed_ATC_texture
+            case PF_ATC_RGB:
+                return ATC_RGB_AMD;
+            case PF_ATC_RGBA_EXPLICIT_ALPHA:
+                return ATC_RGBA_EXPLICIT_ALPHA_AMD;
+            case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+                return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+#   endif
 #endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -129,7 +129,7 @@ namespace Ogre {
                 return GL_RGB;
 
             case PF_X8R8G8B8:
-			case PF_A8R8G8B8:
+            case PF_A8R8G8B8:
             case PF_A4R4G4B4:
             case PF_A1R5G5B5:
             case PF_B8G8R8A8:
@@ -140,7 +140,7 @@ namespace Ogre {
 #endif
 
             case PF_A8B8G8R8:
-			case PF_R8G8B8A8:
+            case PF_R8G8B8A8:
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
             case PF_SHORT_RGBA:
@@ -171,21 +171,21 @@ namespace Ogre {
             case PF_R8_SINT:
             case PF_R16_SINT:
             case PF_R32_SINT:
-				return GL_RED_INTEGER;
+                return GL_RED_INTEGER;
             case PF_R8G8_UINT:
             case PF_R16G16_UINT:
             case PF_R32G32_UINT:
             case PF_R8G8_SINT:
             case PF_R16G16_SINT:
             case PF_R32G32_SINT:
-				return GL_RG_INTEGER;
+                return GL_RG_INTEGER;
             case PF_R8G8B8_UINT:
             case PF_R16G16B16_UINT:
             case PF_R32G32B32_UINT:
             case PF_R8G8B8_SINT:
             case PF_R16G16B16_SINT:
-			case PF_R32G32B32_SINT:
-				return GL_RGB_INTEGER;
+            case PF_R32G32B32_SINT:
+                return GL_RGB_INTEGER;
             case PF_R8G8B8A8_UINT:
             case PF_R16G16B16A16_UINT:
             case PF_R32G32B32A32_UINT:
@@ -213,7 +213,7 @@ namespace Ogre {
                 return 0;
         }
     }
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLOriginDataType(PixelFormat mFormat)
     {
         switch (mFormat)
@@ -233,7 +233,7 @@ namespace Ogre {
             case PF_A4R4G4B4:
             case PF_SHORT_RGB:
             case PF_SHORT_RGBA:
-				return GL_UNSIGNED_SHORT_4_4_4_4;
+                return GL_UNSIGNED_SHORT_4_4_4_4;
             case PF_A1R5G5B5:
                 return GL_UNSIGNED_SHORT_5_5_5_1;
 
@@ -299,7 +299,7 @@ namespace Ogre {
             case PF_R8G8_UINT:
             case PF_R8G8B8_UINT:
             case PF_R8G8B8A8_UINT:
-				return GL_UNSIGNED_BYTE;
+                return GL_UNSIGNED_BYTE;
             case PF_R32_UINT:
             case PF_R32G32_UINT:
             case PF_R32G32B32_UINT:
@@ -309,19 +309,19 @@ namespace Ogre {
             case PF_R16G16_UINT:
             case PF_R16G16B16_UINT:
             case PF_R16G16B16A16_UINT:
-				return GL_UNSIGNED_SHORT;
+                return GL_UNSIGNED_SHORT;
             case PF_R16_SINT:
             case PF_R16G16_SINT:
             case PF_R16G16B16_SINT:
             case PF_R16G16B16A16_SINT:
-				return GL_SHORT;
+                return GL_SHORT;
             case PF_R32G32B32_SINT:
             case PF_R32_SINT:
             case PF_R32G32_SINT:
             case PF_R32G32B32A32_SINT:
                 return GL_INT;
 
-			case PF_R9G9B9E5_SHAREDEXP:
+            case PF_R9G9B9E5_SHAREDEXP:
                 return GL_UNSIGNED_INT_5_9_9_9_REV;
             case PF_R11G11B10_FLOAT:
                 return GL_UNSIGNED_INT_10F_11F_11F_REV;
@@ -331,7 +331,7 @@ namespace Ogre {
         }
     }
 
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLInternalFormat(PixelFormat fmt, bool hwGamma)
     {
         switch (fmt)
@@ -356,18 +356,18 @@ namespace Ogre {
 #endif
 
 #if OGRE_NO_ETC_CODEC == 0 
-#	ifdef GL_OES_compressed_ETC1_RGB8_texture
+#   ifdef GL_OES_compressed_ETC1_RGB8_texture
             case PF_ETC1_RGB8:
                 return GL_ETC1_RGB8_OES;
-#	endif
-#	ifdef GL_AMD_compressed_ATC_texture
-			case PF_ATC_RGB:
-				return ATC_RGB_AMD;
-			case PF_ATC_RGBA_EXPLICIT_ALPHA:
-				return ATC_RGBA_EXPLICIT_ALPHA_AMD;
-			case PF_ATC_RGBA_INTERPOLATED_ALPHA:
-				return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
-#	endif
+#   endif
+#   ifdef GL_AMD_compressed_ATC_texture
+            case PF_ATC_RGB:
+                return ATC_RGB_AMD;
+            case PF_ATC_RGBA_EXPLICIT_ALPHA:
+                return ATC_RGBA_EXPLICIT_ALPHA_AMD;
+            case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+                return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+#   endif
 #endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -380,19 +380,19 @@ namespace Ogre {
 #endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
-			case PF_A1R5G5B5:
-				return GL_RGB5_A1;
+            case PF_A1R5G5B5:
+                return GL_RGB5_A1;
             case PF_R5G6B5:
-			case PF_B5G6R5:
+            case PF_B5G6R5:
                 return GL_RGB565;
             case PF_A4R4G4B4:
                 return GL_RGBA4;
             case PF_R8G8B8:
             case PF_B8G8R8:
-				if (hwGamma)
-					return GL_SRGB8;
-				else
-					return GL_RGB8;
+                if (hwGamma)
+                    return GL_SRGB8;
+                else
+                    return GL_RGB8;
             case PF_A8R8G8B8:
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 return GL_BGRA8_EXT;
@@ -400,12 +400,12 @@ namespace Ogre {
             case PF_B8G8R8A8:
             case PF_A8B8G8R8:
             case PF_R8G8B8A8:
-			case PF_X8B8G8R8:
-			case PF_X8R8G8B8:
-				if (hwGamma)
-					return GL_SRGB8_ALPHA8;
-				else
-					return GL_RGBA8;
+            case PF_X8B8G8R8:
+            case PF_X8R8G8B8:
+                if (hwGamma)
+                    return GL_SRGB8_ALPHA8;
+                else
+                    return GL_RGBA8;
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
                 return GL_RGB10_A2UI;
@@ -517,20 +517,20 @@ namespace Ogre {
             case PF_A4L4:
             case PF_R3G3B2:
             case PF_SHORT_GR:
-			case PF_DXT1:
+            case PF_DXT1:
 #if GL_EXT_texture_compression_dxt1
-				if (!hwGamma)
-					return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+                if (!hwGamma)
+                    return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 #endif
             case PF_DXT3:
 #if GL_EXT_texture_compression_s3tc
-				if (!hwGamma)
-	                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+                if (!hwGamma)
+                    return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
 #endif
             case PF_DXT5:
 #if GL_EXT_texture_compression_s3tc
-				if (!hwGamma)
-	                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+                if (!hwGamma)
+                    return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
 #endif
                 
 #if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL) || (OGRE_NO_GLES3_SUPPORT == 0)
@@ -551,7 +551,7 @@ namespace Ogre {
                 return GL_NONE;
         }
     }
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getClosestGLInternalFormat(PixelFormat mFormat,
                                                    bool hwGamma)
     {
@@ -584,7 +584,7 @@ namespace Ogre {
             return format;
         }
     }
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     PixelFormat GLES2PixelUtil::getClosestOGREFormat(GLenum fmt, GLenum dataType)
     {
         switch (fmt)
@@ -615,18 +615,18 @@ namespace Ogre {
 #endif
 
 #if OGRE_NO_ETC_CODEC == 0 
-#	ifdef GL_OES_compressed_ETC1_RGB8_texture
+#   ifdef GL_OES_compressed_ETC1_RGB8_texture
             case GL_ETC1_RGB8_OES:
                 return PF_ETC1_RGB8;
-#	endif
-#	ifdef GL_AMD_compressed_ATC_texture
-			case ATC_RGB_AMD:
-				return PF_ATC_RGB;
-			case ATC_RGBA_EXPLICIT_ALPHA_AMD:
-				return PF_ATC_RGBA_EXPLICIT_ALPHA;
-			case ATC_RGBA_INTERPOLATED_ALPHA_AMD:
-				return PF_ATC_RGBA_INTERPOLATED_ALPHA;
-#	endif
+#   endif
+#   ifdef GL_AMD_compressed_ATC_texture
+            case ATC_RGB_AMD:
+                return PF_ATC_RGB;
+            case ATC_RGBA_EXPLICIT_ALPHA_AMD:
+                return PF_ATC_RGBA_EXPLICIT_ALPHA;
+            case ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+                return PF_ATC_RGBA_INTERPOLATED_ALPHA;
+#   endif
 #endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -794,11 +794,11 @@ namespace Ogre {
                 return PF_A8B8G8R8;
         };
     }
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     size_t GLES2PixelUtil::getMaxMipmaps(uint32 width, uint32 height, uint32 depth,
                                       PixelFormat format)
     {
-		size_t count = 0;
+        size_t count = 0;
         if((width > 0) && (height > 0) && (depth > 0))
         {
             do {
@@ -818,10 +818,10 @@ namespace Ogre {
                 
                 count++;
             } while(!(width == 1 && height == 1 && depth == 1));
-        }		
-		return count;
+        }       
+        return count;
     }
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     // TODO: Remove
     uint32 GLES2PixelUtil::optionalPO2(uint32 value)
     {

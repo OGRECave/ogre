@@ -9,7 +9,7 @@
         PCZTestApp.cpp
     \brief
         Demonstrates the Portal Connected Zone Scene Manager.  This application
-		is based on the Skybox demo app and uses the ExampleApplication framework.
+        is based on the Skybox demo app and uses the ExampleApplication framework.
 */
 
 #include "PCZTestApp.h"

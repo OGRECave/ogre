@@ -29,7 +29,7 @@ OgrePCZSceneQuery.h  -  description
 begin                : Wed Feb 21, 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -63,14 +63,14 @@ namespace Ogre
         /** See RaySceneQuery. */
         void execute(SceneQueryListener* listener);
 
-		/** set the zone to start the scene query */
+        /** set the zone to start the scene query */
         void setStartZone(PCZone * startZone) {mStartZone = startZone;}
         /** set node to exclude from query */
         void setExcludeNode(SceneNode * excludeNode) {mExcludeNode = excludeNode;}
-	protected:
-		PCZone * mStartZone;
+    protected:
+        PCZone * mStartZone;
         SceneNode * mExcludeNode;
-	};
+    };
     /** PCZ implementation of RaySceneQuery. */
     class _OgrePCZPluginExport PCZRaySceneQuery : public DefaultRaySceneQuery
     {
@@ -81,12 +81,12 @@ namespace Ogre
         /** See RayScenQuery. */
         void execute(RaySceneQueryListener* listener);
 
-		/** set the zone to start the scene query */
+        /** set the zone to start the scene query */
         void setStartZone(PCZone * startZone) {mStartZone = startZone;}
         /** set node to exclude from query */
         void setExcludeNode(SceneNode * excludeNode) {mExcludeNode = excludeNode;}
-	protected:
-		PCZone * mStartZone;
+    protected:
+        PCZone * mStartZone;
         SceneNode * mExcludeNode;
     };
     /** PCZ implementation of SphereSceneQuery. */
@@ -99,12 +99,12 @@ namespace Ogre
         /** See SceneQuery. */
         void execute(SceneQueryListener* listener);
 
-		/** set the zone to start the scene query */
+        /** set the zone to start the scene query */
         void setStartZone(PCZone * startZone) {mStartZone = startZone;}
         /** set node to exclude from query */
         void setExcludeNode(SceneNode * excludeNode) {mExcludeNode = excludeNode;}
-	protected:
-		PCZone * mStartZone;
+    protected:
+        PCZone * mStartZone;
         SceneNode * mExcludeNode;
     };
     /** PCZ implementation of PlaneBoundedVolumeListSceneQuery. */
@@ -117,14 +117,14 @@ namespace Ogre
         /** See SceneQuery. */
         void execute(SceneQueryListener* listener);
 
-		/** set the zone to start the scene query */
+        /** set the zone to start the scene query */
         void setStartZone(PCZone * startZone) {mStartZone = startZone;}
         /** set node to exclude from query */
         void setExcludeNode(SceneNode * excludeNode) {mExcludeNode = excludeNode;}
-	protected:
-		PCZone * mStartZone;
+    protected:
+        PCZone * mStartZone;
         SceneNode * mExcludeNode;
-	};
+    };
 
 
 }

@@ -64,7 +64,7 @@ THE SOFTWARE
 // the warnings with things we may not be able to do anything about (e.g.
 // generated code from nvparse etc). I doubt very much that these calls
 // will ever be actually removed from VC anyway, it would break too much code.
-#	pragma warning( disable: 4996)
+#   pragma warning( disable: 4996)
 
 // disable: "conditional expression constant", always occurs on 
 // OGRE_MUTEX_CONDITIONAL when no threading enabled

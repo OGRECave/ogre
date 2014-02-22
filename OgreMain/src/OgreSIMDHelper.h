@@ -86,12 +86,12 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
 
 #if __OGRE_HAVE_SSE
 
@@ -307,8 +307,8 @@ namespace Ogre {
 
 
 #endif  // __OGRE_HAVE_SSE
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

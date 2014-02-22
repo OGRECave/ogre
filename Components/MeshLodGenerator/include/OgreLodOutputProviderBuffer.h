@@ -38,19 +38,19 @@ namespace Ogre
 {
 
 class _OgreLodExport LodOutputProviderBuffer :
-	public LodOutputProvider
+    public LodOutputProvider
 {
 public:
-	LodOutputProviderBuffer(MeshPtr mesh) : mMesh(mesh) {}
-	virtual void prepare(LodData* data);
-	virtual void finalize(LodData* data) {}
-	virtual void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex);
-	virtual void bakeLodLevel(LodData* data, int lodIndex);
-	virtual void inject();
-	LodOutputBuffer& getBuffer();
+    LodOutputProviderBuffer(MeshPtr mesh) : mMesh(mesh) {}
+    virtual void prepare(LodData* data);
+    virtual void finalize(LodData* data) {}
+    virtual void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex);
+    virtual void bakeLodLevel(LodData* data, int lodIndex);
+    virtual void inject();
+    LodOutputBuffer& getBuffer();
 protected:
-	MeshPtr mMesh;
-	LodOutputBuffer mBuffer;
+    MeshPtr mMesh;
+    LodOutputBuffer mBuffer;
 };
 
 }

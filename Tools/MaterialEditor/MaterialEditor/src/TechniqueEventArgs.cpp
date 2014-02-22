@@ -42,10 +42,10 @@ TechniqueEventArgs::TechniqueEventArgs(TechniqueController* tc, PassController* 
 
 TechniqueController* TechniqueEventArgs::getTechniqueController() const
 {
-	return mTechniqueController;
+    return mTechniqueController;
 }
 
 PassController* TechniqueEventArgs::getPassController() const
 {
-	return mPassController;
+    return mPassController;
 }

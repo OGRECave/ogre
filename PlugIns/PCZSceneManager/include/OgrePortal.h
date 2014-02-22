@@ -25,18 +25,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 Portal.h  -  Portals are special constructs which which are used to connect 
-			 two Zones in a PCZScene.  Portals are defined by 4 coplanr 
+             two Zones in a PCZScene.  Portals are defined by 4 coplanr 
              corners and a direction.  Portals are contained within Zones and 
              are essentially "one way" connectors.  Objects and entities can
-			 use them to travel to other Zones, but to return, there must be
-			 a corresponding Portal which connects back to the original zone
-			 from the new zone.
+             use them to travel to other Zones, but to return, there must be
+             a corresponding Portal which connects back to the original zone
+             from the new zone.
 
 -----------------------------------------------------------------------------
 begin                : Thu Feb 22 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 : Apr 5, 2007
+Code Style Update    : Apr 5, 2007
 -----------------------------------------------------------------------------
 */
 
@@ -47,56 +47,56 @@ Code Style Update	 : Apr 5, 2007
 
 namespace Ogre
 {
-	/** Portal datastructure for connecting zones. */
-	class _OgrePCZPluginExport Portal : public PortalBase
-	{
-	public:
-		Portal(const String &name, const PORTAL_TYPE type = PORTAL_TYPE_QUAD);
-		virtual ~Portal();
+    /** Portal datastructure for connecting zones. */
+    class _OgrePCZPluginExport Portal : public PortalBase
+    {
+    public:
+        Portal(const String &name, const PORTAL_TYPE type = PORTAL_TYPE_QUAD);
+        virtual ~Portal();
 
-		void setTargetZone(PCZone* zone);
-		/** Set the target portal pointer */
-		void setTargetPortal(Portal* portal);
+        void setTargetZone(PCZone* zone);
+        /** Set the target portal pointer */
+        void setTargetPortal(Portal* portal);
 
-		/** Get the Zone the Portal connects to */
-		PCZone* getTargetZone() {return mTargetZone;}
-		/** Get the connected portal (if any) */
-		Portal* getTargetPortal() {return mTargetPortal;}
+        /** Get the Zone the Portal connects to */
+        PCZone* getTargetZone() {return mTargetZone;}
+        /** Get the connected portal (if any) */
+        Portal* getTargetPortal() {return mTargetPortal;}
 
-		/** @copydoc MovableObject::getMovableType. */
-		const String& getMovableType() const;
+        /** @copydoc MovableObject::getMovableType. */
+        const String& getMovableType() const;
 
-	protected:
-		///connected Zone
-		PCZone* mTargetZone;
-		/** Matching Portal in the target zone (usually in same world space 
-			as this portal, but pointing the opposite direction)
-		*/
-		Portal* mTargetPortal;
-	};
+    protected:
+        ///connected Zone
+        PCZone* mTargetZone;
+        /** Matching Portal in the target zone (usually in same world space 
+            as this portal, but pointing the opposite direction)
+        */
+        Portal* mTargetPortal;
+    };
 
-	/** Factory object for creating Portal instances */
-	class _OgrePCZPluginExport PortalFactory : public PortalBaseFactory
-	{
-	protected:
-		MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
-	public:
-		PortalFactory() {}
-		~PortalFactory() {}
+    /** Factory object for creating Portal instances */
+    class _OgrePCZPluginExport PortalFactory : public PortalBaseFactory
+    {
+    protected:
+        MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
+    public:
+        PortalFactory() {}
+        ~PortalFactory() {}
 
-		static String FACTORY_TYPE_NAME;
-		static unsigned long FACTORY_TYPE_FLAG;
+        static String FACTORY_TYPE_NAME;
+        static unsigned long FACTORY_TYPE_FLAG;
 
-		const String& getType() const
-		{ return FACTORY_TYPE_NAME; }
+        const String& getType() const
+        { return FACTORY_TYPE_NAME; }
 
-		void destroyInstance(MovableObject* obj);
+        void destroyInstance(MovableObject* obj);
 
-		/** Return true here as we want to get a unique type flag. */
-		bool requestTypeFlags() const
-		{ return true; }
+        /** Return true here as we want to get a unique type flag. */
+        bool requestTypeFlags() const
+        { return true; }
 
-	};
+    };
 
 }
 

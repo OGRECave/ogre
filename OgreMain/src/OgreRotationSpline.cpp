@@ -64,7 +64,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     Quaternion RotationalSpline::interpolate(unsigned int fromIndex, Real t,
-		bool useShortestPath)
+        bool useShortestPath)
     {
         // Bounds check
         assert (fromIndex < mPoints.size() &&

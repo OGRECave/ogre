@@ -34,25 +34,25 @@ namespace Ogre {
 
     class AndroidEGLContext;
     
-	/** Represents a Android rendering resource.
-	Provide unified interface to
-	handle various device states.
-	*/
-	class _OgrePrivate AndroidResource
-	{
+    /** Represents a Android rendering resource.
+    Provide unified interface to
+    handle various device states.
+    */
+    class _OgrePrivate AndroidResource
+    {
 
-	// Interface.
-	public:
+    // Interface.
+    public:
 
-		// Called immediately after the Android context has entered a lost state.
-		virtual void notifyOnContextLost() {}
+        // Called immediately after the Android context has entered a lost state.
+        virtual void notifyOnContextLost() {}
 
-		// Called immediately after the Android context has been reset.
-		virtual void notifyOnContextReset() {}
+        // Called immediately after the Android context has been reset.
+        virtual void notifyOnContextReset() {}
 
-	public:
-		AndroidResource();
-		virtual ~AndroidResource();
-	};
+    public:
+        AndroidResource();
+        virtual ~AndroidResource();
+    };
 }
 #endif

@@ -41,26 +41,26 @@ int main(int argc, char *argv[])
     runner.run( controller );
 
     // Print test results to a file
-	std::ofstream ofile("OgreTestResults.xml");
-	
+    std::ofstream ofile("OgreTestResults.xml");
+    
     CPPUNIT_NS::XmlOutputter xmlOut(&result, ofile);
     xmlOut.write();
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-	if (IsDebuggerPresent()){
-		// Write report to MSVC IDE console for convenience.
-		// If you click on the assert location then the IDE will jump there!
-		char separator[82];
-		memset(separator, '+', 80);
-		separator[80] = '\n';
-		separator[81] = 0;
-		Ogre::StringStream str;
-		str << "\n" << separator << separator;
-		CPPUNIT_NS::CompilerOutputter txtOut(&result, str);
-		txtOut.write();
-		str << separator << separator << "\n";
-		OutputDebugStringA(str.str().c_str());
-	}
+    if (IsDebuggerPresent()){
+        // Write report to MSVC IDE console for convenience.
+        // If you click on the assert location then the IDE will jump there!
+        char separator[82];
+        memset(separator, '+', 80);
+        separator[80] = '\n';
+        separator[81] = 0;
+        Ogre::StringStream str;
+        str << "\n" << separator << separator;
+        CPPUNIT_NS::CompilerOutputter txtOut(&result, str);
+        txtOut.write();
+        str << separator << separator << "\n";
+        OutputDebugStringA(str.str().c_str());
+    }
 #endif
     tearDownSuite();
 

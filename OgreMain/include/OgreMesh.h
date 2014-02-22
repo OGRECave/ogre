@@ -89,7 +89,7 @@ namespace Ogre {
         friend class MeshSerializerImpl;
         friend class MeshSerializerImpl_v1_8;
         friend class MeshSerializerImpl_v1_4;
-		friend class MeshSerializerImpl_v1_3;
+        friend class MeshSerializerImpl_v1_3;
         friend class MeshSerializerImpl_v1_2;
         friend class MeshSerializerImpl_v1_1;
 
@@ -156,14 +156,14 @@ namespace Ogre {
             VertexData* targetVertexData);
 #if !OGRE_NO_MESHLOD
         const LodStrategy *mLodStrategy;
-		bool mHasManualLodLevel;
+        bool mHasManualLodLevel;
         ushort mNumLods;
         MeshLodUsageList mMeshLodUsageList;
 #else
-		const LodStrategy *mLodStrategy;
-		const bool mHasManualLodLevel;
-		const ushort mNumLods;
-		MeshLodUsageList mMeshLodUsageList;
+        const LodStrategy *mLodStrategy;
+        const bool mHasManualLodLevel;
+        const ushort mNumLods;
+        MeshLodUsageList mMeshLodUsageList;
 #endif
         HardwareBuffer::Usage mVertexBufferUsage;
         HardwareBuffer::Usage mIndexBufferUsage;
@@ -208,8 +208,8 @@ namespace Ogre {
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
 
-		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
-									 unsigned short texCoordSetToDestroy, VertexData *vertexData );
+        void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
+                                     unsigned short texCoordSetToDestroy, VertexData *vertexData );
 
 
     public:
@@ -371,22 +371,22 @@ namespace Ogre {
         */
         void _computeBoneBoundingRadius();
 
-		/** Automatically update the bounding radius and bounding box for this Mesh.
-		@remarks
-		Calling this method is required when building manual meshes. However it is recommended to
-		use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
-		a shadow copy in the memory. Reading back the buffer from video memory is very slow!
-		@param pad If true, a certain padding will be added to the bounding box to separate it from the mesh
-		*/
-		void _updateBoundsFromVertexBuffers(bool pad = false);
+        /** Automatically update the bounding radius and bounding box for this Mesh.
+        @remarks
+        Calling this method is required when building manual meshes. However it is recommended to
+        use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
+        a shadow copy in the memory. Reading back the buffer from video memory is very slow!
+        @param pad If true, a certain padding will be added to the bounding box to separate it from the mesh
+        */
+        void _updateBoundsFromVertexBuffers(bool pad = false);
 
-		/** Calculates 
-		@remarks
-		Calling this method is required when building manual meshes. However it is recommended to
-		use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
-		a shadow copy in the memory. Reading back the buffer from video memory is very slow!
-		*/
-		void _calcBoundsFromVertexBuffer(VertexData* vertexData, AxisAlignedBox& outAABB, Real& outRadius, bool updateOnly = false);
+        /** Calculates 
+        @remarks
+        Calling this method is required when building manual meshes. However it is recommended to
+        use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
+        a shadow copy in the memory. Reading back the buffer from video memory is very slow!
+        */
+        void _calcBoundsFromVertexBuffer(VertexData* vertexData, AxisAlignedBox& outAABB, Real& outRadius, bool updateOnly = false);
         /** Sets the name of the skeleton this Mesh uses for animation.
         @remarks
             Meshes can optionally be assigned a skeleton which can be used to animate
@@ -480,12 +480,12 @@ namespace Ogre {
         */
         ushort getLodIndex(Real value) const;
 
-		/** Returns true if this mesh has a manual LOD level.
-		@remarks
-		    A mesh can either use automatically generated LOD, or it can use alternative
-		    meshes as provided by an artist.
-		*/
-		bool hasManualLodLevel(void) const { return mHasManualLodLevel; }
+        /** Returns true if this mesh has a manual LOD level.
+        @remarks
+            A mesh can either use automatically generated LOD, or it can use alternative
+            meshes as provided by an artist.
+        */
+        bool hasManualLodLevel(void) const { return mHasManualLodLevel; }
 #if !OGRE_NO_MESHLOD
         /** Changes the alternate mesh to use as a manual LOD at the given index.
         @remarks
@@ -606,22 +606,22 @@ namespace Ogre {
         */
         void _updateCompiledBoneAssignments(void);
 
-		/** This method collapses two texcoords into one for all submeshes where this is possible.
+        /** This method collapses two texcoords into one for all submeshes where this is possible.
         @remarks
-			Often a submesh can have two tex. coords. (i.e. TEXCOORD0 & TEXCOORD1), being both
-			composed of two floats. There are many practical reasons why it would be more convenient
-			to merge both of them into one TEXCOORD0 of 4 floats. This function does exactly that
-			The finalTexCoordSet must have enough space for the merge, or else the submesh will be
-			skipped. (i.e. you can't merge a tex. coord with 3 floats with one having 2 floats)
+            Often a submesh can have two tex. coords. (i.e. TEXCOORD0 & TEXCOORD1), being both
+            composed of two floats. There are many practical reasons why it would be more convenient
+            to merge both of them into one TEXCOORD0 of 4 floats. This function does exactly that
+            The finalTexCoordSet must have enough space for the merge, or else the submesh will be
+            skipped. (i.e. you can't merge a tex. coord with 3 floats with one having 2 floats)
 
-			finalTexCoordSet & texCoordSetToDestroy must be in the same buffer source, and must
-			be adjacent.
-		@param finalTexCoordSet The tex. coord index to merge to. Should have enough space to
-			actually work.
+            finalTexCoordSet & texCoordSetToDestroy must be in the same buffer source, and must
+            be adjacent.
+        @param finalTexCoordSet The tex. coord index to merge to. Should have enough space to
+            actually work.
         @param texCoordSetToDestroy The texture coordinate index that will disappear on
-			successful merges.
+            successful merges.
         */
-		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
+        void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks

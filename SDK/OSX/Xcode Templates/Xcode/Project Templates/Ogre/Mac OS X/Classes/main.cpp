@@ -58,12 +58,12 @@ int main(int argc, char **argv)
     [pool release];
     return retVal;
 #else
-	try
+    try
     {
-		DemoApp demo;
-		demo.startDemo();
+        DemoApp demo;
+        demo.startDemo();
     }
-	catch(Ogre::Exception& e)
+    catch(Ogre::Exception& e)
     {
 #if OGRE_PLATFORM == PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         MessageBoxA(NULL, e.what(), "An exception has occurred!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
@@ -84,8 +84,8 @@ int main(int argc, char **argv)
 {
     DemoApp demo;
     NSTimer *mTimer;
-	double timeSinceLastFrame;
-	double startTime;
+    double timeSinceLastFrame;
+    double startTime;
 }
 
 - (void)go;

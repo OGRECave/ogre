@@ -17,37 +17,37 @@ same license as the rest of the engine.
 #include "OgreSimpleRenderable.h"
 
 /** Direct Volume Rendering.
- 	TODO: LOD: reduce number of slices in distance
- 	TODO: option to generate normals for lighting
- 	@author W.J. van der Laan
+    TODO: LOD: reduce number of slices in distance
+    TODO: option to generate normals for lighting
+    @author W.J. van der Laan
 */
 class VolumeRenderable: public Ogre::SimpleRenderable {
 public:
-	VolumeRenderable(size_t nSlices, float size, const Ogre::String & texture);
-	~VolumeRenderable();
-	
-	// Copydoc Ogre::SimpleRenderable::notifyCurrentCamera
-	void _notifyCurrentCamera( Ogre::Camera* cam );
-	void getWorldTransforms( Ogre::Matrix4* xform ) const;
-	
-	/**
-	 * Retrieves ratios of the origin-centered bounding sphere for this
-	 * object.
-	 */
-	Ogre::Real getBoundingRadius() const;
-	
-	/**
-	 * Returns the camera-relative squared depth of this renderable.
-	 */
-	Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
+    VolumeRenderable(size_t nSlices, float size, const Ogre::String & texture);
+    ~VolumeRenderable();
+    
+    // Copydoc Ogre::SimpleRenderable::notifyCurrentCamera
+    void _notifyCurrentCamera( Ogre::Camera* cam );
+    void getWorldTransforms( Ogre::Matrix4* xform ) const;
+    
+    /**
+     * Retrieves ratios of the origin-centered bounding sphere for this
+     * object.
+     */
+    Ogre::Real getBoundingRadius() const;
+    
+    /**
+     * Returns the camera-relative squared depth of this renderable.
+     */
+    Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
 protected:
-	void initialise();
+    void initialise();
 
-	size_t mSlices;
-	float mSize;
-	float mRadius;
-	Ogre::Matrix3 mFakeOrientation;
-	Ogre::String mTexture;
-	Ogre::TextureUnitState *mUnit;
+    size_t mSlices;
+    float mSize;
+    float mRadius;
+    Ogre::Matrix3 mFakeOrientation;
+    Ogre::String mTexture;
+    Ogre::TextureUnitState *mUnit;
 };
 #endif

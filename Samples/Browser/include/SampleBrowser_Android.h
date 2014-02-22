@@ -263,7 +263,7 @@ namespace OgreBites
             mInputInjector = NULL;
             
 #ifdef OGRE_STATIC_LIB
-			mStaticPluginLoader->unload();
+            mStaticPluginLoader->unload();
             delete mStaticPluginLoader;
             mStaticPluginLoader = NULL;
 #endif

@@ -74,20 +74,20 @@ void android_main(struct android_app* state) {
 int main(int argc, char *argv[]) {
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-	int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
-	[pool release];
-	return retVal;
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
+    [pool release];
+    return retVal;
 #elif (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
-	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     mAppDelegate = [[AppDelegate alloc] init];
     [[NSApplication sharedApplication] setDelegate:mAppDelegate];
-	int retVal = NSApplicationMain(argc, (const char **) argv);
+    int retVal = NSApplicationMain(argc, (const char **) argv);
 
-	[pool release];
+    [pool release];
 
-	return retVal;
+    return retVal;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     // Make sure glue isn't stripped.
     app_dummy();
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     OgreAndroidBridge::go(state);
 #else
 
-	try
-	{
+    try
+    {
         bool nograb = false;
         if (argc >= 2 && Ogre::String(argv[1]) == "nograb")
             nograb = true;
@@ -113,18 +113,18 @@ int main(int argc, char *argv[]) {
             // get -1, which is fine.
             startUpSampleIdx = Ogre::StringConverter::parseInt(Ogre::String(argv[1]), -1);
         }
-		OgreBites::SampleBrowser brows (nograb, startUpSampleIdx);
-		brows.go();
-	}
-	catch (Ogre::Exception& e)
-	{
+        OgreBites::SampleBrowser brows (nograb, startUpSampleIdx);
+        brows.go();
+    }
+    catch (Ogre::Exception& e)
+    {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		MessageBoxA(NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_ICONERROR | MB_TASKMODAL);
+        MessageBoxA(NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_ICONERROR | MB_TASKMODAL);
 #else
-		std::cerr << "An exception has occurred: " << e.getFullDescription().c_str() << std::endl;
+        std::cerr << "An exception has occurred: " << e.getFullDescription().c_str() << std::endl;
 #endif
-	}
-	return 0;
+    }
+    return 0;
 #endif
 }
 

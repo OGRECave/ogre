@@ -33,475 +33,475 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 Function::Function(const String& name, const String& desc, const FunctionType functionType)
 {
-	mName			= name;
-	mDescription	= desc;
-	mFunctionType	= functionType;
+    mName           = name;
+    mDescription    = desc;
+    mFunctionType   = functionType;
 }
 
 //-----------------------------------------------------------------------------
 Function::~Function()
 {
-	for (FunctionAtomInstanceIterator it=mAtomInstances.begin(); it != mAtomInstances.end(); ++it)		
-		OGRE_DELETE (*it);
-	mAtomInstances.clear();
+    for (FunctionAtomInstanceIterator it=mAtomInstances.begin(); it != mAtomInstances.end(); ++it)      
+        OGRE_DELETE (*it);
+    mAtomInstances.clear();
 
-	for (ShaderParameterIterator it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
-		(*it).setNull();
-	mInputParameters.clear();
+    for (ShaderParameterIterator it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
+        (*it).setNull();
+    mInputParameters.clear();
 
-	for (ShaderParameterIterator it = mOutputParameters.begin(); it != mOutputParameters.end(); ++it)
-		(*it).setNull();
-	mOutputParameters.clear();
+    for (ShaderParameterIterator it = mOutputParameters.begin(); it != mOutputParameters.end(); ++it)
+        (*it).setNull();
+    mOutputParameters.clear();
 
-	for (ShaderParameterIterator it = mLocalParameters.begin(); it != mLocalParameters.end(); ++it)
-		(*it).setNull();
-	mLocalParameters.clear();
+    for (ShaderParameterIterator it = mLocalParameters.begin(); it != mLocalParameters.end(); ++it)
+        (*it).setNull();
+    mLocalParameters.clear();
 
 }
 
 //-----------------------------------------------------------------------------
 ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
-										int index,
-										const Parameter::Content content,
-										GpuConstantType type)
+                                        int index,
+                                        const Parameter::Content content,
+                                        GpuConstantType type)
 {
-	ParameterPtr param;
+    ParameterPtr param;
 
-	// Check if desired parameter already defined.
-	param = getParameterByContent(mInputParameters, content, type);
-	if (param.get() != NULL)
-		return param;
+    // Check if desired parameter already defined.
+    param = getParameterByContent(mInputParameters, content, type);
+    if (param.get() != NULL)
+        return param;
 
-	// Case we have to create new parameter.
-	if (index == -1)
-	{
-		index = 0;
+    // Case we have to create new parameter.
+    if (index == -1)
+    {
+        index = 0;
 
-		// Find the next available index of the target semantic.
-		ShaderParameterIterator it;
+        // Find the next available index of the target semantic.
+        ShaderParameterIterator it;
 
-		for (it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
-		{
-			if ((*it)->getSemantic() == semantic)
-			{
-				index++;
-			}
-		}
-	}
-	else
-	{
-		// Check if desired parameter already defined.
-		param = getParameterBySemantic(mInputParameters, semantic, index);
-		if (param.get() != NULL && param->getContent() == content)
-		{
-			if (param->getType() == type)
-			{
-				return param;
-			}
-			else 
-			{
-				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-					"Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " due to type mismatch. Function <" + getName() + ">", 			
-					"Function::resolveInputParameter" );
-			}
-		}
-	}
+        for (it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
+        {
+            if ((*it)->getSemantic() == semantic)
+            {
+                index++;
+            }
+        }
+    }
+    else
+    {
+        // Check if desired parameter already defined.
+        param = getParameterBySemantic(mInputParameters, semantic, index);
+        if (param.get() != NULL && param->getContent() == content)
+        {
+            if (param->getType() == type)
+            {
+                return param;
+            }
+            else 
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                    "Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " due to type mismatch. Function <" + getName() + ">",           
+                    "Function::resolveInputParameter" );
+            }
+        }
+    }
 
-	
+    
 
-	// No parameter found -> create new one.
-	switch (semantic)
-	{
-	case Parameter::SPS_POSITION:	
-		assert(type == GCT_FLOAT4);
-		param = ParameterFactory::createInPosition(index);
-		break;
-			
-	case Parameter::SPS_BLEND_WEIGHTS:			
-		assert(type == GCT_FLOAT4);
-		param = ParameterFactory::createInWeights(index);
-		break;
-			
-	case Parameter::SPS_BLEND_INDICES:
-		assert(type == GCT_FLOAT4);
-		param = ParameterFactory::createInIndices(index);
-		break;
-			
-	case Parameter::SPS_NORMAL:
-		assert(type == GCT_FLOAT3);
-		param = ParameterFactory::createInNormal(index);
-		break;
-			
-	case Parameter::SPS_COLOR:
-		assert(type == GCT_FLOAT4);
-		param = ParameterFactory::createInColor(index);
-		break;
-						
-	case Parameter::SPS_TEXTURE_COORDINATES:		
-		param = ParameterFactory::createInTexcoord(type, index, content);				
-		break;
-			
-	case Parameter::SPS_BINORMAL:
-		assert(type == GCT_FLOAT3);
-		param = ParameterFactory::createInBiNormal(index);
-		break;
-			
-	case Parameter::SPS_TANGENT:
-		assert(type == GCT_FLOAT3);
-		param = ParameterFactory::createInTangent(index);
-		break;
-	case Parameter::SPS_UNKNOWN:
+    // No parameter found -> create new one.
+    switch (semantic)
+    {
+    case Parameter::SPS_POSITION:   
+        assert(type == GCT_FLOAT4);
+        param = ParameterFactory::createInPosition(index);
         break;
-	}
+            
+    case Parameter::SPS_BLEND_WEIGHTS:          
+        assert(type == GCT_FLOAT4);
+        param = ParameterFactory::createInWeights(index);
+        break;
+            
+    case Parameter::SPS_BLEND_INDICES:
+        assert(type == GCT_FLOAT4);
+        param = ParameterFactory::createInIndices(index);
+        break;
+            
+    case Parameter::SPS_NORMAL:
+        assert(type == GCT_FLOAT3);
+        param = ParameterFactory::createInNormal(index);
+        break;
+            
+    case Parameter::SPS_COLOR:
+        assert(type == GCT_FLOAT4);
+        param = ParameterFactory::createInColor(index);
+        break;
+                        
+    case Parameter::SPS_TEXTURE_COORDINATES:        
+        param = ParameterFactory::createInTexcoord(type, index, content);               
+        break;
+            
+    case Parameter::SPS_BINORMAL:
+        assert(type == GCT_FLOAT3);
+        param = ParameterFactory::createInBiNormal(index);
+        break;
+            
+    case Parameter::SPS_TANGENT:
+        assert(type == GCT_FLOAT3);
+        param = ParameterFactory::createInTangent(index);
+        break;
+    case Parameter::SPS_UNKNOWN:
+        break;
+    }
 
-	if (param.get() != NULL)
-		addInputParameter(param);
+    if (param.get() != NULL)
+        addInputParameter(param);
 
-	return param;
+    return param;
 }
 
 //-----------------------------------------------------------------------------
 ParameterPtr Function::resolveOutputParameter(Parameter::Semantic semantic,
-											int index,
-											Parameter::Content content,											
-											GpuConstantType type)
+                                            int index,
+                                            Parameter::Content content,                                         
+                                            GpuConstantType type)
 {
-	ParameterPtr param;
+    ParameterPtr param;
 
-	// Check if desired parameter already defined.
-	param = getParameterByContent(mOutputParameters, content, type);
-	if (param.get() != NULL)
-		return param;
+    // Check if desired parameter already defined.
+    param = getParameterByContent(mOutputParameters, content, type);
+    if (param.get() != NULL)
+        return param;
 
-	// Case we have to create new parameter.
-	if (index == -1)
-	{
-		index = 0;
+    // Case we have to create new parameter.
+    if (index == -1)
+    {
+        index = 0;
 
-		// Find the next available index of the target semantic.
-		ShaderParameterIterator it;
+        // Find the next available index of the target semantic.
+        ShaderParameterIterator it;
 
-		for (it = mOutputParameters.begin(); it != mOutputParameters.end(); ++it)
-		{
-			if ((*it)->getSemantic() == semantic)
-			{
-				index++;
-			}
-		}
-	}
-	else
-	{
-		// Check if desired parameter already defined.
-		param = getParameterBySemantic(mOutputParameters, semantic, index);
-		if (param.get() != NULL && param->getContent() == content)
-		{
-			if (param->getType() == type)
-			{
-				return param;
-			}
-			else 
-			{
-				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-					"Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " due to type mismatch. Function <" + getName() + ">", 			
-					"Function::resolveOutputParameter" );
-			}
-		}
-	}
-	
+        for (it = mOutputParameters.begin(); it != mOutputParameters.end(); ++it)
+        {
+            if ((*it)->getSemantic() == semantic)
+            {
+                index++;
+            }
+        }
+    }
+    else
+    {
+        // Check if desired parameter already defined.
+        param = getParameterBySemantic(mOutputParameters, semantic, index);
+        if (param.get() != NULL && param->getContent() == content)
+        {
+            if (param->getType() == type)
+            {
+                return param;
+            }
+            else 
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                    "Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " due to type mismatch. Function <" + getName() + ">",           
+                    "Function::resolveOutputParameter" );
+            }
+        }
+    }
+    
 
-	// No parameter found -> create new one.
-	switch (semantic)
-	{
-	case Parameter::SPS_POSITION:	
-		assert(type == GCT_FLOAT4);
-		param = ParameterFactory::createOutPosition(index);
-		break;
-
-	case Parameter::SPS_BLEND_WEIGHTS:		
-	case Parameter::SPS_BLEND_INDICES:
-		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-			"Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " since support in it is not implemented yet. Function <" + getName() + ">", 			
-			"Function::resolveOutputParameter" );
-		break;
-
-	case Parameter::SPS_NORMAL:
-		assert(type == GCT_FLOAT3);
-		param = ParameterFactory::createOutNormal(index);
-		break;
-
-	case Parameter::SPS_COLOR:
-		assert(type == GCT_FLOAT4);
-		param = ParameterFactory::createOutColor(index);
-		break;
-
-	case Parameter::SPS_TEXTURE_COORDINATES:		
-		param = ParameterFactory::createOutTexcoord(type, index, content);				
-		break;
-
-	case Parameter::SPS_BINORMAL:
-		assert(type == GCT_FLOAT3);
-		param = ParameterFactory::createOutBiNormal(index);
-		break;
-
-	case Parameter::SPS_TANGENT:
-		assert(type == GCT_FLOAT3);
-		param = ParameterFactory::createOutTangent(index);
-		break;
-	case Parameter::SPS_UNKNOWN:
+    // No parameter found -> create new one.
+    switch (semantic)
+    {
+    case Parameter::SPS_POSITION:   
+        assert(type == GCT_FLOAT4);
+        param = ParameterFactory::createOutPosition(index);
         break;
-	}
 
-	if (param.get() != NULL)
-		addOutputParameter(param);
+    case Parameter::SPS_BLEND_WEIGHTS:      
+    case Parameter::SPS_BLEND_INDICES:
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+            "Can not resolve parameter - semantic: " + StringConverter::toString(semantic) + " - index: " + StringConverter::toString(index) + " since support in it is not implemented yet. Function <" + getName() + ">",             
+            "Function::resolveOutputParameter" );
+        break;
 
-	return param;
+    case Parameter::SPS_NORMAL:
+        assert(type == GCT_FLOAT3);
+        param = ParameterFactory::createOutNormal(index);
+        break;
+
+    case Parameter::SPS_COLOR:
+        assert(type == GCT_FLOAT4);
+        param = ParameterFactory::createOutColor(index);
+        break;
+
+    case Parameter::SPS_TEXTURE_COORDINATES:        
+        param = ParameterFactory::createOutTexcoord(type, index, content);              
+        break;
+
+    case Parameter::SPS_BINORMAL:
+        assert(type == GCT_FLOAT3);
+        param = ParameterFactory::createOutBiNormal(index);
+        break;
+
+    case Parameter::SPS_TANGENT:
+        assert(type == GCT_FLOAT3);
+        param = ParameterFactory::createOutTangent(index);
+        break;
+    case Parameter::SPS_UNKNOWN:
+        break;
+    }
+
+    if (param.get() != NULL)
+        addOutputParameter(param);
+
+    return param;
 }
 
 //-----------------------------------------------------------------------------
 ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
-										   const String& name,
-										   GpuConstantType type)
+                                           const String& name,
+                                           GpuConstantType type)
 {
-	ParameterPtr param;
+    ParameterPtr param;
 
-	param = getParameterByName(mLocalParameters, name);
-	if (param.get() != NULL)
-	{
-		if (param->getType() == type &&
-			param->getSemantic() == semantic &&
-			param->getIndex() == index)
-		{
-			return param;
-		}
-		else 
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-				"Can not resolve local parameter due to type mismatch. Function <" + getName() + ">", 			
-				"Function::resolveLocalParameter" );
-		}		
-	}
-		
-	param = ParameterPtr(OGRE_NEW Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN));
-	addParameter(mLocalParameters, param);
-			
-	return param;
+    param = getParameterByName(mLocalParameters, name);
+    if (param.get() != NULL)
+    {
+        if (param->getType() == type &&
+            param->getSemantic() == semantic &&
+            param->getIndex() == index)
+        {
+            return param;
+        }
+        else 
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                "Can not resolve local parameter due to type mismatch. Function <" + getName() + ">",           
+                "Function::resolveLocalParameter" );
+        }       
+    }
+        
+    param = ParameterPtr(OGRE_NEW Parameter(type, name, semantic, index, Parameter::SPC_UNKNOWN));
+    addParameter(mLocalParameters, param);
+            
+    return param;
 }
 
 //-----------------------------------------------------------------------------
 ParameterPtr Function::resolveLocalParameter(Parameter::Semantic semantic, int index,
-										   const Parameter::Content content,
-										   GpuConstantType type)
+                                           const Parameter::Content content,
+                                           GpuConstantType type)
 {
-	ParameterPtr param;
+    ParameterPtr param;
 
-	param = getParameterByContent(mLocalParameters, content, type);
-	if (param.get() != NULL)	
-		return param;
+    param = getParameterByContent(mLocalParameters, content, type);
+    if (param.get() != NULL)    
+        return param;
 
-	param = ParameterPtr(OGRE_NEW Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content));
-	addParameter(mLocalParameters, param);
+    param = ParameterPtr(OGRE_NEW Parameter(type, "lLocalParam_" + StringConverter::toString(mLocalParameters.size()), semantic, index, content));
+    addParameter(mLocalParameters, param);
 
-	return param;
+    return param;
 }
 
 //-----------------------------------------------------------------------------
 void Function::addInputParameter(ParameterPtr parameter)
 {
 
-	// Check that parameter with the same semantic and index in input parameters list.
-	if (getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
-	{
-		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">", 			
-			"Function::addInputParameter" );
-	}
+    // Check that parameter with the same semantic and index in input parameters list.
+    if (getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+            "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",             
+            "Function::addInputParameter" );
+    }
 
-	addParameter(mInputParameters, parameter);
+    addParameter(mInputParameters, parameter);
 }
 
 //-----------------------------------------------------------------------------
 void Function::addOutputParameter(ParameterPtr parameter)
 {
-	// Check that parameter with the same semantic and index in output parameters list.
-	if (getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
-	{
-		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">", 			
-			"Function::addOutputParameter" );
-	}
+    // Check that parameter with the same semantic and index in output parameters list.
+    if (getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+            "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",             
+            "Function::addOutputParameter" );
+    }
 
-	addParameter(mOutputParameters, parameter);
+    addParameter(mOutputParameters, parameter);
 }
 
 //-----------------------------------------------------------------------------
 void Function::deleteInputParameter(ParameterPtr parameter)
 {
-	deleteParameter(mInputParameters, parameter);
+    deleteParameter(mInputParameters, parameter);
 }
 
 //-----------------------------------------------------------------------------
 void Function::deleteOutputParameter(ParameterPtr parameter)
 {
-	deleteParameter(mOutputParameters, parameter);
+    deleteParameter(mOutputParameters, parameter);
 }
 
 //-----------------------------------------------------------------------------
 void Function::deleteAllInputParameters()
 {
-	mInputParameters.clear();
+    mInputParameters.clear();
 }
 
 //-----------------------------------------------------------------------------
 void Function::deleteAllOutputParameters()
 {
-	mOutputParameters.clear();
+    mOutputParameters.clear();
 }
 //-----------------------------------------------------------------------------
 void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr parameter)
-										
+                                        
 {
-	// Check that parameter with the same name doest exist in input parameters list.
-	if (getParameterByName(mInputParameters, parameter->getName()).get() != NULL)
-	{
-		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">", 			
-			"Function::addParameter" );
-	}
+    // Check that parameter with the same name doest exist in input parameters list.
+    if (getParameterByName(mInputParameters, parameter->getName()).get() != NULL)
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+            "Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">",            
+            "Function::addParameter" );
+    }
 
-	// Check that parameter with the same name doest exist in output parameters list.
-	if (getParameterByName(mOutputParameters, parameter->getName()).get() != NULL)
-	{
-		OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">", 			
-			"Function::addParameter" );
-	}
+    // Check that parameter with the same name doest exist in output parameters list.
+    if (getParameterByName(mOutputParameters, parameter->getName()).get() != NULL)
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+            "Parameter <" + parameter->getName() + "> already declared in function <" + getName() + ">",            
+            "Function::addParameter" );
+    }
 
 
-	// Add to given parameters list.
-	parameterList.push_back(parameter);
+    // Add to given parameters list.
+    parameterList.push_back(parameter);
 }
 
 //-----------------------------------------------------------------------------
 void Function::deleteParameter(ShaderParameterList& parameterList, ParameterPtr parameter)
 {
-	ShaderParameterIterator it;
+    ShaderParameterIterator it;
 
-	for (it = parameterList.begin(); it != parameterList.end(); ++it)
-	{
-		if (*it == parameter)
-		{
-			(*it).setNull();
-			parameterList.erase(it);
-			break;
-		}
-	}
+    for (it = parameterList.begin(); it != parameterList.end(); ++it)
+    {
+        if (*it == parameter)
+        {
+            (*it).setNull();
+            parameterList.erase(it);
+            break;
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
 ParameterPtr Function::getParameterByName( const ShaderParameterList& parameterList, const String& name )
 {
-	ShaderParameterConstIterator it;
+    ShaderParameterConstIterator it;
 
-	for (it = parameterList.begin(); it != parameterList.end(); ++it)
-	{
-		if ((*it)->getName() == name)
-		{
-			return *it;
-		}
-	}
+    for (it = parameterList.begin(); it != parameterList.end(); ++it)
+    {
+        if ((*it)->getName() == name)
+        {
+            return *it;
+        }
+    }
 
-	return ParameterPtr();
+    return ParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
 ParameterPtr Function::getParameterBySemantic(const ShaderParameterList& parameterList, 
-												const Parameter::Semantic semantic, 
-												int index)
+                                                const Parameter::Semantic semantic, 
+                                                int index)
 {
-	ShaderParameterConstIterator it;
+    ShaderParameterConstIterator it;
 
-	for (it = parameterList.begin(); it != parameterList.end(); ++it)
-	{
-		if ((*it)->getSemantic() == semantic &&
-			(*it)->getIndex() == index)
-		{
-			return *it;
-		}
-	}
+    for (it = parameterList.begin(); it != parameterList.end(); ++it)
+    {
+        if ((*it)->getSemantic() == semantic &&
+            (*it)->getIndex() == index)
+        {
+            return *it;
+        }
+    }
 
-	return ParameterPtr();
+    return ParameterPtr();
 }
 
 //-----------------------------------------------------------------------------
 ParameterPtr Function::getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type)
 {
-	ShaderParameterConstIterator it;
+    ShaderParameterConstIterator it;
 
-	// Search only for known content.
-	if (content != Parameter::SPC_UNKNOWN)	
-	{
-		for (it = parameterList.begin(); it != parameterList.end(); ++it)
-		{
-			if ((*it)->getContent() == content &&
-				(*it)->getType() == type)
-			{
-				return *it;
-			}
-		}
-	}
-	
-	return ParameterPtr();
+    // Search only for known content.
+    if (content != Parameter::SPC_UNKNOWN)  
+    {
+        for (it = parameterList.begin(); it != parameterList.end(); ++it)
+        {
+            if ((*it)->getContent() == content &&
+                (*it)->getType() == type)
+            {
+                return *it;
+            }
+        }
+    }
+    
+    return ParameterPtr();
 }
 
 
 //-----------------------------------------------------------------------------
 void Function::addAtomInstance(FunctionAtom* atomInstance)
 {
-	mAtomInstances.push_back(atomInstance);
+    mAtomInstances.push_back(atomInstance);
 }
 
 //-----------------------------------------------------------------------------
 bool Function::deleteAtomInstance(FunctionAtom* atomInstance)
 {
-	FunctionAtomInstanceIterator it;
+    FunctionAtomInstanceIterator it;
 
-	for (it=mAtomInstances.begin(); it != mAtomInstances.end(); ++it)
-	{
-		if (*it == atomInstance)
-		{
-			OGRE_DELETE atomInstance;
-			mAtomInstances.erase(it);
-			return true;
-		}		
-	}
+    for (it=mAtomInstances.begin(); it != mAtomInstances.end(); ++it)
+    {
+        if (*it == atomInstance)
+        {
+            OGRE_DELETE atomInstance;
+            mAtomInstances.erase(it);
+            return true;
+        }       
+    }
 
-	return false;
-	
+    return false;
+    
 }
 
 namespace {
-	struct CmpAtomInstance {
-		bool operator()(const FunctionAtom* a, const FunctionAtom* b) const
-		{
-			if (a->getGroupExecutionOrder() < b->getGroupExecutionOrder())
-				return true;
-			if (b->getGroupExecutionOrder() < a->getGroupExecutionOrder())
-				return false;
-			return a->getInternalExecutionOrder() < b->getInternalExecutionOrder();
-		}
-	};
+    struct CmpAtomInstance {
+        bool operator()(const FunctionAtom* a, const FunctionAtom* b) const
+        {
+            if (a->getGroupExecutionOrder() < b->getGroupExecutionOrder())
+                return true;
+            if (b->getGroupExecutionOrder() < a->getGroupExecutionOrder())
+                return false;
+            return a->getInternalExecutionOrder() < b->getInternalExecutionOrder();
+        }
+    };
 }
 
 //-----------------------------------------------------------------------------
 void Function::sortAtomInstances()
 {
-	std::sort(mAtomInstances.begin(), mAtomInstances.end(), CmpAtomInstance());
+    std::sort(mAtomInstances.begin(), mAtomInstances.end(), CmpAtomInstance());
 }
 
 //-----------------------------------------------------------------------------
 Ogre::RTShader::Function::FunctionType Function::getFunctionType() const
 {
-	return mFunctionType;
+    return mFunctionType;
 }
 
 }

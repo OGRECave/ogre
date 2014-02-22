@@ -64,9 +64,9 @@ namespace Ogre{
             return GPT_GEOMETRY_PROGRAM;
         case ID_FRAGMENT_PROGRAM:
             return GPT_FRAGMENT_PROGRAM;
-			case ID_TESSELLATION_HULL_PROGRAM:
+            case ID_TESSELLATION_HULL_PROGRAM:
             return GPT_HULL_PROGRAM;
-			case ID_TESSELLATION_DOMAIN_PROGRAM:
+            case ID_TESSELLATION_DOMAIN_PROGRAM:
             return GPT_DOMAIN_PROGRAM;
         case ID_COMPUTE_PROGRAM:
             return GPT_COMPUTE_PROGRAM;
@@ -2509,11 +2509,11 @@ namespace Ogre{
                 case ID_GEOMETRY_PROGRAM_REF:
                     translateGeometryProgramRef(compiler, child);
                     break;
-				case ID_TESSELLATION_HULL_PROGRAM_REF:
-					translateTessellationHullProgramRef(compiler, child);
+                case ID_TESSELLATION_HULL_PROGRAM_REF:
+                    translateTessellationHullProgramRef(compiler, child);
                     break;
-				case ID_TESSELLATION_DOMAIN_PROGRAM_REF:
-					translateTessellationDomainProgramRef(compiler, child);
+                case ID_TESSELLATION_DOMAIN_PROGRAM_REF:
+                    translateTessellationDomainProgramRef(compiler, child);
                     break;
                 case ID_COMPUTE_PROGRAM_REF:
                     translateComputeProgramRef(compiler, child);
@@ -2615,7 +2615,7 @@ namespace Ogre{
         }
     }
     //-------------------------------------------------------------------------
-	void PassTranslator::translateTessellationHullProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+    void PassTranslator::translateTessellationHullProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
         if(node->name.empty())
         {
@@ -2633,15 +2633,15 @@ namespace Ogre{
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
-		pass->setTessellationHullProgram(evt.mName);
-		if(pass->getTessellationHullProgram()->isSupported())
+        pass->setTessellationHullProgram(evt.mName);
+        if(pass->getTessellationHullProgram()->isSupported())
         {
-			GpuProgramParametersSharedPtr params = pass->getTessellationHullProgramParameters();
+            GpuProgramParametersSharedPtr params = pass->getTessellationHullProgramParameters();
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
         }
     }
     //-------------------------------------------------------------------------
-	void PassTranslator::translateTessellationDomainProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+    void PassTranslator::translateTessellationDomainProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
     {
         if(node->name.empty())
         {
@@ -2659,10 +2659,10 @@ namespace Ogre{
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
-		pass->setTessellationDomainProgram(evt.mName);
-		if(pass->getTessellationDomainProgram()->isSupported())
+        pass->setTessellationDomainProgram(evt.mName);
+        if(pass->getTessellationDomainProgram()->isSupported())
         {
-			GpuProgramParametersSharedPtr params = pass->getTessellationDomainProgramParameters();
+            GpuProgramParametersSharedPtr params = pass->getTessellationDomainProgramParameters();
             GpuProgramTranslator::translateProgramParameters(compiler, params, node);
         }
     }
@@ -4165,11 +4165,11 @@ namespace Ogre{
                             case ID_GEOMETRY:
                                 mUnit->setBindingType(TextureUnitState::BT_GEOMETRY);
                                 break;
-							case ID_TESSELLATION_HULL:
-								mUnit->setBindingType(TextureUnitState::BT_TESSELLATION_HULL);
+                            case ID_TESSELLATION_HULL:
+                                mUnit->setBindingType(TextureUnitState::BT_TESSELLATION_HULL);
                                 break;
-							case ID_TESSELLATION_DOMAIN:
-								mUnit->setBindingType(TextureUnitState::BT_TESSELLATION_DOMAIN);
+                            case ID_TESSELLATION_DOMAIN:
+                                mUnit->setBindingType(TextureUnitState::BT_TESSELLATION_DOMAIN);
                                 break;
                             case ID_COMPUTE:
                                 mUnit->setBindingType(TextureUnitState::BT_COMPUTE);
@@ -6704,20 +6704,20 @@ namespace Ogre{
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
                     break;
-				case ID_READ_BACK_AS_TEXTURE:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						bool val;
-						if(getBoolean(prop->values.front(), &val))
-							mPass->setStencilReadBackAsTextureOperation(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
+                case ID_READ_BACK_AS_TEXTURE:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
+                        }
+                        bool val;
+                        if(getBoolean(prop->values.front(), &val))
+                            mPass->setStencilReadBackAsTextureOperation(val);
+                        else
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    }
+                    break;
                 case ID_BUFFERS:
                     {
                         uint32 buffers = 0;
@@ -7016,8 +7016,8 @@ namespace Ogre{
             else if(obj->id == ID_FRAGMENT_PROGRAM ||
                     obj->id == ID_VERTEX_PROGRAM ||
                     obj->id == ID_GEOMETRY_PROGRAM ||
-					obj->id == ID_TESSELLATION_HULL_PROGRAM || 
-					obj->id == ID_TESSELLATION_DOMAIN_PROGRAM ||
+                    obj->id == ID_TESSELLATION_HULL_PROGRAM || 
+                    obj->id == ID_TESSELLATION_DOMAIN_PROGRAM ||
                     obj->id == ID_COMPUTE_PROGRAM)
                 translator = &mGpuProgramTranslator;
             else if(obj->id == ID_SHARED_PARAMS)

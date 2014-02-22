@@ -52,84 +52,84 @@ namespace RTShader {
 */
 class GLSLESProgramWriter : public ProgramWriter
 {
-	// Interface.
+    // Interface.
 public:
 
-	/** Class constructor. 
-	*/
-	GLSLESProgramWriter	();
+    /** Class constructor. 
+    */
+    GLSLESProgramWriter ();
 
-	/** Class destructor */
-	virtual ~GLSLESProgramWriter	();
+    /** Class destructor */
+    virtual ~GLSLESProgramWriter    ();
 
 
-	/** 
-	@see ProgramWriter::writeSourceCode.
-	*/
-	virtual void            writeSourceCode			(std::ostream& os, Program* program);
+    /** 
+    @see ProgramWriter::writeSourceCode.
+    */
+    virtual void            writeSourceCode         (std::ostream& os, Program* program);
 
-	/** 
-	@see ProgramWriter::getTargetLanguage.
-	*/
-	virtual const String&   getTargetLanguage		() const { return TargetLanguage; }
+    /** 
+    @see ProgramWriter::getTargetLanguage.
+    */
+    virtual const String&   getTargetLanguage       () const { return TargetLanguage; }
 
-	static String TargetLanguage;
+    static String TargetLanguage;
 
     protected:
-	typedef		map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
-	typedef		map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
-	typedef		map<Parameter::Content, const char*>	::type  ParamContentToStringMap;
-	typedef		map<String, String>::type					StringMap;
-	typedef		map<FunctionInvocation, String>::type		FunctionMap;
-	typedef		vector<FunctionInvocation>::type            FunctionVector;
+    typedef     map<GpuConstantType, const char*>::type     GpuConstTypeToStringMap;
+    typedef     map<Parameter::Semantic, const char*>::type ParamSemanticToStringMap;
+    typedef     map<Parameter::Content, const char*>    ::type  ParamContentToStringMap;
+    typedef     map<String, String>::type                   StringMap;
+    typedef     map<FunctionInvocation, String>::type       FunctionMap;
+    typedef     vector<FunctionInvocation>::type            FunctionVector;
     typedef     FunctionMap::const_iterator                 FunctionMapIterator;
     typedef     FunctionVector::const_iterator              FunctionVectorIterator;
     typedef     GpuConstTypeToStringMap::const_iterator     GpuConstTypeToStringMapIterator;
 
-	// Protected methods.
+    // Protected methods.
 protected:
 
-	/** Initialize string maps. */
-	void				initializeStringMaps		();
+    /** Initialize string maps. */
+    void                initializeStringMaps        ();
 
     /** Cache functions of a dependency */
     virtual void        cacheDependencyFunctions(const String & libName);
 
 
     /** Create a FunctionInvocation object from a string taken out of a shader library. */
-	FunctionInvocation	*createInvocationFromString	(const String & input);
+    FunctionInvocation  *createInvocationFromString (const String & input);
 
     /** Write the program dependencies. */
-	void                writeProgramDependencies	(std::ostream& os, Program* program);
+    void                writeProgramDependencies    (std::ostream& os, Program* program);
 
-	/** Write a local parameter. */
-	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
+    /** Write a local parameter. */
+    void                writeLocalParameter         (std::ostream& os, ParameterPtr parameter);
 
-	/** Write the input params of the function */
-	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);
-	
-	/** Write the output params of the function */
-	void				writeOutParameters			(std::ostream& os, Function* function, GpuProgramType gpuType);
+    /** Write the input params of the function */
+    void                writeInputParameters        (std::ostream& os, Function* function, GpuProgramType gpuType);
+    
+    /** Write the output params of the function */
+    void                writeOutParameters          (std::ostream& os, Function* function, GpuProgramType gpuType);
 
-	String processOperand(Operand op, GpuProgramType gpuType);
-	
+    String processOperand(Operand op, GpuProgramType gpuType);
+    
     /** Check if a string matches one of the GLSL ES basic types */
     bool                isBasicType(String &type);
     
     /** Search within a function body for non-builtin functions that a given function invocation depends on. */
     void                discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector);
 
-	// Attributes.
+    // Attributes.
 protected:
-	GpuConstTypeToStringMap		mGpuConstTypeMap;				// Map between GPU constant type to string value.
-	ParamSemanticToStringMap	mParamSemanticMap;				// Map between parameter semantic to string value.
+    GpuConstTypeToStringMap     mGpuConstTypeMap;               // Map between GPU constant type to string value.
+    ParamSemanticToStringMap    mParamSemanticMap;              // Map between parameter semantic to string value.
 
-	StringMap					mInputToGLStatesMap;			// Map parameter name to a new parameter name (sometimes renaming is required to match names between vertex and fragment shader)
-	FunctionMap                 mFunctionCacheMap;              // Map function invocation to body.  Used as a cache to reduce library file reads and for inlining
+    StringMap                   mInputToGLStatesMap;            // Map parameter name to a new parameter name (sometimes renaming is required to match names between vertex and fragment shader)
+    FunctionMap                 mFunctionCacheMap;              // Map function invocation to body.  Used as a cache to reduce library file reads and for inlining
     StringMap                   mDefinesMap;                    // Map of #defines and the function library that contains them
-	ParamContentToStringMap		mContentToPerVertexAttributes;	// Map parameter content to vertex attributes
-	int							mGLSLVersion;					// Holds the current glsl es version
-	StringVector				mFragInputParams;				// Holds the fragment input params
+    ParamContentToStringMap     mContentToPerVertexAttributes;  // Map parameter content to vertex attributes
+    int                         mGLSLVersion;                   // Holds the current glsl es version
+    StringVector                mFragInputParams;               // Holds the fragment input params
     StringMap                   mCachedFunctionLibraries;       // Holds the cached function libraries
 };
 
@@ -139,29 +139,29 @@ protected:
 class ShaderProgramWriterGLSLESFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterGLSLESFactory() : mLanguage("glsles")
-	{
-	}
-	virtual ~ShaderProgramWriterGLSLESFactory() {}
+    ShaderProgramWriterGLSLESFactory() : mLanguage("glsles")
+    {
+    }
+    virtual ~ShaderProgramWriterGLSLESFactory() {}
 
-	/** 
-	@see ProgramWriterFactory::getTargetLanguage
-	*/
-	virtual const String& getTargetLanguage(void) const
-	{
-		return mLanguage;
-	}
+    /** 
+    @see ProgramWriterFactory::getTargetLanguage
+    */
+    virtual const String& getTargetLanguage(void) const
+    {
+        return mLanguage;
+    }
 
-	/** 
-	@see ProgramWriterFactory::create
-	*/
-	virtual ProgramWriter* create(void)
-	{
-		return OGRE_NEW GLSLESProgramWriter();
-	}
+    /** 
+    @see ProgramWriterFactory::create
+    */
+    virtual ProgramWriter* create(void)
+    {
+        return OGRE_NEW GLSLESProgramWriter();
+    }
 
 private:
-	String mLanguage;
+    String mLanguage;
 };
 
 /** @} */

@@ -34,68 +34,68 @@ extern "C" {
 #include "WIN32/OgreMinGWSupport.h"
 void _chkstk();
 void _fastcall __security_check_cookie(intptr_t i);
-} 	
+}   
 #endif
 
 namespace Ogre 
 {
-	const String sPluginName = "D3D9 RenderSystem";
-	//---------------------------------------------------------------------
-	D3D9Plugin::D3D9Plugin()
-		: mRenderSystem(0)
-	{
+    const String sPluginName = "D3D9 RenderSystem";
+    //---------------------------------------------------------------------
+    D3D9Plugin::D3D9Plugin()
+        : mRenderSystem(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	const String& D3D9Plugin::getName() const
-	{
-		return sPluginName;
-	}
-	
-	//---------------------------------------------------------------------
-	void D3D9Plugin::install()
-	{
-		// When building with MinGW, we need to call dummy implementations
-		// of missing MinGW DirectX functions to make sure they are carried over
-		// in dynamic AND static builds
+    }
+    //---------------------------------------------------------------------
+    const String& D3D9Plugin::getName() const
+    {
+        return sPluginName;
+    }
+    
+    //---------------------------------------------------------------------
+    void D3D9Plugin::install()
+    {
+        // When building with MinGW, we need to call dummy implementations
+        // of missing MinGW DirectX functions to make sure they are carried over
+        // in dynamic AND static builds
 #ifdef __MINGW32__
     _chkstk();
     __security_check_cookie((intptr_t)NULL);    
 #endif
     
-		// Create the DirectX 9 rendering api
+        // Create the DirectX 9 rendering api
 #ifdef OGRE_STATIC_LIB
-		HINSTANCE hInst = GetModuleHandle( NULL );
+        HINSTANCE hInst = GetModuleHandle( NULL );
 #else
 #  if OGRE_DEBUG_MODE == 1
-		HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D9_d.dll" );
+        HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D9_d.dll" );
 #  else
-		HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D9.dll" );
+        HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D9.dll" );
 #  endif
 #endif
-		mRenderSystem = OGRE_NEW D3D9RenderSystem( hInst );
-		// Register the render system
-		Root::getSingleton().addRenderSystem( mRenderSystem );
-	}
-	//---------------------------------------------------------------------
-	void D3D9Plugin::initialise()
-	{
-		// nothing to do
-	}
-	//---------------------------------------------------------------------
-	void D3D9Plugin::shutdown()
-	{
-		// nothing to do
-	}
-	//---------------------------------------------------------------------
-	void D3D9Plugin::uninstall()
-	{
-		if (mRenderSystem != NULL)
-		{
-			OGRE_DELETE mRenderSystem;
-			mRenderSystem = NULL;
-		}				
-	}
+        mRenderSystem = OGRE_NEW D3D9RenderSystem( hInst );
+        // Register the render system
+        Root::getSingleton().addRenderSystem( mRenderSystem );
+    }
+    //---------------------------------------------------------------------
+    void D3D9Plugin::initialise()
+    {
+        // nothing to do
+    }
+    //---------------------------------------------------------------------
+    void D3D9Plugin::shutdown()
+    {
+        // nothing to do
+    }
+    //---------------------------------------------------------------------
+    void D3D9Plugin::uninstall()
+    {
+        if (mRenderSystem != NULL)
+        {
+            OGRE_DELETE mRenderSystem;
+            mRenderSystem = NULL;
+        }               
+    }
 
 
 }

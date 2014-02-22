@@ -54,9 +54,9 @@ template <class U> struct PixelBoxConverter
     static void conversion(const Ogre::PixelBox &src, const Ogre::PixelBox &dst)
     {
         typename U::SrcType *srcptr = static_cast<typename U::SrcType*>(src.data)
-			+ (src.left + src.top * src.rowPitch + src.front * src.slicePitch);
+            + (src.left + src.top * src.rowPitch + src.front * src.slicePitch);
         typename U::DstType *dstptr = static_cast<typename U::DstType*>(dst.data)
-			+ (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch);
+            + (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch);
         const size_t srcSliceSkip = src.getSliceSkip();
         const size_t dstSliceSkip = dst.getSliceSkip();
         const size_t k = src.right - src.left;
@@ -94,15 +94,15 @@ struct Col3b {
 };
 /** Type for PF_FLOAT32_RGB */
 struct Col3f {
-	Col3f(float inR, float inG, float inB):
-		r(inR), g(inG), b(inB) { }
-	float r,g,b;
+    Col3f(float inR, float inG, float inB):
+        r(inR), g(inG), b(inB) { }
+    float r,g,b;
 };
 /** Type for PF_FLOAT32_RGBA */
 struct Col4f {
-	Col4f(float inR, float inG, float inB, float inA):
-		r(inR), g(inG), b(inB), a(inA) { }
-	float r,g,b,a;
+    Col4f(float inR, float inG, float inB, float inA):
+        r(inR), g(inG), b(inB), a(inA) { }
+    float r,g,b,a;
 };
 
 struct A8R8G8B8toA8B8G8R8: public PixelConverter <Ogre::uint32, Ogre::uint32, FMTCONVERTERID(Ogre::PF_A8R8G8B8, Ogre::PF_A8B8G8R8)>
@@ -358,7 +358,7 @@ struct X8B8G8R8toA8R8G8B8: public PixelConverter <Ogre::uint32, Ogre::uint32, FM
 };
 struct X8B8G8R8toA8B8G8R8: public PixelConverter <Ogre::uint32, Ogre::uint32, FMTCONVERTERID(Ogre::PF_X8B8G8R8, Ogre::PF_A8B8G8R8)>
 {
-	inline static DstType pixelConvert(SrcType inp)
+    inline static DstType pixelConvert(SrcType inp)
     {
         return inp | 0xFF000000;
     }
@@ -386,18 +386,18 @@ inline int doOptimizedConversion(const Ogre::PixelBox &src, const Ogre::PixelBox
     switch(FMTCONVERTERID(src.format, dst.format))
     {
         // Register converters here
-		CASECONVERTER(A8R8G8B8toA8B8G8R8);
-		CASECONVERTER(A8R8G8B8toB8G8R8A8);
-		CASECONVERTER(A8R8G8B8toR8G8B8A8);
-		CASECONVERTER(A8B8G8R8toA8R8G8B8);
-		CASECONVERTER(A8B8G8R8toB8G8R8A8);
-		CASECONVERTER(A8B8G8R8toR8G8B8A8);
-		CASECONVERTER(B8G8R8A8toA8R8G8B8);
-		CASECONVERTER(B8G8R8A8toA8B8G8R8);
-		CASECONVERTER(B8G8R8A8toR8G8B8A8);
-		CASECONVERTER(R8G8B8A8toA8R8G8B8);
-		CASECONVERTER(R8G8B8A8toA8B8G8R8);
-		CASECONVERTER(R8G8B8A8toB8G8R8A8);
+        CASECONVERTER(A8R8G8B8toA8B8G8R8);
+        CASECONVERTER(A8R8G8B8toB8G8R8A8);
+        CASECONVERTER(A8R8G8B8toR8G8B8A8);
+        CASECONVERTER(A8B8G8R8toA8R8G8B8);
+        CASECONVERTER(A8B8G8R8toB8G8R8A8);
+        CASECONVERTER(A8B8G8R8toR8G8B8A8);
+        CASECONVERTER(B8G8R8A8toA8R8G8B8);
+        CASECONVERTER(B8G8R8A8toA8B8G8R8);
+        CASECONVERTER(B8G8R8A8toR8G8B8A8);
+        CASECONVERTER(R8G8B8A8toA8R8G8B8);
+        CASECONVERTER(R8G8B8A8toA8B8G8R8);
+        CASECONVERTER(R8G8B8A8toB8G8R8A8);
         CASECONVERTER(A8B8G8R8toL8);
         CASECONVERTER(L8toA8B8G8R8);
         CASECONVERTER(A8R8G8B8toL8);
@@ -414,16 +414,16 @@ inline int doOptimizedConversion(const Ogre::PixelBox &src, const Ogre::PixelBox
         CASECONVERTER(B8G8R8toA8B8G8R8);
         CASECONVERTER(R8G8B8toB8G8R8A8);
         CASECONVERTER(B8G8R8toB8G8R8A8);
-		CASECONVERTER(A8R8G8B8toR8G8B8);
-		CASECONVERTER(A8R8G8B8toB8G8R8);
-		CASECONVERTER(X8R8G8B8toA8R8G8B8);
-		CASECONVERTER(X8R8G8B8toA8B8G8R8);
-		CASECONVERTER(X8R8G8B8toB8G8R8A8);
-		CASECONVERTER(X8R8G8B8toR8G8B8A8);
-		CASECONVERTER(X8B8G8R8toA8R8G8B8);
-		CASECONVERTER(X8B8G8R8toA8B8G8R8);
-		CASECONVERTER(X8B8G8R8toB8G8R8A8);
-		CASECONVERTER(X8B8G8R8toR8G8B8A8);
+        CASECONVERTER(A8R8G8B8toR8G8B8);
+        CASECONVERTER(A8R8G8B8toB8G8R8);
+        CASECONVERTER(X8R8G8B8toA8R8G8B8);
+        CASECONVERTER(X8R8G8B8toA8B8G8R8);
+        CASECONVERTER(X8R8G8B8toB8G8R8A8);
+        CASECONVERTER(X8R8G8B8toR8G8B8A8);
+        CASECONVERTER(X8B8G8R8toA8R8G8B8);
+        CASECONVERTER(X8B8G8R8toA8B8G8R8);
+        CASECONVERTER(X8B8G8R8toB8G8R8A8);
+        CASECONVERTER(X8B8G8R8toR8G8B8A8);
 
         default:
             return 0;

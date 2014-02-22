@@ -34,44 +34,44 @@ THE SOFTWARE.
 
 namespace OgreMax {
 
-	typedef std::map<int, Ogre::Vector3> TexCoordMap;
+    typedef std::map<int, Ogre::Vector3> TexCoordMap;
 
-	class Vertex {
-	public:
+    class Vertex {
+    public:
 
-		Vertex(float x, float y, float z);
+        Vertex(float x, float y, float z);
 
-		void setNormal(float x, float y, float z);
-		void setColour(float r, float g, float b, float a = 1.0);
-		void addTexCoord(int mapIndex, float u, float v, float w = 0.0);
+        void setNormal(float x, float y, float z);
+        void setColour(float r, float g, float b, float a = 1.0);
+        void addTexCoord(int mapIndex, float u, float v, float w = 0.0);
 
-		bool operator==(Vertex& other);
+        bool operator==(Vertex& other);
 
-		const Ogre::Vector3& getPosition() const { return m_position; }
-		const Ogre::Vector3& getNormal() const { return m_normal; }
-		const Ogre::ColourValue& getColour() const { return m_colour; }
-		const Ogre::Vector3& getUVW(int mapIndex) const { return m_uvwMap.find(mapIndex)->second; }
-	
-	private:
-		bool hasSameTexCoords(std::map<int, Ogre::Vector3>& uvwMap) ;
-		Ogre::Vector3					m_position;
-		Ogre::Vector3					m_normal;
-		Ogre::ColourValue				m_colour;
-		TexCoordMap						m_uvwMap;
-	};
+        const Ogre::Vector3& getPosition() const { return m_position; }
+        const Ogre::Vector3& getNormal() const { return m_normal; }
+        const Ogre::ColourValue& getColour() const { return m_colour; }
+        const Ogre::Vector3& getUVW(int mapIndex) const { return m_uvwMap.find(mapIndex)->second; }
+    
+    private:
+        bool hasSameTexCoords(std::map<int, Ogre::Vector3>& uvwMap) ;
+        Ogre::Vector3                   m_position;
+        Ogre::Vector3                   m_normal;
+        Ogre::ColourValue               m_colour;
+        TexCoordMap                     m_uvwMap;
+    };
 
-	class VertexList {
-	public:
-		// returns the index into the list for the inserted element
-		unsigned int add(Vertex& v);
-		size_t size() { return m_vertexList.size(); }
-		const Vertex& front() { return m_vertexList.front(); }
-		void pop() { m_vertexList.pop_front(); }
+    class VertexList {
+    public:
+        // returns the index into the list for the inserted element
+        unsigned int add(Vertex& v);
+        size_t size() { return m_vertexList.size(); }
+        const Vertex& front() { return m_vertexList.front(); }
+        void pop() { m_vertexList.pop_front(); }
 
-	private:
-		std::list<Vertex> m_vertexList;
+    private:
+        std::list<Vertex> m_vertexList;
 
-	};
+    };
 
 }
 

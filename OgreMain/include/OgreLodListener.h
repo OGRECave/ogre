@@ -34,13 +34,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
-	/// Struct containing information about a LOD change event for movable objects.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
+    /// Struct containing information about a LOD change event for movable objects.
     struct MovableObjectLodChangedEvent
     {
         /// The movable object whose level of detail has changed.
@@ -200,8 +200,8 @@ namespace Ogre {
         { (void)evt; }
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

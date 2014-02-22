@@ -86,10 +86,10 @@ namespace Ogre {
         return mCapabilitiesMap[name];
     }
 
-	const map<String, RenderSystemCapabilities*>::type &RenderSystemCapabilitiesManager::getCapabilities() const
-	{
-		return mCapabilitiesMap;
-	}
+    const map<String, RenderSystemCapabilities*>::type &RenderSystemCapabilitiesManager::getCapabilities() const
+    {
+        return mCapabilitiesMap;
+    }
 
     /** Method used by RenderSystemCapabilitiesSerializer::parseScript */
     void RenderSystemCapabilitiesManager::_addRenderSystemCapabilities(const String& name, RenderSystemCapabilities* caps)

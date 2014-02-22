@@ -254,14 +254,14 @@ namespace Ogre {
         typedef vector<Entity*>::type LODEntityList;
         LODEntityList mLodEntityList;
 #else
-		const ushort mMeshLodIndex;
-		const Real mMeshLodFactorTransformed;
-		const ushort mMinMeshLodIndex;
-		const ushort mMaxMeshLodIndex;
-		const Real mMaterialLodFactor;
-		const Real mMaterialLodFactorTransformed;
-		const ushort mMinMaterialLodIndex;
-		const ushort mMaxMaterialLodIndex;
+        const ushort mMeshLodIndex;
+        const Real mMeshLodFactorTransformed;
+        const ushort mMinMeshLodIndex;
+        const ushort mMaxMeshLodIndex;
+        const Real mMaterialLodFactor;
+        const Real mMaterialLodFactorTransformed;
+        const ushort mMinMaterialLodIndex;
+        const ushort mMaxMaterialLodIndex;
 #endif
         /** This Entity's personal copy of the skeleton, if skeletally animated.
         */

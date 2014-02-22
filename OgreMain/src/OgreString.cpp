@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void StringUtil::trim(String& str, bool left, bool right)
     {
         /*
@@ -123,67 +123,67 @@ namespace Ogre {
 
         return ret;
     }
-	//-----------------------------------------------------------------------
-	StringVector StringUtil::tokenise( const String& str, const String& singleDelims, const String& doubleDelims, unsigned int maxSplits)
-	{
+    //-----------------------------------------------------------------------
+    StringVector StringUtil::tokenise( const String& str, const String& singleDelims, const String& doubleDelims, unsigned int maxSplits)
+    {
         StringVector ret;
         // Pre-allocate some space for performance
         ret.reserve(maxSplits ? maxSplits+1 : 10);    // 10 is guessed capacity for most case
 
         unsigned int numSplits = 0;
-		String delims = singleDelims + doubleDelims;
+        String delims = singleDelims + doubleDelims;
 
-		// Use STL methods 
+        // Use STL methods 
         size_t start, pos;
-		char curDoubleDelim = 0;
+        char curDoubleDelim = 0;
         start = 0;
         do 
         {
-			if (curDoubleDelim != 0)
-			{
-				pos = str.find(curDoubleDelim, start);
-			}
-			else
-			{
-				pos = str.find_first_of(delims, start);
-			}
+            if (curDoubleDelim != 0)
+            {
+                pos = str.find(curDoubleDelim, start);
+            }
+            else
+            {
+                pos = str.find_first_of(delims, start);
+            }
 
             if (pos == start)
             {
-				char curDelim = str.at(pos);
-				if (doubleDelims.find_first_of(curDelim) != String::npos)
-				{
-					curDoubleDelim = curDelim;
-				}
+                char curDelim = str.at(pos);
+                if (doubleDelims.find_first_of(curDelim) != String::npos)
+                {
+                    curDoubleDelim = curDelim;
+                }
                 // Do nothing
                 start = pos + 1;
             }
             else if (pos == String::npos || (maxSplits && numSplits == maxSplits))
             {
-				if (curDoubleDelim != 0)
-				{
-					//Missing closer. Warn or throw exception?
-				}
+                if (curDoubleDelim != 0)
+                {
+                    //Missing closer. Warn or throw exception?
+                }
                 // Copy the rest of the string
                 ret.push_back( str.substr(start) );
                 break;
             }
             else
             {
-				if (curDoubleDelim != 0)
-				{
-					curDoubleDelim = 0;
-				}
+                if (curDoubleDelim != 0)
+                {
+                    curDoubleDelim = 0;
+                }
 
-				// Copy up to delimiter
-				ret.push_back( str.substr(start, pos - start) );
-				start = pos + 1;
+                // Copy up to delimiter
+                ret.push_back( str.substr(start, pos - start) );
+                start = pos + 1;
             }
-			if (curDoubleDelim == 0)
-			{
-				// parse up to next real data
-				start = str.find_first_not_of(singleDelims, start);
-			}
+            if (curDoubleDelim == 0)
+            {
+                // parse up to next real data
+                start = str.find_first_not_of(singleDelims, start);
+            }
             
             ++numSplits;
 
@@ -198,7 +198,7 @@ namespace Ogre {
             str.begin(),
             str.end(),
             str.begin(),
-			tolower);
+            tolower);
     }
 
     //-----------------------------------------------------------------------
@@ -208,7 +208,7 @@ namespace Ogre {
             str.begin(),
             str.end(),
             str.begin(),
-			toupper);
+            toupper);
     }
     //-----------------------------------------------------------------------
     void StringUtil::toTitleCase(String& str) 
@@ -233,12 +233,12 @@ namespace Ogre {
 
         String startOfThis = str.substr(0, patternLen);
         if (lowerCase)
-		{
-			String lowerCasePattern = pattern;
+        {
+            String lowerCasePattern = pattern;
             StringUtil::toLowerCase(lowerCasePattern);
             StringUtil::toLowerCase(startOfThis);
-			return (startOfThis == lowerCasePattern);
-		}
+            return (startOfThis == lowerCasePattern);
+        }
 
         return (startOfThis == pattern);
     }
@@ -252,12 +252,12 @@ namespace Ogre {
 
         String endOfThis = str.substr(thisLen - patternLen, patternLen);
         if (lowerCase)
-		{
-			String lowerCasePattern = pattern;
+        {
+            String lowerCasePattern = pattern;
             StringUtil::toLowerCase(lowerCasePattern);
             StringUtil::toLowerCase(endOfThis);
-			return (endOfThis == lowerCasePattern);
-		}
+            return (endOfThis == lowerCasePattern);
+        }
 
         return (endOfThis == pattern);
     }
@@ -272,91 +272,91 @@ namespace Ogre {
 
         return path;
     }
-	//-----------------------------------------------------------------------
-	String StringUtil::normalizeFilePath(const String& init, bool makeLowerCase)
-	{
-		const char* bufferSrc = init.c_str();
-		int pathLen = (int)init.size();
-		int indexSrc = 0;
-		int indexDst = 0;
-		int metaPathArea = 0;
+    //-----------------------------------------------------------------------
+    String StringUtil::normalizeFilePath(const String& init, bool makeLowerCase)
+    {
+        const char* bufferSrc = init.c_str();
+        int pathLen = (int)init.size();
+        int indexSrc = 0;
+        int indexDst = 0;
+        int metaPathArea = 0;
 
-		char reservedBuf[1024];
-		char* bufferDst = reservedBuf;
-		bool isDestAllocated = false;
-		if (pathLen > 1023)
-		{
-			//if source path is to long ensure we don't do a buffer overrun by allocating some
-			//new memory
-			isDestAllocated = true;
-			bufferDst = new char[pathLen + 1];
-		}
+        char reservedBuf[1024];
+        char* bufferDst = reservedBuf;
+        bool isDestAllocated = false;
+        if (pathLen > 1023)
+        {
+            //if source path is to long ensure we don't do a buffer overrun by allocating some
+            //new memory
+            isDestAllocated = true;
+            bufferDst = new char[pathLen + 1];
+        }
 
-		//The outer loop loops over directories
-		while (indexSrc < pathLen)
-		{		
-			if ((bufferSrc[indexSrc] == '\\') || (bufferSrc[indexSrc] == '/'))
-			{
-				//check if we have a directory delimiter if so skip it (we should already
-				//have written such a delimiter by this point
-				++indexSrc;
-				continue;
-			}
-			else
-			{
-				//check if there is a directory to skip of type ".\"
-				if ((bufferSrc[indexSrc] == '.') && 
-					((bufferSrc[indexSrc + 1] == '\\') || (bufferSrc[indexSrc + 1] == '/')))
-				{
-					indexSrc += 2;
-					continue;			
-				}
+        //The outer loop loops over directories
+        while (indexSrc < pathLen)
+        {       
+            if ((bufferSrc[indexSrc] == '\\') || (bufferSrc[indexSrc] == '/'))
+            {
+                //check if we have a directory delimiter if so skip it (we should already
+                //have written such a delimiter by this point
+                ++indexSrc;
+                continue;
+            }
+            else
+            {
+                //check if there is a directory to skip of type ".\"
+                if ((bufferSrc[indexSrc] == '.') && 
+                    ((bufferSrc[indexSrc + 1] == '\\') || (bufferSrc[indexSrc + 1] == '/')))
+                {
+                    indexSrc += 2;
+                    continue;           
+                }
 
-				//check if there is a directory to skip of type "..\"
-				else if ((bufferSrc[indexSrc] == '.') && (bufferSrc[indexSrc + 1] == '.') &&
-					((bufferSrc[indexSrc + 2] == '\\') || (bufferSrc[indexSrc + 2] == '/')))
-				{
-					if (indexDst > metaPathArea)
-					{
-						//skip a directory backward in the destination path
-						do {
-							--indexDst;
-						}
-						while ((indexDst > metaPathArea) && (bufferDst[indexDst - 1] != '/'));
-						indexSrc += 3;
-						continue;
-					}
-					else
-					{
-						//we are about to write "..\" to the destination buffer
-						//ensure we will not remove this in future "skip directories"
-						metaPathArea += 3;
-					}
-				}
-			}
+                //check if there is a directory to skip of type "..\"
+                else if ((bufferSrc[indexSrc] == '.') && (bufferSrc[indexSrc + 1] == '.') &&
+                    ((bufferSrc[indexSrc + 2] == '\\') || (bufferSrc[indexSrc + 2] == '/')))
+                {
+                    if (indexDst > metaPathArea)
+                    {
+                        //skip a directory backward in the destination path
+                        do {
+                            --indexDst;
+                        }
+                        while ((indexDst > metaPathArea) && (bufferDst[indexDst - 1] != '/'));
+                        indexSrc += 3;
+                        continue;
+                    }
+                    else
+                    {
+                        //we are about to write "..\" to the destination buffer
+                        //ensure we will not remove this in future "skip directories"
+                        metaPathArea += 3;
+                    }
+                }
+            }
 
-			//transfer the current directory name from the source to the destination
-			while (indexSrc < pathLen)
-			{
-				char curChar = bufferSrc[indexSrc];
-				if (makeLowerCase) curChar = tolower(curChar);
-				if ((curChar == '\\') || (curChar == '/')) curChar = '/';
-				bufferDst[indexDst] = curChar;
-				++indexDst;
-				++indexSrc;
-				if (curChar == '/') break;
-			}
-		}
-		bufferDst[indexDst] = 0;
+            //transfer the current directory name from the source to the destination
+            while (indexSrc < pathLen)
+            {
+                char curChar = bufferSrc[indexSrc];
+                if (makeLowerCase) curChar = tolower(curChar);
+                if ((curChar == '\\') || (curChar == '/')) curChar = '/';
+                bufferDst[indexDst] = curChar;
+                ++indexDst;
+                ++indexSrc;
+                if (curChar == '/') break;
+            }
+        }
+        bufferDst[indexDst] = 0;
 
-		String normalized(bufferDst); 
-		if (isDestAllocated)
-		{
-			delete[] bufferDst;
-		}
+        String normalized(bufferDst); 
+        if (isDestAllocated)
+        {
+            delete[] bufferDst;
+        }
 
-		return normalized;		
-	}
+        return normalized;      
+    }
     //-----------------------------------------------------------------------
     void StringUtil::splitFilename(const String& qualifiedName, 
         String& outBasename, String& outPath)
@@ -370,7 +370,7 @@ namespace Ogre {
         if (i == String::npos)
         {
             outPath.clear();
-			outBasename = qualifiedName;
+            outBasename = qualifiedName;
         }
         else
         {
@@ -379,35 +379,35 @@ namespace Ogre {
         }
 
     }
-	//-----------------------------------------------------------------------
-	void StringUtil::splitBaseFilename(const Ogre::String& fullName, 
-		Ogre::String& outBasename, Ogre::String& outExtention)
-	{
-		size_t i = fullName.find_last_of(".");
-		if (i == Ogre::String::npos)
-		{
-			outExtention.clear();
-			outBasename = fullName;
-		}
-		else
-		{
-			outExtention = fullName.substr(i+1);
-			outBasename = fullName.substr(0, i);
-		}
-	}
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
-	void StringUtil::splitFullFilename(	const Ogre::String& qualifiedName, 
-		Ogre::String& outBasename, Ogre::String& outExtention, Ogre::String& outPath )
-	{
-		Ogre::String fullName;
-		splitFilename( qualifiedName, fullName, outPath );
-		splitBaseFilename( fullName, outBasename, outExtention );
-	}
+    //-----------------------------------------------------------------------
+    void StringUtil::splitBaseFilename(const Ogre::String& fullName, 
+        Ogre::String& outBasename, Ogre::String& outExtention)
+    {
+        size_t i = fullName.find_last_of(".");
+        if (i == Ogre::String::npos)
+        {
+            outExtention.clear();
+            outBasename = fullName;
+        }
+        else
+        {
+            outExtention = fullName.substr(i+1);
+            outBasename = fullName.substr(0, i);
+        }
+    }
+    // ----------------------------------------------------------------------------------------------------------------------------------------------
+    void StringUtil::splitFullFilename( const Ogre::String& qualifiedName, 
+        Ogre::String& outBasename, Ogre::String& outExtention, Ogre::String& outPath )
+    {
+        Ogre::String fullName;
+        splitFilename( qualifiedName, fullName, outPath );
+        splitBaseFilename( fullName, outBasename, outExtention );
+    }
     //-----------------------------------------------------------------------
     bool StringUtil::match(const String& str, const String& pattern, bool caseSensitive)
     {
         String tmpStr = str;
-		String tmpPattern = pattern;
+        String tmpPattern = pattern;
         if (!caseSensitive)
         {
             StringUtil::toLowerCase(tmpStr);
@@ -416,22 +416,22 @@ namespace Ogre {
 
         String::const_iterator strIt = tmpStr.begin();
         String::const_iterator patIt = tmpPattern.begin();
-		String::const_iterator lastWildCardIt = tmpPattern.end();
+        String::const_iterator lastWildCardIt = tmpPattern.end();
         while (strIt != tmpStr.end() && patIt != tmpPattern.end())
         {
             if (*patIt == '*')
             {
-				lastWildCardIt = patIt;
+                lastWildCardIt = patIt;
                 // Skip over looking for next character
                 ++patIt;
                 if (patIt == tmpPattern.end())
-				{
-					// Skip right to the end since * matches the entire rest of the string
-					strIt = tmpStr.end();
-				}
-				else
                 {
-					// scan until we find next pattern character
+                    // Skip right to the end since * matches the entire rest of the string
+                    strIt = tmpStr.end();
+                }
+                else
+                {
+                    // scan until we find next pattern character
                     while(strIt != tmpStr.end() && *strIt != *patIt)
                         ++strIt;
                 }
@@ -440,18 +440,18 @@ namespace Ogre {
             {
                 if (*patIt != *strIt)
                 {
-					if (lastWildCardIt != tmpPattern.end())
-					{
-						// The last wildcard can match this incorrect sequence
-						// rewind pattern to wildcard and keep searching
-						patIt = lastWildCardIt;
-						lastWildCardIt = tmpPattern.end();
-					}
-					else
-					{
-						// no wildwards left
-						return false;
-					}
+                    if (lastWildCardIt != tmpPattern.end())
+                    {
+                        // The last wildcard can match this incorrect sequence
+                        // rewind pattern to wildcard and keep searching
+                        patIt = lastWildCardIt;
+                        lastWildCardIt = tmpPattern.end();
+                    }
+                    else
+                    {
+                        // no wildwards left
+                        return false;
+                    }
                 }
                 else
                 {
@@ -461,30 +461,30 @@ namespace Ogre {
             }
 
         }
-		// If we reached the end of both the pattern and the string, we succeeded
-		if (patIt == tmpPattern.end() && strIt == tmpStr.end())
-		{
-        	return true;
-		}
-		else
-		{
-			return false;
-		}
+        // If we reached the end of both the pattern and the string, we succeeded
+        if (patIt == tmpPattern.end() && strIt == tmpStr.end())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
 
     }
-	//-----------------------------------------------------------------------
-	const String StringUtil::replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat)
-	{
-		String result = source;
+    //-----------------------------------------------------------------------
+    const String StringUtil::replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat)
+    {
+        String result = source;
         String::size_type pos = 0;
-		while(1)
-		{
-			pos = result.find(replaceWhat,pos);
-			if (pos == String::npos) break;
-			result.replace(pos,replaceWhat.size(),replaceWithWhat);
+        while(1)
+        {
+            pos = result.find(replaceWhat,pos);
+            if (pos == String::npos) break;
+            result.replace(pos,replaceWhat.size(),replaceWithWhat);
             pos += replaceWithWhat.size();
-		}
-		return result;
-	}
+        }
+        return result;
+    }
 
 }

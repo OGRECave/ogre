@@ -44,7 +44,7 @@ extern "C" void _OgreBspPluginExport dllStartPlugin(void)
 }
 extern "C" void _OgreBspPluginExport dllStopPlugin(void)
 {
-	Ogre::Root::getSingleton().uninstallPlugin(bspPlugin);
+    Ogre::Root::getSingleton().uninstallPlugin(bspPlugin);
     OGRE_DELETE bspPlugin;
 }
 #endif

@@ -31,13 +31,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	AndroidResource::AndroidResource()
-	{				
-		GLESRenderSystem::getResourceManager()->_notifyResourceCreated(static_cast<AndroidResource*>(this));		
-	}
+    AndroidResource::AndroidResource()
+    {               
+        GLESRenderSystem::getResourceManager()->_notifyResourceCreated(static_cast<AndroidResource*>(this));        
+    }
 
-	AndroidResource::~AndroidResource()
-	{	
-		GLESRenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<AndroidResource*>(this));
-	}
+    AndroidResource::~AndroidResource()
+    {   
+        GLESRenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<AndroidResource*>(this));
+    }
 }

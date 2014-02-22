@@ -37,14 +37,14 @@ namespace Ogre
 {
 
 class _OgreLodExport LodOutputProviderCompressedBuffer :
-	public LodOutputProviderCompressedMesh
+    public LodOutputProviderCompressedMesh
 {
 public:
-	LodOutputProviderCompressedBuffer(MeshPtr mesh);
+    LodOutputProviderCompressedBuffer(MeshPtr mesh);
 
 protected:
-	virtual void bakeFirstPass(LodData* data, int lodIndex);
-	virtual void bakeSecondPass(LodData* data, int lodIndex);
+    virtual void bakeFirstPass(LodData* data, int lodIndex);
+    virtual void bakeSecondPass(LodData* data, int lodIndex);
 };
 
 }

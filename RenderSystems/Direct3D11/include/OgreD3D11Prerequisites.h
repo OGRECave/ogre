@@ -43,11 +43,11 @@ THE SOFTWARE.
 
 
 #if OGRE_THREAD_SUPPORT == 1
-#define D3D11_DEVICE_ACCESS_LOCK				OGRE_LOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
-#define D3D11_DEVICE_ACCESS_UNLOCK			OGRE_UNLOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
-#define D3D11_DEVICE_ACCESS_CRITICAL_SECTION	OGRE_LOCK_MUTEX(msDeviceAccessMutex)
+#define D3D11_DEVICE_ACCESS_LOCK                OGRE_LOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
+#define D3D11_DEVICE_ACCESS_UNLOCK          OGRE_UNLOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
+#define D3D11_DEVICE_ACCESS_CRITICAL_SECTION    OGRE_LOCK_MUTEX(msDeviceAccessMutex)
 #else
-#define D3D11_DEVICE_ACCESS_LOCK	
+#define D3D11_DEVICE_ACCESS_LOCK    
 #define D3D11_DEVICE_ACCESS_UNLOCK
 #define D3D11_DEVICE_ACCESS_CRITICAL_SECTION
 #endif
@@ -67,76 +67,76 @@ THE SOFTWARE.
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && OGRE_WINRT_TARGET_TYPE == PHONE)
-#	include <C:\Program Files (x86)\Windows Kits\8.0\Include\um\d3d11shader.h>
+#   include <C:\Program Files (x86)\Windows Kits\8.0\Include\um\d3d11shader.h>
 #else
-#	include <d3d11shader.h>
-#	include <D3Dcompiler.h>
+#   include <d3d11shader.h>
+#   include <D3Dcompiler.h>
 #endif
  
 
 namespace Ogre
 {
-	// typedefs to work with Direct3D 11 or 11.1 as appropriate
+    // typedefs to work with Direct3D 11 or 11.1 as appropriate
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	typedef ID3D11Device			ID3D11DeviceN;
-	typedef ID3D11DeviceContext		ID3D11DeviceContextN;
-	typedef ID3D11RasterizerState	ID3D11RasterizerStateN;
-	typedef IDXGIFactory1			IDXGIFactoryN;
-	typedef IDXGIAdapter1			IDXGIAdapterN;
-	typedef IDXGIDevice1			IDXGIDeviceN;
-	typedef IDXGISwapChain			IDXGISwapChainN;
-	typedef DXGI_SWAP_CHAIN_DESC	DXGI_SWAP_CHAIN_DESC_N;
+    typedef ID3D11Device            ID3D11DeviceN;
+    typedef ID3D11DeviceContext     ID3D11DeviceContextN;
+    typedef ID3D11RasterizerState   ID3D11RasterizerStateN;
+    typedef IDXGIFactory1           IDXGIFactoryN;
+    typedef IDXGIAdapter1           IDXGIAdapterN;
+    typedef IDXGIDevice1            IDXGIDeviceN;
+    typedef IDXGISwapChain          IDXGISwapChainN;
+    typedef DXGI_SWAP_CHAIN_DESC    DXGI_SWAP_CHAIN_DESC_N;
 #elif  OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-	typedef ID3D11Device1			ID3D11DeviceN;
-	typedef ID3D11DeviceContext1	ID3D11DeviceContextN;
-	typedef ID3D11RasterizerState1	ID3D11RasterizerStateN;
-	typedef IDXGIFactory2			IDXGIFactoryN;
-	typedef IDXGIAdapter1			IDXGIAdapterN;			// we don`t need IDXGIAdapter2 functionality
-	typedef IDXGIDevice2			IDXGIDeviceN;
-	typedef IDXGISwapChain1			IDXGISwapChainN;
-	typedef DXGI_SWAP_CHAIN_DESC1	DXGI_SWAP_CHAIN_DESC_N;
+    typedef ID3D11Device1           ID3D11DeviceN;
+    typedef ID3D11DeviceContext1    ID3D11DeviceContextN;
+    typedef ID3D11RasterizerState1  ID3D11RasterizerStateN;
+    typedef IDXGIFactory2           IDXGIFactoryN;
+    typedef IDXGIAdapter1           IDXGIAdapterN;          // we don`t need IDXGIAdapter2 functionality
+    typedef IDXGIDevice2            IDXGIDeviceN;
+    typedef IDXGISwapChain1         IDXGISwapChainN;
+    typedef DXGI_SWAP_CHAIN_DESC1   DXGI_SWAP_CHAIN_DESC_N;
 #endif
 
-	// Predefine classes
-	class D3D11RenderSystem;
-	class D3D11RenderWindowBase;
-	class D3D11Texture;
-	class D3D11TextureManager;
-	class D3D11DepthBuffer;
-	class D3D11Driver;
-	class D3D11DriverList;
-	class D3D11VideoMode;
-	class D3D11VideoModeList;
-	class D3D11GpuProgram;
-	class D3D11GpuProgramManager;
-	class D3D11HardwareBufferManager;
-	class D3D11HardwareIndexBuffer;
-	class D3D11HLSLProgramFactory;
-	class D3D11HLSLProgram;
-	class D3D11VertexDeclaration;
-	class D3D11Device;
-	class D3D11HardwareBuffer;
-	class D3D11HardwarePixelBuffer;
+    // Predefine classes
+    class D3D11RenderSystem;
+    class D3D11RenderWindowBase;
+    class D3D11Texture;
+    class D3D11TextureManager;
+    class D3D11DepthBuffer;
+    class D3D11Driver;
+    class D3D11DriverList;
+    class D3D11VideoMode;
+    class D3D11VideoModeList;
+    class D3D11GpuProgram;
+    class D3D11GpuProgramManager;
+    class D3D11HardwareBufferManager;
+    class D3D11HardwareIndexBuffer;
+    class D3D11HLSLProgramFactory;
+    class D3D11HLSLProgram;
+    class D3D11VertexDeclaration;
+    class D3D11Device;
+    class D3D11HardwareBuffer;
+    class D3D11HardwarePixelBuffer;
 
     typedef SharedPtr<D3D11GpuProgram>  D3D11GpuProgramPtr;
     typedef SharedPtr<D3D11HLSLProgram> D3D11HLSLProgramPtr;
     typedef SharedPtr<D3D11Texture>     D3D11TexturePtr;
 
-	//-------------------------------------------
-	// Windows setttings
-	//-------------------------------------------
+    //-------------------------------------------
+    // Windows setttings
+    //-------------------------------------------
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && !defined(OGRE_STATIC_LIB)
-#	ifdef OGRED3DENGINEDLL_EXPORTS
-#		define _OgreD3D11Export __declspec(dllexport)
-#	else
+#   ifdef OGRED3DENGINEDLL_EXPORTS
+#       define _OgreD3D11Export __declspec(dllexport)
+#   else
 #       if defined( __MINGW32__ )
 #           define _OgreD3D11Export
 #       else
-#    		define _OgreD3D11Export __declspec(dllimport)
+#           define _OgreD3D11Export __declspec(dllimport)
 #       endif
-#	endif
+#   endif
 #else
-#	define _OgreD3D11Export
-#endif	// OGRE_WIN32
+#   define _OgreD3D11Export
+#endif  // OGRE_WIN32
 }
 #endif

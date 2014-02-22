@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     Win32EGLContext::Win32EGLContext(EGLDisplay eglDisplay, 
-							const EGLSupport* glsupport,
+                            const EGLSupport* glsupport,
                            ::EGLConfig glconfig,
                            ::EGLSurface drawable)
         : EGLContext(eglDisplay, glsupport, glconfig, drawable)

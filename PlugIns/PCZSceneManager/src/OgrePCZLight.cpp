@@ -29,7 +29,7 @@ PCZLight.cpp  -  description
 begin                : Wed May 23 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -44,12 +44,12 @@ namespace Ogre
     //-----------------------------------------------------------------------
     PCZLight::PCZLight() : Light()
     {
-		mNeedsUpdate = true;   // need to update the first time, regardless of attachment or movement 
+        mNeedsUpdate = true;   // need to update the first time, regardless of attachment or movement 
     }
     //-----------------------------------------------------------------------
-	PCZLight::PCZLight(const String& name) : Light(name)
+    PCZLight::PCZLight(const String& name) : Light(name)
     {
-		mNeedsUpdate = true;   // need to update the first time, regardless of attachment or movement 
+        mNeedsUpdate = true;   // need to update the first time, regardless of attachment or movement 
     }
     //-----------------------------------------------------------------------
     PCZLight::~PCZLight()
@@ -59,7 +59,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     const String& PCZLight::getMovableType(void) const
     {
-		return PCZLightFactory::FACTORY_TYPE_NAME;
+        return PCZLightFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
     /** Clear the affectedZonesList 
@@ -140,58 +140,58 @@ namespace Ogre
         portalFrustum.setOrigin(v);
         homeZone->_checkLightAgainstPortals(this, frameCount, &portalFrustum, 0);
     }
-	//-----------------------------------------------------------------------
-	void PCZLight::removeZoneFromAffectedZonesList(PCZone * zone)
-	{
-		ZoneList::iterator it = std::find(affectedZonesList.begin(), affectedZonesList.end(), zone);
+    //-----------------------------------------------------------------------
+    void PCZLight::removeZoneFromAffectedZonesList(PCZone * zone)
+    {
+        ZoneList::iterator it = std::find(affectedZonesList.begin(), affectedZonesList.end(), zone);
 
-		if (it != affectedZonesList.end())
-		{
-			affectedZonesList.erase( it );   // zone is in list, erase it.
-		}
-	}
-	//-----------------------------------------------------------------------
-	void PCZLight::_notifyMoved(void)
-	{
-		Light::_notifyMoved();   // inform ogre Light of movement
+        if (it != affectedZonesList.end())
+        {
+            affectedZonesList.erase( it );   // zone is in list, erase it.
+        }
+    }
+    //-----------------------------------------------------------------------
+    void PCZLight::_notifyMoved(void)
+    {
+        Light::_notifyMoved();   // inform ogre Light of movement
 
-		mNeedsUpdate = true;   // set need update flag
-	}
-	//-----------------------------------------------------------------------
-	bool PCZLight::getNeedsUpdate(void)
-	{
-		if(mNeedsUpdate)   // if this light has moved, return true immediately
-			return true;
+        mNeedsUpdate = true;   // set need update flag
+    }
+    //-----------------------------------------------------------------------
+    bool PCZLight::getNeedsUpdate(void)
+    {
+        if(mNeedsUpdate)   // if this light has moved, return true immediately
+            return true;
 
-		// if any zones affected by this light have updated portals, then this light needs updating too
-		for (ZoneList::iterator iter = affectedZonesList.begin() ; iter != affectedZonesList.end(); iter++)
-		{ 
-			if((*iter)->getPortalsUpdated()) return true;   // return immediately to prevent further iterating
-		}
+        // if any zones affected by this light have updated portals, then this light needs updating too
+        for (ZoneList::iterator iter = affectedZonesList.begin() ; iter != affectedZonesList.end(); iter++)
+        { 
+            if((*iter)->getPortalsUpdated()) return true;   // return immediately to prevent further iterating
+        }
 
-		return false;   // light hasn't moved, and no zones have updated portals. no light update.
-	}
+        return false;   // light hasn't moved, and no zones have updated portals. no light update.
+    }
 
 
-	//-----------------------------------------------------------------------
-	String PCZLightFactory::FACTORY_TYPE_NAME = "PCZLight";
-	//-----------------------------------------------------------------------
-	const String& PCZLightFactory::getType(void) const
-	{
-		return FACTORY_TYPE_NAME;
-	}
-	//-----------------------------------------------------------------------
-	MovableObject* PCZLightFactory::createInstanceImpl( const String& name, 
-		const NameValuePairList* params)
-	{
+    //-----------------------------------------------------------------------
+    String PCZLightFactory::FACTORY_TYPE_NAME = "PCZLight";
+    //-----------------------------------------------------------------------
+    const String& PCZLightFactory::getType(void) const
+    {
+        return FACTORY_TYPE_NAME;
+    }
+    //-----------------------------------------------------------------------
+    MovableObject* PCZLightFactory::createInstanceImpl( const String& name, 
+        const NameValuePairList* params)
+    {
 
-		return OGRE_NEW PCZLight(name);
+        return OGRE_NEW PCZLight(name);
 
-	}
-	//-----------------------------------------------------------------------
-	void PCZLightFactory::destroyInstance( MovableObject* obj)
-	{
-		OGRE_DELETE obj;
-	}
+    }
+    //-----------------------------------------------------------------------
+    void PCZLightFactory::destroyInstance( MovableObject* obj)
+    {
+        OGRE_DELETE obj;
+    }
 
 } // Namespace

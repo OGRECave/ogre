@@ -196,7 +196,7 @@ class CPreprocessor
 
         ~Macro ()
         //{ OGRE_DELETE [] Args; OGRE_DELETE Next; }
-		{ delete [] Args; delete Next; }
+        { delete [] Args; delete Next; }
 
         /// Expand the macro value (will not work for functions)
         Token Expand (int iNumArgs, Token *iArgs, Macro *iMacros);

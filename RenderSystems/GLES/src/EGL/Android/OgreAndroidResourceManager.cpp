@@ -30,45 +30,45 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//-----------------------------------------------------------------------
-	AndroidResourceManager::AndroidResourceManager()
-	{
-	}
-	//-----------------------------------------------------------------------
-	AndroidResourceManager::~AndroidResourceManager()
-	{
-	
-	}
     //-----------------------------------------------------------------------
-	void AndroidResourceManager::notifyOnContextLost()
-	{				
-		ResourceContainerIterator it = mResources.begin();
-		while (it != mResources.end())
-		{
-			(*it)->notifyOnContextLost();
-			++it;
-		}				
-	}
+    AndroidResourceManager::AndroidResourceManager()
+    {
+    }
     //-----------------------------------------------------------------------
-	void AndroidResourceManager::notifyOnContextReset()
-	{
-		ResourceContainerIterator it = mResources.begin();
-		while (it != mResources.end())
-		{
-			(*it)->notifyOnContextReset();
-			++it;
-		}	
-	}
-	//-----------------------------------------------------------------------
-	void AndroidResourceManager::_notifyResourceCreated(AndroidResource* pResource)
-	{			
-		mResources.push_back(pResource);
-	}
-	//-----------------------------------------------------------------------
-	void AndroidResourceManager::_notifyResourceDestroyed(AndroidResource* pResource)
-	{		
+    AndroidResourceManager::~AndroidResourceManager()
+    {
+    
+    }
+    //-----------------------------------------------------------------------
+    void AndroidResourceManager::notifyOnContextLost()
+    {               
+        ResourceContainerIterator it = mResources.begin();
+        while (it != mResources.end())
+        {
+            (*it)->notifyOnContextLost();
+            ++it;
+        }               
+    }
+    //-----------------------------------------------------------------------
+    void AndroidResourceManager::notifyOnContextReset()
+    {
+        ResourceContainerIterator it = mResources.begin();
+        while (it != mResources.end())
+        {
+            (*it)->notifyOnContextReset();
+            ++it;
+        }   
+    }
+    //-----------------------------------------------------------------------
+    void AndroidResourceManager::_notifyResourceCreated(AndroidResource* pResource)
+    {           
+        mResources.push_back(pResource);
+    }
+    //-----------------------------------------------------------------------
+    void AndroidResourceManager::_notifyResourceDestroyed(AndroidResource* pResource)
+    {       
         ResourceContainerIterator it = std::find( mResources.begin(), mResources.end(), pResource );
         if(it != mResources.end())
             mResources.erase(it);
-	}
+    }
 }

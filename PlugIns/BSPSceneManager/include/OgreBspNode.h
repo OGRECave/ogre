@@ -48,7 +48,7 @@ namespace Ogre {
         getBack() return null pointers. If the node is a partitioning plane isLeaf() returns false and getFront()
         and getBack() will return the corresponding BspNode objects.
     */
-	class BspNode : public NodeAlloc
+    class BspNode : public NodeAlloc
     {
         friend class BspLevel;
 
@@ -142,14 +142,14 @@ namespace Ogre {
         /// Gets the signed distance to the dividing plane
         Real getDistance(const Vector3& pos) const;
 
-		typedef set<const MovableObject*>::type IntersectingObjectSet;
+        typedef set<const MovableObject*>::type IntersectingObjectSet;
 
         struct Brush
         {
-			list<Plane>::type planes;
+            list<Plane>::type planes;
             SceneQuery::WorldFragment fragment; /// For query reporting
         };
-		typedef vector<Brush*>::type NodeBrushList; /// Main brush memory held on level
+        typedef vector<Brush*>::type NodeBrushList; /// Main brush memory held on level
 
         /** Get the list of solid Brushes for this node.
         @remarks Only applicable for leaf nodes. 

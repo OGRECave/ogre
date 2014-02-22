@@ -32,22 +32,22 @@ class AmbientLight : public Ogre::SimpleRenderable
 
 {
 public:
-	AmbientLight();
-	~AmbientLight();
+    AmbientLight();
+    ~AmbientLight();
 
-	/** @copydoc MovableObject::getBoundingRadius */
-	virtual Ogre::Real getBoundingRadius(void) const;
-	/** @copydoc Renderable::getSquaredViewDepth */
-	virtual Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
-	/** @copydoc Renderable::getMaterial */
-	virtual const Ogre::MaterialPtr& getMaterial(void) const;
+    /** @copydoc MovableObject::getBoundingRadius */
+    virtual Ogre::Real getBoundingRadius(void) const;
+    /** @copydoc Renderable::getSquaredViewDepth */
+    virtual Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
+    /** @copydoc Renderable::getMaterial */
+    virtual const Ogre::MaterialPtr& getMaterial(void) const;
 
-	virtual void getWorldTransforms(Ogre::Matrix4* xform) const;
+    virtual void getWorldTransforms(Ogre::Matrix4* xform) const;
 
-	void updateFromCamera(Ogre::Camera* camera);
+    void updateFromCamera(Ogre::Camera* camera);
 protected:
-	Ogre::Real mRadius;
-	Ogre::MaterialPtr mMatPtr;
+    Ogre::Real mRadius;
+    Ogre::MaterialPtr mMatPtr;
 };
  
 #endif

@@ -33,42 +33,42 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	class D3D11VideoModeList;
-	class D3D11VideoMode;
+    class D3D11VideoModeList;
+    class D3D11VideoMode;
 
-	class D3D11Driver
-	{
-	private:
-		// D3D only allows one device per adapter, so it can safely be stored
-		// here as well.
-		unsigned int mAdapterNumber;
-		DXGI_ADAPTER_DESC1 mAdapterIdentifier;
-		DXGI_MODE_DESC mDesktopDisplayMode;
-		D3D11VideoModeList* mVideoModeList;
-		unsigned int tempNo;
-		static unsigned int driverCount;
-		IDXGIAdapterN*	mDXGIAdapter;
+    class D3D11Driver
+    {
+    private:
+        // D3D only allows one device per adapter, so it can safely be stored
+        // here as well.
+        unsigned int mAdapterNumber;
+        DXGI_ADAPTER_DESC1 mAdapterIdentifier;
+        DXGI_MODE_DESC mDesktopDisplayMode;
+        D3D11VideoModeList* mVideoModeList;
+        unsigned int tempNo;
+        static unsigned int driverCount;
+        IDXGIAdapterN*  mDXGIAdapter;
 
 
-	public:
-		// Constructors
-		D3D11Driver();		// Default
-		D3D11Driver( const D3D11Driver &ob );	// Copy
-		D3D11Driver( unsigned int adapterNumber,  IDXGIAdapterN* pDXGIAdapter );
-		~D3D11Driver();
+    public:
+        // Constructors
+        D3D11Driver();      // Default
+        D3D11Driver( const D3D11Driver &ob );   // Copy
+        D3D11Driver( unsigned int adapterNumber,  IDXGIAdapterN* pDXGIAdapter );
+        ~D3D11Driver();
 
-		D3D11Driver& operator=(const D3D11Driver& r);
+        D3D11Driver& operator=(const D3D11Driver& r);
 
-		// Information accessors
-		String DriverName() const;
-		String DriverDescription() const;
+        // Information accessors
+        String DriverName() const;
+        String DriverDescription() const;
 
-		// change the device
-		unsigned int getAdapterNumber() const;
-		const DXGI_ADAPTER_DESC1& getAdapterIdentifier() const;
-		const DXGI_MODE_DESC& getDesktopMode() const;
-		IDXGIAdapterN* getDeviceAdapter() const;
-		D3D11VideoModeList* getVideoModeList();
-	};
+        // change the device
+        unsigned int getAdapterNumber() const;
+        const DXGI_ADAPTER_DESC1& getAdapterIdentifier() const;
+        const DXGI_MODE_DESC& getDesktopMode() const;
+        IDXGIAdapterN* getDeviceAdapter() const;
+        D3D11VideoModeList* getVideoModeList();
+    };
 }
 #endif

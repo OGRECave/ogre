@@ -38,15 +38,15 @@ namespace Ogre
 
 class _OgreLodExport LodInputProvider {
 public:
-	virtual ~LodInputProvider() {}
-	/// Called when the data should be filled with the input.
-	virtual void initData(LodData* data) = 0;
+    virtual ~LodInputProvider() {}
+    /// Called when the data should be filled with the input.
+    virtual void initData(LodData* data) = 0;
 protected:
-	// Helper functions
-	void printTriangle(LodData::Triangle* triangle, stringstream& str);
-	void addTriangleToEdges(LodData* data, LodData::Triangle* triangle);
-	bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2);
-	LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle);
+    // Helper functions
+    void printTriangle(LodData::Triangle* triangle, stringstream& str);
+    void addTriangleToEdges(LodData* data, LodData::Triangle* triangle);
+    bool isDuplicateTriangle(LodData::Triangle* triangle, LodData::Triangle* triangle2);
+    LodData::Triangle* isDuplicateTriangle(LodData::Triangle* triangle);
 };
 
 }

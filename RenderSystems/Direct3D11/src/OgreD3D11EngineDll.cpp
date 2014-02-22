@@ -31,18 +31,18 @@ THE SOFTWARE.
 #ifndef OGRE_STATIC_LIB
 namespace Ogre 
 {
-	D3D11Plugin* plugin;
+    D3D11Plugin* plugin;
 
-	extern "C" void _OgreD3D11Export dllStartPlugin(void) throw()
-	{
-		plugin = new D3D11Plugin();
-		Root::getSingleton().installPlugin(plugin);
-	}
+    extern "C" void _OgreD3D11Export dllStartPlugin(void) throw()
+    {
+        plugin = new D3D11Plugin();
+        Root::getSingleton().installPlugin(plugin);
+    }
 
-	extern "C" void _OgreD3D11Export dllStopPlugin(void)
-	{
-		Root::getSingleton().uninstallPlugin(plugin);
-		delete plugin;
-	}
+    extern "C" void _OgreD3D11Export dllStopPlugin(void)
+    {
+        Root::getSingleton().uninstallPlugin(plugin);
+        delete plugin;
+    }
 }
 #endif

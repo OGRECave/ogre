@@ -66,7 +66,7 @@ namespace Ogre {
     {
         // precalculate distance of plane from origin
         Real planeDistance = - mPlaneNormal.dotProduct(mPlanePoint) / Math::Sqrt(mPlaneNormal.dotProduct(mPlaneNormal));
-		Vector3 directionPart;
+        Vector3 directionPart;
 
         ParticleIterator pi = pSystem->_getIterator();
 
@@ -81,9 +81,9 @@ namespace Ogre {
                 if (a > 0.0)
                 {
                     // for intersection point
-					directionPart = direction * (- a / direction.dotProduct( mPlaneNormal ));
+                    directionPart = direction * (- a / direction.dotProduct( mPlaneNormal ));
                     // set new position
-					p->mPosition = (p->mPosition + ( directionPart )) + (((directionPart) - direction) * mBounce);
+                    p->mPosition = (p->mPosition + ( directionPart )) + (((directionPart) - direction) * mBounce);
 
                     // reflect direction vector
                     p->mDirection = (p->mDirection - (2.0 * p->mDirection.dotProduct( mPlaneNormal ) * mPlaneNormal)) * mBounce;

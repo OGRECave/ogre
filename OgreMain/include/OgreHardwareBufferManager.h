@@ -122,12 +122,12 @@ namespace Ogre {
         */
         typedef set<HardwareVertexBuffer*>::type VertexBufferList;
         typedef set<HardwareIndexBuffer*>::type IndexBufferList;
-		typedef set<HardwareUniformBuffer*>::type UniformBufferList;
-		typedef set<HardwareCounterBuffer*>::type CounterBufferList;
+        typedef set<HardwareUniformBuffer*>::type UniformBufferList;
+        typedef set<HardwareCounterBuffer*>::type CounterBufferList;
         VertexBufferList mVertexBuffers;
         IndexBufferList mIndexBuffers;
-		UniformBufferList mUniformBuffers;
-		CounterBufferList mCounterBuffers;
+        UniformBufferList mUniformBuffers;
+        CounterBufferList mCounterBuffers;
 
 
         typedef set<VertexDeclaration*>::type VertexDeclarationList;
@@ -284,20 +284,20 @@ namespace Ogre {
         */
         virtual RenderToVertexBufferSharedPtr createRenderToVertexBuffer() = 0;
 
-		/**
-		 * Create uniform buffer. This type of buffer allows the upload of shader constants once,
-		 * and sharing between shader stages or even shaders from another materials. 
-		 * The update shall be triggered by GpuProgramParameters, if is dirty
-		 */
-		virtual HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
-									HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-									bool useShadowBuffer = false, const String& name = "") = 0;
+        /**
+         * Create uniform buffer. This type of buffer allows the upload of shader constants once,
+         * and sharing between shader stages or even shaders from another materials. 
+         * The update shall be triggered by GpuProgramParameters, if is dirty
+         */
+        virtual HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
+                                    HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
+                                    bool useShadowBuffer = false, const String& name = "") = 0;
 
         /**
-		 * Create counter buffer.
-		 * The update shall be triggered by GpuProgramParameters, if is dirty
-		 */
-		virtual HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+         * Create counter buffer.
+         * The update shall be triggered by GpuProgramParameters, if is dirty
+         */
+        virtual HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                                    HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                                    bool useShadowBuffer = false, const String& name = "") = 0;
 
@@ -419,10 +419,10 @@ namespace Ogre {
         void _notifyVertexBufferDestroyed(HardwareVertexBuffer* buf);
         /// Notification that a hardware index buffer has been destroyed.
         void _notifyIndexBufferDestroyed(HardwareIndexBuffer* buf);
-		/// Notification that at hardware uniform buffer has been destroyed
-		void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf);
-		/// Notification that at hardware counter buffer has been destroyed
-		void _notifyCounterBufferDestroyed(HardwareCounterBuffer* buf);
+        /// Notification that at hardware uniform buffer has been destroyed
+        void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf);
+        /// Notification that at hardware counter buffer has been destroyed
+        void _notifyCounterBufferDestroyed(HardwareCounterBuffer* buf);
     };
 
     /** Singleton wrapper for hardware buffer manager. */
@@ -458,20 +458,20 @@ namespace Ogre {
         }
 
         /** @copydoc HardwareBufferManagerBase::createUniformBuffer */
-		HardwareUniformBufferSharedPtr
-				createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "")
-		{
-			return mImpl->createUniformBuffer(sizeBytes, usage, useShadowBuffer, name);
-		}
+        HardwareUniformBufferSharedPtr
+                createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "")
+        {
+            return mImpl->createUniformBuffer(sizeBytes, usage, useShadowBuffer, name);
+        }
         
         /** @copydoc HardwareBufferManagerBase::createCounterBuffer */
-		HardwareCounterBufferSharedPtr
+        HardwareCounterBufferSharedPtr
         createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "")
-		{
-			return mImpl->createCounterBuffer(sizeBytes, usage, useShadowBuffer, name);
-		}
+        {
+            return mImpl->createCounterBuffer(sizeBytes, usage, useShadowBuffer, name);
+        }
 
-		/** @copydoc HardwareBufferManagerInterface::createVertexDeclaration */
+        /** @copydoc HardwareBufferManagerInterface::createVertexDeclaration */
         virtual VertexDeclaration* createVertexDeclaration(void)
         {
             return mImpl->createVertexDeclaration();
@@ -553,16 +553,16 @@ namespace Ogre {
         {
             mImpl->_notifyIndexBufferDestroyed(buf);
         }
-		/** @copydoc HardwareBufferManagerInterface::_notifyUniformBufferDestroyed */
-		void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
-		{
-			mImpl->_notifyUniformBufferDestroyed(buf);
-		}
-		/** @copydoc HardwareBufferManagerInterface::_notifyCounterBufferDestroyed */
-		void _notifyConterBufferDestroyed(HardwareCounterBuffer* buf)
-		{
-			mImpl->_notifyCounterBufferDestroyed(buf);
-		}
+        /** @copydoc HardwareBufferManagerInterface::_notifyUniformBufferDestroyed */
+        void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
+        {
+            mImpl->_notifyUniformBufferDestroyed(buf);
+        }
+        /** @copydoc HardwareBufferManagerInterface::_notifyCounterBufferDestroyed */
+        void _notifyConterBufferDestroyed(HardwareCounterBuffer* buf)
+        {
+            mImpl->_notifyCounterBufferDestroyed(buf);
+        }
 
         /** Override standard Singleton retrieval.
         @remarks

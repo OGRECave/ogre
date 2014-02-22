@@ -36,17 +36,17 @@ class Workspace;
 class WorkspaceEventArgs : public EventArgs
 {
 public:
-	WorkspaceEventArgs();
-	WorkspaceEventArgs(Workspace* workspace, Project* project);
+    WorkspaceEventArgs();
+    WorkspaceEventArgs(Workspace* workspace, Project* project);
 
-	virtual ~WorkspaceEventArgs();
+    virtual ~WorkspaceEventArgs();
 
-	Workspace* getWorkspace();
-	Project* getProject();
+    Workspace* getWorkspace();
+    Project* getProject();
 
 protected:
-	Workspace* mWorkspace;
-	Project* mProject;
+    Workspace* mWorkspace;
+    Project* mProject;
 };
 
 #endif // _WORKSPACEEVENTARGS_H_

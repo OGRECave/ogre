@@ -41,46 +41,46 @@ using namespace Ogre;
 
 Capsule::Capsule()
 {
-	// uninitialized
+    // uninitialized
 }
 //----------------------------------------------------------------------------
 Capsule::Capsule(const Segment& segment, Real radius)
-	: mSegment(segment),
-	mRadius(radius)
+    : mSegment(segment),
+    mRadius(radius)
 {
 }
 //----------------------------------------------------------------------------
 void Capsule::set(const Vector3& newOrigin, const Vector3& newEnd, Real newRadius)
 {
-	mSegment.set(newOrigin, newEnd);
-	mRadius = newRadius;
+    mSegment.set(newOrigin, newEnd);
+    mRadius = newRadius;
 }
 //----------------------------------------------------------------------------
 void Capsule::setOrigin(const Vector3& newOrigin)
 {
-	mSegment.mOrigin = newOrigin;
+    mSegment.mOrigin = newOrigin;
 }
 //----------------------------------------------------------------------------
 void Capsule::setEndPoint(const Vector3& newEndpoint)
 {
-	mSegment.setEndPoint(newEndpoint);
+    mSegment.setEndPoint(newEndpoint);
 }
 //----------------------------------------------------------------------------
 void Capsule::setRadius(Real newRadius)
 {
-	mRadius = newRadius;
+    mRadius = newRadius;
 }
 //----------------------------------------------------------------------------
 bool Capsule::intersects(const Capsule& otherCapsule) const
 {
-	Real fDistance = mSegment.distance(otherCapsule.mSegment);
-	Real fRSum = mRadius + otherCapsule.mRadius;
-	return fDistance <= fRSum;
+    Real fDistance = mSegment.distance(otherCapsule.mSegment);
+    Real fRSum = mRadius + otherCapsule.mRadius;
+    return fDistance <= fRSum;
 }
 //----------------------------------------------------------------------------
 bool Capsule::intersects(const Segment& segment) const
 {
-	Real fDist = segment.distance(mSegment);
-	return fDist <= mRadius;
+    Real fDist = segment.distance(mSegment);
+    return fDist <= mRadius;
 }
 //----------------------------------------------------------------------------

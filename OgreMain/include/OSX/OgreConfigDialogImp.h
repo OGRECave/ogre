@@ -79,21 +79,21 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class _OgreExport ConfigDialog : public UtilityAlloc
-	{
-	public:
-		ConfigDialog();
-		~ConfigDialog();
-	
-		void initialise();
-		bool display();
+    class _OgreExport ConfigDialog : public UtilityAlloc
+    {
+    public:
+        ConfigDialog();
+        ~ConfigDialog();
+    
+        void initialise();
+        bool display();
 
-	protected:
+    protected:
 #ifdef __OBJC__
         OgreConfigWindowDelegate *mWindowDelegate;
 #endif
-		RenderSystem *mSelectedRenderSystem;
-	};
+        RenderSystem *mSelectedRenderSystem;
+    };
 }
 
 #endif // __OSX_CONFIG_DIALOG_H__

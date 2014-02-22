@@ -45,23 +45,23 @@ void setUpSuite()
 void tearDownSuite()
 {
     // shutdown and release managers that might have been created
-	if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
-		delete Ogre::HighLevelGpuProgramManager::getSingletonPtr();
-	if(Ogre::GpuProgramManager::getSingletonPtr())
-		delete Ogre::GpuProgramManager::getSingletonPtr();
-	if(Ogre::CompositorManager::getSingletonPtr())
-		delete Ogre::CompositorManager::getSingletonPtr();
-	if(Ogre::MaterialManager::getSingletonPtr())
-		delete Ogre::MaterialManager::getSingletonPtr();
-	if(Ogre::ResourceGroupManager::getSingletonPtr())
-		delete Ogre::ResourceGroupManager::getSingletonPtr();
+    if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
+        delete Ogre::HighLevelGpuProgramManager::getSingletonPtr();
+    if(Ogre::GpuProgramManager::getSingletonPtr())
+        delete Ogre::GpuProgramManager::getSingletonPtr();
+    if(Ogre::CompositorManager::getSingletonPtr())
+        delete Ogre::CompositorManager::getSingletonPtr();
+    if(Ogre::MaterialManager::getSingletonPtr())
+        delete Ogre::MaterialManager::getSingletonPtr();
+    if(Ogre::ResourceGroupManager::getSingletonPtr())
+        delete Ogre::ResourceGroupManager::getSingletonPtr();
 
-	if(Ogre::LogManager::getSingletonPtr())
-		delete Ogre::LogManager::getSingletonPtr();
-	if(Ogre::ResourceGroupManager::getSingletonPtr())
-		delete Ogre::ResourceGroupManager::getSingletonPtr();
-	if(Ogre::LodStrategyManager::getSingletonPtr())
-		delete Ogre::LodStrategyManager::getSingletonPtr();
+    if(Ogre::LogManager::getSingletonPtr())
+        delete Ogre::LogManager::getSingletonPtr();
+    if(Ogre::ResourceGroupManager::getSingletonPtr())
+        delete Ogre::ResourceGroupManager::getSingletonPtr();
+    if(Ogre::LodStrategyManager::getSingletonPtr())
+        delete Ogre::LodStrategyManager::getSingletonPtr();
 
 }
 

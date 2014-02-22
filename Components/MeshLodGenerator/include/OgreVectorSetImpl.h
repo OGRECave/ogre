@@ -36,82 +36,82 @@
 namespace Ogre
 {
 
-	template<typename T, unsigned S>
-	void VectorSet<T, S>::addNotExists(const T& item)
-	{
-		OgreAssert(find(item) == this->end(), "");
-		this->push_back(item);
-	}
+    template<typename T, unsigned S>
+    void VectorSet<T, S>::addNotExists(const T& item)
+    {
+        OgreAssert(find(item) == this->end(), "");
+        this->push_back(item);
+    }
 
-	template<typename T, unsigned S>
-	void VectorSet<T, S>::remove(iterator it)
-	{
-		// Thats my trick to remove an item from the vector very fast!
-		// It works similar to the heap_pop().
-		// It swaps the removable item to the back, then pops it.
-		*it = this->back();
-		this->pop_back();
-	}
+    template<typename T, unsigned S>
+    void VectorSet<T, S>::remove(iterator it)
+    {
+        // Thats my trick to remove an item from the vector very fast!
+        // It works similar to the heap_pop().
+        // It swaps the removable item to the back, then pops it.
+        *it = this->back();
+        this->pop_back();
+    }
 
-	template<typename T, unsigned S>
-	typename VectorSet<T, S>::iterator VectorSet<T, S>::add(const T& item)
-	{
-		iterator it = find(item);
-		if (it == this->end()) {
-			this->push_back(item);
-			return this->end();
-		}
-		return it;
-	}
+    template<typename T, unsigned S>
+    typename VectorSet<T, S>::iterator VectorSet<T, S>::add(const T& item)
+    {
+        iterator it = find(item);
+        if (it == this->end()) {
+            this->push_back(item);
+            return this->end();
+        }
+        return it;
+    }
 
-	template<typename T, unsigned S>
-	void VectorSet<T, S>::removeExists(const T& item)
-	{
-		iterator it = find(item);
-		OgreAssert(it != this->end(), "");
-		remove(it);
-	}
+    template<typename T, unsigned S>
+    void VectorSet<T, S>::removeExists(const T& item)
+    {
+        iterator it = find(item);
+        OgreAssert(it != this->end(), "");
+        remove(it);
+    }
 
-	template<typename T, unsigned S>
-	bool VectorSet<T, S>::remove(const T& item)
-	{
-		iterator it = find(item);
-		if (it != this->end()) {
-			remove(it);
-			return true;
-		} else {
-			return false;
-		}
-	}
+    template<typename T, unsigned S>
+    bool VectorSet<T, S>::remove(const T& item)
+    {
+        iterator it = find(item);
+        if (it != this->end()) {
+            remove(it);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	template<typename T, unsigned S>
-	void VectorSet<T, S>::replaceExists(const T& oldItem, const T& newItem)
-	{
-		iterator it = find(oldItem);
-		OgreAssert(it != this->end(), "");
-		*it = newItem;
-	}
+    template<typename T, unsigned S>
+    void VectorSet<T, S>::replaceExists(const T& oldItem, const T& newItem)
+    {
+        iterator it = find(oldItem);
+        OgreAssert(it != this->end(), "");
+        *it = newItem;
+    }
 
-	template<typename T, unsigned S>
-	bool VectorSet<T, S>::has(const T& item)
-	{
-		return find(item) != this->end();
-	}
+    template<typename T, unsigned S>
+    bool VectorSet<T, S>::has(const T& item)
+    {
+        return find(item) != this->end();
+    }
 
-	template<typename T, unsigned S>
-	typename VectorSet<T, S>::iterator VectorSet<T, S>::find(const T& item)
-	{
-		return std::find(this->begin(), this->end(), item);
-	}
+    template<typename T, unsigned S>
+    typename VectorSet<T, S>::iterator VectorSet<T, S>::find(const T& item)
+    {
+        return std::find(this->begin(), this->end(), item);
+    }
 
-	template<typename T, unsigned S>
-	typename VectorSet<T, S>::iterator VectorSet<T, S>::findExists(
-		const T& item)
-	{
-		iterator it = find(item);
-		OgreAssert(it != this->end(), "");
-		return it;
-	}
+    template<typename T, unsigned S>
+    typename VectorSet<T, S>::iterator VectorSet<T, S>::findExists(
+        const T& item)
+    {
+        iterator it = find(item);
+        OgreAssert(it != this->end(), "");
+        return it;
+    }
 
 }
 #endif

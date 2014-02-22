@@ -32,106 +32,106 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//---------------------------------------------------------------------
-	const uint32 SimplePageContentCollection::SUBCLASS_CHUNK_ID = StreamSerialiser::makeIdentifier("SPCD");
-	const uint16 SimplePageContentCollection::SUBCLASS_CHUNK_VERSION = 1;
-	//---------------------------------------------------------------------
-	SimplePageContentCollection::SimplePageContentCollection(PageContentCollectionFactory* creator)
-		: PageContentCollection(creator)
-	{
+    //---------------------------------------------------------------------
+    const uint32 SimplePageContentCollection::SUBCLASS_CHUNK_ID = StreamSerialiser::makeIdentifier("SPCD");
+    const uint16 SimplePageContentCollection::SUBCLASS_CHUNK_VERSION = 1;
+    //---------------------------------------------------------------------
+    SimplePageContentCollection::SimplePageContentCollection(PageContentCollectionFactory* creator)
+        : PageContentCollection(creator)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	SimplePageContentCollection::~SimplePageContentCollection()
-	{
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			delete *i;
-		mContentList.clear();
-	}
-	//---------------------------------------------------------------------
-	PageContent* SimplePageContentCollection::createContent(const String& typeName)
-	{
-		PageContent* c = getManager()->createContent(typeName);
-		mContentList.push_back(c);
-		return c;
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::destroyContent(PageContent* c)
-	{
-		ContentList::iterator i = std::find(mContentList.begin(), mContentList.end(), c);
-		if (i != mContentList.end())
-			mContentList.erase(i);
-		getManager()->destroyContent(c);
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::save(StreamSerialiser& stream)
-	{
-		stream.writeChunkBegin(SUBCLASS_CHUNK_ID, SUBCLASS_CHUNK_VERSION);
+    }
+    //---------------------------------------------------------------------
+    SimplePageContentCollection::~SimplePageContentCollection()
+    {
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            delete *i;
+        mContentList.clear();
+    }
+    //---------------------------------------------------------------------
+    PageContent* SimplePageContentCollection::createContent(const String& typeName)
+    {
+        PageContent* c = getManager()->createContent(typeName);
+        mContentList.push_back(c);
+        return c;
+    }
+    //---------------------------------------------------------------------
+    void SimplePageContentCollection::destroyContent(PageContent* c)
+    {
+        ContentList::iterator i = std::find(mContentList.begin(), mContentList.end(), c);
+        if (i != mContentList.end())
+            mContentList.erase(i);
+        getManager()->destroyContent(c);
+    }
+    //---------------------------------------------------------------------
+    void SimplePageContentCollection::save(StreamSerialiser& stream)
+    {
+        stream.writeChunkBegin(SUBCLASS_CHUNK_ID, SUBCLASS_CHUNK_VERSION);
 
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			(*i)->save(stream);
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            (*i)->save(stream);
 
-		stream.writeChunkEnd(SUBCLASS_CHUNK_ID);
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::frameStart(Real timeSinceLastFrame)
-	{
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			(*i)->frameStart(timeSinceLastFrame);
+        stream.writeChunkEnd(SUBCLASS_CHUNK_ID);
+    }
+    //---------------------------------------------------------------------
+    void SimplePageContentCollection::frameStart(Real timeSinceLastFrame)
+    {
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            (*i)->frameStart(timeSinceLastFrame);
 
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::frameEnd(Real timeElapsed)
-	{
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			(*i)->frameEnd(timeElapsed);
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::notifyCamera(Camera* cam)
-	{
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			(*i)->notifyCamera(cam);
-	}
-	//---------------------------------------------------------------------
-	bool SimplePageContentCollection::prepare(StreamSerialiser& stream)
-	{
-		if (!stream.readChunkBegin(SUBCLASS_CHUNK_ID, SUBCLASS_CHUNK_VERSION, "SimplePageContentCollection"))
-			return false;
+    }
+    //---------------------------------------------------------------------
+    void SimplePageContentCollection::frameEnd(Real timeElapsed)
+    {
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            (*i)->frameEnd(timeElapsed);
+    }
+    //---------------------------------------------------------------------
+    void SimplePageContentCollection::notifyCamera(Camera* cam)
+    {
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            (*i)->notifyCamera(cam);
+    }
+    //---------------------------------------------------------------------
+    bool SimplePageContentCollection::prepare(StreamSerialiser& stream)
+    {
+        if (!stream.readChunkBegin(SUBCLASS_CHUNK_ID, SUBCLASS_CHUNK_VERSION, "SimplePageContentCollection"))
+            return false;
 
-		bool ret = true;
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			ret = (*i)->prepare(stream) && ret;
+        bool ret = true;
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            ret = (*i)->prepare(stream) && ret;
 
 
-		stream.readChunkEnd(SUBCLASS_CHUNK_ID);
+        stream.readChunkEnd(SUBCLASS_CHUNK_ID);
 
-		return ret;
+        return ret;
 
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::load()
-	{
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			(*i)->load();
+    }
+    //---------------------------------------------------------------------
+    void SimplePageContentCollection::load()
+    {
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            (*i)->load();
 
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::unload()
-	{
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			(*i)->unload();
+    }
+    //---------------------------------------------------------------------
+    void SimplePageContentCollection::unload()
+    {
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            (*i)->unload();
 
-	}
-	//---------------------------------------------------------------------
-	void SimplePageContentCollection::unprepare()
-	{
-		for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
-			(*i)->unprepare();
-	}
-	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	String SimplePageContentCollectionFactory::FACTORY_NAME = "Simple";
-	//---------------------------------------------------------------------
+    }
+    //---------------------------------------------------------------------
+    void SimplePageContentCollection::unprepare()
+    {
+        for (ContentList::iterator i = mContentList.begin(); i != mContentList.end(); ++i)
+            (*i)->unprepare();
+    }
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    String SimplePageContentCollectionFactory::FACTORY_NAME = "Simple";
+    //---------------------------------------------------------------------
 
 
 

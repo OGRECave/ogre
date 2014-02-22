@@ -40,7 +40,7 @@ String HLSLProgramWriter::TargetLanguage = "hlsl";
 //-----------------------------------------------------------------------
 HLSLProgramWriter::HLSLProgramWriter()
 {
-	initializeStringMaps();
+    initializeStringMaps();
 }
 
 //-----------------------------------------------------------------------
@@ -52,170 +52,170 @@ HLSLProgramWriter::~HLSLProgramWriter()
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::initializeStringMaps()
 {
-	mGpuConstTypeMap[GCT_FLOAT1] = "float";
-	mGpuConstTypeMap[GCT_FLOAT2] = "float2";
-	mGpuConstTypeMap[GCT_FLOAT3] = "float3";
-	mGpuConstTypeMap[GCT_FLOAT4] = "float4";
-	mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
-	mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
-	mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
-	mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCUBE";
-	mGpuConstTypeMap[GCT_SAMPLER_WRAPPER1D]		= "SamplerData1D";
-	mGpuConstTypeMap[GCT_SAMPLER_WRAPPER2D]		= "SamplerData2D";
-	mGpuConstTypeMap[GCT_SAMPLER_WRAPPER3D]		= "SamplerData3D";
-	mGpuConstTypeMap[GCT_SAMPLER_WRAPPERCUBE]	= "SamplerDataCube";
-	mGpuConstTypeMap[GCT_SAMPLER_STATE]			= "SamplerState";
-	
-	mGpuConstTypeMap[GCT_MATRIX_2X2] = "float2x2";
-	mGpuConstTypeMap[GCT_MATRIX_2X3] = "float2x3";
-	mGpuConstTypeMap[GCT_MATRIX_2X4] = "float2x4";
-	mGpuConstTypeMap[GCT_MATRIX_3X2] = "float3x2";
-	mGpuConstTypeMap[GCT_MATRIX_3X3] = "float3x3";
-	mGpuConstTypeMap[GCT_MATRIX_3X4] = "float3x4";
-	mGpuConstTypeMap[GCT_MATRIX_4X2] = "float4x2";
-	mGpuConstTypeMap[GCT_MATRIX_4X3] = "float4x3";
-	mGpuConstTypeMap[GCT_MATRIX_4X4] = "float4x4";
-	mGpuConstTypeMap[GCT_INT1] = "int";
-	mGpuConstTypeMap[GCT_INT2] = "int2";
-	mGpuConstTypeMap[GCT_INT3] = "int3";
-	mGpuConstTypeMap[GCT_INT4] = "int4";
-	mGpuConstTypeMap[GCT_UINT1] = "uint";
-	mGpuConstTypeMap[GCT_UINT2] = "uint2";
-	mGpuConstTypeMap[GCT_UINT3] = "uint3";
-	mGpuConstTypeMap[GCT_UINT4] = "uint4";
+    mGpuConstTypeMap[GCT_FLOAT1] = "float";
+    mGpuConstTypeMap[GCT_FLOAT2] = "float2";
+    mGpuConstTypeMap[GCT_FLOAT3] = "float3";
+    mGpuConstTypeMap[GCT_FLOAT4] = "float4";
+    mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
+    mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
+    mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
+    mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCUBE";
+    mGpuConstTypeMap[GCT_SAMPLER_WRAPPER1D]     = "SamplerData1D";
+    mGpuConstTypeMap[GCT_SAMPLER_WRAPPER2D]     = "SamplerData2D";
+    mGpuConstTypeMap[GCT_SAMPLER_WRAPPER3D]     = "SamplerData3D";
+    mGpuConstTypeMap[GCT_SAMPLER_WRAPPERCUBE]   = "SamplerDataCube";
+    mGpuConstTypeMap[GCT_SAMPLER_STATE]         = "SamplerState";
+    
+    mGpuConstTypeMap[GCT_MATRIX_2X2] = "float2x2";
+    mGpuConstTypeMap[GCT_MATRIX_2X3] = "float2x3";
+    mGpuConstTypeMap[GCT_MATRIX_2X4] = "float2x4";
+    mGpuConstTypeMap[GCT_MATRIX_3X2] = "float3x2";
+    mGpuConstTypeMap[GCT_MATRIX_3X3] = "float3x3";
+    mGpuConstTypeMap[GCT_MATRIX_3X4] = "float3x4";
+    mGpuConstTypeMap[GCT_MATRIX_4X2] = "float4x2";
+    mGpuConstTypeMap[GCT_MATRIX_4X3] = "float4x3";
+    mGpuConstTypeMap[GCT_MATRIX_4X4] = "float4x4";
+    mGpuConstTypeMap[GCT_INT1] = "int";
+    mGpuConstTypeMap[GCT_INT2] = "int2";
+    mGpuConstTypeMap[GCT_INT3] = "int3";
+    mGpuConstTypeMap[GCT_INT4] = "int4";
+    mGpuConstTypeMap[GCT_UINT1] = "uint";
+    mGpuConstTypeMap[GCT_UINT2] = "uint2";
+    mGpuConstTypeMap[GCT_UINT3] = "uint3";
+    mGpuConstTypeMap[GCT_UINT4] = "uint4";
 
-	mParamSemanticMap[Parameter::SPS_POSITION] = "POSITION";
-	mParamSemanticMap[Parameter::SPS_BLEND_WEIGHTS] = "BLENDWEIGHT";
-	mParamSemanticMap[Parameter::SPS_BLEND_INDICES] = "BLENDINDICES";
-	mParamSemanticMap[Parameter::SPS_NORMAL] = "NORMAL";
-	mParamSemanticMap[Parameter::SPS_COLOR] = "COLOR";
-	mParamSemanticMap[Parameter::SPS_TEXTURE_COORDINATES] = "TEXCOORD";
-	mParamSemanticMap[Parameter::SPS_BINORMAL] = "BINORMAL";
-	mParamSemanticMap[Parameter::SPS_TANGENT] = "TANGENT";
-	mParamSemanticMap[Parameter::SPS_UNKNOWN] = "";
+    mParamSemanticMap[Parameter::SPS_POSITION] = "POSITION";
+    mParamSemanticMap[Parameter::SPS_BLEND_WEIGHTS] = "BLENDWEIGHT";
+    mParamSemanticMap[Parameter::SPS_BLEND_INDICES] = "BLENDINDICES";
+    mParamSemanticMap[Parameter::SPS_NORMAL] = "NORMAL";
+    mParamSemanticMap[Parameter::SPS_COLOR] = "COLOR";
+    mParamSemanticMap[Parameter::SPS_TEXTURE_COORDINATES] = "TEXCOORD";
+    mParamSemanticMap[Parameter::SPS_BINORMAL] = "BINORMAL";
+    mParamSemanticMap[Parameter::SPS_TANGENT] = "TANGENT";
+    mParamSemanticMap[Parameter::SPS_UNKNOWN] = "";
 
-	mGpuConstTypeMapV4[GCT_SAMPLER1D] = "Texture1D";
-	mGpuConstTypeMapV4[GCT_SAMPLER2D] = "Texture2D";
-	mGpuConstTypeMapV4[GCT_SAMPLER3D] = "Texture3D";
-	mGpuConstTypeMapV4[GCT_SAMPLERCUBE] = "TextureCube";
+    mGpuConstTypeMapV4[GCT_SAMPLER1D] = "Texture1D";
+    mGpuConstTypeMapV4[GCT_SAMPLER2D] = "Texture2D";
+    mGpuConstTypeMapV4[GCT_SAMPLER3D] = "Texture3D";
+    mGpuConstTypeMapV4[GCT_SAMPLERCUBE] = "TextureCube";
 }
 
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
-	const ShaderFunctionList& functionList = program->getFunctions();
-	ShaderFunctionConstIterator itFunction;
+    const ShaderFunctionList& functionList = program->getFunctions();
+    ShaderFunctionConstIterator itFunction;
 
-	const UniformParameterList& parameterList = program->getParameters();
-	UniformParameterConstIterator itUniformParam = parameterList.begin();
+    const UniformParameterList& parameterList = program->getParameters();
+    UniformParameterConstIterator itUniformParam = parameterList.begin();
 
-	// Generate source code header.
-	writeProgramTitle(os, program);
-	os << std::endl;
+    // Generate source code header.
+    writeProgramTitle(os, program);
+    os << std::endl;
 
-	// Generate dependencies.
-	writeProgramDependencies(os, program);
-	os << std::endl;
+    // Generate dependencies.
+    writeProgramDependencies(os, program);
+    os << std::endl;
 
-	// Generate global variable code.
-	writeUniformParametersTitle(os, program);
-	os << std::endl;
+    // Generate global variable code.
+    writeUniformParametersTitle(os, program);
+    os << std::endl;
 
-	for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
-	{
-		writeUniformParameter(os, *itUniformParam);			
-		os << ";" << std::endl;				
-	}
-	os << std::endl;
+    for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
+    {
+        writeUniformParameter(os, *itUniformParam);         
+        os << ";" << std::endl;             
+    }
+    os << std::endl;
 
-	// Write program function(s).
-	for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
-	{
-		Function* curFunction = *itFunction;
+    // Write program function(s).
+    for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
+    {
+        Function* curFunction = *itFunction;
 
-		writeFunctionTitle(os, curFunction);
+        writeFunctionTitle(os, curFunction);
 
-		writeFunctionDeclaration(os, curFunction);
+        writeFunctionDeclaration(os, curFunction);
 
-		os << "{" << std::endl;
+        os << "{" << std::endl;
 
-		// Write local parameters.
-		const ShaderParameterList& localParams = curFunction->getLocalParameters();
-		ShaderParameterConstIterator itParam = localParams.begin();
+        // Write local parameters.
+        const ShaderParameterList& localParams = curFunction->getLocalParameters();
+        ShaderParameterConstIterator itParam = localParams.begin();
 
-		for (;  itParam != localParams.end(); ++itParam)
-		{
-			os << "\t";
-			writeLocalParameter(os, *itParam);			
-			os << ";" << std::endl;						
-		}
+        for (;  itParam != localParams.end(); ++itParam)
+        {
+            os << "\t";
+            writeLocalParameter(os, *itParam);          
+            os << ";" << std::endl;                     
+        }
 
-		// Sort and write function atoms.
-		curFunction->sortAtomInstances();
+        // Sort and write function atoms.
+        curFunction->sortAtomInstances();
 
-		const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-		FunctionAtomInstanceConstIterator itAtom;
+        const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
+        FunctionAtomInstanceConstIterator itAtom;
 
-		for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
-		{			
-			writeAtomInstance(os, *itAtom);
-		}
+        for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
+        {           
+            writeAtomInstance(os, *itAtom);
+        }
 
 
-		os << "}" << std::endl;
-	}
+        os << "}" << std::endl;
+    }
 
-	os << std::endl;
+    os << std::endl;
 }
 
 
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
 {
-	os << "//-----------------------------------------------------------------------------" << std::endl;
-	os << "//                         PROGRAM DEPENDENCIES" << std::endl;
-	os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "//                         PROGRAM DEPENDENCIES" << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
 
 
-	for (unsigned int i=0; i < program->getDependencyCount(); ++i)
-	{
-		const String& curDependency = program->getDependency(i);
+    for (unsigned int i=0; i < program->getDependencyCount(); ++i)
+    {
+        const String& curDependency = program->getDependency(i);
 
-		os << "#include " << '\"' << curDependency << "." << getTargetLanguage() << '\"' << std::endl;
-	}
+        os << "#include " << '\"' << curDependency << "." << getTargetLanguage() << '\"' << std::endl;
+    }
 }
 
 
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
 {
-	bool isHlsl4 = Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4();
+    bool isHlsl4 = Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4();
 
-	GpuConstantType paramType = parameter->getType();
+    GpuConstantType paramType = parameter->getType();
 
-	if (isHlsl4 && paramType >= GCT_SAMPLER1D && paramType <= GCT_SAMPLERCUBE)
-		os<<mGpuConstTypeMapV4[paramType];
-	else
-		os<<mGpuConstTypeMap[paramType];
+    if (isHlsl4 && paramType >= GCT_SAMPLER1D && paramType <= GCT_SAMPLERCUBE)
+        os<<mGpuConstTypeMapV4[paramType];
+    else
+        os<<mGpuConstTypeMap[paramType];
 
-	os << "\t" << parameter->getName();
+    os << "\t" << parameter->getName();
 
-	if (parameter->isArray() == true)
-	{
-		os << "[" << parameter->getSize() << "]";	
-	}
-	if (parameter->isSampler())
-	{
-		if (isHlsl4)
-			os << " : register(t" << parameter->getIndex() << ")";		
-		else
-			os << " : register(s" << parameter->getIndex() << ")";		
+    if (parameter->isArray() == true)
+    {
+        os << "[" << parameter->getSize() << "]";   
+    }
+    if (parameter->isSampler())
+    {
+        if (isHlsl4)
+            os << " : register(t" << parameter->getIndex() << ")";      
+        else
+            os << " : register(s" << parameter->getIndex() << ")";      
 
-	}
-	else if (parameter->getType() == GCT_SAMPLER_STATE)
-	{
-		os << " : register(s" << parameter->getIndex() << ")";		
-	}
+    }
+    else if (parameter->getType() == GCT_SAMPLER_STATE)
+    {
+        os << " : register(s" << parameter->getIndex() << ")";      
+    }
 
 }
 
@@ -223,110 +223,110 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
 void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic)
 {
 
-	os << mGpuConstTypeMap[parameter->getType()];
-	
-	os << "\t";	
-	os << parameter->getName();	
-	if (parameter->isArray() == true)
-	{
-		os << "[" << parameter->getSize() << "]";	
-	}
+    os << mGpuConstTypeMap[parameter->getType()];
+    
+    os << "\t"; 
+    os << parameter->getName(); 
+    if (parameter->isArray() == true)
+    {
+        os << "[" << parameter->getSize() << "]";   
+    }
 
-	if(forcedSemantic)
-	{
-		os << " : " << forcedSemantic;
-	}
-	else if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
-	{
-		os << " : ";
-		
-		os << mParamSemanticMap[parameter->getSemantic()];
+    if(forcedSemantic)
+    {
+        os << " : " << forcedSemantic;
+    }
+    else if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
+    {
+        os << " : ";
+        
+        os << mParamSemanticMap[parameter->getSemantic()];
 
-		if (parameter->getSemantic() != Parameter::SPS_POSITION && 
-			parameter->getSemantic() != Parameter::SPS_NORMAL &&
-			parameter->getSemantic() != Parameter::SPS_BLEND_INDICES &&
-			parameter->getSemantic() != Parameter::SPS_BLEND_WEIGHTS &&
-			(!(parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() == 0)) &&
-			parameter->getIndex() >= 0)
-		{			
-			os << StringConverter::toString(parameter->getIndex()).c_str();
-		}
-	}
+        if (parameter->getSemantic() != Parameter::SPS_POSITION && 
+            parameter->getSemantic() != Parameter::SPS_NORMAL &&
+            parameter->getSemantic() != Parameter::SPS_BLEND_INDICES &&
+            parameter->getSemantic() != Parameter::SPS_BLEND_WEIGHTS &&
+            (!(parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() == 0)) &&
+            parameter->getIndex() >= 0)
+        {           
+            os << StringConverter::toString(parameter->getIndex()).c_str();
+        }
+    }
 }
 
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
 {
-	os << mGpuConstTypeMap[parameter->getType()];
-	os << "\t";	
-	os << parameter->getName();		
-	if (parameter->isArray() == true)
-	{
-		os << "[" << parameter->getSize() << "]";	
-	}
+    os << mGpuConstTypeMap[parameter->getType()];
+    os << "\t"; 
+    os << parameter->getName();     
+    if (parameter->isArray() == true)
+    {
+        os << "[" << parameter->getSize() << "]";   
+    }
 }
 
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function)
 {
-	const ShaderParameterList& inParams  = function->getInputParameters();
-	const ShaderParameterList& outParams = function->getOutputParameters();
+    const ShaderParameterList& inParams  = function->getInputParameters();
+    const ShaderParameterList& outParams = function->getOutputParameters();
 
 
-	os << "void";
-	os << " ";
+    os << "void";
+    os << " ";
 
-	os << function->getName();
-	os << std::endl << "\t(" << std::endl;
+    os << function->getName();
+    os << std::endl << "\t(" << std::endl;
 
-	ShaderParameterConstIterator it;
-	size_t paramsCount = inParams.size() + outParams.size();
-	size_t curParamIndex = 0;
+    ShaderParameterConstIterator it;
+    size_t paramsCount = inParams.size() + outParams.size();
+    size_t curParamIndex = 0;
 
-	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+    bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
 
-	// Write input parameters.
-	for (it=inParams.begin(); it != inParams.end(); ++it)
-	{					
-		os << "\t in ";
+    // Write input parameters.
+    for (it=inParams.begin(); it != inParams.end(); ++it)
+    {                   
+        os << "\t in ";
 
-		const char* forcedSemantic = 
-			(isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+        const char* forcedSemantic = 
+            (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
 
-		writeFunctionParameter(os, *it, forcedSemantic);
+        writeFunctionParameter(os, *it, forcedSemantic);
 
-		if (curParamIndex + 1 != paramsCount)		
-			os << ", " << std::endl;
+        if (curParamIndex + 1 != paramsCount)       
+            os << ", " << std::endl;
 
-		curParamIndex++;
-	}
+        curParamIndex++;
+    }
 
-	// Write output parameters.
-	for (it=outParams.begin(); it != outParams.end(); ++it)
-	{
-		os << "\t out ";
+    // Write output parameters.
+    for (it=outParams.begin(); it != outParams.end(); ++it)
+    {
+        os << "\t out ";
 
-		const char* forcedSemantic = 
-			(isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN) ? "SV_Target" :
-			(isVs4 && function->getFunctionType() == Function::FFT_VS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+        const char* forcedSemantic = 
+            (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN) ? "SV_Target" :
+            (isVs4 && function->getFunctionType() == Function::FFT_VS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
 
-		writeFunctionParameter(os, *it, forcedSemantic);
+        writeFunctionParameter(os, *it, forcedSemantic);
 
-		if (curParamIndex + 1 != paramsCount)				
-			os << ", " << std::endl;
+        if (curParamIndex + 1 != paramsCount)               
+            os << ", " << std::endl;
 
-		curParamIndex++;
-	}	
-	
-	os << std::endl << "\t)" << std::endl;
+        curParamIndex++;
+    }   
+    
+    os << std::endl << "\t)" << std::endl;
 }
 
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeAtomInstance(std::ostream& os, FunctionAtom* atom)
 {
-	os << std::endl << "\t";
-	atom->writeSourceCode(os, getTargetLanguage());
-	os << std::endl;
+    os << std::endl << "\t";
+    atom->writeSourceCode(os, getTargetLanguage());
+    os << std::endl;
 }
 
 /** @} */

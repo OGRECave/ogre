@@ -1363,7 +1363,7 @@ LONG __cdecl _InterlockedExchange(LONG volatile *Target, LONG Value);
 
 /* Declarations for bit scanning on win32 */
 #if defined(_MSC_VER) && _MSC_VER>=1300
-#ifndef BitScanForward	/* Try to avoid pulling in WinNT.h */
+#ifndef BitScanForward  /* Try to avoid pulling in WinNT.h */
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -1788,7 +1788,7 @@ static FORCEINLINE int win32_acquire_lock (MLOCK_T *sl) {
     else {
       if (!interlockedexchange(&sl->l, 1)) {
         assert(!sl->threadid);
-		sl->c=CURRENT_THREAD;
+        sl->c=CURRENT_THREAD;
         sl->threadid = CURRENT_THREAD;
         sl->c = 1;
         return 0;
@@ -1846,7 +1846,7 @@ static MLOCK_T malloc_global_mutex = PTHREAD_MUTEX_INITIALIZER;
 #ifdef linux
 #if !defined (PTHREAD_MUTEX_RECURSIVE) && defined (PTHREAD_MUTEX_RECURSIVE_NP)
 extern int pthread_mutexattr_setkind_np __P ((pthread_mutexattr_t *__attr,
-					   int __kind));
+                       int __kind));
 #define PTHREAD_MUTEX_RECURSIVE PTHREAD_MUTEX_RECURSIVE_NP
 #define pthread_mutexattr_settype(x,y) pthread_mutexattr_setkind_np(x,y)
 #endif

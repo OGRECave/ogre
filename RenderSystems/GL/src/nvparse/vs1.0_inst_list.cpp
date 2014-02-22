@@ -8,9 +8,9 @@
 #include <string.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#	include <OpenGL/glu.h>
+#   include <OpenGL/glu.h>
 #else
-#	include <GL/glu.h>
+#   include <GL/glu.h>
 #endif
 
 using namespace std;
@@ -22,8 +22,8 @@ extern string vs10_transstring;
 
 VS10InstList::VS10InstList()
 {
-	size = 0;
-	max = INSTRUCTION_LIST_INC;
+    size = 0;
+    max = INSTRUCTION_LIST_INC;
     list = new VS10Inst[max];
 }
 
@@ -34,23 +34,23 @@ VS10InstList::~VS10InstList()
 
 int VS10InstList::Size()
 {
-	return size;
+    return size;
 }
 
 VS10InstList& VS10InstList::operator+=(VS10InstPtr t)
 {
-	if (size == max) {
-		// Extend list size by increment amount.
+    if (size == max) {
+        // Extend list size by increment amount.
         VS10InstPtr newlist;
-		max += INSTRUCTION_LIST_INC;
+        max += INSTRUCTION_LIST_INC;
         newlist = new VS10Inst[max];
         for ( int i = 0; i < size; i++ )
             newlist[i] = list[i];
         delete [] list;
         list = newlist;
-	}
-	list[size++] = *t;
-	return *this;
+    }
+    list[size++] = *t;
+    return *this;
 }
 
 void VS10InstList::Translate()
@@ -58,10 +58,10 @@ void VS10InstList::Translate()
     int ntranslated = 0;
 
     vs10_transstring.append( "!!VP1.0\n" );
-	for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
         {
-	    ntranslated += list[i].Translate();
-	    }
+        ntranslated += list[i].Translate();
+        }
     vs10_transstring.append( "END\n" );
 
     if ( ntranslated > 128 )
@@ -86,8 +86,8 @@ void VS10InstList::Validate()
 
 namespace
 {
-	void LoadProgram( GLenum target, GLuint id, char *instring );
-	GLint vpid;
+    void LoadProgram( GLenum target, GLuint id, char *instring );
+    GLint vpid;
 }
 
 
@@ -119,136 +119,136 @@ bool is_vs10(const char *s)
 
 bool vs10_init_more()
 {
-	static bool vpinit = false;
-	if (vpinit == false )
-	{
+    static bool vpinit = false;
+    if (vpinit == false )
+    {
       /*
-		if(! glh_init_extensions("GL_NV_vertex_program"))
-		{
-			errors.set("unable to initialize GL_NV_vertex_program");
-			return false;
-		}
-		else
-		{
+        if(! glh_init_extensions("GL_NV_vertex_program"))
+        {
+            errors.set("unable to initialize GL_NV_vertex_program");
+            return false;
+        }
+        else
+        {
         */
-			vpinit = true;
+            vpinit = true;
             /*
-		}
+        }
         */
-	}
-	
-	glGetIntegerv( GL_VERTEX_PROGRAM_BINDING_NV, &vpid );
-	
-	if ( vpid == 0 )
-	{
-		char str[128];
-		sprintf( str, "No vertex program id bound for nvparse() invocation.  Bound id = %d\n", (int)vpid );
-		errors.set( str );
-		return false;
-	}
+    }
+    
+    glGetIntegerv( GL_VERTEX_PROGRAM_BINDING_NV, &vpid );
+    
+    if ( vpid == 0 )
+    {
+        char str[128];
+        sprintf( str, "No vertex program id bound for nvparse() invocation.  Bound id = %d\n", (int)vpid );
+        errors.set( str );
+        return false;
+    }
     errors.reset();
     line_number = 1;
     vs10_transstring = "";
-	return true;	
+    return true;    
 }
 
 void vs10_load_program()
 {
     // Only load the program if no errors occurred.
     if ( errors.get_num_errors() == 0 )
-    	LoadProgram( GL_VERTEX_PROGRAM_NV, vpid, (char *) vs10_transstring.c_str() );
+        LoadProgram( GL_VERTEX_PROGRAM_NV, vpid, (char *) vs10_transstring.c_str() );
 }
 
 
 namespace
 {
-	//.----------------------------------------------------------------------------.
-	//|   Function   : LoadProgram                                                 |
-	//|   Description: Load a program into GL, and report any errors encountered.  |
-	//.----------------------------------------------------------------------------.
-	void LoadProgram( GLenum target, GLuint id, char *instring )
-	{
-		GLint  errPos;
-		GLenum errCode;
-		
-		int len = strlen(instring);
-		glLoadProgramNV( target, id, len, (const GLubyte *) instring );
-		if ( (errCode = glGetError()) != GL_NO_ERROR )
-		{
-			glGetIntegerv( GL_PROGRAM_ERROR_POSITION_NV, &errPos );
-			
-			int nlines = 1;
-			int nchar  = 1;
-			int i;
-			for ( i = 0; i < errPos; i++ )
-			{
-				if ( instring[i] == '\n' )
-				{
-					nlines++;
-					nchar = 1;
-				}
-				else
-				{
-					nchar++;
-				}
-			}
-			int start = 0;
-			int end = 0;
-			int flag = ((instring[errPos]==';') | (instring[errPos-1]==';')) ? 1 : 0;
-			for ( i = errPos; i >= 0; i-- )
-			{
-				start = i;
-				if ( flag && (start >= errPos-1)  )
-					continue;
-				if ( instring[i] == ';' )
-				{
-					if ( !flag )
-					{
-						start = i+1;
-						if ( instring[start] == '\n' )
-							start++;
-					}
-					break;
-				}
-			}
-			for ( i = errPos; i < len; i++ )
-			{
-				end = i;
-				if ( instring[i] == ';' && end > start)
-				{
-					break;
-				}
-			}
-			if ( errPos - start > 30 )
-			{
-				start = errPos - 30;
-			}
-			if ( end - errPos > 30 )
-			{
-				end = errPos + 30;
-			}
-			
-			char substring[96];
-			memset( substring, 0, 96 );
-			strncpy( substring, &(instring[start]), end-start+1 );
-			char str[256];
-			//sprintf( str, "error at line %d character %d\n    \"%s\"\n", nlines, nchar, substring );
-			sprintf( str, "error at line %d character %d\n\"%s\"\n", nlines, nchar, substring );
-			int width = errPos-start;
-			for ( i = 0; i < width; i++ )
-			{
-				strcat( str, " " );
-			}
-			strcat( str, "|\n" );
-			for ( i = 0; i < width; i++ )
-			{
-				strcat( str, " " );
-			}
-			strcat( str, "^\n" );
-			
-			errors.set( str );
-		}
-	}
+    //.----------------------------------------------------------------------------.
+    //|   Function   : LoadProgram                                                 |
+    //|   Description: Load a program into GL, and report any errors encountered.  |
+    //.----------------------------------------------------------------------------.
+    void LoadProgram( GLenum target, GLuint id, char *instring )
+    {
+        GLint  errPos;
+        GLenum errCode;
+        
+        int len = strlen(instring);
+        glLoadProgramNV( target, id, len, (const GLubyte *) instring );
+        if ( (errCode = glGetError()) != GL_NO_ERROR )
+        {
+            glGetIntegerv( GL_PROGRAM_ERROR_POSITION_NV, &errPos );
+            
+            int nlines = 1;
+            int nchar  = 1;
+            int i;
+            for ( i = 0; i < errPos; i++ )
+            {
+                if ( instring[i] == '\n' )
+                {
+                    nlines++;
+                    nchar = 1;
+                }
+                else
+                {
+                    nchar++;
+                }
+            }
+            int start = 0;
+            int end = 0;
+            int flag = ((instring[errPos]==';') | (instring[errPos-1]==';')) ? 1 : 0;
+            for ( i = errPos; i >= 0; i-- )
+            {
+                start = i;
+                if ( flag && (start >= errPos-1)  )
+                    continue;
+                if ( instring[i] == ';' )
+                {
+                    if ( !flag )
+                    {
+                        start = i+1;
+                        if ( instring[start] == '\n' )
+                            start++;
+                    }
+                    break;
+                }
+            }
+            for ( i = errPos; i < len; i++ )
+            {
+                end = i;
+                if ( instring[i] == ';' && end > start)
+                {
+                    break;
+                }
+            }
+            if ( errPos - start > 30 )
+            {
+                start = errPos - 30;
+            }
+            if ( end - errPos > 30 )
+            {
+                end = errPos + 30;
+            }
+            
+            char substring[96];
+            memset( substring, 0, 96 );
+            strncpy( substring, &(instring[start]), end-start+1 );
+            char str[256];
+            //sprintf( str, "error at line %d character %d\n    \"%s\"\n", nlines, nchar, substring );
+            sprintf( str, "error at line %d character %d\n\"%s\"\n", nlines, nchar, substring );
+            int width = errPos-start;
+            for ( i = 0; i < width; i++ )
+            {
+                strcat( str, " " );
+            }
+            strcat( str, "|\n" );
+            for ( i = 0; i < width; i++ )
+            {
+                strcat( str, " " );
+            }
+            strcat( str, "^\n" );
+            
+            errors.set( str );
+        }
+    }
 }
 
 /*

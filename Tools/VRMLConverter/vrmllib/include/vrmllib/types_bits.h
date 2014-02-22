@@ -20,35 +20,35 @@ void parse_value(std::string &, std::istream &, file &);
 void parse_value(rot &, std::istream &, file &);
 
 template<class T> void parse_value(T &v, std::istream &s, file &)
-	{ s >> v; }
+    { s >> v; }
 
 template<class T> void parse_vector(std::vector<T> &l, std::istream &s,
-	file &data)
+    file &data)
 {
-	char c;
-	s >> c;
-	if (c == '[') {
-		l.clear();
-		T t;
-		while (s >> c) {
-			if (c == ']')
-				break;
-			else
-				s.putback(c);
+    char c;
+    s >> c;
+    if (c == '[') {
+        l.clear();
+        T t;
+        while (s >> c) {
+            if (c == ']')
+                break;
+            else
+                s.putback(c);
 
-			parse_value(t, s, data);
+            parse_value(t, s, data);
 
-			l.push_back(t);
-			s >> c;
-			if (c != ',')
-				s.putback(c);
-		}
-	} else {
-		l.clear();
-		l.push_back(T());
-		s.putback(c);
-		parse_value(l.back(), s, data);
-	}
+            l.push_back(t);
+            s >> c;
+            if (c != ',')
+                s.putback(c);
+        }
+    } else {
+        l.clear();
+        l.push_back(T());
+        s.putback(c);
+        parse_value(l.back(), s, data);
+    }
 }
 
 } // namespace bits

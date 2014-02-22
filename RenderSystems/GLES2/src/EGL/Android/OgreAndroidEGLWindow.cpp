@@ -46,50 +46,50 @@ THE SOFTWARE.
 #include <climits>
 
 namespace Ogre {
-	AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
-		: EGLWindow(glsupport),
-		  mMaxBufferSize(32),
-		  mMinBufferSize(16),
-		  mMaxDepthSize(16),
-		  mMaxStencilSize(0),
-		  mMSAA(0),
-		  mCSAA(0)
-	{
-	}
+    AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
+        : EGLWindow(glsupport),
+          mMaxBufferSize(32),
+          mMinBufferSize(16),
+          mMaxDepthSize(16),
+          mMaxStencilSize(0),
+          mMSAA(0),
+          mCSAA(0)
+    {
+    }
 
-	AndroidEGLWindow::~AndroidEGLWindow()
-	{
-	}
+    AndroidEGLWindow::~AndroidEGLWindow()
+    {
+    }
 
-	EGLContext* AndroidEGLWindow::createEGLContext() const
-	{
-		return new AndroidEGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
-	}
+    EGLContext* AndroidEGLWindow::createEGLContext() const
+    {
+        return new AndroidEGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
+    }
 
-	void AndroidEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
-	{
-		// We don't have a native window.... but I think all android windows are origined
-		left = top = 0;
-	}
+    void AndroidEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
+    {
+        // We don't have a native window.... but I think all android windows are origined
+        left = top = 0;
+    }
 
-	void AndroidEGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
-	{
-	}
+    void AndroidEGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
+    {
+    }
 
-	void AndroidEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
-	{
-	}
+    void AndroidEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
+    {
+    }
 
-	void AndroidEGLWindow::reposition( int left, int top )
-	{
-	}
+    void AndroidEGLWindow::reposition( int left, int top )
+    {
+    }
 
-	void AndroidEGLWindow::resize(uint width, uint height)
-	{
-	}
+    void AndroidEGLWindow::resize(uint width, uint height)
+    {
+    }
 
-	void AndroidEGLWindow::windowMovedOrResized()
-	{
+    void AndroidEGLWindow::windowMovedOrResized()
+    {
         if(mActive)
         {
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
@@ -100,8 +100,8 @@ namespace Ogre {
             while( it != mViewportList.end() )
                 (*it++).second->_updateDimensions();
         }
-	}
-	
+    }
+    
     void AndroidEGLWindow::switchFullScreen(bool fullscreen)
     {
     
@@ -110,7 +110,7 @@ namespace Ogre {
     void AndroidEGLWindow::create(const String& name, uint width, uint height,
                                bool fullScreen, const NameValuePairList *miscParams)
     {
-		mName = name;
+        mName = name;
         mWidth = width;
         mHeight = height;
         mLeft = 0;
@@ -156,34 +156,34 @@ namespace Ogre {
                 mIsExternalGLControl = true;
                 ctxHandle = Ogre::StringConverter::parseInt(opt->second);
             }
-			
-			if((opt = miscParams->find("maxColourBufferSize")) != end)
+            
+            if((opt = miscParams->find("maxColourBufferSize")) != end)
             {
                 mMaxBufferSize = Ogre::StringConverter::parseInt(opt->second);
             }
-			
-			if((opt = miscParams->find("maxDepthBufferSize")) != end)
+            
+            if((opt = miscParams->find("maxDepthBufferSize")) != end)
             {
                 mMaxDepthSize = Ogre::StringConverter::parseInt(opt->second);
             }
-			
-			if((opt = miscParams->find("maxStencilBufferSize")) != end)
+            
+            if((opt = miscParams->find("maxStencilBufferSize")) != end)
             {
                 mMaxStencilSize = Ogre::StringConverter::parseInt(opt->second);
             }
 
-			if((opt = miscParams->find("minColourBufferSize")) != end)
+            if((opt = miscParams->find("minColourBufferSize")) != end)
             {
                 mMinBufferSize = Ogre::StringConverter::parseInt(opt->second);
                 if (mMinBufferSize > mMaxBufferSize) mMinBufferSize = mMaxBufferSize;
             }
 
-			if((opt = miscParams->find("MSAA")) != end)
+            if((opt = miscParams->find("MSAA")) != end)
             {
                 mMSAA = Ogre::StringConverter::parseInt(opt->second);
             }
-			
-			if((opt = miscParams->find("CSAA")) != end)
+            
+            if((opt = miscParams->find("CSAA")) != end)
             {
                 mCSAA = Ogre::StringConverter::parseInt(opt->second);
             }
@@ -213,21 +213,21 @@ namespace Ogre {
         
         if (!mEglConfig)
         {
-			_createInternalResources(mWindow, config);
+            _createInternalResources(mWindow, config);
             mHwGamma = false;
         }
         
         mContext = createEGLContext();
         mContext->setCurrent();
-		       
+               
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
         EGL_CHECK_ERROR
 
-		mActive = true;
-		mVisible = true;
-		mClosed = false;
-	}
+        mActive = true;
+        mVisible = true;
+        mClosed = false;
+    }
 
     void AndroidEGLWindow::_destroyInternalResources()
     {
@@ -244,7 +244,7 @@ namespace Ogre {
         mEglSurface = 0;
         
         mActive = false;
-		mVisible = false;
+        mVisible = false;
         mClosed = true;
     }
     
@@ -261,72 +261,72 @@ namespace Ogre {
         
         int maxAttribs[] = {
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-			EGL_BUFFER_SIZE, mMaxBufferSize,
+            EGL_BUFFER_SIZE, mMaxBufferSize,
             EGL_DEPTH_SIZE, mMaxDepthSize,
             EGL_STENCIL_SIZE, mMaxStencilSize,
             EGL_NONE
         };
 
-		bool bAASuccess = false;
-		if (mCSAA)
-		{
-			try
-			{
-				int CSAAminAttribs[] = {
-					EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-					EGL_BUFFER_SIZE, mMinBufferSize,
-					EGL_DEPTH_SIZE, 16,
-					EGL_COVERAGE_BUFFERS_NV, 1,
-					EGL_COVERAGE_SAMPLES_NV, mCSAA,
-					EGL_NONE
-				};
-				int CSAAmaxAttribs[] = {
-					EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-					EGL_BUFFER_SIZE, mMaxBufferSize,
-					EGL_DEPTH_SIZE, mMaxDepthSize,
-					EGL_STENCIL_SIZE, mMaxStencilSize,
-					EGL_COVERAGE_BUFFERS_NV, 1,
-					EGL_COVERAGE_SAMPLES_NV, mCSAA,
-					EGL_NONE
-				};
-				mEglConfig = mGLSupport->selectGLConfig(CSAAminAttribs, CSAAmaxAttribs);
-				bAASuccess = true;
-			}
-			catch (Exception& e)
-			{
-				LogManager::getSingleton().logMessage("AndroidEGLWindow::_createInternalResources: setting CSAA failed");
-			}
-		}
+        bool bAASuccess = false;
+        if (mCSAA)
+        {
+            try
+            {
+                int CSAAminAttribs[] = {
+                    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                    EGL_BUFFER_SIZE, mMinBufferSize,
+                    EGL_DEPTH_SIZE, 16,
+                    EGL_COVERAGE_BUFFERS_NV, 1,
+                    EGL_COVERAGE_SAMPLES_NV, mCSAA,
+                    EGL_NONE
+                };
+                int CSAAmaxAttribs[] = {
+                    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                    EGL_BUFFER_SIZE, mMaxBufferSize,
+                    EGL_DEPTH_SIZE, mMaxDepthSize,
+                    EGL_STENCIL_SIZE, mMaxStencilSize,
+                    EGL_COVERAGE_BUFFERS_NV, 1,
+                    EGL_COVERAGE_SAMPLES_NV, mCSAA,
+                    EGL_NONE
+                };
+                mEglConfig = mGLSupport->selectGLConfig(CSAAminAttribs, CSAAmaxAttribs);
+                bAASuccess = true;
+            }
+            catch (Exception& e)
+            {
+                LogManager::getSingleton().logMessage("AndroidEGLWindow::_createInternalResources: setting CSAA failed");
+            }
+        }
 
-		if (mMSAA && !bAASuccess)
-		{
-			try
-			{
-				int MSAAminAttribs[] = {
-					EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-					EGL_BUFFER_SIZE, mMinBufferSize,
-					EGL_DEPTH_SIZE, 16,
-					EGL_SAMPLE_BUFFERS, 1,
-					EGL_SAMPLES, mMSAA,
-					EGL_NONE
-				};
-				int MSAAmaxAttribs[] = {
-					EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-					EGL_BUFFER_SIZE, mMaxBufferSize,
-					EGL_DEPTH_SIZE, mMaxDepthSize,
-					EGL_STENCIL_SIZE, mMaxStencilSize,
-					EGL_SAMPLE_BUFFERS, 1,
-					EGL_SAMPLES, mMSAA,
-					EGL_NONE
-				};
-				mEglConfig = mGLSupport->selectGLConfig(MSAAminAttribs, MSAAmaxAttribs);
-				bAASuccess = true;
-			}
-			catch (Exception& e)
-			{
-				LogManager::getSingleton().logMessage("AndroidEGLWindow::_createInternalResources: setting MSAA failed");
-			}
-		}
+        if (mMSAA && !bAASuccess)
+        {
+            try
+            {
+                int MSAAminAttribs[] = {
+                    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                    EGL_BUFFER_SIZE, mMinBufferSize,
+                    EGL_DEPTH_SIZE, 16,
+                    EGL_SAMPLE_BUFFERS, 1,
+                    EGL_SAMPLES, mMSAA,
+                    EGL_NONE
+                };
+                int MSAAmaxAttribs[] = {
+                    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                    EGL_BUFFER_SIZE, mMaxBufferSize,
+                    EGL_DEPTH_SIZE, mMaxDepthSize,
+                    EGL_STENCIL_SIZE, mMaxStencilSize,
+                    EGL_SAMPLE_BUFFERS, 1,
+                    EGL_SAMPLES, mMSAA,
+                    EGL_NONE
+                };
+                mEglConfig = mGLSupport->selectGLConfig(MSAAminAttribs, MSAAmaxAttribs);
+                bAASuccess = true;
+            }
+            catch (Exception& e)
+            {
+                LogManager::getSingleton().logMessage("AndroidEGLWindow::_createInternalResources: setting MSAA failed");
+            }
+        }
         
         mEglDisplay = mGLSupport->getGLDisplay();
         if (!bAASuccess) mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);

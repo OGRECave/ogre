@@ -34,73 +34,73 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	class XsiMaterialExporter
-	{
-	public:
-		XsiMaterialExporter();
-		virtual ~XsiMaterialExporter();
+    class XsiMaterialExporter
+    {
+    public:
+        XsiMaterialExporter();
+        virtual ~XsiMaterialExporter();
 
-		/** Export a set of XSI materials to a material script.
-		@param materials List of materials to export
-		@param filename Name of the script file to create
-		@param copyTextures Whether to copy any textures used into the same
-			folder as the material script.
-		*/
-		void exportMaterials(MaterialMap& materials, TextureProjectionMap& texProjMap, 
-			const String& filename, bool copyTextures);
-	protected:	
-		MaterialSerializer mMatSerializer;
-		
-		typedef std::multimap<long,TextureUnitState*> TextureUnitTargetMap;
-		/// Map of target id -> texture unit to match up tex transforms
-		TextureUnitTargetMap mTextureUnitTargetMap;
-		/// Pass queue, used to invert ordering
-		PassQueue mPassQueue;
-		/// Texture projection map
-		TextureProjectionMap mTextureProjectionMap;
+        /** Export a set of XSI materials to a material script.
+        @param materials List of materials to export
+        @param filename Name of the script file to create
+        @param copyTextures Whether to copy any textures used into the same
+            folder as the material script.
+        */
+        void exportMaterials(MaterialMap& materials, TextureProjectionMap& texProjMap, 
+            const String& filename, bool copyTextures);
+    protected:  
+        MaterialSerializer mMatSerializer;
+        
+        typedef std::multimap<long,TextureUnitState*> TextureUnitTargetMap;
+        /// Map of target id -> texture unit to match up tex transforms
+        TextureUnitTargetMap mTextureUnitTargetMap;
+        /// Pass queue, used to invert ordering
+        PassQueue mPassQueue;
+        /// Texture projection map
+        TextureProjectionMap mTextureProjectionMap;
 
-		
-		// Export a single material
-		void exportMaterial(MaterialEntry* matEntry, bool copyTextures, 
-			const String& texturePath);
-		/// Fill in all the details of a pass
-		void populatePass(Pass* pass, XSI::Shader& xsishader);
-		/// Fill in the texture units - note this won't pick up transforms yet
-		void populatePassTextures(Pass* pass, PassEntry* passEntry, 
-			bool copyTextures, const String& texturePath);
-		/// Find any texture transforms and hook them up via 'target'
-		void populatePassTextureTransforms(Pass* pass, XSI::Shader& xsishader);
-		/// Populate basic rejection parameters for the pass
-		void populatePassDepthCull(Pass* pass, XSI::Shader& xsishader);
-		/// Populate lighting parameters for the pass
-		void populatePassLighting(Pass* pass, XSI::Shader& xsishader);
-		/// Populate scene blending parameters for the pass
-		void populatePassSceneBlend(Pass* pass, XSI::Shader& xsishader);
-		void populatePassCgPrograms(Pass* pass, XSI::Shader& xsishader);
-		void populatePassHLSLPrograms(Pass* pass, XSI::Shader& xsishader);
-		void populatePassD3DAssemblerPrograms(Pass* pass, XSI::Shader& xsishader);
-		void populateOGLFiltering(TextureUnitState* tex, XSI::Shader& xsishader);
-		void populateDXFiltering(TextureUnitState* tex, XSI::Shader& xsishader);
-
-
-		// Utility method to get texture coord set from tspace_id name
-		unsigned short getTextureCoordIndex(const String& tspace);
-
-		/// Add a 2D texture from a shader
-		TextureUnitState* add2DTexture(Pass* pass, XSI::Shader& shader, 
-			bool copyTextures, const String& targetFolder);
-		/// Add a cubic texture from a shader
-		TextureUnitState* addCubicTexture(Pass* pass, XSI::Shader& shader, 
-			bool copyTextures, const String& targetFolder);
+        
+        // Export a single material
+        void exportMaterial(MaterialEntry* matEntry, bool copyTextures, 
+            const String& texturePath);
+        /// Fill in all the details of a pass
+        void populatePass(Pass* pass, XSI::Shader& xsishader);
+        /// Fill in the texture units - note this won't pick up transforms yet
+        void populatePassTextures(Pass* pass, PassEntry* passEntry, 
+            bool copyTextures, const String& texturePath);
+        /// Find any texture transforms and hook them up via 'target'
+        void populatePassTextureTransforms(Pass* pass, XSI::Shader& xsishader);
+        /// Populate basic rejection parameters for the pass
+        void populatePassDepthCull(Pass* pass, XSI::Shader& xsishader);
+        /// Populate lighting parameters for the pass
+        void populatePassLighting(Pass* pass, XSI::Shader& xsishader);
+        /// Populate scene blending parameters for the pass
+        void populatePassSceneBlend(Pass* pass, XSI::Shader& xsishader);
+        void populatePassCgPrograms(Pass* pass, XSI::Shader& xsishader);
+        void populatePassHLSLPrograms(Pass* pass, XSI::Shader& xsishader);
+        void populatePassD3DAssemblerPrograms(Pass* pass, XSI::Shader& xsishader);
+        void populateOGLFiltering(TextureUnitState* tex, XSI::Shader& xsishader);
+        void populateDXFiltering(TextureUnitState* tex, XSI::Shader& xsishader);
 
 
-		void clearPassQueue(void);
+        // Utility method to get texture coord set from tspace_id name
+        unsigned short getTextureCoordIndex(const String& tspace);
 
-		SceneBlendFactor convertSceneBlend(short xsiVal);
-		TextureUnitState::TextureAddressingMode convertAddressingMode(short xsiVal);
-		void convertTexGenOGL(TextureUnitState* tex, long xsiVal, XSI::Shader& shader);
-		void convertTexGenDX(TextureUnitState* tex, long xsiVal, XSI::Shader& shader);
-	};
+        /// Add a 2D texture from a shader
+        TextureUnitState* add2DTexture(Pass* pass, XSI::Shader& shader, 
+            bool copyTextures, const String& targetFolder);
+        /// Add a cubic texture from a shader
+        TextureUnitState* addCubicTexture(Pass* pass, XSI::Shader& shader, 
+            bool copyTextures, const String& targetFolder);
+
+
+        void clearPassQueue(void);
+
+        SceneBlendFactor convertSceneBlend(short xsiVal);
+        TextureUnitState::TextureAddressingMode convertAddressingMode(short xsiVal);
+        void convertTexGenOGL(TextureUnitState* tex, long xsiVal, XSI::Shader& shader);
+        void convertTexGenDX(TextureUnitState* tex, long xsiVal, XSI::Shader& shader);
+    };
 }
 
 #endif

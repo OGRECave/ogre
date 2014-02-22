@@ -33,104 +33,104 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	String RenderQueueInvocation::RENDER_QUEUE_INVOCATION_SHADOWS = "SHADOWS";
-	//-----------------------------------------------------------------------------
-	RenderQueueInvocation::RenderQueueInvocation(uint8 renderQueueGroupID, 
-		const String& invocationName)
-		: mRenderQueueGroupID(renderQueueGroupID), mInvocationName(invocationName), 
-		mSolidsOrganisation(QueuedRenderableCollection::OM_PASS_GROUP), 
-		mSuppressShadows(false), mSuppressRenderStateChanges(false)
-	{
+    String RenderQueueInvocation::RENDER_QUEUE_INVOCATION_SHADOWS = "SHADOWS";
+    //-----------------------------------------------------------------------------
+    RenderQueueInvocation::RenderQueueInvocation(uint8 renderQueueGroupID, 
+        const String& invocationName)
+        : mRenderQueueGroupID(renderQueueGroupID), mInvocationName(invocationName), 
+        mSolidsOrganisation(QueuedRenderableCollection::OM_PASS_GROUP), 
+        mSuppressShadows(false), mSuppressRenderStateChanges(false)
+    {
 
-	}
-	//-----------------------------------------------------------------------------
-	RenderQueueInvocation::~RenderQueueInvocation()
-	{
+    }
+    //-----------------------------------------------------------------------------
+    RenderQueueInvocation::~RenderQueueInvocation()
+    {
 
-	}
-	//-----------------------------------------------------------------------------
-	void RenderQueueInvocation::invoke(RenderQueueGroup* group, SceneManager* targetSceneManager)
-	{
-		bool oldShadows = targetSceneManager->_areShadowsSuppressed();
-		bool oldRSChanges = targetSceneManager->_areRenderStateChangesSuppressed();
+    }
+    //-----------------------------------------------------------------------------
+    void RenderQueueInvocation::invoke(RenderQueueGroup* group, SceneManager* targetSceneManager)
+    {
+        bool oldShadows = targetSceneManager->_areShadowsSuppressed();
+        bool oldRSChanges = targetSceneManager->_areRenderStateChangesSuppressed();
 
-		targetSceneManager->_suppressShadows(mSuppressShadows);
-		targetSceneManager->_suppressRenderStateChanges(mSuppressRenderStateChanges);
+        targetSceneManager->_suppressShadows(mSuppressShadows);
+        targetSceneManager->_suppressRenderStateChanges(mSuppressRenderStateChanges);
 
-		targetSceneManager->_renderQueueGroupObjects(group, mSolidsOrganisation);
+        targetSceneManager->_renderQueueGroupObjects(group, mSolidsOrganisation);
 
-		targetSceneManager->_suppressShadows(oldShadows);
-		targetSceneManager->_suppressRenderStateChanges(oldRSChanges);
+        targetSceneManager->_suppressShadows(oldShadows);
+        targetSceneManager->_suppressRenderStateChanges(oldRSChanges);
 
-	}
-	//-----------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------
-	RenderQueueInvocationSequence::RenderQueueInvocationSequence(const String& name)
-		:mName(name)
-	{
-	}
-	//-----------------------------------------------------------------------------
-	RenderQueueInvocationSequence::~RenderQueueInvocationSequence()
-	{
-		clear();
-	}
-	//-----------------------------------------------------------------------------
-	RenderQueueInvocation* RenderQueueInvocationSequence::add(uint8 renderQueueGroupID, 
-		const String& invocationName)
-	{
-		RenderQueueInvocation* ret = 
-			OGRE_NEW RenderQueueInvocation(renderQueueGroupID, invocationName);
+    }
+    //-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
+    RenderQueueInvocationSequence::RenderQueueInvocationSequence(const String& name)
+        :mName(name)
+    {
+    }
+    //-----------------------------------------------------------------------------
+    RenderQueueInvocationSequence::~RenderQueueInvocationSequence()
+    {
+        clear();
+    }
+    //-----------------------------------------------------------------------------
+    RenderQueueInvocation* RenderQueueInvocationSequence::add(uint8 renderQueueGroupID, 
+        const String& invocationName)
+    {
+        RenderQueueInvocation* ret = 
+            OGRE_NEW RenderQueueInvocation(renderQueueGroupID, invocationName);
 
-		mInvocations.push_back(ret);
+        mInvocations.push_back(ret);
 
-		return ret;
+        return ret;
 
-	}
-	//-----------------------------------------------------------------------------
-	void RenderQueueInvocationSequence::add(RenderQueueInvocation* i)
-	{
-		mInvocations.push_back(i);
-	}
-	//-----------------------------------------------------------------------------
-	void RenderQueueInvocationSequence::clear(void)
-	{
-		for (RenderQueueInvocationList::iterator i = mInvocations.begin();
-			i != mInvocations.end(); ++i)
-		{
-			OGRE_DELETE *i;
-		}
-		mInvocations.clear();
-	}
-	//-----------------------------------------------------------------------------
-	RenderQueueInvocation* RenderQueueInvocationSequence::get(size_t index)
-	{
-		if (index >= size())
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Index out of bounds", 
-				"RenderQueueInvocationSequence::get");
+    }
+    //-----------------------------------------------------------------------------
+    void RenderQueueInvocationSequence::add(RenderQueueInvocation* i)
+    {
+        mInvocations.push_back(i);
+    }
+    //-----------------------------------------------------------------------------
+    void RenderQueueInvocationSequence::clear(void)
+    {
+        for (RenderQueueInvocationList::iterator i = mInvocations.begin();
+            i != mInvocations.end(); ++i)
+        {
+            OGRE_DELETE *i;
+        }
+        mInvocations.clear();
+    }
+    //-----------------------------------------------------------------------------
+    RenderQueueInvocation* RenderQueueInvocationSequence::get(size_t index)
+    {
+        if (index >= size())
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Index out of bounds", 
+                "RenderQueueInvocationSequence::get");
 
-		return mInvocations[index];
-	}
-	//-----------------------------------------------------------------------------
-	void RenderQueueInvocationSequence::remove(size_t index)
-	{
-		if (index >= size())
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-			"Index out of bounds", 
-			"RenderQueueInvocationSequence::remove");
-		
-		RenderQueueInvocationList::iterator i = mInvocations.begin();
-		std::advance(i, index);
-		OGRE_DELETE *i;
-		mInvocations.erase(i);
-		
-	}
-	//-----------------------------------------------------------------------------
-	RenderQueueInvocationIterator RenderQueueInvocationSequence::iterator(void)
-	{
-		return RenderQueueInvocationIterator(mInvocations.begin(), mInvocations.end());
-	}
-	//-----------------------------------------------------------------------------
+        return mInvocations[index];
+    }
+    //-----------------------------------------------------------------------------
+    void RenderQueueInvocationSequence::remove(size_t index)
+    {
+        if (index >= size())
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+            "Index out of bounds", 
+            "RenderQueueInvocationSequence::remove");
+        
+        RenderQueueInvocationList::iterator i = mInvocations.begin();
+        std::advance(i, index);
+        OGRE_DELETE *i;
+        mInvocations.erase(i);
+        
+    }
+    //-----------------------------------------------------------------------------
+    RenderQueueInvocationIterator RenderQueueInvocationSequence::iterator(void)
+    {
+        return RenderQueueInvocationIterator(mInvocations.begin(), mInvocations.end());
+    }
+    //-----------------------------------------------------------------------------
 
 
 }

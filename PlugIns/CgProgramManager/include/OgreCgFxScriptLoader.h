@@ -439,1053 +439,1053 @@ namespace Ogre {
 
         // some simple types to make working with CGstateassignment easier
 
-		struct Vector1b
-		{
-			bool x;
-			Vector1b();
-			Vector1b( bool iX );
-			Vector1b( CGstateassignment cgStateAssignment );
-			operator bool() const;
-		};
+        struct Vector1b
+        {
+            bool x;
+            Vector1b();
+            Vector1b( bool iX );
+            Vector1b( CGstateassignment cgStateAssignment );
+            operator bool() const;
+        };
 
-		struct Vector2b
-		{
-			bool x, y;
-			Vector2b();
-			Vector2b( bool iX, bool iY , bool iZ, bool iW );
-			Vector2b( CGstateassignment cgStateAssignment );
-		};
+        struct Vector2b
+        {
+            bool x, y;
+            Vector2b();
+            Vector2b( bool iX, bool iY , bool iZ, bool iW );
+            Vector2b( CGstateassignment cgStateAssignment );
+        };
 
-		struct Vector3b
-		{
-			bool x, y, z;
-			Vector3b();
-			Vector3b( bool iX, bool iY , bool iZ, bool iW );
-			Vector3b( CGstateassignment cgStateAssignment );
-		};
+        struct Vector3b
+        {
+            bool x, y, z;
+            Vector3b();
+            Vector3b( bool iX, bool iY , bool iZ, bool iW );
+            Vector3b( CGstateassignment cgStateAssignment );
+        };
 
-		struct Vector4b
-		{
-			bool x, y, z, w;
-			Vector4b();
-			Vector4b( bool iX, bool iY , bool iZ, bool iW );
-			Vector4b( CGstateassignment cgStateAssignment );
-		};
+        struct Vector4b
+        {
+            bool x, y, z, w;
+            Vector4b();
+            Vector4b( bool iX, bool iY , bool iZ, bool iW );
+            Vector4b( CGstateassignment cgStateAssignment );
+        };
 
-		struct Vector1i
-		{
-			int x;
-			Vector1i();
-			Vector1i( int iX );
-			Vector1i( CGstateassignment cgStateAssignment );
-			operator int() const;
+        struct Vector1i
+        {
+            int x;
+            Vector1i();
+            Vector1i( int iX );
+            Vector1i( CGstateassignment cgStateAssignment );
+            operator int() const;
 
-		};
+        };
 
-		struct Vector2i
-		{
-			int x, y;
-			Vector2i();
-			Vector2i( int iX, int iY );
-			Vector2i( CGstateassignment cgStateAssignment );
-		};
+        struct Vector2i
+        {
+            int x, y;
+            Vector2i();
+            Vector2i( int iX, int iY );
+            Vector2i( CGstateassignment cgStateAssignment );
+        };
 
-		struct Vector3i
-		{
-			int x, y, z;
-			Vector3i();
-			Vector3i( int iX, int iY, int iZ );
-			Vector3i( CGstateassignment cgStateAssignment );
-		};
-
-
-		struct Vector4i
-		{
-			int x, y, z, w;
-			Vector4i();
-			Vector4i( int iX, int iY, int iZ, int iW );
-			Vector4i( CGstateassignment cgStateAssignment );
-		};
+        struct Vector3i
+        {
+            int x, y, z;
+            Vector3i();
+            Vector3i( int iX, int iY, int iZ );
+            Vector3i( CGstateassignment cgStateAssignment );
+        };
 
 
-		struct Vector1f
-		{
-			float x;
-			Vector1f();
-			Vector1f( float iX, float iY, float iZ );
-			Vector1f( CGstateassignment cgStateAssignment );
-			operator float() const;
-		};
+        struct Vector4i
+        {
+            int x, y, z, w;
+            Vector4i();
+            Vector4i( int iX, int iY, int iZ, int iW );
+            Vector4i( CGstateassignment cgStateAssignment );
+        };
 
 
-		struct Vector2f
-		{
-			float x, y;
-			Vector2f();
-			Vector2f( float iX, float iY, float iZ );
-			Vector2f( CGstateassignment cgStateAssignment );
-		};
+        struct Vector1f
+        {
+            float x;
+            Vector1f();
+            Vector1f( float iX, float iY, float iZ );
+            Vector1f( CGstateassignment cgStateAssignment );
+            operator float() const;
+        };
 
 
-		struct Vector3f
-		{
-			float x, y, z;
-			Vector3f();
-			Vector3f( float iX, float iY, float iZ );
-			Vector3f( CGstateassignment cgStateAssignment );
-		};
-
-		struct Vector4f
-		{
-			float x, y, z, w;
-			Vector4f();
-			Vector4f( float iX, float iY, float iZ, float iW );
-			Vector4f( CGstateassignment cgStateAssignment );
-		};
+        struct Vector2f
+        {
+            float x, y;
+            Vector2f();
+            Vector2f( float iX, float iY, float iZ );
+            Vector2f( CGstateassignment cgStateAssignment );
+        };
 
 
+        struct Vector3f
+        {
+            float x, y, z;
+            Vector3f();
+            Vector3f( float iX, float iY, float iZ );
+            Vector3f( CGstateassignment cgStateAssignment );
+        };
 
-		// simple types end
-
-
-		class CgStateListener : public GeneralAllocatedObject
-		{
-		protected:
-			CGstate mCgState;
-			CGtype mCgType;
-			CGcontext mCgContext;
-
-			static CGbool cgCallBackSet( CGstateassignment cgStateAssignment );
-			static CGbool cgCallBackReset( CGstateassignment cgStateAssignment );
-			static CGbool cgCallBackValidate( CGstateassignment cgStateAssignment );
-
-			virtual CGstatecallback getCgCallBackSet();
-			virtual CGstatecallback getCgCallBackReset();
-			virtual CGstatecallback getCgCallBackValidate();
-
-			virtual void createState() = 0;
-			void addStateEnumerant( int value, const char *name );
-
-			CGparameter getCgParameter( CGstateassignment cgStateAssignment );
+        struct Vector4f
+        {
+            float x, y, z, w;
+            Vector4f();
+            Vector4f( float iX, float iY, float iZ, float iW );
+            Vector4f( CGstateassignment cgStateAssignment );
+        };
 
 
-		public:
-			CgStateListener( CGtype cgType );
-			virtual ~CgStateListener();
-			virtual void init();
-			CGstate getCgState() const;
-		};
 
-		typedef vector<CgStateListener *>::type CgStateListenerVector;
-
-		class CgGlobalStateListener : public CgStateListener
-		{
-		protected:
-			const GlobalStateType mGlobalStateType;
-			virtual void createState();
-		public:
-			CgGlobalStateListener( const GlobalStateType globalStateType, CGtype cgType );
-			virtual ~CgGlobalStateListener();
-
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Bool
-		class CgBoolGlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector1b getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgBoolGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Bool4
-		class CgBool4GlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector4b getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgBool4GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Float
-		class CgFloatGlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector1f getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgFloatGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Float2
-		class CgFloat2GlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector2f getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgFloat2GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Float3
-		class CgFloat3GlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector3f getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgFloat3GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Float4
-		class CgFloat4GlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector4f getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgFloat4GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Float4x2
-		class CgFloat4x2GlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgFloat4x2GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Float4x3
-		class CgFloat4x3GlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgFloat4x3GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Float4x4
-		class CgFloat4x4GlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgFloat4x4GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Int
-		class CgIntGlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector1i getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgIntGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Int2
-		class CgInt2GlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector2i getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgInt2GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Int3
-		class CgInt3GlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector3i getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgInt3GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Int4
-		class CgInt4GlobalStateListener : public CgGlobalStateListener
-		{
-		protected:
-			const Vector4i getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgInt4GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Sampler
-		class CgSamplerGlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgSamplerGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Sampler2
-		class CgSampler2GlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgSampler2GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Sampler3
-		class CgSampler3GlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgSampler3GlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// SamplerCube
-		class CgSamplerCubeGlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgSamplerCubeGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// SamplerRect
-		class CgSamplerRectGlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgSamplerRectGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Texture
-		class CgTextureGlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgTextureGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// Program
-		class CgProgramGlobalStateListener : public CgGlobalStateListener
-		{
-		public:
-			CgProgramGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-
-		/// BlendEquation
-		class CgBlendEquationGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum BlendEquationType
-			{
-				BET_FUNCADD, // FuncAdd
-				BET_FUNCSUBTRACT,  // FuncSubtract
-				BET_MIN, // Min
-				BET_MAX,  // Max
-				BET_LOGICOP // LogicOp
-			};
-			virtual void createState();
-		public:
-			CgBlendEquationGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// DepthFunc
-		class CgDepthFuncGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum DepthFuncType
-			{
-				DFT_NEVER,  // Never
-				DFT_LESS, // Less
-				DFT_LEQUAL,  // LEqual
-				DFT_EQUAL, // Equal
-				DFT_GREATER,  // Greater
-				DFT_NOTEQUAL, // NotEqual
-				DFT_GEQUAL,  // GEqual
-				DFT_ALWAYS // Always
-			};
-			virtual void createState();
-		public:
-			CgDepthFuncGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// FogDistanceMode
-		class CgFogDistanceModeGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum FogDistanceModeType
-			{
-				FDMT_EYERADIAL, // EyeRadial
-				FDMT_EYEPLANE, // EyePlane
-				FDMT_EYEPLANEABSOLUTE // EyePlaneAbsolute
-			};
-			virtual void createState();
-		public:
-			CgFogDistanceModeGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-		/// FogMode
-		class CgFogModeGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum FogModeType
-			{
-				FMT_LINEAR, // Linear
-				FMT_EXP,  // Exp
-				FMT_EXP2 // Exp2
-			};
-			virtual void createState();
-		public:
-			CgFogModeGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};		
-		
-		/// LightModelColorControl
-		class CgLightModelColorControlGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum LightModelColorControlType
-			{
-				LMCCT_SINGLECOLOR, // SingleColor
-				LMCCT_SEPARATESPECULAR // SeparateSpecular
-			};
-			virtual void createState();
-		public:
-			CgLightModelColorControlGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};		
-		/// LogicOp
-		class CgLogicOpGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum LogicOpType
-			{
-				LOT_CLEAR,  // Clear
-				LOT_AND, // And
-				LOT_ANDREVERSE,  // AndReverse
-				LOT_COPY, // Copy
-				LOT_ANDINVERTED,  // AndInverted
-				LOT_NOOP, // Noop
-				LOT_XOR,  // Xor
-				LOT_OR,  // Or,
-				LOT_NOR, // Nor
-				LOT_EQUIV,  // Equiv
-				LOT_INVERT, // Invert
-				LOT_ORREVERSE, // OrReverse
-				LOT_COPYINVERTED, // CopyInverted
-				LOT_NAND,  // Nand
-				LOT_SET // Set
-			};
-			virtual void createState();
-		public:
-			CgLogicOpGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};		
-		/// PointSpriteCoordOrigin
-		class CgPointSpriteCoordOriginGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum PointSpriteCoordOriginType
-			{
-				PSCOT_LOWERLEFT, // LowerLeft
-				PSCOT_UPPERLEFT // UpperLeft
-			};
-			virtual void createState();
-		public:
-			CgPointSpriteCoordOriginGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};		
-		/// PointSpriteRMode
-		class CgPointSpriteRModeGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum PointSpriteRModeType
-			{
-				PSRMT_ZERO,  // Zero
-				PSRMT_R,  // R
-				PSRMT_S // S
-			};
-			virtual void createState();
-		public:
-			CgPointSpriteRModeGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-		/// ShadeModel
-		class CgShadeModelGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum ShadeModelType
-			{
-				SMT_FLAT,  // Flat
-				SMT_SMOOTH // Smooth
-			};
-			virtual void createState();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		public:
-			CgShadeModelGlobalStateListener();
-		};	
-		/// TexGenMode
-		class CgTexGenModeGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum TexGenModeType
-			{
-				TGMT_OBJECTLINEAR, // ObjectLinear
-				TGMT_EYELINEAR, // EyeLinear
-				TGMT_SPHEREMAP, // SphereMap
-				TGMT_REFLECTIONMAP, // ReflectionMap
-				TGMT_NORMALMAP // NormalMap
-			};
-			virtual void createState();
-		public:
-			CgTexGenModeGlobalStateListener( const GlobalStateType globalStateType );
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-		/// TextureEnvMode
-		class CgTextureEnvModeGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum TextureEnvModeType
-			{
-				BET_MODULATE,  // Modulate
-				BET_DECAL, // Decal
-				BET_BLEND,  // Blend
-				BET_REPLACE, // Replace
-				BET_ADD // Add
-			};
-			virtual void createState();
-		public:
-			CgTextureEnvModeGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-			/// MinFilter
-			class CgMinFilterGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum MinFilterType
-			{
-				MFT_NEAREST,  // Nearest
-				MFT_LINEAR, // Linear
-				MFT_LINEARMIPMAPNEAREST, // LinearMipMapNearest
-				MFT_NEARESTMIPMAPNEAREST, // NearestMipMapNearest
-				MFT_NEARESTMIPMAPLINEAR, // NearestMipMapLinear
-				MFT_LINEARMIPMAPLINEAR // LinearMipMapLinear
-			};
-			virtual void createState();
-		public:
-			CgMinFilterGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-		/// MagFilter
-		class CgMagFilterGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum MagFilterType
-			{
-				MFT_NEAREST,  // Nearest
-				MFT_LINEAR // Linear
-			};
-			virtual void createState();
-		public:
-			CgMagFilterGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};		
-			/// FrontFace
-		class CgFrontFaceGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum FrontFaceType
-			{
-				FFT_CW, // CW
-				FFT_CCW // CCW
-			};
-			virtual void createState();
-		public:
-			CgFrontFaceGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-		/// CullFaceGlobal - CullFace
-		class CgCullFaceGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum CullFaceType
-			{
-				CFT_FRONT,  // Front
-				CFT_BACK, // Back
-				CFT_FRONTANDBACK // FrontAndBack
-			};
-			virtual void createState();
-		public:
-			CgCullFaceGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-		/// FogCoordSrcGlobal - FogCoordSrc
-		class CgFogCoordSrcGlobalStateListener : public CgIntGlobalStateListener
-		{
-		protected:
-			enum FogCoordSrcType
-			{
-				FCST_FRAGMENTDEPTH, // FragmentDepth
-				FCST_FOGCOORD // FogCoord
-			};
-			virtual void createState();
-		public:
-			CgFogCoordSrcGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-
-		// AlphaFuncGlobal - float2 - reference then value
-		class CgAlphaFuncGlobalStateListener : public CgFloat2GlobalStateListener
-		{
-		protected:
-			enum AlphaFuncType
-			{
-				AFT_NEVER,  // Never
-				AFT_LESS, // Less
-				AFT_LEQUAL,  // LEqual
-				AFT_EQUAL, // Equal
-				AFT_GREATER,  // Greater
-				AFT_NOTEQUAL, // NotEqual
-				AFT_GEQUAL,  // GEqual
-				AFT_ALWAYS // Always
-			};
-			virtual void createState();
-		public:
-			CgAlphaFuncGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-	
-		// BlendFuncGlobal - Int2 - src_factor, dst_factor
-		class CgBlendFuncGlobalStateListener : public CgInt2GlobalStateListener
-		{
-		protected:
-			enum BlendFuncType
-			{
-				BF_ZERO,  // Zero
-				BF_ONE, // One
-				BF_DESTCOLOR, // DestColor
-				BF_ONEMINUSDESTCOLOR, // OneMinusDestColor
-				BF_SRCALPHA, // SrcAlpha
-				BF_ONEMINUSSRCALPHA, // OneMinusSrcAlpha
-				BF_DSTALPHA, // DstAlpha
-				BF_ONEMINUSDSTALPHA, // OneMinusDstAlpha
-				BF_SRCALPHASATURATE, // SrcAlphaSaturate
-				BF_SRCCOLOR, // SrcColor
-				BF_ONEMINUSSRCCOLOR, // OneMinusSrcColor
-				BF_CONSTANTCOLOR, // ConstantColor
-				BF_ONEMINUSCONSTANTCOLOR, // OneMinusConstantColor
-				BF_CONSTANTALPHA, // ConstantAlpha
-				BF_ONEMINUSCONSTANTALPHA // OneMinusConstantAlpha
-			};
-			virtual void createState();
-		public:
-			CgBlendFuncGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-	
-
-		// BlendFuncSeparate - int4 (rgb_src, rgb_dst, a_src, a_dst)
-		class CgBlendFuncSeparateGlobalStateListener : public CgInt4GlobalStateListener
-		{
-		protected:
-			enum BlendFuncSeparateType
-			{
-				BFST_ZERO,  // Zero
-				BFST_ONE, // One
-				BFST_DESTCOLOR, // DestColor
-				BFST_ONEMINUSDESTCOLOR, // OneMinusDestColor
-				BFST_SRCALPHA, // SrcAlpha
-				BFST_ONEMINUSSRCALPHA, // OneMinusSrcAlpha
-				BFST_DSTALPHA, // DstAlpha
-				BFST_ONEMINUSDSTALPHA, // OneMinusDstAlpha
-				BFST_SRCALPHASATURATE, // SrcAlphaSaturate
-				BFST_SRCCOLOR, // SrcColor
-				BFST_ONEMINUSSRCCOLOR, // OneMinusSrcColor
-				BFST_CONSTANTCOLOR, // ConstantColor
-				BFST_ONEMINUSCONSTANTCOLOR, // OneMinusConstantColor
-				BFST_CONSTANTALPHA, // ConstantAlpha
-				BFST_ONEMINUSCONSTANTALPHA // OneMinusConstantAlpha
-			};
-			virtual void createState();
-		public:
-			CgBlendFuncSeparateGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
-
-		// BlendEquationSeparate - int2 (rgb,alpha)
-		class CgBlendEquationSeparateGlobalStateListener : public CgInt2GlobalStateListener
-		{
-		protected:
-			enum BlendEquationSeparateType
-			{
-				BEST_FUNCADD, // FuncAdd
-				BEST_FUNCSUBTRACT,  // FuncSubtract
-				BEST_MIN, // Min
-				BEST_MAX,  // Max
-				BEST_LOGICOP // LogicOp
-			};
-			virtual void createState();
-		public:
-			CgBlendEquationSeparateGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};
+        // simple types end
 
 
-		// int2 
-		class CgColorMaterialGlobalStateListener : public CgInt2GlobalStateListener
-		{
-		protected:
-			enum ColorMaterialType
-			{
-				CMT_FRONT,  // Front
-				CMT_BACK, // Back
-				CMT_FRONTANDBACK, // FrontAndBack
-				CMT_EMISSION,  // Emission
-				CMT_AMBIENT, // Ambient
-				CMT_DIFFUSE, // Diffuse
-				CMT_SPECULAR, // Specular
-				CMT_AMBIENTANDDIFFUSE // AmbientAndDiffuse
-			};
-			virtual void createState();
-		public:
-			CgColorMaterialGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};				
-	
-		// int2 
-		class CgPolygonModeGlobalStateListener : public CgInt2GlobalStateListener
-		{
-		protected:
-			enum PolygonModeType
-			{
-				PMT_FRONT,  // Front
-				PMT_BACK, // Back
-				PMT_FRONTANDBACK, // FrontAndBack
-				PMT_POINT,  // Point
-				PMT_LINE,  // Line
-				PMT_FILL // Fill
-			};
-			virtual void createState();
-		public:
-			CgPolygonModeGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
+        class CgStateListener : public GeneralAllocatedObject
+        {
+        protected:
+            CGstate mCgState;
+            CGtype mCgType;
+            CGcontext mCgContext;
 
-		// int3
-		class CgStencilFuncGlobalStateListener : public CgInt3GlobalStateListener
-		{
-		protected:
-			enum StencilFuncType
-			{
-				SFT_NEVER,  // Never
-				SFT_LESS, // Less
-				SFT_LEQUAL,  // LEqual
-				SFT_EQUAL, // Equal
-				SFT_GREATER, // Greater
-				SFT_NOTEQUAL, // NotEqual
-				SFT_GEQUAL,  // GEqual
-				SFT_ALWAYS // Always
-			};
-			virtual void createState();
-		public:
-			CgStencilFuncGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
+            static CGbool cgCallBackSet( CGstateassignment cgStateAssignment );
+            static CGbool cgCallBackReset( CGstateassignment cgStateAssignment );
+            static CGbool cgCallBackValidate( CGstateassignment cgStateAssignment );
 
-		// int3
-		class CgStencilOpGlobalStateListener : public CgInt3GlobalStateListener
-		{
-		protected:
-			enum StencilOpType
-			{
-				SOT_KEEP,  // Keep
-				SOT_ZERO, // Zero
-				SOT_REPLACE,  // Replace
-				SOT_INCR, // Incr
-				SOT_DECR,  // Decr
-				SOT_INVERT, // Invert
-				SOT_INCRWRAP,  // IncrWrap
-				SOT_DECRWRAP // DecrWrap
-			};
-			virtual void createState();
-		public:
-			CgStencilOpGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
+            virtual CGstatecallback getCgCallBackSet();
+            virtual CGstatecallback getCgCallBackReset();
+            virtual CGstatecallback getCgCallBackValidate();
 
-		// int4
-		class CgStencilFuncSeparateGlobalStateListener : public CgInt4GlobalStateListener
-		{
-		protected:
-			enum StencilFuncSeparateType
-			{
-				SFST_FRONT,  // Front
-				SFST_BACK, // Back
-				SFST_FRONTANDBACK, // FrontAndBack
-				SFST_NEVER,  // Never
-				SFST_LESS, // Less
-				SFST_LEQUAL, // LEqual
-				SFST_EQUAL, // Equal
-				SFST_GREATER,  // Greater
-				SFST_NOTEQUAL, // NotEqual
-				SFST_GEQUAL,  // GEqual
-				SFST_ALWAYS // Always
-			};
-			virtual void createState();
-		public:
-			CgStencilFuncSeparateGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
+            virtual void createState() = 0;
+            void addStateEnumerant( int value, const char *name );
 
-		// int2
-		class CgStencilMaskSeparateGlobalStateListener : public CgInt2GlobalStateListener
-		{
-		protected:
-			enum StencilMaskSeparateType
-			{
-				BET_FRONT,  // Front
-				BET_BACK,  // Back
-				BET_FRONTANDBACK // FrontAndBack
-			};
-			virtual void createState();
-		public:
-			CgStencilMaskSeparateGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
-
-		// int4
-		class CgStencilOpSeparateGlobalStateListener : public CgInt4GlobalStateListener
-		{
-		protected:
-			enum StencilOpSeparateType
-			{
-				BET_KEEP, // Keep
-				BET_ZERO, // Zero
-				BET_REPLACE, // Replace
-				BET_INCR, // Incr
-				BET_DECR, // Decr
-				BET_INVERT, // Invert
-				BET_INCRWRAP,  // IncrWrap
-				BET_DECRWRAP // DecrWrap
-			};
-			virtual void createState();
-		public:
-			CgStencilOpSeparateGlobalStateListener();
-			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
-		};	
+            CGparameter getCgParameter( CGstateassignment cgStateAssignment );
 
 
-		class CgSamplerStateListener : public CgStateListener
-		{
-		protected:
-			SamplerStateType mSamplerStateType;
-			virtual void createState();
-		public:
-			CgSamplerStateListener( const SamplerStateType samplerStateType, CGtype cgType );
-			virtual ~CgSamplerStateListener();
+        public:
+            CgStateListener( CGtype cgType );
+            virtual ~CgStateListener();
+            virtual void init();
+            CGstate getCgState() const;
+        };
 
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// Int
-		class CgIntSamplerStateListener : public CgSamplerStateListener
-		{
-		protected:
-			const Vector1i getValue( CGstateassignment cgStateAssignment );
-		public:
-			CgIntSamplerStateListener( const SamplerStateType samplerStateType );
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// Bool
-		class CgBoolSamplerStateListener : public CgSamplerStateListener
-		{
-		public:
-			CgBoolSamplerStateListener( const SamplerStateType samplerStateType );
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// Float
-		class CgFloatSamplerStateListener : public CgSamplerStateListener
-		{
-		public:
-			CgFloatSamplerStateListener( const SamplerStateType samplerStateType );
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// Float4
-		class CgFloat4SamplerStateListener : public CgSamplerStateListener
-		{
-		public:
-			CgFloat4SamplerStateListener( const SamplerStateType samplerStateType );
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// Texture
-		class CgTextureSamplerStateListener : public CgSamplerStateListener
-		{
-		protected:
-			TextureType parseTextureType( CGparameter cgParameter, TextureUnitState * ogreTextureUnitState );
-			void parseTextureName( CGparameter cgParameter, TextureUnitState * ogreTextureUnitState );
-		public:
-			CgTextureSamplerStateListener(const SamplerStateType samplerStateType);
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        typedef vector<CgStateListener *>::type CgStateListenerVector;
 
-		};
+        class CgGlobalStateListener : public CgStateListener
+        {
+        protected:
+            const GlobalStateType mGlobalStateType;
+            virtual void createState();
+        public:
+            CgGlobalStateListener( const GlobalStateType globalStateType, CGtype cgType );
+            virtual ~CgGlobalStateListener();
 
-		// Wrap	= TextureAddressingMode
-		class CgWrapSamplerStateListener : public CgIntSamplerStateListener
-		{
-		protected:
-			enum WarpType
-			{
-				WT_REPEAT, // Repeat
-				WT_CLAMP, // Clamp
-				WT_CLAMPTOEDGE, // ClampToEdge
-				WT_CLAMPTOBORDER, // ClampToBorder
-				WT_MIRROREDREPEAT, // MirroredRepeat
-				WT_MIRRORCLAMP, // MirrorClamp
-				WT_MIRRORCLAMPTOEDGE, // MirrorClampToEdge
-				WT_MIRRORCLAMPTOBORDER // MirrorClampToBorder
-			};
-			virtual void createState();
-			TextureUnitState::TextureAddressingMode getOgreTextureAddressingMode( CGstateassignment cgStateAssignment );
-		public:
-			CgWrapSamplerStateListener(const SamplerStateType samplerStateType);
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// CompareMode
-		class CgCompareModeSamplerStateListener : public CgIntSamplerStateListener
-		{
-		protected:
-			enum CompareModeType
-			{
-				CMT_NONE, // None
-				CMT_COMPARERTOTEXTURE // CompareRToTexture
-			};
-			virtual void createState();
-		public:
-			CgCompareModeSamplerStateListener();
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// CompareFunc
-		class CgCompareFuncSamplerStateListener : public CgIntSamplerStateListener
-		{
-		protected:
-			enum CompareFuncType
-			{
-				CFT_NEVER,  // Never
-				CFT_LESS,  // Less
-				CFT_LEQUAL, // LEqual
-				CFT_EQUAL,  // Equal
-				CFT_GREATER, // Greater
-				CFT_NOTEQUAL // NotEqual
-			};
-			virtual void createState();
-		public:
-			CgCompareFuncSamplerStateListener();
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// DepthMode
-		class CgDepthModeSamplerStateListener : public CgIntSamplerStateListener
-		{
-		protected:
-			enum DepthModeType
-			{
-				DMT_ALPHA,   // Alpha
-				DMT_INTENSITY,  // Intensity
-				DMT_LUMINANCE   // Luminance
-			};
-			virtual void createState();
-		public:
-			CgDepthModeSamplerStateListener();
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// MinFilter
-		class CgMinFilterSamplerStateListener : public CgIntSamplerStateListener
-		{
-		protected:
-			enum MinFilterType
-			{
-				MINFT_NEAREST, // Nearest
-				MINFT_LINEAR, // Linear
-				MINFT_LINEARMIPMAPNEAREST, // LinearMipMapNearest
-				MINFT_NEARESTMIPMAPNEAREST, // NearestMipMapNearest
-				MINFT_NEARESTMIPMAPLINEAR, // NearestMipMapLinear
-				MINFT_LINEARMIPMAPLINEAR // LinearMipMapLinear
-			};
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Bool
+        class CgBoolGlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector1b getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgBoolGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Bool4
+        class CgBool4GlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector4b getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgBool4GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Float
+        class CgFloatGlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector1f getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgFloatGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Float2
+        class CgFloat2GlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector2f getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgFloat2GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Float3
+        class CgFloat3GlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector3f getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgFloat3GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Float4
+        class CgFloat4GlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector4f getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgFloat4GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Float4x2
+        class CgFloat4x2GlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgFloat4x2GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Float4x3
+        class CgFloat4x3GlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgFloat4x3GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Float4x4
+        class CgFloat4x4GlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgFloat4x4GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Int
+        class CgIntGlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector1i getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgIntGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Int2
+        class CgInt2GlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector2i getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgInt2GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Int3
+        class CgInt3GlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector3i getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgInt3GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Int4
+        class CgInt4GlobalStateListener : public CgGlobalStateListener
+        {
+        protected:
+            const Vector4i getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgInt4GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Sampler
+        class CgSamplerGlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgSamplerGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Sampler2
+        class CgSampler2GlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgSampler2GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Sampler3
+        class CgSampler3GlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgSampler3GlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// SamplerCube
+        class CgSamplerCubeGlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgSamplerCubeGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// SamplerRect
+        class CgSamplerRectGlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgSamplerRectGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Texture
+        class CgTextureGlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgTextureGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// Program
+        class CgProgramGlobalStateListener : public CgGlobalStateListener
+        {
+        public:
+            CgProgramGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
 
-			virtual void createState();
-		public:
-			CgMinFilterSamplerStateListener();
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// MagFilter
-		class CgMagFilterSamplerStateListener : public CgIntSamplerStateListener
-		{
-		protected:
-			enum MagFilterType
-			{
-				MAGFT_NEAREST, // Nearest
-				MAGFT_LINEAR // Linear
+        /// BlendEquation
+        class CgBlendEquationGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum BlendEquationType
+            {
+                BET_FUNCADD, // FuncAdd
+                BET_FUNCSUBTRACT,  // FuncSubtract
+                BET_MIN, // Min
+                BET_MAX,  // Max
+                BET_LOGICOP // LogicOp
+            };
+            virtual void createState();
+        public:
+            CgBlendEquationGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// DepthFunc
+        class CgDepthFuncGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum DepthFuncType
+            {
+                DFT_NEVER,  // Never
+                DFT_LESS, // Less
+                DFT_LEQUAL,  // LEqual
+                DFT_EQUAL, // Equal
+                DFT_GREATER,  // Greater
+                DFT_NOTEQUAL, // NotEqual
+                DFT_GEQUAL,  // GEqual
+                DFT_ALWAYS // Always
+            };
+            virtual void createState();
+        public:
+            CgDepthFuncGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// FogDistanceMode
+        class CgFogDistanceModeGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum FogDistanceModeType
+            {
+                FDMT_EYERADIAL, // EyeRadial
+                FDMT_EYEPLANE, // EyePlane
+                FDMT_EYEPLANEABSOLUTE // EyePlaneAbsolute
+            };
+            virtual void createState();
+        public:
+            CgFogDistanceModeGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+        /// FogMode
+        class CgFogModeGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum FogModeType
+            {
+                FMT_LINEAR, // Linear
+                FMT_EXP,  // Exp
+                FMT_EXP2 // Exp2
+            };
+            virtual void createState();
+        public:
+            CgFogModeGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };      
+        
+        /// LightModelColorControl
+        class CgLightModelColorControlGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum LightModelColorControlType
+            {
+                LMCCT_SINGLECOLOR, // SingleColor
+                LMCCT_SEPARATESPECULAR // SeparateSpecular
+            };
+            virtual void createState();
+        public:
+            CgLightModelColorControlGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };      
+        /// LogicOp
+        class CgLogicOpGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum LogicOpType
+            {
+                LOT_CLEAR,  // Clear
+                LOT_AND, // And
+                LOT_ANDREVERSE,  // AndReverse
+                LOT_COPY, // Copy
+                LOT_ANDINVERTED,  // AndInverted
+                LOT_NOOP, // Noop
+                LOT_XOR,  // Xor
+                LOT_OR,  // Or,
+                LOT_NOR, // Nor
+                LOT_EQUIV,  // Equiv
+                LOT_INVERT, // Invert
+                LOT_ORREVERSE, // OrReverse
+                LOT_COPYINVERTED, // CopyInverted
+                LOT_NAND,  // Nand
+                LOT_SET // Set
+            };
+            virtual void createState();
+        public:
+            CgLogicOpGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };      
+        /// PointSpriteCoordOrigin
+        class CgPointSpriteCoordOriginGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum PointSpriteCoordOriginType
+            {
+                PSCOT_LOWERLEFT, // LowerLeft
+                PSCOT_UPPERLEFT // UpperLeft
+            };
+            virtual void createState();
+        public:
+            CgPointSpriteCoordOriginGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };      
+        /// PointSpriteRMode
+        class CgPointSpriteRModeGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum PointSpriteRModeType
+            {
+                PSRMT_ZERO,  // Zero
+                PSRMT_R,  // R
+                PSRMT_S // S
+            };
+            virtual void createState();
+        public:
+            CgPointSpriteRModeGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+        /// ShadeModel
+        class CgShadeModelGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum ShadeModelType
+            {
+                SMT_FLAT,  // Flat
+                SMT_SMOOTH // Smooth
+            };
+            virtual void createState();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        public:
+            CgShadeModelGlobalStateListener();
+        };  
+        /// TexGenMode
+        class CgTexGenModeGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum TexGenModeType
+            {
+                TGMT_OBJECTLINEAR, // ObjectLinear
+                TGMT_EYELINEAR, // EyeLinear
+                TGMT_SPHEREMAP, // SphereMap
+                TGMT_REFLECTIONMAP, // ReflectionMap
+                TGMT_NORMALMAP // NormalMap
+            };
+            virtual void createState();
+        public:
+            CgTexGenModeGlobalStateListener( const GlobalStateType globalStateType );
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+        /// TextureEnvMode
+        class CgTextureEnvModeGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum TextureEnvModeType
+            {
+                BET_MODULATE,  // Modulate
+                BET_DECAL, // Decal
+                BET_BLEND,  // Blend
+                BET_REPLACE, // Replace
+                BET_ADD // Add
+            };
+            virtual void createState();
+        public:
+            CgTextureEnvModeGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+            /// MinFilter
+            class CgMinFilterGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum MinFilterType
+            {
+                MFT_NEAREST,  // Nearest
+                MFT_LINEAR, // Linear
+                MFT_LINEARMIPMAPNEAREST, // LinearMipMapNearest
+                MFT_NEARESTMIPMAPNEAREST, // NearestMipMapNearest
+                MFT_NEARESTMIPMAPLINEAR, // NearestMipMapLinear
+                MFT_LINEARMIPMAPLINEAR // LinearMipMapLinear
+            };
+            virtual void createState();
+        public:
+            CgMinFilterGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+        /// MagFilter
+        class CgMagFilterGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum MagFilterType
+            {
+                MFT_NEAREST,  // Nearest
+                MFT_LINEAR // Linear
+            };
+            virtual void createState();
+        public:
+            CgMagFilterGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };      
+            /// FrontFace
+        class CgFrontFaceGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum FrontFaceType
+            {
+                FFT_CW, // CW
+                FFT_CCW // CCW
+            };
+            virtual void createState();
+        public:
+            CgFrontFaceGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+        /// CullFaceGlobal - CullFace
+        class CgCullFaceGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum CullFaceType
+            {
+                CFT_FRONT,  // Front
+                CFT_BACK, // Back
+                CFT_FRONTANDBACK // FrontAndBack
+            };
+            virtual void createState();
+        public:
+            CgCullFaceGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+        /// FogCoordSrcGlobal - FogCoordSrc
+        class CgFogCoordSrcGlobalStateListener : public CgIntGlobalStateListener
+        {
+        protected:
+            enum FogCoordSrcType
+            {
+                FCST_FRAGMENTDEPTH, // FragmentDepth
+                FCST_FOGCOORD // FogCoord
+            };
+            virtual void createState();
+        public:
+            CgFogCoordSrcGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
 
-			};
+        // AlphaFuncGlobal - float2 - reference then value
+        class CgAlphaFuncGlobalStateListener : public CgFloat2GlobalStateListener
+        {
+        protected:
+            enum AlphaFuncType
+            {
+                AFT_NEVER,  // Never
+                AFT_LESS, // Less
+                AFT_LEQUAL,  // LEqual
+                AFT_EQUAL, // Equal
+                AFT_GREATER,  // Greater
+                AFT_NOTEQUAL, // NotEqual
+                AFT_GEQUAL,  // GEqual
+                AFT_ALWAYS // Always
+            };
+            virtual void createState();
+        public:
+            CgAlphaFuncGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+    
+        // BlendFuncGlobal - Int2 - src_factor, dst_factor
+        class CgBlendFuncGlobalStateListener : public CgInt2GlobalStateListener
+        {
+        protected:
+            enum BlendFuncType
+            {
+                BF_ZERO,  // Zero
+                BF_ONE, // One
+                BF_DESTCOLOR, // DestColor
+                BF_ONEMINUSDESTCOLOR, // OneMinusDestColor
+                BF_SRCALPHA, // SrcAlpha
+                BF_ONEMINUSSRCALPHA, // OneMinusSrcAlpha
+                BF_DSTALPHA, // DstAlpha
+                BF_ONEMINUSDSTALPHA, // OneMinusDstAlpha
+                BF_SRCALPHASATURATE, // SrcAlphaSaturate
+                BF_SRCCOLOR, // SrcColor
+                BF_ONEMINUSSRCCOLOR, // OneMinusSrcColor
+                BF_CONSTANTCOLOR, // ConstantColor
+                BF_ONEMINUSCONSTANTCOLOR, // OneMinusConstantColor
+                BF_CONSTANTALPHA, // ConstantAlpha
+                BF_ONEMINUSCONSTANTALPHA // OneMinusConstantAlpha
+            };
+            virtual void createState();
+        public:
+            CgBlendFuncGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
+    
 
-			virtual void createState();
-		public:
-			CgMagFilterSamplerStateListener();
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// MipFilter
-		class CgMipFilterSamplerStateListener : public CgIntSamplerStateListener
-		{
-		protected:
-			enum MipFilterType
-			{
-				MIPFT_NONE            = 0,    // filtering disabled (valid for mip filter only)
-				MIPFT_POINT           = 1,    // nearest
-				MIPFT_LINEAR          = 2,    // linear interpolation
-				MIPFT_ANISOTROPIC     = 3,    // anisotropic
-				MIPFT_PYRAMIDALQUAD   = 6,    // 4-sample tent
-				MIPFT_GAUSSIANQUAD    = 7     // 4-sample gaussian
+        // BlendFuncSeparate - int4 (rgb_src, rgb_dst, a_src, a_dst)
+        class CgBlendFuncSeparateGlobalStateListener : public CgInt4GlobalStateListener
+        {
+        protected:
+            enum BlendFuncSeparateType
+            {
+                BFST_ZERO,  // Zero
+                BFST_ONE, // One
+                BFST_DESTCOLOR, // DestColor
+                BFST_ONEMINUSDESTCOLOR, // OneMinusDestColor
+                BFST_SRCALPHA, // SrcAlpha
+                BFST_ONEMINUSSRCALPHA, // OneMinusSrcAlpha
+                BFST_DSTALPHA, // DstAlpha
+                BFST_ONEMINUSDSTALPHA, // OneMinusDstAlpha
+                BFST_SRCALPHASATURATE, // SrcAlphaSaturate
+                BFST_SRCCOLOR, // SrcColor
+                BFST_ONEMINUSSRCCOLOR, // OneMinusSrcColor
+                BFST_CONSTANTCOLOR, // ConstantColor
+                BFST_ONEMINUSCONSTANTCOLOR, // OneMinusConstantColor
+                BFST_CONSTANTALPHA, // ConstantAlpha
+                BFST_ONEMINUSCONSTANTALPHA // OneMinusConstantAlpha
+            };
+            virtual void createState();
+        public:
+            CgBlendFuncSeparateGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
 
-			};
-
-			virtual void createState();
-		public:
-			CgMipFilterSamplerStateListener();
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-		/// TextureAddress
-		class CgTextureAddressSamplerStateListener : public CgIntSamplerStateListener
-		{
-		protected:
-			enum TextureAddressType
-			{
-				TAT_WRAP = 1, // Wrap
-				TAT_MIRROR, // Mirror
-				TAT_CLAMP, // Clamp
-				TAT_BORDER, // Border
-				TAT_MIRRORONCE // MirrorOnce
-			};
-
-			virtual void createState();
-		public:
-			CgTextureAddressSamplerStateListener( const SamplerStateType samplerStateType );
-			virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
-		};
-
-		typedef map<CGstate, CgGlobalStateListener *>::type CgGlobalStateToListenerMap;
-		typedef map<CGstate, CgSamplerStateListener *>::type CgSamplerStateToListenerMap;
-
-		CgGlobalStateToListenerMap mCgGlobalStateToListenerMap;
-		CgSamplerStateToListenerMap mCgSamplerStateToListenerMap;
-		CgStateListenerVector mCgStateListenerVector;
-		CgStateListenerVector mCgSamplerStateListenerVector;
-
-		StringVector mScriptPatterns; // for getScriptPatterns(void)
-
-		CGcontext mCgContext;
-		CGcontext getCgContext() const;
+        // BlendEquationSeparate - int2 (rgb,alpha)
+        class CgBlendEquationSeparateGlobalStateListener : public CgInt2GlobalStateListener
+        {
+        protected:
+            enum BlendEquationSeparateType
+            {
+                BEST_FUNCADD, // FuncAdd
+                BEST_FUNCSUBTRACT,  // FuncSubtract
+                BEST_MIN, // Min
+                BEST_MAX,  // Max
+                BEST_LOGICOP // LogicOp
+            };
+            virtual void createState();
+        public:
+            CgBlendEquationSeparateGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };
 
 
-		void parseCgEffect( CGeffect cgEffect, MaterialPtr ogreMaterial );
-		void parseCgEffectTechniques( CGeffect cgEffect, MaterialPtr ogreMaterial );
-		void parseCgTechnique( CGtechnique cgTechnique, Technique * ogreTechnique );
-		void parseCgPass( CGpass cgPass, Pass * ogrePass );
-		void parseSamplerParameters(CGpass cgPass, Pass * ogrePass);
+        // int2 
+        class CgColorMaterialGlobalStateListener : public CgInt2GlobalStateListener
+        {
+        protected:
+            enum ColorMaterialType
+            {
+                CMT_FRONT,  // Front
+                CMT_BACK, // Back
+                CMT_FRONTANDBACK, // FrontAndBack
+                CMT_EMISSION,  // Emission
+                CMT_AMBIENT, // Ambient
+                CMT_DIFFUSE, // Diffuse
+                CMT_SPECULAR, // Specular
+                CMT_AMBIENTANDDIFFUSE // AmbientAndDiffuse
+            };
+            virtual void createState();
+        public:
+            CgColorMaterialGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };              
+    
+        // int2 
+        class CgPolygonModeGlobalStateListener : public CgInt2GlobalStateListener
+        {
+        protected:
+            enum PolygonModeType
+            {
+                PMT_FRONT,  // Front
+                PMT_BACK, // Back
+                PMT_FRONTANDBACK, // FrontAndBack
+                PMT_POINT,  // Point
+                PMT_LINE,  // Line
+                PMT_FILL // Fill
+            };
+            virtual void createState();
+        public:
+            CgPolygonModeGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
 
-		void parsePassStateAssignments( CGpass cgPass, Pass * ogrePass );
-		void parseCgProgram( CGpass cgPass, Pass * ogrePass, const GpuProgramType ogreProgramType );
-		void parseCgProgramParameters( CGpass cgPass, GpuProgramParametersSharedPtr ogreProgramParameters );
-		void parseCgProgramParameter( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
-		void parseTextureUnitState( CGstateassignment cgStateAssignment, TextureUnitState * ogreTextureUnitState );
+        // int3
+        class CgStencilFuncGlobalStateListener : public CgInt3GlobalStateListener
+        {
+        protected:
+            enum StencilFuncType
+            {
+                SFT_NEVER,  // Never
+                SFT_LESS, // Less
+                SFT_LEQUAL,  // LEqual
+                SFT_EQUAL, // Equal
+                SFT_GREATER, // Greater
+                SFT_NOTEQUAL, // NotEqual
+                SFT_GEQUAL,  // GEqual
+                SFT_ALWAYS // Always
+            };
+            virtual void createState();
+        public:
+            CgStencilFuncGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
 
-		void parseFloatCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
-		void parseIntCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
-		bool parseAutoConstantParam( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
-		bool cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo );
-		FXSemanticID cgSemanticStringToType( const char * cgParamSemantic );
+        // int3
+        class CgStencilOpGlobalStateListener : public CgInt3GlobalStateListener
+        {
+        protected:
+            enum StencilOpType
+            {
+                SOT_KEEP,  // Keep
+                SOT_ZERO, // Zero
+                SOT_REPLACE,  // Replace
+                SOT_INCR, // Incr
+                SOT_DECR,  // Decr
+                SOT_INVERT, // Invert
+                SOT_INCRWRAP,  // IncrWrap
+                SOT_DECRWRAP // DecrWrap
+            };
+            virtual void createState();
+        public:
+            CgStencilOpGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
 
-		void buildStateNameStringToTypeMap();
+        // int4
+        class CgStencilFuncSeparateGlobalStateListener : public CgInt4GlobalStateListener
+        {
+        protected:
+            enum StencilFuncSeparateType
+            {
+                SFST_FRONT,  // Front
+                SFST_BACK, // Back
+                SFST_FRONTANDBACK, // FrontAndBack
+                SFST_NEVER,  // Never
+                SFST_LESS, // Less
+                SFST_LEQUAL, // LEqual
+                SFST_EQUAL, // Equal
+                SFST_GREATER,  // Greater
+                SFST_NOTEQUAL, // NotEqual
+                SFST_GEQUAL,  // GEqual
+                SFST_ALWAYS // Always
+            };
+            virtual void createState();
+        public:
+            CgStencilFuncSeparateGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
 
-		const char * getGlobalStateNameTypeToString( const GlobalStateType cgStateName );
-		const char * getSamplerStateNameTypeToString( const SamplerStateType cgStateName );
-		CgGlobalStateListener * createCgGlobalStateListener( const GlobalStateType type );
-		CgSamplerStateListener * createCgSamplerStateListener( const SamplerStateType type );
+        // int2
+        class CgStencilMaskSeparateGlobalStateListener : public CgInt2GlobalStateListener
+        {
+        protected:
+            enum StencilMaskSeparateType
+            {
+                BET_FRONT,  // Front
+                BET_BACK,  // Back
+                BET_FRONTANDBACK // FrontAndBack
+            };
+            virtual void createState();
+        public:
+            CgStencilMaskSeparateGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+
+        // int4
+        class CgStencilOpSeparateGlobalStateListener : public CgInt4GlobalStateListener
+        {
+        protected:
+            enum StencilOpSeparateType
+            {
+                BET_KEEP, // Keep
+                BET_ZERO, // Zero
+                BET_REPLACE, // Replace
+                BET_INCR, // Incr
+                BET_DECR, // Decr
+                BET_INVERT, // Invert
+                BET_INCRWRAP,  // IncrWrap
+                BET_DECRWRAP // DecrWrap
+            };
+            virtual void createState();
+        public:
+            CgStencilOpSeparateGlobalStateListener();
+            virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
+        };  
+
+
+        class CgSamplerStateListener : public CgStateListener
+        {
+        protected:
+            SamplerStateType mSamplerStateType;
+            virtual void createState();
+        public:
+            CgSamplerStateListener( const SamplerStateType samplerStateType, CGtype cgType );
+            virtual ~CgSamplerStateListener();
+
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// Int
+        class CgIntSamplerStateListener : public CgSamplerStateListener
+        {
+        protected:
+            const Vector1i getValue( CGstateassignment cgStateAssignment );
+        public:
+            CgIntSamplerStateListener( const SamplerStateType samplerStateType );
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// Bool
+        class CgBoolSamplerStateListener : public CgSamplerStateListener
+        {
+        public:
+            CgBoolSamplerStateListener( const SamplerStateType samplerStateType );
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// Float
+        class CgFloatSamplerStateListener : public CgSamplerStateListener
+        {
+        public:
+            CgFloatSamplerStateListener( const SamplerStateType samplerStateType );
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// Float4
+        class CgFloat4SamplerStateListener : public CgSamplerStateListener
+        {
+        public:
+            CgFloat4SamplerStateListener( const SamplerStateType samplerStateType );
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// Texture
+        class CgTextureSamplerStateListener : public CgSamplerStateListener
+        {
+        protected:
+            TextureType parseTextureType( CGparameter cgParameter, TextureUnitState * ogreTextureUnitState );
+            void parseTextureName( CGparameter cgParameter, TextureUnitState * ogreTextureUnitState );
+        public:
+            CgTextureSamplerStateListener(const SamplerStateType samplerStateType);
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+
+        };
+
+        // Wrap = TextureAddressingMode
+        class CgWrapSamplerStateListener : public CgIntSamplerStateListener
+        {
+        protected:
+            enum WarpType
+            {
+                WT_REPEAT, // Repeat
+                WT_CLAMP, // Clamp
+                WT_CLAMPTOEDGE, // ClampToEdge
+                WT_CLAMPTOBORDER, // ClampToBorder
+                WT_MIRROREDREPEAT, // MirroredRepeat
+                WT_MIRRORCLAMP, // MirrorClamp
+                WT_MIRRORCLAMPTOEDGE, // MirrorClampToEdge
+                WT_MIRRORCLAMPTOBORDER // MirrorClampToBorder
+            };
+            virtual void createState();
+            TextureUnitState::TextureAddressingMode getOgreTextureAddressingMode( CGstateassignment cgStateAssignment );
+        public:
+            CgWrapSamplerStateListener(const SamplerStateType samplerStateType);
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// CompareMode
+        class CgCompareModeSamplerStateListener : public CgIntSamplerStateListener
+        {
+        protected:
+            enum CompareModeType
+            {
+                CMT_NONE, // None
+                CMT_COMPARERTOTEXTURE // CompareRToTexture
+            };
+            virtual void createState();
+        public:
+            CgCompareModeSamplerStateListener();
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// CompareFunc
+        class CgCompareFuncSamplerStateListener : public CgIntSamplerStateListener
+        {
+        protected:
+            enum CompareFuncType
+            {
+                CFT_NEVER,  // Never
+                CFT_LESS,  // Less
+                CFT_LEQUAL, // LEqual
+                CFT_EQUAL,  // Equal
+                CFT_GREATER, // Greater
+                CFT_NOTEQUAL // NotEqual
+            };
+            virtual void createState();
+        public:
+            CgCompareFuncSamplerStateListener();
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// DepthMode
+        class CgDepthModeSamplerStateListener : public CgIntSamplerStateListener
+        {
+        protected:
+            enum DepthModeType
+            {
+                DMT_ALPHA,   // Alpha
+                DMT_INTENSITY,  // Intensity
+                DMT_LUMINANCE   // Luminance
+            };
+            virtual void createState();
+        public:
+            CgDepthModeSamplerStateListener();
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// MinFilter
+        class CgMinFilterSamplerStateListener : public CgIntSamplerStateListener
+        {
+        protected:
+            enum MinFilterType
+            {
+                MINFT_NEAREST, // Nearest
+                MINFT_LINEAR, // Linear
+                MINFT_LINEARMIPMAPNEAREST, // LinearMipMapNearest
+                MINFT_NEARESTMIPMAPNEAREST, // NearestMipMapNearest
+                MINFT_NEARESTMIPMAPLINEAR, // NearestMipMapLinear
+                MINFT_LINEARMIPMAPLINEAR // LinearMipMapLinear
+            };
+
+            virtual void createState();
+        public:
+            CgMinFilterSamplerStateListener();
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// MagFilter
+        class CgMagFilterSamplerStateListener : public CgIntSamplerStateListener
+        {
+        protected:
+            enum MagFilterType
+            {
+                MAGFT_NEAREST, // Nearest
+                MAGFT_LINEAR // Linear
+
+            };
+
+            virtual void createState();
+        public:
+            CgMagFilterSamplerStateListener();
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// MipFilter
+        class CgMipFilterSamplerStateListener : public CgIntSamplerStateListener
+        {
+        protected:
+            enum MipFilterType
+            {
+                MIPFT_NONE            = 0,    // filtering disabled (valid for mip filter only)
+                MIPFT_POINT           = 1,    // nearest
+                MIPFT_LINEAR          = 2,    // linear interpolation
+                MIPFT_ANISOTROPIC     = 3,    // anisotropic
+                MIPFT_PYRAMIDALQUAD   = 6,    // 4-sample tent
+                MIPFT_GAUSSIANQUAD    = 7     // 4-sample gaussian
+
+            };
+
+            virtual void createState();
+        public:
+            CgMipFilterSamplerStateListener();
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+        /// TextureAddress
+        class CgTextureAddressSamplerStateListener : public CgIntSamplerStateListener
+        {
+        protected:
+            enum TextureAddressType
+            {
+                TAT_WRAP = 1, // Wrap
+                TAT_MIRROR, // Mirror
+                TAT_CLAMP, // Clamp
+                TAT_BORDER, // Border
+                TAT_MIRRORONCE // MirrorOnce
+            };
+
+            virtual void createState();
+        public:
+            CgTextureAddressSamplerStateListener( const SamplerStateType samplerStateType );
+            virtual void upateTextureUnitState( TextureUnitState * ogreTextureUnitState, CGstateassignment cgStateAssignment );
+        };
+
+        typedef map<CGstate, CgGlobalStateListener *>::type CgGlobalStateToListenerMap;
+        typedef map<CGstate, CgSamplerStateListener *>::type CgSamplerStateToListenerMap;
+
+        CgGlobalStateToListenerMap mCgGlobalStateToListenerMap;
+        CgSamplerStateToListenerMap mCgSamplerStateToListenerMap;
+        CgStateListenerVector mCgStateListenerVector;
+        CgStateListenerVector mCgSamplerStateListenerVector;
+
+        StringVector mScriptPatterns; // for getScriptPatterns(void)
+
+        CGcontext mCgContext;
+        CGcontext getCgContext() const;
+
+
+        void parseCgEffect( CGeffect cgEffect, MaterialPtr ogreMaterial );
+        void parseCgEffectTechniques( CGeffect cgEffect, MaterialPtr ogreMaterial );
+        void parseCgTechnique( CGtechnique cgTechnique, Technique * ogreTechnique );
+        void parseCgPass( CGpass cgPass, Pass * ogrePass );
+        void parseSamplerParameters(CGpass cgPass, Pass * ogrePass);
+
+        void parsePassStateAssignments( CGpass cgPass, Pass * ogrePass );
+        void parseCgProgram( CGpass cgPass, Pass * ogrePass, const GpuProgramType ogreProgramType );
+        void parseCgProgramParameters( CGpass cgPass, GpuProgramParametersSharedPtr ogreProgramParameters );
+        void parseCgProgramParameter( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
+        void parseTextureUnitState( CGstateassignment cgStateAssignment, TextureUnitState * ogreTextureUnitState );
+
+        void parseFloatCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
+        void parseIntCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
+        bool parseAutoConstantParam( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
+        bool cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo );
+        FXSemanticID cgSemanticStringToType( const char * cgParamSemantic );
+
+        void buildStateNameStringToTypeMap();
+
+        const char * getGlobalStateNameTypeToString( const GlobalStateType cgStateName );
+        const char * getSamplerStateNameTypeToString( const SamplerStateType cgStateName );
+        CgGlobalStateListener * createCgGlobalStateListener( const GlobalStateType type );
+        CgSamplerStateListener * createCgSamplerStateListener( const SamplerStateType type );
 
     public:
         CgFxScriptLoader();

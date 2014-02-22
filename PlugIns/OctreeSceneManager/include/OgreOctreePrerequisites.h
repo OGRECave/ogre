@@ -46,7 +46,7 @@ THE SOFTWARE.
 #       if defined( __MINGW32__ )
 #           define _OgreOctreePluginExport
 #       else
-#    		define _OgreOctreePluginExport __declspec(dllimport)
+#           define _OgreOctreePluginExport __declspec(dllimport)
 #       endif
 #   endif
 #elif defined ( OGRE_GCC_VISIBILITY )

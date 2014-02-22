@@ -16,16 +16,16 @@ namespace vrmllib {
   * destroyed. */
 class file {
 public:
-	explicit file(std::istream &);
-	~file();
+    explicit file(std::istream &);
+    ~file();
 
-	typedef std::map<std::string, node *> defs_t;
-	typedef std::vector<node *> nodes_t;
-	typedef std::vector<node *> roots_t;
+    typedef std::map<std::string, node *> defs_t;
+    typedef std::vector<node *> nodes_t;
+    typedef std::vector<node *> roots_t;
 
-	defs_t defs;
-	nodes_t nodes;
-	roots_t roots;
+    defs_t defs;
+    nodes_t nodes;
+    roots_t roots;
 };
 
 } // namespace vrmllib

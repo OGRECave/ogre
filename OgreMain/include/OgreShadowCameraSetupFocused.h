@@ -115,7 +115,7 @@ namespace Ogre {
 
             /** Returns the bounding box representation.
             */
-            const AxisAlignedBox& getAAB(void) const;	
+            const AxisAlignedBox& getAAB(void) const;   
 
             /** Adds a specific point to the body list.
             */

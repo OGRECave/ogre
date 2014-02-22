@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-	(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -33,30 +33,30 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	class _OgrePrivate GLXContext: public GL3PlusContext
-	{
-	public:
-		GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable, ::GLXContext context = 0);
-		
-		virtual ~GLXContext();
-		
-		/// @copydoc GL3PlusContext::setCurrent
-		virtual void setCurrent();
-		
-		/// @copydoc GL3PlusContext::endCurrent
-		virtual void endCurrent();
-		
-		/// @copydoc GL3PlusContext::clone
-		GL3PlusContext* clone() const;
-		
-		::GLXDrawable  mDrawable;
-		::GLXContext   mContext;
-		
-	private:
-		::GLXFBConfig  mFBConfig;
-		GLXGLSupport*  mGLSupport;
-		bool mExternalContext;
-	};
+    class _OgrePrivate GLXContext: public GL3PlusContext
+    {
+    public:
+        GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable, ::GLXContext context = 0);
+        
+        virtual ~GLXContext();
+        
+        /// @copydoc GL3PlusContext::setCurrent
+        virtual void setCurrent();
+        
+        /// @copydoc GL3PlusContext::endCurrent
+        virtual void endCurrent();
+        
+        /// @copydoc GL3PlusContext::clone
+        GL3PlusContext* clone() const;
+        
+        ::GLXDrawable  mDrawable;
+        ::GLXContext   mContext;
+        
+    private:
+        ::GLXFBConfig  mFBConfig;
+        GLXGLSupport*  mGLSupport;
+        bool mExternalContext;
+    };
 }
 
 #endif

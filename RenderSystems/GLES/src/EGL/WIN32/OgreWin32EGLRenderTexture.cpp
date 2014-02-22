@@ -46,18 +46,18 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	Win32EGLPBuffer::Win32EGLPBuffer( Win32EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
-		: EGLPBuffer(glsupport, format, width, height)
-	{
-		mGLSupport = glsupport;
-		mGlDisplay = glsupport->getGLDisplay();
-		initEGLPBuffer();
+    Win32EGLPBuffer::Win32EGLPBuffer( Win32EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
+        : EGLPBuffer(glsupport, format, width, height)
+    {
+        mGLSupport = glsupport;
+        mGlDisplay = glsupport->getGLDisplay();
+        initEGLPBuffer();
 
-	}
+    }
 
-	Win32EGLPBuffer::~Win32EGLPBuffer()
-	{
+    Win32EGLPBuffer::~Win32EGLPBuffer()
+    {
 
-	}
+    }
 
 }

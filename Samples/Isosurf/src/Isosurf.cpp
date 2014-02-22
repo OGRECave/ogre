@@ -47,12 +47,12 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
     }
 
     StringVector getRequiredPlugins()
-	{
-		StringVector names;
+    {
+        StringVector names;
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
             names.push_back("Cg Program Manager");
-		return names;
-	}
+        return names;
+    }
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {

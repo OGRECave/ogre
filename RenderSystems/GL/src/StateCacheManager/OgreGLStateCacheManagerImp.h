@@ -98,7 +98,7 @@ namespace Ogre
         GLenum mDepthFunc;
         /// Stores the current stencil mask
         GLuint mStencilMask;
-		/// Stores the last bound texture id
+        /// Stores the last bound texture id
         GLuint mLastBoundTexID;
         /// Stores the currently active texture unit
         size_t mActiveTextureUnit;
@@ -134,7 +134,7 @@ namespace Ogre
         
         /// See GLStateCacheManager.clearCache.
         void clearCache();
-		
+        
         /// See GLStateCacheManager.bindGLBuffer.
         void bindGLBuffer(GLenum target, GLuint buffer, GLenum attach = 0, bool force = false);
         

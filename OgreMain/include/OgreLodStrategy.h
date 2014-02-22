@@ -37,20 +37,20 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
-	/** Strategy for determining level of detail.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
+    /** Strategy for determining level of detail.
     @remarks
         Generally, to create a new LOD strategy, all of the following will
         need to be implemented: getValueImpl, getBaseValue, transformBias,
         getIndex, sort, and isSorted.
         In addition, transformUserValue may be overridden.
     */
-	class _OgreExport LodStrategy : public LodAlloc
+    class _OgreExport LodStrategy : public LodAlloc
     {
     protected:
         /** Name of this strategy. */
@@ -124,8 +124,8 @@ namespace Ogre {
         static ushort getIndexDescending(Real value, const Material::LodValueList& materialLodValueList);
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

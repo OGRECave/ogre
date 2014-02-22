@@ -35,14 +35,14 @@ namespace Ogre {
 CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mParent(parent),
     mType(PT_RENDERQUAD),
-	mIdentifier(0),
-	mFirstRenderQueue(RENDER_QUEUE_BACKGROUND),
-	mLastRenderQueue(RENDER_QUEUE_SKIES_LATE),
-	mMaterialScheme(BLANKSTRING),
+    mIdentifier(0),
+    mFirstRenderQueue(RENDER_QUEUE_BACKGROUND),
+    mLastRenderQueue(RENDER_QUEUE_SKIES_LATE),
+    mMaterialScheme(BLANKSTRING),
     mClearBuffers(FBT_COLOUR|FBT_DEPTH),
     mClearColour(0.0,0.0,0.0,0.0),
-	mClearDepth(1.0f),
-	mClearStencil(0),
+    mClearDepth(1.0f),
+    mClearStencil(0),
     mStencilCheck(false),
     mStencilFunc(CMPF_ALWAYS_PASS),
     mStencilRefValue(0),
@@ -51,14 +51,14 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mStencilDepthFailOp(SOP_KEEP),
     mStencilPassOp(SOP_KEEP),
     mStencilTwoSidedOperation(false),
-	mStencilReadBackAsTexture(false),
+    mStencilReadBackAsTexture(false),
     mQuadCornerModified(false),
     mQuadLeft(-1),
     mQuadTop(1),
     mQuadRight(1),
     mQuadBottom(-1),
-	mQuadFarCorners(false),
-	mQuadFarCornersViewSpace(false)
+    mQuadFarCorners(false),
+    mQuadFarCornersViewSpace(false)
 {
 }
 //-----------------------------------------------------------------------
@@ -159,122 +159,122 @@ CompositionTargetPass *CompositionPass::getParent()
 //-----------------------------------------------------------------------
 void CompositionPass::setFirstRenderQueue(uint8 id)
 {
-	mFirstRenderQueue = id;
+    mFirstRenderQueue = id;
 }
 //-----------------------------------------------------------------------
 uint8 CompositionPass::getFirstRenderQueue() const
 {
-	return mFirstRenderQueue;
+    return mFirstRenderQueue;
 }
 //-----------------------------------------------------------------------
 void CompositionPass::setLastRenderQueue(uint8 id)
 {
-	mLastRenderQueue = id;
+    mLastRenderQueue = id;
 }
 //-----------------------------------------------------------------------
 void CompositionPass::setMaterialScheme(const String& schemeName)
 {
-	mMaterialScheme = schemeName;
+    mMaterialScheme = schemeName;
 }
 //-----------------------------------------------------------------------
 const String& CompositionPass::getMaterialScheme(void) const
 {
-	return mMaterialScheme;
+    return mMaterialScheme;
 }
 //-----------------------------------------------------------------------
 uint8 CompositionPass::getLastRenderQueue() const
 {
-	return mLastRenderQueue;
+    return mLastRenderQueue;
 }
 //-----------------------------------------------------------------------
 void CompositionPass::setClearDepth(Real depth)
 {
-	mClearDepth = depth;
+    mClearDepth = depth;
 }
 Real CompositionPass::getClearDepth() const
 {
-	return mClearDepth;
+    return mClearDepth;
 }
 void CompositionPass::setClearStencil(uint32 value)
 {
-	mClearStencil = value;
+    mClearStencil = value;
 }
 uint32 CompositionPass::getClearStencil() const
 {
-	return mClearStencil;
+    return mClearStencil;
 }
 
 void CompositionPass::setStencilCheck(bool value)
 {
-	mStencilCheck = value;
+    mStencilCheck = value;
 }
 bool CompositionPass::getStencilCheck() const
 {
-	return mStencilCheck;
+    return mStencilCheck;
 }
 void CompositionPass::setStencilFunc(CompareFunction value)
 {
-	mStencilFunc = value;
+    mStencilFunc = value;
 }
 CompareFunction CompositionPass::getStencilFunc() const
 {
-	return mStencilFunc;
+    return mStencilFunc;
 } 
 void CompositionPass::setStencilRefValue(uint32 value)
 {
-	mStencilRefValue = value;
+    mStencilRefValue = value;
 }
 uint32 CompositionPass::getStencilRefValue() const
 {
-	return mStencilRefValue;
+    return mStencilRefValue;
 }
 void CompositionPass::setStencilMask(uint32 value)
 {
-	mStencilMask = value;
+    mStencilMask = value;
 }
 uint32 CompositionPass::getStencilMask() const
 {
-	return mStencilMask;
+    return mStencilMask;
 }
 void CompositionPass::setStencilFailOp(StencilOperation value)
 {
-	mStencilFailOp = value;
+    mStencilFailOp = value;
 }
 StencilOperation CompositionPass::getStencilFailOp() const
 {
-	return mStencilFailOp;
+    return mStencilFailOp;
 }
 void CompositionPass::setStencilDepthFailOp(StencilOperation value)
 {
-	mStencilDepthFailOp = value;
+    mStencilDepthFailOp = value;
 }
 StencilOperation CompositionPass::getStencilDepthFailOp() const
 {
-	return mStencilDepthFailOp;
+    return mStencilDepthFailOp;
 }
 void CompositionPass::setStencilPassOp(StencilOperation value)
 {
-	mStencilPassOp = value;
+    mStencilPassOp = value;
 }
 StencilOperation CompositionPass::getStencilPassOp() const
 {
-	return mStencilPassOp;
+    return mStencilPassOp;
 }
 void CompositionPass::setStencilTwoSidedOperation(bool value)
 {
-	mStencilTwoSidedOperation = value;
+    mStencilTwoSidedOperation = value;
 }
 bool CompositionPass::getStencilTwoSidedOperation() const
 {
-	return mStencilTwoSidedOperation;
+    return mStencilTwoSidedOperation;
 }
 void CompositionPass::setStencilReadBackAsTextureOperation(bool value)
 {
-	mStencilReadBackAsTexture = value;
+    mStencilReadBackAsTexture = value;
 }
 bool CompositionPass::getStencilReadBackAsTextureOperation() const
 {
-	return mStencilReadBackAsTexture;
+    return mStencilReadBackAsTexture;
 }
 
 void CompositionPass::setQuadCorners(Real left,Real top,Real right,Real bottom)
@@ -295,26 +295,26 @@ bool CompositionPass::getQuadCorners(Real & left,Real & top,Real & right,Real & 
 }
 void CompositionPass::setQuadFarCorners(bool farCorners, bool farCornersViewSpace)
 {
-	mQuadFarCorners = farCorners;
-	mQuadFarCornersViewSpace = farCornersViewSpace;
+    mQuadFarCorners = farCorners;
+    mQuadFarCornersViewSpace = farCornersViewSpace;
 }
 bool CompositionPass::getQuadFarCorners() const
 {
-	return mQuadFarCorners;
+    return mQuadFarCorners;
 }
 bool CompositionPass::getQuadFarCornersViewSpace() const
 {
-	return mQuadFarCornersViewSpace;
+    return mQuadFarCornersViewSpace;
 }
-		
+        
 void CompositionPass::setCustomType(const String& customType)
 {
-	mCustomType = customType;
+    mCustomType = customType;
 }
 
 const String& CompositionPass::getCustomType() const
 {
-	return mCustomType;
+    return mCustomType;
 }
 //-----------------------------------------------------------------------
 bool CompositionPass::_isSupported(void)

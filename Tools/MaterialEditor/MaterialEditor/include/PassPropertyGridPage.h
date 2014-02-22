@@ -36,76 +36,76 @@ class PassController;
 class PassPropertyGridPage : public wxPropertyGridPage
 {
 public:
-	PassPropertyGridPage(PassController* controller);
-	virtual ~PassPropertyGridPage();
+    PassPropertyGridPage(PassController* controller);
+    virtual ~PassPropertyGridPage();
 
-	virtual void populate();
+    virtual void populate();
 
 protected:
-	virtual void createGeneralCategory();
-	virtual void createReflectanceCategory();
-	virtual void createPointCategory();
-	virtual void createSceneBlendingCategory();
-	virtual void createDepthCategory();
-	virtual void createCullingCategory();
-	virtual void createIlluminationCategory();
-	virtual void createFogCategory();
-	virtual void createAlphaRejectionCategory();
-	virtual void createMiscCategory();
+    virtual void createGeneralCategory();
+    virtual void createReflectanceCategory();
+    virtual void createPointCategory();
+    virtual void createSceneBlendingCategory();
+    virtual void createDepthCategory();
+    virtual void createCullingCategory();
+    virtual void createIlluminationCategory();
+    virtual void createFogCategory();
+    virtual void createAlphaRejectionCategory();
+    virtual void createMiscCategory();
 
-	virtual void propertyChanged(wxPropertyGridEvent& event);
-	
-	PassController* mController;
+    virtual void propertyChanged(wxPropertyGridEvent& event);
+    
+    PassController* mController;
 
-	wxPGId mNameId;
+    wxPGId mNameId;
 
-	wxPGId mAmbientId;
-	wxPGId mDiffuseId;
-	wxPGId mSpecularId;
-	wxPGId mShininessId;
+    wxPGId mAmbientId;
+    wxPGId mDiffuseId;
+    wxPGId mSpecularId;
+    wxPGId mShininessId;
 
-	wxPGId mPointSizeId;
-	wxPGId mPointSpritesId;
-	wxPGId mAttenuationId;
-	wxPGId mPointAttenuationId;
-	wxPGId mPointMinSizeId;
-	wxPGId mPointMaxSizeId;
-	wxPGId mPointAttenuationConstantId;
-	wxPGId mPointAttenuationLinearId;
-	wxPGId mPointAttenuationQuadraticId;
+    wxPGId mPointSizeId;
+    wxPGId mPointSpritesId;
+    wxPGId mAttenuationId;
+    wxPGId mPointAttenuationId;
+    wxPGId mPointMinSizeId;
+    wxPGId mPointMaxSizeId;
+    wxPGId mPointAttenuationConstantId;
+    wxPGId mPointAttenuationLinearId;
+    wxPGId mPointAttenuationQuadraticId;
 
-	wxPGId mSceneBlendTypeId;
-	wxPGId mSrcSceneBlendTypeId;
-	wxPGId mDestSceneBlendTypeId;
+    wxPGId mSceneBlendTypeId;
+    wxPGId mSrcSceneBlendTypeId;
+    wxPGId mDestSceneBlendTypeId;
 
-	wxPGId mDepthCheckId;
-	wxPGId mDepthWriteId;
-	wxPGId mDepthFunctionId;
-	wxPGId mDepthBiasId;
-	wxPGId mDepthBiasConstantId;
-	wxPGId mDepthBiasSlopeId;
+    wxPGId mDepthCheckId;
+    wxPGId mDepthWriteId;
+    wxPGId mDepthFunctionId;
+    wxPGId mDepthBiasId;
+    wxPGId mDepthBiasConstantId;
+    wxPGId mDepthBiasSlopeId;
 
-	wxPGId mManualCullingModeId;
+    wxPGId mManualCullingModeId;
 
-	wxPGId mLightingId;
-	wxPGId mMaxLightsId;
-	wxPGId mStartLightId;
-	wxPGId mIterationId;
-	wxPGId mShadingModeId;
-	wxPGId mSelfIlluminationId;
+    wxPGId mLightingId;
+    wxPGId mMaxLightsId;
+    wxPGId mStartLightId;
+    wxPGId mIterationId;
+    wxPGId mShadingModeId;
+    wxPGId mSelfIlluminationId;
 
-	wxPGId mOverrideSceneId;
-	wxPGId mFogOverrideId;
-	wxPGId mFogModeId;
+    wxPGId mOverrideSceneId;
+    wxPGId mFogOverrideId;
+    wxPGId mFogModeId;
 
-	wxPGId mAlphaRejectFuncId;
-	wxPGId mAlphaRejectValueId;
+    wxPGId mAlphaRejectFuncId;
+    wxPGId mAlphaRejectValueId;
 
-	wxPGId mColourWriteId;
-	wxPGId mPolygonModeId;
-	wxPGId mTrackVertexColourTypeId;
+    wxPGId mColourWriteId;
+    wxPGId mPolygonModeId;
+    wxPGId mTrackVertexColourTypeId;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif // _PASSPROPERTYGRIDPAGE_H_

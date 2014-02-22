@@ -44,53 +44,53 @@ THE SOFTWARE.
 #include <climits>
 
 namespace Ogre {
-	NaClWindow::NaClWindow(NaClGLSupport *glsupport)
-		: mGLSupport(glsupport), mClosed(false), mContext(0), mInstance(0), mSwapCallback(0)
-	{
-	}
+    NaClWindow::NaClWindow(NaClGLSupport *glsupport)
+        : mGLSupport(glsupport), mClosed(false), mContext(0), mInstance(0), mSwapCallback(0)
+    {
+    }
 
-	NaClWindow::~NaClWindow()
-	{
-		if(mContext)
-			delete mContext;
-	}
+    NaClWindow::~NaClWindow()
+    {
+        if(mContext)
+            delete mContext;
+    }
 
-	void NaClWindow::getCustomAttribute( const String& name, void* pData )
-	{
-		if(name == "pp::Instance")
-		{
-			*static_cast<pp::Instance**>(pData) = mInstance;
+    void NaClWindow::getCustomAttribute( const String& name, void* pData )
+    {
+        if(name == "pp::Instance")
+        {
+            *static_cast<pp::Instance**>(pData) = mInstance;
             return;
-		}
+        }
         else if(name == "GLCONTEXT")
         {
             *static_cast<GLES2Context **>(pData) = mContext;
             return;
         }
-	}
+    }
 
-	void NaClWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
-	{
+    void NaClWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
+    {
         // todo
-	}
+    }
 
-	void NaClWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
-	{
-		LogManager::getSingleton().logMessage("\tinitNativeCreatedWindow called");
+    void NaClWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
+    {
+        LogManager::getSingleton().logMessage("\tinitNativeCreatedWindow called");
 
-		if (miscParams)
-		{
-			NameValuePairList::const_iterator opt;
-			NameValuePairList::const_iterator end = miscParams->end();
+        if (miscParams)
+        {
+            NameValuePairList::const_iterator opt;
+            NameValuePairList::const_iterator end = miscParams->end();
 
             mInstance = NULL;
-			opt = miscParams->find("pp::Instance");
-			if(opt != end)
-			{
+            opt = miscParams->find("pp::Instance");
+            if(opt != end)
+            {
                 LogManager::getSingleton().logMessage("\tgetting pp::Instance - if stopped here - it means the parameter is null!");
-				mInstance = (pp::Instance*)(Ogre::StringConverter::parseUnsignedLong(opt->second));
+                mInstance = (pp::Instance*)(Ogre::StringConverter::parseUnsignedLong(opt->second));
                 LogManager::getSingleton().logMessage("\tgot the pp::Instance.");
-			}
+            }
             opt = miscParams->find("SwapCallback");
             if(opt != end)
             {
@@ -98,83 +98,83 @@ namespace Ogre {
                 mSwapCallback = (pp::CompletionCallback*)(Ogre::StringConverter::parseUnsignedLong(opt->second));
                 LogManager::getSingleton().logMessage("\tgot the SwapCallback.");
             }
-			
-			if(mInstance != NULL)
-			{                
-				mContext = new NaClGLContext(this, mGLSupport, mInstance, mSwapCallback);
-			}
-			else
-			{
-				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-					"pp::Instance parameter required for NaCl windows.",
-					"NaClWindow::initNativeCreatedWindow" );
-			}
-		}
+            
+            if(mInstance != NULL)
+            {                
+                mContext = new NaClGLContext(this, mGLSupport, mInstance, mSwapCallback);
+            }
+            else
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                    "pp::Instance parameter required for NaCl windows.",
+                    "NaClWindow::initNativeCreatedWindow" );
+            }
+        }
         LogManager::getSingleton().logMessage("\tinitNativeCreatedWindow ended");
-	}
+    }
 
-	void NaClWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
-	{
-		LogManager::getSingleton().logMessage("\tcreateNativeWindow called");
-	}
+    void NaClWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
+    {
+        LogManager::getSingleton().logMessage("\tcreateNativeWindow called");
+    }
 
-	void NaClWindow::reposition( int left, int top )
-	{
-		LogManager::getSingleton().logMessage("\treposition called");
-	}
+    void NaClWindow::reposition( int left, int top )
+    {
+        LogManager::getSingleton().logMessage("\treposition called");
+    }
 
-	void NaClWindow::resize(uint width, uint height)
-	{
-		LogManager::getSingleton().logMessage("\tresize called");
+    void NaClWindow::resize(uint width, uint height)
+    {
+        LogManager::getSingleton().logMessage("\tresize called");
 
         mWidth  = width;
         mHeight  = height;
 
         mContext->resize();
-	}
+    }
 
-	void NaClWindow::windowMovedOrResized()
-	{
-		LogManager::getSingleton().logMessage("\twindowMovedOrResized called");
-	}
-	
-	void NaClWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
-	{
-	
-	}
-		
-	bool NaClWindow::requiresTextureFlipping() const
-	{
-		return false;
-	}
-		
-	void NaClWindow::destroy(void)
-	{
-		LogManager::getSingleton().logMessage("\tdestroy called");
-	}
-		
-	bool NaClWindow::isClosed(void) const
-	{
-		return mClosed;
-	}
+    void NaClWindow::windowMovedOrResized()
+    {
+        LogManager::getSingleton().logMessage("\twindowMovedOrResized called");
+    }
+    
+    void NaClWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    {
+    
+    }
+        
+    bool NaClWindow::requiresTextureFlipping() const
+    {
+        return false;
+    }
+        
+    void NaClWindow::destroy(void)
+    {
+        LogManager::getSingleton().logMessage("\tdestroy called");
+    }
+        
+    bool NaClWindow::isClosed(void) const
+    {
+        return mClosed;
+    }
 
     void NaClWindow::create(const String& name, uint width, uint height,
                            bool fullScreen, const NameValuePairList *miscParams)
     {
         LogManager::getSingleton().logMessage("\tcreate called");
-		
-		initNativeCreatedWindow(miscParams);
-		
-		mName = name;
+        
+        initNativeCreatedWindow(miscParams);
+        
+        mName = name;
         mWidth = width;
         mHeight = height;
         mLeft = 0;
         mTop = 0;
         mActive = true;
-		//mVisible = true;
+        //mVisible = true;
 
         mClosed = false;
-	}
+    }
 
     void NaClWindow::swapBuffers()
     {

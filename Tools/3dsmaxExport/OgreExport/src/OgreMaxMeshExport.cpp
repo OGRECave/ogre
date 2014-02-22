@@ -29,16 +29,16 @@ THE SOFTWARE.
 
 namespace OgreMax
 {
-	MeshExporter::MeshExporter(const Config& config) : OgreMaxExporter(config)
-	{
-	}
+    MeshExporter::MeshExporter(const Config& config) : OgreMaxExporter(config)
+    {
+    }
 
-	MeshExporter::~MeshExporter()
-	{
-	}
+    MeshExporter::~MeshExporter()
+    {
+    }
 
-	Ogre::MeshPtr MeshExporter::buildMesh(NodeList nodeList)
-	{
-		return m_pMesh;
-	}
+    Ogre::MeshPtr MeshExporter::buildMesh(NodeList nodeList)
+    {
+        return m_pMesh;
+    }
 }

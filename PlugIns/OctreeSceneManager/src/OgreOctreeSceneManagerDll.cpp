@@ -47,8 +47,8 @@ extern "C" void _OgreOctreePluginExport dllStartPlugin( void )
 }
 extern "C" void _OgreOctreePluginExport dllStopPlugin( void )
 {
-	Root::getSingleton().uninstallPlugin(octreePlugin);
-	OGRE_DELETE octreePlugin;
+    Root::getSingleton().uninstallPlugin(octreePlugin);
+    OGRE_DELETE octreePlugin;
 }
 }
 

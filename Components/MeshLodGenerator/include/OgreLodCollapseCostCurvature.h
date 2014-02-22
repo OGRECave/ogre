@@ -38,10 +38,10 @@ namespace Ogre
 {
 
 class _OgreLodExport LodCollapseCostCurvature :
-	public LodCollapseCost
+    public LodCollapseCost
 {
 public:
-	virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge);
+    virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge);
 };
 
 }

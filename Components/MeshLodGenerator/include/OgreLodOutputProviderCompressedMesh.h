@@ -38,46 +38,46 @@ namespace Ogre
 {
 
 class _OgreLodExport LodOutputProviderCompressedMesh :
-	public LodOutputProvider
+    public LodOutputProvider
 {
 public:
-	LodOutputProviderCompressedMesh(MeshPtr mesh);
-	~LodOutputProviderCompressedMesh();
-	virtual void prepare(LodData* data);
-	virtual void finalize(LodData* data);
-	virtual void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex);
-	virtual void bakeLodLevel(LodData* data, int lodIndex);
-	virtual void inject();
+    LodOutputProviderCompressedMesh(MeshPtr mesh);
+    ~LodOutputProviderCompressedMesh();
+    virtual void prepare(LodData* data);
+    virtual void finalize(LodData* data);
+    virtual void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex);
+    virtual void bakeLodLevel(LodData* data, int lodIndex);
+    virtual void inject();
 
-	virtual void triangleRemoved(LodData* data, LodData::Triangle* tri);
-	virtual void triangleChanged(LodData* data, LodData::Triangle* tri);
+    virtual void triangleRemoved(LodData* data, LodData::Triangle* tri);
+    virtual void triangleChanged(LodData* data, LodData::Triangle* tri);
 
 protected:
 
-	LodOutputProviderCompressedMesh();
+    LodOutputProviderCompressedMesh();
 
-	struct TriangleCache {
-		unsigned int vertexID[3];
-		bool vertexChanged;
-	};
+    struct TriangleCache {
+        unsigned int vertexID[3];
+        bool vertexChanged;
+    };
 
-	typedef vector<TriangleCache>::type TriangleCacheList;
+    typedef vector<TriangleCache>::type TriangleCacheList;
 
-	/// First pass will create the mTriangleCacheList and second pass will use it.
-	/// This is required, because the triangles from first pass will be changed and we need to keep the information.
-	TriangleCacheList mTriangleCacheList;	
+    /// First pass will create the mTriangleCacheList and second pass will use it.
+    /// This is required, because the triangles from first pass will be changed and we need to keep the information.
+    TriangleCacheList mTriangleCacheList;   
 
-	/// Lod index of the buffer for mTriangleCacheList.
-	bool mFirstBufferPass;
+    /// Lod index of the buffer for mTriangleCacheList.
+    bool mFirstBufferPass;
 
-	/// if uneven lod levels are created, we need to fall back for the last lod level.
-	LodOutputProvider* fallback;
-	MeshPtr mMesh;
+    /// if uneven lod levels are created, we need to fall back for the last lod level.
+    LodOutputProvider* fallback;
+    MeshPtr mMesh;
 
-	int mLastIndexBufferID;
+    int mLastIndexBufferID;
 
-	virtual void bakeFirstPass(LodData* data, int lodIndex);
-	virtual void bakeSecondPass(LodData* data, int lodIndex);
+    virtual void bakeFirstPass(LodData* data, int lodIndex);
+    virtual void bakeSecondPass(LodData* data, int lodIndex);
 };
 
 }

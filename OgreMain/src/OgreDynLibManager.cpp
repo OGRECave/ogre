@@ -39,43 +39,43 @@ namespace Ogre
     {
         return msSingleton;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     DynLibManager& DynLibManager::getSingleton(void)
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
-	DynLibManager::DynLibManager()
-	{
-	}
-	//-----------------------------------------------------------------------
+    DynLibManager::DynLibManager()
+    {
+    }
+    //-----------------------------------------------------------------------
     DynLib* DynLibManager::load( const String& filename)
     {
-		DynLibList::iterator i = mLibList.find(filename);
-		if (i != mLibList.end())
-		{
-			return i->second;
-		}
-		else
-		{
-	        DynLib* pLib = OGRE_NEW DynLib(filename);
-			pLib->load();        
-        	mLibList[filename] = pLib;
-	        return pLib;
-		}
+        DynLibList::iterator i = mLibList.find(filename);
+        if (i != mLibList.end())
+        {
+            return i->second;
+        }
+        else
+        {
+            DynLib* pLib = OGRE_NEW DynLib(filename);
+            pLib->load();        
+            mLibList[filename] = pLib;
+            return pLib;
+        }
     }
-	//-----------------------------------------------------------------------
-	void DynLibManager::unload(DynLib* lib)
-	{
-		DynLibList::iterator i = mLibList.find(lib->getName());
-		if (i != mLibList.end())
-		{
-			mLibList.erase(i);
-		}
-		lib->unload();
-		OGRE_DELETE lib;
-	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    void DynLibManager::unload(DynLib* lib)
+    {
+        DynLibList::iterator i = mLibList.find(lib->getName());
+        if (i != mLibList.end())
+        {
+            mLibList.erase(i);
+        }
+        lib->unload();
+        OGRE_DELETE lib;
+    }
+    //-----------------------------------------------------------------------
     DynLibManager::~DynLibManager()
     {
         // Unload & delete resources in turn

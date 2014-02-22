@@ -33,33 +33,33 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	// forward decls
-	class LodCollapseCost;
-	class LodCollapseCostCurvature;
-	class LodCollapseCostOutside;
-	class LodCollapseCostProfiler;
+    // forward decls
+    class LodCollapseCost;
+    class LodCollapseCostCurvature;
+    class LodCollapseCostOutside;
+    class LodCollapseCostProfiler;
 
-	class LodInputProvider;
-	class LodInputProviderMesh;
-	class LodInputProviderBuffer;
-	class LodOutputProvider;
-	class LodOutputProviderMesh;
-	class LodOutputProviderCompressedMesh;
-	class LodOutputProviderBuffer;
-	class LodOutputProviderCompressedBuffer;
-	class LodOutsideMarker;
+    class LodInputProvider;
+    class LodInputProviderMesh;
+    class LodInputProviderBuffer;
+    class LodOutputProvider;
+    class LodOutputProviderMesh;
+    class LodOutputProviderCompressedMesh;
+    class LodOutputProviderBuffer;
+    class LodOutputProviderCompressedBuffer;
+    class LodOutsideMarker;
 
 
-	class LodCollapser;
-	struct LodConfig;
-	struct LodLevel;
-	class LodConfigSerializer;
-	class MeshLodGenerator;
-	class LodWorkQueueWorker;
-	class LodWorkQueueInjector;
-	struct LodWorkQueueRequest;
-	class LodWorkQueueInjectorListener;
-	struct LodData;
+    class LodCollapser;
+    struct LodConfig;
+    struct LodLevel;
+    class LodConfigSerializer;
+    class MeshLodGenerator;
+    class LodWorkQueueWorker;
+    class LodWorkQueueInjector;
+    struct LodWorkQueueRequest;
+    class LodWorkQueueInjectorListener;
+    struct LodData;
 
     typedef SharedPtr<LodCollapseCost> LodCollapseCostPtr;
     typedef SharedPtr<LodCollapser> LodCollapserPtr;
@@ -67,27 +67,27 @@ namespace Ogre
     typedef SharedPtr<LodInputProvider> LodInputProviderPtr;
     typedef SharedPtr<LodOutputProvider> LodOutputProviderPtr;
 
-	typedef GeneralAllocatedObject MeshLodAlloc;
+    typedef GeneralAllocatedObject MeshLodAlloc;
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#	if defined( OGRE_STATIC_LIB )
-#   	define _OgreLodExport
+#   if defined( OGRE_STATIC_LIB )
+#       define _OgreLodExport
 #   else
-#   	if defined( OGRE_MESHLODGENERATOR_EXPORTS )
-#       	define _OgreLodExport __declspec( dllexport )
-#   	else
+#       if defined( OGRE_MESHLODGENERATOR_EXPORTS )
+#           define _OgreLodExport __declspec( dllexport )
+#       else
 #           if defined( __MINGW32__ )
 #               define _OgreLodExport
 #           else
-#       	    define _OgreLodExport __declspec( dllimport )
+#               define _OgreLodExport __declspec( dllimport )
 #           endif
-#   	endif
-#	endif
+#       endif
+#   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
 #   define _OgreLodExport __attribute__ ((visibility("default")))
 #else
-#	define _OgreLodExport
+#   define _OgreLodExport
 #endif 
 
 #endif 

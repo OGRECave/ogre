@@ -36,63 +36,63 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-	VertexData::VertexData(HardwareBufferManagerBase* mgr)
-	{
-		mMgr = mgr ? mgr : HardwareBufferManager::getSingletonPtr();
-		vertexBufferBinding = mMgr->createVertexBufferBinding();
-		vertexDeclaration = mMgr->createVertexDeclaration();
-		mDeleteDclBinding = true;
-		vertexCount = 0;
-		vertexStart = 0;
-		hwAnimDataItemsUsed = 0;
+    VertexData::VertexData(HardwareBufferManagerBase* mgr)
+    {
+        mMgr = mgr ? mgr : HardwareBufferManager::getSingletonPtr();
+        vertexBufferBinding = mMgr->createVertexBufferBinding();
+        vertexDeclaration = mMgr->createVertexDeclaration();
+        mDeleteDclBinding = true;
+        vertexCount = 0;
+        vertexStart = 0;
+        hwAnimDataItemsUsed = 0;
 
-	}
-	//---------------------------------------------------------------------
-	VertexData::VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind)
-	{
-		// this is a fallback rather than actively used
-		mMgr = HardwareBufferManager::getSingletonPtr();
-		vertexDeclaration = dcl;
-		vertexBufferBinding = bind;
-		mDeleteDclBinding = false;
-		vertexCount = 0;
-		vertexStart = 0;
-		hwAnimDataItemsUsed = 0;
-	}
+    }
+    //---------------------------------------------------------------------
+    VertexData::VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind)
+    {
+        // this is a fallback rather than actively used
+        mMgr = HardwareBufferManager::getSingletonPtr();
+        vertexDeclaration = dcl;
+        vertexBufferBinding = bind;
+        mDeleteDclBinding = false;
+        vertexCount = 0;
+        vertexStart = 0;
+        hwAnimDataItemsUsed = 0;
+    }
     //-----------------------------------------------------------------------
-	VertexData::~VertexData()
-	{
-		if (mDeleteDclBinding)
-		{
-			mMgr->destroyVertexBufferBinding(vertexBufferBinding);
-			mMgr->destroyVertexDeclaration(vertexDeclaration);
-		}
-	}
+    VertexData::~VertexData()
+    {
+        if (mDeleteDclBinding)
+        {
+            mMgr->destroyVertexBufferBinding(vertexBufferBinding);
+            mMgr->destroyVertexDeclaration(vertexDeclaration);
+        }
+    }
     //-----------------------------------------------------------------------
-	VertexData* VertexData::clone(bool copyData, HardwareBufferManagerBase* mgr) const
-	{
-		HardwareBufferManagerBase* pManager = mgr ? mgr : mMgr;
+    VertexData* VertexData::clone(bool copyData, HardwareBufferManagerBase* mgr) const
+    {
+        HardwareBufferManagerBase* pManager = mgr ? mgr : mMgr;
 
-		VertexData* dest = OGRE_NEW VertexData(mgr);
+        VertexData* dest = OGRE_NEW VertexData(mgr);
 
-		// Copy vertex buffers in turn
-		const VertexBufferBinding::VertexBufferBindingMap& bindings = 
-			this->vertexBufferBinding->getBindings();
-		VertexBufferBinding::VertexBufferBindingMap::const_iterator vbi, vbend;
-		vbend = bindings.end();
-		for (vbi = bindings.begin(); vbi != vbend; ++vbi)
-		{
-			HardwareVertexBufferSharedPtr srcbuf = vbi->second;
+        // Copy vertex buffers in turn
+        const VertexBufferBinding::VertexBufferBindingMap& bindings = 
+            this->vertexBufferBinding->getBindings();
+        VertexBufferBinding::VertexBufferBindingMap::const_iterator vbi, vbend;
+        vbend = bindings.end();
+        for (vbi = bindings.begin(); vbi != vbend; ++vbi)
+        {
+            HardwareVertexBufferSharedPtr srcbuf = vbi->second;
             HardwareVertexBufferSharedPtr dstBuf;
             if (copyData)
             {
-			    // create new buffer with the same settings
-			    dstBuf = pManager->createVertexBuffer(
-					    srcbuf->getVertexSize(), srcbuf->getNumVertices(), srcbuf->getUsage(),
-					    srcbuf->hasShadowBuffer());
+                // create new buffer with the same settings
+                dstBuf = pManager->createVertexBuffer(
+                        srcbuf->getVertexSize(), srcbuf->getNumVertices(), srcbuf->getUsage(),
+                        srcbuf->hasShadowBuffer());
 
-			    // copy data
-			    dstBuf->copyData(*srcbuf, 0, 0, srcbuf->getSizeInBytes(), true);
+                // copy data
+                dstBuf->copyData(*srcbuf, 0, 0, srcbuf->getSizeInBytes(), true);
             }
             else
             {
@@ -100,13 +100,13 @@ namespace Ogre {
                 dstBuf = srcbuf;
             }
 
-			// Copy binding
-			dest->vertexBufferBinding->setBinding(vbi->first, dstBuf);
+            // Copy binding
+            dest->vertexBufferBinding->setBinding(vbi->first, dstBuf);
         }
 
         // Basic vertex info
         dest->vertexStart = this->vertexStart;
-		dest->vertexCount = this->vertexCount;
+        dest->vertexCount = this->vertexCount;
         // Copy elements
         const VertexDeclaration::VertexElementList elems = 
             this->vertexDeclaration->getElements();
@@ -122,16 +122,16 @@ namespace Ogre {
                 ei->getIndex() );
         }
 
-		// Copy reference to hardware shadow buffer, no matter whether copy data or not
+        // Copy reference to hardware shadow buffer, no matter whether copy data or not
         dest->hardwareShadowVolWBuffer = hardwareShadowVolWBuffer;
 
-		// copy anim data
-		dest->hwAnimationDataList = hwAnimationDataList;
-		dest->hwAnimDataItemsUsed = hwAnimDataItemsUsed;
+        // copy anim data
+        dest->hwAnimationDataList = hwAnimationDataList;
+        dest->hwAnimDataItemsUsed = hwAnimDataItemsUsed;
 
         
         return dest;
-	}
+    }
     //-----------------------------------------------------------------------
     void VertexData::prepareForShadowVolume(void)
     {
@@ -326,21 +326,21 @@ namespace Ogre {
 
         }
     }
-	//-----------------------------------------------------------------------
-	void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration, 
-		const BufferUsageList& bufferUsages, HardwareBufferManagerBase* mgr)
-	{
-		HardwareBufferManagerBase* pManager = mgr ? mgr : mMgr;
+    //-----------------------------------------------------------------------
+    void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration, 
+        const BufferUsageList& bufferUsages, HardwareBufferManagerBase* mgr)
+    {
+        HardwareBufferManagerBase* pManager = mgr ? mgr : mMgr;
         // Firstly, close up any gaps in the buffer sources which might have arisen
         newDeclaration->closeGapsInSource();
 
-		// Build up a list of both old and new elements in each buffer
-		unsigned short buf = 0;
-		vector<void*>::type oldBufferLocks;
+        // Build up a list of both old and new elements in each buffer
+        unsigned short buf = 0;
+        vector<void*>::type oldBufferLocks;
         vector<size_t>::type oldBufferVertexSizes;
-		vector<void*>::type newBufferLocks;
+        vector<void*>::type newBufferLocks;
         vector<size_t>::type newBufferVertexSizes;
-		VertexBufferBinding* newBinding = pManager->createVertexBufferBinding();
+        VertexBufferBinding* newBinding = pManager->createVertexBufferBinding();
         const VertexBufferBinding::VertexBufferBindingMap& oldBindingMap = vertexBufferBinding->getBindings();
         VertexBufferBinding::VertexBufferBindingMap::const_iterator itBinding;
 
@@ -351,7 +351,7 @@ namespace Ogre {
             oldBufferLocks.resize(count);
             oldBufferVertexSizes.resize(count);
         }
-		// Lock all the old buffers for reading
+        // Lock all the old buffers for reading
         for (itBinding = oldBindingMap.begin(); itBinding != oldBindingMap.end(); ++itBinding)
         {
             assert(itBinding->second->getNumVertices() >= vertexCount);
@@ -362,75 +362,75 @@ namespace Ogre {
                 itBinding->second->lock(
                     HardwareBuffer::HBL_READ_ONLY);
         }
-		
-		// Create new buffers and lock all for writing
-		buf = 0;
-		while (!newDeclaration->findElementsBySource(buf).empty())
-		{
+        
+        // Create new buffers and lock all for writing
+        buf = 0;
+        while (!newDeclaration->findElementsBySource(buf).empty())
+        {
             size_t vertexSize = newDeclaration->getVertexSize(buf);
 
-			HardwareVertexBufferSharedPtr vbuf = 
-				pManager->createVertexBuffer(
-					vertexSize,
-					vertexCount, 
-					bufferUsages[buf]);
-			newBinding->setBinding(buf, vbuf);
+            HardwareVertexBufferSharedPtr vbuf = 
+                pManager->createVertexBuffer(
+                    vertexSize,
+                    vertexCount, 
+                    bufferUsages[buf]);
+            newBinding->setBinding(buf, vbuf);
 
             newBufferVertexSizes.push_back(vertexSize);
-			newBufferLocks.push_back(
-				vbuf->lock(HardwareBuffer::HBL_DISCARD));
-			buf++;
-		}
+            newBufferLocks.push_back(
+                vbuf->lock(HardwareBuffer::HBL_DISCARD));
+            buf++;
+        }
 
-		// Map from new to old elements
+        // Map from new to old elements
         typedef map<const VertexElement*, const VertexElement*>::type NewToOldElementMap;
-		NewToOldElementMap newToOldElementMap;
-		const VertexDeclaration::VertexElementList& newElemList = newDeclaration->getElements();
-		VertexDeclaration::VertexElementList::const_iterator ei, eiend;
-		eiend = newElemList.end();
-		for (ei = newElemList.begin(); ei != eiend; ++ei)
-		{
-			// Find corresponding old element
-			const VertexElement* oldElem = 
-				vertexDeclaration->findElementBySemantic(
-					(*ei).getSemantic(), (*ei).getIndex());
-			if (!oldElem)
-			{
-				// Error, cannot create new elements with this method
-				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-					"Element not found in old vertex declaration", 
-					"VertexData::reorganiseBuffers");
-			}
-			newToOldElementMap[&(*ei)] = oldElem;
-		}
-		// Now iterate over the new buffers, pulling data out of the old ones
-		// For each vertex
-		for (size_t v = 0; v < vertexCount; ++v)
-		{
-			// For each (new) element
-			for (ei = newElemList.begin(); ei != eiend; ++ei)
-			{
-				const VertexElement* newElem = &(*ei);
+        NewToOldElementMap newToOldElementMap;
+        const VertexDeclaration::VertexElementList& newElemList = newDeclaration->getElements();
+        VertexDeclaration::VertexElementList::const_iterator ei, eiend;
+        eiend = newElemList.end();
+        for (ei = newElemList.begin(); ei != eiend; ++ei)
+        {
+            // Find corresponding old element
+            const VertexElement* oldElem = 
+                vertexDeclaration->findElementBySemantic(
+                    (*ei).getSemantic(), (*ei).getIndex());
+            if (!oldElem)
+            {
+                // Error, cannot create new elements with this method
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                    "Element not found in old vertex declaration", 
+                    "VertexData::reorganiseBuffers");
+            }
+            newToOldElementMap[&(*ei)] = oldElem;
+        }
+        // Now iterate over the new buffers, pulling data out of the old ones
+        // For each vertex
+        for (size_t v = 0; v < vertexCount; ++v)
+        {
+            // For each (new) element
+            for (ei = newElemList.begin(); ei != eiend; ++ei)
+            {
+                const VertexElement* newElem = &(*ei);
                 NewToOldElementMap::iterator noi = newToOldElementMap.find(newElem);
-				const VertexElement* oldElem = noi->second;
-				unsigned short oldBufferNo = oldElem->getSource();
-				unsigned short newBufferNo = newElem->getSource();
-				void* pSrcBase = static_cast<void*>(
-					static_cast<unsigned char*>(oldBufferLocks[oldBufferNo])
-					+ v * oldBufferVertexSizes[oldBufferNo]);
-				void* pDstBase = static_cast<void*>(
-					static_cast<unsigned char*>(newBufferLocks[newBufferNo])
-					+ v * newBufferVertexSizes[newBufferNo]);
-				void *pSrc, *pDst;
-				oldElem->baseVertexPointerToElement(pSrcBase, &pSrc);
-				newElem->baseVertexPointerToElement(pDstBase, &pDst);
-				
-				memcpy(pDst, pSrc, newElem->getSize());
-				
-			}
-		}
+                const VertexElement* oldElem = noi->second;
+                unsigned short oldBufferNo = oldElem->getSource();
+                unsigned short newBufferNo = newElem->getSource();
+                void* pSrcBase = static_cast<void*>(
+                    static_cast<unsigned char*>(oldBufferLocks[oldBufferNo])
+                    + v * oldBufferVertexSizes[oldBufferNo]);
+                void* pDstBase = static_cast<void*>(
+                    static_cast<unsigned char*>(newBufferLocks[newBufferNo])
+                    + v * newBufferVertexSizes[newBufferNo]);
+                void *pSrc, *pDst;
+                oldElem->baseVertexPointerToElement(pSrcBase, &pSrc);
+                newElem->baseVertexPointerToElement(pDstBase, &pDst);
+                
+                memcpy(pDst, pSrc, newElem->getSize());
+                
+            }
+        }
 
-		// Unlock all buffers
+        // Unlock all buffers
         for (itBinding = oldBindingMap.begin(); itBinding != oldBindingMap.end(); ++itBinding)
         {
             itBinding->second->unlock();
@@ -440,21 +440,21 @@ namespace Ogre {
             newBinding->getBuffer(buf)->unlock();
         }
 
-		// Delete old binding & declaration
-		if (mDeleteDclBinding)
-		{
-			pManager->destroyVertexBufferBinding(vertexBufferBinding);
-			pManager->destroyVertexDeclaration(vertexDeclaration);
-		}
+        // Delete old binding & declaration
+        if (mDeleteDclBinding)
+        {
+            pManager->destroyVertexBufferBinding(vertexBufferBinding);
+            pManager->destroyVertexDeclaration(vertexDeclaration);
+        }
 
-		// Assign new binding and declaration
-		vertexDeclaration = newDeclaration;
-		vertexBufferBinding = newBinding;		
-		// after this is complete, new manager should be used
-		mMgr = pManager;
-		mDeleteDclBinding = true; // because we created these through a manager
+        // Assign new binding and declaration
+        vertexDeclaration = newDeclaration;
+        vertexBufferBinding = newBinding;       
+        // after this is complete, new manager should be used
+        mMgr = pManager;
+        mDeleteDclBinding = true; // because we created these through a manager
 
-	}
+    }
     //-----------------------------------------------------------------------
     void VertexData::reorganiseBuffers(VertexDeclaration* newDeclaration, HardwareBufferManagerBase* mgr)
     {
@@ -580,397 +580,397 @@ namespace Ogre {
         // Close gaps
         closeGapsInBindings();
     }
-	//-----------------------------------------------------------------------
-	void VertexData::convertPackedColour(
-		VertexElementType srcType, VertexElementType destType)
-	{
-		if (destType != VET_COLOUR_ABGR && destType != VET_COLOUR_ARGB)
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Invalid destType parameter", "VertexData::convertPackedColour");
-		}
-		if (srcType != VET_COLOUR_ABGR && srcType != VET_COLOUR_ARGB)
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Invalid srcType parameter", "VertexData::convertPackedColour");
-		}
-
-		const VertexBufferBinding::VertexBufferBindingMap& bindMap = 
-			vertexBufferBinding->getBindings();
-		VertexBufferBinding::VertexBufferBindingMap::const_iterator bindi;
-		for (bindi = bindMap.begin(); bindi != bindMap.end(); ++bindi)
-		{
-			VertexDeclaration::VertexElementList elems = 
-				vertexDeclaration->findElementsBySource(bindi->first);
-			bool conversionNeeded = false;
-			VertexDeclaration::VertexElementList::iterator elemi;
-			for (elemi = elems.begin(); elemi != elems.end(); ++elemi)
-			{
-				VertexElement& elem = *elemi;
-				if (elem.getType() == VET_COLOUR || 
-					((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
-					&& elem.getType() != destType))
-				{
-					conversionNeeded = true;
-				}
-			}
-
-			if (conversionNeeded)
-			{
-				void* pBase = bindi->second->lock(HardwareBuffer::HBL_NORMAL);
-
-				for (size_t v = 0; v < bindi->second->getNumVertices(); ++v)
-				{
-
-					for (elemi = elems.begin(); elemi != elems.end(); ++elemi)
-					{
-						VertexElement& elem = *elemi;
-						VertexElementType currType = (elem.getType() == VET_COLOUR) ?
-							srcType : elem.getType();
-						if (elem.getType() == VET_COLOUR || 
-							((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
-							&& elem.getType() != destType))
-						{
-							uint32* pRGBA;
-							elem.baseVertexPointerToElement(pBase, &pRGBA);
-							VertexElement::convertColourValue(currType, destType, pRGBA);
-						}
-					}
-					pBase = static_cast<void*>(
-						static_cast<char*>(pBase) + bindi->second->getVertexSize());
-				}
-				bindi->second->unlock();
-
-				// Modify the elements to reflect the changed type
-				const VertexDeclaration::VertexElementList& allelems = 
-					vertexDeclaration->getElements();
-				VertexDeclaration::VertexElementList::const_iterator ai;
-				unsigned short elemIndex = 0;
-				for (ai = allelems.begin(); ai != allelems.end(); ++ai, ++elemIndex)
-				{
-					const VertexElement& elem = *ai;
-					if (elem.getType() == VET_COLOUR || 
-						((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
-						&& elem.getType() != destType))
-					{
-						vertexDeclaration->modifyElement(elemIndex, 
-							elem.getSource(), elem.getOffset(), destType, 
-							elem.getSemantic(), elem.getIndex());
-					}
-				}
-
-			}
-
-
-		} // each buffer
-
-
-	}
-	//-----------------------------------------------------------------------
-	ushort VertexData::allocateHardwareAnimationElements(ushort count, bool animateNormals)
-	{
-		// Find first free texture coord set
-		unsigned short texCoord = vertexDeclaration->getNextFreeTextureCoordinate();
-		unsigned short freeCount = (ushort)(OGRE_MAX_TEXTURE_COORD_SETS - texCoord);
-		if (animateNormals)
-			// we need 2x the texture coords, round down
-			freeCount /= 2;
-		
-		unsigned short supportedCount = std::min(freeCount, count);
-		
-		// Increase to correct size
-		for (size_t c = hwAnimationDataList.size(); c < supportedCount; ++c)
-		{
-			// Create a new 3D texture coordinate set
-			HardwareAnimationData data;
-			data.targetBufferIndex = vertexBufferBinding->getNextIndex();
-			vertexDeclaration->addElement(data.targetBufferIndex, 0, VET_FLOAT3, VES_TEXTURE_COORDINATES, texCoord++);
-			if (animateNormals)
-					vertexDeclaration->addElement(data.targetBufferIndex, sizeof(float)*3, VET_FLOAT3, VES_TEXTURE_COORDINATES, texCoord++);
-
-			hwAnimationDataList.push_back(data);
-			// Vertex buffer will not be bound yet, we expect this to be done by the
-			// caller when it becomes appropriate (e.g. through a VertexAnimationTrack)
-		}
-		
-		return supportedCount;
-	}
     //-----------------------------------------------------------------------
-	//-----------------------------------------------------------------------
-	IndexData::IndexData()
-	{
-		indexCount = 0;
-		indexStart = 0;
-		
-	}
+    void VertexData::convertPackedColour(
+        VertexElementType srcType, VertexElementType destType)
+    {
+        if (destType != VET_COLOUR_ABGR && destType != VET_COLOUR_ARGB)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Invalid destType parameter", "VertexData::convertPackedColour");
+        }
+        if (srcType != VET_COLOUR_ABGR && srcType != VET_COLOUR_ARGB)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Invalid srcType parameter", "VertexData::convertPackedColour");
+        }
+
+        const VertexBufferBinding::VertexBufferBindingMap& bindMap = 
+            vertexBufferBinding->getBindings();
+        VertexBufferBinding::VertexBufferBindingMap::const_iterator bindi;
+        for (bindi = bindMap.begin(); bindi != bindMap.end(); ++bindi)
+        {
+            VertexDeclaration::VertexElementList elems = 
+                vertexDeclaration->findElementsBySource(bindi->first);
+            bool conversionNeeded = false;
+            VertexDeclaration::VertexElementList::iterator elemi;
+            for (elemi = elems.begin(); elemi != elems.end(); ++elemi)
+            {
+                VertexElement& elem = *elemi;
+                if (elem.getType() == VET_COLOUR || 
+                    ((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
+                    && elem.getType() != destType))
+                {
+                    conversionNeeded = true;
+                }
+            }
+
+            if (conversionNeeded)
+            {
+                void* pBase = bindi->second->lock(HardwareBuffer::HBL_NORMAL);
+
+                for (size_t v = 0; v < bindi->second->getNumVertices(); ++v)
+                {
+
+                    for (elemi = elems.begin(); elemi != elems.end(); ++elemi)
+                    {
+                        VertexElement& elem = *elemi;
+                        VertexElementType currType = (elem.getType() == VET_COLOUR) ?
+                            srcType : elem.getType();
+                        if (elem.getType() == VET_COLOUR || 
+                            ((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
+                            && elem.getType() != destType))
+                        {
+                            uint32* pRGBA;
+                            elem.baseVertexPointerToElement(pBase, &pRGBA);
+                            VertexElement::convertColourValue(currType, destType, pRGBA);
+                        }
+                    }
+                    pBase = static_cast<void*>(
+                        static_cast<char*>(pBase) + bindi->second->getVertexSize());
+                }
+                bindi->second->unlock();
+
+                // Modify the elements to reflect the changed type
+                const VertexDeclaration::VertexElementList& allelems = 
+                    vertexDeclaration->getElements();
+                VertexDeclaration::VertexElementList::const_iterator ai;
+                unsigned short elemIndex = 0;
+                for (ai = allelems.begin(); ai != allelems.end(); ++ai, ++elemIndex)
+                {
+                    const VertexElement& elem = *ai;
+                    if (elem.getType() == VET_COLOUR || 
+                        ((elem.getType() == VET_COLOUR_ABGR || elem.getType() == VET_COLOUR_ARGB) 
+                        && elem.getType() != destType))
+                    {
+                        vertexDeclaration->modifyElement(elemIndex, 
+                            elem.getSource(), elem.getOffset(), destType, 
+                            elem.getSemantic(), elem.getIndex());
+                    }
+                }
+
+            }
+
+
+        } // each buffer
+
+
+    }
     //-----------------------------------------------------------------------
-	IndexData::~IndexData()
-	{
-	}
+    ushort VertexData::allocateHardwareAnimationElements(ushort count, bool animateNormals)
+    {
+        // Find first free texture coord set
+        unsigned short texCoord = vertexDeclaration->getNextFreeTextureCoordinate();
+        unsigned short freeCount = (ushort)(OGRE_MAX_TEXTURE_COORD_SETS - texCoord);
+        if (animateNormals)
+            // we need 2x the texture coords, round down
+            freeCount /= 2;
+        
+        unsigned short supportedCount = std::min(freeCount, count);
+        
+        // Increase to correct size
+        for (size_t c = hwAnimationDataList.size(); c < supportedCount; ++c)
+        {
+            // Create a new 3D texture coordinate set
+            HardwareAnimationData data;
+            data.targetBufferIndex = vertexBufferBinding->getNextIndex();
+            vertexDeclaration->addElement(data.targetBufferIndex, 0, VET_FLOAT3, VES_TEXTURE_COORDINATES, texCoord++);
+            if (animateNormals)
+                    vertexDeclaration->addElement(data.targetBufferIndex, sizeof(float)*3, VET_FLOAT3, VES_TEXTURE_COORDINATES, texCoord++);
+
+            hwAnimationDataList.push_back(data);
+            // Vertex buffer will not be bound yet, we expect this to be done by the
+            // caller when it becomes appropriate (e.g. through a VertexAnimationTrack)
+        }
+        
+        return supportedCount;
+    }
     //-----------------------------------------------------------------------
-	IndexData* IndexData::clone(bool copyData, HardwareBufferManagerBase* mgr) const
-	{
-		HardwareBufferManagerBase* pManager = mgr ? mgr : HardwareBufferManager::getSingletonPtr();
-		IndexData* dest = OGRE_NEW IndexData();
-		if (indexBuffer.get())
-		{
+    //-----------------------------------------------------------------------
+    IndexData::IndexData()
+    {
+        indexCount = 0;
+        indexStart = 0;
+        
+    }
+    //-----------------------------------------------------------------------
+    IndexData::~IndexData()
+    {
+    }
+    //-----------------------------------------------------------------------
+    IndexData* IndexData::clone(bool copyData, HardwareBufferManagerBase* mgr) const
+    {
+        HardwareBufferManagerBase* pManager = mgr ? mgr : HardwareBufferManager::getSingletonPtr();
+        IndexData* dest = OGRE_NEW IndexData();
+        if (indexBuffer.get())
+        {
             if (copyData)
             {
-			    dest->indexBuffer = pManager->createIndexBuffer(indexBuffer->getType(), indexBuffer->getNumIndexes(),
-				    indexBuffer->getUsage(), indexBuffer->hasShadowBuffer());
-			    dest->indexBuffer->copyData(*indexBuffer, 0, 0, indexBuffer->getSizeInBytes(), true);
+                dest->indexBuffer = pManager->createIndexBuffer(indexBuffer->getType(), indexBuffer->getNumIndexes(),
+                    indexBuffer->getUsage(), indexBuffer->hasShadowBuffer());
+                dest->indexBuffer->copyData(*indexBuffer, 0, 0, indexBuffer->getSizeInBytes(), true);
             }
             else
             {
                 dest->indexBuffer = indexBuffer;
             }
         }
-		dest->indexCount = indexCount;
-		dest->indexStart = indexStart;
-		return dest;
-	}
+        dest->indexCount = indexCount;
+        dest->indexStart = indexStart;
+        return dest;
+    }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-	// Local Utility class for vertex cache optimizer
-	class Triangle
+    // Local Utility class for vertex cache optimizer
+    class Triangle
     {
     public:
-		enum EdgeMatchType {
-			AB, BC, CA, ANY, NONE
-		};
+        enum EdgeMatchType {
+            AB, BC, CA, ANY, NONE
+        };
 
-		uint32 a, b, c;		
+        uint32 a, b, c;     
 
-		inline Triangle()
-		{
-		}
+        inline Triangle()
+        {
+        }
 
-		inline Triangle( uint32 ta, uint32 tb, uint32 tc ) 
-			: a( ta ), b( tb ), c( tc )
-		{
-		}
+        inline Triangle( uint32 ta, uint32 tb, uint32 tc ) 
+            : a( ta ), b( tb ), c( tc )
+        {
+        }
 
-		inline Triangle( uint32 t[3] )
-			: a( t[0] ), b( t[1] ), c( t[2] )
-		{
-		}
+        inline Triangle( uint32 t[3] )
+            : a( t[0] ), b( t[1] ), c( t[2] )
+        {
+        }
 
-		inline Triangle( const Triangle& t )
-			: a( t.a ), b( t.b ), c( t.c )
-		{
-		}
+        inline Triangle( const Triangle& t )
+            : a( t.a ), b( t.b ), c( t.c )
+        {
+        }
 
-		inline bool sharesEdge(const Triangle& t) const
-		{
-			return(	(a == t.a && b == t.c) ||
-					(a == t.b && b == t.a) ||
-					(a == t.c && b == t.b) ||
-					(b == t.a && c == t.c) ||
-					(b == t.b && c == t.a) ||
-					(b == t.c && c == t.b) ||
-					(c == t.a && a == t.c) ||
-					(c == t.b && a == t.a) ||
-					(c == t.c && a == t.b) );
-		}
+        inline bool sharesEdge(const Triangle& t) const
+        {
+            return( (a == t.a && b == t.c) ||
+                    (a == t.b && b == t.a) ||
+                    (a == t.c && b == t.b) ||
+                    (b == t.a && c == t.c) ||
+                    (b == t.b && c == t.a) ||
+                    (b == t.c && c == t.b) ||
+                    (c == t.a && a == t.c) ||
+                    (c == t.b && a == t.a) ||
+                    (c == t.c && a == t.b) );
+        }
 
-		inline bool sharesEdge(const uint32 ea, const uint32 eb, const Triangle& t) const
-		{
-			return(	(ea == t.a && eb == t.c) ||
-					(ea == t.b && eb == t.a) ||
-					(ea == t.c && eb == t.b) );	
-		}
+        inline bool sharesEdge(const uint32 ea, const uint32 eb, const Triangle& t) const
+        {
+            return( (ea == t.a && eb == t.c) ||
+                    (ea == t.b && eb == t.a) ||
+                    (ea == t.c && eb == t.b) ); 
+        }
 
-		inline bool sharesEdge(const EdgeMatchType edge, const Triangle& t) const
-		{
-			if (edge == AB)
-				return sharesEdge(a, b, t);
-			else if (edge == BC)
-				return sharesEdge(b, c, t);
-			else if (edge == CA)
-				return sharesEdge(c, a, t);
-			else
-				return (edge == ANY) == sharesEdge(t);
-		}
+        inline bool sharesEdge(const EdgeMatchType edge, const Triangle& t) const
+        {
+            if (edge == AB)
+                return sharesEdge(a, b, t);
+            else if (edge == BC)
+                return sharesEdge(b, c, t);
+            else if (edge == CA)
+                return sharesEdge(c, a, t);
+            else
+                return (edge == ANY) == sharesEdge(t);
+        }
 
-		inline EdgeMatchType endoSharedEdge(const Triangle& t) const
-		{
-			if (sharesEdge(a, b, t)) return AB;
-			if (sharesEdge(b, c, t)) return BC;
-			if (sharesEdge(c, a, t)) return CA;
-			return NONE;
-		}
+        inline EdgeMatchType endoSharedEdge(const Triangle& t) const
+        {
+            if (sharesEdge(a, b, t)) return AB;
+            if (sharesEdge(b, c, t)) return BC;
+            if (sharesEdge(c, a, t)) return CA;
+            return NONE;
+        }
 
-		inline EdgeMatchType exoSharedEdge(const Triangle& t) const
-		{
-			return t.endoSharedEdge(*this);
-		}
+        inline EdgeMatchType exoSharedEdge(const Triangle& t) const
+        {
+            return t.endoSharedEdge(*this);
+        }
 
-		inline void shiftClockwise()
-		{
-			uint32 t = a;
-			a = c;
-			c = b;
-			b = t;
-		}
+        inline void shiftClockwise()
+        {
+            uint32 t = a;
+            a = c;
+            c = b;
+            b = t;
+        }
 
-		inline void shiftCounterClockwise()
-		{
-			uint32 t = a;
-			a = b;
-			b = c;
-			c = t;
-		}
-	};
+        inline void shiftCounterClockwise()
+        {
+            uint32 t = a;
+            a = b;
+            b = c;
+            c = t;
+        }
+    };
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-	void IndexData::optimiseVertexCacheTriList(void)
-	{
-		if (indexBuffer->isLocked()) return;
+    void IndexData::optimiseVertexCacheTriList(void)
+    {
+        if (indexBuffer->isLocked()) return;
 
-		void *buffer = indexBuffer->lock(HardwareBuffer::HBL_NORMAL);
+        void *buffer = indexBuffer->lock(HardwareBuffer::HBL_NORMAL);
 
-		Triangle* triangles;
+        Triangle* triangles;
 
-		size_t nIndexes = indexCount;
-		size_t nTriangles = nIndexes / 3;
-		size_t i, j;
-		uint16 *source = 0;
+        size_t nIndexes = indexCount;
+        size_t nTriangles = nIndexes / 3;
+        size_t i, j;
+        uint16 *source = 0;
 
-		if (indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT)
-		{
-			triangles = OGRE_ALLOC_T(Triangle, nTriangles, MEMCATEGORY_GEOMETRY);
-			source = (uint16 *)buffer;
-			uint32 *dest = (uint32 *)triangles;
-			for (i = 0; i < nIndexes; ++i) dest[i] = source[i];
-		}
-		else
-			triangles = static_cast<Triangle*>(buffer);
+        if (indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT)
+        {
+            triangles = OGRE_ALLOC_T(Triangle, nTriangles, MEMCATEGORY_GEOMETRY);
+            source = (uint16 *)buffer;
+            uint32 *dest = (uint32 *)triangles;
+            for (i = 0; i < nIndexes; ++i) dest[i] = source[i];
+        }
+        else
+            triangles = static_cast<Triangle*>(buffer);
 
-		// sort triangles based on shared edges
-		uint32 *destlist = OGRE_ALLOC_T(uint32, nTriangles, MEMCATEGORY_GEOMETRY);
-		unsigned char *visited = OGRE_ALLOC_T(unsigned char, nTriangles, MEMCATEGORY_GEOMETRY);
+        // sort triangles based on shared edges
+        uint32 *destlist = OGRE_ALLOC_T(uint32, nTriangles, MEMCATEGORY_GEOMETRY);
+        unsigned char *visited = OGRE_ALLOC_T(unsigned char, nTriangles, MEMCATEGORY_GEOMETRY);
 
-		for (i = 0; i < nTriangles; ++i) visited[i] = 0;
+        for (i = 0; i < nTriangles; ++i) visited[i] = 0;
 
-		uint32 start = 0, ti = 0, destcount = 0;
+        uint32 start = 0, ti = 0, destcount = 0;
 
-		bool found = false;
-		for (i = 0; i < nTriangles; ++i)
-		{
-			if (found)
-				found = false;
-			else
-			{
-				while (visited[start++]);
-				ti = start - 1;
-			}
+        bool found = false;
+        for (i = 0; i < nTriangles; ++i)
+        {
+            if (found)
+                found = false;
+            else
+            {
+                while (visited[start++]);
+                ti = start - 1;
+            }
 
-			destlist[destcount++] = ti;
-			visited[ti] = 1;
+            destlist[destcount++] = ti;
+            visited[ti] = 1;
 
-			for (j = start; j < nTriangles; ++j)
-			{
-				if (visited[j]) continue;
-				
-				if (triangles[ti].sharesEdge(triangles[j]))
-				{
-					found = true;
-					ti = static_cast<uint32>(j);
-					break;
-				}
-			}
-		}
+            for (j = start; j < nTriangles; ++j)
+            {
+                if (visited[j]) continue;
+                
+                if (triangles[ti].sharesEdge(triangles[j]))
+                {
+                    found = true;
+                    ti = static_cast<uint32>(j);
+                    break;
+                }
+            }
+        }
 
-		if (indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT)
-		{
-			// reorder the indexbuffer
-			j = 0;
-			for (i = 0; i < nTriangles; ++i)
-			{
-				Triangle *t = &triangles[destlist[i]];
+        if (indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT)
+        {
+            // reorder the indexbuffer
+            j = 0;
+            for (i = 0; i < nTriangles; ++i)
+            {
+                Triangle *t = &triangles[destlist[i]];
                 if(source)
                 {
                     source[j++] = (uint16)t->a;
                     source[j++] = (uint16)t->b;
                     source[j++] = (uint16)t->c;
                 }
-			}
-			OGRE_FREE(triangles, MEMCATEGORY_GEOMETRY);
-		}
-		else
-		{
-			uint32 *reflist = OGRE_ALLOC_T(uint32, nTriangles, MEMCATEGORY_GEOMETRY);
+            }
+            OGRE_FREE(triangles, MEMCATEGORY_GEOMETRY);
+        }
+        else
+        {
+            uint32 *reflist = OGRE_ALLOC_T(uint32, nTriangles, MEMCATEGORY_GEOMETRY);
 
-			// fill the referencebuffer
-			for (i = 0; i < nTriangles; ++i)
-				reflist[destlist[i]] = static_cast<uint32>(i);
-			
-			// reorder the indexbuffer
-			for (i = 0; i < nTriangles; ++i)
-			{
-				j = destlist[i];
-				if (i == j) continue; // do not move triangle
+            // fill the referencebuffer
+            for (i = 0; i < nTriangles; ++i)
+                reflist[destlist[i]] = static_cast<uint32>(i);
+            
+            // reorder the indexbuffer
+            for (i = 0; i < nTriangles; ++i)
+            {
+                j = destlist[i];
+                if (i == j) continue; // do not move triangle
 
-				// swap triangles
+                // swap triangles
 
-				Triangle t = triangles[i];
-				triangles[i] = triangles[j];
-				triangles[j] = t;
+                Triangle t = triangles[i];
+                triangles[i] = triangles[j];
+                triangles[j] = t;
 
-				// change reference
-				destlist[reflist[i]] = static_cast<uint32>(j);
-				// destlist[i] = i; // not needed, it will not be used
-			}
+                // change reference
+                destlist[reflist[i]] = static_cast<uint32>(j);
+                // destlist[i] = i; // not needed, it will not be used
+            }
 
-			OGRE_FREE(reflist, MEMCATEGORY_GEOMETRY);
-		}
+            OGRE_FREE(reflist, MEMCATEGORY_GEOMETRY);
+        }
 
-		OGRE_FREE(destlist, MEMCATEGORY_GEOMETRY);
-		OGRE_FREE(visited, MEMCATEGORY_GEOMETRY);
-					
-		indexBuffer->unlock();
-	}
-	//-----------------------------------------------------------------------
-	//-----------------------------------------------------------------------
-	void VertexCacheProfiler::profile(const HardwareIndexBufferSharedPtr& indexBuffer)
+        OGRE_FREE(destlist, MEMCATEGORY_GEOMETRY);
+        OGRE_FREE(visited, MEMCATEGORY_GEOMETRY);
+                    
+        indexBuffer->unlock();
+    }
+    //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    void VertexCacheProfiler::profile(const HardwareIndexBufferSharedPtr& indexBuffer)
     {
-		if (indexBuffer->isLocked()) return;
+        if (indexBuffer->isLocked()) return;
 
-		uint16 *shortbuffer = (uint16 *)indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
+        uint16 *shortbuffer = (uint16 *)indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
 
-		if (indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT)
-			for (unsigned int i = 0; i < indexBuffer->getNumIndexes(); ++i)
-				inCache(shortbuffer[i]);
-		else
-		{
-			uint32 *buffer = (uint32 *)shortbuffer;
-			for (unsigned int i = 0; i < indexBuffer->getNumIndexes(); ++i)
-				inCache(buffer[i]);
-		}
+        if (indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT)
+            for (unsigned int i = 0; i < indexBuffer->getNumIndexes(); ++i)
+                inCache(shortbuffer[i]);
+        else
+        {
+            uint32 *buffer = (uint32 *)shortbuffer;
+            for (unsigned int i = 0; i < indexBuffer->getNumIndexes(); ++i)
+                inCache(buffer[i]);
+        }
 
-		indexBuffer->unlock();
-	}
+        indexBuffer->unlock();
+    }
 
-	//-----------------------------------------------------------------------
-	bool VertexCacheProfiler::inCache(unsigned int index)
-	{
-		for (unsigned int i = 0; i < buffersize; ++i)
-		{
-			if (index == cache[i])
-			{
-				hit++;
-				return true;
-			}
-		}
+    //-----------------------------------------------------------------------
+    bool VertexCacheProfiler::inCache(unsigned int index)
+    {
+        for (unsigned int i = 0; i < buffersize; ++i)
+        {
+            if (index == cache[i])
+            {
+                hit++;
+                return true;
+            }
+        }
 
-		miss++;
-		cache[tail++] = index;
-		tail %= size;
+        miss++;
+        cache[tail++] = index;
+        tail %= size;
 
-		if (buffersize < size) buffersize++;
+        if (buffersize < size) buffersize++;
 
-		return false;
-	}
-	
+        return false;
+    }
+    
 
 }

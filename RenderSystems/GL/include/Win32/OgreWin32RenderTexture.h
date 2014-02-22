@@ -36,18 +36,18 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgreGLExport Win32PBuffer : public GLPBuffer
     {
-	public:
-		Win32PBuffer(PixelComponentType format, size_t width, size_t height);
-		~Win32PBuffer();
-	    
-		virtual GLContext *getContext() { return mContext; }
+    public:
+        Win32PBuffer(PixelComponentType format, size_t width, size_t height);
+        ~Win32PBuffer();
+        
+        virtual GLContext *getContext() { return mContext; }
     protected:
         void createPBuffer();
-		void destroyPBuffer();
+        void destroyPBuffer();
 
-		HDC		mHDC;
-		HGLRC	mGlrc;
-		HPBUFFERARB mPBuffer;
+        HDC     mHDC;
+        HGLRC   mGlrc;
+        HPBUFFERARB mPBuffer;
         Win32Context *mContext;
     };
 }

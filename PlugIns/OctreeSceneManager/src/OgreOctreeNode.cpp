@@ -84,17 +84,17 @@ Node * OctreeNode::removeChild( Node* child )
 }
 void OctreeNode::removeAllChildren()
 {
-	ChildNodeMap::iterator i, iend;
-	iend = mChildren.end();
-	for (i = mChildren.begin(); i != iend; ++i)
-	{
-		OctreeNode* on = static_cast<OctreeNode*>(i->second);
-		on->setParent(0);
-		on->_removeNodeAndChildren();
-	}
-	mChildren.clear();
-	mChildrenToUpdate.clear();
-	
+    ChildNodeMap::iterator i, iend;
+    iend = mChildren.end();
+    for (i = mChildren.begin(); i != iend; ++i)
+    {
+        OctreeNode* on = static_cast<OctreeNode*>(i->second);
+        on->setParent(0);
+        on->_removeNodeAndChildren();
+    }
+    mChildren.clear();
+    mChildrenToUpdate.clear();
+    
 }
     
 Node * OctreeNode::removeChild( const String & name )
@@ -141,12 +141,12 @@ void OctreeNode::_updateBounds( void )
 */
 bool OctreeNode::_isIn( AxisAlignedBox &box )
 {
-	// Always fail if not in the scene graph or box is null
-	if (!mIsInSceneGraph || box.isNull()) return false;
+    // Always fail if not in the scene graph or box is null
+    if (!mIsInSceneGraph || box.isNull()) return false;
 
-	// Always succeed if AABB is infinite
-	if (box.isInfinite())
-		return true;
+    // Always succeed if AABB is infinite
+    if (box.isInfinite())
+        return true;
 
     Vector3 center = mWorldAABB.getMaximum().midPoint( mWorldAABB.getMinimum() );
 
@@ -154,30 +154,30 @@ bool OctreeNode::_isIn( AxisAlignedBox &box )
     Vector3 bmax = box.getMaximum();
 
     bool centre = ( bmax > center && bmin < center );
-	if (!centre)
-		return false;
+    if (!centre)
+        return false;
 
-	// Even if covering the centre line, need to make sure this BB is not large
-	// enough to require being moved up into parent. When added, bboxes would
-	// end up in parent due to cascade but when updating need to deal with
-	// bbox growing too large for this child
-	Vector3 octreeSize = bmax - bmin;
-	Vector3 nodeSize = mWorldAABB.getMaximum() - mWorldAABB.getMinimum();
-	return nodeSize < octreeSize;
+    // Even if covering the centre line, need to make sure this BB is not large
+    // enough to require being moved up into parent. When added, bboxes would
+    // end up in parent due to cascade but when updating need to deal with
+    // bbox growing too large for this child
+    Vector3 octreeSize = bmax - bmin;
+    Vector3 nodeSize = mWorldAABB.getMaximum() - mWorldAABB.getMinimum();
+    return nodeSize < octreeSize;
 
 }
 
 /** Adds the attached objects of this OctreeScene node into the queue. */
 void OctreeNode::_addToRenderQueue( Camera* cam, RenderQueue *queue, 
-	bool onlyShadowCasters, VisibleObjectsBoundsInfo* visibleBounds )
+    bool onlyShadowCasters, VisibleObjectsBoundsInfo* visibleBounds )
 {
     ObjectMap::iterator mit = mObjectsByName.begin();
 
     while ( mit != mObjectsByName.end() )
     {
         MovableObject * mo = mit->second;
-		
-		queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
+        
+        queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
 
         ++mit;
     }

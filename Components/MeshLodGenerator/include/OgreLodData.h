@@ -46,125 +46,125 @@ namespace Ogre
 
 struct _OgreLodExport LodData {
 
-	static const Real NEVER_COLLAPSE_COST /*= std::numeric_limits<Real>::max()*/;
-	static const Real UNINITIALIZED_COLLAPSE_COST /*= std::numeric_limits<Real>::infinity()*/;
+    static const Real NEVER_COLLAPSE_COST /*= std::numeric_limits<Real>::max()*/;
+    static const Real UNINITIALIZED_COLLAPSE_COST /*= std::numeric_limits<Real>::infinity()*/;
 
-	struct Edge;
-	struct Vertex;
-	struct Triangle;
-	struct VertexHash;
-	struct VertexEqual;
+    struct Edge;
+    struct Vertex;
+    struct Triangle;
+    struct VertexHash;
+    struct VertexEqual;
 
-	typedef vector<Vertex>::type VertexList;
-	typedef vector<Triangle>::type TriangleList;
-	typedef HashSet<Vertex*, VertexHash, VertexEqual> UniqueVertexSet;
-	typedef multimap<Real, Vertex*>::type CollapseCostHeap;
+    typedef vector<Vertex>::type VertexList;
+    typedef vector<Triangle>::type TriangleList;
+    typedef HashSet<Vertex*, VertexHash, VertexEqual> UniqueVertexSet;
+    typedef multimap<Real, Vertex*>::type CollapseCostHeap;
 
-	typedef VectorSet<Edge, 8> VEdges;
-	typedef VectorSet<Triangle*, 7> VTriangles;
+    typedef VectorSet<Edge, 8> VEdges;
+    typedef VectorSet<Triangle*, 7> VTriangles;
 
-	// Hash function for UniqueVertexSet.
-	struct VertexHash {
-		LodData* mGen;
+    // Hash function for UniqueVertexSet.
+    struct VertexHash {
+        LodData* mGen;
 
-		VertexHash() : mGen(0) { assert(0); }
-		VertexHash(LodData* gen) { mGen = gen; }
-		size_t operator() (const Vertex* v) const;
-	};
+        VertexHash() : mGen(0) { assert(0); }
+        VertexHash(LodData* gen) { mGen = gen; }
+        size_t operator() (const Vertex* v) const;
+    };
 
-	// Equality function for UniqueVertexSet.
-	struct VertexEqual {
-		bool operator() (const Vertex* lhs, const Vertex* rhs) const;
-	};
+    // Equality function for UniqueVertexSet.
+    struct VertexEqual {
+        bool operator() (const Vertex* lhs, const Vertex* rhs) const;
+    };
 
-	// Directed edge
-	struct Edge {
-		Vertex* dst; // destination vertex. (other end of the edge)
-		Real collapseCost; // cost of the edge.
-		int refCount; // Reference count on how many triangles are using this edge. The edge will be removed when it gets 0.
+    // Directed edge
+    struct Edge {
+        Vertex* dst; // destination vertex. (other end of the edge)
+        Real collapseCost; // cost of the edge.
+        int refCount; // Reference count on how many triangles are using this edge. The edge will be removed when it gets 0.
 
-		explicit Edge(Vertex* destination);
-		bool operator== (const Edge& other) const;
-		Edge& operator= (const Edge& b);
-		Edge(const Edge& b);
-		bool operator< (const Edge& other) const;
-	};
+        explicit Edge(Vertex* destination);
+        bool operator== (const Edge& other) const;
+        Edge& operator= (const Edge& b);
+        Edge(const Edge& b);
+        bool operator< (const Edge& other) const;
+    };
 
-	struct Vertex {
-		Vector3 position;
-		VEdges edges;
-		VTriangles triangles;
-		
-		Vector3 normal;
-		Vertex* collapseTo;
-		bool seam;
-		CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
+    struct Vertex {
+        Vector3 position;
+        VEdges edges;
+        VTriangles triangles;
+        
+        Vector3 normal;
+        Vertex* collapseTo;
+        bool seam;
+        CollapseCostHeap::iterator costHeapPosition; /// Iterator pointing to the position in the mCollapseCostSet, which allows fast remove.
 
-		void addEdge(const Edge& edge);
-		void removeEdge(const Edge& edge);
-	};
-	
-	struct Triangle {
-		Vertex* vertex[3];
-		Vector3 normal;
-		bool isRemoved;
-		unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
-		unsigned int vertexID[3]; /// Vertex ID in the buffer associated with the submeshID.
+        void addEdge(const Edge& edge);
+        void removeEdge(const Edge& edge);
+    };
+    
+    struct Triangle {
+        Vertex* vertex[3];
+        Vector3 normal;
+        bool isRemoved;
+        unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
+        unsigned int vertexID[3]; /// Vertex ID in the buffer associated with the submeshID.
 
-		void computeNormal();
-		bool hasVertex(const Vertex* v) const;
-		unsigned int getVertexID(const Vertex* v) const;
-		bool isMalformed();
-	};
+        void computeNormal();
+        bool hasVertex(const Vertex* v) const;
+        unsigned int getVertexID(const Vertex* v) const;
+        bool isMalformed();
+    };
 
-	union IndexBufferPointer {
-		unsigned short* pshort;
-		unsigned int* pint;
-	};
+    union IndexBufferPointer {
+        unsigned short* pshort;
+        unsigned int* pint;
+    };
 
-	struct IndexBufferInfo {
-		size_t indexSize;
-		size_t indexCount;
-		IndexBufferPointer buf; // Used by output providers only!
-		size_t prevOnlyIndexCount; // Used by output providers only!
-		size_t prevIndexCount; // Used by output providers only!
-	};
+    struct IndexBufferInfo {
+        size_t indexSize;
+        size_t indexCount;
+        IndexBufferPointer buf; // Used by output providers only!
+        size_t prevOnlyIndexCount; // Used by output providers only!
+        size_t prevIndexCount; // Used by output providers only!
+    };
 
-	typedef vector<IndexBufferInfo>::type IndexBufferInfoList;
+    typedef vector<IndexBufferInfo>::type IndexBufferInfoList;
 
-	/// Provides position based vertex lookup. Position is the real identifier of a vertex.
-	UniqueVertexSet mUniqueVertexSet;
+    /// Provides position based vertex lookup. Position is the real identifier of a vertex.
+    UniqueVertexSet mUniqueVertexSet;
 
-	VertexList mVertexList;
-	TriangleList mTriangleList;
+    VertexList mVertexList;
+    TriangleList mTriangleList;
 
-	/// Makes possible to get the vertices with the smallest collapse cost.
-	CollapseCostHeap mCollapseCostHeap;
-	IndexBufferInfoList mIndexBufferInfoList;
+    /// Makes possible to get the vertices with the smallest collapse cost.
+    CollapseCostHeap mCollapseCostHeap;
+    IndexBufferInfoList mIndexBufferInfoList;
 #if OGRE_DEBUG_MODE
-	/**
-	 * @brief The name of the mesh being processed.
-	 *
-	 * This is separate from mMesh in order to allow for access from background threads.
-	 */
-	String mMeshName;
+    /**
+     * @brief The name of the mesh being processed.
+     *
+     * This is separate from mMesh in order to allow for access from background threads.
+     */
+    String mMeshName;
 #endif
-	Real mMeshBoundingSphereRadius;
-	bool mUseVertexNormals;
+    Real mMeshBoundingSphereRadius;
+    bool mUseVertexNormals;
 
-	template<typename T, typename A>
-	static size_t getVectorIDFromPointer(const std::vector<T, A>& vec, const T* pointer) {
-		size_t id = pointer - &vec.at(0);
-		OgreAssert(id < vec.size() && (&vec[id] == pointer), "Invalid pointer");
-		return id;
-	}
+    template<typename T, typename A>
+    static size_t getVectorIDFromPointer(const std::vector<T, A>& vec, const T* pointer) {
+        size_t id = pointer - &vec.at(0);
+        OgreAssert(id < vec.size() && (&vec[id] == pointer), "Invalid pointer");
+        return id;
+    }
 
-	LodData() :
-		mUniqueVertexSet((UniqueVertexSet::size_type) 0,
-		(const UniqueVertexSet::hasher&) VertexHash(this)),
-		mMeshBoundingSphereRadius(0.0f),
-		mUseVertexNormals(true)
-	{}
+    LodData() :
+        mUniqueVertexSet((UniqueVertexSet::size_type) 0,
+        (const UniqueVertexSet::hasher&) VertexHash(this)),
+        mMeshBoundingSphereRadius(0.0f),
+        mUseVertexNormals(true)
+    {}
 };
 
 }

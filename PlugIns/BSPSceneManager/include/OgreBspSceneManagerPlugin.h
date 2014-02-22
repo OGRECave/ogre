@@ -35,33 +35,33 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** Plugin instance for BSPSceneManager */
-	class BspSceneManagerPlugin : public Plugin
-	{
-	public:
-		BspSceneManagerPlugin();
+    /** Plugin instance for BSPSceneManager */
+    class BspSceneManagerPlugin : public Plugin
+    {
+    public:
+        BspSceneManagerPlugin();
 
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		BspSceneManagerFactory* mBspFactory;
-		BspResourceManager* mBspResourceManager;
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        BspSceneManagerFactory* mBspFactory;
+        BspResourceManager* mBspResourceManager;
 
 
-	};
+    };
 }
 
 #endif

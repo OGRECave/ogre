@@ -123,7 +123,7 @@ namespace Ogre {
         // return offsetted
         retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
-		mIsLocked = true;
+        mIsLocked = true;
         return retPtr;
     }
     
@@ -154,7 +154,7 @@ namespace Ogre {
         // Get data from the real buffer
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
 
-		OGRE_CHECK_GL_ERROR(glGetBufferPointerv(GL_UNIFORM_BUFFER, GL_BUFFER_MAP_POINTER, &pDest));
+        OGRE_CHECK_GL_ERROR(glGetBufferPointerv(GL_UNIFORM_BUFFER, GL_BUFFER_MAP_POINTER, &pDest));
     }
     
     void GLES2HardwareUniformBuffer::writeData(size_t offset,
@@ -187,7 +187,7 @@ namespace Ogre {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
         if (srcBuffer.isSystemMemory())
         {
-			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
         else
         {

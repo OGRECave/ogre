@@ -37,7 +37,7 @@ ConfigDialog::ConfigDialog() : mSelectedRenderSystem(0)
 //------------------------------------------------------------------------------------//
 bool ConfigDialog::display()
 {
-	return true;
+    return true;
 }
 };
 

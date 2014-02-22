@@ -34,7 +34,7 @@ THE SOFTWARE
 #include "Workspace.h"
 
 BEGIN_EVENT_TABLE(MaterialWizard, wxWizard)
-	EVT_WIZARD_FINISHED(wxID_ANY, MaterialWizard::OnFinish)
+    EVT_WIZARD_FINISHED(wxID_ANY, MaterialWizard::OnFinish)
 END_EVENT_TABLE()
 
 MaterialWizard::MaterialWizard()
@@ -47,26 +47,26 @@ MaterialWizard::~MaterialWizard()
 
 bool MaterialWizard::Create(wxWindow* parent, int id /* = -1 */, const wxString& title /* = wxEmptyString */, const wxBitmap& bitmap /* = wxNullBitmap */, const wxPoint& pos /* = wxDefaultPosition */, long style /* = wxDEFAULT_DIALOG_STYLE */)
 {
-	bool result = wxWizard::Create(parent, id, title, bitmap, pos, style);
+    bool result = wxWizard::Create(parent, id, title, bitmap, pos, style);
 
-	mMaterialPage = new MaterialPage(this);
+    mMaterialPage = new MaterialPage(this);
 
-	GetPageAreaSizer()->Add(mMaterialPage);
+    GetPageAreaSizer()->Add(mMaterialPage);
 
-	return result;
+    return result;
 }
 
 MaterialPage* MaterialWizard::getMaterialPage() const
 {
-	return mMaterialPage;
+    return mMaterialPage;
 }
 
 void MaterialWizard::OnFinish(wxWizardEvent& event)
 {
-	Project* project = mMaterialPage->getProject();
+    Project* project = mMaterialPage->getProject();
 
-	wxString name;
-	mMaterialPage->getName(name);
+    wxString name;
+    mMaterialPage->getName(name);
 
-	project->createMaterial(name.c_str());
+    project->createMaterial(name.c_str());
 }

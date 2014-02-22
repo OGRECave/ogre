@@ -38,11 +38,11 @@ using Ogre::String;
 class EditorInput
 {
 public:
-	EditorInput();
-	virtual ~EditorInput();
+    EditorInput();
+    virtual ~EditorInput();
 
-	virtual String& getName() = 0;
-	virtual String& getToolTipText() = 0;
+    virtual String& getName() = 0;
+    virtual String& getToolTipText() = 0;
 };
 
 #endif // _EDITORINPUT_H_

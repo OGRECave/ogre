@@ -61,16 +61,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MaterialPtr Quake3Shader::createAsMaterial(int lightmapNumber)
     {
-		String matName;
-		StringStream str;
+        String matName;
+        StringStream str;
         String resourceGroup = ResourceGroupManager::getSingleton().getWorldResourceGroupName();
 
         str << mName << "#" << lightmapNumber;
-		matName = str.str();
+        matName = str.str();
 
         MaterialPtr mat = MaterialManager::getSingleton().create(matName, 
             resourceGroup);
-		Ogre::Pass* ogrePass = mat->getTechnique(0)->getPass(0);
+        Ogre::Pass* ogrePass = mat->getTechnique(0)->getPass(0);
 
         LogManager::getSingleton().logMessage("Using Q3 shader " + mName, LML_CRITICAL);
         for (int p = 0; p < numPasses; ++p)
@@ -80,7 +80,7 @@ namespace Ogre {
             if (pass[p].textureName == "$lightmap")
             {
                 StringStream str2;
-				str2 << "@lightmap" << lightmapNumber;
+                str2 << "@lightmap" << lightmapNumber;
                 t = ogrePass->createTextureUnitState(str2.str());
             }
             // Animated texture support
@@ -141,9 +141,9 @@ namespace Ogre {
                     mat->setDepthWriteEnabled(false);
 
                 t->setColourOperation(LBO_REPLACE);
-				// Alpha mode
-				ogrePass->setAlphaRejectSettings(
-					pass[p].alphaFunc, pass[p].alphaVal);
+                // Alpha mode
+                ogrePass->setAlphaRejectSettings(
+                    pass[p].alphaFunc, pass[p].alphaVal);
             }
             else
             {
@@ -157,15 +157,15 @@ namespace Ogre {
                     // simple layer blend
                     t->setColourOperation(pass[p].blend);
                 }
-				// Alpha mode, prefer 'most alphary'
-				CompareFunction currFunc = ogrePass->getAlphaRejectFunction();
-				unsigned char currVal = ogrePass->getAlphaRejectValue();
-				if (pass[p].alphaFunc > currFunc ||
-					(pass[p].alphaFunc == currFunc && pass[p].alphaVal < currVal))
-				{
-					ogrePass->setAlphaRejectSettings(
-						pass[p].alphaFunc, pass[p].alphaVal);
-				}
+                // Alpha mode, prefer 'most alphary'
+                CompareFunction currFunc = ogrePass->getAlphaRejectFunction();
+                unsigned char currVal = ogrePass->getAlphaRejectValue();
+                if (pass[p].alphaFunc > currFunc ||
+                    (pass[p].alphaFunc == currFunc && pass[p].alphaVal < currVal))
+                {
+                    ogrePass->setAlphaRejectSettings(
+                        pass[p].alphaFunc, pass[p].alphaVal);
+                }
             }
             // Tex coords
             if (pass[p].texGen == TEXGEN_BASE)
@@ -269,7 +269,7 @@ namespace Ogre {
 
         pos = texName.find_last_of(".");
         ext = texName.substr(pos, 4);
-		StringUtil::toLowerCase(ext);
+        StringUtil::toLowerCase(ext);
         base = texName.substr(0,pos);
         if (ext == ".jpg")
         {

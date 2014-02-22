@@ -34,13 +34,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** Utility class for provides optimised functions.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** Utility class for provides optimised functions.
     @note
         This class are supposed used by internal engine only.
     */
@@ -116,7 +116,7 @@ namespace Ogre {
         @param srcPos1 Pointer to buffer for the start positions
         @param srcPos2 Pointer to buffer for the end positions
         @param dstPos Pointer to buffer for the destination positions
-		@param pos1VSize, pos2VSize, dstVSize Vertex sizes in bytes of each of the 3 buffers referenced
+        @param pos1VSize, pos2VSize, dstVSize Vertex sizes in bytes of each of the 3 buffers referenced
         @param numVertices Number of vertices to morph, which agree with
             the number in start, end and destination buffer. Bear in mind
             three floating-point values per vertex
@@ -125,9 +125,9 @@ namespace Ogre {
             Real t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
-			size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
+            size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
             size_t numVertices,
-			bool morphNormals) = 0;
+            bool morphNormals) = 0;
 
         /** Concatenate an affine matrix to an array of affine matrices.
         @note
@@ -236,8 +236,8 @@ namespace Ogre {
     {
         ptr = rawOffsetPointer(ptr, offset);
     }
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

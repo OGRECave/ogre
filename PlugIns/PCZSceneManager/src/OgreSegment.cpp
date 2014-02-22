@@ -30,7 +30,7 @@ Some algorithms based off code from the Wild Magic library by Dave Eberly
 begin                : Mon Apr 02 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 : 
+Code Style Update    : 
 -----------------------------------------------------------------------------
 */
 
@@ -39,7 +39,7 @@ Code Style Update	 :
 
 using namespace Ogre;
 
-const Real PARALLEL_TOLERANCE =	0.0001;
+const Real PARALLEL_TOLERANCE = 0.0001;
 
 //----------------------------------------------------------------------------
 Segment::Segment ()
@@ -48,8 +48,8 @@ Segment::Segment ()
 }
 //----------------------------------------------------------------------------
 Segment::Segment (const Vector3& origin,
-					const Vector3& direction, 
-					Real extent)
+                    const Vector3& direction, 
+                    Real extent)
     :
     mOrigin(origin),
     mDirection(direction),
@@ -59,28 +59,28 @@ Segment::Segment (const Vector3& origin,
 //----------------------------------------------------------------------------
 void Segment::set(const Vector3& newOrigin, const Vector3& newEnd)
 {
-	mOrigin = newOrigin;
-	// calc the direction vector
-	mDirection = newEnd - mOrigin;
-	mExtent = mDirection.normalise();
+    mOrigin = newOrigin;
+    // calc the direction vector
+    mDirection = newEnd - mOrigin;
+    mExtent = mDirection.normalise();
 }
 //----------------------------------------------------------------------------
 void Segment::setOrigin(const Vector3& newOrigin)
 {
-	mOrigin = newOrigin;
+    mOrigin = newOrigin;
 }
 //----------------------------------------------------------------------------
 void Segment::setEndPoint(const Vector3& newEnd)
 {
-	// calc the direction vector
-	mDirection = newEnd - mOrigin;
-	mExtent = mDirection.normalise();
+    // calc the direction vector
+    mDirection = newEnd - mOrigin;
+    mExtent = mDirection.normalise();
 }
 //----------------------------------------------------------------------------
 Real Segment::distance(const Segment& otherSegment) const
 {
     Real fSqrDist = squaredDistance(otherSegment);
-	return Ogre::Math::Sqrt(fSqrDist);
+    return Ogre::Math::Sqrt(fSqrDist);
 }
 //----------------------------------------------------------------------------
 Real Segment::squaredDistance(const Segment& otherSegment) const
@@ -89,11 +89,11 @@ Real Segment::squaredDistance(const Segment& otherSegment) const
     Real fA01 = -mDirection.dotProduct(otherSegment.mDirection);
     Real fB0 = kDiff.dotProduct(mDirection);
     Real fB1 = -kDiff.dotProduct(otherSegment.mDirection);
-	Real fC = kDiff.squaredLength();
-	Real fDet = Math::Abs((Real)1.0 - fA01*fA01);
+    Real fC = kDiff.squaredLength();
+    Real fDet = Math::Abs((Real)1.0 - fA01*fA01);
     Real fS0, fS1, fSqrDist, fExtDet0, fExtDet1, fTmpS0, fTmpS1;
 
-	if (fDet >= PARALLEL_TOLERANCE)
+    if (fDet >= PARALLEL_TOLERANCE)
     {
         // segments are not parallel
         fS0 = fA01*fB1-fB0;
@@ -398,7 +398,7 @@ Real Segment::squaredDistance(const Segment& otherSegment) const
 //        fS0 = fLambda + fSign*fS1;
         fSqrDist = fLambda*(fLambda + ((Real)2.0)*fB0Avr) + fC;
     }
-	// we don't need the following stuff - it's for calculating closest point
+    // we don't need the following stuff - it's for calculating closest point
 //    mClosestPoint0 = mOrigin + fS0*mDirection;
 //    mClosestPoint1 = otherSegment.mOrigin + fS1*otherSegment.mDirection;
 //    mSegment0Parameter = fS0;

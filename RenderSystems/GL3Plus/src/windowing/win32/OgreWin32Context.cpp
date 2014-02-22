@@ -44,56 +44,56 @@ namespace Ogre {
     
     Win32Context::~Win32Context()
     {
-		// NB have to do this is subclass to ensure any methods called back
-		// are on this subclass and not half-destructed superclass
-		GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
-		rs->_unregisterContext(this);
+        // NB have to do this is subclass to ensure any methods called back
+        // are on this subclass and not half-destructed superclass
+        GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+        rs->_unregisterContext(this);
     }
         
     void Win32Context::setCurrent()
     {
          wglMakeCurrent(mHDC, mGlrc);      
     }
-	void Win32Context::endCurrent()
-	{
-		wglMakeCurrent(NULL, NULL);
-	}
+    void Win32Context::endCurrent()
+    {
+        wglMakeCurrent(NULL, NULL);
+    }
 
-	GL3PlusContext* Win32Context::clone() const
-	{
-		// Create new context based on own HDC
-		HGLRC newCtx = wglCreateContext(mHDC);
-		
-		if (!newCtx)
-		{
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-				"Error calling wglCreateContext", "Win32Context::clone");
-		}
+    GL3PlusContext* Win32Context::clone() const
+    {
+        // Create new context based on own HDC
+        HGLRC newCtx = wglCreateContext(mHDC);
+        
+        if (!newCtx)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                "Error calling wglCreateContext", "Win32Context::clone");
+        }
 
-		HGLRC oldrc = wglGetCurrentContext();
-		HDC oldhdc = wglGetCurrentDC();
-		wglMakeCurrent(NULL, NULL);
-		// Share lists with old context
-	    if (!wglShareLists(mGlrc, newCtx))
-		{
-			String errorMsg = translateWGLError();
-			wglDeleteContext(newCtx);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("wglShareLists() failed: ") + errorMsg, "Win32Context::clone");
-		}
-		// restore old context
-		wglMakeCurrent(oldhdc, oldrc);
-		
+        HGLRC oldrc = wglGetCurrentContext();
+        HDC oldhdc = wglGetCurrentDC();
+        wglMakeCurrent(NULL, NULL);
+        // Share lists with old context
+        if (!wglShareLists(mGlrc, newCtx))
+        {
+            String errorMsg = translateWGLError();
+            wglDeleteContext(newCtx);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("wglShareLists() failed: ") + errorMsg, "Win32Context::clone");
+        }
+        // restore old context
+        wglMakeCurrent(oldhdc, oldrc);
+        
 
-		return new Win32Context(mHDC, newCtx);
-	}
+        return new Win32Context(mHDC, newCtx);
+    }
 
-	void Win32Context::releaseContext()
-	{
-		if (mGlrc != NULL)
-		{
-			wglDeleteContext(mGlrc);
-			mGlrc = NULL;
-			mHDC  = NULL;
-		}		
-	}
+    void Win32Context::releaseContext()
+    {
+        if (mGlrc != NULL)
+        {
+            wglDeleteContext(mGlrc);
+            mGlrc = NULL;
+            mHDC  = NULL;
+        }       
+    }
 }

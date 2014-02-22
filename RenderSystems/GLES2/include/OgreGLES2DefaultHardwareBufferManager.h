@@ -145,7 +145,7 @@ namespace Ogre {
         HardwareUniformBufferSharedPtr
             createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
 
-		HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                            HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                            bool useShadowBuffer = false, const String& name = "")
         {
@@ -155,19 +155,19 @@ namespace Ogre {
         }
     };
 
-	/// GLES2DefaultHardwareBufferManagerBase as a Singleton
-	class _OgreGLES2Export GLES2DefaultHardwareBufferManager : public HardwareBufferManager
-	{
-	public:
-		GLES2DefaultHardwareBufferManager()
-			: HardwareBufferManager(OGRE_NEW GLES2DefaultHardwareBufferManagerBase()) 
-		{
+    /// GLES2DefaultHardwareBufferManagerBase as a Singleton
+    class _OgreGLES2Export GLES2DefaultHardwareBufferManager : public HardwareBufferManager
+    {
+    public:
+        GLES2DefaultHardwareBufferManager()
+            : HardwareBufferManager(OGRE_NEW GLES2DefaultHardwareBufferManagerBase()) 
+        {
 
-		}
-		~GLES2DefaultHardwareBufferManager()
-		{
-			OGRE_DELETE mImpl;
-		}
+        }
+        ~GLES2DefaultHardwareBufferManager()
+        {
+            OGRE_DELETE mImpl;
+        }
         HardwareUniformBufferSharedPtr
         createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
         {

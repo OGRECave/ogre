@@ -16,17 +16,17 @@ using Ogre::String;
 class DocPanel : public wxPanel
 {
 public:
-	DocPanel(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = "LogPanel");
-	~DocPanel();
+    DocPanel(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = "LogPanel");
+    ~DocPanel();
 
-	void OnActiveEditorChanged(EventArgs& args);
-	void OnFocusedWordChanged(EventArgs& args);
+    void OnActiveEditorChanged(EventArgs& args);
+    void OnFocusedWordChanged(EventArgs& args);
 
 protected:
-	wxBoxSizer* mBoxSizer;
-	wxTextCtrl* mTextControl;
+    wxBoxSizer* mBoxSizer;
+    wxTextCtrl* mTextControl;
 
-	ScintillaEditor* mEditor;
+    ScintillaEditor* mEditor;
 };
 
 #endif // _DOCPANEL_H_

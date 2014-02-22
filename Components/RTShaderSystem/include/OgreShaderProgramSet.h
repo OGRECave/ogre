@@ -46,49 +46,49 @@ Holds both a CPU representation and GPU representation of vertex and fragment pr
 class _OgreRTSSExport ProgramSet : public RTShaderSystemAlloc
 {
 
-	// Interface.
+    // Interface.
 public:
-	/** Class default constructor */
-	ProgramSet();
+    /** Class default constructor */
+    ProgramSet();
 
-	/** Class destructor */
-	~ProgramSet();
+    /** Class destructor */
+    ~ProgramSet();
 
-	/** Get the vertex shader CPU program. */
-	Program* getCpuVertexProgram();
+    /** Get the vertex shader CPU program. */
+    Program* getCpuVertexProgram();
 
-	/** Get the fragment shader CPU program. */
-	Program* getCpuFragmentProgram();
+    /** Get the fragment shader CPU program. */
+    Program* getCpuFragmentProgram();
 
-	/** Get the vertex shader GPU program. */
-	GpuProgramPtr getGpuVertexProgram();
+    /** Get the vertex shader GPU program. */
+    GpuProgramPtr getGpuVertexProgram();
 
-	/** Get the fragment shader GPU program. */
-	GpuProgramPtr getGpuFragmentProgram();
+    /** Get the fragment shader GPU program. */
+    GpuProgramPtr getGpuFragmentProgram();
 
-	// Protected methods.
+    // Protected methods.
 protected:
-	void setCpuVertexProgram(Program* vsCpuProgram);
-	void setCpuFragmentProgram(Program* psCpuProgram);
+    void setCpuVertexProgram(Program* vsCpuProgram);
+    void setCpuFragmentProgram(Program* psCpuProgram);
 
-	void setGpuVertexProgram(GpuProgramPtr vsGpuProgram);
-	void setGpuFragmentProgram(GpuProgramPtr psGpuProgram);
+    void setGpuVertexProgram(GpuProgramPtr vsGpuProgram);
+    void setGpuFragmentProgram(GpuProgramPtr psGpuProgram);
 
 
-	// Attributes.
+    // Attributes.
 protected:
-	// Vertex shader CPU program.
-	Program* mVSCpuProgram;
-	// Fragment shader CPU program.
-	Program* mPSCpuProgram;
-	// Vertex shader GPU program.
-	GpuProgramPtr mVSGpuProgram;
-	// Fragment shader CPU program.
-	GpuProgramPtr mPSGpuProgram;
+    // Vertex shader CPU program.
+    Program* mVSCpuProgram;
+    // Fragment shader CPU program.
+    Program* mPSCpuProgram;
+    // Vertex shader GPU program.
+    GpuProgramPtr mVSGpuProgram;
+    // Fragment shader CPU program.
+    GpuProgramPtr mPSGpuProgram;
 
 private:
-	friend class ProgramManager;
-	friend class TargetRenderState;
+    friend class ProgramManager;
+    friend class TargetRenderState;
 
 };
 

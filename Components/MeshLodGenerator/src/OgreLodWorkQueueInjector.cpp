@@ -34,55 +34,55 @@
 
 namespace Ogre
 {
-	template<> LodWorkQueueInjector* Singleton<LodWorkQueueInjector>::msSingleton = 0;
-	LodWorkQueueInjector* LodWorkQueueInjector::getSingletonPtr(void)
-	{
-		return msSingleton;
-	}
-	LodWorkQueueInjector& LodWorkQueueInjector::getSingleton(void)
-	{  
-		assert( msSingleton );  return ( *msSingleton );  
-	}
+    template<> LodWorkQueueInjector* Singleton<LodWorkQueueInjector>::msSingleton = 0;
+    LodWorkQueueInjector* LodWorkQueueInjector::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+    LodWorkQueueInjector& LodWorkQueueInjector::getSingleton(void)
+    {  
+        assert( msSingleton );  return ( *msSingleton );  
+    }
 
 
-	LodWorkQueueInjector::LodWorkQueueInjector() :
-		mInjectorListener(0)
-	{
-		WorkQueue* wq = Root::getSingleton().getWorkQueue();
-		unsigned short workQueueChannel = wq->getChannel("PMGen");
-		wq->addResponseHandler(workQueueChannel, this);
-	}
+    LodWorkQueueInjector::LodWorkQueueInjector() :
+        mInjectorListener(0)
+    {
+        WorkQueue* wq = Root::getSingleton().getWorkQueue();
+        unsigned short workQueueChannel = wq->getChannel("PMGen");
+        wq->addResponseHandler(workQueueChannel, this);
+    }
 
-	LodWorkQueueInjector::~LodWorkQueueInjector()
-	{
-		Root* root = Root::getSingletonPtr();
-		if (root) {
-			WorkQueue* wq = root->getWorkQueue();
-			if (wq) {
-				unsigned short workQueueChannel = wq->getChannel("PMGen");
-				wq->removeResponseHandler(workQueueChannel, this);
-			}
-		}
-	}
+    LodWorkQueueInjector::~LodWorkQueueInjector()
+    {
+        Root* root = Root::getSingletonPtr();
+        if (root) {
+            WorkQueue* wq = root->getWorkQueue();
+            if (wq) {
+                unsigned short workQueueChannel = wq->getChannel("PMGen");
+                wq->removeResponseHandler(workQueueChannel, this);
+            }
+        }
+    }
 
-	void LodWorkQueueInjector::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
-	{
-		LodWorkQueueRequest* request = any_cast<LodWorkQueueRequest*>(res->getData());
+    void LodWorkQueueInjector::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+    {
+        LodWorkQueueRequest* request = any_cast<LodWorkQueueRequest*>(res->getData());
 
-		if(mInjectorListener){
-			if(!mInjectorListener->shouldInject(request)) {
-				return;
-			}
-		}
+        if(mInjectorListener){
+            if(!mInjectorListener->shouldInject(request)) {
+                return;
+            }
+        }
 
-		request->output->inject();
-		MeshLodGenerator::_configureMeshLodUsage(request->config);
-		//lodConfig.mesh->buildEdgeList();
+        request->output->inject();
+        MeshLodGenerator::_configureMeshLodUsage(request->config);
+        //lodConfig.mesh->buildEdgeList();
 
-		if(mInjectorListener){
-			mInjectorListener->injectionCompleted(request);
-		}
-	}
+        if(mInjectorListener){
+            mInjectorListener->injectionCompleted(request);
+        }
+    }
 
-	
+    
 }

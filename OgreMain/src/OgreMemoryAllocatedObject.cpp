@@ -30,26 +30,26 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/* 
+    /* 
 
-	Ugh, I wish I didn't have to do this.
+    Ugh, I wish I didn't have to do this.
 
-	The problem is that operator new/delete are *implicitly* static. We have to 
-	instantiate them for each combination exactly once throughout all the compilation
-	units that are linked together, and this appears to be the only way to do it. 
+    The problem is that operator new/delete are *implicitly* static. We have to 
+    instantiate them for each combination exactly once throughout all the compilation
+    units that are linked together, and this appears to be the only way to do it. 
 
-	At least I can do it via templates.
+    At least I can do it via templates.
 
-	*/
+    */
 
-	template class AllocatedObject<GeneralAllocPolicy>;
-	template class AllocatedObject<GeometryAllocPolicy>;
-	template class AllocatedObject<AnimationAllocPolicy>;
-	template class AllocatedObject<SceneCtlAllocPolicy>;
-	template class AllocatedObject<SceneObjAllocPolicy>;
-	template class AllocatedObject<ResourceAllocPolicy>;
-	template class AllocatedObject<ScriptingAllocPolicy>;
-	template class AllocatedObject<RenderSysAllocPolicy>; 
+    template class AllocatedObject<GeneralAllocPolicy>;
+    template class AllocatedObject<GeometryAllocPolicy>;
+    template class AllocatedObject<AnimationAllocPolicy>;
+    template class AllocatedObject<SceneCtlAllocPolicy>;
+    template class AllocatedObject<SceneObjAllocPolicy>;
+    template class AllocatedObject<ResourceAllocPolicy>;
+    template class AllocatedObject<ScriptingAllocPolicy>;
+    template class AllocatedObject<RenderSysAllocPolicy>; 
 
 
 

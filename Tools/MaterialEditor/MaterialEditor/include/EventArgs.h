@@ -31,8 +31,8 @@ THE SOFTWARE
 class EventArgs
 {
 public:
-	EventArgs() {}
-	virtual ~EventArgs() {}
+    EventArgs() {}
+    virtual ~EventArgs() {}
 };
 
 #endif // _EVENTARGS_H_

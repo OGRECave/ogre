@@ -35,20 +35,20 @@ THE SOFTWARE.
 
 namespace Ogre {
     GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr, 
-													 IndexType idxType,
+                                                     IndexType idxType,
                                                      size_t numIndexes,
                                                      HardwareBuffer::Usage usage,
                                                      bool useShadowBuffer)
         : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
     {
 #if OGRE_NO_GLES3_SUPPORT == 1
-		if (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_32BIT_INDEX) &&
+        if (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_32BIT_INDEX) &&
             idxType == HardwareIndexBuffer::IT_32BIT)
-		{
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-				"32 bit hardware buffers are not allowed in OpenGL ES.",
-				"GLES2HardwareIndexBuffer");
-		}
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "32 bit hardware buffers are not allowed in OpenGL ES.",
+                "GLES2HardwareIndexBuffer");
+        }
 #endif
         createBuffer();
     }
@@ -75,7 +75,7 @@ namespace Ogre {
                         "GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer");
         }
         
-		static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
         
         OGRE_CHECK_GL_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, NULL,
                                          GLES2HardwareBufferManager::getGLUsage(mUsage)));
@@ -83,7 +83,7 @@ namespace Ogre {
     
     void GLES2HardwareIndexBuffer::destroyBuffer()
     {
-		// Delete the cached value
+        // Delete the cached value
         static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
     }
     
@@ -177,7 +177,7 @@ namespace Ogre {
         // return offsetted
         void *retPtr = static_cast<void*>(
             static_cast<unsigned char*>(pBuffer) + offset);
-		mIsLocked = true;
+        mIsLocked = true;
         return retPtr;
     }
 
@@ -224,7 +224,7 @@ namespace Ogre {
                                             const void* pSource,
                                             bool discardWholeBuffer)
     {
-		static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
         // Update the shadow buffer
         if (mUseShadowBuffer)
@@ -260,7 +260,7 @@ namespace Ogre {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
         if (srcBuffer.isSystemMemory())
         {
-			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
         else
         {
@@ -290,7 +290,7 @@ namespace Ogre {
         {
             const void *srcData = mShadowBuffer->lock(mLockStart, mLockSize, HBL_READ_ONLY);
 
-			static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+            static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
             OGRE_CHECK_GL_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, srcData,
                                              GLES2HardwareBufferManager::getGLUsage(mUsage)));

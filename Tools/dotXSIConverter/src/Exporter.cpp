@@ -87,7 +87,7 @@ void Exporter::exportCSLModel(Mesh* pMesh, CSLModel* XSIModel)
 {
     if (XSIModel->GetPrimitiveType() == CSLTemplate::SI_MESH)
         exportSubMesh(pMesh, (CSLMesh *) XSIModel->Primitive());
-	
+    
     CSLModel* *l_childrenList = XSIModel->GetChildrenList();
 
     // Loop through all children
@@ -102,7 +102,7 @@ void Exporter::exportSubMesh(Mesh *pMesh, CSLMesh* XSIMesh)
 {
     SubMesh* sm = 0;
     sm = pMesh->createSubMesh(XSIMesh->GetName());
-	
+    
     // HACK:  No materials exporter yet, I hard coded this, wrong as hell, but did it anyway
     // For now, I'm just creating the materials file manually.
     sm->setMaterialName("Examples/Woman");
@@ -152,7 +152,7 @@ void Exporter::exportSubMesh(Mesh *pMesh, CSLMesh* XSIMesh)
 
             // We are assuming 1 UV -- in our files, number of UV's = number of Normals
             vertex.uv[0] = Vector2(uv.GetX(), (1 - uv.GetY()));
-						
+                        
             if (hasVertexColors)
                 vertex.color = triArray->GetColorIndicesPtr()[t*3+p];
             size_t index = createOrRetrieveUniqueVertex(triArray->GetVertexIndicesPtr()[t*3+p], vertex);
@@ -195,7 +195,7 @@ void Exporter::exportSubMesh(Mesh *pMesh, CSLMesh* XSIMesh)
     sm->vertexData->vertexDeclaration->addElement(buf, offset, VET_FLOAT3, VES_NORMAL);
     offset += VertexElement::getTypeSize(VET_FLOAT3);
     // TODO:  Split Vertex Data if animated
-	
+    
     if (hasVertexColors)
     {
         sm->vertexData->vertexDeclaration->addElement(buf, offset, VET_COLOUR, VES_DIFFUSE);
@@ -238,7 +238,7 @@ void Exporter::exportSubMesh(Mesh *pMesh, CSLMesh* XSIMesh)
     pMesh->_setBounds(box);
     pMesh->_setBoundingSphereRadius(std::max(pMesh->getBoundingSphereRadius(), 
         Math::Sqrt(squaredRadius)));
-	
+    
     // Get Envelope list for this submesh
     CSLEnvelope** envelopes = XSIMesh->ParentModel()->GetEnvelopeList();
     CSLEnvelope* env = 0;
@@ -257,9 +257,9 @@ void Exporter::exportSubMesh(Mesh *pMesh, CSLMesh* XSIMesh)
                 continue;
             break;
         }
-		
+        
         SLVertexWeight* wtList = env->GetVertexWeightListPtr();
-		
+        
         // Go through all collocated vertices, assigning the same weights to each.
         // All the dotXSI files I've seen normalize the weights to 100, so for now
         // I'm just dividing by 100.  TODO:  Insert code to handle normalization
@@ -280,7 +280,7 @@ void Exporter::exportSubMesh(Mesh *pMesh, CSLMesh* XSIMesh)
             }
         }
     }
-	
+    
     // Last step here is to reorganise the vertex buffers
     VertexDeclaration* newDecl = 
         sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(true);
@@ -288,7 +288,7 @@ void Exporter::exportSubMesh(Mesh *pMesh, CSLMesh* XSIMesh)
     for (size_t u = 0; u <= newDecl->getMaxSource(); ++u)
         bufferUsages.push_back(HardwareBuffer::HBU_STATIC_WRITE_ONLY);
     sm->vertexData->reorganiseBuffers(newDecl, bufferUsages);
-}			
+}           
 
 //-----------------------------------------------------------------------------
 template <typename T>
@@ -406,15 +406,15 @@ size_t Exporter::createOrRetrieveUniqueVertex(size_t originalPositionIndex, cons
 
 //------------------------------------------------------------------------------
 void Exporter::exportBones(std::string fileName)
-{		
+{       
     // Construct skeleton
     SkeletonPtr pSkel = SkeletonManager::getSingleton().create( fileName, ResourceGroupManager::
         DEFAULT_RESOURCE_GROUP_NAME, true);
-		
-    // Recursively traverse the bone tree	
+        
+    // Recursively traverse the bone tree   
     root = false;
     recurseBones(pSkel.getPointer(), SceneRoot);
-	
+    
     // Export animations
     exportAnim(pSkel.getPointer(), SceneRoot);
 
@@ -427,7 +427,7 @@ void Exporter::exportBones(std::string fileName)
 void Exporter::recurseBones(Skeleton* pSkel, CSLModel* XSIModel)
 {
     CSIBCVector3D vec3d;
-		
+        
     // A plethora of logical expressions to ensure that the root null and
     // its children are the only ones that will enter this if block.  Eliminates
     // any extraneous nulls not related to the skeleton.
@@ -443,7 +443,7 @@ void Exporter::recurseBones(Skeleton* pSkel, CSLModel* XSIModel)
         vec3d = XSIModel->Transform()->GetTranslation();
         Vector3 bonePos(vec3d.GetX(), vec3d.GetY(), vec3d.GetZ());
         ogreBone->setPosition(bonePos);
-		
+        
         // Yes, we are converting Euler angles to quaternions, at risk of gimbal lock.
         // This is because XSI doesn't export quaternions, except through the animation
         // mixer and action FCurves.  It's possible to get a 3x3 Rotation matrix, which
@@ -458,13 +458,13 @@ void Exporter::recurseBones(Skeleton* pSkel, CSLModel* XSIModel)
         qfinal = qz * qy * qx;
         ogreBone->setOrientation(qfinal);
         ++boneCount;
-        		
+                
         if ((boneCount > 1) && (XSIModel->ParentModel()->GetPrimitiveType() == CSLTemplate::SI_NULL_OBJECT))
         {
             pSkel->getBone(XSIModel->ParentModel()->GetName())->addChild(ogreBone);
         }
-    }			
-			
+    }           
+            
     CSLModel* *l_childrenList = XSIModel->GetChildrenList();
 
     // Loop through all children
@@ -481,13 +481,13 @@ void Exporter::exportAnim(Skeleton* pSkel, CSLModel* XSIModel)
     CSLTransform* initial;
     CSLTransform* keyfr = 0;
     CSIBCMatrix4x4 initmat, invinitmat, keyfmat, newmat;
-	
+    
     // Timing conversions from XSI frames to OGRE time in seconds
     float frameRate = XSIModel->Scene()->SceneInfo()->GetFrameRate();
     float lengthInFrames = XSIModel->Scene()->SceneInfo()->GetEnd() - 
         XSIModel->Scene()->SceneInfo()->GetStart();
     float realTime = lengthInFrames / frameRate; 
-	
+    
     // HACK:  You'd want to assign the correct name to your particular animation.
     Animation *ogreanim =
         pSkel->createAnimation("Jump", realTime );
@@ -512,13 +512,13 @@ void Exporter::exportAnim(Skeleton* pSkel, CSLModel* XSIModel)
             CSLLinearKey* tranx = XSIbone->Transform()->GetSpecificFCurve(CSLTemplate::SI_TRANSLATION_X)->GetLinearKeyListPtr();
             CSLLinearKey* trany = XSIbone->Transform()->GetSpecificFCurve(CSLTemplate::SI_TRANSLATION_Y)->GetLinearKeyListPtr();
             CSLLinearKey* tranz = XSIbone->Transform()->GetSpecificFCurve(CSLTemplate::SI_TRANSLATION_Z)->GetLinearKeyListPtr();
-				
+                
             // Set up the bind pose matrix and take inverse
             initial = XSIbone->Transform();
             initial->ComputeLocalMatrix();
             initmat = initial->GetMatrix();
             initmat.GetInverse(invinitmat);
-			
+            
             for (int currKeyIdx = 0; currKeyIdx < numKeys; ++currKeyIdx)
             {
                 // Create keyframe
@@ -532,7 +532,7 @@ void Exporter::exportAnim(Skeleton* pSkel, CSLModel* XSIModel)
                 keyfr->SetTranslation(CSIBCVector3D(tranx[currKeyIdx].m_fValue, trany[currKeyIdx].m_fValue, tranz[currKeyIdx].m_fValue));
                 keyfr->ComputeLocalMatrix();
                 keyfmat = keyfr->GetMatrix();
-				
+                
                 // Inverse bind pose matrix * keyframe transformation matrix
                 invinitmat.Multiply(keyfmat, newmat);
                 CSIBCVector3D kfSca, kfRot, kfPos;
@@ -562,7 +562,7 @@ int main(int argc, char *argv[])
         std::cout << "Ex:  exporter example.xsi example\n";
         return (0);
     }
-	
+    
     // Ogre Singletons
     logMgr = new LogManager();
     logMgr->createLog("XSIOgreExport");
@@ -576,10 +576,10 @@ int main(int argc, char *argv[])
     std::string fn(argv[2]);
     std::string meshFileName = fn + ".mesh";
     std::string skelFileName = fn + ".skeleton";
-	
+    
     // Continue if valid dotXSI file, end gracefully if not
     if (Scene.Open(argv[1]) == SI_SUCCESS) 
-    {	
+    {   
         Scene.Read();
         Exporter * e = new Exporter(Scene.Root());
         e->exportBones(skelFileName);

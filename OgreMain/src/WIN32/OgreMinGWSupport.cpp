@@ -32,20 +32,20 @@ THE SOFTWARE.
 // may cause linking errors when linking against the DX SDK.
 
 extern "C" {
-	// MSVC libs use _chkstk for stack-probing. MinGW equivalent is _alloca.
-	// But calling it to ensure Ogre build with D3D9 static does cause a crash.
-	// Might have to investige further here, later.
-	//void _alloca();
-	void _chkstk()
-	{
-		//_alloca();
-	}
-	
-	// MSVC uses security cookies to prevent some buffer overflow attacks.
-	// provide dummy implementations.
-	intptr_t __security_cookie;
-	
-	void _fastcall __security_check_cookie(intptr_t i)
-	{
-	}
+    // MSVC libs use _chkstk for stack-probing. MinGW equivalent is _alloca.
+    // But calling it to ensure Ogre build with D3D9 static does cause a crash.
+    // Might have to investige further here, later.
+    //void _alloca();
+    void _chkstk()
+    {
+        //_alloca();
+    }
+    
+    // MSVC uses security cookies to prevent some buffer overflow attacks.
+    // provide dummy implementations.
+    intptr_t __security_cookie;
+    
+    void _fastcall __security_check_cookie(intptr_t i)
+    {
+    }
 }

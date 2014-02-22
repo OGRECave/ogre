@@ -36,7 +36,7 @@ a given scenenode's PCZSceneNode by the scene manager.
 begin                : Sat Mar 24 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -49,24 +49,24 @@ Code Style Update	 :
 
 namespace Ogre
 {
-	// forward declarations
-	class PCZone;
-	class ZoneData;
-	class PCZCamera;
+    // forward declarations
+    class PCZone;
+    class ZoneData;
+    class PCZCamera;
     typedef map<String, PCZone*>::type ZoneMap;
-	typedef map<String, ZoneData*>::type ZoneDataMap;
+    typedef map<String, ZoneData*>::type ZoneDataMap;
 
-	class _OgrePCZPluginExport PCZSceneNode : public SceneNode
-	{
-	public:
-		/** Standard constructor */
-		PCZSceneNode( SceneManager* creator );
-		/** Standard constructor */
-		PCZSceneNode( SceneManager* creator, const String& name );
-		/** Standard destructor */
-		~PCZSceneNode();
-		void _update(bool updateChildren, bool parentHasChanged);
-		void updateFromParentImpl() const;
+    class _OgrePCZPluginExport PCZSceneNode : public SceneNode
+    {
+    public:
+        /** Standard constructor */
+        PCZSceneNode( SceneManager* creator );
+        /** Standard constructor */
+        PCZSceneNode( SceneManager* creator, const String& name );
+        /** Standard destructor */
+        ~PCZSceneNode();
+        void _update(bool updateChildren, bool parentHasChanged);
+        void updateFromParentImpl() const;
 
         /** Creates an unnamed new SceneNode as a child of this node.
         @param
@@ -90,47 +90,47 @@ namespace Ogre
         virtual SceneNode* createChildSceneNode(const String& name, const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
 
 
-		PCZone* 	getHomeZone(void);
-		void		setHomeZone(PCZone * zone);
-		void		anchorToHomeZone(PCZone * zone);
-		bool		isAnchored(void) {return mAnchored;}
-		void		allowToVisit(bool yesno) {mAllowedToVisit = yesno;}
-		bool		allowedToVisit(void) {return mAllowedToVisit;}
-		void		addZoneToVisitingZonesMap(PCZone * zone);
-		void		clearVisitingZonesMap(void);
-		void		clearNodeFromVisitedZones( void );
-		void		removeReferencesToZone(PCZone * zone);
-		bool		isVisitingZone(PCZone * zone);
-	    void		_addToRenderQueue( Camera* cam, 
+        PCZone*     getHomeZone(void);
+        void        setHomeZone(PCZone * zone);
+        void        anchorToHomeZone(PCZone * zone);
+        bool        isAnchored(void) {return mAnchored;}
+        void        allowToVisit(bool yesno) {mAllowedToVisit = yesno;}
+        bool        allowedToVisit(void) {return mAllowedToVisit;}
+        void        addZoneToVisitingZonesMap(PCZone * zone);
+        void        clearVisitingZonesMap(void);
+        void        clearNodeFromVisitedZones( void );
+        void        removeReferencesToZone(PCZone * zone);
+        bool        isVisitingZone(PCZone * zone);
+        void        _addToRenderQueue( Camera* cam, 
                                        RenderQueue *queue, 
                                        bool onlyShadowCasters, 
                                        VisibleObjectsBoundsInfo* visibleBounds );
-		void		savePrevPosition(void);
-		Vector3&	getPrevPosition(void) {return mPrevPosition;}
-		unsigned long		getLastVisibleFrame(void) {return mLastVisibleFrame;}
-		void		setLastVisibleFrame(unsigned long newLVF) {mLastVisibleFrame = newLVF;}
-		void		setLastVisibleFromCamera(PCZCamera * camera) {mLastVisibleFromCamera = camera;}
-		PCZCamera*	getLastVisibleFromCamera() {return mLastVisibleFromCamera;}
-		void		setZoneData(PCZone * zone, ZoneData * zoneData);
-		ZoneData*	getZoneData(PCZone * zone);
-		void		updateZoneData(void);
-		void		enable(bool yesno) {mEnabled = yesno;}
-		bool		isEnabled(void) {return mEnabled;}
-		bool		isMoved(void) {return mMoved;}
-		void		setMoved(bool value) {mMoved = value;}
-	protected:
-		mutable Vector3	mNewPosition; 
-		PCZone *		mHomeZone;
-		bool			mAnchored;
-		bool			mAllowedToVisit;
-		ZoneMap			mVisitingZones;
-		mutable Vector3	mPrevPosition;
-		unsigned long	mLastVisibleFrame;
-		PCZCamera*		mLastVisibleFromCamera;
-		ZoneDataMap		mZoneData;
-		bool			mEnabled;
-		mutable bool	mMoved;
-	};
+        void        savePrevPosition(void);
+        Vector3&    getPrevPosition(void) {return mPrevPosition;}
+        unsigned long       getLastVisibleFrame(void) {return mLastVisibleFrame;}
+        void        setLastVisibleFrame(unsigned long newLVF) {mLastVisibleFrame = newLVF;}
+        void        setLastVisibleFromCamera(PCZCamera * camera) {mLastVisibleFromCamera = camera;}
+        PCZCamera*  getLastVisibleFromCamera() {return mLastVisibleFromCamera;}
+        void        setZoneData(PCZone * zone, ZoneData * zoneData);
+        ZoneData*   getZoneData(PCZone * zone);
+        void        updateZoneData(void);
+        void        enable(bool yesno) {mEnabled = yesno;}
+        bool        isEnabled(void) {return mEnabled;}
+        bool        isMoved(void) {return mMoved;}
+        void        setMoved(bool value) {mMoved = value;}
+    protected:
+        mutable Vector3 mNewPosition; 
+        PCZone *        mHomeZone;
+        bool            mAnchored;
+        bool            mAllowedToVisit;
+        ZoneMap         mVisitingZones;
+        mutable Vector3 mPrevPosition;
+        unsigned long   mLastVisibleFrame;
+        PCZCamera*      mLastVisibleFromCamera;
+        ZoneDataMap     mZoneData;
+        bool            mEnabled;
+        mutable bool    mMoved;
+    };
 }
 
 #endif // PCZ_SCENE_NODE_H

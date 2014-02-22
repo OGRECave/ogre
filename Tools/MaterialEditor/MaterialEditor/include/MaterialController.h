@@ -38,7 +38,7 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	class Technique;
+    class Technique;
 }
 
 class TechniqueController;
@@ -50,62 +50,62 @@ typedef std::list<TechniqueController*> TechniqueControllerList;
 class MaterialController : public EventContainer
 {
 public:
-	enum MaterialEvent
-	{
-		NameChanged,
-		TechniqueAdded,
-		TechniqueRemoved
-	};
+    enum MaterialEvent
+    {
+        NameChanged,
+        TechniqueAdded,
+        TechniqueRemoved
+    };
 
-	MaterialController();
-	MaterialController(MaterialPtr material);
-	virtual ~MaterialController();
+    MaterialController();
+    MaterialController(MaterialPtr material);
+    virtual ~MaterialController();
 
-	MaterialPtr getMaterial() const;
-	void setMaterial(MaterialPtr mp);
-	
-	TechniqueController* getTechniqueController(const String& name);
-	const TechniqueControllerList* getTechniqueControllers() const;		
+    MaterialPtr getMaterial() const;
+    void setMaterial(MaterialPtr mp);
+    
+    TechniqueController* getTechniqueController(const String& name);
+    const TechniqueControllerList* getTechniqueControllers() const;     
 
-	void setName(const String& name);
-	void setReceiveShadows(bool enabled);
-	void setTransparencyCastsShadows(bool enabled);
-	TechniqueController* createTechnique(void);
-	TechniqueController* createTechnique(const String& name);
-	void removeTechnique(unsigned short index);
-	void removeAllTechniques(void);
+    void setName(const String& name);
+    void setReceiveShadows(bool enabled);
+    void setTransparencyCastsShadows(bool enabled);
+    TechniqueController* createTechnique(void);
+    TechniqueController* createTechnique(const String& name);
+    void removeTechnique(unsigned short index);
+    void removeAllTechniques(void);
 
-	void setAmbient(const ColourValue&  ambient);
-	void setAmbient(Real red, Real green, Real blue);
-	void setColourWriteEnabled(bool enabled);   
-	void setCullingMode(CullingMode mode);   
-	void setDepthBias(float constantBias, float slopeScaleBias);   
-	void setDepthCheckEnabled(bool enabled);  
-	void setDepthFunction(CompareFunction func);
-	void setDepthWriteEnabled(bool enabled);   
-	void setDiffuse(const ColourValue&  diffuse);
-	void setDiffuse(Real red, Real green, Real blue, Real alpha);   
-	void setFog(bool overrideScene, FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 0.001, Real linearStart = 0.0, Real linearEnd = 1.0);   
-	void setLightingEnabled(bool enabled);
-	void setManualCullingMode(ManualCullingMode mode);
-	void setPointSize(Real ps);   
-	void setSceneBlending(const SceneBlendFactor sourceFactor, const SceneBlendFactor  destFactor);   
-	void setSceneBlending(const SceneBlendType sbt);   
-	void setSelfIllumination(const ColourValue& selfIllum);   
-	void setSelfIllumination(Real red, Real green, Real blue);   
-	void setShadingMode(ShadeOptions mode);   
-	void setShininess(Real val);   
-	void setSpecular(const ColourValue& specular);   
-	void setSpecular(Real red, Real green, Real blue, Real alpha);   
-	void setTextureAnisotropy(unsigned int maxAniso);   
-	void setTextureFiltering(TextureFilterOptions filterType);   
+    void setAmbient(const ColourValue&  ambient);
+    void setAmbient(Real red, Real green, Real blue);
+    void setColourWriteEnabled(bool enabled);   
+    void setCullingMode(CullingMode mode);   
+    void setDepthBias(float constantBias, float slopeScaleBias);   
+    void setDepthCheckEnabled(bool enabled);  
+    void setDepthFunction(CompareFunction func);
+    void setDepthWriteEnabled(bool enabled);   
+    void setDiffuse(const ColourValue&  diffuse);
+    void setDiffuse(Real red, Real green, Real blue, Real alpha);   
+    void setFog(bool overrideScene, FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 0.001, Real linearStart = 0.0, Real linearEnd = 1.0);   
+    void setLightingEnabled(bool enabled);
+    void setManualCullingMode(ManualCullingMode mode);
+    void setPointSize(Real ps);   
+    void setSceneBlending(const SceneBlendFactor sourceFactor, const SceneBlendFactor  destFactor);   
+    void setSceneBlending(const SceneBlendType sbt);   
+    void setSelfIllumination(const ColourValue& selfIllum);   
+    void setSelfIllumination(Real red, Real green, Real blue);   
+    void setShadingMode(ShadeOptions mode);   
+    void setShininess(Real val);   
+    void setSpecular(const ColourValue& specular);   
+    void setSpecular(Real red, Real green, Real blue, Real alpha);   
+    void setTextureAnisotropy(unsigned int maxAniso);   
+    void setTextureFiltering(TextureFilterOptions filterType);   
 
 protected:
-	void registerEvents();
+    void registerEvents();
 
-	MaterialPtr mMaterialPtr;
+    MaterialPtr mMaterialPtr;
 
-	TechniqueControllerList mTechniqueControllers;
+    TechniqueControllerList mTechniqueControllers;
 };
 
 #endif // _MATERIALCONTROLLER_H_

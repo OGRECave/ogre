@@ -47,7 +47,7 @@ class MilkshapePlugin : public cMsPlugIn
     char mTitle[64];
 
 public:
-	MilkshapePlugin ();
+    MilkshapePlugin ();
     virtual ~MilkshapePlugin ();
 
 public:
@@ -69,10 +69,10 @@ public:
     bool generateLods;
     bool generateEdgeLists;
     bool generateTangents;
-	Ogre::VertexElementSemantic tangentSemantic;
-	bool tangentsSplitMirrored;
-	bool tangentsSplitRotated;
-	bool tangentsUseParity;
+    Ogre::VertexElementSemantic tangentSemantic;
+    bool tangentsSplitMirrored;
+    bool tangentsSplitRotated;
+    bool tangentsUseParity;
     unsigned short numLods;
     float lodDepthIncrement;
     Ogre::ProgressiveMesh::VertexReductionQuota lodReductionMethod;
@@ -89,7 +89,7 @@ protected:
     void doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& skel);
     Ogre::SkeletonPtr doExportSkeleton(msModel* pModel, Ogre::MeshPtr& mesh); // Skeleton returned for deletion later
     bool locateSkeleton(Ogre::MeshPtr& mesh);
-	Ogre::ColourValue msVec4ToColourValue(float prop[4]);
+    Ogre::ColourValue msVec4ToColourValue(float prop[4]);
 };
 
 #endif

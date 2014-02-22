@@ -88,7 +88,7 @@ namespace Ogre {
         mDiscardBuffers = 0;
         mClearDepth = 1.0f;
         
-		mClearColour.resize(4);
+        mClearColour.resize(4);
         mClearColour[0] = mClearColour[1] = mClearColour[2] = mClearColour[3] = 0.0f;
         
         mColourMask.resize(4);
@@ -157,7 +157,7 @@ namespace Ogre {
     }
     
     bool GLES2StateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
-	{
+    {
         // Always return true for the currently bound texture unit
         if (mActiveTextureUnit == unit)
             return true;
@@ -174,7 +174,7 @@ namespace Ogre {
         {
             return false;
         }
-	}
+    }
     
     void GLES2StateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
     {

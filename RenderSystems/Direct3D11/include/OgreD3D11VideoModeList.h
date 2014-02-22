@@ -33,22 +33,22 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class D3D11VideoModeList
-	{
-	private:
-		D3D11Driver* mDriver;
-		vector<D3D11VideoMode>::type mModeList;
+    class D3D11VideoModeList
+    {
+    private:
+        D3D11Driver* mDriver;
+        vector<D3D11VideoMode>::type mModeList;
 
-	public:
-		D3D11VideoModeList( D3D11Driver* pDriver );
-		~D3D11VideoModeList();
+    public:
+        D3D11VideoModeList( D3D11Driver* pDriver );
+        ~D3D11VideoModeList();
 
-		BOOL enumerate();
+        BOOL enumerate();
 
-		D3D11VideoMode* item( size_t index );
-		size_t count();
+        D3D11VideoMode* item( size_t index );
+        size_t count();
 
-		D3D11VideoMode* item( const String &name );
-	};
+        D3D11VideoMode* item( const String &name );
+    };
 }
 #endif

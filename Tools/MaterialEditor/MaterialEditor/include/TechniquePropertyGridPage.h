@@ -37,25 +37,25 @@ class EventArgs;
 class TechniquePropertyGridPage : public wxPropertyGridPage
 {
 public:
-	TechniquePropertyGridPage(TechniqueController* controller);
-	virtual ~TechniquePropertyGridPage();
+    TechniquePropertyGridPage(TechniqueController* controller);
+    virtual ~TechniquePropertyGridPage();
 
-	virtual void populate();
+    virtual void populate();
 
-	void nameChanged(EventArgs& args);
-	void schemeNameChanged(EventArgs& args);
-	void lodIndexChanged(EventArgs& args);
+    void nameChanged(EventArgs& args);
+    void schemeNameChanged(EventArgs& args);
+    void lodIndexChanged(EventArgs& args);
 
 protected:
-	virtual void propertyChanged(wxPropertyGridEvent& event);
-	
-	TechniqueController* mController;
+    virtual void propertyChanged(wxPropertyGridEvent& event);
+    
+    TechniqueController* mController;
 
-	wxPGId mNameId;
-	wxPGId mSchemeNameId;
-	wxPGId mLodIndexId;
+    wxPGId mNameId;
+    wxPGId mSchemeNameId;
+    wxPGId mLodIndexId;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif // _TECHNIQUEPROPERTYGRIDPAGE_H_

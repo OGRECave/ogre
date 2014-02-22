@@ -34,22 +34,22 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	class D3D11GpuProgramManager : public GpuProgramManager
-	{
-	protected:
-		D3D11Device & mDevice;
-		/// @copydoc ResourceManager::createImpl
-		Resource* createImpl(const String& name, ResourceHandle handle, 
-			const String& group, bool isManual, ManualResourceLoader* loader,
-			const NameValuePairList* createParams);
-		/// Specialised create method with specific parameters
-		Resource* createImpl(const String& name, ResourceHandle handle, 
-			const String& group, bool isManual, ManualResourceLoader* loader,
-			GpuProgramType gptype, const String& syntaxCode);
-	public:
-		D3D11GpuProgramManager(D3D11Device & device);
-		~D3D11GpuProgramManager();
-	};
+    class D3D11GpuProgramManager : public GpuProgramManager
+    {
+    protected:
+        D3D11Device & mDevice;
+        /// @copydoc ResourceManager::createImpl
+        Resource* createImpl(const String& name, ResourceHandle handle, 
+            const String& group, bool isManual, ManualResourceLoader* loader,
+            const NameValuePairList* createParams);
+        /// Specialised create method with specific parameters
+        Resource* createImpl(const String& name, ResourceHandle handle, 
+            const String& group, bool isManual, ManualResourceLoader* loader,
+            GpuProgramType gptype, const String& syntaxCode);
+    public:
+        D3D11GpuProgramManager(D3D11Device & device);
+        ~D3D11GpuProgramManager();
+    };
 
 }
 

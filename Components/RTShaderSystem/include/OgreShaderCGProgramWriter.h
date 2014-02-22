@@ -56,60 +56,60 @@ class _OgreRTSSExport CGProgramWriter : public ProgramWriter
 // Interface.
 public:
 
-	/** Class constructor. 
-	*/
-	CGProgramWriter();
+    /** Class constructor. 
+    */
+    CGProgramWriter();
 
-	/** Class destructor */
-	virtual ~CGProgramWriter();
+    /** Class destructor */
+    virtual ~CGProgramWriter();
 
-	/** 
-	@see ProgramWriter::writeSourceCode.
-	*/
-	virtual void writeSourceCode(std::ostream& os, Program* program);
+    /** 
+    @see ProgramWriter::writeSourceCode.
+    */
+    virtual void writeSourceCode(std::ostream& os, Program* program);
 
-	/** 
-	@see ProgramWriter::getTargetLanguage.
-	*/
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
+    /** 
+    @see ProgramWriter::getTargetLanguage.
+    */
+    virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
-	static String TargetLanguage;
+    static String TargetLanguage;
 
 // Protected methods.
 protected:
 
-	/** Initialize string maps. */
-	void initializeStringMaps();
+    /** Initialize string maps. */
+    void initializeStringMaps();
 
-	/** Write the program dependencies. */
-	void writeProgramDependencies(std::ostream& os, Program* program);
-	
-	/** Write a uniform parameter. */
-	void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
+    /** Write the program dependencies. */
+    void writeProgramDependencies(std::ostream& os, Program* program);
+    
+    /** Write a uniform parameter. */
+    void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
 
-	/** Write a function parameter. */
-	void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
+    /** Write a function parameter. */
+    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
 
-	/** Write a local parameter. */
-	void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
+    /** Write a local parameter. */
+    void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
 
-	/** Write a function declaration. */
-	void writeFunctionDeclaration(std::ostream& os, Function* function);
+    /** Write a function declaration. */
+    void writeFunctionDeclaration(std::ostream& os, Function* function);
 
-	/** Write function atom instance. */
-	void writeAtomInstance(std::ostream& os, FunctionAtom* atom);
+    /** Write function atom instance. */
+    void writeAtomInstance(std::ostream& os, FunctionAtom* atom);
 
 
 protected:
-	typedef map<GpuConstantType, const char*>::type GpuConstTypeToStringMap;
-	typedef map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
+    typedef map<GpuConstantType, const char*>::type GpuConstTypeToStringMap;
+    typedef map<Parameter::Semantic, const char*>::type ParamSemanticToStringMap;
 
 // Attributes.
 protected:
-	// Map between GPU constant type to string value.
-	GpuConstTypeToStringMap mGpuConstTypeMap;
-	// Map between parameter semantic to string value.
-	ParamSemanticToStringMap mParamSemanticMap;
+    // Map between GPU constant type to string value.
+    GpuConstTypeToStringMap mGpuConstTypeMap;
+    // Map between parameter semantic to string value.
+    ParamSemanticToStringMap mParamSemanticMap;
 };
 
 /** CG program writer factory implementation.
@@ -118,29 +118,29 @@ protected:
 class _OgreRTSSExport ShaderProgramWriterCGFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterCGFactory() : mLanguage("cg")
-	{
-	}
-	virtual ~ShaderProgramWriterCGFactory() {}
+    ShaderProgramWriterCGFactory() : mLanguage("cg")
+    {
+    }
+    virtual ~ShaderProgramWriterCGFactory() {}
 
-	/** 
-	@see ProgramWriterFactory::getTargetLanguage
-	*/
-	virtual const String& getTargetLanguage(void) const
-	{
-		return mLanguage;
-	}
+    /** 
+    @see ProgramWriterFactory::getTargetLanguage
+    */
+    virtual const String& getTargetLanguage(void) const
+    {
+        return mLanguage;
+    }
 
-	/** 
-	@see ProgramWriterFactory::create
-	*/
-	virtual ProgramWriter* create(void)
-	{
-		return OGRE_NEW CGProgramWriter();
-	}
+    /** 
+    @see ProgramWriterFactory::create
+    */
+    virtual ProgramWriter* create(void)
+    {
+        return OGRE_NEW CGProgramWriter();
+    }
 
 private:
-	String mLanguage;
+    String mLanguage;
 
 };
 

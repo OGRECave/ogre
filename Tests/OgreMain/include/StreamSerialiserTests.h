@@ -30,17 +30,17 @@ THE SOFTWARE.
 
 class StreamSerialiserTests : public CppUnit::TestFixture
 {
-	// CppUnit macros for setting up the test suite
-	CPPUNIT_TEST_SUITE( StreamSerialiserTests );
-	CPPUNIT_TEST(testWriteBasic);
+    // CppUnit macros for setting up the test suite
+    CPPUNIT_TEST_SUITE( StreamSerialiserTests );
+    CPPUNIT_TEST(testWriteBasic);
 
-	CPPUNIT_TEST_SUITE_END();
+    CPPUNIT_TEST_SUITE_END();
 protected:
 public:
-	void setUp();
-	void tearDown();
+    void setUp();
+    void tearDown();
 
-	void testWriteBasic();
+    void testWriteBasic();
 
 
 };

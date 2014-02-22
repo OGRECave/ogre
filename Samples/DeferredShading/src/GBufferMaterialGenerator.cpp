@@ -33,35 +33,35 @@ using namespace Ogre;
 class GBufferMaterialGeneratorImpl : public MaterialGenerator::Impl
 {
 public:
-	GBufferMaterialGeneratorImpl(const String& baseName) : 
+    GBufferMaterialGeneratorImpl(const String& baseName) : 
       mBaseName(baseName)
       {
           mIsSm4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
           mIsGLSL = (GpuProgramManager::getSingleton().isSyntaxSupported("glsl") || GpuProgramManager::getSingleton().isSyntaxSupported("glsles")) &&
                     !(GpuProgramManager::getSingleton().isSyntaxSupported("vs_1_1") || GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1"));
       }
-	
+    
 protected:
-	String mBaseName;
+    String mBaseName;
     bool mIsSm4;
     bool mIsGLSL;
-	virtual GpuProgramPtr generateVertexShader(MaterialGenerator::Perm permutation);
-	virtual GpuProgramPtr generateFragmentShader(MaterialGenerator::Perm permutation);
-	virtual MaterialPtr generateTemplateMaterial(MaterialGenerator::Perm permutation);
+    virtual GpuProgramPtr generateVertexShader(MaterialGenerator::Perm permutation);
+    virtual GpuProgramPtr generateFragmentShader(MaterialGenerator::Perm permutation);
+    virtual MaterialPtr generateTemplateMaterial(MaterialGenerator::Perm permutation);
 
 };
 
 GBufferMaterialGenerator::GBufferMaterialGenerator() {
     vsMask = VS_MASK;
-	fsMask = FS_MASK;
-	matMask = MAT_MASK;
-	materialBaseName = "DeferredShading/GBuffer/";
-	mImpl = new GBufferMaterialGeneratorImpl(materialBaseName);
+    fsMask = FS_MASK;
+    matMask = MAT_MASK;
+    materialBaseName = "DeferredShading/GBuffer/";
+    mImpl = new GBufferMaterialGeneratorImpl(materialBaseName);
 }
 
 GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerator::Perm permutation)
 {
-	StringStream ss;
+    StringStream ss;
 
     if(mIsGLSL)
     {
@@ -119,22 +119,22 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
         ss << "void main()" << std::endl;
 
         ss << "{" << std::endl;
-        ss << "	gl_Position = cWorldViewProj * vertex;" << std::endl;
-        ss << "	oNormal = (cWorldView * vec4(normal,0)).xyz;" << std::endl;
+        ss << " gl_Position = cWorldViewProj * vertex;" << std::endl;
+        ss << " oNormal = (cWorldView * vec4(normal,0)).xyz;" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "	oTangent = (cWorldView * vec4(tangent,0)).xyz;" << std::endl;
-            ss << "	oBiNormal = cross(oNormal, oTangent);" << std::endl;
+            ss << " oTangent = (cWorldView * vec4(tangent,0)).xyz;" << std::endl;
+            ss << " oBiNormal = cross(oNormal, oTangent);" << std::endl;
         }
 
 #ifdef WRITE_LINEAR_DEPTH
-        ss << "	oViewPos = (cWorldView * vertex).xyz;" << std::endl;
+        ss << " oViewPos = (cWorldView * vertex).xyz;" << std::endl;
 #else
-        ss << "	oDepth = gl_Position.w;" << std::endl;
+        ss << " oDepth = gl_Position.w;" << std::endl;
 #endif
 
         for (uint32 i=0; i<numTexCoords; i++) {
-            ss << "	oUv" << i << " = uv" << i << ';' << std::endl;
+            ss << " oUv" << i << " = uv" << i << ';' << std::endl;
         }
 
         ss << "}" << std::endl;
@@ -173,24 +173,24 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
     else
     {
         ss << "void ToGBufferVP(" << std::endl;
-        ss << "	float4 iPosition : POSITION," << std::endl;
-        ss << "	float3 iNormal   : NORMAL," << std::endl;
+        ss << " float4 iPosition : POSITION," << std::endl;
+        ss << " float3 iNormal   : NORMAL," << std::endl;
 
         uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
         for (uint32 i=0; i<numTexCoords; i++) 
         {
-            ss << "	float2 iUV" << i << " : TEXCOORD" << i << ',' << std::endl;
+            ss << " float2 iUV" << i << " : TEXCOORD" << i << ',' << std::endl;
         }
 
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
             if(mIsSm4)
             {
-                ss << "	float3 iTangent : TANGENT," << std::endl;
+                ss << " float3 iTangent : TANGENT," << std::endl;
             }
             else
             {
-                ss << "	float3 iTangent : TANGENT0," << std::endl;
+                ss << " float3 iTangent : TANGENT0," << std::endl;
             }
         }
 
@@ -199,54 +199,54 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
         
 
 
-        ss << "	out float4 oPosition : " ;
+        ss << " out float4 oPosition : " ;
         if(mIsSm4)
         {
             ss << "SV_";
         }
         ss << "POSITION," << std::endl;
     #ifdef WRITE_LINEAR_DEPTH
-        ss << "	out float3 oViewPos : TEXCOORD0," << std::endl;
+        ss << " out float3 oViewPos : TEXCOORD0," << std::endl;
     #else
-        ss << "	out float oDepth : TEXCOORD0," << std::endl;
+        ss << " out float oDepth : TEXCOORD0," << std::endl;
     #endif
-        ss << "	out float3 oNormal : TEXCOORD1," << std::endl;
+        ss << " out float3 oNormal : TEXCOORD1," << std::endl;
         int texCoordNum = 2;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
         {
-            ss << "	out float3 oTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-            ss << "	out float3 oBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+            ss << " out float3 oTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+            ss << " out float3 oBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
         }
         for (uint32 i=0; i<numTexCoords; i++) 
         {
-            ss << "	out float2 oUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+            ss << " out float2 oUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
         }
 
         ss << std::endl;
 
-        ss << "	uniform float4x4 cWorldViewProj," << std::endl;
-        ss << "	uniform float4x4 cWorldView" << std::endl;
+        ss << " uniform float4x4 cWorldViewProj," << std::endl;
+        ss << " uniform float4x4 cWorldView" << std::endl;
 
-        ss << "	)" << std::endl;
+        ss << " )" << std::endl;
         
         
         ss << "{" << std::endl;
-        ss << "	oPosition = mul(cWorldViewProj, iPosition);" << std::endl;
-        ss << "	oNormal = mul(cWorldView, float4(iNormal,0)).xyz;" << std::endl;
+        ss << " oPosition = mul(cWorldViewProj, iPosition);" << std::endl;
+        ss << " oNormal = mul(cWorldView, float4(iNormal,0)).xyz;" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "	oTangent = mul(cWorldView, float4(iTangent,0)).xyz;" << std::endl;
-            ss << "	oBiNormal = cross(oNormal, oTangent);" << std::endl;
+            ss << " oTangent = mul(cWorldView, float4(iTangent,0)).xyz;" << std::endl;
+            ss << " oBiNormal = cross(oNormal, oTangent);" << std::endl;
         }
 
     #ifdef WRITE_LINEAR_DEPTH
-        ss << "	oViewPos = mul(cWorldView, iPosition).xyz;" << std::endl;
+        ss << " oViewPos = mul(cWorldView, iPosition).xyz;" << std::endl;
     #else
-        ss << "	oDepth = oPosition.w;" << std::endl;
+        ss << " oDepth = oPosition.w;" << std::endl;
     #endif
 
         for (uint32 i=0; i<numTexCoords; i++) {
-            ss << "	oUV" << i << " = iUV" << i << ';' << std::endl;
+            ss << " oUV" << i << " = iUV" << i << ';' << std::endl;
         }
 
         ss << "}" << std::endl;
@@ -284,7 +284,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
 
 GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGenerator::Perm permutation)
 {
-	StringStream ss;
+    StringStream ss;
 
     if(mIsGLSL)
     {
@@ -367,8 +367,8 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         ss << outData << "[0].a = cSpecularity;" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "	vec3 texNormal = (" << textureFunc << "(sNormalMap, oUv0).rgb-0.5)*2.0;" << std::endl;
-            ss << "	mat3 normalRotation = mat3(oTangent, oBiNormal, oNormal);" << std::endl;
+            ss << " vec3 texNormal = (" << textureFunc << "(sNormalMap, oUv0).rgb-0.5)*2.0;" << std::endl;
+            ss << " mat3 normalRotation = mat3(oTangent, oBiNormal, oNormal);" << std::endl;
             ss << outData << "[1].rgb = normalize(texNormal * normalRotation);" << std::endl;
         }
         else
@@ -443,29 +443,29 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         }
 
     #ifdef WRITE_LINEAR_DEPTH
-        ss << "	float3 iViewPos : TEXCOORD0," << std::endl;
+        ss << " float3 iViewPos : TEXCOORD0," << std::endl;
     #else
-        ss << "	float1 iDepth : TEXCOORD0," << std::endl;
+        ss << " float1 iDepth : TEXCOORD0," << std::endl;
     #endif
-        ss << "	float3 iNormal   : TEXCOORD1," << std::endl;
+        ss << " float3 iNormal   : TEXCOORD1," << std::endl;
 
         int texCoordNum = 2;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
         {
-            ss << "	float3 iTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-            ss << "	float3 iBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+            ss << " float3 iTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+            ss << " float3 iBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
         }
 
         uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
         for (uint32 i=0; i<numTexCoords; i++) 
         {
-            ss << "	float2 iUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+            ss << " float2 iUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
         }
 
         ss << std::endl;
 
-        ss << "	out float4 oColor0 : COLOR0," << std::endl;
-        ss << "	out float4 oColor1 : COLOR1," << std::endl;
+        ss << " out float4 oColor0 : COLOR0," << std::endl;
+        ss << " out float4 oColor1 : COLOR1," << std::endl;
 
         ss << std::endl;
 
@@ -474,68 +474,68 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         {
             if(mIsSm4)
             {
-                ss << "	uniform sampler2D sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
+                ss << " uniform sampler2D sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
             }
             else
             {
-                ss << "	uniform sampler sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
+                ss << " uniform sampler sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
             }
         }
         uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
         for (uint32 i=0; i<numTextures; i++) {
             if(mIsSm4)
             {
-                ss << "	uniform sampler2D sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
+                ss << " uniform sampler2D sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
             }
             else
             {
-                ss << "	uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
+                ss << " uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
             }
         }
         if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
         {
-            ss << "	uniform float4 cDiffuseColour," << std::endl;
+            ss << " uniform float4 cDiffuseColour," << std::endl;
         }
 
     #ifdef WRITE_LINEAR_DEPTH
-        ss << "	uniform float cFarDistance," << std::endl;
+        ss << " uniform float cFarDistance," << std::endl;
     #endif
         
-        ss << "	uniform float cSpecularity" << std::endl;
+        ss << " uniform float cSpecularity" << std::endl;
 
-        ss << "	)" << std::endl;
+        ss << " )" << std::endl;
         
         
         ss << "{" << std::endl;
 
         if (numTexCoords > 0 && numTextures > 0) 
         {
-            ss << "	oColor0.rgb = tex2D(sTex0, iUV0).rgb;" << std::endl;
+            ss << " oColor0.rgb = tex2D(sTex0, iUV0).rgb;" << std::endl;
             if (permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
             {
-                ss << "	oColor0.rgb *= cDiffuseColour.rgb;" << std::endl;
+                ss << " oColor0.rgb *= cDiffuseColour.rgb;" << std::endl;
             }
         }
         else
         {
-            ss << "	oColor0.rgb = cDiffuseColour.rgb;" << std::endl;
+            ss << " oColor0.rgb = cDiffuseColour.rgb;" << std::endl;
         }
         
         
-        ss << "	oColor0.a = cSpecularity;" << std::endl;
+        ss << " oColor0.a = cSpecularity;" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
         {
-            ss << "	float3 texNormal = (tex2D(sNormalMap, iUV0).rgb-0.5)*2;" << std::endl;
-            ss << "	float3x3 normalRotation = float3x3(iTangent, iBiNormal, iNormal);" << std::endl;
-            ss << "	oColor1.rgb = normalize(mul(texNormal, normalRotation));" << std::endl;
+            ss << " float3 texNormal = (tex2D(sNormalMap, iUV0).rgb-0.5)*2;" << std::endl;
+            ss << " float3x3 normalRotation = float3x3(iTangent, iBiNormal, iNormal);" << std::endl;
+            ss << " oColor1.rgb = normalize(mul(texNormal, normalRotation));" << std::endl;
         } else 
         {
-            ss << "	oColor1.rgb = normalize(iNormal);" << std::endl;
+            ss << " oColor1.rgb = normalize(iNormal);" << std::endl;
         }
     #ifdef WRITE_LINEAR_DEPTH
-        ss << "	oColor1.a = length(iViewPos) / cFarDistance;" << std::endl;
+        ss << " oColor1.a = length(iViewPos) / cFarDistance;" << std::endl;
     #else
-        ss << "	oColor1.a = iDepth;" << std::endl;
+        ss << " oColor1.a = iDepth;" << std::endl;
     #endif
 
         ss << "}" << std::endl;
@@ -581,22 +581,22 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
 
 MaterialPtr GBufferMaterialGeneratorImpl::generateTemplateMaterial(MaterialGenerator::Perm permutation)
 {
-	String matName = mBaseName + "Mat_" + StringConverter::toString(permutation);
+    String matName = mBaseName + "Mat_" + StringConverter::toString(permutation);
 
-	MaterialPtr matPtr = MaterialManager::getSingleton().create
-		(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-	Pass* pass = matPtr->getTechnique(0)->getPass(0);
-	pass->setName(mBaseName + "Pass_" + StringConverter::toString(permutation));
-	pass->setLightingEnabled(false);
-	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
-	{
-		pass->createTextureUnitState();
-	}
-	uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
-	for (uint32 i=0; i<numTextures; i++)
-	{
-		pass->createTextureUnitState();
-	}
+    MaterialPtr matPtr = MaterialManager::getSingleton().create
+        (matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    Pass* pass = matPtr->getTechnique(0)->getPass(0);
+    pass->setName(mBaseName + "Pass_" + StringConverter::toString(permutation));
+    pass->setLightingEnabled(false);
+    if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+    {
+        pass->createTextureUnitState();
+    }
+    uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
+    for (uint32 i=0; i<numTextures; i++)
+    {
+        pass->createTextureUnitState();
+    }
 
-	return matPtr;
+    return matPtr;
 }

@@ -32,18 +32,18 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	D3D9Plugin* plugin;
+    D3D9Plugin* plugin;
 
-	extern "C" void _OgreD3D9Export dllStartPlugin(void) throw()
-	{
-		plugin = OGRE_NEW D3D9Plugin();
-		Root::getSingleton().installPlugin(plugin);
-	}
+    extern "C" void _OgreD3D9Export dllStartPlugin(void) throw()
+    {
+        plugin = OGRE_NEW D3D9Plugin();
+        Root::getSingleton().installPlugin(plugin);
+    }
 
-	extern "C" void _OgreD3D9Export dllStopPlugin(void)
-	{
-		Root::getSingleton().uninstallPlugin(plugin);
-		OGRE_DELETE plugin;
-	}
+    extern "C" void _OgreD3D9Export dllStopPlugin(void)
+    {
+        Root::getSingleton().uninstallPlugin(plugin);
+        OGRE_DELETE plugin;
+    }
 }
 #endif

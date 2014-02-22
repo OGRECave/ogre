@@ -36,83 +36,83 @@ struct ID3D11Resource;
 
 namespace Ogre {
 
-	class D3D11HardwarePixelBuffer: public HardwarePixelBuffer
-	{
-	protected:
-		/// Lock a box
-		PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
+    class D3D11HardwarePixelBuffer: public HardwarePixelBuffer
+    {
+    protected:
+        /// Lock a box
+        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
 
-		/// Unlock a box
-		void unlockImpl(void);
+        /// Unlock a box
+        void unlockImpl(void);
 
-		/// D3DDevice pointer
-		D3D11Device & mDevice;
+        /// D3DDevice pointer
+        D3D11Device & mDevice;
 
-		D3D11Texture * mParentTexture;
-		size_t mSubresourceIndex;
+        D3D11Texture * mParentTexture;
+        size_t mSubresourceIndex;
 
-		// if the usage is static - alloc at lock then use device UpdateSubresource when unlock and free memory
-		int8 * mDataForStaticUsageLock; 
+        // if the usage is static - alloc at lock then use device UpdateSubresource when unlock and free memory
+        int8 * mDataForStaticUsageLock; 
 
-		size_t mFace;
+        size_t mFace;
 
-		Image::Box mLockBox;
-		PixelBox mCurrentLock;
-		LockOptions mCurrentLockOptions;
+        Image::Box mLockBox;
+        PixelBox mCurrentLock;
+        LockOptions mCurrentLockOptions;
 
-		D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;
+        D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;
 
-		/// Util functions to convert a D3D locked box to a pixel box
-		void fromD3DLock(PixelBox &rval, const DXGI_MAPPED_RECT &lrect);
+        /// Util functions to convert a D3D locked box to a pixel box
+        void fromD3DLock(PixelBox &rval, const DXGI_MAPPED_RECT &lrect);
 
-		/// Render targets
-		typedef vector<RenderTexture*>::type SliceTRT;
-		SliceTRT mSliceTRT;
+        /// Render targets
+        typedef vector<RenderTexture*>::type SliceTRT;
+        SliceTRT mSliceTRT;
 
-		void createStagingBuffer();
-		bool mUsingStagingBuffer;
-		ID3D11Resource *mStagingBuffer;
-		
-		void _map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box);
-		void *_mapstagingbuffer(D3D11_MAP flags);
-		void *_mapstaticbuffer(PixelBox lock);
-		void _unmap(ID3D11Resource *res);
-		void _unmapstagingbuffer(bool copyback = true);
-		void _unmapstaticbuffer();
-	public:
-		D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,
-			size_t width, size_t height, size_t depth, size_t face, PixelFormat format, HardwareBuffer::Usage usage);
+        void createStagingBuffer();
+        bool mUsingStagingBuffer;
+        ID3D11Resource *mStagingBuffer;
+        
+        void _map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box);
+        void *_mapstagingbuffer(D3D11_MAP flags);
+        void *_mapstaticbuffer(PixelBox lock);
+        void _unmap(ID3D11Resource *res);
+        void _unmapstagingbuffer(bool copyback = true);
+        void _unmapstaticbuffer();
+    public:
+        D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,
+            size_t width, size_t height, size_t depth, size_t face, PixelFormat format, HardwareBuffer::Usage usage);
 
-		/// @copydoc HardwarePixelBuffer::blit
-		void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
+        /// @copydoc HardwarePixelBuffer::blit
+        void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
 
-		/// @copydoc HardwarePixelBuffer::blitFromMemory
-		void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
+        /// @copydoc HardwarePixelBuffer::blitFromMemory
+        void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
 
-		/// @copydoc HardwarePixelBuffer::blitToMemory
-		void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
+        /// @copydoc HardwarePixelBuffer::blitToMemory
+        void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
 
-		/// Internal function to update mipmaps on update of level 0
-		void _genMipmaps();
+        /// Internal function to update mipmaps on update of level 0
+        void _genMipmaps();
 
 
-		~D3D11HardwarePixelBuffer();
+        ~D3D11HardwarePixelBuffer();
 
-		/// Get rendertarget for z slice
-		RenderTexture *getRenderTarget(size_t zoffset);
+        /// Get rendertarget for z slice
+        RenderTexture *getRenderTarget(size_t zoffset);
 
-		/// Notify TextureBuffer of destruction of render target
-		virtual void _clearSliceRTT(size_t zoffset)
-		{
-			if (mSliceTRT.size() > zoffset)
-			{
-				mSliceTRT[zoffset] = 0;
-			}
-		}
+        /// Notify TextureBuffer of destruction of render target
+        virtual void _clearSliceRTT(size_t zoffset)
+        {
+            if (mSliceTRT.size() > zoffset)
+            {
+                mSliceTRT[zoffset] = 0;
+            }
+        }
 
-		D3D11Texture * getParentTexture() const;
-		size_t getSubresourceIndex() const;
-		size_t getFace() const;
-	};
+        D3D11Texture * getParentTexture() const;
+        size_t getSubresourceIndex() const;
+        size_t getFace() const;
+    };
 };
 #endif

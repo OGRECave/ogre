@@ -35,13 +35,13 @@ THE SOFTWARE.
 
 namespace Ogre {
     EGLContext::EGLContext(EGLDisplay eglDisplay,
-							const EGLSupport* glsupport,
+                            const EGLSupport* glsupport,
                            ::EGLConfig glconfig,
                            ::EGLSurface drawable)
         : mGLSupport(glsupport),
           mContext(0)
     {
-		assert(drawable);
+        assert(drawable);
         GLES2RenderSystem* renderSystem = static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
         EGLContext* mainContext = static_cast<EGLContext*>(renderSystem->_getMainContext());
         ::EGLContext shareContext = (::EGLContext) 0;
@@ -110,12 +110,12 @@ namespace Ogre {
 
     void EGLContext::endCurrent()
     {
-		eglMakeCurrent(mEglDisplay, 0, 0, 0);
+        eglMakeCurrent(mEglDisplay, 0, 0, 0);
         EGL_CHECK_ERROR
     }
 
-	EGLSurface EGLContext::getDrawable() const
-	{
-		return mDrawable;
-	}
+    EGLSurface EGLContext::getDrawable() const
+    {
+        return mDrawable;
+    }
 }

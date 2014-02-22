@@ -68,26 +68,26 @@ class _OgreGL3PlusExport GL3PlusHardwareOcclusionQuery : public HardwareOcclusio
 // Public methods
 //--
 public:
-	/**
-	  * Default object constructor
-	  * 
-	  */
-	GL3PlusHardwareOcclusionQuery();
-	/**
-	  * Object destructor
-	  */
-	~GL3PlusHardwareOcclusionQuery();
+    /**
+      * Default object constructor
+      * 
+      */
+    GL3PlusHardwareOcclusionQuery();
+    /**
+      * Object destructor
+      */
+    ~GL3PlusHardwareOcclusionQuery();
 
-	//------------------------------------------------------------------
-	// Occlusion query functions (see base class documentation for this)
-	//--
-	void beginOcclusionQuery();
-	void endOcclusionQuery();
-	bool pullOcclusionQuery(unsigned int* NumOfFragments);
-	bool isStillOutstanding(void);
+    //------------------------------------------------------------------
+    // Occlusion query functions (see base class documentation for this)
+    //--
+    void beginOcclusionQuery();
+    void endOcclusionQuery();
+    bool pullOcclusionQuery(unsigned int* NumOfFragments);
+    bool isStillOutstanding(void);
 
     private:
-	    GLuint mQueryID;
+        GLuint mQueryID;
 };
 
 }

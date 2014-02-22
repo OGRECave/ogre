@@ -37,93 +37,93 @@ namespace Ogre {
     namespace GLSL {
 
     /// Structure used to keep track of named uniforms in the linked program object
-	struct GLUniformReference
-	{
-		/// GL location handle
-		GLint  mLocation;
-		/// Which type of program params will this value come from?
-		GpuProgramType mSourceProgType;
-		/// The constant definition it relates to
-		const GpuConstantDefinition* mConstantDef;
-	};
+    struct GLUniformReference
+    {
+        /// GL location handle
+        GLint  mLocation;
+        /// Which type of program params will this value come from?
+        GpuProgramType mSourceProgType;
+        /// The constant definition it relates to
+        const GpuConstantDefinition* mConstantDef;
+    };
 
-	typedef vector<GLUniformReference>::type GLUniformReferenceList;
-	typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
+    typedef vector<GLUniformReference>::type GLUniformReferenceList;
+    typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
 
-	/** C++ encapsulation of GLSL Program Object
+    /** C++ encapsulation of GLSL Program Object
 
-	*/
+    */
 
-	class _OgreGLExport GLSLLinkProgram
-	{
-	private:
-		/// Container of uniform references that are active in the program object
-		GLUniformReferenceList mGLUniformReferences;
+    class _OgreGLExport GLSLLinkProgram
+    {
+    private:
+        /// Container of uniform references that are active in the program object
+        GLUniformReferenceList mGLUniformReferences;
 
-		/// Linked vertex program
-		GLSLGpuProgram* mVertexProgram;
-		/// Linked geometry program
-		GLSLGpuProgram* mGeometryProgram;
-		/// Linked fragment program
-		GLSLGpuProgram* mFragmentProgram;
+        /// Linked vertex program
+        GLSLGpuProgram* mVertexProgram;
+        /// Linked geometry program
+        GLSLGpuProgram* mGeometryProgram;
+        /// Linked fragment program
+        GLSLGpuProgram* mFragmentProgram;
         GLUniformCache *mUniformCache;
 
-		/// Flag to indicate that uniform references have already been built
-		bool		mUniformRefsBuilt;
-		/// GL handle for the program object
-		GLhandleARB mGLHandle;
-		/// Flag indicating that the program object has been successfully linked
-		GLint		mLinked;
-		/// Flag indicating that the program object has tried to link and failed
-		bool		mTriedToLinkAndFailed;
-		/// Flag indicating skeletal animation is being performed
-		bool mSkeletalAnimation;
+        /// Flag to indicate that uniform references have already been built
+        bool        mUniformRefsBuilt;
+        /// GL handle for the program object
+        GLhandleARB mGLHandle;
+        /// Flag indicating that the program object has been successfully linked
+        GLint       mLinked;
+        /// Flag indicating that the program object has tried to link and failed
+        bool        mTriedToLinkAndFailed;
+        /// Flag indicating skeletal animation is being performed
+        bool mSkeletalAnimation;
 
-		/// Build uniform references from active named uniforms
-		void buildGLUniformReferences(void);
-		/// Extract attributes
-		void extractAttributes(void);
+        /// Build uniform references from active named uniforms
+        void buildGLUniformReferences(void);
+        /// Extract attributes
+        void extractAttributes(void);
 
-		typedef set<GLuint>::type AttributeSet;
-		/// Custom attribute bindings
-		AttributeSet mValidAttributes;
+        typedef set<GLuint>::type AttributeSet;
+        /// Custom attribute bindings
+        AttributeSet mValidAttributes;
 
-		/// Name / attribute list
-		struct CustomAttribute
-		{
-			String name;
-			GLuint attrib;
-			CustomAttribute(const String& _name, GLuint _attrib)
-				:name(_name), attrib(_attrib) {}
-		};
+        /// Name / attribute list
+        struct CustomAttribute
+        {
+            String name;
+            GLuint attrib;
+            CustomAttribute(const String& _name, GLuint _attrib)
+                :name(_name), attrib(_attrib) {}
+        };
 
-		static CustomAttribute msCustomAttributes[];
+        static CustomAttribute msCustomAttributes[];
 
-		String getCombinedName();		
-		/// Compiles and links the the vertex and fragment programs
-		void compileAndLink();
-		/// Get the the binary data of a program from the microcode cache
-		void getMicrocodeFromCache();
-	public:
-		/// Constructor should only be used by GLSLLinkProgramManager
-		GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
-		~GLSLLinkProgram(void);
+        String getCombinedName();       
+        /// Compiles and links the the vertex and fragment programs
+        void compileAndLink();
+        /// Get the the binary data of a program from the microcode cache
+        void getMicrocodeFromCache();
+    public:
+        /// Constructor should only be used by GLSLLinkProgramManager
+        GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
+        ~GLSLLinkProgram(void);
 
-		/** Makes a program object active by making sure it is linked and then putting it in use.
+        /** Makes a program object active by making sure it is linked and then putting it in use.
 
-		*/
-		void activate(void);
+        */
+        void activate(void);
 
-		/** Updates program object uniforms using data from GpuProgramParameters.
-		normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
-		*/
-		void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-		/** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-		normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
-		*/
-		void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
-		/// Get the GL Handle for the program object
-		GLhandleARB getGLHandle(void) const { return mGLHandle; }
+        /** Updates program object uniforms using data from GpuProgramParameters.
+        normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
+        */
+        void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
+        normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
+        */
+        void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
+        /// Get the GL Handle for the program object
+        GLhandleARB getGLHandle(void) const { return mGLHandle; }
         /** Sets whether the linked program includes the required instructions
         to perform skeletal animation. 
         @remarks
@@ -141,12 +141,12 @@ namespace Ogre {
         */
         bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
-		/// Get the index of a non-standard attribute bound in the linked code
-		GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
-		/// Is a non-standard attribute bound in the linked code?
-		bool isAttributeValid(VertexElementSemantic semantic, uint index);
+        /// Get the index of a non-standard attribute bound in the linked code
+        GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
+        /// Is a non-standard attribute bound in the linked code?
+        bool isAttributeValid(VertexElementSemantic semantic, uint index);
 
-	};
+    };
 
     }
 }

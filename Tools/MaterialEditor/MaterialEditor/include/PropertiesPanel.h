@@ -56,31 +56,31 @@ typedef std::map<PassController*, int> PassPageIndexMap;
 class PropertiesPanel : public wxPanel
 {
 public:
-	PropertiesPanel(wxWindow* parent,
-		wxWindowID id = wxID_ANY,
-		const wxPoint& pos = wxDefaultPosition,
-		const wxSize& size = wxDefaultSize,
-		long style = wxTAB_TRAVERSAL | wxNO_BORDER,
-		const wxString& name = wxT("Properties Panel"));
+    PropertiesPanel(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxDefaultSize,
+        long style = wxTAB_TRAVERSAL | wxNO_BORDER,
+        const wxString& name = wxT("Properties Panel"));
 
-	virtual ~PropertiesPanel();
+    virtual ~PropertiesPanel();
 
-	void selectionChanged(EventArgs& args);
+    void selectionChanged(EventArgs& args);
 
-	void projectRemoved(EventArgs& args);
-	void materialRemoved(EventArgs& args);
-	void techniqueRemoved(EventArgs& args);
-	void passRemoved(EventArgs& args);
+    void projectRemoved(EventArgs& args);
+    void materialRemoved(EventArgs& args);
+    void techniqueRemoved(EventArgs& args);
+    void passRemoved(EventArgs& args);
 
 protected:
-	wxGridSizer* mGridSizer;
-	wxPropertyGridManager* mPropertyGrid;
+    wxGridSizer* mGridSizer;
+    wxPropertyGridManager* mPropertyGrid;
 
-	MaterialPageIndexMap mMaterialPageIndexMap;
-	TechniquePageIndexMap mTechniquePageIndexMap;
-	PassPageIndexMap mPassPageIndexMap;
+    MaterialPageIndexMap mMaterialPageIndexMap;
+    TechniquePageIndexMap mTechniquePageIndexMap;
+    PassPageIndexMap mPassPageIndexMap;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _PROPERTIESPANEL_H_

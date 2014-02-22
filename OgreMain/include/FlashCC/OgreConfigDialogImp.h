@@ -35,23 +35,23 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class _OgreExport ConfigDialog : public UtilityAlloc
-	{
-	public:
-		ConfigDialog();
-		~ConfigDialog();
-	
-	public:
-		void initialise();
-		void run();
-		void cancel();
+    class _OgreExport ConfigDialog : public UtilityAlloc
+    {
+    public:
+        ConfigDialog();
+        ~ConfigDialog();
+    
+    public:
+        void initialise();
+        void run();
+        void cancel();
 
-		bool display();
+        bool display();
 
-	protected:
-		RenderSystem* iSelectedRenderSystem;
-		bool		iDisplayStatus;		
-	};
+    protected:
+        RenderSystem* iSelectedRenderSystem;
+        bool        iDisplayStatus;     
+    };
 }
 
 #endif // __AndroidConfigDialog_H__

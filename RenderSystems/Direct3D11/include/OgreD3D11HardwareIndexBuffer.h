@@ -35,43 +35,43 @@ THE SOFTWARE.
 namespace Ogre { 
 
 
-	class D3D11HardwareIndexBuffer : public HardwareIndexBuffer
-	{
-	protected:
-		D3D11HardwareBuffer* mBufferImpl;
-		// have to implement these, but do nothing as overridden lock/unlock
-		void* lockImpl(size_t offset, size_t length, LockOptions options) {return 0;}
-		void unlockImpl(void) {}
+    class D3D11HardwareIndexBuffer : public HardwareIndexBuffer
+    {
+    protected:
+        D3D11HardwareBuffer* mBufferImpl;
+        // have to implement these, but do nothing as overridden lock/unlock
+        void* lockImpl(size_t offset, size_t length, LockOptions options) {return 0;}
+        void unlockImpl(void) {}
 
-	public:
-		D3D11HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, 
-			HardwareBuffer::Usage usage, D3D11Device & device, bool useSystemMem, bool useShadowBuffer);
-		~D3D11HardwareIndexBuffer();
+    public:
+        D3D11HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, 
+            HardwareBuffer::Usage usage, D3D11Device & device, bool useSystemMem, bool useShadowBuffer);
+        ~D3D11HardwareIndexBuffer();
 
-		// override all data-gathering methods
-		void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
-		void unlock(void);
-		void readData(size_t offset, size_t length, void* pDest);
-		void writeData(size_t offset, size_t length, const void* pSource,
-			bool discardWholeBuffer = false);
+        // override all data-gathering methods
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
+        void unlock(void);
+        void readData(size_t offset, size_t length, void* pDest);
+        void writeData(size_t offset, size_t length, const void* pSource,
+            bool discardWholeBuffer = false);
 
-		void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
-			size_t dstOffset, size_t length, bool discardWholeBuffer = false);
-		bool isLocked(void) const;
+        void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
+            size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+        bool isLocked(void) const;
 
-		/// For dealing with lost devices - release the resource if in the default pool
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool
-		bool recreateIfDefaultPool(D3D11Device & device);
+        /// For dealing with lost devices - release the resource if in the default pool
+        bool releaseIfDefaultPool(void);
+        /// For dealing with lost devices - recreate the resource if in the default pool
+        bool recreateIfDefaultPool(D3D11Device & device);
 
-		/// Get the D3D-specific index buffer
-		ID3D11Buffer * getD3DIndexBuffer(void) const;
-
-
+        /// Get the D3D-specific index buffer
+        ID3D11Buffer * getD3DIndexBuffer(void) const;
 
 
 
-	};
+
+
+    };
 
 
 }

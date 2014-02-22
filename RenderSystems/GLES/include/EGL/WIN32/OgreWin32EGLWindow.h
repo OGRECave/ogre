@@ -36,19 +36,19 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgrePrivate Win32EGLWindow : public EGLWindow
     {
-	protected:
-		virtual EGLContext * createEGLContext() const;
-		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
-		virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
-		virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
-		virtual void reposition(int left, int top);
-		virtual void resize(unsigned int width, unsigned int height);
-		virtual void windowMovedOrResized();
-		virtual void switchFullScreen(bool fullscreen);
+    protected:
+        virtual EGLContext * createEGLContext() const;
+        virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+        virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
+        virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
+        virtual void reposition(int left, int top);
+        virtual void resize(unsigned int width, unsigned int height);
+        virtual void windowMovedOrResized();
+        virtual void switchFullScreen(bool fullscreen);
 
     public:
-		Win32EGLWindow(Win32EGLSupport* glsupport);
-		virtual ~Win32EGLWindow();
+        Win32EGLWindow(Win32EGLSupport* glsupport);
+        virtual ~Win32EGLWindow();
         void create(const String& name, unsigned int width, unsigned int height,
                     bool fullScreen, const NameValuePairList *miscParams);
 

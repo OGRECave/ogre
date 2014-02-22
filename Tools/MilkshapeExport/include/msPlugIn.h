@@ -12,13 +12,13 @@ public:
         eTypeImport  = 1,
         eTypeExport  = 2,
         eTypeTool    = 3,
-		eTypeEdit    = 4,
-		eTypeVertex  = 5,
-		eTypeFace    = 6,
-		eTypeAnimate = 7,
-		eTypeMask    = 0x000F,
+        eTypeEdit    = 4,
+        eTypeVertex  = 5,
+        eTypeFace    = 6,
+        eTypeAnimate = 7,
+        eTypeMask    = 0x000F,
 
-		eNormalsAndTexCoordsPerTriangleVertex = 128
+        eNormalsAndTexCoordsPerTriangleVertex = 128
     };
 
 public:

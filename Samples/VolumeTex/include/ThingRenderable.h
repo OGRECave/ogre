@@ -20,40 +20,40 @@ same license as the rest of the engine.
 #include "OgreVector3.h"
 
 /** Quad fragments that rotate around origin (0,0,0) in a random orbit, always oriented to 0,0,0.
-	@author W.J. van der Laan
+    @author W.J. van der Laan
 */
 class ThingRenderable: public Ogre::SimpleRenderable {
 public:
-	/** Create one this object.
-		@param radius	Radius of orbits
-		@param count	Number of quads
-		@param qsize	Size of quads
-	 */
-	ThingRenderable(float radius, size_t count, float qsize);
-	~ThingRenderable();
-	/**
-	 * Retrieves ratios of the origin-centered bounding sphere for this
-	 * object.
-	 */
-	Ogre::Real getBoundingRadius() const;
-	/**
-	 * Returns the camera-relative squared depth of this renderable.
-	 */
-	Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
-	/**
-	 * Notify that t seconds have elapsed.
-	 */
-	void addTime(float t);
+    /** Create one this object.
+        @param radius   Radius of orbits
+        @param count    Number of quads
+        @param qsize    Size of quads
+     */
+    ThingRenderable(float radius, size_t count, float qsize);
+    ~ThingRenderable();
+    /**
+     * Retrieves ratios of the origin-centered bounding sphere for this
+     * object.
+     */
+    Ogre::Real getBoundingRadius() const;
+    /**
+     * Returns the camera-relative squared depth of this renderable.
+     */
+    Ogre::Real getSquaredViewDepth(const Ogre::Camera*) const;
+    /**
+     * Notify that t seconds have elapsed.
+     */
+    void addTime(float t);
 protected:
-	void initialise();
-	void fillBuffer();
+    void initialise();
+    void fillBuffer();
 
-	Ogre::HardwareVertexBufferSharedPtr vbuf;// Our vertex buffer
-	float mRadius;
-	size_t mCount;
-	float mQSize;
-	Ogre::vector <Ogre::Quaternion>::type things;
-	Ogre::vector <Ogre::Quaternion>::type orbits;
+    Ogre::HardwareVertexBufferSharedPtr vbuf;// Our vertex buffer
+    float mRadius;
+    size_t mCount;
+    float mQSize;
+    Ogre::vector <Ogre::Quaternion>::type things;
+    Ogre::vector <Ogre::Quaternion>::type orbits;
 };
 
 #endif

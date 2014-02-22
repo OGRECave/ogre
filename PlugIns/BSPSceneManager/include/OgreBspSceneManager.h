@@ -70,10 +70,10 @@ namespace Ogre {
 
         // State variables for rendering WIP
         // Set of face groups (by index) already included
-		typedef set<int>::type FaceGroupSet;
+        typedef set<int>::type FaceGroupSet;
         FaceGroupSet mFaceGroupSet;
         // Material -> face group hashmap
-		typedef map<Material*, vector<StaticFaceGroup*>::type, materialLess >::type MaterialFaceGroupMap;
+        typedef map<Material*, vector<StaticFaceGroup*>::type, materialLess >::type MaterialFaceGroupMap;
         MaterialFaceGroupMap mMatFaceGroupMap;
 
         RenderOperation mRenderOp;
@@ -91,7 +91,7 @@ namespace Ogre {
         BspNode* walkTree(Camera* camera, VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters);
         /** Tags geometry in the leaf specified for later rendering. */
         void processVisibleLeaf(BspNode* leaf, Camera* cam, 
-			VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters);
+            VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters);
 
         /** Caches a face group for imminent rendering. */
         unsigned int cacheGeometry(unsigned int* pIndexes, const StaticFaceGroup* faceGroup);
@@ -105,13 +105,13 @@ namespace Ogre {
         /** Renders the static level geometry tagged in walkTree. */
         void renderStaticGeometry(void);
 
-		/** @copydoc SceneManager::clearScene */
-		void clearScene(void);
+        /** @copydoc SceneManager::clearScene */
+        void clearScene(void);
 
-		// Overridden so we can manually render world geometry
-		bool fireRenderQueueEnded(uint8 id, const String& invocation);
+        // Overridden so we can manually render world geometry
+        bool fireRenderQueueEnded(uint8 id, const String& invocation);
 
-		typedef set<const MovableObject*>::type MovablesForRendering;
+        typedef set<const MovableObject*>::type MovablesForRendering;
         MovablesForRendering mMovablesForRendering;
 
     public:
@@ -119,8 +119,8 @@ namespace Ogre {
         ~BspSceneManager();
 
 
-		/// @copydoc SceneManager::getTypeName
-		const String& getTypeName(void) const;
+        /// @copydoc SceneManager::getTypeName
+        const String& getTypeName(void) const;
 
         /** Specialised from SceneManager to support Quake3 bsp files. */
         void setWorldGeometry(const String& filename);
@@ -130,13 +130,13 @@ namespace Ogre {
         
         /** Specialised from SceneManager to support Quake3 bsp files. */
         void setWorldGeometry(DataStreamPtr& stream, 
-			const String& typeName = BLANKSTRING);
+            const String& typeName = BLANKSTRING);
 
         /** Specialised from SceneManager to support Quake3 bsp files. */
         size_t estimateWorldGeometry(DataStreamPtr& stream, 
-			const String& typeName = BLANKSTRING);
+            const String& typeName = BLANKSTRING);
 
-		/** Tells the manager whether to draw the axis-aligned boxes that surround
+        /** Tells the manager whether to draw the axis-aligned boxes that surround
             nodes in the Bsp tree. For debugging purposes.
         */
         void showNodeBoxes(bool show);
@@ -148,7 +148,7 @@ namespace Ogre {
 
         /** Overridden from SceneManager. */
         void _findVisibleObjects(Camera* cam, VisibleObjectsBoundsInfo* visibleBounds, 
-			bool onlyShadowCasters);
+            bool onlyShadowCasters);
 
         /** Creates a specialized BspSceneNode */
         SceneNode * createSceneNodeImpl ( void );
@@ -157,8 +157,8 @@ namespace Ogre {
 
         /** Internal method for tagging BspNodes with objects which intersect them. */
         void _notifyObjectMoved(const MovableObject* mov, const Vector3& pos);
-		/** Internal method for notifying the level that an object has been detached from a node */
-		void _notifyObjectDetached(const MovableObject* mov);
+        /** Internal method for notifying the level that an object has been detached from a node */
+        void _notifyObjectDetached(const MovableObject* mov);
 
         /* Creates an AxisAlignedBoxSceneQuery for this scene manager. 
         @remarks
@@ -244,9 +244,9 @@ namespace Ogre {
         void execute(RaySceneQueryListener* listener);
     protected:
         /// Set for eliminating duplicates since objects can be in > 1 node
-		set<MovableObject*>::type mObjsThisQuery;
+        set<MovableObject*>::type mObjsThisQuery;
         /// list of the last single intersection world fragments (derived)
-		vector<SceneQuery::WorldFragment*>::type mSingleIntersections;
+        vector<SceneQuery::WorldFragment*>::type mSingleIntersections;
 
         void clearTemporaries(void);
         /** Internal processing of a single node.
@@ -262,19 +262,19 @@ namespace Ogre {
 
     };
 
-	/// Factory for BspSceneManager
-	class BspSceneManagerFactory : public SceneManagerFactory
-	{
-	protected:
-		void initMetaData(void) const;
-	public:
-		BspSceneManagerFactory() {}
-		~BspSceneManagerFactory() {}
-		/// Factory type name
-		static const String FACTORY_TYPE_NAME;
-		SceneManager* createInstance(const String& instanceName);
-		void destroyInstance(SceneManager* instance);
-	};
+    /// Factory for BspSceneManager
+    class BspSceneManagerFactory : public SceneManagerFactory
+    {
+    protected:
+        void initMetaData(void) const;
+    public:
+        BspSceneManagerFactory() {}
+        ~BspSceneManagerFactory() {}
+        /// Factory type name
+        static const String FACTORY_TYPE_NAME;
+        SceneManager* createInstance(const String& instanceName);
+        void destroyInstance(SceneManager* instance);
+    };
 }
 
 #endif

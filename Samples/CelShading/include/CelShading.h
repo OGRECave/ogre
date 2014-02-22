@@ -10,64 +10,64 @@ class _OgreSampleClassExport Sample_CelShading : public SdkSample
 {
 public:
 
-	Sample_CelShading()
-	{
-		mInfo["Title"] = "Cel-shading";
-		mInfo["Description"] = "A demo of cel-shaded graphics using vertex & fragment programs.";
-		mInfo["Thumbnail"] = "thumb_cel.png";
-		mInfo["Category"] = "Lighting";
-	}
+    Sample_CelShading()
+    {
+        mInfo["Title"] = "Cel-shading";
+        mInfo["Description"] = "A demo of cel-shaded graphics using vertex & fragment programs.";
+        mInfo["Thumbnail"] = "thumb_cel.png";
+        mInfo["Category"] = "Lighting";
+    }
 
-	StringVector getRequiredPlugins()
-	{
-		StringVector names;
+    StringVector getRequiredPlugins()
+    {
+        StringVector names;
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
             names.push_back("Cg Program Manager");
-		return names;
-	}
+        return names;
+    }
 
-	void testCapabilities(const RenderSystemCapabilities* caps)
-	{
-		if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
+    void testCapabilities(const RenderSystemCapabilities* caps)
+    {
+        if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
         {
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
-				" programs, so you cannot run this sample. Sorry!", "Sample_CelShading::testCapabilities");
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
+                " programs, so you cannot run this sample. Sorry!", "Sample_CelShading::testCapabilities");
         }
-	}
+    }
 
-	bool frameRenderingQueued(const FrameEvent& evt)
-	{
-		// make the light revolve around our model if and only if the check box is checked
-		if (mMoveLight->isChecked()) mLightPivot->yaw(Degree(evt.timeSinceLastFrame * 30));
+    bool frameRenderingQueued(const FrameEvent& evt)
+    {
+        // make the light revolve around our model if and only if the check box is checked
+        if (mMoveLight->isChecked()) mLightPivot->yaw(Degree(evt.timeSinceLastFrame * 30));
 
-		return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
-	}
+        return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
+    }
 
 protected:
 
-	void setupContent()
-	{     
-		mViewport->setBackgroundColour(ColourValue::White);
+    void setupContent()
+    {     
+        mViewport->setBackgroundColour(ColourValue::White);
 
-		// set our camera to orbit around the origin and show cursor
-		mCameraMan->setStyle(CS_ORBIT);
-		mTrayMgr->showCursor();
+        // set our camera to orbit around the origin and show cursor
+        mCameraMan->setStyle(CS_ORBIT);
+        mTrayMgr->showCursor();
 
-		// create a basic point light with an offset
-		Light* light = mSceneMgr->createLight();
-		light->setPosition(20, 40, 50);
+        // create a basic point light with an offset
+        Light* light = mSceneMgr->createLight();
+        light->setPosition(20, 40, 50);
 
-		// attach the light to a pivot node
-		mLightPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		mLightPivot->attachObject(light);
+        // attach the light to a pivot node
+        mLightPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        mLightPivot->attachObject(light);
 
-		// create our model, give it the shader material, and place it at the origin
+        // create our model, give it the shader material, and place it at the origin
         Entity *ent = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-		ent->setMaterialName("Examples/CelShading");
-		mSceneMgr->getRootSceneNode()->attachObject(ent);
+        ent->setMaterialName("Examples/CelShading");
+        mSceneMgr->getRootSceneNode()->attachObject(ent);
 
         /* We set the same material for all parts of the head, but use custom shader parameters to set the
-		colours for each part. See Examples-Advanced.material for how these are bound to GPU parameters. */
+        colours for each part. See Examples-Advanced.material for how these are bound to GPU parameters. */
 
         SubEntity* sub;
         
@@ -91,16 +91,16 @@ protected:
         sub->setCustomParameter(SP_DIFFUSE, Vector4(1, 1, 0.7, 1));
         sub->setCustomParameter(SP_SPECULAR, Vector4(1, 1, 1, 1));
 
-		// create a check box to toggle light movement
-		mMoveLight = mTrayMgr->createCheckBox(TL_TOPLEFT, "MoveLight", "Move Light");
-		mMoveLight->setChecked(true);
-	}
+        // create a check box to toggle light movement
+        mMoveLight = mTrayMgr->createCheckBox(TL_TOPLEFT, "MoveLight", "Move Light");
+        mMoveLight->setChecked(true);
+    }
 
-	// custom shader parameter bindings
-	enum ShaderParam { SP_SHININESS = 1, SP_DIFFUSE, SP_SPECULAR };
+    // custom shader parameter bindings
+    enum ShaderParam { SP_SHININESS = 1, SP_DIFFUSE, SP_SPECULAR };
 
-	SceneNode* mLightPivot;
-	CheckBox* mMoveLight;
+    SceneNode* mLightPivot;
+    CheckBox* mMoveLight;
 };
 
 #endif

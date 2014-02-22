@@ -34,14 +34,14 @@ THE SOFTWARE.
 #include "OgreMath.h"
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
-#	if !defined( __MINGW32__ )
-#		ifndef WIN32_LEAN_AND_MEAN
-#			define WIN32_LEAN_AND_MEAN 1
-#		endif
-#		ifndef NOMINMAX
-#			define NOMINMAX // required to stop windows.h messing up std::min
-#		endif
-#	endif
+#   if !defined( __MINGW32__ )
+#       ifndef WIN32_LEAN_AND_MEAN
+#           define WIN32_LEAN_AND_MEAN 1
+#       endif
+#       ifndef NOMINMAX
+#           define NOMINMAX // required to stop windows.h messing up std::min
+#       endif
+#   endif
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
@@ -50,16 +50,16 @@ THE SOFTWARE.
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#	ifndef GL_GLEXT_PROTOTYPES
-#		define  GL_GLEXT_PROTOTYPES
-#	endif
+#   ifndef GL_GLEXT_PROTOTYPES
+#       define  GL_GLEXT_PROTOTYPES
+#   endif
 #elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-#	ifndef GL_GLEXT_PROTOTYPES
-#		define  GL_GLEXT_PROTOTYPES
-#	endif
-#	include <GLES/glplatform.h>
-#	include <GLES/gl.h>
-#	include <GLES/glext.h>
+#   ifndef GL_GLEXT_PROTOTYPES
+#       define  GL_GLEXT_PROTOTYPES
+#   endif
+#   include <GLES/glplatform.h>
+#   include <GLES/gl.h>
+#   include <GLES/glext.h>
 #   include <EGL/egl.h>
 #else
 #   include <GLES/gl.h>
@@ -69,25 +69,25 @@ THE SOFTWARE.
 // If we are going to use the PVRTC_CODEC make sure we
 // setup the needed constants
 #if OGRE_NO_PVRTC_CODEC == 0
-#	ifndef GL_IMG_texture_compression_pvrtc
-#		define GL_IMG_texture_compression_pvrtc 1
-#		define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG                      	0x8C00
-#		define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG                      	0x8C01
-#		define GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG                     	0x8C02
-#		define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                     	0x8C03
-#	endif
+#   ifndef GL_IMG_texture_compression_pvrtc
+#       define GL_IMG_texture_compression_pvrtc 1
+#       define GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG                       0x8C00
+#       define GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG                       0x8C01
+#       define GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG                      0x8C02
+#       define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                      0x8C03
+#   endif
 #endif
 
 /* GL_EXT_texture_compression_dxt1 */
 #ifndef GL_EXT_texture_compression_dxt1
-#	define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                         		0x83F0
-#	define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                        		0x83F1
+#   define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                              0x83F0
+#   define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                             0x83F1
 #endif
 
 // Function pointers for FBO extension methods
 // Declare them here since we don't have GLEW to do it for us
 
-#	ifndef GL_GLEXT_PROTOTYPES
+#   ifndef GL_GLEXT_PROTOTYPES
 extern PFNGLISRENDERBUFFEROESPROC glIsRenderbufferOES;
 extern PFNGLBINDRENDERBUFFEROESPROC glBindRenderbufferOES;
 extern PFNGLDELETERENDERBUFFERSOESPROC glDeleteRenderbuffersOES;
@@ -108,7 +108,7 @@ extern PFNGLBLENDFUNCSEPARATEOESPROC glBlendFuncSeparateOES;
 extern PFNGLBLENDEQUATIONSEPARATEOESPROC glBlendEquationSeparateOES;
 extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
 extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
-#	endif
+#   endif
 
 #endif
 

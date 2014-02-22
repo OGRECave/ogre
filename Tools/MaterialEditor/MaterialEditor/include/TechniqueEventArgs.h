@@ -36,15 +36,15 @@ class TechniqueController;
 class TechniqueEventArgs : public EventArgs
 {
 public:
-	TechniqueEventArgs(TechniqueController* tc);
-	TechniqueEventArgs(TechniqueController* tc, PassController* pc);
+    TechniqueEventArgs(TechniqueController* tc);
+    TechniqueEventArgs(TechniqueController* tc, PassController* pc);
 
-	TechniqueController* getTechniqueController() const;
-	PassController* getPassController() const;
+    TechniqueController* getTechniqueController() const;
+    PassController* getPassController() const;
 
 protected:
-	TechniqueController* mTechniqueController;
-	PassController* mPassController;
+    TechniqueController* mTechniqueController;
+    PassController* mPassController;
 };
 
 #endif // _PROJECTEVENTARGS_H_

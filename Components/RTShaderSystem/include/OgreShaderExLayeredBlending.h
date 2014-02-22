@@ -44,110 +44,110 @@ Derives from FFPTexturing class which derives from SubRenderState class.
 class _OgreRTSSExport LayeredBlending : public FFPTexturing
 {
 public:
-	enum BlendMode
-	{
-		LB_Invalid = -1,
-		LB_FFPBlend,
-		LB_BlendNormal,
-		LB_BlendLighten,			
-		LB_BlendDarken,		
-		LB_BlendMultiply,
-		LB_BlendAverage,	
-		LB_BlendAdd,
-		LB_BlendSubtract,
-		LB_BlendDifference,
-		LB_BlendNegation,
-		LB_BlendExclusion,
-		LB_BlendScreen,
-		LB_BlendOverlay,
-		LB_BlendSoftLight,
-		LB_BlendHardLight,
-		LB_BlendColorDodge,
-		LB_BlendColorBurn, 
-		LB_BlendLinearDodge,
-		LB_BlendLinearBurn,
-		LB_BlendLinearLight,
-		LB_BlendVividLight,
-		LB_BlendPinLight,
-		LB_BlendHardMix,
-		LB_BlendReflect,
-		LB_BlendGlow,
-		LB_BlendPhoenix,
-		LB_BlendSaturation,
-		LB_BlendColor,
-		LB_BlendLuminosity,
-		LB_MaxBlendModes
-	};
+    enum BlendMode
+    {
+        LB_Invalid = -1,
+        LB_FFPBlend,
+        LB_BlendNormal,
+        LB_BlendLighten,            
+        LB_BlendDarken,     
+        LB_BlendMultiply,
+        LB_BlendAverage,    
+        LB_BlendAdd,
+        LB_BlendSubtract,
+        LB_BlendDifference,
+        LB_BlendNegation,
+        LB_BlendExclusion,
+        LB_BlendScreen,
+        LB_BlendOverlay,
+        LB_BlendSoftLight,
+        LB_BlendHardLight,
+        LB_BlendColorDodge,
+        LB_BlendColorBurn, 
+        LB_BlendLinearDodge,
+        LB_BlendLinearBurn,
+        LB_BlendLinearLight,
+        LB_BlendVividLight,
+        LB_BlendPinLight,
+        LB_BlendHardMix,
+        LB_BlendReflect,
+        LB_BlendGlow,
+        LB_BlendPhoenix,
+        LB_BlendSaturation,
+        LB_BlendColor,
+        LB_BlendLuminosity,
+        LB_MaxBlendModes
+    };
 
-	enum SourceModifier
-	{
-		SM_Invalid = -1,
-		SM_None,
-		SM_Source1Modulate,
-		SM_Source2Modulate,
-		SM_Source1InvModulate,
-		SM_Source2InvModulate,
-		SM_MaxSourceModifiers
-	};
+    enum SourceModifier
+    {
+        SM_Invalid = -1,
+        SM_None,
+        SM_Source1Modulate,
+        SM_Source2Modulate,
+        SM_Source1InvModulate,
+        SM_Source2InvModulate,
+        SM_MaxSourceModifiers
+    };
 
-	struct TextureBlend
-	{
-		TextureBlend() : blendMode(LB_Invalid), sourceModifier(SM_Invalid), customNum(0) {}
+    struct TextureBlend
+    {
+        TextureBlend() : blendMode(LB_Invalid), sourceModifier(SM_Invalid), customNum(0) {}
 
-		//The blend mode to use
-		BlendMode blendMode;
-		//The source modification to use
-		SourceModifier sourceModifier;
-		// The number of the custom param controlling the source modification
-		int customNum;
-		//The parameter controlling the source modification
-		ParameterPtr modControlParam;
-	};
-
-
-	/** Class default constructor */
-	LayeredBlending();
-
-	/** 
-	@see SubRenderState::getType.
-	*/
-	virtual const Ogre::String&	getType					() const;
+        //The blend mode to use
+        BlendMode blendMode;
+        //The source modification to use
+        SourceModifier sourceModifier;
+        // The number of the custom param controlling the source modification
+        int customNum;
+        //The parameter controlling the source modification
+        ParameterPtr modControlParam;
+    };
 
 
-	/** 
-	Set the blend mode of the given texture unit layer with the previous layer.
-	@param index The texture unit texture. Textures units (index-1) and (index) will be blended.
-	@param mode The blend mode to apply.
-	*/
-	void setBlendMode(unsigned short index, BlendMode mode);
+    /** Class default constructor */
+    LayeredBlending();
 
-	/** 
-	Return the blend mode of the given texture unit index.
-	*/
-	BlendMode getBlendMode(unsigned short index) const;
+    /** 
+    @see SubRenderState::getType.
+    */
+    virtual const Ogre::String& getType                 () const;
 
-	
 
-	/** 
-	Set the source modifier parameters for a given texture unit
-	@param modType The source modification type to use
-	@param customNum The custom parameter number used to control the modification
-	*/
-	void setSourceModifier(unsigned short index, SourceModifier modType, int customNum);
+    /** 
+    Set the blend mode of the given texture unit layer with the previous layer.
+    @param index The texture unit texture. Textures units (index-1) and (index) will be blended.
+    @param mode The blend mode to apply.
+    */
+    void setBlendMode(unsigned short index, BlendMode mode);
 
-	/** 
-	Returns the source modifier parameters for a given texture unit
-	@return True if a valid modifier exist for the given texture unit
+    /** 
+    Return the blend mode of the given texture unit index.
+    */
+    BlendMode getBlendMode(unsigned short index) const;
+
+    
+
+    /** 
+    Set the source modifier parameters for a given texture unit
+    @param modType The source modification type to use
+    @param customNum The custom parameter number used to control the modification
+    */
+    void setSourceModifier(unsigned short index, SourceModifier modType, int customNum);
+
+    /** 
+    Returns the source modifier parameters for a given texture unit
+    @return True if a valid modifier exist for the given texture unit
     @param index Texture blend index
-	@param modType The source modification type to use
-	@param customNum The custom parameter number used to control the modification
-	*/
-	bool getSourceModifier(unsigned short index, SourceModifier& modType, int& customNum) const;
+    @param modType The source modification type to use
+    @param customNum The custom parameter number used to control the modification
+    */
+    bool getSourceModifier(unsigned short index, SourceModifier& modType, int& customNum) const;
 
-	/** 
-	@see SubRenderState::copyFrom.
-	*/
-	virtual void copyFrom(const SubRenderState& rhs);
+    /** 
+    @see SubRenderState::copyFrom.
+    */
+    virtual void copyFrom(const SubRenderState& rhs);
 
     static String Type;
 
@@ -202,54 +202,54 @@ class LayeredBlendingFactory : public SubRenderStateFactory
 {
 public:
 
-	/** 
-	@see SubRenderStateFactory::getType.
-	*/
-	virtual const String& getType() const;
+    /** 
+    @see SubRenderStateFactory::getType.
+    */
+    virtual const String& getType() const;
 
-	/** 
-	@see SubRenderStateFactory::createInstance.
-	*/
-	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator);
+    /** 
+    @see SubRenderStateFactory::createInstance.
+    */
+    virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator);
 
-	/** 
-	@see SubRenderStateFactory::writeInstance.
-	*/
-	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit);
+    /** 
+    @see SubRenderStateFactory::writeInstance.
+    */
+    virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit);
 
     
 protected:
 
-	/** 
-	@see SubRenderStateFactory::createInstanceImpl.
-	*/
-	virtual SubRenderState* createInstanceImpl();
+    /** 
+    @see SubRenderStateFactory::createInstanceImpl.
+    */
+    virtual SubRenderState* createInstanceImpl();
 
-	/** 
-	@Converts string to Enum
-	*/
-	LayeredBlending::BlendMode stringToBlendMode(const String &strValue);
-	/** 
-	@Converts Enum to string
-	*/
-	String blendModeToString(LayeredBlending::BlendMode blendMode);
+    /** 
+    @Converts string to Enum
+    */
+    LayeredBlending::BlendMode stringToBlendMode(const String &strValue);
+    /** 
+    @Converts Enum to string
+    */
+    String blendModeToString(LayeredBlending::BlendMode blendMode);
 
-	/** 
-	@Converts string to Enum
-	*/
-	LayeredBlending::SourceModifier stringToSourceModifier(const String &strValue);
-	
-	/** 
-	@Converts Enum to string
-	*/
-	String sourceModifierToString(LayeredBlending::SourceModifier modifier);
+    /** 
+    @Converts string to Enum
+    */
+    LayeredBlending::SourceModifier stringToSourceModifier(const String &strValue);
+    
+    /** 
+    @Converts Enum to string
+    */
+    String sourceModifierToString(LayeredBlending::SourceModifier modifier);
 
-	/** 
-	Returns the LayeredBlending sub-rener state previously created for this material/pass.
-	if no such sub-render state exists creates a new one
-	@param translator compiler
-	*/
-	LayeredBlending* createOrRetrieveSubRenderState(SGScriptTranslator* translator);
+    /** 
+    Returns the LayeredBlending sub-rener state previously created for this material/pass.
+    if no such sub-render state exists creates a new one
+    @param translator compiler
+    */
+    LayeredBlending* createOrRetrieveSubRenderState(SGScriptTranslator* translator);
 };
 
 } // namespace RTShader

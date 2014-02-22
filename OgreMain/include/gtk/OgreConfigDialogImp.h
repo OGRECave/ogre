@@ -90,8 +90,8 @@ namespace Ogre
         static void rendererChanged (GtkComboBox *widget, gpointer data);
         /// Callback function to change a renderer option
         static void optionChanged (GtkComboBox *widget, gpointer data);
-	/// Idle function to refresh renderer parameters
-	static gboolean refreshParams (gpointer data);
+    /// Idle function to refresh renderer parameters
+    static gboolean refreshParams (gpointer data);
     };
 }
 #endif

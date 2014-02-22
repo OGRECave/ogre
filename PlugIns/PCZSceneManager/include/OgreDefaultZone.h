@@ -31,7 +31,7 @@ Default Implementation of PCZone
 begin                : Tue Feb 20 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -45,15 +45,15 @@ namespace Ogre
     class PCZFrustum;
     struct VisibleObjectsBoundsInfo;
 
-	class _OgrePCZPluginExport DefaultZone : public PCZone
+    class _OgrePCZPluginExport DefaultZone : public PCZone
     {
     public:
         DefaultZone( PCZSceneManager *, const String& );
         ~DefaultZone();
 
-		/** Set the enclosure node for this Zone
-		*/
-		void setEnclosureNode(PCZSceneNode *);
+        /** Set the enclosure node for this Zone
+        */
+        void setEnclosureNode(PCZSceneNode *);
 
         /** Adds an SceneNode to this Zone.
         @remarks
@@ -66,14 +66,14 @@ namespace Ogre
         */
         void removeNode( PCZSceneNode * );
 
-		/** Indicates whether or not this zone requires zone-specific data for 
-		 *  each scene node
-		 */
-		bool requiresZoneSpecificNodeData(void);
+        /** Indicates whether or not this zone requires zone-specific data for 
+         *  each scene node
+         */
+        bool requiresZoneSpecificNodeData(void);
 
-		/** (recursive) check the given node against all portals in the zone
-		*/
-		void _checkNodeAgainstPortals(PCZSceneNode *, Portal * );
+        /** (recursive) check the given node against all portals in the zone
+        */
+        void _checkNodeAgainstPortals(PCZSceneNode *, Portal * );
 
         /** (recursive) check the given light against all portals in the zone
         */
@@ -82,15 +82,15 @@ namespace Ogre
                                        PCZFrustum *,
                                        Portal *);
 
-		/* Update the zone data for each portal 
-		*/
-		void updatePortalsZoneData(void);
+        /* Update the zone data for each portal 
+        */
+        void updatePortalsZoneData(void);
 
-		/** Mark nodes dirty base on moving portals. */
-		void dirtyNodeByMovingPortals(void);
+        /** Mark nodes dirty base on moving portals. */
+        void dirtyNodeByMovingPortals(void);
 
-		/* Update a node's home zone */
-		PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces);
+        /* Update a node's home zone */
+        PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces);
 
         /** Find and add visible objects to the render queue.
         @remarks
@@ -98,54 +98,54 @@ namespace Ogre
         This is a recursive call (the main call should be to _findVisibleObjects)
         */
         void findVisibleNodes(PCZCamera *, 
-							  NodeList & visibleNodeList,
-							  RenderQueue * queue,
-							  VisibleObjectsBoundsInfo* visibleBounds, 
-							  bool onlyShadowCasters,
-							  bool displayNodes,
-							  bool showBoundingBoxes);
+                              NodeList & visibleNodeList,
+                              RenderQueue * queue,
+                              VisibleObjectsBoundsInfo* visibleBounds, 
+                              bool onlyShadowCasters,
+                              bool displayNodes,
+                              bool showBoundingBoxes);
 
-		/* Functions for finding Nodes that intersect various shapes */
-		void _findNodes( const AxisAlignedBox &t, 
-						 PCZSceneNodeList &list, 
+        /* Functions for finding Nodes that intersect various shapes */
+        void _findNodes( const AxisAlignedBox &t, 
+                         PCZSceneNodeList &list, 
                          PortalList &visitedPortals,
-						 bool includeVisitors,
-						 bool recurseThruPortals,
-						 PCZSceneNode *exclude);
-	    void _findNodes( const Sphere &t, 
-						 PCZSceneNodeList &list, 
+                         bool includeVisitors,
+                         bool recurseThruPortals,
+                         PCZSceneNode *exclude);
+        void _findNodes( const Sphere &t, 
+                         PCZSceneNodeList &list, 
                          PortalList &visitedPortals,
-						 bool includeVisitors,
-						 bool recurseThruPortals,
-						 PCZSceneNode *exclude );
-	    void _findNodes( const PlaneBoundedVolume &t, 
-						 PCZSceneNodeList &list, 
+                         bool includeVisitors,
+                         bool recurseThruPortals,
+                         PCZSceneNode *exclude );
+        void _findNodes( const PlaneBoundedVolume &t, 
+                         PCZSceneNodeList &list, 
                          PortalList &visitedPortals,
-						 bool includeVisitors,
-						 bool recurseThruPortals,
-						 PCZSceneNode *exclude );
-	    void _findNodes( const Ray &t, 
-						 PCZSceneNodeList &list, 
+                         bool includeVisitors,
+                         bool recurseThruPortals,
+                         PCZSceneNode *exclude );
+        void _findNodes( const Ray &t, 
+                         PCZSceneNodeList &list, 
                          PortalList &visitedPortals,
-						 bool includeVisitors,
-						 bool recurseThruPortals,
-						 PCZSceneNode *exclude );
+                         bool includeVisitors,
+                         bool recurseThruPortals,
+                         PCZSceneNode *exclude );
 
-		/** Sets the options for the Zone */
-		bool setOption( const String &, const void * );
+        /** Sets the options for the Zone */
+        bool setOption( const String &, const void * );
 
-		/** called when the scene manager creates a camera because
-		    some zone managers (like TerrainZone) need the camera info.
-		*/
-		void notifyCameraCreated( Camera* c );
-		/* called by PCZSM during setWorldGeometryRenderQueue() */
-		virtual void notifyWorldGeometryRenderQueue(uint8 qid);
-		/* Called when a _renderScene is called in the SceneManager */
-		virtual void notifyBeginRenderScene(void);
-		/* called by PCZSM during setZoneGeometry() */
-		virtual void setZoneGeometry(const String &filename, PCZSceneNode * parentNode);
+        /** called when the scene manager creates a camera because
+            some zone managers (like TerrainZone) need the camera info.
+        */
+        void notifyCameraCreated( Camera* c );
+        /* called by PCZSM during setWorldGeometryRenderQueue() */
+        virtual void notifyWorldGeometryRenderQueue(uint8 qid);
+        /* Called when a _renderScene is called in the SceneManager */
+        virtual void notifyBeginRenderScene(void);
+        /* called by PCZSM during setZoneGeometry() */
+        virtual void setZoneGeometry(const String &filename, PCZSceneNode * parentNode);
 
-	protected:
+    protected:
 
     };
 

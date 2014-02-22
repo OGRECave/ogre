@@ -37,15 +37,15 @@ THE SOFTWARE.
 #include "TechniqueEventArgs.h"
 
 BEGIN_EVENT_TABLE(TechniquePropertyGridPage, wxPropertyGridPage)
-	EVT_PG_CHANGED(-1, TechniquePropertyGridPage::propertyChanged)
+    EVT_PG_CHANGED(-1, TechniquePropertyGridPage::propertyChanged)
 END_EVENT_TABLE()
 
 TechniquePropertyGridPage::TechniquePropertyGridPage(TechniqueController* controller)
 : mController(controller)
 {
-	mController->subscribe(TechniqueController::NameChanged, boost::bind(&TechniquePropertyGridPage::nameChanged, this, _1));
-	mController->subscribe(TechniqueController::SchemeChanged, boost::bind(&TechniquePropertyGridPage::schemeNameChanged, this, _1));
-	mController->subscribe(TechniqueController::LodIndexChanged, boost::bind(&TechniquePropertyGridPage::lodIndexChanged, this, _1));
+    mController->subscribe(TechniqueController::NameChanged, boost::bind(&TechniquePropertyGridPage::nameChanged, this, _1));
+    mController->subscribe(TechniqueController::SchemeChanged, boost::bind(&TechniquePropertyGridPage::schemeNameChanged, this, _1));
+    mController->subscribe(TechniqueController::LodIndexChanged, boost::bind(&TechniquePropertyGridPage::lodIndexChanged, this, _1));
 }
 
 TechniquePropertyGridPage::~TechniquePropertyGridPage()
@@ -54,56 +54,56 @@ TechniquePropertyGridPage::~TechniquePropertyGridPage()
 
 void TechniquePropertyGridPage::populate()
 {
-	mNameId = Append(wxStringProperty(wxT("Name"), wxPG_LABEL, mController->getTechnique()->getName()));
-	mSchemeNameId = Append(wxStringProperty(wxT("Scheme Name"), wxPG_LABEL, mController->getTechnique()->getSchemeName()));
-	mLodIndexId = Append(wxIntProperty(wxT("LOD Index"), wxPG_LABEL, mController->getTechnique()->getLodIndex()));
+    mNameId = Append(wxStringProperty(wxT("Name"), wxPG_LABEL, mController->getTechnique()->getName()));
+    mSchemeNameId = Append(wxStringProperty(wxT("Scheme Name"), wxPG_LABEL, mController->getTechnique()->getSchemeName()));
+    mLodIndexId = Append(wxIntProperty(wxT("LOD Index"), wxPG_LABEL, mController->getTechnique()->getLodIndex()));
 }
 
 void TechniquePropertyGridPage::propertyChanged(wxPropertyGridEvent& event)
 {
-	wxPGId id = event.GetProperty();
-	if(id == mNameId)
-	{
-		mController->setName(event.GetPropertyValueAsString().c_str());
-	}
-	else if(id == mSchemeNameId)
-	{
-		mController->setSchemeName(event.GetPropertyValueAsString().c_str());
-	}
-	else if(id = mLodIndexId)
-	{
-		mController->setLodIndex(event.GetPropertyValueAsInt());
-	}
+    wxPGId id = event.GetProperty();
+    if(id == mNameId)
+    {
+        mController->setName(event.GetPropertyValueAsString().c_str());
+    }
+    else if(id == mSchemeNameId)
+    {
+        mController->setSchemeName(event.GetPropertyValueAsString().c_str());
+    }
+    else if(id = mLodIndexId)
+    {
+        mController->setLodIndex(event.GetPropertyValueAsInt());
+    }
 }
 
 void TechniquePropertyGridPage::nameChanged(EventArgs& args)
 {
-	TechniqueEventArgs tea = dynamic_cast<TechniqueEventArgs&>(args);
-	TechniqueController* tc = tea.getTechniqueController();
+    TechniqueEventArgs tea = dynamic_cast<TechniqueEventArgs&>(args);
+    TechniqueController* tc = tea.getTechniqueController();
 
-	wxPGProperty* prop = GetPropertyPtr(mNameId);
-	if(prop == NULL) return;
-	prop->SetValueFromString(tc->getTechnique()->getName().c_str());
+    wxPGProperty* prop = GetPropertyPtr(mNameId);
+    if(prop == NULL) return;
+    prop->SetValueFromString(tc->getTechnique()->getName().c_str());
 }
 
 void TechniquePropertyGridPage::schemeNameChanged(EventArgs& args)
 {
-	TechniqueEventArgs tea = dynamic_cast<TechniqueEventArgs&>(args);
-	TechniqueController* tc = tea.getTechniqueController();
+    TechniqueEventArgs tea = dynamic_cast<TechniqueEventArgs&>(args);
+    TechniqueController* tc = tea.getTechniqueController();
 
-	wxPGProperty* prop = GetPropertyPtr(mSchemeNameId);
-	if(prop == NULL) return;
-	prop->SetValueFromString(tc->getTechnique()->getSchemeName().c_str());
+    wxPGProperty* prop = GetPropertyPtr(mSchemeNameId);
+    if(prop == NULL) return;
+    prop->SetValueFromString(tc->getTechnique()->getSchemeName().c_str());
 }
 
 void TechniquePropertyGridPage::lodIndexChanged(EventArgs& args)
 {
-	TechniqueEventArgs tea = dynamic_cast<TechniqueEventArgs&>(args);
-	TechniqueController* tc = tea.getTechniqueController();
+    TechniqueEventArgs tea = dynamic_cast<TechniqueEventArgs&>(args);
+    TechniqueController* tc = tea.getTechniqueController();
 
-	wxPGProperty* prop = GetPropertyPtr(mLodIndexId);
-	if(prop == NULL) return;
-	prop->SetValueFromInt(tc->getTechnique()->getLodIndex());
+    wxPGProperty* prop = GetPropertyPtr(mLodIndexId);
+    if(prop == NULL) return;
+    prop->SetValueFromInt(tc->getTechnique()->getLodIndex());
 }
 
 

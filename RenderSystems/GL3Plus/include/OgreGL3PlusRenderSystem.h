@@ -290,23 +290,23 @@ namespace Ogre {
             RenderSystem
         */
         void _setPointSpritesEnabled(bool enabled);
-		/** See
+        /** See
          RenderSystem
          */
         void _setVertexTexture(size_t unit, const TexturePtr &tex);
-		/** See
+        /** See
          RenderSystem
          */
         void _setGeometryTexture(size_t unit, const TexturePtr &tex);
-		/** See
+        /** See
          RenderSystem
          */
         void _setComputeTexture(size_t unit, const TexturePtr &tex);
-		/** See
+        /** See
          RenderSystem
          */
         void _setTesselationHullTexture(size_t unit, const TexturePtr &tex);
-		/** See
+        /** See
          RenderSystem
          */
         void _setTesselationDomainTexture(size_t unit, const TexturePtr &tex);
@@ -437,7 +437,7 @@ namespace Ogre {
                                     StencilOperation depthFailOp = SOP_KEEP,
                                     StencilOperation passOp = SOP_KEEP,
                     bool twoSidedOperation = false,
-					bool readBackAsTexture = false);
+                    bool readBackAsTexture = false);
         /** See
             RenderSystem
         */

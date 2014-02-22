@@ -34,30 +34,30 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** Plugin instance for D3D9 Manager */
-	class _OgreD3D9Export D3D9Plugin : public Plugin
-	{
-	public:
-		D3D9Plugin();
+    /** Plugin instance for D3D9 Manager */
+    class _OgreD3D9Export D3D9Plugin : public Plugin
+    {
+    public:
+        D3D9Plugin();
 
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		D3D9RenderSystem* mRenderSystem;
-	};
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        D3D9RenderSystem* mRenderSystem;
+    };
 }
 
 #endif

@@ -34,16 +34,16 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
-	class DistanceLodBoxStrategy;
-	/// Backward compatible name for Distance_Box strategy.
-	typedef DistanceLodBoxStrategy DistanceLodStrategy;
+    class DistanceLodBoxStrategy;
+    /// Backward compatible name for Distance_Box strategy.
+    typedef DistanceLodBoxStrategy DistanceLodStrategy;
 
     /** Level of detail strategy based on distance from camera. This is an abstract base class for DistanceLodBoxStrategy and DistanceLodSphereStrategy.
         @remarks
@@ -111,15 +111,15 @@ namespace Ogre {
         Real mReferenceViewValue;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
     /** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
     /** Level of detail strategy based on distance from camera to an object's bounding sphere.
         @remarks
@@ -177,11 +177,11 @@ namespace Ogre {
     /** @} */
 
     /** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
     /** Level of detail strategy based on distance from camera to an object's bounding box.
         @remarks

@@ -86,268 +86,268 @@ namespace Ogre {
  * buttons.
  */
 class GLXConfigurator {
-	/* GUI constants */
-	static const int wWidth = 400;		// Width of window
-	static const int wHeight = 340;		// Height of window
-	static const int col1x = 20;		// Starting x of column 1 (labels)
-	static const int col2x = 180;		// Starting x of column 2 (options)
-	static const int col1w = 150;		// Width of column 1 (labels)
-	static const int col2w = 200;		// Width of column 2 (options)
-	static const int ystart = 105;		// Starting y of option table rows
-	static const int rowh = 20;		// Height of one row in the option table
+    /* GUI constants */
+    static const int wWidth = 400;      // Width of window
+    static const int wHeight = 340;     // Height of window
+    static const int col1x = 20;        // Starting x of column 1 (labels)
+    static const int col2x = 180;       // Starting x of column 2 (options)
+    static const int col1w = 150;       // Width of column 1 (labels)
+    static const int col2w = 200;       // Width of column 2 (options)
+    static const int ystart = 105;      // Starting y of option table rows
+    static const int rowh = 20;     // Height of one row in the option table
 
 public:
-	GLXConfigurator();
-	virtual ~GLXConfigurator();
+    GLXConfigurator();
+    virtual ~GLXConfigurator();
 
-	bool CreateWindow();
-	void Main();
-	/**
-	 * Exit from main loop.
-	 */
-	void Exit();
+    bool CreateWindow();
+    void Main();
+    /**
+     * Exit from main loop.
+     */
+    void Exit();
 protected:
-	Display *mDisplay;
-	Window mWindow;
-	Pixmap mBackDrop;
+    Display *mDisplay;
+    Window mWindow;
+    Pixmap mBackDrop;
 
-	int mWidth, mHeight;
-	// Xt
-	XtAppContext appContext;
-	Widget toplevel;
+    int mWidth, mHeight;
+    // Xt
+    XtAppContext appContext;
+    Widget toplevel;
 
-	/**
-	 * Create backdrop image, and return it as a Pixmap.
-	 */
-	virtual Pixmap CreateBackdrop(Window rootWindow, int depth);
-	/**
-	 * Called after window initialisation.
-	 */
-	virtual bool Init();
-	/**
-	 * Called initially, and on expose.
-	 */
-	virtual void Draw();
+    /**
+     * Create backdrop image, and return it as a Pixmap.
+     */
+    virtual Pixmap CreateBackdrop(Window rootWindow, int depth);
+    /**
+     * Called after window initialisation.
+     */
+    virtual bool Init();
+    /**
+     * Called initially, and on expose.
+     */
+    virtual void Draw();
 public:
-	/* Local */
-	bool accept;
-	/* Class that binds a callback to a RenderSystem */
-	class RendererCallbackData {
-	public:
-		RendererCallbackData(GLXConfigurator *parent_, RenderSystem *renderer_, Widget optionmenu_):
-			parent(parent_),
-			renderer(renderer_),
-			optionmenu(optionmenu_) {
-		}
-		GLXConfigurator *parent;
-		RenderSystem *renderer;
-		Widget optionmenu;
-	};
-	std::list<RendererCallbackData> mRendererCallbackData;
+    /* Local */
+    bool accept;
+    /* Class that binds a callback to a RenderSystem */
+    class RendererCallbackData {
+    public:
+        RendererCallbackData(GLXConfigurator *parent_, RenderSystem *renderer_, Widget optionmenu_):
+            parent(parent_),
+            renderer(renderer_),
+            optionmenu(optionmenu_) {
+        }
+        GLXConfigurator *parent;
+        RenderSystem *renderer;
+        Widget optionmenu;
+    };
+    std::list<RendererCallbackData> mRendererCallbackData;
 
-	RenderSystem *mRenderer;
-	Widget box; 				// Box'o control widgets
-	std::list<Widget> mRenderOptionWidgets; // List of RenderSystem specific
-						// widgets for visibility management (cleared when another rendersystem is selected)
-	/* Class that binds a callback to a certain configuration option/value */
-	class ConfigCallbackData {
-	public:
-		ConfigCallbackData(GLXConfigurator *parent_, const String &optionName_, const String &valueName_, Widget optionmenu_):
-			parent(parent_),
-			optionName(optionName_),
-			valueName(valueName_),
-			optionmenu(optionmenu_) {
-		}
-		GLXConfigurator *parent;
-		String optionName, valueName;
-		Widget optionmenu;
-	};
-	std::list<ConfigCallbackData> mConfigCallbackData;
+    RenderSystem *mRenderer;
+    Widget box;                 // Box'o control widgets
+    std::list<Widget> mRenderOptionWidgets; // List of RenderSystem specific
+                        // widgets for visibility management (cleared when another rendersystem is selected)
+    /* Class that binds a callback to a certain configuration option/value */
+    class ConfigCallbackData {
+    public:
+        ConfigCallbackData(GLXConfigurator *parent_, const String &optionName_, const String &valueName_, Widget optionmenu_):
+            parent(parent_),
+            optionName(optionName_),
+            valueName(valueName_),
+            optionmenu(optionmenu_) {
+        }
+        GLXConfigurator *parent;
+        String optionName, valueName;
+        Widget optionmenu;
+    };
+    std::list<ConfigCallbackData> mConfigCallbackData;
 
-	void SetRenderSystem(RenderSystem *sys) {
-		mRenderer = sys;
-	}
+    void SetRenderSystem(RenderSystem *sys) {
+        mRenderer = sys;
+    }
 private:
-	/* Callbacks that terminate modal dialog loop */
-	static void acceptHandler(Widget w, GLXConfigurator *obj, XtPointer callData) {
-		// Check if a renderer was selected, if not, don't accept
-		if(!obj->mRenderer)
-			return;
-		obj->accept = true;
-		obj->Exit();
-	}
-	static void cancelHandler(Widget w, GLXConfigurator *obj, XtPointer callData) {
-		obj->Exit();
-	}
-	/* Callbacks that set a setting */
-	static void renderSystemHandler(Widget w, RendererCallbackData *cdata, XtPointer callData) {
-		// Set selected renderer its name
+    /* Callbacks that terminate modal dialog loop */
+    static void acceptHandler(Widget w, GLXConfigurator *obj, XtPointer callData) {
+        // Check if a renderer was selected, if not, don't accept
+        if(!obj->mRenderer)
+            return;
+        obj->accept = true;
+        obj->Exit();
+    }
+    static void cancelHandler(Widget w, GLXConfigurator *obj, XtPointer callData) {
+        obj->Exit();
+    }
+    /* Callbacks that set a setting */
+    static void renderSystemHandler(Widget w, RendererCallbackData *cdata, XtPointer callData) {
+        // Set selected renderer its name
             XtVaSetValues(cdata->optionmenu, XtNlabel, cdata->renderer->getName().c_str(), 0, NULL);
-		// Notify Configurator (and Ogre)
-		cdata->parent->SetRenderer(cdata->renderer);
-	}
-	static void configOptionHandler(Widget w, ConfigCallbackData *cdata, XtPointer callData) {
-		// Set selected renderer its name
+        // Notify Configurator (and Ogre)
+        cdata->parent->SetRenderer(cdata->renderer);
+    }
+    static void configOptionHandler(Widget w, ConfigCallbackData *cdata, XtPointer callData) {
+        // Set selected renderer its name
             XtVaSetValues(cdata->optionmenu, XtNlabel, cdata->valueName.c_str(), 0, NULL);
-		// Notify Configurator (and Ogre)
-		cdata->parent->SetConfigOption(cdata->optionName, cdata->valueName);
-	}
+        // Notify Configurator (and Ogre)
+        cdata->parent->SetConfigOption(cdata->optionName, cdata->valueName);
+    }
 
-	/* Functions reacting to GUI */
-	void SetRenderer(RenderSystem *);
-	void SetConfigOption(const String &optionName, const String &valueName);
+    /* Functions reacting to GUI */
+    void SetRenderer(RenderSystem *);
+    void SetConfigOption(const String &optionName, const String &valueName);
 };
 
 GLXConfigurator::GLXConfigurator():
-	mDisplay(0), mWindow(0), mBackDrop(0),
-	mWidth(wWidth), mHeight(wHeight),
-	appContext(0), toplevel(0),
+    mDisplay(0), mWindow(0), mBackDrop(0),
+    mWidth(wWidth), mHeight(wHeight),
+    appContext(0), toplevel(0),
 
-	accept(false),
-	mRenderer(0) {
+    accept(false),
+    mRenderer(0) {
 }
 GLXConfigurator::~GLXConfigurator() {
-	if(mBackDrop)
-		XFreePixmap(mDisplay, mBackDrop);
-	if(toplevel) {
-		XtUnrealizeWidget(toplevel);
-		XtDestroyWidget(toplevel);
-	}
-	if(mDisplay) {
-		XCloseDisplay(mDisplay);
-	}
+    if(mBackDrop)
+        XFreePixmap(mDisplay, mBackDrop);
+    if(toplevel) {
+        XtUnrealizeWidget(toplevel);
+        XtDestroyWidget(toplevel);
+    }
+    if(mDisplay) {
+        XCloseDisplay(mDisplay);
+    }
 }
 
 bool GLXConfigurator::CreateWindow() {
 
 
-	const char *bla[] = {"Rendering Settings", "-bg", "honeydew3", "-fg", "black","-bd","darkseagreen4"};
-	int argc = sizeof(bla)/sizeof(*bla);
+    const char *bla[] = {"Rendering Settings", "-bg", "honeydew3", "-fg", "black","-bd","darkseagreen4"};
+    int argc = sizeof(bla)/sizeof(*bla);
 
-	toplevel = XtVaOpenApplication(&appContext, "OGRE", NULL, 0, &argc, const_cast<char**>(bla), NULL,sessionShellWidgetClass,
-		XtNwidth, mWidth,
-		XtNheight, mHeight,
-		XtNminWidth, mWidth,
-		XtNmaxWidth, mWidth,
-		XtNminHeight, mHeight,
-		XtNmaxHeight, mHeight,
-		XtNallowShellResize, False,
-		XtNborderWidth, 0,
-		XtNoverrideRedirect, False,
-		NULL, NULL);
+    toplevel = XtVaOpenApplication(&appContext, "OGRE", NULL, 0, &argc, const_cast<char**>(bla), NULL,sessionShellWidgetClass,
+        XtNwidth, mWidth,
+        XtNheight, mHeight,
+        XtNminWidth, mWidth,
+        XtNmaxWidth, mWidth,
+        XtNminHeight, mHeight,
+        XtNmaxHeight, mHeight,
+        XtNallowShellResize, False,
+        XtNborderWidth, 0,
+        XtNoverrideRedirect, False,
+        NULL, NULL);
 
-	/* Find out display and screen used */
-	mDisplay = XtDisplay(toplevel);
-	int screen = DefaultScreen(mDisplay);
-	Window rootWindow = RootWindow(mDisplay,screen);
+    /* Find out display and screen used */
+    mDisplay = XtDisplay(toplevel);
+    int screen = DefaultScreen(mDisplay);
+    Window rootWindow = RootWindow(mDisplay,screen);
 
-	/* Move to center of display */
-	int w = DisplayWidth(mDisplay, screen);
-	int h = DisplayHeight(mDisplay, screen);
-	XtVaSetValues(toplevel,
-			XtNx, w/2-mWidth/2,
-			XtNy, h/2-mHeight/2, 0, NULL);
+    /* Move to center of display */
+    int w = DisplayWidth(mDisplay, screen);
+    int h = DisplayHeight(mDisplay, screen);
+    XtVaSetValues(toplevel,
+            XtNx, w/2-mWidth/2,
+            XtNy, h/2-mHeight/2, 0, NULL);
 
-	/* Backdrop stuff */
-	mBackDrop = CreateBackdrop(rootWindow, DefaultDepth(mDisplay,screen));
+    /* Backdrop stuff */
+    mBackDrop = CreateBackdrop(rootWindow, DefaultDepth(mDisplay,screen));
 
-	/* Create toplevel */
-	box = XtVaCreateManagedWidget("box",formWidgetClass,toplevel,
-		XtNbackgroundPixmap, mBackDrop,
-		0,NULL);
+    /* Create toplevel */
+    box = XtVaCreateManagedWidget("box",formWidgetClass,toplevel,
+        XtNbackgroundPixmap, mBackDrop,
+        0,NULL);
 
-	/* Create renderer selection */
-	int cury = ystart + 0*rowh;
+    /* Create renderer selection */
+    int cury = ystart + 0*rowh;
 
     XtVaCreateManagedWidget("topLabel", labelWidgetClass, box, XtNlabel, "Select Renderer", XtNborderWidth, 0,
-		XtNwidth, col1w, 	// Fixed width
-		XtNheight, 18,
-		XtNleft, XawChainLeft,
-		XtNtop, XawChainTop,
-		XtNright, XawChainLeft,
-		XtNbottom, XawChainTop,
-		XtNhorizDistance, col1x,
-		XtNvertDistance, cury,
-		XtNjustify, XtJustifyLeft,
-		NULL);
+        XtNwidth, col1w,    // Fixed width
+        XtNheight, 18,
+        XtNleft, XawChainLeft,
+        XtNtop, XawChainTop,
+        XtNright, XawChainLeft,
+        XtNbottom, XawChainTop,
+        XtNhorizDistance, col1x,
+        XtNvertDistance, cury,
+        XtNjustify, XtJustifyLeft,
+        NULL);
 
-	const char *curRenderName = " Select One "; // Name of current renderer, or hint to select one
-	if(mRenderer)
-		curRenderName = mRenderer->getName().c_str();
-	Widget mb1 = XtVaCreateManagedWidget("Menu", menuButtonWidgetClass, box, XtNlabel,curRenderName,
-		XtNresize, false,
-		XtNresizable, false,
-		XtNwidth, col2w, 	// Fixed width
-		XtNheight, 18,
-		XtNleft, XawChainLeft,
-		XtNtop, XawChainTop,
-		XtNright, XawChainLeft,
-		XtNbottom, XawChainTop,
-		XtNhorizDistance, col2x,
-		XtNvertDistance, cury,
-		NULL);
+    const char *curRenderName = " Select One "; // Name of current renderer, or hint to select one
+    if(mRenderer)
+        curRenderName = mRenderer->getName().c_str();
+    Widget mb1 = XtVaCreateManagedWidget("Menu", menuButtonWidgetClass, box, XtNlabel,curRenderName,
+        XtNresize, false,
+        XtNresizable, false,
+        XtNwidth, col2w,    // Fixed width
+        XtNheight, 18,
+        XtNleft, XawChainLeft,
+        XtNtop, XawChainTop,
+        XtNright, XawChainLeft,
+        XtNbottom, XawChainTop,
+        XtNhorizDistance, col2x,
+        XtNvertDistance, cury,
+        NULL);
 
-	Widget menu = XtVaCreatePopupShell("menu", simpleMenuWidgetClass, mb1,
-		0, NULL);
+    Widget menu = XtVaCreatePopupShell("menu", simpleMenuWidgetClass, mb1,
+        0, NULL);
 
-	const RenderSystemList& renderers = Root::getSingleton().getAvailableRenderers();
-	for (RenderSystemList::const_iterator pRend = renderers.begin();
-	                pRend != renderers.end(); pRend++) {
-		// Create callback data
-		mRendererCallbackData.push_back(RendererCallbackData(this, *pRend, mb1));
+    const RenderSystemList& renderers = Root::getSingleton().getAvailableRenderers();
+    for (RenderSystemList::const_iterator pRend = renderers.begin();
+                    pRend != renderers.end(); pRend++) {
+        // Create callback data
+        mRendererCallbackData.push_back(RendererCallbackData(this, *pRend, mb1));
 
-		Widget entry = XtVaCreateManagedWidget("menuentry", smeBSBObjectClass, menu,
-			XtNlabel, (*pRend)->getName().c_str(),
-			0, NULL);
-		XtAddCallback(entry, XtNcallback, (XtCallbackProc)&GLXConfigurator::renderSystemHandler, &mRendererCallbackData.back());
-	}
+        Widget entry = XtVaCreateManagedWidget("menuentry", smeBSBObjectClass, menu,
+            XtNlabel, (*pRend)->getName().c_str(),
+            0, NULL);
+        XtAddCallback(entry, XtNcallback, (XtCallbackProc)&GLXConfigurator::renderSystemHandler, &mRendererCallbackData.back());
+    }
 
-	Widget bottomPanel = XtVaCreateManagedWidget("bottomPanel", formWidgetClass, box,
-		XtNsensitive, True,
-		XtNborderWidth, 0,
-		XtNwidth, 150, 	// Fixed width
-		XtNleft, XawChainLeft,
-		XtNtop, XawChainTop,
-		XtNright, XawChainLeft,
-		XtNbottom, XawChainTop,
-		XtNhorizDistance, mWidth - 160,
-		XtNvertDistance, mHeight - 40,
-		NULL);
+    Widget bottomPanel = XtVaCreateManagedWidget("bottomPanel", formWidgetClass, box,
+        XtNsensitive, True,
+        XtNborderWidth, 0,
+        XtNwidth, 150,  // Fixed width
+        XtNleft, XawChainLeft,
+        XtNtop, XawChainTop,
+        XtNright, XawChainLeft,
+        XtNbottom, XawChainTop,
+        XtNhorizDistance, mWidth - 160,
+        XtNvertDistance, mHeight - 40,
+        NULL);
 
-	Widget helloButton = XtVaCreateManagedWidget("cancelButton", commandWidgetClass, bottomPanel, XtNlabel," Cancel ", NULL);
-	XtAddCallback(helloButton, XtNcallback, (XtCallbackProc)&GLXConfigurator::cancelHandler, this);
+    Widget helloButton = XtVaCreateManagedWidget("cancelButton", commandWidgetClass, bottomPanel, XtNlabel," Cancel ", NULL);
+    XtAddCallback(helloButton, XtNcallback, (XtCallbackProc)&GLXConfigurator::cancelHandler, this);
 
-	Widget exitButton = XtVaCreateManagedWidget("acceptButton", commandWidgetClass, bottomPanel, XtNlabel," Accept ", XtNfromHoriz,helloButton, NULL);
- 	XtAddCallback(exitButton, XtNcallback, (XtCallbackProc)&GLXConfigurator::acceptHandler, this);
+    Widget exitButton = XtVaCreateManagedWidget("acceptButton", commandWidgetClass, bottomPanel, XtNlabel," Accept ", XtNfromHoriz,helloButton, NULL);
+    XtAddCallback(exitButton, XtNcallback, (XtCallbackProc)&GLXConfigurator::acceptHandler, this);
 
-	XtRealizeWidget(toplevel);
+    XtRealizeWidget(toplevel);
 
-	if(mRenderer)
-		/* There was already a renderer selected; display its options */
-		SetRenderer(mRenderer);
+    if(mRenderer)
+        /* There was already a renderer selected; display its options */
+        SetRenderer(mRenderer);
 
-	return true;
+    return true;
 }
 
 Pixmap GLXConfigurator::CreateBackdrop(Window rootWindow, int depth) {
-	int bpl;
-	/* Find out number of bytes per pixel */
-	switch(depth) {
-	default:
-		LogManager::getSingleton().logMessage("GLX backdrop: Unsupported bit depth");
-		/* Unsupported bit depth */
-		return 0;
-	case 15:
-	case 16:
-		bpl = 2; break;
-	case 24:
-	case 32:
-		bpl = 4; break;
-	}
-	/* Create background pixmap */
-	unsigned char *data = 0; // Must be allocated with malloc
+    int bpl;
+    /* Find out number of bytes per pixel */
+    switch(depth) {
+    default:
+        LogManager::getSingleton().logMessage("GLX backdrop: Unsupported bit depth");
+        /* Unsupported bit depth */
+        return 0;
+    case 15:
+    case 16:
+        bpl = 2; break;
+    case 24:
+    case 32:
+        bpl = 4; break;
+    }
+    /* Create background pixmap */
+    unsigned char *data = 0; // Must be allocated with malloc
 
-	try {
+    try {
         String imgType = "png";
         Image img;
         MemoryDataStream *imgStream;
@@ -356,135 +356,135 @@ Pixmap GLXConfigurator::CreateBackdrop(Window rootWindow, int depth) {
         // Load backdrop image using OGRE
         imgStream = new MemoryDataStream(const_cast<unsigned char*>(GLX_backdrop_data), sizeof(GLX_backdrop_data), false);
         imgStreamPtr = DataStreamPtr(imgStream);
-		img.load(imgStreamPtr, imgType);
+        img.load(imgStreamPtr, imgType);
 
         PixelBox src = img.getPixelBox(0, 0);
 
-		// Convert and copy image
-		data = (unsigned char*)malloc(mWidth * mHeight * bpl); // Must be allocated with malloc
+        // Convert and copy image
+        data = (unsigned char*)malloc(mWidth * mHeight * bpl); // Must be allocated with malloc
 
         PixelBox dst(src, bpl == 2 ? PF_B5G6R5 : PF_A8R8G8B8, data );
 
         PixelUtil::bulkPixelConversion(src, dst);
-	} catch(Exception &e) {
-		// Could not find image; never mind
-		LogManager::getSingleton().logMessage("WARNING: Can not load backdrop for config dialog. " + e.getDescription(), LML_TRIVIAL);
-		return 0;
-	}
+    } catch(Exception &e) {
+        // Could not find image; never mind
+        LogManager::getSingleton().logMessage("WARNING: Can not load backdrop for config dialog. " + e.getDescription(), LML_TRIVIAL);
+        return 0;
+    }
 
-	GC context = XCreateGC (mDisplay, rootWindow, 0, NULL);
+    GC context = XCreateGC (mDisplay, rootWindow, 0, NULL);
 
-	/* put my pixmap data into the client side X image data structure */
-	XImage *image = XCreateImage (mDisplay, NULL, depth, ZPixmap, 0,
-		(char*)data,
-		mWidth, mHeight, 8,
-		mWidth*bpl);
+    /* put my pixmap data into the client side X image data structure */
+    XImage *image = XCreateImage (mDisplay, NULL, depth, ZPixmap, 0,
+        (char*)data,
+        mWidth, mHeight, 8,
+        mWidth*bpl);
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-	image->byte_order = MSBFirst;
+    image->byte_order = MSBFirst;
 #else
     image->byte_order = LSBFirst;
 #endif
 
-	/* tell server to start managing my pixmap */
-	Pixmap rv = XCreatePixmap(mDisplay, rootWindow, mWidth,
-		mHeight, depth);
+    /* tell server to start managing my pixmap */
+    Pixmap rv = XCreatePixmap(mDisplay, rootWindow, mWidth,
+        mHeight, depth);
 
-	/* copy from client to server */
-	XPutImage(mDisplay, rv, context, image, 0, 0, 0, 0,
-	 	mWidth, mHeight);
+    /* copy from client to server */
+    XPutImage(mDisplay, rv, context, image, 0, 0, 0, 0,
+        mWidth, mHeight);
 
-	/* free up the client side pixmap data area */
-	XDestroyImage(image); // also cleans data
-	XFreeGC(mDisplay, context);
+    /* free up the client side pixmap data area */
+    XDestroyImage(image); // also cleans data
+    XFreeGC(mDisplay, context);
 
-	return rv;
+    return rv;
 }
 bool GLXConfigurator::Init() {
-	// Init misc resources
-	return true;
+    // Init misc resources
+    return true;
 }
 void GLXConfigurator::Draw() {
 }
 void GLXConfigurator::Main() {
-	XtAppMainLoop(appContext);
+    XtAppMainLoop(appContext);
 }
 void GLXConfigurator::Exit() {
-	XtAppSetExitFlag(appContext);
+    XtAppSetExitFlag(appContext);
 }
 
 void GLXConfigurator::SetRenderer(RenderSystem *r) {
-	mRenderer = r;
+    mRenderer = r;
 
-	// Destroy each widget of GUI of previously selected renderer
-	for(std::list<Widget>::iterator i=mRenderOptionWidgets.begin(); i!=mRenderOptionWidgets.end(); i++)
-		XtDestroyWidget(*i);
-	mRenderOptionWidgets.clear();
-	mConfigCallbackData.back();
+    // Destroy each widget of GUI of previously selected renderer
+    for(std::list<Widget>::iterator i=mRenderOptionWidgets.begin(); i!=mRenderOptionWidgets.end(); i++)
+        XtDestroyWidget(*i);
+    mRenderOptionWidgets.clear();
+    mConfigCallbackData.back();
 
-	// Create option GUI
-	int cury = ystart + 1*rowh + 10;
+    // Create option GUI
+    int cury = ystart + 1*rowh + 10;
 
-	ConfigOptionMap options = mRenderer->getConfigOptions();
-	// Process each option and create an optionmenu widget for it
-	for (ConfigOptionMap::iterator it = options.begin();
-					it != options.end(); it++) {
-		// if the config option does not have any possible value, then skip it.
-		// if we create a popup with zero entries, it will crash when you click
-		// on it.
-		if (it->second.possibleValues.empty())
-			continue;
+    ConfigOptionMap options = mRenderer->getConfigOptions();
+    // Process each option and create an optionmenu widget for it
+    for (ConfigOptionMap::iterator it = options.begin();
+                    it != options.end(); it++) {
+        // if the config option does not have any possible value, then skip it.
+        // if we create a popup with zero entries, it will crash when you click
+        // on it.
+        if (it->second.possibleValues.empty())
+            continue;
 
-		Widget lb1 = XtVaCreateManagedWidget("topLabel", labelWidgetClass, box, XtNlabel, it->second.name.c_str(), XtNborderWidth, 0,
-			XtNwidth, col1w, 	// Fixed width
-			XtNheight, 18,
-			XtNleft, XawChainLeft,
-			XtNtop, XawChainTop,
-			XtNright, XawChainLeft,
-			XtNbottom, XawChainTop,
-			XtNhorizDistance, col1x,
-			XtNvertDistance, cury,
-			XtNjustify, XtJustifyLeft,
-			NULL);
-		mRenderOptionWidgets.push_back(lb1);
-		Widget mb1 = XtVaCreateManagedWidget("Menu", menuButtonWidgetClass, box, XtNlabel, it->second.currentValue.c_str(),
-			XtNresize, false,
-			XtNresizable, false,
-			XtNwidth, col2w, 	// Fixed width
-			XtNheight, 18,
-			XtNleft, XawChainLeft,
-			XtNtop, XawChainTop,
-			XtNright, XawChainLeft,
-			XtNbottom, XawChainTop,
-			XtNhorizDistance, col2x,
-			XtNvertDistance, cury,
-			NULL);
-		mRenderOptionWidgets.push_back(mb1);
+        Widget lb1 = XtVaCreateManagedWidget("topLabel", labelWidgetClass, box, XtNlabel, it->second.name.c_str(), XtNborderWidth, 0,
+            XtNwidth, col1w,    // Fixed width
+            XtNheight, 18,
+            XtNleft, XawChainLeft,
+            XtNtop, XawChainTop,
+            XtNright, XawChainLeft,
+            XtNbottom, XawChainTop,
+            XtNhorizDistance, col1x,
+            XtNvertDistance, cury,
+            XtNjustify, XtJustifyLeft,
+            NULL);
+        mRenderOptionWidgets.push_back(lb1);
+        Widget mb1 = XtVaCreateManagedWidget("Menu", menuButtonWidgetClass, box, XtNlabel, it->second.currentValue.c_str(),
+            XtNresize, false,
+            XtNresizable, false,
+            XtNwidth, col2w,    // Fixed width
+            XtNheight, 18,
+            XtNleft, XawChainLeft,
+            XtNtop, XawChainTop,
+            XtNright, XawChainLeft,
+            XtNbottom, XawChainTop,
+            XtNhorizDistance, col2x,
+            XtNvertDistance, cury,
+            NULL);
+        mRenderOptionWidgets.push_back(mb1);
 
-		Widget menu = XtVaCreatePopupShell("menu", simpleMenuWidgetClass, mb1,
-			0, NULL);
+        Widget menu = XtVaCreatePopupShell("menu", simpleMenuWidgetClass, mb1,
+            0, NULL);
 
-		// Process each choice
-		StringVector::iterator opt_it;
-		for (opt_it = it->second.possibleValues.begin();
-		                opt_it != it->second.possibleValues.end(); opt_it++) {
-			// Create callback data
-			mConfigCallbackData.push_back(ConfigCallbackData(this, it->second.name, *opt_it, mb1));
+        // Process each choice
+        StringVector::iterator opt_it;
+        for (opt_it = it->second.possibleValues.begin();
+                        opt_it != it->second.possibleValues.end(); opt_it++) {
+            // Create callback data
+            mConfigCallbackData.push_back(ConfigCallbackData(this, it->second.name, *opt_it, mb1));
 
-			Widget entry = XtVaCreateManagedWidget("menuentry", smeBSBObjectClass, menu,
-				XtNlabel, (*opt_it).c_str(),
-				0, NULL);
-			XtAddCallback(entry, XtNcallback, (XtCallbackProc)&GLXConfigurator::configOptionHandler, &mConfigCallbackData.back());
-		}
-		cury += rowh;
-	}
+            Widget entry = XtVaCreateManagedWidget("menuentry", smeBSBObjectClass, menu,
+                XtNlabel, (*opt_it).c_str(),
+                0, NULL);
+            XtAddCallback(entry, XtNcallback, (XtCallbackProc)&GLXConfigurator::configOptionHandler, &mConfigCallbackData.back());
+        }
+        cury += rowh;
+    }
 }
 
 void GLXConfigurator::SetConfigOption(const String &optionName, const String &valueName) {
-	if(!mRenderer)
-		// No renderer set -- how can this be called?
-		return;
-	mRenderer->setConfigOption(optionName, valueName);
-	SetRenderer(mRenderer);
+    if(!mRenderer)
+        // No renderer set -- how can this be called?
+        return;
+    mRenderer->setConfigOption(optionName, valueName);
+    SetRenderer(mRenderer);
 }
 
 //------------------------------------------------------------------------------------//
@@ -495,24 +495,24 @@ ConfigDialog::ConfigDialog() : mSelectedRenderSystem(0)
 //------------------------------------------------------------------------------------//
 bool ConfigDialog::display()
 {
-	GLXConfigurator test;
-	/* Select previously selected rendersystem */
-	if(Root::getSingleton().getRenderSystem())
-		test.SetRenderSystem(Root::getSingleton().getRenderSystem());
-	/* Attempt to create the window */
-	if(!test.CreateWindow())
-		OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Could not create configuration dialog",
-		       "GLXConfig::display");
+    GLXConfigurator test;
+    /* Select previously selected rendersystem */
+    if(Root::getSingleton().getRenderSystem())
+        test.SetRenderSystem(Root::getSingleton().getRenderSystem());
+    /* Attempt to create the window */
+    if(!test.CreateWindow())
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Could not create configuration dialog",
+               "GLXConfig::display");
 
-	// Modal loop
-	test.Main();
-	if(!test.accept) // User did not accept
-		return false;
+    // Modal loop
+    test.Main();
+    if(!test.accept) // User did not accept
+        return false;
 
-	/* All done */
-	Root::getSingleton().setRenderSystem(test.mRenderer);
+    /* All done */
+    Root::getSingleton().setRenderSystem(test.mRenderer);
 
-	return true;
+    return true;
 }
 }
 

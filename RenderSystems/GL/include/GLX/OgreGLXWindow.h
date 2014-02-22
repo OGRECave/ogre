@@ -36,91 +36,91 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class _OgrePrivate GLXWindow : public RenderWindow
-	{
-	public:
-		GLXWindow(GLXGLSupport* glsupport);
-		~GLXWindow();
-		
-		void create(const String& name, unsigned int width, unsigned int height,
-					bool fullScreen, const NameValuePairList *miscParams);
-		
-		/** @copydoc RenderWindow::setFullscreen */
-		void setFullscreen (bool fullscreen, uint width, uint height);
-		
-		/** @copydoc RenderWindow::destroy */
-		void destroy(void);
-		
-		/** @copydoc RenderWindow::isClosed */
-		bool isClosed(void) const;
-		
-		/** @copydoc RenderWindow::isVisible */
-		bool isVisible(void) const;
-		
-		/** @copydoc RenderWindow::setVisible */
-		void setVisible(bool visible);
+    class _OgrePrivate GLXWindow : public RenderWindow
+    {
+    public:
+        GLXWindow(GLXGLSupport* glsupport);
+        ~GLXWindow();
+        
+        void create(const String& name, unsigned int width, unsigned int height,
+                    bool fullScreen, const NameValuePairList *miscParams);
+        
+        /** @copydoc RenderWindow::setFullscreen */
+        void setFullscreen (bool fullscreen, uint width, uint height);
+        
+        /** @copydoc RenderWindow::destroy */
+        void destroy(void);
+        
+        /** @copydoc RenderWindow::isClosed */
+        bool isClosed(void) const;
+        
+        /** @copydoc RenderWindow::isVisible */
+        bool isVisible(void) const;
+        
+        /** @copydoc RenderWindow::setVisible */
+        void setVisible(bool visible);
 
-		/** @copydoc RenderWindow::isHidden */
-		bool isHidden(void) const { return mHidden; }
+        /** @copydoc RenderWindow::isHidden */
+        bool isHidden(void) const { return mHidden; }
 
-		/** @copydoc RenderWindow::setHidden */
-		void setHidden(bool hidden);
+        /** @copydoc RenderWindow::setHidden */
+        void setHidden(bool hidden);
 
-		/** @copydoc RenderWindow::setVSyncEnabled */
-		void setVSyncEnabled(bool vsync);
+        /** @copydoc RenderWindow::setVSyncEnabled */
+        void setVSyncEnabled(bool vsync);
 
-		/** @copydoc RenderWindow::isVSyncEnabled */
-		bool isVSyncEnabled() const;
+        /** @copydoc RenderWindow::isVSyncEnabled */
+        bool isVSyncEnabled() const;
 
-		/** @copydoc RenderWindow::setVSyncInterval */
-		void setVSyncInterval(unsigned int interval);
+        /** @copydoc RenderWindow::setVSyncInterval */
+        void setVSyncInterval(unsigned int interval);
 
-		/** @copydoc RenderWindow::getVSyncInterval */
-		unsigned int getVSyncInterval() const;
-		
-		/** @copydoc RenderWindow::reposition */
-		void reposition(int left, int top);
-		
-		/** @copydoc RenderWindow::resize */
-		void resize(unsigned int width, unsigned int height);
+        /** @copydoc RenderWindow::getVSyncInterval */
+        unsigned int getVSyncInterval() const;
+        
+        /** @copydoc RenderWindow::reposition */
+        void reposition(int left, int top);
+        
+        /** @copydoc RenderWindow::resize */
+        void resize(unsigned int width, unsigned int height);
 
-		/** @copydoc RenderWindow::windowMovedOrResized */
-		void windowMovedOrResized();
-		
-		/** @copydoc RenderWindow::swapBuffers */
-		void swapBuffers();
-		
-		/** @copydoc RenderTarget::copyContentsToMemory */
-		void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
-		
-		/**
-		   @remarks
-		   * Get custom attribute; the following attributes are valid:
-		   * WINDOW		 The X Window target for rendering.
-		   * GLCONTEXT	  The Ogre GLContext used for rendering.
-		   * DISPLAY		The X Display connection behind that context.
-		   * DISPLAYNAME	The X Server name for the connected display.
-		   * ATOM		   The X Atom used in client delete events.
-		   */
-		void getCustomAttribute(const String& name, void* pData);
-		
-		bool requiresTextureFlipping() const { return false; }
+        /** @copydoc RenderWindow::windowMovedOrResized */
+        void windowMovedOrResized();
+        
+        /** @copydoc RenderWindow::swapBuffers */
+        void swapBuffers();
+        
+        /** @copydoc RenderTarget::copyContentsToMemory */
+        void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        
+        /**
+           @remarks
+           * Get custom attribute; the following attributes are valid:
+           * WINDOW      The X Window target for rendering.
+           * GLCONTEXT    The Ogre GLContext used for rendering.
+           * DISPLAY        The X Display connection behind that context.
+           * DISPLAYNAME    The X Server name for the connected display.
+           * ATOM          The X Atom used in client delete events.
+           */
+        void getCustomAttribute(const String& name, void* pData);
+        
+        bool requiresTextureFlipping() const { return false; }
 
-	private:
-		bool mClosed;
-		bool mVisible;
-		bool mHidden;
-		bool mIsTopLevel;
-		bool mIsExternal;
-		bool mIsExternalGLControl;
-		bool mVSync;
-		int mVSyncInterval;
-		
-		GLXGLSupport* mGLSupport;
-		::Window	  mWindow;
-		GLXContext*   mContext;
-		void switchFullScreen(bool fullscreen);
-	};
+    private:
+        bool mClosed;
+        bool mVisible;
+        bool mHidden;
+        bool mIsTopLevel;
+        bool mIsExternal;
+        bool mIsExternalGLControl;
+        bool mVSync;
+        int mVSyncInterval;
+        
+        GLXGLSupport* mGLSupport;
+        ::Window      mWindow;
+        GLXContext*   mContext;
+        void switchFullScreen(bool fullscreen);
+    };
 }
 
 #endif

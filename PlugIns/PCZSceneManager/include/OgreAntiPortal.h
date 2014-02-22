@@ -35,40 +35,40 @@ PortalBase.h  -  PortalBase is the base class for Portal and AntiPortal.
 
 namespace Ogre
 {
-	/** AntiPortal datastructure for occlusion culling. */
-	class _OgrePCZPluginExport AntiPortal : public PortalBase
-	{
-	public:
-		AntiPortal(const String &name, const PORTAL_TYPE type = PORTAL_TYPE_QUAD);
-		virtual ~AntiPortal();
+    /** AntiPortal datastructure for occlusion culling. */
+    class _OgrePCZPluginExport AntiPortal : public PortalBase
+    {
+    public:
+        AntiPortal(const String &name, const PORTAL_TYPE type = PORTAL_TYPE_QUAD);
+        virtual ~AntiPortal();
 
-		/** @copydoc MovableObject::getMovableType. */
-		const String& getMovableType() const;
+        /** @copydoc MovableObject::getMovableType. */
+        const String& getMovableType() const;
 
-	};
+    };
 
-	/** Factory object for creating AntiPortal instances */
-	class _OgrePCZPluginExport AntiPortalFactory : public PortalBaseFactory
-	{
-	protected:
-		MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
-	public:
-		AntiPortalFactory() {}
-		~AntiPortalFactory() {}
+    /** Factory object for creating AntiPortal instances */
+    class _OgrePCZPluginExport AntiPortalFactory : public PortalBaseFactory
+    {
+    protected:
+        MovableObject* createInstanceImpl(const String& name, const NameValuePairList* params);
+    public:
+        AntiPortalFactory() {}
+        ~AntiPortalFactory() {}
 
-		static String FACTORY_TYPE_NAME;
-		static unsigned long FACTORY_TYPE_FLAG;
+        static String FACTORY_TYPE_NAME;
+        static unsigned long FACTORY_TYPE_FLAG;
 
-		const String& getType() const
-		{ return FACTORY_TYPE_NAME; }
+        const String& getType() const
+        { return FACTORY_TYPE_NAME; }
 
-		void destroyInstance(MovableObject* obj);
+        void destroyInstance(MovableObject* obj);
 
-		/** Return true here as we want to get a unique type flag. */
-		bool requestTypeFlags() const
-		{ return true; }
+        /** Return true here as we want to get a unique type flag. */
+        bool requestTypeFlags() const
+        { return true; }
 
-	};
+    };
 
 }
 

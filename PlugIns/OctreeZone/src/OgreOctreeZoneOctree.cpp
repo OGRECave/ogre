@@ -57,8 +57,8 @@ namespace Ogre
     {
         // Null box?
         if (two.isNull()) return OUTSIDE;
-	    // Infinite box?
-	    if (two.isInfinite()) return INTERSECT;
+        // Infinite box?
+        if (two.isInfinite()) return INTERSECT;
 
         bool inside = true;
         const Vector3& twoMin = two.getMinimum();
@@ -127,8 +127,8 @@ namespace Ogre
     {
         // Null box?
         if (two.isNull()) return OUTSIDE;
-	    // Infinite box?
-	    if (two.isInfinite()) return INTERSECT;
+        // Infinite box?
+        if (two.isInfinite()) return INTERSECT;
 
         // Get centre of the box
         Vector3 centre = two.getCenter();
@@ -167,8 +167,8 @@ namespace Ogre
     {
         // Null box?
         if (one.isNull() || two.isNull()) return OUTSIDE;
-	    if (one.isInfinite()) return INSIDE;
-	    if (two.isInfinite()) return INTERSECT;
+        if (one.isInfinite()) return INSIDE;
+        if (two.isInfinite()) return INTERSECT;
 
 
         const Vector3& insideMin = two.getMinimum();
@@ -207,7 +207,7 @@ namespace Ogre
     {
         // Null box?
         if (two.isNull()) return OUTSIDE;
-	    if (two.isInfinite()) return INTERSECT;
+        if (two.isInfinite()) return INTERSECT;
 
         float sradius = one.getRadius();
 
@@ -267,9 +267,9 @@ namespace Ogre
     */
     bool Octree::_isTwiceSize( const AxisAlignedBox &box ) const
     {
-	    // infinite boxes never fit in a child - always root node
-	    if (box.isInfinite())
-		    return false;
+        // infinite boxes never fit in a child - always root node
+        if (box.isInfinite())
+            return false;
 
         Vector3 halfMBoxSize = mBox.getHalfSize();
         Vector3 boxSize = box.getSize();
@@ -319,7 +319,7 @@ namespace Ogre
                 }
             }
         }
-	    mZone = oz;
+        mZone = oz;
         mParent = parent;
         mNumNodes = 0;
     }
@@ -358,7 +358,7 @@ namespace Ogre
     void Octree::_removeNode( PCZSceneNode * n )
     {
         mNodes.erase(n);
-		((OctreeZoneData*)n ->getZoneData(mZone))->setOctant( 0 );
+        ((OctreeZoneData*)n ->getZoneData(mZone))->setOctant( 0 );
 
         //update total counts.
         _unref();
@@ -382,231 +382,231 @@ namespace Ogre
     void Octree::_findNodes(const AxisAlignedBox &t, 
                             PCZSceneNodeList &list, 
                             PCZSceneNode *exclude, 
-							bool includeVisitors,
+                            bool includeVisitors,
                             bool full )
     {
-	    if ( !full )
-	    {
-		    AxisAlignedBox obox;
-		    _getCullBounds( &obox );
+        if ( !full )
+        {
+            AxisAlignedBox obox;
+            _getCullBounds( &obox );
 
-		    Intersection isect = intersect( t, obox );
+            Intersection isect = intersect( t, obox );
 
-		    if ( isect == OUTSIDE )
-			    return ;
+            if ( isect == OUTSIDE )
+                return ;
 
-		    full = ( isect == INSIDE );
-	    }
+            full = ( isect == INSIDE );
+        }
 
 
-	    PCZSceneNodeList::iterator it = mNodes.begin();
+        PCZSceneNodeList::iterator it = mNodes.begin();
 
-	    while ( it != mNodes.end() )
-	    {
-		    PCZSceneNode * on = ( *it );
+        while ( it != mNodes.end() )
+        {
+            PCZSceneNode * on = ( *it );
 
-		    if ( on != exclude && (on->getHomeZone() == mZone || includeVisitors ))
-		    {
-			    if ( full )
-			    {
-					// make sure the node isn't already on the list
-					list.insert( on );
-			    }
+            if ( on != exclude && (on->getHomeZone() == mZone || includeVisitors ))
+            {
+                if ( full )
+                {
+                    // make sure the node isn't already on the list
+                    list.insert( on );
+                }
 
-			    else
-			    {
-				    Intersection nsect = intersect( t, on -> _getWorldAABB() );
+                else
+                {
+                    Intersection nsect = intersect( t, on -> _getWorldAABB() );
 
-				    if ( nsect != OUTSIDE )
-				    {
-						// make sure the node isn't already on the list
-						list.insert( on );
-				    }
-			    }
+                    if ( nsect != OUTSIDE )
+                    {
+                        // make sure the node isn't already on the list
+                        list.insert( on );
+                    }
+                }
 
-		    }
-		    ++it;
-	    }
+            }
+            ++it;
+        }
 
-	    Octree* child;
+        Octree* child;
 
-	    if ( (child=mChildren[ 0 ][ 0 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 0 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 0 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 0 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 1 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 1 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 1 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 1 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 0 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 0 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 0 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 0 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 1 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 1 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 1 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 1 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
     }
 
     void Octree::_findNodes(const Ray &t, 
                             PCZSceneNodeList &list, 
                             PCZSceneNode *exclude, 
-							bool includeVisitors,
+                            bool includeVisitors,
                             bool full )
     {
-	    if ( !full )
-	    {
-		    AxisAlignedBox obox;
-		    _getCullBounds( &obox );
+        if ( !full )
+        {
+            AxisAlignedBox obox;
+            _getCullBounds( &obox );
 
-		    Intersection isect = intersect( t, obox );
+            Intersection isect = intersect( t, obox );
 
-		    if ( isect == OUTSIDE )
-			    return ;
+            if ( isect == OUTSIDE )
+                return ;
 
-		    full = ( isect == INSIDE );
-	    }
+            full = ( isect == INSIDE );
+        }
 
 
-	    PCZSceneNodeList::iterator it = mNodes.begin();
+        PCZSceneNodeList::iterator it = mNodes.begin();
 
-	    while ( it != mNodes.end() )
-	    {
-		    PCZSceneNode * on = ( *it );
+        while ( it != mNodes.end() )
+        {
+            PCZSceneNode * on = ( *it );
 
-		    if ( on != exclude && (on->getHomeZone() == mZone || includeVisitors ))
-		    {
-			    if ( full )
-			    {
-					// make sure the node isn't already on the list
-					list.insert( on );
-			    }
+            if ( on != exclude && (on->getHomeZone() == mZone || includeVisitors ))
+            {
+                if ( full )
+                {
+                    // make sure the node isn't already on the list
+                    list.insert( on );
+                }
 
-			    else
-			    {
-				    Intersection nsect = intersect( t, on -> _getWorldAABB() );
+                else
+                {
+                    Intersection nsect = intersect( t, on -> _getWorldAABB() );
 
-				    if ( nsect != OUTSIDE )
-				    {
-						// make sure the node isn't already on the list
-						list.insert( on );
-				    }
-			    }
+                    if ( nsect != OUTSIDE )
+                    {
+                        // make sure the node isn't already on the list
+                        list.insert( on );
+                    }
+                }
 
-		    }
-		    ++it;
-	    }
+            }
+            ++it;
+        }
 
-	    Octree* child;
+        Octree* child;
 
-	    if ( (child=mChildren[ 0 ][ 0 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 0 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 0 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 0 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 1 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 1 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 1 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 1 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 0 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 0 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 0 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 0 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 1 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 1 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 1 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 1 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
     }
 
     void Octree::_findNodes(const Sphere &t, 
                             PCZSceneNodeList &list, 
                             PCZSceneNode *exclude, 
-							bool includeVisitors,
+                            bool includeVisitors,
                             bool full )
     {
-	    if ( !full )
-	    {
-		    AxisAlignedBox obox;
-		    _getCullBounds( &obox );
+        if ( !full )
+        {
+            AxisAlignedBox obox;
+            _getCullBounds( &obox );
 
-		    Intersection isect = intersect( t, obox );
+            Intersection isect = intersect( t, obox );
 
-		    if ( isect == OUTSIDE )
-			    return ;
+            if ( isect == OUTSIDE )
+                return ;
 
-		    full = ( isect == INSIDE );
-	    }
+            full = ( isect == INSIDE );
+        }
 
 
-	    PCZSceneNodeList::iterator it = mNodes.begin();
+        PCZSceneNodeList::iterator it = mNodes.begin();
 
-	    while ( it != mNodes.end() )
-	    {
-		    PCZSceneNode * on = ( *it );
+        while ( it != mNodes.end() )
+        {
+            PCZSceneNode * on = ( *it );
 
-		    if ( on != exclude && (on->getHomeZone() == mZone || includeVisitors ))
-		    {
-			    if ( full )
-			    {
-					// make sure the node isn't already on the list
-					list.insert( on );
-			    }
+            if ( on != exclude && (on->getHomeZone() == mZone || includeVisitors ))
+            {
+                if ( full )
+                {
+                    // make sure the node isn't already on the list
+                    list.insert( on );
+                }
 
-			    else
-			    {
-				    Intersection nsect = intersect( t, on -> _getWorldAABB() );
+                else
+                {
+                    Intersection nsect = intersect( t, on -> _getWorldAABB() );
 
-				    if ( nsect != OUTSIDE )
-				    {
-						// make sure the node isn't already on the list
-						list.insert( on );
-				    }
-			    }
+                    if ( nsect != OUTSIDE )
+                    {
+                        // make sure the node isn't already on the list
+                        list.insert( on );
+                    }
+                }
 
-		    }
-		    ++it;
-	    }
+            }
+            ++it;
+        }
 
-	    Octree* child;
+        Octree* child;
 
-	    if ( (child=mChildren[ 0 ][ 0 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 0 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 0 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 0 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 1 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 1 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 1 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 1 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 0 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 0 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 0 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 0 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 1 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 1 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 1 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 1 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
     }
 
@@ -614,77 +614,77 @@ namespace Ogre
     void Octree::_findNodes(const PlaneBoundedVolume &t, 
                             PCZSceneNodeList &list, 
                             PCZSceneNode *exclude, 
-							bool includeVisitors,
+                            bool includeVisitors,
                             bool full )
     {
-	    if ( !full )
-	    {
-		    AxisAlignedBox obox;
-		    _getCullBounds( &obox );
+        if ( !full )
+        {
+            AxisAlignedBox obox;
+            _getCullBounds( &obox );
 
-		    Intersection isect = intersect( t, obox );
+            Intersection isect = intersect( t, obox );
 
-		    if ( isect == OUTSIDE )
-			    return ;
+            if ( isect == OUTSIDE )
+                return ;
 
-		    full = ( isect == INSIDE );
-	    }
+            full = ( isect == INSIDE );
+        }
 
 
-	    PCZSceneNodeList::iterator it = mNodes.begin();
+        PCZSceneNodeList::iterator it = mNodes.begin();
 
-	    while ( it != mNodes.end() )
-	    {
-		    PCZSceneNode * on = ( *it );
+        while ( it != mNodes.end() )
+        {
+            PCZSceneNode * on = ( *it );
 
-		    if ( on != exclude && (on->getHomeZone() == mZone || includeVisitors ))
-		    {
-			    if ( full )
-			    {
-					// make sure the node isn't already on the list
-					list.insert( on );
-			    }
+            if ( on != exclude && (on->getHomeZone() == mZone || includeVisitors ))
+            {
+                if ( full )
+                {
+                    // make sure the node isn't already on the list
+                    list.insert( on );
+                }
 
-			    else
-			    {
-				    Intersection nsect = intersect( t, on -> _getWorldAABB() );
+                else
+                {
+                    Intersection nsect = intersect( t, on -> _getWorldAABB() );
 
-				    if ( nsect != OUTSIDE )
-				    {
-						// make sure the node isn't already on the list
-						list.insert( on );
-				    }
-			    }
+                    if ( nsect != OUTSIDE )
+                    {
+                        // make sure the node isn't already on the list
+                        list.insert( on );
+                    }
+                }
 
-		    }
-		    ++it;
-	    }
+            }
+            ++it;
+        }
 
-	    Octree* child;
+        Octree* child;
 
-	    if ( (child=mChildren[ 0 ][ 0 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 0 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 0 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 0 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 1 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 1 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 1 ][ 0 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 1 ][ 0 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 0 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 0 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 0 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 0 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 0 ][ 1 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 0 ][ 1 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
-	    if ( (child=mChildren[ 1 ][ 1 ][ 1 ]) != 0 )
-		    child->_findNodes( t, list, exclude, includeVisitors, full );
+        if ( (child=mChildren[ 1 ][ 1 ][ 1 ]) != 0 )
+            child->_findNodes( t, list, exclude, includeVisitors, full );
 
     }
 

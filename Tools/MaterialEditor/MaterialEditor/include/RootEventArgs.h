@@ -33,7 +33,7 @@ THE SOFTWARE
 class RootEventArgs : public EventArgs
 {
 public:
-	RootEventArgs() {}
+    RootEventArgs() {}
 };
 
 #endif // _ROOTEVENTARGS_H_

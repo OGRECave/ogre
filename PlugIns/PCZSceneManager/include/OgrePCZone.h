@@ -44,7 +44,7 @@ a pointer to their home zone and a list of references to zones they are
 begin                : Tue Feb 20 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -58,8 +58,8 @@ namespace Ogre
 {
     class Portal;
     class AntiPortal;
-	class PCZSceneNode;
-	class PCZSceneManager;
+    class PCZSceneNode;
+    class PCZSceneManager;
     class PCZLight;
     class PCZone;
     class PCZCamera;
@@ -67,64 +67,64 @@ namespace Ogre
     struct VisibleObjectsBoundsInfo;
 
     typedef map<String, PCZone*>::type ZoneMap;
-	typedef list<PCZone*>::type PCZoneList;
-	typedef list<Portal*>::type PortalList;
-	typedef list<AntiPortal*>::type AntiPortalList;
-	typedef vector<PortalBase*>::type PortalBaseList;
-	typedef vector<SceneNode*>::type NodeList;
-	typedef set< PCZSceneNode * >::type PCZSceneNodeList;
+    typedef list<PCZone*>::type PCZoneList;
+    typedef list<Portal*>::type PortalList;
+    typedef list<AntiPortal*>::type AntiPortalList;
+    typedef vector<PortalBase*>::type PortalBaseList;
+    typedef vector<SceneNode*>::type NodeList;
+    typedef set< PCZSceneNode * >::type PCZSceneNodeList;
     typedef map<String, SceneNode*>::type SceneNodeList;
 
     /** Portal-Connected Zone datastructure for managing scene nodes.
     */
 
-	class _OgrePCZPluginExport PCZone : public SceneCtlAllocatedObject
+    class _OgrePCZPluginExport PCZone : public SceneCtlAllocatedObject
     {
     public:
 
-		enum NODE_LIST_TYPE
-		{
-			HOME_NODE_LIST = 1,
-			VISITOR_NODE_LIST = 2
-		};
+        enum NODE_LIST_TYPE
+        {
+            HOME_NODE_LIST = 1,
+            VISITOR_NODE_LIST = 2
+        };
 
         PCZone( PCZSceneManager *, const String& );
         virtual ~PCZone();
 
-		/// @return The zone type name (ex: "ZoneType_Terrain")
-		const String& getZoneTypeName() const { return mZoneTypeName; }
+        /// @return The zone type name (ex: "ZoneType_Terrain")
+        const String& getZoneTypeName() const { return mZoneTypeName; }
 
-		/// @return the name of the zone
-		const String& getName(void) const { return mName; }
+        /// @return the name of the zone
+        const String& getName(void) const { return mName; }
 
-		/** Get a pointer to the enclosure node for this PCZone
-		*/
-		SceneNode * getEnclosureNode(void) {return mEnclosureNode;}
+        /** Get a pointer to the enclosure node for this PCZone
+        */
+        SceneNode * getEnclosureNode(void) {return mEnclosureNode;}
 
-		/** If sky should be drawn with this zone
-		*/
-		void setHasSky(bool yesno) {mHasSky = yesno;}
+        /** If sky should be drawn with this zone
+        */
+        void setHasSky(bool yesno) {mHasSky = yesno;}
 
-		/** @return Whether or not this zone has sky
-		*/
-		bool hasSky(void) {return mHasSky;}
+        /** @return Whether or not this zone has sky
+        */
+        bool hasSky(void) {return mHasSky;}
 
-		/** Set the lastVisibleFrame counter */
-		void setLastVisibleFrame(unsigned long frameCount) {mLastVisibleFrame = frameCount;}
+        /** Set the lastVisibleFrame counter */
+        void setLastVisibleFrame(unsigned long frameCount) {mLastVisibleFrame = frameCount;}
 
         /** Get the lastVisibleFrame counter value */
         unsigned long getLastVisibleFrame(void) {return mLastVisibleFrame;}
 
-		/** Set the lastVisibleFromCamera pointer */
-		void setLastVisibleFromCamera(PCZCamera * camera) {mLastVisibleFromCamera = camera;}
+        /** Set the lastVisibleFromCamera pointer */
+        void setLastVisibleFromCamera(PCZCamera * camera) {mLastVisibleFromCamera = camera;}
 
-		/** Get the lastVisibleFromCamera pointer */
-		PCZCamera* getLastVisibleFromCamera() {return mLastVisibleFromCamera;}
+        /** Get the lastVisibleFromCamera pointer */
+        PCZCamera* getLastVisibleFromCamera() {return mLastVisibleFromCamera;}
 
-	public:
-		/** Set the enclosure node for this PCZone
-		*/
-		virtual void setEnclosureNode(PCZSceneNode *) = 0;
+    public:
+        /** Set the enclosure node for this PCZone
+        */
+        virtual void setEnclosureNode(PCZSceneNode *) = 0;
 
         /** Adds an SceneNode to this PCZone.
         @remarks
@@ -137,38 +137,38 @@ namespace Ogre
         */
         virtual void removeNode( PCZSceneNode * ) = 0;
 
-		/** Remove all nodes from the node reference list and clear it
-		*/
-		virtual void _clearNodeLists(short nodeListTypes);
+        /** Remove all nodes from the node reference list and clear it
+        */
+        virtual void _clearNodeLists(short nodeListTypes);
 
-		/** Indicates whether or not this zone requires zone-specific data for 
-		 *  each scene node
-		 */
-		virtual bool requiresZoneSpecificNodeData(void) = 0;
+        /** Indicates whether or not this zone requires zone-specific data for 
+         *  each scene node
+         */
+        virtual bool requiresZoneSpecificNodeData(void) = 0;
 
-		/** Create zone specific data for a node
-		*/
-		virtual void createNodeZoneData(PCZSceneNode *);
+        /** Create zone specific data for a node
+        */
+        virtual void createNodeZoneData(PCZSceneNode *);
 
-		/** Find a matching portal (for connecting portals)
-		*/
-		virtual Portal * findMatchingPortal(Portal *);
+        /** Find a matching portal (for connecting portals)
+        */
+        virtual Portal * findMatchingPortal(Portal *);
 
-		/** Add a portal to the zone */
-		virtual void _addPortal(Portal* newPortal);
+        /** Add a portal to the zone */
+        virtual void _addPortal(Portal* newPortal);
 
-		/** Remove a portal from the zone */
-		virtual void _removePortal(Portal* removePortal);
+        /** Remove a portal from the zone */
+        virtual void _removePortal(Portal* removePortal);
 
-		/** Add an anti portal to the zone */
-		virtual void _addAntiPortal(AntiPortal* newAntiPortal);
+        /** Add an anti portal to the zone */
+        virtual void _addAntiPortal(AntiPortal* newAntiPortal);
 
-		/** Remove an anti portal from the zone */
-		virtual void _removeAntiPortal(AntiPortal* removeAntiPortal);
+        /** Remove an anti portal from the zone */
+        virtual void _removeAntiPortal(AntiPortal* removeAntiPortal);
 
-		/** (recursive) Check the given node against all portals in the zone
-		*/
-		virtual void _checkNodeAgainstPortals(PCZSceneNode *, Portal * ) = 0;
+        /** (recursive) Check the given node against all portals in the zone
+        */
+        virtual void _checkNodeAgainstPortals(PCZSceneNode *, Portal * ) = 0;
 
         /** (recursive) Check the given light against all portals in the zone
         */
@@ -177,15 +177,15 @@ namespace Ogre
                                                PCZFrustum *,
                                                Portal *) = 0;
 
-		/** Update the zone data for each portal
-		*/
-		virtual void updatePortalsZoneData(void) = 0;
+        /** Update the zone data for each portal
+        */
+        virtual void updatePortalsZoneData(void) = 0;
 
-		/** Mark nodes dirty base on moving portals. */
-		virtual void dirtyNodeByMovingPortals(void) = 0;
+        /** Mark nodes dirty base on moving portals. */
+        virtual void dirtyNodeByMovingPortals(void) = 0;
 
-		/** Update a node's home zone */
-		virtual PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces) = 0;
+        /** Update a node's home zone */
+        virtual PCZone * updateNodeHomeZone(PCZSceneNode * pczsn, bool allowBackTouces) = 0;
 
         /** Find and add visible objects to the render queue.
         @remarks
@@ -193,119 +193,119 @@ namespace Ogre
         This is a recursive call (the main call should be to _findVisibleObjects)
         */
         virtual void findVisibleNodes(PCZCamera *, 
-									  NodeList & visibleNodeList,
-									  RenderQueue * queue,
-									  VisibleObjectsBoundsInfo* visibleBounds, 
-									  bool onlyShadowCasters,
-									  bool displayNodes,
-									  bool showBoundingBoxes) = 0;
+                                      NodeList & visibleNodeList,
+                                      RenderQueue * queue,
+                                      VisibleObjectsBoundsInfo* visibleBounds, 
+                                      bool onlyShadowCasters,
+                                      bool displayNodes,
+                                      bool showBoundingBoxes) = 0;
 
-		/* Functions for finding Nodes that intersect various shapes */
-		virtual void _findNodes( const AxisAlignedBox &t, 
-						         PCZSceneNodeList &list, 
+        /* Functions for finding Nodes that intersect various shapes */
+        virtual void _findNodes( const AxisAlignedBox &t, 
+                                 PCZSceneNodeList &list, 
                                  PortalList &visitedPortals,
-						         bool includeVisitors,
-						         bool recurseThruPortals,
-						         PCZSceneNode *exclude) = 0;
-	    virtual void _findNodes( const Sphere &t, 
-						         PCZSceneNodeList &list, 
+                                 bool includeVisitors,
+                                 bool recurseThruPortals,
+                                 PCZSceneNode *exclude) = 0;
+        virtual void _findNodes( const Sphere &t, 
+                                 PCZSceneNodeList &list, 
                                  PortalList &visitedPortals,
-						         bool includeVisitors,
-						         bool recurseThruPortals,
-						         PCZSceneNode *exclude ) = 0;
-	    virtual void _findNodes( const PlaneBoundedVolume &t, 
-						         PCZSceneNodeList &list, 
+                                 bool includeVisitors,
+                                 bool recurseThruPortals,
+                                 PCZSceneNode *exclude ) = 0;
+        virtual void _findNodes( const PlaneBoundedVolume &t, 
+                                 PCZSceneNodeList &list, 
                                  PortalList &visitedPortals,
-						         bool includeVisitors,
-						         bool recurseThruPortals,
-						         PCZSceneNode *exclude ) = 0;
-	    virtual void _findNodes( const Ray &t, 
-						         PCZSceneNodeList &list, 
+                                 bool includeVisitors,
+                                 bool recurseThruPortals,
+                                 PCZSceneNode *exclude ) = 0;
+        virtual void _findNodes( const Ray &t, 
+                                 PCZSceneNodeList &list, 
                                  PortalList &visitedPortals,
-						         bool includeVisitors,
-						         bool recurseThruPortals,
-						         PCZSceneNode *exclude ) = 0;
+                                 bool includeVisitors,
+                                 bool recurseThruPortals,
+                                 PCZSceneNode *exclude ) = 0;
 
-		/** Sets the options for the Zone */
-		virtual bool setOption( const String &, const void * ) = 0;
-		/** Called when the scene manager creates a camera in order to store the first camera created as the primary
-			one, for determining error metrics and the 'home' terrain page.
-		*/
-		virtual void notifyCameraCreated( Camera* c ) = 0;
-		/** Called by PCZSM during setWorldGeometryRenderQueue() */
-		virtual void notifyWorldGeometryRenderQueue(uint8 qid) = 0;
-		/** Called when a _renderScene is called in the SceneManager */
-		virtual void notifyBeginRenderScene(void) = 0;
-		/** Called by PCZSM during setZoneGeometry() */
-		virtual void setZoneGeometry(const String &filename, PCZSceneNode * parentNode) = 0;
-		/** Get the world coordinate aabb of the zone */
-		virtual void getAABB(AxisAlignedBox &);
-		void setPortalsUpdated(bool updated)   { mPortalsUpdated = updated;    }
-		bool getPortalsUpdated(void)      { return mPortalsUpdated;   }
-		/** Get & set the user data */
-		void * getUserData(void) {return mUserData;}
-		void setUserData(void * userData) {mUserData = userData;}
-		/** List of Portals which this zone contains (each portal leads to another zone)
-		*/
-		PortalList mPortals;
-		AntiPortalList mAntiPortals;
-		/// Pointer to the pcz scene manager that created this zone
-		PCZSceneManager * mPCZSM;
+        /** Sets the options for the Zone */
+        virtual bool setOption( const String &, const void * ) = 0;
+        /** Called when the scene manager creates a camera in order to store the first camera created as the primary
+            one, for determining error metrics and the 'home' terrain page.
+        */
+        virtual void notifyCameraCreated( Camera* c ) = 0;
+        /** Called by PCZSM during setWorldGeometryRenderQueue() */
+        virtual void notifyWorldGeometryRenderQueue(uint8 qid) = 0;
+        /** Called when a _renderScene is called in the SceneManager */
+        virtual void notifyBeginRenderScene(void) = 0;
+        /** Called by PCZSM during setZoneGeometry() */
+        virtual void setZoneGeometry(const String &filename, PCZSceneNode * parentNode) = 0;
+        /** Get the world coordinate aabb of the zone */
+        virtual void getAABB(AxisAlignedBox &);
+        void setPortalsUpdated(bool updated)   { mPortalsUpdated = updated;    }
+        bool getPortalsUpdated(void)      { return mPortalsUpdated;   }
+        /** Get & set the user data */
+        void * getUserData(void) {return mUserData;}
+        void setUserData(void * userData) {mUserData = userData;}
+        /** List of Portals which this zone contains (each portal leads to another zone)
+        */
+        PortalList mPortals;
+        AntiPortalList mAntiPortals;
+        /// Pointer to the pcz scene manager that created this zone
+        PCZSceneManager * mPCZSM;
 
-	protected:
-		/** Binary predicate for portal <-> camera distance sorting. */
-		struct PortalSortDistance
-		{
-			const Vector3& cameraPosition;
-			PortalSortDistance(const Vector3& inCameraPosition) : cameraPosition(inCameraPosition)
-			{ }
+    protected:
+        /** Binary predicate for portal <-> camera distance sorting. */
+        struct PortalSortDistance
+        {
+            const Vector3& cameraPosition;
+            PortalSortDistance(const Vector3& inCameraPosition) : cameraPosition(inCameraPosition)
+            { }
 
-			bool _OgrePCZPluginExport operator()(const PortalBase* p1, const PortalBase* p2) const
-			{
-				Real depth1 = p1->getDerivedCP().squaredDistance(cameraPosition);
-				Real depth2 = p2->getDerivedCP().squaredDistance(cameraPosition);
-				return (depth1 < depth2);
-			}
-		};
+            bool _OgrePCZPluginExport operator()(const PortalBase* p1, const PortalBase* p2) const
+            {
+                Real depth1 = p1->getDerivedCP().squaredDistance(cameraPosition);
+                Real depth2 = p2->getDerivedCP().squaredDistance(cameraPosition);
+                return (depth1 < depth2);
+            }
+        };
 
-		/// Name of the zone (must be unique)
-		String mName;
-		/// Zone type name
-		String mZoneTypeName;
+        /// Name of the zone (must be unique)
+        String mName;
+        /// Zone type name
+        String mZoneTypeName;
         /// Frame counter for visibility
         unsigned long mLastVisibleFrame;
-		/// Last camera which this zone was visible to
-		PCZCamera * mLastVisibleFromCamera;
-		/// Flag determining whether or not this zone has sky in it.
-		bool mHasSky;
-		/// SceneNode which corresponds to the enclosure for this zone
-		SceneNode * mEnclosureNode;
-		/// List of SceneNodes contained in this particular PCZone
+        /// Last camera which this zone was visible to
+        PCZCamera * mLastVisibleFromCamera;
+        /// Flag determining whether or not this zone has sky in it.
+        bool mHasSky;
+        /// SceneNode which corresponds to the enclosure for this zone
+        SceneNode * mEnclosureNode;
+        /// List of SceneNodes contained in this particular PCZone
         PCZSceneNodeList mHomeNodeList;
-		/// List of SceneNodes visiting this particular PCZone
+        /// List of SceneNodes visiting this particular PCZone
         PCZSceneNodeList mVisitorNodeList;
-		/// Flag recording whether any portals in this zone have moved
-		bool mPortalsUpdated;   
-		/** User defined data pointer - NOT allocated or deallocated by the zone!
+        /// Flag recording whether any portals in this zone have moved
+        bool mPortalsUpdated;   
+        /** User defined data pointer - NOT allocated or deallocated by the zone!
             you must clean it up yourself! */
-		void * mUserData;
+        void * mUserData;
 
     };
 
-	class _OgrePCZPluginExport ZoneData : public SceneCtlAllocatedObject
-	{
-	public:
-		/** Standard Constructor */
-		ZoneData(PCZSceneNode *, PCZone * );
-		/** Standard destructor */
-		virtual ~ZoneData();
-		/** Update data if necessary */
-		virtual void update(void);
-	public:
-		PCZone *		mAssociatedZone;
-		PCZSceneNode *	mAssociatedNode;
+    class _OgrePCZPluginExport ZoneData : public SceneCtlAllocatedObject
+    {
+    public:
+        /** Standard Constructor */
+        ZoneData(PCZSceneNode *, PCZone * );
+        /** Standard destructor */
+        virtual ~ZoneData();
+        /** Update data if necessary */
+        virtual void update(void);
+    public:
+        PCZone *        mAssociatedZone;
+        PCZSceneNode *  mAssociatedNode;
 
-	};
+    };
 
 }
 

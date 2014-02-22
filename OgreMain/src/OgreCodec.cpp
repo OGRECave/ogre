@@ -50,7 +50,7 @@ namespace Ogre {
     Codec* Codec::getCodec(const String& extension)
     {
         String lwrcase = extension;
-		StringUtil::toLowerCase(lwrcase);
+        StringUtil::toLowerCase(lwrcase);
         CodecList::const_iterator i = msMapCodecs.find(lwrcase);
         if (i == msMapCodecs.end())
         {
@@ -70,27 +70,27 @@ namespace Ogre {
 
     }
 
-	Codec* Codec::getCodec(char *magicNumberPtr, size_t maxbytes)
-	{
-		for (CodecList::const_iterator i = msMapCodecs. begin(); 
-			i != msMapCodecs.end(); ++i)
-		{
-			String ext = i->second->magicNumberToFileExt(magicNumberPtr, maxbytes);
-			if (!ext.empty())
-			{
-				// check codec type matches
-				// if we have a single codec class that can handle many types, 
-				// and register many instances of it against different types, we
-				// can end up matching the wrong one here, so grab the right one
-				if (ext == i->second->getType())
-					return i->second;
-				else
-					return getCodec(ext);
-			}
-		}
+    Codec* Codec::getCodec(char *magicNumberPtr, size_t maxbytes)
+    {
+        for (CodecList::const_iterator i = msMapCodecs. begin(); 
+            i != msMapCodecs.end(); ++i)
+        {
+            String ext = i->second->magicNumberToFileExt(magicNumberPtr, maxbytes);
+            if (!ext.empty())
+            {
+                // check codec type matches
+                // if we have a single codec class that can handle many types, 
+                // and register many instances of it against different types, we
+                // can end up matching the wrong one here, so grab the right one
+                if (ext == i->second->getType())
+                    return i->second;
+                else
+                    return getCodec(ext);
+            }
+        }
 
-		return 0;
+        return 0;
 
-	}
+    }
 
 }

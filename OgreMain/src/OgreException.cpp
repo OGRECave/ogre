@@ -46,31 +46,31 @@ namespace Ogre {
     }
 
     Exception::Exception(int num, const String& desc, const String& src, 
-		const char* typ, const char* fil, long lin) :
+        const char* typ, const char* fil, long lin) :
         line( lin ),
         number( num ),
-		typeName(typ),
+        typeName(typ),
         description( desc ),
         source( src ),
         file( fil )
     {
         // Log this error, mask it from debug though since it may be caught and ignored
         if(LogManager::getSingletonPtr())
-		{
+        {
             LogManager::getSingleton().logMessage(
-				this->getFullDescription(), 
+                this->getFullDescription(), 
                 LML_CRITICAL, true);
-		}
+        }
 
     }
 
     Exception::Exception(const Exception& rhs)
         : line( rhs.line ), 
-		number( rhs.number ), 
-		typeName( rhs.typeName ), 
-		description( rhs.description ), 
-		source( rhs.source ), 
-		file( rhs.file )
+        number( rhs.number ), 
+        typeName( rhs.typeName ), 
+        description( rhs.description ), 
+        source( rhs.source ), 
+        file( rhs.file )
     {
     }
 
@@ -81,31 +81,31 @@ namespace Ogre {
         source = rhs.source;
         file = rhs.file;
         line = rhs.line;
-		typeName = rhs.typeName;
+        typeName = rhs.typeName;
 
         return *this;
     }
 
     const String& Exception::getFullDescription(void) const
     {
-		if (fullDesc.empty())
-		{
+        if (fullDesc.empty())
+        {
 
-			StringStream desc;
+            StringStream desc;
 
-			desc <<  "OGRE EXCEPTION(" << number << ":" << typeName << "): "
-				<< description 
-				<< " in " << source;
+            desc <<  "OGRE EXCEPTION(" << number << ":" << typeName << "): "
+                << description 
+                << " in " << source;
 
-			if( line > 0 )
-			{
-				desc << " at " << file << " (line " << line << ")";
-			}
+            if( line > 0 )
+            {
+                desc << " at " << file << " (line " << line << ")";
+            }
 
-			fullDesc = desc.str();
-		}
+            fullDesc = desc.str();
+        }
 
-		return fullDesc;
+        return fullDesc;
     }
 
     int Exception::getNumber(void) const throw()

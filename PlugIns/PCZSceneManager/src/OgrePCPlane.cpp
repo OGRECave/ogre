@@ -41,11 +41,11 @@ namespace Ogre
     {
         mPortal = 0;
     }
-	PCPlane::PCPlane(const Plane & plane) 
-			: Plane(plane)
-	{
-		mPortal = 0;
-	}
+    PCPlane::PCPlane(const Plane & plane) 
+            : Plane(plane)
+    {
+        mPortal = 0;
+    }
     PCPlane::PCPlane(const Vector3& rkNormal, const Vector3& rkPoint) 
             : Plane(rkNormal, rkPoint)
     {
@@ -56,16 +56,16 @@ namespace Ogre
     {
         mPortal = 0;
     }
-	void PCPlane::setFromOgrePlane(Plane & ogrePlane)
-	{
-		d = ogrePlane.d;
-		normal = ogrePlane.normal;
-		mPortal = 0;
-	}
+    void PCPlane::setFromOgrePlane(Plane & ogrePlane)
+    {
+        d = ogrePlane.d;
+        normal = ogrePlane.normal;
+        mPortal = 0;
+    }
 
     PCPlane::~PCPlane()
     {
-		mPortal = 0;
+        mPortal = 0;
     }
 
 }

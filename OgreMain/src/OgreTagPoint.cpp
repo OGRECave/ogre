@@ -103,7 +103,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void TagPoint::needUpdate(bool forceParentUpdate)
     {
-		Bone::needUpdate(forceParentUpdate);
+        Bone::needUpdate(forceParentUpdate);
 
         // We need to tell parent entities node
         if (mParentEntity)

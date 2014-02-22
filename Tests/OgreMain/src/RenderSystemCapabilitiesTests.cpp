@@ -240,7 +240,7 @@ void RenderSystemCapabilitiesTests::testSerializeShaderCapability()
 void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
 {
     using namespace Ogre;
-	using namespace std;
+    using namespace std;
 
     String name = "simple caps";
     String filename = "simpleCapsTest.rendercaps";
@@ -268,7 +268,7 @@ void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
     capsfile.getline(buff, 255);
     CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
     // scan every line and find the set capabilities it them
-	std::vector <String> lines;
+    std::vector <String> lines;
     while(capsfile.good())
     {
         capsfile.getline(buff, 255);
@@ -572,13 +572,13 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     caps.setNonPOW2TexturesLimited(true);
     caps.setVertexTextureUnitsShared(true);
 
-	DriverVersion driverversion;
-	driverversion.major = 11;
-	driverversion.minor = 13;
-	driverversion.release = 17;
-	driverversion.build = 0;
+    DriverVersion driverversion;
+    driverversion.major = 11;
+    driverversion.minor = 13;
+    driverversion.release = 17;
+    driverversion.build = 0;
 
-	caps.setDriverVersion(driverversion);
+    caps.setDriverVersion(driverversion);
     caps.setDeviceName("Dummy Device");
     caps.setRenderSystemName("Dummy RenderSystem");
 
@@ -662,12 +662,12 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     CPPUNIT_ASSERT_EQUAL(caps.getMaxPointSize(), caps2.getMaxPointSize());
     CPPUNIT_ASSERT_EQUAL(caps.getNonPOW2TexturesLimited(), caps2.getNonPOW2TexturesLimited());
     CPPUNIT_ASSERT_EQUAL(caps.getVertexTextureUnitsShared(), caps2.getVertexTextureUnitsShared());
-	
-	// test versions
-	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().major, caps2.getDriverVersion().major);
-	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().minor, caps2.getDriverVersion().minor);
-	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().release, caps2.getDriverVersion().release);
-	CPPUNIT_ASSERT_EQUAL(0, caps2.getDriverVersion().build);
+    
+    // test versions
+    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().major, caps2.getDriverVersion().major);
+    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().minor, caps2.getDriverVersion().minor);
+    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().release, caps2.getDriverVersion().release);
+    CPPUNIT_ASSERT_EQUAL(0, caps2.getDriverVersion().build);
 
     dataStreamPtr.setNull();
 }

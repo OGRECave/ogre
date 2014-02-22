@@ -39,20 +39,20 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class OSXCarbonWindow : public OSXWindow
-	{
-	public:
-		OSXCarbonWindow();
-		virtual ~OSXCarbonWindow();
-		
-		virtual void create( const String& name, unsigned int width, unsigned int height,
-	            bool fullScreen, const NameValuePairList *miscParams );
+    class OSXCarbonWindow : public OSXWindow
+    {
+    public:
+        OSXCarbonWindow();
+        virtual ~OSXCarbonWindow();
+        
+        virtual void create( const String& name, unsigned int width, unsigned int height,
+                bool fullScreen, const NameValuePairList *miscParams );
         /** Overridden - see RenderWindow */
-		virtual void destroy( void );
+        virtual void destroy( void );
         /** Overridden - see RenderWindow */
-		virtual bool isActive( void ) const;
+        virtual bool isActive( void ) const;
         /** Overridden - see RenderWindow */
-		virtual bool isClosed( void ) const;
+        virtual bool isClosed( void ) const;
         /** @copydoc RenderWindow::isHidden */
         bool isHidden(void) const { return mHidden; }
         /** @copydoc RenderWindow::setHidden */
@@ -62,40 +62,40 @@ namespace Ogre
         /** @copydoc RenderWindow::isVSyncEnabled */
         bool isVSyncEnabled() const;
         /** Overridden - see RenderWindow */
-		virtual void reposition( int left, int top );
+        virtual void reposition( int left, int top );
         /** Overridden - see RenderWindow */
-		virtual void resize( unsigned int width, unsigned int height );
+        virtual void resize( unsigned int width, unsigned int height );
         /** Overridden - see RenderWindow */
-    	virtual void setVisible( bool visible );
+        virtual void setVisible( bool visible );
         /** Overridden - see RenderWindow */
-    	virtual bool isVisible(void) const;
+        virtual bool isVisible(void) const;
         /** Overridden - see RenderWindow */
-		virtual void swapBuffers( );
+        virtual void swapBuffers( );
         /** Overridden - see RenderWindow */
         virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
-   	    /** Overridden - see RenderTarget */
-		virtual void windowMovedOrResized();
+        /** Overridden - see RenderTarget */
+        virtual void windowMovedOrResized();
 
-		bool requiresTextureFlipping(void) const { return false; }
-		
-		void windowResized(void);
-		void windowHasResized(void);
-		
-		void getCustomAttribute( const String& name, void* pData );
+        bool requiresTextureFlipping(void) const { return false; }
+        
+        void windowResized(void);
+        void windowHasResized(void);
+        
+        void getCustomAttribute( const String& name, void* pData );
 
-	private:
-		void createNewWindow(unsigned int width, unsigned int height, String title);
+    private:
+        void createNewWindow(unsigned int width, unsigned int height, String title);
         void createWindowFromExternal(HIViewRef viewRef);
         void createAGLContext(size_t fsaa_samples, int depth);
 
-		WindowRef mWindow;
+        WindowRef mWindow;
         EventHandlerRef mEventHandlerRef;
-		HIViewRef mView;
-		AGLContext mAGLContext;
+        HIViewRef mView;
+        AGLContext mAGLContext;
         AGLPixelFormat mAGLPixelFormat;
         String mWindowTitle;
-		OSXCGLContext* mCGLContext;
-		OSXCarbonContext* mCarbonContext;
+        OSXCGLContext* mCGLContext;
+        OSXCarbonContext* mCarbonContext;
         bool mVSync;
         bool mActive;
         bool mClosed;
@@ -104,7 +104,7 @@ namespace Ogre
         bool mHasResized;
         bool mIsExternal;
         bool mVisible;
-	};
+    };
 }
 
 #endif // __LP64__

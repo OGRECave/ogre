@@ -41,7 +41,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLES2HardwareBufferManagerBase::GLES2HardwareBufferManagerBase()
     {
-		mStateCacheManager = dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->getStateCacheManager();
+        mStateCacheManager = dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->getStateCacheManager();
     }
 
     GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()
@@ -90,26 +90,26 @@ namespace Ogre {
         return HardwareIndexBufferSharedPtr(buf);
     }
 
-	RenderToVertexBufferSharedPtr GLES2HardwareBufferManagerBase::createRenderToVertexBuffer()
-	{
+    RenderToVertexBufferSharedPtr GLES2HardwareBufferManagerBase::createRenderToVertexBuffer()
+    {
 #if OGRE_NO_GLES3_SUPPORT == 0
-		return RenderToVertexBufferSharedPtr(new GLES2RenderToVertexBuffer());
+        return RenderToVertexBufferSharedPtr(new GLES2RenderToVertexBuffer());
 #else
-		// not supported
-		return RenderToVertexBufferSharedPtr();
+        // not supported
+        return RenderToVertexBufferSharedPtr();
 #endif
-	}
+    }
 
-	VertexDeclaration* GLES2HardwareBufferManagerBase::createVertexDeclarationImpl(void)
-	{
-		return OGRE_NEW GLES2VertexDeclaration();
-	}
+    VertexDeclaration* GLES2HardwareBufferManagerBase::createVertexDeclarationImpl(void)
+    {
+        return OGRE_NEW GLES2VertexDeclaration();
+    }
 
     void GLES2HardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)
-	{
+    {
         if(decl)
             OGRE_DELETE decl;
-	}
+    }
 
     GLenum GLES2HardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {

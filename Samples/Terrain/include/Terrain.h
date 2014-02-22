@@ -756,10 +756,10 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
-		// Bugfix for D3D11 Render System because of pixel format incompatibility when using
-		// vertex compression
-		if (Ogre::Root::getSingleton().getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem")
-			mTerrainGlobals->setUseVertexCompressionWhenAvailable(false);
+        // Bugfix for D3D11 Render System because of pixel format incompatibility when using
+        // vertex compression
+        if (Ogre::Root::getSingleton().getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem")
+            mTerrainGlobals->setUseVertexCompressionWhenAvailable(false);
 
         mEditMarker = mSceneMgr->createEntity("editMarker", "sphere.mesh");
         mEditNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -794,7 +794,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
         mTerrainGroup->setOrigin(mTerrainPos);
         mTerrainGroup->setResourceGroup("Terrain");
-		
+        
         configureTerrainDefaults(l);
 #ifdef PAGING
         // Paging setup
@@ -857,7 +857,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         sn->attachObject(e);
         mHouseList.push_back(e);
 
-		mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox", 5000);
+        mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox", 5000);
 
 
     }

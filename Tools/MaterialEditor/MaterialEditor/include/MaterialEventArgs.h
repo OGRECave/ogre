@@ -36,15 +36,15 @@ class TechniqueController;
 class MaterialEventArgs : public EventArgs
 {
 public:
-	MaterialEventArgs(MaterialController* mc);
-	MaterialEventArgs(MaterialController* mc, TechniqueController* tc);
+    MaterialEventArgs(MaterialController* mc);
+    MaterialEventArgs(MaterialController* mc, TechniqueController* tc);
 
-	MaterialController* getMaterialController() const;
-	TechniqueController* getTechniqueController() const;
+    MaterialController* getMaterialController() const;
+    TechniqueController* getTechniqueController() const;
 
 protected:
-	MaterialController* mMaterialController;
-	TechniqueController* mTechniqueController;
+    MaterialController* mMaterialController;
+    TechniqueController* mTechniqueController;
 };
 
 #endif // _MATERIALEVENTARGS_H_

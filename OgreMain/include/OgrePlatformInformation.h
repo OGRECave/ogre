@@ -52,13 +52,13 @@ namespace Ogre {
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__BIG_ENDIAN__)
 #   define OGRE_CPU OGRE_CPU_PPC
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#	define OGRE_CPU OGRE_CPU_X86
+#   define OGRE_CPU OGRE_CPU_X86
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
-#	define OGRE_CPU OGRE_CPU_X86
+#   define OGRE_CPU OGRE_CPU_X86
 #elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__) || defined(_aarch64_)
-#	define OGRE_CPU OGRE_CPU_ARM
+#   define OGRE_CPU OGRE_CPU_ARM
 #elif defined(__mips64) || defined(__mips64_)
-#	define OGRE_CPU OGRE_CPU_MIPS
+#   define OGRE_CPU OGRE_CPU_MIPS
 #else
 #   define OGRE_CPU OGRE_CPU_UNKNOWN
 #endif
@@ -132,12 +132,12 @@ namespace Ogre {
 #   define __OGRE_HAVE_MSA  0
 #endif
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
 
 
     /** Class which provides the run-time platform information Ogre runs on.
@@ -197,20 +197,20 @@ namespace Ogre {
         */
         static uint getCpuFeatures(void);
 
-		/** Gets whether a specific feature is supported by the CPU.
-		@note
-			Actual detecting are performs in the first time call to this function,
-			and then all future calls with return internal cached value.
-		*/
-		static bool hasCpuFeature(CpuFeatures feature);
+        /** Gets whether a specific feature is supported by the CPU.
+        @note
+            Actual detecting are performs in the first time call to this function,
+            and then all future calls with return internal cached value.
+        */
+        static bool hasCpuFeature(CpuFeatures feature);
 
 
-		/** Write the CPU information to the passed in Log */
-		static void log(Log* pLog);
+        /** Write the CPU information to the passed in Log */
+        static void log(Log* pLog);
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

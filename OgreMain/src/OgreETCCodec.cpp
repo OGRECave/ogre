@@ -71,63 +71,63 @@ namespace Ogre {
         uint8  iHeightMSB;
         uint8  iHeightLSB;
     } PKMHeader;
-	
+    
     typedef struct {
-    	uint8     identifier[12];
-    	uint32    endianness;
-    	uint32    glType;
-    	uint32    glTypeSize;
-    	uint32    glFormat;
-    	uint32    glInternalFormat;
-    	uint32    glBaseInternalFormat;
-    	uint32    pixelWidth;
-    	uint32    pixelHeight;
-    	uint32    pixelDepth;
-    	uint32    numberOfArrayElements;
-    	uint32    numberOfFaces;
-    	uint32    numberOfMipmapLevels;
-    	uint32    bytesOfKeyValueData;
+        uint8     identifier[12];
+        uint32    endianness;
+        uint32    glType;
+        uint32    glTypeSize;
+        uint32    glFormat;
+        uint32    glInternalFormat;
+        uint32    glBaseInternalFormat;
+        uint32    pixelWidth;
+        uint32    pixelHeight;
+        uint32    pixelDepth;
+        uint32    numberOfArrayElements;
+        uint32    numberOfFaces;
+        uint32    numberOfMipmapLevels;
+        uint32    bytesOfKeyValueData;
     } KTXHeader;
 
-	//---------------------------------------------------------------------
-	ETCCodec* ETCCodec::msPKMInstance = 0;
-	ETCCodec* ETCCodec::msKTXInstance = 0;
-	//---------------------------------------------------------------------
-	void ETCCodec::startup(void)
-	{
-		if (!msPKMInstance)
-		{
-			msPKMInstance = OGRE_NEW ETCCodec("pkm");
-			Codec::registerCodec(msPKMInstance);
-		}
+    //---------------------------------------------------------------------
+    ETCCodec* ETCCodec::msPKMInstance = 0;
+    ETCCodec* ETCCodec::msKTXInstance = 0;
+    //---------------------------------------------------------------------
+    void ETCCodec::startup(void)
+    {
+        if (!msPKMInstance)
+        {
+            msPKMInstance = OGRE_NEW ETCCodec("pkm");
+            Codec::registerCodec(msPKMInstance);
+        }
 
-		if (!msKTXInstance)
-		{
-			msKTXInstance = OGRE_NEW ETCCodec("ktx");
-			Codec::registerCodec(msKTXInstance);
-		}
+        if (!msKTXInstance)
+        {
+            msKTXInstance = OGRE_NEW ETCCodec("ktx");
+            Codec::registerCodec(msKTXInstance);
+        }
 
         LogManager::getSingleton().logMessage(LML_NORMAL,
                                               "ETC codec registering");
-	}
-	//---------------------------------------------------------------------
-	void ETCCodec::shutdown(void)
-	{
-		if(msPKMInstance)
-		{
-			Codec::unregisterCodec(msPKMInstance);
-			OGRE_DELETE msPKMInstance;
-			msPKMInstance = 0;
-		}
+    }
+    //---------------------------------------------------------------------
+    void ETCCodec::shutdown(void)
+    {
+        if(msPKMInstance)
+        {
+            Codec::unregisterCodec(msPKMInstance);
+            OGRE_DELETE msPKMInstance;
+            msPKMInstance = 0;
+        }
 
-		if(msKTXInstance)
-		{
-			Codec::unregisterCodec(msKTXInstance);
-			OGRE_DELETE msKTXInstance;
-			msKTXInstance = 0;
-		}
-	}
-	//---------------------------------------------------------------------
+        if(msKTXInstance)
+        {
+            Codec::unregisterCodec(msKTXInstance);
+            OGRE_DELETE msKTXInstance;
+            msKTXInstance = 0;
+        }
+    }
+    //---------------------------------------------------------------------
     ETCCodec::ETCCodec(const String &type):
         mType(type)
     { 
@@ -135,7 +135,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DataStreamPtr ETCCodec::encode(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
     {        
-		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ETC encoding not supported",
                     "ETCCodec::encode" ) ;
     }
@@ -143,22 +143,22 @@ namespace Ogre {
     void ETCCodec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
-		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "ETC encoding not supported",
                     "ETCCodec::encodeToFile" ) ;
-	}
+    }
     //---------------------------------------------------------------------
     Codec::DecodeResult ETCCodec::decode(DataStreamPtr& stream) const
     {
         DecodeResult ret;
-		if (decodeKTX(stream, ret))
-			return ret;
+        if (decodeKTX(stream, ret))
+            return ret;
 
-		stream->seek(0);
-		if (decodePKM(stream, ret))
-			return ret;
+        stream->seek(0);
+        if (decodePKM(stream, ret))
+            return ret;
 
-		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                     "This is not a valid ETC file!", "ETCCodec::decode");
     }
     //---------------------------------------------------------------------    
@@ -170,7 +170,7 @@ namespace Ogre {
     void ETCCodec::flipEndian(void * pData, size_t size, size_t count) const
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		for(unsigned int index = 0; index < count; index++)
+        for(unsigned int index = 0; index < count; index++)
         {
             flipEndian((void *)((long)pData + (index * size)), size);
         }
@@ -189,26 +189,26 @@ namespace Ogre {
 #endif
     }
     //---------------------------------------------------------------------    
-	String ETCCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const
-	{
-		if (maxbytes >= sizeof(uint32))
-		{
-			uint32 fileType;
-			memcpy(&fileType, magicNumberPtr, sizeof(uint32));
-			flipEndian(&fileType, sizeof(uint32), 1);
+    String ETCCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const
+    {
+        if (maxbytes >= sizeof(uint32))
+        {
+            uint32 fileType;
+            memcpy(&fileType, magicNumberPtr, sizeof(uint32));
+            flipEndian(&fileType, sizeof(uint32), 1);
 
-			if (PKM_MAGIC == fileType)
-				return String("pkm");
-		
-			if (KTX_MAGIC == fileType)
+            if (PKM_MAGIC == fileType)
+                return String("pkm");
+        
+            if (KTX_MAGIC == fileType)
                 return String("ktx");
-		}
+        }
 
-		return BLANKSTRING;
-	}
+        return BLANKSTRING;
+    }
     //---------------------------------------------------------------------
-	bool ETCCodec::decodePKM(DataStreamPtr& stream, DecodeResult& result) const
-	{
+    bool ETCCodec::decodePKM(DataStreamPtr& stream, DecodeResult& result) const
+    {
         PKMHeader header;
 
         // Read the ETC header
@@ -268,105 +268,105 @@ namespace Ogre {
         imgData->flags |= IF_COMPRESSED;
 
         // Calculate total size from number of mipmaps, faces and size
-		imgData->size = (paddedWidth * paddedHeight) >> 1;
+        imgData->size = (paddedWidth * paddedHeight) >> 1;
 
-		// Bind output buffer
-		MemoryDataStreamPtr output;
-		output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        // Bind output buffer
+        MemoryDataStreamPtr output;
+        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
 
-		// Now deal with the data
-		void *destPtr = output->getPtr();
+        // Now deal with the data
+        void *destPtr = output->getPtr();
         stream->read(destPtr, imgData->size);
         destPtr = static_cast<void*>(static_cast<uchar*>(destPtr));
         
-		DecodeResult ret;
-		ret.first = output;
-		ret.second = CodecDataPtr(imgData);
+        DecodeResult ret;
+        ret.first = output;
+        ret.second = CodecDataPtr(imgData);
 
         return true;
     }
     //---------------------------------------------------------------------
-	bool ETCCodec::decodeKTX(DataStreamPtr& stream, DecodeResult& result) const
-	{
+    bool ETCCodec::decodeKTX(DataStreamPtr& stream, DecodeResult& result) const
+    {
         KTXHeader header;
         // Read the ETC1 header
         stream->read(&header, sizeof(KTXHeader));
 
-		const uint8 KTXFileIdentifier[12] = { 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
-		if (memcmp(KTXFileIdentifier, &header.identifier, sizeof(KTXFileIdentifier)) != 0 )
-			return false;
+        const uint8 KTXFileIdentifier[12] = { 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
+        if (memcmp(KTXFileIdentifier, &header.identifier, sizeof(KTXFileIdentifier)) != 0 )
+            return false;
 
-		if (header.endianness == KTX_ENDIAN_REF_REV)
-			flipEndian(&header.glType, sizeof(uint32), 1);
+        if (header.endianness == KTX_ENDIAN_REF_REV)
+            flipEndian(&header.glType, sizeof(uint32), 1);
 
         ImageData *imgData = OGRE_NEW ImageData();
         imgData->depth = 1;
         imgData->width = header.pixelWidth;
         imgData->height = header.pixelHeight;
-		imgData->num_mipmaps = static_cast<ushort>(header.numberOfMipmapLevels - 1);
+        imgData->num_mipmaps = static_cast<ushort>(header.numberOfMipmapLevels - 1);
 
-		switch(header.glInternalFormat)
-		{
-		case 37492: // GL_COMPRESSED_RGB8_ETC2
+        switch(header.glInternalFormat)
+        {
+        case 37492: // GL_COMPRESSED_RGB8_ETC2
             imgData->format = PF_ETC2_RGB8;
-			break;
-        case 37496:// GL_COMPRESSED_RGBA8_ETC2_EAC
-			imgData->format = PF_ETC2_RGBA8;
             break;
-		case 37494: // GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2
+        case 37496:// GL_COMPRESSED_RGBA8_ETC2_EAC
+            imgData->format = PF_ETC2_RGBA8;
+            break;
+        case 37494: // GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2
             imgData->format = PF_ETC2_RGB8A1;
-			break;
-		case 35986: // ATC_RGB
-			imgData->format = PF_ATC_RGB;
-			break;
-		case 35987: // ATC_RGB_Explicit
-			imgData->format = PF_ATC_RGBA_EXPLICIT_ALPHA;
-			break;
-		case 34798: // ATC_RGB_Interpolated
-			imgData->format = PF_ATC_RGBA_INTERPOLATED_ALPHA;
-			break;
-		case 33777: // DXT 1
-	        imgData->format = PF_DXT1;
-			break;
-		case 33778: // DXT 3
-	        imgData->format = PF_DXT3;
-			break;
-		case 33779: // DXT 5
-	        imgData->format = PF_DXT5;
-			break;
-		default:		
-	        imgData->format = PF_ETC1_RGB8;
-			break;
-		}
-		
-		imgData->flags = 0;
-		if (header.glType == 0 || header.glFormat == 0)
-	        imgData->flags |= IF_COMPRESSED;
+            break;
+        case 35986: // ATC_RGB
+            imgData->format = PF_ATC_RGB;
+            break;
+        case 35987: // ATC_RGB_Explicit
+            imgData->format = PF_ATC_RGBA_EXPLICIT_ALPHA;
+            break;
+        case 34798: // ATC_RGB_Interpolated
+            imgData->format = PF_ATC_RGBA_INTERPOLATED_ALPHA;
+            break;
+        case 33777: // DXT 1
+            imgData->format = PF_DXT1;
+            break;
+        case 33778: // DXT 3
+            imgData->format = PF_DXT3;
+            break;
+        case 33779: // DXT 5
+            imgData->format = PF_DXT5;
+            break;
+        default:        
+            imgData->format = PF_ETC1_RGB8;
+            break;
+        }
+        
+        imgData->flags = 0;
+        if (header.glType == 0 || header.glFormat == 0)
+            imgData->flags |= IF_COMPRESSED;
 
-		size_t numFaces = 1; // Assume one face until we know otherwise
+        size_t numFaces = 1; // Assume one face until we know otherwise
                              // Calculate total size from number of mipmaps, faces and size
-		imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces,
+        imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces,
                                              imgData->width, imgData->height, imgData->depth, imgData->format);
 
-		stream->skip(header.bytesOfKeyValueData);
+        stream->skip(header.bytesOfKeyValueData);
 
-		// Bind output buffer
-		MemoryDataStreamPtr output;
-		output.bind(OGRE_NEW MemoryDataStream(imgData->size));
+        // Bind output buffer
+        MemoryDataStreamPtr output;
+        output.bind(OGRE_NEW MemoryDataStream(imgData->size));
 
-		// Now deal with the data
-		uchar* destPtr = output->getPtr();
-		for (uint32 level = 0; level < header.numberOfMipmapLevels; ++level)
-		{
-			uint32 imageSize = 0;
-			stream->read(&imageSize, sizeof(uint32));
-			stream->read(destPtr, imageSize);
-			destPtr += imageSize;
-		}
+        // Now deal with the data
+        uchar* destPtr = output->getPtr();
+        for (uint32 level = 0; level < header.numberOfMipmapLevels; ++level)
+        {
+            uint32 imageSize = 0;
+            stream->read(&imageSize, sizeof(uint32));
+            stream->read(destPtr, imageSize);
+            destPtr += imageSize;
+        }
 
-		result.first = output;
-		result.second = CodecDataPtr(imgData);
+        result.first = output;
+        result.second = CodecDataPtr(imgData);
         
-		return true;
-	}
+        return true;
+    }
 }

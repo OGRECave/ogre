@@ -37,19 +37,19 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Overlays
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Overlays
+    *  @{
+    */
 
 #if OGRE_UNICODE_SUPPORT
-	typedef UTFString DisplayString;
-#	define OGRE_DEREF_DISPLAYSTRING_ITERATOR(it) it.getCharacter()
+    typedef UTFString DisplayString;
+#   define OGRE_DEREF_DISPLAYSTRING_ITERATOR(it) it.getCharacter()
 #else
-	typedef String DisplayString;
-#	define OGRE_DEREF_DISPLAYSTRING_ITERATOR(it) *it
+    typedef String DisplayString;
+#   define OGRE_DEREF_DISPLAYSTRING_ITERATOR(it) *it
 #endif
     /** Enum describing how the position / size of an element is to be recorded. 
     */
@@ -158,8 +158,8 @@ namespace Ogre {
 
         /// Flag indicating if the vertex positions need recalculating
         bool mGeomPositionsOutOfDate;
-		/// Flag indicating if the vertex uvs need recalculating
-		bool mGeomUVsOutOfDate;
+        /// Flag indicating if the vertex uvs need recalculating
+        bool mGeomUVsOutOfDate;
 
         /** Zorder for when sending to render queue.
             Derived from parent */
@@ -171,8 +171,8 @@ namespace Ogre {
         /// Is element enabled?
         bool mEnabled;
 
-		/// Is element initialised?
-		bool mInitialised;
+        /// Is element initialised?
+        bool mInitialised;
 
         /// Used to see if this element is created from a Template
         OverlayElement* mSourceTemplate ;
@@ -182,11 +182,11 @@ namespace Ogre {
         subclasses must implement this.
         */
         virtual void updatePositionGeometry(void) = 0;
-		/** Internal method which is triggered when the UVs of the element get updated,
-		meaning the element should be rebuilding it's mesh UVs. Abstract since
-		subclasses must implement this.
-		*/
-		virtual void updateTextureGeometry(void) = 0;
+        /** Internal method which is triggered when the UVs of the element get updated,
+        meaning the element should be rebuilding it's mesh UVs. Abstract since
+        subclasses must implement this.
+        */
+        virtual void updateTextureGeometry(void) = 0;
 
         /** Internal method for setting up the basic parameter definitions for a subclass. 
         @remarks
@@ -314,10 +314,10 @@ namespace Ogre {
         /** Gets the 'top' position as derived from own left and that of parents. */
         virtual Real _getDerivedTop(void);
 
-		/** Gets the 'width' as derived from own width and metrics mode. */
-		virtual Real _getRelativeWidth(void);
-		/** Gets the 'height' as derived from own height and metrics mode. */
-		virtual Real _getRelativeHeight(void);
+        /** Gets the 'width' as derived from own width and metrics mode. */
+        virtual Real _getRelativeWidth(void);
+        /** Gets the 'height' as derived from own height and metrics mode. */
+        virtual Real _getRelativeHeight(void);
 
 
         /** Gets the clipping region of the element */
@@ -331,9 +331,9 @@ namespace Ogre {
         nested within this to ensure that containers are displayed behind contained
         items. This method is used internally to notify the element of a change in
         final Z-order which is used to render the element.
-		@return Return the next Z-ordering number available. For single elements, this
-		is simply 'newZOrder + 1', except for containers. They increment it once for each
-		child (or even more if those children are also containers with their own elements).
+        @return Return the next Z-ordering number available. For single elements, this
+        is simply 'newZOrder + 1', except for containers. They increment it once for each
+        child (or even more if those children are also containers with their own elements).
         */
         virtual ushort _notifyZOrder(ushort newZOrder);
 
@@ -350,9 +350,9 @@ namespace Ogre {
         /** Internal method to put the contents onto the render queue. */
         virtual void _updateRenderQueue(RenderQueue* queue);
 
-		/// @copydoc MovableObject::visitRenderables
-		void visitRenderables(Renderable::Visitor* visitor, 
-			bool debugRenderables = false);
+        /// @copydoc MovableObject::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false);
 
         /** Gets the type name of the element. All concrete subclasses must implement this. */
         virtual const String& getTypeName(void) const = 0;
@@ -363,7 +363,7 @@ namespace Ogre {
         However, being a common requirement it is in the top-level interface to avoid
         having to set it via the StringInterface all the time.
         */
-		virtual void setCaption(const DisplayString& text);
+        virtual void setCaption(const DisplayString& text);
         /** Gets the caption for this element. */
         virtual const DisplayString& getCaption(void) const;
         /** Sets the colour on elements that support it. 
@@ -434,7 +434,7 @@ namespace Ogre {
         virtual bool contains(Real x, Real y) const;
 
         /** Returns true if xy is within the constraints of the component */
-        virtual OverlayElement* findElementAt(Real x, Real y);		// relative to parent
+        virtual OverlayElement* findElementAt(Real x, Real y);      // relative to parent
 
         /**
         * returns false as this class is not a container type 
@@ -488,8 +488,8 @@ namespace Ogre {
     };
 
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

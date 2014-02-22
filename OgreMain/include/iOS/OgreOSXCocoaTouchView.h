@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 @interface OgreView : UIView
 {
-	Ogre::RenderWindow *window;
+    Ogre::RenderWindow *window;
 }
 
 - (id)initWithFrame:(CGRect)f;

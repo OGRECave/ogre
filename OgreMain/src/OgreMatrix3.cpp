@@ -389,7 +389,7 @@ namespace Ogre
         Real fY = kA[0][0] - (Math::Abs(fRoot1-fT22) <=
             Math::Abs(fRoot2-fT22) ? fRoot1 : fRoot2);
         Real fZ = kA[0][1];
-		Real fInvLength = Math::InvSqrt(fY*fY+fZ*fZ);
+        Real fInvLength = Math::InvSqrt(fY*fY+fZ*fZ);
         Real fSin = fZ*fInvLength;
         Real fCos = -fY*fInvLength;
 
@@ -483,7 +483,7 @@ namespace Ogre
     {
         // temas: currently unused
         //const int iMax = 16;
-		size_t iRow, iCol;
+        size_t iRow, iCol;
 
         Matrix3 kA = *this;
         Bidiagonalize(kA,kL,kR);
@@ -731,7 +731,7 @@ namespace Ogre
         kQ[0][1] = m[0][1]-fDot*kQ[0][0];
         kQ[1][1] = m[1][1]-fDot*kQ[1][0];
         kQ[2][1] = m[2][1]-fDot*kQ[2][0];
-		fInvLength = Math::InvSqrt(kQ[0][1]*kQ[0][1] + kQ[1][1]*kQ[1][1] + kQ[2][1]*kQ[2][1]);
+        fInvLength = Math::InvSqrt(kQ[0][1]*kQ[0][1] + kQ[1][1]*kQ[1][1] + kQ[2][1]*kQ[2][1]);
         
         kQ[0][1] *= fInvLength;
         kQ[1][1] *= fInvLength;
@@ -749,7 +749,7 @@ namespace Ogre
         kQ[2][2] -= fDot*kQ[2][1];
         fInvLength = Math::InvSqrt(kQ[0][2]*kQ[0][2] + kQ[1][2]*kQ[1][2] + kQ[2][2]*kQ[2][2]);
 
-		kQ[0][2] *= fInvLength;
+        kQ[0][2] *= fInvLength;
         kQ[1][2] *= fInvLength;
         kQ[2][2] *= fInvLength;
 

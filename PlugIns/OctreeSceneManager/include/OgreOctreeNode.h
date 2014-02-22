@@ -69,8 +69,8 @@ public:
     /** Overridden from Node to remove any reference to octants */
     Node * removeChild( Node* child);
 
-	/** Overridden from Node to remove any reference to octants */
-	void removeAllChildren(void);
+    /** Overridden from Node to remove any reference to octants */
+    void removeAllChildren(void);
 
     /** Returns the Octree in which this OctreeNode resides
     */
@@ -93,7 +93,7 @@ public:
     /** Adds all the attached scenenodes to the render queue
     */
     virtual void _addToRenderQueue( Camera* cam, RenderQueue * q, bool onlyShadowCasters, 
-		VisibleObjectsBoundsInfo* visibleBounds);
+        VisibleObjectsBoundsInfo* visibleBounds);
 
     /** Sets up the LegacyRenderOperation for rendering this scene node as geometry.
     @remarks

@@ -46,9 +46,9 @@ namespace Ogre {
             OGRE_NEW MemoryDataStream(pHeader, sizeof(bsp_header_t), false));
         // Grab all the counts, header only
         initialise(true);
-		// Delete manually since delete and delete[] (as used by MemoryDataStream)
-		// are not compatible
-		OGRE_FREE(pHeader, MEMCATEGORY_RESOURCE);
+        // Delete manually since delete and delete[] (as used by MemoryDataStream)
+        // are not compatible
+        OGRE_FREE(pHeader, MEMCATEGORY_RESOURCE);
 
     }
     //-----------------------------------------------------------------------
@@ -98,12 +98,12 @@ namespace Ogre {
         else
         {
             mLumpStart = ((unsigned char*)mHeader) + sizeof(mHeader);
-			initialisePointers();
+            initialisePointers();
         }
 
 
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		// swap header
+        // swap header
         SwapFourBytes ((uint32*)&mHeader->version);
 #endif
     }
@@ -242,15 +242,15 @@ namespace Ogre {
         unsigned char* pLightmap = mLightmaps;
         for (int i = 0; i < mNumLightmaps; ++i)
         {
-			StringStream name;
+            StringStream name;
             name << "@lightmap" << i;
 
             // Load, no mipmaps, brighten by factor 2.5
-			DataStreamPtr stream(OGRE_NEW MemoryDataStream(pLightmap, 128 * 128 * 3, false));
+            DataStreamPtr stream(OGRE_NEW MemoryDataStream(pLightmap, 128 * 128 * 3, false));
             Image img; 
-			img.loadRawData( stream, 128, 128, PF_BYTE_RGB );
+            img.loadRawData( stream, 128, 128, PF_BYTE_RGB );
             TextureManager::getSingleton().loadImage( name.str(), 
-				ResourceGroupManager::getSingleton().getWorldResourceGroupName(), img, TEX_TYPE_2D, 0, 4.0f );
+                ResourceGroupManager::getSingleton().getWorldResourceGroupName(), img, TEX_TYPE_2D, 0, 4.0f );
             pLightmap += BSP_LIGHTMAP_BANKSIZE;
         }
 

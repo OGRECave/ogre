@@ -34,17 +34,17 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Optional Components
-	*  @{
-	*/
+    /** \addtogroup Optional Components
+    *  @{
+    */
 
-	/** \addtogroup Paging
-	*  Some details on paging component
-	*  @{
-	*/
+    /** \addtogroup Paging
+    *  Some details on paging component
+    *  @{
+    */
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

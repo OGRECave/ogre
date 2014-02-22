@@ -43,25 +43,25 @@ namespace Ogre {
 
     typedef _StringBase String;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
 
-	/// Fast general hashing algorithm
-	uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar = 0);
-	/// Combine hashes with same style as boost::hash_combine
-	template <typename T>
-	uint32 HashCombine (uint32 hashSoFar, const T& data)
-	{
-		return FastHash((const char*)&data, sizeof(T), hashSoFar);
-	}
+    /// Fast general hashing algorithm
+    uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar = 0);
+    /// Combine hashes with same style as boost::hash_combine
+    template <typename T>
+    uint32 HashCombine (uint32 hashSoFar, const T& data)
+    {
+        return FastHash((const char*)&data, sizeof(T), hashSoFar);
+    }
 
 
     /** Comparison functions used for the depth/stencil buffer operations and 
-		others. */
+        others. */
     enum CompareFunction
     {
         CMPF_ALWAYS_FAIL,
@@ -85,7 +85,7 @@ namespace Ogre {
         /// Equal to: min=FO_LINEAR, mag=FO_LINEAR, mip=FO_LINEAR
         TFO_TRILINEAR,
         /// Equal to: min=FO_ANISOTROPIC, max=FO_ANISOTROPIC, mip=FO_LINEAR
-		TFO_ANISOTROPIC
+        TFO_ANISOTROPIC
     };
 
     enum FilterType
@@ -145,9 +145,9 @@ namespace Ogre {
 
     /** Manual culling modes based on vertex normals.
         This setting applies to how the software culls triangles before sending them to the 
-		hardware API. This culling mode is used by scene managers which choose to implement it -
-		normally those which deal with large amounts of fixed world geometry which is often 
-		planar (software culling movable variable geometry is expensive). */
+        hardware API. This culling mode is used by scene managers which choose to implement it -
+        normally those which deal with large amounts of fixed world geometry which is often 
+        planar (software culling movable variable geometry is expensive). */
     enum ManualCullingMode
     {
         /// No culling so everything is sent to the hardware.
@@ -171,19 +171,19 @@ namespace Ogre {
         WFT_SAWTOOTH,
         /// Gradual steady decrease from max to min over the period, with an instant return to max at the end.
         WFT_INVERSE_SAWTOOTH,
-		/// Pulse Width Modulation. Works like WFT_SQUARE, except the high to low transition is controlled by duty cycle. 
-		/// With a duty cycle of 50% (0.5) will give the same output as WFT_SQUARE.
-		WFT_PWM
+        /// Pulse Width Modulation. Works like WFT_SQUARE, except the high to low transition is controlled by duty cycle. 
+        /// With a duty cycle of 50% (0.5) will give the same output as WFT_SQUARE.
+        WFT_PWM
     };
 
     /** The polygon mode to use when rasterising. */
     enum PolygonMode
     {
-		/// Only points are rendered.
+        /// Only points are rendered.
         PM_POINTS = 1,
-		/// Wireframe models are rendered.
+        /// Wireframe models are rendered.
         PM_WIREFRAME = 2,
-		/// Solid polygons are rendered.
+        /// Solid polygons are rendered.
         PM_SOLID = 3
     };
 
@@ -192,22 +192,22 @@ namespace Ogre {
     {
         /** No shadows */
         SHADOWTYPE_NONE = 0x00,
-		/** Mask for additive shadows (not for direct use, use  SHADOWTYPE_ enum instead)
-		*/
-		SHADOWDETAILTYPE_ADDITIVE = 0x01,
-		/** Mask for modulative shadows (not for direct use, use  SHADOWTYPE_ enum instead)
-		*/
-		SHADOWDETAILTYPE_MODULATIVE = 0x02,
-		/** Mask for integrated shadows (not for direct use, use SHADOWTYPE_ enum instead)
-		*/
-		SHADOWDETAILTYPE_INTEGRATED = 0x04,
-		/** Mask for stencil shadows (not for direct use, use  SHADOWTYPE_ enum instead)
-		*/
-		SHADOWDETAILTYPE_STENCIL = 0x10,
-		/** Mask for texture shadows (not for direct use, use  SHADOWTYPE_ enum instead)
-		*/
-		SHADOWDETAILTYPE_TEXTURE = 0x20,
-		
+        /** Mask for additive shadows (not for direct use, use  SHADOWTYPE_ enum instead)
+        */
+        SHADOWDETAILTYPE_ADDITIVE = 0x01,
+        /** Mask for modulative shadows (not for direct use, use  SHADOWTYPE_ enum instead)
+        */
+        SHADOWDETAILTYPE_MODULATIVE = 0x02,
+        /** Mask for integrated shadows (not for direct use, use SHADOWTYPE_ enum instead)
+        */
+        SHADOWDETAILTYPE_INTEGRATED = 0x04,
+        /** Mask for stencil shadows (not for direct use, use  SHADOWTYPE_ enum instead)
+        */
+        SHADOWDETAILTYPE_STENCIL = 0x10,
+        /** Mask for texture shadows (not for direct use, use  SHADOWTYPE_ enum instead)
+        */
+        SHADOWDETAILTYPE_TEXTURE = 0x20,
+        
         /** Stencil shadow technique which renders all shadow volumes as
             a modulation after all the non-transparent areas have been 
             rendered. This technique is considerably less fillrate intensive 
@@ -228,49 +228,49 @@ namespace Ogre {
             shadow receivers as a modulative pass. 
         */
         SHADOWTYPE_TEXTURE_MODULATIVE = 0x22,
-		
+        
         /** Texture-based shadow technique which involves a render-to-texture
             of the shadow caster and a projection of that texture onto the 
             shadow receivers, built up per light as additive passes. 
-			This technique can be very fillrate intensive because it requires numLights + 2 
-			passes of the entire scene. However, it is a more accurate model than the 
-			modulative approach and this is especially apparent when using coloured lights 
-			or bump mapping.
+            This technique can be very fillrate intensive because it requires numLights + 2 
+            passes of the entire scene. However, it is a more accurate model than the 
+            modulative approach and this is especially apparent when using coloured lights 
+            or bump mapping.
         */
         SHADOWTYPE_TEXTURE_ADDITIVE = 0x21,
 
-		/** Texture-based shadow technique which involves a render-to-texture
-		of the shadow caster and a projection of that texture on to the shadow
-		receivers, with the usage of those shadow textures completely controlled
-		by the materials of the receivers.
-		This technique is easily the most flexible of all techniques because 
-		the material author is in complete control over how the shadows are
-		combined with regular rendering. It can perform shadows as accurately
-		as SHADOWTYPE_TEXTURE_ADDITIVE but more efficiently because it requires
-		less passes. However it also requires more expertise to use, and 
-		in almost all cases, shader capable hardware to really use to the full.
-		@note The 'additive' part of this mode means that the colour of
-		the rendered shadow texture is by default plain black. It does
-		not mean it does the adding on your receivers automatically though, how you
-		use that result is up to you.
-		*/
-		SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED = 0x25,
-		/** Texture-based shadow technique which involves a render-to-texture
-			of the shadow caster and a projection of that texture on to the shadow
-			receivers, with the usage of those shadow textures completely controlled
-			by the materials of the receivers.
-			This technique is easily the most flexible of all techniques because 
-			the material author is in complete control over how the shadows are
-			combined with regular rendering. It can perform shadows as accurately
-			as SHADOWTYPE_TEXTURE_ADDITIVE but more efficiently because it requires
-			less passes. However it also requires more expertise to use, and 
-			in almost all cases, shader capable hardware to really use to the full.
-			@note The 'modulative' part of this mode means that the colour of
-			the rendered shadow texture is by default the 'shadow colour'. It does
-			not mean it modulates on your receivers automatically though, how you
-			use that result is up to you.
-		*/
-		SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED = 0x26
+        /** Texture-based shadow technique which involves a render-to-texture
+        of the shadow caster and a projection of that texture on to the shadow
+        receivers, with the usage of those shadow textures completely controlled
+        by the materials of the receivers.
+        This technique is easily the most flexible of all techniques because 
+        the material author is in complete control over how the shadows are
+        combined with regular rendering. It can perform shadows as accurately
+        as SHADOWTYPE_TEXTURE_ADDITIVE but more efficiently because it requires
+        less passes. However it also requires more expertise to use, and 
+        in almost all cases, shader capable hardware to really use to the full.
+        @note The 'additive' part of this mode means that the colour of
+        the rendered shadow texture is by default plain black. It does
+        not mean it does the adding on your receivers automatically though, how you
+        use that result is up to you.
+        */
+        SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED = 0x25,
+        /** Texture-based shadow technique which involves a render-to-texture
+            of the shadow caster and a projection of that texture on to the shadow
+            receivers, with the usage of those shadow textures completely controlled
+            by the materials of the receivers.
+            This technique is easily the most flexible of all techniques because 
+            the material author is in complete control over how the shadows are
+            combined with regular rendering. It can perform shadows as accurately
+            as SHADOWTYPE_TEXTURE_ADDITIVE but more efficiently because it requires
+            less passes. However it also requires more expertise to use, and 
+            in almost all cases, shader capable hardware to really use to the full.
+            @note The 'modulative' part of this mode means that the colour of
+            the rendered shadow texture is by default the 'shadow colour'. It does
+            not mean it modulates on your receivers automatically though, how you
+            use that result is up to you.
+        */
+        SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED = 0x26
     };
 
     /** An enumeration describing which material properties should track the vertex colours */
@@ -299,248 +299,248 @@ namespace Ogre {
         FBT_STENCIL = 0x4
     };
 
-	/** Flags for the Instance Manager when calculating ideal number of instances per batch */
-	enum InstanceManagerFlags
-	{
-		/** Forces an amount of instances per batch low enough so that vertices * numInst < 65535
-			since usually improves performance. In HW instanced techniques, this flag is ignored
-		*/
-		IM_USE16BIT		= 0x0001,
+    /** Flags for the Instance Manager when calculating ideal number of instances per batch */
+    enum InstanceManagerFlags
+    {
+        /** Forces an amount of instances per batch low enough so that vertices * numInst < 65535
+            since usually improves performance. In HW instanced techniques, this flag is ignored
+        */
+        IM_USE16BIT     = 0x0001,
 
-		/** The num. of instances is adjusted so that as few pixels as possible are wasted
-			in the vertex texture */
-		IM_VTFBESTFIT	= 0x0002,
+        /** The num. of instances is adjusted so that as few pixels as possible are wasted
+            in the vertex texture */
+        IM_VTFBESTFIT   = 0x0002,
 
-		/** Use a limited number of skeleton animations shared among all instances. 
-		Update only that limited amount of animations in the vertex texture.*/
-		IM_VTFBONEMATRIXLOOKUP = 0x0004,
+        /** Use a limited number of skeleton animations shared among all instances. 
+        Update only that limited amount of animations in the vertex texture.*/
+        IM_VTFBONEMATRIXLOOKUP = 0x0004,
 
-		IM_USEBONEDUALQUATERNIONS = 0x0008,
+        IM_USEBONEDUALQUATERNIONS = 0x0008,
 
-		/** Use one weight per vertex when recommended (i.e. VTF). */
-		IM_USEONEWEIGHT = 0x0010,
+        /** Use one weight per vertex when recommended (i.e. VTF). */
+        IM_USEONEWEIGHT = 0x0010,
 
-		/** All techniques are forced to one weight per vertex. */
-		IM_FORCEONEWEIGHT = 0x0020,
+        /** All techniques are forced to one weight per vertex. */
+        IM_FORCEONEWEIGHT = 0x0020,
 
-		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT|IM_USEONEWEIGHT
-	};
+        IM_USEALL       = IM_USE16BIT|IM_VTFBESTFIT|IM_USEONEWEIGHT
+    };
     
-	
-	/** A hashed vector.
-	*/
-	template <typename T>
-	class HashedVector
-	{
-	public:
-		typedef std::vector<T, STLAllocator<T, GeneralAllocPolicy> > VectorImpl;
-	protected:
-		VectorImpl mList;
-		mutable uint32 mListHash;
-		mutable bool mListHashDirty;
+    
+    /** A hashed vector.
+    */
+    template <typename T>
+    class HashedVector
+    {
+    public:
+        typedef std::vector<T, STLAllocator<T, GeneralAllocPolicy> > VectorImpl;
+    protected:
+        VectorImpl mList;
+        mutable uint32 mListHash;
+        mutable bool mListHashDirty;
 
-		void addToHash(const T& newPtr) const
-		{
-			mListHash = FastHash((const char*)&newPtr, sizeof(T), mListHash);
-		}
-		void recalcHash() const
-		{
-			mListHash = 0;
-			for (const_iterator i = mList.begin(); i != mList.end(); ++i)
-				addToHash(*i);
-			mListHashDirty = false;
-			
-		}
+        void addToHash(const T& newPtr) const
+        {
+            mListHash = FastHash((const char*)&newPtr, sizeof(T), mListHash);
+        }
+        void recalcHash() const
+        {
+            mListHash = 0;
+            for (const_iterator i = mList.begin(); i != mList.end(); ++i)
+                addToHash(*i);
+            mListHashDirty = false;
+            
+        }
 
-	public:
-		typedef typename VectorImpl::value_type value_type;
-		typedef typename VectorImpl::pointer pointer;
-		typedef typename VectorImpl::reference reference;
-		typedef typename VectorImpl::const_reference const_reference;
-		typedef typename VectorImpl::size_type size_type;
-		typedef typename VectorImpl::difference_type difference_type;
-		typedef typename VectorImpl::iterator iterator;
-		typedef typename VectorImpl::const_iterator const_iterator;
-		typedef typename VectorImpl::reverse_iterator reverse_iterator;
-		typedef typename VectorImpl::const_reverse_iterator const_reverse_iterator;
+    public:
+        typedef typename VectorImpl::value_type value_type;
+        typedef typename VectorImpl::pointer pointer;
+        typedef typename VectorImpl::reference reference;
+        typedef typename VectorImpl::const_reference const_reference;
+        typedef typename VectorImpl::size_type size_type;
+        typedef typename VectorImpl::difference_type difference_type;
+        typedef typename VectorImpl::iterator iterator;
+        typedef typename VectorImpl::const_iterator const_iterator;
+        typedef typename VectorImpl::reverse_iterator reverse_iterator;
+        typedef typename VectorImpl::const_reverse_iterator const_reverse_iterator;
 
-		void dirtyHash()
-		{
-			mListHashDirty = true;
-		}
-		bool isHashDirty() const
-		{
-			return mListHashDirty;
-		}
+        void dirtyHash()
+        {
+            mListHashDirty = true;
+        }
+        bool isHashDirty() const
+        {
+            return mListHashDirty;
+        }
 
-		iterator begin() 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.begin(); 
-		}
-		iterator end() { return mList.end(); }
-		const_iterator begin() const { return mList.begin(); }
-		const_iterator end() const { return mList.end(); }
-		reverse_iterator rbegin() 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.rbegin(); 
-		}
-		reverse_iterator rend() { return mList.rend(); }
-		const_reverse_iterator rbegin() const { return mList.rbegin(); }
-		const_reverse_iterator rend() const { return mList.rend(); }
-		size_type size() const { return mList.size(); }
-		size_type max_size() const { return mList.max_size(); }
-		size_type capacity() const { return mList.capacity(); }
-		bool empty() const { return mList.empty(); }
-		reference operator[](size_type n) 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList[n]; 
-		}
-		const_reference operator[](size_type n) const { return mList[n]; }
-		reference at(size_type n) 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.const_iterator(n); 
-		}
-		const_reference at(size_type n) const { return mList.at(n); }
-		HashedVector() : mListHash(0), mListHashDirty(false) {}
-		HashedVector(size_type n) : mList(n), mListHash(0), mListHashDirty(n > 0) {}
-		HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0), mListHashDirty(n > 0) {}
-		HashedVector(const HashedVector<T>& rhs) 
-			: mList(rhs.mList), mListHash(rhs.mListHash), mListHashDirty(rhs.mListHashDirty) {}
+        iterator begin() 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.begin(); 
+        }
+        iterator end() { return mList.end(); }
+        const_iterator begin() const { return mList.begin(); }
+        const_iterator end() const { return mList.end(); }
+        reverse_iterator rbegin() 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.rbegin(); 
+        }
+        reverse_iterator rend() { return mList.rend(); }
+        const_reverse_iterator rbegin() const { return mList.rbegin(); }
+        const_reverse_iterator rend() const { return mList.rend(); }
+        size_type size() const { return mList.size(); }
+        size_type max_size() const { return mList.max_size(); }
+        size_type capacity() const { return mList.capacity(); }
+        bool empty() const { return mList.empty(); }
+        reference operator[](size_type n) 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList[n]; 
+        }
+        const_reference operator[](size_type n) const { return mList[n]; }
+        reference at(size_type n) 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.const_iterator(n); 
+        }
+        const_reference at(size_type n) const { return mList.at(n); }
+        HashedVector() : mListHash(0), mListHashDirty(false) {}
+        HashedVector(size_type n) : mList(n), mListHash(0), mListHashDirty(n > 0) {}
+        HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0), mListHashDirty(n > 0) {}
+        HashedVector(const HashedVector<T>& rhs) 
+            : mList(rhs.mList), mListHash(rhs.mListHash), mListHashDirty(rhs.mListHashDirty) {}
 
-		template <class InputIterator>
-		HashedVector(InputIterator a, InputIterator b)
-			: mList(a, b), mListHash(0), mListHashDirty(false)
-		{
-			dirtyHash();
-		}
+        template <class InputIterator>
+        HashedVector(InputIterator a, InputIterator b)
+            : mList(a, b), mListHash(0), mListHashDirty(false)
+        {
+            dirtyHash();
+        }
 
-		~HashedVector() {}
-		HashedVector<T>& operator=(const HashedVector<T>& rhs)
-		{
-			mList = rhs.mList;
-			mListHash = rhs.mListHash;
-			mListHashDirty = rhs.mListHashDirty;
-			return *this;
-		}
+        ~HashedVector() {}
+        HashedVector<T>& operator=(const HashedVector<T>& rhs)
+        {
+            mList = rhs.mList;
+            mListHash = rhs.mListHash;
+            mListHashDirty = rhs.mListHashDirty;
+            return *this;
+        }
 
-		void reserve(size_t t) { mList.reserve(t); }
-		reference front() 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.front(); 
-		}
-		const_reference front() const { return mList.front(); }
-		reference back()  
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.back(); 
-		}
-		const_reference back() const { return mList.back(); }
-		void push_back(const T& t)
-		{ 
-			mList.push_back(t);
-			// Quick progressive hash add
-			if (!isHashDirty())
-				addToHash(t);
-		}
-		void pop_back()
-		{
-			mList.pop_back();
-			dirtyHash();
-		}
-		void swap(HashedVector<T>& rhs)
-		{
-			mList.swap(rhs.mList);
-			dirtyHash();
-		}
-		iterator insert(iterator pos, const T& t)
-		{
-			bool recalc = (pos != end());
-			iterator ret = mList.insert(pos, t);
-			if (recalc)
-				dirtyHash();
-			else
-				addToHash(t);
-			return ret;
-		}
+        void reserve(size_t t) { mList.reserve(t); }
+        reference front() 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.front(); 
+        }
+        const_reference front() const { return mList.front(); }
+        reference back()  
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.back(); 
+        }
+        const_reference back() const { return mList.back(); }
+        void push_back(const T& t)
+        { 
+            mList.push_back(t);
+            // Quick progressive hash add
+            if (!isHashDirty())
+                addToHash(t);
+        }
+        void pop_back()
+        {
+            mList.pop_back();
+            dirtyHash();
+        }
+        void swap(HashedVector<T>& rhs)
+        {
+            mList.swap(rhs.mList);
+            dirtyHash();
+        }
+        iterator insert(iterator pos, const T& t)
+        {
+            bool recalc = (pos != end());
+            iterator ret = mList.insert(pos, t);
+            if (recalc)
+                dirtyHash();
+            else
+                addToHash(t);
+            return ret;
+        }
 
-		template <class InputIterator>
-		void insert(iterator pos,
-			InputIterator f, InputIterator l)
-		{
-			mList.insert(pos, f, l);
-			dirtyHash();
-		}
+        template <class InputIterator>
+        void insert(iterator pos,
+            InputIterator f, InputIterator l)
+        {
+            mList.insert(pos, f, l);
+            dirtyHash();
+        }
 
-		void insert(iterator pos, size_type n, const T& x)
-		{
-			mList.insert(pos, n, x);
-			dirtyHash();
-		}
+        void insert(iterator pos, size_type n, const T& x)
+        {
+            mList.insert(pos, n, x);
+            dirtyHash();
+        }
 
-		iterator erase(iterator pos)
-		{
-			iterator ret = mList.erase(pos);
-			dirtyHash();
-			return ret;
-		}
-		iterator erase(iterator first, iterator last)
-		{
-			iterator ret = mList.erase(first, last);
-			dirtyHash();
-			return ret;
-		}
-		void clear()
-		{
-			mList.clear();
-			mListHash = 0;
-			mListHashDirty = false;
-		}
+        iterator erase(iterator pos)
+        {
+            iterator ret = mList.erase(pos);
+            dirtyHash();
+            return ret;
+        }
+        iterator erase(iterator first, iterator last)
+        {
+            iterator ret = mList.erase(first, last);
+            dirtyHash();
+            return ret;
+        }
+        void clear()
+        {
+            mList.clear();
+            mListHash = 0;
+            mListHashDirty = false;
+        }
 
-		void resize(size_type n, const T& t = T())
-		{
-			bool recalc = false;
-			if (n != size())
-				recalc = true;
+        void resize(size_type n, const T& t = T())
+        {
+            bool recalc = false;
+            if (n != size())
+                recalc = true;
 
-			mList.resize(n, t);
-			if (recalc)
-				dirtyHash();
-		}
+            mList.resize(n, t);
+            if (recalc)
+                dirtyHash();
+        }
 
-		bool operator==(const HashedVector<T>& b)
-		{ return mListHash == b.mListHash; }
+        bool operator==(const HashedVector<T>& b)
+        { return mListHash == b.mListHash; }
 
-		bool operator<(const HashedVector<T>& b)
-		{ return mListHash < b.mListHash; }
-
-
-		/// Get the hash value
-		uint32 getHash() const 
-		{ 
-			if (isHashDirty())
-				recalcHash();
-
-			return mListHash; 
-		}
-	public:
+        bool operator<(const HashedVector<T>& b)
+        { return mListHash < b.mListHash; }
 
 
+        /// Get the hash value
+        uint32 getHash() const 
+        { 
+            if (isHashDirty())
+                recalcHash();
 
-	};
+            return mListHash; 
+        }
+    public:
 
-	class Light;
-	typedef HashedVector<Light*> LightList;
+
+
+    };
+
+    class Light;
+    typedef HashedVector<Light*> LightList;
 
 
     /// Constant blank string, useful for returning by ref where local does not exist
@@ -549,8 +549,8 @@ namespace Ogre {
     typedef map<String, bool>::type UnaryOptionList;
     typedef map<String, String>::type BinaryOptionList;
 
-	/// Name / value parameter pair (first = name, second = value)
-	typedef map<String, String>::type NameValuePairList;
+    /// Name / value parameter pair (first = name, second = value)
+    typedef map<String, String>::type NameValuePairList;
 
     /// Alias / Texture name pair (first = alias, second = texture name)
     typedef map<String, String>::type AliasTextureNamePairList;
@@ -583,98 +583,98 @@ namespace Ogre {
           {
             return bottom - top;
           }
-		  bool isNull() const
-		  {
-			  return width() == 0 || height() == 0;
-		  }
-		  void setNull()
-		  {
-			  left = right = top = bottom = 0;
-		  }
-		  TRect & merge(const TRect& rhs)
-		  {
-			  if (isNull())
-			  {
-				  *this = rhs;
-			  }
-			  else if (!rhs.isNull())
-			  {
-				  left = std::min(left, rhs.left);
-				  right = std::max(right, rhs.right);
-				  top = std::min(top, rhs.top);
-				  bottom = std::max(bottom, rhs.bottom);
-			  }
+          bool isNull() const
+          {
+              return width() == 0 || height() == 0;
+          }
+          void setNull()
+          {
+              left = right = top = bottom = 0;
+          }
+          TRect & merge(const TRect& rhs)
+          {
+              if (isNull())
+              {
+                  *this = rhs;
+              }
+              else if (!rhs.isNull())
+              {
+                  left = std::min(left, rhs.left);
+                  right = std::max(right, rhs.right);
+                  top = std::min(top, rhs.top);
+                  bottom = std::max(bottom, rhs.bottom);
+              }
 
-			  return *this;
+              return *this;
 
-		  }
-		  TRect intersect(const TRect& rhs) const
-		  {
-			  TRect ret;
-			  if (isNull() || rhs.isNull())
-			  {
-				  // empty
-				  return ret;
-			  }
-			  else
-			  {
-				  ret.left = std::max(left, rhs.left);
-				  ret.right = std::min(right, rhs.right);
-				  ret.top = std::max(top, rhs.top);
-				  ret.bottom = std::min(bottom, rhs.bottom);
-			  }
+          }
+          TRect intersect(const TRect& rhs) const
+          {
+              TRect ret;
+              if (isNull() || rhs.isNull())
+              {
+                  // empty
+                  return ret;
+              }
+              else
+              {
+                  ret.left = std::max(left, rhs.left);
+                  ret.right = std::min(right, rhs.right);
+                  ret.top = std::max(top, rhs.top);
+                  ret.bottom = std::min(bottom, rhs.bottom);
+              }
 
-			  if (ret.left > ret.right || ret.top > ret.bottom)
-			  {
-				  // no intersection, return empty
-				  ret.left = ret.top = ret.right = ret.bottom = 0;
-			  }
+              if (ret.left > ret.right || ret.top > ret.bottom)
+              {
+                  // no intersection, return empty
+                  ret.left = ret.top = ret.right = ret.bottom = 0;
+              }
 
-			  return ret;
+              return ret;
 
-		  }
+          }
 
         };
-		template<typename T>
-		std::ostream& operator<<(std::ostream& o, const TRect<T>& r)
-		{
-			o << "TRect<>(l:" << r.left << ", t:" << r.top << ", r:" << r.right << ", b:" << r.bottom << ")";
-			return o;
-		}
+        template<typename T>
+        std::ostream& operator<<(std::ostream& o, const TRect<T>& r)
+        {
+            o << "TRect<>(l:" << r.left << ", t:" << r.top << ", r:" << r.right << ", b:" << r.bottom << ")";
+            return o;
+        }
 
         /** Structure used to define a rectangle in a 2-D floating point space.
         */
         typedef TRect<float> FloatRect;
 
-		/** Structure used to define a rectangle in a 2-D floating point space, 
-			subject to double / single floating point settings.
-		*/
-		typedef TRect<Real> RealRect;
+        /** Structure used to define a rectangle in a 2-D floating point space, 
+            subject to double / single floating point settings.
+        */
+        typedef TRect<Real> RealRect;
 
         /** Structure used to define a rectangle in a 2-D integer space.
         */
         typedef TRect< long > Rect;
 
         /** Structure used to define a box in a 3-D integer space.
-         	Note that the left, top, and front edges are included but the right, 
-         	bottom and back ones are not.
+            Note that the left, top, and front edges are included but the right, 
+            bottom and back ones are not.
          */
         struct Box
         {
             uint32 left, top, right, bottom, front, back;
-			/// Parameterless constructor for setting the members manually
+            /// Parameterless constructor for setting the members manually
             Box()
-				: left(0), top(0), right(1), bottom(1), front(0), back(1)
+                : left(0), top(0), right(1), bottom(1), front(0), back(1)
             {
             }
             /** Define a box from left, top, right and bottom coordinates
-            	This box will have depth one (front=0 and back=1).
-            	@param	l	x value of left edge
-            	@param	t	y value of top edge
-            	@param	r	x value of right edge
-            	@param	b	y value of bottom edge
-            	@note Note that the left, top, and front edges are included 
- 		           	but the right, bottom and back ones are not.
+                This box will have depth one (front=0 and back=1).
+                @param  l   x value of left edge
+                @param  t   y value of top edge
+                @param  r   x value of right edge
+                @param  b   y value of bottom edge
+                @note Note that the left, top, and front edges are included 
+                    but the right, bottom and back ones are not.
             */
             Box( uint32 l, uint32 t, uint32 r, uint32 b ):
                 left(l),
@@ -684,18 +684,18 @@ namespace Ogre {
                 front(0),
                 back(1)
             {
-          		assert(right >= left && bottom >= top && back >= front);
+                assert(right >= left && bottom >= top && back >= front);
             }
             /** Define a box from left, top, front, right, bottom and back
-            	coordinates.
-            	@param	l	x value of left edge
-            	@param	t	y value of top edge
-            	@param  ff  z value of front edge
-            	@param	r	x value of right edge
-            	@param	b	y value of bottom edge
-            	@param  bb  z value of back edge
-            	@note Note that the left, top, and front edges are included 
- 		           	but the right, bottom and back ones are not.
+                coordinates.
+                @param  l   x value of left edge
+                @param  t   y value of top edge
+                @param  ff  z value of front edge
+                @param  r   x value of right edge
+                @param  b   y value of bottom edge
+                @param  bb  z value of back edge
+                @note Note that the left, top, and front edges are included 
+                    but the right, bottom and back ones are not.
             */
             Box( uint32 l, uint32 t, uint32 ff, uint32 r, uint32 b, uint32 bb ):
                 left(l),
@@ -705,14 +705,14 @@ namespace Ogre {
                 front(ff),
                 back(bb)
             {
-          		assert(right >= left && bottom >= top && back >= front);
+                assert(right >= left && bottom >= top && back >= front);
             }
             
             /// Return true if the other box is a part of this one
             bool contains(const Box &def) const
             {
-            	return (def.left >= left && def.top >= top && def.front >= front &&
-					def.right <= right && def.bottom <= bottom && def.back <= back);
+                return (def.left >= left && def.top >= top && def.front >= front &&
+                    def.right <= right && def.bottom <= bottom && def.back <= back);
             }
             
             /// Get the width of this box
@@ -724,8 +724,8 @@ namespace Ogre {
         };
 
     
-	
-	/** Locate command-line options of the unary form '-blah' and of the
+    
+    /** Locate command-line options of the unary form '-blah' and of the
         binary form '-blah foo', passing back the index of the next non-option.
     @param numargs, argv The standard parameters passed to the main method
     @param unaryOptList Map of unary options (i.e. those that do not require a parameter).
@@ -739,35 +739,35 @@ namespace Ogre {
     int _OgreExport findCommandLineOpts(int numargs, char** argv, UnaryOptionList& unaryOptList, 
         BinaryOptionList& binOptList);
 
-	/// Generic result of clipping
-	enum ClipResult
-	{
-		/// Nothing was clipped
-		CLIPPED_NONE = 0,
-		/// Partially clipped
-		CLIPPED_SOME = 1, 
-		/// Everything was clipped away
-		CLIPPED_ALL = 2
-	};
+    /// Generic result of clipping
+    enum ClipResult
+    {
+        /// Nothing was clipped
+        CLIPPED_NONE = 0,
+        /// Partially clipped
+        CLIPPED_SOME = 1, 
+        /// Everything was clipped away
+        CLIPPED_ALL = 2
+    };
 
-	/// Render window creation parameters.
-	struct RenderWindowDescription
-	{
-		String				name;
-		unsigned int		width;
-		unsigned int		height;
-		bool				useFullScreen;
-		NameValuePairList	miscParams;
-	};
+    /// Render window creation parameters.
+    struct RenderWindowDescription
+    {
+        String              name;
+        unsigned int        width;
+        unsigned int        height;
+        bool                useFullScreen;
+        NameValuePairList   miscParams;
+    };
 
-	/// Render window creation parameters container.
-	typedef vector<RenderWindowDescription>::type RenderWindowDescriptionList;
+    /// Render window creation parameters container.
+    typedef vector<RenderWindowDescription>::type RenderWindowDescriptionList;
 
-	/// Render window container.
-	typedef vector<RenderWindow*>::type RenderWindowList;
+    /// Render window container.
+    typedef vector<RenderWindow*>::type RenderWindowList;
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

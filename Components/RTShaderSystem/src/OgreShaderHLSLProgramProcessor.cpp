@@ -49,30 +49,30 @@ HLSLProgramProcessor::~HLSLProgramProcessor()
 //-----------------------------------------------------------------------------
 bool HLSLProgramProcessor::preCreateGpuPrograms( ProgramSet* programSet )
 {
-	Program* vsProgram = programSet->getCpuVertexProgram();
-	Program* psProgram = programSet->getCpuFragmentProgram();
-	Function* vsMain   = vsProgram->getEntryPointFunction();
-	Function* fsMain   = psProgram->getEntryPointFunction();	
-	bool success;
+    Program* vsProgram = programSet->getCpuVertexProgram();
+    Program* psProgram = programSet->getCpuFragmentProgram();
+    Function* vsMain   = vsProgram->getEntryPointFunction();
+    Function* fsMain   = psProgram->getEntryPointFunction();    
+    bool success;
 
-	// Compact vertex shader outputs.
-	success = ProgramProcessor::compactVsOutputs(vsMain, fsMain);
-	if (success == false)	
-		return false;	
+    // Compact vertex shader outputs.
+    success = ProgramProcessor::compactVsOutputs(vsMain, fsMain);
+    if (success == false)   
+        return false;   
 
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 bool HLSLProgramProcessor::postCreateGpuPrograms( ProgramSet* programSet )
 {
-	// Bind vertex shader auto parameters.
-	bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
+    // Bind vertex shader auto parameters.
+    bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
 
-	// Bind fragment shader auto parameters.
-	bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
+    // Bind fragment shader auto parameters.
+    bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
 
-	return true;
+    return true;
 }
 
 }

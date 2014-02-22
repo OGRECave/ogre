@@ -148,7 +148,7 @@ namespace Ogre {
                     else
                     {
                         // Attribute
-						StringUtil::toLowerCase(line);
+                        StringUtil::toLowerCase(line);
                         parseShaderAttrib(line, pShader);
                     }
 
@@ -301,7 +301,7 @@ namespace Ogre {
         if (params[0] == "map")
         {
             pPass->textureName = params[1];
-			StringUtil::toLowerCase(params[1]);
+            StringUtil::toLowerCase(params[1]);
             if (params[1] == "$lightmap")
                 pPass->texGen = TEXGEN_LIGHTMAP;
         }
@@ -309,7 +309,7 @@ namespace Ogre {
         if (params[0] == "clampmap")
         {
             pPass->textureName = params[1];
-			StringUtil::toLowerCase(params[1]);
+            StringUtil::toLowerCase(params[1]);
             if (params[1] == "$lightmap")
                 pPass->texGen = TEXGEN_LIGHTMAP;
             pPass->addressMode = TextureUnitState::TAM_CLAMP;

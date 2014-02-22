@@ -45,9 +45,9 @@ namespace Ogre
 */
 bool Octree::_isTwiceSize( const AxisAlignedBox &box ) const
 {
-	// infinite boxes never fit in a child - always root node
-	if (box.isInfinite())
-		return false;
+    // infinite boxes never fit in a child - always root node
+    if (box.isInfinite())
+        return false;
 
     Vector3 halfMBoxSize = mBox.getHalfSize();
     Vector3 boxSize = box.getSize();

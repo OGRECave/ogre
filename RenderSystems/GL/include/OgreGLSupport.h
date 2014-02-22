@@ -53,7 +53,7 @@ public:
     */
     virtual void addConfig() = 0;
 
-	virtual void setConfigOption(const String &name, const String &value);
+    virtual void setConfigOption(const String &name, const String &value);
 
     /**
     * Make sure all the extra options are valid
@@ -61,13 +61,13 @@ public:
     */
     virtual String validateConfig() = 0;
 
-	virtual ConfigOptionMap& getConfigOptions(void);
+    virtual ConfigOptionMap& getConfigOptions(void);
 
-	virtual RenderWindow* createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle) = 0;
+    virtual RenderWindow* createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle) = 0;
 
-	/// @copydoc RenderSystem::_createRenderWindow
-	virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 
-		bool fullScreen, const NameValuePairList *miscParams = 0) = 0;
+    /// @copydoc RenderSystem::_createRenderWindow
+    virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 
+        bool fullScreen, const NameValuePairList *miscParams = 0) = 0;
 
     virtual bool supportsPBuffers();
     virtual GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height);
@@ -126,17 +126,17 @@ public:
     */
     virtual void initialiseExtensions();
 
-	/// @copydoc RenderSystem::getDisplayMonitorCount
-	virtual unsigned int getDisplayMonitorCount() const
-	{
-		return 1;
-	}
+    /// @copydoc RenderSystem::getDisplayMonitorCount
+    virtual unsigned int getDisplayMonitorCount() const
+    {
+        return 1;
+    }
 
 protected:
-	// Stored options
+    // Stored options
     ConfigOptionMap mOptions;
 
-	// This contains the complete list of supported extensions
+    // This contains the complete list of supported extensions
     set<String>::type extensionList;
 private:
     String mVersion;

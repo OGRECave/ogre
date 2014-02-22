@@ -32,50 +32,50 @@ THE SOFTWARE.
 #include "OgreNaClGLSupport.h"
 
 namespace Ogre {
-	class NaClGLContext;
-	
-	
+    class NaClGLContext;
+    
+    
     class _OgrePrivate NaClWindow : public RenderWindow
     {
-	protected:
-		NaClGLSupport* mGLSupport;
-		NaClGLContext* mContext;
+    protected:
+        NaClGLSupport* mGLSupport;
+        NaClGLContext* mContext;
         pp::Instance* mInstance;
         pp::CompletionCallback* mSwapCallback;
-		bool mClosed;
+        bool mClosed;
 
-		void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
-		void initNativeCreatedWindow(const NameValuePairList *miscParams);
-		void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
-		void reposition(int left, int top);
-		void resize(unsigned int width, unsigned int height);
-		void windowMovedOrResized();
-		void switchFullScreen(bool fullscreen);
+        void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+        void initNativeCreatedWindow(const NameValuePairList *miscParams);
+        void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
+        void reposition(int left, int top);
+        void resize(unsigned int width, unsigned int height);
+        void windowMovedOrResized();
+        void switchFullScreen(bool fullscreen);
 
 
-	public:
+    public:
         NaClWindow(NaClGLSupport* glsupport);
         virtual  ~NaClWindow();
 
-		/**
-		@remarks
-		* Get custom attribute; the following attributes are valid:
-		* HANDLE        The integer id of the android window
-		* GLCONTEXT      The Ogre GLContext used for rendering.
-		*/
-		void getCustomAttribute(const String& name, void* pData);
-		
-		void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
-		bool requiresTextureFlipping() const;
-		void destroy(void);
-		bool isClosed(void) const;
+        /**
+        @remarks
+        * Get custom attribute; the following attributes are valid:
+        * HANDLE        The integer id of the android window
+        * GLCONTEXT      The Ogre GLContext used for rendering.
+        */
+        void getCustomAttribute(const String& name, void* pData);
+        
+        void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        bool requiresTextureFlipping() const;
+        void destroy(void);
+        bool isClosed(void) const;
 
         void swapBuffers();
 
-	    //Moved this from EGLWindow because it has some native calls.
+        //Moved this from EGLWindow because it has some native calls.
         void create(const String& name, unsigned int width, unsigned int height,
-			bool fullScreen, const NameValuePairList *miscParams);
-	};
+            bool fullScreen, const NameValuePairList *miscParams);
+    };
 }
 
 #endif

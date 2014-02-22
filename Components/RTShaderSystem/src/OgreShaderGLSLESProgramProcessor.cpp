@@ -44,81 +44,81 @@ GLSLESProgramProcessor::GLSLESProgramProcessor()
 //-----------------------------------------------------------------------------
 GLSLESProgramProcessor::~GLSLESProgramProcessor()
 {
-	StringVector::iterator it = mLibraryPrograms.begin();
-	StringVector::iterator itEnd = mLibraryPrograms.end();
-	
-	for (; it != itEnd; ++it)
-	{
-		HighLevelGpuProgramManager::getSingleton().remove(*it);
-	}
-	mLibraryPrograms.clear();
+    StringVector::iterator it = mLibraryPrograms.begin();
+    StringVector::iterator itEnd = mLibraryPrograms.end();
+    
+    for (; it != itEnd; ++it)
+    {
+        HighLevelGpuProgramManager::getSingleton().remove(*it);
+    }
+    mLibraryPrograms.clear();
 }
 
 //-----------------------------------------------------------------------------
 bool GLSLESProgramProcessor::preCreateGpuPrograms(ProgramSet* programSet)
 {
-	Program* vsProgram = programSet->getCpuVertexProgram();
-	Program* fsProgram = programSet->getCpuFragmentProgram();
-	Function* vsMain   = vsProgram->getEntryPointFunction();
-	Function* fsMain   = fsProgram->getEntryPointFunction();	
-	bool success;
+    Program* vsProgram = programSet->getCpuVertexProgram();
+    Program* fsProgram = programSet->getCpuFragmentProgram();
+    Function* vsMain   = vsProgram->getEntryPointFunction();
+    Function* fsMain   = fsProgram->getEntryPointFunction();    
+    bool success;
 
-	// Compact vertex shader outputs.
-	success = ProgramProcessor::compactVsOutputs(vsMain, fsMain);
-	if (success == false)	
-		return false;	
+    // Compact vertex shader outputs.
+    success = ProgramProcessor::compactVsOutputs(vsMain, fsMain);
+    if (success == false)   
+        return false;   
 
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 bool GLSLESProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
 {
-	Program* vsCpuProgram = programSet->getCpuVertexProgram();
-	Program* fsCpuProgram = programSet->getCpuFragmentProgram();
-	GpuProgramPtr vsGpuProgram = programSet->getGpuVertexProgram();
-	GpuProgramPtr fsGpuProgram = programSet->getGpuFragmentProgram();
+    Program* vsCpuProgram = programSet->getCpuVertexProgram();
+    Program* fsCpuProgram = programSet->getCpuFragmentProgram();
+    GpuProgramPtr vsGpuProgram = programSet->getGpuVertexProgram();
+    GpuProgramPtr fsGpuProgram = programSet->getGpuFragmentProgram();
 
-	// Bind vertex shader auto parameters.
-	bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
+    // Bind vertex shader auto parameters.
+    bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
 
-	// Bind fragment shader auto parameters.
-	bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
+    // Bind fragment shader auto parameters.
+    bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
 
-	// Bind texture samplers for the vertex shader.
-	bindTextureSamplers(vsCpuProgram, vsGpuProgram);
+    // Bind texture samplers for the vertex shader.
+    bindTextureSamplers(vsCpuProgram, vsGpuProgram);
 
-	// Bind texture samplers for the fragment shader.
-	bindTextureSamplers(fsCpuProgram, fsGpuProgram);
+    // Bind texture samplers for the fragment shader.
+    bindTextureSamplers(fsCpuProgram, fsGpuProgram);
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
-	vsGpuProgram->setParameter("use_optimiser", "true");
-	fsGpuProgram->setParameter("use_optimiser", "true");
+    vsGpuProgram->setParameter("use_optimiser", "true");
+    fsGpuProgram->setParameter("use_optimiser", "true");
 #endif
 
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 void GLSLESProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
 {
-	GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
-	const UniformParameterList& progParams = pCpuProgram->getParameters();
-	UniformParameterConstIterator itParams;
+    GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
+    const UniformParameterList& progParams = pCpuProgram->getParameters();
+    UniformParameterConstIterator itParams;
 
-	// Bind the samplers.
-	for (itParams = progParams.begin(); itParams != progParams.end(); ++itParams)
-	{
-		const UniformParameterPtr pCurParam = *itParams;
-		
-		if (pCurParam->isSampler())
-		{
+    // Bind the samplers.
+    for (itParams = progParams.begin(); itParams != progParams.end(); ++itParams)
+    {
+        const UniformParameterPtr pCurParam = *itParams;
+        
+        if (pCurParam->isSampler())
+        {
             // The optimizer may remove some unnecessary parameters, so we should ignore them
             pGpuParams->setIgnoreMissingParams(true);
 
             pGpuParams->setNamedConstant(pCurParam->getName(), pCurParam->getIndex());
-		}
-	}
+        }
+    }
 }
 
 }

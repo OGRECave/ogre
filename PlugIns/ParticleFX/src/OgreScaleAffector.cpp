@@ -63,24 +63,24 @@ namespace Ogre {
         // Scale adjustments by time
         ds = mScaleAdj * timeElapsed;
 
-		Real NewWide, NewHigh;
+        Real NewWide, NewHigh;
 
         while (!pi.end())
         {
             p = pi.getNext();
 
-			if( p->hasOwnDimensions() == false )
-			{
-            	NewWide = pSystem->getDefaultWidth() + ds;
-	            NewHigh = pSystem->getDefaultHeight() + ds;
+            if( p->hasOwnDimensions() == false )
+            {
+                NewWide = pSystem->getDefaultWidth() + ds;
+                NewHigh = pSystem->getDefaultHeight() + ds;
 
-			}
-			else
-			{
-            	NewWide = p->getOwnWidth()  + ds;
-            	NewHigh = p->getOwnHeight() + ds;
-			}
-			p->setDimensions( NewWide, NewHigh ); 
+            }
+            else
+            {
+                NewWide = p->getOwnWidth()  + ds;
+                NewHigh = p->getOwnHeight() + ds;
+            }
+            p->setDimensions( NewWide, NewHigh ); 
         }
 
     }

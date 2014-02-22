@@ -34,70 +34,70 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Optional Components
-	*  @{
-	*/
-	/** \addtogroup Paging
-	*  Some details on paging component
-	*  @{
-	*/
+    /** \addtogroup Optional Components
+    *  @{
+    */
+    /** \addtogroup Paging
+    *  Some details on paging component
+    *  @{
+    */
 
 
-	/** Definition of the interface for a collection of PageContent instances. 
-	@remarks
-		This class acts as a grouping level for PageContent instances. Rather than 
-		PageContent instances being held in a list directly under Page, which might 
-		be the most obvious solution, this intermediate class is here to allow
-		the collection of relevant PageContent instances to be modified at runtime
-		if required. For example, potentially you might want to define Page-level LOD
-		in which different collections of PageContent are loaded at different times.
-	*/
-	class _OgrePagingExport PageContentCollection : public PageAlloc
-	{
-	protected:
-		PageContentCollectionFactory* mCreator;
-		Page* mParent;
-	public:
-		static const uint32 CHUNK_ID;
-		static const uint16 CHUNK_VERSION;
+    /** Definition of the interface for a collection of PageContent instances. 
+    @remarks
+        This class acts as a grouping level for PageContent instances. Rather than 
+        PageContent instances being held in a list directly under Page, which might 
+        be the most obvious solution, this intermediate class is here to allow
+        the collection of relevant PageContent instances to be modified at runtime
+        if required. For example, potentially you might want to define Page-level LOD
+        in which different collections of PageContent are loaded at different times.
+    */
+    class _OgrePagingExport PageContentCollection : public PageAlloc
+    {
+    protected:
+        PageContentCollectionFactory* mCreator;
+        Page* mParent;
+    public:
+        static const uint32 CHUNK_ID;
+        static const uint16 CHUNK_VERSION;
 
-		PageContentCollection(PageContentCollectionFactory* creator);
-		virtual ~PageContentCollection();
+        PageContentCollection(PageContentCollectionFactory* creator);
+        virtual ~PageContentCollection();
 
-		PageManager* getManager() const;
-		Page* getParentPage() const { return mParent; }
-		SceneManager* getSceneManager() const;
+        PageManager* getManager() const;
+        Page* getParentPage() const { return mParent; }
+        SceneManager* getSceneManager() const;
 
-		/// Get the type of the collection, which will match it's factory
-		virtual const String& getType() const;
+        /// Get the type of the collection, which will match it's factory
+        virtual const String& getType() const;
 
-		/// Internal method to notify a collection that it is attached
-		virtual void _notifyAttached(Page* parent);
-		/// Save the collection to a stream
-		virtual void save(StreamSerialiser& stream) = 0;
-		/// Called when the frame starts
-		virtual void frameStart(Real timeSinceLastFrame) = 0;
-		/// Called when the frame ends
-		virtual void frameEnd(Real timeElapsed) = 0;
-		/// Notify a section of the current camera
-		virtual void notifyCamera(Camera* cam) = 0;
-
-
-		/// Prepare data - may be called in the background
-		virtual bool prepare(StreamSerialiser& ser) = 0;
-		/// Load - will be called in main thread
-		virtual void load() = 0;
-		/// Unload - will be called in main thread
-		virtual void unload() = 0;
-		/// Unprepare data - may be called in the background
-		virtual void unprepare() = 0;
+        /// Internal method to notify a collection that it is attached
+        virtual void _notifyAttached(Page* parent);
+        /// Save the collection to a stream
+        virtual void save(StreamSerialiser& stream) = 0;
+        /// Called when the frame starts
+        virtual void frameStart(Real timeSinceLastFrame) = 0;
+        /// Called when the frame ends
+        virtual void frameEnd(Real timeElapsed) = 0;
+        /// Notify a section of the current camera
+        virtual void notifyCamera(Camera* cam) = 0;
 
 
-	};
+        /// Prepare data - may be called in the background
+        virtual bool prepare(StreamSerialiser& ser) = 0;
+        /// Load - will be called in main thread
+        virtual void load() = 0;
+        /// Unload - will be called in main thread
+        virtual void unload() = 0;
+        /// Unprepare data - may be called in the background
+        virtual void unprepare() = 0;
 
 
-	/** @} */
-	/** @} */
+    };
+
+
+    /** @} */
+    /** @} */
 }
 
 #endif

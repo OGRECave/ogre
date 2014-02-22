@@ -31,43 +31,43 @@
 
 namespace Ogre
 {
-	LodCollapseCostOutside::LodCollapseCostOutside( LodCollapseCostPtr costCalculator, Real outsideWeight, Real outsideWalkAngle ) :
-		mOutsideWeight(outsideWeight),
-		mOutsideWalkAngle(outsideWalkAngle),
-		mCostCalculator(costCalculator),
-		mOutsideMarker(NULL)
-	{
-	}
+    LodCollapseCostOutside::LodCollapseCostOutside( LodCollapseCostPtr costCalculator, Real outsideWeight, Real outsideWalkAngle ) :
+        mOutsideWeight(outsideWeight),
+        mOutsideWalkAngle(outsideWalkAngle),
+        mCostCalculator(costCalculator),
+        mOutsideMarker(NULL)
+    {
+    }
 
-	LodCollapseCostOutside::~LodCollapseCostOutside()
-	{
-		delete mOutsideMarker;
-	}
+    LodCollapseCostOutside::~LodCollapseCostOutside()
+    {
+        delete mOutsideMarker;
+    }
 
-	void LodCollapseCostOutside::initCollapseCosts( LodData* data )
-	{
-		OgreAssert(mOutsideWeight != 0.0, "");
+    void LodCollapseCostOutside::initCollapseCosts( LodData* data )
+    {
+        OgreAssert(mOutsideWeight != 0.0, "");
 
-		delete mOutsideMarker;
-		mOutsideMarker = new LodOutsideMarker(data->mVertexList, data->mMeshBoundingSphereRadius, mOutsideWalkAngle);
-		mOutsideMarker->markOutside();
+        delete mOutsideMarker;
+        mOutsideMarker = new LodOutsideMarker(data->mVertexList, data->mMeshBoundingSphereRadius, mOutsideWalkAngle);
+        mOutsideMarker->markOutside();
 
 
-		mCostCalculator->initCollapseCosts(data);
-	}
+        mCostCalculator->initCollapseCosts(data);
+    }
 
-	Real LodCollapseCostOutside::computeEdgeCollapseCost( LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge )
-	{
-		Real cost = mCostCalculator->computeEdgeCollapseCost(data, src, dstEdge);
-		if(mOutsideMarker->isVertexOutside(src) || mOutsideMarker->isVertexOutside(dstEdge->dst)) {
-			if(mOutsideWeight != LodData::NEVER_COLLAPSE_COST && cost != LodData::NEVER_COLLAPSE_COST) {
-				cost *= std::max<Real>(0.0078125f, mOutsideWeight * 8.0f);
-			} else {
-				return LodData::NEVER_COLLAPSE_COST;
-			}
-		}
-		OgreAssert(cost >= 0 && cost != LodData::UNINITIALIZED_COLLAPSE_COST, "Invalid collapse cost");
-		return cost;
-	}
+    Real LodCollapseCostOutside::computeEdgeCollapseCost( LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge )
+    {
+        Real cost = mCostCalculator->computeEdgeCollapseCost(data, src, dstEdge);
+        if(mOutsideMarker->isVertexOutside(src) || mOutsideMarker->isVertexOutside(dstEdge->dst)) {
+            if(mOutsideWeight != LodData::NEVER_COLLAPSE_COST && cost != LodData::NEVER_COLLAPSE_COST) {
+                cost *= std::max<Real>(0.0078125f, mOutsideWeight * 8.0f);
+            } else {
+                return LodData::NEVER_COLLAPSE_COST;
+            }
+        }
+        OgreAssert(cost >= 0 && cost != LodData::UNINITIALIZED_COLLAPSE_COST, "Invalid collapse cost");
+        return cost;
+    }
 }
 

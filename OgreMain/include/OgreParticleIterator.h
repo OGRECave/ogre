@@ -34,13 +34,13 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
-	/** Convenience class to make it easy to step through all particles in a ParticleSystem.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
+    /** Convenience class to make it easy to step through all particles in a ParticleSystem.
     */
     class _OgreExport ParticleIterator
     {
@@ -60,8 +60,8 @@ namespace Ogre {
         /** Returns a pointer to the next particle, and moves the iterator on by 1 element. */
         Particle* getNext(void);
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

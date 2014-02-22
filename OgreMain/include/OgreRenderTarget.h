@@ -35,20 +35,20 @@ THE SOFTWARE.
 
 /* Define the number of priority groups for the render system's render targets. */
 #ifndef OGRE_NUM_RENDERTARGET_GROUPS
-	#define OGRE_NUM_RENDERTARGET_GROUPS 10
-	#define OGRE_DEFAULT_RT_GROUP 4
-	#define OGRE_REND_TO_TEX_RT_GROUP 2
+    #define OGRE_NUM_RENDERTARGET_GROUPS 10
+    #define OGRE_DEFAULT_RT_GROUP 4
+    #define OGRE_REND_TO_TEX_RT_GROUP 2
 #endif
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/** A 'canvas' which can receive the results of a rendering
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /** A 'canvas' which can receive the results of a rendering
         operation.
         @remarks
             This abstract class defines a common root to all targets of rendering operations. A
@@ -83,15 +83,15 @@ namespace Ogre {
             unsigned long worstFrameTime;
             size_t triangleCount;
             size_t batchCount;
-			int vBlankMissCount; // -1 means that the value is not applicable
+            int vBlankMissCount; // -1 means that the value is not applicable
         };
 
-		enum FrameBuffer
-		{
-			FB_FRONT,
-			FB_BACK,
-			FB_AUTO
-		};
+        enum FrameBuffer
+        {
+            FB_FRONT,
+            FB_BACK,
+            FB_AUTO
+        };
 
         RenderTarget();
         virtual ~RenderTarget();
@@ -106,30 +106,30 @@ namespace Ogre {
         virtual uint32 getHeight(void) const;
         virtual uint32 getColourDepth(void) const;
 
-		/**
-		 * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.
-		 * Set to POOL_NO_DEPTH to avoid using a DepthBuffer (or manually controlling it) @see DepthBuffer
-		 *	@remarks
-		 *		Changing the pool Id will cause the current depth buffer to be detached unless the old
-		 *		id and the new one are the same
-		 */
-		void setDepthBufferPool( uint16 poolId );
+        /**
+         * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.
+         * Set to POOL_NO_DEPTH to avoid using a DepthBuffer (or manually controlling it) @see DepthBuffer
+         *  @remarks
+         *      Changing the pool Id will cause the current depth buffer to be detached unless the old
+         *      id and the new one are the same
+         */
+        void setDepthBufferPool( uint16 poolId );
 
-		//Returns the pool ID this RenderTarget should query from. @see DepthBuffer
-		uint16 getDepthBufferPool() const;
+        //Returns the pool ID this RenderTarget should query from. @see DepthBuffer
+        uint16 getDepthBufferPool() const;
 
-		DepthBuffer* getDepthBuffer() const;
+        DepthBuffer* getDepthBuffer() const;
 
-		//Returns false if couldn't attach
-		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
+        //Returns false if couldn't attach
+        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
 
-		virtual void detachDepthBuffer();
+        virtual void detachDepthBuffer();
 
-		/** Detaches DepthBuffer without notifying it from the detach.
-			Useful when called from the DepthBuffer while it iterates through attached
-			RenderTargets (@see DepthBuffer::_setPoolId())
-		*/
-		virtual void _detachDepthBuffer();
+        /** Detaches DepthBuffer without notifying it from the detach.
+            Useful when called from the DepthBuffer while it iterates through attached
+            RenderTargets (@see DepthBuffer::_setPoolId())
+        */
+        virtual void _detachDepthBuffer();
 
         /** Tells the target to update it's contents.
             @remarks
@@ -143,15 +143,15 @@ namespace Ogre {
                 This allows OGRE to be used in multi-windowed utilities
                 and for contents to be refreshed only when required, rather than
                 constantly as with the automatic rendering loop.
-			@param swapBuffers For targets that support double-buffering, if set 
-				to true, the target will immediately
-				swap it's buffers after update. Otherwise, the buffers are
-				not swapped, and you have to call swapBuffers yourself sometime
-				later. You might want to do this on some rendersystems which 
-				pause for queued rendering commands to complete before accepting
-				swap buffers calls - so you could do other CPU tasks whilst the 
-				queued commands complete. Or, you might do this if you want custom
-				control over your windows, such as for externally created windows.
+            @param swapBuffers For targets that support double-buffering, if set 
+                to true, the target will immediately
+                swap it's buffers after update. Otherwise, the buffers are
+                not swapped, and you have to call swapBuffers yourself sometime
+                later. You might want to do this on some rendersystems which 
+                pause for queued rendering commands to complete before accepting
+                swap buffers calls - so you could do other CPU tasks whilst the 
+                queued commands complete. Or, you might do this if you want custom
+                control over your windows, such as for externally created windows.
         */
         virtual void update(bool swapBuffers = true);
         /** Swaps the frame buffers to display the next frame.
@@ -196,13 +196,13 @@ namespace Ogre {
         /** Retrieves a pointer to the viewport with the given index. */
         virtual Viewport* getViewport(unsigned short index);
 
-		/** Retrieves a pointer to the viewport with the given Z-order. 
-			@remarks throws if not found.
-		*/
+        /** Retrieves a pointer to the viewport with the given Z-order. 
+            @remarks throws if not found.
+        */
         virtual Viewport* getViewportByZOrder(int ZOrder);
 
-		/** Returns true if and only if a viewport exists at the given Z-order. */
-		virtual bool hasViewportWithZOrder(int ZOrder);
+        /** Returns true if and only if a viewport exists at the given Z-order. */
+        virtual bool hasViewportWithZOrder(int ZOrder);
 
         /** Removes a viewport at a given Z-order.
         */
@@ -288,7 +288,7 @@ namespace Ogre {
         /** Removes all listeners from this instance. */
         virtual void removeAllListeners(void);
 
-		/** Sets the priority of this render target in relation to the others. 
+        /** Sets the priority of this render target in relation to the others. 
         @remarks
             This can be used in order to schedule render target updates. Lower
             priorities will be rendered first. Note that the priority must be set
@@ -297,7 +297,7 @@ namespace Ogre {
         */
         virtual void setPriority( uchar priority ) { mPriority = priority; }
         /** Gets the priority of a render target. */
-		virtual uchar getPriority() const { return mPriority; }
+        virtual uchar getPriority() const { return mPriority; }
 
         /** Used to retrieve or set the active state of the render target.
         */
@@ -324,31 +324,31 @@ namespace Ogre {
         */
         virtual bool isAutoUpdated(void) const;
 
-		/** Copies the current contents of the render target to a pixelbox. 
-		@remarks See suggestPixelFormat for a tip as to the best pixel format to
-			extract into, although you can use whatever format you like and the 
-			results will be converted.
-		*/
-		virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer = FB_AUTO) = 0;
+        /** Copies the current contents of the render target to a pixelbox. 
+        @remarks See suggestPixelFormat for a tip as to the best pixel format to
+            extract into, although you can use whatever format you like and the 
+            results will be converted.
+        */
+        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer = FB_AUTO) = 0;
 
-		/** Suggests a pixel format to use for extracting the data in this target, 
-			when calling copyContentsToMemory.
-		*/
-		virtual PixelFormat suggestPixelFormat() const { return PF_BYTE_RGBA; }
-		
+        /** Suggests a pixel format to use for extracting the data in this target, 
+            when calling copyContentsToMemory.
+        */
+        virtual PixelFormat suggestPixelFormat() const { return PF_BYTE_RGBA; }
+        
         /** Writes the current contents of the render target to the named file. */
         void writeContentsToFile(const String& filename);
 
-		/** Writes the current contents of the render target to the (PREFIX)(time-stamp)(SUFFIX) file.
-			@return the name of the file used.*/
-		virtual String writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix);
+        /** Writes the current contents of the render target to the (PREFIX)(time-stamp)(SUFFIX) file.
+            @return the name of the file used.*/
+        virtual String writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix);
 
-		virtual bool requiresTextureFlipping() const = 0;
+        virtual bool requiresTextureFlipping() const = 0;
 
-		/** Gets the number of triangles rendered in the last update() call. */
-		virtual size_t getTriangleCount(void) const;
+        /** Gets the number of triangles rendered in the last update() call. */
+        virtual size_t getTriangleCount(void) const;
         /** Gets the number of batches rendered in the last update() call. */
-		virtual size_t getBatchCount(void) const;
+        virtual size_t getBatchCount(void) const;
         /** Utility method to notify a render target that a camera has been removed,
         incase it was referring to it as a viewer.
         */
@@ -362,22 +362,22 @@ namespace Ogre {
         */
         virtual bool isPrimary(void) const;
 
-		/** Indicates whether on rendering, linear colour space is converted to 
-			sRGB gamma colour space. This is the exact opposite conversion of
-			what is indicated by Texture::isHardwareGammaEnabled, and can only
-			be enabled on creation of the render target. For render windows, it's
-			enabled through the 'gamma' creation misc parameter. For textures, 
-			it is enabled through the hwGamma parameter to the create call.
-		*/
-		virtual bool isHardwareGammaEnabled() const { return mHwGamma; }
+        /** Indicates whether on rendering, linear colour space is converted to 
+            sRGB gamma colour space. This is the exact opposite conversion of
+            what is indicated by Texture::isHardwareGammaEnabled, and can only
+            be enabled on creation of the render target. For render windows, it's
+            enabled through the 'gamma' creation misc parameter. For textures, 
+            it is enabled through the hwGamma parameter to the create call.
+        */
+        virtual bool isHardwareGammaEnabled() const { return mHwGamma; }
 
-		/** Indicates whether multisampling is performed on rendering and at what level.
-		*/
-		virtual uint getFSAA() const { return mFSAA; }
+        /** Indicates whether multisampling is performed on rendering and at what level.
+        */
+        virtual uint getFSAA() const { return mFSAA; }
 
-		/** Gets the FSAA hint (@see Root::createRenderWindow)
-		*/
-		virtual const String& getFSAAHint() const { return mFSAAHint; }
+        /** Gets the FSAA hint (@see Root::createRenderWindow)
+        */
+        virtual const String& getFSAAHint() const { return mFSAAHint; }
 
         /** RenderSystem specific interface for a RenderTarget;
             this should be subclassed by RenderSystems.
@@ -394,84 +394,84 @@ namespace Ogre {
         */
         virtual Impl *_getImpl();
 
-		/** Method for manual management of rendering : fires 'preRenderTargetUpdate'
-			and initialises statistics etc.
-		@remarks 
-		<ul>
-		<li>_beginUpdate resets statistics and fires 'preRenderTargetUpdate'.</li>
-		<li>_updateViewport renders the given viewport (even if it is not autoupdated),
-		fires preViewportUpdate and postViewportUpdate and manages statistics.</li>
-		<li>_updateAutoUpdatedViewports renders only viewports that are auto updated,
-		fires preViewportUpdate and postViewportUpdate and manages statistics.</li>
-		<li>_endUpdate() ends statistics calculation and fires postRenderTargetUpdate.</li>
-		</ul>
-		you can use it like this for example :
-		<pre>
-			renderTarget->_beginUpdate();
-			renderTarget->_updateViewport(1); // which is not auto updated
-			renderTarget->_updateViewport(2); // which is not auto updated
-			renderTarget->_updateAutoUpdatedViewports();
-			renderTarget->_endUpdate();
-			renderTarget->swapBuffers();
-		</pre>
-			Please note that in that case, the zorder may not work as you expect,
-			since you are responsible for calling _updateViewport in the correct order.
+        /** Method for manual management of rendering : fires 'preRenderTargetUpdate'
+            and initialises statistics etc.
+        @remarks 
+        <ul>
+        <li>_beginUpdate resets statistics and fires 'preRenderTargetUpdate'.</li>
+        <li>_updateViewport renders the given viewport (even if it is not autoupdated),
+        fires preViewportUpdate and postViewportUpdate and manages statistics.</li>
+        <li>_updateAutoUpdatedViewports renders only viewports that are auto updated,
+        fires preViewportUpdate and postViewportUpdate and manages statistics.</li>
+        <li>_endUpdate() ends statistics calculation and fires postRenderTargetUpdate.</li>
+        </ul>
+        you can use it like this for example :
+        <pre>
+            renderTarget->_beginUpdate();
+            renderTarget->_updateViewport(1); // which is not auto updated
+            renderTarget->_updateViewport(2); // which is not auto updated
+            renderTarget->_updateAutoUpdatedViewports();
+            renderTarget->_endUpdate();
+            renderTarget->swapBuffers();
+        </pre>
+            Please note that in that case, the zorder may not work as you expect,
+            since you are responsible for calling _updateViewport in the correct order.
         */
-		virtual void _beginUpdate();
+        virtual void _beginUpdate();
 
-		/** Method for manual management of rendering - renders the given 
-		viewport (even if it is not autoupdated)
-		@remarks
-		This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
-		You should call it between _beginUpdate() and _endUpdate().
-		@see _beginUpdate for more details.
-		@param zorder The zorder of the viewport to update.
-		@param updateStatistics Whether you want to update statistics or not.
-		*/
-		virtual void _updateViewport(int zorder, bool updateStatistics = true);
+        /** Method for manual management of rendering - renders the given 
+        viewport (even if it is not autoupdated)
+        @remarks
+        This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
+        You should call it between _beginUpdate() and _endUpdate().
+        @see _beginUpdate for more details.
+        @param zorder The zorder of the viewport to update.
+        @param updateStatistics Whether you want to update statistics or not.
+        */
+        virtual void _updateViewport(int zorder, bool updateStatistics = true);
 
-		/** Method for manual management of rendering - renders the given viewport (even if it is not autoupdated)
-		@remarks
-		This also fires preViewportUpdate and postViewportUpdate, and manages statistics
-		if needed. You should call it between _beginUpdate() and _endUpdate().
-		@see _beginUpdate for more details.
-		@param viewport The viewport you want to update, it must be bound to the rendertarget.
-		@param updateStatistics Whether you want to update statistics or not.
-		*/
-		virtual void _updateViewport(Viewport* viewport, bool updateStatistics = true);
+        /** Method for manual management of rendering - renders the given viewport (even if it is not autoupdated)
+        @remarks
+        This also fires preViewportUpdate and postViewportUpdate, and manages statistics
+        if needed. You should call it between _beginUpdate() and _endUpdate().
+        @see _beginUpdate for more details.
+        @param viewport The viewport you want to update, it must be bound to the rendertarget.
+        @param updateStatistics Whether you want to update statistics or not.
+        */
+        virtual void _updateViewport(Viewport* viewport, bool updateStatistics = true);
 
-		/** Method for manual management of rendering - renders only viewports that are auto updated
-		@remarks
-		This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
-		You should call it between _beginUpdate() and _endUpdate().
-		See _beginUpdate for more details.
-		@param updateStatistics Whether you want to update statistics or not.
-		@see _beginUpdate()
-		*/
-		virtual void _updateAutoUpdatedViewports(bool updateStatistics = true);
-		
-		/** Method for manual management of rendering - finishes statistics calculation 
-			and fires 'postRenderTargetUpdate'.
-		@remarks
-		You should call it after a _beginUpdate
-		@see _beginUpdate for more details.
-		*/
-		virtual void _endUpdate();
+        /** Method for manual management of rendering - renders only viewports that are auto updated
+        @remarks
+        This also fires preViewportUpdate and postViewportUpdate, and manages statistics.
+        You should call it between _beginUpdate() and _endUpdate().
+        See _beginUpdate for more details.
+        @param updateStatistics Whether you want to update statistics or not.
+        @see _beginUpdate()
+        */
+        virtual void _updateAutoUpdatedViewports(bool updateStatistics = true);
+        
+        /** Method for manual management of rendering - finishes statistics calculation 
+            and fires 'postRenderTargetUpdate'.
+        @remarks
+        You should call it after a _beginUpdate
+        @see _beginUpdate for more details.
+        */
+        virtual void _endUpdate();
 
     protected:
         /// The name of this target.
         String mName;
-		/// The priority of the render target.
-		uchar mPriority;
+        /// The priority of the render target.
+        uchar mPriority;
 
         uint32 mWidth;
         uint32 mHeight;
         uint32 mColourDepth;
-		uint16		 mDepthBufferPoolId;
-        DepthBuffer	*mDepthBuffer;
+        uint16       mDepthBufferPoolId;
+        DepthBuffer *mDepthBuffer;
 
         // Stats
-		FrameStats mStats;
+        FrameStats mStats;
         
         Timer* mTimer ;
         unsigned long mLastSecond;
@@ -480,21 +480,21 @@ namespace Ogre {
 
         bool mActive;
         bool mAutoUpdate;
-		// Hardware sRGB gamma conversion done on write?
-		bool mHwGamma;
-		// FSAA performed?
-		uint mFSAA;
-		String mFSAAHint;
+        // Hardware sRGB gamma conversion done on write?
+        bool mHwGamma;
+        // FSAA performed?
+        uint mFSAA;
+        String mFSAAHint;
 
         virtual void updateStats(void);
 
-		typedef map<int, Viewport*>::type ViewportList;
+        typedef map<int, Viewport*>::type ViewportList;
         /// List of viewports, map on Z-order
         ViewportList mViewportList;
 
         typedef vector<RenderTargetListener*>::type RenderTargetListenerList;
         RenderTargetListenerList mListeners;
-	
+    
 
         /// internal method for firing events
         virtual void firePreUpdate(void);
@@ -504,16 +504,16 @@ namespace Ogre {
         virtual void fireViewportPreUpdate(Viewport* vp);
         /// internal method for firing events
         virtual void fireViewportPostUpdate(Viewport* vp);
-		/// internal method for firing events
-		virtual void fireViewportAdded(Viewport* vp);
-		/// internal method for firing events
-		virtual void fireViewportRemoved(Viewport* vp);
-		
-		/// Internal implementation of update()
-		virtual void updateImpl();
+        /// internal method for firing events
+        virtual void fireViewportAdded(Viewport* vp);
+        /// internal method for firing events
+        virtual void fireViewportRemoved(Viewport* vp);
+        
+        /// Internal implementation of update()
+        virtual void updateImpl();
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // Namespace
 

@@ -46,25 +46,25 @@ void UseCustomCapabilitiesTests::setUp()
 {
     using namespace Ogre;
 
-	// write cleanup to log
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("testCustomCapabilitiesSetUp.log", true, false);
-	}
+    // write cleanup to log
+    if(LogManager::getSingletonPtr() == 0)
+    {
+        LogManager* logManager = OGRE_NEW LogManager();
+        logManager->createLog("testCustomCapabilitiesSetUp.log", true, false);
+    }
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
-	
-	if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
-		OGRE_DELETE Ogre::HighLevelGpuProgramManager::getSingletonPtr();
-	if(Ogre::GpuProgramManager::getSingletonPtr())
-		OGRE_DELETE Ogre::GpuProgramManager::getSingletonPtr();
-	if(Ogre::CompositorManager::getSingletonPtr())
-		OGRE_DELETE Ogre::CompositorManager::getSingletonPtr();
-	if(Ogre::MaterialManager::getSingletonPtr())
-		OGRE_DELETE Ogre::MaterialManager::getSingletonPtr();
-	if(Ogre::ResourceGroupManager::getSingletonPtr())
-		OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
+    
+    if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
+        OGRE_DELETE Ogre::HighLevelGpuProgramManager::getSingletonPtr();
+    if(Ogre::GpuProgramManager::getSingletonPtr())
+        OGRE_DELETE Ogre::GpuProgramManager::getSingletonPtr();
+    if(Ogre::CompositorManager::getSingletonPtr())
+        OGRE_DELETE Ogre::CompositorManager::getSingletonPtr();
+    if(Ogre::MaterialManager::getSingletonPtr())
+        OGRE_DELETE Ogre::MaterialManager::getSingletonPtr();
+    if(Ogre::ResourceGroupManager::getSingletonPtr())
+        OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
 
 #if OGRE_STATIC
         mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
@@ -73,10 +73,10 @@ void UseCustomCapabilitiesTests::setUp()
 
 void UseCustomCapabilitiesTests::tearDown()
 {
-	using namespace Ogre;
-	// set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+    using namespace Ogre;
+    // set up silent logging to not pollute output
+    if(LogManager::getSingletonPtr())
+        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
 #if OGRE_STATIC
         OGRE_DELETE mStaticPluginLoader;
@@ -162,148 +162,148 @@ void checkCaps(const Ogre::RenderSystemCapabilities* caps)
 
 void setUpGLRenderSystemOptions(Ogre::RenderSystem* rs)
 {
-	using namespace Ogre;
-	ConfigOptionMap options = rs->getConfigOptions();
-	// set default options
-	// this should work on every semi-normal system
-	rs->setConfigOption(String("Colour Depth"), String("32"));
-	rs->setConfigOption(String("FSAA"), String("0"));
-	rs->setConfigOption(String("Full Screen"), String("No"));
-	rs->setConfigOption(String("VSync"), String("No"));
-	rs->setConfigOption(String("Video Mode"), String("800 x 600"));
-	
-	// use the best RTT
-	ConfigOption optionRTT = options["RTT Preferred Mode"];
-	
-	if(find(optionRTT.possibleValues.begin(), optionRTT.possibleValues.end(), "FBO") != optionRTT.possibleValues.end())
-	{
-		rs->setConfigOption(String("RTT Preferred Mode"), String("FBO"));
-	}
-	else if(find(optionRTT.possibleValues.begin(), optionRTT.possibleValues.end(), "PBuffer") != optionRTT.possibleValues.end())
-	{
-		rs->setConfigOption(String("RTT Preferred Mode"), String("PBuffer"));
-	}
-	else
-		rs->setConfigOption(String("RTT Preferred Mode"), String("Copy"));
+    using namespace Ogre;
+    ConfigOptionMap options = rs->getConfigOptions();
+    // set default options
+    // this should work on every semi-normal system
+    rs->setConfigOption(String("Colour Depth"), String("32"));
+    rs->setConfigOption(String("FSAA"), String("0"));
+    rs->setConfigOption(String("Full Screen"), String("No"));
+    rs->setConfigOption(String("VSync"), String("No"));
+    rs->setConfigOption(String("Video Mode"), String("800 x 600"));
+    
+    // use the best RTT
+    ConfigOption optionRTT = options["RTT Preferred Mode"];
+    
+    if(find(optionRTT.possibleValues.begin(), optionRTT.possibleValues.end(), "FBO") != optionRTT.possibleValues.end())
+    {
+        rs->setConfigOption(String("RTT Preferred Mode"), String("FBO"));
+    }
+    else if(find(optionRTT.possibleValues.begin(), optionRTT.possibleValues.end(), "PBuffer") != optionRTT.possibleValues.end())
+    {
+        rs->setConfigOption(String("RTT Preferred Mode"), String("PBuffer"));
+    }
+    else
+        rs->setConfigOption(String("RTT Preferred Mode"), String("Copy"));
 }
 
 void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 {
     using namespace Ogre;
 
-	// set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-	
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("testCustomCapabilitiesGL.log", true, false);
-	}
+    // set up silent logging to not pollute output
+    if(LogManager::getSingletonPtr())
+        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+    
+    if(LogManager::getSingletonPtr() == 0)
+    {
+        LogManager* logManager = OGRE_NEW LogManager();
+        logManager->createLog("testCustomCapabilitiesGL.log", true, false);
+    }
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #ifdef OGRE_STATIC_LIB
-	Root* root = OGRE_NEW Root(BLANKSTRING);
+    Root* root = OGRE_NEW Root(BLANKSTRING);
         
-	mStaticPluginLoader.load();
+    mStaticPluginLoader.load();
 #else
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-	Root* root = OGRE_NEW Root(macBundlePath() + "/Contents/Resources/plugins.cfg");
+    Root* root = OGRE_NEW Root(macBundlePath() + "/Contents/Resources/plugins.cfg");
 #else
-	Root* root = OGRE_NEW Root("plugins.cfg");
+    Root* root = OGRE_NEW Root("plugins.cfg");
 #endif
 #endif
 
-	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
-	if(rs == 0)
-	{
-		CPPUNIT_ASSERT_ASSERTION_PASS("This test is irrelevant because GL RenderSystem is not available");
-	}
-	else
-	{
-		try {
-			setUpGLRenderSystemOptions(rs);
-			root->setRenderSystem(rs);
+    RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
+    if(rs == 0)
+    {
+        CPPUNIT_ASSERT_ASSERTION_PASS("This test is irrelevant because GL RenderSystem is not available");
+    }
+    else
+    {
+        try {
+            setUpGLRenderSystemOptions(rs);
+            root->setRenderSystem(rs);
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
+            root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
                              macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
 #else
-			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
+            root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
                              "../Tests/Media/CustomCapabilities/customCapabilitiesTest.cfg");
 #endif
 
-			const RenderSystemCapabilities* caps = rs->getCapabilities();
+            const RenderSystemCapabilities* caps = rs->getCapabilities();
 
-			checkCaps(caps);
-		}
-		// clean up root, in case of error, and let cppunit to handle the exception
-		catch(...)
-		{
-		}
-	}
+            checkCaps(caps);
+        }
+        // clean up root, in case of error, and let cppunit to handle the exception
+        catch(...)
+        {
+        }
+    }
     OGRE_DELETE root;
 }
 
 void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
 {
-	using namespace Ogre;
-	ConfigOptionMap options = rs->getConfigOptions();
-	// set default options
-	// this should work on every semi-normal system
-	rs->setConfigOption(String("Anti aliasing"), String("None"));
-	rs->setConfigOption(String("Full Screen"), String("No"));
-	rs->setConfigOption(String("VSync"), String("No"));
-	rs->setConfigOption(String("Video Mode"), String("800 x 600 @ 32-bit colour"));
-	
-	// pick first available device
-	ConfigOption optionDevice = options["Rendering Device"];
+    using namespace Ogre;
+    ConfigOptionMap options = rs->getConfigOptions();
+    // set default options
+    // this should work on every semi-normal system
+    rs->setConfigOption(String("Anti aliasing"), String("None"));
+    rs->setConfigOption(String("Full Screen"), String("No"));
+    rs->setConfigOption(String("VSync"), String("No"));
+    rs->setConfigOption(String("Video Mode"), String("800 x 600 @ 32-bit colour"));
+    
+    // pick first available device
+    ConfigOption optionDevice = options["Rendering Device"];
 
-	rs->setConfigOption(optionDevice.name, optionDevice.currentValue);
+    rs->setConfigOption(optionDevice.name, optionDevice.currentValue);
 }
 
 void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 {
-	// set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-	
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("testCustomCapabilitiesD3D9.log", true, false);
-	}
+    // set up silent logging to not pollute output
+    if(LogManager::getSingletonPtr())
+        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+    
+    if(LogManager::getSingletonPtr() == 0)
+    {
+        LogManager* logManager = OGRE_NEW LogManager();
+        logManager->createLog("testCustomCapabilitiesD3D9.log", true, false);
+    }
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #ifdef OGRE_STATIC_LIB
-	Root* root = OGRE_NEW Root(BLANKSTRING);
+    Root* root = OGRE_NEW Root(BLANKSTRING);
         
-	mStaticPluginLoader.load();
+    mStaticPluginLoader.load();
 #else
-	Root* root = OGRE_NEW Root("plugins.cfg");
+    Root* root = OGRE_NEW Root("plugins.cfg");
 #endif
 
-	RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
-	if(rs == 0)
-	{
-		CPPUNIT_ASSERT_ASSERTION_PASS("This test is irrelevant because D3D9 RenderSystem is not available");
-	}
-	else
-	{	
-		try {
-			setUpD3D9RenderSystemOptions(rs);
-			root->setRenderSystem(rs);
-			root->initialise(true, "OGRE testCustomCapabilitiesD3D9 Window",
-											"../../../Media/CustomCapabilities/customCapabilitiesTest.cfg");
-		
-			const RenderSystemCapabilities* caps = rs->getCapabilities();
+    RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
+    if(rs == 0)
+    {
+        CPPUNIT_ASSERT_ASSERTION_PASS("This test is irrelevant because D3D9 RenderSystem is not available");
+    }
+    else
+    {   
+        try {
+            setUpD3D9RenderSystemOptions(rs);
+            root->setRenderSystem(rs);
+            root->initialise(true, "OGRE testCustomCapabilitiesD3D9 Window",
+                                            "../../../Media/CustomCapabilities/customCapabilitiesTest.cfg");
+        
+            const RenderSystemCapabilities* caps = rs->getCapabilities();
 
-			checkCaps(caps);
-		}
-		// clean up root, in case of error, and let cppunit to handle the exception
-		catch(...)
-		{
-		}
-	}
+            checkCaps(caps);
+        }
+        // clean up root, in case of error, and let cppunit to handle the exception
+        catch(...)
+        {
+        }
+    }
 
     OGRE_DELETE root;
 }

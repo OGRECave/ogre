@@ -40,20 +40,20 @@ typedef std::list<INode*> NodeList;
 
 namespace OgreMax {
 
-	class MeshExporter : public OgreMaxExporter
-	{
-	public:
+    class MeshExporter : public OgreMaxExporter
+    {
+    public:
 
-		MeshExporter(const Config& config);
-		virtual ~MeshExporter();
+        MeshExporter(const Config& config);
+        virtual ~MeshExporter();
 
-		// take in a list of INode* for assembly into Ogre::Mesh form; returns
-		// a MeshPtr pointing to the newly minted Ogre Mesh object.
-		Ogre::MeshPtr buildMesh(NodeList nodeList);
+        // take in a list of INode* for assembly into Ogre::Mesh form; returns
+        // a MeshPtr pointing to the newly minted Ogre Mesh object.
+        Ogre::MeshPtr buildMesh(NodeList nodeList);
 
-	private:
+    private:
 
-		// Pointer to Mesh object for export
-		Ogre::MeshPtr	m_pMesh;
-	};
+        // Pointer to Mesh object for export
+        Ogre::MeshPtr   m_pMesh;
+    };
 }

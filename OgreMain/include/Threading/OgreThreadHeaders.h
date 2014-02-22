@@ -27,15 +27,15 @@ THE SOFTWARE
 #define __OgreThreadHeaders_H__
 
 #if !defined(NOMINMAX) && defined(_MSC_VER)
-#	define NOMINMAX // required to stop windows.h messing up std::min
+#   define NOMINMAX // required to stop windows.h messing up std::min
 #endif
 
 #if OGRE_THREAD_PROVIDER == 1
-	#include "OgreThreadHeadersBoost.h"
+    #include "OgreThreadHeadersBoost.h"
 #elif OGRE_THREAD_PROVIDER == 2
-	#include "OgreThreadHeadersPoco.h"
+    #include "OgreThreadHeadersPoco.h"
 #elif OGRE_THREAD_PROVIDER == 3
-	#include "OgreThreadHeadersTBB.h"
+    #include "OgreThreadHeadersTBB.h"
 #endif
 
 #include "OgreThreadDefines.h"

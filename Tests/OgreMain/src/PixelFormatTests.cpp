@@ -105,25 +105,25 @@ void naiveBulkPixelConversion(const PixelBox &src, const PixelBox &dst)
     unsigned long dstRowSkipBytes = dst.getRowSkip()*dstPixelSize;
     unsigned long dstSliceSkipBytes = dst.getSliceSkip()*dstPixelSize;
 
-	// The brute force fallback
-	float r,g,b,a;
-	for(size_t z=src.front; z<src.back; z++)
-	{
-		for(size_t y=src.top; y<src.bottom; y++)
-		{
-			for(size_t x=src.left; x<src.right; x++)
-			{
-				PixelUtil::unpackColour(&r, &g, &b, &a, src.format, srcptr);
-				PixelUtil::packColour(r, g, b, a, dst.format, dstptr);
-				srcptr += srcPixelSize;
-				dstptr += dstPixelSize;
-			}
-			srcptr += srcRowSkipBytes;
-			dstptr += dstRowSkipBytes;
-		}
-		srcptr += srcSliceSkipBytes;
-		dstptr += dstSliceSkipBytes;
-	}
+    // The brute force fallback
+    float r,g,b,a;
+    for(size_t z=src.front; z<src.back; z++)
+    {
+        for(size_t y=src.top; y<src.bottom; y++)
+        {
+            for(size_t x=src.left; x<src.right; x++)
+            {
+                PixelUtil::unpackColour(&r, &g, &b, &a, src.format, srcptr);
+                PixelUtil::packColour(r, g, b, a, dst.format, dstptr);
+                srcptr += srcPixelSize;
+                dstptr += dstPixelSize;
+            }
+            srcptr += srcRowSkipBytes;
+            dstptr += dstRowSkipBytes;
+        }
+        srcptr += srcSliceSkipBytes;
+        dstptr += dstSliceSkipBytes;
+    }
 
 }
 
@@ -135,8 +135,8 @@ void PixelFormatTests::setupBoxes(PixelFormat srcFormat, PixelFormat dstFormat)
         width = width2;
 
     src = PixelBox(width, 1, 1, srcFormat, randomData);
-	dst1 = PixelBox(width, 1, 1, dstFormat, temp);
-	dst2 = PixelBox(width, 1, 1, dstFormat, temp2);
+    dst1 = PixelBox(width, 1, 1, dstFormat, temp);
+    dst2 = PixelBox(width, 1, 1, dstFormat, temp2);
 
 }
 
@@ -171,11 +171,11 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
     s << " ";
 
     // Compare result
-	StringStream msg;
-	msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
-		"->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
+    StringStream msg;
+    msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
+        "->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
     CPPUNIT_ASSERT_MESSAGE(msg.str().c_str(),
-		memcmp(dst1.data, dst2.data, eob) == 0);
+        memcmp(dst1.data, dst2.data, eob) == 0);
 }
 
 void PixelFormatTests::testBulkConversion()
@@ -183,18 +183,18 @@ void PixelFormatTests::testBulkConversion()
     // Self match
     testCase(PF_A8R8G8B8, PF_A8R8G8B8);
     // Optimized
-	testCase(PF_A8R8G8B8,PF_A8B8G8R8);
-	testCase(PF_A8R8G8B8,PF_B8G8R8A8);
-	testCase(PF_A8R8G8B8,PF_R8G8B8A8);
-	testCase(PF_A8B8G8R8,PF_A8R8G8B8);
-	testCase(PF_A8B8G8R8,PF_B8G8R8A8);
-	testCase(PF_A8B8G8R8,PF_R8G8B8A8);
-	testCase(PF_B8G8R8A8,PF_A8R8G8B8);
-	testCase(PF_B8G8R8A8,PF_A8B8G8R8);
-	testCase(PF_B8G8R8A8,PF_R8G8B8A8);
-	testCase(PF_R8G8B8A8,PF_A8R8G8B8);
-	testCase(PF_R8G8B8A8,PF_A8B8G8R8);
-	testCase(PF_R8G8B8A8,PF_B8G8R8A8);
+    testCase(PF_A8R8G8B8,PF_A8B8G8R8);
+    testCase(PF_A8R8G8B8,PF_B8G8R8A8);
+    testCase(PF_A8R8G8B8,PF_R8G8B8A8);
+    testCase(PF_A8B8G8R8,PF_A8R8G8B8);
+    testCase(PF_A8B8G8R8,PF_B8G8R8A8);
+    testCase(PF_A8B8G8R8,PF_R8G8B8A8);
+    testCase(PF_B8G8R8A8,PF_A8R8G8B8);
+    testCase(PF_B8G8R8A8,PF_A8B8G8R8);
+    testCase(PF_B8G8R8A8,PF_R8G8B8A8);
+    testCase(PF_R8G8B8A8,PF_A8R8G8B8);
+    testCase(PF_R8G8B8A8,PF_A8B8G8R8);
+    testCase(PF_R8G8B8A8,PF_B8G8R8A8);
 
     testCase(PF_A8B8G8R8, PF_L8);
     testCase(PF_L8, PF_A8B8G8R8);
@@ -214,16 +214,16 @@ void PixelFormatTests::testBulkConversion()
     testCase(PF_B8G8R8, PF_A8B8G8R8);
     testCase(PF_R8G8B8, PF_B8G8R8A8);
     testCase(PF_B8G8R8, PF_B8G8R8A8);
-	testCase(PF_A8R8G8B8, PF_R8G8B8);
-	testCase(PF_A8R8G8B8, PF_B8G8R8);
-	testCase(PF_X8R8G8B8, PF_A8R8G8B8);
-	testCase(PF_X8R8G8B8, PF_A8B8G8R8);
-	testCase(PF_X8R8G8B8, PF_B8G8R8A8);
-	testCase(PF_X8R8G8B8, PF_R8G8B8A8);
-	testCase(PF_X8B8G8R8, PF_A8R8G8B8);
-	testCase(PF_X8B8G8R8, PF_A8B8G8R8);
-	testCase(PF_X8B8G8R8, PF_B8G8R8A8);
-	testCase(PF_X8B8G8R8, PF_R8G8B8A8);
+    testCase(PF_A8R8G8B8, PF_R8G8B8);
+    testCase(PF_A8R8G8B8, PF_B8G8R8);
+    testCase(PF_X8R8G8B8, PF_A8R8G8B8);
+    testCase(PF_X8R8G8B8, PF_A8B8G8R8);
+    testCase(PF_X8R8G8B8, PF_B8G8R8A8);
+    testCase(PF_X8R8G8B8, PF_R8G8B8A8);
+    testCase(PF_X8B8G8R8, PF_A8R8G8B8);
+    testCase(PF_X8B8G8R8, PF_A8B8G8R8);
+    testCase(PF_X8B8G8R8, PF_B8G8R8A8);
+    testCase(PF_X8B8G8R8, PF_R8G8B8A8);
 
     //CPPUNIT_ASSERT_MESSAGE("Conversion mismatch", false);
 }

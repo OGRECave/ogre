@@ -35,14 +35,14 @@ GLenum getGLShaderType(GpuProgramType programType);
 
 GLenum getGLShaderType(GpuProgramType programType)
 {
-	switch (programType)
-	{
-		case GPT_VERTEX_PROGRAM:
-		default:
-			return GL_VERTEX_SHADER;
-		case GPT_FRAGMENT_PROGRAM:
-			return GL_FRAGMENT_SHADER;
-	}
+    switch (programType)
+    {
+        case GPT_VERTEX_PROGRAM:
+        default:
+            return GL_VERTEX_SHADER;
+        case GPT_FRAGMENT_PROGRAM:
+            return GL_FRAGMENT_SHADER;
+    }
 }
 
 GLES2GpuProgram::GLES2GpuProgram(ResourceManager* creator, const String& name, 
@@ -77,4 +77,4 @@ size_t GLES2GpuProgram::calculateSize(void) const
 }
 
 
-	
+    

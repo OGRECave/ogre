@@ -44,9 +44,9 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     ControllerManager::ControllerManager()
-		: mFrameTimeController(OGRE_NEW FrameTimeControllerValue())
-		, mPassthroughFunction(OGRE_NEW PassthroughControllerFunction())
-		, mLastFrameNumber(0)
+        : mFrameTimeController(OGRE_NEW FrameTimeControllerValue())
+        , mPassthroughFunction(OGRE_NEW PassthroughControllerFunction())
+        , mLastFrameNumber(0)
     {
 
     }
@@ -101,11 +101,11 @@ namespace Ogre {
     {
         return mFrameTimeController;
     }
-	//-----------------------------------------------------------------------
-	const ControllerFunctionRealPtr& ControllerManager::getPassthroughControllerFunction(void) const
-	{
-		return mPassthroughFunction;
-	}
+    //-----------------------------------------------------------------------
+    const ControllerFunctionRealPtr& ControllerManager::getPassthroughControllerFunction(void) const
+    {
+        return mPassthroughFunction;
+    }
     //-----------------------------------------------------------------------
     Controller<Real>* ControllerManager::createTextureAnimator(TextureUnitState* layer, Real sequenceTime)
     {
@@ -117,22 +117,22 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Controller<Real>* ControllerManager::createTextureUVScroller(TextureUnitState* layer, Real speed)
     {
-		Controller<Real>* ret = 0;
+        Controller<Real>* ret = 0;
 
-		if (speed != 0)
+        if (speed != 0)
         {
-			SharedPtr< ControllerValue<Real> > val;
-			SharedPtr< ControllerFunction<Real> > func;
+            SharedPtr< ControllerValue<Real> > val;
+            SharedPtr< ControllerFunction<Real> > func;
 
-			// We do both scrolls with a single controller
-			val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, true, true));
-			// Create function: use -speed since we're altering texture coords so they have reverse effect
+            // We do both scrolls with a single controller
+            val.bind(OGRE_NEW TexCoordModifierControllerValue(layer, true, true));
+            // Create function: use -speed since we're altering texture coords so they have reverse effect
             func.bind(OGRE_NEW ScaleControllerFunction(-speed, true));
             ret = createController(mFrameTimeController, val, func);
-		}
+        }
 
-		return ret;
-	}
+        return ret;
+    }
     //-----------------------------------------------------------------------
     Controller<Real>* ControllerManager::createTextureUScroller(TextureUnitState* layer, Real uSpeed)
     {
@@ -140,8 +140,8 @@ namespace Ogre {
 
         if (uSpeed != 0)
         {
-			SharedPtr< ControllerValue<Real> > uVal;
-			SharedPtr< ControllerFunction<Real> > uFunc;
+            SharedPtr< ControllerValue<Real> > uVal;
+            SharedPtr< ControllerFunction<Real> > uFunc;
 
                 uVal.bind(OGRE_NEW TexCoordModifierControllerValue(layer, true));
             // Create function: use -speed since we're altering texture coords so they have reverse effect
@@ -151,15 +151,15 @@ namespace Ogre {
 
         return ret;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     Controller<Real>* ControllerManager::createTextureVScroller(TextureUnitState* layer, Real vSpeed)
     {
-		Controller<Real>* ret = 0;
+        Controller<Real>* ret = 0;
 
-		if (vSpeed != 0)
+        if (vSpeed != 0)
         {
-			SharedPtr< ControllerValue<Real> > vVal;
-			SharedPtr< ControllerFunction<Real> > vFunc;
+            SharedPtr< ControllerValue<Real> > vVal;
+            SharedPtr< ControllerFunction<Real> > vFunc;
 
             // Set up a second controller for v scroll
             vVal.bind(OGRE_NEW TexCoordModifierControllerValue(layer, false, true));
@@ -243,30 +243,30 @@ namespace Ogre {
             OGRE_DELETE controller;
         }
     }
-	//-----------------------------------------------------------------------
-	Real ControllerManager::getTimeFactor(void) const {
-		return static_cast<const FrameTimeControllerValue*>(mFrameTimeController.get())->getTimeFactor();
-	}
-	//-----------------------------------------------------------------------
-	void ControllerManager::setTimeFactor(Real tf) {
-		static_cast<FrameTimeControllerValue*>(mFrameTimeController.getPointer())->setTimeFactor(tf);
-	}
-	//-----------------------------------------------------------------------
-	Real ControllerManager::getFrameDelay(void) const {
-		return static_cast<const FrameTimeControllerValue*>(mFrameTimeController.get())->getFrameDelay();
-	}
-	//-----------------------------------------------------------------------
-	void ControllerManager::setFrameDelay(Real fd) {
-		static_cast<FrameTimeControllerValue*>(mFrameTimeController.getPointer())->setFrameDelay(fd);
-	}
-	//-----------------------------------------------------------------------
-	Real ControllerManager::getElapsedTime(void) const
-	{
-		return static_cast<const FrameTimeControllerValue*>(mFrameTimeController.get())->getElapsedTime();
-	}
-	//-----------------------------------------------------------------------
-	void ControllerManager::setElapsedTime(Real elapsedTime)
-	{
-		static_cast<FrameTimeControllerValue*>(mFrameTimeController.get())->setElapsedTime(elapsedTime);
-	}
+    //-----------------------------------------------------------------------
+    Real ControllerManager::getTimeFactor(void) const {
+        return static_cast<const FrameTimeControllerValue*>(mFrameTimeController.get())->getTimeFactor();
+    }
+    //-----------------------------------------------------------------------
+    void ControllerManager::setTimeFactor(Real tf) {
+        static_cast<FrameTimeControllerValue*>(mFrameTimeController.getPointer())->setTimeFactor(tf);
+    }
+    //-----------------------------------------------------------------------
+    Real ControllerManager::getFrameDelay(void) const {
+        return static_cast<const FrameTimeControllerValue*>(mFrameTimeController.get())->getFrameDelay();
+    }
+    //-----------------------------------------------------------------------
+    void ControllerManager::setFrameDelay(Real fd) {
+        static_cast<FrameTimeControllerValue*>(mFrameTimeController.getPointer())->setFrameDelay(fd);
+    }
+    //-----------------------------------------------------------------------
+    Real ControllerManager::getElapsedTime(void) const
+    {
+        return static_cast<const FrameTimeControllerValue*>(mFrameTimeController.get())->getElapsedTime();
+    }
+    //-----------------------------------------------------------------------
+    void ControllerManager::setElapsedTime(Real elapsedTime)
+    {
+        static_cast<FrameTimeControllerValue*>(mFrameTimeController.get())->setElapsedTime(elapsedTime);
+    }
 }

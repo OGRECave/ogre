@@ -31,9 +31,9 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#	include <SDL/sdl.h>
+#   include <SDL/sdl.h>
 #else
-#	include <SDL.h>
+#   include <SDL.h>
 #endif
 
 #include "OgreGLPrerequisites.h"

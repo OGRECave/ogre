@@ -38,11 +38,11 @@ namespace Ogre {
         mOwnDimensions(false),
         mUseTexcoordRect(false),
         mTexcoordIndex(0),
-		mPosition(Vector3::ZERO),
+        mPosition(Vector3::ZERO),
         mDirection(Vector3::ZERO),        
         mParentSet(0),
         mColour(ColourValue::White),
-		mRotation(0)
+        mRotation(0)
     {
     }
     //-----------------------------------------------------------------------

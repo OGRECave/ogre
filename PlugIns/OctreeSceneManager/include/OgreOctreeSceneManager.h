@@ -75,8 +75,8 @@ public:
     /** Standard destructor */
     ~OctreeSceneManager();
 
-	/// @copydoc SceneManager::getTypeName
-	const String& getTypeName(void) const;
+    /// @copydoc SceneManager::getTypeName
+    const String& getTypeName(void) const;
 
     /** Initializes the manager to the given box and depth.
     */
@@ -98,7 +98,7 @@ public:
     virtual void _updateSceneGraph( Camera * cam );
     /** Recurses through the octree determining which nodes are visible. */
     virtual void _findVisibleObjects ( Camera * cam, 
-		VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters );
+        VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters );
 
     /** Alerts each unculled object, notifying it that it will be drawn.
      * Useful for doing calculations only on nodes that will be drawn, prior
@@ -112,8 +112,8 @@ public:
     all subchildren are automatically added with no visibility tests.
     */
     void walkOctree( OctreeCamera *, RenderQueue *, Octree *, 
-		VisibleObjectsBoundsInfo* visibleBounds, bool foundvisible, 
-		bool onlyShadowCasters);
+        VisibleObjectsBoundsInfo* visibleBounds, bool foundvisible, 
+        bool onlyShadowCasters);
 
     /** Checks the given OctreeNode, and determines if it needs to be moved
     * to a different octant.
@@ -183,7 +183,7 @@ public:
 protected:
 
 
-	Octree::NodeList mVisible;
+    Octree::NodeList mVisible;
 
     /// The root octree
     Octree *mOctree;
@@ -214,14 +214,14 @@ protected:
 class OctreeSceneManagerFactory : public SceneManagerFactory
 {
 protected:
-	void initMetaData(void) const;
+    void initMetaData(void) const;
 public:
-	OctreeSceneManagerFactory() {}
-	~OctreeSceneManagerFactory() {}
-	/// Factory type name
-	static const String FACTORY_TYPE_NAME;
-	SceneManager* createInstance(const String& instanceName);
-	void destroyInstance(SceneManager* instance);
+    OctreeSceneManagerFactory() {}
+    ~OctreeSceneManagerFactory() {}
+    /// Factory type name
+    static const String FACTORY_TYPE_NAME;
+    SceneManager* createInstance(const String& instanceName);
+    void destroyInstance(SceneManager* instance);
 };
 
 

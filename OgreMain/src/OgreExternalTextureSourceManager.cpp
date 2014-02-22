@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 /***************************************************************************
 OgreExternalTextureSourceManager.cpp  -  
-	Implementation of the manager class
+    Implementation of the manager class
 
 -------------------
 date                 : Jan 1 2004
@@ -42,7 +42,7 @@ email                : pjcast@yahoo.com
 
 namespace Ogre 
 {
-	//****************************************************************************************
+    //****************************************************************************************
     template<> ExternalTextureSourceManager* Singleton<ExternalTextureSourceManager>::msSingleton = 0;
     ExternalTextureSourceManager* ExternalTextureSourceManager::getSingletonPtr(void)
     {
@@ -52,93 +52,93 @@ namespace Ogre
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
-	//****************************************************************************************
+    //****************************************************************************************
 
-	//****************************************************************************************
-	ExternalTextureSourceManager::ExternalTextureSourceManager()
-	{
-		mCurrExternalTextureSource = 0;
-	}
+    //****************************************************************************************
+    ExternalTextureSourceManager::ExternalTextureSourceManager()
+    {
+        mCurrExternalTextureSource = 0;
+    }
 
-	//****************************************************************************************
-	ExternalTextureSourceManager::~ExternalTextureSourceManager()
-	{
-		mTextureSystems.clear();
-	}
+    //****************************************************************************************
+    ExternalTextureSourceManager::~ExternalTextureSourceManager()
+    {
+        mTextureSystems.clear();
+    }
 
-	//****************************************************************************************
-	
-	void ExternalTextureSourceManager::setCurrentPlugIn( const String& sTexturePlugInType )
-	{
-		TextureSystemList::iterator i;
-			
-		for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
-		{
-			if( i->first == sTexturePlugInType )
-			{
-				mCurrExternalTextureSource = i->second;
-				mCurrExternalTextureSource->initialise();	//Now call overridden Init function
-				return;
-			}
-		}
-		mCurrExternalTextureSource = 0;
-		LogManager::getSingleton().logMessage( "ExternalTextureSourceManager::SetCurrentPlugIn(ENUM) failed setting texture plugin ", LML_CRITICAL);
-	}
+    //****************************************************************************************
+    
+    void ExternalTextureSourceManager::setCurrentPlugIn( const String& sTexturePlugInType )
+    {
+        TextureSystemList::iterator i;
+            
+        for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
+        {
+            if( i->first == sTexturePlugInType )
+            {
+                mCurrExternalTextureSource = i->second;
+                mCurrExternalTextureSource->initialise();   //Now call overridden Init function
+                return;
+            }
+        }
+        mCurrExternalTextureSource = 0;
+        LogManager::getSingleton().logMessage( "ExternalTextureSourceManager::SetCurrentPlugIn(ENUM) failed setting texture plugin ", LML_CRITICAL);
+    }
 
-	//****************************************************************************************
-	void ExternalTextureSourceManager::destroyAdvancedTexture( const String& sTextureName,
-		const String& groupName )
-	{
-		TextureSystemList::iterator i;
-		for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
-		{
-			//Broadcast to every registered System... Only the true one will destroy texture
-			i->second->destroyAdvancedTexture( sTextureName, groupName );
-		}
-	}
+    //****************************************************************************************
+    void ExternalTextureSourceManager::destroyAdvancedTexture( const String& sTextureName,
+        const String& groupName )
+    {
+        TextureSystemList::iterator i;
+        for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
+        {
+            //Broadcast to every registered System... Only the true one will destroy texture
+            i->second->destroyAdvancedTexture( sTextureName, groupName );
+        }
+    }
 
-	//****************************************************************************************
-	void ExternalTextureSourceManager::setExternalTextureSource( const String& sTexturePlugInType, ExternalTextureSource* pTextureSystem )
-	{
-		LogManager::getSingleton().logMessage( "Registering Texture Controller: Type = "
-						+ sTexturePlugInType + " Name = " + pTextureSystem->getPluginStringName());
+    //****************************************************************************************
+    void ExternalTextureSourceManager::setExternalTextureSource( const String& sTexturePlugInType, ExternalTextureSource* pTextureSystem )
+    {
+        LogManager::getSingleton().logMessage( "Registering Texture Controller: Type = "
+                        + sTexturePlugInType + " Name = " + pTextureSystem->getPluginStringName());
 
-		TextureSystemList::iterator i;
-			
-		for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
-		{
-			if( i->first == sTexturePlugInType )
-			{
-				LogManager::getSingleton().logMessage( "Shutting Down Texture Controller: " 
-						+ i->second->getPluginStringName() 
-						+ " To be replaced by: "
-						+ pTextureSystem->getPluginStringName());
+        TextureSystemList::iterator i;
+            
+        for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
+        {
+            if( i->first == sTexturePlugInType )
+            {
+                LogManager::getSingleton().logMessage( "Shutting Down Texture Controller: " 
+                        + i->second->getPluginStringName() 
+                        + " To be replaced by: "
+                        + pTextureSystem->getPluginStringName());
 
-				i->second->shutDown();				//Only one plugIn of Sent Type can be registered at a time
-													//so shut down old plugin before starting new plugin
-				i->second = pTextureSystem;
-				// **Moved this line b/c Rendersystem needs to be selected before things
-				// such as framelistners can be added
-				// pTextureSystem->Initialise();
-				return;
-			}
-		}
-		mTextureSystems[sTexturePlugInType] = pTextureSystem;	//If we got here then add it to map
-	}
+                i->second->shutDown();              //Only one plugIn of Sent Type can be registered at a time
+                                                    //so shut down old plugin before starting new plugin
+                i->second = pTextureSystem;
+                // **Moved this line b/c Rendersystem needs to be selected before things
+                // such as framelistners can be added
+                // pTextureSystem->Initialise();
+                return;
+            }
+        }
+        mTextureSystems[sTexturePlugInType] = pTextureSystem;   //If we got here then add it to map
+    }
 
-	//****************************************************************************************
-	ExternalTextureSource* ExternalTextureSourceManager::getExternalTextureSource( const String& sTexturePlugInType )
-	{
-		TextureSystemList::iterator i;
-		for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
-		{
-			if( i->first == sTexturePlugInType )
-				return i->second;
-		}
-		return 0;
-	}
+    //****************************************************************************************
+    ExternalTextureSource* ExternalTextureSourceManager::getExternalTextureSource( const String& sTexturePlugInType )
+    {
+        TextureSystemList::iterator i;
+        for( i = mTextureSystems.begin(); i != mTextureSystems.end(); ++i )
+        {
+            if( i->first == sTexturePlugInType )
+                return i->second;
+        }
+        return 0;
+    }
 
-	//****************************************************************************************
+    //****************************************************************************************
 
 }  //End Ogre Namespace
 

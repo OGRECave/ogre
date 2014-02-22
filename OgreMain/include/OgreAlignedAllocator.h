@@ -30,15 +30,15 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
 
-	/** \addtogroup Memory
-	*  @{
-	*/
+    /** \addtogroup Memory
+    *  @{
+    */
 
-	/** Class to provide aligned memory allocate functionality.
+    /** Class to provide aligned memory allocate functionality.
     @remarks
         All SIMD processing are friendly with aligned memory, and some SIMD routines
         are designed for working with aligned memory only. If the data are intended to
@@ -56,9 +56,9 @@ namespace Ogre {
     @note
         This class intended to use by advanced user only.
     */
-	class _OgreExport AlignedMemory
-	{
-	public:
+    class _OgreExport AlignedMemory
+    {
+    public:
         /** Allocate memory with given alignment.
             @param
                 size The size of memory need to allocate.
@@ -93,10 +93,10 @@ namespace Ogre {
                 On <b>NULL</b> pointer, nothing happen.
         */
         static void deallocate(void* p);
-	};
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

@@ -39,21 +39,21 @@ namespace Ogre
 {
 
 class _OgreLodExport LodCollapseCostOutside :
-	public LodCollapseCost
+    public LodCollapseCost
 {
 public:
-	LodCollapseCostOutside(LodCollapseCostPtr costCalculator, Real outsideWeight, Real outsideWalkAngle);
-	~LodCollapseCostOutside();
-	virtual void initCollapseCosts(LodData* data);
-	virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge);
+    LodCollapseCostOutside(LodCollapseCostPtr costCalculator, Real outsideWeight, Real outsideWalkAngle);
+    ~LodCollapseCostOutside();
+    virtual void initCollapseCosts(LodData* data);
+    virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge);
 protected:
 
-	Real mOutsideWeight;
-	Real mOutsideWalkAngle;
+    Real mOutsideWeight;
+    Real mOutsideWalkAngle;
 
-	// Result of this collapse cost algorithm will be modified, if it is outside.
-	LodCollapseCostPtr mCostCalculator;
-	LodOutsideMarker* mOutsideMarker;
+    // Result of this collapse cost algorithm will be modified, if it is outside.
+    LodCollapseCostPtr mCostCalculator;
+    LodOutsideMarker* mOutsideMarker;
 };
 
 }

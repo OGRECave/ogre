@@ -34,13 +34,13 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** Standard 3-dimensional vector.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** Standard 3-dimensional vector.
         @remarks
             A direction in 3D space represented as distances along the 3
             orthogonal axes (x, y, z). Note that positions, directions and
@@ -50,7 +50,7 @@ namespace Ogre
     class _OgreExport Vector3
     {
     public:
-		Real x, y, z;
+        Real x, y, z;
 
     public:
         /** Default constructor.
@@ -93,38 +93,38 @@ namespace Ogre
         }
 
 
-		/** Exchange the contents of this vector with another. 
-		*/
-		inline void swap(Vector3& other)
-		{
-			std::swap(x, other.x);
-			std::swap(y, other.y);
-			std::swap(z, other.z);
-		}
+        /** Exchange the contents of this vector with another. 
+        */
+        inline void swap(Vector3& other)
+        {
+            std::swap(x, other.x);
+            std::swap(y, other.y);
+            std::swap(z, other.z);
+        }
 
-		inline Real operator [] ( const size_t i ) const
+        inline Real operator [] ( const size_t i ) const
         {
             assert( i < 3 );
 
             return *(&x+i);
         }
 
-		inline Real& operator [] ( const size_t i )
+        inline Real& operator [] ( const size_t i )
         {
             assert( i < 3 );
 
             return *(&x+i);
         }
-		/// Pointer accessor for direct copying
-		inline Real* ptr()
-		{
-			return &x;
-		}
-		/// Pointer accessor for direct copying
-		inline const Real* ptr() const
-		{
-			return &x;
-		}
+        /// Pointer accessor for direct copying
+        inline Real* ptr()
+        {
+            return &x;
+        }
+        /// Pointer accessor for direct copying
+        inline const Real* ptr() const
+        {
+            return &x;
+        }
 
         /** Assigns the value of the other vector.
             @param
@@ -447,7 +447,7 @@ namespace Ogre
             Real fLength = Math::Sqrt( x * x + y * y + z * z );
 
             // Will also work for zero-sized vectors, but will change nothing
-			// We're not using epsilons because we don't need to.
+            // We're not using epsilons because we don't need to.
             // Read http://www.ogre3d.org/forums/viewtopic.php?f=4&t=61259
             if ( fLength > Real(0.0f) )
             {
@@ -478,7 +478,7 @@ namespace Ogre
                 returned vector will be on the side from which the arc from 'this'
                 to rkVector is anticlockwise, e.g. UNIT_Y.crossProduct(UNIT_Z)
                 = UNIT_X, whilst UNIT_Z.crossProduct(UNIT_Y) = -UNIT_X.
-				This is because OGRE uses a right-handed coordinate system.
+                This is because OGRE uses a right-handed coordinate system.
             @par
                 For a clearer explanation, look a the left and the bottom edges
                 of your monitor's screen. Assume that the first vector is the
@@ -576,7 +576,7 @@ namespace Ogre
                 */
                 perp = this->crossProduct( Vector3::UNIT_Y );
             }
-			perp.normalise();
+            perp.normalise();
 
             return perp;
         }
@@ -625,34 +625,34 @@ namespace Ogre
             return q * (*this);
         }
 
-		/** Gets the angle between 2 vectors.
-		@remarks
-			Vectors do not have to be unit-length but must represent directions.
-		*/
-		inline Radian angleBetween(const Vector3& dest) const
-		{
-			Real lenProduct = length() * dest.length();
+        /** Gets the angle between 2 vectors.
+        @remarks
+            Vectors do not have to be unit-length but must represent directions.
+        */
+        inline Radian angleBetween(const Vector3& dest) const
+        {
+            Real lenProduct = length() * dest.length();
 
-			// Divide by zero check
-			if(lenProduct < 1e-6f)
-				lenProduct = 1e-6f;
+            // Divide by zero check
+            if(lenProduct < 1e-6f)
+                lenProduct = 1e-6f;
 
-			Real f = dotProduct(dest) / lenProduct;
+            Real f = dotProduct(dest) / lenProduct;
 
-			f = Math::Clamp(f, (Real)-1.0, (Real)1.0);
-			return Math::ACos(f);
+            f = Math::Clamp(f, (Real)-1.0, (Real)1.0);
+            return Math::ACos(f);
 
-		}
+        }
         /** Gets the shortest arc quaternion to rotate this vector to the destination
             vector.
         @remarks
             If you call this with a dest vector that is close to the inverse
             of this vector, we will rotate 180 degrees around the 'fallbackAxis'
-			(if specified, or a generated axis if not) since in this case
-			ANY axis of rotation is valid.
+            (if specified, or a generated axis if not) since in this case
+            ANY axis of rotation is valid.
         */
         Quaternion getRotationTo(const Vector3& dest,
-			const Vector3& fallbackAxis = Vector3::ZERO) const
+            const Vector3& fallbackAxis = Vector3::ZERO) const
         {
             // Based on Stan Melax's article in Game Programming Gems
             Quaternion q;
@@ -668,36 +668,36 @@ namespace Ogre
             {
                 return Quaternion::IDENTITY;
             }
-			if (d < (1e-6f - 1.0f))
-			{
-				if (fallbackAxis != Vector3::ZERO)
-				{
-					// rotate 180 degrees about the fallback axis
-					q.FromAngleAxis(Radian(Math::PI), fallbackAxis);
-				}
-				else
-				{
-					// Generate an axis
-					Vector3 axis = Vector3::UNIT_X.crossProduct(*this);
-					if (axis.isZeroLength()) // pick another if colinear
-						axis = Vector3::UNIT_Y.crossProduct(*this);
-					axis.normalise();
-					q.FromAngleAxis(Radian(Math::PI), axis);
-				}
-			}
-			else
-			{
+            if (d < (1e-6f - 1.0f))
+            {
+                if (fallbackAxis != Vector3::ZERO)
+                {
+                    // rotate 180 degrees about the fallback axis
+                    q.FromAngleAxis(Radian(Math::PI), fallbackAxis);
+                }
+                else
+                {
+                    // Generate an axis
+                    Vector3 axis = Vector3::UNIT_X.crossProduct(*this);
+                    if (axis.isZeroLength()) // pick another if colinear
+                        axis = Vector3::UNIT_Y.crossProduct(*this);
+                    axis.normalise();
+                    q.FromAngleAxis(Radian(Math::PI), axis);
+                }
+            }
+            else
+            {
                 Real s = Math::Sqrt( (1+d)*2 );
-	            Real invs = 1 / s;
+                Real invs = 1 / s;
 
-				Vector3 c = v0.crossProduct(v1);
+                Vector3 c = v0.crossProduct(v1);
 
-    	        q.x = c.x * invs;
-        	    q.y = c.y * invs;
-            	q.z = c.z * invs;
-            	q.w = s * 0.5f;
-				q.normalise();
-			}
+                q.x = c.x * invs;
+                q.y = c.y * invs;
+                q.z = c.z * invs;
+                q.w = s * 0.5f;
+                q.normalise();
+            }
             return q;
         }
 
@@ -726,76 +726,76 @@ namespace Ogre
             return Vector3( *this - ( 2 * this->dotProduct(normal) * normal ) );
         }
 
-		/** Returns whether this vector is within a positional tolerance
-			of another vector.
-		@param rhs The vector to compare with
-		@param tolerance The amount that each element of the vector may vary by
-			and still be considered equal
-		*/
-		inline bool positionEquals(const Vector3& rhs, Real tolerance = 1e-03) const
-		{
-			return Math::RealEqual(x, rhs.x, tolerance) &&
-				Math::RealEqual(y, rhs.y, tolerance) &&
-				Math::RealEqual(z, rhs.z, tolerance);
+        /** Returns whether this vector is within a positional tolerance
+            of another vector.
+        @param rhs The vector to compare with
+        @param tolerance The amount that each element of the vector may vary by
+            and still be considered equal
+        */
+        inline bool positionEquals(const Vector3& rhs, Real tolerance = 1e-03) const
+        {
+            return Math::RealEqual(x, rhs.x, tolerance) &&
+                Math::RealEqual(y, rhs.y, tolerance) &&
+                Math::RealEqual(z, rhs.z, tolerance);
 
-		}
+        }
 
-		/** Returns whether this vector is within a positional tolerance
-			of another vector, also take scale of the vectors into account.
-		@param rhs The vector to compare with
-		@param tolerance The amount (related to the scale of vectors) that distance
+        /** Returns whether this vector is within a positional tolerance
+            of another vector, also take scale of the vectors into account.
+        @param rhs The vector to compare with
+        @param tolerance The amount (related to the scale of vectors) that distance
             of the vector may vary by and still be considered close
-		*/
-		inline bool positionCloses(const Vector3& rhs, Real tolerance = 1e-03f) const
-		{
-			return squaredDistance(rhs) <=
+        */
+        inline bool positionCloses(const Vector3& rhs, Real tolerance = 1e-03f) const
+        {
+            return squaredDistance(rhs) <=
                 (squaredLength() + rhs.squaredLength()) * tolerance;
-		}
+        }
 
-		/** Returns whether this vector is within a directional tolerance
-			of another vector.
-		@param rhs The vector to compare with
-		@param tolerance The maximum angle by which the vectors may vary and
-			still be considered equal
-		@note Both vectors should be normalised.
-		*/
-		inline bool directionEquals(const Vector3& rhs,
-			const Radian& tolerance) const
-		{
-			Real dot = dotProduct(rhs);
-			Radian angle = Math::ACos(dot);
+        /** Returns whether this vector is within a directional tolerance
+            of another vector.
+        @param rhs The vector to compare with
+        @param tolerance The maximum angle by which the vectors may vary and
+            still be considered equal
+        @note Both vectors should be normalised.
+        */
+        inline bool directionEquals(const Vector3& rhs,
+            const Radian& tolerance) const
+        {
+            Real dot = dotProduct(rhs);
+            Radian angle = Math::ACos(dot);
 
-			return Math::Abs(angle.valueRadians()) <= tolerance.valueRadians();
+            return Math::Abs(angle.valueRadians()) <= tolerance.valueRadians();
 
-		}
+        }
 
-		/// Check whether this vector contains valid values
-		inline bool isNaN() const
-		{
-			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z);
-		}
+        /// Check whether this vector contains valid values
+        inline bool isNaN() const
+        {
+            return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z);
+        }
 
-		/// Extract the primary (dominant) axis from this direction vector
-		inline Vector3 primaryAxis() const
-		{
-			Real absx = Math::Abs(x);
-			Real absy = Math::Abs(y);
-			Real absz = Math::Abs(z);
-			if (absx > absy)
-				if (absx > absz)
-					return x > 0 ? Vector3::UNIT_X : Vector3::NEGATIVE_UNIT_X;
-				else
-					return z > 0 ? Vector3::UNIT_Z : Vector3::NEGATIVE_UNIT_Z;
-			else // absx <= absy
-				if (absy > absz)
-					return y > 0 ? Vector3::UNIT_Y : Vector3::NEGATIVE_UNIT_Y;
-				else
-					return z > 0 ? Vector3::UNIT_Z : Vector3::NEGATIVE_UNIT_Z;
+        /// Extract the primary (dominant) axis from this direction vector
+        inline Vector3 primaryAxis() const
+        {
+            Real absx = Math::Abs(x);
+            Real absy = Math::Abs(y);
+            Real absz = Math::Abs(z);
+            if (absx > absy)
+                if (absx > absz)
+                    return x > 0 ? Vector3::UNIT_X : Vector3::NEGATIVE_UNIT_X;
+                else
+                    return z > 0 ? Vector3::UNIT_Z : Vector3::NEGATIVE_UNIT_Z;
+            else // absx <= absy
+                if (absy > absz)
+                    return y > 0 ? Vector3::UNIT_Y : Vector3::NEGATIVE_UNIT_Y;
+                else
+                    return z > 0 ? Vector3::UNIT_Z : Vector3::NEGATIVE_UNIT_Z;
 
 
-		}
+        }
 
-		// special points
+        // special points
         static const Vector3 ZERO;
         static const Vector3 UNIT_X;
         static const Vector3 UNIT_Y;
@@ -814,8 +814,8 @@ namespace Ogre
             return o;
         }
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 #endif

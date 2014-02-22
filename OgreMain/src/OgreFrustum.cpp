@@ -51,7 +51,7 @@ namespace Ogre {
         mFarDist(100000.0f), 
         mNearDist(100.0f), 
         mAspect(1.33333333333333f), 
-		mOrthoHeight(1000),
+        mOrthoHeight(1000),
         mFrustumOffset(Vector2::ZERO),
         mFocalLength(1.0f),
         mLastParentOrientation(Quaternion::IDENTITY),
@@ -61,9 +61,9 @@ namespace Ogre {
         mRecalcFrustumPlanes(true),
         mRecalcWorldSpaceCorners(true),
         mRecalcVertexData(true),
-		mCustomViewMatrix(false),
-		mCustomProjMatrix(false),
-		mFrustumExtentsManuallySet(false),
+        mCustomViewMatrix(false),
+        mCustomProjMatrix(false),
+        mFrustumExtentsManuallySet(false),
         mOrientationMode(OR_DEGREE_0),
         mReflect(false), 
         mLinkedReflectPlane(0),
@@ -313,86 +313,86 @@ namespace Ogre {
 
         return true;
     }
-	//---------------------------------------------------------------------
-	uint32 Frustum::getTypeFlags(void) const
-	{
-		return SceneManager::FRUSTUM_TYPE_MASK;
-	}
+    //---------------------------------------------------------------------
+    uint32 Frustum::getTypeFlags(void) const
+    {
+        return SceneManager::FRUSTUM_TYPE_MASK;
+    }
     //-----------------------------------------------------------------------
     void Frustum::calcProjectionParameters(Real& left, Real& right, Real& bottom, Real& top) const
     { 
-		if (mCustomProjMatrix)
-		{
-			// Convert clipspace corners to camera space
-			Matrix4 invProj = mProjMatrix.inverse();
-			Vector3 topLeft(-0.5f, 0.5f, 0.0f);
-			Vector3 bottomRight(0.5f, -0.5f, 0.0f);
+        if (mCustomProjMatrix)
+        {
+            // Convert clipspace corners to camera space
+            Matrix4 invProj = mProjMatrix.inverse();
+            Vector3 topLeft(-0.5f, 0.5f, 0.0f);
+            Vector3 bottomRight(0.5f, -0.5f, 0.0f);
 
-			topLeft = invProj * topLeft;
-			bottomRight = invProj * bottomRight;
+            topLeft = invProj * topLeft;
+            bottomRight = invProj * bottomRight;
 
-			left = topLeft.x;
-			top = topLeft.y;
-			right = bottomRight.x;
-			bottom = bottomRight.y;
+            left = topLeft.x;
+            top = topLeft.y;
+            right = bottomRight.x;
+            bottom = bottomRight.y;
 
-		}
-		else
-		{
-			if (mFrustumExtentsManuallySet)
-			{
-				left = mLeft;
-				right = mRight;
-				top = mTop;
-				bottom = mBottom;
-			}
-			// Calculate general projection parameters
-			else if (mProjType == PT_PERSPECTIVE)
-			{
-				Radian thetaY (mFOVy * 0.5f);
-				Real tanThetaY = Math::Tan(thetaY);
-				Real tanThetaX = tanThetaY * mAspect;
+        }
+        else
+        {
+            if (mFrustumExtentsManuallySet)
+            {
+                left = mLeft;
+                right = mRight;
+                top = mTop;
+                bottom = mBottom;
+            }
+            // Calculate general projection parameters
+            else if (mProjType == PT_PERSPECTIVE)
+            {
+                Radian thetaY (mFOVy * 0.5f);
+                Real tanThetaY = Math::Tan(thetaY);
+                Real tanThetaX = tanThetaY * mAspect;
 
-				Real nearFocal = mNearDist / mFocalLength;
-				Real nearOffsetX = mFrustumOffset.x * nearFocal;
-				Real nearOffsetY = mFrustumOffset.y * nearFocal;
-				Real half_w = tanThetaX * mNearDist;
-				Real half_h = tanThetaY * mNearDist;
+                Real nearFocal = mNearDist / mFocalLength;
+                Real nearOffsetX = mFrustumOffset.x * nearFocal;
+                Real nearOffsetY = mFrustumOffset.y * nearFocal;
+                Real half_w = tanThetaX * mNearDist;
+                Real half_h = tanThetaY * mNearDist;
 
-				left   = - half_w + nearOffsetX;
-				right  = + half_w + nearOffsetX;
-				bottom = - half_h + nearOffsetY;
-				top    = + half_h + nearOffsetY;
+                left   = - half_w + nearOffsetX;
+                right  = + half_w + nearOffsetX;
+                bottom = - half_h + nearOffsetY;
+                top    = + half_h + nearOffsetY;
 
-				mLeft = left;
-				mRight = right;
-				mTop = top;
-				mBottom = bottom;
-			}
-			else
-			{
-				// Unknown how to apply frustum offset to orthographic camera, just ignore here
-				Real half_w = getOrthoWindowWidth() * 0.5f;
-				Real half_h = getOrthoWindowHeight() * 0.5f;
+                mLeft = left;
+                mRight = right;
+                mTop = top;
+                mBottom = bottom;
+            }
+            else
+            {
+                // Unknown how to apply frustum offset to orthographic camera, just ignore here
+                Real half_w = getOrthoWindowWidth() * 0.5f;
+                Real half_h = getOrthoWindowHeight() * 0.5f;
 
-				left   = - half_w;
-				right  = + half_w;
-				bottom = - half_h;
-				top    = + half_h;
+                left   = - half_w;
+                right  = + half_w;
+                bottom = - half_h;
+                top    = + half_h;
 
-				mLeft = left;
-				mRight = right;
-				mTop = top;
-				mBottom = bottom;
-			}
+                mLeft = left;
+                mRight = right;
+                mTop = top;
+                mBottom = bottom;
+            }
 
-		}
+        }
     }
-	//-----------------------------------------------------------------------
-	void Frustum::updateFrustumImpl(void) const
-	{
-		// Common calcs
-		Real left, right, bottom, top;
+    //-----------------------------------------------------------------------
+    void Frustum::updateFrustumImpl(void) const
+    {
+        // Common calcs
+        Real left, right, bottom, top;
 
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         if (mOrientationMode != OR_PORTRAIT)
@@ -401,197 +401,197 @@ namespace Ogre {
 #endif
             calcProjectionParameters(left, right, bottom, top);
 
-		if (!mCustomProjMatrix)
-		{
+        if (!mCustomProjMatrix)
+        {
 
-			// The code below will dealing with general projection 
-			// parameters, similar glFrustum and glOrtho.
-			// Doesn't optimise manually except division operator, so the 
-			// code more self-explaining.
+            // The code below will dealing with general projection 
+            // parameters, similar glFrustum and glOrtho.
+            // Doesn't optimise manually except division operator, so the 
+            // code more self-explaining.
 
-			Real inv_w = 1 / (right - left);
-			Real inv_h = 1 / (top - bottom);
-			Real inv_d = 1 / (mFarDist - mNearDist);
+            Real inv_w = 1 / (right - left);
+            Real inv_h = 1 / (top - bottom);
+            Real inv_d = 1 / (mFarDist - mNearDist);
 
-			// Recalc if frustum params changed
-			if (mProjType == PT_PERSPECTIVE)
-			{
-				// Calc matrix elements
-				Real A = 2 * mNearDist * inv_w;
-				Real B = 2 * mNearDist * inv_h;
-				Real C = (right + left) * inv_w;
-				Real D = (top + bottom) * inv_h;
-				Real q, qn;
-				if (mFarDist == 0)
-				{
-					// Infinite far plane
-					q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-					qn = mNearDist * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
-				}
-				else
-				{
-					q = - (mFarDist + mNearDist) * inv_d;
-					qn = -2 * (mFarDist * mNearDist) * inv_d;
-				}
+            // Recalc if frustum params changed
+            if (mProjType == PT_PERSPECTIVE)
+            {
+                // Calc matrix elements
+                Real A = 2 * mNearDist * inv_w;
+                Real B = 2 * mNearDist * inv_h;
+                Real C = (right + left) * inv_w;
+                Real D = (top + bottom) * inv_h;
+                Real q, qn;
+                if (mFarDist == 0)
+                {
+                    // Infinite far plane
+                    q = Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
+                    qn = mNearDist * (Frustum::INFINITE_FAR_PLANE_ADJUST - 2);
+                }
+                else
+                {
+                    q = - (mFarDist + mNearDist) * inv_d;
+                    qn = -2 * (mFarDist * mNearDist) * inv_d;
+                }
 
-				// NB: This creates 'uniform' perspective projection matrix,
-				// which depth range [-1,1], right-handed rules
-				//
-				// [ A   0   C   0  ]
-				// [ 0   B   D   0  ]
-				// [ 0   0   q   qn ]
-				// [ 0   0   -1  0  ]
-				//
-				// A = 2 * near / (right - left)
-				// B = 2 * near / (top - bottom)
-				// C = (right + left) / (right - left)
-				// D = (top + bottom) / (top - bottom)
-				// q = - (far + near) / (far - near)
-				// qn = - 2 * (far * near) / (far - near)
+                // NB: This creates 'uniform' perspective projection matrix,
+                // which depth range [-1,1], right-handed rules
+                //
+                // [ A   0   C   0  ]
+                // [ 0   B   D   0  ]
+                // [ 0   0   q   qn ]
+                // [ 0   0   -1  0  ]
+                //
+                // A = 2 * near / (right - left)
+                // B = 2 * near / (top - bottom)
+                // C = (right + left) / (right - left)
+                // D = (top + bottom) / (top - bottom)
+                // q = - (far + near) / (far - near)
+                // qn = - 2 * (far * near) / (far - near)
 
-				mProjMatrix = Matrix4::ZERO;
-				mProjMatrix[0][0] = A;
-				mProjMatrix[0][2] = C;
-				mProjMatrix[1][1] = B;
-				mProjMatrix[1][2] = D;
-				mProjMatrix[2][2] = q;
-				mProjMatrix[2][3] = qn;
-				mProjMatrix[3][2] = -1;
+                mProjMatrix = Matrix4::ZERO;
+                mProjMatrix[0][0] = A;
+                mProjMatrix[0][2] = C;
+                mProjMatrix[1][1] = B;
+                mProjMatrix[1][2] = D;
+                mProjMatrix[2][2] = q;
+                mProjMatrix[2][3] = qn;
+                mProjMatrix[3][2] = -1;
 
-				if (mObliqueDepthProjection)
-				{
-					// Translate the plane into view space
+                if (mObliqueDepthProjection)
+                {
+                    // Translate the plane into view space
 
-					// Don't use getViewMatrix here, incase overrided by 
-					// camera and return a cull frustum view matrix
-					updateView();
-					Plane plane = mViewMatrix * mObliqueProjPlane;
+                    // Don't use getViewMatrix here, incase overrided by 
+                    // camera and return a cull frustum view matrix
+                    updateView();
+                    Plane plane = mViewMatrix * mObliqueProjPlane;
 
-					// Thanks to Eric Lenyel for posting this calculation 
-					// at www.terathon.com
+                    // Thanks to Eric Lenyel for posting this calculation 
+                    // at www.terathon.com
 
-					// Calculate the clip-space corner point opposite the 
-					// clipping plane
-					// as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
-					// transform it into camera space by multiplying it
-					// by the inverse of the projection matrix
+                    // Calculate the clip-space corner point opposite the 
+                    // clipping plane
+                    // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
+                    // transform it into camera space by multiplying it
+                    // by the inverse of the projection matrix
 
-					/* generalised version
-					Vector4 q = matrix.inverse() * 
-					Vector4(Math::Sign(plane.normal.x), 
-					Math::Sign(plane.normal.y), 1.0f, 1.0f);
-					*/
-					Vector4 qVec;
-					qVec.x = (Math::Sign(plane.normal.x) + mProjMatrix[0][2]) / mProjMatrix[0][0];
-					qVec.y = (Math::Sign(plane.normal.y) + mProjMatrix[1][2]) / mProjMatrix[1][1];
-					qVec.z = -1;
-					qVec.w = (1 + mProjMatrix[2][2]) / mProjMatrix[2][3];
+                    /* generalised version
+                    Vector4 q = matrix.inverse() * 
+                    Vector4(Math::Sign(plane.normal.x), 
+                    Math::Sign(plane.normal.y), 1.0f, 1.0f);
+                    */
+                    Vector4 qVec;
+                    qVec.x = (Math::Sign(plane.normal.x) + mProjMatrix[0][2]) / mProjMatrix[0][0];
+                    qVec.y = (Math::Sign(plane.normal.y) + mProjMatrix[1][2]) / mProjMatrix[1][1];
+                    qVec.z = -1;
+                    qVec.w = (1 + mProjMatrix[2][2]) / mProjMatrix[2][3];
 
-					// Calculate the scaled plane vector
-					Vector4 clipPlane4d(plane.normal.x, plane.normal.y, plane.normal.z, plane.d);
-					Vector4 c = clipPlane4d * (2 / (clipPlane4d.dotProduct(qVec)));
+                    // Calculate the scaled plane vector
+                    Vector4 clipPlane4d(plane.normal.x, plane.normal.y, plane.normal.z, plane.d);
+                    Vector4 c = clipPlane4d * (2 / (clipPlane4d.dotProduct(qVec)));
 
-					// Replace the third row of the projection matrix
-					mProjMatrix[2][0] = c.x;
-					mProjMatrix[2][1] = c.y;
-					mProjMatrix[2][2] = c.z + 1;
-					mProjMatrix[2][3] = c.w; 
-				}
-			} // perspective
-			else if (mProjType == PT_ORTHOGRAPHIC)
-			{
-				Real A = 2 * inv_w;
-				Real B = 2 * inv_h;
-				Real C = - (right + left) * inv_w;
-				Real D = - (top + bottom) * inv_h;
-				Real q, qn;
-				if (mFarDist == 0)
-				{
-					// Can not do infinite far plane here, avoid divided zero only
-					q = - Frustum::INFINITE_FAR_PLANE_ADJUST / mNearDist;
-					qn = - Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
-				}
-				else
-				{
-					q = - 2 * inv_d;
-					qn = - (mFarDist + mNearDist)  * inv_d;
-				}
+                    // Replace the third row of the projection matrix
+                    mProjMatrix[2][0] = c.x;
+                    mProjMatrix[2][1] = c.y;
+                    mProjMatrix[2][2] = c.z + 1;
+                    mProjMatrix[2][3] = c.w; 
+                }
+            } // perspective
+            else if (mProjType == PT_ORTHOGRAPHIC)
+            {
+                Real A = 2 * inv_w;
+                Real B = 2 * inv_h;
+                Real C = - (right + left) * inv_w;
+                Real D = - (top + bottom) * inv_h;
+                Real q, qn;
+                if (mFarDist == 0)
+                {
+                    // Can not do infinite far plane here, avoid divided zero only
+                    q = - Frustum::INFINITE_FAR_PLANE_ADJUST / mNearDist;
+                    qn = - Frustum::INFINITE_FAR_PLANE_ADJUST - 1;
+                }
+                else
+                {
+                    q = - 2 * inv_d;
+                    qn = - (mFarDist + mNearDist)  * inv_d;
+                }
 
-				// NB: This creates 'uniform' orthographic projection matrix,
-				// which depth range [-1,1], right-handed rules
-				//
-				// [ A   0   0   C  ]
-				// [ 0   B   0   D  ]
-				// [ 0   0   q   qn ]
-				// [ 0   0   0   1  ]
-				//
-				// A = 2 * / (right - left)
-				// B = 2 * / (top - bottom)
-				// C = - (right + left) / (right - left)
-				// D = - (top + bottom) / (top - bottom)
-				// q = - 2 / (far - near)
-				// qn = - (far + near) / (far - near)
+                // NB: This creates 'uniform' orthographic projection matrix,
+                // which depth range [-1,1], right-handed rules
+                //
+                // [ A   0   0   C  ]
+                // [ 0   B   0   D  ]
+                // [ 0   0   q   qn ]
+                // [ 0   0   0   1  ]
+                //
+                // A = 2 * / (right - left)
+                // B = 2 * / (top - bottom)
+                // C = - (right + left) / (right - left)
+                // D = - (top + bottom) / (top - bottom)
+                // q = - 2 / (far - near)
+                // qn = - (far + near) / (far - near)
 
-				mProjMatrix = Matrix4::ZERO;
-				mProjMatrix[0][0] = A;
-				mProjMatrix[0][3] = C;
-				mProjMatrix[1][1] = B;
-				mProjMatrix[1][3] = D;
-				mProjMatrix[2][2] = q;
-				mProjMatrix[2][3] = qn;
-				mProjMatrix[3][3] = 1;
-			} // ortho            
-		} // !mCustomProjMatrix
+                mProjMatrix = Matrix4::ZERO;
+                mProjMatrix[0][0] = A;
+                mProjMatrix[0][3] = C;
+                mProjMatrix[1][1] = B;
+                mProjMatrix[1][3] = D;
+                mProjMatrix[2][2] = q;
+                mProjMatrix[2][3] = qn;
+                mProjMatrix[3][3] = 1;
+            } // ortho            
+        } // !mCustomProjMatrix
 
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
         // Deal with orientation mode
         mProjMatrix = mProjMatrix * Quaternion(Degree(mOrientationMode * 90.f), Vector3::UNIT_Z);
 #endif
 
-		RenderSystem* renderSystem = Root::getSingleton().getRenderSystem();
-		// API specific
-		renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRS);
-		// API specific for Gpu Programs
-		renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRSDepth, true);
+        RenderSystem* renderSystem = Root::getSingleton().getRenderSystem();
+        // API specific
+        renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRS);
+        // API specific for Gpu Programs
+        renderSystem->_convertProjectionMatrix(mProjMatrix, mProjMatrixRSDepth, true);
 
 
-		// Calculate bounding box (local)
-		// Box is from 0, down -Z, max dimensions as determined from far plane
-		// If infinite view frustum just pick a far value
-		Real farDist = (mFarDist == 0) ? 100000 : mFarDist;
-		// Near plane bounds
-		Vector3 min(left, bottom, -farDist);
-		Vector3 max(right, top, 0);
+        // Calculate bounding box (local)
+        // Box is from 0, down -Z, max dimensions as determined from far plane
+        // If infinite view frustum just pick a far value
+        Real farDist = (mFarDist == 0) ? 100000 : mFarDist;
+        // Near plane bounds
+        Vector3 min(left, bottom, -farDist);
+        Vector3 max(right, top, 0);
 
-		if (mCustomProjMatrix)
-		{
-			// Some custom projection matrices can have unusual inverted settings
-			// So make sure the AABB is the right way around to start with
-			Vector3 tmp = min;
-			min.makeFloor(max);
-			max.makeCeil(tmp);
-		}
+        if (mCustomProjMatrix)
+        {
+            // Some custom projection matrices can have unusual inverted settings
+            // So make sure the AABB is the right way around to start with
+            Vector3 tmp = min;
+            min.makeFloor(max);
+            max.makeCeil(tmp);
+        }
 
-		if (mProjType == PT_PERSPECTIVE)
-		{
-			// Merge with far plane bounds
-			Real radio = farDist / mNearDist;
-			min.makeFloor(Vector3(left * radio, bottom * radio, -farDist));
-			max.makeCeil(Vector3(right * radio, top * radio, 0));
-		}
-		mBoundingBox.setExtents(min, max);
+        if (mProjType == PT_PERSPECTIVE)
+        {
+            // Merge with far plane bounds
+            Real radio = farDist / mNearDist;
+            min.makeFloor(Vector3(left * radio, bottom * radio, -farDist));
+            max.makeCeil(Vector3(right * radio, top * radio, 0));
+        }
+        mBoundingBox.setExtents(min, max);
 
-		mRecalcFrustum = false;
+        mRecalcFrustum = false;
 
-		// Signal to update frustum clipping planes
-		mRecalcFrustumPlanes = true;
-	}
+        // Signal to update frustum clipping planes
+        mRecalcFrustumPlanes = true;
+    }
     //-----------------------------------------------------------------------
     void Frustum::updateFrustum(void) const
     {
         if (isFrustumOutOfDate())
         {
-			updateFrustumImpl();
+            updateFrustumImpl();
         }
     }
 
@@ -750,100 +750,100 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-	void Frustum::updateViewImpl(void) const
-	{
-		// ----------------------
-		// Update the view matrix
-		// ----------------------
+    void Frustum::updateViewImpl(void) const
+    {
+        // ----------------------
+        // Update the view matrix
+        // ----------------------
 
-		// Get orientation from quaternion
+        // Get orientation from quaternion
 
-		if (!mCustomViewMatrix)
-		{
-			Matrix3 rot;
-			const Quaternion& orientation = getOrientationForViewUpdate();
-			const Vector3& position = getPositionForViewUpdate();
+        if (!mCustomViewMatrix)
+        {
+            Matrix3 rot;
+            const Quaternion& orientation = getOrientationForViewUpdate();
+            const Vector3& position = getPositionForViewUpdate();
 
-			mViewMatrix = Math::makeViewMatrix(position, orientation, mReflect? &mReflectMatrix : 0);
-		}
+            mViewMatrix = Math::makeViewMatrix(position, orientation, mReflect? &mReflectMatrix : 0);
+        }
 
-		mRecalcView = false;
+        mRecalcView = false;
 
-		// Signal to update frustum clipping planes
-		mRecalcFrustumPlanes = true;
-		// Signal to update world space corners
-		mRecalcWorldSpaceCorners = true;
-		// Signal to update frustum if oblique plane enabled,
-		// since plane needs to be in view space
-		if (mObliqueDepthProjection)
-		{
-			mRecalcFrustum = true;
-		}
-	}
-	//---------------------------------------------------------------------
-	void Frustum::calcViewMatrixRelative(const Vector3& relPos, Matrix4& matToUpdate) const
-	{
-		Matrix4 matTrans = Matrix4::IDENTITY;
-		matTrans.setTrans(relPos);
-		matToUpdate = getViewMatrix() * matTrans;
+        // Signal to update frustum clipping planes
+        mRecalcFrustumPlanes = true;
+        // Signal to update world space corners
+        mRecalcWorldSpaceCorners = true;
+        // Signal to update frustum if oblique plane enabled,
+        // since plane needs to be in view space
+        if (mObliqueDepthProjection)
+        {
+            mRecalcFrustum = true;
+        }
+    }
+    //---------------------------------------------------------------------
+    void Frustum::calcViewMatrixRelative(const Vector3& relPos, Matrix4& matToUpdate) const
+    {
+        Matrix4 matTrans = Matrix4::IDENTITY;
+        matTrans.setTrans(relPos);
+        matToUpdate = getViewMatrix() * matTrans;
 
-	}
-	//-----------------------------------------------------------------------
+    }
+    //-----------------------------------------------------------------------
     void Frustum::updateView(void) const
     {
         if (isViewOutOfDate())
         {
-			updateViewImpl();
+            updateViewImpl();
         }
     }
 
-	//-----------------------------------------------------------------------
-	void Frustum::updateFrustumPlanesImpl(void) const
-	{
-		// -------------------------
-		// Update the frustum planes
-		// -------------------------
-		Matrix4 combo = mProjMatrix * mViewMatrix;
+    //-----------------------------------------------------------------------
+    void Frustum::updateFrustumPlanesImpl(void) const
+    {
+        // -------------------------
+        // Update the frustum planes
+        // -------------------------
+        Matrix4 combo = mProjMatrix * mViewMatrix;
 
-		mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal.x = combo[3][0] + combo[0][0];
-		mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal.y = combo[3][1] + combo[0][1];
-		mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal.z = combo[3][2] + combo[0][2];
-		mFrustumPlanes[FRUSTUM_PLANE_LEFT].d = combo[3][3] + combo[0][3];
+        mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal.x = combo[3][0] + combo[0][0];
+        mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal.y = combo[3][1] + combo[0][1];
+        mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal.z = combo[3][2] + combo[0][2];
+        mFrustumPlanes[FRUSTUM_PLANE_LEFT].d = combo[3][3] + combo[0][3];
 
-		mFrustumPlanes[FRUSTUM_PLANE_RIGHT].normal.x = combo[3][0] - combo[0][0];
-		mFrustumPlanes[FRUSTUM_PLANE_RIGHT].normal.y = combo[3][1] - combo[0][1];
-		mFrustumPlanes[FRUSTUM_PLANE_RIGHT].normal.z = combo[3][2] - combo[0][2];
-		mFrustumPlanes[FRUSTUM_PLANE_RIGHT].d = combo[3][3] - combo[0][3];
+        mFrustumPlanes[FRUSTUM_PLANE_RIGHT].normal.x = combo[3][0] - combo[0][0];
+        mFrustumPlanes[FRUSTUM_PLANE_RIGHT].normal.y = combo[3][1] - combo[0][1];
+        mFrustumPlanes[FRUSTUM_PLANE_RIGHT].normal.z = combo[3][2] - combo[0][2];
+        mFrustumPlanes[FRUSTUM_PLANE_RIGHT].d = combo[3][3] - combo[0][3];
 
-		mFrustumPlanes[FRUSTUM_PLANE_TOP].normal.x = combo[3][0] - combo[1][0];
-		mFrustumPlanes[FRUSTUM_PLANE_TOP].normal.y = combo[3][1] - combo[1][1];
-		mFrustumPlanes[FRUSTUM_PLANE_TOP].normal.z = combo[3][2] - combo[1][2];
-		mFrustumPlanes[FRUSTUM_PLANE_TOP].d = combo[3][3] - combo[1][3];
+        mFrustumPlanes[FRUSTUM_PLANE_TOP].normal.x = combo[3][0] - combo[1][0];
+        mFrustumPlanes[FRUSTUM_PLANE_TOP].normal.y = combo[3][1] - combo[1][1];
+        mFrustumPlanes[FRUSTUM_PLANE_TOP].normal.z = combo[3][2] - combo[1][2];
+        mFrustumPlanes[FRUSTUM_PLANE_TOP].d = combo[3][3] - combo[1][3];
 
-		mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.x = combo[3][0] + combo[1][0];
-		mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.y = combo[3][1] + combo[1][1];
-		mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.z = combo[3][2] + combo[1][2];
-		mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].d = combo[3][3] + combo[1][3];
+        mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.x = combo[3][0] + combo[1][0];
+        mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.y = combo[3][1] + combo[1][1];
+        mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal.z = combo[3][2] + combo[1][2];
+        mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].d = combo[3][3] + combo[1][3];
 
-		mFrustumPlanes[FRUSTUM_PLANE_NEAR].normal.x = combo[3][0] + combo[2][0];
-		mFrustumPlanes[FRUSTUM_PLANE_NEAR].normal.y = combo[3][1] + combo[2][1];
-		mFrustumPlanes[FRUSTUM_PLANE_NEAR].normal.z = combo[3][2] + combo[2][2];
-		mFrustumPlanes[FRUSTUM_PLANE_NEAR].d = combo[3][3] + combo[2][3];
+        mFrustumPlanes[FRUSTUM_PLANE_NEAR].normal.x = combo[3][0] + combo[2][0];
+        mFrustumPlanes[FRUSTUM_PLANE_NEAR].normal.y = combo[3][1] + combo[2][1];
+        mFrustumPlanes[FRUSTUM_PLANE_NEAR].normal.z = combo[3][2] + combo[2][2];
+        mFrustumPlanes[FRUSTUM_PLANE_NEAR].d = combo[3][3] + combo[2][3];
 
-		mFrustumPlanes[FRUSTUM_PLANE_FAR].normal.x = combo[3][0] - combo[2][0];
-		mFrustumPlanes[FRUSTUM_PLANE_FAR].normal.y = combo[3][1] - combo[2][1];
-		mFrustumPlanes[FRUSTUM_PLANE_FAR].normal.z = combo[3][2] - combo[2][2];
-		mFrustumPlanes[FRUSTUM_PLANE_FAR].d = combo[3][3] - combo[2][3];
+        mFrustumPlanes[FRUSTUM_PLANE_FAR].normal.x = combo[3][0] - combo[2][0];
+        mFrustumPlanes[FRUSTUM_PLANE_FAR].normal.y = combo[3][1] - combo[2][1];
+        mFrustumPlanes[FRUSTUM_PLANE_FAR].normal.z = combo[3][2] - combo[2][2];
+        mFrustumPlanes[FRUSTUM_PLANE_FAR].d = combo[3][3] - combo[2][3];
 
-		// Renormalise any normals which were not unit length
-		for(int i=0; i<6; i++ ) 
-		{
-			Real length = mFrustumPlanes[i].normal.normalise();
-			mFrustumPlanes[i].d /= length;
-		}
+        // Renormalise any normals which were not unit length
+        for(int i=0; i<6; i++ ) 
+        {
+            Real length = mFrustumPlanes[i].normal.normalise();
+            mFrustumPlanes[i].d /= length;
+        }
 
-		mRecalcFrustumPlanes = false;
-	}
+        mRecalcFrustumPlanes = false;
+    }
     //-----------------------------------------------------------------------
     void Frustum::updateFrustumPlanes(void) const
     {
@@ -852,46 +852,46 @@ namespace Ogre {
 
         if (mRecalcFrustumPlanes)
         {
-			updateFrustumPlanesImpl();
+            updateFrustumPlanesImpl();
         }
     }
-	//-----------------------------------------------------------------------
-	void Frustum::updateWorldSpaceCornersImpl(void) const
-	{
-		Matrix4 eyeToWorld = mViewMatrix.inverseAffine();
+    //-----------------------------------------------------------------------
+    void Frustum::updateWorldSpaceCornersImpl(void) const
+    {
+        Matrix4 eyeToWorld = mViewMatrix.inverseAffine();
 
-		// Note: Even though we can dealing with general projection matrix here,
-		//       but because it's incompatibly with infinite far plane, thus, we
-		//       still need to working with projection parameters.
+        // Note: Even though we can dealing with general projection matrix here,
+        //       but because it's incompatibly with infinite far plane, thus, we
+        //       still need to working with projection parameters.
 
-		// Calc near plane corners
-		Real nearLeft, nearRight, nearBottom, nearTop;
-		calcProjectionParameters(nearLeft, nearRight, nearBottom, nearTop);
+        // Calc near plane corners
+        Real nearLeft, nearRight, nearBottom, nearTop;
+        calcProjectionParameters(nearLeft, nearRight, nearBottom, nearTop);
 
-		// Treat infinite fardist as some arbitrary far value
-		Real farDist = (mFarDist == 0) ? 100000 : mFarDist;
+        // Treat infinite fardist as some arbitrary far value
+        Real farDist = (mFarDist == 0) ? 100000 : mFarDist;
 
-		// Calc far palne corners
-		Real radio = mProjType == PT_PERSPECTIVE ? farDist / mNearDist : 1;
-		Real farLeft = nearLeft * radio;
-		Real farRight = nearRight * radio;
-		Real farBottom = nearBottom * radio;
-		Real farTop = nearTop * radio;
+        // Calc far palne corners
+        Real radio = mProjType == PT_PERSPECTIVE ? farDist / mNearDist : 1;
+        Real farLeft = nearLeft * radio;
+        Real farRight = nearRight * radio;
+        Real farBottom = nearBottom * radio;
+        Real farTop = nearTop * radio;
 
-		// near
-		mWorldSpaceCorners[0] = eyeToWorld.transformAffine(Vector3(nearRight, nearTop,    -mNearDist));
-		mWorldSpaceCorners[1] = eyeToWorld.transformAffine(Vector3(nearLeft,  nearTop,    -mNearDist));
-		mWorldSpaceCorners[2] = eyeToWorld.transformAffine(Vector3(nearLeft,  nearBottom, -mNearDist));
-		mWorldSpaceCorners[3] = eyeToWorld.transformAffine(Vector3(nearRight, nearBottom, -mNearDist));
-		// far
-		mWorldSpaceCorners[4] = eyeToWorld.transformAffine(Vector3(farRight,  farTop,     -farDist));
-		mWorldSpaceCorners[5] = eyeToWorld.transformAffine(Vector3(farLeft,   farTop,     -farDist));
-		mWorldSpaceCorners[6] = eyeToWorld.transformAffine(Vector3(farLeft,   farBottom,  -farDist));
-		mWorldSpaceCorners[7] = eyeToWorld.transformAffine(Vector3(farRight,  farBottom,  -farDist));
+        // near
+        mWorldSpaceCorners[0] = eyeToWorld.transformAffine(Vector3(nearRight, nearTop,    -mNearDist));
+        mWorldSpaceCorners[1] = eyeToWorld.transformAffine(Vector3(nearLeft,  nearTop,    -mNearDist));
+        mWorldSpaceCorners[2] = eyeToWorld.transformAffine(Vector3(nearLeft,  nearBottom, -mNearDist));
+        mWorldSpaceCorners[3] = eyeToWorld.transformAffine(Vector3(nearRight, nearBottom, -mNearDist));
+        // far
+        mWorldSpaceCorners[4] = eyeToWorld.transformAffine(Vector3(farRight,  farTop,     -farDist));
+        mWorldSpaceCorners[5] = eyeToWorld.transformAffine(Vector3(farLeft,   farTop,     -farDist));
+        mWorldSpaceCorners[6] = eyeToWorld.transformAffine(Vector3(farLeft,   farBottom,  -farDist));
+        mWorldSpaceCorners[7] = eyeToWorld.transformAffine(Vector3(farRight,  farBottom,  -farDist));
 
 
-		mRecalcWorldSpaceCorners = false;
-	}
+        mRecalcWorldSpaceCorners = false;
+    }
     //-----------------------------------------------------------------------
     void Frustum::updateWorldSpaceCorners(void) const
     {
@@ -899,7 +899,7 @@ namespace Ogre {
 
         if (mRecalcWorldSpaceCorners)
         {
-			updateWorldSpaceCornersImpl();
+            updateWorldSpaceCornersImpl();
         }
 
     }
@@ -925,11 +925,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Frustum::_updateRenderQueue(RenderQueue* queue)
     {
-		if (mDebugDisplay)
-		{
-			// Add self 
-			queue->addRenderable(this);
-		}
+        if (mDebugDisplay)
+        {
+            // Add self 
+            queue->addRenderable(this);
+        }
     }
     //-----------------------------------------------------------------------
     const String& Frustum::getMovableType(void) const
@@ -937,10 +937,10 @@ namespace Ogre {
         return msMovableType;
     }
     //-----------------------------------------------------------------------
-	Real Frustum::getBoundingRadius(void) const
-	{
+    Real Frustum::getBoundingRadius(void) const
+    {
         return (mFarDist == 0)? 100000 : mFarDist;
-	}
+    }
     //-----------------------------------------------------------------------
     const MaterialPtr& Frustum::getMaterial(void) const
     {
@@ -1066,165 +1066,165 @@ namespace Ogre {
     bool Frustum::projectSphere(const Sphere& sphere, 
         Real* left, Real* top, Real* right, Real* bottom) const
     {
-		// See http://www.gamasutra.com/features/20021011/lengyel_06.htm
+        // See http://www.gamasutra.com/features/20021011/lengyel_06.htm
         // Transform light position into camera space
 
         updateView();
         Vector3 eyeSpacePos = mViewMatrix.transformAffine(sphere.getCenter());
 
-		// initialise
-		*left = *bottom = -1.0f;
-		*right = *top = 1.0f;
+        // initialise
+        *left = *bottom = -1.0f;
+        *right = *top = 1.0f;
 
         if (eyeSpacePos.z < 0)
         {
-			updateFrustum();
-			const Matrix4& projMatrix = getProjectionMatrix();
+            updateFrustum();
+            const Matrix4& projMatrix = getProjectionMatrix();
             Real r = sphere.getRadius();
-			Real rsq = r * r;
+            Real rsq = r * r;
 
             // early-exit
             if (eyeSpacePos.squaredLength() <= rsq)
                 return false;
 
-			Real Lxz = Math::Sqr(eyeSpacePos.x) + Math::Sqr(eyeSpacePos.z);
-			Real Lyz = Math::Sqr(eyeSpacePos.y) + Math::Sqr(eyeSpacePos.z);
+            Real Lxz = Math::Sqr(eyeSpacePos.x) + Math::Sqr(eyeSpacePos.z);
+            Real Lyz = Math::Sqr(eyeSpacePos.y) + Math::Sqr(eyeSpacePos.z);
 
-			// Find the tangent planes to the sphere
-			// XZ first
-			// calculate quadratic discriminant: b*b - 4ac
-			// x = Nx
-			// a = Lx^2 + Lz^2
-			// b = -2rLx
-			// c = r^2 - Lz^2
-			Real a = Lxz;
-			Real b = -2.0f * r * eyeSpacePos.x;
-			Real c = rsq - Math::Sqr(eyeSpacePos.z);
-			Real D = b*b - 4.0f*a*c;
+            // Find the tangent planes to the sphere
+            // XZ first
+            // calculate quadratic discriminant: b*b - 4ac
+            // x = Nx
+            // a = Lx^2 + Lz^2
+            // b = -2rLx
+            // c = r^2 - Lz^2
+            Real a = Lxz;
+            Real b = -2.0f * r * eyeSpacePos.x;
+            Real c = rsq - Math::Sqr(eyeSpacePos.z);
+            Real D = b*b - 4.0f*a*c;
 
-			// two roots?
-			if (D > 0)
-			{
-				Real sqrootD = Math::Sqrt(D);
-				// solve the quadratic to get the components of the normal
-				Real Nx0 = (-b + sqrootD) / (2 * a);
-				Real Nx1 = (-b - sqrootD) / (2 * a);
-				
-				// Derive Z from this
-				Real Nz0 = (r - Nx0 * eyeSpacePos.x) / eyeSpacePos.z;
-				Real Nz1 = (r - Nx1 * eyeSpacePos.x) / eyeSpacePos.z;
+            // two roots?
+            if (D > 0)
+            {
+                Real sqrootD = Math::Sqrt(D);
+                // solve the quadratic to get the components of the normal
+                Real Nx0 = (-b + sqrootD) / (2 * a);
+                Real Nx1 = (-b - sqrootD) / (2 * a);
+                
+                // Derive Z from this
+                Real Nz0 = (r - Nx0 * eyeSpacePos.x) / eyeSpacePos.z;
+                Real Nz1 = (r - Nx1 * eyeSpacePos.x) / eyeSpacePos.z;
 
-				// Get the point of tangency
-				// Only consider points of tangency in front of the camera
-				Real Pz0 = (Lxz - rsq) / (eyeSpacePos.z - ((Nz0 / Nx0) * eyeSpacePos.x));
-				if (Pz0 < 0)
-				{
-					// Project point onto near plane in worldspace
-					Real nearx0 = (Nz0 * mNearDist) / Nx0;
-					// now we need to map this to viewport coords
-					// use projection matrix since that will take into account all factors
-					Vector3 relx0 = projMatrix * Vector3(nearx0, 0, -mNearDist);
+                // Get the point of tangency
+                // Only consider points of tangency in front of the camera
+                Real Pz0 = (Lxz - rsq) / (eyeSpacePos.z - ((Nz0 / Nx0) * eyeSpacePos.x));
+                if (Pz0 < 0)
+                {
+                    // Project point onto near plane in worldspace
+                    Real nearx0 = (Nz0 * mNearDist) / Nx0;
+                    // now we need to map this to viewport coords
+                    // use projection matrix since that will take into account all factors
+                    Vector3 relx0 = projMatrix * Vector3(nearx0, 0, -mNearDist);
 
-					// find out whether this is a left side or right side
-					Real Px0 = -(Pz0 * Nz0) / Nx0;
-					if (Px0 > eyeSpacePos.x)
-					{
-						*right = std::min(*right, relx0.x);
-					}
-					else
-					{
-						*left = std::max(*left, relx0.x);
-					}
-				}
-				Real Pz1 = (Lxz - rsq) / (eyeSpacePos.z - ((Nz1 / Nx1) * eyeSpacePos.x));
-				if (Pz1 < 0)
-				{
-					// Project point onto near plane in worldspace
-					Real nearx1 = (Nz1 * mNearDist) / Nx1;
-					// now we need to map this to viewport coords
-					// use projection matrix since that will take into account all factors
-					Vector3 relx1 = projMatrix * Vector3(nearx1, 0, -mNearDist);
+                    // find out whether this is a left side or right side
+                    Real Px0 = -(Pz0 * Nz0) / Nx0;
+                    if (Px0 > eyeSpacePos.x)
+                    {
+                        *right = std::min(*right, relx0.x);
+                    }
+                    else
+                    {
+                        *left = std::max(*left, relx0.x);
+                    }
+                }
+                Real Pz1 = (Lxz - rsq) / (eyeSpacePos.z - ((Nz1 / Nx1) * eyeSpacePos.x));
+                if (Pz1 < 0)
+                {
+                    // Project point onto near plane in worldspace
+                    Real nearx1 = (Nz1 * mNearDist) / Nx1;
+                    // now we need to map this to viewport coords
+                    // use projection matrix since that will take into account all factors
+                    Vector3 relx1 = projMatrix * Vector3(nearx1, 0, -mNearDist);
 
-					// find out whether this is a left side or right side
-					Real Px1 = -(Pz1 * Nz1) / Nx1;
-					if (Px1 > eyeSpacePos.x)
-					{
-						*right = std::min(*right, relx1.x);
-					}
-					else
-					{
-						*left = std::max(*left, relx1.x);
-					}
-				}
-			}
+                    // find out whether this is a left side or right side
+                    Real Px1 = -(Pz1 * Nz1) / Nx1;
+                    if (Px1 > eyeSpacePos.x)
+                    {
+                        *right = std::min(*right, relx1.x);
+                    }
+                    else
+                    {
+                        *left = std::max(*left, relx1.x);
+                    }
+                }
+            }
 
 
-			// Now YZ 
-			// calculate quadratic discriminant: b*b - 4ac
-			// x = Ny
-			// a = Ly^2 + Lz^2
-			// b = -2rLy
-			// c = r^2 - Lz^2
-			a = Lyz;
-			b = -2.0f * r * eyeSpacePos.y;
-			c = rsq - Math::Sqr(eyeSpacePos.z);
-			D = b*b - 4.0f*a*c;
+            // Now YZ 
+            // calculate quadratic discriminant: b*b - 4ac
+            // x = Ny
+            // a = Ly^2 + Lz^2
+            // b = -2rLy
+            // c = r^2 - Lz^2
+            a = Lyz;
+            b = -2.0f * r * eyeSpacePos.y;
+            c = rsq - Math::Sqr(eyeSpacePos.z);
+            D = b*b - 4.0f*a*c;
 
-			// two roots?
-			if (D > 0)
-			{
-				Real sqrootD = Math::Sqrt(D);
-				// solve the quadratic to get the components of the normal
-				Real Ny0 = (-b + sqrootD) / (2 * a);
-				Real Ny1 = (-b - sqrootD) / (2 * a);
+            // two roots?
+            if (D > 0)
+            {
+                Real sqrootD = Math::Sqrt(D);
+                // solve the quadratic to get the components of the normal
+                Real Ny0 = (-b + sqrootD) / (2 * a);
+                Real Ny1 = (-b - sqrootD) / (2 * a);
 
-				// Derive Z from this
-				Real Nz0 = (r - Ny0 * eyeSpacePos.y) / eyeSpacePos.z;
-				Real Nz1 = (r - Ny1 * eyeSpacePos.y) / eyeSpacePos.z;
+                // Derive Z from this
+                Real Nz0 = (r - Ny0 * eyeSpacePos.y) / eyeSpacePos.z;
+                Real Nz1 = (r - Ny1 * eyeSpacePos.y) / eyeSpacePos.z;
 
-				// Get the point of tangency
-				// Only consider points of tangency in front of the camera
-				Real Pz0 = (Lyz - rsq) / (eyeSpacePos.z - ((Nz0 / Ny0) * eyeSpacePos.y));
-				if (Pz0 < 0)
-				{
-					// Project point onto near plane in worldspace
-					Real neary0 = (Nz0 * mNearDist) / Ny0;
-					// now we need to map this to viewport coords
-					// use projection matriy since that will take into account all factors
-					Vector3 rely0 = projMatrix * Vector3(0, neary0, -mNearDist);
+                // Get the point of tangency
+                // Only consider points of tangency in front of the camera
+                Real Pz0 = (Lyz - rsq) / (eyeSpacePos.z - ((Nz0 / Ny0) * eyeSpacePos.y));
+                if (Pz0 < 0)
+                {
+                    // Project point onto near plane in worldspace
+                    Real neary0 = (Nz0 * mNearDist) / Ny0;
+                    // now we need to map this to viewport coords
+                    // use projection matriy since that will take into account all factors
+                    Vector3 rely0 = projMatrix * Vector3(0, neary0, -mNearDist);
 
-					// find out whether this is a top side or bottom side
-					Real Py0 = -(Pz0 * Nz0) / Ny0;
-					if (Py0 > eyeSpacePos.y)
-					{
-						*top = std::min(*top, rely0.y);
-					}
-					else
-					{
-						*bottom = std::max(*bottom, rely0.y);
-					}
-				}
-				Real Pz1 = (Lyz - rsq) / (eyeSpacePos.z - ((Nz1 / Ny1) * eyeSpacePos.y));
-				if (Pz1 < 0)
-				{
-					// Project point onto near plane in worldspace
-					Real neary1 = (Nz1 * mNearDist) / Ny1;
-					// now we need to map this to viewport coords
-					// use projection matriy since that will take into account all factors
-					Vector3 rely1 = projMatrix * Vector3(0, neary1, -mNearDist);
+                    // find out whether this is a top side or bottom side
+                    Real Py0 = -(Pz0 * Nz0) / Ny0;
+                    if (Py0 > eyeSpacePos.y)
+                    {
+                        *top = std::min(*top, rely0.y);
+                    }
+                    else
+                    {
+                        *bottom = std::max(*bottom, rely0.y);
+                    }
+                }
+                Real Pz1 = (Lyz - rsq) / (eyeSpacePos.z - ((Nz1 / Ny1) * eyeSpacePos.y));
+                if (Pz1 < 0)
+                {
+                    // Project point onto near plane in worldspace
+                    Real neary1 = (Nz1 * mNearDist) / Ny1;
+                    // now we need to map this to viewport coords
+                    // use projection matriy since that will take into account all factors
+                    Vector3 rely1 = projMatrix * Vector3(0, neary1, -mNearDist);
 
-					// find out whether this is a top side or bottom side
-					Real Py1 = -(Pz1 * Nz1) / Ny1;
-					if (Py1 > eyeSpacePos.y)
-					{
-						*top = std::min(*top, rely1.y);
-					}
-					else
-					{
-						*bottom = std::max(*bottom, rely1.y);
-					}
-				}
-			}
+                    // find out whether this is a top side or bottom side
+                    Real Py1 = -(Pz1 * Nz1) / Ny1;
+                    if (Py1 > eyeSpacePos.y)
+                    {
+                        *top = std::min(*top, rely1.y);
+                    }
+                    else
+                    {
+                        *bottom = std::max(*bottom, rely1.y);
+                    }
+                }
+            }
         }
 
         return (*left != -1.0f) || (*top != 1.0f) || (*right != 1.0f) || (*bottom != -1.0f);
@@ -1254,106 +1254,106 @@ namespace Ogre {
         invalidateFrustum();
     }
     //---------------------------------------------------------------------
-	void Frustum::setCustomViewMatrix(bool enable, const Matrix4& viewMatrix)
-	{
-		mCustomViewMatrix = enable;
-		if (enable)
-		{
+    void Frustum::setCustomViewMatrix(bool enable, const Matrix4& viewMatrix)
+    {
+        mCustomViewMatrix = enable;
+        if (enable)
+        {
             assert(viewMatrix.isAffine());
-			mViewMatrix = viewMatrix;
-		}
-		invalidateView();
-	}
+            mViewMatrix = viewMatrix;
+        }
+        invalidateView();
+    }
     //---------------------------------------------------------------------
-	void Frustum::setCustomProjectionMatrix(bool enable, const Matrix4& projMatrix)
-	{
-		mCustomProjMatrix = enable;
-		if (enable)
-		{
-			mProjMatrix = projMatrix;
-		}
-		invalidateFrustum();
-	}
-	//---------------------------------------------------------------------
-	void Frustum::setOrthoWindow(Real w, Real h)
-	{
-		mOrthoHeight = h;
-		mAspect = w / h;
-		invalidateFrustum();
-	}
-	//---------------------------------------------------------------------
-	void Frustum::setOrthoWindowHeight(Real h)
-	{
-		mOrthoHeight = h;
-		invalidateFrustum();
-	}
-	//---------------------------------------------------------------------
-	void Frustum::setOrthoWindowWidth(Real w)
-	{
-		mOrthoHeight = w / mAspect;
-		invalidateFrustum();
-	}
-	//---------------------------------------------------------------------
-	Real Frustum::getOrthoWindowHeight() const
-	{
-		return mOrthoHeight;
-	}
-	//---------------------------------------------------------------------
-	Real Frustum::getOrthoWindowWidth() const
-	{
-		return mOrthoHeight * mAspect;	
-	}
-	//---------------------------------------------------------------------
-	void Frustum::visitRenderables(Renderable::Visitor* visitor, 
-		bool debugRenderables)
-	{
-		// Only displayed in debug
-		if (debugRenderables)
-		{
-			visitor->visit(this, 0, true);
-		}
+    void Frustum::setCustomProjectionMatrix(bool enable, const Matrix4& projMatrix)
+    {
+        mCustomProjMatrix = enable;
+        if (enable)
+        {
+            mProjMatrix = projMatrix;
+        }
+        invalidateFrustum();
+    }
+    //---------------------------------------------------------------------
+    void Frustum::setOrthoWindow(Real w, Real h)
+    {
+        mOrthoHeight = h;
+        mAspect = w / h;
+        invalidateFrustum();
+    }
+    //---------------------------------------------------------------------
+    void Frustum::setOrthoWindowHeight(Real h)
+    {
+        mOrthoHeight = h;
+        invalidateFrustum();
+    }
+    //---------------------------------------------------------------------
+    void Frustum::setOrthoWindowWidth(Real w)
+    {
+        mOrthoHeight = w / mAspect;
+        invalidateFrustum();
+    }
+    //---------------------------------------------------------------------
+    Real Frustum::getOrthoWindowHeight() const
+    {
+        return mOrthoHeight;
+    }
+    //---------------------------------------------------------------------
+    Real Frustum::getOrthoWindowWidth() const
+    {
+        return mOrthoHeight * mAspect;  
+    }
+    //---------------------------------------------------------------------
+    void Frustum::visitRenderables(Renderable::Visitor* visitor, 
+        bool debugRenderables)
+    {
+        // Only displayed in debug
+        if (debugRenderables)
+        {
+            visitor->visit(this, 0, true);
+        }
 
-	}
-	//---------------------------------------------------------------------
-	void Frustum::setFrustumExtents(Real left, Real right, Real top, Real bottom)
-	{
-		mFrustumExtentsManuallySet = true;
-		mLeft = left;
-		mRight = right;
-		mTop = top;
-		mBottom = bottom;
+    }
+    //---------------------------------------------------------------------
+    void Frustum::setFrustumExtents(Real left, Real right, Real top, Real bottom)
+    {
+        mFrustumExtentsManuallySet = true;
+        mLeft = left;
+        mRight = right;
+        mTop = top;
+        mBottom = bottom;
 
-		invalidateFrustum();
-	}
-	//---------------------------------------------------------------------
-	void Frustum::resetFrustumExtents()
-	{
-		mFrustumExtentsManuallySet = false;
-		invalidateFrustum();
-	}
-	//---------------------------------------------------------------------
-	void Frustum::getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const
-	{
-		updateFrustum();
-		outleft = mLeft;
-		outright = mRight;
-		outtop = mTop;
-		outbottom = mBottom;
-	}
-	//---------------------------------------------------------------------
-	PlaneBoundedVolume Frustum::getPlaneBoundedVolume()
-	{
-		updateFrustumPlanes();
+        invalidateFrustum();
+    }
+    //---------------------------------------------------------------------
+    void Frustum::resetFrustumExtents()
+    {
+        mFrustumExtentsManuallySet = false;
+        invalidateFrustum();
+    }
+    //---------------------------------------------------------------------
+    void Frustum::getFrustumExtents(Real& outleft, Real& outright, Real& outtop, Real& outbottom) const
+    {
+        updateFrustum();
+        outleft = mLeft;
+        outright = mRight;
+        outtop = mTop;
+        outbottom = mBottom;
+    }
+    //---------------------------------------------------------------------
+    PlaneBoundedVolume Frustum::getPlaneBoundedVolume()
+    {
+        updateFrustumPlanes();
 
-		PlaneBoundedVolume volume;
-		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_NEAR]);
-		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_FAR]);
-		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_BOTTOM]);
-		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_TOP]);
-		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_LEFT]);
-		volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_RIGHT]);
-		return volume;
-	}
+        PlaneBoundedVolume volume;
+        volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_NEAR]);
+        volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_FAR]);
+        volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_BOTTOM]);
+        volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_TOP]);
+        volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_LEFT]);
+        volume.planes.push_back(mFrustumPlanes[FRUSTUM_PLANE_RIGHT]);
+        return volume;
+    }
     //---------------------------------------------------------------------
     void Frustum::setOrientationMode(OrientationMode orientationMode)
     {

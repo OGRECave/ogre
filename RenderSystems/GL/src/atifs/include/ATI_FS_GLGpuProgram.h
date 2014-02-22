@@ -34,37 +34,37 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** Specialisation of the GL low-level program for ATI Fragment Shader programs. */
-	class _OgreGLExport ATI_FS_GLGpuProgram : public GLGpuProgram
-	{
-	public:
+    /** Specialisation of the GL low-level program for ATI Fragment Shader programs. */
+    class _OgreGLExport ATI_FS_GLGpuProgram : public GLGpuProgram
+    {
+    public:
         ATI_FS_GLGpuProgram(ResourceManager* creator, 
             const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader);
-		virtual ~ATI_FS_GLGpuProgram();
+        virtual ~ATI_FS_GLGpuProgram();
 
 
-		/// Execute the binding functions for this program
-		void bindProgram(void);
-		/// Execute the unbinding functions for this program
-		void unbindProgram(void);
-		/// Execute the param binding functions for this program
-		void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-		/** Execute the pass iteration param binding functions for this program.
+        /// Execute the binding functions for this program
+        void bindProgram(void);
+        /// Execute the unbinding functions for this program
+        void unbindProgram(void);
+        /// Execute the param binding functions for this program
+        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /** Execute the pass iteration param binding functions for this program.
             Only binds those parameters used for multipass rendering
         */
         void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
-		/// Get the assigned GL program id
-		GLuint getProgramID(void) const
-		{ return mProgramID; }
+        /// Get the assigned GL program id
+        GLuint getProgramID(void) const
+        { return mProgramID; }
 
-	protected:
-		/// @copydoc Resource::unload
-		void unloadImpl(void);
-		void loadFromSource(void);
+    protected:
+        /// @copydoc Resource::unload
+        void unloadImpl(void);
+        void loadFromSource(void);
 
-	}; // class ATI_FS_GLGpuProgram
+    }; // class ATI_FS_GLGpuProgram
 
 
 

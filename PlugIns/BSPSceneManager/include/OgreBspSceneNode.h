@@ -48,9 +48,9 @@ namespace Ogre {
     */
     class BspSceneNode : public SceneNode
     {
-	protected:
-		/// Overridden from SceneNode
-		void setInSceneGraph(bool inGraph);		
+    protected:
+        /// Overridden from SceneNode
+        void setInSceneGraph(bool inGraph);     
     public:
         BspSceneNode(SceneManager* creator) : SceneNode(creator) {}
         BspSceneNode(SceneManager* creator, const String& name) 

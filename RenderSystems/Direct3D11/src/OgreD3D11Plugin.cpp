@@ -30,42 +30,42 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	const String sPluginName = "D3D11 RenderSystem";
-	//---------------------------------------------------------------------
-	D3D11Plugin::D3D11Plugin()
-		: mRenderSystem(0)
-	{
+    const String sPluginName = "D3D11 RenderSystem";
+    //---------------------------------------------------------------------
+    D3D11Plugin::D3D11Plugin()
+        : mRenderSystem(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	const String& D3D11Plugin::getName() const
-	{
-		return sPluginName;
-	}
-	//---------------------------------------------------------------------
-	void D3D11Plugin::install()
-	{
-		// Create the DirectX 11 rendering api
-		mRenderSystem = new D3D11RenderSystem();
-		// Register the render system
-		Root::getSingleton().addRenderSystem( mRenderSystem );
-	}
-	//---------------------------------------------------------------------
-	void D3D11Plugin::initialise()
-	{
-		// nothing to do
-	}
-	//---------------------------------------------------------------------
-	void D3D11Plugin::shutdown()
-	{
-		// nothing to do
-	}
-	//---------------------------------------------------------------------
-	void D3D11Plugin::uninstall()
-	{
-		delete mRenderSystem;
-		mRenderSystem = 0;
-	}
+    }
+    //---------------------------------------------------------------------
+    const String& D3D11Plugin::getName() const
+    {
+        return sPluginName;
+    }
+    //---------------------------------------------------------------------
+    void D3D11Plugin::install()
+    {
+        // Create the DirectX 11 rendering api
+        mRenderSystem = new D3D11RenderSystem();
+        // Register the render system
+        Root::getSingleton().addRenderSystem( mRenderSystem );
+    }
+    //---------------------------------------------------------------------
+    void D3D11Plugin::initialise()
+    {
+        // nothing to do
+    }
+    //---------------------------------------------------------------------
+    void D3D11Plugin::shutdown()
+    {
+        // nothing to do
+    }
+    //---------------------------------------------------------------------
+    void D3D11Plugin::uninstall()
+    {
+        delete mRenderSystem;
+        mRenderSystem = 0;
+    }
 
 
 }

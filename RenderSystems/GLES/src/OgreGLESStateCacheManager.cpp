@@ -81,9 +81,9 @@ namespace Ogre {
     }
     
     bool GLESStateCacheManager::activateGLTextureUnit(unsigned char unit)
-	{
+    {
         return mImp->activateGLTextureUnit(unit);
-	}
+    }
     
     void GLESStateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {

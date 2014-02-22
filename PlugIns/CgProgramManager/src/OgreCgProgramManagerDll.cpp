@@ -47,8 +47,8 @@ namespace Ogre {
     }
     extern "C" void _OgreCgPluginExport dllStopPlugin(void)
     {
-		Root::getSingleton().uninstallPlugin(cgPlugin);
-		OGRE_DELETE cgPlugin;
+        Root::getSingleton().uninstallPlugin(cgPlugin);
+        OGRE_DELETE cgPlugin;
     }
 #endif
 

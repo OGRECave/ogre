@@ -45,32 +45,32 @@ namespace Ogre
         mSelectedRenderSystem = 0;
     }
 
-	ConfigDialog::~ConfigDialog()
+    ConfigDialog::~ConfigDialog()
     {
-	}
+    }
 
 
     bool ConfigDialog::display(void)
     {
-		if(Root::getSingleton().getRenderSystem() != NULL)
-		{
-			return true;
-		}
+        if(Root::getSingleton().getRenderSystem() != NULL)
+        {
+            return true;
+        }
 
-		// just select the first available render system for now.
-		const RenderSystemList* lstRend;
-		RenderSystemList::const_iterator pRend;
+        // just select the first available render system for now.
+        const RenderSystemList* lstRend;
+        RenderSystemList::const_iterator pRend;
 
-		lstRend = &Root::getSingleton().getAvailableRenderers();
-		pRend = lstRend->begin();            
+        lstRend = &Root::getSingleton().getAvailableRenderers();
+        pRend = lstRend->begin();            
 
-		if (pRend != lstRend->end())
-		{
-			Root::getSingleton().setRenderSystem((*pRend));
+        if (pRend != lstRend->end())
+        {
+            Root::getSingleton().setRenderSystem((*pRend));
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
+        return false;
     }
 }

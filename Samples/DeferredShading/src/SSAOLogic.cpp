@@ -20,17 +20,17 @@ using namespace Ogre;
 class ssaoListener: public Ogre::CompositorInstance::Listener
 {
 public:
-	
-	ssaoListener(Ogre::CompositorInstance* instance) : mInstance(instance) {}
+    
+    ssaoListener(Ogre::CompositorInstance* instance) : mInstance(instance) {}
    
-	// this callback we will use to modify SSAO parameters
+    // this callback we will use to modify SSAO parameters
     void notifyMaterialRender(Ogre::uint32 pass_id, Ogre::MaterialPtr &mat)
     {
         if (pass_id != 42) // not SSAO, return
             return;
 
         // this is the camera you're using
-		Ogre::Camera *cam = mInstance->getChain()->getViewport()->getCamera();
+        Ogre::Camera *cam = mInstance->getChain()->getViewport()->getCamera();
 
         // calculate the far-top-right corner in view-space
         Ogre::Vector3 farCorner = cam->getViewMatrix(true) * cam->getWorldSpaceCorners()[4];
@@ -58,10 +58,10 @@ public:
             params->setNamedConstant("far", cam->getFarClipDistance());
     }
 private:
-	Ogre::CompositorInstance* mInstance;
+    Ogre::CompositorInstance* mInstance;
 };
 
 Ogre::CompositorInstance::Listener* SSAOLogic::createListener(Ogre::CompositorInstance* instance)
 {
-	return new ssaoListener(instance);
+    return new ssaoListener(instance);
 }

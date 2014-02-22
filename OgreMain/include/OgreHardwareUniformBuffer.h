@@ -35,30 +35,30 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	class HardwareBufferManagerBase;
+    class HardwareBufferManagerBase;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/** Specialisation of HardwareBuffer for a uniform buffer. */
-	class _OgreExport HardwareUniformBuffer : public HardwareBuffer
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /** Specialisation of HardwareBuffer for a uniform buffer. */
+    class _OgreExport HardwareUniformBuffer : public HardwareBuffer
     {
-	    protected:
-		    HardwareBufferManagerBase* mMgr;
-			String mName;
+        protected:
+            HardwareBufferManagerBase* mMgr;
+            String mName;
 
-	    public:
-		    /// Should be called by HardwareBufferManager
-		    HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
-							HardwareBuffer::Usage usage, bool useShadowBuffer = false, const String& name = "");
-		    ~HardwareUniformBuffer();
-		    /// Return the manager of this buffer, if any
-		    HardwareBufferManagerBase* getManager() const { return mMgr; }
+        public:
+            /// Should be called by HardwareBufferManager
+            HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
+                            HardwareBuffer::Usage usage, bool useShadowBuffer = false, const String& name = "");
+            ~HardwareUniformBuffer();
+            /// Return the manager of this buffer, if any
+            HardwareBufferManagerBase* getManager() const { return mMgr; }
 
-			const String& getName() const { return mName; }
+            const String& getName() const { return mName; }
 
     };
 

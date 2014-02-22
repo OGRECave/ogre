@@ -35,17 +35,17 @@
 
 namespace Ogre {
     
-	//-----------------------------------------------------------------------
-	GLSLESProgramCommon::GLSLESProgramCommon(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
+    //-----------------------------------------------------------------------
+    GLSLESProgramCommon::GLSLESProgramCommon(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
     : mVertexProgram(vertexProgram)
     , mFragmentProgram(fragmentProgram)
     , mUniformRefsBuilt(false)
     , mLinked(false)
     , mTriedToLinkAndFailed(false)
-	{
-		// init mCustomAttributesIndexes
-		for(size_t i = 0 ; i < VES_COUNT; i++)
-			for(size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
+    {
+        // init mCustomAttributesIndexes
+        for(size_t i = 0 ; i < VES_COUNT; i++)
+            for(size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
             {
                 mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
             }
@@ -70,38 +70,38 @@ namespace Ogre {
         }
 
         // Initialise uniform cache
-		mUniformCache = new GLES2UniformCache();
-	}
+        mUniformCache = new GLES2UniformCache();
+    }
     
-	//-----------------------------------------------------------------------
-	GLSLESProgramCommon::~GLSLESProgramCommon(void)
-	{
-		OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+    //-----------------------------------------------------------------------
+    GLSLESProgramCommon::~GLSLESProgramCommon(void)
+    {
+        OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
 
         delete mUniformCache;
         mUniformCache = 0;
-	}
+    }
     
-	//-----------------------------------------------------------------------
-	Ogre::String GLSLESProgramCommon::getCombinedName()
-	{
-		String name;
-		if (mVertexProgram)
-		{
-			name += "Vertex Program:" ;
-			name += mVertexProgram->getName();
-		}
-		if (mFragmentProgram)
-		{
-			name += " Fragment Program:" ;
-			name += mFragmentProgram->getName();
-		}
+    //-----------------------------------------------------------------------
+    Ogre::String GLSLESProgramCommon::getCombinedName()
+    {
+        String name;
+        if (mVertexProgram)
+        {
+            name += "Vertex Program:" ;
+            name += mVertexProgram->getName();
+        }
+        if (mFragmentProgram)
+        {
+            name += " Fragment Program:" ;
+            name += mFragmentProgram->getName();
+        }
         name += "\n";
 
-		return name;
-	}
+        return name;
+    }
 
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     VertexElementSemantic GLSLESProgramCommon::getAttributeSemanticEnum(String type)
     {
         VertexElementSemantic semantic = mSemanticTypeMap[type];
@@ -116,9 +116,9 @@ namespace Ogre {
         }
     }
     
-	//-----------------------------------------------------------------------
-	const char * GLSLESProgramCommon::getAttributeSemanticString(VertexElementSemantic semantic)
-	{
+    //-----------------------------------------------------------------------
+    const char * GLSLESProgramCommon::getAttributeSemanticString(VertexElementSemantic semantic)
+    {
         for (SemanticToStringMap::iterator i = mSemanticTypeMap.begin(); i != mSemanticTypeMap.end(); ++i)
         {
             if((*i).second == semantic)
@@ -127,59 +127,59 @@ namespace Ogre {
 
         assert(false && "Missing attribute!");
         return 0;
-	}
+    }
     
-	//-----------------------------------------------------------------------
-	GLint GLSLESProgramCommon::getAttributeIndex(VertexElementSemantic semantic, uint index)
-	{
-		GLint res = mCustomAttributesIndexes[semantic-1][index];
-		if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
-		{
-			const char * attString = getAttributeSemanticString(semantic);
-			GLint attrib;
+    //-----------------------------------------------------------------------
+    GLint GLSLESProgramCommon::getAttributeIndex(VertexElementSemantic semantic, uint index)
+    {
+        GLint res = mCustomAttributesIndexes[semantic-1][index];
+        if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
+        {
+            const char * attString = getAttributeSemanticString(semantic);
+            GLint attrib;
             OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attString));
 
-			// sadly position is a special case 
-			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
-			{
-				OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, "position"));
-			}
+            // sadly position is a special case 
+            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
+            {
+                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, "position"));
+            }
 
-			// for uv and other case the index is a part of the name
-			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
-			{
-				String attStringWithSemantic = String(attString) + StringConverter::toString(index);
-				OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attStringWithSemantic.c_str()));
-			}
+            // for uv and other case the index is a part of the name
+            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
+            {
+                String attStringWithSemantic = String(attString) + StringConverter::toString(index);
+                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attStringWithSemantic.c_str()));
+            }
 
-			// update mCustomAttributesIndexes with the index we found (or didn't find) 
-			mCustomAttributesIndexes[semantic-1][index] = attrib;
-			res = attrib;
-		}
-		return res;
-	}
-	//-----------------------------------------------------------------------
-	bool GLSLESProgramCommon::isAttributeValid(VertexElementSemantic semantic, uint index)
-	{
-		return getAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
-	}
+            // update mCustomAttributesIndexes with the index we found (or didn't find) 
+            mCustomAttributesIndexes[semantic-1][index] = attrib;
+            res = attrib;
+        }
+        return res;
+    }
     //-----------------------------------------------------------------------
-	void GLSLESProgramCommon::getMicrocodeFromCache(void)
-	{
-		GpuProgramManager::Microcode cacheMicrocode =
+    bool GLSLESProgramCommon::isAttributeValid(VertexElementSemantic semantic, uint index)
+    {
+        return getAttributeIndex(semantic, index) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
+    }
+    //-----------------------------------------------------------------------
+    void GLSLESProgramCommon::getMicrocodeFromCache(void)
+    {
+        GpuProgramManager::Microcode cacheMicrocode =
             GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
 
-		// add to the microcode to the cache
-		String name;
-		name = getCombinedName();
+        // add to the microcode to the cache
+        String name;
+        name = getCombinedName();
 
-		// turns out we need this param when loading
-		GLenum binaryFormat = 0;
+        // turns out we need this param when loading
+        GLenum binaryFormat = 0;
 
-		cacheMicrocode->seek(0);
+        cacheMicrocode->seek(0);
 
-		// get size of binary
-		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
+        // get size of binary
+        cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
 
         if(getGLES2SupportRef()->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
         {
@@ -192,17 +192,17 @@ namespace Ogre {
                                binaryLength));
         }
 
-		GLint success = 0;
-		OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success));
-		if (!success)
-		{
-			//
-			// Something must have changed since the program binaries
-			// were cached away.  Fallback to source shader loading path,
-			// and then retrieve and cache new program binaries once again.
-			//
-			compileAndLink();
-		}
-	}
+        GLint success = 0;
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success));
+        if (!success)
+        {
+            //
+            // Something must have changed since the program binaries
+            // were cached away.  Fallback to source shader loading path,
+            // and then retrieve and cache new program binaries once again.
+            //
+            compileAndLink();
+        }
+    }
 
 } // namespace Ogre

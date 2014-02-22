@@ -541,7 +541,7 @@ namespace Ogre {
         */
         bool isInLightRange(const Ogre::Sphere& sphere) const;
         
-        /** Check whether a bounding box is included in the lighted	area of the light
+        /** Check whether a bounding box is included in the lighted area of the light
         @note 
             The function trades accuracy for efficiency. As a result you may get
             false-positives (The function should not return any false-negatives).

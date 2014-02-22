@@ -33,20 +33,20 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class _OgreD3D9Export D3D9DriverList : public ResourceAlloc
-	{
-	private:
-		vector<D3D9Driver>::type mDriverList;
-		
-	public:
-		D3D9DriverList();
-		~D3D9DriverList();
+    class _OgreD3D9Export D3D9DriverList : public ResourceAlloc
+    {
+    private:
+        vector<D3D9Driver>::type mDriverList;
+        
+    public:
+        D3D9DriverList();
+        ~D3D9DriverList();
 
-		BOOL enumerate();
-		size_t count() const;
-		D3D9Driver* item( size_t index );
+        BOOL enumerate();
+        size_t count() const;
+        D3D9Driver* item( size_t index );
 
-		D3D9Driver* item( const String &name );
-	};
+        D3D9Driver* item( const String &name );
+    };
 }
 #endif

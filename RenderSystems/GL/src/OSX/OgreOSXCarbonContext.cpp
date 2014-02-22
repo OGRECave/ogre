@@ -34,38 +34,38 @@ namespace Ogre
 
     OSXCarbonContext::OSXCarbonContext(AGLContext aglContext, AGLPixelFormat pixelFormat) :
         mAGLContext(aglContext), mPixelFormat(pixelFormat) {}
-	
-	OSXCarbonContext::~OSXCarbonContext()
-	{
-		_unregisterContext();
-		
+    
+    OSXCarbonContext::~OSXCarbonContext()
+    {
+        _unregisterContext();
+        
         if(mPixelFormat != NULL)
             aglDestroyPixelFormat(mPixelFormat);
     }
 
     void OSXCarbonContext::setCurrent()
-	{
-		// Apple's docs claim that you may need to force the context to null
-		// before setting current, especially when using pBuffers.
-		aglSetCurrentContext(NULL);
-		aglSetCurrentContext(mAGLContext);
-    }
-		
-	void OSXCarbonContext::endCurrent()
-	{
-		aglSetCurrentContext(NULL);
-	}
-	
-	GLContext* OSXCarbonContext::clone() const
-	{
+    {
+        // Apple's docs claim that you may need to force the context to null
+        // before setting current, especially when using pBuffers.
         aglSetCurrentContext(NULL);
-		AGLContext aglCtxShare = aglCreateContext(mPixelFormat, mAGLContext);
-		return OGRE_NEW OSXCarbonContext(aglCtxShare, mPixelFormat);
-	}
-	
-	String OSXCarbonContext::getContextType()
-	{
-		return "AGL";
-	}
+        aglSetCurrentContext(mAGLContext);
+    }
+        
+    void OSXCarbonContext::endCurrent()
+    {
+        aglSetCurrentContext(NULL);
+    }
+    
+    GLContext* OSXCarbonContext::clone() const
+    {
+        aglSetCurrentContext(NULL);
+        AGLContext aglCtxShare = aglCreateContext(mPixelFormat, mAGLContext);
+        return OGRE_NEW OSXCarbonContext(aglCtxShare, mPixelFormat);
+    }
+    
+    String OSXCarbonContext::getContextType()
+    {
+        return "AGL";
+    }
 
 }

@@ -111,7 +111,7 @@ namespace Ogre
         ///@see InstanceManager::setNumCustomParams(). Because this may not even be used,
         ///our implementations keep the params separate from the InstancedEntity to lower
         ///the memory overhead. They default to Vector4::ZERO
-        CustomParamsVec		mCustomParams;
+        CustomParamsVec     mCustomParams;
 
         /// This bbox contains all (visible) instanced entities
         AxisAlignedBox      mFullBoundingBox;
@@ -249,7 +249,7 @@ namespace Ogre
         /** Fills the input vector with the instances that are currently being used or were requested.
             Used for defragmentation, @see InstanceManager::defragmentBatches
         */
-		void getInstancedEntitiesInUse( InstancedEntityVec &outEntities, CustomParamsVec &outParams );
+        void getInstancedEntitiesInUse( InstancedEntityVec &outEntities, CustomParamsVec &outParams );
 
         /** @see InstanceManager::defragmentBatches
             This function takes InstancedEntities and pushes back all entities it can fit here
@@ -259,104 +259,104 @@ namespace Ogre
         @param usedEntities Array of InstancedEntities to parent with this batch. Those reparented
             are removed from this input vector
         @param usedParams Array of Custom parameters correlated with the InstancedEntities in usedEntities.
-			They follow the fate of the entities in that vector.
-		@remarks:
-			This function assumes caller holds data to mInstancedEntities! Otherwise
-			you can get memory leaks. Don't call this directly if you don't know what you're doing!
-		*/
-		void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities,
-								CustomParamsVec &usedParams );
-
-		/** @see InstanceManager::_defragmentBatchDiscard
-			Destroys unused entities and clears the mInstancedEntity container which avoids leaving
-			dangling pointers from reparented InstancedEntities
-			Usually called before deleting this pointer. Don't call directly!
-		*/
-		void _defragmentBatchDiscard(void);
-
-		/** Called by InstancedEntity(s) to tell us we need to update the bounds
-			(we touch the SceneNode so the SceneManager aknowledges such change)
+            They follow the fate of the entities in that vector.
+        @remarks:
+            This function assumes caller holds data to mInstancedEntities! Otherwise
+            you can get memory leaks. Don't call this directly if you don't know what you're doing!
         */
-		virtual void _boundsDirty(void);
+        void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities,
+                                CustomParamsVec &usedParams );
 
-		/** Tells this batch to stop updating animations, positions, rotations, and display
-			all it's active instances. Currently only InstanceBatchHW & InstanceBatchHW_VTF support it.
-			This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
-			memory advantages (less VRAM, less bandwidth) and not LOD support. Very useful for
-			billboards of trees, repeating vegetation, etc.
-			@remarks
-				This function moves a lot of processing time from the CPU to the GPU. If the GPU
-				is already a bottleneck, you may see a decrease in performance instead!
-				Call this function again (with bStatic=true) if you've made a change to an
-				InstancedEntity and wish this change to take effect.
-				Be sure to call this after you've set all your instances
-				@see InstanceBatchHW::setStaticAndUpdate
-		*/
-		virtual void setStaticAndUpdate( bool bStatic )		{}
-
-		/** Returns true if this batch was set as static. @see setStaticAndUpdate
-		*/
-		virtual bool isStatic() const						{ return false; }
-
-		/** Returns a pointer to a new InstancedEntity ready to use
-			Note it's actually preallocated, so no memory allocation happens at
-			this point.
-			@remarks
-				Returns NULL if all instances are being used
+        /** @see InstanceManager::_defragmentBatchDiscard
+            Destroys unused entities and clears the mInstancedEntity container which avoids leaving
+            dangling pointers from reparented InstancedEntities
+            Usually called before deleting this pointer. Don't call directly!
         */
-		InstancedEntity* createInstancedEntity();
+        void _defragmentBatchDiscard(void);
 
-		/** Removes an InstancedEntity from the scene retrieved with
-			getNewInstancedEntity, putting back into a queue
-			@remarks
-				Throws an exception if the instanced entity wasn't created by this batch
-				Removed instanced entities save little CPU time, but _not_ GPU
+        /** Called by InstancedEntity(s) to tell us we need to update the bounds
+            (we touch the SceneNode so the SceneManager aknowledges such change)
         */
-		void removeInstancedEntity( InstancedEntity *instancedEntity );
+        virtual void _boundsDirty(void);
 
-		/** Tells whether world bone matrices need to be calculated.
-			This does not include bone matrices which are calculated regardless
+        /** Tells this batch to stop updating animations, positions, rotations, and display
+            all it's active instances. Currently only InstanceBatchHW & InstanceBatchHW_VTF support it.
+            This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
+            memory advantages (less VRAM, less bandwidth) and not LOD support. Very useful for
+            billboards of trees, repeating vegetation, etc.
+            @remarks
+                This function moves a lot of processing time from the CPU to the GPU. If the GPU
+                is already a bottleneck, you may see a decrease in performance instead!
+                Call this function again (with bStatic=true) if you've made a change to an
+                InstancedEntity and wish this change to take effect.
+                Be sure to call this after you've set all your instances
+                @see InstanceBatchHW::setStaticAndUpdate
         */
-		virtual bool useBoneWorldMatrices() const { return true; }
+        virtual void setStaticAndUpdate( bool bStatic )     {}
 
-		/** Tells that the list of entity instances with shared transforms has changed */
-		void _markTransformSharingDirty() { mTransformSharingDirty = true; }
+        /** Returns true if this batch was set as static. @see setStaticAndUpdate
+        */
+        virtual bool isStatic() const                       { return false; }
 
-		/** @see InstancedEntity::setCustomParam */
-		void _setCustomParam( InstancedEntity *instancedEntity, unsigned char idx, const Vector4 &newParam );
+        /** Returns a pointer to a new InstancedEntity ready to use
+            Note it's actually preallocated, so no memory allocation happens at
+            this point.
+            @remarks
+                Returns NULL if all instances are being used
+        */
+        InstancedEntity* createInstancedEntity();
 
-		/** @see InstancedEntity::getCustomParam */
-		const Vector4& _getCustomParam( InstancedEntity *instancedEntity, unsigned char idx );
+        /** Removes an InstancedEntity from the scene retrieved with
+            getNewInstancedEntity, putting back into a queue
+            @remarks
+                Throws an exception if the instanced entity wasn't created by this batch
+                Removed instanced entities save little CPU time, but _not_ GPU
+        */
+        void removeInstancedEntity( InstancedEntity *instancedEntity );
 
-		//Renderable overloads
+        /** Tells whether world bone matrices need to be calculated.
+            This does not include bone matrices which are calculated regardless
+        */
+        virtual bool useBoneWorldMatrices() const { return true; }
+
+        /** Tells that the list of entity instances with shared transforms has changed */
+        void _markTransformSharingDirty() { mTransformSharingDirty = true; }
+
+        /** @see InstancedEntity::setCustomParam */
+        void _setCustomParam( InstancedEntity *instancedEntity, unsigned char idx, const Vector4 &newParam );
+
+        /** @see InstancedEntity::getCustomParam */
+        const Vector4& _getCustomParam( InstancedEntity *instancedEntity, unsigned char idx );
+
+        //Renderable overloads
         /** @copydoc Renderable::getMaterial. */
-		const MaterialPtr& getMaterial(void) const		{ return mMaterial; }
+        const MaterialPtr& getMaterial(void) const      { return mMaterial; }
         /** @copydoc Renderable::getRenderOperation. */
-		void getRenderOperation( RenderOperation& op )	{ op = mRenderOperation; }
+        void getRenderOperation( RenderOperation& op )  { op = mRenderOperation; }
 
         /** @copydoc Renderable::getSquaredViewDepth. */
-		Real getSquaredViewDepth( const Camera* cam ) const;
+        Real getSquaredViewDepth( const Camera* cam ) const;
         /** @copydoc Renderable::getLights. */
         const LightList& getLights( void ) const;
         /** @copydoc Renderable::getTechnique. */
-		Technique* getTechnique(void) const;
+        Technique* getTechnique(void) const;
 
         /** @copydoc MovableObject::getMovableType. */
-		const String& getMovableType(void) const;
+        const String& getMovableType(void) const;
         /** @copydoc MovableObject::_notifyCurrentCamera. */
-		void _notifyCurrentCamera( Camera* cam );
+        void _notifyCurrentCamera( Camera* cam );
         /** @copydoc MovableObject::getBoundingBox. */
-		const AxisAlignedBox& getBoundingBox(void) const;
+        const AxisAlignedBox& getBoundingBox(void) const;
         /** @copydoc MovableObject::getBoundingRadius. */
-		Real getBoundingRadius(void) const;
+        Real getBoundingRadius(void) const;
 
-		virtual void _updateRenderQueue(RenderQueue* queue);
-		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
+        virtual void _updateRenderQueue(RenderQueue* queue);
+        void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
 
         // resolve ambiguity of get/setUserAny due to inheriting from Renderable and MovableObject
         using Renderable::getUserAny;
         using Renderable::setUserAny;
-	};
+    };
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

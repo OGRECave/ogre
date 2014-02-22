@@ -68,7 +68,7 @@ OctreeCamera::Visibility OctreeCamera::getVisibility( const AxisAlignedBox &boun
         if (plane == FRUSTUM_PLANE_FAR && mFarDist == 0)
             continue;
 
-		// This updates frustum planes and deals with cull frustum
+        // This updates frustum planes and deals with cull frustum
         Plane::Side side = getFrustumPlane(plane).getSide(centre, halfSize);
         if(side == Plane::NEGATIVE_SIDE) return NONE;
         // We can't return now as the box could be later on the negative side of a plane.

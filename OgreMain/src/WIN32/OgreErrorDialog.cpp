@@ -38,7 +38,7 @@ namespace Ogre
     ErrorDialog::ErrorDialog()
     {
 #ifdef OGRE_STATIC_LIB
-		mHInstance = GetModuleHandle( NULL );
+        mHInstance = GetModuleHandle( NULL );
 #else
 #  if OGRE_DEBUG_MODE == 1
         mHInstance = GetModuleHandle("OgreMain_d.dll");

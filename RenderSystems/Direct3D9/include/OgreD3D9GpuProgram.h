@@ -38,7 +38,7 @@ namespace Ogre {
     /** Direct3D implementation of a few things common to low-level vertex & fragment programs. */
     class _OgreD3D9Export D3D9GpuProgram : public GpuProgram, public D3D9Resource
     {   
-	public:
+    public:
         /// Command object for setting matrix packing in column-major order
         class CmdColumnMajorMatrices : public ParamCommand
         {
@@ -46,16 +46,16 @@ namespace Ogre {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
-		/// Command object for getting/setting external micro code (void*)
-		class CmdExternalMicrocode : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-	protected:
-		static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
-		static CmdExternalMicrocode msCmdExternalMicrocode;
+        /// Command object for getting/setting external micro code (void*)
+        class CmdExternalMicrocode : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+    protected:
+        static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
+        static CmdExternalMicrocode msCmdExternalMicrocode;
     public:
         D3D9GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
@@ -67,9 +67,9 @@ namespace Ogre {
         /** Gets whether matrix packed in column-major order. */
         bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
 
-		/** Tells the program to load from some externally created microcode instead of a file or source. 
-		*/
-		void setExternalMicrocode(const void* pMicrocode, size_t size);
+        /** Tells the program to load from some externally created microcode instead of a file or source. 
+        */
+        void setExternalMicrocode(const void* pMicrocode, size_t size);
         /** Tells the program to load from some externally created microcode instead of a file or source. 
         @remarks
             add ref count to pMicrocode when setting
@@ -80,15 +80,15 @@ namespace Ogre {
     protected:
         /** @copydoc Resource::loadImpl */
         void loadImpl(void);
-		/** Loads this program to specified device */
-		void loadImpl(IDirect3DDevice9* d3d9Device);
-		/** Overridden from GpuProgram */
-		void unloadImpl(void);
+        /** Loads this program to specified device */
+        void loadImpl(IDirect3DDevice9* d3d9Device);
+        /** Overridden from GpuProgram */
+        void unloadImpl(void);
         /** Overridden from GpuProgram */
         void loadFromSource(void);
-		/** Loads this program from source to specified device */
-		void loadFromSource(IDirect3DDevice9* d3d9Device);        
-		/** Loads this program from microcode, must be overridden by subclasses. */
+        /** Loads this program from source to specified device */
+        void loadFromSource(IDirect3DDevice9* d3d9Device);        
+        /** Loads this program from microcode, must be overridden by subclasses. */
         virtual void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode) = 0;
 
 
@@ -100,12 +100,12 @@ namespace Ogre {
             they are appropriate.
         */
         virtual GpuProgramParametersSharedPtr createParameters(void);
-	protected:    
-		bool mColumnMajorMatrices;
-		ID3DXBuffer* mExternalMicrocode;
+    protected:    
+        bool mColumnMajorMatrices;
+        ID3DXBuffer* mExternalMicrocode;
 
-		void getMicrocodeFromCache( IDirect3DDevice9* d3d9Device );
-		void compileMicrocode( IDirect3DDevice9* d3d9Device );
+        void getMicrocodeFromCache( IDirect3DDevice9* d3d9Device );
+        void compileMicrocode( IDirect3DDevice9* d3d9Device );
     };
 
     /** Direct3D implementation of low-level vertex programs. */
@@ -114,27 +114,27 @@ namespace Ogre {
     public:
         D3D9GpuVertexProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
-		~D3D9GpuVertexProgram();
+        ~D3D9GpuVertexProgram();
         
-		/// Gets the vertex shader
+        /// Gets the vertex shader
         IDirect3DVertexShader9* getVertexShader(void);
 
-		// Called immediately after the Direct3D device has been created.
-		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+        // Called immediately after the Direct3D device has been created.
+        virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
 
-		// Called before the Direct3D device is going to be destroyed.
-		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+        // Called before the Direct3D device is going to be destroyed.
+        virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
 
     protected:
         /** @copydoc Resource::unloadImpl */
         void unloadImpl(void);
         void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
 
-	protected:
-		typedef map<IDirect3DDevice9*, IDirect3DVertexShader9*>::type   DeviceToVertexShaderMap;
-		typedef DeviceToVertexShaderMap::iterator						DeviceToVertexShaderIterator;
-	
-		DeviceToVertexShaderMap		mMapDeviceToVertexShader;	
+    protected:
+        typedef map<IDirect3DDevice9*, IDirect3DVertexShader9*>::type   DeviceToVertexShaderMap;
+        typedef DeviceToVertexShaderMap::iterator                       DeviceToVertexShaderIterator;
+    
+        DeviceToVertexShaderMap     mMapDeviceToVertexShader;   
     };
 
     /** Direct3D implementation of low-level fragment programs. */
@@ -143,26 +143,26 @@ namespace Ogre {
     public:
         D3D9GpuFragmentProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
-		~D3D9GpuFragmentProgram();
+        ~D3D9GpuFragmentProgram();
         /// Gets the pixel shader
         IDirect3DPixelShader9* getPixelShader(void);
 
-		// Called immediately after the Direct3D device has been created.
-		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+        // Called immediately after the Direct3D device has been created.
+        virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
 
-		// Called before the Direct3D device is going to be destroyed.
-		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+        // Called before the Direct3D device is going to be destroyed.
+        virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
 
     protected:
         /** @copydoc Resource::unloadImpl */
         void unloadImpl(void);
         void loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode);
 
-	protected:
-		typedef map<IDirect3DDevice9*, IDirect3DPixelShader9*>::type	DeviceToPixelShaderMap;
-		typedef DeviceToPixelShaderMap::iterator						DeviceToPixelShaderIterator;
+    protected:
+        typedef map<IDirect3DDevice9*, IDirect3DPixelShader9*>::type    DeviceToPixelShaderMap;
+        typedef DeviceToPixelShaderMap::iterator                        DeviceToPixelShaderIterator;
 
-		DeviceToPixelShaderMap		mMapDeviceToPixelShader;			
+        DeviceToPixelShaderMap      mMapDeviceToPixelShader;            
     };
 }
 

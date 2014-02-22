@@ -33,10 +33,10 @@ namespace Ogre
 
 LodConfig::Advanced::Advanced() :
     useBackgroundQueue(false),
-			useCompression(true),
-			useVertexNormals(true),
-			outsideWeight(0.0),
-			outsideWalkAngle(0.0)
+            useCompression(true),
+            useVertexNormals(true),
+            outsideWeight(0.0),
+            outsideWalkAngle(0.0)
 {
 }
 

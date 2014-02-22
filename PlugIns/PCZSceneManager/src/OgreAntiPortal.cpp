@@ -33,7 +33,7 @@ AntiPortal.cpp  -
 using namespace Ogre;
 
 AntiPortal::AntiPortal(const String& name, const PORTAL_TYPE type)
-	: PortalBase(name, type)
+    : PortalBase(name, type)
 {
 }
 
@@ -44,7 +44,7 @@ AntiPortal::~AntiPortal()
 /** @copydoc MovableObject::getMovableType. */
 const String& AntiPortal::getMovableType() const
 {
-	return AntiPortalFactory::FACTORY_TYPE_NAME;
+    return AntiPortalFactory::FACTORY_TYPE_NAME;
 }
 
 //-----------------------------------------------------------------------
@@ -54,10 +54,10 @@ unsigned long AntiPortalFactory::FACTORY_TYPE_FLAG = 0xFFFFFFFF;
 
 MovableObject* AntiPortalFactory::createInstanceImpl(const String& name, const NameValuePairList* params)
 {
-	return OGRE_NEW AntiPortal(name, getPortalType(params));
+    return OGRE_NEW AntiPortal(name, getPortalType(params));
 }
 
 void AntiPortalFactory::destroyInstance(MovableObject* obj)
 {
-	OGRE_DELETE obj;
+    OGRE_DELETE obj;
 }

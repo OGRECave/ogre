@@ -977,30 +977,30 @@ namespace Ogre {
         activateGLTextureUnit(0);
     }
 
-	void GL3PlusRenderSystem::_setVertexTexture( size_t unit, const TexturePtr &tex )
-	{
-		_setTexture(unit, true, tex);
-	}
+    void GL3PlusRenderSystem::_setVertexTexture( size_t unit, const TexturePtr &tex )
+    {
+        _setTexture(unit, true, tex);
+    }
 
-	void GL3PlusRenderSystem::_setGeometryTexture( size_t unit, const TexturePtr &tex )
-	{
-		_setTexture(unit, true, tex);
-	}
+    void GL3PlusRenderSystem::_setGeometryTexture( size_t unit, const TexturePtr &tex )
+    {
+        _setTexture(unit, true, tex);
+    }
 
-	void GL3PlusRenderSystem::_setComputeTexture( size_t unit, const TexturePtr &tex )
-	{
-		_setTexture(unit, true, tex);
-	}
+    void GL3PlusRenderSystem::_setComputeTexture( size_t unit, const TexturePtr &tex )
+    {
+        _setTexture(unit, true, tex);
+    }
 
-	void GL3PlusRenderSystem::_setTesselationHullTexture( size_t unit, const TexturePtr &tex )
-	{
-		_setTexture(unit, true, tex);
-	}
+    void GL3PlusRenderSystem::_setTesselationHullTexture( size_t unit, const TexturePtr &tex )
+    {
+        _setTexture(unit, true, tex);
+    }
 
-	void GL3PlusRenderSystem::_setTesselationDomainTexture( size_t unit, const TexturePtr &tex )
-	{
-		_setTexture(unit, true, tex);
-	}
+    void GL3PlusRenderSystem::_setTesselationDomainTexture( size_t unit, const TexturePtr &tex )
+    {
+        _setTexture(unit, true, tex);
+    }
 
     void GL3PlusRenderSystem::_setTextureCoordSet(size_t stage, size_t index)
     {
@@ -1579,7 +1579,7 @@ namespace Ogre {
                                                      StencilOperation depthFailOp,
                                                      StencilOperation passOp,
                                                      bool twoSidedOperation,
-													 bool readBackAsTexture)
+                                                     bool readBackAsTexture)
     {
         bool flip;
         mStencilWriteMask = writeMask;

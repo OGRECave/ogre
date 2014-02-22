@@ -11,12 +11,12 @@ You may use this sample code for anything you like, it is not covered by the
 same license as the rest of the engine.
 -----------------------------------------------------------------------------
 */
-/**	Generate 3D julia sets and render them as volume texture
-	This demonstrates
-	   - User generated textures
-	   - Procedural volume textures (Julia makes nice dust clouds)
-	   - Custom renderables
-	@author W.J. van der Laan
+/** Generate 3D julia sets and render them as volume texture
+    This demonstrates
+       - User generated textures
+       - Procedural volume textures (Julia makes nice dust clouds)
+       - Custom renderables
+    @author W.J. van der Laan
 */
 
 #include "SdkSample.h"
@@ -47,73 +47,73 @@ class _OgreSampleClassExport Sample_VolumeTex : public SdkSample
 public:
 
     Sample_VolumeTex()
-	{
-		mInfo["Title"] = "Volume Textures";
-		mInfo["Description"] = "Demonstrates the use of volume textures.";
-		mInfo["Thumbnail"] = "thumb_voltex.png";
-		mInfo["Category"] = "Unsorted";
-	}
+    {
+        mInfo["Title"] = "Volume Textures";
+        mInfo["Description"] = "Demonstrates the use of volume textures.";
+        mInfo["Thumbnail"] = "thumb_voltex.png";
+        mInfo["Category"] = "Unsorted";
+    }
 
-	void testCapabilities(const RenderSystemCapabilities* caps)
-	{       
-		if (!caps->hasCapability(RSC_TEXTURE_3D))
+    void testCapabilities(const RenderSystemCapabilities* caps)
+    {       
+        if (!caps->hasCapability(RSC_TEXTURE_3D))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support 3D textures, so cannot "
                 "run this demo. Sorry!", "Sample_VolumeTex::testCapabilities");
         }
-	}
+    }
 
 protected:
 
-	float global_real, global_imag, global_theta;
+    float global_real, global_imag, global_theta;
 
     void setupView(void)
-	{
-		SdkSample::setupView();
+    {
+        SdkSample::setupView();
 
-		// Create the camera
+        // Create the camera
         mCamera->setPosition(Vector3(220,-2,176));
         mCamera->lookAt(Vector3(0,0,0));
         mCamera->setNearClipDistance(5);
-	}
+    }
 
     void setupContent(void)
     {
         // Create dynamic texture
-		ptex = TextureManager::getSingleton().createManual(
-			"DynaTex","General", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);
+        ptex = TextureManager::getSingleton().createManual(
+            "DynaTex","General", TEX_TYPE_3D, 64, 64, 64, 0, PF_A8R8G8B8);
 
-		// Set ambient light
+        // Set ambient light
         mSceneMgr->setAmbientLight(ColourValue(0.6, 0.6, 0.6));
-		mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox", 50 );
+        mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox", 50 );
 
         //mRoot->getRenderSystem()->clearFrameBuffer(FBT_COLOUR, ColourValue(255,255,255,0));
 
         // Create a light
         Light* l = mSceneMgr->createLight("MainLight");
         l->setDiffuseColour(0.75, 0.75, 0.80);
-		l->setSpecularColour(0.9, 0.9, 1);
+        l->setSpecularColour(0.9, 0.9, 1);
         l->setPosition(-100,80,50);
-		mSceneMgr->getRootSceneNode()->attachObject(l);
-		
-		// Create volume renderable
-		snode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));      
-		
+        mSceneMgr->getRootSceneNode()->attachObject(l);
+        
+        // Create volume renderable
+        snode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));      
+        
         vrend = new VolumeRenderable(32, 750.0f, "DynaTex");
         snode->attachObject( vrend );
-		
-		trend = new ThingRenderable(90.0f, 32, 7.5f);
-		trend->setMaterial("Examples/VTDarkStuff");
-		snode->attachObject(trend);
-		
-		// Ogre head node
-		fnode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));
-		// Load ogre head
-		Entity* head = mSceneMgr->createEntity("head", "ogrehead.mesh");
-		fnode->attachObject(head);
-		
-		// Animation for ogre head
-		// Create a track for the light
+        
+        trend = new ThingRenderable(90.0f, 32, 7.5f);
+        trend->setMaterial("Examples/VTDarkStuff");
+        snode->attachObject(trend);
+        
+        // Ogre head node
+        fnode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,0,0));
+        // Load ogre head
+        Entity* head = mSceneMgr->createEntity("head", "ogrehead.mesh");
+        fnode->attachObject(head);
+        
+        // Animation for ogre head
+        // Create a track for the light
         Animation* anim = mSceneMgr->createAnimation("OgreTrack", 10);
         // Spline it for nice curves
         anim->setInterpolationMode(Animation::IM_SPLINE);
@@ -132,113 +132,113 @@ protected:
      
         //mFountainNode->attachObject(pSys2);
 
-		//Setup defaults
-		global_real = 0.4f;
-		global_imag = 0.6f;
-		global_theta = 0.0f;
+        //Setup defaults
+        global_real = 0.4f;
+        global_imag = 0.6f;
+        global_theta = 0.0f;
 
-		// show GUI
-		createControls();
+        // show GUI
+        createControls();
 
-		setDragLook(true);
+        setDragLook(true);
 
-		generate();
+        generate();
     }
 
-	bool frameRenderingQueued( const FrameEvent& evt )
+    bool frameRenderingQueued( const FrameEvent& evt )
     {
-		xtime += evt.timeSinceLastFrame;
-		xtime = fmod(xtime, 10.0f);
-		//snode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
-		//fnode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
-		static_cast<ThingRenderable*>(trend)->addTime(evt.timeSinceLastFrame * 0.05f);
-		mOgreAnimState->addTime(evt.timeSinceLastFrame);
-		return SdkSample::frameRenderingQueued(evt);
+        xtime += evt.timeSinceLastFrame;
+        xtime = fmod(xtime, 10.0f);
+        //snode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
+        //fnode->roll(Degree(evt.timeSinceLastFrame * 20.0f));
+        static_cast<ThingRenderable*>(trend)->addTime(evt.timeSinceLastFrame * 0.05f);
+        mOgreAnimState->addTime(evt.timeSinceLastFrame);
+        return SdkSample::frameRenderingQueued(evt);
     }
 
-	void cleanupContent(void)
-	{
-		TextureManager::getSingleton().remove("DynaTex");
-		delete vrend;
-		delete trend;
-	}
+    void cleanupContent(void)
+    {
+        TextureManager::getSingleton().remove("DynaTex");
+        delete vrend;
+        delete trend;
+    }
 
-	void createControls()
-	{
-		mTrayMgr->createLabel(TL_TOPLEFT, "JuliaParamLabel", "Julia Parameters", 200);
-		mTrayMgr->createThickSlider(TL_TOPLEFT, "RealSlider", "Real", 200, 80, -1, 1, 50)->setValue(global_real, false);
-		mTrayMgr->createThickSlider(TL_TOPLEFT, "ImagSlider", "Imag", 200, 80, -1, 1, 50)->setValue(global_imag, false);
-		mTrayMgr->createThickSlider(TL_TOPLEFT, "ThetaSlider", "Theta", 200, 80, -1, 1, 50)->setValue(global_theta, false);
-		mTrayMgr->showCursor();
-	}
+    void createControls()
+    {
+        mTrayMgr->createLabel(TL_TOPLEFT, "JuliaParamLabel", "Julia Parameters", 200);
+        mTrayMgr->createThickSlider(TL_TOPLEFT, "RealSlider", "Real", 200, 80, -1, 1, 50)->setValue(global_real, false);
+        mTrayMgr->createThickSlider(TL_TOPLEFT, "ImagSlider", "Imag", 200, 80, -1, 1, 50)->setValue(global_imag, false);
+        mTrayMgr->createThickSlider(TL_TOPLEFT, "ThetaSlider", "Theta", 200, 80, -1, 1, 50)->setValue(global_theta, false);
+        mTrayMgr->showCursor();
+    }
 
-	void sliderMoved(Slider* slider)
-	{
-		if (slider->getName() == "RealSlider")
-		{
-			global_real = slider->getValue();
-		}
-		else if (slider->getName() == "ImagSlider")
-		{
-			global_imag = slider->getValue();
-		} 
-		else if (slider->getName() == "ThetaSlider")
-		{
-			global_theta = slider->getValue();
-		}
-		generate();
-	}
+    void sliderMoved(Slider* slider)
+    {
+        if (slider->getName() == "RealSlider")
+        {
+            global_real = slider->getValue();
+        }
+        else if (slider->getName() == "ImagSlider")
+        {
+            global_imag = slider->getValue();
+        } 
+        else if (slider->getName() == "ThetaSlider")
+        {
+            global_theta = slider->getValue();
+        }
+        generate();
+    }
 
-	void generate()
-	{
-		/* Evaluate julia fractal for each point */
-		Julia julia(global_real, global_imag, global_theta);
-		const float scale = 2.5;
-		const float vcut = 29.0f;
-		const float vscale = 1.0f/vcut;
-		
-		HardwarePixelBufferSharedPtr buffer = ptex->getBuffer(0, 0);
-		Ogre::StringStream d;
-		d << "HardwarePixelBuffer " << buffer->getWidth() << " " << buffer->getHeight() << " " << buffer->getDepth();
-		LogManager::getSingleton().logMessage(d.str());
-		
-		buffer->lock(HardwareBuffer::HBL_NORMAL);
-		const PixelBox &pb = buffer->getCurrentLock();
-		d.str("");
-		d << "PixelBox " << pb.getWidth() << " " << pb.getHeight() << " " << pb.getDepth() << " " << pb.rowPitch << " " << pb.slicePitch << " " << pb.data << " " << PixelUtil::getFormatName(pb.format);
-		LogManager::getSingleton().logMessage(d.str());
-		
-		Ogre::uint32 *pbptr = static_cast<Ogre::uint32*>(pb.data);
-		for(size_t z=pb.front; z<pb.back; z++) 
+    void generate()
+    {
+        /* Evaluate julia fractal for each point */
+        Julia julia(global_real, global_imag, global_theta);
+        const float scale = 2.5;
+        const float vcut = 29.0f;
+        const float vscale = 1.0f/vcut;
+        
+        HardwarePixelBufferSharedPtr buffer = ptex->getBuffer(0, 0);
+        Ogre::StringStream d;
+        d << "HardwarePixelBuffer " << buffer->getWidth() << " " << buffer->getHeight() << " " << buffer->getDepth();
+        LogManager::getSingleton().logMessage(d.str());
+        
+        buffer->lock(HardwareBuffer::HBL_NORMAL);
+        const PixelBox &pb = buffer->getCurrentLock();
+        d.str("");
+        d << "PixelBox " << pb.getWidth() << " " << pb.getHeight() << " " << pb.getDepth() << " " << pb.rowPitch << " " << pb.slicePitch << " " << pb.data << " " << PixelUtil::getFormatName(pb.format);
+        LogManager::getSingleton().logMessage(d.str());
+        
+        Ogre::uint32 *pbptr = static_cast<Ogre::uint32*>(pb.data);
+        for(size_t z=pb.front; z<pb.back; z++) 
         {
             for(size_t y=pb.top; y<pb.bottom; y++)
             {
                 for(size_t x=pb.left; x<pb.right; x++)
                 {
                     if(z==pb.front || z==(pb.back-1) || y==pb.top|| y==(pb.bottom-1) ||
-						x==pb.left || x==(pb.right-1))
-					{
-						// On border, must be zero
-						pbptr[x] = 0;
+                        x==pb.left || x==(pb.right-1))
+                    {
+                        // On border, must be zero
+                        pbptr[x] = 0;
                     } 
-					else
-					{
-						float val = julia.eval(((float)x/pb.getWidth()-0.5f) * scale, 
-								((float)y/pb.getHeight()-0.5f) * scale, 
-								((float)z/pb.getDepth()-0.5f) * scale);
-						if(val > vcut)
-							val = vcut;
-						
-						PixelUtil::packColour((float)x/pb.getWidth(), (float)y/pb.getHeight(), (float)z/pb.getDepth(), (1.0f-(val*vscale))*0.7f, PF_A8R8G8B8, &pbptr[x]);
-						
-					}	
+                    else
+                    {
+                        float val = julia.eval(((float)x/pb.getWidth()-0.5f) * scale, 
+                                ((float)y/pb.getHeight()-0.5f) * scale, 
+                                ((float)z/pb.getDepth()-0.5f) * scale);
+                        if(val > vcut)
+                            val = vcut;
+                        
+                        PixelUtil::packColour((float)x/pb.getWidth(), (float)y/pb.getHeight(), (float)z/pb.getDepth(), (1.0f-(val*vscale))*0.7f, PF_A8R8G8B8, &pbptr[x]);
+                        
+                    }   
                 }
                 pbptr += pb.rowPitch;
             }
             pbptr += pb.getSliceSkip();
         }
-		buffer->unlock();
-	}
+        buffer->unlock();
+    }
 };
 
 #ifndef OGRE_STATIC_LIB
@@ -248,16 +248,16 @@ Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
-	s = new Sample_VolumeTex;
-	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
-	sp->addSample(s);
-	Root::getSingleton().installPlugin(sp);
+    s = new Sample_VolumeTex;
+    sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
+    sp->addSample(s);
+    Root::getSingleton().installPlugin(sp);
 }
 
 extern "C" _OgreSampleExport void dllStopPlugin()
 {
-	Root::getSingleton().uninstallPlugin(sp); 
-	OGRE_DELETE sp;
-	delete s;
+    Root::getSingleton().uninstallPlugin(sp); 
+    OGRE_DELETE sp;
+    delete s;
 }
 #endif

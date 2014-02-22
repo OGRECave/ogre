@@ -34,12 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
     /** Abstract factory class, archive codec plugins can register concrete
         subclasses of this.
         @remarks
@@ -70,8 +70,8 @@ namespace Ogre {
 
         virtual Archive* createInstance(const String& name) { return createInstance(name, true); }
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

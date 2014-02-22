@@ -36,15 +36,15 @@ class MaterialController;
 class ProjectEventArgs : public EventArgs
 {
 public:
-	ProjectEventArgs(Project* project);
-	ProjectEventArgs(Project* project, MaterialController* material);
+    ProjectEventArgs(Project* project);
+    ProjectEventArgs(Project* project, MaterialController* material);
 
-	Project* getProject() const;
-	MaterialController* getMaterial() const;
+    Project* getProject() const;
+    MaterialController* getMaterial() const;
 
 protected:
-	Project* mProject;
-	MaterialController* mMaterial;
+    Project* mProject;
+    MaterialController* mMaterial;
 };
 
 #endif // _PROJECTEVENTARGS_H_

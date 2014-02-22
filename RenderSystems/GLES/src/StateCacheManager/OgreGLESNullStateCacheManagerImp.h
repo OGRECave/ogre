@@ -73,7 +73,7 @@ namespace Ogre
         
         /// See GLESStateCacheManager.clearCache.
         void clearCache();
-		
+        
         /// See GLESStateCacheManager.bindGLBuffer.
         void bindGLBuffer(GLenum target, GLuint buffer, GLenum attach = 0, bool force = false);
         

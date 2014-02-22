@@ -46,7 +46,7 @@ class ScriptCompiler;
 class PropertyAbstractNode;
 class MaterialSerializer;
 
-typedef GeneralAllocatedObject	RTShaderSystemAlloc;
+typedef GeneralAllocatedObject  RTShaderSystemAlloc;
 
 namespace RTShader 
 {
@@ -79,21 +79,21 @@ typedef vector<ParameterPtr>::type  ShaderParameterList;
 template <class T>
 inline void sh_hash_combine(uint32& seed, T const& v)
 {
-	seed ^= FastHash((const char*)&v, sizeof(T)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    seed ^= FastHash((const char*)&v, sizeof(T)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
 }
 
 // Vertex shader output parameters compact policy.
 enum VSOutputCompactPolicy
-{	
-	VSOCP_LOW		= 0,		// VS Outputs will be compacted just in case the maximum slot count exceeded.
-	VSOCP_MEDIUM	= 1,		// VS Outputs will be compacted always without parameter splits.
-	VSOCP_HIGH		= 2			// VS Outputs will be compacted always including parameter splits.
+{   
+    VSOCP_LOW       = 0,        // VS Outputs will be compacted just in case the maximum slot count exceeded.
+    VSOCP_MEDIUM    = 1,        // VS Outputs will be compacted always without parameter splits.
+    VSOCP_HIGH      = 2         // VS Outputs will be compacted always including parameter splits.
 };
 
 enum SkinningType
 {
-	ST_LINEAR,
-	ST_DUAL_QUATERNION
+    ST_LINEAR,
+    ST_DUAL_QUATERNION
 };
 
 
@@ -101,23 +101,23 @@ enum SkinningType
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#	if defined( OGRE_STATIC_LIB )
-#   	define _OgreRTSSExport
+#   if defined( OGRE_STATIC_LIB )
+#       define _OgreRTSSExport
 #   else
-#   	if defined( OgreRTShaderSystem_EXPORTS )
-#       	define _OgreRTSSExport __declspec( dllexport )
-#   	else
+#       if defined( OgreRTShaderSystem_EXPORTS )
+#           define _OgreRTSSExport __declspec( dllexport )
+#       else
 #           if defined( __MINGW32__ )
 #               define _OgreRTSSExport
 #           else
-#       	    define _OgreRTSSExport __declspec( dllimport )
+#               define _OgreRTSSExport __declspec( dllimport )
 #           endif
-#   	endif
-#	endif
+#       endif
+#   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
 #   define _OgreRTSSExport __attribute__ ((visibility("default")))
 #else
-#	define _OgreRTSSExport
+#   define _OgreRTSSExport
 #endif 
 
 

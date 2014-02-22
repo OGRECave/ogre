@@ -34,18 +34,18 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	void GLSupport::setConfigOption(const String &name, const String &value)
-	{
-		ConfigOptionMap::iterator it = mOptions.find(name);
+    void GLSupport::setConfigOption(const String &name, const String &value)
+    {
+        ConfigOptionMap::iterator it = mOptions.find(name);
 
         if (it != mOptions.end())
             it->second.currentValue = value;
-	}
+    }
 
-	ConfigOptionMap& GLSupport::getConfigOptions(void)
-	{
-		return mOptions;
-	}
+    ConfigOptionMap& GLSupport::getConfigOptions(void)
+    {
+        return mOptions;
+    }
 
     void GLSupport::initialiseExtensions(void)
     {
@@ -71,7 +71,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("GL_RENDERER = " + tmpStr);
 
         // Set extension list
-		StringStream ext;
+        StringStream ext;
         String str;
 
         const GLubyte* pcExt = glGetString(GL_EXTENSIONS);
@@ -126,7 +126,7 @@ namespace Ogre {
 
     bool GLSupport::checkExtension(const String& ext) const
     {
-		assert(!extensionList.empty() && "ExtensionList is empty!" );
+        assert(!extensionList.empty() && "ExtensionList is empty!" );
 
         if(extensionList.find(ext) == extensionList.end())
             return false; 

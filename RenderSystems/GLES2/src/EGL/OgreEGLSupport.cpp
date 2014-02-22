@@ -46,7 +46,7 @@ namespace Ogre {
     EGLSupport::EGLSupport()
         : mGLDisplay(0),
           mNativeDisplay(0),
-	  mRandr(false)
+      mRandr(false)
     {
     }
 
@@ -204,7 +204,7 @@ namespace Ogre {
 
     String EGLSupport::getDisplayName(void)
     {
-		return "todo";
+        return "todo";
     }
 
     EGLConfig* EGLSupport::chooseGLConfig(const GLint *attribList, GLint *nElements)
@@ -386,8 +386,8 @@ namespace Ogre {
 
         if (!nConfigs)
         {
-			glConfigs = getConfigs(&nConfigs);
-		}
+            glConfigs = getConfigs(&nConfigs);
+        }
 
         if (!nConfigs)
         {
@@ -481,7 +481,7 @@ namespace Ogre {
     }
 
     ::EGLContext EGLSupport::createNewContext(EGLDisplay eglDisplay,
-					      ::EGLConfig glconfig,
+                          ::EGLConfig glconfig,
                                               ::EGLContext shareList) const 
     {
         EGLint contextAttrs[] = {
@@ -521,8 +521,8 @@ namespace Ogre {
 
     void EGLSupport::stop()
     {
-		eglTerminate(mGLDisplay);
-		EGL_CHECK_ERROR
+        eglTerminate(mGLDisplay);
+        EGL_CHECK_ERROR
     }
 
     void EGLSupport::setGLDisplay( EGLDisplay val )

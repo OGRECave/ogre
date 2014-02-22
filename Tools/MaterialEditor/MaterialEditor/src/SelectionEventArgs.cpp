@@ -42,13 +42,13 @@ SelectionEventArgs::SelectionEventArgs(boost::any& source, SelectionList& select
 SelectionEventArgs::~SelectionEventArgs()
 {
 }
-	
+    
 const boost::any& SelectionEventArgs::getSource() const
 {
-	return mSource;
+    return mSource;
 }
 
 const SelectionList& SelectionEventArgs::getSelection() const
 {
-	return mSelection;
+    return mSelection;
 }

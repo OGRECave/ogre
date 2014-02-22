@@ -43,12 +43,12 @@ namespace Ogre {
     class EAGL2Window;
     class EAGLES2Context;
 
-	template<class C> void removeDuplicates(C& c)
-	{
-		std::sort(c.begin(), c.end());
-		typename C::iterator p = std::unique(c.begin(), c.end());
-		c.erase(p, c.end());
-	}
+    template<class C> void removeDuplicates(C& c)
+    {
+        std::sort(c.begin(), c.end());
+        typename C::iterator p = std::unique(c.begin(), c.end());
+        c.erase(p, c.end());
+    }
 
     class _OgrePrivate EAGL2Support : public GLES2Support
     {
@@ -61,7 +61,7 @@ namespace Ogre {
             void addConfig(void);
             String validateConfig(void);
             virtual String getDisplayName(void);
-			CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
+            CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
             float getCurrentOSVersion(void) { return mCurrentOSVersion; }
             void * getProcAddress(const Ogre::String& name);
@@ -82,10 +82,10 @@ namespace Ogre {
             CFDictionaryRef getGLConfigFromContext(EAGLES2Context context);
             CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);
 #endif
-			CFDictionaryRef selectGLConfig(const int* minAttribs, const int *maxAttribs);
+            CFDictionaryRef selectGLConfig(const int* minAttribs, const int *maxAttribs);
         protected:
             float mCurrentOSVersion;
-	};
+    };
 }
 
 #endif

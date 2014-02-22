@@ -36,12 +36,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
 
     /// List of parameter types available
     enum ParameterType
@@ -110,7 +110,7 @@ namespace Ogre {
             }
         }
 
-		const ParamCommand* getParamCommand(const String& name) const
+        const ParamCommand* getParamCommand(const String& name) const
         {
             ParamCommandMap::const_iterator i = mParamCommands.find(name);
             if (i != mParamCommands.end())
@@ -169,9 +169,9 @@ namespace Ogre {
 
         /// Class name for this instance to be used as a lookup (must be initialised by subclasses)
         String mParamDictName;
-		ParamDictionary* mParamDict;
+        ParamDictionary* mParamDict;
 
-	protected:
+    protected:
         /** Internal method for creating a parameter dictionary for the class, if it does not already exist.
         @remarks
             This method will check to see if a parameter dictionary exist for this class yet,
@@ -186,24 +186,24 @@ namespace Ogre {
         {
             OGRE_LOCK_MUTEX( msDictionaryMutex );
 
-			ParamDictionaryMap::iterator it = msDictionary.find(className);
+            ParamDictionaryMap::iterator it = msDictionary.find(className);
 
-			if ( it == msDictionary.end() )
-			{
-				mParamDict = &msDictionary.insert( std::make_pair( className, ParamDictionary() ) ).first->second;
-				mParamDictName = className;
-				return true;
-			}
-			else
-			{
-				mParamDict = &it->second;
-				mParamDictName = className;
-				return false;
-			}
+            if ( it == msDictionary.end() )
+            {
+                mParamDict = &msDictionary.insert( std::make_pair( className, ParamDictionary() ) ).first->second;
+                mParamDictName = className;
+                return true;
+            }
+            else
+            {
+                mParamDict = &it->second;
+                mParamDictName = className;
+                return false;
+            }
         }
 
     public:
-		StringInterface() : mParamDict(NULL) { }
+        StringInterface() : mParamDict(NULL) { }
 
         /** Virtual destructor, see Effective C++ */
         virtual ~StringInterface() {}
@@ -217,12 +217,12 @@ namespace Ogre {
         */
         ParamDictionary* getParamDictionary(void)
         {
-			return mParamDict;
+            return mParamDict;
         }
 
-		const ParamDictionary* getParamDictionary(void) const
+        const ParamDictionary* getParamDictionary(void) const
         {
-			return mParamDict;
+            return mParamDict;
         }
 
         /** Retrieves a list of parameters valid for this object. 
@@ -326,8 +326,8 @@ namespace Ogre {
 
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 
 }

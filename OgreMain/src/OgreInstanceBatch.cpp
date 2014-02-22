@@ -37,463 +37,463 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	InstanceBatch::InstanceBatch( InstanceManager *creator, MeshPtr &meshReference,
-									const MaterialPtr &material, size_t instancesPerBatch,
-									const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
-				Renderable(),
+    InstanceBatch::InstanceBatch( InstanceManager *creator, MeshPtr &meshReference,
+                                    const MaterialPtr &material, size_t instancesPerBatch,
+                                    const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
+                Renderable(),
                 MovableObject(),
-				mInstancesPerBatch( instancesPerBatch ),
-				mCreator( creator ),
-				mMaterial( material ),
-				mMeshReference( meshReference ),
-				mIndexToBoneMap( indexToBoneMap ),
-				mBoundingRadius( 0 ),
-				mBoundsDirty( false ),
-				mBoundsUpdated( false ),
-				mCurrentCamera( 0 ),
-				mMaterialLodIndex( 0 ),
+                mInstancesPerBatch( instancesPerBatch ),
+                mCreator( creator ),
+                mMaterial( material ),
+                mMeshReference( meshReference ),
+                mIndexToBoneMap( indexToBoneMap ),
+                mBoundingRadius( 0 ),
+                mBoundsDirty( false ),
+                mBoundsUpdated( false ),
+                mCurrentCamera( 0 ),
+                mMaterialLodIndex( 0 ),
                 mDirtyAnimation(true),
-				mTechnSupportsSkeletal( true ),
-				mCachedCamera( 0 ),
-				mTransformSharingDirty(true),
-				mRemoveOwnVertexData(false),
-				mRemoveOwnIndexData(false)
-	{
-		assert( mInstancesPerBatch );
+                mTechnSupportsSkeletal( true ),
+                mCachedCamera( 0 ),
+                mTransformSharingDirty(true),
+                mRemoveOwnVertexData(false),
+                mRemoveOwnIndexData(false)
+    {
+        assert( mInstancesPerBatch );
 
-		//Force batch visibility to be always visible. The instanced entities
-		//have individual visibility flags. If none matches the scene's current,
-		//then this batch won't rendered.
-		mVisibilityFlags = std::numeric_limits<Ogre::uint32>::max();
+        //Force batch visibility to be always visible. The instanced entities
+        //have individual visibility flags. If none matches the scene's current,
+        //then this batch won't rendered.
+        mVisibilityFlags = std::numeric_limits<Ogre::uint32>::max();
 
-		if( indexToBoneMap )
-		{
-			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
-		}
+        if( indexToBoneMap )
+        {
+            assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
+        }
 
-		mFullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
+        mFullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
 
-		mName = batchName;
+        mName = batchName;
 
-		mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
-	}
+        mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
+    }
 
-	InstanceBatch::~InstanceBatch()
-	{
-		deleteAllInstancedEntities();
+    InstanceBatch::~InstanceBatch()
+    {
+        deleteAllInstancedEntities();
 
-		//Remove the parent scene node automatically
-		SceneNode *sceneNode = getParentSceneNode();
-		if( sceneNode )
-		{
-			sceneNode->detachAllObjects();
-			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
-		}
+        //Remove the parent scene node automatically
+        SceneNode *sceneNode = getParentSceneNode();
+        if( sceneNode )
+        {
+            sceneNode->detachAllObjects();
+            sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
+        }
 
-		if( mRemoveOwnVertexData )
-			OGRE_DELETE mRenderOperation.vertexData;
-		if( mRemoveOwnIndexData )
-			OGRE_DELETE mRenderOperation.indexData;
+        if( mRemoveOwnVertexData )
+            OGRE_DELETE mRenderOperation.vertexData;
+        if( mRemoveOwnIndexData )
+            OGRE_DELETE mRenderOperation.indexData;
 
-	}
+    }
 
-	void InstanceBatch::_setInstancesPerBatch( size_t instancesPerBatch )
-	{
-		if( !mInstancedEntities.empty() )
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-						" building the batch.", "InstanceBatch::_setInstancesPerBatch");
-		}
+    void InstanceBatch::_setInstancesPerBatch( size_t instancesPerBatch )
+    {
+        if( !mInstancedEntities.empty() )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
+                        " building the batch.", "InstanceBatch::_setInstancesPerBatch");
+        }
 
-		mInstancesPerBatch = instancesPerBatch;
-	}
-	//-----------------------------------------------------------------------
-	bool InstanceBatch::checkSubMeshCompatibility( const SubMesh* baseSubMesh )
-	{
-		if( baseSubMesh->operationType != RenderOperation::OT_TRIANGLE_LIST )
-		{
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Only meshes with OT_TRIANGLE_LIST are supported",
-						"InstanceBatch::checkSubMeshCompatibility");
-		}
+        mInstancesPerBatch = instancesPerBatch;
+    }
+    //-----------------------------------------------------------------------
+    bool InstanceBatch::checkSubMeshCompatibility( const SubMesh* baseSubMesh )
+    {
+        if( baseSubMesh->operationType != RenderOperation::OT_TRIANGLE_LIST )
+        {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Only meshes with OT_TRIANGLE_LIST are supported",
+                        "InstanceBatch::checkSubMeshCompatibility");
+        }
 
-		if( !mCustomParams.empty() && mCreator->getInstancingTechnique() != InstanceManager::HWInstancingBasic )
-		{
-			//Implementing this for ShaderBased is impossible. All other variants can be.
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Custom parameters not supported for this "
-														"technique. Do you dare implementing it?"
-														"See InstanceManager::setNumCustomParams "
-														"documentation.",
-						"InstanceBatch::checkSubMeshCompatibility");
-		}
+        if( !mCustomParams.empty() && mCreator->getInstancingTechnique() != InstanceManager::HWInstancingBasic )
+        {
+            //Implementing this for ShaderBased is impossible. All other variants can be.
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Custom parameters not supported for this "
+                                                        "technique. Do you dare implementing it?"
+                                                        "See InstanceManager::setNumCustomParams "
+                                                        "documentation.",
+                        "InstanceBatch::checkSubMeshCompatibility");
+        }
 
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_updateBounds(void)
-	{
-		mFullBoundingBox.setNull();
+        return true;
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::_updateBounds(void)
+    {
+        mFullBoundingBox.setNull();
 
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-		Real maxScale = 0;
-		while( itor != end )
-		{
-			InstancedEntity* ent = (*itor);
-			//Only increase the bounding box for those objects we know are in the scene
-			if( ent->isInScene() )
-			{
-				maxScale = std::max(maxScale, ent->getMaxScaleCoef());
-				mFullBoundingBox.merge( ent->_getDerivedPosition() );
-			}
+        Real maxScale = 0;
+        while( itor != end )
+        {
+            InstancedEntity* ent = (*itor);
+            //Only increase the bounding box for those objects we know are in the scene
+            if( ent->isInScene() )
+            {
+                maxScale = std::max(maxScale, ent->getMaxScaleCoef());
+                mFullBoundingBox.merge( ent->_getDerivedPosition() );
+            }
 
-			++itor;
-		}
+            ++itor;
+        }
 
-		Real addToBound = maxScale * _getMeshReference()->getBoundingSphereRadius();
-		mFullBoundingBox.setMaximum(mFullBoundingBox.getMaximum() + addToBound);
-		mFullBoundingBox.setMinimum(mFullBoundingBox.getMinimum() - addToBound);
+        Real addToBound = maxScale * _getMeshReference()->getBoundingSphereRadius();
+        mFullBoundingBox.setMaximum(mFullBoundingBox.getMaximum() + addToBound);
+        mFullBoundingBox.setMinimum(mFullBoundingBox.getMinimum() - addToBound);
 
 
-		mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
+        mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
 
-		//Tell the SceneManager our bounds have changed
-		getParentSceneNode()->needUpdate(true);
+        //Tell the SceneManager our bounds have changed
+        getParentSceneNode()->needUpdate(true);
 
-		mBoundsDirty	= false;
-		mBoundsUpdated	= true;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::updateVisibility(void)
-	{
-		mVisible = false;
+        mBoundsDirty    = false;
+        mBoundsUpdated  = true;
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::updateVisibility(void)
+    {
+        mVisible = false;
 
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-		while( itor != end && !mVisible )
-		{
-			//Trick to force Ogre not to render us if none of our instances is visible
-			//Because we do Camera::isVisible(), it is better if the SceneNode from the
-			//InstancedEntity is not part of the scene graph (i.e. ultimate parent is root node)
-			//to avoid unnecessary wasteful calculations
-			mVisible |= (*itor)->findVisible( mCurrentCamera );
-			++itor;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::createAllInstancedEntities()
-	{
-		mInstancedEntities.reserve( mInstancesPerBatch );
-		mUnusedEntities.reserve( mInstancesPerBatch );
+        while( itor != end && !mVisible )
+        {
+            //Trick to force Ogre not to render us if none of our instances is visible
+            //Because we do Camera::isVisible(), it is better if the SceneNode from the
+            //InstancedEntity is not part of the scene graph (i.e. ultimate parent is root node)
+            //to avoid unnecessary wasteful calculations
+            mVisible |= (*itor)->findVisible( mCurrentCamera );
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::createAllInstancedEntities()
+    {
+        mInstancedEntities.reserve( mInstancesPerBatch );
+        mUnusedEntities.reserve( mInstancesPerBatch );
 
-		for( size_t i=0; i<mInstancesPerBatch; ++i )
-		{
-			InstancedEntity *instance = generateInstancedEntity(i);
-			mInstancedEntities.push_back( instance );
-			mUnusedEntities.push_back( instance );
-		}
-	}
-	//-----------------------------------------------------------------------
-	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
-	{
-		return OGRE_NEW InstancedEntity(this, static_cast<uint32>(num));
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::deleteAllInstancedEntities()
-	{
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+        for( size_t i=0; i<mInstancesPerBatch; ++i )
+        {
+            InstancedEntity *instance = generateInstancedEntity(i);
+            mInstancedEntities.push_back( instance );
+            mUnusedEntities.push_back( instance );
+        }
+    }
+    //-----------------------------------------------------------------------
+    InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
+    {
+        return OGRE_NEW InstancedEntity(this, static_cast<uint32>(num));
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::deleteAllInstancedEntities()
+    {
+        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-		while( itor != end )
-		{
-			if( (*itor)->getParentSceneNode() )
-				(*itor)->getParentSceneNode()->detachObject( (*itor) );
+        while( itor != end )
+        {
+            if( (*itor)->getParentSceneNode() )
+                (*itor)->getParentSceneNode()->detachObject( (*itor) );
 
-			OGRE_DELETE *itor++;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::deleteUnusedInstancedEntities()
-	{
-		InstancedEntityVec::const_iterator itor = mUnusedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mUnusedEntities.end();
+            OGRE_DELETE *itor++;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::deleteUnusedInstancedEntities()
+    {
+        InstancedEntityVec::const_iterator itor = mUnusedEntities.begin();
+        InstancedEntityVec::const_iterator end  = mUnusedEntities.end();
 
-		while( itor != end )
-			OGRE_DELETE *itor++;
+        while( itor != end )
+            OGRE_DELETE *itor++;
 
-		mUnusedEntities.clear();
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::makeMatrixCameraRelative3x4( float *mat3x4, size_t numFloats )
-	{
-		const Vector3 &cameraRelativePosition = mCurrentCamera->getDerivedPosition();
+        mUnusedEntities.clear();
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::makeMatrixCameraRelative3x4( float *mat3x4, size_t numFloats )
+    {
+        const Vector3 &cameraRelativePosition = mCurrentCamera->getDerivedPosition();
 
-		for( size_t i=0; i<numFloats >> 2; i += 3 )
-		{
-			const Vector3 worldTrans( mat3x4[(i+0) * 4 + 3], mat3x4[(i+1) * 4 + 3],
-										mat3x4[(i+2) * 4 + 3] );
-			const Vector3 newPos( worldTrans - cameraRelativePosition );
+        for( size_t i=0; i<numFloats >> 2; i += 3 )
+        {
+            const Vector3 worldTrans( mat3x4[(i+0) * 4 + 3], mat3x4[(i+1) * 4 + 3],
+                                        mat3x4[(i+2) * 4 + 3] );
+            const Vector3 newPos( worldTrans - cameraRelativePosition );
 
-			mat3x4[(i+0) * 4 + 3] = (float)newPos.x;
-			mat3x4[(i+1) * 4 + 3] = (float)newPos.y;
-			mat3x4[(i+2) * 4 + 3] = (float)newPos.z;
-		}
-	}
-	//-----------------------------------------------------------------------
-	RenderOperation InstanceBatch::build( const SubMesh* baseSubMesh )
-	{
-		if( checkSubMeshCompatibility( baseSubMesh ) )
-		{
-			//Only triangle list at the moment
-			mRenderOperation.operationType	= RenderOperation::OT_TRIANGLE_LIST;
-			mRenderOperation.srcRenderable	= this;
-			mRenderOperation.useIndexes	= true;
-			setupVertices( baseSubMesh );
-			setupIndices( baseSubMesh );
+            mat3x4[(i+0) * 4 + 3] = (float)newPos.x;
+            mat3x4[(i+1) * 4 + 3] = (float)newPos.y;
+            mat3x4[(i+2) * 4 + 3] = (float)newPos.z;
+        }
+    }
+    //-----------------------------------------------------------------------
+    RenderOperation InstanceBatch::build( const SubMesh* baseSubMesh )
+    {
+        if( checkSubMeshCompatibility( baseSubMesh ) )
+        {
+            //Only triangle list at the moment
+            mRenderOperation.operationType  = RenderOperation::OT_TRIANGLE_LIST;
+            mRenderOperation.srcRenderable  = this;
+            mRenderOperation.useIndexes = true;
+            setupVertices( baseSubMesh );
+            setupIndices( baseSubMesh );
 
-			createAllInstancedEntities();
-		}
+            createAllInstancedEntities();
+        }
 
-		return mRenderOperation;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation )
-	{
-		mRenderOperation = renderOperation;
-		createAllInstancedEntities();
-	}
-	//-----------------------------------------------------------------------
-	InstancedEntity* InstanceBatch::createInstancedEntity()
-	{
-		InstancedEntity *retVal = 0;
+        return mRenderOperation;
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation )
+    {
+        mRenderOperation = renderOperation;
+        createAllInstancedEntities();
+    }
+    //-----------------------------------------------------------------------
+    InstancedEntity* InstanceBatch::createInstancedEntity()
+    {
+        InstancedEntity *retVal = 0;
 
-		if( !mUnusedEntities.empty() )
-		{
-			retVal = mUnusedEntities.back();
-			mUnusedEntities.pop_back();
+        if( !mUnusedEntities.empty() )
+        {
+            retVal = mUnusedEntities.back();
+            mUnusedEntities.pop_back();
 
-			retVal->setInUse(true);
-		}
+            retVal->setInUse(true);
+        }
 
-		return retVal;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::removeInstancedEntity( InstancedEntity *instancedEntity )
-	{
-		if( instancedEntity->mBatchOwner != this )
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-						"Trying to remove an InstancedEntity from scene created"
-						" with a different InstanceBatch",
-						"InstanceBatch::removeInstancedEntity()");
-		}
-		if( !instancedEntity->isInUse() )
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-						"Trying to remove an InstancedEntity that is already removed!",
-						"InstanceBatch::removeInstancedEntity()");
-		}
+        return retVal;
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::removeInstancedEntity( InstancedEntity *instancedEntity )
+    {
+        if( instancedEntity->mBatchOwner != this )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Trying to remove an InstancedEntity from scene created"
+                        " with a different InstanceBatch",
+                        "InstanceBatch::removeInstancedEntity()");
+        }
+        if( !instancedEntity->isInUse() )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "Trying to remove an InstancedEntity that is already removed!",
+                        "InstanceBatch::removeInstancedEntity()");
+        }
 
-		if( instancedEntity->getParentSceneNode() )
-			instancedEntity->getParentSceneNode()->detachObject( instancedEntity );
+        if( instancedEntity->getParentSceneNode() )
+            instancedEntity->getParentSceneNode()->detachObject( instancedEntity );
 
-		instancedEntity->setInUse(false);
-		instancedEntity->stopSharingTransform();
+        instancedEntity->setInUse(false);
+        instancedEntity->stopSharingTransform();
 
-		//Put it back into the queue
-		mUnusedEntities.push_back( instancedEntity );
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities,
-													CustomParamsVec &outParams )
-	{
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+        //Put it back into the queue
+        mUnusedEntities.push_back( instancedEntity );
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities,
+                                                    CustomParamsVec &outParams )
+    {
+        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-		while( itor != end )
-		{
-			if( (*itor)->isInUse() )
-			{
-				outEntities.push_back( *itor );
+        while( itor != end )
+        {
+            if( (*itor)->isInUse() )
+            {
+                outEntities.push_back( *itor );
 
-				for( unsigned char i=0; i<mCreator->getNumCustomParams(); ++i )
-					outParams.push_back( _getCustomParam( *itor, i ) );
-			}
+                for( unsigned char i=0; i<mCreator->getNumCustomParams(); ++i )
+                    outParams.push_back( _getCustomParam( *itor, i ) );
+            }
 
-			++itor;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::defragmentBatchNoCull( InstancedEntityVec &usedEntities,
-												CustomParamsVec &usedParams )
-	{
-		const size_t maxInstancesToCopy = std::min( mInstancesPerBatch, usedEntities.size() );
-		InstancedEntityVec::iterator first = usedEntities.end() - maxInstancesToCopy;
-		CustomParamsVec::iterator firstParams = usedParams.end() - maxInstancesToCopy *
-																	mCreator->getNumCustomParams();
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::defragmentBatchNoCull( InstancedEntityVec &usedEntities,
+                                                CustomParamsVec &usedParams )
+    {
+        const size_t maxInstancesToCopy = std::min( mInstancesPerBatch, usedEntities.size() );
+        InstancedEntityVec::iterator first = usedEntities.end() - maxInstancesToCopy;
+        CustomParamsVec::iterator firstParams = usedParams.end() - maxInstancesToCopy *
+                                                                    mCreator->getNumCustomParams();
 
-		//Copy from the back to front, into m_instancedEntities
-		mInstancedEntities.insert( mInstancedEntities.begin(), first, usedEntities.end() );
-		//Remove them from the array
-		usedEntities.resize( usedEntities.size() - maxInstancesToCopy );	
+        //Copy from the back to front, into m_instancedEntities
+        mInstancedEntities.insert( mInstancedEntities.begin(), first, usedEntities.end() );
+        //Remove them from the array
+        usedEntities.resize( usedEntities.size() - maxInstancesToCopy );    
 
-		mCustomParams.insert( mCustomParams.begin(), firstParams, usedParams.end() );
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::defragmentBatchDoCull( InstancedEntityVec &usedEntities,
-												CustomParamsVec &usedParams )
-	{
-		//Get the the entity closest to the minimum bbox edge and put into "first"
-		InstancedEntityVec::const_iterator itor   = usedEntities.begin();
-		InstancedEntityVec::const_iterator end   = usedEntities.end();
+        mCustomParams.insert( mCustomParams.begin(), firstParams, usedParams.end() );
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::defragmentBatchDoCull( InstancedEntityVec &usedEntities,
+                                                CustomParamsVec &usedParams )
+    {
+        //Get the the entity closest to the minimum bbox edge and put into "first"
+        InstancedEntityVec::const_iterator itor   = usedEntities.begin();
+        InstancedEntityVec::const_iterator end   = usedEntities.end();
 
-		Vector3 vMinPos = Vector3::ZERO, firstPos = Vector3::ZERO;
-		InstancedEntity *first = 0;
+        Vector3 vMinPos = Vector3::ZERO, firstPos = Vector3::ZERO;
+        InstancedEntity *first = 0;
 
-		if( !usedEntities.empty() )
-		{
-			first      = *usedEntities.begin();
-			firstPos   = first->_getDerivedPosition();
-			vMinPos      = first->_getDerivedPosition();
-		}
+        if( !usedEntities.empty() )
+        {
+            first      = *usedEntities.begin();
+            firstPos   = first->_getDerivedPosition();
+            vMinPos      = first->_getDerivedPosition();
+        }
 
-		while( itor != end )
-		{
-			const Vector3 &vPos      = (*itor)->_getDerivedPosition();
+        while( itor != end )
+        {
+            const Vector3 &vPos      = (*itor)->_getDerivedPosition();
 
-			vMinPos.x = std::min( vMinPos.x, vPos.x );
-			vMinPos.y = std::min( vMinPos.y, vPos.y );
-			vMinPos.z = std::min( vMinPos.z, vPos.z );
+            vMinPos.x = std::min( vMinPos.x, vPos.x );
+            vMinPos.y = std::min( vMinPos.y, vPos.y );
+            vMinPos.z = std::min( vMinPos.z, vPos.z );
 
-			if( vMinPos.squaredDistance( vPos ) < vMinPos.squaredDistance( firstPos ) )
-			{
-				firstPos   = vPos;
-			}
+            if( vMinPos.squaredDistance( vPos ) < vMinPos.squaredDistance( firstPos ) )
+            {
+                firstPos   = vPos;
+            }
 
-			++itor;
-		}
+            ++itor;
+        }
 
-		//Now collect entities closest to 'first'
-		while( !usedEntities.empty() && mInstancedEntities.size() < mInstancesPerBatch )
-		{
-			InstancedEntityVec::iterator closest   = usedEntities.begin();
-			InstancedEntityVec::iterator it         = usedEntities.begin();
-			InstancedEntityVec::iterator e          = usedEntities.end();
+        //Now collect entities closest to 'first'
+        while( !usedEntities.empty() && mInstancedEntities.size() < mInstancesPerBatch )
+        {
+            InstancedEntityVec::iterator closest   = usedEntities.begin();
+            InstancedEntityVec::iterator it         = usedEntities.begin();
+            InstancedEntityVec::iterator e          = usedEntities.end();
 
-			Vector3 closestPos;
-			closestPos = (*closest)->_getDerivedPosition();
+            Vector3 closestPos;
+            closestPos = (*closest)->_getDerivedPosition();
 
-			while( it != e )
-			{
-				const Vector3 &vPos   = (*it)->_getDerivedPosition();
+            while( it != e )
+            {
+                const Vector3 &vPos   = (*it)->_getDerivedPosition();
 
-				if( firstPos.squaredDistance( vPos ) < firstPos.squaredDistance( closestPos ) )
-				{
-					closest      = it;
-					closestPos   = vPos;
-				}
+                if( firstPos.squaredDistance( vPos ) < firstPos.squaredDistance( closestPos ) )
+                {
+                    closest      = it;
+                    closestPos   = vPos;
+                }
 
-				++it;
-			}
+                ++it;
+            }
 
-			mInstancedEntities.push_back( *closest );
-			//Now the custom params
-			const size_t idx = closest - usedEntities.begin();	
-			for( unsigned char i=0; i<mCreator->getNumCustomParams(); ++i )
-			{
-				mCustomParams.push_back( usedParams[idx + i] );
-			}
+            mInstancedEntities.push_back( *closest );
+            //Now the custom params
+            const size_t idx = closest - usedEntities.begin();  
+            for( unsigned char i=0; i<mCreator->getNumCustomParams(); ++i )
+            {
+                mCustomParams.push_back( usedParams[idx + i] );
+            }
 
-			//Remove 'closest' from usedEntities & usedParams using swap and pop_back trick
-			*closest = *(usedEntities.end() - 1);
-			usedEntities.pop_back();
+            //Remove 'closest' from usedEntities & usedParams using swap and pop_back trick
+            *closest = *(usedEntities.end() - 1);
+            usedEntities.pop_back();
 
-			for( unsigned char i=1; i<=mCreator->getNumCustomParams(); ++i )
-			{
-				usedParams[idx + mCreator->getNumCustomParams() - i] = *(usedParams.end() - 1);
-				usedParams.pop_back();
-			}
-		}
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities,
-											CustomParamsVec &usedParams )
-	{
-		//Remove and clear what we don't need
-		mInstancedEntities.clear();
-		mCustomParams.clear();
-		deleteUnusedInstancedEntities();
+            for( unsigned char i=1; i<=mCreator->getNumCustomParams(); ++i )
+            {
+                usedParams[idx + mCreator->getNumCustomParams() - i] = *(usedParams.end() - 1);
+                usedParams.pop_back();
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::_defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities,
+                                            CustomParamsVec &usedParams )
+    {
+        //Remove and clear what we don't need
+        mInstancedEntities.clear();
+        mCustomParams.clear();
+        deleteUnusedInstancedEntities();
 
-		if( !optimizeCulling )
-			defragmentBatchNoCull( usedEntities, usedParams );
-		else
-			defragmentBatchDoCull( usedEntities, usedParams );
+        if( !optimizeCulling )
+            defragmentBatchNoCull( usedEntities, usedParams );
+        else
+            defragmentBatchDoCull( usedEntities, usedParams );
 
-		//Reassign instance IDs and tell we're the new parent
-		uint32 instanceId = 0;
-		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+        //Reassign instance IDs and tell we're the new parent
+        uint32 instanceId = 0;
+        InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+        InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-		while( itor != end )
-		{
-			(*itor)->mInstanceId = instanceId++;
-			(*itor)->mBatchOwner = this;
-			++itor;
-		}
+        while( itor != end )
+        {
+            (*itor)->mInstanceId = instanceId++;
+            (*itor)->mBatchOwner = this;
+            ++itor;
+        }
 
-		//Recreate unused entities, if there's left space in our container
-		assert( (signed)(mInstancesPerBatch) - (signed)(mInstancedEntities.size()) >= 0 );
-		mInstancedEntities.reserve( mInstancesPerBatch );
-		mUnusedEntities.reserve( mInstancesPerBatch );
-		mCustomParams.reserve( mCreator->getNumCustomParams() * mInstancesPerBatch );
-		for( size_t i=mInstancedEntities.size(); i<mInstancesPerBatch; ++i )
-		{
-			InstancedEntity *instance = generateInstancedEntity(i);
-			mInstancedEntities.push_back( instance );
-			mUnusedEntities.push_back( instance );
-			mCustomParams.push_back( Ogre::Vector4::ZERO );
-		}
+        //Recreate unused entities, if there's left space in our container
+        assert( (signed)(mInstancesPerBatch) - (signed)(mInstancedEntities.size()) >= 0 );
+        mInstancedEntities.reserve( mInstancesPerBatch );
+        mUnusedEntities.reserve( mInstancesPerBatch );
+        mCustomParams.reserve( mCreator->getNumCustomParams() * mInstancesPerBatch );
+        for( size_t i=mInstancedEntities.size(); i<mInstancesPerBatch; ++i )
+        {
+            InstancedEntity *instance = generateInstancedEntity(i);
+            mInstancedEntities.push_back( instance );
+            mUnusedEntities.push_back( instance );
+            mCustomParams.push_back( Ogre::Vector4::ZERO );
+        }
 
-		//We've potentially changed our bounds
-		if( !isBatchUnused() )
-			_boundsDirty();
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_defragmentBatchDiscard(void)
-	{
-		//Remove and clear what we don't need
-		mInstancedEntities.clear();
-		deleteUnusedInstancedEntities();
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_boundsDirty(void)
-	{
-		if( mCreator && !mBoundsDirty ) 
-			mCreator->_addDirtyBatch( this );
-		mBoundsDirty = true;
-	}
-	//-----------------------------------------------------------------------
-	const String& InstanceBatch::getMovableType(void) const
-	{
-		static String sType = "InstanceBatch";
-		return sType;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_notifyCurrentCamera( Camera* cam )
-	{
-		mCurrentCamera = cam;
+        //We've potentially changed our bounds
+        if( !isBatchUnused() )
+            _boundsDirty();
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::_defragmentBatchDiscard(void)
+    {
+        //Remove and clear what we don't need
+        mInstancedEntities.clear();
+        deleteUnusedInstancedEntities();
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::_boundsDirty(void)
+    {
+        if( mCreator && !mBoundsDirty ) 
+            mCreator->_addDirtyBatch( this );
+        mBoundsDirty = true;
+    }
+    //-----------------------------------------------------------------------
+    const String& InstanceBatch::getMovableType(void) const
+    {
+        static String sType = "InstanceBatch";
+        return sType;
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::_notifyCurrentCamera( Camera* cam )
+    {
+        mCurrentCamera = cam;
 
-		//See DistanceLodStrategy::getValueImpl()
-		//We use our own because our SceneNode is just filled with zeroes, and updating it
-		//with real values is expensive, plus we would need to make sure it doesn't get to
-		//the shader
-		Real depth = Math::Sqrt( getSquaredViewDepth(cam) ) -
-					 mMeshReference->getBoundingSphereRadius();
+        //See DistanceLodStrategy::getValueImpl()
+        //We use our own because our SceneNode is just filled with zeroes, and updating it
+        //with real values is expensive, plus we would need to make sure it doesn't get to
+        //the shader
+        Real depth = Math::Sqrt( getSquaredViewDepth(cam) ) -
+                     mMeshReference->getBoundingSphereRadius();
         depth = std::max( depth, Real(0) );
         Real lodValue = depth * cam->_getLodBiasInverse();
 
-		//Now calculate Material LOD
+        //Now calculate Material LOD
         /*const LodStrategy *materialStrategy = m_material->getLodStrategy();
         
         //Calculate LOD value for given strategy
@@ -502,7 +502,7 @@ namespace Ogre
         //Get the index at this depth
         unsigned short idx = mMaterial->getLodIndex( lodValue );
 
-		//TODO: Replace subEntity for MovableObject
+        //TODO: Replace subEntity for MovableObject
         // Construct event object
         /*EntityMaterialLodChangedEvent subEntEvt;
         subEntEvt.subEntity = this;
@@ -517,96 +517,96 @@ namespace Ogre
         //Change LOD index
         mMaterialLodIndex = idx;
 
-		MovableObject::_notifyCurrentCamera( cam );
-	}
-	//-----------------------------------------------------------------------
-	const AxisAlignedBox& InstanceBatch::getBoundingBox(void) const
-	{
-		return mFullBoundingBox;
-	}
-	//-----------------------------------------------------------------------
-	Real InstanceBatch::getBoundingRadius(void) const
-	{
-		return mBoundingRadius;
-	}
-	//-----------------------------------------------------------------------
-	Real InstanceBatch::getSquaredViewDepth( const Camera* cam ) const
-	{
-		if( mCachedCamera != cam )
-		{
-			mCachedCameraDist = std::numeric_limits<Real>::infinity();
+        MovableObject::_notifyCurrentCamera( cam );
+    }
+    //-----------------------------------------------------------------------
+    const AxisAlignedBox& InstanceBatch::getBoundingBox(void) const
+    {
+        return mFullBoundingBox;
+    }
+    //-----------------------------------------------------------------------
+    Real InstanceBatch::getBoundingRadius(void) const
+    {
+        return mBoundingRadius;
+    }
+    //-----------------------------------------------------------------------
+    Real InstanceBatch::getSquaredViewDepth( const Camera* cam ) const
+    {
+        if( mCachedCamera != cam )
+        {
+            mCachedCameraDist = std::numeric_limits<Real>::infinity();
 
-			InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-			InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+            InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+            InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-			while( itor != end )
-			{
-				if( (*itor)->isVisible() )
-					mCachedCameraDist = std::min( mCachedCameraDist, (*itor)->getSquaredViewDepth( cam ) );
-				++itor;
-			}
+            while( itor != end )
+            {
+                if( (*itor)->isVisible() )
+                    mCachedCameraDist = std::min( mCachedCameraDist, (*itor)->getSquaredViewDepth( cam ) );
+                ++itor;
+            }
 
-			mCachedCamera = cam;
-		}
+            mCachedCamera = cam;
+        }
 
         return mCachedCameraDist;
-	}
-	//-----------------------------------------------------------------------
-	const LightList& InstanceBatch::getLights( void ) const
-	{
-		return queryLights();
-	}
-	//-----------------------------------------------------------------------
-	Technique* InstanceBatch::getTechnique( void ) const
-	{
-		return mMaterial->getBestTechnique( mMaterialLodIndex, this );
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_updateRenderQueue( RenderQueue* queue )
-	{
-		/*if( m_boundsDirty )
-			_updateBounds();*/
+    }
+    //-----------------------------------------------------------------------
+    const LightList& InstanceBatch::getLights( void ) const
+    {
+        return queryLights();
+    }
+    //-----------------------------------------------------------------------
+    Technique* InstanceBatch::getTechnique( void ) const
+    {
+        return mMaterial->getBestTechnique( mMaterialLodIndex, this );
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::_updateRenderQueue( RenderQueue* queue )
+    {
+        /*if( m_boundsDirty )
+            _updateBounds();*/
 
-		mDirtyAnimation = false;
+        mDirtyAnimation = false;
 
-		//Is at least one object in the scene?
-		updateVisibility();
+        //Is at least one object in the scene?
+        updateVisibility();
 
-		if( mVisible )
-		{
-			if( mMeshReference->hasSkeleton() )
-			{
-				InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-				InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+        if( mVisible )
+        {
+            if( mMeshReference->hasSkeleton() )
+            {
+                InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+                InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-				while( itor != end )	
-				{
-					mDirtyAnimation |= (*itor)->_updateAnimation();
-					++itor;
-				}
-			}
+                while( itor != end )    
+                {
+                    mDirtyAnimation |= (*itor)->_updateAnimation();
+                    ++itor;
+                }
+            }
 
-			queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
-		}
+            queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
+        }
 
-		//Reset visibility once we skipped addRenderable (which saves GPU time), because OGRE for some
-		//reason stops updating our render queue afterwards, preventing us to recalculate visibility
-		mVisible = true;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )
-	{
-		visitor->visit( this, 0, false );
-	}
-	//-----------------------------------------------------------------------
-	void InstanceBatch::_setCustomParam( InstancedEntity *instancedEntity, unsigned char idx,
-										 const Vector4 &newParam )
-	{
-		mCustomParams[instancedEntity->mInstanceId * mCreator->getNumCustomParams() + idx] = newParam;
-	}
-	//-----------------------------------------------------------------------
-	const Vector4& InstanceBatch::_getCustomParam( InstancedEntity *instancedEntity, unsigned char idx )
-	{
-		return mCustomParams[instancedEntity->mInstanceId * mCreator->getNumCustomParams() + idx];
-	}
+        //Reset visibility once we skipped addRenderable (which saves GPU time), because OGRE for some
+        //reason stops updating our render queue afterwards, preventing us to recalculate visibility
+        mVisible = true;
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )
+    {
+        visitor->visit( this, 0, false );
+    }
+    //-----------------------------------------------------------------------
+    void InstanceBatch::_setCustomParam( InstancedEntity *instancedEntity, unsigned char idx,
+                                         const Vector4 &newParam )
+    {
+        mCustomParams[instancedEntity->mInstanceId * mCreator->getNumCustomParams() + idx] = newParam;
+    }
+    //-----------------------------------------------------------------------
+    const Vector4& InstanceBatch::_getCustomParam( InstancedEntity *instancedEntity, unsigned char idx )
+    {
+        return mCustomParams[instancedEntity->mInstanceId * mCreator->getNumCustomParams() + idx];
+    }
 }

@@ -69,62 +69,62 @@ template <typename T>
 class iterator_range{
 
 #if !OGRE_USE_BOOST
-	
-	T mBegin, mEnd;
-	
-	public : 
-	
+    
+    T mBegin, mEnd;
+    
+    public : 
+    
         /** Constructor.
         @remarks
         Provide a start and end iterator to initialise.
         */
-		iterator_range( T b , T e ) : mBegin(b) , mEnd(e){}
+        iterator_range( T b , T e ) : mBegin(b) , mEnd(e){}
 
-		///access to the begin of the range
-		T begin() const { return mBegin; }
-		
-		///access to the end of the range
-		T end() const 	{ return mEnd;  } 	
+        ///access to the begin of the range
+        T begin() const { return mBegin; }
+        
+        ///access to the end of the range
+        T end() const   { return mEnd;  }   
 
-		///informs if there are any elements in the range
-		bool empty() const { return mBegin = mEnd ; }
+        ///informs if there are any elements in the range
+        bool empty() const { return mBegin = mEnd ; }
 
-		///comparison for equality
-		bool equal( const iterator_range& other ) const  
-		{return mBegin == other.mBegin && mEnd == other.mEnd;}
+        ///comparison for equality
+        bool equal( const iterator_range& other ) const  
+        {return mBegin == other.mBegin && mEnd == other.mEnd;}
 
-		///comparison operator for equality
-		bool operator==( const iterator_range& rhs ) const
-		{return equal( rhs ) ;}
-	
-		///comparison operator for inequality
-		bool operator!=( const iterator_range& rhs ) const { return !operator==(rhs); }
+        ///comparison operator for equality
+        bool operator==( const iterator_range& rhs ) const
+        {return equal( rhs ) ;}
+    
+        ///comparison operator for inequality
+        bool operator!=( const iterator_range& rhs ) const { return !operator==(rhs); }
 
-		/**
-		@brief typedef to fulfill container interface
-		
-		@note there is no distinction between const_iterator and iterator.
-		
-		*/				
-		typedef T iterator;
-		
-		/**
-		@brief typedef to fulfill container interface
-		
-		@note there is no distinction between const_iterator and iterator.
-		
-		*/						
-		typedef T const_iterator;
-		
-		/// defines the real used type
-		/**
-			type will be defined as Ogre::iterator_range if not used with boost
-			\n otherwise the type will be boost::iterator_range
-		*/
-		typedef iterator_range<T> type;
+        /**
+        @brief typedef to fulfill container interface
+        
+        @note there is no distinction between const_iterator and iterator.
+        
+        */              
+        typedef T iterator;
+        
+        /**
+        @brief typedef to fulfill container interface
+        
+        @note there is no distinction between const_iterator and iterator.
+        
+        */                      
+        typedef T const_iterator;
+        
+        /// defines the real used type
+        /**
+            type will be defined as Ogre::iterator_range if not used with boost
+            \n otherwise the type will be boost::iterator_range
+        */
+        typedef iterator_range<T> type;
 #else
-		/// defines (this) type as boost::iterator_range
-		public: typedef boost::iterator_range<T> type ;
+        /// defines (this) type as boost::iterator_range
+        public: typedef boost::iterator_range<T> type ;
 
 #endif
 }; 
@@ -142,35 +142,35 @@ template<typename T>
 struct VectorRange : public iterator_range<typename T::iterator>::type
 {
 
-	/** Constructor.
-	@remarks
-		Provide a container to initialise.
-	*/
-	VectorRange( T& c )
-	: iterator_range<typename T::iterator>::type( c.begin(), c.end() )
-	{}
+    /** Constructor.
+    @remarks
+        Provide a container to initialise.
+    */
+    VectorRange( T& c )
+    : iterator_range<typename T::iterator>::type( c.begin(), c.end() )
+    {}
 
-	/** Constructor.
-	@remarks
-	Provide a start and end iterator to initialise.
-	*/
-	VectorRange( typename T::iterator b, typename T::iterator e )
-	: iterator_range<typename T::iterator>::type( b, e )
-	{}
+    /** Constructor.
+    @remarks
+    Provide a start and end iterator to initialise.
+    */
+    VectorRange( typename T::iterator b, typename T::iterator e )
+    : iterator_range<typename T::iterator>::type( b, e )
+    {}
 
-	///comparison operator for equality
-	bool operator==( const VectorRange& rhs ) const { return equal( rhs) ; }
-	///comparison operator for inequality
-	bool operator!=( const VectorRange& rhs ) const { return !equal( rhs) ; }
+    ///comparison operator for equality
+    bool operator==( const VectorRange& rhs ) const { return equal( rhs) ; }
+    ///comparison operator for inequality
+    bool operator!=( const VectorRange& rhs ) const { return !equal( rhs) ; }
 
 
 #ifdef __Ogre_Iterator_Wrapper_H__
-	///cast operator to a VectorIterator
-	operator VectorIterator<T>(){return VectorIterator<T>( this->begin(), this->end());}
-	///cast operator to a ConstVectorIterator
-	operator ConstVectorIterator<T>(){return ConstVectorIterator<T>( this->begin(), this->end());}
+    ///cast operator to a VectorIterator
+    operator VectorIterator<T>(){return VectorIterator<T>( this->begin(), this->end());}
+    ///cast operator to a ConstVectorIterator
+    operator ConstVectorIterator<T>(){return ConstVectorIterator<T>( this->begin(), this->end());}
 #endif
-	
+    
 };
 
 /** 
@@ -185,51 +185,51 @@ template<typename T>
 struct ConstVectorRange : public iterator_range<typename T::const_iterator>::type
 {
 
-	/** Constructor.
-	@remarks
-		Provide a container to initialise.
-	*/
-	ConstVectorRange( const T& c )
-	: iterator_range<typename T::const_iterator>::type( c.begin(), c.end() )
-	{}
+    /** Constructor.
+    @remarks
+        Provide a container to initialise.
+    */
+    ConstVectorRange( const T& c )
+    : iterator_range<typename T::const_iterator>::type( c.begin(), c.end() )
+    {}
 
-	/** Constructor.
-	@remarks
-	Provide a start and end iterator to initialise.
-	*/
-	ConstVectorRange( typename T::iterator b, typename T::iterator e )
-	: iterator_range<typename T::const_iterator>::type( b, e )
-	{}
+    /** Constructor.
+    @remarks
+    Provide a start and end iterator to initialise.
+    */
+    ConstVectorRange( typename T::iterator b, typename T::iterator e )
+    : iterator_range<typename T::const_iterator>::type( b, e )
+    {}
 
-	/** Constructor.
-	@remarks
-	Provide a start and end const_iterator to initialise.
-	*/
-	ConstVectorRange( typename T::const_iterator b, typename T::const_iterator e )
-	: iterator_range<typename T::const_iterator>::type( b, e )
-	{}
+    /** Constructor.
+    @remarks
+    Provide a start and end const_iterator to initialise.
+    */
+    ConstVectorRange( typename T::const_iterator b, typename T::const_iterator e )
+    : iterator_range<typename T::const_iterator>::type( b, e )
+    {}
 
-	/** Constructor.
-	@remarks
-	Provide a VectorRange to initialise.
-	*/
-	ConstVectorRange( const VectorRange<T>& rhs  )
-	: iterator_range<typename T::const_iterator>::type( rhs.begin(), rhs.end() )
-	{}
+    /** Constructor.
+    @remarks
+    Provide a VectorRange to initialise.
+    */
+    ConstVectorRange( const VectorRange<T>& rhs  )
+    : iterator_range<typename T::const_iterator>::type( rhs.begin(), rhs.end() )
+    {}
 
-	///comparison operator for equality
-	bool operator==( const ConstVectorRange& rhs ) const { return equal( rhs) ; }
-	///comparison operator for inequality
-	bool operator!=( const ConstVectorRange& rhs ) const { return !equal( rhs) ; }
-	
-	
+    ///comparison operator for equality
+    bool operator==( const ConstVectorRange& rhs ) const { return equal( rhs) ; }
+    ///comparison operator for inequality
+    bool operator!=( const ConstVectorRange& rhs ) const { return !equal( rhs) ; }
+    
+    
 
 
 #ifdef __Ogre_Iterator_Wrapper_H__
-	///cast operator to a ConstVectorIterator
-	operator ConstVectorIterator<T>(){return  ConstVectorIterator<T>( this->begin(),this->end());}
+    ///cast operator to a ConstVectorIterator
+    operator ConstVectorIterator<T>(){return  ConstVectorIterator<T>( this->begin(),this->end());}
 #endif
-	
+    
 };
 
 
@@ -245,35 +245,35 @@ struct ConstVectorRange : public iterator_range<typename T::const_iterator>::typ
 template<typename T>
 struct MapRange : public iterator_range<typename T::iterator>::type
 {
-	/** Constructor.
-	@remarks
-		Provide a container to initialise.
-	*/
-	MapRange( T& c )
-	: iterator_range<typename T::iterator>::type( c.begin(), c.end() )
-	{}
+    /** Constructor.
+    @remarks
+        Provide a container to initialise.
+    */
+    MapRange( T& c )
+    : iterator_range<typename T::iterator>::type( c.begin(), c.end() )
+    {}
 
-	/** Constructor.
-	@remarks
-	Provide a start and end iterator to initialise.
-	*/
-	MapRange( typename T::iterator b, typename T::iterator e )
-	: iterator_range<typename T::iterator>::type( b, e )
-	{}
+    /** Constructor.
+    @remarks
+    Provide a start and end iterator to initialise.
+    */
+    MapRange( typename T::iterator b, typename T::iterator e )
+    : iterator_range<typename T::iterator>::type( b, e )
+    {}
 
-	///comparison operator for equality
-	bool operator==( const MapRange& rhs ) const { return equal( rhs) ; }
-	///comparison operator for inequality
-	bool operator!=( const MapRange& rhs ) const { return !equal( rhs) ; }
+    ///comparison operator for equality
+    bool operator==( const MapRange& rhs ) const { return equal( rhs) ; }
+    ///comparison operator for inequality
+    bool operator!=( const MapRange& rhs ) const { return !equal( rhs) ; }
 
 
 #ifdef __Ogre_Iterator_Wrapper_H__
-	///cast operator to a MapIterator
-	operator MapIterator<T>(){return MapIterator<T>( this->begin(), this->end());}
-	///cast operator to a ConstMapIterator
-	operator ConstMapIterator<T>(){return ConstMapIterator<T>( this->begin(), this->end());}
+    ///cast operator to a MapIterator
+    operator MapIterator<T>(){return MapIterator<T>( this->begin(), this->end());}
+    ///cast operator to a ConstMapIterator
+    operator ConstMapIterator<T>(){return ConstMapIterator<T>( this->begin(), this->end());}
 #endif
-	
+    
 };
 
 /** 
@@ -288,49 +288,49 @@ template<typename T>
 struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
 {
 
-	/** Constructor.
-	@remarks
-		Provide a container to initialise.
-	*/
-	ConstMapRange( const T& c )
-	: iterator_range<typename T::const_iterator>::type( c.begin(), c.end() )
-	{}
+    /** Constructor.
+    @remarks
+        Provide a container to initialise.
+    */
+    ConstMapRange( const T& c )
+    : iterator_range<typename T::const_iterator>::type( c.begin(), c.end() )
+    {}
 
-	/** Constructor.
-	@remarks
-	Provide a start and end iterator to initialise.
-	*/
-	ConstMapRange( typename T::iterator b, typename T::iterator e )
-	: iterator_range<typename T::const_iterator>::type( b, e )
-	{}
-	
-	/** Constructor.
-	@remarks
-	Provide a start and end const_iterator to initialise.
-	*/
-	ConstMapRange( typename T::const_iterator b, typename T::const_iterator e )
-	: iterator_range<typename T::const_iterator>::type( b, e )
-	{}
+    /** Constructor.
+    @remarks
+    Provide a start and end iterator to initialise.
+    */
+    ConstMapRange( typename T::iterator b, typename T::iterator e )
+    : iterator_range<typename T::const_iterator>::type( b, e )
+    {}
+    
+    /** Constructor.
+    @remarks
+    Provide a start and end const_iterator to initialise.
+    */
+    ConstMapRange( typename T::const_iterator b, typename T::const_iterator e )
+    : iterator_range<typename T::const_iterator>::type( b, e )
+    {}
 
-	/** Constructor.
-	@remarks
-	Provide a MapRange to initialise.
-	*/
-	ConstMapRange( const MapRange<T>& rhs  )
-	: iterator_range<typename T::const_iterator>::type( rhs.begin(), rhs.end() )
-	{}
-	
-	///comparison operator for equality
-	bool operator==( const ConstMapRange& rhs ) const { return equal( rhs) ; }
-	///comparison operator for inequality
-	bool operator!=( const ConstMapRange& rhs ) const { return !equal( rhs) ; }
+    /** Constructor.
+    @remarks
+    Provide a MapRange to initialise.
+    */
+    ConstMapRange( const MapRange<T>& rhs  )
+    : iterator_range<typename T::const_iterator>::type( rhs.begin(), rhs.end() )
+    {}
+    
+    ///comparison operator for equality
+    bool operator==( const ConstMapRange& rhs ) const { return equal( rhs) ; }
+    ///comparison operator for inequality
+    bool operator!=( const ConstMapRange& rhs ) const { return !equal( rhs) ; }
 
 
 #ifdef __Ogre_Iterator_Wrapper_H__
-	///cast operator to a ConstMapIterator
-	operator ConstMapIterator<T>(){return  ConstMapIterator<T>( this->begin(),this->end());}
+    ///cast operator to a ConstMapIterator
+    operator ConstMapIterator<T>(){return  ConstMapIterator<T>( this->begin(),this->end());}
 #endif
-	
+    
 };
 
 #include "OgreHeaderSuffix.h"

@@ -37,13 +37,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Utility class which defines the sub-parts of an Entity.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Utility class which defines the sub-parts of an Entity.
         @remarks
             Just as meshes are split into submeshes, an Entity is made up of
             potentially multiple SubMeshes. These are mainly here to provide the
@@ -82,7 +82,7 @@ namespace Ogre {
         /// Pointer to the SubMesh defining geometry.
         SubMesh* mSubMesh;
 
-		/// override the start index for the RenderOperation
+        /// override the start index for the RenderOperation
         size_t mIndexStart;
 
         /// override the end index for the RenderOperation
@@ -100,31 +100,31 @@ namespace Ogre {
         /// Flags whether the RenderQueue's default should be used.
         bool mRenderQueuePrioritySet;
 #if !OGRE_NO_MESHLOD
-		/// The LOD number of the material to use, calculated by Entity::_notifyCurrentCamera
-		unsigned short mMaterialLodIndex;
+        /// The LOD number of the material to use, calculated by Entity::_notifyCurrentCamera
+        unsigned short mMaterialLodIndex;
 #else
-		const unsigned short mMaterialLodIndex; // = 0
+        const unsigned short mMaterialLodIndex; // = 0
 #endif
         /// Blend buffer details for dedicated geometry
         VertexData* mSkelAnimVertexData;
         /// Quick lookup of buffers
         TempBlendedBufferInfo mTempSkelAnimInfo;
-		/// Temp buffer details for software Vertex anim geometry
-		TempBlendedBufferInfo mTempVertexAnimInfo;
-		/// Vertex data details for software Vertex anim of shared geometry
-		VertexData* mSoftwareVertexAnimVertexData;
-		/// Vertex data details for hardware Vertex anim of shared geometry
-		/// - separate since we need to s/w anim for shadows whilst still altering
-		///   the vertex data for hardware morphing (pos2 binding)
-		VertexData* mHardwareVertexAnimVertexData;
-		/// Have we applied any vertex animation to geometry?
-		bool mVertexAnimationAppliedThisFrame;
-		/// Number of hardware blended poses supported by material
-		ushort mHardwarePoseCount;
-		/// Cached distance to last camera for getSquaredViewDepth
-		mutable Real mCachedCameraDist;
-		/// The camera for which the cached distance is valid
-		mutable const Camera *mCachedCamera;
+        /// Temp buffer details for software Vertex anim geometry
+        TempBlendedBufferInfo mTempVertexAnimInfo;
+        /// Vertex data details for software Vertex anim of shared geometry
+        VertexData* mSoftwareVertexAnimVertexData;
+        /// Vertex data details for hardware Vertex anim of shared geometry
+        /// - separate since we need to s/w anim for shadows whilst still altering
+        ///   the vertex data for hardware morphing (pos2 binding)
+        VertexData* mHardwareVertexAnimVertexData;
+        /// Have we applied any vertex animation to geometry?
+        bool mVertexAnimationAppliedThisFrame;
+        /// Number of hardware blended poses supported by material
+        ushort mHardwarePoseCount;
+        /// Cached distance to last camera for getSquaredViewDepth
+        mutable Real mCachedCameraDist;
+        /// The camera for which the cached distance is valid
+        mutable const Camera *mCachedCamera;
 
         /** Internal method for preparing this Entity for use in animation. */
         void prepareTempBlendBuffers(void);
@@ -142,13 +142,13 @@ namespace Ogre {
         */
         void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
-		/** Sets a Material to be used.
-			@remarks
-				By default a SubEntity uses the default Material that the SubMesh
-				uses. This call can alter that so that the Material is different
-				for this instance.
-		*/
-		void setMaterial( const MaterialPtr& material );
+        /** Sets a Material to be used.
+            @remarks
+                By default a SubEntity uses the default Material that the SubMesh
+                uses. This call can alter that so that the Material is different
+                for this instance.
+        */
+        void setMaterial( const MaterialPtr& material );
 
         /** Tells this SubEntity whether to be visible or not. */
         virtual void setVisible(bool visible);
@@ -200,8 +200,8 @@ namespace Ogre {
         */
         SubMesh* getSubMesh(void);
 
-		/** Accessor to get parent Entity */
-		Entity* getParent(void) const { return mParentEntity; }
+        /** Accessor to get parent Entity */
+        Entity* getParent(void) const { return mParentEntity; }
 
         /** Overridden - see Renderable.
         */
@@ -215,7 +215,7 @@ namespace Ogre {
         */
         void getRenderOperation(RenderOperation& op);
 
-		/** Tells this SubEntity to draw a subset of the SubMesh by adjusting the index buffer extents.
+        /** Tells this SubEntity to draw a subset of the SubMesh by adjusting the index buffer extents.
          * Default value is zero so that the entire index buffer is used when drawing.
          * Valid values are zero to getIndexDataEndIndex()
         */
@@ -233,11 +233,11 @@ namespace Ogre {
         void setIndexDataEndIndex(size_t end_index);
 
         /** Returns the current value of the start index used for drawing.
-		*/
+        */
         size_t getIndexDataEndIndex() const;
 
-		/** Reset the custom start/end index to the default values.
-		*/
+        /** Reset the custom start/end index to the default values.
+        */
         void resetIndexDataStartEndIndex();
 
         /** Overridden - see Renderable.
@@ -252,65 +252,65 @@ namespace Ogre {
         const LightList& getLights(void) const;
         /** @copydoc Renderable::getCastsShadows */
         bool getCastsShadows(void) const;
-		/** Advanced method to get the temporarily blended vertex information
-		for entities which are software skinned. 
+        /** Advanced method to get the temporarily blended vertex information
+        for entities which are software skinned. 
         @remarks
             Internal engine will eliminate software animation if possible, this
             information is unreliable unless added request for software animation
             via Entity::addSoftwareAnimationRequest.
         @note
             The positions/normals of the returned vertex data is in object space.
-		*/
-		VertexData* _getSkelAnimVertexData(void);
-		/** Advanced method to get the temporarily blended software morph vertex information
+        */
+        VertexData* _getSkelAnimVertexData(void);
+        /** Advanced method to get the temporarily blended software morph vertex information
         @remarks
             Internal engine will eliminate software animation if possible, this
             information is unreliable unless added request for software animation
             via Entity::addSoftwareAnimationRequest.
         @note
             The positions/normals of the returned vertex data is in object space.
-		*/
-		VertexData* _getSoftwareVertexAnimVertexData(void);
-		/** Advanced method to get the hardware morph vertex information
+        */
+        VertexData* _getSoftwareVertexAnimVertexData(void);
+        /** Advanced method to get the hardware morph vertex information
         @note
             The positions/normals of the returned vertex data is in object space.
-		*/
-		VertexData* _getHardwareVertexAnimVertexData(void);
-		/** Advanced method to get the temp buffer information for software 
-		skeletal animation.
-		*/
-		TempBlendedBufferInfo* _getSkelAnimTempBufferInfo(void);
-		/** Advanced method to get the temp buffer information for software 
-		morph animation.
-		*/
-		TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void);
-		/// Retrieve the VertexData which should be used for GPU binding
-		VertexData* getVertexDataForBinding(void);
+        */
+        VertexData* _getHardwareVertexAnimVertexData(void);
+        /** Advanced method to get the temp buffer information for software 
+        skeletal animation.
+        */
+        TempBlendedBufferInfo* _getSkelAnimTempBufferInfo(void);
+        /** Advanced method to get the temp buffer information for software 
+        morph animation.
+        */
+        TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void);
+        /// Retrieve the VertexData which should be used for GPU binding
+        VertexData* getVertexDataForBinding(void);
 
-		/** Mark all vertex data as so far unanimated. 
-		*/
-		void _markBuffersUnusedForAnimation(void);
-		/** Mark all vertex data as animated. 
-		*/
-		void _markBuffersUsedForAnimation(void);
-		/** Are buffers already marked as vertex animated? */
-		bool _getBuffersMarkedForAnimation(void) const { return mVertexAnimationAppliedThisFrame; }
-		/** Internal method to copy original vertex data to the morph structures
-		should there be no active animation in use.
-		*/
-		void _restoreBuffersForUnusedAnimation(bool hardwareAnimation);
+        /** Mark all vertex data as so far unanimated. 
+        */
+        void _markBuffersUnusedForAnimation(void);
+        /** Mark all vertex data as animated. 
+        */
+        void _markBuffersUsedForAnimation(void);
+        /** Are buffers already marked as vertex animated? */
+        bool _getBuffersMarkedForAnimation(void) const { return mVertexAnimationAppliedThisFrame; }
+        /** Internal method to copy original vertex data to the morph structures
+        should there be no active animation in use.
+        */
+        void _restoreBuffersForUnusedAnimation(bool hardwareAnimation);
 
-		/** Overridden from Renderable to provide some custom behaviour. */
-		void _updateCustomGpuParameter(
-			const GpuProgramParameters::AutoConstantEntry& constantEntry,
-			GpuProgramParameters* params) const;
+        /** Overridden from Renderable to provide some custom behaviour. */
+        void _updateCustomGpuParameter(
+            const GpuProgramParameters::AutoConstantEntry& constantEntry,
+            GpuProgramParameters* params) const;
 
-		/** Invalidate the camera distance cache */
-		void _invalidateCameraCache ()
-		{ mCachedCamera = 0; }
+        /** Invalidate the camera distance cache */
+        void _invalidateCameraCache ()
+        { mCachedCamera = 0; }
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

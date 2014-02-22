@@ -32,21 +32,21 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** Class for displaying the error dialog if Ogre fails badly. */
-	class _OgreExport ErrorDialog
-	{
-	public:
-		ErrorDialog();
+    /** Class for displaying the error dialog if Ogre fails badly. */
+    class _OgreExport ErrorDialog
+    {
+    public:
+        ErrorDialog();
 
-		/**
-		@remarks
-			Displays the error dialog.
-		@param
-			errorMessage The error message which has caused the failure.
-		@param
-			logName Optional name of the log to display in the detail pane.
-		*/
+        /**
+        @remarks
+            Displays the error dialog.
+        @param
+            errorMessage The error message which has caused the failure.
+        @param
+            logName Optional name of the log to display in the detail pane.
+        */
         void display(const String& errorMessage, String logName = "");
-	};
+    };
 }
 #endif

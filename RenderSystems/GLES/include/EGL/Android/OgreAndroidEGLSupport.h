@@ -47,7 +47,7 @@ namespace Ogre {
         
         virtual GLESPBuffer* createPBuffer(PixelComponentType format,
                                            size_t width, size_t height);
-	};
+    };
 }
 
 #endif

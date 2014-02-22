@@ -36,17 +36,17 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class _OgrePrivate GLXPBuffer : public GLPBuffer
-	{
-	public:
-		GLXPBuffer(GLXGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
-		~GLXPBuffer();
-		
-		virtual GLContext *getContext();
+    class _OgrePrivate GLXPBuffer : public GLPBuffer
+    {
+    public:
+        GLXPBuffer(GLXGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
+        ~GLXPBuffer();
+        
+        virtual GLContext *getContext();
 
-	protected:
-		GLXContext*   mContext;
-		GLXGLSupport* mGLSupport;
-	};
+    protected:
+        GLXContext*   mContext;
+        GLXGLSupport* mGLSupport;
+    };
 }
 #endif

@@ -35,13 +35,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Animation
-	*  @{
-	*/
-	/** Handles the management of skeleton resources.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Animation
+    *  @{
+    */
+    /** Handles the management of skeleton resources.
         @remarks
             This class deals with the runtime management of
             skeleton data; like other resource managers it handles
@@ -55,15 +55,15 @@ namespace Ogre {
         SkeletonManager();
         ~SkeletonManager();
 
-		/// Create a new skeleton
-		/// @see ResourceManager::createResource
-		SkeletonPtr create (const String& name, const String& group,
-							bool isManual = false, ManualResourceLoader* loader = 0,
-							const NameValuePairList* createParams = 0);
+        /// Create a new skeleton
+        /// @see ResourceManager::createResource
+        SkeletonPtr create (const String& name, const String& group,
+                            bool isManual = false, ManualResourceLoader* loader = 0,
+                            const NameValuePairList* createParams = 0);
 
-		/// Get a resource by name
-		/// @see ResourceManager::getResourceByName
-		SkeletonPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        /// Get a resource by name
+        /// @see ResourceManager::getResourceByName
+        SkeletonPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Override standard Singleton retrieval.
         @remarks
@@ -106,8 +106,8 @@ namespace Ogre {
 
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

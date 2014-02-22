@@ -39,25 +39,25 @@ EventContainer::~EventContainer()
 
 void EventContainer::subscribe(int eventId, EventHandler handler)
 {
-	DelegateMap::iterator it = mDelegates.find(eventId);
-	it->second->connect(handler);
+    DelegateMap::iterator it = mDelegates.find(eventId);
+    it->second->connect(handler);
 }
 
 // TODO: Implement unsubscribe
 void EventContainer::unsubscribe(int eventId,EventHandler handler)
 {
-	DelegateMap::iterator it = mDelegates.find(eventId);
-	//it->second->disconnect(handler);
+    DelegateMap::iterator it = mDelegates.find(eventId);
+    //it->second->disconnect(handler);
 }
 
 // Should we throw an exception on duplicate event IDs?
 void EventContainer::registerEvent(int eventId)
 {
-	mDelegates[eventId] = new Delegate();
+    mDelegates[eventId] = new Delegate();
 }
 
 void EventContainer::fireEvent(int eventId, EventArgs& args)
 {
-	DelegateMap::iterator it = mDelegates.find(eventId);
-	(*(it->second))(args);
+    DelegateMap::iterator it = mDelegates.find(eventId);
+    (*(it->second))(args);
 }
