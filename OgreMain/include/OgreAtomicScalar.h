@@ -48,12 +48,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
     template<class T> class AtomicScalar
     {
 
@@ -110,15 +110,15 @@ namespace Ogre {
             return BUILTIN_FETCH_ADD (&mField, -1);
         }
 
-		T operator+=(const T &add)
-		{
-			return BUILTIN_ADD_FETCH (&mField, add);
-		}
+        T operator+=(const T &add)
+        {
+            return BUILTIN_ADD_FETCH (&mField, add);
+        }
 
-		T operator-=(const T &sub)
-		{
-			return BUILTIN_SUB_FETCH (&mField, sub);
-		}
+        T operator-=(const T &sub)
+        {
+            return BUILTIN_SUB_FETCH (&mField, sub);
+        }
 
         // Need special alignment for atomic functions on ARM CPU's
 #if OGRE_CPU == OGRE_CPU_ARM
@@ -139,8 +139,8 @@ namespace Ogre {
 #endif
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 
@@ -150,7 +150,7 @@ namespace Ogre {
 #  define WIN32_LEAN_AND_MEAN
 #endif
 #if !defined(NOMINMAX) && defined(_MSC_VER)
-#	define NOMINMAX // required to stop windows.h messing up std::min
+#   define NOMINMAX // required to stop windows.h messing up std::min
 #endif
 #include <windows.h>
 #include <intrin.h>
@@ -161,12 +161,12 @@ namespace Ogre {
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
     template<class T> class AtomicScalar
     {
 
@@ -203,14 +203,14 @@ namespace Ogre {
             if (sizeof(T)==2) {
                 return _InterlockedCompareExchange16((SHORT*)&mField, static_cast<SHORT>(nu), static_cast<SHORT>(old)) == static_cast<SHORT>(old);
             } 
-			else if (sizeof(T)==4) 
-			{
+            else if (sizeof(T)==4) 
+            {
                 return _InterlockedCompareExchange((LONG*)&mField, static_cast<LONG>(nu), static_cast<LONG>(old)) == static_cast<LONG>(old);
-			} 
-			else if (sizeof(T)==8) {
+            } 
+            else if (sizeof(T)==8) {
                 return _InterlockedCompareExchange64((LONGLONG*)&mField, static_cast<LONGLONG>(nu), static_cast<LONGLONG>(old)) == static_cast<LONGLONG>(old);
             } 
-			else {
+            else {
                 OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,"Only 16, 32, and 64 bit scalars supported in win32.","AtomicScalar::cas");
             }
         }
@@ -267,41 +267,41 @@ namespace Ogre {
             }
         }
 
-		T operator+=(const T &add)
-		{
-			//The function InterlockedExchangeAdd is not available for 64 and 16 bit version
-			//We will use the cas operation instead. 
-			T newVal;
-			do {
-				//Create a value of the current field plus the added value
-				newVal = mField + add;
-				//Replace the current field value with the new value. Ensure that the value 
-				//of the field hasn't changed in the mean time by comparing it to the new value
-				//minus the added value. 
-			} while (!cas(newVal - add, newVal)); //repeat until successful
-			return newVal;
-		}
+        T operator+=(const T &add)
+        {
+            //The function InterlockedExchangeAdd is not available for 64 and 16 bit version
+            //We will use the cas operation instead. 
+            T newVal;
+            do {
+                //Create a value of the current field plus the added value
+                newVal = mField + add;
+                //Replace the current field value with the new value. Ensure that the value 
+                //of the field hasn't changed in the mean time by comparing it to the new value
+                //minus the added value. 
+            } while (!cas(newVal - add, newVal)); //repeat until successful
+            return newVal;
+        }
 
-		T operator-=(const T &sub)
-		{
-			//The function InterlockedExchangeAdd is not available for 64 and 16 bit version
-			//We will use the cas operation instead. 
-			T newVal;
-			do {
-				//Create a value of the current field plus the added value
-				newVal = mField - sub;
-				//Replace the current field value with the new value. Ensure that the value 
-				//of the field hasn't changed in the mean time by comparing it to the new value
-				//minus the added value. 
-			} while (!cas(newVal + sub, newVal)); //repeat until successful
-			return newVal;
-		}
+        T operator-=(const T &sub)
+        {
+            //The function InterlockedExchangeAdd is not available for 64 and 16 bit version
+            //We will use the cas operation instead. 
+            T newVal;
+            do {
+                //Create a value of the current field plus the added value
+                newVal = mField - sub;
+                //Replace the current field value with the new value. Ensure that the value 
+                //of the field hasn't changed in the mean time by comparing it to the new value
+                //minus the added value. 
+            } while (!cas(newVal + sub, newVal)); //repeat until successful
+            return newVal;
+        }
 
         volatile T mField;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 
@@ -313,12 +313,12 @@ namespace Ogre {
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
     template <class T> class AtomicScalar {
 
         public:
@@ -386,19 +386,19 @@ namespace Ogre {
             return mField--;
         }
 
-		T operator+=(const T &add)
-		{
+        T operator+=(const T &add)
+        {
             OGRE_LOCK_AUTO_MUTEX;
-			mField += add;
-			return mField;
-		}
+            mField += add;
+            return mField;
+        }
 
-		T operator-=(const T &sub)
-		{
+        T operator-=(const T &sub)
+        {
             OGRE_LOCK_AUTO_MUTEX;
-			mField -= sub;
-			return mField;
-		}
+            mField -= sub;
+            return mField;
+        }
 
         protected:
 
@@ -407,8 +407,8 @@ namespace Ogre {
         volatile T mField;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

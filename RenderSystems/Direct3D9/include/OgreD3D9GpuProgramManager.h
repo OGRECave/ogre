@@ -46,7 +46,7 @@ namespace Ogre {
             GpuProgramType gptype, const String& syntaxCode);
     public:
         D3D9GpuProgramManager();
-		~D3D9GpuProgramManager();
+        ~D3D9GpuProgramManager();
     };
 
 }

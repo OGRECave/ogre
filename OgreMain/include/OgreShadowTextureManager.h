@@ -40,81 +40,81 @@ Torus Knot Software Ltd.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	typedef vector<TexturePtr>::type ShadowTextureList;
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    typedef vector<TexturePtr>::type ShadowTextureList;
 
-	/** Structure containing the configuration for one shadow texture. */
-	struct ShadowTextureConfig
-	{
-		unsigned int width;
-		unsigned int height;
-		PixelFormat format;
+    /** Structure containing the configuration for one shadow texture. */
+    struct ShadowTextureConfig
+    {
+        unsigned int width;
+        unsigned int height;
+        PixelFormat format;
         unsigned int fsaa;
-		uint16		depthBufferPoolId;
+        uint16      depthBufferPoolId;
 
-		ShadowTextureConfig()
-			: width(512), height(512), format(PF_X8R8G8B8), fsaa(0), depthBufferPoolId(1) {}
-	};
+        ShadowTextureConfig()
+            : width(512), height(512), format(PF_X8R8G8B8), fsaa(0), depthBufferPoolId(1) {}
+    };
 
-	typedef vector<ShadowTextureConfig>::type ShadowTextureConfigList;
-	typedef ConstVectorIterator<ShadowTextureConfigList> ConstShadowTextureConfigIterator;
+    typedef vector<ShadowTextureConfig>::type ShadowTextureConfigList;
+    typedef ConstVectorIterator<ShadowTextureConfigList> ConstShadowTextureConfigIterator;
 
-	inline _OgreExport bool operator== ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
-	inline _OgreExport bool operator!= ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
+    inline _OgreExport bool operator== ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
+    inline _OgreExport bool operator!= ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
 
 
-	/** Class to manage the available shadow textures which may be shared between
-		many SceneManager instances if formats agree.
-	@remarks
-		The management of the list of shadow textures has been separated out into
-		a dedicated class to enable the clean management of shadow textures
-		across many scene manager instances. Where multiple scene managers are
-		used with shadow textures, the configuration of those shadows may or may
-		not be consistent - if it is, it is good to centrally manage the textures
-		so that creation and destruction responsibility is clear.
-	*/
-	class _OgreExport ShadowTextureManager : public Singleton<ShadowTextureManager>, public ShadowDataAlloc
-	{
-	protected:
-		ShadowTextureList mTextureList;
-		ShadowTextureList mNullTextureList;
-		size_t mCount;
+    /** Class to manage the available shadow textures which may be shared between
+        many SceneManager instances if formats agree.
+    @remarks
+        The management of the list of shadow textures has been separated out into
+        a dedicated class to enable the clean management of shadow textures
+        across many scene manager instances. Where multiple scene managers are
+        used with shadow textures, the configuration of those shadows may or may
+        not be consistent - if it is, it is good to centrally manage the textures
+        so that creation and destruction responsibility is clear.
+    */
+    class _OgreExport ShadowTextureManager : public Singleton<ShadowTextureManager>, public ShadowDataAlloc
+    {
+    protected:
+        ShadowTextureList mTextureList;
+        ShadowTextureList mNullTextureList;
+        size_t mCount;
 
-	public:
-		ShadowTextureManager();
-		virtual ~ShadowTextureManager();
+    public:
+        ShadowTextureManager();
+        virtual ~ShadowTextureManager();
 
-		/** Populate an incoming list with shadow texture references as requested
-			in the configuration list.
-		*/
-		virtual void getShadowTextures(const ShadowTextureConfigList& config, 
-			ShadowTextureList& listToPopulate);
+        /** Populate an incoming list with shadow texture references as requested
+            in the configuration list.
+        */
+        virtual void getShadowTextures(const ShadowTextureConfigList& config, 
+            ShadowTextureList& listToPopulate);
 
         /** Populate an incoming list with all shadow texture references.
          */
-		virtual void getAllShadowTextures(ShadowTextureList& listToPopulate) { listToPopulate = mTextureList; }
+        virtual void getAllShadowTextures(ShadowTextureList& listToPopulate) { listToPopulate = mTextureList; }
 
-		/** Get an appropriately defined 'null' texture, i.e. one which will always
-			result in no shadows.
-		*/
-		virtual TexturePtr getNullShadowTexture(PixelFormat format);
+        /** Get an appropriately defined 'null' texture, i.e. one which will always
+            result in no shadows.
+        */
+        virtual TexturePtr getNullShadowTexture(PixelFormat format);
 
-		/** Remove any shadow textures that are no longer being referenced.
-		@remarks
-			This should be called fairly regularly since references may take a 
-			little while to disappear in some cases (if referenced by materials)
-		*/
-		virtual void clearUnused();
-		/** Dereference all the shadow textures kept in this class and remove them
-			from TextureManager; note that it is up to the SceneManagers to clear 
-			their local references.
-		*/
-		virtual void clear();
+        /** Remove any shadow textures that are no longer being referenced.
+        @remarks
+            This should be called fairly regularly since references may take a 
+            little while to disappear in some cases (if referenced by materials)
+        */
+        virtual void clearUnused();
+        /** Dereference all the shadow textures kept in this class and remove them
+            from TextureManager; note that it is up to the SceneManagers to clear 
+            their local references.
+        */
+        virtual void clear();
 
         /** Override standard Singleton retrieval.
         @remarks
@@ -149,10 +149,10 @@ namespace Ogre
         */
         static ShadowTextureManager* getSingletonPtr(void);
 
-	};
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

@@ -39,13 +39,13 @@ THE SOFTWARE.
 #include "OgrePlane.h"
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** Class encapsulating a standard 4x4 homogeneous matrix.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** Class encapsulating a standard 4x4 homogeneous matrix.
         @remarks
             OGRE uses column vectors when applying matrix multiplications,
             This means a vector is represented as a single column, 4-row
@@ -80,15 +80,15 @@ namespace Ogre
     class _OgreExport Matrix4
     {
     protected:
-		friend class ArrayMatrix4;
-		friend class ArrayMatrixAf4x3;
-		friend class SimpleMatrix4;
-		friend class SimpleMatrixAf4x3;
+        friend class ArrayMatrix4;
+        friend class ArrayMatrixAf4x3;
+        friend class SimpleMatrix4;
+        friend class SimpleMatrixAf4x3;
         /// The matrix entries, indexed by [row][col].
         union {
             /*OGRE_ALIGNED_DECL( Real, m[4][4], OGRE_SIMD_ALIGNMENT );
             OGRE_ALIGNED_DECL( Real, _m[16], OGRE_SIMD_ALIGNMENT );*/
-			Real m[4][4];
+            Real m[4][4];
             Real _m[16];
         };
     public:
@@ -145,29 +145,29 @@ namespace Ogre
         }
         
 
-		/** Exchange the contents of this matrix with another. 
-		*/
-		inline void swap(Matrix4& other)
-		{
-			std::swap(m[0][0], other.m[0][0]);
-			std::swap(m[0][1], other.m[0][1]);
-			std::swap(m[0][2], other.m[0][2]);
-			std::swap(m[0][3], other.m[0][3]);
-			std::swap(m[1][0], other.m[1][0]);
-			std::swap(m[1][1], other.m[1][1]);
-			std::swap(m[1][2], other.m[1][2]);
-			std::swap(m[1][3], other.m[1][3]);
-			std::swap(m[2][0], other.m[2][0]);
-			std::swap(m[2][1], other.m[2][1]);
-			std::swap(m[2][2], other.m[2][2]);
-			std::swap(m[2][3], other.m[2][3]);
-			std::swap(m[3][0], other.m[3][0]);
-			std::swap(m[3][1], other.m[3][1]);
-			std::swap(m[3][2], other.m[3][2]);
-			std::swap(m[3][3], other.m[3][3]);
-		}
+        /** Exchange the contents of this matrix with another. 
+        */
+        inline void swap(Matrix4& other)
+        {
+            std::swap(m[0][0], other.m[0][0]);
+            std::swap(m[0][1], other.m[0][1]);
+            std::swap(m[0][2], other.m[0][2]);
+            std::swap(m[0][3], other.m[0][3]);
+            std::swap(m[1][0], other.m[1][0]);
+            std::swap(m[1][1], other.m[1][1]);
+            std::swap(m[1][2], other.m[1][2]);
+            std::swap(m[1][3], other.m[1][3]);
+            std::swap(m[2][0], other.m[2][0]);
+            std::swap(m[2][1], other.m[2][1]);
+            std::swap(m[2][2], other.m[2][2]);
+            std::swap(m[2][3], other.m[2][3]);
+            std::swap(m[3][0], other.m[3][0]);
+            std::swap(m[3][1], other.m[3][1]);
+            std::swap(m[3][2], other.m[3][2]);
+            std::swap(m[3][3], other.m[3][3]);
+        }
 
-		inline Real* operator [] ( size_t iRow )
+        inline Real* operator [] ( size_t iRow )
         {
             assert( iRow < 4 );
             return m[iRow];
@@ -180,38 +180,38 @@ namespace Ogre
         }
 
 /*#if OGRE_CPU == OGRE_CPU_X86
-		inline Matrix4 concatenate(const Matrix4 &_m2) const
+        inline Matrix4 concatenate(const Matrix4 &_m2) const
         {
-			Matrix4 r;
-			ArrayReal m2[4];
-			m2[0] = _mm_load_ps( &_m2[0][0] );
-			m2[1] = _mm_load_ps( &_m2[1][0] );
-			m2[2] = _mm_load_ps( &_m2[2][0] );
-			m2[3] = _mm_load_ps( &_m2[3][0] );
+            Matrix4 r;
+            ArrayReal m2[4];
+            m2[0] = _mm_load_ps( &_m2[0][0] );
+            m2[1] = _mm_load_ps( &_m2[1][0] );
+            m2[2] = _mm_load_ps( &_m2[2][0] );
+            m2[3] = _mm_load_ps( &_m2[3][0] );
 
-			ArrayReal t = _mm_mul_ps( _mm_load_ps1( &m[0][0] ), m2[0] );
-			t = _mm_madd_ps( _mm_load_ps1( &m[0][1] ), m2[1], t );
-			t = _mm_madd_ps( _mm_load_ps1( &m[0][2] ), m2[2], t );
-			t = _mm_madd_ps( _mm_load_ps1( &m[0][3] ), m2[3], t );
-			_mm_store_ps( r._m+0, t );
+            ArrayReal t = _mm_mul_ps( _mm_load_ps1( &m[0][0] ), m2[0] );
+            t = _mm_madd_ps( _mm_load_ps1( &m[0][1] ), m2[1], t );
+            t = _mm_madd_ps( _mm_load_ps1( &m[0][2] ), m2[2], t );
+            t = _mm_madd_ps( _mm_load_ps1( &m[0][3] ), m2[3], t );
+            _mm_store_ps( r._m+0, t );
 
-			t = _mm_mul_ps( _mm_load_ps1( &m[1][0] ), m2[0] );
-			t = _mm_madd_ps( _mm_load_ps1( &m[1][1] ), m2[1], t );
-			t = _mm_madd_ps( _mm_load_ps1( &m[1][2] ), m2[2], t );
-			t = _mm_madd_ps( _mm_load_ps1( &m[1][3] ), m2[3], t );
-			_mm_store_ps( r._m+4, t );
+            t = _mm_mul_ps( _mm_load_ps1( &m[1][0] ), m2[0] );
+            t = _mm_madd_ps( _mm_load_ps1( &m[1][1] ), m2[1], t );
+            t = _mm_madd_ps( _mm_load_ps1( &m[1][2] ), m2[2], t );
+            t = _mm_madd_ps( _mm_load_ps1( &m[1][3] ), m2[3], t );
+            _mm_store_ps( r._m+4, t );
 
-			t = _mm_mul_ps( _mm_load_ps1( &m[2][0] ), m2[0] );
-			t = _mm_madd_ps( _mm_load_ps1( &m[2][1] ), m2[1], t );
-			t = _mm_madd_ps( _mm_load_ps1( &m[2][2] ), m2[2], t );
-			t = _mm_madd_ps( _mm_load_ps1( &m[2][3] ), m2[3], t );
-			_mm_store_ps( r._m+8, t );
+            t = _mm_mul_ps( _mm_load_ps1( &m[2][0] ), m2[0] );
+            t = _mm_madd_ps( _mm_load_ps1( &m[2][1] ), m2[1], t );
+            t = _mm_madd_ps( _mm_load_ps1( &m[2][2] ), m2[2], t );
+            t = _mm_madd_ps( _mm_load_ps1( &m[2][3] ), m2[3], t );
+            _mm_store_ps( r._m+8, t );
 
-			t = _mm_mul_ps( _mm_load_ps1( &m[3][0] ), m2[0] );
-			t = _mm_madd_ps( _mm_load_ps1( &m[3][1] ), m2[1], t );
-			t = _mm_madd_ps( _mm_load_ps1( &m[3][2] ), m2[2], t );
-			t = _mm_madd_ps( _mm_load_ps1( &m[3][3] ), m2[3], t );
-			_mm_store_ps( r._m+12, t );
+            t = _mm_mul_ps( _mm_load_ps1( &m[3][0] ), m2[0] );
+            t = _mm_madd_ps( _mm_load_ps1( &m[3][1] ), m2[1], t );
+            t = _mm_madd_ps( _mm_load_ps1( &m[3][2] ), m2[2], t );
+            t = _mm_madd_ps( _mm_load_ps1( &m[3][3] ), m2[3], t );
+            _mm_store_ps( r._m+12, t );
 
             return r;
         }
@@ -283,13 +283,13 @@ namespace Ogre
         inline Plane operator * (const Plane& p) const
         {
             Plane ret;
-			Matrix4 invTrans = inverse().transpose();
-			Vector4 v4( p.normal.x, p.normal.y, p.normal.z, p.d );
-			v4 = invTrans * v4;
-			ret.normal.x = v4.x; 
-			ret.normal.y = v4.y; 
-			ret.normal.z = v4.z;
-			ret.d = v4.w / ret.normal.normalise();
+            Matrix4 invTrans = inverse().transpose();
+            Vector4 v4( p.normal.x, p.normal.y, p.normal.z, p.d );
+            v4 = invTrans * v4;
+            ret.normal.x = v4.x; 
+            ret.normal.y = v4.y; 
+            ret.normal.z = v4.z;
+            ret.d = v4.w / ret.normal.normalise();
 
             return ret;
         }
@@ -520,30 +520,30 @@ namespace Ogre
 
         }
 
-		/** Determines if this matrix involves a scaling. */
-		inline bool hasScale() const
-		{
-			// check magnitude of column vectors (==local axes)
-			Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
-			if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-				return true;
-			t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
-			if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-				return true;
-			t = m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2];
-			if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-				return true;
+        /** Determines if this matrix involves a scaling. */
+        inline bool hasScale() const
+        {
+            // check magnitude of column vectors (==local axes)
+            Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
+            t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
+            t = m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
 
-			return false;
-		}
+            return false;
+        }
 
-		/** Determines if this matrix involves a negative scaling. */
-		inline bool hasNegativeScale() const
-		{
-			return determinant() < 0;
-		}
+        /** Determines if this matrix involves a negative scaling. */
+        inline bool hasNegativeScale() const
+        {
+            return determinant() < 0;
+        }
 
-		/** Extracts the rotation / scaling part as a quaternion from the Matrix.
+        /** Extracts the rotation / scaling part as a quaternion from the Matrix.
          */
         inline Quaternion extractQuaternion() const
         {
@@ -552,9 +552,9 @@ namespace Ogre
           return Quaternion(m3x3);
         }
 
-	static const Matrix4 ZERO;
-	static const Matrix4 ZEROAFFINE;
-	static const Matrix4 IDENTITY;
+    static const Matrix4 ZERO;
+    static const Matrix4 ZEROAFFINE;
+    static const Matrix4 IDENTITY;
         /** Useful little matrix which takes 2D clipspace {-1, 1} to {0,1}
             and inverts the Y. */
         static const Matrix4 CLIPSPACE2DTOIMAGESPACE;
@@ -574,7 +574,7 @@ namespace Ogre
             ( std::ostream& o, const Matrix4& mat )
         {
             o << "Matrix4(";
-			for (size_t i = 0; i < 4; ++i)
+            for (size_t i = 0; i < 4; ++i)
             {
                 o << " row" << (unsigned)i << "{";
                 for(size_t j = 0; j < 4; ++j)
@@ -586,10 +586,10 @@ namespace Ogre
             o << ")";
             return o;
         }
-		
-		Matrix4 adjoint() const;
-		Real determinant() const;
-		Matrix4 inverse() const;
+        
+        Matrix4 adjoint() const;
+        Real determinant() const;
+        Matrix4 inverse() const;
 
         /** Building a Matrix4 from orientation / scale / position.
         @remarks
@@ -699,8 +699,8 @@ namespace Ogre
             v.x*mat[0][3] + v.y*mat[1][3] + v.z*mat[2][3] + v.w*mat[3][3]
             );
     }
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 #endif

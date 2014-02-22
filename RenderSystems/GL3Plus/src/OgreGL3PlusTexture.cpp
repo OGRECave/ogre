@@ -98,10 +98,10 @@ namespace Ogre {
     // Creation / loading methods
     void GL3PlusTexture::createInternalResourcesImpl(void)
     {
-		// Adjust format if required
+        // Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
 
-		// Check requested number of mipmaps
+        // Check requested number of mipmaps
         size_t maxMips = GL3PlusPixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
 
         if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
@@ -111,7 +111,7 @@ namespace Ogre {
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
 
-		// Generate texture name
+        // Generate texture name
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
         GLenum texTarget = getGL3PlusTextureTarget();
 
@@ -123,7 +123,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         }
 
-		// Set texture type
+        // Set texture type
         OGRE_CHECK_GL_ERROR(glBindTexture(texTarget, mTextureID));
 
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_BASE_LEVEL, 0));
@@ -191,14 +191,14 @@ namespace Ogre {
 //                << " Data type: 0x" << std::hex << datatype;
 //                LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
-				switch(mTextureType)
-				{
-					case TEX_TYPE_1D:
-						OGRE_CHECK_GL_ERROR(glCompressedTexImage1D(GL_TEXTURE_1D, mip, format, 
-							width, 0, 
-							size, NULL));
-						break;
-					case TEX_TYPE_2D:
+                switch(mTextureType)
+                {
+                    case TEX_TYPE_1D:
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage1D(GL_TEXTURE_1D, mip, format, 
+                            width, 0, 
+                            size, NULL));
+                        break;
+                    case TEX_TYPE_2D:
                         OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_2D,
                                                mip,
                                                format,
@@ -207,7 +207,7 @@ namespace Ogre {
                                                size,
                                                NULL));
                         break;
-					case TEX_TYPE_2D_RECT:
+                    case TEX_TYPE_2D_RECT:
                         OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_RECTANGLE,
                                                mip,
                                                format,
@@ -216,19 +216,19 @@ namespace Ogre {
                                                size,
                                                NULL));
                         break;
-					case TEX_TYPE_2D_ARRAY:
-					case TEX_TYPE_3D:
-						OGRE_CHECK_GL_ERROR(glCompressedTexImage3D(texTarget, mip, format,
-							width, height, depth, 0, 
-							size, NULL));
-						break;
-					case TEX_TYPE_CUBE_MAP:
-						for(int face = 0; face < 6; face++) {
-							OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
-								width, height, 0, 
-								size, NULL));
-						}
-						break;
+                    case TEX_TYPE_2D_ARRAY:
+                    case TEX_TYPE_3D:
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage3D(texTarget, mip, format,
+                            width, height, depth, 0, 
+                            size, NULL));
+                        break;
+                    case TEX_TYPE_CUBE_MAP:
+                        for(int face = 0; face < 6; face++) {
+                            OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+                                width, height, 0, 
+                                size, NULL));
+                        }
+                        break;
                     default:
                         break;
                 };
@@ -532,12 +532,12 @@ namespace Ogre {
         assert(idx < mSurfaceList.size());
         return mSurfaceList[idx];
     }
-	//---------------------------------------------------------------------------------------------
-	void GL3PlusTexture::getCustomAttribute(const String& name, void* pData)
-	{
-		if (name == "GLID")
-			*static_cast<GLuint*>(pData) = mTextureID;
-	}
-	
+    //---------------------------------------------------------------------------------------------
+    void GL3PlusTexture::getCustomAttribute(const String& name, void* pData)
+    {
+        if (name == "GLID")
+            *static_cast<GLuint*>(pData) = mTextureID;
+    }
+    
 }
 

@@ -34,125 +34,125 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	class D3D9Texture;
-	class D3D9RenderTexture;
+    class D3D9Texture;
+    class D3D9RenderTexture;
 
-	class _OgreD3D9Export D3D9HardwarePixelBuffer: public HardwarePixelBuffer
-	{
-	protected:		
-		struct BufferResources
-		{			
-			/// Surface abstracted by this buffer
-			IDirect3DSurface9* surface;
-			/// AA Surface abstracted by this buffer
-			IDirect3DSurface9* fSAASurface;
-			/// Volume abstracted by this buffer
-			IDirect3DVolume9* volume;
-			/// Temporary surface in main memory if direct locking of mSurface is not possible
-			IDirect3DSurface9* tempSurface;
-			/// Temporary volume in main memory if direct locking of mVolume is not possible
-			IDirect3DVolume9* tempVolume;
-			/// Mip map texture.
-			IDirect3DBaseTexture9 *mipTex;			
-		};
+    class _OgreD3D9Export D3D9HardwarePixelBuffer: public HardwarePixelBuffer
+    {
+    protected:      
+        struct BufferResources
+        {           
+            /// Surface abstracted by this buffer
+            IDirect3DSurface9* surface;
+            /// AA Surface abstracted by this buffer
+            IDirect3DSurface9* fSAASurface;
+            /// Volume abstracted by this buffer
+            IDirect3DVolume9* volume;
+            /// Temporary surface in main memory if direct locking of mSurface is not possible
+            IDirect3DSurface9* tempSurface;
+            /// Temporary volume in main memory if direct locking of mVolume is not possible
+            IDirect3DVolume9* tempVolume;
+            /// Mip map texture.
+            IDirect3DBaseTexture9 *mipTex;          
+        };
 
-		typedef map<IDirect3DDevice9*, BufferResources*>::type	DeviceToBufferResourcesMap;
-		typedef DeviceToBufferResourcesMap::iterator			DeviceToBufferResourcesIterator;
+        typedef map<IDirect3DDevice9*, BufferResources*>::type  DeviceToBufferResourcesMap;
+        typedef DeviceToBufferResourcesMap::iterator            DeviceToBufferResourcesIterator;
 
-		/// Map between device to buffer resources.
-		DeviceToBufferResourcesMap	mMapDeviceToBufferResources;
-				
-		/// Mipmapping
-		bool mDoMipmapGen;
-		bool mHWMipmaps;
-		
-		/// Render target
-		D3D9RenderTexture* mRenderTexture;
+        /// Map between device to buffer resources.
+        DeviceToBufferResourcesMap  mMapDeviceToBufferResources;
+                
+        /// Mipmapping
+        bool mDoMipmapGen;
+        bool mHWMipmaps;
+        
+        /// Render target
+        D3D9RenderTexture* mRenderTexture;
 
-		// The owner texture if exists.
-		D3D9Texture* mOwnerTexture;
-		
-		// The current lock flags of this surface.
-		DWORD mLockFlags;
+        // The owner texture if exists.
+        D3D9Texture* mOwnerTexture;
+        
+        // The current lock flags of this surface.
+        DWORD mLockFlags;
 
-		// Device access mutex.
-		OGRE_STATIC_MUTEX(msDeviceAccessMutex);
-	protected:
-		/// Lock a box
-		PixelBox lockImpl(const Image::Box lockBox,  LockOptions options);
-		PixelBox lockBuffer(BufferResources* bufferResources, const Image::Box &lockBox, DWORD flags);
+        // Device access mutex.
+        OGRE_STATIC_MUTEX(msDeviceAccessMutex);
+    protected:
+        /// Lock a box
+        PixelBox lockImpl(const Image::Box lockBox,  LockOptions options);
+        PixelBox lockBuffer(BufferResources* bufferResources, const Image::Box &lockBox, DWORD flags);
 
-		/// Unlock a box
-		void unlockImpl(void);
-		void unlockBuffer(BufferResources* bufferResources);
+        /// Unlock a box
+        void unlockImpl(void);
+        void unlockBuffer(BufferResources* bufferResources);
 
-		BufferResources* getBufferResources(IDirect3DDevice9* d3d9Device);
-		BufferResources* createBufferResources();
-	
-		/// updates render texture.
-		void updateRenderTexture(bool writeGamma, uint fsaa, const String& srcName);
-		/// destroy render texture.
-		void destroyRenderTexture();
+        BufferResources* getBufferResources(IDirect3DDevice9* d3d9Device);
+        BufferResources* createBufferResources();
+    
+        /// updates render texture.
+        void updateRenderTexture(bool writeGamma, uint fsaa, const String& srcName);
+        /// destroy render texture.
+        void destroyRenderTexture();
 
-		void blit(IDirect3DDevice9* d3d9Device, const HardwarePixelBufferSharedPtr &src,
-				const Image::Box &srcBox, const Image::Box &dstBox, 
-				BufferResources* srcBufferResources, 
-				BufferResources* dstBufferResources);
-		void blitFromMemory(const PixelBox &src, const Image::Box &dstBox, BufferResources* dstBufferResources);
+        void blit(IDirect3DDevice9* d3d9Device, const HardwarePixelBufferSharedPtr &src,
+                const Image::Box &srcBox, const Image::Box &dstBox, 
+                BufferResources* srcBufferResources, 
+                BufferResources* dstBufferResources);
+        void blitFromMemory(const PixelBox &src, const Image::Box &dstBox, BufferResources* dstBufferResources);
 
-		void blitToMemory(const Image::Box &srcBox, const PixelBox &dst, BufferResources* srcBufferResources, IDirect3DDevice9* d3d9Device);
-			
-	public:
-		D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
-			D3D9Texture* ownerTexture);
-		~D3D9HardwarePixelBuffer();
+        void blitToMemory(const Image::Box &srcBox, const PixelBox &dst, BufferResources* srcBufferResources, IDirect3DDevice9* d3d9Device);
+            
+    public:
+        D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
+            D3D9Texture* ownerTexture);
+        ~D3D9HardwarePixelBuffer();
 
-		/// Call this to associate a D3D surface or volume with this pixel buffer
-		void bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *mSurface, IDirect3DSurface9* fsaaSurface,
-				  bool writeGamma, uint fsaa, const String& srcName, IDirect3DBaseTexture9 *mipTex);
-		void bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *mVolume, IDirect3DBaseTexture9 *mipTex);
-		
-		/// @copydoc HardwarePixelBuffer::blit
+        /// Call this to associate a D3D surface or volume with this pixel buffer
+        void bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *mSurface, IDirect3DSurface9* fsaaSurface,
+                  bool writeGamma, uint fsaa, const String& srcName, IDirect3DBaseTexture9 *mipTex);
+        void bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *mVolume, IDirect3DBaseTexture9 *mipTex);
+        
+        /// @copydoc HardwarePixelBuffer::blit
         void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
-		
-		/// @copydoc HardwarePixelBuffer::blitFromMemory
-		void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
-	
-		/// @copydoc HardwarePixelBuffer::blitToMemory
-		void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
-		
-		/// Internal function to update mipmaps on update of level 0
-		void _genMipmaps(IDirect3DBaseTexture9* mipTex);
-		
-		/// Function to set mipmap generation
-		void _setMipmapping(bool doMipmapGen, bool HWMipmaps);
-		
-		
-		/// Get rendertarget for z slice
-		RenderTexture *getRenderTarget(size_t zoffset);
+        
+        /// @copydoc HardwarePixelBuffer::blitFromMemory
+        void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
+    
+        /// @copydoc HardwarePixelBuffer::blitToMemory
+        void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
+        
+        /// Internal function to update mipmaps on update of level 0
+        void _genMipmaps(IDirect3DBaseTexture9* mipTex);
+        
+        /// Function to set mipmap generation
+        void _setMipmapping(bool doMipmapGen, bool HWMipmaps);
+        
+        
+        /// Get rendertarget for z slice
+        RenderTexture *getRenderTarget(size_t zoffset);
 
-		/// Accessor for surface
-		IDirect3DSurface9 *getSurface(IDirect3DDevice9* d3d9Device);
-		
-		/// Accessor for AA surface
-		IDirect3DSurface9 *getFSAASurface(IDirect3DDevice9* d3d9Device);
+        /// Accessor for surface
+        IDirect3DSurface9 *getSurface(IDirect3DDevice9* d3d9Device);
+        
+        /// Accessor for AA surface
+        IDirect3DSurface9 *getFSAASurface(IDirect3DDevice9* d3d9Device);
 
-		/// Notify TextureBuffer of destruction of render target
+        /// Notify TextureBuffer of destruction of render target
         virtual void _clearSliceRTT(size_t zoffset);
 
-		/// Release surfaces held by this pixel buffer.
-		void releaseSurfaces(IDirect3DDevice9* d3d9Device);
+        /// Release surfaces held by this pixel buffer.
+        void releaseSurfaces(IDirect3DDevice9* d3d9Device);
 
-		/// Destroy resources associated with the given device.
-		void destroyBufferResources(IDirect3DDevice9* d3d9Device);
+        /// Destroy resources associated with the given device.
+        void destroyBufferResources(IDirect3DDevice9* d3d9Device);
 
-		// Called when device state is changing. Access to any device should be locked.
-		// Relevant for multi thread application.
-		static void lockDeviceAccess();
+        // Called when device state is changing. Access to any device should be locked.
+        // Relevant for multi thread application.
+        static void lockDeviceAccess();
 
-		// Called when device state change completed. Access to any device is allowed.
-		// Relevant for multi thread application.
-		static void unlockDeviceAccess();
-	};
+        // Called when device state change completed. Access to any device is allowed.
+        // Relevant for multi thread application.
+        static void unlockDeviceAccess();
+    };
 };
 #endif

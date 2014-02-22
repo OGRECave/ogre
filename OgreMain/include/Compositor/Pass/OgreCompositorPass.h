@@ -35,66 +35,66 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class RenderTarget;
-	struct CompositorChannel;
-	class CompositorNode;
+    class RenderTarget;
+    struct CompositorChannel;
+    class CompositorNode;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
-	/** Abstract class for compositor passes. A pass can be a fullscreen quad, a scene
-		rendering, a clear. etc.
-		Derived classes are responsible for performing an actual job.
-		Note that passes do not own RenderTargets, therefore we're not responsible
-		for destroying it.
+    /** Abstract class for compositor passes. A pass can be a fullscreen quad, a scene
+        rendering, a clear. etc.
+        Derived classes are responsible for performing an actual job.
+        Note that passes do not own RenderTargets, therefore we're not responsible
+        for destroying it.
     @author
-		Matias N. Goldberg
+        Matias N. Goldberg
     @version
         1.0
     */
-	class _OgreExport CompositorPass : public CompositorInstAlloc
-	{
-		CompositorPassDef const *mDefinition;
-	protected:
-		RenderTarget	*mTarget;
-		Viewport		*mViewport;
+    class _OgreExport CompositorPass : public CompositorInstAlloc
+    {
+        CompositorPassDef const *mDefinition;
+    protected:
+        RenderTarget    *mTarget;
+        Viewport        *mViewport;
 
-		uint32			mNumPassesLeft;
+        uint32          mNumPassesLeft;
 
-		CompositorNode	*mParentNode;
+        CompositorNode  *mParentNode;
 
-		RenderTarget* calculateRenderTarget( size_t rtIndex, const CompositorChannel &source );
+        RenderTarget* calculateRenderTarget( size_t rtIndex, const CompositorChannel &source );
 
-	public:
-		CompositorPass( const CompositorPassDef *definition, const CompositorChannel &target,
-						CompositorNode *parentNode );
-		virtual ~CompositorPass();
+    public:
+        CompositorPass( const CompositorPassDef *definition, const CompositorChannel &target,
+                        CompositorNode *parentNode );
+        virtual ~CompositorPass();
 
-		virtual void execute( const Camera *lodCameraconst ) = 0;
+        virtual void execute( const Camera *lodCameraconst ) = 0;
 
-		/// @See CompositorNode::notifyRecreated
-		virtual void notifyRecreated( const CompositorChannel &oldChannel,
-										const CompositorChannel &newChannel );
+        /// @See CompositorNode::notifyRecreated
+        virtual void notifyRecreated( const CompositorChannel &oldChannel,
+                                        const CompositorChannel &newChannel );
 
-		/// @See CompositorNode::notifyDestroyed
-		virtual void notifyDestroyed( const CompositorChannel &channel );
+        /// @See CompositorNode::notifyDestroyed
+        virtual void notifyDestroyed( const CompositorChannel &channel );
 
-		/// @See CompositorNode::_notifyCleared
-		virtual void notifyCleared(void);
+        /// @See CompositorNode::_notifyCleared
+        virtual void notifyCleared(void);
 
-		CompositorPassType getType() const	{ return mDefinition->getType(); }
+        CompositorPassType getType() const  { return mDefinition->getType(); }
 
-		Viewport* getViewport() const		{ return mViewport; }
+        Viewport* getViewport() const       { return mViewport; }
 
-		const CompositorPassDef* getDefinition(void) const	{ return mDefinition; }
-	};
+        const CompositorPassDef* getDefinition(void) const  { return mDefinition; }
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

@@ -16,49 +16,49 @@ same license as the rest of the engine.
 
 namespace Ogre
 {
-	const String& ProceduralManualObject::getMovableType(void) const
-	{
-		return ProceduralManualObjectFactory::FACTORY_TYPE_NAME;
-	}
-	//-----------------------------------------------------------------------------
+    const String& ProceduralManualObject::getMovableType(void) const
+    {
+        return ProceduralManualObjectFactory::FACTORY_TYPE_NAME;
+    }
+    //-----------------------------------------------------------------------------
     void ProceduralManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera,
                                                     const Camera *lodCamera)
-	{
-		mR2vbObject->update(mParentSceneManager);
-		queue->addRenderable(this);
-	}
-	//-----------------------------------------------------------------------------
-	void ProceduralManualObject::getRenderOperation(RenderOperation& op)
-	{
-		mR2vbObject->getRenderOperation(op);
-	}
-	//-----------------------------------------------------------------------------
-	void ProceduralManualObject::setManualObject(Ogre::ManualObject *manualObject)
-	{
-		mManualObject = manualObject;
-		mParentSceneManager = manualObject->_getManager();
-		if (!mR2vbObject.isNull())
-		{
-			mR2vbObject->setSourceRenderable(manualObject->getSection(0));
-		}
-	}
-	//-----------------------------------------------------------------------------
-	String ProceduralManualObjectFactory::FACTORY_TYPE_NAME = "ProceduralManualObject";
-	//-----------------------------------------------------------------------------
-	const String& ProceduralManualObjectFactory::getType(void) const
-	{
-		return FACTORY_TYPE_NAME;
-	}
-	//-----------------------------------------------------------------------------
-	MovableObject* ProceduralManualObjectFactory::createInstanceImpl( IdType id,
-											ObjectMemoryManager *objectMemoryManager,
-											const NameValuePairList* params )
-	{
-		return new ProceduralManualObject( id, objectMemoryManager );
-	}
-	//-----------------------------------------------------------------------------
-	void ProceduralManualObjectFactory::destroyInstance( MovableObject* obj)
-	{
-		delete obj;
-	}
+    {
+        mR2vbObject->update(mParentSceneManager);
+        queue->addRenderable(this);
+    }
+    //-----------------------------------------------------------------------------
+    void ProceduralManualObject::getRenderOperation(RenderOperation& op)
+    {
+        mR2vbObject->getRenderOperation(op);
+    }
+    //-----------------------------------------------------------------------------
+    void ProceduralManualObject::setManualObject(Ogre::ManualObject *manualObject)
+    {
+        mManualObject = manualObject;
+        mParentSceneManager = manualObject->_getManager();
+        if (!mR2vbObject.isNull())
+        {
+            mR2vbObject->setSourceRenderable(manualObject->getSection(0));
+        }
+    }
+    //-----------------------------------------------------------------------------
+    String ProceduralManualObjectFactory::FACTORY_TYPE_NAME = "ProceduralManualObject";
+    //-----------------------------------------------------------------------------
+    const String& ProceduralManualObjectFactory::getType(void) const
+    {
+        return FACTORY_TYPE_NAME;
+    }
+    //-----------------------------------------------------------------------------
+    MovableObject* ProceduralManualObjectFactory::createInstanceImpl( IdType id,
+                                            ObjectMemoryManager *objectMemoryManager,
+                                            const NameValuePairList* params )
+    {
+        return new ProceduralManualObject( id, objectMemoryManager );
+    }
+    //-----------------------------------------------------------------------------
+    void ProceduralManualObjectFactory::destroyInstance( MovableObject* obj)
+    {
+        delete obj;
+    }
 }

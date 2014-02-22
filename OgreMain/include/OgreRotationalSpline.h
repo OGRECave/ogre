@@ -34,13 +34,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** This class interpolates orientations (rotations) along a spline using 
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** This class interpolates orientations (rotations) along a spline using 
         derivatives of quaternions.
     @remarks
         Like the SimpleSpline class, this class is about interpolating values 
@@ -55,7 +55,7 @@ namespace Ogre {
         generate an extra quaternion in between each actual quaternion which when take with 
         the original quaternion forms the 'tangent' of that quaternion.
     */
-	class _OgreExport RotationalSpline
+    class _OgreExport RotationalSpline
     {
     public:
         RotationalSpline();
@@ -84,14 +84,14 @@ namespace Ogre {
             Given a t value between 0 and 1 representing the parametric distance along the
             whole length of the spline, this method returns an interpolated point.
         @param t Parametric value.
-		@param useShortestPath Defines if rotation should take the shortest possible path
+        @param useShortestPath Defines if rotation should take the shortest possible path
         */
         Quaternion interpolate(Real t, bool useShortestPath=true);
 
         /** Interpolates a single segment of the spline given a parametric value.
         @param fromIndex The point index to treat as t=0. fromIndex + 1 is deemed to be t=1
         @param t Parametric value
-		@param useShortestPath Defines if rotation should take the shortest possible path
+        @param useShortestPath Defines if rotation should take the shortest possible path
         */
         Quaternion interpolate(unsigned int fromIndex, Real t, bool useShortestPath=true);
 
@@ -127,8 +127,8 @@ namespace Ogre {
 
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

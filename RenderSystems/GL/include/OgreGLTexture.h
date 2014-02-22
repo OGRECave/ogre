@@ -49,34 +49,34 @@ namespace Ogre {
         virtual ~GLTexture();      
 
         void createRenderTexture();
-			
-		/// @copydoc Texture::getBuffer
-		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
+            
+        /// @copydoc Texture::getBuffer
+        HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
         /// Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
         GLenum getGLTextureTarget(void) const;
 
         GLuint getGLID() const
         {
-			if( mFSAA > 0 )
-			{
-				//Before GL 3.3, only implicit resolves are supported.
-				for( size_t face=0; face<getNumFaces(); ++face )
-				{
-					RenderTarget *renderTarget = mSurfaceList[face * (mNumMipmaps+1)]->getRenderTarget();
-					if( renderTarget->isFsaaResolveDirty() )
-						renderTarget->swapBuffers();
-				}
-			}
+            if( mFSAA > 0 )
+            {
+                //Before GL 3.3, only implicit resolves are supported.
+                for( size_t face=0; face<getNumFaces(); ++face )
+                {
+                    RenderTarget *renderTarget = mSurfaceList[face * (mNumMipmaps+1)]->getRenderTarget();
+                    if( renderTarget->isFsaaResolveDirty() )
+                        renderTarget->swapBuffers();
+                }
+            }
 
             return mTextureID;
         }
-		
-		void getCustomAttribute(const String& name, void* pData);
+        
+        void getCustomAttribute(const String& name, void* pData);
 
     protected:
-		/// @copydoc Texture::createInternalResourcesImpl
-		void createInternalResourcesImpl(void);
+        /// @copydoc Texture::createInternalResourcesImpl
+        void createInternalResourcesImpl(void);
         /// @copydoc Resource::prepareImpl
         void prepareImpl(void);
         /// @copydoc Resource::unprepareImpl
@@ -86,12 +86,12 @@ namespace Ogre {
         /// @copydoc Texture::freeInternalResourcesImpl
         void freeInternalResourcesImpl(void);
 
-		/** internal method, create GLHardwarePixelBuffers for every face and
-			 mipmap level. This method must be called after the GL texture object was created,
-			the number of mipmaps was set (GL_TEXTURE_MAX_LEVEL) and glTexImageXD was called to
-			actually allocate the buffer
-		*/
-		void _createSurfaceList();
+        /** internal method, create GLHardwarePixelBuffers for every face and
+             mipmap level. This method must be called after the GL texture object was created,
+            the number of mipmaps was set (GL_TEXTURE_MAX_LEVEL) and glTexImageXD was called to
+            actually allocate the buffer
+        */
+        void _createSurfaceList();
 
         /// Used to hold images between calls to prepare and load.
         typedef SharedPtr<vector<Image>::type > LoadedImages;
@@ -106,10 +106,10 @@ namespace Ogre {
     private:
         GLuint mTextureID;
         GLSupport& mGLSupport;
-		
-		/// Vector of pointers to subsurfaces
-		typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
-		SurfaceList	mSurfaceList;
+        
+        /// Vector of pointers to subsurfaces
+        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
+        SurfaceList mSurfaceList;
     };
 }
 

@@ -176,20 +176,20 @@ namespace Ogre {
             RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
     };
 
-	/// GL3PlusDefaultHardwareBufferManagerBase as a Singleton
-	class _OgreGL3PlusExport GL3PlusDefaultHardwareBufferManager : public HardwareBufferManager
-	{
-	public:
-		GL3PlusDefaultHardwareBufferManager()
-			: HardwareBufferManager(OGRE_NEW GL3PlusDefaultHardwareBufferManagerBase()) 
-		{
+    /// GL3PlusDefaultHardwareBufferManagerBase as a Singleton
+    class _OgreGL3PlusExport GL3PlusDefaultHardwareBufferManager : public HardwareBufferManager
+    {
+    public:
+        GL3PlusDefaultHardwareBufferManager()
+            : HardwareBufferManager(OGRE_NEW GL3PlusDefaultHardwareBufferManagerBase()) 
+        {
 
-		}
-		~GL3PlusDefaultHardwareBufferManager()
-		{
-			OGRE_DELETE mImpl;
-		}
-	};
+        }
+        ~GL3PlusDefaultHardwareBufferManager()
+        {
+            OGRE_DELETE mImpl;
+        }
+    };
 }
 
 #endif

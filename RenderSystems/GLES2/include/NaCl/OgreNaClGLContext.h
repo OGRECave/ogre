@@ -38,8 +38,8 @@ namespace Ogre {
 
     class _OgrePrivate NaClGLContext : public GLES2Context, public pp::Graphics3DClient
     {
-		private:
-			const NaClGLSupport *mGLSupport;
+        private:
+            const NaClGLSupport *mGLSupport;
             const NaClWindow * mWindow;
             pp::Instance* mInstance;
             pp::CompletionCallback* mSwapCallback;
@@ -50,7 +50,7 @@ namespace Ogre {
             NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance, pp::CompletionCallback* swapCallback);
             virtual ~NaClGLContext();
 
-			virtual void setCurrent();
+            virtual void setCurrent();
             virtual void endCurrent();
             GLES2Context* clone() const;
 

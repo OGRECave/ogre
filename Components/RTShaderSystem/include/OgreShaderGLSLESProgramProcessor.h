@@ -47,38 +47,38 @@ class GLSLESProgramProcessor : public ProgramProcessor
 {
 
 // Interface.
-public:	
+public: 
 
-	/** Class constructor.
-	*/
-	GLSLESProgramProcessor();
-
-	/** Class destructor */
-	virtual ~GLSLESProgramProcessor();
-
-	/** Return the target language of this processor. */
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
-
-	/** 
-	@see ProgramProcessor::preCreateGpuPrograms
+    /** Class constructor.
     */
-	virtual bool preCreateGpuPrograms(ProgramSet* programSet);
+    GLSLESProgramProcessor();
 
-	/** 
-	@see ProgramProcessor::postCreateGpuPrograms
-	*/
-	virtual bool postCreateGpuPrograms(ProgramSet* programSet);
+    /** Class destructor */
+    virtual ~GLSLESProgramProcessor();
+
+    /** Return the target language of this processor. */
+    virtual const String& getTargetLanguage() const { return TargetLanguage; }
+
+    /** 
+    @see ProgramProcessor::preCreateGpuPrograms
+    */
+    virtual bool preCreateGpuPrograms(ProgramSet* programSet);
+
+    /** 
+    @see ProgramProcessor::postCreateGpuPrograms
+    */
+    virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
 
 private:
 
-	/** Bind texture samplers. */
-	void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
+    /** Bind texture samplers. */
+    void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
 
-	static String TargetLanguage;
+    static String TargetLanguage;
 
-	// The list of created library shaders.
-	StringVector mLibraryPrograms;
+    // The list of created library shaders.
+    StringVector mLibraryPrograms;
 };
 
 

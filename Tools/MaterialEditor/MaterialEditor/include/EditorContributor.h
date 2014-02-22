@@ -33,11 +33,11 @@ THE SOFTWARE.
 class EditorContributor
 {
 public:
-	EditorContributor() {}
-	virtual ~EditorContributor() {}
+    EditorContributor() {}
+    virtual ~EditorContributor() {}
 
-	virtual void contributeToMenu(wxMenu* menu) {}
-	virtual void contributeToToolBar(wxToolBar* toolBar) {}
+    virtual void contributeToMenu(wxMenu* menu) {}
+    virtual void contributeToToolBar(wxToolBar* toolBar) {}
 };
 
 #endif // _EDITORCONTRIBUTOR_H_

@@ -46,12 +46,12 @@ namespace Ogre {
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
-	String ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME = "General";
-	String ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME = "Internal";
-	String ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME = "Autodetect";
-	// A reference count of 3 means that only RGM and RM have references
-	// RGM has one (this one) and RM has 2 (by name and by handle)
-	size_t ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS = 3;
+    String ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME = "General";
+    String ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME = "Internal";
+    String ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME = "Autodetect";
+    // A reference count of 3 means that only RGM and RM have references
+    // RGM has one (this one) and RM has 2 (by name and by handle)
+    size_t ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS = 3;
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     ResourceGroupManager::ResourceGroupManager()
@@ -61,8 +61,8 @@ namespace Ogre {
         createResourceGroup(DEFAULT_RESOURCE_GROUP_NAME);
         // Create the 'Internal' group
         createResourceGroup(INTERNAL_RESOURCE_GROUP_NAME);
-		// Create the 'Autodetect' group (only used for temp storage)
-		createResourceGroup(AUTODETECT_RESOURCE_GROUP_NAME);
+        // Create the 'Autodetect' group (only used for temp storage)
+        createResourceGroup(AUTODETECT_RESOURCE_GROUP_NAME);
         // default world group to the default group
         mWorldGroupName = DEFAULT_RESOURCE_GROUP_NAME;
     }
@@ -74,7 +74,7 @@ namespace Ogre {
         iend = mResourceGroupMap.end();
         for (i = mResourceGroupMap.begin(); i != iend; ++i)
         {
-			deleteGroup(i->second);
+            deleteGroup(i->second);
         }
         mResourceGroupMap.clear();
     }
@@ -83,7 +83,7 @@ namespace Ogre {
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-		LogManager::getSingleton().logMessage("Creating resource group " + name);
+        LogManager::getSingleton().logMessage("Creating resource group " + name);
         if (getResourceGroup(name))
         {
             OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
@@ -91,456 +91,456 @@ namespace Ogre {
                 "ResourceGroupManager::createResourceGroup");
         }
         ResourceGroup* grp = OGRE_NEW_T(ResourceGroup, MEMCATEGORY_RESOURCE)();
-		grp->groupStatus = ResourceGroup::UNINITIALSED;
+        grp->groupStatus = ResourceGroup::UNINITIALSED;
         grp->name = name;
-		grp->inGlobalPool = inGlobalPool;
+        grp->inGlobalPool = inGlobalPool;
         grp->worldGeometrySceneManager = 0;
         mResourceGroupMap.insert(
             ResourceGroupMap::value_type(name, grp));
     }
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::initialiseResourceGroup(const String& name)
-	{
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::initialiseResourceGroup(const String& name)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		LogManager::getSingleton().logMessage("Initialising resource group " + name);
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::initialiseResourceGroup");
-		}
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex;
+        LogManager::getSingleton().logMessage("Initialising resource group " + name);
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::initialiseResourceGroup");
+        }
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex;
 
-		if (grp->groupStatus == ResourceGroup::UNINITIALSED)
-		{
-			// in the process of initialising
-			grp->groupStatus = ResourceGroup::INITIALISING;
-			// Set current group
-			parseResourceGroupScripts(grp);
-			mCurrentGroup = grp;
-			LogManager::getSingleton().logMessage("Creating resources for group " + name);
-			createDeclaredResources(grp);
-			grp->groupStatus = ResourceGroup::INITIALISED;
-			LogManager::getSingleton().logMessage("All done");
-			// Reset current group
-			mCurrentGroup = 0;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::initialiseAllResourceGroups(void)
-	{
+        if (grp->groupStatus == ResourceGroup::UNINITIALSED)
+        {
+            // in the process of initialising
+            grp->groupStatus = ResourceGroup::INITIALISING;
+            // Set current group
+            parseResourceGroupScripts(grp);
+            mCurrentGroup = grp;
+            LogManager::getSingleton().logMessage("Creating resources for group " + name);
+            createDeclaredResources(grp);
+            grp->groupStatus = ResourceGroup::INITIALISED;
+            LogManager::getSingleton().logMessage("All done");
+            // Reset current group
+            mCurrentGroup = 0;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::initialiseAllResourceGroups(void)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		// Intialise all declared resource groups
-		ResourceGroupMap::iterator i, iend;
-		iend = mResourceGroupMap.end();
-		for (i = mResourceGroupMap.begin(); i != iend; ++i)
-		{
-			ResourceGroup* grp = i->second;
-			OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-			if (grp->groupStatus == ResourceGroup::UNINITIALSED)
-			{
-				// in the process of initialising
-				grp->groupStatus = ResourceGroup::INITIALISING;
-				// Set current group
-				mCurrentGroup = grp;
-				parseResourceGroupScripts(grp);
-				LogManager::getSingleton().logMessage("Creating resources for group " + i->first);
-				createDeclaredResources(grp);
-				grp->groupStatus = ResourceGroup::INITIALISED;
-				LogManager::getSingleton().logMessage("All done");
-				// Reset current group
-				mCurrentGroup = 0;
-			}
-		}
-	}
+        // Intialise all declared resource groups
+        ResourceGroupMap::iterator i, iend;
+        iend = mResourceGroupMap.end();
+        for (i = mResourceGroupMap.begin(); i != iend; ++i)
+        {
+            ResourceGroup* grp = i->second;
+            OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+            if (grp->groupStatus == ResourceGroup::UNINITIALSED)
+            {
+                // in the process of initialising
+                grp->groupStatus = ResourceGroup::INITIALISING;
+                // Set current group
+                mCurrentGroup = grp;
+                parseResourceGroupScripts(grp);
+                LogManager::getSingleton().logMessage("Creating resources for group " + i->first);
+                createDeclaredResources(grp);
+                grp->groupStatus = ResourceGroup::INITIALISED;
+                LogManager::getSingleton().logMessage("All done");
+                // Reset current group
+                mCurrentGroup = 0;
+            }
+        }
+    }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::prepareResourceGroup(const String& name, 
-		bool prepareMainResources, bool prepareWorldGeom)
+        bool prepareMainResources, bool prepareWorldGeom)
     {
-		// Can only bulk-load one group at a time (reasonable limitation I think)
+        // Can only bulk-load one group at a time (reasonable limitation I think)
         OGRE_LOCK_AUTO_MUTEX;
 
-		LogManager::getSingleton().stream()
-			<< "Preparing resource group '" << name << "' - Resources: "
-			<< prepareMainResources << " World Geometry: " << prepareWorldGeom;
-		// load all created resources
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::prepareResourceGroup");
-		}
+        LogManager::getSingleton().stream()
+            << "Preparing resource group '" << name << "' - Resources: "
+            << prepareMainResources << " World Geometry: " << prepareWorldGeom;
+        // load all created resources
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::prepareResourceGroup");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
-		// Set current group
-		mCurrentGroup = grp;
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
+        // Set current group
+        mCurrentGroup = grp;
 
-		// Count up resources for starting event
-		ResourceGroup::LoadResourceOrderMap::iterator oi;
-		size_t resourceCount = 0;
-		if (prepareMainResources)
-		{
-			for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
-			{
-				resourceCount += oi->second->size();
-			}
-		}
+        // Count up resources for starting event
+        ResourceGroup::LoadResourceOrderMap::iterator oi;
+        size_t resourceCount = 0;
+        if (prepareMainResources)
+        {
+            for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
+            {
+                resourceCount += oi->second->size();
+            }
+        }
         // Estimate world geometry size
         if (grp->worldGeometrySceneManager && prepareWorldGeom)
         {
             resourceCount += 
-				grp->worldGeometrySceneManager->estimateWorldGeometry(
-					grp->worldGeometry);
+                grp->worldGeometrySceneManager->estimateWorldGeometry(
+                    grp->worldGeometry);
         }
 
-		fireResourceGroupPrepareStarted(name, resourceCount);
+        fireResourceGroupPrepareStarted(name, resourceCount);
 
-		// Now load for real
-		if (prepareMainResources)
-		{
-			for (oi = grp->loadResourceOrderMap.begin(); 
-				oi != grp->loadResourceOrderMap.end(); ++oi)
-			{
-				size_t n = 0;
-				LoadUnloadResourceList::iterator l = oi->second->begin();
-				while (l != oi->second->end())
-				{
-					ResourcePtr res = *l;
+        // Now load for real
+        if (prepareMainResources)
+        {
+            for (oi = grp->loadResourceOrderMap.begin(); 
+                oi != grp->loadResourceOrderMap.end(); ++oi)
+            {
+                size_t n = 0;
+                LoadUnloadResourceList::iterator l = oi->second->begin();
+                while (l != oi->second->end())
+                {
+                    ResourcePtr res = *l;
 
-					// Fire resource events no matter whether resource needs preparing
+                    // Fire resource events no matter whether resource needs preparing
                     // or not. This ensures that the number of callbacks
-					// matches the number originally estimated, which is important
-					// for progress bars.
-					fireResourcePrepareStarted(res);
+                    // matches the number originally estimated, which is important
+                    // for progress bars.
+                    fireResourcePrepareStarted(res);
 
-					// If preparing one of these resources cascade-prepares another resource, 
-					// the list will get longer! But these should be prepared immediately
-					// Call prepare regardless, already prepared or loaded resources will be skipped
-					res->prepare();
+                    // If preparing one of these resources cascade-prepares another resource, 
+                    // the list will get longer! But these should be prepared immediately
+                    // Call prepare regardless, already prepared or loaded resources will be skipped
+                    res->prepare();
 
-					fireResourcePrepareEnded();
+                    fireResourcePrepareEnded();
 
-					++n;
+                    ++n;
 
-					// Did the resource change group? if so, our iterator will have
-					// been invalidated
-					if (res->getGroup() != name)
-					{
-						l = oi->second->begin();
-						std::advance(l, n);
-					}
-					else
-					{
-						++l;
-					}
-				}
-			}
-		}
+                    // Did the resource change group? if so, our iterator will have
+                    // been invalidated
+                    if (res->getGroup() != name)
+                    {
+                        l = oi->second->begin();
+                        std::advance(l, n);
+                    }
+                    else
+                    {
+                        ++l;
+                    }
+                }
+            }
+        }
         // Load World Geometry
         if (grp->worldGeometrySceneManager && prepareWorldGeom)
         {
             grp->worldGeometrySceneManager->prepareWorldGeometry(
                 grp->worldGeometry);
         }
-		fireResourceGroupPrepareEnded(name);
+        fireResourceGroupPrepareEnded(name);
 
-		// reset current group
-		mCurrentGroup = 0;
-		
-		LogManager::getSingleton().logMessage("Finished preparing resource group " + name);
+        // reset current group
+        mCurrentGroup = 0;
+        
+        LogManager::getSingleton().logMessage("Finished preparing resource group " + name);
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::loadResourceGroup(const String& name, 
-		bool loadMainResources, bool loadWorldGeom)
+        bool loadMainResources, bool loadWorldGeom)
     {
-		// Can only bulk-load one group at a time (reasonable limitation I think)
+        // Can only bulk-load one group at a time (reasonable limitation I think)
         OGRE_LOCK_AUTO_MUTEX;
 
-		LogManager::getSingleton().stream()
-			<< "Loading resource group '" << name << "' - Resources: "
-			<< loadMainResources << " World Geometry: " << loadWorldGeom;
-		// load all created resources
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::loadResourceGroup");
-		}
+        LogManager::getSingleton().stream()
+            << "Loading resource group '" << name << "' - Resources: "
+            << loadMainResources << " World Geometry: " << loadWorldGeom;
+        // load all created resources
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::loadResourceGroup");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
-		// Set current group
-		mCurrentGroup = grp;
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
+        // Set current group
+        mCurrentGroup = grp;
 
-		// Count up resources for starting event
-		ResourceGroup::LoadResourceOrderMap::iterator oi;
-		size_t resourceCount = 0;
-		if (loadMainResources)
-		{
-			for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
-			{
-				resourceCount += oi->second->size();
-			}
-		}
+        // Count up resources for starting event
+        ResourceGroup::LoadResourceOrderMap::iterator oi;
+        size_t resourceCount = 0;
+        if (loadMainResources)
+        {
+            for (oi = grp->loadResourceOrderMap.begin(); oi != grp->loadResourceOrderMap.end(); ++oi)
+            {
+                resourceCount += oi->second->size();
+            }
+        }
         // Estimate world geometry size
         if (grp->worldGeometrySceneManager && loadWorldGeom)
         {
             resourceCount += 
-				grp->worldGeometrySceneManager->estimateWorldGeometry(
-					grp->worldGeometry);
+                grp->worldGeometrySceneManager->estimateWorldGeometry(
+                    grp->worldGeometry);
         }
 
-		fireResourceGroupLoadStarted(name, resourceCount);
+        fireResourceGroupLoadStarted(name, resourceCount);
 
-		// Now load for real
-		if (loadMainResources)
-		{
-			for (oi = grp->loadResourceOrderMap.begin(); 
-				oi != grp->loadResourceOrderMap.end(); ++oi)
-			{
-				size_t n = 0;
-				LoadUnloadResourceList::iterator l = oi->second->begin();
-				while (l != oi->second->end())
-				{
-					ResourcePtr res = *l;
+        // Now load for real
+        if (loadMainResources)
+        {
+            for (oi = grp->loadResourceOrderMap.begin(); 
+                oi != grp->loadResourceOrderMap.end(); ++oi)
+            {
+                size_t n = 0;
+                LoadUnloadResourceList::iterator l = oi->second->begin();
+                while (l != oi->second->end())
+                {
+                    ResourcePtr res = *l;
 
-					// Fire resource events no matter whether resource is already
-					// loaded or not. This ensures that the number of callbacks
-					// matches the number originally estimated, which is important
-					// for progress bars.
-					fireResourceLoadStarted(res);
+                    // Fire resource events no matter whether resource is already
+                    // loaded or not. This ensures that the number of callbacks
+                    // matches the number originally estimated, which is important
+                    // for progress bars.
+                    fireResourceLoadStarted(res);
 
-					// If loading one of these resources cascade-loads another resource, 
-					// the list will get longer! But these should be loaded immediately
-					// Call load regardless, already loaded resources will be skipped
-					res->load();
+                    // If loading one of these resources cascade-loads another resource, 
+                    // the list will get longer! But these should be loaded immediately
+                    // Call load regardless, already loaded resources will be skipped
+                    res->load();
 
-					fireResourceLoadEnded();
+                    fireResourceLoadEnded();
 
-					++n;
+                    ++n;
 
-					// Did the resource change group? if so, our iterator will have
-					// been invalidated
-					if (res->getGroup() != name)
-					{
-						l = oi->second->begin();
-						std::advance(l, n);
-					}
-					else
-					{
-						++l;
-					}
-				}
-			}
-		}
+                    // Did the resource change group? if so, our iterator will have
+                    // been invalidated
+                    if (res->getGroup() != name)
+                    {
+                        l = oi->second->begin();
+                        std::advance(l, n);
+                    }
+                    else
+                    {
+                        ++l;
+                    }
+                }
+            }
+        }
         // Load World Geometry
         if (grp->worldGeometrySceneManager && loadWorldGeom)
         {
             grp->worldGeometrySceneManager->setWorldGeometry(
                 grp->worldGeometry);
         }
-		fireResourceGroupLoadEnded(name);
+        fireResourceGroupLoadEnded(name);
 
-		// group is loaded
-		grp->groupStatus = ResourceGroup::LOADED;
+        // group is loaded
+        grp->groupStatus = ResourceGroup::LOADED;
 
-		// reset current group
-		mCurrentGroup = 0;
-		
-		LogManager::getSingleton().logMessage("Finished loading resource group " + name);
+        // reset current group
+        mCurrentGroup = 0;
+        
+        LogManager::getSingleton().logMessage("Finished loading resource group " + name);
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::unloadResourceGroup(const String& name, bool reloadableOnly)
     {
-		// Can only bulk-unload one group at a time (reasonable limitation I think)
+        // Can only bulk-unload one group at a time (reasonable limitation I think)
         OGRE_LOCK_AUTO_MUTEX;
 
-		LogManager::getSingleton().logMessage("Unloading resource group " + name);
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::unloadResourceGroup");
-		}
-		// Set current group
-		mCurrentGroup = grp;
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
+        LogManager::getSingleton().logMessage("Unloading resource group " + name);
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::unloadResourceGroup");
+        }
+        // Set current group
+        mCurrentGroup = grp;
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex 
 
-		// Count up resources for starting event
-		ResourceGroup::LoadResourceOrderMap::reverse_iterator oi;
-		// unload in reverse order
-		for (oi = grp->loadResourceOrderMap.rbegin(); oi != grp->loadResourceOrderMap.rend(); ++oi)
-		{
-			for (LoadUnloadResourceList::iterator l = oi->second->begin();
-				l != oi->second->end(); ++l)
-			{
-				Resource* resource = l->get();
-				if (!reloadableOnly || resource->isReloadable())
-				{
-					resource->unload();
-				}
-			}
-		}
+        // Count up resources for starting event
+        ResourceGroup::LoadResourceOrderMap::reverse_iterator oi;
+        // unload in reverse order
+        for (oi = grp->loadResourceOrderMap.rbegin(); oi != grp->loadResourceOrderMap.rend(); ++oi)
+        {
+            for (LoadUnloadResourceList::iterator l = oi->second->begin();
+                l != oi->second->end(); ++l)
+            {
+                Resource* resource = l->get();
+                if (!reloadableOnly || resource->isReloadable())
+                {
+                    resource->unload();
+                }
+            }
+        }
 
-		grp->groupStatus = ResourceGroup::INITIALISED;
+        grp->groupStatus = ResourceGroup::INITIALISED;
 
-		// reset current group
-		mCurrentGroup = 0;
-		LogManager::getSingleton().logMessage("Finished unloading resource group " + name);
+        // reset current group
+        mCurrentGroup = 0;
+        LogManager::getSingleton().logMessage("Finished unloading resource group " + name);
     }
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::unloadUnreferencedResourcesInGroup(
-		const String& name, bool reloadableOnly )
-	{
-		// Can only bulk-unload one group at a time (reasonable limitation I think)
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::unloadUnreferencedResourcesInGroup(
+        const String& name, bool reloadableOnly )
+    {
+        // Can only bulk-unload one group at a time (reasonable limitation I think)
             OGRE_LOCK_AUTO_MUTEX;
 
-		LogManager::getSingleton().logMessage(
-			"Unloading unused resources in resource group " + name);
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::unloadUnreferencedResourcesInGroup");
-		}
-		// Set current group
-		mCurrentGroup = grp;
+        LogManager::getSingleton().logMessage(
+            "Unloading unused resources in resource group " + name);
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::unloadUnreferencedResourcesInGroup");
+        }
+        // Set current group
+        mCurrentGroup = grp;
 
-		ResourceGroup::LoadResourceOrderMap::reverse_iterator oi;
-		// unload in reverse order
-		for (oi = grp->loadResourceOrderMap.rbegin(); oi != grp->loadResourceOrderMap.rend(); ++oi)
-		{
-			for (LoadUnloadResourceList::iterator l = oi->second->begin();
-				l != oi->second->end(); ++l)
-			{
-				// A use count of 3 means that only RGM and RM have references
-				// RGM has one (this one) and RM has 2 (by name and by handle)
-				if (l->useCount() == RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
-				{
-					Resource* resource = l->get();
-					if (!reloadableOnly || resource->isReloadable())
-					{
-						resource->unload();
-					}
-				}
-			}
-		}
+        ResourceGroup::LoadResourceOrderMap::reverse_iterator oi;
+        // unload in reverse order
+        for (oi = grp->loadResourceOrderMap.rbegin(); oi != grp->loadResourceOrderMap.rend(); ++oi)
+        {
+            for (LoadUnloadResourceList::iterator l = oi->second->begin();
+                l != oi->second->end(); ++l)
+            {
+                // A use count of 3 means that only RGM and RM have references
+                // RGM has one (this one) and RM has 2 (by name and by handle)
+                if (l->useCount() == RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
+                {
+                    Resource* resource = l->get();
+                    if (!reloadableOnly || resource->isReloadable())
+                    {
+                        resource->unload();
+                    }
+                }
+            }
+        }
 
-		grp->groupStatus = ResourceGroup::INITIALISED;
+        grp->groupStatus = ResourceGroup::INITIALISED;
 
-		// reset current group
-		mCurrentGroup = 0;
-		LogManager::getSingleton().logMessage(
-			"Finished unloading unused resources in resource group " + name);
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::clearResourceGroup(const String& name)
-	{
-		// Can only bulk-clear one group at a time (reasonable limitation I think)
+        // reset current group
+        mCurrentGroup = 0;
+        LogManager::getSingleton().logMessage(
+            "Finished unloading unused resources in resource group " + name);
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::clearResourceGroup(const String& name)
+    {
+        // Can only bulk-clear one group at a time (reasonable limitation I think)
             OGRE_LOCK_AUTO_MUTEX;
 
-			LogManager::getSingleton().logMessage("Clearing resource group " + name);
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::clearResourceGroup");
-		}
-		// set current group
-		mCurrentGroup = grp;
-		dropGroupContents(grp);
-		// clear initialised flag
-		grp->groupStatus = ResourceGroup::UNINITIALSED;
-		// reset current group
-		mCurrentGroup = 0;
-		LogManager::getSingleton().logMessage("Finished clearing resource group " + name);
-	}
+            LogManager::getSingleton().logMessage("Clearing resource group " + name);
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::clearResourceGroup");
+        }
+        // set current group
+        mCurrentGroup = grp;
+        dropGroupContents(grp);
+        // clear initialised flag
+        grp->groupStatus = ResourceGroup::UNINITIALSED;
+        // reset current group
+        mCurrentGroup = 0;
+        LogManager::getSingleton().logMessage("Finished clearing resource group " + name);
+    }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::destroyResourceGroup(const String& name)
     {
-		// Can only bulk-destroy one group at a time (reasonable limitation I think)
+        // Can only bulk-destroy one group at a time (reasonable limitation I think)
         OGRE_LOCK_AUTO_MUTEX;
 
-		LogManager::getSingleton().logMessage("Destroying resource group " + name);
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::destroyResourceGroup");
-		}
-		// set current group
-		mCurrentGroup = grp;
+        LogManager::getSingleton().logMessage("Destroying resource group " + name);
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::destroyResourceGroup");
+        }
+        // set current group
+        mCurrentGroup = grp;
         unloadResourceGroup(name, false); // will throw an exception if name not valid
-		dropGroupContents(grp);
-		deleteGroup(grp);
+        dropGroupContents(grp);
+        deleteGroup(grp);
         mResourceGroupMap.erase(mResourceGroupMap.find(name));
-		// reset current group
-		mCurrentGroup = 0;
+        // reset current group
+        mCurrentGroup = 0;
     }
-	//-----------------------------------------------------------------------
-	bool ResourceGroupManager::isResourceGroupInitialised(const String& name)
+    //-----------------------------------------------------------------------
+    bool ResourceGroupManager::isResourceGroupInitialised(const String& name)
     {
-		// Can only bulk-destroy one group at a time (reasonable limitation I think)
+        // Can only bulk-destroy one group at a time (reasonable limitation I think)
         OGRE_LOCK_AUTO_MUTEX;
 
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::isResourceGroupInitialised");
-		}
-		return (grp->groupStatus != ResourceGroup::UNINITIALSED &&
-			grp->groupStatus != ResourceGroup::INITIALISING);
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::isResourceGroupInitialised");
+        }
+        return (grp->groupStatus != ResourceGroup::UNINITIALSED &&
+            grp->groupStatus != ResourceGroup::INITIALISING);
     }
-	//-----------------------------------------------------------------------
-	bool ResourceGroupManager::isResourceGroupLoaded(const String& name)
+    //-----------------------------------------------------------------------
+    bool ResourceGroupManager::isResourceGroupLoaded(const String& name)
     {
-		// Can only bulk-destroy one group at a time (reasonable limitation I think)
+        // Can only bulk-destroy one group at a time (reasonable limitation I think)
         OGRE_LOCK_AUTO_MUTEX;
 
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::isResourceGroupInitialised");
-		}
-		return (grp->groupStatus == ResourceGroup::LOADED);
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::isResourceGroupInitialised");
+        }
+        return (grp->groupStatus == ResourceGroup::LOADED);
     }
-	//-----------------------------------------------------------------------
-	bool ResourceGroupManager::resourceGroupExists(const String& name)
-	{
-		return getResourceGroup(name) ? true : false;
-	}
+    //-----------------------------------------------------------------------
+    bool ResourceGroupManager::resourceGroupExists(const String& name)
+    {
+        return getResourceGroup(name) ? true : false;
+    }
     //-----------------------------------------------------------------------
     bool ResourceGroupManager::resourceLocationExists(const String& name, 
         const String& resGroup)
     {
-		ResourceGroup* grp = getResourceGroup(resGroup);
-		if (!grp)
-			return false;
+        ResourceGroup* grp = getResourceGroup(resGroup);
+        if (!grp)
+            return false;
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		LocationList::iterator li, liend;
-		liend = grp->locationList.end();
-		for (li = grp->locationList.begin(); li != liend; ++li)
-		{
-			Archive* pArch = (*li)->archive;
-			if (pArch->getName() == name)
-				// Delete indexes
-				return true;
-		}
-		return false;
-	}
+        LocationList::iterator li, liend;
+        liend = grp->locationList.end();
+        for (li = grp->locationList.begin(); li != liend; ++li)
+        {
+            Archive* pArch = (*li)->archive;
+            if (pArch->getName() == name)
+                // Delete indexes
+                return true;
+        }
+        return false;
+    }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::addResourceLocation(const String& name, 
         const String& locType, const String& resGroup, bool recursive, bool readOnly)
@@ -557,63 +557,63 @@ namespace Ogre {
         // Get archive
         Archive* pArch = ArchiveManager::getSingleton().load( name, locType, readOnly );
         // Add to location list
-		ResourceLocation* loc = OGRE_NEW_T(ResourceLocation, MEMCATEGORY_RESOURCE);
-		loc->archive = pArch;
-		loc->recursive = recursive;
+        ResourceLocation* loc = OGRE_NEW_T(ResourceLocation, MEMCATEGORY_RESOURCE);
+        loc->archive = pArch;
+        loc->recursive = recursive;
         grp->locationList.push_back(loc);
         // Index resources
         StringVectorPtr vec = pArch->find("*", recursive);
         for( StringVector::iterator it = vec->begin(); it != vec->end(); ++it )
-			grp->addToIndex(*it, pArch);
-		
-		StringUtil::StrStreamType msg;
-		msg << "Added resource location '" << name << "' of type '" << locType
-			<< "' to resource group '" << resGroup << "'";
-		if (recursive)
-			msg << " with recursive option";
-		LogManager::getSingleton().logMessage(msg.str());
+            grp->addToIndex(*it, pArch);
+        
+        StringUtil::StrStreamType msg;
+        msg << "Added resource location '" << name << "' of type '" << locType
+            << "' to resource group '" << resGroup << "'";
+        if (recursive)
+            msg << " with recursive option";
+        LogManager::getSingleton().logMessage(msg.str());
 
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::removeResourceLocation(const String& name, 
         const String& resGroup)
     {
-		ResourceGroup* grp = getResourceGroup(resGroup);
-		if (!grp)
+        ResourceGroup* grp = getResourceGroup(resGroup);
+        if (!grp)
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
                 "Cannot locate a resource group called '" + resGroup + "'", 
                 "ResourceGroupManager::removeResourceLocation");
         }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
         // Remove from location list
-		LocationList::iterator li, liend;
-		liend = grp->locationList.end();
-		for (li = grp->locationList.begin(); li != liend; ++li)
-		{
-			Archive* pArch = (*li)->archive;
-			if (pArch->getName() == name)
-			{
-				grp->removeFromIndex(pArch);
-				// Erase list entry
-				OGRE_DELETE_T(*li, ResourceLocation, MEMCATEGORY_RESOURCE);
-				grp->locationList.erase(li);
+        LocationList::iterator li, liend;
+        liend = grp->locationList.end();
+        for (li = grp->locationList.begin(); li != liend; ++li)
+        {
+            Archive* pArch = (*li)->archive;
+            if (pArch->getName() == name)
+            {
+                grp->removeFromIndex(pArch);
+                // Erase list entry
+                OGRE_DELETE_T(*li, ResourceLocation, MEMCATEGORY_RESOURCE);
+                grp->locationList.erase(li);
 
-				break;
-			}
+                break;
+            }
 
-		}
+        }
 
-		LogManager::getSingleton().logMessage("Removed resource location " + name);
+        LogManager::getSingleton().logMessage("Removed resource location " + name);
 
 
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::declareResource(const String& name, 
         const String& resourceType, const String& groupName,
-		const NameValuePairList& loadParameters)
+        const NameValuePairList& loadParameters)
     {
         declareResource(name, resourceType, groupName, 0, loadParameters);
     }
@@ -623,84 +623,84 @@ namespace Ogre {
         ManualResourceLoader* loader,
         const NameValuePairList& loadParameters)
     {
-		ResourceGroup* grp = getResourceGroup(groupName);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + groupName, 
-				"ResourceGroupManager::declareResource");
-		}
-		
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + groupName, 
+                "ResourceGroupManager::declareResource");
+        }
+        
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		ResourceDeclaration dcl;
-		dcl.loader = loader;
-		dcl.parameters = loadParameters;
-		dcl.resourceName = name;
-		dcl.resourceType = resourceType;
-		grp->resourceDeclarations.push_back(dcl);
+        ResourceDeclaration dcl;
+        dcl.loader = loader;
+        dcl.parameters = loadParameters;
+        dcl.resourceName = name;
+        dcl.resourceType = resourceType;
+        grp->resourceDeclarations.push_back(dcl);
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::undeclareResource(const String& name, 
-		const String& groupName)
+        const String& groupName)
     {
-		ResourceGroup* grp = getResourceGroup(groupName);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + groupName, 
-				"ResourceGroupManager::undeclareResource");
-		}
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + groupName, 
+                "ResourceGroupManager::undeclareResource");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		for (ResourceDeclarationList::iterator i = grp->resourceDeclarations.begin();
-			i != grp->resourceDeclarations.end(); ++i)
-		{
-			if (i->resourceName == name)
-			{
-				grp->resourceDeclarations.erase(i);
-				break;
-			}
-		}
+        for (ResourceDeclarationList::iterator i = grp->resourceDeclarations.begin();
+            i != grp->resourceDeclarations.end(); ++i)
+        {
+            if (i->resourceName == name)
+            {
+                grp->resourceDeclarations.erase(i);
+                break;
+            }
+        }
     }
     //-----------------------------------------------------------------------
     DataStreamPtr ResourceGroupManager::openResource(
         const String& resourceName, const String& groupName, 
-		bool searchGroupsIfNotFound, Resource* resourceBeingLoaded)
+        bool searchGroupsIfNotFound, Resource* resourceBeingLoaded)
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-		if(mLoadingListener)
-		{
-			DataStreamPtr stream = mLoadingListener->resourceLoading(resourceName, groupName, resourceBeingLoaded);
-			if(!stream.isNull())
-				return stream;
-		}
+        if(mLoadingListener)
+        {
+            DataStreamPtr stream = mLoadingListener->resourceLoading(resourceName, groupName, resourceBeingLoaded);
+            if(!stream.isNull())
+                return stream;
+        }
 
-		// Try to find in resource index first
-		ResourceGroup* grp = getResourceGroup(groupName);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot locate a resource group called '" + groupName + 
-				"' for resource '" + resourceName + "'" , 
-				"ResourceGroupManager::openResource");
-		}
+        // Try to find in resource index first
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + groupName + 
+                "' for resource '" + resourceName + "'" , 
+                "ResourceGroupManager::openResource");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		Archive* pArch = 0;
-		ResourceLocationIndex::iterator rit = grp->resourceIndexCaseSensitive.find(resourceName);
-		if (rit != grp->resourceIndexCaseSensitive.end())
-		{
-			// Found in the index
-			pArch = rit->second;
-			DataStreamPtr stream = pArch->open(resourceName);
-			if (mLoadingListener)
-				mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, stream);
-			return stream;
-		}
+        Archive* pArch = 0;
+        ResourceLocationIndex::iterator rit = grp->resourceIndexCaseSensitive.find(resourceName);
+        if (rit != grp->resourceIndexCaseSensitive.end())
+        {
+            // Found in the index
+            pArch = rit->second;
+            DataStreamPtr stream = pArch->open(resourceName);
+            if (mLoadingListener)
+                mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, stream);
+            return stream;
+        }
         else 
         {
             // try case insensitive
@@ -711,54 +711,54 @@ namespace Ogre {
             {
                 // Found in the index
                 pArch = rit->second;
-				DataStreamPtr stream = pArch->open(resourceName);
-				if (mLoadingListener)
-					mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, stream);
-				return stream;
+                DataStreamPtr stream = pArch->open(resourceName);
+                if (mLoadingListener)
+                    mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, stream);
+                return stream;
             }
-		    else
-		    {
-			    // Search the hard way
-			    LocationList::iterator li, liend;
-			    liend = grp->locationList.end();
-			    for (li = grp->locationList.begin(); li != liend; ++li)
-			    {
-				    Archive* arch = (*li)->archive;
+            else
+            {
+                // Search the hard way
+                LocationList::iterator li, liend;
+                liend = grp->locationList.end();
+                for (li = grp->locationList.begin(); li != liend; ++li)
+                {
+                    Archive* arch = (*li)->archive;
                     if (arch->exists(resourceName))
-				    {
+                    {
                         DataStreamPtr ptr = arch->open(resourceName);
-						if (mLoadingListener)
-							mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, ptr);
-					    return ptr;
-				    }
-			    }
-		    }
+                        if (mLoadingListener)
+                            mLoadingListener->resourceStreamOpened(resourceName, groupName, resourceBeingLoaded, ptr);
+                        return ptr;
+                    }
+                }
+            }
         }
 
-		
-		// Not found
-		if (searchGroupsIfNotFound)
-		{
-			ResourceGroup* foundGrp = findGroupContainingResourceImpl(resourceName); 
-			if (foundGrp)
-			{
-				if (resourceBeingLoaded)
-				{
-					resourceBeingLoaded->changeGroupOwnership(foundGrp->name);
-				}
-				return openResource(resourceName, foundGrp->name, false);
-			}
-			else
-			{
-				OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, 
-					"Cannot locate resource " + resourceName + 
-					" in resource group " + groupName + " or any other group.", 
-					"ResourceGroupManager::openResource");
-			}
-		}
-		OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "Cannot locate resource " + 
-			resourceName + " in resource group " + groupName + ".", 
-			"ResourceGroupManager::openResource");
+        
+        // Not found
+        if (searchGroupsIfNotFound)
+        {
+            ResourceGroup* foundGrp = findGroupContainingResourceImpl(resourceName); 
+            if (foundGrp)
+            {
+                if (resourceBeingLoaded)
+                {
+                    resourceBeingLoaded->changeGroupOwnership(foundGrp->name);
+                }
+                return openResource(resourceName, foundGrp->name, false);
+            }
+            else
+            {
+                OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, 
+                    "Cannot locate resource " + resourceName + 
+                    " in resource group " + groupName + " or any other group.", 
+                    "ResourceGroupManager::openResource");
+            }
+        }
+        OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "Cannot locate resource " + 
+            resourceName + " in resource group " + groupName + ".", 
+            "ResourceGroupManager::openResource");
 
     }
     //-----------------------------------------------------------------------
@@ -766,178 +766,178 @@ namespace Ogre {
         const String& pattern, const String& groupName)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		ResourceGroup* grp = getResourceGroup(groupName);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot locate a resource group called '" + groupName + "'", 
-				"ResourceGroupManager::openResources");
-		}
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + groupName + "'", 
+                "ResourceGroupManager::openResources");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		// Iterate through all the archives and build up a combined list of
-		// streams
-		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-		DataStreamListPtr ret = DataStreamListPtr(OGRE_NEW_T(DataStreamList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        // Iterate through all the archives and build up a combined list of
+        // streams
+        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        DataStreamListPtr ret = DataStreamListPtr(OGRE_NEW_T(DataStreamList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
-		LocationList::iterator li, liend;
-		liend = grp->locationList.end();
-		for (li = grp->locationList.begin(); li != liend; ++li)
-		{
-			Archive* arch = (*li)->archive;
-			// Find all the names based on whether this archive is recursive
-			StringVectorPtr names = arch->find(pattern, (*li)->recursive);
+        LocationList::iterator li, liend;
+        liend = grp->locationList.end();
+        for (li = grp->locationList.begin(); li != liend; ++li)
+        {
+            Archive* arch = (*li)->archive;
+            // Find all the names based on whether this archive is recursive
+            StringVectorPtr names = arch->find(pattern, (*li)->recursive);
 
-			// Iterate over the names and load a stream for each
-			for (StringVector::iterator ni = names->begin(); ni != names->end(); ++ni)
-			{
-				DataStreamPtr ptr = arch->open(*ni);
-				if (!ptr.isNull())
-				{
-					ret->push_back(ptr);
-				}
-			}
-		}
-		return ret;
-		
+            // Iterate over the names and load a stream for each
+            for (StringVector::iterator ni = names->begin(); ni != names->end(); ++ni)
+            {
+                DataStreamPtr ptr = arch->open(*ni);
+                if (!ptr.isNull())
+                {
+                    ret->push_back(ptr);
+                }
+            }
+        }
+        return ret;
+        
     }
-	//---------------------------------------------------------------------
-	DataStreamPtr ResourceGroupManager::createResource(const String& filename, 
-		const String& groupName, bool overwrite, const String& locationPattern)
-	{
+    //---------------------------------------------------------------------
+    DataStreamPtr ResourceGroupManager::createResource(const String& filename, 
+        const String& groupName, bool overwrite, const String& locationPattern)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		ResourceGroup* grp = getResourceGroup(groupName);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot locate a resource group called '" + groupName + "'", 
-				"ResourceGroupManager::createResource");
-		}
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + groupName + "'", 
+                "ResourceGroupManager::createResource");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		
-		for (LocationList::iterator li = grp->locationList.begin(); 
-			li != grp->locationList.end(); ++li)
-		{
-			Archive* arch = (*li)->archive;
+        
+        for (LocationList::iterator li = grp->locationList.begin(); 
+            li != grp->locationList.end(); ++li)
+        {
+            Archive* arch = (*li)->archive;
 
-			if (!arch->isReadOnly() && 
-				(locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
-			{
-				if (!overwrite && arch->exists(filename))
-					OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-						"Cannot overwrite existing file " + filename, 
-						"ResourceGroupManager::createResource");
-				
-				// create it
-				DataStreamPtr ret = arch->create(filename);
-				grp->addToIndex(filename, arch);
+            if (!arch->isReadOnly() && 
+                (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
+            {
+                if (!overwrite && arch->exists(filename))
+                    OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+                        "Cannot overwrite existing file " + filename, 
+                        "ResourceGroupManager::createResource");
+                
+                // create it
+                DataStreamPtr ret = arch->create(filename);
+                grp->addToIndex(filename, arch);
 
 
-				return ret;
-			}
-		}
+                return ret;
+            }
+        }
 
-		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-			"Cannot find a writable location in group " + groupName, 
-			"ResourceGroupManager::createResource");
+        OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+            "Cannot find a writable location in group " + groupName, 
+            "ResourceGroupManager::createResource");
 
-	}
-	//---------------------------------------------------------------------
-	void ResourceGroupManager::deleteResource(const String& filename, const String& groupName, 
-		const String& locationPattern)
-	{
+    }
+    //---------------------------------------------------------------------
+    void ResourceGroupManager::deleteResource(const String& filename, const String& groupName, 
+        const String& locationPattern)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		ResourceGroup* grp = getResourceGroup(groupName);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot locate a resource group called '" + groupName + "'", 
-				"ResourceGroupManager::createResource");
-		}
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + groupName + "'", 
+                "ResourceGroupManager::createResource");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		
-		for (LocationList::iterator li = grp->locationList.begin(); 
-			li != grp->locationList.end(); ++li)
-		{
-			Archive* arch = (*li)->archive;
+        
+        for (LocationList::iterator li = grp->locationList.begin(); 
+            li != grp->locationList.end(); ++li)
+        {
+            Archive* arch = (*li)->archive;
 
-			if (!arch->isReadOnly() && 
-				(locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
-			{
-				if (arch->exists(filename))
-				{
-					arch->remove(filename);
-					grp->removeFromIndex(filename, arch);
+            if (!arch->isReadOnly() && 
+                (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
+            {
+                if (arch->exists(filename))
+                {
+                    arch->remove(filename);
+                    grp->removeFromIndex(filename, arch);
 
-					// only remove one file
-					break;
-				}
-			}
-		}
+                    // only remove one file
+                    break;
+                }
+            }
+        }
 
-	}
-	//---------------------------------------------------------------------
-	void ResourceGroupManager::deleteMatchingResources(const String& filePattern, 
-		const String& groupName, const String& locationPattern)
-	{
+    }
+    //---------------------------------------------------------------------
+    void ResourceGroupManager::deleteMatchingResources(const String& filePattern, 
+        const String& groupName, const String& locationPattern)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		ResourceGroup* grp = getResourceGroup(groupName);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot locate a resource group called '" + groupName + "'", 
-				"ResourceGroupManager::createResource");
-		}
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + groupName + "'", 
+                "ResourceGroupManager::createResource");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		
-		for (LocationList::iterator li = grp->locationList.begin(); 
-			li != grp->locationList.end(); ++li)
-		{
-			Archive* arch = (*li)->archive;
+        
+        for (LocationList::iterator li = grp->locationList.begin(); 
+            li != grp->locationList.end(); ++li)
+        {
+            Archive* arch = (*li)->archive;
 
-			if (!arch->isReadOnly() && 
-				(locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
-			{
-				StringVectorPtr matchingFiles = arch->find(filePattern);
-				for (StringVector::iterator f = matchingFiles->begin(); f != matchingFiles->end(); ++f)
-				{
-					arch->remove(*f);
-					grp->removeFromIndex(*f, arch);
+            if (!arch->isReadOnly() && 
+                (locationPattern.empty() || StringUtil::match(arch->getName(), locationPattern, false)))
+            {
+                StringVectorPtr matchingFiles = arch->find(filePattern);
+                for (StringVector::iterator f = matchingFiles->begin(); f != matchingFiles->end(); ++f)
+                {
+                    arch->remove(*f);
+                    grp->removeFromIndex(*f, arch);
 
-				}
-			}
-		}
+                }
+            }
+        }
 
 
-	}
+    }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::addResourceGroupListener(ResourceGroupListener* l)
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-		mResourceGroupListenerList.push_back(l);
+        mResourceGroupListenerList.push_back(l);
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::removeResourceGroupListener(ResourceGroupListener* l)
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-		for (ResourceGroupListenerList::iterator i = mResourceGroupListenerList.begin();
-			i != mResourceGroupListenerList.end(); ++i)
-		{
-			if (*i == l)
-			{
-				mResourceGroupListenerList.erase(i);
-				break;
-			}
-		}
+        for (ResourceGroupListenerList::iterator i = mResourceGroupListenerList.begin();
+            i != mResourceGroupListenerList.end(); ++i)
+        {
+            if (*i == l)
+            {
+                mResourceGroupListenerList.erase(i);
+                break;
+            }
+        }
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::_registerResourceManager(
@@ -945,9 +945,9 @@ namespace Ogre {
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-		LogManager::getSingleton().logMessage(
-			"Registering ResourceManager for type " + resourceType);
-		mResourceManagerMap[resourceType] = rm;
+        LogManager::getSingleton().logMessage(
+            "Registering ResourceManager for type " + resourceType);
+        mResourceManagerMap[resourceType] = rm;
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::_unregisterResourceManager(
@@ -955,336 +955,336 @@ namespace Ogre {
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-		LogManager::getSingleton().logMessage(
-			"Unregistering ResourceManager for type " + resourceType);
-		
-		ResourceManagerMap::iterator i = mResourceManagerMap.find(resourceType);
-		if (i != mResourceManagerMap.end())
-		{
-			mResourceManagerMap.erase(i);
-		}
+        LogManager::getSingleton().logMessage(
+            "Unregistering ResourceManager for type " + resourceType);
+        
+        ResourceManagerMap::iterator i = mResourceManagerMap.find(resourceType);
+        if (i != mResourceManagerMap.end())
+        {
+            mResourceManagerMap.erase(i);
+        }
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void ResourceGroupManager::_registerScriptLoader(ScriptLoader* su)
-	{
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		mScriptLoaderOrderMap.insert(
-			ScriptLoaderOrderMap::value_type(su->getLoadingOrder(), su));
-	}
-	//-----------------------------------------------------------------------
+        mScriptLoaderOrderMap.insert(
+            ScriptLoaderOrderMap::value_type(su->getLoadingOrder(), su));
+    }
+    //-----------------------------------------------------------------------
     void ResourceGroupManager::_unregisterScriptLoader(ScriptLoader* su)
-	{
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		Real order = su->getLoadingOrder();
-		ScriptLoaderOrderMap::iterator oi = mScriptLoaderOrderMap.find(order);
-		while (oi != mScriptLoaderOrderMap.end() && oi->first == order)
-		{
-			if (oi->second == su)
-			{
-				// erase does not invalidate on multimap, except current
-				ScriptLoaderOrderMap::iterator del = oi++;
-				mScriptLoaderOrderMap.erase(del);
-			}
-			else
-			{
-				++oi;
-			}
-		}
-	}
-	//-----------------------------------------------------------------------
-	ScriptLoader *ResourceGroupManager::_findScriptLoader(const String &pattern)
-	{
-		OGRE_LOCK_AUTO_MUTEX;
+        Real order = su->getLoadingOrder();
+        ScriptLoaderOrderMap::iterator oi = mScriptLoaderOrderMap.find(order);
+        while (oi != mScriptLoaderOrderMap.end() && oi->first == order)
+        {
+            if (oi->second == su)
+            {
+                // erase does not invalidate on multimap, except current
+                ScriptLoaderOrderMap::iterator del = oi++;
+                mScriptLoaderOrderMap.erase(del);
+            }
+            else
+            {
+                ++oi;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
+    ScriptLoader *ResourceGroupManager::_findScriptLoader(const String &pattern)
+    {
+        OGRE_LOCK_AUTO_MUTEX;
 
-		ScriptLoaderOrderMap::iterator oi;
-		for (oi = mScriptLoaderOrderMap.begin();
-			oi != mScriptLoaderOrderMap.end(); ++oi)
-		{
-			ScriptLoader* su = oi->second;
-			const StringVector& patterns = su->getScriptPatterns();
+        ScriptLoaderOrderMap::iterator oi;
+        for (oi = mScriptLoaderOrderMap.begin();
+            oi != mScriptLoaderOrderMap.end(); ++oi)
+        {
+            ScriptLoader* su = oi->second;
+            const StringVector& patterns = su->getScriptPatterns();
 
-			// Search for matches in the patterns
-			for (StringVector::const_iterator p = patterns.begin(); p != patterns.end(); ++p)
-			{
-				if(*p == pattern)
-					return su;
-			}
-		}
+            // Search for matches in the patterns
+            for (StringVector::const_iterator p = patterns.begin(); p != patterns.end(); ++p)
+            {
+                if(*p == pattern)
+                    return su;
+            }
+        }
 
-		return 0; // No loader was found
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::parseResourceGroupScripts(ResourceGroup* grp)
-	{
+        return 0; // No loader was found
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::parseResourceGroupScripts(ResourceGroup* grp)
+    {
 
-		LogManager::getSingleton().logMessage(
-			"Parsing scripts for resource group " + grp->name);
+        LogManager::getSingleton().logMessage(
+            "Parsing scripts for resource group " + grp->name);
 
-		// Count up the number of scripts we have to parse
+        // Count up the number of scripts we have to parse
         typedef list<FileInfoListPtr>::type FileListList;
         typedef SharedPtr<FileListList> FileListListPtr;
         typedef std::pair<ScriptLoader*, FileListListPtr> LoaderFileListPair;
         typedef list<LoaderFileListPair>::type ScriptLoaderFileList;
         ScriptLoaderFileList scriptLoaderFileList;
-		size_t scriptCount = 0;
-		// Iterate over script users in loading order and get streams
-		ScriptLoaderOrderMap::iterator oi;
-		for (oi = mScriptLoaderOrderMap.begin();
-			oi != mScriptLoaderOrderMap.end(); ++oi)
-		{
-			ScriptLoader* su = oi->second;
-			// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        size_t scriptCount = 0;
+        // Iterate over script users in loading order and get streams
+        ScriptLoaderOrderMap::iterator oi;
+        for (oi = mScriptLoaderOrderMap.begin();
+            oi != mScriptLoaderOrderMap.end(); ++oi)
+        {
+            ScriptLoader* su = oi->second;
+            // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
             FileListListPtr fileListList(OGRE_NEW_T(FileListList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
-			// Get all the patterns and search them
-			const StringVector& patterns = su->getScriptPatterns();
-			for (StringVector::const_iterator p = patterns.begin(); p != patterns.end(); ++p)
-			{
-				FileInfoListPtr fileList = findResourceFileInfo(grp->name, *p);
-				scriptCount += fileList->size();
-				fileListList->push_back(fileList);
-			}
+            // Get all the patterns and search them
+            const StringVector& patterns = su->getScriptPatterns();
+            for (StringVector::const_iterator p = patterns.begin(); p != patterns.end(); ++p)
+            {
+                FileInfoListPtr fileList = findResourceFileInfo(grp->name, *p);
+                scriptCount += fileList->size();
+                fileListList->push_back(fileList);
+            }
             scriptLoaderFileList.push_back(
                 LoaderFileListPair(su, fileListList));
-		}
-		// Fire scripting event
-		fireResourceGroupScriptingStarted(grp->name, scriptCount);
+        }
+        // Fire scripting event
+        fireResourceGroupScriptingStarted(grp->name, scriptCount);
 
-		// Iterate over scripts and parse
-		// Note we respect original ordering
+        // Iterate over scripts and parse
+        // Note we respect original ordering
         for (ScriptLoaderFileList::iterator slfli = scriptLoaderFileList.begin();
             slfli != scriptLoaderFileList.end(); ++slfli)
         {
-			ScriptLoader* su = slfli->first;
+            ScriptLoader* su = slfli->first;
             // Iterate over each list
             for (FileListList::iterator flli = slfli->second->begin(); flli != slfli->second->end(); ++flli)
             {
-			    // Iterate over each item in the list
-			    for (FileInfoList::iterator fii = (*flli)->begin(); fii != (*flli)->end(); ++fii)
-			    {
-					bool skipScript = false;
+                // Iterate over each item in the list
+                for (FileInfoList::iterator fii = (*flli)->begin(); fii != (*flli)->end(); ++fii)
+                {
+                    bool skipScript = false;
                     fireScriptStarted(fii->filename, skipScript);
-					if(skipScript)
-					{
-						LogManager::getSingleton().logMessage(
-							"Skipping script " + fii->filename);
-					}
-					else
-					{
-						LogManager::getSingleton().logMessage(
-							"Parsing script " + fii->filename);
+                    if(skipScript)
+                    {
+                        LogManager::getSingleton().logMessage(
+                            "Skipping script " + fii->filename);
+                    }
+                    else
+                    {
+                        LogManager::getSingleton().logMessage(
+                            "Parsing script " + fii->filename);
                         DataStreamPtr stream = fii->archive->open(fii->filename);
                         if (!stream.isNull())
                         {
-							if (mLoadingListener)
-								mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
+                            if (mLoadingListener)
+                                mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
 
-							if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
-							{
-								DataStreamPtr cachedCopy;
-								cachedCopy.bind(OGRE_NEW MemoryDataStream(stream->getName(), stream));
-								su->parseScript(cachedCopy, grp->name);
-							}
-							else
-                            	su->parseScript(stream, grp->name);
+                            if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
+                            {
+                                DataStreamPtr cachedCopy;
+                                cachedCopy.bind(OGRE_NEW MemoryDataStream(stream->getName(), stream));
+                                su->parseScript(cachedCopy, grp->name);
+                            }
+                            else
+                                su->parseScript(stream, grp->name);
                         }
                     }
-					fireScriptEnded(fii->filename, skipScript);
-			    }
+                    fireScriptEnded(fii->filename, skipScript);
+                }
             }
-		}
+        }
 
-		fireResourceGroupScriptingEnded(grp->name);
-		LogManager::getSingleton().logMessage(
-			"Finished parsing scripts for resource group " + grp->name);
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::createDeclaredResources(ResourceGroup* grp)
-	{
-
-		for (ResourceDeclarationList::iterator i = grp->resourceDeclarations.begin();
-			i != grp->resourceDeclarations.end(); ++i)
-		{
-			ResourceDeclaration& dcl = *i;
-			// Retrieve the appropriate manager
-			ResourceManager* mgr = _getResourceManager(dcl.resourceType);
-			// Create the resource
-			ResourcePtr res = mgr->createResource(dcl.resourceName, grp->name,
-                dcl.loader != 0, dcl.loader, &dcl.parameters);
-			// Add resource to load list
-			ResourceGroup::LoadResourceOrderMap::iterator li = 
-				grp->loadResourceOrderMap.find(mgr->getLoadingOrder());
-			LoadUnloadResourceList* loadList;
-			if (li == grp->loadResourceOrderMap.end())
-			{
-				loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
-				grp->loadResourceOrderMap[mgr->getLoadingOrder()] = loadList;
-			}
-		}
-
-	}
+        fireResourceGroupScriptingEnded(grp->name);
+        LogManager::getSingleton().logMessage(
+            "Finished parsing scripts for resource group " + grp->name);
+    }
     //-----------------------------------------------------------------------
-	void ResourceGroupManager::_notifyResourceCreated(ResourcePtr& res)
-	{
-		if (mCurrentGroup && res->getGroup() == mCurrentGroup->name)
-		{
-			// Use current group (batch loading)
-			addCreatedResource(res, *mCurrentGroup);
-		}
-		else
-		{
-			// Find group
-			ResourceGroup* grp = getResourceGroup(res->getGroup());
-			if (grp)
-			{
-				addCreatedResource(res, *grp);
-			}
-		}
+    void ResourceGroupManager::createDeclaredResources(ResourceGroup* grp)
+    {
 
-		fireResourceCreated(res);
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::_notifyResourceRemoved(ResourcePtr& res)
-	{
-		fireResourceRemove(res);
+        for (ResourceDeclarationList::iterator i = grp->resourceDeclarations.begin();
+            i != grp->resourceDeclarations.end(); ++i)
+        {
+            ResourceDeclaration& dcl = *i;
+            // Retrieve the appropriate manager
+            ResourceManager* mgr = _getResourceManager(dcl.resourceType);
+            // Create the resource
+            ResourcePtr res = mgr->createResource(dcl.resourceName, grp->name,
+                dcl.loader != 0, dcl.loader, &dcl.parameters);
+            // Add resource to load list
+            ResourceGroup::LoadResourceOrderMap::iterator li = 
+                grp->loadResourceOrderMap.find(mgr->getLoadingOrder());
+            LoadUnloadResourceList* loadList;
+            if (li == grp->loadResourceOrderMap.end())
+            {
+                loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
+                grp->loadResourceOrderMap[mgr->getLoadingOrder()] = loadList;
+            }
+        }
 
-		if (mCurrentGroup)
-		{
-			// Do nothing - we're batch unloading so list will be cleared
-		}
-		else
-		{
-			// Find group
-			ResourceGroup* grp = getResourceGroup(res->getGroup());
-			if (grp)
-			{
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::_notifyResourceCreated(ResourcePtr& res)
+    {
+        if (mCurrentGroup && res->getGroup() == mCurrentGroup->name)
+        {
+            // Use current group (batch loading)
+            addCreatedResource(res, *mCurrentGroup);
+        }
+        else
+        {
+            // Find group
+            ResourceGroup* grp = getResourceGroup(res->getGroup());
+            if (grp)
+            {
+                addCreatedResource(res, *grp);
+            }
+        }
+
+        fireResourceCreated(res);
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::_notifyResourceRemoved(ResourcePtr& res)
+    {
+        fireResourceRemove(res);
+
+        if (mCurrentGroup)
+        {
+            // Do nothing - we're batch unloading so list will be cleared
+        }
+        else
+        {
+            // Find group
+            ResourceGroup* grp = getResourceGroup(res->getGroup());
+            if (grp)
+            {
                             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-				ResourceGroup::LoadResourceOrderMap::iterator i = 
-					grp->loadResourceOrderMap.find(
-						res->getCreator()->getLoadingOrder());
-				if (i != grp->loadResourceOrderMap.end())
-				{
-					// Iterate over the resource list and remove
-					LoadUnloadResourceList* resList = i->second;
-					for (LoadUnloadResourceList::iterator l = resList->begin();
-						l != resList->end(); ++ l)
-					{
-						if ((*l).getPointer() == res.getPointer())
-						{
-							// this is the one
-							resList->erase(l);
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::_notifyResourceGroupChanged(const String& oldGroup, 
-		Resource* res)
-	{
-		ResourcePtr resPtr;
-	
-		// find old entry
-		ResourceGroup* grp = getResourceGroup(oldGroup);
+                ResourceGroup::LoadResourceOrderMap::iterator i = 
+                    grp->loadResourceOrderMap.find(
+                        res->getCreator()->getLoadingOrder());
+                if (i != grp->loadResourceOrderMap.end())
+                {
+                    // Iterate over the resource list and remove
+                    LoadUnloadResourceList* resList = i->second;
+                    for (LoadUnloadResourceList::iterator l = resList->begin();
+                        l != resList->end(); ++ l)
+                    {
+                        if ((*l).getPointer() == res.getPointer())
+                        {
+                            // this is the one
+                            resList->erase(l);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::_notifyResourceGroupChanged(const String& oldGroup, 
+        Resource* res)
+    {
+        ResourcePtr resPtr;
+    
+        // find old entry
+        ResourceGroup* grp = getResourceGroup(oldGroup);
 
-		if (grp)
-		{
+        if (grp)
+        {
                     OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-			Real order = res->getCreator()->getLoadingOrder();
-			ResourceGroup::LoadResourceOrderMap::iterator i = 
-				grp->loadResourceOrderMap.find(order);
-			assert(i != grp->loadResourceOrderMap.end());
-			LoadUnloadResourceList* loadList = i->second;
-			for (LoadUnloadResourceList::iterator l = loadList->begin(); 
-				l != loadList->end(); ++l)
-			{
-				if ((*l).getPointer() == res)
-				{
-					resPtr = *l;
-					loadList->erase(l);
-					break;
-				}
-			}
-		}
+            Real order = res->getCreator()->getLoadingOrder();
+            ResourceGroup::LoadResourceOrderMap::iterator i = 
+                grp->loadResourceOrderMap.find(order);
+            assert(i != grp->loadResourceOrderMap.end());
+            LoadUnloadResourceList* loadList = i->second;
+            for (LoadUnloadResourceList::iterator l = loadList->begin(); 
+                l != loadList->end(); ++l)
+            {
+                if ((*l).getPointer() == res)
+                {
+                    resPtr = *l;
+                    loadList->erase(l);
+                    break;
+                }
+            }
+        }
 
-		if (!resPtr.isNull())
-		{
-			// New group
-			ResourceGroup* newGrp = getResourceGroup(res->getGroup());
+        if (!resPtr.isNull())
+        {
+            // New group
+            ResourceGroup* newGrp = getResourceGroup(res->getGroup());
 
-			addCreatedResource(resPtr, *newGrp);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::_notifyAllResourcesRemoved(ResourceManager* manager)
-	{
+            addCreatedResource(resPtr, *newGrp);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::_notifyAllResourcesRemoved(ResourceManager* manager)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		// Iterate over all groups
-		for (ResourceGroupMap::iterator grpi = mResourceGroupMap.begin();
-			grpi != mResourceGroupMap.end(); ++grpi)
-		{
+        // Iterate over all groups
+        for (ResourceGroupMap::iterator grpi = mResourceGroupMap.begin();
+            grpi != mResourceGroupMap.end(); ++grpi)
+        {
                     OGRE_LOCK_MUTEX(grpi->second->OGRE_AUTO_MUTEX_NAME);
-			// Iterate over all priorities
-			for (ResourceGroup::LoadResourceOrderMap::iterator oi = grpi->second->loadResourceOrderMap.begin();
-				oi != grpi->second->loadResourceOrderMap.end(); ++oi)
-			{
-				// Iterate over all resources
-				for (LoadUnloadResourceList::iterator l = oi->second->begin();
-					l != oi->second->end(); )
-				{
-					if ((*l)->getCreator() == manager)
-					{
-						// Increment first since iterator will be invalidated
-						LoadUnloadResourceList::iterator del = l++;
-						oi->second->erase(del);
-					}
-					else
-					{
-						++l;
-					}
-				}
-			}
+            // Iterate over all priorities
+            for (ResourceGroup::LoadResourceOrderMap::iterator oi = grpi->second->loadResourceOrderMap.begin();
+                oi != grpi->second->loadResourceOrderMap.end(); ++oi)
+            {
+                // Iterate over all resources
+                for (LoadUnloadResourceList::iterator l = oi->second->begin();
+                    l != oi->second->end(); )
+                {
+                    if ((*l)->getCreator() == manager)
+                    {
+                        // Increment first since iterator will be invalidated
+                        LoadUnloadResourceList::iterator del = l++;
+                        oi->second->erase(del);
+                    }
+                    else
+                    {
+                        ++l;
+                    }
+                }
+            }
 
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::addCreatedResource(ResourcePtr& res, ResourceGroup& grp)
-	{
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::addCreatedResource(ResourcePtr& res, ResourceGroup& grp)
+    {
             OGRE_LOCK_MUTEX(grp.OGRE_AUTO_MUTEX_NAME);
-		Real order = res->getCreator()->getLoadingOrder();
+        Real order = res->getCreator()->getLoadingOrder();
 
-		ResourceGroup::LoadResourceOrderMap::iterator i = grp.loadResourceOrderMap.find(order);
-		LoadUnloadResourceList* loadList;
-		if (i == grp.loadResourceOrderMap.end())
-		{
-			loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
-			grp.loadResourceOrderMap[order] = loadList;
-		}
-		else
-		{
-			loadList = i->second;
-		}
-		loadList->push_back(res);
-	}
-	//-----------------------------------------------------------------------
-	ResourceGroupManager::ResourceGroup* ResourceGroupManager::getResourceGroup(const String& name)
-	{
+        ResourceGroup::LoadResourceOrderMap::iterator i = grp.loadResourceOrderMap.find(order);
+        LoadUnloadResourceList* loadList;
+        if (i == grp.loadResourceOrderMap.end())
+        {
+            loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
+            grp.loadResourceOrderMap[order] = loadList;
+        }
+        else
+        {
+            loadList = i->second;
+        }
+        loadList->push_back(res);
+    }
+    //-----------------------------------------------------------------------
+    ResourceGroupManager::ResourceGroup* ResourceGroupManager::getResourceGroup(const String& name)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		ResourceGroupMap::iterator i = mResourceGroupMap.find(name);
-		if (i != mResourceGroupMap.end())
-		{
-			return i->second;
-		}
-		return 0;
+        ResourceGroupMap::iterator i = mResourceGroupMap.find(name);
+        if (i != mResourceGroupMap.end())
+        {
+            return i->second;
+        }
+        return 0;
 
-	}
+    }
     //-----------------------------------------------------------------------
     ResourceManager* ResourceGroupManager::_getResourceManager(const String& resourceType) 
     {
@@ -1300,86 +1300,86 @@ namespace Ogre {
         return i->second;
 
     }
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::dropGroupContents(ResourceGroup* grp)
-	{
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::dropGroupContents(ResourceGroup* grp)
+    {
             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME);
 
-		bool groupSet = false;
-		if (!mCurrentGroup)
-		{
-			// Set current group to indicate ignoring of notifications
-			mCurrentGroup = grp;
-			groupSet = true;
-		}
-		// delete all the load list entries
-		ResourceGroup::LoadResourceOrderMap::iterator j, jend;
-		jend = grp->loadResourceOrderMap.end();
-		for (j = grp->loadResourceOrderMap.begin(); j != jend; ++j)
-		{
-			// Iterate over resources
-			for (LoadUnloadResourceList::iterator k = j->second->begin();
-				k != j->second->end(); ++k)
-			{
-				(*k)->getCreator()->remove((*k)->getHandle());
-			}
-			OGRE_DELETE_T(j->second, LoadUnloadResourceList, MEMCATEGORY_RESOURCE);
-		}
+        bool groupSet = false;
+        if (!mCurrentGroup)
+        {
+            // Set current group to indicate ignoring of notifications
+            mCurrentGroup = grp;
+            groupSet = true;
+        }
+        // delete all the load list entries
+        ResourceGroup::LoadResourceOrderMap::iterator j, jend;
+        jend = grp->loadResourceOrderMap.end();
+        for (j = grp->loadResourceOrderMap.begin(); j != jend; ++j)
+        {
+            // Iterate over resources
+            for (LoadUnloadResourceList::iterator k = j->second->begin();
+                k != j->second->end(); ++k)
+            {
+                (*k)->getCreator()->remove((*k)->getHandle());
+            }
+            OGRE_DELETE_T(j->second, LoadUnloadResourceList, MEMCATEGORY_RESOURCE);
+        }
         grp->loadResourceOrderMap.clear();
 
-		if (groupSet)
-		{
-			mCurrentGroup = 0;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::deleteGroup(ResourceGroup* grp)
-	{
+        if (groupSet)
+        {
+            mCurrentGroup = 0;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::deleteGroup(ResourceGroup* grp)
+    {
         {
             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME);
-		    // delete all the load list entries
-		    ResourceGroup::LoadResourceOrderMap::iterator j, jend;
-		    jend = grp->loadResourceOrderMap.end();
-		    for (j = grp->loadResourceOrderMap.begin(); j != jend; ++j)
-		    {
-			    // Don't iterate over resources to drop with ResourceManager
-			    // Assume this is being done anyway since this is a shutdown method
-			    OGRE_DELETE_T(j->second, LoadUnloadResourceList, MEMCATEGORY_RESOURCE);
-		    }
-		    // Drop location list
-		    for (LocationList::iterator ll = grp->locationList.begin();
-			    ll != grp->locationList.end(); ++ll)
-		    {
-			    OGRE_DELETE_T(*ll, ResourceLocation, MEMCATEGORY_RESOURCE);
-		    }
+            // delete all the load list entries
+            ResourceGroup::LoadResourceOrderMap::iterator j, jend;
+            jend = grp->loadResourceOrderMap.end();
+            for (j = grp->loadResourceOrderMap.begin(); j != jend; ++j)
+            {
+                // Don't iterate over resources to drop with ResourceManager
+                // Assume this is being done anyway since this is a shutdown method
+                OGRE_DELETE_T(j->second, LoadUnloadResourceList, MEMCATEGORY_RESOURCE);
+            }
+            // Drop location list
+            for (LocationList::iterator ll = grp->locationList.begin();
+                ll != grp->locationList.end(); ++ll)
+            {
+                OGRE_DELETE_T(*ll, ResourceLocation, MEMCATEGORY_RESOURCE);
+            }
         }
 
-		// delete ResourceGroup
-		OGRE_DELETE_T(grp, ResourceGroup, MEMCATEGORY_RESOURCE);
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceGroupScriptingStarted(const String& groupName, size_t scriptCount)
-	{
+        // delete ResourceGroup
+        OGRE_DELETE_T(grp, ResourceGroup, MEMCATEGORY_RESOURCE);
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceGroupScriptingStarted(const String& groupName, size_t scriptCount)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceGroupScriptingStarted(groupName, scriptCount);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireScriptStarted(const String& scriptName, bool &skipScript)
-	{
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceGroupScriptingStarted(groupName, scriptCount);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireScriptStarted(const String& scriptName, bool &skipScript)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			bool temp = false;
-			(*l)->scriptParseStarted(scriptName, temp);
-			if(temp)
-				skipScript = true;
-		}
-	}
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            bool temp = false;
+            (*l)->scriptParseStarted(scriptName, temp);
+            if(temp)
+                skipScript = true;
+        }
+    }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::fireScriptEnded(const String& scriptName, bool skipped)
     {
@@ -1390,36 +1390,36 @@ namespace Ogre {
                 (*l)->scriptParseEnded(scriptName, skipped);
             }
     }
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceGroupScriptingEnded(const String& groupName)
-	{
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceGroupScriptingEnded(const String& groupName)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceGroupScriptingEnded(groupName);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceGroupLoadStarted(const String& groupName, size_t resourceCount)
-	{
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceGroupScriptingEnded(groupName);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceGroupLoadStarted(const String& groupName, size_t resourceCount)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceGroupLoadStarted(groupName, resourceCount);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceLoadStarted(const ResourcePtr& resource)
-	{
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceGroupLoadStarted(groupName, resourceCount);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceLoadStarted(const ResourcePtr& resource)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceLoadStarted(resource);
-		}
-	}
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceLoadStarted(resource);
+        }
+    }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::fireResourceLoadEnded(void)
     {
@@ -1434,11 +1434,11 @@ namespace Ogre {
     void ResourceGroupManager::_notifyWorldGeometryStageStarted(const String& desc)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->worldGeometryStageStarted(desc);
-		}
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->worldGeometryStageStarted(desc);
+        }
     }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::_notifyWorldGeometryStageEnded(void)
@@ -1450,26 +1450,26 @@ namespace Ogre {
                 (*l)->worldGeometryStageEnded();
             }
     }
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceGroupLoadEnded(const String& groupName)
-	{
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceGroupLoadEnded(const String& groupName)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceGroupLoadEnded(groupName);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceGroupPrepareStarted(const String& groupName, size_t resourceCount)
-	{
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceGroupLoadEnded(groupName);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceGroupPrepareStarted(const String& groupName, size_t resourceCount)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceGroupPrepareStarted(groupName, resourceCount);
-		}
-	}
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceGroupPrepareStarted(groupName, resourceCount);
+        }
+    }
     //-----------------------------------------------------------------------
     void ResourceGroupManager::fireResourcePrepareStarted(const ResourcePtr& resource)
     {
@@ -1490,37 +1490,37 @@ namespace Ogre {
                 (*l)->resourcePrepareEnded();
             }
     }
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceGroupPrepareEnded(const String& groupName)
-	{
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceGroupPrepareEnded(const String& groupName)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceGroupPrepareEnded(groupName);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceCreated(const ResourcePtr& resource)
-	{
-		OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceCreated(resource);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void ResourceGroupManager::fireResourceRemove(const ResourcePtr& resource)
-	{
-		OGRE_LOCK_AUTO_MUTEX;
-		for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
-			l != mResourceGroupListenerList.end(); ++l)
-		{
-			(*l)->resourceRemove(resource);
-		}
-	}
-	//-----------------------------------------------------------------------
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceGroupPrepareEnded(groupName);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceCreated(const ResourcePtr& resource)
+    {
+        OGRE_LOCK_AUTO_MUTEX;
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceCreated(resource);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void ResourceGroupManager::fireResourceRemove(const ResourcePtr& resource)
+    {
+        OGRE_LOCK_AUTO_MUTEX;
+        for (ResourceGroupListenerList::iterator l = mResourceGroupListenerList.begin();
+            l != mResourceGroupListenerList.end(); ++l)
+        {
+            (*l)->resourceRemove(resource);
+        }
+    }
+    //-----------------------------------------------------------------------
     void ResourceGroupManager::shutdownAll(void)
     {
         OGRE_LOCK_AUTO_MUTEX;
@@ -1536,7 +1536,7 @@ namespace Ogre {
     StringVectorPtr ResourceGroupManager::listResourceNames(const String& groupName, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
         StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
@@ -1567,7 +1567,7 @@ namespace Ogre {
     FileInfoListPtr ResourceGroupManager::listResourceFileInfo(const String& groupName, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
         FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
@@ -1598,8 +1598,8 @@ namespace Ogre {
         const String& pattern, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
-		StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        StringVectorPtr vec(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
@@ -1628,7 +1628,7 @@ namespace Ogre {
         const String& pattern, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		// MEMCATEGORY_GENERAL is the only category supported for SharedPtr
+        // MEMCATEGORY_GENERAL is the only category supported for SharedPtr
         FileInfoListPtr vec(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
 
         // Try to find in resource index first
@@ -1654,11 +1654,11 @@ namespace Ogre {
         return vec;
     }
     //-----------------------------------------------------------------------
-	bool ResourceGroupManager::resourceExists(const String& groupName, const String& resourceName)
-	{
+    bool ResourceGroupManager::resourceExists(const String& groupName, const String& resourceName)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		// Try to find in resource index first
+        // Try to find in resource index first
         ResourceGroup* grp = getResourceGroup(groupName);
         if (!grp)
         {
@@ -1667,21 +1667,21 @@ namespace Ogre {
                 "ResourceGroupManager::resourceExists");
         }
 
-		return resourceExists(grp, resourceName);
-	}
+        return resourceExists(grp, resourceName);
+    }
     //-----------------------------------------------------------------------
-	bool ResourceGroupManager::resourceExists(ResourceGroup* grp, const String& resourceName)
-	{
+    bool ResourceGroupManager::resourceExists(ResourceGroup* grp, const String& resourceName)
+    {
 
             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		// Try indexes first
-		ResourceLocationIndex::iterator rit = grp->resourceIndexCaseSensitive.find(resourceName);
-		if (rit != grp->resourceIndexCaseSensitive.end())
-		{
-			// Found in the index
-			return true;
-		}
+        // Try indexes first
+        ResourceLocationIndex::iterator rit = grp->resourceIndexCaseSensitive.find(resourceName);
+        if (rit != grp->resourceIndexCaseSensitive.end())
+        {
+            // Found in the index
+            return true;
+        }
         else 
         {
             // try case insensitive
@@ -1693,53 +1693,53 @@ namespace Ogre {
                 // Found in the index
                 return true;
             }
-		    else
-		    {
-			    // Search the hard way
-			    LocationList::iterator li, liend;
-			    liend = grp->locationList.end();
-			    for (li = grp->locationList.begin(); li != liend; ++li)
-			    {
-				    Archive* arch = (*li)->archive;
+            else
+            {
+                // Search the hard way
+                LocationList::iterator li, liend;
+                liend = grp->locationList.end();
+                for (li = grp->locationList.begin(); li != liend; ++li)
+                {
+                    Archive* arch = (*li)->archive;
                     if (arch->exists(resourceName))
-				    {
-						return true;
-				    }
-			    }
-		    }
+                    {
+                        return true;
+                    }
+                }
+            }
         }
 
-		return false;
+        return false;
 
-	}
-	//-----------------------------------------------------------------------
-	time_t ResourceGroupManager::resourceModifiedTime(const String& groupName, const String& resourceName)
-	{
+    }
+    //-----------------------------------------------------------------------
+    time_t ResourceGroupManager::resourceModifiedTime(const String& groupName, const String& resourceName)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		// Try to find in resource index first
-		ResourceGroup* grp = getResourceGroup(groupName);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot locate a resource group called '" + groupName + "'", 
-				"ResourceGroupManager::resourceModifiedTime");
-		}
+        // Try to find in resource index first
+        ResourceGroup* grp = getResourceGroup(groupName);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + groupName + "'", 
+                "ResourceGroupManager::resourceModifiedTime");
+        }
 
-		return resourceModifiedTime(grp, resourceName);
+        return resourceModifiedTime(grp, resourceName);
 
-	}
-	//-----------------------------------------------------------------------
-	time_t ResourceGroupManager::resourceModifiedTime(ResourceGroup* grp, const String& resourceName)
-	{
+    }
+    //-----------------------------------------------------------------------
+    time_t ResourceGroupManager::resourceModifiedTime(ResourceGroup* grp, const String& resourceName)
+    {
             OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
 
-		// Try indexes first
-		ResourceLocationIndex::iterator rit = grp->resourceIndexCaseSensitive.find(resourceName);
-		if (rit != grp->resourceIndexCaseSensitive.end())
-		{
-			return rit->second->getModifiedTime(resourceName);
-		}
+        // Try indexes first
+        ResourceLocationIndex::iterator rit = grp->resourceIndexCaseSensitive.find(resourceName);
+        if (rit != grp->resourceIndexCaseSensitive.end())
+        {
+            return rit->second->getModifiedTime(resourceName);
+        }
         else 
         {
             // try case insensitive
@@ -1748,70 +1748,70 @@ namespace Ogre {
             rit = grp->resourceIndexCaseInsensitive.find(lcResourceName);
             if (rit != grp->resourceIndexCaseInsensitive.end())
             {
-				return rit->second->getModifiedTime(resourceName);
+                return rit->second->getModifiedTime(resourceName);
             }
-		    else
-		    {
-			    // Search the hard way
-			    LocationList::iterator li, liend;
-			    liend = grp->locationList.end();
-			    for (li = grp->locationList.begin(); li != liend; ++li)
-			    {
-				    Archive* arch = (*li)->archive;
-					time_t testTime = arch->getModifiedTime(resourceName);
+            else
+            {
+                // Search the hard way
+                LocationList::iterator li, liend;
+                liend = grp->locationList.end();
+                for (li = grp->locationList.begin(); li != liend; ++li)
+                {
+                    Archive* arch = (*li)->archive;
+                    time_t testTime = arch->getModifiedTime(resourceName);
 
                     if (testTime > 0)
-				    {
-						return testTime;
-				    }
-			    }
-		    }
+                    {
+                        return testTime;
+                    }
+                }
+            }
         }
 
-		return 0;
-	}
-	//-----------------------------------------------------------------------
-	ResourceGroupManager::ResourceGroup* 
-	ResourceGroupManager::findGroupContainingResourceImpl(const String& filename)
-	{
+        return 0;
+    }
+    //-----------------------------------------------------------------------
+    ResourceGroupManager::ResourceGroup* 
+    ResourceGroupManager::findGroupContainingResourceImpl(const String& filename)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-			// Iterate over resource groups and find
-		for (ResourceGroupMap::iterator i = mResourceGroupMap.begin();
-			i != mResourceGroupMap.end(); ++i)
-		{
-	        ResourceGroup* grp = i->second;
+            // Iterate over resource groups and find
+        for (ResourceGroupMap::iterator i = mResourceGroupMap.begin();
+            i != mResourceGroupMap.end(); ++i)
+        {
+            ResourceGroup* grp = i->second;
 
                 OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-				
-			if (resourceExists(grp, filename))
-				return grp;
-		}
-		// Not found
-		return 0;
-	}
+                
+            if (resourceExists(grp, filename))
+                return grp;
+        }
+        // Not found
+        return 0;
+    }
     //-----------------------------------------------------------------------
-	bool ResourceGroupManager::resourceExistsInAnyGroup(const String& filename)
-	{
-		ResourceGroup* grp = findGroupContainingResourceImpl(filename);
-		if (!grp)
-			return false;
-		return true;
-	}
-	//-----------------------------------------------------------------------
-	const String& ResourceGroupManager::findGroupContainingResource(const String& filename)
-	{
-		ResourceGroup* grp = findGroupContainingResourceImpl(filename);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-				"Unable to derive resource group for " + 
-				filename + " automatically since the resource was not "
-				"found.", 
-				"ResourceGroupManager::findGroupContainingResource");
-		}
-		return grp->name;
-	}
+    bool ResourceGroupManager::resourceExistsInAnyGroup(const String& filename)
+    {
+        ResourceGroup* grp = findGroupContainingResourceImpl(filename);
+        if (!grp)
+            return false;
+        return true;
+    }
+    //-----------------------------------------------------------------------
+    const String& ResourceGroupManager::findGroupContainingResource(const String& filename)
+    {
+        ResourceGroup* grp = findGroupContainingResourceImpl(filename);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                "Unable to derive resource group for " + 
+                filename + " automatically since the resource was not "
+                "found.", 
+                "ResourceGroupManager::findGroupContainingResource");
+        }
+        return grp->name;
+    }
     //-----------------------------------------------------------------------
     StringVectorPtr ResourceGroupManager::listResourceLocations(const String& groupName)
     {
@@ -1905,36 +1905,36 @@ namespace Ogre {
         grp->worldGeometry = StringUtil::BLANK;
         grp->worldGeometrySceneManager = 0;
     }
-	//-----------------------------------------------------------------------
-	bool ResourceGroupManager::isResourceGroupInGlobalPool(const String& name)
+    //-----------------------------------------------------------------------
+    bool ResourceGroupManager::isResourceGroupInGlobalPool(const String& name)
     {
         OGRE_LOCK_AUTO_MUTEX;
 
-		ResourceGroup* grp = getResourceGroup(name);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot find a group named " + name, 
-				"ResourceGroupManager::isResourceGroupInitialised");
-		}
-		return grp->inGlobalPool;
+        ResourceGroup* grp = getResourceGroup(name);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot find a group named " + name, 
+                "ResourceGroupManager::isResourceGroupInitialised");
+        }
+        return grp->inGlobalPool;
     }
     //-----------------------------------------------------------------------
-	StringVector ResourceGroupManager::getResourceGroups(void)
-	{
+    StringVector ResourceGroupManager::getResourceGroups(void)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		StringVector vec;
-		for (ResourceGroupMap::iterator i = mResourceGroupMap.begin();
-			i != mResourceGroupMap.end(); ++i)
-		{
-			vec.push_back(i->second->name);
-		}
-		return vec;
-	}
+        StringVector vec;
+        for (ResourceGroupMap::iterator i = mResourceGroupMap.begin();
+            i != mResourceGroupMap.end(); ++i)
+        {
+            vec.push_back(i->second->name);
+        }
+        return vec;
+    }
     //-----------------------------------------------------------------------
-	ResourceGroupManager::ResourceDeclarationList 
-	ResourceGroupManager::getResourceDeclarationList(const String& group)
-	{
+    ResourceGroupManager::ResourceDeclarationList 
+    ResourceGroupManager::getResourceDeclarationList(const String& group)
+    {
             OGRE_LOCK_AUTO_MUTEX;
         ResourceGroup* grp = getResourceGroup(group);
         if (!grp)
@@ -1945,104 +1945,104 @@ namespace Ogre {
         }
 
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-		return grp->resourceDeclarations;
-	}
-	//---------------------------------------------------------------------
-	const ResourceGroupManager::LocationList& 
-	ResourceGroupManager::getResourceLocationList(const String& group)
-	{
+        return grp->resourceDeclarations;
+    }
+    //---------------------------------------------------------------------
+    const ResourceGroupManager::LocationList& 
+    ResourceGroupManager::getResourceLocationList(const String& group)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-			ResourceGroup* grp = getResourceGroup(group);
-		if (!grp)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"Cannot locate a resource group called '" + group + "'", 
-				"ResourceGroupManager::getResourceLocationList");
-		}
+            ResourceGroup* grp = getResourceGroup(group);
+        if (!grp)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "Cannot locate a resource group called '" + group + "'", 
+                "ResourceGroupManager::getResourceLocationList");
+        }
 
-		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-		return grp->locationList;
+        OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
+        return grp->locationList;
 
-	}
-	//-------------------------------------------------------------------------
-	void ResourceGroupManager::setLoadingListener(ResourceLoadingListener *listener)
-	{
-		mLoadingListener = listener;
-	}
-	//-------------------------------------------------------------------------
-	ResourceLoadingListener *ResourceGroupManager::getLoadingListener()
-	{
-		return mLoadingListener;
-	}
-	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	void ResourceGroupManager::ResourceGroup::addToIndex(const String& filename, Archive* arch)
-	{
-		// internal, assumes mutex lock has already been obtained
-		this->resourceIndexCaseSensitive[filename] = arch;
+    }
+    //-------------------------------------------------------------------------
+    void ResourceGroupManager::setLoadingListener(ResourceLoadingListener *listener)
+    {
+        mLoadingListener = listener;
+    }
+    //-------------------------------------------------------------------------
+    ResourceLoadingListener *ResourceGroupManager::getLoadingListener()
+    {
+        return mLoadingListener;
+    }
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void ResourceGroupManager::ResourceGroup::addToIndex(const String& filename, Archive* arch)
+    {
+        // internal, assumes mutex lock has already been obtained
+        this->resourceIndexCaseSensitive[filename] = arch;
 
-		if (!arch->isCaseSensitive())
-		{
-			String lcase = filename;
-			StringUtil::toLowerCase(lcase);
-			this->resourceIndexCaseInsensitive[lcase] = arch;
-		}
-	}
-	//---------------------------------------------------------------------
-	void ResourceGroupManager::ResourceGroup::removeFromIndex(const String& filename, Archive* arch)
-	{
-		// internal, assumes mutex lock has already been obtained
-		ResourceLocationIndex::iterator i = this->resourceIndexCaseSensitive.find(filename);
-		if (i != this->resourceIndexCaseSensitive.end() && i->second == arch)
-			this->resourceIndexCaseSensitive.erase(i);
+        if (!arch->isCaseSensitive())
+        {
+            String lcase = filename;
+            StringUtil::toLowerCase(lcase);
+            this->resourceIndexCaseInsensitive[lcase] = arch;
+        }
+    }
+    //---------------------------------------------------------------------
+    void ResourceGroupManager::ResourceGroup::removeFromIndex(const String& filename, Archive* arch)
+    {
+        // internal, assumes mutex lock has already been obtained
+        ResourceLocationIndex::iterator i = this->resourceIndexCaseSensitive.find(filename);
+        if (i != this->resourceIndexCaseSensitive.end() && i->second == arch)
+            this->resourceIndexCaseSensitive.erase(i);
 
-		if (!arch->isCaseSensitive())
-		{
-			String lcase = filename;
-			StringUtil::toLowerCase(lcase);
-			i = this->resourceIndexCaseInsensitive.find(lcase);
-			if (i != this->resourceIndexCaseInsensitive.end() && i->second == arch)
-				this->resourceIndexCaseInsensitive.erase(i);
-		}
-	}
-	//---------------------------------------------------------------------
-	void ResourceGroupManager::ResourceGroup::removeFromIndex(Archive* arch)
-	{
-		// Delete indexes
-		ResourceLocationIndex::iterator rit, ritend;
-		ritend = this->resourceIndexCaseInsensitive.end();
-		for (rit = this->resourceIndexCaseInsensitive.begin(); rit != ritend;)
-		{
-			if (rit->second == arch)
-			{
-				ResourceLocationIndex::iterator del = rit++;
-				this->resourceIndexCaseInsensitive.erase(del);
-			}
-			else
-			{
-				++rit;
-			}
-		}
-		ritend = this->resourceIndexCaseSensitive.end();
-		for (rit = this->resourceIndexCaseSensitive.begin(); rit != ritend;)
-		{
-			if (rit->second == arch)
-			{
-				ResourceLocationIndex::iterator del = rit++;
-				this->resourceIndexCaseSensitive.erase(del);
-			}
-			else
-			{
-				++rit;
-			}
-		}
+        if (!arch->isCaseSensitive())
+        {
+            String lcase = filename;
+            StringUtil::toLowerCase(lcase);
+            i = this->resourceIndexCaseInsensitive.find(lcase);
+            if (i != this->resourceIndexCaseInsensitive.end() && i->second == arch)
+                this->resourceIndexCaseInsensitive.erase(i);
+        }
+    }
+    //---------------------------------------------------------------------
+    void ResourceGroupManager::ResourceGroup::removeFromIndex(Archive* arch)
+    {
+        // Delete indexes
+        ResourceLocationIndex::iterator rit, ritend;
+        ritend = this->resourceIndexCaseInsensitive.end();
+        for (rit = this->resourceIndexCaseInsensitive.begin(); rit != ritend;)
+        {
+            if (rit->second == arch)
+            {
+                ResourceLocationIndex::iterator del = rit++;
+                this->resourceIndexCaseInsensitive.erase(del);
+            }
+            else
+            {
+                ++rit;
+            }
+        }
+        ritend = this->resourceIndexCaseSensitive.end();
+        for (rit = this->resourceIndexCaseSensitive.begin(); rit != ritend;)
+        {
+            if (rit->second == arch)
+            {
+                ResourceLocationIndex::iterator del = rit++;
+                this->resourceIndexCaseSensitive.erase(del);
+            }
+            else
+            {
+                ++rit;
+            }
+        }
 
-	}
-	//---------------------------------------------------------------------
-	//-----------------------------------------------------------------------
-	ScriptLoader::~ScriptLoader()
-	{
-	}
+    }
+    //---------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    ScriptLoader::~ScriptLoader()
+    {
+    }
 
 
 }

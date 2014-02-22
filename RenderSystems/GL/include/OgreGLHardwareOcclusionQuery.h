@@ -75,23 +75,23 @@ class _OgreGLExport GLHardwareOcclusionQuery : public HardwareOcclusionQuery
 // Public methods
 //--
 public:
-	/**
-	  * Default object constructor
-	  * 
-	  */
-	GLHardwareOcclusionQuery();
-	/**
-	  * Object destructor
-	  */
-	~GLHardwareOcclusionQuery();
+    /**
+      * Default object constructor
+      * 
+      */
+    GLHardwareOcclusionQuery();
+    /**
+      * Object destructor
+      */
+    ~GLHardwareOcclusionQuery();
 
-	//------------------------------------------------------------------
-	// Occlusion query functions (see base class documentation for this)
-	//--
-	void beginOcclusionQuery();
-	void endOcclusionQuery();
-	bool pullOcclusionQuery( unsigned int* NumOfFragments); 
-	bool isStillOutstanding(void);
+    //------------------------------------------------------------------
+    // Occlusion query functions (see base class documentation for this)
+    //--
+    void beginOcclusionQuery();
+    void endOcclusionQuery();
+    bool pullOcclusionQuery( unsigned int* NumOfFragments); 
+    bool isStillOutstanding(void);
 
 
     //----------------------------------------------------------------------
@@ -99,7 +99,7 @@ public:
     //--
     private:
 
-	    GLuint			mQueryID;
+        GLuint          mQueryID;
 };
 
 }

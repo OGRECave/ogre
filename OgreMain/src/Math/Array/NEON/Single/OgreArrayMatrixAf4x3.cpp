@@ -34,13 +34,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	const ArrayMatrixAf4x3 ArrayMatrixAf4x3::IDENTITY( ArrayMatrixAf4x3::createAllFromMatrix4(
-				Matrix4(	1, 0, 0, 0,
-							0, 1, 0, 0,
-							0, 0, 1, 0,
-							0, 0, 0, 1 ) ) );
+    const ArrayMatrixAf4x3 ArrayMatrixAf4x3::IDENTITY( ArrayMatrixAf4x3::createAllFromMatrix4(
+                Matrix4(    1, 0, 0, 0,
+                            0, 1, 0, 0,
+                            0, 0, 1, 0,
+                            0, 0, 0, 1 ) ) );
 
-	const SimpleMatrixAf4x3 SimpleMatrixAf4x3::IDENTITY( (ArrayReal) { 0, 0, 0, 1 },
+    const SimpleMatrixAf4x3 SimpleMatrixAf4x3::IDENTITY( (ArrayReal) { 0, 0, 0, 1 },
                                                         (ArrayReal) { 0, 0, 1, 0 },
                                                         (ArrayReal) { 0, 1, 0, 0 } );
 }

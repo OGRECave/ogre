@@ -49,11 +49,11 @@ namespace Ogre {
         virtual void unbindProgram(void) {}
 
         /// Execute the param binding functions for this program
-		virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
-		/// Bind just the pass iteration parameters
-		virtual void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
-		/// Execute the shared param binding functions for this program
-		virtual void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
+        virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
+        /// Bind just the pass iteration parameters
+        virtual void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
+        /// Execute the shared param binding functions for this program
+        virtual void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
 
         /// @copydoc Resource::calculateSize
         virtual size_t calculateSize(void) const;
@@ -63,8 +63,8 @@ namespace Ogre {
         { return mProgramID; }
 
     protected:
-		/** Overridden from GpuProgram, do nothing */
-		void loadFromSource(void) {}
+        /** Overridden from GpuProgram, do nothing */
+        void loadFromSource(void) {}
         /// @copydoc Resource::unloadImpl
         void unloadImpl(void) {}
 

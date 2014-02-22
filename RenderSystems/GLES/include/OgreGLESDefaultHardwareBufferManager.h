@@ -112,7 +112,7 @@ namespace Ogre {
                 createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes,
                     HardwareBuffer::Usage usage, bool useShadowBuffer = false);
             /// Create a render to vertex buffer
-	    RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
+        RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
         HardwareUniformBufferSharedPtr
         createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
         {
@@ -120,7 +120,7 @@ namespace Ogre {
                         "GLES does not support uniform buffer objects",
                         "GLESDefaultHardwareBufferManagerBase::createUniformBuffer");
         }
-		HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                            HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                            bool useShadowBuffer = false, const String& name = "")
         {
@@ -130,19 +130,19 @@ namespace Ogre {
         }
     };
 
-	/// GLESDefaultHardwareBufferManagerBase as a Singleton
-	class _OgreGLESExport GLESDefaultHardwareBufferManager : public HardwareBufferManager
-	{
-	public:
-		GLESDefaultHardwareBufferManager()
-			: HardwareBufferManager(OGRE_NEW GLESDefaultHardwareBufferManagerBase()) 
-		{
+    /// GLESDefaultHardwareBufferManagerBase as a Singleton
+    class _OgreGLESExport GLESDefaultHardwareBufferManager : public HardwareBufferManager
+    {
+    public:
+        GLESDefaultHardwareBufferManager()
+            : HardwareBufferManager(OGRE_NEW GLESDefaultHardwareBufferManagerBase()) 
+        {
 
-		}
-		~GLESDefaultHardwareBufferManager()
-		{
-			OGRE_DELETE mImpl;
-		}
+        }
+        ~GLESDefaultHardwareBufferManager()
+        {
+            OGRE_DELETE mImpl;
+        }
         HardwareUniformBufferSharedPtr
         createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
         {
@@ -150,7 +150,7 @@ namespace Ogre {
                         "GLES does not support render to vertex buffer objects",
                         "GLESDefaultHardwareBufferManager::createUniformBuffer");
         }
-	};
+    };
 }
 
 #endif

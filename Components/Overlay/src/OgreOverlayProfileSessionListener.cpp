@@ -37,29 +37,29 @@ namespace Ogre
 {
     //-----------------------------------------------------------------------
     OverlayProfileSessionListener::OverlayProfileSessionListener() 
-		: mOverlay(0)
-		, mProfileGui(0)
-		, mBarHeight(10)
-		, mGuiHeight(25)
-		, mGuiWidth(250)
-		, mGuiLeft(0)
+        : mOverlay(0)
+        , mProfileGui(0)
+        , mBarHeight(10)
+        , mGuiHeight(25)
+        , mGuiWidth(250)
+        , mGuiLeft(0)
         , mGuiTop(0)
-		, mBarIndent(250)
-		, mGuiBorderWidth(10)
-		, mBarLineWidth(2)
-		, mBarSpacing(3)
-		, mMaxDisplayProfiles(50)
-	{
-	}
+        , mBarIndent(250)
+        , mGuiBorderWidth(10)
+        , mBarLineWidth(2)
+        , mBarSpacing(3)
+        , mMaxDisplayProfiles(50)
+    {
+    }
     //-----------------------------------------------------------------------
-	OverlayProfileSessionListener::~OverlayProfileSessionListener()
-	{
+    OverlayProfileSessionListener::~OverlayProfileSessionListener()
+    {
         mProfileBars.clear();
-	}
+    }
     //-----------------------------------------------------------------------
-	void OverlayProfileSessionListener::initializeSession()
-	{
-		// create a new overlay to hold our Profiler display
+    void OverlayProfileSessionListener::initializeSession()
+    {
+        // create a new overlay to hold our Profiler display
         mOverlay = OverlayManager::getSingleton().create("Profiler");
         mOverlay->setZOrder(500);
 
@@ -70,7 +70,7 @@ namespace Ogre
 
         // we create an initial pool of 50 profile bars
         for (uint i = 0; i < mMaxDisplayProfiles; ++i) 
-		{
+        {
             // this is for the profile name and the number of times it was called in a frame
             element = createTextArea("profileText" + StringConverter::toString(i), 90, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, 14, "", false);
             mProfileGui->addChild(element);
@@ -96,167 +96,167 @@ namespace Ogre
             mProfileGui->addChild(element);
             mProfileBars.push_back(element);
 
-			// this indicates the text of the frame time
-			element = createTextArea("statText" + StringConverter::toString(i), 20, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, 14, "", false);
-			mProfileGui->addChild(element);
-			mProfileBars.push_back(element);
+            // this indicates the text of the frame time
+            element = createTextArea("statText" + StringConverter::toString(i), 20, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, 14, "", false);
+            mProfileGui->addChild(element);
+            mProfileBars.push_back(element);
         }
 
         // throw everything all the GUI stuff into the overlay and display it
         mOverlay->add2D(mProfileGui);
-	}
+    }
     //-----------------------------------------------------------------------
-	void OverlayProfileSessionListener::finializeSession()
-	{
-		OverlayContainer* container = dynamic_cast<OverlayContainer*>(mProfileGui);
-		if (container)
-		{
-			OverlayContainer::ChildIterator children = container->getChildIterator();
-			while (children.hasMoreElements())
-			{
-				OverlayElement* element = children.getNext();
-				OverlayContainer* parent = element->getParent();
-				if (parent) parent->removeChild(element->getName());
-				OverlayManager::getSingleton().destroyOverlayElement(element);
-			}
-		}
-		if(mProfileGui)
-			OverlayManager::getSingleton().destroyOverlayElement(mProfileGui);
-		if(mOverlay)
-			OverlayManager::getSingleton().destroy(mOverlay);			
-			
-		mProfileBars.clear();
-	}
+    void OverlayProfileSessionListener::finializeSession()
+    {
+        OverlayContainer* container = dynamic_cast<OverlayContainer*>(mProfileGui);
+        if (container)
+        {
+            OverlayContainer::ChildIterator children = container->getChildIterator();
+            while (children.hasMoreElements())
+            {
+                OverlayElement* element = children.getNext();
+                OverlayContainer* parent = element->getParent();
+                if (parent) parent->removeChild(element->getName());
+                OverlayManager::getSingleton().destroyOverlayElement(element);
+            }
+        }
+        if(mProfileGui)
+            OverlayManager::getSingleton().destroyOverlayElement(mProfileGui);
+        if(mOverlay)
+            OverlayManager::getSingleton().destroy(mOverlay);           
+            
+        mProfileBars.clear();
+    }
     //-----------------------------------------------------------------------
-	void OverlayProfileSessionListener::displayResults(const ProfileInstance& root, ulong maxTotalFrameTime)
-	{
-		Real newGuiHeight = mGuiHeight;
-		int profileCount = 0;
-		Real maxTimeMillisecs = (Real)maxTotalFrameTime / 1000.0f;
+    void OverlayProfileSessionListener::displayResults(const ProfileInstance& root, ulong maxTotalFrameTime)
+    {
+        Real newGuiHeight = mGuiHeight;
+        int profileCount = 0;
+        Real maxTimeMillisecs = (Real)maxTotalFrameTime / 1000.0f;
 
-		ProfileBarList::const_iterator bIter = mProfileBars.begin();
-		ProfileInstance::ProfileChildren::const_iterator it = root.children.begin(), endit = root.children.end();
-		for(;it != endit; ++it)
-		{
-			ProfileInstance* child = it->second;
-			displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
-		}
-			
-		// set the main display dimensions
-		mProfileGui->setMetricsMode(GMM_PIXELS);
-		mProfileGui->setHeight(newGuiHeight);
-		mProfileGui->setWidth(mGuiWidth * 2 + 15);
-		mProfileGui->setTop(5);
-		mProfileGui->setLeft(5);
+        ProfileBarList::const_iterator bIter = mProfileBars.begin();
+        ProfileInstance::ProfileChildren::const_iterator it = root.children.begin(), endit = root.children.end();
+        for(;it != endit; ++it)
+        {
+            ProfileInstance* child = it->second;
+            displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
+        }
+            
+        // set the main display dimensions
+        mProfileGui->setMetricsMode(GMM_PIXELS);
+        mProfileGui->setHeight(newGuiHeight);
+        mProfileGui->setWidth(mGuiWidth * 2 + 15);
+        mProfileGui->setTop(5);
+        mProfileGui->setLeft(5);
 
-		// we hide all the remaining pre-created bars
-		for (; bIter != mProfileBars.end(); ++bIter) 
-		{
-			(*bIter)->hide();
-		}
-	}
+        // we hide all the remaining pre-created bars
+        for (; bIter != mProfileBars.end(); ++bIter) 
+        {
+            (*bIter)->hide();
+        }
+    }
     //-----------------------------------------------------------------------
-	void OverlayProfileSessionListener::displayResults(ProfileInstance* instance, ProfileBarList::const_iterator& bIter, Real& maxTimeMillisecs, Real& newGuiHeight, int& profileCount)
-	{
-		OverlayElement* g;
+    void OverlayProfileSessionListener::displayResults(ProfileInstance* instance, ProfileBarList::const_iterator& bIter, Real& maxTimeMillisecs, Real& newGuiHeight, int& profileCount)
+    {
+        OverlayElement* g;
 
-		// display the profile's name and the number of times it was called in a frame
-		g = *bIter;
-		++bIter;
-		g->show();
-		g->setCaption(String(instance->name + " (" + StringConverter::toString(instance->history.numCallsThisFrame) + ")"));
-		g->setLeft(10 + instance->hierarchicalLvl * 15.0f);
-
-
-		// display the main bar that show the percentage of the frame time that this
-		// profile has taken
-		g = *bIter;
-		++bIter;
-		g->show();
-		// most of this junk has been set before, but we do this to get around a weird
-		// Ogre gui issue (bug?)
-		g->setMetricsMode(GMM_PIXELS);
-		g->setHeight(mBarHeight);
-
-		if (mDisplayMode == DISPLAY_PERCENTAGE)
-			g->setWidth( (instance->history.currentTimePercent) * mGuiWidth);
-		else
-			g->setWidth( (instance->history.currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
-
-		g->setLeft(mGuiWidth);
-		g->setTop(mGuiBorderWidth + profileCount * (mBarHeight + mBarSpacing));
+        // display the profile's name and the number of times it was called in a frame
+        g = *bIter;
+        ++bIter;
+        g->show();
+        g->setCaption(String(instance->name + " (" + StringConverter::toString(instance->history.numCallsThisFrame) + ")"));
+        g->setLeft(10 + instance->hierarchicalLvl * 15.0f);
 
 
+        // display the main bar that show the percentage of the frame time that this
+        // profile has taken
+        g = *bIter;
+        ++bIter;
+        g->show();
+        // most of this junk has been set before, but we do this to get around a weird
+        // Ogre gui issue (bug?)
+        g->setMetricsMode(GMM_PIXELS);
+        g->setHeight(mBarHeight);
 
-		// display line to indicate the minimum frame time for this profile
-		g = *bIter;
-		++bIter;
-		g->show();
-		if(mDisplayMode == DISPLAY_PERCENTAGE)
-			g->setLeft(mBarIndent + instance->history.minTimePercent * mGuiWidth);
-		else
-			g->setLeft(mBarIndent + (instance->history.minTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
+        if (mDisplayMode == DISPLAY_PERCENTAGE)
+            g->setWidth( (instance->history.currentTimePercent) * mGuiWidth);
+        else
+            g->setWidth( (instance->history.currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
 
-		// display line to indicate the maximum frame time for this profile
-		g = *bIter;
-		++bIter;
-		g->show();
-		if(mDisplayMode == DISPLAY_PERCENTAGE)
-			g->setLeft(mBarIndent + instance->history.maxTimePercent * mGuiWidth);
-		else
-			g->setLeft(mBarIndent + (instance->history.maxTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
+        g->setLeft(mGuiWidth);
+        g->setTop(mGuiBorderWidth + profileCount * (mBarHeight + mBarSpacing));
 
-		// display line to indicate the average frame time for this profile
-		g = *bIter;
-		++bIter;
-		g->show();
-		if(instance->history.totalCalls != 0)
-		{
-			if (mDisplayMode == DISPLAY_PERCENTAGE)
-				g->setLeft(mBarIndent + (instance->history.totalTimePercent / instance->history.totalCalls) * mGuiWidth);
-			else
-				g->setLeft(mBarIndent + ((instance->history.totalTimeMillisecs / instance->history.totalCalls) / maxTimeMillisecs) * mGuiWidth);
-		}
-		else
-			g->setLeft(mBarIndent);
 
-		// display text
-		g = *bIter;
-		++bIter;
-		g->show();
-		if (mDisplayMode == DISPLAY_PERCENTAGE)
-		{
-			g->setLeft(mBarIndent + instance->history.currentTimePercent * mGuiWidth + 2);
-			g->setCaption(StringConverter::toString(instance->history.currentTimePercent * 100.0f, 3, 3) + "%");
-		}
-		else
-		{
-			g->setLeft(mBarIndent + (instance->history.currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth + 2);
-			g->setCaption(StringConverter::toString(instance->history.currentTimeMillisecs, 3, 3) + "ms");
-		}
 
-		// we set the height of the display with respect to the number of profiles displayed
-		newGuiHeight += mBarHeight + mBarSpacing;
+        // display line to indicate the minimum frame time for this profile
+        g = *bIter;
+        ++bIter;
+        g->show();
+        if(mDisplayMode == DISPLAY_PERCENTAGE)
+            g->setLeft(mBarIndent + instance->history.minTimePercent * mGuiWidth);
+        else
+            g->setLeft(mBarIndent + (instance->history.minTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
 
-		++profileCount;
+        // display line to indicate the maximum frame time for this profile
+        g = *bIter;
+        ++bIter;
+        g->show();
+        if(mDisplayMode == DISPLAY_PERCENTAGE)
+            g->setLeft(mBarIndent + instance->history.maxTimePercent * mGuiWidth);
+        else
+            g->setLeft(mBarIndent + (instance->history.maxTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
 
-		// display children
-		ProfileInstance::ProfileChildren::const_iterator it = instance->children.begin(), endit = instance->children.end();
-		for(;it != endit; ++it)
-		{
-			ProfileInstance* child = it->second;
-			displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
-		}
-	}
+        // display line to indicate the average frame time for this profile
+        g = *bIter;
+        ++bIter;
+        g->show();
+        if(instance->history.totalCalls != 0)
+        {
+            if (mDisplayMode == DISPLAY_PERCENTAGE)
+                g->setLeft(mBarIndent + (instance->history.totalTimePercent / instance->history.totalCalls) * mGuiWidth);
+            else
+                g->setLeft(mBarIndent + ((instance->history.totalTimeMillisecs / instance->history.totalCalls) / maxTimeMillisecs) * mGuiWidth);
+        }
+        else
+            g->setLeft(mBarIndent);
+
+        // display text
+        g = *bIter;
+        ++bIter;
+        g->show();
+        if (mDisplayMode == DISPLAY_PERCENTAGE)
+        {
+            g->setLeft(mBarIndent + instance->history.currentTimePercent * mGuiWidth + 2);
+            g->setCaption(StringConverter::toString(instance->history.currentTimePercent * 100.0f, 3, 3) + "%");
+        }
+        else
+        {
+            g->setLeft(mBarIndent + (instance->history.currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth + 2);
+            g->setCaption(StringConverter::toString(instance->history.currentTimeMillisecs, 3, 3) + "ms");
+        }
+
+        // we set the height of the display with respect to the number of profiles displayed
+        newGuiHeight += mBarHeight + mBarSpacing;
+
+        ++profileCount;
+
+        // display children
+        ProfileInstance::ProfileChildren::const_iterator it = instance->children.begin(), endit = instance->children.end();
+        for(;it != endit; ++it)
+        {
+            ProfileInstance* child = it->second;
+            displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
+        }
+    }
     //-----------------------------------------------------------------------
     void OverlayProfileSessionListener::changeEnableState(bool enabled) 
-	{
+    {
         if (enabled) 
-		{
+        {
             mOverlay->show();
         }
         else 
-		{
+        {
             mOverlay->hide();
         }
     }
@@ -264,8 +264,8 @@ namespace Ogre
     OverlayContainer* OverlayProfileSessionListener::createContainer()
     {
         OverlayContainer* container = (OverlayContainer*) 
-			OverlayManager::getSingleton().createOverlayElement(
-				"BorderPanel", "profiler");
+            OverlayManager::getSingleton().createOverlayElement(
+                "BorderPanel", "profiler");
         container->setMetricsMode(GMM_PIXELS);
         container->setMaterialName("Core/StatsBlockCenter");
         container->setHeight(mGuiHeight);
@@ -315,7 +315,7 @@ namespace Ogre
                                       const String& materialName, bool show)
     {
         OverlayElement* panel = 
-			OverlayManager::getSingleton().createOverlayElement("Panel", name);
+            OverlayManager::getSingleton().createOverlayElement("Panel", name);
         panel->setMetricsMode(GMM_PIXELS);
         panel->setWidth(width);
         panel->setHeight(height);
@@ -333,41 +333,41 @@ namespace Ogre
         return panel;
     }
     //-----------------------------------------------------------------------
-	void OverlayProfileSessionListener::setOverlayPosition(Real left, Real top)
-	{
-		mGuiLeft = left;
-		mGuiTop = top;
+    void OverlayProfileSessionListener::setOverlayPosition(Real left, Real top)
+    {
+        mGuiLeft = left;
+        mGuiTop = top;
 
-		mProfileGui->setPosition(left, top);
-	}
-	//---------------------------------------------------------------------
-	Real OverlayProfileSessionListener::getOverlayWidth() const
-	{
-		return mGuiWidth;
-	}
-	//---------------------------------------------------------------------
-	Real OverlayProfileSessionListener::getOverlayHeight() const
-	{
-		return mGuiHeight;
-	}
-	//---------------------------------------------------------------------
-	Real OverlayProfileSessionListener::getOverlayLeft() const
-	{
-		return mGuiLeft;
-	}
-	//---------------------------------------------------------------------
-	Real OverlayProfileSessionListener::getOverlayTop() const
-	{
-		return mGuiTop;
-	}
-	//-----------------------------------------------------------------------
-	void OverlayProfileSessionListener::setOverlayDimensions(Real width, Real height)
-	{
-		mGuiWidth = width;
-		mGuiHeight = height;
-		mBarIndent = mGuiWidth;
+        mProfileGui->setPosition(left, top);
+    }
+    //---------------------------------------------------------------------
+    Real OverlayProfileSessionListener::getOverlayWidth() const
+    {
+        return mGuiWidth;
+    }
+    //---------------------------------------------------------------------
+    Real OverlayProfileSessionListener::getOverlayHeight() const
+    {
+        return mGuiHeight;
+    }
+    //---------------------------------------------------------------------
+    Real OverlayProfileSessionListener::getOverlayLeft() const
+    {
+        return mGuiLeft;
+    }
+    //---------------------------------------------------------------------
+    Real OverlayProfileSessionListener::getOverlayTop() const
+    {
+        return mGuiTop;
+    }
+    //-----------------------------------------------------------------------
+    void OverlayProfileSessionListener::setOverlayDimensions(Real width, Real height)
+    {
+        mGuiWidth = width;
+        mGuiHeight = height;
+        mBarIndent = mGuiWidth;
 
-		mProfileGui->setDimensions(width, height);
-	}
-	//-----------------------------------------------------------------------
+        mProfileGui->setDimensions(width, height);
+    }
+    //-----------------------------------------------------------------------
 }

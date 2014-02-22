@@ -99,10 +99,10 @@ namespace Ogre {
     {
         // Get beginning iterator
         for (StrategyMap::iterator it = mStrategies.begin(); it != mStrategies.end(); ++it)
-		{
-			OGRE_DELETE it->second;
-		}
-		mStrategies.clear();
+        {
+            OGRE_DELETE it->second;
+        }
+        mStrategies.clear();
     }
     //-----------------------------------------------------------------------
     LodStrategy *LodStrategyManager::getStrategy(const String& name)

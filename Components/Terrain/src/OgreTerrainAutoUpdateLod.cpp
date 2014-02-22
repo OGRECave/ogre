@@ -59,108 +59,108 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	void TerrainAutoUpdateLodByDistance::autoUpdateLod(Terrain *terrain, bool synchronous, const Any &data)
-	{
-		if( terrain )
-			autoUpdateLodByDistance(terrain, synchronous, any_cast<Real>(data));
-	}
+    void TerrainAutoUpdateLodByDistance::autoUpdateLod(Terrain *terrain, bool synchronous, const Any &data)
+    {
+        if( terrain )
+            autoUpdateLodByDistance(terrain, synchronous, any_cast<Real>(data));
+    }
 
-	void TerrainAutoUpdateLodByDistance::autoUpdateLodByDistance(Terrain *terrain, bool synchronous, const Real holdDistance)
-	{
-		if (!terrain->isLoaded())
-			return;
+    void TerrainAutoUpdateLodByDistance::autoUpdateLodByDistance(Terrain *terrain, bool synchronous, const Real holdDistance)
+    {
+        if (!terrain->isLoaded())
+            return;
 
-		// calculate error terms
-		const Camera* cam = terrain->getSceneManager()->getCameraInProgress()->getLodCamera();
-		if(!cam)
-			return;
+        // calculate error terms
+        const Camera* cam = terrain->getSceneManager()->getCameraInProgress()->getLodCamera();
+        if(!cam)
+            return;
 
-		const Viewport* vp = cam->getLastViewport();
-		if(!vp)
-			return;
+        const Viewport* vp = cam->getLastViewport();
+        if(!vp)
+            return;
 
-		// W. de Boer 2000 calculation
-		// A = vp_near / abs(vp_top)
-		// A = 1 / tan(fovy*0.5)    (== 1 for fovy=45*2)
-		Real A = 1.0f / Math::Tan(cam->getFOVy() * 0.5f);
-		// T = 2 * maxPixelError / vertRes
-		Real maxPixelError = TerrainGlobalOptions::getSingleton().getMaxPixelError() * cam->_getLodBiasInverse();
-		Real T = 2.0f * maxPixelError / (Real)vp->getActualHeight();
+        // W. de Boer 2000 calculation
+        // A = vp_near / abs(vp_top)
+        // A = 1 / tan(fovy*0.5)    (== 1 for fovy=45*2)
+        Real A = 1.0f / Math::Tan(cam->getFOVy() * 0.5f);
+        // T = 2 * maxPixelError / vertRes
+        Real maxPixelError = TerrainGlobalOptions::getSingleton().getMaxPixelError() * cam->_getLodBiasInverse();
+        Real T = 2.0f * maxPixelError / (Real)vp->getActualHeight();
 
-		// CFactor = A / T
-		Real cFactor = A / T;
+        // CFactor = A / T
+        Real cFactor = A / T;
 
-		int maxLod = traverseTreeByDistance(terrain->getQuadTree(), cam, cFactor, holdDistance);
-		if (maxLod >= 0)
-			terrain->load(maxLod,synchronous);
-	}
+        int maxLod = traverseTreeByDistance(terrain->getQuadTree(), cam, cFactor, holdDistance);
+        if (maxLod >= 0)
+            terrain->load(maxLod,synchronous);
+    }
 
-	int TerrainAutoUpdateLodByDistance::traverseTreeByDistance(TerrainQuadTreeNode *node,
-			const Camera *cam, Real cFactor, const Real holdDistance)
-	{
-		if (!node->isLeaf())
-		{
-			int ret, tmp = -1;
-			for (int i = 0; i < 4; ++i)
-			{
-				ret = traverseTreeByDistance(node->getChild(i), cam, cFactor, holdDistance);
-				if (ret != -1)
-				{
-					if (tmp == -1 || ret < tmp)
-						tmp = ret;
-				}
-			}
+    int TerrainAutoUpdateLodByDistance::traverseTreeByDistance(TerrainQuadTreeNode *node,
+            const Camera *cam, Real cFactor, const Real holdDistance)
+    {
+        if (!node->isLeaf())
+        {
+            int ret, tmp = -1;
+            for (int i = 0; i < 4; ++i)
+            {
+                ret = traverseTreeByDistance(node->getChild(i), cam, cFactor, holdDistance);
+                if (ret != -1)
+                {
+                    if (tmp == -1 || ret < tmp)
+                        tmp = ret;
+                }
+            }
 
-			if (tmp != -1)
-				return tmp;
-	    }
+            if (tmp != -1)
+                return tmp;
+        }
 
-		Vector3 localPos = cam->getDerivedPosition() - node->getLocalCentre() - node->getTerrain()->getPosition();
-		Real dist;
-		if (TerrainGlobalOptions::getSingleton().getUseRayBoxDistanceCalculation())
-		{
-			// Get distance to this terrain node (to closest point of the box)
-			// head towards centre of the box (note, box may not cover mLocalCentre because of height)
-			Vector3 dir(node->getAABB().getCenter() - localPos);
-			dir.normalise();
-			Ray ray(localPos, dir);
-			std::pair<bool, Real> intersectRes = Math::intersects(ray, node->getAABB());
+        Vector3 localPos = cam->getDerivedPosition() - node->getLocalCentre() - node->getTerrain()->getPosition();
+        Real dist;
+        if (TerrainGlobalOptions::getSingleton().getUseRayBoxDistanceCalculation())
+        {
+            // Get distance to this terrain node (to closest point of the box)
+            // head towards centre of the box (note, box may not cover mLocalCentre because of height)
+            Vector3 dir(node->getAABB().getCenter() - localPos);
+            dir.normalise();
+            Ray ray(localPos, dir);
+            std::pair<bool, Real> intersectRes = Math::intersects(ray, node->getAABB());
 
-			// ray will always intersect, we just want the distance
-			dist = intersectRes.second;
-		}
-		else
-		{
-			// distance to tile centre
-			dist = localPos.length();
-			// deduct half the radius of the box, assume that on average the
-			// worst case is best approximated by this
-			dist -= (node->getBoundingRadius() * 0.5f);
-		}
+            // ray will always intersect, we just want the distance
+            dist = intersectRes.second;
+        }
+        else
+        {
+            // distance to tile centre
+            dist = localPos.length();
+            // deduct half the radius of the box, assume that on average the
+            // worst case is best approximated by this
+            dist -= (node->getBoundingRadius() * 0.5f);
+        }
 
-		// For each LOD, the distance at which the LOD will transition *downwards*
-		// is given by
-		// distTransition = maxDelta * cFactor;
-		for (uint16 lodLevel = 0; lodLevel < node->getLodCount(); ++lodLevel)
-		{
-			// If we have no parent, and this is the lowest LOD, we always render
-			// this is the 'last resort' so to speak, we always enoucnter this last
-			if (lodLevel+1 == node->getLodCount() && !node->getParent())
-				return lodLevel + node->getBaseLod();
-			else
-			{
-				// Calculate or reuse transition distance
-				Real distTransition;
-				if (Math::RealEqual(cFactor, node->getLodLevel(lodLevel)->lastCFactor))
-					distTransition = node->getLodLevel(lodLevel)->lastTransitionDist;
-				else
-					distTransition = node->getLodLevel(lodLevel)->maxHeightDelta * cFactor;
+        // For each LOD, the distance at which the LOD will transition *downwards*
+        // is given by
+        // distTransition = maxDelta * cFactor;
+        for (uint16 lodLevel = 0; lodLevel < node->getLodCount(); ++lodLevel)
+        {
+            // If we have no parent, and this is the lowest LOD, we always render
+            // this is the 'last resort' so to speak, we always enoucnter this last
+            if (lodLevel+1 == node->getLodCount() && !node->getParent())
+                return lodLevel + node->getBaseLod();
+            else
+            {
+                // Calculate or reuse transition distance
+                Real distTransition;
+                if (Math::RealEqual(cFactor, node->getLodLevel(lodLevel)->lastCFactor))
+                    distTransition = node->getLodLevel(lodLevel)->lastTransitionDist;
+                else
+                    distTransition = node->getLodLevel(lodLevel)->maxHeightDelta * cFactor;
 
-				if ((dist - holdDistance) < distTransition)
-					return lodLevel + node->getBaseLod();
-			}
-		}
+                if ((dist - holdDistance) < distTransition)
+                    return lodLevel + node->getBaseLod();
+            }
+        }
 
-		return -1;
-	}
+        return -1;
+    }
 }

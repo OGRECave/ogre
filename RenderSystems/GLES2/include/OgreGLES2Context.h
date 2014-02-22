@@ -64,10 +64,10 @@ namespace Ogre {
             */
             virtual GLES2Context* clone() const = 0;
 
-		/**
-		* Release the render context.
-		*/
-		virtual void releaseContext() {}
+        /**
+        * Release the render context.
+        */
+        virtual void releaseContext() {}
 
         protected:
             bool initialized;

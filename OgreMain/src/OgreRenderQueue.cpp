@@ -44,7 +44,7 @@ namespace Ogre {
 
     //---------------------------------------------------------------------
     RenderQueue::RenderQueue()
-		: mRenderableListener(0)
+        : mRenderableListener(0)
     {
         // Create the 'main' queue up-front since we'll always need that
         mGroups.insert(
@@ -55,7 +55,7 @@ namespace Ogre {
 
         // set default queue
         mDefaultQueueGroup = RENDER_QUEUE_MAIN;
-		mDefaultRenderablePriority = OGRE_RENDERABLE_DEFAULT_PRIORITY;
+        mDefaultRenderablePriority = OGRE_RENDERABLE_DEFAULT_PRIORITY;
 
     }
     //---------------------------------------------------------------------
@@ -86,13 +86,13 @@ namespace Ogre {
         RenderQueueGroup* pGroup = getQueueGroup(groupID);
 
 
-		Technique* pTech;
+        Technique* pTech;
 
-		// tell material it's been used
-		if (!pRend->getMaterial().isNull())
-			pRend->getMaterial()->touch();
+        // tell material it's been used
+        if (!pRend->getMaterial().isNull())
+            pRend->getMaterial()->touch();
 
-		// Check material & technique supplied (the former since the default implementation
+        // Check material & technique supplied (the former since the default implementation
         // of getTechnique is based on it for backwards compatibility
         if(pRend->getMaterial().isNull() || !pRend->getTechnique())
         {
@@ -100,20 +100,20 @@ namespace Ogre {
             MaterialPtr baseWhite = MaterialManager::getSingleton().getByName("BaseWhite");
             pTech = baseWhite->getTechnique(0);
         }
-		else
-			pTech = pRend->getTechnique();
+        else
+            pTech = pRend->getTechnique();
 
-		if (mRenderableListener)
-		{
-			// Allow listener to override technique and to abort
-			if (!mRenderableListener->renderableQueued(pRend, groupID, priority, 
-				&pTech, this))
-				return; // rejected
+        if (mRenderableListener)
+        {
+            // Allow listener to override technique and to abort
+            if (!mRenderableListener->renderableQueued(pRend, groupID, priority, 
+                &pTech, this))
+                return; // rejected
 
-			// tell material it's been used (incase changed)
-			pTech->getParent()->touch();
-		}
-		
+            // tell material it's been used (incase changed)
+            pTech->getParent()->touch();
+        }
+        
         pGroup->addRenderable(pRend, pTech, priority);
 
     }
@@ -164,7 +164,7 @@ namespace Ogre {
     {
         addRenderable(pRend, groupID, mDefaultRenderablePriority);
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void RenderQueue::addRenderable(Renderable* pRend)
     {
         addRenderable(pRend, mDefaultQueueGroup, mDefaultRenderablePriority);
@@ -189,43 +189,43 @@ namespace Ogre {
     {
         mDefaultRenderablePriority = priority;
     }
-	
-	
-	//-----------------------------------------------------------------------
-	RenderQueueGroup* RenderQueue::getQueueGroup(uint8 groupID)
-	{
-		// Find group
-		RenderQueueGroupMap::iterator groupIt;
-		RenderQueueGroup* pGroup;
+    
+    
+    //-----------------------------------------------------------------------
+    RenderQueueGroup* RenderQueue::getQueueGroup(uint8 groupID)
+    {
+        // Find group
+        RenderQueueGroupMap::iterator groupIt;
+        RenderQueueGroup* pGroup;
 
-		groupIt = mGroups.find(groupID);
-		if (groupIt == mGroups.end())
-		{
-			// Insert new
-			pGroup = OGRE_NEW RenderQueueGroup(this);
-			mGroups.insert(RenderQueueGroupMap::value_type(groupID, pGroup));
-		}
-		else
-		{
-			pGroup = groupIt->second;
-		}
+        groupIt = mGroups.find(groupID);
+        if (groupIt == mGroups.end())
+        {
+            // Insert new
+            pGroup = OGRE_NEW RenderQueueGroup(this);
+            mGroups.insert(RenderQueueGroupMap::value_type(groupID, pGroup));
+        }
+        else
+        {
+            pGroup = groupIt->second;
+        }
 
-		return pGroup;
+        return pGroup;
 
-	}
-	//-----------------------------------------------------------------------
-	void RenderQueue::merge( const RenderQueue* rhs )
-	{
-		ConstQueueGroupIterator it = rhs->_getQueueGroupIterator( );
+    }
+    //-----------------------------------------------------------------------
+    void RenderQueue::merge( const RenderQueue* rhs )
+    {
+        ConstQueueGroupIterator it = rhs->_getQueueGroupIterator( );
 
-		while( it.hasMoreElements() )
-		{
-			uint8 groupID = it.peekNextKey();
-			RenderQueueGroup* pSrcGroup = it.getNext();
-			RenderQueueGroup* pDstGroup = getQueueGroup( groupID );
+        while( it.hasMoreElements() )
+        {
+            uint8 groupID = it.peekNextKey();
+            RenderQueueGroup* pSrcGroup = it.getNext();
+            RenderQueueGroup* pDstGroup = getQueueGroup( groupID );
 
-			pDstGroup->merge( pSrcGroup );
-		}
-	}
+            pDstGroup->merge( pSrcGroup );
+        }
+    }
 }
 

@@ -33,12 +33,12 @@ THE SOFTWARE.
 
 namespace Ogre  {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
     namespace EmitterCommands {
         /// Command object for ParticleEmitter  - see ParamCommand 
@@ -87,7 +87,7 @@ namespace Ogre  {
             void doSet(void* target, const String& val);
         };
 
-		/// Command object for particle emitter  - see ParamCommand 
+        /// Command object for particle emitter  - see ParamCommand 
         class _OgreExport CmdDirPositionRef : public ParamCommand
         {
         public:
@@ -193,7 +193,7 @@ namespace Ogre  {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
-		/// Command object for particle emitter  - see ParamCommand
+        /// Command object for particle emitter  - see ParamCommand
         class _OgreExport CmdName : public ParamCommand
         {
         public:
@@ -201,7 +201,7 @@ namespace Ogre  {
             void doSet(void* target, const String& val);
         };
 
-		/// Command object for particle emitter  - see ParamCommand 
+        /// Command object for particle emitter  - see ParamCommand 
         class _OgreExport CmdEmittedEmitter : public ParamCommand
         {
         public:
@@ -210,8 +210,8 @@ namespace Ogre  {
         };
 
     }
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

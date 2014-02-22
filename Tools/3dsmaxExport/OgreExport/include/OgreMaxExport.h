@@ -6,21 +6,21 @@ class Interface;
 
 namespace OgreMax {
 
-	class Config;
+    class Config;
 
-	class OgreMaxExporter {
-	public:
-		OgreMaxExporter(const Config& config) : m_config(config) {}
+    class OgreMaxExporter {
+    public:
+        OgreMaxExporter(const Config& config) : m_config(config) {}
 
-		void setMaxInterface(ExpInterface* ei, Interface* i) { m_ei = ei; m_i = i; }
+        void setMaxInterface(ExpInterface* ei, Interface* i) { m_ei = ei; m_i = i; }
 
-	protected:
-		// configuration data
-		const Config&	m_config;
+    protected:
+        // configuration data
+        const Config&   m_config;
 
-		ExpInterface *m_ei;
-		Interface *m_i;
-	};
+        ExpInterface *m_ei;
+        Interface *m_i;
+    };
 
 }
 

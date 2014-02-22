@@ -35,19 +35,19 @@ THE SOFTWARE
 class ProjectWizard : public wxWizard
 {
 public:
-	ProjectWizard();
-	virtual ~ProjectWizard();
+    ProjectWizard();
+    virtual ~ProjectWizard();
 
-	bool Create(wxWindow* parent, int id = -1, const wxString& title = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap, const wxPoint& pos = wxDefaultPosition, long style = wxDEFAULT_DIALOG_STYLE);
+    bool Create(wxWindow* parent, int id = -1, const wxString& title = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap, const wxPoint& pos = wxDefaultPosition, long style = wxDEFAULT_DIALOG_STYLE);
 
-	ProjectPage* getProjectPage() const;
+    ProjectPage* getProjectPage() const;
 
-	void OnFinish(wxWizardEvent& event);
+    void OnFinish(wxWizardEvent& event);
 
 protected:
-	ProjectPage* mProjectPage;
+    ProjectPage* mProjectPage;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _PROJECTWIZARD_H_

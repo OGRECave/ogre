@@ -1,14 +1,14 @@
 /**********************************************************************
  *<
-	FILE: PhyExport.h
+    FILE: PhyExport.h
 
-	DESCRIPTION:	Template Utility
+    DESCRIPTION:    Template Utility
 
-	CREATED BY:
+    CREATED BY:
 
-	HISTORY:
+    HISTORY:
 
- *>	Copyright (c) 1997, All Rights Reserved.
+ *> Copyright (c) 1997, All Rights Reserved.
  **********************************************************************/
 
 #ifndef __PHYEXPORT__H

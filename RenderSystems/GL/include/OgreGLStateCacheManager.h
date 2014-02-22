@@ -37,7 +37,7 @@ typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
 
 namespace Ogre
 {
-	class GLStateCacheManagerImp;
+    class GLStateCacheManagerImp;
 
     /** An in memory cache of the OpenGL state.
      @remarks
@@ -55,11 +55,11 @@ namespace Ogre
     class _OgreGLExport GLStateCacheManager : public StateCacheAlloc
     {
     private:
-		GLStateCacheManagerImp* mImp;
+        GLStateCacheManagerImp* mImp;
         typedef map<intptr_t, GLStateCacheManagerImp*>::type CachesMap;
         typedef MapIterator<CachesMap> CachesMapIterator;
 
-		CachesMap mCaches;
+        CachesMap mCaches;
 
     public:
         GLStateCacheManager(void);
@@ -79,22 +79,22 @@ namespace Ogre
         /** Clears all cached values
         */
         void clearCache();
-		
-		/** Bind an OpenGL buffer of any type.
+        
+        /** Bind an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
         void bindGLBuffer(GLenum target, GLuint buffer, bool force = false);
 
-		/** Delete an OpenGL buffer of any type.
+        /** Delete an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
         void deleteGLBuffer(GLenum target, GLuint buffer, bool force = false);
 
-		/** Bind an OpenGL texture of any type.
+        /** Bind an OpenGL texture of any type.
          @param target The texture target.
          @param texture The texture ID.
          */
@@ -161,7 +161,7 @@ namespace Ogre
          */
         void setDepthFunc(GLenum func);
 
-		/** Gets the clear depth in the range from [0..1].
+        /** Gets the clear depth in the range from [0..1].
          @return The current clearing depth.
          */
         GLclampf getClearDepth(void) const;

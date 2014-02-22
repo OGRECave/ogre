@@ -57,7 +57,7 @@ namespace Ogre {
             virtual void endCurrent();
             virtual GLES2Context* clone() const = 0;
 
-	    EGLSurface getDrawable() const;
+        EGLSurface getDrawable() const;
 
     };
 }

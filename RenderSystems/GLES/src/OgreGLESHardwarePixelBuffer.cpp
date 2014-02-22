@@ -469,12 +469,12 @@ namespace Ogre {
     // @author W.J. van der Laan
     void GLESTextureBuffer::blitFromTexture(GLESTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
-		if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_FBO) == false)
-		{
-			// the following code depends on FBO support, it crashes if FBO is not supported.
-			// TODO - write PBUFFER version of this function or a version that doesn't require FBO
-			return; // for now - do nothing.
-		}
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_FBO) == false)
+        {
+            // the following code depends on FBO support, it crashes if FBO is not supported.
+            // TODO - write PBUFFER version of this function or a version that doesn't require FBO
+            return; // for now - do nothing.
+        }
 
 //        std::cerr << "GLESTextureBuffer::blitFromTexture " <<
 //        src->mTextureID << ":" << srcBox.left << "," << srcBox.top << "," << srcBox.right << "," << srcBox.bottom << " " << 

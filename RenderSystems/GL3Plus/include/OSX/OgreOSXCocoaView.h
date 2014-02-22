@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 @interface OgreGL3PlusView : NSView
 {
-	Ogre::RenderWindow *window;
+    Ogre::RenderWindow *window;
 }
 
 - (id)initWithFrame:(NSRect)f;

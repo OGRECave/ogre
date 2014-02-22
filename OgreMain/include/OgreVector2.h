@@ -35,13 +35,13 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** Standard 2-dimensional vector.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** Standard 2-dimensional vector.
         @remarks
             A direction in 2D space represented as distances along the 2
             orthogonal axes (x, y). Note that positions, directions and
@@ -85,38 +85,38 @@ namespace Ogre
         {
         }
 
-		/** Exchange the contents of this vector with another. 
-		*/
-		inline void swap(Vector2& other)
-		{
-			std::swap(x, other.x);
-			std::swap(y, other.y);
-		}
+        /** Exchange the contents of this vector with another. 
+        */
+        inline void swap(Vector2& other)
+        {
+            std::swap(x, other.x);
+            std::swap(y, other.y);
+        }
 
-		inline Real operator [] ( const size_t i ) const
+        inline Real operator [] ( const size_t i ) const
         {
             assert( i < 2 );
 
             return *(&x+i);
         }
 
-		inline Real& operator [] ( const size_t i )
+        inline Real& operator [] ( const size_t i )
         {
             assert( i < 2 );
 
             return *(&x+i);
         }
 
-		/// Pointer accessor for direct copying
-		inline Real* ptr()
-		{
-			return &x;
-		}
-		/// Pointer accessor for direct copying
-		inline const Real* ptr() const
-		{
-			return &x;
-		}
+        /// Pointer accessor for direct copying
+        inline Real* ptr()
+        {
+            return &x;
+        }
+        /// Pointer accessor for direct copying
+        inline const Real* ptr() const
+        {
+            return &x;
+        }
 
         /** Assigns the value of the other vector.
             @param
@@ -130,13 +130,13 @@ namespace Ogre
             return *this;
         }
 
-		inline Vector2& operator = ( const Real fScalar)
-		{
-			x = fScalar;
-			y = fScalar;
+        inline Vector2& operator = ( const Real fScalar)
+        {
+            x = fScalar;
+            y = fScalar;
 
-			return *this;
-		}
+            return *this;
+        }
 
         inline bool operator == ( const Vector2& rkVector ) const
         {
@@ -405,7 +405,7 @@ namespace Ogre
             Real fLength = Math::Sqrt( x * x + y * y);
 
             // Will also work for zero-sized vectors, but will change nothing
-			// We're not using epsilons because we don't need to.
+            // We're not using epsilons because we don't need to.
             // Read http://www.ogre3d.org/forums/viewtopic.php?f=4&t=61259
             if ( fLength > Real(0.0f) )
             {
@@ -486,7 +486,7 @@ namespace Ogre
         }
 
         /** Calculates the 2 dimensional cross-product of 2 vectors, which results
-			in a single floating point value which is 2 times the area of the triangle.
+            in a single floating point value which is 2 times the area of the triangle.
         */
         inline Real crossProduct( const Vector2& rkVector ) const
         {
@@ -539,43 +539,43 @@ namespace Ogre
             return Vector2( *this - ( 2 * this->dotProduct(normal) * normal ) );
         }
 
-		/// Check whether this vector contains valid values
-		inline bool isNaN() const
-		{
-			return Math::isNaN(x) || Math::isNaN(y);
-		}
+        /// Check whether this vector contains valid values
+        inline bool isNaN() const
+        {
+            return Math::isNaN(x) || Math::isNaN(y);
+        }
 
-		/**	 Gets the angle between 2 vectors.
-		@remarks
-			Vectors do not have to be unit-length but must represent directions.
-		*/
-		inline Ogre::Radian angleBetween(const Ogre::Vector2& other) const
-		{		
-			Ogre::Real lenProduct = length() * other.length();
-			// Divide by zero check
-			if(lenProduct < 1e-6f)
-				lenProduct = 1e-6f;
-		
-			Ogre::Real f = dotProduct(other) / lenProduct;
-	
-			f = Ogre::Math::Clamp(f, (Ogre::Real)-1.0, (Ogre::Real)1.0);
-			return Ogre::Math::ACos(f);
-		}
+        /**  Gets the angle between 2 vectors.
+        @remarks
+            Vectors do not have to be unit-length but must represent directions.
+        */
+        inline Ogre::Radian angleBetween(const Ogre::Vector2& other) const
+        {       
+            Ogre::Real lenProduct = length() * other.length();
+            // Divide by zero check
+            if(lenProduct < 1e-6f)
+                lenProduct = 1e-6f;
+        
+            Ogre::Real f = dotProduct(other) / lenProduct;
+    
+            f = Ogre::Math::Clamp(f, (Ogre::Real)-1.0, (Ogre::Real)1.0);
+            return Ogre::Math::ACos(f);
+        }
 
-		/**	 Gets the oriented angle between 2 vectors.
-		@remarks
-			Vectors do not have to be unit-length but must represent directions.
-			The angle is comprised between 0 and 2 PI.
-		*/
-		inline Ogre::Radian angleTo(const Ogre::Vector2& other) const
-		{
-			Ogre::Radian angle = angleBetween(other);
-		
-			if (crossProduct(other)<0)			
-				angle = (Ogre::Radian)Ogre::Math::TWO_PI - angle;		
+        /**  Gets the oriented angle between 2 vectors.
+        @remarks
+            Vectors do not have to be unit-length but must represent directions.
+            The angle is comprised between 0 and 2 PI.
+        */
+        inline Ogre::Radian angleTo(const Ogre::Vector2& other) const
+        {
+            Ogre::Radian angle = angleBetween(other);
+        
+            if (crossProduct(other)<0)          
+                angle = (Ogre::Radian)Ogre::Math::TWO_PI - angle;       
 
-			return angle;
-		}
+            return angle;
+        }
 
         // special points
         static const Vector2 ZERO;
@@ -594,8 +594,8 @@ namespace Ogre
             return o;
         }
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 #endif

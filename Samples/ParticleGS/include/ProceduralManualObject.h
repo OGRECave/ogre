@@ -21,51 +21,51 @@ same license as the rest of the engine.
 
 namespace Ogre
 {
-	class ProceduralManualObject : public SimpleRenderable
-	{
-	public:
-		ProceduralManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
-			: SimpleRenderable( id, objectMemoryManager ) {}
-		virtual ~ProceduralManualObject() {}
+    class ProceduralManualObject : public SimpleRenderable
+    {
+    public:
+        ProceduralManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
+            : SimpleRenderable( id, objectMemoryManager ) {}
+        virtual ~ProceduralManualObject() {}
 
-		void setRenderToVertexBuffer(RenderToVertexBufferSharedPtr r2vbObject)
-			{ mR2vbObject = r2vbObject; }
-		const RenderToVertexBufferSharedPtr& getRenderToVertexBuffer()
-			{ return mR2vbObject; }
-		
-		void setManualObject(ManualObject* manualObject);
-		ManualObject* getManualObject() const { return mManualObject; }
+        void setRenderToVertexBuffer(RenderToVertexBufferSharedPtr r2vbObject)
+            { mR2vbObject = r2vbObject; }
+        const RenderToVertexBufferSharedPtr& getRenderToVertexBuffer()
+            { return mR2vbObject; }
+        
+        void setManualObject(ManualObject* manualObject);
+        ManualObject* getManualObject() const { return mManualObject; }
 
-		/** @copydoc SimpleRenderable::_updateRenderQueue. */
+        /** @copydoc SimpleRenderable::_updateRenderQueue. */
         void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
-		/** @copydoc SimpleRenderable::getMovableType. */
-		const String& getMovableType(void) const;
-		/** @copydoc SimpleRenderable::getRenderOperation. */
-		void getRenderOperation(RenderOperation& op);
+        /** @copydoc SimpleRenderable::getMovableType. */
+        const String& getMovableType(void) const;
+        /** @copydoc SimpleRenderable::getRenderOperation. */
+        void getRenderOperation(RenderOperation& op);
 
-		//Delegate to the manual object
-		Real getSquaredViewDepth(const Ogre::Camera* cam) const 
-			{ return mManualObject->getSection(0)->getSquaredViewDepth(cam); }
-	protected:
-		ManualObject* mManualObject;
-		RenderToVertexBufferSharedPtr mR2vbObject;
-	};
+        //Delegate to the manual object
+        Real getSquaredViewDepth(const Ogre::Camera* cam) const 
+            { return mManualObject->getSection(0)->getSquaredViewDepth(cam); }
+    protected:
+        ManualObject* mManualObject;
+        RenderToVertexBufferSharedPtr mR2vbObject;
+    };
 
-	class ProceduralManualObjectFactory : public MovableObjectFactory
-	{
-	protected:
-			MovableObject* createInstanceImpl( IdType id,
-											ObjectMemoryManager *objectMemoryManager,
-											const NameValuePairList* params );
-		public:
-			ProceduralManualObjectFactory() {}
-			~ProceduralManualObjectFactory() {}
+    class ProceduralManualObjectFactory : public MovableObjectFactory
+    {
+    protected:
+            MovableObject* createInstanceImpl( IdType id,
+                                            ObjectMemoryManager *objectMemoryManager,
+                                            const NameValuePairList* params );
+        public:
+            ProceduralManualObjectFactory() {}
+            ~ProceduralManualObjectFactory() {}
 
-			static String FACTORY_TYPE_NAME;
+            static String FACTORY_TYPE_NAME;
 
-			const String& getType(void) const;
-			void destroyInstance( MovableObject* obj);  
-	};
+            const String& getType(void) const;
+            void destroyInstance( MovableObject* obj);  
+    };
 
 }
 #endif

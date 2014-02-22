@@ -59,7 +59,7 @@ namespace Ogre {
         /** @copydoc GLRTTManager::createRenderTexture
         */
         virtual RenderTexture *createRenderTexture(const String &name, 
-			const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+            const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
         
          /** @copydoc GLRTTManager::checkFormat
         */
@@ -87,10 +87,10 @@ namespace Ogre {
     protected:
         /** GLSupport reference, used to create PBuffers */
         GLSupport *mSupport;
-		/** Primary window reference */
-		RenderTarget *mMainWindow;
-		/** Primary window context */
-		GLContext *mMainContext;
+        /** Primary window reference */
+        RenderTarget *mMainWindow;
+        /** Primary window context */
+        GLContext *mMainContext;
         /** Reference to a PBuffer, with refcount */
         struct PBRef
         {

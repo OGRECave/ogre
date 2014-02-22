@@ -30,63 +30,63 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	GL3PlusFBOMultiRenderTarget::GL3PlusFBOMultiRenderTarget(GL3PlusFBOManager *manager, const String &name):
-		MultiRenderTarget(name),
-		fbo(manager, 0 /* TODO: multisampling on MRTs? */)
-	{
-	}
-	GL3PlusFBOMultiRenderTarget::~GL3PlusFBOMultiRenderTarget()
-	{
-	}
+    GL3PlusFBOMultiRenderTarget::GL3PlusFBOMultiRenderTarget(GL3PlusFBOManager *manager, const String &name):
+        MultiRenderTarget(name),
+        fbo(manager, 0 /* TODO: multisampling on MRTs? */)
+    {
+    }
+    GL3PlusFBOMultiRenderTarget::~GL3PlusFBOMultiRenderTarget()
+    {
+    }
 
-	void GL3PlusFBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
-	{
-		// Check if the render target is in the rendertarget->FBO map
+    void GL3PlusFBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
+    {
+        // Check if the render target is in the rendertarget->FBO map
         GL3PlusFrameBufferObject *fbobj = 0;
         target->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbobj);
-		assert(fbobj);
-		fbo.bindSurface(attachment, fbobj->getSurface(0));
+        assert(fbobj);
+        fbo.bindSurface(attachment, fbobj->getSurface(0));
 
-		// Set width and height
-		mWidth = fbo.getWidth();
-		mHeight = fbo.getHeight();
-	}
+        // Set width and height
+        mWidth = fbo.getWidth();
+        mHeight = fbo.getHeight();
+    }
 
-	void GL3PlusFBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
-	{
-		fbo.unbindSurface(attachment);
+    void GL3PlusFBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
+    {
+        fbo.unbindSurface(attachment);
 
-		// Set width and height
-		mWidth = fbo.getWidth();
-		mHeight = fbo.getHeight();
-	}
+        // Set width and height
+        mWidth = fbo.getWidth();
+        mHeight = fbo.getHeight();
+    }
 
-	void GL3PlusFBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
-	{
-		if(name == GL3PlusRenderTexture::CustomAttributeString_FBO)
+    void GL3PlusFBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
+    {
+        if(name == GL3PlusRenderTexture::CustomAttributeString_FBO)
         {
             *static_cast<GL3PlusFrameBufferObject **>(pData) = &fbo;
         }
-	}
-	//-----------------------------------------------------------------------------
-	bool GL3PlusFBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
-	{
-		bool result;
-		if( (result = MultiRenderTarget::attachDepthBuffer( depthBuffer )) )
-			fbo.attachDepthBuffer( depthBuffer );
+    }
+    //-----------------------------------------------------------------------------
+    bool GL3PlusFBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        bool result;
+        if( (result = MultiRenderTarget::attachDepthBuffer( depthBuffer )) )
+            fbo.attachDepthBuffer( depthBuffer );
 
-		return result;
-	}
-	//-----------------------------------------------------------------------------
-	void GL3PlusFBOMultiRenderTarget::detachDepthBuffer()
-	{
-		fbo.detachDepthBuffer();
-		MultiRenderTarget::detachDepthBuffer();
-	}
-	//-----------------------------------------------------------------------------
-	void GL3PlusFBOMultiRenderTarget::_detachDepthBuffer()
-	{
-		fbo.detachDepthBuffer();
-		MultiRenderTarget::_detachDepthBuffer();
-	}
+        return result;
+    }
+    //-----------------------------------------------------------------------------
+    void GL3PlusFBOMultiRenderTarget::detachDepthBuffer()
+    {
+        fbo.detachDepthBuffer();
+        MultiRenderTarget::detachDepthBuffer();
+    }
+    //-----------------------------------------------------------------------------
+    void GL3PlusFBOMultiRenderTarget::_detachDepthBuffer()
+    {
+        fbo.detachDepthBuffer();
+        MultiRenderTarget::_detachDepthBuffer();
+    }
 }

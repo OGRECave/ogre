@@ -34,12 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	HardwareCounterBuffer::HardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
-									HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-		: HardwareBuffer(usage, false, useShadowBuffer)
-		, mName(name)
-	{
-		// Calculate the size of the vertices
+    HardwareCounterBuffer::HardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
+                                    HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+        : HardwareBuffer(usage, false, useShadowBuffer)
+        , mName(name)
+    {
+        // Calculate the size of the vertices
         mSizeInBytes = sizeBytes;
 
         // Create a shadow buffer if required
@@ -47,21 +47,21 @@ namespace Ogre {
         {
             mShadowBuffer = OGRE_NEW DefaultHardwareCounterBuffer(mMgr, sizeBytes, HardwareBuffer::HBU_DYNAMIC, false);
         }
-	}
-	
-	HardwareCounterBuffer::~HardwareCounterBuffer()
-	{
-		if (mMgr)
-		{
-			mMgr->_notifyCounterBufferDestroyed(this);
-		}
+    }
+    
+    HardwareCounterBuffer::~HardwareCounterBuffer()
+    {
+        if (mMgr)
+        {
+            mMgr->_notifyCounterBufferDestroyed(this);
+        }
         if (mShadowBuffer)
         {
             OGRE_DELETE mShadowBuffer;
         }
-	}
+    }
 
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     HardwareCounterBufferSharedPtr::HardwareCounterBufferSharedPtr(HardwareCounterBuffer* buf)
         : SharedPtr<HardwareCounterBuffer>(buf)
     {

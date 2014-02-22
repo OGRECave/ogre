@@ -32,43 +32,43 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	void CompositorNodeDef::getTextureSource( size_t outputChannel, size_t &index,
-												TextureSource &textureSource ) const
-	{
-		decodeTexSource( mOutChannelMapping[outputChannel], index, textureSource );
-		assert( textureSource != TEXTURE_GLOBAL && "Can't use global textures in the output channel!" );
-	}
-	//-----------------------------------------------------------------------------------
-	CompositorTargetDef* CompositorNodeDef::addTargetPass( const String &renderTargetName,
-															uint32 rtIndex )
-	{
-		assert( mTargetPasses.size() < mTargetPasses.capacity() &&
-				"setNumTargetPass called improperly!" );
+    void CompositorNodeDef::getTextureSource( size_t outputChannel, size_t &index,
+                                                TextureSource &textureSource ) const
+    {
+        decodeTexSource( mOutChannelMapping[outputChannel], index, textureSource );
+        assert( textureSource != TEXTURE_GLOBAL && "Can't use global textures in the output channel!" );
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorTargetDef* CompositorNodeDef::addTargetPass( const String &renderTargetName,
+                                                            uint32 rtIndex )
+    {
+        assert( mTargetPasses.size() < mTargetPasses.capacity() &&
+                "setNumTargetPass called improperly!" );
 
-		if( renderTargetName.find( "global_" ) == 0 )
-			addTextureSourceName( renderTargetName, 0, TEXTURE_GLOBAL );
+        if( renderTargetName.find( "global_" ) == 0 )
+            addTextureSourceName( renderTargetName, 0, TEXTURE_GLOBAL );
 
-		mTargetPasses.push_back( CompositorTargetDef( renderTargetName, rtIndex, this ) );
-		return &mTargetPasses.back();
-	}
-	//-----------------------------------------------------------------------------------
-	void CompositorNodeDef::mapOutputChannel( size_t outChannel, IdString textureName )
-	{
-		size_t index;
-		TextureSource textureSource;
-		getTextureSource( textureName, index, textureSource );
+        mTargetPasses.push_back( CompositorTargetDef( renderTargetName, rtIndex, this ) );
+        return &mTargetPasses.back();
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNodeDef::mapOutputChannel( size_t outChannel, IdString textureName )
+    {
+        size_t index;
+        TextureSource textureSource;
+        getTextureSource( textureName, index, textureSource );
 
-		mOutChannelMapping.resize( outChannel+1 );
+        mOutChannelMapping.resize( outChannel+1 );
 
-		if( textureSource != TEXTURE_GLOBAL )
-		{
-			mOutChannelMapping[outChannel] = encodeTexSource( (uint32)index, textureSource );
-		}
-		else
-		{
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-						"Can't use global textures as an output channel!. Node: '" +
-						mName.getFriendlyText() + "'", "CompositorNodeDef::mapOutputChannel" );
-		}
-	}
+        if( textureSource != TEXTURE_GLOBAL )
+        {
+            mOutChannelMapping[outChannel] = encodeTexSource( (uint32)index, textureSource );
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                        "Can't use global textures as an output channel!. Node: '" +
+                        mName.getFriendlyText() + "'", "CompositorNodeDef::mapOutputChannel" );
+        }
+    }
 }

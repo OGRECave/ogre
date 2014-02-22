@@ -35,13 +35,13 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/** An abstraction of a viewport, i.e. a rendering region on a render
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /** An abstraction of a viewport, i.e. a rendering region on a render
         target.
         @remarks
             A viewport is the meeting of a camera and a rendering surface -
@@ -54,11 +54,11 @@ namespace Ogre {
             viewport on a single render target and they overlap, one must
             obscure the other in some predetermined way.
     */
-	class _OgreExport Viewport : public ViewportAlloc
+    class _OgreExport Viewport : public ViewportAlloc
     {
     public:
-		/// @copydoc MovableObject::mGlobalIndex
-		size_t mGlobalIndex;
+        /// @copydoc MovableObject::mGlobalIndex
+        size_t mGlobalIndex;
 
         /** The usual constructor.
             @param camera
@@ -95,31 +95,31 @@ namespace Ogre {
 
         /** Instructs the viewport to updates its contents.
         */
-		void _updateCullPhase01(Camera* camera, const Camera *lodCamera, uint8 firstRq, uint8 lastRq );
-		void _updateRenderPhase02( Camera* camera, const Camera *lodCamera,
-								   uint8 firstRq, uint8 lastRq );
-		
-		/** Instructs the viewport to clear itself, without performing an update.
-		 @remarks
-			You would not normally call this method when updating the viewport, 
-			since the viewport usually clears itself when updating anyway (@see 
-		    Viewport::setClearEveryFrame). However, if you wish you have the
-			option of manually clearing the frame buffer (or elements of it)
-		    using this method.
-		 @param buffers Bitmask identifying which buffer elements to clear
-		 @param colour The colour value to clear to, if FBT_COLOUR is included
-		 @param depth The depth value to clear to, if FBT_DEPTH is included
-		 @param stencil The stencil value to clear to, if FBT_STENCIL is included
-		*/
-		void clear(unsigned int buffers = FBT_COLOUR | FBT_DEPTH,
-				   const ColourValue& colour = ColourValue::Black, 
-				   Real depth = 1.0f, unsigned short stencil = 0);
+        void _updateCullPhase01(Camera* camera, const Camera *lodCamera, uint8 firstRq, uint8 lastRq );
+        void _updateRenderPhase02( Camera* camera, const Camera *lodCamera,
+                                   uint8 firstRq, uint8 lastRq );
+        
+        /** Instructs the viewport to clear itself, without performing an update.
+         @remarks
+            You would not normally call this method when updating the viewport, 
+            since the viewport usually clears itself when updating anyway (@see 
+            Viewport::setClearEveryFrame). However, if you wish you have the
+            option of manually clearing the frame buffer (or elements of it)
+            using this method.
+         @param buffers Bitmask identifying which buffer elements to clear
+         @param colour The colour value to clear to, if FBT_COLOUR is included
+         @param depth The depth value to clear to, if FBT_DEPTH is included
+         @param stencil The stencil value to clear to, if FBT_STENCIL is included
+        */
+        void clear(unsigned int buffers = FBT_COLOUR | FBT_DEPTH,
+                   const ColourValue& colour = ColourValue::Black, 
+                   Real depth = 1.0f, unsigned short stencil = 0);
 
         /** Retrieves a pointer to the render target for this viewport.
         */
         RenderTarget* getTarget(void) const;
 
-		/** Gets one of the relative dimensions of the viewport,
+        /** Gets one of the relative dimensions of the viewport,
             a value between 0.0 and 1.0.
         */
         Real getLeft(void) const;
@@ -189,22 +189,22 @@ namespace Ogre {
         */
         static OrientationMode getDefaultOrientationMode();
 
-		/** Set the material scheme which the viewport should use.
-		@remarks
-			This allows you to tell the system to use a particular
-			material scheme when rendering this viewport, which can 
-			involve using different techniques to render your materials.
-		@see Technique::setSchemeName
-		*/
-		void setMaterialScheme(const String& schemeName)
-		{ mMaterialSchemeName = schemeName; }
-		
-		/** Get the material scheme which the viewport should use.
-		*/
-		const String& getMaterialScheme(void) const
-		{ return mMaterialSchemeName; }
+        /** Set the material scheme which the viewport should use.
+        @remarks
+            This allows you to tell the system to use a particular
+            material scheme when rendering this viewport, which can 
+            involve using different techniques to render your materials.
+        @see Technique::setSchemeName
+        */
+        void setMaterialScheme(const String& schemeName)
+        { mMaterialSchemeName = schemeName; }
+        
+        /** Get the material scheme which the viewport should use.
+        */
+        const String& getMaterialScheme(void) const
+        { return mMaterialSchemeName; }
 
-		/** Access to actual dimensions (based on target size).
+        /** Access to actual dimensions (based on target size).
         */
         void getActualDimensions(
             int &left, int &top, int &width, int &height ) const;
@@ -244,41 +244,41 @@ namespace Ogre {
             viewport. */
         bool getSkiesEnabled(void) const;
 
-		/** Sets a per-viewport visibility mask.
-		@remarks
-			The visibility mask is a way to exclude objects from rendering for
-			a given viewport. For each object in the frustum, a check is made
-			between this mask and the objects visibility flags 
-			(@see MovableObject::setVisibilityFlags), and if a binary 'and'
-			returns zero, the object will not be rendered.
-		@par
-			Viewport's visibility mask assumes the user knows what he's doing
-			with the reserved flags!
-		*/
-		void _setVisibilityMask(uint32 mask) { mVisibilityMask = mask; }
+        /** Sets a per-viewport visibility mask.
+        @remarks
+            The visibility mask is a way to exclude objects from rendering for
+            a given viewport. For each object in the frustum, a check is made
+            between this mask and the objects visibility flags 
+            (@see MovableObject::setVisibilityFlags), and if a binary 'and'
+            returns zero, the object will not be rendered.
+        @par
+            Viewport's visibility mask assumes the user knows what he's doing
+            with the reserved flags!
+        */
+        void _setVisibilityMask(uint32 mask) { mVisibilityMask = mask; }
 
-		/** Gets a per-viewport visibility mask.
-		@see Viewport::setVisibilityMask
-		*/
-		uint getVisibilityMask(void) const { return mVisibilityMask; }
+        /** Gets a per-viewport visibility mask.
+        @see Viewport::setVisibilityMask
+        */
+        uint getVisibilityMask(void) const { return mVisibilityMask; }
 
-		/** Sets the use of a custom RenderQueueInvocationSequence for
-			rendering this target.
-		@remarks
-			RenderQueueInvocationSequence instances are managed through Root. By
-			setting this, you are indicating that you wish this RenderTarget to
-			be updated using a custom sequence of render queue invocations, with
-			potentially customised ordering and render state options. You should
-			create the named sequence through Root first, then set the name here.
-		@param sequenceName The name of the RenderQueueInvocationSequence to use. If you
-			specify a blank string, behaviour will return to the default render
-			queue management.
-		*/
-		virtual void setRenderQueueInvocationSequenceName(const String& sequenceName);
-		/** Gets the name of the render queue invocation sequence for this target. */
-		virtual const String& getRenderQueueInvocationSequenceName(void) const;
-		/// Get the invocation sequence - will return null if using standard
-		RenderQueueInvocationSequence* _getRenderQueueInvocationSequence(void);
+        /** Sets the use of a custom RenderQueueInvocationSequence for
+            rendering this target.
+        @remarks
+            RenderQueueInvocationSequence instances are managed through Root. By
+            setting this, you are indicating that you wish this RenderTarget to
+            be updated using a custom sequence of render queue invocations, with
+            potentially customised ordering and render state options. You should
+            create the named sequence through Root first, then set the name here.
+        @param sequenceName The name of the RenderQueueInvocationSequence to use. If you
+            specify a blank string, behaviour will return to the default render
+            queue management.
+        */
+        virtual void setRenderQueueInvocationSequenceName(const String& sequenceName);
+        /** Gets the name of the render queue invocation sequence for this target. */
+        virtual const String& getRenderQueueInvocationSequenceName(void) const;
+        /// Get the invocation sequence - will return null if using standard
+        RenderQueueInvocationSequence* _getRenderQueueInvocationSequence(void);
 
         /** Convert oriented input point coordinates to screen coordinates. */
         void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv);
@@ -298,18 +298,18 @@ namespace Ogre {
         bool mUpdated;
         bool mShowOverlays;
         bool mShowSkies;
-		uint32 mVisibilityMask;
-		// Render queue invocation sequence name
-		String mRQSequenceName;
-		RenderQueueInvocationSequence* mRQSequence;
-		/// Material scheme
-		String mMaterialSchemeName;
+        uint32 mVisibilityMask;
+        // Render queue invocation sequence name
+        String mRQSequenceName;
+        RenderQueueInvocationSequence* mRQSequence;
+        /// Material scheme
+        String mMaterialSchemeName;
         /// Viewport orientation mode
         OrientationMode mOrientationMode;
         static OrientationMode mDefaultOrientationMode;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

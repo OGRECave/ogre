@@ -30,31 +30,31 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
-	/** Class for displaying the error dialog if Ogre fails badly. */
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
+    /** Class for displaying the error dialog if Ogre fails badly. */
     class _OgreExport ErrorDialog
     {
     public:
         ErrorDialog();
-		~ErrorDialog() {}
+        ~ErrorDialog() {}
 
-		/**
-		@remarks
-			Displays the error dialog.
-		@param
-			errorMessage The error message which has caused the failure.
-		@param
-			logName Optional name of the log to display in the detail pane.
-		*/
+        /**
+        @remarks
+            Displays the error dialog.
+        @param
+            errorMessage The error message which has caused the failure.
+        @param
+            logName Optional name of the log to display in the detail pane.
+        */
         void display(const String& errorMessage, String logName = "");
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 #endif

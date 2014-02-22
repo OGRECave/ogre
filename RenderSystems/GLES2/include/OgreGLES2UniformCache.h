@@ -35,13 +35,13 @@ typedef Ogre::GeneralAllocatedObject UniformCacheAlloc;
 
 namespace Ogre
 {
-	class GLES2UniformCacheImp;
+    class GLES2UniformCacheImp;
 
     /** An in memory cache of the OpenGL ES 2 uniforms. */
     class _OgreGLES2Export GLES2UniformCache : public UniformCacheAlloc
     {
     private:
-		GLES2UniformCacheImp* mImp;
+        GLES2UniformCacheImp* mImp;
 
     public:
         GLES2UniformCache(void);
@@ -50,7 +50,7 @@ namespace Ogre
         /** Clears all cached values
         */
         void clearCache();
-		
+        
         /** Update a uniform
          @return A boolean value indicating whether this uniform needs to be updated in the GL.
          */

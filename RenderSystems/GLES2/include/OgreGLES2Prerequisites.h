@@ -55,28 +55,28 @@ THE SOFTWARE.
 #       endif
 #   endif
 #elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
-#	ifndef GL_GLEXT_PROTOTYPES
-#		define GL_GLEXT_PROTOTYPES
-#	endif
+#   ifndef GL_GLEXT_PROTOTYPES
+#       define GL_GLEXT_PROTOTYPES
+#   endif
 #   if OGRE_NO_GLES3_SUPPORT == 0
 #       include <GLES3/gl3platform.h>
-#	    include <GLES3/gl3.h>
+#       include <GLES3/gl3.h>
 #   else
 #       include <GLES2/gl2platform.h>
-#	    include <GLES2/gl2.h>
+#       include <GLES2/gl2.h>
 #       include <GLES2/gl2ext.h>
 #   endif
-#	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
-#		include "ppapi/cpp/completion_callback.h"
+#   if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#       include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
 #       include "ppapi/c/ppp_graphics_3d.h"
 #       include "ppapi/cpp/graphics_3d.h"
 #       include "ppapi/cpp/graphics_3d_client.h"
-#		include "ppapi/gles2/gl2ext_ppapi.h"
+#       include "ppapi/gles2/gl2ext_ppapi.h"
 #       undef GL_OES_get_program_binary
 #       undef GL_OES_mapbuffer
 #       undef GL_OES_vertex_array_object
-#	endif
+#   endif
 #else
 #   if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 #       if !defined( __MINGW32__ )
@@ -89,7 +89,7 @@ THE SOFTWARE.
 #           endif
 #       endif
 #   endif
-#	undef  GL_GLEXT_PROTOTYPES
+#   undef  GL_GLEXT_PROTOTYPES
 #   if OGRE_NO_GLES3_SUPPORT == 0
 #       include <GLES3/gl3platform.h>
 #       include <GLES3/gl3.h>

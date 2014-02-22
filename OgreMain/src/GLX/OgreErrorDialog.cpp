@@ -38,7 +38,7 @@ ErrorDialog::ErrorDialog()
 //---------------------------------------------------------------------------//
 void ErrorDialog::display(const String& errorMessage, String logName)
 {
-	std::cout << "*** ERROR: " << errorMessage << std::endl;
+    std::cout << "*** ERROR: " << errorMessage << std::endl;
 }
 
 }

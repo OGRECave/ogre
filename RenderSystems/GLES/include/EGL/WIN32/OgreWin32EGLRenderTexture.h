@@ -42,9 +42,9 @@ namespace Ogre
 
     class _OgrePrivate Win32EGLPBuffer : public EGLPBuffer
     {
-		protected:
+        protected:
 
-		public:
+        public:
             Win32EGLPBuffer(Win32EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
             virtual ~Win32EGLPBuffer();
     };

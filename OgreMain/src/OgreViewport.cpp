@@ -42,7 +42,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Viewport::Viewport(RenderTarget* target, Real left, Real top, Real width, Real height)
         : mGlobalIndex( -1 )
-		, mTarget(target)
+        , mTarget(target)
         , mRelLeft(left)
         , mRelTop(top)
         , mRelWidth(width)
@@ -51,13 +51,13 @@ namespace Ogre {
         , mUpdated(false)
         , mShowOverlays(true)
         , mShowSkies(true)
-		, mVisibilityMask(0)
-		, mRQSequence(0)
-		, mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
-    {			
+        , mVisibilityMask(0)
+        , mRQSequence(0)
+        , mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
+    {           
         // Set the default orientation mode
         mOrientationMode = mDefaultOrientationMode;
-			
+            
         // Set the default material scheme
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
         mMaterialSchemeName = rs->_getDefaultViewportMaterialScheme();
@@ -68,11 +68,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Viewport::~Viewport()
     {
-		RenderSystem* rs = Root::getSingleton().getRenderSystem();
-		if ((rs) && (rs->_getViewport() == this))
-		{
-			rs->_setViewport(NULL);
-		}
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
+        if ((rs) && (rs->_getViewport() == this))
+        {
+            rs->_setViewport(NULL);
+        }
     }
     //---------------------------------------------------------------------
     bool Viewport::_isUpdated(void) const
@@ -95,9 +95,9 @@ namespace Ogre {
         mActWidth = (int) (mRelWidth * width);
         mActHeight = (int) (mRelHeight * height);
 
-		mUpdated = true;
-	}
-	//---------------------------------------------------------------------
+        mUpdated = true;
+    }
+    //---------------------------------------------------------------------
     RenderTarget* Viewport::getTarget(void) const
     {
         return mTarget;
@@ -151,29 +151,29 @@ namespace Ogre {
         mRelHeight = height;
         _updateDimensions();
     }
-	//---------------------------------------------------------------------
-	void Viewport::_updateCullPhase01( Camera* camera, const Camera *lodCamera,
-									   uint8 firstRq, uint8 lastRq )
+    //---------------------------------------------------------------------
+    void Viewport::_updateCullPhase01( Camera* camera, const Camera *lodCamera,
+                                       uint8 firstRq, uint8 lastRq )
     {
-		// Automatic AR cameras are useful for cameras that draw into multiple viewports
-		const Real aspectRatio = (Real) mActWidth / (Real) mActHeight;
-		if( camera->getAutoAspectRatio() && camera->getAspectRatio() != aspectRatio )
-		{
-			camera->setAspectRatio( aspectRatio );
+        // Automatic AR cameras are useful for cameras that draw into multiple viewports
+        const Real aspectRatio = (Real) mActWidth / (Real) mActHeight;
+        if( camera->getAutoAspectRatio() && camera->getAspectRatio() != aspectRatio )
+        {
+            camera->setAspectRatio( aspectRatio );
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             camera->setOrientationMode(mOrientationMode);
 #endif
-		}
+        }
         // Tell Camera to render into me
-		camera->_notifyViewport(this);
+        camera->_notifyViewport(this);
 
-		camera->_cullScenePhase01( lodCamera, this, firstRq, lastRq );
+        camera->_cullScenePhase01( lodCamera, this, firstRq, lastRq );
     }
     //---------------------------------------------------------------------
-	void Viewport::_updateRenderPhase02( Camera* camera, const Camera *lodCamera,
-										 uint8 firstRq, uint8 lastRq )
+    void Viewport::_updateRenderPhase02( Camera* camera, const Camera *lodCamera,
+                                         uint8 firstRq, uint8 lastRq )
     {
-		camera->_renderScenePhase02( lodCamera, this, firstRq, lastRq, mShowOverlays );
+        camera->_renderScenePhase02( lodCamera, this, firstRq, lastRq, mShowOverlays );
     }
     //---------------------------------------------------------------------
     void Viewport::setOrientationMode(OrientationMode orientationMode, bool setDefault)
@@ -190,7 +190,7 @@ namespace Ogre {
             setDefaultOrientationMode(orientationMode);
         }
 
-	// Update the render system config
+    // Update the render system config
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
         if(mOrientationMode == OR_LANDSCAPELEFT)
@@ -232,23 +232,23 @@ namespace Ogre {
         return mDefaultOrientationMode;
     }
     //---------------------------------------------------------------------
-	void Viewport::clear(unsigned int buffers, const ColourValue& col,  
-						 Real depth, unsigned short stencil)
-	{
-		RenderSystem* rs = Root::getSingleton().getRenderSystem();
-		if (rs)
-		{
-			Viewport* currentvp = rs->_getViewport();
-			if (currentvp == this)
-				rs->clearFrameBuffer(buffers, col, depth, stencil);
-			else
-			{
-				rs->_setViewport(this);
-				rs->clearFrameBuffer(buffers, col, depth, stencil);
-				rs->_setViewport(currentvp);
-			}
-		}
-	}
+    void Viewport::clear(unsigned int buffers, const ColourValue& col,  
+                         Real depth, unsigned short stencil)
+    {
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
+        if (rs)
+        {
+            Viewport* currentvp = rs->_getViewport();
+            if (currentvp == this)
+                rs->clearFrameBuffer(buffers, col, depth, stencil);
+            else
+            {
+                rs->_setViewport(this);
+                rs->clearFrameBuffer(buffers, col, depth, stencil);
+                rs->_setViewport(currentvp);
+            }
+        }
+    }
     //---------------------------------------------------------------------
     void Viewport::getActualDimensions(int &left, int&top, int &width, int &height) const
     {
@@ -258,7 +258,7 @@ namespace Ogre {
         height = mActHeight;
 
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void Viewport::setOverlaysEnabled(bool enabled)
     {
         mShowOverlays = enabled;
@@ -278,36 +278,36 @@ namespace Ogre {
     {
         return mShowSkies;
     }
-	//-----------------------------------------------------------------------
-	void Viewport::setRenderQueueInvocationSequenceName(const String& sequenceName)
-	{
-		mRQSequenceName = sequenceName;
-		if (mRQSequenceName.empty())
-		{
-			mRQSequence = 0;
-		}
-		else
-		{
-			mRQSequence =
-				Root::getSingleton().getRenderQueueInvocationSequence(mRQSequenceName);
-		}
-	}
-	//-----------------------------------------------------------------------
-	const String& Viewport::getRenderQueueInvocationSequenceName(void) const
-	{
-		return mRQSequenceName;
-	}
-	//-----------------------------------------------------------------------
-	RenderQueueInvocationSequence* Viewport::_getRenderQueueInvocationSequence(void)
-	{
-		return mRQSequence;
-	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    void Viewport::setRenderQueueInvocationSequenceName(const String& sequenceName)
+    {
+        mRQSequenceName = sequenceName;
+        if (mRQSequenceName.empty())
+        {
+            mRQSequence = 0;
+        }
+        else
+        {
+            mRQSequence =
+                Root::getSingleton().getRenderQueueInvocationSequence(mRQSequenceName);
+        }
+    }
+    //-----------------------------------------------------------------------
+    const String& Viewport::getRenderQueueInvocationSequenceName(void) const
+    {
+        return mRQSequenceName;
+    }
+    //-----------------------------------------------------------------------
+    RenderQueueInvocationSequence* Viewport::_getRenderQueueInvocationSequence(void)
+    {
+        return mRQSequence;
+    }
+    //-----------------------------------------------------------------------
     void Viewport::pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv)
     {
         pointOrientedToScreen(v.x, v.y, orientationMode, outv.x, outv.y);
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void Viewport::pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
                                          Real &screenX, Real &screenY)
     {

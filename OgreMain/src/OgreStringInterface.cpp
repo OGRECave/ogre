@@ -63,21 +63,21 @@ namespace Ogre {
         // Fallback
         return false;
     }
-	//-----------------------------------------------------------------------
-	void StringInterface::setParameterList(const NameValuePairList& paramList)
-	{
-		NameValuePairList::const_iterator i, iend;
-		iend = paramList.end();
-		for (i = paramList.begin(); i != iend; ++i)
-		{
-			setParameter(i->first, i->second);
-		}
-	}
     //-----------------------------------------------------------------------
-	void StringInterface::cleanupDictionary ()
-	{
+    void StringInterface::setParameterList(const NameValuePairList& paramList)
+    {
+        NameValuePairList::const_iterator i, iend;
+        iend = paramList.end();
+        for (i = paramList.begin(); i != iend; ++i)
+        {
+            setParameter(i->first, i->second);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void StringInterface::cleanupDictionary ()
+    {
             OGRE_LOCK_MUTEX( msDictionaryMutex );
 
-		msDictionary.clear();
-	}
+        msDictionary.clear();
+    }
 }

@@ -35,35 +35,35 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Animation
-	*  @{
-	*/
-	/** Handles the management of skeleton resources.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Animation
+    *  @{
+    */
+    /** Handles the management of skeleton resources.
         @remarks
             This class deals with the runtime management of
             skeleton data; like other resource managers it handles
             the creation of resources (in this case skeleton data),
             working within a fixed memory budget.
     */
-	class _OgreExport OldSkeletonManager: public ResourceManager, public Singleton<OldSkeletonManager>
+    class _OgreExport OldSkeletonManager: public ResourceManager, public Singleton<OldSkeletonManager>
     {
     public:
         /// Constructor
-		OldSkeletonManager();
-		~OldSkeletonManager();
+        OldSkeletonManager();
+        ~OldSkeletonManager();
 
-		/// Create a new skeleton
-		/// @see ResourceManager::createResource
-		SkeletonPtr create (const String& name, const String& group,
-							bool isManual = false, ManualResourceLoader* loader = 0,
-							const NameValuePairList* createParams = 0);
+        /// Create a new skeleton
+        /// @see ResourceManager::createResource
+        SkeletonPtr create (const String& name, const String& group,
+                            bool isManual = false, ManualResourceLoader* loader = 0,
+                            const NameValuePairList* createParams = 0);
 
-		/// Get a resource by name
-		/// @see ResourceManager::getResourceByName
-		SkeletonPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        /// Get a resource by name
+        /// @see ResourceManager::getResourceByName
+        SkeletonPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Override standard Singleton retrieval.
         @remarks
@@ -80,7 +80,7 @@ namespace Ogre {
         but the implementation stays in this single compilation unit,
         preventing link errors.
         */
-		static OldSkeletonManager& getSingleton(void);
+        static OldSkeletonManager& getSingleton(void);
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton
@@ -96,7 +96,7 @@ namespace Ogre {
         but the implementation stays in this single compilation unit,
         preventing link errors.
         */
-		static OldSkeletonManager* getSingletonPtr(void);
+        static OldSkeletonManager* getSingletonPtr(void);
     protected:
 
         /// @copydoc ResourceManager::createImpl
@@ -106,8 +106,8 @@ namespace Ogre {
 
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

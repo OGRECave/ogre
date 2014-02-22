@@ -38,7 +38,7 @@ namespace Ogre
     {
     public:
         AndroidLogListener();
-	
+    
         virtual void messageLogged(const Ogre::String& message, Ogre::LogMessageLevel lml, bool maskDebug, const Ogre::String &logName, bool& skipThisMessage );
     };
 }

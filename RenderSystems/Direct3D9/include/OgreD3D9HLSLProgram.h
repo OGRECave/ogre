@@ -71,37 +71,37 @@ namespace Ogre {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
-		/// Command object for setting optimisation level
-		class CmdOptimisation : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
+        /// Command object for setting optimisation level
+        class CmdOptimisation : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
 
-		/// Command object for getting/setting micro code
-		class CmdMicrocode : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
+        /// Command object for getting/setting micro code
+        class CmdMicrocode : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
 
-		/// Command object for getting/setting assembler code
-		class CmdAssemblerCode : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
+        /// Command object for getting/setting assembler code
+        class CmdAssemblerCode : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
 
-		/// Command object for enabling backwards compatibility
-		class CmdBackwardsCompatibility : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
+        /// Command object for enabling backwards compatibility
+        class CmdBackwardsCompatibility : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
 
     protected:
 
@@ -109,9 +109,9 @@ namespace Ogre {
         static CmdTarget msCmdTarget;
         static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
-		static CmdOptimisation msCmdOptimisation;
-		static CmdMicrocode msCmdMicrocode;
-		static CmdAssemblerCode msCmdAssemblerCode;
+        static CmdOptimisation msCmdOptimisation;
+        static CmdMicrocode msCmdMicrocode;
+        static CmdAssemblerCode msCmdAssemblerCode;
         static CmdBackwardsCompatibility msCmdBackwardsCompatibility;
 
         /** Internal load implementation, must be implemented by subclasses.
@@ -127,7 +127,7 @@ namespace Ogre {
 
         // Recursive utility method for buildParamNameMap
         void processParamElement(LPD3DXCONSTANTTABLE pConstTable, D3DXHANDLE parent, String prefix, unsigned int index);
-		void populateDef(D3DXCONSTANT_DESC& d3dDesc, GpuConstantDefinition& def) const;
+        void populateDef(D3DXCONSTANT_DESC& d3dDesc, GpuConstantDefinition& def) const;
 
         String mTarget;
         String mEntryPoint;
@@ -137,37 +137,37 @@ namespace Ogre {
 
         LPD3DXBUFFER mMicroCode;
 
-		GpuConstantDefinitionMap mParametersMap;
-		size_t mParametersMapSizeAsBuffer;
+        GpuConstantDefinitionMap mParametersMap;
+        size_t mParametersMapSizeAsBuffer;
 
-	public:
-		LPD3DXBUFFER getMicroCode();
-	public:
-		/// Shader optimisation level
-		enum OptimisationLevel
-		{
-			/// default - no optimisation in debug mode, OPT_1 in release mode
-			OPT_DEFAULT,
-			/// No optimisation
-			OPT_NONE,
-			/// Optimisation level 0
-			OPT_0, 
-			/// Optimisation level 1
-			OPT_1,
-			/// Optimisation level 2
-			OPT_2, 
-			/// Optimisation level 3
-			OPT_3
-		};
-	protected:
-		OptimisationLevel mOptimisationLevel;
+    public:
+        LPD3DXBUFFER getMicroCode();
+    public:
+        /// Shader optimisation level
+        enum OptimisationLevel
+        {
+            /// default - no optimisation in debug mode, OPT_1 in release mode
+            OPT_DEFAULT,
+            /// No optimisation
+            OPT_NONE,
+            /// Optimisation level 0
+            OPT_0, 
+            /// Optimisation level 1
+            OPT_1,
+            /// Optimisation level 2
+            OPT_2, 
+            /// Optimisation level 3
+            OPT_3
+        };
+    protected:
+        OptimisationLevel mOptimisationLevel;
 
         /** Gets the microcode from the microcode cache. */
-		void getMicrocodeFromCache(void);
+        void getMicrocodeFromCache(void);
         /** Compiles the microcode from the program source. */
-		void compileMicrocode(void);
-		void addMicrocodeToCache();
-	public:
+        void compileMicrocode(void);
+        void addMicrocodeToCache();
+    public:
         D3D9HLSLProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
         ~D3D9HLSLProgram();
@@ -188,17 +188,17 @@ namespace Ogre {
         void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }
         /** Gets whether matrix packed in column-major order. */
         bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
-		/** Sets whether backwards compatibility mode should be enabled. */
-		void setBackwardsCompatibility(bool compat) { mBackwardsCompatibility = compat; }
-		/** Gets whether backwards compatibility mode should be enabled. */
-		bool getBackwardsCompatibility(void) const { return mBackwardsCompatibility; }
-		/** Sets the optimisation level to use.
-		@param opt Optimisation level
-		*/
-		void setOptimisationLevel(OptimisationLevel opt) { mOptimisationLevel = opt; }
+        /** Sets whether backwards compatibility mode should be enabled. */
+        void setBackwardsCompatibility(bool compat) { mBackwardsCompatibility = compat; }
+        /** Gets whether backwards compatibility mode should be enabled. */
+        bool getBackwardsCompatibility(void) const { return mBackwardsCompatibility; }
+        /** Sets the optimisation level to use.
+        @param opt Optimisation level
+        */
+        void setOptimisationLevel(OptimisationLevel opt) { mOptimisationLevel = opt; }
 
-		/** Gets the optimisation level to use. */
-		OptimisationLevel getOptimisationLevel() const { return mOptimisationLevel; }
+        /** Gets the optimisation level to use. */
+        OptimisationLevel getOptimisationLevel() const { return mOptimisationLevel; }
 
         /// Overridden from GpuProgram
         bool isSupported(void) const;
@@ -206,7 +206,7 @@ namespace Ogre {
         GpuProgramParametersSharedPtr createParameters(void);
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
-	};
+    };
 }
 
 #endif

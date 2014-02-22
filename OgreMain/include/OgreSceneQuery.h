@@ -40,13 +40,13 @@ namespace Ogre {
 
     // forward declaration
     class SceneQueryListener;
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** A class for performing queries on a scene.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** A class for performing queries on a scene.
     @remarks
         This is an abstract class for performing a query on a scene, i.e. to retrieve
         a list of objects and/or world geometry sections which are potentially intersecting a
@@ -71,7 +71,7 @@ namespace Ogre {
         using the SceneManager interfaces for the type of query required, e.g.
         SceneManager::createSphereSceneQuery.
     */
-	class _OgreExport SceneQuery : public SceneMgtAlloc
+    class _OgreExport SceneQuery : public SceneMgtAlloc
     {
     public:
         /** This type can be used by collaborating applications & SceneManagers to 
@@ -122,7 +122,7 @@ namespace Ogre {
     protected:
         SceneManager* mParentSceneMgr;
         uint32 mQueryMask;
-		uint32 mQueryTypeMask;
+        uint32 mQueryTypeMask;
         set<WorldFragmentType>::type mSupportedWorldFragments;
         WorldFragmentType mWorldFragmentType;
     
@@ -148,15 +148,15 @@ namespace Ogre {
         @remarks
             This method allows you to set a 'type mask' to limit the results of this
             query to certain types of objects. Whilst setQueryMask deals with flags
-			set per instance of object, this method deals with setting a mask on 
-			flags set per type of object. Both may exclude an object from query
-			results.
+            set per instance of object, this method deals with setting a mask on 
+            flags set per type of object. Both may exclude an object from query
+            results.
         */
         virtual void setQueryTypeMask(uint32 mask);
         /** Returns the current mask for this query. */
         virtual uint32 getQueryTypeMask(void) const;
 
-		/** Tells the query what kind of world geometry to return from queries;
+        /** Tells the query what kind of world geometry to return from queries;
             often the full renderable geometry is not what is needed. 
         @remarks
             The application receiving the world geometry is expected to know 
@@ -206,12 +206,12 @@ namespace Ogre {
     typedef list<MovableObject*>::type SceneQueryResultMovableList;
     typedef list<SceneQuery::WorldFragment*>::type SceneQueryResultWorldFragmentList;
     /** Holds the results of a scene query. */
-	struct _OgreExport SceneQueryResult : public SceneMgtAlloc
+    struct _OgreExport SceneQueryResult : public SceneMgtAlloc
     {
         /// List of movable objects in the query (entities, particle systems etc)
         SceneQueryResultMovableList movables;
         /// List of world fragments
-		SceneQueryResultWorldFragmentList worldFragments;
+        SceneQueryResultWorldFragmentList worldFragments;
     };
 
     /** Abstract class defining a query which returns single results from a region. 
@@ -490,7 +490,7 @@ namespace Ogre {
     typedef list<SceneQueryMovableObjectPair>::type SceneQueryMovableIntersectionList;
     typedef list<SceneQueryMovableObjectWorldFragmentPair>::type SceneQueryMovableWorldFragmentIntersectionList;
     /** Holds the results of an intersection scene query (pair values). */
-	struct _OgreExport IntersectionSceneQueryResult : public SceneMgtAlloc
+    struct _OgreExport IntersectionSceneQueryResult : public SceneMgtAlloc
     {
         /// List of movable / movable intersections (entities, particle systems etc)
         SceneQueryMovableIntersectionList movables2movables;
@@ -555,8 +555,8 @@ namespace Ogre {
         bool queryResult(MovableObject* movable, SceneQuery::WorldFragment* fragment);
     };
     
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
     

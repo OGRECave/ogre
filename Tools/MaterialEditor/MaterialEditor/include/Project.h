@@ -39,7 +39,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class SceneManager;
+    class SceneManager;
 }
 
 class MaterialController;
@@ -55,57 +55,57 @@ typedef std::list<MaterialController*> MaterialControllerList;
 class Project : public EventContainer
 {
 public:
-	enum ProjectEvent
-	{
-		NameChanged,
-		MaterialAdded,
-		MaterialRemoved,
-		ActiveMaterialChanged
-	};
+    enum ProjectEvent
+    {
+        NameChanged,
+        MaterialAdded,
+        MaterialRemoved,
+        ActiveMaterialChanged
+    };
 
-	Project();
-	Project(const String& name);
-	virtual ~Project();
+    Project();
+    Project(const String& name);
+    virtual ~Project();
 
-	void registerEvents();
+    void registerEvents();
 
-	const String& getName() const;
-	void setName(const String& name);
+    const String& getName() const;
+    void setName(const String& name);
 
-	void addMaterial(MaterialPtr materialPtr);
-	void createMaterial(const String& name);
+    void addMaterial(MaterialPtr materialPtr);
+    void createMaterial(const String& name);
 
-	void removeMaterial(MaterialController* controller);
-	void removeMaterial(Material* material);
-	void removeMaterial(const String& name);
-	
-	MaterialController* getActiveMaterial() const;
-	void setActiveMaterial(MaterialController* controller);
-	void setActiveMaterial(Material* material);
-	void setActiveMaterial(const String& name);
-	
-	MaterialController* getMaterialController(const String& name);
-	
-	const MaterialControllerList* getMaterials() const;
+    void removeMaterial(MaterialController* controller);
+    void removeMaterial(Material* material);
+    void removeMaterial(const String& name);
+    
+    MaterialController* getActiveMaterial() const;
+    void setActiveMaterial(MaterialController* controller);
+    void setActiveMaterial(Material* material);
+    void setActiveMaterial(const String& name);
+    
+    MaterialController* getMaterialController(const String& name);
+    
+    const MaterialControllerList* getMaterials() const;
 
-	void open();
-	void close();
+    void open();
+    void close();
 
-	bool isOpen();
-	bool isClosed();
+    bool isOpen();
+    bool isClosed();
 
-	void generateScene(Ogre::SceneManager* sceneManager);
-	
-	void OnRootInitialized(EventArgs& args);
-	void OnRootShutdown(EventArgs& args);
+    void generateScene(Ogre::SceneManager* sceneManager);
+    
+    void OnRootInitialized(EventArgs& args);
+    void OnRootShutdown(EventArgs& args);
 
 protected:
-	String mName;
-	bool mOpen;
-	MaterialController* mActiveMaterial;
-	MaterialControllerList mMaterialControllers;
-	
-	void subscribeTo(RootEventPlugin* plugin);
+    String mName;
+    bool mOpen;
+    MaterialController* mActiveMaterial;
+    MaterialControllerList mMaterialControllers;
+    
+    void subscribeTo(RootEventPlugin* plugin);
 };
 
 #endif // _PROJECT_H_

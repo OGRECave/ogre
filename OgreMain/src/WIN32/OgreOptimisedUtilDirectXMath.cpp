@@ -72,9 +72,9 @@ namespace Ogre {
             Real t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
-			size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
+            size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
             size_t numVertices,
-			bool morphNormals);
+            bool morphNormals);
 
         /// @copydoc OptimisedUtil::concatenateAffineMatrices
         virtual void concatenateAffineMatrices(
@@ -1231,28 +1231,28 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
         Real t,
         const float *pSrc1, const float *pSrc2,
         float *pDst,
-		size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
+        size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
         size_t numVertices,
-		bool morphNormals)
-    {	
+        bool morphNormals)
+    {   
         XMVECTOR src01, src02, src11, src12, src21, src22;
         XMVECTOR dst0, dst1, dst2;
 
         XMVECTOR t4 = XMVectorReplicate(t);
 
 
-		// If we're morphing normals, we have twice the number of floats to process
-		// Positions are interleaved with normals, so we'll have to separately
-		// normalise just the normals later; we'll just lerp in the first pass
-		// We can't normalise as we go because normals & positions are only 3 floats
-		// each so are not aligned for DirectXMath, we'd mix the data up
-		size_t normalsMultiplier = morphNormals ? 2 : 1;
+        // If we're morphing normals, we have twice the number of floats to process
+        // Positions are interleaved with normals, so we'll have to separately
+        // normalise just the normals later; we'll just lerp in the first pass
+        // We can't normalise as we go because normals & positions are only 3 floats
+        // each so are not aligned for DirectXMath, we'd mix the data up
+        size_t normalsMultiplier = morphNormals ? 2 : 1;
         size_t numIterations = (numVertices*normalsMultiplier) / 4;
-		size_t numVerticesRemainder = (numVertices*normalsMultiplier) & 3;
-		
-		// Save for later
-		float *pStartDst = pDst;
-						
+        size_t numVerticesRemainder = (numVertices*normalsMultiplier) & 3;
+        
+        // Save for later
+        float *pStartDst = pDst;
+                        
         // Never use meta-function technique to accessing memory because looks like
         // VC7.1 generate a bit inefficient binary code when put following code into
         // inline function.
@@ -1406,36 +1406,36 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
                 XMStoreFloat3((XMFLOAT3*)(pDst + 0), dst0);
                 break;
             }
-			
+            
         }
-		
-		if (morphNormals)
-		{
-			
-			// Now we need to do and unaligned normalise on the normals data we just
-			// lerped; because normals are 3 elements each they're always unaligned
-			float *pNorm = pStartDst;
-			
-			// Offset past first position
-			pNorm += 3;
-			
-			// We'll do one normal each iteration, but still use DirectXMath
-			for (size_t n = 0; n < numVertices; ++n)
-			{
-				// normalise function
-				XMVECTOR norm;
-				
-				// load 3 floating-point normal values
+        
+        if (morphNormals)
+        {
+            
+            // Now we need to do and unaligned normalise on the normals data we just
+            // lerped; because normals are 3 elements each they're always unaligned
+            float *pNorm = pStartDst;
+            
+            // Offset past first position
+            pNorm += 3;
+            
+            // We'll do one normal each iteration, but still use DirectXMath
+            for (size_t n = 0; n < numVertices; ++n)
+            {
+                // normalise function
+                XMVECTOR norm;
+                
+                // load 3 floating-point normal values
                 norm = XMLoadFloat3((XMFLOAT3*)pNorm);
                 norm = XMVector3Normalize(norm);
-				
-				// Store back in the same place
+                
+                // Store back in the same place
                 XMStoreFloat3((XMFLOAT3*)pNorm, norm);
-				
-				// Skip to next vertex (3x normal components, 3x position components)
-				pNorm += 6;
-			}
-		}
+                
+                // Skip to next vertex (3x normal components, 3x position components)
+                pNorm += 6;
+            }
+        }
     }
     //---------------------------------------------------------------------
     void OptimisedUtilDirectXMath::concatenateAffineMatrices(

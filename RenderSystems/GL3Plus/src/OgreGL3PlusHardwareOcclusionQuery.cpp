@@ -49,7 +49,7 @@ namespace Ogre {
   */
 GL3PlusHardwareOcclusionQuery::GL3PlusHardwareOcclusionQuery() 
 { 
-	// Check for hardware occlusion support
+    // Check for hardware occlusion support
     OGRE_CHECK_GL_ERROR(glGenQueries(1, &mQueryID ));
 }
 //------------------------------------------------------------------
@@ -84,7 +84,7 @@ bool GL3PlusHardwareOcclusionQuery::isStillOutstanding(void)
 
     OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT_AVAILABLE, &available));
 
-	// GL_TRUE means a wait would occur
+    // GL_TRUE means a wait would occur
     return !(available == GL_TRUE);  
 } 
 

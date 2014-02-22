@@ -35,32 +35,32 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** Plugin instance for ParticleFX Manager */
-	class ParticleFXPlugin : public Plugin
-	{
-	public:
-		ParticleFXPlugin();
+    /** Plugin instance for ParticleFX Manager */
+    class ParticleFXPlugin : public Plugin
+    {
+    public:
+        ParticleFXPlugin();
 
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		vector<ParticleEmitterFactory*>::type mEmitterFactories;
-		vector<ParticleAffectorFactory*>::type mAffectorFactories;
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        vector<ParticleEmitterFactory*>::type mEmitterFactories;
+        vector<ParticleAffectorFactory*>::type mAffectorFactories;
 
-	};
+    };
 }
 
 #endif

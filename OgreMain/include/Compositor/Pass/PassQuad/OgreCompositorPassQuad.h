@@ -36,73 +36,73 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class Rectangle2D;
-	class CompositorPassQuadDef;
+    class Rectangle2D;
+    class CompositorPassQuadDef;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
-	/** Implementation of CompositorPass
-		This implementation will render a fullscreen triangle/quad to the RenderTarget using
-		the parameters from definition (rectangle area, whether triangle or quad pass,
-		whether to include frustum corners, etc)
-	@par
-		A fullscreen quad are two triangles that form a rectangle, which cover the entire screen.
-		This is however an inefficient way of harnessing the GPU's power. Modern GPUs iterate
-		a whole bounding rect that encloses each triangle (it's highly more parallelizable & scalable
-		than the scanline algorithm used by older Voodoo cards in the 90's). That means we're wasting
-		50% of GPU reasources in pixels that aren't drawn.
-	@par
-		A much faster approach made famous by Emil Persson (see max area triangulation
-		http://www.humus.name/index.php?page=News&ID=228) is to render a single oversized triangle
-		that covers the entire screen, which has it's UV scaled up; so that when interpolated at
-		screen position, it appears it goes from the range [0; 1) like a regular quad pass.
-		The difference is that pixels that go past the viewport are much better clipped/earlied-out
-		by the GPU than those that fall inside the viewport but outside the triangle (like the
-		rectangle approach)
-	@par
-		This faster technique only works for passes that cover the entire screen. When the viewport
-		is not 0 0 1 1; the CompositorPassQuad automatically switches to a fullscreen quad.
-	@par
-		<b>IMPORTANT:</b> The texel-to-pixel adjustment offset is included in the world matrix passed
-		to the vertex shader. This differs from Ogre 1.x which tried to embed the offset into the
-		vertices.
-	@par
-		<b>IMPORTANT:</b> When the viewport is not 0 0 1 1; the scale & position factors are passed
-		through the world matrix. This behavior differs from Ogre 1.x
+    /** Implementation of CompositorPass
+        This implementation will render a fullscreen triangle/quad to the RenderTarget using
+        the parameters from definition (rectangle area, whether triangle or quad pass,
+        whether to include frustum corners, etc)
+    @par
+        A fullscreen quad are two triangles that form a rectangle, which cover the entire screen.
+        This is however an inefficient way of harnessing the GPU's power. Modern GPUs iterate
+        a whole bounding rect that encloses each triangle (it's highly more parallelizable & scalable
+        than the scanline algorithm used by older Voodoo cards in the 90's). That means we're wasting
+        50% of GPU reasources in pixels that aren't drawn.
+    @par
+        A much faster approach made famous by Emil Persson (see max area triangulation
+        http://www.humus.name/index.php?page=News&ID=228) is to render a single oversized triangle
+        that covers the entire screen, which has it's UV scaled up; so that when interpolated at
+        screen position, it appears it goes from the range [0; 1) like a regular quad pass.
+        The difference is that pixels that go past the viewport are much better clipped/earlied-out
+        by the GPU than those that fall inside the viewport but outside the triangle (like the
+        rectangle approach)
+    @par
+        This faster technique only works for passes that cover the entire screen. When the viewport
+        is not 0 0 1 1; the CompositorPassQuad automatically switches to a fullscreen quad.
+    @par
+        <b>IMPORTANT:</b> The texel-to-pixel adjustment offset is included in the world matrix passed
+        to the vertex shader. This differs from Ogre 1.x which tried to embed the offset into the
+        vertices.
+    @par
+        <b>IMPORTANT:</b> When the viewport is not 0 0 1 1; the scale & position factors are passed
+        through the world matrix. This behavior differs from Ogre 1.x
     @author
-		Matias N. Goldberg
+        Matias N. Goldberg
     @version
         1.0
     */
-	class _OgreExport CompositorPassQuad : public CompositorPass
-	{
-		CompositorPassQuadDef const *mDefinition;
-	protected:
-		Rectangle2D		*mFsRect;
-		Pass			*mPass;
-		Camera			*mCamera;
+    class _OgreExport CompositorPassQuad : public CompositorPass
+    {
+        CompositorPassQuadDef const *mDefinition;
+    protected:
+        Rectangle2D     *mFsRect;
+        Pass            *mPass;
+        Camera          *mCamera;
 
-		Real		mHorizonalTexelOffset;
-		Real		mVerticalTexelOffset;
+        Real        mHorizonalTexelOffset;
+        Real        mVerticalTexelOffset;
 
-	public:
-		CompositorPassQuad( const CompositorPassQuadDef *definition, Camera *defaultCamera,
-							CompositorNode *parentNode, const CompositorChannel &target,
-							Real horizonalTexelOffset, Real verticalTexelOffset );
+    public:
+        CompositorPassQuad( const CompositorPassQuadDef *definition, Camera *defaultCamera,
+                            CompositorNode *parentNode, const CompositorChannel &target,
+                            Real horizonalTexelOffset, Real verticalTexelOffset );
 
-		virtual void execute( const Camera *lodCamera );
+        virtual void execute( const Camera *lodCamera );
 
-		/// Don't make this const (useful for compile-time multithreading errors)
-		Pass* getPass(void)										{ return mPass; }
-	};
+        /// Don't make this const (useful for compile-time multithreading errors)
+        Pass* getPass(void)                                     { return mPass; }
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

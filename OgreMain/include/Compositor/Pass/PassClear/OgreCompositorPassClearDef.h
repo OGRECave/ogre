@@ -37,57 +37,57 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
-	class _OgreExport CompositorPassClearDef : public CompositorPassDef
-	{
-	public:
-		uint32					mClearBufferFlags;
-		ColourValue				mColourValue;
-		Real					mDepthValue;
-		uint32					mStencilValue;
+    class _OgreExport CompositorPassClearDef : public CompositorPassDef
+    {
+    public:
+        uint32                  mClearBufferFlags;
+        ColourValue             mColourValue;
+        Real                    mDepthValue;
+        uint32                  mStencilValue;
 
-		/** This value is only supported by a few APIs (D3D11 at the time of writting)
-			which instead of actually clearing the buffers, it informs the GPU that
-			the __entire__ contents will be overwritten, which is what happens
-			with fullscreen quad pass.
-		@remarks
-			When the API does not support discard-only clears, __the pass is ignored__
-		@par
-			The main purpose of this feature is to be friendly with multi-GPU systems
-			(since we're telling there is no dependency with a previous frame) while
-			avoid doing a full clear at the same time (wastes bandwidth)
-		@par
-			When performing PASS_QUAD that covers the entire render target and doesn't
-			have alpha blending, a discard is automatically performed on the colour
-			buffer.
-		@par
-			Warning: Incorrect usage of discard only clears can lead to visual artifacts
-		*/
-		bool					mDiscardOnly;
+        /** This value is only supported by a few APIs (D3D11 at the time of writting)
+            which instead of actually clearing the buffers, it informs the GPU that
+            the __entire__ contents will be overwritten, which is what happens
+            with fullscreen quad pass.
+        @remarks
+            When the API does not support discard-only clears, __the pass is ignored__
+        @par
+            The main purpose of this feature is to be friendly with multi-GPU systems
+            (since we're telling there is no dependency with a previous frame) while
+            avoid doing a full clear at the same time (wastes bandwidth)
+        @par
+            When performing PASS_QUAD that covers the entire render target and doesn't
+            have alpha blending, a discard is automatically performed on the colour
+            buffer.
+        @par
+            Warning: Incorrect usage of discard only clears can lead to visual artifacts
+        */
+        bool                    mDiscardOnly;
 
-		/** By default clear all buffers. Stencil needs to be cleared because it hinders Fast Z Clear
-			on GPU architectures that don't separate the stencil from depth and the program requested
-			a Z Buffer with stencil (even if we never use it)
-		*/
-		CompositorPassClearDef( uint32 rtIndex ) :
-			CompositorPassDef( PASS_CLEAR, rtIndex ),
-			mClearBufferFlags( FBT_COLOUR|FBT_DEPTH|FBT_STENCIL ),
-			mColourValue( ColourValue::Black ),
-			mDepthValue( 1.0f ),
-			mStencilValue( 0 ),
-			mDiscardOnly( false )
-		{
-		}
-	};
+        /** By default clear all buffers. Stencil needs to be cleared because it hinders Fast Z Clear
+            on GPU architectures that don't separate the stencil from depth and the program requested
+            a Z Buffer with stencil (even if we never use it)
+        */
+        CompositorPassClearDef( uint32 rtIndex ) :
+            CompositorPassDef( PASS_CLEAR, rtIndex ),
+            mClearBufferFlags( FBT_COLOUR|FBT_DEPTH|FBT_STENCIL ),
+            mColourValue( ColourValue::Black ),
+            mDepthValue( 1.0f ),
+            mStencilValue( 0 ),
+            mDiscardOnly( false )
+        {
+        }
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

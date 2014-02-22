@@ -44,7 +44,7 @@ namespace Ogre {
                                         unsigned int width, unsigned int height,
                                         bool fullScreen,
                                         const NameValuePairList *miscParams = 0);
-	};
+    };
 }
 
 #endif

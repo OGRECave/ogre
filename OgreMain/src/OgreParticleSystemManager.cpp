@@ -57,8 +57,8 @@ namespace Ogre {
     ParticleSystemManager::ParticleSystemManager()
     {
         OGRE_LOCK_AUTO_MUTEX;
-		mFactory = OGRE_NEW ParticleSystemFactory();
-		Root::getSingleton().addMovableObjectFactory(mFactory);
+        mFactory = OGRE_NEW ParticleSystemFactory();
+        Root::getSingleton().addMovableObjectFactory(mFactory);
     }
     //-----------------------------------------------------------------------
     ParticleSystemManager::~ParticleSystemManager()
@@ -75,18 +75,18 @@ namespace Ogre {
         ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
         // delete billboard factory
         if (mBillboardRendererFactory)
-		{
+        {
             OGRE_DELETE mBillboardRendererFactory;
-			mBillboardRendererFactory = 0;
-		}
+            mBillboardRendererFactory = 0;
+        }
 
-		if (mFactory)
-		{
-			// delete particle system factory
-			Root::getSingleton().removeMovableObjectFactory(mFactory);
-			OGRE_DELETE mFactory;
-			mFactory = 0;
-		}
+        if (mFactory)
+        {
+            // delete particle system factory
+            Root::getSingleton().removeMovableObjectFactory(mFactory);
+            OGRE_DELETE mFactory;
+            mFactory = 0;
+        }
 
     }
     //-----------------------------------------------------------------------
@@ -103,7 +103,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystemManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
-		ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
+        ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
     }
     //-----------------------------------------------------------------------
     void ParticleSystemManager::addEmitterFactory(ParticleEmitterFactory* factory)
@@ -121,25 +121,25 @@ namespace Ogre {
         mAffectorFactories[name] = factory;
         LogManager::getSingleton().logMessage("Particle Affector Type '" + name + "' registered");
     }
-	//-----------------------------------------------------------------------
-	void ParticleSystemManager::addRendererFactory(ParticleSystemRendererFactory* factory)
-	{
+    //-----------------------------------------------------------------------
+    void ParticleSystemManager::addRendererFactory(ParticleSystemRendererFactory* factory)
+    {
             OGRE_LOCK_AUTO_MUTEX ;
-		String name = factory->getType();
+        String name = factory->getType();
         mRendererFactories[name] = factory;
         LogManager::getSingleton().logMessage("Particle Renderer Type '" + name + "' registered");
-	}
-	//-----------------------------------------------------------------------
+    }
+    //-----------------------------------------------------------------------
     void ParticleSystemManager::addTemplate(const String& name, ParticleSystem* sysTemplate)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		// check name
-		if (mSystemTemplates.find(name) != mSystemTemplates.end())
-		{
-			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-				"ParticleSystem template with name '" + name + "' already exists.", 
-				"ParticleSystemManager::addTemplate");
-		}
+        // check name
+        if (mSystemTemplates.find(name) != mSystemTemplates.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+                "ParticleSystem template with name '" + name + "' already exists.", 
+                "ParticleSystemManager::addTemplate");
+        }
 
         mSystemTemplates[name] = sysTemplate;
     }
@@ -175,40 +175,40 @@ namespace Ogre {
     void ParticleSystemManager::removeTemplatesByResourceGroup(const String& resourceGroup)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		
-		ParticleTemplateMap::iterator i = mSystemTemplates.begin();
-		while (i != mSystemTemplates.end())
-		{
-			ParticleTemplateMap::iterator icur = i++;
+        
+        ParticleTemplateMap::iterator i = mSystemTemplates.begin();
+        while (i != mSystemTemplates.end())
+        {
+            ParticleTemplateMap::iterator icur = i++;
 
-			if(icur->second->getResourceGroupName() == resourceGroup)
-			{
-				delete icur->second;
-				mSystemTemplates.erase(icur);
-			}
-		}    
-	}
+            if(icur->second->getResourceGroupName() == resourceGroup)
+            {
+                delete icur->second;
+                mSystemTemplates.erase(icur);
+            }
+        }    
+    }
     //-----------------------------------------------------------------------
     ParticleSystem* ParticleSystemManager::createTemplate(const String& name, 
         const String& resourceGroup)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		// check name
-		if (mSystemTemplates.find(name) != mSystemTemplates.end())
-		{
+        // check name
+        if (mSystemTemplates.find(name) != mSystemTemplates.end())
+        {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-			LogManager::getSingleton().logMessage("ParticleSystem template with name '" + name + "' already exists.");
-			return NULL;
+            LogManager::getSingleton().logMessage("ParticleSystem template with name '" + name + "' already exists.");
+            return NULL;
 #else
-			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-				"ParticleSystem template with name '" + name + "' already exists.", 
-				"ParticleSystemManager::createTemplate");
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+                "ParticleSystem template with name '" + name + "' already exists.", 
+                "ParticleSystemManager::createTemplate");
 #endif
-		}
+        }
 
-		ParticleSystem* tpl = OGRE_NEW ParticleSystem( Id::generateNewId<ParticleSystem>(),
-														&mTemplatesObjectMemMgr, resourceGroup );
-		tpl->setName( name );
+        ParticleSystem* tpl = OGRE_NEW ParticleSystem( Id::generateNewId<ParticleSystem>(),
+                                                        &mTemplatesObjectMemMgr, resourceGroup );
+        tpl->setName( name );
         addTemplate(name, tpl);
         return tpl;
 
@@ -227,30 +227,30 @@ namespace Ogre {
             return 0;
         }
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     ParticleSystem* ParticleSystemManager::createSystemImpl(IdType id,
-												ObjectMemoryManager *objectMemoryManager,
-												size_t quota, const String& resourceGroup)
+                                                ObjectMemoryManager *objectMemoryManager,
+                                                size_t quota, const String& resourceGroup)
     {
-		ParticleSystem* sys = OGRE_NEW ParticleSystem( id, objectMemoryManager, resourceGroup );
+        ParticleSystem* sys = OGRE_NEW ParticleSystem( id, objectMemoryManager, resourceGroup );
         sys->setParticleQuota(quota);
         return sys;
     }
     //-----------------------------------------------------------------------
     ParticleSystem* ParticleSystemManager::createSystemImpl(IdType id,
-												ObjectMemoryManager *objectMemoryManager,
-												const String& templateName)
+                                                ObjectMemoryManager *objectMemoryManager,
+                                                const String& templateName)
     {
         // Look up template
         ParticleSystem* pTemplate = getTemplate(templateName);
         if (!pTemplate)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot find required template '" + templateName + "'",
-						"ParticleSystemManager::createSystem");
+                        "ParticleSystemManager::createSystem");
         }
 
         ParticleSystem* sys = createSystemImpl( id, objectMemoryManager, pTemplate->getParticleQuota(), 
-												pTemplate->getResourceGroupName() );
+                                                pTemplate->getResourceGroupName() );
         // Copy template settings
         *sys = *pTemplate;
         return sys;
@@ -258,9 +258,9 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void ParticleSystemManager::destroySystemImpl(ParticleSystem* sys)
-	{
-		OGRE_DELETE sys;
-	}
+    {
+        OGRE_DELETE sys;
+    }
     //-----------------------------------------------------------------------
     ParticleEmitter* ParticleSystemManager::_createEmitter(
         const String& emitterType, ParticleSystem* psys)
@@ -332,7 +332,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     ParticleSystemRenderer* ParticleSystemManager::_createRenderer(const String& rendererType)
-	{
+    {
         OGRE_LOCK_AUTO_MUTEX;
         // Locate affector type
         ParticleSystemRendererFactoryMap::iterator pFact = mRendererFactories.find(rendererType);
@@ -344,10 +344,10 @@ namespace Ogre {
         }
 
         return pFact->second->createInstance(rendererType);
-	}
-	//-----------------------------------------------------------------------
+    }
+    //-----------------------------------------------------------------------
     void ParticleSystemManager::_destroyRenderer(ParticleSystemRenderer* renderer)
-	{
+    {
         if(!renderer)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot destroy a null ParticleSystemRenderer.", "ParticleSystemManager::_destroyRenderer");
 
@@ -362,7 +362,7 @@ namespace Ogre {
         }
 
         pFact->second->destroyInstance(renderer);
-	}
+    }
     //-----------------------------------------------------------------------
     void ParticleSystemManager::_initialise(void)
     {
@@ -394,7 +394,7 @@ namespace Ogre {
                 else
                 {
                     // Attribute
-					StringUtil::toLowerCase(line);
+                    StringUtil::toLowerCase(line);
                     parseEmitterAttrib(line, pEmit);
                 }
             }
@@ -425,7 +425,7 @@ namespace Ogre {
                 else
                 {
                     // Attribute
-					StringUtil::toLowerCase(line);
+                    StringUtil::toLowerCase(line);
                     parseAffectorAttrib(line, pAff);
                 }
             }
@@ -506,81 +506,81 @@ namespace Ogre {
         }
 
     }
-	//-----------------------------------------------------------------------
-	ParticleSystemManager::ParticleAffectorFactoryIterator 
-	ParticleSystemManager::getAffectorFactoryIterator(void)
-	{
-		return ParticleAffectorFactoryIterator(
-			mAffectorFactories.begin(), mAffectorFactories.end());
-	}
-	//-----------------------------------------------------------------------
-	ParticleSystemManager::ParticleEmitterFactoryIterator 
-	ParticleSystemManager::getEmitterFactoryIterator(void)
-	{
-		return ParticleEmitterFactoryIterator(
-			mEmitterFactories.begin(), mEmitterFactories.end());
-	}
-	//-----------------------------------------------------------------------
-	ParticleSystemManager::ParticleRendererFactoryIterator 
-	ParticleSystemManager::getRendererFactoryIterator(void)
-	{
-		return ParticleRendererFactoryIterator(
-			mRendererFactories.begin(), mRendererFactories.end());
-	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    ParticleSystemManager::ParticleAffectorFactoryIterator 
+    ParticleSystemManager::getAffectorFactoryIterator(void)
+    {
+        return ParticleAffectorFactoryIterator(
+            mAffectorFactories.begin(), mAffectorFactories.end());
+    }
+    //-----------------------------------------------------------------------
+    ParticleSystemManager::ParticleEmitterFactoryIterator 
+    ParticleSystemManager::getEmitterFactoryIterator(void)
+    {
+        return ParticleEmitterFactoryIterator(
+            mEmitterFactories.begin(), mEmitterFactories.end());
+    }
+    //-----------------------------------------------------------------------
+    ParticleSystemManager::ParticleRendererFactoryIterator 
+    ParticleSystemManager::getRendererFactoryIterator(void)
+    {
+        return ParticleRendererFactoryIterator(
+            mRendererFactories.begin(), mRendererFactories.end());
+    }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-	String ParticleSystemFactory::FACTORY_TYPE_NAME = "ParticleSystem";
     //-----------------------------------------------------------------------
-	MovableObject* ParticleSystemFactory::createInstanceImpl( IdType id,
-											ObjectMemoryManager *objectMemoryManager,
-											const NameValuePairList* params )
-	{
-		if (params != 0)
-		{
-			NameValuePairList::const_iterator ni = params->find("templateName");
-			if (ni != params->end())
-			{
-				String templateName = ni->second;
-				// create using manager
-				return ParticleSystemManager::getSingleton().createSystemImpl(
-						id, objectMemoryManager, templateName);
-			}
-		}
-		// Not template based, look for quota & resource name
-		size_t quota = 500;
-		String resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-		if (params != 0)
-		{
-			NameValuePairList::const_iterator ni = params->find("quota");
-			if (ni != params->end())
-			{
-				quota = StringConverter::parseUnsignedInt(ni->second);
-			}
-			ni = params->find("resourceGroup");
-			if (ni != params->end())
-			{
-				resourceGroup = ni->second;
-			}
-		}
-		// create using manager
-		return ParticleSystemManager::getSingleton().createSystemImpl(
-								id, objectMemoryManager, quota, resourceGroup);
-				
+    String ParticleSystemFactory::FACTORY_TYPE_NAME = "ParticleSystem";
+    //-----------------------------------------------------------------------
+    MovableObject* ParticleSystemFactory::createInstanceImpl( IdType id,
+                                            ObjectMemoryManager *objectMemoryManager,
+                                            const NameValuePairList* params )
+    {
+        if (params != 0)
+        {
+            NameValuePairList::const_iterator ni = params->find("templateName");
+            if (ni != params->end())
+            {
+                String templateName = ni->second;
+                // create using manager
+                return ParticleSystemManager::getSingleton().createSystemImpl(
+                        id, objectMemoryManager, templateName);
+            }
+        }
+        // Not template based, look for quota & resource name
+        size_t quota = 500;
+        String resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+        if (params != 0)
+        {
+            NameValuePairList::const_iterator ni = params->find("quota");
+            if (ni != params->end())
+            {
+                quota = StringConverter::parseUnsignedInt(ni->second);
+            }
+            ni = params->find("resourceGroup");
+            if (ni != params->end())
+            {
+                resourceGroup = ni->second;
+            }
+        }
+        // create using manager
+        return ParticleSystemManager::getSingleton().createSystemImpl(
+                                id, objectMemoryManager, quota, resourceGroup);
+                
 
-	}
+    }
     //-----------------------------------------------------------------------
-	const String& ParticleSystemFactory::getType(void) const
-	{
-		return FACTORY_TYPE_NAME;
-	}
+    const String& ParticleSystemFactory::getType(void) const
+    {
+        return FACTORY_TYPE_NAME;
+    }
     //-----------------------------------------------------------------------
-	void ParticleSystemFactory::destroyInstance( MovableObject* obj) 
-	{
-		// use manager
-		ParticleSystemManager::getSingleton().destroySystemImpl(
-			static_cast<ParticleSystem*>(obj));
+    void ParticleSystemFactory::destroyInstance( MovableObject* obj) 
+    {
+        // use manager
+        ParticleSystemManager::getSingleton().destroySystemImpl(
+            static_cast<ParticleSystem*>(obj));
 
-	}
+    }
     //-----------------------------------------------------------------------
 }

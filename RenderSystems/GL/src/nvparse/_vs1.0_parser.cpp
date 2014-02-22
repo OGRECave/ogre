@@ -180,9 +180,9 @@ int yylex(void);
 void LexError(const char *format, ...);
 extern int line_incr;
 
-#define do_linenum_incr()		{ line_number+=line_incr; line_incr = 0; }
-//int get_linenum()			{ return( gbTempInsideMacro ? base_linenumber : line_number ); }
-int get_linenum()			{ return( line_number ); }
+#define do_linenum_incr()       { line_number+=line_incr; line_incr = 0; }
+//int get_linenum()         { return( gbTempInsideMacro ? base_linenumber : line_number ); }
+int get_linenum()           { return( line_number ); }
 
 #define YYDEBUG 1
 
@@ -262,7 +262,7 @@ typedef union YYSTYPE {
 
 #if (! defined (yyoverflow) \
      && (! defined (__cplusplus) \
-	 || (YYSTYPE_IS_TRIVIAL)))
+     || (YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
@@ -277,7 +277,7 @@ union yyalloc
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 # define YYSTACK_BYTES(N) \
-     ((N) * (sizeof (short) + sizeof (YYSTYPE))				\
+     ((N) * (sizeof (short) + sizeof (YYSTYPE))             \
       + YYSTACK_GAP_MAXIMUM)
 
 /* Copy COUNT objects from FROM to TO.  The source and destination do
@@ -287,13 +287,13 @@ union yyalloc
 #   define YYCOPY(To, From, Count) \
       __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
 #  else
-#   define YYCOPY(To, From, Count)		\
-      do					\
-	{					\
-	  register YYSIZE_T yyi;		\
-	  for (yyi = 0; yyi < (Count); yyi++)	\
-	    (To)[yyi] = (From)[yyi];		\
-	}					\
+#   define YYCOPY(To, From, Count)      \
+      do                    \
+    {                   \
+      register YYSIZE_T yyi;        \
+      for (yyi = 0; yyi < (Count); yyi++)   \
+        (To)[yyi] = (From)[yyi];        \
+    }                   \
       while (0)
 #  endif
 # endif
@@ -303,15 +303,15 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack)					\
-    do									\
-      {									\
-	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack, Stack, yysize);				\
-	Stack = &yyptr->Stack;						\
-	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
-	yyptr += yynewbytes / sizeof (*yyptr);				\
-      }									\
+# define YYSTACK_RELOCATE(Stack)                    \
+    do                                  \
+      {                                 \
+    YYSIZE_T yynewbytes;                        \
+    YYCOPY (&yyptr->Stack, Stack, yysize);              \
+    Stack = &yyptr->Stack;                      \
+    yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
+    yyptr += yynewbytes / sizeof (*yyptr);              \
+      }                                 \
     while (0)
 
 #endif
@@ -340,7 +340,7 @@ union yyalloc
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   290
 
-#define YYTRANSLATE(YYX) 						\
+#define YYTRANSLATE(YYX)                        \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
@@ -597,43 +597,43 @@ static const unsigned char yystos[] =
 # define YYSIZE_T unsigned int
 #endif
 
-#define yyerrok		(yyerrstatus = 0)
-#define yyclearin	(yychar = YYEMPTY)
-#define YYEMPTY		(-2)
-#define YYEOF		0
+#define yyerrok     (yyerrstatus = 0)
+#define yyclearin   (yychar = YYEMPTY)
+#define YYEMPTY     (-2)
+#define YYEOF       0
 
-#define YYACCEPT	goto yyacceptlab
-#define YYABORT		goto yyabortlab
-#define YYERROR		goto yyerrlab1
+#define YYACCEPT    goto yyacceptlab
+#define YYABORT     goto yyabortlab
+#define YYERROR     goto yyerrlab1
 
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
    Once GCC version 2 has supplanted version 1, this can go.  */
 
-#define YYFAIL		goto yyerrlab
+#define YYFAIL      goto yyerrlab
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)					\
-do								\
-  if (yychar == YYEMPTY && yylen == 1)				\
-    {								\
-      yychar = (Token);						\
-      yylval = (Value);						\
-      yytoken = YYTRANSLATE (yychar);				\
-      YYPOPSTACK;						\
-      goto yybackup;						\
-    }								\
-  else								\
-    { 								\
+#define YYBACKUP(Token, Value)                  \
+do                              \
+  if (yychar == YYEMPTY && yylen == 1)              \
+    {                               \
+      yychar = (Token);                     \
+      yylval = (Value);                     \
+      yytoken = YYTRANSLATE (yychar);               \
+      YYPOPSTACK;                       \
+      goto yybackup;                        \
+    }                               \
+  else                              \
+    {                               \
       yyerror ("syntax error: cannot back up");\
-      YYERROR;							\
-    }								\
+      YYERROR;                          \
+    }                               \
 while (0)
 
-#define YYTERROR	1
-#define YYERRCODE	256
+#define YYTERROR    1
+#define YYERRCODE   256
 
 /* YYLLOC_DEFAULT -- Compute the default location (before the actions
    are run).  */
@@ -662,27 +662,27 @@ while (0)
 #  define YYFPRINTF fprintf
 # endif
 
-# define YYDPRINTF(Args)			\
-do {						\
-  if (yydebug)					\
-    YYFPRINTF Args;				\
+# define YYDPRINTF(Args)            \
+do {                        \
+  if (yydebug)                  \
+    YYFPRINTF Args;             \
 } while (0)
 
-# define YYDSYMPRINT(Args)			\
-do {						\
-  if (yydebug)					\
-    yysymprint Args;				\
+# define YYDSYMPRINT(Args)          \
+do {                        \
+  if (yydebug)                  \
+    yysymprint Args;                \
 } while (0)
 
-# define YYDSYMPRINTF(Title, Token, Value, Location)		\
-do {								\
-  if (yydebug)							\
-    {								\
-      YYFPRINTF (stderr, "%s ", Title);				\
-      yysymprint (stderr, 					\
-                  Token, Value);	\
-      YYFPRINTF (stderr, "\n");					\
-    }								\
+# define YYDSYMPRINTF(Title, Token, Value, Location)        \
+do {                                \
+  if (yydebug)                          \
+    {                               \
+      YYFPRINTF (stderr, "%s ", Title);             \
+      yysymprint (stderr,                   \
+                  Token, Value);    \
+      YYFPRINTF (stderr, "\n");                 \
+    }                               \
 } while (0)
 
 /*------------------------------------------------------------------.
@@ -706,10 +706,10 @@ yy_stack_print (bottom, top)
   YYFPRINTF (stderr, "\n");
 }
 
-# define YY_STACK_PRINT(Bottom, Top)				\
-do {								\
-  if (yydebug)							\
-    yy_stack_print ((Bottom), (Top));				\
+# define YY_STACK_PRINT(Bottom, Top)                \
+do {                                \
+  if (yydebug)                          \
+    yy_stack_print ((Bottom), (Top));               \
 } while (0)
 
 
@@ -736,10 +736,10 @@ yy_reduce_print (yyrule)
   YYFPRINTF (stderr, "-> %s\n", yytname [yyr1[yyrule]]);
 }
 
-# define YY_REDUCE_PRINT(Rule)		\
-do {					\
-  if (yydebug)				\
-    yy_reduce_print (Rule);		\
+# define YY_REDUCE_PRINT(Rule)      \
+do {                    \
+  if (yydebug)              \
+    yy_reduce_print (Rule);     \
 } while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -755,7 +755,7 @@ int yydebug;
 
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
-#ifndef	YYINITDEPTH
+#ifndef YYINITDEPTH
 # define YYINITDEPTH 200
 #endif
 
@@ -964,7 +964,7 @@ yyparse ()
      to reallocate them elsewhere.  */
 
   /* The state stack.  */
-  short	yyssa[YYINITDEPTH];
+  short yyssa[YYINITDEPTH];
   short *yyss = yyssa;
   register short *yyssp;
 
@@ -993,7 +993,7 @@ yyparse ()
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY;		/* Cause a token to be read.  */
+  yychar = YYEMPTY;     /* Cause a token to be read.  */
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
@@ -1024,25 +1024,25 @@ yyparse ()
 
 #ifdef yyoverflow
       {
-	/* Give user a chance to reallocate the stack. Use copies of
-	   these so that the &'s don't force the real ones into
-	   memory.  */
-	YYSTYPE *yyvs1 = yyvs;
-	short *yyss1 = yyss;
+    /* Give user a chance to reallocate the stack. Use copies of
+       these so that the &'s don't force the real ones into
+       memory.  */
+    YYSTYPE *yyvs1 = yyvs;
+    short *yyss1 = yyss;
 
 
-	/* Each stack pointer address is followed by the size of the
-	   data in use in that stack, in bytes.  This used to be a
-	   conditional around just the two extra args, but that might
-	   be undefined if yyoverflow is a macro.  */
-	yyoverflow ("parser stack overflow",
-		    &yyss1, yysize * sizeof (*yyssp),
-		    &yyvs1, yysize * sizeof (*yyvsp),
+    /* Each stack pointer address is followed by the size of the
+       data in use in that stack, in bytes.  This used to be a
+       conditional around just the two extra args, but that might
+       be undefined if yyoverflow is a macro.  */
+    yyoverflow ("parser stack overflow",
+            &yyss1, yysize * sizeof (*yyssp),
+            &yyvs1, yysize * sizeof (*yyvsp),
 
-		    &yystacksize);
+            &yystacksize);
 
-	yyss = yyss1;
-	yyvs = yyvs1;
+    yyss = yyss1;
+    yyvs = yyvs1;
       }
 #else /* no yyoverflow */
 # ifndef YYSTACK_RELOCATE
@@ -1050,23 +1050,23 @@ yyparse ()
 # else
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
-	goto yyoverflowlab;
+    goto yyoverflowlab;
       yystacksize *= 2;
       if (YYMAXDEPTH < yystacksize)
-	yystacksize = YYMAXDEPTH;
+    yystacksize = YYMAXDEPTH;
 
       {
-	short *yyss1 = yyss;
-	union yyalloc *yyptr =
-	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
-	if (! yyptr)
-	  goto yyoverflowlab;
-	YYSTACK_RELOCATE (yyss);
-	YYSTACK_RELOCATE (yyvs);
+    short *yyss1 = yyss;
+    union yyalloc *yyptr =
+      (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
+    if (! yyptr)
+      goto yyoverflowlab;
+    YYSTACK_RELOCATE (yyss);
+    YYSTACK_RELOCATE (yyvs);
 
 #  undef YYSTACK_RELOCATE
-	if (yyss1 != yyssa)
-	  YYSTACK_FREE (yyss1);
+    if (yyss1 != yyssa)
+      YYSTACK_FREE (yyss1);
       }
 # endif
 #endif /* no yyoverflow */
@@ -1076,10 +1076,10 @@ yyparse ()
 
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-		  (unsigned long int) yystacksize));
+          (unsigned long int) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
-	YYABORT;
+    YYABORT;
     }
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
@@ -1130,7 +1130,7 @@ yybackup:
   if (yyn <= 0)
     {
       if (yyn == 0 || yyn == YYTABLE_NINF)
-	goto yyerrlab;
+    goto yyerrlab;
       yyn = -yyn;
       goto yyreduce;
     }
@@ -1191,472 +1191,472 @@ yyreduce:
         case 2:
 #line 97 "vs1.0_grammar.y"
     {
-	yyvsp[0].instList->Validate();
-	yyvsp[0].instList->Translate();
-	delete yyvsp[0].instList;
-	;}
+    yyvsp[0].instList->Validate();
+    yyvsp[0].instList->Translate();
+    delete yyvsp[0].instList;
+    ;}
     break;
 
   case 3:
 #line 105 "vs1.0_grammar.y"
     {
-		*(yyvsp[-1].instList) += yyvsp[0].inst;
-		delete yyvsp[0].inst;
-		yyval.instList = yyvsp[-1].instList
-	;}
+        *(yyvsp[-1].instList) += yyvsp[0].inst;
+        delete yyvsp[0].inst;
+        yyval.instList = yyvsp[-1].instList
+    ;}
     break;
 
   case 4:
 #line 111 "vs1.0_grammar.y"
     {
- 		VS10InstListPtr instList = new VS10InstList;
-		if ( yyvsp[0].inst != NULL )
-			{
-			*instList += yyvsp[0].inst;
-			delete yyvsp[0].inst;
-			}
-		yyval.instList = instList;
-	;}
+        VS10InstListPtr instList = new VS10InstList;
+        if ( yyvsp[0].inst != NULL )
+            {
+            *instList += yyvsp[0].inst;
+            delete yyvsp[0].inst;
+            }
+        yyval.instList = instList;
+    ;}
     break;
 
   case 5:
 #line 123 "vs1.0_grammar.y"
     {
-		yyval.inst = yyvsp[0].inst;
-		do_linenum_incr();
-	;}
+        yyval.inst = yyvsp[0].inst;
+        do_linenum_incr();
+    ;}
     break;
 
   case 6:
 #line 128 "vs1.0_grammar.y"
     {
-		yyval.inst = new VS10Inst( get_linenum() );
-		do_linenum_incr();
-	;}
+        yyval.inst = new VS10Inst( get_linenum() );
+        do_linenum_incr();
+    ;}
     break;
 
   case 12:
 #line 140 "vs1.0_grammar.y"
     {
-		   yyval.inst = new VS10Inst( get_linenum(), VS10_NOP );
-		   ;}
+           yyval.inst = new VS10Inst( get_linenum(), VS10_NOP );
+           ;}
     break;
 
   case 13:
 #line 144 "vs1.0_grammar.y"
     {
-		   yyval.inst = new VS10Inst( get_linenum(), VS10_COMMENT, yyvsp[0].comment );
-		   ;}
+           yyval.inst = new VS10Inst( get_linenum(), VS10_COMMENT, yyvsp[0].comment );
+           ;}
     break;
 
   case 14:
 #line 148 "vs1.0_grammar.y"
     {
-		   yyval.inst = new VS10Inst( get_linenum(), VS10_HEADER );
-		   ;}
+           yyval.inst = new VS10Inst( get_linenum(), VS10_HEADER );
+           ;}
     break;
 
   case 15:
 #line 154 "vs1.0_grammar.y"
     {
-		yyval.inst = new VS10Inst( get_linenum(), yyvsp[-3].ival, yyvsp[-2].reg, yyvsp[0].reg );
-	;}
+        yyval.inst = new VS10Inst( get_linenum(), yyvsp[-3].ival, yyvsp[-2].reg, yyvsp[0].reg );
+    ;}
     break;
 
   case 16:
 #line 160 "vs1.0_grammar.y"
     {
-		   VS10Reg reg;
-		   reg = yyvsp[-2].reg;
-		   reg.sign = -1;
-		   reg.type = yyvsp[-2].reg.type;
-		   reg.index = yyvsp[-2].reg.index;
-		   for ( int i = 0; i < 4; i++ ) reg.mask[i] = yyvsp[0].mask[i];
-		   yyval.reg = reg;
-		   ;}
+           VS10Reg reg;
+           reg = yyvsp[-2].reg;
+           reg.sign = -1;
+           reg.type = yyvsp[-2].reg.type;
+           reg.index = yyvsp[-2].reg.index;
+           for ( int i = 0; i < 4; i++ ) reg.mask[i] = yyvsp[0].mask[i];
+           yyval.reg = reg;
+           ;}
     break;
 
   case 17:
 #line 170 "vs1.0_grammar.y"
     {
-		   VS10Reg reg;
-		   reg = yyvsp[-2].reg;
-		   reg.sign = 1;
-		   reg.type = yyvsp[-2].reg.type;
-		   reg.index = yyvsp[-2].reg.index;
-		   for ( int i = 0; i < 4; i++ ) reg.mask[i] = yyvsp[0].mask[i];
-		   yyval.reg = reg;
-		   ;}
+           VS10Reg reg;
+           reg = yyvsp[-2].reg;
+           reg.sign = 1;
+           reg.type = yyvsp[-2].reg.type;
+           reg.index = yyvsp[-2].reg.index;
+           for ( int i = 0; i < 4; i++ ) reg.mask[i] = yyvsp[0].mask[i];
+           yyval.reg = reg;
+           ;}
     break;
 
   case 18:
 #line 180 "vs1.0_grammar.y"
     {
-		   VS10Reg reg;
-		   reg = yyvsp[0].reg;
-		   reg.sign = -1;
-		   reg.type = yyvsp[0].reg.type;
-		   reg.index = yyvsp[0].reg.index;
-		   for ( int i = 0; i < 4; i++ ) reg.mask[i] = 0;
-		   yyval.reg = reg;
-		   ;}
+           VS10Reg reg;
+           reg = yyvsp[0].reg;
+           reg.sign = -1;
+           reg.type = yyvsp[0].reg.type;
+           reg.index = yyvsp[0].reg.index;
+           for ( int i = 0; i < 4; i++ ) reg.mask[i] = 0;
+           yyval.reg = reg;
+           ;}
     break;
 
   case 19:
 #line 190 "vs1.0_grammar.y"
     {
-		   VS10Reg reg;
-		   reg = yyvsp[0].reg;
-		   reg.sign = 1;
-		   reg.type = yyvsp[0].reg.type;
-		   reg.index = yyvsp[0].reg.index;
-		   for ( int i = 0; i < 4; i++ ) reg.mask[i] = 0;
-		   yyval.reg = reg;
-		   ;}
+           VS10Reg reg;
+           reg = yyvsp[0].reg;
+           reg.sign = 1;
+           reg.type = yyvsp[0].reg.type;
+           reg.index = yyvsp[0].reg.index;
+           for ( int i = 0; i < 4; i++ ) reg.mask[i] = 0;
+           yyval.reg = reg;
+           ;}
     break;
 
   case 21:
 #line 201 "vs1.0_grammar.y"
     {
-	  ;}
+      ;}
     break;
 
   case 22:
 #line 205 "vs1.0_grammar.y"
     {
-		   VS10Reg reg;
-		   reg.type = TYPE_CONSTANT_MEM_REG;
-		   reg.index = yyvsp[-1].ival;
-		   yyval.reg = reg;
-		   ;}
+           VS10Reg reg;
+           reg.type = TYPE_CONSTANT_MEM_REG;
+           reg.index = yyvsp[-1].ival;
+           yyval.reg = reg;
+           ;}
     break;
 
   case 23:
 #line 212 "vs1.0_grammar.y"
     {
-		   // Register is valid only if
-		   //	type = TYPE_ADDRESS_REG
-		   //	index = 0
-		   //	len(mask) = 1
-		   //	mask[0] = 'x'
-		   VS10Reg reg;
-		   yyval.reg.type = TYPE_CONSTANT_A0_REG;
-		   if ( yyvsp[-3].reg.type != TYPE_ADDRESS_REG )
-		       {
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-			   }
-		       else if ( yyvsp[-3].reg.index != 0 )
-			   {
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-			   }
-			   else
-			   {
-			       int len = 0;
-				   while ( len < 2 )
-				   {
-				       if ( yyvsp[-1].mask[len] == 0 )
-				           break;
-					   len++;
-				   }
-				   if ( len != 1 || yyvsp[-1].mask[0] != 'x' )
-				   {
-			       LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-				   }
+           // Register is valid only if
+           //   type = TYPE_ADDRESS_REG
+           //   index = 0
+           //   len(mask) = 1
+           //   mask[0] = 'x'
+           VS10Reg reg;
+           yyval.reg.type = TYPE_CONSTANT_A0_REG;
+           if ( yyvsp[-3].reg.type != TYPE_ADDRESS_REG )
+               {
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+               }
+               else if ( yyvsp[-3].reg.index != 0 )
+               {
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+               }
+               else
+               {
+                   int len = 0;
+                   while ( len < 2 )
+                   {
+                       if ( yyvsp[-1].mask[len] == 0 )
+                           break;
+                       len++;
+                   }
+                   if ( len != 1 || yyvsp[-1].mask[0] != 'x' )
+                   {
+                   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+                   }
 
-				   reg.type = TYPE_CONSTANT_A0_REG;
-				   yyval.reg = reg;
-			   }
-		   ;}
+                   reg.type = TYPE_CONSTANT_A0_REG;
+                   yyval.reg = reg;
+               }
+           ;}
     break;
 
   case 24:
 #line 247 "vs1.0_grammar.y"
     {
-		   // Register is valid only if
-		   //	type = TYPE_ADDRESS_REG
-		   //	index = 0
-		   //	len(mask) = 1
-		   //	mask[0] = 'x'
-		   VS10Reg reg;
-		   yyval.reg.type = TYPE_CONSTANT_A0_OFFSET_REG;
-		   if ( yyvsp[-5].reg.type != TYPE_ADDRESS_REG )
-		       {
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-			   }
-		       else if ( yyvsp[-5].reg.index != 0 )
-			   {
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-			   }
-			   else
-			   {
-			       int len = 0;
-				   while ( len < 2 )
-				   {
-				       if ( yyvsp[-3].mask[len] == 0 )
-				           break;
-					   len++;
-				   }
-				   if ( len != 1 || yyvsp[-3].mask[0] != 'x' )
-				   {
-			       LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-				   }
+           // Register is valid only if
+           //   type = TYPE_ADDRESS_REG
+           //   index = 0
+           //   len(mask) = 1
+           //   mask[0] = 'x'
+           VS10Reg reg;
+           yyval.reg.type = TYPE_CONSTANT_A0_OFFSET_REG;
+           if ( yyvsp[-5].reg.type != TYPE_ADDRESS_REG )
+               {
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+               }
+               else if ( yyvsp[-5].reg.index != 0 )
+               {
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+               }
+               else
+               {
+                   int len = 0;
+                   while ( len < 2 )
+                   {
+                       if ( yyvsp[-3].mask[len] == 0 )
+                           break;
+                       len++;
+                   }
+                   if ( len != 1 || yyvsp[-3].mask[0] != 'x' )
+                   {
+                   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+                   }
 
-				   reg.type = TYPE_CONSTANT_A0_OFFSET_REG;
-				   reg.index = yyvsp[-1].ival;
-				   yyval.reg = reg;
-			   }
-		   ;}
+                   reg.type = TYPE_CONSTANT_A0_OFFSET_REG;
+                   reg.index = yyvsp[-1].ival;
+                   yyval.reg = reg;
+               }
+           ;}
     break;
 
   case 25:
 #line 283 "vs1.0_grammar.y"
     {
-		       yyval.reg.type = TYPE_CONSTANT_A0_REG;
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-		   ;}
+               yyval.reg.type = TYPE_CONSTANT_A0_REG;
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+           ;}
     break;
 
   case 26:
 #line 288 "vs1.0_grammar.y"
     {
-		       yyval.reg.type = TYPE_CONSTANT_A0_REG;
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-		   ;}
+               yyval.reg.type = TYPE_CONSTANT_A0_REG;
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+           ;}
     break;
 
   case 27:
 #line 293 "vs1.0_grammar.y"
     {
-		       yyval.reg.type = TYPE_CONSTANT_A0_REG;
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-		   ;}
+               yyval.reg.type = TYPE_CONSTANT_A0_REG;
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+           ;}
     break;
 
   case 28:
 #line 298 "vs1.0_grammar.y"
     {
-		       yyval.reg.type = TYPE_CONSTANT_A0_REG;
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-		   ;}
+               yyval.reg.type = TYPE_CONSTANT_A0_REG;
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+           ;}
     break;
 
   case 29:
 #line 303 "vs1.0_grammar.y"
     {
-		       yyval.reg.type = TYPE_CONSTANT_A0_REG;
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-		   ;}
+               yyval.reg.type = TYPE_CONSTANT_A0_REG;
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+           ;}
     break;
 
   case 30:
 #line 308 "vs1.0_grammar.y"
     {
-		       yyval.reg.type = TYPE_CONSTANT_A0_REG;
-			   LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
-		   ;}
+               yyval.reg.type = TYPE_CONSTANT_A0_REG;
+               LexError( "constant register index must be:\t<int>, a0.x, or a0.x + <int>.\n" );
+           ;}
     break;
 
   case 31:
 #line 315 "vs1.0_grammar.y"
     {
-		yyval.inst = new VS10Inst( get_linenum(), yyvsp[-3].ival, yyvsp[-2].reg, yyvsp[0].reg );
-	;}
+        yyval.inst = new VS10Inst( get_linenum(), yyvsp[-3].ival, yyvsp[-2].reg, yyvsp[0].reg );
+    ;}
     break;
 
   case 32:
 #line 321 "vs1.0_grammar.y"
     {
-		yyval.inst = new VS10Inst( get_linenum(), yyvsp[-3].ival, yyvsp[-2].reg, yyvsp[0].reg );
-	;}
+        yyval.inst = new VS10Inst( get_linenum(), yyvsp[-3].ival, yyvsp[-2].reg, yyvsp[0].reg );
+    ;}
     break;
 
   case 33:
 #line 327 "vs1.0_grammar.y"
     {
-		yyval.inst = new VS10Inst( get_linenum(), yyvsp[-5].ival, yyvsp[-4].reg, yyvsp[-2].reg, yyvsp[0].reg );
-	;}
+        yyval.inst = new VS10Inst( get_linenum(), yyvsp[-5].ival, yyvsp[-4].reg, yyvsp[-2].reg, yyvsp[0].reg );
+    ;}
     break;
 
   case 34:
 #line 334 "vs1.0_grammar.y"
     {
-		yyval.inst = new VS10Inst( get_linenum(), yyvsp[-7].ival, yyvsp[-6].reg, yyvsp[-4].reg, yyvsp[-2].reg, yyvsp[0].reg );
-	;}
+        yyval.inst = new VS10Inst( get_linenum(), yyvsp[-7].ival, yyvsp[-6].reg, yyvsp[-4].reg, yyvsp[-2].reg, yyvsp[0].reg );
+    ;}
     break;
 
   case 35:
 #line 340 "vs1.0_grammar.y"
     {
-		yyval.ival = VS10_MOV;
-	;}
+        yyval.ival = VS10_MOV;
+    ;}
     break;
 
   case 36:
 #line 344 "vs1.0_grammar.y"
     {
-		yyval.ival = VS10_LIT;
-	;}
+        yyval.ival = VS10_LIT;
+    ;}
     break;
 
   case 37:
 #line 350 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_RCP;
-	;}
+    yyval.ival = VS10_RCP;
+    ;}
     break;
 
   case 38:
 #line 354 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_RSQ;
-	;}
+    yyval.ival = VS10_RSQ;
+    ;}
     break;
 
   case 39:
 #line 358 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_EXP;
-	;}
+    yyval.ival = VS10_EXP;
+    ;}
     break;
 
   case 40:
 #line 362 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_EXPP;
-	;}
+    yyval.ival = VS10_EXPP;
+    ;}
     break;
 
   case 41:
 #line 366 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_LOG;
-	;}
+    yyval.ival = VS10_LOG;
+    ;}
     break;
 
   case 42:
 #line 370 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_LOGP;
-	;}
+    yyval.ival = VS10_LOGP;
+    ;}
     break;
 
   case 43:
 #line 376 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_FRC;
-	;}
+    yyval.ival = VS10_FRC;
+    ;}
     break;
 
   case 44:
 #line 382 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_MUL;
-	;}
+    yyval.ival = VS10_MUL;
+    ;}
     break;
 
   case 45:
 #line 386 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_ADD;
-	;}
+    yyval.ival = VS10_ADD;
+    ;}
     break;
 
   case 46:
 #line 390 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_DP3;
-	;}
+    yyval.ival = VS10_DP3;
+    ;}
     break;
 
   case 47:
 #line 394 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_DP4;
-	;}
+    yyval.ival = VS10_DP4;
+    ;}
     break;
 
   case 48:
 #line 398 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_DST;
-	;}
+    yyval.ival = VS10_DST;
+    ;}
     break;
 
   case 49:
 #line 402 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_MIN;
-	;}
+    yyval.ival = VS10_MIN;
+    ;}
     break;
 
   case 50:
 #line 406 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_MAX;
-	;}
+    yyval.ival = VS10_MAX;
+    ;}
     break;
 
   case 51:
 #line 410 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_SLT;
-	;}
+    yyval.ival = VS10_SLT;
+    ;}
     break;
 
   case 52:
 #line 414 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_SGE;
-	;}
+    yyval.ival = VS10_SGE;
+    ;}
     break;
 
   case 53:
 #line 418 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_M3X2;
-	;}
+    yyval.ival = VS10_M3X2;
+    ;}
     break;
 
   case 54:
 #line 422 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_M3X3;
-	;}
+    yyval.ival = VS10_M3X3;
+    ;}
     break;
 
   case 55:
 #line 426 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_M3X4;
-	;}
+    yyval.ival = VS10_M3X4;
+    ;}
     break;
 
   case 56:
 #line 430 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_M4X3;
-	;}
+    yyval.ival = VS10_M4X3;
+    ;}
     break;
 
   case 57:
 #line 434 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_M4X4;
-	;}
+    yyval.ival = VS10_M4X4;
+    ;}
     break;
 
   case 58:
 #line 438 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_SUB;
-	;}
+    yyval.ival = VS10_SUB;
+    ;}
     break;
 
   case 59:
 #line 444 "vs1.0_grammar.y"
     {
-	yyval.ival = VS10_MAD;
-	;}
+    yyval.ival = VS10_MAD;
+    ;}
     break;
 
 
@@ -1701,50 +1701,50 @@ yyerrlab:
       yyn = yypact[yystate];
 
       if (YYPACT_NINF < yyn && yyn < YYLAST)
-	{
-	  YYSIZE_T yysize = 0;
-	  int yytype = YYTRANSLATE (yychar);
-	  char *yymsg;
-	  int yyx, yycount;
+    {
+      YYSIZE_T yysize = 0;
+      int yytype = YYTRANSLATE (yychar);
+      char *yymsg;
+      int yyx, yycount;
 
-	  yycount = 0;
-	  /* Start YYX at -YYN if negative to avoid negative indexes in
-	     YYCHECK.  */
-	  for (yyx = yyn < 0 ? -yyn : 0;
-	       yyx < (int) (sizeof (yytname) / sizeof (char *)); yyx++)
-	    if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
-	      yysize += yystrlen (yytname[yyx]) + 15, yycount++;
-	  yysize += yystrlen ("syntax error, unexpected ") + 1;
-	  yysize += yystrlen (yytname[yytype]);
-	  yymsg = (char *) YYSTACK_ALLOC (yysize);
-	  if (yymsg != 0)
-	    {
-	      char *yyp = yystpcpy (yymsg, "syntax error, unexpected ");
-	      yyp = yystpcpy (yyp, yytname[yytype]);
+      yycount = 0;
+      /* Start YYX at -YYN if negative to avoid negative indexes in
+         YYCHECK.  */
+      for (yyx = yyn < 0 ? -yyn : 0;
+           yyx < (int) (sizeof (yytname) / sizeof (char *)); yyx++)
+        if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
+          yysize += yystrlen (yytname[yyx]) + 15, yycount++;
+      yysize += yystrlen ("syntax error, unexpected ") + 1;
+      yysize += yystrlen (yytname[yytype]);
+      yymsg = (char *) YYSTACK_ALLOC (yysize);
+      if (yymsg != 0)
+        {
+          char *yyp = yystpcpy (yymsg, "syntax error, unexpected ");
+          yyp = yystpcpy (yyp, yytname[yytype]);
 
-	      if (yycount < 5)
-		{
-		  yycount = 0;
-		  for (yyx = yyn < 0 ? -yyn : 0;
-		       yyx < (int) (sizeof (yytname) / sizeof (char *));
-		       yyx++)
-		    if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
-		      {
-			const char *yyq = ! yycount ? ", expecting " : " or ";
-			yyp = yystpcpy (yyp, yyq);
-			yyp = yystpcpy (yyp, yytname[yyx]);
-			yycount++;
-		      }
-		}
-	      yyerror (yymsg);
-	      YYSTACK_FREE (yymsg);
-	    }
-	  else
-	    yyerror ("syntax error; also virtual memory exhausted");
-	}
+          if (yycount < 5)
+        {
+          yycount = 0;
+          for (yyx = yyn < 0 ? -yyn : 0;
+               yyx < (int) (sizeof (yytname) / sizeof (char *));
+               yyx++)
+            if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
+              {
+            const char *yyq = ! yycount ? ", expecting " : " or ";
+            yyp = yystpcpy (yyp, yyq);
+            yyp = yystpcpy (yyp, yytname[yyx]);
+            yycount++;
+              }
+        }
+          yyerror (yymsg);
+          YYSTACK_FREE (yymsg);
+        }
+      else
+        yyerror ("syntax error; also virtual memory exhausted");
+    }
       else
 #endif /* YYERROR_VERBOSE */
-	yyerror ("syntax error");
+    yyerror ("syntax error");
     }
 
 
@@ -1752,21 +1752,21 @@ yyerrlab:
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
-	 error, discard it.  */
+     error, discard it.  */
 
       /* Return failure if at end of input.  */
       if (yychar == YYEOF)
         {
-	  /* Pop the error token.  */
+      /* Pop the error token.  */
           YYPOPSTACK;
-	  /* Pop the rest of the stack.  */
-	  while (yyss < yyssp)
-	    {
-	      YYDSYMPRINTF ("Error: popping", yystos[*yyssp], yyvsp, yylsp);
-	      yydestruct (yystos[*yyssp], yyvsp);
-	      YYPOPSTACK;
-	    }
-	  YYABORT;
+      /* Pop the rest of the stack.  */
+      while (yyss < yyssp)
+        {
+          YYDSYMPRINTF ("Error: popping", yystos[*yyssp], yyvsp, yylsp);
+          yydestruct (yystos[*yyssp], yyvsp);
+          YYPOPSTACK;
+        }
+      YYABORT;
         }
 
       YYDSYMPRINTF ("Error: discarding", yytoken, &yylval, &yylloc);
@@ -1784,25 +1784,25 @@ yyerrlab:
 | yyerrlab1 -- error raised explicitly by an action.  |
 `----------------------------------------------------*/
 yyerrlab1:
-  yyerrstatus = 3;	/* Each real token shifted decrements this.  */
+  yyerrstatus = 3;  /* Each real token shifted decrements this.  */
 
   for (;;)
     {
       yyn = yypact[yystate];
       if (yyn != YYPACT_NINF)
-	{
-	  yyn += YYTERROR;
-	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
-	    {
-	      yyn = yytable[yyn];
-	      if (0 < yyn)
-		break;
-	    }
-	}
+    {
+      yyn += YYTERROR;
+      if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+        {
+          yyn = yytable[yyn];
+          if (0 < yyn)
+        break;
+        }
+    }
 
       /* Pop the current state because it cannot handle the error token.  */
       if (yyssp == yyss)
-	YYABORT;
+    YYABORT;
 
       YYDSYMPRINTF ("Error: popping", yystos[*yyssp], yyvsp, yylsp);
       yydestruct (yystos[yystate], yyvsp);

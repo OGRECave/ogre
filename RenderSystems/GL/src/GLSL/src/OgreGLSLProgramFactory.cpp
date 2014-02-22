@@ -35,15 +35,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String GLSLProgramFactory::sLanguageName = "glsl";
     //-----------------------------------------------------------------------
-	GLSLProgramFactory::GLSLProgramFactory(void)
+    GLSLProgramFactory::GLSLProgramFactory(void)
     {
-		mLinkProgramManager = new GLSLLinkProgramManager();
+        mLinkProgramManager = new GLSLLinkProgramManager();
     }
     //-----------------------------------------------------------------------
     GLSLProgramFactory::~GLSLProgramFactory(void)
     {
-		if (mLinkProgramManager)
-			delete mLinkProgramManager;
+        if (mLinkProgramManager)
+            delete mLinkProgramManager;
     }
     //-----------------------------------------------------------------------
     const String& GLSLProgramFactory::getLanguage(void) const
@@ -58,7 +58,7 @@ namespace Ogre {
         return new GLSLProgram(creator, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-	void GLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
+    void GLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
     {
         delete prog;
     }

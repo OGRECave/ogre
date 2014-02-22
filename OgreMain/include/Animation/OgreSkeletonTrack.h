@@ -35,100 +35,100 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class KfTransformArrayMemoryManager;
+    class KfTransformArrayMemoryManager;
 
-	struct KeyFrameRig
-	{
-		Real mFrame;
-		Real mInvNextFrameDistance; // 1.0f / (KeyFrameRig[1].mFrame - KeyFrameRig[0].mFrame)
+    struct KeyFrameRig
+    {
+        Real mFrame;
+        Real mInvNextFrameDistance; // 1.0f / (KeyFrameRig[1].mFrame - KeyFrameRig[0].mFrame)
 
-		// SoA variable. Packs posrotscale posrotscale ...
-		KfTransform * RESTRICT_ALIAS mBoneTransform;
-	};
+        // SoA variable. Packs posrotscale posrotscale ...
+        KfTransform * RESTRICT_ALIAS mBoneTransform;
+    };
 
-	typedef vector<KeyFrameRig>::type KeyFrameRigVec;
+    typedef vector<KeyFrameRig>::type KeyFrameRigVec;
 
-	typedef FastArray<BoneTransform> TransformArray;
+    typedef FastArray<BoneTransform> TransformArray;
 
-	class _OgreExport SkeletonTrack : public AnimationAlloc
-	{
-	protected:
-		/// There is one entry per each parent level
-		KeyFrameRigVec		mKeyFrameRigs;
-		Real				mNumFrames;
+    class _OgreExport SkeletonTrack : public AnimationAlloc
+    {
+    protected:
+        /// There is one entry per each parent level
+        KeyFrameRigVec      mKeyFrameRigs;
+        Real                mNumFrames;
 
-		uint32				mBoneBlockIdx;
+        uint32              mBoneBlockIdx;
 
-		/** Number of SIMD slots used by all @see KeyFrameRig::mBoneTransform.
-			When this value is <= (ARRAY_PACKED_REALS / 2); then we repeat the transforms
-			to the next slots. i.e: 
-			mUsedSlots = 2;
-			mBoneTransform[0] = Bone Transform A
-			mBoneTransform[1] = Bone Transform B
-			mBoneTransform[2] = mBoneTransform[0]
-			mBoneTransform[3] = mBoneTransform[1]
+        /** Number of SIMD slots used by all @see KeyFrameRig::mBoneTransform.
+            When this value is <= (ARRAY_PACKED_REALS / 2); then we repeat the transforms
+            to the next slots. i.e: 
+            mUsedSlots = 2;
+            mBoneTransform[0] = Bone Transform A
+            mBoneTransform[1] = Bone Transform B
+            mBoneTransform[2] = mBoneTransform[0]
+            mBoneTransform[3] = mBoneTransform[1]
 
-			mUsedSlots = 1;
-			mBoneTransform[0] = Bone Transform A
-			mBoneTransform[1] = mBoneTransform[0]
-			mBoneTransform[2] = mBoneTransform[0]
-			mBoneTransform[3] = mBoneTransform[0]
-		*/
-        uint32				mUsedSlots;
+            mUsedSlots = 1;
+            mBoneTransform[0] = Bone Transform A
+            mBoneTransform[1] = mBoneTransform[0]
+            mBoneTransform[2] = mBoneTransform[0]
+            mBoneTransform[3] = mBoneTransform[0]
+        */
+        uint32              mUsedSlots;
 
-		KfTransformArrayMemoryManager *mLocalMemoryManager;
+        KfTransformArrayMemoryManager *mLocalMemoryManager;
 
-	public:
-		SkeletonTrack( uint32 boneBlockIdx, KfTransformArrayMemoryManager *kfTransformMemoryManager );
-		~SkeletonTrack();
+    public:
+        SkeletonTrack( uint32 boneBlockIdx, KfTransformArrayMemoryManager *kfTransformMemoryManager );
+        ~SkeletonTrack();
 
-		void setNumKeyFrame( size_t numKeyFrames );
+        void setNumKeyFrame( size_t numKeyFrames );
 
-		void addKeyFrame( Real timestamp, Real frameRate );
-		void setKeyFrameTransform( Real frame, uint32 slot, const Vector3 &vPos,
-									const Quaternion &qRot, const Vector3 vScale );
+        void addKeyFrame( Real timestamp, Real frameRate );
+        void setKeyFrameTransform( Real frame, uint32 slot, const Vector3 &vPos,
+                                    const Quaternion &qRot, const Vector3 vScale );
 
-		uint32 getBoneBlockIdx(void) const						{ return mBoneBlockIdx; }
-		size_t getUsedSlots(void) const							{ return mUsedSlots; }
+        uint32 getBoneBlockIdx(void) const                      { return mBoneBlockIdx; }
+        size_t getUsedSlots(void) const                         { return mUsedSlots; }
         void _setMaxUsedSlot( uint32 slot )
-										{ mUsedSlots = std::max( slot+1, mUsedSlots ); }
+                                        { mUsedSlots = std::max( slot+1, mUsedSlots ); }
 
-		const KeyFrameRigVec& getKeyFrames(void) const			{ return mKeyFrameRigs; }
-		KeyFrameRigVec& _getKeyFrames(void)						{ return mKeyFrameRigs; }
+        const KeyFrameRigVec& getKeyFrames(void) const          { return mKeyFrameRigs; }
+        KeyFrameRigVec& _getKeyFrames(void)                     { return mKeyFrameRigs; }
 
-		inline void getKeyFrameRigAt( KeyFrameRigVec::const_iterator &inOutPrevFrame,
-										KeyFrameRigVec::const_iterator &outNextFrame,
-										Real frame ) const;
+        inline void getKeyFrameRigAt( KeyFrameRigVec::const_iterator &inOutPrevFrame,
+                                        KeyFrameRigVec::const_iterator &outNextFrame,
+                                        Real frame ) const;
 
-		/** Applies the interpolated keyframe at the given frame to all bone
-			transformations that are animated by this Track.
-		@param inOutLastKnownKeyFrame [in/out]
-			Hint to this system on where to start next. If unknown (i.e. first call) set
-			it to mKeyFrameRigs.begin()
-			As output it will be set to the current keyframe, and should be used as input
-			for the next call to keep keyframe searchs in constant time.
-		@param frame [in]
-			Frame number, should be in range [0; mNumFrames]; if below zero the result
-			will look like clamped to zero, if above mNumFrames, it result will look
-			like clamped to mNumFrames
-		@param perBoneWeights [in]
-			A list of per bone weights. The size of the array must be 1 (or more)
-		@param KfTransforms [out]
-			An array with all bone transformations, sorted by parent level.
-			The key frames are only applied to affected bones.
-		*/
-		void applyKeyFrameRigAt( KeyFrameRigVec::const_iterator &inOutLastKnownKeyFrame, float frame,
-								 ArrayReal animWeight, const ArrayReal * RESTRICT_ALIAS perBoneWeights,
-								 const TransformArray &KfTransforms ) const;
+        /** Applies the interpolated keyframe at the given frame to all bone
+            transformations that are animated by this Track.
+        @param inOutLastKnownKeyFrame [in/out]
+            Hint to this system on where to start next. If unknown (i.e. first call) set
+            it to mKeyFrameRigs.begin()
+            As output it will be set to the current keyframe, and should be used as input
+            for the next call to keep keyframe searchs in constant time.
+        @param frame [in]
+            Frame number, should be in range [0; mNumFrames]; if below zero the result
+            will look like clamped to zero, if above mNumFrames, it result will look
+            like clamped to mNumFrames
+        @param perBoneWeights [in]
+            A list of per bone weights. The size of the array must be 1 (or more)
+        @param KfTransforms [out]
+            An array with all bone transformations, sorted by parent level.
+            The key frames are only applied to affected bones.
+        */
+        void applyKeyFrameRigAt( KeyFrameRigVec::const_iterator &inOutLastKnownKeyFrame, float frame,
+                                 ArrayReal animWeight, const ArrayReal * RESTRICT_ALIAS perBoneWeights,
+                                 const TransformArray &KfTransforms ) const;
 
-		/** Takes all KeyFrames and repeats the KfTransforms for every unused slot by a pattern
-			based on the number of used slots. Only useful when
-			mUsedSlots <= (ARRAY_PACKED_REALS >> 1). Otherwise it does nothing.
-		*/
-		void _bakeUnusedSlots(void);
-	};
+        /** Takes all KeyFrames and repeats the KfTransforms for every unused slot by a pattern
+            based on the number of used slots. Only useful when
+            mUsedSlots <= (ARRAY_PACKED_REALS >> 1). Otherwise it does nothing.
+        */
+        void _bakeUnusedSlots(void);
+    };
 
-	typedef vector<SkeletonTrack>::type SkeletonTrackVec;
+    typedef vector<SkeletonTrack>::type SkeletonTrackVec;
 }
 
 #endif

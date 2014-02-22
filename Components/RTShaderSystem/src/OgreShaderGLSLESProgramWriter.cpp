@@ -105,9 +105,9 @@ namespace Ogre {
                 // 3. The name
                 if(paramTokens.size() == 3)
                 {
-					StringUtil::trim(paramTokens[0]);
-					StringUtil::trim(paramTokens[1]);
-					StringUtil::trim(paramTokens[2]);
+                    StringUtil::trim(paramTokens[0]);
+                    StringUtil::trim(paramTokens[1]);
+                    StringUtil::trim(paramTokens[2]);
 
                     Operand::OpSemantic semantic = Operand::OPS_IN;
                     GpuConstantType gpuType = GCT_UNKNOWN;
@@ -141,7 +141,7 @@ namespace Ogre {
                     {
                         OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                             "Can not convert Operand::OpMask to GpuConstantType", 
-                            "GLSLESProgramWriter::createInvocationFromString" );	
+                            "GLSLESProgramWriter::createInvocationFromString" );    
                     }
 
                     if(gpuType == GCT_SAMPLER1D)
@@ -185,25 +185,25 @@ namespace Ogre {
                 {
                     StringVector moreTokens = StringUtil::split(*it, " ");
 
-					if (!moreTokens.empty())
-					{
+                    if (!moreTokens.empty())
+                    {
                     FunctionMap::const_iterator itFuncCache = mFunctionCacheMap.begin();
 
-						for (; itFuncCache != mFunctionCacheMap.end(); ++itFuncCache)
-						{
+                        for (; itFuncCache != mFunctionCacheMap.end(); ++itFuncCache)
+                        {
 
-							FunctionInvocation fi = itFuncCache->first;
-						
-							if(fi.getFunctionName() == moreTokens.back())
-							{
-								// Add the function declaration
-								depVector.push_back(FunctionInvocation((*itFuncCache).first));
+                            FunctionInvocation fi = itFuncCache->first;
+                        
+                            if(fi.getFunctionName() == moreTokens.back())
+                            {
+                                // Add the function declaration
+                                depVector.push_back(FunctionInvocation((*itFuncCache).first));
 
-								discoverFunctionDependencies(itFuncCache->first, depVector);
-							}
-						}
-					}
-				}
+                                discoverFunctionDependencies(itFuncCache->first, depVector);
+                            }
+                        }
+                    }
+                }
                 
             }
             else
@@ -223,7 +223,7 @@ namespace Ogre {
             mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler2D";
             mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
             mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
-        	mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "sampler2DArray";
+            mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "sampler2DArray";
             mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCube";
             mGpuConstTypeMap[GCT_SAMPLER1DSHADOW] = "sampler1DShadow";
             mGpuConstTypeMap[GCT_SAMPLER2DSHADOW] = "sampler2DShadow";
@@ -261,15 +261,15 @@ namespace Ogre {
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeSourceCode(
-			std::ostream& os, 
-			Program* program)
+            std::ostream& os, 
+            Program* program)
         {
             GpuProgramType gpuType = program->getType();
             if(gpuType == GPT_GEOMETRY_PROGRAM)
             {
                 OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, 
                     "Geometry Programs not supported in GLSL ES writer ", 
-                    "GLSLESProgramWriter::writeSourceCode" );	
+                    "GLSLESProgramWriter::writeSourceCode" );   
             }
 
             // Clear out old input params
@@ -323,13 +323,13 @@ namespace Ogre {
                 os << mGpuConstTypeMap[pUniformParam->getType()];
                 os << "\t";
                 os << pUniformParam->getName();
-				if (pUniformParam->isArray() == true)
-				{
-					os << "[" << pUniformParam->getSize() << "]";	
-				}
+                if (pUniformParam->isArray() == true)
+                {
+                    os << "[" << pUniformParam->getSize() << "]";   
+                }
                 os << ";" << std::endl;
             }
-            os << std::endl;			
+            os << std::endl;            
 
             // Write program function(s).
             for (itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
@@ -348,14 +348,14 @@ namespace Ogre {
                 // The function name must always main.
                 os << "void main() {" << std::endl;
 
-				if (gpuType == GPT_FRAGMENT_PROGRAM)
-				{
-					os << "\tvec4 outputColor;" << std::endl;
-				}
-				else if (gpuType == GPT_VERTEX_PROGRAM)
-				{
-					os << "\tvec4 outputPosition;" << std::endl;
-				}
+                if (gpuType == GPT_FRAGMENT_PROGRAM)
+                {
+                    os << "\tvec4 outputColor;" << std::endl;
+                }
+                else if (gpuType == GPT_VERTEX_PROGRAM)
+                {
+                    os << "\tvec4 outputPosition;" << std::endl;
+                }
 
                 // Write local parameters.
                 const ShaderParameterList& localParams = curFunction->getLocalParameters();
@@ -365,10 +365,10 @@ namespace Ogre {
                 for (; itParam != itParamEnd; ++itParam)
                 {
                     os << "\t";
-                    writeLocalParameter(os, *itParam);			
-                    os << ";" << std::endl;						
+                    writeLocalParameter(os, *itParam);          
+                    os << ";" << std::endl;                     
                 }
-                os << std::endl;			
+                os << std::endl;            
 
                 // Sort function atoms.
                 curFunction->sortAtomInstances();
@@ -378,7 +378,7 @@ namespace Ogre {
                 FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
 
                 for (; itAtom != itAtomEnd; ++itAtom)
-                {		
+                {       
                     FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
                     FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
                     FunctionInvocation::OperandVector::const_iterator itOperandEnd = pFuncInvoc->getOperandList().end();
@@ -389,10 +389,10 @@ namespace Ogre {
                     // Local string stream
                     StringStream localOs;
 
-                    // Write function name			
+                    // Write function name          
                     localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
 
-					int curIndLevel = 0;
+                    int curIndLevel = 0;
                     for (; itOperand != itOperandEnd; )
                     {
                         Operand op = *itOperand;
@@ -402,16 +402,16 @@ namespace Ogre {
 
                         // Check if we write to a varying because the are only readable in fragment programs 
                         if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
-                        {	
+                        {   
                             // Is the written parameter a varying 
                             bool isVarying = false;
 
                             // Check if we write to a varying because the are only readable in fragment programs 
                             if (gpuType == GPT_FRAGMENT_PROGRAM)
-                            {	
-                                StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
+                            {   
+                                StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);    
                                 if(itFound != mFragInputParams.end())
-                                {						
+                                {                       
                                     // Declare the copy variable
                                     String newVar = "local_" + paramName;
                                     String tempVar = paramName;
@@ -422,7 +422,7 @@ namespace Ogre {
                                     tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
 
                                     // Declare the copy variable and assign the original
-                                    os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;	
+                                    os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;    
 
                                     // From now on we replace it automatic 
                                     mInputToGLStatesMap[paramName] = newVar;
@@ -438,7 +438,7 @@ namespace Ogre {
                             {
                                 UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByNameES(), paramName ) );
                                 if(itFound != parameterList.end())
-                                {	
+                                {   
                                     // Declare the copy variable
                                     String newVar = "local_" + paramName;
 
@@ -446,7 +446,7 @@ namespace Ogre {
                                     if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
                                     {
                                         // Declare the copy variable and assign the original
-                                        os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << std::endl;	
+                                        os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << std::endl; 
 
                                         // From now on we replace it automatic 
                                         mInputToGLStatesMap[paramName] = newVar;
@@ -467,7 +467,7 @@ namespace Ogre {
                             if(mask != Operand::OPM_ALL)
                             {
                                 newParam += "." + Operand::getMaskAsString(mask);
-                            }	
+                            }   
                             // Now that every texcoord is a vec4 (passed as vertex attributes) we
                             // have to swizzle them according the desired type.
                             else if(gpuType == GPT_VERTEX_PROGRAM &&
@@ -500,7 +500,7 @@ namespace Ogre {
                                 default:
                                     break;
                                 }
-                            }						
+                            }                       
                         }
                         else
                         {
@@ -512,46 +512,46 @@ namespace Ogre {
                         // Prepare for the next operand
                         localOs << newParam;
 
-						// Prepare for the next operand
-						ushort opIndLevel = 0;
-						if (itOperand != itOperandEnd)
-						{
-							opIndLevel = itOperand->getIndirectionLevel();
-						}
+                        // Prepare for the next operand
+                        ushort opIndLevel = 0;
+                        if (itOperand != itOperandEnd)
+                        {
+                            opIndLevel = itOperand->getIndirectionLevel();
+                        }
 
-						if (curIndLevel != 0)
-						{
-							localOs << ")";
-						}
+                        if (curIndLevel != 0)
+                        {
+                            localOs << ")";
+                        }
 
-						if (curIndLevel < opIndLevel)
-						{
-							while (curIndLevel < opIndLevel)
-							{
-								++curIndLevel;
-								localOs << "[";
-							}
-						}
-						else //if (curIndLevel >= opIndLevel)
-						{
-							while (curIndLevel > opIndLevel)
-							{
-								--curIndLevel;
-								localOs << "]";
-							}
-							if (opIndLevel != 0)
-							{
-								localOs << "][";
-							}
-							else if (itOperand != itOperandEnd)
-							{
-								localOs << ", ";
-							}
-						}
-						if (curIndLevel != 0)
-						{
-							localOs << "int(";
-						}
+                        if (curIndLevel < opIndLevel)
+                        {
+                            while (curIndLevel < opIndLevel)
+                            {
+                                ++curIndLevel;
+                                localOs << "[";
+                            }
+                        }
+                        else //if (curIndLevel >= opIndLevel)
+                        {
+                            while (curIndLevel > opIndLevel)
+                            {
+                                --curIndLevel;
+                                localOs << "]";
+                            }
+                            if (opIndLevel != 0)
+                            {
+                                localOs << "][";
+                            }
+                            else if (itOperand != itOperandEnd)
+                            {
+                                localOs << ", ";
+                            }
+                        }
+                        if (curIndLevel != 0)
+                        {
+                            localOs << "int(";
+                        }
                     }
 
                     // Write function call closer.
@@ -559,9 +559,9 @@ namespace Ogre {
                     localOs << std::endl;
                     os << localOs.str();
                 }
-				
-				if (gpuType == GPT_FRAGMENT_PROGRAM)
-				{
+                
+                if (gpuType == GPT_FRAGMENT_PROGRAM)
+                {
                     // GLSL fragment program has to write always gl_FragColor (but this is also deprecated after version 130)
                     // Always add gl_FragColor as an output.  The name is for compatibility.
                     if(mGLSLVersion > 100)
@@ -572,12 +572,12 @@ namespace Ogre {
                     {
                         os << "\tgl_FragColor = outputColor;" << std::endl;
                     }
-				}
-				else if (gpuType == GPT_VERTEX_PROGRAM)
-				{
-					os << "\tgl_Position = outputPosition;" << std::endl;
-				}
-				
+                }
+                else if (gpuType == GPT_VERTEX_PROGRAM)
+                {
+                    os << "\tgl_Position = outputPosition;" << std::endl;
+                }
+                
                 os << "}" << std::endl;
             }
             os << std::endl;
@@ -585,9 +585,9 @@ namespace Ogre {
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeInputParameters(
-			std::ostream& os, 
-			Function* function, 
-			GpuProgramType gpuType)
+            std::ostream& os, 
+            Function* function, 
+            GpuProgramType gpuType)
         {
             const ShaderParameterList& inParams = function->getInputParameters();
 
@@ -595,13 +595,13 @@ namespace Ogre {
             ShaderParameterConstIterator itParamEnd = inParams.end();
 
             for ( ; itParam != itParamEnd; ++itParam)
-            {		
+            {       
                 ParameterPtr pParam = *itParam;
                 Parameter::Content paramContent = pParam->getContent();
                 String paramName = pParam->getName();
 
                 if (gpuType == GPT_FRAGMENT_PROGRAM)
-                {					
+                {                   
                     // push fragment inputs they all could be written (in glsl you can not write
                     // input params in the fragment program)
                     mFragInputParams.push_back(paramName);
@@ -609,7 +609,7 @@ namespace Ogre {
                     // In the vertex and fragment program the variable names must match.
                     // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
                     // Thats why we are using a map for name mapping (we rename the params which are used in function atoms).
-                    paramName.replace(paramName.begin(), paramName.begin() + 1, "o");	
+                    paramName.replace(paramName.begin(), paramName.begin() + 1, "o");   
                     mInputToGLStatesMap[pParam->getName()] = paramName;
 
                     if(mGLSLVersion > 100)
@@ -618,9 +618,9 @@ namespace Ogre {
                         os << "varying\t";
 
                     os << mGpuConstTypeMap[pParam->getType()];
-                    os << "\t";	
+                    os << "\t"; 
                     os << paramName;
-                    os << ";" << std::endl;	
+                    os << ";" << std::endl; 
                 }
                 else if (gpuType == GPT_VERTEX_PROGRAM && 
                          mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
@@ -649,26 +649,26 @@ namespace Ogre {
                     {
                         os << mGpuConstTypeMap[pParam->getType()];
                     }
-                    os << "\t";	
+                    os << "\t"; 
                     os << mContentToPerVertexAttributes[paramContent];
-                    os << ";" << std::endl;	
+                    os << ";" << std::endl; 
                 }
                 else
                 {
                     os << "uniform \t ";
                     os << mGpuConstTypeMap[pParam->getType()];
-                    os << "\t";	
+                    os << "\t"; 
                     os << paramName;
-                    os << ";" << std::endl;	
-                }							
+                    os << ";" << std::endl; 
+                }                           
             }
         }
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeOutParameters(
-			std::ostream& os,
-			Function* function, 
-			GpuProgramType gpuType)
+            std::ostream& os,
+            Function* function, 
+            GpuProgramType gpuType)
         {
             const ShaderParameterList& outParams = function->getOutputParameters();
 
@@ -695,11 +695,11 @@ namespace Ogre {
                         os << mGpuConstTypeMap[pParam->getType()];
                         os << "\t";
                         os << pParam->getName();
-						if (pParam->isArray() == true)
-						{
-							os << "[" << pParam->getSize() << "]";	
-						}
-						os << ";" << std::endl;	
+                        if (pParam->isArray() == true)
+                        {
+                            os << "[" << pParam->getSize() << "]";  
+                        }
+                        os << ";" << std::endl; 
                     }
                 }
                 else if(gpuType == GPT_FRAGMENT_PROGRAM &&
@@ -725,8 +725,8 @@ namespace Ogre {
         // 5. Go back to step 1 until we have found all the functions
         //
         void GLSLESProgramWriter::writeProgramDependencies(
-			std::ostream& os, 
-			Program* program)
+            std::ostream& os, 
+            Program* program)
         {
             for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
             {
@@ -749,7 +749,7 @@ namespace Ogre {
             FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
             // Now iterate over all function atoms
             for ( ; itAtom != itAtomEnd; ++itAtom)
-            {	
+            {   
                 // Skip non function invocation atoms.
                 if ((*itAtom)->getFunctionAtomType() != FunctionInvocation::Type)
                     continue;
@@ -806,8 +806,8 @@ namespace Ogre {
                     break;
                 }
 
-				if(invoc.getFunctionName().length())
-				{
+                if(invoc.getFunctionName().length())
+                {
                     // Write out the function from the cached FunctionInvocation;
                     os << invoc.getReturnType();
                     os << " ";
@@ -858,7 +858,7 @@ namespace Ogre {
                         {
                             OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                                 "Can not convert Operand::OpMask to GpuConstantType", 
-                                "GLSLESProgramWriter::writeProgramDependencies" );	
+                                "GLSLESProgramWriter::writeProgramDependencies" );  
                         }
 
                         os << mGpuConstTypeMap[gpuType] << " " << paramName;
@@ -902,12 +902,12 @@ namespace Ogre {
         void GLSLESProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
         {
             os << mGpuConstTypeMap[parameter->getType()];
-            os << "\t";	
-            os << parameter->getName();		
-			if (parameter->isArray() == true)
-			{
-				os << "[" << parameter->getSize() << "]";	
-			}
+            os << "\t"; 
+            os << parameter->getName();     
+            if (parameter->isArray() == true)
+            {
+                os << "[" << parameter->getSize() << "]";   
+            }
         }
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::cacheDependencyFunctions(const String & libName)

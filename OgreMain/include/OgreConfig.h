@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreBuildSettings.h"
 
 /** If set to 1, profiling code will be included in the application. When you
-	are deploying your application you will probably want to set this to 0 */
+    are deploying your application you will probably want to set this to 0 */
 #ifndef OGRE_PROFILING
 #define OGRE_PROFILING 0
 #endif
@@ -54,8 +54,8 @@ THE SOFTWARE.
 
 /** If set to 1, Real is typedef'ed to double. Otherwise, Real is typedef'ed
     to float. Setting this allows you to perform mathematical operations in the
-	CPU (Quaternion, Vector3 etc) with more precision, but bear in mind that the
-	GPU still operates in single-precision mode.
+    CPU (Quaternion, Vector3 etc) with more precision, but bear in mind that the
+    GPU still operates in single-precision mode.
 */
 #ifndef OGRE_DOUBLE_PRECISION
 #define OGRE_DOUBLE_PRECISION 0
@@ -102,7 +102,7 @@ THE SOFTWARE.
 //#define OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR 1
 // Doing this will mean Ogre's strings will not be compatible with std::string however
 #ifndef OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR
-#	define OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR 0
+#   define OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR 0
 #endif
 
 // enable or disable the memory tracker, recording the memory allocations & tracking leaks
@@ -122,21 +122,21 @@ THE SOFTWARE.
 /** Support for multithreading, there are 3 options
 
 OGRE_THREAD_SUPPORT = 0
-	No support for threading.		
+    No support for threading.       
 OGRE_THREAD_SUPPORT = 1
-	Thread support for background loading, by both loading and constructing resources
-	in a background thread. Resource management and SharedPtr handling becomes
-	thread-safe, and resources may be completely loaded in the background. 
-	The places where threading is available are clearly
-	marked, you should assume state is NOT thread safe unless otherwise
-	stated in relation to this flag.
+    Thread support for background loading, by both loading and constructing resources
+    in a background thread. Resource management and SharedPtr handling becomes
+    thread-safe, and resources may be completely loaded in the background. 
+    The places where threading is available are clearly
+    marked, you should assume state is NOT thread safe unless otherwise
+    stated in relation to this flag.
 OGRE_THREAD_SUPPORT = 2
-	Thread support for background resource preparation. This means that resource
-	data can streamed into memory in the background, but the final resource
-	construction (including RenderSystem dependencies) is still done in the primary
-	thread. Has a lower synchronisation primitive overhead than full threading
-	while still allowing the major blocking aspects of resource management (I/O)
-	to be done in the background.
+    Thread support for background resource preparation. This means that resource
+    data can streamed into memory in the background, but the final resource
+    construction (including RenderSystem dependencies) is still done in the primary
+    thread. Has a lower synchronisation primitive overhead than full threading
+    while still allowing the major blocking aspects of resource management (I/O)
+    to be done in the background.
 */
 #ifndef OGRE_THREAD_SUPPORT
 #define OGRE_THREAD_SUPPORT 0
@@ -148,13 +148,13 @@ OGRE_THREAD_SUPPORT = 2
 /** Provider for threading functionality, there are 4 options.
 
 OGRE_THREAD_PROVIDER = 0
-	No support for threading.
+    No support for threading.
 OGRE_THREAD_PROVIDER = 1
-	Boost libraries provide threading functionality.
+    Boost libraries provide threading functionality.
 OGRE_THREAD_PROVIDER = 2
-	Poco libraries provide threading functionality.
+    Poco libraries provide threading functionality.
 OGRE_THREAD_PROVIDER = 3
-	TBB library provides threading functionality.
+    TBB library provides threading functionality.
 */
 #ifndef OGRE_THREAD_PROVIDER
 #define OGRE_THREAD_PROVIDER 0

@@ -41,23 +41,23 @@ typedef list<wxString> TriggerList;
 class CallTipManager
 {
 public:
-	CallTipManager();
-	virtual ~CallTipManager();
+    CallTipManager();
+    virtual ~CallTipManager();
 
-	void load(wxString& path);
+    void load(wxString& path);
 
-	void addTip(wxString& key, wxString& tip);
-	void removeTip(wxString& key);
+    void addTip(wxString& key, wxString& tip);
+    void removeTip(wxString& key);
 
-	void addTrigger(wxChar& trigger);
-	void removeTrigger(wxChar& trigger);
-	bool isTrigger(wxChar& ch);
+    void addTrigger(wxChar& trigger);
+    void removeTrigger(wxChar& trigger);
+    bool isTrigger(wxChar& ch);
 
-	wxString* find(wxString& s);
+    wxString* find(wxString& s);
 
 protected:
-	CallTipMap mCallTips;
-	TriggerList mTriggers;
+    CallTipMap mCallTips;
+    TriggerList mTriggers;
 };
 
 #endif // _CALLTIPMANAGER_H_

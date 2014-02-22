@@ -63,26 +63,26 @@ namespace Ogre {
 
     NaClGLSupport::~NaClGLSupport()
     {
-	}
+    }
 
     String NaClGLSupport::getDisplayName(void)
     {
-		return "NaCl GLES2 Support";
-	}
+        return "NaCl GLES2 Support";
+    }
 
 
     void NaClGLSupport::switchMode(uint& width, uint& height, short& frequency)
     {
         
-	}
-	
-	RenderWindow* NaClGLSupport::createWindow(bool autoCreateWindow,
-											GLES2RenderSystem *renderSystem,
-											const String& windowTitle)
-	{
-		LogManager::getSingleton().logMessage("\tGLSupport createWindow called");
-		
-		RenderWindow *window = 0;
+    }
+    
+    RenderWindow* NaClGLSupport::createWindow(bool autoCreateWindow,
+                                            GLES2RenderSystem *renderSystem,
+                                            const String& windowTitle)
+    {
+        LogManager::getSingleton().logMessage("\tGLSupport createWindow called");
+        
+        RenderWindow *window = 0;
 
         if (autoCreateWindow)
         {
@@ -91,7 +91,7 @@ namespace Ogre {
             NameValuePairList miscParams;
 
             bool fullscreen = true;
-			unsigned int w = 1, h = 1;
+            unsigned int w = 1, h = 1;
 
             if ((opt = mOptions.find("Display Frequency")) != end)
             {
@@ -102,58 +102,58 @@ namespace Ogre {
         }
 
         return window;
-	}
+    }
 
     RenderWindow* NaClGLSupport::newWindow(const String &name,
                                         unsigned int width, unsigned int height,
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
-		LogManager::getSingleton().logMessage("\tGLSupport newWindow called");
-		
-		NaClWindow* window = new NaClWindow(this);
+        LogManager::getSingleton().logMessage("\tGLSupport newWindow called");
+        
+        NaClWindow* window = new NaClWindow(this);
         window->create(name, width, height, fullScreen, miscParams);
         String targetName =  window->getName();
 
         return window;
     }
-	
-	void NaClGLSupport::start(void)
-	{
-		LogManager::getSingleton().logMessage("\tGLSupport start called");
-	}
     
-	void NaClGLSupport::stop(void)
-	{
-		LogManager::getSingleton().logMessage("\tGLSupport stop called");
-	}
+    void NaClGLSupport::start(void)
+    {
+        LogManager::getSingleton().logMessage("\tGLSupport start called");
+    }
     
-	void NaClGLSupport::addConfig(void)
-	{
-		LogManager::getSingleton().logMessage("\tGLSupport addConfig called");
-		
-		// Currently no config options supported
-		refreshConfig();
-	}
-	
-	void NaClGLSupport::refreshConfig(void)
-	{
-	}
+    void NaClGLSupport::stop(void)
+    {
+        LogManager::getSingleton().logMessage("\tGLSupport stop called");
+    }
     
-	String NaClGLSupport::validateConfig(void)
-	{
-		return StringUtil::BLANK;
-	}
+    void NaClGLSupport::addConfig(void)
+    {
+        LogManager::getSingleton().logMessage("\tGLSupport addConfig called");
+        
+        // Currently no config options supported
+        refreshConfig();
+    }
     
-	void NaClGLSupport::setConfigOption(const String &name, const String &value)
-	{
-		GLES2Support::setConfigOption(name, value);
-	}
+    void NaClGLSupport::refreshConfig(void)
+    {
+    }
     
-	void* NaClGLSupport::getProcAddress(const Ogre::String& name)
-	{
+    String NaClGLSupport::validateConfig(void)
+    {
+        return StringUtil::BLANK;
+    }
+    
+    void NaClGLSupport::setConfigOption(const String &name, const String &value)
+    {
+        GLES2Support::setConfigOption(name, value);
+    }
+    
+    void* NaClGLSupport::getProcAddress(const Ogre::String& name)
+    {
         //return (void*)pglGetProcAddress((const char*) name.c_str()); - doesn't link
         return 0;
-	}
-	
+    }
+    
 }

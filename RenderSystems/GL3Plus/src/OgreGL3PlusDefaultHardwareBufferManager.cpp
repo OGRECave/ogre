@@ -101,7 +101,7 @@ namespace Ogre {
         : HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false)
           // always software, never shadowed
     {
-	   mData = new unsigned char[mSizeInBytes];
+       mData = new unsigned char[mSizeInBytes];
     }
 
     GL3PlusDefaultHardwareIndexBuffer::~GL3PlusDefaultHardwareIndexBuffer()
@@ -300,26 +300,26 @@ namespace Ogre {
             new GL3PlusDefaultHardwareIndexBuffer(itype, numIndexes, usage));
     }
 
-	HardwareUniformBufferSharedPtr
+    HardwareUniformBufferSharedPtr
     GL3PlusDefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                                  bool useShadowBuffer, const String& name)
-	{
+    {
         return HardwareUniformBufferSharedPtr(
             new GL3PlusDefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name));
-	}
+    }
 
     HardwareCounterBufferSharedPtr
     GL3PlusDefaultHardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                                  bool useShadowBuffer, const String& name)
-	{
+    {
         return HardwareCounterBufferSharedPtr(
             new GL3PlusDefaultHardwareCounterBuffer(this, name));
-	}
+    }
 
-	Ogre::RenderToVertexBufferSharedPtr GL3PlusDefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
-	{
+    Ogre::RenderToVertexBufferSharedPtr GL3PlusDefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
+    {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                 "Cannot create RenderToVertexBuffer in GL3PlusDefaultHardwareBufferManagerBase", 
                 "GL3PlusDefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
-	}
+    }
 }

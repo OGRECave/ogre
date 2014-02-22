@@ -32,19 +32,19 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	OSXContext::OSXContext()
-	{
-	}
-	
-	OSXContext::~OSXContext()
-	{        
+    OSXContext::OSXContext()
+    {
     }
-	
-	void OSXContext::_unregisterContext()
-	{
-		// NB have to do this is subclass to ensure any methods called back
-		// are on this subclass and not half-destructed superclass
-		GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-		rs->_unregisterContext(this);
-	}
+    
+    OSXContext::~OSXContext()
+    {        
+    }
+    
+    void OSXContext::_unregisterContext()
+    {
+        // NB have to do this is subclass to ensure any methods called back
+        // are on this subclass and not half-destructed superclass
+        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+        rs->_unregisterContext(this);
+    }
 }

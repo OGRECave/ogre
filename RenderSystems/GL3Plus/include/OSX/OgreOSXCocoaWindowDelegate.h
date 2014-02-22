@@ -36,7 +36,7 @@ using namespace Ogre;
 {
 @private
     RenderWindow *ogreWindow;
-	NSWindow *window;
+    NSWindow *window;
 }
 
 -(id)initWithNSWindow:(NSWindow*)nswin ogreWindow:(RenderWindow*)ogrewin;

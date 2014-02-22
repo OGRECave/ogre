@@ -45,52 +45,52 @@ void DualQuaternionTests::tearDown()
 
 void DualQuaternionTests::testConversion()
 {
-	DualQuaternion dQuat;
-	Quaternion quat(Radian(Degree(60)), Vector3::UNIT_Y);
-	Vector3 translation(0, 0, 10);
-	dQuat.fromRotationTranslation(quat, translation);
-		
-	Quaternion result;
-	Vector3 resTrans;
-	dQuat.toRotationTranslation(result, resTrans);
+    DualQuaternion dQuat;
+    Quaternion quat(Radian(Degree(60)), Vector3::UNIT_Y);
+    Vector3 translation(0, 0, 10);
+    dQuat.fromRotationTranslation(quat, translation);
+        
+    Quaternion result;
+    Vector3 resTrans;
+    dQuat.toRotationTranslation(result, resTrans);
 
-	CPPUNIT_ASSERT_EQUAL(result, quat);
-	CPPUNIT_ASSERT(resTrans.positionEquals(translation));
+    CPPUNIT_ASSERT_EQUAL(result, quat);
+    CPPUNIT_ASSERT(resTrans.positionEquals(translation));
 }
 
 void DualQuaternionTests::testDefaultValue()
 {
-	DualQuaternion dQuatDefault;
-	
-	Quaternion quatDefault;
-	Vector3 transDefault;
-	
-	dQuatDefault.toRotationTranslation(quatDefault, transDefault);
+    DualQuaternion dQuatDefault;
+    
+    Quaternion quatDefault;
+    Vector3 transDefault;
+    
+    dQuatDefault.toRotationTranslation(quatDefault, transDefault);
 
-	CPPUNIT_ASSERT_EQUAL(quatDefault, Quaternion::IDENTITY); 
-	CPPUNIT_ASSERT(transDefault.positionEquals(Vector3::ZERO));
+    CPPUNIT_ASSERT_EQUAL(quatDefault, Quaternion::IDENTITY); 
+    CPPUNIT_ASSERT(transDefault.positionEquals(Vector3::ZERO));
 }
 
 void DualQuaternionTests::testMatrix()
 {
-	Matrix4 transform;
-	Vector3 translation(10, 4, 0);
-	Vector3 scale = Vector3::UNIT_SCALE;
-	Quaternion rotation;
-	rotation.FromAngleAxis(Radian(Math::PI), Vector3::UNIT_Z);
-	transform.makeTransform(translation, scale, rotation);
+    Matrix4 transform;
+    Vector3 translation(10, 4, 0);
+    Vector3 scale = Vector3::UNIT_SCALE;
+    Quaternion rotation;
+    rotation.FromAngleAxis(Radian(Math::PI), Vector3::UNIT_Z);
+    transform.makeTransform(translation, scale, rotation);
 
-	DualQuaternion dQuat;
-	dQuat.fromTransformationMatrix(transform);
-	Matrix4 transformResult;
-	dQuat.toTransformationMatrix(transformResult);
+    DualQuaternion dQuat;
+    dQuat.fromTransformationMatrix(transform);
+    Matrix4 transformResult;
+    dQuat.toTransformationMatrix(transformResult);
 
-	Vector3 translationResult;
-	Vector3 scaleResult;
-	Quaternion rotationResult;
-	transformResult.decomposition(translationResult, scaleResult, rotationResult);
+    Vector3 translationResult;
+    Vector3 scaleResult;
+    Quaternion rotationResult;
+    transformResult.decomposition(translationResult, scaleResult, rotationResult);
 
-	CPPUNIT_ASSERT(translationResult.positionEquals(translation));
-	CPPUNIT_ASSERT(scaleResult.positionEquals(scale));
-	CPPUNIT_ASSERT(rotationResult.equals(rotation, Radian(0.001)));
+    CPPUNIT_ASSERT(translationResult.positionEquals(translation));
+    CPPUNIT_ASSERT(scaleResult.positionEquals(scale));
+    CPPUNIT_ASSERT(rotationResult.equals(rotation, Radian(0.001)));
 }

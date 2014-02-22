@@ -36,40 +36,40 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class RenderTarget;
+    class RenderTarget;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
-	/** Implementation of CompositorPass
-		This implementation will clear the RenderTarget using the parameters from definition
-		(rectangle area, which buffers, what values, etc)
+    /** Implementation of CompositorPass
+        This implementation will clear the RenderTarget using the parameters from definition
+        (rectangle area, which buffers, what values, etc)
     @author
-		Matias N. Goldberg
+        Matias N. Goldberg
     @version
         1.0
     */
-	class _OgreExport CompositorPassStencil : public CompositorPass
-	{
-		CompositorPassStencilDef const *mDefinition;
+    class _OgreExport CompositorPassStencil : public CompositorPass
+    {
+        CompositorPassStencilDef const *mDefinition;
 
-	protected:
-		RenderSystem *mRenderSystem;
+    protected:
+        RenderSystem *mRenderSystem;
 
-	public:
-		CompositorPassStencil( const CompositorPassStencilDef *definition,
-								const CompositorChannel &target, CompositorNode *parentNode,
-								RenderSystem *renderSystem );
+    public:
+        CompositorPassStencil( const CompositorPassStencilDef *definition,
+                                const CompositorChannel &target, CompositorNode *parentNode,
+                                RenderSystem *renderSystem );
 
-		virtual void execute( const Camera *lodCamera );
-	};
+        virtual void execute( const Camera *lodCamera );
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

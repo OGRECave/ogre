@@ -33,146 +33,146 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, ushort indirectionLevel)
 {
-	mParameter = parameter;
-	mSemantic = opSemantic;
-	mMask = opMask;
-	mIndirectionLevel = indirectionLevel;
+    mParameter = parameter;
+    mSemantic = opSemantic;
+    mMask = opMask;
+    mIndirectionLevel = indirectionLevel;
 }
 //-----------------------------------------------------------------------------
 Operand::Operand(const Operand& other) 
 {
-	*this = other;
+    *this = other;
 }
 //-----------------------------------------------------------------------------
 Operand& Operand::operator= (const Operand & other)
 {
-	if (this != &other) 
-	{
-		mParameter = other.mParameter;
-		mSemantic = other.mSemantic;
-		mMask = other.mMask;
-		mIndirectionLevel = other.mIndirectionLevel;
-	}		
-	return *this;
+    if (this != &other) 
+    {
+        mParameter = other.mParameter;
+        mSemantic = other.mSemantic;
+        mMask = other.mMask;
+        mIndirectionLevel = other.mIndirectionLevel;
+    }       
+    return *this;
 }
 //-----------------------------------------------------------------------------
 Operand::~Operand()
 {
-	// nothing todo
+    // nothing todo
 }
 //-----------------------------------------------------------------------------
 String Operand::getMaskAsString(int mask)
 {
-	String retVal = "";
+    String retVal = "";
 
-	if (mask & ~OPM_ALL) 
-	{
-		if (mask & OPM_X)
-		{
-			retVal += "x";
-		}
+    if (mask & ~OPM_ALL) 
+    {
+        if (mask & OPM_X)
+        {
+            retVal += "x";
+        }
 
-		if (mask & OPM_Y)
-		{
-			retVal += "y";
-		}
+        if (mask & OPM_Y)
+        {
+            retVal += "y";
+        }
 
-		if (mask & OPM_Z)
-		{
-			retVal += "z";
-		}
+        if (mask & OPM_Z)
+        {
+            retVal += "z";
+        }
 
-		if (mask & OPM_W)
-		{
-			retVal += "w";
-		}
-	}
+        if (mask & OPM_W)
+        {
+            retVal += "w";
+        }
+    }
 
-	return retVal;
+    return retVal;
 }
 
 //-----------------------------------------------------------------------------
 int Operand::getFloatCount(int mask)
 {
-	int floatCount = 0;
+    int floatCount = 0;
 
-	while (mask != 0)
-	{
-		if ((mask & Operand::OPM_X) != 0)
-		{
-			floatCount++;
+    while (mask != 0)
+    {
+        if ((mask & Operand::OPM_X) != 0)
+        {
+            floatCount++;
 
-		}			
-		mask = mask >> 1;
-	}
+        }           
+        mask = mask >> 1;
+    }
 
-	return floatCount;
+    return floatCount;
 }
 
 //-----------------------------------------------------------------------------
-GpuConstantType	Operand::getGpuConstantType(int mask)
+GpuConstantType Operand::getGpuConstantType(int mask)
 {
-	int floatCount = getFloatCount(mask);
-	GpuConstantType type;
+    int floatCount = getFloatCount(mask);
+    GpuConstantType type;
 
-	switch (floatCount)
-	{
+    switch (floatCount)
+    {
 
-	case 1:
-		type = GCT_FLOAT1;
-		break;
+    case 1:
+        type = GCT_FLOAT1;
+        break;
 
-	case 2:
-		type = GCT_FLOAT2;
-		break;
+    case 2:
+        type = GCT_FLOAT2;
+        break;
 
-	case 3:
-		type = GCT_FLOAT3;
-		break;
+    case 3:
+        type = GCT_FLOAT3;
+        break;
 
-	case 4:
-		type = GCT_FLOAT4;
-		break;
+    case 4:
+        type = GCT_FLOAT4;
+        break;
 
-	default:
-		type = GCT_UNKNOWN;
-		break;
-	}
+    default:
+        type = GCT_UNKNOWN;
+        break;
+    }
 
-	return type;
+    return type;
 }
 
 //-----------------------------------------------------------------------------
 String Operand::toString() const
 {
-	String retVal = mParameter->toString();
-	if ((mMask & OPM_ALL) || ((mMask & OPM_X) && (mMask & OPM_Y) && (mMask & OPM_Z) && (mMask & OPM_W)))
-	{
-		return retVal;
-	}
+    String retVal = mParameter->toString();
+    if ((mMask & OPM_ALL) || ((mMask & OPM_X) && (mMask & OPM_Y) && (mMask & OPM_Z) && (mMask & OPM_W)))
+    {
+        return retVal;
+    }
 
-	retVal += "." + getMaskAsString(mMask);
+    retVal += "." + getMaskAsString(mMask);
 
-	return retVal;
+    return retVal;
 }
 
 //-----------------------------------------------------------------------------
 FunctionAtom::FunctionAtom()
 {
-	mGroupExecutionOrder   = -1;
-	mInternalExecutionOrder = -1;
+    mGroupExecutionOrder   = -1;
+    mInternalExecutionOrder = -1;
 }
 
 //-----------------------------------------------------------------------------
 int FunctionAtom::getGroupExecutionOrder() const
 {
-	return mGroupExecutionOrder;
+    return mGroupExecutionOrder;
 }
 
 //-----------------------------------------------------------------------------
-int	FunctionAtom::getInternalExecutionOrder() const
+int FunctionAtom::getInternalExecutionOrder() const
 {
-	return mInternalExecutionOrder;
+    return mInternalExecutionOrder;
 }
 
 
@@ -180,22 +180,22 @@ String FunctionInvocation::Type = "FunctionInvocation";
 
 //-----------------------------------------------------------------------
 FunctionInvocation::FunctionInvocation(const String& functionName, 
-									   int groupOrder, int internalOrder, String returnType)
+                                       int groupOrder, int internalOrder, String returnType)
 {
-	mFunctionName = functionName;
-	mGroupExecutionOrder = groupOrder;
-	mInternalExecutionOrder = internalOrder;
-	mReturnType = returnType;
+    mFunctionName = functionName;
+    mGroupExecutionOrder = groupOrder;
+    mInternalExecutionOrder = internalOrder;
+    mReturnType = returnType;
 }
 
 //-----------------------------------------------------------------------------
 FunctionInvocation::FunctionInvocation(const FunctionInvocation& other)
 {
     
-	mFunctionName = other.mFunctionName;
-	mGroupExecutionOrder = other.mGroupExecutionOrder;
-	mInternalExecutionOrder = other.mInternalExecutionOrder;
-	mReturnType = other.mReturnType;
+    mFunctionName = other.mFunctionName;
+    mGroupExecutionOrder = other.mGroupExecutionOrder;
+    mInternalExecutionOrder = other.mInternalExecutionOrder;
+    mReturnType = other.mReturnType;
     
     for ( OperandVector::const_iterator it = other.mOperands.begin(); it != other.mOperands.end(); ++it)
         mOperands.push_back(Operand(*it));
@@ -204,56 +204,56 @@ FunctionInvocation::FunctionInvocation(const FunctionInvocation& other)
 //-----------------------------------------------------------------------
 void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetLanguage) const
 {
-	// Write function name.
-	os << mFunctionName << "(";
+    // Write function name.
+    os << mFunctionName << "(";
 
-	// Write parameters.
-	ushort curIndLevel = 0;
-	for (OperandVector::const_iterator it = mOperands.begin(); it != mOperands.end(); )
-	{
-		os << (*it).toString();
-		++it;
+    // Write parameters.
+    ushort curIndLevel = 0;
+    for (OperandVector::const_iterator it = mOperands.begin(); it != mOperands.end(); )
+    {
+        os << (*it).toString();
+        ++it;
 
-		ushort opIndLevel = 0;
-		if (it != mOperands.end())
-		{
-			opIndLevel = (*it).getIndirectionLevel();
-		}
+        ushort opIndLevel = 0;
+        if (it != mOperands.end())
+        {
+            opIndLevel = (*it).getIndirectionLevel();
+        }
 
-		if (curIndLevel < opIndLevel)
-		{
-			while (curIndLevel < opIndLevel)
-			{
-				++curIndLevel;
-				os << "[";
-			}
-		}
-		else //if (curIndLevel >= opIndLevel)
-		{
-			while (curIndLevel > opIndLevel)
-			{
-				--curIndLevel;
-				os << "]";
-			}
-			if (opIndLevel != 0)
-			{
-				os << "][";
-			}
-			else if (it != mOperands.end())
-			{
-				os << ", ";
-			}
-		}
-	}
+        if (curIndLevel < opIndLevel)
+        {
+            while (curIndLevel < opIndLevel)
+            {
+                ++curIndLevel;
+                os << "[";
+            }
+        }
+        else //if (curIndLevel >= opIndLevel)
+        {
+            while (curIndLevel > opIndLevel)
+            {
+                --curIndLevel;
+                os << "]";
+            }
+            if (opIndLevel != 0)
+            {
+                os << "][";
+            }
+            else if (it != mOperands.end())
+            {
+                os << ", ";
+            }
+        }
+    }
 
-	// Write function call closer.
-	os << ");";
+    // Write function call closer.
+    os << ");";
 }
 
 //-----------------------------------------------------------------------
 void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, int indirectionLevel)
 {
-	mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
+    mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
 }
 
 //-----------------------------------------------------------------------

@@ -39,185 +39,185 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-	class D3D11Texture : public Texture
-	{
-	protected:
+    class D3D11Texture : public Texture
+    {
+    protected:
         // needed to store data between prepareImpl and loadImpl
         typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
 
-		/// D3DDevice pointer
-		D3D11Device	&	mDevice;	
+        /// D3DDevice pointer
+        D3D11Device &   mDevice;    
 
-		/// D3D11 pointer
-		//LPDIRECT3D11				*mpD3D;
-		// 1D texture pointer
-		ID3D11Texture1D *mp1DTex;
-		// 2D texture pointer
-		ID3D11Texture2D *mp2DTex;
-		/// cubic texture pointer
-		ID3D11Texture3D	*mp3DTex;	
-		/// actual texture pointer
-		ID3D11Resource 	*mpTex;		
+        /// D3D11 pointer
+        //LPDIRECT3D11              *mpD3D;
+        // 1D texture pointer
+        ID3D11Texture1D *mp1DTex;
+        // 2D texture pointer
+        ID3D11Texture2D *mp2DTex;
+        /// cubic texture pointer
+        ID3D11Texture3D *mp3DTex;   
+        /// actual texture pointer
+        ID3D11Resource  *mpTex;     
 
-		ID3D11ShaderResourceView* mpShaderResourceView;
+        ID3D11ShaderResourceView* mpShaderResourceView;
 
-		bool mAutoMipMapGeneration;
+        bool mAutoMipMapGeneration;
 
-		template<typename fromtype, typename totype>
-		void _queryInterface(fromtype *from, totype **to)
-		{
-			HRESULT hr = from->QueryInterface(__uuidof(totype), (void **)to);
+        template<typename fromtype, typename totype>
+        void _queryInterface(fromtype *from, totype **to)
+        {
+            HRESULT hr = from->QueryInterface(__uuidof(totype), (void **)to);
 
-			if(FAILED(hr) || mDevice.isError())
-			{
-				this->freeInternalResources();
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture\nError Description:" + errorDescription, 
-					"D3D11Texture::_queryInterface" );
-			}
-		}
+            if(FAILED(hr) || mDevice.isError())
+            {
+                this->freeInternalResources();
+                String errorDescription = mDevice.getErrorDescription();
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture\nError Description:" + errorDescription, 
+                    "D3D11Texture::_queryInterface" );
+            }
+        }
 
-#ifdef USE_D3DX11_LIBRARY		
-		void _loadDDS(DataStreamPtr &dstream);
+#ifdef USE_D3DX11_LIBRARY       
+        void _loadDDS(DataStreamPtr &dstream);
 #endif
         void _create1DResourceView();
-		void _create2DResourceView();
-		void _create3DResourceView();
+        void _create2DResourceView();
+        void _create3DResourceView();
 
-		// is dynamic
-		bool mIsDynamic; 
+        // is dynamic
+        bool mIsDynamic; 
 
-		/// cube texture individual face names
-		String							mCubeFaceNames[6];
-		/// device creation parameters
-		//D3DDEVICE_CREATION_PARAMETERS	mDevCreParams;
-		/// back buffer pixel format
-		DXGI_FORMAT						mBBPixelFormat;
-		/// The memory pool being used
-		//D3DPOOL							mD3DPool;
-		/// device capabilities pointer
-		//D3DCAPS9						mDevCaps;
-		// Dynamic textures?
-		bool                            mDynamicTextures;
-		/// Vector of pointers to subsurfaces
-		typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
-		SurfaceList						mSurfaceList;
+        /// cube texture individual face names
+        String                          mCubeFaceNames[6];
+        /// device creation parameters
+        //D3DDEVICE_CREATION_PARAMETERS mDevCreParams;
+        /// back buffer pixel format
+        DXGI_FORMAT                     mBBPixelFormat;
+        /// The memory pool being used
+        //D3DPOOL                           mD3DPool;
+        /// device capabilities pointer
+        //D3DCAPS9                      mDevCaps;
+        // Dynamic textures?
+        bool                            mDynamicTextures;
+        /// Vector of pointers to subsurfaces
+        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
+        SurfaceList                     mSurfaceList;
 
-		D3D11_SHADER_RESOURCE_VIEW_DESC mSRVDesc;
-		/// internal method, load a normal texture
-		void _loadTex(LoadedStreams & loadedStreams);
+        D3D11_SHADER_RESOURCE_VIEW_DESC mSRVDesc;
+        /// internal method, load a normal texture
+        void _loadTex(LoadedStreams & loadedStreams);
 
-		/// internal method, create a blank normal 1D Dtexture
-		void _create1DTex();
-		/// internal method, create a blank normal 2D texture
-		void _create2DTex();
-		/// internal method, create a blank cube texture
-		void _create3DTex();
+        /// internal method, create a blank normal 1D Dtexture
+        void _create1DTex();
+        /// internal method, create a blank normal 2D texture
+        void _create2DTex();
+        /// internal method, create a blank cube texture
+        void _create3DTex();
 
-		/// internal method, return a D3D pixel format for texture creation
-		DXGI_FORMAT _chooseD3DFormat();
+        /// internal method, return a D3D pixel format for texture creation
+        DXGI_FORMAT _chooseD3DFormat();
 
-		/// @copydoc Texture::createInternalResources
-		void createInternalResources(void);
-		/// @copydoc Texture::createInternalResourcesImpl
-		void createInternalResourcesImpl(void);
-		/// @copydoc Texture::freeInternalResources
-		void freeInternalResources(void);
-		/// free internal resources
-		void freeInternalResourcesImpl(void);
-		/// internal method, set Texture class source image protected attributes
-		void _setSrcAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
-		/// internal method, set Texture class final texture protected attributes
-		void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format, UINT miscflags);
+        /// @copydoc Texture::createInternalResources
+        void createInternalResources(void);
+        /// @copydoc Texture::createInternalResourcesImpl
+        void createInternalResourcesImpl(void);
+        /// @copydoc Texture::freeInternalResources
+        void freeInternalResources(void);
+        /// free internal resources
+        void freeInternalResourcesImpl(void);
+        /// internal method, set Texture class source image protected attributes
+        void _setSrcAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
+        /// internal method, set Texture class final texture protected attributes
+        void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format, UINT miscflags);
 
-		/// internal method, the cube map face name for the spec. face index
-		String _getCubeFaceName(unsigned char face) const
-		{ assert(face < 6); return mCubeFaceNames[face]; }
+        /// internal method, the cube map face name for the spec. face index
+        String _getCubeFaceName(unsigned char face) const
+        { assert(face < 6); return mCubeFaceNames[face]; }
 
-		/// internal method, create D3D11HardwarePixelBuffers for every face and
-		/// mipmap level. This method must be called after the D3D texture object was created
-		void _createSurfaceList(void);
+        /// internal method, create D3D11HardwarePixelBuffers for every face and
+        /// mipmap level. This method must be called after the D3D texture object was created
+        void _createSurfaceList(void);
 
 
         /// @copydoc Resource::prepareImpl
         void prepareImpl(void);
         /// @copydoc Resource::unprepareImpl
         void unprepareImpl(void);
-		/// overridden from Resource
-		void loadImpl();
-		/// overridden from Resource
-		void postLoadImpl();
+        /// overridden from Resource
+        void loadImpl();
+        /// overridden from Resource
+        void postLoadImpl();
 
         /** Vector of pointers to streams that were pulled from disk by
             prepareImpl  but have yet to be pushed into texture memory
             by loadImpl.  Should be cleared on load and on unprepare.
         */
         LoadedStreams mLoadedStreams;
-		LoadedStreams _prepareNormTex();
-		LoadedStreams _prepareVolumeTex();
-		LoadedStreams _prepareCubeTex();
-	public:
-		/// constructor 
-		D3D11Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual, ManualResourceLoader* loader, 
-			D3D11Device & device);
-		/// destructor
-		~D3D11Texture();
+        LoadedStreams _prepareNormTex();
+        LoadedStreams _prepareVolumeTex();
+        LoadedStreams _prepareCubeTex();
+    public:
+        /// constructor 
+        D3D11Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader, 
+            D3D11Device & device);
+        /// destructor
+        ~D3D11Texture();
 
-		/// overridden from Texture
-		void copyToTexture( TexturePtr& target );
-		/// overridden from Texture
-		void loadImage( const Image &img );
-
-
-		/// @copydoc Texture::getBuffer
-		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
-
-		ID3D11Resource *getTextureResource() 
-		{ assert(mpTex); return mpTex; }
-		/// retrieves a pointer to the actual texture
-		ID3D11ShaderResourceView *getTexture() 
-		{ assert(mpShaderResourceView); return mpShaderResourceView; }
-		/*/// retrieves a pointer to the normal 1D/2D texture
-		IDirect3DTexture9 *getNormTexture()
-		{ assert(mpNormTex); return mpNormTex; }
-		/// retrieves a pointer to the cube texture
-		IDirect3DCubeTexture9 *getCubeTexture()
-		{ assert(mpCubeTex); return mpCubeTex; }
-		*/
+        /// overridden from Texture
+        void copyToTexture( TexturePtr& target );
+        /// overridden from Texture
+        void loadImage( const Image &img );
 
 
-		/// For dealing with lost devices - release the resource if in the default pool (and return true)
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool (and return true)
-		bool recreateIfDefaultPool(D3D11Device & device);
+        /// @copydoc Texture::getBuffer
+        HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
-		ID3D11Texture1D * GetTex1D() {return mp1DTex;};
-		ID3D11Texture2D * GetTex2D() {return mp2DTex;};
-		ID3D11Texture3D	* GetTex3D() {return mp3DTex;};
+        ID3D11Resource *getTextureResource() 
+        { assert(mpTex); return mpTex; }
+        /// retrieves a pointer to the actual texture
+        ID3D11ShaderResourceView *getTexture() 
+        { assert(mpShaderResourceView); return mpShaderResourceView; }
+        /*/// retrieves a pointer to the normal 1D/2D texture
+        IDirect3DTexture9 *getNormTexture()
+        { assert(mpNormTex); return mpNormTex; }
+        /// retrieves a pointer to the cube texture
+        IDirect3DCubeTexture9 *getCubeTexture()
+        { assert(mpCubeTex); return mpCubeTex; }
+        */
 
-		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const;
 
-		bool HasAutoMipMapGenerationEnabled() const { return mAutoMipMapGeneration; }
+        /// For dealing with lost devices - release the resource if in the default pool (and return true)
+        bool releaseIfDefaultPool(void);
+        /// For dealing with lost devices - recreate the resource if in the default pool (and return true)
+        bool recreateIfDefaultPool(D3D11Device & device);
 
-	};
+        ID3D11Texture1D * GetTex1D() {return mp1DTex;};
+        ID3D11Texture2D * GetTex2D() {return mp2DTex;};
+        ID3D11Texture3D * GetTex3D() {return mp3DTex;};
 
-	/// RenderTexture implementation for D3D11
-	class D3D11RenderTexture : public RenderTexture
-	{
-		D3D11Device & mDevice;
-		ID3D11RenderTargetView * mRenderTargetView;
-		ID3D11DepthStencilView * mDepthStencilView;
-	public:
-		D3D11RenderTexture(const String &name, D3D11HardwarePixelBuffer *buffer, D3D11Device & device );
-		virtual ~D3D11RenderTexture();
+        D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const;
 
-		void rebind(D3D11HardwarePixelBuffer *buffer);
+        bool HasAutoMipMapGenerationEnabled() const { return mAutoMipMapGeneration; }
 
-		virtual void getCustomAttribute( const String& name, void *pData );
+    };
 
-		bool requiresTextureFlipping() const { return false; }
-	};
+    /// RenderTexture implementation for D3D11
+    class D3D11RenderTexture : public RenderTexture
+    {
+        D3D11Device & mDevice;
+        ID3D11RenderTargetView * mRenderTargetView;
+        ID3D11DepthStencilView * mDepthStencilView;
+    public:
+        D3D11RenderTexture(const String &name, D3D11HardwarePixelBuffer *buffer, D3D11Device & device );
+        virtual ~D3D11RenderTexture();
+
+        void rebind(D3D11HardwarePixelBuffer *buffer);
+
+        virtual void getCustomAttribute( const String& name, void *pData );
+
+        bool requiresTextureFlipping() const { return false; }
+    };
 
 }
 

@@ -35,7 +35,7 @@ namespace Ogre {
 #define MAX_MACRO_ARGS 16
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined( __MINGW32__ )
-	#define snprintf _snprintf
+    #define snprintf _snprintf
 #endif
 
 //---------------------------------------------------------------------------//

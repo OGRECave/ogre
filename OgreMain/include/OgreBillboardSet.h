@@ -319,8 +319,8 @@ namespace Ogre {
             BillboardSet::setAutoextend
         */
         BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
-						unsigned int poolSize = 20, bool externalDataSource = false,
-						uint8 renderQueueId=RENDER_QUEUE_MAIN );
+                        unsigned int poolSize = 20, bool externalDataSource = false,
+                        uint8 renderQueueId=RENDER_QUEUE_MAIN );
 
         virtual ~BillboardSet();
 
@@ -838,7 +838,7 @@ namespace Ogre {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-													const NameValuePairList* params = 0 );
+                                                    const NameValuePairList* params = 0 );
     public:
         BillboardSetFactory() {}
         ~BillboardSetFactory() {}

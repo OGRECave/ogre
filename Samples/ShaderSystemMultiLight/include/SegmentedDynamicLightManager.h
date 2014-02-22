@@ -45,120 +45,120 @@ THE SOFTWARE.
 using namespace Ogre;
 
 class SegmentedDynamicLightManager : public Singleton<SegmentedDynamicLightManager>,
-	public SceneManager::Listener
+    public SceneManager::Listener
 {
-	
+    
 public:
-	SegmentedDynamicLightManager();
-	~SegmentedDynamicLightManager();
-			
-	bool setDebugMode(bool i_IsDebugMode);
-	//Set the system to active mode
-	void setSceneManager(SceneManager* i_Manager);
-	SceneManager * getSceneManager(void) { return mManager; }
-	//Tells if the system is active
-	bool isActive() const { return mManager != NULL; }
-	//Get the name of the texture used to store the light information
-	const String& getSDLTextureName();
+    SegmentedDynamicLightManager();
+    ~SegmentedDynamicLightManager();
+            
+    bool setDebugMode(bool i_IsDebugMode);
+    //Set the system to active mode
+    void setSceneManager(SceneManager* i_Manager);
+    SceneManager * getSceneManager(void) { return mManager; }
+    //Tells if the system is active
+    bool isActive() const { return mManager != NULL; }
+    //Get the name of the texture used to store the light information
+    const String& getSDLTextureName();
 
-	//Get the range of lights in the supplied texture data that need to be calculated for a given renderable 
-	bool getLightListRange(const Renderable* i_Rend, Vector4& o_GridBounds, unsigned int& o_IndexMin, unsigned int& o_IndexMax);
+    //Get the range of lights in the supplied texture data that need to be calculated for a given renderable 
+    bool getLightListRange(const Renderable* i_Rend, Vector4& o_GridBounds, unsigned int& o_IndexMin, unsigned int& o_IndexMax);
 
-	//Get the width of the texture containing the light information
-	unsigned int getTextureWidth() const { return mTextureWidth; }
-	//Get the height of the texture containing the light information
-	unsigned int getTextureHeight() const { return mTextureHeight; }
-	//Get the amount of cells the texture is divided into on either axis
-	unsigned int getGridDivision() const { return SDL_SEGMENT_DIVISIONS; }
-	//Get whether to display the lights in debug mode
-	bool isDebugMode() const { return mIsDebugMode; }
+    //Get the width of the texture containing the light information
+    unsigned int getTextureWidth() const { return mTextureWidth; }
+    //Get the height of the texture containing the light information
+    unsigned int getTextureHeight() const { return mTextureHeight; }
+    //Get the amount of cells the texture is divided into on either axis
+    unsigned int getGridDivision() const { return SDL_SEGMENT_DIVISIONS; }
+    //Get whether to display the lights in debug mode
+    bool isDebugMode() const { return mIsDebugMode; }
 
-	//Implementation of SceneManager::Listener
-	virtual void postFindVisibleObjects(SceneManager* source, 
-		SceneManager::IlluminationRenderStage irs, Viewport* v);
-	
+    //Implementation of SceneManager::Listener
+    virtual void postFindVisibleObjects(SceneManager* source, 
+        SceneManager::IlluminationRenderStage irs, Viewport* v);
+    
 private:
-		
-	class LightData 
-	{
-	public:
-		//Constructor for LightData
-		LightData();
-		//Sets the values of the boundaries of the light
-		void setBounds(const AxisAlignedBox& i_Bounds);
-		//Add an index to the possible range of indexes
-		void addIndexToRange(unsigned int i_LightIndex);
-			
-		unsigned int getIndexMin() const { return mIndexMin; }
-		unsigned int getIndexMax() const { return mIndexMax; }
+        
+    class LightData 
+    {
+    public:
+        //Constructor for LightData
+        LightData();
+        //Sets the values of the boundaries of the light
+        void setBounds(const AxisAlignedBox& i_Bounds);
+        //Add an index to the possible range of indexes
+        void addIndexToRange(unsigned int i_LightIndex);
+            
+        unsigned int getIndexMin() const { return mIndexMin; }
+        unsigned int getIndexMax() const { return mIndexMax; }
 
-		Real getMinX() const { return mMinX; }
-		Real getMaxX() const { return mMaxX; } 
-		Real getMinZ() const { return mMinZ; }
-		Real getMaxZ() const { return mMaxZ; } 
+        Real getMinX() const { return mMinX; }
+        Real getMaxX() const { return mMaxX; } 
+        Real getMinZ() const { return mMinZ; }
+        Real getMaxZ() const { return mMaxZ; } 
 
-	private:
-		unsigned int mIndexMin;
-		unsigned int mIndexMax;
-		
-		Real mMinX;
-		Real mMaxX;
-		Real mMinZ;
-		Real mMaxZ;
-	};
+    private:
+        unsigned int mIndexMin;
+        unsigned int mIndexMax;
+        
+        Real mMinX;
+        Real mMaxX;
+        Real mMinZ;
+        Real mMaxZ;
+    };
 
-	typedef map<const Light*,LightData>::type MapLightData;
-
-private:
-	//Update the systems internal light lists
-	void updateLightList(const Camera* i_pCamera, const LightArray& i_LightList);
-	//Initialize the texture to be used to store the light information
-	bool initTexture();
-	//Arrange the lights in the different lists
-	void arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightArray& i_LightList);
-	//Repopulate the mActiveLights list which keeps track of all lights being rendered in the frame
-	void regenerateActiveLightList(const LightArray& i_LightList);
-	//Calculate the bounds of a single light
-	void calculateLightBounds(const Light* i_Light, LightData &o_LightData);
-	//Calculate the area which bounds area in which the lights exist
-	void recalculateGridSize();
-	//Distribute the lights in the active light list (mActiveLights) in the grid parameter (mSegmentedLightGrid)
-	void distributeLightsInGrid();
-	//Get the index in the grid of a given world position
-	unsigned int calcGridColumn(Real i_Position, Real i_BoundStart, Real i_BoundEnd);
-	//Returns a grid index for a given x and y index positions
-	unsigned int calcGridIndex(unsigned int i_X, unsigned int i_Y);
-
-	//Load the lights information from the internal lists to the texture
-	void updateTextureFromSegmentedLists(const Camera* i_pCamera);
+    typedef map<const Light*,LightData>::type MapLightData;
 
 private:
-	//Tells whether to run the lights in debug mode
-	bool mIsDebugMode;
-	//Pointer to a scene manager on which the lights will work
-	SceneManager* mManager;
-		
-	//List of active lights in the frame
-	MapLightData mActiveLights;
-		
-	//A Grid structures to contain the lights as they are represented in the light texture
-	typedef vector<const Light*>::type VecLights;
-	typedef vector<VecLights>::type SegmentedVecLight;
-	SegmentedVecLight mSegmentedLightGrid;
+    //Update the systems internal light lists
+    void updateLightList(const Camera* i_pCamera, const LightArray& i_LightList);
+    //Initialize the texture to be used to store the light information
+    bool initTexture();
+    //Arrange the lights in the different lists
+    void arrangeLightsInSegmentedLists(const Camera* i_pCamera, const LightArray& i_LightList);
+    //Repopulate the mActiveLights list which keeps track of all lights being rendered in the frame
+    void regenerateActiveLightList(const LightArray& i_LightList);
+    //Calculate the bounds of a single light
+    void calculateLightBounds(const Light* i_Light, LightData &o_LightData);
+    //Calculate the area which bounds area in which the lights exist
+    void recalculateGridSize();
+    //Distribute the lights in the active light list (mActiveLights) in the grid parameter (mSegmentedLightGrid)
+    void distributeLightsInGrid();
+    //Get the index in the grid of a given world position
+    unsigned int calcGridColumn(Real i_Position, Real i_BoundStart, Real i_BoundEnd);
+    //Returns a grid index for a given x and y index positions
+    unsigned int calcGridIndex(unsigned int i_X, unsigned int i_Y);
 
-	//A pointer to a texture which containing information from which a shader renders the lights
-	TexturePtr mLightTexture;
-	//The height of the width information texture
-	unsigned int mTextureWidth;
-	//The height of the light information texture
-	unsigned int mTextureHeight;
+    //Load the lights information from the internal lists to the texture
+    void updateTextureFromSegmentedLists(const Camera* i_pCamera);
 
-		
-	//Light grid bounds
-	Real mGridMinX;
-	Real mGridMinZ;
-	Real mGridMaxX;
-	Real mGridMaxZ;
+private:
+    //Tells whether to run the lights in debug mode
+    bool mIsDebugMode;
+    //Pointer to a scene manager on which the lights will work
+    SceneManager* mManager;
+        
+    //List of active lights in the frame
+    MapLightData mActiveLights;
+        
+    //A Grid structures to contain the lights as they are represented in the light texture
+    typedef vector<const Light*>::type VecLights;
+    typedef vector<VecLights>::type SegmentedVecLight;
+    SegmentedVecLight mSegmentedLightGrid;
+
+    //A pointer to a texture which containing information from which a shader renders the lights
+    TexturePtr mLightTexture;
+    //The height of the width information texture
+    unsigned int mTextureWidth;
+    //The height of the light information texture
+    unsigned int mTextureHeight;
+
+        
+    //Light grid bounds
+    Real mGridMinX;
+    Real mGridMinZ;
+    Real mGridMaxX;
+    Real mGridMaxZ;
 };
 
 #endif

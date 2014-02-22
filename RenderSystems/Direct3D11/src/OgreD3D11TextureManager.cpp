@@ -33,81 +33,81 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	//---------------------------------------------------------------------
-	D3D11TextureManager::D3D11TextureManager( D3D11Device & device ) : TextureManager(), mDevice (device)
-	{
-		if( mDevice.isNull())
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid Direct3DDevice passed", "D3D11TextureManager::D3D11TextureManager" );
-		// register with group manager
-		ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
-	}
-	//---------------------------------------------------------------------
-	D3D11TextureManager::~D3D11TextureManager()
-	{
-		// unregister with group manager
-		ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
+    //---------------------------------------------------------------------
+    D3D11TextureManager::D3D11TextureManager( D3D11Device & device ) : TextureManager(), mDevice (device)
+    {
+        if( mDevice.isNull())
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid Direct3DDevice passed", "D3D11TextureManager::D3D11TextureManager" );
+        // register with group manager
+        ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
+    }
+    //---------------------------------------------------------------------
+    D3D11TextureManager::~D3D11TextureManager()
+    {
+        // unregister with group manager
+        ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
 
-	}
-	//---------------------------------------------------------------------
-	Resource* D3D11TextureManager::createImpl(const String& name, 
-		ResourceHandle handle, const String& group, bool isManual, 
-		ManualResourceLoader* loader, const NameValuePairList* createParams)
-	{
-		return new D3D11Texture(this, name, handle, group, isManual, loader, mDevice); 
-	}
-	//---------------------------------------------------------------------
-	void D3D11TextureManager::releaseDefaultPoolResources(void)
-	{
-		size_t count = 0;
+    }
+    //---------------------------------------------------------------------
+    Resource* D3D11TextureManager::createImpl(const String& name, 
+        ResourceHandle handle, const String& group, bool isManual, 
+        ManualResourceLoader* loader, const NameValuePairList* createParams)
+    {
+        return new D3D11Texture(this, name, handle, group, isManual, loader, mDevice); 
+    }
+    //---------------------------------------------------------------------
+    void D3D11TextureManager::releaseDefaultPoolResources(void)
+    {
+        size_t count = 0;
 
-		ResourceMap::iterator r, rend;
-		rend = mResources.end();
-		for (r = mResources.begin(); r != rend; ++r)
-		{
-			D3D11TexturePtr t = r->second.staticCast<D3D11Texture>();
-			if (t->releaseIfDefaultPool())
-				count++;
-		}
-		LogManager::getSingleton().logMessage("D3D11TextureManager released:");
-		LogManager::getSingleton().logMessage(
-			StringConverter::toString(count) + " unmanaged textures");
-	}
-	//---------------------------------------------------------------------
-	void D3D11TextureManager::recreateDefaultPoolResources(void)
-	{
-		size_t count = 0;
+        ResourceMap::iterator r, rend;
+        rend = mResources.end();
+        for (r = mResources.begin(); r != rend; ++r)
+        {
+            D3D11TexturePtr t = r->second.staticCast<D3D11Texture>();
+            if (t->releaseIfDefaultPool())
+                count++;
+        }
+        LogManager::getSingleton().logMessage("D3D11TextureManager released:");
+        LogManager::getSingleton().logMessage(
+            StringConverter::toString(count) + " unmanaged textures");
+    }
+    //---------------------------------------------------------------------
+    void D3D11TextureManager::recreateDefaultPoolResources(void)
+    {
+        size_t count = 0;
 
-		ResourceMap::iterator r, rend;
-		rend = mResources.end();
-		for (r = mResources.begin(); r != rend; ++r)
-		{
-			D3D11TexturePtr t = r->second.staticCast<D3D11Texture>();
-			if(t->recreateIfDefaultPool(mDevice))
-				count++;
-		}
-		LogManager::getSingleton().logMessage("D3D11TextureManager recreated:");
-		LogManager::getSingleton().logMessage(
-			StringConverter::toString(count) + " unmanaged textures");
-	}
-	//---------------------------------------------------------------------
-	PixelFormat D3D11TextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)
-	{
-		// Basic filtering
-		DXGI_FORMAT d3dPF = D3D11Mappings::_getPF(D3D11Mappings::_getClosestSupportedPF(format));
+        ResourceMap::iterator r, rend;
+        rend = mResources.end();
+        for (r = mResources.begin(); r != rend; ++r)
+        {
+            D3D11TexturePtr t = r->second.staticCast<D3D11Texture>();
+            if(t->recreateIfDefaultPool(mDevice))
+                count++;
+        }
+        LogManager::getSingleton().logMessage("D3D11TextureManager recreated:");
+        LogManager::getSingleton().logMessage(
+            StringConverter::toString(count) + " unmanaged textures");
+    }
+    //---------------------------------------------------------------------
+    PixelFormat D3D11TextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)
+    {
+        // Basic filtering
+        DXGI_FORMAT d3dPF = D3D11Mappings::_getPF(D3D11Mappings::_getClosestSupportedPF(format));
 
-		return D3D11Mappings::_getPF(d3dPF);
-	}
-	//---------------------------------------------------------------------
-	bool D3D11TextureManager::isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
-		bool preciseFormatOnly)
-	{
-		if (!preciseFormatOnly)
-			format = getNativeFormat(ttype, format, usage);
+        return D3D11Mappings::_getPF(d3dPF);
+    }
+    //---------------------------------------------------------------------
+    bool D3D11TextureManager::isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
+        bool preciseFormatOnly)
+    {
+        if (!preciseFormatOnly)
+            format = getNativeFormat(ttype, format, usage);
 
-		D3D11RenderSystem* rs = static_cast<D3D11RenderSystem*>(
-			Root::getSingleton().getRenderSystem());
+        D3D11RenderSystem* rs = static_cast<D3D11RenderSystem*>(
+            Root::getSingleton().getRenderSystem());
 
-		return rs->_checkTextureFilteringSupported(ttype, format, usage);
-	}
-	//---------------------------------------------------------------------
+        return rs->_checkTextureFilteringSupported(ttype, format, usage);
+    }
+    //---------------------------------------------------------------------
 }

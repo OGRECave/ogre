@@ -33,36 +33,36 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	// forward decls
-	class Terrain;
-	class TerrainPageContent;
-	class TerrainPageContentFactory;
-	class TerrainQuadTreeNode;
+    // forward decls
+    class Terrain;
+    class TerrainPageContent;
+    class TerrainPageContentFactory;
+    class TerrainQuadTreeNode;
 
 
-	typedef GeneralAllocatedObject TerrainAlloc;
+    typedef GeneralAllocatedObject TerrainAlloc;
 
 
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#	if defined( OGRE_STATIC_LIB )
-#   	define _OgreTerrainExport
+#   if defined( OGRE_STATIC_LIB )
+#       define _OgreTerrainExport
 #   else
-#   	if defined( OGRE_TERRAIN_EXPORTS )
-#       	define _OgreTerrainExport __declspec( dllexport )
-#   	else
+#       if defined( OGRE_TERRAIN_EXPORTS )
+#           define _OgreTerrainExport __declspec( dllexport )
+#       else
 #           if defined( __MINGW32__ )
 #               define _OgreTerrainExport
 #           else
-#       	    define _OgreTerrainExport __declspec( dllimport )
+#               define _OgreTerrainExport __declspec( dllimport )
 #           endif
-#   	endif
-#	endif
+#       endif
+#   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
 #   define _OgreTerrainExport __attribute__ ((visibility("default")))
 #else
-#	define _OgreTerrainExport
+#   define _OgreTerrainExport
 #endif 
 
 #endif 

@@ -12,19 +12,19 @@
 namespace ps10
 {
 
-	struct constdef
-	{
-		std::string reg;
-		float r,g,b,a;
-	};
+    struct constdef
+    {
+        std::string reg;
+        float r,g,b,a;
+    };
 
-	extern std::map<int, std::pair<int,int> > constToStageAndConstMap;
-	extern std::map<int, GLenum> stageToTargetMap;
-	void invoke(std::vector<constdef> * c,
-		        std::list<std::vector<std::string> > * a,
-				std::list<std::vector<std::string> > * b);
-	
-	bool init_extensions();
+    extern std::map<int, std::pair<int,int> > constToStageAndConstMap;
+    extern std::map<int, GLenum> stageToTargetMap;
+    void invoke(std::vector<constdef> * c,
+                std::list<std::vector<std::string> > * a,
+                std::list<std::vector<std::string> > * b);
+    
+    bool init_extensions();
 }
 
 #endif

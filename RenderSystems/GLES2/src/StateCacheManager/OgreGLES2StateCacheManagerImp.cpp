@@ -116,23 +116,23 @@ namespace Ogre {
     
     void GLES2StateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
     {
-		bool update = false;
+        bool update = false;
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         if (i == mActiveBufferMap.end())
         {
             // Haven't cached this state yet.  Insert it into the map
             mActiveBufferMap.insert(BindBufferMap::value_type(target, buffer));
-			update = true;
+            update = true;
         }
         else if((*i).second != buffer || force) // Update the cached value if needed
         {
-			(*i).second = buffer;
-			update = true;
+            (*i).second = buffer;
+            update = true;
         }
 
-		// Update GL
-		if(update)
-		{
+        // Update GL
+        if(update)
+        {
             if(target == GL_FRAMEBUFFER)
             {
                 OGRE_CHECK_GL_ERROR(glBindFramebuffer(target, buffer));
@@ -145,7 +145,7 @@ namespace Ogre {
             {
                 OGRE_CHECK_GL_ERROR(glBindBuffer(target, buffer));
             }
-		}
+        }
     }
     
     void GLES2StateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
@@ -158,17 +158,17 @@ namespace Ogre {
         
         if (i != mActiveBufferMap.end() && ((*i).second == buffer || force))
         {
-			if(target == GL_FRAMEBUFFER)
+            if(target == GL_FRAMEBUFFER)
             {
-				OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &buffer));
+                OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &buffer));
             }
             else if(target == GL_RENDERBUFFER)
             {
-				OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &buffer));
+                OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &buffer));
             }
             else
             {
-				OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
+                OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
             }
 
             // Currently bound buffer is being deleted, update the cached value to 0,
@@ -280,30 +280,30 @@ namespace Ogre {
     }
     
     bool GLES2StateCacheManagerImp::activateGLTextureUnit(size_t unit)
-	{
-		if (mActiveTextureUnit != unit)
-		{
-			if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
-			{
-				OGRE_CHECK_GL_ERROR(glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + unit)));
-				mActiveTextureUnit = static_cast<GLenum>(unit);
-				return true;
-			}
-			else if (!unit)
-			{
-				// always ok to use the first unit
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return true;
-		}
-	}
+    {
+        if (mActiveTextureUnit != unit)
+        {
+            if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
+            {
+                OGRE_CHECK_GL_ERROR(glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + unit)));
+                mActiveTextureUnit = static_cast<GLenum>(unit);
+                return true;
+            }
+            else if (!unit)
+            {
+                // always ok to use the first unit
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
     
     // TODO: Store as high/low bits of a GLuint
     void GLES2StateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)

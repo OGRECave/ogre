@@ -40,13 +40,13 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Materials
-	*  @{
-	*/
-	/** Class for managing Material settings for Ogre.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Materials
+    *  @{
+    */
+    /** Class for managing Material settings for Ogre.
         @remarks
             Materials control the eventual surface rendering properties of geometry. This class
             manages the library of materials, dealing with programmatic registrations and lookups,
@@ -63,49 +63,49 @@ namespace Ogre {
     */
     class _OgreExport MaterialManager : public ResourceManager, public Singleton<MaterialManager>
     {
-	public:
-		/** Listener on any general material events.
-		@see MaterialManager::addListener
-		*/
-		class Listener
-		{
-		public:
+    public:
+        /** Listener on any general material events.
+        @see MaterialManager::addListener
+        */
+        class Listener
+        {
+        public:
             /** Virtual destructor needed as class has virtual methods. */
             virtual ~Listener() { }
-			/** Called if a technique for a given scheme is not found within a material,
-				allows the application to specify a Technique instance manually.
-			@remarks
-				Material schemes allow you to switch wholesale between families of 
-				techniques on a material. However they require you to define those
-				schemes on the materials up-front, which might not be possible or
-				desirable for all materials, particular if, for example, you wanted
-				a simple way to replace all materials with another using a scheme.
-			@par
-				This callback allows you to handle the case where a scheme is requested
-				but the material doesn't have an entry for it. You can return a
-				Technique pointer from this method to specify the material technique
-				you'd like to be applied instead, which can be from another material
-				entirely (and probably will be). Note that it is critical that you
-				only return a Technique that is supported on this hardware; there are
-				utility methods like Material::getBestTechnique to help you with this.
-			@param schemeIndex The index of the scheme that was requested - all 
-				schemes have a unique index when created that does not alter. 
-			@param schemeName The friendly name of the scheme being requested
-			@param originalMaterial The material that is being processed, that 
-				didn't have a specific technique for this scheme
-			@param lodIndex The material level-of-detail that was being asked for, 
-				in case you need to use it to determine a technique.
-			@param rend Pointer to the Renderable that is requesting this technique
-				to be used, so this may influence your choice of Technique. May be
-				null if the technique isn't being requested in that context.
-			@return A pointer to the technique to be used, or NULL if you wish to
-				use the default technique for this material
-			*/
-			virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 
-				const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
-				const Renderable* rend) = 0;
+            /** Called if a technique for a given scheme is not found within a material,
+                allows the application to specify a Technique instance manually.
+            @remarks
+                Material schemes allow you to switch wholesale between families of 
+                techniques on a material. However they require you to define those
+                schemes on the materials up-front, which might not be possible or
+                desirable for all materials, particular if, for example, you wanted
+                a simple way to replace all materials with another using a scheme.
+            @par
+                This callback allows you to handle the case where a scheme is requested
+                but the material doesn't have an entry for it. You can return a
+                Technique pointer from this method to specify the material technique
+                you'd like to be applied instead, which can be from another material
+                entirely (and probably will be). Note that it is critical that you
+                only return a Technique that is supported on this hardware; there are
+                utility methods like Material::getBestTechnique to help you with this.
+            @param schemeIndex The index of the scheme that was requested - all 
+                schemes have a unique index when created that does not alter. 
+            @param schemeName The friendly name of the scheme being requested
+            @param originalMaterial The material that is being processed, that 
+                didn't have a specific technique for this scheme
+            @param lodIndex The material level-of-detail that was being asked for, 
+                in case you need to use it to determine a technique.
+            @param rend Pointer to the Renderable that is requesting this technique
+                to be used, so this may influence your choice of Technique. May be
+                null if the technique isn't being requested in that context.
+            @return A pointer to the technique to be used, or NULL if you wish to
+                use the default technique for this material
+            */
+            virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+                const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
+                const Renderable* rend) = 0;
 
-		};
+        };
 
     protected:
 
@@ -115,51 +115,51 @@ namespace Ogre {
         FilterOptions mDefaultMagFilter;
         /// Default Texture filtering - mipmapping
         FilterOptions mDefaultMipFilter;
-		/// Default Texture filtering - comparison
-		FilterOptions mDefaultCompare;
+        /// Default Texture filtering - comparison
+        FilterOptions mDefaultCompare;
 
-		bool			mDefaultCompareEnabled;
-		CompareFunction	mDefaultCompareFunction;
+        bool            mDefaultCompareEnabled;
+        CompareFunction mDefaultCompareFunction;
 
         /// Default Texture anisotropy
         unsigned int mDefaultMaxAniso;
         /// Serializer - Hold instance per thread if necessary
         OGRE_THREAD_POINTER(MaterialSerializer, mSerializer);
-		/// Default settings
-		MaterialPtr mDefaultSettings;
+        /// Default settings
+        MaterialPtr mDefaultSettings;
 
-		/// Overridden from ResourceManager
-		Resource* createImpl(const String& name, ResourceHandle handle, 
-			const String& group, bool isManual, ManualResourceLoader* loader,
+        /// Overridden from ResourceManager
+        Resource* createImpl(const String& name, ResourceHandle handle, 
+            const String& group, bool isManual, ManualResourceLoader* loader,
             const NameValuePairList* params);
 
-		/// Scheme name -> index. Never shrinks! Should be pretty static anyway
-		typedef map<String, unsigned short>::type SchemeMap;
-		/// List of material schemes
-		SchemeMap mSchemes;
-		/// Current material scheme
-		String mActiveSchemeName;
-		/// Current material scheme
-		unsigned short mActiveSchemeIndex;
+        /// Scheme name -> index. Never shrinks! Should be pretty static anyway
+        typedef map<String, unsigned short>::type SchemeMap;
+        /// List of material schemes
+        SchemeMap mSchemes;
+        /// Current material scheme
+        String mActiveSchemeName;
+        /// Current material scheme
+        unsigned short mActiveSchemeIndex;
 
-		/// The list of per-scheme (and general) material listeners
-		typedef list<Listener*>::type ListenerList;
-		typedef map<String, ListenerList>::type ListenerMap;
-		ListenerMap mListenerMap;
+        /// The list of per-scheme (and general) material listeners
+        typedef list<Listener*>::type ListenerList;
+        typedef map<String, ListenerList>::type ListenerMap;
+        ListenerMap mListenerMap;
 
     public:
-		/// Default material scheme
-		static String DEFAULT_SCHEME_NAME;
+        /// Default material scheme
+        static String DEFAULT_SCHEME_NAME;
 
-		/// Create a new material
-		/// @see ResourceManager::createResource
-		MaterialPtr create (const String& name, const String& group,
-							bool isManual = false, ManualResourceLoader* loader = 0,
-							const NameValuePairList* createParams = 0);
-		
-		/// Get a resource by name
-		/// @see ResourceManager::getResourceByName
-		MaterialPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        /// Create a new material
+        /// @see ResourceManager::createResource
+        MaterialPtr create (const String& name, const String& group,
+                            bool isManual = false, ManualResourceLoader* loader = 0,
+                            const NameValuePairList* createParams = 0);
+        
+        /// Get a resource by name
+        /// @see ResourceManager::getResourceByName
+        MaterialPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Default constructor.
         */
@@ -169,11 +169,11 @@ namespace Ogre {
         */
         virtual ~MaterialManager();
 
-		/** Initialises the material manager, which also triggers it to 
-		 * parse all available .program and .material scripts. */
-		void initialise(void);
+        /** Initialises the material manager, which also triggers it to 
+         * parse all available .program and .material scripts. */
+        void initialise(void);
         
-		/** @see ScriptLoader::parseScript
+        /** @see ScriptLoader::parseScript
         */
         void parseScript(DataStreamPtr& stream, const String& groupName);
 
@@ -196,7 +196,7 @@ namespace Ogre {
         */
         virtual void setDefaultTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
 
-		/// Get the default texture filtering
+        /// Get the default texture filtering
         virtual FilterOptions getDefaultTextureFiltering(FilterType ftype) const;
 
         /** Sets the default anisotropy level to be used for loaded textures, for when textures are
@@ -205,9 +205,9 @@ namespace Ogre {
             @note
                 The default value is 1 (no anisotropy).
         */
-		void setDefaultAnisotropy(unsigned int maxAniso);
-		/// Get the default maxAnisotropy
-		unsigned int getDefaultAnisotropy() const;
+        void setDefaultAnisotropy(unsigned int maxAniso);
+        /// Get the default maxAnisotropy
+        unsigned int getDefaultAnisotropy() const;
 
         /** Returns a pointer to the default Material settings.
             @remarks
@@ -239,46 +239,46 @@ namespace Ogre {
                 <li>Bilinear texture filtering</li>
                 </ul>
         */
-		virtual MaterialPtr getDefaultSettings(void) const { return mDefaultSettings; }
+        virtual MaterialPtr getDefaultSettings(void) const { return mDefaultSettings; }
 
-		/** Internal method - returns index for a given material scheme name.
-		@see Technique::setSchemeName
-		*/
-		virtual unsigned short _getSchemeIndex(const String& name);
-		/** Internal method - returns name for a given material scheme index.
-		@see Technique::setSchemeName
-		*/
-		virtual const String& _getSchemeName(unsigned short index);
-		/** Internal method - returns the active scheme index.
-		@see Technique::setSchemeName
-		*/
-		virtual unsigned short _getActiveSchemeIndex(void) const;
+        /** Internal method - returns index for a given material scheme name.
+        @see Technique::setSchemeName
+        */
+        virtual unsigned short _getSchemeIndex(const String& name);
+        /** Internal method - returns name for a given material scheme index.
+        @see Technique::setSchemeName
+        */
+        virtual const String& _getSchemeName(unsigned short index);
+        /** Internal method - returns the active scheme index.
+        @see Technique::setSchemeName
+        */
+        virtual unsigned short _getActiveSchemeIndex(void) const;
 
-		/** Returns the name of the active material scheme. 
-		@see Technique::setSchemeName
-		*/
-		virtual const String& getActiveScheme(void) const;
-		
-		/** Sets the name of the active material scheme. 
-		@see Technique::setSchemeName
-		*/
-		virtual void setActiveScheme(const String& schemeName);
+        /** Returns the name of the active material scheme. 
+        @see Technique::setSchemeName
+        */
+        virtual const String& getActiveScheme(void) const;
+        
+        /** Sets the name of the active material scheme. 
+        @see Technique::setSchemeName
+        */
+        virtual void setActiveScheme(const String& schemeName);
 
-		/** 
-		Add a listener to handle material events. 
-		If schemeName is supplied, the listener will only receive events for that certain scheme.
-		*/
-		virtual void addListener(Listener* l, const Ogre::String& schemeName = StringUtil::BLANK);
+        /** 
+        Add a listener to handle material events. 
+        If schemeName is supplied, the listener will only receive events for that certain scheme.
+        */
+        virtual void addListener(Listener* l, const Ogre::String& schemeName = StringUtil::BLANK);
 
-		/** 
-		Remove a listener handling material events. 
-		If the listener was added with a custom scheme name, it needs to be supplied here as well.
-		*/
-		virtual void removeListener(Listener* l, const Ogre::String& schemeName = StringUtil::BLANK);
+        /** 
+        Remove a listener handling material events. 
+        If the listener was added with a custom scheme name, it needs to be supplied here as well.
+        */
+        virtual void removeListener(Listener* l, const Ogre::String& schemeName = StringUtil::BLANK);
 
-		/// Internal method for sorting out missing technique for a scheme
-		virtual Technique* _arbitrateMissingTechniqueForActiveScheme(
-			Material* mat, unsigned short lodIndex, const Renderable* rend);
+        /// Internal method for sorting out missing technique for a scheme
+        virtual Technique* _arbitrateMissingTechniqueForActiveScheme(
+            Material* mat, unsigned short lodIndex, const Renderable* rend);
 
         /** Override standard Singleton retrieval.
         @remarks
@@ -314,8 +314,8 @@ namespace Ogre {
         static MaterialManager* getSingletonPtr(void);
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

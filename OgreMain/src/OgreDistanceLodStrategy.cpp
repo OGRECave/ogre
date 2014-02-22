@@ -76,29 +76,29 @@ namespace Ogre {
         // Now adjust it by the camera bias and return the computed value
         return squaredDepth * camera->_getLodBiasInverse();
     }
-	//-----------------------------------------------------------------------
-	void DistanceLodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData objData,
-											 const Camera *camera, Real bias ) const
-	{
-		ArrayVector3 cameraPos;
-		cameraPos.setAll( camera->getDerivedPosition() );
+    //-----------------------------------------------------------------------
+    void DistanceLodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData objData,
+                                             const Camera *camera, Real bias ) const
+    {
+        ArrayVector3 cameraPos;
+        cameraPos.setAll( camera->getDerivedPosition() );
 
-		ArrayReal lodInvBias( Mathlib::SetAll( camera->_getLodBiasInverse() * bias ) );
-		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
+        ArrayReal lodInvBias( Mathlib::SetAll( camera->_getLodBiasInverse() * bias ) );
+        OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
-		for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
-		{
-			ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
-																		(objData.mWorldRadius);
-			ArrayReal arrayLodValue = objData.mWorldAabb->mCenter.distance( cameraPos ) - (*worldRadius);
-			arrayLodValue = arrayLodValue * lodInvBias;
-			CastArrayToReal( lodValues, arrayLodValue );
+        for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+        {
+            ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+                                                                        (objData.mWorldRadius);
+            ArrayReal arrayLodValue = objData.mWorldAabb->mCenter.distance( cameraPos ) - (*worldRadius);
+            arrayLodValue = arrayLodValue * lodInvBias;
+            CastArrayToReal( lodValues, arrayLodValue );
 
-			lodSet( objData, lodValues );
+            lodSet( objData, lodValues );
 
-			objData.advanceLodPack();
-		}
-	}
+            objData.advanceLodPack();
+        }
+    }
     //-----------------------------------------------------------------------
     Real DistanceLodStrategy::getBaseValue() const
     {
@@ -195,7 +195,7 @@ namespace Ogre {
         // more computation (including a sqrt) so we approximate 
         // it with d^2 - r^2, which is good enough for determining 
         // LOD.
-		return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getWorldRadius());
+        return movableObject->getParentNode()->getSquaredViewDepth(camera) - Math::Sqr(movableObject->getWorldRadius());
     }
     //-----------------------------------------------------------------------
 

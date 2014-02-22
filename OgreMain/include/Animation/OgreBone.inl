@@ -27,50 +27,50 @@ THE SOFTWARE.
 */
 
 #ifndef NDEBUG
-	#define CACHED_TRANSFORM_OUT_OF_DATE() this->setCachedTransformOutOfDate()
+    #define CACHED_TRANSFORM_OUT_OF_DATE() this->setCachedTransformOutOfDate()
 #else
-	#define CACHED_TRANSFORM_OUT_OF_DATE() ((void)0)
+    #define CACHED_TRANSFORM_OUT_OF_DATE() ((void)0)
 #endif
 
 namespace Ogre
 {
-	//-----------------------------------------------------------------------
-	inline Quaternion Bone::getOrientation() const
-	{
-		return mTransform.mOrientation->getAsQuaternion( mTransform.mIndex );
-	}
-	//-----------------------------------------------------------------------
-	inline void Bone::setOrientation( Quaternion q )
-	{
-		assert(!q.isNaN() && "Invalid orientation supplied as parameter");
-		q.normalise();
-		mTransform.mOrientation->setFromQuaternion( q, mTransform.mIndex );
-		CACHED_TRANSFORM_OUT_OF_DATE();
-	}
-	//-----------------------------------------------------------------------
-	inline void Bone::setPosition(const Vector3& pos)
-	{
-		assert(!pos.isNaN() && "Invalid vector supplied as parameter");
-		mTransform.mPosition->setFromVector3( pos, mTransform.mIndex );
-		CACHED_TRANSFORM_OUT_OF_DATE();
-	}
-	//-----------------------------------------------------------------------
-	inline Vector3 Bone::getPosition(void) const
-	{
-		return mTransform.mPosition->getAsVector3( mTransform.mIndex );
-	}
-	//-----------------------------------------------------------------------
-	inline void Bone::setScale(const Vector3& scale)
-	{
-		assert(!scale.isNaN() && "Invalid vector supplied as parameter");
-		mTransform.mScale->setFromVector3( scale, mTransform.mIndex );
-		CACHED_TRANSFORM_OUT_OF_DATE();
-	}
-	//-----------------------------------------------------------------------
-	inline Vector3 Bone::getScale(void) const
-	{
-		return mTransform.mScale->getAsVector3( mTransform.mIndex );
-	}
+    //-----------------------------------------------------------------------
+    inline Quaternion Bone::getOrientation() const
+    {
+        return mTransform.mOrientation->getAsQuaternion( mTransform.mIndex );
+    }
+    //-----------------------------------------------------------------------
+    inline void Bone::setOrientation( Quaternion q )
+    {
+        assert(!q.isNaN() && "Invalid orientation supplied as parameter");
+        q.normalise();
+        mTransform.mOrientation->setFromQuaternion( q, mTransform.mIndex );
+        CACHED_TRANSFORM_OUT_OF_DATE();
+    }
+    //-----------------------------------------------------------------------
+    inline void Bone::setPosition(const Vector3& pos)
+    {
+        assert(!pos.isNaN() && "Invalid vector supplied as parameter");
+        mTransform.mPosition->setFromVector3( pos, mTransform.mIndex );
+        CACHED_TRANSFORM_OUT_OF_DATE();
+    }
+    //-----------------------------------------------------------------------
+    inline Vector3 Bone::getPosition(void) const
+    {
+        return mTransform.mPosition->getAsVector3( mTransform.mIndex );
+    }
+    //-----------------------------------------------------------------------
+    inline void Bone::setScale(const Vector3& scale)
+    {
+        assert(!scale.isNaN() && "Invalid vector supplied as parameter");
+        mTransform.mScale->setFromVector3( scale, mTransform.mIndex );
+        CACHED_TRANSFORM_OUT_OF_DATE();
+    }
+    //-----------------------------------------------------------------------
+    inline Vector3 Bone::getScale(void) const
+    {
+        return mTransform.mScale->getAsVector3( mTransform.mIndex );
+    }
 }
 
 #undef CACHED_TRANSFORM_OUT_OF_DATE

@@ -38,13 +38,13 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 ProgramWriterManager* ProgramWriterManager::getSingletonPtr(void)
 {
-	return msSingleton;
+    return msSingleton;
 }
 //-----------------------------------------------------------------------
 ProgramWriterManager& ProgramWriterManager::getSingleton(void)
 {  
-	assert( msSingleton );  
-	return ( *msSingleton );  
+    assert( msSingleton );  
+    return ( *msSingleton );  
 }
 //-----------------------------------------------------------------------
 ProgramWriterManager::ProgramWriterManager()
@@ -59,39 +59,39 @@ ProgramWriterManager::~ProgramWriterManager()
 //-----------------------------------------------------------------------
 void ProgramWriterManager::addFactory(ProgramWriterFactory* factory)
 {
-	mFactories[factory->getTargetLanguage()] = factory;
+    mFactories[factory->getTargetLanguage()] = factory;
 }
 //-----------------------------------------------------------------------
 void ProgramWriterManager::removeFactory(ProgramWriterFactory* factory)
 {
-	// Remove only if equal to registered one, since it might overridden
-	// by other plugins
-	FactoryMap::iterator it = mFactories.find(factory->getTargetLanguage());
-	if (it != mFactories.end() && it->second == factory)
-	{
-		mFactories.erase(it);
-	}
+    // Remove only if equal to registered one, since it might overridden
+    // by other plugins
+    FactoryMap::iterator it = mFactories.find(factory->getTargetLanguage());
+    if (it != mFactories.end() && it->second == factory)
+    {
+        mFactories.erase(it);
+    }
 }
 //-----------------------------------------------------------------------
 bool ProgramWriterManager::isLanguageSupported(const String& lang)
 {
-	FactoryMap::iterator i = mFactories.find(lang);
+    FactoryMap::iterator i = mFactories.find(lang);
 
-	return i != mFactories.end();
+    return i != mFactories.end();
 }
 //-----------------------------------------------------------------------
 ProgramWriter* ProgramWriterManager::createProgramWriter( const String& language)
 {
-	FactoryMap::iterator it = mFactories.find(language);
+    FactoryMap::iterator it = mFactories.find(language);
 
-	if (it != mFactories.end())
-	{
-		return (it->second)->create();
-	}
-	
-	OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
-		"Could not create ShaderProgramWriter unknown language ", 
-		"ShaderProgramWriterManager::createProgramWriter" );
+    if (it != mFactories.end())
+    {
+        return (it->second)->create();
+    }
+    
+    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
+        "Could not create ShaderProgramWriter unknown language ", 
+        "ShaderProgramWriterManager::createProgramWriter" );
 }
 
 }

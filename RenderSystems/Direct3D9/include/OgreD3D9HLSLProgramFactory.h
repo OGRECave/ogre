@@ -37,16 +37,16 @@ namespace Ogre
     class _OgreD3D9Export D3D9HLSLProgramFactory : public HighLevelGpuProgramFactory
     {
     protected:
-		static String sLanguageName;
+        static String sLanguageName;
     public:
         D3D9HLSLProgramFactory();
         ~D3D9HLSLProgramFactory();
-		/// Get the name of the language this factory creates programs for
-		const String& getLanguage(void) const;
+        /// Get the name of the language this factory creates programs for
+        const String& getLanguage(void) const;
         HighLevelGpuProgram* create(ResourceManager* creator, 
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
-		void destroy(HighLevelGpuProgram* prog);
+        void destroy(HighLevelGpuProgram* prog);
 
     };
 }

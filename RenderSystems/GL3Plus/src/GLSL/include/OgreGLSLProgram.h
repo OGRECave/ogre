@@ -35,22 +35,22 @@ namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to provide support for OpenGL 
         Shader Language (GLSL).
     @remarks
-		GLSL has no target assembler or entry point specification like DirectX 9 HLSL.
-		Vertex and Fragment shaders only have one entry point called "main".  
-		When a shader is compiled, microcode is generated but can not be accessed by
-		the application.
-		GLSL also does not provide assembler low level output after compiling.  The GL Render
-		system assumes that the Gpu program is a GL Gpu program so GLSLProgram will create a 
-		GLSLGpuProgram that is subclassed from GLGpuProgram for the low level implementation.
-		The GLSLProgram class will create a shader object and compile the source but will
-		not create a program object.  It's up to GLSLGpuProgram class to request a program object
-		to link the shader object to.
+        GLSL has no target assembler or entry point specification like DirectX 9 HLSL.
+        Vertex and Fragment shaders only have one entry point called "main".  
+        When a shader is compiled, microcode is generated but can not be accessed by
+        the application.
+        GLSL also does not provide assembler low level output after compiling.  The GL Render
+        system assumes that the Gpu program is a GL Gpu program so GLSLProgram will create a 
+        GLSLGpuProgram that is subclassed from GLGpuProgram for the low level implementation.
+        The GLSLProgram class will create a shader object and compile the source but will
+        not create a program object.  It's up to GLSLGpuProgram class to request a program object
+        to link the shader object to.
 
-	@note
-		GLSL supports multiple modular shader objects that can be attached to one program
-		object to form a single shader.  This is supported through the "attach" material script
-		command.  All the modules to be attached are listed on the same line as the attach command
-		separated by white space.
+    @note
+        GLSL supports multiple modular shader objects that can be attached to one program
+        object to form a single shader.  This is supported through the "attach" material script
+        command.  All the modules to be attached are listed on the same line as the attach command
+        separated by white space.
         
     */
     class _OgreGL3PlusExport GLSLProgram : public HighLevelGpuProgram
@@ -99,57 +99,57 @@ namespace Ogre {
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
-		/** Returns the operation type that this geometry program expects to
-			receive as input
-		*/
-		virtual RenderOperation::OperationType getInputOperationType(void) const 
-		{ return mInputOperationType; }
-		/** Returns the operation type that this geometry program will emit
-		*/
-		virtual RenderOperation::OperationType getOutputOperationType(void) const 
-		{ return mOutputOperationType; }
-		/** Returns the maximum number of vertices that this geometry program can
-			output in a single run
-		*/
-		virtual int getMaxOutputVertices(void) const { return mMaxOutputVertices; }
+        /** Returns the operation type that this geometry program expects to
+            receive as input
+        */
+        virtual RenderOperation::OperationType getInputOperationType(void) const 
+        { return mInputOperationType; }
+        /** Returns the operation type that this geometry program will emit
+        */
+        virtual RenderOperation::OperationType getOutputOperationType(void) const 
+        { return mOutputOperationType; }
+        /** Returns the maximum number of vertices that this geometry program can
+            output in a single run
+        */
+        virtual int getMaxOutputVertices(void) const { return mMaxOutputVertices; }
 
-		/** Sets the operation type that this geometry program expects to receive
-		*/
-		virtual void setInputOperationType(RenderOperation::OperationType operationType) 
-		{ mInputOperationType = operationType; }
-		/** Set the operation type that this geometry program will emit
-		*/
-		virtual void setOutputOperationType(RenderOperation::OperationType operationType) 
-		{ mOutputOperationType = operationType; }
-		/** Set the maximum number of vertices that a single run of this geometry program
-			can emit.
-		*/
-		virtual void setMaxOutputVertices(int maxOutputVertices) 
-		{ mMaxOutputVertices = maxOutputVertices; }
+        /** Sets the operation type that this geometry program expects to receive
+        */
+        virtual void setInputOperationType(RenderOperation::OperationType operationType) 
+        { mInputOperationType = operationType; }
+        /** Set the operation type that this geometry program will emit
+        */
+        virtual void setOutputOperationType(RenderOperation::OperationType operationType) 
+        { mOutputOperationType = operationType; }
+        /** Set the maximum number of vertices that a single run of this geometry program
+            can emit.
+        */
+        virtual void setMaxOutputVertices(int maxOutputVertices) 
+        { mMaxOutputVertices = maxOutputVertices; }
 
         GLSLProgram(ResourceManager* creator, 
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
-		~GLSLProgram();
+        ~GLSLProgram();
 
-		GLuint getGLShaderHandle() const { return mGLShaderHandle; }
-		GLuint getGLProgramHandle() const { return mGLProgramHandle; }
-		void attachToProgramObject( const GLuint programObject );
-		void detachFromProgramObject( const GLuint programObject );
-		String getAttachedShaderNames() const { return mAttachedShaderNames; }
+        GLuint getGLShaderHandle() const { return mGLShaderHandle; }
+        GLuint getGLProgramHandle() const { return mGLProgramHandle; }
+        void attachToProgramObject( const GLuint programObject );
+        void detachFromProgramObject( const GLuint programObject );
+        String getAttachedShaderNames() const { return mAttachedShaderNames; }
 
-		/// Overridden
-		bool getPassTransformStates(void) const;
-		bool getPassSurfaceAndLightStates(void) const;
-		bool getPassFogStates(void) const;
+        /// Overridden
+        bool getPassTransformStates(void) const;
+        bool getPassSurfaceAndLightStates(void) const;
+        bool getPassFogStates(void) const;
 
         /** Attach another GLSL Shader to this one. */
         void attachChildShader(const String& name);
 
-		/// Sets the preprocessor defines use to compile the program.
-		void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
-		/// Sets the preprocessor defines use to compile the program.
-		const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
+        /// Sets the preprocessor defines use to compile the program.
+        void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
+        /// Sets the preprocessor defines use to compile the program.
+        const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
@@ -158,64 +158,64 @@ namespace Ogre {
         /** Gets whether matrix packed in column-major order. */
         bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
 
-		/// Overridden from GpuProgram
-		GpuProgramParametersSharedPtr createParameters(void);
+        /// Overridden from GpuProgram
+        GpuProgramParametersSharedPtr createParameters(void);
 
-		/// Compile source into shader object
-		bool compile( const bool checkErrors = false);
+        /// Compile source into shader object
+        bool compile( const bool checkErrors = false);
 
-	protected:
-		static CmdPreprocessorDefines msCmdPreprocessorDefines;
+    protected:
+        static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdAttach msCmdAttach;
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
-		static CmdInputOperationType msInputOperationTypeCmd;
-		static CmdOutputOperationType msOutputOperationTypeCmd;
-		static CmdMaxOutputVertices msMaxOutputVerticesCmd;
+        static CmdInputOperationType msInputOperationTypeCmd;
+        static CmdOutputOperationType msOutputOperationTypeCmd;
+        static CmdMaxOutputVertices msMaxOutputVerticesCmd;
 
         /** Internal load implementation, must be implemented by subclasses.
         */
         void loadFromSource(void);
         /** Internal method for creating a dummy low-level program for this
-        high-level program.	GLSL does not give access to the low level implementation of the
-		shader so this method creates an object sub-classed from GL3PlusGpuProgram just to be
-		compatible with	GL3PlusRenderSystem.
-		*/
-		void createLowLevelImpl(void);
+        high-level program. GLSL does not give access to the low level implementation of the
+        shader so this method creates an object sub-classed from GL3PlusGpuProgram just to be
+        compatible with GL3PlusRenderSystem.
+        */
+        void createLowLevelImpl(void);
         /// Internal unload implementation, must be implemented by subclasses
         void unloadHighLevelImpl(void);
-		/// Overridden from HighLevelGpuProgram
-		void unloadImpl(void);
+        /// Overridden from HighLevelGpuProgram
+        void unloadImpl(void);
 
         /// Populate the passed parameters with name->index map
         void populateParameterNames(GpuProgramParametersSharedPtr params);
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
-		/** Check the compile result for an error with default precision - and recompile if needed.
-			some glsl compilers return an error default precision is set to types other then
-			int or float, this function test a failed compile result for the error,
-			delete the needed lines from the source if needed then try to re-compile.
-		*/
-		void checkAndFixInvalidDefaultPrecisionError( String &message );
-	private:
-		/// GL handle for shader object
-		GLuint mGLShaderHandle;
+        /** Check the compile result for an error with default precision - and recompile if needed.
+            some glsl compilers return an error default precision is set to types other then
+            int or float, this function test a failed compile result for the error,
+            delete the needed lines from the source if needed then try to re-compile.
+        */
+        void checkAndFixInvalidDefaultPrecisionError( String &message );
+    private:
+        /// GL handle for shader object
+        GLuint mGLShaderHandle;
         GLuint mGLProgramHandle;
-		/// Flag indicating if shader object successfully compiled
-		GLint mCompiled;
-		/// The input operation type for this (geometry) program
-		RenderOperation::OperationType mInputOperationType;
-		/// The output operation type for this (geometry) program
-		RenderOperation::OperationType mOutputOperationType;
-		/// The maximum amount of vertices that this (geometry) program can output
-		int mMaxOutputVertices;
-		/// Attached Shader names
-		String mAttachedShaderNames;
-		/// Preprocessor options
-		String mPreprocessorDefines;
-		/// Container of attached programs
-		typedef vector< GLSLProgram* >::type GLSLProgramContainer;
-		typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
-		GLSLProgramContainer mAttachedGLSLPrograms;
+        /// Flag indicating if shader object successfully compiled
+        GLint mCompiled;
+        /// The input operation type for this (geometry) program
+        RenderOperation::OperationType mInputOperationType;
+        /// The output operation type for this (geometry) program
+        RenderOperation::OperationType mOutputOperationType;
+        /// The maximum amount of vertices that this (geometry) program can output
+        int mMaxOutputVertices;
+        /// Attached Shader names
+        String mAttachedShaderNames;
+        /// Preprocessor options
+        String mPreprocessorDefines;
+        /// Container of attached programs
+        typedef vector< GLSLProgram* >::type GLSLProgramContainer;
+        typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
+        GLSLProgramContainer mAttachedGLSLPrograms;
         /// Matrix in column major pack format?
         bool mColumnMajorMatrices;
     };

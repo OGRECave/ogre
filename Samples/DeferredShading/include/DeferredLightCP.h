@@ -28,34 +28,34 @@ same license as the rest of the engine.
 class DeferredLightRenderOperation : public Ogre::CompositorInstance::RenderSystemOperation
 {
 public:
-	DeferredLightRenderOperation(Ogre::CompositorInstance* instance, const Ogre::CompositionPass* pass);
-	
-	/** @copydoc CompositorInstance::RenderSystemOperation::execute */
-	virtual void execute(Ogre::SceneManager *sm, Ogre::RenderSystem *rs);
+    DeferredLightRenderOperation(Ogre::CompositorInstance* instance, const Ogre::CompositionPass* pass);
+    
+    /** @copydoc CompositorInstance::RenderSystemOperation::execute */
+    virtual void execute(Ogre::SceneManager *sm, Ogre::RenderSystem *rs);
 
-	virtual ~DeferredLightRenderOperation();
+    virtual ~DeferredLightRenderOperation();
 private:
 
-	/** Create a new deferred light
-	 */
-	DLight *createDLight(Ogre::Light* light);
-	
-	//The texture names of the GBuffer components
-	Ogre::String mTexName0;
-	Ogre::String mTexName1;
+    /** Create a new deferred light
+     */
+    DLight *createDLight(Ogre::Light* light);
+    
+    //The texture names of the GBuffer components
+    Ogre::String mTexName0;
+    Ogre::String mTexName1;
 
-	//The material generator for the light geometry
-	MaterialGenerator* mLightMaterialGenerator;
+    //The material generator for the light geometry
+    MaterialGenerator* mLightMaterialGenerator;
 
-	//The map of deferred light geometries already constructed
-	typedef std::map<Ogre::Light*, DLight*> LightsMap;
-	LightsMap mLights;
+    //The map of deferred light geometries already constructed
+    typedef std::map<Ogre::Light*, DLight*> LightsMap;
+    LightsMap mLights;
 
-	//The ambient light used to render the scene
-	AmbientLight* mAmbientLight;
+    //The ambient light used to render the scene
+    AmbientLight* mAmbientLight;
 
-	//The viewport that we are rendering to
-	Ogre::Viewport* mViewport;
+    //The viewport that we are rendering to
+    Ogre::Viewport* mViewport;
 };
 
 //The custom composition pass that is used for rendering the light geometry
@@ -64,15 +64,15 @@ class DeferredLightCompositionPass : public Ogre::CustomCompositionPass
 {
 public:
 
-	/** @copydoc CustomCompositionPass::createOperation */
-	virtual Ogre::CompositorInstance::RenderSystemOperation* createOperation(
-		Ogre::CompositorInstance* instance, const Ogre::CompositionPass* pass)
-	{
-		return OGRE_NEW DeferredLightRenderOperation(instance, pass);
-	}
+    /** @copydoc CustomCompositionPass::createOperation */
+    virtual Ogre::CompositorInstance::RenderSystemOperation* createOperation(
+        Ogre::CompositorInstance* instance, const Ogre::CompositionPass* pass)
+    {
+        return OGRE_NEW DeferredLightRenderOperation(instance, pass);
+    }
 
 protected:
-	virtual ~DeferredLightCompositionPass() {}
+    virtual ~DeferredLightCompositionPass() {}
 };
 
 #endif

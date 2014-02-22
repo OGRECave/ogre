@@ -36,44 +36,44 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	CompositorTargetDef::~CompositorTargetDef()
-	{
-		CompositorPassDefVec::const_iterator itor = mCompositorPasses.begin();
-		CompositorPassDefVec::const_iterator end  = mCompositorPasses.end();
+    CompositorTargetDef::~CompositorTargetDef()
+    {
+        CompositorPassDefVec::const_iterator itor = mCompositorPasses.begin();
+        CompositorPassDefVec::const_iterator end  = mCompositorPasses.end();
 
-		while( itor != end )
-		{
-			OGRE_DELETE *itor;
-			++itor;
-		}
+        while( itor != end )
+        {
+            OGRE_DELETE *itor;
+            ++itor;
+        }
 
-		mCompositorPasses.clear();
-	}
-	//-----------------------------------------------------------------------------------
-	CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType )
-	{
-		CompositorPassDef *retVal = 0;
-		switch( passType )
-		{
-		case PASS_CLEAR:
-			retVal = OGRE_NEW CompositorPassClearDef( mRtIndex );
-			break;
-		case PASS_QUAD:
-			retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef, mRtIndex );
-			break;
-		case PASS_SCENE:
-			retVal = OGRE_NEW CompositorPassSceneDef( mRtIndex );
-			break;
-		case PASS_STENCIL:
-			retVal = OGRE_NEW CompositorPassStencilDef( mRtIndex );
-			break;
+        mCompositorPasses.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType )
+    {
+        CompositorPassDef *retVal = 0;
+        switch( passType )
+        {
+        case PASS_CLEAR:
+            retVal = OGRE_NEW CompositorPassClearDef( mRtIndex );
+            break;
+        case PASS_QUAD:
+            retVal = OGRE_NEW CompositorPassQuadDef( mParentNodeDef, mRtIndex );
+            break;
+        case PASS_SCENE:
+            retVal = OGRE_NEW CompositorPassSceneDef( mRtIndex );
+            break;
+        case PASS_STENCIL:
+            retVal = OGRE_NEW CompositorPassStencilDef( mRtIndex );
+            break;
         default:
             break;
-		}
+        }
 
-		mCompositorPasses.push_back( retVal );
-		
-		return retVal;
-	}
-	//-----------------------------------------------------------------------------------
+        mCompositorPasses.push_back( retVal );
+        
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
 }

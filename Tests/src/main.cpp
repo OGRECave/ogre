@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
     runner.run( controller );
 
     // Print test results to a file
-	std::ofstream ofile("OgreTestResults.xml");
-	
+    std::ofstream ofile("OgreTestResults.xml");
+    
     CPPUNIT_NS::XmlOutputter xmlOut(&result, ofile);
     xmlOut.write();
 

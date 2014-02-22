@@ -32,9 +32,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	const ArrayAabb ArrayAabb::BOX_INFINITE( ArrayVector3( 0, 0, 0 ),
-								ArrayVector3( std::numeric_limits<float>::infinity(),
-												std::numeric_limits<float>::infinity(),
-												std::numeric_limits<float>::infinity() ) );
-	const ArrayAabb ArrayAabb::BOX_ZERO( ArrayVector3( 0, 0, 0 ), ArrayVector3( 0, 0, 0 ) );
+    const ArrayAabb ArrayAabb::BOX_INFINITE( ArrayVector3( 0, 0, 0 ),
+                                ArrayVector3( std::numeric_limits<float>::infinity(),
+                                                std::numeric_limits<float>::infinity(),
+                                                std::numeric_limits<float>::infinity() ) );
+    const ArrayAabb ArrayAabb::BOX_ZERO( ArrayVector3( 0, 0, 0 ), ArrayVector3( 0, 0, 0 ) );
 }

@@ -34,30 +34,30 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** Plugin instance for D3D11 Manager */
-	class D3D11Plugin : public Plugin
-	{
-	public:
-		D3D11Plugin();
+    /** Plugin instance for D3D11 Manager */
+    class D3D11Plugin : public Plugin
+    {
+    public:
+        D3D11Plugin();
 
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		D3D11RenderSystem* mRenderSystem;
-	};
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        D3D11RenderSystem* mRenderSystem;
+    };
 }
 
 #endif

@@ -42,34 +42,34 @@ namespace Ogre {
 
         /** See GLContext */
         virtual void setCurrent();
-		/**
+        /**
          * This is called before another context is made current. By default,
          * nothing is done here.
          */
         virtual void endCurrent();
-		/** Create a new context based on the same window/pbuffer as this
-			context - mostly useful for additional threads.
-		@note The caller is responsible for deleting the returned context.
-		*/
-		virtual GLContext* clone() const;
-		/**
-		 * Return value will be "NSOpenGL"
-		 */
-		virtual String getContextType();
-		
-		/** Grab the NSOpenGLContext if it exists */
-		NSOpenGLContext* getContext();
-		
-		/** Grab the NSOpenGLPixelFormat if it exists */
-		NSOpenGLPixelFormat* getPixelFormat();
-		
+        /** Create a new context based on the same window/pbuffer as this
+            context - mostly useful for additional threads.
+        @note The caller is responsible for deleting the returned context.
+        */
+        virtual GLContext* clone() const;
+        /**
+         * Return value will be "NSOpenGL"
+         */
+        virtual String getContextType();
+        
+        /** Grab the NSOpenGLContext if it exists */
+        NSOpenGLContext* getContext();
+        
+        /** Grab the NSOpenGLPixelFormat if it exists */
+        NSOpenGLPixelFormat* getPixelFormat();
+        
         /* The pixel dimensions of the backbuffer */
         GLint mBackingWidth;
         GLint mBackingHeight;
 
-	private:
-		NSOpenGLContext* mNSGLContext;
-		NSOpenGLPixelFormat *mNSGLPixelFormat;
+    private:
+        NSOpenGLContext* mNSGLContext;
+        NSOpenGLPixelFormat *mNSGLPixelFormat;
     };
 }
 

@@ -42,29 +42,29 @@ MaterialDescriptor::MaterialDescriptor(const String& name)
 MaterialDescriptor::~MaterialDescriptor()
 {
 }
-	
+    
 const String& MaterialDescriptor::getName() const
 {
-	return mName;
+    return mName;
 }
 
 const String& MaterialDescriptor::getScript() const
 {
-	return mScript;
+    return mScript;
 }
 
 MaterialController* MaterialDescriptor::getMaterialController()
 {
-	return mMaterialController;
+    return mMaterialController;
 }
 
 void MaterialDescriptor::OnRootInitialized(EventArgs& args)
 {
-	if(mMaterialController != NULL)
-	{	
-		delete mMaterialController;
-		mMaterialController = NULL;
-	}
+    if(mMaterialController != NULL)
+    {   
+        delete mMaterialController;
+        mMaterialController = NULL;
+    }
 }
 
 void MaterialDescriptor::OnRootShutdown(EventArgs& args)

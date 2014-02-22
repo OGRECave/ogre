@@ -52,37 +52,37 @@ THE SOFTWARE
 class IconManager : public Ogre::Singleton<IconManager>
 {
 public:
-	IconManager();
-	~IconManager();
+    IconManager();
+    ~IconManager();
 
-	enum IconType
-	{
-		CLOSE,
-		COPY,
-		CUT,
-		MATERIAL,
-		MATERIAL_SCRIPT,
-		OGRE,
-		PASS,
-		PASTE,
-		PROGRAM_SCRIPT,
-		PROJECT,
-		PROJECT_NEW,
-		PROJECT_SAVE,
-		SAVE,
-		SAVE_AS,
-		SHADER,
-		TECHNIQUE,
-		WORKSPACE
-	};
+    enum IconType
+    {
+        CLOSE,
+        COPY,
+        CUT,
+        MATERIAL,
+        MATERIAL_SCRIPT,
+        OGRE,
+        PASS,
+        PASTE,
+        PROGRAM_SCRIPT,
+        PROJECT,
+        PROJECT_NEW,
+        PROJECT_SAVE,
+        SAVE,
+        SAVE_AS,
+        SHADER,
+        TECHNIQUE,
+        WORKSPACE
+    };
 
-	const wxBitmap& getIcon(IconType type) const;
+    const wxBitmap& getIcon(IconType type) const;
 
-	static IconManager& getSingleton(void);
-	static IconManager* getSingletonPtr(void);
+    static IconManager& getSingleton(void);
+    static IconManager* getSingletonPtr(void);
 
 private:
-	typedef std::map<IconType, wxBitmap> IconMap;
-	IconMap mIconMap;
+    typedef std::map<IconType, wxBitmap> IconMap;
+    IconMap mIconMap;
 };
 #endif

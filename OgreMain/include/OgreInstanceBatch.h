@@ -91,21 +91,21 @@ namespace Ogre
     public:
         typedef vector<InstancedEntity*>::type  InstancedEntityVec;
         typedef vector<Vector4>::type           CustomParamsVec;
-		typedef FastArray<InstancedEntity*>		InstancedEntityArray;
+        typedef FastArray<InstancedEntity*>     InstancedEntityArray;
 
-		enum SkeletalAnimationMode
-		{
-			SKELETONS_NOT_SUPPORTED,
-			SKELETONS_SUPPORTED,
-			SKELETONS_LUT
-		};
+        enum SkeletalAnimationMode
+        {
+            SKELETONS_NOT_SUPPORTED,
+            SKELETONS_SUPPORTED,
+            SKELETONS_LUT
+        };
 
     protected:
         RenderOperation     mRenderOperation;
         size_t              mInstancesPerBatch;
 
         InstanceManager     *mCreator;
-		ObjectMemoryManager mLocalObjectMemoryManager; ///Only one render queue is used
+        ObjectMemoryManager mLocalObjectMemoryManager; ///Only one render queue is used
 
         MaterialPtr         mMaterial;
 
@@ -120,19 +120,19 @@ namespace Ogre
         InstancedEntityVec  mUnusedEntities;
 
 #ifdef OGRE_LEGACY_ANIMATIONS
-		/** This variable may change after we refactor animations. In the meantime: some
-			techniques animate all entities, some techniques don't animate anything
-			(eg. HW Basic) and other techniques animate a few (eg. HW VTF LUT)
-		*/
-		InstancedEntityArray mAnimatedEntities;
+        /** This variable may change after we refactor animations. In the meantime: some
+            techniques animate all entities, some techniques don't animate anything
+            (eg. HW Basic) and other techniques animate a few (eg. HW VTF LUT)
+        */
+        InstancedEntityArray mAnimatedEntities;
 #endif
 
         ///@see InstanceManager::setNumCustomParams(). Because this may not even be used,
         ///our implementations keep the params separate from the InstancedEntity to lower
         ///the memory overhead. They default to Vector4::ZERO
-		CustomParamsVec		mCustomParams;
+        CustomParamsVec     mCustomParams;
 
-        SkeletalAnimationMode	mTechnSupportsSkeletal;
+        SkeletalAnimationMode   mTechnSupportsSkeletal;
 
         /// Cached distance to last camera for getSquaredViewDepth
         mutable Real mCachedCameraDist;
@@ -142,10 +142,10 @@ namespace Ogre
         /// Tells that the list of entity instances with shared transforms has changed
         bool mTransformSharingDirty;
 
-		bool mStaticDirty;
+        bool mStaticDirty;
 
-		vector<Aabb>::type		mThreadAabbs;
-		MovableObjectArray		mCulledInstances; /// Only for HW Basic & HW VTF
+        vector<Aabb>::type      mThreadAabbs;
+        MovableObjectArray      mCulledInstances; /// Only for HW Basic & HW VTF
 
         /// When true remove the memory of the VertexData we've created because no one else will
         bool mRemoveOwnVertexData;
@@ -173,15 +173,15 @@ namespace Ogre
         */
         void defragmentBatchDoCull( InstancedEntityVec &usedEntities, CustomParamsVec &usedParams );
 
-		/** Used by HW Basic & HW VTF techniques to cull from multiple threads.
-			@see InstancingTheadedCullingMethod
-		*/
+        /** Used by HW Basic & HW VTF techniques to cull from multiple threads.
+            @see InstancingTheadedCullingMethod
+        */
         void instanceBatchCullFrustumThreadedImpl(const Frustum *frustum, const Camera *lodCamera,
                                                     uint32 combinedVisibilityFlags );
 
     public:
         InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,
-					   InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+                       InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
                        size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap );
         virtual ~InstanceBatch();
 
@@ -202,16 +202,16 @@ namespace Ogre
         SkeletalAnimationMode _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
 
 #ifdef OGRE_LEGACY_ANIMATIONS
-		/// Updates animations from all our entities.
-		void _updateAnimations(void);
+        /// Updates animations from all our entities.
+        void _updateAnimations(void);
 #endif
 
-		/** Updates the bounds of only our entities from multiple threads. To be called before
-			_updateBounds (which is single threaded). @see InstanceManager::updateDirtyBatches
-		@param threadIdx
-			The index of this thread, must be unique for each thread
-		*/
-		void _updateEntitiesBoundsThread( size_t threadIdx );
+        /** Updates the bounds of only our entities from multiple threads. To be called before
+            _updateBounds (which is single threaded). @see InstanceManager::updateDirtyBatches
+        @param threadIdx
+            The index of this thread, must be unique for each thread
+        */
+        void _updateEntitiesBoundsThread( size_t threadIdx );
 
         /** @see InstanceManager::updateDirtyBatches */
         void _updateBounds(void);
@@ -271,17 +271,17 @@ namespace Ogre
         /** Fills the input vector with the instances that are currently being used or were requested.
             Used for defragmentation, @see InstanceManager::defragmentBatches
         */
-		void getInstancedEntitiesInUse( InstancedEntityVec &outEntities, CustomParamsVec &outParams );
+        void getInstancedEntitiesInUse( InstancedEntityVec &outEntities, CustomParamsVec &outParams );
 
 #ifdef OGRE_LEGACY_ANIMATIONS
-		/// Schedules the given Instanced Entity to be updated every frame in @see _updateAnimations
-		void _addAnimatedInstance( InstancedEntity *instancedEntity );
+        /// Schedules the given Instanced Entity to be updated every frame in @see _updateAnimations
+        void _addAnimatedInstance( InstancedEntity *instancedEntity );
 
-		/** Removes an instanced already scheduled for animation update. @See _updateAnimations
-		@remarks
-			Does nothing if the animation wasn't already added.
-		*/
-		void _removeAnimatedInstance( const InstancedEntity *instancedEntity );
+        /** Removes an instanced already scheduled for animation update. @See _updateAnimations
+        @remarks
+            Does nothing if the animation wasn't already added.
+        */
+        void _removeAnimatedInstance( const InstancedEntity *instancedEntity );
 #endif
 
         /** @see InstanceManager::defragmentBatches
@@ -292,97 +292,97 @@ namespace Ogre
         @param usedEntities Array of InstancedEntities to parent with this batch. Those reparented
             are removed from this input vector
         @param usedParams Array of Custom parameters correlated with the InstancedEntities in usedEntities.
-			They follow the fate of the entities in that vector.
-		@remarks:
-			This function assumes caller holds data to mInstancedEntities! Otherwise
-			you can get memory leaks. Don't call this directly if you don't know what you're doing!
-		*/
-		void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities,
-								CustomParamsVec &usedParams );
-
-		/** @see InstanceManager::_defragmentBatchDiscard
-			Destroys unused entities and clears the mInstancedEntity container which avoids leaving
-			dangling pointers from reparented InstancedEntities
-			Usually called before deleting this pointer. Don't call directly!
-		*/
-		void _defragmentBatchDiscard(void);
-
-		/** Tells this batch to stop updating animations, positions, rotations, and display
-			all it's active instances. Some implementations allow to keep culling individual
-			instances while others may not.
-			This option makes the batch behave pretty much like Static Geometry, plust the GPU RAM
-			memory advantages (less VRAM, less bandwidth) but no LOD support. Very useful for
-			billboards of trees, repeating vegetation, modular buildings, etc.
-			@remarks
-				When individual culling is disabled (or not supported) This function moves a lot of
-				processing time from the CPU to the GPU. If the GPU is already a bottleneck,
-				you may see a decrease in performance instead!
-				@See updateStaticDirty if you've made a change to an InstancedEntity and wish
-				that change to take effect. Be sure to call this after you've set all your instances
-				and not once per change.
-		*/
-		bool setStatic( bool bStatic );
-
-		/** Called by InstancedEntity(s) or directly to tell us we need to update the bounds
-			Should only useful if this batch is static.
+            They follow the fate of the entities in that vector.
+        @remarks:
+            This function assumes caller holds data to mInstancedEntities! Otherwise
+            you can get memory leaks. Don't call this directly if you don't know what you're doing!
         */
-		virtual void _notifyStaticDirty(void);
+        void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities,
+                                CustomParamsVec &usedParams );
 
-		/** Returns a pointer to a new InstancedEntity ready to use
-			Note it's actually preallocated, so no memory allocation happens at
-			this point.
-			@remarks
-				Returns NULL if all instances are being used
+        /** @see InstanceManager::_defragmentBatchDiscard
+            Destroys unused entities and clears the mInstancedEntity container which avoids leaving
+            dangling pointers from reparented InstancedEntities
+            Usually called before deleting this pointer. Don't call directly!
         */
-		InstancedEntity* createInstancedEntity();
+        void _defragmentBatchDiscard(void);
 
-		/** Removes an InstancedEntity from the scene retrieved with
-			getNewInstancedEntity, putting back into a queue
-			@remarks
-				Throws an exception if the instanced entity wasn't created by this batch
-				Removed instanced entities save little CPU time, but _not_ GPU
+        /** Tells this batch to stop updating animations, positions, rotations, and display
+            all it's active instances. Some implementations allow to keep culling individual
+            instances while others may not.
+            This option makes the batch behave pretty much like Static Geometry, plust the GPU RAM
+            memory advantages (less VRAM, less bandwidth) but no LOD support. Very useful for
+            billboards of trees, repeating vegetation, modular buildings, etc.
+            @remarks
+                When individual culling is disabled (or not supported) This function moves a lot of
+                processing time from the CPU to the GPU. If the GPU is already a bottleneck,
+                you may see a decrease in performance instead!
+                @See updateStaticDirty if you've made a change to an InstancedEntity and wish
+                that change to take effect. Be sure to call this after you've set all your instances
+                and not once per change.
         */
-		void removeInstancedEntity( InstancedEntity *instancedEntity );
+        bool setStatic( bool bStatic );
+
+        /** Called by InstancedEntity(s) or directly to tell us we need to update the bounds
+            Should only useful if this batch is static.
+        */
+        virtual void _notifyStaticDirty(void);
+
+        /** Returns a pointer to a new InstancedEntity ready to use
+            Note it's actually preallocated, so no memory allocation happens at
+            this point.
+            @remarks
+                Returns NULL if all instances are being used
+        */
+        InstancedEntity* createInstancedEntity();
+
+        /** Removes an InstancedEntity from the scene retrieved with
+            getNewInstancedEntity, putting back into a queue
+            @remarks
+                Throws an exception if the instanced entity wasn't created by this batch
+                Removed instanced entities save little CPU time, but _not_ GPU
+        */
+        void removeInstancedEntity( InstancedEntity *instancedEntity );
 
 #ifdef OGRE_LEGACY_ANIMATIONS
-		/** Tells whether world bone matrices need to be calculated.
-			This does not include bone matrices which are calculated regardless
+        /** Tells whether world bone matrices need to be calculated.
+            This does not include bone matrices which are calculated regardless
         */
-		bool useBoneWorldMatrices() const { return mTechnSupportsSkeletal != SKELETONS_LUT; }
+        bool useBoneWorldMatrices() const { return mTechnSupportsSkeletal != SKELETONS_LUT; }
 #endif
 
-		/** Tells that the list of entity instances with shared transforms has changed */
-		void _markTransformSharingDirty() { mTransformSharingDirty = true; }
+        /** Tells that the list of entity instances with shared transforms has changed */
+        void _markTransformSharingDirty() { mTransformSharingDirty = true; }
 
-		/** @see InstancedEntity::setCustomParam */
-		void _setCustomParam( InstancedEntity *instancedEntity, unsigned char idx, const Vector4 &newParam );
+        /** @see InstancedEntity::setCustomParam */
+        void _setCustomParam( InstancedEntity *instancedEntity, unsigned char idx, const Vector4 &newParam );
 
-		/** @see InstancedEntity::getCustomParam */
-		const Vector4& _getCustomParam( InstancedEntity *instancedEntity, unsigned char idx );
+        /** @see InstancedEntity::getCustomParam */
+        const Vector4& _getCustomParam( InstancedEntity *instancedEntity, unsigned char idx );
 
-		//Renderable overloads
+        //Renderable overloads
         /** @copydoc Renderable::getMaterial. */
-		const MaterialPtr& getMaterial(void) const		{ return mMaterial; }
+        const MaterialPtr& getMaterial(void) const      { return mMaterial; }
         /** @copydoc Renderable::getRenderOperation. */
-		void getRenderOperation( RenderOperation& op )	{ op = mRenderOperation; }
+        void getRenderOperation( RenderOperation& op )  { op = mRenderOperation; }
 
         /** @copydoc Renderable::getSquaredViewDepth. */
-		Real getSquaredViewDepth( const Camera* cam ) const;
+        Real getSquaredViewDepth( const Camera* cam ) const;
         /** @copydoc Renderable::getLights. */
         const LightList& getLights( void ) const;
         /** @copydoc Renderable::getTechnique. */
-		Technique* getTechnique(void) const;
+        Technique* getTechnique(void) const;
 
         /** @copydoc MovableObject::getMovableType. */
-		const String& getMovableType(void) const;
+        const String& getMovableType(void) const;
 
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
-		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
+        void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
 
         // resolve ambiguity of get/setUserAny due to inheriting from Renderable and MovableObject
         using Renderable::getUserAny;
         using Renderable::setUserAny;
-	};
+    };
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

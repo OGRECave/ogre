@@ -42,10 +42,10 @@ void TransparencyTest::setupContent()
 
     mCamera->setPosition(0, 0, 300);   // set camera's starting position
 
-	SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     Light *light = mSceneMgr->createLight();
-	lightNode->attachObject( light );
-	lightNode->setPosition(20, 80, 50);   // add basic point light
+    lightNode->attachObject( light );
+    lightNode->setPosition(20, 80, 50);   // add basic point light
 
     // create a torus knot model, give it the translucent texture, and attach it to the origin
     Entity* ent = mSceneMgr->createEntity("Knot", "knot.mesh");

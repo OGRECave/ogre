@@ -55,7 +55,7 @@ namespace Ogre {
         /// The billboard set that's doing the rendering
         BillboardSet* mBillboardSet;
     public:
-		BillboardParticleRenderer( IdType id, ObjectMemoryManager *objectMemoryManager );
+        BillboardParticleRenderer( IdType id, ObjectMemoryManager *objectMemoryManager );
         ~BillboardParticleRenderer();
 
         /** Command object for billboard type (see ParamCommand).*/
@@ -220,12 +220,12 @@ namespace Ogre {
         void _notifyAttached(Node* parent);
         /// @copydoc ParticleSystemRenderer::_notifyDefaultDimensions
         void _notifyDefaultDimensions(Real width, Real height);
-		/// @copydoc ParticleSystemRenderer::setRenderQueueGroup
-		void setRenderQueueGroup(uint8 queueID);
-		/// @copydoc MovableObject::setRenderQueueGroupAndPriority
-		void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
-		/// @copydoc ParticleSystemRenderer::setKeepParticlesInLocalSpace
-		void setKeepParticlesInLocalSpace(bool keepLocal);
+        /// @copydoc ParticleSystemRenderer::setRenderQueueGroup
+        void setRenderQueueGroup(uint8 queueID);
+        /// @copydoc MovableObject::setRenderQueueGroupAndPriority
+        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+        /// @copydoc ParticleSystemRenderer::setKeepParticlesInLocalSpace
+        void setKeepParticlesInLocalSpace(bool keepLocal);
         /// @copydoc ParticleSystemRenderer::_getSortMode
         SortMode _getSortMode(void) const;
 
@@ -247,16 +247,16 @@ namespace Ogre {
     /** Factory class for BillboardParticleRenderer */
     class _OgreExport BillboardParticleRendererFactory : public ParticleSystemRendererFactory
     {
-		ObjectMemoryManager *mDummyObjectMemoryManager;
-		
+        ObjectMemoryManager *mDummyObjectMemoryManager;
+        
     public:
-		BillboardParticleRendererFactory();
-		~BillboardParticleRendererFactory();
+        BillboardParticleRendererFactory();
+        ~BillboardParticleRendererFactory();
 
         /// @copydoc FactoryObj::getType
         const String& getType() const;
         /// @copydoc FactoryObj::createInstance
-		ParticleSystemRenderer* createInstance( const String &name );
+        ParticleSystemRenderer* createInstance( const String &name );
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance(ParticleSystemRenderer* ptr);
     };

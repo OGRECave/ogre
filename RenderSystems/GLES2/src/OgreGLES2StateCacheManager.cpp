@@ -97,9 +97,9 @@ namespace Ogre {
     }
     
     bool GLES2StateCacheManager::activateGLTextureUnit(size_t unit)
-	{
+    {
         return mImp->activateGLTextureUnit(unit);
-	}
+    }
     
     void GLES2StateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {

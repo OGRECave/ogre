@@ -35,22 +35,22 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
 
-	namespace VisibilityFlags
+    namespace VisibilityFlags
     {
-		extern _OgreExport const uint32 LAYER_SHADOW_RECEIVER;	///When this is bit is set, object receives shadows
-		extern _OgreExport const uint32 LAYER_SHADOW_CASTER;	///Object casts shadows (is rendered to shadow camera)
-		extern _OgreExport const uint32 LAYER_VISIBILITY;		///When this is bit is clear, the obj is not rendered at all.
-		extern _OgreExport const uint32 RESERVED_VISIBILITY_FLAGS;
-	};
-	/** @} */
-	/** @} */
+        extern _OgreExport const uint32 LAYER_SHADOW_RECEIVER;  ///When this is bit is set, object receives shadows
+        extern _OgreExport const uint32 LAYER_SHADOW_CASTER;    ///Object casts shadows (is rendered to shadow camera)
+        extern _OgreExport const uint32 LAYER_VISIBILITY;       ///When this is bit is clear, the obj is not rendered at all.
+        extern _OgreExport const uint32 RESERVED_VISIBILITY_FLAGS;
+    };
+    /** @} */
+    /** @} */
 
 }
 

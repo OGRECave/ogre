@@ -35,12 +35,12 @@ THE SOFTWARE.
 #include "OgreNode.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
     /** Level of detail strategy based on distance from camera. This is an abstract base class for DistanceLodBoxStrategy and DistanceLodSphereStrategy.
         @remarks
@@ -86,8 +86,8 @@ namespace Ogre {
         /** Get the squared depth from camera to the LOD object */
         virtual Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const = 0;
 
-		virtual void lodUpdateImpl( const size_t numNodes, ObjectData t,
-									const Camera *camera, Real bias ) const;
+        virtual void lodUpdateImpl( const size_t numNodes, ObjectData t,
+                                    const Camera *camera, Real bias ) const;
 
         /** Sets the reference view upon which the distances were based.
         @note
@@ -111,15 +111,15 @@ namespace Ogre {
         Real mReferenceViewValue;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
     /** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
     /** Level of detail strategy based on distance from camera to an object's bounding sphere.
         @remarks
@@ -177,11 +177,11 @@ namespace Ogre {
     /** @} */
 
     /** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
     /** Level of detail strategy based on distance from camera to an object's bounding box.
         @remarks

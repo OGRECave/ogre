@@ -50,11 +50,11 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 HardwareSkinningTechnique::HardwareSkinningTechnique() :
-	mBoneCount(0),
-	mWeightCount(0),
-	mCorrectAntipodalityHandling(false),
-	mScalingShearingSupport(false),
-	mDoBoneCalculations(false)
+    mBoneCount(0),
+    mWeightCount(0),
+    mCorrectAntipodalityHandling(false),
+    mScalingShearingSupport(false),
+    mDoBoneCalculations(false)
 {
 }
 
@@ -66,63 +66,63 @@ HardwareSkinningTechnique::~HardwareSkinningTechnique()
 //-----------------------------------------------------------------------
 void HardwareSkinningTechnique::setHardwareSkinningParam(ushort boneCount, ushort weightCount, bool correctAntipodalityHandling, bool scalingShearingSupport)
 {
-	mBoneCount = std::min<ushort>(boneCount, 256);
-	mWeightCount = std::min<ushort>(weightCount, 4);
-	mCorrectAntipodalityHandling = correctAntipodalityHandling;
-	mScalingShearingSupport = scalingShearingSupport;
+    mBoneCount = std::min<ushort>(boneCount, 256);
+    mWeightCount = std::min<ushort>(weightCount, 4);
+    mCorrectAntipodalityHandling = correctAntipodalityHandling;
+    mScalingShearingSupport = scalingShearingSupport;
 }
 
 //-----------------------------------------------------------------------
 void HardwareSkinningTechnique::setDoBoneCalculations(bool doBoneCalculations)
 {
-	mDoBoneCalculations = doBoneCalculations;
+    mDoBoneCalculations = doBoneCalculations;
 }
 
 //-----------------------------------------------------------------------
 ushort HardwareSkinningTechnique::getBoneCount()
 {
-	return mBoneCount;
+    return mBoneCount;
 }
 
 //-----------------------------------------------------------------------
 ushort HardwareSkinningTechnique::getWeightCount()
 {
-	return mWeightCount;
+    return mWeightCount;
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinningTechnique::hasCorrectAntipodalityHandling()
 {
-	return mCorrectAntipodalityHandling;
+    return mCorrectAntipodalityHandling;
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinningTechnique::hasScalingShearingSupport()
 {
-	return mScalingShearingSupport;
+    return mScalingShearingSupport;
 }
 
 //-----------------------------------------------------------------------
 Operand::OpMask HardwareSkinningTechnique::indexToMask(int index)
 {
-	switch(index)
-	{
-	case 0: return Operand::OPM_X;
-	case 1: return Operand::OPM_Y;
-	case 2: return Operand::OPM_Z;
-	case 3: return Operand::OPM_W;
-	default: OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Illegal value", "HardwareSkinningTechnique::indexToMask");
-	}
+    switch(index)
+    {
+    case 0: return Operand::OPM_X;
+    case 1: return Operand::OPM_Y;
+    case 2: return Operand::OPM_Z;
+    case 3: return Operand::OPM_W;
+    default: OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Illegal value", "HardwareSkinningTechnique::indexToMask");
+    }
 }
 
 //-----------------------------------------------------------------------
 void HardwareSkinningTechnique::copyFrom(const HardwareSkinningTechnique* hardSkin)
 {
-	mWeightCount = hardSkin->mWeightCount;
-	mBoneCount = hardSkin->mBoneCount;
-	mDoBoneCalculations = hardSkin->mDoBoneCalculations;
-	mCorrectAntipodalityHandling = hardSkin->mCorrectAntipodalityHandling;
-	mScalingShearingSupport = hardSkin->mScalingShearingSupport;
+    mWeightCount = hardSkin->mWeightCount;
+    mBoneCount = hardSkin->mBoneCount;
+    mDoBoneCalculations = hardSkin->mDoBoneCalculations;
+    mCorrectAntipodalityHandling = hardSkin->mCorrectAntipodalityHandling;
+    mScalingShearingSupport = hardSkin->mScalingShearingSupport;
 }
 
 }

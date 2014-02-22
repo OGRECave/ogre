@@ -38,11 +38,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String GLSLProgramFactory::sLanguageName = "glsl";
     //-----------------------------------------------------------------------
-	GLSLProgramFactory::GLSLProgramFactory(void)
+    GLSLProgramFactory::GLSLProgramFactory(void)
     {
         if (mLinkProgramManager == NULL)
         {
-		    mLinkProgramManager = new GLSLLinkProgramManager();
+            mLinkProgramManager = new GLSLLinkProgramManager();
         }
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
@@ -55,9 +55,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLProgramFactory::~GLSLProgramFactory(void)
     {
-		if (mLinkProgramManager)
+        if (mLinkProgramManager)
         {
-			delete mLinkProgramManager;
+            delete mLinkProgramManager;
             mLinkProgramManager = NULL;
         }
 
@@ -83,7 +83,7 @@ namespace Ogre {
         return OGRE_NEW GLSLProgram(creator, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-	void GLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
+    void GLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
     {
         OGRE_DELETE prog;
     }

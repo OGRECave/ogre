@@ -155,7 +155,7 @@ namespace Ogre {
     }
     
     bool GLESStateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
-	{
+    {
         // Always return true for the currently bound texture unit
         if (mActiveTextureUnit == unit)
             return true;
@@ -173,7 +173,7 @@ namespace Ogre {
         {
             return false;
         }
-	}
+    }
     
     void GLESStateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
     {

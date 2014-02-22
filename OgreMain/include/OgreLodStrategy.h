@@ -37,20 +37,20 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
-	/** Strategy for determining level of detail.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
+    /** Strategy for determining level of detail.
     @remarks
         Generally, to create a new LOD strategy, all of the following will
         need to be implemented: getValueImpl, getBaseValue, transformBias,
         getIndex, sort, and isSorted.
         In addition, transformUserValue may be overridden.
     */
-	class _OgreExport LodStrategy : public LodAlloc
+    class _OgreExport LodStrategy : public LodAlloc
     {
     protected:
         /** Name of this strategy. */
@@ -72,11 +72,11 @@ namespace Ogre {
         /** Transform LOD bias so it only needs to be multiplied by the LOD value. */
         virtual Real transformBias(Real factor) const = 0;
 
-		virtual void lodUpdateImpl( const size_t numNodes, ObjectData t,
-									const Camera *camera, Real bias ) const = 0;
+        virtual void lodUpdateImpl( const size_t numNodes, ObjectData t,
+                                    const Camera *camera, Real bias ) const = 0;
 
-		//Include OgreLodStrategyPrivate.inl in the CPP files that use this function.
-		inline static void lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
+        //Include OgreLodStrategyPrivate.inl in the CPP files that use this function.
+        inline static void lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
 
         /** Transform user supplied value to internal value.
         @remarks
@@ -94,7 +94,7 @@ namespace Ogre {
         virtual ushort getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const = 0;
 
         /** Get the index of the LOD usage which applies to a given value. */
-		virtual ushort getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const = 0;
+        virtual ushort getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const = 0;
 
         /** Sort mesh LOD usage list from greatest to least detail */
         virtual void sort(Mesh::MeshLodUsageList& meshLodUsageList) const = 0;
@@ -125,13 +125,13 @@ namespace Ogre {
         static ushort getIndexDescending(Real value, const Mesh::MeshLodUsageList& meshLodUsageList);
 
         /** Implementation of getIndex suitable for ascending values. */
-		static ushort getIndexAscending(Real value, const Material::LodValueArray& materialLodValueArray);
+        static ushort getIndexAscending(Real value, const Material::LodValueArray& materialLodValueArray);
         /** Implementation of getIndex suitable for descending values. */
         static ushort getIndexDescending(Real value, const Material::LodValueArray& materialLodValueArray);
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

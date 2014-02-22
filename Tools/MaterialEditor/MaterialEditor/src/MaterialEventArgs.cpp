@@ -42,10 +42,10 @@ MaterialEventArgs::MaterialEventArgs(MaterialController* mc, TechniqueController
 
 MaterialController* MaterialEventArgs::getMaterialController() const
 {
-	return mMaterialController;
+    return mMaterialController;
 }
 
 TechniqueController* MaterialEventArgs::getTechniqueController() const
 {
-	return mTechniqueController;
+    return mTechniqueController;
 }

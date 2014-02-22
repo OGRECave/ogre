@@ -48,23 +48,23 @@ class _OgreGLES2Export GLES2HardwareOcclusionQuery : public HardwareOcclusionQue
 // Public methods
 //--
 public:
-	/**
-	  * Default object constructor
-	  * 
-	  */
-	GLES2HardwareOcclusionQuery();
-	/**
-	  * Object destructor
-	  */
-	~GLES2HardwareOcclusionQuery();
+    /**
+      * Default object constructor
+      * 
+      */
+    GLES2HardwareOcclusionQuery();
+    /**
+      * Object destructor
+      */
+    ~GLES2HardwareOcclusionQuery();
 
-	//------------------------------------------------------------------
-	// Occlusion query functions (see base class documentation for this)
-	//--
-	void beginOcclusionQuery();
-	void endOcclusionQuery();
-	bool pullOcclusionQuery( unsigned int* NumOfFragments); 
-	bool isStillOutstanding(void);
+    //------------------------------------------------------------------
+    // Occlusion query functions (see base class documentation for this)
+    //--
+    void beginOcclusionQuery();
+    void endOcclusionQuery();
+    bool pullOcclusionQuery( unsigned int* NumOfFragments); 
+    bool isStillOutstanding(void);
 
 
 //----------------------------------------------------------------------

@@ -33,30 +33,30 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Optional Components
-	*  @{
-	*/
-	/** \addtogroup Paging
-	*  Some details on paging component
-	*  @{
-	*/
+    /** \addtogroup Optional Components
+    *  @{
+    */
+    /** \addtogroup Paging
+    *  Some details on paging component
+    *  @{
+    */
 
-	/** Define the interface to a factory class that will create subclasses
-		of PageContentCollection. 
-	*/
-	class PageContentCollectionFactory : public PageAlloc
-	{
-	public:
-		PageContentCollectionFactory() {}
-		virtual ~PageContentCollectionFactory() {}
+    /** Define the interface to a factory class that will create subclasses
+        of PageContentCollection. 
+    */
+    class PageContentCollectionFactory : public PageAlloc
+    {
+    public:
+        PageContentCollectionFactory() {}
+        virtual ~PageContentCollectionFactory() {}
 
-		virtual const String& getName() const = 0;
-		virtual PageContentCollection* createInstance() = 0;
-		virtual void destroyInstance(PageContentCollection*) = 0;
-	};
+        virtual const String& getName() const = 0;
+        virtual PageContentCollection* createInstance() = 0;
+        virtual void destroyInstance(PageContentCollection*) = 0;
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

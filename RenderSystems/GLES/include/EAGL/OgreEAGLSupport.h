@@ -43,12 +43,12 @@ namespace Ogre {
     class EAGLWindow;
     class EAGLESContext;
 
-	template<class C> void removeDuplicates(C& c)
-	{
-		std::sort(c.begin(), c.end());
-		typename C::iterator p = std::unique(c.begin(), c.end());
-		c.erase(p, c.end());
-	}
+    template<class C> void removeDuplicates(C& c)
+    {
+        std::sort(c.begin(), c.end());
+        typename C::iterator p = std::unique(c.begin(), c.end());
+        c.erase(p, c.end());
+    }
 
     class _OgrePrivate EAGLSupport : public GLESSupport
     {
@@ -62,7 +62,7 @@ namespace Ogre {
             void addConfig(void);
             String validateConfig(void);
             virtual String getDisplayName(void);
-			CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
+            CFDictionaryRef chooseGLConfig(const GLint *attribList, GLint *nElements);
             GLint getGLConfigAttrib(CFDictionaryRef fbConfig, GLint attribute, GLint *value);
             void * getProcAddress(const Ogre::String& name);
             RenderWindow * createWindow(bool autoCreateWindow,
@@ -84,8 +84,8 @@ namespace Ogre {
             CFDictionaryRef getGLConfigFromContext(EAGLESContext context);
             CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);
 #endif
-			CFDictionaryRef selectGLConfig(const int* minAttribs, const int *maxAttribs);
-	};
+            CFDictionaryRef selectGLConfig(const int* minAttribs, const int *maxAttribs);
+    };
 }
 
 #endif

@@ -35,13 +35,13 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
-	/** Enumerates the types of Font usable in the engine. */
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
+    /** Enumerates the types of Font usable in the engine. */
     enum FontType
     {
         /// Generated from a truetype (.ttf) font
@@ -59,65 +59,65 @@ namespace Ogre
     using a truetype font. You can either create the texture manually in code, or you
     can use a .fontdef script to define it (probably more practical since you can reuse
     the definition more easily)
-	@note
-	This class extends both Resource and ManualResourceLoader since it is
-	both a resource in it's own right, but it also provides the manual load
-	implementation for the Texture it creates.
+    @note
+    This class extends both Resource and ManualResourceLoader since it is
+    both a resource in it's own right, but it also provides the manual load
+    implementation for the Texture it creates.
     */
-	class _OgreOverlayExport Font : public Resource, public ManualResourceLoader
+    class _OgreOverlayExport Font : public Resource, public ManualResourceLoader
     {
     protected:
-		/// Command object for Font - see ParamCommand 
-		class _OgreOverlayExport CmdType : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		/// Command object for Font - see ParamCommand 
-		class _OgreOverlayExport CmdSource : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
- 		class _OgreOverlayExport CmdCharSpacer : public ParamCommand
- 		{
- 		public:
- 			String doGet(const void* target) const;
- 			void doSet(void* target, const String& val);
- 		};
         /// Command object for Font - see ParamCommand 
-		class _OgreOverlayExport CmdSize : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		/// Command object for Font - see ParamCommand 
-		class _OgreOverlayExport CmdResolution : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		/// Command object for Font - see ParamCommand 
-		class _OgreOverlayExport CmdCodePoints : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
+        class _OgreOverlayExport CmdType : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        /// Command object for Font - see ParamCommand 
+        class _OgreOverlayExport CmdSource : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        class _OgreOverlayExport CmdCharSpacer : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        /// Command object for Font - see ParamCommand 
+        class _OgreOverlayExport CmdSize : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        /// Command object for Font - see ParamCommand 
+        class _OgreOverlayExport CmdResolution : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        /// Command object for Font - see ParamCommand 
+        class _OgreOverlayExport CmdCodePoints : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
 
-		// Command object for setting / getting parameters
-		static CmdType msTypeCmd;
-		static CmdSource msSourceCmd;
- 		static CmdCharSpacer msCharacterSpacerCmd;
-		static CmdSize msSizeCmd;
-		static CmdResolution msResolutionCmd;
-		static CmdCodePoints msCodePointsCmd;
+        // Command object for setting / getting parameters
+        static CmdType msTypeCmd;
+        static CmdSource msSourceCmd;
+        static CmdCharSpacer msCharacterSpacerCmd;
+        static CmdSize msSizeCmd;
+        static CmdResolution msResolutionCmd;
+        static CmdCodePoints msCodePointsCmd;
 
-		/// The type of font
+        /// The type of font
         FontType mType;
 
         /// Source of the font (either an image name or a truetype font)
@@ -131,62 +131,62 @@ namespace Ogre
         Real mTtfSize;
         /// Resolution (dpi) of truetype font
         uint mTtfResolution;
-		/// Max distance to baseline of this (truetype) font
-		int mTtfMaxBearingY;
+        /// Max distance to baseline of this (truetype) font
+        int mTtfMaxBearingY;
 
 
-	public:
-		typedef Ogre::uint32 CodePoint;
-		typedef Ogre::FloatRect UVRect;
-		/// Information about the position and size of a glyph in a texture
-		struct GlyphInfo 
-		{
-			CodePoint codePoint;
-			UVRect uvRect;
-			Real aspectRatio;
+    public:
+        typedef Ogre::uint32 CodePoint;
+        typedef Ogre::FloatRect UVRect;
+        /// Information about the position and size of a glyph in a texture
+        struct GlyphInfo 
+        {
+            CodePoint codePoint;
+            UVRect uvRect;
+            Real aspectRatio;
 
-			GlyphInfo(CodePoint id, const UVRect& rect, Real aspect)
-				: codePoint(id), uvRect(rect), aspectRatio(aspect)
-			{
+            GlyphInfo(CodePoint id, const UVRect& rect, Real aspect)
+                : codePoint(id), uvRect(rect), aspectRatio(aspect)
+            {
 
-			}
-		};
-		/// A range of code points, inclusive on both ends
-		typedef std::pair<CodePoint, CodePoint> CodePointRange;
-		typedef vector<CodePointRange>::type CodePointRangeList;
-	protected:
-		/// Map from unicode code point to texture coordinates
-		typedef map<CodePoint, GlyphInfo>::type CodePointMap;
-		CodePointMap mCodePointMap;
+            }
+        };
+        /// A range of code points, inclusive on both ends
+        typedef std::pair<CodePoint, CodePoint> CodePointRange;
+        typedef vector<CodePointRange>::type CodePointRangeList;
+    protected:
+        /// Map from unicode code point to texture coordinates
+        typedef map<CodePoint, GlyphInfo>::type CodePointMap;
+        CodePointMap mCodePointMap;
 
         /// The material which is generated for this font
         MaterialPtr mMaterial;
 
-		/// Texture pointer
-		TexturePtr mTexture;
+        /// Texture pointer
+        TexturePtr mTexture;
 
         /// for TRUE_TYPE font only
         bool mAntialiasColour;
 
-		/// Range of code points to generate glyphs for (truetype only)
-		CodePointRangeList mCodePointRangeList;
+        /// Range of code points to generate glyphs for (truetype only)
+        CodePointRangeList mCodePointRangeList;
 
         /// Internal method for loading from ttf
         void createTextureFromFont(void);
 
-		/// @copydoc Resource::loadImpl
-		virtual void loadImpl();
-		/// @copydoc Resource::unloadImpl
-		virtual void unloadImpl();
-		/// @copydoc Resource::calculateSize
-		size_t calculateSize(void) const { return 0; } // permanent resource is in the texture 
+        /// @copydoc Resource::loadImpl
+        virtual void loadImpl();
+        /// @copydoc Resource::unloadImpl
+        virtual void unloadImpl();
+        /// @copydoc Resource::calculateSize
+        size_t calculateSize(void) const { return 0; } // permanent resource is in the texture 
     public:
 
         /** Constructor.
-		@see Resource
+        @see Resource
         */
-		Font(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
+        Font(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
         virtual ~Font();
 
         /** Sets the type of font. Must be set before loading. */
@@ -206,8 +206,8 @@ namespace Ogre
             If you have created a font of type FT_TRUETYPE, this method tells the
             Font which .ttf file to use to generate the text. You will also need to call 
             setTrueTypeSize and setTrueTypeResolution, and call addCodePointRange
-			as many times as required to define the range of glyphs you want to be
-			available.
+            as many times as required to define the range of glyphs you want to be
+            available.
         @param source An image file or a truetype font, depending on the type of this font
         */
         void setSource(const String& source);
@@ -254,36 +254,36 @@ namespace Ogre
             Only applicable for FT_TRUETYPE Font objects.
         */
         uint getTrueTypeResolution(void) const;
-		/** Gets the maximum baseline distance of all glyphs used in the texture.
-		@remarks
-			Only applicable for FT_TRUETYPE Font objects.
-			The baseline is the vertical origin of horizontal based glyphs.  The bearingY
-			attribute is the distance from the baseline (origin) to the top of the glyph's 
-			bounding box.
-		@note
-			This value is only available after the font has been loaded.
-		*/
-		int getTrueTypeMaxBearingY() const;
+        /** Gets the maximum baseline distance of all glyphs used in the texture.
+        @remarks
+            Only applicable for FT_TRUETYPE Font objects.
+            The baseline is the vertical origin of horizontal based glyphs.  The bearingY
+            attribute is the distance from the baseline (origin) to the top of the glyph's 
+            bounding box.
+        @note
+            This value is only available after the font has been loaded.
+        */
+        int getTrueTypeMaxBearingY() const;
 
 
         /** Returns the texture coordinates of the associated glyph. 
             @remarks Parameter is a short to allow both ASCII and wide chars.
             @param id The code point (unicode)
             @return A rectangle with the UV coordinates, or null UVs if the
-				code point was not present
+                code point was not present
         */
         inline const UVRect& getGlyphTexCoords(CodePoint id) const
         {
-			CodePointMap::const_iterator i = mCodePointMap.find(id);
-			if (i != mCodePointMap.end())
-			{
-				return i->second.uvRect;
-			}
-			else
-			{
-				static UVRect nullRect(0.0, 0.0, 0.0, 0.0);
-				return nullRect;
-			}
+            CodePointMap::const_iterator i = mCodePointMap.find(id);
+            if (i != mCodePointMap.end())
+            {
+                return i->second.uvRect;
+            }
+            else
+            {
+                static UVRect nullRect(0.0, 0.0, 0.0, 0.0);
+                return nullRect;
+            }
         }
 
         /** Sets the texture coordinates of a glyph.
@@ -291,86 +291,86 @@ namespace Ogre
             You only need to call this if you're setting up a font loaded from a texture manually.
         @note
             Also sets the aspect ratio (width / height) of this character. textureAspect
-			is the width/height of the texture (may be non-square)
+            is the width/height of the texture (may be non-square)
         */
         inline void setGlyphTexCoords(CodePoint id, Real u1, Real v1, Real u2, Real v2, Real textureAspect)
         {
-			CodePointMap::iterator i = mCodePointMap.find(id);
-			if (i != mCodePointMap.end())
-			{
-				i->second.uvRect.left = u1;
-				i->second.uvRect.top = v1;
-				i->second.uvRect.right = u2;
-				i->second.uvRect.bottom = v2;
-				i->second.aspectRatio = textureAspect * (u2 - u1)  / (v2 - v1);
-			}
-			else
-			{
-				mCodePointMap.insert(
-					CodePointMap::value_type(id, 
-						GlyphInfo(id, UVRect(u1, v1, u2, v2), 
-							textureAspect * (u2 - u1)  / (v2 - v1))));
-			}
+            CodePointMap::iterator i = mCodePointMap.find(id);
+            if (i != mCodePointMap.end())
+            {
+                i->second.uvRect.left = u1;
+                i->second.uvRect.top = v1;
+                i->second.uvRect.right = u2;
+                i->second.uvRect.bottom = v2;
+                i->second.aspectRatio = textureAspect * (u2 - u1)  / (v2 - v1);
+            }
+            else
+            {
+                mCodePointMap.insert(
+                    CodePointMap::value_type(id, 
+                        GlyphInfo(id, UVRect(u1, v1, u2, v2), 
+                            textureAspect * (u2 - u1)  / (v2 - v1))));
+            }
 
         }
         /** Gets the aspect ratio (width / height) of this character. */
         inline Real getGlyphAspectRatio(CodePoint id) const
         {
-			CodePointMap::const_iterator i = mCodePointMap.find(id);
-			if (i != mCodePointMap.end())
-			{
-				return i->second.aspectRatio;
-			}
-			else
-			{
-				return 1.0;
-			}
+            CodePointMap::const_iterator i = mCodePointMap.find(id);
+            if (i != mCodePointMap.end())
+            {
+                return i->second.aspectRatio;
+            }
+            else
+            {
+                return 1.0;
+            }
         }
         /** Sets the aspect ratio (width / height) of this character.
         @remarks
             You only need to call this if you're setting up a font loaded from a 
-			texture manually.
+            texture manually.
         */
         inline void setGlyphAspectRatio(CodePoint id, Real ratio)
         {
-			CodePointMap::iterator i = mCodePointMap.find(id);
-			if (i != mCodePointMap.end())
-			{
-				i->second.aspectRatio = ratio;
-			}
+            CodePointMap::iterator i = mCodePointMap.find(id);
+            if (i != mCodePointMap.end())
+            {
+                i->second.aspectRatio = ratio;
+            }
         }
 
-		/** Gets the information available for a glyph corresponding to a
-			given code point, or throws an exception if it doesn't exist;
-		*/
-		const GlyphInfo& getGlyphInfo(CodePoint id) const;
+        /** Gets the information available for a glyph corresponding to a
+            given code point, or throws an exception if it doesn't exist;
+        */
+        const GlyphInfo& getGlyphInfo(CodePoint id) const;
 
-		/** Adds a range of code points to the list of code point ranges to generate
-			glyphs for, if this is a truetype based font.
-		@remarks
-			In order to save texture space, only the glyphs which are actually
-			needed by the application are generated into the texture. Before this
-			object is loaded you must call this method as many times as necessary
-			to define the code point range that you need.
-		*/
-		void addCodePointRange(const CodePointRange& range)
-		{
-			mCodePointRangeList.push_back(range);
-		}
+        /** Adds a range of code points to the list of code point ranges to generate
+            glyphs for, if this is a truetype based font.
+        @remarks
+            In order to save texture space, only the glyphs which are actually
+            needed by the application are generated into the texture. Before this
+            object is loaded you must call this method as many times as necessary
+            to define the code point range that you need.
+        */
+        void addCodePointRange(const CodePointRange& range)
+        {
+            mCodePointRangeList.push_back(range);
+        }
 
-		/** Clear the list of code point ranges.
-		*/
-		void clearCodePointRanges()
-		{
-			mCodePointRangeList.clear();
-		}
-		/** Get a const reference to the list of code point ranges to be used to
-			generate glyphs from a truetype font.
-		*/
-		const CodePointRangeList& getCodePointRangeList() const
-		{
-			return mCodePointRangeList;
-		}
+        /** Clear the list of code point ranges.
+        */
+        void clearCodePointRanges()
+        {
+            mCodePointRangeList.clear();
+        }
+        /** Get a const reference to the list of code point ranges to be used to
+            generate glyphs from a truetype font.
+        */
+        const CodePointRangeList& getCodePointRangeList() const
+        {
+            return mCodePointRangeList;
+        }
         /** Gets the material generated for this font, as a weak reference. 
         @remarks
             This will only be valid after the Font has been loaded. 
@@ -390,7 +390,7 @@ namespace Ogre
         /** Sets whether or not the colour of this font is antialiased as it is generated
             from a true type font.
         @remarks
-        	This is valid only for a FT_TRUETYPE font. If you are planning on using 
+            This is valid only for a FT_TRUETYPE font. If you are planning on using 
             alpha blending to draw your font, then it is a good idea to set this to
             false (which is the default), otherwise the darkening of the font will combine
             with the fading out of the alpha around the edges and make your font look thinner
@@ -400,24 +400,24 @@ namespace Ogre
         */
         inline void setAntialiasColour(bool enabled)
         {
-        	mAntialiasColour = enabled;
+            mAntialiasColour = enabled;
         }
 
-		/** Gets whether or not the colour of this font is antialiased as it is generated
-		from a true type font.
-		*/
+        /** Gets whether or not the colour of this font is antialiased as it is generated
+        from a true type font.
+        */
         inline bool getAntialiasColour(void) const
         {
             return mAntialiasColour;
         }
 
-		/** Implementation of ManualResourceLoader::loadResource, called
-			when the Texture that this font creates needs to (re)load.
-		*/
-		void loadResource(Resource* resource);
+        /** Implementation of ManualResourceLoader::loadResource, called
+            when the Texture that this font creates needs to (re)load.
+        */
+        void loadResource(Resource* resource);
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

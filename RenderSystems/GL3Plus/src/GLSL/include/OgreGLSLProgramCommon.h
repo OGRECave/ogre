@@ -38,77 +38,77 @@ namespace Ogre {
 
     class GLSLGpuProgram;
 
-	/// Structure used to keep track of named uniforms in the linked program object
-	struct GLUniformReference
-	{
-		/// GL location handle
-		GLint mLocation;
-		/// Which type of program params will this value come from?
-		GpuProgramType mSourceProgType;
-		/// The constant definition it relates to
-		const GpuConstantDefinition* mConstantDef;
-	};
+    /// Structure used to keep track of named uniforms in the linked program object
+    struct GLUniformReference
+    {
+        /// GL location handle
+        GLint mLocation;
+        /// Which type of program params will this value come from?
+        GpuProgramType mSourceProgType;
+        /// The constant definition it relates to
+        const GpuConstantDefinition* mConstantDef;
+    };
 
-	typedef vector<GLUniformReference>::type GLUniformReferenceList;
-	typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
+    typedef vector<GLUniformReference>::type GLUniformReferenceList;
+    typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
     typedef vector<HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
-	typedef GLUniformBufferList::iterator GLUniformBufferIterator;
+    typedef GLUniformBufferList::iterator GLUniformBufferIterator;
 
-	/** C++ encapsulation of GLSL Program Object
+    /** C++ encapsulation of GLSL Program Object
      
      */
 
-	class _OgreGL3PlusExport GLSLProgramCommon
-	{
-	protected:
-		/// Container of uniform references that are active in the program object
-		GLUniformReferenceList mGLUniformReferences;
+    class _OgreGL3PlusExport GLSLProgramCommon
+    {
+    protected:
+        /// Container of uniform references that are active in the program object
+        GLUniformReferenceList mGLUniformReferences;
 
-		/// Container of uniform buffer references that are active in the program object
-		GLUniformBufferList mGLUniformBufferReferences;
+        /// Container of uniform buffer references that are active in the program object
+        GLUniformBufferList mGLUniformBufferReferences;
 
-		/// Linked vertex program
-		GLSLGpuProgram* mVertexProgram;
-		/// Linked fragment program
-		GLSLGpuProgram* mFragmentProgram;
-		/// Linked geometry program
-		GLSLGpuProgram* mGeometryProgram;
-		/// Linked hull(control) program
-		GLSLGpuProgram* mHullProgram;
-		/// Linked domain(evaluation) program
-		GLSLGpuProgram* mDomainProgram;
-		/// Linked compute program
-		GLSLGpuProgram* mComputeProgram;
+        /// Linked vertex program
+        GLSLGpuProgram* mVertexProgram;
+        /// Linked fragment program
+        GLSLGpuProgram* mFragmentProgram;
+        /// Linked geometry program
+        GLSLGpuProgram* mGeometryProgram;
+        /// Linked hull(control) program
+        GLSLGpuProgram* mHullProgram;
+        /// Linked domain(evaluation) program
+        GLSLGpuProgram* mDomainProgram;
+        /// Linked compute program
+        GLSLGpuProgram* mComputeProgram;
         /// GL handle for the vertex array object
         GL3PlusVertexArrayObject *mVertexArrayObject;
 
-		/// Flag to indicate that uniform references have already been built
-		bool mUniformRefsBuilt;
-		/// GL handle for the program object
-		GLuint mGLProgramHandle;
-		/// Flag indicating that the program or pipeline object has been successfully linked
-		GLint mLinked;
-		/// Flag indicating that the program or pipeline object has tried to link and failed
-		bool mTriedToLinkAndFailed;
-		/// Flag indicating skeletal animation is being performed
-		bool mSkeletalAnimation;
+        /// Flag to indicate that uniform references have already been built
+        bool mUniformRefsBuilt;
+        /// GL handle for the program object
+        GLuint mGLProgramHandle;
+        /// Flag indicating that the program or pipeline object has been successfully linked
+        GLint mLinked;
+        /// Flag indicating that the program or pipeline object has tried to link and failed
+        bool mTriedToLinkAndFailed;
+        /// Flag indicating skeletal animation is being performed
+        bool mSkeletalAnimation;
 
-		/// Build uniform references from active named uniforms
-		void buildGLUniformReferences(void);
-		typedef set<GLuint>::type AttributeSet;
+        /// Build uniform references from active named uniforms
+        void buildGLUniformReferences(void);
+        typedef set<GLuint>::type AttributeSet;
 
-		/// An array to hold the attributes indexes
-		GLint mCustomAttributesIndexes[VES_COUNT][OGRE_MAX_TEXTURE_COORD_SETS];
+        /// An array to hold the attributes indexes
+        GLint mCustomAttributesIndexes[VES_COUNT][OGRE_MAX_TEXTURE_COORD_SETS];
         /// A value to define the case we didn't look for the attributes since the contractor
 #define NULL_CUSTOM_ATTRIBUTES_INDEX -2
         /// A value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)
 #define NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX -1
 
-		Ogre::String getCombinedName(void);
-		/// Get the the binary data of a program from the microcode cache
-		void getMicrocodeFromCache(void);
-		/// Compiles and links the vertex and fragment programs
-		virtual void compileAndLink(void) = 0;
+        Ogre::String getCombinedName(void);
+        /// Get the the binary data of a program from the microcode cache
+        void getMicrocodeFromCache(void);
+        /// Compiles and links the vertex and fragment programs
+        virtual void compileAndLink(void) = 0;
         /// Put a program in use
         virtual void _useProgram(void) = 0;
 
@@ -118,31 +118,31 @@ namespace Ogre {
         VertexElementSemantic getAttributeSemanticEnum(String type);
         const char * getAttributeSemanticString(VertexElementSemantic semantic);
 
-	public:
-		/// Constructor should only be used by GLSLLinkProgramManager and GLSLProgramPipelineManager
-		GLSLProgramCommon(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram);
-		virtual ~GLSLProgramCommon(void);
+    public:
+        /// Constructor should only be used by GLSLLinkProgramManager and GLSLProgramPipelineManager
+        GLSLProgramCommon(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram, GLSLGpuProgram* hullProgram, GLSLGpuProgram* domainProgram, GLSLGpuProgram* computeProgram);
+        virtual ~GLSLProgramCommon(void);
 
-		/** Makes a program object active by making sure it is linked and then putting it in use.
+        /** Makes a program object active by making sure it is linked and then putting it in use.
          */
-		virtual void activate(void) = 0;
+        virtual void activate(void) = 0;
 
-		/** Updates program object uniforms using data from GpuProgramParameters.
+        /** Updates program object uniforms using data from GpuProgramParameters.
          normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
          */
-		virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
-		/** Updates program object uniform blocks using data from GpuProgramParameters.
+        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
+        /** Updates program object uniform blocks using data from GpuProgramParameters.
          normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
          */
-		virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
-		/** Updates program object uniforms using data from pass iteration GpuProgramParameters.
+        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType) = 0;
+        /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
          normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
          */
-		virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
+        virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params) = 0;
         /// Finds layout qualifiers in the shader source and sets attribute indices appropriately
         virtual void extractLayoutQualifiers(void);
-		/// Get the GL Handle for the program object
-		GLuint getGLProgramHandle(void) const { return mGLProgramHandle; }
+        /// Get the GL Handle for the program object
+        GLuint getGLProgramHandle(void) const { return mGLProgramHandle; }
         /** Sets whether the linked program includes the required instructions
          to perform skeletal animation. 
          @remarks
@@ -159,19 +159,19 @@ namespace Ogre {
          */
         bool isSkeletalAnimationIncluded(void) const { return mSkeletalAnimation; }
 
-		/// Get the index of a non-standard attribute bound in the linked code
-		virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
-		/// Is a non-standard attribute bound in the linked code?
-		bool isAttributeValid(VertexElementSemantic semantic, uint index);
+        /// Get the index of a non-standard attribute bound in the linked code
+        virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
+        /// Is a non-standard attribute bound in the linked code?
+        bool isAttributeValid(VertexElementSemantic semantic, uint index);
 
-		GLSLGpuProgram* getVertexProgram() const { return mVertexProgram; }
-		GLSLGpuProgram* getFragmentProgram() const { return mFragmentProgram; }
-		GLSLGpuProgram* getGeometryProgram() const { return mGeometryProgram; }
-		GLSLGpuProgram* getHullProgram() const { return mHullProgram; }
-		GLSLGpuProgram* getDomainProgram() const { return mDomainProgram; }
-		GLSLGpuProgram* getComputeProgram() const { return mComputeProgram; }
+        GLSLGpuProgram* getVertexProgram() const { return mVertexProgram; }
+        GLSLGpuProgram* getFragmentProgram() const { return mFragmentProgram; }
+        GLSLGpuProgram* getGeometryProgram() const { return mGeometryProgram; }
+        GLSLGpuProgram* getHullProgram() const { return mHullProgram; }
+        GLSLGpuProgram* getDomainProgram() const { return mDomainProgram; }
+        GLSLGpuProgram* getComputeProgram() const { return mComputeProgram; }
         GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
-	};
+    };
 }
 
 #endif // __GLSLProgramCommon_H__

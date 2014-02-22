@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     GL3PlusHardwareVertexBuffer::GL3PlusHardwareVertexBuffer(HardwareBufferManagerBase* mgr, 
-													   size_t vertexSize,
+                                                       size_t vertexSize,
                                                        size_t numVertices,
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer)
@@ -83,13 +83,13 @@ namespace Ogre {
         void* retPtr = 0;
 
         if (!retPtr)
-		{
-			// Use glMapBuffer
+        {
+            // Use glMapBuffer
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
 
-			if (mUsage & HBU_WRITE_ONLY)
+            if (mUsage & HBU_WRITE_ONLY)
             {
-				access |= GL_MAP_WRITE_BIT;
+                access |= GL_MAP_WRITE_BIT;
                 access |= GL_MAP_FLUSH_EXPLICIT_BIT;
                 if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
                 {
@@ -98,21 +98,21 @@ namespace Ogre {
                 }
                 access |= GL_MAP_UNSYNCHRONIZED_BIT;
             }
-			else if (options == HBL_READ_ONLY)
-				access |= GL_MAP_READ_BIT;
-			else
-				access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
+            else if (options == HBL_READ_ONLY)
+                access |= GL_MAP_READ_BIT;
+            else
+                access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
             // FIXME: Big stall here
             void* pBuffer;
             OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, access));
 
-			if(pBuffer == 0)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Vertex Buffer: Out of memory",
+            if(pBuffer == 0)
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                    "Vertex Buffer: Out of memory",
                     "GL3PlusHardwareVertexBuffer::lock");
-			}
+            }
 
             if(mFence)
             {
@@ -126,12 +126,12 @@ namespace Ogre {
                 mFence = 0;
             }
 
-			// return offsetted
-			retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+            // return offsetted
+            retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
-			mLockedToScratch = false;
-		}
-		mIsLocked = true;
+            mLockedToScratch = false;
+        }
+        mIsLocked = true;
         return retPtr;
     }
 
@@ -146,7 +146,7 @@ namespace Ogre {
                           mScratchOffset == 0 && mScratchSize == getSizeInBytes());
             }
 
-			// deallocate from scratch buffer
+            // deallocate from scratch buffer
             static_cast<GL3PlusHardwareBufferManager*>(
                 HardwareBufferManager::getSingletonPtr())->deallocateScratch(mScratchPtr);
 
@@ -156,19 +156,19 @@ namespace Ogre {
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
 
-			if (mUsage & HBU_WRITE_ONLY)
+            if (mUsage & HBU_WRITE_ONLY)
             {
                 OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ARRAY_BUFFER, mLockStart, mLockSize));
             }
 
             GLboolean mapped;
             OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_ARRAY_BUFFER));
-			if(!mapped)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Buffer data corrupted, please reload", 
-					"GL3PlusHardwareVertexBuffer::unlock");
-			}
+            if(!mapped)
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                    "Buffer data corrupted, please reload", 
+                    "GL3PlusHardwareVertexBuffer::unlock");
+            }
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
         }
 
@@ -231,7 +231,7 @@ namespace Ogre {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
         if (srcBuffer.isSystemMemory())
         {
-			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
         else
         {

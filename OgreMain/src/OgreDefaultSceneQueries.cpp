@@ -31,284 +31,284 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 
 namespace Ogre {
-	//---------------------------------------------------------------------
-	DefaultIntersectionSceneQuery::DefaultIntersectionSceneQuery(SceneManager* creator)
-	: IntersectionSceneQuery(creator)
-	{
-		// No world geometry results supported
-		mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
-	}
-	//---------------------------------------------------------------------
-	DefaultIntersectionSceneQuery::~DefaultIntersectionSceneQuery()
-	{
-	}
-	//---------------------------------------------------------------------
-	void DefaultIntersectionSceneQuery::execute(IntersectionSceneQueryListener* listener)
-	{
+    //---------------------------------------------------------------------
+    DefaultIntersectionSceneQuery::DefaultIntersectionSceneQuery(SceneManager* creator)
+    : IntersectionSceneQuery(creator)
+    {
+        // No world geometry results supported
+        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
+    }
+    //---------------------------------------------------------------------
+    DefaultIntersectionSceneQuery::~DefaultIntersectionSceneQuery()
+    {
+    }
+    //---------------------------------------------------------------------
+    void DefaultIntersectionSceneQuery::execute(IntersectionSceneQueryListener* listener)
+    {
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-		// Iterate over all movable types
-		Root::MovableObjectFactoryIterator factIt = 
-			Root::getSingleton().getMovableObjectFactoryIterator();
-		while(factIt.hasMoreElements())
-		{
-			SceneManager::MovableObjectIterator objItA = 
-				mParentSceneMgr->getMovableObjectIterator(
-					factIt.getNext()->getType());
-			while (objItA.hasMoreElements())
-			{
-				MovableObject* a = objItA.getNext();
-				// skip entire section if type doesn't match
-				if (!(a->getTypeFlags() & mQueryTypeMask))
-					break;
+        // Iterate over all movable types
+        Root::MovableObjectFactoryIterator factIt = 
+            Root::getSingleton().getMovableObjectFactoryIterator();
+        while(factIt.hasMoreElements())
+        {
+            SceneManager::MovableObjectIterator objItA = 
+                mParentSceneMgr->getMovableObjectIterator(
+                    factIt.getNext()->getType());
+            while (objItA.hasMoreElements())
+            {
+                MovableObject* a = objItA.getNext();
+                // skip entire section if type doesn't match
+                if (!(a->getTypeFlags() & mQueryTypeMask))
+                    break;
 
-				// Skip if a does not pass the mask
-				if (!(a->getQueryFlags() & mQueryMask) ||
-					!a->isInScene())
-					continue;
+                // Skip if a does not pass the mask
+                if (!(a->getQueryFlags() & mQueryMask) ||
+                    !a->isInScene())
+                    continue;
 
-				// Check against later objects in the same group
-				SceneManager::MovableObjectIterator objItB = objItA;
-				while (objItB.hasMoreElements())
-				{
-					MovableObject* b = objItB.getNext();
+                // Check against later objects in the same group
+                SceneManager::MovableObjectIterator objItB = objItA;
+                while (objItB.hasMoreElements())
+                {
+                    MovableObject* b = objItB.getNext();
 
-					// Apply mask to b (both must pass)
-					if ((b->getQueryFlags() & mQueryMask) && 
-						b->isInScene())
-					{
-						const AxisAlignedBox& box1 = a->getWorldBoundingBox();
-						const AxisAlignedBox& box2 = b->getWorldBoundingBox();
+                    // Apply mask to b (both must pass)
+                    if ((b->getQueryFlags() & mQueryMask) && 
+                        b->isInScene())
+                    {
+                        const AxisAlignedBox& box1 = a->getWorldBoundingBox();
+                        const AxisAlignedBox& box2 = b->getWorldBoundingBox();
 
-						if (box1.intersects(box2))
-						{
-							if (!listener->queryResult(a, b)) return;
-						}
-					}
-				}
-				// Check  against later groups
-				Root::MovableObjectFactoryIterator factItLater = factIt;
-				while (factItLater.hasMoreElements())
-				{
-					SceneManager::MovableObjectIterator objItC = 
-						mParentSceneMgr->getMovableObjectIterator(
-							factItLater.getNext()->getType());
-					while (objItC.hasMoreElements())
-					{
-						MovableObject* c = objItC.getNext();
-						// skip entire section if type doesn't match
-						if (!(c->getTypeFlags() & mQueryTypeMask))
-							break;
+                        if (box1.intersects(box2))
+                        {
+                            if (!listener->queryResult(a, b)) return;
+                        }
+                    }
+                }
+                // Check  against later groups
+                Root::MovableObjectFactoryIterator factItLater = factIt;
+                while (factItLater.hasMoreElements())
+                {
+                    SceneManager::MovableObjectIterator objItC = 
+                        mParentSceneMgr->getMovableObjectIterator(
+                            factItLater.getNext()->getType());
+                    while (objItC.hasMoreElements())
+                    {
+                        MovableObject* c = objItC.getNext();
+                        // skip entire section if type doesn't match
+                        if (!(c->getTypeFlags() & mQueryTypeMask))
+                            break;
 
-						// Apply mask to c (both must pass)
-						if ((c->getQueryFlags() & mQueryMask) &&
-							c->isInScene())
-						{
-							const AxisAlignedBox& box1 = a->getWorldBoundingBox();
-							const AxisAlignedBox& box2 = c->getWorldBoundingBox();
+                        // Apply mask to c (both must pass)
+                        if ((c->getQueryFlags() & mQueryMask) &&
+                            c->isInScene())
+                        {
+                            const AxisAlignedBox& box1 = a->getWorldBoundingBox();
+                            const AxisAlignedBox& box2 = c->getWorldBoundingBox();
 
-							if (box1.intersects(box2))
-							{
-								if (!listener->queryResult(a, c)) return;
-							}
-						}
-					}
+                            if (box1.intersects(box2))
+                            {
+                                if (!listener->queryResult(a, c)) return;
+                            }
+                        }
+                    }
 
-				}
+                }
 
-			}
+            }
 
 
-		}
+        }
 #endif
 
-	}
-	//---------------------------------------------------------------------
-	DefaultAxisAlignedBoxSceneQuery::
-	DefaultAxisAlignedBoxSceneQuery(SceneManager* creator)
-	: AxisAlignedBoxSceneQuery(creator)
-	{
-		// No world geometry results supported
-		mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
-	}
-	//---------------------------------------------------------------------
-	DefaultAxisAlignedBoxSceneQuery::~DefaultAxisAlignedBoxSceneQuery()
-	{
-	}
-	//---------------------------------------------------------------------
-	void DefaultAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
-	{
+    }
+    //---------------------------------------------------------------------
+    DefaultAxisAlignedBoxSceneQuery::
+    DefaultAxisAlignedBoxSceneQuery(SceneManager* creator)
+    : AxisAlignedBoxSceneQuery(creator)
+    {
+        // No world geometry results supported
+        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
+    }
+    //---------------------------------------------------------------------
+    DefaultAxisAlignedBoxSceneQuery::~DefaultAxisAlignedBoxSceneQuery()
+    {
+    }
+    //---------------------------------------------------------------------
+    void DefaultAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
+    {
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-		// Iterate over all movable types
-		Root::MovableObjectFactoryIterator factIt = 
-			Root::getSingleton().getMovableObjectFactoryIterator();
-		while(factIt.hasMoreElements())
-		{
-			SceneManager::MovableObjectIterator objItA = 
-				mParentSceneMgr->getMovableObjectIterator(
-				factIt.getNext()->getType());
-			while (objItA.hasMoreElements())
-			{
-				MovableObject* a = objItA.getNext();
-				// skip whole group if type doesn't match
-				if (!(a->getTypeFlags() & mQueryTypeMask))
-					break;
+        // Iterate over all movable types
+        Root::MovableObjectFactoryIterator factIt = 
+            Root::getSingleton().getMovableObjectFactoryIterator();
+        while(factIt.hasMoreElements())
+        {
+            SceneManager::MovableObjectIterator objItA = 
+                mParentSceneMgr->getMovableObjectIterator(
+                factIt.getNext()->getType());
+            while (objItA.hasMoreElements())
+            {
+                MovableObject* a = objItA.getNext();
+                // skip whole group if type doesn't match
+                if (!(a->getTypeFlags() & mQueryTypeMask))
+                    break;
 
-				if ((a->getQueryFlags() & mQueryMask) && 
-					a->isInScene() &&
-					mAABB.intersects(a->getWorldBoundingBox()))
-				{
-					if (!listener->queryResult(a)) return;
-				}
-			}
-		}
+                if ((a->getQueryFlags() & mQueryMask) && 
+                    a->isInScene() &&
+                    mAABB.intersects(a->getWorldBoundingBox()))
+                {
+                    if (!listener->queryResult(a)) return;
+                }
+            }
+        }
 #endif
-	}
-	//---------------------------------------------------------------------
-	DefaultRaySceneQuery::
-	DefaultRaySceneQuery(SceneManager* creator) : RaySceneQuery(creator)
-	{
-		// No world geometry results supported
-		mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
-	}
-	//---------------------------------------------------------------------
-	DefaultRaySceneQuery::~DefaultRaySceneQuery()
-	{
-	}
-	//---------------------------------------------------------------------
-	void DefaultRaySceneQuery::execute(RaySceneQueryListener* listener)
-	{
+    }
+    //---------------------------------------------------------------------
+    DefaultRaySceneQuery::
+    DefaultRaySceneQuery(SceneManager* creator) : RaySceneQuery(creator)
+    {
+        // No world geometry results supported
+        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
+    }
+    //---------------------------------------------------------------------
+    DefaultRaySceneQuery::~DefaultRaySceneQuery()
+    {
+    }
+    //---------------------------------------------------------------------
+    void DefaultRaySceneQuery::execute(RaySceneQueryListener* listener)
+    {
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-		// Note that because we have no scene partitioning, we actually
-		// perform a complete scene search even if restricted results are
-		// requested; smarter scene manager queries can utilise the paritioning 
-		// of the scene in order to reduce the number of intersection tests 
-		// required to fulfil the query
+        // Note that because we have no scene partitioning, we actually
+        // perform a complete scene search even if restricted results are
+        // requested; smarter scene manager queries can utilise the paritioning 
+        // of the scene in order to reduce the number of intersection tests 
+        // required to fulfil the query
 
-		// Iterate over all movable types
-		Root::MovableObjectFactoryIterator factIt = 
-			Root::getSingleton().getMovableObjectFactoryIterator();
-		while(factIt.hasMoreElements())
-		{
-			SceneManager::MovableObjectIterator objItA = 
-				mParentSceneMgr->getMovableObjectIterator(
-				factIt.getNext()->getType());
-			while (objItA.hasMoreElements())
-			{
-				MovableObject* a = objItA.getNext();
-				// skip whole group if type doesn't match
-				if (!(a->getTypeFlags() & mQueryTypeMask))
-					break;
+        // Iterate over all movable types
+        Root::MovableObjectFactoryIterator factIt = 
+            Root::getSingleton().getMovableObjectFactoryIterator();
+        while(factIt.hasMoreElements())
+        {
+            SceneManager::MovableObjectIterator objItA = 
+                mParentSceneMgr->getMovableObjectIterator(
+                factIt.getNext()->getType());
+            while (objItA.hasMoreElements())
+            {
+                MovableObject* a = objItA.getNext();
+                // skip whole group if type doesn't match
+                if (!(a->getTypeFlags() & mQueryTypeMask))
+                    break;
 
-				if( (a->getQueryFlags() & mQueryMask) &&
-					a->isInScene())
-				{
-					// Do ray / box test
-					std::pair<bool, Real> result =
-						mRay.intersects(a->getWorldBoundingBox());
+                if( (a->getQueryFlags() & mQueryMask) &&
+                    a->isInScene())
+                {
+                    // Do ray / box test
+                    std::pair<bool, Real> result =
+                        mRay.intersects(a->getWorldBoundingBox());
 
-					if (result.first)
-					{
-						if (!listener->queryResult(a, result.second)) return;
-					}
-				}
-			}
-		}
+                    if (result.first)
+                    {
+                        if (!listener->queryResult(a, result.second)) return;
+                    }
+                }
+            }
+        }
 #endif
-	}
-	//---------------------------------------------------------------------
-	DefaultSphereSceneQuery::
-	DefaultSphereSceneQuery(SceneManager* creator) : SphereSceneQuery(creator)
-	{
-		// No world geometry results supported
-		mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
-	}
-	//---------------------------------------------------------------------
-	DefaultSphereSceneQuery::~DefaultSphereSceneQuery()
-	{
-	}
-	//---------------------------------------------------------------------
-	void DefaultSphereSceneQuery::execute(SceneQueryListener* listener)
-	{
+    }
+    //---------------------------------------------------------------------
+    DefaultSphereSceneQuery::
+    DefaultSphereSceneQuery(SceneManager* creator) : SphereSceneQuery(creator)
+    {
+        // No world geometry results supported
+        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
+    }
+    //---------------------------------------------------------------------
+    DefaultSphereSceneQuery::~DefaultSphereSceneQuery()
+    {
+    }
+    //---------------------------------------------------------------------
+    void DefaultSphereSceneQuery::execute(SceneQueryListener* listener)
+    {
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-		Sphere testSphere;
+        Sphere testSphere;
 
-		// Iterate over all movable types
-		Root::MovableObjectFactoryIterator factIt = 
-			Root::getSingleton().getMovableObjectFactoryIterator();
-		while(factIt.hasMoreElements())
-		{
-			SceneManager::MovableObjectIterator objItA = 
-				mParentSceneMgr->getMovableObjectIterator(
-				factIt.getNext()->getType());
-			while (objItA.hasMoreElements())
-			{
-				MovableObject* a = objItA.getNext();
-				// skip whole group if type doesn't match
-				if (!(a->getTypeFlags() & mQueryTypeMask))
-					break;
-				// Skip unattached
-				if (!a->isInScene() || 
-					!(a->getQueryFlags() & mQueryMask))
-					continue;
+        // Iterate over all movable types
+        Root::MovableObjectFactoryIterator factIt = 
+            Root::getSingleton().getMovableObjectFactoryIterator();
+        while(factIt.hasMoreElements())
+        {
+            SceneManager::MovableObjectIterator objItA = 
+                mParentSceneMgr->getMovableObjectIterator(
+                factIt.getNext()->getType());
+            while (objItA.hasMoreElements())
+            {
+                MovableObject* a = objItA.getNext();
+                // skip whole group if type doesn't match
+                if (!(a->getTypeFlags() & mQueryTypeMask))
+                    break;
+                // Skip unattached
+                if (!a->isInScene() || 
+                    !(a->getQueryFlags() & mQueryMask))
+                    continue;
 
-				// Do sphere / sphere test
-				testSphere.setCenter(a->getParentNode()->_getDerivedPosition());
-				testSphere.setRadius(a->getBoundingRadius());
-				if (mSphere.intersects(testSphere))
-				{
-					if (!listener->queryResult(a)) return;
-				}
-			}
-		}
+                // Do sphere / sphere test
+                testSphere.setCenter(a->getParentNode()->_getDerivedPosition());
+                testSphere.setRadius(a->getBoundingRadius());
+                if (mSphere.intersects(testSphere))
+                {
+                    if (!listener->queryResult(a)) return;
+                }
+            }
+        }
 #endif
-	}
-	//---------------------------------------------------------------------
-	DefaultPlaneBoundedVolumeListSceneQuery::
-	DefaultPlaneBoundedVolumeListSceneQuery(SceneManager* creator) 
-	: PlaneBoundedVolumeListSceneQuery(creator)
-	{
-		// No world geometry results supported
-		mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
-	}
-	//---------------------------------------------------------------------
-	DefaultPlaneBoundedVolumeListSceneQuery::~DefaultPlaneBoundedVolumeListSceneQuery()
-	{
-	}
-	//---------------------------------------------------------------------
-	void DefaultPlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listener)
-	{
+    }
+    //---------------------------------------------------------------------
+    DefaultPlaneBoundedVolumeListSceneQuery::
+    DefaultPlaneBoundedVolumeListSceneQuery(SceneManager* creator) 
+    : PlaneBoundedVolumeListSceneQuery(creator)
+    {
+        // No world geometry results supported
+        mSupportedWorldFragments.insert(SceneQuery::WFT_NONE);
+    }
+    //---------------------------------------------------------------------
+    DefaultPlaneBoundedVolumeListSceneQuery::~DefaultPlaneBoundedVolumeListSceneQuery()
+    {
+    }
+    //---------------------------------------------------------------------
+    void DefaultPlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listener)
+    {
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-		// Iterate over all movable types
-		Root::MovableObjectFactoryIterator factIt = 
-			Root::getSingleton().getMovableObjectFactoryIterator();
-		while(factIt.hasMoreElements())
-		{
-			SceneManager::MovableObjectIterator objItA = 
-				mParentSceneMgr->getMovableObjectIterator(
-				factIt.getNext()->getType());
-			while (objItA.hasMoreElements())
-			{
-				MovableObject* a = objItA.getNext();
-				// skip whole group if type doesn't match
-				if (!(a->getTypeFlags() & mQueryTypeMask))
-					break;
+        // Iterate over all movable types
+        Root::MovableObjectFactoryIterator factIt = 
+            Root::getSingleton().getMovableObjectFactoryIterator();
+        while(factIt.hasMoreElements())
+        {
+            SceneManager::MovableObjectIterator objItA = 
+                mParentSceneMgr->getMovableObjectIterator(
+                factIt.getNext()->getType());
+            while (objItA.hasMoreElements())
+            {
+                MovableObject* a = objItA.getNext();
+                // skip whole group if type doesn't match
+                if (!(a->getTypeFlags() & mQueryTypeMask))
+                    break;
 
-				PlaneBoundedVolumeList::iterator pi, piend;
-				piend = mVolumes.end();
-				for (pi = mVolumes.begin(); pi != piend; ++pi)
-				{
-					PlaneBoundedVolume& vol = *pi;
-					// Do AABB / plane volume test
-					if ((a->getQueryFlags() & mQueryMask) && 
-						a->isInScene() && 
-						vol.intersects(a->getWorldBoundingBox()))
-					{
-						if (!listener->queryResult(a)) return;
-						break;
-					}
-				}
-			}
-		}
+                PlaneBoundedVolumeList::iterator pi, piend;
+                piend = mVolumes.end();
+                for (pi = mVolumes.begin(); pi != piend; ++pi)
+                {
+                    PlaneBoundedVolume& vol = *pi;
+                    // Do AABB / plane volume test
+                    if ((a->getQueryFlags() & mQueryMask) && 
+                        a->isInScene() && 
+                        vol.intersects(a->getWorldBoundingBox()))
+                    {
+                        if (!listener->queryResult(a)) return;
+                        break;
+                    }
+                }
+            }
+        }
 #endif
-	}
+    }
 }

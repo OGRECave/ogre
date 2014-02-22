@@ -38,12 +38,12 @@ namespace Ogre {
     {
     private:
         GLuint mBufferId;
-		// Scratch buffer handling
-		bool mLockedToScratch;
-		size_t mScratchOffset;
-		size_t mScratchSize;
-		void* mScratchPtr;
-		bool mScratchUploadOnUnlock;
+        // Scratch buffer handling
+        bool mLockedToScratch;
+        size_t mScratchOffset;
+        size_t mScratchSize;
+        void* mScratchPtr;
+        bool mScratchUploadOnUnlock;
 
     protected:
         /** See HardwareBuffer. */

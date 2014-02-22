@@ -36,25 +36,25 @@ THE SOFTWARE.
 #include "OgreD3D9HardwarePixelBuffer.h"
 
 namespace Ogre {
-	class _OgreD3D9Export D3D9MultiRenderTarget : public MultiRenderTarget
-	{
-	public:
-		D3D9MultiRenderTarget(const String &name);
-		~D3D9MultiRenderTarget();
+    class _OgreD3D9Export D3D9MultiRenderTarget : public MultiRenderTarget
+    {
+    public:
+        D3D9MultiRenderTarget(const String &name);
+        ~D3D9MultiRenderTarget();
 
         //virtual void update(bool swapBuffers);
 
-		virtual void getCustomAttribute( const String& name, void *pData );
+        virtual void getCustomAttribute( const String& name, void *pData );
 
-		bool requiresTextureFlipping() const { return false; }
-	private:
-		D3D9HardwarePixelBuffer *mRenderTargets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
-		virtual void unbindSurfaceImpl(size_t attachment);
+        bool requiresTextureFlipping() const { return false; }
+    private:
+        D3D9HardwarePixelBuffer *mRenderTargets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
+        virtual void unbindSurfaceImpl(size_t attachment);
 
-		/** Check surfaces and update RenderTarget extent */
-		void checkAndUpdate();
-	};
+        /** Check surfaces and update RenderTarget extent */
+        void checkAndUpdate();
+    };
 };
 
 #endif

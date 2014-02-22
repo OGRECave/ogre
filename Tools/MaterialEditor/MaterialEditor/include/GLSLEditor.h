@@ -33,20 +33,20 @@ THE SOFTWARE.
 class GLSLEditor : public ScintillaEditor
 {
 public:
-	GLSLEditor(wxWindow* parent, wxWindowID id = -1,
-		const wxPoint& pos = wxDefaultPosition,
-		const wxSize& size = wxDefaultSize,
-		long style = wxVSCROLL
-		);
+    GLSLEditor(wxWindow* parent, wxWindowID id = -1,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxDefaultSize,
+        long style = wxVSCROLL
+        );
 
-	virtual ~GLSLEditor();
+    virtual ~GLSLEditor();
 
-	void OnCharAdded(wxScintillaEvent &event);
-	
+    void OnCharAdded(wxScintillaEvent &event);
+    
 protected:
-	void initialize();
+    void initialize();
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 
 };
 

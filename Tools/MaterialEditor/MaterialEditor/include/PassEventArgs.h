@@ -35,12 +35,12 @@ class PassController;
 class PassEventArgs : public EventArgs
 {
 public:
-	PassEventArgs(PassController* pass);
+    PassEventArgs(PassController* pass);
 
-	PassController* getPassController() const;
+    PassController* getPassController() const;
 
 protected:
-	PassController* mPassController;
+    PassController* mPassController;
 };
 
 #endif // _PASSEVENTARGS_H_

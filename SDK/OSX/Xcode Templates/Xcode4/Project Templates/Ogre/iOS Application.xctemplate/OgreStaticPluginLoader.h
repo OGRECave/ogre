@@ -48,104 +48,104 @@ Description: Utility class to load plugins statically
 
 namespace Ogre
 {
-	/** Utility class for loading some plugins statically.
-	@remarks
-		When loading plugins statically, you are limited to loading plugins 
-		that are known about at compile time. You should define preprocessor
-		symbols depending on which plugins you want to load - the symbol being
-		OGRE_STATIC_<pluginname>, with pluginname being the usual name of the
-		plugin DLL (no file extension, no debug suffix, and without the Plugin_ 
-		or RenderSystem_ prefix.)
-	*/
-	class StaticPluginLoader
-	{
-	protected:
+    /** Utility class for loading some plugins statically.
+    @remarks
+        When loading plugins statically, you are limited to loading plugins 
+        that are known about at compile time. You should define preprocessor
+        symbols depending on which plugins you want to load - the symbol being
+        OGRE_STATIC_<pluginname>, with pluginname being the usual name of the
+        plugin DLL (no file extension, no debug suffix, and without the Plugin_ 
+        or RenderSystem_ prefix.)
+    */
+    class StaticPluginLoader
+    {
+    protected:
 #ifdef OGRE_STATIC_CgProgramManager
-		CgPlugin* mCgPlugin;
+        CgPlugin* mCgPlugin;
 #endif
 #ifdef OGRE_STATIC_ParticleFX
-		ParticleFXPlugin* mParticleFXPlugin;
+        ParticleFXPlugin* mParticleFXPlugin;
 #endif
 #ifdef OGRE_STATIC_GL
-		GLPlugin* mGLPlugin;
+        GLPlugin* mGLPlugin;
 #endif
 #ifdef OGRE_STATIC_GLES
-		GLESPlugin* mGLESPlugin;
+        GLESPlugin* mGLESPlugin;
 #endif
 #ifdef OGRE_STATIC_GLES2
-		GLES2Plugin* mGLES2Plugin;
+        GLES2Plugin* mGLES2Plugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D9
-		D3D9Plugin* mD3D9Plugin;
+        D3D9Plugin* mD3D9Plugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D10
-		D3D10Plugin* mD3D10Plugin;
+        D3D10Plugin* mD3D10Plugin;
 #endif
-	public:
-		StaticPluginLoader() {}
+    public:
+        StaticPluginLoader() {}
 
-		/** Load all the enabled plugins against the passed in root object. */
-		void load()
-		{
-			Root& root  = Root::getSingleton();
+        /** Load all the enabled plugins against the passed in root object. */
+        void load()
+        {
+            Root& root  = Root::getSingleton();
 #ifdef OGRE_STATIC_GL
-			mGLPlugin = OGRE_NEW GLPlugin();
-			root.installPlugin(mGLPlugin);
+            mGLPlugin = OGRE_NEW GLPlugin();
+            root.installPlugin(mGLPlugin);
 #endif
 #ifdef OGRE_STATIC_GLES
-			mGLESPlugin = OGRE_NEW GLESPlugin();
-			root.installPlugin(mGLESPlugin);
+            mGLESPlugin = OGRE_NEW GLESPlugin();
+            root.installPlugin(mGLESPlugin);
 #endif
 #ifdef OGRE_STATIC_GLES2
-			mGLES2Plugin = OGRE_NEW GLES2Plugin();
-			root.installPlugin(mGLES2Plugin);
+            mGLES2Plugin = OGRE_NEW GLES2Plugin();
+            root.installPlugin(mGLES2Plugin);
 #endif
 #ifdef OGRE_STATIC_Direct3D9
-			mD3D9Plugin = OGRE_NEW D3D9Plugin();
-			root.installPlugin(mD3D9Plugin);
+            mD3D9Plugin = OGRE_NEW D3D9Plugin();
+            root.installPlugin(mD3D9Plugin);
 #endif
 #ifdef OGRE_STATIC_Direct3D10
-			mD3D10Plugin = OGRE_NEW D3D10Plugin();
-			root.installPlugin(mD3D10Plugin);
+            mD3D10Plugin = OGRE_NEW D3D10Plugin();
+            root.installPlugin(mD3D10Plugin);
 #endif
 #ifdef OGRE_STATIC_CgProgramManager
-			mCgPlugin = OGRE_NEW CgPlugin();
-			root.installPlugin(mCgPlugin);
+            mCgPlugin = OGRE_NEW CgPlugin();
+            root.installPlugin(mCgPlugin);
 #endif
 #ifdef OGRE_STATIC_ParticleFX
-			mParticleFXPlugin = OGRE_NEW ParticleFXPlugin();
-			root.installPlugin(mParticleFXPlugin);
+            mParticleFXPlugin = OGRE_NEW ParticleFXPlugin();
+            root.installPlugin(mParticleFXPlugin);
 #endif
-		}
+        }
 
-		void unload()
-		{
-			// don't unload plugins, since Root will have done that. Destroy here.
+        void unload()
+        {
+            // don't unload plugins, since Root will have done that. Destroy here.
 #ifdef OGRE_STATIC_ParticleFX
-			OGRE_DELETE mParticleFXPlugin;
+            OGRE_DELETE mParticleFXPlugin;
 #endif
 #ifdef OGRE_STATIC_CgProgramManager
-			OGRE_DELETE mCgPlugin;
+            OGRE_DELETE mCgPlugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D9
-			OGRE_DELETE mD3D9Plugin;
+            OGRE_DELETE mD3D9Plugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D10
-			OGRE_DELETE mD3D10Plugin;
+            OGRE_DELETE mD3D10Plugin;
 #endif
 #ifdef OGRE_STATIC_GL
-			OGRE_DELETE mGLPlugin;
+            OGRE_DELETE mGLPlugin;
 #endif
 #ifdef OGRE_STATIC_GLES
-			OGRE_DELETE mGLESPlugin;
+            OGRE_DELETE mGLESPlugin;
 #endif
 #ifdef OGRE_STATIC_GLES2
-			OGRE_DELETE mGLES2Plugin;
+            OGRE_DELETE mGLES2Plugin;
 #endif
 
-		}
+        }
 
-	};
+    };
 
 }
 

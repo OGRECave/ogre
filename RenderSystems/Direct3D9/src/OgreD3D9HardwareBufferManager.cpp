@@ -49,19 +49,19 @@ namespace Ogre {
     HardwareVertexBufferSharedPtr 
     D3D9HardwareBufferManagerBase::
     createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage,
-		bool useShadowBuffer)
+        bool useShadowBuffer)
     {
-		assert (numVerts > 0);
+        assert (numVerts > 0);
 #if OGRE_D3D_MANAGE_BUFFERS
         // Override shadow buffer setting; managed buffers are automatically
         // backed by system memory
         // Don't override shadow buffer if discardable, since then we use
         // unmanaged buffers for speed (avoids write-through overhead)
-		// Don't override if we use directX9EX, since then we don't have managed
-		// pool. And creating non-write only default pool causes a performance warning. 
-		if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DISCARDABLE) &&
-			!D3D9RenderSystem::isDirectX9Ex())
-		{
+        // Don't override if we use directX9EX, since then we don't have managed
+        // pool. And creating non-write only default pool causes a performance warning. 
+        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DISCARDABLE) &&
+            !D3D9RenderSystem::isDirectX9Ex())
+        {
             useShadowBuffer = false;
             // Also drop any WRITE_ONLY so we can read direct
             if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
@@ -74,31 +74,31 @@ namespace Ogre {
             }
         }
 #endif
-		D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
-			this, vertexSize, numVerts, usage, false, useShadowBuffer);
-		{
+        D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
+            this, vertexSize, numVerts, usage, false, useShadowBuffer);
+        {
                     OGRE_LOCK_MUTEX(mVertexBuffersMutex);
-			mVertexBuffers.insert(vbuf);
-		}
+            mVertexBuffers.insert(vbuf);
+        }
         return HardwareVertexBufferSharedPtr(vbuf);
     }
     //-----------------------------------------------------------------------
-	HardwareIndexBufferSharedPtr 
+    HardwareIndexBufferSharedPtr 
     D3D9HardwareBufferManagerBase::
     createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
         HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
-		assert (numIndexes > 0);
+        assert (numIndexes > 0);
 #if OGRE_D3D_MANAGE_BUFFERS
         // Override shadow buffer setting; managed buffers are automatically
         // backed by system memory
-		// Don't override shadow buffer if discardable, since then we use
-		// unmanaged buffers for speed (avoids write-through overhead)
-		// Don't override if we use directX9EX, since then we don't have managed
-		// pool. And creating non-write only default pool causes a performance warning. 
-		if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DISCARDABLE) &&
-			!D3D9RenderSystem::isDirectX9Ex())
-		{
+        // Don't override shadow buffer if discardable, since then we use
+        // unmanaged buffers for speed (avoids write-through overhead)
+        // Don't override if we use directX9EX, since then we don't have managed
+        // pool. And creating non-write only default pool causes a performance warning. 
+        if (useShadowBuffer && !(usage & HardwareBuffer::HBU_DISCARDABLE) &&
+            !D3D9RenderSystem::isDirectX9Ex())
+        {
             useShadowBuffer = false;
             // Also drop any WRITE_ONLY so we can read direct
             if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
@@ -111,13 +111,13 @@ namespace Ogre {
             }
         }
 #endif
-		D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(
-			this, itype, numIndexes, usage, false, useShadowBuffer);
-		{
+        D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(
+            this, itype, numIndexes, usage, false, useShadowBuffer);
+        {
                     OGRE_LOCK_MUTEX(mIndexBuffersMutex);
-			mIndexBuffers.insert(idx);
-		}
-		return HardwareIndexBufferSharedPtr(idx);
+            mIndexBuffers.insert(idx);
+        }
+        return HardwareIndexBufferSharedPtr(idx);
             
     }
     //-----------------------------------------------------------------------
@@ -127,24 +127,24 @@ namespace Ogre {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
             "Direct3D9 does not support render to vertex buffer objects", 
             "D3D9HardwareBufferManagerBase::createRenderToVertexBuffer");
-	}
-	//---------------------------------------------------------------------
-	HardwareUniformBufferSharedPtr 
-		D3D9HardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-	{
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Uniform buffer not supported in Direct3D 9 RenderSystem.",
-				"D3D9HardwareBufferManagerBase::createUniformBuffer");
-	}
+    }
+    //---------------------------------------------------------------------
+    HardwareUniformBufferSharedPtr 
+        D3D9HardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "Uniform buffer not supported in Direct3D 9 RenderSystem.",
+                "D3D9HardwareBufferManagerBase::createUniformBuffer");
+    }
     //-----------------------------------------------------------------------
-	HardwareCounterBufferSharedPtr
+    HardwareCounterBufferSharedPtr
     D3D9HardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
                                                           HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-	{
+    {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                     "D3D9 does not support atomic counter buffers",
                     "D3D9HardwareBufferManagerBase::createCounterBuffer");
-	}
+    }
     //-----------------------------------------------------------------------
     VertexDeclaration* D3D9HardwareBufferManagerBase::createVertexDeclarationImpl(void)
     {

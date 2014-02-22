@@ -105,7 +105,7 @@ namespace Ogre {
 
         /** List of SubEntities (point to SubMeshes).
         */
-		typedef vector<SubEntity>::type SubEntityList;
+        typedef vector<SubEntity>::type SubEntityList;
         SubEntityList mSubEntityList;
 
 
@@ -288,19 +288,19 @@ namespace Ogre {
 
         /** Gets a pointer to a SubEntity, ie a part of an Entity.
         */
-		SubEntity* getSubEntity(size_t index);
-		const SubEntity* getSubEntity(size_t index) const;
+        SubEntity* getSubEntity(size_t index);
+        const SubEntity* getSubEntity(size_t index) const;
 
         /** Gets a pointer to a SubEntity by name
         @remarks 
             Names should be initialized during a Mesh creation.
         */
-		SubEntity* getSubEntity( const String& name );
-		const SubEntity* getSubEntity( const String& name ) const;
+        SubEntity* getSubEntity( const String& name );
+        const SubEntity* getSubEntity( const String& name ) const;
 
         /** Retrieves the number of SubEntity objects making up this entity.
         */
-		size_t getNumSubEntities(void) const;
+        size_t getNumSubEntities(void) const;
 
         /** Clones this entity and returns a pointer to the clone.
         @remarks
@@ -387,12 +387,12 @@ namespace Ogre {
         */
         Entity* getManualLodLevel(size_t index) const;
 
-		/** Returns the number of manual levels of detail that this entity supports.
-		@remarks
-			This number never includes the original entity, it is difference
-			with Mesh::getNumLodLevels.
-		*/
-		size_t getNumManualLodLevels(void) const;
+        /** Returns the number of manual levels of detail that this entity supports.
+        @remarks
+            This number never includes the original entity, it is difference
+            with Mesh::getNumLodLevels.
+        */
+        size_t getNumManualLodLevels(void) const;
 
         /** Sets whether the polygon mode of this entire entity may be
             overridden by the camera detail settings.
@@ -441,7 +441,7 @@ namespace Ogre {
         void detachAllObjectsFromBone(void);
 
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-		/// Contains the child objects (attached to bones) indexed by name.
+        /// Contains the child objects (attached to bones) indexed by name.
         typedef map<String, MovableObject*>::type ChildObjectList;
         typedef MapIterator<ChildObjectList> ChildObjectListIterator;
         /** Gets an iterator to the list of objects attached to bones on this entity. */
@@ -708,7 +708,7 @@ namespace Ogre {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-													const NameValuePairList* params = 0 );
+                                                    const NameValuePairList* params = 0 );
     public:
         EntityFactory() {}
         ~EntityFactory() {}

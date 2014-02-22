@@ -41,12 +41,12 @@ namespace Ogre {
         that run on previous results of those shaders, creating stateful 
         shaders.
     */
-	class _OgreGL3PlusExport GL3PlusRenderToVertexBuffer : public RenderToVertexBuffer
+    class _OgreGL3PlusExport GL3PlusRenderToVertexBuffer : public RenderToVertexBuffer
     {    
     public:
-		/** C'tor */
-		GL3PlusRenderToVertexBuffer();
-		/** D'tor */
+        /** C'tor */
+        GL3PlusRenderToVertexBuffer();
+        /** D'tor */
         virtual ~GL3PlusRenderToVertexBuffer();
 
         /**
@@ -58,13 +58,13 @@ namespace Ogre {
             Update the contents of this vertex buffer by rendering
         */
         virtual void update(SceneManager* sceneMgr);
-	protected:
-		void reallocateBuffer(size_t index);
-		void bindVerticesOutput(Pass* pass);
-		String getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index);
-		HardwareVertexBufferSharedPtr mVertexBuffers[2];
-		size_t mFrontBufferIndex;
-		GLuint mPrimitivesDrawnQuery;
+    protected:
+        void reallocateBuffer(size_t index);
+        void bindVerticesOutput(Pass* pass);
+        String getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index);
+        HardwareVertexBufferSharedPtr mVertexBuffers[2];
+        size_t mFrontBufferIndex;
+        GLuint mPrimitivesDrawnQuery;
         bool mFeedbackActive;
     };
 }

@@ -66,7 +66,7 @@ public:
                 bool fullScreen, int left, int top, bool depthBuffer, 
                 void* miscParam, ...);
 
-	void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
+    void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
     void destroy(void);
     bool isActive(void) const;
     bool isClosed(void) const;
@@ -77,12 +77,12 @@ public:
 
     bool requiresTextureFlipping() const { return false; }
 
-	/**
-	 * Get a custom, GTK specific attribute. The specific attributes
-	 * are:
-	 * GTKMMWINDOW		The Gtk::Window instance (Rendering window)
-	 * GTKGLMMWIDGET	The Gtk::GL::DrawingArea instance (Ogre widget)
-	 */
+    /**
+     * Get a custom, GTK specific attribute. The specific attributes
+     * are:
+     * GTKMMWINDOW      The Gtk::Window instance (Rendering window)
+     * GTKGLMMWIDGET    The Gtk::GL::DrawingArea instance (Ogre widget)
+     */
     void getCustomAttribute( const String& name, void* pData );
 protected:
     // Signal handlers

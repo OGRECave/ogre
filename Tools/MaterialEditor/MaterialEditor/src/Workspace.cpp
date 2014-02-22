@@ -35,67 +35,67 @@ template<> Workspace* Ogre::Singleton<Workspace>::msSingleton = 0;
 
 Workspace& Workspace::getSingleton(void)
 {  
-	assert( msSingleton );  return ( *msSingleton );  
+    assert( msSingleton );  return ( *msSingleton );  
 }
 
 Workspace* Workspace::getSingletonPtr(void)
 {
-	return msSingleton;
+    return msSingleton;
 }
 
 Workspace::Workspace()
 {
-	registerEvents();
+    registerEvents();
 }
 
 Workspace::~Workspace()
 {
-	ProjectList::iterator it;
-	for(it = mProjects.begin(); it != mProjects.end(); ++it)
-	{
-		delete *it;
-	}
+    ProjectList::iterator it;
+    for(it = mProjects.begin(); it != mProjects.end(); ++it)
+    {
+        delete *it;
+    }
 }
 
 void Workspace::registerEvents()
 {
-	registerEvent(ProjectAdded);
-	registerEvent(ProjectRemoved);
+    registerEvent(ProjectAdded);
+    registerEvent(ProjectRemoved);
 }
 
 void Workspace::addProject(Project* project)
 {
-	mProjects.push_back(project);
-	
-	fireEvent(ProjectAdded, WorkspaceEventArgs(this, project));
+    mProjects.push_back(project);
+    
+    fireEvent(ProjectAdded, WorkspaceEventArgs(this, project));
 }
 
 void Workspace::removeProject(Project* project)
 {
-	mProjects.remove(project);
-	fireEvent(ProjectAdded, WorkspaceEventArgs(this, project));
-	delete project;
+    mProjects.remove(project);
+    fireEvent(ProjectAdded, WorkspaceEventArgs(this, project));
+    delete project;
 }
 
 void Workspace::removeProject(const String& name)
 {
-	removeProject(getProject(name));
+    removeProject(getProject(name));
 }
 
 Project* Workspace::getProject(const String& name)
 {
-	Project* p;
-	ProjectList::iterator it;
-	for(it = mProjects.begin(); it != mProjects.end(); ++it)
-	{
-		p = (*it);
-		if(p->getName() == name) return p;
-	}
+    Project* p;
+    ProjectList::iterator it;
+    for(it = mProjects.begin(); it != mProjects.end(); ++it)
+    {
+        p = (*it);
+        if(p->getName() == name) return p;
+    }
 
-	return NULL;
+    return NULL;
 }
 
 const ProjectList* Workspace::getProjects() const
 {
-	return &mProjects;
+    return &mProjects;
 }

@@ -33,16 +33,16 @@ THE SOFTWARE.
 class HLSLEditor : public ScintillaEditor
 {
 public:
-	HLSLEditor(wxWindow* parent, wxWindowID id = -1,
-		const wxPoint& pos = wxDefaultPosition,
-		const wxSize& size = wxDefaultSize,
-		long style = wxVSCROLL
-		);
+    HLSLEditor(wxWindow* parent, wxWindowID id = -1,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxDefaultSize,
+        long style = wxVSCROLL
+        );
 
-	virtual ~HLSLEditor();
-	
+    virtual ~HLSLEditor();
+    
 protected:
-	void initialize();
+    void initialize();
 };
 
 #endif // _HLSLEDITOR_H_

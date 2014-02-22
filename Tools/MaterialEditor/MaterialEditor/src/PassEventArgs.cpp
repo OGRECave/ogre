@@ -36,5 +36,5 @@ PassEventArgs::PassEventArgs(PassController* controller)
 
 PassController* PassEventArgs::getPassController() const
 {
-	return mPassController;
+    return mPassController;
 }

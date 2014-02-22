@@ -28,17 +28,17 @@ THE SOFTWARE.
 #include "CgEditor.h"
 
 BEGIN_EVENT_TABLE(CgEditor, ScintillaEditor)
-	// Scintilla
-	EVT_SCI_CHARADDED (-1,   CgEditor::OnCharAdded)
+    // Scintilla
+    EVT_SCI_CHARADDED (-1,   CgEditor::OnCharAdded)
 END_EVENT_TABLE()
 
 CgEditor::CgEditor(wxWindow* parent, wxWindowID id /*= -1*/,
-		const wxPoint& pos /*= wxDefaultPosition*/,
-		const wxSize& size /*= wxDefaultSize*/,
-		long style /*= wxVSCROLL*/
-		) : ScintillaEditor(parent, id, pos, size, style)
+        const wxPoint& pos /*= wxDefaultPosition*/,
+        const wxSize& size /*= wxDefaultSize*/,
+        long style /*= wxVSCROLL*/
+        ) : ScintillaEditor(parent, id, pos, size, style)
 {
-	initialize();
+    initialize();
 }
 
 CgEditor::~CgEditor()
@@ -47,59 +47,59 @@ CgEditor::~CgEditor()
 
 void CgEditor::initialize()
 {
-	StyleClearAll();
-	SetLexer(wxSCI_LEX_CPP);
+    StyleClearAll();
+    SetLexer(wxSCI_LEX_CPP);
 
-	// Load keywords
-	wxString path = wxT("../lexers/cg/keywords");
-	loadKeywords(path);
+    // Load keywords
+    wxString path = wxT("../lexers/cg/keywords");
+    loadKeywords(path);
 
-	// Load call tips
-	path = wxT("../lexers/cg/calltips");
-	getCallTipManager().load(path);
-	wxChar trigger('(');
-	getCallTipManager().addTrigger(trigger);
-	
-	// Set styles
-	StyleSetForeground(wxSCI_C_COMMENT, wxColour(0, 128, 0));
-	StyleSetFontAttr(wxSCI_C_COMMENT, 10, "Courier New", false, false, false);
-	StyleSetForeground(wxSCI_C_COMMENTLINE, wxColour(0, 128, 0));
-	StyleSetFontAttr(wxSCI_C_COMMENTLINE, 10, "Courier New", false, false, false);
-	StyleSetForeground(wxSCI_C_NUMBER, wxColour(0, 0, 128));
-	StyleSetFontAttr(wxSCI_C_NUMBER, 10, "Courier New", false, false, false);
-	StyleSetForeground(wxSCI_C_STRING, wxColour(200, 200, 200));
-	StyleSetFontAttr(wxSCI_C_STRING, 10, "Courier New", false, false, false);
-	StyleSetForeground(wxSCI_C_WORD, wxColour(0, 0, 255));
-	StyleSetFontAttr(wxSCI_C_WORD, 10, "Courier New", false, false, false);
-	StyleSetForeground(wxSCI_C_WORD2, wxColour(136, 0, 0));
-	StyleSetFontAttr(wxSCI_C_WORD2, 10, "Courier New", false, false, false);
+    // Load call tips
+    path = wxT("../lexers/cg/calltips");
+    getCallTipManager().load(path);
+    wxChar trigger('(');
+    getCallTipManager().addTrigger(trigger);
+    
+    // Set styles
+    StyleSetForeground(wxSCI_C_COMMENT, wxColour(0, 128, 0));
+    StyleSetFontAttr(wxSCI_C_COMMENT, 10, "Courier New", false, false, false);
+    StyleSetForeground(wxSCI_C_COMMENTLINE, wxColour(0, 128, 0));
+    StyleSetFontAttr(wxSCI_C_COMMENTLINE, 10, "Courier New", false, false, false);
+    StyleSetForeground(wxSCI_C_NUMBER, wxColour(0, 0, 128));
+    StyleSetFontAttr(wxSCI_C_NUMBER, 10, "Courier New", false, false, false);
+    StyleSetForeground(wxSCI_C_STRING, wxColour(200, 200, 200));
+    StyleSetFontAttr(wxSCI_C_STRING, 10, "Courier New", false, false, false);
+    StyleSetForeground(wxSCI_C_WORD, wxColour(0, 0, 255));
+    StyleSetFontAttr(wxSCI_C_WORD, 10, "Courier New", false, false, false);
+    StyleSetForeground(wxSCI_C_WORD2, wxColour(136, 0, 0));
+    StyleSetFontAttr(wxSCI_C_WORD2, 10, "Courier New", false, false, false);
 }
 
 void CgEditor::OnCharAdded(wxScintillaEvent &event)
 {
-	char ch = event.GetKey();
-	if(getCallTipManager().isTrigger(ch))
-	{
-		int lineNum = GetCurrentLine();
-		if(lineNum != -1)
-		{
-			wxString line = GetLine(lineNum);
-			int pos = GetCurrentPos() - 1;
+    char ch = event.GetKey();
+    if(getCallTipManager().isTrigger(ch))
+    {
+        int lineNum = GetCurrentLine();
+        if(lineNum != -1)
+        {
+            wxString line = GetLine(lineNum);
+            int pos = GetCurrentPos() - 1;
 
-			wxString word("");
-			wxChar ch;
-			while(pos)
-			{
-				ch = GetCharAt(--pos);
-				if(ch != ' ' || ch != '\n') word.Prepend(ch);
-				else break;
-			}
+            wxString word("");
+            wxChar ch;
+            while(pos)
+            {
+                ch = GetCharAt(--pos);
+                if(ch != ' ' || ch != '\n') word.Prepend(ch);
+                else break;
+            }
 
-			wxString* tips = getCallTipManager().find(word);
-			if(tips != NULL)
-			{
-				CallTipShow(pos, *tips);
-			}
-		}
-	}
+            wxString* tips = getCallTipManager().find(word);
+            if(tips != NULL)
+            {
+                CallTipShow(pos, *tips);
+            }
+        }
+    }
 }

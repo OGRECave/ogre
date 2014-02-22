@@ -89,26 +89,26 @@ namespace Ogre {
         /// Load the high-level part in a thread-safe way, required for delegate functionality
         void loadHighLevelSafe();
 
-		/// Recurse down structures getting data on parameters
-		void recurseParams(CGparameter param, size_t contextArraySize = 1);
-		/// Turn a Cg type into a GpuConstantType and number of elements
-		void mapTypeAndElementSize(CGtype cgType, bool isRegisterCombiner, GpuConstantDefinition& def) const;
+        /// Recurse down structures getting data on parameters
+        void recurseParams(CGparameter param, size_t contextArraySize = 1);
+        /// Turn a Cg type into a GpuConstantType and number of elements
+        void mapTypeAndElementSize(CGtype cgType, bool isRegisterCombiner, GpuConstantDefinition& def) const;
 
         StringVector mProfiles;
         String mEntryPoint;
         String mSelectedProfile;
-		String mProgramString;
+        String mProgramString;
         CGprofile mSelectedCgProfile;
         String mCompileArgs;
         // Unfortunately Cg uses char** for arguments - bleh
         // This is a null-terminated list of char* (each null terminated)
         char** mCgArguments;
-		
-		GpuConstantDefinitionMap mParametersMap;
-		size_t mParametersMapSizeAsBuffer;
+        
+        GpuConstantDefinitionMap mParametersMap;
+        size_t mParametersMapSizeAsBuffer;
         map<String,int>::type mSamplerRegisterMap;
         CGenum mInputOp, mOutputOp;
-		
+        
         /// Internal method which works out which profile to use for this program
         void selectProfile(void);
         /// Internal method which merges manual and automatic compile arguments
@@ -116,9 +116,9 @@ namespace Ogre {
         /// Releases memory for the horrible Cg char**
         void freeCgArgs(void);
 
-		void getMicrocodeFromCache(void);
-		void compileMicrocode(void);
-		void addMicrocodeToCache();
+        void getMicrocodeFromCache(void);
+        void compileMicrocode(void);
+        void addMicrocodeToCache();
 
     private:
         HighLevelGpuProgramPtr mDelegate;
@@ -167,8 +167,8 @@ namespace Ogre {
         size_t getSize(void) const;
         void touch(void);
 
-		/// Scan the file for #include and replace with source from the OGRE resources
-		static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
+        /// Scan the file for #include and replace with source from the OGRE resources
+        static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
     };
 }
 

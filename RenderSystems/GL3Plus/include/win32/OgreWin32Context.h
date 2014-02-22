@@ -42,14 +42,14 @@ namespace Ogre {
 
         /** See GL3PlusContext */
         virtual void setCurrent();
-		/** See GL3PlusContext */
-		virtual void endCurrent();
-		/// @copydoc GL3PlusContext::clone
-		GL3PlusContext* clone() const;
+        /** See GL3PlusContext */
+        virtual void endCurrent();
+        /// @copydoc GL3PlusContext::clone
+        GL3PlusContext* clone() const;
 
-		virtual void releaseContext();
+        virtual void releaseContext();
 
-	protected:
+    protected:
         HDC     mHDC;
         HGLRC   mGlrc;
     };

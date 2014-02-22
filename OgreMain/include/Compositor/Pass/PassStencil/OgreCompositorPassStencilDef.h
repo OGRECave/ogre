@@ -36,33 +36,33 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	enum CompareFunction;
-	enum StencilOperation;
+    enum CompareFunction;
+    enum StencilOperation;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
-	class _OgreExport CompositorPassStencilDef : public CompositorPassDef
-	{
-	public:
-		bool					mStencilCheck;
-		bool					mTwoSided;
-		StencilOperation		mStencilPassOp;
-		StencilOperation		mStencilFailOp;
-		StencilOperation		mStencilDepthFailOp;
-		CompareFunction			mCompareFunc;
-		uint32					mStencilMask;
-		uint32					mStencilRef;
+    class _OgreExport CompositorPassStencilDef : public CompositorPassDef
+    {
+    public:
+        bool                    mStencilCheck;
+        bool                    mTwoSided;
+        StencilOperation        mStencilPassOp;
+        StencilOperation        mStencilFailOp;
+        StencilOperation        mStencilDepthFailOp;
+        CompareFunction         mCompareFunc;
+        uint32                  mStencilMask;
+        uint32                  mStencilRef;
 
-		CompositorPassStencilDef( uint32 rtIndex );
-	};
+        CompositorPassStencilDef( uint32 rtIndex );
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

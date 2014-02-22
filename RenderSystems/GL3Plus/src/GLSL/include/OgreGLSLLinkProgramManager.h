@@ -38,81 +38,81 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-	/** Ogre assumes that there are separate vertex and fragment programs to deal with but
-		GLSL has one program object that represents the active vertex and fragment shader objects
-		during a rendering state.  GLSL Vertex and fragment 
-		shader objects are compiled separately and then attached to a program object and then the
-		program object is linked.  Since Ogre can only handle one vertex program and one fragment
-		program being active in a pass, the GLSL Link Program Manager does the same.  The GLSL Link
-		program manager acts as a state machine and activates a program object based on the active
-		vertex and fragment program.  Previously created program objects are stored along with a unique
-		key in a hash_map for quick retrieval the next time the program object is required.
+    /** Ogre assumes that there are separate vertex and fragment programs to deal with but
+        GLSL has one program object that represents the active vertex and fragment shader objects
+        during a rendering state.  GLSL Vertex and fragment 
+        shader objects are compiled separately and then attached to a program object and then the
+        program object is linked.  Since Ogre can only handle one vertex program and one fragment
+        program being active in a pass, the GLSL Link Program Manager does the same.  The GLSL Link
+        program manager acts as a state machine and activates a program object based on the active
+        vertex and fragment program.  Previously created program objects are stored along with a unique
+        key in a hash_map for quick retrieval the next time the program object is required.
 
-	*/
+    */
 
-	class _OgreGL3PlusExport GLSLLinkProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLLinkProgramManager>
-	{
+    class _OgreGL3PlusExport GLSLLinkProgramManager : public GLSLProgramManagerCommon, public Singleton<GLSLLinkProgramManager>
+    {
 
-	private:
-	
-		typedef map<uint32, GLSLLinkProgram*>::type LinkProgramMap;
-		typedef LinkProgramMap::iterator LinkProgramIterator;
+    private:
+    
+        typedef map<uint32, GLSLLinkProgram*>::type LinkProgramMap;
+        typedef LinkProgramMap::iterator LinkProgramIterator;
 
-		/// container holding previously created program objects 
-		LinkProgramMap mLinkPrograms; 
+        /// container holding previously created program objects 
+        LinkProgramMap mLinkPrograms; 
 
-		/// active objects defining the active rendering gpu state
-		GLSLLinkProgram* mActiveLinkProgram;
+        /// active objects defining the active rendering gpu state
+        GLSLLinkProgram* mActiveLinkProgram;
 
-		typedef map<String, GLenum>::type StringToEnumMap;
-		StringToEnumMap mTypeEnumMap;
+        typedef map<String, GLenum>::type StringToEnumMap;
+        StringToEnumMap mTypeEnumMap;
 
-	public:
+    public:
 
-		GLSLLinkProgramManager(void);
+        GLSLLinkProgramManager(void);
 
-		~GLSLLinkProgramManager(void);
+        ~GLSLLinkProgramManager(void);
 
-		/**
-			Get the program object that links the two active shader objects together
-			if a program object was not already created and linked a new one is created and linked
-		*/
-		GLSLLinkProgram* getActiveLinkProgram(void);
+        /**
+            Get the program object that links the two active shader objects together
+            if a program object was not already created and linked a new one is created and linked
+        */
+        GLSLLinkProgram* getActiveLinkProgram(void);
 
-		/** Set the active fragment shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
-		*/
-		void setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram);
-		/** Set the active geometry shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
-		*/
-		void setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram);
-		/** Set the active vertex shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
-		*/
-		void setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram);
-		/** Set the active hull(control) shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
-		*/
-		void setActiveHullShader(GLSLGpuProgram* hullGpuProgram);
-		/** Set the active domain(evaluation) shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
-		*/
-		void setActiveDomainShader(GLSLGpuProgram* domainGpuProgram);
-   		/** Set the active compute shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
-		*/
-		void setActiveComputeShader(GLSLGpuProgram* computeGpuProgram);
+        /** Set the active fragment shader for the next rendering state.
+            The active program object will be cleared.
+            Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
+        */
+        void setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram);
+        /** Set the active geometry shader for the next rendering state.
+            The active program object will be cleared.
+            Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
+        */
+        void setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram);
+        /** Set the active vertex shader for the next rendering state.
+            The active program object will be cleared.
+            Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
+        */
+        void setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram);
+        /** Set the active hull(control) shader for the next rendering state.
+            The active program object will be cleared.
+            Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
+        */
+        void setActiveHullShader(GLSLGpuProgram* hullGpuProgram);
+        /** Set the active domain(evaluation) shader for the next rendering state.
+            The active program object will be cleared.
+            Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
+        */
+        void setActiveDomainShader(GLSLGpuProgram* domainGpuProgram);
+        /** Set the active compute shader for the next rendering state.
+            The active program object will be cleared.
+            Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
+        */
+        void setActiveComputeShader(GLSLGpuProgram* computeGpuProgram);
 
-		static GLSLLinkProgramManager& getSingleton(void);
+        static GLSLLinkProgramManager& getSingleton(void);
         static GLSLLinkProgramManager* getSingletonPtr(void);
-	};
+    };
 
 }
 

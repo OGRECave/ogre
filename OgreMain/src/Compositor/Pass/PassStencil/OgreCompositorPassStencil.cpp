@@ -38,50 +38,50 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	CompositorPassStencilDef::CompositorPassStencilDef( uint32 rtIndex ) :
-			CompositorPassDef( PASS_STENCIL, rtIndex ),
-			mStencilCheck( false ),
-			mTwoSided( false ),
-			mStencilPassOp( SOP_KEEP ),
-			mStencilFailOp( SOP_KEEP ),
-			mStencilDepthFailOp( SOP_KEEP ),
-			mCompareFunc( CMPF_ALWAYS_PASS ),
-			mStencilMask( 0xFFFFFFFF ),
-			mStencilRef( 0 )
-	{
-	}
-	//-----------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------
-	CompositorPassStencil::CompositorPassStencil( const CompositorPassStencilDef *definition,
-													const CompositorChannel &target,
-													CompositorNode *parentNode,
-													RenderSystem *renderSystem ) :
-				CompositorPass( definition, target, parentNode ),
-				mDefinition( definition ),
-				mRenderSystem( renderSystem )
-	{
-	}
-	//-----------------------------------------------------------------------------------
-	void CompositorPassStencil::execute( const Camera *lodCamera )
-	{
-		//Execute a limited number of times?
-		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
-		{
-			if( !mNumPassesLeft )
-				return;
-			--mNumPassesLeft;
-		}
+    CompositorPassStencilDef::CompositorPassStencilDef( uint32 rtIndex ) :
+            CompositorPassDef( PASS_STENCIL, rtIndex ),
+            mStencilCheck( false ),
+            mTwoSided( false ),
+            mStencilPassOp( SOP_KEEP ),
+            mStencilFailOp( SOP_KEEP ),
+            mStencilDepthFailOp( SOP_KEEP ),
+            mCompareFunc( CMPF_ALWAYS_PASS ),
+            mStencilMask( 0xFFFFFFFF ),
+            mStencilRef( 0 )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    CompositorPassStencil::CompositorPassStencil( const CompositorPassStencilDef *definition,
+                                                    const CompositorChannel &target,
+                                                    CompositorNode *parentNode,
+                                                    RenderSystem *renderSystem ) :
+                CompositorPass( definition, target, parentNode ),
+                mDefinition( definition ),
+                mRenderSystem( renderSystem )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassStencil::execute( const Camera *lodCamera )
+    {
+        //Execute a limited number of times?
+        if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
+        {
+            if( !mNumPassesLeft )
+                return;
+            --mNumPassesLeft;
+        }
 
-		//Fire the listener in case it wants to change anything
-		CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
-		if( listener )
-			listener->passPreExecute( this );
+        //Fire the listener in case it wants to change anything
+        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+        if( listener )
+            listener->passPreExecute( this );
 
-		mRenderSystem->setStencilCheckEnabled( mDefinition->mStencilCheck );
-		mRenderSystem->setStencilBufferParams( mDefinition->mCompareFunc, mDefinition->mStencilRef,
-									mDefinition->mStencilMask, 0xFFFFFFFF, mDefinition->mStencilFailOp,
-									mDefinition->mStencilDepthFailOp, mDefinition->mStencilPassOp,
-									mDefinition->mTwoSided );
-	}
+        mRenderSystem->setStencilCheckEnabled( mDefinition->mStencilCheck );
+        mRenderSystem->setStencilBufferParams( mDefinition->mCompareFunc, mDefinition->mStencilRef,
+                                    mDefinition->mStencilMask, 0xFFFFFFFF, mDefinition->mStencilFailOp,
+                                    mDefinition->mStencilDepthFailOp, mDefinition->mStencilPassOp,
+                                    mDefinition->mTwoSided );
+    }
 }

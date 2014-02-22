@@ -127,8 +127,8 @@ namespace Ogre {
             bool activateGLTextureUnit(size_t unit);
             bool activateGLClientTextureUnit(size_t unit);
 
-			// Mipmap count of the actual bounded texture
-			size_t mCurTexMipCount;
+            // Mipmap count of the actual bounded texture
+            size_t mCurTexMipCount;
         public:
             // Default constructor / destructor
             GLESRenderSystem();
@@ -387,11 +387,11 @@ namespace Ogre {
              RenderSystem
              */
             void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
-			/** See
+            /** See
              RenderSystem
              */
-			virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-				FilterOptions magFilter, FilterOptions mipFilter);
+            virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
+                FilterOptions magFilter, FilterOptions mipFilter);
             /** See
              RenderSystem
              */
@@ -476,14 +476,14 @@ namespace Ogre {
             void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
             void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
-			/// @copydoc RenderSystem::_setSceneBlending
-			void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
-			/// @copydoc RenderSystem::_setSeparateSceneBlending
-			void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
-			/// @copydoc RenderSystem::_setAlphaRejectSettings
-			void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
-			/// @copydoc RenderSystem::getDisplayMonitorCount
-			unsigned int getDisplayMonitorCount() const;
+            /// @copydoc RenderSystem::_setSceneBlending
+            void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
+            /// @copydoc RenderSystem::_setSeparateSceneBlending
+            void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
+            /// @copydoc RenderSystem::_setAlphaRejectSettings
+            void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
+            /// @copydoc RenderSystem::getDisplayMonitorCount
+            unsigned int getDisplayMonitorCount() const;
 
             /// Internal method for anisotropy validation
             GLfloat _getCurrentAnisotropy(size_t unit);

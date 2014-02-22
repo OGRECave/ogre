@@ -68,40 +68,40 @@ BEGIN_EVENT_TABLE(PropertiesPanel, wxPanel)
 END_EVENT_TABLE()
 
 PropertiesPanel::PropertiesPanel(wxWindow* parent,
-							   wxWindowID id /* = wxID_ANY */,
-							   const wxPoint& pos /* = wxDefaultPosition */,
-							   const wxSize& size /* = wxDefaultSize */,
-							   long style /* = wxTAB_TRAVERSAL | wxNO_BORDER */,
-							   const wxString& name /* = wxT("Workspace Panel")) */)
-							   : wxPanel(parent, id, pos, size, style, name)
+                               wxWindowID id /* = wxID_ANY */,
+                               const wxPoint& pos /* = wxDefaultPosition */,
+                               const wxSize& size /* = wxDefaultSize */,
+                               long style /* = wxTAB_TRAVERSAL | wxNO_BORDER */,
+                               const wxString& name /* = wxT("Workspace Panel")) */)
+                               : wxPanel(parent, id, pos, size, style, name)
 {
-	mGridSizer = new wxGridSizer(1, 1, 0, 0);
+    mGridSizer = new wxGridSizer(1, 1, 0, 0);
 
-	mPropertyGrid = new wxPropertyGridManager(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-		wxPG_BOLD_MODIFIED | wxPG_SPLITTER_AUTO_CENTER | wxPG_DESCRIPTION | wxPGMAN_DEFAULT_STYLE);
+    mPropertyGrid = new wxPropertyGridManager(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+        wxPG_BOLD_MODIFIED | wxPG_SPLITTER_AUTO_CENTER | wxPG_DESCRIPTION | wxPGMAN_DEFAULT_STYLE);
 
-	// Adding a page sets target page to the one added, so
-	// we don't have to call SetTargetPage if we are filling
-	// it right after adding.
-	//MaterialController* controller = new MaterialController((MaterialPtr)MaterialManager::getSingletonPtr()->create("Test", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
-	//TechniqueController* tc = controller->createTechnique();
-	//PassController* pc = tc->createPass();
-	//PassPropertyGridPage* page = new PassPropertyGridPage(pc);
-	//TechniquePropertyGridPage* page = new TechniquePropertyGridPage(tc);
-	//MaterialPropertyGridPage* page = new MaterialPropertyGridPage(controller);
-	//mPropertyGrid->AddPage(wxEmptyString, wxPG_NULL_BITMAP, page);
-	//page->populate();
+    // Adding a page sets target page to the one added, so
+    // we don't have to call SetTargetPage if we are filling
+    // it right after adding.
+    //MaterialController* controller = new MaterialController((MaterialPtr)MaterialManager::getSingletonPtr()->create("Test", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
+    //TechniqueController* tc = controller->createTechnique();
+    //PassController* pc = tc->createPass();
+    //PassPropertyGridPage* page = new PassPropertyGridPage(pc);
+    //TechniquePropertyGridPage* page = new TechniquePropertyGridPage(tc);
+    //MaterialPropertyGridPage* page = new MaterialPropertyGridPage(controller);
+    //mPropertyGrid->AddPage(wxEmptyString, wxPG_NULL_BITMAP, page);
+    //page->populate();
 
-	// For total safety, finally reset the target page.
-	//mPropertyGrid->SetTargetPage(0);
+    // For total safety, finally reset the target page.
+    //mPropertyGrid->SetTargetPage(0);
 
-	mGridSizer->Add(mPropertyGrid, 0, wxALL | wxEXPAND, 0);
+    mGridSizer->Add(mPropertyGrid, 0, wxALL | wxEXPAND, 0);
 
-	SetSizer(mGridSizer);
-	Layout();
+    SetSizer(mGridSizer);
+    Layout();
 
-	SelectionService::getSingletonPtr()->subscribe(SelectionService::SelectionChanged, boost::bind(&PropertiesPanel::selectionChanged, this, _1));
-	Workspace::getSingletonPtr()->subscribe(Workspace::ProjectRemoved, boost::bind(&PropertiesPanel::projectRemoved, this, _1));
+    SelectionService::getSingletonPtr()->subscribe(SelectionService::SelectionChanged, boost::bind(&PropertiesPanel::selectionChanged, this, _1));
+    Workspace::getSingletonPtr()->subscribe(Workspace::ProjectRemoved, boost::bind(&PropertiesPanel::projectRemoved, this, _1));
 }
 
 PropertiesPanel::~PropertiesPanel()
@@ -110,134 +110,134 @@ PropertiesPanel::~PropertiesPanel()
 
 void PropertiesPanel::selectionChanged(EventArgs& args)
 {
-	SelectionEventArgs sea = dynamic_cast<SelectionEventArgs&>(args);
-	SelectionList selection = sea.getSelection();
-	if(!selection.empty())
-	{
-		boost::any sel = selection.front();
-		if(sel.type() == typeid(Project))
-		{
-		}
-		else if(sel.type() == typeid(MaterialController*))
-		{
-			MaterialController* mc = any_cast<MaterialController*>(sel);
+    SelectionEventArgs sea = dynamic_cast<SelectionEventArgs&>(args);
+    SelectionList selection = sea.getSelection();
+    if(!selection.empty())
+    {
+        boost::any sel = selection.front();
+        if(sel.type() == typeid(Project))
+        {
+        }
+        else if(sel.type() == typeid(MaterialController*))
+        {
+            MaterialController* mc = any_cast<MaterialController*>(sel);
 
-			MaterialPageIndexMap::iterator it = mMaterialPageIndexMap.find(mc);
-			if(it != mMaterialPageIndexMap.end())
-			{
-				int index = mMaterialPageIndexMap[mc];
-				mPropertyGrid->SelectPage(index);
-			}
-			else
-			{
-				MaterialPropertyGridPage* page = new MaterialPropertyGridPage(mc);
+            MaterialPageIndexMap::iterator it = mMaterialPageIndexMap.find(mc);
+            if(it != mMaterialPageIndexMap.end())
+            {
+                int index = mMaterialPageIndexMap[mc];
+                mPropertyGrid->SelectPage(index);
+            }
+            else
+            {
+                MaterialPropertyGridPage* page = new MaterialPropertyGridPage(mc);
 
-				int index = mPropertyGrid->AddPage(wxEmptyString, wxPG_NULL_BITMAP, page);
-				page->populate();
+                int index = mPropertyGrid->AddPage(wxEmptyString, wxPG_NULL_BITMAP, page);
+                page->populate();
 
-				mMaterialPageIndexMap[mc] = index;
+                mMaterialPageIndexMap[mc] = index;
 
-				mPropertyGrid->SelectPage(index);
-			}
-		}
-		else if(sel.type() == typeid(TechniqueController*))
-		{
-			TechniqueController* tc = any_cast<TechniqueController*>(sel);
+                mPropertyGrid->SelectPage(index);
+            }
+        }
+        else if(sel.type() == typeid(TechniqueController*))
+        {
+            TechniqueController* tc = any_cast<TechniqueController*>(sel);
 
-			TechniquePageIndexMap::iterator it = mTechniquePageIndexMap.find(tc);
-			if(it != mTechniquePageIndexMap.end())
-			{
-				int index = mTechniquePageIndexMap[tc];
-				mPropertyGrid->SelectPage(index);
-			}
-			else
-			{
-				TechniquePropertyGridPage* page = new TechniquePropertyGridPage(tc);
+            TechniquePageIndexMap::iterator it = mTechniquePageIndexMap.find(tc);
+            if(it != mTechniquePageIndexMap.end())
+            {
+                int index = mTechniquePageIndexMap[tc];
+                mPropertyGrid->SelectPage(index);
+            }
+            else
+            {
+                TechniquePropertyGridPage* page = new TechniquePropertyGridPage(tc);
 
-				int index = mPropertyGrid->AddPage(wxEmptyString, wxPG_NULL_BITMAP, page);
-				page->populate();
+                int index = mPropertyGrid->AddPage(wxEmptyString, wxPG_NULL_BITMAP, page);
+                page->populate();
 
-				mTechniquePageIndexMap[tc] = index;
+                mTechniquePageIndexMap[tc] = index;
 
-				mPropertyGrid->SelectPage(index);
-			}
-		}
-		else if(sel.type() == typeid(PassController*))
-		{
-			PassController* pc = any_cast<PassController*>(sel);
+                mPropertyGrid->SelectPage(index);
+            }
+        }
+        else if(sel.type() == typeid(PassController*))
+        {
+            PassController* pc = any_cast<PassController*>(sel);
 
-			PassPageIndexMap::iterator it = mPassPageIndexMap.find(pc);
-			if(it != mPassPageIndexMap.end())
-			{
-				int index = mPassPageIndexMap[pc];
-				mPropertyGrid->SelectPage(index);
-			}
-			else
-			{
-				PassPropertyGridPage* page = new PassPropertyGridPage(pc);
+            PassPageIndexMap::iterator it = mPassPageIndexMap.find(pc);
+            if(it != mPassPageIndexMap.end())
+            {
+                int index = mPassPageIndexMap[pc];
+                mPropertyGrid->SelectPage(index);
+            }
+            else
+            {
+                PassPropertyGridPage* page = new PassPropertyGridPage(pc);
 
-				int index = mPropertyGrid->AddPage(wxEmptyString, wxPG_NULL_BITMAP, page);
-				page->populate();
+                int index = mPropertyGrid->AddPage(wxEmptyString, wxPG_NULL_BITMAP, page);
+                page->populate();
 
-				mPassPageIndexMap[pc] = index;
+                mPassPageIndexMap[pc] = index;
 
-				mPropertyGrid->SelectPage(index);
-			}
-		}
+                mPropertyGrid->SelectPage(index);
+            }
+        }
 
-		mPropertyGrid->Refresh();
-	}
+        mPropertyGrid->Refresh();
+    }
 }
 
 void PropertiesPanel::projectRemoved(EventArgs& args)
 {
-	// Consider: Should this method also attempt to remove all
-	//           of the page associated with this Projects, 
-	//           Materials, Techniques, and Passes?
+    // Consider: Should this method also attempt to remove all
+    //           of the page associated with this Projects, 
+    //           Materials, Techniques, and Passes?
 }
 
 void PropertiesPanel::materialRemoved(EventArgs& args)
 {
-	// Consider: Should this method also attempt to remove all
-	//           of the page associated with this Materials, Techniques,
-	//           and Passes?
+    // Consider: Should this method also attempt to remove all
+    //           of the page associated with this Materials, Techniques,
+    //           and Passes?
 
-	ProjectEventArgs pea = dynamic_cast<ProjectEventArgs&>(args);
-	MaterialController* mc = pea.getMaterial();
+    ProjectEventArgs pea = dynamic_cast<ProjectEventArgs&>(args);
+    MaterialController* mc = pea.getMaterial();
 
-	MaterialPageIndexMap::iterator it = mMaterialPageIndexMap.find(mc);
-	if(it != mMaterialPageIndexMap.end())
-	{
-		mPropertyGrid->RemovePage(mMaterialPageIndexMap[mc]);
-		mMaterialPageIndexMap.erase(it);
-	}
+    MaterialPageIndexMap::iterator it = mMaterialPageIndexMap.find(mc);
+    if(it != mMaterialPageIndexMap.end())
+    {
+        mPropertyGrid->RemovePage(mMaterialPageIndexMap[mc]);
+        mMaterialPageIndexMap.erase(it);
+    }
 }
 
 void PropertiesPanel::techniqueRemoved(EventArgs& args)
 {
-	// Consider: Should this method also attempt to remove all
-	//           of the page associated with this Techniques, Passes?
+    // Consider: Should this method also attempt to remove all
+    //           of the page associated with this Techniques, Passes?
 
-	MaterialEventArgs mea = dynamic_cast<MaterialEventArgs&>(args);
-	TechniqueController* tc = mea.getTechniqueController();
+    MaterialEventArgs mea = dynamic_cast<MaterialEventArgs&>(args);
+    TechniqueController* tc = mea.getTechniqueController();
 
-	TechniquePageIndexMap::iterator it = mTechniquePageIndexMap.find(tc);
-	if(it != mTechniquePageIndexMap.end())
-	{
-		mPropertyGrid->RemovePage(mTechniquePageIndexMap[tc]);
-		mTechniquePageIndexMap.erase(it);
-	}
+    TechniquePageIndexMap::iterator it = mTechniquePageIndexMap.find(tc);
+    if(it != mTechniquePageIndexMap.end())
+    {
+        mPropertyGrid->RemovePage(mTechniquePageIndexMap[tc]);
+        mTechniquePageIndexMap.erase(it);
+    }
 }
 
 void PropertiesPanel::passRemoved(EventArgs& args)
 {
-	TechniqueEventArgs tea = dynamic_cast<TechniqueEventArgs&>(args);
-	PassController* pc = tea.getPassController();
+    TechniqueEventArgs tea = dynamic_cast<TechniqueEventArgs&>(args);
+    PassController* pc = tea.getPassController();
 
-	PassPageIndexMap::iterator it = mPassPageIndexMap.find(pc);
-	if(it != mPassPageIndexMap.end())
-	{
-		mPropertyGrid->RemovePage(mPassPageIndexMap[pc]);
-		mPassPageIndexMap.erase(it);
-	}
+    PassPageIndexMap::iterator it = mPassPageIndexMap.find(pc);
+    if(it != mPassPageIndexMap.end())
+    {
+        mPropertyGrid->RemovePage(mPassPageIndexMap[pc]);
+        mPassPageIndexMap.erase(it);
+    }
 }

@@ -44,11 +44,11 @@ THE SOFTWARE.
 #endif
 
 #if OGRE_THREAD_SUPPORT == 1
-#   define D3D9_DEVICE_ACCESS_LOCK				OGRE_LOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
-#   define D3D9_DEVICE_ACCESS_UNLOCK			OGRE_UNLOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
-#   define D3D9_DEVICE_ACCESS_CRITICAL_SECTION	OGRE_LOCK_MUTEX(msDeviceAccessMutex);
+#   define D3D9_DEVICE_ACCESS_LOCK              OGRE_LOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
+#   define D3D9_DEVICE_ACCESS_UNLOCK            OGRE_UNLOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
+#   define D3D9_DEVICE_ACCESS_CRITICAL_SECTION  OGRE_LOCK_MUTEX(msDeviceAccessMutex);
 #else
-#   define D3D9_DEVICE_ACCESS_LOCK	
+#   define D3D9_DEVICE_ACCESS_LOCK  
 #   define D3D9_DEVICE_ACCESS_UNLOCK
 #   define D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 #endif
@@ -63,12 +63,12 @@ THE SOFTWARE.
 
 // enable extended d3d debug 
 #if OGRE_DEBUG_MODE
-#	define D3D_DEBUG_INFO
+#   define D3D_DEBUG_INFO
 #endif
 
 #define WIN32_LEAN_AND_MEAN
 #if !defined(NOMINMAX) && defined(_MSC_VER)
-#	define NOMINMAX // required to stop windows.h messing up std::min
+#   define NOMINMAX // required to stop windows.h messing up std::min
 #endif
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -77,24 +77,24 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	// Predefine classes
-	class D3D9DepthBuffer;
-	class D3D9RenderSystem;
-	class D3D9RenderWindow;
-	class D3D9Texture;
-	class D3D9TextureManager;
-	class D3D9Driver;
-	class D3D9DriverList;
-	class D3D9VideoMode;
-	class D3D9VideoModeList;
-	class D3D9GpuProgram;
-	class D3D9GpuProgramManager;
+    // Predefine classes
+    class D3D9DepthBuffer;
+    class D3D9RenderSystem;
+    class D3D9RenderWindow;
+    class D3D9Texture;
+    class D3D9TextureManager;
+    class D3D9Driver;
+    class D3D9DriverList;
+    class D3D9VideoMode;
+    class D3D9VideoModeList;
+    class D3D9GpuProgram;
+    class D3D9GpuProgramManager;
     class D3D9HardwareBufferManager;
     class D3D9HardwareIndexBuffer;
     class D3D9HLSLProgramFactory;
     class D3D9HLSLProgram;
     class D3D9VertexDeclaration;
-	class D3D9Resource;
+    class D3D9Resource;
 
     typedef SharedPtr<D3D9GpuProgram>  D3D9GpuProgramPtr;
     typedef SharedPtr<D3D9HLSLProgram> D3D9HLSLProgramPtr;
@@ -106,20 +106,20 @@ namespace Ogre
 #define OGRE_D3D_MANAGE_BUFFERS 1
 
     //-------------------------------------------
-	// Windows setttings
-	//-------------------------------------------
+    // Windows setttings
+    //-------------------------------------------
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)
-#	ifdef OGRED3DENGINEDLL_EXPORTS
-#		define _OgreD3D9Export __declspec(dllexport)
-#	else
+#   ifdef OGRED3DENGINEDLL_EXPORTS
+#       define _OgreD3D9Export __declspec(dllexport)
+#   else
 #       if defined( __MINGW32__ )
 #           define _OgreD3D9Export
 #       else
-#    		define _OgreD3D9Export __declspec(dllimport)
+#           define _OgreD3D9Export __declspec(dllimport)
 #       endif
-#	endif
+#   endif
 #else
-#	define _OgreD3D9Export
-#endif	// OGRE_WIN32
+#   define _OgreD3D9Export
+#endif  // OGRE_WIN32
 }
 #endif

@@ -34,52 +34,52 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class _OgreExport SkeletonAnimationDef : public AnimationAlloc
-	{
-		friend class SkeletonAnimation;
-	protected:
-		SkeletonTrackVec	mTracks;
-		/** Number of frames. May not equal the number of keyframes
-			(i.e. remain stationary at the end for a long time).
-		*/
-		Real				mNumFrames;
-		Real				mOriginalFrameRate;
-		/** Converts bone index to consecutive slot (@see SkeletonAnimation::mBoneWeights).
-			The parent level depth is in the last 8 bits
-		*/
-		map<IdString, size_t>::type	mBoneToWeights;
-		String				mName;
+    class _OgreExport SkeletonAnimationDef : public AnimationAlloc
+    {
+        friend class SkeletonAnimation;
+    protected:
+        SkeletonTrackVec    mTracks;
+        /** Number of frames. May not equal the number of keyframes
+            (i.e. remain stationary at the end for a long time).
+        */
+        Real                mNumFrames;
+        Real                mOriginalFrameRate;
+        /** Converts bone index to consecutive slot (@see SkeletonAnimation::mBoneWeights).
+            The parent level depth is in the last 8 bits
+        */
+        map<IdString, size_t>::type mBoneToWeights;
+        String              mName;
 
-		KfTransformArrayMemoryManager *mKfTransformMemoryManager;
+        KfTransformArrayMemoryManager *mKfTransformMemoryManager;
 
-		inline uint32 slotToBlockIdx( uint32 slotIdx ) const;
+        inline uint32 slotToBlockIdx( uint32 slotIdx ) const;
 
-		typedef vector<Real>::type TimestampVec;
-		typedef map<size_t, TimestampVec>::type TimestampsPerBlock;
+        typedef vector<Real>::type TimestampVec;
+        typedef map<size_t, TimestampVec>::type TimestampsPerBlock;
 
-		/** Allocates enough memory in mKfTransformMemoryManager, creates all the mTracks
-			(one per each entry in timestampsByBlock), and allocates all the keyframes
-			from each track in a cache friendly manner, according to the usage pattern
-			we'll be going to do.
-		@param timestampsByBlock
-			A map with block index as key; and as value an array of unique time stamps
-			(a time stamp = one keyframe)
-		@param frameRate
-			The original recording framerate.
-		*/
-		void allocateCacheFriendlyKeyframes( const TimestampsPerBlock &timestampsByBlock,
-											 Real frameRate );
+        /** Allocates enough memory in mKfTransformMemoryManager, creates all the mTracks
+            (one per each entry in timestampsByBlock), and allocates all the keyframes
+            from each track in a cache friendly manner, according to the usage pattern
+            we'll be going to do.
+        @param timestampsByBlock
+            A map with block index as key; and as value an array of unique time stamps
+            (a time stamp = one keyframe)
+        @param frameRate
+            The original recording framerate.
+        */
+        void allocateCacheFriendlyKeyframes( const TimestampsPerBlock &timestampsByBlock,
+                                             Real frameRate );
 
-	public:
-		SkeletonAnimationDef();
-		~SkeletonAnimationDef();
+    public:
+        SkeletonAnimationDef();
+        ~SkeletonAnimationDef();
 
-		void setName( const String &name )								{ mName = name; }
+        void setName( const String &name )                              { mName = name; }
 
-		void build( const Skeleton *skeleton, const Animation *animation, Real frameRate );
-	};
+        void build( const Skeleton *skeleton, const Animation *animation, Real frameRate );
+    };
 
-	typedef vector<SkeletonAnimationDef>::type SkeletonAnimationDefVec;
+    typedef vector<SkeletonAnimationDef>::type SkeletonAnimationDefVec;
 }
 
 #endif

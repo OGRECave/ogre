@@ -36,13 +36,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Class representing a node in the scene graph.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Class representing a node in the scene graph.
         @remarks
             A SceneNode is a type of Node which is used to organise objects in a scene.
             It has the same hierarchical transformation properties of the generic Node class,
@@ -54,9 +54,9 @@ namespace Ogre {
     class _OgreExport SceneNode : public Node
     {
     public:
-		typedef vector<MovableObject*>::type ObjectVec;
+        typedef vector<MovableObject*>::type ObjectVec;
         typedef VectorIterator<ObjectVec> ObjectIterator;
-		typedef ConstVectorIterator<ObjectVec> ConstObjectIterator;
+        typedef ConstVectorIterator<ObjectVec> ConstObjectIterator;
 
     protected:
         ObjectVec mAttachments;
@@ -75,7 +75,7 @@ namespace Ogre {
         /// Fixed axis to yaw around
         Vector3 mYawFixedAxis;
 
-		//TODO: Move auto tracking out of here. dark_sylinc
+        //TODO: Move auto tracking out of here. dark_sylinc
         /// Auto tracking target
         SceneNode* mAutoTrackTarget;
         /// Tracking offset for fine tuning
@@ -83,29 +83,29 @@ namespace Ogre {
         /// Local 'normal' direction vector
         Vector3 mAutoTrackLocalDirection;
 
-		/** Retrieves a the iterator to an attached object.
+        /** Retrieves a the iterator to an attached object.
         @remarks Retrieves by object name, see alternate version to retrieve by index.
-		Retrieving by name forces a linear search O(N), prefer using the index, which is O(1)
+        Retrieving by name forces a linear search O(N), prefer using the index, which is O(1)
         */
-		ObjectVec::iterator getAttachedObjectIt( const String& name );
-		ObjectVec::const_iterator getAttachedObjectIt( const String& name ) const;
+        ObjectVec::iterator getAttachedObjectIt( const String& name );
+        ObjectVec::const_iterator getAttachedObjectIt( const String& name ) const;
     public:
         /** Constructor, only to be called by the creator SceneManager. */
-		SceneNode( IdType id, SceneManager* creator, NodeMemoryManager *nodeMemoryManager,
-					SceneNode *parent );
+        SceneNode( IdType id, SceneManager* creator, NodeMemoryManager *nodeMemoryManager,
+                    SceneNode *parent );
 
-		/** Don't use this constructor unless you know what you're doing.
-			@See NodeMemoryManager::mDummyNode
-		*/
-		SceneNode( const Transform &transformPtrs );
+        /** Don't use this constructor unless you know what you're doing.
+            @See NodeMemoryManager::mDummyNode
+        */
+        SceneNode( const Transform &transformPtrs );
 
         virtual ~SceneNode();
 
-		/// @copydoc Node::setStatic
-		virtual bool setStatic( bool bStatic );
+        /// @copydoc Node::setStatic
+        virtual bool setStatic( bool bStatic );
 
-		/// @copydoc Node::_notifyStaticDirty
-		virtual void _notifyStaticDirty(void) const;
+        /// @copydoc Node::_notifyStaticDirty
+        virtual void _notifyStaticDirty(void) const;
 
         /** Adds an instance of a scene object to this node.
         @remarks
@@ -116,32 +116,32 @@ namespace Ogre {
 
         /** Reports the number of objects attached to this node.
         */
-		size_t numAttachedObjects(void) const						{ return mAttachments.size(); }
+        size_t numAttachedObjects(void) const                       { return mAttachments.size(); }
 
         /** Retrieves a pointer to an attached object.
         @remarks Retrieves by index, see alternate version to retrieve by name. The index
         of an object may change as other objects are added / removed.
         */
-		MovableObject* getAttachedObject( size_t index )			{ return mAttachments[index]; }
+        MovableObject* getAttachedObject( size_t index )            { return mAttachments[index]; }
 
         /** Retrieves a pointer to an attached object.
         @remarks Retrieves by object name, see alternate version to retrieve by index.
-		Retrieving by name forces a linear search O(N), prefer using the index, which is O(1)
+        Retrieving by name forces a linear search O(N), prefer using the index, which is O(1)
         */
         MovableObject* getAttachedObject( const String& name );
 
         /** Detaches an object by pointer.
-		@remarks
-			It's fast, takes only O(1)
-		*/
+        @remarks
+            It's fast, takes only O(1)
+        */
         virtual_l2 void detachObject(MovableObject* obj);
 
         /** Detaches all objects attached to this node.
         */
         virtual void detachAllObjects(void);
 
-		/// @copydoc Node::_callMemoryChangeListeners
-		virtual void _callMemoryChangeListeners(void);
+        /// @copydoc Node::_callMemoryChangeListeners
+        virtual void _callMemoryChangeListeners(void);
 
         /** Retrieves an iterator which can be used to efficiently step through the objects 
             attached to this node.
@@ -164,7 +164,7 @@ namespace Ogre {
             until the end, or retrieve a new iterator after making the change. Making changes to
             the object returned through the iterator is OK though.
         */
-		virtual ConstObjectIterator getAttachedObjectIterator(void) const;
+        virtual ConstObjectIterator getAttachedObjectIterator(void) const;
 
         /** Gets the creator of this scene node. 
         @remarks
@@ -173,7 +173,7 @@ namespace Ogre {
         */
         SceneManager* getCreator(void) const { return mCreator; }
 
-		/** This method removes and destroys the child and all of its children.
+        /** This method removes and destroys the child and all of its children.
         @remarks
             Unlike removeChild, which removes a single child from this
             node but does not destroy it, this method destroys the child
@@ -182,8 +182,8 @@ namespace Ogre {
             Use this if you wish to recursively destroy a node as well as 
             detaching it from it's parent. Note that any objects attached to
             the nodes will be detached but will not themselves be destroyed.
-		@param
-			SceneNode, must be a child of ours
+        @param
+            SceneNode, must be a child of ours
         */
         virtual void removeAndDestroyChild( SceneNode *sceneNode );
 
@@ -202,11 +202,11 @@ namespace Ogre {
             rotate Initial rotation relative to parent
         */
         virtual SceneNode* createChildSceneNode(
-				SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
-				const Vector3& translate = Vector3::ZERO, 
-				const Quaternion& rotate = Quaternion::IDENTITY );
+                SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
+                const Vector3& translate = Vector3::ZERO, 
+                const Quaternion& rotate = Quaternion::IDENTITY );
 
-		virtual void setListener( Listener* listener );
+        virtual void setListener( Listener* listener );
 
         /** Tells the node whether to yaw around it's own local Y axis or a fixed axis of choice.
         @remarks
@@ -224,11 +224,11 @@ namespace Ogre {
         */
         void setFixedYawAxis( bool useFixed, const Vector3& fixedAxis = Vector3::UNIT_Y );
 
-		bool isYawFixed(void) const										{ return mYawFixed; }
+        bool isYawFixed(void) const                                     { return mYawFixed; }
 
-		/** Rotate the node around the Y-axis.
-		*/
-		void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
+        /** Rotate the node around the Y-axis.
+        */
+        void yaw(const Radian& angle, TransformSpace relativeTo = TS_LOCAL);
         /** Sets the node's direction vector ie it's local -z.
         @remarks
         Note that the 'up' vector for the orientation will automatically be 
@@ -284,13 +284,13 @@ namespace Ogre {
         virtual void setAutoTracking(bool enabled, SceneNode* const target = 0, 
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z,
             const Vector3& offset = Vector3::ZERO);
-		/** Get the auto tracking target for this node, if any. */
+        /** Get the auto tracking target for this node, if any. */
         virtual SceneNode* getAutoTrackTarget(void) { return mAutoTrackTarget; }
-		/** Get the auto tracking offset for this node, if the node is auto tracking. */
-		virtual const Vector3& getAutoTrackOffset(void) { return mAutoTrackOffset; }
-		/** Get the auto tracking local direction for this node, if it is auto tracking. */
-		virtual const Vector3& getAutoTrackLocalDirection(void) { return mAutoTrackLocalDirection; }
-		/** Internal method used by OGRE to update auto-tracking cameras. */
+        /** Get the auto tracking offset for this node, if the node is auto tracking. */
+        virtual const Vector3& getAutoTrackOffset(void) { return mAutoTrackOffset; }
+        /** Get the auto tracking local direction for this node, if it is auto tracking. */
+        virtual const Vector3& getAutoTrackLocalDirection(void) { return mAutoTrackLocalDirection; }
+        /** Internal method used by OGRE to update auto-tracking cameras. */
         void _autoTrack(void);
         /** Gets the parent of this SceneNode. */
         SceneNode* getParentSceneNode(void) const;
@@ -313,7 +313,7 @@ namespace Ogre {
         virtual void flipVisibility(bool cascade = true);
 
         /** Tells all objects attached to this node whether to display their
-			debug information or not.
+            debug information or not.
         @remarks    
             This is a shortcut to calling setDebugDisplayEnabled() on the objects attached
             to this node, and optionally to all objects attached to child
@@ -323,15 +323,15 @@ namespace Ogre {
         */
         virtual void setDebugDisplayEnabled(bool enabled, bool cascade = true);
 
-		/// As Node::getDebugRenderable, except scaling is automatically determined
-		//virtual DebugRenderable* getDebugRenderable();
+        /// As Node::getDebugRenderable, except scaling is automatically determined
+        //virtual DebugRenderable* getDebugRenderable();
 
 
 
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 
 }// namespace

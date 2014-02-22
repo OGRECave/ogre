@@ -611,12 +611,12 @@ void TestContext::setTimestep(Ogre::Real timestep)
 
 void TestContext::createDummyScene()
 {
-	//Test multithreading which is prone to errors (regardless of number of cores the system has)
+    //Test multithreading which is prone to errors (regardless of number of cores the system has)
     const size_t numThreads = 3;
-	Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+    Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
 
     Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, numThreads,
-														threadedCullingMethod, "DummyScene");
+                                                        threadedCullingMethod, "DummyScene");
     sm->addRenderQueueListener(mOverlaySystem);
 #ifdef INCLUDE_RTSHADER_SYSTEM
     // Initialize shader generator.

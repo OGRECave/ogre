@@ -36,61 +36,61 @@ THE SOFTWARE.
 namespace Ogre {
     namespace GLSL {
     /** GLSL low level compiled shader object - this class is used to get at the linked program object 
-		and provide an interface for GLRenderSystem calls.  GLSL does not provide access to the
-		low level code of the shader so this class is really just a dummy place holder.
-		GLSL uses a program object to represent the active vertex and fragment programs used
-		but Ogre materials maintain separate instances of the active vertex and fragment programs
-		which creates a small problem for GLSL integration.  The GLSLGpuProgram class provides the
-		interface between the GLSLLinkProgramManager , GLRenderSystem, and the active GLSLProgram
-		instances.
-	*/
+        and provide an interface for GLRenderSystem calls.  GLSL does not provide access to the
+        low level code of the shader so this class is really just a dummy place holder.
+        GLSL uses a program object to represent the active vertex and fragment programs used
+        but Ogre materials maintain separate instances of the active vertex and fragment programs
+        which creates a small problem for GLSL integration.  The GLSLGpuProgram class provides the
+        interface between the GLSLLinkProgramManager , GLRenderSystem, and the active GLSLProgram
+        instances.
+    */
     class _OgreGLExport GLSLGpuProgram : public GLGpuProgram
     {
     private:
-		/// GL Handle for the shader object
-		GLSLProgram* mGLSLProgram;
+        /// GL Handle for the shader object
+        GLSLProgram* mGLSLProgram;
 
-		/// Keep track of the number of vertex shaders created
-		static GLuint mVertexShaderCount;
-		/// Keep track of the number of fragment shaders created
-		static GLuint mFragmentShaderCount;
-		/// keep track of the number of geometry shaders created
-		static GLuint mGeometryShaderCount;
+        /// Keep track of the number of vertex shaders created
+        static GLuint mVertexShaderCount;
+        /// Keep track of the number of fragment shaders created
+        static GLuint mFragmentShaderCount;
+        /// keep track of the number of geometry shaders created
+        static GLuint mGeometryShaderCount;
 
-	public:
+    public:
         GLSLGpuProgram(GLSLProgram* parent);
-		~GLSLGpuProgram();
+        ~GLSLGpuProgram();
 
 
-		/// Execute the binding functions for this program
-		void bindProgram(void);
-		/// Execute the unbinding functions for this program
-		void unbindProgram(void);
-		/// Execute the param binding functions for this program
-		void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-		/// Execute the pass iteration param binding functions for this program
-		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
+        /// Execute the binding functions for this program
+        void bindProgram(void);
+        /// Execute the unbinding functions for this program
+        void unbindProgram(void);
+        /// Execute the param binding functions for this program
+        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /// Execute the pass iteration param binding functions for this program
+        void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
-		/// Get the assigned GL program id
-		GLuint getProgramID(void) const
-		{ return mProgramID; }
+        /// Get the assigned GL program id
+        GLuint getProgramID(void) const
+        { return mProgramID; }
 
-		/// Get the GLSLProgram for the shader object
-		GLSLProgram* getGLSLProgram(void) const { return mGLSLProgram; }
+        /// Get the GLSLProgram for the shader object
+        GLSLProgram* getGLSLProgram(void) const { return mGLSLProgram; }
 
-		/// @copydoc GLGpuProgram::getAttributeIndex
-		GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
-		
-		/// @copydoc GLGpuProgram::isAttributeValid
-		bool isAttributeValid(VertexElementSemantic semantic, uint index);
+        /// @copydoc GLGpuProgram::getAttributeIndex
+        GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
+        
+        /// @copydoc GLGpuProgram::isAttributeValid
+        bool isAttributeValid(VertexElementSemantic semantic, uint index);
 
     protected:
         /// Overridden from GpuProgram
         void loadFromSource(void);
-		/// @copydoc Resource::unloadImpl
-		void unloadImpl(void);
-		/// @copydoc Resource::loadImpl
-		void loadImpl(void);
+        /// @copydoc Resource::unloadImpl
+        void unloadImpl(void);
+        /// @copydoc Resource::loadImpl
+        void loadImpl(void);
     };
 
     }

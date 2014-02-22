@@ -45,52 +45,52 @@ THE SOFTWARE.
 #include <climits>
 
 namespace Ogre {
-	AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
-		: EGLWindow(glsupport),
-		  mMaxBufferSize(32),
-		  mMaxDepthSize(24),
-		  mMaxStencilSize(8)
-	{
-	}
+    AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
+        : EGLWindow(glsupport),
+          mMaxBufferSize(32),
+          mMaxDepthSize(24),
+          mMaxStencilSize(8)
+    {
+    }
 
-	AndroidEGLWindow::~AndroidEGLWindow()
-	{
-	}
+    AndroidEGLWindow::~AndroidEGLWindow()
+    {
+    }
 
-	EGLContext* AndroidEGLWindow::createEGLContext() const
-	{
-		return new AndroidEGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
-	}
+    EGLContext* AndroidEGLWindow::createEGLContext() const
+    {
+        return new AndroidEGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
+    }
 
-	void AndroidEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
-	{
-		// We don't have a native window.... but I think all android windows are origined
-		left = top = 0;
-	}
+    void AndroidEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
+    {
+        // We don't have a native window.... but I think all android windows are origined
+        left = top = 0;
+    }
 
-	void AndroidEGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
-	{
-	}
+    void AndroidEGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
+    {
+    }
 
-	void AndroidEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
-	{
-	}
+    void AndroidEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
+    {
+    }
 
-	void AndroidEGLWindow::reposition( int left, int top )
-	{
-	}
+    void AndroidEGLWindow::reposition( int left, int top )
+    {
+    }
 
-	void AndroidEGLWindow::resize(uint width, uint height)
-	{
-	}
+    void AndroidEGLWindow::resize(uint width, uint height)
+    {
+    }
 
-	void AndroidEGLWindow::windowMovedOrResized()
-	{
+    void AndroidEGLWindow::windowMovedOrResized()
+    {
         if(mActive)
         {
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
-			EGL_CHECK_ERROR
-			
+            EGL_CHECK_ERROR
+            
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
             EGL_CHECK_ERROR
             
@@ -99,8 +99,8 @@ namespace Ogre {
             while( it != mViewportList.end() )
                 (*it++).second->_updateDimensions();
         }
-	}
-	
+    }
+    
     void AndroidEGLWindow::switchFullScreen(bool fullscreen)
     {
     
@@ -109,7 +109,7 @@ namespace Ogre {
     void AndroidEGLWindow::create(const String& name, uint width, uint height,
                                bool fullScreen, const NameValuePairList *miscParams)
     {
-		mName = name;
+        mName = name;
         mWidth = width;
         mHeight = height;
         mLeft = 0;
@@ -155,18 +155,18 @@ namespace Ogre {
                 mIsExternalGLControl = true;
                 ctxHandle = Ogre::StringConverter::parseInt(opt->second);
             }
-			
-			if((opt = miscParams->find("maxColourBufferSize")) != end)
+            
+            if((opt = miscParams->find("maxColourBufferSize")) != end)
             {
                 mMaxBufferSize = Ogre::StringConverter::parseInt(opt->second);
             }
-			
-			if((opt = miscParams->find("maxDepthBufferSize")) != end)
+            
+            if((opt = miscParams->find("maxDepthBufferSize")) != end)
             {
                 mMaxDepthSize = Ogre::StringConverter::parseInt(opt->second);
             }
-			
-			if((opt = miscParams->find("maxStencilBufferSize")) != end)
+            
+            if((opt = miscParams->find("maxStencilBufferSize")) != end)
             {
                 mMaxStencilSize = Ogre::StringConverter::parseInt(opt->second);
             }
@@ -203,10 +203,10 @@ namespace Ogre {
         
         mContext = createEGLContext();
         
-		mActive = true;
-		mVisible = true;
-		mClosed = false;
-	}
+        mActive = true;
+        mVisible = true;
+        mClosed = false;
+    }
 
     void AndroidEGLWindow::_destroyInternalResources()
     {
@@ -223,7 +223,7 @@ namespace Ogre {
         mEglSurface = 0;
         
         mActive = false;
-		mVisible = false;
+        mVisible = false;
         mClosed = true;
     }
     
@@ -240,7 +240,7 @@ namespace Ogre {
         
         int maxAttribs[] = {
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-			EGL_BUFFER_SIZE, mMaxBufferSize,
+            EGL_BUFFER_SIZE, mMaxBufferSize,
             EGL_DEPTH_SIZE, mMaxDepthSize,
             EGL_STENCIL_SIZE, mMaxStencilSize,
             EGL_NONE

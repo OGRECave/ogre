@@ -48,18 +48,18 @@ namespace Ogre {
     EGLWindow::EGLWindow(EGLSupport *glsupport)
         : mGLSupport(glsupport),
           mContext(0),
-		  mEglConfig(0),
-		  mEglSurface(0),
-		  mWindow(0),
-		  mNativeDisplay(0),
-		  mEglDisplay(EGL_NO_DISPLAY)
+          mEglConfig(0),
+          mEglSurface(0),
+          mWindow(0),
+          mNativeDisplay(0),
+          mEglDisplay(EGL_NO_DISPLAY)
     {
         mIsTopLevel = false;
         mIsFullScreen = false;
         mClosed = false;
         mActive = true;//todo
         mIsExternalGLControl = false;
-		mVisible = false;
+        mVisible = false;
     }
 
     EGLWindow::~EGLWindow()
@@ -109,7 +109,7 @@ namespace Ogre {
         {
             return;
         }
-		if (fullscreen)
+        if (fullscreen)
         {
             mGLSupport->switchMode(width, height, frequency);
         }
@@ -179,60 +179,60 @@ namespace Ogre {
             *static_cast<EGLContext**>(pData) = mContext;
             return;
         } 
-		else if (name == "WINDOW")
-		{
-			*static_cast<NativeWindowType*>(pData) = mWindow;
-			return;
-		} 
-	}
+        else if (name == "WINDOW")
+        {
+            *static_cast<NativeWindowType*>(pData) = mWindow;
+            return;
+        } 
+    }
 
     void EGLWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-		if ((dst.left < 0) || (dst.right > mWidth) ||
-			(dst.top < 0) || (dst.bottom > mHeight) ||
-			(dst.front != 0) || (dst.back != 1))
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Invalid box.",
-				"EGLWindow::copyContentsToMemory" );
-		}
+        if ((dst.left < 0) || (dst.right > mWidth) ||
+            (dst.top < 0) || (dst.bottom > mHeight) ||
+            (dst.front != 0) || (dst.back != 1))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Invalid box.",
+                "EGLWindow::copyContentsToMemory" );
+        }
 
-		if (buffer == FB_AUTO)
-		{
-			buffer = mIsFullScreen? FB_FRONT : FB_BACK;
-		}
+        if (buffer == FB_AUTO)
+        {
+            buffer = mIsFullScreen? FB_FRONT : FB_BACK;
+        }
 
-		GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
-		GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
+        GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
 
-		if ((format == 0) || (type == 0))
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Unsupported format.",
-				"EGLWindow::copyContentsToMemory" );
-		}
+        if ((format == 0) || (type == 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Unsupported format.",
+                "EGLWindow::copyContentsToMemory" );
+        }
 
 
-		// Switch context if different from current one
-		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-		rsys->_setViewport(this->getViewport(0));
+        // Switch context if different from current one
+        RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+        rsys->_setViewport(this->getViewport(0));
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         if(dst.getWidth() != dst.rowPitch)
             glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
 #endif
-		// Must change the packing to ensure no overruns!
-		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        // Must change the packing to ensure no overruns!
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
 #if OGRE_NO_GLES3_SUPPORT == 0
-		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
+        glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
 #endif
         glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
                      format, type, dst.getTopLeftFrontPixelPtr());
 
-		// restore default alignment
-		glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        // restore default alignment
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
 #if OGRE_NO_GLES3_SUPPORT == 0
         glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 #endif
@@ -258,9 +258,9 @@ namespace Ogre {
         return surface;
     }
 
-	bool EGLWindow::requiresTextureFlipping() const
-	{
-		return false;
-	}
+    bool EGLWindow::requiresTextureFlipping() const
+    {
+        return false;
+    }
 
 }

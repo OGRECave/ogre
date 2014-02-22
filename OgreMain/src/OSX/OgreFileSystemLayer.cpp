@@ -35,60 +35,60 @@
 
 namespace Ogre
 {
-	void FileSystemLayer::getConfigPaths()
-	{
-		mConfigPaths.push_back(Ogre::macBundlePath() + "/Contents/Resources/");
-		mConfigPaths.push_back(Ogre::macBundlePath() + "/");
-	}
+    void FileSystemLayer::getConfigPaths()
+    {
+        mConfigPaths.push_back(Ogre::macBundlePath() + "/Contents/Resources/");
+        mConfigPaths.push_back(Ogre::macBundlePath() + "/");
+    }
     //---------------------------------------------------------------------
-	void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
-	{
-		struct passwd* pwd = getpwuid(getuid());
-		if (pwd)
-		{
-			mHomePath = pwd->pw_dir;
-		}
-		else
-		{
-			// try the $HOME environment variable
-			mHomePath = getenv("HOME");
-		}
+    void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
+    {
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd)
+        {
+            mHomePath = pwd->pw_dir;
+        }
+        else
+        {
+            // try the $HOME environment variable
+            mHomePath = getenv("HOME");
+        }
 
-		if (!mHomePath.empty())
-		{
-			// create an Ogre subdir in application support
-			mHomePath.append("/Library/Application Support/Ogre/");
-			if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
-			{
-				// can't create dir
-				mHomePath.clear();
-			}
-			else
-			{
-				// now create the given subdir
-				mHomePath.append(subdir + '/');
-				if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
-				{
-					// can't create dir
-					mHomePath.clear();
-				}
-			}
-		}
+        if (!mHomePath.empty())
+        {
+            // create an Ogre subdir in application support
+            mHomePath.append("/Library/Application Support/Ogre/");
+            if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
+            {
+                // can't create dir
+                mHomePath.clear();
+            }
+            else
+            {
+                // now create the given subdir
+                mHomePath.append(subdir + '/');
+                if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
+                {
+                    // can't create dir
+                    mHomePath.clear();
+                }
+            }
+        }
 
-		if (mHomePath.empty())
-		{
-			// couldn't create dir in home directory, fall back to cwd
-			mHomePath = "./";
-		}
-	}
+        if (mHomePath.empty())
+        {
+            // couldn't create dir in home directory, fall back to cwd
+            mHomePath = "./";
+        }
+    }
     //---------------------------------------------------------------------
-	bool FileSystemLayer::fileExists(const Ogre::String& path) const
-	{
-		return access(path.c_str(), R_OK) == 0;
-	}
+    bool FileSystemLayer::fileExists(const Ogre::String& path) const
+    {
+        return access(path.c_str(), R_OK) == 0;
+    }
     //---------------------------------------------------------------------
-	bool FileSystemLayer::createDirectory(const Ogre::String& path)
-	{
-		return !mkdir(path.c_str(), 0755) || errno == EEXIST;
-	}
+    bool FileSystemLayer::createDirectory(const Ogre::String& path)
+    {
+        return !mkdir(path.c_str(), 0755) || errno == EEXIST;
+    }
 }

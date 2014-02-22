@@ -28,21 +28,21 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//-----------------------------------------------------------------------------------
-	inline ArrayMaskR ArraySphere::intersects( const ArraySphere &s ) const
-	{
-		ArrayReal sqRadius	= mRadius + s.mRadius;
-		sqRadius			= sqRadius * sqRadius;
-		ArrayReal sqDist	= mCenter.squaredDistance( s.mCenter );
+    //-----------------------------------------------------------------------------------
+    inline ArrayMaskR ArraySphere::intersects( const ArraySphere &s ) const
+    {
+        ArrayReal sqRadius  = mRadius + s.mRadius;
+        sqRadius            = sqRadius * sqRadius;
+        ArrayReal sqDist    = mCenter.squaredDistance( s.mCenter );
 
-		return sqDist <= sqRadius;
-	}
-	//-----------------------------------------------------------------------------------
-	inline ArrayMaskR ArraySphere::intersects( const ArrayVector3 &v ) const
-	{
-		ArrayReal sqRadius	= mRadius * mRadius;
-		ArrayReal sqDist	= mCenter.squaredDistance( v );
+        return sqDist <= sqRadius;
+    }
+    //-----------------------------------------------------------------------------------
+    inline ArrayMaskR ArraySphere::intersects( const ArrayVector3 &v ) const
+    {
+        ArrayReal sqRadius  = mRadius * mRadius;
+        ArrayReal sqDist    = mCenter.squaredDistance( v );
 
-		return sqDist <= sqRadius;
-	}
+        return sqDist <= sqRadius;
+    }
 }

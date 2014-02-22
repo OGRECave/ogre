@@ -79,14 +79,14 @@ THE SOFTWARE.
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
 #line 43 "ps1.0_grammar.y"
 typedef union YYSTYPE {
-	int ival;
-	float fval;
-	
-	string * sval;
-	constdef * cdef;
-	vector<constdef> * consts;
-	vector<string> * line;
-	list<vector<string> > * lines;
+    int ival;
+    float fval;
+    
+    string * sval;
+    constdef * cdef;
+    vector<constdef> * consts;
+    vector<string> * line;
+    list<vector<string> > * lines;
 } YYSTYPE;
 /* Line 1240 of yacc.c.  */
 #line 65 "_ps1.0_parser.h"

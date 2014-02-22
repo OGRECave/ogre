@@ -38,441 +38,441 @@
 
 namespace OgreBites
 {
-	/*=============================================================================
-	// Base SDK sample class. Includes default player camera and SDK trays.
-	=============================================================================*/
-	class SdkSample : public Sample, public SdkTrayListener
+    /*=============================================================================
+    // Base SDK sample class. Includes default player camera and SDK trays.
+    =============================================================================*/
+    class SdkSample : public Sample, public SdkTrayListener
     {
-	public:
-		SdkSample()
-		{
-			// so we don't have to worry about checking if these keys exist later
-			mInfo["Title"] = "Untitled";
-			mInfo["Description"] = "";
-			mInfo["Category"] = "Unsorted";
-			mInfo["Thumbnail"] = "";
-			mInfo["Help"] = "";
+    public:
+        SdkSample()
+        {
+            // so we don't have to worry about checking if these keys exist later
+            mInfo["Title"] = "Untitled";
+            mInfo["Description"] = "";
+            mInfo["Category"] = "Unsorted";
+            mInfo["Thumbnail"] = "";
+            mInfo["Help"] = "";
 
-			mTrayMgr = 0;
-			mCameraMan = 0;
-			mCamera = 0;
-			mDetailsPanel = 0;
-			mCursorWasVisible = false;
-			mDragLook = false;
-			mBackgroundColour = Ogre::ColourValue::Black;
-		}
+            mTrayMgr = 0;
+            mCameraMan = 0;
+            mCamera = 0;
+            mDetailsPanel = 0;
+            mCursorWasVisible = false;
+            mDragLook = false;
+            mBackgroundColour = Ogre::ColourValue::Black;
+        }
 
-		virtual ~SdkSample() {}
+        virtual ~SdkSample() {}
 
-		/*-----------------------------------------------------------------------------
-		| Manually update the cursor position after being unpaused.
-		-----------------------------------------------------------------------------*/
-		virtual void unpaused()
-		{
-			mTrayMgr->refreshCursor();
-		}
+        /*-----------------------------------------------------------------------------
+        | Manually update the cursor position after being unpaused.
+        -----------------------------------------------------------------------------*/
+        virtual void unpaused()
+        {
+            mTrayMgr->refreshCursor();
+        }
 
-		/*-----------------------------------------------------------------------------
-		| Automatically saves position and orientation for free-look cameras.
-		-----------------------------------------------------------------------------*/
-		virtual void saveState(Ogre::NameValuePairList& state)
-		{
-			if (mCameraMan->getStyle() == CS_FREELOOK)
-			{
-				state["CameraPosition"] = Ogre::StringConverter::toString(mCamera->getPosition());
-				state["CameraOrientation"] = Ogre::StringConverter::toString(mCamera->getOrientation());
-			}
-		}
+        /*-----------------------------------------------------------------------------
+        | Automatically saves position and orientation for free-look cameras.
+        -----------------------------------------------------------------------------*/
+        virtual void saveState(Ogre::NameValuePairList& state)
+        {
+            if (mCameraMan->getStyle() == CS_FREELOOK)
+            {
+                state["CameraPosition"] = Ogre::StringConverter::toString(mCamera->getPosition());
+                state["CameraOrientation"] = Ogre::StringConverter::toString(mCamera->getOrientation());
+            }
+        }
 
-		/*-----------------------------------------------------------------------------
-		| Automatically restores position and orientation for free-look cameras.
-		-----------------------------------------------------------------------------*/
-		virtual void restoreState(Ogre::NameValuePairList& state)
-		{
-			if (state.find("CameraPosition") != state.end() && state.find("CameraOrientation") != state.end())
-			{
-				mCameraMan->setStyle(CS_FREELOOK);
-				mCamera->setPosition(Ogre::StringConverter::parseVector3(state["CameraPosition"]));
-				mCamera->setOrientation(Ogre::StringConverter::parseQuaternion(state["CameraOrientation"]));
-			}
-		}
+        /*-----------------------------------------------------------------------------
+        | Automatically restores position and orientation for free-look cameras.
+        -----------------------------------------------------------------------------*/
+        virtual void restoreState(Ogre::NameValuePairList& state)
+        {
+            if (state.find("CameraPosition") != state.end() && state.find("CameraOrientation") != state.end())
+            {
+                mCameraMan->setStyle(CS_FREELOOK);
+                mCamera->setPosition(Ogre::StringConverter::parseVector3(state["CameraPosition"]));
+                mCamera->setOrientation(Ogre::StringConverter::parseQuaternion(state["CameraOrientation"]));
+            }
+        }
 
-		virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt)
-		{
-			mTrayMgr->frameRenderingQueued(evt);
+        virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt)
+        {
+            mTrayMgr->frameRenderingQueued(evt);
 
-			if (!mTrayMgr->isDialogVisible())
-			{
-				mCameraMan->frameRenderingQueued(evt);   // if dialog isn't up, then update the camera
+            if (!mTrayMgr->isDialogVisible())
+            {
+                mCameraMan->frameRenderingQueued(evt);   // if dialog isn't up, then update the camera
 
-				if (mDetailsPanel->isVisible())   // if details panel is visible, then update its contents
-				{
-					mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mCamera->getDerivedPosition().x));
-					mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
-					mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
-					mDetailsPanel->setParamValue(4, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().w));
-					mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
-					mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
-					mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
+                if (mDetailsPanel->isVisible())   // if details panel is visible, then update its contents
+                {
+                    mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mCamera->getDerivedPosition().x));
+                    mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
+                    mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
+                    mDetailsPanel->setParamValue(4, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().w));
+                    mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
+                    mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
+                    mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-					mDetailsPanel->setParamValue(14, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
-					mDetailsPanel->setParamValue(15, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));		
+                    mDetailsPanel->setParamValue(14, Ogre::StringConverter::toString(mShaderGenerator->getVertexShaderCount()));
+                    mDetailsPanel->setParamValue(15, Ogre::StringConverter::toString(mShaderGenerator->getFragmentShaderCount()));      
 #endif
-				}	
-			}
+                }   
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		virtual void windowResized(Ogre::RenderWindow* rw)
-		{
-			//Commented, Camera has auto AR
-			//mCamera->setAspectRatio((Ogre::Real)rw->getWidth() / (Ogre::Real)rw->getHeight());
-		}
+        virtual void windowResized(Ogre::RenderWindow* rw)
+        {
+            //Commented, Camera has auto AR
+            //mCamera->setAspectRatio((Ogre::Real)rw->getWidth() / (Ogre::Real)rw->getHeight());
+        }
 
-		virtual bool keyPressed(const OIS::KeyEvent& evt)
-		{
-			if (evt.key == OIS::KC_H || evt.key == OIS::KC_F1)   // toggle visibility of help dialog
-			{
-				if (!mTrayMgr->isDialogVisible() && mInfo["Help"] != "") mTrayMgr->showOkDialog("Help", mInfo["Help"]);
-				else mTrayMgr->closeDialog();
-			}
+        virtual bool keyPressed(const OIS::KeyEvent& evt)
+        {
+            if (evt.key == OIS::KC_H || evt.key == OIS::KC_F1)   // toggle visibility of help dialog
+            {
+                if (!mTrayMgr->isDialogVisible() && mInfo["Help"] != "") mTrayMgr->showOkDialog("Help", mInfo["Help"]);
+                else mTrayMgr->closeDialog();
+            }
 
-			if (mTrayMgr->isDialogVisible()) return true;   // don't process any more keys if dialog is up
+            if (mTrayMgr->isDialogVisible()) return true;   // don't process any more keys if dialog is up
 
-			if (evt.key == OIS::KC_F)   // toggle visibility of advanced frame stats
-			{
-				mTrayMgr->toggleAdvancedFrameStats();
-			}
-			else if (evt.key == OIS::KC_G)   // toggle visibility of even rarer debugging details
-			{
-				if (mDetailsPanel->getTrayLocation() == TL_NONE)
-				{
-					mTrayMgr->moveWidgetToTray(mDetailsPanel, TL_TOPRIGHT, 0);
-					mDetailsPanel->show();
-				}
-				else
-				{
-					mTrayMgr->removeWidgetFromTray(mDetailsPanel);
-					mDetailsPanel->hide();
-				}
-			}
-			else if (evt.key == OIS::KC_T)   // cycle texture filtering mode
-			{
-				Ogre::String newVal;
-				Ogre::TextureFilterOptions tfo;
-				unsigned int aniso;
+            if (evt.key == OIS::KC_F)   // toggle visibility of advanced frame stats
+            {
+                mTrayMgr->toggleAdvancedFrameStats();
+            }
+            else if (evt.key == OIS::KC_G)   // toggle visibility of even rarer debugging details
+            {
+                if (mDetailsPanel->getTrayLocation() == TL_NONE)
+                {
+                    mTrayMgr->moveWidgetToTray(mDetailsPanel, TL_TOPRIGHT, 0);
+                    mDetailsPanel->show();
+                }
+                else
+                {
+                    mTrayMgr->removeWidgetFromTray(mDetailsPanel);
+                    mDetailsPanel->hide();
+                }
+            }
+            else if (evt.key == OIS::KC_T)   // cycle texture filtering mode
+            {
+                Ogre::String newVal;
+                Ogre::TextureFilterOptions tfo;
+                unsigned int aniso;
 
-				switch (DISPLAY_STRING_TO_STRING(mDetailsPanel->getParamValue(9))[0])
-				{
-				case 'B':
-					newVal = "Trilinear";
-					tfo = Ogre::TFO_TRILINEAR;
-					aniso = 1;
-					break;
-				case 'T':
-					newVal = "Anisotropic";
-					tfo = Ogre::TFO_ANISOTROPIC;
-					aniso = 8;
-					break;
-				case 'A':
-					newVal = "None";
-					tfo = Ogre::TFO_NONE;
-					aniso = 1;
-					break;
-				default:
-					newVal = "Bilinear";
-					tfo = Ogre::TFO_BILINEAR;
-					aniso = 1;
-				}
+                switch (DISPLAY_STRING_TO_STRING(mDetailsPanel->getParamValue(9))[0])
+                {
+                case 'B':
+                    newVal = "Trilinear";
+                    tfo = Ogre::TFO_TRILINEAR;
+                    aniso = 1;
+                    break;
+                case 'T':
+                    newVal = "Anisotropic";
+                    tfo = Ogre::TFO_ANISOTROPIC;
+                    aniso = 8;
+                    break;
+                case 'A':
+                    newVal = "None";
+                    tfo = Ogre::TFO_NONE;
+                    aniso = 1;
+                    break;
+                default:
+                    newVal = "Bilinear";
+                    tfo = Ogre::TFO_BILINEAR;
+                    aniso = 1;
+                }
 
-				Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(tfo);
-				Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(aniso);
-				mDetailsPanel->setParamValue(9, newVal);
-			}
-			else if (evt.key == OIS::KC_R)   // cycle polygon rendering mode
-			{
-				Ogre::String newVal;
-				Ogre::PolygonMode pm;
+                Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(tfo);
+                Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(aniso);
+                mDetailsPanel->setParamValue(9, newVal);
+            }
+            else if (evt.key == OIS::KC_R)   // cycle polygon rendering mode
+            {
+                Ogre::String newVal;
+                Ogre::PolygonMode pm;
 
-				switch (mCamera->getPolygonMode())
-				{
-				case Ogre::PM_SOLID:
-					newVal = "Wireframe";
-					pm = Ogre::PM_WIREFRAME;
-					break;
-				case Ogre::PM_WIREFRAME:
-					newVal = "Points";
-					pm = Ogre::PM_POINTS;
-					break;
-				default:
-					newVal = "Solid";
-					pm = Ogre::PM_SOLID;
-				}
+                switch (mCamera->getPolygonMode())
+                {
+                case Ogre::PM_SOLID:
+                    newVal = "Wireframe";
+                    pm = Ogre::PM_WIREFRAME;
+                    break;
+                case Ogre::PM_WIREFRAME:
+                    newVal = "Points";
+                    pm = Ogre::PM_POINTS;
+                    break;
+                default:
+                    newVal = "Solid";
+                    pm = Ogre::PM_SOLID;
+                }
 
-				mCamera->setPolygonMode(pm);
-				mDetailsPanel->setParamValue(10, newVal);
-			}
-			else if(evt.key == OIS::KC_F5)   // refresh all textures
-			{
-				Ogre::TextureManager::getSingleton().reloadAll();
-			}
-			else if (evt.key == OIS::KC_F6)   // take a screenshot
-			{
-				mWindow->writeContentsToTimestampedFile("screenshot", ".png");
-			}
+                mCamera->setPolygonMode(pm);
+                mDetailsPanel->setParamValue(10, newVal);
+            }
+            else if(evt.key == OIS::KC_F5)   // refresh all textures
+            {
+                Ogre::TextureManager::getSingleton().reloadAll();
+            }
+            else if (evt.key == OIS::KC_F6)   // take a screenshot
+            {
+                mWindow->writeContentsToTimestampedFile("screenshot", ".png");
+            }
 
-#ifdef INCLUDE_RTSHADER_SYSTEM		
-			// Toggle schemes.			
-			else if (evt.key == OIS::KC_F2)
-			{	
-				if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
-				{
-					Ogre::Viewport* mainVP = mCamera->getLastViewport();
-					const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
+#ifdef INCLUDE_RTSHADER_SYSTEM      
+            // Toggle schemes.          
+            else if (evt.key == OIS::KC_F2)
+            {   
+                if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
+                {
+                    Ogre::Viewport* mainVP = mCamera->getLastViewport();
+                    const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
 
-					if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
-					{							
-						mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-						mDetailsPanel->setParamValue(11, "On");
-					}
-					else if (curMaterialScheme == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-					{
-						mainVP->setMaterialScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
-						mDetailsPanel->setParamValue(11, "Off");
-					}														
-				}
-			}			
-			// Toggles per pixel per light model.
-			else if (evt.key == OIS::KC_F3)
-			{
-				static bool usePerPixelLighting = true;					
-												
-				// Grab the scheme render state.												
-				Ogre::RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+                    if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
+                    {                           
+                        mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+                        mDetailsPanel->setParamValue(11, "On");
+                    }
+                    else if (curMaterialScheme == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+                    {
+                        mainVP->setMaterialScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+                        mDetailsPanel->setParamValue(11, "Off");
+                    }                                                       
+                }
+            }           
+            // Toggles per pixel per light model.
+            else if (evt.key == OIS::KC_F3)
+            {
+                static bool usePerPixelLighting = true;                 
+                                                
+                // Grab the scheme render state.                                                
+                Ogre::RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
-				
-				// Add per pixel lighting sub render state to the global scheme render state.
-				// It will override the default FFP lighting sub render state.
-				if (usePerPixelLighting)
-				{
-					Ogre::RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
-					
-					schemRenderState->addTemplateSubRenderState(perPixelLightModel);					
-				}
+                
+                // Add per pixel lighting sub render state to the global scheme render state.
+                // It will override the default FFP lighting sub render state.
+                if (usePerPixelLighting)
+                {
+                    Ogre::RTShader::SubRenderState* perPixelLightModel = mShaderGenerator->createSubRenderState(Ogre::RTShader::PerPixelLighting::Type);
+                    
+                    schemRenderState->addTemplateSubRenderState(perPixelLightModel);                    
+                }
 
-				// Search the per pixel sub render state and remove it.
-				else
-				{
-					const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
-					Ogre::RTShader::SubRenderStateListConstIterator it = subRenderStateList.begin();
-					Ogre::RTShader::SubRenderStateListConstIterator itEnd = subRenderStateList.end();
-						
-					for (; it != itEnd; ++it)
-					{
-						Ogre::RTShader::SubRenderState* curSubRenderState = *it;
+                // Search the per pixel sub render state and remove it.
+                else
+                {
+                    const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
+                    Ogre::RTShader::SubRenderStateListConstIterator it = subRenderStateList.begin();
+                    Ogre::RTShader::SubRenderStateListConstIterator itEnd = subRenderStateList.end();
+                        
+                    for (; it != itEnd; ++it)
+                    {
+                        Ogre::RTShader::SubRenderState* curSubRenderState = *it;
 
-						// This is the per pixel sub render state -> remove it.
-						if (curSubRenderState->getType() == Ogre::RTShader::PerPixelLighting::Type)
-						{
-							schemRenderState->removeTemplateSubRenderState(*it);
-							break;
-						}
-					}
-				}
+                        // This is the per pixel sub render state -> remove it.
+                        if (curSubRenderState->getType() == Ogre::RTShader::PerPixelLighting::Type)
+                        {
+                            schemRenderState->removeTemplateSubRenderState(*it);
+                            break;
+                        }
+                    }
+                }
 
-				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+                // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+                mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
 
-				// Update UI.
-				if (usePerPixelLighting)
-					mDetailsPanel->setParamValue(12, "Pixel");
-				else
-					mDetailsPanel->setParamValue(12, "Vertex");
-				usePerPixelLighting = !usePerPixelLighting;				
-			}	
+                // Update UI.
+                if (usePerPixelLighting)
+                    mDetailsPanel->setParamValue(12, "Pixel");
+                else
+                    mDetailsPanel->setParamValue(12, "Vertex");
+                usePerPixelLighting = !usePerPixelLighting;             
+            }   
 
-			// Switch vertex shader outputs compaction policy.
-			else if (evt.key == OIS::KC_F4)   
-			{
-				switch (mShaderGenerator->getVertexShaderOutputsCompactPolicy())
-				{
-				case Ogre::RTShader::VSOCP_LOW:
-					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_MEDIUM);
-					mDetailsPanel->setParamValue(13, "Medium");
-					break;
+            // Switch vertex shader outputs compaction policy.
+            else if (evt.key == OIS::KC_F4)   
+            {
+                switch (mShaderGenerator->getVertexShaderOutputsCompactPolicy())
+                {
+                case Ogre::RTShader::VSOCP_LOW:
+                    mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_MEDIUM);
+                    mDetailsPanel->setParamValue(13, "Medium");
+                    break;
 
-				case Ogre::RTShader::VSOCP_MEDIUM:
-					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_HIGH);
-					mDetailsPanel->setParamValue(13, "High");
-					break;
+                case Ogre::RTShader::VSOCP_MEDIUM:
+                    mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_HIGH);
+                    mDetailsPanel->setParamValue(13, "High");
+                    break;
 
-				case Ogre::RTShader::VSOCP_HIGH:
-					mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_LOW);
-					mDetailsPanel->setParamValue(13, "Low");
-					break;
-				}
-				
-				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-			}	
+                case Ogre::RTShader::VSOCP_HIGH:
+                    mShaderGenerator->setVertexShaderOutputsCompactPolicy(Ogre::RTShader::VSOCP_LOW);
+                    mDetailsPanel->setParamValue(13, "Low");
+                    break;
+                }
+                
+                // Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+                mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+            }   
 #endif // INCLUDE_RTSHADER_SYSTEM
 
-			mCameraMan->injectKeyDown(evt);
-			return true;
-		}
+            mCameraMan->injectKeyDown(evt);
+            return true;
+        }
 
-		virtual bool keyReleased(const OIS::KeyEvent& evt)
-		{
-			mCameraMan->injectKeyUp(evt);
+        virtual bool keyReleased(const OIS::KeyEvent& evt)
+        {
+            mCameraMan->injectKeyUp(evt);
 
-			return true;
-		}
+            return true;
+        }
 
-		/* IMPORTANT: When overriding these following handlers, remember to allow the tray manager
-		to filter out any interface-related mouse events before processing them in your scene.
-		If the tray manager handler returns true, the event was meant for the trays, not you. */
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-#else
-		virtual bool mouseMoved(const OIS::MouseEvent& evt)
-#endif
-		{
-			if (mTrayMgr->injectMouseMove(evt)) return true;
-
-			mCameraMan->injectMouseMove(evt);
-
-			return true;
-		}
+        /* IMPORTANT: When overriding these following handlers, remember to allow the tray manager
+        to filter out any interface-related mouse events before processing them in your scene.
+        If the tray manager handler returns true, the event was meant for the trays, not you. */
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
-		{
-			if (mTrayMgr->injectMouseDown(evt)) return true;
-            
-			if (mDragLook)
-			{
-				mCameraMan->setStyle(CS_FREELOOK);
-				mTrayMgr->hideCursor();
-			}
-				
-			mCameraMan->injectMouseDown(evt);
-            
-			return true;
-		}
+        virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
 #else
-		virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-		{
-			if (mTrayMgr->injectMouseDown(evt, id)) return true;
+        virtual bool mouseMoved(const OIS::MouseEvent& evt)
+#endif
+        {
+            if (mTrayMgr->injectMouseMove(evt)) return true;
+
+            mCameraMan->injectMouseMove(evt);
+
+            return true;
+        }
+
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+        virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
+        {
+            if (mTrayMgr->injectMouseDown(evt)) return true;
             
-			if (mDragLook && id == OIS::MB_Left)
-			{
-				mCameraMan->setStyle(CS_FREELOOK);
-				mTrayMgr->hideCursor();
-			}
+            if (mDragLook)
+            {
+                mCameraMan->setStyle(CS_FREELOOK);
+                mTrayMgr->hideCursor();
+            }
+                
+            mCameraMan->injectMouseDown(evt);
+            
+            return true;
+        }
+#else
+        virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+        {
+            if (mTrayMgr->injectMouseDown(evt, id)) return true;
+            
+            if (mDragLook && id == OIS::MB_Left)
+            {
+                mCameraMan->setStyle(CS_FREELOOK);
+                mTrayMgr->hideCursor();
+            }
 
-			mCameraMan->injectMouseDown(evt, id);
+            mCameraMan->injectMouseDown(evt, id);
 
-			return true;
-		}
+            return true;
+        }
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
-		{
-			if (mTrayMgr->injectMouseUp(evt)) return true;
+        virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
+        {
+            if (mTrayMgr->injectMouseUp(evt)) return true;
             
-			if (mDragLook)
-			{
-				mCameraMan->setStyle(CS_MANUAL);
-				mTrayMgr->showCursor();
-			}
+            if (mDragLook)
+            {
+                mCameraMan->setStyle(CS_MANUAL);
+                mTrayMgr->showCursor();
+            }
             
-			mCameraMan->injectMouseUp(evt);
+            mCameraMan->injectMouseUp(evt);
             
-			return true;
-		}
+            return true;
+        }
 #else
-		virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-		{
-			if (mTrayMgr->injectMouseUp(evt, id)) return true;
+        virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+        {
+            if (mTrayMgr->injectMouseUp(evt, id)) return true;
             
-			if (mDragLook && id == OIS::MB_Left)
-			{
-				mCameraMan->setStyle(CS_MANUAL);
-				mTrayMgr->showCursor();
-			}
+            if (mDragLook && id == OIS::MB_Left)
+            {
+                mCameraMan->setStyle(CS_MANUAL);
+                mTrayMgr->showCursor();
+            }
 
-			mCameraMan->injectMouseUp(evt, id);
+            mCameraMan->injectMouseUp(evt, id);
 
-			return true;
-		}
+            return true;
+        }
 #endif
 
-		/*-----------------------------------------------------------------------------
-		| Extended to setup a default tray interface and camera controller.
-		-----------------------------------------------------------------------------*/
-		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
-		{
-			// assign mRoot here in case Root was initialised after the Sample's constructor ran.
-			mRoot = Ogre::Root::getSingletonPtr();
-			mWindow = window;
-			mInputContext = inputContext;
-			mFSLayer = fsLayer;
-			mOverlaySystem = overlaySys;
+        /*-----------------------------------------------------------------------------
+        | Extended to setup a default tray interface and camera controller.
+        -----------------------------------------------------------------------------*/
+        virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
+        {
+            // assign mRoot here in case Root was initialised after the Sample's constructor ran.
+            mRoot = Ogre::Root::getSingletonPtr();
+            mWindow = window;
+            mInputContext = inputContext;
+            mFSLayer = fsLayer;
+            mOverlaySystem = overlaySys;
 
-			locateResources();
-			createSceneManager();
-			setupView();
+            locateResources();
+            createSceneManager();
+            setupView();
 
-			mTrayMgr = new SdkTrayManager("SampleControls", window, inputContext, this);  // create a tray interface
+            mTrayMgr = new SdkTrayManager("SampleControls", window, inputContext, this);  // create a tray interface
 
-			loadResources();
-			mResourcesLoaded = true;
+            loadResources();
+            mResourcesLoaded = true;
 
-			// show stats and logo and hide the cursor
-			mTrayMgr->showFrameStats(TL_BOTTOMLEFT);
-			mTrayMgr->showLogo(TL_BOTTOMRIGHT);
-			mTrayMgr->hideCursor();
+            // show stats and logo and hide the cursor
+            mTrayMgr->showFrameStats(TL_BOTTOMLEFT);
+            mTrayMgr->showLogo(TL_BOTTOMRIGHT);
+            mTrayMgr->hideCursor();
 
-			// create a params panel for displaying sample details
-			Ogre::StringVector items;
-			items.push_back("cam.pX");
-			items.push_back("cam.pY");
-			items.push_back("cam.pZ");
-			items.push_back("");
-			items.push_back("cam.oW");
-			items.push_back("cam.oX");
-			items.push_back("cam.oY");
-			items.push_back("cam.oZ");
-			items.push_back("");
-			items.push_back("Filtering");
-			items.push_back("Poly Mode");
+            // create a params panel for displaying sample details
+            Ogre::StringVector items;
+            items.push_back("cam.pX");
+            items.push_back("cam.pY");
+            items.push_back("cam.pZ");
+            items.push_back("");
+            items.push_back("cam.oW");
+            items.push_back("cam.oX");
+            items.push_back("cam.oY");
+            items.push_back("cam.oZ");
+            items.push_back("");
+            items.push_back("Filtering");
+            items.push_back("Poly Mode");
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-			items.push_back("RT Shaders");
-			items.push_back("Lighting Model");
-			items.push_back("Compact Policy");
-			items.push_back("Generated VS");
-			items.push_back("Generated FS");														
+            items.push_back("RT Shaders");
+            items.push_back("Lighting Model");
+            items.push_back("Compact Policy");
+            items.push_back("Generated VS");
+            items.push_back("Generated FS");                                                        
 
-			// fix scene compositor for d3d11
-			// Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
-			// Ogre::CompositorPtr scene = compMgr.getByName("Ogre/Scene/Default", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-			// scene->getTechnique(0)->getOutputTargetPass()->setMaterialScheme(Ogre::Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme());
+            // fix scene compositor for d3d11
+            // Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
+            // Ogre::CompositorPtr scene = compMgr.getByName("Ogre/Scene/Default", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+            // scene->getTechnique(0)->getOutputTargetPass()->setMaterialScheme(Ogre::Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme());
 #endif
 
-			mDetailsPanel = mTrayMgr->createParamsPanel(TL_NONE, "DetailsPanel", 200, items);
-			mDetailsPanel->hide();
+            mDetailsPanel = mTrayMgr->createParamsPanel(TL_NONE, "DetailsPanel", 200, items);
+            mDetailsPanel->hide();
 
-			mDetailsPanel->setParamValue(9, "Bilinear");
-			mDetailsPanel->setParamValue(10, "Solid");
+            mDetailsPanel->setParamValue(9, "Bilinear");
+            mDetailsPanel->setParamValue(10, "Solid");
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-			mDetailsPanel->setParamValue(11, "Off");
+            mDetailsPanel->setParamValue(11, "Off");
 
             Ogre::Viewport* mainVP = mCamera->getLastViewport();
             //const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
@@ -481,82 +481,82 @@ namespace OgreBites
                 mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
                 mDetailsPanel->setParamValue(11, "On");
             }
-			mDetailsPanel->setParamValue(12, "Vertex");
-			mDetailsPanel->setParamValue(13, "Low");
-			mDetailsPanel->setParamValue(14, "0");
-			mDetailsPanel->setParamValue(15, "0");															
+            mDetailsPanel->setParamValue(12, "Vertex");
+            mDetailsPanel->setParamValue(13, "Low");
+            mDetailsPanel->setParamValue(14, "0");
+            mDetailsPanel->setParamValue(15, "0");                                                          
 #endif
 
-			mWorkspace = setupCompositor();
-			setupContent();
-			mContentSetup = true;
+            mWorkspace = setupCompositor();
+            setupContent();
+            mContentSetup = true;
 
-			mDone = false;
-		}
+            mDone = false;
+        }
 
-		virtual void _shutdown()
-		{
-			Sample::_shutdown();
+        virtual void _shutdown()
+        {
+            Sample::_shutdown();
 
             if (mTrayMgr) delete mTrayMgr;
-			if (mCameraMan) delete mCameraMan;
+            if (mCameraMan) delete mCameraMan;
 
-			// restore settings we may have changed, so as not to affect other samples
-			Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_BILINEAR);
-			Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(1);
-		}
+            // restore settings we may have changed, so as not to affect other samples
+            Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::TFO_BILINEAR);
+            Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(1);
+        }
 
     protected:
 
-		/** virtual so that advanced samples such as Sample_Compositor can override this method to change the default behavior
-		 *  if setupCompositor() is overridden, be aware @mBackgroundColour will be ignored
-		 */
-		virtual Ogre::CompositorWorkspace* setupCompositor()
-		{
-			Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+        /** virtual so that advanced samples such as Sample_Compositor can override this method to change the default behavior
+         *  if setupCompositor() is overridden, be aware @mBackgroundColour will be ignored
+         */
+        virtual Ogre::CompositorWorkspace* setupCompositor()
+        {
+            Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
-			const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
-			if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-			{
-				compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColour,
-															Ogre::IdString() );
-			}
-			return compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-		}
+            const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
+            if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+            {
+                compositorManager->createBasicWorkspaceDef( workspaceName, mBackgroundColour,
+                                                            Ogre::IdString() );
+            }
+            return compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+        }
 
-		virtual void setupView()
-		{
-			// setup default viewport layout and camera
-			mCamera = mSceneMgr->createCamera("MainCamera");
+        virtual void setupView()
+        {
+            // setup default viewport layout and camera
+            mCamera = mSceneMgr->createCamera("MainCamera");
             mCamera->setAutoAspectRatio(true);
-			mCamera->setNearClipDistance(5);
+            mCamera->setNearClipDistance(5);
 
-			mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
-		}
+            mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
+        }
 
-		virtual void setDragLook(bool enabled)
-		{
-			if (enabled)
-			{
-				mCameraMan->setStyle(CS_MANUAL);
-				mTrayMgr->showCursor();
-				mDragLook = true;
-			}
-			else
-			{
-				mCameraMan->setStyle(CS_FREELOOK);
-				mTrayMgr->hideCursor();
-				mDragLook = false;
-			}
-		}
+        virtual void setDragLook(bool enabled)
+        {
+            if (enabled)
+            {
+                mCameraMan->setStyle(CS_MANUAL);
+                mTrayMgr->showCursor();
+                mDragLook = true;
+            }
+            else
+            {
+                mCameraMan->setStyle(CS_FREELOOK);
+                mTrayMgr->hideCursor();
+                mDragLook = false;
+            }
+        }
 
-		Ogre::Camera* mCamera;        		// main camera
-		SdkTrayManager* mTrayMgr;     		// tray interface manager
-		SdkCameraMan* mCameraMan;     		// basic camera controller
-		ParamsPanel* mDetailsPanel;   		// sample details panel
-		bool mCursorWasVisible;				// was cursor visible before dialog appeared
-		bool mDragLook;                     // click and drag to free-look
-		Ogre::ColourValue mBackgroundColour;	// color value passed to createBasicWorkspaceDef
+        Ogre::Camera* mCamera;              // main camera
+        SdkTrayManager* mTrayMgr;           // tray interface manager
+        SdkCameraMan* mCameraMan;           // basic camera controller
+        ParamsPanel* mDetailsPanel;         // sample details panel
+        bool mCursorWasVisible;             // was cursor visible before dialog appeared
+        bool mDragLook;                     // click and drag to free-look
+        Ogre::ColourValue mBackgroundColour;    // color value passed to createBasicWorkspaceDef
     };
 }
 

@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     GLESHardwareVertexBuffer::GLESHardwareVertexBuffer(HardwareBufferManagerBase* mgr, 
-													   size_t vertexSize,
+                                                       size_t vertexSize,
                                                        size_t numVertices,
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer)
@@ -107,12 +107,12 @@ namespace Ogre {
 
         void* retPtr = 0;
 
-		GLESHardwareBufferManager* glBufManager = static_cast<GLESHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
+        GLESHardwareBufferManager* glBufManager = static_cast<GLESHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 
-		// Try to use scratch buffers for smaller buffers
+        // Try to use scratch buffers for smaller buffers
         if (length < glBufManager->getGLMapBufferThreshold())
         {
-			// if this fails, we fall back on mapping
+            // if this fails, we fall back on mapping
             retPtr = glBufManager->allocateScratch((uint32)length);
 
             if (retPtr)
@@ -125,7 +125,7 @@ namespace Ogre {
 
                 if (options != HBL_DISCARD && options != HBL_NO_OVERWRITE)
                 {
-					// have to read back the data before returning the pointer
+                    // have to read back the data before returning the pointer
                     readData(offset, length, retPtr);
                 }
             }
@@ -139,37 +139,37 @@ namespace Ogre {
 
 #if defined(GL_GLEXT_PROTOTYPES)
         if (!retPtr)
-		{
+        {
             GLenum access = 0;
-			// Use glMapBuffer
-			glBindBuffer( GL_ARRAY_BUFFER, mBufferId );
-			// Use glMapBuffer
-			if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
-			{
-				// Discard the buffer
-				glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL, 
+            // Use glMapBuffer
+            glBindBuffer( GL_ARRAY_BUFFER, mBufferId );
+            // Use glMapBuffer
+            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
+            {
+                // Discard the buffer
+                glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL, 
                                 GLESHardwareBufferManager::getGLUsage(mUsage));
                 
-			}
-			if (mUsage & HBU_WRITE_ONLY)
-				access = GL_WRITE_ONLY_OES;
+            }
+            if (mUsage & HBU_WRITE_ONLY)
+                access = GL_WRITE_ONLY_OES;
             
-			void* pBuffer = glMapBufferOES( GL_ARRAY_BUFFER, access);
+            void* pBuffer = glMapBufferOES( GL_ARRAY_BUFFER, access);
             
-			if(pBuffer == 0)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+            if(pBuffer == 0)
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
                             "Vertex Buffer: Out of memory", "GLESHardwareVertexBuffer::lock");
-			}
+            }
             
-			// return offsetted
-			retPtr = static_cast<void*>(
-				static_cast<unsigned char*>(pBuffer) + offset);
+            // return offsetted
+            retPtr = static_cast<void*>(
+                static_cast<unsigned char*>(pBuffer) + offset);
             
-			mLockedToScratch = false;
-		}
+            mLockedToScratch = false;
+        }
 #endif
-		mIsLocked = true;
+        mIsLocked = true;
         return retPtr;
     }
 
@@ -192,14 +192,14 @@ namespace Ogre {
         else
         {
 #if defined(GL_GLEXT_PROTOTYPES)
-			glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+            glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
             
-			if(!glUnmapBufferOES( GL_ARRAY_BUFFER ))
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+            if(!glUnmapBufferOES( GL_ARRAY_BUFFER ))
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
                             "Buffer data corrupted, please reload", 
                             "GLESHardwareVertexBuffer::unlock");
-			}
+            }
 #else
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Only locking to scratch is supported",

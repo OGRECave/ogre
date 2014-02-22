@@ -34,48 +34,48 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Allows the rendering of a wireframe bounding box.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Allows the rendering of a wireframe bounding box.
         @remarks
             This class builds a wireframe renderable from a given aabb. A pointer to this class can be
-			added to a render queue to display the bounding box of an object.
+            added to a render queue to display the bounding box of an object.
     */
-	class _OgreExport WireBoundingBox : public SimpleRenderable
-	{
+    class _OgreExport WireBoundingBox : public SimpleRenderable
+    {
     protected:
         /** Override this method to prevent parent transforms (rotation,translation,scale)
         */
-		void getWorldTransforms( Matrix4* xform ) const;
-		
+        void getWorldTransforms( Matrix4* xform ) const;
+        
         /** Builds the wireframe line list.
         */
-		void setupBoundingBoxVertices(const AxisAlignedBox& aab);
+        void setupBoundingBoxVertices(const AxisAlignedBox& aab);
 
         Real mRadius;
 
-		void _initWireBoundingBox();
+        void _initWireBoundingBox();
 
-	public:
-			
-		WireBoundingBox( IdType id, ObjectMemoryManager *objectMemoryManager );
-		~WireBoundingBox();
+    public:
+            
+        WireBoundingBox( IdType id, ObjectMemoryManager *objectMemoryManager );
+        ~WireBoundingBox();
 
         /** Builds the wireframe line list.
             @param
                 aabb bounding box to build a wireframe from.
         */
-		void setupBoundingBox(const AxisAlignedBox& aabb);
+        void setupBoundingBox(const AxisAlignedBox& aabb);
 
-		Real getSquaredViewDepth(const Camera* cam) const;
+        Real getSquaredViewDepth(const Camera* cam) const;
 
-	};
-	/** @} */
-	/** @} */
+    };
+    /** @} */
+    /** @} */
 
 }// namespace
 

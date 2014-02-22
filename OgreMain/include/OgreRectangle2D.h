@@ -34,30 +34,30 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Allows the rendering of a simple 2D rectangle
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Allows the rendering of a simple 2D rectangle
     This class renders a simple 2D rectangle; this rectangle has no depth and
     therefore is best used with 'depth_write off' materials.
-	@par
-	Beginning Ogre 2.0, it supports building a full screen triangle instead
-	of rectangle. Position & UVs are in the first source. Normals are in the second one
+    @par
+    Beginning Ogre 2.0, it supports building a full screen triangle instead
+    of rectangle. Position & UVs are in the first source. Normals are in the second one
     */
     class _OgreExport Rectangle2D : public Renderable, public MovableAlloc
     {
     protected:
-		Vector3		mPosition;
-		Quaternion	mOrientation;
-		Vector3		mScale;
+        Vector3     mPosition;
+        Quaternion  mOrientation;
+        Vector3     mScale;
 
-		bool		mQuad;
+        bool        mQuad;
 
-		MaterialPtr	mMaterial;
-		RenderOperation	mRenderOp;
+        MaterialPtr mMaterial;
+        RenderOperation mRenderOp;
 
         void initRectangle2D(void);
 
@@ -74,25 +74,25 @@ namespace Ogre {
         */
         void setCorners( Real left, Real top, Real width, Real height );
 
-		/** Sets the normals of the rectangle
-		@remarks
-			Be careful the normals can be bilinearly interpolated correctly, otherwise the
-			results between Fullscreen Triangles & Fullscreen Quads will be different
-		*/
-		void setNormals( const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft,
-						const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight );
+        /** Sets the normals of the rectangle
+        @remarks
+            Be careful the normals can be bilinearly interpolated correctly, otherwise the
+            results between Fullscreen Triangles & Fullscreen Quads will be different
+        */
+        void setNormals( const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft,
+                        const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight );
 
-        Real getSquaredViewDepth(const Camera* cam) const	{ (void)cam; return 0; }
+        Real getSquaredViewDepth(const Camera* cam) const   { (void)cam; return 0; }
 
-		void setMaterial( const String& matName );
+        void setMaterial( const String& matName );
         virtual const MaterialPtr& getMaterial(void) const;
-		virtual void getWorldTransforms( Matrix4* xform ) const;
-		virtual void getRenderOperation( RenderOperation& op );
-		virtual const LightList& getLights(void) const;
+        virtual void getWorldTransforms( Matrix4* xform ) const;
+        virtual void getRenderOperation( RenderOperation& op );
+        virtual const LightList& getLights(void) const;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }// namespace
 

@@ -39,35 +39,35 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	CompositorPassClear::CompositorPassClear( const CompositorPassClearDef *definition,
-												SceneManager *sceneManager,
-												const CompositorChannel &target,
-												CompositorNode *parentNode ) :
-				CompositorPass( definition, target, parentNode ),
-				mSceneManager( sceneManager ),
-				mDefinition( definition )
-	{
-	}
-	//-----------------------------------------------------------------------------------
-	void CompositorPassClear::execute( const Camera *lodCamera )
-	{
-		//Execute a limited number of times?
-		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
-		{
-			if( !mNumPassesLeft )
-				return;
-			--mNumPassesLeft;
-		}
+    CompositorPassClear::CompositorPassClear( const CompositorPassClearDef *definition,
+                                                SceneManager *sceneManager,
+                                                const CompositorChannel &target,
+                                                CompositorNode *parentNode ) :
+                CompositorPass( definition, target, parentNode ),
+                mSceneManager( sceneManager ),
+                mDefinition( definition )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassClear::execute( const Camera *lodCamera )
+    {
+        //Execute a limited number of times?
+        if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
+        {
+            if( !mNumPassesLeft )
+                return;
+            --mNumPassesLeft;
+        }
 
-		//TODO: Implement mDiscardOnly
-		mSceneManager->_setViewport( mViewport );
+        //TODO: Implement mDiscardOnly
+        mSceneManager->_setViewport( mViewport );
 
-		//Fire the listener in case it wants to change anything
-		CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
-		if( listener )
-			listener->passPreExecute( this );
+        //Fire the listener in case it wants to change anything
+        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+        if( listener )
+            listener->passPreExecute( this );
 
-		mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
-							mDefinition->mDepthValue, mDefinition->mStencilValue );
-	}
+        mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
+                            mDefinition->mDepthValue, mDefinition->mStencilValue );
+    }
 }

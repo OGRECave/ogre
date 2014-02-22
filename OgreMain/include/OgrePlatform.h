@@ -60,7 +60,7 @@ namespace Ogre {
 #if defined( __GCCE__ )
 #   define OGRE_COMPILER OGRE_COMPILER_GCCE
 #   define OGRE_COMP_VER _MSC_VER
-//#	include <staticlibinit_gcce.h> // This is a GCCE toolchain workaround needed when compiling with GCCE 
+//# include <staticlibinit_gcce.h> // This is a GCCE toolchain workaround needed when compiling with GCCE 
 #elif defined( __WINSCW__ )
 #   define OGRE_COMPILER OGRE_COMPILER_WINSCW
 #   define OGRE_COMP_VER _MSC_VER
@@ -103,29 +103,29 @@ namespace Ogre {
 
 /* Finds the current platform */
 #if defined( __WIN32__ ) || defined( _WIN32 )
-#	if defined(WINAPI_FAMILY)
-#		define __OGRE_HAVE_DIRECTXMATH 1
-#		include <winapifamily.h>
-#		if WINAPI_FAMILY == WINAPI_FAMILY_APP|| WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-#			define DESKTOP_APP 1
-#			define PHONE 2
-#			define OGRE_PLATFORM OGRE_PLATFORM_WINRT
-#			define _CRT_SECURE_NO_WARNINGS
-#			define _SCL_SECURE_NO_WARNINGS
-#			if WINAPI_FAMILY == WINAPI_FAMILY_APP
-#				define OGRE_WINRT_TARGET_TYPE DESKTOP_APP
-#			endif
-#			if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-#				define OGRE_WINRT_TARGET_TYPE PHONE
-#			endif
-#		else
-#			define OGRE_PLATFORM OGRE_PLATFORM_WIN32
-#		endif
-#	else
-#		define OGRE_PLATFORM OGRE_PLATFORM_WIN32
-#	endif
+#   if defined(WINAPI_FAMILY)
+#       define __OGRE_HAVE_DIRECTXMATH 1
+#       include <winapifamily.h>
+#       if WINAPI_FAMILY == WINAPI_FAMILY_APP|| WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
+#           define DESKTOP_APP 1
+#           define PHONE 2
+#           define OGRE_PLATFORM OGRE_PLATFORM_WINRT
+#           define _CRT_SECURE_NO_WARNINGS
+#           define _SCL_SECURE_NO_WARNINGS
+#           if WINAPI_FAMILY == WINAPI_FAMILY_APP
+#               define OGRE_WINRT_TARGET_TYPE DESKTOP_APP
+#           endif
+#           if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
+#               define OGRE_WINRT_TARGET_TYPE PHONE
+#           endif
+#       else
+#           define OGRE_PLATFORM OGRE_PLATFORM_WIN32
+#       endif
+#   else
+#       define OGRE_PLATFORM OGRE_PLATFORM_WIN32
+#   endif
 #elif defined(__FLASHCC__)
-#	define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
+#   define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
 #elif defined( __APPLE_CC__)
     // Device                                                     Simulator
     // Both requiring OS version 6.0 or greater
@@ -135,7 +135,7 @@ namespace Ogre {
 #       define OGRE_PLATFORM OGRE_PLATFORM_APPLE
 #   endif
 #elif defined(__ANDROID__)
-#	define OGRE_PLATFORM OGRE_PLATFORM_ANDROID
+#   define OGRE_PLATFORM OGRE_PLATFORM_ANDROID
 #elif defined( __native_client__ ) 
 #   define OGRE_PLATFORM OGRE_PLATFORM_NACL
 #   ifndef OGRE_STATIC_LIB
@@ -177,22 +177,22 @@ namespace Ogre {
 
 // If we're not including this from a client build, specify that the stuff
 // should get exported. Otherwise, import it.
-#	if defined( OGRE_STATIC_LIB )
-		// Linux compilers don't have symbol import/export directives.
-#   	define _OgreExport
-#   	define _OgrePrivate
+#   if defined( OGRE_STATIC_LIB )
+        // Linux compilers don't have symbol import/export directives.
+#       define _OgreExport
+#       define _OgrePrivate
 #   else
-#   	if defined( OGRE_NONCLIENT_BUILD )
-#       	define _OgreExport __declspec( dllexport )
-#   	else
+#       if defined( OGRE_NONCLIENT_BUILD )
+#           define _OgreExport __declspec( dllexport )
+#       else
 #           if defined( __MINGW32__ )
 #               define _OgreExport
 #           else
-#       	    define _OgreExport __declspec( dllimport )
+#               define _OgreExport __declspec( dllimport )
 #           endif
-#   	endif
-#   	define _OgrePrivate
-#	endif
+#       endif
+#       define _OgrePrivate
+#   endif
 // Win32 compilers use _DEBUG for specifying debug builds.
 // for MinGW, we set DEBUG
 #   if defined(_DEBUG) || defined(DEBUG)
@@ -269,7 +269,7 @@ namespace Ogre {
 #   ifdef OGRE_UNICODE_SUPPORT
 #       undef OGRE_UNICODE_SUPPORT
 #   endif
-#	define OGRE_UNICODE_SUPPORT 1
+#   define OGRE_UNICODE_SUPPORT 1
     // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
 #   ifdef DEBUG
@@ -278,7 +278,7 @@ namespace Ogre {
 #       define OGRE_DEBUG_MODE 0
 #   endif
 #   ifndef CLOCKS_PER_SEC
-#	    define CLOCKS_PER_SEC  1000
+#       define CLOCKS_PER_SEC  1000
 #   endif
 #endif
     
@@ -288,7 +288,7 @@ namespace Ogre {
 #   ifdef OGRE_UNICODE_SUPPORT
 #       undef OGRE_UNICODE_SUPPORT
 #   endif
-#	define OGRE_UNICODE_SUPPORT 0
+#   define OGRE_UNICODE_SUPPORT 0
 #   ifdef DEBUG
 #       define OGRE_DEBUG_MODE 1
 #   else
@@ -308,28 +308,28 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Set the default locale for strings
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-//	Locales are not supported by the C lib you have to go through JNI.
-#	define OGRE_DEFAULT_LOCALE ""
+//  Locales are not supported by the C lib you have to go through JNI.
+#   define OGRE_DEFAULT_LOCALE ""
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#	define OGRE_DEFAULT_LOCALE "C"
+#   define OGRE_DEFAULT_LOCALE "C"
 #else
-#	if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#		if _MSC_VER >= 1700
-#			define OGRE_DEFAULT_LOCALE "en-GB"
-#		else
-// 			http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
-#			define OGRE_DEFAULT_LOCALE "uk"
-#		endif
-#	elif OGRE_COMPILER == OGRE_COMPILER_GCCE
-//		http://gcc.gnu.org/onlinedocs/libstdc++/manual/localization.html
-#   	define OGRE_DEFAULT_LOCALE "en_GB.UTF8"
-#	else
+#   if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#       if _MSC_VER >= 1700
+#           define OGRE_DEFAULT_LOCALE "en-GB"
+#       else
+//          http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
+#           define OGRE_DEFAULT_LOCALE "uk"
+#       endif
+#   elif OGRE_COMPILER == OGRE_COMPILER_GCCE
+//      http://gcc.gnu.org/onlinedocs/libstdc++/manual/localization.html
+#       define OGRE_DEFAULT_LOCALE "en_GB.UTF8"
+#   else
 #       if OGRE_NO_LIBCPP_SUPPORT == 0
 #           define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
 #       else
-#   	    define OGRE_DEFAULT_LOCALE "C"
+#           define OGRE_DEFAULT_LOCALE "C"
 #       endif
-#	endif
+#   endif
 #endif
 
 //----------------------------------------------------------------------------
@@ -346,25 +346,25 @@ namespace Ogre {
 #endif
 
 #if OGRE_FLEXIBILITY_LEVEL >= 0
-	#define virtual_l0 virtual
+    #define virtual_l0 virtual
 #else
-	#define virtual_l0
+    #define virtual_l0
 #endif
 #if OGRE_FLEXIBILITY_LEVEL > 1
-	#define virtual_l1 virtual
+    #define virtual_l1 virtual
 #else
-	#define virtual_l1
+    #define virtual_l1
 #endif
 #if OGRE_FLEXIBILITY_LEVEL > 2
-	#define virtual_l2 virtual
+    #define virtual_l2 virtual
 #else
-	#define virtual_l2
+    #define virtual_l2
 #endif
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-	#define DECL_MALLOC __declspec(restrict) __declspec(noalias)
+    #define DECL_MALLOC __declspec(restrict) __declspec(noalias)
 #else
-	#define DECL_MALLOC __attribute__ ((malloc))
+    #define DECL_MALLOC __attribute__ ((malloc))
 #endif
 
 // Stack-alignment hackery.
@@ -407,31 +407,31 @@ typedef short int16;
 typedef signed char int8;
 // define uint64 type
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-	typedef unsigned __int64 uint64;
-	typedef __int64 int64;
+    typedef unsigned __int64 uint64;
+    typedef __int64 int64;
 #else
-	typedef unsigned long long uint64;
-	typedef long long int64;
+    typedef unsigned long long uint64;
+    typedef long long int64;
 #endif
 
 #ifndef OGRE_RESTRICT_ALIASING
-	#define OGRE_RESTRICT_ALIASING 0
+    #define OGRE_RESTRICT_ALIASING 0
 #endif
 
 #if OGRE_RESTRICT_ALIASING != 0
-	#if OGRE_COMPILER == OGRE_COMPILER_MSVC
-		#define RESTRICT_ALIAS __restrict	//MSVC
-	#else
-		#define RESTRICT_ALIAS __restrict__ //GCC... and others?
-	#endif
+    #if OGRE_COMPILER == OGRE_COMPILER_MSVC
+        #define RESTRICT_ALIAS __restrict   //MSVC
+    #else
+        #define RESTRICT_ALIAS __restrict__ //GCC... and others?
+    #endif
 #else
-	#define RESTRICT_ALIAS
+    #define RESTRICT_ALIAS
 #endif
 
 // Disable these warnings (too much noise)
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#	define _CRT_SECURE_NO_WARNINGS
-#	define _SCL_SECURE_NO_WARNINGS
+#   define _CRT_SECURE_NO_WARNINGS
+#   define _SCL_SECURE_NO_WARNINGS
 // Turn off warnings generated by long std templates
 // This warns about truncation to 255 characters in debug/browse info
 #   pragma warning (disable : 4786)

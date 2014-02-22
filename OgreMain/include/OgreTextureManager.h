@@ -38,13 +38,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
-	/** Class for loading & managing textures.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
+    /** Class for loading & managing textures.
         @remarks
             Note that this class is abstract - the particular
             RenderSystem that is in use at the time will create
@@ -65,14 +65,14 @@ namespace Ogre {
         virtual ~TextureManager();
 
 
-		/// Create a new texture
-		/// @see ResourceManager::createResource
-		TexturePtr create (const String& name, const String& group,
-							bool isManual = false, ManualResourceLoader* loader = 0,
-							const NameValuePairList* createParams = 0);
-		/// Get a resource by name
-		/// @see ResourceManager::getResourceByName
-		TexturePtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        /// Create a new texture
+        /// @see ResourceManager::createResource
+        TexturePtr create (const String& name, const String& group,
+                            bool isManual = false, ManualResourceLoader* loader = 0,
+                            const NameValuePairList* createParams = 0);
+        /// Get a resource by name
+        /// @see ResourceManager::getResourceByName
+        TexturePtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
         /** Create a new texture, or retrieve an existing one with the same
             name if it already exists.
@@ -92,11 +92,11 @@ namespace Ogre {
             @param 
                 desiredFormat The format you would like to have used instead of
                 the format being based on the contents of the texture
-			@param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-				(sRGB) on this texture. The hardware will convert from gamma space
-				to linear space when reading from this texture. Only applicable for 
-				8-bits per channel textures, will be ignored for other types. Has the advantage
-				over pre-applied gamma that the texture precision is maintained.
+            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+                (sRGB) on this texture. The hardware will convert from gamma space
+                to linear space when reading from this texture. Only applicable for 
+                8-bits per channel textures, will be ignored for other types. Has the advantage
+                over pre-applied gamma that the texture precision is maintained.
             @see ResourceManager::createOrRetrieve
         */
         virtual ResourceCreateOrRetrieveResult createOrRetrieve(
@@ -127,11 +127,11 @@ namespace Ogre {
             @param 
                 desiredFormat The format you would like to have used instead of
                 the format being based on the contents of the texture
-			@param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-				(sRGB) on this texture. The hardware will convert from gamma space
-				to linear space when reading from this texture. Only applicable for 
-				8-bits per channel textures, will be ignored for other types. Has the advantage
-				over pre-applied gamma that the texture precision is maintained.
+            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+                (sRGB) on this texture. The hardware will convert from gamma space
+                to linear space when reading from this texture. Only applicable for 
+                8-bits per channel textures, will be ignored for other types. Has the advantage
+                over pre-applied gamma that the texture precision is maintained.
         */
         virtual TexturePtr prepare( 
             const String& name, const String& group, 
@@ -149,31 +149,31 @@ namespace Ogre {
             @param
                 numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
                 the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps())
-				If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-				level, 1x1x1.
+                If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
+                level, 1x1x1.
             @param
                 gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
-					during loading
-			@param 
-				isAlpha Only applicable to greyscale images. If true, specifies that
-				the image should be loaded into an alpha texture rather than a
-				single channel colour texture - useful for fixed-function systems.
-			@param 
-				desiredFormat The format you would like to have used instead of
-				the format being based on the contents of the texture. Pass PF_UNKNOWN
-				to default.
-			@param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-				(sRGB) on this texture. The hardware will convert from gamma space
-				to linear space when reading from this texture. Only applicable for 
-				8-bits per channel textures, will be ignored for other types. Has the advantage
-				over pre-applied gamma that the texture precision is maintained.
+                    during loading
+            @param 
+                isAlpha Only applicable to greyscale images. If true, specifies that
+                the image should be loaded into an alpha texture rather than a
+                single channel colour texture - useful for fixed-function systems.
+            @param 
+                desiredFormat The format you would like to have used instead of
+                the format being based on the contents of the texture. Pass PF_UNKNOWN
+                to default.
+            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+                (sRGB) on this texture. The hardware will convert from gamma space
+                to linear space when reading from this texture. Only applicable for 
+                8-bits per channel textures, will be ignored for other types. Has the advantage
+                over pre-applied gamma that the texture precision is maintained.
         */
         virtual TexturePtr load( 
             const String& name, const String& group, 
             TextureType texType = TEX_TYPE_2D, int numMipmaps = MIP_DEFAULT, 
             Real gamma = 1.0f, bool isAlpha = false,
             PixelFormat desiredFormat = PF_UNKNOWN, 
-			bool hwGammaCorrection = false);
+            bool hwGammaCorrection = false);
 
         /** Loads a texture from an Image object.
             @note
@@ -189,29 +189,29 @@ namespace Ogre {
             @param
                 numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
                 the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps())
-				If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-				level, 1x1x1.
+                If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
+                level, 1x1x1.
             @param
                 gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
-			@param 
-				isAlpha Only applicable to greyscale images. If true, specifies that
-				the image should be loaded into an alpha texture rather than a
-				single channel colour texture - useful for fixed-function systems.
-			@param 
-				desiredFormat The format you would like to have used instead of
-				the format being based on the contents of the texture
-			@param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-				(sRGB) on this texture. The hardware will convert from gamma space
-				to linear space when reading from this texture. Only applicable for 
-				8-bits per channel textures, will be ignored for other types. Has the advantage
-				over pre-applied gamma that the texture precision is maintained.
+            @param 
+                isAlpha Only applicable to greyscale images. If true, specifies that
+                the image should be loaded into an alpha texture rather than a
+                single channel colour texture - useful for fixed-function systems.
+            @param 
+                desiredFormat The format you would like to have used instead of
+                the format being based on the contents of the texture
+            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+                (sRGB) on this texture. The hardware will convert from gamma space
+                to linear space when reading from this texture. Only applicable for 
+                8-bits per channel textures, will be ignored for other types. Has the advantage
+                over pre-applied gamma that the texture precision is maintained.
         */
         virtual TexturePtr loadImage( 
             const String &name, const String& group, const Image &img, 
             TextureType texType = TEX_TYPE_2D,
             int numMipmaps = MIP_DEFAULT, Real gamma = 1.0f, bool isAlpha = false,
             PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
-			
+            
         /** Loads a texture from a raw data stream.
             @note
                 The texture will create as manual texture without loader.
@@ -234,23 +234,23 @@ namespace Ogre {
             @param numMipmaps
                 The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
                 the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps())
-				If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-				level, 1x1x1.
+                If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
+                level, 1x1x1.
             @param gamma
                 The gamma adjustment factor to apply to this texture (brightening/darkening)
-				while loading
-			@param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-				 (sRGB) on this texture. The hardware will convert from gamma space
-				 to linear space when reading from this texture. Only applicable for 
-				 8-bits per channel textures, will be ignored for other types. Has the advantage
-				 over pre-applied gamma that the texture precision is maintained.
+                while loading
+            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+                 (sRGB) on this texture. The hardware will convert from gamma space
+                 to linear space when reading from this texture. Only applicable for 
+                 8-bits per channel textures, will be ignored for other types. Has the advantage
+                 over pre-applied gamma that the texture precision is maintained.
         */
         virtual TexturePtr loadRawData(const String &name, const String& group,
             DataStreamPtr& stream, ushort width, ushort height, 
             PixelFormat format, TextureType texType = TEX_TYPE_2D, 
             int numMipmaps = MIP_DEFAULT, Real gamma = 1.0f, bool hwGammaCorrection = false);
 
-		/** Create a manual texture with specified width, height and depth (not loaded from a file).
+        /** Create a manual texture with specified width, height and depth (not loaded from a file).
             @param
                 name The name to give the resulting texture
             @param
@@ -266,18 +266,18 @@ namespace Ogre {
             @param
                 numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
                 the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps())
-				If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-				level, 1x1x1.
+                If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
+                level, 1x1x1.
             @param
                 format The internal format you wish to request; the manager reserves
                 the right to create a different format if the one you select is
                 not available in this context.
-			@param 
-				usage The kind of usage this texture is intended for. It 
-				is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY, 
-				TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
-            	strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
-            	update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
+            @param 
+                usage The kind of usage this texture is intended for. It 
+                is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY, 
+                TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
+                strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
+                update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
             @param
                 loader If you intend the contents of the manual texture to be 
                 regularly updated, to the extent that you don't need to recover 
@@ -287,24 +287,24 @@ namespace Ogre {
                 and pass a pointer to it in this parameter; this means that if the
                 manual texture ever needs to be reloaded, the ManualResourceLoader
                 will be called to do it.
-			@param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-				(sRGB) on this texture. The hardware will convert from gamma space
-				to linear space when reading from this texture. Only applicable for 
-				8-bits per channel textures, will be ignored for other types. Has the advantage
-				over pre-applied gamma that the texture precision is maintained.
-			@param fsaa The level of multisampling to use if this is a render target. Ignored
-				if usage does not include TU_RENDERTARGET or if the device does
-				not support it.
-			@param explicitResolve Whether FSAA resolves are done implicitly when used as
-				texture, or must be done explicitly.
-				@See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
+            @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+                (sRGB) on this texture. The hardware will convert from gamma space
+                to linear space when reading from this texture. Only applicable for 
+                8-bits per channel textures, will be ignored for other types. Has the advantage
+                over pre-applied gamma that the texture precision is maintained.
+            @param fsaa The level of multisampling to use if this is a render target. Ignored
+                if usage does not include TU_RENDERTARGET or if the device does
+                not support it.
+            @param explicitResolve Whether FSAA resolves are done implicitly when used as
+                texture, or must be done explicitly.
+                @See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
         */
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 
-			int numMipmaps, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
-			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK,
-			bool explicitResolve = false);
-			
+            int numMipmaps, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
+            bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK,
+            bool explicitResolve = false);
+            
         /** Create a manual texture with a depth of 1 (not loaded from a file).
             @param
                 name The name to give the resulting texture
@@ -319,18 +319,18 @@ namespace Ogre {
             @param
                 numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
                 the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps()).
-				If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-				level, 1x1x1.
+                If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
+                level, 1x1x1.
             @param
                 format The internal format you wish to request; the manager reserves
                 the right to create a different format if the one you select is
                 not available in this context.
-			@param 
-				usage The kind of usage this texture is intended for. It 
-				is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY, 
-				TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
-            	strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
-            	update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
+            @param 
+                usage The kind of usage this texture is intended for. It 
+                is a combination of TU_STATIC, TU_DYNAMIC, TU_WRITE_ONLY, 
+                TU_AUTOMIPMAP and TU_RENDERTARGET (see TextureUsage enum). You are
+                strongly advised to use HBU_STATIC_WRITE_ONLY wherever possible, if you need to 
+                update regularly, consider HBU_DYNAMIC_WRITE_ONLY.
             @param
                 loader If you intend the contents of the manual texture to be 
                 regularly updated, to the extent that you don't need to recover 
@@ -340,27 +340,27 @@ namespace Ogre {
                 and pass a pointer to it in this parameter; this means that if the
                 manual texture ever needs to be reloaded, the ManualResourceLoader
                 will be called to do it.
-			 @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
-				 (sRGB) on this texture. The hardware will convert from gamma space
-				 to linear space when reading from this texture. Only applicable for 
-				 8-bits per channel textures, will be ignored for other types. Has the advantage
-				 over pre-applied gamma that the texture precision is maintained.
-			@param fsaa The level of multisampling to use if this is a render target. Ignored
-				if usage does not include TU_RENDERTARGET or if the device does
-				not support it.
-			@param explicitResolve Whether FSAA resolves are done implicitly when used as
-				texture, or must be done explicitly.
-				@See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
+             @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+                 (sRGB) on this texture. The hardware will convert from gamma space
+                 to linear space when reading from this texture. Only applicable for 
+                 8-bits per channel textures, will be ignored for other types. Has the advantage
+                 over pre-applied gamma that the texture precision is maintained.
+            @param fsaa The level of multisampling to use if this is a render target. Ignored
+                if usage does not include TU_RENDERTARGET or if the device does
+                not support it.
+            @param explicitResolve Whether FSAA resolves are done implicitly when used as
+                texture, or must be done explicitly.
+                @See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
         */
         TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, int numMipmaps,
             PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
-			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK,
-			bool explicitResolve = false)
-		{
-			return createManual(name, group, texType, width, height, 1, 
-				numMipmaps, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint, explicitResolve);
-		}
+            bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK,
+            bool explicitResolve = false)
+        {
+            return createManual(name, group, texType, width, height, 1, 
+                numMipmaps, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint, explicitResolve);
+        }
 
         /** Sets preferred bit depth for integer pixel format textures.
         @param
@@ -400,33 +400,33 @@ namespace Ogre {
         */
         virtual void setPreferredBitDepths(ushort integerBits, ushort floatBits, bool reloadTextures = true);
 
-		/** Returns whether this render system can natively support the precise texture 
-			format requested with the given usage options.
-		@remarks
-			You can still create textures with this format even if this method returns
-			false; the texture format will just be altered to one which the device does
-			support.
-		@note
-			Sometimes the device may just slightly change the format, such as reordering the 
-			channels or packing the channels differently, without it making and qualitative 
-			differences to the texture. If you want to just detect whether the quality of a
-			given texture will be reduced, use isEquivalentFormatSupport instead.
-		@param format The pixel format requested
-		@param usage The kind of usage this texture is intended for, a combination of 
-			the TextureUsage flags.
-		@return true if the format is natively supported, false if a fallback would be used.
-		*/
-		virtual bool isFormatSupported(TextureType ttype, PixelFormat format, int usage);
+        /** Returns whether this render system can natively support the precise texture 
+            format requested with the given usage options.
+        @remarks
+            You can still create textures with this format even if this method returns
+            false; the texture format will just be altered to one which the device does
+            support.
+        @note
+            Sometimes the device may just slightly change the format, such as reordering the 
+            channels or packing the channels differently, without it making and qualitative 
+            differences to the texture. If you want to just detect whether the quality of a
+            given texture will be reduced, use isEquivalentFormatSupport instead.
+        @param format The pixel format requested
+        @param usage The kind of usage this texture is intended for, a combination of 
+            the TextureUsage flags.
+        @return true if the format is natively supported, false if a fallback would be used.
+        */
+        virtual bool isFormatSupported(TextureType ttype, PixelFormat format, int usage);
 
-		/** Returns whether this render system can support the texture format requested
-			with the given usage options, or another format with no quality reduction.
-		*/
-		virtual bool isEquivalentFormatSupported(TextureType ttype, PixelFormat format, int usage);
+        /** Returns whether this render system can support the texture format requested
+            with the given usage options, or another format with no quality reduction.
+        */
+        virtual bool isEquivalentFormatSupported(TextureType ttype, PixelFormat format, int usage);
 
-		/** Gets the format which will be natively used for a requested format given the
-			constraints of the current device.
-		*/
-		virtual PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage) = 0;
+        /** Gets the format which will be natively used for a requested format given the
+            constraints of the current device.
+        */
+        virtual PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage) = 0;
 
         /** Returns whether this render system has hardware filtering supported for the
             texture format requested with the given usage options.
@@ -457,15 +457,15 @@ namespace Ogre {
             <b>filtering none</b> in the material script's texture_unit section, or
             call TextureUnitState::setTextureFiltering with TFO_NONE if populate
             material in code).
-		@param ttype The texture type requested
-		@param format The pixel format requested
-		@param usage The kind of usage this texture is intended for, a combination of 
-			the TextureUsage flags.
+        @param ttype The texture type requested
+        @param format The pixel format requested
+        @param usage The kind of usage this texture is intended for, a combination of 
+            the TextureUsage flags.
         @param preciseFormatOnly Whether precise or fallback format mode is used to detecting.
             In case the pixel format doesn't supported by device, false will be returned
             if in precise mode, and natively used pixel format will be actually use to
             check if in fallback mode.
-		@return true if the texture filtering is supported.
+        @return true if the texture filtering is supported.
         */
         virtual bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
             bool preciseFormatOnly = false) = 0;
@@ -473,8 +473,8 @@ namespace Ogre {
         /** Sets the default number of mipmaps to be used for loaded textures, for when textures are
             loaded automatically (e.g. by Material class) or when 'load' is called with the default
             parameters by the application.
-			If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
-				level, 1x1x1.
+            If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
+                level, 1x1x1.
             @note
                 The default value is 0.
         */
@@ -526,8 +526,8 @@ namespace Ogre {
         ushort mPreferredFloatBitDepth;
         size_t mDefaultNumMipmaps;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }// Namespace
 
 #endif

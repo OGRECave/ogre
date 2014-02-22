@@ -42,13 +42,13 @@ THE SOFTWARE.
 namespace Ogre {
 
     RenderTarget::RenderTarget()
-		: mPriority(OGRE_DEFAULT_RT_GROUP)
-		, mDepthBufferPoolId(DepthBuffer::POOL_DEFAULT)
-		, mDepthBuffer(0)
-		, mActive(true)
-		, mHwGamma(false)
-		, mFSAA(0)
-		, mFsaaResolveDirty(false)
+        : mPriority(OGRE_DEFAULT_RT_GROUP)
+        , mDepthBufferPoolId(DepthBuffer::POOL_DEFAULT)
+        , mDepthBuffer(0)
+        , mActive(true)
+        , mHwGamma(false)
+        , mFSAA(0)
+        , mFsaaResolveDirty(false)
     {
         resetStatistics();
     }
@@ -63,11 +63,11 @@ namespace Ogre {
             OGRE_DELETE *i;
         }
 
-		//DepthBuffer keeps track of us, avoid a dangling pointer
-		detachDepthBuffer();
+        //DepthBuffer keeps track of us, avoid a dangling pointer
+        detachDepthBuffer();
 
         // Write closing message
-		LogManager::getSingleton().stream(LML_TRIVIAL) << "Render Target '" << mName << "' ";
+        LogManager::getSingleton().stream(LML_TRIVIAL) << "Render Target '" << mName << "' ";
     }
 
     const String& RenderTarget::getName(void) const
@@ -95,134 +95,134 @@ namespace Ogre {
     {
         return mColourDepth;
     }
-	//-----------------------------------------------------------------------
-	void RenderTarget::setDepthBufferPool( uint16 poolId )
-	{
-		if( mDepthBufferPoolId != poolId )
-		{
-			mDepthBufferPoolId = poolId;
-			detachDepthBuffer();
-		}
-	}
-	//-----------------------------------------------------------------------
-	uint16 RenderTarget::getDepthBufferPool() const
-	{
-		return mDepthBufferPoolId;
-	}
-	//-----------------------------------------------------------------------
-	DepthBuffer* RenderTarget::getDepthBuffer() const
-	{
-		return mDepthBuffer;
-	}
-	//-----------------------------------------------------------------------
-	bool RenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
-	{
-		bool retVal = false;
+    //-----------------------------------------------------------------------
+    void RenderTarget::setDepthBufferPool( uint16 poolId )
+    {
+        if( mDepthBufferPoolId != poolId )
+        {
+            mDepthBufferPoolId = poolId;
+            detachDepthBuffer();
+        }
+    }
+    //-----------------------------------------------------------------------
+    uint16 RenderTarget::getDepthBufferPool() const
+    {
+        return mDepthBufferPoolId;
+    }
+    //-----------------------------------------------------------------------
+    DepthBuffer* RenderTarget::getDepthBuffer() const
+    {
+        return mDepthBuffer;
+    }
+    //-----------------------------------------------------------------------
+    bool RenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        bool retVal = false;
 
-		if( (retVal = depthBuffer->isCompatible( this )) )
-		{
-			detachDepthBuffer();
-			mDepthBuffer = depthBuffer;
-			mDepthBuffer->_notifyRenderTargetAttached( this );
-		}
+        if( (retVal = depthBuffer->isCompatible( this )) )
+        {
+            detachDepthBuffer();
+            mDepthBuffer = depthBuffer;
+            mDepthBuffer->_notifyRenderTargetAttached( this );
+        }
 
-		return retVal;
-	}
-	//-----------------------------------------------------------------------
-	void RenderTarget::detachDepthBuffer()
-	{
-		if( mDepthBuffer )
-		{
-			mDepthBuffer->_notifyRenderTargetDetached( this );
-			mDepthBuffer = 0;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void RenderTarget::_detachDepthBuffer()
-	{
-		mDepthBuffer = 0;
-	}
+        return retVal;
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::detachDepthBuffer()
+    {
+        if( mDepthBuffer )
+        {
+            mDepthBuffer->_notifyRenderTargetDetached( this );
+            mDepthBuffer = 0;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::_detachDepthBuffer()
+    {
+        mDepthBuffer = 0;
+    }
 
-	void RenderTarget::_beginUpdate()
-	{
-		// notify listeners (pre)
+    void RenderTarget::_beginUpdate()
+    {
+        // notify listeners (pre)
         firePreUpdate();
 
         mStats.triangleCount = 0;
         mStats.batchCount = 0;
 
-		OgreProfileBeginGPUEvent("RenderTarget: " + getName());
-	}
+        OgreProfileBeginGPUEvent("RenderTarget: " + getName());
+    }
 
-	void RenderTarget::_endUpdate()
-	{
-		 // notify listeners (post)
+    void RenderTarget::_endUpdate()
+    {
+         // notify listeners (post)
         firePostUpdate();
 
-		OgreProfileEndGPUEvent("RenderTarget: " + getName());
-	}
+        OgreProfileEndGPUEvent("RenderTarget: " + getName());
+    }
 
-	void RenderTarget::_updateViewportCullPhase01( Viewport* viewport, Camera *camera,
-												   const Camera *lodCamera, uint8 firstRq, uint8 lastRq )
-	{
-		assert( viewport->getTarget() == this &&
-				"RenderTarget::_updateViewportCullPhase the requested viewport is "
-				"not bound to the rendertarget!" );
+    void RenderTarget::_updateViewportCullPhase01( Viewport* viewport, Camera *camera,
+                                                   const Camera *lodCamera, uint8 firstRq, uint8 lastRq )
+    {
+        assert( viewport->getTarget() == this &&
+                "RenderTarget::_updateViewportCullPhase the requested viewport is "
+                "not bound to the rendertarget!" );
 
-		fireViewportPreUpdate(viewport);
-		viewport->_updateCullPhase01( camera, lodCamera, firstRq, lastRq );
-	}
-	//-----------------------------------------------------------------------
-	void RenderTarget::_updateViewportRenderPhase02( Viewport* viewport, Camera *camera,
-													 const Camera *lodCamera, uint8 firstRq,
-													 uint8 lastRq, bool updateStatistics )
-	{
-		assert( viewport->getTarget() == this &&
-				"RenderTarget::_updateViewport the requested viewport is "
-				"not bound to the rendertarget!" );
+        fireViewportPreUpdate(viewport);
+        viewport->_updateCullPhase01( camera, lodCamera, firstRq, lastRq );
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::_updateViewportRenderPhase02( Viewport* viewport, Camera *camera,
+                                                     const Camera *lodCamera, uint8 firstRq,
+                                                     uint8 lastRq, bool updateStatistics )
+    {
+        assert( viewport->getTarget() == this &&
+                "RenderTarget::_updateViewport the requested viewport is "
+                "not bound to the rendertarget!" );
 
-		viewport->_updateRenderPhase02( camera, lodCamera, firstRq, lastRq );
-		if(updateStatistics)
-		{
-			mStats.triangleCount += camera->_getNumRenderedFaces();
-			mStats.batchCount += camera->_getNumRenderedBatches();
-		}
-		fireViewportPostUpdate(viewport);
-	}
-	//-----------------------------------------------------------------------
+        viewport->_updateRenderPhase02( camera, lodCamera, firstRq, lastRq );
+        if(updateStatistics)
+        {
+            mStats.triangleCount += camera->_getNumRenderedFaces();
+            mStats.batchCount += camera->_getNumRenderedBatches();
+        }
+        fireViewportPostUpdate(viewport);
+    }
+    //-----------------------------------------------------------------------
     Viewport* RenderTarget::addViewport( float left, float top, float width, float height )
-    {		
+    {       
         // Add viewport to list
         Viewport* vp = OGRE_NEW Viewport( this, left, top, width, height );
         mViewportList.push_back( vp );
 
-		vp->mGlobalIndex = mViewportList.size() - 1;
+        vp->mGlobalIndex = mViewportList.size() - 1;
 
-		fireViewportAdded(vp);
+        fireViewportAdded(vp);
 
         return vp;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void RenderTarget::removeViewport( Viewport *vp )
     {
-		if( vp->mGlobalIndex >= mViewportList.size() ||
-			vp != *(mViewportList.begin() + vp->mGlobalIndex) )
-		{
-			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Viewport had it's mGlobalIndex out of "
-				"date!!! (or Viewport wasn't created by this RenderTarget",
-				"RenderTarget::removeViewport" );
-		}
+        if( vp->mGlobalIndex >= mViewportList.size() ||
+            vp != *(mViewportList.begin() + vp->mGlobalIndex) )
+        {
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Viewport had it's mGlobalIndex out of "
+                "date!!! (or Viewport wasn't created by this RenderTarget",
+                "RenderTarget::removeViewport" );
+        }
 
         ViewportList::iterator itor = mViewportList.begin() + vp->mGlobalIndex;
 
-		fireViewportRemoved( vp );
-		OGRE_DELETE vp;
+        fireViewportRemoved( vp );
+        OGRE_DELETE vp;
 
-		itor = efficientVectorRemove( mViewportList, itor );
+        itor = efficientVectorRemove( mViewportList, itor );
 
-		//The Viewport that was at the end got swapped and has now a different index
-		if( itor != mViewportList.end() )
-			(*itor)->mGlobalIndex = itor - mViewportList.begin();
+        //The Viewport that was at the end got swapped and has now a different index
+        if( itor != mViewportList.end() )
+            (*itor)->mGlobalIndex = itor - mViewportList.begin();
     }
 
     void RenderTarget::removeAllViewports(void)
@@ -364,38 +364,38 @@ namespace Ogre {
             (*i)->postViewportUpdate(evt);
         }
     }
-	//-----------------------------------------------------------------------
-	void RenderTarget::fireViewportAdded(Viewport* vp)
-	{
-		RenderTargetViewportEvent evt;
-		evt.source = vp;
+    //-----------------------------------------------------------------------
+    void RenderTarget::fireViewportAdded(Viewport* vp)
+    {
+        RenderTargetViewportEvent evt;
+        evt.source = vp;
 
-		RenderTargetListenerList::iterator i, iend;
-		i = mListeners.begin();
-		iend = mListeners.end();
-		for(; i != iend; ++i)
-		{
-			(*i)->viewportAdded(evt);
-		}
-	}
-	//-----------------------------------------------------------------------
-	void RenderTarget::fireViewportRemoved(Viewport* vp)
-	{
-		RenderTargetViewportEvent evt;
-		evt.source = vp;
+        RenderTargetListenerList::iterator i, iend;
+        i = mListeners.begin();
+        iend = mListeners.end();
+        for(; i != iend; ++i)
+        {
+            (*i)->viewportAdded(evt);
+        }
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::fireViewportRemoved(Viewport* vp)
+    {
+        RenderTargetViewportEvent evt;
+        evt.source = vp;
 
-		// Make a temp copy of the listeners
-		// some will want to remove themselves as listeners when they get this
-		RenderTargetListenerList tempList = mListeners;
+        // Make a temp copy of the listeners
+        // some will want to remove themselves as listeners when they get this
+        RenderTargetListenerList tempList = mListeners;
 
-		RenderTargetListenerList::iterator i, iend;
-		i = tempList.begin();
-		iend = tempList.end();
-		for(; i != iend; ++i)
-		{
-			(*i)->viewportRemoved(evt);
-		}
-	}
+        RenderTargetListenerList::iterator i, iend;
+        i = tempList.begin();
+        iend = tempList.end();
+        for(; i != iend; ++i)
+        {
+            (*i)->viewportRemoved(evt);
+        }
+    }
     //-----------------------------------------------------------------------
     String RenderTarget::writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix)
     {
@@ -403,33 +403,33 @@ namespace Ogre {
         time_t ctTime; time(&ctTime);
         pTime = localtime( &ctTime );
         Ogre::StringStream oss;
-        oss	<< std::setw(2) << std::setfill('0') << (pTime->tm_mon + 1)
+        oss << std::setw(2) << std::setfill('0') << (pTime->tm_mon + 1)
             << std::setw(2) << std::setfill('0') << pTime->tm_mday
             << std::setw(2) << std::setfill('0') << (pTime->tm_year + 1900)
             << "_" << std::setw(2) << std::setfill('0') << pTime->tm_hour
             << std::setw(2) << std::setfill('0') << pTime->tm_min
             << std::setw(2) << std::setfill('0') << pTime->tm_sec
             << std::setw(3) << std::setfill('0') <<
-						(Root::getSingleton().getTimer()->getMilliseconds() % 1000);
+                        (Root::getSingleton().getTimer()->getMilliseconds() % 1000);
         String filename = filenamePrefix + oss.str() + filenameSuffix;
         writeContentsToFile(filename);
         return filename;
 
     }
-	//-----------------------------------------------------------------------
-	void RenderTarget::writeContentsToFile(const String& filename)
-	{
-		PixelFormat pf = suggestPixelFormat();
+    //-----------------------------------------------------------------------
+    void RenderTarget::writeContentsToFile(const String& filename)
+    {
+        PixelFormat pf = suggestPixelFormat();
 
-		uchar *data = OGRE_ALLOC_T(uchar, mWidth * mHeight * PixelUtil::getNumElemBytes(pf), MEMCATEGORY_RENDERSYS);
-		PixelBox pb(mWidth, mHeight, 1, pf, data);
+        uchar *data = OGRE_ALLOC_T(uchar, mWidth * mHeight * PixelUtil::getNumElemBytes(pf), MEMCATEGORY_RENDERSYS);
+        PixelBox pb(mWidth, mHeight, 1, pf, data);
 
-		copyContentsToMemory(pb);
+        copyContentsToMemory(pb);
 
-		Image().loadDynamicImage(data, mWidth, mHeight, 1, pf, false, 1, 0).save(filename);
+        Image().loadDynamicImage(data, mWidth, mHeight, 1, pf, false, 1, 0).save(filename);
 
-		OGRE_FREE(data, MEMCATEGORY_RENDERSYS);
-	}
+        OGRE_FREE(data, MEMCATEGORY_RENDERSYS);
+    }
     //-----------------------------------------------------------------------
     bool RenderTarget::isPrimary(void) const
     {

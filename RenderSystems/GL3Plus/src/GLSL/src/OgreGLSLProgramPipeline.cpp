@@ -46,7 +46,7 @@ namespace Ogre
     }
 
     void GLSLProgramPipeline::compileAndLink()
-	{        
+    {        
         OGRE_CHECK_GL_ERROR(glGenProgramPipelines(1, &mGLProgramPipelineHandle));
         OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
 
@@ -60,29 +60,29 @@ namespace Ogre
         compileIndividualProgram(mHullProgram);
         compileIndividualProgram(mComputeProgram);
 
-		if(mLinked)
-		{
-			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
-			{
-				// Add to the microcode to the cache
-				String name;
-				name = getCombinedName();
+        if(mLinked)
+        {
+            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+            {
+                // Add to the microcode to the cache
+                String name;
+                name = getCombinedName();
 
-				// Get buffer size
-				GLint binaryLength = 0;
+                // Get buffer size
+                GLint binaryLength = 0;
 
-				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramPipelineHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
+                OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramPipelineHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
 
                 // Create microcode
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
 
-				// Get binary
-				OGRE_CHECK_GL_ERROR(glGetProgramBinary(mGLProgramPipelineHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
+                // Get binary
+                OGRE_CHECK_GL_ERROR(glGetProgramBinary(mGLProgramPipelineHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
 
-        		// Add to the microcode to the cache
-				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
-			}
+                // Add to the microcode to the cache
+                GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
+            }
             if(mVertexProgram && mVertexProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStages(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT, mVertexProgram->getGLSLProgram()->getGLProgramHandle()));
@@ -114,13 +114,13 @@ namespace Ogre
 //            if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
 //                glObjectLabel(GL_PROGRAM_PIPELINE, mGLProgramPipelineHandle, 0,
 //                                 (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
-		}
-	}
+        }
+    }
 
     void GLSLProgramPipeline::compileIndividualProgram(GLSLGpuProgram *program)
     {
         GLint linkStatus = 0;
-		// Compile and attach program
+        // Compile and attach program
         if(program && !program->isLinked())
         {
             try
@@ -129,7 +129,7 @@ namespace Ogre
             }
             catch (Exception& e)
             {
-				LogManager::getSingleton().stream() << e.getDescription();
+                LogManager::getSingleton().stream() << e.getDescription();
                 mTriedToLinkAndFailed = true;
                 return;
             }
@@ -153,79 +153,79 @@ namespace Ogre
 
     void GLSLProgramPipeline::_useProgram(void)
     {
-		if (mLinked)
-		{
+        if (mLinked)
+        {
             OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
-		}
+        }
     }
 
-	//-----------------------------------------------------------------------
-	GLint GLSLProgramPipeline::getAttributeIndex(VertexElementSemantic semantic, uint index)
-	{
-		GLint res = mCustomAttributesIndexes[semantic-1][index];
-		if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
-		{
+    //-----------------------------------------------------------------------
+    GLint GLSLProgramPipeline::getAttributeIndex(VertexElementSemantic semantic, uint index)
+    {
+        GLint res = mCustomAttributesIndexes[semantic-1][index];
+        if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
+        {
             GLuint handle = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
-			const char * attString = getAttributeSemanticString(semantic);
-			GLint attrib;
+            const char * attString = getAttributeSemanticString(semantic);
+            GLint attrib;
             OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attString));
 
-			// Sadly position is a special case 
-			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
-			{
-				OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, "position"));
-			}
+            // Sadly position is a special case 
+            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
+            {
+                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, "position"));
+            }
             
-			// For uv and other case the index is a part of the name
-			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
-			{
-				String attStringWithSemantic = String(attString) + StringConverter::toString(index);
-				OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attStringWithSemantic.c_str()));
-			}
+            // For uv and other case the index is a part of the name
+            if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
+            {
+                String attStringWithSemantic = String(attString) + StringConverter::toString(index);
+                OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(handle, attStringWithSemantic.c_str()));
+            }
             
-			// Update mCustomAttributesIndexes with the index we found (or didn't find) 
-			mCustomAttributesIndexes[semantic-1][index] = attrib;
-			res = attrib;
-		}
+            // Update mCustomAttributesIndexes with the index we found (or didn't find) 
+            mCustomAttributesIndexes[semantic-1][index] = attrib;
+            res = attrib;
+        }
         
-		return res;
-	}
+        return res;
+    }
 
     //-----------------------------------------------------------------------
-	void GLSLProgramPipeline::activate(void)
-	{
-		if (!mLinked && !mTriedToLinkAndFailed)
-		{            
-			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
-				GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
-			{
-				getMicrocodeFromCache();
-			}
-			else
-			{
-				compileAndLink();
-			}
+    void GLSLProgramPipeline::activate(void)
+    {
+        if (!mLinked && !mTriedToLinkAndFailed)
+        {            
+            if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
+                GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
+            {
+                getMicrocodeFromCache();
+            }
+            else
+            {
+                compileAndLink();
+            }
 
             extractLayoutQualifiers();
 
-			buildGLUniformReferences();
-		}
+            buildGLUniformReferences();
+        }
 
         _useProgram();
-	}
+    }
 
     //-----------------------------------------------------------------------
-	void GLSLProgramPipeline::updateUniformBlocks(GpuProgramParametersSharedPtr params,
+    void GLSLProgramPipeline::updateUniformBlocks(GpuProgramParametersSharedPtr params,
                                               uint16 mask, GpuProgramType fromProgType)
-	{
+    {
         // Iterate through the list of uniform buffers and update them as needed
-		GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
-		GLUniformBufferIterator endBuffer = mGLUniformBufferReferences.end();
+        GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
+        GLUniformBufferIterator endBuffer = mGLUniformBufferReferences.end();
 
         const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
 
-		GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
-		for (it = sharedParams.begin(); it != end; ++it)
+        GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
+        for (it = sharedParams.begin(); it != end; ++it)
         {
             for (;currentBuffer != endBuffer; ++currentBuffer)
             {
@@ -240,67 +240,67 @@ namespace Ogre
                 hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
             }
         }
-	}
+    }
 
     //-----------------------------------------------------------------------
-	void GLSLProgramPipeline::buildGLUniformReferences(void)
-	{
-		if (!mUniformRefsBuilt)
-		{
-			const GpuConstantDefinitionMap* vertParams = 0;
-			const GpuConstantDefinitionMap* fragParams = 0;
-			const GpuConstantDefinitionMap* geomParams = 0;
-			const GpuConstantDefinitionMap* hullParams = 0;
-			const GpuConstantDefinitionMap* domainParams = 0;
-			const GpuConstantDefinitionMap* computeParams = 0;
-			if (mVertexProgram)
-			{
-				vertParams = &(mVertexProgram->getGLSLProgram()->getConstantDefinitions().map);
+    void GLSLProgramPipeline::buildGLUniformReferences(void)
+    {
+        if (!mUniformRefsBuilt)
+        {
+            const GpuConstantDefinitionMap* vertParams = 0;
+            const GpuConstantDefinitionMap* fragParams = 0;
+            const GpuConstantDefinitionMap* geomParams = 0;
+            const GpuConstantDefinitionMap* hullParams = 0;
+            const GpuConstantDefinitionMap* domainParams = 0;
+            const GpuConstantDefinitionMap* computeParams = 0;
+            if (mVertexProgram)
+            {
+                vertParams = &(mVertexProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mVertexProgram->getGLSLProgram()->getGLProgramHandle(),
                                                                            vertParams, NULL, NULL, NULL, NULL, NULL, mGLUniformReferences, mGLUniformBufferReferences);
-			}
-			if (mGeometryProgram)
-			{
-				geomParams = &(mGeometryProgram->getGLSLProgram()->getConstantDefinitions().map);
+            }
+            if (mGeometryProgram)
+            {
+                geomParams = &(mGeometryProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mGeometryProgram->getGLSLProgram()->getGLProgramHandle(),
                                                                            NULL, geomParams, NULL, NULL, NULL, NULL, mGLUniformReferences, mGLUniformBufferReferences);
-			}
-			if (mFragmentProgram)
-			{
-				fragParams = &(mFragmentProgram->getGLSLProgram()->getConstantDefinitions().map);
+            }
+            if (mFragmentProgram)
+            {
+                fragParams = &(mFragmentProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mFragmentProgram->getGLSLProgram()->getGLProgramHandle(),
                                                                            NULL, NULL, fragParams, NULL, NULL, NULL, mGLUniformReferences, mGLUniformBufferReferences);
-			}
-			if (mHullProgram)
-			{
-				hullParams = &(mHullProgram->getGLSLProgram()->getConstantDefinitions().map);
+            }
+            if (mHullProgram)
+            {
+                hullParams = &(mHullProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mHullProgram->getGLSLProgram()->getGLProgramHandle(),
                                                                            NULL, NULL, NULL, hullParams, NULL, NULL, mGLUniformReferences, mGLUniformBufferReferences);
-			}
-			if (mDomainProgram)
-			{
-				domainParams = &(mDomainProgram->getGLSLProgram()->getConstantDefinitions().map);
+            }
+            if (mDomainProgram)
+            {
+                domainParams = &(mDomainProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mDomainProgram->getGLSLProgram()->getGLProgramHandle(),
                                                                            NULL, NULL, NULL, NULL, domainParams, NULL, mGLUniformReferences, mGLUniformBufferReferences);
-			}
-			if (mComputeProgram)
-			{
-				computeParams = &(mComputeProgram->getGLSLProgram()->getConstantDefinitions().map);
+            }
+            if (mComputeProgram)
+            {
+                computeParams = &(mComputeProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLProgramPipelineManager::getSingleton().extractUniforms(mComputeProgram->getGLSLProgram()->getGLProgramHandle(),
                                                                            NULL, NULL, NULL, NULL, NULL, computeParams, mGLUniformReferences, mGLUniformBufferReferences);
-			}
+            }
 
-			mUniformRefsBuilt = true;
-		}
-	}
+            mUniformRefsBuilt = true;
+        }
+    }
 
-	//-----------------------------------------------------------------------
-	void GLSLProgramPipeline::updateUniforms(GpuProgramParametersSharedPtr params, 
+    //-----------------------------------------------------------------------
+    void GLSLProgramPipeline::updateUniforms(GpuProgramParametersSharedPtr params, 
                                            uint16 mask, GpuProgramType fromProgType)
-	{
-		// Iterate through uniform reference list and update uniform values
-		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
-		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
+    {
+        // Iterate through uniform reference list and update uniform values
+        GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
+        GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
@@ -340,21 +340,21 @@ namespace Ogre
             progID = mComputeProgram->getGLSLProgram()->getGLProgramHandle();
         }
 
-		for (;currentUniform != endUniform; ++currentUniform)
-		{
-			// Only pull values from buffer it's supposed to be in (vertex or fragment)
-			// This method will be called twice, once for vertex program params, 
-			// and once for fragment program params.
-			if (fromProgType == currentUniform->mSourceProgType)
-			{
-				const GpuConstantDefinition* def = currentUniform->mConstantDef;
-				if (def->variability & mask)
-				{
-					GLsizei glArraySize = (GLsizei)def->arraySize;
+        for (;currentUniform != endUniform; ++currentUniform)
+        {
+            // Only pull values from buffer it's supposed to be in (vertex or fragment)
+            // This method will be called twice, once for vertex program params, 
+            // and once for fragment program params.
+            if (fromProgType == currentUniform->mSourceProgType)
+            {
+                const GpuConstantDefinition* def = currentUniform->mConstantDef;
+                if (def->variability & mask)
+                {
+                    GLsizei glArraySize = (GLsizei)def->arraySize;
 
-					// Get the index in the parameter real list
-					switch (def->constType)
-					{
+                    // Get the index in the parameter real list
+                    switch (def->constType)
+                    {
                         case GCT_FLOAT1:
                             OGRE_CHECK_GL_ERROR(glProgramUniform1fv(progID, currentUniform->mLocation, glArraySize,
                                                                     params->getFloatPointer(def->physicalIndex)));
@@ -491,28 +491,28 @@ namespace Ogre
                         case GCT_SUBROUTINE:
                             break;
                             
-					} // End switch
-				} // Variability & mask
-			} // fromProgType == currentUniform->mSourceProgType
+                    } // End switch
+                } // Variability & mask
+            } // fromProgType == currentUniform->mSourceProgType
             
-  		} // End for
-	}
-	//-----------------------------------------------------------------------
-	void GLSLProgramPipeline::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
-	{
-		if (params->hasPassIterationNumber())
-		{
-			size_t index = params->getPassIterationNumberIndex();
+        } // End for
+    }
+    //-----------------------------------------------------------------------
+    void GLSLProgramPipeline::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
+    {
+        if (params->hasPassIterationNumber())
+        {
+            size_t index = params->getPassIterationNumberIndex();
             
-			GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
-			GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
+            GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
+            GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
             
-			// Need to find the uniform that matches the multi pass entry
-			for (;currentUniform != endUniform; ++currentUniform)
-			{
-				// Get the index in the parameter real list
-				if (index == currentUniform->mConstantDef->physicalIndex)
-				{
+            // Need to find the uniform that matches the multi pass entry
+            for (;currentUniform != endUniform; ++currentUniform)
+            {
+                // Get the index in the parameter real list
+                if (index == currentUniform->mConstantDef->physicalIndex)
+                {
                     GLuint progID = 0;
                     if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
@@ -547,9 +547,9 @@ namespace Ogre
                     OGRE_CHECK_GL_ERROR(glProgramUniform1fv(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
 
                     // There will only be one multipass entry
-					return;
-				}
-			}
-		}
+                    return;
+                }
+            }
+        }
     }
 }

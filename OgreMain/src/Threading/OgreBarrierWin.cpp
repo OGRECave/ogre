@@ -38,38 +38,38 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	Barrier::Barrier( size_t threadCount ) : mNumThreads( threadCount ), mIndex( 0 ), mLockCount( 0 )
-	{
-		for( size_t i=0; i<2; ++i )
-			mSemaphores[i] = CreateSemaphore( NULL, 0, mNumThreads, NULL );
-	}
-	//-----------------------------------------------------------------------------------
-	Barrier::~Barrier()
-	{
-		for( size_t i=0; i<2; ++i )
-			CloseHandle( mSemaphores[i] );
-	}
-	//-----------------------------------------------------------------------------------
-	void Barrier::sync(void)
-	{
-		//We need to be absolutely certain we read mIndex before incrementing mLockCount
-		volatile size_t idx = mIndex;
-		MemoryBarrier();
+    Barrier::Barrier( size_t threadCount ) : mNumThreads( threadCount ), mIndex( 0 ), mLockCount( 0 )
+    {
+        for( size_t i=0; i<2; ++i )
+            mSemaphores[i] = CreateSemaphore( NULL, 0, mNumThreads, NULL );
+    }
+    //-----------------------------------------------------------------------------------
+    Barrier::~Barrier()
+    {
+        for( size_t i=0; i<2; ++i )
+            CloseHandle( mSemaphores[i] );
+    }
+    //-----------------------------------------------------------------------------------
+    void Barrier::sync(void)
+    {
+        //We need to be absolutely certain we read mIndex before incrementing mLockCount
+        volatile size_t idx = mIndex;
+        MemoryBarrier();
 
-		LONG oldLockCount = _InterlockedExchangeAdd( &mLockCount, 1 );
-		if( oldLockCount != mNumThreads - 1 )
-		{
-			WaitForSingleObject( mSemaphores[idx], INFINITE );
-		}
-		else
-		{
-			//Swap the index to use the other semaphore. Otherwise a thread that runs too fast
-			//gets to the next sync point and enters the semaphore, causing threads from this
-			//one to get stuck in the current sync point (and ultimately, deadlock).
-			mIndex		= !idx;
-			mLockCount	= 0;
-			if( mNumThreads > 1 )
-				ReleaseSemaphore( mSemaphores[idx], mNumThreads - 1, NULL );
-		}
-	}
+        LONG oldLockCount = _InterlockedExchangeAdd( &mLockCount, 1 );
+        if( oldLockCount != mNumThreads - 1 )
+        {
+            WaitForSingleObject( mSemaphores[idx], INFINITE );
+        }
+        else
+        {
+            //Swap the index to use the other semaphore. Otherwise a thread that runs too fast
+            //gets to the next sync point and enters the semaphore, causing threads from this
+            //one to get stuck in the current sync point (and ultimately, deadlock).
+            mIndex      = !idx;
+            mLockCount  = 0;
+            if( mNumThreads > 1 )
+                ReleaseSemaphore( mSemaphores[idx], mNumThreads - 1, NULL );
+        }
+    }
 }

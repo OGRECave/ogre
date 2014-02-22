@@ -43,7 +43,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     void RenderWindow::getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth,
-		int& left, int& top)
+        int& left, int& top)
     {
         width = mWidth;
         height = mHeight;
@@ -56,7 +56,7 @@ namespace Ogre {
     {
         return mIsFullScreen;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     bool RenderWindow::isPrimary(void) const
     {
         return mIsPrimary;

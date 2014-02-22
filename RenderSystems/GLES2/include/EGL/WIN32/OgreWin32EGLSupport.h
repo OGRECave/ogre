@@ -36,32 +36,32 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgrePrivate Win32EGLSupport : public EGLSupport
     {
-	protected:
+    protected:
 
-		//Removed createEGLWindow because it was easier to just call
-		//new Win32EGLWindow in the code to get the native version
-		//virtual EGLWindow* createEGLWindow( EGLSupport * support);
+        //Removed createEGLWindow because it was easier to just call
+        //new Win32EGLWindow in the code to get the native version
+        //virtual EGLWindow* createEGLWindow( EGLSupport * support);
 
         public:
             Win32EGLSupport();
             virtual ~Win32EGLSupport();
 
-			//virtual GLESPBuffer* createPBuffer(PixelComponentType format,
-			//	size_t width, size_t height);
-			virtual void switchMode(uint& width, uint& height, short& frequency);
+            //virtual GLESPBuffer* createPBuffer(PixelComponentType format,
+            //  size_t width, size_t height);
+            virtual void switchMode(uint& width, uint& height, short& frequency);
 
             RenderWindow* newWindow(const String& name,
                                     unsigned int width, unsigned int height,
                                     bool fullScreen,
                                     const NameValuePairList *miscParams = 0);
 
-			//Moved getNativeDisplay to native class
-			NativeDisplayType getNativeDisplay();
+            //Moved getNativeDisplay to native class
+            NativeDisplayType getNativeDisplay();
 
-			//This sets up the native variables then calls EGLSupport::getGLDisplay
-			EGLDisplay getGLDisplay();
+            //This sets up the native variables then calls EGLSupport::getGLDisplay
+            EGLDisplay getGLDisplay();
 
-	};
+    };
 }
 
 #endif

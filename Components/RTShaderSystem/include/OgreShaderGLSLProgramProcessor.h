@@ -48,41 +48,41 @@ class _OgreRTSSExport GLSLProgramProcessor : public ProgramProcessor
 {
 
 // Interface.
-public:	
+public: 
 
-	/** Class constructor.
-	*/
-	GLSLProgramProcessor();
+    /** Class constructor.
+    */
+    GLSLProgramProcessor();
 
-	/** Class destructor */
-	virtual ~GLSLProgramProcessor();
+    /** Class destructor */
+    virtual ~GLSLProgramProcessor();
 
-	/** Return the target language of this processor. */
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
+    /** Return the target language of this processor. */
+    virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
-	/** 
-	@see ProgramProcessor::preCreateGpuPrograms
-	*/
-	virtual bool preCreateGpuPrograms(ProgramSet* programSet);
+    /** 
+    @see ProgramProcessor::preCreateGpuPrograms
+    */
+    virtual bool preCreateGpuPrograms(ProgramSet* programSet);
 
-	/** 
-	@see ProgramProcessor::postCreateGpuPrograms
-	*/
-	virtual bool postCreateGpuPrograms(ProgramSet* programSet);
+    /** 
+    @see ProgramProcessor::postCreateGpuPrograms
+    */
+    virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
 
 private:
 
-	/** Bind texture samplers. */
-	void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
+    /** Bind texture samplers. */
+    void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
 
-	/** Compiles sub shaders (only if the not exists) and attach them to the main gpu program. */
-	void bindSubShaders(Program* program, GpuProgramPtr pGpuProgram);
+    /** Compiles sub shaders (only if the not exists) and attach them to the main gpu program. */
+    void bindSubShaders(Program* program, GpuProgramPtr pGpuProgram);
 
-	static String TargetLanguage;
+    static String TargetLanguage;
 
-	// The list of created library shaders.
-	StringVector mLibraryPrograms;
+    // The list of created library shaders.
+    StringVector mLibraryPrograms;
 
 };
 

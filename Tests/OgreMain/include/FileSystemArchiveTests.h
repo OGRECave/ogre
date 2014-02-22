@@ -45,7 +45,7 @@ class FileSystemArchiveTests : public CppUnit::TestFixture
     CPPUNIT_TEST(testFindFileInfoRecursive);
     CPPUNIT_TEST(testFileRead);
     CPPUNIT_TEST(testReadInterleave);
-	CPPUNIT_TEST(testCreateAndRemoveFile);
+    CPPUNIT_TEST(testCreateAndRemoveFile);
     CPPUNIT_TEST_SUITE_END();
 protected:
     String testPath;
@@ -63,6 +63,6 @@ public:
     void testFindFileInfoRecursive();
     void testFileRead();
     void testReadInterleave();
-	void testCreateAndRemoveFile();
+    void testCreateAndRemoveFile();
 
 };

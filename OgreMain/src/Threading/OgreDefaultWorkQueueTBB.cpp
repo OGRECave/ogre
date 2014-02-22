@@ -34,124 +34,124 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/// Worker function to register threads with the RenderSystem, if required
-	struct RegisterRSWorker
-	{
-		RegisterRSWorker(DefaultWorkQueue* queue): mQueue(queue) { }
-		void operator() () { mQueue->_registerThreadWithRenderSystem(); }
-		DefaultWorkQueue* mQueue;
-	};
+    /// Worker function to register threads with the RenderSystem, if required
+    struct RegisterRSWorker
+    {
+        RegisterRSWorker(DefaultWorkQueue* queue): mQueue(queue) { }
+        void operator() () { mQueue->_registerThreadWithRenderSystem(); }
+        DefaultWorkQueue* mQueue;
+    };
 
-	//---------------------------------------------------------------------
-	DefaultWorkQueue::DefaultWorkQueue(const String& name)
-		: DefaultWorkQueueBase(name)
-		, mTaskScheduler(tbb::task_scheduler_init::deferred)
-	{
-	}
-	//---------------------------------------------------------------------
-	void DefaultWorkQueue::startup(bool forceRestart)
-	{
-		if (mIsRunning)
-		{
-			if (forceRestart)
-				shutdown();
-			else
-				return;
-		}
+    //---------------------------------------------------------------------
+    DefaultWorkQueue::DefaultWorkQueue(const String& name)
+        : DefaultWorkQueueBase(name)
+        , mTaskScheduler(tbb::task_scheduler_init::deferred)
+    {
+    }
+    //---------------------------------------------------------------------
+    void DefaultWorkQueue::startup(bool forceRestart)
+    {
+        if (mIsRunning)
+        {
+            if (forceRestart)
+                shutdown();
+            else
+                return;
+        }
 
-		mShuttingDown = false;
-		
-		mWorkerFunc = OGRE_NEW_T(WorkerFunc(this), MEMCATEGORY_GENERAL);
+        mShuttingDown = false;
+        
+        mWorkerFunc = OGRE_NEW_T(WorkerFunc(this), MEMCATEGORY_GENERAL);
 
-		LogManager::getSingleton().stream() <<
-			"DefaultWorkQueue('" << mName << "') initialising.";
+        LogManager::getSingleton().stream() <<
+            "DefaultWorkQueue('" << mName << "') initialising.";
 
-		mTaskScheduler.initialize(mWorkerThreadCount);
+        mTaskScheduler.initialize(mWorkerThreadCount);
 
-		if (mWorkerRenderSystemAccess)
-		{
-			Root::getSingleton().getRenderSystem()->preExtraThreadsStarted();
-			RegisterRSWorker worker (this);
-			// current thread need not be registered
-			mRegisteredThreads.insert(tbb::this_tbb_thread::get_id());
-			while (mRegisteredThreads.size() < mWorkerThreadCount)
-			{
-				// spawn tasks until all worker threads have registered themselves with the RS
-				for (size_t i = 0; i < mWorkerThreadCount*3; ++i)
-				{
-					mTaskGroup.run(worker);
-				}
-				mTaskGroup.wait();
-			}
-			Root::getSingleton().getRenderSystem()->postExtraThreadsStarted();
-		}
+        if (mWorkerRenderSystemAccess)
+        {
+            Root::getSingleton().getRenderSystem()->preExtraThreadsStarted();
+            RegisterRSWorker worker (this);
+            // current thread need not be registered
+            mRegisteredThreads.insert(tbb::this_tbb_thread::get_id());
+            while (mRegisteredThreads.size() < mWorkerThreadCount)
+            {
+                // spawn tasks until all worker threads have registered themselves with the RS
+                for (size_t i = 0; i < mWorkerThreadCount*3; ++i)
+                {
+                    mTaskGroup.run(worker);
+                }
+                mTaskGroup.wait();
+            }
+            Root::getSingleton().getRenderSystem()->postExtraThreadsStarted();
+        }
 
-		mIsRunning = true;
-	}
-	//---------------------------------------------------------------------
-	void DefaultWorkQueue::_registerThreadWithRenderSystem()
-	{
-		{
+        mIsRunning = true;
+    }
+    //---------------------------------------------------------------------
+    void DefaultWorkQueue::_registerThreadWithRenderSystem()
+    {
+        {
                     OGRE_LOCK_MUTEX(mRegisterRSMutex);;
-			tbb::tbb_thread::id cur = tbb::this_tbb_thread::get_id();
-			if (mRegisteredThreads.find(cur) == mRegisteredThreads.end())
-			{
-				Root::getSingleton().getRenderSystem()->registerThread();
-				mRegisteredThreads.insert(cur);
-			}
-		}
+            tbb::tbb_thread::id cur = tbb::this_tbb_thread::get_id();
+            if (mRegisteredThreads.find(cur) == mRegisteredThreads.end())
+            {
+                Root::getSingleton().getRenderSystem()->registerThread();
+                mRegisteredThreads.insert(cur);
+            }
+        }
 
-		tbb::this_tbb_thread::yield();
-	}
-	//---------------------------------------------------------------------
-	DefaultWorkQueue::~DefaultWorkQueue()
-	{
-		shutdown();
-	}
-	//---------------------------------------------------------------------
-	void DefaultWorkQueue::shutdown()
-	{
-		LogManager::getSingleton().stream() <<
-			"DefaultWorkQueue('" << mName << "') shutting down.";
+        tbb::this_tbb_thread::yield();
+    }
+    //---------------------------------------------------------------------
+    DefaultWorkQueue::~DefaultWorkQueue()
+    {
+        shutdown();
+    }
+    //---------------------------------------------------------------------
+    void DefaultWorkQueue::shutdown()
+    {
+        LogManager::getSingleton().stream() <<
+            "DefaultWorkQueue('" << mName << "') shutting down.";
 
-		mShuttingDown = true;
-		mTaskGroup.cancel();
-		abortAllRequests();
+        mShuttingDown = true;
+        mTaskGroup.cancel();
+        abortAllRequests();
 
-		// wait until all tasks have finished.
-		mTaskGroup.wait();
+        // wait until all tasks have finished.
+        mTaskGroup.wait();
 
-		if (mTaskScheduler.is_active())
-			mTaskScheduler.terminate();
+        if (mTaskScheduler.is_active())
+            mTaskScheduler.terminate();
 
-		if (mWorkerFunc)
-		{
-			OGRE_DELETE_T(mWorkerFunc, WorkerFunc, MEMCATEGORY_GENERAL);
-			mWorkerFunc = 0;
-		}
-			
-		mIsRunning = false;
+        if (mWorkerFunc)
+        {
+            OGRE_DELETE_T(mWorkerFunc, WorkerFunc, MEMCATEGORY_GENERAL);
+            mWorkerFunc = 0;
+        }
+            
+        mIsRunning = false;
 
-	}
-	//---------------------------------------------------------------------
-	void DefaultWorkQueue::_threadMain()
-	{
-		//// Initialise the thread for RS if necessary
-		//if (mWorkerRenderSystemAccess)
-		//{
-		//	Root::getSingleton().getRenderSystem()->registerThread();
-		//	_notifyThreadRegistered();
-		//}
+    }
+    //---------------------------------------------------------------------
+    void DefaultWorkQueue::_threadMain()
+    {
+        //// Initialise the thread for RS if necessary
+        //if (mWorkerRenderSystemAccess)
+        //{
+        //  Root::getSingleton().getRenderSystem()->registerThread();
+        //  _notifyThreadRegistered();
+        //}
 
-		// Task main function. Process a single request.
+        // Task main function. Process a single request.
 
-		_processNextRequest();
-	}
-	//---------------------------------------------------------------------
-	void DefaultWorkQueue::notifyWorkers()
-	{
-		// create a new task
-		mTaskGroup.run(*mWorkerFunc);
-	}
+        _processNextRequest();
+    }
+    //---------------------------------------------------------------------
+    void DefaultWorkQueue::notifyWorkers()
+    {
+        // create a new task
+        mTaskGroup.run(*mWorkerFunc);
+    }
 }
 

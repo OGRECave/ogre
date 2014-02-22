@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     GLHardwareIndexBuffer::GLHardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType,
         size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
         : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
@@ -46,7 +46,7 @@ namespace Ogre {
                 "GLHardwareIndexBuffer::GLHardwareIndexBuffer");
         }
 
-		static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
+        static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 
         // Initialise buffer and set usage
         glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
@@ -54,12 +54,12 @@ namespace Ogre {
 
         //std::cerr << "creating index buffer " << mBufferId << std::endl;
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     GLHardwareIndexBuffer::~GLHardwareIndexBuffer()
     {
         static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void* GLHardwareIndexBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {
@@ -71,101 +71,101 @@ namespace Ogre {
         }
 
         
-		void* retPtr = 0;
+        void* retPtr = 0;
 
-		GLHardwareBufferManager* glBufManager = static_cast<GLHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
+        GLHardwareBufferManager* glBufManager = static_cast<GLHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 
-		// Try to use scratch buffers for smaller buffers
-		if( length < glBufManager->getGLMapBufferThreshold() )
-		{
-			retPtr = glBufManager->allocateScratch((uint32)length);
-			if (retPtr)
-			{
-				mLockedToScratch = true;
-				mScratchOffset = offset;
-				mScratchSize = length;
-				mScratchPtr = retPtr;
-				mScratchUploadOnUnlock = (options != HBL_READ_ONLY);
+        // Try to use scratch buffers for smaller buffers
+        if( length < glBufManager->getGLMapBufferThreshold() )
+        {
+            retPtr = glBufManager->allocateScratch((uint32)length);
+            if (retPtr)
+            {
+                mLockedToScratch = true;
+                mScratchOffset = offset;
+                mScratchSize = length;
+                mScratchPtr = retPtr;
+                mScratchUploadOnUnlock = (options != HBL_READ_ONLY);
 
-				if (options != HBL_DISCARD && options != HBL_NO_OVERWRITE)
-				{
-					// have to read back the data before returning the pointer
-					readData(offset, length, retPtr);
-				}
-			}
-		}
+                if (options != HBL_DISCARD && options != HBL_NO_OVERWRITE)
+                {
+                    // have to read back the data before returning the pointer
+                    readData(offset, length, retPtr);
+                }
+            }
+        }
 
-		if (!retPtr)
-		{
+        if (!retPtr)
+        {
             GLenum access = 0;
             static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
-			// Use glMapBuffer
-			if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE) // TODO: check possibility to use GL_MAP_UNSYNCHRONIZED_BIT for HBL_NO_OVERWRITE locking promise
-			{
-				// Discard the buffer
-				glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
-					GLHardwareBufferManager::getGLUsage(mUsage));
-			}
-			if (mUsage & HBU_WRITE_ONLY)
-				access = GL_WRITE_ONLY_ARB;
-			else if (options == HBL_READ_ONLY)
-				access = GL_READ_ONLY_ARB;
-			else
-				access = GL_READ_WRITE_ARB;
+            // Use glMapBuffer
+            if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE) // TODO: check possibility to use GL_MAP_UNSYNCHRONIZED_BIT for HBL_NO_OVERWRITE locking promise
+            {
+                // Discard the buffer
+                glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, mSizeInBytes, NULL, 
+                    GLHardwareBufferManager::getGLUsage(mUsage));
+            }
+            if (mUsage & HBU_WRITE_ONLY)
+                access = GL_WRITE_ONLY_ARB;
+            else if (options == HBL_READ_ONLY)
+                access = GL_READ_ONLY_ARB;
+            else
+                access = GL_READ_WRITE_ARB;
 
-			void* pBuffer = glMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, access );
+            void* pBuffer = glMapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, access );
 
-			if(pBuffer == 0)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Index Buffer: Out of memory", 
-					"GLHardwareIndexBuffer::lock");
-			}
+            if(pBuffer == 0)
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                    "Index Buffer: Out of memory", 
+                    "GLHardwareIndexBuffer::lock");
+            }
 
-			// return offsetted
-			retPtr = static_cast<void*>(
-				static_cast<unsigned char*>(pBuffer) + offset);
+            // return offsetted
+            retPtr = static_cast<void*>(
+                static_cast<unsigned char*>(pBuffer) + offset);
 
-			mLockedToScratch = false;
+            mLockedToScratch = false;
 
-		}
-		mIsLocked = true;
-		return retPtr;
+        }
+        mIsLocked = true;
+        return retPtr;
     }
-	//---------------------------------------------------------------------
-	void GLHardwareIndexBuffer::unlockImpl(void)
+    //---------------------------------------------------------------------
+    void GLHardwareIndexBuffer::unlockImpl(void)
     {
-		if (mLockedToScratch)
-		{
-			if (mScratchUploadOnUnlock)
-			{
-				// have to write the data back to vertex buffer
-				writeData(mScratchOffset, mScratchSize, mScratchPtr, 
-					mScratchOffset == 0 && mScratchSize == getSizeInBytes());
-			}
+        if (mLockedToScratch)
+        {
+            if (mScratchUploadOnUnlock)
+            {
+                // have to write the data back to vertex buffer
+                writeData(mScratchOffset, mScratchSize, mScratchPtr, 
+                    mScratchOffset == 0 && mScratchSize == getSizeInBytes());
+            }
 
-			// deallocate from scratch buffer
-			static_cast<GLHardwareBufferManager*>(
-				HardwareBufferManager::getSingletonPtr())->deallocateScratch(mScratchPtr);
+            // deallocate from scratch buffer
+            static_cast<GLHardwareBufferManager*>(
+                HardwareBufferManager::getSingletonPtr())->deallocateScratch(mScratchPtr);
 
-			mLockedToScratch = false;
-		}
-		else
-		{
+            mLockedToScratch = false;
+        }
+        else
+        {
 
             static_cast<GLHardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId);
 
-			if(!glUnmapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB ))
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Buffer data corrupted, please reload", 
-					"GLHardwareIndexBuffer::unlock");
-			}
-		}
+            if(!glUnmapBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB ))
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                    "Buffer data corrupted, please reload", 
+                    "GLHardwareIndexBuffer::unlock");
+            }
+        }
 
         mIsLocked = false;
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void GLHardwareIndexBuffer::readData(size_t offset, size_t length, 
         void* pDest)
     {
@@ -182,7 +182,7 @@ namespace Ogre {
             glGetBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, offset, length, pDest);
         }
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void GLHardwareIndexBuffer::writeData(size_t offset, size_t length, 
             const void* pSource, bool discardWholeBuffer)
     {
@@ -214,7 +214,7 @@ namespace Ogre {
             glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, offset, length, pSource);
         }
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void GLHardwareIndexBuffer::_updateFromShadow(void)
     {
         if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)

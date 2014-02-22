@@ -38,14 +38,14 @@ void EdgeBuilderTests::setUp()
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
 
     // set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
+    if(LogManager::getSingletonPtr())
+        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("EdgeBuilderTests.log", true, false);
-	}
+    if(LogManager::getSingletonPtr() == 0)
+    {
+        LogManager* logManager = OGRE_NEW LogManager();
+        logManager->createLog("EdgeBuilderTests.log", true, false);
+    }
     LogManager::getSingleton().setLogDetail(LL_LOW);
 }
 void EdgeBuilderTests::tearDown()

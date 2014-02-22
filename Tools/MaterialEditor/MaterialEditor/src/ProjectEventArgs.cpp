@@ -39,10 +39,10 @@ ProjectEventArgs::ProjectEventArgs(Project* project, MaterialController* materia
 
 Project* ProjectEventArgs::getProject() const
 {
-	return mProject;
+    return mProject;
 }
 
 MaterialController* ProjectEventArgs::getMaterial() const
 {
-	return mMaterial;
+    return mMaterial;
 }

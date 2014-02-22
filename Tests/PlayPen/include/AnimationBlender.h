@@ -7,34 +7,34 @@ using namespace Ogre;
 class AnimationBlender
 {
 public:
-	enum BlendingTransition
-	{
-		BlendSwitch,         // stop source and start dest
-		BlendWhileAnimating,   // cross fade, blend source animation out while blending destination animation in
-		BlendThenAnimate      // blend source to first frame of dest, when done, start dest anim
-	};
+    enum BlendingTransition
+    {
+        BlendSwitch,         // stop source and start dest
+        BlendWhileAnimating,   // cross fade, blend source animation out while blending destination animation in
+        BlendThenAnimate      // blend source to first frame of dest, when done, start dest anim
+    };
 
 private:
-	Entity *mEntity;
-	AnimationState *mSource;
-	AnimationState *mTarget;
+    Entity *mEntity;
+    AnimationState *mSource;
+    AnimationState *mTarget;
 
-	BlendingTransition mTransition;
+    BlendingTransition mTransition;
 
-	bool loop;
+    bool loop;
 
-	~AnimationBlender() {}
+    ~AnimationBlender() {}
 
 public: 
-	Real mTimeleft, mDuration;
+    Real mTimeleft, mDuration;
 
-	bool complete;
+    bool complete;
 
-	void blend( const String &animation, BlendingTransition transition, Real duration, bool loop );
-	void addTime( Real );
-	Real getProgress() { return mTimeleft/ mDuration; }
-	AnimationState *getSource() { return mSource; }
-	AnimationState *getTarget() { return mTarget; }
-	AnimationBlender( Entity *);
-	void init( const String &animation );
+    void blend( const String &animation, BlendingTransition transition, Real duration, bool loop );
+    void addTime( Real );
+    Real getProgress() { return mTimeleft/ mDuration; }
+    AnimationState *getSource() { return mSource; }
+    AnimationState *getTarget() { return mTarget; }
+    AnimationBlender( Entity *);
+    void init( const String &animation );
 };

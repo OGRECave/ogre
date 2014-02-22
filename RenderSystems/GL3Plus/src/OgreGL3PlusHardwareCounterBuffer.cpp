@@ -114,7 +114,7 @@ namespace Ogre {
         // return offsetted
         retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
-		mIsLocked = true;
+        mIsLocked = true;
         return retPtr;
     }
     
@@ -177,7 +177,7 @@ namespace Ogre {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
         if (srcBuffer.isSystemMemory())
         {
-			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
         else
         {

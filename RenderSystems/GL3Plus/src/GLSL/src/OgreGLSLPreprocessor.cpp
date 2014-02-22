@@ -39,7 +39,7 @@ namespace Ogre {
 #define MAX_MACRO_ARGS 16
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined( __MINGW32__ )
-	#define snprintf _snprintf
+    #define snprintf _snprintf
 #endif
 
 //---------------------------------------------------------------------------//
@@ -1110,7 +1110,7 @@ Done:
 #define IS_DIRECTIVE(s) \
     (dirlen == strlen(s) && (strncmp (directive, s, strlen(s)) == 0))
 
-	bool outputEnabled = ((EnableOutput & (EnableOutput + 1)) == 0);
+    bool outputEnabled = ((EnableOutput & (EnableOutput + 1)) == 0);
     bool rc;
 
     if (IS_DIRECTIVE ("define") && outputEnabled)

@@ -35,13 +35,13 @@ using namespace Ogre;
 
 class PropertyTests : public CppUnit::TestFixture
 {
-	// CppUnit macros for setting up the test suite
-	CPPUNIT_TEST_SUITE( PropertyTests );
-	CPPUNIT_TEST(testStringProp);
-	CPPUNIT_TEST_SUITE_END();
+    // CppUnit macros for setting up the test suite
+    CPPUNIT_TEST_SUITE( PropertyTests );
+    CPPUNIT_TEST(testStringProp);
+    CPPUNIT_TEST_SUITE_END();
 
 public:
-	void setUp();
-	void tearDown();
-	void testStringProp();
+    void setUp();
+    void tearDown();
+    void testStringProp();
 };

@@ -104,12 +104,12 @@ namespace Ogre {
         : HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false)
           // always software, never shadowed
     {
-		if ((!dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->checkExtension("GL_OES_element_index_uint") && idxType == HardwareIndexBuffer::IT_32BIT) || !gleswIsSupported(3, 0))
-		{
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-				"32 bit hardware buffers are not allowed in OpenGL ES.",
-				"GLES2DefaultHardwareIndexBuffer");
-		}
+        if ((!dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->checkExtension("GL_OES_element_index_uint") && idxType == HardwareIndexBuffer::IT_32BIT) || !gleswIsSupported(3, 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "32 bit hardware buffers are not allowed in OpenGL ES.",
+                "GLES2DefaultHardwareIndexBuffer");
+        }
 
         mData = new unsigned char[mSizeInBytes];
     }
@@ -251,7 +251,7 @@ namespace Ogre {
     HardwareUniformBufferSharedPtr
     GLES2DefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                                  bool useShadowBuffer, const String& name)
-	{
+    {
         if(!gleswIsSupported(3, 0))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -260,12 +260,12 @@ namespace Ogre {
         }
 
         return HardwareUniformBufferSharedPtr(new GLES2DefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name));
-	}
+    }
     
-	Ogre::RenderToVertexBufferSharedPtr GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
-	{
+    Ogre::RenderToVertexBufferSharedPtr GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
+    {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                 "Cannot create RenderToVertexBuffer in GLES2DefaultHardwareBufferManagerBase", 
                 "GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
-	}
+    }
 }

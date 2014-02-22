@@ -83,9 +83,9 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void OldBone::setManuallyControlled(bool manuallyControlled) 
-	{
+    {
         mManuallyControlled = manuallyControlled;
-		mCreator->_notifyManualBoneStateChange(this);
+        mCreator->_notifyManualBoneStateChange(this);
     }
     //---------------------------------------------------------------------
     bool OldBone::isManuallyControlled() const {
@@ -115,18 +115,18 @@ namespace Ogre {
     {
         return mHandle;
     }
-	//---------------------------------------------------------------------
-	void OldBone::needUpdate(bool forceParentUpdate)
-	{
-		OldNode::needUpdate(forceParentUpdate);
+    //---------------------------------------------------------------------
+    void OldBone::needUpdate(bool forceParentUpdate)
+    {
+        OldNode::needUpdate(forceParentUpdate);
 
-		if (isManuallyControlled())
-		{
-			// Dirty the skeleton if manually controlled so animation can be updated
-			mCreator->_notifyManualBonesDirty();
-		}
+        if (isManuallyControlled())
+        {
+            // Dirty the skeleton if manually controlled so animation can be updated
+            mCreator->_notifyManualBonesDirty();
+        }
 
-	}
+    }
 
 
 

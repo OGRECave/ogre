@@ -40,97 +40,97 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
-	/** Enumerates the types of programs which can run on the GPU. */
-	enum GpuProgramType
-	{
-		GPT_VERTEX_PROGRAM,
-		GPT_FRAGMENT_PROGRAM,
-		GPT_GEOMETRY_PROGRAM,
-		GPT_DOMAIN_PROGRAM,
-		GPT_HULL_PROGRAM,
-		GPT_COMPUTE_PROGRAM
-	};
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
+    /** Enumerates the types of programs which can run on the GPU. */
+    enum GpuProgramType
+    {
+        GPT_VERTEX_PROGRAM,
+        GPT_FRAGMENT_PROGRAM,
+        GPT_GEOMETRY_PROGRAM,
+        GPT_DOMAIN_PROGRAM,
+        GPT_HULL_PROGRAM,
+        GPT_COMPUTE_PROGRAM
+    };
 
-	/** Defines a program which runs on the GPU such as a vertex or fragment program. 
-	@remarks
-		This class defines the low-level program in assembler code, the sort used to
-		directly assemble into machine instructions for the GPU to execute. By nature,
-		this means that the assembler source is rendersystem specific, which is why this
-		is an abstract class - real instances are created through the RenderSystem. 
-		If you wish to use higher level shading languages like HLSL and Cg, you need to 
-		use the HighLevelGpuProgram class instead.
-	*/
-	class _OgreExport GpuProgram : public Resource
-	{
-	protected:
-		/// Command object - see ParamCommand 
-		class _OgreExport CmdType : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		class _OgreExport CmdSyntax : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		class _OgreExport CmdSkeletal : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		class _OgreExport CmdMorph : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		class _OgreExport CmdPose : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		class _OgreExport CmdVTF : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		class _OgreExport CmdManualNamedConstsFile : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		class _OgreExport CmdAdjacency : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
-		// Command object for setting / getting parameters
-		static CmdType msTypeCmd;
-		static CmdSyntax msSyntaxCmd;
-		static CmdSkeletal msSkeletalCmd;
-		static CmdMorph msMorphCmd;
-		static CmdPose msPoseCmd;
-		static CmdVTF msVTFCmd;
-		static CmdManualNamedConstsFile msManNamedConstsFileCmd;
-		static CmdAdjacency msAdjacencyCmd;
-		/// The type of the program
-		GpuProgramType mType;
-		/// The name of the file to load source from (may be blank)
-		String mFilename;
+    /** Defines a program which runs on the GPU such as a vertex or fragment program. 
+    @remarks
+        This class defines the low-level program in assembler code, the sort used to
+        directly assemble into machine instructions for the GPU to execute. By nature,
+        this means that the assembler source is rendersystem specific, which is why this
+        is an abstract class - real instances are created through the RenderSystem. 
+        If you wish to use higher level shading languages like HLSL and Cg, you need to 
+        use the HighLevelGpuProgram class instead.
+    */
+    class _OgreExport GpuProgram : public Resource
+    {
+    protected:
+        /// Command object - see ParamCommand 
+        class _OgreExport CmdType : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        class _OgreExport CmdSyntax : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        class _OgreExport CmdSkeletal : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        class _OgreExport CmdMorph : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        class _OgreExport CmdPose : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        class _OgreExport CmdVTF : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        class _OgreExport CmdManualNamedConstsFile : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        class _OgreExport CmdAdjacency : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+        // Command object for setting / getting parameters
+        static CmdType msTypeCmd;
+        static CmdSyntax msSyntaxCmd;
+        static CmdSkeletal msSkeletalCmd;
+        static CmdMorph msMorphCmd;
+        static CmdPose msPoseCmd;
+        static CmdVTF msVTFCmd;
+        static CmdManualNamedConstsFile msManNamedConstsFileCmd;
+        static CmdAdjacency msAdjacencyCmd;
+        /// The type of the program
+        GpuProgramType mType;
+        /// The name of the file to load source from (may be blank)
+        String mFilename;
         /// The assembler source of the program (may be blank until file loaded)
         String mSource;
         /// Whether we need to load source from file or not
@@ -139,73 +139,73 @@ namespace Ogre {
         String mSyntaxCode;
         /// Does this (vertex) program include skeletal animation?
         bool mSkeletalAnimation;
-		/// Does this (vertex) program include morph animation?
-		bool mMorphAnimation;
-		/// Does this (vertex) program include pose animation (count of number of poses supported)
-		ushort mPoseAnimation;
-		/// Does this (vertex) program require support for vertex texture fetch?
-		bool mVertexTextureFetch;
-		/// Does this (geometry) program require adjacency information?
-		bool mNeedsAdjacencyInfo;
-		/// The default parameters for use with this object
-		GpuProgramParametersSharedPtr mDefaultParams;
-		/// Did we encounter a compilation error?
-		bool mCompileError;
-		/** Record of logical to physical buffer maps. Mandatory for low-level
-			programs or high-level programs which set their params the same way. 
-			This is a shared pointer because if the program is recompiled and the parameters
-			change, this definition will alter, but previous params may reference the old def. */
-		mutable GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
-		/** Record of logical to physical buffer maps. Mandatory for low-level
+        /// Does this (vertex) program include morph animation?
+        bool mMorphAnimation;
+        /// Does this (vertex) program include pose animation (count of number of poses supported)
+        ushort mPoseAnimation;
+        /// Does this (vertex) program require support for vertex texture fetch?
+        bool mVertexTextureFetch;
+        /// Does this (geometry) program require adjacency information?
+        bool mNeedsAdjacencyInfo;
+        /// The default parameters for use with this object
+        GpuProgramParametersSharedPtr mDefaultParams;
+        /// Did we encounter a compilation error?
+        bool mCompileError;
+        /** Record of logical to physical buffer maps. Mandatory for low-level
+            programs or high-level programs which set their params the same way. 
+            This is a shared pointer because if the program is recompiled and the parameters
+            change, this definition will alter, but previous params may reference the old def. */
+        mutable GpuLogicalBufferStructPtr mFloatLogicalToPhysical;
+        /** Record of logical to physical buffer maps. Mandatory for low-level
          programs or high-level programs which set their params the same way.
          This is a shared pointer because if the program is recompiled and the parameters
          change, this definition will alter, but previous params may reference the old def. */
-		mutable GpuLogicalBufferStructPtr mDoubleLogicalToPhysical;
-		/** Record of logical to physical buffer maps. Mandatory for low-level
-			programs or high-level programs which set their params the same way. 
-			This is a shared pointer because if the program is recompiled and the parameters
-			change, this definition will alter, but previous params may reference the old def.*/
-		mutable GpuLogicalBufferStructPtr mIntLogicalToPhysical;
-		/** Parameter name -> ConstantDefinition map, shared instance used by all parameter objects.
-		This is a shared pointer because if the program is recompiled and the parameters
-		change, this definition will alter, but previous params may reference the old def.
-		*/
-		mutable GpuNamedConstantsPtr mConstantDefs;
-		/// File from which to load named constants manually
-		String mManualNamedConstantsFile;
-		bool mLoadedManualNamedConstants;
+        mutable GpuLogicalBufferStructPtr mDoubleLogicalToPhysical;
+        /** Record of logical to physical buffer maps. Mandatory for low-level
+            programs or high-level programs which set their params the same way. 
+            This is a shared pointer because if the program is recompiled and the parameters
+            change, this definition will alter, but previous params may reference the old def.*/
+        mutable GpuLogicalBufferStructPtr mIntLogicalToPhysical;
+        /** Parameter name -> ConstantDefinition map, shared instance used by all parameter objects.
+        This is a shared pointer because if the program is recompiled and the parameters
+        change, this definition will alter, but previous params may reference the old def.
+        */
+        mutable GpuNamedConstantsPtr mConstantDefs;
+        /// File from which to load named constants manually
+        String mManualNamedConstantsFile;
+        bool mLoadedManualNamedConstants;
 
 
-		/** Internal method for setting up the basic parameter definitions for a subclass. 
-		@remarks
-		Because StringInterface holds a dictionary of parameters per class, subclasses need to
-		call this to ask the base class to add it's parameters to their dictionary as well.
-		Can't do this in the constructor because that runs in a non-virtual context.
-		@par
-		The subclass must have called it's own createParamDictionary before calling this method.
-		*/
-		void setupBaseParamDictionary(void);
+        /** Internal method for setting up the basic parameter definitions for a subclass. 
+        @remarks
+        Because StringInterface holds a dictionary of parameters per class, subclasses need to
+        call this to ask the base class to add it's parameters to their dictionary as well.
+        Can't do this in the constructor because that runs in a non-virtual context.
+        @par
+        The subclass must have called it's own createParamDictionary before calling this method.
+        */
+        void setupBaseParamDictionary(void);
 
         /** Internal method returns whether required capabilities for this program is supported.
         */
         bool isRequiredCapabilitiesSupported(void) const;
 
-		/// @copydoc Resource::loadImpl
-		void loadImpl(void);
+        /// @copydoc Resource::loadImpl
+        void loadImpl(void);
 
-		/// Create the internal params logical & named mapping structures
-		void createParameterMappingStructures(bool recreateIfExists = true) const;
-		/// Create the internal params logical mapping structures
-		void createLogicalParameterMappingStructures(bool recreateIfExists = true) const;
-		/// Create the internal params named mapping structures
-		void createNamedParameterMappingStructures(bool recreateIfExists = true) const;
+        /// Create the internal params logical & named mapping structures
+        void createParameterMappingStructures(bool recreateIfExists = true) const;
+        /// Create the internal params logical mapping structures
+        void createLogicalParameterMappingStructures(bool recreateIfExists = true) const;
+        /// Create the internal params named mapping structures
+        void createNamedParameterMappingStructures(bool recreateIfExists = true) const;
 
-	public:
+    public:
 
-		GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
+        GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
 
-		virtual ~GpuProgram() {}
+        virtual ~GpuProgram() {}
 
         /** Sets the filename of the source assembly for this program.
         @remarks
@@ -213,7 +213,7 @@ namespace Ogre {
         */
         virtual void setSourceFile(const String& filename);
 
-		/** Sets the source assembly for this program from an in-memory string.
+        /** Sets the source assembly for this program from an in-memory string.
         @remarks
             Setting this will have no effect until you (re)load the program.
         */
@@ -222,15 +222,15 @@ namespace Ogre {
         /** Gets the syntax code for this program e.g. arbvp1, fp20, vs_1_1 etc */
         virtual const String& getSyntaxCode(void) const { return mSyntaxCode; }
 
-		/** Sets the syntax code for this program e.g. arbvp1, fp20, vs_1_1 etc */
-		virtual void setSyntaxCode(const String& syntax);
+        /** Sets the syntax code for this program e.g. arbvp1, fp20, vs_1_1 etc */
+        virtual void setSyntaxCode(const String& syntax);
 
-		/** Gets the name of the file used as source for this program. */
-		virtual const String& getSourceFile(void) const { return mFilename; }
+        /** Gets the name of the file used as source for this program. */
+        virtual const String& getSourceFile(void) const { return mFilename; }
         /** Gets the assembler source for this program. */
         virtual const String& getSource(void) const { return mSource; }
-		/// Set the program type (only valid before load)
-		virtual void setType(GpuProgramType t);
+        /// Set the program type (only valid before load)
+        virtual void setType(GpuProgramType t);
         /// Get the program type
         virtual GpuProgramType getType(void) const { return mType; }
 
@@ -276,19 +276,19 @@ namespace Ogre {
         morph animation, it will expect the vertex program to do it.
         */
         virtual void setMorphAnimationIncluded(bool included) 
-		{ mMorphAnimation = included; }
+        { mMorphAnimation = included; }
 
         /** Sets whether a vertex program includes the required instructions
         to perform pose animation. 
         @remarks
         If this is set to true, OGRE will not blend the geometry according to 
         pose animation, it will expect the vertex program to do it.
-		@param poseCount The number of simultaneous poses the program can blend
+        @param poseCount The number of simultaneous poses the program can blend
         */
         virtual void setPoseAnimationIncluded(ushort poseCount) 
-		{ mPoseAnimation = poseCount; }
+        { mPoseAnimation = poseCount; }
 
-		/** Returns whether a vertex program includes the required instructions
+        /** Returns whether a vertex program includes the required instructions
             to perform morph animation. 
         @remarks
             If this returns true, OGRE will not blend the geometry according to 
@@ -296,137 +296,137 @@ namespace Ogre {
         */
         virtual bool isMorphAnimationIncluded(void) const { return mMorphAnimation; }
 
-		/** Returns whether a vertex program includes the required instructions
+        /** Returns whether a vertex program includes the required instructions
             to perform pose animation. 
         @remarks
             If this returns true, OGRE will not blend the geometry according to 
             pose animation, it will expect the vertex program to do it.
         */
         virtual bool isPoseAnimationIncluded(void) const { return mPoseAnimation > 0; }
-		/** Returns the number of simultaneous poses the vertex program can 
-			blend, for use in pose animation.
+        /** Returns the number of simultaneous poses the vertex program can 
+            blend, for use in pose animation.
         */
         virtual ushort getNumberOfPosesIncluded(void) const { return mPoseAnimation; }
-		/** Sets whether this vertex program requires support for vertex 
-			texture fetch from the hardware.
-		*/
-		virtual void setVertexTextureFetchRequired(bool r) { mVertexTextureFetch = r; }
-		/** Returns whether this vertex program requires support for vertex 
-			texture fetch from the hardware.
-		*/
-		virtual bool isVertexTextureFetchRequired(void) const { return mVertexTextureFetch; }
+        /** Sets whether this vertex program requires support for vertex 
+            texture fetch from the hardware.
+        */
+        virtual void setVertexTextureFetchRequired(bool r) { mVertexTextureFetch = r; }
+        /** Returns whether this vertex program requires support for vertex 
+            texture fetch from the hardware.
+        */
+        virtual bool isVertexTextureFetchRequired(void) const { return mVertexTextureFetch; }
 
-		/** Sets whether this geometry program requires adjacency information
-			from the input primitives.
-		*/
-		virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
-		/** Returns whether this geometry program requires adjacency information 
-			from the input primitives.
-		*/
-		virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
-		
-		/** Get a reference to the default parameters which are to be used for all
-			uses of this program.
-		@remarks
-			A program can be set up with a list of default parameters, which can save time when 
-			using a program many times in a material with roughly the same settings. By 
-			retrieving the default parameters and populating it with the most used options, 
-			any new parameter objects created from this program afterwards will automatically include
-			the default parameters; thus users of the program need only change the parameters
-			which are unique to their own usage of the program.
-		*/
-		virtual GpuProgramParametersSharedPtr getDefaultParameters(void);
+        /** Sets whether this geometry program requires adjacency information
+            from the input primitives.
+        */
+        virtual void setAdjacencyInfoRequired(bool r) { mNeedsAdjacencyInfo = r; }
+        /** Returns whether this geometry program requires adjacency information 
+            from the input primitives.
+        */
+        virtual bool isAdjacencyInfoRequired(void) const { return mNeedsAdjacencyInfo; }
+        
+        /** Get a reference to the default parameters which are to be used for all
+            uses of this program.
+        @remarks
+            A program can be set up with a list of default parameters, which can save time when 
+            using a program many times in a material with roughly the same settings. By 
+            retrieving the default parameters and populating it with the most used options, 
+            any new parameter objects created from this program afterwards will automatically include
+            the default parameters; thus users of the program need only change the parameters
+            which are unique to their own usage of the program.
+        */
+        virtual GpuProgramParametersSharedPtr getDefaultParameters(void);
 
         /** Returns true if default parameters have been set up.  
         */
         virtual bool hasDefaultParameters(void) const { return !mDefaultParams.isNull(); }
 
-		/** Returns whether a vertex program wants light and material states to be passed
-		through fixed pipeline low level API rendering calls (default false, subclasses can override)
-		@remarks
-			Most vertex programs do not need this material information, however GLSL
-			shaders can refer to this material and lighting state so enable this option
-		*/
-		virtual bool getPassSurfaceAndLightStates(void) const { return false; }
+        /** Returns whether a vertex program wants light and material states to be passed
+        through fixed pipeline low level API rendering calls (default false, subclasses can override)
+        @remarks
+            Most vertex programs do not need this material information, however GLSL
+            shaders can refer to this material and lighting state so enable this option
+        */
+        virtual bool getPassSurfaceAndLightStates(void) const { return false; }
 
-		/** Returns whether a fragment program wants fog state to be passed
-		through fixed pipeline low level API rendering calls (default true, subclasses can override)
-		@remarks
-		On DirectX, shader model 2 and earlier continues to have fixed-function fog
-		applied to it, so fog state is still passed (you should disable fog on the
-		pass if you want to perform fog in the shader). In OpenGL it is also
-		common to be able to access the fixed-function fog state inside the shader. 
-		*/
-		virtual bool getPassFogStates(void) const { return true; }
+        /** Returns whether a fragment program wants fog state to be passed
+        through fixed pipeline low level API rendering calls (default true, subclasses can override)
+        @remarks
+        On DirectX, shader model 2 and earlier continues to have fixed-function fog
+        applied to it, so fog state is still passed (you should disable fog on the
+        pass if you want to perform fog in the shader). In OpenGL it is also
+        common to be able to access the fixed-function fog state inside the shader. 
+        */
+        virtual bool getPassFogStates(void) const { return true; }
 
-		/** Returns whether a vertex program wants transform state to be passed
-		through fixed pipeline low level API rendering calls
-		@remarks
-		Most vertex programs do not need fixed-function transform information, however GLSL
-		shaders can refer to this state so enable this option
-		*/
-		virtual bool getPassTransformStates(void) const { return false; }
+        /** Returns whether a vertex program wants transform state to be passed
+        through fixed pipeline low level API rendering calls
+        @remarks
+        Most vertex programs do not need fixed-function transform information, however GLSL
+        shaders can refer to this state so enable this option
+        */
+        virtual bool getPassTransformStates(void) const { return false; }
 
-		/** Returns a string that specifies the language of the gpu programs as specified
+        /** Returns a string that specifies the language of the gpu programs as specified
         in a material script. ie: asm, cg, hlsl, glsl
         */
         virtual const String& getLanguage(void) const;
 
-		/** Did this program encounter a compile error when loading?
-		*/
-		virtual bool hasCompileError(void) const { return mCompileError; }
+        /** Did this program encounter a compile error when loading?
+        */
+        virtual bool hasCompileError(void) const { return mCompileError; }
 
-		/** Reset a compile error if it occurred, allowing the load to be retried
-		*/
-		virtual void resetCompileError(void) { mCompileError = false; }
+        /** Reset a compile error if it occurred, allowing the load to be retried
+        */
+        virtual void resetCompileError(void) { mCompileError = false; }
 
-		/** Allows you to manually provide a set of named parameter mappings
-			to a program which would not be able to derive named parameters itself.
-		@remarks
-			You may wish to use this if you have assembler programs that were compiled
-			from a high-level source, and want the convenience of still being able
-			to use the named parameters from the original high-level source.
-		@see setManualNamedConstantsFile
-		*/
-		virtual void setManualNamedConstants(const GpuNamedConstants& namedConstants);
+        /** Allows you to manually provide a set of named parameter mappings
+            to a program which would not be able to derive named parameters itself.
+        @remarks
+            You may wish to use this if you have assembler programs that were compiled
+            from a high-level source, and want the convenience of still being able
+            to use the named parameters from the original high-level source.
+        @see setManualNamedConstantsFile
+        */
+        virtual void setManualNamedConstants(const GpuNamedConstants& namedConstants);
 
-		/// Get a read-only reference to the named constants registered for this program (manually or automatically)
-		virtual const GpuNamedConstants& getNamedConstants() const { return *mConstantDefs.get(); }
+        /// Get a read-only reference to the named constants registered for this program (manually or automatically)
+        virtual const GpuNamedConstants& getNamedConstants() const { return *mConstantDefs.get(); }
 
-		/** Specifies the name of a file from which to load named parameters mapping
-			for a program which would not be able to derive named parameters itself.
-		@remarks
-			You may wish to use this if you have assembler programs that were compiled
-			from a high-level source, and want the convenience of still being able
-			to use the named parameters from the original high-level source. This
-			method will make a low-level program search in the resource group of the
-			program for the named file from which to load parameter names from. 
-			The file must be in the format produced by GpuNamedConstants::save.
-		*/
-		virtual void setManualNamedConstantsFile(const String& paramDefFile);
+        /** Specifies the name of a file from which to load named parameters mapping
+            for a program which would not be able to derive named parameters itself.
+        @remarks
+            You may wish to use this if you have assembler programs that were compiled
+            from a high-level source, and want the convenience of still being able
+            to use the named parameters from the original high-level source. This
+            method will make a low-level program search in the resource group of the
+            program for the named file from which to load parameter names from. 
+            The file must be in the format produced by GpuNamedConstants::save.
+        */
+        virtual void setManualNamedConstantsFile(const String& paramDefFile);
 
-		/** Gets the name of a file from which to load named parameters mapping
-			for a program which would not be able to derive named parameters itself.
-		*/
-		virtual const String& getManualNamedConstantsFile() const { return mManualNamedConstantsFile; }
-		/** Get the full list of named constants.
-		@note
-		Only available if this parameters object has named parameters, which means either
-		a high-level program which loads them, or a low-level program which has them
-		specified manually.
-		*/
-		virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
+        /** Gets the name of a file from which to load named parameters mapping
+            for a program which would not be able to derive named parameters itself.
+        */
+        virtual const String& getManualNamedConstantsFile() const { return mManualNamedConstantsFile; }
+        /** Get the full list of named constants.
+        @note
+        Only available if this parameters object has named parameters, which means either
+        a high-level program which loads them, or a low-level program which has them
+        specified manually.
+        */
+        virtual const GpuNamedConstants& getConstantDefinitions() const { return *mConstantDefs.get(); }
 
-		/// @copydoc Resource::calculateSize
-		virtual size_t calculateSize(void) const;
+        /// @copydoc Resource::calculateSize
+        virtual size_t calculateSize(void) const;
 
     protected:
         /// Virtual method which must be implemented by subclasses, load from mSource
         virtual void loadFromSource(void) = 0;
 
-	};
-	/** @} */
-	/** @} */
+    };
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

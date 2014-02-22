@@ -88,7 +88,7 @@ void ConfigDialog::rendererChanged (GtkComboBox *widget, gpointer data)
         if (strcmp (renderer, (*r)->getName ().c_str ()) == 0)
         {
             This->mSelectedRenderSystem = *r;
-	    This->setupRendererParams ();
+        This->setupRendererParams ();
         }
 }
 
@@ -133,10 +133,10 @@ void ConfigDialog::setupRendererParams ()
     uint row = 0;
     for (ConfigOptionMap::iterator i = options.begin (); i != options.end (); i++, row++)
     {
-	if (i->second.possibleValues.empty())
-	{
-	    continue;
-	}
+    if (i->second.possibleValues.empty())
+    {
+        continue;
+    }
 
         GtkWidget *ro_label = gtk_label_new (i->second.name.c_str ());
         gtk_widget_show (ro_label);

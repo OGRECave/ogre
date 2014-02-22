@@ -37,13 +37,13 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Overlays
-	*  @{
-	*/
-	/** A 2D element which contains other OverlayElement instances.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Overlays
+    *  @{
+    */
+    /** A 2D element which contains other OverlayElement instances.
     @remarks
         This is a specialisation of OverlayElement for 2D elements that contain other
         elements. These are also the smallest elements that can be attached directly
@@ -66,7 +66,7 @@ namespace Ogre {
         /// Map of container children (subset of mChildren)
         ChildContainerMap mChildContainers;
 
-		bool mChildrenProcessEvents;
+        bool mChildrenProcessEvents;
  
     public:
         /// Constructor: do not call direct, use OverlayManager::createOverlayElement
@@ -84,8 +84,8 @@ namespace Ogre {
         /** Gets the named child of this container. */
         virtual OverlayElement* getChild(const String& name);
 
-		/** @copydoc OverlayElement::initialise */
-		void initialise(void);
+        /** @copydoc OverlayElement::initialise */
+        void initialise(void);
 
         void _addChild(OverlayElement* elem);
         void _removeChild(OverlayElement* elem) { _removeChild(elem->getName()); }
@@ -100,8 +100,8 @@ namespace Ogre {
         */
         virtual ChildContainerIterator getChildContainerIterator(void);
 
-		/** Tell the object and its children to recalculate */
-		virtual void _positionsOutOfDate(void);
+        /** Tell the object and its children to recalculate */
+        virtual void _positionsOutOfDate(void);
 
         /** Overridden from OverlayElement. */
         virtual void _update(void);
@@ -116,34 +116,34 @@ namespace Ogre {
         virtual void _notifyWorldTransforms(const Matrix4& xform);
 
         /** Overridden from OverlayElement. */
-	    virtual void _notifyParent(OverlayContainer* parent, Overlay* overlay);
+        virtual void _notifyParent(OverlayContainer* parent, Overlay* overlay);
 
         /** Overridden from OverlayElement. */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
         /** Overridden from OverlayElement. */
-		inline bool isContainer() const
-		{ return true; }
+        inline bool isContainer() const
+        { return true; }
 
-		/** Should this container pass events to their children */
-		virtual inline bool isChildrenProcessEvents() const
-		{ return true; }
+        /** Should this container pass events to their children */
+        virtual inline bool isChildrenProcessEvents() const
+        { return true; }
 
-		/** Should this container pass events to their children */
-		virtual inline void setChildrenProcessEvents(bool val)
-		{ mChildrenProcessEvents = val; }
+        /** Should this container pass events to their children */
+        virtual inline void setChildrenProcessEvents(bool val)
+        { mChildrenProcessEvents = val; }
 
         /** This returns a OverlayElement at position x,y. */
-		virtual OverlayElement* findElementAt(Real x, Real y);		// relative to parent
+        virtual OverlayElement* findElementAt(Real x, Real y);      // relative to parent
 
-	    void copyFromTemplate(OverlayElement* templateOverlay);
+        void copyFromTemplate(OverlayElement* templateOverlay);
         virtual OverlayElement* clone(const String& instanceName);
 
     };
 
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

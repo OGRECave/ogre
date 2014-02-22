@@ -35,74 +35,74 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 ProgramSet::ProgramSet()
 {
-	
+    
 }
 
 //-----------------------------------------------------------------------------
 ProgramSet::~ProgramSet()
 {
-	if (mVSCpuProgram != NULL)
-	{
-		ProgramManager::getSingleton().destroyCpuProgram(mVSCpuProgram);
-		mVSCpuProgram = NULL;
-	}
+    if (mVSCpuProgram != NULL)
+    {
+        ProgramManager::getSingleton().destroyCpuProgram(mVSCpuProgram);
+        mVSCpuProgram = NULL;
+    }
 
-	if (mPSCpuProgram != NULL)
-	{
-		ProgramManager::getSingleton().destroyCpuProgram(mPSCpuProgram);
-		mPSCpuProgram = NULL;
-	}
-				
-	mVSGpuProgram.setNull();					
-	mPSGpuProgram.setNull();	
+    if (mPSCpuProgram != NULL)
+    {
+        ProgramManager::getSingleton().destroyCpuProgram(mPSCpuProgram);
+        mPSCpuProgram = NULL;
+    }
+                
+    mVSGpuProgram.setNull();                    
+    mPSGpuProgram.setNull();    
 }
 
 //-----------------------------------------------------------------------------
 void ProgramSet::setCpuVertexProgram(Program* vsCpuProgram)
 {
-	mVSCpuProgram = vsCpuProgram;
+    mVSCpuProgram = vsCpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 Program* ProgramSet::getCpuVertexProgram()
 {
-	return mVSCpuProgram;
+    return mVSCpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 void ProgramSet::setCpuFragmentProgram(Program* psCpuProgram)
 {
-	mPSCpuProgram = psCpuProgram;
+    mPSCpuProgram = psCpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 Program* ProgramSet::getCpuFragmentProgram()
 {
-	return mPSCpuProgram;
+    return mPSCpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 void ProgramSet::setGpuVertexProgram(GpuProgramPtr vsGpuProgram)
 {
-	mVSGpuProgram = vsGpuProgram;
+    mVSGpuProgram = vsGpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 GpuProgramPtr ProgramSet::getGpuVertexProgram()
 {
-	return mVSGpuProgram;
+    return mVSGpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 void ProgramSet::setGpuFragmentProgram(GpuProgramPtr psGpuProgram)
 {
-	mPSGpuProgram = psGpuProgram;
+    mPSGpuProgram = psGpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 GpuProgramPtr ProgramSet::getGpuFragmentProgram()
 {
-	return mPSGpuProgram;
+    return mPSGpuProgram;
 }
 
 }

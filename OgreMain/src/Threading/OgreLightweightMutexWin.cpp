@@ -36,34 +36,34 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	LightweightMutex::LightweightMutex() :
-		mCounter( 0 )
-	{
+    LightweightMutex::LightweightMutex() :
+        mCounter( 0 )
+    {
         mSemaphore = CreateSemaphore( NULL, 0, 1, NULL );
-	}
-	//-----------------------------------------------------------------------------------
-	LightweightMutex::~LightweightMutex()
-	{
-		CloseHandle( mSemaphore );
-	}
-	//-----------------------------------------------------------------------------------
-	void LightweightMutex::lock()
-	{
-		if( _InterlockedIncrement( &mCounter ) > 1 )
-			WaitForSingleObject( mSemaphore, INFINITE );
-	}
-	//-----------------------------------------------------------------------------------
-	bool LightweightMutex::tryLock()
-	{
-		long result = _InterlockedCompareExchange( &mCounter, 1, 0 );
-		return (result == 0);
-	}
-	//-----------------------------------------------------------------------------------
-	void LightweightMutex::unlock()
-	{
-		if( _InterlockedDecrement( &mCounter ) > 0 )
-		{
-			ReleaseSemaphore( mSemaphore, 1, NULL );
-		}
-	}
+    }
+    //-----------------------------------------------------------------------------------
+    LightweightMutex::~LightweightMutex()
+    {
+        CloseHandle( mSemaphore );
+    }
+    //-----------------------------------------------------------------------------------
+    void LightweightMutex::lock()
+    {
+        if( _InterlockedIncrement( &mCounter ) > 1 )
+            WaitForSingleObject( mSemaphore, INFINITE );
+    }
+    //-----------------------------------------------------------------------------------
+    bool LightweightMutex::tryLock()
+    {
+        long result = _InterlockedCompareExchange( &mCounter, 1, 0 );
+        return (result == 0);
+    }
+    //-----------------------------------------------------------------------------------
+    void LightweightMutex::unlock()
+    {
+        if( _InterlockedDecrement( &mCounter ) > 0 )
+        {
+            ReleaseSemaphore( mSemaphore, 1, NULL );
+        }
+    }
 }

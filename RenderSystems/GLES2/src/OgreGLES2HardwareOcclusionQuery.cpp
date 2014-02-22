@@ -55,7 +55,7 @@ GLES2HardwareOcclusionQuery::~GLES2HardwareOcclusionQuery()
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::createQuery()
 {
-	// Check for hardware occlusion support
+    // Check for hardware occlusion support
     
     if(getGLES2SupportRef()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
     {
@@ -127,7 +127,7 @@ bool GLES2HardwareOcclusionQuery::isStillOutstanding(void)
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available));
     }
 
-	// GL_TRUE means a wait would occur
+    // GL_TRUE means a wait would occur
     return !(available == GL_TRUE);  
 } 
 

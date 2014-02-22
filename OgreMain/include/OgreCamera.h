@@ -78,9 +78,9 @@ namespace Ogre {
         aspect ratio as the camera to avoid distortion (unless you want it!).
     @par
         Starting Ogre 2.x, a Camera must be attached to a SceneNode, using the
-		method SceneNode::attachObject. By default the camera is attached to
-		the root scene node on creation.
-		When this is done the Camera will combine it's own
+        method SceneNode::attachObject. By default the camera is attached to
+        the root scene node on creation.
+        When this is done the Camera will combine it's own
         position/orientation settings with it's parent SceneNode. 
         This is also useful for implementing more complex Camera / object
         relationships i.e. having a camera attached to a world object.
@@ -183,9 +183,9 @@ namespace Ogre {
         /// @see Camera::getPixelDisplayRatio
         Real mPixelDisplayRatio;
 
-		/// Each frame it is set to all false. After rendering each RQ, it is set to true
-		vector<bool>::type	mRenderedRqs;
-		AxisAlignedBoxVec	mReceiversBoxPerRenderQueue;
+        /// Each frame it is set to all false. After rendering each RQ, it is set to true
+        vector<bool>::type  mRenderedRqs;
+        AxisAlignedBoxVec   mReceiversBoxPerRenderQueue;
 
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
@@ -211,7 +211,7 @@ namespace Ogre {
     public:
         /** Standard constructor.
         */
-		Camera( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager* sm );
+        Camera( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager* sm );
 
         /** Standard destructor.
         */
@@ -358,15 +358,15 @@ namespace Ogre {
         /** Tells the Camera to contact the SceneManager to render from it's viewpoint.
         @param vp The viewport to render to
         @param includeOverlays Whether or not any overlay objects should be included
-		@param firstRq
-			First RenderQueue ID to render (inclusive)
-		@param lastRq
-			Last RenderQueue ID to render (exclusive)
+        @param firstRq
+            First RenderQueue ID to render (inclusive)
+        @param lastRq
+            Last RenderQueue ID to render (exclusive)
         */
-		void _cullScenePhase01(const Camera *lodCamera, Viewport *vp, uint8 firstRq, uint8 lastRq );
+        void _cullScenePhase01(const Camera *lodCamera, Viewport *vp, uint8 firstRq, uint8 lastRq );
 
-		void _renderScenePhase02(const Camera *lodCamera, Viewport *vp, uint8 firstRq, uint8 lastRq,
-								 bool includeOverlays);
+        void _renderScenePhase02(const Camera *lodCamera, Viewport *vp, uint8 firstRq, uint8 lastRq,
+                                 bool includeOverlays);
 
         /** Function for outputting to a stream.
         */
@@ -682,29 +682,29 @@ namespace Ogre {
         */
         Real getPixelDisplayRatio() const { return mPixelDisplayRatio; }
 
-		/** Called at the beginning of each frame to know which RenderQueue IDs have been rendered
-		@param numRqs
-			Max number of total possible render queues in this frame
-		*/
-		void _resetRenderedRqs( size_t numRqs );
+        /** Called at the beginning of each frame to know which RenderQueue IDs have been rendered
+        @param numRqs
+            Max number of total possible render queues in this frame
+        */
+        void _resetRenderedRqs( size_t numRqs );
 
-		/** Tells the camera that render queues in the range [rqStart; rqEnd) were rendered
-		@remarks
-			This function may be called before having been actually rendered
-			(i.e. during the culling phase 01)
-		@param rqStart
-			The first render queue in the range to be rendered. Inclusive.
-		@param rqEnd
-			Next to last render queue id to be rendered. Must be below or equal than
-			the value passed to @see _resetRenderedRqs
-		*/
-		void _setRenderedRqs( size_t rqStart, size_t rqEnd );
+        /** Tells the camera that render queues in the range [rqStart; rqEnd) were rendered
+        @remarks
+            This function may be called before having been actually rendered
+            (i.e. during the culling phase 01)
+        @param rqStart
+            The first render queue in the range to be rendered. Inclusive.
+        @param rqEnd
+            Next to last render queue id to be rendered. Must be below or equal than
+            the value passed to @see _resetRenderedRqs
+        */
+        void _setRenderedRqs( size_t rqStart, size_t rqEnd );
 
-		/// Returns true if the asked render queue has been rendered. False otherwise
-		bool isRenderedRq( size_t rqId ) const			{ return mRenderedRqs[rqId]; }
-		const AxisAlignedBoxVec& getReceiversBoxPerRenderQueue(void) const
-														{ return mReceiversBoxPerRenderQueue; }
-		AxisAlignedBoxVec& _getReceiversBoxPerRenderQueue(void)	{ return mReceiversBoxPerRenderQueue; }
+        /// Returns true if the asked render queue has been rendered. False otherwise
+        bool isRenderedRq( size_t rqId ) const          { return mRenderedRqs[rqId]; }
+        const AxisAlignedBoxVec& getReceiversBoxPerRenderQueue(void) const
+                                                        { return mReceiversBoxPerRenderQueue; }
+        AxisAlignedBoxVec& _getReceiversBoxPerRenderQueue(void) { return mReceiversBoxPerRenderQueue; }
         
     };
     /** @} */

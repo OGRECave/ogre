@@ -35,17 +35,17 @@ using namespace Ogre;
 
 class TerrainTests : public CppUnit::TestFixture
 {
-	// CppUnit macros for setting up the test suite
-	CPPUNIT_TEST_SUITE( TerrainTests );
-	CPPUNIT_TEST(testCreate);
-	CPPUNIT_TEST_SUITE_END();
+    // CppUnit macros for setting up the test suite
+    CPPUNIT_TEST_SUITE( TerrainTests );
+    CPPUNIT_TEST(testCreate);
+    CPPUNIT_TEST_SUITE_END();
 
-	Root* mRoot;
-	SceneManager* mSceneMgr;
-	TerrainGlobalOptions* mTerrainOpts;
+    Root* mRoot;
+    SceneManager* mSceneMgr;
+    TerrainGlobalOptions* mTerrainOpts;
 
 public:
-	void setUp();
-	void tearDown();
-	void testCreate();
+    void setUp();
+    void tearDown();
+    void testCreate();
 };

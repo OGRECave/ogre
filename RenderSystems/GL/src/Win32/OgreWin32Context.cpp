@@ -45,58 +45,58 @@ namespace Ogre {
     
     Win32Context::~Win32Context()
     {
-		// NB have to do this is subclass to ensure any methods called back
-		// are on this subclass and not half-destructed superclass
-		GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-		rs->_unregisterContext(this);
+        // NB have to do this is subclass to ensure any methods called back
+        // are on this subclass and not half-destructed superclass
+        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+        rs->_unregisterContext(this);
     }
         
     void Win32Context::setCurrent()
     {
          wglMakeCurrent(mHDC, mGlrc);      
     }
-	void Win32Context::endCurrent()
-	{
-		wglMakeCurrent(NULL, NULL);
-	}
+    void Win32Context::endCurrent()
+    {
+        wglMakeCurrent(NULL, NULL);
+    }
 
-	GLContext* Win32Context::clone() const
-	{
-		// Create new context based on own HDC
-		HGLRC newCtx = wglCreateContext(mHDC);
-		
-		if (!newCtx)
-		{
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-				"Error calling wglCreateContext", "Win32Context::clone");
-		}
+    GLContext* Win32Context::clone() const
+    {
+        // Create new context based on own HDC
+        HGLRC newCtx = wglCreateContext(mHDC);
+        
+        if (!newCtx)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                "Error calling wglCreateContext", "Win32Context::clone");
+        }
 
-		HGLRC oldrc = wglGetCurrentContext();
-		HDC oldhdc = wglGetCurrentDC();
-		wglMakeCurrent(NULL, NULL);
-		// Share lists with old context
-	    if (!wglShareLists(mGlrc, newCtx))
-		{
-			String errorMsg = translateWGLError();
-			wglDeleteContext(newCtx);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("wglShareLists() failed: ") + errorMsg, "Win32Context::clone");
-		}
-		// restore old context
-		wglMakeCurrent(oldhdc, oldrc);
-		
+        HGLRC oldrc = wglGetCurrentContext();
+        HDC oldhdc = wglGetCurrentDC();
+        wglMakeCurrent(NULL, NULL);
+        // Share lists with old context
+        if (!wglShareLists(mGlrc, newCtx))
+        {
+            String errorMsg = translateWGLError();
+            wglDeleteContext(newCtx);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("wglShareLists() failed: ") + errorMsg, "Win32Context::clone");
+        }
+        // restore old context
+        wglMakeCurrent(oldhdc, oldrc);
+        
 
-		return new Win32Context(mHDC, newCtx);
-	}
+        return new Win32Context(mHDC, newCtx);
+    }
 
-	void Win32Context::releaseContext()
-	{
-		if (mGlrc != NULL)
-		{
-			wglDeleteContext(mGlrc);
-			mGlrc = NULL;
-			mHDC  = NULL;
-		}		
-	}
+    void Win32Context::releaseContext()
+    {
+        if (mGlrc != NULL)
+        {
+            wglDeleteContext(mGlrc);
+            mGlrc = NULL;
+            mHDC  = NULL;
+        }       
+    }
 }
 
 #if OGRE_THREAD_SUPPORT == 1
@@ -104,19 +104,19 @@ namespace Ogre {
 // declared in OgreGLPrerequisites.h 
 WGLEWContext * wglewGetContext()
 {
-	using namespace Ogre;
-	static OGRE_THREAD_POINTER_VAR(WGLEWContext, WGLEWContextsPtr);
+    using namespace Ogre;
+    static OGRE_THREAD_POINTER_VAR(WGLEWContext, WGLEWContextsPtr);
 
-	WGLEWContext * currentWGLEWContextsPtr = OGRE_THREAD_POINTER_GET(WGLEWContextsPtr);
-	if (currentWGLEWContextsPtr == NULL)
-	{
-		currentWGLEWContextsPtr = new WGLEWContext();
-		OGRE_THREAD_POINTER_SET(WGLEWContextsPtr, currentWGLEWContextsPtr);
-		ZeroMemory(currentWGLEWContextsPtr, sizeof(WGLEWContext));
-		wglewInit();
+    WGLEWContext * currentWGLEWContextsPtr = OGRE_THREAD_POINTER_GET(WGLEWContextsPtr);
+    if (currentWGLEWContextsPtr == NULL)
+    {
+        currentWGLEWContextsPtr = new WGLEWContext();
+        OGRE_THREAD_POINTER_SET(WGLEWContextsPtr, currentWGLEWContextsPtr);
+        ZeroMemory(currentWGLEWContextsPtr, sizeof(WGLEWContext));
+        wglewInit();
 
-	}
-	return currentWGLEWContextsPtr;
+    }
+    return currentWGLEWContextsPtr;
 }
 
 #endif

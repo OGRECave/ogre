@@ -49,7 +49,7 @@ void TextureEffectsTest::setupContent()
         Entity* ent = mSceneMgr->createEntity(SceneManager::PT_PLANE, SCENE_STATIC);
 
         // attach it to a node, scale it, and position appropriately
-		SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode( SCENE_STATIC );
+        SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode( SCENE_STATIC );
         node->setPosition(i % 2 ? 25 : -25, i / 2 ? -25 : 25, 0);
         node->setScale(0.25, 0.25, 0.25);
         node->attachObject(ent);

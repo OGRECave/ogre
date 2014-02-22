@@ -145,76 +145,76 @@ namespace Ogre {
             }
         }
     }
-	//-----------------------------------------------------------------------
-	void AbsolutePixelCountLodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData objData,
-													   const Camera *camera, Real bias ) const
-	{
-		const Viewport *viewport = camera->getLastViewport();
-		Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
-		ArrayVector3 cameraPos;
-		cameraPos.setAll( camera->getDerivedPosition() );
+    //-----------------------------------------------------------------------
+    void AbsolutePixelCountLodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData objData,
+                                                       const Camera *camera, Real bias ) const
+    {
+        const Viewport *viewport = camera->getLastViewport();
+        Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
+        ArrayVector3 cameraPos;
+        cameraPos.setAll( camera->getDerivedPosition() );
 
-		const Matrix4 &projMat = camera->getProjectionMatrix();
-		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
+        const Matrix4 &projMat = camera->getProjectionMatrix();
+        OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
-		if( camera->getProjectionType() == PT_PERSPECTIVE )
-		{
-			//vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
-			//order and use lower_bound (which wouldn't be the same as using upper_bound)
-			ArrayReal PiDotVpAreaDotProjMat00dot11(
-							Mathlib::SetAll( -Math::PI * viewportArea * projMat[0][0] * projMat[1][1] *
-											 camera->getLodBias() * bias ) );
+        if( camera->getProjectionType() == PT_PERSPECTIVE )
+        {
+            //vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
+            //order and use lower_bound (which wouldn't be the same as using upper_bound)
+            ArrayReal PiDotVpAreaDotProjMat00dot11(
+                            Mathlib::SetAll( -Math::PI * viewportArea * projMat[0][0] * projMat[1][1] *
+                                             camera->getLodBias() * bias ) );
 
-			for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
-			{
-				ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
-																			(objData.mWorldRadius);
-				ArrayReal sqDistance = objData.mWorldAabb->mCenter.squaredDistance( cameraPos );
+            for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+            {
+                ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+                                                                            (objData.mWorldRadius);
+                ArrayReal sqDistance = objData.mWorldAabb->mCenter.squaredDistance( cameraPos );
 
-				//Avoid division by zero
-				sqDistance = Mathlib::Max( sqDistance, Mathlib::fEpsilon );
+                //Avoid division by zero
+                sqDistance = Mathlib::Max( sqDistance, Mathlib::fEpsilon );
 
-				// Get area of unprojected circle with object bounding radius
-				//ArrayReal boundingArea = Mathlib::PI * (*worldRadius * *worldRadius);
-				//ArrayReal arrayLodValue = (boundingArea * vpAreaDotProjMat00dot11) / sqDistance;
+                // Get area of unprojected circle with object bounding radius
+                //ArrayReal boundingArea = Mathlib::PI * (*worldRadius * *worldRadius);
+                //ArrayReal arrayLodValue = (boundingArea * vpAreaDotProjMat00dot11) / sqDistance;
 
-				ArrayReal sqRadius = (*worldRadius * *worldRadius);
-				ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11) / sqDistance;
+                ArrayReal sqRadius = (*worldRadius * *worldRadius);
+                ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11) / sqDistance;
 
-				CastArrayToReal( lodValues, arrayLodValue );
+                CastArrayToReal( lodValues, arrayLodValue );
 
-				lodSet( objData, lodValues );
+                lodSet( objData, lodValues );
 
-				objData.advanceLodPack();
-			}
-		}
-		else
-		{
-			Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
+                objData.advanceLodPack();
+            }
+        }
+        else
+        {
+            Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
 
-			//Avoid division by zero
-			orthoArea = Ogre::max( orthoArea, 1e-6f );
+            //Avoid division by zero
+            orthoArea = Ogre::max( orthoArea, 1e-6f );
 
-			//vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
-			//order and use lower_bound (which wouldn't be the same as using upper_bound)
-			ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI * viewportArea / orthoArea ) );
+            //vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
+            //order and use lower_bound (which wouldn't be the same as using upper_bound)
+            ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI * viewportArea / orthoArea ) );
 
-			ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );
+            ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );
 
-			for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
-			{
-				ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
-																			(objData.mWorldRadius);
-				ArrayReal arrayLodValue = (*worldRadius * *worldRadius) *
-											PiDotVpAreaDivOrhtoArea * lodBias;
-				CastArrayToReal( lodValues, arrayLodValue );
+            for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+            {
+                ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+                                                                            (objData.mWorldRadius);
+                ArrayReal arrayLodValue = (*worldRadius * *worldRadius) *
+                                            PiDotVpAreaDivOrhtoArea * lodBias;
+                CastArrayToReal( lodValues, arrayLodValue );
 
-				lodSet( objData, lodValues );
+                lodSet( objData, lodValues );
 
-				objData.advanceLodPack();
-			}
-		}
-	}
+                objData.advanceLodPack();
+            }
+        }
+    }
     //-----------------------------------------------------------------------
 
     /************************************************************************/
@@ -246,76 +246,76 @@ namespace Ogre {
         Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
         
         // Return ratio of screen size to absolutely covered pixel count
-		return absoluteValue / viewportArea;
+        return absoluteValue / viewportArea;
     }
-	//-----------------------------------------------------------------------
-	void ScreenRatioPixelCountLodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData objData,
-													   const Camera *camera, Real bias ) const
-	{
-		ArrayVector3 cameraPos;
-		cameraPos.setAll( camera->getDerivedPosition() );
+    //-----------------------------------------------------------------------
+    void ScreenRatioPixelCountLodStrategy::lodUpdateImpl( const size_t numNodes, ObjectData objData,
+                                                       const Camera *camera, Real bias ) const
+    {
+        ArrayVector3 cameraPos;
+        cameraPos.setAll( camera->getDerivedPosition() );
 
-		const Matrix4 &projMat = camera->getProjectionMatrix();
-		OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
+        const Matrix4 &projMat = camera->getProjectionMatrix();
+        OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
 
-		if( camera->getProjectionType() == PT_PERSPECTIVE )
-		{
-			//vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
-			//order and use lower_bound (which wouldn't be the same as using upper_bound)
-			ArrayReal PiDotVpAreaDotProjMat00dot11(
-							Mathlib::SetAll( -Math::PI * projMat[0][0] * projMat[1][1] *
-											 camera->getLodBias() * bias ) );
+        if( camera->getProjectionType() == PT_PERSPECTIVE )
+        {
+            //vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
+            //order and use lower_bound (which wouldn't be the same as using upper_bound)
+            ArrayReal PiDotVpAreaDotProjMat00dot11(
+                            Mathlib::SetAll( -Math::PI * projMat[0][0] * projMat[1][1] *
+                                             camera->getLodBias() * bias ) );
 
-			for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
-			{
-				ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
-																			(objData.mWorldRadius);
-				ArrayReal sqDistance = objData.mWorldAabb->mCenter.squaredDistance( cameraPos );
+            for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+            {
+                ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+                                                                            (objData.mWorldRadius);
+                ArrayReal sqDistance = objData.mWorldAabb->mCenter.squaredDistance( cameraPos );
 
-				//Avoid division by zero
-				sqDistance = Mathlib::Max( sqDistance, Mathlib::fEpsilon );
+                //Avoid division by zero
+                sqDistance = Mathlib::Max( sqDistance, Mathlib::fEpsilon );
 
-				// Get area of unprojected circle with object bounding radius
-				//ArrayReal boundingArea = Mathlib::PI * (*worldRadius * *worldRadius);
-				//ArrayReal arrayLodValue = (boundingArea * vpAreaDotProjMat00dot11) / sqDistance;
+                // Get area of unprojected circle with object bounding radius
+                //ArrayReal boundingArea = Mathlib::PI * (*worldRadius * *worldRadius);
+                //ArrayReal arrayLodValue = (boundingArea * vpAreaDotProjMat00dot11) / sqDistance;
 
-				ArrayReal sqRadius = (*worldRadius * *worldRadius);
-				ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11) / sqDistance;
+                ArrayReal sqRadius = (*worldRadius * *worldRadius);
+                ArrayReal arrayLodValue = (sqRadius * PiDotVpAreaDotProjMat00dot11) / sqDistance;
 
-				CastArrayToReal( lodValues, arrayLodValue );
+                CastArrayToReal( lodValues, arrayLodValue );
 
-				lodSet( objData, lodValues );
+                lodSet( objData, lodValues );
 
-				objData.advanceLodPack();
-			}
-		}
-		else
-		{
-			Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
+                objData.advanceLodPack();
+            }
+        }
+        else
+        {
+            Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
 
-			//Avoid division by zero
-			orthoArea = Ogre::max( orthoArea, 1e-6f );
+            //Avoid division by zero
+            orthoArea = Ogre::max( orthoArea, 1e-6f );
 
-			//vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
-			//order and use lower_bound (which wouldn't be the same as using upper_bound)
-			ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI / orthoArea ) );
+            //vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
+            //order and use lower_bound (which wouldn't be the same as using upper_bound)
+            ArrayReal PiDotVpAreaDivOrhtoArea( Mathlib::SetAll( -Math::PI / orthoArea ) );
 
-			ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );
+            ArrayReal lodBias( Mathlib::SetAll( camera->getLodBias() * bias ) );
 
-			for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
-			{
-				ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
-																			(objData.mWorldRadius);
-				ArrayReal arrayLodValue = (*worldRadius * *worldRadius) *
-											PiDotVpAreaDivOrhtoArea * lodBias;
-				CastArrayToReal( lodValues, arrayLodValue );
+            for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+            {
+                ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+                                                                            (objData.mWorldRadius);
+                ArrayReal arrayLodValue = (*worldRadius * *worldRadius) *
+                                            PiDotVpAreaDivOrhtoArea * lodBias;
+                CastArrayToReal( lodValues, arrayLodValue );
 
-				lodSet( objData, lodValues );
+                lodSet( objData, lodValues );
 
-				objData.advanceLodPack();
-			}
-		}
-	}
+                objData.advanceLodPack();
+            }
+        }
+    }
     //-----------------------------------------------------------------------
 
 } // namespace

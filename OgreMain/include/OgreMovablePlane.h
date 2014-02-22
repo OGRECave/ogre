@@ -37,13 +37,13 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Definition of a Plane that may be attached to a node, and the derived
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Definition of a Plane that may be attached to a node, and the derived
         details of it retrieved simply.
     @remarks
         This plane is not here for rendering purposes, it's to allow you to attach
@@ -66,11 +66,11 @@ namespace Ogre {
         MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager, const Plane& rhs );
         /** Construct a plane through a normal, and a distance to move the plane along the normal.*/
         MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
-						const Vector3& rkNormal, Real fConstant );
+                        const Vector3& rkNormal, Real fConstant );
         MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
-						const Vector3& rkNormal, const Vector3& rkPoint );
+                        const Vector3& rkNormal, const Vector3& rkPoint );
         MovablePlane ( IdType id, ObjectMemoryManager *objectMemoryManager,
-						const Vector3& rkPoint0, const Vector3& rkPoint1, const Vector3& rkPoint2 );
+                        const Vector3& rkPoint0, const Vector3& rkPoint1, const Vector3& rkPoint2 );
         ~MovablePlane() {}
         /// Overridden from MovableObject
         void _notifyCurrentCamera(Camera*) { /* don't care */ }
@@ -82,9 +82,9 @@ namespace Ogre {
         const String& getMovableType(void) const;
         /// Get the derived plane as transformed by its parent node. 
         const Plane& _getDerivedPlane(void) const;
-		/// @copydoc MovableObject::visitRenderables
-		void visitRenderables(Renderable::Visitor* visitor, 
-			bool debugRenderables = false)
+        /// @copydoc MovableObject::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false)
                 {
                     /* do nothing */
                     (void)visitor;
@@ -92,8 +92,8 @@ namespace Ogre {
                 }
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

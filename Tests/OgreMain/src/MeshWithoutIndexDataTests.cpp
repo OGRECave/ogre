@@ -43,26 +43,26 @@ void MeshWithoutIndexDataTests::setUp()
     if(LogManager::getSingletonPtr() == 0)
         mLogManager = OGRE_NEW LogManager();
 
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
+    LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
     LogManager::getSingleton().setLogDetail(LL_LOW);
-	OGRE_NEW ResourceGroupManager();
-	OGRE_NEW LodStrategyManager();
+    OGRE_NEW ResourceGroupManager();
+    OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
     mMeshMgr = OGRE_NEW MeshManager();
     archiveMgr = OGRE_NEW ArchiveManager();
     archiveMgr->addArchiveFactory(OGRE_NEW FileSystemArchiveFactory());
 
-	MaterialManager* matMgr = OGRE_NEW MaterialManager();
-	matMgr->initialise();
+    MaterialManager* matMgr = OGRE_NEW MaterialManager();
+    matMgr->initialise();
 }
 void MeshWithoutIndexDataTests::tearDown()
 {
     OGRE_DELETE mMeshMgr;
     OGRE_DELETE mBufMgr;
     OGRE_DELETE archiveMgr;
-	OGRE_DELETE MaterialManager::getSingletonPtr();
-	OGRE_DELETE LodStrategyManager::getSingletonPtr();
-	OGRE_DELETE ResourceGroupManager::getSingletonPtr();
+    OGRE_DELETE MaterialManager::getSingletonPtr();
+    OGRE_DELETE LodStrategyManager::getSingletonPtr();
+    OGRE_DELETE ResourceGroupManager::getSingletonPtr();
     OGRE_DELETE mLogManager;
 }
 
@@ -457,7 +457,7 @@ void MeshWithoutIndexDataTests::testBuildTangentVectors()
     }
     catch (const InvalidParametersException&)
     {
-    	// ok
+        // ok
     }
     
     mMeshMgr->remove( fileName );
@@ -469,7 +469,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
-	LodConfig lodConfig;
+    LodConfig lodConfig;
     lodConfig.levels.clear();
     lodConfig.mesh = MeshPtr(mesh);
     lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();

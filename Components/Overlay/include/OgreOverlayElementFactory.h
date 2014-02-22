@@ -36,13 +36,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Overlays
-	*  @{
-	*/
-	/** Defines the interface which all components wishing to 
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Overlays
+    *  @{
+    */
+    /** Defines the interface which all components wishing to 
         supply OverlayElement subclasses must implement.
     @remarks
         To allow the OverlayElement types available for inclusion on 
@@ -54,7 +54,7 @@ namespace Ogre {
         Each OverlayElementFactory creates a single type of OverlayElement, 
         identified by a 'type name' which must be unique.
     */
-	class _OgreOverlayExport OverlayElementFactory : public OverlayAlloc
+    class _OgreOverlayExport OverlayElementFactory : public OverlayAlloc
     {
     public:
         /** Destroy the overlay element factory */
@@ -106,8 +106,8 @@ namespace Ogre {
         /** See OverlayElementFactory */
         virtual const String& getTypeName(void) const;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

@@ -40,8 +40,8 @@ namespace Ogre {
     class Win32Context;
 
 
-	// Useful error method implemented in Win32GLSupport
-	String translateWGLError();
+    // Useful error method implemented in Win32GLSupport
+    String translateWGLError();
 }
 
 

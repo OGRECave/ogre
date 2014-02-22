@@ -36,20 +36,20 @@ class MaterialController;
 class MaterialPropertyGridPage : public wxPropertyGridPage
 {
 public:
-	MaterialPropertyGridPage(MaterialController* controller);
-	virtual ~MaterialPropertyGridPage();
-	virtual void populate();
+    MaterialPropertyGridPage(MaterialController* controller);
+    virtual ~MaterialPropertyGridPage();
+    virtual void populate();
 
 protected:
-	virtual void propertyChange(wxPropertyGridEvent& event);
+    virtual void propertyChange(wxPropertyGridEvent& event);
 
-	MaterialController* mController;
+    MaterialController* mController;
 
-	wxPGId mPropertyNameId;
-	wxPGId mPropertyReceiveShadowsId;
-	wxPGId mPropertyTransparencyCastsShadowsId;
+    wxPGId mPropertyNameId;
+    wxPGId mPropertyReceiveShadowsId;
+    wxPGId mPropertyTransparencyCastsShadowsId;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif // _MATERIALPROPERTYGRIDPAGE_H_

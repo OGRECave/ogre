@@ -28,37 +28,37 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//-----------------------------------------------------------------------------------
-	inline ArrayReal MathlibC::Modf4( ArrayReal x, ArrayReal &outIntegral )
-	{
+    //-----------------------------------------------------------------------------------
+    inline ArrayReal MathlibC::Modf4( ArrayReal x, ArrayReal &outIntegral )
+    {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-		double _outIntegral;
-		ArrayReal fractpart = modf( x, &_outIntegral );
-		outIntegral = static_cast<ArrayReal>( _outIntegral );
-		return fractpart;
+        double _outIntegral;
+        ArrayReal fractpart = modf( x, &_outIntegral );
+        outIntegral = static_cast<ArrayReal>( _outIntegral );
+        return fractpart;
 #else
-		return modff( x, &outIntegral );
+        return modff( x, &outIntegral );
 #endif
-	}
-	//-----------------------------------------------------------------------------------
-	inline ArrayReal MathlibC::ACos4( ArrayReal x)
-	{
-		return acos( x );
-	}
-	//-----------------------------------------------------------------------------------
-	inline ArrayReal MathlibC::Sin4( ArrayReal x )
-	{
-		return sin( x );
-	}
-	//-----------------------------------------------------------------------------------
-	inline ArrayReal MathlibC::Cos4( ArrayReal x )
-	{
-		return cos( x );
-	}
-	//-----------------------------------------------------------------------------------
-	inline void MathlibC::SinCos4( ArrayReal x, ArrayReal &outSin, ArrayReal &outCos )
-	{
-		outSin = sin( x );
-		outCos = cos( x );
-	}
+    }
+    //-----------------------------------------------------------------------------------
+    inline ArrayReal MathlibC::ACos4( ArrayReal x)
+    {
+        return acos( x );
+    }
+    //-----------------------------------------------------------------------------------
+    inline ArrayReal MathlibC::Sin4( ArrayReal x )
+    {
+        return sin( x );
+    }
+    //-----------------------------------------------------------------------------------
+    inline ArrayReal MathlibC::Cos4( ArrayReal x )
+    {
+        return cos( x );
+    }
+    //-----------------------------------------------------------------------------------
+    inline void MathlibC::SinCos4( ArrayReal x, ArrayReal &outSin, ArrayReal &outCos )
+    {
+        outSin = sin( x );
+        outCos = cos( x );
+    }
 }

@@ -65,48 +65,48 @@ namespace Ogre {
     }
     //-------------------------------------------------------------------------
     Animation* OldSkeletonInstance::getAnimation(const String& name, 
-		const LinkedSkeletonAnimationSource** linker) const
+        const LinkedSkeletonAnimationSource** linker) const
     {
         return mSkeleton->getAnimation(name, linker);
     }
-	//-------------------------------------------------------------------------
-	Animation* OldSkeletonInstance::_getAnimationImpl(const String& name, 
-		const LinkedSkeletonAnimationSource** linker) const
-	{
-		return mSkeleton->_getAnimationImpl(name, linker);
-	}
+    //-------------------------------------------------------------------------
+    Animation* OldSkeletonInstance::_getAnimationImpl(const String& name, 
+        const LinkedSkeletonAnimationSource** linker) const
+    {
+        return mSkeleton->_getAnimationImpl(name, linker);
+    }
     //-------------------------------------------------------------------------
     void OldSkeletonInstance::removeAnimation(const String& name)
     {
         mSkeleton->removeAnimation(name);
     }
-	//-------------------------------------------------------------------------
-	void OldSkeletonInstance::addLinkedSkeletonAnimationSource(const String& skelName, 
-		Real scale)
-	{
-		mSkeleton->addLinkedSkeletonAnimationSource(skelName, scale);
-	}
-	//-------------------------------------------------------------------------
-	void OldSkeletonInstance::removeAllLinkedSkeletonAnimationSources(void)
-	{
-		mSkeleton->removeAllLinkedSkeletonAnimationSources();
-	}
-	//-------------------------------------------------------------------------
-	Skeleton::LinkedSkeletonAnimSourceIterator 
-	OldSkeletonInstance::getLinkedSkeletonAnimationSourceIterator(void) const
-	{
-		return mSkeleton->getLinkedSkeletonAnimationSourceIterator();
-	}
-	//-------------------------------------------------------------------------
-	void OldSkeletonInstance::_initAnimationState(AnimationStateSet* animSet)
-	{
-		mSkeleton->_initAnimationState(animSet);
-	}
-	//-------------------------------------------------------------------------
-	void OldSkeletonInstance::_refreshAnimationState(AnimationStateSet* animSet)
-	{
-		mSkeleton->_refreshAnimationState(animSet);
-	}
+    //-------------------------------------------------------------------------
+    void OldSkeletonInstance::addLinkedSkeletonAnimationSource(const String& skelName, 
+        Real scale)
+    {
+        mSkeleton->addLinkedSkeletonAnimationSource(skelName, scale);
+    }
+    //-------------------------------------------------------------------------
+    void OldSkeletonInstance::removeAllLinkedSkeletonAnimationSources(void)
+    {
+        mSkeleton->removeAllLinkedSkeletonAnimationSources();
+    }
+    //-------------------------------------------------------------------------
+    Skeleton::LinkedSkeletonAnimSourceIterator 
+    OldSkeletonInstance::getLinkedSkeletonAnimationSourceIterator(void) const
+    {
+        return mSkeleton->getLinkedSkeletonAnimationSourceIterator();
+    }
+    //-------------------------------------------------------------------------
+    void OldSkeletonInstance::_initAnimationState(AnimationStateSet* animSet)
+    {
+        mSkeleton->_initAnimationState(animSet);
+    }
+    //-------------------------------------------------------------------------
+    void OldSkeletonInstance::_refreshAnimationState(AnimationStateSet* animSet)
+    {
+        mSkeleton->_refreshAnimationState(animSet);
+    }
     //-------------------------------------------------------------------------
     void OldSkeletonInstance::cloneBoneAndChildren(OldBone* source, OldBone* parent)
     {
@@ -132,7 +132,7 @@ namespace Ogre {
         newBone->setScale(source->getScale());
 
         // Process children
-		OldNode::ChildOldNodeIterator it = source->getChildIterator();
+        OldNode::ChildOldNodeIterator it = source->getChildIterator();
         while (it.hasMoreElements())
         {
             cloneBoneAndChildren(static_cast<OldBone*>(it.getNext()), newBone);
@@ -223,24 +223,24 @@ namespace Ogre {
             mFreeTagPoints.splice(mFreeTagPoints.end(), mActiveTagPoints, it);
         }
     }
-	//-------------------------------------------------------------------------
-	const String& OldSkeletonInstance::getName(void) const
-	{
-		// delegate
-		return mSkeleton->getName();
-	}
-	//-------------------------------------------------------------------------
-	ResourceHandle OldSkeletonInstance::getHandle(void) const
-	{
-		// delegate
-		return mSkeleton->getHandle();
-	}
-	//-------------------------------------------------------------------------
-	const String& OldSkeletonInstance::getGroup(void)
-	{
-		// delegate
-		return mSkeleton->getGroup();
-	}
+    //-------------------------------------------------------------------------
+    const String& OldSkeletonInstance::getName(void) const
+    {
+        // delegate
+        return mSkeleton->getName();
+    }
+    //-------------------------------------------------------------------------
+    ResourceHandle OldSkeletonInstance::getHandle(void) const
+    {
+        // delegate
+        return mSkeleton->getHandle();
+    }
+    //-------------------------------------------------------------------------
+    const String& OldSkeletonInstance::getGroup(void)
+    {
+        // delegate
+        return mSkeleton->getGroup();
+    }
 
 
 }

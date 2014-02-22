@@ -34,243 +34,243 @@ THE SOFTWARE.
 #include "Math/Array/OgreBoneTransform.h"
 
 #ifndef NDEBUG
-	#include "OgreNode.h"
+    #include "OgreNode.h"
 #endif
 
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Animation
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Animation
+    *  @{
+    */
 
-	/** Class representing a Bone in the join hierarchy of a skeleton.
+    /** Class representing a Bone in the join hierarchy of a skeleton.
         @remarks
             Unlike 1.9; a Bone is practically a SceneNode in all purposes. It can even have
-			objects directly attached to them. The only reason we need to overload is because
-			the mDerivedTransform matrix is constructed differently, since it is not in world
-			space, but rather in "offset space" (world space minus the reverse transform of the
-			original bind pose).
-			mDerivedPosition, mDeriverdOrientation and mDerivedScale are still in world space
-			though, it's only the 4x4 matrix we send to the GPU that is in a different space.
+            objects directly attached to them. The only reason we need to overload is because
+            the mDerivedTransform matrix is constructed differently, since it is not in world
+            space, but rather in "offset space" (world space minus the reverse transform of the
+            original bind pose).
+            mDerivedPosition, mDeriverdOrientation and mDerivedScale are still in world space
+            though, it's only the 4x4 matrix we send to the GPU that is in a different space.
     */
-	class _OgreExport Bone : public NodeAlloc, public IdObject
+    class _OgreExport Bone : public NodeAlloc, public IdObject
     {
-		typedef vector<Bone*>::type BoneVec;
+        typedef vector<Bone*>::type BoneVec;
     protected:
-		ArrayMatrixAf4x3 const * RESTRICT_ALIAS	mReverseBind;
-		BoneTransform							mTransform;
+        ArrayMatrixAf4x3 const * RESTRICT_ALIAS mReverseBind;
+        BoneTransform                           mTransform;
 
 #ifndef NDEBUG
-		mutable bool mCachedTransformOutOfDate;
-		Node		*mDebugParentNode;
-		bool		mInitialized;
+        mutable bool mCachedTransformOutOfDate;
+        Node        *mDebugParentNode;
+        bool        mInitialized;
 #endif
 
-		/// Depth level in the hierarchy tree (0: Root node, 1: Child of root, etc)
-		uint16	mDepthLevel;
-		/// Pointer to parent node
-		Bone	*mParent;
-		/// Collection of pointers to direct children
-		BoneVec	mChildren;
+        /// Depth level in the hierarchy tree (0: Root node, 1: Child of root, etc)
+        uint16  mDepthLevel;
+        /// Pointer to parent node
+        Bone    *mParent;
+        /// Collection of pointers to direct children
+        BoneVec mChildren;
 
-		String	mName;
+        String  mName;
 
-		/// The memory manager used to allocate the Transform.
-		BoneMemoryManager *mBoneMemoryManager;
+        /// The memory manager used to allocate the Transform.
+        BoneMemoryManager *mBoneMemoryManager;
 
-		/// @copydoc Node::_updateFromParent
-		void _updateFromParent(void);
+        /// @copydoc Node::_updateFromParent
+        void _updateFromParent(void);
 
-		/// @copydoc Node::updateFromParentImpl.
-		void updateFromParentImpl(void);
+        /// @copydoc Node::updateFromParentImpl.
+        void updateFromParentImpl(void);
 
-		void setCachedTransformOutOfDate(void) const;
+        void setCachedTransformOutOfDate(void) const;
 
-		void resetParentTransformPtr(void);
+        void resetParentTransformPtr(void);
 
-		/** For debug use ONLY. Bones don't support dynamically changing their hierarchy structure.
-			It can mess with the memory layout of neighbouring SkeletonInstances
-		*/
-		void removeChild( Bone* child );
+        /** For debug use ONLY. Bones don't support dynamically changing their hierarchy structure.
+            It can mess with the memory layout of neighbouring SkeletonInstances
+        */
+        void removeChild( Bone* child );
 
     public:
-		/** Index in the vector holding this node reference (could be our parent node, or a global array
-			tracking all created nodes to avoid memory leaks). Used for O(1) removals.
-		@remarks
-			It is the parent (or our creator) the one that sets this value, not ourselves. Do NOT modify
-			it manually.
-		*/
-		size_t mGlobalIndex;
-		/// @copydoc mGlobalIndex
-		size_t mParentIndex;
+        /** Index in the vector holding this node reference (could be our parent node, or a global array
+            tracking all created nodes to avoid memory leaks). Used for O(1) removals.
+        @remarks
+            It is the parent (or our creator) the one that sets this value, not ourselves. Do NOT modify
+            it manually.
+        */
+        size_t mGlobalIndex;
+        /// @copydoc mGlobalIndex
+        size_t mParentIndex;
 
-		Bone();
+        Bone();
         virtual ~Bone();
 
-		void _initialize( IdType id, BoneMemoryManager *boneMemoryManager,
-							Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind );
-		void _deinitialize(void);
+        void _initialize( IdType id, BoneMemoryManager *boneMemoryManager,
+                            Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind );
+        void _deinitialize(void);
 
-		/// Returns how deep in the hierarchy we are (eg. 0 -> root node, 1 -> child of root)
-		uint16 getDepthLevel() const								{ return mDepthLevel; }
+        /// Returns how deep in the hierarchy we are (eg. 0 -> root node, 1 -> child of root)
+        uint16 getDepthLevel() const                                { return mDepthLevel; }
 
-		/// Returns a direct access to the Transform state
-		BoneTransform& _getTransform()								{ return mTransform; }
+        /// Returns a direct access to the Transform state
+        BoneTransform& _getTransform()                              { return mTransform; }
 
-		/// Internal use. Called from BoneMemoryManager's rebases (i.e. cleanups, grows)
-		void _memoryRebased(void);
+        /// Internal use. Called from BoneMemoryManager's rebases (i.e. cleanups, grows)
+        void _memoryRebased(void);
 
-		void _setReverseBindPtr( const ArrayMatrixAf4x3 *ptr )		{ mReverseBind = ptr; }
+        void _setReverseBindPtr( const ArrayMatrixAf4x3 *ptr )      { mReverseBind = ptr; }
 
-		/// Sets a custom name for this node. Doesn't have to be unique
-		void setName( const String &name )							{ mName = name; }
+        /// Sets a custom name for this node. Doesn't have to be unique
+        void setName( const String &name )                          { mName = name; }
 
-		/// Returns the name of the node.
-		const String& getName(void) const							{ return mName; }
+        /// Returns the name of the node.
+        const String& getName(void) const                           { return mName; }
 
-		/// Gets this Bones's parent (NULL if this is the root).
-		Bone* getParent(void) const									{ return mParent; }
+        /// Gets this Bones's parent (NULL if this is the root).
+        Bone* getParent(void) const                                 { return mParent; }
 
-		/** Sets a regular Node to be parent of this Bone
-		@remarks
-			1. Multiple calls to _setNodeParent with different arguments will
-			   silently override previous calls.
-			2. By the time we update, we assume the Node has already been updated.
-			   (even when calling _getDerivedPositionUpdated and Co)
-			3. Null pointers will "detach", causing derived updates to be in local space
-			4. Ogre must ensure that when a NodeMemoryManager performs a cleanup (or resizes),
-			   this function is called again (to update our pointers).
-		*/
-		void _setNodeParent( Node *nodeParent );
+        /** Sets a regular Node to be parent of this Bone
+        @remarks
+            1. Multiple calls to _setNodeParent with different arguments will
+               silently override previous calls.
+            2. By the time we update, we assume the Node has already been updated.
+               (even when calling _getDerivedPositionUpdated and Co)
+            3. Null pointers will "detach", causing derived updates to be in local space
+            4. Ogre must ensure that when a NodeMemoryManager performs a cleanup (or resizes),
+               this function is called again (to update our pointers).
+        */
+        void _setNodeParent( Node *nodeParent );
 
-		/** Sets a given orientation in local space (ie. relative to its parent)
-		@remarks
-			Don't call this function too often, as we need to convert to SoA
-		*/
-		inline void setOrientation( Quaternion q );
+        /** Sets a given orientation in local space (ie. relative to its parent)
+        @remarks
+            Don't call this function too often, as we need to convert to SoA
+        */
+        inline void setOrientation( Quaternion q );
 
-		/** Returns a quaternion representing the nodes orientation.
-		@remarks
-			Don't call this function too often, as we need to convert from SoA
-		*/
-		inline Quaternion getOrientation() const;
+        /** Returns a quaternion representing the nodes orientation.
+        @remarks
+            Don't call this function too often, as we need to convert from SoA
+        */
+        inline Quaternion getOrientation() const;
 
-		/** Sets the position of the node relative to its parent.
-		@remarks
-			Don't call this function too often, as we need to convert to SoA
-		*/
-		inline void setPosition( const Vector3& pos );
+        /** Sets the position of the node relative to its parent.
+        @remarks
+            Don't call this function too often, as we need to convert to SoA
+        */
+        inline void setPosition( const Vector3& pos );
 
-		/** Gets the position of the node relative to its parent.
-		@remarks
-			Don't call this function too often, as we need to convert from SoA
-		*/
-		inline Vector3 getPosition(void) const;
+        /** Gets the position of the node relative to its parent.
+        @remarks
+            Don't call this function too often, as we need to convert from SoA
+        */
+        inline Vector3 getPosition(void) const;
 
-		/** Sets the scale of the node relative to its parent.
-		@remarks
-			Don't call this function too often, as we need to convert to SoA
-		*/
-		inline void setScale( const Vector3& pos );
+        /** Sets the scale of the node relative to its parent.
+        @remarks
+            Don't call this function too often, as we need to convert to SoA
+        */
+        inline void setScale( const Vector3& pos );
 
-		/** Gets the scale of the node relative to its parent.
-		@remarks
-			Don't call this function too often, as we need to convert from SoA
-		*/
-		inline Vector3 getScale(void) const;
+        /** Gets the scale of the node relative to its parent.
+        @remarks
+            Don't call this function too often, as we need to convert from SoA
+        */
+        inline Vector3 getScale(void) const;
 
-		/** Tells the Bone whether it should inherit orientation from it's parent node.
-		@remarks
-			@See Node::setInheritOrientation remarks.
-			Note that Nodes and bones inherit scale and orientation differently, because
-			Bones support non-uniform scaling, whereas Nodes don't.
-		@par
-			They may behave differently, because we assume inherited scale is never negative
-			(due to this information being lost when embedded into a matrix. This mimics
-			the behavior of major 3D modeling tools. i.e. scaling by x = -1 & y = -1 is
-			the same as rotating 180° around Z axis)
-			Default is true.
-		@param inherit If true, this node's orientation will be affected by its parent's orientation.
-			If false, it will not be affected.
-		*/
-		void setInheritOrientation(bool inherit);
+        /** Tells the Bone whether it should inherit orientation from it's parent node.
+        @remarks
+            @See Node::setInheritOrientation remarks.
+            Note that Nodes and bones inherit scale and orientation differently, because
+            Bones support non-uniform scaling, whereas Nodes don't.
+        @par
+            They may behave differently, because we assume inherited scale is never negative
+            (due to this information being lost when embedded into a matrix. This mimics
+            the behavior of major 3D modeling tools. i.e. scaling by x = -1 & y = -1 is
+            the same as rotating 180° around Z axis)
+            Default is true.
+        @param inherit If true, this node's orientation will be affected by its parent's orientation.
+            If false, it will not be affected.
+        */
+        void setInheritOrientation(bool inherit);
 
-		/** Returns true if this node is affected by orientation applied to the parent node.
-		@remarks
-			@See setInheritOrientation for more info.
-		*/
-		bool getInheritOrientation(void) const;
+        /** Returns true if this node is affected by orientation applied to the parent node.
+        @remarks
+            @See setInheritOrientation for more info.
+        */
+        bool getInheritOrientation(void) const;
 
-		/** Tells the node whether it should inherit scaling factors from it's parent node.
-		@remarks
-			@See setInheritOrientation.
-		@param inherit If true, this node's scale will be affected by its parent's scale. If false,
-			it will not be affected.
-		*/
-		void setInheritScale(bool inherit);
+        /** Tells the node whether it should inherit scaling factors from it's parent node.
+        @remarks
+            @See setInheritOrientation.
+        @param inherit If true, this node's scale will be affected by its parent's scale. If false,
+            it will not be affected.
+        */
+        void setInheritScale(bool inherit);
 
-		/** Returns true if this node is affected by scaling factors applied to the parent node.
-		@remarks
-			@See setInheritOrientation for more info.
-		*/
-		bool getInheritScale(void) const;
+        /** Returns true if this node is affected by scaling factors applied to the parent node.
+        @remarks
+            @See setInheritOrientation for more info.
+        */
+        bool getInheritScale(void) const;
 
-		/** Gets the transformation matrix for this bone in local space (i.e. as if the
-			skeleton wasn't attached to a SceneNode).
-		@remarks
-			This method returns the full transformation matrix
-			for this node, including the effect of any parent Bone
-			transformations.
-		@par
-			Assumes the caches are already updated.
-		*/
-		FORCEINLINE const SimpleMatrixAf4x3& _getLocalSpaceTransform(void) const
-		{
-			assert( !mCachedTransformOutOfDate );
-			return mTransform.mDerivedTransform[mTransform.mIndex];
-		}
+        /** Gets the transformation matrix for this bone in local space (i.e. as if the
+            skeleton wasn't attached to a SceneNode).
+        @remarks
+            This method returns the full transformation matrix
+            for this node, including the effect of any parent Bone
+            transformations.
+        @par
+            Assumes the caches are already updated.
+        */
+        FORCEINLINE const SimpleMatrixAf4x3& _getLocalSpaceTransform(void) const
+        {
+            assert( !mCachedTransformOutOfDate );
+            return mTransform.mDerivedTransform[mTransform.mIndex];
+        }
 
-		/** Gets the full transformation matrix for this node.
-		@remarks
-			This method returns the full transformation matrix
-			for this node, including the effect of any parent Bone
-			transformations.
-		@par
-			Assumes the caches are already updated.
-		@par
-			The transform is in "world bone" space, unless our root parent called
-			_setNodeParent( nullptr ) in which case the transform will be in
-			local bone space.
-		*/
-		FORCEINLINE const SimpleMatrixAf4x3& _getFullTransform(void) const
-		{
-			assert( !mCachedTransformOutOfDate &&
-					(!mDebugParentNode || !mDebugParentNode->isCachedTransformOutOfDate()) );
-			return mTransform.mFinalTransform[mTransform.mIndex];
-		}
+        /** Gets the full transformation matrix for this node.
+        @remarks
+            This method returns the full transformation matrix
+            for this node, including the effect of any parent Bone
+            transformations.
+        @par
+            Assumes the caches are already updated.
+        @par
+            The transform is in "world bone" space, unless our root parent called
+            _setNodeParent( nullptr ) in which case the transform will be in
+            local bone space.
+        */
+        FORCEINLINE const SimpleMatrixAf4x3& _getFullTransform(void) const
+        {
+            assert( !mCachedTransformOutOfDate &&
+                    (!mDebugParentNode || !mDebugParentNode->isCachedTransformOutOfDate()) );
+            return mTransform.mFinalTransform[mTransform.mIndex];
+        }
 
-		/** @See _getDerivedScaleUpdated remarks. @See _getFullTransform */
-		const SimpleMatrixAf4x3& _getFullTransformUpdated(void);
+        /** @See _getDerivedScaleUpdated remarks. @See _getFullTransform */
+        const SimpleMatrixAf4x3& _getFullTransformUpdated(void);
 
         /** TODO
         */
         /*virtual SceneNode* createChildSceneNode(
-				SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
-				const Vector3& translate = Vector3::ZERO, 
-				const Quaternion& rotate = Quaternion::IDENTITY );*/
+                SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
+                const Vector3& translate = Vector3::ZERO, 
+                const Quaternion& rotate = Quaternion::IDENTITY );*/
 
-		/// @See Node::updateAllTransforms
-		static void updateAllTransforms( const size_t numNodes, BoneTransform t,
-										 ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind,
-										 size_t numBinds );
+        /// @See Node::updateAllTransforms
+        static void updateAllTransforms( const size_t numNodes, BoneTransform t,
+                                         ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind,
+                                         size_t numBinds );
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 
 }// namespace

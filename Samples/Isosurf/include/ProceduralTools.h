@@ -8,7 +8,7 @@
 class ProceduralTools
 {
 public:
-	static Ogre::MeshPtr generateTetrahedra();
+    static Ogre::MeshPtr generateTetrahedra();
 };
 
 #endif

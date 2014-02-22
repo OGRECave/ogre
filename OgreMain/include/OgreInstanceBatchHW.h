@@ -32,73 +32,73 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
 
-	/** This is technique requires true instancing hardware support.
-		Basically it creates a cloned vertex buffer from the original, with an extra buffer containing
-		3 additional TEXCOORDS (12 bytes) repeated as much as the instance count.
-		That will be used for each instance data.
-		@par
-		The main advantage of this technique is that it's <u>VERY</u> fast; but it doesn't support
-		skeletal animation at all. Very reduced memory consumption and bandwidth. Great for particles,
-		debris, bricks, trees, sprites.
-		This batch is one of the few (if not the only) techniques that allows culling on an individual
-		basis. This means we can save vertex shader performance for instances that aren't in scene or
-		just not focused by the camera.
+    /** This is technique requires true instancing hardware support.
+        Basically it creates a cloned vertex buffer from the original, with an extra buffer containing
+        3 additional TEXCOORDS (12 bytes) repeated as much as the instance count.
+        That will be used for each instance data.
+        @par
+        The main advantage of this technique is that it's <u>VERY</u> fast; but it doesn't support
+        skeletal animation at all. Very reduced memory consumption and bandwidth. Great for particles,
+        debris, bricks, trees, sprites.
+        This batch is one of the few (if not the only) techniques that allows culling on an individual
+        basis. This means we can save vertex shader performance for instances that aren't in scene or
+        just not focused by the camera.
 
         @remarks
-			Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
+            Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
         @author
             Matias N. Goldberg ("dark_sylinc")
         @version
             1.1
      */
-	class _OgreExport InstanceBatchHW : public InstanceBatch
-	{
-	protected:
-		void setupVertices( const SubMesh* baseSubMesh );
-		void setupIndices( const SubMesh* baseSubMesh );
+    class _OgreExport InstanceBatchHW : public InstanceBatch
+    {
+    protected:
+        void setupVertices( const SubMesh* baseSubMesh );
+        void setupIndices( const SubMesh* baseSubMesh );
 
-		void removeBlendData();
-		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
+        void removeBlendData();
+        virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
         size_t updateVertexBuffer( Camera *currentCamera , const Camera *lodCamera );
 
-		/// Overloaded to reserve enough space in mCulledInstances
-		virtual void createAllInstancedEntities(void);
+        /// Overloaded to reserve enough space in mCulledInstances
+        virtual void createAllInstancedEntities(void);
 
-	public:
-		InstanceBatchHW( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceManager *creator,
-							MeshPtr &meshReference, const MaterialPtr &material,
-							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap );
-		virtual ~InstanceBatchHW();
+    public:
+        InstanceBatchHW( IdType id, ObjectMemoryManager *objectMemoryManager, InstanceManager *creator,
+                            MeshPtr &meshReference, const MaterialPtr &material,
+                            size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap );
+        virtual ~InstanceBatchHW();
 
-		/** @see InstanceBatch::calculateMaxNumInstances */
-		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
+        /** @see InstanceBatch::calculateMaxNumInstances */
+        size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 
-		/** @see InstanceBatch::buildFrom */
-		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
+        /** @see InstanceBatch::buildFrom */
+        void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
-		//Renderable overloads
-		void getWorldTransforms( Matrix4* xform ) const;
-		unsigned short getNumWorldTransforms(void) const;
+        //Renderable overloads
+        void getWorldTransforms( Matrix4* xform ) const;
+        unsigned short getNumWorldTransforms(void) const;
 
-		/** Overloaded to avoid updating skeletons (which we don't support), check visibility on a
-			per unit basis and finally updated the vertex buffer */
+        /** Overloaded to avoid updating skeletons (which we don't support), check visibility on a
+            per unit basis and finally updated the vertex buffer */
         virtual void _updateRenderQueue( RenderQueue* queue, Camera *camera, const Camera *lodCamera );
 
-		virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
+        virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum,
                                                        const Camera *lodCamera,
-														uint32 combinedVisibilityFlags )
-		{
+                                                        uint32 combinedVisibilityFlags )
+        {
             instanceBatchCullFrustumThreadedImpl( frustum, lodCamera, combinedVisibilityFlags );
-		}
-	};
+        }
+    };
 }
 
 #endif

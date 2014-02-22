@@ -45,52 +45,52 @@ class IGameMaterial;
 
 namespace OgreMax {
 
-	class MeshXMLExporter  : public OgreMaxExporter, public ITreeEnumProc
-	{
-		typedef struct {
-			std::string name;
-			int start;
-			int end;
-		} NamedAnimation;
+    class MeshXMLExporter  : public OgreMaxExporter, public ITreeEnumProc
+    {
+        typedef struct {
+            std::string name;
+            int start;
+            int end;
+        } NamedAnimation;
 
-	public:
-		typedef std::map< std::string, std::string > OutputMap;
+    public:
+        typedef std::map< std::string, std::string > OutputMap;
 
-		MeshXMLExporter(const Config& config, MaterialMap& materialMap);
-		virtual ~MeshXMLExporter();
+        MeshXMLExporter(const Config& config, MaterialMap& materialMap);
+        virtual ~MeshXMLExporter();
 
-		// generates a list of INode* for assembly into Ogre::Mesh form; returns
-		// a map of filename --> XML stringstream.
-		bool buildMeshXML(OutputMap& output);
+        // generates a list of INode* for assembly into Ogre::Mesh form; returns
+        // a map of filename --> XML stringstream.
+        bool buildMeshXML(OutputMap& output);
 
-	protected:
-		// mesh file stream functions
-		bool streamFileHeader(std::ostream &of);
-		bool streamFileFooter(std::ostream &of);
-		bool streamSubmesh(std::ostream &of, IGameObject *obj, std::string &mtlName);
-		bool streamBoneAssignments(std::ostream &of, Modifier *mod, IGameNode *node);
+    protected:
+        // mesh file stream functions
+        bool streamFileHeader(std::ostream &of);
+        bool streamFileFooter(std::ostream &of);
+        bool streamSubmesh(std::ostream &of, IGameObject *obj, std::string &mtlName);
+        bool streamBoneAssignments(std::ostream &of, Modifier *mod, IGameNode *node);
 
-		int getBoneIndex(char *name);
-		std::string removeSpaces(const std::string &s);
+        int getBoneIndex(char *name);
+        std::string removeSpaces(const std::string &s);
 
-		int callback(INode *node);
+        int callback(INode *node);
 
-	private:
+    private:
 
-		bool export(OutputMap& output);
+        bool export(OutputMap& output);
 
-		bool m_createSkeletonLink;
-		std::string m_exportFilename;			// filename provided by
-		std::string m_filename;			// filename provided by
-		std::string m_skeletonFilename;
-		std::queue< std::string > m_submeshNames;
-		MaterialMap& m_materialMap;
-		std::map< std::string, int > m_boneIndexMap;
-		int m_currentBoneIndex;
+        bool m_createSkeletonLink;
+        std::string m_exportFilename;           // filename provided by
+        std::string m_filename;         // filename provided by
+        std::string m_skeletonFilename;
+        std::queue< std::string > m_submeshNames;
+        MaterialMap& m_materialMap;
+        std::map< std::string, int > m_boneIndexMap;
+        int m_currentBoneIndex;
 
-		IGameScene*	m_pGame;
-		Tab<INode*> m_nodeTab;
-	};
+        IGameScene* m_pGame;
+        Tab<INode*> m_nodeTab;
+    };
 }
 
 #endif

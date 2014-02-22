@@ -52,13 +52,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** A 3x3 matrix which can represent rotations around axes.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** A 3x3 matrix which can represent rotations around axes.
         @note
             <b>All the code is adapted from the Wild Magic 0.2 Matrix
             library (http://www.geometrictools.com/).</b>
@@ -72,44 +72,44 @@ namespace Ogre
             @note
                 It does <b>NOT</b> initialize the matrix for efficiency.
         */
-		inline Matrix3 () {}
+        inline Matrix3 () {}
         inline explicit Matrix3 (const Real arr[3][3])
-		{
-			memcpy(m,arr,9*sizeof(Real));
-		}
+        {
+            memcpy(m,arr,9*sizeof(Real));
+        }
         inline Matrix3 (const Matrix3& rkMatrix)
-		{
-			memcpy(m,rkMatrix.m,9*sizeof(Real));
-		}
+        {
+            memcpy(m,rkMatrix.m,9*sizeof(Real));
+        }
         Matrix3 (Real fEntry00, Real fEntry01, Real fEntry02,
                     Real fEntry10, Real fEntry11, Real fEntry12,
                     Real fEntry20, Real fEntry21, Real fEntry22)
-		{
-			m[0][0] = fEntry00;
-			m[0][1] = fEntry01;
-			m[0][2] = fEntry02;
-			m[1][0] = fEntry10;
-			m[1][1] = fEntry11;
-			m[1][2] = fEntry12;
-			m[2][0] = fEntry20;
-			m[2][1] = fEntry21;
-			m[2][2] = fEntry22;
-		}
+        {
+            m[0][0] = fEntry00;
+            m[0][1] = fEntry01;
+            m[0][2] = fEntry02;
+            m[1][0] = fEntry10;
+            m[1][1] = fEntry11;
+            m[1][2] = fEntry12;
+            m[2][0] = fEntry20;
+            m[2][1] = fEntry21;
+            m[2][2] = fEntry22;
+        }
 
-		/** Exchange the contents of this matrix with another. 
-		*/
-		inline void swap(Matrix3& other)
-		{
-			std::swap(m[0][0], other.m[0][0]);
-			std::swap(m[0][1], other.m[0][1]);
-			std::swap(m[0][2], other.m[0][2]);
-			std::swap(m[1][0], other.m[1][0]);
-			std::swap(m[1][1], other.m[1][1]);
-			std::swap(m[1][2], other.m[1][2]);
-			std::swap(m[2][0], other.m[2][0]);
-			std::swap(m[2][1], other.m[2][1]);
-			std::swap(m[2][2], other.m[2][2]);
-		}
+        /** Exchange the contents of this matrix with another. 
+        */
+        inline void swap(Matrix3& other)
+        {
+            std::swap(m[0][0], other.m[0][0]);
+            std::swap(m[0][1], other.m[0][1]);
+            std::swap(m[0][2], other.m[0][2]);
+            std::swap(m[1][0], other.m[1][0]);
+            std::swap(m[1][1], other.m[1][1]);
+            std::swap(m[1][2], other.m[1][2]);
+            std::swap(m[2][0], other.m[2][0]);
+            std::swap(m[2][1], other.m[2][1]);
+            std::swap(m[2][2], other.m[2][2]);
+        }
 
         /// Member access, allows use of construct mat[r][c]
         inline const Real* operator[] (size_t iRow) const
@@ -125,19 +125,19 @@ namespace Ogre
 
 
         /*inline operator Real* ()
-		{
-			return (Real*)m[0];
-		}*/
+        {
+            return (Real*)m[0];
+        }*/
         Vector3 GetColumn (size_t iCol) const;
         void SetColumn(size_t iCol, const Vector3& vec);
         void FromAxes(const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
 
         /// Assignment and comparison
         inline Matrix3& operator= (const Matrix3& rkMatrix)
-		{
-			memcpy(m,rkMatrix.m,9*sizeof(Real));
-			return *this;
-		}
+        {
+            memcpy(m,rkMatrix.m,9*sizeof(Real));
+            return *this;
+        }
 
         /** Tests 2 matrices for equality.
          */
@@ -146,9 +146,9 @@ namespace Ogre
         /** Tests 2 matrices for inequality.
          */
         inline bool operator!= (const Matrix3& rkMatrix) const
-		{
-			return !operator==(rkMatrix);
-		}
+        {
+            return !operator==(rkMatrix);
+        }
 
         // arithmetic operations
         /** Matrix addition.
@@ -200,11 +200,11 @@ namespace Ogre
 
         /// Note: Matrix must be orthonormal
         void ToAngleAxis (Vector3& rkAxis, Radian& rfAngle) const;
-		inline void ToAngleAxis (Vector3& rkAxis, Degree& rfAngle) const {
-			Radian r;
-			ToAngleAxis ( rkAxis, r );
-			rfAngle = r;
-		}
+        inline void ToAngleAxis (Vector3& rkAxis, Degree& rfAngle) const {
+            Radian r;
+            ToAngleAxis ( rkAxis, r );
+            rfAngle = r;
+        }
         void FromAngleAxis (const Vector3& rkAxis, const Radian& fRadians);
 
         /** The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
@@ -235,33 +235,33 @@ namespace Ogre
         static void TensorProduct (const Vector3& rkU, const Vector3& rkV,
             Matrix3& rkProduct);
 
-		/** Determines if this matrix involves a scaling. */
-		inline bool hasScale() const
-		{
-			// check magnitude of column vectors (==local axes)
-			Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
-			if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-				return true;
-			t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
-			if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-				return true;
-			t = m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2];
-			if (!Math::RealEqual(t, 1.0, (Real)1e-04))
-				return true;
+        /** Determines if this matrix involves a scaling. */
+        inline bool hasScale() const
+        {
+            // check magnitude of column vectors (==local axes)
+            Real t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
+            t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
+            t = m[0][2] * m[0][2] + m[1][2] * m[1][2] + m[2][2] * m[2][2];
+            if (!Math::RealEqual(t, 1.0, (Real)1e-04))
+                return true;
 
-			return false;
-		}
+            return false;
+        }
 
-		/** Function for writing to a stream.
-		*/
-		inline _OgreExport friend std::ostream& operator <<
-			( std::ostream& o, const Matrix3& mat )
-		{
-			o << "Matrix3(" << mat[0][0] << ", " << mat[0][1] << ", " << mat[0][2] << ", " 
+        /** Function for writing to a stream.
+        */
+        inline _OgreExport friend std::ostream& operator <<
+            ( std::ostream& o, const Matrix3& mat )
+        {
+            o << "Matrix3(" << mat[0][0] << ", " << mat[0][1] << ", " << mat[0][2] << ", " 
                             << mat[1][0] << ", " << mat[1][1] << ", " << mat[1][2] << ", " 
                             << mat[2][0] << ", " << mat[2][1] << ", " << mat[2][2] << ")";
-			return o;
-		}
+            return o;
+        }
 
         static const Real EPSILON;
         static const Matrix3 ZERO;
@@ -288,7 +288,7 @@ namespace Ogre
         // for faster access
         friend class Matrix4;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 #endif

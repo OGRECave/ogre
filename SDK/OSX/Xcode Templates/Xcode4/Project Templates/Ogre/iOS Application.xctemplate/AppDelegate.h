@@ -81,7 +81,7 @@
         Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
         
         // Clear event times
-		Ogre::Root::getSingleton().clearEventTimes();
+        Ogre::Root::getSingleton().clearEventTimes();
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
@@ -168,34 +168,34 @@
     if(!OgreFramework::getSingletonPtr()->isOgreToBeShutDown() &&
        Ogre::Root::getSingletonPtr() && Ogre::Root::getSingleton().isInitialised())
     {
-		if(OgreFramework::getSingletonPtr()->m_pRenderWnd->isActive())
-		{
-			mStartTime = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU();
+        if(OgreFramework::getSingletonPtr()->m_pRenderWnd->isActive())
+        {
+            mStartTime = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU();
             
-			OgreFramework::getSingletonPtr()->m_pMouse->capture();
+            OgreFramework::getSingletonPtr()->m_pMouse->capture();
             
-			OgreFramework::getSingletonPtr()->updateOgre(mLastFrameTime);
-			OgreFramework::getSingletonPtr()->m_pRoot->renderOneFrame();
+            OgreFramework::getSingletonPtr()->updateOgre(mLastFrameTime);
+            OgreFramework::getSingletonPtr()->m_pRoot->renderOneFrame();
             
-			mLastFrameTime = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU() - mStartTime;
-		}
+            mLastFrameTime = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU() - mStartTime;
+        }
     }
     else
     {
-		
-	    if (mDisplayLinkSupported)
-	    {
-	        [mDate release];
-	        mDate = nil;
+        
+        if (mDisplayLinkSupported)
+        {
+            [mDate release];
+            mDate = nil;
 
-	        [mDisplayLink invalidate];
-	        mDisplayLink = nil;
-	    }
-	    else
-	    {
-	        [mTimer invalidate];
-	        mTimer = nil;
-	    }
+            [mDisplayLink invalidate];
+            mDisplayLink = nil;
+        }
+        else
+        {
+            [mTimer invalidate];
+            mTimer = nil;
+        }
         [[UIApplication sharedApplication] performSelector:@selector(terminate:) withObject:nil afterDelay:0.0];
     }
 }

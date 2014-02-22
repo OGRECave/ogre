@@ -40,15 +40,15 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	class MeshSerializerListener;
+    class MeshSerializerListener;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
-	/** Handles the management of mesh resources.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
+    /** Handles the management of mesh resources.
         @remarks
             This class deals with the runtime management of
             mesh data; like other resource managers it handles
@@ -65,16 +65,16 @@ namespace Ogre {
         /** Initialises the manager, only to be called by OGRE internally. */
         void _initialise(void);
 
-		/// Get a resource by name
-		/// @see ResourceManager::getResourceByName
-		MeshPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        /// Get a resource by name
+        /// @see ResourceManager::getResourceByName
+        MeshPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
 
-		/// Create a new mesh
-		/// @see ResourceManager::createResource
-		MeshPtr create (const String& name, const String& group,
-							bool isManual = false, ManualResourceLoader* loader = 0,
-							const NameValuePairList* createParams = 0);
+        /// Create a new mesh
+        /// @see ResourceManager::createResource
+        MeshPtr create (const String& name, const String& group,
+                            bool isManual = false, ManualResourceLoader* loader = 0,
+                            const NameValuePairList* createParams = 0);
 
         /** Create a new mesh, or retrieve an existing one with the same
             name if it already exists.
@@ -93,9 +93,9 @@ namespace Ogre {
             const String& group,
             bool isManual=false, ManualResourceLoader* loader=0,
             const NameValuePairList* params=0,
-			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
+            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
 
         /** Prepares a mesh for loading from a file.  This does the IO in advance of the call to load().
             @note
@@ -107,21 +107,21 @@ namespace Ogre {
                 format is better for runtime performance, and we also have
                 control over pre-processed data (such as
                 collision boxes, LOD reductions etc).
-			@param filename The name of the .mesh file
+            @param filename The name of the .mesh file
             @param groupName The name of the resource group to assign the mesh to 
-			@param vertexBufferUsage The usage flags with which the vertex buffer(s)
-				will be created
-			@param indexBufferUsage The usage flags with which the index buffer(s) created for 
-				this mesh will be created with.
-			@param vertexBufferShadowed If true, the vertex buffers will be shadowed by system memory 
+            @param vertexBufferUsage The usage flags with which the vertex buffer(s)
+                will be created
+            @param indexBufferUsage The usage flags with which the index buffer(s) created for 
+                this mesh will be created with.
+            @param vertexBufferShadowed If true, the vertex buffers will be shadowed by system memory 
                 copies for faster read access
-			@param indexBufferShadowed If true, the index buffers will be shadowed by system memory 
+            @param indexBufferShadowed If true, the index buffers will be shadowed by system memory 
                 copies for faster read access
         */
         MeshPtr prepare( const String& filename, const String& groupName,
-			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
+            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
 
         /** Loads a mesh from a file, making it immediately available for use.
             @note
@@ -133,27 +133,27 @@ namespace Ogre {
                 format is better for runtime performance, and we also have
                 control over pre-processed data (such as
                 collision boxes, LOD reductions etc).
-			@param filename The name of the .mesh file
+            @param filename The name of the .mesh file
             @param groupName The name of the resource group to assign the mesh to 
-			@param vertexBufferUsage The usage flags with which the vertex buffer(s)
-				will be created
-			@param indexBufferUsage The usage flags with which the index buffer(s) created for 
-				this mesh will be created with.
-			@param vertexBufferShadowed If true, the vertex buffers will be shadowed by system memory 
+            @param vertexBufferUsage The usage flags with which the vertex buffer(s)
+                will be created
+            @param indexBufferUsage The usage flags with which the index buffer(s) created for 
+                this mesh will be created with.
+            @param vertexBufferShadowed If true, the vertex buffers will be shadowed by system memory 
                 copies for faster read access
-			@param indexBufferShadowed If true, the index buffers will be shadowed by system memory 
+            @param indexBufferShadowed If true, the index buffers will be shadowed by system memory 
                 copies for faster read access
         */
         MeshPtr load( const String& filename, const String& groupName,
-			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
+            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            bool vertexBufferShadowed = true, bool indexBufferShadowed = true);
 
 
         /** Creates a new Mesh specifically for manual definition rather
             than loading from an object file. 
-		@remarks
-			Note that once you've defined your mesh, you must call Mesh::_setBounds and
+        @remarks
+            Note that once you've defined your mesh, you must call Mesh::_setBounds and
             Mesh::_setBoundingRadius in order to define the bounds of your mesh. In previous
             versions of OGRE you could call Mesh::_updateBounds, but OGRE's support of 
             write-only vertex buffers makes this no longer appropriate.
@@ -192,18 +192,18 @@ namespace Ogre {
                 vTile The number of times the texture should be repeated in the v direction
             @param
                 upVector The 'Up' direction of the plane texture coordinates.
-			@param
-				vertexBufferUsage The usage flag with which the vertex buffer for this plane will be created
-			@param
-				indexBufferUsage The usage flag with which the index buffer for this plane will be created
-			@param
-				vertexShadowBuffer If this flag is set to true, the vertex buffer will be created 
-				with a system memory shadow buffer,
-				allowing you to read it back more efficiently than if it is in hardware
-			@param
-				indexShadowBuffer If this flag is set to true, the index buffer will be 
-				created with a system memory shadow buffer,
-				allowing you to read it back more efficiently than if it is in hardware
+            @param
+                vertexBufferUsage The usage flag with which the vertex buffer for this plane will be created
+            @param
+                indexBufferUsage The usage flag with which the index buffer for this plane will be created
+            @param
+                vertexShadowBuffer If this flag is set to true, the vertex buffer will be created 
+                with a system memory shadow buffer,
+                allowing you to read it back more efficiently than if it is in hardware
+            @param
+                indexShadowBuffer If this flag is set to true, the index buffer will be 
+                created with a system memory shadow buffer,
+                allowing you to read it back more efficiently than if it is in hardware
         */
         MeshPtr createPlane(
             const String& name, const String& groupName, const Plane& plane,
@@ -211,13 +211,13 @@ namespace Ogre {
             int xsegments = 1, int ysegments = 1,
             bool normals = true, unsigned short numTexCoordSets = 1,
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
-			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-			bool vertexShadowBuffer = true, bool indexShadowBuffer = true);
+            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            bool vertexShadowBuffer = true, bool indexShadowBuffer = true);
 
         
         /** Creates a plane, which because of it's texture coordinates looks like a curved
-			surface, useful for skies in a skybox. 
+            surface, useful for skies in a skybox. 
             @param name
                 The name to give the resulting mesh
             @param groupName
@@ -229,11 +229,11 @@ namespace Ogre {
             @param height
                 The height of the plane in world coordinates
             @param curvature
-				The curvature of the plane. Good values are
+                The curvature of the plane. Good values are
                 between 2 and 65. Higher values are more curved leading to
                 a smoother effect, lower values are less curved meaning
                 more distortion at the horizons but a better distance effect.
-			@param xsegments
+            @param xsegments
                 The number of segments to the plane in the x direction
             @param ysegments
                 The number of segments to the plane in the y direction
@@ -250,35 +250,35 @@ namespace Ogre {
                 The 'Up' direction of the plane.
             @param orientation
                 The orientation of the overall sphere that's used to create the illusion
-			@param vertexBufferUsage
-				The usage flag with which the vertex buffer for this plane will be created
-			@param indexBufferUsage
-				The usage flag with which the index buffer for this plane will be created
-			@param vertexShadowBuffer
-				If this flag is set to true, the vertex buffer will be created 
-				with a system memory shadow buffer,
-				allowing you to read it back more efficiently than if it is in hardware
-			@param indexShadowBuffer
-				If this flag is set to true, the index buffer will be 
-				created with a system memory shadow buffer,
-				allowing you to read it back more efficiently than if it is in hardware
+            @param vertexBufferUsage
+                The usage flag with which the vertex buffer for this plane will be created
+            @param indexBufferUsage
+                The usage flag with which the index buffer for this plane will be created
+            @param vertexShadowBuffer
+                If this flag is set to true, the vertex buffer will be created 
+                with a system memory shadow buffer,
+                allowing you to read it back more efficiently than if it is in hardware
+            @param indexShadowBuffer
+                If this flag is set to true, the index buffer will be 
+                created with a system memory shadow buffer,
+                allowing you to read it back more efficiently than if it is in hardware
             @param ySegmentsToKeep The number of segments from the top of the dome
                 downwards to keep. -1 keeps all of them. This can save fillrate if
                 you cannot see much of the sky lower down.
         */
-		MeshPtr createCurvedIllusionPlane(
+        MeshPtr createCurvedIllusionPlane(
             const String& name, const String& groupName, const Plane& plane,
             Real width, Real height, Real curvature,
             int xsegments = 1, int ysegments = 1,
             bool normals = true, unsigned short numTexCoordSets = 1,
             Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
             const Quaternion& orientation = Quaternion::IDENTITY,
-			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-			bool vertexShadowBuffer = true, bool indexShadowBuffer = true, 
+            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            bool vertexShadowBuffer = true, bool indexShadowBuffer = true, 
             int ySegmentsToKeep = -1);
 
-		/** Creates a genuinely curved plane, by default majoring on the x/y axes facing positive Z.
+        /** Creates a genuinely curved plane, by default majoring on the x/y axes facing positive Z.
             @param name
                 The name to give the resulting mesh
             @param groupName
@@ -289,8 +289,8 @@ namespace Ogre {
                 The width of the plane in world coordinates
             @param height
                 The height of the plane in world coordinates
-			@param bow
-				The amount of 'bow' in the curved plane.  (Could also be considered the depth.)
+            @param bow
+                The amount of 'bow' in the curved plane.  (Could also be considered the depth.)
             @param xsegments
                 The number of segments to the plane in the x direction
             @param ysegments
@@ -306,28 +306,28 @@ namespace Ogre {
                 The number of times the texture should be repeated in the v direction
             @param upVector
                 The 'Up' direction of the plane.
-			@param vertexBufferUsage
-				The usage flag with which the vertex buffer for this plane will be created
-			@param indexBufferUsage
-				The usage flag with which the index buffer for this plane will be created
-			@param vertexShadowBuffer
-				If this flag is set to true, the vertex buffer will be created 
-				with a system memory shadow buffer,
-				allowing you to read it back more efficiently than if it is in hardware
-			@param indexShadowBuffer
-				If this flag is set to true, the index buffer will be 
-				created with a system memory shadow buffer,
-				allowing you to read it back more efficiently than if it is in hardware
+            @param vertexBufferUsage
+                The usage flag with which the vertex buffer for this plane will be created
+            @param indexBufferUsage
+                The usage flag with which the index buffer for this plane will be created
+            @param vertexShadowBuffer
+                If this flag is set to true, the vertex buffer will be created 
+                with a system memory shadow buffer,
+                allowing you to read it back more efficiently than if it is in hardware
+            @param indexShadowBuffer
+                If this flag is set to true, the index buffer will be 
+                created with a system memory shadow buffer,
+                allowing you to read it back more efficiently than if it is in hardware
         */
-		MeshPtr createCurvedPlane( 
-			const String& name, const String& groupName, const Plane& plane, 
-			Real width, Real height, Real bow = 0.5f, 
-			int xsegments = 1, int ysegments = 1,
-			bool normals = false, unsigned short numTexCoordSets = 1, 
-			Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
-			HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-			bool vertexShadowBuffer = true, bool indexShadowBuffer = true);
+        MeshPtr createCurvedPlane( 
+            const String& name, const String& groupName, const Plane& plane, 
+            Real width, Real height, Real bow = 0.5f, 
+            int xsegments = 1, int ysegments = 1,
+            bool normals = false, unsigned short numTexCoordSets = 1, 
+            Real uTile = 1.0f, Real vTile = 1.0f, const Vector3& upVector = Vector3::UNIT_Y,
+            HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
+            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            bool vertexShadowBuffer = true, bool indexShadowBuffer = true);
 
         /** Creates a Bezier patch based on an array of control vertices.
             @param name
@@ -415,22 +415,22 @@ namespace Ogre {
         */
         static MeshManager* getSingletonPtr(void);
 
-	    /** Gets the factor by which the bounding box of an entity is padded.
-	        Default is 0.01
-	    */
+        /** Gets the factor by which the bounding box of an entity is padded.
+            Default is 0.01
+        */
         Real getBoundsPaddingFactor(void);
-	
-	    /** Sets the factor by which the bounding box of an entity is padded
-	    */
+    
+        /** Sets the factor by which the bounding box of an entity is padded
+        */
         void setBoundsPaddingFactor(Real paddingFactor);
 
-		/** Sets the listener used to control mesh loading through the serializer.
-		*/
-		void setListener(MeshSerializerListener *listener);
-		
-		/** Gets the listener used to control mesh loading through the serializer.
-		*/
-		MeshSerializerListener *getListener();
+        /** Sets the listener used to control mesh loading through the serializer.
+        */
+        void setListener(MeshSerializerListener *listener);
+        
+        /** Gets the listener used to control mesh loading through the serializer.
+        */
+        MeshSerializerListener *getListener();
 
         /** @see ManualResourceLoader::loadResource */
         void loadResource(Resource* res);
@@ -444,13 +444,13 @@ namespace Ogre {
         /** Utility method for tessellating 2D meshes.
         */
         void tesselate2DMesh(SubMesh* pSub, unsigned short meshWidth, unsigned short meshHeight, 
-			bool doubleSided = false, 
-			HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
-			bool indexSysMem = false);
+            bool doubleSided = false, 
+            HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            bool indexSysMem = false);
 
         void createPrefabPlane(void);
-		void createPrefabCube(void);
-		void createPrefabSphere(void);
+        void createPrefabCube(void);
+        void createPrefabSphere(void);
     
         /** Enum identifying the types of manual mesh built by this manager */
         enum MeshBuildType
@@ -493,16 +493,16 @@ namespace Ogre {
         void loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params);
 
         bool mPrepAllMeshesForShadowVolumes;
-	
-		//the factor by which the bounding box of an entity is padded	
-		Real mBoundsPaddingFactor;
+    
+        //the factor by which the bounding box of an entity is padded   
+        Real mBoundsPaddingFactor;
 
-		// The listener to pass to serializers
-		MeshSerializerListener *mListener;
+        // The listener to pass to serializers
+        MeshSerializerListener *mListener;
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } //namespace
 

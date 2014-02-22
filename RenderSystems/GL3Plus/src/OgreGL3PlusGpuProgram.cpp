@@ -36,16 +36,16 @@ GLenum getGLShaderType(GpuProgramType programType);
 
 GLenum getGLShaderType(GpuProgramType programType)
 {
-	switch (programType)
-	{
-		case GPT_VERTEX_PROGRAM:
-		default:
-			return GL_VERTEX_SHADER;
-		case GPT_GEOMETRY_PROGRAM:
-			return GL_GEOMETRY_SHADER;
-		case GPT_FRAGMENT_PROGRAM:
-			return GL_FRAGMENT_SHADER;
-	}
+    switch (programType)
+    {
+        case GPT_VERTEX_PROGRAM:
+        default:
+            return GL_VERTEX_SHADER;
+        case GPT_GEOMETRY_PROGRAM:
+            return GL_GEOMETRY_SHADER;
+        case GPT_FRAGMENT_PROGRAM:
+            return GL_FRAGMENT_SHADER;
+    }
 }
 
 GL3PlusGpuProgram::GL3PlusGpuProgram(ResourceManager* creator, const String& name, 

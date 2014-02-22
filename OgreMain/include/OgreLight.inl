@@ -28,32 +28,32 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	inline void Light::setSpotlightFalloff( Real val )
-	{
-		mSpotFalloff = val;
-	}
-	//-----------------------------------------------------------------------------------
-	inline void Light::setDiffuseColour( Real red, Real green, Real blue )
-	{
-		mDiffuse.r = red;
+    inline void Light::setSpotlightFalloff( Real val )
+    {
+        mSpotFalloff = val;
+    }
+    //-----------------------------------------------------------------------------------
+    inline void Light::setDiffuseColour( Real red, Real green, Real blue )
+    {
+        mDiffuse.r = red;
         mDiffuse.b = blue;
         mDiffuse.g = green;
-	}
-	//-----------------------------------------------------------------------------------
-	inline void Light::setDiffuseColour( const ColourValue& colour )
-	{
-		mDiffuse = colour;
-	}
-	//-----------------------------------------------------------------------------------
-	inline void Light::setSpecularColour( Real red, Real green, Real blue )
-	{
-		mSpecular.r = red;
+    }
+    //-----------------------------------------------------------------------------------
+    inline void Light::setDiffuseColour( const ColourValue& colour )
+    {
+        mDiffuse = colour;
+    }
+    //-----------------------------------------------------------------------------------
+    inline void Light::setSpecularColour( Real red, Real green, Real blue )
+    {
+        mSpecular.r = red;
         mSpecular.b = blue;
         mSpecular.g = green;
-	}
-	//-----------------------------------------------------------------------------------
-	inline void Light::setSpecularColour( const ColourValue& colour )
-	{
-		mSpecular = colour;
-	}
+    }
+    //-----------------------------------------------------------------------------------
+    inline void Light::setSpecularColour( const ColourValue& colour )
+    {
+        mSpecular = colour;
+    }
 }

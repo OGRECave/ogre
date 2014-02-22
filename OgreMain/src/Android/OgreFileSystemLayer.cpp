@@ -29,21 +29,21 @@
 
 namespace Ogre
 {
-	void FileSystemLayer::getConfigPaths()
-	{
-	}
+    void FileSystemLayer::getConfigPaths()
+    {
+    }
     //---------------------------------------------------------------------
-	void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
-	{
-	}
+    void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
+    {
+    }
     //---------------------------------------------------------------------
-	bool FileSystemLayer::fileExists(const Ogre::String& path) const
-	{
-		return access(path.c_str(), 00) == 0;
-	}
+    bool FileSystemLayer::fileExists(const Ogre::String& path) const
+    {
+        return access(path.c_str(), 00) == 0;
+    }
     //---------------------------------------------------------------------
-	bool FileSystemLayer::createDirectory(const Ogre::String& path)
-	{
-		return false;
-	}
+    bool FileSystemLayer::createDirectory(const Ogre::String& path)
+    {
+        return false;
+    }
 }

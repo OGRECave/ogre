@@ -33,15 +33,15 @@
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-	template<> GLSLProgramPipelineManager* Singleton<GLSLProgramPipelineManager>::msSingleton = 0;
+    template<> GLSLProgramPipelineManager* Singleton<GLSLProgramPipelineManager>::msSingleton = 0;
     
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     GLSLProgramPipelineManager* GLSLProgramPipelineManager::getSingletonPtr(void)
     {
         return msSingleton;
     }
     
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     GLSLProgramPipelineManager& GLSLProgramPipelineManager::getSingleton(void)
     {  
         assert( msSingleton );  return ( *msSingleton );  
@@ -52,142 +52,142 @@ namespace Ogre
 
     GLSLProgramPipelineManager::~GLSLProgramPipelineManager(void)
     {
-		// Iterate through map container and delete program pipelines
-		for (ProgramPipelineIterator currentProgram = mProgramPipelines.begin();
+        // Iterate through map container and delete program pipelines
+        for (ProgramPipelineIterator currentProgram = mProgramPipelines.begin();
              currentProgram != mProgramPipelines.end(); ++currentProgram)
-		{
-			delete currentProgram->second;
-		}
+        {
+            delete currentProgram->second;
+        }
     }
 
     //-----------------------------------------------------------------------
-	void GLSLProgramPipelineManager::setActiveFragmentLinkProgram(GLSLGpuProgram* fragmentGpuProgram)
-	{
-		if (fragmentGpuProgram != mActiveFragmentGpuProgram)
-		{
-			mActiveFragmentGpuProgram = fragmentGpuProgram;
-			// ActiveProgramPipeline is no longer valid
-			mActiveProgramPipeline = NULL;
-		}
-	}
+    void GLSLProgramPipelineManager::setActiveFragmentLinkProgram(GLSLGpuProgram* fragmentGpuProgram)
+    {
+        if (fragmentGpuProgram != mActiveFragmentGpuProgram)
+        {
+            mActiveFragmentGpuProgram = fragmentGpuProgram;
+            // ActiveProgramPipeline is no longer valid
+            mActiveProgramPipeline = NULL;
+        }
+    }
     
-	//-----------------------------------------------------------------------
-	void GLSLProgramPipelineManager::setActiveVertexLinkProgram(GLSLGpuProgram* vertexGpuProgram)
-	{
-		if (vertexGpuProgram != mActiveVertexGpuProgram)
-		{
-			mActiveVertexGpuProgram = vertexGpuProgram;
-			// ActiveProgramPipeline is no longer valid
-			mActiveProgramPipeline = NULL;
-		}
-	}
+    //-----------------------------------------------------------------------
+    void GLSLProgramPipelineManager::setActiveVertexLinkProgram(GLSLGpuProgram* vertexGpuProgram)
+    {
+        if (vertexGpuProgram != mActiveVertexGpuProgram)
+        {
+            mActiveVertexGpuProgram = vertexGpuProgram;
+            // ActiveProgramPipeline is no longer valid
+            mActiveProgramPipeline = NULL;
+        }
+    }
 
     void GLSLProgramPipelineManager::setActiveGeometryLinkProgram(GLSLGpuProgram* geometryGpuProgram)
-	{
-		if (geometryGpuProgram != mActiveGeometryGpuProgram)
-		{
-			mActiveGeometryGpuProgram = geometryGpuProgram;
-			// ActiveProgramPipeline is no longer valid
-			mActiveProgramPipeline = NULL;
-		}
-	}
+    {
+        if (geometryGpuProgram != mActiveGeometryGpuProgram)
+        {
+            mActiveGeometryGpuProgram = geometryGpuProgram;
+            // ActiveProgramPipeline is no longer valid
+            mActiveProgramPipeline = NULL;
+        }
+    }
 
     void GLSLProgramPipelineManager::setActiveTessDomainLinkProgram(GLSLGpuProgram* domainGpuProgram)
-	{
-		if (domainGpuProgram != mActiveDomainGpuProgram)
-		{
-			mActiveDomainGpuProgram = domainGpuProgram;
-			// ActiveProgramPipeline is no longer valid
-			mActiveProgramPipeline = NULL;
-		}
-	}
+    {
+        if (domainGpuProgram != mActiveDomainGpuProgram)
+        {
+            mActiveDomainGpuProgram = domainGpuProgram;
+            // ActiveProgramPipeline is no longer valid
+            mActiveProgramPipeline = NULL;
+        }
+    }
 
     void GLSLProgramPipelineManager::setActiveTessHullLinkProgram(GLSLGpuProgram* hullGpuProgram)
-	{
-		if (hullGpuProgram != mActiveHullGpuProgram)
-		{
-			mActiveHullGpuProgram = hullGpuProgram;
-			// ActiveProgramPipeline is no longer valid
-			mActiveProgramPipeline = NULL;
-		}
-	}
+    {
+        if (hullGpuProgram != mActiveHullGpuProgram)
+        {
+            mActiveHullGpuProgram = hullGpuProgram;
+            // ActiveProgramPipeline is no longer valid
+            mActiveProgramPipeline = NULL;
+        }
+    }
 
     void GLSLProgramPipelineManager::setActiveComputeLinkProgram(GLSLGpuProgram* computeGpuProgram)
-	{
-		if (computeGpuProgram != mActiveComputeGpuProgram)
-		{
-			mActiveComputeGpuProgram = computeGpuProgram;
-			// ActiveProgramPipeline is no longer valid
-			mActiveProgramPipeline = NULL;
-		}
-	}
+    {
+        if (computeGpuProgram != mActiveComputeGpuProgram)
+        {
+            mActiveComputeGpuProgram = computeGpuProgram;
+            // ActiveProgramPipeline is no longer valid
+            mActiveProgramPipeline = NULL;
+        }
+    }
 
     //-----------------------------------------------------------------------
-	GLSLProgramPipeline* GLSLProgramPipelineManager::getActiveProgramPipeline(void)
-	{
-		// If there is an active link program then return it
-		if (mActiveProgramPipeline)
-			return mActiveProgramPipeline;
+    GLSLProgramPipeline* GLSLProgramPipelineManager::getActiveProgramPipeline(void)
+    {
+        // If there is an active link program then return it
+        if (mActiveProgramPipeline)
+            return mActiveProgramPipeline;
 
-		// No active link program so find one or make a new one
-		// Is there an active key?
-		uint32 activeKey = 0;
+        // No active link program so find one or make a new one
+        // Is there an active key?
+        uint32 activeKey = 0;
         GLuint progID = 0;
-		if (mActiveVertexGpuProgram)
-		{
+        if (mActiveVertexGpuProgram)
+        {
             progID = mActiveVertexGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveFragmentGpuProgram)
-		{
+        }
+        if (mActiveFragmentGpuProgram)
+        {
             progID = mActiveFragmentGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveGeometryGpuProgram)
-		{
+        }
+        if (mActiveGeometryGpuProgram)
+        {
             progID = mActiveGeometryGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveDomainGpuProgram)
-		{
+        }
+        if (mActiveDomainGpuProgram)
+        {
             progID = mActiveDomainGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveHullGpuProgram)
-		{
+        }
+        if (mActiveHullGpuProgram)
+        {
             progID = mActiveHullGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveComputeGpuProgram)
-		{
+        }
+        if (mActiveComputeGpuProgram)
+        {
             progID = mActiveComputeGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
+        }
 
-		// Only return a program pipeline object if a vertex or fragment stage exist
-		if (activeKey > 0)
-		{
-			// Find the key in the hash map
-			ProgramPipelineIterator programFound = mProgramPipelines.find(activeKey);
-			// Program object not found for key so need to create it
-			if (programFound == mProgramPipelines.end())
-			{
-				mActiveProgramPipeline = new GLSLProgramPipeline(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,
+        // Only return a program pipeline object if a vertex or fragment stage exist
+        if (activeKey > 0)
+        {
+            // Find the key in the hash map
+            ProgramPipelineIterator programFound = mProgramPipelines.find(activeKey);
+            // Program object not found for key so need to create it
+            if (programFound == mProgramPipelines.end())
+            {
+                mActiveProgramPipeline = new GLSLProgramPipeline(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,
                                                                  mActiveFragmentGpuProgram, mActiveHullGpuProgram,
                                                                  mActiveDomainGpuProgram, mActiveComputeGpuProgram);
-				mProgramPipelines[activeKey] = mActiveProgramPipeline;
-			}
-			else
-			{
-				// Found a link program in map container so make it active
-				mActiveProgramPipeline = programFound->second;
-			}
-		}
-		// Make the program object active
-		if (mActiveProgramPipeline)
+                mProgramPipelines[activeKey] = mActiveProgramPipeline;
+            }
+            else
+            {
+                // Found a link program in map container so make it active
+                mActiveProgramPipeline = programFound->second;
+            }
+        }
+        // Make the program object active
+        if (mActiveProgramPipeline)
             mActiveProgramPipeline->activate();
         
-		return mActiveProgramPipeline;
-	}
+        return mActiveProgramPipeline;
+    }
 
 }

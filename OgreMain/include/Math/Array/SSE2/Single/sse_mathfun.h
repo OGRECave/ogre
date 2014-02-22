@@ -102,38 +102,38 @@ _PS_CONST(cephes_log_q2, 0.693359375);
 */
 
 inline __m128 my_movehl_ps(__m128 a, const __m128 b) {
-	asm (
-			"movhlps %2,%0\n\t"
-			: "=x" (a)
-			: "0" (a), "x"(b)
-	    );
-	return a;                                 }
+    asm (
+            "movhlps %2,%0\n\t"
+            : "=x" (a)
+            : "0" (a), "x"(b)
+        );
+    return a;                                 }
 #warning "redefined _mm_movehl_ps (see gcc bug 21179)"
 #define _mm_movehl_ps my_movehl_ps
 
 inline __m128 my_cmplt_ps(__m128 a, const __m128 b) {
-	asm (
-			"cmpltps %2,%0\n\t"
-			: "=x" (a)
-			: "0" (a), "x"(b)
-	    );
-	return a;               
+    asm (
+            "cmpltps %2,%0\n\t"
+            : "=x" (a)
+            : "0" (a), "x"(b)
+        );
+    return a;               
                   }
 inline __m128 my_cmpgt_ps(__m128 a, const __m128 b) {
-	asm (
-			"cmpnleps %2,%0\n\t"
-			: "=x" (a)
-			: "0" (a), "x"(b)
-	    );
-	return a;               
+    asm (
+            "cmpnleps %2,%0\n\t"
+            : "=x" (a)
+            : "0" (a), "x"(b)
+        );
+    return a;               
 }
 inline __m128 my_cmpeq_ps(__m128 a, const __m128 b) {
-	asm (
-			"cmpeqps %2,%0\n\t"
-			: "=x" (a)
-			: "0" (a), "x"(b)
-	    );
-	return a;               
+    asm (
+            "cmpeqps %2,%0\n\t"
+            : "=x" (a)
+            : "0" (a), "x"(b)
+        );
+    return a;               
 }
 #warning "redefined _mm_cmpxx_ps functions..."
 #define _mm_cmplt_ps my_cmplt_ps
@@ -250,8 +250,8 @@ v4sf log_ps(v4sf x) {
   return x;
 }
 
-_PS_CONST(exp_hi,	88.3762626647949f);
-_PS_CONST(exp_lo,	-88.3762626647949f);
+_PS_CONST(exp_hi,   88.3762626647949f);
+_PS_CONST(exp_lo,   -88.3762626647949f);
 
 _PS_CONST(cephes_LOG2EF, 1.44269504088896341);
 _PS_CONST(cephes_exp_C1, 0.693359375);

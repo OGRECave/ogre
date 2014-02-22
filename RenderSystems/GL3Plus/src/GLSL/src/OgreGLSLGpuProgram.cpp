@@ -34,14 +34,14 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	GLuint GLSLGpuProgram::mVertexShaderCount = 0;
-	GLuint GLSLGpuProgram::mFragmentShaderCount = 0;
-	GLuint GLSLGpuProgram::mGeometryShaderCount = 0;
-	GLuint GLSLGpuProgram::mHullShaderCount = 0;
-	GLuint GLSLGpuProgram::mDomainShaderCount = 0;
-	GLuint GLSLGpuProgram::mComputeShaderCount = 0;
+    GLuint GLSLGpuProgram::mVertexShaderCount = 0;
+    GLuint GLSLGpuProgram::mFragmentShaderCount = 0;
+    GLuint GLSLGpuProgram::mGeometryShaderCount = 0;
+    GLuint GLSLGpuProgram::mHullShaderCount = 0;
+    GLuint GLSLGpuProgram::mDomainShaderCount = 0;
+    GLuint GLSLGpuProgram::mComputeShaderCount = 0;
     //-----------------------------------------------------------------------------
-	GLSLGpuProgram::GLSLGpuProgram(GLSLProgram* parent) : 
+    GLSLGpuProgram::GLSLGpuProgram(GLSLProgram* parent) : 
         GL3PlusGpuProgram(parent->getCreator(), parent->getName(), parent->getHandle(), 
             parent->getGroup(), false, 0), mGLSLProgram(parent)
     {
@@ -50,35 +50,35 @@ namespace Ogre {
 
         mLinked = 0;
 
-		if (parent->getType() == GPT_VERTEX_PROGRAM)
-		{
-			mProgramID = ++mVertexShaderCount;
-		}
-		else if (parent->getType() == GPT_FRAGMENT_PROGRAM)
-		{
-			mProgramID = ++mFragmentShaderCount;
-		}
-		else if (parent->getType() == GPT_GEOMETRY_PROGRAM)
-		{
-			mProgramID = ++mGeometryShaderCount;
-		}
-		else if (parent->getType() == GPT_HULL_PROGRAM)
-		{
-			mProgramID = ++mHullShaderCount;
-		}
+        if (parent->getType() == GPT_VERTEX_PROGRAM)
+        {
+            mProgramID = ++mVertexShaderCount;
+        }
+        else if (parent->getType() == GPT_FRAGMENT_PROGRAM)
+        {
+            mProgramID = ++mFragmentShaderCount;
+        }
+        else if (parent->getType() == GPT_GEOMETRY_PROGRAM)
+        {
+            mProgramID = ++mGeometryShaderCount;
+        }
+        else if (parent->getType() == GPT_HULL_PROGRAM)
+        {
+            mProgramID = ++mHullShaderCount;
+        }
         else if (parent->getType() == GPT_COMPUTE_PROGRAM)
-		{
-			mProgramID = ++mComputeShaderCount;
-		}
-		else
-		{
-			mProgramID = ++mDomainShaderCount;
-		}
+        {
+            mProgramID = ++mComputeShaderCount;
+        }
+        else
+        {
+            mProgramID = ++mDomainShaderCount;
+        }
 
         // Transfer skeletal animation status from parent
         mSkeletalAnimation = mGLSLProgram->isSkeletalAnimationIncluded();
-		// There is nothing to load
-		mLoadFromFile = false;
+        // There is nothing to load
+        mLoadFromFile = false;
     }
     //-----------------------------------------------------------------------
     GLSLGpuProgram::~GLSLGpuProgram()
@@ -87,27 +87,27 @@ namespace Ogre {
         // since calling virtual methods in base destructors causes crash
         unload(); 
     }
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     void GLSLGpuProgram::loadImpl(void)
     {
-		// nothing to load
+        // nothing to load
     }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::unloadImpl(void)
-	{
-		// nothing to unload
-	}
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::unloadImpl(void)
+    {
+        // nothing to unload
+    }
 
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     void GLSLGpuProgram::loadFromSource(void)
     {
-		// nothing to load
-	}
+        // nothing to load
+    }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::bindProgram(void)
-	{
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::bindProgram(void)
+    {
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Tell the Program Pipeline Manager what pipeline is to become active
@@ -160,11 +160,11 @@ namespace Ogre {
                     break;
             }
         }
-	}
+    }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::unbindProgram(void)
-	{
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::unbindProgram(void)
+    {
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Tell the Program Pipeline Manager what pipeline is to become inactive
@@ -221,14 +221,14 @@ namespace Ogre {
                 GLSLLinkProgramManager::getSingleton().setActiveFragmentShader( NULL );
             }
         }
-	}
+    }
 
     //-----------------------------------------------------------------------------
-	void GLSLGpuProgram::bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
-	{
-		// Link can throw exceptions, ignore them at this point
-		try
-		{
+    void GLSLGpuProgram::bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    {
+        // Link can throw exceptions, ignore them at this point
+        try
+        {
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object
@@ -243,16 +243,16 @@ namespace Ogre {
                 // Pass on parameters from params to program object uniforms
                 linkProgram->updateUniformBlocks(params, mask, mType);
             }
-		}
-		catch (Exception& e) {}
-	}
+        }
+        catch (Exception& e) {}
+    }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
-	{
-		// Link can throw exceptions, ignore them at this point
-		try
-		{
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+    {
+        // Link can throw exceptions, ignore them at this point
+        try
+        {
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object
@@ -267,13 +267,13 @@ namespace Ogre {
                 // Pass on parameters from params to program object uniforms
                 linkProgram->updateUniforms(params, mask, mType);
             }
-		}
-		catch (Exception& e) {}
-	}
+        }
+        catch (Exception& e) {}
+    }
 
-	//-----------------------------------------------------------------------------
-	void GLSLGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
-	{
+    //-----------------------------------------------------------------------------
+    void GLSLGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)
+    {
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Activate the program pipeline object
@@ -287,7 +287,7 @@ namespace Ogre {
             GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
             // Pass on parameters from params to program object uniforms
             linkProgram->updatePassIterationUniforms( params );
-		}
-	}
+        }
+    }
 }
 

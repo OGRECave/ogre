@@ -32,15 +32,15 @@ THE SOFTWARE.
 #include "OgreArrayConfig.h"
 
 #if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
-	#if OGRE_DOUBLE_PRECISION == 1
-		#include "SSE2/Double/OgreMathlibSSE2.h"
-	#else
-		#include "SSE2/Single/OgreMathlibSSE2.h"
-	#endif
+    #if OGRE_DOUBLE_PRECISION == 1
+        #include "SSE2/Double/OgreMathlibSSE2.h"
+    #else
+        #include "SSE2/Single/OgreMathlibSSE2.h"
+    #endif
 
 namespace Ogre
 {
-	typedef MathlibSSE2 Mathlib;
+    typedef MathlibSSE2 Mathlib;
 }
 #elif OGRE_CPU == OGRE_CPU_ARM && OGRE_USE_SIMD == 1
     #if OGRE_DOUBLE_PRECISION == 1
@@ -51,13 +51,13 @@ namespace Ogre
 
 namespace Ogre
 {
-	typedef MathlibNEON Mathlib;
+    typedef MathlibNEON Mathlib;
 }
 #else
-	#include "C/OgreMathlibC.h"
+    #include "C/OgreMathlibC.h"
 namespace Ogre
 {
-	typedef MathlibC Mathlib;
+    typedef MathlibC Mathlib;
 }
 #endif
 

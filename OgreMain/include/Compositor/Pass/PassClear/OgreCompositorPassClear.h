@@ -36,40 +36,40 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class RenderTarget;
+    class RenderTarget;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
-	/** Implementation of CompositorPass
-		This implementation will clear the RenderTarget using the parameters from definition
-		(rectangle area, which buffers, what values, etc)
+    /** Implementation of CompositorPass
+        This implementation will clear the RenderTarget using the parameters from definition
+        (rectangle area, which buffers, what values, etc)
     @author
-		Matias N. Goldberg
+        Matias N. Goldberg
     @version
         1.0
     */
-	class _OgreExport CompositorPassClear : public CompositorPass
-	{
-	protected:
-		SceneManager	*mSceneManager;
+    class _OgreExport CompositorPassClear : public CompositorPass
+    {
+    protected:
+        SceneManager    *mSceneManager;
 
-	public:
-		CompositorPassClear( const CompositorPassClearDef *definition, SceneManager *sceneManager,
-							 const CompositorChannel &target, CompositorNode *parentNode );
+    public:
+        CompositorPassClear( const CompositorPassClearDef *definition, SceneManager *sceneManager,
+                             const CompositorChannel &target, CompositorNode *parentNode );
 
-		virtual void execute( const Camera *lodCamera );
+        virtual void execute( const Camera *lodCamera );
 
-	private:
-		CompositorPassClearDef const *mDefinition;
-	};
+    private:
+        CompositorPassClearDef const *mDefinition;
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

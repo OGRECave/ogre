@@ -42,7 +42,7 @@ namespace Ogre
 
     class _OgrePrivate X11EGLPBuffer : public EGLPBuffer
     {
-		protected:
+        protected:
 
         public:
             X11EGLPBuffer(X11EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);

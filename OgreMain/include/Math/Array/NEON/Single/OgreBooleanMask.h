@@ -30,56 +30,56 @@ THE SOFTWARE.
 #define __NEON_BooleanMask_H___
 
 #ifndef __BooleanMask_H__
-	#error "Don't include this file directly. include Math/Array/OgreBooleanMask.h"
+    #error "Don't include this file directly. include Math/Array/OgreBooleanMask.h"
 #endif
 
 namespace Ogre
 {
-	class BooleanMask4
-	{
-	public:
-		enum
-		{
-			MASK_NONE			= 0,
-			MASK_X				= 1,
+    class BooleanMask4
+    {
+    public:
+        enum
+        {
+            MASK_NONE           = 0,
+            MASK_X              = 1,
 
-			MASK_Y				= 2,
-			MASK_XY				= 3, //MASK_X|MASK_Y
+            MASK_Y              = 2,
+            MASK_XY             = 3, //MASK_X|MASK_Y
 
-			MASK_Z				= 4,
-			MASK_XZ				= 5, //MASK_X|MASK_Z
-			MASK_YZ				= 6, //MASK_Y|MASK_Z
-			MASK_XYZ			= 7, //MASK_X|MASK_Y|MASK_Z
+            MASK_Z              = 4,
+            MASK_XZ             = 5, //MASK_X|MASK_Z
+            MASK_YZ             = 6, //MASK_Y|MASK_Z
+            MASK_XYZ            = 7, //MASK_X|MASK_Y|MASK_Z
 
-			MASK_W				= 8,
-			MASK_XW				= 9, //MASK_X|MASK_W
-			MASK_YW				=10, //MASK_Y|MASK_W
-			MASK_XYW			=11, //MASK_X|MASK_Y|MASK_W
-			MASK_ZW				=12, //MASK_Z|MASK_W
-			MASK_XZW			=13, //MASK_X|MASK_Z|MASK_W
-			MASK_YZW			=14, //MASK_Y|MASK_Z|MASK_W
-			MASK_XYZW			=15, //MASK_X|MASK_Y|MASK_Z|MASK_W
+            MASK_W              = 8,
+            MASK_XW             = 9, //MASK_X|MASK_W
+            MASK_YW             =10, //MASK_Y|MASK_W
+            MASK_XYW            =11, //MASK_X|MASK_Y|MASK_W
+            MASK_ZW             =12, //MASK_Z|MASK_W
+            MASK_XZW            =13, //MASK_X|MASK_Z|MASK_W
+            MASK_YZW            =14, //MASK_Y|MASK_Z|MASK_W
+            MASK_XYZW           =15, //MASK_X|MASK_Y|MASK_Z|MASK_W
 
-			NUM_MASKS			=16
-		};
-	private:
-		static const ArrayReal mMasks[NUM_MASKS];
-	public:
-		inline static ArrayReal getMask( bool x, bool y, bool z, bool w );
-		inline static ArrayReal getMask( bool booleans[4] );
+            NUM_MASKS           =16
+        };
+    private:
+        static const ArrayReal mMasks[NUM_MASKS];
+    public:
+        inline static ArrayReal getMask( bool x, bool y, bool z, bool w );
+        inline static ArrayReal getMask( bool booleans[4] );
 
         /// Returns true if alls bit in mask0[i] and mask1[i] are set.
-		inline static bool allBitsSet( bool mask0[4], bool mask1[4] );
+        inline static bool allBitsSet( bool mask0[4], bool mask1[4] );
 
-		/** Converts a SIMD mask into a mask that fits in 32-bit number
-		@remarks
-			@See IS_SET_MASK_X & co. to read the mask, since the result may need
-			byteswapping in some architectures (i.e. SSE2)
-		*/
-		inline static uint32 getScalarMask( ArrayReal mask );
+        /** Converts a SIMD mask into a mask that fits in 32-bit number
+        @remarks
+            @See IS_SET_MASK_X & co. to read the mask, since the result may need
+            byteswapping in some architectures (i.e. SSE2)
+        */
+        inline static uint32 getScalarMask( ArrayReal mask );
 
-		inline static uint32 getScalarMask( ArrayInt mask );
-	};
+        inline static uint32 getScalarMask( ArrayInt mask );
+    };
 }
 
 #include "OgreBooleanMask.inl"

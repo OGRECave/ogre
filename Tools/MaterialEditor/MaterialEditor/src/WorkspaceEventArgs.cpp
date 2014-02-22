@@ -45,11 +45,11 @@ WorkspaceEventArgs::~WorkspaceEventArgs()
 
 Workspace* WorkspaceEventArgs::getWorkspace()
 {
-	return mWorkspace;
+    return mWorkspace;
 }
 
 Project* WorkspaceEventArgs::getProject()
 {
-	return mProject;
+    return mProject;
 }
 

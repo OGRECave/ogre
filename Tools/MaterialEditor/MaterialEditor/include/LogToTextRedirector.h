@@ -15,14 +15,14 @@ using Ogre::String;
 class LogToTextRedirector : public LogListener
 {
 public:
-	LogToTextRedirector(wxTextCtrl* textCtrl, const String& logName);
-	~LogToTextRedirector();
+    LogToTextRedirector(wxTextCtrl* textCtrl, const String& logName);
+    ~LogToTextRedirector();
 
-	void messageLogged(const String& message, LogMessageLevel level, bool maskDebug, const String &logName);
+    void messageLogged(const String& message, LogMessageLevel level, bool maskDebug, const String &logName);
 
 protected:
-	wxTextCtrl* mTextControl;
-	String mLogName;
+    wxTextCtrl* mTextControl;
+    String mLogName;
 };
 
 #endif // _LOGTOTEXTREDIRECTOR_H_

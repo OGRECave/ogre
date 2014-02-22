@@ -50,28 +50,28 @@ PassWizard::~PassWizard()
 
 bool PassWizard::Create(wxWindow* parent, int id /* = -1 */, const wxString& title /* = wxEmptyString */, const wxBitmap& bitmap /* = wxNullBitmap */, const wxPoint& pos /* = wxDefaultPosition */, long style /* = wxDEFAULT_DIALOG_STYLE */)
 {
-	bool result = wxWizard::Create(parent, id, title, bitmap, pos, style);
+    bool result = wxWizard::Create(parent, id, title, bitmap, pos, style);
 
-	mPassPage = new PassPage(this);
+    mPassPage = new PassPage(this);
 
-	GetPageAreaSizer()->Add(mPassPage);
+    GetPageAreaSizer()->Add(mPassPage);
 
-	return result;
+    return result;
 }
 
 PassPage* PassWizard::getPassPage() const
 {
-	return mPassPage;
+    return mPassPage;
 }
 
 void PassWizard::OnFinish(wxWizardEvent& event)
 {
-	Project* project = mPassPage->getProject();
-	MaterialController* mc = mPassPage->getMaterial();
-	TechniqueController* tc = mPassPage->getTechnique();
+    Project* project = mPassPage->getProject();
+    MaterialController* mc = mPassPage->getMaterial();
+    TechniqueController* tc = mPassPage->getTechnique();
 
-	wxString name;
-	mPassPage->getName(name);
+    wxString name;
+    mPassPage->getName(name);
 
-	tc->createPass(name.c_str());
+    tc->createPass(name.c_str());
 }

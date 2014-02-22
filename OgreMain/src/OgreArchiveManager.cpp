@@ -48,9 +48,9 @@ namespace Ogre {
         assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
-	ArchiveManager::ArchiveManager()
-	{
-	}
+    ArchiveManager::ArchiveManager()
+    {
+    }
     //-----------------------------------------------------------------------
     Archive* ArchiveManager::load( const String& filename, const String& archiveType, bool readOnly)
     {
@@ -62,11 +62,11 @@ namespace Ogre {
             // Search factories
             ArchiveFactoryMap::iterator it = mArchFactories.find(archiveType);
             if (it == mArchFactories.end())
-			{
+            {
                 // Factory not found
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find an archive factory "
                     "to deal with archive of type " + archiveType, "ArchiveManager::load");
-			}
+            }
 
             pArch = it->second->createInstance(filename, readOnly);
             pArch->load();
@@ -79,38 +79,38 @@ namespace Ogre {
         }
         return pArch;
     }
-	//-----------------------------------------------------------------------
-	void ArchiveManager::unload(Archive* arch)
-	{
-		unload(arch->getName());
-	}
-	//-----------------------------------------------------------------------
-	void ArchiveManager::unload(const String& filename)
-	{
-		ArchiveMap::iterator i = mArchives.find(filename);
+    //-----------------------------------------------------------------------
+    void ArchiveManager::unload(Archive* arch)
+    {
+        unload(arch->getName());
+    }
+    //-----------------------------------------------------------------------
+    void ArchiveManager::unload(const String& filename)
+    {
+        ArchiveMap::iterator i = mArchives.find(filename);
 
-		if (i != mArchives.end())
-		{
-			i->second->unload();
-			// Find factory to destroy. An archive factory created this file, it should still be there!
-			ArchiveFactoryMap::iterator fit = mArchFactories.find(i->second->getType());
-			assert( fit != mArchFactories.end() && "Cannot find an archive factory "
-					"to deal with archive this type" );
-			fit->second->destroyInstance(i->second);
-			mArchives.erase(i);
-		}
-	}
-	//-----------------------------------------------------------------------
-	ArchiveManager::ArchiveMapIterator ArchiveManager::getArchiveIterator(void)
-	{
-		return ArchiveMapIterator(mArchives.begin(), mArchives.end());
-	}
+        if (i != mArchives.end())
+        {
+            i->second->unload();
+            // Find factory to destroy. An archive factory created this file, it should still be there!
+            ArchiveFactoryMap::iterator fit = mArchFactories.find(i->second->getType());
+            assert( fit != mArchFactories.end() && "Cannot find an archive factory "
+                    "to deal with archive this type" );
+            fit->second->destroyInstance(i->second);
+            mArchives.erase(i);
+        }
+    }
+    //-----------------------------------------------------------------------
+    ArchiveManager::ArchiveMapIterator ArchiveManager::getArchiveIterator(void)
+    {
+        return ArchiveMapIterator(mArchives.begin(), mArchives.end());
+    }
     //-----------------------------------------------------------------------
     ArchiveManager::~ArchiveManager()
     {
-		// Thanks to http://www.viva64.com/en/examples/V509/ for finding the error for us!
-		// (originally, it detected we were throwing using OGRE_EXCEPT in the destructor)
-		// We now raise an assert.
+        // Thanks to http://www.viva64.com/en/examples/V509/ for finding the error for us!
+        // (originally, it detected we were throwing using OGRE_EXCEPT in the destructor)
+        // We now raise an assert.
 
         // Unload & delete resources in turn
         for( ArchiveMap::iterator it = mArchives.begin(); it != mArchives.end(); ++it )
@@ -120,8 +120,8 @@ namespace Ogre {
             arch->unload();
             // Find factory to destroy. An archive factory created this file, it should still be there!
             ArchiveFactoryMap::iterator fit = mArchFactories.find(arch->getType());
-			assert( fit != mArchFactories.end() && "Cannot find an archive factory "
-					"to deal with archive this type" );
+            assert( fit != mArchFactories.end() && "Cannot find an archive factory "
+                    "to deal with archive this type" );
             fit->second->destroyInstance(arch);
             
         }

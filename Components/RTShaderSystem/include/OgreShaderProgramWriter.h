@@ -54,29 +54,29 @@ class _OgreRTSSExport ProgramWriter : public RTShaderSystemAlloc
 // Interface.
 public:
 
-	/** Class destructor */
-	virtual ~ProgramWriter	() {}
+    /** Class destructor */
+    virtual ~ProgramWriter  () {}
 
 
-	/** Write the program shader source code.
-	@param os The output stream to write to code into.
-	@param program The source CPU program for the GPU program code.
-	*/
-	virtual void				writeSourceCode			(std::ostream& os, Program* program) = 0;
+    /** Write the program shader source code.
+    @param os The output stream to write to code into.
+    @param program The source CPU program for the GPU program code.
+    */
+    virtual void                writeSourceCode         (std::ostream& os, Program* program) = 0;
     
-	/** Return the target language of this writer. */
-	virtual const String&		getTargetLanguage	() const = 0;
+    /** Return the target language of this writer. */
+    virtual const String&       getTargetLanguage   () const = 0;
 
 // Protected methods.
 protected:
-	/** Write the program title. */
-	void				writeProgramTitle			(std::ostream& os, Program* program);
+    /** Write the program title. */
+    void                writeProgramTitle           (std::ostream& os, Program* program);
 
-	/** Write the uniform parameters title. */
-	void				writeUniformParametersTitle	(std::ostream& os, Program* program);
+    /** Write the uniform parameters title. */
+    void                writeUniformParametersTitle (std::ostream& os, Program* program);
 
-	/** Write a function title. */
-	void				writeFunctionTitle			(std::ostream& os, Function* function);
+    /** Write a function title. */
+    void                writeFunctionTitle          (std::ostream& os, Function* function);
 };
 
 /** @} */

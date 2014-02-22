@@ -35,103 +35,103 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Optional Components
-	*  @{
-	*/
-	/** \addtogroup Paging
-	*  Some details on paging component
-	*/
-	/*@{*/
+    /** \addtogroup Optional Components
+    *  @{
+    */
+    /** \addtogroup Paging
+    *  Some details on paging component
+    */
+    /*@{*/
 
 
-	/** Specialisation of PageContentCollection which just provides a simple list
-		of PageContent instances. 
-	@par
-	The data format for this in a file is:<br/>
-	<b>SimplePageContentCollectionData (Identifier 'SPCD')</b>\n
-	[Version 1]
-	<table>
-	<tr>
-	<td><b>Name</b></td>
-	<td><b>Type</b></td>
-	<td><b>Description</b></td>
-	</tr>
-	<tr>
-	<td>Nested contents</td>
-	<td>Nested chunk list</td>
-	<td>A sequence of nested PageContent chunks</td>
-	</tr>
-	</table>
-	*/
-	class _OgrePagingExport SimplePageContentCollection : public PageContentCollection
-	{
-	public:
-		typedef vector<PageContent*>::type ContentList;
-		static const uint32 SUBCLASS_CHUNK_ID;
-		static const uint16 SUBCLASS_CHUNK_VERSION;
-	protected:
-		ContentList mContentList;
-	public:
-		SimplePageContentCollection(PageContentCollectionFactory* creator);
-		~SimplePageContentCollection();
+    /** Specialisation of PageContentCollection which just provides a simple list
+        of PageContent instances. 
+    @par
+    The data format for this in a file is:<br/>
+    <b>SimplePageContentCollectionData (Identifier 'SPCD')</b>\n
+    [Version 1]
+    <table>
+    <tr>
+    <td><b>Name</b></td>
+    <td><b>Type</b></td>
+    <td><b>Description</b></td>
+    </tr>
+    <tr>
+    <td>Nested contents</td>
+    <td>Nested chunk list</td>
+    <td>A sequence of nested PageContent chunks</td>
+    </tr>
+    </table>
+    */
+    class _OgrePagingExport SimplePageContentCollection : public PageContentCollection
+    {
+    public:
+        typedef vector<PageContent*>::type ContentList;
+        static const uint32 SUBCLASS_CHUNK_ID;
+        static const uint16 SUBCLASS_CHUNK_VERSION;
+    protected:
+        ContentList mContentList;
+    public:
+        SimplePageContentCollection(PageContentCollectionFactory* creator);
+        ~SimplePageContentCollection();
 
-		/** Create a new PageContent within this collection.
-		@param typeName The name of the type of content  (see PageManager::getContentFactories)
-		*/
-		virtual PageContent* createContent(const String& typeName);
+        /** Create a new PageContent within this collection.
+        @param typeName The name of the type of content  (see PageManager::getContentFactories)
+        */
+        virtual PageContent* createContent(const String& typeName);
 
-		/** Destroy a PageContent within this page.
-		This is equivalent to calling detachContent and 
-		PageManager::destroyContent.
-		*/
-		virtual void destroyContent(PageContent* coll);
+        /** Destroy a PageContent within this page.
+        This is equivalent to calling detachContent and 
+        PageManager::destroyContent.
+        */
+        virtual void destroyContent(PageContent* coll);
 
-		/// Get const access to the list of content
-		virtual const ContentList& getContentList() const { return mContentList; }
+        /// Get const access to the list of content
+        virtual const ContentList& getContentList() const { return mContentList; }
 
-		// Overridden from PageContentCollection
-		virtual void save(StreamSerialiser& stream);
-		virtual void frameStart(Real timeSinceLastFrame);
-		virtual void frameEnd(Real timeElapsed);
-		virtual void notifyCamera(Camera* cam);
-		bool prepare(StreamSerialiser& stream);
-		void load();
-		void unload();
-		void unprepare();
+        // Overridden from PageContentCollection
+        virtual void save(StreamSerialiser& stream);
+        virtual void frameStart(Real timeSinceLastFrame);
+        virtual void frameEnd(Real timeElapsed);
+        virtual void notifyCamera(Camera* cam);
+        bool prepare(StreamSerialiser& stream);
+        void load();
+        void unload();
+        void unprepare();
 
-	protected:
-
-
+    protected:
 
 
-	};
 
 
-	/// Factory class for SimplePageContentCollection
-	class _OgrePagingExport SimplePageContentCollectionFactory : public PageContentCollectionFactory
-	{
-	public:
-		static String FACTORY_NAME;
-
-		SimplePageContentCollectionFactory() {}
-		~SimplePageContentCollectionFactory() {}
-
-		const String& getName() const { return FACTORY_NAME; }
-
-		PageContentCollection* createInstance() 
-		{
-			return OGRE_NEW SimplePageContentCollection(this); 
-		}
-		void destroyInstance(PageContentCollection* c)
-		{
-			OGRE_DELETE c;
-		}
+    };
 
 
-	};
+    /// Factory class for SimplePageContentCollection
+    class _OgrePagingExport SimplePageContentCollectionFactory : public PageContentCollectionFactory
+    {
+    public:
+        static String FACTORY_NAME;
 
-	/*@}*/
-	/*@}*/
+        SimplePageContentCollectionFactory() {}
+        ~SimplePageContentCollectionFactory() {}
+
+        const String& getName() const { return FACTORY_NAME; }
+
+        PageContentCollection* createInstance() 
+        {
+            return OGRE_NEW SimplePageContentCollection(this); 
+        }
+        void destroyInstance(PageContentCollection* c)
+        {
+            OGRE_DELETE c;
+        }
+
+
+    };
+
+    /*@}*/
+    /*@}*/
 }
 
 #endif

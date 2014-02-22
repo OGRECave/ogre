@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreShaderProgramWriterManager.h"
 
 namespace Ogre {
-	namespace RTShader {
+    namespace RTShader {
 
 /** \addtogroup Core
 *  @{
@@ -46,62 +46,62 @@ namespace Ogre {
 class _OgreRTSSExport HLSLProgramWriter : public ProgramWriter
 {
 
-	// Interface.
+    // Interface.
 public:
 
-	/** Class constructor. 
-	*/
-	HLSLProgramWriter();
+    /** Class constructor. 
+    */
+    HLSLProgramWriter();
 
-	/** Class destructor */
-	virtual ~HLSLProgramWriter();
+    /** Class destructor */
+    virtual ~HLSLProgramWriter();
 
-	/** 
-	@see ProgramWriter::writeSourceCode.
-	*/
-	virtual void writeSourceCode(std::ostream& os, Program* program);
+    /** 
+    @see ProgramWriter::writeSourceCode.
+    */
+    virtual void writeSourceCode(std::ostream& os, Program* program);
 
-	/** 
-	@see ProgramWriter::getTargetLanguage.
-	*/
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
+    /** 
+    @see ProgramWriter::getTargetLanguage.
+    */
+    virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
-	static String TargetLanguage;
+    static String TargetLanguage;
 
-	// Protected methods.
+    // Protected methods.
 protected:
 
-	/** Initialize string maps. */
-	void initializeStringMaps();
+    /** Initialize string maps. */
+    void initializeStringMaps();
 
-	/** Write the program dependencies. */
-	void writeProgramDependencies(std::ostream& os, Program* program);
+    /** Write the program dependencies. */
+    void writeProgramDependencies(std::ostream& os, Program* program);
 
-	/** Write a uniform parameter. */
-	void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
+    /** Write a uniform parameter. */
+    void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
 
-	/** Write a function parameter. */
-	void writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic);
+    /** Write a function parameter. */
+    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic);
 
-	/** Write a local parameter. */
-	void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
+    /** Write a local parameter. */
+    void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
 
-	/** Write a function declaration. */
-	void writeFunctionDeclaration(std::ostream& os, Function* function);
+    /** Write a function declaration. */
+    void writeFunctionDeclaration(std::ostream& os, Function* function);
 
-	/** Write function atom instance. */
-	void writeAtomInstance(std::ostream& os, FunctionAtom* atom);	
+    /** Write function atom instance. */
+    void writeAtomInstance(std::ostream& os, FunctionAtom* atom);   
 
 protected:
-	typedef	map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
-	typedef	map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
+    typedef map<GpuConstantType, const char*>::type     GpuConstTypeToStringMap;
+    typedef map<Parameter::Semantic, const char*>::type ParamSemanticToStringMap;
 
-	// Attributes.
+    // Attributes.
 protected:
-	// Map between GPU constant type to string value.
-	GpuConstTypeToStringMap mGpuConstTypeMap;
-	// Map between parameter semantic to string value.
-	ParamSemanticToStringMap mParamSemanticMap;
+    // Map between GPU constant type to string value.
+    GpuConstTypeToStringMap mGpuConstTypeMap;
+    // Map between parameter semantic to string value.
+    ParamSemanticToStringMap mParamSemanticMap;
 };
 
 /** HLSL program writer factory implementation.
@@ -110,30 +110,30 @@ protected:
 class _OgreRTSSExport ShaderProgramWriterHLSLFactory : public ProgramWriterFactory
 {
 public:
-	ShaderProgramWriterHLSLFactory()
-	{
-		mLanguage = "hlsl";
-	}
-	virtual ~ShaderProgramWriterHLSLFactory() {}
+    ShaderProgramWriterHLSLFactory()
+    {
+        mLanguage = "hlsl";
+    }
+    virtual ~ShaderProgramWriterHLSLFactory() {}
 
-	/** 
-	@see ProgramWriterFactory::getTargetLanguage
-	*/
-	virtual const String& getTargetLanguage(void) const
-	{
-		return mLanguage;
-	}
+    /** 
+    @see ProgramWriterFactory::getTargetLanguage
+    */
+    virtual const String& getTargetLanguage(void) const
+    {
+        return mLanguage;
+    }
 
-	/** 
-	@see ProgramWriterFactory::create
-	*/
-	virtual ProgramWriter* create(void)
-	{
-		return OGRE_NEW HLSLProgramWriter();
-	}
+    /** 
+    @see ProgramWriterFactory::create
+    */
+    virtual ProgramWriter* create(void)
+    {
+        return OGRE_NEW HLSLProgramWriter();
+    }
 
 private:
-	String mLanguage;
+    String mLanguage;
 
 };
 

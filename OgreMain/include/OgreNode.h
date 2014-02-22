@@ -61,8 +61,8 @@ namespace Ogre {
         This is an abstract class - concrete classes are based on this for specific purposes,
         e.g. SceneNode, Bone
     */
-	class _OgreExport Node : public NodeAlloc, public IdObject
-	{
+    class _OgreExport Node : public NodeAlloc, public IdObject
+    {
     public:
         /** Enumeration denoting the spaces which a transform can be relative to.
         */
@@ -75,7 +75,7 @@ namespace Ogre {
             /// Transform is relative to world space
             TS_WORLD
         };
-		typedef vector<Node*>::type NodeVec;
+        typedef vector<Node*>::type NodeVec;
         typedef VectorIterator<NodeVec> NodeVecIterator;
         typedef ConstVectorIterator<NodeVec> ConstNodeVecIterator;
 
@@ -123,24 +123,24 @@ namespace Ogre {
         };
 
     protected:
-		/// Depth level in the hierarchy tree (0: Root node, 1: Child of root, etc)
-		uint16 mDepthLevel;
+        /// Depth level in the hierarchy tree (0: Root node, 1: Child of root, etc)
+        uint16 mDepthLevel;
         /// Pointer to parent node
         Node* mParent;
         /// Collection of pointers to direct children; hashmap for efficiency
         NodeVec mChildren;
-		/// All the transform data needed in SoA form
-		Transform mTransform;
+        /// All the transform data needed in SoA form
+        Transform mTransform;
 
-		/// Friendly name of this node, can be empty
-		String mName;
+        /// Friendly name of this node, can be empty
+        String mName;
 
-		/// Only available internally - notification of parent. Can't be null
+        /// Only available internally - notification of parent. Can't be null
         void setParent( Node* parent );
-		void unsetParent(void);
+        void unsetParent(void);
 
-		/// Notification from parent that we need to migrate to a different depth level
-		void parentDepthLevelChanged(void);
+        /// Notification from parent that we need to migrate to a different depth level
+        void parentDepthLevelChanged(void);
 
         /** Triggers the node to update it's combined transforms.
         @par
@@ -148,7 +148,7 @@ namespace Ogre {
             to update it's complete transformation based on it's parents
             derived transform.
         */
-		void _updateFromParent(void);
+        void _updateFromParent(void);
 
         /** Class-specific implementation of _updateFromParent.
         @remarks
@@ -162,7 +162,7 @@ namespace Ogre {
         /** Internal method for creating a new child node - must be overridden per subclass. */
         virtual Node* createChildImpl( SceneMemoryMgrTypes sceneType ) = 0;
 
-		// TODO: Remove Initial position out of here (dark_sylinc)
+        // TODO: Remove Initial position out of here (dark_sylinc)
         /// The position to use as a base for keyframe animation
         Vector3 mInitialPosition;
         /// The orientation to use as a base for keyframe animation
@@ -171,14 +171,14 @@ namespace Ogre {
         Vector3 mInitialScale;
 
 #ifndef NDEBUG
-		mutable bool mCachedTransformOutOfDate;
+        mutable bool mCachedTransformOutOfDate;
 #endif
 
         /** Node listener - only one allowed (no list) for size & performance reasons. */
         Listener* mListener;
 
-		/// The memory manager used to allocate the Transform.
-		NodeMemoryManager *mNodeMemoryManager;
+        /// The memory manager used to allocate the Transform.
+        NodeMemoryManager *mNodeMemoryManager;
 
         DebugRenderable* mDebug;
 
@@ -186,70 +186,70 @@ namespace Ogre {
         UserObjectBindings mUserObjectBindings;
 
     public:
-		/** Index in the vector holding this node reference (could be our parent node, or a global array
-			tracking all created nodes to avoid memory leaks). Used for O(1) removals.
-		@remarks
-			It is the parent (or our creator) the one that sets this value, not ourselves. Do NOT modify
-			it manually.
-		*/
-		size_t mGlobalIndex;
-		/// @copydoc mGlobalIndex
-		size_t mParentIndex;
+        /** Index in the vector holding this node reference (could be our parent node, or a global array
+            tracking all created nodes to avoid memory leaks). Used for O(1) removals.
+        @remarks
+            It is the parent (or our creator) the one that sets this value, not ourselves. Do NOT modify
+            it manually.
+        */
+        size_t mGlobalIndex;
+        /// @copydoc mGlobalIndex
+        size_t mParentIndex;
 
         /** Constructor, should only be called by parent, not directly.
         @remarks
-			Parent pointer can be null.
+            Parent pointer can be null.
         */
         Node( IdType id, NodeMemoryManager *nodeMemoryManager, Node *parent );
 
-		/** Don't use this constructor unless you know what you're doing.
-			@See NodeMemoryManager::mDummyNode
-		*/
-		Node( const Transform &transformPtrs );
+        /** Don't use this constructor unless you know what you're doing.
+            @See NodeMemoryManager::mDummyNode
+        */
+        Node( const Transform &transformPtrs );
 
         virtual ~Node();
 
-		/** Sets a custom name for this node. Doesn't have to be unique */
-		void setName( const String &name )							{ mName = name; }
+        /** Sets a custom name for this node. Doesn't have to be unique */
+        void setName( const String &name )                          { mName = name; }
 
         /** Returns the name of the node. */
-		const String& getName(void) const							{ return mName; }
+        const String& getName(void) const                           { return mName; }
 
         /** Gets this node's parent (NULL if this is the root). */
         Node* getParent(void) const;
 
-		/// Checks whether this node is static. @See setStatic
-		bool isStatic() const;
+        /// Checks whether this node is static. @See setStatic
+        bool isStatic() const;
 
-		/** Turns this Node into static or dynamic
-		@remarks
-			Switching between dynamic and static has some overhead and forces to update all
-			static scene when converted to static. So don't do it frequently.
-			Static objects are not updated every frame, only when requested explicitly. Use
-			this feature if you plan to have this object unaltered for a very long times
-		@par
-			Changing this attribute to a node will cause to switch the attribute to all
-			attached entities (but not children or parent nodes; it's perfectly valid
-			and useful to have dynamic children of a static parent; although the opposite
-			(static children, dynamic parent) is probably a bug.
-		@return
-			True if setStatic made an actual change. False otherwise. Can fail because the
-			object was already static/dynamic, or because switching is not supported
-		*/
-		virtual bool setStatic( bool bStatic );
+        /** Turns this Node into static or dynamic
+        @remarks
+            Switching between dynamic and static has some overhead and forces to update all
+            static scene when converted to static. So don't do it frequently.
+            Static objects are not updated every frame, only when requested explicitly. Use
+            this feature if you plan to have this object unaltered for a very long times
+        @par
+            Changing this attribute to a node will cause to switch the attribute to all
+            attached entities (but not children or parent nodes; it's perfectly valid
+            and useful to have dynamic children of a static parent; although the opposite
+            (static children, dynamic parent) is probably a bug.
+        @return
+            True if setStatic made an actual change. False otherwise. Can fail because the
+            object was already static/dynamic, or because switching is not supported
+        */
+        virtual bool setStatic( bool bStatic );
 
-		/// Returns how deep in the hierarchy we are (eg. 0 -> root node, 1 -> child of root)
-		uint16 getDepthLevel() const									{ return mDepthLevel; }
+        /// Returns how deep in the hierarchy we are (eg. 0 -> root node, 1 -> child of root)
+        uint16 getDepthLevel() const                                    { return mDepthLevel; }
 
-		/// Returns a direct access to the Transform state
-		Transform& _getTransform()										{ return mTransform; }
+        /// Returns a direct access to the Transform state
+        Transform& _getTransform()                                      { return mTransform; }
 
-		/// Called by SceneManager when it is telling we're a static node being dirty
-		virtual void _notifyStaticDirty(void) const {}
+        /// Called by SceneManager when it is telling we're a static node being dirty
+        virtual void _notifyStaticDirty(void) const {}
 
         /** Returns a quaternion representing the nodes orientation.
-			@remarks
-				Don't call this function too often, as we need to convert from SoA
+            @remarks
+                Don't call this function too often, as we need to convert from SoA
         */
         virtual_l2 Quaternion getOrientation() const;
 
@@ -263,7 +263,7 @@ namespace Ogre {
             parent's orientation), but not in other cases (e.g. where the child node is just
             for positioning another object, you want it to maintain it's own orientation).
             The default is to inherit as with other transforms.
-			Don't call this function too often, as we need to convert to SoA
+            Don't call this function too often, as we need to convert to SoA
         @par
             Note that rotations are oriented around the node's origin.
         */
@@ -279,7 +279,7 @@ namespace Ogre {
             parent's orientation), but not in other cases (e.g. where the child node is just
             for positioning another object, you want it to maintain it's own orientation).
             The default is to inherit as with other transforms.
-			Don't call this function too often, as we need to convert to SoA
+            Don't call this function too often, as we need to convert to SoA
         @par
             Note that rotations are oriented around the node's origin.
         */
@@ -301,20 +301,20 @@ namespace Ogre {
         virtual_l1 void resetOrientation(void);
 
         /** Sets the position of the node relative to it's parent.
-		@remarks
-			Don't call this function too often, as we need to convert to SoA
+        @remarks
+            Don't call this function too often, as we need to convert to SoA
         */
         virtual_l1 void setPosition( const Vector3& pos );
 
         /** Sets the position of the node relative to it's parent.
-		@remarks
-			Don't call this function too often, as we need to convert to SoA
+        @remarks
+            Don't call this function too often, as we need to convert to SoA
         */
         virtual_l1 void setPosition(Real x, Real y, Real z);
 
         /** Gets the position of the node relative to it's parent.
-			@remarks
-				Don't call this function too often, as we need to convert from SoA
+            @remarks
+                Don't call this function too often, as we need to convert from SoA
         */
         virtual_l2 Vector3 getPosition(void) const;
 
@@ -327,7 +327,7 @@ namespace Ogre {
             the same relative size based on the parent's size), but not in other cases (e.g. where the
             child node is just for positioning another object, you want it to maintain it's own size).
             The default is to inherit as with other transforms.
-			Don't call this function too often, as we need to convert to SoA
+            Don't call this function too often, as we need to convert to SoA
         @par
             Note that like rotations, scalings are oriented around the node's origin.
         */
@@ -342,15 +342,15 @@ namespace Ogre {
             the same relative size based on the parent's size), but not in other cases (e.g. where the
             child node is just for positioning another object, you want it to maintain it's own size).
             The default is to inherit as with other transforms.
-			Don't call this function too often, as we need to convert to SoA
+            Don't call this function too often, as we need to convert to SoA
         @par
             Note that like rotations, scalings are oriented around the node's origin.
         */
         virtual_l1 void setScale(Real x, Real y, Real z);
 
         /** Gets the scaling factor of this node.
-			@remarks
-				Don't call this function too often, as we need to convert from SoA
+            @remarks
+                Don't call this function too often, as we need to convert from SoA
         */
         virtual_l2 Vector3 getScale(void) const;
 
@@ -526,7 +526,7 @@ namespace Ogre {
             Initial rotation relative to parent
         */
         virtual Node* createChild(
-			SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
+            SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC,
             const Vector3& translate = Vector3::ZERO, 
             const Quaternion& rotate = Quaternion::IDENTITY );
 
@@ -538,11 +538,11 @@ namespace Ogre {
 
         /** Reports the number of child nodes under this one.
         */
-		size_t numChildren(void) const										{ return mChildren.size(); }
+        size_t numChildren(void) const                                      { return mChildren.size(); }
 
         /** Gets a pointer to a child node. */
-		Node* getChild( size_t index )										{ return mChildren[index]; }
-		const Node* getChild( size_t index ) const							{ return mChildren[index]; }
+        Node* getChild( size_t index )                                      { return mChildren[index]; }
+        const Node* getChild( size_t index ) const                          { return mChildren[index]; }
 
         /** Retrieves an iterator for efficiently looping through all children of this node.
         @remarks
@@ -572,8 +572,8 @@ namespace Ogre {
         @remarks
             Does not delete the node, just detaches it from
             this parent, potentially to be reattached elsewhere. 
-		@par
-			Asserts if child is not one of our children.
+        @par
+            Asserts if child is not one of our children.
         */
         virtual void removeChild( Node* child );
 
@@ -596,61 +596,61 @@ namespace Ogre {
         virtual_l2 void _setDerivedOrientation(const Quaternion& q);
 
         /** Gets the orientation of the node as derived from all parents.
-		@remarks
-			Assumes the caches are already updated. Will trigger an assert
-			otherwise.
-			@See _getDerivedOrientationUpdated if you need the update process
-			to be guaranteed
+        @remarks
+            Assumes the caches are already updated. Will trigger an assert
+            otherwise.
+            @See _getDerivedOrientationUpdated if you need the update process
+            to be guaranteed
         */
         virtual_l2 Quaternion _getDerivedOrientation(void) const;
 
-		/** Gets the orientation of the node as derived from all parents.
-		@remarks
-			Unlike _getDerivedOrientation, this function guarantees the
-			cache stays up to date.
-			It is strongly advised against calling this function for a large
-			number of nodes. Refactor your queries so that they happen
-			after SceneManager::UpdateAllTransforms() has been called
-		*/
-		virtual_l2 Quaternion _getDerivedOrientationUpdated(void);
+        /** Gets the orientation of the node as derived from all parents.
+        @remarks
+            Unlike _getDerivedOrientation, this function guarantees the
+            cache stays up to date.
+            It is strongly advised against calling this function for a large
+            number of nodes. Refactor your queries so that they happen
+            after SceneManager::UpdateAllTransforms() has been called
+        */
+        virtual_l2 Quaternion _getDerivedOrientationUpdated(void);
 
         /** Gets the position of the node as derived from all parents.
-		@remarks
-			Assumes the caches are already updated. Will trigger an assert
-			otherwise.
-			@See _getDerivedPositionUpdated if you need the update process
-			to be guaranteed
+        @remarks
+            Assumes the caches are already updated. Will trigger an assert
+            otherwise.
+            @See _getDerivedPositionUpdated if you need the update process
+            to be guaranteed
         */
         virtual_l2 Vector3 _getDerivedPosition(void) const;
 
-		/** Gets the position of the node as derived from all parents.
-		@remarks
-			Unlike _getDerivedPosition, this function guarantees the
-			cache stays up to date.
-			It is strongly advised against calling this function for a large
-			number of nodes. Refactor your queries so that they happen
-			after SceneManager::UpdateAllTransforms() has been called
-		*/
-		virtual_l2 Vector3 _getDerivedPositionUpdated(void);
+        /** Gets the position of the node as derived from all parents.
+        @remarks
+            Unlike _getDerivedPosition, this function guarantees the
+            cache stays up to date.
+            It is strongly advised against calling this function for a large
+            number of nodes. Refactor your queries so that they happen
+            after SceneManager::UpdateAllTransforms() has been called
+        */
+        virtual_l2 Vector3 _getDerivedPositionUpdated(void);
 
         /** Gets the scaling factor of the node as derived from all parents.
-		@remarks
-			Assumes the caches are already updated. Will trigger an assert
-			otherwise.
-			@See _getDerivedScaleUpdated if you need the update process
-			to be guaranteed
+        @remarks
+            Assumes the caches are already updated. Will trigger an assert
+            otherwise.
+            @See _getDerivedScaleUpdated if you need the update process
+            to be guaranteed
         */
         virtual_l2 Vector3 _getDerivedScale(void) const;
 
-		/** Gets the scalling factor of the node as derived from all parents.
-		@remarks
-			Unlike _getDerivedScale, this function guarantees the
-			cache stays up to date.
-			It is STRONGLY advised against calling this function for a large
-			number of nodes. Refactor your queries so that they happen
-			after SceneManager::UpdateAllTransforms() has been called
-		*/
-		virtual_l2 Vector3 _getDerivedScaleUpdated(void);
+        /** Gets the scalling factor of the node as derived from all parents.
+        @remarks
+            Unlike _getDerivedScale, this function guarantees the
+            cache stays up to date.
+            It is STRONGLY advised against calling this function for a large
+            number of nodes. Refactor your queries so that they happen
+            after SceneManager::UpdateAllTransforms() has been called
+        */
+        virtual_l2 Vector3 _getDerivedScaleUpdated(void);
 
         /** Gets the full transformation matrix for this node.
         @remarks
@@ -660,33 +660,33 @@ namespace Ogre {
             This should only be called by a SceneManager which knows the
             derived transforms have been updated before calling this method.
             Applications using Ogre should just use the relative transforms.
-			Assumes the caches are already updated
+            Assumes the caches are already updated
         */
         virtual_l2 FORCEINLINE const Matrix4& _getFullTransform(void) const
-		{
-			assert( !mCachedTransformOutOfDate );
-			return mTransform.mDerivedTransform[mTransform.mIndex];
-		}
+        {
+            assert( !mCachedTransformOutOfDate );
+            return mTransform.mDerivedTransform[mTransform.mIndex];
+        }
 
-		/** @See _getDerivedScaleUpdated remarks. @See _getFullTransform */
-		virtual_l2 const Matrix4& _getFullTransformUpdated(void);
+        /** @See _getDerivedScaleUpdated remarks. @See _getFullTransform */
+        virtual_l2 const Matrix4& _getFullTransformUpdated(void);
 
         /** Sets a listener for this Node.
         @remarks
             Note for size and performance reasons only one listener per node is
             allowed.
         */
-        virtual void setListener(Listener* listener)					{ mListener = listener; }
+        virtual void setListener(Listener* listener)                    { mListener = listener; }
         
         /** Gets the current listener for this Node.
         */
-        Listener* getListener(void) const								{ return mListener; }
+        Listener* getListener(void) const                               { return mListener; }
 
-		/** @See SceneManager::updateAllTransforms()
-		@remarks
-			We don't pass by reference on purpose (avoid implicit aliasing)
-		*/
-		static void updateAllTransforms( const size_t numNodes, Transform t );
+        /** @See SceneManager::updateAllTransforms()
+        @remarks
+            We don't pass by reference on purpose (avoid implicit aliasing)
+        */
+        static void updateAllTransforms( const size_t numNodes, Transform t );
 
         /** Sets the current transform of this node to be the 'initial state' ie that
             position / orientation / scale to be used as a basis for delta values used
@@ -753,7 +753,7 @@ namespace Ogre {
             You can use it to associate one or more custom objects with this class instance.
         @see UserObjectBindings::setUserAny.
         */
-        UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
+        UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
 
         /** Return an instance of user objects binding associated with this class.
             You can use it to associate one or more custom objects with this class instance.
@@ -761,20 +761,20 @@ namespace Ogre {
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
-		/** Manually set the mNodeMemoryManager to a null ptr.
-		@remarks
-			Node doesn't follow the rule of three. This function is useful when you make multiple
-			hard copies but only the destructor must release the mTransform only slots once.
-		*/
-		void _setNullNodeMemoryManager(void)					{ mNodeMemoryManager = 0; }
+        /** Manually set the mNodeMemoryManager to a null ptr.
+        @remarks
+            Node doesn't follow the rule of three. This function is useful when you make multiple
+            hard copies but only the destructor must release the mTransform only slots once.
+        */
+        void _setNullNodeMemoryManager(void)                    { mNodeMemoryManager = 0; }
 
-		/** Internal use, notifies all attached objects that our memory pointers
-			(i.e. Transform) may have changed (e.g. during cleanups, change of parent, etc)
-		*/
-		virtual void _callMemoryChangeListeners(void) = 0;
+        /** Internal use, notifies all attached objects that our memory pointers
+            (i.e. Transform) may have changed (e.g. during cleanups, change of parent, etc)
+        */
+        virtual void _callMemoryChangeListeners(void) = 0;
 
 #ifndef NDEBUG
-		bool isCachedTransformOutOfDate(void) const				{ return mCachedTransformOutOfDate; }
+        bool isCachedTransformOutOfDate(void) const             { return mCachedTransformOutOfDate; }
 #endif
     };
     /** @} */

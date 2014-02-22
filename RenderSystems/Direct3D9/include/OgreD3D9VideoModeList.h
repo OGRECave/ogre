@@ -34,22 +34,22 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class _OgreD3D9Export D3D9VideoModeList : public RenderSysAlloc
-	{
-	private:
-		D3D9Driver* mDriver;
-		vector<D3D9VideoMode>::type mModeList;
+    class _OgreD3D9Export D3D9VideoModeList : public RenderSysAlloc
+    {
+    private:
+        D3D9Driver* mDriver;
+        vector<D3D9VideoMode>::type mModeList;
 
-	public:
-		D3D9VideoModeList( D3D9Driver* pDriver );
-		~D3D9VideoModeList();
+    public:
+        D3D9VideoModeList( D3D9Driver* pDriver );
+        ~D3D9VideoModeList();
 
-		BOOL enumerate();
+        BOOL enumerate();
 
-		D3D9VideoMode* item( size_t index );
-		size_t count();
+        D3D9VideoMode* item( size_t index );
+        size_t count();
 
-		D3D9VideoMode* item( const String &name );
-	};
+        D3D9VideoMode* item( const String &name );
+    };
 }
 #endif

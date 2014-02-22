@@ -63,13 +63,13 @@ int MilkshapePlugin::Execute (msModel* pModel)
     if (!pModel)
         return -1;
 
-	Ogre::LogManager logMgr;
-	logMgr.createLog("msOgreExporter.log", true);
-	logMgr.logMessage("OGRE Milkshape Exporter Log");
-	logMgr.logMessage("---------------------------");
-	Ogre::ResourceGroupManager resGrpMgr;
+    Ogre::LogManager logMgr;
+    logMgr.createLog("msOgreExporter.log", true);
+    logMgr.logMessage("OGRE Milkshape Exporter Log");
+    logMgr.logMessage("---------------------------");
+    Ogre::ResourceGroupManager resGrpMgr;
 
-	//
+    //
     // check, if we have something to export
     //
     if (msModel_GetMeshCount (pModel) == 0)
@@ -97,7 +97,7 @@ BOOL MilkshapePlugin::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam
 #endif
 {
     HWND hwndDlgItem;
-	int sel;
+    int sel;
 
     switch (iMsg)
     {
@@ -140,11 +140,11 @@ BOOL MilkshapePlugin::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam
         hwndDlgItem = GetDlgItem(hDlg, IDC_EXPORT_SKEL);
         SendMessage(hwndDlgItem, BM_SETCHECK, BST_CHECKED,0);
 
-		// Set tangents option
-		hwndDlgItem = GetDlgItem(hDlg, IDC_TANGENTS_TARGET);
-		SendMessage(hwndDlgItem, CB_ADDSTRING, 0, (LPARAM)"Tangent Semantic");
-		SendMessage(hwndDlgItem, CB_ADDSTRING, 0, (LPARAM)"Texture Coord Semantic");
-		SendMessage(hwndDlgItem, CB_SETCURSEL, 0, 0);
+        // Set tangents option
+        hwndDlgItem = GetDlgItem(hDlg, IDC_TANGENTS_TARGET);
+        SendMessage(hwndDlgItem, CB_ADDSTRING, 0, (LPARAM)"Tangent Semantic");
+        SendMessage(hwndDlgItem, CB_ADDSTRING, 0, (LPARAM)"Texture Coord Semantic");
+        SendMessage(hwndDlgItem, CB_SETCURSEL, 0, 0);
 
 
 
@@ -219,24 +219,24 @@ BOOL MilkshapePlugin::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam
 
                 hwndDlgItem = GetDlgItem(hDlg, IDC_TANGENT_VECTORS);
                 plugin->generateTangents = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
-				hwndDlgItem = GetDlgItem(hDlg, IDC_TANGENTS_TARGET);
-				sel = SendMessage(hwndDlgItem, CB_GETCURSEL,0,0);
-				if (sel == 0)
-				{
-					// tangents
-					plugin->tangentSemantic = Ogre::VES_TANGENT;
-				}
-				else
-				{
-					// texture coords
-					plugin->tangentSemantic = Ogre::VES_TEXTURE_COORDINATES;
-				}
-				hwndDlgItem = GetDlgItem(hDlg, IDC_TANG_SPLIT_MIRR);
-				plugin->tangentsSplitMirrored = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
-				hwndDlgItem = GetDlgItem(hDlg, IDC_TANG_SPLIT_ROT);
-				plugin->tangentsSplitRotated = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
-				hwndDlgItem = GetDlgItem(hDlg, IDC_4D_TANGENTS);
-				plugin->tangentsUseParity = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
+                hwndDlgItem = GetDlgItem(hDlg, IDC_TANGENTS_TARGET);
+                sel = SendMessage(hwndDlgItem, CB_GETCURSEL,0,0);
+                if (sel == 0)
+                {
+                    // tangents
+                    plugin->tangentSemantic = Ogre::VES_TANGENT;
+                }
+                else
+                {
+                    // texture coords
+                    plugin->tangentSemantic = Ogre::VES_TEXTURE_COORDINATES;
+                }
+                hwndDlgItem = GetDlgItem(hDlg, IDC_TANG_SPLIT_MIRR);
+                plugin->tangentsSplitMirrored = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
+                hwndDlgItem = GetDlgItem(hDlg, IDC_TANG_SPLIT_ROT);
+                plugin->tangentsSplitRotated = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
+                hwndDlgItem = GetDlgItem(hDlg, IDC_4D_TANGENTS);
+                plugin->tangentsUseParity = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
 
                 hwndDlgItem = GetDlgItem(hDlg, IDC_EXPORT_SKEL);
                 plugin->exportSkeleton = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
@@ -245,10 +245,10 @@ BOOL MilkshapePlugin::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam
                 hwndDlgItem = GetDlgItem(hDlg, IDC_SPLIT_ANIMATION);
                 plugin->splitAnimations = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
 
-				hwndDlgItem = GetDlgItem(hDlg, IDC_EXPORT_MATERIALS);
-				plugin->exportMaterials = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
+                hwndDlgItem = GetDlgItem(hDlg, IDC_EXPORT_MATERIALS);
+                plugin->exportMaterials = (SendMessage(hwndDlgItem, BM_GETCHECK, 0, 0) == BST_CHECKED) ? true : false;
 
-				hwndDlgItem = GetDlgItem(hDlg, IDC_FPS);
+                hwndDlgItem = GetDlgItem(hDlg, IDC_FPS);
                 GetWindowText(hwndDlgItem, val, 20);
                 plugin->fps = atof(val);
                 if (!plugin->fps)
@@ -277,7 +277,7 @@ bool MilkshapePlugin::showOptions(void)
     exportMesh = true;
     exportSkeleton = false;
 
-	return (DialogBox(hInst, MAKEINTRESOURCE(IDD_OPTIONS), NULL, DlgProc) == TRUE);
+    return (DialogBox(hInst, MAKEINTRESOURCE(IDD_OPTIONS), NULL, DlgProc) == TRUE);
 
 
 
@@ -293,8 +293,8 @@ void MilkshapePlugin::doExportMesh(msModel* pModel)
     // Create singletons
     Ogre::SkeletonManager skelMgr;
     Ogre::DefaultHardwareBufferManager defHWBufMgr;
-	Ogre::LogManager& logMgr = Ogre::LogManager::getSingleton();
-	Ogre::MeshManager meshMgr;
+    Ogre::LogManager& logMgr = Ogre::LogManager::getSingleton();
+    Ogre::MeshManager meshMgr;
 
 
     //
@@ -332,8 +332,8 @@ void MilkshapePlugin::doExportMesh(msModel* pModel)
 
     // No shared geometry
     int i;
-	int wh, numbones;
-	int intweight[3], intbones[3];
+    int wh, numbones;
+    int intweight[3], intbones[3];
     size_t j;
     Ogre::Vector3 min, max, currpos;
     Ogre::Real maxSquaredRadius;
@@ -402,7 +402,7 @@ void MilkshapePlugin::doExportMesh(msModel* pModel)
         {
             logMgr.logMessage("Doing vertex " + Ogre::StringConverter::toString(j));
             msVertex *pVertex = msMesh_GetVertexAt (pMesh, (int)j);
-			msVertexEx *pVertexEx=msMesh_GetVertexExAt(pMesh, (int)j);
+            msVertexEx *pVertexEx=msMesh_GetVertexExAt(pMesh, (int)j);
             msVec3 Vertex;
             msVertex_GetVertex (pVertex, Vertex);
 
@@ -427,58 +427,58 @@ void MilkshapePlugin::doExportMesh(msModel* pModel)
             int boneIdx = msVertex_GetBoneIndex(pVertex);
             if (boneIdx != -1)
             {
-				foundBoneAssignment = true;
-				numbones = 1;
-				intbones[0] = intbones[1] = intbones[2] = -1;
-				intweight[0] = intweight[1] = intweight[2] = 0;
-				for(wh = 0; wh < 3; ++wh) 
-				{
-					intbones[wh] = msVertexEx_GetBoneIndices(pVertexEx, wh);
-					if(intbones[wh] == -1) 
-						break;
+                foundBoneAssignment = true;
+                numbones = 1;
+                intbones[0] = intbones[1] = intbones[2] = -1;
+                intweight[0] = intweight[1] = intweight[2] = 0;
+                for(wh = 0; wh < 3; ++wh) 
+                {
+                    intbones[wh] = msVertexEx_GetBoneIndices(pVertexEx, wh);
+                    if(intbones[wh] == -1) 
+                        break;
 
-					++numbones;
-					intweight[wh] = msVertexEx_GetBoneWeights(pVertexEx, wh);
+                    ++numbones;
+                    intweight[wh] = msVertexEx_GetBoneWeights(pVertexEx, wh);
 
-				} // for(k)
-				Ogre::VertexBoneAssignment vertAssign;
-				vertAssign.boneIndex = boneIdx;
-				vertAssign.vertexIndex = (unsigned int)j;
-				if(numbones == 1) 
-				{
-					vertAssign.weight = 1.0;
-				} // single assignment
-				else 
-				{
-					vertAssign.weight=(Ogre::Real)intweight[0]/100.0;
-				}
-				ogreSubMesh->addBoneAssignment(vertAssign);
-				if(numbones > 1) 
-				{
-					// this somewhat contorted logic is because the first weight [0] matches to the bone assignment
-					// located with pVertex. The next two weights [1][2] match up to the first two bones found
-					// with pVertexEx [0][1]. The weight for the fourth bone, if present, is the unassigned weight
-					for(wh = 0; wh < 3; wh++) 
-					{
-						boneIdx = intbones[wh];
-						if(boneIdx == -1) 
-							break;
-						vertAssign.boneIndex = boneIdx;
-						vertAssign.vertexIndex = (unsigned int)j;
-						if(wh == 2) 
-						{ 
-							// fourth weight is 1.0-(sumoffirstthreeweights)
-							vertAssign.weight = 1.0-(((Ogre::Real)intweight[0]/100.0)+
-								((Ogre::Real)intweight[1]/100.0)+((Ogre::Real)intweight[2]/100.0));
-						}
-						else 
-						{
-							vertAssign.weight=(Ogre::Real)intweight[wh+1];
-						}
-						ogreSubMesh->addBoneAssignment(vertAssign);
-					} // for(k)
-				} // if(numbones)
-			}
+                } // for(k)
+                Ogre::VertexBoneAssignment vertAssign;
+                vertAssign.boneIndex = boneIdx;
+                vertAssign.vertexIndex = (unsigned int)j;
+                if(numbones == 1) 
+                {
+                    vertAssign.weight = 1.0;
+                } // single assignment
+                else 
+                {
+                    vertAssign.weight=(Ogre::Real)intweight[0]/100.0;
+                }
+                ogreSubMesh->addBoneAssignment(vertAssign);
+                if(numbones > 1) 
+                {
+                    // this somewhat contorted logic is because the first weight [0] matches to the bone assignment
+                    // located with pVertex. The next two weights [1][2] match up to the first two bones found
+                    // with pVertexEx [0][1]. The weight for the fourth bone, if present, is the unassigned weight
+                    for(wh = 0; wh < 3; wh++) 
+                    {
+                        boneIdx = intbones[wh];
+                        if(boneIdx == -1) 
+                            break;
+                        vertAssign.boneIndex = boneIdx;
+                        vertAssign.vertexIndex = (unsigned int)j;
+                        if(wh == 2) 
+                        { 
+                            // fourth weight is 1.0-(sumoffirstthreeweights)
+                            vertAssign.weight = 1.0-(((Ogre::Real)intweight[0]/100.0)+
+                                ((Ogre::Real)intweight[1]/100.0)+((Ogre::Real)intweight[2]/100.0));
+                        }
+                        else 
+                        {
+                            vertAssign.weight=(Ogre::Real)intweight[wh+1];
+                        }
+                        ogreSubMesh->addBoneAssignment(vertAssign);
+                    } // for(k)
+                } // if(numbones)
+            }
 
         }
         pbuf->unlock();
@@ -504,7 +504,7 @@ void MilkshapePlugin::doExportMesh(msModel* pModel)
         for (j = 0; j < ogreSubMesh->indexData->indexCount; j+=3)
         {
             msTriangle *pTriangle = msMesh_GetTriangleAt (pMesh, (int)j/3);
-			msTriangleEx *pTriangleEx=msMesh_GetTriangleExAt(pMesh, (int)j/3);
+            msTriangleEx *pTriangleEx=msMesh_GetTriangleExAt(pMesh, (int)j/3);
             word nIndices[3];
             msTriangle_GetVertexIndices (pTriangle, nIndices);
             msVec3 Normal;
@@ -519,10 +519,10 @@ void MilkshapePlugin::doExportMesh(msModel* pModel)
 
                 // Vertex normals
                 // For the moment, ignore any discrepancies per vertex
-				msTriangleEx_GetNormal(pTriangleEx, k, &Normal[0]);
-				msTriangleEx_GetTexCoord(pTriangleEx, k, &uv[0]);
-				pTex[(vertIdx*2)]=uv[0];
-				pTex[(vertIdx*2)+1]=uv[1];
+                msTriangleEx_GetNormal(pTriangleEx, k, &Normal[0]);
+                msTriangleEx_GetTexCoord(pTriangleEx, k, &uv[0]);
+                pTex[(vertIdx*2)]=uv[0];
+                pTex[(vertIdx*2)+1]=uv[1];
                 pNorm[(vertIdx*3)] = Normal[0];
                 pNorm[(vertIdx*3)+1] = Normal[1];
                 pNorm[(vertIdx*3)+2] = Normal[2];
@@ -596,14 +596,14 @@ void MilkshapePlugin::doExportMesh(msModel* pModel)
 
     if (generateTangents)
     {
-		unsigned short src, dest;
-		ogreMesh->suggestTangentVectorBuildParams(tangentSemantic, src, dest);
-		ogreMesh->buildTangentVectors(tangentSemantic, src, dest, tangentsSplitMirrored, tangentsSplitRotated, tangentsUseParity);
+        unsigned short src, dest;
+        ogreMesh->suggestTangentVectorBuildParams(tangentSemantic, src, dest);
+        ogreMesh->buildTangentVectors(tangentSemantic, src, dest, tangentsSplitMirrored, tangentsSplitRotated, tangentsUseParity);
     }
 
     // Export
     Ogre::String msg;
-	msg  = "Exporting mesh data to file '" + Ogre::String(szFile) + "'";
+    msg  = "Exporting mesh data to file '" + Ogre::String(szFile) + "'";
     logMgr.logMessage(msg);
     serializer.exportMesh(ogreMesh.getPointer(), szFile);
     logMgr.logMessage("Export successful");
@@ -612,10 +612,10 @@ void MilkshapePlugin::doExportMesh(msModel* pModel)
     if (!pSkel.isNull())
         Ogre::SkeletonManager::getSingleton().remove(pSkel->getHandle());
 
-	if (exportMaterials && msModel_GetMaterialCount(pModel) > 0)
-	{
-		doExportMaterials(pModel);
-	}
+    if (exportMaterials && msModel_GetMaterialCount(pModel) > 0)
+    {
+        doExportMaterials(pModel);
+    }
 }
 
 
@@ -665,7 +665,7 @@ Ogre::SkeletonPtr MilkshapePlugin::doExportSkeleton(msModel* pModel, Ogre::MeshP
 
     // Do the bones
     int numBones = msModel_GetBoneCount(pModel);
-	msg = "Number of bones: " + Ogre::StringConverter::toString(numBones);
+    msg = "Number of bones: " + Ogre::StringConverter::toString(numBones);
     logMgr.logMessage(msg);
 
     int i;
@@ -694,8 +694,8 @@ Ogre::SkeletonPtr MilkshapePlugin::doExportSkeleton(msModel* pModel, Ogre::MeshP
         qfinal = qz * qy * qx;
         ogrebone->setOrientation(qfinal);
 
-		Ogre::LogManager::getSingleton().stream()
-			<< "Bone #" << i << ": " <<
+        Ogre::LogManager::getSingleton().stream()
+            << "Bone #" << i << ": " <<
             "Name='" << bone->szName << "' " <<
             "Position: " << bonePos << " " <<
             "Ms3d Rotation: {" << msBoneRot[0] << ", " << msBoneRot[1] << ", " << msBoneRot[2] << "} " <<
@@ -713,7 +713,7 @@ Ogre::SkeletonPtr MilkshapePlugin::doExportSkeleton(msModel* pModel, Ogre::MeshP
         {
             // Root bone
             msg = "Root bone detected: Name='" + Ogre::String(bone->szName) + "' Index=" 
-				+ Ogre::StringConverter::toString(i);
+                + Ogre::StringConverter::toString(i);
             logMgr.logMessage(msg);
         }
         else
@@ -724,14 +724,14 @@ Ogre::SkeletonPtr MilkshapePlugin::doExportSkeleton(msModel* pModel, Ogre::MeshP
             if (ogrechild == 0)
             {
                 msg = "Error: could not locate child bone '" +
-					Ogre::String(bone->szName) + "'";
+                    Ogre::String(bone->szName) + "'";
                 logMgr.logMessage(msg);
                 continue;
             }
             if (ogreparent == 0)
             {
                 msg = "Error: could not locate parent bone '"
-					+ Ogre::String(bone->szParentName) + "'";
+                    + Ogre::String(bone->szParentName) + "'";
                 logMgr.logMessage(msg);
                 continue;
             }
@@ -821,88 +821,88 @@ struct SplitAnimationStruct
 
 void MilkshapePlugin::doExportMaterials(msModel* pModel)
 {
-	Ogre::LogManager& logMgr = Ogre::LogManager::getSingleton();
-	Ogre::MaterialManager matMgrSgl;
-	Ogre::String msg;
+    Ogre::LogManager& logMgr = Ogre::LogManager::getSingleton();
+    Ogre::MaterialManager matMgrSgl;
+    Ogre::String msg;
 
     matMgrSgl.initialise();
 
-	int numMaterials = msModel_GetMaterialCount(pModel);
-	msg = "Number of materials: " + Ogre::StringConverter::toString(numMaterials);
-	logMgr.logMessage(msg);
+    int numMaterials = msModel_GetMaterialCount(pModel);
+    msg = "Number of materials: " + Ogre::StringConverter::toString(numMaterials);
+    logMgr.logMessage(msg);
 
-	OPENFILENAME ofn;
-	memset (&ofn, 0, sizeof (OPENFILENAME));
+    OPENFILENAME ofn;
+    memset (&ofn, 0, sizeof (OPENFILENAME));
 
-	char szFile[MS_MAX_PATH];
-	char szFileTitle[MS_MAX_PATH];
-	char szDefExt[32] = "material";
-	char szFilter[128] = "OGRE .material Files (*.material)\0*.material\0All Files (*.*)\0*.*\0\0";
-	szFile[0] = '\0';
-	szFileTitle[0] = '\0';
+    char szFile[MS_MAX_PATH];
+    char szFileTitle[MS_MAX_PATH];
+    char szDefExt[32] = "material";
+    char szFilter[128] = "OGRE .material Files (*.material)\0*.material\0All Files (*.*)\0*.*\0\0";
+    szFile[0] = '\0';
+    szFileTitle[0] = '\0';
 
-	ofn.lStructSize = sizeof (OPENFILENAME);
-	ofn.lpstrDefExt = szDefExt;
-	ofn.lpstrFilter = szFilter;
-	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = MS_MAX_PATH;
-	ofn.lpstrFileTitle = szFileTitle;
-	ofn.nMaxFileTitle = MS_MAX_PATH;
-	ofn.Flags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
-	ofn.lpstrTitle = "Export to OGRE Material";
+    ofn.lStructSize = sizeof (OPENFILENAME);
+    ofn.lpstrDefExt = szDefExt;
+    ofn.lpstrFilter = szFilter;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MS_MAX_PATH;
+    ofn.lpstrFileTitle = szFileTitle;
+    ofn.nMaxFileTitle = MS_MAX_PATH;
+    ofn.Flags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
+    ofn.lpstrTitle = "Export to OGRE Material";
 
-	if (!::GetSaveFileName (&ofn))
-		return;
+    if (!::GetSaveFileName (&ofn))
+        return;
 
-	// Strip off the path
-	Ogre::String matName = szFile;
-	size_t lastSlash = matName.find_last_of("\\");
-	matName = matName.substr(lastSlash+1);
+    // Strip off the path
+    Ogre::String matName = szFile;
+    size_t lastSlash = matName.find_last_of("\\");
+    matName = matName.substr(lastSlash+1);
 
-	// Set up
-	logMgr.logMessage("Trying to create Material object");
+    // Set up
+    logMgr.logMessage("Trying to create Material object");
 
-	Ogre::MaterialSerializer matSer;
+    Ogre::MaterialSerializer matSer;
 
-	for (int i = 0; i < numMaterials; ++i)
-	{
-		msMaterial *mat = msModel_GetMaterialAt(pModel, i);
+    for (int i = 0; i < numMaterials; ++i)
+    {
+        msMaterial *mat = msModel_GetMaterialAt(pModel, i);
 
-		msg = "Creating material " + Ogre::String(mat->szName);
-		logMgr.logMessage(msg);
+        msg = "Creating material " + Ogre::String(mat->szName);
+        logMgr.logMessage(msg);
         Ogre::MaterialPtr ogremat = matMgrSgl.create(mat->szName, 
             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		logMgr.logMessage("Created.");
+        logMgr.logMessage("Created.");
 
-		ogremat->setAmbient(msVec4ToColourValue(mat->Ambient));
-		ogremat->setDiffuse(msVec4ToColourValue(mat->Diffuse));
-		ogremat->setSpecular(msVec4ToColourValue(mat->Specular));
-		ogremat->setShininess(mat->fShininess);
+        ogremat->setAmbient(msVec4ToColourValue(mat->Ambient));
+        ogremat->setDiffuse(msVec4ToColourValue(mat->Diffuse));
+        ogremat->setSpecular(msVec4ToColourValue(mat->Specular));
+        ogremat->setShininess(mat->fShininess);
 
-		if (0 < strlen(mat->szDiffuseTexture))
-			ogremat->getTechnique(0)->getPass(0)->createTextureUnitState(mat->szDiffuseTexture);
+        if (0 < strlen(mat->szDiffuseTexture))
+            ogremat->getTechnique(0)->getPass(0)->createTextureUnitState(mat->szDiffuseTexture);
 
         if (0 < strlen(mat->szAlphaTexture))
-			ogremat->getTechnique(0)->getPass(0)->createTextureUnitState(mat->szAlphaTexture);
+            ogremat->getTechnique(0)->getPass(0)->createTextureUnitState(mat->szAlphaTexture);
 
 
-		matSer.queueForExport(ogremat);
-	}
+        matSer.queueForExport(ogremat);
+    }
 
-	msg = "Exporting materials to " + matName;
-	logMgr.logMessage(msg);
-	matSer.exportQueued(matName);
+    msg = "Exporting materials to " + matName;
+    logMgr.logMessage(msg);
+    matSer.exportQueued(matName);
 }
 
 Ogre::ColourValue MilkshapePlugin::msVec4ToColourValue(float prop[4])
 {
-	Ogre::ColourValue colour;
-	colour.r = prop[0];
-	colour.g = prop[1];
-	colour.b = prop[2];
-	colour.a = prop[3];
+    Ogre::ColourValue colour;
+    colour.r = prop[0];
+    colour.g = prop[1];
+    colour.b = prop[2];
+    colour.a = prop[3];
 
-	return colour;
+    return colour;
 }
 
 void MilkshapePlugin::doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& ogreskel)
@@ -913,19 +913,19 @@ void MilkshapePlugin::doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& ogr
     Ogre::String msg;
 
     int numFrames = msModel_GetTotalFrames(pModel);
-	msg = "Number of frames: " + Ogre::StringConverter::toString(numFrames);
+    msg = "Number of frames: " + Ogre::StringConverter::toString(numFrames);
     logMgr.logMessage(msg);
 
     if (splitAnimations)
     {
         // Explain
         msg = "You have chosen to create multiple discrete animations by splitting up the frames in "
-			"the animation sequence. In order to do this, you must supply a simple text file "
+            "the animation sequence. In order to do this, you must supply a simple text file "
             "describing the separate animations, which has a single line per animation in the format: \n\n" 
             "startFrame,endFrame,animationName\n\nFor example: \n\n"
             "1,20,Walk\n21,35,Run\n36,40,Shoot\n\n" 
             "..creates 3 separate animations (the frame numbers are inclusive)."
-			"You must browse to this file in the next dialog.";
+            "You must browse to this file in the next dialog.";
         MessageBox(0,msg.c_str(), "Splitting Animations",MB_ICONINFORMATION | MB_OK);
         // Prompt for a file which contains animation splitting info
         OPENFILENAME ofn;
@@ -978,7 +978,7 @@ void MilkshapePlugin::doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& ogr
                     continue;
 
                 // Split on ','
-				std::vector<Ogre::String> svec = Ogre::StringUtil::split(line, ",\n");
+                std::vector<Ogre::String> svec = Ogre::StringUtil::split(line, ",\n");
 
                 // Basic validation on number of elements
                 if (svec.size() != 3)
@@ -988,7 +988,7 @@ void MilkshapePlugin::doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& ogr
                     continue;
                 }
                 // Remove any embedded spaces
-				Ogre::StringUtil::trim(svec[0]);
+                Ogre::StringUtil::trim(svec[0]);
                 Ogre::StringUtil::trim(svec[1]);
                 Ogre::StringUtil::trim(svec[2]);
                 // Create split info
@@ -1030,14 +1030,14 @@ void MilkshapePlugin::doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& ogr
         // Create animation
         frameTime = currSplit.end - currSplit.start;
         realTime = frameTime / fps;
-		Ogre::LogManager::getSingleton().stream()
-			<< "Trying to create Animation object for animation "
-			<<  currSplit.name << " For Frames " << currSplit.start << " to "
+        Ogre::LogManager::getSingleton().stream()
+            << "Trying to create Animation object for animation "
+            <<  currSplit.name << " For Frames " << currSplit.start << " to "
             << currSplit.end << " inclusive. ";
 
-		Ogre::LogManager::getSingleton().stream()
-			<< "Frame time = "
-			<< frameTime << ", Seconds = " << realTime;
+        Ogre::LogManager::getSingleton().stream()
+            << "Frame time = "
+            << frameTime << ", Seconds = " << realTime;
 
         Ogre::Animation *ogreanim =
             ogreskel->createAnimation(currSplit.name, realTime);
@@ -1052,7 +1052,7 @@ void MilkshapePlugin::doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& ogr
             Ogre::Bone* ogrebone = ogreskel->getBone(bone->szName);
 
             // Create animation tracks
-			msg = "Creating AnimationTrack for bone " + Ogre::StringConverter::toString(i);
+            msg = "Creating AnimationTrack for bone " + Ogre::StringConverter::toString(i);
             logMgr.logMessage(msg);
 
             Ogre::NodeAnimationTrack *ogretrack = ogreanim->createNodeTrack(i, ogrebone);
@@ -1089,23 +1089,23 @@ void MilkshapePlugin::doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& ogr
                     Ogre::TransformKeyFrame *ogrekey = ogretrack->createNodeKeyFrame(realTime);
                     logMgr.logMessage("KeyFrame created");
 
-					Ogre::Vector3 kfPos;
-					// Imported milkshape animations may not have positions 
-					// for all rotation keys
-					if ( currKeyIdx < bone->nNumPositionKeys ) {
-						kfPos.x = currPosKey->Position[0];
-						kfPos.y = currPosKey->Position[1];
-						kfPos.z = currPosKey->Position[2];
-					}
-					else {
-						kfPos.x = bone->Position[0];
-						kfPos.y = bone->Position[1];
-						kfPos.z = bone->Position[2];
-					}
+                    Ogre::Vector3 kfPos;
+                    // Imported milkshape animations may not have positions 
+                    // for all rotation keys
+                    if ( currKeyIdx < bone->nNumPositionKeys ) {
+                        kfPos.x = currPosKey->Position[0];
+                        kfPos.y = currPosKey->Position[1];
+                        kfPos.z = currPosKey->Position[2];
+                    }
+                    else {
+                        kfPos.x = bone->Position[0];
+                        kfPos.y = bone->Position[1];
+                        kfPos.z = bone->Position[2];
+                    }
                     Ogre::Quaternion qx, qy, qz, kfQ;
 
-					// Milkshape translations are local to own orientation, not parent
-					kfPos = ogrebone->getOrientation() * kfPos;
+                    // Milkshape translations are local to own orientation, not parent
+                    kfPos = ogrebone->getOrientation() * kfPos;
 
                     ogrekey->setTranslate(kfPos);
                     qx.FromAngleAxis(Ogre::Radian(currRotKey->Rotation[0]), Ogre::Vector3::UNIT_X);
@@ -1114,12 +1114,12 @@ void MilkshapePlugin::doExportAnimations(msModel* pModel, Ogre::SkeletonPtr& ogr
                     kfQ = qz * qy * qx;
                     ogrekey->setRotation(kfQ);
 
-					Ogre::LogManager::getSingleton().stream()
-						<< "KeyFrame details: Adjusted Frame Time=" << frameTime
-						<< " Seconds: " << realTime << " Position=" << kfPos << " " 
-						<< "Ms3d Rotation= {" << currRotKey->Rotation[0] << ", " 
-						<< currRotKey->Rotation[1] << ", " << currRotKey->Rotation[2] 
-						<< "} " << "Orientation=" << kfQ;
+                    Ogre::LogManager::getSingleton().stream()
+                        << "KeyFrame details: Adjusted Frame Time=" << frameTime
+                        << " Seconds: " << realTime << " Position=" << kfPos << " " 
+                        << "Ms3d Rotation= {" << currRotKey->Rotation[0] << ", " 
+                        << currRotKey->Rotation[1] << ", " << currRotKey->Rotation[2] 
+                        << "} " << "Orientation=" << kfQ;
                 } // keyframe creation
 
             } // keys

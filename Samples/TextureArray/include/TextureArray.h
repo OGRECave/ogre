@@ -11,24 +11,24 @@ class _OgreSampleClassExport Sample_TextureArray : public SdkSample
 {
 public:
 
-	Sample_TextureArray()
-	{
-		mInfo["Title"] = "Texture Array";
-		mInfo["Description"] = "Demonstrates texture array support.";
-		mInfo["Thumbnail"] = "thumb_texarray.png";
-		mInfo["Category"] = "Unsorted";
-		mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
-	}
+    Sample_TextureArray()
+    {
+        mInfo["Title"] = "Texture Array";
+        mInfo["Description"] = "Demonstrates texture array support.";
+        mInfo["Thumbnail"] = "thumb_texarray.png";
+        mInfo["Category"] = "Unsorted";
+        mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
+    }
 
 protected:
 
     StringVector getRequiredPlugins()
-	{
-		StringVector names;
+    {
+        StringVector names;
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
             names.push_back("Cg Program Manager");
-		return names;
-	}
+        return names;
+    }
 
     void testCapabilities( const RenderSystemCapabilities* caps )
     {
@@ -52,16 +52,16 @@ protected:
         }
     }
 
-	void setupContent()
-	{
-		mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
+    void setupContent()
+    {
+        mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
 
-		// set our camera to orbit around the origin and show cursor
-		mCameraMan->setStyle(CS_ORBIT);
-		mTrayMgr->showCursor();
+        // set our camera to orbit around the origin and show cursor
+        mCameraMan->setStyle(CS_ORBIT);
+        mTrayMgr->showCursor();
 
-		// the names of the textures we will use (all need to be the same size: 512*512 in our case)
-		vector<String>::type texNames;
+        // the names of the textures we will use (all need to be the same size: 512*512 in our case)
+        vector<String>::type texNames;
         texNames.push_back("BeachStones.jpg");
         texNames.push_back("BumpyMetal.jpg");
         texNames.push_back("egyptrockyfull.jpg");
@@ -93,8 +93,8 @@ protected:
 
 
         // add all the textures to a 2d texture array
-		for (uint32 i = 0; i < static_cast<uint32>(texNames.size()); i++)
-		{
+        for (uint32 i = 0; i < static_cast<uint32>(texNames.size()); i++)
+        {
             Image terrainTex;
             terrainTex.load(texNames[i], ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
             HardwarePixelBufferSharedPtr pixelBufferBuf = tex->getBuffer(0);
@@ -109,38 +109,38 @@ protected:
         texArrayMat->compile();
         Pass * pass = texArrayMat->getBestTechnique()->getPass(0);
         pass->setLightingEnabled(false);
-		TextureUnitState* pState = pass->createTextureUnitState();
+        TextureUnitState* pState = pass->createTextureUnitState();
         pState->setTextureName(tex->getName(), TEX_TYPE_2D_ARRAY);
 
         // create a plane with float3 tex coord - the third value will be the texture index in our case
-	    ManualObject* textureArrayObject = mSceneMgr->createManualObject();
+        ManualObject* textureArrayObject = mSceneMgr->createManualObject();
         
         // create a quad that uses our material 
         int quadSize = 100;
-	    textureArrayObject->begin(texArrayMat->getName(), RenderOperation::OT_TRIANGLE_LIST);
-	    // triangle 0 of the quad
-	    textureArrayObject->position(0, 0, 0);
-    	textureArrayObject->textureCoord(0, 0, 0);
-	    textureArrayObject->position(quadSize, 0, 0);
-    	textureArrayObject->textureCoord(1, 0, 0);
-	    textureArrayObject->position(quadSize, quadSize, 0);
-    	textureArrayObject->textureCoord(1, 1, texNames.size());
+        textureArrayObject->begin(texArrayMat->getName(), RenderOperation::OT_TRIANGLE_LIST);
+        // triangle 0 of the quad
+        textureArrayObject->position(0, 0, 0);
+        textureArrayObject->textureCoord(0, 0, 0);
+        textureArrayObject->position(quadSize, 0, 0);
+        textureArrayObject->textureCoord(1, 0, 0);
+        textureArrayObject->position(quadSize, quadSize, 0);
+        textureArrayObject->textureCoord(1, 1, texNames.size());
 
-	    // triangle 1 of the quad
-	    textureArrayObject->position(0, 0, 0);
-    	textureArrayObject->textureCoord(0, 0, 0); 
-	    textureArrayObject->position(quadSize, quadSize, 0); 
-    	textureArrayObject->textureCoord(1, 1, texNames.size()); 
-	    textureArrayObject->position(0, quadSize, 0);
-    	textureArrayObject->textureCoord(0, 1, texNames.size());
+        // triangle 1 of the quad
+        textureArrayObject->position(0, 0, 0);
+        textureArrayObject->textureCoord(0, 0, 0); 
+        textureArrayObject->position(quadSize, quadSize, 0); 
+        textureArrayObject->textureCoord(1, 1, texNames.size()); 
+        textureArrayObject->position(0, quadSize, 0);
+        textureArrayObject->textureCoord(0, 1, texNames.size());
 
-	    textureArrayObject->end();
+        textureArrayObject->end();
 
-		// attach it to a node and position appropriately
-		SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		node->setPosition(-quadSize / 2, -quadSize / 2, 0);
-		node->attachObject(textureArrayObject);
-	}
+        // attach it to a node and position appropriately
+        SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        node->setPosition(-quadSize / 2, -quadSize / 2, 0);
+        node->attachObject(textureArrayObject);
+    }
     
     void cleanupContent()
     {

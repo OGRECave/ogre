@@ -32,39 +32,39 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	ThreadHandle::ThreadHandle( size_t threadIdx, void *userParam ) :
-		mThreadIdx( threadIdx ),
-		mUserParam( userParam )
-	{
-	}
-	//-----------------------------------------------------------------------------------
-	ThreadHandle::~ThreadHandle()
-	{
-	}
-	//-----------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------
+    ThreadHandle::ThreadHandle( size_t threadIdx, void *userParam ) :
+        mThreadIdx( threadIdx ),
+        mUserParam( userParam )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    ThreadHandle::~ThreadHandle()
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
 
-	ThreadHandlePtr Threads::CreateThread( THREAD_ENTRY_POINT entryPoint, size_t threadIdx, void *param )
-	{
+    ThreadHandlePtr Threads::CreateThread( THREAD_ENTRY_POINT entryPoint, size_t threadIdx, void *param )
+    {
         ThreadHandle *threadArg( new ThreadHandle( threadIdx, param ) );
-		ThreadHandlePtr retVal( new ThreadHandle( threadIdx, param ) );
-		pthread_t threadId;
+        ThreadHandlePtr retVal( new ThreadHandle( threadIdx, param ) );
+        pthread_t threadId;
         pthread_create( &threadId, NULL, entryPoint, threadArg );
-		retVal->_setOsHandle( threadId );
-		return retVal;
-	}
-	//-----------------------------------------------------------------------------------
-	void Threads::WaitForThreads( size_t numThreadHandles, const ThreadHandlePtr *threadHandles )
-	{
-		assert( numThreadHandles < 128 );
+        retVal->_setOsHandle( threadId );
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void Threads::WaitForThreads( size_t numThreadHandles, const ThreadHandlePtr *threadHandles )
+    {
+        assert( numThreadHandles < 128 );
 
-		for( size_t i=0; i<numThreadHandles; ++i )
-			pthread_join( threadHandles[i]->_getOsHandle(), NULL );
-	}
-	//-----------------------------------------------------------------------------------
-	void Threads::WaitForThreads( const ThreadHandleVec &threadHandles )
-	{
-		if( !threadHandles.empty() )
-			Threads::WaitForThreads( threadHandles.size(), &threadHandles[0] );
-	}
+        for( size_t i=0; i<numThreadHandles; ++i )
+            pthread_join( threadHandles[i]->_getOsHandle(), NULL );
+    }
+    //-----------------------------------------------------------------------------------
+    void Threads::WaitForThreads( const ThreadHandleVec &threadHandles )
+    {
+        if( !threadHandles.empty() )
+            Threads::WaitForThreads( threadHandles.size(), &threadHandles[0] );
+    }
 }

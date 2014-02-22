@@ -34,13 +34,13 @@ struct FIBITMAP;
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Image
-	*  @{
-	*/
-	/** Codec specialized in images loaded using FreeImage.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Image
+    *  @{
+    */
+    /** Codec specialized in images loaded using FreeImage.
         @remarks
             The users implementing subclasses of ImageCodec are required to return
             a valid pointer to a ImageData class from the decode(...) function.
@@ -51,11 +51,11 @@ namespace Ogre {
         String mType;
         unsigned int mFreeImageType;
 
-		typedef list<ImageCodec*>::type RegisteredCodecList;
-		static RegisteredCodecList msCodecList;
+        typedef list<ImageCodec*>::type RegisteredCodecList;
+        static RegisteredCodecList msCodecList;
 
-		/** Common encoding routine. */
-		FIBITMAP* encodeBitmap(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
+        /** Common encoding routine. */
+        FIBITMAP* encodeBitmap(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
 
     public:
         FreeImageCodec(const String &type, unsigned int fiType);
@@ -71,16 +71,16 @@ namespace Ogre {
         
         virtual String getType() const;        
 
-		/// @copydoc Codec::magicNumberToFileExt
-		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
+        /// @copydoc Codec::magicNumberToFileExt
+        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
 
-		/// Static method to startup FreeImage and register the FreeImage codecs
-		static void startup(void);
-		/// Static method to shutdown FreeImage and unregister the FreeImage codecs
-		static void shutdown(void);
+        /// Static method to startup FreeImage and register the FreeImage codecs
+        static void startup(void);
+        /// Static method to shutdown FreeImage and unregister the FreeImage codecs
+        static void shutdown(void);
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

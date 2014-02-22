@@ -137,7 +137,7 @@ namespace Ogre
                 return 1;
             }
 
-			/**
+            /**
             * Get the state cache manager
             */
             GLES2StateCacheManager* getStateCacheManager() const
@@ -152,7 +152,7 @@ namespace Ogre
             {
                 mStateCacheMgr = stateCacheMgr;
             }
-			
+            
             /**
             * Start anything special
             */
@@ -174,9 +174,9 @@ namespace Ogre
 
             // This contains the complete list of supported extensions
             set<String>::type extensionList;
-			
-			// State cache management
-			GLES2StateCacheManager* mStateCacheMgr;
+            
+            // State cache management
+            GLES2StateCacheManager* mStateCacheMgr;
     };
 
 }

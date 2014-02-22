@@ -32,11 +32,11 @@ THE SOFTWARE.
 #include "OgreArrayConfig.h"
 
 #if OGRE_CPU == OGRE_CPU_X86 && OGRE_USE_SIMD == 1
-	#if OGRE_DOUBLE_PRECISION == 1
-		#include "SSE2/Double/OgreArraySphere.h"
-	#else
-		#include "SSE2/Single/OgreArraySphere.h"
-	#endif
+    #if OGRE_DOUBLE_PRECISION == 1
+        #include "SSE2/Double/OgreArraySphere.h"
+    #else
+        #include "SSE2/Single/OgreArraySphere.h"
+    #endif
 #elif OGRE_CPU == OGRE_CPU_ARM && OGRE_USE_SIMD == 1
     #if OGRE_DOUBLE_PRECISION == 1
         #error Double precision with SIMD on ARM is not supported
@@ -44,7 +44,7 @@ THE SOFTWARE.
         #include "NEON/Single/OgreArraySphere.h"
     #endif
 #else
-	#include "C/OgreArraySphere.h"
+    #include "C/OgreArraySphere.h"
 #endif
 
 #endif

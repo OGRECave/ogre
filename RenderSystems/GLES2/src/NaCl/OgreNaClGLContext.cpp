@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     NaClGLContext::NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance, pp::CompletionCallback* swapCallback)
-		: pp::Graphics3DClient(instance)
+        : pp::Graphics3DClient(instance)
         , mWindow(window)
         , mGLSupport(glsupport)
         , mInstance(instance)
@@ -58,8 +58,8 @@ namespace Ogre {
     {
         glSetCurrentContextPPAPI(0);
     }
-	
-	void NaClGLContext::setCurrent()
+    
+    void NaClGLContext::setCurrent()
     {
         if (mInstance == NULL) {
             glSetCurrentContextPPAPI(0);

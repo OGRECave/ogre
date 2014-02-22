@@ -32,28 +32,28 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	LightweightMutex::LightweightMutex()
-	{
+    LightweightMutex::LightweightMutex()
+    {
         pthread_mutex_init( &mMutex, 0 );
-	}
-	//-----------------------------------------------------------------------------------
-	LightweightMutex::~LightweightMutex()
-	{
-		pthread_mutex_destroy( &mMutex );
-	}
-	//-----------------------------------------------------------------------------------
-	void LightweightMutex::lock()
-	{
-		pthread_mutex_lock( &mMutex );
-	}
-	//-----------------------------------------------------------------------------------
-	bool LightweightMutex::tryLock()
-	{
-		return pthread_mutex_trylock( &mMutex ) == 0;
-	}
-	//-----------------------------------------------------------------------------------
-	void LightweightMutex::unlock()
-	{
-		pthread_mutex_unlock( &mMutex );
-	}
+    }
+    //-----------------------------------------------------------------------------------
+    LightweightMutex::~LightweightMutex()
+    {
+        pthread_mutex_destroy( &mMutex );
+    }
+    //-----------------------------------------------------------------------------------
+    void LightweightMutex::lock()
+    {
+        pthread_mutex_lock( &mMutex );
+    }
+    //-----------------------------------------------------------------------------------
+    bool LightweightMutex::tryLock()
+    {
+        return pthread_mutex_trylock( &mMutex ) == 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void LightweightMutex::unlock()
+    {
+        pthread_mutex_unlock( &mMutex );
+    }
 }

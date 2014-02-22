@@ -34,12 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
     template <class T> class AtomicObject {
 
         public:
@@ -98,19 +98,19 @@ namespace Ogre {
             return mField--;
         }
 
-		T operator+=(const T &add)
-		{
+        T operator+=(const T &add)
+        {
                     OGRE_LOCK_AUTO_MUTEX;
-			mField += add;
-			return mField;
-		}
+            mField += add;
+            return mField;
+        }
 
-		T operator-=(const T &sub)
-		{
+        T operator-=(const T &sub)
+        {
                     OGRE_LOCK_AUTO_MUTEX;
-			mField -= sub;
-			return mField;
-		}
+            mField -= sub;
+            return mField;
+        }
 
         protected:
 
@@ -119,8 +119,8 @@ namespace Ogre {
         volatile T mField;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

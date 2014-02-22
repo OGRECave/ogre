@@ -224,7 +224,7 @@ namespace Ogre {
 
             /// @copydoc RenderSystem::_createRenderWindows
             bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
-			RenderWindowList& createdWindows);
+            RenderWindowList& createdWindows);
 
             /// @copydoc RenderSystem::_createDepthBufferFor
             DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
@@ -505,14 +505,14 @@ namespace Ogre {
             void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
             void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
-			/// @copydoc RenderSystem::_setSceneBlending
-			void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
-			/// @copydoc RenderSystem::_setSeparateSceneBlending
-			void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
-			/// @copydoc RenderSystem::_setAlphaRejectSettings
-			void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
-			/// @copydoc RenderSystem::getDisplayMonitorCount
-			unsigned int getDisplayMonitorCount() const;
+            /// @copydoc RenderSystem::_setSceneBlending
+            void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
+            /// @copydoc RenderSystem::_setSeparateSceneBlending
+            void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
+            /// @copydoc RenderSystem::_setAlphaRejectSettings
+            void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
+            /// @copydoc RenderSystem::getDisplayMonitorCount
+            unsigned int getDisplayMonitorCount() const;
 
             /// Internal method for anisotropy validation
             GLfloat _getCurrentAnisotropy(size_t unit);

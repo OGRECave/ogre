@@ -46,8 +46,8 @@ public:
         mInfo["Category"] = "Tests";
         mInfo["Thumbnail"] = "thumb_visual_tests.png";
         mInfo["Help"] = "";
-		//This bg colour is very hard to confuse with common mistakes (i.e. black triangle on black bg)
-		mBackgroundColour = Ogre::ColourValue( 0.79f, 0.2f, 0.75f );
+        //This bg colour is very hard to confuse with common mistakes (i.e. black triangle on black bg)
+        mBackgroundColour = Ogre::ColourValue( 0.79f, 0.2f, 0.75f );
         Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
         if (!rgm.resourceGroupExists(TRANSIENT_RESOURCE_GROUP))
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
@@ -86,7 +86,7 @@ public:
     virtual void setupView()
     {
         mCamera = mSceneMgr->createCamera("MainCamera");
-		mCamera->setAutoAspectRatio( true );
+        mCamera->setAutoAspectRatio( true );
         mCamera->setNearClipDistance(0.5f);
         mCamera->setFarClipDistance(10000.f);
         mCamera->setPosition(Ogre::Vector3::ZERO);
@@ -122,7 +122,7 @@ public:
         return false;
     }
 
-	/** Default frame started callback, advances animations */
+    /** Default frame started callback, advances animations */
     virtual bool frameStarted(const Ogre::FrameEvent& evt)
     {
         for(unsigned int i = 0; i < mAnimStateList.size(); ++i)
@@ -132,21 +132,21 @@ public:
 
 protected:
 
-	/** virtual so that advanced samples such as Sample_Compositor can override this method to change the default behavior
-	 *  if setupCompositor() is overridden, be aware @mBackgroundColour will be ignored
-	 */
-	virtual void setupCompositor()
-	{
-		Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
+    /** virtual so that advanced samples such as Sample_Compositor can override this method to change the default behavior
+     *  if setupCompositor() is overridden, be aware @mBackgroundColour will be ignored
+     */
+    virtual void setupCompositor()
+    {
+        Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
-		const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
-		if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-		{
-			compositorManager->createBasicWorkspaceDef( mInfo["Title"] + " Workspace", mBackgroundColour,
-														Ogre::IdString() );
-		}
-		compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
-	}
+        const Ogre::IdString workspaceName( mInfo["Title"] + " Workspace" );
+        if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
+        {
+            compositorManager->createBasicWorkspaceDef( mInfo["Title"] + " Workspace", mBackgroundColour,
+                                                        Ogre::IdString() );
+        }
+        compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+    }
 
     // a set of frame numbers at which to trigger screenshots
     std::set<unsigned int> mScreenshotFrames;
@@ -156,7 +156,7 @@ protected:
 
     // The camera for this sample
     Ogre::Camera* mCamera;
-	Ogre::ColourValue mBackgroundColour;	// color value passed to createBasicWorkspaceDef
+    Ogre::ColourValue mBackgroundColour;    // color value passed to createBasicWorkspaceDef
 };
 
 #endif

@@ -45,58 +45,58 @@ DocManager::~DocManager()
 
 void DocManager::load(wxString& path)
 {
-	// TODO: Clear tips list
+    // TODO: Clear tips list
 
-	std::ifstream fp;
-	fp.open(path, std::ios::in | std::ios::binary);
-	if(fp)
-	{
-		DataStreamPtr stream(new FileStreamDataStream(path.c_str(), &fp, false));
+    std::ifstream fp;
+    fp.open(path, std::ios::in | std::ios::binary);
+    if(fp)
+    {
+        DataStreamPtr stream(new FileStreamDataStream(path.c_str(), &fp, false));
 
-		int index = -1;
-		String line;
-		String key;
-		while(!stream->eof())
-		{
-			line = stream->getLine();
+        int index = -1;
+        String line;
+        String key;
+        while(!stream->eof())
+        {
+            line = stream->getLine();
 
-			// Ignore comments
-			if(line.length() > 0 && line.at(0) == '#') continue;
+            // Ignore comments
+            if(line.length() > 0 && line.at(0) == '#') continue;
 
-			if(line.length() > 0 && line.at(0) == '[')
-			{
-				int endBrace = (int)line.find(']');
-				if(endBrace != -1)
-				{
-					key = line.substr(1, endBrace - 1);
-				}
-			}
-			else
-			{
-				if(mDocs.find(key) != mDocs.end())
-					mDocs[key] = mDocs[key] + "\n" + line;
-				else
-					mDocs[key] = line;
-			}
-		}
-	}
+            if(line.length() > 0 && line.at(0) == '[')
+            {
+                int endBrace = (int)line.find(']');
+                if(endBrace != -1)
+                {
+                    key = line.substr(1, endBrace - 1);
+                }
+            }
+            else
+            {
+                if(mDocs.find(key) != mDocs.end())
+                    mDocs[key] = mDocs[key] + "\n" + line;
+                else
+                    mDocs[key] = line;
+            }
+        }
+    }
 }
 
 void DocManager::addDoc(wxString& key, wxString& doc)
 {
-	mDocs[key] = doc;
+    mDocs[key] = doc;
 }
 
 void DocManager::removeDoc(wxString& key)
 {
-	DocMap::iterator it = mDocs.find(key);
-	if(it != mDocs.end()) mDocs.erase(it);
+    DocMap::iterator it = mDocs.find(key);
+    if(it != mDocs.end()) mDocs.erase(it);
 }
 
 wxString* DocManager::find(wxString& s)
 {
-	if(mDocs.find(s) != mDocs.end())
-		return &mDocs[s];
+    if(mDocs.find(s) != mDocs.end())
+        return &mDocs[s];
 
-	return NULL;
+    return NULL;
 }

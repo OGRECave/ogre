@@ -261,7 +261,7 @@ namespace Ogre {
     }
     
     bool GLESStateCacheManagerImp::activateGLTextureUnit(size_t unit)
-	{
+    {
         // Always return true for the currently bound texture unit
         if (mActiveTextureUnit == unit)
             return true;
@@ -279,7 +279,7 @@ namespace Ogre {
         {
             return false;
         }
-	}
+    }
     
 #pragma mark Blending settings
     // TODO: Store as high/low bits of a GLuint

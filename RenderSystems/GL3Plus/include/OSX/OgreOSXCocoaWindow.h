@@ -53,13 +53,13 @@ namespace Ogre {
         CVDisplayLinkRef mDisplayLink;
         NSPoint mWindowOrigin;
         CocoaWindowDelegate *mWindowDelegate;
-		CocoaContext* mContext;
+        CocoaContext* mContext;
 
         bool mActive;
         bool mClosed;
         bool mHidden;
         bool mVSync;
-		bool mHasResized;
+        bool mHasResized;
         bool mIsExternal;
         String mWindowTitle;
         bool mUseNSView;
@@ -69,14 +69,14 @@ namespace Ogre {
     public:
         CocoaWindow();
         ~CocoaWindow();
-		
-		NSView* ogreView() const { return mView; };
-		NSWindow* ogreWindow() const { return mWindow; };
-		NSOpenGLContext* nsopenGLContext() const { return mGLContext; };
-		void createWithView(OgreGL3PlusView *view);
+        
+        NSView* ogreView() const { return mView; };
+        NSWindow* ogreWindow() const { return mWindow; };
+        NSOpenGLContext* nsopenGLContext() const { return mGLContext; };
+        void createWithView(OgreGL3PlusView *view);
 
-		void create(const String& name, unsigned int width, unsigned int height,
-	            bool fullScreen, const NameValuePairList *miscParams);
+        void create(const String& name, unsigned int width, unsigned int height,
+                bool fullScreen, const NameValuePairList *miscParams);
         /** Overridden - see RenderWindow */
         void destroy(void);
         /** Overridden - see RenderWindow */
@@ -106,14 +106,14 @@ namespace Ogre {
         /** Overridden - see RenderWindow */
         virtual unsigned int getHeight(void) const;
         /** Overridden - see RenderWindow */
-		void windowMovedOrResized(void);
-		void windowResized(void);
-		void windowHasResized(void);
-		void createNewWindow(unsigned int width, unsigned int height, String title);
+        void windowMovedOrResized(void);
+        void windowResized(void);
+        void windowHasResized(void);
+        void createNewWindow(unsigned int width, unsigned int height, String title);
         void createWindowFromExternal(NSView *viewRef);
 
-		bool requiresTextureFlipping() const { return false; }		
-		void getCustomAttribute( const String& name, void* pData );
+        bool requiresTextureFlipping() const { return false; }      
+        void getCustomAttribute( const String& name, void* pData );
     };
 }
 

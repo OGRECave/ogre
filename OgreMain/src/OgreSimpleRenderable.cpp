@@ -37,11 +37,11 @@ namespace Ogre {
     uint SimpleRenderable::msGenNameCount = 0;
 
     SimpleRenderable::SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager )
- 	: MovableObject( id, objectMemoryManager )
- 	, mWorldTransform(Matrix4::IDENTITY)
- 	, mMatName("BaseWhite")
+    : MovableObject( id, objectMemoryManager )
+    , mWorldTransform(Matrix4::IDENTITY)
+    , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
- 	, mParentSceneManager(NULL)
+    , mParentSceneManager(NULL)
     {
     }
 
@@ -49,9 +49,9 @@ namespace Ogre {
     {
         mMatName = matName;
         mMaterial = MaterialManager::getSingleton().getByName(mMatName);
-		if (mMaterial.isNull())
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + mMatName,
-				"SimpleRenderable::setMaterial" );
+        if (mMaterial.isNull())
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + mMatName,
+                "SimpleRenderable::setMaterial" );
     
         // Won't load twice anyway
         mMaterial->load();
@@ -98,11 +98,11 @@ namespace Ogre {
         queue->addRenderable( this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY); 
     }
 
-	void SimpleRenderable::visitRenderables(Renderable::Visitor* visitor, 
-		bool debugRenderables)
-	{
-		visitor->visit(this, 0, false);
-	}
+    void SimpleRenderable::visitRenderables(Renderable::Visitor* visitor, 
+        bool debugRenderables)
+    {
+        visitor->visit(this, 0, false);
+    }
 
     SimpleRenderable::~SimpleRenderable()
     {

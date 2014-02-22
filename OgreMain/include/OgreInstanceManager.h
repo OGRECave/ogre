@@ -97,7 +97,7 @@ namespace Ogre
             }
         };
 
-        typedef vector<InstanceBatch*>::type		InstanceBatchVec;   //vec[batchN] = Batch
+        typedef vector<InstanceBatch*>::type        InstanceBatchVec;   //vec[batchN] = Batch
         typedef map<IdString, InstanceBatchVec>::type InstanceBatchMap; //map[materialName] = Vec
 
         typedef map<IdString, BatchSettings>::type  BatchSettingsMap;
@@ -109,7 +109,7 @@ namespace Ogre
         size_t                  mIdCount;
 #endif
         InstanceBatchVec        mDynamicBatches;
-		InstanceBatchVec        mDirtyStaticBatches;
+        InstanceBatchVec        mDirtyStaticBatches;
 
         RenderOperation         mSharedRenderOperation;
 
@@ -122,7 +122,7 @@ namespace Ogre
         SceneManager*           mSceneManager;
 
         size_t                  mMaxLookupTableInstances;
-        unsigned char			mNumCustomParams;		//Number of custom params per instance.
+        unsigned char           mNumCustomParams;       //Number of custom params per instance.
 
         /** Finds a batch with at least one free instanced entity we can use.
             If none found, creates one.
@@ -139,23 +139,23 @@ namespace Ogre
         @return The created InstancedManager for convenience
         */
         InstanceBatch* buildNewBatch( const String &materialName, SceneMemoryMgrTypes sceneType,
-										bool firstTime );
+                                        bool firstTime );
 
         /** @see defragmentBatches overload, this takes care of an array of batches
             for a specific material */
         void defragmentBatches( bool optimizeCull, vector<InstancedEntity*>::type &entities,
-								vector<Ogre::Vector4>::type &usedParams,
-								InstanceBatchVec &fragmentedBatches );
+                                vector<Ogre::Vector4>::type &usedParams,
+                                InstanceBatchVec &fragmentedBatches );
 
         /** @see setSetting. This function helps it by setting the given parameter to all batches
             in container.
         */
         void applySettingToBatches( BatchSettingId id, bool value, const InstanceBatchVec &container );
 
-		/** Called when we you use a mesh which has shared vertices, the function creates separate
-			vertex/index buffers and also recreates the bone assignments.
-		*/
-		void unshareVertices(const Ogre::MeshPtr &mesh);
+        /** Called when we you use a mesh which has shared vertices, the function creates separate
+            vertex/index buffers and also recreates the bone assignments.
+        */
+        void unshareVertices(const Ogre::MeshPtr &mesh);
 
     public:
         InstanceManager( IdString customName, SceneManager *sceneManager,
@@ -185,28 +185,28 @@ namespace Ogre
         */
         void setMaxLookupTableInstances( size_t maxLookupTableInstances );
 
-		/** Sets the number of custom parameters per instance. Some techniques (i.e. HWInstancingBasic)
-			support this, but not all of them. They also may have limitations to the max number. All
-			instancing implementations assume each instance param is a Vector4 (4 floats).
-		@remarks
-			This function cannot be called after the first batch has been created. Otherwise
-			it will raise an exception. If the technique doesn't support custom params, it will
-			raise an exception at the time of building the first InstanceBatch.
+        /** Sets the number of custom parameters per instance. Some techniques (i.e. HWInstancingBasic)
+            support this, but not all of them. They also may have limitations to the max number. All
+            instancing implementations assume each instance param is a Vector4 (4 floats).
+        @remarks
+            This function cannot be called after the first batch has been created. Otherwise
+            it will raise an exception. If the technique doesn't support custom params, it will
+            raise an exception at the time of building the first InstanceBatch.
 
-			HWInstancingBasic:
-				* Each custom params adds an additional float4 TEXCOORD.
-			HWInstancingVTF:
-				* Not implemented. (Recommendation: Implement this as an additional float4 VTF fetch)
-			TextureVTF:
-				* Not implemented. (see HWInstancingVTF's recommendation)
-			ShaderBased:
-				* Not supported.
-		@param numCustomParams Number of custom parameters each instance will have. Default: 0
-		*/
-		void setNumCustomParams( unsigned char numCustomParams );
+            HWInstancingBasic:
+                * Each custom params adds an additional float4 TEXCOORD.
+            HWInstancingVTF:
+                * Not implemented. (Recommendation: Implement this as an additional float4 VTF fetch)
+            TextureVTF:
+                * Not implemented. (see HWInstancingVTF's recommendation)
+            ShaderBased:
+                * Not supported.
+        @param numCustomParams Number of custom parameters each instance will have. Default: 0
+        */
+        void setNumCustomParams( unsigned char numCustomParams );
 
-		unsigned char getNumCustomParams() const
-		{ return mNumCustomParams; }
+        unsigned char getNumCustomParams() const
+        { return mNumCustomParams; }
 
         /** @return Instancing technique this manager was created for. Can't be changed after creation */
         InstancingTechnique getInstancingTechnique() const
@@ -224,11 +224,11 @@ namespace Ogre
         @return The max/best amount of instances per batch given the suggested size and flags
         */
         size_t getMaxOrBestNumInstancesPerBatch( const String &materialName, size_t suggestedSize,
-												 uint16 flags );
+                                                 uint16 flags );
 
         /** @copydoc SceneManager::createInstancedEntity */
-		InstancedEntity* createInstancedEntity( const String &materialName,
-												SceneMemoryMgrTypes sceneType=SCENE_DYNAMIC );
+        InstancedEntity* createInstancedEntity( const String &materialName,
+                                                SceneMemoryMgrTypes sceneType=SCENE_DYNAMIC );
 
         /** This function can be useful to improve CPU speed after having too many instances
             created, which where now removed, thus freeing many batches with zero used Instanced Entities
@@ -292,19 +292,19 @@ namespace Ogre
         /** @copydoc InstanceBatch::setStatic */
         void setBatchesAsStatic( bool bStatic );
 
-		/** Kees the batch in the dynamic batch list so that it gets updated every frame.
-			@See _removeFromDynamicBatchList
+        /** Kees the batch in the dynamic batch list so that it gets updated every frame.
+            @See _removeFromDynamicBatchList
         @param dynamicBatch
-			The batch which is now static or unused, usually same as caller.
+            The batch which is now static or unused, usually same as caller.
         */
-		void _addToDynamicBatchList( InstanceBatch *dynamicBatch );
+        void _addToDynamicBatchList( InstanceBatch *dynamicBatch );
 
-		/** Called when a previously dynamic InstanceBatch went static (@see InstanceBatch::setStatic)
-			or a dynamic batch has no InstancedEntity in use
+        /** Called when a previously dynamic InstanceBatch went static (@see InstanceBatch::setStatic)
+            or a dynamic batch has no InstancedEntity in use
         @param batch
-			The batch which is now static or unused, usually same as caller.
+            The batch which is now static or unused, usually same as caller.
         */
-		void _removeFromDynamicBatchList( InstanceBatch *batch );
+        void _removeFromDynamicBatchList( InstanceBatch *batch );
 
         /** Called by an InstanceBatch when it requests their bounds to be updated for proper culling
         @param dirtyBatch The batch which is dirty, usually same as caller.
@@ -312,11 +312,11 @@ namespace Ogre
         void _addDirtyStaticBatch( InstanceBatch *dirtyBatch );
 
 #ifdef OGRE_LEGACY_ANIMATIONS
-		/// Called by SceneManager every frame
-		void _updateAnimations(void);
+        /// Called by SceneManager every frame
+        void _updateAnimations(void);
 #endif
 
-		/** Called by SceneManager every frame from multiple threads */
+        /** Called by SceneManager every frame from multiple threads */
         void _updateDirtyBatchesThread( size_t threadIdx );
 
         /** Called by SceneManager every frame */
@@ -336,24 +336,24 @@ namespace Ogre
             multithreading or creating more instances, that's up to the user.
         */
         InstanceBatchIterator getInstanceBatchIterator( const String &materialName,
-														SceneMemoryMgrTypes sceneType ) const;
+                                                        SceneMemoryMgrTypes sceneType ) const;
     };
 
-	struct InstanceManagerCmp
-	{
-		bool operator () ( const InstanceManager *a, const InstanceManager *b ) const
-		{
-			return a->getName() < b->getName();
-		}
-		bool operator () ( const InstanceManager *a, IdString name ) const
-		{
-			return a->getName() < name;
-		}
-		bool operator () ( IdString name, const InstanceManager *a ) const
-		{
-			return name < a->getName();
-		}
-	};
+    struct InstanceManagerCmp
+    {
+        bool operator () ( const InstanceManager *a, const InstanceManager *b ) const
+        {
+            return a->getName() < b->getName();
+        }
+        bool operator () ( const InstanceManager *a, IdString name ) const
+        {
+            return a->getName() < name;
+        }
+        bool operator () ( IdString name, const InstanceManager *a ) const
+        {
+            return name < a->getName();
+        }
+    };
 
 } // namespace Ogre
 

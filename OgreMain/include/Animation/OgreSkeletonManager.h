@@ -35,46 +35,46 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Animation
-	*  @{
-	*/
-	/** Handles the management of skeleton resources.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Animation
+    *  @{
+    */
+    /** Handles the management of skeleton resources.
         @remarks
             This class deals with the runtime management of
             skeleton data; like other resource managers it handles
-			the creation of resources (in this case skeleton data).
+            the creation of resources (in this case skeleton data).
     */
-	class _OgreExport SkeletonManager : public Singleton<SkeletonManager>, public ResourceAlloc
-	{
-		typedef map<IdString, SkeletonDefPtr>::type SkeletonDefMap;
-		SkeletonDefMap mSkeletonDefs;
+    class _OgreExport SkeletonManager : public Singleton<SkeletonManager>, public ResourceAlloc
+    {
+        typedef map<IdString, SkeletonDefPtr>::type SkeletonDefMap;
+        SkeletonDefMap mSkeletonDefs;
 
     public:
         /// Constructor
-		SkeletonManager();
-		~SkeletonManager();
+        SkeletonManager();
+        ~SkeletonManager();
 
-		/** Creates a skeletondef based on an existing one from the legacy skeleton system.
-			If a skeleton def with the same name already exists, returns that one instead.
-		*/
-		SkeletonDefPtr getSkeletonDef( Skeleton *oldSkeletonBase );
+        /** Creates a skeletondef based on an existing one from the legacy skeleton system.
+            If a skeleton def with the same name already exists, returns that one instead.
+        */
+        SkeletonDefPtr getSkeletonDef( Skeleton *oldSkeletonBase );
 
-		/// Create a new skeleton or retrieves an existing one. Will throw if can't find the skeleton.
-		SkeletonDefPtr getSkeletonDef( const String &name,
-						const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+        /// Create a new skeleton or retrieves an existing one. Will throw if can't find the skeleton.
+        SkeletonDefPtr getSkeletonDef( const String &name,
+                        const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
-		/** Adds an external pointer for us to track. Throws
-			if a skeleton with the same name already exists
-		*/
-		void add( SkeletonDefPtr skeletonDef );
+        /** Adds an external pointer for us to track. Throws
+            if a skeleton with the same name already exists
+        */
+        void add( SkeletonDefPtr skeletonDef );
 
-		/** Will remove the SkeletonDef from our lists, but the memory pointer may not actually be
-			deleted, which will happen when all references to the shared object are destroyed.
-		*/
-		void remove( const IdString &name );
+        /** Will remove the SkeletonDef from our lists, but the memory pointer may not actually be
+            deleted, which will happen when all references to the shared object are destroyed.
+        */
+        void remove( const IdString &name );
 
         /** Override standard Singleton retrieval.
         @remarks
@@ -91,7 +91,7 @@ namespace Ogre {
         but the implementation stays in this single compilation unit,
         preventing link errors.
         */
-		static SkeletonManager& getSingleton(void);
+        static SkeletonManager& getSingleton(void);
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton
@@ -107,11 +107,11 @@ namespace Ogre {
         but the implementation stays in this single compilation unit,
         preventing link errors.
         */
-		static SkeletonManager* getSingletonPtr(void);
+        static SkeletonManager* getSingletonPtr(void);
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

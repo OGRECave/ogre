@@ -64,18 +64,18 @@ namespace __gnu_cxx
 #endif
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
 
     /** Utility class for manipulating Strings.  */
     class _OgreExport StringUtil
     {
-	public:
-		typedef StringStream StrStreamType;
+    public:
+        typedef StringStream StrStreamType;
 
         /** Removes any whitespace characters, be it standard space or
             TABs and so on.
@@ -96,23 +96,23 @@ namespace Ogre {
             @param
                 preserveDelims Flag to determine if delimiters should be saved as substrings
         */
-		static vector<String>::type split( const String& str, const String& delims = "\t\n ", unsigned int maxSplits = 0, bool preserveDelims = false);
+        static vector<String>::type split( const String& str, const String& delims = "\t\n ", unsigned int maxSplits = 0, bool preserveDelims = false);
 
-		/** Returns a StringVector that contains all the substrings delimited
+        /** Returns a StringVector that contains all the substrings delimited
             by the characters in the passed <code>delims</code> argument, 
-			or in the <code>doubleDelims</code> argument, which is used to include (normal) 
-			delimeters in the tokenised string. For example, "strings like this".
+            or in the <code>doubleDelims</code> argument, which is used to include (normal) 
+            delimeters in the tokenised string. For example, "strings like this".
             @param
                 delims A list of delimiter characters to split by
-			@param
+            @param
                 doubleDelims A list of double delimeters characters to tokenise by
             @param
                 maxSplits The maximum number of splits to perform (0 for unlimited splits). If this
                 parameters is > 0, the splitting process will stop after this many splits, left to right.
         */
-		static vector<String>::type tokenise( const String& str, const String& delims = "\t\n ", const String& doubleDelims = "\"", unsigned int maxSplits = 0);
+        static vector<String>::type tokenise( const String& str, const String& delims = "\t\n ", const String& doubleDelims = "\"", unsigned int maxSplits = 0);
 
-		/** Lower-cases all the characters in the string.
+        /** Lower-cases all the characters in the string.
         */
         static void toLowerCase( String& str );
 
@@ -138,17 +138,17 @@ namespace Ogre {
         /** Method for standardising paths - use forward slashes only, end with slash.
         */
         static String standardisePath( const String &init);
-		/** Returns a normalized version of a file path
-		This method can be used to make file path strings which point to the same directory  
-		but have different texts to be normalized to the same text. The function:
-		- Transforms all backward slashes to forward slashes.
-		- Removes repeating slashes.
-		- Removes initial slashes from the beginning of the path.
-		- Removes ".\" and "..\" meta directories.
-		- Sets all characters to lowercase (if requested)
-		@param init The file path to normalize.
-		@param makeLowerCase If true, transforms all characters in the string to lowercase.
-		*/
+        /** Returns a normalized version of a file path
+        This method can be used to make file path strings which point to the same directory  
+        but have different texts to be normalized to the same text. The function:
+        - Transforms all backward slashes to forward slashes.
+        - Removes repeating slashes.
+        - Removes initial slashes from the beginning of the path.
+        - Removes ".\" and "..\" meta directories.
+        - Sets all characters to lowercase (if requested)
+        @param init The file path to normalize.
+        @param makeLowerCase If true, transforms all characters in the string to lowercase.
+        */
        static String normalizeFilePath(const String& init, bool makeLowerCase = true);
 
 
@@ -160,20 +160,20 @@ namespace Ogre {
         static void splitFilename(const String& qualifiedName,
             String& outBasename, String& outPath);
 
-		/** Method for splitting a fully qualified filename into the base name,
-		extension and path.
-		@remarks
-		Path is standardised as in standardisePath
-		*/
-		static void splitFullFilename(const Ogre::String& qualifiedName, 
-			Ogre::String& outBasename, Ogre::String& outExtention, 
-			Ogre::String& outPath);
+        /** Method for splitting a fully qualified filename into the base name,
+        extension and path.
+        @remarks
+        Path is standardised as in standardisePath
+        */
+        static void splitFullFilename(const Ogre::String& qualifiedName, 
+            Ogre::String& outBasename, Ogre::String& outExtention, 
+            Ogre::String& outPath);
 
-		/** Method for splitting a filename into the base name
-		and extension.
-		*/
-		static void splitBaseFilename(const Ogre::String& fullName, 
-			Ogre::String& outBasename, Ogre::String& outExtention);
+        /** Method for splitting a filename into the base name
+        and extension.
+        */
+        static void splitBaseFilename(const Ogre::String& fullName, 
+            Ogre::String& outBasename, Ogre::String& outExtention);
 
 
         /** Simple pattern-matching routine allowing a wildcard pattern.
@@ -184,13 +184,13 @@ namespace Ogre {
         static bool match(const String& str, const String& pattern, bool caseSensitive = true);
 
 
-		/** replace all instances of a sub-string with a another sub-string.
-		@param source Source string
-		@param replaceWhat Sub-string to find and replace
-		@param replaceWithWhat Sub-string to replace with (the new sub-string)
-		@return An updated string with the sub-string replaced
-		*/
-		static const String replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat);
+        /** replace all instances of a sub-string with a another sub-string.
+        @param source Source string
+        @param replaceWhat Sub-string to find and replace
+        @param replaceWithWhat Sub-string to replace with (the new sub-string)
+        @return An updated string with the sub-string replaced
+        */
+        static const String replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat);
 
         /// Constant blank string, useful for returning by ref where local does not exist
         static const String BLANK;
@@ -199,25 +199,25 @@ namespace Ogre {
 
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
 #   if OGRE_COMP_VER < 430
-	typedef ::__gnu_cxx::hash< _StringBase > _StringHash;
+    typedef ::__gnu_cxx::hash< _StringBase > _StringHash;
 #   else
-	typedef ::std::tr1::hash< _StringBase > _StringHash;
+    typedef ::std::tr1::hash< _StringBase > _StringHash;
 #   endif
 #elif OGRE_COMPILER == OGRE_COMPILER_CLANG
 #   if defined(_LIBCPP_VERSION)
-	typedef ::std::hash< _StringBase > _StringHash;
+    typedef ::std::hash< _StringBase > _StringHash;
 #   else
-	typedef ::std::tr1::hash< _StringBase > _StringHash;
+    typedef ::std::tr1::hash< _StringBase > _StringHash;
 #   endif
 #elif OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1600 && !defined(STLPORT) // VC++ 10.0
-	typedef ::std::tr1::hash< _StringBase > _StringHash;
+    typedef ::std::tr1::hash< _StringBase > _StringHash;
 #elif !defined( _STLP_HASH_FUN_H )
-	typedef stdext::hash_compare< _StringBase, std::less< _StringBase > > _StringHash;
+    typedef stdext::hash_compare< _StringBase, std::less< _StringBase > > _StringHash;
 #else
-	typedef std::hash< _StringBase > _StringHash;
+    typedef std::hash< _StringBase > _StringHash;
 #endif 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace Ogre
 
@@ -228,11 +228,11 @@ namespace Ogre {
 #   define NOMINMAX
 #   include <windows.h>
 #   pragma pop_macro("NOMINMAX")
-#	define Ogre_OutputCString(str) ::OutputDebugStringA(str)
-#	define Ogre_OutputWString(str) ::OutputDebugStringW(str)
+#   define Ogre_OutputCString(str) ::OutputDebugStringA(str)
+#   define Ogre_OutputWString(str) ::OutputDebugStringW(str)
 #else
-#	define Ogre_OutputCString(str) std::cerr << str
-#	define Ogre_OutputWString(str) std::cerr << str
+#   define Ogre_OutputCString(str) std::cerr << str
+#   define Ogre_OutputWString(str) std::cerr << str
 #endif
 
 #endif // _String_H__

@@ -90,7 +90,7 @@ namespace Ogre {
         also that mesh sub-sections (when used in an instantiated object)
         share the same scene node as the parent.
     */
-	class _OgreExport Mesh: public Resource, public AnimationContainer
+    class _OgreExport Mesh: public Resource, public AnimationContainer
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
@@ -100,7 +100,7 @@ namespace Ogre {
 
     public:
         typedef FastArray<Real> LodValueArray;
-		typedef vector<MeshLodUsage>::type MeshLodUsageList;
+        typedef vector<MeshLodUsage>::type MeshLodUsageList;
         /// Multimap of vertex bone assignments (orders by vertex index).
         typedef multimap<size_t, VertexBoneAssignment>::type VertexBoneAssignmentList;
         typedef MapIterator<VertexBoneAssignmentList> BoneAssignmentIterator;
@@ -141,8 +141,8 @@ namespace Ogre {
 
         /// Optional linked skeleton.
         String mSkeletonName;
-		SkeletonPtr mOldSkeleton;
-		SkeletonDefPtr mSkeleton;
+        SkeletonPtr mOldSkeleton;
+        SkeletonDefPtr mSkeleton;
 
        
         VertexBoneAssignmentList mBoneAssignments;
@@ -162,8 +162,8 @@ namespace Ogre {
         String mLodStrategyName;
         bool mIsLodManual;
         ushort mNumLods;
-		MeshLodUsageList	mMeshLodUsageList;
-		LodValueArray		mLodValues;
+        MeshLodUsageList    mMeshLodUsageList;
+        LodValueArray       mLodValues;
 
         HardwareBuffer::Usage mVertexBufferUsage;
         HardwareBuffer::Usage mIndexBufferUsage;
@@ -208,8 +208,8 @@ namespace Ogre {
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
 
-		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
-									 unsigned short texCoordSetToDestroy, VertexData *vertexData );
+        void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
+                                     unsigned short texCoordSetToDestroy, VertexData *vertexData );
 
 
     public:
@@ -379,11 +379,11 @@ namespace Ogre {
         @return
             Weak reference to the skeleton - copy this if you want to hold a strong pointer.
         */
-		const SkeletonPtr& getOldSkeleton(void) const;
-		const SkeletonDefPtr& getSkeleton(void) const					{ return mSkeleton; }
+        const SkeletonPtr& getOldSkeleton(void) const;
+        const SkeletonDefPtr& getSkeleton(void) const                   { return mSkeleton; }
 
         /** Gets the name of any linked Skeleton */
-		const String& getSkeletonName(void) const;
+        const String& getSkeletonName(void) const;
         /** Initialise an animation set suitable for use with this mesh. 
         @remarks
             Only recommended for use inside the engine, not by applications.
@@ -433,10 +433,10 @@ namespace Ogre {
         */
         const VertexBoneAssignmentList& getBoneAssignments() const { return mBoneAssignments; }
 
-		void setLodStrategyName( const String &name )				{ mLodStrategyName = name; }
+        void setLodStrategyName( const String &name )               { mLodStrategyName = name; }
 
-		/// Returns the name of the Lod strategy the user lod values have been calibrated for
-		const String& getLodStrategyName(void) const				{ return mLodStrategyName; }
+        /// Returns the name of the Lod strategy the user lod values have been calibrated for
+        const String& getLodStrategyName(void) const                { return mLodStrategyName; }
 
         /** Returns the number of levels of detail that this mesh supports. 
         @remarks
@@ -585,24 +585,24 @@ namespace Ogre {
         */
         void _updateCompiledBoneAssignments(void);
 
-		/** This method collapses two texcoords into one for all submeshes where this is possible.
+        /** This method collapses two texcoords into one for all submeshes where this is possible.
         @remarks
-			Often a submesh can have two tex. coords. (i.e. TEXCOORD0 & TEXCOORD1), being both
-			composed of two floats. There are many practical reasons why it would be more convenient
-			to merge both of them into one TEXCOORD0 of 4 floats. This function does exactly that
-			The finalTexCoordSet must have enough space for the merge, or else the submesh will be
-			skipped. (i.e. you can't merge a tex. coord with 3 floats with one having 2 floats)
+            Often a submesh can have two tex. coords. (i.e. TEXCOORD0 & TEXCOORD1), being both
+            composed of two floats. There are many practical reasons why it would be more convenient
+            to merge both of them into one TEXCOORD0 of 4 floats. This function does exactly that
+            The finalTexCoordSet must have enough space for the merge, or else the submesh will be
+            skipped. (i.e. you can't merge a tex. coord with 3 floats with one having 2 floats)
 
-			finalTexCoordSet & texCoordSetToDestroy must be in the same buffer source, and must
-			be adjacent.
-		@param finalTexCoordSet The tex. coord index to merge to. Should have enough space to
-			actually work.
+            finalTexCoordSet & texCoordSetToDestroy must be in the same buffer source, and must
+            be adjacent.
+        @param finalTexCoordSet The tex. coord index to merge to. Should have enough space to
+            actually work.
         @param texCoordSetToDestroy The texture coordinate index that will disappear on
-			successful merges.
+            successful merges.
         */
-		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
+        void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
 
-		void _configureMeshLodUsage(const LodConfig& lodConfig);
+        void _configureMeshLodUsage(const LodConfig& lodConfig);
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks
@@ -934,7 +934,7 @@ namespace Ogre {
         /** Get pose list. */
         const PoseList& getPoseList(void) const;
 
-		const LodValueArray* _getLodValueArray(void) const						{ return &mLodValues; }
+        const LodValueArray* _getLodValueArray(void) const                      { return &mLodValues; }
 
     };
 

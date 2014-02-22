@@ -33,9 +33,9 @@ THE SOFTWARE.
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #include <excpt.h>      // For SEH values
-	#if _MSC_VER >= 1400
-		#include <intrin.h>
-	#endif
+    #if _MSC_VER >= 1400
+        #include <intrin.h>
+    #endif
 #elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 #include <signal.h>
 #include <setjmp.h>
@@ -88,13 +88,13 @@ namespace Ogre {
     static int _isSupportCpuid(void)
     {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-		// Visual Studio 2005 & 64-bit compilers always supports __cpuid intrinsic
-		// note that even though this is a build rather than runtime setting, all
-		// 64-bit CPUs support this so since binary is 64-bit only we're ok
-	#if _MSC_VER >= 1400 && defined(_M_X64)
-		return true;
-	#else
-		// If we can modify flag register bit 21, the cpu is supports CPUID instruction
+        // Visual Studio 2005 & 64-bit compilers always supports __cpuid intrinsic
+        // note that even though this is a build rather than runtime setting, all
+        // 64-bit CPUs support this so since binary is 64-bit only we're ok
+    #if _MSC_VER >= 1400 && defined(_M_X64)
+        return true;
+    #else
+        // If we can modify flag register bit 21, the cpu is supports CPUID instruction
         __asm
         {
             // Read EFLAG
@@ -122,7 +122,7 @@ namespace Ogre {
 
             // Return values in eax, no return statement requirement here for VC.
         }
-	#endif
+    #endif
 #elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
            return true;
@@ -156,20 +156,20 @@ namespace Ogre {
     static uint _performCpuid(int query, CpuidResult& result)
     {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
-	#if _MSC_VER >= 1400 
-		int CPUInfo[4];
-		__cpuid(CPUInfo, query);
-		result._eax = CPUInfo[0];
-		result._ebx = CPUInfo[1];
-		result._ecx = CPUInfo[2];
-		result._edx = CPUInfo[3];
-		return result._eax;
-	#else
+    #if _MSC_VER >= 1400 
+        int CPUInfo[4];
+        __cpuid(CPUInfo, query);
+        result._eax = CPUInfo[0];
+        result._ebx = CPUInfo[1];
+        result._ecx = CPUInfo[2];
+        result._edx = CPUInfo[3];
+        return result._eax;
+    #else
         __asm
         {
             mov     edi, result
             mov     eax, query
-			xor     ecx, ecx
+            xor     ecx, ecx
             cpuid
             mov     [edi]._eax, eax
             mov     [edi]._ebx, ebx
@@ -177,19 +177,19 @@ namespace Ogre {
             mov     [edi]._ecx, ecx
             // Return values in eax, no return statement requirement here for VC.
         }
-	#endif
+    #endif
 #elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
         __asm__
         (
-			"xor     %%rcx, %%rcx    \n\t"
+            "xor     %%rcx, %%rcx    \n\t"
             "cpuid": "=a" (result._eax), "=b" (result._ebx), "=c" (result._ecx), "=d" (result._edx) : "a" (query)
         );
         #else
         __asm__
         (
             "pushl  %%ebx           \n\t"
-			"xor    %%ecx, %%ecx    \n\t"
+            "xor    %%ecx, %%ecx    \n\t"
             "cpuid                  \n\t"
             "movl   %%ebx, %%edi    \n\t"
             "popl   %%ebx           \n\t"
@@ -238,12 +238,12 @@ namespace Ogre {
             exception using the (non-standard) __try/__except mechanism
             of Microsoft Visual C/C++.
         */
-		// Visual Studio 2005, Both AMD and Intel x64 support SSE
-		// note that even though this is a build rather than runtime setting, all
-		// 64-bit CPUs support this so since binary is 64-bit only we're ok
-	#if _MSC_VER >= 1400 && defined(_M_X64)
-			return true;
-	#else
+        // Visual Studio 2005, Both AMD and Intel x64 support SSE
+        // note that even though this is a build rather than runtime setting, all
+        // 64-bit CPUs support this so since binary is 64-bit only we're ok
+    #if _MSC_VER >= 1400 && defined(_M_X64)
+            return true;
+    #else
         __try
         {
             __asm orps  xmm0, xmm0
@@ -253,7 +253,7 @@ namespace Ogre {
         {
             return false;
         }
-	#endif
+    #endif
 #elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 
             return true;
@@ -405,15 +405,15 @@ namespace Ogre {
 
         return features;
     }
-	//---------------------------------------------------------------------
-	static uint32 _detectNumLogicalCores(void)
-	{
-		uint numLogicalCores = 0;
+    //---------------------------------------------------------------------
+    static uint32 _detectNumLogicalCores(void)
+    {
+        uint numLogicalCores = 0;
 
         // Supports CPUID instruction ?
         if (_isSupportCpuid())
         {
-			CpuidResult result;
+            CpuidResult result;
 
             // Has standard feature ?
             if (_performCpuid(0, result))
@@ -421,97 +421,97 @@ namespace Ogre {
                 // Check vendor strings
                 if (memcmp(&result._ebx, "GenuineIntel", 12) == 0)
                 {
-					_performCpuid(4, result);
-					numLogicalCores = ((result._eax >> 26) & 0x3f) + 1; // EAX[31:26] + 1
+                    _performCpuid(4, result);
+                    numLogicalCores = ((result._eax >> 26) & 0x3f) + 1; // EAX[31:26] + 1
                 }
                 else if (memcmp(&result._ebx, "AuthenticAMD", 12) == 0)
                 {
-					//Number of CPU cores - 1
-					_performCpuid( 0x80000008, result );
-					numLogicalCores = (result._ecx & 0xff) + 1; // EAX[7:0] + 1
+                    //Number of CPU cores - 1
+                    _performCpuid( 0x80000008, result );
+                    numLogicalCores = (result._ecx & 0xff) + 1; // EAX[7:0] + 1
                 }
-				else
-				{
-					// Check standard feature
-					_performCpuid(1, result);
-					numLogicalCores = (result._ebx >> 16) & 0xff;
-				}
+                else
+                {
+                    // Check standard feature
+                    _performCpuid(1, result);
+                    numLogicalCores = (result._ebx >> 16) & 0xff;
+                }
             }
-		}
+        }
 
-		return numLogicalCores;
-	}
+        return numLogicalCores;
+    }
     //---------------------------------------------------------------------
     static String _detectCpuIdentifier(void)
     {
-		// Supports CPUID instruction ?
-		if (_isSupportCpuid())
-		{
-			CpuidResult result;
-			uint nExIds;
-			char CPUString[0x20];
-			char CPUBrandString[0x40];
+        // Supports CPUID instruction ?
+        if (_isSupportCpuid())
+        {
+            CpuidResult result;
+            uint nExIds;
+            char CPUString[0x20];
+            char CPUBrandString[0x40];
 
-			StringUtil::StrStreamType detailedIdentStr;
+            StringUtil::StrStreamType detailedIdentStr;
 
 
-			// Has standard feature ?
-			if (_performCpuid(0, result))
-			{
-				memset(CPUString, 0, sizeof(CPUString));
-				memset(CPUBrandString, 0, sizeof(CPUBrandString));
+            // Has standard feature ?
+            if (_performCpuid(0, result))
+            {
+                memset(CPUString, 0, sizeof(CPUString));
+                memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
-				//*((int*)CPUString) = result._ebx;
+                //*((int*)CPUString) = result._ebx;
                                 memcpy(CPUString, &result._ebx, sizeof(int));
-				//*((int*)(CPUString+4)) = result._edx;
+                //*((int*)(CPUString+4)) = result._edx;
                                 memcpy(CPUString+4, &result._edx, sizeof(int));
                                 //*((int*)(CPUString+8)) = result._ecx;
                                 memcpy(CPUString+8, &result._ecx, sizeof(int));
 
-				detailedIdentStr << CPUString;
+                detailedIdentStr << CPUString;
 
-				// Calling _performCpuid with 0x80000000 as the query argument
-				// gets the number of valid extended IDs.
-				nExIds = _performCpuid(0x80000000, result);
+                // Calling _performCpuid with 0x80000000 as the query argument
+                // gets the number of valid extended IDs.
+                nExIds = _performCpuid(0x80000000, result);
 
-				for (uint i=0x80000000; i<=nExIds; ++i)
-				{
-					_performCpuid(i, result);
+                for (uint i=0x80000000; i<=nExIds; ++i)
+                {
+                    _performCpuid(i, result);
 
-					// Interpret CPU brand string and cache information.
-					if  (i == 0x80000002)
+                    // Interpret CPU brand string and cache information.
+                    if  (i == 0x80000002)
                     {
-						memcpy(CPUBrandString + 0, &result._eax, sizeof(result._eax));
-						memcpy(CPUBrandString + 4, &result._ebx, sizeof(result._ebx));
-						memcpy(CPUBrandString + 8, &result._ecx, sizeof(result._ecx));
-						memcpy(CPUBrandString + 12, &result._edx, sizeof(result._edx));
+                        memcpy(CPUBrandString + 0, &result._eax, sizeof(result._eax));
+                        memcpy(CPUBrandString + 4, &result._ebx, sizeof(result._ebx));
+                        memcpy(CPUBrandString + 8, &result._ecx, sizeof(result._ecx));
+                        memcpy(CPUBrandString + 12, &result._edx, sizeof(result._edx));
                     }
-					else if  (i == 0x80000003)
+                    else if  (i == 0x80000003)
                     {
-						memcpy(CPUBrandString + 16 + 0, &result._eax, sizeof(result._eax));
-						memcpy(CPUBrandString + 16 + 4, &result._ebx, sizeof(result._ebx));
-						memcpy(CPUBrandString + 16 + 8, &result._ecx, sizeof(result._ecx));
-						memcpy(CPUBrandString + 16 + 12, &result._edx, sizeof(result._edx));
+                        memcpy(CPUBrandString + 16 + 0, &result._eax, sizeof(result._eax));
+                        memcpy(CPUBrandString + 16 + 4, &result._ebx, sizeof(result._ebx));
+                        memcpy(CPUBrandString + 16 + 8, &result._ecx, sizeof(result._ecx));
+                        memcpy(CPUBrandString + 16 + 12, &result._edx, sizeof(result._edx));
                     }
-					else if  (i == 0x80000004)
+                    else if  (i == 0x80000004)
                     {
-						memcpy(CPUBrandString + 32 + 0, &result._eax, sizeof(result._eax));
-						memcpy(CPUBrandString + 32 + 4, &result._ebx, sizeof(result._ebx));
-						memcpy(CPUBrandString + 32 + 8, &result._ecx, sizeof(result._ecx));
-						memcpy(CPUBrandString + 32 + 12, &result._edx, sizeof(result._edx));
+                        memcpy(CPUBrandString + 32 + 0, &result._eax, sizeof(result._eax));
+                        memcpy(CPUBrandString + 32 + 4, &result._ebx, sizeof(result._ebx));
+                        memcpy(CPUBrandString + 32 + 8, &result._ecx, sizeof(result._ecx));
+                        memcpy(CPUBrandString + 32 + 12, &result._edx, sizeof(result._edx));
                     }
-				}
+                }
 
-				String brand(CPUBrandString);
-				StringUtil::trim(brand);
-				if (!brand.empty())
-					detailedIdentStr << ": " << brand;
+                String brand(CPUBrandString);
+                StringUtil::trim(brand);
+                if (!brand.empty())
+                    detailedIdentStr << ": " << brand;
 
-				return detailedIdentStr.str();
-			}
-		}
+                return detailedIdentStr.str();
+            }
+        }
 
-		return "X86";
+        return "X86";
     }
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -555,12 +555,12 @@ namespace Ogre {
         }
         return cpuID;
     }
-	//---------------------------------------------------------------------
-	static uint32 _detectNumLogicalCores(void)
-	{
-		//TODO
-		return 0;
-	}
+    //---------------------------------------------------------------------
+    static uint32 _detectNumLogicalCores(void)
+    {
+        //TODO
+        return 0;
+    }
     
 #elif OGRE_CPU == OGRE_CPU_ARM  // OGRE_CPU == OGRE_CPU_ARM
 
@@ -620,21 +620,21 @@ namespace Ogre {
 #endif
         return cpuID;
     }
-	//---------------------------------------------------------------------
-	static uint32 _detectNumLogicalCores(void)
-	{
+    //---------------------------------------------------------------------
+    static uint32 _detectNumLogicalCores(void)
+    {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Get the ARM logical CPU count
         size_t size = sizeof(size_t);
         int logicalcpu = 0;
         sysctlbyname("hw.logicalcpu", &logicalcpu, &size, NULL, 0);
 
-		return logicalcpu;
+        return logicalcpu;
 #else
-		//TODO
-		return 0;
+        //TODO
+        return 0;
 #endif
-	}
+    }
     
 #else   // OGRE_CPU == OGRE_CPU_ARM
 
@@ -648,11 +648,11 @@ namespace Ogre {
     {
         return "Unknown";
     }
-	//---------------------------------------------------------------------
-	static uint32 _detectNumLogicalCores(void)
-	{
-		return 0;
-	}
+    //---------------------------------------------------------------------
+    static uint32 _detectNumLogicalCores(void)
+    {
+        return 0;
+    }
 
 #endif  // OGRE_CPU
 
@@ -671,62 +671,62 @@ namespace Ogre {
         static const uint sFeatures = _detectCpuFeatures();
         return sFeatures;
     }
-	//---------------------------------------------------------------------
-	bool PlatformInformation::hasCpuFeature(CpuFeatures feature)
-	{
-		return (getCpuFeatures() & feature) != 0;
-	}
-	//---------------------------------------------------------------------
-	uint32 PlatformInformation::getNumLogicalCores(void)
-	{
-		static const uint32 sNumCores = _detectNumLogicalCores();
-		return sNumCores;
-	}
-	//---------------------------------------------------------------------
-	void PlatformInformation::log(Log* pLog)
-	{
-		pLog->logMessage("CPU Identifier & Features");
-		pLog->logMessage("-------------------------");
-		pLog->logMessage(
-			" *   CPU ID: " + getCpuIdentifier());
-		pLog->logMessage(
-			" *   Logical cores (excluding HyperThreaded): " +
-						StringConverter::toString( getNumLogicalCores() ) );
+    //---------------------------------------------------------------------
+    bool PlatformInformation::hasCpuFeature(CpuFeatures feature)
+    {
+        return (getCpuFeatures() & feature) != 0;
+    }
+    //---------------------------------------------------------------------
+    uint32 PlatformInformation::getNumLogicalCores(void)
+    {
+        static const uint32 sNumCores = _detectNumLogicalCores();
+        return sNumCores;
+    }
+    //---------------------------------------------------------------------
+    void PlatformInformation::log(Log* pLog)
+    {
+        pLog->logMessage("CPU Identifier & Features");
+        pLog->logMessage("-------------------------");
+        pLog->logMessage(
+            " *   CPU ID: " + getCpuIdentifier());
+        pLog->logMessage(
+            " *   Logical cores (excluding HyperThreaded): " +
+                        StringConverter::toString( getNumLogicalCores() ) );
 #if OGRE_CPU == OGRE_CPU_X86
-		if(_isSupportCpuid())
-		{
-			pLog->logMessage(
-				" *      SSE: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE), true));
-			pLog->logMessage(
-				" *     SSE2: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE2), true));
-			pLog->logMessage(
-				" *     SSE3: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE3), true));
-			pLog->logMessage(
-				" *      MMX: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MMX), true));
-			pLog->logMessage(
-				" *   MMXEXT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MMXEXT), true));
-			pLog->logMessage(
-				" *    3DNOW: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_3DNOW), true));
-			pLog->logMessage(
-				" * 3DNOWEXT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_3DNOWEXT), true));
-			pLog->logMessage(
-				" *     CMOV: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_CMOV), true));
-			pLog->logMessage(
-				" *      TSC: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_TSC), true));
-			pLog->logMessage(
-				" *      FPU: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_FPU), true));
-			pLog->logMessage(
-				" *      PRO: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_PRO), true));
-			pLog->logMessage(
-				" *       HT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_HTT), true));
-		}
+        if(_isSupportCpuid())
+        {
+            pLog->logMessage(
+                " *      SSE: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE), true));
+            pLog->logMessage(
+                " *     SSE2: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE2), true));
+            pLog->logMessage(
+                " *     SSE3: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE3), true));
+            pLog->logMessage(
+                " *      MMX: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MMX), true));
+            pLog->logMessage(
+                " *   MMXEXT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MMXEXT), true));
+            pLog->logMessage(
+                " *    3DNOW: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_3DNOW), true));
+            pLog->logMessage(
+                " * 3DNOWEXT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_3DNOWEXT), true));
+            pLog->logMessage(
+                " *     CMOV: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_CMOV), true));
+            pLog->logMessage(
+                " *      TSC: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_TSC), true));
+            pLog->logMessage(
+                " *      FPU: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_FPU), true));
+            pLog->logMessage(
+                " *      PRO: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_PRO), true));
+            pLog->logMessage(
+                " *       HT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_HTT), true));
+        }
 #elif OGRE_CPU == OGRE_CPU_ARM || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         pLog->logMessage(
-				" *     NEON: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_NEON), true));
+                " *     NEON: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_NEON), true));
 #endif
-		pLog->logMessage("-------------------------");
+        pLog->logMessage("-------------------------");
 
-	}
+    }
 
 
 }

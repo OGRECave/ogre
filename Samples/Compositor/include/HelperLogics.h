@@ -23,29 +23,29 @@ conditions of the standard open source license.
 
 class SamplePostprocessWorkspaceListener : public Ogre::CompositorWorkspaceListener
 {
-	//Heat vision's
+    //Heat vision's
     float start, end, curr;
     Ogre::Timer *timer;
 
-	int mVpWidth, mVpHeight;
-	int mBloomSize;
-	// Array params - have to pack in groups of 4 since this is how Cg generates them
-	// also prevents dependent texture read problems if ops don't require swizzle
-	float mBloomTexWeights[15][4];
-	float mBloomTexOffsetsHorz[15][4];
-	float mBloomTexOffsetsVert[15][4];
+    int mVpWidth, mVpHeight;
+    int mBloomSize;
+    // Array params - have to pack in groups of 4 since this is how Cg generates them
+    // also prevents dependent texture read problems if ops don't require swizzle
+    float mBloomTexWeights[15][4];
+    float mBloomTexOffsetsHorz[15][4];
+    float mBloomTexOffsetsVert[15][4];
 
-	void onHeatVision( Ogre::CompositorPass *pass );
-	void onGaussianBlurV( Ogre::CompositorPass *pass );
-	void onGaussianBlurH( Ogre::CompositorPass *pass );
+    void onHeatVision( Ogre::CompositorPass *pass );
+    void onGaussianBlurV( Ogre::CompositorPass *pass );
+    void onGaussianBlurH( Ogre::CompositorPass *pass );
 public:
-	SamplePostprocessWorkspaceListener();
-	~SamplePostprocessWorkspaceListener();
+    SamplePostprocessWorkspaceListener();
+    ~SamplePostprocessWorkspaceListener();
 
-	//Called when each pass is about to be executed.
-	virtual void passPreExecute( Ogre::CompositorPass *pass );
+    //Called when each pass is about to be executed.
+    virtual void passPreExecute( Ogre::CompositorPass *pass );
 
-	void windowResized( unsigned int width, unsigned int height );
+    void windowResized( unsigned int width, unsigned int height );
 };
 
 #endif

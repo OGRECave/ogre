@@ -32,11 +32,11 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	//No need to include the heavy windows.h header for something like this!
-	typedef long LONG;
-	typedef void* HANDLE;
+    //No need to include the heavy windows.h header for something like this!
+    typedef long LONG;
+    typedef void* HANDLE;
 #else
-	#include <pthread.h>
+    #include <pthread.h>
     #if defined(ANDROID) || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     typedef struct
     {
@@ -50,35 +50,35 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** A barrier is a synchronization mechanism where multiple threads wait until all
-		of them have reached the barrier sync point before continuing.
-		A fixed number of threads must be provided on initialization.
-	@remarks
-		On Windows, Synchronization Barriers weren't introduced until Windows 8 (!?!?!? No comments...)
-		Therefore, we emulate them using two Semaphores and (for performance reasons)
-	 @author
-		Matias N. Goldberg
-	*/
-	class _OgreExport Barrier
-	{
+    /** A barrier is a synchronization mechanism where multiple threads wait until all
+        of them have reached the barrier sync point before continuing.
+        A fixed number of threads must be provided on initialization.
+    @remarks
+        On Windows, Synchronization Barriers weren't introduced until Windows 8 (!?!?!? No comments...)
+        Therefore, we emulate them using two Semaphores and (for performance reasons)
+     @author
+        Matias N. Goldberg
+    */
+    class _OgreExport Barrier
+    {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		size_t					mNumThreads;
-		size_t					mIndex;
-		OGRE_ALIGNED_DECL( volatile LONG,	mLockCount,		4 );
-		HANDLE					mSemaphores[2];
+        size_t                  mNumThreads;
+        size_t                  mIndex;
+        OGRE_ALIGNED_DECL( volatile LONG,   mLockCount,     4 );
+        HANDLE                  mSemaphores[2];
 #else
-		pthread_barrier_t		mBarrier;
+        pthread_barrier_t       mBarrier;
 #endif
 
-	public:
-		Barrier( size_t threadCount );
-		~Barrier();
+    public:
+        Barrier( size_t threadCount );
+        ~Barrier();
 
-		/** When calling this function, it will block until all N threads reach this point; where
-			N is the thread count passed to the Barrier's constructor.
-		*/
-		void sync(void);
-	};
+        /** When calling this function, it will block until all N threads reach this point; where
+            N is the thread count passed to the Barrier's constructor.
+        */
+        void sync(void);
+    };
 }
 
 #endif

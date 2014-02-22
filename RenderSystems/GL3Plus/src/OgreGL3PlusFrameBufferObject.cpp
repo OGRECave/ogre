@@ -49,15 +49,15 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
         mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
 
-		// Will we need a second FBO to do multisampling?
-		if (mNumSamples)
-		{
-			OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-		}
-		else
-		{
-			mMultisampleFB = 0;
-		}
+        // Will we need a second FBO to do multisampling?
+        if (mNumSamples)
+        {
+            OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
+        }
+        else
+        {
+            mMultisampleFB = 0;
+        }
 
         // Initialise state
         mDepth.buffer=0;
@@ -72,38 +72,38 @@ namespace Ogre {
     {
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
-		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // Delete framebuffer object
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mFB));
 
-		if (mMultisampleFB)
-			OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mMultisampleFB));
+        if (mMultisampleFB)
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mMultisampleFB));
     }
     
     void GL3PlusFrameBufferObject::bindSurface(size_t attachment, const GL3PlusSurfaceDesc &target)
     {
         assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
         mColour[attachment] = target;
-		// Re-initialise
-		if(mColour[0].buffer)
-			initialise();
+        // Re-initialise
+        if(mColour[0].buffer)
+            initialise();
     }
     
     void GL3PlusFrameBufferObject::unbindSurface(size_t attachment)
     {
         assert(attachment < OGRE_MAX_MULTIPLE_RENDER_TARGETS);
         mColour[attachment].buffer = 0;
-		// Re-initialise if buffer 0 still bound
-		if(mColour[0].buffer)
-			initialise();
+        // Re-initialise if buffer 0 still bound
+        if(mColour[0].buffer)
+            initialise();
     }
     
     void GL3PlusFrameBufferObject::initialise()
     {
-		// Release depth and stencil, if they were bound
+        // Release depth and stencil, if they were bound
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
-		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // First buffer must be bound
         if(!mColour[0].buffer)
         {
@@ -112,10 +112,10 @@ namespace Ogre {
                 "GL3PlusFrameBufferObject::initialise");
         }
 
-		// If we're doing multisampling, then we need another FBO which contains a
-		// renderbuffer which is set up to multisample, and we'll blit it to the final 
-		// FBO afterwards to perform the multisample resolve. In that case, the 
-		// mMultisampleFB is bound during rendering and is the one with a depth/stencil
+        // If we're doing multisampling, then we need another FBO which contains a
+        // renderbuffer which is set up to multisample, and we'll blit it to the final 
+        // FBO afterwards to perform the multisample resolve. In that case, the 
+        // mMultisampleFB is bound during rendering and is the one with a depth/stencil
 
         // Store basic stats
         uint32 width = mColour[0].buffer->getWidth();
@@ -123,8 +123,8 @@ namespace Ogre {
         GLuint format = mColour[0].buffer->getGLFormat();
         ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
-		// Bind simple buffer to add colour attachments
-		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
+        // Bind simple buffer to add colour attachments
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
 
         // Bind all attachment points to frame buffer
         for(unsigned int x = 0; x < maxSupportedMRTs; ++x)
@@ -159,63 +159,63 @@ namespace Ogre {
             }
         }
 
-		// Now deal with depth / stencil
-		if (mMultisampleFB)
-		{
-			// Bind multisample buffer
-			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB));
+        // Now deal with depth / stencil
+        if (mMultisampleFB)
+        {
+            // Bind multisample buffer
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB));
 
-			// Create AA render buffer (colour)
-			// note, this can be shared too because we blit it to the final FBO
-			// right after the render is finished
-			mMultisampleColourBuffer = mManager->requestRenderBuffer(format, width, height, mNumSamples);
+            // Create AA render buffer (colour)
+            // note, this can be shared too because we blit it to the final FBO
+            // right after the render is finished
+            mMultisampleColourBuffer = mManager->requestRenderBuffer(format, width, height, mNumSamples);
 
-			// Attach it, because we won't be attaching below and non-multisample has
-			// actually been attached to other FBO
-			mMultisampleColourBuffer.buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0, 
-				mMultisampleColourBuffer.zoffset);
+            // Attach it, because we won't be attaching below and non-multisample has
+            // actually been attached to other FBO
+            mMultisampleColourBuffer.buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0, 
+                mMultisampleColourBuffer.zoffset);
 
-			// depth & stencil will be dealt with below
-		}
+            // depth & stencil will be dealt with below
+        }
 
         // Depth buffer is not handled here anymore.
-		// See GL3PlusFrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
+        // See GL3PlusFrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
-		// Do glDrawBuffer calls
+        // Do glDrawBuffer calls
         GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		GLsizei n=0;
-		for(unsigned int x=0; x<maxSupportedMRTs; ++x)
-		{
-			// Fill attached colour buffers
-			if(mColour[x].buffer)
-			{
+        GLsizei n=0;
+        for(unsigned int x=0; x<maxSupportedMRTs; ++x)
+        {
+            // Fill attached colour buffers
+            if(mColour[x].buffer)
+            {
                 if(getFormat() == PF_DEPTH)
                     bufs[x] = GL_DEPTH_ATTACHMENT;
                 else
                     bufs[x] = GL_COLOR_ATTACHMENT0 + x;
-				// Keep highest used buffer + 1
-				n = x+1;
-			}
-			else
-			{
-				bufs[x] = GL_NONE;
-			}
-		}
+                // Keep highest used buffer + 1
+                n = x+1;
+            }
+            else
+            {
+                bufs[x] = GL_NONE;
+            }
+        }
 
         // Drawbuffer extension supported, use it
         if(getFormat() != PF_DEPTH)
             OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
 
-		if (mMultisampleFB)
-		{
-			// we need a read buffer because we'll be blitting to mFB
-			OGRE_CHECK_GL_ERROR(glReadBuffer(bufs[0]));
-		}
-		else
-		{
-			// No read buffer, by default, if we want to read anyway we must not forget to set this.
-			OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
-		}
+        if (mMultisampleFB)
+        {
+            // we need a read buffer because we'll be blitting to mFB
+            OGRE_CHECK_GL_ERROR(glReadBuffer(bufs[0]));
+        }
+        else
+        {
+            // No read buffer, by default, if we want to read anyway we must not forget to set this.
+            OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
+        }
         
         // Check status
         GLuint status;
@@ -244,61 +244,61 @@ namespace Ogre {
     void GL3PlusFrameBufferObject::bind()
     {
         // Bind it to FBO
-		const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
-		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fb));
+        const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fb));
     }
 
-	void GL3PlusFrameBufferObject::swapBuffers()
-	{
-		if (mMultisampleFB)
-		{
+    void GL3PlusFrameBufferObject::swapBuffers()
+    {
+        if (mMultisampleFB)
+        {
             GLint oldfb = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
-			// Blit from multisample buffer to final buffer, triggers resolve
-			uint32 width = mColour[0].buffer->getWidth();
-			uint32 height = mColour[0].buffer->getHeight();
-			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mMultisampleFB));
-			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFB));
-			OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
-			// Unbind
-			OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
-		}
-	}
+            // Blit from multisample buffer to final buffer, triggers resolve
+            uint32 width = mColour[0].buffer->getWidth();
+            uint32 height = mColour[0].buffer->getHeight();
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mMultisampleFB));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFB));
+            OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+            // Unbind
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
+        }
+    }
 
-	void GL3PlusFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
-	{
-		GL3PlusDepthBuffer *glDepthBuffer = static_cast<GL3PlusDepthBuffer*>(depthBuffer);
-		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
+    void GL3PlusFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        GL3PlusDepthBuffer *glDepthBuffer = static_cast<GL3PlusDepthBuffer*>(depthBuffer);
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
 
-		if( glDepthBuffer )
-		{
-			GL3PlusRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
-			GL3PlusRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
+        if( glDepthBuffer )
+        {
+            GL3PlusRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
+            GL3PlusRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
 
             // Attach depth buffer, if it has one.
             if( depthBuf )
                 depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT, 0 );
             // Attach stencil buffer, if it has one.
             if( stencilBuf )
-				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT, 0 );
-		}
-		else
-		{
-			OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT, 0 );
+        }
+        else
+        {
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                                                           GL_RENDERBUFFER, 0));
-			OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
                                                           GL_RENDERBUFFER, 0));
-		}
-	}
-	//-----------------------------------------------------------------------------
-	void GL3PlusFrameBufferObject::detachDepthBuffer()
-	{
-		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
-		OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
-		OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+        }
+    }
+    //-----------------------------------------------------------------------------
+    void GL3PlusFrameBufferObject::detachDepthBuffer()
+    {
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB ));
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 ));
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
                                                       GL_RENDERBUFFER, 0 ));
-	}
+    }
 
     uint32 GL3PlusFrameBufferObject::getWidth()
     {
@@ -315,7 +315,7 @@ namespace Ogre {
         assert(mColour[0].buffer);
         return mColour[0].buffer->getFormat();
     }
-	GLsizei GL3PlusFrameBufferObject::getFSAA()
+    GLsizei GL3PlusFrameBufferObject::getFSAA()
     {
         return mNumSamples;
     }

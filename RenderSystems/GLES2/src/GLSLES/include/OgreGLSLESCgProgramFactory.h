@@ -39,12 +39,12 @@ namespace Ogre
     class _OgreGLES2Export GLSLESCgProgramFactory : public HighLevelGpuProgramFactory
     {
     protected:
-		static String sLanguageName;
+        static String sLanguageName;
     public:
         GLSLESCgProgramFactory();
         virtual ~GLSLESCgProgramFactory();
 
-		const String& getLanguage(void) const;
+        const String& getLanguage(void) const;
         HighLevelGpuProgram* create(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group, bool isManual, ManualResourceLoader* loader);
         void destroy(HighLevelGpuProgram* prog);
     };

@@ -31,37 +31,37 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//---------------------------------------------------------------------
-	PageContent::PageContent(PageContentFactory* creator)
-		: mCreator(creator), mParent(0)
-	{
+    //---------------------------------------------------------------------
+    PageContent::PageContent(PageContentFactory* creator)
+        : mCreator(creator), mParent(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	PageContent::~PageContent()
-	{
-		// don't call destroy(), we're not the final subclass
-	}
-	//---------------------------------------------------------------------
-	PageManager* PageContent::getManager() const
-	{
-		return mParent->getManager();
-	}
-	//---------------------------------------------------------------------
-	SceneManager* PageContent::getSceneManager() const
-	{
-		return mParent->getSceneManager();
-	}
-	//---------------------------------------------------------------------
-	const String& PageContent::getType() const
-	{
-		return mCreator->getName();
-	}
-	//---------------------------------------------------------------------
-	void PageContent::_notifyAttached(PageContentCollection* parent)
-	{
-		mParent = parent;
-	}
+    }
+    //---------------------------------------------------------------------
+    PageContent::~PageContent()
+    {
+        // don't call destroy(), we're not the final subclass
+    }
+    //---------------------------------------------------------------------
+    PageManager* PageContent::getManager() const
+    {
+        return mParent->getManager();
+    }
+    //---------------------------------------------------------------------
+    SceneManager* PageContent::getSceneManager() const
+    {
+        return mParent->getSceneManager();
+    }
+    //---------------------------------------------------------------------
+    const String& PageContent::getType() const
+    {
+        return mCreator->getName();
+    }
+    //---------------------------------------------------------------------
+    void PageContent::_notifyAttached(PageContentCollection* parent)
+    {
+        mParent = parent;
+    }
 
 }
 

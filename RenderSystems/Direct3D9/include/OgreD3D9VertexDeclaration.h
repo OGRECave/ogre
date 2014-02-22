@@ -53,38 +53,38 @@ namespace Ogre {
 
         /** See VertexDeclaration */
         void removeElement(unsigned short elem_index);
-		
-		/** See VertexDeclaration */
-		void removeElement(VertexElementSemantic semantic, unsigned short index = 0);
+        
+        /** See VertexDeclaration */
+        void removeElement(VertexElementSemantic semantic, unsigned short index = 0);
 
-		/** See VertexDeclaration */
-		void removeAllElements(void);
+        /** See VertexDeclaration */
+        void removeAllElements(void);
 
 
         /** See VertexDeclaration */
         void modifyElement(unsigned short elem_index, unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
 
-		// Called immediately after the Direct3D device has been created.
-		virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
+        // Called immediately after the Direct3D device has been created.
+        virtual void notifyOnDeviceCreate(IDirect3DDevice9* d3d9Device);
 
-		// Called before the Direct3D device is going to be destroyed.
-		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
+        // Called before the Direct3D device is going to be destroyed.
+        virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
 
         /** Gets the D3D9-specific vertex declaration. */
         IDirect3DVertexDeclaration9* getD3DVertexDeclaration(VertexDeclaration * globalDeclaration, bool useGlobalInstancingVertexBufferIsAvailable);
 
-	protected:
-		void	releaseDeclaration();
+    protected:
+        void    releaseDeclaration();
         void convertElement( const VertexElement & element, D3DVERTEXELEMENT9 & dxElement );
 
-	protected:        
-		typedef map<IDirect3DDevice9*, IDirect3DVertexDeclaration9*>::type	DeviceToDeclarationMap;
-		typedef DeviceToDeclarationMap::iterator							DeviceToDeclarationIterator;
+    protected:        
+        typedef map<IDirect3DDevice9*, IDirect3DVertexDeclaration9*>::type  DeviceToDeclarationMap;
+        typedef DeviceToDeclarationMap::iterator                            DeviceToDeclarationIterator;
 
-		DeviceToDeclarationMap		mMapDeviceToDeclaration;
-		VertexDeclaration *			mLastUsedGlobalDeclaration;
-		bool			            mUsedGlobalDeclaration;
+        DeviceToDeclarationMap      mMapDeviceToDeclaration;
+        VertexDeclaration *         mLastUsedGlobalDeclaration;
+        bool                        mUsedGlobalDeclaration;
     };
 
 }

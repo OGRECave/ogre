@@ -36,44 +36,44 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	ThreadHandle::ThreadHandle( size_t threadIdx, void *userParam ) :
-		mThread( 0 ),
-		mThreadIdx( threadIdx ),
-		mUserParam( userParam )
-	{
-	}
-	//-----------------------------------------------------------------------------------
-	ThreadHandle::~ThreadHandle()
-	{
-		if( mThread )
-			CloseHandle( mThread );
-		mThread = 0;
-	}
-	//-----------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------
+    ThreadHandle::ThreadHandle( size_t threadIdx, void *userParam ) :
+        mThread( 0 ),
+        mThreadIdx( threadIdx ),
+        mUserParam( userParam )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    ThreadHandle::~ThreadHandle()
+    {
+        if( mThread )
+            CloseHandle( mThread );
+        mThread = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
 
-	ThreadHandlePtr Threads::CreateThread( THREAD_ENTRY_POINT entryPoint, size_t threadIdx, void *param )
-	{
-		ThreadHandle *threadArg( new ThreadHandle( threadIdx, param ) );
-		ThreadHandlePtr retVal( new ThreadHandle( threadIdx, param ) );
-		HANDLE handle = ::CreateThread( 0, 0, entryPoint, threadArg, 0, 0 );
-		retVal->_setOsHandle( handle );
-		return retVal;
-	}
-	//-----------------------------------------------------------------------------------
-	void Threads::WaitForThreads( size_t numThreadHandles, const ThreadHandlePtr *threadHandles )
-	{
-		assert( numThreadHandles < 128 );
-		HANDLE hThreads[128];
-		for( size_t i=0; i<numThreadHandles; ++i )
-			hThreads[i] = threadHandles[i]->_getOsHandle();
+    ThreadHandlePtr Threads::CreateThread( THREAD_ENTRY_POINT entryPoint, size_t threadIdx, void *param )
+    {
+        ThreadHandle *threadArg( new ThreadHandle( threadIdx, param ) );
+        ThreadHandlePtr retVal( new ThreadHandle( threadIdx, param ) );
+        HANDLE handle = ::CreateThread( 0, 0, entryPoint, threadArg, 0, 0 );
+        retVal->_setOsHandle( handle );
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void Threads::WaitForThreads( size_t numThreadHandles, const ThreadHandlePtr *threadHandles )
+    {
+        assert( numThreadHandles < 128 );
+        HANDLE hThreads[128];
+        for( size_t i=0; i<numThreadHandles; ++i )
+            hThreads[i] = threadHandles[i]->_getOsHandle();
 
-		WaitForMultipleObjects( numThreadHandles, hThreads, true, INFINITE );
-	}
-	//-----------------------------------------------------------------------------------
-	void Threads::WaitForThreads( const ThreadHandleVec &threadHandles )
-	{
-		if( !threadHandles.empty() )
-			Threads::WaitForThreads( threadHandles.size(), &threadHandles[0] );
-	}
+        WaitForMultipleObjects( numThreadHandles, hThreads, true, INFINITE );
+    }
+    //-----------------------------------------------------------------------------------
+    void Threads::WaitForThreads( const ThreadHandleVec &threadHandles )
+    {
+        if( !threadHandles.empty() )
+            Threads::WaitForThreads( threadHandles.size(), &threadHandles[0] );
+    }
 }

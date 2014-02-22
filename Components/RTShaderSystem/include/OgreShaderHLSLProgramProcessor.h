@@ -46,29 +46,29 @@ namespace RTShader {
 class _OgreRTSSExport HLSLProgramProcessor : public ProgramProcessor
 {
 
-	// Interface.
-public:	
+    // Interface.
+public: 
 
-	/** Class constructor.
-	*/
-	HLSLProgramProcessor();
+    /** Class constructor.
+    */
+    HLSLProgramProcessor();
 
-	/** Class destructor */
-	virtual ~HLSLProgramProcessor();
+    /** Class destructor */
+    virtual ~HLSLProgramProcessor();
 
-	/** Return the target language of this processor. */
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
+    /** Return the target language of this processor. */
+    virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
-	/** 
-	@see ProgramProcessor::preCreateGpuPrograms
-	*/
-	virtual bool preCreateGpuPrograms(ProgramSet* programSet);
-	/** 
-	@see ProgramProcessor::postCreateGpuPrograms
-	*/
-	virtual bool postCreateGpuPrograms(ProgramSet* programSet);
+    /** 
+    @see ProgramProcessor::preCreateGpuPrograms
+    */
+    virtual bool preCreateGpuPrograms(ProgramSet* programSet);
+    /** 
+    @see ProgramProcessor::postCreateGpuPrograms
+    */
+    virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
-	static String TargetLanguage;
+    static String TargetLanguage;
 
 };
 

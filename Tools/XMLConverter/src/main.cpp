@@ -56,21 +56,21 @@ struct XmlOptions
     Real lodPercent;
     size_t lodFixed;
     size_t nuextremityPoints;
-	size_t mergeTexcoordResult;
-	size_t mergeTexcoordToDestroy;
+    size_t mergeTexcoordResult;
+    size_t mergeTexcoordToDestroy;
     bool usePercent;
     bool generateEdgeLists;
     bool generateTangents;
-	VertexElementSemantic tangentSemantic;
-	bool tangentUseParity;
-	bool tangentSplitMirrored;
-	bool tangentSplitRotated;
+    VertexElementSemantic tangentSemantic;
+    bool tangentUseParity;
+    bool tangentSplitMirrored;
+    bool tangentSplitRotated;
     bool reorganiseBuffers;
-	bool optimiseAnimations;
-	bool quietMode;
-	bool d3d;
-	bool gl;
-	Serializer::Endian endian;
+    bool optimiseAnimations;
+    bool quietMode;
+    bool d3d;
+    bool gl;
+    Serializer::Endian endian;
 };
 
 void help(void)
@@ -79,7 +79,7 @@ void help(void)
     cout << endl << "OgreXMLConvert: Converts data between XML and OGRE binary formats." << endl;
     cout << "Provided for OGRE by Steve Streeting" << endl << endl;
     cout << "Usage: OgreXMLConverter [options] sourcefile [destfile] " << endl;
-	cout << endl << "Available options:" << endl;
+    cout << endl << "Available options:" << endl;
     cout << "-i             = interactive mode - prompt for options" << endl;
     cout << "(The next 4 options are only applicable when converting XML to Mesh)" << endl;
     cout << "-l lodlevels   = number of LOD levels" << endl;
@@ -87,24 +87,24 @@ void help(void)
     cout << "-s lodstrategy = LOD strategy to use for this mesh" << endl;
     cout << "-p lodpercent  = Percentage triangle reduction amount per LOD" << endl;
     cout << "-f lodnumtris  = Fixed vertex reduction per LOD" << endl;
-	cout << "-merge [n0,n1] = Merge texcoordn0 with texcoordn1. The , separator must be" << endl;
-	cout << "                 present, otherwise only n0 is provided assuming n1 = n0+1;" << endl;
-	cout << "                 n0 and n1 must be in the same buffer source & adjacent" << endl;
-	cout << "                 to each other for the merge to work." << endl;
+    cout << "-merge [n0,n1] = Merge texcoordn0 with texcoordn1. The , separator must be" << endl;
+    cout << "                 present, otherwise only n0 is provided assuming n1 = n0+1;" << endl;
+    cout << "                 n0 and n1 must be in the same buffer source & adjacent" << endl;
+    cout << "                 to each other for the merge to work." << endl;
     cout << "-e             = DON'T generate edge lists (for stencil shadows)" << endl;
     cout << "-r             = DON'T reorganise vertex buffers to OGRE recommended format." << endl;
     cout << "-t             = Generate tangents (for normal mapping)" << endl;
-	cout << "-td [uvw|tangent]" << endl;
-	cout << "           = Tangent vertex semantic destination (default tangent)" << endl;
-	cout << "-ts [3|4]      = Tangent size (3 or 4 components, 4 includes parity, default 3)" << endl;
-	cout << "-tm            = Split tangent vertices at UV mirror points" << endl;
-	cout << "-tr            = Split tangent vertices where basis is rotated > 90 degrees" << endl;
+    cout << "-td [uvw|tangent]" << endl;
+    cout << "           = Tangent vertex semantic destination (default tangent)" << endl;
+    cout << "-ts [3|4]      = Tangent size (3 or 4 components, 4 includes parity, default 3)" << endl;
+    cout << "-tm            = Split tangent vertices at UV mirror points" << endl;
+    cout << "-tr            = Split tangent vertices where basis is rotated > 90 degrees" << endl;
     cout << "-o             = DON'T optimise out redundant tracks & keyframes" << endl;
-	cout << "-d3d           = Prefer D3D packed colour formats (default on Windows)" << endl;
-	cout << "-gl            = Prefer GL packed colour formats (default on non-Windows)" << endl;
-	cout << "-E endian      = Set endian mode 'big' 'little' or 'native' (default)" << endl;
-	cout << "-x num         = Generate no more than num eXtremes for every submesh (default 0)" << endl;
-	cout << "-q             = Quiet mode, less output" << endl;
+    cout << "-d3d           = Prefer D3D packed colour formats (default on Windows)" << endl;
+    cout << "-gl            = Prefer GL packed colour formats (default on non-Windows)" << endl;
+    cout << "-E endian      = Set endian mode 'big' 'little' or 'native' (default)" << endl;
+    cout << "-x num         = Generate no more than num eXtremes for every submesh (default 0)" << endl;
+    cout << "-q             = Quiet mode, less output" << endl;
     cout << "-log filename  = name of the log file (default: 'OgreXMLConverter.log')" << endl;
     cout << "sourcefile     = name of file to convert" << endl;
     cout << "destfile       = optional name of file to write to. If you don't" << endl;
@@ -127,19 +127,19 @@ XmlOptions parseArgs(int numArgs, char **args)
     opts.lodPercent = 20;
     opts.numLods = 0;
     opts.nuextremityPoints = 0;
-	opts.mergeTexcoordResult = 0;
-	opts.mergeTexcoordToDestroy = 0;
+    opts.mergeTexcoordResult = 0;
+    opts.mergeTexcoordToDestroy = 0;
     opts.usePercent = true;
     opts.generateEdgeLists = true;
     opts.generateTangents = false;
-	opts.tangentSemantic = VES_TANGENT;
-	opts.tangentUseParity = false;
-	opts.tangentSplitMirrored = false;
-	opts.tangentSplitRotated = false;
+    opts.tangentSemantic = VES_TANGENT;
+    opts.tangentUseParity = false;
+    opts.tangentSplitMirrored = false;
+    opts.tangentSplitRotated = false;
     opts.reorganiseBuffers = true;
-	opts.optimiseAnimations = true;
+    opts.optimiseAnimations = true;
     opts.quietMode = false;
-	opts.endian = Serializer::ENDIAN_NATIVE;
+    opts.endian = Serializer::ENDIAN_NATIVE;
 
     // ignore program name
     char* source = 0;
@@ -153,13 +153,13 @@ XmlOptions parseArgs(int numArgs, char **args)
     unOpt["-e"] = false;
     unOpt["-r"] = false;
     unOpt["-t"] = false;
-	unOpt["-tm"] = false;
-	unOpt["-tr"] = false;
+    unOpt["-tm"] = false;
+    unOpt["-tr"] = false;
     unOpt["-o"] = false;
-	unOpt["-q"] = false;
-	unOpt["-d3d"] = false;
-	unOpt["-gl"] = false;
-	unOpt["-h"] = false;
+    unOpt["-q"] = false;
+    unOpt["-d3d"] = false;
+    unOpt["-gl"] = false;
+    unOpt["-h"] = false;
     binOpt["-l"] = "";
     binOpt["-v"] = "";
     binOpt["-s"] = "Distance";
@@ -168,28 +168,28 @@ XmlOptions parseArgs(int numArgs, char **args)
     binOpt["-E"] = "";
     binOpt["-x"] = "";
     binOpt["-log"] = "OgreXMLConverter.log";
-	binOpt["-td"] = "";
-	binOpt["-ts"] = "";
-	binOpt["-merge"] = "0,0";
+    binOpt["-td"] = "";
+    binOpt["-ts"] = "";
+    binOpt["-merge"] = "0,0";
 
     int startIndex = findCommandLineOpts(numArgs, args, unOpt, binOpt);
     UnaryOptionList::iterator ui;
     BinaryOptionList::iterator bi;
 
     ui = unOpt.find("-h");
-	if (ui->second)
-	{
-		help();
+    if (ui->second)
+    {
+        help();
         exit(1);
-	}
+    }
 
-	ui = unOpt.find("-q");
-	if (ui->second)
-	{
-		opts.quietMode = true;
-	}
+    ui = unOpt.find("-q");
+    if (ui->second)
+    {
+        opts.quietMode = true;
+    }
 
-	ui = unOpt.find("-i");
+    ui = unOpt.find("-i");
     if (ui->second)
     {
         opts.interactiveMode = true;
@@ -213,31 +213,31 @@ XmlOptions parseArgs(int numArgs, char **args)
         {
             opts.generateTangents = true;
         }
-		ui = unOpt.find("-tm");
-		if (ui->second)
-		{
-			opts.tangentSplitMirrored = true;
-		}
-		ui = unOpt.find("-tr");
-		if (ui->second)
-		{
-			opts.tangentSplitRotated = true;
-		}
+        ui = unOpt.find("-tm");
+        if (ui->second)
+        {
+            opts.tangentSplitMirrored = true;
+        }
+        ui = unOpt.find("-tr");
+        if (ui->second)
+        {
+            opts.tangentSplitRotated = true;
+        }
 
-		bi = binOpt.find("-td");
-		if (!bi->second.empty())
-		{
-			if (bi->second == "uvw")
-				opts.tangentSemantic = VES_TEXTURE_COORDINATES;
-			else
-				opts.tangentSemantic = VES_TANGENT;
-		}
-		bi = binOpt.find("-ts");
-		if (!bi->second.empty())
-		{
-			if (bi->second == "4")
-				opts.tangentUseParity = true;
-		}
+        bi = binOpt.find("-td");
+        if (!bi->second.empty())
+        {
+            if (bi->second == "uvw")
+                opts.tangentSemantic = VES_TEXTURE_COORDINATES;
+            else
+                opts.tangentSemantic = VES_TANGENT;
+        }
+        bi = binOpt.find("-ts");
+        if (!bi->second.empty())
+        {
+            if (bi->second == "4")
+                opts.tangentUseParity = true;
+        }
 
         ui = unOpt.find("-o");
         if (ui->second)
@@ -245,7 +245,7 @@ XmlOptions parseArgs(int numArgs, char **args)
             opts.optimiseAnimations = false;
         }
 
-		bi = binOpt.find("-l");
+        bi = binOpt.find("-l");
         if (!bi->second.empty())
         {
             opts.numLods = StringConverter::parseInt(bi->second);
@@ -270,36 +270,36 @@ XmlOptions parseArgs(int numArgs, char **args)
             opts.usePercent = true;
         }
 
-		bi = binOpt.find("-merge");
+        bi = binOpt.find("-merge");
         if (!bi->second.empty())
         {
-			String::size_type separator = bi->second.find_first_of( "," );
-			if( separator == String::npos )
-			{
-				//Input format was "-merge 2"
-				//Assume we want to merge 2 with 3
-				opts.mergeTexcoordResult	= StringConverter::parseInt( bi->second, 0 );
-				opts.mergeTexcoordToDestroy	= opts.mergeTexcoordResult + 1;
-			}
-			else if( separator + 1 < bi->second.size() )
-			{
-				//Input format was "-merge 1,2"
-				//We want to merge 1 with 2
-				opts.mergeTexcoordResult	= StringConverter::parseInt(
-																bi->second.substr( 0, separator ), 0 );
-				opts.mergeTexcoordToDestroy = StringConverter::parseInt(
-																bi->second.substr( separator+1,
-																bi->second.size() ), 1 );
-			}
+            String::size_type separator = bi->second.find_first_of( "," );
+            if( separator == String::npos )
+            {
+                //Input format was "-merge 2"
+                //Assume we want to merge 2 with 3
+                opts.mergeTexcoordResult    = StringConverter::parseInt( bi->second, 0 );
+                opts.mergeTexcoordToDestroy = opts.mergeTexcoordResult + 1;
+            }
+            else if( separator + 1 < bi->second.size() )
+            {
+                //Input format was "-merge 1,2"
+                //We want to merge 1 with 2
+                opts.mergeTexcoordResult    = StringConverter::parseInt(
+                                                                bi->second.substr( 0, separator ), 0 );
+                opts.mergeTexcoordToDestroy = StringConverter::parseInt(
+                                                                bi->second.substr( separator+1,
+                                                                bi->second.size() ), 1 );
+            }
         }
-		else
-		{
-			//Very rare to reach here.
-			//Input format was "-merge"
-			//Assume we want to merge 0 with 1
-			opts.mergeTexcoordResult = 0;
-			opts.mergeTexcoordResult = 1;
-		}
+        else
+        {
+            //Very rare to reach here.
+            //Input format was "-merge"
+            //Assume we want to merge 0 with 1
+            opts.mergeTexcoordResult = 0;
+            opts.mergeTexcoordResult = 1;
+        }
 
 
         bi = binOpt.find("-f");
@@ -332,20 +332,20 @@ XmlOptions parseArgs(int numArgs, char **args)
                 opts.endian = Serializer::ENDIAN_NATIVE;
         }
 
-		ui = unOpt.find("-d3d");
-		if (ui->second)
-		{
-			opts.d3d = true;
-		}
+        ui = unOpt.find("-d3d");
+        if (ui->second)
+        {
+            opts.d3d = true;
+        }
 
-		ui = unOpt.find("-gl");
-		if (ui->second)
-		{
-			opts.gl = true;
-			opts.d3d = false;
-		}
+        ui = unOpt.find("-gl");
+        if (ui->second)
+        {
+            opts.gl = true;
+            opts.d3d = false;
+        }
 
-	}
+    }
     // Source / dest
     if (numArgs > startIndex)
         source = args[startIndex];
@@ -365,9 +365,9 @@ XmlOptions parseArgs(int numArgs, char **args)
     }
     // Work out what kind of conversion this is
     opts.source = source;
-	Ogre::vector<String>::type srcparts = StringUtil::split(opts.source, ".");
+    Ogre::vector<String>::type srcparts = StringUtil::split(opts.source, ".");
     String& ext = srcparts.back();
-	StringUtil::toLowerCase(ext);
+    StringUtil::toLowerCase(ext);
     opts.sourceExt = ext;
 
     if (!dest)
@@ -389,13 +389,13 @@ XmlOptions parseArgs(int numArgs, char **args)
     {
         opts.dest = dest;
     }
-	Ogre::vector<String>::type dstparts = StringUtil::split(opts.dest, ".");
+    Ogre::vector<String>::type dstparts = StringUtil::split(opts.dest, ".");
     ext = dstparts.back();
-	StringUtil::toLowerCase(ext);
+    StringUtil::toLowerCase(ext);
     opts.destExt = ext;
 
     if (!opts.quietMode) 
-	{
+    {
         cout << endl;
         cout << "-- OPTIONS --" << endl;
         cout << "source file      = " << opts.source << endl;
@@ -424,13 +424,13 @@ XmlOptions parseArgs(int numArgs, char **args)
             cout << "Generate extremes per submesh = " << opts.nuextremityPoints << endl;
         cout << "Generate edge lists  = " << opts.generateEdgeLists << endl;
         cout << "Generate tangents = " << opts.generateTangents << endl;
-		cout << " semantic = " << (opts.tangentSemantic == VES_TANGENT? "TANGENT" : "TEXCOORD") << endl;
-		cout << " parity = " << opts.tangentUseParity << endl;
-		cout << " split mirror = " << opts.tangentSplitMirrored << endl;
-		cout << " split rotated = " << opts.tangentSplitRotated << endl;
+        cout << " semantic = " << (opts.tangentSemantic == VES_TANGENT? "TANGENT" : "TEXCOORD") << endl;
+        cout << " parity = " << opts.tangentUseParity << endl;
+        cout << " split mirror = " << opts.tangentSplitMirrored << endl;
+        cout << " split rotated = " << opts.tangentSplitRotated << endl;
         cout << "Reorganise vertex buffers = " << opts.reorganiseBuffers << endl;
-    	cout << "Optimise animations = " << opts.optimiseAnimations << endl;
-    	
+        cout << "Optimise animations = " << opts.optimiseAnimations << endl;
+        
         cout << "-- END OPTIONS --" << endl;
         cout << endl;
     }
@@ -500,17 +500,17 @@ void XMLToBinary(XmlOptions opts)
         delete doc;
         MeshPtr newMesh = MeshManager::getSingleton().createManual("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		VertexElementType colourElementType;
-		if (opts.d3d)
-			colourElementType = VET_COLOUR_ARGB;
-		else
-			colourElementType = VET_COLOUR_ABGR;
+        VertexElementType colourElementType;
+        if (opts.d3d)
+            colourElementType = VET_COLOUR_ARGB;
+        else
+            colourElementType = VET_COLOUR_ABGR;
 
         xmlMeshSerializer->importMesh(opts.source, colourElementType, newMesh.getPointer());
 
         // Re-jig the buffers?
-		// Make sure animation types are up to date first
-		newMesh->_determineAnimationTypes();
+        // Make sure animation types are up to date first
+        newMesh->_determineAnimationTypes();
         if (opts.reorganiseBuffers)
         {
             logMgr->logMessage("Reorganising vertex buffers to automatic layout...");
@@ -537,7 +537,7 @@ void XMLToBinary(XmlOptions opts)
                 SubMesh* sm = smIt.getNext();
                 if (!sm->useSharedVertices)
                 {
-					const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
+                    const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
 
                     // Automatic
                     VertexDeclaration* newDcl = 
@@ -580,7 +580,7 @@ void XMLToBinary(XmlOptions opts)
                 while (response == "")
                 {
                     cin >> response;
-					StringUtil::toLowerCase(response);
+                    StringUtil::toLowerCase(response);
                     if (response == "u")
                     {
                         // Do nothing
@@ -608,7 +608,7 @@ void XMLToBinary(XmlOptions opts)
                 while (response == "")
                 {
                     cin >> response;
-					StringUtil::toLowerCase(response);
+                    StringUtil::toLowerCase(response);
                     if (response == "n")
                     {
                         // Do nothing
@@ -708,7 +708,7 @@ void XMLToBinary(XmlOptions opts)
 
             }
 
-			newMesh->setLodStrategyName( opts.lodStrategy );
+            newMesh->setLodStrategyName( opts.lodStrategy );
             ProgressiveMeshGenerator pm;
             pm.generateLodLevels(lodConfig);
         }
@@ -760,7 +760,7 @@ void XMLToBinary(XmlOptions opts)
         if (opts.generateEdgeLists)
         {
             if (!opts.quietMode) 
-			{
+            {
                 std::cout << "Generating edge lists...." << std::endl;
             }
             newMesh->buildEdgeList();
@@ -810,18 +810,18 @@ void XMLToBinary(XmlOptions opts)
             if (opts.generateTangents)
             {
                 if (!opts.quietMode) 
-				{
+                {
                     std::cout << "Generating tangent vectors...." << std::endl;
                 }
                 newMesh->buildTangentVectors(opts.tangentSemantic, srcTex, destTex, 
-					opts.tangentSplitMirrored, opts.tangentSplitRotated, opts.tangentUseParity);
+                    opts.tangentSplitMirrored, opts.tangentSplitRotated, opts.tangentUseParity);
             }
         }
 
-		if( opts.mergeTexcoordResult != opts.mergeTexcoordToDestroy )
-		{
-			newMesh->mergeAdjacentTexcoords( opts.mergeTexcoordResult, opts.mergeTexcoordToDestroy );
-		}
+        if( opts.mergeTexcoordResult != opts.mergeTexcoordToDestroy )
+        {
+            newMesh->mergeAdjacentTexcoords( opts.mergeTexcoordResult, opts.mergeTexcoordToDestroy );
+        }
 
         if (opts.nuextremityPoints)
         {
@@ -841,17 +841,17 @@ void XMLToBinary(XmlOptions opts)
     else if (!stricmp(root->Value(), "skeleton"))
     {
         delete doc;
-		SkeletonPtr newSkel = OldSkeletonManager::getSingleton().create("conversion",
+        SkeletonPtr newSkel = OldSkeletonManager::getSingleton().create("conversion",
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.getPointer());
-		if (opts.optimiseAnimations)
-		{
-			newSkel->optimiseAllAnimations();
-		}
+        if (opts.optimiseAnimations)
+        {
+            newSkel->optimiseAllAnimations();
+        }
         skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
 
         // Clean up the conversion skeleton
-		OldSkeletonManager::getSingleton().remove("conversion");
+        OldSkeletonManager::getSingleton().remove("conversion");
     }
     else
     {
@@ -866,12 +866,12 @@ void skeletonToXML(XmlOptions opts)
     std::ifstream ifs;
     ifs.open(opts.source.c_str(), std::ios_base::in | std::ios_base::binary);
     if (ifs.bad())
-	{
-		cout << "Unable to load file " << opts.source << endl;
-		exit(1);
-	}
+    {
+        cout << "Unable to load file " << opts.source << endl;
+        exit(1);
+    }
 
-	SkeletonPtr skel = OldSkeletonManager::getSingleton().create("conversion",
+    SkeletonPtr skel = OldSkeletonManager::getSingleton().create("conversion",
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     // pass false for freeOnClose to FileStreamDataStream since ifs is created locally on stack
@@ -881,7 +881,7 @@ void skeletonToXML(XmlOptions opts)
     xmlSkeletonSerializer->exportSkeleton(skel.getPointer(), opts.dest);
 
     // Clean up the conversion skeleton
-	OldSkeletonManager::getSingleton().remove("conversion");
+    OldSkeletonManager::getSingleton().remove("conversion");
 }
 
 int main(int numargs, char** args)
@@ -892,62 +892,62 @@ int main(int numargs, char** args)
         return -1;
     }
 
-	// Assume success
-	int retCode = 0;
+    // Assume success
+    int retCode = 0;
 
-	try 
-	{
-		logMgr = new LogManager();
+    try 
+    {
+        logMgr = new LogManager();
 
         // this log catches output from the parseArgs call and routes it to stdout only
-		logMgr->createLog("Temporary log", false, true, true); 
+        logMgr->createLog("Temporary log", false, true, true); 
 
-		XmlOptions opts = parseArgs(numargs, args);
+        XmlOptions opts = parseArgs(numargs, args);
         // use the log specified by the cmdline params
         logMgr->setDefaultLog(logMgr->createLog(opts.logFile, false, !opts.quietMode)); 
         // get rid of the temporary log as we use the new log now
-		logMgr->destroyLog("Temporary log");
+        logMgr->destroyLog("Temporary log");
 
-		rgm = new ResourceGroupManager();
-		mth = new Math();
+        rgm = new ResourceGroupManager();
+        mth = new Math();
         lodMgr = new LodStrategyManager();
-		meshMgr = new MeshManager();
-		matMgr = new MaterialManager();
-		matMgr->initialise();
-		skelMgr = new OldSkeletonManager();
-		meshSerializer = new MeshSerializer();
-		xmlMeshSerializer = new XMLMeshSerializer();
-		skeletonSerializer = new SkeletonSerializer();
-		xmlSkeletonSerializer = new XMLSkeletonSerializer();
-		bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
+        meshMgr = new MeshManager();
+        matMgr = new MaterialManager();
+        matMgr->initialise();
+        skelMgr = new OldSkeletonManager();
+        meshSerializer = new MeshSerializer();
+        xmlMeshSerializer = new XMLMeshSerializer();
+        skeletonSerializer = new SkeletonSerializer();
+        xmlSkeletonSerializer = new XMLSkeletonSerializer();
+        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
 
 
 
-		if (opts.sourceExt == "mesh")
-		{
-			meshToXML(opts);
-		}
-		else if (opts.sourceExt == "skeleton")
-		{
-			skeletonToXML(opts);
-		}
-		else if (opts.sourceExt == "xml")
-		{
-			XMLToBinary(opts);
-		}
-		else
-		{
-			cout << "Unknown input type.\n";
-			retCode = 1;
-		}
+        if (opts.sourceExt == "mesh")
+        {
+            meshToXML(opts);
+        }
+        else if (opts.sourceExt == "skeleton")
+        {
+            skeletonToXML(opts);
+        }
+        else if (opts.sourceExt == "xml")
+        {
+            XMLToBinary(opts);
+        }
+        else
+        {
+            cout << "Unknown input type.\n";
+            retCode = 1;
+        }
 
-	}
-	catch(Exception& e)
-	{
-		cerr << "FATAL ERROR: " << e.getDescription() << std::endl;
-		cerr << "ABORTING!" << std::endl;
-		retCode = 1;
-	}
+    }
+    catch(Exception& e)
+    {
+        cerr << "FATAL ERROR: " << e.getDescription() << std::endl;
+        cerr << "ABORTING!" << std::endl;
+        retCode = 1;
+    }
 
     Pass::processPendingPassUpdates(); // make sure passes are cleaned up
 
@@ -958,7 +958,7 @@ int main(int numargs, char** args)
     delete skelMgr;
     delete matMgr;
     delete meshMgr;
-	delete bufferManager;
+    delete bufferManager;
     delete lodMgr;
     delete mth;
     delete rgm;

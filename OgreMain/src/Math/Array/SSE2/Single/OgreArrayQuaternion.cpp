@@ -34,8 +34,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	const ArrayQuaternion ArrayQuaternion::ZERO( _mm_setzero_ps(), _mm_setzero_ps(), _mm_setzero_ps(), _mm_setzero_ps() );
-	const ArrayQuaternion ArrayQuaternion::IDENTITY( _mm_set_ps1( 1.0f ), _mm_setzero_ps(), _mm_setzero_ps(), _mm_setzero_ps() );
+    const ArrayQuaternion ArrayQuaternion::ZERO( _mm_setzero_ps(), _mm_setzero_ps(), _mm_setzero_ps(), _mm_setzero_ps() );
+    const ArrayQuaternion ArrayQuaternion::IDENTITY( _mm_set_ps1( 1.0f ), _mm_setzero_ps(), _mm_setzero_ps(), _mm_setzero_ps() );
 }
 
 #endif

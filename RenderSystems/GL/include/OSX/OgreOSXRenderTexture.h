@@ -45,12 +45,12 @@ namespace Ogre
 
     protected:
         void createPBuffer();
-		void destroyPBuffer();
+        void destroyPBuffer();
 
-	private:
-		AGLPbuffer mPBuffer;
-		AGLContext mAGLContext;
-		OSXCarbonContext* mContext;
+    private:
+        AGLPbuffer mPBuffer;
+        AGLContext mAGLContext;
+        OSXCarbonContext* mContext;
     };
 }
 #endif

@@ -40,23 +40,23 @@ class Project;
 class MaterialPage : public wxWizardPageSimple
 {
 public:
-	MaterialPage(wxWizard* parent);
-	virtual ~MaterialPage();
+    MaterialPage(wxWizard* parent);
+    virtual ~MaterialPage();
 
-	void getName(wxString& name) const;
-	Project* getProject() const;
-	void setProject(Project* project);
+    void getName(wxString& name) const;
+    Project* getProject() const;
+    void setProject(Project* project);
 
 protected:
-	void createPage();
+    void createPage();
 
-	wxBoxSizer* mSizer;
-	wxStaticText* mProjectLabel;
-	wxComboBox* mProjectComboBox;
-	wxStaticText* mNameLabel;
-	wxTextCtrl* mNameText;
+    wxBoxSizer* mSizer;
+    wxStaticText* mProjectLabel;
+    wxComboBox* mProjectComboBox;
+    wxStaticText* mNameLabel;
+    wxTextCtrl* mNameText;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _MATERIALPAGE_H_

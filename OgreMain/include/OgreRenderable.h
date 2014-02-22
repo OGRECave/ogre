@@ -352,7 +352,7 @@ namespace Ogre {
             You can use it to associate one or more custom objects with this class instance.
         @see UserObjectBindings::setUserAny.
         */
-        UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
+        UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
 
         /** Return an instance of user objects binding associated with this class.
             You can use it to associate one or more custom objects with this class instance.

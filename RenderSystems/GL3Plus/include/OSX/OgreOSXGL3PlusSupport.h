@@ -38,51 +38,51 @@ namespace Ogre
 class OSXGL3PlusSupport : public GL3PlusSupport
 {
 public:
-	OSXGL3PlusSupport();
-	~OSXGL3PlusSupport();
+    OSXGL3PlusSupport();
+    ~OSXGL3PlusSupport();
 
-	/**
-	* Add any special config values to the system.
-	* Must have a "Full Screen" value that is a bool and a "Video Mode" value
-	* that is a string in the form of wxh
-	*/
-	void addConfig( void );
+    /**
+    * Add any special config values to the system.
+    * Must have a "Full Screen" value that is a bool and a "Video Mode" value
+    * that is a string in the form of wxh
+    */
+    void addConfig( void );
 
-	/**
-	* Make sure all the extra options are valid
-	*/
-	String validateConfig( void );
+    /**
+    * Make sure all the extra options are valid
+    */
+    String validateConfig( void );
 
-	/// @copydoc GL3PlusSupport::createWindow
-	RenderWindow* createWindow( bool autoCreateWindow, GL3PlusRenderSystem* renderSystem, const String& windowTitle );
-	
-	/// @copydoc RenderSystem::createRenderWindow
-	virtual RenderWindow* newWindow( const String &name, unsigned int width, unsigned int height, 
-		bool fullScreen, const NameValuePairList *miscParams = 0 );
-	
-	/**
-	* Start anything special
-	*/
-	void start();
+    /// @copydoc GL3PlusSupport::createWindow
+    RenderWindow* createWindow( bool autoCreateWindow, GL3PlusRenderSystem* renderSystem, const String& windowTitle );
+    
+    /// @copydoc RenderSystem::createRenderWindow
+    virtual RenderWindow* newWindow( const String &name, unsigned int width, unsigned int height, 
+        bool fullScreen, const NameValuePairList *miscParams = 0 );
+    
+    /**
+    * Start anything special
+    */
+    void start();
 
-	/**
-	* Stop anything special
-	*/
-	void stop();
+    /**
+    * Stop anything special
+    */
+    void stop();
 
-	/**
-	* Get the address of a function
-	*/
-	void* getProcAddress( const char *name );
-	void* getProcAddress( const String& procname );
+    /**
+    * Get the address of a function
+    */
+    void* getProcAddress( const char *name );
+    void* getProcAddress( const String& procname );
 
-	virtual bool supportsPBuffers();
-	
-	// Core Foundation Array callback function for sorting, must be static for the function ptr
-	static CFComparisonResult _compareModes (const void *val1, const void *val2, void *context);
-	// Core Fondation Dictionary helper functions, also static for ease of use in above static
-	static Boolean _getDictionaryBoolean(CFDictionaryRef dict, const void* key);
-	static long _getDictionaryLong(CFDictionaryRef dict, const void* key);
+    virtual bool supportsPBuffers();
+    
+    // Core Foundation Array callback function for sorting, must be static for the function ptr
+    static CFComparisonResult _compareModes (const void *val1, const void *val2, void *context);
+    // Core Fondation Dictionary helper functions, also static for ease of use in above static
+    static Boolean _getDictionaryBoolean(CFDictionaryRef dict, const void* key);
+    static long _getDictionaryLong(CFDictionaryRef dict, const void* key);
 
 }; // class OSXGL3PlusSupport
 

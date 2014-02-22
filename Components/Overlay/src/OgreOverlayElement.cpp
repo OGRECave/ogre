@@ -80,8 +80,8 @@ namespace Ogre {
       , mInitialised(false)
       , mSourceTemplate(0)
     {
-		// default overlays to preserve their own detail level
-		mPolygonModeOverrideable = false;
+        // default overlays to preserve their own detail level
+        mPolygonModeOverrideable = false;
 
         // use identity projection and view matrices
         mUseIdentityProjection = true;
@@ -90,11 +90,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     OverlayElement::~OverlayElement()
     {
-		if (mParent)
-		{
-			mParent->removeChild(mName);
-			mParent = 0;
-		}
+        if (mParent)
+        {
+            mParent->removeChild(mName);
+            mParent = 0;
+        }
     }
     //---------------------------------------------------------------------
     const String& OverlayElement::getName(void) const
@@ -167,12 +167,12 @@ namespace Ogre {
     {
         if (mMetricsMode != GMM_RELATIVE)
         {
-			return mPixelWidth;
-		}
-		else
-		{
-        	return mWidth;
-		}
+            return mPixelWidth;
+        }
+        else
+        {
+            return mWidth;
+        }
     }
     //---------------------------------------------------------------------
     void OverlayElement::setHeight(Real height)
@@ -193,12 +193,12 @@ namespace Ogre {
     {
         if (mMetricsMode != GMM_RELATIVE)
         {
-			return mPixelHeight;
-		}
-		else
-		{
-			return mHeight;
-		}
+            return mPixelHeight;
+        }
+        else
+        {
+            return mHeight;
+        }
     }
     //---------------------------------------------------------------------
     void OverlayElement::setLeft(Real left)
@@ -219,12 +219,12 @@ namespace Ogre {
     {
         if (mMetricsMode != GMM_RELATIVE)
         {
-			return mPixelLeft;
-		}
-		else
-		{
-        	return mLeft;
-		}
+            return mPixelLeft;
+        }
+        else
+        {
+            return mLeft;
+        }
     }
     //---------------------------------------------------------------------
     void OverlayElement::setTop(Real top)
@@ -246,12 +246,12 @@ namespace Ogre {
     {
         if (mMetricsMode != GMM_RELATIVE)
         {
-			return mPixelTop;
-		}
-		else
-		{
-	        return mTop;
-		}
+            return mPixelTop;
+        }
+        else
+        {
+            return mTop;
+        }
     }
     //---------------------------------------------------------------------
     void OverlayElement::_setLeft(Real left)
@@ -320,21 +320,21 @@ namespace Ogre {
     void OverlayElement::setMaterialName(const String& matName)
     {
         mMaterialName = matName;
-		if (matName != StringUtil::BLANK)
-		{
-			mMaterial = MaterialManager::getSingleton().getByName(matName);
-			if (mMaterial.isNull())
-				OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + matName,
-					"OverlayElement::setMaterialName" );
-			mMaterial->load();
-			// Set some prerequisites to be sure
-			mMaterial->setLightingEnabled(false);
-			mMaterial->setDepthCheckEnabled(false);
-		}
-		else
-		{
-			mMaterial.setNull();
-		}
+        if (matName != StringUtil::BLANK)
+        {
+            mMaterial = MaterialManager::getSingleton().getByName(matName);
+            if (mMaterial.isNull())
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + matName,
+                    "OverlayElement::setMaterialName" );
+            mMaterial->load();
+            // Set some prerequisites to be sure
+            mMaterial->setLightingEnabled(false);
+            mMaterial->setDepthCheckEnabled(false);
+        }
+        else
+        {
+            mMaterial.setNull();
+        }
     }
     //---------------------------------------------------------------------
     const MaterialPtr& OverlayElement::getMaterial(void) const
@@ -347,10 +347,10 @@ namespace Ogre {
         mOverlay->_getWorldTransforms(xform);
     }
     //---------------------------------------------------------------------
-	void OverlayElement::_positionsOutOfDate(void)
-	{
-		mGeomPositionsOutOfDate = true;
-	}
+    void OverlayElement::_positionsOutOfDate(void)
+    {
+        mGeomPositionsOutOfDate = true;
+    }
     //---------------------------------------------------------------------
     void OverlayElement::_update(void)
     {
@@ -514,10 +514,10 @@ namespace Ogre {
         mParent = parent;
         mOverlay = overlay;
 
-		if (mOverlay && mOverlay->isInitialised() && !mInitialised)
-		{
-			initialise();
-		}
+        if (mOverlay && mOverlay->isInitialised() && !mInitialised)
+        {
+            initialise();
+        }
 
         mDerivedOutOfDate = true;
     }
@@ -539,16 +539,16 @@ namespace Ogre {
         }
         return mDerivedTop;
     }
-	//---------------------------------------------------------------------
-	Real OverlayElement::_getRelativeWidth(void)
-	{
-		return mWidth;
-	}
-	//---------------------------------------------------------------------
-	Real OverlayElement::_getRelativeHeight(void)
-	{
-		return mHeight;
-	}
+    //---------------------------------------------------------------------
+    Real OverlayElement::_getRelativeWidth(void)
+    {
+        return mWidth;
+    }
+    //---------------------------------------------------------------------
+    Real OverlayElement::_getRelativeHeight(void)
+    {
+        return mHeight;
+    }
     //---------------------------------------------------------------------    
     void OverlayElement::_getClippingRegion(RealRect &clippingRegion)
     {
@@ -562,7 +562,7 @@ namespace Ogre {
     ushort OverlayElement::_notifyZOrder(ushort newZOrder)
     {
         mZOrder = newZOrder;
-		return mZOrder + 1;
+        return mZOrder + 1;
     }
     //---------------------------------------------------------------------
     void OverlayElement::_notifyWorldTransforms(const Matrix4& xform)
@@ -624,12 +624,12 @@ namespace Ogre {
             queue->addRenderable(this, RENDER_QUEUE_OVERLAY, mZOrder);
         }      
     }
-	//---------------------------------------------------------------------
-	void OverlayElement::visitRenderables(Renderable::Visitor* visitor, 
-		bool debugRenderables)
-	{
-		visitor->visit(this, 0, false);
-	}
+    //---------------------------------------------------------------------
+    void OverlayElement::visitRenderables(Renderable::Visitor* visitor, 
+        bool debugRenderables)
+    {
+        visitor->visit(this, 0, false);
+    }
     //-----------------------------------------------------------------------
     void OverlayElement::addBaseParameters(void)    
     {
@@ -683,7 +683,7 @@ namespace Ogre {
         _positionsOutOfDate();
     }
     //-----------------------------------------------------------------------
-	const DisplayString& OverlayElement::getCaption() const
+    const DisplayString& OverlayElement::getCaption() const
     {
         return mCaption;
     }
@@ -709,9 +709,9 @@ namespace Ogre {
                 vpWidth = (Real) (oMgr.getViewportWidth());
                 vpHeight = (Real) (oMgr.getViewportHeight());
 
-				// cope with temporarily zero dimensions, avoid divide by zero
-				vpWidth = vpWidth == 0.0f? 1.0f : vpWidth;
-				vpHeight = vpHeight == 0.0f? 1.0f : vpHeight;
+                // cope with temporarily zero dimensions, avoid divide by zero
+                vpWidth = vpWidth == 0.0f? 1.0f : vpWidth;
+                vpHeight = vpHeight == 0.0f? 1.0f : vpHeight;
 
                 mPixelScaleX = 1.0f / vpWidth;
                 mPixelScaleY = 1.0f / vpHeight;
@@ -794,53 +794,53 @@ namespace Ogre {
         return mVertAlign;
     }
     //-----------------------------------------------------------------------    
-	bool OverlayElement::contains(Real x, Real y) const
-	{
-		return x >= mClippingRegion.left && x <= mClippingRegion.right && y >= mClippingRegion.top && y <= mClippingRegion.bottom;
-	}
+    bool OverlayElement::contains(Real x, Real y) const
+    {
+        return x >= mClippingRegion.left && x <= mClippingRegion.right && y >= mClippingRegion.top && y <= mClippingRegion.bottom;
+    }
     //-----------------------------------------------------------------------
-	OverlayElement* OverlayElement::findElementAt(Real x, Real y) 		// relative to parent
-	{
-		OverlayElement* ret = NULL;
-		if (contains(x , y ))
-		{
-			ret = this;
-		}
-		return ret;
-	}
+    OverlayElement* OverlayElement::findElementAt(Real x, Real y)       // relative to parent
+    {
+        OverlayElement* ret = NULL;
+        if (contains(x , y ))
+        {
+            ret = this;
+        }
+        return ret;
+    }
     //-----------------------------------------------------------------------
-	OverlayContainer* OverlayElement::getParent() 
-	{ 
-		return mParent;		
-	}
+    OverlayContainer* OverlayElement::getParent() 
+    { 
+        return mParent;     
+    }
     //-----------------------------------------------------------------------
     void OverlayElement::copyFromTemplate(OverlayElement* templateOverlay)
-	{
-		templateOverlay->copyParametersTo(this);
+    {
+        templateOverlay->copyParametersTo(this);
         mSourceTemplate = templateOverlay ;
-		return;
-	}
+        return;
+    }
     //-----------------------------------------------------------------------
     OverlayElement* OverlayElement::clone(const String& instanceName)
     {
         OverlayElement* newElement;
 
         newElement = OverlayManager::getSingleton().createOverlayElement(
-			getTypeName(), instanceName + "/" + mName);
+            getTypeName(), instanceName + "/" + mName);
         copyParametersTo(newElement);
 
         return newElement;
     }
     //-----------------------------------------------------------------------
-	bool OverlayElement::isEnabled() const
-	{ 
-		return mEnabled;
-	}
+    bool OverlayElement::isEnabled() const
+    { 
+        return mEnabled;
+    }
     //-----------------------------------------------------------------------
-	void OverlayElement::setEnabled(bool b) 
-	{
-		mEnabled = b;
-	}
+    void OverlayElement::setEnabled(bool b) 
+    {
+        mEnabled = b;
+    }
     //-----------------------------------------------------------------------
 
 }

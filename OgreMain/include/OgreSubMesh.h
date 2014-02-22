@@ -40,13 +40,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
-	/** Defines a part of a complete mesh.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
+    /** Defines a part of a complete mesh.
         @remarks
             Meshes which make up the definition of a discrete 3D object
             are made up of potentially multiple parts. This is because
@@ -59,7 +59,7 @@ namespace Ogre {
             their material differences on a per-object basis if required.
             See the SubEntity class for more information.
     */
-	class _OgreExport SubMesh : public SubMeshAlloc
+    class _OgreExport SubMesh : public SubMeshAlloc
     {
         friend class Mesh;
         friend class MeshSerializerImpl;
@@ -110,8 +110,8 @@ namespace Ogre {
         typedef FastArray<unsigned short> IndexMap;
         IndexMap blendIndexToBoneIndexMap;
 
-		typedef vector<IndexData*>::type LODFaceList;
-		LODFaceList mLodFaceList;
+        typedef vector<IndexData*>::type LODFaceList;
+        LODFaceList mLodFaceList;
 
         /** A list of extreme points on the submesh (optional).
             @remarks
@@ -184,9 +184,9 @@ namespace Ogre {
         */
         BoneAssignmentIterator getBoneAssignmentIterator(void);
 
-		/** Gets a const reference to the list of bone assignments
-		*/
-		const VertexBoneAssignmentList& getBoneAssignments() { return mBoneAssignments; }
+        /** Gets a const reference to the list of bone assignments
+        */
+        const VertexBoneAssignmentList& getBoneAssignments() { return mBoneAssignments; }
 
 
         /** Must be called once to compile bone assignments into geometry buffer. */
@@ -236,12 +236,12 @@ namespace Ogre {
         */
         bool updateMaterialUsingTextureAliases(void);
 
-		/** Get the type of any vertex animation used by dedicated geometry.
-		*/
-		VertexAnimationType getVertexAnimationType(void) const;
-		
-		/// Returns whether animation on dedicated vertex data includes normals
-		bool getVertexAnimationIncludesNormals() const { return mVertexAnimationIncludesNormals; }
+        /** Get the type of any vertex animation used by dedicated geometry.
+        */
+        VertexAnimationType getVertexAnimationType(void) const;
+        
+        /// Returns whether animation on dedicated vertex data includes normals
+        bool getVertexAnimationIncludesNormals() const { return mVertexAnimationIncludesNormals; }
 
 
         /** Generate the submesh extremes (@see extremityPoints).
@@ -250,10 +250,10 @@ namespace Ogre {
         */
         void generateExtremes(size_t count);
 
-		/** Returns true(by default) if the submesh should be included in the mesh EdgeList, otherwise returns false.
-        */		
-		bool isBuildEdgesEnabled(void) const { return mBuildEdgesEnabled; }
-		void setBuildEdgesEnabled(bool b);
+        /** Returns true(by default) if the submesh should be included in the mesh EdgeList, otherwise returns false.
+        */      
+        bool isBuildEdgesEnabled(void) const { return mBuildEdgesEnabled; }
+        void setBuildEdgesEnabled(bool b);
         /** Makes a copy of this submesh object and gives it a new name.
          @param newName
          The name to give the clone.
@@ -279,22 +279,22 @@ namespace Ogre {
         /// Flag indicating that bone assignments need to be recompiled
         bool mBoneAssignmentsOutOfDate;
 
-		/// Type of vertex animation for dedicated vertex data (populated by Mesh)
-		mutable VertexAnimationType mVertexAnimationType;
+        /// Type of vertex animation for dedicated vertex data (populated by Mesh)
+        mutable VertexAnimationType mVertexAnimationType;
 
-		/// Whether normals are included in vertex animation keyframes
-		mutable bool mVertexAnimationIncludesNormals;
+        /// Whether normals are included in vertex animation keyframes
+        mutable bool mVertexAnimationIncludesNormals;
 
-		/// Is Build Edges Enabled
-		bool mBuildEdgesEnabled;
+        /// Is Build Edges Enabled
+        bool mBuildEdgesEnabled;
 
         /// Internal method for removing LOD data
         void removeLodLevels(void);
 
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

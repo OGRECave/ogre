@@ -224,7 +224,7 @@ namespace Ogre {
         
         // Get height
         if(mTarget == GL_TEXTURE_1D)
-            value = 1;	// Height always 1 for 1D textures
+            value = 1;  // Height always 1 for 1D textures
         else
             OGRE_CHECK_GL_ERROR(glGetTexLevelParameteriv(mFaceTarget, level, GL_TEXTURE_HEIGHT, &value));
         mHeight = value;
@@ -428,7 +428,7 @@ namespace Ogre {
                                     GL3PlusPixelUtil::getGLOriginFormat(data.format), GL3PlusPixelUtil::getGLOriginDataType(data.format),
                                     NULL));
                     break;
-            }	
+            }   
             if (mUsage & TU_AUTOMIPMAP && (mTarget == GL_TEXTURE_2D_ARRAY || mTarget == GL_TEXTURE_3D))
             {
                 OGRE_CHECK_GL_ERROR(glGenerateMipmap(mTarget));
@@ -635,7 +635,7 @@ namespace Ogre {
         
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
         rsys->_disableTextureUnitsFrom(0);
-		OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0));
+        OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0));
 
         // Disable alpha, depth and scissor testing, disable blending, 
         // disable culling, disable lighting, disable fog and reset foreground
@@ -745,7 +745,7 @@ namespace Ogre {
             // Normalise to texture coordinate in 0.0 .. 1.0
             w = (w+0.5f) / (float)src->mDepth;
             
-            // Finally we're ready to rumble	
+            // Finally we're ready to rumble    
             OGRE_CHECK_GL_ERROR(glBindTexture(src->mTarget, src->mTextureID));
             OGRE_CHECK_GL_ERROR(glEnable(src->mTarget));
 

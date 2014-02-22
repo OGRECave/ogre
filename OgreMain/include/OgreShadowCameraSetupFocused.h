@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
-Copyright (c) 2006 Matthias Fink, netAllied GmbH <matthias.fink@web.de>								
+Copyright (c) 2006 Matthias Fink, netAllied GmbH <matthias.fink@web.de>                             
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ namespace Ogre {
         static const Matrix4 msNormalToLightSpace;
         static const Matrix4 msLightSpaceToNormal;
 
-		ObjectMemoryManager mObjectMemoryManager;
+        ObjectMemoryManager mObjectMemoryManager;
 
         /** Temporary preallocated frustum to set up a projection matrix in 
             calculateShadowMappingMatrix().
@@ -82,7 +82,7 @@ namespace Ogre {
         */
         Camera* mLightFrustumCamera;
         mutable bool mLightFrustumCameraCalculated;
-		NodeMemoryManager *mLocalNodeMemoryManager;
+        NodeMemoryManager *mLocalNodeMemoryManager;
 
         /// Use tighter focus region?
         bool mUseAggressiveRegion;
@@ -123,7 +123,7 @@ namespace Ogre {
 
             /** Returns the bounding box representation.
             */
-            const AxisAlignedBox& getAAB(void) const;	
+            const AxisAlignedBox& getAAB(void) const;   
 
             /** Adds a specific point to the body list.
             */
@@ -290,7 +290,7 @@ namespace Ogre {
         /** Returns a uniform shadow camera with a focused view.
         */
         virtual void getShadowCamera(const SceneManager *sm, const Camera *cam, 
-									const Light *light, Camera *texCam, size_t iteration) const;
+                                    const Light *light, Camera *texCam, size_t iteration) const;
 
         /** Sets whether or not to use the more aggressive approach to deciding on
             the focus region or not.

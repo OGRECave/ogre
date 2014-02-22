@@ -33,26 +33,26 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class D3D11DepthBuffer : public DepthBuffer
-	{
-	public:
-		D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
-							ID3D11DepthStencilView *depthBufferView,
-							uint32 width, uint32 height,
-							uint32 fsaa, uint32 multiSampleQuality, bool isManual );
-		~D3D11DepthBuffer();
+    class D3D11DepthBuffer : public DepthBuffer
+    {
+    public:
+        D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
+                            ID3D11DepthStencilView *depthBufferView,
+                            uint32 width, uint32 height,
+                            uint32 fsaa, uint32 multiSampleQuality, bool isManual );
+        ~D3D11DepthBuffer();
 
-		/// @copydoc DepthBuffer::isCompatible
-		virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        /// @copydoc DepthBuffer::isCompatible
+        virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
-		ID3D11DepthStencilView* getDepthStencilView() const;
-		/// internal method, gets called when the renderwindow was resized
-		void _resized(ID3D11DepthStencilView *depthBufferView, uint32 width, uint32 height);
+        ID3D11DepthStencilView* getDepthStencilView() const;
+        /// internal method, gets called when the renderwindow was resized
+        void _resized(ID3D11DepthStencilView *depthBufferView, uint32 width, uint32 height);
 
-	protected:
-		ID3D11DepthStencilView		*mDepthStencilView; //aka. actual "DepthBuffer"
-		uint32						mMultiSampleQuality;
-		D3D11RenderSystem			*mRenderSystem;
-	};
+    protected:
+        ID3D11DepthStencilView      *mDepthStencilView; //aka. actual "DepthBuffer"
+        uint32                      mMultiSampleQuality;
+        D3D11RenderSystem           *mRenderSystem;
+    };
 }
 #endif

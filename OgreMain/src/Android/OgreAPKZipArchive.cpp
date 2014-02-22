@@ -4,11 +4,11 @@
 #include <OgreLogManager.h>
 
 namespace Ogre{
-	//-----------------------------------------------------------------------
-	const String &APKZipArchiveFactory::getType() const
-	{
-		static String type = "APKZip";
-		return type;
-	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    const String &APKZipArchiveFactory::getType() const
+    {
+        static String type = "APKZip";
+        return type;
+    }
+    //-----------------------------------------------------------------------
 }

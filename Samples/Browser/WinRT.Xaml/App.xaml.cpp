@@ -1,4 +1,4 @@
-﻿//
+//
 // App.xaml.cpp
 // Implementation of the App class.
 //
@@ -30,8 +30,8 @@ using namespace Windows::UI::Xaml::Navigation;
 /// </summary>
 App::App()
 {
-	InitializeComponent();
-	Suspending += ref new SuspendingEventHandler(this, &App::OnSuspending);
+    InitializeComponent();
+    Suspending += ref new SuspendingEventHandler(this, &App::OnSuspending);
 }
 
 /// <summary>
@@ -42,29 +42,29 @@ App::App()
 /// <param name="pArgs">Details about the launch request and process.</param>
 void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs^ pArgs)
 {
-	// Do not repeat app initialization when already running, just ensure that
-	// the window is active
-	if (pArgs->PreviousExecutionState == ApplicationExecutionState::Running)
-	{
-		Window::Current->Activate();
-		return;
-	}
+    // Do not repeat app initialization when already running, just ensure that
+    // the window is active
+    if (pArgs->PreviousExecutionState == ApplicationExecutionState::Running)
+    {
+        Window::Current->Activate();
+        return;
+    }
 
-	if (pArgs->PreviousExecutionState == ApplicationExecutionState::Terminated)
-	{
-		//TODO: Load state from previously suspended application
-	}
+    if (pArgs->PreviousExecutionState == ApplicationExecutionState::Terminated)
+    {
+        //TODO: Load state from previously suspended application
+    }
 
-	// Create a Frame to act navigation context and navigate to the first page
-	auto rootFrame = ref new Frame();
-	if (!rootFrame->Navigate(TypeName(SampleBrowserWinRT::typeid)))
-	{
-		throw ref new FailureException("Failed to create initial page");
-	}
+    // Create a Frame to act navigation context and navigate to the first page
+    auto rootFrame = ref new Frame();
+    if (!rootFrame->Navigate(TypeName(SampleBrowserWinRT::typeid)))
+    {
+        throw ref new FailureException("Failed to create initial page");
+    }
 
-	// Place the frame in the current Window and ensure that it is active
-	Window::Current->Content = rootFrame;
-	Window::Current->Activate();
+    // Place the frame in the current Window and ensure that it is active
+    Window::Current->Content = rootFrame;
+    Window::Current->Activate();
 }
 
 /// <summary>
@@ -76,8 +76,8 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
 /// <param name="e">Details about the suspend request.</param>
 void App::OnSuspending(Object^ sender, SuspendingEventArgs^ e)
 {
-	(void) sender;	// Unused parameter
-	(void) e;	// Unused parameter
+    (void) sender;  // Unused parameter
+    (void) e;   // Unused parameter
 
-	//TODO: Save application state and stop any background activity
+    //TODO: Save application state and stop any background activity
 }

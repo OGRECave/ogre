@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 /***************************************************************************
 OgreExternalTextureSource.cpp  -  
-	Implementation of texture controller class
+    Implementation of texture controller class
 
 -------------------
 date                 : Jan 1 2004
@@ -43,149 +43,149 @@ email                : pjcast@yahoo.com
 
 namespace Ogre
 {
-	//String interface commands for setting some basic commands
-	ExternalTextureSource::CmdInputFileName ExternalTextureSource::msCmdInputFile;
-	ExternalTextureSource::CmdFPS			ExternalTextureSource::msCmdFramesPerSecond;
-	ExternalTextureSource::CmdPlayMode		ExternalTextureSource::msCmdPlayMode;
-	ExternalTextureSource::CmdTecPassState	ExternalTextureSource::msCmdTecPassState;
+    //String interface commands for setting some basic commands
+    ExternalTextureSource::CmdInputFileName ExternalTextureSource::msCmdInputFile;
+    ExternalTextureSource::CmdFPS           ExternalTextureSource::msCmdFramesPerSecond;
+    ExternalTextureSource::CmdPlayMode      ExternalTextureSource::msCmdPlayMode;
+    ExternalTextureSource::CmdTecPassState  ExternalTextureSource::msCmdTecPassState;
 
-	//---------------------------------------------------------------------------------------//
+    //---------------------------------------------------------------------------------------//
 
-	ExternalTextureSource::ExternalTextureSource()
-	{
-		mInputFileName = "None";
-		mDictionaryName = "NotAssigned";
-		mUpdateEveryFrame = false;
-		mFramesPerSecond = 24;
-		mMode = TextureEffectPause;
-	}
+    ExternalTextureSource::ExternalTextureSource()
+    {
+        mInputFileName = "None";
+        mDictionaryName = "NotAssigned";
+        mUpdateEveryFrame = false;
+        mFramesPerSecond = 24;
+        mMode = TextureEffectPause;
+    }
 
-	//---------------------------------------------------------------------------------------//
+    //---------------------------------------------------------------------------------------//
 
-	void ExternalTextureSource::addBaseParams()
-	{
-		if( mDictionaryName == "NotAssigned" )
+    void ExternalTextureSource::addBaseParams()
+    {
+        if( mDictionaryName == "NotAssigned" )
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, 
                 "Plugin " + mPluginName + 
-				" needs to override default mDictionaryName", 
+                " needs to override default mDictionaryName", 
                 "ExternalTextureSource::addBaseParams");
 
-		//Create Dictionary Here
+        //Create Dictionary Here
         if (createParamDictionary( mDictionaryName ))
-		{
-	        ParamDictionary* dict = getParamDictionary();
-			
-			dict->addParameter(ParameterDef("filename", 
-			    "A source for the texture effect (only certain plugins require this)"
-				, PT_STRING),
-				&ExternalTextureSource::msCmdInputFile);
-			dict->addParameter(ParameterDef("frames_per_second", 
-			    "How fast should playback be (only certain plugins use this)"
-				, PT_INT),
-				&ExternalTextureSource::msCmdFramesPerSecond);
-			dict->addParameter(ParameterDef("play_mode", 
-			    "How the playback starts(only certain plugins use this)"
-				, PT_STRING),
-				&ExternalTextureSource::msCmdPlayMode);
-			dict->addParameter(ParameterDef("set_T_P_S", 
-			    "Set the technique, pass, and state level of this texture_unit (eg. 0 0 0 )"
-				, PT_STRING),
-				&ExternalTextureSource::msCmdTecPassState);
-		}
-	}
+        {
+            ParamDictionary* dict = getParamDictionary();
+            
+            dict->addParameter(ParameterDef("filename", 
+                "A source for the texture effect (only certain plugins require this)"
+                , PT_STRING),
+                &ExternalTextureSource::msCmdInputFile);
+            dict->addParameter(ParameterDef("frames_per_second", 
+                "How fast should playback be (only certain plugins use this)"
+                , PT_INT),
+                &ExternalTextureSource::msCmdFramesPerSecond);
+            dict->addParameter(ParameterDef("play_mode", 
+                "How the playback starts(only certain plugins use this)"
+                , PT_STRING),
+                &ExternalTextureSource::msCmdPlayMode);
+            dict->addParameter(ParameterDef("set_T_P_S", 
+                "Set the technique, pass, and state level of this texture_unit (eg. 0 0 0 )"
+                , PT_STRING),
+                &ExternalTextureSource::msCmdTecPassState);
+        }
+    }
 
-	//---------------------------------------------------------------------------------------//
-	//*** String Interface Command Class Definitions *****************************************/
-	String ExternalTextureSource::CmdInputFileName::doGet(const void* target) const
-	{
-		return static_cast<const ExternalTextureSource*>(target)->getInputName();
-	}
-	void ExternalTextureSource::CmdInputFileName::doSet(void* target, const String& val)
-	{
-		static_cast<ExternalTextureSource*>(target)->setInputName( val );
-	}
-	
-	//------------------------------------------------------------------------------//
-	String ExternalTextureSource::CmdFPS::doGet(const void* target) const
-	{
-		return StringConverter::toString(
-			static_cast<const ExternalTextureSource*>(target)->getFPS() );
-	}
-	void ExternalTextureSource::CmdFPS::doSet(void* target, const String& val)
-	{
-		static_cast<ExternalTextureSource*>(target)->setFPS(StringConverter::parseInt(val));
-	}
-	//------------------------------------------------------------------------------//
-	String ExternalTextureSource::CmdPlayMode::doGet(const void* target) const
-	{
-		eTexturePlayMode eMode = static_cast<const ExternalTextureSource*>(target)->getPlayMode();
-		String val;
+    //---------------------------------------------------------------------------------------//
+    //*** String Interface Command Class Definitions *****************************************/
+    String ExternalTextureSource::CmdInputFileName::doGet(const void* target) const
+    {
+        return static_cast<const ExternalTextureSource*>(target)->getInputName();
+    }
+    void ExternalTextureSource::CmdInputFileName::doSet(void* target, const String& val)
+    {
+        static_cast<ExternalTextureSource*>(target)->setInputName( val );
+    }
+    
+    //------------------------------------------------------------------------------//
+    String ExternalTextureSource::CmdFPS::doGet(const void* target) const
+    {
+        return StringConverter::toString(
+            static_cast<const ExternalTextureSource*>(target)->getFPS() );
+    }
+    void ExternalTextureSource::CmdFPS::doSet(void* target, const String& val)
+    {
+        static_cast<ExternalTextureSource*>(target)->setFPS(StringConverter::parseInt(val));
+    }
+    //------------------------------------------------------------------------------//
+    String ExternalTextureSource::CmdPlayMode::doGet(const void* target) const
+    {
+        eTexturePlayMode eMode = static_cast<const ExternalTextureSource*>(target)->getPlayMode();
+        String val;
 
-		switch(eMode)
-		{
-		case TextureEffectPlay_ASAP:
-			val = "play";
-			break;
-		case TextureEffectPlay_Looping: 
-			val = "loop";
-			break;
-		case TextureEffectPause:
-			val = "pause";
-			break;
-		default: 
-			val = "error"; 
-			break;
-		}
+        switch(eMode)
+        {
+        case TextureEffectPlay_ASAP:
+            val = "play";
+            break;
+        case TextureEffectPlay_Looping: 
+            val = "loop";
+            break;
+        case TextureEffectPause:
+            val = "pause";
+            break;
+        default: 
+            val = "error"; 
+            break;
+        }
 
-		return val;
-	}
-	void ExternalTextureSource::CmdPlayMode::doSet(void* target, const String& val)
-	{
-		eTexturePlayMode eMode = TextureEffectPause;
+        return val;
+    }
+    void ExternalTextureSource::CmdPlayMode::doSet(void* target, const String& val)
+    {
+        eTexturePlayMode eMode = TextureEffectPause;
 
-		if( val == "play" )
-			eMode = TextureEffectPlay_ASAP;
-		if( val == "loop" )
-			eMode = TextureEffectPlay_Looping;
-		if( val == "pause" )
-			eMode = TextureEffectPause;
+        if( val == "play" )
+            eMode = TextureEffectPlay_ASAP;
+        if( val == "loop" )
+            eMode = TextureEffectPlay_Looping;
+        if( val == "pause" )
+            eMode = TextureEffectPause;
 
-		static_cast<ExternalTextureSource*>(target)->setPlayMode( eMode );
-	}
+        static_cast<ExternalTextureSource*>(target)->setPlayMode( eMode );
+    }
 
-	//------------------------------------------------------------------------------//
-	String ExternalTextureSource::CmdTecPassState::doGet(const void* target) const
-	{
-		int t = 0, p = 0, s = 0;
+    //------------------------------------------------------------------------------//
+    String ExternalTextureSource::CmdTecPassState::doGet(const void* target) const
+    {
+        int t = 0, p = 0, s = 0;
 
-		static_cast<const ExternalTextureSource*>(target)->getTextureTecPassStateLevel(t, p, s);
+        static_cast<const ExternalTextureSource*>(target)->getTextureTecPassStateLevel(t, p, s);
 
-		String ret = StringConverter::toString( t ) + " " 
-					+ StringConverter::toString( p ) + " " 
-					+ StringConverter::toString( s );
-		
-		return ret;			
-	}
+        String ret = StringConverter::toString( t ) + " " 
+                    + StringConverter::toString( p ) + " " 
+                    + StringConverter::toString( s );
+        
+        return ret;         
+    }
 
-	void ExternalTextureSource::CmdTecPassState::doSet(void* target, const String& val)
-	{
-		int t = 0, p = 0, s = 0;
+    void ExternalTextureSource::CmdTecPassState::doSet(void* target, const String& val)
+    {
+        int t = 0, p = 0, s = 0;
 
-		StringVector vecparams = StringUtil::split(val, " \t");
+        StringVector vecparams = StringUtil::split(val, " \t");
 
-		if( vecparams.size() == 3 )
-		{
-			t = StringConverter::parseInt( vecparams[0] );
-			p = StringConverter::parseInt( vecparams[1] );
-			s = StringConverter::parseInt( vecparams[2] );
-		}
-		else
-		{
-			LogManager::getSingleton().logMessage("Texture controller had problems extracting technique, pass, and state level... Default to 0, 0, 0");
-			t = p = s = 0;
-		}
+        if( vecparams.size() == 3 )
+        {
+            t = StringConverter::parseInt( vecparams[0] );
+            p = StringConverter::parseInt( vecparams[1] );
+            s = StringConverter::parseInt( vecparams[2] );
+        }
+        else
+        {
+            LogManager::getSingleton().logMessage("Texture controller had problems extracting technique, pass, and state level... Default to 0, 0, 0");
+            t = p = s = 0;
+        }
 
-		static_cast<ExternalTextureSource*>(target)->setTextureTecPassStateLevel(t,p,s);
-	}
+        static_cast<ExternalTextureSource*>(target)->setTextureTecPassStateLevel(t,p,s);
+    }
 }
 

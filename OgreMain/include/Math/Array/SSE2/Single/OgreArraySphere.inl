@@ -28,21 +28,21 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//-----------------------------------------------------------------------------------
-	inline ArrayReal ArraySphere::intersects( const ArraySphere &s ) const
-	{
-		ArrayReal sqRadius	= _mm_add_ps( mRadius, s.mRadius );
-		sqRadius			= _mm_mul_ps( sqRadius, sqRadius );
-		ArrayReal sqDist	= mCenter.squaredDistance( s.mCenter );
+    //-----------------------------------------------------------------------------------
+    inline ArrayReal ArraySphere::intersects( const ArraySphere &s ) const
+    {
+        ArrayReal sqRadius  = _mm_add_ps( mRadius, s.mRadius );
+        sqRadius            = _mm_mul_ps( sqRadius, sqRadius );
+        ArrayReal sqDist    = mCenter.squaredDistance( s.mCenter );
 
-		return _mm_cmple_ps( sqDist, sqRadius ); // sqDist <= sqRadius
-	}
-	//-----------------------------------------------------------------------------------
-	inline ArrayReal ArraySphere::intersects( const ArrayVector3 &v ) const
-	{
-		ArrayReal sqRadius	= _mm_mul_ps( mRadius, mRadius );
-		ArrayReal sqDist	= mCenter.squaredDistance( v );
+        return _mm_cmple_ps( sqDist, sqRadius ); // sqDist <= sqRadius
+    }
+    //-----------------------------------------------------------------------------------
+    inline ArrayReal ArraySphere::intersects( const ArrayVector3 &v ) const
+    {
+        ArrayReal sqRadius  = _mm_mul_ps( mRadius, mRadius );
+        ArrayReal sqDist    = mCenter.squaredDistance( v );
 
-		return _mm_cmple_ps( sqDist, sqRadius ); // sqDist <= sqRadius
-	}
+        return _mm_cmple_ps( sqDist, sqRadius ); // sqDist <= sqRadius
+    }
 }

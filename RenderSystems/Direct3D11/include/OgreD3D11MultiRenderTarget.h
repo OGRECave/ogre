@@ -32,28 +32,28 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 
 namespace Ogre {
-	class D3D11MultiRenderTarget : public MultiRenderTarget
-	{
-	public:
-		D3D11MultiRenderTarget(const String &name);
-		~D3D11MultiRenderTarget();
+    class D3D11MultiRenderTarget : public MultiRenderTarget
+    {
+    public:
+        D3D11MultiRenderTarget(const String &name);
+        ~D3D11MultiRenderTarget();
 
-		virtual void getCustomAttribute( const String& name, void *pData );
+        virtual void getCustomAttribute( const String& name, void *pData );
 
-		bool requiresTextureFlipping() const { return false; }
-	private:
-		D3D11HardwarePixelBuffer *targets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		ID3D11RenderTargetView* mRenderTargetViews[OGRE_MAX_MULTIPLE_RENDER_TARGETS];	// Store views to accelerate bind
-		uint mNumberOfViews;															// Store number of views to accelerate bind
+        bool requiresTextureFlipping() const { return false; }
+    private:
+        D3D11HardwarePixelBuffer *targets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        ID3D11RenderTargetView* mRenderTargetViews[OGRE_MAX_MULTIPLE_RENDER_TARGETS];   // Store views to accelerate bind
+        uint mNumberOfViews;                                                            // Store number of views to accelerate bind
 
-		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
-		virtual void unbindSurfaceImpl(size_t attachment);
+        virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
+        virtual void unbindSurfaceImpl(size_t attachment);
 
-		/** Check surfaces and update RenderTarget extent */
-		void checkAndUpdate();
+        /** Check surfaces and update RenderTarget extent */
+        void checkAndUpdate();
 
-		Ogre::RenderTexture*	mRenderTargets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-	};
+        Ogre::RenderTexture*    mRenderTargets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+    };
 };
 
 #endif

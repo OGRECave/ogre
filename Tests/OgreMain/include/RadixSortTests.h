@@ -30,24 +30,24 @@ THE SOFTWARE.
 
 class RadixSortTests : public CppUnit::TestFixture
 {
-	// CppUnit macros for setting up the test suite
-	CPPUNIT_TEST_SUITE( RadixSortTests );
-	CPPUNIT_TEST(testFloatVector);
-	CPPUNIT_TEST(testFloatList);
-	CPPUNIT_TEST(testUnsignedIntList);
-	CPPUNIT_TEST(testIntList);
-	CPPUNIT_TEST(testUnsignedIntVector);
-	CPPUNIT_TEST(testIntVector);
-	CPPUNIT_TEST_SUITE_END();
+    // CppUnit macros for setting up the test suite
+    CPPUNIT_TEST_SUITE( RadixSortTests );
+    CPPUNIT_TEST(testFloatVector);
+    CPPUNIT_TEST(testFloatList);
+    CPPUNIT_TEST(testUnsignedIntList);
+    CPPUNIT_TEST(testIntList);
+    CPPUNIT_TEST(testUnsignedIntVector);
+    CPPUNIT_TEST(testIntVector);
+    CPPUNIT_TEST_SUITE_END();
 protected:
 public:
-	void setUp();
-	void tearDown();
-	void testFloatVector();
-	void testFloatList();
-	void testUnsignedIntList();
-	void testIntList();
-	void testUnsignedIntVector();
-	void testIntVector();
+    void setUp();
+    void tearDown();
+    void testFloatVector();
+    void testFloatList();
+    void testUnsignedIntList();
+    void testIntList();
+    void testUnsignedIntVector();
+    void testIntVector();
 
 };

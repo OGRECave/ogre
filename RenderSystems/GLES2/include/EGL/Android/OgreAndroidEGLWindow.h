@@ -36,30 +36,30 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgrePrivate AndroidEGLWindow : public EGLWindow
     {
-	private:
-		uint mMaxBufferSize;
-		uint mMaxDepthSize;
-		uint mMaxStencilSize;
-		
-	protected:
-		virtual EGLContext * createEGLContext() const;
-		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
-		virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
-		virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
-		virtual void reposition(int left, int top);
-		virtual void resize(unsigned int width, unsigned int height);
-		virtual void windowMovedOrResized();
-		virtual void switchFullScreen(bool fullscreen);
+    private:
+        uint mMaxBufferSize;
+        uint mMaxDepthSize;
+        uint mMaxStencilSize;
+        
+    protected:
+        virtual EGLContext * createEGLContext() const;
+        virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+        virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
+        virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
+        virtual void reposition(int left, int top);
+        virtual void resize(unsigned int width, unsigned int height);
+        virtual void windowMovedOrResized();
+        virtual void switchFullScreen(bool fullscreen);
         
     public:
-		AndroidEGLWindow(AndroidEGLSupport* glsupport);
-		virtual ~AndroidEGLWindow();
+        AndroidEGLWindow(AndroidEGLSupport* glsupport);
+        virtual ~AndroidEGLWindow();
         void create(const String& name, unsigned int width, unsigned int height,
                     bool fullScreen, const NameValuePairList *miscParams);
         
         void _destroyInternalResources();
         void _createInternalResources(NativeWindowType window, AConfiguration* config);
-	};
+    };
 }
 
 #endif

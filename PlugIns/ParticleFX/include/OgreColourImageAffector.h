@@ -40,10 +40,10 @@ namespace Ogre {
     class _OgreParticleFXExport ColourImageAffector : public ParticleAffector
     {
     public:
-		/** Command object for red adjust (see ParamCommand).*/
+        /** Command object for red adjust (see ParamCommand).*/
         class CmdImageAdjust : public ParamCommand
         {
-		public:
+        public:
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
@@ -52,21 +52,21 @@ namespace Ogre {
         ColourImageAffector(ParticleSystem* psys);
 
         /** See ParticleAffector. */
-		void _initParticle(Particle* pParticle);
+        void _initParticle(Particle* pParticle);
 
         /** See ParticleAffector. */
         void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
 
-		void setImageAdjust(String name);
-		String getImageAdjust(void) const;
+        void setImageAdjust(String name);
+        String getImageAdjust(void) const;
         
         
-        static CmdImageAdjust	msImageCmd;
+        static CmdImageAdjust   msImageCmd;
 
     protected:
-        Image					mColourImage;
+        Image                   mColourImage;
         bool                    mColourImageLoaded;
-		String					mColourImageName;
+        String                  mColourImageName;
 
         /** Internal method to load the image */
         void _loadImage(void);

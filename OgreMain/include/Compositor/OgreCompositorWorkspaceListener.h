@@ -35,29 +35,29 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
-	class CompositorWorkspaceListener
-	{
-	public:
-		/** Called before all nodes are going to be updated. Use this place to update your own,
-			manually updated Workspaces without having to call
-			@CompositorWorkspace::_beginUpdate( forceBeginFrame=true )
-		*/
-		virtual void workspacePreUpdate(void)	{}
-		/** Called when each pass is about to be executed.
-			Warning: calling pass->execute can result in recursive calls.
-		*/
-		virtual void passPreExecute( CompositorPass *pass ) {}
-	};
+    class CompositorWorkspaceListener
+    {
+    public:
+        /** Called before all nodes are going to be updated. Use this place to update your own,
+            manually updated Workspaces without having to call
+            @CompositorWorkspace::_beginUpdate( forceBeginFrame=true )
+        */
+        virtual void workspacePreUpdate(void)   {}
+        /** Called when each pass is about to be executed.
+            Warning: calling pass->execute can result in recursive calls.
+        */
+        virtual void passPreExecute( CompositorPass *pass ) {}
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

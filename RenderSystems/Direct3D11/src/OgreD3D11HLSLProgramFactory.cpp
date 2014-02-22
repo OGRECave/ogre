@@ -31,33 +31,33 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 
 namespace Ogre {
-	//-----------------------------------------------------------------------
-	String D3D11HLSLProgramFactory::sLanguageName = "hlsl";
-	//-----------------------------------------------------------------------
-	D3D11HLSLProgramFactory::D3D11HLSLProgramFactory(D3D11Device & device) :  mDevice(device)
-	{
-	}
-	//-----------------------------------------------------------------------
-	D3D11HLSLProgramFactory::~D3D11HLSLProgramFactory()
-	{
-	}
-	//-----------------------------------------------------------------------
-	const String& D3D11HLSLProgramFactory::getLanguage(void) const
-	{
-		return sLanguageName;
-	}
-	//-----------------------------------------------------------------------
-	HighLevelGpuProgram* D3D11HLSLProgramFactory::create(ResourceManager* creator, 
-		const String& name, ResourceHandle handle,
-		const String& group, bool isManual, ManualResourceLoader* loader)
-	{
-		return new D3D11HLSLProgram(creator, name, handle, group, isManual, loader, mDevice);
-	}
-	//-----------------------------------------------------------------------
-	void D3D11HLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
-	{
-		delete prog;
-	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    String D3D11HLSLProgramFactory::sLanguageName = "hlsl";
+    //-----------------------------------------------------------------------
+    D3D11HLSLProgramFactory::D3D11HLSLProgramFactory(D3D11Device & device) :  mDevice(device)
+    {
+    }
+    //-----------------------------------------------------------------------
+    D3D11HLSLProgramFactory::~D3D11HLSLProgramFactory()
+    {
+    }
+    //-----------------------------------------------------------------------
+    const String& D3D11HLSLProgramFactory::getLanguage(void) const
+    {
+        return sLanguageName;
+    }
+    //-----------------------------------------------------------------------
+    HighLevelGpuProgram* D3D11HLSLProgramFactory::create(ResourceManager* creator, 
+        const String& name, ResourceHandle handle,
+        const String& group, bool isManual, ManualResourceLoader* loader)
+    {
+        return new D3D11HLSLProgram(creator, name, handle, group, isManual, loader, mDevice);
+    }
+    //-----------------------------------------------------------------------
+    void D3D11HLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
+    {
+        delete prog;
+    }
+    //-----------------------------------------------------------------------
 
 }

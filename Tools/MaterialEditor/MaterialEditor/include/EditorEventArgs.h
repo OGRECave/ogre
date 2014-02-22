@@ -30,11 +30,11 @@ THE SOFTWARE.
 class EditorEventArgs : public EventArgs
 {
 public:
-	EditorEventArgs(Editor* editor) : mEditor(editor) {}
-	virtual ~EditorEventArgs() {}
+    EditorEventArgs(Editor* editor) : mEditor(editor) {}
+    virtual ~EditorEventArgs() {}
 
-	Editor* getEditor() { return mEditor; }
+    Editor* getEditor() { return mEditor; }
 
 protected:
-	Editor* mEditor;
+    Editor* mEditor;
 };

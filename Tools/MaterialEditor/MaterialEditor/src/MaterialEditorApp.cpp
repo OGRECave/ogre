@@ -47,37 +47,37 @@ MaterialEditorApp::~MaterialEditorApp()
 
 bool MaterialEditorApp::OnInit()
 {
-	wxInitAllImageHandlers();
+    wxInitAllImageHandlers();
 
-	wxBitmap bitmap;
-	if(bitmap.LoadFile("../lexers/splash.png", wxBITMAP_TYPE_PNG))
-	{
-		wxSplashScreen* splash = new wxSplashScreen(bitmap, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
-			2000, NULL, -1, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER | wxSTAY_ON_TOP);
-	}
+    wxBitmap bitmap;
+    if(bitmap.LoadFile("../lexers/splash.png", wxBITMAP_TYPE_PNG))
+    {
+        wxSplashScreen* splash = new wxSplashScreen(bitmap, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
+            2000, NULL, -1, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER | wxSTAY_ON_TOP);
+    }
 
-	// Create Selection Service
-	new SelectionService();
+    // Create Selection Service
+    new SelectionService();
 
-	// Ensure Workspace is created
-	new Workspace();
+    // Ensure Workspace is created
+    new Workspace();
 
-	// Create the IconManager
-	new IconManager();
+    // Create the IconManager
+    new IconManager();
 
-	MaterialEditorFrame* frame = new MaterialEditorFrame();
-	frame->SetIcon(wxIcon(ogre_xpm));
-	frame->Show(true);
+    MaterialEditorFrame* frame = new MaterialEditorFrame();
+    frame->SetIcon(wxIcon(ogre_xpm));
+    frame->Show(true);
 
-	SetTopWindow(frame);
+    SetTopWindow(frame);
 
-	return true;
+    return true;
 }
 
 int MaterialEditorApp::OnExit()
 {
-	// Minimally clean up the IconManager
-	delete IconManager::getSingletonPtr();
+    // Minimally clean up the IconManager
+    delete IconManager::getSingletonPtr();
 
-	return 0;
+    return 0;
 }

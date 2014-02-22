@@ -33,15 +33,15 @@
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-	template<> GLSLESProgramPipelineManager* Singleton<GLSLESProgramPipelineManager>::msSingleton = 0;
+    template<> GLSLESProgramPipelineManager* Singleton<GLSLESProgramPipelineManager>::msSingleton = 0;
     
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     GLSLESProgramPipelineManager* GLSLESProgramPipelineManager::getSingletonPtr(void)
     {
         return msSingleton;
     }
     
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     GLSLESProgramPipelineManager& GLSLESProgramPipelineManager::getSingleton(void)
     {  
         assert( msSingleton );  return ( *msSingleton );  
@@ -52,79 +52,79 @@ namespace Ogre
 
     GLSLESProgramPipelineManager::~GLSLESProgramPipelineManager(void)
     {
-		// Iterate through map container and delete program pipelines
-		for (ProgramPipelineIterator currentProgram = mProgramPipelines.begin();
+        // Iterate through map container and delete program pipelines
+        for (ProgramPipelineIterator currentProgram = mProgramPipelines.begin();
              currentProgram != mProgramPipelines.end(); ++currentProgram)
-		{
-			delete currentProgram->second;
-		}
+        {
+            delete currentProgram->second;
+        }
     }
 
     //-----------------------------------------------------------------------
-	void GLSLESProgramPipelineManager::setActiveFragmentLinkProgram(GLSLESGpuProgram* fragmentGpuProgram)
-	{
-		if (fragmentGpuProgram != mActiveFragmentGpuProgram)
-		{
-			mActiveFragmentGpuProgram = fragmentGpuProgram;
-			// ActiveProgramPipeline is no longer valid
-			mActiveProgramPipeline = NULL;
-		}
-	}
+    void GLSLESProgramPipelineManager::setActiveFragmentLinkProgram(GLSLESGpuProgram* fragmentGpuProgram)
+    {
+        if (fragmentGpuProgram != mActiveFragmentGpuProgram)
+        {
+            mActiveFragmentGpuProgram = fragmentGpuProgram;
+            // ActiveProgramPipeline is no longer valid
+            mActiveProgramPipeline = NULL;
+        }
+    }
     
-	//-----------------------------------------------------------------------
-	void GLSLESProgramPipelineManager::setActiveVertexLinkProgram(GLSLESGpuProgram* vertexGpuProgram)
-	{
-		if (vertexGpuProgram != mActiveVertexGpuProgram)
-		{
-			mActiveVertexGpuProgram = vertexGpuProgram;
-			// ActiveProgramPipeline is no longer valid
-			mActiveProgramPipeline = NULL;
-		}
-	}
+    //-----------------------------------------------------------------------
+    void GLSLESProgramPipelineManager::setActiveVertexLinkProgram(GLSLESGpuProgram* vertexGpuProgram)
+    {
+        if (vertexGpuProgram != mActiveVertexGpuProgram)
+        {
+            mActiveVertexGpuProgram = vertexGpuProgram;
+            // ActiveProgramPipeline is no longer valid
+            mActiveProgramPipeline = NULL;
+        }
+    }
 
     //-----------------------------------------------------------------------
-	GLSLESProgramPipeline* GLSLESProgramPipelineManager::getActiveProgramPipeline(void)
-	{
-		// If there is an active link program then return it
-		if (mActiveProgramPipeline)
-			return mActiveProgramPipeline;
+    GLSLESProgramPipeline* GLSLESProgramPipelineManager::getActiveProgramPipeline(void)
+    {
+        // If there is an active link program then return it
+        if (mActiveProgramPipeline)
+            return mActiveProgramPipeline;
 
-		// No active link program so find one or make a new one
-		// Is there an active key?
-		uint64 activeKey = 0;
+        // No active link program so find one or make a new one
+        // Is there an active key?
+        uint64 activeKey = 0;
 
-		if (mActiveVertexGpuProgram)
-		{
-			activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getProgramID()) << 32;
-		}
-		if (mActiveFragmentGpuProgram)
-		{
-			activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getProgramID());
-		}
+        if (mActiveVertexGpuProgram)
+        {
+            activeKey = static_cast<uint64>(mActiveVertexGpuProgram->getProgramID()) << 32;
+        }
+        if (mActiveFragmentGpuProgram)
+        {
+            activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getProgramID());
+        }
 
-		// Only return a program pipeline object if a vertex or fragment stage exist
-		if (activeKey > 0)
-		{
-			// Find the key in the hash map
-			ProgramPipelineIterator programFound = mProgramPipelines.find(activeKey);
-			// Program object not found for key so need to create it
-			if (programFound == mProgramPipelines.end())
-			{
-				mActiveProgramPipeline = new GLSLESProgramPipeline(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
-				mProgramPipelines[activeKey] = mActiveProgramPipeline;
-			}
-			else
-			{
-				// Found a link program in map container so make it active
-				mActiveProgramPipeline = programFound->second;
-			}
+        // Only return a program pipeline object if a vertex or fragment stage exist
+        if (activeKey > 0)
+        {
+            // Find the key in the hash map
+            ProgramPipelineIterator programFound = mProgramPipelines.find(activeKey);
+            // Program object not found for key so need to create it
+            if (programFound == mProgramPipelines.end())
+            {
+                mActiveProgramPipeline = new GLSLESProgramPipeline(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
+                mProgramPipelines[activeKey] = mActiveProgramPipeline;
+            }
+            else
+            {
+                // Found a link program in map container so make it active
+                mActiveProgramPipeline = programFound->second;
+            }
             
-		}
-		// Make the program object active
-		if (mActiveProgramPipeline)
+        }
+        // Make the program object active
+        if (mActiveProgramPipeline)
             mActiveProgramPipeline->activate();
         
-		return mActiveProgramPipeline;
-	}
+        return mActiveProgramPipeline;
+    }
 
 }

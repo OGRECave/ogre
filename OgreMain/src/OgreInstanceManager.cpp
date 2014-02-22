@@ -41,698 +41,698 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	InstanceManager::InstanceManager( IdString customName, SceneManager *sceneManager,
-										const String &meshName, const String &groupName,
-										InstancingTechnique instancingTechnique, uint16 instancingFlags,
-										size_t instancesPerBatch, unsigned short subMeshIdx,
-										bool useBoneMatrixLookup ) :
-				mName( customName ),
+    InstanceManager::InstanceManager( IdString customName, SceneManager *sceneManager,
+                                        const String &meshName, const String &groupName,
+                                        InstancingTechnique instancingTechnique, uint16 instancingFlags,
+                                        size_t instancesPerBatch, unsigned short subMeshIdx,
+                                        bool useBoneMatrixLookup ) :
+                mName( customName ),
 #ifndef NDEBUG
-				mIdCount( 0 ),
+                mIdCount( 0 ),
 #endif
-				mInstancesPerBatch( instancesPerBatch ),
-				mInstancingTechnique( instancingTechnique ),
-				mInstancingFlags( instancingFlags ),
-				mSubMeshIdx( subMeshIdx ),
+                mInstancesPerBatch( instancesPerBatch ),
+                mInstancingTechnique( instancingTechnique ),
+                mInstancingFlags( instancingFlags ),
+                mSubMeshIdx( subMeshIdx ),
                 mSceneManager( sceneManager ),
-				mMaxLookupTableInstances(16),
-				mNumCustomParams( 0 )
-	{
-		mMeshReference = MeshManager::getSingleton().load( meshName, groupName );
+                mMaxLookupTableInstances(16),
+                mNumCustomParams( 0 )
+    {
+        mMeshReference = MeshManager::getSingleton().load( meshName, groupName );
 
-		if(mMeshReference->sharedVertexData)
-			unshareVertices(mMeshReference);
+        if(mMeshReference->sharedVertexData)
+            unshareVertices(mMeshReference);
 
-		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
-			mMeshReference->getSubMesh(mSubMeshIdx)->_compileBoneAssignments();
-	}
-				
-	InstanceManager::~InstanceManager()
-	{
-		//Remove all batches from all materials we created
-		InstanceBatchMap::const_iterator itor = mInstanceBatches.begin();
-		InstanceBatchMap::const_iterator end  = mInstanceBatches.end();
+        if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+            mMeshReference->getSubMesh(mSubMeshIdx)->_compileBoneAssignments();
+    }
+                
+    InstanceManager::~InstanceManager()
+    {
+        //Remove all batches from all materials we created
+        InstanceBatchMap::const_iterator itor = mInstanceBatches.begin();
+        InstanceBatchMap::const_iterator end  = mInstanceBatches.end();
 
-		while( itor != end )
-		{
-			InstanceBatchVec::const_iterator it = itor->second.begin();
-			InstanceBatchVec::const_iterator en = itor->second.end();
+        while( itor != end )
+        {
+            InstanceBatchVec::const_iterator it = itor->second.begin();
+            InstanceBatchVec::const_iterator en = itor->second.end();
 
-			while( it != en )
-				OGRE_DELETE *it++;
+            while( it != en )
+                OGRE_DELETE *it++;
 
-			++itor;
-		}
-	}
-	//----------------------------------------------------------------------
-	void InstanceManager::setInstancesPerBatch( size_t instancesPerBatch )
-	{
-		if( !mInstanceBatches.empty() )
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-						" building the batch.", "InstanceManager::setInstancesPerBatch");
-		}
+            ++itor;
+        }
+    }
+    //----------------------------------------------------------------------
+    void InstanceManager::setInstancesPerBatch( size_t instancesPerBatch )
+    {
+        if( !mInstanceBatches.empty() )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
+                        " building the batch.", "InstanceManager::setInstancesPerBatch");
+        }
 
-		mInstancesPerBatch = instancesPerBatch;
-	}
+        mInstancesPerBatch = instancesPerBatch;
+    }
 
-	//----------------------------------------------------------------------
-	void InstanceManager::setMaxLookupTableInstances( size_t maxLookupTableInstances )
-	{
-		if( !mInstanceBatches.empty() )
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-				" building the batch.", "InstanceManager::setMaxLookupTableInstances");
-		}
+    //----------------------------------------------------------------------
+    void InstanceManager::setMaxLookupTableInstances( size_t maxLookupTableInstances )
+    {
+        if( !mInstanceBatches.empty() )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
+                " building the batch.", "InstanceManager::setMaxLookupTableInstances");
+        }
 
-		mMaxLookupTableInstances = maxLookupTableInstances;
-	}
-	
-	//----------------------------------------------------------------------
-	void InstanceManager::setNumCustomParams( unsigned char numCustomParams )
-	{
-		if( !mInstanceBatches.empty() )
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "setNumCustomParams can only be changed before"
-				" building the batch.", "InstanceManager::setNumCustomParams");
-		}
+        mMaxLookupTableInstances = maxLookupTableInstances;
+    }
+    
+    //----------------------------------------------------------------------
+    void InstanceManager::setNumCustomParams( unsigned char numCustomParams )
+    {
+        if( !mInstanceBatches.empty() )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "setNumCustomParams can only be changed before"
+                " building the batch.", "InstanceManager::setNumCustomParams");
+        }
 
-		mNumCustomParams = numCustomParams;
-	}
-	//----------------------------------------------------------------------
-	size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( const String &materialName,
-																size_t suggestedSize, uint16 flags )
-	{
-		//Get the material
-		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
-																	mMeshReference->getGroup() );
-		InstanceBatch *batch = 0;
+        mNumCustomParams = numCustomParams;
+    }
+    //----------------------------------------------------------------------
+    size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( const String &materialName,
+                                                                size_t suggestedSize, uint16 flags )
+    {
+        //Get the material
+        MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
+                                                                    mMeshReference->getGroup() );
+        InstanceBatch *batch = 0;
 
-		//Base material couldn't be found
-		if( mat.isNull() )
-			return 0;
+        //Base material couldn't be found
+        if( mat.isNull() )
+            return 0;
 
-		switch( mInstancingTechnique )
-		{
-		case ShaderBased:
-			batch = OGRE_NEW InstanceBatchShader( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ),
-													this, mMeshReference, mat, suggestedSize, 0 );
-			break;
-		case TextureVTF:
-			batch = OGRE_NEW InstanceBatchVTF( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
-												mMeshReference, mat, suggestedSize, 0 );
-			static_cast<InstanceBatchVTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
-			static_cast<InstanceBatchVTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
-			static_cast<InstanceBatchVTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
-			break;
-		case HWInstancingBasic:
-			batch = OGRE_NEW InstanceBatchHW( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
-												mMeshReference, mat, suggestedSize, 0 );
-			break;
-		case HWInstancingVTF:
-			batch = OGRE_NEW InstanceBatchHW_VTF( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
-													mMeshReference, mat, suggestedSize, 0 );
-			static_cast<InstanceBatchHW_VTF*>(batch)->setBoneMatrixLookup((mInstancingFlags & IM_VTFBONEMATRIXLOOKUP) != 0, mMaxLookupTableInstances);
-			static_cast<InstanceBatchHW_VTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
-			static_cast<InstanceBatchHW_VTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
-			static_cast<InstanceBatchHW_VTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
-			break;
-		default:
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-					"Unimplemented instancing technique: " +
-					StringConverter::toString(mInstancingTechnique),
-					"InstanceBatch::getMaxOrBestNumInstancesPerBatches()");
-		}
+        switch( mInstancingTechnique )
+        {
+        case ShaderBased:
+            batch = OGRE_NEW InstanceBatchShader( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ),
+                                                    this, mMeshReference, mat, suggestedSize, 0 );
+            break;
+        case TextureVTF:
+            batch = OGRE_NEW InstanceBatchVTF( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
+                                                mMeshReference, mat, suggestedSize, 0 );
+            static_cast<InstanceBatchVTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
+            static_cast<InstanceBatchVTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
+            static_cast<InstanceBatchVTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
+            break;
+        case HWInstancingBasic:
+            batch = OGRE_NEW InstanceBatchHW( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
+                                                mMeshReference, mat, suggestedSize, 0 );
+            break;
+        case HWInstancingVTF:
+            batch = OGRE_NEW InstanceBatchHW_VTF( -1, &mSceneManager->_getEntityMemoryManager( SCENE_DYNAMIC ), this,
+                                                    mMeshReference, mat, suggestedSize, 0 );
+            static_cast<InstanceBatchHW_VTF*>(batch)->setBoneMatrixLookup((mInstancingFlags & IM_VTFBONEMATRIXLOOKUP) != 0, mMaxLookupTableInstances);
+            static_cast<InstanceBatchHW_VTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
+            static_cast<InstanceBatchHW_VTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
+            static_cast<InstanceBatchHW_VTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
+            break;
+        default:
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Unimplemented instancing technique: " +
+                    StringConverter::toString(mInstancingTechnique),
+                    "InstanceBatch::getMaxOrBestNumInstancesPerBatches()");
+        }
 
-		const size_t retVal = batch->calculateMaxNumInstances( mMeshReference->getSubMesh(mSubMeshIdx),
-																flags );
+        const size_t retVal = batch->calculateMaxNumInstances( mMeshReference->getSubMesh(mSubMeshIdx),
+                                                                flags );
 
-		OGRE_DELETE batch;
+        OGRE_DELETE batch;
 
-		return retVal;
-	}
-	//----------------------------------------------------------------------
-	InstancedEntity* InstanceManager::createInstancedEntity( const String &materialName,
-															 SceneMemoryMgrTypes sceneType )
-	{
-		InstanceBatch *instanceBatch;
+        return retVal;
+    }
+    //----------------------------------------------------------------------
+    InstancedEntity* InstanceManager::createInstancedEntity( const String &materialName,
+                                                             SceneMemoryMgrTypes sceneType )
+    {
+        InstanceBatch *instanceBatch;
 
-		if( mInstanceBatches.empty() )
-			instanceBatch = buildNewBatch( materialName, sceneType, true );
-		else
-			instanceBatch = getFreeBatch( materialName, sceneType );
+        if( mInstanceBatches.empty() )
+            instanceBatch = buildNewBatch( materialName, sceneType, true );
+        else
+            instanceBatch = getFreeBatch( materialName, sceneType );
 
-		return instanceBatch->createInstancedEntity();
-	}
-	//-----------------------------------------------------------------------
-	inline InstanceBatch* InstanceManager::getFreeBatch( const String &materialName,
-														 SceneMemoryMgrTypes sceneType )
-	{
-		IdString materialHash( materialName + StringConverter::toString( sceneType ) );
-		InstanceBatchVec &batchVec = mInstanceBatches[materialHash];
+        return instanceBatch->createInstancedEntity();
+    }
+    //-----------------------------------------------------------------------
+    inline InstanceBatch* InstanceManager::getFreeBatch( const String &materialName,
+                                                         SceneMemoryMgrTypes sceneType )
+    {
+        IdString materialHash( materialName + StringConverter::toString( sceneType ) );
+        InstanceBatchVec &batchVec = mInstanceBatches[materialHash];
 
-		InstanceBatchVec::const_reverse_iterator itor = batchVec.rbegin();
-		InstanceBatchVec::const_reverse_iterator end  = batchVec.rend();
+        InstanceBatchVec::const_reverse_iterator itor = batchVec.rbegin();
+        InstanceBatchVec::const_reverse_iterator end  = batchVec.rend();
 
-		while( itor != end )
-		{
-			if( !(*itor)->isBatchFull() )
-				return *itor;
-			++itor;
-		}
+        while( itor != end )
+        {
+            if( !(*itor)->isBatchFull() )
+                return *itor;
+            ++itor;
+        }
 
-		//None found, or they're all full
-		return buildNewBatch( materialName, sceneType, false );
-	}
-	//-----------------------------------------------------------------------
-	InstanceBatch* InstanceManager::buildNewBatch( const String &materialName,
-													SceneMemoryMgrTypes sceneType, bool firstTime )
-	{
-		IdString materialHashGeneric( materialName );
-		IdString materialHash( materialName + StringConverter::toString( sceneType ) );
+        //None found, or they're all full
+        return buildNewBatch( materialName, sceneType, false );
+    }
+    //-----------------------------------------------------------------------
+    InstanceBatch* InstanceManager::buildNewBatch( const String &materialName,
+                                                    SceneMemoryMgrTypes sceneType, bool firstTime )
+    {
+        IdString materialHashGeneric( materialName );
+        IdString materialHash( materialName + StringConverter::toString( sceneType ) );
 
-		//Get the bone to index map for the batches
-		Mesh::IndexMap &idxMap = mMeshReference->getSubMesh(mSubMeshIdx)->blendIndexToBoneIndexMap;
-		idxMap = idxMap.empty() ? mMeshReference->sharedBlendIndexToBoneIndexMap : idxMap;
+        //Get the bone to index map for the batches
+        Mesh::IndexMap &idxMap = mMeshReference->getSubMesh(mSubMeshIdx)->blendIndexToBoneIndexMap;
+        idxMap = idxMap.empty() ? mMeshReference->sharedBlendIndexToBoneIndexMap : idxMap;
 
-		//Get the material
-		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
-																	mMeshReference->getGroup() );
+        //Get the material
+        MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
+                                                                    mMeshReference->getGroup() );
 
-		//Get the array of batches grouped by this material
-		InstanceBatchVec &materialInstanceBatch = mInstanceBatches[materialHash];
+        //Get the array of batches grouped by this material
+        InstanceBatchVec &materialInstanceBatch = mInstanceBatches[materialHash];
 
-		InstanceBatch *batch = 0;
+        InstanceBatch *batch = 0;
 
-		switch( mInstancingTechnique )
-		{
-		case ShaderBased:
-			batch = OGRE_NEW InstanceBatchShader( Id::generateNewId<InstanceBatch>(),
-													&mSceneManager->_getEntityMemoryManager(sceneType),
-													this, mMeshReference, mat, mInstancesPerBatch,
-													&idxMap );
-			break;
-		case TextureVTF:
-			batch = OGRE_NEW InstanceBatchVTF( Id::generateNewId<InstanceBatch>(),
-													&mSceneManager->_getEntityMemoryManager(sceneType),
-													this, mMeshReference, mat, mInstancesPerBatch,
-													&idxMap );
-			static_cast<InstanceBatchVTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
-			static_cast<InstanceBatchVTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
-			static_cast<InstanceBatchVTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
-			break;
-		case HWInstancingBasic:
-			batch = OGRE_NEW InstanceBatchHW( Id::generateNewId<InstanceBatch>(),
-													&mSceneManager->_getEntityMemoryManager(sceneType), 
-													this, mMeshReference, mat, mInstancesPerBatch,
-													&idxMap );
-			break;
-		case HWInstancingVTF:
-			batch = OGRE_NEW InstanceBatchHW_VTF( Id::generateNewId<InstanceBatch>(),
-													&mSceneManager->_getEntityMemoryManager(sceneType),
-													this, mMeshReference, mat, mInstancesPerBatch,
-													&idxMap );
-			static_cast<InstanceBatchHW_VTF*>(batch)->setBoneMatrixLookup((mInstancingFlags & IM_VTFBONEMATRIXLOOKUP) != 0, mMaxLookupTableInstances);
-			static_cast<InstanceBatchHW_VTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
-			static_cast<InstanceBatchHW_VTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
-			static_cast<InstanceBatchHW_VTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
-			break;
-		default:
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-					"Unimplemented instancing technique: " +
-					StringConverter::toString(mInstancingTechnique),
-					"InstanceBatch::buildNewBatch()");
-		}
+        switch( mInstancingTechnique )
+        {
+        case ShaderBased:
+            batch = OGRE_NEW InstanceBatchShader( Id::generateNewId<InstanceBatch>(),
+                                                    &mSceneManager->_getEntityMemoryManager(sceneType),
+                                                    this, mMeshReference, mat, mInstancesPerBatch,
+                                                    &idxMap );
+            break;
+        case TextureVTF:
+            batch = OGRE_NEW InstanceBatchVTF( Id::generateNewId<InstanceBatch>(),
+                                                    &mSceneManager->_getEntityMemoryManager(sceneType),
+                                                    this, mMeshReference, mat, mInstancesPerBatch,
+                                                    &idxMap );
+            static_cast<InstanceBatchVTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
+            static_cast<InstanceBatchVTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
+            static_cast<InstanceBatchVTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
+            break;
+        case HWInstancingBasic:
+            batch = OGRE_NEW InstanceBatchHW( Id::generateNewId<InstanceBatch>(),
+                                                    &mSceneManager->_getEntityMemoryManager(sceneType), 
+                                                    this, mMeshReference, mat, mInstancesPerBatch,
+                                                    &idxMap );
+            break;
+        case HWInstancingVTF:
+            batch = OGRE_NEW InstanceBatchHW_VTF( Id::generateNewId<InstanceBatch>(),
+                                                    &mSceneManager->_getEntityMemoryManager(sceneType),
+                                                    this, mMeshReference, mat, mInstancesPerBatch,
+                                                    &idxMap );
+            static_cast<InstanceBatchHW_VTF*>(batch)->setBoneMatrixLookup((mInstancingFlags & IM_VTFBONEMATRIXLOOKUP) != 0, mMaxLookupTableInstances);
+            static_cast<InstanceBatchHW_VTF*>(batch)->setBoneDualQuaternions((mInstancingFlags & IM_USEBONEDUALQUATERNIONS) != 0);
+            static_cast<InstanceBatchHW_VTF*>(batch)->setUseOneWeight((mInstancingFlags & IM_USEONEWEIGHT) != 0);
+            static_cast<InstanceBatchHW_VTF*>(batch)->setForceOneWeight((mInstancingFlags & IM_FORCEONEWEIGHT) != 0);
+            break;
+        default:
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Unimplemented instancing technique: " +
+                    StringConverter::toString(mInstancingTechnique),
+                    "InstanceBatch::buildNewBatch()");
+        }
 
 #ifndef NDEBUG
-		batch->setName( mName.getFriendlyText() + "/InstanceBatch_" +
-							StringConverter::toString(mIdCount++) );
+        batch->setName( mName.getFriendlyText() + "/InstanceBatch_" +
+                            StringConverter::toString(mIdCount++) );
 #endif
 
-		batch->_notifyManager( mSceneManager );
+        batch->_notifyManager( mSceneManager );
 
-		if( !firstTime )
-		{
-			//TODO: Check different materials have the same mInstancesPerBatch upper limit
-			//otherwise we can't share
-			batch->buildFrom( mMeshReference->getSubMesh(mSubMeshIdx), mSharedRenderOperation );
-		}
-		else
-		{
-			//Ensure we don't request more than we can
-			const size_t maxInstPerBatch = batch->calculateMaxNumInstances( mMeshReference->
-														getSubMesh(mSubMeshIdx), mInstancingFlags );
-			mInstancesPerBatch = std::min( maxInstPerBatch, mInstancesPerBatch );
-			batch->_setInstancesPerBatch( mInstancesPerBatch );
+        if( !firstTime )
+        {
+            //TODO: Check different materials have the same mInstancesPerBatch upper limit
+            //otherwise we can't share
+            batch->buildFrom( mMeshReference->getSubMesh(mSubMeshIdx), mSharedRenderOperation );
+        }
+        else
+        {
+            //Ensure we don't request more than we can
+            const size_t maxInstPerBatch = batch->calculateMaxNumInstances( mMeshReference->
+                                                        getSubMesh(mSubMeshIdx), mInstancingFlags );
+            mInstancesPerBatch = std::min( maxInstPerBatch, mInstancesPerBatch );
+            batch->_setInstancesPerBatch( mInstancesPerBatch );
 
-			//TODO: Create a "merge" function that merges all submeshes into one big submesh
-			//instead of just sending submesh #0
+            //TODO: Create a "merge" function that merges all submeshes into one big submesh
+            //instead of just sending submesh #0
 
-			//Get the RenderOperation to be shared with further instances.
-			mSharedRenderOperation = batch->build( mMeshReference->getSubMesh(mSubMeshIdx) );
-		}
+            //Get the RenderOperation to be shared with further instances.
+            mSharedRenderOperation = batch->build( mMeshReference->getSubMesh(mSubMeshIdx) );
+        }
 
-		const BatchSettings &batchSettings = mBatchSettings[materialHashGeneric];
-		batch->setCastShadows( batchSettings.setting[CAST_SHADOWS] );
+        const BatchSettings &batchSettings = mBatchSettings[materialHashGeneric];
+        batch->setCastShadows( batchSettings.setting[CAST_SHADOWS] );
 
-		batch->setStatic( sceneType == SCENE_STATIC );
+        batch->setStatic( sceneType == SCENE_STATIC );
 
-		materialInstanceBatch.push_back( batch );
+        materialInstanceBatch.push_back( batch );
 
-		return batch;
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::cleanupEmptyBatches(void)
-	{
-		//Do this now to avoid any dangling pointer inside mDirtyBatches
-		_updateDirtyBatches();
-
-		InstanceBatchMap::iterator itor = mInstanceBatches.begin();
-		InstanceBatchMap::iterator end  = mInstanceBatches.end();
-
-		while( itor != end )
-		{
-			InstanceBatchVec::iterator it = itor->second.begin();
-			InstanceBatchVec::iterator en = itor->second.end();
-
-			while( it != en )
-			{
-				if( (*it)->isBatchUnused() )
-				{
-					OGRE_DELETE *it;
-					//Remove it from the list swapping with the last element and popping back
-					size_t idx = it - itor->second.begin();
-					*it = itor->second.back();
-					itor->second.pop_back();
-
-					//Restore invalidated iterators
-					it = itor->second.begin() + idx;
-					en = itor->second.end();
-				}
-				else
-					++it;
-			}
-
-			++itor;
-		}
-
-		//By this point it may happen that all mInstanceBatches' objects are also empty
-		//however if we call mInstanceBatches.clear(), next time we'll create an InstancedObject
-		//we'll end up calling buildFirstTime() instead of buildNewBatch(), which is not the idea
-		//(takes more time and will leak the shared render operation)
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::defragmentBatches( bool optimizeCull,
-												InstanceBatch::InstancedEntityVec &usedEntities,
-												InstanceBatch::CustomParamsVec &usedParams,
-												InstanceBatchVec &fragmentedBatches )
-	{
-		InstanceBatchVec::iterator itor = fragmentedBatches.begin();
-		InstanceBatchVec::iterator end  = fragmentedBatches.end();
-
-		while( itor != end && !usedEntities.empty() )
-		{
-			if( !(*itor)->isStatic() )
-				(*itor)->_defragmentBatch( optimizeCull, usedEntities, usedParams );
-			++itor;
-		}
-
-		InstanceBatchVec::iterator lastImportantBatch = itor;
-
-		while( itor != end )
-		{
-			if( !(*itor)->isStatic() )
-			{
-				//If we get here, this means we hit remaining batches which will be unused.
-				//Destroy them
-				//Call this to avoid freeing InstancedEntities that were just reparented
-				(*itor)->_defragmentBatchDiscard();
-				OGRE_DELETE *itor;
-			}
-			else
-			{
-				//This isn't a meaningless batch, move it forward so it doesn't get wipe
-				//when we resize the container (faster than removing element by element)
-				*lastImportantBatch++ = *itor;
-			}
-
-			++itor;
-		}
-
-		//Remove remaining batches all at once from the vector
-		const size_t remainingBatches = end - lastImportantBatch;
-		fragmentedBatches.resize( fragmentedBatches.size() - remainingBatches );
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::defragmentBatches( bool optimizeCulling )
-	{
-		//Do this now to avoid any dangling pointer inside mDirtyBatches
-		_updateDirtyBatches();
-
-		//Do this for every material
-		InstanceBatchMap::iterator itor = mInstanceBatches.begin();
-		InstanceBatchMap::iterator end  = mInstanceBatches.end();
-
-		while( itor != end )
-		{
-			InstanceBatch::InstancedEntityVec	usedEntities;
-			InstanceBatch::CustomParamsVec		usedParams;
-			usedEntities.reserve( itor->second.size() * mInstancesPerBatch );
-
-			//Collect all Instanced Entities being used by _all_ batches from this material
-			InstanceBatchVec::iterator it = itor->second.begin();
-			InstanceBatchVec::iterator en = itor->second.end();
-
-			while( it != en )
-			{
-				//Don't collect instances from static batches, we assume they're correctly set
-				//Plus, we don't want to put InstancedEntities from non-static into static batches
-				if( !(*it)->isStatic() )
-					(*it)->getInstancedEntitiesInUse( usedEntities, usedParams );
-				++it;
-			}
-
-			defragmentBatches( optimizeCulling, usedEntities, usedParams, itor->second );
-
-			++itor;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::setSetting( BatchSettingId id, bool value, IdString materialName )
-	{
-		assert( id < NUM_SETTINGS );
-
-		if( materialName == IdString() )
-		{
-			//Setup all existing materials
-			InstanceBatchMap::iterator itor = mInstanceBatches.begin();
-			InstanceBatchMap::iterator end  = mInstanceBatches.end();
-
-			while( itor != end )
-			{
-				mBatchSettings[itor->first].setting[id] = value;
-				applySettingToBatches( id, value, itor->second );
-
-				++itor;
-			}
-		}
-		else
-		{
-			//Setup a given material
-			mBatchSettings[materialName].setting[id] = value;
-
-			InstanceBatchMap::const_iterator itor = mInstanceBatches.find( materialName );
-			//Don't crash or throw if the batch with that material hasn't been created yet
-			if( itor != mInstanceBatches.end() )
-				applySettingToBatches( id, value, itor->second );
-		}
-	}
-	//-----------------------------------------------------------------------
-	bool InstanceManager::getSetting( BatchSettingId id, IdString materialName ) const
-	{
-		assert( id < NUM_SETTINGS );
-
-		BatchSettingsMap::const_iterator itor = mBatchSettings.find( materialName );
-		if( itor != mBatchSettings.end() )
-			return itor->second.setting[id]; //Return current setting
-
-		//Return default
-		return BatchSettings().setting[id];
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::applySettingToBatches( BatchSettingId id, bool value,
-												 const InstanceBatchVec &container )
-	{
-		InstanceBatchVec::const_iterator itor = container.begin();
-		InstanceBatchVec::const_iterator end  = container.end();
-
-		while( itor != end )
-		{
-			switch( id )
-			{
-			case CAST_SHADOWS:
-				(*itor)->setCastShadows( value );
-				break;
-			case SHOW_BOUNDINGBOX:
-				//(*itor)->getParentSceneNode()->showBoundingBox( value );
-				break;
-			default:
-				break;
-			}
-			++itor;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::setBatchesAsStatic( bool bStatic )
-	{
-		InstanceBatchMap::iterator itor = mInstanceBatches.begin();
-		InstanceBatchMap::iterator end  = mInstanceBatches.end();
-
-		while( itor != end )
-		{
-			InstanceBatchVec::iterator it = itor->second.begin();
-			InstanceBatchVec::iterator en = itor->second.end();
-
-			while( it != en )
-			{
-				(*it)->setStatic( bStatic );
-				++it;
-			}
-
-			++itor;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::_addToDynamicBatchList( InstanceBatch *dynamicBatch )
-	{
-		InstanceBatchVec::iterator itor = std::find( mDynamicBatches.begin(), mDynamicBatches.end(),
-													 dynamicBatch );
-		if( itor == mDynamicBatches.end() )
-			mDynamicBatches.push_back( dynamicBatch );
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::_removeFromDynamicBatchList( InstanceBatch *batch )
-	{
-		InstanceBatchVec::iterator itor = std::find( mDynamicBatches.begin(), mDynamicBatches.end(),
-													 batch );
-		if( itor != mDynamicBatches.end() )
-			efficientVectorRemove( mDynamicBatches, itor );
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::_addDirtyStaticBatch( InstanceBatch *dirtyBatch )
-	{
-		//If he needs to this very often, they're probably not static...
-		//Note: Calling this more often will only affect performance for the next frame.
-		//It won't crash and can be ignored
-		assert( std::find( mDirtyStaticBatches.begin(), mDirtyStaticBatches.end(), dirtyBatch )
-				== mDirtyStaticBatches.end() && "Only flag as dirty static batches once!" );
-
-		mDirtyStaticBatches.push_back( dirtyBatch );
-	}
-	//-----------------------------------------------------------------------
-#ifdef OGRE_LEGACY_ANIMATIONS
-	void InstanceManager::_updateAnimations(void)
-	{
-		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
-		InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
-
-		while( itor != end )
-		{
-			(*itor)->_updateAnimations();
-			++itor;
-		}
-
-		itor = mDirtyStaticBatches.begin();
-		end  = mDirtyStaticBatches.end();
-
-		while( itor != end )
-		{
-			(*itor)->_updateAnimations();
-			++itor;
-		}
-
-		//_updateDirtyBatches will be called after us, and will do that job.
-		//mDirtyStaticBatches.clear();
-	}
-#endif
-	//-----------------------------------------------------------------------
-	void InstanceManager::_updateDirtyBatchesThread( size_t threadIdx )
-	{
-		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
-		InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
-
-		while( itor != end )
-		{
-			(*itor)->_updateEntitiesBoundsThread( threadIdx );
-			++itor;
-		}
-
-		itor = mDirtyStaticBatches.begin();
-		end  = mDirtyStaticBatches.end();
-
-		while( itor != end )
-		{
-			(*itor)->_updateEntitiesBoundsThread( threadIdx );
-			++itor;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::_updateDirtyBatches(void)
-	{
-		InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
-		InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
-
-		while( itor != end )
-		{
-			(*itor)->_updateBounds();
-			++itor;
-		}
-
-		itor = mDirtyStaticBatches.begin();
-		end  = mDirtyStaticBatches.end();
-
-		while( itor != end )
-		{
-			(*itor)->_updateBounds();
-			++itor;
-		}
-
-		mDirtyStaticBatches.clear();
-	}
-	//-----------------------------------------------------------------------
-	InstanceManager::InstanceBatchIterator InstanceManager::getInstanceBatchIterator(
-										const String &materialName, SceneMemoryMgrTypes sceneType ) const
+        return batch;
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::cleanupEmptyBatches(void)
     {
-		IdString materialHash( materialName + StringConverter::toString( sceneType ) );
+        //Do this now to avoid any dangling pointer inside mDirtyBatches
+        _updateDirtyBatches();
+
+        InstanceBatchMap::iterator itor = mInstanceBatches.begin();
+        InstanceBatchMap::iterator end  = mInstanceBatches.end();
+
+        while( itor != end )
+        {
+            InstanceBatchVec::iterator it = itor->second.begin();
+            InstanceBatchVec::iterator en = itor->second.end();
+
+            while( it != en )
+            {
+                if( (*it)->isBatchUnused() )
+                {
+                    OGRE_DELETE *it;
+                    //Remove it from the list swapping with the last element and popping back
+                    size_t idx = it - itor->second.begin();
+                    *it = itor->second.back();
+                    itor->second.pop_back();
+
+                    //Restore invalidated iterators
+                    it = itor->second.begin() + idx;
+                    en = itor->second.end();
+                }
+                else
+                    ++it;
+            }
+
+            ++itor;
+        }
+
+        //By this point it may happen that all mInstanceBatches' objects are also empty
+        //however if we call mInstanceBatches.clear(), next time we'll create an InstancedObject
+        //we'll end up calling buildFirstTime() instead of buildNewBatch(), which is not the idea
+        //(takes more time and will leak the shared render operation)
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::defragmentBatches( bool optimizeCull,
+                                                InstanceBatch::InstancedEntityVec &usedEntities,
+                                                InstanceBatch::CustomParamsVec &usedParams,
+                                                InstanceBatchVec &fragmentedBatches )
+    {
+        InstanceBatchVec::iterator itor = fragmentedBatches.begin();
+        InstanceBatchVec::iterator end  = fragmentedBatches.end();
+
+        while( itor != end && !usedEntities.empty() )
+        {
+            if( !(*itor)->isStatic() )
+                (*itor)->_defragmentBatch( optimizeCull, usedEntities, usedParams );
+            ++itor;
+        }
+
+        InstanceBatchVec::iterator lastImportantBatch = itor;
+
+        while( itor != end )
+        {
+            if( !(*itor)->isStatic() )
+            {
+                //If we get here, this means we hit remaining batches which will be unused.
+                //Destroy them
+                //Call this to avoid freeing InstancedEntities that were just reparented
+                (*itor)->_defragmentBatchDiscard();
+                OGRE_DELETE *itor;
+            }
+            else
+            {
+                //This isn't a meaningless batch, move it forward so it doesn't get wipe
+                //when we resize the container (faster than removing element by element)
+                *lastImportantBatch++ = *itor;
+            }
+
+            ++itor;
+        }
+
+        //Remove remaining batches all at once from the vector
+        const size_t remainingBatches = end - lastImportantBatch;
+        fragmentedBatches.resize( fragmentedBatches.size() - remainingBatches );
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::defragmentBatches( bool optimizeCulling )
+    {
+        //Do this now to avoid any dangling pointer inside mDirtyBatches
+        _updateDirtyBatches();
+
+        //Do this for every material
+        InstanceBatchMap::iterator itor = mInstanceBatches.begin();
+        InstanceBatchMap::iterator end  = mInstanceBatches.end();
+
+        while( itor != end )
+        {
+            InstanceBatch::InstancedEntityVec   usedEntities;
+            InstanceBatch::CustomParamsVec      usedParams;
+            usedEntities.reserve( itor->second.size() * mInstancesPerBatch );
+
+            //Collect all Instanced Entities being used by _all_ batches from this material
+            InstanceBatchVec::iterator it = itor->second.begin();
+            InstanceBatchVec::iterator en = itor->second.end();
+
+            while( it != en )
+            {
+                //Don't collect instances from static batches, we assume they're correctly set
+                //Plus, we don't want to put InstancedEntities from non-static into static batches
+                if( !(*it)->isStatic() )
+                    (*it)->getInstancedEntitiesInUse( usedEntities, usedParams );
+                ++it;
+            }
+
+            defragmentBatches( optimizeCulling, usedEntities, usedParams, itor->second );
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::setSetting( BatchSettingId id, bool value, IdString materialName )
+    {
+        assert( id < NUM_SETTINGS );
+
+        if( materialName == IdString() )
+        {
+            //Setup all existing materials
+            InstanceBatchMap::iterator itor = mInstanceBatches.begin();
+            InstanceBatchMap::iterator end  = mInstanceBatches.end();
+
+            while( itor != end )
+            {
+                mBatchSettings[itor->first].setting[id] = value;
+                applySettingToBatches( id, value, itor->second );
+
+                ++itor;
+            }
+        }
+        else
+        {
+            //Setup a given material
+            mBatchSettings[materialName].setting[id] = value;
+
+            InstanceBatchMap::const_iterator itor = mInstanceBatches.find( materialName );
+            //Don't crash or throw if the batch with that material hasn't been created yet
+            if( itor != mInstanceBatches.end() )
+                applySettingToBatches( id, value, itor->second );
+        }
+    }
+    //-----------------------------------------------------------------------
+    bool InstanceManager::getSetting( BatchSettingId id, IdString materialName ) const
+    {
+        assert( id < NUM_SETTINGS );
+
+        BatchSettingsMap::const_iterator itor = mBatchSettings.find( materialName );
+        if( itor != mBatchSettings.end() )
+            return itor->second.setting[id]; //Return current setting
+
+        //Return default
+        return BatchSettings().setting[id];
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::applySettingToBatches( BatchSettingId id, bool value,
+                                                 const InstanceBatchVec &container )
+    {
+        InstanceBatchVec::const_iterator itor = container.begin();
+        InstanceBatchVec::const_iterator end  = container.end();
+
+        while( itor != end )
+        {
+            switch( id )
+            {
+            case CAST_SHADOWS:
+                (*itor)->setCastShadows( value );
+                break;
+            case SHOW_BOUNDINGBOX:
+                //(*itor)->getParentSceneNode()->showBoundingBox( value );
+                break;
+            default:
+                break;
+            }
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::setBatchesAsStatic( bool bStatic )
+    {
+        InstanceBatchMap::iterator itor = mInstanceBatches.begin();
+        InstanceBatchMap::iterator end  = mInstanceBatches.end();
+
+        while( itor != end )
+        {
+            InstanceBatchVec::iterator it = itor->second.begin();
+            InstanceBatchVec::iterator en = itor->second.end();
+
+            while( it != en )
+            {
+                (*it)->setStatic( bStatic );
+                ++it;
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::_addToDynamicBatchList( InstanceBatch *dynamicBatch )
+    {
+        InstanceBatchVec::iterator itor = std::find( mDynamicBatches.begin(), mDynamicBatches.end(),
+                                                     dynamicBatch );
+        if( itor == mDynamicBatches.end() )
+            mDynamicBatches.push_back( dynamicBatch );
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::_removeFromDynamicBatchList( InstanceBatch *batch )
+    {
+        InstanceBatchVec::iterator itor = std::find( mDynamicBatches.begin(), mDynamicBatches.end(),
+                                                     batch );
+        if( itor != mDynamicBatches.end() )
+            efficientVectorRemove( mDynamicBatches, itor );
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::_addDirtyStaticBatch( InstanceBatch *dirtyBatch )
+    {
+        //If he needs to this very often, they're probably not static...
+        //Note: Calling this more often will only affect performance for the next frame.
+        //It won't crash and can be ignored
+        assert( std::find( mDirtyStaticBatches.begin(), mDirtyStaticBatches.end(), dirtyBatch )
+                == mDirtyStaticBatches.end() && "Only flag as dirty static batches once!" );
+
+        mDirtyStaticBatches.push_back( dirtyBatch );
+    }
+    //-----------------------------------------------------------------------
+#ifdef OGRE_LEGACY_ANIMATIONS
+    void InstanceManager::_updateAnimations(void)
+    {
+        InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
+        InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
+
+        while( itor != end )
+        {
+            (*itor)->_updateAnimations();
+            ++itor;
+        }
+
+        itor = mDirtyStaticBatches.begin();
+        end  = mDirtyStaticBatches.end();
+
+        while( itor != end )
+        {
+            (*itor)->_updateAnimations();
+            ++itor;
+        }
+
+        //_updateDirtyBatches will be called after us, and will do that job.
+        //mDirtyStaticBatches.clear();
+    }
+#endif
+    //-----------------------------------------------------------------------
+    void InstanceManager::_updateDirtyBatchesThread( size_t threadIdx )
+    {
+        InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
+        InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
+
+        while( itor != end )
+        {
+            (*itor)->_updateEntitiesBoundsThread( threadIdx );
+            ++itor;
+        }
+
+        itor = mDirtyStaticBatches.begin();
+        end  = mDirtyStaticBatches.end();
+
+        while( itor != end )
+        {
+            (*itor)->_updateEntitiesBoundsThread( threadIdx );
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::_updateDirtyBatches(void)
+    {
+        InstanceBatchVec::const_iterator itor = mDynamicBatches.begin();
+        InstanceBatchVec::const_iterator end  = mDynamicBatches.end();
+
+        while( itor != end )
+        {
+            (*itor)->_updateBounds();
+            ++itor;
+        }
+
+        itor = mDirtyStaticBatches.begin();
+        end  = mDirtyStaticBatches.end();
+
+        while( itor != end )
+        {
+            (*itor)->_updateBounds();
+            ++itor;
+        }
+
+        mDirtyStaticBatches.clear();
+    }
+    //-----------------------------------------------------------------------
+    InstanceManager::InstanceBatchIterator InstanceManager::getInstanceBatchIterator(
+                                        const String &materialName, SceneMemoryMgrTypes sceneType ) const
+    {
+        IdString materialHash( materialName + StringConverter::toString( sceneType ) );
         InstanceBatchMap::const_iterator it = mInstanceBatches.find( materialHash );
-		if( it == mInstanceBatches.end() )
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-						"Can't find instance batches with material '" + materialName + "'",
-						"InstanceManager::getInstanceBatchIterator");
-		}
+        if( it == mInstanceBatches.end() )
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                        "Can't find instance batches with material '" + materialName + "'",
+                        "InstanceManager::getInstanceBatchIterator");
+        }
         return InstanceBatchIterator( it->second.begin(), it->second.end() );
     }
-	//-----------------------------------------------------------------------
-	// Helper functions to unshare the vertices
-	//-----------------------------------------------------------------------
-	typedef map<uint32, uint32>::type IndicesMap;
+    //-----------------------------------------------------------------------
+    // Helper functions to unshare the vertices
+    //-----------------------------------------------------------------------
+    typedef map<uint32, uint32>::type IndicesMap;
 
-	template< typename TIndexType >
-	IndicesMap getUsedIndices(IndexData* idxData)
-	{
-		TIndexType *data = (TIndexType*)idxData->indexBuffer->lock(idxData->indexStart * sizeof(TIndexType), 
-			idxData->indexCount * sizeof(TIndexType), HardwareBuffer::HBL_READ_ONLY);
+    template< typename TIndexType >
+    IndicesMap getUsedIndices(IndexData* idxData)
+    {
+        TIndexType *data = (TIndexType*)idxData->indexBuffer->lock(idxData->indexStart * sizeof(TIndexType), 
+            idxData->indexCount * sizeof(TIndexType), HardwareBuffer::HBL_READ_ONLY);
 
-		IndicesMap indicesMap;
-		for (size_t i = 0; i < idxData->indexCount; i++) 
-		{
-			TIndexType index = data[i];
-			if (indicesMap.find(index) == indicesMap.end()) 
-			{
-				indicesMap[index] = (uint32)(indicesMap.size());
-			}
-		}
+        IndicesMap indicesMap;
+        for (size_t i = 0; i < idxData->indexCount; i++) 
+        {
+            TIndexType index = data[i];
+            if (indicesMap.find(index) == indicesMap.end()) 
+            {
+                indicesMap[index] = (uint32)(indicesMap.size());
+            }
+        }
 
-		idxData->indexBuffer->unlock();
-		return indicesMap;
-	}
-	//-----------------------------------------------------------------------
-	template< typename TIndexType >
-	void copyIndexBuffer(IndexData* idxData, IndicesMap& indicesMap)
-	{
-		TIndexType *data = (TIndexType*)idxData->indexBuffer->lock(idxData->indexStart * sizeof(TIndexType), 
-			idxData->indexCount * sizeof(TIndexType), HardwareBuffer::HBL_NORMAL);
+        idxData->indexBuffer->unlock();
+        return indicesMap;
+    }
+    //-----------------------------------------------------------------------
+    template< typename TIndexType >
+    void copyIndexBuffer(IndexData* idxData, IndicesMap& indicesMap)
+    {
+        TIndexType *data = (TIndexType*)idxData->indexBuffer->lock(idxData->indexStart * sizeof(TIndexType), 
+            idxData->indexCount * sizeof(TIndexType), HardwareBuffer::HBL_NORMAL);
 
-		for (uint32 i = 0; i < idxData->indexCount; i++) 
-		{
-			data[i] = (TIndexType)indicesMap[data[i]];
-		}
+        for (uint32 i = 0; i < idxData->indexCount; i++) 
+        {
+            data[i] = (TIndexType)indicesMap[data[i]];
+        }
 
-		idxData->indexBuffer->unlock();
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::unshareVertices(const Ogre::MeshPtr &mesh)
-	{
-		// Retrieve data to copy bone assignments
-		const Mesh::VertexBoneAssignmentList& boneAssignments = mesh->getBoneAssignments();
-		Mesh::VertexBoneAssignmentList::const_iterator it = boneAssignments.begin();
-		Mesh::VertexBoneAssignmentList::const_iterator end = boneAssignments.end();
-		size_t curVertexOffset = 0;
+        idxData->indexBuffer->unlock();
+    }
+    //-----------------------------------------------------------------------
+    void InstanceManager::unshareVertices(const Ogre::MeshPtr &mesh)
+    {
+        // Retrieve data to copy bone assignments
+        const Mesh::VertexBoneAssignmentList& boneAssignments = mesh->getBoneAssignments();
+        Mesh::VertexBoneAssignmentList::const_iterator it = boneAssignments.begin();
+        Mesh::VertexBoneAssignmentList::const_iterator end = boneAssignments.end();
+        size_t curVertexOffset = 0;
 
-		// Access shared vertices
-		VertexData* sharedVertexData = mesh->sharedVertexData;
+        // Access shared vertices
+        VertexData* sharedVertexData = mesh->sharedVertexData;
 
-		for (size_t subMeshIdx = 0; subMeshIdx < mesh->getNumSubMeshes(); subMeshIdx++)
-		{
-			SubMesh *subMesh = mesh->getSubMesh(subMeshIdx);
+        for (size_t subMeshIdx = 0; subMeshIdx < mesh->getNumSubMeshes(); subMeshIdx++)
+        {
+            SubMesh *subMesh = mesh->getSubMesh(subMeshIdx);
 
-			IndexData *indexData = subMesh->indexData;
-			HardwareIndexBuffer::IndexType idxType = indexData->indexBuffer->getType();
-			IndicesMap indicesMap = (idxType == HardwareIndexBuffer::IT_16BIT) ? getUsedIndices<uint16>(indexData) :
-																				 getUsedIndices<uint32>(indexData);
+            IndexData *indexData = subMesh->indexData;
+            HardwareIndexBuffer::IndexType idxType = indexData->indexBuffer->getType();
+            IndicesMap indicesMap = (idxType == HardwareIndexBuffer::IT_16BIT) ? getUsedIndices<uint16>(indexData) :
+                                                                                 getUsedIndices<uint32>(indexData);
 
 
-			VertexData *newVertexData = new VertexData();
-			newVertexData->vertexCount = indicesMap.size();
-			newVertexData->vertexDeclaration = sharedVertexData->vertexDeclaration->clone();
+            VertexData *newVertexData = new VertexData();
+            newVertexData->vertexCount = indicesMap.size();
+            newVertexData->vertexDeclaration = sharedVertexData->vertexDeclaration->clone();
 
-			for (size_t bufIdx = 0; bufIdx < sharedVertexData->vertexBufferBinding->getBufferCount(); bufIdx++) 
-			{
-				HardwareVertexBufferSharedPtr sharedVertexBuffer = sharedVertexData->vertexBufferBinding->getBuffer(bufIdx);
-				size_t vertexSize = sharedVertexBuffer->getVertexSize();				
+            for (size_t bufIdx = 0; bufIdx < sharedVertexData->vertexBufferBinding->getBufferCount(); bufIdx++) 
+            {
+                HardwareVertexBufferSharedPtr sharedVertexBuffer = sharedVertexData->vertexBufferBinding->getBuffer(bufIdx);
+                size_t vertexSize = sharedVertexBuffer->getVertexSize();                
 
-				HardwareVertexBufferSharedPtr newVertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer
-					(vertexSize, newVertexData->vertexCount, sharedVertexBuffer->getUsage(), sharedVertexBuffer->hasShadowBuffer());
+                HardwareVertexBufferSharedPtr newVertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer
+                    (vertexSize, newVertexData->vertexCount, sharedVertexBuffer->getUsage(), sharedVertexBuffer->hasShadowBuffer());
 
-				uint8 *oldLock = (uint8*)sharedVertexBuffer->lock(0, sharedVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_READ_ONLY);
-				uint8 *newLock = (uint8*)newVertexBuffer->lock(0, newVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_NORMAL);
+                uint8 *oldLock = (uint8*)sharedVertexBuffer->lock(0, sharedVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_READ_ONLY);
+                uint8 *newLock = (uint8*)newVertexBuffer->lock(0, newVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_NORMAL);
 
-				IndicesMap::iterator indIt = indicesMap.begin();
-				IndicesMap::iterator endIndIt = indicesMap.end();
-				for (; indIt != endIndIt; indIt++) 
-				{
-					memcpy(newLock + vertexSize * indIt->second, oldLock + vertexSize * indIt->first, vertexSize);
-				}
+                IndicesMap::iterator indIt = indicesMap.begin();
+                IndicesMap::iterator endIndIt = indicesMap.end();
+                for (; indIt != endIndIt; indIt++) 
+                {
+                    memcpy(newLock + vertexSize * indIt->second, oldLock + vertexSize * indIt->first, vertexSize);
+                }
 
-				sharedVertexBuffer->unlock();
-				newVertexBuffer->unlock();
+                sharedVertexBuffer->unlock();
+                newVertexBuffer->unlock();
 
-				newVertexData->vertexBufferBinding->setBinding(bufIdx, newVertexBuffer);
-			}
+                newVertexData->vertexBufferBinding->setBinding(bufIdx, newVertexBuffer);
+            }
 
-			if (idxType == HardwareIndexBuffer::IT_16BIT)
-			{
-				copyIndexBuffer<uint16>(indexData, indicesMap);
-			}
-			else
-			{
-				copyIndexBuffer<uint32>(indexData, indicesMap);
-			}
+            if (idxType == HardwareIndexBuffer::IT_16BIT)
+            {
+                copyIndexBuffer<uint16>(indexData, indicesMap);
+            }
+            else
+            {
+                copyIndexBuffer<uint32>(indexData, indicesMap);
+            }
 
-			// Store new attributes
-			subMesh->useSharedVertices = false;
-			subMesh->vertexData = newVertexData;
+            // Store new attributes
+            subMesh->useSharedVertices = false;
+            subMesh->vertexData = newVertexData;
 
-			// Transfer bone assignments to the submesh
-			size_t offset = curVertexOffset + newVertexData->vertexCount;
-			for (; it != end; it++)
-			{
-				size_t vertexIdx = (*it).first;
-				if (vertexIdx > offset)
-					break;
+            // Transfer bone assignments to the submesh
+            size_t offset = curVertexOffset + newVertexData->vertexCount;
+            for (; it != end; it++)
+            {
+                size_t vertexIdx = (*it).first;
+                if (vertexIdx > offset)
+                    break;
 
-				VertexBoneAssignment boneAssignment = (*it).second;
-				boneAssignment.vertexIndex = static_cast<unsigned int>(boneAssignment.vertexIndex - curVertexOffset);
-				subMesh->addBoneAssignment(boneAssignment);
-			}
-			curVertexOffset = newVertexData->vertexCount + 1;
-		}
+                VertexBoneAssignment boneAssignment = (*it).second;
+                boneAssignment.vertexIndex = static_cast<unsigned int>(boneAssignment.vertexIndex - curVertexOffset);
+                subMesh->addBoneAssignment(boneAssignment);
+            }
+            curVertexOffset = newVertexData->vertexCount + 1;
+        }
 
-		// Release shared vertex data
-		delete mesh->sharedVertexData;
-		mesh->sharedVertexData = NULL;
-		mesh->clearBoneAssignments();
-	}
-	//-----------------------------------------------------------------------
+        // Release shared vertex data
+        delete mesh->sharedVertexData;
+        mesh->sharedVertexData = NULL;
+        mesh->clearBoneAssignments();
+    }
+    //-----------------------------------------------------------------------
 }

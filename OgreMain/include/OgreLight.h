@@ -52,10 +52,10 @@ namespace Ogre {
         attenuation (does not decrease with distance) and a range of 1000 world units.
     @par
         Lights are created by using the SceneManager::createLight method. Starting Ogre 2.0
-		all Lights must be associated to a SceneNode in order to work; which holds the position
-		and direction.
-		Light::setDirection and Light::getDirection will redirect to the SceneNode and assert
-		or crash if not attached to one.
+        all Lights must be associated to a SceneNode in order to work; which holds the position
+        and direction.
+        Light::setDirection and Light::getDirection will redirect to the SceneNode and assert
+        or crash if not attached to one.
     @par
         Remember also that dynamic lights rely on modifying the colour of vertices based on the position of
         the light compared to an object's vertex normals. Dynamic lighting will only look good if the
@@ -97,10 +97,10 @@ namespace Ogre {
 
         /** Returns the light type.
         */
-		LightTypes getType(void) const								{ return mLightType; }
+        LightTypes getType(void) const                              { return mLightType; }
 
-		/// Sets the Aabb (local space) for this light when it's of type spot
-		void setSpotAabb(void);
+        /// Sets the Aabb (local space) for this light when it's of type spot
+        void setSpotAabb(void);
 
         /** Sets the colour of the diffuse light given off by this source.
         @remarks
@@ -126,7 +126,7 @@ namespace Ogre {
 
         /** Returns the colour of the diffuse light given off by this light source (see setDiffuseColour for more info).
         */
-		const ColourValue& getDiffuseColour(void) const				{ return mDiffuse; }
+        const ColourValue& getDiffuseColour(void) const             { return mDiffuse; }
 
         /** Sets the colour of the specular light given off by this source.
         @remarks
@@ -148,11 +148,11 @@ namespace Ogre {
             Specular light affects the appearance of shiny highlights on objects, and is also dependent on the
             'shininess' Material value.
         */
-		inline void setSpecularColour(const ColourValue& colour);
+        inline void setSpecularColour(const ColourValue& colour);
 
         /** Returns the colour of specular light given off by this light source.
         */
-        const ColourValue& getSpecularColour(void) const			{ return mSpecular; }
+        const ColourValue& getSpecularColour(void) const            { return mSpecular; }
 
         /** Sets the attenuation parameters of the light source i.e. how it diminishes with distance.
         @remarks
@@ -177,19 +177,19 @@ namespace Ogre {
 
         /** Returns the absolute upper range of the light.
         */
-		Real getAttenuationRange(void) const						{ return mRange; }
+        Real getAttenuationRange(void) const                        { return mRange; }
 
         /** Returns the constant factor in the attenuation formula.
         */
-		Real getAttenuationConstant(void) const						{ return mAttenuationConst; }
+        Real getAttenuationConstant(void) const                     { return mAttenuationConst; }
 
         /** Returns the linear factor in the attenuation formula.
         */
-		Real getAttenuationLinear(void) const						{ return mAttenuationLinear; }
+        Real getAttenuationLinear(void) const                       { return mAttenuationLinear; }
 
         /** Returns the quadric factor in the attenuation formula.
         */
-		Real getAttenuationQuadric(void) const						{ return mAttenuationQuad; }
+        Real getAttenuationQuadric(void) const                      { return mAttenuationQuad; }
 
         /** Sets the direction in which a light points.
         @remarks
@@ -202,7 +202,7 @@ namespace Ogre {
         /** Returns the light's direction.
         @remarks
             Applicable only to the spotlight and directional light types.
-			Try to cache the value instead of calling it multiple times in the same scope
+            Try to cache the value instead of calling it multiple times in the same scope
         */
         Vector3 getDirection(void) const;
 
@@ -222,15 +222,15 @@ namespace Ogre {
 
         /** Returns the angle covered by the spotlights inner cone.
         */
-		const Radian& getSpotlightInnerAngle(void) const			{ return mSpotInner; }
+        const Radian& getSpotlightInnerAngle(void) const            { return mSpotInner; }
 
         /** Returns the angle covered by the spotlights outer cone.
         */
-		const Radian& getSpotlightOuterAngle(void) const			{ return mSpotOuter; }
+        const Radian& getSpotlightOuterAngle(void) const            { return mSpotOuter; }
 
         /** Returns the falloff between the inner and outer cones of the spotlight.
         */
-		Real getSpotlightFalloff(void) const						{ return mSpotFalloff; }
+        Real getSpotlightFalloff(void) const                        { return mSpotFalloff; }
 
         /** Sets the angle covered by the spotlights inner cone.
         */
@@ -270,7 +270,7 @@ namespace Ogre {
         /** Set the scaling factor which indicates the relative power of a 
             light.
         */
-		Real getPowerScale(void) const								{ return mPowerScale; }
+        Real getPowerScale(void) const                              { return mPowerScale; }
 
         /** @copydoc MovableObject::_updateRenderQueue */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {}
@@ -280,7 +280,7 @@ namespace Ogre {
 
         /** Retrieves the direction of the light including any transform from nodes it is attached to. */
         Vector3 getDerivedDirection(void) const;
-		Vector3 getDerivedDirectionUpdated(void) const;
+        Vector3 getDerivedDirectionUpdated(void) const;
 
         /** @copydoc MovableObject::setVisible.
         @remarks
@@ -307,7 +307,7 @@ namespace Ogre {
 
         /// @copydoc MovableObject::visitRenderables
         virtual void visitRenderables(Renderable::Visitor* visitor, 
-										bool debugRenderables = false) {}
+                                        bool debugRenderables = false) {}
 
         /** Sets the maximum distance away from the camera that shadows
             by this light will be visible.
@@ -438,7 +438,7 @@ namespace Ogre {
         */
         bool isInLightRange(const Ogre::Sphere& sphere) const;
         
-        /** Check whether a bounding box is included in the lighted	area of the light
+        /** Check whether a bounding box is included in the lighted area of the light
         @note 
             The function trades accuracy for efficiency. As a result you may get
             false-positives (The function should not return any false-negatives).
@@ -484,7 +484,7 @@ namespace Ogre {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-													const NameValuePairList* params = 0 );
+                                                    const NameValuePairList* params = 0 );
     public:
         LightFactory() {}
         ~LightFactory() {}

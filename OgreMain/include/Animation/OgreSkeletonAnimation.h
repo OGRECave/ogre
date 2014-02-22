@@ -38,122 +38,122 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class SkeletonAnimationDef;
-	class SkeletonInstance;
+    class SkeletonAnimationDef;
+    class SkeletonInstance;
 
-	typedef vector<KeyFrameRigVec::const_iterator>::type KnownKeyFramesVec;
+    typedef vector<KeyFrameRigVec::const_iterator>::type KnownKeyFramesVec;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Animation
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Animation
+    *  @{
+    */
 
-	/// Represents the instance of a Skeletal animation based on its definition
-	class _OgreExport SkeletonAnimation : public MovableAlloc
-	{
-		SkeletonAnimationDef const	*mDefinition;
-	protected:
-		RawSimdUniquePtr<ArrayReal, MEMCATEGORY_ANIMATION> mBoneWeights;
-		Real					mCurrentFrame;
-	public:
-		Real					mFrameRate;		// Playback framerate
-		Real					mWeight;
-		FastArray<size_t> const	*mSlotStarts;	// One per parent depth level
-		bool					mLoop;
-		bool					mEnabled;
-		SkeletonInstance		*mOwner;
-	protected:
-		IdString				mName;
+    /// Represents the instance of a Skeletal animation based on its definition
+    class _OgreExport SkeletonAnimation : public MovableAlloc
+    {
+        SkeletonAnimationDef const  *mDefinition;
+    protected:
+        RawSimdUniquePtr<ArrayReal, MEMCATEGORY_ANIMATION> mBoneWeights;
+        Real                    mCurrentFrame;
+    public:
+        Real                    mFrameRate;     // Playback framerate
+        Real                    mWeight;
+        FastArray<size_t> const *mSlotStarts;   // One per parent depth level
+        bool                    mLoop;
+        bool                    mEnabled;
+        SkeletonInstance        *mOwner;
+    protected:
+        IdString                mName;
 
-		/// One per track
-		KnownKeyFramesVec		mLastKnownKeyFrames;
+        /// One per track
+        KnownKeyFramesVec       mLastKnownKeyFrames;
 
-	public:
-		SkeletonAnimation( const SkeletonAnimationDef *definition, const FastArray<size_t> *slotStarts,
-							SkeletonInstance *owner );
+    public:
+        SkeletonAnimation( const SkeletonAnimationDef *definition, const FastArray<size_t> *slotStarts,
+                            SkeletonInstance *owner );
 
-		/// Call this function before using the animation!
-		void initialize(void);
+        /// Call this function before using the animation!
+        void initialize(void);
 
-		/** Plays the animation forward (or backwards if negative)
-		@param time
-			Time to advance, in seconds
-		*/
-		void addTime( Real time )									{ addFrame( time * mFrameRate ); }
+        /** Plays the animation forward (or backwards if negative)
+        @param time
+            Time to advance, in seconds
+        */
+        void addTime( Real time )                                   { addFrame( time * mFrameRate ); }
 
-		/** Plays the animation forward (or backwards if negative)
-		@param frames
-			Frames to advance, in frames
-		*/
-		void addFrame( Real frames );
+        /** Plays the animation forward (or backwards if negative)
+        @param frames
+            Frames to advance, in frames
+        */
+        void addFrame( Real frames );
 
-		/// Gets the current animation time, in seconds. Prefer using getCurrentFrame
-		Real getCurrentTime( Real time ) const						{ return mCurrentFrame / mFrameRate; }
+        /// Gets the current animation time, in seconds. Prefer using getCurrentFrame
+        Real getCurrentTime( Real time ) const                      { return mCurrentFrame / mFrameRate; }
 
-		/// Gets the current animation frame, in frames.
-		Real getCurrentFrame( Real time ) const						{ return mCurrentFrame; }
+        /// Gets the current animation frame, in frames.
+        Real getCurrentFrame( Real time ) const                     { return mCurrentFrame; }
 
-		IdString getName(void) const								{ return mName; }
+        IdString getName(void) const                                { return mName; }
 
-		/** Loop setting. Looped animations will wrap back to zero when reaching the animation length
-			or go back to the animation length if playing backwards.
-			Non-looped animations will stop at the animation length (or at 0 if backwards) but won't
-			be disabled.
-		*/
-		void setLoop( bool bLoop )									{ mLoop = bLoop; }
+        /** Loop setting. Looped animations will wrap back to zero when reaching the animation length
+            or go back to the animation length if playing backwards.
+            Non-looped animations will stop at the animation length (or at 0 if backwards) but won't
+            be disabled.
+        */
+        void setLoop( bool bLoop )                                  { mLoop = bLoop; }
 
-		/** Returns current loop setting. @See setLoop.
-		*/
-		bool getLoop(void) const									{ return mLoop; }
+        /** Returns current loop setting. @See setLoop.
+        */
+        bool getLoop(void) const                                    { return mLoop; }
 
-		/** Sets the per-bone weight to a particular bone. Useful for fine control
-			over animation strength on a set of nodes (i.e. an arm)
-		@remarks
-			By default all bone weights are set to 1.0
-		@param boneName
-			The name of the bone to set. If this animation doesn't affect that bone (or the
-			name is invalid) this function does nothing.
-		@param weight
-			Weight to apply to this particular bone. Note that the animation multiplies this
-			value against the global mWeight to obtain the final weight.
-			Normal range is between [0; 1] but not necessarily.
-		*/
-		void setBoneWeight( IdString boneName, Real weight );
+        /** Sets the per-bone weight to a particular bone. Useful for fine control
+            over animation strength on a set of nodes (i.e. an arm)
+        @remarks
+            By default all bone weights are set to 1.0
+        @param boneName
+            The name of the bone to set. If this animation doesn't affect that bone (or the
+            name is invalid) this function does nothing.
+        @param weight
+            Weight to apply to this particular bone. Note that the animation multiplies this
+            value against the global mWeight to obtain the final weight.
+            Normal range is between [0; 1] but not necessarily.
+        */
+        void setBoneWeight( IdString boneName, Real weight );
 
-		/** Gets the current per-bone weight of a particular bone.
-		@param boneName
-			The name of the bone to get. If this animation doesn't affect that bone (or the
-			name is invalid) this function returns 0.
-		@return
-			The weight of the specified bone. 0 if not found.
-		*/
-		Real getBoneWeight( IdString boneName ) const;
+        /** Gets the current per-bone weight of a particular bone.
+        @param boneName
+            The name of the bone to get. If this animation doesn't affect that bone (or the
+            name is invalid) this function returns 0.
+        @return
+            The weight of the specified bone. 0 if not found.
+        */
+        Real getBoneWeight( IdString boneName ) const;
 
-		/** Gets a pointer current per-bone weight of a particular bone. Useful if you intend
-			to have read/write access to this value very often.
-		@remarks
-			If returnPtr is the return value to bone[0], do not assume that returnPtr+1
-			affects bone[1] or even any other bone. Doing so the behavior is underfined
-			and most likely you could be affecting the contents of other SkeletonInstances.
-		@param boneName
-			The name of the bone to get. If this animation doesn't affect that bone (or the
-			name is invalid) this function returns a null pointer.
-		@return
-			The pointer to the bone weight of the specified bone. Null pointer if not found.
-		*/
-		Real* getBoneWeightPtr( IdString boneName );
+        /** Gets a pointer current per-bone weight of a particular bone. Useful if you intend
+            to have read/write access to this value very often.
+        @remarks
+            If returnPtr is the return value to bone[0], do not assume that returnPtr+1
+            affects bone[1] or even any other bone. Doing so the behavior is underfined
+            and most likely you could be affecting the contents of other SkeletonInstances.
+        @param boneName
+            The name of the bone to get. If this animation doesn't affect that bone (or the
+            name is invalid) this function returns a null pointer.
+        @return
+            The pointer to the bone weight of the specified bone. Null pointer if not found.
+        */
+        Real* getBoneWeightPtr( IdString boneName );
 
-		/// Enables or disables this animation. A disabled animation won't be processed at all.
-		void setEnabled( bool bEnable );
-		bool getEnabled(void) const									{ return mEnabled; }
+        /// Enables or disables this animation. A disabled animation won't be processed at all.
+        void setEnabled( bool bEnable );
+        bool getEnabled(void) const                                 { return mEnabled; }
 
-		void _applyAnimation( const TransformArray &boneTransforms );
-	};
+        void _applyAnimation( const TransformArray &boneTransforms );
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

@@ -34,32 +34,32 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** Plugin instance for Cg Program Manager */
-	class CgPlugin : public Plugin
-	{
-	public:
-		CgPlugin();
+    /** Plugin instance for Cg Program Manager */
+    class CgPlugin : public Plugin
+    {
+    public:
+        CgPlugin();
 
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		CgProgramFactory* mCgProgramFactory;
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        CgProgramFactory* mCgProgramFactory;
 
 
-	};
+    };
 }
 
 #endif

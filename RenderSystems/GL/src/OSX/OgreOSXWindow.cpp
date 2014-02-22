@@ -102,8 +102,8 @@ namespace Ogre
         }
         
         // Switch context if different from current one
-		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-		rsys->_setViewport(this->getViewport(0));
+        RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+        rsys->_setViewport(this->getViewport(0));
 
         if(dst.getWidth() != dst.rowPitch)
         {

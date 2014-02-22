@@ -34,80 +34,80 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
 
-	/// Define a list of usage flags
-	typedef vector<HardwareBuffer::Usage>::type BufferUsageList;
+    /// Define a list of usage flags
+    typedef vector<HardwareBuffer::Usage>::type BufferUsageList;
 
 
-	/** Summary class collecting together vertex source information. */
-	class _OgreExport VertexData : public VertexDataAlloc
-	{
+    /** Summary class collecting together vertex source information. */
+    class _OgreExport VertexData : public VertexDataAlloc
+    {
     private:
         /// Protected copy constructor, to prevent misuse
         VertexData(const VertexData& rhs); /* do nothing, should not use */
         /// Protected operator=, to prevent misuse
         VertexData& operator=(const VertexData& rhs); /* do not use */
 
-		HardwareBufferManagerBase* mMgr;
+        HardwareBufferManagerBase* mMgr;
     public:
-		/** Constructor.
-		@note 
-			This constructor creates the VertexDeclaration and VertexBufferBinding
-			automatically, and arranges for their deletion afterwards.
-		@param mgr Optional HardwareBufferManager from which to create resources
-		*/
+        /** Constructor.
+        @note 
+            This constructor creates the VertexDeclaration and VertexBufferBinding
+            automatically, and arranges for their deletion afterwards.
+        @param mgr Optional HardwareBufferManager from which to create resources
+        */
         VertexData(HardwareBufferManagerBase* mgr = 0);
-		/** Constructor.
-		@note 
-		This constructor receives the VertexDeclaration and VertexBufferBinding
-		from the caller, and as such does not arrange for their deletion afterwards, 
-		the caller remains responsible for that.
-		@param dcl The VertexDeclaration to use
-		@param bind The VertexBufferBinding to use
-		*/
-		VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind);
+        /** Constructor.
+        @note 
+        This constructor receives the VertexDeclaration and VertexBufferBinding
+        from the caller, and as such does not arrange for their deletion afterwards, 
+        the caller remains responsible for that.
+        @param dcl The VertexDeclaration to use
+        @param bind The VertexBufferBinding to use
+        */
+        VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind);
         ~VertexData();
 
-		/** Declaration of the vertex to be used in this operation. 
-		@remarks Note that this is created for you on construction.
-		*/
-		VertexDeclaration* vertexDeclaration;
-		/** The vertex buffer bindings to be used. 
-		@remarks Note that this is created for you on construction.
-		*/
-		VertexBufferBinding* vertexBufferBinding;
-		/// Whether this class should delete the declaration and binding
-		bool mDeleteDclBinding;
-		/// The base vertex index to start from
-		size_t vertexStart;
-		/// The number of vertices used in this operation
-		size_t vertexCount;
+        /** Declaration of the vertex to be used in this operation. 
+        @remarks Note that this is created for you on construction.
+        */
+        VertexDeclaration* vertexDeclaration;
+        /** The vertex buffer bindings to be used. 
+        @remarks Note that this is created for you on construction.
+        */
+        VertexBufferBinding* vertexBufferBinding;
+        /// Whether this class should delete the declaration and binding
+        bool mDeleteDclBinding;
+        /// The base vertex index to start from
+        size_t vertexStart;
+        /// The number of vertices used in this operation
+        size_t vertexCount;
 
 
-		/// Struct used to hold hardware morph / pose vertex data information
-		struct HardwareAnimationData
-		{
-			unsigned short targetBufferIndex;
-			Real parametric;
-		};
-		typedef vector<HardwareAnimationData>::type HardwareAnimationDataList;
-		/// VertexElements used for hardware morph / pose animation
-		HardwareAnimationDataList hwAnimationDataList;
-		/// Number of hardware animation data items used
-		size_t hwAnimDataItemsUsed;
-		
-		/** Clones this vertex data, potentially including replicating any vertex buffers.
-		@param copyData Whether to create new vertex buffers too or just reference the existing ones
-		@param mgr If supplied, the buffer manager through which copies should be made
-		@remarks The caller is expected to delete the returned pointer when ready
-		*/
-		VertexData* clone(bool copyData = true, HardwareBufferManagerBase* mgr = 0) const;
+        /// Struct used to hold hardware morph / pose vertex data information
+        struct HardwareAnimationData
+        {
+            unsigned short targetBufferIndex;
+            Real parametric;
+        };
+        typedef vector<HardwareAnimationData>::type HardwareAnimationDataList;
+        /// VertexElements used for hardware morph / pose animation
+        HardwareAnimationDataList hwAnimationDataList;
+        /// Number of hardware animation data items used
+        size_t hwAnimDataItemsUsed;
+        
+        /** Clones this vertex data, potentially including replicating any vertex buffers.
+        @param copyData Whether to create new vertex buffers too or just reference the existing ones
+        @param mgr If supplied, the buffer manager through which copies should be made
+        @remarks The caller is expected to delete the returned pointer when ready
+        */
+        VertexData* clone(bool copyData = true, HardwareBufferManagerBase* mgr = 0) const;
 
         /** Modifies the vertex data to be suitable for use for rendering shadow geometry.
         @remarks
@@ -146,45 +146,45 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr hardwareShadowVolWBuffer;
 
 
-		/** Reorganises the data in the vertex buffers according to the 
-			new vertex declaration passed in. Note that new vertex buffers
-			are created and written to, so if the buffers being referenced 
-			by this vertex data object are also used by others, then the 
-			original buffers will not be damaged by this operation.
-			Once this operation has completed, the new declaration 
-			passed in will overwrite the current one.
-		@param newDeclaration The vertex declaration which will be used
-			for the reorganised buffer state. Note that the new declaration
-			must not include any elements which do not already exist in the 
-			current declaration; you can drop elements by 
-			excluding them from the declaration if you wish, however.
-		@param bufferUsage Vector of usage flags which indicate the usage options
-			for each new vertex buffer created. The indexes of the entries must correspond
-			to the buffer binding values referenced in the declaration.
-		@param mgr Optional pointer to the manager to use to create new declarations
-			and buffers etc. If not supplied, the HardwareBufferManager singleton will be used
-		*/
-		void reorganiseBuffers(VertexDeclaration* newDeclaration, const BufferUsageList& bufferUsage, 
-			HardwareBufferManagerBase* mgr = 0);
+        /** Reorganises the data in the vertex buffers according to the 
+            new vertex declaration passed in. Note that new vertex buffers
+            are created and written to, so if the buffers being referenced 
+            by this vertex data object are also used by others, then the 
+            original buffers will not be damaged by this operation.
+            Once this operation has completed, the new declaration 
+            passed in will overwrite the current one.
+        @param newDeclaration The vertex declaration which will be used
+            for the reorganised buffer state. Note that the new declaration
+            must not include any elements which do not already exist in the 
+            current declaration; you can drop elements by 
+            excluding them from the declaration if you wish, however.
+        @param bufferUsage Vector of usage flags which indicate the usage options
+            for each new vertex buffer created. The indexes of the entries must correspond
+            to the buffer binding values referenced in the declaration.
+        @param mgr Optional pointer to the manager to use to create new declarations
+            and buffers etc. If not supplied, the HardwareBufferManager singleton will be used
+        */
+        void reorganiseBuffers(VertexDeclaration* newDeclaration, const BufferUsageList& bufferUsage, 
+            HardwareBufferManagerBase* mgr = 0);
 
-		/** Reorganises the data in the vertex buffers according to the 
-			new vertex declaration passed in. Note that new vertex buffers
-			are created and written to, so if the buffers being referenced 
-			by this vertex data object are also used by others, then the 
-			original buffers will not be damaged by this operation.
-			Once this operation has completed, the new declaration 
-			passed in will overwrite the current one.
+        /** Reorganises the data in the vertex buffers according to the 
+            new vertex declaration passed in. Note that new vertex buffers
+            are created and written to, so if the buffers being referenced 
+            by this vertex data object are also used by others, then the 
+            original buffers will not be damaged by this operation.
+            Once this operation has completed, the new declaration 
+            passed in will overwrite the current one.
             This version of the method derives the buffer usages from the existing
             buffers, by using the 'most flexible' usage from the equivalent sources.
-		@param newDeclaration The vertex declaration which will be used
-			for the reorganised buffer state. Note that the new delcaration
-			must not include any elements which do not already exist in the 
-			current declaration; you can drop elements by 
-			excluding them from the declaration if you wish, however.
-		@param mgr Optional pointer to the manager to use to create new declarations
-			and buffers etc. If not supplied, the HardwareBufferManager singleton will be used
-		*/
-		void reorganiseBuffers(VertexDeclaration* newDeclaration, HardwareBufferManagerBase* mgr = 0);
+        @param newDeclaration The vertex declaration which will be used
+            for the reorganised buffer state. Note that the new delcaration
+            must not include any elements which do not already exist in the 
+            current declaration; you can drop elements by 
+            excluding them from the declaration if you wish, however.
+        @param mgr Optional pointer to the manager to use to create new declarations
+            and buffers etc. If not supplied, the HardwareBufferManager singleton will be used
+        */
+        void reorganiseBuffers(VertexDeclaration* newDeclaration, HardwareBufferManagerBase* mgr = 0);
 
         /** Remove any gaps in the vertex buffer bindings.
         @remarks
@@ -207,40 +207,40 @@ namespace Ogre {
         */
         void removeUnusedBuffers(void);
 
-		/** Convert all packed colour values (VET_COLOUR_*) in buffers used to
-			another type.
-		@param srcType The source colour type to assume if the ambiguous VET_COLOUR
-			is encountered.
-		@param destType The destination colour type, must be VET_COLOUR_ABGR or
-			VET_COLOUR_ARGB.
-		*/
-		void convertPackedColour(VertexElementType srcType, VertexElementType destType);
+        /** Convert all packed colour values (VET_COLOUR_*) in buffers used to
+            another type.
+        @param srcType The source colour type to assume if the ambiguous VET_COLOUR
+            is encountered.
+        @param destType The destination colour type, must be VET_COLOUR_ABGR or
+            VET_COLOUR_ARGB.
+        */
+        void convertPackedColour(VertexElementType srcType, VertexElementType destType);
 
 
-		/** Allocate elements to serve a holder of morph / pose target data 
-			for hardware morphing / pose blending.
-		@remarks
-			This method will allocate the given number of 3D texture coordinate 
-			sets for use as a morph target or target pose offset (3D position).
-			These elements will be saved in hwAnimationDataList.
-			It will also assume that the source of these new elements will be new
-			buffers which are not bound at this time, so will start the sources to 
-			1 higher than the current highest binding source. The caller is
-			expected to bind these new buffers when appropriate. For morph animation
-			the original position buffer will be the 'from' keyframe data, whilst
-			for pose animation it will be the original vertex data.
-			If normals are animated, then twice the number of 3D texture coordinates are required
-		 @return The number of sets that were supported
-		*/
-		ushort allocateHardwareAnimationElements(ushort count, bool animateNormals);
+        /** Allocate elements to serve a holder of morph / pose target data 
+            for hardware morphing / pose blending.
+        @remarks
+            This method will allocate the given number of 3D texture coordinate 
+            sets for use as a morph target or target pose offset (3D position).
+            These elements will be saved in hwAnimationDataList.
+            It will also assume that the source of these new elements will be new
+            buffers which are not bound at this time, so will start the sources to 
+            1 higher than the current highest binding source. The caller is
+            expected to bind these new buffers when appropriate. For morph animation
+            the original position buffer will be the 'from' keyframe data, whilst
+            for pose animation it will be the original vertex data.
+            If normals are animated, then twice the number of 3D texture coordinates are required
+         @return The number of sets that were supported
+        */
+        ushort allocateHardwareAnimationElements(ushort count, bool animateNormals);
 
 
 
-	};
+    };
 
-	/** Summary class collecting together index data source information. */
-	class _OgreExport IndexData : public IndexDataAlloc
-	{
+    /** Summary class collecting together index data source information. */
+    class _OgreExport IndexData : public IndexDataAlloc
+    {
     protected:
         /// Protected copy constructor, to prevent misuse
         IndexData(const IndexData& rhs); /* do nothing, should not use */
@@ -249,75 +249,75 @@ namespace Ogre {
     public:
         IndexData();
         ~IndexData();
-		/// Pointer to the HardwareIndexBuffer to use, must be specified if useIndexes = true
-		HardwareIndexBufferSharedPtr indexBuffer;
+        /// Pointer to the HardwareIndexBuffer to use, must be specified if useIndexes = true
+        HardwareIndexBufferSharedPtr indexBuffer;
 
-		/// Index in the buffer to start from for this operation
-		size_t indexStart;
+        /// Index in the buffer to start from for this operation
+        size_t indexStart;
 
-		/// The number of indexes to use from the buffer
-		size_t indexCount;
+        /// The number of indexes to use from the buffer
+        size_t indexCount;
 
-		/** Clones this index data, potentially including replicating the index buffer.
-		@param copyData Whether to create new buffers too or just reference the existing ones
-		@param mgr If supplied, the buffer manager through which copies should be made
-		@remarks The caller is expected to delete the returned pointer when finished
-		*/
-		IndexData* clone(bool copyData = true, HardwareBufferManagerBase* mgr = 0) const;
+        /** Clones this index data, potentially including replicating the index buffer.
+        @param copyData Whether to create new buffers too or just reference the existing ones
+        @param mgr If supplied, the buffer manager through which copies should be made
+        @remarks The caller is expected to delete the returned pointer when finished
+        */
+        IndexData* clone(bool copyData = true, HardwareBufferManagerBase* mgr = 0) const;
 
-		/** Re-order the indexes in this index data structure to be more
-			vertex cache friendly; that is to re-use the same vertices as close
-			together as possible. 
-		@remarks
-			Can only be used for index data which consists of triangle lists.
-			It would in fact be pointless to use it on triangle strips or fans
-			in any case.
-		*/
-		void optimiseVertexCacheTriList(void);
-	
-	};
+        /** Re-order the indexes in this index data structure to be more
+            vertex cache friendly; that is to re-use the same vertices as close
+            together as possible. 
+        @remarks
+            Can only be used for index data which consists of triangle lists.
+            It would in fact be pointless to use it on triangle strips or fans
+            in any case.
+        */
+        void optimiseVertexCacheTriList(void);
+    
+    };
 
-	/** Vertex cache profiler.
-	@remarks
-		Utility class for evaluating the effectiveness of the use of the vertex
-		cache by a given index buffer.
-	*/
-	class _OgreExport VertexCacheProfiler : public BufferAlloc
+    /** Vertex cache profiler.
+    @remarks
+        Utility class for evaluating the effectiveness of the use of the vertex
+        cache by a given index buffer.
+    */
+    class _OgreExport VertexCacheProfiler : public BufferAlloc
     {
-		public:
-			enum CacheType {
-				FIFO, LRU
-			};
+        public:
+            enum CacheType {
+                FIFO, LRU
+            };
 
-			VertexCacheProfiler(unsigned int cachesize = 16, CacheType cachetype = FIFO )
-				: size ( cachesize ), tail (0), buffersize (0), hit (0), miss (0)
-			{
-				cache = OGRE_ALLOC_T(uint32, size, MEMCATEGORY_GEOMETRY);
-			}
+            VertexCacheProfiler(unsigned int cachesize = 16, CacheType cachetype = FIFO )
+                : size ( cachesize ), tail (0), buffersize (0), hit (0), miss (0)
+            {
+                cache = OGRE_ALLOC_T(uint32, size, MEMCATEGORY_GEOMETRY);
+            }
 
-			~VertexCacheProfiler()
-			{
-				OGRE_FREE(cache, MEMCATEGORY_GEOMETRY);
-			}
+            ~VertexCacheProfiler()
+            {
+                OGRE_FREE(cache, MEMCATEGORY_GEOMETRY);
+            }
 
-			void profile(const HardwareIndexBufferSharedPtr& indexBuffer);
-			void reset() { hit = 0; miss = 0; tail = 0; buffersize = 0; }
-			void flush() { tail = 0; buffersize = 0; }
+            void profile(const HardwareIndexBufferSharedPtr& indexBuffer);
+            void reset() { hit = 0; miss = 0; tail = 0; buffersize = 0; }
+            void flush() { tail = 0; buffersize = 0; }
 
-			unsigned int getHits() { return hit; }
-			unsigned int getMisses() { return miss; }
-			unsigned int getSize() { return size; }
-		private:
-			unsigned int size;
-			uint32 *cache;
+            unsigned int getHits() { return hit; }
+            unsigned int getMisses() { return miss; }
+            unsigned int getSize() { return size; }
+        private:
+            unsigned int size;
+            uint32 *cache;
 
-			unsigned int tail, buffersize;
-			unsigned int hit, miss;
+            unsigned int tail, buffersize;
+            unsigned int hit, miss;
 
-			bool inCache(unsigned int index);
-	};
-	/** @} */
-	/** @} */
+            bool inCache(unsigned int index);
+    };
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

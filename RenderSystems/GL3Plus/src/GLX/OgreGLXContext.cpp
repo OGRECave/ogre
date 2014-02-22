@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-	(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -34,56 +34,56 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	GLXContext::GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable, ::GLXContext context) :
-		mGLSupport(glsupport), mDrawable(drawable), mContext(0), mFBConfig(fbconfig), mExternalContext(false)
-	{
-		GL3PlusRenderSystem *renderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
-		GLXContext* mainContext = static_cast<GLXContext*>(renderSystem->_getMainContext());
-		::GLXContext shareContext = 0;
-		
-		if (mainContext)
-		{
-			shareContext = mainContext->mContext;
-		}
-		
-		if (context)
-		{
-			mContext = context;
-			mExternalContext = true;
-		}
-		else
-		{
-			mContext = mGLSupport->createNewContext(mFBConfig, GLX_RGBA_TYPE, shareContext, GL_TRUE);
-		}
+    GLXContext::GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable, ::GLXContext context) :
+        mGLSupport(glsupport), mDrawable(drawable), mContext(0), mFBConfig(fbconfig), mExternalContext(false)
+    {
+        GL3PlusRenderSystem *renderSystem = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+        GLXContext* mainContext = static_cast<GLXContext*>(renderSystem->_getMainContext());
+        ::GLXContext shareContext = 0;
+        
+        if (mainContext)
+        {
+            shareContext = mainContext->mContext;
+        }
+        
+        if (context)
+        {
+            mContext = context;
+            mExternalContext = true;
+        }
+        else
+        {
+            mContext = mGLSupport->createNewContext(mFBConfig, GLX_RGBA_TYPE, shareContext, GL_TRUE);
+        }
 
-		if (! mContext)
-		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to create a suitable GLXContext", "GLXContext::GLXContext");
-		}
-	}
-	
-	GLXContext::~GLXContext() 	
-	{
-		GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
-		
-		if (!mExternalContext)
-			glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
-		
-		rs->_unregisterContext(this);
-	}
-	
-	void GLXContext::setCurrent() 
-	{
-		glXMakeCurrent(mGLSupport->getGLDisplay(), mDrawable, mContext);
-	}
-	
-	void GLXContext::endCurrent() 
-	{
-		glXMakeCurrent(mGLSupport->getGLDisplay(), None, None);
-	}
-	
-	GL3PlusContext* GLXContext::clone() const
-	{
-		return new GLXContext(mGLSupport, mFBConfig, mDrawable);
-	} 
+        if (! mContext)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to create a suitable GLXContext", "GLXContext::GLXContext");
+        }
+    }
+    
+    GLXContext::~GLXContext()   
+    {
+        GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+        
+        if (!mExternalContext)
+            glXDestroyContext(mGLSupport->getGLDisplay(), mContext);
+        
+        rs->_unregisterContext(this);
+    }
+    
+    void GLXContext::setCurrent() 
+    {
+        glXMakeCurrent(mGLSupport->getGLDisplay(), mDrawable, mContext);
+    }
+    
+    void GLXContext::endCurrent() 
+    {
+        glXMakeCurrent(mGLSupport->getGLDisplay(), None, None);
+    }
+    
+    GL3PlusContext* GLXContext::clone() const
+    {
+        return new GLXContext(mGLSupport, mFBConfig, mDrawable);
+    } 
 }

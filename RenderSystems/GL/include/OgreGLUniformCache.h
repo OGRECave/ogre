@@ -35,13 +35,13 @@ typedef Ogre::GeneralAllocatedObject UniformCacheAlloc;
 
 namespace Ogre
 {
-	class GLUniformCacheImp;
+    class GLUniformCacheImp;
 
     /** An in memory cache of the OpenGL uniforms. */
     class _OgreGLExport GLUniformCache : public UniformCacheAlloc
     {
     private:
-		GLUniformCacheImp* mImp;
+        GLUniformCacheImp* mImp;
 
     public:
         GLUniformCache(void);
@@ -50,7 +50,7 @@ namespace Ogre
         /** Clears all cached values
         */
         void clearCache();
-		
+        
         /** Update a uniform
          @return A boolean value indicating whether this uniform needs to be updated in the GL.
          */

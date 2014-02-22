@@ -33,98 +33,98 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class D3D11Device
-	{
-	private:
-		ID3D11DeviceN * mD3D11Device;
-		ID3D11DeviceContextN * mImmediateContext;
+    class D3D11Device
+    {
+    private:
+        ID3D11DeviceN * mD3D11Device;
+        ID3D11DeviceContextN * mImmediateContext;
         ID3D11InfoQueue * mInfoQueue; 
 
-		// Storing class linkage
-		ID3D11ClassLinkage* mClassLinkage;
+        // Storing class linkage
+        ID3D11ClassLinkage* mClassLinkage;
 
-		struct ThreadInfo
-		{
-			ID3D11DeviceContextN* mContext;
-			void* mEventHandle;
+        struct ThreadInfo
+        {
+            ID3D11DeviceContextN* mContext;
+            void* mEventHandle;
 
-			ThreadInfo(ID3D11DeviceContextN* context)
-				: mContext(context)
-				, mEventHandle(0)
-			{
-				mEventHandle = CreateEventEx(0, TEXT("ThreadContextEvent"), 0, EVENT_ALL_ACCESS);
-			}
+            ThreadInfo(ID3D11DeviceContextN* context)
+                : mContext(context)
+                , mEventHandle(0)
+            {
+                mEventHandle = CreateEventEx(0, TEXT("ThreadContextEvent"), 0, EVENT_ALL_ACCESS);
+            }
 
-			~ThreadInfo()
-			{
-				SAFE_RELEASE(mContext);
+            ~ThreadInfo()
+            {
+                SAFE_RELEASE(mContext);
 
-				CloseHandle(mEventHandle);
-			}
-		};
+                CloseHandle(mEventHandle);
+            }
+        };
 
-		D3D11Device();
+        D3D11Device();
     public:
 
 
-		D3D11Device(ID3D11DeviceN * device);
+        D3D11Device(ID3D11DeviceN * device);
 
-		~D3D11Device();
+        ~D3D11Device();
 
-		inline ID3D11DeviceContextN * GetImmediateContext()
-		{
-			return mImmediateContext;
-		}
-		
-		inline ID3D11ClassLinkage* GetClassLinkage()
-		{
-			return mClassLinkage;
-		}
-		
-		inline ID3D11DeviceN * operator->() const
-		{
-			assert(mD3D11Device); 
-			if (D3D_NO_EXCEPTION != mExceptionsErrorLevel)
-			{
-				clearStoredErrorMessages();
-			}
-			return mD3D11Device;
-		}
+        inline ID3D11DeviceContextN * GetImmediateContext()
+        {
+            return mImmediateContext;
+        }
+        
+        inline ID3D11ClassLinkage* GetClassLinkage()
+        {
+            return mClassLinkage;
+        }
+        
+        inline ID3D11DeviceN * operator->() const
+        {
+            assert(mD3D11Device); 
+            if (D3D_NO_EXCEPTION != mExceptionsErrorLevel)
+            {
+                clearStoredErrorMessages();
+            }
+            return mD3D11Device;
+        }
 
-		const void clearStoredErrorMessages(  ) const;
+        const void clearStoredErrorMessages(  ) const;
 
-		ID3D11DeviceN * operator=(ID3D11DeviceN * device);
-		const bool isNull();
-		const String getErrorDescription(const HRESULT hr = NO_ERROR) const;
+        ID3D11DeviceN * operator=(ID3D11DeviceN * device);
+        const bool isNull();
+        const String getErrorDescription(const HRESULT hr = NO_ERROR) const;
 
-		inline const bool isError(  ) const
-		{
-			if (D3D_NO_EXCEPTION == mExceptionsErrorLevel)
-			{
-				return  false;
-			}
+        inline const bool isError(  ) const
+        {
+            if (D3D_NO_EXCEPTION == mExceptionsErrorLevel)
+            {
+                return  false;
+            }
 
-			return _getErrorsFromQueue();
-		}
+            return _getErrorsFromQueue();
+        }
 
-		const bool _getErrorsFromQueue() const;
-		void release();
-		ID3D11DeviceN * get();
+        const bool _getErrorsFromQueue() const;
+        void release();
+        ID3D11DeviceN * get();
 
-		enum eExceptionsErrorLevel
-		{
-			D3D_NO_EXCEPTION,
-			D3D_CORRUPTION,
-			D3D_ERROR,
-			D3D_WARNING,
-			D3D_INFO,
-		};
+        enum eExceptionsErrorLevel
+        {
+            D3D_NO_EXCEPTION,
+            D3D_CORRUPTION,
+            D3D_ERROR,
+            D3D_WARNING,
+            D3D_INFO,
+        };
 
-		static eExceptionsErrorLevel mExceptionsErrorLevel;
-		static void setExceptionsErrorLevel(const eExceptionsErrorLevel exceptionsErrorLevel);
-		static const eExceptionsErrorLevel getExceptionsErrorLevel();
+        static eExceptionsErrorLevel mExceptionsErrorLevel;
+        static void setExceptionsErrorLevel(const eExceptionsErrorLevel exceptionsErrorLevel);
+        static const eExceptionsErrorLevel getExceptionsErrorLevel();
 
 
-	};
+    };
 }
 #endif

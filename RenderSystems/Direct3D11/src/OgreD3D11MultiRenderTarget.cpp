@@ -33,135 +33,135 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	//---------------------------------------------------------------------
-	D3D11MultiRenderTarget::D3D11MultiRenderTarget(const String &name) :
-	//---------------------------------------------------------------------
-	MultiRenderTarget(name), mNumberOfViews(0)
-	{
-		/// Clear targets
-		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-		{
-			targets[x] = 0;
-			mRenderTargetViews[x] = 0;
-			mRenderTargets[x] = 0;
-		}
-	}
-	//---------------------------------------------------------------------
-	D3D11MultiRenderTarget::~D3D11MultiRenderTarget()
-	{
-	}
-	//---------------------------------------------------------------------
-	void D3D11MultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
-	{
-		assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-		/// Get buffer and surface to bind to
-		D3D11HardwarePixelBuffer *buffer = 0;
-		target->getCustomAttribute("BUFFER", &buffer);
-		assert(buffer);
+    //---------------------------------------------------------------------
+    D3D11MultiRenderTarget::D3D11MultiRenderTarget(const String &name) :
+    //---------------------------------------------------------------------
+    MultiRenderTarget(name), mNumberOfViews(0)
+    {
+        /// Clear targets
+        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+        {
+            targets[x] = 0;
+            mRenderTargetViews[x] = 0;
+            mRenderTargets[x] = 0;
+        }
+    }
+    //---------------------------------------------------------------------
+    D3D11MultiRenderTarget::~D3D11MultiRenderTarget()
+    {
+    }
+    //---------------------------------------------------------------------
+    void D3D11MultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
+    {
+        assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
+        /// Get buffer and surface to bind to
+        D3D11HardwarePixelBuffer *buffer = 0;
+        target->getCustomAttribute("BUFFER", &buffer);
+        assert(buffer);
 
-		/// Find first non-null target
-		int y;
-		for(y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && !targets[y]; ++y) ;
+        /// Find first non-null target
+        int y;
+        for(y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && !targets[y]; ++y) ;
 
-		if(y!=OGRE_MAX_MULTIPLE_RENDER_TARGETS)
-		{
-			/// If there is another target bound, compare sizes
-			if(targets[y]->getWidth() != buffer->getWidth() ||
-				targets[y]->getHeight() != buffer->getHeight() ||
-				PixelUtil::getNumElemBits(targets[y]->getFormat()) != 
-				PixelUtil::getNumElemBits(buffer->getFormat()))
-			{
-				OGRE_EXCEPT(
-					Exception::ERR_INVALIDPARAMS, 
-					"MultiRenderTarget surfaces are not of same size or bit depth", 
-					"D3D11MultiRenderTarget::bindSurface"
-					);
-			}
-		}
+        if(y!=OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+        {
+            /// If there is another target bound, compare sizes
+            if(targets[y]->getWidth() != buffer->getWidth() ||
+                targets[y]->getHeight() != buffer->getHeight() ||
+                PixelUtil::getNumElemBits(targets[y]->getFormat()) != 
+                PixelUtil::getNumElemBits(buffer->getFormat()))
+            {
+                OGRE_EXCEPT(
+                    Exception::ERR_INVALIDPARAMS, 
+                    "MultiRenderTarget surfaces are not of same size or bit depth", 
+                    "D3D11MultiRenderTarget::bindSurface"
+                    );
+            }
+        }
 
-		targets[attachment] = buffer;
-		mRenderTargets[attachment] = target;
+        targets[attachment] = buffer;
+        mRenderTargets[attachment] = target;
 
-		ID3D11RenderTargetView** v;
-		target->getCustomAttribute( "ID3D11RenderTargetView", &v );
-		mRenderTargetViews[attachment] = *v;
+        ID3D11RenderTargetView** v;
+        target->getCustomAttribute( "ID3D11RenderTargetView", &v );
+        mRenderTargetViews[attachment] = *v;
 
-		if(mNumberOfViews >= OGRE_MAX_MULTIPLE_RENDER_TARGETS)
-			mNumberOfViews++;
+        if(mNumberOfViews >= OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+            mNumberOfViews++;
 
-		checkAndUpdate();
-	}
-	//---------------------------------------------------------------------
-	void D3D11MultiRenderTarget::unbindSurfaceImpl(size_t attachment)
-	{
-		assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-		targets[attachment] = 0;
-		mRenderTargetViews[attachment] = 0;
+        checkAndUpdate();
+    }
+    //---------------------------------------------------------------------
+    void D3D11MultiRenderTarget::unbindSurfaceImpl(size_t attachment)
+    {
+        assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
+        targets[attachment] = 0;
+        mRenderTargetViews[attachment] = 0;
 
-		if(mNumberOfViews <= 0)
-			mNumberOfViews--;
+        if(mNumberOfViews <= 0)
+            mNumberOfViews--;
 
-		checkAndUpdate();
-	}
-	//---------------------------------------------------------------------
-	void D3D11MultiRenderTarget::getCustomAttribute(const String& name, void *pData)
-	{
-		if(name == "DDBACKBUFFER")
-		{
-			ID3D11Texture2D ** pSurf = (ID3D11Texture2D **)pData;
-			/// Transfer surfaces
-			for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-			{
-				if(targets[x])
-					pSurf[x] = targets[x]->getParentTexture()->GetTex2D();
-			}
-			return;
-		}
-		else if(name == "ID3D11RenderTargetView")
-		{
-			//*static_cast<ID3D11RenderTargetView***>(pData) = mRenderTargetViews;
-			ID3D11RenderTargetView ** pRTView = (ID3D11RenderTargetView**)pData;
+        checkAndUpdate();
+    }
+    //---------------------------------------------------------------------
+    void D3D11MultiRenderTarget::getCustomAttribute(const String& name, void *pData)
+    {
+        if(name == "DDBACKBUFFER")
+        {
+            ID3D11Texture2D ** pSurf = (ID3D11Texture2D **)pData;
+            /// Transfer surfaces
+            for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+            {
+                if(targets[x])
+                    pSurf[x] = targets[x]->getParentTexture()->GetTex2D();
+            }
+            return;
+        }
+        else if(name == "ID3D11RenderTargetView")
+        {
+            //*static_cast<ID3D11RenderTargetView***>(pData) = mRenderTargetViews;
+            ID3D11RenderTargetView ** pRTView = (ID3D11RenderTargetView**)pData;
 
-			memset(pRTView,0,sizeof(pRTView));
+            memset(pRTView,0,sizeof(pRTView));
 
-			for(int y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && mRenderTargets[y]; ++y)
-			{
-				ID3D11RenderTargetView * view;
-				mRenderTargets[y]->getCustomAttribute("ID3D11RenderTargetView",&view);
-				pRTView[y]=view;
-			}
-			return;
-		}
-		else if( name == "numberOfViews" )
-		{
-			uint* n = reinterpret_cast<unsigned int*>(pData);
-			*n = mNumberOfViews;
-			return;
-		}
-		else if(name == "isTexture")
-		{
-			bool *b = reinterpret_cast< bool * >( pData );
-			*b = false;
-			return;
-		}
+            for(int y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && mRenderTargets[y]; ++y)
+            {
+                ID3D11RenderTargetView * view;
+                mRenderTargets[y]->getCustomAttribute("ID3D11RenderTargetView",&view);
+                pRTView[y]=view;
+            }
+            return;
+        }
+        else if( name == "numberOfViews" )
+        {
+            uint* n = reinterpret_cast<unsigned int*>(pData);
+            *n = mNumberOfViews;
+            return;
+        }
+        else if(name == "isTexture")
+        {
+            bool *b = reinterpret_cast< bool * >( pData );
+            *b = false;
+            return;
+        }
 
-		MultiRenderTarget::getCustomAttribute(name, pData);
-	}
-	//---------------------------------------------------------------------
-	void D3D11MultiRenderTarget::checkAndUpdate()
-	{
-		if(targets[0])
-		{
-			mWidth = static_cast<unsigned int>(targets[0]->getWidth());
-			mHeight = static_cast<unsigned int>(targets[0]->getHeight());
-		}
-		else
-		{
-			mWidth = 0;
-			mHeight = 0;
-		}
-	}
-	//---------------------------------------------------------------------
+        MultiRenderTarget::getCustomAttribute(name, pData);
+    }
+    //---------------------------------------------------------------------
+    void D3D11MultiRenderTarget::checkAndUpdate()
+    {
+        if(targets[0])
+        {
+            mWidth = static_cast<unsigned int>(targets[0]->getWidth());
+            mHeight = static_cast<unsigned int>(targets[0]->getHeight());
+        }
+        else
+        {
+            mWidth = 0;
+            mHeight = 0;
+        }
+    }
+    //---------------------------------------------------------------------
 
 
 }

@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     GL3PlusHardwareIndexBuffer::GL3PlusHardwareIndexBuffer(HardwareBufferManagerBase* mgr, 
-													 IndexType idxType,
+                                                     IndexType idxType,
                                                      size_t numIndexes,
                                                      HardwareBuffer::Usage usage,
                                                      bool useShadowBuffer)
@@ -73,7 +73,7 @@ namespace Ogre {
 
         void* retPtr = 0;
         GLenum access = 0;
-//		GL3PlusHardwareBufferManager* glBufManager = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
+//      GL3PlusHardwareBufferManager* glBufManager = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 //
 //        // Try to use scratch buffers for smaller buffers
 //        if(length < glBufManager->getGLMapBufferThreshold())
@@ -89,20 +89,20 @@ namespace Ogre {
 //
 //                if (options != HBL_DISCARD)
 //                {
-//					// have to read back the data before returning the pointer
+//                  // have to read back the data before returning the pointer
 //                    readData(offset, length, retPtr);
 //                }
 //            }
 //        }
 
-		if (!retPtr)
-		{
+        if (!retPtr)
+        {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId));
 
-			// Use glMapBuffer
-			if (mUsage & HBU_WRITE_ONLY)
+            // Use glMapBuffer
+            if (mUsage & HBU_WRITE_ONLY)
             {
-				access |= GL_MAP_WRITE_BIT;
+                access |= GL_MAP_WRITE_BIT;
                 access |= GL_MAP_FLUSH_EXPLICIT_BIT;
                 if(options == HBL_DISCARD || options == HBL_NO_OVERWRITE)
                 {
@@ -112,28 +112,28 @@ namespace Ogre {
                 // We explicitly flush when the buffer is unlocked
                 access |= GL_MAP_UNSYNCHRONIZED_BIT;
             }
-			else if (options == HBL_READ_ONLY)
-				access |= GL_MAP_READ_BIT;
-			else
-				access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
+            else if (options == HBL_READ_ONLY)
+                access |= GL_MAP_READ_BIT;
+            else
+                access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
 
             void* pBuffer;
             OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, offset, length, access));
 
-			if(pBuffer == 0)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Index Buffer: Out of memory", 
-					"GL3PlusHardwareIndexBuffer::lock");
-			}
+            if(pBuffer == 0)
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                    "Index Buffer: Out of memory", 
+                    "GL3PlusHardwareIndexBuffer::lock");
+            }
 
-			// return offsetted
-			retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+            // return offsetted
+            retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
-			mLockedToScratch = false;
-		}
-		mIsLocked = true;
+            mLockedToScratch = false;
+        }
+        mIsLocked = true;
         return retPtr;
     }
 
@@ -157,19 +157,19 @@ namespace Ogre {
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId));
 
-			if (mUsage & HBU_WRITE_ONLY)
+            if (mUsage & HBU_WRITE_ONLY)
             {
                 OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ELEMENT_ARRAY_BUFFER, mLockStart, mLockSize));
             }
 
             GLboolean mapped;
             OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER));
-			if(!mapped)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-					"Buffer data corrupted, please reload", 
-					"GL3PlusHardwareIndexBuffer::unlock");
-			}
+            if(!mapped)
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                    "Buffer data corrupted, please reload", 
+                    "GL3PlusHardwareIndexBuffer::unlock");
+            }
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
         }
         mIsLocked = false;
@@ -232,7 +232,7 @@ namespace Ogre {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
         if (srcBuffer.isSystemMemory())
         {
-			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
         else
         {

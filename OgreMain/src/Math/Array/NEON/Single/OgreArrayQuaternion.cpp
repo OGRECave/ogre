@@ -34,8 +34,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	const ArrayQuaternion ArrayQuaternion::ZERO( vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ) );
-	const ArrayQuaternion ArrayQuaternion::IDENTITY( vdupq_n_f32( 1.0f ), vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ) );
+    const ArrayQuaternion ArrayQuaternion::ZERO( vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ) );
+    const ArrayQuaternion ArrayQuaternion::IDENTITY( vdupq_n_f32( 1.0f ), vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ), vdupq_n_f32( 0.0f ) );
 }
 
 #endif

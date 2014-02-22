@@ -48,7 +48,7 @@ namespace Ogre {
     #define SCRATCH_ALIGNMENT 32
 
     GL3PlusHardwareBufferManagerBase::GL3PlusHardwareBufferManagerBase()
-		: mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
+        : mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
         // Init scratch pool
         // TODO make it a configurable size?
@@ -60,14 +60,14 @@ namespace Ogre {
         ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GL3PlusScratchBufferAlloc);
         ptrAlloc->free = 1;
 
-		// Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
-		// disable for now until we figure out where the problem lies			
-#	if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_AMD) 
-		{
-			mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
-		}
-#	endif
+        // Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
+        // disable for now until we figure out where the problem lies           
+#   if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_AMD) 
+        {
+            mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
+        }
+#   endif
 
     }
     //-----------------------------------------------------------------------
@@ -130,10 +130,10 @@ namespace Ogre {
         return HardwareCounterBufferSharedPtr(buf);
     }
 
-	RenderToVertexBufferSharedPtr GL3PlusHardwareBufferManagerBase::createRenderToVertexBuffer()
-	{
-		return RenderToVertexBufferSharedPtr(new GL3PlusRenderToVertexBuffer);
-	}
+    RenderToVertexBufferSharedPtr GL3PlusHardwareBufferManagerBase::createRenderToVertexBuffer()
+    {
+        return RenderToVertexBufferSharedPtr(new GL3PlusRenderToVertexBuffer);
+    }
 
     GLenum GL3PlusHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
@@ -295,14 +295,14 @@ namespace Ogre {
         // Should never get here unless there's a corruption
         assert(false && "Memory deallocation error");
     }
-	//---------------------------------------------------------------------
-	size_t GL3PlusHardwareBufferManagerBase::getGLMapBufferThreshold() const
-	{
-		return mMapBufferThreshold;
-	}
-	//---------------------------------------------------------------------
-	void GL3PlusHardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
-	{
-		mMapBufferThreshold = value;
-	}
+    //---------------------------------------------------------------------
+    size_t GL3PlusHardwareBufferManagerBase::getGLMapBufferThreshold() const
+    {
+        return mMapBufferThreshold;
+    }
+    //---------------------------------------------------------------------
+    void GL3PlusHardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
+    {
+        mMapBufferThreshold = value;
+    }
 }

@@ -30,11 +30,11 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	//-----------------------------------------------------------------------
-	GL3PlusVertexArrayObject::GL3PlusVertexArrayObject() :
+    //-----------------------------------------------------------------------
+    GL3PlusVertexArrayObject::GL3PlusVertexArrayObject() :
         mVAO(0),
         mInitialised(false)
-	{
+    {
         OGRE_CHECK_GL_ERROR(glGenVertexArrays(1, &mVAO));
 
         if (!mVAO)
@@ -43,19 +43,19 @@ namespace Ogre {
                     "Cannot create GL Vertex Array Object",
                     "GL3PlusVertexArrayObject::GL3PlusVertexArrayObject");
         }
-	}
+    }
 
-	//-----------------------------------------------------------------------
-	GL3PlusVertexArrayObject::~GL3PlusVertexArrayObject()
-	{
+    //-----------------------------------------------------------------------
+    GL3PlusVertexArrayObject::~GL3PlusVertexArrayObject()
+    {
         if(mVAO)
         {
             OGRE_CHECK_GL_ERROR(glDeleteVertexArrays(1, &mVAO));
             mVAO = 0;
         }
-	}
+    }
 
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void GL3PlusVertexArrayObject::bind(void)
     {
         if(mVAO)

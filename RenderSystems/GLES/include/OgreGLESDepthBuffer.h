@@ -35,39 +35,39 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	/**
-		@copydoc DepthBuffer
+    /**
+        @copydoc DepthBuffer
 
-		OpenGL supports 2 different methods: FBO & Copy.
-		Each one has it's own limitations. Non-FBO methods are solved using "dummy" DepthBuffers.
-		That is, a DepthBuffer pointer is attached to the RenderTarget (for the sake of consistency)
-		but it doesn't actually contain a Depth surface/renderbuffer (mDepthBuffer & mStencilBuffer are
-		null pointers all the time) Those dummy DepthBuffers are identified thanks to their GL context.
-		Note that FBOs don't allow sharing with the main window's depth buffer. Therefore even
-		when FBO is enabled, a dummy DepthBuffer is still used to manage the windows.
-	*/
-	class GLESDepthBuffer : public DepthBuffer
-	{
-	public:
-		GLESDepthBuffer( uint16 poolId, GLESRenderSystem *renderSystem, GLESContext *creatorContext,
-						GLESRenderBuffer *depth, GLESRenderBuffer *stencil,
-						uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
-						bool isManual );
-		~GLESDepthBuffer();
+        OpenGL supports 2 different methods: FBO & Copy.
+        Each one has it's own limitations. Non-FBO methods are solved using "dummy" DepthBuffers.
+        That is, a DepthBuffer pointer is attached to the RenderTarget (for the sake of consistency)
+        but it doesn't actually contain a Depth surface/renderbuffer (mDepthBuffer & mStencilBuffer are
+        null pointers all the time) Those dummy DepthBuffers are identified thanks to their GL context.
+        Note that FBOs don't allow sharing with the main window's depth buffer. Therefore even
+        when FBO is enabled, a dummy DepthBuffer is still used to manage the windows.
+    */
+    class GLESDepthBuffer : public DepthBuffer
+    {
+    public:
+        GLESDepthBuffer( uint16 poolId, GLESRenderSystem *renderSystem, GLESContext *creatorContext,
+                        GLESRenderBuffer *depth, GLESRenderBuffer *stencil,
+                        uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+                        bool isManual );
+        ~GLESDepthBuffer();
 
-		/// @copydoc DepthBuffer::isCompatible
-		virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        /// @copydoc DepthBuffer::isCompatible
+        virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
-		GLESContext* getGLContext() const { return mCreatorContext; }
-		GLESRenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
-		GLESRenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
+        GLESContext* getGLContext() const { return mCreatorContext; }
+        GLESRenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
+        GLESRenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
 
-	protected:
-		uint32						mMultiSampleQuality;
-		GLESContext					*mCreatorContext;
-		GLESRenderBuffer			*mDepthBuffer;
-		GLESRenderBuffer			*mStencilBuffer;
-		GLESRenderSystem			*mRenderSystem;
-	};
+    protected:
+        uint32                      mMultiSampleQuality;
+        GLESContext                 *mCreatorContext;
+        GLESRenderBuffer            *mDepthBuffer;
+        GLESRenderBuffer            *mStencilBuffer;
+        GLESRenderSystem            *mRenderSystem;
+    };
 }
 #endif

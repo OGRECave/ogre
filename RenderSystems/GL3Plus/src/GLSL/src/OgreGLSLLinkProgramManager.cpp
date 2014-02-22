@@ -38,167 +38,167 @@
 
 namespace Ogre {
     
-	//-----------------------------------------------------------------------
-	template<> GLSLLinkProgramManager* Singleton<GLSLLinkProgramManager>::msSingleton = 0;
+    //-----------------------------------------------------------------------
+    template<> GLSLLinkProgramManager* Singleton<GLSLLinkProgramManager>::msSingleton = 0;
     
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     GLSLLinkProgramManager* GLSLLinkProgramManager::getSingletonPtr(void)
     {
         return msSingleton;
     }
     
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     GLSLLinkProgramManager& GLSLLinkProgramManager::getSingleton(void)
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
     
-	//-----------------------------------------------------------------------
-	GLSLLinkProgramManager::GLSLLinkProgramManager(void) :
+    //-----------------------------------------------------------------------
+    GLSLLinkProgramManager::GLSLLinkProgramManager(void) :
         GLSLProgramManagerCommon(),
         mActiveLinkProgram(NULL)
-	{
-	}
+    {
+    }
     
-	//-----------------------------------------------------------------------
-	GLSLLinkProgramManager::~GLSLLinkProgramManager(void)
-	{
-		// iterate through map container and delete link programs
-		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
+    //-----------------------------------------------------------------------
+    GLSLLinkProgramManager::~GLSLLinkProgramManager(void)
+    {
+        // iterate through map container and delete link programs
+        for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
              currentProgram != mLinkPrograms.end(); ++currentProgram)
-		{
-			delete currentProgram->second;
-		}
-	}
+        {
+            delete currentProgram->second;
+        }
+    }
     
-	//-----------------------------------------------------------------------
-	GLSLLinkProgram* GLSLLinkProgramManager::getActiveLinkProgram(void)
-	{
-		// if there is an active link program then return it
-		if (mActiveLinkProgram)
-			return mActiveLinkProgram;
+    //-----------------------------------------------------------------------
+    GLSLLinkProgram* GLSLLinkProgramManager::getActiveLinkProgram(void)
+    {
+        // if there is an active link program then return it
+        if (mActiveLinkProgram)
+            return mActiveLinkProgram;
         
-		// no active link program so find one or make a new one
-		// is there an active key?
-		uint32 activeKey = 0;
+        // no active link program so find one or make a new one
+        // is there an active key?
+        uint32 activeKey = 0;
         GLuint progID = 0;
 
-		if (mActiveVertexGpuProgram)
-		{
+        if (mActiveVertexGpuProgram)
+        {
             progID = mActiveVertexGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveFragmentGpuProgram)
-		{
+        }
+        if (mActiveFragmentGpuProgram)
+        {
             progID = mActiveFragmentGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveGeometryGpuProgram)
-		{
+        }
+        if (mActiveGeometryGpuProgram)
+        {
             progID = mActiveGeometryGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveDomainGpuProgram)
-		{
+        }
+        if (mActiveDomainGpuProgram)
+        {
             progID = mActiveDomainGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveHullGpuProgram)
-		{
+        }
+        if (mActiveHullGpuProgram)
+        {
             progID = mActiveHullGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
-		if (mActiveComputeGpuProgram)
-		{
+        }
+        if (mActiveComputeGpuProgram)
+        {
             progID = mActiveComputeGpuProgram->getProgramID();
             activeKey = FastHash((const char *)(&progID), sizeof(GLuint), activeKey);
-		}
+        }
 
-		// only return a link program object if a program exists
-		if (activeKey > 0)
-		{
-			// find the key in the hash map
-			LinkProgramIterator programFound = mLinkPrograms.find(activeKey);
-			// program object not found for key so need to create it
-			if (programFound == mLinkPrograms.end())
-			{
+        // only return a link program object if a program exists
+        if (activeKey > 0)
+        {
+            // find the key in the hash map
+            LinkProgramIterator programFound = mLinkPrograms.find(activeKey);
+            // program object not found for key so need to create it
+            if (programFound == mLinkPrograms.end())
+            {
                 mActiveLinkProgram = new GLSLLinkProgram(mActiveVertexGpuProgram, mActiveGeometryGpuProgram,
                                                          mActiveFragmentGpuProgram, mActiveHullGpuProgram,
                                                          mActiveDomainGpuProgram, mActiveComputeGpuProgram);
-				mLinkPrograms[activeKey] = mActiveLinkProgram;
-			}
-			else
-			{
-				// found a link program in map container so make it active
-				mActiveLinkProgram = programFound->second;
-			}
-		}
-		// make the program object active
-		if (mActiveLinkProgram)
+                mLinkPrograms[activeKey] = mActiveLinkProgram;
+            }
+            else
+            {
+                // found a link program in map container so make it active
+                mActiveLinkProgram = programFound->second;
+            }
+        }
+        // make the program object active
+        if (mActiveLinkProgram)
             mActiveLinkProgram->activate();
         
-		return mActiveLinkProgram;
-	}
+        return mActiveLinkProgram;
+    }
     
-	//-----------------------------------------------------------------------
-	void GLSLLinkProgramManager::setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram)
-	{
-		if (fragmentGpuProgram != mActiveFragmentGpuProgram)
-		{
-			mActiveFragmentGpuProgram = fragmentGpuProgram;
-			// ActiveLinkProgram is no longer valid
-			mActiveLinkProgram = NULL;
-		}
-	}
+    //-----------------------------------------------------------------------
+    void GLSLLinkProgramManager::setActiveFragmentShader(GLSLGpuProgram* fragmentGpuProgram)
+    {
+        if (fragmentGpuProgram != mActiveFragmentGpuProgram)
+        {
+            mActiveFragmentGpuProgram = fragmentGpuProgram;
+            // ActiveLinkProgram is no longer valid
+            mActiveLinkProgram = NULL;
+        }
+    }
     
-	//-----------------------------------------------------------------------
-	void GLSLLinkProgramManager::setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram)
-	{
-		if (vertexGpuProgram != mActiveVertexGpuProgram)
-		{
-			mActiveVertexGpuProgram = vertexGpuProgram;
-			// ActiveLinkProgram is no longer valid
-			mActiveLinkProgram = NULL;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void GLSLLinkProgramManager::setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram)
-	{
-		if (geometryGpuProgram != mActiveGeometryGpuProgram)
-		{
-			mActiveGeometryGpuProgram = geometryGpuProgram;
-			// ActiveLinkProgram is no longer valid
-			mActiveLinkProgram = NULL;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void GLSLLinkProgramManager::setActiveHullShader(GLSLGpuProgram* hullGpuProgram)
-	{
-		if (hullGpuProgram != mActiveHullGpuProgram)
-		{
-			mActiveHullGpuProgram = hullGpuProgram;
-			// ActiveLinkProgram is no longer valid
-			mActiveLinkProgram = NULL;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void GLSLLinkProgramManager::setActiveDomainShader(GLSLGpuProgram* domainGpuProgram)
-	{
-		if (domainGpuProgram != mActiveDomainGpuProgram)
-		{
-			mActiveDomainGpuProgram = domainGpuProgram;
-			// ActiveLinkProgram is no longer valid
-			mActiveLinkProgram = NULL;
-		}
-	}
-	//-----------------------------------------------------------------------
-	void GLSLLinkProgramManager::setActiveComputeShader(GLSLGpuProgram* computeGpuProgram)
-	{
-		if (computeGpuProgram != mActiveComputeGpuProgram)
-		{
-			mActiveComputeGpuProgram = computeGpuProgram;
-			// ActiveLinkProgram is no longer valid
-			mActiveLinkProgram = NULL;
-		}
-	}
+    //-----------------------------------------------------------------------
+    void GLSLLinkProgramManager::setActiveVertexShader(GLSLGpuProgram* vertexGpuProgram)
+    {
+        if (vertexGpuProgram != mActiveVertexGpuProgram)
+        {
+            mActiveVertexGpuProgram = vertexGpuProgram;
+            // ActiveLinkProgram is no longer valid
+            mActiveLinkProgram = NULL;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void GLSLLinkProgramManager::setActiveGeometryShader(GLSLGpuProgram* geometryGpuProgram)
+    {
+        if (geometryGpuProgram != mActiveGeometryGpuProgram)
+        {
+            mActiveGeometryGpuProgram = geometryGpuProgram;
+            // ActiveLinkProgram is no longer valid
+            mActiveLinkProgram = NULL;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void GLSLLinkProgramManager::setActiveHullShader(GLSLGpuProgram* hullGpuProgram)
+    {
+        if (hullGpuProgram != mActiveHullGpuProgram)
+        {
+            mActiveHullGpuProgram = hullGpuProgram;
+            // ActiveLinkProgram is no longer valid
+            mActiveLinkProgram = NULL;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void GLSLLinkProgramManager::setActiveDomainShader(GLSLGpuProgram* domainGpuProgram)
+    {
+        if (domainGpuProgram != mActiveDomainGpuProgram)
+        {
+            mActiveDomainGpuProgram = domainGpuProgram;
+            // ActiveLinkProgram is no longer valid
+            mActiveLinkProgram = NULL;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void GLSLLinkProgramManager::setActiveComputeShader(GLSLGpuProgram* computeGpuProgram)
+    {
+        if (computeGpuProgram != mActiveComputeGpuProgram)
+        {
+            mActiveComputeGpuProgram = computeGpuProgram;
+            // ActiveLinkProgram is no longer valid
+            mActiveLinkProgram = NULL;
+        }
+    }
 }

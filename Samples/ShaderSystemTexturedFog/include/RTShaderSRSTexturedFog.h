@@ -48,103 +48,103 @@ public:
 // Interface.
 public:
 
-	/** Class default constructor */
-	RTShaderSRSTexturedFog(RTShaderSRSTexturedFogFactory* factory = NULL);
+    /** Class default constructor */
+    RTShaderSRSTexturedFog(RTShaderSRSTexturedFogFactory* factory = NULL);
 
-	/** 
-	@see SubRenderState::getType.
-	*/
-	virtual const String& getType() const;
+    /** 
+    @see SubRenderState::getType.
+    */
+    virtual const String& getType() const;
 
-	/** 
-	@see SubRenderState::getType.
-	*/
-	virtual int	getExecutionOrder() const;
+    /** 
+    @see SubRenderState::getType.
+    */
+    virtual int getExecutionOrder() const;
 
-	/** 
-	@see SubRenderState::updateGpuProgramsParams.
-	*/
-	virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+    /** 
+    @see SubRenderState::updateGpuProgramsParams.
+    */
+    virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 
-	/** 
-	@see SubRenderState::copyFrom.
-	*/
-	virtual void copyFrom(const SubRenderState& rhs);
+    /** 
+    @see SubRenderState::copyFrom.
+    */
+    virtual void copyFrom(const SubRenderState& rhs);
 
-	/** 
-	@see SubRenderState::preAddToRenderState.
-	*/
-	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+    /** 
+    @see SubRenderState::preAddToRenderState.
+    */
+    virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
-	/** 
-	Set the fog properties this fog sub render state should emulate.
-	@param fogMode The fog mode to emulate (FOG_NONE, FOG_EXP, FOG_EXP2, FOG_LINEAR).
-	@param fogStart Start distance of fog, used for linear mode only.
-	@param fogEnd End distance of fog, used for linear mode only.
-	@param fogDensity Fog density used in exponential modes only.
-	*/
-	void setFogProperties(FogMode fogMode, float fogStart, float fogEnd, float fogDensity);
+    /** 
+    Set the fog properties this fog sub render state should emulate.
+    @param fogMode The fog mode to emulate (FOG_NONE, FOG_EXP, FOG_EXP2, FOG_LINEAR).
+    @param fogStart Start distance of fog, used for linear mode only.
+    @param fogEnd End distance of fog, used for linear mode only.
+    @param fogDensity Fog density used in exponential modes only.
+    */
+    void setFogProperties(FogMode fogMode, float fogStart, float fogEnd, float fogDensity);
 
-	static String Type;
+    static String Type;
 
 // Protected methods
 protected:
 
-	/** 
-	@see SubRenderState::resolveParameters.
-	*/
-	virtual bool resolveParameters(ProgramSet* programSet);
+    /** 
+    @see SubRenderState::resolveParameters.
+    */
+    virtual bool resolveParameters(ProgramSet* programSet);
 
-	/** 
-	@see SubRenderState::resolveDependencies.
-	*/
-	virtual bool resolveDependencies(ProgramSet* programSet);
+    /** 
+    @see SubRenderState::resolveDependencies.
+    */
+    virtual bool resolveDependencies(ProgramSet* programSet);
 
-	/** 
-	@see SubRenderState::addFunctionInvocations.
-	*/
-	virtual bool addFunctionInvocations(ProgramSet* programSet);
+    /** 
+    @see SubRenderState::addFunctionInvocations.
+    */
+    virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 // Attributes.
-protected:	
-	/// The factory which created the texture fog instance
-	RTShaderSRSTexturedFogFactory* mFactory;    
-	/// Fog formula. 
-	FogMode	mFogMode;				
-	/// Fog parameters (density, start, end, 1/end-start).
-	Vector4	mFogParamsValue;		
-	/// True if the fog parameters should be taken from the pass.
-	bool mPassOverrideParams;	
-	/// The index of the background texture unit state in the pass 
-	unsigned int mBackgroundSamplerIndex;
+protected:  
+    /// The factory which created the texture fog instance
+    RTShaderSRSTexturedFogFactory* mFactory;    
+    /// Fog formula. 
+    FogMode mFogMode;               
+    /// Fog parameters (density, start, end, 1/end-start).
+    Vector4 mFogParamsValue;        
+    /// True if the fog parameters should be taken from the pass.
+    bool mPassOverrideParams;   
+    /// The index of the background texture unit state in the pass 
+    unsigned int mBackgroundSamplerIndex;
 
-	// World matrix parameter.	
-	UniformParameterPtr	mWorldMatrix;				
-	// camera position parameter.		
-	UniformParameterPtr	mCameraPos;			    
-	// Fog parameters program parameter.	
-	UniformParameterPtr	mFogParams;				
-	// Vertex shader input position parameter.
-	ParameterPtr mVSInPos;				
-	// Fog colour parameter.	
-	ParameterPtr mFogColour;				
-	// Vertex shader output fog colour parameter.
-	ParameterPtr mVSOutFogFactor;		
-	// Pixel shader input fog factor.
-	ParameterPtr mPSInFogFactor;			
-	// Vertex shader output depth.
-	ParameterPtr mVSOutDepth;			
-	// Pixel shader input depth.
-	ParameterPtr mPSInDepth;				
-	// Vertex shader world position relative to camera.
-	ParameterPtr mVSOutPosView;			
-	// Pixel shader world position relative to camera.
-	ParameterPtr mPSInPosView;			 
-	// Pixel shader output diffuse colour.
-	ParameterPtr mPSOutDiffuse;			
-	//Background color texture parameter
-	ParameterPtr mBackgroundTextureSampler; 
-	
+    // World matrix parameter.  
+    UniformParameterPtr mWorldMatrix;               
+    // camera position parameter.       
+    UniformParameterPtr mCameraPos;             
+    // Fog parameters program parameter.    
+    UniformParameterPtr mFogParams;             
+    // Vertex shader input position parameter.
+    ParameterPtr mVSInPos;              
+    // Fog colour parameter.    
+    ParameterPtr mFogColour;                
+    // Vertex shader output fog colour parameter.
+    ParameterPtr mVSOutFogFactor;       
+    // Pixel shader input fog factor.
+    ParameterPtr mPSInFogFactor;            
+    // Vertex shader output depth.
+    ParameterPtr mVSOutDepth;           
+    // Pixel shader input depth.
+    ParameterPtr mPSInDepth;                
+    // Vertex shader world position relative to camera.
+    ParameterPtr mVSOutPosView;         
+    // Pixel shader world position relative to camera.
+    ParameterPtr mPSInPosView;           
+    // Pixel shader output diffuse colour.
+    ParameterPtr mPSOutDiffuse;         
+    //Background color texture parameter
+    ParameterPtr mBackgroundTextureSampler; 
+    
 };
 
 
@@ -156,25 +156,25 @@ class RTShaderSRSTexturedFogFactory : public SubRenderStateFactory
 {
 public:
 
-	/** 
-	@see SubRenderStateFactory::getType.
-	*/
-	virtual const String&	getType() const;
+    /** 
+    @see SubRenderStateFactory::getType.
+    */
+    virtual const String&   getType() const;
 
-	/** Set the name of the texture to use as a background for the fog */
-	const String& getBackgroundTextureName() const { return mBackgroundTextureName; }
-	/** Return the name of the texture used as a background for the fog */
-	void setBackgroundTextureName(const String& name) { mBackgroundTextureName = name; }
-	
+    /** Set the name of the texture to use as a background for the fog */
+    const String& getBackgroundTextureName() const { return mBackgroundTextureName; }
+    /** Return the name of the texture used as a background for the fog */
+    void setBackgroundTextureName(const String& name) { mBackgroundTextureName = name; }
+    
 protected:
 
-	/** 
-	@see SubRenderStateFactory::createInstanceImpl.
-	*/
-	virtual SubRenderState*	createInstanceImpl();
+    /** 
+    @see SubRenderStateFactory::createInstanceImpl.
+    */
+    virtual SubRenderState* createInstanceImpl();
 
 private:
-	String mBackgroundTextureName;
+    String mBackgroundTextureName;
 };
 
 #endif

@@ -55,41 +55,41 @@ namespace Ogre {
         {
             *static_cast<GL3PlusFrameBufferObject **>(pData) = &mFB;
         }
-		else if (name == "GL_FBOID")
-		{
+        else if (name == "GL_FBOID")
+        {
             *static_cast<GLuint*>(pData) = mFB.getGLFBOID();
-		}
-		else if (name == "GL_MULTISAMPLEFBOID")
-		{
+        }
+        else if (name == "GL_MULTISAMPLEFBOID")
+        {
             *static_cast<GLuint*>(pData) = mFB.getGLMultisampleFBOID();
-		}
+        }
     }
 
-	void GL3PlusFBORenderTexture::swapBuffers()
-	{
-		mFB.swapBuffers();
-	}
-	//-----------------------------------------------------------------------------
-	bool GL3PlusFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
-	{
-		bool result;
-		if( (result = GL3PlusRenderTexture::attachDepthBuffer( depthBuffer )) )
-			mFB.attachDepthBuffer( depthBuffer );
+    void GL3PlusFBORenderTexture::swapBuffers()
+    {
+        mFB.swapBuffers();
+    }
+    //-----------------------------------------------------------------------------
+    bool GL3PlusFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        bool result;
+        if( (result = GL3PlusRenderTexture::attachDepthBuffer( depthBuffer )) )
+            mFB.attachDepthBuffer( depthBuffer );
 
-		return result;
-	}
-	//-----------------------------------------------------------------------------
-	void GL3PlusFBORenderTexture::detachDepthBuffer()
-	{
-		mFB.detachDepthBuffer();
-		GL3PlusRenderTexture::detachDepthBuffer();
-	}
-	//-----------------------------------------------------------------------------
-	void GL3PlusFBORenderTexture::_detachDepthBuffer()
-	{
-		mFB.detachDepthBuffer();
-		GL3PlusRenderTexture::_detachDepthBuffer();
-	}
+        return result;
+    }
+    //-----------------------------------------------------------------------------
+    void GL3PlusFBORenderTexture::detachDepthBuffer()
+    {
+        mFB.detachDepthBuffer();
+        GL3PlusRenderTexture::detachDepthBuffer();
+    }
+    //-----------------------------------------------------------------------------
+    void GL3PlusFBORenderTexture::_detachDepthBuffer()
+    {
+        mFB.detachDepthBuffer();
+        GL3PlusRenderTexture::_detachDepthBuffer();
+    }
    
     // Size of probe texture
     #define PROBE_SIZE 16
@@ -125,22 +125,22 @@ namespace Ogre {
     };
     #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
-	GL3PlusFBOManager::GL3PlusFBOManager()
+    GL3PlusFBOManager::GL3PlusFBOManager()
     {
         detectFBOFormats();
         
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
     }
 
-	GL3PlusFBOManager::~GL3PlusFBOManager()
-	{
-		if(!mRenderBufferMap.empty())
-		{
-			LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.");
-		}
+    GL3PlusFBOManager::~GL3PlusFBOManager()
+    {
+        if(!mRenderBufferMap.empty())
+        {
+            LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.");
+        }
         
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
-	}
+    }
 
     void GL3PlusFBOManager::_createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
     {
@@ -281,16 +281,16 @@ namespace Ogre {
         {
             mProps[x].valid = false;
 
-			// Fetch GL format token
-			GLenum fmt = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x);
-			GLenum fmt2 = GL3PlusPixelUtil::getGLOriginFormat((PixelFormat)x);
-			GLenum type = GL3PlusPixelUtil::getGLOriginDataType((PixelFormat)x);
+            // Fetch GL format token
+            GLenum fmt = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x);
+            GLenum fmt2 = GL3PlusPixelUtil::getGLOriginFormat((PixelFormat)x);
+            GLenum type = GL3PlusPixelUtil::getGLOriginDataType((PixelFormat)x);
             if(fmt == GL_NONE && x != 0)
                 continue;
 
-			// No test for compressed formats
-			if(PixelUtil::isCompressed((PixelFormat)x))
-				continue;
+            // No test for compressed formats
+            if(PixelUtil::isCompressed((PixelFormat)x))
+                continue;
 
             // Create and attach framebuffer
             _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
@@ -298,15 +298,15 @@ namespace Ogre {
             // Check status
             GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 
-			// Ignore status in case of fmt==GL_NONE, because no implementation will accept
-			// a buffer without *any* attachment. Buffers with only stencil and depth attachment
-			// might still be supported, so we must continue probing.
+            // Ignore status in case of fmt==GL_NONE, because no implementation will accept
+            // a buffer without *any* attachment. Buffers with only stencil and depth attachment
+            // might still be supported, so we must continue probing.
             if(fmt == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE)
             {
                 mProps[x].valid = true;
-				StringUtil::StrStreamType str;
-				str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
-					<< " depth/stencil support: ";
+                StringUtil::StrStreamType str;
+                str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
+                    << " depth/stencil support: ";
 
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
@@ -319,8 +319,8 @@ namespace Ogre {
                         {
 //                            StringUtil::StrStreamType l;
 //                            l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 
-//                            	<< " D" << depthBits[depth] 
-//                            	<< "S" << stencilBits[stencil];
+//                              << " D" << depthBits[depth] 
+//                              << "S" << stencilBits[stencil];
 //                            LogManager::getSingleton().logMessage(l.str());
 
                             if (_tryFormat(depthFormats[depth], stencilFormats[stencil]))
@@ -380,7 +380,7 @@ namespace Ogre {
             // Delete texture and framebuffer
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             glDeleteFramebuffers(1, &fb);
-			
+            
             if (fmt != GL_NONE)
             {
                 glDeleteTextures(1, &tid);
@@ -388,7 +388,7 @@ namespace Ogre {
             }
         }
 
-		String fmtstring = "";
+        String fmtstring = "";
         for(size_t x = 0; x < PF_COUNT; ++x)
         {
             if(mProps[x].valid)
@@ -420,8 +420,8 @@ namespace Ogre {
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
-			if((depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8 || depthFormats[props.modes[mode].depth]==GL_DEPTH32F_STENCIL8) && !requestDepthOnly) // Prefer 24/8 packed
-				desirability += 5000;
+            if((depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8 || depthFormats[props.modes[mode].depth]==GL_DEPTH32F_STENCIL8) && !requestDepthOnly) // Prefer 24/8 packed
+                desirability += 5000;
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
             
             if(desirability>bestscore)
@@ -438,15 +438,15 @@ namespace Ogre {
     }
 
     GL3PlusFBORenderTexture *GL3PlusFBOManager::createRenderTexture(const String &name, 
-		const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa)
+        const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
         GL3PlusFBORenderTexture *retval = new GL3PlusFBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
-	MultiRenderTarget *GL3PlusFBOManager::createMultiRenderTarget(const String & name)
-	{
-		return new GL3PlusFBOMultiRenderTarget(this, name);
-	}
+    MultiRenderTarget *GL3PlusFBOManager::createMultiRenderTarget(const String & name)
+    {
+        return new GL3PlusFBOMultiRenderTarget(this, name);
+    }
 
     void GL3PlusFBOManager::bind(RenderTarget *target)
     {
@@ -472,7 +472,7 @@ namespace Ogre {
             {
                 retval.buffer = it->second.buffer;
                 retval.zoffset = 0;
-				retval.numSamples = fsaa;
+                retval.numSamples = fsaa;
                 // Increase refcount
                 ++it->second.refcount;
             }
@@ -483,7 +483,7 @@ namespace Ogre {
                 mRenderBufferMap[key] = RBRef(rb);
                 retval.buffer = rb;
                 retval.zoffset = 0;
-				retval.numSamples = fsaa;
+                retval.numSamples = fsaa;
             }
         }
 //        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
@@ -512,17 +512,17 @@ namespace Ogre {
         RBFormat key(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
         RenderBufferMap::iterator it = mRenderBufferMap.find(key);
         if(it != mRenderBufferMap.end())
-		{
-			// Decrease refcount
-			--it->second.refcount;
-			if(it->second.refcount==0)
-			{
-				// If refcount reaches zero, delete buffer and remove from map
-				delete it->second.buffer;
-				mRenderBufferMap.erase(it);
-//				std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
-//				        << " of " << key.width << "x" << key.height << std::endl;
-			}
-		}
+        {
+            // Decrease refcount
+            --it->second.refcount;
+            if(it->second.refcount==0)
+            {
+                // If refcount reaches zero, delete buffer and remove from map
+                delete it->second.buffer;
+                mRenderBufferMap.erase(it);
+//              std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
+//                      << " of " << key.width << "x" << key.height << std::endl;
+            }
+        }
     }
 }

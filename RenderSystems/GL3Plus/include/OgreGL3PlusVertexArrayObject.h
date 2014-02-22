@@ -33,23 +33,23 @@ THE SOFTWARE.
 
 namespace Ogre { 
 
-	/** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
-	class GL3PlusVertexArrayObject
-	{
-	protected:
+    /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
+    class GL3PlusVertexArrayObject
+    {
+    protected:
         /// OpenGL id for the vertex array object
         GLuint mVAO;
         /// Is this VAO initialised?
         bool mInitialised;
 
-	public:
-		GL3PlusVertexArrayObject();
-		~GL3PlusVertexArrayObject();
+    public:
+        GL3PlusVertexArrayObject();
+        ~GL3PlusVertexArrayObject();
         /// Bind a VAO
         void bind(void);
         bool isInitialised(void) { return mInitialised; }
         void setInitialised(bool flag) { mInitialised = flag; }
-	};
+    };
 
 }
 

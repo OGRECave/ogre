@@ -33,13 +33,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/// Holds the transform of a KeyFrame (which is part of an animation)
-	struct _OgreExport KfTransform
-	{
-		ArrayVector3	mPosition;
-		ArrayQuaternion	mOrientation;
-		ArrayVector3	mScale;
-	};
+    /// Holds the transform of a KeyFrame (which is part of an animation)
+    struct _OgreExport KfTransform
+    {
+        ArrayVector3    mPosition;
+        ArrayQuaternion mOrientation;
+        ArrayVector3    mScale;
+    };
 }
 
 #endif

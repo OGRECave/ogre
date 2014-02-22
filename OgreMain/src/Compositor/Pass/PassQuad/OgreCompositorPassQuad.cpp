@@ -41,132 +41,132 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	void CompositorPassQuadDef::addQuadTextureSource( size_t texUnitIdx, const String &textureName,
-														size_t mrtIndex )
-	{
-		if( textureName.find( "global_" ) == 0 )
-		{
-			mParentNodeDef->addTextureSourceName( textureName, 0,
-													TextureDefinitionBase::TEXTURE_GLOBAL );
-		}
-		mTextureSources.push_back( QuadTextureSource( texUnitIdx, textureName, mrtIndex ) );
-	}
-	//-----------------------------------------------------------------------------------
-	//-----------------------------------------------------------------------------------
-	CompositorPassQuad::CompositorPassQuad( const CompositorPassQuadDef *definition,
-											Camera *defaultCamera, CompositorNode *parentNode,
-											const CompositorChannel &target, Real horizonalTexelOffset,
-											Real verticalTexelOffset ) :
-				CompositorPass( definition, target, parentNode ),
-				mDefinition( definition ),
-				mFsRect( 0 ),
-				mPass( 0 ),
-				mCamera( 0 ),
-				mHorizonalTexelOffset( horizonalTexelOffset ),
-				mVerticalTexelOffset( verticalTexelOffset )
-	{
-		MaterialPtr material = MaterialManager::getSingleton().getByName( mDefinition->mMaterialName );
-		if( material.isNull() )
-		{
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find material '" +
-						 mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
-		}
-		material->load();
+    void CompositorPassQuadDef::addQuadTextureSource( size_t texUnitIdx, const String &textureName,
+                                                        size_t mrtIndex )
+    {
+        if( textureName.find( "global_" ) == 0 )
+        {
+            mParentNodeDef->addTextureSourceName( textureName, 0,
+                                                    TextureDefinitionBase::TEXTURE_GLOBAL );
+        }
+        mTextureSources.push_back( QuadTextureSource( texUnitIdx, textureName, mrtIndex ) );
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    CompositorPassQuad::CompositorPassQuad( const CompositorPassQuadDef *definition,
+                                            Camera *defaultCamera, CompositorNode *parentNode,
+                                            const CompositorChannel &target, Real horizonalTexelOffset,
+                                            Real verticalTexelOffset ) :
+                CompositorPass( definition, target, parentNode ),
+                mDefinition( definition ),
+                mFsRect( 0 ),
+                mPass( 0 ),
+                mCamera( 0 ),
+                mHorizonalTexelOffset( horizonalTexelOffset ),
+                mVerticalTexelOffset( verticalTexelOffset )
+    {
+        MaterialPtr material = MaterialManager::getSingleton().getByName( mDefinition->mMaterialName );
+        if( material.isNull() )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find material '" +
+                         mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
+        }
+        material->load();
 
-		if( !material->getBestTechnique() )
-		{
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find best technique for material '" +
-						 mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
-		}
+        if( !material->getBestTechnique() )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find best technique for material '" +
+                         mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
+        }
 
-		if( !material->getBestTechnique()->getPass( 0 ) )
-		{
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Best technique must have a Pass! Material '" +
-						 mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
-		}
+        if( !material->getBestTechnique()->getPass( 0 ) )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Best technique must have a Pass! Material '" +
+                         mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
+        }
 
-		mPass = material->getBestTechnique()->getPass( 0 );
+        mPass = material->getBestTechnique()->getPass( 0 );
 
-		const CompositorWorkspace *workspace = parentNode->getWorkspace();
+        const CompositorWorkspace *workspace = parentNode->getWorkspace();
 
-		if( mDefinition->mUseQuad ||
-			mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS )
-		{
-			mFsRect = workspace->getCompositorManager()->getSharedFullscreenQuad();
-		}
-		else
-		{
-			mFsRect = workspace->getCompositorManager()->getSharedFullscreenTriangle();
-		}
+        if( mDefinition->mUseQuad ||
+            mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS )
+        {
+            mFsRect = workspace->getCompositorManager()->getSharedFullscreenQuad();
+        }
+        else
+        {
+            mFsRect = workspace->getCompositorManager()->getSharedFullscreenTriangle();
+        }
 
-		if( mDefinition->mCameraName != IdString() )
-			mCamera = workspace->findCamera( mDefinition->mCameraName );
-		else
-			mCamera = defaultCamera;
-	}
-	//-----------------------------------------------------------------------------------
-	void CompositorPassQuad::execute( const Camera *lodCamera )
-	{
-		//Execute a limited number of times?
-		if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
-		{
-			if( !mNumPassesLeft )
-				return;
-			--mNumPassesLeft;
-		}
+        if( mDefinition->mCameraName != IdString() )
+            mCamera = workspace->findCamera( mDefinition->mCameraName );
+        else
+            mCamera = defaultCamera;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassQuad::execute( const Camera *lodCamera )
+    {
+        //Execute a limited number of times?
+        if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
+        {
+            if( !mNumPassesLeft )
+                return;
+            --mNumPassesLeft;
+        }
 
-		//Call beginUpdate if we're the first to use this RT
-		if( mDefinition->mBeginRtUpdate )
-			mTarget->_beginUpdate();
+        //Call beginUpdate if we're the first to use this RT
+        if( mDefinition->mBeginRtUpdate )
+            mTarget->_beginUpdate();
 
-		//Set the material textures every frame (we don't clone the material)
-		const CompositorPassQuadDef::TextureSources &textureSources = mDefinition->getTextureSources();
-		CompositorPassQuadDef::TextureSources::const_iterator itor = textureSources.begin();
-		CompositorPassQuadDef::TextureSources::const_iterator end  = textureSources.end();
-		while( itor != end )
-		{
-			if( itor->texUnitIdx < mPass->getNumTextureUnitStates() )
-			{
-				TextureUnitState *tu = mPass->getTextureUnitState( itor->texUnitIdx );
-				tu->setTexture( mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex ) );
-			}
+        //Set the material textures every frame (we don't clone the material)
+        const CompositorPassQuadDef::TextureSources &textureSources = mDefinition->getTextureSources();
+        CompositorPassQuadDef::TextureSources::const_iterator itor = textureSources.begin();
+        CompositorPassQuadDef::TextureSources::const_iterator end  = textureSources.end();
+        while( itor != end )
+        {
+            if( itor->texUnitIdx < mPass->getNumTextureUnitStates() )
+            {
+                TextureUnitState *tu = mPass->getTextureUnitState( itor->texUnitIdx );
+                tu->setTexture( mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex ) );
+            }
 
-			++itor;
-		}
+            ++itor;
+        }
 
-		const Real hOffset = 2.0f * mHorizonalTexelOffset / mTarget->getWidth();
-		const Real vOffset = 2.0f * mVerticalTexelOffset / mTarget->getHeight();
+        const Real hOffset = 2.0f * mHorizonalTexelOffset / mTarget->getWidth();
+        const Real vOffset = 2.0f * mVerticalTexelOffset / mTarget->getHeight();
 
-		//The rectangle is shared, set the corners each time
-		mFsRect->setCorners( mDefinition->mVpLeft + hOffset, mDefinition->mVpTop - vOffset,
-							 mDefinition->mVpWidth, mDefinition->mVpHeight );
+        //The rectangle is shared, set the corners each time
+        mFsRect->setCorners( mDefinition->mVpLeft + hOffset, mDefinition->mVpTop - vOffset,
+                             mDefinition->mVpWidth, mDefinition->mVpHeight );
 
-		if( mDefinition->mFrustumCorners == CompositorPassQuadDef::VIEW_SPACE_CORNERS )
-		{
-			const Ogre::Matrix4 &viewMat = mCamera->getViewMatrix(true);
-			const Vector3 *corners = mCamera->getWorldSpaceCorners();
+        if( mDefinition->mFrustumCorners == CompositorPassQuadDef::VIEW_SPACE_CORNERS )
+        {
+            const Ogre::Matrix4 &viewMat = mCamera->getViewMatrix(true);
+            const Vector3 *corners = mCamera->getWorldSpaceCorners();
 
-			mFsRect->setNormals( viewMat * corners[5], viewMat * corners[6],
-								 viewMat * corners[4], viewMat * corners[7] );
-		}
-		else if( mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS )
-		{
-			const Vector3 *corners = mCamera->getWorldSpaceCorners();
-			mFsRect->setNormals( corners[5], corners[6], corners[4], corners[7] );
-		}
+            mFsRect->setNormals( viewMat * corners[5], viewMat * corners[6],
+                                 viewMat * corners[4], viewMat * corners[7] );
+        }
+        else if( mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS )
+        {
+            const Vector3 *corners = mCamera->getWorldSpaceCorners();
+            mFsRect->setNormals( corners[5], corners[6], corners[4], corners[7] );
+        }
 
-		SceneManager *sceneManager = mCamera->getSceneManager();
-		sceneManager->_setViewport( mViewport );
+        SceneManager *sceneManager = mCamera->getSceneManager();
+        sceneManager->_setViewport( mViewport );
 
-		//Fire the listener in case it wants to change anything
-		CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
-		if( listener )
-			listener->passPreExecute( this );
+        //Fire the listener in case it wants to change anything
+        CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
+        if( listener )
+            listener->passPreExecute( this );
 
-		sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
+        sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
 
-		//Call endUpdate if we're the last pass in a row to use this RT
-		if( mDefinition->mEndRtUpdate )
-			mTarget->_endUpdate();
-	}
+        //Call endUpdate if we're the last pass in a row to use this RT
+        if( mDefinition->mEndRtUpdate )
+            mTarget->_endUpdate();
+    }
 }

@@ -32,46 +32,46 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	struct KfTransform;
+    struct KfTransform;
 
-	/** Implementation to create the KfTransform variables needed by SkeletonTrack
-		@See SkeletonAnimationDef and @see SkeletonTrack
-	@author
-		Matias N. Goldberg
-	@version
-		1.0
-	*/
-	class _OgreExport KfTransformArrayMemoryManager : public ArrayMemoryManager
-	{
-	public:
-		enum MemoryTypes
-		{
-			KfTransformType = 0,
-			NumMemoryTypes
-		};
+    /** Implementation to create the KfTransform variables needed by SkeletonTrack
+        @See SkeletonAnimationDef and @see SkeletonTrack
+    @author
+        Matias N. Goldberg
+    @version
+        1.0
+    */
+    class _OgreExport KfTransformArrayMemoryManager : public ArrayMemoryManager
+    {
+    public:
+        enum MemoryTypes
+        {
+            KfTransformType = 0,
+            NumMemoryTypes
+        };
 
-		static const size_t ElementsMemSize[NumMemoryTypes];
+        static const size_t ElementsMemSize[NumMemoryTypes];
 
-		/// @copydoc ArrayMemoryManager::ArrayMemoryManager
-		KfTransformArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
-								size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
-								RebaseListener *rebaseListener=0 );
+        /// @copydoc ArrayMemoryManager::ArrayMemoryManager
+        KfTransformArrayMemoryManager( uint16 depthLevel, size_t hintMaxNodes,
+                                size_t cleanupThreshold=100, size_t maxHardLimit=MAX_MEMORY_SLOTS,
+                                RebaseListener *rebaseListener=0 );
 
         virtual ~KfTransformArrayMemoryManager() {}
 
-		/** Requests memory for a new KfTransofrm (for the Array vectors & matrices)
-		@remarks
-			Uses all slots.
-			Deletion is assumed to take place when the memory manager is destroyed;
-			as this manager is run in a controlled environment.
-		@param outTransform
-			Out: The transform with filled memory pointers
-		*/
-		void createNewNode( KfTransform **outTransform );
-	};
+        /** Requests memory for a new KfTransofrm (for the Array vectors & matrices)
+        @remarks
+            Uses all slots.
+            Deletion is assumed to take place when the memory manager is destroyed;
+            as this manager is run in a controlled environment.
+        @param outTransform
+            Out: The transform with filled memory pointers
+        */
+        void createNewNode( KfTransform **outTransform );
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

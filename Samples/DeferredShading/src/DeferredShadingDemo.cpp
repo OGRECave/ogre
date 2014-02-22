@@ -1,7 +1,7 @@
 /**
 Demo of Deferred Shading in OGRE using Multiple Render Targets and HLSL/GLSL high level 
 language shaders.
-	// W.J. :wumpus: van der Laan 2005 //
+    // W.J. :wumpus: van der Laan 2005 //
 
 Deferred shading renders the scene to a 'fat' texture format, using a shader that outputs colour, 
 normal, depth, and possible other attributes per fragment. Multi Render Target is required as we 
@@ -34,17 +34,17 @@ Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
-	s = new Sample_DeferredShading;
-	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
-	sp->addSample(s);
-	Root::getSingleton().installPlugin(sp);
+    s = new Sample_DeferredShading;
+    sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
+    sp->addSample(s);
+    Root::getSingleton().installPlugin(sp);
 }
 
 extern "C" _OgreSampleExport void dllStopPlugin()
 {
-	Root::getSingleton().uninstallPlugin(sp); 
-	OGRE_DELETE sp;
-	delete s;
+    Root::getSingleton().uninstallPlugin(sp); 
+    OGRE_DELETE sp;
+    delete s;
 }
 
 #endif

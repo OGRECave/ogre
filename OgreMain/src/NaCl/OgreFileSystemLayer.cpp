@@ -34,18 +34,18 @@
 namespace Ogre
 {
     //---------------------------------------------------------------------
-	void FileSystemLayer::getConfigPaths()
-	{
-		// use application path as first config search path
-		mConfigPaths.push_back("");
-	}
+    void FileSystemLayer::getConfigPaths()
+    {
+        // use application path as first config search path
+        mConfigPaths.push_back("");
+    }
     //---------------------------------------------------------------------
-	void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
-	{
-	}
+    void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
+    {
+    }
     //---------------------------------------------------------------------
-	bool FileSystemLayer::fileExists(const Ogre::String& path) const
-	{
+    bool FileSystemLayer::fileExists(const Ogre::String& path) const
+    {
         return false;
     }
 }

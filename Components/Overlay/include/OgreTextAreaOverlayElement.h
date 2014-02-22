@@ -32,13 +32,13 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Overlays
-	*  @{
-	*/
-	/** This class implements an overlay element which contains simple unformatted text.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Overlays
+    *  @{
+    */
+    /** This class implements an overlay element which contains simple unformatted text.
     */
     class _OgreOverlayExport TextAreaOverlayElement : public OverlayElement
     {
@@ -56,7 +56,7 @@ namespace Ogre
         virtual ~TextAreaOverlayElement();
 
         virtual void initialise(void);
-		virtual void setCaption(const DisplayString& text);
+        virtual void setCaption(const DisplayString& text);
 
         void setCharHeight( Real height );
         Real getCharHeight() const;
@@ -70,7 +70,7 @@ namespace Ogre
         /** See OverlayElement. */
         virtual const String& getTypeName(void) const;
         /** See Renderable. */
-		const MaterialPtr& getMaterial(void) const;
+        const MaterialPtr& getMaterial(void) const;
         /** See Renderable. */
         void getRenderOperation(RenderOperation& op);
         /** Overridden from OverlayElement */
@@ -108,7 +108,7 @@ namespace Ogre
         inline void setAlignment( Alignment a )
         {
             mAlignment = a;
-			mGeomPositionsOutOfDate = true;
+            mGeomPositionsOutOfDate = true;
         }
         inline Alignment getAlignment() const
         {
@@ -233,7 +233,7 @@ namespace Ogre
         Real mSpaceWidth;
         ushort mPixelSpaceWidth;
         size_t mAllocSize;
-		Real mViewportAspectCoef;
+        Real mViewportAspectCoef;
 
         /// Colours to use for the vertices
         ColourValue mColourBottom;
@@ -245,13 +245,13 @@ namespace Ogre
         void checkMemoryAllocation( size_t numChars );
         /// Inherited function
         virtual void updatePositionGeometry();
-		/// Inherited function
-		virtual void updateTextureGeometry();
+        /// Inherited function
+        virtual void updateTextureGeometry();
         /// Updates vertex colours
         virtual void updateColours(void);
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

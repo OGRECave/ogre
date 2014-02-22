@@ -40,18 +40,18 @@ typedef map<wxString, wxString> DocMap;
 class DocManager
 {
 public:
-	DocManager();
-	virtual ~DocManager();
+    DocManager();
+    virtual ~DocManager();
 
-	void load(wxString& path);
+    void load(wxString& path);
 
-	void addDoc(wxString& key, wxString& doc);
-	void removeDoc(wxString& key);
+    void addDoc(wxString& key, wxString& doc);
+    void removeDoc(wxString& key);
 
-	wxString* find(wxString& s);
+    wxString* find(wxString& s);
 
 protected:
-	DocMap mDocs;
+    DocMap mDocs;
 };
 
 #endif // _DOCMANAGER_H_

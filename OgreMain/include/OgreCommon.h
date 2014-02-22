@@ -51,25 +51,25 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
 
-	/// Fast general hashing algorithm
-	uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar = 0);
-	/// Combine hashes with same style as boost::hash_combine
-	template <typename T>
-	uint32 HashCombine (uint32 hashSoFar, const T& data)
-	{
-		return FastHash((const char*)&data, sizeof(T), hashSoFar);
-	}
+    /// Fast general hashing algorithm
+    uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar = 0);
+    /// Combine hashes with same style as boost::hash_combine
+    template <typename T>
+    uint32 HashCombine (uint32 hashSoFar, const T& data)
+    {
+        return FastHash((const char*)&data, sizeof(T), hashSoFar);
+    }
 
 
     /** Comparison functions used for the depth/stencil buffer operations and 
-		others. */
+        others. */
     enum CompareFunction
     {
         CMPF_ALWAYS_FAIL,
@@ -82,26 +82,26 @@ namespace Ogre {
         CMPF_GREATER
     };
 
-	/// Enum describing the various actions which can be taken on the stencil buffer
-	enum StencilOperation
-	{
-		/// Leave the stencil buffer unchanged
-		SOP_KEEP,
-		/// Set the stencil value to zero
-		SOP_ZERO,
-		/// Set the stencil value to the reference value
-		SOP_REPLACE,
-		/// Increase the stencil value by 1, clamping at the maximum value
-		SOP_INCREMENT,
-		/// Decrease the stencil value by 1, clamping at 0
-		SOP_DECREMENT,
-		/// Increase the stencil value by 1, wrapping back to 0 when incrementing the maximum value
-		SOP_INCREMENT_WRAP,
-		/// Decrease the stencil value by 1, wrapping when decrementing 0
-		SOP_DECREMENT_WRAP,
-		/// Invert the bits of the stencil buffer
-		SOP_INVERT
-	};
+    /// Enum describing the various actions which can be taken on the stencil buffer
+    enum StencilOperation
+    {
+        /// Leave the stencil buffer unchanged
+        SOP_KEEP,
+        /// Set the stencil value to zero
+        SOP_ZERO,
+        /// Set the stencil value to the reference value
+        SOP_REPLACE,
+        /// Increase the stencil value by 1, clamping at the maximum value
+        SOP_INCREMENT,
+        /// Decrease the stencil value by 1, clamping at 0
+        SOP_DECREMENT,
+        /// Increase the stencil value by 1, wrapping back to 0 when incrementing the maximum value
+        SOP_INCREMENT_WRAP,
+        /// Decrease the stencil value by 1, wrapping when decrementing 0
+        SOP_DECREMENT_WRAP,
+        /// Invert the bits of the stencil buffer
+        SOP_INVERT
+    };
 
     /** High-level filtering options providing shortcuts to settings the
         minification, magnification and mip filters. */
@@ -114,7 +114,7 @@ namespace Ogre {
         /// Equal to: min=FO_LINEAR, mag=FO_LINEAR, mip=FO_LINEAR
         TFO_TRILINEAR,
         /// Equal to: min=FO_ANISOTROPIC, max=FO_ANISOTROPIC, mip=FO_LINEAR
-		TFO_ANISOTROPIC
+        TFO_ANISOTROPIC
     };
 
     enum FilterType
@@ -174,9 +174,9 @@ namespace Ogre {
 
     /** Manual culling modes based on vertex normals.
         This setting applies to how the software culls triangles before sending them to the 
-		hardware API. This culling mode is used by scene managers which choose to implement it -
-		normally those which deal with large amounts of fixed world geometry which is often 
-		planar (software culling movable variable geometry is expensive). */
+        hardware API. This culling mode is used by scene managers which choose to implement it -
+        normally those which deal with large amounts of fixed world geometry which is often 
+        planar (software culling movable variable geometry is expensive). */
     enum ManualCullingMode
     {
         /// No culling so everything is sent to the hardware.
@@ -200,19 +200,19 @@ namespace Ogre {
         WFT_SAWTOOTH,
         /// Gradual steady decrease from max to min over the period, with an instant return to max at the end.
         WFT_INVERSE_SAWTOOTH,
-		/// Pulse Width Modulation. Works like WFT_SQUARE, except the high to low transition is controlled by duty cycle. 
-		/// With a duty cycle of 50% (0.5) will give the same output as WFT_SQUARE.
-		WFT_PWM
+        /// Pulse Width Modulation. Works like WFT_SQUARE, except the high to low transition is controlled by duty cycle. 
+        /// With a duty cycle of 50% (0.5) will give the same output as WFT_SQUARE.
+        WFT_PWM
     };
 
     /** The polygon mode to use when rasterising. */
     enum PolygonMode
     {
-		/// Only points are rendered.
+        /// Only points are rendered.
         PM_POINTS = 1,
-		/// Wireframe models are rendered.
+        /// Wireframe models are rendered.
         PM_WIREFRAME = 2,
-		/// Solid polygons are rendered.
+        /// Solid polygons are rendered.
         PM_SOLID = 3
     };
 
@@ -242,338 +242,338 @@ namespace Ogre {
         FBT_STENCIL = 0x4
     };
 
-	/** Flags for the Instance Manager when calculating ideal number of instances per batch */
-	enum InstanceManagerFlags
-	{
-		/** Forces an amount of instances per batch low enough so that vertices * numInst < 65535
-			since usually improves performance. In HW instanced techniques, this flag is ignored
-		*/
-		IM_USE16BIT		= 0x0001,
+    /** Flags for the Instance Manager when calculating ideal number of instances per batch */
+    enum InstanceManagerFlags
+    {
+        /** Forces an amount of instances per batch low enough so that vertices * numInst < 65535
+            since usually improves performance. In HW instanced techniques, this flag is ignored
+        */
+        IM_USE16BIT     = 0x0001,
 
-		/** The num. of instances is adjusted so that as few pixels as possible are wasted
-			in the vertex texture */
-		IM_VTFBESTFIT	= 0x0002,
+        /** The num. of instances is adjusted so that as few pixels as possible are wasted
+            in the vertex texture */
+        IM_VTFBESTFIT   = 0x0002,
 
-		/** Use a limited number of skeleton animations shared among all instances. 
-		Update only that limited amount of animations in the vertex texture.*/
-		IM_VTFBONEMATRIXLOOKUP = 0x0004,
+        /** Use a limited number of skeleton animations shared among all instances. 
+        Update only that limited amount of animations in the vertex texture.*/
+        IM_VTFBONEMATRIXLOOKUP = 0x0004,
 
-		IM_USEBONEDUALQUATERNIONS = 0x0008,
+        IM_USEBONEDUALQUATERNIONS = 0x0008,
 
-		/** Use one weight per vertex when recommended (i.e. VTF). */
-		IM_USEONEWEIGHT = 0x0010,
+        /** Use one weight per vertex when recommended (i.e. VTF). */
+        IM_USEONEWEIGHT = 0x0010,
 
-		/** All techniques are forced to one weight per vertex. */
-		IM_FORCEONEWEIGHT = 0x0020,
+        /** All techniques are forced to one weight per vertex. */
+        IM_FORCEONEWEIGHT = 0x0020,
 
-		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT|IM_USEONEWEIGHT
-	};
+        IM_USEALL       = IM_USE16BIT|IM_VTFBESTFIT|IM_USEONEWEIGHT
+    };
 
-	/** The types of NodeMemoryManager & ObjectMemoryManagers
-	@remarks
-		By default all objects are dynamic. Static objects can save a lot of performance on CPU side
-		(and sometimes GPU side, for example with some instancing techniques) by telling the engine
-		they won't be changing often.
-	@par
-		What it means for Nodes:
-			Nodes created with SCENE_STATIC won't update their derived position/rotation/scale every
-			frame.
-			This means that modifying (eg) a static node position won't actually take effect until
-			SceneManager::notifyStaticDirty( mySceneNode ) is called or some other similar call.
+    /** The types of NodeMemoryManager & ObjectMemoryManagers
+    @remarks
+        By default all objects are dynamic. Static objects can save a lot of performance on CPU side
+        (and sometimes GPU side, for example with some instancing techniques) by telling the engine
+        they won't be changing often.
+    @par
+        What it means for Nodes:
+            Nodes created with SCENE_STATIC won't update their derived position/rotation/scale every
+            frame.
+            This means that modifying (eg) a static node position won't actually take effect until
+            SceneManager::notifyStaticDirty( mySceneNode ) is called or some other similar call.
 
-			If the static scene node is child of a dynamic parent node, modifying the dynamic node
-			will not cause the static one to notice the change until explicitly notifying the
-			SceneManager that the child node should be updated.
+            If the static scene node is child of a dynamic parent node, modifying the dynamic node
+            will not cause the static one to notice the change until explicitly notifying the
+            SceneManager that the child node should be updated.
 
-			If a static scene node is child of another static scene node, explicitly notifying the
-			SceneManager of the parent's change automatically causes the child to be updated as well
+            If a static scene node is child of another static scene node, explicitly notifying the
+            SceneManager of the parent's change automatically causes the child to be updated as well
 
-			Having a dynamic node to be child of a static node is perfectly pausible and encouraged,
-			for example a moving pendulum hanging from a static clock.
-			Having a static node being child of a dynamic node doesn't make much sense, and is probably
-			a bug (unless the parent is the root node).
-	@par
-		What it means for Entities (and InstancedEntities, etc)
-			Static entities are scheduled for culling and rendering like dynamic ones, but won't update
-			their world AABB bounds (even if their scene node they're attached to changes)
-			
-			Static entities will update their aabb if user calls
-			SceneManager::notifyStaticDirty( myEntity ) or the static node they're attached to was also
-			flagged as dirty. Note that updating the node's position doesn't flag the node as dirty
-			(it's not implicit) and hence the entity won't be updated either.
-			
-			Static entities can only be attached to static nodes, and dynamic entities can only be
-			attached to dynamic nodes.
-	@par	
-		Note that on most cases, changing a single static entity or node (or creating more) can cause
-		a lot of other static objects to be scheduled to update, so don't do it often, and do it all
-		in the same frame. An example is doing it at startup (i.e. during loading time)
-	@par
-		Entities & Nodes can switch between dynamic & static at runtime. However InstancedEntities can't.
-		You need to destroy the InstancedEntity and create a new one if you wish to switch (which, by
-		the way, isn't expensive because batches preallocate the instances)
-		InstancedEntities with different SceneMemoryMgrTypes will never share the same batch.
-	*/
-	enum SceneMemoryMgrTypes
-	{
-		SCENE_DYNAMIC = 0,
-		SCENE_STATIC,
-		NUM_SCENE_MEMORY_MANAGER_TYPES
-	};
-	
-	/** A hashed vector.
-	*/
-	template <typename T>
-	class HashedVector
-	{
-	public:
-		typedef std::vector<T, STLAllocator<T, GeneralAllocPolicy> > VectorImpl;
-	protected:
-		VectorImpl mList;
-		mutable uint32 mListHash;
-		mutable bool mListHashDirty;
+            Having a dynamic node to be child of a static node is perfectly pausible and encouraged,
+            for example a moving pendulum hanging from a static clock.
+            Having a static node being child of a dynamic node doesn't make much sense, and is probably
+            a bug (unless the parent is the root node).
+    @par
+        What it means for Entities (and InstancedEntities, etc)
+            Static entities are scheduled for culling and rendering like dynamic ones, but won't update
+            their world AABB bounds (even if their scene node they're attached to changes)
+            
+            Static entities will update their aabb if user calls
+            SceneManager::notifyStaticDirty( myEntity ) or the static node they're attached to was also
+            flagged as dirty. Note that updating the node's position doesn't flag the node as dirty
+            (it's not implicit) and hence the entity won't be updated either.
+            
+            Static entities can only be attached to static nodes, and dynamic entities can only be
+            attached to dynamic nodes.
+    @par    
+        Note that on most cases, changing a single static entity or node (or creating more) can cause
+        a lot of other static objects to be scheduled to update, so don't do it often, and do it all
+        in the same frame. An example is doing it at startup (i.e. during loading time)
+    @par
+        Entities & Nodes can switch between dynamic & static at runtime. However InstancedEntities can't.
+        You need to destroy the InstancedEntity and create a new one if you wish to switch (which, by
+        the way, isn't expensive because batches preallocate the instances)
+        InstancedEntities with different SceneMemoryMgrTypes will never share the same batch.
+    */
+    enum SceneMemoryMgrTypes
+    {
+        SCENE_DYNAMIC = 0,
+        SCENE_STATIC,
+        NUM_SCENE_MEMORY_MANAGER_TYPES
+    };
+    
+    /** A hashed vector.
+    */
+    template <typename T>
+    class HashedVector
+    {
+    public:
+        typedef std::vector<T, STLAllocator<T, GeneralAllocPolicy> > VectorImpl;
+    protected:
+        VectorImpl mList;
+        mutable uint32 mListHash;
+        mutable bool mListHashDirty;
 
-		void addToHash(const T& newPtr) const
-		{
-			mListHash = FastHash((const char*)&newPtr, sizeof(T), mListHash);
-		}
-		void recalcHash() const
-		{
-			mListHash = 0;
-			for (const_iterator i = mList.begin(); i != mList.end(); ++i)
-				addToHash(*i);
-			mListHashDirty = false;
-			
-		}
+        void addToHash(const T& newPtr) const
+        {
+            mListHash = FastHash((const char*)&newPtr, sizeof(T), mListHash);
+        }
+        void recalcHash() const
+        {
+            mListHash = 0;
+            for (const_iterator i = mList.begin(); i != mList.end(); ++i)
+                addToHash(*i);
+            mListHashDirty = false;
+            
+        }
 
-	public:
-		typedef typename VectorImpl::value_type value_type;
-		typedef typename VectorImpl::pointer pointer;
-		typedef typename VectorImpl::reference reference;
-		typedef typename VectorImpl::const_reference const_reference;
-		typedef typename VectorImpl::size_type size_type;
-		typedef typename VectorImpl::difference_type difference_type;
-		typedef typename VectorImpl::iterator iterator;
-		typedef typename VectorImpl::const_iterator const_iterator;
-		typedef typename VectorImpl::reverse_iterator reverse_iterator;
-		typedef typename VectorImpl::const_reverse_iterator const_reverse_iterator;
+    public:
+        typedef typename VectorImpl::value_type value_type;
+        typedef typename VectorImpl::pointer pointer;
+        typedef typename VectorImpl::reference reference;
+        typedef typename VectorImpl::const_reference const_reference;
+        typedef typename VectorImpl::size_type size_type;
+        typedef typename VectorImpl::difference_type difference_type;
+        typedef typename VectorImpl::iterator iterator;
+        typedef typename VectorImpl::const_iterator const_iterator;
+        typedef typename VectorImpl::reverse_iterator reverse_iterator;
+        typedef typename VectorImpl::const_reverse_iterator const_reverse_iterator;
 
-		void dirtyHash()
-		{
-			mListHashDirty = true;
-		}
-		bool isHashDirty() const
-		{
-			return mListHashDirty;
-		}
+        void dirtyHash()
+        {
+            mListHashDirty = true;
+        }
+        bool isHashDirty() const
+        {
+            return mListHashDirty;
+        }
 
-		iterator begin() 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.begin(); 
-		}
-		iterator end() { return mList.end(); }
-		const_iterator begin() const { return mList.begin(); }
-		const_iterator end() const { return mList.end(); }
-		reverse_iterator rbegin() 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.rbegin(); 
-		}
-		reverse_iterator rend() { return mList.rend(); }
-		const_reverse_iterator rbegin() const { return mList.rbegin(); }
-		const_reverse_iterator rend() const { return mList.rend(); }
-		size_type size() const { return mList.size(); }
-		size_type max_size() const { return mList.max_size(); }
-		size_type capacity() const { return mList.capacity(); }
-		bool empty() const { return mList.empty(); }
-		reference operator[](size_type n) 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList[n]; 
-		}
-		const_reference operator[](size_type n) const { return mList[n]; }
-		reference at(size_type n) 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.const_iterator(n); 
-		}
-		const_reference at(size_type n) const { return mList.at(n); }
-		HashedVector() : mListHash(0), mListHashDirty(false) {}
-		HashedVector(size_type n) : mList(n), mListHash(0), mListHashDirty(n > 0) {}
-		HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0), mListHashDirty(n > 0) {}
-		HashedVector(const HashedVector<T>& rhs) 
-			: mList(rhs.mList), mListHash(rhs.mListHash), mListHashDirty(rhs.mListHashDirty) {}
+        iterator begin() 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.begin(); 
+        }
+        iterator end() { return mList.end(); }
+        const_iterator begin() const { return mList.begin(); }
+        const_iterator end() const { return mList.end(); }
+        reverse_iterator rbegin() 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.rbegin(); 
+        }
+        reverse_iterator rend() { return mList.rend(); }
+        const_reverse_iterator rbegin() const { return mList.rbegin(); }
+        const_reverse_iterator rend() const { return mList.rend(); }
+        size_type size() const { return mList.size(); }
+        size_type max_size() const { return mList.max_size(); }
+        size_type capacity() const { return mList.capacity(); }
+        bool empty() const { return mList.empty(); }
+        reference operator[](size_type n) 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList[n]; 
+        }
+        const_reference operator[](size_type n) const { return mList[n]; }
+        reference at(size_type n) 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.const_iterator(n); 
+        }
+        const_reference at(size_type n) const { return mList.at(n); }
+        HashedVector() : mListHash(0), mListHashDirty(false) {}
+        HashedVector(size_type n) : mList(n), mListHash(0), mListHashDirty(n > 0) {}
+        HashedVector(size_type n, const T& t) : mList(n, t), mListHash(0), mListHashDirty(n > 0) {}
+        HashedVector(const HashedVector<T>& rhs) 
+            : mList(rhs.mList), mListHash(rhs.mListHash), mListHashDirty(rhs.mListHashDirty) {}
 
-		template <class InputIterator>
-		HashedVector(InputIterator a, InputIterator b)
-			: mList(a, b), mListHashDirty(false)
-		{
-			dirtyHash();
-		}
+        template <class InputIterator>
+        HashedVector(InputIterator a, InputIterator b)
+            : mList(a, b), mListHashDirty(false)
+        {
+            dirtyHash();
+        }
 
-		~HashedVector() {}
-		HashedVector<T>& operator=(const HashedVector<T>& rhs)
-		{
-			mList = rhs.mList;
-			mListHash = rhs.mListHash;
-			mListHashDirty = rhs.mListHashDirty;
-			return *this;
-		}
+        ~HashedVector() {}
+        HashedVector<T>& operator=(const HashedVector<T>& rhs)
+        {
+            mList = rhs.mList;
+            mListHash = rhs.mListHash;
+            mListHashDirty = rhs.mListHashDirty;
+            return *this;
+        }
 
-		void reserve(size_t t) { mList.reserve(t); }
-		reference front() 
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.front(); 
-		}
-		const_reference front() const { return mList.front(); }
-		reference back()  
-		{ 
-			// we have to assume that hash needs recalculating on non-const
-			dirtyHash();
-			return mList.back(); 
-		}
-		const_reference back() const { return mList.back(); }
-		void push_back(const T& t)
-		{ 
-			mList.push_back(t);
-			// Quick progressive hash add
-			if (!isHashDirty())
-				addToHash(t);
-		}
-		void pop_back()
-		{
-			mList.pop_back();
-			dirtyHash();
-		}
-		void swap(HashedVector<T>& rhs)
-		{
-			mList.swap(rhs.mList);
-			dirtyHash();
-		}
-		iterator insert(iterator pos, const T& t)
-		{
-			bool recalc = (pos != end());
-			iterator ret = mList.insert(pos, t);
-			if (recalc)
-				dirtyHash();
-			else
-				addToHash(t);
-			return ret;
-		}
+        void reserve(size_t t) { mList.reserve(t); }
+        reference front() 
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.front(); 
+        }
+        const_reference front() const { return mList.front(); }
+        reference back()  
+        { 
+            // we have to assume that hash needs recalculating on non-const
+            dirtyHash();
+            return mList.back(); 
+        }
+        const_reference back() const { return mList.back(); }
+        void push_back(const T& t)
+        { 
+            mList.push_back(t);
+            // Quick progressive hash add
+            if (!isHashDirty())
+                addToHash(t);
+        }
+        void pop_back()
+        {
+            mList.pop_back();
+            dirtyHash();
+        }
+        void swap(HashedVector<T>& rhs)
+        {
+            mList.swap(rhs.mList);
+            dirtyHash();
+        }
+        iterator insert(iterator pos, const T& t)
+        {
+            bool recalc = (pos != end());
+            iterator ret = mList.insert(pos, t);
+            if (recalc)
+                dirtyHash();
+            else
+                addToHash(t);
+            return ret;
+        }
 
-		template <class InputIterator>
-		void insert(iterator pos,
-			InputIterator f, InputIterator l)
-		{
-			mList.insert(pos, f, l);
-			dirtyHash();
-		}
+        template <class InputIterator>
+        void insert(iterator pos,
+            InputIterator f, InputIterator l)
+        {
+            mList.insert(pos, f, l);
+            dirtyHash();
+        }
 
-		void insert(iterator pos, size_type n, const T& x)
-		{
-			mList.insert(pos, n, x);
-			dirtyHash();
-		}
+        void insert(iterator pos, size_type n, const T& x)
+        {
+            mList.insert(pos, n, x);
+            dirtyHash();
+        }
 
-		iterator erase(iterator pos)
-		{
-			iterator ret = mList.erase(pos);
-			dirtyHash();
-			return ret;
-		}
-		iterator erase(iterator first, iterator last)
-		{
-			iterator ret = mList.erase(first, last);
-			dirtyHash();
-			return ret;
-		}
-		void clear()
-		{
-			mList.clear();
-			mListHash = 0;
-			mListHashDirty = false;
-		}
+        iterator erase(iterator pos)
+        {
+            iterator ret = mList.erase(pos);
+            dirtyHash();
+            return ret;
+        }
+        iterator erase(iterator first, iterator last)
+        {
+            iterator ret = mList.erase(first, last);
+            dirtyHash();
+            return ret;
+        }
+        void clear()
+        {
+            mList.clear();
+            mListHash = 0;
+            mListHashDirty = false;
+        }
 
-		void resize(size_type n, const T& t = T())
-		{
-			bool recalc = false;
-			if (n != size())
-				recalc = true;
+        void resize(size_type n, const T& t = T())
+        {
+            bool recalc = false;
+            if (n != size())
+                recalc = true;
 
-			mList.resize(n, t);
-			if (recalc)
-				dirtyHash();
-		}
+            mList.resize(n, t);
+            if (recalc)
+                dirtyHash();
+        }
 
-		bool operator==(const HashedVector<T>& b)
-		{ return mListHash == b.mListHash; }
+        bool operator==(const HashedVector<T>& b)
+        { return mListHash == b.mListHash; }
 
-		bool operator<(const HashedVector<T>& b)
-		{ return mListHash < b.mListHash; }
-
-
-		/// Get the hash value
-		uint32 getHash() const 
-		{ 
-			if (isHashDirty())
-				recalcHash();
-
-			return mListHash; 
-		}
-	public:
+        bool operator<(const HashedVector<T>& b)
+        { return mListHash < b.mListHash; }
 
 
+        /// Get the hash value
+        uint32 getHash() const 
+        { 
+            if (isHashDirty())
+                recalcHash();
 
-	};
+            return mListHash; 
+        }
+    public:
 
-	class Light;
-	typedef FastArray<Light*> LightArray;
 
-	/// Used as the light list, sorted
-	struct LightClosest
-	{
-		Light const *light;
-		size_t		globalIndex; //Index to SceneManager::mGlobalLightList
-		Real		distance;
-		size_t		localIndex; //Index to MovableObject::mLightList
 
-		LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ), localIndex(0) {}
-		LightClosest( Light *_light, size_t _globalIndex, Real _distance, size_t _localIndex ) :
-			light( _light ), globalIndex( _globalIndex ),
-			distance( _distance ), localIndex( _localIndex ) {}
+    };
 
-		inline bool operator < ( const LightClosest &right ) const;
-	};
-	/// Holds all lights in SoA after being culled over all frustums
-	struct LightListInfo
-	{
-		LightArray						lights;
-		///Copy from lights[i]->getVisibilityFlags(), this copy avoids one level of indirection
-		uint32	* RESTRICT_ALIAS		visibilityMask;
-		Sphere	* RESTRICT_ALIAS 		boundingSphere;
+    class Light;
+    typedef FastArray<Light*> LightArray;
 
-		LightListInfo() : visibilityMask(0), boundingSphere(0) {}
-		~LightListInfo()
-		{
-			OGRE_FREE_SIMD( visibilityMask, MEMCATEGORY_SCENE_CONTROL );
-			OGRE_FREE_SIMD( boundingSphere, MEMCATEGORY_SCENE_CONTROL );
-		}
-	};
-	typedef HashedVector<LightClosest> LightList;
-	typedef vector<LightClosest>::type LightClosestVec;
+    /// Used as the light list, sorted
+    struct LightClosest
+    {
+        Light const *light;
+        size_t      globalIndex; //Index to SceneManager::mGlobalLightList
+        Real        distance;
+        size_t      localIndex; //Index to MovableObject::mLightList
+
+        LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ), localIndex(0) {}
+        LightClosest( Light *_light, size_t _globalIndex, Real _distance, size_t _localIndex ) :
+            light( _light ), globalIndex( _globalIndex ),
+            distance( _distance ), localIndex( _localIndex ) {}
+
+        inline bool operator < ( const LightClosest &right ) const;
+    };
+    /// Holds all lights in SoA after being culled over all frustums
+    struct LightListInfo
+    {
+        LightArray                      lights;
+        ///Copy from lights[i]->getVisibilityFlags(), this copy avoids one level of indirection
+        uint32  * RESTRICT_ALIAS        visibilityMask;
+        Sphere  * RESTRICT_ALIAS        boundingSphere;
+
+        LightListInfo() : visibilityMask(0), boundingSphere(0) {}
+        ~LightListInfo()
+        {
+            OGRE_FREE_SIMD( visibilityMask, MEMCATEGORY_SCENE_CONTROL );
+            OGRE_FREE_SIMD( boundingSphere, MEMCATEGORY_SCENE_CONTROL );
+        }
+    };
+    typedef HashedVector<LightClosest> LightList;
+    typedef vector<LightClosest>::type LightClosestVec;
 
     typedef map<String, bool>::type UnaryOptionList;
     typedef map<String, String>::type BinaryOptionList;
 
-	/// Name / value parameter pair (first = name, second = value)
-	typedef map<String, String>::type NameValuePairList;
+    /// Name / value parameter pair (first = name, second = value)
+    typedef map<String, String>::type NameValuePairList;
 
     /// Alias / Texture name pair (first = alias, second = texture name)
     typedef map<String, String>::type AliasTextureNamePairList;
@@ -606,98 +606,98 @@ namespace Ogre {
           {
             return bottom - top;
           }
-		  bool isNull() const
-		  {
-			  return width() == 0 || height() == 0;
-		  }
-		  void setNull()
-		  {
-			  left = right = top = bottom = 0;
-		  }
-		  TRect & merge(const TRect& rhs)
-		  {
-			  if (isNull())
-			  {
-				  *this = rhs;
-			  }
-			  else if (!rhs.isNull())
-			  {
-				  left = std::min(left, rhs.left);
-				  right = std::max(right, rhs.right);
-				  top = std::min(top, rhs.top);
-				  bottom = std::max(bottom, rhs.bottom);
-			  }
+          bool isNull() const
+          {
+              return width() == 0 || height() == 0;
+          }
+          void setNull()
+          {
+              left = right = top = bottom = 0;
+          }
+          TRect & merge(const TRect& rhs)
+          {
+              if (isNull())
+              {
+                  *this = rhs;
+              }
+              else if (!rhs.isNull())
+              {
+                  left = std::min(left, rhs.left);
+                  right = std::max(right, rhs.right);
+                  top = std::min(top, rhs.top);
+                  bottom = std::max(bottom, rhs.bottom);
+              }
 
-			  return *this;
+              return *this;
 
-		  }
-		  TRect intersect(const TRect& rhs) const
-		  {
-			  TRect ret;
-			  if (isNull() || rhs.isNull())
-			  {
-				  // empty
-				  return ret;
-			  }
-			  else
-			  {
-				  ret.left = std::max(left, rhs.left);
-				  ret.right = std::min(right, rhs.right);
-				  ret.top = std::max(top, rhs.top);
-				  ret.bottom = std::min(bottom, rhs.bottom);
-			  }
+          }
+          TRect intersect(const TRect& rhs) const
+          {
+              TRect ret;
+              if (isNull() || rhs.isNull())
+              {
+                  // empty
+                  return ret;
+              }
+              else
+              {
+                  ret.left = std::max(left, rhs.left);
+                  ret.right = std::min(right, rhs.right);
+                  ret.top = std::max(top, rhs.top);
+                  ret.bottom = std::min(bottom, rhs.bottom);
+              }
 
-			  if (ret.left > ret.right || ret.top > ret.bottom)
-			  {
-				  // no intersection, return empty
-				  ret.left = ret.top = ret.right = ret.bottom = 0;
-			  }
+              if (ret.left > ret.right || ret.top > ret.bottom)
+              {
+                  // no intersection, return empty
+                  ret.left = ret.top = ret.right = ret.bottom = 0;
+              }
 
-			  return ret;
+              return ret;
 
-		  }
+          }
 
         };
-		template<typename T>
-		std::ostream& operator<<(std::ostream& o, const TRect<T>& r)
-		{
-			o << "TRect<>(l:" << r.left << ", t:" << r.top << ", r:" << r.right << ", b:" << r.bottom << ")";
-			return o;
-		}
+        template<typename T>
+        std::ostream& operator<<(std::ostream& o, const TRect<T>& r)
+        {
+            o << "TRect<>(l:" << r.left << ", t:" << r.top << ", r:" << r.right << ", b:" << r.bottom << ")";
+            return o;
+        }
 
         /** Structure used to define a rectangle in a 2-D floating point space.
         */
         typedef TRect<float> FloatRect;
 
-		/** Structure used to define a rectangle in a 2-D floating point space, 
-			subject to double / single floating point settings.
-		*/
-		typedef TRect<Real> RealRect;
+        /** Structure used to define a rectangle in a 2-D floating point space, 
+            subject to double / single floating point settings.
+        */
+        typedef TRect<Real> RealRect;
 
         /** Structure used to define a rectangle in a 2-D integer space.
         */
         typedef TRect< long > Rect;
 
         /** Structure used to define a box in a 3-D integer space.
-         	Note that the left, top, and front edges are included but the right, 
-         	bottom and back ones are not.
+            Note that the left, top, and front edges are included but the right, 
+            bottom and back ones are not.
          */
         struct Box
         {
             uint32 left, top, right, bottom, front, back;
-			/// Parameterless constructor for setting the members manually
+            /// Parameterless constructor for setting the members manually
             Box()
-				: left(0), top(0), right(1), bottom(1), front(0), back(1)
+                : left(0), top(0), right(1), bottom(1), front(0), back(1)
             {
             }
             /** Define a box from left, top, right and bottom coordinates
-            	This box will have depth one (front=0 and back=1).
-            	@param	l	x value of left edge
-            	@param	t	y value of top edge
-            	@param	r	x value of right edge
-            	@param	b	y value of bottom edge
-            	@note Note that the left, top, and front edges are included 
- 		           	but the right, bottom and back ones are not.
+                This box will have depth one (front=0 and back=1).
+                @param  l   x value of left edge
+                @param  t   y value of top edge
+                @param  r   x value of right edge
+                @param  b   y value of bottom edge
+                @note Note that the left, top, and front edges are included 
+                    but the right, bottom and back ones are not.
             */
             Box( uint32 l, uint32 t, uint32 r, uint32 b ):
                 left(l),
@@ -707,18 +707,18 @@ namespace Ogre {
                 front(0),
                 back(1)
             {
-          		assert(right >= left && bottom >= top && back >= front);
+                assert(right >= left && bottom >= top && back >= front);
             }
             /** Define a box from left, top, front, right, bottom and back
-            	coordinates.
-            	@param	l	x value of left edge
-            	@param	t	y value of top edge
-            	@param  ff  z value of front edge
-            	@param	r	x value of right edge
-            	@param	b	y value of bottom edge
-            	@param  bb  z value of back edge
-            	@note Note that the left, top, and front edges are included 
- 		           	but the right, bottom and back ones are not.
+                coordinates.
+                @param  l   x value of left edge
+                @param  t   y value of top edge
+                @param  ff  z value of front edge
+                @param  r   x value of right edge
+                @param  b   y value of bottom edge
+                @param  bb  z value of back edge
+                @note Note that the left, top, and front edges are included 
+                    but the right, bottom and back ones are not.
             */
             Box( uint32 l, uint32 t, uint32 ff, uint32 r, uint32 b, uint32 bb ):
                 left(l),
@@ -728,14 +728,14 @@ namespace Ogre {
                 front(ff),
                 back(bb)
             {
-          		assert(right >= left && bottom >= top && back >= front);
+                assert(right >= left && bottom >= top && back >= front);
             }
             
             /// Return true if the other box is a part of this one
             bool contains(const Box &def) const
             {
-            	return (def.left >= left && def.top >= top && def.front >= front &&
-					def.right <= right && def.bottom <= bottom && def.back <= back);
+                return (def.left >= left && def.top >= top && def.front >= front &&
+                    def.right <= right && def.bottom <= bottom && def.back <= back);
             }
             
             /// Get the width of this box
@@ -747,8 +747,8 @@ namespace Ogre {
         };
 
     
-	
-	/** Locate command-line options of the unary form '-blah' and of the
+    
+    /** Locate command-line options of the unary form '-blah' and of the
         binary form '-blah foo', passing back the index of the next non-option.
     @param numargs, argv The standard parameters passed to the main method
     @param unaryOptList Map of unary options (i.e. those that do not require a parameter).
@@ -762,102 +762,102 @@ namespace Ogre {
     int _OgreExport findCommandLineOpts(int numargs, char** argv, UnaryOptionList& unaryOptList, 
         BinaryOptionList& binOptList);
 
-	/// Generic result of clipping
-	enum ClipResult
-	{
-		/// Nothing was clipped
-		CLIPPED_NONE = 0,
-		/// Partially clipped
-		CLIPPED_SOME = 1, 
-		/// Everything was clipped away
-		CLIPPED_ALL = 2
-	};
+    /// Generic result of clipping
+    enum ClipResult
+    {
+        /// Nothing was clipped
+        CLIPPED_NONE = 0,
+        /// Partially clipped
+        CLIPPED_SOME = 1, 
+        /// Everything was clipped away
+        CLIPPED_ALL = 2
+    };
 
-	/// Render window creation parameters.
-	struct RenderWindowDescription
-	{
-		String				name;
-		unsigned int		width;
-		unsigned int		height;
-		bool				useFullScreen;
-		NameValuePairList	miscParams;
-	};
+    /// Render window creation parameters.
+    struct RenderWindowDescription
+    {
+        String              name;
+        unsigned int        width;
+        unsigned int        height;
+        bool                useFullScreen;
+        NameValuePairList   miscParams;
+    };
 
-	/// Render window creation parameters container.
-	typedef vector<RenderWindowDescription>::type RenderWindowDescriptionList;
+    /// Render window creation parameters container.
+    typedef vector<RenderWindowDescription>::type RenderWindowDescriptionList;
 
-	/// Render window container.
-	typedef vector<RenderWindow*>::type RenderWindowList;
+    /// Render window container.
+    typedef vector<RenderWindow*>::type RenderWindowList;
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
-	/** Used for efficient removal in std::vector and std::deque (like an std::list)
-		However it assumes the order of elements in container is not important or
-		something external to the container holds the index of an element in it
-		(but still should be kept deterministically across machines)
-		Basically it swaps the iterator with the last iterator, and pops back
-		Returns the next iterator
-	*/
-	template<typename T>
-	typename T::iterator efficientVectorRemove( T& container, typename T::iterator& iterator )
-	{
-		const size_t idx = iterator - container.begin();
-		*iterator = container.back();
-		container.pop_back();
+    /** Used for efficient removal in std::vector and std::deque (like an std::list)
+        However it assumes the order of elements in container is not important or
+        something external to the container holds the index of an element in it
+        (but still should be kept deterministically across machines)
+        Basically it swaps the iterator with the last iterator, and pops back
+        Returns the next iterator
+    */
+    template<typename T>
+    typename T::iterator efficientVectorRemove( T& container, typename T::iterator& iterator )
+    {
+        const size_t idx = iterator - container.begin();
+        *iterator = container.back();
+        container.pop_back();
 
-		return container.begin() + idx;
-	}
+        return container.begin() + idx;
+    }
 
 #if OGRE_CPU == OGRE_CPU_X86
-	//VS 2012 translates this to a single maxss/maxpd instruction! :)
-	//(plus some memory loading if arguments weren't loaded)
-	inline float min( const float &left, const float &right )
-	{
-		float retVal;
-		_mm_store_ss( &retVal, _mm_min_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
-		return retVal;
-	}
-	inline float max( const float &left, const float &right )
-	{
-		float retVal;
-		_mm_store_ss( &retVal, _mm_max_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
-		return retVal;
-	}
-	inline double min( const double &left, const double &right )
-	{
-		double retVal;
-		_mm_store_sd( &retVal, _mm_min_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
-		return retVal;
-	}
-	inline double max( const double &left, const double &right )
-	{
-		double retVal;
-		_mm_store_sd( &retVal, _mm_max_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
-		return retVal;
-	}
+    //VS 2012 translates this to a single maxss/maxpd instruction! :)
+    //(plus some memory loading if arguments weren't loaded)
+    inline float min( const float &left, const float &right )
+    {
+        float retVal;
+        _mm_store_ss( &retVal, _mm_min_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
+        return retVal;
+    }
+    inline float max( const float &left, const float &right )
+    {
+        float retVal;
+        _mm_store_ss( &retVal, _mm_max_ss( _mm_set_ss( left ), _mm_set_ss( right ) ) );
+        return retVal;
+    }
+    inline double min( const double &left, const double &right )
+    {
+        double retVal;
+        _mm_store_sd( &retVal, _mm_min_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
+        return retVal;
+    }
+    inline double max( const double &left, const double &right )
+    {
+        double retVal;
+        _mm_store_sd( &retVal, _mm_max_sd( _mm_set_sd( left ), _mm_set_sd( right ) ) );
+        return retVal;
+    }
 #else
-	//At least VS 2012 translates this to conditional moves. Using
-	//"const float" instead of "const float&" and becomes a jump
-	inline const float& min( const float &a, const float &b )
-	{
-		return a < b ? a : b;
-	}
+    //At least VS 2012 translates this to conditional moves. Using
+    //"const float" instead of "const float&" and becomes a jump
+    inline const float& min( const float &a, const float &b )
+    {
+        return a < b ? a : b;
+    }
 
-	inline const float& max( const float &a, const float &b )
-	{
-		return a > b ? a : b;
-	}
+    inline const float& max( const float &a, const float &b )
+    {
+        return a > b ? a : b;
+    }
 
-	inline const double& min( const double &a, const double &b )
-	{
-		return a < b ? a : b;
-	}
+    inline const double& min( const double &a, const double &b )
+    {
+        return a < b ? a : b;
+    }
 
-	inline const double& max( const double &a, const double &b )
-	{
-		return a > b ? a : b;
-	}
+    inline const double& max( const double &a, const double &b )
+    {
+        return a > b ? a : b;
+    }
 #endif
 }
 

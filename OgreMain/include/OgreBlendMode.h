@@ -32,12 +32,12 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Materials
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Materials
+    *  @{
+    */
 
     /** Type of texture blend mode.
     */
@@ -220,8 +220,8 @@ namespace Ogre {
         SBT_TRANSPARENT_COLOUR,
         /// Add the texture values to the existing scene content
         SBT_ADD,
-		/// Multiply the 2 colours together
-		SBT_MODULATE,
+        /// Multiply the 2 colours together
+        SBT_MODULATE,
         /// The default blend mode where source replaces destination
         SBT_REPLACE
         // TODO : more
@@ -246,20 +246,20 @@ namespace Ogre {
 
     };
 
-	/** Blending operations controls how objects are blended into the scene. The default operation
-		is add (+) but by changing this you can change how drawn objects are blended into the
-		existing scene.
-	*/
-	enum SceneBlendOperation
-	{
-		SBO_ADD,
-		SBO_SUBTRACT,
-		SBO_REVERSE_SUBTRACT,
-		SBO_MIN,
-		SBO_MAX
-	};
-	/** @} */
-	/** @} */
+    /** Blending operations controls how objects are blended into the scene. The default operation
+        is add (+) but by changing this you can change how drawn objects are blended into the
+        existing scene.
+    */
+    enum SceneBlendOperation
+    {
+        SBO_ADD,
+        SBO_SUBTRACT,
+        SBO_REVERSE_SUBTRACT,
+        SBO_MIN,
+        SBO_MAX
+    };
+    /** @} */
+    /** @} */
 
 }
 

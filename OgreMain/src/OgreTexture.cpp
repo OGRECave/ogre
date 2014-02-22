@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 
 namespace Ogre {
-	//--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
     Texture::Texture(ResourceManager* creator, const String& name, 
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader)
@@ -44,13 +44,13 @@ namespace Ogre {
             mHeight(512),
             mWidth(512),
             mDepth(1),
-			mNumRequestedMipmaps(0),
+            mNumRequestedMipmaps(0),
             mNumMipmaps(0),
-			mMipmapsHardwareGenerated(false),
+            mMipmapsHardwareGenerated(false),
             mGamma(1.0f),
-			mHwGamma(false),
-			mFSAA(0),
-			mFsaaExplicitResolve( false ),
+            mHwGamma(false),
+            mFSAA(0),
+            mFsaaExplicitResolve( false ),
             mTextureType(TEX_TYPE_2D),            
             mFormat(PF_UNKNOWN),
             mUsage(TU_DEFAULT),
@@ -72,60 +72,60 @@ namespace Ogre {
             // information required.
         }
 
-		// Set some defaults for default load path
-		if (TextureManager::getSingletonPtr())
-		{
-			TextureManager& tmgr = TextureManager::getSingleton();
-			setNumMipmaps(tmgr.getDefaultNumMipmaps());
-			setDesiredBitDepths(tmgr.getPreferredIntegerBitDepth(), tmgr.getPreferredFloatBitDepth());
-		}
+        // Set some defaults for default load path
+        if (TextureManager::getSingletonPtr())
+        {
+            TextureManager& tmgr = TextureManager::getSingleton();
+            setNumMipmaps(tmgr.getDefaultNumMipmaps());
+            setDesiredBitDepths(tmgr.getPreferredIntegerBitDepth(), tmgr.getPreferredFloatBitDepth());
+        }
 
         
     }
-	//--------------------------------------------------------------------------
-	void Texture::loadRawData( DataStreamPtr& stream, 
-		ushort uWidth, ushort uHeight, PixelFormat eFormat)
-	{
-		Image img;
-		img.loadRawData(stream, uWidth, uHeight, eFormat);
-		loadImage(img);
-	}
-	//--------------------------------------------------------------------------    
-	void Texture::loadImage( const Image &img )
-	{
+    //--------------------------------------------------------------------------
+    void Texture::loadRawData( DataStreamPtr& stream, 
+        ushort uWidth, ushort uHeight, PixelFormat eFormat)
+    {
+        Image img;
+        img.loadRawData(stream, uWidth, uHeight, eFormat);
+        loadImage(img);
+    }
+    //--------------------------------------------------------------------------    
+    void Texture::loadImage( const Image &img )
+    {
 
         LoadingState old = mLoadingState.get();
         if (old!=LOADSTATE_UNLOADED && old!=LOADSTATE_PREPARED) return;
 
         if (!mLoadingState.cas(old,LOADSTATE_LOADING)) return;
 
-		// Scope lock for actual loading
-		try
-		{
+        // Scope lock for actual loading
+        try
+        {
                     OGRE_LOCK_AUTO_MUTEX;
-			vector<const Image*>::type imagePtrs;
-			imagePtrs.push_back(&img);
-			_loadImages( imagePtrs );
+            vector<const Image*>::type imagePtrs;
+            imagePtrs.push_back(&img);
+            _loadImages( imagePtrs );
 
-		}
-		catch (...)
-		{
-			// Reset loading in-progress flag in case failed for some reason
-			mLoadingState.set(old);
-			// Re-throw
-			throw;
-		}
+        }
+        catch (...)
+        {
+            // Reset loading in-progress flag in case failed for some reason
+            mLoadingState.set(old);
+            // Re-throw
+            throw;
+        }
 
         mLoadingState.set(LOADSTATE_LOADED);
 
-		// Notify manager
-		if(mCreator)
-			mCreator->_notifyResourceLoaded(this);
+        // Notify manager
+        if(mCreator)
+            mCreator->_notifyResourceLoaded(this);
 
-		// No deferred loading events since this method is not called in background
+        // No deferred loading events since this method is not called in background
 
 
-	}
+    }
     //--------------------------------------------------------------------------
     void Texture::setFormat(PixelFormat pf)
     {
@@ -175,26 +175,26 @@ namespace Ogre {
         return mTreatLuminanceAsAlpha;
     }
     //--------------------------------------------------------------------------
-	size_t Texture::calculateSize(void) const
-	{
+    size_t Texture::calculateSize(void) const
+    {
         return getNumFaces() * PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-	}
-	//--------------------------------------------------------------------------
-	size_t Texture::getNumFaces(void) const
-	{
-		return getTextureType() == TEX_TYPE_CUBE_MAP ? 6 : 1;
-	}
-	//--------------------------------------------------------------------------
+    }
+    //--------------------------------------------------------------------------
+    size_t Texture::getNumFaces(void) const
+    {
+        return getTextureType() == TEX_TYPE_CUBE_MAP ? 6 : 1;
+    }
+    //--------------------------------------------------------------------------
     void Texture::_loadImages( const ConstImagePtrList& images )
     {
-		if(images.size() < 1)
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot load empty vector of images",
-			 "Texture::loadImages");
+        if(images.size() < 1)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot load empty vector of images",
+             "Texture::loadImages");
         
-		// Set desired texture size and properties from images[0]
-		mSrcWidth = mWidth = images[0]->getWidth();
-		mSrcHeight = mHeight = images[0]->getHeight();
-		mSrcDepth = mDepth = images[0]->getDepth();
+        // Set desired texture size and properties from images[0]
+        mSrcWidth = mWidth = images[0]->getWidth();
+        mSrcHeight = mHeight = images[0]->getHeight();
+        mSrcDepth = mDepth = images[0]->getDepth();
 
         // Get source image format and adjust if required
         mSrcFormat = images[0]->getFormat();
@@ -214,38 +214,38 @@ namespace Ogre {
             mFormat = PixelUtil::getFormatForBitDepths(mSrcFormat, mDesiredIntegerBitDepth, mDesiredFloatBitDepth);
         }
 
-		// The custom mipmaps in the image have priority over everything
+        // The custom mipmaps in the image have priority over everything
         uint8 imageMips = images[0]->getNumMipmaps();
 
-		if(imageMips > 0)
-		{
-			mNumMipmaps = mNumRequestedMipmaps = images[0]->getNumMipmaps();
-			// Disable flag for auto mip generation
-			mUsage &= ~TU_AUTOMIPMAP;
-		}
+        if(imageMips > 0)
+        {
+            mNumMipmaps = mNumRequestedMipmaps = images[0]->getNumMipmaps();
+            // Disable flag for auto mip generation
+            mUsage &= ~TU_AUTOMIPMAP;
+        }
 
         // Create the texture
         createInternalResources();
-		// Check if we're loading one image with multiple faces
-		// or a vector of images representing the faces
-		size_t faces;
-		bool multiImage; // Load from multiple images?
-		if(images.size() > 1)
-		{
-			faces = images.size();
-			multiImage = true;
-		}
-		else
-		{
-			faces = images[0]->getNumFaces();
-			multiImage = false;
-		}
-		
-		// Check whether number of faces in images exceeds number of faces
-		// in this texture. If so, clamp it.
-		if(faces > getNumFaces())
-			faces = getNumFaces();
-		
+        // Check if we're loading one image with multiple faces
+        // or a vector of images representing the faces
+        size_t faces;
+        bool multiImage; // Load from multiple images?
+        if(images.size() > 1)
+        {
+            faces = images.size();
+            multiImage = true;
+        }
+        else
+        {
+            faces = images[0]->getNumFaces();
+            multiImage = false;
+        }
+        
+        // Check whether number of faces in images exceeds number of faces
+        // in this texture. If so, clamp it.
+        if(faces > getNumFaces())
+            faces = getNumFaces();
+        
         if (TextureManager::getSingleton().getVerbose()) {
             // Say what we're doing
             StringUtil::StrStreamType str;
@@ -283,8 +283,8 @@ namespace Ogre {
             LogManager::getSingleton().logMessage( 
                     LML_NORMAL, str.str());
         }
-		
-		// Main loading loop
+        
+        // Main loading loop
         // imageMips == 0 if the image has no custom mipmaps, otherwise contains the number of custom mips
         for(size_t mip = 0; mip <= std::min(mNumMipmaps, imageMips); ++mip)
         {
@@ -336,29 +336,29 @@ namespace Ogre {
         mSize = getNumFaces() * PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
 
     }
-	//-----------------------------------------------------------------------------
-	void Texture::createInternalResources(void)
-	{
-		if (!mInternalResourcesCreated)
-		{
-			createInternalResourcesImpl();
-			mInternalResourcesCreated = true;
-		}
-	}
-	//-----------------------------------------------------------------------------
-	void Texture::freeInternalResources(void)
-	{
-		if (mInternalResourcesCreated)
-		{
-			freeInternalResourcesImpl();
-			mInternalResourcesCreated = false;
-		}
-	}
-	//-----------------------------------------------------------------------------
-	void Texture::unloadImpl(void)
-	{
-		freeInternalResources();
-	}
+    //-----------------------------------------------------------------------------
+    void Texture::createInternalResources(void)
+    {
+        if (!mInternalResourcesCreated)
+        {
+            createInternalResourcesImpl();
+            mInternalResourcesCreated = true;
+        }
+    }
+    //-----------------------------------------------------------------------------
+    void Texture::freeInternalResources(void)
+    {
+        if (mInternalResourcesCreated)
+        {
+            freeInternalResourcesImpl();
+            mInternalResourcesCreated = false;
+        }
+    }
+    //-----------------------------------------------------------------------------
+    void Texture::unloadImpl(void)
+    {
+        freeInternalResources();
+    }
     //-----------------------------------------------------------------------------   
     void Texture::copyToTexture( TexturePtr& target )
     {
@@ -379,78 +379,78 @@ namespace Ogre {
             }
         }
     }
-	//---------------------------------------------------------------------
-	String Texture::getSourceFileType() const
-	{
-		if (mName.empty())
-			return StringUtil::BLANK;
+    //---------------------------------------------------------------------
+    String Texture::getSourceFileType() const
+    {
+        if (mName.empty())
+            return StringUtil::BLANK;
 
-		String::size_type pos = mName.find_last_of(".");
-		if (pos != String::npos && pos < (mName.length() - 1))
-		{
-			String ext = mName.substr(pos+1);
-			StringUtil::toLowerCase(ext);
-			return ext;
-		}
-		else
-		{
-			// No extension
-			DataStreamPtr dstream;
-			try
-			{
-				dstream = ResourceGroupManager::getSingleton().openResource(
-						mName, mGroup, true, 0);
-			}
-			catch (Exception&)
-			{
-			}
-			if (dstream.isNull() && getTextureType() == TEX_TYPE_CUBE_MAP)
-			{
-				// try again with one of the faces (non-dds)
-				try
-				{
-					dstream = ResourceGroupManager::getSingleton().openResource(
-						mName + "_rt", mGroup, true, 0);
-				}
-				catch (Exception&)
-				{
-				}
-			}
+        String::size_type pos = mName.find_last_of(".");
+        if (pos != String::npos && pos < (mName.length() - 1))
+        {
+            String ext = mName.substr(pos+1);
+            StringUtil::toLowerCase(ext);
+            return ext;
+        }
+        else
+        {
+            // No extension
+            DataStreamPtr dstream;
+            try
+            {
+                dstream = ResourceGroupManager::getSingleton().openResource(
+                        mName, mGroup, true, 0);
+            }
+            catch (Exception&)
+            {
+            }
+            if (dstream.isNull() && getTextureType() == TEX_TYPE_CUBE_MAP)
+            {
+                // try again with one of the faces (non-dds)
+                try
+                {
+                    dstream = ResourceGroupManager::getSingleton().openResource(
+                        mName + "_rt", mGroup, true, 0);
+                }
+                catch (Exception&)
+                {
+                }
+            }
 
-			if (!dstream.isNull())
-			{
-				return Image::getFileExtFromMagic(dstream);
-			}
-		}
+            if (!dstream.isNull())
+            {
+                return Image::getFileExtFromMagic(dstream);
+            }
+        }
 
-		return StringUtil::BLANK;
+        return StringUtil::BLANK;
 
-	}
-	//---------------------------------------------------------------------
-	void Texture::convertToImage(Image& destImage, bool includeMipMaps)
-	{
+    }
+    //---------------------------------------------------------------------
+    void Texture::convertToImage(Image& destImage, bool includeMipMaps)
+    {
 
-		size_t numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
-		size_t dataSize = Image::calculateSize(numMips,
-			getNumFaces(), getWidth(), getHeight(), getDepth(), getFormat());
+        size_t numMips = includeMipMaps? getNumMipmaps() + 1 : 1;
+        size_t dataSize = Image::calculateSize(numMips,
+            getNumFaces(), getWidth(), getHeight(), getDepth(), getFormat());
 
-		void* pixData = OGRE_MALLOC(dataSize, Ogre::MEMCATEGORY_GENERAL);
-		// if there are multiple faces and mipmaps we must pack them into the data
-		// faces, then mips
-		void* currentPixData = pixData;
-		for (size_t face = 0; face < getNumFaces(); ++face)
-		{
+        void* pixData = OGRE_MALLOC(dataSize, Ogre::MEMCATEGORY_GENERAL);
+        // if there are multiple faces and mipmaps we must pack them into the data
+        // faces, then mips
+        void* currentPixData = pixData;
+        for (size_t face = 0; face < getNumFaces(); ++face)
+        {
             uint32 width = getWidth();
             uint32 height = getHeight();
             uint32 depth = getDepth();
-			for (size_t mip = 0; mip < numMips; ++mip)
-			{
-				size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
+            for (size_t mip = 0; mip < numMips; ++mip)
+            {
+                size_t mipDataSize = PixelUtil::getMemorySize(width, height, depth, getFormat());
 
-				Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
-				getBuffer(face, mip)->blitToMemory(pixBox);
+                Ogre::PixelBox pixBox(width, height, depth, getFormat(), currentPixData);
+                getBuffer(face, mip)->blitToMemory(pixBox);
 
-				currentPixData = (void*)((char*)currentPixData + mipDataSize);
+                currentPixData = (void*)((char*)currentPixData + mipDataSize);
 
                 if(width != 1)
                     width /= 2;
@@ -458,15 +458,15 @@ namespace Ogre {
                     height /= 2;
                 if(depth != 1)
                     depth /= 2;
-			}
-		}
+            }
+        }
 
 
-		// load, and tell Image to delete the memory when it's done.
-		destImage.loadDynamicImage((Ogre::uchar*)pixData, getWidth(), getHeight(), getDepth(), getFormat(), true, 
-			getNumFaces(), numMips - 1);
+        // load, and tell Image to delete the memory when it's done.
+        destImage.loadDynamicImage((Ogre::uchar*)pixData, getWidth(), getHeight(), getDepth(), getFormat(), true, 
+            getNumFaces(), numMips - 1);
 
-	}
+    }
 
 
 }

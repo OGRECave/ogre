@@ -36,84 +36,84 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	class CompositorNodeDef;
+    class CompositorNodeDef;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
-	class _OgreExport CompositorPassQuadDef : public CompositorPassDef
-	{
-	public:
-		struct QuadTextureSource
-		{
-			/// Index of texture unit state to change
-			size_t		texUnitIdx;
-			/// Name of the texture (can come from input channel, local textures, or global ones)
-			IdString	textureName;
-			/// Index in case of MRT. Ignored if textureSource isn't mrt
-			size_t		mrtIndex;
+    class _OgreExport CompositorPassQuadDef : public CompositorPassDef
+    {
+    public:
+        struct QuadTextureSource
+        {
+            /// Index of texture unit state to change
+            size_t      texUnitIdx;
+            /// Name of the texture (can come from input channel, local textures, or global ones)
+            IdString    textureName;
+            /// Index in case of MRT. Ignored if textureSource isn't mrt
+            size_t      mrtIndex;
 
-			QuadTextureSource( size_t _texUnitIdx, IdString _textureName, size_t _mrtIndex ) :
-				texUnitIdx( _texUnitIdx ), textureName( _textureName ), mrtIndex( _mrtIndex ) {}
-		};
-		typedef vector<QuadTextureSource>::type TextureSources;
+            QuadTextureSource( size_t _texUnitIdx, IdString _textureName, size_t _mrtIndex ) :
+                texUnitIdx( _texUnitIdx ), textureName( _textureName ), mrtIndex( _mrtIndex ) {}
+        };
+        typedef vector<QuadTextureSource>::type TextureSources;
 
-	protected:
-		TextureSources		mTextureSources;
-		CompositorNodeDef	*mParentNodeDef;
+    protected:
+        TextureSources      mTextureSources;
+        CompositorNodeDef   *mParentNodeDef;
 
-	public:
-		enum FrustumCorners
-		{
-			NO_CORNERS,
-			VIEW_SPACE_CORNERS,
-			WORLD_SPACE_CORNERS,
-		};
+    public:
+        enum FrustumCorners
+        {
+            NO_CORNERS,
+            VIEW_SPACE_CORNERS,
+            WORLD_SPACE_CORNERS,
+        };
 
-		/** Whether to use a full screen quad or triangle. (default: false). Note that you may not
-			always get the triangle (for example, if you ask for WORLD_SPACE_CORNERS)
-		*/
-		bool	mUseQuad;
+        /** Whether to use a full screen quad or triangle. (default: false). Note that you may not
+            always get the triangle (for example, if you ask for WORLD_SPACE_CORNERS)
+        */
+        bool    mUseQuad;
 
-		/** When true, the user is telling Ogre this pass just performs a custom FSAA resolve filter.
-			Hence we should skip this pass for those APIs that don't support explicit resolving
-			TODO: Not really implemented yet!!!
-		@remarks
-			@See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
-		*/
-		bool	mIsResolve;
+        /** When true, the user is telling Ogre this pass just performs a custom FSAA resolve filter.
+            Hence we should skip this pass for those APIs that don't support explicit resolving
+            TODO: Not really implemented yet!!!
+        @remarks
+            @See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
+        */
+        bool    mIsResolve;
 
-		String	mMaterialName;
+        String  mMaterialName;
 
-		/** Type of frustum corners to pass in the quad normals.
-			mCameraName contains which camera's frustum to pass
-		*/
-		FrustumCorners	mFrustumCorners;
-		IdString		mCameraName;
+        /** Type of frustum corners to pass in the quad normals.
+            mCameraName contains which camera's frustum to pass
+        */
+        FrustumCorners  mFrustumCorners;
+        IdString        mCameraName;
 
-		CompositorPassQuadDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :
-			CompositorPassDef( PASS_QUAD, rtIndex ),
-			mParentNodeDef( parentNodeDef ),
-			mUseQuad( false ),
-			mIsResolve( false ),
-			mFrustumCorners( NO_CORNERS )
-		{
-		}
+        CompositorPassQuadDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :
+            CompositorPassDef( PASS_QUAD, rtIndex ),
+            mParentNodeDef( parentNodeDef ),
+            mUseQuad( false ),
+            mIsResolve( false ),
+            mFrustumCorners( NO_CORNERS )
+        {
+        }
 
-		/** Indicates the pass to change the texture units to use the specified texture sources.
-			@See QuadTextureSource for params
-		*/
-		void addQuadTextureSource( size_t texUnitIdx, const String &textureName, size_t mrtIndex );
+        /** Indicates the pass to change the texture units to use the specified texture sources.
+            @See QuadTextureSource for params
+        */
+        void addQuadTextureSource( size_t texUnitIdx, const String &textureName, size_t mrtIndex );
 
-		const TextureSources& getTextureSources(void) const		{ return mTextureSources; }
-	};
+        const TextureSources& getTextureSources(void) const     { return mTextureSources; }
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

@@ -35,7 +35,7 @@
 
 namespace Ogre
 {
-	/** Ogre assumes that there are separate vertex and fragment programs to deal with but
+    /** Ogre assumes that there are separate vertex and fragment programs to deal with but
      GLSL ES has one program pipeline object that represents the active vertex and fragment program objects
      during a rendering state.  GLSL vertex and fragment program objects are compiled separately
      and then attached to a program object and then the program pipeline object is linked.
@@ -47,29 +47,29 @@ namespace Ogre
      */
     class _OgreGL3PlusExport GLSLProgramPipelineManager : public GLSLProgramManagerCommon, public Singleton<GLSLProgramPipelineManager>
     {
-	private:
+    private:
 
-		typedef map<uint32, GLSLProgramPipeline*>::type ProgramPipelineMap;
-		typedef ProgramPipelineMap::iterator ProgramPipelineIterator;
+        typedef map<uint32, GLSLProgramPipeline*>::type ProgramPipelineMap;
+        typedef ProgramPipelineMap::iterator ProgramPipelineIterator;
 
-		/// Container holding previously created program pipeline objects 
-		ProgramPipelineMap mProgramPipelines;
+        /// Container holding previously created program pipeline objects 
+        ProgramPipelineMap mProgramPipelines;
 
-		/// Active objects defining the active rendering gpu state
-		GLSLProgramPipeline* mActiveProgramPipeline;
+        /// Active objects defining the active rendering gpu state
+        GLSLProgramPipeline* mActiveProgramPipeline;
 
-	public:
+    public:
 
-		GLSLProgramPipelineManager(void);
-		~GLSLProgramPipelineManager(void);
+        GLSLProgramPipelineManager(void);
+        ~GLSLProgramPipelineManager(void);
 
-		/**
+        /**
          Get the program object that links the two active program objects together.
          If a program pipeline object was not already created and linked a new one is created and linked.
          */
-		GLSLProgramPipeline* getActiveProgramPipeline(void);
+        GLSLProgramPipeline* getActiveProgramPipeline(void);
 
-		/** Set the active vertex and fragment link programs for the next rendering state.
+        /** Set the active vertex and fragment link programs for the next rendering state.
          The active program pipeline object will be cleared.
          Normally called from the GLSLGpuProgram::bindProgram and unbindProgram methods
          */
@@ -80,7 +80,7 @@ namespace Ogre
         void setActiveTessHullLinkProgram(GLSLGpuProgram* hullGpuProgram);
         void setActiveComputeLinkProgram(GLSLGpuProgram* computGpuProgram);
 
-		static GLSLProgramPipelineManager& getSingleton(void);
+        static GLSLProgramPipelineManager& getSingleton(void);
         static GLSLProgramPipelineManager* getSingletonPtr(void);
     };
 }
