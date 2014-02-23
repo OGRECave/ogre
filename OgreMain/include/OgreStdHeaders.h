@@ -76,8 +76,7 @@
 
 // C++ Stream stuff
 #include <fstream>
-#include <iostream>
-#include <iomanip>
+#include <iosfwd>
 #include <sstream>
 
 #ifdef __BORLANDC__

@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreColourValue.h"
 #include "OgreException.h"
-#include "OgreStringConverter.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreRoot.h"
@@ -66,10 +65,7 @@ namespace Ogre {
         {
             mMgr->_notifyVertexBufferDestroyed(this);
         }
-        if (mShadowBuffer)
-        {
-            OGRE_DELETE mShadowBuffer;
-        }
+        OGRE_DELETE mShadowBuffer;
     }
     //-----------------------------------------------------------------------------
     bool HardwareVertexBuffer::checkIfVertexInstanceDataIsSupported()
@@ -802,13 +798,13 @@ namespace Ogre {
         mHighIndex = targetIndex;
     }
     //-----------------------------------------------------------------------------
-    bool VertexBufferBinding::hasInstanceData() const
+    bool VertexBufferBinding::getHasInstanceData() const
     {
         VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
         iend = mBindingMap.end();
         for (i = mBindingMap.begin(); i != iend; ++i)
         {
-            if ( i->second->isInstanceData() )
+            if ( i->second->getIsInstanceData() )
             {
                 return true;
             }

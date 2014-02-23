@@ -63,12 +63,17 @@ class ProgramProcessor;
 class ProgramSet;
 class RenderState;
 class Parameter;
+class UniformParameter;
 class Function;
 class FFPRenderStateBuilder;
 class ShaderGenerator;
 class SGMaterialSerializerListener;
 class ProgramWriterFactory;
 class ProgramWriterManager;
+
+typedef SharedPtr<Parameter>        ParameterPtr;
+typedef SharedPtr<UniformParameter> UniformParameterPtr;
+typedef vector<ParameterPtr>::type  ShaderParameterList;
 
 /// Utility function with same style as boost::hash_combine
 template <class T>

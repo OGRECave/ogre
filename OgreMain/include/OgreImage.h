@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 #include "OgrePixelFormat.h"
-#include "OgreDataStream.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -295,7 +294,7 @@ namespace Ogre {
             @see
                 Image::load( const String& filename )
         */
-        Image & load(DataStreamPtr& stream, const String& type = StringUtil::BLANK );
+        Image & load(DataStreamPtr& stream, const String& type = BLANKSTRING );
 
         /** Utility method to combine 2 separate images into this one, with the first
         image source supplying the RGB channels, and the second image supplying the 
@@ -326,7 +325,7 @@ namespace Ogre {
             a header to identify the data.
         */
         Image & loadTwoImagesAsRGBA(DataStreamPtr& rgbStream, DataStreamPtr& alphaStream, PixelFormat format = PF_BYTE_RGBA,
-            const String& rgbType = StringUtil::BLANK, const String& alphaType = StringUtil::BLANK);
+            const String& rgbType = BLANKSTRING, const String& alphaType = BLANKSTRING);
 
         /** Utility method to combine 2 separate images into this one, with the first
             image source supplying the RGB channels, and the second image supplying the 

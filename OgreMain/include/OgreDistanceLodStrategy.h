@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "OgreLodStrategy.h"
 #include "OgreSingleton.h"
-#include "OgreNode.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -41,6 +40,10 @@ namespace Ogre {
     /** \addtogroup LOD
     *  @{
     */
+
+    class DistanceLodBoxStrategy;
+    /// Backward compatible name for Distance_Box strategy.
+    typedef DistanceLodBoxStrategy DistanceLodStrategy;
 
     /** Level of detail strategy based on distance from camera. This is an abstract base class for DistanceLodBoxStrategy and DistanceLodSphereStrategy.
         @remarks
@@ -52,7 +55,7 @@ namespace Ogre {
         @par
             If all your testers had varying resolutions or you just didn't care, then this feature is useless for you and should be disabled (default: disabled).
      */
-    class _OgreExport DistanceLodStrategy : public LodStrategy
+    class _OgreExport DistanceLodStrategyBase : public LodStrategy
     {
     protected:
         /// @copydoc LodStrategy::getValueImpl
@@ -60,7 +63,7 @@ namespace Ogre {
 
     public:
         /** Default constructor. */
-        DistanceLodStrategy(const String& name);
+        DistanceLodStrategyBase(const String& name);
 
         /// @copydoc LodStrategy::getBaseValue
         virtual Real getBaseValue() const;
@@ -131,7 +134,7 @@ namespace Ogre {
         @par
             If all your testers had varying resolutions or you just didn't care, then this feature is useless for you and should be disabled (default: disabled).
      */
-    class _OgreExport DistanceLodSphereStrategy : public DistanceLodStrategy, public Singleton<DistanceLodSphereStrategy>
+    class _OgreExport DistanceLodSphereStrategy : public DistanceLodStrategyBase, public Singleton<DistanceLodSphereStrategy>
     {
     public:
         /** Default constructor. */
@@ -193,7 +196,7 @@ namespace Ogre {
         @par
             If all your testers had varying resolutions or you just didn't care, then this feature is useless for you and should be disabled (default: disabled).
      */
-    class _OgreExport DistanceLodBoxStrategy : public DistanceLodStrategy, public Singleton<DistanceLodBoxStrategy>
+    class _OgreExport DistanceLodBoxStrategy : public DistanceLodStrategyBase, public Singleton<DistanceLodBoxStrategy>
     {
     public:
         /** Default constructor. */
@@ -235,6 +238,7 @@ namespace Ogre {
         */
         static DistanceLodBoxStrategy* getSingletonPtr(void);
     };
+
     /** @} */
     /** @} */
 

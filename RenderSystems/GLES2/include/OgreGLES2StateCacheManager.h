@@ -115,7 +115,7 @@ namespace Ogre
         void getTexParameterfv(GLenum target, GLenum pname, GLfloat *param);
 
         /** Activate an OpenGL texture unit.
-         @param offset The texture unit to activate.
+         @param unit The texture unit to activate.
          @return Whether or not the texture unit was successfully activated.
          */
         bool activateGLTextureUnit(size_t unit);

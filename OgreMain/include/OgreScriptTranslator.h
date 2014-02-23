@@ -71,18 +71,16 @@ namespace Ogre{
         static bool getBoolean(const AbstractNodePtr &node, bool *result);
         /// Converts the node to a string and returns true if successful
         static bool getString(const AbstractNodePtr &node, String *result);
-        /// Converts the node to an IdString and returns true if successful
-        static bool getIdString(const AbstractNodePtr &node, IdString *result);
         /// Converts the node to a Real and returns true if successful
         static bool getReal(const AbstractNodePtr &node, Real *result);
         /// Converts the node to a float and returns true if successful
         static bool getFloat(const AbstractNodePtr &node, float *result);
+        /// Converts the node to a float and returns true if successful
+        static bool getDouble(const AbstractNodePtr &node, double *result);
         /// Converts the node to an integer and returns true if successful
         static bool getInt(const AbstractNodePtr &node, int *result); 
         /// Converts the node to an unsigned integer and returns true if successful
         static bool getUInt(const AbstractNodePtr &node, uint32 *result); 
-        /// Converts the node to a an integer (from hexadecimal) and returns true if successful
-        static bool getHex(const AbstractNodePtr &node, uint32 *result);
         /// Converts the range of nodes to a ColourValue and returns true if successful
         static bool getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result, int maxEntries = 4);
         /// Converts the node to a SceneBlendFactor enum and returns true if successful
@@ -95,6 +93,12 @@ namespace Ogre{
         static bool getInts(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, int *vals, int count);
         /// Converts the range of nodes to an array of floats and returns true if successful
         static bool getFloats(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, float *vals, int count);
+        /// Converts the range of nodes to an array of floats and returns true if successful
+        static bool getDoubles(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, double *vals, int count);
+        /// Converts the range of nodes to an array of floats and returns true if successful
+        static bool getUInts(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, uint *vals, int count);
+        /// Converts the range of nodes to an array of uint-stored boolean values and returns true if successful
+        static bool getBooleans(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, uint *vals, int count);
         /// Converts the node to a StencilOperation enum and returns true if successful
         static bool getStencilOp(const AbstractNodePtr &node, StencilOperation *op); 
         /// Converts the node to a GpuConstantType enum and returns true if successful
@@ -193,6 +197,8 @@ namespace Ogre{
     public:
         SharedParamsTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+                template <class T>
+                void translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters *sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType);
     protected:
     };
 
@@ -293,38 +299,6 @@ namespace Ogre{
         CompositorPassTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
     };
-    /*class _OgreExport CompositorTranslator : public ScriptTranslator
-    {
-    protected:
-        Compositor *mCompositor;
-    public:
-        CompositorTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
-    };
-    class _OgreExport CompositionTechniqueTranslator : public ScriptTranslator
-    {
-    protected:
-        CompositionTechnique *mTechnique;
-    public:
-        CompositionTechniqueTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
-    };
-    class _OgreExport CompositionTargetPassTranslator : public ScriptTranslator
-    {
-    protected:
-        CompositionTargetPass *mTarget;
-    public:
-        CompositionTargetPassTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
-    };
-    class _OgreExport CompositionPassTranslator : public ScriptTranslator
-    {
-    protected:
-        CompositionPass *mPass;
-    public:
-        CompositionPassTranslator();
-        void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
-    };*/
 
     /**************************************************************************
      * BuiltinScriptTranslatorManager

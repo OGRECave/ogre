@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreVertexIndexData.h"
-#include "OgreMovablePlane.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

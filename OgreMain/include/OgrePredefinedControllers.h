@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreController.h"
 #include "OgreFrameListener.h"
-#include "OgreGpuProgram.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

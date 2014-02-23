@@ -32,9 +32,7 @@ THE SOFTWARE.
 
 #include "OgreResource.h"
 #include "OgreResourceGroupManager.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreCommon.h"
-#include "OgreDataStream.h"
 #include "OgreStringVector.h"
 #include "OgreScriptLoader.h"
 #include "OgreHeaderPrefix.h"

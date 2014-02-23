@@ -8,6 +8,7 @@
 
 #include "SdkSample.h"
 #include "OgreImage.h"
+#include "OgreBillboard.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -21,7 +22,7 @@ public:
     {
         mInfo["Title"] = "PNTriangles";
         mInfo["Description"] = "Sample for parametric PN-Triangles tessellation algorithm";
-        mInfo["Thumbnail"] = "thumb_tesselation.png";
+        mInfo["Thumbnail"] = "thumb_tessellation.png";
         mInfo["Category"] = "Unsorted";
         mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
         mBackgroundColour = ColourValue(0.41f, 0.41f, 0.41f);
@@ -34,9 +35,9 @@ public:
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
                 " programs, so you cannot run this sample. Sorry!", "Sample_PNTrianglesTessellation::testCapabilities");
         }
-        if (!caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM))
+        if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tesselation shaders. Sorry!",
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tessellation shaders. Sorry!",
                 "Sample_PNTrianglesTessellation:testCapabilities");
         }
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_5_0") &&
@@ -123,7 +124,7 @@ public:
         if( slider->getName() == "tessellationAmount" )
         {
             MaterialPtr lMaterialPtr = MaterialManager::getSingleton().getByName( mMaterialMenu->getSelectedItem() );
-            lMaterialPtr->getTechnique(0)->getPass(0)->getTesselationHullProgramParameters()->setNamedConstant( "g_tessellationAmount", slider->getValue() );
+            lMaterialPtr->getTechnique(0)->getPass(0)->getTessellationHullProgramParameters()->setNamedConstant( "g_tessellationAmount", slider->getValue() );
         }
     }
 
@@ -163,7 +164,7 @@ protected:
         StringVector matNames;
 
         matNames.push_back("Ogre/NoTessellation");
-        matNames.push_back("Ogre/TesselationExample");
+        matNames.push_back("Ogre/TessellationExample");
         matNames.push_back("Ogre/SimpleTessellation");
         //matNames.push_back("Ogre/AdaptiveTessellation");
         matNames.push_back("Ogre/AdaptivePNTrianglesTessellation");

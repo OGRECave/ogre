@@ -15,7 +15,7 @@ same license as the rest of the engine.
 #ifndef __SHAREDDATA_H
 #define __SHAREDDATA_H
 
-#include <Ogre.h>
+#include "Ogre.h"
 #include "DeferredShading.h"
 
 class SharedData : public Ogre::Singleton<SharedData> {

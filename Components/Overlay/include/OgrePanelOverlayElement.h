@@ -30,9 +30,9 @@ THE SOFTWARE.
 #define __PanelOverlayElement_H__
 
 #include "OgreOverlayContainer.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre {
-
 
     /** \addtogroup Core
     *  @{

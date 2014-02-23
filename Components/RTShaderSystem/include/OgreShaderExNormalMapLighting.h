@@ -29,9 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
-#include "OgreVector4.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
 
@@ -310,7 +308,7 @@ protected:
 
 
 // Attributes.
-protected:  
+protected:
     // The normal map texture name.
     String mNormalMapTextureName;
     // Track per vertex colour type.

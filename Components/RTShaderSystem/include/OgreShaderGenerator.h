@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreFileSystemLayer.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreSceneManager.h"
 #include "OgreShaderRenderState.h"
@@ -38,6 +37,9 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+
+    class FileSystemLayer;
+
 namespace RTShader {
 
 /** \addtogroup Core
@@ -62,9 +64,9 @@ public:
     static bool initialize();
 
     /** 
-    Finalize the Shader Generator instance.
+    Destroy the Shader Generator instance.
     */
-    static void finalize();
+    static void destroy();
 
 
     /** Override standard Singleton retrieval.
@@ -119,18 +121,35 @@ public:
     This attribute will be update on the call to preFindVisibleObjects. 
     */
     SceneManager* getActiveSceneManager();
-    
+
+    /** 
+    Set the active scene manager against which new render states are compiled.
+    Note that normally the setting of the active scene manager is updated through the
+    preFindVisibleObjects method.
+    */
+
+    void _setActiveSceneManager(SceneManager* sceneManager);
+
     /** 
     Set the target shader language.
     @param shaderLanguage The output shader language to use.    
     @remarks The default shader language is cg.
     */
-    void setTargetLanguage(const String& shaderLanguage);
+    void setTargetLanguage(const String& shaderLanguage,const float version = 1.0);
 
+    /** 
+    Return if hlsl 4.0 shading language is currently in use.        
+    */
+    bool IsHlsl4() const { return mShaderLanguage == "hlsl" && mShaderLanguageVersion == 4.0f; }
     /** 
     Return the target shader language currently in use.     
     */
     const String& getTargetLanguage() const { return mShaderLanguage; }
+
+    /** 
+    Return the target shader language version currently in use.     
+    */
+    float getTargetLanguageVersion() const { return mShaderLanguageVersion; }
 
     /** 
     Set the output vertex shader target profiles.
@@ -540,7 +559,7 @@ protected:
         /** Set the custom render state of this pass. */
         void setCustomRenderState(RenderState* customRenderState) { mCustomRenderState = customRenderState; }
 
-        // Key name for associating with a Pass instance.
+        /// Key name for associating with a Pass instance.
         static String UserKey;
     
     protected:
@@ -555,7 +574,7 @@ protected:
         Pass* mDstPass;
         // Custom render state.
         RenderState* mCustomRenderState;
-        // The compiled render state.       
+        // The compiled render state.
         TargetRenderState* mTargetRenderState;
     };
 
@@ -852,8 +871,8 @@ protected:
     /** Initialize the shader generator instance. */
     bool _initialize();
     
-    /** Finalize the shader generator instance. */
-    void _finalize();
+    /** Destory the shader generator instance. */
+    void _destroy();
 
     /** Find source technique to generate shader based technique based on it. */
     Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable);
@@ -948,8 +967,8 @@ protected:
     /** Used to check if finalizing */
     bool getIsFinalizing() const;
 protected:  
-        // Auto mutex.
-        OGRE_AUTO_MUTEX;
+    // Auto mutex.
+    OGRE_AUTO_MUTEX;
     // The active scene manager.
     SceneManager* mActiveSceneMgr;
     // A map of all scene managers this generator is bound to.
@@ -968,6 +987,8 @@ protected:
     SGScriptTranslator mCoreScriptTranslator;
     // The target shader language (currently only cg supported).
     String mShaderLanguage;
+    // The target shader language version.
+    float  mShaderLanguageVersion;
     // The target vertex shader profile. Will be used as argument for program compilation.
     String mVertexShaderProfiles;
     // List of target vertex shader profiles.
@@ -1004,7 +1025,7 @@ protected:
     VSOutputCompactPolicy mVSOutputCompactPolicy;
     // Tells whether shaders are created for passes with shaders
     bool mCreateShaderOverProgrammablePass;
-    // a flag to indicate finalizing
+    // A flag to indicate finalizing
     bool mIsFinalizing;
 private:
     friend class SGPass;

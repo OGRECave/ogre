@@ -18,6 +18,7 @@ same license as the rest of the engine.
 #include "SdkSample.h"
 #include "SamplePlugin.h"
 #include "MaterialControls.h"
+#include "OgreBillboard.h"
 
 using namespace Ogre;
 using namespace OgreBites;

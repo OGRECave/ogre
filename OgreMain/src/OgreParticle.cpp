@@ -35,8 +35,8 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void Particle::setRotation(const Radian& rot)
     {
-        rotation = rot;
-        if (rotation != Radian(0))
+        mRotation = rot;
+        if (mRotation != Radian(0))
             mParentSystem->_notifyParticleRotated();
     }
     //-----------------------------------------------------------------------

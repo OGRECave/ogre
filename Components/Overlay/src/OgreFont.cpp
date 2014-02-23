@@ -28,16 +28,11 @@ THE SOFTWARE
 #include "OgreMaterialManager.h"
 #include "OgreTextureManager.h"
 #include "OgreTexture.h"
-#include "OgreResourceGroupManager.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreRenderWindow.h"
 #include "OgreException.h"
-#include "OgreBlendMode.h"
 #include "OgreTextureUnitState.h"
 #include "OgreTechnique.h"
-#include "OgrePass.h"
-#include "OgreMaterial.h"
 #include "OgreBitwise.h"
 
 #define generic _generic    // keyword for C++/CX
@@ -362,7 +357,7 @@ namespace Ogre
                 {
                     // problem loading this glyph, continue
                     LogManager::getSingleton().logMessage("Info: cannot load character " +
-                        StringConverter::toString(cp) + " in font " + mName);
+                        StringConverter::toString(cp) + " in font " + mName, LML_CRITICAL);
                     continue;
                 }
 
@@ -516,7 +511,7 @@ namespace Ogre
     {
         const Font* f = static_cast<const Font*>(target);
         const CodePointRangeList& rangeList = f->getCodePointRangeList();
-        StringUtil::StrStreamType str;
+        StringStream str;
         for (CodePointRangeList::const_iterator i = rangeList.begin(); i != rangeList.end(); ++i)
         {
             str << i->first << "-" << i->second << " ";

@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreKeyFrame.h"
 #include "OgreLodStrategyManager.h"
+#include "OgreLodStrategy.h"
 #include <cstddef>
 
 namespace Ogre {
@@ -692,7 +693,7 @@ namespace Ogre {
     void XMLMeshSerializer::readSubMeshes(TiXmlElement* mSubmeshesNode)
     {
         LogManager::getSingleton().logMessage("Reading submeshes...");
-
+        assert(mMesh->getNumSubMeshes() == 0);
         for (TiXmlElement* smElem = mSubmeshesNode->FirstChildElement();
             smElem != 0; smElem = smElem->NextSiblingElement())
         {
@@ -970,7 +971,7 @@ namespace Ogre {
                 {
                     // NB set is local to this buffer, but will be translated into a 
                     // global set number across all vertex buffers
-                    StringUtil::StrStreamType str;
+                    StringStream str;
                     str << "texture_coord_dimensions_" << tx;
                     attrib = vbElem->Attribute(str.str().c_str());
                     VertexElementType vtype = VET_FLOAT2; // Default
@@ -1528,11 +1529,13 @@ namespace Ogre {
                 {
                     pInt = static_cast<unsigned int*>(
                         ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
+                    pInt += facedata->indexStart;
                 }
                 else
                 {
                     pShort = static_cast<unsigned short*>(
                         ibuf->lock(HardwareBuffer::HBL_READ_ONLY)); 
+                    pShort += facedata->indexStart;
                 }
                 
                 for (size_t f = 0; f < facedata->indexCount; f += 3)
@@ -1562,11 +1565,10 @@ namespace Ogre {
     void XMLMeshSerializer::writeExtremes(TiXmlElement* mMeshNode, const Mesh* m)
     {
         TiXmlElement* extremesNode = NULL;
-        int idx = 0;
-        for (Mesh::SubMeshIterator i = ((Mesh &)*m).getSubMeshIterator ();
-             i.hasMoreElements (); i.moveNext (), ++idx)
+        ushort submeshCount = m->getNumSubMeshes();
+        for (int idx = 0; idx < submeshCount; ++idx)
         {
-            SubMesh *sm = i.peekNext ();
+            SubMesh *sm = m->getSubMesh(idx);
             if (sm->extremityPoints.empty())
                 continue; // do nothing
 

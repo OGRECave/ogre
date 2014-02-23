@@ -33,11 +33,10 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
-#include "OgreString.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreBillboardParticleRenderer.h"
-#include "OgreStringConverter.h"
 #include "OgreScriptCompiler.h"
+#include "OgreParticleSystem.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -447,14 +446,14 @@ namespace Ogre {
                 if (!renderer->setParameter(vecparams[0], vecparams[1]))
                 {
                     LogManager::getSingleton().logMessage("Bad particle system attribute line: '"
-                        + line + "' in " + sys->getName() + " (tried renderer)");
+                        + line + "' in " + sys->getName() + " (tried renderer)", LML_CRITICAL);
                 }
             }
             else
             {
                 // BAD command. BAD!
                 LogManager::getSingleton().logMessage("Bad particle system attribute line: '"
-                    + line + "' in " + sys->getName() + " (no renderer)");
+                    + line + "' in " + sys->getName() + " (no renderer)", LML_CRITICAL);
             }
         }
     }
@@ -469,7 +468,7 @@ namespace Ogre {
         {
             // BAD command. BAD!
             LogManager::getSingleton().logMessage("Bad particle emitter attribute line: '"
-                + line + "' for emitter " + emit->getType());
+                + line + "' for emitter " + emit->getType(), LML_CRITICAL);
         }
     }
     //-----------------------------------------------------------------------
@@ -483,7 +482,7 @@ namespace Ogre {
         {
             // BAD command. BAD!
             LogManager::getSingleton().logMessage("Bad particle affector attribute line: '"
-                + line + "' for affector " + aff->getType());
+                + line + "' for affector " + aff->getType(), LML_CRITICAL);
         }
     }
     //-----------------------------------------------------------------------

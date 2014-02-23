@@ -58,7 +58,7 @@ namespace Ogre {
             void writeData(size_t offset, size_t length, const void* pSource,
                            bool discardWholeBuffer = false);
             /** Override HardwareBuffer to turn off all shadowing. */
-            void* lock(size_t offset, size_t length, LockOptions options);
+            void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
             /** Override HardwareBuffer to turn off all shadowing. */
             void unlock(void);
 
@@ -84,7 +84,7 @@ namespace Ogre {
             void writeData(size_t offset, size_t length, const void* pSource,
                     bool discardWholeBuffer = false);
             /** Override HardwareBuffer to turn off all shadowing. */
-            void* lock(size_t offset, size_t length, LockOptions options);
+            void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
             /** Override HardwareBuffer to turn off all shadowing. */
             void unlock(void);
 
@@ -112,7 +112,7 @@ namespace Ogre {
         void writeData(size_t offset, size_t length, const void* pSource,
                        bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 
@@ -167,6 +167,13 @@ namespace Ogre {
         ~GLES2DefaultHardwareBufferManager()
         {
             OGRE_DELETE mImpl;
+        }
+        HardwareUniformBufferSharedPtr
+        createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "GLES does not support render to vertex buffer objects",
+                        "GLES2DefaultHardwareBufferManager::createUniformBuffer");
         }
     };
 }

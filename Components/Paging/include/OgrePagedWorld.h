@@ -30,8 +30,6 @@ THE SOFTWARE.
 #define __Ogre_PagedWorld_H__
 
 #include "OgrePagingPrerequisites.h"
-#include "OgreString.h"
-#include "OgreDataStream.h"
 #include "OgreCommon.h"
 #include "OgreNameGenerator.h"
 
@@ -111,7 +109,7 @@ namespace Ogre
         */
         PagedWorldSection* createSection(SceneManager* sceneMgr,
             const String& typeName,
-            const String& sectionName = StringUtil::BLANK);
+            const String& sectionName = BLANKSTRING);
 
 
         /** Create a new manually defined section of the world.
@@ -128,7 +126,7 @@ namespace Ogre
             provided, one will be generated)
         */
         PagedWorldSection* createSection(const String& strategyName, SceneManager* sceneMgr,
-            const String& sectionName = StringUtil::BLANK);
+            const String& sectionName = BLANKSTRING);
 
 
         /** Create a manually defined new section of the world.
@@ -144,7 +142,7 @@ namespace Ogre
             provided, one will be generated)
         */
         PagedWorldSection* createSection(PageStrategy* strategy, SceneManager* sceneMgr, 
-            const String& sectionName = StringUtil::BLANK);
+            const String& sectionName = BLANKSTRING);
         /** Destroy a section of world. */
         void destroySection(const String& name);
         /** Destroy a section of world. */

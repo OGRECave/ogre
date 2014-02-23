@@ -486,9 +486,8 @@ namespace Ogre
             monitorInfo.cbSize = sizeof(MONITORINFO);
             GetMonitorInfo(hMonitor, &monitorInfo);
 
-            LONG screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
-            LONG screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
-
+            ULONG screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+            ULONG screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
 
             int left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
             int top = screenh > winHeight ? ((screenh - winHeight) / 2) : 0;
@@ -512,9 +511,19 @@ namespace Ogre
 
         ZeroMemory( presentParams, sizeof(D3DPRESENT_PARAMETERS) );
         presentParams->Windowed                 = !mIsFullScreen;
-        presentParams->SwapEffect               = D3DSWAPEFFECT_DISCARD;
+        
+        DWORD version = GetVersion();
+        DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
+        DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
+        bool isWindows7 = (major > 6) || ((major == 6) && (minor >= 1));
+
+        // http://msdn.microsoft.com/en-us/library/windows/desktop/bb172574%28v=vs.85%29.aspx
+        // Multisampling is valid only on a swap chain that is being created or reset with the D3DSWAPEFFECT_DISCARD swap effect.       
+        bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7 && (isAA() == false);
+            
+        presentParams->SwapEffect               = useFlipSwap ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_DISCARD;
         // triple buffer if VSync is on or if flip swap is used. Otherwise we may get a performance penalty.
-        presentParams->BackBufferCount          = mVSync ? 2 : 1;
+        presentParams->BackBufferCount          = mVSync || useFlipSwap ? 2 : 1;
         presentParams->EnableAutoDepthStencil   = (mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH);
         presentParams->hDeviceWindow            = mHWnd;
         presentParams->BackBufferWidth          = mWidth;
@@ -850,6 +859,7 @@ namespace Ogre
     {
         RenderWindow::_endUpdate();
 
+        mStats.vBlankMissCount = mDevice->getVBlankMissCount(this);
         D3D9RenderSystem::getDeviceManager()->setActiveRenderTargetDevice(NULL);    
 
     }

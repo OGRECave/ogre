@@ -64,7 +64,7 @@ namespace Ogre {
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 
@@ -89,7 +89,7 @@ namespace Ogre {
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 
@@ -116,7 +116,7 @@ namespace Ogre {
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
     };
@@ -142,7 +142,7 @@ namespace Ogre {
         void writeData(size_t offset, size_t length, const void* pSource,
                        bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
     };

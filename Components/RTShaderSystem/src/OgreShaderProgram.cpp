@@ -26,7 +26,6 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderProgram.h"
-#include "OgreStringConverter.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -61,10 +60,7 @@ void Program::destroyFunctions()
 
     for (it = mFunctions.begin(); it != mFunctions.end(); ++it)
     {
-        if (*it != NULL)
-        {
-            OGRE_DELETE *it;
-        }   
+        OGRE_DELETE *it;
     }
     mFunctions.clear();
 }
@@ -99,6 +95,7 @@ void Program::removeParameter(UniformParameterPtr parameter)
         {
             (*it).setNull();
             mParameters.erase(it);
+            break;
         }
     }
 }

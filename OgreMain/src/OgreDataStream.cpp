@@ -684,10 +684,8 @@ namespace Ogre {
             if (mFreeOnClose)
             {
                 // delete the stream too
-                if (mFStreamRO)
-                    OGRE_DELETE_T(mFStreamRO, basic_ifstream, MEMCATEGORY_GENERAL);
-                if (mFStream)
-                    OGRE_DELETE_T(mFStream, basic_fstream, MEMCATEGORY_GENERAL);
+                OGRE_DELETE_T(mFStreamRO, basic_ifstream, MEMCATEGORY_GENERAL);
+                OGRE_DELETE_T(mFStream, basic_fstream, MEMCATEGORY_GENERAL);
                 mInStream = 0;
                 mFStreamRO = 0; 
                 mFStream = 0; 

@@ -61,7 +61,7 @@ namespace Ogre {
                 msColourCmd[i].mIndex   = i;
                 msTimeCmd[i].mIndex     = i;
 
-                StringUtil::StrStreamType stage;
+                StringStream stage;
                 stage << i;
                 String  colour_title    = String("colour") + stage.str();
                 String  time_title      = String("time") + stage.str();
@@ -83,16 +83,16 @@ namespace Ogre {
         while (!pi.end())
         {
             p = pi.getNext();
-            const Real      life_time       = p->totalTimeToLive;
-            Real            particle_time   = 1.0f - (p->timeToLive / life_time); 
+            const Real      life_time       = p->mTotalTimeToLive;
+            Real            particle_time   = 1.0f - (p->mTimeToLive / life_time);
 
             if (particle_time <= mTimeAdj[0])
             {
-                p->colour = mColourAdj[0];
+                p->mColour = mColourAdj[0];
             } else
             if (particle_time >= mTimeAdj[MAX_STAGES - 1])
             {
-                p->colour = mColourAdj[MAX_STAGES-1];
+                p->mColour = mColourAdj[MAX_STAGES-1];
             } else
             {
                 for (int i=0;i<MAX_STAGES-1;i++)
@@ -101,10 +101,10 @@ namespace Ogre {
                     {
                         particle_time -= mTimeAdj[i];
                         particle_time /= (mTimeAdj[i+1]-mTimeAdj[i]);
-                        p->colour.r = ((mColourAdj[i+1].r * particle_time) + (mColourAdj[i].r * (1.0f - particle_time)));
-                        p->colour.g = ((mColourAdj[i+1].g * particle_time) + (mColourAdj[i].g * (1.0f - particle_time)));
-                        p->colour.b = ((mColourAdj[i+1].b * particle_time) + (mColourAdj[i].b * (1.0f - particle_time)));
-                        p->colour.a = ((mColourAdj[i+1].a * particle_time) + (mColourAdj[i].a * (1.0f - particle_time)));
+                        p->mColour.r = ((mColourAdj[i+1].r * particle_time) + (mColourAdj[i].r * (1.0f - particle_time)));
+                        p->mColour.g = ((mColourAdj[i+1].g * particle_time) + (mColourAdj[i].g * (1.0f - particle_time)));
+                        p->mColour.b = ((mColourAdj[i+1].b * particle_time) + (mColourAdj[i].b * (1.0f - particle_time)));
+                        p->mColour.a = ((mColourAdj[i+1].a * particle_time) + (mColourAdj[i].a * (1.0f - particle_time)));
                         break;
                     }
                 }

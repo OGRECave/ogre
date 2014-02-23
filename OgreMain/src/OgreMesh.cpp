@@ -33,17 +33,18 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreOldSkeletonManager.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreStringConverter.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreException.h"
 #include "OgreMeshManager.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreAnimation.h"
 #include "OgreAnimationState.h"
 #include "OgreAnimationTrack.h"
+#include "OgreBone.h"
 #include "OgreOptimisedUtil.h"
+#include "OgreSkeleton.h"
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
-#include "OgreLodConfig.h"
 #include "OgrePixelCountLodStrategy.h"
 
 #include "Animation/OgreSkeletonDef.h"
@@ -55,9 +56,10 @@ namespace Ogre {
         const String& group, bool isManual, ManualResourceLoader* loader)
         : Resource(creator, name, handle, group, isManual, loader),
         mBoundRadius(0.0f),
+        mBoneBoundingRadius(0.0f),
         mBoneAssignmentsOutOfDate(false),
         mLodStrategyName( LodStrategyManager::getSingleton().getDefaultStrategy()->getName() ),
-        mIsLodManual(false),
+        mHasManualLodLevel(false),
         mNumLods(1),
         mVertexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
         mIndexBufferUsage(HardwareBuffer::HBU_STATIC_WRITE_ONLY),
@@ -209,7 +211,7 @@ namespace Ogre {
                 buildEdgeList();
             }
         }
-
+#if !OGRE_NO_MESHLOD
         // The loading process accesses LOD usages directly, so
         // transformation of user values must occur after loading is complete.
 
@@ -223,6 +225,7 @@ namespace Ogre {
             i->value = lodStrategy->transformUserValue(i->userValue);
             *lodValueIt++ = i->value;
         }
+#endif
     }
     //-----------------------------------------------------------------------
     void Mesh::prepareImpl()
@@ -286,8 +289,10 @@ namespace Ogre {
         // Clear SubMesh lists
         mSubMeshList.clear();
         mSubMeshNameMap.clear();
+#if !OGRE_NO_MESHLOD
         // Removes all LOD data
         removeLodLevels();
+#endif
         mPreparedForShadowVolumes = false;
 
         // remove all poses & animations
@@ -299,7 +304,7 @@ namespace Ogre {
         mBoneAssignmentsOutOfDate = false;
 
         // Removes reference to skeleton
-        setSkeletonName(StringUtil::BLANK);
+        setSkeletonName(BLANKSTRING);
     }
 
     //-----------------------------------------------------------------------
@@ -310,7 +315,7 @@ namespace Ogre {
 
         // New Mesh is assumed to be manually defined rather than loaded since you're cloning it for a reason
         String theGroup;
-        if (newGroup == StringUtil::BLANK)
+        if (newGroup == BLANKSTRING)
         {
             theGroup = this->getGroup();
         }
@@ -325,6 +330,7 @@ namespace Ogre {
         for (subi = mSubMeshList.begin(); subi != mSubMeshList.end(); ++subi)
         {
             (*subi)->clone("", newMesh.get());
+
         }
 
         // Copy shared geometry and index map, if any
@@ -342,19 +348,29 @@ namespace Ogre {
         // Copy bounds
         newMesh->mAABB = mAABB;
         newMesh->mBoundRadius = mBoundRadius;
+        newMesh->mBoneBoundingRadius = mBoneBoundingRadius;
+        newMesh->mAutoBuildEdgeLists = mAutoBuildEdgeLists;
+        newMesh->mEdgeListsBuilt = mEdgeListsBuilt;
 
+#if !OGRE_NO_MESHLOD
         newMesh->mLodStrategyName = mLodStrategyName;
         newMesh->mIsLodManual = mIsLodManual;
         newMesh->mNumLods = mNumLods;
         newMesh->mMeshLodUsageList  = mMeshLodUsageList;
         newMesh->mLodValues         = mLodValues;
         newMesh->mAutoBuildEdgeLists= mAutoBuildEdgeLists;
+#endif
         // Unreference edge lists, otherwise we'll delete the same lot twice, build on demand
-        MeshLodUsageList::iterator lodi;
-        for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi) {
-            MeshLodUsage& lod = *lodi;
-            lod.edgeData = NULL;
-            // TODO: Copy manual LOD meshes
+        MeshLodUsageList::iterator lodi, lodOldi;
+        lodOldi = mMeshLodUsageList.begin();
+        for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi, ++lodOldi) {
+            MeshLodUsage& newLod = *lodi;
+            MeshLodUsage& lod = *lodOldi;
+            newLod.manualName = lod.manualName;
+            newLod.userValue = lod.userValue;
+            newLod.value = lod.value;
+            if (lod.edgeData) {
+                newLod.edgeData = lod.edgeData->clone();
         }
 
         newMesh->mVertexBufferUsage = mVertexBufferUsage;
@@ -369,9 +385,7 @@ namespace Ogre {
         // Keep prepared shadow volume info (buffers may already be prepared)
         newMesh->mPreparedForShadowVolumes = mPreparedForShadowVolumes;
 
-        // mEdgeListsBuilt and edgeData of mMeshLodUsageList
-        // will up to date on demand. Not copied since internal references, and mesh
-        // data may be altered
+        newMesh->mEdgeListsBuilt = mEdgeListsBuilt;
         
         // Clone vertex animation
         for (AnimationList::iterator i = mAnimationsList.begin();
@@ -424,6 +438,72 @@ namespace Ogre {
     void Mesh::_setBoundingSphereRadius(Real radius)
     {
         mBoundRadius = radius;
+    }
+    //-----------------------------------------------------------------------
+    void Mesh::_setBoneBoundingRadius(Real radius)
+    {
+        mBoneBoundingRadius = radius;
+    }
+    //-----------------------------------------------------------------------
+    void Mesh::_updateBoundsFromVertexBuffers(bool pad)
+    {
+        bool extendOnly = false; // First time we need full AABB of the given submesh, but on the second call just extend that one.
+        if (sharedVertexData){
+            _calcBoundsFromVertexBuffer(sharedVertexData, mAABB, mBoundRadius, extendOnly);
+            extendOnly = true;
+        }
+        for (size_t i = 0; i < mSubMeshList.size(); i++){
+            if (mSubMeshList[i]->vertexData){
+                _calcBoundsFromVertexBuffer(mSubMeshList[i]->vertexData, mAABB, mBoundRadius, extendOnly);
+                extendOnly = true;
+            }
+        }
+        if (pad)
+        {
+            Vector3 max = mAABB.getMaximum();
+            Vector3 min = mAABB.getMinimum();
+            // Pad out the AABB a little, helps with most bounds tests
+            Vector3 scaler = (max - min) * MeshManager::getSingleton().getBoundsPaddingFactor();
+            mAABB.setExtents(min - scaler, max + scaler);
+            // Pad out the sphere a little too
+            mBoundRadius = mBoundRadius + (mBoundRadius * MeshManager::getSingleton().getBoundsPaddingFactor());
+        }
+    }
+    void Mesh::_calcBoundsFromVertexBuffer(VertexData* vertexData, AxisAlignedBox& outAABB, Real& outRadius, bool extendOnly /*= false*/)
+    {
+        if (vertexData->vertexCount == 0) {
+            if (!extendOnly) {
+                outAABB = AxisAlignedBox(Vector3::ZERO, Vector3::ZERO);
+                outRadius = 0;
+            }
+            return;
+        }
+        const VertexElement* elemPos = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+        HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(elemPos->getSource());
+        
+        unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+
+        if (!extendOnly){
+            // init values
+            outRadius = 0;
+            float* pFloat;
+            elemPos->baseVertexPointerToElement(vertex, &pFloat);
+            Vector3 basePos(pFloat[0], pFloat[1], pFloat[2]);
+            outAABB.setExtents(basePos, basePos);
+        }
+        size_t vSize = vbuf->getVertexSize();
+        unsigned char* vEnd = vertex + vertexData->vertexCount * vSize;
+        Real radiusSqr = outRadius * outRadius;
+        // Loop through all vertices.
+        for (; vertex < vEnd; vertex += vSize) {
+            float* pFloat;
+            elemPos->baseVertexPointerToElement(vertex, &pFloat);
+            Vector3 pos(pFloat[0], pFloat[1], pFloat[2]);
+            outAABB.getMinimum().makeFloor(pos);
+            outAABB.getMaximum().makeCeil(pos);
+            radiusSqr = std::max<Real>(radiusSqr, pos.squaredLength());
+        }
+        outRadius = std::sqrt(radiusSqr);
     }
     //-----------------------------------------------------------------------
     void Mesh::setSkeletonName(const String& skelName)
@@ -642,7 +722,7 @@ namespace Ogre {
                 "The lowest weighted assignments beyond this limit have been removed, so "
                 "your animation may look slightly different. To eliminate this, reduce "
                 "the number of bone assignments per vertex on your mesh to " +
-                StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + ".");
+                StringConverter::toString(OGRE_MAX_BLEND_WEIGHTS) + ".", LML_CRITICAL);
             // we've adjusted them down to the max
             maxBones = OGRE_MAX_BLEND_WEIGHTS;
 
@@ -655,7 +735,7 @@ namespace Ogre {
                 "includes vertices without bone assignments. Those vertices will "
                 "transform to wrong position when skeletal animation enabled. "
                 "To eliminate this, assign at least one bone assignment per vertex "
-                "on your mesh.");
+                "on your mesh.", LML_CRITICAL);
         }
 
         return maxBones;
@@ -834,6 +914,135 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
+    Real distLineSegToPoint( const Vector3& line0, const Vector3& line1, const Vector3& pt )
+    {
+        Vector3 v01 = line1 - line0;
+        Real tt = v01.dotProduct( pt - line0 ) / std::max( v01.dotProduct(v01), std::numeric_limits<Real>::epsilon() );
+        tt = Math::Clamp( tt, Real(0.0f), Real(1.0f) );
+        Vector3 onLine = line0 + tt * v01;
+        return pt.distance( onLine );
+    }
+    //---------------------------------------------------------------------
+    Real _computeBoneBoundingRadiusHelper( VertexData* vertexData,
+        const Mesh::VertexBoneAssignmentList& boneAssignments,
+        const vector<Vector3>::type& bonePositions,
+        const vector< vector<ushort>::type >::type& boneChildren
+        )
+    {
+        vector<Vector3>::type vertexPositions;
+        {
+            // extract vertex positions
+            const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+            HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
+            // if usage is write only,
+            if ( !vbuf->hasShadowBuffer() && (vbuf->getUsage() & HardwareBuffer::HBU_WRITE_ONLY) )
+            {
+                // can't do it
+                return Real(0.0f);
+            }
+            vertexPositions.resize( vertexData->vertexCount );
+            unsigned char* vertex = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+            float* pFloat;
+
+            for(size_t i = 0; i < vertexData->vertexCount; ++i)
+            {
+                posElem->baseVertexPointerToElement(vertex, &pFloat);
+                vertexPositions[ i ] = Vector3( pFloat[0], pFloat[1], pFloat[2] );
+                vertex += vbuf->getVertexSize();
+            }
+            vbuf->unlock();
+        }
+        Real maxRadius = Real(0);
+        Real minWeight = Real(0.01);
+        // for each vertex-bone assignment,
+        for (Mesh::VertexBoneAssignmentList::const_iterator i = boneAssignments.begin(); i != boneAssignments.end(); ++i)
+        {
+            // if weight is close to zero, ignore
+            if (i->second.weight > minWeight)
+            {
+                // if we have a bounding box around all bone origins, we consider how far outside this box the
+                // current vertex could ever get (assuming it is only attached to the given bone, and the bones all have unity scale)
+                size_t iBone = i->second.boneIndex;
+                const Vector3& v = vertexPositions[ i->second.vertexIndex ];
+                Vector3 diff = v - bonePositions[ iBone ];
+                Real dist = diff.length();  // max distance of vertex v outside of bounding box
+                // if this bone has children, we can reduce the dist under the assumption that the children may rotate wrt their parent, but don't translate
+                for (size_t iChild = 0; iChild < boneChildren[iBone].size(); ++iChild)
+                {
+                    // given this assumption, we know that the bounding box will enclose both the bone origin as well as the origin of the child bone,
+                    // and therefore everything on a line segment between the bone origin and the child bone will be inside the bounding box as well
+                    size_t iChildBone = boneChildren[ iBone ][ iChild ];
+                    // compute distance from vertex to line segment between bones
+                    Real distChild = distLineSegToPoint( bonePositions[ iBone ], bonePositions[ iChildBone ], v );
+                    dist = std::min( dist, distChild );
+                }
+                // scale the distance by the weight, this prevents the radius from being over-inflated because of a vertex that is lightly influenced by a faraway bone
+                dist *= i->second.weight;
+                maxRadius = std::max( maxRadius, dist );
+            }
+        }
+        return maxRadius;
+    }
+    //---------------------------------------------------------------------
+    void Mesh::_computeBoneBoundingRadius()
+    {
+        if (mBoneBoundingRadius == Real(0) && ! mSkeleton.isNull())
+        {
+            Real radius = Real(0);
+            vector<Vector3>::type bonePositions;
+            vector< vector<ushort>::type >::type boneChildren;  // for each bone, a list of children
+            {
+                // extract binding pose bone positions, and also indices for child bones
+                size_t numBones = mSkeleton->getNumBones();
+                mSkeleton->setBindingPose();
+                mSkeleton->_updateTransforms();
+                bonePositions.resize( numBones );
+                boneChildren.resize( numBones );
+                // for each bone,
+                for (size_t iBone = 0; iBone < numBones; ++iBone)
+                {
+                    Bone* bone = mSkeleton->getBone( iBone );
+                    bonePositions[ iBone ] = bone->_getDerivedPosition();
+                    boneChildren[ iBone ].reserve( bone->numChildren() );
+                    for (size_t iChild = 0; iChild < bone->numChildren(); ++iChild)
+                    {
+                        Bone* child = static_cast<Bone*>( bone->getChild( iChild ) );
+                        boneChildren[ iBone ].push_back( child->getHandle() );
+                    }
+                }
+            }
+            if (sharedVertexData)
+            {
+                // check shared vertices
+                radius = _computeBoneBoundingRadiusHelper(sharedVertexData, mBoneAssignments, bonePositions, boneChildren);
+            }
+
+            // check submesh vertices
+            SubMeshList::const_iterator itor = mSubMeshList.begin();
+            SubMeshList::const_iterator end  = mSubMeshList.end();
+
+            while( itor != end )
+            {
+                SubMesh* submesh = *itor;
+                if (!submesh->useSharedVertices && submesh->vertexData)
+                {
+                    Real r = _computeBoneBoundingRadiusHelper(submesh->vertexData, submesh->mBoneAssignments, bonePositions, boneChildren);
+                    radius = std::max( radius, r );
+                }
+                ++itor;
+            }
+            if (radius > Real(0))
+            {
+                mBoneBoundingRadius = radius;
+            }
+            else
+            {
+                // fallback if we failed to find the vertices
+                mBoneBoundingRadius = mBoundRadius;
+            }
+        }
+    }
+    //---------------------------------------------------------------------
     void Mesh::_notifySkeleton(SkeletonPtr& pSkel)
     {
         mOldSkeleton = pSkel;
@@ -860,17 +1069,16 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
     {
+#if !OGRE_NO_MESHLOD
         assert( index < mMeshLodUsageList.size() );
         if (mIsLodManual && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
         {
             // Load the mesh now
             try {
-                String groupName = mMeshLodUsageList[index].manualGroup.empty() ? 
-                    mGroup : mMeshLodUsageList[index].manualGroup;
                 mMeshLodUsageList[index].manualMesh =
                     MeshManager::getSingleton().load(
                         mMeshLodUsageList[index].manualName,
-                        groupName);
+                        getGroup());
                 // get the edge data, if required
                 if (!mMeshLodUsageList[index].edgeData)
                 {
@@ -889,36 +1097,16 @@ namespace Ogre {
 
         }
         return mMeshLodUsageList[index];
+#else
+        return mMeshLodUsageList[0];
+#endif
     }
     //---------------------------------------------------------------------
-    void Mesh::createManualLodLevel(Real lodValue, const String& meshName, const String& groupName)
-    {
-        LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+
+	void Mesh::updateManualLodLevel(ushort index, const String& meshName)
+	{
 
         // Basic prerequisites
-        assert((mIsLodManual || mNumLods == 1) && "Generated LODs already in use!");
-
-        mIsLodManual = true;
-        MeshLodUsage lod;
-        lod.userValue = lodValue;
-        lod.value = lodStrategy->transformUserValue(lod.userValue);
-        lod.manualName = meshName;
-        lod.manualGroup = groupName.empty() ? mGroup : groupName;
-        lod.manualMesh.setNull();
-        lod.edgeData = 0;
-        mMeshLodUsageList.push_back(lod);
-        mLodValues.push_back( lod.value );
-        ++mNumLods;
-
-        lodStrategy->sort(mMeshLodUsageList);
-        std::sort( mLodValues.begin(), mLodValues.end() );
-    }
-    //---------------------------------------------------------------------
-    void Mesh::updateManualLodLevel(ushort index, const String& meshName)
-    {
-
-        // Basic prerequisites
-        assert(mIsLodManual && "Not using manual LODs!");
         assert(index != 0 && "Can't modify first LOD level (full detail)");
         assert(index < mMeshLodUsageList.size() && "Idndex out of bounds");
         // get lod
@@ -926,11 +1114,11 @@ namespace Ogre {
 
         lod->manualName = meshName;
         lod->manualMesh.setNull();
-        if (lod->edgeData) OGRE_DELETE lod->edgeData;
+        OGRE_DELETE lod->edgeData;
         lod->edgeData = 0;
     }
     //---------------------------------------------------------------------
-    void Mesh::_setLodInfo(unsigned short numLevels, bool isManual)
+    void Mesh::_setLodInfo(unsigned short numLevels)
     {
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 
@@ -945,7 +1133,6 @@ namespace Ogre {
         {
             (*i)->mLodFaceList.resize(numLevels - 1);
         }
-        mIsLodManual = isManual;
     }
     //---------------------------------------------------------------------
     void Mesh::_setLodUsage(unsigned short level, MeshLodUsage& usage)
@@ -959,6 +1146,10 @@ namespace Ogre {
 
         mMeshLodUsageList[level] = usage;
         mLodValues[level] = usage.userValue;
+
+        if(!mMeshLodUsageList[level].manualName.empty()){
+            mHasManualLodLevel = true;
+        }
     }
     //---------------------------------------------------------------------
     void Mesh::_setSubMeshLodFaceList(unsigned short subIdx, unsigned short level,
@@ -967,14 +1158,23 @@ namespace Ogre {
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 
         // Basic prerequisites
-        assert(!mIsLodManual && "Not using generated LODs!");
-        assert(subIdx <= mSubMeshList.size() && "Index out of bounds");
+        assert(mMeshLodUsageList[level].manualName.empty() && "Not using generated LODs!");
+        assert(subIdx < mSubMeshList.size() && "Index out of bounds");
         assert(level != 0 && "Can't modify first LOD level (full detail)");
-        assert(level <= mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
+        assert(level-1 < (unsigned short)mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
 
         SubMesh* sm = mSubMeshList[subIdx];
         sm->mLodFaceList[level - 1] = facedata;
-
+    }
+#endif
+    //---------------------------------------------------------------------
+    bool Mesh::_isManualLodLevel( unsigned short level ) const
+    {
+#if !OGRE_NO_MESHLOD
+        return !mMeshLodUsageList[level].manualName.empty();
+#else
+        return false;
+#endif
     }
     //---------------------------------------------------------------------
     ushort Mesh::_getSubMeshIndex(const String& name) const
@@ -986,18 +1186,16 @@ namespace Ogre {
 
         return i->second;
     }
-    //---------------------------------------------------------------------
+    //--------------------------------------------------------------------
     void Mesh::removeLodLevels(void)
     {
-        if (!mIsLodManual)
+#if !OGRE_NO_MESHLOD
+        // Remove data from SubMeshes
+        SubMeshList::iterator isub, isubend;
+        isubend = mSubMeshList.end();
+        for (isub = mSubMeshList.begin(); isub != isubend; ++isub)
         {
-            // Remove data from SubMeshes
-            SubMeshList::iterator isub, isubend;
-            isubend = mSubMeshList.end();
-            for (isub = mSubMeshList.begin(); isub != isubend; ++isub)
-            {
-                (*isub)->removeLodLevels();
-            }
+            (*isub)->removeLodLevels();
         }
 
         freeEdgeList();
@@ -1008,22 +1206,22 @@ namespace Ogre {
 
         // Reinitialise
         mNumLods = 1;
-        // Init first (manual) lod
-        MeshLodUsage lod;
-        lod.userValue = 0;
-        lod.value = lodStrategy->getBaseValue();
-        lod.edgeData = 0;
-        lod.manualMesh.setNull();
-        mMeshLodUsageList.push_back(lod);
+        mMeshLodUsageList.resize(1);
+        mMeshLodUsageList[0].edgeData = NULL;
+        // TODO: Shouldn't we rebuild edge lists after freeing them?
         mLodValues.push_back( lodStrategy->getBaseValue() );
-        mIsLodManual = false;
-
-
+#endif
     }
+
     //---------------------------------------------------------------------
     Real Mesh::getBoundingSphereRadius(void) const
     {
         return mBoundRadius;
+    }
+    //---------------------------------------------------------------------
+    Real Mesh::getBoneBoundingRadius(void) const
+    {
+        return mBoneBoundingRadius;
     }
     //---------------------------------------------------------------------
     void Mesh::setVertexBufferPolicy(HardwareBuffer::Usage vbUsage, bool shadowBuffer)
@@ -1213,7 +1411,7 @@ namespace Ogre {
                     tangentsCalc.build(targetSemantic, sourceTexCoordSet, index);
 
                 // If any vertex splitting happened, we have to give them bone assignments
-                if (getSkeletonName() != StringUtil::BLANK)
+                if (getSkeletonName() != BLANKSTRING)
                 {
                     for (TangentSpaceCalc::IndexRemapList::iterator r = res.indexesRemapped.begin(); 
                         r != res.indexesRemapped.end(); ++r)
@@ -1273,7 +1471,7 @@ namespace Ogre {
                     tangentsCalc.build(targetSemantic, sourceTexCoordSet, index);
 
                 // If any vertex splitting happened, we have to give them bone assignments
-                if (getSkeletonName() != StringUtil::BLANK)
+                if (getSkeletonName() != BLANKSTRING)
                 {
                     for (TangentSpaceCalc::IndexRemapList::iterator r = res.indexesRemapped.begin(); 
                         r != res.indexesRemapped.end(); ++r)
@@ -1420,16 +1618,14 @@ namespace Ogre {
     {
         if (mEdgeListsBuilt)
             return;
-
+#if !OGRE_NO_MESHLOD
         // Loop over LODs
         for (unsigned short lodIndex = 0; lodIndex < (unsigned short)mMeshLodUsageList.size(); ++lodIndex)
         {
             // use getLodLevel to enforce loading of manual mesh lods
             MeshLodUsage& usage = const_cast<MeshLodUsage&>(getLodLevel(lodIndex));
 
-            bool atLeastOneIndexSet = false;
-
-            if (mIsLodManual && lodIndex != 0)
+            if (!usage.manualName.empty() && lodIndex != 0)
             {
                 // Delegate edge building to manual mesh
                 // It should have already built it's own edge list while loading
@@ -1443,6 +1639,7 @@ namespace Ogre {
                 // Build
                 EdgeListBuilder eb;
                 size_t vertexSetCount = 0;
+                bool atLeastOneIndexSet = false;
 
                 if (sharedVertexData)
                 {
@@ -1517,6 +1714,54 @@ namespace Ogre {
                 }
             }
         }
+#else
+        // Build
+        EdgeListBuilder eb;
+        size_t vertexSetCount = 0;
+        if (sharedVertexData)
+        {
+            eb.addVertexData(sharedVertexData);
+            vertexSetCount++;
+        }
+
+        // Prepare the builder using the submesh information
+        SubMeshList::iterator i, iend;
+        iend = mSubMeshList.end();
+        for (i = mSubMeshList.begin(); i != iend; ++i)
+        {
+            SubMesh* s = *i;
+            if (s->operationType != RenderOperation::OT_TRIANGLE_FAN && 
+                s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
+                s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
+            {
+                continue;
+            }
+            if (s->useSharedVertices)
+            {
+                eb.addIndexData(s->indexData, 0, s->operationType);
+            }
+            else if(s->isBuildEdgesEnabled())
+            {
+                // own vertex data, add it and reference it directly
+                eb.addVertexData(s->vertexData);
+                // Base index data
+                eb.addIndexData(s->indexData, vertexSetCount++,
+                    s->operationType);
+            }
+        }
+
+            mMeshLodUsageList[0].edgeData = eb.build();
+
+#if OGRE_DEBUG_MODE
+            // Override default log
+            Log* log = LogManager::getSingleton().createLog(
+                mName + "_lod0"+
+                "_prepshadow.log", false, false);
+            mMeshLodUsageList[0].edgeData->log(log);
+            // clean up log & close file handle
+            LogManager::getSingleton().destroyLog(log);
+#endif
+#endif
         mEdgeListsBuilt = true;
     }
     //---------------------------------------------------------------------
@@ -1524,7 +1769,7 @@ namespace Ogre {
     {
         if (!mEdgeListsBuilt)
             return;
-
+#if !OGRE_NO_MESHLOD
         // Loop over LODs
         MeshLodUsageList::iterator i, iend;
         iend = mMeshLodUsageList.end();
@@ -1533,7 +1778,7 @@ namespace Ogre {
         {
             MeshLodUsage& usage = *i;
 
-            if (!mIsLodManual || index == 0)
+            if (usage.manualName.empty() || index == 0)
             {
                 // Only delete if we own this data
                 // Manual LODs > 0 own their own
@@ -1541,7 +1786,10 @@ namespace Ogre {
             }
             usage.edgeData = NULL;
         }
-
+#else
+        OGRE_DELETE mMeshLodUsageList[0].edgeData;
+        mMeshLodUsageList[0].edgeData = NULL;
+#endif
         mEdgeListsBuilt = false;
     }
     //---------------------------------------------------------------------
@@ -1577,13 +1825,22 @@ namespace Ogre {
         {
             buildEdgeList();
         }
-
+#if !OGRE_NO_MESHLOD
         return getLodLevel(lodIndex).edgeData;
+#else
+        assert(lodIndex == 0);
+        return mMeshLodUsageList[0].edgeData;
+#endif
     }
     //---------------------------------------------------------------------
     const EdgeData* Mesh::getEdgeList(unsigned short lodIndex) const
     {
+#if !OGRE_NO_MESHLOD
         return getLodLevel(lodIndex).edgeData;
+#else
+        assert(lodIndex == 0);
+        return mMeshLodUsageList[0].edgeData;
+#endif
     }
     //---------------------------------------------------------------------
     void Mesh::prepareMatricesForVertexBlend(const Matrix4** blendMatrices,
@@ -2138,7 +2395,7 @@ namespace Ogre {
             if ((*i)->getName() == name)
                 return *i;
         }
-        StringUtil::StrStreamType str;
+        StringStream str;
         str << "No pose called " << name << " found in Mesh " << mName;
         OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
             str.str(),
@@ -2172,7 +2429,7 @@ namespace Ogre {
                 return;
             }
         }
-        StringUtil::StrStreamType str;
+        StringStream str;
         str << "No pose called " << name << " found in Mesh " << mName;
         OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
             str.str(),

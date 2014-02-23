@@ -29,9 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-#include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
-#include "OgreVector4.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
 

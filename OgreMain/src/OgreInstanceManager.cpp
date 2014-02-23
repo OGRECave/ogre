@@ -36,8 +36,9 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreSceneManager.h"
-#include "OgreMeshSerializer.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreSceneNode.h"
+#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {
@@ -690,7 +691,7 @@ namespace Ogre
 
                 IndicesMap::iterator indIt = indicesMap.begin();
                 IndicesMap::iterator endIndIt = indicesMap.end();
-                for (; indIt != endIndIt; indIt++) 
+                for (; indIt != endIndIt; ++indIt)
                 {
                     memcpy(newLock + vertexSize * indIt->second, oldLock + vertexSize * indIt->first, vertexSize);
                 }
@@ -716,7 +717,7 @@ namespace Ogre
 
             // Transfer bone assignments to the submesh
             size_t offset = curVertexOffset + newVertexData->vertexCount;
-            for (; it != end; it++)
+            for (; it != end; ++it)
             {
                 size_t vertexIdx = (*it).first;
                 if (vertexIdx > offset)

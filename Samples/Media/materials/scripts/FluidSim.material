@@ -1,0 +1,861 @@
+/*vertex_program Ogre/FluidSim/VS_GRID hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point VS_GRID
+	target vs_4_0
+
+	default_params
+	{
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0
+	}
+}
+
+geometry_program Ogre/FluidSim/GS_ARRAY hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point GS_ARRAY
+	target gs_4_0
+
+	default_params
+	{
+
+	}
+}
+
+
+fragment_program Ogre/FluidSim/PS_ADVECT_MACCORMACK hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_ADVECT_MACCORMACK
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_advectAsTemperature int 0
+		param_named g_treatAsLiquidVelocity int 0
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0
+		param_named g_timestep float 0.0
+		param_named g_decay float 0.0
+		param_named g_temperatureLoss float 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_ADVECT hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_ADVECT
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_advectAsTemperature int 0
+		param_named g_treatAsLiquidVelocity int 0
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0	
+		param_named g_timestep float 0.0
+		param_named g_decay float 0.0
+		param_named g_temperatureLoss float 0.0		
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_VORTICITY hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_VORTICITY
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_CONFINEMENT hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_CONFINEMENT
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_treatAsLiquidVelocity int 0
+		param_named g_timestep float 0.0
+		param_named g_vortConfinementScale float 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_DIFFUSE hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_DIFFUSE
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_timestep float 0.0
+		param_named g_viscosity float 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_DIVERGENCE hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_DIVERGENCE
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_SCALAR_JACOBI hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_SCALAR_JACOBI
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_PROJECT hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_PROJECT
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_treatAsLiquidVelocity int 0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_SIGNED_DISTANCE_TO_LIQUIDHEIGHT hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_SIGNED_DISTANCE_TO_LIQUIDHEIGHT
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_INJECT_LIQUID hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_INJECT_LIQUID
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_APPLY_AIR_PRESSURE hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_APPLY_AIR_PRESSURE
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_treatAsLiquidVelocity int 0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_REDISTANCING hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_REDISTANCING
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_EXTRAPOLATE_VELOCITY hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_EXTRAPOLATE_VELOCITY
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_treatAsLiquidVelocity int 0
+		param_named g_textureWidth float 0.0
+		param_named g_textureHeight float 0.0
+		param_named g_textureDepth float 0.0		
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_LIQUID_STREAM hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_LIQUID_STREAM
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_radius float 0.0
+		param_named g_center float 0.0
+		param_named g_color float 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_APPLY_GRAVITY hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_APPLY_GRAVITY
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_treatAsLiquidVelocity int 0
+		param_named g_gravity float 9.8
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_GAUSSIAN hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_GAUSSIAN
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_radius float 0.0
+		param_named g_center float 0.0
+		param_named g_color float 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_COPY_TEXURE hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_COPY_TEXURE
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_color float 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_ADD_DERIVATIVE_VEL
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_color float 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_ADD_DERIVATIVE_VEL
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_ADD_DERIVATIVE_VEL
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_ADD_DERIVATIVE_VEL
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_STATIC_OBSTACLE hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_STATIC_OBSTACLE
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_DYNAMIC_OBSTACLE_BOX hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_DYNAMIC_OBSTACLE_BOX
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_obstBoxVelocity float4 0.0 0.0 0.0 0.0
+		param_named g_obstBoxRTUcorner float4 0.0 0.0 0.0 0.0
+		param_named g_obstBoxLBDcorner float4 0.0 0.0 0.0 0.0
+	}	
+}
+
+fragment_program Ogre/FluidSim/PS_DRAW_TEXTURE hlsl
+{
+	source HairFluidSim.hlsl
+	entry_point PS_DRAW_TEXTURE
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_drawTextureNumber int 1
+		param_named g_textureDepth float 0.0
+		param_named g_color float 0.0		
+	}	
+}
+
+material Ogre/FluidSim
+{
+	technique AdvectMACCORMACK
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_ADVECT_MACCORMACK
+			{
+			
+			}
+			
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique Advect
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_ADVECT
+			{
+			
+			}
+			
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique Vorticity
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_VORTICITY
+			{
+			
+			}
+			
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique Confinement
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_CONFINEMENT
+			{
+			
+			}
+			scene_blend add
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}	
+	technique Diffuse
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_DIFFUSE
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique Divergence
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_DIVERGENCE
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique ScalarJacobi
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_SCALAR_JACOBI
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}	
+	technique Project
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_PROJECT
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}	
+	technique InitLevelSetToLiquidHeight
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_SIGNED_DISTANCE_TO_LIQUIDHEIGHT
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique InjectLiquid
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_INJECT_LIQUID
+			{
+			
+			}
+			scene_blend add
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}	
+	technique AirPressure
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_APPLY_AIR_PRESSURE
+			{
+			
+			}
+			scene_blend add
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}	
+	technique Redistance
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_REDISTANCING
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique ExtrapolateVelocity
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_EXTRAPOLATE_VELOCITY
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique LiquidStream_LevelSet
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_LIQUID_STREAM
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique LiquidStream_Velocity
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_LIQUID_STREAM
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique Gravity
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_APPLY_GRAVITY
+			{
+			
+			}
+			scene_blend add
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique Gaussian
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_GAUSSIAN
+			{
+			
+			}
+			scene_blend add
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique CopyTexture
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_COPY_TEXURE
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}
+	technique AddDerivativeVelocity
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_ADD_DERIVATIVE_VEL
+			{
+			
+			}
+			scene_blend add
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}	
+	technique StaticObstacleTriangles
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_STATIC_OBSTACLE
+			{
+			
+			}
+			cull_hardware none
+			cull_software back
+			depth_check off
+			depth_write off
+		}
+	}
+	technique StaticObstacleLines
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_STATIC_OBSTACLE
+			{
+			
+			}
+			cull_hardware none
+			cull_software back
+			depth_check off
+			depth_write off
+		}
+	}	
+	technique DynamicObstacleBox
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+			geometry_program_ref Ogre/FluidSim/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/FluidSim/PS_DYNAMIC_OBSTACLE_BOX
+			{
+			
+			}
+			cull_hardware none
+			cull_software back
+			depth_check off
+			depth_write off
+		}
+	}
+	technique DrawTexture
+	{
+		pass
+		{
+			vertex_program_ref Ogre/FluidSim/VS_GRID
+			{
+			
+			}
+
+			fragment_program_ref Ogre/FluidSim/PS_DRAW_TEXTURE
+			{
+			
+			}
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		}
+	}	
+}*/

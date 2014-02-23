@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreSerializer.h"
 #include "OgreLogManager.h"
-#include "OgreDataStream.h"
 #include "OgreException.h"
 #include "OgreVector3.h"
 #include "OgreQuaternion.h"
@@ -37,17 +36,18 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    /// stream overhead = ID + size
-    const size_t STREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
     const uint16 HEADER_STREAM_ID = 0x1000;
     const uint16 OTHER_ENDIAN_HEADER_STREAM_ID = 0x0010;
     //---------------------------------------------------------------------
-    Serializer::Serializer()
+    Serializer::Serializer() :
+        mVersion("[Serializer_v1.00]"), // Version number
+        mFlipEndian(false)
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        , mReportChunkErrors(true)
+#endif
     {
-        // Version number
-        mVersion = "[Serializer_v1.00]";
-        mFlipEndian = false;
     }
+
     //---------------------------------------------------------------------
     Serializer::~Serializer()
     {
@@ -126,6 +126,16 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Serializer::writeChunkHeader(uint16 id, size_t size)
     {
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        if (!mChunkSizeStack.empty()){
+            size_t pos = mStream->tell();
+            if (pos != static_cast<size_t>(mChunkSizeStack.back()) && mReportChunkErrors){
+                LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: '" + mStream->getName()
+                    + "' Chunk id: " + StringConverter::toString(id));
+            }
+            mChunkSizeStack.back() = pos + size;
+        }
+#endif
         writeShorts(&id, 1);
         uint32 uint32size = static_cast<uint32>(size);
         writeInts(&uint32size, 1);
@@ -191,17 +201,17 @@ namespace Ogre {
     {
         if(mFlipEndian)
         {
-            unsigned int * pIntToWrite = (unsigned int *)malloc(sizeof(unsigned int) * count);
-            memcpy(pIntToWrite, pInt, sizeof(unsigned int) * count);
+            uint32 * pIntToWrite = (uint32 *)malloc(sizeof(uint32) * count);
+            memcpy(pIntToWrite, pInt, sizeof(uint32) * count);
             
-            flipToLittleEndian(pIntToWrite, sizeof(unsigned int), count);
-            writeData(pIntToWrite, sizeof(unsigned int), count);
+            flipToLittleEndian(pIntToWrite, sizeof(uint32), count);
+            writeData(pIntToWrite, sizeof(uint32), count);
             
             free(pIntToWrite);
         }
         else
         {
-            writeData(pInt, sizeof(unsigned int), count);
+            writeData(pInt, sizeof(uint32), count);
         }
     }
     //---------------------------------------------------------------------
@@ -270,10 +280,21 @@ namespace Ogre {
     //---------------------------------------------------------------------
     unsigned short Serializer::readChunk(DataStreamPtr& stream)
     {
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        size_t pos = stream->tell();
+#endif
         unsigned short id;
         readShorts(stream, &id, 1);
         
         readInts(stream, &mCurrentstreamLen, 1);
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        if (!mChunkSizeStack.empty() && !stream->eof()){
+            if (pos != static_cast<size_t>(mChunkSizeStack.back()) && mReportChunkErrors){
+                LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: '" + stream->getName() + "' Chunk id: " + StringConverter::toString(id));
+            }
+            mChunkSizeStack.back() = pos + mCurrentstreamLen;
+        }
+#endif
         return id;
     }
     //---------------------------------------------------------------------
@@ -320,10 +341,10 @@ namespace Ogre {
         flipFromLittleEndian(pDest, sizeof(unsigned short), count);
     }
     //---------------------------------------------------------------------
-    void Serializer::readInts(DataStreamPtr& stream, unsigned int* pDest, size_t count)
+    void Serializer::readInts(DataStreamPtr& stream, uint32* pDest, size_t count)
     {
-        stream->read(pDest, sizeof(unsigned int) * count);
-        flipFromLittleEndian(pDest, sizeof(unsigned int), count);
+        stream->read(pDest, sizeof(uint32) * count);
+        flipFromLittleEndian(pDest, sizeof(uint32), count);
     }
     //---------------------------------------------------------------------
     String Serializer::readString(DataStreamPtr& stream, size_t numChars)
@@ -399,14 +420,53 @@ namespace Ogre {
     
     void Serializer::flipEndian(void * pData, size_t size)
     {
-        char swapByte;
         for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
         {
-            swapByte = *(char *)((size_t)pData + byteIndex);
+            char swapByte = *(char *)((size_t)pData + byteIndex);
             *(char *)((size_t)pData + byteIndex) = *(char *)((size_t)pData + size - byteIndex - 1);
             *(char *)((size_t)pData + size - byteIndex - 1) = swapByte;
         }
     }
-    
+
+    size_t Serializer::calcChunkHeaderSize()
+    {
+        return sizeof(uint16) + sizeof(uint32);
+    }
+
+    size_t Serializer::calcStringSize( const String& string )
+    {
+        // string + terminating \n character
+        return string.length() + 1;
+    }
+
+    void Serializer::pushInnerChunk(const DataStreamPtr& stream)
+    {
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        mChunkSizeStack.push_back(stream->tell());
+#endif
+    }
+    void Serializer::backpedalChunkHeader(DataStreamPtr& stream)
+    {
+        if (!stream->eof()){
+            stream->skip(-(int)calcChunkHeaderSize());
+        }
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        mChunkSizeStack.back() = stream->tell();
+#endif
+    }
+    void Serializer::popInnerChunk(const DataStreamPtr& stream)
+    {
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        if (!mChunkSizeStack.empty()){
+            size_t pos = stream->tell();
+            if (pos != static_cast<size_t>(mChunkSizeStack.back()) && !stream->eof() && mReportChunkErrors){
+                LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: " + stream->getName());
+            }
+
+            mChunkSizeStack.pop_back();
+        }
+#endif
+    }
+
 }
 

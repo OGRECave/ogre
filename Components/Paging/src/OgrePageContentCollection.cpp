@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgrePageContentCollection.h"
 #include "OgrePageContentCollectionFactory.h"
 #include "OgreStreamSerialiser.h"
-#include "OgrePageContent.h"
 #include "OgrePage.h"
 
 namespace Ogre

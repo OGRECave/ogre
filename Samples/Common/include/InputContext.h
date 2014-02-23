@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@
 #ifndef __InputContext_H__
 #define __InputContext_H__
 
-#include "Ogre.h"
 #include "OIS.h"
 
 #if OIS_VERSION >= 0x010300     //  OIS_VERSION >= 1.3.0

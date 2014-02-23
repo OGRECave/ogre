@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -36,6 +36,7 @@ namespace Ogre {
         mOperationType(RenderOperation::OT_TRIANGLE_LIST),
         mResetsEveryUpdate(false),
         mResetRequested(true),
+        mSourceRenderable(0),
         mMaxVertexCount(1000)
     {
         mVertexData = OGRE_NEW VertexData;
@@ -58,7 +59,7 @@ namespace Ogre {
 
         if (mMaterial.isNull())
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + materialName,
-                "RenderToVertexBuffer::setRenderToBufferMaterialName" );
+                         "RenderToVertexBuffer::setRenderToBufferMaterialName" );
 
         /* Ensure that the new material was loaded (will not load again if
            already loaded anyway)

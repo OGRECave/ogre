@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __Vector3_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMath.h"
 #include "OgreQuaternion.h"
 
 namespace Ogre
@@ -54,6 +53,10 @@ namespace Ogre
         Real x, y, z;
 
     public:
+        /** Default constructor.
+            @note
+                It does <b>NOT</b> initialize the vector for efficiency.
+        */
         inline Vector3()
         {
         }

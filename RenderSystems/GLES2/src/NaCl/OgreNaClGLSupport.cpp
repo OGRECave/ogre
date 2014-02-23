@@ -142,7 +142,7 @@ namespace Ogre {
     
     String NaClGLSupport::validateConfig(void)
     {
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
     
     void NaClGLSupport::setConfigOption(const String &name, const String &value)

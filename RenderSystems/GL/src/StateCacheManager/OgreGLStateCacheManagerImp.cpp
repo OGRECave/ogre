@@ -110,9 +110,11 @@ namespace Ogre {
         
         mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
-        
-        mEnableVector.reserve(10);
-        mEnableVector.clear();
+
+#if !(OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER <= 1500)
+        mBoolStateMap.reserve(10);
+#endif
+        mBoolStateMap.clear();
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
@@ -160,7 +162,7 @@ namespace Ogre {
         mColourMask.clear();
         mClearColour.clear();
         mActiveBufferMap.clear();
-        mEnableVector.clear();
+        mBoolStateMap.clear();
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
     }
@@ -392,28 +394,18 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setEnabled(GLenum flag)
+    void GLStateCacheManagerImp::setEnabled(GLenum flag, bool enabled)
     {
-        bool found = std::find(mEnableVector.begin(), mEnableVector.end(), flag) != mEnableVector.end();
-        if(!found)
+        if (mBoolStateMap[flag] == enabled)
         {
-            mEnableVector.push_back(flag);
-            
+            glDisable(flag);
+        }
+        else
+        {
             glEnable(flag);
         }
     }
-    
-    void GLStateCacheManagerImp::setDisabled(GLenum flag)
-    {
-        vector<GLenum>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
-        if(iter != mEnableVector.end())
-        {
-            mEnableVector.erase(iter);
-            
-            glDisable(flag);
-        }
-    }
-    
+
     void GLStateCacheManagerImp::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
         if((mViewport[0] != x) ||

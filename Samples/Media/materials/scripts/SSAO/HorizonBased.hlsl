@@ -6,14 +6,19 @@ SamplerState g_samLinear
 	AddressW = Wrap;
 };
 
-uniform Texture2D sMRT1; // fragment normals
-uniform Texture2D sMRT2; // view space position, remember that we are looking down the negative Z axis!!!
-uniform Texture2D sRand; // MxN random texture, M sets of N precomputed low-discrepancy samples
+uniform Texture2D sMRT1 : register(s0); // fragment normals
+uniform Texture2D sMRT2 : register(s1); // view space position, remember that we are looking down the negative Z axis!!!
+uniform Texture2D sRand : register(s2); // MxN random texture, M sets of N precomputed low-discrepancy samples
+
+struct fragmentIn
+{
+	float4 position : SV_POSITION;
+    float2 uv : TEXCOORD0;
+};
 
 float4 HorizonBased_fp
 (
-	float4 position : SV_POSITION,
-    in float2 uv : TEXCOORD0,
+	fragmentIn input,
     
     uniform float4 cViewportSize, // (viewport_width, viewport_height, inverse_viewport_width, inverse_viewport_height)
     uniform float cFov, // vertical field of view in radians
@@ -28,8 +33,8 @@ float4 HorizonBased_fp
     const float numSteps = 7; // number of samples/steps along a direction
     const float numDirections = 4; // number of sampling directions in uv space
     
-    float3 p = sMRT2.Sample(g_samLinear, uv).xyz; // the current fragment in view space
-    float3 pointNormal = sMRT1.Sample(g_samLinear, uv).xyz; // the fragment normal
+    float3 p = sMRT2.Sample(g_samLinear, input.uv).xyz; // the current fragment in view space
+    float3 pointNormal = sMRT1.Sample(g_samLinear, input.uv).xyz; // the fragment normal
 
     float Ruv = 0; // radius of influence in screen space
     float R = 0; // radius of influence in world space
@@ -63,7 +68,7 @@ float4 HorizonBased_fp
             // omitted by the distance attenuation (W(R) = 0 by definition)
             // Therefore we add a extra step and don't use the last sample.
 
-    float3 randomValues = sRand.Sample(g_samLinear, (uv * cViewportSize.xy) / 4).xyz; //4px tiles
+    float3 randomValues = sRand.Sample(g_samLinear, (input.uv * cViewportSize.xy) / 4).xyz; //4px tiles
     float2x2 rotationMatrix;
     rotationMatrix._m00 = (randomValues.x - 0.5) * 2;
     rotationMatrix._m01 = (randomValues.y - 0.5) * 2;
@@ -88,7 +93,7 @@ float4 HorizonBased_fp
 
         /*[unroll]*/ for (int j = 1; j <= numSteps; j++) // sample along a direction, needs to start at one, for the sake of the next line
         {
-            sampleUV = uv + ((jitter + j) * sampleDirection); // jitter the step a little bit
+            sampleUV = input.uv + ((jitter + j) * sampleDirection); // jitter the step a little bit
             
             sample = sMRT2.SampleLevel(g_samLinear, sampleUV, 0).xyz; // the sample in view space
             sampleVector = (sample - p);

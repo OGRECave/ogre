@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgrePagedWorldSection.h"
 #include "OgrePageStrategy.h"
 #include "OgreStreamSerialiser.h"
-#include "OgreException.h"
 #include "OgrePagedWorld.h"
 #include "OgrePageManager.h"
 #include "OgrePage.h"
@@ -42,7 +41,7 @@ namespace Ogre
     const uint16 PagedWorldSection::CHUNK_VERSION = 1;
     //---------------------------------------------------------------------
     PagedWorldSection::PagedWorldSection(const String& name, PagedWorld* parent, SceneManager* sm)
-        : mName(name), mParent(parent), mStrategy(0), mPageProvider(0), mSceneMgr(sm)
+        : mName(name), mParent(parent), mStrategy(0), mStrategyData(0), mPageProvider(0), mSceneMgr(sm)
     {
     }
     //---------------------------------------------------------------------

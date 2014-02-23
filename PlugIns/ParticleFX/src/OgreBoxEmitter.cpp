@@ -53,16 +53,16 @@ namespace Ogre {
         yOff = Math::SymmetricRandom() * mYRange;
         zOff = Math::SymmetricRandom() * mZRange;
 
-        pParticle->position = mPosition + xOff + yOff + zOff;
+        pParticle->mPosition = mPosition + xOff + yOff + zOff;
         
 
         // Generate complex data by reference
-        genEmissionColour(pParticle->colour);
-        genEmissionDirection( pParticle->position, pParticle->direction );
-        genEmissionVelocity(pParticle->direction);
+        genEmissionColour(pParticle->mColour);
+        genEmissionDirection( pParticle->mPosition, pParticle->mDirection );
+        genEmissionVelocity(pParticle->mDirection);
 
         // Generate simpler data
-        pParticle->timeToLive = pParticle->totalTimeToLive = genEmissionTTL();
+        pParticle->mTimeToLive = pParticle->mTotalTimeToLive = genEmissionTTL();
         
     }
 

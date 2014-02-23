@@ -27,7 +27,9 @@ THE SOFTWARE.
 #include "OgreVolumeOctreeNode.h"
 
 #include "OgreVolumeMeshBuilder.h"
-
+#include "OgreVolumeSource.h"
+#include "OgreVolumeOctreeNodeSplitPolicy.h"
+#include "OgreSceneManager.h"
 
 namespace Ogre {
 namespace Volume {
@@ -156,10 +158,10 @@ namespace Volume {
             buildOctreeGridLines(manual); 
             manual->end();
         
-            StringUtil::StrStreamType meshName;
+            StringStream meshName;
             meshName << "VolumeOctreeGridMesh" << mNodeI;
             manual->convertToMesh(meshName.str());
-            StringUtil::StrStreamType entityName;
+            StringStream entityName;
             entityName << "VolumeOctreeGrid" << mNodeI;
             mOctreeGrid = sceneManager->createEntity(entityName.str(), meshName.str());
         }

@@ -1,12 +1,13 @@
 #include "SegmentedDynamicLightManager.h"
-#include <OgreTextureManager.h>
-#include <OgreCamera.h>
-#include <OgreSceneManager.h>
-#include <OgreHardwarePixelBuffer.h>
-#include <OgreRenderable.h>
-#include <OgreBitwise.h>
-#include <OgrePixelFormat.h>
-#include <OgreRoot.h>
+#include "OgreTextureManager.h"
+#include "OgreCamera.h"
+#include "OgreSceneManager.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderable.h"
+#include "OgreBitwise.h"
+#include "OgrePixelFormat.h"
+#include "OgreRoot.h"
+#include "OgreViewport.h"
 
 #define SDL_LIGHT_DATA_SIZE 3 // 12 floats divided by 4 slots (rgba) 
 

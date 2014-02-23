@@ -30,9 +30,9 @@ THE SOFTWARE.
 #define __Log_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
-#include "OgreHeaderPrefix.h"
+#include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
+#include "OgreHeaderPrefix.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
 namespace pp
@@ -204,7 +204,7 @@ namespace Ogre {
             Log* mTarget;
             LogMessageLevel mLevel;
             bool mMaskDebug;
-            typedef StringUtil::StrStreamType BaseStream;
+            typedef StringStream BaseStream;
             BaseStream mCache;
 
         public:
@@ -244,7 +244,7 @@ namespace Ogre {
             {
                                 (void)v;
                 mTarget->logMessage(mCache.str(), mLevel, mMaskDebug);
-                mCache.str(StringUtil::BLANK);
+                mCache.str(BLANKSTRING);
                 return *this;
             }
 

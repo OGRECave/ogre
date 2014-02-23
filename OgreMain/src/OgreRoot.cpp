@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreControllerManager.h"
 #include "OgreLogManager.h"
-#include "OgreMath.h"
 #include "OgreDynLibManager.h"
 #include "OgreDynLib.h"
 #include "OgreConfigFile.h"
@@ -46,9 +45,7 @@ THE SOFTWARE.
 #include "OgreParticleSystemManager.h"
 #include "OgreOldSkeletonManager.h"
 #include "OgreProfiler.h"
-#include "OgreErrorDialog.h"
 #include "OgreConfigDialog.h"
-#include "OgreStringConverter.h"
 #include "OgreArchiveManager.h"
 #include "OgrePlugin.h"
 #include "OgreFileSystem.h"
@@ -85,8 +82,8 @@ THE SOFTWARE.
 #include "OgreScriptCompiler.h"
 #include "OgreWindowEventUtilities.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#  include "macUtils.h"
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#include "macUtils.h"
 #endif
 #if OGRE_NO_PVRTC_CODEC == 0
 #  include "OgrePVRTCCodec.h"
@@ -124,6 +121,7 @@ namespace Ogre {
       , mFrameSmoothingTime(0.0f)
       , mRemoveQueueStructuresOnClear(false)
       , mDefaultMinPixelSize(0)
+      , mFreqUpdatedBuffersUploadOption(HardwareBuffer::HBU_DEFAULT)
       , mNextMovableObjectTypeFlag(1)
       , mIsInitialised(false)
       , mIsBlendIndicesGpuRedundant(true)
@@ -209,12 +207,6 @@ namespace Ogre {
 
         // LOD strategy manager
         mLodStrategyManager = OGRE_NEW LodStrategyManager();
-
-        // Queued Progressive Mesh Generator Worker
-        mPMWorker = OGRE_NEW PMWorker();
-
-        // Queued Progressive Mesh Generator Injector
-        mPMInjector = OGRE_NEW PMInjector();
 
 #if OGRE_PROFILING
         // Profiler
@@ -320,8 +312,6 @@ namespace Ogre {
 #endif
 
         OGRE_DELETE mLodStrategyManager;
-        OGRE_DELETE mPMWorker;
-        OGRE_DELETE mPMInjector;
 
         OGRE_DELETE mArchiveManager;
 
@@ -336,10 +326,8 @@ namespace Ogre {
         OGRE_DELETE mMeshManager;
         OGRE_DELETE mParticleManager;
 
-        if( mControllerManager )
-            OGRE_DELETE mControllerManager;
-        if (mHighLevelGpuProgramManager)
-            OGRE_DELETE mHighLevelGpuProgramManager;
+        OGRE_DELETE mControllerManager;
+        OGRE_DELETE mHighLevelGpuProgramManager;
 
         unloadPlugins();
         OGRE_DELETE mMaterialManager;
@@ -668,7 +656,7 @@ namespace Ogre {
         // .rendercaps manager
         RenderSystemCapabilitiesManager& rscManager = RenderSystemCapabilitiesManager::getSingleton();
         // caller wants to load custom RenderSystemCapabilities form a config file
-        if(customCapabilitiesConfig != StringUtil::BLANK)
+        if(customCapabilitiesConfig != BLANKSTRING)
         {
             ConfigFile cfg;
             cfg.load(customCapabilitiesConfig, "\t:=", false);
@@ -679,7 +667,18 @@ namespace Ogre {
             while(iter.hasMoreElements())
             {
                 String archType = iter.peekNextKey();
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 String filename = iter.getNext();
+
+                // Only adjust relative directories
+                if (!StringUtil::startsWith(filename, "/", false))
+                {
+                    filename = StringUtil::replaceAll(filename, "../", "");
+                    filename = String(macBundlePath() + "/Contents/Resources/" + filename);
+                }
+#else
+                String filename = iter.getNext();
+#endif
 
                 rscManager.parseCapabilitiesFromArchive(filename, archType, true);
             }
@@ -812,87 +811,65 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::addFrameListener(FrameListener* newListener)
     {
-        // Check if the specified listener is scheduled for removal
-        set<FrameListener *>::type::iterator i = mRemovedFrameListeners.find(newListener);
-
-        // If yes, cancel the removal. Otherwise add it to other listeners.
-        if (i != mRemovedFrameListeners.end())
-            mRemovedFrameListeners.erase(*i);
-        else
-            mFrameListeners.insert(newListener); // Insert, unique only (set)
+        mRemovedFrameListeners.erase(newListener);
+        mAddedFrameListeners.insert(newListener);
     }
-
     //-----------------------------------------------------------------------
     void Root::removeFrameListener(FrameListener* oldListener)
     {
-        // Remove, 1 only (set), and only when this listener was added before.
-        if( mFrameListeners.find( oldListener ) != mFrameListeners.end() )
-            mRemovedFrameListeners.insert(oldListener);
+        mAddedFrameListeners.erase(oldListener);
+        mRemovedFrameListeners.insert(oldListener);
+    }
+    //-----------------------------------------------------------------------
+    void Root::_syncAddedRemovedFrameListeners()
+    {
+        for (set<FrameListener*>::type::iterator i = mRemovedFrameListeners.begin(); i != mRemovedFrameListeners.end(); ++i)
+            mFrameListeners.erase(*i);
+        mRemovedFrameListeners.clear();
+
+        for (set<FrameListener*>::type::iterator i = mAddedFrameListeners.begin(); i != mAddedFrameListeners.end(); ++i)
+            mFrameListeners.insert(*i);
+        mAddedFrameListeners.clear();
     }
     //-----------------------------------------------------------------------
     bool Root::_fireFrameStarted(FrameEvent& evt)
     {
         OgreProfileBeginGroup("Frame", OGREPROF_GENERAL);
-
-        // Remove all marked listeners
-        set<FrameListener*>::type::iterator i;
-        for (i = mRemovedFrameListeners.begin();
-            i != mRemovedFrameListeners.end(); i++)
-        {
-            mFrameListeners.erase(*i);
-        }
-        mRemovedFrameListeners.clear();
+        _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
-        for (i= mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if (!(*i)->frameStarted(evt))
                 return false;
         }
 
         return true;
-
     }
     //-----------------------------------------------------------------------
     bool Root::_fireFrameRenderingQueued(FrameEvent& evt)
     {
         // Increment next frame number
         ++mNextFrame;
-
-        // Remove all marked listeners
-        set<FrameListener*>::type::iterator i;
-        for (i = mRemovedFrameListeners.begin();
-            i != mRemovedFrameListeners.end(); i++)
-        {
-            mFrameListeners.erase(*i);
-        }
-        mRemovedFrameListeners.clear();
+        _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
-        for (i= mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if (!(*i)->frameRenderingQueued(evt))
                 return false;
         }
 
         return true;
-
     }
     //-----------------------------------------------------------------------
     bool Root::_fireFrameEnded(FrameEvent& evt)
     {
-        // Remove all marked listeners
-        set<FrameListener*>::type::iterator i;
-        for (i = mRemovedFrameListeners.begin();
-            i != mRemovedFrameListeners.end(); i++)
-        {
-            mFrameListeners.erase(*i);
-        }
-        mRemovedFrameListeners.clear();
+        _syncAddedRemovedFrameListeners();
 
         // Tell all listeners
         bool ret = true;
-        for (i= mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
+        for (set<FrameListener*>::type::iterator i = mFrameListeners.begin(); i != mFrameListeners.end(); ++i)
         {
             if (!(*i)->frameEnded(evt))
             {
@@ -1256,6 +1233,12 @@ namespace Ogre {
     RenderWindow* Root::createRenderWindow(const String &name, unsigned int width, unsigned int height,
             bool fullScreen, const NameValuePairList *miscParams)
     {
+        if (!mIsInitialised)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+            "Cannot create window - Root has not been initialised! "
+            "Make sure to call Root::initialise before creating a window.", "Root::createRenderWindow");
+        }
         if (!mActiveRenderer)
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
@@ -1279,6 +1262,12 @@ namespace Ogre {
     bool Root::createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
         RenderWindowList& createdWindows)
     {
+        if (!mIsInitialised)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+            "Cannot create window - Root has not been initialised! "
+            "Make sure to call Root::initialise before creating a window.", "Root::createRenderWindows");
+        }
         if (!mActiveRenderer)
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,

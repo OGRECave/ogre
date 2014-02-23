@@ -31,22 +31,16 @@ THE SOFTWARE.
 // Default options
 #include "OgrePrerequisites.h"
 
-#include "OgreString.h"
-#include "OgreMovableObject.h"
-
 // Matrices & Vectors
-#include "OgreMatrix4.h"
-#include "OgreVector3.h"
-#include "OgrePlane.h"
-#include "OgreQuaternion.h"
 #include "OgreCommon.h"
 #include "OgreFrustum.h"
-#include "OgreRay.h"
-#include "OgrePlaneBoundedVolume.h"
 #include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
+
+    class Matrix4;
+    class Ray;
 
     /** \addtogroup Core
     *  @{

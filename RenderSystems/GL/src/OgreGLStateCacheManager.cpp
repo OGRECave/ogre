@@ -86,7 +86,7 @@ namespace Ogre {
         if (mImp == NULL)
         {
             // Therefore we add a "dummy" cache if none are left
-            if (!mCaches.size())
+            if (mCaches.empty())
                 mCaches[0] = OGRE_NEW GLStateCacheManagerImp();
             mImp = mCaches.begin()->second;
         }
@@ -167,16 +167,11 @@ namespace Ogre {
         mImp->setStencilMask(mask);
     }
     
-    void GLStateCacheManager::setEnabled(GLenum flag)
+    void GLStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
-        mImp->setEnabled(flag);
+        mImp->setEnabled(flag, enabled);
     }
-    
-    void GLStateCacheManager::setDisabled(GLenum flag)
-    {
-        mImp->setDisabled(flag);
-    }
-    
+
     void GLStateCacheManager::setCullFace(GLenum face)
     {
         mImp->setCullFace(face);

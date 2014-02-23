@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __ParticleEmitter_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
 #include "OgreVector3.h"
 #include "OgreColourValue.h"
 #include "OgreStringInterface.h"

@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreRenderQueueSortingGrouping.h"
-#include "OgreIteratorWrappers.h"
 
 namespace Ogre {
 
@@ -81,7 +80,7 @@ namespace Ogre {
             invocation from others in a RenderQueueListener
         */
         RenderQueueInvocation(uint8 renderQueueGroupID, 
-            const String& invocationName = StringUtil::BLANK);
+            const String& invocationName = BLANKSTRING);
         virtual ~RenderQueueInvocation();
 
         /// Get the render queue group id

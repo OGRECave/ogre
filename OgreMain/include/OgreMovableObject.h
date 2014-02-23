@@ -31,13 +31,9 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
-#include "OgreRenderQueue.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreSphere.h"
-#include "OgreFactoryObj.h"
 #include "OgreAnimable.h"
-#include "OgreAny.h"
-#include "OgreUserObjectBindings.h"
 #include "OgreSceneNode.h"
 #include "Math/Array/OgreObjectData.h"
 #include "OgreId.h"

@@ -28,12 +28,9 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreMeshSerializer.h"
-#include "OgreMeshFileFormat.h"
 #include "OgreMesh.h"
-#include "OgreSubMesh.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
-#include "OgreSkeleton.h"
 
 
 namespace Ogre {
@@ -188,7 +185,7 @@ namespace Ogre {
         {
             LogManager::getSingleton().logMessage("WARNING: " + pDest->getName() + 
                 " is an older format (" + ver + "); you should upgrade it as soon as possible" +
-                " using the OgreMeshUpgrade tool.");
+                " using the OgreMeshUpgrade tool.", LML_CRITICAL);
         }
 
         if(mListener)

@@ -28,8 +28,10 @@ THE SOFTWARE.
 #include "OgreEAGL2View.h"
 
 #include "OgreRoot.h"
+#include "OgreCamera.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreViewport.h"
 
 #import <QuartzCore/QuartzCore.h>
 #import <UIKit/UIWindow.h>

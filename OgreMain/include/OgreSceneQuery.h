@@ -29,17 +29,11 @@ THE SOFTWARE.
 #define __SceneQuery_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreAxisAlignedBox.h"
 #include "OgreSphere.h"
 #include "OgreRay.h"
-#include "OgreRenderOperation.h"
-#include "OgrePlaneBoundedVolume.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-
-    // forward declaration
-    class SceneQueryListener;
     /** \addtogroup Core
     *  @{
     */

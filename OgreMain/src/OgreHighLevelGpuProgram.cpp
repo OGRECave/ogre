@@ -197,6 +197,8 @@ namespace Ogre
         getConstantDefinitions();
         params->_setNamedConstants(mConstantDefs);
         // also set logical / physical maps for programs which use this
-        params->_setLogicalIndexes(mFloatLogicalToPhysical, mDoubleLogicalToPhysical, mIntLogicalToPhysical);
+        params->_setLogicalIndexes(mFloatLogicalToPhysical, mDoubleLogicalToPhysical, 
+                                           mIntLogicalToPhysical, mUIntLogicalToPhysical,
+                                           mBoolLogicalToPhysical);
     }
 }

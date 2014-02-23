@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreGLESPrerequisites.h"
 #include "OgreHardwareBufferManager.h"
+#include "Threading/OgreThreadHeaders.h"
 
 namespace Ogre {
     // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)

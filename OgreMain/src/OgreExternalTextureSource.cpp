@@ -51,7 +51,7 @@ namespace Ogre
 
     //---------------------------------------------------------------------------------------//
 
-    ExternalTextureSource::ExternalTextureSource()
+    ExternalTextureSource::ExternalTextureSource() : mTechniqueLevel(0), mPassLevel(0), mStateLevel(0)
     {
         mInputFileName = "None";
         mDictionaryName = "NotAssigned";
@@ -181,7 +181,7 @@ namespace Ogre
         }
         else
         {
-            LogManager::getSingleton().logMessage("Texture controller had problems extracting technique, pass, and state level... Default to 0, 0, 0");
+            LogManager::getSingleton().logMessage("Texture controller had problems extracting technique, pass, and state level... Default to 0, 0, 0", LML_CRITICAL);
             t = p = s = 0;
         }
 

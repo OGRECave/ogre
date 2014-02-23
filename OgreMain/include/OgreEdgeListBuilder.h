@@ -29,9 +29,9 @@ THE SOFTWARE.
 #define __EdgeListBuilder_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreVector4.h"
-#include "OgreHardwareVertexBuffer.h"
 #include "OgreRenderOperation.h"
+#include "OgreVector3.h"
+#include "OgreVector4.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -150,6 +150,7 @@ namespace Ogre {
         */
         void updateFaceNormals(size_t vertexSet, const HardwareVertexBufferSharedPtr& positionBuffer);
 
+        EdgeData* clone();
 
 
         /// Debugging method

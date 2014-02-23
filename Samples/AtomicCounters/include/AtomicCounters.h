@@ -8,7 +8,7 @@ using namespace OgreBites;
 
 class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
 {
-public:
+ public:
 
     Sample_AtomicCounters()
     {
@@ -20,6 +20,10 @@ public:
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                    "Sample currently under construction.  Try again soon!",
+                    "Sample_AtomicCounters::testCapabilities");
+
         if (!caps->hasCapability(RSC_ATOMIC_COUNTERS))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support atomic counters"
@@ -27,18 +31,19 @@ public:
         }
     }
 
-protected:
+ protected:
 
     void setupContent()
     {
         // Setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
         mSceneMgr->createLight()->setPosition(20, 80, 50);
-        
+
         mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox");
 
         // Create a dragon entity and attach it to a node
         Entity *ent = mSceneMgr->createEntity("Dragon", "dragon.mesh");
+        ent->setMaterialName("Example/RasterizationOrder");
         SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         node->rotate(Vector3(0,1,0), Ogre::Angle(180));
         node->attachObject(ent);
@@ -49,7 +54,7 @@ protected:
         setDragLook(true);
 #endif
 
-        HardwareCounterBufferSharedPtr cBuf = HardwareBufferManager::getSingleton().createCounterBuffer(sizeof(uint32), HardwareBuffer::HBU_WRITE_ONLY, false);
+        //HardwareCounterBufferSharedPtr cBuf = HardwareBufferManager::getSingleton().createCounterBuffer(sizeof(uint32), HardwareBuffer::HBU_WRITE_ONLY, false);
 
         mTrayMgr->showCursor();
     }

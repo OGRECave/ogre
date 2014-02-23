@@ -6,6 +6,7 @@
 #include "OgreGpuProgram.h"
 #include "OgrePass.h"
 #include "OgreShaderGenerator.h"
+#include "OgreMaterialSerializer.h"
 #include "SegmentedDynamicLightManager.h"
 
 #define SL_LIB_PERPIXELLIGHTING                         "SegmentedPerPixelLighting"

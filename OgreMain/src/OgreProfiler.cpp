@@ -42,7 +42,6 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #include "OgreProfiler.h"
 #include "OgreTimer.h"
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 
@@ -158,7 +157,7 @@ namespace Ogre {
 
             mInitialized = true;
         }
-        else
+        else if (mInitialized)
         {
             for( TProfileSessionListener::iterator i = mListeners.begin(); i != mListeners.end(); ++i )
                 (*i)->finializeSession();

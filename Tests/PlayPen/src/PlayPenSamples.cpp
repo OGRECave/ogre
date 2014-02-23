@@ -26,7 +26,10 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "PlayPenSamples.h"
-
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
+#include "OgreMeshLodGenerator.h"
+#include "OgreLodConfig.h"
+#endif
 
 //---------------------------------------------------------------------
 PlayPen_testManualBlend::PlayPen_testManualBlend()
@@ -39,7 +42,7 @@ void PlayPen_testManualBlend::setupContent()
 {
     // create material
     MaterialPtr mat = MaterialManager::getSingleton().create("TestMat", 
-        TRANSIENT_RESOURCE_GROUP);
+        TRANSIENT_RESOURCE_GROUP).staticCast<Material>();
     Pass * p = mat->getTechnique(0)->getPass(0);
     p->setLightingEnabled(false);
     p->createTextureUnitState("Dirt.jpg");
@@ -106,7 +109,7 @@ void PlayPen_testProjectSphere::setupContent()
     sphereNode->attachObject(debugSphere);
 
     MaterialPtr mat = MaterialManager::getSingleton().create("scissormat", 
-        TRANSIENT_RESOURCE_GROUP);
+        TRANSIENT_RESOURCE_GROUP).staticCast<Material>();
     Pass* p = mat->getTechnique(0)->getPass(0);
     p->setDepthWriteEnabled(false);
     p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
@@ -211,6 +214,7 @@ void PlayPen_testCameraSetDirection::checkBoxToggled(OgreBites::CheckBox* box)
 
     }
 }
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
 //---------------------------------------------------------------------
 PlayPen_testManualLOD::PlayPen_testManualLOD()
 {
@@ -305,6 +309,7 @@ String PlayPen_testManualLODFromFile::getLODMesh()
     return "testlod.mesh";
 
 }
+#endif
 //---------------------------------------------------------------------
 PlayPen_testFullScreenSwitch::PlayPen_testFullScreenSwitch()
 {

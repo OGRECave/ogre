@@ -31,12 +31,7 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
-#include "OgreSingleton.h"
-#include "OgreString.h"
 #include "OgreSceneManagerEnumerator.h"
-#include "OgreResourceGroupManager.h"
-#include "OgreLodStrategyManager.h"
-#include "OgreWorkQueue.h"       
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "Android/OgreAndroidLogListener.h"
@@ -111,8 +106,6 @@ namespace Ogre
         RenderSystemCapabilitiesManager* mRenderSystemCapabilitiesManager;
         ScriptCompilerManager *mCompilerManager;
         LodStrategyManager *mLodStrategyManager;
-        PMWorker* mPMWorker;
-        PMInjector* mPMInjector;
 
         FrameStats* mFrameStats;
         Timer* mTimer;
@@ -125,6 +118,7 @@ namespace Ogre
         Real mFrameSmoothingTime;
         bool mRemoveQueueStructuresOnClear;
         Real mDefaultMinPixelSize;
+        HardwareBuffer::UploadOptions mFreqUpdatedBuffersUploadOption;
 
     public:
         typedef vector<DynLib*>::type PluginLibList;
@@ -186,8 +180,10 @@ namespace Ogre
         /** Set of registered frame listeners */
         set<FrameListener*>::type mFrameListeners;
 
-        /** Set of frame listeners marked for removal*/
+        /** Set of frame listeners marked for removal and addition*/
         set<FrameListener*>::type mRemovedFrameListeners;
+        set<FrameListener*>::type mAddedFrameListeners;
+        void _syncAddedRemovedFrameListeners();
 
         /** Indicates the type of event to be considered by calculateEventTime(). */
         enum FrameEventTimeType {
@@ -336,13 +332,10 @@ namespace Ogre
                 requested, otherwise <b>NULL</b>.
         */
         RenderWindow* initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window",
-                                    const String& customCapabilitiesConfig = StringUtil::BLANK);
+                                    const String& customCapabilitiesConfig = BLANKSTRING);
 
-        /// Call this function after Root::initialise and having set at least one RenderWindow
-        void initialiseCompositor(void);
-
-        /** Returns whether the system is initialised or not. */
-        bool isInitialised(void) const { return mIsInitialised; }
+		/** Returns whether the system is initialised or not. */
+		bool isInitialised(void) const { return mIsInitialised; }
 
         /** Requests active RenderSystem to use custom RenderSystemCapabilities
         @remarks
@@ -411,7 +404,7 @@ namespace Ogre
         */
         SceneManager* createSceneManager(const String& typeName, size_t numWorkerThreads,
                                         InstancingTheadedCullingMethod threadedCullingMethod,
-                                        const String& instanceName = StringUtil::BLANK);
+                                        const String& instanceName = BLANKSTRING);
 
         /** Create a SceneManager instance based on scene type support.
         @remarks
@@ -437,7 +430,7 @@ namespace Ogre
         */
         SceneManager* createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads, 
                                         InstancingTheadedCullingMethod threadedCullingMethod,
-                                        const String& instanceName = StringUtil::BLANK);
+                                        const String& instanceName = BLANKSTRING);
 
         /** Destroy an instance of a SceneManager. */
         void destroySceneManager(SceneManager* sm);
@@ -662,7 +655,7 @@ namespace Ogre
             will be considered candidates for creation.
         */
         DataStreamPtr createFileStream(const String& filename, const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-            bool overwrite = false, const String& locationPattern = StringUtil::BLANK);
+            bool overwrite = false, const String& locationPattern = BLANKSTRING);
 
         /** Helper method to assist you in accessing readable file streams.
         @remarks
@@ -679,7 +672,7 @@ namespace Ogre
             will be considered candidates for creation.
         */      
         DataStreamPtr openFileStream(const String& filename, const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-            const String& locationPattern = StringUtil::BLANK);
+            const String& locationPattern = BLANKSTRING);
 
         /** Generates a packed data version of the passed in ColourValue suitable for
             use with the current RenderSystem.
@@ -1115,6 +1108,17 @@ namespace Ogre
         */
         Real getDefaultMinPixelSize() { return mDefaultMinPixelSize; }
     
+        /** Set the default upload option for buffers that frequently changed
+        Setting upload option to HBU_ON_DEMAND can increase the framerate in multi-device scenarios,
+        as it will upload frequently changing buffers to devices that require them.
+        However setting the HBU_ON_DEMAND may also introduce hiccups.
+        */
+        void setFreqUpdatedBuffersUploadOption(HardwareBuffer::UploadOptions uploadOp) { mFreqUpdatedBuffersUploadOption = uploadOp; }
+        /** Get the default upload option for buffers that frequently changed
+        @note
+            To use this feature see Camera::setFreqUpdatedBuffersUploadOption()
+        */
+        HardwareBuffer::UploadOptions getFreqUpdatedBuffersUploadOption() const { return mFreqUpdatedBuffersUploadOption; }
 
     };
     /** @} */

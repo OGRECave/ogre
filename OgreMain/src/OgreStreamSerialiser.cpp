@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreStreamSerialiser.h"
 #include "OgreException.h"
-#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
 #include "OgreVector2.h"
 #include "OgreVector3.h"
@@ -783,10 +782,9 @@ namespace Ogre
         for (size_t c = 0; c < count; ++c)
         {
             void *pData = (void *)((intptr_t)pBase + (c * size));
-            char swapByte;
             for(size_t byteIndex = 0; byteIndex < size/2; byteIndex++)
             {
-                swapByte = *(char *)((intptr_t)pData + byteIndex);
+                char swapByte = *(char *)((intptr_t)pData + byteIndex);
                 *(char *)((intptr_t)pData + byteIndex) = 
                     *(char *)((intptr_t)pData + size - byteIndex - 1);
                 *(char *)((intptr_t)pData + size - byteIndex - 1) = swapByte;

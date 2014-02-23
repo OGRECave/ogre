@@ -31,7 +31,6 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
-#include "OgreVector3.h"
 #include "OgreMatrix4.h"
 
 namespace Ogre {
@@ -351,7 +350,7 @@ namespace Ogre {
             }
         }
 
-        _OgreExport friend std::ostream& operator<<( std::ostream& o, const AxisAlignedBox aab )
+        _OgreExport friend std::ostream& operator<<( std::ostream& o, const AxisAlignedBox &aab )
         {
             switch (aab.mExtent)
             {
@@ -840,8 +839,6 @@ namespace Ogre {
 
 
     };
-
-    typedef vector<AxisAlignedBox>::type AxisAlignedBoxVec;
 
     /** @} */
     /** @} */

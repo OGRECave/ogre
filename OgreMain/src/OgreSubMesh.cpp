@@ -30,9 +30,7 @@ THE SOFTWARE.
 
 #include "OgreMesh.h"
 #include "OgreException.h"
-#include "OgreMeshManager.h"
 #include "OgreMaterialManager.h"
-#include "OgreStringConverter.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -40,6 +38,7 @@ namespace Ogre {
         : useSharedVertices(true)
         , operationType(RenderOperation::OT_TRIANGLE_LIST)
         , vertexData(0)
+        , parent(0)
         , mMatInitialised(false)
         , mBoneAssignmentsOutOfDate(false)
         , mVertexAnimationType(VAT_NONE)
@@ -51,6 +50,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()
     {
+        removeLodLevels();
         OGRE_DELETE vertexData;
         OGRE_DELETE indexData;
 

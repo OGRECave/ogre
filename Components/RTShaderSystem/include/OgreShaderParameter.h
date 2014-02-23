@@ -28,11 +28,9 @@ THE SOFTWARE.
 #define _ShaderParameter_
 
 #include "OgreShaderPrerequisites.h"
-#include "OgreGpuProgram.h"
 #include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
 #include "OgreMatrix4.h"
+#include "OgreGpuProgramParams.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -303,7 +301,7 @@ public:
 // Interface.
 public:
     /** */
-    Parameter() {}
+    Parameter();
 
     /** Class constructor.
     @param type The type of this parameter.
@@ -366,8 +364,6 @@ protected:
     
 };
 
-typedef SharedPtr<Parameter>                    ParameterPtr; 
-typedef vector<ParameterPtr>::type              ShaderParameterList;
 typedef ShaderParameterList::iterator           ShaderParameterIterator;
 typedef ShaderParameterList::const_iterator     ShaderParameterConstIterator;
 
@@ -565,7 +561,6 @@ protected:
     size_t mPhysicalIndex;
 };
 
-typedef SharedPtr<UniformParameter>             UniformParameterPtr; 
 typedef vector<UniformParameterPtr>::type       UniformParameterList;
 typedef UniformParameterList::iterator          UniformParameterIterator;
 typedef UniformParameterList::const_iterator    UniformParameterConstIterator;

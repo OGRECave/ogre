@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "ZipArchiveTests.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreZip.h"
+#include "OgreCommon.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
@@ -54,20 +55,35 @@ void ZipArchiveTests::tearDown()
 
 void ZipArchiveTests::testListNonRecursive()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
-    StringVectorPtr vec = arch.list(false);
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
+    StringVectorPtr vec = arch->list(false);
 
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), vec->at(0));
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), vec->at(1));
 
+    OGRE_DELETE arch;
 }
 void ZipArchiveTests::testListRecursive()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
-    StringVectorPtr vec = arch.list(true);
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
+    StringVectorPtr vec = arch->list(true);
 
     CPPUNIT_ASSERT_EQUAL((size_t)6, vec->size());
     CPPUNIT_ASSERT_EQUAL(String("file.material"), vec->at(0));
@@ -76,31 +92,49 @@ void ZipArchiveTests::testListRecursive()
     CPPUNIT_ASSERT_EQUAL(String("file4.material"), vec->at(3));
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), vec->at(4));
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), vec->at(5));
+
+    OGRE_DELETE arch;
 }
 void ZipArchiveTests::testListFileInfoNonRecursive()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
-    FileInfoListPtr vec = arch.listFileInfo(false);
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
+    FileInfoListPtr vec = arch->listFileInfo(false);
 
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
     FileInfo& fi1 = vec->at(0);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     CPPUNIT_ASSERT_EQUAL((size_t)40, fi1.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     FileInfo& fi2 = vec->at(1);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     CPPUNIT_ASSERT_EQUAL((size_t)45, fi2.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
+
+    OGRE_DELETE arch;
 }
 void ZipArchiveTests::testListFileInfoRecursive()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
-    FileInfoListPtr vec = arch.listFileInfo(true);
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+    arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
+    FileInfoListPtr vec = arch->listFileInfo(true);
 
     CPPUNIT_ASSERT_EQUAL((size_t)6, vec->size());
     FileInfo& fi3 = vec->at(0);
@@ -130,63 +164,100 @@ void ZipArchiveTests::testListFileInfoRecursive()
 
     FileInfo& fi1 = vec->at(4);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     CPPUNIT_ASSERT_EQUAL((size_t)40, fi1.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     FileInfo& fi2 = vec->at(5);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     CPPUNIT_ASSERT_EQUAL((size_t)45, fi2.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
 
+    OGRE_DELETE arch;
 }
 void ZipArchiveTests::testFindNonRecursive()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
-    StringVectorPtr vec = arch.find("*.txt", false);
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
+
+    StringVectorPtr vec = arch->find("*.txt", false);
 
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), vec->at(0));
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), vec->at(1));
+
+    OGRE_DELETE arch;
 }
 void ZipArchiveTests::testFindRecursive()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
-    StringVectorPtr vec = arch.find("*.material", true);
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
+
+    StringVectorPtr vec = arch->find("*.material", true);
 
     CPPUNIT_ASSERT_EQUAL((size_t)4, vec->size());
     CPPUNIT_ASSERT_EQUAL(String("file.material"), vec->at(0));
     CPPUNIT_ASSERT_EQUAL(String("file2.material"), vec->at(1));
     CPPUNIT_ASSERT_EQUAL(String("file3.material"), vec->at(2));
     CPPUNIT_ASSERT_EQUAL(String("file4.material"), vec->at(3));
+
+    OGRE_DELETE arch;
 }
 void ZipArchiveTests::testFindFileInfoNonRecursive()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
-    FileInfoListPtr vec = arch.findFileInfo("*.txt", false);
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
+    FileInfoListPtr vec = arch->findFileInfo("*.txt", false);
 
     CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
     FileInfo& fi1 = vec->at(0);
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi1.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
     CPPUNIT_ASSERT_EQUAL((size_t)40, fi1.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
 
     FileInfo& fi2 = vec->at(1);
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    CPPUNIT_ASSERT_EQUAL(StringUtil::BLANK, fi2.path);
+    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
     CPPUNIT_ASSERT_EQUAL((size_t)45, fi2.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
+
+    OGRE_DELETE arch;
 }
 void ZipArchiveTests::testFindFileInfoRecursive()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
-    FileInfoListPtr vec = arch.findFileInfo("*.material", true);
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
+    FileInfoListPtr vec = arch->findFileInfo("*.material", true);
 
     CPPUNIT_ASSERT_EQUAL((size_t)4, vec->size());
 
@@ -214,13 +285,22 @@ void ZipArchiveTests::testFindFileInfoRecursive()
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/"), fi6.path);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi6.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi6.uncompressedSize);
+
+    OGRE_DELETE arch;
 }
 void ZipArchiveTests::testFileRead()
 {
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
 
-    DataStreamPtr stream = arch.open("rootfile.txt");
+    DataStreamPtr stream = arch->open("rootfile.txt");
     CPPUNIT_ASSERT_EQUAL(String("this is line 1 in file 1"), stream->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 2 in file 1"), stream->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 3 in file 1"), stream->getLine());
@@ -228,21 +308,29 @@ void ZipArchiveTests::testFileRead()
     CPPUNIT_ASSERT_EQUAL(String("this is line 5 in file 1"), stream->getLine());
     CPPUNIT_ASSERT(stream->eof());
 
+    OGRE_DELETE arch;
+
 }
 void ZipArchiveTests::testReadInterleave()
 {
     // Test overlapping reads from same archive
-
-    ZipArchive arch(testPath, "Zip");
-    arch.load();
+    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    try {
+        arch->load();
+    } catch (Ogre::Exception e) {
+        // If it starts in build/bin/debug
+        OGRE_DELETE arch;
+        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch->load();
+    }
 
     // File 1
-    DataStreamPtr stream1 = arch.open("rootfile.txt");
+    DataStreamPtr stream1 = arch->open("rootfile.txt");
     CPPUNIT_ASSERT_EQUAL(String("this is line 1 in file 1"), stream1->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 2 in file 1"), stream1->getLine());
 
     // File 2
-    DataStreamPtr stream2 = arch.open("rootfile2.txt");
+    DataStreamPtr stream2 = arch->open("rootfile2.txt");
     CPPUNIT_ASSERT_EQUAL(String("this is line 1 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 2 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 3 in file 2"), stream2->getLine());
@@ -261,4 +349,5 @@ void ZipArchiveTests::testReadInterleave()
     CPPUNIT_ASSERT_EQUAL(String("this is line 6 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT(stream2->eof());
 
+    OGRE_DELETE arch;
 }

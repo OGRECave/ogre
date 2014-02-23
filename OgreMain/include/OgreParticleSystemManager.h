@@ -30,12 +30,8 @@ THE SOFTWARE.
 
 
 #include "OgrePrerequisites.h"
-#include "OgreParticleSystem.h"
-#include "OgreFrameListener.h"
 #include "OgreSingleton.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreScriptLoader.h"
-#include "OgreResourceGroupManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "OgreHeaderPrefix.h"
 

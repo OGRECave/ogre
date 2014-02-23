@@ -30,9 +30,7 @@ THE SOFTWARE.
 #include "OgreShaderPrerequisites.h"
 #include "OgreGpuProgram.h"
 #include "OgreSingleton.h"
-#include "OgreShaderParameter.h"
 #include "OgreShaderFunction.h"
-#include "OgreShaderFunctionAtom.h"
 #include "OgreStringVector.h"
 
 namespace Ogre {

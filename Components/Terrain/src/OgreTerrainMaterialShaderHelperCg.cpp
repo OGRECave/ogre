@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreTerrain.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreShadowCameraSetupPSSM.h"
+#include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre
 {
@@ -40,11 +41,11 @@ namespace Ogre
     {
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
         String progName = getVertexProgramName(prof, terrain, tt);
-        HighLevelGpuProgramPtr ret = mgr.getByName(progName);
+        HighLevelGpuProgramPtr ret = mgr.getByName(progName).staticCast<HighLevelGpuProgram>();
         if (ret.isNull())
         {
             ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-                "cg", GPT_VERTEX_PROGRAM);
+                "cg", GPT_VERTEX_PROGRAM).staticCast<HighLevelGpuProgram>();
         }
         else
         {
@@ -65,11 +66,11 @@ namespace Ogre
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
         String progName = getFragmentProgramName(prof, terrain, tt);
 
-        HighLevelGpuProgramPtr ret = mgr.getByName(progName);
+        HighLevelGpuProgramPtr ret = mgr.getByName(progName).staticCast<HighLevelGpuProgram>();
         if (ret.isNull())
         {
             ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-                "cg", GPT_FRAGMENT_PROGRAM);
+                "cg", GPT_FRAGMENT_PROGRAM).staticCast<HighLevelGpuProgram>();
         }
         else
         {
@@ -87,7 +88,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpHeader(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
         outStream << 
             "void main_vp(\n";
@@ -248,7 +249,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpHeader(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
 
         // Main header
@@ -457,13 +458,13 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpLayer(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream)
     {
         // nothing to do
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpLayer(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringStream& outStream)
     {
         uint uvIdx = layer / 2;
         String uvChannels = (layer % 2) ? ".zw" : ".xy";
@@ -532,7 +533,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpFooter(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
 
         outStream << 
@@ -564,7 +565,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpFooter(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
 
         if (tt == LOW_LOD)
@@ -638,7 +639,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpDynamicShadowsHelpers(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
         // TODO make filtering configurable
         outStream <<
@@ -759,7 +760,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     uint TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpDynamicShadowsParams(
-        uint texCoord, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        uint texCoord, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
         // out semantics & params
         uint numTextures = 1;
@@ -784,7 +785,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateVpDynamicShadows(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
         uint numTextures = 1;
         if (prof->getReceiveDynamicShadowsPSSM())
@@ -817,7 +818,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpDynamicShadowsParams(
-        uint* texCoord, uint* sampler, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        uint* texCoord, uint* sampler, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
         if (tt == HIGH_LOD)
             mShadowSamplerStartHi = *sampler;
@@ -849,7 +850,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg::generateFpDynamicShadows(
-        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+        const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringStream& outStream)
     {
         if (prof->getReceiveDynamicShadowsPSSM())
         {

@@ -27,12 +27,9 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreResourceBackgroundQueue.h"
-#include "OgreLogManager.h"
 #include "OgreException.h"
-#include "OgreResourceGroupManager.h"
 #include "OgreResourceManager.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 
 namespace Ogre {
 
@@ -51,7 +48,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------   
     //------------------------------------------------------------------------
-    ResourceBackgroundQueue::ResourceBackgroundQueue()
+    ResourceBackgroundQueue::ResourceBackgroundQueue() : mWorkQueueChannel(0)
     {
     }
     //------------------------------------------------------------------------

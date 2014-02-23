@@ -30,14 +30,13 @@ THE SOFTWARE.
 
 #include "OgreVector3.h"
 
-#include "OgreVolumeSource.h"
-#include "OgreVolumeOctreeNode.h"
 #include "OgreVolumePrerequisites.h"
 
 namespace Ogre {
 namespace Volume {
 
     class OctreeNode;
+    class Source;
 
     /** The class deciding on whether to split an octree node or not
         when building the octree.

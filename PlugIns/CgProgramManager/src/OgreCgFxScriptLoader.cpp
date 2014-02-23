@@ -34,9 +34,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreCgProgram.h"
 
-
 namespace Ogre {
-
 
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------

@@ -82,10 +82,10 @@ namespace Ogre {
         while (!pi.end())
         {
             p = pi.getNext();
-            applyAdjustWithClamp(&p->colour.r, dr);
-            applyAdjustWithClamp(&p->colour.g, dg);
-            applyAdjustWithClamp(&p->colour.b, db);
-            applyAdjustWithClamp(&p->colour.a, da);
+            applyAdjustWithClamp(&p->mColour.r, dr);
+            applyAdjustWithClamp(&p->mColour.g, dg);
+            applyAdjustWithClamp(&p->mColour.b, db);
+            applyAdjustWithClamp(&p->mColour.a, da);
         }
 
     }

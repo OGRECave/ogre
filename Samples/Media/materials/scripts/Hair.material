@@ -1,0 +1,2619 @@
+/*vertex_program Ogre/Hair/AddAngularForcesVS hlsl
+{
+	source Hair.hlsl
+	entry_point AddAngularForcesVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/AddAngularForcesGS hlsl
+{
+	source Hair.hlsl
+	entry_point AddAngularForcesGS
+	target gs_4_0
+	
+	default_params
+	{
+		param_named g_bClearForces int 0
+	}	
+}
+
+vertex_program Ogre/Hair/addForcesAndIntegrateVS hlsl
+{
+	source Hair.hlsl
+	entry_point addForcesAndIntegrateVS
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalTransform int 0
+		param_named g_bApplyHorizontalForce int 0
+		param_named g_bAddGravity int 0
+		param_named g_TimeStep float 1.0
+		param_named g_gravityStrength float 1.0
+		param_named g_bSimulate int 0
+		param_named g_windForce float3 1.0 1.0 1.0
+		param_named g_NumSphereImplicits int 1
+		param_named g_NumCylinderImplicits int 1
+		param_named g_NumSphereNoMoveImplicits int 1
+	}	
+}
+
+geometry_program Ogre/Hair/addForcesAndIntegrateVSG hlsl
+{
+	source Hair.hlsl
+	entry_point addForcesAndIntegrateVS
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalTransform int 0
+		param_named g_bApplyHorizontalForce int 0
+		param_named g_bAddGravity int 0
+		param_named g_TimeStep float 1.0
+		param_named g_gravityStrength float 1.0
+		param_named g_bSimulate int 0
+		param_named g_windForce float3 1.0 1.0 1.0
+		param_named g_NumSphereImplicits int 1
+		param_named g_NumCylinderImplicits int 1
+		param_named g_NumSphereNoMoveImplicits int 1
+	}	
+}
+
+vertex_program Ogre/Hair/SatisfySpringConstraintsVS hlsl
+{
+	source Hair.hlsl
+	entry_point SatisfySpringConstraintsGS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/SatisfySpringConstraintsGS hlsl
+{
+	source Hair.hlsl
+	entry_point SatisfySpringConstraintsGS
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/SatisfyAngularSpringConstraintsVS hlsl
+{
+	source Hair.hlsl
+	entry_point SatisfyAngularSpringConstraintsVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/SatisfyAngularSpringConstraintsGS hlsl
+{
+	source Hair.hlsl
+	entry_point SatisfyAngularSpringConstraintsGS
+	target gs_4_0
+	
+	default_params
+	{
+		param_named g_angularStiffness float 1.0
+	}	
+}
+
+vertex_program Ogre/Hair/SatisfyCollisionConstraintsVS hlsl
+{
+	source Hair.hlsl
+	entry_point SatisfyCollisionConstraintsVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/SatisfyCollisionConstraintsVSG hlsl
+{
+	source Hair.hlsl
+	entry_point SatisfyCollisionConstraintsVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/UpdateCoordinateFrameVS hlsl
+{
+	source Hair.hlsl
+	entry_point UpdateCoordinateFrameVS
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_blendAxis float 0.0
+	}	
+}
+
+geometry_program Ogre/Hair/UpdateCoordinateFrameVSG hlsl
+{
+	source Hair.hlsl
+	entry_point UpdateCoordinateFrameVS
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_blendAxis float 0.0
+	}	
+}
+
+vertex_program Ogre/Hair/PropagateCoordinateFrameVS hlsl
+{
+	source Hair.hlsl
+	entry_point PropagateCoordinateFrameVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+
+geometry_program Ogre/Hair/PropagateCoordinateFrameVSG hlsl
+{
+	source Hair.hlsl
+	entry_point PropagateCoordinateFrameVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/restoreToDefaultPositionsVS hlsl
+{
+	source Hair.hlsl
+	entry_point restoreToDefaultPositionsVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/restoreToDefaultPositionsVSG hlsl
+{
+	source Hair.hlsl
+	entry_point restoreToDefaultPositionsVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/RenderCoordinateFrameVSUnTess hlsl
+{
+	source Hair.hlsl
+	entry_point RenderCoordinateFrameVSUnTess
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/RenderCoordinateFrameVSUnTessSB hlsl
+{
+	source Hair.hlsl
+	entry_point RenderCoordinateFrameVSUnTessSB
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/RenderCoordinateFrameVS hlsl
+{
+	source Hair.hlsl
+	entry_point RenderCoordinateFrameVS
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/RenderCoordinateFrameGSUnTessellated hlsl
+{
+	source Hair.hlsl
+	entry_point RenderCoordinateFrameGSUnTessellated
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/RenderCoordinateFrameGSUnTessellatedSB hlsl
+{
+	source Hair.hlsl
+	entry_point RenderCoordinateFrameGSUnTessellatedSB
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/RenderCoordinateFrameGSTessellated hlsl
+{
+	source Hair.hlsl
+	entry_point RenderCoordinateFrameGSTessellated
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/Hair/RenderCoordinateFramePS hlsl
+{
+	source Hair.hlsl
+	entry_point restoreToDefaultPositionsVS
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+material Ogre/Hair/SimulateHair
+{
+	technique SimulateHair
+	{
+		pass addAngularForces
+		{
+			vertex_program_ref Ogre/Hair/AddAngularForcesVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/AddAngularForcesGS
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass addForcesAndIntegrate
+		{
+			vertex_program_ref Ogre/Hair/addForcesAndIntegrateVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/addForcesAndIntegrateVSG
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass SatisfySpringConstraints
+		{
+			vertex_program_ref Ogre/Hair/SatisfySpringConstraintsVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/SatisfySpringConstraintsGS
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass SatisfyAngularSpringConstraints
+		{
+			vertex_program_ref Ogre/Hair/SatisfyAngularSpringConstraintsVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/SatisfyAngularSpringConstraintsGS
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass SatisfyCollisionConstraints
+		{
+			vertex_program_ref Ogre/Hair/SatisfyCollisionConstraintsVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/SatisfyCollisionConstraintsVSG
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass restoreToDefaultPositions
+		{
+			vertex_program_ref Ogre/Hair/restoreToDefaultPositionsVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/restoreToDefaultPositionsVSG
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass RenderCoordinateFrameUnTessellated
+		{
+			vertex_program_ref Ogre/Hair/RenderCoordinateFrameVSUnTess
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/RenderCoordinateFrameGSUnTessellated
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderCoordinateFramePS
+			{
+			
+			}
+		
+			depth_check on
+			depth_write on
+		}
+		pass RenderCoordinateFrameUnTessellatedSB
+		{
+			vertex_program_ref Ogre/Hair/RenderCoordinateFrameVSUnTessSB
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/RenderCoordinateFrameGSUnTessellatedSB
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderCoordinateFramePS
+			{
+			
+			}
+		
+			depth_check on
+			depth_write on
+		}
+		pass RenderCoordinateFrameTessellated
+		{
+			vertex_program_ref Ogre/Hair/RenderCoordinateFrameVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/RenderCoordinateFrameGSTessellated
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderCoordinateFramePS
+			{
+			
+			}
+		
+			depth_check on
+			depth_write on
+		}
+		pass UpdateCoordinateFrame
+		{
+			vertex_program_ref Ogre/Hair/UpdateCoordinateFrameVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/UpdateCoordinateFrameVSG
+			{
+			
+			}
+		
+			depth_check off
+			depth_write off
+		}
+		pass PropagateCoordinateFrame
+		{
+			vertex_program_ref Ogre/Hair/PropagateCoordinateFrameVS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/PropagateCoordinateFrameVSG
+			{
+			
+			}
+		
+			depth_check off
+			depth_write off
+		}
+	}
+}
+
+vertex_program Ogre/Hair/InterpolateVS_DUMMY11 hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVS_DUMMY11
+	target vs_5_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/InterpolateVSMultiStrand_LOAD hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSMultiStrand_LOAD
+	target vs_5_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform int 0
+		param_named g_useShadows int 1
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
+	}
+}
+
+vertex_program Ogre/Hair/InterpolateVSMultiStrandDepthShadows_LOAD hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSMultiStrandDepthShadows_LOAD
+	target vs_5_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform int 0	
+	}
+}
+
+vertex_program Ogre/Hair/InterpolateVSMultiStrandCollisions hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSMultiStrandCollisions
+	target vs_5_0
+	
+	default_params
+	{
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0		
+	}
+}
+
+tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrand hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateHSMultiStrand
+	target hs_5_0
+	
+	default_params
+	{
+		param_named g_fNumHairsLOD float 1.0
+	}
+}
+
+tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandDepth hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateHSMultiStrandDepth
+	target hs_5_0
+	
+	default_params
+	{
+		param_named g_fNumHairsLOD float 1.0
+	}
+}
+
+tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandCollisions hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateHSMultiStrandCollisions
+	target hs_5_0
+	
+	default_params
+	{
+		param_named g_fNumHairsLOD float 1.0
+	}
+}
+
+tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrand hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateDSMultiStrand
+	target ds_5_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform int 0
+		param_named g_fWidthHairsLOD float 1.0
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0	
+		param_named g_thinning float 0.5
+		param_named g_useShadows int 1
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
+	}
+}
+
+tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandDepth hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateDSMultiStrandDepth
+	target ds_5_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform bool 0
+		param_named g_fWidthHairsLOD float 1.0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
+		param_named g_thinning float 0.5		
+	}
+}
+
+tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisions hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateDSMultiStrandCollisions
+	target ds_5_0
+	
+	default_params
+	{
+	
+	}
+}
+
+tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisionsWithGS hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateDSMultiStrandCollisionsWithGS
+	target ds_5_0
+	
+	default_params
+	{
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0	
+	}
+}
+
+geometry_program Ogre/Hair/InterpolateGS hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateGS
+	target gs_5_0
+	
+	default_params
+	{
+		param_named g_ScreenWidth float 1280.0
+		param_named g_ScreenHeight float 1024.0	
+	}
+}
+
+geometry_program Ogre/Hair/InterpolateGSDepthShadows hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateGSDepthShadows
+	target gs_5_0
+	
+	default_params
+	{
+	
+	}
+}
+
+geometry_program Ogre/Hair/InterpolateGSMultiStrandCollisions hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateGSMultiStrandCollisions
+	target gs_5_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/RenderPS hlsl
+{
+	source Hair.hlsl
+	entry_point RenderPS
+	target ps_5_0
+	
+	default_params
+	{
+		param_named g_ksP float 0.0
+		param_named g_ksS float 0.0
+		param_named g_kd float 0.0
+		param_named g_specPowerPrimary float 0.0
+		param_named g_specPowerSecondary float 0.0
+		param_named g_ksP_sparkles float 0.0
+		param_named g_specPowerPrimarySparkles float 0.0
+		param_named g_ka float 0.0
+		param_named g_baseColor float4 0.0 0.0 0.0 0.0
+		param_named g_specColor float4 0.0 0.0 0.0 0.0
+		param_named g_useShadows int 1
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
+	}
+}
+
+fragment_program Ogre/Hair/RenderDepthPSSmall hlsl
+{
+	source Hair.hlsl
+	entry_point RenderDepthPSSmall
+	target ps_5_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/InterpolatePSMultiStrandCollisions hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolatePSMultiStrandCollisions
+	target ps_5_0
+	
+	default_params
+	{
+		param_named g_densityThreshold float 1.0
+		param_named g_textureDepth float 1.0
+	}
+}
+
+fragment_program Ogre/Hair/RenderDepthPSSmall_DOM hlsl
+{
+	source Hair.hlsl
+	entry_point RenderDepthPSSmall_DOM
+	target ps_5_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/TessellateVSBSplinePassThrough hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateVSBSplinePassThrough
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/TessellateVSBSplineCFs hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateVSBSplineCFs
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/TessellateVSBSplineSBCFs hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateVSBSplineSBCFs
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/TessellateVSBSplineLengths hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateVSBSplineLengths
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSMultiStrand_SO hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSMultiStrand_SO
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
+		param_named g_doCurlyHair int 0
+		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSSingleStrand_SO hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSSingleStrand_SO
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSDepthPrepass hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSDepthPrepass
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
+		param_named g_doCurlyHair int 0
+		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSDepthPrepass_LOAD hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSDepthPrepass_LOAD
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform int 0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0		
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSMultiStrand hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSMultiStrand
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_doCurlyHair int 0
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSClumpDepthPrepass hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSClumpDepthPrepass
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSClumpDepthPrepass_LOAD hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSClumpDepthPrepass_LOAD
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform int 0
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSSingleStrand hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSSingleStrand
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSSingleStrand_LOAD hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSSingleStrand_LOAD
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform int 0
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
+		param_named g_useShadows int 1		
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSMCollisions hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSMCollisions
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_NumTotalWisps int 0
+		param_named g_NumMaxStrandsPerWisp int 0
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVS2Grid hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVS2Grid
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/TessellateGSBSpline hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateGSBSpline
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/TessellateGSBSplineSB hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateGSBSplineSB
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/TessellateVSBSplineCFsG hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateVSBSplineCFs
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/TessellateVSBSplineSBCFsG hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateVSBSplineSBCFs
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/TessellateVSBSplineLengthsG hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateVSBSplineLengths
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/InterpolateVSMultiStrand_SOG hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSMultiStrand_SO
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}	
+}
+
+geometry_program Ogre/Hair/InterpolateVSSingleStrand_SOG hlsl
+{
+	source Hair.hlsl
+	entry_point TessellateVSBSplineCFs
+	target vs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/InterpolateGSDepthPrepass hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateGSDepthPrepass
+	target gs_4_0
+	
+	default_params
+	{
+		param_named g_ScreenWidth float 1280.0
+		param_named g_ScreenHeight float 1024.0
+	}	
+}
+
+geometry_program Ogre/Hair/InterpolateGSMCollisions hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateGSMCollisions
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/InterpolateGS2Grid hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateGS2Grid
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+geometry_program Ogre/Hair/GS_ARRAY hlsl
+{
+	source Hair.hlsl
+	entry_point GS_ARRAY
+	target gs_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+tesselation_hull_program Ogre/Hair/InterpolateHSSingleStrand hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateHSSingleStrand
+	target hs_5_0
+	
+	default_params
+	{
+		param_named g_fNumHairsLOD float 1.0
+	}	
+}
+
+tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_DEPTH hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateHSSingleStrand
+	target ds_5_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform int 0
+		param_named g_fWidthHairsLOD float 1.0
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_doCurlyHair int 0
+		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}	
+}
+
+tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_NORMAL hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateDSSingleStrand_NORMAL
+	target ds_5_0
+	
+	default_params
+	{
+		param_named g_bApplyAdditionalRenderingTransform int 0	
+		param_named g_fWidthHairsLOD float 1.0
+		param_named g_maxLengthToRoot float 12.0
+		param_named g_doCurlyHair int 0
+		param_named g_thinning float 0.5
+		param_named g_TessellatedMasterStrandLengthMax int 1
+		param_named g_useShadows int 1
+		param_named g_SigmaA float 1.0
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
+	}	
+}
+
+fragment_program Ogre/Hair/RenderPSDepthPrepass hlsl
+{
+	source Hair.hlsl
+	entry_point RenderPSDepthPrepass
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/Hair/InterpolatePSMCollisions hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolatePSMCollisions
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+fragment_program Ogre/Hair/RenderPSForGridMRT hlsl
+{
+	source Hair.hlsl
+	entry_point RenderPSForGridMRT
+	target ps_4_0
+	
+	default_params
+	{
+
+	}	
+}
+
+vertex_program Ogre/Hair/InterpolateVSBMultiStrandDepthShadows hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSBMultiStrandDepthShadows
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_doCurlyHair int 0
+	}
+}
+
+vertex_program Ogre/Hair/InterpolateVSSingleStrandDepthShadows hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSSingleStrandDepthShadows
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_TessellatedMasterStrandLengthMax int 1
+	}
+}
+
+vertex_program Ogre/Hair/InterpolateVSSingleStrandDepthShadows_LOAD hlsl
+{
+	source Hair.hlsl
+	entry_point InterpolateVSSingleStrandDepthShadows_LOAD
+	target vs_4_0
+	
+	default_params
+	{
+			param_named g_bApplyAdditionalRenderingTransform int 0
+	}
+}
+
+vertex_program Ogre/Hair/FullScreenTriVS hlsl
+{
+	source Hair.hlsl
+	entry_point FullScreenTriVS
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/MeshVS hlsl
+{
+	source Hair.hlsl
+	entry_point MeshVS
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/MeshVSShadows hlsl
+{
+	source Hair.hlsl
+	entry_point MeshVSShadows
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/VSDrawPlane hlsl
+{
+	source Hair.hlsl
+	entry_point VSDrawPlane
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/MeshDepthVS hlsl
+{
+	source Hair.hlsl
+	entry_point MeshDepthVS
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
+	}
+}
+
+vertex_program Ogre/Hair/VS_GRID hlsl
+{
+	source Hair.hlsl
+	entry_point VS_GRID
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_textureHeight float 1.0
+		param_named g_textureWidth float 1.0
+	}
+}
+
+vertex_program Ogre/Hair/VS_COLLISIONS hlsl
+{
+	source Hair.hlsl
+	entry_point VS_COLLISIONS
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/VS_GRID_FLUIDSIM hlsl
+{
+	source Hair.hlsl
+	entry_point VS_GRID_FLUIDSIM
+	target vs_4_0
+	
+	default_params
+	{
+		param_named fluidg_textureWidth int 1
+		param_named fluidg_textureHeight int 1
+		param_named fluidg_textureDepth int 1
+		param_named g_textureDepth float 1.0		
+	}
+}
+
+vertex_program Ogre/Hair/VSArrow hlsl
+{
+	source Hair.hlsl
+	entry_point VSArrow
+	target vs_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+vertex_program Ogre/Hair/CollisionVS hlsl
+{
+	source Hair.hlsl
+	entry_point CollisionVS
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_currentCollisionSphere int 1
+	}
+}
+
+fragment_program Ogre/Hair/CollisionPS hlsl
+{
+	source Hair.hlsl
+	entry_point CollisionPS
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/VisDepthsPS hlsl
+{
+	source Hair.hlsl
+	entry_point VisDepthsPS
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_ZNear float 1.0
+		param_named g_ZFar float 2.0
+	}
+}
+
+fragment_program Ogre/Hair/CopyTexturePS hlsl
+{
+	source Hair.hlsl
+	entry_point CopyTexturePS
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/MeshPS hlsl
+{
+	source Hair.hlsl
+	entry_point MeshPS
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_useScalpTexture int 0
+	}
+}
+
+fragment_program Ogre/Hair/MeshPSShadows hlsl
+{
+	source Hair.hlsl
+	entry_point MeshPSShadows
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_useScalpTexture int 0
+		param_named g_useShadows int 1
+	}
+}
+
+fragment_program Ogre/Hair/PSDrawPlane hlsl
+{
+	source Hair.hlsl
+	entry_point PSDrawPlane
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_useShadows bool 1
+	}
+}
+
+fragment_program Ogre/Hair/MeshDepthPS hlsl
+{
+	source Hair.hlsl
+	entry_point MeshDepthPS
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/MeshDepthPS_DOM hlsl
+{
+	source Hair.hlsl
+	entry_point MeshDepthPS_DOM
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_DRAW_TEXTURE hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DRAW_TEXTURE
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_densityThreshold float 1.0
+		param_named g_rowWidth int 1
+		param_named g_colWidth int 1
+	}
+}
+
+fragment_program Ogre/Hair/PS_DRAW_COLLISIONS_TEXTURE hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DRAW_COLLISIONS_TEXTURE
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_RESOLVE_SUPERSAMPLE hlsl
+{
+	source Hair.hlsl
+	entry_point PS_RESOLVE_SUPERSAMPLE
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_SSg_textureWidth float 0.0
+		param_named g_SSg_textureHeight float 0.0
+	}
+}
+
+fragment_program Ogre/Hair/PS_RECONSTRUCT_DEPTH hlsl
+{
+	source Hair.hlsl
+	entry_point PS_RECONSTRUCT_DEPTH
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+fragment_program Ogre/Hair/PS_DRAW_TEXTURE_DEMUX hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DRAW_TEXTURE_DEMUX
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_densityThreshold float 1.0
+		param_named g_rowWidth int 1
+		param_named g_colWidth int 1
+		param_named g_textureIndex int 1
+	}
+}
+
+fragment_program Ogre/Hair/PS_DEMUX hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DEMUX
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_gridZIndex int 1
+	}
+}
+
+fragment_program Ogre/Hair/PS_VOXELIZE_OBSTACLES hlsl
+{
+	source Hair.hlsl
+	entry_point PS_VOXELIZE_OBSTACLES
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_NumSphereImplicits int 1
+		param_named g_NumCylinderImplicits int 1
+		param_named g_NumSphereNoMoveImplicits int 1
+		param_named g_densityThreshold float 1.0
+		param_named g_textureDepth float 1.0
+		param_named g_gridZIndex int 1
+	}
+}
+
+fragment_program Ogre/Hair/PS_DEMUX_TO_3D_OBSTACLE_TEX hlsl
+{
+	source Hair.hlsl
+	entry_point PS_DEMUX_TO_3D_OBSTACLE_TEX
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_NumSphereImplicits int 1
+		param_named g_NumCylinderImplicits int 1
+		param_named g_NumSphereNoMoveImplicits int 1
+		param_named g_densityThreshold float 1.0
+		param_named g_textureDepth float 1.0
+	}
+}
+
+fragment_program Ogre/Hair/PSArrow hlsl
+{
+	source Hair.hlsl
+	entry_point PSArrow
+	target ps_4_0
+	
+	default_params
+	{
+	
+	}
+}
+
+material Ogre/Hair/RenderHair
+{
+	technique RenderHair
+	{
+		//hardwareTessellation passes for multistrand interpolation  ------------------------------------------------
+		pass InterpolateAndRenderM_HardwareTess
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVS_DUMMY11
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrand
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrand
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPS
+			{
+			
+			}
+
+			scene_blend alpha_blend
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+		pass InterpolateInstancedVS_LOAD
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSMultiStrand_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPS
+			{
+			
+			}
+
+			scene_blend alpha_blend
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}  
+		pass InterpolateAndRenderDepth_HardwareTess
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVS_DUMMY11
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandDepth
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandDepth
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+
+			scene_blend alpha_blend
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		pass InterpolateAndRenderDepth_HardwareTess_DOM
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVS_DUMMY11
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandDepth
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandDepth
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+
+			scene_blend add
+			scene_blend_op min
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		pass InterpolateInstancedDepthVS_LOAD
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSMultiStrandDepthShadows_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		pass InterpolateInstancedDepthVS_LOAD_DOM
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSMultiStrandDepthShadows_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+
+			scene_blend add
+			scene_blend_op min
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		 pass InterpolateAndRenderCollisions_HardwareTess
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVS_DUMMY11
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandCollisions
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandCollisionsWithGS
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSMultiStrandCollisions
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/InterpolatePSMultiStrandCollisions
+			{
+			
+			}
+
+			scene_blend add
+			scene_blend_op min
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}   
+		pass InterpolateInstancedBaryCentricCollisions
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSMultiStrandCollisions
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/InterpolatePSMultiStrandCollisions
+			{
+			
+			}
+
+			scene_blend add
+			scene_blend_op min
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}      
+		
+		//tessellation
+		pass Tessellate
+		{
+			vertex_program_ref Ogre/Hair/TessellateVSBSplinePassThrough
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/TessellateGSBSpline
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass TessellateSB
+		{
+			vertex_program_ref Ogre/Hair/TessellateVSBSplinePassThrough
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/TessellateGSBSplineSB
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		
+		pass TessellateCoordinateFrames
+		{
+			vertex_program_ref Ogre/Hair/TessellateVSBSplineCFs
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/TessellateVSBSplineCFsG
+			{
+			
+			}
+			depth_check off
+			depth_write off	
+		}
+		
+		pass TessellateCoordinateFramesSB
+		{
+			vertex_program_ref Ogre/Hair/TessellateVSBSplineSBCFs
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/TessellateVSBSplineSBCFsG
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		
+		pass TessellateLengths
+		{
+			vertex_program_ref Ogre/Hair/TessellateVSBSplineLengths
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/TessellateVSBSplineLengthsG
+			{
+			
+			}
+
+			depth_check off
+			depth_write off
+		}
+		   
+		//streamout the attributes-----------------------------------------------------
+		pass SO_M_Attributes
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSMultiStrand_SO
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateVSMultiStrand_SOG
+			{
+			
+			}
+
+			depth_check off
+			depth_write off	
+		}
+		pass SO_S_Attributes
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrand_SO
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateVSSingleStrand_SOG
+			{
+			
+			}
+
+			depth_check off
+			depth_write off  
+		}
+		pass InterpolateInstancedDepthVSSingleStrand11
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVS_DUMMY11
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_DEPTH
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+		pass InterpolateInstancedDepthVSSingleStrand11_DOM
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVS_DUMMY11
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_DEPTH
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+
+			scene_blend add
+			scene_blend_op min
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+		pass InterpolateAndRenderS_HardwareTess
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVS_DUMMY11
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_NORMAL
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPS
+			{
+			
+			}
+
+			scene_blend alpha_blend
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		//normal rendering
+		pass InterpolateInstancedDepthPrepassVS
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSDepthPrepass
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthPrepass
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPSDepthPrepass
+			{
+			
+			}
+
+			alpha_to_coverage on
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}    
+		pass InterpolateInstancedDepthPrepassVS_LOAD
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSDepthPrepass_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthPrepass
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPSDepthPrepass
+			{
+			
+			}
+
+			alpha_to_coverage on
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+		
+		pass InterpolateInstancedVS
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSMultiStrand
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPS
+			{
+			
+			}
+
+			scene_blend alpha_blend
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		
+		pass InterpolateInstancedVSSingleStrandDepthPrepass
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSClumpDepthPrepass
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthPrepass
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPSDepthPrepass
+			{
+			
+			}
+
+			alpha_to_coverage on
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+		pass InterpolateInstancedVSSingleStrandDepthPrepass_LOAD
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSClumpDepthPrepass_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthPrepass
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPSDepthPrepass
+			{
+			
+			}
+
+			alpha_to_coverage on
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+		
+		pass InterpolateInstancedVSSingleStrand
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrand
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPS
+			{
+			
+			}
+
+			scene_blend alpha_blend
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+		pass InterpolateInstancedVSSingleStrand_LOAD
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrand_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPS
+			{
+			
+			}
+
+			scene_blend alpha_blend
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+		
+		//density rendering
+
+		pass InterpolateInstancedVSRenderCollisionsNormal
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSMCollisions
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSMCollisions
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/InterpolatePSMCollisions
+			{
+			
+			}
+
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none 
+		} 
+	   
+		pass InterpolateInstancedVSForGrid3DTextureMRT
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVS2Grid
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGS2Grid
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderPSForGridMRT
+			{
+			
+			}
+			scene_blend add
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+		//next passes are for shadows
+		pass InterpolateInstancedDepthVS
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSBMultiStrandDepthShadows
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		pass InterpolateInstancedDepthVS_DOM
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSBMultiStrandDepthShadows
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+			scene_blend add
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		pass InterpolateInstancedDepthVSSingleStrand
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrandDepthShadows
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		pass InterpolateInstancedDepthVSSingleStrand_DOM
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrandDepthShadows
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+			scene_blend add
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}
+
+		pass InterpolateInstancedDepthVSSingleStrand_LOAD
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrandDepthShadows_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		} 
+		pass InterpolateInstancedDepthVSSingleStrand_LOAD_DOM
+		{
+			vertex_program_ref Ogre/Hair/InterpolateVSSingleStrandDepthShadows_LOAD
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/InterpolateGSDepthShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/RenderDepthPSSmall_DOM
+			{
+			
+			}
+			scene_blend add
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		} 
+			
+		pass VisualizeShadowMap
+		{
+			vertex_program_ref Ogre/Hair/FullScreenTriVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/VisDepthsPS
+			{
+			
+			}
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none	
+		}
+		
+		pass copyTexture
+		{
+			vertex_program_ref Ogre/Hair/FullScreenTriVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/CopyTexturePS
+			{
+			
+			}
+			scene_blend alpha_blend
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+		
+		pass AllNulls
+		{
+		}
+	}
+}
+
+material Ogre/Hair/RenderMesh
+{
+	technique RenderMesh
+	{
+		pass RenderWithoutShadows
+		{
+			vertex_program_ref Ogre/Hair/MeshVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshPS
+			{
+			
+			}
+			depth_check on
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+		pass RenderWithShadows
+		{
+			vertex_program_ref Ogre/Hair/MeshVSShadows
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshPSShadows
+			{
+			
+			}
+			depth_check on
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+		pass RenderMeshDepthPass
+		{
+			vertex_program_ref Ogre/Hair/MeshVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshPS
+			{
+			
+			}
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
+			colour_write off
+		}
+	}
+}
+material Ogre/Hair/RenderPlane
+{
+	technique RenderPlane
+	{
+		pass RenderPlaneWithShadows
+		{
+			vertex_program_ref Ogre/Hair/VSDrawPlane
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/PSDrawPlane
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+			
+		}  
+		pass RenderPlaneWithoutShadows
+		{
+			vertex_program_ref Ogre/Hair/VSDrawPlane
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/PSDrawPlane
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none			
+		}  
+	}
+}
+
+material Ogre/Hair/RenderMeshDepth
+{
+	technique RenderMeshDepth
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/MeshDepthVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshDepthPS
+			{
+			
+			}
+			depth_check on
+			depth_write on
+			cull_hardware none
+			cull_software none
+		}  
+	}
+}
+material Ogre/Hair/RenderMeshDepth_DOM
+{
+	technique RenderMeshDepth_DOM
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/MeshDepthVS
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/MeshDepthPS_DOM
+			{
+			
+			}
+			scene_blend add
+			depth_check off
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}  
+	}
+}
+
+material Ogre/Hair/RenderArrow
+{
+	technique RenderArrow
+	{
+		pass P0
+		{
+			vertex_program_ref Ogre/Hair/VSArrow
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/PSArrow
+			{
+			
+			}
+			depth_check on
+			depth_write off
+			cull_hardware none
+			cull_software none       
+		}
+	}
+}
+
+material Ogre/Hair/DrawTexture
+{
+	technique DrawTexture
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_DRAW_TEXTURE
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass drawCollisionsTexture
+		{
+			vertex_program_ref Ogre/Hair/VS_COLLISIONS
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_DRAW_COLLISIONS_TEXTURE
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass ResolveSuperSample
+		{
+			vertex_program_ref Ogre/Hair/VS_COLLISIONS
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_RESOLVE_SUPERSAMPLE
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+		pass ReconstructDepth
+		{
+			vertex_program_ref Ogre/Hair/VS_COLLISIONS
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_RECONSTRUCT_DEPTH
+			{
+			
+			}
+			depth_check off
+			depth_write on
+			colour_write off
+		}       
+	}
+}
+
+material Ogre/Hair/DrawTextureDemuxed
+{
+	technique DrawTextureDemuxed
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_DRAW_TEXTURE_DEMUX
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+	}
+}
+
+material Ogre/Hair/TextureDemux
+{
+	technique TextureDemux
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_DEMUX
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+	}
+}
+
+material Ogre/Hair/VoxelizeObstacles
+{
+	technique VoxelizeObstacles
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/PS_VOXELIZE_OBSTACLES
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+	}
+}
+
+material Ogre/Hair/RenderCollisionObjects
+{
+	technique RenderCollisionObjects
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/CollisionVS
+			{
+			
+			}
+
+			fragment_program_ref Ogre/Hair/CollisionPS
+			{
+			
+			}
+			depth_check on
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+	}
+}
+
+material Ogre/Hair/DemuxTo3DFluidObstacles
+{
+	technique DemuxTo3DFluidObstacles
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Hair/VS_GRID_FLUIDSIM
+			{
+			
+			}
+			geometry_program_ref Ogre/Hair/GS_ARRAY
+			{
+			
+			}
+			fragment_program_ref Ogre/Hair/PS_DEMUX_TO_3D_OBSTACLE_TEX
+			{
+			
+			}
+			depth_check off
+			depth_write off
+		}
+
+	}
+}*/

@@ -30,8 +30,6 @@ THE SOFTWARE.
 // Common stuff
 
 #include "OgrePlatformInformation.h"
-#include "OgreString.h"
-#include "OgrePlatformInformation.h"
 
 #if OGRE_CPU == OGRE_CPU_X86
     #include <xmmintrin.h>
@@ -51,6 +49,9 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+    typedef _StringBase String;
+
     /** \addtogroup Core
     *  @{
     */
@@ -411,7 +412,7 @@ namespace Ogre {
 
         template <class InputIterator>
         HashedVector(InputIterator a, InputIterator b)
-            : mList(a, b), mListHashDirty(false)
+            : mList(a, b), mListHash(0), mListHashDirty(false)
         {
             dirtyHash();
         }
@@ -568,6 +569,9 @@ namespace Ogre {
     };
     typedef HashedVector<LightClosest> LightList;
     typedef vector<LightClosest>::type LightClosestVec;
+
+    /// Constant blank string, useful for returning by ref where local does not exist
+    const String BLANKSTRING;
 
     typedef map<String, bool>::type UnaryOptionList;
     typedef map<String, String>::type BinaryOptionList;

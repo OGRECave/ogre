@@ -28,7 +28,9 @@ same license as the rest of the engine.
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrainPagedWorldSection.h"
+#include "OgreTerrainAutoUpdateLod.h"
 #include "OgreTerrainPaging.h"
+#include "OgrePageManager.h"
 #include "PerlinNoiseTerrainGenerator.h"
 
 #define ENDLESS_TERRAIN_FILE_PREFIX String("EndlessWorldTerrain")
@@ -384,6 +386,11 @@ protected:
     void setupContent()
     {
         mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
+
+        // Bugfix for D3D11 Render System because of pixel format incompatibility when using
+        // vertex compression
+        if (Ogre::Root::getSingleton().getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem")
+            mTerrainGlobals->setUseVertexCompressionWhenAvailable(false);
 
         setupControls();
         mCameraMan->setTopSpeed(100);

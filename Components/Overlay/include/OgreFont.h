@@ -29,9 +29,8 @@ THE SOFTWARE
 
 #include "OgreOverlayPrerequisites.h"
 #include "OgreResource.h"
-#include "OgreTexture.h"
-#include "OgreMaterial.h"
 #include "OgreCommon.h"
+#include "OgreSharedPtr.h"
 
 namespace Ogre
 {
@@ -165,7 +164,7 @@ namespace Ogre
         /// Texture pointer
         TexturePtr mTexture;
 
-        /// for TRUE_TYPE font only
+        /// For TRUE_TYPE font only
         bool mAntialiasColour;
 
         /// Range of code points to generate glyphs for (truetype only)

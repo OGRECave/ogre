@@ -84,6 +84,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/atifs/include
   ${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse
+  ${OGRE_SOURCE_DIR}/OgreMain/include/Threading
 )
 
 if(NOT APPLE)

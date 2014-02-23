@@ -29,12 +29,9 @@ THE SOFTWARE.
 #define __Ogre_Volume_MeshBuilder_H__
 
 #include <vector>
-#include "OgreSimpleRenderable.h"
 #include "OgreManualObject.h"
-#include "OgreRenderOperation.h"
 #include "OgreVector3.h"
 #include "OgreAxisAlignedBox.h"
-#include "OgreSceneManager.h"
 #include "OgreVolumePrerequisites.h"
 
 namespace Ogre {

@@ -28,7 +28,7 @@ THE SOFTWARE
 #define _TextAreaOverlayElement_H__
 
 #include "OgreOverlayElement.h"
-#include "OgreFont.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre
 {
@@ -230,6 +230,7 @@ namespace Ogre
         FontPtr mFont;
         Real mCharHeight;
         ushort mPixelCharHeight;
+        bool mSpaceWidthOverridden;
         Real mSpaceWidth;
         ushort mPixelSpaceWidth;
         size_t mAllocSize;

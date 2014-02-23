@@ -35,22 +35,17 @@ CPPUNIT_TEST_SUITE_REGISTRATION( EdgeBuilderTests );
 
 void EdgeBuilderTests::setUp()
 {
+    OGRE_DELETE LogManager::getSingletonPtr();
+    mLogManager = OGRE_NEW LogManager();
+    mLogManager->createLog("EdgeBuilderTests.log", true);
+    mLogManager->setLogDetail(LL_LOW);
+
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
-
-    // set up silent logging to not pollute output
-    if(LogManager::getSingletonPtr())
-        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-
-    if(LogManager::getSingletonPtr() == 0)
-    {
-        LogManager* logManager = OGRE_NEW LogManager();
-        logManager->createLog("EdgeBuilderTests.log", true, false);
-    }
-    LogManager::getSingleton().setLogDetail(LL_LOW);
 }
 void EdgeBuilderTests::tearDown()
 {
     OGRE_DELETE mBufMgr;
+    OGRE_DELETE mLogManager;
 }
 
 void EdgeBuilderTests::testSingleIndexBufSingleVertexBuf()

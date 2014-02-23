@@ -31,12 +31,10 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 
-#include "OgreString.h"
 #include "OgreMovableObject.h"
 #include "OgreQuaternion.h"
 #include "OgreVector3.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreMesh.h"
 #include "OgreRenderable.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreSubEntity.h"
@@ -234,7 +232,16 @@ namespace Ogre {
         */
         typedef vector<Entity*>::type LODEntityList;
         LODEntityList mLodEntityList;
-
+#else
+        const ushort mMeshLodIndex;
+        const Real mMeshLodFactorTransformed;
+        const ushort mMinMeshLodIndex;
+        const ushort mMaxMeshLodIndex;
+        const Real mMaterialLodFactor;
+        const Real mMaterialLodFactorTransformed;
+        const ushort mMinMaterialLodIndex;
+        const ushort mMaxMaterialLodIndex;
+#endif
         /** This Entity's personal copy of the skeleton, if skeletally animated.
         */
         OldSkeletonInstance* mSkeletonInstance;
@@ -378,14 +385,6 @@ namespace Ogre {
         /** Returns whether or not the entity is currently displaying its skeleton.
         */
         bool getDisplaySkeleton(void) const;
-
-
-        /** Gets a pointer to the entity representing the numbered manual level of detail.
-        @remarks
-            The zero-based index never includes the original entity, unlike
-            Mesh::getLodLevel.
-        */
-        Entity* getManualLodLevel(size_t index) const;
 
         /** Returns the number of manual levels of detail that this entity supports.
         @remarks
@@ -698,6 +697,24 @@ namespace Ogre {
         */
         bool getAlwaysUpdateMainSkeleton() const {
             return mAlwaysUpdateMainSkeleton;
+        }
+
+        /** If true, the skeleton of the entity will be used to update the bounding box for culling.
+            Useful if you have skeletal animations that move the bones away from the root.  Otherwise, the
+            bounding box of the mesh in the binding pose will be used.
+        @remarks
+            When true, the bounding box will be generated to only enclose the bones that are used for skinning.
+            Also the resulting bounding box will be expanded by the amount of GetMesh()->getBoneBoundingRadius().
+            The expansion amount can be changed on the mesh to achieve a better fitting bounding box.
+        */
+        void setUpdateBoundingBoxFromSkeleton(bool update);
+
+        /** If true, the skeleton of the entity will be used to update the bounding box for culling.
+            Useful if you have skeletal animations that move the bones away from the root.  Otherwise, the
+            bounding box of the mesh in the binding pose will be used.
+        */
+        bool getUpdateBoundingBoxFromSkeleton() const {
+            return mUpdateBoundingBoxFromSkeleton;
         }
 
         

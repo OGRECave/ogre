@@ -33,10 +33,7 @@ THE SOFTWARE.
 #include "OgreDDSCodec.h"
 #include "OgreImage.h"
 #include "OgreException.h"
-
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-
 
 namespace Ogre {
     // Internal DDS structure definitions
@@ -136,10 +133,7 @@ namespace Ogre {
     const uint32 DDSD_CAPS = 0x00000001;
     const uint32 DDSD_HEIGHT = 0x00000002;
     const uint32 DDSD_WIDTH = 0x00000004;
-    const uint32 DDSD_PITCH = 0x00000008;
     const uint32 DDSD_PIXELFORMAT = 0x00001000;
-    const uint32 DDSD_MIPMAPCOUNT = 0x00020000;
-    const uint32 DDSD_LINEARSIZE = 0x00080000;
     const uint32 DDSD_DEPTH = 0x00800000;
     const uint32 DDPF_ALPHAPIXELS = 0x00000001;
     const uint32 DDPF_FOURCC = 0x00000004;
@@ -155,6 +149,11 @@ namespace Ogre {
     const uint32 DDSCAPS2_CUBEMAP_POSITIVEZ = 0x00004000;
     const uint32 DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x00008000;
     const uint32 DDSCAPS2_VOLUME = 0x00200000;
+
+    // Currently unused
+//    const uint32 DDSD_PITCH = 0x00000008;
+//    const uint32 DDSD_MIPMAPCOUNT = 0x00020000;
+//    const uint32 DDSD_LINEARSIZE = 0x00080000;
 
     // Special FourCC codes
     const uint32 D3DFMT_R16F            = 111;
@@ -221,7 +220,6 @@ namespace Ogre {
         // Establish texture attributes
         bool isVolume = (imgData->depth > 1);       
         bool isFloat32r = (imgData->format == PF_FLOAT32_R);
-        bool hasAlpha = false;
         bool notImplemented = false;
         String notImplementedString = "";
 
@@ -280,7 +278,8 @@ namespace Ogre {
             // Build header and write to disk
 
             // Variables for some DDS header flags
-            uint32 ddsHeaderFlags = 0;          
+            bool hasAlpha = false;
+            uint32 ddsHeaderFlags = 0;
             uint32 ddsHeaderRgbBits = 0;
             uint32 ddsHeaderSizeOrPitch = 0;
             uint32 ddsHeaderCaps1 = 0;
@@ -914,10 +913,9 @@ namespace Ogre {
     void DDSCodec::flipEndian(void * pData, size_t size) const
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        char swapByte;
         for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
         {
-            swapByte = *(char *)((long)pData + byteIndex);
+            char swapByte = *(char *)((long)pData + byteIndex);
             *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
             *(char *)((long)pData + size - byteIndex - 1) = swapByte;
         }
@@ -938,7 +936,7 @@ namespace Ogre {
             }
         }
 
-        return StringUtil::BLANK;
+        return BLANKSTRING;
 
     }
     

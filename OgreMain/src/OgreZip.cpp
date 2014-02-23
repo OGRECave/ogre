@@ -29,12 +29,10 @@ THE SOFTWARE.
 
 #if OGRE_NO_ZIP_ARCHIVE == 0
 
-#include "OgreZip.h"
+//#include "OgreZip.h"
 
 #include "OgreLogManager.h"
 #include "OgreException.h"
-#include "OgreStringVector.h"
-#include "OgreRoot.h"
 
 #include <zzip/zzip.h>
 #include <zzip/plugin.h>
@@ -161,7 +159,7 @@ namespace Ogre {
             int zerr = zzip_error(mZzipDir);
             String zzDesc = getZzipErrorDescription((zzip_error_t)zerr);
             LogManager::getSingleton().logMessage(
-                mName + " - Unable to open file " + lookUpFileName + ", error was '" + zzDesc + "'");
+                mName + " - Unable to open file " + lookUpFileName + ", error was '" + zzDesc + "'", LML_CRITICAL);
                 
             // return null pointer
             return DataStreamPtr();

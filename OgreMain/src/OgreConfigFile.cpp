@@ -65,6 +65,12 @@ namespace Ogre {
         loadDirect(filename, separators, trimWhitespace);
     }
     //-----------------------------------------------------------------------
+    void ConfigFile::load(const String& filename, const String& resourceGroup, 
+        const String& separators, bool trimWhitespace)
+    {
+        loadFromResourceSystem(filename, resourceGroup, separators, trimWhitespace);
+    }
+    //-----------------------------------------------------------------------
     void ConfigFile::loadDirect(const String& filename, const String& separators, 
         bool trimWhitespace)
     {
@@ -102,7 +108,7 @@ namespace Ogre {
         /* Clear current settings map */
         clear();
 
-        String currentSection = StringUtil::BLANK;
+        String currentSection = BLANKSTRING;
         SettingsMultiMap* currentSettings = OGRE_NEW_T(SettingsMultiMap, MEMCATEGORY_GENERAL)();
         mSettings[currentSection] = currentSettings;
 

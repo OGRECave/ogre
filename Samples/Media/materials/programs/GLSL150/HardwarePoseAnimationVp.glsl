@@ -15,11 +15,10 @@ uniform vec4 anim_t;
 // hardware pose animation (no normals)
 void main()
 {
-	// interpolate
-    vec4 interp = vec4(vertex + anim_t.x*uv1.xyz + anim_t.y*uv2.xyz, 1.0);
+    // interpolate
+    vec4 interp = vec4(vertex.xyz + anim_t.x * uv1.xyz + anim_t.y * uv2.xyz, 1.0);
 
-	gl_Position = worldViewProj * interp;
-	oUv = uv0.xy;
-	colour = vec4(1.0,0.0,0.0,1.0);
+    gl_Position = worldViewProj * interp;
+    oUv = uv0.xy;
+    colour = vec4(1.0, 0.0, 0.0, 1.0);
 }
-

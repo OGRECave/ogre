@@ -29,14 +29,7 @@ THE SOFTWARE.
 #ifndef __OverlaySystem_H__
 #define __OverlaySystem_H__
 
-#include "OgreOverlay.h"
-#include "OgreOverlayContainer.h"
-#include "OgreOverlayElement.h"
-#include "OgreOverlayManager.h"
-#include "OgreFontManager.h"
-#include "OgreBorderPanelOverlayElement.h"
-#include "OgreTextAreaOverlayElement.h"
-#include "OgreOverlayElementFactory.h"
+#include "OgreOverlayPrerequisites.h"
 #include "OgreRenderQueueListener.h"
 
 #if OGRE_PROFILING

@@ -30,29 +30,17 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 
 #include "OgreCamera.h"
-#include "OgreRenderSystem.h"
 #include "OgreMeshManager.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
 #include "OgreEntity.h"
 #include "OgreSubEntity.h"
 #include "OgreLight.h"
-#include "OgreMath.h"
 #include "OgreControllerManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreAnimation.h"
-#include "OgreAnimationTrack.h"
-#include "OgreRenderQueueSortingGrouping.h"
-#include "OgreStringConverter.h"
-#include "OgreRenderQueueListener.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreBillboardSet.h"
-#include "OgrePass.h"
 #include "OgreTechnique.h"
-#include "OgreTextureUnitState.h"
-#include "OgreException.h"
 #include "OgreLogManager.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
 #include "OgreSpotShadowFadePng.h"
 #include "OgreGpuProgramManager.h"
@@ -65,9 +53,15 @@ THE SOFTWARE.
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"
 #include "OgreParticleSystemManager.h"
+#include "OgreParticleSystem.h"
 #include "OgreProfiler.h"
 #include "OgreInstanceBatch.h"
 #include "OgreInstancedEntity.h"
+#include "OgreRenderTexture.h"
+#include "OgreTextureManager.h"
+#include "OgreSceneNode.h"
+#include "OgreRectangle2D.h"
+#include "OgreLodListener.h"
 #include "OgreOldNode.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"
@@ -98,6 +92,7 @@ mName(name),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
 mAmbientLight(ColourValue::Black),
+mCameraInProgress(0),
 mCurrentViewport(0),
 mCurrentShadowNode(0),
 mSkyPlaneEntity(0),
@@ -823,9 +818,9 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             }
             // Set fixed-function vertex parameters
         }
-        if (pass->hasTesselationHullProgram())
+        if (pass->hasTessellationHullProgram())
         {
-            bindGpuProgram(pass->getTesselationHullProgram()->_getBindingDelegate());
+            bindGpuProgram(pass->getTessellationHullProgram()->_getBindingDelegate());
             // bind parameters later
         }
         else
@@ -835,12 +830,12 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             {
                 mDestRenderSystem->unbindGpuProgram(GPT_HULL_PROGRAM);
             }
-            // Set fixed-function tesselation control parameters
+            // Set fixed-function tessellation control parameters
         }
 
-        if (pass->hasTesselationDomainProgram())
+        if (pass->hasTessellationDomainProgram())
         {
-            bindGpuProgram(pass->getTesselationDomainProgram()->_getBindingDelegate());
+            bindGpuProgram(pass->getTessellationDomainProgram()->_getBindingDelegate());
             // bind parameters later
         }
         else
@@ -850,9 +845,23 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             {
                 mDestRenderSystem->unbindGpuProgram(GPT_DOMAIN_PROGRAM);
             }
-            // Set fixed-function tesselation evaluation parameters
+            // Set fixed-function tessellation evaluation parameters
         }
 
+                if (pass->hasComputeProgram())
+        {
+                    bindGpuProgram(pass->getComputeProgram()->_getBindingDelegate());
+                    // bind parameters later
+        }
+        else
+        {
+                    // Unbind program?
+                    if (mDestRenderSystem->isGpuProgramBound(GPT_COMPUTE_PROGRAM))
+                    {
+                        mDestRenderSystem->unbindGpuProgram(GPT_COMPUTE_PROGRAM);
+                    }
+                    // Set fixed-function compute parameters
+        }
 
         if (passSurfaceAndLightParams)
         {
@@ -1487,7 +1496,7 @@ void SceneManager::_setSkyBox(
             !m->getBestTechnique()->getNumPasses())
         {
             LogManager::getSingleton().logMessage(
-                "Warning, skybox material " + materialName + " is not supported, defaulting.");
+                "Warning, skybox material " + materialName + " is not supported, defaulting.", LML_CRITICAL);
             m = MaterialManager::getSingleton().getDefaultSettings();
         }
 
@@ -1533,7 +1542,6 @@ void SceneManager::_setSkyBox(
         for (uint16 i = 0; i < 6; ++i)
         {
             Plane plane;
-            String meshName;
             Vector3 middle;
             Vector3 up, right;
 
@@ -4447,10 +4455,7 @@ SceneManager::RenderContext* SceneManager::_pauseRendering()
 //---------------------------------------------------------------------
 void SceneManager::_resumeRendering(SceneManager::RenderContext* context) 
 {
-    if (mRenderQueue != 0) 
-    {
-        delete mRenderQueue;
-    }
+    delete mRenderQueue;
     mRenderQueue = context->renderQueue;
     _setActiveCompositorChain(context->activeChain);
     Ogre::Viewport* vp = context->viewport;
@@ -5252,17 +5257,23 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
                 pass->getFragmentProgramParameters(), mGpuParamsDirty);
         }
 
-        if (pass->hasTesselationHullProgram())
+        if (pass->hasTessellationHullProgram())
         {
             mDestRenderSystem->bindGpuProgramParameters(GPT_HULL_PROGRAM, 
-                pass->getTesselationHullProgramParameters(), mGpuParamsDirty);
+                pass->getTessellationHullProgramParameters(), mGpuParamsDirty);
         }
 
-        if (pass->hasTesselationHullProgram())
+        if (pass->hasTessellationDomainProgram())
         {
             mDestRenderSystem->bindGpuProgramParameters(GPT_DOMAIN_PROGRAM, 
-                pass->getTesselationDomainProgramParameters(), mGpuParamsDirty);
+                pass->getTessellationDomainProgramParameters(), mGpuParamsDirty);
         }
+
+                // if (pass->hasComputeProgram())
+        // {
+                //     mDestRenderSystem->bindGpuProgramParameters(GPT_COMPUTE_PROGRAM, 
+                //                                                 pass->getComputeProgramParameters(), mGpuParamsDirty);
+        // }
 
         mGpuParamsDirty = 0;
     }

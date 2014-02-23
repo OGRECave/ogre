@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 #include "OgrePrerequisites.h"
 #include "OgreMemoryTracker.h"
-#include "OgreString.h"
+#include <iostream>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #   include <windows.h>
@@ -108,7 +108,7 @@ namespace Ogre
     {   
         if (mRecordEnable)
         {
-            StringUtil::StrStreamType os;
+            StringStream os;
 
             if (mAllocations.empty())
             {

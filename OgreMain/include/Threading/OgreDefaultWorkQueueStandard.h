@@ -39,7 +39,7 @@ namespace Ogre
     {
     public:
 
-        DefaultWorkQueue(const String& name = StringUtil::BLANK);
+        DefaultWorkQueue(const String& name = BLANKSTRING);
         virtual ~DefaultWorkQueue(); 
 
         /// Main function for each thread spawned.

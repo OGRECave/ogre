@@ -30,21 +30,12 @@ THE SOFTWARE.
 
 // Emulate _findfirst, _findnext on non-Windows platforms
 
-
-
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-
 #include "OgrePlatform.h"
 
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 
-#include <dirent.h>
 #include <unistd.h>
-#include <fnmatch.h>
 
 /* Our simplified data entry structure */
 struct _finddata_t

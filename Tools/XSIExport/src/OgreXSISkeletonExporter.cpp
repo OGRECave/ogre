@@ -384,7 +384,7 @@ namespace Ogre
             // up all the potentially derived effects on deformers
 
             float animLength = (float)(animEntry.endFrame - animEntry.startFrame) / fps;
-            StringUtil::StrStreamType str;
+            StringStream str;
             str << "Creating animation " << animEntry.animationName << 
                 " with length " << animLength << " seconds";
             LogOgreAndXSI(str.str());

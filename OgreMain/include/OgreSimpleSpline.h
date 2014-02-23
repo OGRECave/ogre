@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __SimpleSpline_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreVector3.h"
 #include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
 

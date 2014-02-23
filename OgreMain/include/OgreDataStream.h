@@ -29,13 +29,14 @@ THE SOFTWARE.
 #define __DataStream_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
 #include "OgreSharedPtr.h"
 #include <istream>
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-    
+
+    typedef _StringBase String;
+
     /** Template version of cache based on static array.
      'cacheSize' defines size of cache in bytes. */
     template <size_t cacheSize>
@@ -56,6 +57,7 @@ namespace Ogre {
         {
             mValidBytes = 0;
             mPos = 0;
+            memset(mBuffer, 0, cacheSize);
         }
         
         /** Cache data pointed by 'buf'. If 'count' is greater than cache size, we cache only last bytes.
@@ -302,11 +304,6 @@ namespace Ogre {
 
     };
 
-    /** Shared pointer to allow data streams to be passed around without
-        worrying about deallocation
-    */
-    typedef SharedPtr<DataStream> DataStreamPtr;
-
     /// List of DataStream items
     typedef list<DataStreamPtr>::type DataStreamList;
     /// Shared pointer to list of DataStream items
@@ -477,11 +474,6 @@ namespace Ogre {
         /** Sets whether or not to free the encapsulated memory on close. */
         void setFreeOnClose(bool free) { mFreeOnClose = free; }
     };
-
-    /** Shared pointer to allow memory data streams to be passed around without
-    worrying about deallocation
-    */
-    typedef SharedPtr<MemoryDataStream> MemoryDataStreamPtr;
 
     /** Common subclass of DataStream for handling data from 
         std::basic_istream.

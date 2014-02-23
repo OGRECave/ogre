@@ -2,6 +2,7 @@
 #define __Lighting_H__
 
 #include "SdkSample.h"
+#include "OgreBillboard.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -136,7 +137,7 @@ protected:
 
         if (mUseOcclusionQuery == false)
         {
-            LogManager::getSingleton().logMessage("Sample_Lighting - Error: failed to create hardware occlusion query");
+            LogManager::getSingleton().logMessage("Sample_Lighting - Error: failed to create hardware occlusion query", LML_CRITICAL);
         }
         
         // Create the materials to be used by the objects used fo the occlusion query

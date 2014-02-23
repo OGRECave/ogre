@@ -28,14 +28,18 @@
 #ifndef __SdkTrays_H__
 #define __SdkTrays_H__
 
-#include "Ogre.h"
-#include "OgreOverlaySystem.h"
-#include <math.h>
-
+#include "OgreOverlay.h"
+#include "OgreOverlayManager.h"
+#include "OgreBorderPanelOverlayElement.h"
+#include "OgreTextAreaOverlayElement.h"
+#include "OgreFontManager.h"
 #include "OgreTimer.h"
 #include "OgreFrameStats.h"
-
 #include "InputContext.h"
+#include "OgreRoot.h"
+#include "OgreCamera.h"
+#include "OgreRenderWindow.h"
+#include <iomanip>
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // TODO - remove this
@@ -718,7 +722,14 @@ namespace OgreBites
 
             setCaption(caption);
         }
-
+        void copyItemsFrom(SelectMenu* other){
+            const Ogre::StringVector& items = other->getItems();
+            Ogre::StringVector::const_iterator it, itEnd;
+            itEnd = items.end();
+            for(it=items.begin(); it != itEnd; it++){
+                this->addItem(*it);
+            }
+        }
         bool isExpanded()
         {
             return mExpanded;
@@ -786,58 +797,49 @@ namespace OgreBites
             setItems(mItems);
         }
 
+        void insertItem(int index, const Ogre::DisplayString& item)
+        {
+            mItems.insert(mItems.begin() + index, item);
+            setItems(mItems);
+        }
+
         void removeItem(const Ogre::DisplayString& item)
         {
-            Ogre::StringVector::iterator it;
-
-            for (it = mItems.begin(); it != mItems.end(); it++)
+            for (size_t i=0; i < mItems.size(); i++)
             {
-                if (item == *it) break;
-            }
-
-            if (it != mItems.end())
-            {
-                mItems.erase(it);
-                if (mItems.size() < mItemsShown)
-                {
-                    mItemsShown = (int)mItems.size();
-                    nukeOverlayElement(mItemElements.back());
-                    mItemElements.pop_back();
+                if (item == mItems[i]) {
+                    removeItem(static_cast<unsigned int>(i));
+                    i--; // check again same index
                 }
-            }
-            else 
-            {
-                Ogre::String desc = "Menu \"" + getName() + "\" contains no item \"" + item + "\".";
-                OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "SelectMenu::removeItem");
             }
         }
 
         void removeItem(unsigned int index)
         {
-            Ogre::StringVector::iterator it;
-            unsigned int i = 0;
-
-            for (it = mItems.begin(); it != mItems.end(); it++)
-            {
-                if (i == index) break;
-                i++;
-            }
-
-            if (it != mItems.end())
-            {
-                mItems.erase(it);
-                if (mItems.size() < mItemsShown)
-                {
-                    mItemsShown = (int)mItems.size();
-                    nukeOverlayElement(mItemElements.back());
-                    mItemElements.pop_back();
-                }
-            }
-            else 
-            {
+            if(index >= mItems.size()){
                 Ogre::String desc = "Menu \"" + getName() + "\" contains no item at position " +
                     Ogre::StringConverter::toString(index) + ".";
                 OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "SelectMenu::removeItem");
+            }
+            mItems.erase(mItems.begin() + index);
+
+            if (mItems.size() < mItemsShown)
+            {
+                mItemsShown = static_cast<unsigned int>(mItems.size());
+                nukeOverlayElement(mItemElements.back());
+                mItemElements.pop_back();
+            }
+            if((size_t)mSelectionIndex == index){
+                if(index < mItems.size()) {
+                    // update the text of the menu
+                    selectItem(index);
+                } else if (!mItems.empty()){
+                    // last item was selected and we removed it
+                    selectItem(index - 1);
+                } else {
+                    // we had only 1 item, but we removed it, so clear caption
+                    mSmallTextArea->setCaption("");
+                }
             }
         }
 
@@ -846,6 +848,11 @@ namespace OgreBites
             mItems.clear();
             mSelectionIndex = -1;
             mSmallTextArea->setCaption("");
+        }
+
+        size_t getItemsCount()
+        {
+            return mItems.size();
         }
 
         void selectItem(unsigned int index, bool notifyListener = true)
@@ -861,6 +868,21 @@ namespace OgreBites
             fitCaptionToArea(mItems[index], mSmallTextArea, mSmallBox->getWidth() - mSmallTextArea->getLeft() * 2);
 
             if (mListener && notifyListener) mListener->itemSelected(this);
+        }
+
+        bool containsItem(const Ogre::DisplayString& item)
+        {
+            bool res = false;
+            for (unsigned int i = 0; i < mItems.size(); i++)
+            {
+                if (item == mItems[i])
+                {
+                    res = true;
+                    break;
+                }
+            }
+
+            return res;
         }
 
         void selectItem(const Ogre::DisplayString& item, bool notifyListener = true)
@@ -1052,13 +1074,11 @@ namespace OgreBites
         {
             index = std::min<int>(index, (int)(mItems.size() - mItemElements.size()));
             mDisplayIndex = index;
-            Ogre::BorderPanelOverlayElement* ie;
-            Ogre::TextAreaOverlayElement* ta;
 
             for (int i = 0; i < (int)mItemElements.size(); i++)
             {
-                ie = mItemElements[i];
-                ta = (Ogre::TextAreaOverlayElement*)ie->getChild(ie->getName() + "/MenuItemText");
+                Ogre::BorderPanelOverlayElement *ie = mItemElements[i];
+                Ogre::TextAreaOverlayElement *ta = (Ogre::TextAreaOverlayElement*)ie->getChild(ie->getName() + "/MenuItemText");
 
                 fitCaptionToArea(mItems[mDisplayIndex + i], ta, ie->getWidth() - 2 * ta->getLeft());
 
@@ -1858,9 +1878,9 @@ namespace OgreBites
         | Displays specified material on backdrop, or the last material used if
         | none specified. Good for pause menus like in the browser.
         -----------------------------------------------------------------------------*/
-        void showBackdrop(const Ogre::String& materialName = Ogre::StringUtil::BLANK)
+        void showBackdrop(const Ogre::String& materialName = Ogre::BLANKSTRING)
         {
-            if (materialName != Ogre::StringUtil::BLANK) mBackdrop->setMaterialName(materialName);
+            if (materialName != Ogre::BLANKSTRING) mBackdrop->setMaterialName(materialName);
             mBackdropLayer->show();
         }
 
@@ -1873,9 +1893,9 @@ namespace OgreBites
         | Displays specified material on cursor, or the last material used if
         | none specified. Used to change cursor type.
         -----------------------------------------------------------------------------*/
-        void showCursor(const Ogre::String& materialName = Ogre::StringUtil::BLANK)
+        void showCursor(const Ogre::String& materialName = Ogre::BLANKSTRING)
         {
-            if (materialName != Ogre::StringUtil::BLANK) getCursorImage()->setMaterialName(materialName);
+            if (materialName != Ogre::BLANKSTRING) getCursorImage()->setMaterialName(materialName);
 
             if (!mCursorLayer->isVisible())
             {

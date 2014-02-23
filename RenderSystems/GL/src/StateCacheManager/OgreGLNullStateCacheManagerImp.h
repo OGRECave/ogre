@@ -166,10 +166,7 @@ namespace Ogre
         void setStencilMask(GLuint mask);
         
         /// See GLStateCacheManager.setEnabled.
-        void setEnabled(GLenum flag);
-        
-        /// See GLStateCacheManager.setDisabled.
-        void setDisabled(GLenum flag);
+        void setEnabled(GLenum flag, bool enabled);
         
         /// See GLStateCacheManager.getDiscardBuffers.
         unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }

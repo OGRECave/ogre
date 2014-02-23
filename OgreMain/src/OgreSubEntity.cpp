@@ -29,15 +29,11 @@ THE SOFTWARE.
 #include "OgreSubEntity.h"
 
 #include "OgreEntity.h"
-#include "OgreOldSkeletonInstance.h"
-#include "OgreSceneManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreSubMesh.h"
-#include "OgreTagPoint.h"
 #include "OgreLogManager.h"
 #include "OgreMesh.h"
 #include "OgreException.h"
-#include "OgreCamera.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -48,6 +44,7 @@ namespace Ogre {
         //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
         mSkelAnimVertexData = 0;
+        mVertexAnimationAppliedThisFrame = false;
         mSoftwareVertexAnimVertexData = 0;
         mHardwareVertexAnimVertexData = 0;
         mHardwarePoseCount = 0;
@@ -57,12 +54,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubEntity::~SubEntity()
     {
-        if (mSkelAnimVertexData)
-            OGRE_DELETE mSkelAnimVertexData;
-        if (mHardwareVertexAnimVertexData)
-            OGRE_DELETE mHardwareVertexAnimVertexData;
-        if (mSoftwareVertexAnimVertexData)
-            OGRE_DELETE mSoftwareVertexAnimVertexData;
+        OGRE_DELETE mSkelAnimVertexData;
+        OGRE_DELETE mHardwareVertexAnimVertexData;
+        OGRE_DELETE mSoftwareVertexAnimVertexData;
     }
     //-----------------------------------------------------------------------
     SubMesh* SubEntity::getSubMesh(void) const
@@ -72,7 +66,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const String& SubEntity::getMaterialName(void) const
     {
-        return !mMaterialPtr.isNull() ? mMaterialPtr->getName() : StringUtil::BLANK;
+        return !mMaterialPtr.isNull() ? mMaterialPtr->getName() : BLANKSTRING;
         //return mMaterialName;
     }
     //-----------------------------------------------------------------------
@@ -87,7 +81,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Can't assign material " + name +
                 " to SubEntity of " + mParentEntity->getName() + " because this "
                 "Material does not exist. Have you forgotten to define it in a "
-                ".material script?");
+                ".material script?", LML_CRITICAL);
 
             material = MaterialManager::getSingleton().getByName("BaseWhite");
 
@@ -112,7 +106,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Can't assign material "  
                 " to SubEntity of " + mParentEntity->getName() + " because this "
                 "Material does not exist. Have you forgotten to define it in a "
-                ".material script?");
+                ".material script?", LML_CRITICAL);
             
             mMaterialPtr = MaterialManager::getSingleton().getByName("BaseWhite");
             

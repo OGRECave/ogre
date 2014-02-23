@@ -76,7 +76,7 @@ void GLHardwarePixelBuffer::freeBuffer()
     }
 }
 //-----------------------------------------------------------------------------  
-PixelBox GLHardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+PixelBox GLHardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
 {
     allocateBuffer();
     if(options != HardwareBuffer::HBL_DISCARD) 
@@ -604,13 +604,13 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
     /// Disable alpha, depth and scissor testing, disable blending, 
     /// disable culling, disble lighting, disable fog and reset foreground
     /// colour.
-    mGLSupport.getStateCacheManager()->setDisabled(GL_ALPHA_TEST);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_DEPTH_TEST);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_SCISSOR_TEST);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_BLEND);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_CULL_FACE);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_LIGHTING);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_FOG);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_ALPHA_TEST, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_DEPTH_TEST, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_SCISSOR_TEST, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_BLEND, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_CULL_FACE, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_LIGHTING, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_FOG, false);
     
     /// Save and reset matrices
     glMatrixMode(GL_MODELVIEW);
@@ -716,7 +716,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         
         /// Finally we're ready to rumble   
         mGLSupport.getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
-        mGLSupport.getStateCacheManager()->setEnabled(src->mTarget);
+        mGLSupport.getStateCacheManager()->setEnabled(src->mTarget, true);
         glBegin(GL_QUADS);
         glTexCoord3f(u1, v1, w);
         glVertex2f(-1.0f, -1.0f);
@@ -727,7 +727,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         glTexCoord3f(u1, v2, w);
         glVertex2f(-1.0f, 1.0f);
         glEnd();
-        mGLSupport.getStateCacheManager()->setDisabled(src->mTarget);
+        mGLSupport.getStateCacheManager()->setEnabled(src->mTarget, false);
         
         if(tempTex)
         {
@@ -851,7 +851,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box 
         glTexImage2D(target, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
     /// GL texture buffer
-    GLTextureBuffer tex(mGLSupport, StringUtil::BLANK, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
+    GLTextureBuffer tex(mGLSupport, BLANKSTRING, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
     
     /// Upload data to 0,0,0 in temporary texture
     Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());

@@ -26,12 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __AnimationSet_H__
-#define __AnimationSet_H__
+#ifndef __AnimationState_H__
+#define __AnimationState_H__
 
 #include "OgrePrerequisites.h"
 
-#include "OgreString.h"
+#include "OgreCommon.h"
 #include "OgreController.h"
 #include "OgreIteratorWrappers.h"
 #include "Threading/OgreThreadHeaders.h"

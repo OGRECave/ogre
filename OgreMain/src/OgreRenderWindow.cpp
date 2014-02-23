@@ -28,22 +28,17 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRenderWindow.h"
 
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreViewport.h"
-#include "OgreSceneManager.h"
-
 namespace Ogre {
 
     RenderWindow::RenderWindow()
-        : RenderTarget(), mIsPrimary(false)
+        : RenderTarget(), mIsFullScreen(false), mIsPrimary(false), mLeft(0), mTop(0)
     {
         mAutoDeactivatedOnFocusChange = true;
     }
 
     //-----------------------------------------------------------------------
     void RenderWindow::getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth,
-        int& left, int& top)
+        int& left, int& top) const
     {
         width = mWidth;
         height = mHeight;

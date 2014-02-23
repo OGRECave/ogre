@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreManualObject.h"
 #include "OgreException.h"
 #include "OgreMaterialManager.h"
-#include "OgreSceneNode.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreHardwareBufferManager.h"
@@ -37,6 +36,8 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMesh.h"
 #include "OgreSubMesh.h"
+#include "OgreLogManager.h"
+#include "OgreTechnique.h"
 
 namespace Ogre {
 
@@ -186,7 +187,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Can't assign material " + materialName +
                                                   " to the ManualObject " + mName + " because this "
                                                   "Material does not exist. Have you forgotten to define it in a "
-                                                  ".material script?");
+                                                  ".material script?", LML_CRITICAL);
 
             material = MaterialManager::getSingleton().getByName("BaseWhite");
 

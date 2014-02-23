@@ -211,15 +211,7 @@ namespace Ogre {
         //-----------------------------------------------------------------------
         String CmdVisible::doGet(const void* target) const
         {
-            bool visible = 
-                static_cast<const OverlayElement*>(target)->isVisible();
-            if(visible)
-                return "true";
-            else
-                return "false";
-
-            // To keep compiler happy
-            return "true";
+            return StringConverter::toString(static_cast<const OverlayElement*>(target)->isVisible());
         }
         void CmdVisible::doSet(void* target, const String& val)
         {

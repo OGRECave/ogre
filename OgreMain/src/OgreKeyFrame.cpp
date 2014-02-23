@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreKeyFrame.h"
 #include "OgreAnimationTrack.h"
-#include "OgreHardwareBufferManager.h"
 
 namespace Ogre
 {

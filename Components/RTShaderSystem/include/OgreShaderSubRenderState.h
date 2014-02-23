@@ -28,12 +28,7 @@ THE SOFTWARE.
 #define _ShaderSubRenderState_
 
 #include "OgreShaderPrerequisites.h"
-#include "OgreGpuProgram.h"
-#include "OgreSceneManager.h"
-#include "OgreMaterialSerializer.h"
-#include "OgreScriptCompiler.h"
 #include "OgreShaderScriptTranslator.h"
-
 
 namespace Ogre {
 namespace RTShader {

@@ -5,7 +5,7 @@
 #include "SegmentedDynamicLightManager.h"
 #include "RTShaderSRSSegmentedLights.h"
 #include "OgreControllerManager.h"
-#include "OgreNameGenerator.h"
+#include "OgreBillboard.h"
 
 /*
 Part of the original guidelines under which the RTSS was created was to emulate the fixed pipeline mechanism as close as possible.  

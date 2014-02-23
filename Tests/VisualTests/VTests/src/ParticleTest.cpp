@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 
 #include "ParticleTest.h"
+#include "OgreParticleSystem.h"
 
 ParticleTest::ParticleTest()
 {

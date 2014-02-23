@@ -29,10 +29,10 @@ THE SOFTWARE.
 #include "OgreTerrain.h"
 #include "OgreVertexIndexData.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreRenderSystemCapabilities.h"
+#include "OgreCamera.h"
 #include "OgreStreamSerialiser.h"
+#include "OgreSceneNode.h"
+#include "OgreLodStrategy.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing

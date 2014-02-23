@@ -31,11 +31,8 @@ THE SOFTWARE.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
-#include "OgreHardwareIndexBuffer.h"
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
-
-
 
 namespace Ogre
 {
@@ -148,7 +145,7 @@ namespace Ogre
             /// The cFactor value used to calculate transitionDist
             Real lastCFactor;
 
-            LodLevel() : gpuIndexData(0), maxHeightDelta(0), calcMaxHeightDelta(0),
+            LodLevel() : batchSize(0), gpuIndexData(0), maxHeightDelta(0), calcMaxHeightDelta(0),
                 lastTransitionDist(0), lastCFactor(0) {}
         };
         typedef vector<LodLevel*>::type LodLevelList;
@@ -306,7 +303,8 @@ namespace Ogre
 
             VertexDataRecord(uint16 res, uint16 sz, uint16 lvls) 
                 : cpuVertexData(0), gpuVertexData(0), resolution(res), size(sz),
-                treeLevels(lvls), gpuVertexDataDirty(false) {}
+                treeLevels(lvls), numSkirtRowsCols(0),
+                skirtRowColSkip(0), gpuVertexDataDirty(false) {}
         };
         
         TerrainQuadTreeNode* mNodeWithVertexData;

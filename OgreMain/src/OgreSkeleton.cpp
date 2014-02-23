@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreOldSkeletonManager.h"
 #include "OgreSkeletonSerializer.h"
-#include "OgreStringConverter.h"
 // Just for logging
 #include "OgreAnimationTrack.h"
 #include "OgreKeyFrame.h"
@@ -546,7 +545,7 @@ namespace Ogre {
         BoneList::const_iterator iend = mBoneList.end();
         for (i = mBoneList.begin(); i != iend; ++i)
         {
-            currentBone = *i;
+            Bone* currentBone = *i;
             if (currentBone->getParent() == 0)
             {
                 // This is a root

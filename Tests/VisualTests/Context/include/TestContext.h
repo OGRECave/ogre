@@ -1,37 +1,37 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #ifndef __TestContext_H__
 #define __TestContext_H__
 
+#include "VisualTest.h"
 #include "SampleContext.h"
 #include "SamplePlugin.h"
-#include "VisualTest.h"
 
 // These need to be included prior to everything else to prevent name clashes.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
@@ -51,13 +51,13 @@ typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
 #ifdef INCLUDE_RTSHADER_SYSTEM
 
 /** This class demonstrates basic usage of the RTShader system.
- It sub class the material manager listener class and when a target scheme callback
- is invoked with the shader generator scheme it tries to create an equivalent shader
- based technique based on the default technique of the given material.
- */
+    It sub class the material manager listener class and when a target scheme callback
+    is invoked with the shader generator scheme it tries to create an equivalent shader
+    based technique based on the default technique of the given material.
+*/
 class ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
 {
-public:
+ public:
 
     ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator)
     {
@@ -65,13 +65,13 @@ public:
     }
 
     /** This is the hook point where shader based technique will be created.
-     It will be called whenever the material manager won't find appropriate technique
-     that satisfy the target scheme name. If the scheme name is out target RT Shader System
-     scheme name we will try to create shader generated technique for it.
-     */
+        It will be called whenever the material manager won't find appropriate technique
+        that satisfy the target scheme name. If the scheme name is out target RT Shader System
+        scheme name we will try to create shader generated technique for it.
+    */
     virtual Technique* handleSchemeNotFound(unsigned short schemeIndex,
-                                                  const String& schemeName, Material* originalMaterial, unsigned short lodIndex,
-                                                  const Renderable* rend)
+                                            const String& schemeName, Material* originalMaterial, unsigned short lodIndex,
+                                            const Renderable* rend)
     {
         Technique* generatedTech = NULL;
 
@@ -82,9 +82,9 @@ public:
 
             // Create shader generated technique for this material.
             techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-                                                                            originalMaterial->getName(),
-                                                                            MaterialManager::DEFAULT_SCHEME_NAME,
-                                                                            schemeName);
+                originalMaterial->getName(),
+                MaterialManager::DEFAULT_SCHEME_NAME,
+                schemeName);
 
             // Case technique registration succeeded.
             if (techniqueCreated)
@@ -111,15 +111,15 @@ public:
         return generatedTech;
     }
 
-protected:
-    RTShader::ShaderGenerator*  mShaderGenerator;           // The shader generator instance.
+ protected:
+    RTShader::ShaderGenerator* mShaderGenerator; // The shader generator instance.
 };
 #endif // INCLUDE_RTSHADER_SYSTEM
 
 /** The common environment that all of the tests run in */
 class TestContext : public OgreBites::SampleContext
 {
-public:
+ public:
 
     TestContext(int argc = 0, char** argv = 0);
     virtual ~TestContext();
@@ -127,16 +127,16 @@ public:
     /** Does basic setup for the context */
     virtual void setup();
 
-    /** Frame listener callback, handles updating of the tests at the start of frames 
+    /** Frame listener callback, handles updating of the tests at the start of frames
      *        @param evt The frame event (passed in for the framelistener) */
     virtual bool frameStarted(const FrameEvent& evt);
 
-    /** Frame listener callback, handles updating of the tests at the end of frames 
+    /** Frame listener callback, handles updating of the tests at the end of frames
      *        @param evt The frame event (passed in for the framelistener) */
     virtual bool frameEnded(const FrameEvent& evt);
 
     /** Runs a given test or sample
-     *        @param s The OgreBites::Sample to run 
+     *        @param s The OgreBites::Sample to run
      *        @remarks If s is a VisualTest, then timing and rand will be setup for
      *            determinism. */
     virtual void runSample(OgreBites::Sample* s);
@@ -167,7 +167,7 @@ public:
     void finaliseRTShaderSystem();
 
     /** Sets the timstep value
-     *        @param timestep The time to simulate elapsed between each frame 
+     *        @param timestep The time to simulate elapsed between each frame
      *        @remarks Use with care! Screenshots produced at different timesteps
      *            will almost certainly turn out different. */
     void setTimestep(Real timestep);
@@ -196,7 +196,7 @@ public:
     }
 #endif
 
-protected:
+ protected:
 
     /// The timestep
     Real mTimestep;
@@ -209,15 +209,18 @@ protected:
 
     /// The tests to be run
     std::deque<OgreBites::Sample*> mTests;
-    
+
     /// Path to the output directory for the running test
     String mOutputDir;
+
+    /// Path to the reference set location
+    String mReferenceSetPath;
 
     /// The active test (0 if none is active)
     VisualTest* mCurrentTest;
 #ifdef INCLUDE_RTSHADER_SYSTEM
-    RTShader::ShaderGenerator*          mShaderGenerator;           // The Shader generator instance.
-    ShaderGeneratorTechniqueResolverListener*   mMaterialMgrListener;       // Shader generator material manager listener.
+    RTShader::ShaderGenerator* mShaderGenerator; // The Shader generator instance.
+    ShaderGeneratorTechniqueResolverListener* mMaterialMgrListener;             // Shader generator material manager listener.
 #endif // INCLUDE_RTSHADER_SYSTEM
 
     /// The current frame of a running test
@@ -273,7 +276,7 @@ protected:
 #endif
 {
     NSTimer *mTimer;
-    
+
     NSTimeInterval mLastFrameTime;
     TestContext *tc;
 }
@@ -283,19 +286,21 @@ protected:
 - (void)shutdown;
 
 @property (retain) NSTimer *mTimer;
-@property (nonatomic) NSTimeInterval mLastFrameTime;
+                   @property (nonatomic) NSTimeInterval mLastFrameTime;
 
-@end
+                                         @end
 
-@implementation AppDelegate
+                                         //static id mAppDelegate;
 
-@synthesize mTimer;
-@dynamic mLastFrameTime;
+                                         @implementation AppDelegate
 
-- (NSTimeInterval)mLastFrameTime
-{
-    return mLastFrameTime;
-}
+                                         @synthesize mTimer;
+                                         @dynamic mLastFrameTime;
+
+                                         - (NSTimeInterval)mLastFrameTime
+                   {
+                       return mLastFrameTime;
+                   }
 
 - (void)setLastFrameTime:(NSTimeInterval)frameInterval
 {
@@ -312,39 +317,39 @@ protected:
 }
 
 - (void)go {
-    
+
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     mLastFrameTime = 1;
     mTimer = nil;
-    
+
     try {
         tc = new TestContext(*_NSGetArgc(), *_NSGetArgv());
         tc->go();
         Root::getSingleton().getRenderSystem()->_initRenderTargets();
-        
+
         // Clear event times
         Root::getSingleton().clearEventTimes();
     } catch( Exception& e ) {
         std::cerr << "An exception has occurred: " <<
-        e.getFullDescription().c_str() << std::endl;
+            e.getFullDescription().c_str() << std::endl;
     }
     mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f) * mLastFrameTime
-                                              target:self
-                                            selector:@selector(renderOneFrame:)
-                                            userInfo:nil
-                                             repeats:YES];
+              target:self
+              selector:@selector(renderOneFrame:)
+              userInfo:nil
+              repeats:YES];
     [pool release];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)application {
     mLastFrameTime = 1;
     mTimer = nil;
-    
+
     [self go];
 }
 
 - (void)shutdown {
-    
+
     [NSApp terminate:nil];
 }
 
@@ -387,13 +392,13 @@ protected:
 
 @property (nonatomic) NSTimeInterval mLastFrameTime;
 
-@end
+                      @end
 
-@implementation AppDelegate
+                      @implementation AppDelegate
 
-@dynamic mLastFrameTime;
+                      @dynamic mLastFrameTime;
 
-- (NSTimeInterval)mLastFrameTime
+                      - (NSTimeInterval)mLastFrameTime
 {
     return mLastFrameTime;
 }
@@ -434,7 +439,7 @@ protected:
         Root::getSingleton().clearEventTimes();
     } catch( Exception& e ) {
         std::cerr << "An exception has occurred: " <<
-        e.getFullDescription().c_str() << std::endl;
+            e.getFullDescription().c_str() << std::endl;
     }
 
     [pool release];
@@ -503,5 +508,6 @@ protected:
 
 @end
 
-#endif
+#endif // OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && defined(__OBJC__)
+
 #endif

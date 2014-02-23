@@ -29,12 +29,10 @@ THE SOFTWARE.
 #define _Resource_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
-#include "OgreSharedPtr.h"
-#include "OgreStringInterface.h"
 #include "OgreAtomicScalar.h"
-#include "Threading/OgreThreadHeaders.h"
+#include "OgreStringInterface.h"
 #include "OgreHeaderPrefix.h"
+#include "Threading/OgreThreadHeaders.h"
 
 namespace Ogre {
 
@@ -86,17 +84,7 @@ namespace Ogre {
             Listener() {}
             virtual ~Listener() {}
 
-            /** Callback to indicate that background loading has completed.
-            @deprecated
-                Use loadingComplete instead.
-            */
-            virtual void backgroundLoadingComplete(Resource*) {}
 
-            /** Callback to indicate that background preparing has completed.
-            @deprecated
-                Use preparingComplete instead.
-            */
-            virtual void backgroundPreparingComplete(Resource*) {}
 
             /** Called whenever the resource finishes loading. 
             @remarks
@@ -109,7 +97,7 @@ namespace Ogre {
             virtual void loadingComplete(Resource*) {}
 
 
-            /** called whenever the resource finishes preparing (paging into memory).
+            /** Called whenever the resource finishes preparing (paging into memory).
             @remarks
                 If a Resource has been marked as background loaded (@see Resource::setBackgroundLoaded)
                 the call does not itself occur in the thread which is doing the preparing;
@@ -171,7 +159,7 @@ namespace Ogre {
         */
         Resource() 
             : mCreator(0), mHandle(0), mLoadingState(LOADSTATE_UNLOADED), 
-            mIsBackgroundLoaded(false), mSize(0), mIsManual(0), mLoader(0)
+            mIsBackgroundLoaded(false), mSize(0), mIsManual(0), mLoader(0), mStateCount(0)
         { 
         }
 
@@ -291,6 +279,14 @@ namespace Ogre {
             return mIsManual;
         }
 
+        /** Set "Is this resource manually loaded?"
+        */
+        virtual void setManuallyLoaded(bool isManual)
+        {
+            mIsManual = isManual;
+        }
+
+
         /** Unloads the resource; this is not permanent, the resource can be
             reloaded later if required.
         */
@@ -333,6 +329,14 @@ namespace Ogre {
         { 
             // No lock required to read this state since no modify
             return (mLoadingState.get() == LOADSTATE_LOADED); 
+        }
+
+        /** Change the Resource loading state to loaded.
+        */
+        virtual void setToLoaded(void) 
+        { 
+            // No lock required to read this state since no modify
+            mLoadingState.set(LOADSTATE_LOADED); 
         }
 
         /** Returns whether the resource is currently in the process of
@@ -469,26 +473,6 @@ namespace Ogre {
         virtual size_t calculateSize(void) const;
 
     };
-
-    /** Shared pointer to a Resource.
-    @remarks
-        This shared pointer allows many references to a resource to be held, and
-        when the final reference is removed, the resource will be destroyed. 
-        Note that the ResourceManager which created this Resource will be holding
-        at least one reference, so this resource will not get destroyed until 
-        someone removes the resource from the manager - this at least gives you
-        strong control over when resources are freed. But the nature of the 
-        shared pointer means that if anyone refers to the removed resource in the
-        meantime, the resource will remain valid.
-    @par
-        You may well see references to ResourcePtr (i.e. ResourcePtr&) being passed 
-        around internally within Ogre. These are 'weak references' ie they do 
-        not increment the reference count on the Resource. This is done for 
-        efficiency in temporary operations that shouldn't need to incur the 
-        overhead of maintaining the reference count; however we don't recommend 
-        you do it yourself since these references are not guaranteed to remain valid.
-    */
-    typedef SharedPtr<Resource> ResourcePtr;
 
     /** Interface describing a manual resource loader.
     @remarks

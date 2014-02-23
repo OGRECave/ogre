@@ -113,7 +113,7 @@ namespace Ogre
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
 
         /** Activate an OpenGL texture unit.
-         @param offset The texture unit to activate.
+         @param unit The texture unit to activate.
          @return Whether or not the texture unit was successfully activated.
          */
         bool activateGLTextureUnit(size_t unit);
@@ -205,12 +205,7 @@ namespace Ogre
         /** Enables a piece of OpenGL functionality.
          @param flag The function to enable.
          */
-        void setEnabled(GLenum flag);
-
-        /** Disables a piece of OpenGL functionality.
-         @param flag The function to disable.
-         */
-        void setDisabled(GLenum flag);
+        void setEnabled(GLenum flag, bool enabled);
 
         /** Gets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
          @return The buffer mask.

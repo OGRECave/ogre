@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreScriptCompiler.h"
-#include "OgreScriptLexer.h"
 #include "OgreScriptParser.h"
 #include "OgreScriptTranslator.h"
 #include "OgreResourceGroupManager.h"
@@ -235,7 +234,7 @@ namespace Ogre
             Ogre::StringConverter::toString(line) + ")";
         if(!msg.empty())
             str = str + ": " + msg;
-        Ogre::LogManager::getSingleton().logMessage(str);
+        Ogre::LogManager::getSingleton().logMessage(str, LML_CRITICAL);
     }
 
     bool ScriptCompilerListener::handleEvent(ScriptCompiler *compiler, ScriptCompilerEvent *evt, void *retval)
@@ -467,7 +466,7 @@ namespace Ogre
                 Ogre::StringConverter::toString(line) + ")";
             if(!msg.empty())
                 str = str + ": " + msg;
-            Ogre::LogManager::getSingleton().logMessage(str);
+            Ogre::LogManager::getSingleton().logMessage(str, LML_CRITICAL);
         }
 
         mErrors.push_back(err);
@@ -1198,8 +1197,8 @@ namespace Ogre
         mIds["vertex"] = ID_VERTEX;
         mIds["fragment"] = ID_FRAGMENT;
         mIds["geometry"] = ID_GEOMETRY;
-        mIds["tesselation_hull"] = ID_TESSELATION_HULL;
-        mIds["tesselation_domain"] = ID_TESSELATION_DOMAIN;
+        mIds["tessellation_hull"] = ID_TESSELLATION_HULL;
+        mIds["tessellation_domain"] = ID_TESSELLATION_DOMAIN;
         mIds["compute"] = ID_COMPUTE;
         mIds["content_type"] = ID_CONTENT_TYPE;
         mIds["named"] = ID_NAMED;

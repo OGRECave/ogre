@@ -2,6 +2,7 @@
 #define __DynTex_H__
 
 #include "SdkSample.h"
+#include "OgreParticleSystem.h"
 
 using namespace Ogre;
 using namespace OgreBites;

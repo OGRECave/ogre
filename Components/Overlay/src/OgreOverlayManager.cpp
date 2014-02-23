@@ -27,17 +27,14 @@ THE SOFTWARE.
 */
 
 #include "OgreOverlayManager.h"
-#include "OgreStringVector.h"
 #include "OgreOverlayContainer.h"
-#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
-#include "OgreSceneManagerEnumerator.h"
-#include "OgreSceneManager.h"
-#include "OgreSceneNode.h"
-#include "OgreEntity.h"
 #include "OgreException.h"
 #include "OgreViewport.h"
+#include "OgreOverlay.h"
+#include "OgreResourceGroupManager.h"
 #include "OgreOverlayElementFactory.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre {
 
@@ -191,12 +188,11 @@ namespace Ogre {
         }
         String line;
         Overlay* pOverlay = 0;
-        bool skipLine;
 
         while(!stream->eof())
         {
             bool isATemplate = false;
-            skipLine = false;
+            bool skipLine = false;
             line = stream->getLine();
             // Ignore comments & blanks
             if (!(line.length() == 0 || line.substr(0,2) == "//"))
@@ -383,7 +379,7 @@ namespace Ogre {
                     LogManager::getSingleton().logMessage( 
                         "Bad element/container line: '"
                         + line + "' in " + parent->getTypeName()+ " " + parent->getName() +
-                        ", expecting ':' templateName");
+                        ", expecting ':' templateName", LML_CRITICAL);
                     skipToNextCloseBrace(stream);
                     // barf 
                     return ret;
@@ -393,7 +389,7 @@ namespace Ogre {
                     LogManager::getSingleton().logMessage( 
                         "Bad element/container line: '"
                         + line + "' in " + parent->getTypeName()+ " " + parent->getName() +
-                        ", expecting ':' for element inheritance");
+                        ", expecting ':' for element inheritance", LML_CRITICAL);
                     skipToNextCloseBrace(stream);
                     // barf 
                     return ret;
@@ -437,7 +433,7 @@ namespace Ogre {
         else
         {
             LogManager::getSingleton().logMessage("Bad overlay attribute line: '"
-                + line + "' for overlay " + pOverlay->getName());
+                + line + "' for overlay " + pOverlay->getName(), LML_CRITICAL);
         }
     }
     //---------------------------------------------------------------------
@@ -453,7 +449,7 @@ namespace Ogre {
             // BAD command. BAD!
             LogManager::getSingleton().logMessage("Bad element attribute line: '"
                 + line + "' for element " + pElement->getName() + " in overlay " + 
-                (!pOverlay ? StringUtil::BLANK : pOverlay->getName()));
+                (!pOverlay ? BLANKSTRING : pOverlay->getName()), LML_CRITICAL);
         }
     }
     //-----------------------------------------------------------------------

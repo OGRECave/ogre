@@ -36,6 +36,11 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreFrameStats.h"
 #include "OgreRenderSystem.h"
+#include "OgreMatrix4.h"
+#include "OgreVector4.h"
+#include "OgreColourValue.h"
+#include "OgreSceneNode.h"
+#include "OgreViewport.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
 
@@ -48,7 +53,9 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
     AutoParamDataSource::AutoParamDataSource()
-        : mWorldMatrixDirty(true),
+        : mWorldMatrixCount(0),
+         mWorldMatrixArray(0),
+         mWorldMatrixDirty(true),
          mViewMatrixDirty(true),
          mProjMatrixDirty(true),
          mWorldViewMatrixDirty(true),
@@ -61,6 +68,7 @@ namespace Ogre {
          mInverseTransposeWorldViewMatrixDirty(true),
          mCameraPositionDirty(true),
          mCameraPositionObjectSpaceDirty(true),
+         mPassNumber(0),
          mSceneDepthRangeDirty(true),
          mLodCameraPositionDirty(true),
          mLodCameraPositionObjectSpaceDirty(true),

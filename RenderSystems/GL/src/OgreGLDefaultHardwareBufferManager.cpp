@@ -60,7 +60,7 @@ namespace Ogre {
         // Nothing to do
     }
     //-----------------------------------------------------------------------
-    void* GLDefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* GLDefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -111,8 +111,9 @@ namespace Ogre {
         // Nothing to do
     }
     //-----------------------------------------------------------------------
-    void* GLDefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* GLDefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt)
     {
+        
         mIsLocked = true;
         return mData + offset;
     }

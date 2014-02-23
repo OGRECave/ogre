@@ -37,7 +37,6 @@ date                 : Jan 1 2004
 email                : pjcast@yahoo.com
 ***************************************************************************/
 #include "OgreSingleton.h"
-#include "OgreString.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreExternalTextureSource.h"
 #include "OgreHeaderPrefix.h"

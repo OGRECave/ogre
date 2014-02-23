@@ -287,10 +287,10 @@ namespace Ogre {
             hue += (int)hue + 1;
         }
         // clamp saturation / brightness
-        saturation = min(saturation, (Real)1.0);
-        saturation = max(saturation, (Real)0.0);
-        brightness = min(brightness, (Real)1.0);
-        brightness = max(brightness, (Real)0.0);
+        saturation = Ogre::min(saturation, (Real)1.0);
+        saturation = Ogre::max(saturation, (Real)0.0);
+        brightness = Ogre::min(brightness, (Real)1.0);
+        brightness = Ogre::max(brightness, (Real)0.0);
 
         if (brightness == 0.0f)
         {   
@@ -365,8 +365,8 @@ namespace Ogre {
     void ColourValue::getHSB(Real* hue, Real* saturation, Real* brightness) const
     {
 
-        Real vMin = min(r, min(g, b));
-        Real vMax = max(r, max(g, b));
+        Real vMin = Ogre::min(r, min(g, b));
+        Real vMax = Ogre::max(r, max(g, b));
         Real delta = vMax - vMin;
 
         *brightness = vMax;

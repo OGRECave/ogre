@@ -26,9 +26,9 @@ fragment_program SSAO/CreaseShading_fp_glsl glsl
 
 fragment_program SSAO/CreaseShading_fp unified
 {
-	delegate SSAO/CreaseShading_fp_glsl 
+	//delegate SSAO/CreaseShading_fp_glsl 
 	delegate SSAO/CreaseShading_fp_hlsl 
-	delegate SSAO/CreaseShading_fp_cg
+	//delegate SSAO/CreaseShading_fp_cg
 }
 
 material SSAO/CreaseShading

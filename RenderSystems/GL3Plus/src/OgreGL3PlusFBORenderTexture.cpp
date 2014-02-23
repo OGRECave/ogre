@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 #include "OgreGL3PlusPrerequisites.h"
 
@@ -35,8 +35,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-//-----------------------------------------------------------------------------    
-    GL3PlusFBORenderTexture::GL3PlusFBORenderTexture(GL3PlusFBOManager *manager, const String &name,
+
+    GL3PlusFBORenderTexture::GL3PlusFBORenderTexture(
+        GL3PlusFBOManager *manager, const String &name,
         const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa):
         GL3PlusRenderTexture(name, target, writeGamma, fsaa),
         mFB(manager, fsaa)
@@ -92,178 +93,187 @@ namespace Ogre {
     }
    
     // Size of probe texture
-    #define PROBE_SIZE 16
+#define PROBE_SIZE 16
 
     // Stencil and depth formats to be tried
     static const GLenum stencilFormats[] =
-    {
-        GL_NONE,                    // No stencil
-        GL_STENCIL_INDEX1,
-        GL_STENCIL_INDEX4,
-        GL_STENCIL_INDEX8,
-        GL_STENCIL_INDEX16
-    };
+        {
+            GL_NONE,                    // No stencil
+            GL_STENCIL_INDEX1,
+            GL_STENCIL_INDEX4,
+            GL_STENCIL_INDEX8,
+            GL_STENCIL_INDEX16
+        };
     static const size_t stencilBits[] =
-    {
-        0, 1, 4, 8, 16
-    };
-    #define STENCILFORMAT_COUNT (sizeof(stencilFormats)/sizeof(GLenum))
+        {
+            0, 1, 4, 8, 16
+        };
+#define STENCILFORMAT_COUNT (sizeof(stencilFormats)/sizeof(GLenum))
 
     static const GLenum depthFormats[] =
-    {
-        GL_NONE,
-        GL_DEPTH_COMPONENT16,
-        GL_DEPTH_COMPONENT24,   // Prefer 24 bit depth
-        GL_DEPTH_COMPONENT32,
-        GL_DEPTH_COMPONENT32F,
-        GL_DEPTH24_STENCIL8,    // Packed depth / stencil
-        GL_DEPTH32F_STENCIL8
-    };
+        {
+            GL_NONE,
+            GL_DEPTH_COMPONENT16,
+            GL_DEPTH_COMPONENT24,   // Prefer 24 bit depth
+            GL_DEPTH_COMPONENT32,
+            GL_DEPTH_COMPONENT32F,
+            GL_DEPTH24_STENCIL8,    // Packed depth / stencil
+            GL_DEPTH32F_STENCIL8
+        };
     static const size_t depthBits[] =
-    {
-        0,16,24,32,32,24,32
-    };
-    #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
+        {
+            0,16,24,32,32,24,32
+        };
+#define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
     GL3PlusFBOManager::GL3PlusFBOManager()
     {
         detectFBOFormats();
-        
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
+
+        GLsizei numBuffers = 1;
+
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(numBuffers, &mTempFBO));
     }
 
     GL3PlusFBOManager::~GL3PlusFBOManager()
     {
         if(!mRenderBufferMap.empty())
         {
-            LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.");
+            LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.", LML_CRITICAL);
         }
-        
-        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
+
+        GLsizei numBuffers = 1;
+
+        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(numBuffers, &mTempFBO));
     }
 
     void GL3PlusFBOManager::_createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
     {
-        glGenFramebuffers(1, &fb);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &fb));
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb));
         if (fmt != GL_NONE)
         {
             if (tid)
-                glDeleteTextures(1, &tid);
+                OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
 
             // Create and attach texture
-            glGenTextures(1, &tid);
-            glBindTexture(GL_TEXTURE_2D, tid);
+            OGRE_CHECK_GL_ERROR(glGenTextures(1, &tid));
+            OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, tid));
 
             // Set some default parameters
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, dataType, 0);
+            OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, dataType, 0));
 
-            if(ogreFormat == PF_DEPTH)
-                glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tid, 0);
+            if (ogreFormat == PF_DEPTH)
+            {
+                OGRE_CHECK_GL_ERROR(glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tid, 0));
+            }
             else
-                glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tid, 0);
+            {
+                OGRE_CHECK_GL_ERROR(glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tid, 0));
+            }
         }
         else
         {
             // Draw to nowhere -- stencil/depth only
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
+            OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_NONE));
+            OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
         }
     }
 
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
         @returns true    if this combo is supported
-                 false   if this combo is not supported
+        false   if this combo is not supported
     */
     GLuint GL3PlusFBOManager::_tryFormat(GLenum depthFormat, GLenum stencilFormat)
     {
         GLuint status, depthRB = 0, stencilRB = 0;
 
-        if(depthFormat != GL_NONE)
+        if (depthFormat != GL_NONE)
         {
             // Generate depth renderbuffer
-            glGenRenderbuffers(1, &depthRB);
+            OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &depthRB));
 
             // Bind it to FBO
-            glBindRenderbuffer(GL_RENDERBUFFER, depthRB);
+            OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, depthRB));
 
             // Allocate storage for depth buffer
-            glRenderbufferStorage(GL_RENDERBUFFER, depthFormat,
-                                PROBE_SIZE, PROBE_SIZE);
+            OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, depthFormat,
+                                                      PROBE_SIZE, PROBE_SIZE));
 
             // Attach depth
-            glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRB);
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRB));
         }
 
-        if(stencilFormat != GL_NONE)
+        if (stencilFormat != GL_NONE)
         {
             // Generate stencil renderbuffer
-            glGenRenderbuffers(1, &stencilRB);
+            OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &stencilRB));
             // Bind it to FBO
-            glBindRenderbuffer(GL_RENDERBUFFER, stencilRB);
+            OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, stencilRB));
 
             // Allocate storage for stencil buffer
-            glRenderbufferStorage(GL_RENDERBUFFER, stencilFormat, PROBE_SIZE, PROBE_SIZE); 
+            OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, stencilFormat, PROBE_SIZE, PROBE_SIZE));
 
             // Attach stencil
-            glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                            GL_RENDERBUFFER, stencilRB);
+            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                                          GL_RENDERBUFFER, stencilRB));
         }
 
-        status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+        OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
 
         // If status is negative, clean up
         // Detach and destroy
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0));
 
         if (depthRB)
-            glDeleteRenderbuffers(1, &depthRB);
+            OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &depthRB));
 
         if (stencilRB)
-            glDeleteRenderbuffers(1, &stencilRB);
-        
+            OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &stencilRB));
+
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
-    
+
     /** Try a certain packed depth/stencil format, and return the status.
         @return true    if this combo is supported
-                 false   if this combo is not supported
+        false   if this combo is not supported
     */
     bool GL3PlusFBOManager::_tryPackedFormat(GLenum packedFormat)
     {
         GLuint packedRB;
 
         // Generate renderbuffer
-        glGenRenderbuffers(1, &packedRB);
+        OGRE_CHECK_GL_ERROR(glGenRenderbuffers(1, &packedRB));
 
         // Bind it to FBO
-        glBindRenderbuffer(GL_RENDERBUFFER, packedRB);
+        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, packedRB));
 
         // Allocate storage for buffer
-        glRenderbufferStorage(GL_RENDERBUFFER, packedFormat, PROBE_SIZE, PROBE_SIZE);
+        OGRE_CHECK_GL_ERROR(glRenderbufferStorage(GL_RENDERBUFFER, packedFormat, PROBE_SIZE, PROBE_SIZE));
 
         // Attach depth
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-            GL_RENDERBUFFER, packedRB);
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                                      GL_RENDERBUFFER, packedRB));
 
         // Attach stencil
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-            GL_RENDERBUFFER, packedRB);
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                                      GL_RENDERBUFFER, packedRB));
 
-        GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+        GLuint status;
+        OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
 
         // Detach and destroy
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
-        glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
-        glDeleteRenderbuffers(1, &packedRB);
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0));
+        OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &packedRB));
 
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
@@ -296,7 +306,8 @@ namespace Ogre {
             _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
 
             // Check status
-            GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+            GLuint status;
+            OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
 
             // Ignore status in case of fmt==GL_NONE, because no implementation will accept
             // a buffer without *any* attachment. Buffers with only stencil and depth attachment
@@ -304,8 +315,8 @@ namespace Ogre {
             if(fmt == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE)
             {
                 mProps[x].valid = true;
-                StringUtil::StrStreamType str;
-                str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
+                StringStream str;
+                str << "FBO " << PixelUtil::getFormatName((PixelFormat)x)
                     << " depth/stencil support: ";
 
                 // For each depth/stencil formats
@@ -317,11 +328,11 @@ namespace Ogre {
 
                         for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
-//                            StringUtil::StrStreamType l;
-//                            l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 
-//                              << " D" << depthBits[depth] 
-//                              << "S" << stencilBits[stencil];
-//                            LogManager::getSingleton().logMessage(l.str());
+                            //                            StringStream l;
+                            //                            l << "Trying " << PixelUtil::getFormatName((PixelFormat)x)
+                            //                                  << " D" << depthBits[depth]
+                            //                                  << "S" << stencilBits[stencil];
+                            //                            LogManager::getSingleton().logMessage(l.str());
 
                             if (_tryFormat(depthFormats[depth], stencilFormats[stencil]))
                             {
@@ -336,12 +347,12 @@ namespace Ogre {
                             {
                                 // There is a small edge case that FBO is trashed during the test
                                 // on some drivers resulting in undefined behavior
-                                glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                                glDeleteFramebuffers(1, &fb);
+                                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+                                OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
 
                                 // Workaround for NVIDIA / Linux 169.21 driver problem
                                 // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                                glFinish();
+                                OGRE_CHECK_GL_ERROR(glFinish());
 
                                 _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
                             }
@@ -363,12 +374,12 @@ namespace Ogre {
                         {
                             // There is a small edge case that FBO is trashed during the test
                             // on some drivers resulting in undefined behavior
-                            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                            glDeleteFramebuffers(1, &fb);
+                            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+                            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
 
                             // Workaround for NVIDIA / Linux 169.21 driver problem
                             // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                            glFinish();
+                            OGRE_CHECK_GL_ERROR(glFinish());
 
                             _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
                         }
@@ -378,12 +389,12 @@ namespace Ogre {
             }
 
             // Delete texture and framebuffer
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-            glDeleteFramebuffers(1, &fb);
-            
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
+
             if (fmt != GL_NONE)
             {
-                glDeleteTextures(1, &tid);
+                OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
                 tid = 0;
             }
         }
@@ -423,7 +434,7 @@ namespace Ogre {
             if((depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8 || depthFormats[props.modes[mode].depth]==GL_DEPTH32F_STENCIL8) && !requestDepthOnly) // Prefer 24/8 packed
                 desirability += 5000;
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
-            
+
             if(desirability>bestscore)
             {
                 bestscore = desirability;
@@ -437,8 +448,8 @@ namespace Ogre {
             *stencilFormat = stencilFormats[props.modes[bestmode].stencil];
     }
 
-    GL3PlusFBORenderTexture *GL3PlusFBOManager::createRenderTexture(const String &name, 
-        const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa)
+    GL3PlusFBORenderTexture *GL3PlusFBOManager::createRenderTexture(const String &name,
+                                                                    const GL3PlusSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
         GL3PlusFBORenderTexture *retval = new GL3PlusFBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
@@ -459,7 +470,7 @@ namespace Ogre {
             // Old style context (window/pbuffer) or copying render texture
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
-    
+
     GL3PlusSurfaceDesc GL3PlusFBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GL3PlusSurfaceDesc retval;
@@ -486,10 +497,10 @@ namespace Ogre {
                 retval.numSamples = fsaa;
             }
         }
-//        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
+        //        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
         return retval;
     }
-    //-----------------------------------------------------------------------
+
     void GL3PlusFBOManager::requestRenderBuffer(const GL3PlusSurfaceDesc &surface)
     {
         if(surface.buffer == 0)
@@ -504,7 +515,7 @@ namespace Ogre {
             ++it->second.refcount;
         }
     }
-    //-----------------------------------------------------------------------
+
     void GL3PlusFBOManager::releaseRenderBuffer(const GL3PlusSurfaceDesc &surface)
     {
         if(surface.buffer == 0)
@@ -520,8 +531,8 @@ namespace Ogre {
                 // If refcount reaches zero, delete buffer and remove from map
                 delete it->second.buffer;
                 mRenderBufferMap.erase(it);
-//              std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
-//                      << " of " << key.width << "x" << key.height << std::endl;
+                //                              std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
+                //                                      << " of " << key.width << "x" << key.height << std::endl;
             }
         }
     }

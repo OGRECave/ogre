@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreTerrainPagedWorldSection.h"
 #include "OgreTerrainGroup.h"
 #include "OgrePagedWorld.h"
+#include "OgrePageManager.h"
 
 namespace Ogre
 {

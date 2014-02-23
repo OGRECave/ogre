@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "OgreStreamSerialiser.h"
 #include "OgrePageContentCollectionFactory.h"
 #include "OgrePageContentCollection.h"
+#include "OgreLogManager.h"
+#include <iomanip>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     #include "macUtils.h"
@@ -446,7 +448,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     String Page::generateFilename() const
     {
-        StringUtil::StrStreamType str;
+        StringStream str;
         if (mParent)
             str << mParent->getWorld()->getName() << "_" << mParent->getName();
 

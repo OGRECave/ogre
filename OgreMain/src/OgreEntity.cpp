@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
 #include "OgreEntity.h"
@@ -45,9 +45,6 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreOldSkeletonInstance.h"
-#include "OgreEdgeListBuilder.h"
-#include "OgreStringConverter.h"
-#include "OgreAnimation.h"
 #include "OgreOptimisedUtil.h"
 #include "OgreSceneNode.h"
 #include "OgreLodStrategy.h"
@@ -61,8 +58,10 @@ namespace Ogre {
         : MovableObject( id, objectMemoryManager ),
           mAnimationState(NULL),
           mSkelAnimVertexData(0),
+          mTempVertexAnimInfo(),
           mSoftwareVertexAnimVertexData(0),
           mHardwareVertexAnimVertexData(0),
+          mVertexAnimationAppliedThisFrame(false),
           mPreparedForShadowVolumes(false),
           mBoneWorldMatrices(NULL),
           mBoneMatrices(NULL),
@@ -298,8 +297,8 @@ namespace Ogre {
     {
         if (index >= mSubEntityList.size())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Index out of bounds.",
-            "Entity::getSubEntity");
+                        "Index out of bounds.",
+                        "Entity::getSubEntity");
         return &mSubEntityList[index];
     }
     //-----------------------------------------------------------------------
@@ -334,8 +333,8 @@ namespace Ogre {
         if (!mManager)
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                "Cannot clone an Entity that wasn't created through a "
-                "SceneManager", "Entity::clone");
+                        "Cannot clone an Entity that wasn't created through a "
+                        "SceneManager", "Entity::clone");
         }
         Entity* newEnt = mManager->createEntity(newName, getMesh()->getName() );
 
@@ -388,7 +387,8 @@ namespace Ogre {
         // Calculate the LOD
         if (mParentNode)
         {
-            // Get mesh LOD strategy
+#if !OGRE_NO_MESHLOD
+            // Get mesh lod strategy
             const LodStrategy *meshStrategy = mMesh->getLodStrategy();
             // Get the appropriate LOD value
             Real lodValue = meshStrategy->getValue(this, cam);
@@ -399,9 +399,9 @@ namespace Ogre {
             // Get the index at this biased depth
             ushort newMeshLodIndex = mMesh->getLodIndex(biasedMeshLodValue);
             // Apply maximum detail restriction (remember lower = higher detail)
-            newMeshLodIndex = std::max(mMaxMeshLodIndex, newMeshLodIndex);
+            newMeshLodIndex = std::max<ushort>(mMaxMeshLodIndex, newMeshLodIndex);
             // Apply minimum detail restriction (remember higher = lower detail)
-            newMeshLodIndex = std::min(mMinMeshLodIndex, newMeshLodIndex);
+            newMeshLodIndex = std::min<ushort>(mMinMeshLodIndex, newMeshLodIndex);
 
             // Construct event object
             EntityMeshLodChangedEvent evt;
@@ -419,13 +419,14 @@ namespace Ogre {
 
             // Now do material LOD
             lodValue *= mMaterialLodFactorTransformed;
-
+#endif
 
 
             SubEntityList::iterator i, iend;
             iend = mSubEntityList.end();
             for (i = mSubEntityList.begin(); i != iend; ++i)
             {
+#if !OGRE_NO_MESHLOD
                 // Get sub-entity material
                 const MaterialPtr& material = i->getMaterial();
                 
@@ -459,6 +460,8 @@ namespace Ogre {
 
                 // Change LOD index
                 i->mMaterialLodIndex = subEntEvt.newLodIndex;
+                // Also invalidate any camera distance cache
+                (*i)->_invalidateCameraCache ();
             }
 
 
@@ -466,7 +469,7 @@ namespace Ogre {
         // Notify any child objects
         ChildObjectList::iterator child_itr = mChildObjectList.begin();
         ChildObjectList::iterator child_itr_end = mChildObjectList.end();
-        for( ; child_itr != child_itr_end; child_itr++)
+        for( ; child_itr != child_itr_end; ++child_itr)
         {
             (*child_itr).second->_notifyCurrentCamera(cam);
         }
@@ -508,7 +511,7 @@ namespace Ogre {
             // index - 1 as we skip index 0 (original LOD)
             if (hasSkeleton() && mLodEntityList[mCurrentMeshLod - 1]->hasSkeleton())
             {
-                // Copy the animation state set to LOD entity, we assume the LOD
+                // Copy the animation state set to lod entity, we assume the lod
                 // entity only has a subset animation states
                 AnimationStateSet* targetState = mLodEntityList[mCurrentMeshLod - 1]->mAnimationState;
                 if (mAnimationState != targetState) // only copy if LODs use different skeleton instances
@@ -519,6 +522,7 @@ namespace Ogre {
             }
             displayEntity = mLodEntityList[mCurrentMeshLod - 1];
         }
+#endif
 
         // Add each visible SubEntity to the queue
         SubEntityList::iterator i, iend;
@@ -569,7 +573,7 @@ namespace Ogre {
         if (!mAnimationState)
         {
             OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Entity is not animated",
-                "Entity::getAnimationState");
+                        "Entity::getAnimationState");
         }
 
         return mAnimationState->getAnimationState(name);
@@ -621,7 +625,7 @@ namespace Ogre {
                 return false;
         }
         for (SubEntityList::const_iterator i = mSubEntityList.begin();
-            i != mSubEntityList.end(); ++i)
+             i != mSubEntityList.end(); ++i)
         {
             const SubEntity &sub = *i;
             if (sub.mSkelAnimVertexData)
@@ -791,7 +795,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     ushort Entity::initHardwareAnimationElements(VertexData* vdata,
-        ushort numberOfElements, bool animateNormals)
+                                                 ushort numberOfElements, bool animateNormals)
     {
         ushort elemsSupported = numberOfElements;
         if (vdata->hwAnimationDataList.size() < numberOfElements)
@@ -799,7 +803,7 @@ namespace Ogre {
             elemsSupported = 
                 vdata->allocateHardwareAnimationElements(numberOfElements, animateNormals);
         }
-        // Initialise parametrics incase we don't use all of them
+        // Initialise parametrics in case we don't use all of them
         for (size_t i = 0; i < vdata->hwAnimationDataList.size(); ++i)
         {
             vdata->hwAnimationDataList[i].parametric = 0.0f;
@@ -1226,14 +1230,30 @@ namespace Ogre {
         return mDisplaySkeleton;
     }
     //-----------------------------------------------------------------------
+    size_t Entity::getNumManualLodLevels(void) const
+    {
+#if !OGRE_NO_MESHLOD
+        return mLodEntityList.size();
+#else
+        return 0;
+#endif
+    }
+
+    //-----------------------------------------------------------------------
     Entity* Entity::getManualLodLevel(size_t index) const
     {
+#if !OGRE_NO_MESHLOD
         assert(index < mLodEntityList.size());
 
         return mLodEntityList[index];
+#else
+        OgreAssert(0, "This feature is disabled in ogre configuration!");
+        return NULL;
+#endif
     }
+#if !OGRE_NO_MESHLOD
     //-----------------------------------------------------------------------
-    size_t Entity::getNumManualLodLevels(void) const
+    void Entity::setMeshLodBias(Real factor, ushort maxDetailIndex, ushort minDetailIndex)
     {
         return mLodEntityList.size();
     }
@@ -1511,12 +1531,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     EdgeData* Entity::getEdgeList(void)
     {
+#if OGRE_NO_MESHLOD
+        unsigned short mMeshLodIndex = 0;
+#endif
         // Get from Mesh
         return mMesh->getEdgeList(mCurrentMeshLod);
     }
     //-----------------------------------------------------------------------
     bool Entity::hasEdgeList(void)
     {
+#if OGRE_NO_MESHLOD
+        unsigned short mMeshLodIndex = 0;
+#endif
         // check if mesh has an edge list attached
         // give mesh a chance to built it if scheduled
         return (mMesh->getEdgeList(mCurrentMeshLod) != NULL);
@@ -1742,17 +1768,19 @@ namespace Ogre {
     void Entity::setRenderQueueGroup(uint8 queueID)
     {
         MovableObject::setRenderQueueGroup(queueID);
-
+#if !OGRE_NO_MESHLOD
         // Set render queue for all manual LOD entities
-        if (mMesh->isLodManual())
+        if (mMesh->hasManualLodLevel())
         {
             LODEntityList::iterator li, liend;
             liend = mLodEntityList.end();
             for (li = mLodEntityList.begin(); li != liend; ++li)
             {
-                (*li)->setRenderQueueGroup(queueID);
+                if(*li != this)
+                    (*li)->setRenderQueueGroup(queueID);
             }
         }
+#endif
     }
     //-----------------------------------------------------------------------
     void Entity::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)

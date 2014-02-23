@@ -61,7 +61,7 @@ namespace Ogre {
         virtual void notifyOnDeviceReset(IDirect3DDevice9* d3d9Device);
 
         // Create the actual vertex buffer.
-        void createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool);
+        void createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool, bool updateNewBuffer);
         
         /// Get D3D9-specific vertex buffer
         IDirect3DVertexBuffer9* getD3D9VertexBuffer(void);

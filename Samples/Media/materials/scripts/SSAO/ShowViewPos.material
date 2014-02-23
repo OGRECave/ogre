@@ -24,9 +24,9 @@ fragment_program SSAO/ShowViewPos_fp_glsl glsl
 
 fragment_program SSAO/ShowViewPos_fp unified
 {
-	delegate SSAO/ShowViewPos_fp_glsl 
+	//delegate SSAO/ShowViewPos_fp_glsl 
 	delegate SSAO/ShowViewPos_fp_hlsl 
-	delegate SSAO/ShowViewPos_fp_cg
+	//delegate SSAO/ShowViewPos_fp_cg
 }
 
 material SSAO/ShowViewPos

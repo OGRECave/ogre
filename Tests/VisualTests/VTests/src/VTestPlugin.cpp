@@ -37,10 +37,10 @@ VTestPlugin::VTestPlugin()
     :SamplePlugin("VTestPlugin")
 {
     // add the playpen tests
+    addSample(new CubeMappingTest()); // no bg on Win
     addSample(new ParticleTest());
     addSample(new TransparencyTest());
-    addSample(new CubeMappingTest());
-    addSample(new TextureEffectsTest());
+   addSample(new TextureEffectsTest());
 }
 //---------------------------------------------------------------------
 

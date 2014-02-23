@@ -1,0 +1,225 @@
+/*
+----------------------------------------------------------
+Terrain Tessellation sample from NVIDIA's DirectX 11 SDK:
+http://developer.nvidia.com/nvidia-graphics-sdk-11-direct3d
+----------------------------------------------------------
+*/
+
+vertex_program Ogre/TerrainTessellation/InitializationVS hlsl
+{
+	source  TerrainTessellationDeformation.hlsl
+	entry_point InitializationVS
+	target vs_4_0
+	
+	default_params
+	{
+		param_named g_DeformMin float3 0.0 0.0 0.0
+		param_named g_DeformMax float3 1.0 1.0 1.0
+	}
+}
+
+fragment_program Ogre/TerrainTessellation/InitializationPS hlsl
+{
+	source TerrainTessellationDeformation.hlsl
+	entry_point InitializationPS
+	target ps_4_0
+	
+	default_params
+	{
+		param_named g_FractalOctaves int3 0 0 0
+		param_named g_TextureWorldOffset float3 0.0 0.0 0.0
+	}
+}
+
+fragment_program Ogre/TerrainTessellation/GradientPS hlsl
+{
+	source TerrainTessellationDeformation.hlsl
+	entry_point GradientPS
+	target ps_4_0
+	
+	default_params
+	{
+
+	}
+}
+
+
+material Ogre/TerrainTessellation/TerrainDeformation
+{
+	technique initialization
+	{
+		pass init
+		{
+			vertex_program_ref Ogre/TerrainTessellation/InitializationVS
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/InitializationPS
+			{
+			
+			}
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+
+	}
+	
+	technique gradienttech
+	{
+		pass gradient
+		{
+			vertex_program_ref Ogre/TerrainTessellation/InitializationVS
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/GradientPS
+			{
+			
+			}
+			depth_write off
+			cull_hardware none
+			cull_software none
+		}
+	}	
+}
+
+vertex_program Ogre/TerrainTessellation/HwTessellationPassThruVS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point HwTessellationPassThruVS
+	target vs_5_0
+
+	default_params
+	{
+		param_named g_DebugShowTiles int 0
+		param_named g_DetailNoiseScale float 5
+		param_named g_tileSize float 5
+		param_named g_DetailUVScale float2 0.0 0.0
+		param_named g_TextureWorldOffset float3 0.0 0.0 0.0		
+	}
+}
+
+vertex_program Ogre/TerrainTessellation/VTFDisplacementVS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point VTFDisplacementVS
+	target vs_4_0
+
+	default_params
+	{
+		param_named_auto g_WorldViewProj worldviewproj_matrix
+		param_named g_DebugShowTiles int 0
+		param_named g_DebugShowPatches int 0
+		param_named g_DetailNoiseScale float 5
+		param_named g_tileSize float 5
+		param_named g_DetailUVScale float2 0.0 0.0
+		param_named g_TextureWorldOffset float3 0.0 0.0 0.0
+	}
+}
+
+tesselation_hull_program Ogre/TerrainTessellation/TerrainScreenspaceLODHS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point TerrainScreenspaceLODHS
+	target hs_5_0
+
+	default_params
+	{
+		param_named_auto g_WorldViewProj worldviewproj_matrix
+		param_named_auto g_WorldViewProjLOD worldviewproj_matrix
+		param_named_auto g_WorldViewLOD worldview_matrix
+		param_named_auto g_Proj projection_matrix
+		param_named_auto g_EyePos camera_position
+		param_named_auto g_ViewDir view_direction
+	}
+}
+
+tesselation_domain_program Ogre/TerrainTessellation/TerrainDisplaceDS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point TerrainDisplaceDS
+	target ds_5_0
+
+	default_params
+	{
+		param_named_auto g_WorldViewProj worldviewproj_matrix
+		param_named g_DebugShowPatches int 1
+		param_named g_fDisplacementHeight float 5
+	}
+}
+
+fragment_program Ogre/TerrainTessellation/SmoothShadePS hlsl
+{
+	source TerrainTessellation.hlsl
+	entry_point SmoothShadePS
+	target ps_5_0
+	
+	default_params
+	{
+		param_named g_CoarseSampleSpacing float 1.0
+	}	
+}
+
+material Ogre/TerrainTessellation/Terrain
+{
+	technique
+	{
+		pass HwTessellated
+		{
+			vertex_program_ref Ogre/TerrainTessellation/HwTessellationPassThruVS
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/TerrainTessellation/TerrainScreenspaceLODHS
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/TerrainTessellation/TerrainDisplaceDS
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/SmoothShadePS
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+
+			}
+			
+			texture_unit 
+			{
+
+			}
+		}
+		pass ShadedTriStrip
+		{
+			vertex_program_ref Ogre/TerrainTessellation/VTFDisplacementVS
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/TerrainTessellation/SmoothShadePS
+			{
+			
+			}	
+			
+			texture_unit 
+			{
+
+			}
+			
+			texture_unit 
+			{
+
+			}
+		}
+	}
+}

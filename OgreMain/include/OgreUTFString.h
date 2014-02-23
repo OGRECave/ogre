@@ -108,7 +108,7 @@ namespace Ogre {
 // for any compiler that provides this, wchar_t is guaranteed to hold any Unicode value with a single code point (32-bit or larger)
 // so we can safely skip the rest of the testing
 #else // #ifdef __STDC_ISO_10646__
-#if defined( __WIN32__ ) || defined( _WIN32 )
+#if defined( __WIN32__ ) || defined( _WIN32 ) || !defined(ANDROID)
 #define WCHAR_UTF16 // All currently known Windows platforms utilize UTF-16 encoding in wchar_t
 #else // #if defined( __WIN32__ ) || defined( _WIN32 )
 #if OGRE_COMPILER != OGRE_COMPILER_GCCE

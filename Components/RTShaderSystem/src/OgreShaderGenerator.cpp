@@ -25,7 +25,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderGenerator.h"
-#include "OgreShaderProgram.h"
 #include "OgreShaderProgramManager.h"
 #include "OgreShaderFFPRenderStateBuilder.h"
 #include "OgreShaderRenderState.h"
@@ -74,27 +73,16 @@ ShaderGenerator& ShaderGenerator::getSingleton()
 }
 
 //-----------------------------------------------------------------------------
-ShaderGenerator::ShaderGenerator()
+ShaderGenerator::ShaderGenerator() :
+    mActiveSceneMgr(NULL), mRenderObjectListener(NULL), mSceneManagerListener(NULL), mScriptTranslatorManager(NULL),
+    mMaterialSerializerListener(NULL), mShaderLanguage(""), mProgramManager(NULL), mProgramWriterManager(NULL),
+    mFSLayer(0), mFFPRenderStateBuilder(NULL),mActiveViewportValid(false), mVSOutputCompactPolicy(VSOCP_LOW),
+    mCreateShaderOverProgrammablePass(false), mIsFinalizing(false)
 {
-    mProgramWriterManager       = NULL;
-    mProgramManager             = NULL;
-    mFFPRenderStateBuilder      = NULL;
-    mActiveSceneMgr             = NULL;
-    mRenderObjectListener       = NULL;
-    mSceneManagerListener       = NULL;
-    mScriptTranslatorManager    = NULL;
-    mMaterialSerializerListener = NULL;
-    mActiveViewportValid        = false;
     mLightCount[0]              = 0;
     mLightCount[1]              = 0;
     mLightCount[2]              = 0;
-    mVSOutputCompactPolicy      = VSOCP_LOW;
-    mCreateShaderOverProgrammablePass = false;
-    mIsFinalizing = false;
 
-
-    mShaderLanguage = "";
-    
     HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
 
     if (hmgr.isLanguageSupported("glsles"))
@@ -234,11 +222,11 @@ void ShaderGenerator::createSubRenderStateExFactories()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::finalize()
+void ShaderGenerator::destroy()
 {
     if (msSingleton != NULL)
     {
-        msSingleton->_finalize();
+        msSingleton->_destroy();
 
         OGRE_DELETE msSingleton;
         msSingleton = NULL;
@@ -246,7 +234,7 @@ void ShaderGenerator::finalize()
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::_finalize()
+void ShaderGenerator::_destroy()
 {
     OGRE_LOCK_AUTO_MUTEX;
     
@@ -280,7 +268,7 @@ void ShaderGenerator::_finalize()
     // Delete FFP Emulator.
     if (mFFPRenderStateBuilder != NULL)
     {
-        mFFPRenderStateBuilder->finalize();
+        mFFPRenderStateBuilder->destroy();
         OGRE_DELETE mFFPRenderStateBuilder;
         mFFPRenderStateBuilder = NULL;
     }
@@ -643,6 +631,12 @@ void ShaderGenerator::removeSceneManager(SceneManager* sceneMgr)
 SceneManager* ShaderGenerator::getActiveSceneManager()
 {
     return mActiveSceneMgr;
+}
+//-----------------------------------------------------------------------------
+void ShaderGenerator::_setActiveSceneManager(SceneManager* sceneManager)
+{
+    mActiveViewportValid &= (mActiveSceneMgr == sceneManager);
+    mActiveSceneMgr = sceneManager;
 }
 
 //-----------------------------------------------------------------------------
@@ -1022,7 +1016,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 {
     OGRE_LOCK_AUTO_MUTEX;
 
-    while (mMaterialEntriesMap.size() > 0)
+    while (!mMaterialEntriesMap.empty())
     {
         SGMaterialIterator itMatEntry = mMaterialEntriesMap.begin();
 
@@ -1341,7 +1335,7 @@ size_t ShaderGenerator::getFragmentShaderCount() const
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
+void ShaderGenerator::setTargetLanguage(const String& shaderLanguage,const float version)
 {
     // Make sure that the shader language is supported.
     if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(shaderLanguage) == false)
@@ -1352,9 +1346,10 @@ void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
     }
 
     // Case target language changed -> flush the shaders cache.
-    if (mShaderLanguage != shaderLanguage)
+    if (mShaderLanguage != shaderLanguage || mShaderLanguageVersion != version )
     {
         mShaderLanguage = shaderLanguage;
+        mShaderLanguageVersion = version;
         flushShaderCache();
     }
 }
@@ -1613,13 +1608,9 @@ SubRenderState* ShaderGenerator::SGPass::getCustomFFPSubState(int subStateOrder,
 }
 
 //-----------------------------------------------------------------------------
-ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, Technique* srcTechnique, const String& dstTechniqueSchemeName)
+ShaderGenerator::SGTechnique::SGTechnique(SGMaterial* parent, Technique* srcTechnique, const String& dstTechniqueSchemeName) :
+    mParent(parent), mSrcTechnique(srcTechnique), mDstTechnique(NULL), mBuildDstTechnique(true), mDstTechniqueSchemeName(dstTechniqueSchemeName)
 {
-    mParent                 = parent;
-    mSrcTechnique           = srcTechnique;
-    mDstTechniqueSchemeName = dstTechniqueSchemeName;
-    mDstTechnique           = NULL;
-    mBuildDstTechnique      = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1801,12 +1792,9 @@ bool ShaderGenerator::SGTechnique::hasRenderState(unsigned short passIndex)
 
 
 //-----------------------------------------------------------------------------
-ShaderGenerator::SGScheme::SGScheme(const String& schemeName)
+ShaderGenerator::SGScheme::SGScheme(const String& schemeName) :
+    mName(schemeName), mOutOfDate(true), mRenderState(NULL), mFogMode(FOG_NONE)
 {
-    mOutOfDate   = true;
-    mRenderState = NULL;
-    mName        = schemeName;
-    mFogMode     = FOG_NONE;
 }
 
 //-----------------------------------------------------------------------------

@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreCgPrerequisites.h"
 #include "OgreCgPlugin.h"
-#include "OgreCgProgram.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
