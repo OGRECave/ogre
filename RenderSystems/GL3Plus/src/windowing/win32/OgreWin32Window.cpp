@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreDepthBuffer.h"
+#include "OgrePixelBox.h"
 
 namespace Ogre {
 
@@ -799,9 +800,9 @@ namespace Ogre {
             mHeight = rc.bottom - rc.top;
 
             // Notify viewports of resize
-            ViewportList::iterator it = mViewportList.begin();
+            ViewportList::const_iterator it = mViewportList.begin();
             while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();            
+                (*it++)->_updateDimensions();
         }
     }
 
