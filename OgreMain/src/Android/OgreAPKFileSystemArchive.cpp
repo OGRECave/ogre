@@ -36,7 +36,7 @@ namespace Ogre{
 
     }
 
-    DataStreamPtr APKFileSystemArchive::open(const Ogre::String &filename, bool readOnly) const
+    DataStreamPtr APKFileSystemArchive::open(const Ogre::String &filename, bool readOnly)
     {
         DataStreamPtr stream;
         AAsset* asset = AAssetManager_open(mAssetMgr, (mPathPreFix + filename).c_str(), AASSET_MODE_BUFFER);
@@ -52,12 +52,12 @@ namespace Ogre{
         return stream;
     }
 
-    DataStreamPtr APKFileSystemArchive::create(const Ogre::String &filename) const
+    DataStreamPtr APKFileSystemArchive::create(const Ogre::String &filename)
     {
         return DataStreamPtr();
     }
 
-    void APKFileSystemArchive::remove(const String &filename) const
+    void APKFileSystemArchive::remove(const String &filename)
     {
 
     }
@@ -122,7 +122,7 @@ namespace Ogre{
         return files;
     }
 
-    FileInfoListPtr APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs) const
+    FileInfoListPtr APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs)
     {
         FileInfoListPtr files(new FileInfoList);
 
