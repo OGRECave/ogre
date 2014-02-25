@@ -198,8 +198,8 @@ namespace Ogre {
         , mShadowCasterFragmentProgramUsage(0)
         , mFragmentProgramUsage(0)
         , mGeometryProgramUsage(0)
-        , mTesselationHullProgramUsage(0)
-        , mTesselationDomainProgramUsage(0)
+        , mTessellationHullProgramUsage(0)
+        , mTessellationDomainProgramUsage(0)
         , mComputeProgramUsage(0)
         , mQueuedForDeletion(false)
         , mPassIterationCount(1)
@@ -226,8 +226,8 @@ namespace Ogre {
     Pass::Pass(Technique *parent, unsigned short index, const Pass& oth)
         :mParent(parent), mIndex(index), mVertexProgramUsage(0), mShadowCasterVertexProgramUsage(0), 
         mShadowCasterFragmentProgramUsage(0), mFragmentProgramUsage(0), 
-        mGeometryProgramUsage(0), mTesselationHullProgramUsage(0)
-        , mTesselationDomainProgramUsage(0), mComputeProgramUsage(0), mQueuedForDeletion(false), mPassIterationCount(1)
+        mGeometryProgramUsage(0), mTessellationHullProgramUsage(0)
+        , mTessellationDomainProgramUsage(0), mComputeProgramUsage(0), mQueuedForDeletion(false), mPassIterationCount(1)
     {
         *this = oth;
         mParent = parent;

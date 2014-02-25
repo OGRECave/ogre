@@ -840,6 +840,8 @@ namespace Ogre {
 
     };
 
+	typedef vector<AxisAlignedBox>::type AxisAlignedBoxVec;
+
     /** @} */
     /** @} */
 } // namespace Ogre

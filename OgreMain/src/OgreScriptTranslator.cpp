@@ -4053,11 +4053,11 @@ namespace Ogre{
                             case ID_GEOMETRY:
                                 mUnit->setBindingType(TextureUnitState::BT_GEOMETRY);
                                 break;
-                            case ID_TESSELATION_HULL:
-                                mUnit->setBindingType(TextureUnitState::BT_TESSELATION_HULL);
+                            case ID_TESSELLATION_HULL:
+                                mUnit->setBindingType(TextureUnitState::BT_TESSELLATION_HULL);
                                 break;
-                            case ID_TESSELATION_DOMAIN:
-                                mUnit->setBindingType(TextureUnitState::BT_TESSELATION_DOMAIN);
+                            case ID_TESSELLATION_DOMAIN:
+                                mUnit->setBindingType(TextureUnitState::BT_TESSELLATION_DOMAIN);
                                 break;
                             case ID_COMPUTE:
                                 mUnit->setBindingType(TextureUnitState::BT_COMPUTE);
@@ -7869,8 +7869,8 @@ namespace Ogre{
             else if(obj->id == ID_FRAGMENT_PROGRAM || 
                     obj->id == ID_VERTEX_PROGRAM || 
                     obj->id == ID_GEOMETRY_PROGRAM ||
-                    obj->id == ID_TESSELATION_HULL_PROGRAM || 
-                    obj->id == ID_TESSELATION_DOMAIN_PROGRAM ||
+                    obj->id == ID_TESSELLATION_HULL_PROGRAM || 
+                    obj->id == ID_TESSELLATION_DOMAIN_PROGRAM ||
                     obj->id == ID_COMPUTE_PROGRAM)
                 translator = &mGpuProgramTranslator;
             else if(obj->id == ID_SHARED_PARAMS)

@@ -31,9 +31,10 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNode.h"
 #include "Compositor/Pass/OgreCompositorPass.h"
 
-#include "OgreRenderTarget.h"
+#include "OgreRenderTexture.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
+#include "OgreTextureManager.h"
 
 namespace Ogre
 {
@@ -166,7 +167,7 @@ namespace Ogre
 
         bool defaultHwGamma     = false;
         uint defaultFsaa        = 0;
-        String defaultFsaaHint  = StringUtil::BLANK;
+        String defaultFsaaHint  = BLANKSTRING;
         if( finalTarget )
         {
             // Inherit settings from target
@@ -180,7 +181,7 @@ namespace Ogre
                                 defaultHwGamma : (textureDef.hwGammaWrite == BoolTrue);
         //If true, use main target's fsaa settings, else disable
         uint fsaa       = textureDef.fsaa ? defaultFsaa : 0;
-        const String &fsaaHint = textureDef.fsaa ? defaultFsaaHint : StringUtil::BLANK;
+        const String &fsaaHint = textureDef.fsaa ? defaultFsaaHint : BLANKSTRING;
 
         uint width  = textureDef.width;
         uint height = textureDef.height;

@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 #include "OgreAnimation.h"
 #include "OgreOldBone.h"
+#include "OgreKeyFrame.h"
 #include "OgreSkeleton.h"
 
 namespace Ogre

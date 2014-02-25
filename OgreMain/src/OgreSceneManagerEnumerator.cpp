@@ -163,11 +163,11 @@ namespace Ogre {
                     // generate a name
                     StringStream s;
                     s << "SceneManagerInstance" << ++mInstanceCreateCount;
-                    inst = (*i)->createInstance(s.str());
+                    inst = (*i)->createInstance(s.str(), numWorkerThreads, threadedCullingMethod);
                 }
                 else
                 {
-                    inst = (*i)->createInstance(instanceName);
+                    inst = (*i)->createInstance(instanceName, numWorkerThreads, threadedCullingMethod);
                 }
                 break;
             }

@@ -743,6 +743,7 @@ namespace Ogre {
 #elif OGRE_CPU == OGRE_CPU_MIPS
         pLog->logMessage(
                 " *      MSA: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MSA), true));#endif
+#endif
         pLog->logMessage("-------------------------");
 
     }

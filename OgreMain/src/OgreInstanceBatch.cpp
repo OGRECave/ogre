@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreSubMesh.h"
 #include "OgreInstancedEntity.h"
 #include "OgreSceneNode.h"
+#include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreException.h"
 #include "OgreRenderQueue.h"
@@ -44,7 +45,7 @@ namespace Ogre
                                     const MaterialPtr &material, size_t instancesPerBatch,
                                     const Mesh::IndexMap *indexToBoneMap ) :
                 Renderable(),
-                MovableObject( id, objectMemoryManager ),
+				MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
                 mInstancesPerBatch( instancesPerBatch ),
                 mCreator( creator ),
                 mMaterial( material ),

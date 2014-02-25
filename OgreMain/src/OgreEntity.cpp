@@ -113,15 +113,6 @@ namespace Ogre {
         _initialise();
     }
     //-----------------------------------------------------------------------
-    void Entity::backgroundLoadingComplete(Resource* res)
-    {
-        if (res == mMesh.get())
-        {
-            // mesh loading has finished, we can construct ourselves now
-            _initialise();
-        }
-    }
-    //-----------------------------------------------------------------------
     void Entity::_initialise(bool forceReinitialise)
     {
         if (forceReinitialise)

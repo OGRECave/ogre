@@ -157,7 +157,7 @@ namespace Ogre {
             VertexData* targetVertexData);
 
         String mLodStrategyName;
-        bool mIsLodManual;
+        bool mHasManualLodLevel;
         ushort mNumLods;
         MeshLodUsageList    mMeshLodUsageList;
         LodValueArray       mLodValues;
@@ -166,7 +166,6 @@ namespace Ogre {
         HardwareBuffer::Usage mIndexBufferUsage;
         bool mVertexBufferShadowBuffer;
         bool mIndexBufferShadowBuffer;
-
 
         bool mPreparedForShadowVolumes;
         bool mEdgeListsBuilt;
@@ -489,7 +488,7 @@ namespace Ogre {
             meshes as provided by an artist.
         */
         bool hasManualLodLevel(void) const { return mHasManualLodLevel; }
-#if !OGRE_NO_MESHLOD
+
         /** Changes the alternate mesh to use as a manual LOD at the given index.
         @remarks
             Note that the index of a LOD may change if you insert other LODs. If in doubt,
@@ -501,14 +500,6 @@ namespace Ogre {
         */
         void updateManualLodLevel(ushort index, const String& meshName);
 
-        /** Returns true if this mesh is using manual LOD.
-        @remarks
-            A mesh can either use automatically generated LOD, or it can use alternative
-            meshes as provided by an artist. A mesh can only use either all manual LODs 
-            or all generated LODs, not a mixture of both.
-        */
-        bool isLodManual(void) const { return mIsLodManual; }
-
         /** Internal methods for loading LOD, do not use. */
         void _setLodInfo(unsigned short numLevels);
         /** Internal methods for loading LOD, do not use. */
@@ -517,7 +508,6 @@ namespace Ogre {
         void _setSubMeshLodFaceList(unsigned short subIdx, unsigned short level, IndexData* facedata);
         /** Internal methods for loading LOD, do not use. */
         bool _isManualLodLevel(unsigned short level) const;
-
 
         /** Removes all LOD data from this Mesh. */
         void removeLodLevels(void);
@@ -632,8 +622,6 @@ namespace Ogre {
             successful merges.
         */
         void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
-
-        void _configureMeshLodUsage(const LodConfig& lodConfig);
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks

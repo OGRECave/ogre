@@ -545,7 +545,7 @@ namespace Ogre {
         BoneList::const_iterator iend = mBoneList.end();
         for (i = mBoneList.begin(); i != iend; ++i)
         {
-            Bone* currentBone = *i;
+            OldBone* currentBone = *i;
             if (currentBone->getParent() == 0)
             {
                 // This is a root

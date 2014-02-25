@@ -71,6 +71,8 @@ namespace Ogre{
         static bool getBoolean(const AbstractNodePtr &node, bool *result);
         /// Converts the node to a string and returns true if successful
         static bool getString(const AbstractNodePtr &node, String *result);
+		/// Converts the node to an IdString and returns true if successful
+        static bool getIdString(const AbstractNodePtr &node, IdString *result);
         /// Converts the node to a Real and returns true if successful
         static bool getReal(const AbstractNodePtr &node, Real *result);
         /// Converts the node to a float and returns true if successful
@@ -81,6 +83,8 @@ namespace Ogre{
         static bool getInt(const AbstractNodePtr &node, int *result); 
         /// Converts the node to an unsigned integer and returns true if successful
         static bool getUInt(const AbstractNodePtr &node, uint32 *result); 
+		/// Converts the node to a an integer (from hexadecimal) and returns true if successful
+        static bool getHex(const AbstractNodePtr &node, uint32 *result);
         /// Converts the range of nodes to a ColourValue and returns true if successful
         static bool getColour(AbstractNodeList::const_iterator i, AbstractNodeList::const_iterator end, ColourValue *result, int maxEntries = 4);
         /// Converts the node to a SceneBlendFactor enum and returns true if successful
@@ -156,8 +160,8 @@ namespace Ogre{
         void translateVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
         void translateGeometryProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
         void translateFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
-        void translateTesselationHullProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
-        void translateTesselationDomainProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
+        void translateTessellationHullProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
+        void translateTessellationDomainProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
         void translateComputeProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
         void translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
         void translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);

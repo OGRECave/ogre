@@ -63,6 +63,9 @@ THE SOFTWARE.
 #include "OgreRectangle2D.h"
 #include "OgreLodListener.h"
 #include "OgreOldNode.h"
+#include "OgreLodStrategyManager.h"
+#include "OgreRenderQueueListener.h"
+#include "OgreViewport.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -2560,7 +2563,7 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
             if (fireRenderQueueStarted(qId, 
                 mIlluminationStage == IRS_RENDER_TO_TEXTURE ? 
                     RenderQueueInvocation::RENDER_QUEUE_INVOCATION_SHADOWS : 
-                    StringUtil::BLANK))
+                    BLANKSTRING))
             {
                 // Someone requested we skip this queue
                 break;
@@ -2572,7 +2575,7 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
             if (fireRenderQueueEnded(qId, 
                 mIlluminationStage == IRS_RENDER_TO_TEXTURE ? 
                     RenderQueueInvocation::RENDER_QUEUE_INVOCATION_SHADOWS : 
-                    StringUtil::BLANK))
+                    BLANKSTRING))
             {
                 // Someone requested we repeat this queue
                 repeatQueue = true;
@@ -3895,7 +3898,7 @@ const Pass* SceneManager::deriveShadowCasterPass(const Pass* pass)
         else
         {
             // Standard shadow caster pass, reset to no vp
-            retPass->setVertexProgram(StringUtil::BLANK);
+            retPass->setVertexProgram(BLANKSTRING);
         }
     }
 
@@ -3933,7 +3936,7 @@ const Pass* SceneManager::deriveShadowCasterPass(const Pass* pass)
         else
         {
             // Standard shadow caster pass, reset to no fp
-            retPass->setFragmentProgram(StringUtil::BLANK);
+            retPass->setFragmentProgram(BLANKSTRING);
         }
     }
     

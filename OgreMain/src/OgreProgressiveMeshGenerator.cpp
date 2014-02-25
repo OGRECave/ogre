@@ -720,8 +720,6 @@ void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 #endif // ifndef NDEBUG
 
     computeLods(lodConfig);
-
-    mMesh.get()->_configureMeshLodUsage(lodConfig);
 }
 
 void ProgressiveMeshGenerator::computeLods(LodConfig& lodConfigs)

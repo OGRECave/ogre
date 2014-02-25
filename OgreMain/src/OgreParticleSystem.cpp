@@ -78,7 +78,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ParticleSystem::ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager,
                                     const String& resourceGroup )
-      : MovableObject( id, objectMemoryManager ),
+      : MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
         mBoundsAutoUpdate(true),
         mBoundsUpdateTime(10.0f),
         mUpdateRemainTime(0),
@@ -554,9 +554,9 @@ namespace Ogre {
             // Translate position & direction into world space
             if (!mLocalSpace)
             {
-                p->position  = 
-                    (derivedOrientation * (derivedScale * p->position)) + derivedPosition;
-                p->direction = (derivedOrientation * p->direction);
+                p->mPosition  = 
+                    (derivedOrientation * (derivedScale * p->mPosition)) + derivedPosition;
+                p->mDirection = (derivedOrientation * p->mDirection);
             }
 
             // apply partial frame motion to this particle
@@ -816,8 +816,8 @@ namespace Ogre {
                     {
                         Vector3 padding = 
                             halfScale * Ogre::max((*p)->mWidth, (*p)->mHeight);
-                        min.makeFloor((*p)->position - padding);
-                        max.makeCeil((*p)->position + padding);
+                        min.makeFloor((*p)->mPosition - padding);
+                        max.makeCeil((*p)->mPosition + padding);
                     }
                     else
                     {

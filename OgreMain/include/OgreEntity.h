@@ -224,6 +224,8 @@ namespace Ogre {
         bool mSkipAnimStateUpdates;
         /// Flag indicating whether to update the main entity skeleton even when an LOD is displayed.
         bool mAlwaysUpdateMainSkeleton;
+		/// Flag indicating whether to update the bounding box from the bones of the skeleton.
+        bool mUpdateBoundingBoxFromSkeleton;
 
         /** List of LOD Entity instances (for manual LODs).
             We don't know when the mesh is using manual LODs whether one LOD to the next will have the
@@ -232,16 +234,7 @@ namespace Ogre {
         */
         typedef vector<Entity*>::type LODEntityList;
         LODEntityList mLodEntityList;
-#else
-        const ushort mMeshLodIndex;
-        const Real mMeshLodFactorTransformed;
-        const ushort mMinMeshLodIndex;
-        const ushort mMaxMeshLodIndex;
-        const Real mMaterialLodFactor;
-        const Real mMaterialLodFactorTransformed;
-        const ushort mMinMaterialLodIndex;
-        const ushort mMaxMaterialLodIndex;
-#endif
+
         /** This Entity's personal copy of the skeleton, if skeletally animated.
         */
         OldSkeletonInstance* mSkeletonInstance;
@@ -659,11 +652,6 @@ namespace Ogre {
         void _initialise(bool forceReinitialise = false);
         /** Tear down the internal structures of this Entity, rendering it uninitialised. */
         void _deinitialise(void);
-
-        /** Resource::Listener hook to notify Entity that a delay-loaded Mesh is
-            complete.
-        */
-        void backgroundLoadingComplete(Resource* res);
 
         /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 

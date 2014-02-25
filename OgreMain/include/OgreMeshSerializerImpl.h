@@ -94,7 +94,7 @@ namespace Ogre {
         virtual void writeSkeletonLink(const String& skelName);
         virtual void writeMeshBoneAssignment(const VertexBoneAssignment& assign);
         virtual void writeSubMeshBoneAssignment(const VertexBoneAssignment& assign);
-#if !OGRE_NO_MESHLOD
+
         virtual void writeLodLevel(const Mesh* pMesh);
         virtual void writeLodUsageManual(const MeshLodUsage& usage);
         virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);

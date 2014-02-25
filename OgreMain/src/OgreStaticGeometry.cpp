@@ -1200,7 +1200,7 @@ namespace Ogre {
         //   source
         //   semantic
         //   type
-        StringUtil::StrStreamType str;
+		StringStream str;
 
         str << geom->indexData->indexBuffer->getType() << "|";
         const VertexDeclaration::VertexElementList& elemList =
