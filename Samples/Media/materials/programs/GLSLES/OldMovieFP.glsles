@@ -3,8 +3,8 @@
 precision mediump int;
 precision mediump float;
 
-varying vec2 uv0;
-varying vec2 uv1;
+varying vec2 oUv0;
+//varying vec2 uv1;
 
 uniform sampler2D RT;
 uniform sampler2D SplotchesTx;
@@ -34,14 +34,14 @@ vec4 getSplotches(vec2 spriteAddr)
 void main()
 {
    // get sprite address
-   vec2 spriteAddr = calcSpriteAddr(uv0, DirtFrequency, time_cycle_period);
+   vec2 spriteAddr = calcSpriteAddr(oUv0, DirtFrequency, time_cycle_period);
 
    // add some dark and light splotches to the film
    vec4 splotches = getSplotches(spriteAddr);
    vec4 specs = 1.0 - getSplotches(spriteAddr / 3.0);
 
    // convert color to base luminance
-   vec4 base = texture2D(RT, uv0 + vec2(0.0, spriteAddr.y * frameJitter));
+   vec4 base = texture2D(RT, oUv0 + vec2(0.0, spriteAddr.y * frameJitter));
    float lumi = dot(base.rgb, luminance);
    // randomly shift luminance
    lumi -= spriteAddr.x * lumiShift;
