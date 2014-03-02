@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include "OgreAnimation.h"
 #include "OgreAnimationState.h"
 #include "OgreAnimationTrack.h"
-#include "OgreBone.h"
+#include "OgreOldBone.h"
 #include "OgreOptimisedUtil.h"
 #include "OgreSkeleton.h"
 #include "OgreTangentSpaceCalc.h"

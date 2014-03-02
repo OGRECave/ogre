@@ -5006,18 +5006,6 @@ namespace Ogre
             pPass->getShadowCasterFragmentProgram(), pPass->getShadowCasterFragmentProgramParameters());
     }
     //-----------------------------------------------------------------------
-    void MaterialSerializer::writeShadowReceiverVertexProgramRef(const Pass* pPass)
-    {
-        writeGpuProgramRef("shadow_receiver_vertex_program_ref",
-            pPass->getShadowReceiverVertexProgram(), pPass->getShadowReceiverVertexProgramParameters());
-    }
-    //-----------------------------------------------------------------------
-    void MaterialSerializer::writeShadowReceiverFragmentProgramRef(const Pass* pPass)
-    {
-        writeGpuProgramRef("shadow_receiver_fragment_program_ref",
-            pPass->getShadowReceiverFragmentProgram(), pPass->getShadowReceiverFragmentProgramParameters());
-    }
-    //-----------------------------------------------------------------------
     void MaterialSerializer::writeGeometryProgramRef(const Pass* pPass)
     {
         writeGpuProgramRef("geometry_program_ref",

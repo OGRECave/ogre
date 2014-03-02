@@ -290,7 +290,7 @@ namespace Ogre {
         // Operation type
         writeSubMeshOperation(s);
 
-        // OldBone assignments
+        // Bone assignments
         if (!s->mBoneAssignments.empty())
         {
             LogManager::getSingleton().logMessage("Exporting dedicated geometry bone assignments...");
@@ -608,7 +608,7 @@ namespace Ogre {
         size += calcSubMeshTextureAliasesSize(pSub);
         size += calcSubMeshOperationSize(pSub);
 
-        // OldBone assignments
+        // Bone assignments
         if (!pSub->mBoneAssignments.empty())
         {
             SubMesh::VertexBoneAssignmentList::const_iterator vi;
@@ -1214,7 +1214,7 @@ namespace Ogre {
 
         // Vert index
         size += sizeof(unsigned int);
-        // OldBone index
+        // Bone index
         size += sizeof(unsigned short);
         // weight
         size += sizeof(float);
@@ -1222,13 +1222,11 @@ namespace Ogre {
         return size;
     }
     //---------------------------------------------------------------------
-#if !OGRE_NO_MESHLOD
     void MeshSerializerImpl::writeLodLevel(const Mesh* pMesh)
     {
-        const LodStrategy *strategy = pMesh->getLodStrategy();
         exportedLodCount = pMesh->getNumLodLevels();
         writeChunkHeader(M_MESH_LOD_LEVEL, calcLodLevelSize(pMesh));
-        writeString(strategy->getName()); // string strategyName;
+        writeString(pMesh->getLodStrategyName()); // string strategyName;
         writeShorts(&exportedLodCount, 1); // unsigned short numLevels;
 
         pushInnerChunk(mStream);
@@ -1315,12 +1313,11 @@ namespace Ogre {
             writeLodUsageGeneratedSubmesh(submesh, lodNum);
         }
     }
-#endif
     size_t MeshSerializerImpl::calcLodLevelSize(const Mesh* pMesh)
     {
         exportedLodCount = pMesh->getNumLodLevels();
         size_t size = MSTREAM_OVERHEAD_SIZE; // Header
-        size += calcStringSize(pMesh->getLodStrategy()->getName()); // string strategyName;
+        size += calcStringSize(pMesh->getLodStrategyName()); // string strategyName;
         size += sizeof(unsigned short); // unsigned short numLevels;
         //size += sizeof(bool); // bool manual; <== this is removed in v1_9
 
@@ -1497,13 +1494,7 @@ namespace Ogre {
 #else
         // Read the strategy to be used for this mesh
         String strategyName = readString(stream);
-        LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
-
-        // Check that valid strategy name was given, otherwise use default
-        if (strategy == 0)
-            strategy = LodStrategyManager::getSingleton().getDefaultStrategy();
-
-        pMesh->setLodStrategyName(strategy->getName());
+        pMesh->setLodStrategyName(strategyName);
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
@@ -2793,7 +2784,7 @@ namespace Ogre {
         }
         exportedLodCount = pMesh->getNumLodLevels();
         size_t size = MSTREAM_OVERHEAD_SIZE; // Header
-        size += calcStringSize(pMesh->getLodStrategy()->getName()); // string strategyName;
+        size += calcStringSize(pMesh->getLodStrategyName()); // string strategyName;
         size += sizeof(unsigned short); // unsigned short numLevels;
         size += sizeof(bool); // bool manual; <== this is removed in v1_9
 
@@ -2870,7 +2861,7 @@ namespace Ogre {
 
             // Details
             // Get backward compatible strategy name
-            String strategyName = pMesh->getLodStrategy()->getName();
+            String strategyName = pMesh->getLodStrategyName();
             if (strategyName == "distance_box" || strategyName == "distance_sphere") {
                 strategyName = "Distance";
             } else if (strategyName == "pixel_count" || strategyName == "screen_ratio_pixel_count") {
@@ -3155,8 +3146,7 @@ namespace Ogre {
 
         // Read the strategy to be used for this mesh
         String strategyName = readString(stream);
-        LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
-        pMesh->setLodStrategy(strategy);
+        pMesh->setLodStrategyName(strategyName);
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
@@ -3395,7 +3385,7 @@ namespace Ogre {
     }
     size_t MeshSerializerImpl_v1_4::calcLodLevelSize(const Mesh* pMesh)
     {
-        if (isLodMixed(pMesh) || pMesh->getLodStrategy() != DistanceLodStrategy::getSingletonPtr()) {
+		if (isLodMixed(pMesh) || pMesh->getLodStrategyName() != DistanceLodStrategy::getSingletonPtr()->getName()) {
             return 0; // Supported in v1_9+
         }
         exportedLodCount = pMesh->getNumLodLevels();
@@ -3425,7 +3415,7 @@ namespace Ogre {
     {
         if (isLodMixed(pMesh)) {
             LogManager::getSingleton().logMessage("MeshSerializer_v1_4 or older mesh format is incompatible with mixed manual/generated Lod levels. Lod levels will not be exported.");
-        } else if (pMesh->getLodStrategy() != DistanceLodStrategy::getSingletonPtr()) {
+		} else if (pMesh->getLodStrategyName() != DistanceLodStrategy::getSingletonPtr()->getName()) {
             LogManager::getSingleton().logMessage("MeshSerializer_v1_4 or older mesh format is only compatible with Distance Lod Strategy. Lod levels will not be exported.");
         } else {
             exportedLodCount = pMesh->getNumLodLevels();
@@ -3550,19 +3540,9 @@ namespace Ogre {
 #else
         unsigned short streamID, i;
 
-        LodStrategy *activeStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
-        if( activeStrategy != DistanceLodSphereStrategy::getSingletonPtr() )
-        {
-            LogManager::getSingleton().logMessage("WARNING! Lod strategies don't match.\n"
-                                "Active strategy (global):\t" + activeStrategy->getName() + "\n" +
-                                "Mesh' strategy:\t" +
-                                DistanceLodSphereStrategy::getSingletonPtr()->getName() + "\n" +
-                                "in " + pMesh->getName() + ". Lod may pop in/out in unexpected ways." );
-        }
-
         // Use the old strategy for this mesh
         LodStrategy *strategy = DistanceLodSphereStrategy::getSingletonPtr();
-        pMesh->setLodStrategyName(strategy->getName());
+		pMesh->setLodStrategyName(strategy->getName());
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
@@ -3585,7 +3565,6 @@ namespace Ogre {
         }
         pushInnerChunk(stream);
         // Loop from 1 rather than 0 (full detail index is not in file)
-        pMesh->mLodValues.resize( pMesh->mNumLods, 0 );
         for (i = 1; i < pMesh->mNumLods; ++i)
         {
             streamID = readChunk(stream);
