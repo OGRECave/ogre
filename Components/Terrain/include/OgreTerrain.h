@@ -41,6 +41,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	class NameGenerator;
+
     /** \addtogroup Optional Components
     *  @{
     */

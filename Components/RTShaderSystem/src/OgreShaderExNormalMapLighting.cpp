@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreShaderRenderState.h"
 #include "OgrePass.h"
 #include "OgreMaterialSerializer.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre {
 namespace RTShader {

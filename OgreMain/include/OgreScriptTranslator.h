@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 namespace Ogre{
     struct IdString;
+	enum SceneBlendFactor;
     enum StencilOperation;
     class TextureDefinitionBase;
 

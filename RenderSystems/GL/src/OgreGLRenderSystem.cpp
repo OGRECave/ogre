@@ -55,6 +55,7 @@ THE SOFTWARE.
 #include "OgreGLPBRenderTexture.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
+#include "OgreRenderOperation.h"
 
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -2076,7 +2077,7 @@ namespace Ogre {
     void GLRenderSystem::_beginFrame(void)
     {
         // Activate the viewport clipping
-        mStateCacheManager->setEnabled(GL_SCISSOR_TEST);
+        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
     }
 
     //-----------------------------------------------------------------------------

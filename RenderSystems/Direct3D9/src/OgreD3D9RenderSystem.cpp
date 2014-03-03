@@ -52,6 +52,7 @@ THE SOFTWARE.
 #include "OgreD3D9DeviceManager.h"
 #include "OgreD3D9ResourceManager.h"
 #include "OgreD3D9DepthBuffer.h"
+#include "OgreRenderOperation.h"
 
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 

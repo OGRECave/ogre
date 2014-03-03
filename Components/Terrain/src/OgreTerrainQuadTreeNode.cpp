@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreStreamSerialiser.h"
 #include "OgreSceneNode.h"
 #include "OgreLodStrategy.h"
+#include "OgreLodStrategyManager.h"
+
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
@@ -1482,13 +1484,15 @@ namespace Ogre
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     TerrainQuadTreeNode::Movable::Movable(TerrainQuadTreeNode* parent)
-        : MovableObject(0, new ObjectMemoryManager()), mParent(parent)
+		: MovableObject(0, new ObjectMemoryManager(), RENDER_QUEUE_MAIN), mParent(parent)
     {
     }
     //---------------------------------------------------------------------
     TerrainQuadTreeNode::Movable::~Movable()
     {
-
+		//TODO: Having one ObjectMemoryManager per movable is a terrible idea (unless they're very few)
+		delete mObjectMemoryManager;
+		mObjectMemoryManager = 0;
     }
     //---------------------------------------------------------------------
     const String& TerrainQuadTreeNode::Movable::getMovableType(void) const
@@ -1520,13 +1524,13 @@ namespace Ogre
     uint32 TerrainQuadTreeNode::Movable::getVisibilityFlags(void) const
     {
         // Combine own vis (in case anyone sets this) and terrain overall
-        return getVisibilityFlags() & mParent->getTerrain()->getVisibilityFlags();
+		return MovableObject::getVisibilityFlags() & mParent->getTerrain()->getVisibilityFlags();
     }
     //---------------------------------------------------------------------
     uint32 TerrainQuadTreeNode::Movable::getQueryFlags(void) const
     {
         // Combine own vis (in case anyone sets this) and terrain overall
-        return getQueryFlags() & mParent->getTerrain()->getQueryFlags();
+        return MovableObject::getQueryFlags() & mParent->getTerrain()->getQueryFlags();
     }
     //------------------------------------------------------------------------
     void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)

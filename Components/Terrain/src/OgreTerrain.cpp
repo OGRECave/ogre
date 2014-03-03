@@ -48,6 +48,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreTimer.h"
 #include "OgreTerrainMaterialGeneratorA.h"
+#include "OgreNameGenerator.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"

@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgrePixelBox.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {

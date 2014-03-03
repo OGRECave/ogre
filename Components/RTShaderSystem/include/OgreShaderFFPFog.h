@@ -31,6 +31,7 @@ THE SOFTWARE.
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderSubRenderState.h"
 #include "OgreVector4.h"
+#include "OgreColourValue.h"
 
 namespace Ogre {
 namespace RTShader {
