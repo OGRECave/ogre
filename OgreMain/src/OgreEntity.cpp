@@ -55,7 +55,7 @@ namespace Ogre {
     extern const FastArray<Real> c_DefaultLodMesh;
     //-----------------------------------------------------------------------
     Entity::Entity ( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager ),
+		: MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
           mAnimationState(NULL),
           mSkelAnimVertexData(0),
           mTempVertexAnimInfo(),
@@ -85,7 +85,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     Entity::Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh) :
-        MovableObject(id, objectMemoryManager),
+		MovableObject(id, objectMemoryManager, RENDER_QUEUE_MAIN),
         mMesh(mesh),
         mAnimationState(NULL),
         mSkelAnimVertexData(0),

@@ -100,7 +100,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Real DistanceLodStrategy::getBaseValue() const
+    Real DistanceLodStrategyBase::getBaseValue() const
     {
         return Real(0);
     }

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreInstancedEntity.h"
 #include "OgreCamera.h"
+#include "OgreViewport.h"
 #include "OgreRoot.h"
 
 namespace Ogre

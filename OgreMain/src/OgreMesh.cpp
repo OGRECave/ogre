@@ -352,24 +352,23 @@ namespace Ogre {
         newMesh->mAutoBuildEdgeLists = mAutoBuildEdgeLists;
         newMesh->mEdgeListsBuilt = mEdgeListsBuilt;
 
-#if !OGRE_NO_MESHLOD
-        newMesh->mLodStrategyName = mLodStrategyName;
-        newMesh->mIsLodManual = mIsLodManual;
+		newMesh->mLodStrategyName = mLodStrategyName;
+		newMesh->mHasManualLodLevel = mHasManualLodLevel;
         newMesh->mNumLods = mNumLods;
         newMesh->mMeshLodUsageList  = mMeshLodUsageList;
         newMesh->mLodValues         = mLodValues;
-        newMesh->mAutoBuildEdgeLists= mAutoBuildEdgeLists;
-#endif
+
         // Unreference edge lists, otherwise we'll delete the same lot twice, build on demand
         MeshLodUsageList::iterator lodi, lodOldi;
         lodOldi = mMeshLodUsageList.begin();
-        for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi, ++lodOldi) {
+        for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi, ++lodOldi)
+		{
             MeshLodUsage& newLod = *lodi;
             MeshLodUsage& lod = *lodOldi;
             newLod.manualName = lod.manualName;
             newLod.userValue = lod.userValue;
             newLod.value = lod.value;
-            if (lod.edgeData) {
+            if (lod.edgeData)
                 newLod.edgeData = lod.edgeData->clone();
         }
 
@@ -993,20 +992,20 @@ namespace Ogre {
             vector< vector<ushort>::type >::type boneChildren;  // for each bone, a list of children
             {
                 // extract binding pose bone positions, and also indices for child bones
-                size_t numBones = mSkeleton->getNumBones();
-                mSkeleton->setBindingPose();
-                mSkeleton->_updateTransforms();
+                size_t numBones = mOldSkeleton->getNumBones();
+                mOldSkeleton->setBindingPose();
+                mOldSkeleton->_updateTransforms();
                 bonePositions.resize( numBones );
                 boneChildren.resize( numBones );
                 // for each bone,
                 for (size_t iBone = 0; iBone < numBones; ++iBone)
                 {
-                    Bone* bone = mSkeleton->getBone( iBone );
+                    OldBone* bone = mOldSkeleton->getBone( iBone );
                     bonePositions[ iBone ] = bone->_getDerivedPosition();
                     boneChildren[ iBone ].reserve( bone->numChildren() );
                     for (size_t iChild = 0; iChild < bone->numChildren(); ++iChild)
                     {
-                        Bone* child = static_cast<Bone*>( bone->getChild( iChild ) );
+                        OldBone* child = static_cast<OldBone*>( bone->getChild( iChild ) );
                         boneChildren[ iBone ].push_back( child->getHandle() );
                     }
                 }
@@ -1071,7 +1070,7 @@ namespace Ogre {
     {
 #if !OGRE_NO_MESHLOD
         assert( index < mMeshLodUsageList.size() );
-        if (mIsLodManual && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
+        if (this->_isManualLodLevel(index) && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
         {
             // Load the mesh now
             try {
@@ -1147,7 +1146,8 @@ namespace Ogre {
         mMeshLodUsageList[level] = usage;
         mLodValues[level] = usage.userValue;
 
-        if(!mMeshLodUsageList[level].manualName.empty()){
+        if( !mMeshLodUsageList[level].manualName.empty() )
+		{
             mHasManualLodLevel = true;
         }
     }
@@ -1166,7 +1166,6 @@ namespace Ogre {
         SubMesh* sm = mSubMeshList[subIdx];
         sm->mLodFaceList[level - 1] = facedata;
     }
-#endif
     //---------------------------------------------------------------------
     bool Mesh::_isManualLodLevel( unsigned short level ) const
     {
@@ -2469,48 +2468,6 @@ namespace Ogre {
             (*subi)->updateMaterialUsingTextureAliases();
         }
 
-    }
-    //--------------------------------------------------------------------
-    void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
-    {
-        LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
-        // In theory every mesh should have a submesh.
-        assert(getNumSubMeshes() > 0);
-        SubMesh* submesh = getSubMesh(0);
-        mNumLods = submesh->mLodFaceList.size() + 1;
-        mMeshLodUsageList.resize(mNumLods);
-        mLodValues.resize(mNumLods);
-        for (size_t n = 0, i = 0; i < lodConfig.levels.size(); i++) {
-            // Record usages. First LOD usage is the mesh itself.
-
-            // Skip LODs, which have the same amount of vertices. No buffer generated for them.
-            if (!lodConfig.levels[i].outSkipped) {
-                // Generated buffers are less then the reported by ProgressiveMesh.
-                // This would fail if you use QueuedProgressiveMesh and the MeshPtr is force unloaded before LOD generation completes.
-                assert(mMeshLodUsageList.size() > n + 1);
-                ++n;
-                MeshLodUsage& lod = mMeshLodUsageList[n];
-                lod.userValue = lodConfig.levels[i].distance;
-                lod.value = lodStrategy->transformUserValue(lod.userValue);
-                lod.edgeData = 0;
-                lod.manualMesh.setNull();
-                mLodValues[n] = lod.value;
-            }
-        }
-
-        // TODO: Fix this in PixelCountLodStrategy::getIndex()
-        // Fix bug in Ogre with pixel count LOD strategy.
-        // Changes [0, 20, 15, 10, 5] to [max, 20, 15, 10, 5].
-        // Fixes PixelCountLodStrategy::getIndex() function, which returned always 0 index.
-        if (lodConfig.strategy == AbsolutePixelCountLodStrategy::getSingletonPtr()) {
-            mMeshLodUsageList[0].userValue = std::numeric_limits<Real>::max();
-            mMeshLodUsageList[0].value = std::numeric_limits<Real>::max();
-            mLodValues[0] = std::numeric_limits<Real>::max();
-        } else {
-            mMeshLodUsageList[0].userValue = 0;
-            mMeshLodUsageList[0].value = 0;
-            mLodValues[0] = 0;
-        }
     }
     //---------------------------------------------------------------------
 }
