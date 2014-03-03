@@ -101,7 +101,7 @@ void MeshLodGenerator::generateAutoconfiguredLodLevels(MeshPtr& mesh)
 void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
 {
     lodConfig.mesh->freeEdgeList();
-    lodConfig.mesh->setLodStrategy(lodConfig.strategy);
+	lodConfig.mesh->setLodStrategyName(lodConfig.strategy->getName());
     MeshLodUsage usage;
     size_t n = 0;
     lodConfig.mesh->_setLodInfo(lodConfig.levels.size() + 1); // add Lod levels
@@ -112,7 +112,7 @@ void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
         if(!lodConfig.levels[i].outSkipped) {
 
             usage.userValue = lodConfig.levels[i].distance;
-            usage.value = lodConfig.mesh->getLodStrategy()->transformUserValue(usage.userValue);
+            usage.value = lodConfig.strategy->transformUserValue(usage.userValue);
             usage.edgeData = NULL;
             usage.manualMesh.setNull();
             usage.manualName = lodConfig.levels[i].manualMeshName;

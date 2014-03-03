@@ -379,6 +379,13 @@ namespace Ogre {
         */
         bool getDisplaySkeleton(void) const;
 
+		/** Gets a pointer to the entity representing the numbered manual level of detail.
+        @remarks
+            The zero-based index never includes the original entity, unlike
+            Mesh::getLodLevel.
+        */
+        Entity* getManualLodLevel(size_t index) const;
+
         /** Returns the number of manual levels of detail that this entity supports.
         @remarks
             This number never includes the original entity, it is difference

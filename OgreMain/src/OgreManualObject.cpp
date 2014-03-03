@@ -47,7 +47,7 @@ namespace Ogre {
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
     //-----------------------------------------------------------------------------
     ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager ),
+		: MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
           mDynamic(false), mCurrentSection(0), mFirstVertex(true),
           mTempVertexPending(false),
           mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),

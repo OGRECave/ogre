@@ -159,7 +159,7 @@ namespace Ogre {
         }
 
         // Check if mesh is using manual LOD
-        if (mMesh->isLodManual())
+        if (mMesh->hasManualLodLevel())
         {
             ushort i, numLod;
             numLod = mMesh->getNumLodLevels();
@@ -378,7 +378,6 @@ namespace Ogre {
         // Calculate the LOD
         if (mParentNode)
         {
-#if !OGRE_NO_MESHLOD
             // Get mesh lod strategy
             const LodStrategy *meshStrategy = mMesh->getLodStrategy();
             // Get the appropriate LOD value
@@ -410,14 +409,12 @@ namespace Ogre {
 
             // Now do material LOD
             lodValue *= mMaterialLodFactorTransformed;
-#endif
 
 
             SubEntityList::iterator i, iend;
             iend = mSubEntityList.end();
             for (i = mSubEntityList.begin(); i != iend; ++i)
             {
-#if !OGRE_NO_MESHLOD
                 // Get sub-entity material
                 const MaterialPtr& material = i->getMaterial();
                 
@@ -494,7 +491,7 @@ namespace Ogre {
 
         Entity* displayEntity = this;
         // Check we're not using a manual LOD
-        if (mCurrentMeshLod > 0 && mMesh->isLodManual())
+        if (mCurrentMeshLod > 0 && mMesh->hasManualLodLevel())
         {
             // Use alternate entity
             assert( static_cast< size_t >( mCurrentMeshLod - 1 ) < mLodEntityList.size() &&
@@ -513,7 +510,6 @@ namespace Ogre {
             }
             displayEntity = mLodEntityList[mCurrentMeshLod - 1];
         }
-#endif
 
         // Add each visible SubEntity to the queue
         SubEntityList::iterator i, iend;
@@ -1220,17 +1216,7 @@ namespace Ogre {
     {
         return mDisplaySkeleton;
     }
-    //-----------------------------------------------------------------------
-    size_t Entity::getNumManualLodLevels(void) const
-    {
-#if !OGRE_NO_MESHLOD
-        return mLodEntityList.size();
-#else
-        return 0;
-#endif
-    }
-
-    //-----------------------------------------------------------------------
+	//-----------------------------------------------------------------------
     Entity* Entity::getManualLodLevel(size_t index) const
     {
 #if !OGRE_NO_MESHLOD
@@ -1242,9 +1228,8 @@ namespace Ogre {
         return NULL;
 #endif
     }
-#if !OGRE_NO_MESHLOD
-    //-----------------------------------------------------------------------
-    void Entity::setMeshLodBias(Real factor, ushort maxDetailIndex, ushort minDetailIndex)
+	//-----------------------------------------------------------------------
+    size_t Entity::getNumManualLodLevels(void) const
     {
         return mLodEntityList.size();
     }
@@ -1779,7 +1764,7 @@ namespace Ogre {
         MovableObject::setRenderQueueGroupAndPriority(queueID, priority);
 
         // Set render queue for all manual LOD entities
-        if (mMesh->isLodManual())
+        if (mMesh->hasManualLodLevel())
         {
             LODEntityList::iterator li, liend;
             liend = mLodEntityList.end();

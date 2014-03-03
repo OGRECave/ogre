@@ -65,7 +65,7 @@ namespace Ogre {
     BillboardChain::BillboardChain( IdType id, ObjectMemoryManager *objectMemoryManager,
             size_t maxElements, size_t numberOfChains, bool useTextureCoords,
             bool useColours, bool dynamic )
-        :MovableObject( id, objectMemoryManager ),
+        :MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
         mMaxElementsPerChain(maxElements),
         mChainCount(numberOfChains),
         mUseTexCoords(useTextureCoords),
@@ -737,16 +737,8 @@ namespace Ogre {
     {
         updateIndexBuffer();
 
-		if (mIndexData->indexCount > 0)
-		{
-			if (mRenderQueuePrioritySet)
-				queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
-			else if (mRenderQueueIDSet)
-                queue->addRenderable(this, mRenderQueueID);
-            else
-                queue->addRenderable(this);
-		}
-
+        if (mIndexData->indexCount > 0)
+            queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::getRenderOperation(RenderOperation& op)

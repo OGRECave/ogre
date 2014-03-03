@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreRadixSort.h"
 #include "OgreCommon.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreRenderQueue.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

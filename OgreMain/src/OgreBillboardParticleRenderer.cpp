@@ -140,7 +140,7 @@ namespace Ogre {
             i != currentParticles.end(); ++i)
         {
             Particle* p = *i;
-            bb.mPosition = p->position;
+            bb.mPosition = p->mPosition;
             if (mBillboardSet->getBillboardType() == BBT_ORIENTED_SELF ||
                 mBillboardSet->getBillboardType() == BBT_PERPENDICULAR_SELF)
             {
