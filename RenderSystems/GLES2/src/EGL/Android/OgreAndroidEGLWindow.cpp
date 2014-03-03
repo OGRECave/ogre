@@ -90,7 +90,13 @@ namespace Ogre {
 	void AndroidEGLWindow::windowMovedOrResized()
 	{
         if(mActive)
-        {
+        {		
+			// When using GPU rendering for Android UI the os creates a context in the main thread
+			// Now we have 2 choices create OGRE in its own thread or set our context current before doing
+			// anything else. I put this code here because this function called before any rendering is done.
+			// Because the events for screen rotation / resizing did not worked on all devices it is the best way
+			// to query the correct dimensions.
+	        mContext->setCurrent(); 
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
             
