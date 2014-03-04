@@ -110,7 +110,7 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
             curSearchLightIndex = 0;
         }
 
-        Light*      srcLight = NULL;
+        Light const*srcLight = NULL;
         Vector4     vParameter;
         ColourValue colour;
 
@@ -127,9 +127,8 @@ void NormalMapLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, co
 
         // No matching light found -> use a blank dummy light for parameter update.
         if (srcLight == NULL)
-        {           
-            assert("No matching light found!");
-            return;
+        {                       
+            srcLight = &source->_getBlankLight();
         }
 
 

@@ -42,6 +42,7 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String PerPixelLighting::Type = "SGX_PerPixelLighting";
+
 //-----------------------------------------------------------------------
 PerPixelLighting::PerPixelLighting()
 {
@@ -84,7 +85,7 @@ void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, con
             curSearchLightIndex = 0;
         }
 
-        Light*      srcLight = NULL;
+        Light const*srcLight = NULL;
         Vector4     vParameter;
         ColourValue colour;
 
@@ -101,9 +102,8 @@ void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, con
 
         // No matching light found -> use a blank dummy light for parameter update.
         if (srcLight == NULL)
-        {           
-            assert("No matching light found");
-            return;
+        {                       
+            srcLight = &source->_getBlankLight();
         }
 
 
