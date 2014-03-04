@@ -74,8 +74,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     bool PixelCountLodStrategyBase::isSorted(const Mesh::LodValueArray& values) const
     {
-        // Check if values are sorted descending
-        return isSortedDescending(values);
+        return isSortedAscending(values);
     }
 
     /************************************************************************/

@@ -11,6 +11,7 @@ using namespace OgreBites;
 #include "OgreLodInputProviderMesh.h"
 #include "OgreLodOutsideMarker.h"
 #include "OgreLodData.h"
+#include "OgreLodStrategyManager.h"
 
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreMeshSerializer.h"
@@ -25,6 +26,9 @@ Sample_MeshLod::Sample_MeshLod()
 
 void Sample_MeshLod::setupContent()
 {
+	mPreviousLodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
+	LodStrategyManager::getSingleton().setDefaultStrategy( PixelCountLodStrategy::getSingletonPtr() );
+
     mCameraMan->setStyle(CS_ORBIT);
 
     mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));  // set ambient light
@@ -44,7 +48,8 @@ void Sample_MeshLod::setupContent()
     mHullNode->scale(1.001,1.001,1.001);
     mHullEntity = NULL;
 #endif
-    if(!MeshLodGenerator::getSingletonPtr()) {
+    if(!MeshLodGenerator::getSingletonPtr())
+	{
         new MeshLodGenerator();
     }
     MeshLodGenerator::getSingleton()._initWorkQueue(); // needed only for LodWorkQueueInjector::setInjectorListener
@@ -60,12 +65,16 @@ void Sample_MeshLod::setupContent()
 void Sample_MeshLod::cleanupContent()
 {
     Ogre::LodWorkQueueInjector::getSingleton().removeInjectorListener();
-    if(mMeshEntity){
+    if(mMeshEntity)
+	{
         mSceneMgr->destroyEntity(mMeshEntity);
         mMeshEntity = 0;
         saveConfig();
     }
+
     cleanupControls();
+
+	LodStrategyManager::getSingleton().setDefaultStrategy( mPreviousLodStrategy );
 }
 
 void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
@@ -383,6 +392,9 @@ Real Sample_MeshLod::getCameraDistance()
 
 void Sample_MeshLod::moveCameraToPixelDistance( Real pixels )
 {
+	if( !mCameraMan->getCamera()->getLastViewport() )
+		return; //see getCameraDistance comments
+
     PixelCountLodStrategy& strategy = PixelCountLodStrategy::getSingleton();
     Real distance = mLodConfig.mesh->getBoundingSphereRadius() * 4;
     const Real epsilon = pixels * 0.000001;
@@ -390,26 +402,34 @@ void Sample_MeshLod::moveCameraToPixelDistance( Real pixels )
     mCamera->setPosition(Vector3(0, 0, 0));
     mCamera->moveRelative(Vector3(0, 0, distance));
     // We need to find a distance, which is bigger then requested
-    for(int i=0;i<iterations;i++){
+    for(int i=0;i<iterations;i++)
+	{
         Real curPixels = strategy.getValue(mMeshEntity, mCameraMan->getCamera());
-        if (curPixels > pixels) {
+        if (curPixels > pixels)
+		{
             distance *= 2.0;
             mCamera->moveRelative(Vector3(0, 0, distance));
-        } else {
+        }
+		else
+		{
             break;
         }
     }
     // Binary search for distance
-    for(int i=0;i<iterations;i++){
+    for(int i=0;i<iterations;i++)
+	{
         Real curPixels = strategy.getValue(mMeshEntity, mCameraMan->getCamera());
-        if(std::abs(curPixels - pixels) < epsilon){
+        if(std::abs(curPixels - pixels) < epsilon)
             break;
-        }
+
         distance /= 2;
-        if (curPixels > pixels) {
+        if (curPixels > pixels)
+		{
             // move camera further
             mCamera->moveRelative(Vector3(0, 0, distance));
-        } else {
+        }
+		else
+		{
             // move camera nearer
             mCamera->moveRelative(Vector3(0, 0, -distance));
         }
@@ -426,24 +446,26 @@ bool Sample_MeshLod::getResourceFullPath(MeshPtr& mesh, String& outPath)
     FileInfoList::iterator it, itEnd;
     it = locPtr->begin();
     itEnd = locPtr->end();
-    for (; it != itEnd; it++) {
-        if (stricmp(name.c_str(), it->filename.c_str()) == 0) {
+    for (; it != itEnd; it++)
+	{
+        if (stricmp(name.c_str(), it->filename.c_str()) == 0)
+		{
             info = &*it;
             break;
         }
     }
-    if(!info) {
+    if(!info)
+	{
         outPath = name;
         return false;
     }
     outPath = info->archive->getName();
-    if (outPath[outPath .size()-1] != '/' && outPath[outPath .size()-1] != '\\') {
+    if (outPath[outPath .size()-1] != '/' && outPath[outPath.size()-1] != '\\')
         outPath += '/';
-    }
+
     outPath += info->path;
-    if (outPath[outPath .size()-1] != '/' && outPath[outPath .size()-1] != '\\') {
+    if (outPath[outPath .size()-1] != '/' && outPath[outPath.size()-1] != '\\')
         outPath += '/';
-    }
     outPath += info->filename;
 
     return (info->archive->getType() == "FileSystem");
@@ -461,13 +483,16 @@ void Sample_MeshLod::addToProfile( Real cost )
     gen.generateLodLevels(config, LodCollapseCostPtr(), data, LodInputProviderPtr(), LodOutputProviderPtr(), collapser);
     
     ProfiledEdge pv;
-    if(collapser->_getLastVertexPos(data.get(), pv.src)){
+    if(collapser->_getLastVertexPos(data.get(), pv.src))
+	{
         collapser->_getLastVertexCollapseTo(data.get(), pv.dst);
         // Prevent duplicates if you edit the same vertex twice.
         size_t size = mLodConfig.advanced.profile.size();
-        for(uint i=0;i<size;i++){
+        for(uint i=0;i<size;i++)
+		{
             ProfiledEdge& v = mLodConfig.advanced.profile[i];
-            if(v.src == pv.src && v.dst == pv.dst){
+            if(v.src == pv.src && v.dst == pv.dst)
+			{
                 v.cost = cost;
                 mProfileList->selectItem(i, false);
                 loadUserLod();
@@ -479,7 +504,9 @@ void Sample_MeshLod::addToProfile( Real cost )
         mLodConfig.advanced.profile.push_back(pv);
         mProfileList->addItem(StringConverter::toString(pv.src));
         mProfileList->selectItem(mProfileList->getNumItems() - 1, false);
-    } else {
+    }
+	else
+	{
         mTrayMgr->showOkDialog("Error", "No vertex selected, because the mesh is not reduced.");
     }
     loadUserLod();
@@ -487,27 +514,35 @@ void Sample_MeshLod::addToProfile( Real cost )
 
 bool Sample_MeshLod::frameStarted( const FrameEvent& evt )
 {
-    mDistanceLabel->setCaption("Distance: " + StringConverter::toString(getCameraDistance()) + "px");
+    mDistanceLabel->setCaption("Distance: " + StringConverter::toString(-getCameraDistance()) + "px");
     return true;
 }
 
 void Sample_MeshLod::checkBoxToggled( CheckBox * box )
 {
-    if(box->getName() == "chkUseVertexNormals") {
+    if(box->getName() == "chkUseVertexNormals")
+	{
         mLodConfig.advanced.useVertexNormals = box->isChecked();
         loadUserLod();
-    } else if (box->getName() == "chkShowWireframe") {
+    }
+	else if (box->getName() == "chkShowWireframe")
+	{
         mCameraMan->getCamera()->setPolygonMode(mWireframe->isChecked() ? PM_WIREFRAME : PM_SOLID);
     }
 }
 
 void Sample_MeshLod::itemSelected( SelectMenu* menu )
 {
-    if (menu->getName() == "cmbModels") {
+    if (menu->getName() == "cmbModels")
+	{
         changeSelectedMesh(menu->getSelectedItem());
-    } else if(menu->getName() == "cmbLodLevels") {
-        loadLodLevel(menu->getSelectionIndex());
-    } else if(menu->getName() == "cmbManualMesh") {
+	}
+	else if(menu->getName() == "cmbLodLevels")
+	{
+		loadLodLevel(menu->getSelectionIndex());
+	}
+    else if(menu->getName() == "cmbManualMesh")
+	{
         mWorkLevel.manualMeshName = menu->getSelectedItem();
         loadUserLod();
     }
@@ -515,17 +550,22 @@ void Sample_MeshLod::itemSelected( SelectMenu* menu )
 
 void Sample_MeshLod::sliderMoved(Slider* slider)
 {
-    if (slider->getName() == "sldReductionValue") {
+    if (slider->getName() == "sldReductionValue")
+	{
         mWorkLevel.reductionValue = slider->getValue();
         loadUserLod();
-    } else if (slider->getName() == "sldOutsideWeight") {
-        if(mOutsideWeightSlider->getValue() == 100){
+    }
+	else if (slider->getName() == "sldOutsideWeight")
+	{
+        if(mOutsideWeightSlider->getValue() == 100)
             mLodConfig.advanced.outsideWeight = LodData::NEVER_COLLAPSE_COST;
-        } else {
+        else
             mLodConfig.advanced.outsideWeight = (mOutsideWeightSlider->getValue() * mOutsideWeightSlider->getValue()) / 10000;
-        }
+
         loadUserLod();
-    } else if (slider->getName() == "sldOutsideWalkAngle") {
+    }
+	else if (slider->getName() == "sldOutsideWalkAngle")
+	{
         mLodConfig.advanced.outsideWalkAngle = mOutsideWalkAngle->getValue();
         loadUserLod();
     }
@@ -534,37 +574,50 @@ void Sample_MeshLod::sliderMoved(Slider* slider)
 
 void Sample_MeshLod::buttonHit( OgreBites::Button* button )
 {
-    if(button->getName() == "btnReduceMore") {
+    if(button->getName() == "btnReduceMore")
         mReductionSlider->setValue(mReductionSlider->getValue()+1);
-    } else if(button->getName() == "btnReduceLess") {
+    else if(button->getName() == "btnReduceLess")
         mReductionSlider->setValue(mReductionSlider->getValue()-1);
-    } else if(button->getName() == "btnAddToProfile") {
+    else if(button->getName() == "btnAddToProfile")
         addToProfile(std::numeric_limits<Real>::max());
-    } else if(button->getName() == "btnRemoveFromProfile") {
-        if(!mLodConfig.advanced.profile.empty()){
+    else if(button->getName() == "btnRemoveFromProfile")
+	{
+        if(!mLodConfig.advanced.profile.empty())
+		{
             LodProfile& profile = mLodConfig.advanced.profile;
             profile.erase(profile.begin() + mProfileList->getSelectionIndex());
             mProfileList->removeItem(mProfileList->getSelectionIndex());
             loadUserLod();
-        }
-    } else if(button->getName() == "btnRemoveSelectedLodLevel") {
+		}
+    }
+	else if(button->getName() == "btnRemoveSelectedLodLevel")
+	{
         removeLodLevel();
-    } else if(button->getName() == "btnAddLodLevel") {
+    }
+	else if(button->getName() == "btnAddLodLevel")
+	{
         addLodLevel();
-    } else if(button->getName() == "btnAutoconfigure") {
+    }
+	else if(button->getName() == "btnAutoconfigure")
+	{
         mTrayMgr->destroyAllWidgetsInTray(TL_TOP);
         mTrayMgr->createLabel(TL_TOP, "lblWhatYouSee", "Showing autoconfigured LOD", 300);
         loadAutomaticLod();
         forceLodLevel(-1); // disable Lod level forcing
-    } else if (button->getName() == "btnShowAll") {
+    }
+	else if (button->getName() == "btnShowAll")
+	{
         loadUserLod(false);
         mTrayMgr->destroyAllWidgetsInTray(TL_TOP);
         mTrayMgr->createLabel(TL_TOP, "lblWhatYouSee", "Showing all LOD levels", 300);
         forceLodLevel(-1); // disable Lod level forcing
-    } else if(button->getName() == "btnShowMesh") {
+    }
+	else if(button->getName() == "btnShowMesh")
+	{
         mTrayMgr->destroyAllWidgetsInTray(TL_TOP);
         mTrayMgr->createLabel(TL_TOP, "lblWhatYouSee", "Showing LOD from mesh file", 300);
-        if(mMeshEntity){
+        if(mMeshEntity)
+		{
             mSceneMgr->destroyEntity(mMeshEntity);
             mMeshEntity = 0;
         }
@@ -575,25 +628,32 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
         //String filename("");
         //getResourceFullPath(mLodConfig.mesh, filename);
         //mTrayMgr->showOkDialog("Success", "Showing mesh from: " + filename);
-    } else if(button->getName() == "btnSaveMesh") {
-        if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible() && !mLodConfig.levels.empty()){
+    }
+	else if(button->getName() == "btnSaveMesh")
+	{
+        if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible() && !mLodConfig.levels.empty())
+		{
             LodWorkQueueWorker::getSingleton().clearPendingLodRequests();
             MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
             mLodConfig.advanced.useBackgroundQueue = false; // Non-threaded
             gen.generateLodLevels(mLodConfig);
             forceLodLevel(-1); // disable Lod level forcing
         }
+
         String filename("");
-        if(!getResourceFullPath(mLodConfig.mesh, filename) || filename == "") {
+        if(!getResourceFullPath(mLodConfig.mesh, filename) || filename == "")
+		{
             mTrayMgr->showOkDialog("Error", "'" + filename + "' is not a writable path!");
-        } else {
+        }
+		else
+		{
             MeshSerializer ms;
             ms.exportMesh(mLodConfig.mesh.get(), filename);
             mTrayMgr->showOkDialog("Success", "Mesh saved to: " + filename);
         }
-        if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible()){
+
+        if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible())
             loadUserLod();
-        }
     }
 }
 
