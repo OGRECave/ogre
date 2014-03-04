@@ -214,7 +214,7 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
 bool Sample_MeshLod::loadConfig()
 {
     mLodConfig.advanced = LodConfig::Advanced();
-    mLodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
+    mLodConfig.strategy = ScreenRatioPixelCountLodStrategy::getSingletonPtr();
     mLodConfig.levels.clear();
     mLodConfig.advanced.profile.clear();
 
@@ -228,7 +228,7 @@ bool Sample_MeshLod::loadConfig()
 
     mLodLevelList->clearItems();
     for(size_t i = 0; i < mLodConfig.levels.size(); i++){
-        mLodLevelList->addItem(StringConverter::toString(mLodConfig.levels[i].distance) + "px");
+        mLodLevelList->addItem(StringConverter::toString(-mLodConfig.levels[i].distance) + "px");
     }
 
     mProfileList->clearItems();
@@ -319,7 +319,7 @@ size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
     // The vertex buffer contains the same vertex position multiple times.
     // To get the count of the vertices, which has unique positions, we can use progressive mesh.
     // It is constructing a mesh grid at the beginning, so if we reduce 0%, we will get the unique vertex count.
-    LodConfig lodConfig(mesh, PixelCountLodStrategy::getSingletonPtr());
+    LodConfig lodConfig(mesh, ScreenRatioPixelCountLodStrategy::getSingletonPtr());
     lodConfig.advanced.useBackgroundQueue = false; // Non-threaded
     lodConfig.createGeneratedLodLevel(0, 0);
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
@@ -337,18 +337,18 @@ void Sample_MeshLod::addLodLevel()
     size_t i = 0;
     bool addLevel = true;
     for(; i < mLodConfig.levels.size(); i++){
-        if(mLodConfig.levels[i].distance < distepsilon){
+        if(mLodConfig.levels[i].distance > distepsilon){
             addLevel = false;
             break;
         }
     }
     if(/*mLodConfig.levels.empty() || */addLevel){
         mLodConfig.levels.push_back(lvl);
-        mLodLevelList->addItem(StringConverter::toString(lvl.distance) + "px");
+        mLodLevelList->addItem(StringConverter::toString(-lvl.distance) + "px");
         mLodLevelList->selectItem(mLodLevelList->getNumItems() - 1, false);
     } else {
         mLodConfig.levels.insert(mLodConfig.levels.begin() + i, lvl);
-        mLodLevelList->insertItem(i, StringConverter::toString(lvl.distance) + "px");
+        mLodLevelList->insertItem(i, StringConverter::toString(-lvl.distance) + "px");
         mLodLevelList->selectItem(i, false);
     }
 }
@@ -382,7 +382,7 @@ Real Sample_MeshLod::getCameraDistance()
 	//compositor listener.
 	if(mLodConfig.mesh->getBoundingSphereRadius() != 0.0 && mCameraMan->getCamera()->getLastViewport() )
 	{
-        return PixelCountLodStrategy::getSingleton().getValue(mMeshEntity, mCameraMan->getCamera());
+        return ScreenRatioPixelCountLodStrategy::getSingleton().getValue(mMeshEntity, mCameraMan->getCamera());
     }
 	else
 	{
@@ -395,9 +395,9 @@ void Sample_MeshLod::moveCameraToPixelDistance( Real pixels )
 	if( !mCameraMan->getCamera()->getLastViewport() )
 		return; //see getCameraDistance comments
 
-    PixelCountLodStrategy& strategy = PixelCountLodStrategy::getSingleton();
+    ScreenRatioPixelCountLodStrategy& strategy = ScreenRatioPixelCountLodStrategy::getSingleton();
     Real distance = mLodConfig.mesh->getBoundingSphereRadius() * 4;
-    const Real epsilon = pixels * 0.000001;
+    const Real epsilon = -pixels * 0.000001;
     const int iterations = 64;
     mCamera->setPosition(Vector3(0, 0, 0));
     mCamera->moveRelative(Vector3(0, 0, distance));
@@ -405,7 +405,7 @@ void Sample_MeshLod::moveCameraToPixelDistance( Real pixels )
     for(int i=0;i<iterations;i++)
 	{
         Real curPixels = strategy.getValue(mMeshEntity, mCameraMan->getCamera());
-        if (curPixels > pixels)
+        if (curPixels < pixels)
 		{
             distance *= 2.0;
             mCamera->moveRelative(Vector3(0, 0, distance));
@@ -423,7 +423,7 @@ void Sample_MeshLod::moveCameraToPixelDistance( Real pixels )
             break;
 
         distance /= 2;
-        if (curPixels > pixels)
+        if (curPixels < pixels)
 		{
             // move camera further
             mCamera->moveRelative(Vector3(0, 0, distance));
