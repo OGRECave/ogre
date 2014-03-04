@@ -140,9 +140,7 @@ protected:
         ps->fastForward(30);
 
         // create a frosted screen in front of the camera, using our dynamic texture to "thaw" certain areas
-		Entity* ent = mSceneMgr->createEntity(SceneManager::PT_PLANE,
-												ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-												SCENE_STATIC);
+		Entity* ent = mSceneMgr->createEntity(SceneManager::PT_PLANE, SCENE_STATIC);
         ent->setMaterialName("Examples/Frost");
         SceneNode* node = mSceneMgr->getRootSceneNode( SCENE_STATIC )->createChildSceneNode( SCENE_STATIC );
         node->setPosition(0, 0, 50);
