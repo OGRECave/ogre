@@ -37,11 +37,11 @@ namespace Ogre{
  * @brief Basefunctionality for IteratorWrappers
  *
  * 
- * @param T a Container like vector list map ...
- * @param IteratorType  T::iterator or T::const_iterator
- * @param ValType  T::mapped_type in case of a map, T::value_type for vector, list,...
+ * @tparam T a Container like vector list map ...
+ * @tparam IteratorType  T::iterator or T::const_iterator
+ * @tparam ValType  T::mapped_type in case of a map, T::value_type for vector, list,...
  * 
- * have a look at VectorIteratorWrapper and MapIteratorWrapper for a concrete usage
+ * Have a look at VectorIteratorWrapper and MapIteratorWrapper for a concrete usage
 */
 template <typename T, typename IteratorType, typename ValType>
 class IteratorWrapper
@@ -126,8 +126,8 @@ class IteratorWrapper
  * @brief Prepared IteratorWrapper for container like std::vector 
  *
  * 
- * @param T = Container eg vector 
- * @param IteratorType  T::iterator or T::const_iterator
+ * @tparam T = Container eg vector
+ * @tparam IteratorType  T::iterator or T::const_iterator
  * 
  * Have a look at VectorIterator and ConstVectorIterator for a more concrete usage
 */
@@ -179,7 +179,7 @@ class VectorIteratorWrapper : public IteratorWrapper<T, IteratorType, typename  
  * 
  * @brief Concrete IteratorWrapper for nonconst access to the underlying container
  * 
- * @param T  Container 
+ * @tparam T  Container
  * 
 */
 template <typename T>
@@ -210,7 +210,7 @@ class VectorIterator : public VectorIteratorWrapper<T,  typename T::iterator>{
  * @brief Concrete IteratorWrapper for const access to the underlying container
  *
  * 
- * @param T = Container 
+ * @tparam T = Container
  * 
 */
 template <typename T>
@@ -244,8 +244,8 @@ class ConstVectorIterator : public VectorIteratorWrapper<T,  typename T::const_i
  * @brief Prepared IteratorWrapper for key-value container
  *
  * 
- * @param T  Container  (map - or also set )
- * @param  IteratorType T::iterator or T::const_iterator
+ * @tparam T  Container  (map - or also set )
+ * @tparam  IteratorType T::iterator or T::const_iterator
  * 
  * Have a look at MapIterator and ConstMapIterator for a concrete usage
 */
@@ -345,7 +345,7 @@ class MapIterator : public MapIteratorWrapper<T,  typename T::iterator>{
  * @brief Concrete IteratorWrapper for const access to the underlying key-value container
  *
  * 
- * @param T key-value container
+ * @tparam T key-value container
  * 
 */
 template <typename T>

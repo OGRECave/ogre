@@ -31,16 +31,10 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreResource.h"
-#include "OgreVertexIndexData.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreVertexBoneAssignment.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreHardwareVertexBuffer.h"
-#include "OgreSkeleton.h"
 #include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
-#include "OgrePose.h"
-#include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 
 
@@ -55,7 +49,6 @@ namespace Ogre {
     */
 
     struct MeshLodUsage;
-    struct LodConfig;
     class LodStrategy;
 
     /** Resource holding data about 3D mesh.
@@ -94,7 +87,9 @@ namespace Ogre {
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
+        friend class MeshSerializerImpl_v1_8;
         friend class MeshSerializerImpl_v1_4;
+        friend class MeshSerializerImpl_v1_3;
         friend class MeshSerializerImpl_v1_2;
         friend class MeshSerializerImpl_v1_1;
 
@@ -138,6 +133,8 @@ namespace Ogre {
         AxisAlignedBox mAABB;
         /// Local bounding sphere radius (centered on object).
         Real mBoundRadius;
+        /// Largest bounding radius of any bone in the skeleton (centered on each bone, only considering verts weighted to the bone)
+        Real mBoneBoundingRadius;
 
         /// Optional linked skeleton.
         String mSkeletonName;
@@ -160,7 +157,7 @@ namespace Ogre {
             VertexData* targetVertexData);
 
         String mLodStrategyName;
-        bool mIsLodManual;
+        bool mHasManualLodLevel;
         ushort mNumLods;
         MeshLodUsageList    mMeshLodUsageList;
         LodValueArray       mLodValues;
@@ -169,7 +166,6 @@ namespace Ogre {
         HardwareBuffer::Usage mIndexBufferUsage;
         bool mVertexBufferShadowBuffer;
         bool mIndexBufferShadowBuffer;
-
 
         bool mPreparedForShadowVolumes;
         bool mEdgeListsBuilt;
@@ -327,7 +323,7 @@ namespace Ogre {
             if you leave this blank, the clone will be assigned to the same
             group as this Mesh.
         */
-        MeshPtr clone(const String& newName, const String& newGroup = StringUtil::BLANK);
+        MeshPtr clone(const String& newName, const String& newGroup = BLANKSTRING);
 
         /** Get the axis-aligned bounding box for this mesh.
         */
@@ -335,6 +331,9 @@ namespace Ogre {
 
         /** Gets the radius of the bounding sphere surrounding this mesh. */
         Real getBoundingSphereRadius(void) const;
+
+        /** Gets the radius used to inflate the bounding box around the bones. */
+        Real getBoneBoundingRadius() const;
 
         /** Manually set the bounding box for this Mesh.
         @remarks
@@ -355,6 +354,35 @@ namespace Ogre {
         */
         void _setBoundingSphereRadius(Real radius);
 
+        /** Manually set the bone bounding radius. 
+        @remarks
+            This value is normally computed automatically, however it can be overriden with this method.
+        */
+        void _setBoneBoundingRadius(Real radius);
+
+        /** Compute the bone bounding radius by looking at the vertices, vertex-bone-assignments, and skeleton bind pose.
+        @remarks
+            This is automatically called by Entity if necessary.  Only does something if the boneBoundingRadius is zero to
+            begin with.  Only works if vertex data is readable (i.e. not WRITE_ONLY).
+        */
+        void _computeBoneBoundingRadius();
+
+        /** Automatically update the bounding radius and bounding box for this Mesh.
+        @remarks
+        Calling this method is required when building manual meshes. However it is recommended to
+        use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
+        a shadow copy in the memory. Reading back the buffer from video memory is very slow!
+        @param pad If true, a certain padding will be added to the bounding box to separate it from the mesh
+        */
+        void _updateBoundsFromVertexBuffers(bool pad = false);
+
+        /** Calculates 
+        @remarks
+        Calling this method is required when building manual meshes. However it is recommended to
+        use _setBounds and _setBoundingSphereRadius instead, because the vertex buffer may not have
+        a shadow copy in the memory. Reading back the buffer from video memory is very slow!
+        */
+        void _calcBoundsFromVertexBuffer(VertexData* vertexData, AxisAlignedBox& outAABB, Real& outRadius, bool updateOnly = false);
         /** Sets the name of the skeleton this Mesh uses for animation.
         @remarks
             Meshes can optionally be assigned a skeleton which can be used to animate
@@ -445,22 +473,21 @@ namespace Ogre {
         ushort getNumLodLevels(void) const;
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
-        /** Adds a new manual level-of-detail entry to this Mesh.
-        @remarks
-            As an alternative to generating lower level of detail versions of a mesh, you can
-            use your own manually modelled meshes as lower level versions. This lets you 
-            have complete control over the LOD, and in addition lets you scale down other
-            aspects of the model which cannot be done using the generated method; for example, 
-            you could use less detailed materials and / or use less bones in the skeleton if
-            this is an animated mesh. Therefore for complex models you are likely to be better off
-            modelling your LODs yourself and using this method, whilst for models with fairly
-            simple materials and no animation you can just use the generateLodLevels method.
-        @param value
-            The value from which this LOD will apply.
-        @param meshName
-            The name of the mesh which will be the lower level detail version.
+
+        /** Retrieves the level of detail index for the given LOD value. 
+        @note
+            The value passed in is the 'transformed' value. If you are dealing with
+            an original source value (e.g. distance), use LodStrategy::transformUserValue
+            to turn this into a lookup value.
         */
-        void createManualLodLevel(Real value, const String& meshName, const String& groupName = Ogre::String());
+        ushort getLodIndex(Real value) const;
+
+        /** Returns true if this mesh has a manual LOD level.
+        @remarks
+            A mesh can either use automatically generated LOD, or it can use alternative
+            meshes as provided by an artist.
+        */
+        bool hasManualLodLevel(void) const { return mHasManualLodLevel; }
 
         /** Changes the alternate mesh to use as a manual LOD at the given index.
         @remarks
@@ -473,20 +500,14 @@ namespace Ogre {
         */
         void updateManualLodLevel(ushort index, const String& meshName);
 
-        /** Returns true if this mesh is using manual LOD.
-        @remarks
-            A mesh can either use automatically generated LOD, or it can use alternative
-            meshes as provided by an artist. A mesh can only use either all manual LODs 
-            or all generated LODs, not a mixture of both.
-        */
-        bool isLodManual(void) const { return mIsLodManual; }
-
         /** Internal methods for loading LOD, do not use. */
-        void _setLodInfo(unsigned short numLevels, bool isManual);
+        void _setLodInfo(unsigned short numLevels);
         /** Internal methods for loading LOD, do not use. */
         void _setLodUsage(unsigned short level, MeshLodUsage& usage);
         /** Internal methods for loading LOD, do not use. */
         void _setSubMeshLodFaceList(unsigned short subIdx, unsigned short level, IndexData* facedata);
+        /** Internal methods for loading LOD, do not use. */
+        bool _isManualLodLevel(unsigned short level) const;
 
         /** Removes all LOD data from this Mesh. */
         void removeLodLevels(void);
@@ -601,8 +622,6 @@ namespace Ogre {
             successful merges.
         */
         void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
-
-        void _configureMeshLodUsage(const LodConfig& lodConfig);
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks
@@ -904,7 +923,7 @@ namespace Ogre {
         @return
             A new Pose ready for population.
         */
-        Pose* createPose(ushort target, const String& name = StringUtil::BLANK);
+        Pose* createPose(ushort target, const String& name = BLANKSTRING);
         /** Get the number of poses.*/
         size_t getPoseCount(void) const { return mPoseList.size(); }
         /** Retrieve an existing Pose by index.*/
@@ -941,7 +960,7 @@ namespace Ogre {
     /** A way of recording the way each LODs is recorded this Mesh. */
     struct MeshLodUsage
     {
-        /** User-supplied values used to determine when th is LOD applies.
+        /** User-supplied values used to determine on which distance the lod is applies.
         @remarks
             This is required in case the LOD strategy changes.
         */
@@ -954,10 +973,9 @@ namespace Ogre {
         */
         Real value;
         
+
         /// Only relevant if mIsLodManual is true, the name of the alternative mesh to use.
         String manualName;
-        /// Only relevant if mIsLodManual is true, the name of the group of the alternative mesh.
-        String manualGroup;
         /// Hard link to mesh to avoid looking up each time.
         mutable MeshPtr manualMesh;
         /// Edge list for this LOD level (may be derived from manual mesh).

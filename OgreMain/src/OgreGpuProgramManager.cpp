@@ -306,7 +306,7 @@ namespace Ogre {
         // loop the array and save it
         MicrocodeMap::const_iterator iter = mMicrocodeCache.begin();
         MicrocodeMap::const_iterator iterE = mMicrocodeCache.end();
-        for ( ; iter != iterE ; iter++ )
+        for ( ; iter != iterE ; ++iter )
         {
             // saves the name of the shader
             {

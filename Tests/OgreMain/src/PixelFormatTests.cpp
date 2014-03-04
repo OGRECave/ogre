@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "PixelFormatTests.h"
 #include <cstdlib>
+#include <iomanip>
 
 // Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( PixelFormatTests );
@@ -94,15 +95,15 @@ void naiveBulkPixelConversion(const PixelBox &src, const PixelBox &dst)
 {
     uint8 *srcptr = static_cast<uint8*>(src.data);
     uint8 *dstptr = static_cast<uint8*>(dst.data);
-    unsigned int srcPixelSize = PixelUtil::getNumElemBytes(src.format);
-    unsigned int dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
+    size_t srcPixelSize = PixelUtil::getNumElemBytes(src.format);
+    size_t dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
 
     // Calculate pitches+skips in bytes
-    int srcRowSkipBytes = src.getRowSkip()*srcPixelSize;
-    int srcSliceSkipBytes = src.getSliceSkip()*srcPixelSize;
+    unsigned long srcRowSkipBytes = src.getRowSkip()*srcPixelSize;
+    unsigned long srcSliceSkipBytes = src.getSliceSkip()*srcPixelSize;
 
-    int dstRowSkipBytes = dst.getRowSkip()*dstPixelSize;
-    int dstSliceSkipBytes = dst.getSliceSkip()*dstPixelSize;
+    unsigned long dstRowSkipBytes = dst.getRowSkip()*dstPixelSize;
+    unsigned long dstSliceSkipBytes = dst.getSliceSkip()*dstPixelSize;
 
     // The brute force fallback
     float r,g,b,a;
@@ -143,7 +144,7 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
 {
     setupBoxes(srcFormat, dstFormat);
     // Check end of buffer
-    unsigned int eob = dst1.getWidth()*PixelUtil::getNumElemBytes(dstFormat);
+    unsigned long eob = dst1.getWidth()*PixelUtil::getNumElemBytes(dstFormat);
     temp[eob] = (unsigned char)0x56;
     temp[eob+1] = (unsigned char)0x23;
 
@@ -170,7 +171,7 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
     s << " ";
 
     // Compare result
-    StringUtil::StrStreamType msg;
+    StringStream msg;
     msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
         "->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
     CPPUNIT_ASSERT_MESSAGE(msg.str().c_str(),

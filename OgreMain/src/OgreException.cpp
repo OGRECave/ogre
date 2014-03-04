@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreException.h"
-
-#include "OgreRoot.h"
 #include "OgreLogManager.h"
 
 #ifdef __BORLANDC__
@@ -76,7 +74,7 @@ namespace Ogre {
     {
     }
 
-    void Exception::operator = ( const Exception& rhs )
+    Exception & Exception::operator = ( const Exception& rhs )
     {
         description = rhs.description;
         number = rhs.number;
@@ -84,6 +82,8 @@ namespace Ogre {
         file = rhs.file;
         line = rhs.line;
         typeName = rhs.typeName;
+
+        return *this;
     }
 
     const String& Exception::getFullDescription(void) const
@@ -91,7 +91,7 @@ namespace Ogre {
         if (fullDesc.empty())
         {
 
-            StringUtil::StrStreamType desc;
+            StringStream desc;
 
             desc <<  "OGRE EXCEPTION(" << number << ":" << typeName << "): "
                 << description 

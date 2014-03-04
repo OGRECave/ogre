@@ -82,7 +82,7 @@ namespace Ogre
             }
         }
         mCurrExternalTextureSource = 0;
-        LogManager::getSingleton().logMessage( "ExternalTextureSourceManager::SetCurrentPlugIn(ENUM) failed setting texture plugin ");
+        LogManager::getSingleton().logMessage( "ExternalTextureSourceManager::SetCurrentPlugIn(ENUM) failed setting texture plugin ", LML_CRITICAL);
     }
 
     //****************************************************************************************

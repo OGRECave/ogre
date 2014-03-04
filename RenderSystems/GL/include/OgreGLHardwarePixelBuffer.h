@@ -36,7 +36,7 @@ namespace Ogre {
     {
     protected:  
         /// Lock a box
-        PixelBox lockImpl(const Image::Box lockBox,  LockOptions options);
+        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
 
         /// Unlock a box
         void unlockImpl(void);

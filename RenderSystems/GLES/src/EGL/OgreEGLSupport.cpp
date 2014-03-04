@@ -177,7 +177,7 @@ namespace Ogre {
     String EGLSupport::validateConfig(void)
     {
         // TODO
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
 
     //Moved to native.

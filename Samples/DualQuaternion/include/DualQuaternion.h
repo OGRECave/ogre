@@ -2,6 +2,7 @@
 #define __DualQuaternion_Sample_H__
 
 #include "SdkSample.h"
+#include "OgreBillboard.h"
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 #include "OgreShaderExHardwareSkinning.h"
@@ -24,6 +25,15 @@ public:
         mInfo["Category"] = "Animation";
     }
 
+    void testCapabilities(const RenderSystemCapabilities* caps)
+    {
+        if (Root::getSingleton().getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                        "Sample currently out of order in the OpenGL 3+ render system."
+                        "  Try again soon!",
+                        "Sample_DualQuaternion::testCapabilities");
+    }
+
     bool frameRenderingQueued(const FrameEvent& evt)
     {
         const Real start = 30;
@@ -34,12 +44,11 @@ public:
         Quaternion orient = Quaternion(Degree(start + Ogre::Math::Sin(totalTime * speed) * range), vec);
         ent->getSkeleton()->getBone("Bone02")->setOrientation(orient);
         entDQ->getSkeleton()->getBone("Bone02")->setOrientation(orient);
-                
+
         return SdkSample::frameRenderingQueued(evt);
     }
 
-
-protected:
+ protected:
     StringVector getRequiredPlugins()
     {
         StringVector names;
@@ -51,7 +60,8 @@ protected:
     void setupContent()
     {
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        //Add the hardware skinning to the shader generator default render state
+        // Add the hardware skinning to the shader generator default
+        // render state.
         mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
         Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
@@ -134,19 +144,21 @@ protected:
         sn->scale(Vector3(0.2,0.2,0.2));
         
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        //In case the system uses the RTSS, the following line will ensure
-        //that the entity is using hardware animation in RTSS as well.
+        // In case the system uses the RTSS, the following line will
+        // ensure that the entity is using hardware animation in RTSS
+        // as well.
         RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
         RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(entDQ, RTShader::ST_DUAL_QUATERNION, false, true);
 
-        //The following line is needed only because the spine models' materials have shaders and
-        //as such is not automatically reflected in the RTSS system     
+        // The following line is needed only because the spine models'
+        // materials have shaders and as such is not automatically
+        // reflected in the RTSS system.
         RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
             ent->getSubEntity(0)->getMaterialName(),
             Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
             Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
             true);
-        
+
         RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
             entDQ->getSubEntity(0)->getMaterialName(),
             Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
@@ -154,12 +166,12 @@ protected:
             true);
 #endif
 
-        // create name and value for skinning mode
+        // Create name and value for skinning mode.
         StringVector names;
         names.push_back("Skinning");
         String value = "Software";
 
-        // change the value if hardware skinning is enabled
+        // Change the value if hardware skinning is enabled.
         MaterialPtr dqMat = ent->getSubEntity(0)->getMaterial();
         if(!dqMat.isNull())
         {
@@ -174,7 +186,7 @@ protected:
             }
         }
 
-        // create a params panel to display the skinning mode
+        // Create a params panel to display the skinning mode.
         mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 170, names)->setParamValue(0, value);
     }
 

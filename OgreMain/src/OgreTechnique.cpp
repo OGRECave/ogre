@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreGpuProgramManager.h"
 #include "OgreMaterialManager.h"
 
 
@@ -78,7 +77,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     String Technique::_compile(bool autoManageTextureUnits)
     {
-        StringUtil::StrStreamType errors;
+        StringStream errors;
 
         mIsSupported = checkGPURules(errors);
         if (mIsSupported)
@@ -94,7 +93,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    bool Technique::checkHardwareSupport(bool autoManageTextureUnits, StringUtil::StrStreamType& compileErrors)
+    bool Technique::checkHardwareSupport(bool autoManageTextureUnits, StringStream& compileErrors)
     {
         // Go through each pass, checking requirements
         Passes::iterator i;
@@ -179,16 +178,16 @@ namespace Ogre {
                     return false;
                 }
             }
-            if (currPass->hasTesselationHullProgram())
+            if (currPass->hasTessellationHullProgram())
             {
-                // Check tesselation control program version
-                if (!currPass->getTesselationHullProgram()->isSupported() )
+                // Check tessellation control program version
+                if (!currPass->getTessellationHullProgram()->isSupported() )
                 {
                     // Can't do this one
                     compileErrors << "Pass " << passNum << 
-                        ": Tesselation Hull program " << currPass->getTesselationHullProgram()->getName()
+                        ": Tessellation Hull program " << currPass->getTessellationHullProgram()->getName()
                         << " cannot be used - ";
-                    if (currPass->getTesselationHullProgram()->hasCompileError())
+                    if (currPass->getTessellationHullProgram()->hasCompileError())
                         compileErrors << "compile error.";
                     else
                         compileErrors << "not supported.";
@@ -197,16 +196,16 @@ namespace Ogre {
                     return false;
                 }
             }
-            if (currPass->hasTesselationDomainProgram())
+            if (currPass->hasTessellationDomainProgram())
             {
-                // Check tesselation control program version
-                if (!currPass->getTesselationDomainProgram()->isSupported() )
+                // Check tessellation control program version
+                if (!currPass->getTessellationDomainProgram()->isSupported() )
                 {
                     // Can't do this one
                     compileErrors << "Pass " << passNum << 
-                        ": Tesselation Domain program " << currPass->getTesselationDomainProgram()->getName()
+                        ": Tessellation Domain program " << currPass->getTessellationDomainProgram()->getName()
                         << " cannot be used - ";
-                    if (currPass->getTesselationDomainProgram()->hasCompileError())
+                    if (currPass->getTessellationDomainProgram()->hasCompileError())
                         compileErrors << "compile error.";
                     else
                         compileErrors << "not supported.";
@@ -327,12 +326,12 @@ namespace Ogre {
         return true;
     }
     //---------------------------------------------------------------------
-    bool Technique::checkGPURules(StringUtil::StrStreamType& errors)
+    bool Technique::checkGPURules(StringStream& errors)
     {
         const RenderSystemCapabilities* caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
 
-        StringUtil::StrStreamType includeRules;
+        StringStream includeRules;
         bool includeRulesPresent = false;
         bool includeRuleMatched = false;
 
@@ -367,7 +366,7 @@ namespace Ogre {
         }
 
         // now check device names
-        includeRules.str(StringUtil::BLANK);
+        includeRules.str(BLANKSTRING);
         includeRulesPresent = false;
         includeRuleMatched = false;
 

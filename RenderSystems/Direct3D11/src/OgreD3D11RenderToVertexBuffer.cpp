@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
+#include "OgreTechnique.h"
 #include "OgreStringConverter.h"
 #include "OgreD3D11RenderSystem.h"
 #include "OgreD3D11HLSLProgram.h"

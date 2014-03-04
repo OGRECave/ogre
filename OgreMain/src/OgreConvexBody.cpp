@@ -30,10 +30,10 @@ THE SOFTWARE.
 #include "OgreConvexBody.h"
 #include "OgreException.h"
 #include "OgreVector3.h"
-#include <OgreLogManager.h>
-#include <OgreRay.h>
-#include <OgreFrustum.h>
-#include <OgreAxisAlignedBox.h>
+#include "OgreLogManager.h"
+#include "OgreRay.h"
+#include "OgreFrustum.h"
+#include "OgreAxisAlignedBox.h"
 
 
 namespace Ogre
@@ -1213,7 +1213,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void ConvexBody::logInfo( void ) const
     {
-        StringUtil::StrStreamType ssOut( std::stringstream::out );
+        StringStream ssOut( std::stringstream::out );
         ssOut << *this;
         
         Ogre::LogManager::getSingleton().logMessage( Ogre::LML_NORMAL, ssOut.str()  );

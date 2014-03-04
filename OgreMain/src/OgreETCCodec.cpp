@@ -28,14 +28,11 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 #include "OgreETCCodec.h"
 #include "OgreImage.h"
 #include "OgreException.h"
 
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
 
 #define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define KTX_ENDIAN_REF      (0x04030201)
@@ -183,10 +180,9 @@ namespace Ogre {
     void ETCCodec::flipEndian(void * pData, size_t size) const
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        char swapByte;
         for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
         {
-            swapByte = *(char *)((long)pData + byteIndex);
+            char swapByte = *(char *)((long)pData + byteIndex);
             *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
             *(char *)((long)pData + size - byteIndex - 1) = swapByte;
         }
@@ -208,7 +204,7 @@ namespace Ogre {
                 return String("ktx");
         }
 
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
     //---------------------------------------------------------------------
     bool ETCCodec::decodePKM(DataStreamPtr& stream, DecodeResult& result) const

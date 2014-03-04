@@ -26,12 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgrePageManager.h"
-#include "OgrePagedWorld.h"
-#include "OgrePageStrategy.h"
 #include "OgrePageContentCollectionFactory.h"
 #include "OgrePagedWorldSection.h"
 #include "OgrePageContentFactory.h"
-#include "OgreStringConverter.h"
 #include "OgreException.h"
 #include "OgrePagedWorldSection.h"
 #include "OgrePagedWorld.h"
@@ -362,7 +359,7 @@ namespace Ogre
         if (!ser)
         {
             // use default implementation
-            StringUtil::StrStreamType nameStr;
+            StringStream nameStr;
             nameStr << section->getWorld()->getName() << "_" << section->getName() 
                 << "_" << pageID << ".page";
             DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(nameStr.str());
@@ -383,7 +380,7 @@ namespace Ogre
         if (!ser)
         {
             // use default implementation
-            StringUtil::StrStreamType nameStr;
+            StringStream nameStr;
             nameStr << section->getWorld()->getName() << "_" << section->getName() 
                 << "_" << pageID << ".page";
             
@@ -515,6 +512,8 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool PageManager::EventRouter::frameStarted(const FrameEvent& evt)
     {
+        if(pWorldMap->empty())
+            return true;
 
         for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
         {
@@ -534,6 +533,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool PageManager::EventRouter::frameEnded(const FrameEvent& evt)
     {
+        if(pWorldMap->empty())
+            return true;
+
         for(WorldMap::iterator i = pWorldMap->begin(); i != pWorldMap->end(); ++i)
             i->second->frameEnd(evt.timeSinceLastFrame);
 

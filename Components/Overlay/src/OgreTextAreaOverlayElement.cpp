@@ -34,6 +34,7 @@ THE SOFTWARE
 #include "OgreStringConverter.h"
 #include "OgreFont.h"
 #include "OgreFontManager.h"
+#include "OgreOverlayElement.h"
 
 namespace Ogre {
 
@@ -57,19 +58,18 @@ namespace Ogre {
     #define UNICODE_ZERO 0x0030
     //---------------------------------------------------------------------
     TextAreaOverlayElement::TextAreaOverlayElement(const String& name)
-        : OverlayElement(name)
+        : OverlayElement(name), mColourBottom(ColourValue::White), mColourTop(ColourValue::White)
     {
         mTransparent = false;
         mAlignment = Left;
 
-        mColourTop = ColourValue::White;
-        mColourBottom = ColourValue::White;
         mColoursChanged = true;
 
         mAllocSize = 0;
 
         mCharHeight = 0.02;
         mPixelCharHeight = 12;
+        mSpaceWidthOverridden = false;
         mSpaceWidth = 0;
         mPixelSpaceWidth = 0;
         mViewportAspectCoef = 1;
@@ -167,14 +167,14 @@ namespace Ogre {
         const HardwareVertexBufferSharedPtr& vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(POS_TEX_BINDING);
         pVert = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+            vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
 
         float largestWidth = 0;
         float left = _getDerivedLeft() * 2.0f - 1.0f;
         float top = -( (_getDerivedTop() * 2.0f ) - 1.0f );
 
         // Derive space with from a number 0
-        if (mSpaceWidth == 0)
+        if(!mSpaceWidthOverridden)
         {
             mSpaceWidth = mFont->getGlyphAspectRatio(UNICODE_ZERO) * mCharHeight;
         }
@@ -393,6 +393,7 @@ namespace Ogre {
 
     void TextAreaOverlayElement::setSpaceWidth( Real width )
     {
+        mSpaceWidthOverridden = true;
         if (mMetricsMode != GMM_RELATIVE)
         {
             mPixelSpaceWidth = static_cast<unsigned short>(width);
@@ -538,7 +539,7 @@ namespace Ogre {
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(COLOUR_BINDING);
 
         RGBA* pDest = static_cast<RGBA*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+            vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
 
         for (size_t i = 0; i < mAllocSize; ++i)
         {

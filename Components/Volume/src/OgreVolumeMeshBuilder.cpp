@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreManualObject.h"
 #include "OgreMeshManager.h"
-
+#include "OgreSceneManager.h"
 
 namespace Ogre {
 namespace Volume {
@@ -184,7 +184,7 @@ namespace Volume {
             }
 
             manual->end();
-            StringUtil::StrStreamType meshName;
+            StringStream meshName;
             meshName << name << "ManualObject";
             MeshManager::getSingleton().remove(meshName.str());
             manual->convertToMesh(meshName.str());

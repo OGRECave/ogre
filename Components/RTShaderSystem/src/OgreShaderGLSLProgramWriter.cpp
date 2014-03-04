@@ -26,23 +26,14 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderGLSLProgramWriter.h"
-#include "OgreStringConverter.h"
-#include "OgreShaderGenerator.h"
+#include "OgreShaderProgram.h"
 #include "OgreRoot.h"
+#include "OgreString.h"
 
 namespace Ogre {
 namespace RTShader {
 
 String GLSLProgramWriter::TargetLanguage = "glsl";
-
-// Uniform comparer
-struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
-{
-    bool operator()( const UniformParameterPtr& uniform, const String& name ) const 
-    {
-        return uniform->getName() == name;
-    }
-};
 
 //-----------------------------------------------------------------------
 GLSLProgramWriter::GLSLProgramWriter()
@@ -85,6 +76,10 @@ void GLSLProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_INT2] = "int2";
     mGpuConstTypeMap[GCT_INT3] = "int3";
     mGpuConstTypeMap[GCT_INT4] = "int4";
+    mGpuConstTypeMap[GCT_UINT1] = "uint";
+    mGpuConstTypeMap[GCT_UINT2] = "uint2";
+    mGpuConstTypeMap[GCT_UINT3] = "uint3";
+    mGpuConstTypeMap[GCT_UINT4] = "uint4";
 
     // Custom vertex attributes defined http://www.ogre3d.org/docs/manual/manual_21.html
     mContentToPerVertexAttributes[Parameter::SPC_POSITION_OBJECT_SPACE] = "vertex";
@@ -486,7 +481,7 @@ void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* prog
     StringVector::iterator endIt = std::unique(forwardDecl.begin(), forwardDecl.end()); 
 
     // Finally write all function declarations to the shader file
-    for (StringVector::iterator it = forwardDecl.begin(); it != endIt; it++)
+    for (StringVector::iterator it = forwardDecl.begin(); it != endIt; ++it)
     {
         os << *it;
     }

@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __StringInterface_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
 #include "OgreCommon.h"
 #include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"

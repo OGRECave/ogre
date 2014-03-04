@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreRenderTarget.h"
-#include "OgreStringConverter.h"
 
 #include "OgreViewport.h"
 #include "OgreException.h"
@@ -35,9 +34,10 @@ THE SOFTWARE.
 #include "OgreRenderTargetListener.h"
 #include "OgrePixelBox.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 #include "OgreDepthBuffer.h"
 #include "OgreProfiler.h"
+#include "OgreTimer.h"
+#include <iomanip>
 
 namespace Ogre {
 

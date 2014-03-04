@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -26,26 +26,26 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreGLPrerequisites.h"
 #include "OgreRoot.h"
 #include "OgreGLPlugin.h"
 
 #ifndef OGRE_STATIC_LIB
 
-namespace Ogre {
-
+namespace Ogre 
+{
     static GLPlugin* plugin;
 
     extern "C" void _OgreGLExport dllStartPlugin(void) throw()
     {
-        plugin = new GLPlugin();
+        plugin = OGRE_NEW GLPlugin();
         Root::getSingleton().installPlugin(plugin);
-
     }
 
     extern "C" void _OgreGLExport dllStopPlugin(void)
     {
         Root::getSingleton().uninstallPlugin(plugin);
-        delete plugin;
+        OGRE_DELETE plugin;
     }
 }
 

@@ -24,9 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
+#include <algorithm> // for std::sort
 #include "OgreShaderFunction.h"
-#include "OgreShaderProgramManager.h"
 #include "OgreStringConverter.h"
 
 namespace Ogre {
@@ -480,25 +479,23 @@ bool Function::deleteAtomInstance(FunctionAtom* atomInstance)
     
 }
 
-//-----------------------------------------------------------------------------
-void Function::sortAtomInstances()
-{
-    if (mAtomInstances.size() > 1)  
-        qsort(&mAtomInstances[0], mAtomInstances.size(), sizeof(FunctionAtom*), sAtomInstanceCompare);      
+namespace {
+    struct CmpAtomInstance {
+        bool operator()(const FunctionAtom* a, const FunctionAtom* b) const
+        {
+            if (a->getGroupExecutionOrder() < b->getGroupExecutionOrder())
+                return true;
+            if (b->getGroupExecutionOrder() < a->getGroupExecutionOrder())
+                return false;
+            return a->getInternalExecutionOrder() < b->getInternalExecutionOrder();
+        }
+    };
 }
 
 //-----------------------------------------------------------------------------
-int Function::sAtomInstanceCompare(const void* p0, const void* p1)
+void Function::sortAtomInstances()
 {
-    FunctionAtom* pInstance0 = *((FunctionAtom**)p0);
-    FunctionAtom* pInstance1 = *((FunctionAtom**)p1);
-
-    if (pInstance0->getGroupExecutionOrder() != pInstance1->getGroupExecutionOrder())
-    {
-        return pInstance0->getGroupExecutionOrder() - pInstance1->getGroupExecutionOrder();
-    }
-     
-    return pInstance0->getInternalExecutionOrder() - pInstance1->getInternalExecutionOrder();   
+    std::sort(mAtomInstances.begin(), mAtomInstances.end(), CmpAtomInstance());
 }
 
 //-----------------------------------------------------------------------------

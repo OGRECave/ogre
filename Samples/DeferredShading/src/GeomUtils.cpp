@@ -18,6 +18,7 @@ same license as the rest of the engine.
 #include "OgreMeshManager.h"
 #include "OgreSubMesh.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreMesh.h"
 
 using namespace Ogre;
 

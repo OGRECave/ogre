@@ -29,9 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-#include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
-#include "OgreVector4.h"
 #include "OgreLight.h"
 #include "OgreCommon.h"
 
@@ -179,7 +177,7 @@ protected:
 
 
 // Attributes.
-protected:  
+protected:
     // Track per vertex colour type.
     TrackVertexColourType mTrackVertexColourType;
     // Specular component enabled/disabled.

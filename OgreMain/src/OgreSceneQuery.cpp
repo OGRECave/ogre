@@ -102,10 +102,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RegionSceneQuery::clearResults(void)
     {
-        if (mLastResult)
-        {
-            OGRE_DELETE mLastResult;
-        }
+        OGRE_DELETE mLastResult;
         mLastResult = NULL;
     }
     //---------------------------------------------------------------------
@@ -320,10 +317,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void IntersectionSceneQuery::clearResults(void)
     {
-        if (mLastResult)
-        {
-            OGRE_DELETE mLastResult;
-        }
+        OGRE_DELETE mLastResult;
         mLastResult = NULL;
     }
     //---------------------------------------------------------------------

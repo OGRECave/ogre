@@ -1,29 +1,29 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------------------------------
 */
 
 #include "OgreGL3PlusHardwareBufferManager.h"
@@ -32,11 +32,12 @@ THE SOFTWARE.
 #include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre {
-    GL3PlusHardwareUniformBuffer::GL3PlusHardwareUniformBuffer(HardwareBufferManagerBase* mgr, 
-                                                               size_t bufferSize,
-                                                               HardwareBuffer::Usage usage,
-                                                               bool useShadowBuffer, const String& name)
-    : HardwareUniformBuffer(mgr, bufferSize, usage, useShadowBuffer, name)
+    GL3PlusHardwareUniformBuffer::GL3PlusHardwareUniformBuffer(
+        HardwareBufferManagerBase* mgr,
+        size_t bufferSize,
+        HardwareBuffer::Usage usage,
+        bool useShadowBuffer, const String& name)
+        : HardwareUniformBuffer(mgr, bufferSize, usage, useShadowBuffer, name)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
@@ -51,9 +52,9 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBufferData(GL_UNIFORM_BUFFER, mSizeInBytes, NULL,
                                          GL3PlusHardwareBufferManager::getGLUsage(usage)));
 
-//        std::cerr << "creating uniform buffer = " << mBufferId << std::endl;
+        //        std::cerr << "creating uniform buffer = " << mBufferId << std::endl;
     }
-    
+
     GL3PlusHardwareUniformBuffer::~GL3PlusHardwareUniformBuffer()
     {
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
@@ -63,7 +64,7 @@ namespace Ogre {
     {
         mBinding = binding;
 
-        // Attach the buffer to the UBO binding
+        // Attach the entire buffer to the UBO binding index.
         OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_UNIFORM_BUFFER, mBinding, mBufferId));
     }
 
@@ -77,13 +78,13 @@ namespace Ogre {
                         "Invalid attempt to lock a uniform buffer that has already been locked",
                         "GL3PlusHardwareUniformBuffer::lock");
         }
-        
+
         GLenum access = 0;
         void* retPtr = 0;
-        
+
         // Use glMapBuffer
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
-        
+
         if (mUsage & HBU_WRITE_ONLY)
         {
             access |= GL_MAP_WRITE_BIT;
@@ -100,28 +101,28 @@ namespace Ogre {
             access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
         access |= GL_MAP_UNSYNCHRONIZED_BIT;
-        
+
         void* pBuffer;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_UNIFORM_BUFFER, offset, length, access));
-        
+
         if(pBuffer == 0)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Uniform Buffer: Out of memory",
                         "GL3PlusHardwareUniformBuffer::lock");
         }
-        
+
         // return offsetted
         retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
         mIsLocked = true;
         return retPtr;
     }
-    
+
     void GL3PlusHardwareUniformBuffer::unlockImpl(void)
     {
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
-        
+
         if (mUsage & HBU_WRITE_ONLY)
         {
             OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_UNIFORM_BUFFER, mLockStart, mLockSize));
@@ -132,22 +133,22 @@ namespace Ogre {
         if(!mapped)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Buffer data corrupted, please reload", 
+                        "Buffer data corrupted, please reload",
                         "GL3PlusHardwareUniformBuffer::unlock");
         }
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, 0));
 
         mIsLocked = false;
     }
-    
+
     void GL3PlusHardwareUniformBuffer::readData(size_t offset, size_t length, void* pDest)
     {
         // Get data from the real buffer
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
-        
+
         OGRE_CHECK_GL_ERROR(glGetBufferSubData(GL_UNIFORM_BUFFER, offset, length, pDest));
     }
-    
+
     void GL3PlusHardwareUniformBuffer::writeData(size_t offset,
                                                  size_t length,
                                                  const void* pSource,
@@ -167,12 +168,12 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glBufferData(GL_UNIFORM_BUFFER, mSizeInBytes, NULL,
                                                  GL3PlusHardwareBufferManager::getGLUsage(mUsage)));
             }
-            
+
             OGRE_CHECK_GL_ERROR(glBufferSubData(GL_UNIFORM_BUFFER, offset, length, pSource));
         }
     }
-    
-    void GL3PlusHardwareUniformBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
+
+    void GL3PlusHardwareUniformBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
                                                 size_t dstOffset, size_t length, bool discardWholeBuffer)
     {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
@@ -200,4 +201,9 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
         }
     }
+
+    // void GL3PlusHardwareUniformBuffer::getOffsetMap(, void* pDest)
+    // {
+        
+    // }
 }

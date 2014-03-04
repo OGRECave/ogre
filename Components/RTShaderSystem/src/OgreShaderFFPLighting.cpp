@@ -30,12 +30,10 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
-#include "OgreGpuProgram.h"
 #include "OgrePass.h"
-#include "OgreShaderGenerator.h"
-#include "OgreSceneManager.h"
-#include "OgreViewport.h"
-
+#include "OgreMaterialSerializer.h"
+#include "OgreAutoParamDataSource.h"
+#include "OgreShaderRenderState.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -87,7 +85,7 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
             curSearchLightIndex = 0;
         }
 
-        Light*      srcLight = NULL;
+        Light const*srcLight = NULL;
         Vector4     vParameter;
         ColourValue colour;
 
@@ -104,11 +102,11 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 
         // No matching light found -> use a blank dummy light for parameter update.
         if (srcLight == NULL)
-        {
-            assert("No matching light found");
-            return;
+        {                       
+            srcLight = &source->_getBlankLight();
         }
-
+                    
+        
         switch (curParams.mType)
         {
         case Light::LT_DIRECTIONAL:

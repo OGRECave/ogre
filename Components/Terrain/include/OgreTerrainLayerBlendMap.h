@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgreCommon.h"
-#include "OgreVector3.h"
 #include "OgreDataStream.h"
 
 namespace Ogre
@@ -171,7 +170,7 @@ namespace Ogre
         @param stream Stream containing the image data
         @param ext Extension identifying the image type, if the stream data doesn't identify
         */
-        void loadImage(DataStreamPtr& stream, const String& ext = StringUtil::BLANK);
+        void loadImage(DataStreamPtr& stream, const String& ext = BLANKSTRING);
 
         /** Load an image into this blend layer. 
         */

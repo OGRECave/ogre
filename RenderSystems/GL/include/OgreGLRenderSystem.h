@@ -301,6 +301,26 @@ namespace Ogre {
         /** See
           RenderSystem
          */
+        void _setVertexTexture(size_t unit, const TexturePtr &tex);     
+        /** See
+          RenderSystem
+         */
+        void _setGeometryTexture(size_t unit, const TexturePtr &tex);
+        /** See
+          RenderSystem
+         */
+        void _setComputeTexture(size_t unit, const TexturePtr &tex);
+        /** See
+          RenderSystem
+         */
+        void _setTesselationHullTexture(size_t unit, const TexturePtr &tex);
+        /** See
+          RenderSystem
+         */
+        void _setTesselationDomainTexture(size_t unit, const TexturePtr &tex);
+        /** See
+          RenderSystem
+         */
         void _setTextureCoordSet(size_t stage, size_t index);
         /** See
           RenderSystem
@@ -440,7 +460,8 @@ namespace Ogre {
             StencilOperation stencilFailOp = SOP_KEEP, 
             StencilOperation depthFailOp = SOP_KEEP,
             StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false);
+            bool twoSidedOperation = false,
+            bool readBackAsTexture = false);
         /** See
           RenderSystem
          */

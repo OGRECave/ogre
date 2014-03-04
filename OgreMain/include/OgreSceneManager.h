@@ -33,8 +33,6 @@ Torus Knot Software Ltd.
 // Precompiler options
 #include "OgrePrerequisites.h"
 
-#include "OgreString.h"
-#include "OgreSceneNode.h"
 #include "OgrePlane.h"
 #include "OgreQuaternion.h"
 #include "OgreColourValue.h"
@@ -44,16 +42,11 @@ Torus Knot Software Ltd.
 #include "OgreAnimationState.h"
 #include "OgreRenderQueue.h"
 #include "OgreRenderQueueSortingGrouping.h"
-#include "OgreRectangle2D.h"
-#include "OgrePixelFormat.h"
 #include "OgreResourceGroupManager.h"
-#include "OgreTexture.h"
-#include "OgreShadowCameraSetup.h"
 #include "OgreShadowTextureManager.h"
-#include "OgreCamera.h"
-#include "OgreLodListener.h"
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
+#include "OgreLodListener.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "Animation/OgreSkeletonAnimManager.h"
@@ -143,6 +136,11 @@ namespace Ogre {
     class DefaultRaySceneQuery;
     class DefaultSphereSceneQuery;
     class DefaultAxisAlignedBoxSceneQuery;
+    class Rectangle2D;
+    class LodListener;
+    struct MovableObjectLodChangedEvent;
+    struct EntityMeshLodChangedEvent;
+    struct EntityMaterialLodChangedEvent;
     class CompositorChain;
     class CompositorShadowNode;
     class UniformScalableTask;
@@ -1522,7 +1520,7 @@ namespace Ogre {
                 supports one type of world geometry.
         */
         virtual void prepareWorldGeometry(DataStreamPtr& stream, 
-            const String& typeName = StringUtil::BLANK);
+            const String& typeName = BLANKSTRING);
 
         /** Sets the source of the 'world' geometry, i.e. the large, mainly static geometry
             making up the world e.g. rooms, landscape etc.
@@ -1554,7 +1552,7 @@ namespace Ogre {
                 supports one type of world geometry.
         */
         virtual void setWorldGeometry(DataStreamPtr& stream, 
-            const String& typeName = StringUtil::BLANK);
+            const String& typeName = BLANKSTRING);
 
         /** Estimate the number of loading stages required to load the named
             world geometry. 
@@ -1584,7 +1582,7 @@ namespace Ogre {
             supports one type of world geometry.
         */      
         virtual size_t estimateWorldGeometry(DataStreamPtr& stream, 
-            const String& typeName = StringUtil::BLANK)
+            const String& typeName = BLANKSTRING)
         { (void)stream; (void)typeName; return 0; }
 
         /** Asks the SceneManager to provide a suggested viewpoint from which the scene should be viewed.
@@ -1837,7 +1835,7 @@ namespace Ogre {
             @param xsegments, ysegments
                 Determines the number of segments the plane will have to it. This
                 is most important when you are bowing the plane, but may also be useful
-                if you need tesselation on the plane to perform per-vertex effects.
+                if you need tessellation on the plane to perform per-vertex effects.
             @param groupName
                 The name of the resource group to which to assign the plane mesh.
         */
@@ -1887,7 +1885,7 @@ namespace Ogre {
             @param xsegments, ysegments
                 Determines the number of segments the plane will have to it. This
                 is most important when you are bowing the plane, but may also be useful
-                if you need tesselation on the plane to perform per-vertex effects.
+                if you need tessellation on the plane to perform per-vertex effects.
             @param groupName
                 The name of the resource group to which to assign the plane mesh.
         */        

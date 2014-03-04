@@ -27,8 +27,9 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderCGProgramWriter.h"
+#include "OgreShaderFunctionAtom.h"
+#include "OgreShaderProgram.h"
 #include "OgreStringConverter.h"
-#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -71,6 +72,10 @@ void CGProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_INT2] = "int2";
     mGpuConstTypeMap[GCT_INT3] = "int3";
     mGpuConstTypeMap[GCT_INT4] = "int4";
+    mGpuConstTypeMap[GCT_UINT1] = "uint";
+    mGpuConstTypeMap[GCT_UINT2] = "uint2";
+    mGpuConstTypeMap[GCT_UINT3] = "uint3";
+    mGpuConstTypeMap[GCT_UINT4] = "uint4";
 
 
     mParamSemanticMap[Parameter::SPS_POSITION] = "POSITION";

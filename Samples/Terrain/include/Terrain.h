@@ -1,15 +1,15 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+  -----------------------------------------------------------------------------
+  This source file is part of OGRE
+  (Object-oriented Graphics Rendering Engine)
+  For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
-You may use this sample code for anything you like, it is not covered by the
-same license as the rest of the engine.
------------------------------------------------------------------------------
+  You may use this sample code for anything you like, it is not covered by the
+  same license as the rest of the engine.
+  -----------------------------------------------------------------------------
 */
 #ifndef __Terrain_H__
 #define __Terrain_H__
@@ -22,6 +22,7 @@ same license as the rest of the engine.
 #define TERRAIN_PAGE_MAX_Y 0
 
 #include "SdkSample.h"
+#include "OgrePageManager.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainGroup.h"
 #include "OgreTerrainQuadTreeNode.h"
@@ -42,10 +43,11 @@ using namespace OgreBites;
 
 class _OgreSampleClassExport Sample_Terrain : public SdkSample
 {
-public:
+ public:
 
-    Sample_Terrain()
-        : mTerrainGroup(0)
+ Sample_Terrain()
+     : mTerrainGlobals(0)
+        , mTerrainGroup(0)
         , mTerrainPaging(0)
         , mPageManager(0)
         , mFly(false)
@@ -77,7 +79,7 @@ public:
                         "so you cannot run this sample. Sorry!", "Sample_Terrain::testCapabilities");
         }
     }
-    
+
     StringVector getRequiredPlugins()
     {
         StringVector names;
@@ -92,7 +94,7 @@ public:
         terrain->getTerrainPosition(centrepos, &tsPos);
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         if (mInputContext.isKeyDown(OIS::KC_EQUALS) || mInputContext.isKeyDown(OIS::KC_ADD) ||
-                mInputContext.isKeyDown(OIS::KC_MINUS) || mInputContext.isKeyDown(OIS::KC_SUBTRACT))
+            mInputContext.isKeyDown(OIS::KC_MINUS) || mInputContext.isKeyDown(OIS::KC_SUBTRACT))
         {
             switch(mMode)
             {
@@ -115,8 +117,8 @@ public:
                             Real tsXdist = (x / terrainSize) - tsPos.x;
                             Real tsYdist = (y / terrainSize)  - tsPos.y;
 
-                            Real weight = std::min((Real)1.0, 
-                                Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
+                            Real weight = std::min((Real)1.0,
+                                                   Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
                             weight = 1.0 - (weight * weight);
 
                             float addedHeight = weight * 250.0 * timeElapsed;
@@ -153,8 +155,8 @@ public:
                             Real tsXdist = (x / imgSize) - tsPos.x;
                             Real tsYdist = (y / imgSize)  - tsPos.y;
 
-                            Real weight = std::min((Real)1.0, 
-                                Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
+                            Real weight = std::min((Real)1.0,
+                                                   Math::Sqrt(tsYdist * tsYdist + tsXdist * tsXdist) / Real(0.5 * mBrushSizeTerrainSpace));
                             weight = 1.0 - (weight * weight);
 
                             float paint = weight * timeElapsed;
@@ -186,7 +188,7 @@ public:
         if (mMode != MODE_NORMAL)
         {
             // fire ray
-            Ray ray; 
+            Ray ray;
             //ray = mCamera->getCameraToViewportRay(0.5, 0.5);
             ray = mTrayMgr->getCursorRay(mCamera);
 
@@ -203,7 +205,7 @@ public:
                 mTerrainGroup->sphereIntersects(sphere, &terrainList);
 
                 for (TerrainGroup::TerrainList::iterator ti = terrainList.begin();
-                    ti != terrainList.end(); ++ti)
+                     ti != terrainList.end(); ++ti)
                     doTerrainModify(*ti, rayResult.position, evt.timeSinceLastFrame);
             }
             else
@@ -235,7 +237,7 @@ public:
                 }
                 newy = std::max(rayResult.position.y + distanceAboveTerrain, newy);
                 mCamera->setPosition(camPos.x, newy, camPos.z);
-                
+
             }
 
         }
@@ -249,7 +251,6 @@ public:
                 mHeightUpdateCountDown = 0;
 
             }
-
         }
 
         if (mTerrainGroup->isDerivedDataUpdateInProgress())
@@ -314,20 +315,20 @@ public:
             }
             break;
             /*
-        case OIS::KC_F7:
-            // change terrain size
-            if (mTerrainGroup->getTerrainSize() == 513)
-                mTerrainGroup->setTerrainSize(1025);
-            else
-                mTerrainGroup->setTerrainSize(513);
-            break;
-        case OIS::KC_F8:
-            // change terrain world size
-            if (mTerrainGroup->getTerrainWorldSize() == TERRAIN_WORLD_SIZE)
-                mTerrainGroup->setTerrainWorldSize(TERRAIN_WORLD_SIZE * 2);
-            else
-                mTerrainGroup->setTerrainWorldSize(TERRAIN_WORLD_SIZE);
-            break;
+              case OIS::KC_F7:
+              // change terrain size
+              if (mTerrainGroup->getTerrainSize() == 513)
+              mTerrainGroup->setTerrainSize(1025);
+              else
+              mTerrainGroup->setTerrainSize(513);
+              break;
+              case OIS::KC_F8:
+              // change terrain world size
+              if (mTerrainGroup->getTerrainWorldSize() == TERRAIN_WORLD_SIZE)
+              mTerrainGroup->setTerrainWorldSize(TERRAIN_WORLD_SIZE * 2);
+              else
+              mTerrainGroup->setTerrainWorldSize(TERRAIN_WORLD_SIZE);
+              break;
             */
         default:
             return SdkSample::keyPressed(e);
@@ -358,7 +359,7 @@ public:
         }
     }
 
-protected:
+ protected:
 
     TerrainGlobalOptions* mTerrainGlobals;
     TerrainGroup* mTerrainGroup;
@@ -412,8 +413,6 @@ protected:
     typedef std::list<Entity*> EntityList;
     EntityList mHouseList;
 
-
-
     void defineTerrain(long x, long y, bool flat = false)
     {
         // if a file is available, use it
@@ -440,7 +439,6 @@ protected:
                 mTerrainGroup->defineTerrain(x, y, &img);
                 mTerrainsImported = true;
             }
-
         }
     }
 
@@ -451,7 +449,6 @@ protected:
             img.flipAroundY();
         if (flipY)
             img.flipAroundX();
-
     }
 
     void initBlendMaps(Terrain* terrain)
@@ -544,8 +541,6 @@ protected:
         defaultimp.layerList[2].worldSize = 200;
         defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_diffusespecular.dds");
         defaultimp.layerList[2].textureNames.push_back("growth_weirdfungus-03_normalheight.dds");
-
-
     }
 
     void addTextureDebugOverlay(TrayLocation loc, TexturePtr tex, size_t i)
@@ -560,7 +555,7 @@ protected:
         if (debugMat.isNull())
         {
             debugMat = MaterialManager::getSingleton().create(matName,
-                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+                                                              ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         }
         Pass* p = debugMat->getTechnique(0)->getPass(0);
         p->removeAllTextureUnitStates();
@@ -585,7 +580,6 @@ protected:
             w = mTrayMgr->createDecorWidget(loc, widgetName, "Ogre/DebugTexOverlay");
         }
         w->getOverlayElement()->setMaterialName(matName);
-
     }
 
     void addTextureShadowDebugOverlay(TrayLocation loc, size_t num)
@@ -614,15 +608,13 @@ protected:
             p->getTextureUnitState("diffuse")->setTextureName(textureName);
 
             Vector4 splitPoints;
-            const PSSMShadowCameraSetup::SplitPointList& splitPointList = 
+            const PSSMShadowCameraSetup::SplitPointList& splitPointList =
                 static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get())->getSplitPoints();
             for (int i = 0; i < 3; ++i)
             {
                 splitPoints[i] = splitPointList[i];
             }
             p->getFragmentProgramParameters()->setNamedConstant("pssmSplitPoints", splitPoints);
-
-
         }
 
         return ret;
@@ -635,7 +627,7 @@ protected:
 
     void configureShadows(bool enabled, bool depthShadows)
     {
-        TerrainMaterialGeneratorA::SM2Profile* matProfile = 
+        TerrainMaterialGeneratorA::SM2Profile* matProfile =
             static_cast<TerrainMaterialGeneratorA::SM2Profile*>(mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
         matProfile->setReceiveDynamicShadowsEnabled(enabled);
 #ifdef SHADOWS_IN_LOW_LOD_MATERIAL
@@ -670,7 +662,6 @@ protected:
                 pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
                 mPSSMSetup.bind(pssmSetup);
-
             }
             mSceneMgr->setShadowCameraSetup(mPSSMSetup);
 
@@ -688,7 +679,6 @@ protected:
                 {
                     (*i)->setMaterial(houseMat);
                 }
-
             }
             else
             {
@@ -698,15 +688,13 @@ protected:
                 mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_X8B8G8R8);
                 mSceneMgr->setShadowTextureSelfShadow(false);
                 mSceneMgr->setShadowCasterRenderBackFaces(false);
-                mSceneMgr->setShadowTextureCasterMaterial(StringUtil::BLANK);
+                mSceneMgr->setShadowTextureCasterMaterial(BLANKSTRING);
             }
 
             matProfile->setReceiveDynamicShadowsDepth(depthShadows);
             matProfile->setReceiveDynamicShadowsPSSM(static_cast<PSSMShadowCameraSetup*>(mPSSMSetup.get()));
 
             //addTextureShadowDebugOverlay(TL_RIGHT, 3);
-
-
         }
         else
         {
@@ -717,8 +705,8 @@ protected:
     }
 
     /*-----------------------------------------------------------------------------
-    | Extends setupView to change some initial camera settings for this sample.
-    -----------------------------------------------------------------------------*/
+      | Extends setupView to change some initial camera settings for this sample.
+      -----------------------------------------------------------------------------*/
     void setupView()
     {
         SdkSample::setupView();
@@ -773,8 +761,10 @@ protected:
 
         mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
-        ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
-        ResourceGroupManager::getSingleton().addResourceLocation(mFSLayer->getWritablePath(""), "FileSystem", "Terrain", false, false);
+        // Bugfix for D3D11 Render System because of pixel format incompatibility when using
+        // vertex compression
+        if (Ogre::Root::getSingleton().getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem")
+            mTerrainGlobals->setUseVertexCompressionWhenAvailable(false);
 
         mEditMarker = mSceneMgr->createEntity("sphere.mesh");
         mEditMarker->setName("editMarker");
@@ -798,7 +788,6 @@ protected:
         Vector3 lightdir(0.55, -0.3, 0.75);
         lightdir.normalise();
 
-
         Light* l = mSceneMgr->createLight("tstLight");
         l->setType(Light::LT_DIRECTIONAL);
         l->setDirection(lightdir);
@@ -817,15 +806,15 @@ protected:
 #ifdef PAGING
         // Paging setup
         mPageManager = OGRE_NEW PageManager();
-        // Since we're not loading any pages from .page files, we need a way just 
+        // Since we're not loading any pages from .page files, we need a way just
         // to say we've loaded them without them actually being loaded
         mPageManager->setPageProvider(&mDummyPageProvider);
         mPageManager->addCamera(mCamera);
         mTerrainPaging = OGRE_NEW TerrainPaging(mPageManager);
         PagedWorld* world = mPageManager->createWorld();
-        mTerrainPaging->createWorldSection(world, mTerrainGroup, 2000, 3000, 
-            TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y, 
-            TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
+        mTerrainPaging->createWorldSection(world, mTerrainGroup, 2000, 3000,
+                                           TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y,
+                                           TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
 #else
         for (long x = TERRAIN_PAGE_MIN_X; x <= TERRAIN_PAGE_MAX_X; ++x)
             for (long y = TERRAIN_PAGE_MIN_Y; y <= TERRAIN_PAGE_MAX_Y; ++y)
@@ -845,8 +834,6 @@ protected:
         }
 
         mTerrainGroup->freeTemporaryResources();
-
-
 
         // create a few entities on the terrain
         Entity* e = mSceneMgr->createEntity("tudorhouse.mesh");
@@ -877,7 +864,7 @@ protected:
         sn->attachObject(e);
         mHouseList.push_back(e);
 
-        mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+        mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox", 5000);
 
 
     }

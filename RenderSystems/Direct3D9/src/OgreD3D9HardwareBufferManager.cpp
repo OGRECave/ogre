@@ -73,6 +73,13 @@ namespace Ogre {
                 usage = HardwareBuffer::HBU_STATIC;
             }
         }
+        //If we have write only buffers in DirectX9Ex we will turn on the discardable flag.
+        //Otherwise Ogre will operates in far less framerate
+        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HardwareBuffer::HBU_WRITE_ONLY))
+        {
+            usage = (HardwareBuffer::Usage)
+                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DISCARDABLE);
+        }
 #endif
         D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
             this, vertexSize, numVerts, usage, false, useShadowBuffer);
@@ -109,6 +116,13 @@ namespace Ogre {
             {
                 usage = HardwareBuffer::HBU_STATIC;
             }
+        }
+        //If we have write only buffers in DirectX9Ex we will turn on the discardable flag.
+        //Otherwise Ogre will operates in far less framerate
+        if (D3D9RenderSystem::isDirectX9Ex() && (usage & HardwareBuffer::HBU_WRITE_ONLY))
+        {
+            usage = (HardwareBuffer::Usage)
+                ((unsigned int)usage | (unsigned int)HardwareBuffer::HBU_DISCARDABLE);
         }
 #endif
         D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(

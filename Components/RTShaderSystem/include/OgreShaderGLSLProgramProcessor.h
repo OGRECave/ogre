@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreShaderProgramProcessor.h"
 #include "OgreStringVector.h"
 
-
 namespace Ogre {
 namespace RTShader {
 

@@ -223,7 +223,7 @@ namespace Ogre
             the parameters, instead of using the object's own. This allows
             querying for a technique without requiering to actually build it.
         @param baseSubMesh The base submesh that will be using to build it.
-        @param flags @see InstanceManagerFlags
+        @param flags Flags to pass to the InstanceManager. @see InstanceManagerFlags
         @return The max instances limit
         */
         virtual size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const = 0;

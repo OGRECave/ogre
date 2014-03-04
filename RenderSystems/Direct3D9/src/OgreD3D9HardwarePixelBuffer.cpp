@@ -43,7 +43,7 @@ namespace Ogre {
 D3D9HardwarePixelBuffer::D3D9HardwarePixelBuffer(HardwareBuffer::Usage usage, 
                                                  D3D9Texture* ownerTexture):
     HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage, false, false),
-    mDoMipmapGen(0), mHWMipmaps(0), mOwnerTexture(ownerTexture), 
+    mDoMipmapGen(false), mHWMipmaps(false), mOwnerTexture(ownerTexture), 
     mRenderTexture(NULL)
 {   
 }
@@ -108,7 +108,7 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *sur
     if(mUsage & TU_RENDERTARGET)
         updateRenderTexture(writeGamma, fsaa, srcName);
 
-    if (isNewBuffer && mOwnerTexture->isManuallyLoaded())
+    if (isNewBuffer && mOwnerTexture->isLoaded() && mOwnerTexture->isManuallyLoaded())
     {
         DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
 
@@ -336,7 +336,7 @@ D3DBOX toD3DBOXExtent(const PixelBox &lockBox)
     return pbox;
 }
 //-----------------------------------------------------------------------------  
-PixelBox D3D9HardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+PixelBox D3D9HardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
 {   
     D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
@@ -650,6 +650,12 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
     size_t rowWidth;
     if (PixelUtil::isCompressed(converted.format))
     {
+        // if the row doesn't divide by 4 - there is padding to 4
+        if(converted.rowPitch  % 4 > 0)
+        {
+            converted.rowPitch  += 4;
+        }
+
         // D3D wants the width of one row of cells in bytes
         if (converted.format == PF_DXT1)
         {
@@ -673,6 +679,12 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
         RECT destRect, srcRect;
         srcRect = toD3DRECT(converted);
         destRect = toD3DRECT(dstBox);
+
+        if(converted.getWidth() != dstBox.getWidth() || converted.getHeight() != dstBox.getHeight() )
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Source and dest size are different",
+                "D3D9HardwarePixelBuffer::blitFromMemory");
+        }
 
         if(D3DXLoadSurfaceFromMemory(dstBufferResources->surface, NULL, &destRect, 
             converted.data, D3D9Mappings::_getPF(converted.format),

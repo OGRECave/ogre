@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreLight.h"
 #include "OgreMath.h"
+#include "OgreViewport.h"
 #include "OgreD3D9HardwareBufferManager.h"
 #include "OgreD3D9HardwareIndexBuffer.h"
 #include "OgreD3D9HardwareVertexBuffer.h"
@@ -51,6 +52,7 @@ THE SOFTWARE.
 #include "OgreD3D9DeviceManager.h"
 #include "OgreD3D9ResourceManager.h"
 #include "OgreD3D9DepthBuffer.h"
+#include "OgreRenderOperation.h"
 
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 
@@ -391,7 +393,7 @@ namespace Ogre
             it->second.currentValue = value;
         else
         {
-            StringUtil::StrStreamType str;
+            StringStream str;
             str << "Option named '" << name << "' does not exist.";
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, str.str(), "D3D9RenderSystem::setConfigOption" );
         }
@@ -582,7 +584,7 @@ namespace Ogre
                 "the 'Rendering Device' has been changed.";
         }
 
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
     //---------------------------------------------------------------------
     ConfigOptionMap& D3D9RenderSystem::getConfigOptions()
@@ -896,6 +898,7 @@ namespace Ogre
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_HWOCCLUSION);        
         rsc->setCapability(RSC_USER_CLIP_PLANES);           
+        rsc->setCapability(RSC_32BIT_INDEX);            
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);           
         rsc->setCapability(RSC_TEXTURE_1D);         
         rsc->setCapability(RSC_TEXTURE_3D);         
@@ -989,6 +992,10 @@ namespace Ogre
             // User clip planes
             if (rkCurCaps.MaxUserClipPlanes == 0)           
                 rsc->unsetCapability(RSC_USER_CLIP_PLANES);         
+
+            // D3DFMT_INDEX32 type?
+            if (rkCurCaps.MaxVertexIndex <= 0xFFFF)         
+                rsc->unsetCapability(RSC_32BIT_INDEX);  
 
             // UBYTE4 type?
             if ((rkCurCaps.DeclTypes & D3DDTCAPS_UBYTE4) == 0)          
@@ -2712,7 +2719,7 @@ namespace Ogre
     void D3D9RenderSystem::setStencilBufferParams(CompareFunction func, 
         uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
         StencilOperation depthFailOp, StencilOperation passOp, 
-        bool twoSidedOperation)
+        bool twoSidedOperation, bool readBackAsTexture)
     {
         HRESULT hr;
         bool flip;
@@ -3261,7 +3268,7 @@ namespace Ogre
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = useGlobalInstancingVertexBufferIsAvailable &&
                     !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
-                || binding->hasInstanceData();
+                || binding->getHasInstanceData();
 
 
         // TODO: attempt to detect duplicates
@@ -3301,7 +3308,7 @@ namespace Ogre
             // SetStreamSourceFreq
             if ( hasInstanceData ) 
             {
-                if ( d3d9buf->isInstanceData() )
+                if ( d3d9buf->getIsInstanceData() )
                 {
                     hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
                 }
@@ -4115,6 +4122,13 @@ namespace Ogre
         }
 
         return d3d9Device;
+    }   
+
+    //---------------------------------------------------------------------
+    IDirect3DDevice9* D3D9RenderSystem::getActiveD3D9DeviceIfExists()
+    {   
+        D3D9Device* activeDevice = msD3D9RenderSystem->mDeviceManager->getActiveDevice();
+        return activeDevice ? activeDevice->getD3D9Device() : NULL;
     }   
 
     //---------------------------------------------------------------------

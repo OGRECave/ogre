@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 #include "OgreAnimation.h"
 #include "OgreOldBone.h"
+#include "OgreKeyFrame.h"
 #include "OgreSkeleton.h"
 
 namespace Ogre
@@ -62,6 +63,11 @@ namespace Ogre
     inline uint32 SkeletonAnimationDef::slotToBlockIdx( uint32 slotIdx ) const
     {
         return (slotIdx & 0xFF000000) | ((slotIdx & 0x00FFFFFF) / ARRAY_PACKED_REALS);
+    }
+	//-----------------------------------------------------------------------------------
+    inline uint32 SkeletonAnimationDef::blockIdxToSlotStart( uint32 blockIdx ) const
+    {
+        return (blockIdx & 0xFF000000) | ((blockIdx & 0x00FFFFFF) * ARRAY_PACKED_REALS);
     }
     //-----------------------------------------------------------------------------------
     void SkeletonAnimationDef::build( const Skeleton *skeleton, const Animation *animation, Real frameRate )
@@ -180,6 +186,7 @@ namespace Ogre
             KeyFrameRigVec::iterator enKeys = keyFrames.end();
 
             uint32 blockIdx = itTrack->getBoneBlockIdx();
+			uint32 slotStart= blockIdxToSlotStart( blockIdx );
 
             while( itKeys != enKeys )
             {
@@ -187,7 +194,7 @@ namespace Ogre
 
                 for( uint32 i=0; i<ARRAY_PACKED_REALS; ++i )
                 {
-                    uint32 slotIdx = blockIdx + i;
+                    uint32 slotIdx = slotStart + i;
 
                     uint32 boneIdx = -1;
                     map<uint32, uint32>::type::const_iterator it = slotToBone.find( slotIdx );

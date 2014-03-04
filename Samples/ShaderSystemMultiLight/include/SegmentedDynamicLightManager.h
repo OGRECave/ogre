@@ -28,11 +28,11 @@ THE SOFTWARE.
 #define _SegmentedLightManager_
 
 #include "OgreShaderPrerequisites.h"
-#include <OgreSingleton.h>
-#include <OgreLight.h>
-#include <OgreTexture.h>
-#include <OgreLight.h>
-#include <OgreSceneManager.h>
+#include "OgreSingleton.h"
+#include "OgreLight.h"
+#include "OgreTexture.h"
+#include "OgreLight.h"
+#include "OgreSceneManager.h"
 
 #define SDL_SEGMENT_DIVISIONS 9
 #define SDL_SEGMENT_GRID_SIZE (SDL_SEGMENT_DIVISIONS * SDL_SEGMENT_DIVISIONS)

@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreGLSLLinkProgramManager.h"
 #include "OgreStringConverter.h"
+#include "OgreLogManager.h"
+#include "OgreTechnique.h"
 
 namespace Ogre {
 //-----------------------------------------------------------------------------
@@ -72,7 +74,7 @@ namespace Ogre {
     }
 //-----------------------------------------------------------------------------
     void checkGLError(bool logError, bool throwException, 
-        const Ogre::String& sectionName = StringUtil::BLANK)
+        const Ogre::String& sectionName = BLANKSTRING)
     {
         String msg;
         bool foundError = false;
@@ -95,7 +97,7 @@ namespace Ogre {
             String fullErrorMessage = "GL Error : " + msg + " in " + sectionName;
             if (logError)
             {
-                LogManager::getSingleton().getDefaultLog()->logMessage(fullErrorMessage);
+                LogManager::getSingleton().getDefaultLog()->logMessage(fullErrorMessage, LML_CRITICAL);
             }
             if (throwException)
             {

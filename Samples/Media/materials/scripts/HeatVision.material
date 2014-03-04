@@ -7,28 +7,28 @@ vertex_program Fury/HeatVision/HeatCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_vp
-   profiles vs_4_0 vs_1_1 arbvp1
+   profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
 }
 
 fragment_program Fury/HeatVision/HeatCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_fp
-   profiles ps_4_0 ps_2_0 arbfp1
+   profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/HeatCaster_HLSL_vp hlsl
 {
    source HeatVision.hlsl
    entry_point HeatCaster_vp
-   target vs_4_0
+   target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 }
 
 fragment_program Fury/HeatVision/HeatCaster_HLSL_fp hlsl
 {
    source HeatVision.hlsl
    entry_point HeatCaster_fp
-   target ps_4_0
+   target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 vertex_program Fury/HeatVision/HeatCaster_GLSLES_vp glsles
@@ -98,28 +98,28 @@ vertex_program Fury/HeatVision/ColdCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point ColdCaster_vp
-   profiles vs_4_0 vs_1_1 arbvp1
+   profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_1_1 arbvp1
 }
 
 fragment_program Fury/HeatVision/ColdCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point ColdCaster_fp
-   profiles ps_4_0 ps_2_0 arbfp1
+   profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/ColdCaster_HLSL_vp hlsl
 {
    source HeatVision.hlsl
    entry_point ColdCaster_vp
-   target vs_4_0
+   target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 }
 
 fragment_program Fury/HeatVision/ColdCaster_HLSL_fp hlsl
 {
    source HeatVision.hlsl
    entry_point ColdCaster_fp
-   target ps_4_0
+   target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 vertex_program Fury/HeatVision/ColdCaster_GLSLES_vp glsles
@@ -196,7 +196,7 @@ fragment_program Fury/HeatVision/LightToHeat_HLSL_fp hlsl
 {
    source HeatVision.hlsl
    entry_point LightToHeat_fp
-   target ps_4_0
+   target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Fury/HeatVision/LightToHeat_GLSLES_fp glsles
@@ -234,12 +234,11 @@ material Fury/HeatVision/LightToHeat
 {
     technique
     {
-        // pass 1
         pass
         {
-			cull_hardware none
-			cull_software none
-			depth_func always_pass
+            cull_hardware none
+            cull_software none
+            depth_func always_pass
             polygon_mode_overrideable false
 
             vertex_program_ref Ogre/Compositor/StdQuad_vp
@@ -301,7 +300,7 @@ fragment_program Fury/HeatVision/Blur_HLSL_fp hlsl
 {
    source HeatVision.hlsl
    entry_point Blur_fp
-   target ps_4_0
+   target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Fury/HeatVision/Blur_GLSLES_fp glsles
@@ -335,12 +334,11 @@ material Fury/HeatVision/Blur
 {
     technique
     {
-        // pass 1
         pass
         {
-			cull_hardware none
-			cull_software none
-			depth_func always_pass
+            cull_hardware none
+            cull_software none
+            depth_func always_pass
             polygon_mode_overrideable false
 
             vertex_program_ref Ogre/Compositor/StdQuad_vp
@@ -355,7 +353,6 @@ material Fury/HeatVision/Blur
             // INPUT (from previous)
             texture_unit
             {
-                texture Input
                 tex_coord_set 0
                 filtering linear linear none
                 tex_address_mode clamp

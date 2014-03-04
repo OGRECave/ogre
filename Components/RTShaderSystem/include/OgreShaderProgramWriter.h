@@ -28,11 +28,10 @@ THE SOFTWARE.
 #define _ShaderProgramWriter_
 
 #include "OgreShaderPrerequisites.h"
+#include "OgreCommon.h"
+#include "OgreGpuProgramParams.h"
 #include "OgreGpuProgram.h"
-#include "OgreString.h"
-#include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
-#include "OgreShaderFunction.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -43,6 +42,15 @@ namespace RTShader {
 /** \addtogroup RTShader
 *  @{
 */
+
+// Uniform comparer
+struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
+{
+    bool operator()( const UniformParameterPtr& uniform, const String& name ) const
+    {
+        return uniform->getName() == name;
+    }
+};
 
 /** Base class interface for shader program writers.
 The main usage of this class is to generate a shader source code from the given CPU program.

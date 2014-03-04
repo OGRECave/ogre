@@ -30,14 +30,13 @@ THE SOFTWARE.
 #include "OgreHardwareCounterBuffer.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreException.h"
 
 namespace Ogre {
 
     HardwareCounterBuffer::HardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
                                     HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
         : HardwareBuffer(usage, false, useShadowBuffer)
-        , mName(name)
+        , mMgr(mgr), mName(name)
     {
         // Calculate the size of the vertices
         mSizeInBytes = sizeBytes;
@@ -55,10 +54,7 @@ namespace Ogre {
         {
             mMgr->_notifyCounterBufferDestroyed(this);
         }
-        if (mShadowBuffer)
-        {
-            OGRE_DELETE mShadowBuffer;
-        }
+        OGRE_DELETE mShadowBuffer;
     }
 
     //-----------------------------------------------------------------------------

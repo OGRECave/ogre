@@ -74,65 +74,48 @@ if (OGRE_STATIC)
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 	${OGRE_BINARY_DIR}/Samples/include)
-	
+
+  # Fix for static build with MinGW
+  if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
+    include_directories(${DirectX9_INCLUDE_DIR})
+  endif() 
+  
 	ogre_add_component_include_dir(Paging)
 	ogre_add_component_include_dir(Terrain)
 	ogre_add_component_include_dir(Volume)
+	ogre_add_component_include_dir(MeshLodGenerator)
 else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 endif()
 
 if(ANDROID)
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
-    ADD_LIBRARY(SampleBrowserDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
-    target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
-    add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
-
-    if(APPLE OR WIN32)
-      SET(ANDROID_EXECUTABLE "android")
-      SET(NDK_BUILD_EXECUTABLE "ndk-build")
-    else()
-      SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
-      SET(NDK_BUILD_EXECUTABLE "$ENV{ANDROID_NDK}/ndk-build")
-    endif()
-
-    SET(ANT_EXECUTABLE "ant")
-	if(${ANDROID_NATIVE_API_LEVEL} LESS 14)
-		MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
-	else()
-		SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
-		SET(SCREEN_SIZE "|screenSize")
-	endif()
-	
-	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
-		SET(GLES_OPTIMISER "-lglsl_optimizer -lmesa -lglcpp-library")
-	endif()
-
-    SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
+    include(AndroidMacros)
+    
+    SET(ANDROID_MOD_NAME "OgreSampleBrowser")
+    SET(JNI_PATH "${CMAKE_SOURCE_DIR}/Samples/Browser/src")
+    SET(JNI_SRC_FILES "SampleBrowser.cpp")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
-    file(MAKE_DIRECTORY "${NDKOUT}")
-    file(MAKE_DIRECTORY "${NDKOUT}/jni")
-    file(MAKE_DIRECTORY "${NDKOUT}/assets")	
-    file(MAKE_DIRECTORY "${NDKOUT}/res")
-    file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
-    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static ")
-    configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
-
-	SET(ANDROID_MOD_NAME "OgreSampleBrowser")
-	SET(JNI_SRC "LOCAL_PATH := @CMAKE_SOURCE_DIR@/Samples/Browser/src\n")
-    SET(JNI_SRC "${JNI_SRC}\tLOCAL_SRC_FILES := SampleBrowser.cpp\n")
-	
+    
+    
+    SET(PKG_NAME "org.ogre.browser")
+    # Set this variable to false if no java code will be present (google android:hasCode for more info)
+    SET(HAS_CODE "false")
+    
+    SET(MAIN_ACTIVITY "android.app.NativeActivity")
+    SET(HEADERS "")
+    SET(SAMPLE_LDLIBS "")
+    
+    add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_Water" "Sample_Ocean" "Sample_NewInstancing" "Sample_ShaderSystem" "Sample_DeferredShading" "Sample_EndlessWorld" "Sample_VolumeCSG" "Sample_VolumeTerrain" "Sample_Terrain")
     if(NOT ANDROID_GLES_ONLY)
-	 SET(SAMPLE_LDLIBS "LOCAL_LDLIBS += -lSample_CameraTrack -lSample_CelShading -lSample_Character -lSample_Compositor -lSample_Lighting -lSample_BezierPatch -lSample_CubeMapping -lSample_DynTex\n")
-     SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\tLOCAL_LDLIBS += -lSample_FacialAnimation -lSample_Fresnel -lSample_Grass -lSample_ParticleFX -lSample_Lighting -lSample_MeshLod -lSample_SkyBox -lSample_SkyPlane -lSample_SkyDome -lSample_Smoke\n")
-     SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\tLOCAL_LDLIBS += -lSample_Water -lSample_Ocean -lSample_NewInstancing -lSample_ShaderSystem -lSample_DeferredShading -lSample_EndlessWorld -lSample_VolumeCSG -lSample_VolumeTerrain -lSample_Terrain\n")
-	 configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Fresnel" "Sample_Grass" "Sample_ParticleFX" "Sample_MeshLod" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_CameraTrack" "Sample_CelShading" "Sample_Character" "Sample_Compositor" "Sample_Lighting" "Sample_BezierPatch" "Sample_CubeMapping" "Sample_DynTex")
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_TerrainTessellation")
     else()
-     SET(SAMPLE_LDLIBS "LOCAL_LDLIBS += -lSample_CameraTrack -lSample_Character -lSample_Compositor -lSample_Lighting -lSample_BezierPatch -lSample_DynTex\n")
-	 SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\tLOCAL_LDLIBS += -lSample_FacialAnimation -lSample_Grass -lSample_ParticleFX -lSample_Lighting -lSample_SkyBox -lSample_SkyPlane -lSample_SkyDome -lSample_Smoke\n")
-     configure_file("${OGRE_TEMPLATES_DIR}/AndroidGLES1.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Grass" "Sample_ParticleFX" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_CameraTrack"  "Sample_Character" "Sample_Compositor" "Sample_Lighting" "Sample_BezierPatch" "Sample_DynTex")
     endif()
+    
 
     configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
@@ -149,35 +132,12 @@ if(ANDROID)
 	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-mdpi" DESTINATION "${NDKOUT}/res")
 	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/res")
     
-	add_custom_command(
-	                    TARGET SampleBrowserDummy
-                        POST_BUILD
-	                    COMMAND ${ANDROID_EXECUTABLE} update project --target ${ANDROID_TARGET} --path "${NDKOUT}"
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
-	
-	if(DEBUG)	 
-	 	add_custom_command(
-							TARGET SampleBrowserDummy
-						    POST_BUILD
-					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
-				            WORKING_DIRECTORY ${NDKOUT}
-			              )
-	else()
-		add_custom_command(
-							TARGET SampleBrowserDummy
-						    POST_BUILD
-					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2
-				            WORKING_DIRECTORY ${NDKOUT}
-			              )
-	endif()
-	                  
-	add_custom_command(
-	                    TARGET SampleBrowserDummy
-                        POST_BUILD
-	                    COMMAND ${ANT_EXECUTABLE} debug
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
+    ADD_LIBRARY(SampleBrowserDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
+    target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
+    add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
+    
+    create_android_proj(SampleBrowserDummy)
 
 else()
 
@@ -186,7 +146,18 @@ if (OGRE_BUILD_TESTS)
 	include_directories(${OGRE_SOURCE_DIR}/Tests/PlayPen/include
 	${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
 endif()
+
+# Fix for static build with MinGW
+if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
+    link_directories(${DirectX9_LIBRARY_DIR})
+endif()
+
 ogre_add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+
+# Fix for static build with MinGW
+if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
+   target_link_libraries(SampleBrowser ${DirectX9_LIBRARIES})
+endif()
 
 target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
 

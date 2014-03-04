@@ -53,14 +53,22 @@ namespace Ogre {
         TU_STATIC_WRITE_ONLY = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
         TU_DYNAMIC_WRITE_ONLY = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
         TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
-        /// mipmaps will be automatically generated for this texture
-        TU_AUTOMIPMAP = 0x100,
-        /// this texture will be a render target, i.e. used as a target for render to texture
-        /// setting this flag will ignore all other texture usages except TU_AUTOMIPMAP
-        TU_RENDERTARGET = 0x200,
-        /// default to automatic mipmap generation static textures
+        /// Mipmaps will be automatically generated for this texture
+        TU_AUTOMIPMAP = 0x10,
+        /** This texture will be a render target, i.e. used as a target for render to texture
+            setting this flag will ignore all other texture usages except TU_AUTOMIPMAP */
+        TU_RENDERTARGET = 0x20,
+        /// Default to automatic mipmap generation static textures
         TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY
-        
+    };
+
+    /** Enum identifying the texture access privilege
+     */
+    enum TextureAccess
+    {
+        TA_READ = 0x01,
+        TA_WRITE = 0x10,
+        TA_READ_WRITE = TA_READ | TA_WRITE
     };
 
     /** Enum identifying the texture type
@@ -386,6 +394,17 @@ namespace Ogre {
         */
         virtual void getCustomAttribute(const String& name, void* pData) {}
         
+
+        /** Enable read and/or write privileges to the texture from shaders.
+            @param bindPoint The buffer binding location for shader access. For OpenGL this must be unique and is not related to the texture binding point.
+            @param access The texture access privileges given to the shader.
+            @param mipmapLevel The texture mipmap level to use.
+            @param textureArrayIndex The index of the texture array to use. If texture is not a texture array, set to 0.
+            @param format Texture format to be read in by shader. For OpenGL this may be different than the bound texture format.
+        */
+        virtual void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
+                                             int mipmapLevel = 0, int textureArrayIndex = 0,
+                                             PixelFormat* format = NULL) {}
 
 
     protected:

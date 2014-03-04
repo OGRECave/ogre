@@ -28,12 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreSceneManagerEnumerator.h"
 
-#include "OgreDynLibManager.h"
-#include "OgreDynLib.h"
-#include "OgreConfigFile.h"
-#include "OgreMaterial.h"
 #include "OgreException.h"
-#include "OgreRoot.h"
 #include "OgreLogManager.h"
 
 
@@ -166,7 +161,7 @@ namespace Ogre {
                 if (instanceName.empty())
                 {
                     // generate a name
-                    StringUtil::StrStreamType s;
+                    StringStream s;
                     s << "SceneManagerInstance" << ++mInstanceCreateCount;
                     inst = (*i)->createInstance(s.str(), numWorkerThreads, threadedCullingMethod);
                 }
@@ -213,7 +208,7 @@ namespace Ogre {
         if (name.empty())
         {
             // generate a name
-            StringUtil::StrStreamType s;
+            StringStream s;
             s << "SceneManagerInstance" << ++mInstanceCreateCount;
             name = s.str();
         }

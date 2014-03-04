@@ -51,6 +51,7 @@ namespace Ogre
         bool                isVisible           () const;
         bool                isClosed            () const { return mClosed; }
         bool                isVSync             () const { return mVSync; }
+        bool                isAA                () const { return mFSAA != 0; }
         bool                isHidden            () const { return mHidden; }
         void                setHidden           (bool hidden);
         void                setVSyncEnabled     (bool vsync);

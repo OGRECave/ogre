@@ -27,6 +27,10 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 
 #include "OgreVolumeChunkHandler.h"
+#include "OgreVolumeChunk.h"
+#include "OgreVolumeMeshBuilder.h"
+#include "OgreVolumeOctreeNode.h"
+#include "OgreVolumeDualGridGenerator.h"
 
 namespace Ogre {
 namespace Volume {
@@ -37,18 +41,18 @@ namespace Volume {
     
     void ChunkHandler::init(void)
     {
-        if (!wq)
+        if (!mWQ)
         {
-            wq = Root::getSingleton().getWorkQueue();
-            workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
-            wq->addResponseHandler(workQueueChannel, this);
-            wq->addRequestHandler(workQueueChannel, this);
+            mWQ = Root::getSingleton().getWorkQueue();
+            mWorkQueueChannel = mWQ->getChannel("Ogre/VolumeRendering");
+            mWQ->addResponseHandler(mWorkQueueChannel, this);
+            mWQ->addRequestHandler(mWorkQueueChannel, this);
         }
     }
 
     //-----------------------------------------------------------------------
     
-    ChunkHandler::ChunkHandler(void) : wq(0)
+    ChunkHandler::ChunkHandler(void) : mWQ(0), mWorkQueueChannel(0)
     {
     }
 
@@ -57,10 +61,10 @@ namespace Volume {
     ChunkHandler::~ChunkHandler(void)
     {
         // Root might already be shutdown.
-        if (wq && Root::getSingletonPtr())
+        if (mWQ && Root::getSingletonPtr())
         {
-            wq->removeRequestHandler(workQueueChannel, this);
-            wq->removeResponseHandler(workQueueChannel, this);
+            mWQ->removeRequestHandler(mWorkQueueChannel, this);
+            mWQ->removeResponseHandler(mWorkQueueChannel, this);
         }
     }
 
@@ -69,14 +73,14 @@ namespace Volume {
     void ChunkHandler::addRequest(const ChunkRequest &req)
     {
         init();
-        wq->addRequest(workQueueChannel, WORKQUEUE_LOAD_REQUEST, Any(req));
+        mWQ->addRequest(mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST, Any(req));
     }
     
     //-----------------------------------------------------------------------
   
     void ChunkHandler::processWorkQueue(void)
     {
-        wq->processResponses();
+        mWQ->processResponses();
     }
 
     //-----------------------------------------------------------------------

@@ -27,12 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgram.h"
-#include "OgreHighLevelGpuProgram.h"
 #include "OgreGpuProgramManager.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
-#include "OgreAutoParamDataSource.h"
-#include "OgreLight.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderSystemCapabilities.h"
@@ -50,6 +45,7 @@ namespace Ogre
     GpuProgram::CmdVTF GpuProgram::msVTFCmd;
     GpuProgram::CmdManualNamedConstsFile GpuProgram::msManNamedConstsFileCmd;
     GpuProgram::CmdAdjacency GpuProgram::msAdjacencyCmd;
+    GpuProgram::CmdComputeGroupDims GpuProgram::msComputeGroupDimsCmd;
     
 
     //-----------------------------------------------------------------------------
@@ -284,7 +280,9 @@ namespace Ogre
             ret->_setNamedConstants(mConstantDefs);
         }
         // link shared logical / physical map for low-level use
-        ret->_setLogicalIndexes(mFloatLogicalToPhysical, mDoubleLogicalToPhysical, mIntLogicalToPhysical);
+        ret->_setLogicalIndexes(mFloatLogicalToPhysical, mDoubleLogicalToPhysical, 
+                                        mIntLogicalToPhysical, mUIntLogicalToPhysical,
+                                        mBoolLogicalToPhysical);
 
         // Copy in default parameters if present
         if (!mDefaultParams.isNull())
@@ -307,34 +305,39 @@ namespace Ogre
         ParamDictionary* dict = getParamDictionary();
 
         dict->addParameter(
-            ParameterDef("type", "'vertex_program', 'geometry_program' or 'fragment_program'",
-                PT_STRING), &msTypeCmd);
+            ParameterDef("type", "'vertex_program', 'geometry_program', 'fragment_program', 'hull_program', 'domain_program', 'compute_program'",
+                         PT_STRING), &msTypeCmd);
         dict->addParameter(
             ParameterDef("syntax", "Syntax code, e.g. vs_1_1", PT_STRING), &msSyntaxCmd);
         dict->addParameter(
             ParameterDef("includes_skeletal_animation", 
-            "Whether this vertex program includes skeletal animation", PT_BOOL), 
+                         "Whether this vertex program includes skeletal animation", PT_BOOL), 
             &msSkeletalCmd);
         dict->addParameter(
             ParameterDef("includes_morph_animation", 
-            "Whether this vertex program includes morph animation", PT_BOOL), 
+                         "Whether this vertex program includes morph animation", PT_BOOL), 
             &msMorphCmd);
         dict->addParameter(
             ParameterDef("includes_pose_animation", 
-            "The number of poses this vertex program supports for pose animation", PT_INT), 
+                         "The number of poses this vertex program supports for pose animation", PT_INT),
             &msPoseCmd);
         dict->addParameter(
             ParameterDef("uses_vertex_texture_fetch", 
-            "Whether this vertex program requires vertex texture fetch support.", PT_BOOL), 
+                         "Whether this vertex program requires vertex texture fetch support.", PT_BOOL), 
             &msVTFCmd);
         dict->addParameter(
             ParameterDef("manual_named_constants", 
-            "File containing named parameter mappings for low-level programs.", PT_BOOL), 
+                         "File containing named parameter mappings for low-level programs.", PT_BOOL), 
             &msManNamedConstsFileCmd);
         dict->addParameter(
             ParameterDef("uses_adjacency_information",
-            "Whether this geometry program requires adjacency information from the input primitives.", PT_BOOL),
+                         "Whether this geometry program requires adjacency information from the input primitives.", PT_BOOL),
             &msAdjacencyCmd);
+        dict->addParameter(
+            ParameterDef("compute_group_dimensions",
+                         "The number of process groups created by this compute program.", PT_VECTOR3),
+            &msComputeGroupDimsCmd);
+            
     }
 
     //-----------------------------------------------------------------------
@@ -478,6 +481,17 @@ namespace Ogre
     {
         GpuProgram* t = static_cast<GpuProgram*>(target);
         t->setAdjacencyInfoRequired(StringConverter::parseBool(val));
+    }
+    //-----------------------------------------------------------------------
+    String GpuProgram::CmdComputeGroupDims::doGet(const void* target) const
+    {
+        const GpuProgram* t = static_cast<const GpuProgram*>(target);
+        return StringConverter::toString(t->getComputeGroupDimensions());
+    }
+    void GpuProgram::CmdComputeGroupDims::doSet(void* target, const String& val)
+    {
+        GpuProgram* t = static_cast<GpuProgram*>(target);
+        t->setComputeGroupDimensions(StringConverter::parseVector3(val));
     }
 }
 

@@ -37,7 +37,10 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspaceListener.h"
 
 #include "OgreRenderTarget.h"
+#include "OgreMaterialManager.h"
+#include "OgreRectangle2D.h"
 #include "OgreSceneManager.h"
+#include "OgreTechnique.h"
 
 namespace Ogre
 {

@@ -14,7 +14,7 @@ int main(char argc, char** argv)
     try 
     {
         Root root("", "", "OgreCapsReportD3D9.log");
-        StringUtil::StrStreamType str;
+        StringStream str;
         str << "RenderSystem_Direct3D9" << OGRE_LIB_SUFFIX;
         root.loadPlugin(str.str());
 
@@ -40,7 +40,7 @@ int main(char argc, char** argv)
     try 
     {
         Root root("", "", "OgreCapsReportGL.log");
-        StringUtil::StrStreamType str;
+        StringStream str;
         str << "RenderSystem_GL" << OGRE_LIB_SUFFIX;
         root.loadPlugin(str.str());
 

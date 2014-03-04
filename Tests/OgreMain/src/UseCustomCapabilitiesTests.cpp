@@ -201,11 +201,15 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #ifdef OGRE_STATIC_LIB
-    Root* root = OGRE_NEW Root(StringUtil::BLANK);
+    Root* root = OGRE_NEW Root(BLANKSTRING);
         
     mStaticPluginLoader.load();
 #else
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    Root* root = OGRE_NEW Root(macBundlePath() + "/Contents/Resources/plugins.cfg");
+#else
     Root* root = OGRE_NEW Root("plugins.cfg");
+#endif
 #endif
 
     RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
@@ -269,7 +273,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
     LogManager::getSingleton().setLogDetail(LL_LOW);
 
 #ifdef OGRE_STATIC_LIB
-    Root* root = OGRE_NEW Root(StringUtil::BLANK);
+    Root* root = OGRE_NEW Root(BLANKSTRING);
         
     mStaticPluginLoader.load();
 #else

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreHardwareBuffer.h"
 
 namespace Ogre {
 
@@ -58,7 +59,7 @@ namespace Ogre {
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 
@@ -84,7 +85,7 @@ namespace Ogre {
         void writeData(size_t offset, size_t length, const void* pSource,
                 bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 

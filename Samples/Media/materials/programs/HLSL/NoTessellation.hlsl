@@ -1,6 +1,6 @@
 /**
 *	Modified by: Juan Camilo Acosta Arango (ja0335 )
-*	Date: 09-04-2013
+*	Date: 09-04-2014
 *	Note: This shaders are based one my study over the 
 * 	Eat3D course, "Shader Production - Writing Custom Shaders with CGFX"
 *	http://eat3d.com/shaders_intro

@@ -31,12 +31,13 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 #include "OgreResourceManager.h"
-#include "OgreException.h"
 #include "OgreGpuProgram.h"
 #include "OgreSingleton.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+        //TODO Add documentation and explain rationale of this class.
 
     /** \addtogroup Core
     *  @{

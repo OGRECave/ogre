@@ -32,6 +32,7 @@
 #include "OgreLogManager.h"
 #include "OgrePlugin.h"
 #include "OgreFileSystemLayer.h"
+#include "OgreFrameListener.h"
 #include "OgreOverlaySystem.h"
 
 // Static plugins declaration section
@@ -590,7 +591,7 @@ namespace OgreBites
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             mRoot = Ogre::Root::getSingletonPtr();
 #else
-            Ogre::String pluginsPath = Ogre::StringUtil::BLANK;
+            Ogre::String pluginsPath = Ogre::BLANKSTRING;
 #   ifndef OGRE_STATIC_LIB
             pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
 #   endif

@@ -28,8 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgrePlatformInformation.h"
-#include "OgreLog.h"
-#include "OgreStringConverter.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #include <excpt.h>      // For SEH values
@@ -452,7 +450,7 @@ namespace Ogre {
             char CPUString[0x20];
             char CPUBrandString[0x40];
 
-            StringUtil::StrStreamType detailedIdentStr;
+            StringStream detailedIdentStr;
 
 
             // Has standard feature ?
@@ -464,7 +462,6 @@ namespace Ogre {
                 //*((int*)CPUString) = result._ebx;
                                 memcpy(CPUString, &result._ebx, sizeof(int));
                 //*((int*)(CPUString+4)) = result._edx;
-                                memcpy(CPUString+4, &result._edx, sizeof(int));
                                 //*((int*)(CPUString+8)) = result._ecx;
                                 memcpy(CPUString+8, &result._ecx, sizeof(int));
 
@@ -636,7 +633,27 @@ namespace Ogre {
 #endif
     }
     
-#else   // OGRE_CPU == OGRE_CPU_ARM
+#elif OGRE_CPU == OGRE_CPU_MIPS  // OGRE_CPU == OGRE_CPU_ARM
+
+    //---------------------------------------------------------------------
+    static uint _detectCpuFeatures(void)
+    {
+        // Use preprocessor definitions to determine architecture and CPU features
+        uint features = 0;
+#if defined(__mips_msa)
+        features |= PlatformInformation::CPU_FEATURE_MSA;
+#endif
+        return features;
+    }
+    //---------------------------------------------------------------------
+    static String _detectCpuIdentifier(void)
+    {
+        String cpuID = "MIPS";
+
+        return cpuID;
+    }
+
+#else   // OGRE_CPU == OGRE_CPU_MIPS
 
     //---------------------------------------------------------------------
     static uint _detectCpuFeatures(void)
@@ -723,6 +740,9 @@ namespace Ogre {
 #elif OGRE_CPU == OGRE_CPU_ARM || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         pLog->logMessage(
                 " *     NEON: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_NEON), true));
+#elif OGRE_CPU == OGRE_CPU_MIPS
+        pLog->logMessage(
+                " *      MSA: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MSA), true));#endif
 #endif
         pLog->logMessage("-------------------------");
 

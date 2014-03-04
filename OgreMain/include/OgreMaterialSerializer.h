@@ -29,8 +29,6 @@ THE SOFTWARE.
 #define __MaterialSerializer_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMaterial.h"
-#include "OgreBlendMode.h"
 #include "OgreTextureUnitState.h"
 #include "OgreGpuProgram.h"
 #include "OgreStringVector.h"
@@ -242,27 +240,31 @@ namespace Ogre {
         void writeTechnique(const Technique* pTech);
         void writePass(const Pass* pPass);
         void writeVertexProgramRef(const Pass* pPass);
+        void writeTesselationHullProgramRef(const Pass* pPass);
+        void writeTesselationDomainProgramRef(const Pass* pPass);
         void writeShadowCasterVertexProgramRef(const Pass* pPass);
         void writeShadowCasterFragmentProgramRef(const Pass* pPass);
+        void writeGeometryProgramRef(const Pass* pPass);
         void writeFragmentProgramRef(const Pass* pPass);
         void writeGpuProgramRef(const String& attrib, const GpuProgramPtr& program, const GpuProgramParametersSharedPtr& params);
         void writeGpuPrograms(void);
         void writeGPUProgramParameters(const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-            const unsigned short level = 4, const bool useMainBuffer = true);
+                                       const unsigned short level = 4, const bool useMainBuffer = true);
         void writeNamedGpuProgramParameters(const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-            const unsigned short level = 4, const bool useMainBuffer = true);
+                                            const unsigned short level = 4, const bool useMainBuffer = true);
         void writeLowLevelGpuProgramParameters(const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
-            const unsigned short level = 4, const bool useMainBuffer = true);
+                                               const unsigned short level = 4, const bool useMainBuffer = true);
         void writeGpuProgramParameter(
             const String& commandName, const String& identifier, 
             const GpuProgramParameters::AutoConstantEntry* autoEntry, 
             const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-            bool isFloat, bool isDouble, size_t physicalIndex, size_t physicalSize,
+            bool isFloat, bool isDouble, bool isInt, bool isUnsignedInt, 
+            size_t physicalIndex, size_t physicalSize,
             const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
             const unsigned short level, const bool useMainBuffer);
         void writeTextureUnit(const TextureUnitState *pTex);
         void writeSceneBlendFactor(const SceneBlendFactor c_src, const SceneBlendFactor c_dest, 
-            const SceneBlendFactor a_src, const SceneBlendFactor a_dest);
+                                   const SceneBlendFactor a_src, const SceneBlendFactor a_dest);
         void writeSceneBlendFactor(const SceneBlendFactor sbf_src, const SceneBlendFactor sbf_dest);
         void writeSceneBlendFactor(const SceneBlendFactor sbf);
         void writeCompareFunction(const CompareFunction cf);

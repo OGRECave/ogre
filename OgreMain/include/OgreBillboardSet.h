@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreRadixSort.h"
 #include "OgreCommon.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreRenderQueue.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -722,7 +723,11 @@ namespace Ogre {
         */
         virtual void setBillboardsInWorldSpace(bool ws) { mWorldSpace = ws; }
 
-        /** BillboardSet can use custom texture coordinates for various billboards. 
+        /** Gets whether billboards are treated as being in world space.
+         */
+        bool getBillboardsInWorldSpace() { return mWorldSpace; }
+
+        /** BillboardSet can use custom texture coordinates for various billboards.
             This is useful for selecting one of many particle images out of a tiled 
             texture sheet, or doing flipbook animation within a single texture.
         @par

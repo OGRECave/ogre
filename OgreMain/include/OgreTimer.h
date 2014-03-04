@@ -28,7 +28,6 @@ THE SOFTWARE.
 #ifndef __OgreCommonTimer_H__
 #define __OgreCommonTimer_H__
 
-#include "OgrePrerequisites.h"
 #include "OgrePlatform.h"
 
 //Bring in the specific platform's header file

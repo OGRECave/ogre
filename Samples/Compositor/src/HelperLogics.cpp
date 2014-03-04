@@ -20,6 +20,8 @@ same license as the rest of the engine.
 #include "Compositor/Pass/OgreCompositorPassDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuad.h"
 
+#include "OgreTimer.h"
+
 
 SamplePostprocessWorkspaceListener::SamplePostprocessWorkspaceListener() :
     start( 0 ),

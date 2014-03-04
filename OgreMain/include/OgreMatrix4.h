@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 //#include "Math/Array/OgreArrayConfig.h"
 
-#include "OgreVector3.h"
 #include "OgreMatrix3.h"
 #include "OgreVector4.h"
 #include "OgrePlane.h"

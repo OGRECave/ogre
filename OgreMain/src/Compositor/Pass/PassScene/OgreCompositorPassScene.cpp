@@ -101,6 +101,10 @@ namespace Ogre
         if( lodCamera && mCamera == mLodCamera )
             usedLodCamera = lodCamera;
 
+		//Let the code receive valid camera->getLastViewport() return values.
+		mCamera->_notifyViewport( mViewport );
+		const_cast<Camera*>(usedLodCamera)->_notifyViewport( mViewport ); //TODO: Ugly const_cast
+
         //Call beginUpdate if we're the first to use this RT
         if( mDefinition->mBeginRtUpdate )
             mTarget->_beginUpdate();

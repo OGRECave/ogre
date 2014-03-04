@@ -6,9 +6,9 @@ SamplerState g_samLinear
 	AddressW = Wrap;
 };
 
-uniform Texture2D sMRT1; // fragment normals
-uniform Texture2D sMRT2; // view space position, remember that we are looking down the negative Z axis!!!
-uniform Texture2D sRand; // MxN random texture, M sets of N precomputed low-discrepancy samples
+Texture2D sMRT1 : register(s0); // fragment normals
+Texture2D sMRT2 : register(s1); // view space position, remember that we are looking down the negative Z axis!!!
+Texture2D sRand : register(s2); // MxN random texture, M sets of N precomputed low-discrepancy samples
 
 struct v2p
 {
@@ -53,8 +53,7 @@ float4 HemisphereMC_fp
         return float4(1.0,1.0,1.0,1.0);
     }
     
-
-    float accessibility = 0; // accessibility of the fragment
+	float accessibility = 0; // accessibility of the fragment
 
     const float3 viewVector = float3(0, 0, 1); // the constant view vector in view space
 

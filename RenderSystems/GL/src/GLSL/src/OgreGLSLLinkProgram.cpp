@@ -117,6 +117,7 @@ namespace Ogre {
         , mUniformRefsBuilt(false)
         , mLinked(false)
         , mTriedToLinkAndFailed(false)
+        , mSkeletalAnimation(false)
     {
         // Initialise uniform cache
         mUniformCache = new GLUniformCache();
@@ -410,7 +411,7 @@ namespace Ogre {
                     case GCT_SAMPLER1DSHADOW:
                     case GCT_SAMPLER2D:
                     case GCT_SAMPLER2DSHADOW:
-                    case GCT_SAMPLER2DARRAY:
+                                        case GCT_SAMPLER2DARRAY:
                     case GCT_SAMPLER3D:
                     case GCT_SAMPLERCUBE:
                         // samplers handled like 1-element ints
@@ -584,17 +585,6 @@ namespace Ogre {
         glGetObjectParameterivARB( mGLHandle, GL_OBJECT_LINK_STATUS_ARB, &mLinked );
         mTriedToLinkAndFailed = !mLinked;
 
-        if(mTriedToLinkAndFailed == true)
-        {
-            GLchar *msg = NULL;
-            GLint length;
-            glGetProgramiv(mGLHandle, GL_INFO_LOG_LENGTH, &length);
-            msg = new GLchar[length];
-            glGetProgramInfoLog(mGLHandle, length, NULL, msg);
-            logObjectInfo( getCombinedName() + String(", Error linking program: ") + msg, mGLHandle );
-            delete msg;
-        }
-        
         // force logging and raise exception if not linked
         GLenum glErr = glGetError();
         if(glErr != GL_NO_ERROR)

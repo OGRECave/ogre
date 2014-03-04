@@ -27,12 +27,13 @@ THE SOFTWARE.
 
 #include "OgreShaderProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreConfigFile.h"
 #include "OgreShaderRenderState.h"
 #include "OgreShaderProgramSet.h"
+#include "OgreShaderProgram.h"
 #include "OgreShaderGenerator.h"
 #include "OgrePass.h"
 #include "OgreLogManager.h"
+#include "OgreHighLevelGpuProgram.h"
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #include "OgreShaderCGProgramWriter.h"
 #include "OgreShaderHLSLProgramWriter.h"
@@ -105,7 +106,7 @@ void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
     {
         OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
             "Could not create gpu programs from render state ", 
-            "ProgramManager::acquireGpuPrograms" );
+                        "ProgramManager::acquireGpuPrograms" );
     }   
 
     // Bind the created GPU programs to the target pass.
@@ -123,29 +124,35 @@ void ProgramManager::releasePrograms(Pass* pass, TargetRenderState* renderState)
 {
     ProgramSet* programSet = renderState->getProgramSet();
 
-    pass->setVertexProgram(StringUtil::BLANK);
-    pass->setFragmentProgram(StringUtil::BLANK);
-
-    GpuProgramsMapIterator itVsGpuProgram = mVertexShaderMap.find(programSet->getGpuVertexProgram()->getName());
-    GpuProgramsMapIterator itFsGpuProgram = mFragmentShaderMap.find(programSet->getGpuFragmentProgram()->getName());
-
-    renderState->destroyProgramSet();
-
-    if (itVsGpuProgram != mVertexShaderMap.end())
+    if (programSet != NULL)
     {
-        if (itVsGpuProgram->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+        pass->setVertexProgram(BLANKSTRING);
+        pass->setFragmentProgram(BLANKSTRING);
+
+        GpuProgramPtr vsProgram(programSet->getGpuVertexProgram());
+        GpuProgramPtr psProgram(programSet->getGpuFragmentProgram());
+
+        GpuProgramsMapIterator itVsGpuProgram = vsProgram.isNull() ? mVertexShaderMap.end() : mVertexShaderMap.find(vsProgram->getName());
+        GpuProgramsMapIterator itFsGpuProgram = psProgram.isNull() ? mFragmentShaderMap.end() : mFragmentShaderMap.find(psProgram->getName());
+
+        renderState->destroyProgramSet();
+
+        if (itVsGpuProgram != mVertexShaderMap.end())
         {
-            destroyGpuProgram(itVsGpuProgram->second);
-            mVertexShaderMap.erase(itVsGpuProgram);
+            if (itVsGpuProgram->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+            {
+                destroyGpuProgram(itVsGpuProgram->second);
+                mVertexShaderMap.erase(itVsGpuProgram);
+            }
         }
-    }
 
-    if (itFsGpuProgram != mFragmentShaderMap.end())
-    {
-        if (itFsGpuProgram->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+        if (itFsGpuProgram != mFragmentShaderMap.end())
         {
-            destroyGpuProgram(itFsGpuProgram->second);
-            mFragmentShaderMap.erase(itFsGpuProgram);
+            if (itFsGpuProgram->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+            {
+                destroyGpuProgram(itFsGpuProgram->second);
+                mFragmentShaderMap.erase(itFsGpuProgram);
+            }
         }
     }
 }
@@ -480,7 +487,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
                 }
             }
 
-            pGpuProgram->setParameter("enable_backwards_compatibility", "true");
+            pGpuProgram->setParameter("enable_backwards_compatibility", "false");
             pGpuProgram->setParameter("column_major_matrices", StringConverter::toString(shaderProgram->getUseColumnMajorMatrices()));
         }
         

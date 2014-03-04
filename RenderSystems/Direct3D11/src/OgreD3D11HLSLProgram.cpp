@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreRoot.h"
+#include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreD3D11Mappings.h"
 #include "OgreGpuProgramManager.h"
@@ -148,68 +149,72 @@ namespace Ogre {
 
         defines.clear();
 
-        if (stringBuffer.empty())
-            return;
-
-        // Split preprocessor defines and build up macro array
-        D3D_SHADER_MACRO macro;
-        String::size_type pos = 0;
-        while (pos != String::npos)
+        if (!stringBuffer.empty())
         {
-            macro.Name = &stringBuffer[pos];
-            macro.Definition = 0;
-
-            String::size_type start_pos=pos;
-
-            // Find delims
-            pos = stringBuffer.find_first_of(";,=", pos);
-
-            if(start_pos==pos)
+            // Split preprocessor defines and build up macro array
+            D3D_SHADER_MACRO macro;
+            String::size_type pos = 0;
+            while (pos != String::npos)
             {
-                if(pos==stringBuffer.length())
-                {
-                    break;
-                }
-                pos++;
-                continue;
-            }
+                macro.Name = &stringBuffer[pos];
+                macro.Definition = 0;
 
-            if (pos != String::npos)
-            {
-                // Check definition part
-                if (stringBuffer[pos] == '=')
+                String::size_type start_pos=pos;
+
+                // Find delims
+                pos = stringBuffer.find_first_of(";,=", pos);
+
+                if(start_pos==pos)
                 {
-                    // Setup null character for macro name
-                    stringBuffer[pos++] = '\0';
-                    macro.Definition = &stringBuffer[pos];
-                    pos = stringBuffer.find_first_of(";,", pos);
-                }
-                else
-                {
-                    // No definition part, define as "1"
-                    macro.Definition = "1";
+                    if(pos==stringBuffer.length())
+                    {
+                        break;
+                    }
+                    pos++;
+                    continue;
                 }
 
                 if (pos != String::npos)
                 {
-                    // Setup null character for macro name or definition
-                    stringBuffer[pos++] = '\0';
+                    // Check definition part
+                    if (stringBuffer[pos] == '=')
+                    {
+                        // Setup null character for macro name
+                        stringBuffer[pos++] = '\0';
+                        macro.Definition = &stringBuffer[pos];
+                        pos = stringBuffer.find_first_of(";,", pos);
+                    }
+                    else
+                    {
+                        // No definition part, define as "1"
+                        macro.Definition = "1";
+                    }
+
+                    if (pos != String::npos)
+                    {
+                        // Setup null character for macro name or definition
+                        stringBuffer[pos++] = '\0';
+                    }
                 }
-            }
-            else
-            {
-                macro.Definition = "1";
-            }
-            if(strlen(macro.Name)>0)
-            {
-                defines.push_back(macro);
-            }
-            else
-            {
-                break;
+                else
+                {
+                    macro.Definition = "1";
+                }
+                if(strlen(macro.Name)>0)
+                {
+                    defines.push_back(macro);
+                }
+                else
+                {
+                    break;
+                }
             }
         }
 
+        //Add D3D11 define to all program, compiled with D3D11 RenderSystem
+        D3D_SHADER_MACRO macro = {"D3D11","1"};
+        defines.push_back(macro);       
+        
         // Add NULL terminator
         macro.Name = 0;
         macro.Definition = 0;
@@ -1180,7 +1185,10 @@ namespace Ogre {
     void D3D11HLSLProgram::createLowLevelImpl(void)
     {
         // Create a low-level program, give it the same name as us
-        mAssemblerProgram =GpuProgramPtr(dynamic_cast<GpuProgram*>(this));
+        if(mAssemblerProgram.get() != this)
+        {
+            mAssemblerProgram =GpuProgramPtr(dynamic_cast<GpuProgram*>(this));
+        }
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::unloadHighLevelImpl(void)
@@ -1512,7 +1520,25 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::setTarget(const String& target)
     {
-        mTarget = target;
+        mTarget = "";
+        vector<String>::type profiles = StringUtil::split(target, " ");
+        for(int i = 0 ; i < profiles.size() ; i++)
+        {
+            String & currentProfile = profiles[i];
+            if(GpuProgramManager::getSingleton().isSyntaxSupported(currentProfile))
+            {
+                mTarget = currentProfile;
+                break;
+            }
+        }
+
+        if(mTarget == "")
+        {
+            LogManager::getSingleton().logMessage(
+                "Invalid target for D3D11 shader '" + mName + "' - '" + target + "'");
+        }
+
+
     }
     //-----------------------------------------------------------------------
     const String& D3D11HLSLProgram::getCompatibleTarget(void) const

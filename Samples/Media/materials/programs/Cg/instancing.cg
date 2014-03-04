@@ -1,0 +1,55 @@
+
+
+void instancing_vp(uniform float3x4   worldMatrix3x4Array[80], float4 position : POSITION,
+						float3 normal : NORMAL,
+						float2 uv : TEXCOORD0,
+						float index : TEXCOORD1,
+						uniform float4x4 viewProjectionMatrix,
+						uniform float4 lightPos,
+						uniform float4 ambient,
+						uniform float4 lightDiffuseColour,
+						out float4 oPosition : POSITION,
+						out float2 oUv : TEXCOORD0,
+						out float4 Color : COLOR )
+{
+	// transform by indexed matrix
+	float4 transformedPos = float4(mul(worldMatrix3x4Array[index], position).xyz, 1.0);
+	
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, transformedPos);
+	oUv = uv;
+
+	float3 norm = mul((float3x3)worldMatrix3x4Array[index], normal);
+	
+	float3 lightDir = 	normalize(
+		lightPos.xyz -  (transformedPos.xyz * lightPos.w));
+
+	Color = ambient + saturate(dot(lightDir, norm)) * lightDiffuseColour;
+	
+	
+}
+
+/*
+  Instancing shadow-caster pass
+*/
+void instancingCaster_vp(
+	float4 position : POSITION,
+	float3 normal   : NORMAL,
+	float index     : TEXCOORD1,
+
+	out float4 oPosition : POSITION,
+	out float4 colour    : COLOR,
+	// Support up to 80 bones of float3x4
+	uniform float3x4   worldMatrix3x4Array[80],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	// transform by indexed matrix
+	float4 transformedPos = float4(mul(worldMatrix3x4Array[index], position).xyz, 1.0);
+
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, transformedPos);
+	
+	colour = ambient;
+	
+}

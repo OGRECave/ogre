@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __InstanceBatchHW_VTF_H__
 
 #include "OgreInstanceBatchVTF.h"
-#include "OgreTexture.h"
 
 namespace Ogre
 {

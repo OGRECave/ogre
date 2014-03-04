@@ -28,9 +28,17 @@ THE SOFTWARE.
 #define _ShaderProgramWriterGLSLES_
 
 #include "OgreShaderProgramWriterManager.h"
+#include "OgreShaderProgramWriter.h"
+#include "OgreShaderParameter.h"
+#include "OgreStringVector.h"
 
 namespace Ogre {
 namespace RTShader {
+
+    class Function;
+    class FunctionInvocation;
+    class Operand;
+    class Program;
 
 /** \addtogroup Core
 *  @{
@@ -121,7 +129,7 @@ protected:
     StringMap                   mDefinesMap;                    // Map of #defines and the function library that contains them
     ParamContentToStringMap     mContentToPerVertexAttributes;  // Map parameter content to vertex attributes
     int                         mGLSLVersion;                   // Holds the current glsl es version
-    StringVector                mFragInputParams;               // Holds the fragment input params 
+    StringVector                mFragInputParams;               // Holds the fragment input params
     StringMap                   mCachedFunctionLibraries;       // Holds the cached function libraries
 };
 
@@ -131,9 +139,8 @@ protected:
 class ShaderProgramWriterGLSLESFactory : public ProgramWriterFactory
 {
 public:
-    ShaderProgramWriterGLSLESFactory()
+    ShaderProgramWriterGLSLESFactory() : mLanguage("glsles")
     {
-        mLanguage = "glsles";
     }
     virtual ~ShaderProgramWriterGLSLESFactory() {}
 

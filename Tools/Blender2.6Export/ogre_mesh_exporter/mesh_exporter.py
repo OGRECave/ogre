@@ -106,6 +106,8 @@ def exportMesh(meshObject, filepath):
 			meshXMLConverterSettings = MeshXMLConverterSettings.fromRNA(meshObject)
 
 		# get linked armature
+		armatureObject = None
+		ogreSkeleton = None
 		parentObject = meshObject.parent
 		if (parentObject and meshObject.parent_type == 'ARMATURE'):
 			armatureObject = parentObject

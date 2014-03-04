@@ -38,8 +38,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreException.h"
-#include "OgreString.h"
-#include <algorithm>
 #include <typeinfo>
 #include "OgreHeaderPrefix.h"
 
@@ -205,7 +203,7 @@ namespace Ogre
             }
             else
             {
-                StringUtil::StrStreamType str;
+                StringStream str;
                 str << "Bad cast from type '" << getType().name() << "' "
                     << "to '" << typeid(ValueType).name() << "'";
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -229,7 +227,7 @@ namespace Ogre
             }
             else
             {
-                StringUtil::StrStreamType str;
+                StringStream str;
                 str << "Bad cast from type '" << getType().name() << "' "
                     << "to '" << typeid(ValueType).name() << "'";
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -421,7 +419,7 @@ namespace Ogre
         const ValueType * result = any_cast<ValueType>(&operand);
         if(!result)
         {
-            StringUtil::StrStreamType str;
+            StringStream str;
             str << "Bad cast from type '" << operand.getType().name() << "' "
                 << "to '" << typeid(ValueType).name() << "'";
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,

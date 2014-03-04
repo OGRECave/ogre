@@ -28,8 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreSimpleRenderable.h"
 #include "OgreException.h"
-#include "OgreSceneNode.h"
-
+#include "OgreRenderQueue.h"
 #include "OgreMaterialManager.h"
 
 namespace Ogre {
@@ -37,7 +36,7 @@ namespace Ogre {
     uint SimpleRenderable::msGenNameCount = 0;
 
     SimpleRenderable::SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager )
-    : MovableObject( id, objectMemoryManager )
+		: MovableObject( id, objectMemoryManager, Ogre::RENDER_QUEUE_MAIN )
     , mWorldTransform(Matrix4::IDENTITY)
     , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))

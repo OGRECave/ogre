@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreTextureManager.h"
-#include "OgreException.h"
 #include "OgrePixelFormat.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"

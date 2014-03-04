@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLPlugin.h"
 #include "OgreRoot.h"
+#include "OgreGLRenderSystem.h"
 
 namespace Ogre 
 {
@@ -46,7 +47,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GLPlugin::install()
     {
-        mRenderSystem = new GLRenderSystem();
+        mRenderSystem = OGRE_NEW GLRenderSystem();
 
         Root::getSingleton().addRenderSystem(mRenderSystem);
     }
@@ -63,10 +64,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GLPlugin::uninstall()
     {
-        delete mRenderSystem;
+        OGRE_DELETE mRenderSystem;
         mRenderSystem = 0;
-
     }
-
-
 }

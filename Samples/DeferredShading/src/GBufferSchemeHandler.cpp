@@ -14,8 +14,8 @@ same license as the rest of the engine.
 
 #include "GBufferSchemeHandler.h"
 
-#include <OgreMaterialManager.h>
-#include <OgreTechnique.h>
+#include "OgreMaterialManager.h"
+#include "OgreTechnique.h"
 
 using namespace Ogre;
 

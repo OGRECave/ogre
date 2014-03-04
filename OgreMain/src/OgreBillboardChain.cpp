@@ -32,14 +32,13 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreBillboardChain.h"
 
-#include "OgreSimpleRenderable.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreNode.h"
 #include "OgreCamera.h"
 #include "OgreRoot.h"
 #include "OgreMaterialManager.h"
 #include "OgreLogManager.h"
-#include "OgreStringConverter.h"
+#include "OgreViewport.h"
 
 #include <limits>
 
@@ -66,7 +65,7 @@ namespace Ogre {
     BillboardChain::BillboardChain( IdType id, ObjectMemoryManager *objectMemoryManager,
             size_t maxElements, size_t numberOfChains, bool useTextureCoords,
             bool useColours, bool dynamic )
-        :MovableObject( id, objectMemoryManager ),
+        :MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
         mMaxElementsPerChain(maxElements),
         mChainCount(numberOfChains),
         mUseTexCoords(useTextureCoords),
@@ -715,7 +714,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Can't assign material " + name +
                 " to BillboardChain " + mName + " because this "
                 "Material does not exist. Have you forgotten to define it in a "
-                ".material script?");
+                ".material script?", LML_CRITICAL);
             mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting");
             if (mMaterial.isNull())
             {
@@ -740,17 +739,17 @@ namespace Ogre {
 
         if (mIndexData->indexCount > 0)
             queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
-    }
-    //-----------------------------------------------------------------------
-    void BillboardChain::getRenderOperation(RenderOperation& op)
-    {
-        op.indexData = mIndexData;
-        op.operationType = RenderOperation::OT_TRIANGLE_LIST;
-        op.srcRenderable = this;
-        op.useIndexes = true;
-        op.vertexData = mVertexData;
-    }
-    //-----------------------------------------------------------------------
+	}
+	//-----------------------------------------------------------------------
+	void BillboardChain::getRenderOperation(RenderOperation& op)
+	{
+		op.indexData = mIndexData;
+		op.operationType = RenderOperation::OT_TRIANGLE_LIST;
+		op.srcRenderable = this;
+		op.useIndexes = true;
+		op.vertexData = mVertexData;
+	}
+	//-----------------------------------------------------------------------
     bool BillboardChain::preRender(SceneManager* sm, RenderSystem* rsys)
     {
         // Retrieve the current viewport from the scene manager.

@@ -29,11 +29,8 @@ THE SOFTWARE.
 #define __Technique_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreBlendMode.h"
 #include "OgreCommon.h"
 #include "OgrePass.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreRenderSystemCapabilities.h"
 #include "OgreUserObjectBindings.h"
 
@@ -153,9 +150,9 @@ namespace Ogre {
         */
         String _compile(bool autoManageTextureUnits);
         /// Internal method for checking GPU vendor / device rules
-        bool checkGPURules(StringUtil::StrStreamType& errors);
+        bool checkGPURules(StringStream& errors);
         /// Internal method for checking hardware support
-        bool checkHardwareSupport(bool autoManageTextureUnits, StringUtil::StrStreamType& compileErrors);
+        bool checkHardwareSupport(bool autoManageTextureUnits, StringStream& compileErrors);
         /** Internal method for splitting the passes into illumination passes. */        
         void _compileIlluminationPasses(void);
         size_t calculateSize(void) const;

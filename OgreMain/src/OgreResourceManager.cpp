@@ -29,10 +29,6 @@ THE SOFTWARE.
 #include "OgreResourceManager.h"
 
 #include "OgreException.h"
-#include "OgreArchive.h"
-#include "OgreArchiveManager.h"
-#include "OgreStringVector.h"
-#include "OgreStringConverter.h"
 #include "OgreResourceGroupManager.h"
 
 namespace Ogre {
@@ -430,7 +426,7 @@ namespace Ogre {
                 {
                     ResourceWithGroupMap::iterator iter = mResourcesWithGroup.begin();
                     ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
-                    for ( ; iter != iterE ; iter++ )
+                    for ( ; iter != iterE ; ++iter )
                     {
                         ResourceMap::iterator resMapIt = iter->second.find(name);
 
@@ -472,9 +468,8 @@ namespace Ogre {
     {
         if (getMemoryUsage() > mMemoryBudget)
         {
-                    OGRE_LOCK_AUTO_MUTEX;
+            OGRE_LOCK_AUTO_MUTEX;
             // unload unreferenced resources until we are within our budget again
-            const bool reloadableOnly = true;
             ResourceMap::iterator i, iend;
             iend = mResources.end();
             for (i = mResources.begin(); i != iend && getMemoryUsage() > mMemoryBudget; ++i)
@@ -484,7 +479,7 @@ namespace Ogre {
                 if (i->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS)
                 {
                     Resource* res = i->second.get();
-                    if (!reloadableOnly || res->isReloadable())
+                    if (res->isReloadable())
                     {
                         res->unload();
                     }

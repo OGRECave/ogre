@@ -30,10 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreString.h"
-#include "OgreTextureManager.h"
-#include "OgreViewport.h"
-#include "OgreTimer.h"
+#include "OgrePixelFormat.h"
 #include "OgreHeaderPrefix.h"
 
 /* Define the number of priority groups for the render system's render targets. */
@@ -80,6 +77,7 @@ namespace Ogre {
         {
             size_t triangleCount;
             size_t batchCount;
+            int vBlankMissCount; // -1 means that the value is not applicable
         };
 
         enum FrameBuffer

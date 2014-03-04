@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreScriptLoader.h"
 #include "OgreSceneManager.h"
+#include "OgreResourceManager.h"
 
 namespace Ogre {
 
@@ -566,7 +567,7 @@ namespace Ogre {
         for( StringVector::iterator it = vec->begin(); it != vec->end(); ++it )
             grp->addToIndex(*it, pArch);
         
-        StringUtil::StrStreamType msg;
+        StringStream msg;
         msg << "Added resource location '" << name << "' of type '" << locType
             << "' to resource group '" << resGroup << "'";
         if (recursive)
@@ -1902,7 +1903,7 @@ namespace Ogre {
         }
 
         OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME); // lock group mutex
-        grp->worldGeometry = StringUtil::BLANK;
+        grp->worldGeometry = BLANKSTRING;
         grp->worldGeometrySceneManager = 0;
     }
     //-----------------------------------------------------------------------

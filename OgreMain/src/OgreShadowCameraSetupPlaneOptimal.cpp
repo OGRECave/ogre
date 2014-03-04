@@ -28,13 +28,11 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreCommon.h"
-#include "OgreSceneManager.h"
 #include "OgreLight.h"
 #include "OgreShadowCameraSetupPlaneOptimal.h"
 #include "OgreNumerics.h"
 #include "OgreCamera.h"
-#include "OgreViewport.h"
-
+#include "OgreMovablePlane.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do a lot of PreciseReal -> Real in here, casting is messy

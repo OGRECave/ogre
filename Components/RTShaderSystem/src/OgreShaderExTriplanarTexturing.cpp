@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
+#include "OgrePass.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -54,8 +55,8 @@ namespace RTShader {
         // Resolve output vertex shader normal.
         mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
 
-    // Resolve pixel shader output diffuse color.
-    mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        // Resolve pixel shader output diffuse color.
+        mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 
         // Resolve input pixel shader normal.
         mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
@@ -66,7 +67,6 @@ namespace RTShader {
         // Resolve input vertex shader normal.
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 
-        mVSInPosition  = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
         mVSOutPosition = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
         mPSInPosition = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
             mVSOutPosition->getIndex(), 
@@ -244,13 +244,13 @@ namespace RTShader {
                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
-                it++;
+                ++it;
                 if (false == SGScriptTranslator::getFloat(*it, parameters + 1))
                 {
                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
-                it++;
+                ++it;
                 if (false == SGScriptTranslator::getFloat(*it, parameters + 2))
                 {
                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);

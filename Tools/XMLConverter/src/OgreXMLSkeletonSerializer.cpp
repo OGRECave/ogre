@@ -524,7 +524,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     // 
-    // Modifications effectuÃ©es:
+    // Modifications effectuées:
     //
     // on stoque les noms et pas les Id. c'est plus lisibles.
 

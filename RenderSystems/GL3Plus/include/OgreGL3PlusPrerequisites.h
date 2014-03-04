@@ -30,21 +30,24 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreLogManager.h"
+
 namespace Ogre {
     // Forward declarations
     class GL3PlusSupport;
     class GL3PlusRenderSystem;
     class GL3PlusTexture;
     class GL3PlusTextureManager;
-    class GL3PlusGpuProgram;
     class GL3PlusContext;
     class GL3PlusRTTManager;
     class GL3PlusFBOManager;
     class GL3PlusHardwarePixelBuffer;
     class GL3PlusRenderBuffer;
     class GL3PlusDepthBuffer;
+    
+    class GLSLShader;
 
-    typedef SharedPtr<GL3PlusGpuProgram> GL3PlusGpuProgramPtr;
+    typedef SharedPtr<GLSLShader> GLSLShaderPtr;
     typedef SharedPtr<GL3PlusTexture> GL3PlusTexturePtr;
 }
 
@@ -104,8 +107,9 @@ namespace Ogre {
 #   define __PRETTY_FUNCTION__ __FUNCTION__
 #endif
 
-#define ENABLE_GL_CHECK 0
+#define ENABLE_GL_CHECK 1
 #if ENABLE_GL_CHECK
+#include "OgreStringVector.h"
 #define OGRE_CHECK_GL_ERROR(glFunc) \
 { \
     glFunc; \
@@ -125,7 +129,7 @@ namespace Ogre {
         char msgBuf[4096]; \
         StringVector tokens = StringUtil::split(#glFunc, "("); \
         sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, tokens[0].c_str()); \
-        LogManager::getSingleton().logMessage(msgBuf); \
+        LogManager::getSingleton().logMessage(msgBuf, LML_CRITICAL); \
     } \
 }
 #else

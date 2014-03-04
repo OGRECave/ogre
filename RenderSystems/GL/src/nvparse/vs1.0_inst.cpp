@@ -960,7 +960,7 @@ int VS10Inst::Translate()
     int ninstr = 0;
 
 #if DEBUGGING_PURPOSES
-    char mystr[16];
+    char mystr[32];
     if ( instid == VS10_HEADER )
     {
         sprintf( mystr, "%d:\tvs.1.0 (skip)\n", line );

@@ -198,9 +198,6 @@ protected:
     /** Delete parameter from a given list */
     void deleteParameter(ShaderParameterList& parameterList, ParameterPtr parameter);
 
-    /** Function atom comparison function used to sort atoms. */
-    static int sAtomInstanceCompare(const void * p0, const void *p1);
-
 protected:
     // Function name.
     String mName;

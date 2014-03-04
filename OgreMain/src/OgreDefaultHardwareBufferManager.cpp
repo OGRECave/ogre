@@ -62,7 +62,7 @@ namespace Ogre {
         // Nothing to do
     }
     //-----------------------------------------------------------------------
-    void* DefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* DefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -113,7 +113,7 @@ namespace Ogre {
         // Nothing to do
     }
     //-----------------------------------------------------------------------
-    void* DefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* DefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -170,7 +170,7 @@ namespace Ogre {
     }
     */
     //-----------------------------------------------------------------------
-    void* DefaultHardwareUniformBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* DefaultHardwareUniformBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -226,7 +226,7 @@ namespace Ogre {
      }
      */
     //-----------------------------------------------------------------------
-    void* DefaultHardwareCounterBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* DefaultHardwareCounterBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;

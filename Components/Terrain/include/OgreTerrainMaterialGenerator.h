@@ -31,8 +31,7 @@ THE SOFTWARE.
 
 #include "OgreTerrainPrerequisites.h"
 #include "OgrePixelFormat.h"
-#include "OgreMaterial.h"
-#include "OgreTexture.h"
+#include "OgreSharedPtr.h"
 
 namespace Ogre
 {
@@ -86,7 +85,10 @@ namespace Ogre
                 elementCount == e.elementCount;
         }
 
-        TerrainLayerSamplerElement() {}
+        TerrainLayerSamplerElement() : 
+            source(0), semantic(TLSS_ALBEDO), elementStart(0), elementCount(0)
+        {}
+
         TerrainLayerSamplerElement(uint8 src, TerrainLayerSamplerSemantic sem,
             uint8 elemStart, uint8 elemCount)
             : source(src), semantic(sem), elementStart(elemStart), elementCount(elemCount)
@@ -109,7 +111,10 @@ namespace Ogre
             return alias == s.alias && format == s.format;
         }
 
-        TerrainLayerSampler() {}
+        TerrainLayerSampler()
+            : alias(""), format(PF_UNKNOWN)
+        {
+        }
 
         TerrainLayerSampler(const String& aliasName, PixelFormat fmt)
             : alias(aliasName), format(fmt)

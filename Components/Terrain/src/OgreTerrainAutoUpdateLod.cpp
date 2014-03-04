@@ -27,27 +27,13 @@ THE SOFTWARE.
 */
 #include "OgreTerrain.h"
 #include "OgreTerrainQuadTreeNode.h"
-#include "OgreStreamSerialiser.h"
-#include "OgreMath.h"
-#include "OgreImage.h"
-#include "OgrePixelFormat.h"
+#include "OgreCamera.h"
 #include "OgreSceneManager.h"
-#include "OgreSceneNode.h"
-#include "OgreException.h"
-#include "OgreBitwise.h"
-#include "OgreStringConverter.h"
 #include "OgreViewport.h"
 #include "OgreLogManager.h"
-#include "OgreHardwarePixelBuffer.h"
-#include "OgreTextureManager.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreRay.h"
-#include "OgrePlane.h"
-#include "OgreTerrainMaterialGeneratorA.h"
-#include "OgreMaterialManager.h"
-#include "OgreHardwareBufferManager.h"
-#include "OgreDeflate.h"
 #include "OgreTerrainAutoUpdateLod.h"
 
 /*
@@ -100,10 +86,10 @@ namespace Ogre
     {
         if (!node->isLeaf())
         {
-            int ret, tmp = -1;
+            int tmp = -1;
             for (int i = 0; i < 4; ++i)
             {
-                ret = traverseTreeByDistance(node->getChild(i), cam, cFactor, holdDistance);
+                int ret = traverseTreeByDistance(node->getChild(i), cam, cFactor, holdDistance);
                 if (ret != -1)
                 {
                     if (tmp == -1 || ret < tmp)

@@ -30,11 +30,11 @@ THE SOFTWARE.
 #define __SCRIPTCOMPILER_H_
 
 #include "OgreSharedPtr.h"
-#include "OgreMaterial.h"
-#include "OgreHighLevelGpuProgram.h"
-#include "OgreScriptLoader.h"
-#include "OgreAny.h"
 #include "OgreSingleton.h"
+#include "OgreScriptLoader.h"
+#include "OgreGpuProgram.h"
+#include "OgreAny.h"
+#include "Threading/OgreThreadHeaders.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -858,6 +858,7 @@ namespace Ogre
                     ID_DEPTH_FAIL_OP,
                     ID_PASS_OP,
                     ID_TWO_SIDED,
+            ID_READ_BACK_AS_TEXTURE,
 
         ID_SHADOW_NODE,
             ID_NUM_SPLITS,
@@ -877,16 +878,16 @@ namespace Ogre
 #endif
         /// Suport for shader model 5.0
         // More program IDs
-        ID_TESSELATION_HULL_PROGRAM,
-        ID_TESSELATION_DOMAIN_PROGRAM,
+        ID_TESSELLATION_HULL_PROGRAM,
+        ID_TESSELLATION_DOMAIN_PROGRAM,
         ID_COMPUTE_PROGRAM,
-        ID_TESSELATION_HULL_PROGRAM_REF,
-        ID_TESSELATION_DOMAIN_PROGRAM_REF,
+        ID_TESSELLATION_HULL_PROGRAM_REF,
+        ID_TESSELLATION_DOMAIN_PROGRAM_REF,
         ID_COMPUTE_PROGRAM_REF,
         // More binding IDs
         ID_GEOMETRY,
-        ID_TESSELATION_HULL,
-        ID_TESSELATION_DOMAIN,
+        ID_TESSELLATION_HULL,
+        ID_TESSELLATION_DOMAIN,
         ID_COMPUTE,
 
         // Support for subroutine

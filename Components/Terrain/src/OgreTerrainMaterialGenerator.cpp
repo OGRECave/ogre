@@ -27,18 +27,17 @@ THE SOFTWARE.
 */
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreRoot.h"
-#include "OgreSceneManager.h"
-#include "OgreSceneManagerEnumerator.h"
+#include "OgreHardwarePixelBuffer.h"
 #include "OgreTextureManager.h"
 #include "OgreTexture.h"
 #include "OgreTerrain.h"
 #include "OgreManualObject.h"
 #include "OgreCamera.h"
 #include "OgreViewport.h"
-#include "OgreRenderTexture.h"
-#include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
-
+#include "OgreRenderTarget.h"
+#include "OgreRenderTexture.h"
+#include "OgreSceneNode.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
@@ -118,6 +117,8 @@ namespace Ogre
 
             // Just in case material relies on light auto params
             mCompositeMapLight = mCompositeMapSM->createLight();
+			SceneNode *lightNode = mCompositeMapSM->getRootSceneNode()->createChildSceneNode();
+			lightNode->attachObject( mCompositeMapLight );
             mCompositeMapLight->setType(Light::LT_DIRECTIONAL);
 
             RenderSystem* rSys = Root::getSingleton().getRenderSystem();

@@ -32,6 +32,9 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
 #include "OgreTechnique.h"
+#include "OgreLogManager.h"
+#include "OgreShaderGenerator.h"
+#include "OgreShaderFFPTexturing.h"
 
 #define SGX_LIB_TEXTURE_ATLAS "SGXLib_TextureAtlas"
 
@@ -66,6 +69,7 @@ TextureAtlasSampler::TextureAtlasSampler() :
     mIsTableDataUpdated(false),
     mAutoAdjustPollPosition(true)
 {
+    mTextureAddressings->u = mTextureAddressings->v = mTextureAddressings->w = TextureUnitState::TAM_UNKNOWN;
     memset(mIsAtlasTextureUnits, 0, sizeof(bool) * TAS_MAX_TEXTURES);
 }
 
@@ -190,6 +194,9 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
             ParameterPtr texcoord = psMain->getParameterByContent(inpParams, (Parameter::Content)(Parameter::SPC_TEXTURE_COORDINATE0 + j), GCT_FLOAT2);
             ParameterPtr texel = psMain->getParameterByName(localParams, c_ParamTexel + Ogre::StringConverter::toString(j));
             UniformParameterPtr sampler = psProgram->getParameterByType(GCT_SAMPLER2D, j);
+            UniformParameterPtr samplerState;
+            if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+                samplerState = psProgram->getParameterByType(GCT_SAMPLER_STATE, j);
                 
             const char* addressUFuncName = getAdressingFunctionName(mTextureAddressings[j].u);
             const char* addressVFuncName = getAdressingFunctionName(mTextureAddressings[j].v);
@@ -210,10 +217,18 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
                 curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_OUT, Operand::OPM_Y);
                 psMain->addAtomInstance(curFuncInvocation);
 
+                bool isHLSL = Ogre::RTShader::ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
+                
+                if (isHLSL)
+                    FFPTexturing::AddTextureSampleWrapperInvocation(sampler,samplerState,GCT_SAMPLER2D,psMain,groupOrder,internalCounter);
+
                 //sample the texel color
                 curFuncInvocation = OGRE_NEW FunctionInvocation(
                     mAutoAdjustPollPosition ? SGX_FUNC_ATLAS_SAMPLE_AUTO_ADJUST : SGX_FUNC_ATLAS_SAMPLE_NORMAL, groupOrder, internalCounter++);
-                curFuncInvocation->pushOperand(sampler, Operand::OPS_IN);
+                if (isHLSL)
+                    curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(GCT_SAMPLER2D,psMain), Operand::OPS_IN);
+                else
+                    curFuncInvocation->pushOperand(sampler, Operand::OPS_IN);
                 curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_XY);
                 curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_IN);
                 curFuncInvocation->pushOperand(mPSInpTextureDatas[j], Operand::OPS_IN);
@@ -233,7 +248,8 @@ const char* TextureAtlasSampler::getAdressingFunctionName(TextureUnitState::Text
     switch (mode)
     {
     case TextureUnitState::TAM_WRAP: return SGX_FUNC_ATLAS_WRAP; 
-    case TextureUnitState::TAM_MIRROR: return SGX_FUNC_ATLAS_MIRROR; 
+    case TextureUnitState::TAM_UNKNOWN: return SGX_FUNC_ATLAS_WRAP;
+    case TextureUnitState::TAM_MIRROR: return SGX_FUNC_ATLAS_MIRROR;
     case TextureUnitState::TAM_CLAMP: return SGX_FUNC_ATLAS_CLAMP; 
     case TextureUnitState::TAM_BORDER: return SGX_FUNC_ATLAS_BORDER; 
     }

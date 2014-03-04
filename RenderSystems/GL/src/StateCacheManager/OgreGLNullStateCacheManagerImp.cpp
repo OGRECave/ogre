@@ -295,16 +295,18 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setEnabled(GLenum flag)
+    void GLStateCacheManagerImp::setEnabled(GLenum flag, bool enabled)
     {
-        glEnable(flag);
+        if(enabled)
+        {
+            glEnable(flag);
+        }
+        else
+        {
+            glDisable(flag);
+        }
     }
-    
-    void GLStateCacheManagerImp::setDisabled(GLenum flag)
-    {
-        glDisable(flag);
-    }
-    
+
     void GLStateCacheManagerImp::setCullFace(GLenum face)
     {
         if(mCullFace != face)

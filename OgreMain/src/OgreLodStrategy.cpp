@@ -52,12 +52,12 @@ namespace Ogre {
         return getValueImpl(movableObject, camera->getLodCamera());
     }
     //-----------------------------------------------------------------------
-    void LodStrategy::assertSorted(const Mesh::LodValueArray &values) const
+    void LodStrategy::assertSorted(const Mesh::LodValueArray &values)
     {
         assert(isSorted(values) && "The LOD values must be sorted");
     }
     //---------------------------------------------------------------------
-    bool LodStrategy::isSortedAscending(const Mesh::LodValueArray& values)
+    bool LodStrategy::isSorted(const Mesh::LodValueArray& values)
     {
         Mesh::LodValueArray::const_iterator it = values.begin();
         Real prev = (*it);
@@ -65,21 +65,6 @@ namespace Ogre {
         {
             Real cur = (*it);
             if (cur < prev)
-                return false;
-            prev = cur;
-        }
-
-        return true;
-    }
-    //---------------------------------------------------------------------
-    bool LodStrategy::isSortedDescending(const Mesh::LodValueArray& values)
-    {
-        Mesh::LodValueArray::const_iterator it = values.begin();
-        Real prev = (*it);
-        for (++it; it != values.end(); ++it)
-        {
-            Real cur = (*it);
-            if (cur > prev)
                 return false;
             prev = cur;
         }
@@ -96,28 +81,13 @@ namespace Ogre {
             return mesh1.value < mesh2.value;
         }
     };
-    void LodStrategy::sortAscending(Mesh::MeshLodUsageList& meshLodUsageList)
+    void LodStrategy::sort(Mesh::MeshLodUsageList& meshLodUsageList)
     {
         // Perform standard sort
         std::sort(meshLodUsageList.begin(), meshLodUsageList.end(), LodUsageSortLess());
     }
     //---------------------------------------------------------------------
-    struct LodUsageSortGreater :
-    public std::binary_function<const MeshLodUsage&, const MeshLodUsage&, bool>
-    {
-        bool operator() (const MeshLodUsage& mesh1, const MeshLodUsage& mesh2)
-        {
-            // Sort descending
-            return mesh1.value > mesh2.value;
-        }
-    };
-    void LodStrategy::sortDescending(Mesh::MeshLodUsageList& meshLodUsageList)
-    {
-        // Perform standard sort
-        std::sort(meshLodUsageList.begin(), meshLodUsageList.end(), LodUsageSortGreater());
-    }
-    //---------------------------------------------------------------------
-    ushort LodStrategy::getIndexAscending(Real value, const Mesh::MeshLodUsageList& meshLodUsageList)
+    ushort LodStrategy::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList)
     {
         Mesh::MeshLodUsageList::const_iterator i, iend;
         iend = meshLodUsageList.end();
@@ -134,24 +104,7 @@ namespace Ogre {
         return static_cast<ushort>(meshLodUsageList.size() - 1);
     }
     //---------------------------------------------------------------------
-    ushort LodStrategy::getIndexDescending(Real value, const Mesh::MeshLodUsageList& meshLodUsageList)
-    {
-        Mesh::MeshLodUsageList::const_iterator i, iend;
-        iend = meshLodUsageList.end();
-        ushort index = 0;
-        for (i = meshLodUsageList.begin(); i != iend; ++i, ++index)
-        {
-            if (i->value < value)
-            {
-                return index ? index - 1 : 0;
-            }
-        }
-
-        // If we fall all the way through, use the highest value
-        return static_cast<ushort>(meshLodUsageList.size() - 1);
-    }
-    //---------------------------------------------------------------------
-    ushort LodStrategy::getIndexAscending(Real value, const Material::LodValueArray& materialLodValueArray)
+    ushort LodStrategy::getIndex(Real value, const Material::LodValueArray& materialLodValueArray)
     {
         Material::LodValueArray::const_iterator i, iend;
         iend = materialLodValueArray.end();
@@ -159,23 +112,6 @@ namespace Ogre {
         for (i = materialLodValueArray.begin(); i != iend; ++i, ++index)
         {
             if (*i > value)
-            {
-                return index ? index - 1 : 0;
-            }
-        }
-
-        // If we fall all the way through, use the highest value
-        return static_cast<ushort>(materialLodValueArray.size() - 1);
-    }
-    //---------------------------------------------------------------------
-    ushort LodStrategy::getIndexDescending(Real value, const Material::LodValueArray& materialLodValueArray)
-    {
-        Material::LodValueArray::const_iterator i, iend;
-        iend = materialLodValueArray.end();
-        unsigned short index = 0;
-        for (i = materialLodValueArray.begin(); i != iend; ++i, ++index)
-        {
-            if (*i < value)
             {
                 return index ? index - 1 : 0;
             }

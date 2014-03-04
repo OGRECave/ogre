@@ -28,7 +28,6 @@ THE SOFTWARE.
 #define _ShaderSRSTexturedFog_
 
 #include "OgreShaderPrerequisites.h"
-#include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
 #include "OgreVector4.h"
 

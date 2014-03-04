@@ -29,16 +29,12 @@ THE SOFTWARE.
 
 #include "OgreParticleSystem.h"
 #include "OgreParticleSystemManager.h"
-#include "OgreRenderQueue.h"
-#include "OgreBillboardSet.h"
 #include "OgreParticleEmitter.h"
 #include "OgreParticleAffector.h"
 #include "OgreParticle.h"
-#include "OgreSceneNode.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreCamera.h"
 #include "OgreStringConverter.h"
-#include "OgreLogManager.h"
-#include "OgreException.h"
 #include "OgreParticleAffectorFactory.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreMaterialManager.h"
@@ -82,7 +78,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ParticleSystem::ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager,
                                     const String& resourceGroup )
-      : MovableObject( id, objectMemoryManager ),
+      : MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
         mBoundsAutoUpdate(true),
         mBoundsUpdateTime(10.0f),
         mUpdateRemainTime(0),
@@ -412,13 +408,13 @@ namespace Ogre {
         for (i = mActiveParticles.begin(); i != itEnd; )
         {
             pParticle = static_cast<Particle*>(*i);
-            if (pParticle->timeToLive < timeElapsed)
+            if (pParticle->mTimeToLive < timeElapsed)
             {
                 // Notify renderer
                 mRenderer->_notifyParticleExpired(pParticle);
 
                 // Identify the particle type
-                if (pParticle->particleType == Particle::Visual)
+                if (pParticle->mParticleType == Particle::Visual)
                 {
                     // Destroy this one
                     mFreeParticles.splice(mFreeParticles.end(), mActiveParticles, i++);
@@ -440,7 +436,7 @@ namespace Ogre {
             else
             {
                 // Decrement TTL
-                pParticle->timeToLive -= timeElapsed;
+                pParticle->mTimeToLive -= timeElapsed;
                 ++i;
             }
 
@@ -544,7 +540,7 @@ namespace Ogre {
             // The particle is a visual particle if the emit_emitter property of the emitter isn't set 
             Particle* p = 0;
             String  emitterName = emitter->getEmittedEmitter();
-            if (emitterName == StringUtil::BLANK)
+            if (emitterName == BLANKSTRING)
                 p = createParticle();
             else
                 p = createEmitterParticle(emitterName);
@@ -558,13 +554,13 @@ namespace Ogre {
             // Translate position & direction into world space
             if (!mLocalSpace)
             {
-                p->position  = 
-                    (derivedOrientation * (derivedScale * p->position)) + derivedPosition;
-                p->direction = (derivedOrientation * p->direction);
+                p->mPosition  = 
+                    (derivedOrientation * (derivedScale * p->mPosition)) + derivedPosition;
+                p->mDirection = (derivedOrientation * p->mDirection);
             }
 
             // apply partial frame motion to this particle
-            p->position += (p->direction * timePoint);
+            p->mPosition += (p->mDirection * timePoint);
 
             // apply particle initialization by the affectors
             itAffEnd = mAffectors.end();
@@ -574,13 +570,13 @@ namespace Ogre {
             // Increment time fragment
             timePoint += timeInc;
 
-            if (p->particleType == Particle::Emitter)
+            if (p->mParticleType == Particle::Emitter)
             {
                 // If the particle is an emitter, the position on the emitter side must also be initialised
                 // Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set 
                 // to false (will this become a problem?)
                 ParticleEmitter* pParticleEmitter = static_cast<ParticleEmitter*>(p);
-                pParticleEmitter->setPosition(p->position);
+                pParticleEmitter->setPosition(p->mPosition);
             }
 
             // Notify renderer
@@ -598,15 +594,15 @@ namespace Ogre {
         for (i = mActiveParticles.begin(); i != itEnd; ++i)
         {
             pParticle = static_cast<Particle*>(*i);
-            pParticle->position += (pParticle->direction * timeElapsed);
+            pParticle->mPosition += (pParticle->mDirection * timeElapsed);
 
-            if (pParticle->particleType == Particle::Emitter)
+            if (pParticle->mParticleType == Particle::Emitter)
             {
                 // If it is an emitter, the emitter position must also be updated
                 // Note, that position of the emitter becomes a position in worldspace if mLocalSpace is set 
                 // to false (will this become a problem?)
                 pParticleEmitter = static_cast<ParticleEmitter*>(*i);
-                pParticleEmitter->setPosition(pParticle->position);
+                pParticleEmitter->setPosition(pParticle->mPosition);
             }
         }
 
@@ -685,7 +681,7 @@ namespace Ogre {
         if (fee && !fee->empty())
         {
             p = fee->front();
-            p->particleType = Particle::Emitter;
+            p->mParticleType = Particle::Emitter;
             fee->pop_front();
             mActiveParticles.push_back(p);
 
@@ -820,13 +816,13 @@ namespace Ogre {
                     {
                         Vector3 padding = 
                             halfScale * Ogre::max((*p)->mWidth, (*p)->mHeight);
-                        min.makeFloor((*p)->position - padding);
-                        max.makeCeil((*p)->position + padding);
+                        min.makeFloor((*p)->mPosition - padding);
+                        max.makeCeil((*p)->mPosition + padding);
                     }
                     else
                     {
-                        min.makeFloor((*p)->position - defaultPadding);
-                        max.makeCeil((*p)->position + defaultPadding);
+                        min.makeFloor((*p)->mPosition - defaultPadding);
+                        max.makeCeil((*p)->mPosition + defaultPadding);
                     }
                 }
                 aabb.setExtents(min, max);
@@ -1057,7 +1053,7 @@ namespace Ogre {
         }
         else
         {
-            return StringUtil::BLANK;
+            return BLANKSTRING;
         }
     }
     //-----------------------------------------------------------------------
@@ -1164,7 +1160,7 @@ namespace Ogre {
     }
     float ParticleSystem::SortByDirectionFunctor::operator()(Particle* p) const
     {
-        return sortDir.dotProduct(p->position);
+        return sortDir.dotProduct(p->mPosition);
     }
     ParticleSystem::SortByDistanceFunctor::SortByDistanceFunctor(const Vector3& pos)
         : sortPos(pos)
@@ -1173,7 +1169,7 @@ namespace Ogre {
     float ParticleSystem::SortByDistanceFunctor::operator()(Particle* p) const
     {
         // Sort descending by squared distance
-        return - (sortPos - p->position).squaredLength();
+        return - (sortPos - p->mPosition).squaredLength();
     }
     //-----------------------------------------------------------------------
     uint32 ParticleSystem::getTypeFlags(void) const
@@ -1226,13 +1222,12 @@ namespace Ogre {
         // Run through mEmitters and add keys to the pool
         ParticleEmitterList::iterator emitterIterator;
         ParticleEmitterList::iterator emitterIteratorInner;
-        ParticleEmitter* emitter = 0;
         ParticleEmitter* emitterInner = 0;
         for (emitterIterator = mEmitters.begin(); emitterIterator != mEmitters.end(); ++emitterIterator)
         {
             // Determine the names of all emitters that are emitted
-            emitter = *emitterIterator ;
-            if (emitter && emitter->getEmittedEmitter() != StringUtil::BLANK)
+            ParticleEmitter* emitter = *emitterIterator ;
+            if (emitter && emitter->getEmittedEmitter() != BLANKSTRING)
             {
                 // This one will be emitted, register its name and leave the vector empty!
                 EmittedEmitterList empty;
@@ -1245,7 +1240,7 @@ namespace Ogre {
                 emitterInner = *emitterIteratorInner;
                 if (emitter && 
                     emitterInner && 
-                    emitter->getName() != StringUtil::BLANK && 
+                    emitter->getName() != BLANKSTRING && 
                     emitter->getName() == emitterInner->getEmittedEmitter())
                 {
                     emitter->setEmitted(true);
@@ -1270,9 +1265,8 @@ namespace Ogre {
 
         EmittedEmitterPool::iterator emittedEmitterPoolIterator;
         ParticleEmitterList::iterator emitterIterator;
-        ParticleEmitter* emitter = 0;
         ParticleEmitter* clonedEmitter = 0;
-        String name = StringUtil::BLANK;
+        String name = BLANKSTRING;
         EmittedEmitterList* e = 0;
         size_t maxNumberOfEmitters = size / mEmittedEmitterPool.size(); // equally distribute the number for each emitted emitter list
         size_t oldSize = 0;
@@ -1284,12 +1278,11 @@ namespace Ogre {
             e = &emittedEmitterPoolIterator->second;
 
             // Search the correct emitter in the mEmitters vector
-            emitter = 0;
             for (emitterIterator = mEmitters.begin(); emitterIterator != mEmitters.end(); ++emitterIterator)
             {
-                emitter = *emitterIterator;
+                ParticleEmitter* emitter = *emitterIterator;
                 if (emitter && 
-                    name != StringUtil::BLANK && 
+                    name != BLANKSTRING && 
                     name == emitter->getName())
                 {       
                     // Found the right emitter, clone each emitter a number of times
@@ -1302,7 +1295,7 @@ namespace Ogre {
 
                         // Initially deactivate the emitted emitter if duration/repeat_delay are set
                         if (clonedEmitter->getDuration() > 0.0f && 
-                            (clonedEmitter->getRepeatDelay() > 0.0f || clonedEmitter->getMinRepeatDelay() > 0.0f || clonedEmitter->getMinRepeatDelay() > 0.0f))
+                            (clonedEmitter->getRepeatDelay() > 0.0f || clonedEmitter->getMinRepeatDelay() > 0.0f))
                             clonedEmitter->setEnabled(false);
 
                         // Add cloned emitters to the pool
@@ -1324,7 +1317,7 @@ namespace Ogre {
         EmittedEmitterList::iterator emittedEmitterIterator;
         EmittedEmitterList* emittedEmitters = 0;
         list<ParticleEmitter*>::type* fee = 0;
-        String name = StringUtil::BLANK;
+        String name = BLANKSTRING;
 
         // Run through the emittedEmitterPool map
         for (emittedEmitterPoolIterator = mEmittedEmitterPool.begin(); emittedEmitterPoolIterator != mEmittedEmitterPool.end(); ++emittedEmitterPoolIterator)

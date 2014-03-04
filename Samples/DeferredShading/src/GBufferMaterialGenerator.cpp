@@ -20,7 +20,9 @@ same license as the rest of the engine.
 #include "OgreRoot.h"
 #include "OgreStringConverter.h"
 #include "OgreHighLevelGpuProgramManager.h"
+#include "OgreHighLevelGpuProgram.h"
 #include "OgreTechnique.h"
+#include "OgreLogManager.h"
 
 using namespace Ogre;
 

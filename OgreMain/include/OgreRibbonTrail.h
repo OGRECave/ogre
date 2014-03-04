@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 #include "OgreBillboardChain.h"
 #include "OgreNode.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreFrameListener.h"
 #include "OgreControllerManager.h"
 #include "OgreHeaderPrefix.h"
 

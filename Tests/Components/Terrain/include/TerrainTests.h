@@ -30,6 +30,12 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreTerrain.h"
+#include "OgreFileSystemLayer.h"
+
+#include "OgreBuildSettings.h"
+#ifdef OGRE_STATIC_LIB
+#include "../../../../Samples/Common/include/OgreStaticPluginLoader.h"
+#endif
 
 using namespace Ogre; 
 
@@ -40,9 +46,14 @@ class TerrainTests : public CppUnit::TestFixture
     CPPUNIT_TEST(testCreate);
     CPPUNIT_TEST_SUITE_END();
 
+#ifdef OGRE_STATIC_LIB
+StaticPluginLoader mStaticPluginLoader;
+#endif
+
     Root* mRoot;
     SceneManager* mSceneMgr;
     TerrainGlobalOptions* mTerrainOpts;
+    FileSystemLayer* mFSLayer;
 
 public:
     void setUp();

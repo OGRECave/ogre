@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreManualObject.h"
 #include "OgreException.h"
 #include "OgreMaterialManager.h"
-#include "OgreSceneNode.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreHardwareBufferManager.h"
@@ -37,6 +36,8 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMesh.h"
 #include "OgreSubMesh.h"
+#include "OgreLogManager.h"
+#include "OgreTechnique.h"
 
 namespace Ogre {
 
@@ -46,7 +47,7 @@ namespace Ogre {
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
     //-----------------------------------------------------------------------------
     ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager ),
+		: MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
           mDynamic(false), mCurrentSection(0), mFirstVertex(true),
           mTempVertexPending(false),
           mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
@@ -186,7 +187,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Can't assign material " + materialName +
                                                   " to the ManualObject " + mName + " because this "
                                                   "Material does not exist. Have you forgotten to define it in a "
-                                                  ".material script?");
+                                                  ".material script?", LML_CRITICAL);
 
             material = MaterialManager::getSingleton().getByName("BaseWhite");
 

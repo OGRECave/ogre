@@ -26,22 +26,15 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreBuildSettings.h"
-
-#if defined(OGRE_BUILD_RENDERSYSTEM_GLES2) || defined(OGRE_BUILD_RENDERSYSTEM_GL3PLUS) || defined(OGRE_BUILD_RENDERSYSTEM_D3D11)
-#  define INCLUDE_RTSHADER_SYSTEM
-#endif
-
-//#define _RTSS_WRITE_SHADERS_TO_DISK
 
 #include "TestContext.h"
 #include "SamplePlugin.h"
 #include "TestResultWriter.h"
 #include "HTMLWriter.h"
-#include "SimpleResultWriter.h"
+#include "CppUnitResultWriter.h"
 #include "OgreConfigFile.h"
 #include "OgrePlatform.h"
-
+#include <iostream>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -58,26 +51,28 @@ static id mAppDelegate;
 #include "PlayPenTestPlugin.h"
 #endif
 
-TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
+TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(BLANKSTRING), mCurrentTest(0), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
 
-    // prepopulate expected options
+    // Prepopulate expected options.
     unOpt["-r"] = false;        // generate reference set
-    unOpt["--no-html"] = false; // whether or not to generate html
-    unOpt["-d"] = false;        // force config dialogue
+    unOpt["--no-html"] = false; // whether or not to generate HTML
+    unOpt["-d"] = false;        // force config dialog
     unOpt["--nograb"] = false;  // do not grab mouse
     unOpt["-h"] = false;        // help, give usage details
     unOpt["--help"] = false;    // help, give usage details
     binOpt["-m"] = "";          // optional comment
+    binOpt["-rp"] = "";         // optional specified reference set location
+    binOpt["-od"] = "";         // directory to write output to
     binOpt["-ts"] = "VTests";   // name of the test set to use
     binOpt["-c"] = "Reference"; // name of batch to compare against
     binOpt["-n"] = "AUTO";      // name for this batch
     binOpt["-rs"] = "SAVED";    // rendersystem to use (default: use name from the config file/dialog)
     binOpt["-o"] = "NONE";      // path to output a summary file to (default: don't output a file)
 
-    // parse
+    // Parse.
     Ogre::findCommandLineOpts(argc, argv, unOpt, binOpt);
 
     mReferenceSet = unOpt["-r"];
@@ -88,9 +83,19 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     mCompareWith = binOpt["-c"];
     mForceConfig = unOpt["-d"];
     mNoGrabMouse = unOpt["--nograb"];
+    mOutputDir = binOpt["-od"];
     mRenderSystemName = binOpt["-rs"];
+    mReferenceSetPath = binOpt["-rp"];
     mSummaryOutputDir = binOpt["-o"];
     mHelp = unOpt["-h"] || unOpt["--help"];
+
+    if(mReferenceSetPath == BLANKSTRING)
+        mReferenceSetPath = mOutputDir;
+    
+#ifdef INCLUDE_RTSHADER_SYSTEM
+    mShaderGenerator     = NULL;
+    mMaterialMgrListener = NULL;
+#endif // INCLUDE_RTSHADER_SYSTEM
 }
 //-----------------------------------------------------------------------
 
@@ -103,7 +108,7 @@ TestContext::~TestContext()
 
 void TestContext::setup()
 {
-    // standard setup
+    // Standard setup.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     CGSize modeSize = [[UIScreen mainScreen] currentMode].size;
     uint w = modeSize.width / [UIScreen mainScreen].scale;
@@ -125,10 +130,11 @@ void TestContext::setup()
     mWindow->setDeactivateOnFocusChange(false);
     mRoot->initialiseCompositor();
 
-    // grab input, since moving the window seemed to change the results (in Linux anyways)
+    // Grab input, since moving the window seemed to change the results (in Linux anyways).
     setupInput(mNoGrabMouse);
-
+    
     locateResources();
+
     createDummyScene();
 #ifdef INCLUDE_RTSHADER_SYSTEM
     if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
@@ -145,14 +151,29 @@ void TestContext::setup()
     Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 #endif
 
-    // get the path and list of test plugins from the config file
+    // Get the path and list of test plugins from the config file.
     Ogre::ConfigFile testConfig;
     testConfig.load(mFSLayer->getConfigFilePath("tests.cfg"));
     mPluginDirectory = testConfig.getSetting("TestFolder");
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+    if (mPluginDirectory.empty()) mPluginDirectory = ".";   // user didn't specify plugins folder, try current one
+#endif
+
+    // add slash or backslash based on platform
+    char lastChar = mPluginDirectory[mPluginDirectory.length() - 1];
+    if (lastChar != '/' && lastChar != '\\')
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
+        mPluginDirectory += "\\";
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+        mPluginDirectory += "/";
+#endif
+    }
+
     Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
 
-    // parse for the test sets and plugins that they're made up of
+    // Parse for the test sets and plugins that they're made up of.
     for (; sections.hasMoreElements(); sections.moveNext())
     {
         Ogre::String setName = sections.peekNextKey();
@@ -170,33 +191,40 @@ void TestContext::setup()
     mPluginNameMap["PlayPenTests"] = (OgreBites::SamplePlugin *) OGRE_NEW PlaypenTestPlugin();
 #endif
 
+    Ogre::String batchName = BLANKSTRING;
+    time_t raw = time(0);
+
     // timestamp for the filename
     char temp[25];
-    time_t raw = time(0);
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
-    Ogre::String filestamp = Ogre::String(temp);
-    // name for this batch (used for naming the directory, and uniquely identifying this batch)
-    Ogre::String batchName = mTestSetName + "_" + filestamp;
 
-    // a nicer formatted version for display
+    // A nicer formatted version for display.
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
     Ogre::String timestamp = Ogre::String(temp);
 
-    if (mReferenceSet)
-        batchName = "Reference";
-    else if (mBatchName != "AUTO")
-        batchName = mBatchName;
+    if(mOutputDir == BLANKSTRING)
+    {
+        Ogre::String filestamp = Ogre::String(temp);
+        // name for this batch (used for naming the directory, and uniquely identifying this batch)
+        batchName = mTestSetName + "_" + filestamp;
 
-    // set up output directories
+        if (mReferenceSet)
+            batchName = "Reference";
+        else if (mBatchName != "AUTO")
+            batchName = mBatchName;
+    }
+
+    // Set up output directories.
     setupDirectories(batchName);
 
-    // an object storing info about this set
+    // An object storing info about this set.
     mBatch = new TestBatch(batchName, mTestSetName, timestamp,
                            mWindow->getWidth(), mWindow->getHeight(), mOutputDir + batchName + "/");
     mBatch->comment = mComment;
 
     OgreBites::Sample* firstTest = loadTests(mTestSetName);
-    runSample(firstTest);
+    if (firstTest)
+        runSample(firstTest);
 }
 //-----------------------------------------------------------------------
 
@@ -230,7 +258,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
                 mRoot->installPlugin(pluginInstance);
             }
 #else
-            mRoot->loadPlugin(mPluginDirectory + "/" + plugin);
+            mRoot->loadPlugin(mPluginDirectory + plugin);
 #endif
         }
         // if it fails, just return right away
@@ -243,7 +271,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
         Ogre::Plugin* p = mRoot->getInstalledPlugins().back();
         OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
 
-        // if something's gone wrong return null
+        // if something has gone wrong return null
         if (!sp)
             return 0;
 
@@ -281,8 +309,13 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
     }
 
     // start with the first one on the list
-    startSample = mTests.front();
-    return startSample;
+    if (!mTests.empty())
+    {
+        startSample = mTests.front();
+        return startSample;
+    }
+    else
+        return 0;    
 }
 //-----------------------------------------------------------------------
 
@@ -377,7 +410,8 @@ void TestContext::runSample(OgreBites::Sample* s)
 
     OgreBites::Sample* sampleToRun = s;
 
-    // if a valid test is passed, then run it, if null, grab the next one from the deque
+    // If a valid test is passed, then run it
+    // If null, grab the next one from the deque
     if (!sampleToRun && !mTests.empty())
     {
         mTests.pop_front();
@@ -385,10 +419,10 @@ void TestContext::runSample(OgreBites::Sample* s)
             sampleToRun = mTests.front();
     }
 
-    // check if this is a VisualTest
+    // Check if this is a VisualTest
     mCurrentTest = static_cast<VisualTest*>(sampleToRun);
 
-    // set things up to be deterministic
+    // Set things up to be deterministic
     if (mCurrentTest)
     {
         // Seed rand with a predictable value
@@ -396,10 +430,8 @@ void TestContext::runSample(OgreBites::Sample* s)
 
         // Give a fixed timestep for particles and other time-dependent things in OGRE
         Ogre::ControllerManager::getSingleton().setFrameDelay(mTimestep);
-    }
-
-    if (mCurrentTest)
         LogManager::getSingleton().logMessage("----- Running Visual Test " + mCurrentTest->getInfo()["Title"] + " -----");
+    }
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
     if (sampleToRun) {
@@ -417,7 +449,7 @@ void TestContext::createRoot()
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     mRoot = Ogre::Root::getSingletonPtr();
 #else
-    Ogre::String pluginsPath = Ogre::StringUtil::BLANK;
+    Ogre::String pluginsPath = Ogre::BLANKSTRING;
 #ifndef OGRE_STATIC_LIB
     pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
 #endif
@@ -494,25 +526,27 @@ bool TestContext::oneTimeConfig()
 void TestContext::setupDirectories(Ogre::String batchName)
 {
     // ensure there's a root directory for visual tests
-    mOutputDir = mFSLayer->getWritablePath("VisualTests/");
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+    if(mOutputDir == BLANKSTRING)
+    {
+        mOutputDir = mFSLayer->getWritablePath("VisualTests/");
+        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
 
-    // make sure there's a directory for the test set
-    mOutputDir += mTestSetName + "/";
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+        // make sure there's a directory for the test set
+        mOutputDir += mTestSetName + "/";
+        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
 
-    // add a directory for the render system
-    Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
-    // strip spaces from render system name
-    for (unsigned int i = 0;i < rsysName.size(); ++i)
-        if (rsysName[i] != ' ')
-            mOutputDir += rsysName[i];
-    mOutputDir += "/";
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+        // add a directory for the render system
+        Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
+        // strip spaces from render system name
+        for (unsigned int i = 0;i < rsysName.size(); ++i)
+            if (rsysName[i] != ' ')
+                mOutputDir += rsysName[i];
+        mOutputDir += "/";
+        static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+    }
 
     if(mSummaryOutputDir != "NONE")
     {
-        mSummaryOutputDir = mFSLayer->getWritablePath(mSummaryOutputDir);
         static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mSummaryOutputDir);
     }
 
@@ -527,6 +561,8 @@ void TestContext::finishedTests()
     if ((mGenerateHtml || mSummaryOutputDir != "NONE") && !mReferenceSet)
     {
         const TestBatch* compareTo = 0;
+        TestBatchSetPtr batches;
+        TestBatchSet::iterator i;
 
         Ogre::ConfigFile info;
         bool foundReference = true;
@@ -535,15 +571,14 @@ void TestContext::finishedTests()
         // look for a reference set first (either "Reference" or a user-specified image set)
         try
         {
-            info.load(mOutputDir + mCompareWith + "/info.cfg");
+            info.load(mReferenceSetPath + mCompareWith + "/info.cfg");
         }
         catch (Ogre::FileNotFoundException e)
         {
             // if no luck, just grab the most recent compatible set
             foundReference = false;
-            TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
-
-            TestBatchSet::iterator i;
+            batches = TestBatch::loadTestBatches(mOutputDir);
+            
             for (i = batches->begin(); i != batches->end(); ++i)
             {
                 if (mBatch->canCompareWith((*i)))
@@ -556,7 +591,7 @@ void TestContext::finishedTests()
 
         if (foundReference)
         {
-            ref = OGRE_NEW TestBatch(info, mOutputDir + mCompareWith);
+            ref = OGRE_NEW TestBatch(info, mReferenceSetPath + mCompareWith);
             if (mBatch->canCompareWith(*ref))
                 compareTo = ref;
         }
@@ -579,12 +614,12 @@ void TestContext::finishedTests()
             if(mSummaryOutputDir != "NONE")
             {
                 Ogre::String rs;
-                for(size_t i = 0; i < mRenderSystemName.size(); ++i)
-                    if(mRenderSystemName[i]!=' ')
-                        rs += mRenderSystemName[i];
+                for(size_t j = 0; j < mRenderSystemName.size(); ++j)
+                    if(mRenderSystemName[j]!=' ')
+                        rs += mRenderSystemName[j];
 
-                SimpleResultWriter simpleWriter(*compareTo, *mBatch, results);
-                simpleWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".txt");
+                CppUnitResultWriter cppunitWriter(*compareTo, *mBatch, results);
+                cppunitWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".xml");
             }
         }
 
@@ -750,7 +785,7 @@ bool TestContext::initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
 }
 
 /*-----------------------------------------------------------------------------
-  | Finalize the RT Shader system.
+  | Destroy the RT Shader system.
   -----------------------------------------------------------------------------*/
 void TestContext::finaliseRTShaderSystem()
 {
@@ -765,10 +800,10 @@ void TestContext::finaliseRTShaderSystem()
         mMaterialMgrListener = NULL;
     }
 
-    // Finalize RTShader system.
+    // Destroy RTShader system.
     if (mShaderGenerator != NULL)
     {
-        Ogre::RTShader::ShaderGenerator::finalize();
+        Ogre::RTShader::ShaderGenerator::destroy();
         mShaderGenerator = NULL;
     }
 }

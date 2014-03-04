@@ -34,8 +34,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreVector3.h"
 #include "OgreHardwareBuffer.h"
-#include "OgreMesh.h"
-#include "OgrePatchMesh.h"
+#include "OgrePatchSurface.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

@@ -41,6 +41,7 @@ namespace Ogre {
 #define OGRE_CPU_X86        1
 #define OGRE_CPU_PPC        2
 #define OGRE_CPU_ARM        3
+#define OGRE_CPU_MIPS       4
 
 /* Find CPU type
 */
@@ -54,8 +55,10 @@ namespace Ogre {
 #   define OGRE_CPU OGRE_CPU_X86
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
 #   define OGRE_CPU OGRE_CPU_X86
-#elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__)
+#elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__) || defined(_aarch64_)
 #   define OGRE_CPU OGRE_CPU_ARM
+#elif defined(__mips64) || defined(__mips64_)
+#   define OGRE_CPU OGRE_CPU_MIPS
 #else
 #   define OGRE_CPU OGRE_CPU_UNKNOWN
 #endif
@@ -103,7 +106,7 @@ namespace Ogre {
     #endif
 #endif
 
-#if OGRE_USE_SIMD == 0 || !defined(__OGRE_HAVE_SSE)
+#ifndef __OGRE_HAVE_SSE
 #   define __OGRE_HAVE_SSE  0
 #endif
 
@@ -114,13 +117,13 @@ namespace Ogre {
 #if !defined(__OGRE_HAVE_DIRECTXMATH)
 #   define __OGRE_HAVE_DIRECTXMATH  0
 #endif
-
-    /** \addtogroup Core
-    *  @{
-    */
-    /** \addtogroup General
-    *  @{
-    */
+    
+	/** \addtogroup Core
+	*  @{
+	*/
+	/** \addtogroup General
+	*  @{
+	*/
 
 
     /** Class which provides the run-time platform information Ogre runs on.
@@ -159,6 +162,8 @@ namespace Ogre {
 #elif OGRE_CPU == OGRE_CPU_ARM
             CPU_FEATURE_VFP         = 1 << 12,
             CPU_FEATURE_NEON        = 1 << 13,
+#elif OGRE_CPU == OGRE_CPU_MIPS
+            CPU_FEATURE_MSA         = 1 << 14,
 #endif
 
             CPU_FEATURE_NONE        = 0

@@ -27,9 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgrePanelOverlayElement.h"
-#include "OgreMaterial.h"
 #include "OgreTechnique.h"
-#include "OgrePass.h"
 #include "OgreStringConverter.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
@@ -224,7 +222,7 @@ namespace Ogre {
         HardwareVertexBufferSharedPtr vbuf =
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(POSITION_BINDING);
         float* pPos = static_cast<float*>(
-            vbuf->lock(HardwareBuffer::HBL_DISCARD) );
+            vbuf->lock(HardwareBuffer::HBL_DISCARD, Root::getSingleton().getFreqUpdatedBuffersUploadOption()) );
 
         // Use the furthest away depth value, since materials should have depth-check off
         // This initialised the depth buffer for any 3D objects in front

@@ -49,7 +49,7 @@ namespace Ogre {
         SAFE_DELETE(mBufferImpl);
     }
     //---------------------------------------------------------------------
-    void* D3D11HardwareUniformBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* D3D11HardwareUniformBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
     {
         return mBufferImpl->lock(offset, length, options);
     }

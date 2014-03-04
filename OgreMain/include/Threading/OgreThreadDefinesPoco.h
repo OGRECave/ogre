@@ -49,8 +49,8 @@ THE SOFTWARE
 #define OGRE_THREAD_NOTIFY_ALL(sync) sync.broadcast()
 // Read-write mutex
 #define OGRE_RW_MUTEX(name) mutable Poco::RWLock name
-#define OGRE_LOCK_RW_MUTEX_READ(name) Poco::RWLock::ScopedLock ogrenameLock(name, false)
-#define OGRE_LOCK_RW_MUTEX_WRITE(name) Poco::RWLock::ScopedLock ogrenameLock(name, true)
+#define OGRE_LOCK_RW_MUTEX_READ(name) Poco::RWLock::ScopedLock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, false)
+#define OGRE_LOCK_RW_MUTEX_WRITE(name) Poco::RWLock::ScopedLock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, true)
 // Thread-local pointer
 #define OGRE_THREAD_POINTER(T, var) Poco::ThreadLocal<SharedPtr<T> > var
 #define OGRE_THREAD_POINTER_INIT(var) var()

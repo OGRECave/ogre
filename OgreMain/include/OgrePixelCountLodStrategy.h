@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "OgreLodStrategy.h"
 #include "OgreSingleton.h"
-#include "OgreNode.h"
 
 namespace Ogre {
 
@@ -42,16 +41,17 @@ namespace Ogre {
     /** \addtogroup LOD
     *  @{
     */
-    /** Abstract base class for level of detail strategy based on pixel count approximations from bounding sphere projection. */
-    class _OgreExport PixelCountLodStrategy : public LodStrategy
-    {
-    protected:
-        /// @copydoc LodStrategy::getValueImpl
-        virtual Real getValueImpl(const MovableObject *movableObject, const Camera *camera) const = 0;
 
+    class AbsolutePixelCountLodStrategy;
+    /// Backward compatible name for Distance_Box strategy.
+    typedef AbsolutePixelCountLodStrategy PixelCountLodStrategy;
+
+    /** Abstract base class for level of detail strategy based on pixel count approximations from bounding sphere projection. */
+    class _OgreExport PixelCountLodStrategyBase : public LodStrategy
+    {
     public:
         /** Default constructor. */
-        PixelCountLodStrategy(const String& name);
+        PixelCountLodStrategyBase(const String& name);
 
         /// @copydoc LodStrategy::getBaseValue
         virtual Real getBaseValue() const;
@@ -65,23 +65,11 @@ namespace Ogre {
             may be changed such that the values become valid.
         */
         virtual Real transformUserValue(Real userValue) const               { return -userValue; }
-
-        /// @copydoc LodStrategy::getIndex
-        virtual ushort getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const;
-
-        /// @copydoc LodStrategy::getIndex
-        virtual ushort getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const;
-
-        /// @copydoc LodStrategy::sort
-        virtual void sort(Mesh::MeshLodUsageList& meshLodUsageList) const;
-
-        /// @copydoc LodStrategy::isSorted
-        virtual bool isSorted(const Mesh::LodValueArray& values) const;
     };
     /** @} */
     /** @} */
 
-    class _OgreExport AbsolutePixelCountLodStrategy : public PixelCountLodStrategy, public Singleton<AbsolutePixelCountLodStrategy>
+    class _OgreExport AbsolutePixelCountLodStrategy : public PixelCountLodStrategyBase, public Singleton<AbsolutePixelCountLodStrategy>
     {
     public:
         /** Default constructor. */
@@ -129,7 +117,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 
-    class _OgreExport ScreenRatioPixelCountLodStrategy : public PixelCountLodStrategy, public Singleton<ScreenRatioPixelCountLodStrategy>
+    class _OgreExport ScreenRatioPixelCountLodStrategy : public PixelCountLodStrategyBase, public Singleton<ScreenRatioPixelCountLodStrategy>
     {
     public:
         /** Default constructor. */

@@ -29,15 +29,11 @@ THE SOFTWARE.
 
 #include "OgreMaterial.h"
 
-#include "OgreSceneManagerEnumerator.h"
 #include "OgreMaterialManager.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreTechnique.h"
 #include "OgreLogManager.h"
-#include "OgreException.h"
-#include "OgreStringConverter.h"
-#include "OgreLodStrategy.h"
 #include "OgreLodStrategyManager.h"
+#include "OgreLodStrategy.h"
 
 namespace Ogre {
 
@@ -497,7 +493,7 @@ namespace Ogre {
             else
             {
                 // Log informational
-                StringUtil::StrStreamType str;
+                StringStream str;
                 str << "Material " << mName << " Technique " << techNo;
                 if (!(*i)->getName().empty())
                     str << "(" << (*i)->getName() << ")";
@@ -512,7 +508,7 @@ namespace Ogre {
         // Did we find any?
         if (mSupportedTechniques.empty())
         {
-            LogManager::getSingleton().stream()
+            LogManager::getSingleton().stream(LML_CRITICAL)
                 << "WARNING: material " << mName << " has no supportable "
                 << "Techniques and will be blank. Explanation: \n" << mUnsupportedReasons;
         }

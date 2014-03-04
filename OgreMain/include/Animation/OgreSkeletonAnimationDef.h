@@ -53,6 +53,7 @@ namespace Ogre
         KfTransformArrayMemoryManager *mKfTransformMemoryManager;
 
         inline uint32 slotToBlockIdx( uint32 slotIdx ) const;
+		inline uint32 blockIdxToSlotStart( uint32 blockIdx ) const;
 
         typedef vector<Real>::type TimestampVec;
         typedef map<size_t, TimestampVec>::type TimestampsPerBlock;

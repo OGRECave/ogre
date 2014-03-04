@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreQuaternion.h"
 #include "OgreAny.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre 

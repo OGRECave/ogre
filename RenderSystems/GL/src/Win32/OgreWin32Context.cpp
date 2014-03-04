@@ -97,6 +97,11 @@ namespace Ogre {
             mHDC  = NULL;
         }       
     }
+
+    HGLRC Win32Context::getGlrc() const
+    {
+        return mGlrc;
+    }
 }
 
 #if OGRE_THREAD_SUPPORT == 1

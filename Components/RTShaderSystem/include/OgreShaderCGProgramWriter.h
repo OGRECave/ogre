@@ -28,10 +28,17 @@ THE SOFTWARE.
 #ifndef __ShaderProgramWriterCG_H__
 #define __ShaderProgramWriterCG_H__
 
+#include "OgreShaderPrerequisites.h"
 #include "OgreShaderProgramWriterManager.h"
+#include "OgreShaderProgramWriter.h"
+#include "OgreShaderParameter.h"
 
 namespace Ogre {
 namespace RTShader {
+
+    class Function;
+    class FunctionAtom;
+    class Program;
 
 /** \addtogroup Core
 *  @{
@@ -111,9 +118,8 @@ protected:
 class _OgreRTSSExport ShaderProgramWriterCGFactory : public ProgramWriterFactory
 {
 public:
-    ShaderProgramWriterCGFactory()
+    ShaderProgramWriterCGFactory() : mLanguage("cg")
     {
-        mLanguage = "cg";
     }
     virtual ~ShaderProgramWriterCGFactory() {}
 

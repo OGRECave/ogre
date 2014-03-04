@@ -245,7 +245,7 @@ namespace Ogre {
             String shaderSource = gpuProgram->getGLSLProgram()->getSource();
             glslopt_shader* shader = glslopt_optimize(mGLSLOptimiserContext, shaderType, shaderSource.c_str(), 0);
 
-            std::stringstream os;
+            StringStream os;
             if(glslopt_get_status(shader))
             {
                 // Write the current version (this forces the driver to fulfill the glsl es standard)

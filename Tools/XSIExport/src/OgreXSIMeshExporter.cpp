@@ -333,7 +333,7 @@ namespace Ogre {
     {
         CRefArray uvs = xsiMesh->geometry.GetUVs();
 
-        StringUtil::StrStreamType msg;
+        StringStream msg;
         msg << "-- " << XSItoOgre(xsiMesh->name) << " --" << std::endl;
         msg << "Points: " << xsiMesh->geometry.GetVertexCount() << std::endl;
         msg << "Triangles: " << xsiMesh->geometry.GetTriangleCount() << std::endl;
@@ -345,7 +345,7 @@ namespace Ogre {
         if (uvs.GetCount() > OGRE_MAX_TEXTURE_COORD_SETS)
         {
             // too many texture coordinates!
-            StringUtil::StrStreamType str;
+            StringStream str;
             str << "PolygonMesh '" << XSItoOgre(xsiMesh->name) 
                 << "' has too many texture coordinate sets (" 
                 << uvs.GetCount()

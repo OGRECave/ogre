@@ -31,8 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreResourceManager.h"
 #include "OgreSingleton.h"
-#include "OgreException.h"
-#include "OgreHighLevelGpuProgram.h"
+#include "OgreGpuProgram.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -56,6 +55,7 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader) = 0;
         virtual void destroy(HighLevelGpuProgram* prog) = 0;
     };
+
     /** This ResourceManager manages high-level vertex and fragment programs. 
     @remarks
         High-level vertex and fragment programs can be used instead of assembler programs

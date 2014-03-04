@@ -113,10 +113,20 @@ if (OGRE_INSTALL_DEPENDENCIES)
 	  endif ()
     
 	  if (MINGW)
-      install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
-      install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
-      install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
-      install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
+		if (EXISTS ${OIS_LIBRARY_DBG})
+			install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
+		else()	
+			install(FILES DESTINATION lib/debug CONFIGURATIONS Debug)
+		endif ()
+		if (EXISTS ${OIS_LIBRARY_REL})
+			install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+			install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
+			install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
+		else()
+			install(FILES DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+			install(FILES DESTINATION lib/release CONFIGURATIONS Release)
+			install(FILES DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
+		endif ()
 	  endif () # MINGW
 	endif () # WIN32
 endif () # OGRE_INSTALL_DEPENDENCIES
@@ -206,7 +216,6 @@ endif () # OGRE_INSTALL_DEPENDENCIES
       PATTERN "timer" EXCLUDE
       PATTERN "tr1" EXCLUDE
       PATTERN "units" EXCLUDE
-      PATTERN "unordered" EXCLUDE
       PATTERN "uuid" EXCLUDE
       PATTERN "variant" EXCLUDE
       PATTERN "wave" EXCLUDE

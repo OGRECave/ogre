@@ -1,0 +1,127 @@
+vertex_program Ogre/Tessellation/VertexProgramHLSL hlsl
+{
+    source Tessellation.hlsl
+    entry_point VS
+    target vs_5_0
+}
+
+vertex_program Ogre/Tessellation/VertexProgramGLSL glsl
+{
+    source TessellationVp.glsl
+    syntax glsl400
+}
+
+vertex_program Ogre/Tessellation/VertexProgram unified
+{
+    delegate Ogre/Tessellation/VertexProgramHLSL
+    delegate Ogre/Tessellation/VertexProgramGLSL
+}
+
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgramHLSL hlsl
+{
+    source Tessellation.hlsl
+    entry_point HS
+    target hs_5_0
+
+    default_params
+    {
+        param_named g_fTessellationFactor float 16
+    }
+}
+
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgramGLSL glsl
+{
+    source TessellationTh.glsl
+    syntax glsl400
+
+    default_params
+    {
+        param_named g_fTessellationFactor float 16
+    }
+}
+
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgram unified
+{
+    delegate Ogre/Tessellation/TessellationHullProgramHLSL
+    delegate Ogre/Tessellation/TessellationHullProgramGLSL
+}
+
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgramHLSL hlsl
+{
+    source Tessellation.hlsl
+    entry_point DS
+    target ds_5_0
+
+    default_params
+    {
+        param_named_auto g_mViewProjection worldviewproj_matrix
+    }
+}
+
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgramGLSL glsl
+{
+    source TessellationTd.glsl
+    syntax glsl400
+
+    default_params
+    {
+        param_named_auto g_mWorldViewProjection worldviewproj_matrix
+    }
+}
+
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgram unified
+{
+    delegate Ogre/Tessellation/TessellationDomainProgramHLSL
+    delegate Ogre/Tessellation/TessellationDomainProgramGLSL
+}
+
+fragment_program Ogre/Tessellation/FragmentProgramHLSL hlsl
+{
+    source Tessellation.hlsl
+    entry_point SolidColorPS
+    target ps_5_0
+}
+
+fragment_program Ogre/Tessellation/FragmentProgramGLSL glsl
+{
+    source TessellationFp.glsl
+    syntax glsl400
+}
+
+fragment_program Ogre/Tessellation/FragmentProgram unified
+{
+    delegate Ogre/Tessellation/FragmentProgramHLSL
+    delegate Ogre/Tessellation/FragmentProgramGLSL
+}
+
+material Ogre/TessellationExample
+{
+    technique
+    {
+        pass
+        {
+            lighting off
+            depth_write off
+
+            vertex_program_ref Ogre/Tessellation/VertexProgram
+            {
+
+            }
+
+            tessellation_hull_program_ref Ogre/Tessellation/TessellationHullProgram
+            {
+
+            }
+
+            tessellation_domain_program_ref Ogre/Tessellation/TessellationDomainProgram
+            {
+
+            }
+
+            fragment_program_ref Ogre/Tessellation/FragmentProgram
+            {
+
+            }
+        }
+    }
+}

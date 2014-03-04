@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-//-----------------------------------------------------------------------------
+
     GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
@@ -319,5 +319,5 @@ namespace Ogre {
     {
         return mNumSamples;
     }
-//-----------------------------------------------------------------------------
+
 }

@@ -42,12 +42,18 @@ namespace Ogre {
     {
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
-        
+
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
+        }
+
         mNumSamples = 0;
         mMultisampleFB = 0;
 
         // Check multisampling if supported
-        if(getGLES2SupportRef()->checkExtension("GL_APPLE_framebuffer_multisample") || gleswIsSupported(3, 0))
+        if(gleswIsSupported(3, 0))
         {
             // Check samples supported
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
@@ -61,12 +67,21 @@ namespace Ogre {
         if (mNumSamples)
         {
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
+            if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+            {
+                OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+                OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mMultisampleFB, 0, ("MSAA FBO #" + StringConverter::toString(mMultisampleFB)).c_str()));
+            }
         }
-        
+        else
+        {
+            mMultisampleFB = 0;
+        }
+
         // Initialise state
-        mDepth.buffer=0;
-        mStencil.buffer=0;
-        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+        mDepth.buffer = 0;
+        mStencil.buffer = 0;
+        for(size_t x = 0; x < OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
         {
             mColour[x].buffer=0;
         }
@@ -146,12 +161,11 @@ namespace Ogre {
         // FBO afterwards to perform the multisample resolve. In that case, the 
         // mMultisampleFB is bound during rendering and is the one with a depth/stencil
 
-        ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
-
         // Store basic stats
         uint32 width = mColour[0].buffer->getWidth();
         uint32 height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
+        ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
         // Bind simple buffer to add colour attachments
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
@@ -177,12 +191,15 @@ namespace Ogre {
                     ss << "Attachment " << x << " has incompatible format.";
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GLES2FrameBufferObject::initialise");
                 }
-                mColour[x].buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0+x, mColour[x].zoffset);
+                if(getFormat() == PF_DEPTH)
+                    mColour[x].buffer->bindToFramebuffer(GL_DEPTH_ATTACHMENT, mColour[x].zoffset);
+                else
+                    mColour[x].buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0+x, mColour[x].zoffset);
             }
             else
             {
                 // Detach
-                OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0));
+                OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, static_cast<GLenum>(GL_COLOR_ATTACHMENT0+x), GL_RENDERBUFFER, 0));
             }
         }
 
@@ -209,25 +226,26 @@ namespace Ogre {
         // See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
         GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-        GLsizei n=0;
-        for(uint32 x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-        {
-            // Fill attached colour buffers
-            if(mColour[x].buffer)
-            {
-                bufs[x] = GL_COLOR_ATTACHMENT0 + x;
-                // Keep highest used buffer + 1
-                n = x+1;
-            }
-            else
-            {
-                bufs[x] = GL_NONE;
-            }
-        }
+		GLsizei n=0;
+		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+		{
+			// Fill attached colour buffers
+			if(mColour[x].buffer)
+			{
+				bufs[x] = GL_COLOR_ATTACHMENT0 + x;
+				// Keep highest used buffer + 1
+				n = x+1;
+			}
+			else
+			{
+				bufs[x] = GL_NONE;
+			}
+		}
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         // Drawbuffer extension supported, use it
-        OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
+        if(getFormat() != PF_DEPTH)
+            OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
 
         if (mMultisampleFB)
         {
@@ -280,14 +298,7 @@ namespace Ogre {
     {
         if (mMultisampleFB)
         {
-#if OGRE_NO_GLES3_SUPPORT == 1
-            if(getGLES2SupportRef()->checkExtension("GL_APPLE_framebuffer_multisample"))
-            {
-                // Blit from multisample buffer to final buffer, triggers resolve
-                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mMultisampleFB));
-                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mFB));
-            }
-#else
+#if OGRE_NO_GLES3_SUPPORT == 0
             GLint oldfb = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 

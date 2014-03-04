@@ -30,11 +30,10 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
-#include "OgreGpuProgram.h"
+#include "OgreAutoParamDataSource.h"
+#include "OgreShaderRenderState.h"
 #include "OgrePass.h"
-#include "OgreShaderGenerator.h"
-#include "OgreSceneManager.h"
-#include "OgreViewport.h"
+#include "OgreMaterialSerializer.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -43,6 +42,7 @@ namespace RTShader {
 /*                                                                      */
 /************************************************************************/
 String PerPixelLighting::Type = "SGX_PerPixelLighting";
+
 //-----------------------------------------------------------------------
 PerPixelLighting::PerPixelLighting()
 {
@@ -85,7 +85,7 @@ void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, con
             curSearchLightIndex = 0;
         }
 
-        Light*      srcLight = NULL;
+        Light const*srcLight = NULL;
         Vector4     vParameter;
         ColourValue colour;
 
@@ -102,9 +102,8 @@ void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, con
 
         // No matching light found -> use a blank dummy light for parameter update.
         if (srcLight == NULL)
-        {           
-            assert("No matching light found");
-            return;
+        {                       
+            srcLight = &source->_getBlankLight();
         }
 
 

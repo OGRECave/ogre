@@ -32,8 +32,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreBlendMode.h"
 #include "OgreMatrix4.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreString.h"
 #include "OgreTexture.h"
 #include "OgreIdString.h"
 #include "OgreHeaderPrefix.h"
@@ -133,7 +131,9 @@ namespace Ogre {
             /// Texture clamps at 1.0.
             TAM_CLAMP,
             /// Texture coordinates outside the range [0.0, 1.0] are set to the border colour.
-            TAM_BORDER
+            TAM_BORDER,
+            /// Unknown
+            TAM_UNKNOWN = 99
         };
 
         /** Texture addressing mode for each texture coordinate. */
@@ -474,10 +474,10 @@ namespace Ogre {
             BT_VERTEX = 1,          
             /// Geometry processing unit        
             BT_GEOMETRY = 2,
-            /// Tesselation control processing unit
-            BT_TESSELATION_HULL = 3,
-            /// Tesselation evaluation processing unit
-            BT_TESSELATION_DOMAIN = 4,
+            /// Tessellation control processing unit
+            BT_TESSELLATION_HULL = 3,
+            /// Tessellation evaluation processing unit
+            BT_TESSELLATION_DOMAIN = 4,
             /// Compute processing unit
             BT_COMPUTE = 5
         };
@@ -1255,7 +1255,7 @@ protected:
 
         bool mIsDefaultAniso;
         bool mIsDefaultFiltering;
-        /// Binding type (fragment or vertex pipeline).
+        /// Binding type (fragment, vertex, tesselation hull and domain pipeline).
         BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
         ContentType mContentType;

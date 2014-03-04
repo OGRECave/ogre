@@ -15,8 +15,8 @@ conditions of the standard open source license.
 #ifndef _LISTENER_FACTORY_LOGIC_H
 #define _LISTENER_FACTORY_LOGIC_H
 
-#include <OgreCompositorInstance.h>
-#include <OgreCompositorLogic.h>
+#include "OgreCompositorInstance.h"
+#include "OgreCompositorLogic.h"
 #include <map>
 
 //The simple types of compositor logics will all do the same thing -

@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __StreamSerialiser_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreCommon.h"
 #include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 
@@ -192,7 +193,7 @@ namespace Ogre
         @param msg Descriptive text added to the log if versions are not compatible
         @return The chunk if it passes the validation.
         */
-        virtual const Chunk* readChunkBegin(uint32 id, uint16 maxVersion, const String& msg = StringUtil::BLANK);
+        virtual const Chunk* readChunkBegin(uint32 id, uint16 maxVersion, const String& msg = BLANKSTRING);
 
         /** Call this to 'rewind' the stream to just before the start of the current
             chunk. 

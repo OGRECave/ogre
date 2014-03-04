@@ -134,7 +134,7 @@ namespace Ogre {
     String EAGL2Support::validateConfig(void)
     {
         // TODO - DJR
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
 
     String EAGL2Support::getDisplayName(void)

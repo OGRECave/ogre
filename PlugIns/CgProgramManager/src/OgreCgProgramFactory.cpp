@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreCgProgramFactory.h"
-#include "OgreString.h"
 #include "OgreCgProgram.h"
 
 namespace Ogre {

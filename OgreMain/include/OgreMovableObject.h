@@ -31,13 +31,9 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
-#include "OgreRenderQueue.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreSphere.h"
-#include "OgreFactoryObj.h"
 #include "OgreAnimable.h"
-#include "OgreAny.h"
-#include "OgreUserObjectBindings.h"
 #include "OgreSceneNode.h"
 #include "Math/Array/OgreObjectData.h"
 #include "OgreId.h"
@@ -151,7 +147,7 @@ namespace Ogre {
 
         /// Constructor
         MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
-                        uint8 renderQueueId=RENDER_QUEUE_MAIN );
+                        uint8 renderQueueId );
 
         /** Don't use this constructor unless you know what you're doing.
             @See ObjectMemoryManager::mDummyNode

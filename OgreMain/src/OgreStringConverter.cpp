@@ -394,11 +394,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool StringConverter::parseBool(const String& val, bool defaultValue)
     {
+        //FIXME Returns both parsed value and error in same value - ambiguous.
+        // Suggested alternatives: implement exception handling or make either
+        // error or parsed value a parameter.
         if ((StringUtil::startsWith(val, "true") || StringUtil::startsWith(val, "yes")
-            || StringUtil::startsWith(val, "1")))
+             || StringUtil::startsWith(val, "1") ||  StringUtil::startsWith(val, "on")))
             return true;
         else if ((StringUtil::startsWith(val, "false") || StringUtil::startsWith(val, "no")
-            || StringUtil::startsWith(val, "0")))
+                  || StringUtil::startsWith(val, "0") ||  StringUtil::startsWith(val, "off")))
             return false;
         else
             return defaultValue;

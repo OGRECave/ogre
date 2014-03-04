@@ -31,7 +31,7 @@ clear_if_changed(FREETYPE_PREFIX_PATH
   FREETYPE_INCLUDE_DIR
 )
 
-set(FREETYPE_LIBRARY_NAMES freetype251 freetype2501 freetype250 freetype2412 freetype2411 freetype2410 freetype249 freetype248 freetype246 freetype2311 freetype239 freetype238 freetype235 freetype219 freetype)
+set(FREETYPE_LIBRARY_NAMES freetype252 freetype251 freetype2501 freetype250 freetype2412 freetype2411 freetype2410 freetype249 freetype248 freetype246 freetype2311 freetype239 freetype238 freetype235 freetype219 freetype)
 get_debug_names(FREETYPE_LIBRARY_NAMES)
 
 use_pkgconfig(FREETYPE_PKGC freetype2)

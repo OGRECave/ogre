@@ -28,9 +28,15 @@ THE SOFTWARE.
 #define _ShaderProgramWriterGLSL_
 
 #include "OgreShaderProgramWriterManager.h"
+#include "OgreShaderProgramWriter.h"
+#include "OgreShaderParameter.h"
+#include "OgreStringVector.h"
 
 namespace Ogre {
 namespace RTShader {
+
+    class Function;
+    class Program;
 
 /** \addtogroup Core
 *  @{
@@ -115,9 +121,8 @@ protected:
 class _OgreRTSSExport ShaderProgramWriterGLSLFactory : public ProgramWriterFactory
 {
 public:
-    ShaderProgramWriterGLSLFactory()
+    ShaderProgramWriterGLSLFactory() : mLanguage("glsl")
     {
-        mLanguage = "glsl";
     }
     virtual ~ShaderProgramWriterGLSLFactory() {}
 

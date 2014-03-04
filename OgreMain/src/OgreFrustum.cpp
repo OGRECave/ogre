@@ -30,17 +30,15 @@ THE SOFTWARE.
 
 #include "OgreMath.h"
 #include "OgreMatrix3.h"
-#include "OgreSceneNode.h"
 #include "OgreSphere.h"
-#include "OgreLogManager.h"
 #include "OgreException.h"
 #include "OgreRoot.h"
 #include "OgreCamera.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
-#include "OgreHardwareIndexBuffer.h"
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
+#include "OgreMovablePlane.h"
 
 namespace Ogre {
 
@@ -48,7 +46,7 @@ namespace Ogre {
     const Real Frustum::INFINITE_FAR_PLANE_ADJUST = 0.00001;
     //-----------------------------------------------------------------------
     Frustum::Frustum( IdType id, ObjectMemoryManager *objectMemoryManager ) : 
-        MovableObject( id, objectMemoryManager ),
+        MovableObject( id, objectMemoryManager, 0 ),
         mProjType(PT_PERSPECTIVE), 
         mFOVy(Radian(Math::PI/4.0f)), 
         mFarDist(100000.0f), 
@@ -1119,11 +1117,11 @@ namespace Ogre {
                     Real Px0 = -(Pz0 * Nz0) / Nx0;
                     if (Px0 > eyeSpacePos.x)
                     {
-                        *right = min(*right, relx0.x);
+                        *right = Ogre::min(*right, relx0.x);
                     }
                     else
                     {
-                        *left = max(*left, relx0.x);
+                        *left = Ogre::max(*left, relx0.x);
                     }
                 }
                 Real Pz1 = (Lxz - rsq) / (eyeSpacePos.z - ((Nz1 / Nx1) * eyeSpacePos.x));
@@ -1139,11 +1137,11 @@ namespace Ogre {
                     Real Px1 = -(Pz1 * Nz1) / Nx1;
                     if (Px1 > eyeSpacePos.x)
                     {
-                        *right = min(*right, relx1.x);
+                        *right = Ogre::min(*right, relx1.x);
                     }
                     else
                     {
-                        *left = max(*left, relx1.x);
+                        *left = Ogre::max(*left, relx1.x);
                     }
                 }
             }
@@ -1187,11 +1185,11 @@ namespace Ogre {
                     Real Py0 = -(Pz0 * Nz0) / Ny0;
                     if (Py0 > eyeSpacePos.y)
                     {
-                        *top = min(*top, rely0.y);
+                        *top = Ogre::min(*top, rely0.y);
                     }
                     else
                     {
-                        *bottom = max(*bottom, rely0.y);
+                        *bottom = Ogre::max(*bottom, rely0.y);
                     }
                 }
                 Real Pz1 = (Lyz - rsq) / (eyeSpacePos.z - ((Nz1 / Ny1) * eyeSpacePos.y));
@@ -1207,11 +1205,11 @@ namespace Ogre {
                     Real Py1 = -(Pz1 * Nz1) / Ny1;
                     if (Py1 > eyeSpacePos.y)
                     {
-                        *top = min(*top, rely1.y);
+                        *top = Ogre::min(*top, rely1.y);
                     }
                     else
                     {
-                        *bottom = max(*bottom, rely1.y);
+                        *bottom = Ogre::max(*bottom, rely1.y);
                     }
                 }
             }

@@ -27,12 +27,9 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreString.h"
-#include "OgreStringVector.h"
 
 namespace Ogre {
 
-    //-----------------------------------------------------------------------
-    const String StringUtil::BLANK;
     //-----------------------------------------------------------------------
     void StringUtil::trim(String& str, bool left, bool right)
     {
@@ -212,6 +209,19 @@ namespace Ogre {
             str.end(),
             str.begin(),
             toupper);
+    }
+    //-----------------------------------------------------------------------
+    void StringUtil::toTitleCase(String& str) 
+    {
+        String::iterator it = str.begin();
+        *it = toupper(*it);
+        for (; it != str.end() - 1; it++)
+        {
+            if (*it == ' ') 
+            {
+                *(it + 1) = toupper(*(it + 1));
+            }
+        }
     }
     //-----------------------------------------------------------------------
     bool StringUtil::startsWith(const String& str, const String& pattern, bool lowerCase)

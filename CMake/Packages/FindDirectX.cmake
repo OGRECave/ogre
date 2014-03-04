@@ -39,6 +39,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX9 SDK
   )
 
   create_search_paths(DirectX9)
+
   # redo search if prefix path changed
   clear_if_changed(DirectX9_PREFIX_PATH
     DirectX9_LIBRARY
@@ -68,5 +69,4 @@ if(WIN32) # The only platform it makes sense to check for DirectX9 SDK
   mark_as_advanced(DirectX9_D3DX9_LIBRARY DirectX9_DXERR_LIBRARY DirectX9_DXGUID_LIBRARY
     DirectX9_DXGI_LIBRARY DirectX9_D3DCOMPILER_LIBRARY) 
 
-  
 endif(WIN32)

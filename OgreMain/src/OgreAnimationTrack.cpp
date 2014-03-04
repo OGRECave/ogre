@@ -30,8 +30,6 @@ THE SOFTWARE.
 #include "OgreAnimation.h"
 #include "OgreKeyFrame.h"
 #include "OgreOldNode.h"
-#include "OgreLogManager.h"
-#include "OgreHardwareBufferManager.h"
 #include "OgreMesh.h"
 #include "OgreException.h"
 

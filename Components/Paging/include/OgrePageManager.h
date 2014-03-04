@@ -30,8 +30,6 @@ THE SOFTWARE.
 #define __Ogre_PageManager_H__
 
 #include "OgrePagingPrerequisites.h"
-#include "OgreString.h"
-#include "OgreResourceGroupManager.h"
 #include "OgreCommon.h"
 #include "OgreCamera.h"
 #include "OgreFrameListener.h"
@@ -143,7 +141,7 @@ namespace Ogre
         @param name Optionally give a name to the world (if no name is given, one
             will be generated).
         */
-        PagedWorld* createWorld(const String& name = StringUtil::BLANK);
+        PagedWorld* createWorld(const String& name = BLANKSTRING);
 
         /** Destroy a world. */
         void destroyWorld(const String& name);
@@ -156,13 +154,13 @@ namespace Ogre
         @param name Optionally give a name to the world (if no name is given, one
         will be generated).
         */
-        PagedWorld* loadWorld(const String& filename, const String& name = StringUtil::BLANK);
+        PagedWorld* loadWorld(const String& filename, const String& name = BLANKSTRING);
         /** Load a new PagedWorld from a stream. 
         @param stream A stream from which to load the world data
         @param name Optionally give a name to the world (if no name is given, one
         will be generated).
         */
-        PagedWorld* loadWorld(const DataStreamPtr& stream, const String& name = StringUtil::BLANK);
+        PagedWorld* loadWorld(const DataStreamPtr& stream, const String& name = BLANKSTRING);
         /** Save a PagedWorld instance to a file. 
         @param world The world to be saved
         @param filename The filename to save the data to
@@ -444,7 +442,7 @@ namespace Ogre
             WorldMap* pWorldMap;
             CameraList* pCameraList;
 
-            EventRouter() {}
+            EventRouter() : pManager(0), pWorldMap(0), pCameraList(0) {}
             ~EventRouter() {}
 
             void cameraPreRenderScene(Camera* cam);

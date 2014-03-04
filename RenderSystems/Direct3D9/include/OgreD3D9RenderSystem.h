@@ -252,7 +252,8 @@ namespace Ogre
             StencilOperation stencilFailOp = SOP_KEEP, 
             StencilOperation depthFailOp = SOP_KEEP,
             StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false);
+            bool twoSidedOperation = false,
+            bool readBackAsTexture = false);
         void setNormaliseNormals(bool normalise);
 
         // Low-level overridden members, mainly for internal use
@@ -350,13 +351,14 @@ namespace Ogre
         /// Tells whether the system is initialized with DirectX 9Ex driver
         /// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
         static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
-        
+
         static D3D9ResourceManager* getResourceManager();
         static D3D9DeviceManager* getDeviceManager();
         static IDirect3D9* getDirect3D9();
         static UINT getResourceCreationDeviceCount();
         static IDirect3DDevice9* getResourceCreationDevice(UINT index);
         static IDirect3DDevice9* getActiveD3D9Device();
+        static IDirect3DDevice9* getActiveD3D9DeviceIfExists();
 
         /** Check which depthStencil formats can be used with a certain pixel format,
             and return the best suited.
@@ -374,9 +376,8 @@ namespace Ogre
 
         /// @copydoc RenderSystem::getDisplayMonitorCount
         unsigned int getDisplayMonitorCount() const;
-
         /// @copydoc RenderSystem::hasAnisotropicMipMapFilter
-        virtual bool hasAnisotropicMipMapFilter() const { return false; }
+        virtual bool hasAnisotropicMipMapFilter() const { return false; }   
 
         /// @copydoc RenderSystem::beginProfileEvent
         virtual void beginProfileEvent( const String &eventName );

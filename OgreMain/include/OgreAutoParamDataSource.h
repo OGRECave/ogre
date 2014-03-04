@@ -30,10 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
-#include "OgreMatrix4.h"
-#include "OgreVector4.h"
 #include "OgreLight.h"
-#include "OgreColourValue.h"
 
 #include "Math/Array/OgreObjectMemoryManager.h"
 
@@ -259,6 +256,8 @@ namespace Ogre {
          void setPassNumber(const int passNumber);
          void incPassNumber(void);
          void updateLightCustomGpuParameter(const GpuProgramParameters::AutoConstantEntry& constantEntry, GpuProgramParameters *params) const;
+
+		 const Light& _getBlankLight(void) const		{ return mBlankLight; }
     };
     /** @} */
     /** @} */

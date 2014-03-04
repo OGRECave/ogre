@@ -39,7 +39,6 @@ namespace Ogre {
     {
         private:
             GLuint mBufferId;
-            GLsync mFence;
 
         protected:
             /** See HardwareBuffer. */
@@ -79,7 +78,6 @@ namespace Ogre {
             void _updateFromShadow(void);
 
             inline GLuint getGLBufferId(void) const { return mBufferId; }
-            void setFence(void);
     };
 }
 

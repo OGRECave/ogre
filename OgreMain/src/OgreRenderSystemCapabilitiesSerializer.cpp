@@ -29,9 +29,8 @@ THE SOFTWARE.
 
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
-#include "OgreStringConverter.h"
 #include "OgreLogManager.h"
-#include "OgreException.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreRenderSystemCapabilities.h"
 
 #include <fstream>
@@ -49,7 +48,7 @@ namespace Ogre
     }
     
     //-----------------------------------------------------------------------
-    static void write(const RenderSystemCapabilities* caps, String name, std::ostream &file)
+    static void write(const RenderSystemCapabilities* caps, const String &name, std::ostream &file)
     {
         using namespace std;
 
@@ -76,11 +75,12 @@ namespace Ogre
         file << "\t" << "cubemapping " << StringConverter::toString(caps->hasCapability(RSC_CUBEMAPPING)) << endl;
         file << "\t" << "hwstencil " << StringConverter::toString(caps->hasCapability(RSC_HWSTENCIL)) << endl;
         file << "\t" << "vbo " << StringConverter::toString(caps->hasCapability(RSC_VBO)) << endl;
+        file << "\t" << "32bit_index " << StringConverter::toString(caps->hasCapability(RSC_32BIT_INDEX)) << endl;
         file << "\t" << "vertex_program " << StringConverter::toString(caps->hasCapability(RSC_VERTEX_PROGRAM)) << endl;
         file << "\t" << "fragment_program " << StringConverter::toString(caps->hasCapability(RSC_FRAGMENT_PROGRAM)) << endl;
         file << "\t" << "geometry_program " << StringConverter::toString(caps->hasCapability(RSC_GEOMETRY_PROGRAM)) << endl;
-        file << "\t" << "tesselation_hull_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM)) << endl;
-        file << "\t" << "tesselation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM)) << endl;
+        file << "\t" << "tessellation_hull_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM)) << endl;
+        file << "\t" << "tessellation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM)) << endl;
         file << "\t" << "compute_program " << StringConverter::toString(caps->hasCapability(RSC_COMPUTE_PROGRAM)) << endl;
         file << "\t" << "scissor_test " << StringConverter::toString(caps->hasCapability(RSC_SCISSOR_TEST)) << endl;
         file << "\t" << "two_sided_stencil " << StringConverter::toString(caps->hasCapability(RSC_TWO_SIDED_STENCIL)) << endl;
@@ -148,12 +148,12 @@ namespace Ogre
         file << "\t" << "geometry_program_constant_float_count " << StringConverter::toString(caps->getGeometryProgramConstantFloatCount()) << endl;
         file << "\t" << "geometry_program_constant_int_count " << StringConverter::toString(caps->getGeometryProgramConstantIntCount()) << endl;
         file << "\t" << "geometry_program_constant_bool_count " << StringConverter::toString(caps->getGeometryProgramConstantBoolCount()) << endl;
-        file << "\t" << "tesselation_hull_program_constant_float_count " << StringConverter::toString(caps->getTesselationHullProgramConstantFloatCount()) << endl;
-        file << "\t" << "tesselation_hull_program_constant_int_count " << StringConverter::toString(caps->getTesselationHullProgramConstantIntCount()) << endl;
-        file << "\t" << "tesselation_hull_program_constant_bool_count " << StringConverter::toString(caps->getTesselationHullProgramConstantBoolCount()) << endl;
-        file << "\t" << "tesselation_domain_program_constant_float_count " << StringConverter::toString(caps->getTesselationDomainProgramConstantFloatCount()) << endl;
-        file << "\t" << "tesselation_domain_program_constant_int_count " << StringConverter::toString(caps->getTesselationDomainProgramConstantIntCount()) << endl;
-        file << "\t" << "tesselation_domain_program_constant_bool_count " << StringConverter::toString(caps->getTesselationDomainProgramConstantBoolCount()) << endl;
+        file << "\t" << "tessellation_hull_program_constant_float_count " << StringConverter::toString(caps->getTessellationHullProgramConstantFloatCount()) << endl;
+        file << "\t" << "tessellation_hull_program_constant_int_count " << StringConverter::toString(caps->getTessellationHullProgramConstantIntCount()) << endl;
+        file << "\t" << "tessellation_hull_program_constant_bool_count " << StringConverter::toString(caps->getTessellationHullProgramConstantBoolCount()) << endl;
+        file << "\t" << "tessellation_domain_program_constant_float_count " << StringConverter::toString(caps->getTessellationDomainProgramConstantFloatCount()) << endl;
+        file << "\t" << "tessellation_domain_program_constant_int_count " << StringConverter::toString(caps->getTessellationDomainProgramConstantIntCount()) << endl;
+        file << "\t" << "tessellation_domain_program_constant_bool_count " << StringConverter::toString(caps->getTessellationDomainProgramConstantBoolCount()) << endl;
         file << "\t" << "compute_program_constant_float_count " << StringConverter::toString(caps->getComputeProgramConstantFloatCount()) << endl;
         file << "\t" << "compute_program_constant_int_count " << StringConverter::toString(caps->getComputeProgramConstantIntCount()) << endl;
         file << "\t" << "compute_program_constant_bool_count " << StringConverter::toString(caps->getComputeProgramConstantBoolCount()) << endl;
@@ -165,7 +165,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-    void RenderSystemCapabilitiesSerializer::writeScript(const RenderSystemCapabilities* caps, String name, String filename)
+    void RenderSystemCapabilitiesSerializer::writeScript(const RenderSystemCapabilities* caps, const String &name, String filename)
     {
         using namespace std;
 
@@ -177,7 +177,7 @@ namespace Ogre
     }
     
     //-----------------------------------------------------------------------
-    String RenderSystemCapabilitiesSerializer::writeString(const RenderSystemCapabilities* caps, String name)
+    String RenderSystemCapabilitiesSerializer::writeString(const RenderSystemCapabilities* caps, const String &name)
     {
         using namespace std;
         
@@ -364,12 +364,12 @@ namespace Ogre
         addKeywordType("geometry_program_constant_float_count", SET_INT_METHOD);
         addKeywordType("geometry_program_constant_int_count", SET_INT_METHOD);
         addKeywordType("geometry_program_constant_bool_count", SET_INT_METHOD);
-        addKeywordType("tesselation_hull_program_constant_float_count", SET_INT_METHOD);
-        addKeywordType("tesselation_hull_program_constant_int_count", SET_INT_METHOD);
-        addKeywordType("tesselation_hull_program_constant_bool_count", SET_INT_METHOD);
-        addKeywordType("tesselation_domain_program_constant_float_count", SET_INT_METHOD);
-        addKeywordType("tesselation_domain_program_constant_int_count", SET_INT_METHOD);
-        addKeywordType("tesselation_domain_program_constant_bool_count", SET_INT_METHOD);
+        addKeywordType("tessellation_hull_program_constant_float_count", SET_INT_METHOD);
+        addKeywordType("tessellation_hull_program_constant_int_count", SET_INT_METHOD);
+        addKeywordType("tessellation_hull_program_constant_bool_count", SET_INT_METHOD);
+        addKeywordType("tessellation_domain_program_constant_float_count", SET_INT_METHOD);
+        addKeywordType("tessellation_domain_program_constant_int_count", SET_INT_METHOD);
+        addKeywordType("tessellation_domain_program_constant_bool_count", SET_INT_METHOD);
         addKeywordType("compute_program_constant_float_count", SET_INT_METHOD);
         addKeywordType("compute_program_constant_int_count", SET_INT_METHOD);
         addKeywordType("compute_program_constant_bool_count", SET_INT_METHOD);
@@ -390,12 +390,12 @@ namespace Ogre
         addSetIntMethod("geometry_program_constant_float_count", &RenderSystemCapabilities::setGeometryProgramConstantFloatCount);
         addSetIntMethod("geometry_program_constant_int_count", &RenderSystemCapabilities::setGeometryProgramConstantIntCount);
         addSetIntMethod("geometry_program_constant_bool_count", &RenderSystemCapabilities::setGeometryProgramConstantBoolCount);
-        addSetIntMethod("tesselation_hull_program_constant_float_count", &RenderSystemCapabilities::setTesselationHullProgramConstantFloatCount);
-        addSetIntMethod("tesselation_hull_program_constant_int_count", &RenderSystemCapabilities::setTesselationHullProgramConstantIntCount);
-        addSetIntMethod("tesselation_hull_program_constant_bool_count", &RenderSystemCapabilities::setTesselationHullProgramConstantBoolCount);
-        addSetIntMethod("tesselation_domain_program_constant_float_count", &RenderSystemCapabilities::setTesselationDomainProgramConstantFloatCount);
-        addSetIntMethod("tesselation_domain_program_constant_int_count", &RenderSystemCapabilities::setTesselationDomainProgramConstantIntCount);
-        addSetIntMethod("tesselation_domain_program_constant_bool_count", &RenderSystemCapabilities::setTesselationDomainProgramConstantBoolCount);
+        addSetIntMethod("tessellation_hull_program_constant_float_count", &RenderSystemCapabilities::setTessellationHullProgramConstantFloatCount);
+        addSetIntMethod("tessellation_hull_program_constant_int_count", &RenderSystemCapabilities::setTessellationHullProgramConstantIntCount);
+        addSetIntMethod("tessellation_hull_program_constant_bool_count", &RenderSystemCapabilities::setTessellationHullProgramConstantBoolCount);
+        addSetIntMethod("tessellation_domain_program_constant_float_count", &RenderSystemCapabilities::setTessellationDomainProgramConstantFloatCount);
+        addSetIntMethod("tessellation_domain_program_constant_int_count", &RenderSystemCapabilities::setTessellationDomainProgramConstantIntCount);
+        addSetIntMethod("tessellation_domain_program_constant_bool_count", &RenderSystemCapabilities::setTessellationDomainProgramConstantBoolCount);
         addSetIntMethod("compute_program_constant_float_count", &RenderSystemCapabilities::setComputeProgramConstantFloatCount);
         addSetIntMethod("compute_program_constant_int_count", &RenderSystemCapabilities::setComputeProgramConstantIntCount);
         addSetIntMethod("compute_program_constant_bool_count", &RenderSystemCapabilities::setComputeProgramConstantBoolCount);
@@ -430,8 +430,8 @@ namespace Ogre
         addKeywordType("vertex_program", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("geometry_program", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("fragment_program", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("tesselation_hull_program", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("tesselation_domain_program", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("tessellation_hull_program", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("tessellation_domain_program", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("compute_program", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("scissor_test", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("two_sided_stencil", SET_CAPABILITY_ENUM_BOOL);
@@ -477,11 +477,12 @@ namespace Ogre
         addCapabilitiesMapping("cubemapping", RSC_CUBEMAPPING);
         addCapabilitiesMapping("hwstencil", RSC_HWSTENCIL);
         addCapabilitiesMapping("vbo", RSC_VBO);
+        addCapabilitiesMapping("32bit_index", RSC_32BIT_INDEX);
         addCapabilitiesMapping("vertex_program", RSC_VERTEX_PROGRAM);
         addCapabilitiesMapping("geometry_program", RSC_GEOMETRY_PROGRAM);
         addCapabilitiesMapping("fragment_program", RSC_FRAGMENT_PROGRAM);
-        addCapabilitiesMapping("tesselation_hull_program", RSC_TESSELATION_HULL_PROGRAM);
-        addCapabilitiesMapping("tesselation_domain_program", RSC_TESSELATION_DOMAIN_PROGRAM);
+        addCapabilitiesMapping("tessellation_hull_program", RSC_TESSELLATION_HULL_PROGRAM);
+        addCapabilitiesMapping("tessellation_domain_program", RSC_TESSELLATION_DOMAIN_PROGRAM);
         addCapabilitiesMapping("compute_program", RSC_COMPUTE_PROGRAM);
         addCapabilitiesMapping("scissor_test", RSC_SCISSOR_TEST);
         addCapabilitiesMapping("two_sided_stencil", RSC_TWO_SIDED_STENCIL);

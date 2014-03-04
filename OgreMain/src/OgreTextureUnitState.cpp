@@ -196,7 +196,7 @@ namespace Ogre {
         if (mCurrentFrame < mFrames.size())
             return mFrames[mCurrentFrame];
         else
-            return StringUtil::BLANK;
+            return BLANKSTRING;
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTextureName( const String& name, TextureType texType)
@@ -505,7 +505,7 @@ namespace Ogre {
 
         for (unsigned int i = 0; i < mFrames.size(); ++i)
         {
-            StringUtil::StrStreamType str;
+            StringStream str;
             str << baseName << "_" << i << ext;
             mFrames[i] = str.str();
             mFramePtrs[i].setNull();
@@ -876,7 +876,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TextureUnitState::setBlank(void)
     {
-        setTextureName(StringUtil::BLANK);
+        setTextureName(BLANKSTRING);
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTextureTransform(const Matrix4& xform)
@@ -1174,7 +1174,7 @@ namespace Ogre {
                         ". Texture layer will be blank. Loading the texture "
                         "failed with the following exception: " 
                         + e.getFullDescription();
-                    LogManager::getSingleton().logMessage(msg);
+                    LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
                     mTextureLoadFailed = true;
                 }   
             }
@@ -1206,7 +1206,7 @@ namespace Ogre {
                         ". Texture layer will be blank. Loading the texture "
                         "failed with the following exception: " 
                         + e.getFullDescription();
-                    LogManager::getSingleton().logMessage(msg);
+                    LogManager::getSingleton().logMessage(msg, LML_CRITICAL);
                     mTextureLoadFailed = true;
                 }
             }
@@ -1462,7 +1462,8 @@ namespace Ogre {
             if (i->second.subtype == ENV_REFLECTION)
                 return true;
         }
-        for(i = mEffects.find(ET_PROJECTIVE_TEXTURE); i != iend; ++i)
+
+        if(mEffects.find(ET_PROJECTIVE_TEXTURE) != iend)
         {
             return true;
         }

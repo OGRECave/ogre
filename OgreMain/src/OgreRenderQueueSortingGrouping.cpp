@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRenderQueueSortingGrouping.h"
 #include "OgreException.h"
+#include "OgreTechnique.h"
 
 namespace Ogre {
     // Init statics

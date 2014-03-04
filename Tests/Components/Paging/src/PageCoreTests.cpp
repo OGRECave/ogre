@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "PageCoreTests.h"
 #include "OgrePaging.h"
+#include "OgreLogManager.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
 
@@ -42,20 +43,21 @@ void PageCoreTests::setUp()
         logManager->createLog("testPageCore.log", true, false);
     }
     LogManager::getSingleton().setLogDetail(LL_LOW);
+    mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #if OGRE_STATIC
         mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
 #endif
 
 #ifdef OGRE_STATIC_LIB
-    mRoot = OGRE_NEW Root(StringUtil::BLANK);
+    mRoot = OGRE_NEW Root(BLANKSTRING);
         
     mStaticPluginLoader.load();
 #else
-    mRoot = OGRE_NEW Root();
+    String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+    mRoot = OGRE_NEW Root(pluginsPath);
 #endif
 
-    LogManager::getSingleton().setLogDetail(LL_LOW);
     mPageManager = OGRE_NEW PageManager();
 
     // make certain the resource location is NOT read-only
@@ -80,8 +82,9 @@ void PageCoreTests::tearDown()
 {
     OGRE_DELETE mPageManager;
     OGRE_DELETE mRoot;
+    OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 #if OGRE_STATIC
-        OGRE_DELETE mStaticPluginLoader;
+    OGRE_DELETE mStaticPluginLoader;
 #endif
 }
 

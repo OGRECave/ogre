@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreMovableObject.h"
 #include "OgreSceneNode.h"
-#include "OgreTagPoint.h"
 #include "OgreLight.h"
 #include "OgreEntity.h"
 #include "OgreRoot.h"
@@ -37,6 +36,7 @@ THE SOFTWARE.
 #include "OgreCamera.h"
 #include "OgreLodListener.h"
 #include "OgreLight.h"
+#include "OgreTechnique.h"
 #include "Math/Array/OgreArraySphere.h"
 #include "Math/Array/OgreBooleanMask.h"
 #include "OgreRawPtr.h"

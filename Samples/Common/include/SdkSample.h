@@ -32,6 +32,8 @@
 #include "SdkTrays.h"
 #include "SdkCameraMan.h"
 
+#include "Ogre.h"
+
 #ifdef INCLUDE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
 #endif
@@ -319,6 +321,15 @@ namespace OgreBites
                 mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
             }   
 #endif // INCLUDE_RTSHADER_SYSTEM
+#if OGRE_PROFILING
+            // Toggle visibility of profiler window
+            else if (evt.key == OIS::KC_P)
+            {
+                Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
+                if (prof)
+                    prof->setEnabled(!prof->getEnabled());
+            }
+#endif // OGRE_PROFILING
 
             mCameraMan->injectKeyDown(evt);
             return true;
@@ -478,7 +489,7 @@ namespace OgreBites
             //const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
-                mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+                //mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
                 mDetailsPanel->setParamValue(11, "On");
             }
             mDetailsPanel->setParamValue(12, "Vertex");

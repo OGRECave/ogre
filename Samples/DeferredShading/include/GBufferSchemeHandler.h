@@ -16,7 +16,7 @@ same license as the rest of the engine.
 #ifndef _GBUFFERSCHEMEHANDLER_H
 #define _GBUFFERSCHEMEHANDLER_H
 
-#include <OgreMaterialManager.h>
+#include "OgreMaterialManager.h"
 #include "GBufferMaterialGenerator.h"
 
 /** Class for handling materials who did not specify techniques for rendering

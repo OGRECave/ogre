@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreMath.h"
-#include "OgreLogManager.h"
 #include "OgreTextureUnitState.h"
 
 namespace Ogre

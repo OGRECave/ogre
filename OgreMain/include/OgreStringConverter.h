@@ -32,13 +32,8 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreStringVector.h"
 #include "OgreColourValue.h"
-#include "OgreMath.h"
-#include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
-#include "OgreQuaternion.h"
 #include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
 
 namespace Ogre {
 
@@ -218,7 +213,8 @@ namespace Ogre {
         /** Converts a String to a boolean. 
         @remarks
             Returns true if case-insensitive match of the start of the string
-            matches "true", "yes" or "1", false otherwise.
+            matches "true", "yes", "1", or "on", false if "false", "no", "0" 
+            or "off".
         */
         static bool parseBool(const String& val, bool defaultValue = 0);
         /** Parses a Vector2 out of a String.
@@ -274,7 +270,7 @@ namespace Ogre {
         static bool isNumber(const String& val);
 
         //-----------------------------------------------------------------------
-        static void setDefaultStringLocale(String loc)
+        static void setDefaultStringLocale(const String &loc)
         {
             msDefaultStringLocale = loc;
             msLocale = std::locale(msDefaultStringLocale.c_str());

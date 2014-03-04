@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreExternalTextureSourceManager.h"
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreHighLevelGpuProgram.h"
 
 namespace Ogre
 {
@@ -54,7 +55,7 @@ namespace Ogre
         {
             LogManager::getSingleton().logMessage(
                 "Error in material " + context.material->getName() +
-                " : " + error);
+                " : " + error, LML_CRITICAL);
         }
         else
         {
@@ -63,13 +64,13 @@ namespace Ogre
                 LogManager::getSingleton().logMessage(
                     "Error in material " + context.material->getName() +
                     " at line " + StringConverter::toString(context.lineNo) +
-                    " of " + context.filename + ": " + error);
+                    " of " + context.filename + ": " + error, LML_CRITICAL);
             }
             else
             {
                 LogManager::getSingleton().logMessage(
                     "Error at line " + StringConverter::toString(context.lineNo) +
-                    " of " + context.filename + ": " + error);
+                    " of " + context.filename + ": " + error, LML_CRITICAL);
             }
         }
     }
@@ -996,13 +997,13 @@ namespace Ogre
         {
             context.textureUnit->setBindingType(TextureUnitState::BT_GEOMETRY);
         }
-        else if (params == "tesselation_hull")
+        else if (params == "tessellation_hull")
         {
-            context.textureUnit->setBindingType(TextureUnitState::BT_TESSELATION_HULL);
+            context.textureUnit->setBindingType(TextureUnitState::BT_TESSELLATION_HULL);
         }
-        else if (params == "tesselation_domain")
+        else if (params == "tessellation_domain")
         {
-            context.textureUnit->setBindingType(TextureUnitState::BT_TESSELATION_DOMAIN);
+            context.textureUnit->setBindingType(TextureUnitState::BT_TESSELLATION_DOMAIN);
         }
         else if (params == "compute")
         {
@@ -1898,19 +1899,50 @@ namespace Ogre
 
         return false;
     }
-
     //-----------------------------------------------------------------------
-    void processManualProgramParam(bool isNamed, const String commandname,
-        StringVector& vecparams, MaterialScriptContext& context,
-        size_t index = 0, const String& paramName = StringUtil::BLANK)
+    inline size_t parseParamDimensions(String& dimensions, size_t start)
+    {
+        // Assume 1 unless otherwise specified
+        size_t dims = 1;
+
+        if (start != String::npos)
+        {
+            size_t end = dimensions.find_first_of("[", start);
+
+            // int1, int2, etc.
+            if (end != start)
+            {
+                dims *= StringConverter::parseInt(
+                    dimensions.substr(start, end - start));
+                start = end;
+            }
+
+            // C-style array
+            while (start != String::npos)
+            {
+                end = dimensions.find_first_of("]", start);
+                dims *= StringConverter::parseInt(
+                    dimensions.substr(start + 1, end - start - 1));
+                start = dimensions.find_first_of("[", start);
+            }
+        }
+        
+        return dims;
+    }
+    //-----------------------------------------------------------------------
+    void processManualProgramParam(bool isNamed, const String &commandname,
+                                   StringVector& vecparams, MaterialScriptContext& context,
+                                   size_t index = 0, const String& paramName = BLANKSTRING)
     {
         // NB we assume that the first element of vecparams is taken up with either
         // the index or the parameter name, which we ignore
 
         // Determine type
-        size_t start, dims, roundedDims, i;
+        size_t dims, roundedDims, i;
         bool isReal;
         bool isMatrix4x4 = false;
+        bool isInt = false;
+        bool isUnsignedInt = false;
 
         StringUtil::toLowerCase(vecparams[1]);
 
@@ -1920,72 +1952,59 @@ namespace Ogre
             isReal = true;
             isMatrix4x4 = true;
         }
-        else if ((start = vecparams[1].find("float")) != String::npos)
+        else if (vecparams[1].find("float") != String::npos)
         {
-            // find the dimensionality
-            start = vecparams[1].find_first_not_of("float");
-            // Assume 1 if not specified
-            if (start == String::npos)
-            {
-                dims = 1;
-            }
-            else
-            {
-                dims = StringConverter::parseInt(vecparams[1].substr(start));
-            }
+            dims = parseParamDimensions(vecparams[1], 
+                                        vecparams[1].find_first_not_of("float"));
             isReal = true;
         }
-        else if ((start = vecparams[1].find("double")) != String::npos)
+        else if (vecparams[1].find("double") != String::npos)
         {
-            // find the dimensionality
-            start = vecparams[1].find_first_not_of("double");
-            // Assume 1 if not specified
-            if (start == String::npos)
-            {
-                dims = 1;
-            }
-            else
-            {
-                dims = StringConverter::parseInt(vecparams[1].substr(start));
-            }
+            dims = parseParamDimensions(vecparams[1], 
+                                        vecparams[1].find_first_not_of("double"));
             isReal = true;
         }
-        else if ((start = vecparams[1].find("int")) != String::npos)
+        else if (vecparams[1].find("int") != String::npos)
         {
-            // find the dimensionality
-            start = vecparams[1].find_first_not_of("int");
-            // Assume 1 if not specified
-            if (start == String::npos)
-            {
-                dims = 1;
-            }
-            else
-            {
-                dims = StringConverter::parseInt(vecparams[1].substr(start));
-            }
+            dims = parseParamDimensions(vecparams[1], 
+                                        vecparams[1].find_first_not_of("int"));
+            isReal = false;
+            isInt = true;
+        }
+        else if (vecparams[1].find("uint") != String::npos)
+        {
+            dims = parseParamDimensions(vecparams[1],
+                                        vecparams[1].find_first_not_of("uint"));
+            isReal = false;
+            isUnsignedInt = true;
+        }
+        else if (vecparams[1].find("bool") != String::npos)
+        {
+            dims = parseParamDimensions(vecparams[1], 
+                                        vecparams[1].find_first_not_of("bool"));
             isReal = false;
         }
         else
         {
             logParseError("Invalid " + commandname + " attribute - unrecognised "
-                "parameter type " + vecparams[1], context);
+                          "parameter type " + vecparams[1], context);
             return;
         }
 
         if (vecparams.size() != 2 + dims)
         {
             logParseError("Invalid " + commandname + " attribute - you need " +
-                StringConverter::toString(2 + dims) + " parameters for a parameter of "
-                "type " + vecparams[1], context);
+                          StringConverter::toString(2 + dims) + " parameters for a parameter of "
+                          "type " + vecparams[1], context);
         }
 
-        // clear any auto parameter bound to this constant, it would override this setting
-        // can cause problems overriding materials or changing default params
+        // Clear any auto parameter bound to this constant, it would
+        // override this setting can cause problems overriding
+        // materials or changing default params
         if (isNamed)
             context.programParams->clearNamedAutoConstant(paramName);
         else
             context.programParams->clearAutoConstant(index);
-
 
         // Round dims to multiple of 4
         if (dims %4 != 0)
@@ -2015,14 +2034,15 @@ namespace Ogre
 
             if (isMatrix4x4)
             {
-                // its a Matrix4x4 so pass as a Matrix4
-                // use specialized setConstant that takes a matrix so matrix is transposed if required
+                // It's a Matrix4x4 so pass as a Matrix4. Use
+                // specialized setConstant that takes a matrix so
+                // matrix is transposed if required.
                 Matrix4 m4x4(
                     realBuffer[0],  realBuffer[1],  realBuffer[2],  realBuffer[3],
                     realBuffer[4],  realBuffer[5],  realBuffer[6],  realBuffer[7],
                     realBuffer[8],  realBuffer[9],  realBuffer[10], realBuffer[11],
                     realBuffer[12], realBuffer[13], realBuffer[14], realBuffer[15]
-                    );
+                );
                 if (isNamed)
                     context.programParams->setNamedConstant(paramName, m4x4);
                 else
@@ -2038,31 +2058,30 @@ namespace Ogre
                     // GLSL can support sub-float4 elements and we support that
                     // in the buffer now. Note how we set the 'multiple' param to 1
                     context.programParams->setNamedConstant(paramName, realBuffer,
-                        dims, 1);
+                                                            dims, 1);
                 }
                 else
                 {
                     context.programParams->setConstant(index, realBuffer,
-                        static_cast<size_t>(roundedDims * 0.25));
+                                                       static_cast<size_t>(roundedDims * 0.25));
                 }
 
             }
 
-
             OGRE_FREE(realBuffer, MEMCATEGORY_SCRIPTING);
         }
-        else
+        else if (isInt)
         {
-            int* intBuffer = OGRE_ALLOC_T(int, roundedDims, MEMCATEGORY_SCRIPTING);
+            int* buffer = OGRE_ALLOC_T(int, roundedDims, MEMCATEGORY_SCRIPTING);
             // Do specified values
             for (i = 0; i < dims; ++i)
             {
-                intBuffer[i] = StringConverter::parseInt(vecparams[i+2]);
+                buffer[i] = StringConverter::parseInt(vecparams[i + 2]);
             }
             // Fill to multiple of 4 with 0
             for (; i < roundedDims; ++i)
             {
-                intBuffer[i] = 0;
+                buffer[i] = 0;
             }
             // Set
             if (isNamed)
@@ -2071,21 +2090,81 @@ namespace Ogre
                 // (no rounding to 4 elements)
                 // GLSL can support sub-float4 elements and we support that
                 // in the buffer now. Note how we set the 'multiple' param to 1
-                context.programParams->setNamedConstant(paramName, intBuffer,
-                    dims, 1);
+                context.programParams->setNamedConstant(paramName, buffer,
+                                                        dims, 1);
             }
             else
             {
-                context.programParams->setConstant(index, intBuffer,
-                    static_cast<size_t>(roundedDims * 0.25));
+                context.programParams->setConstant(index, buffer,
+                                                   static_cast<size_t>(roundedDims * 0.25));
             }
-            OGRE_FREE(intBuffer, MEMCATEGORY_SCRIPTING);
+            OGRE_FREE(buffer, MEMCATEGORY_SCRIPTING);
+        }
+        else if (isUnsignedInt)
+        {
+            uint* buffer = OGRE_ALLOC_T(uint, roundedDims, MEMCATEGORY_SCRIPTING);
+            // Do specified values
+            for (i = 0; i < dims; ++i)
+            {
+                buffer[i] = StringConverter::parseUnsignedInt(vecparams[i + 2]);
+            }
+            // Fill to multiple of 4 with 0
+            for (; i < roundedDims; ++i)
+            {
+                buffer[i] = 0;
+            }
+            // Set
+            if (isNamed)
+            {
+                // For named, only set up to the precise number of elements
+                // (no rounding to 4 elements)
+                // GLSL can support sub-float4 elements and we support that
+                // in the buffer now. Note how we set the 'multiple' param to 1
+                context.programParams->setNamedConstant(paramName, buffer,
+                                                        dims, 1);
+            }
+            else
+            {
+                context.programParams->setConstant(index, buffer,
+                                                   static_cast<size_t>(roundedDims * 0.25));
+            }
+            OGRE_FREE(buffer, MEMCATEGORY_SCRIPTING);
+        }
+        else // bool
+        {
+            uint* buffer = OGRE_ALLOC_T(uint, roundedDims, MEMCATEGORY_SCRIPTING);
+            // Do specified values
+            for (i = 0; i < dims; ++i)
+            {
+                buffer[i] = StringConverter::parseBool(vecparams[i + 2]) != 0;
+            }
+            // Fill to multiple of 4 with 0
+            for (; i < roundedDims; ++i)
+            {
+                buffer[i] = false;
+            }
+            // Set
+            if (isNamed)
+            {
+                // For named, only set up to the precise number of elements
+                // (no rounding to 4 elements)
+                // GLSL can support sub-float4 elements and we support that
+                // in the buffer now. Note how we set the 'multiple' param to 1
+                context.programParams->setNamedConstant(paramName, buffer,
+                                                        dims, 1);
+            }
+            else
+            {
+                context.programParams->setConstant(index, buffer,
+                                                   static_cast<size_t>(roundedDims * 0.25));
+            }
+            OGRE_FREE(buffer, MEMCATEGORY_SCRIPTING);
         }
     }
     //-----------------------------------------------------------------------
     void processAutoProgramParam(bool isNamed, const String& commandname,
         StringVector& vecparams, MaterialScriptContext& context,
-        size_t index = 0, const String& paramName = StringUtil::BLANK)
+        size_t index = 0, const String& paramName = BLANKSTRING)
     {
         // NB we assume that the first element of vecparams is taken up with either
         // the index or the parameter name, which we ignore
@@ -2270,7 +2349,7 @@ namespace Ogre
         if (vecparams.size() < 3)
         {
             logParseError("Invalid param_named attribute - expected at least 3 parameters.",
-                context);
+                          context);
             return false;
         }
 
@@ -3107,6 +3186,7 @@ namespace Ogre
         mScriptContext.techLev = -1;
         mScriptContext.passLev = -1;
         mScriptContext.stateLev = -1;
+        mDefaults = false;
 
         mBuffer.clear();
     }
@@ -3313,7 +3393,7 @@ namespace Ogre
                 }
                 else
                 {
-                    String cmd = splitCmd.size() >= 2? splitCmd[1]:StringUtil::BLANK;
+                    String cmd = splitCmd.size() >= 2? splitCmd[1]:BLANKSTRING;
                     // Use parser with remainder
                     return iparser->second(cmd, mScriptContext );
                 }
@@ -3438,7 +3518,7 @@ namespace Ogre
                     = mProgramDefaultParamAttribParsers.find(splitCmd[0]);
                 if (iparser != mProgramDefaultParamAttribParsers.end())
                 {
-                    String cmd = splitCmd.size() >= 2? splitCmd[1]:StringUtil::BLANK;
+                    String cmd = splitCmd.size() >= 2? splitCmd[1]:BLANKSTRING;
                     // Use parser with remainder
                     iparser->second(cmd, mScriptContext );
                 }
@@ -4196,6 +4276,21 @@ namespace Ogre
                 writeFragmentProgramRef(pPass);
             }
 
+            if(pPass->hasTessellationHullProgram())
+            {
+                writeTesselationHullProgramRef(pPass);
+            }
+
+            if(pPass->hasTessellationHullProgram())
+            {
+                writeTesselationDomainProgramRef(pPass);
+            }
+            
+            if (pPass->hasGeometryProgram())
+            {
+                writeGeometryProgramRef(pPass);
+            }
+
             if (pPass->hasShadowCasterVertexProgram())
             {
                 writeShadowCasterVertexProgramRef(pPass);
@@ -4247,6 +4342,7 @@ namespace Ogre
         case TextureUnitState::TAM_MIRROR:
             return "mirror";
         case TextureUnitState::TAM_WRAP:
+        case TextureUnitState::TAM_UNKNOWN:
             return "wrap";
         }
 
@@ -4566,9 +4662,16 @@ namespace Ogre
                     writeValue("vertex");
                     break;
                 case TextureUnitState::BT_GEOMETRY:
-                case TextureUnitState::BT_TESSELATION_DOMAIN:
-                case TextureUnitState::BT_TESSELATION_HULL:
+                    writeValue("geometry");
+                    break;
+                case TextureUnitState::BT_TESSELLATION_DOMAIN:
+                    writeValue("tessellation_domain");
+                    break;
+                case TextureUnitState::BT_TESSELLATION_HULL:
+                    writeValue("tessellation_hull");
+                    break;
                 case TextureUnitState::BT_COMPUTE:
+                    writeValue("compute");
                     break;
                 };
         
@@ -4879,6 +4982,18 @@ namespace Ogre
             pPass->getVertexProgram(), pPass->getVertexProgramParameters());
     }
     //-----------------------------------------------------------------------
+    void MaterialSerializer::writeTesselationHullProgramRef(const Pass* pPass)
+    {
+        writeGpuProgramRef("tesselation_hull_program_ref",
+            pPass->getTessellationHullProgram(), pPass->getTessellationHullProgramParameters());
+    }
+    //-----------------------------------------------------------------------
+    void MaterialSerializer::writeTesselationDomainProgramRef(const Pass* pPass)
+    {
+        writeGpuProgramRef("tesselation_domain_program_ref",
+            pPass->getTessellationDomainProgram(), pPass->getTessellationDomainProgramParameters());
+    }
+    //-----------------------------------------------------------------------
     void MaterialSerializer::writeShadowCasterVertexProgramRef(const Pass* pPass)
     {
         writeGpuProgramRef("shadow_caster_vertex_program_ref",
@@ -4891,6 +5006,13 @@ namespace Ogre
             pPass->getShadowCasterFragmentProgram(), pPass->getShadowCasterFragmentProgramParameters());
     }
     //-----------------------------------------------------------------------
+    void MaterialSerializer::writeGeometryProgramRef(const Pass* pPass)
+    {
+        writeGpuProgramRef("geometry_program_ref",
+            pPass->getGeometryProgram(), pPass->getGeometryProgramParameters());
+    }
+    //--
+    //-----------------------------------------------------------------------
     void MaterialSerializer::writeFragmentProgramRef(const Pass* pPass)
     {
         writeGpuProgramRef("fragment_program_ref",
@@ -4898,7 +5020,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGpuProgramRef(const String& attrib,
-        const GpuProgramPtr& program, const GpuProgramParametersSharedPtr& params)
+                                                const GpuProgramPtr& program, const GpuProgramParametersSharedPtr& params)
     {       
         bool skipWriting = false;
 
@@ -4913,7 +5035,7 @@ namespace Ogre
         beginSection(3);
         {
             // write out parameters
-            GpuProgramParameters* defaultParams= 0;
+            GpuProgramParameters* defaultParams = 0;
             // does the GPU program have default parameters?
             if (program->hasDefaultParameters())
                 defaultParams = program->getDefaultParameters().getPointer();
@@ -4975,9 +5097,10 @@ namespace Ogre
             }
 
             writeGpuProgramParameter("param_named", 
-                paramName, autoEntry, defaultAutoEntry, def.isFloat(), def.isDouble(),
-                def.physicalIndex, def.elementSize * def.arraySize,
-                params, defaultParams, level, useMainBuffer);
+                                     paramName, autoEntry, defaultAutoEntry, 
+                                     def.isFloat(), def.isDouble(), def.isInt(), def.isUnsignedInt(),
+                                     def.physicalIndex, def.elementSize * def.arraySize,
+                                     params, defaultParams, level, useMainBuffer);
         }
 
     }
@@ -4994,7 +5117,7 @@ namespace Ogre
         GpuLogicalBufferStructPtr floatLogical = params->getFloatLogicalBufferStruct();
         if( !floatLogical.isNull() )
         {
-                    OGRE_LOCK_MUTEX(floatLogical->mutex);
+            OGRE_LOCK_MUTEX(floatLogical->mutex);
 
             for(GpuLogicalIndexUseMap::const_iterator i = floatLogical->map.begin();
                 i != floatLogical->map.end(); ++i)
@@ -5011,10 +5134,10 @@ namespace Ogre
                 }
 
                 writeGpuProgramParameter("param_indexed", 
-                    StringConverter::toString(logicalIndex), autoEntry, 
-                    defaultAutoEntry, true, false, logicalUse.physicalIndex,
-                    logicalUse.currentSize,
-                    params, defaultParams, level, useMainBuffer);
+                                         StringConverter::toString(logicalIndex), autoEntry, 
+                                         defaultAutoEntry, true, false, false, false,
+                                         logicalUse.physicalIndex, logicalUse.currentSize,
+                                         params, defaultParams, level, useMainBuffer);
             }
         }
 
@@ -5022,7 +5145,7 @@ namespace Ogre
         GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
         if( !doubleLogical.isNull() )
         {
-                    OGRE_LOCK_MUTEX(floatLogical->mutex);
+            OGRE_LOCK_MUTEX(floatLogical->mutex);
 
             for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
                 i != doubleLogical->map.end(); ++i)
@@ -5031,7 +5154,7 @@ namespace Ogre
                 const GpuLogicalIndexUse& logicalUse = i->second;
 
                 const GpuProgramParameters::AutoConstantEntry* autoEntry =
-                params->findDoubleAutoConstantEntry(logicalIndex);
+                    params->findDoubleAutoConstantEntry(logicalIndex);
                 const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
                 if (defaultParams)
                 {
@@ -5040,8 +5163,8 @@ namespace Ogre
 
                 writeGpuProgramParameter("param_indexed",
                                          StringConverter::toString(logicalIndex), autoEntry,
-                                         defaultAutoEntry, false, true, logicalUse.physicalIndex,
-                                         logicalUse.currentSize,
+                                         defaultAutoEntry, false, true, false, false,
+                                         logicalUse.physicalIndex, logicalUse.currentSize,
                                          params, defaultParams, level, useMainBuffer);
             }
         }
@@ -5050,7 +5173,7 @@ namespace Ogre
         GpuLogicalBufferStructPtr intLogical = params->getIntLogicalBufferStruct();
         if( !intLogical.isNull() )
         {
-                    OGRE_LOCK_MUTEX(intLogical->mutex);
+            OGRE_LOCK_MUTEX(intLogical->mutex);
 
             for(GpuLogicalIndexUseMap::const_iterator i = intLogical->map.begin();
                 i != intLogical->map.end(); ++i)
@@ -5067,13 +5190,71 @@ namespace Ogre
                 }
 
                 writeGpuProgramParameter("param_indexed", 
-                    StringConverter::toString(logicalIndex), autoEntry, 
-                    defaultAutoEntry, false, false, logicalUse.physicalIndex,
-                    logicalUse.currentSize,
-                    params, defaultParams, level, useMainBuffer);
+                                         StringConverter::toString(logicalIndex), autoEntry, 
+                                         defaultAutoEntry, false, false, true, false,
+                                         logicalUse.physicalIndex, logicalUse.currentSize,
+                                         params, defaultParams, level, useMainBuffer);
             }
 
         }
+
+        // uint params
+        GpuLogicalBufferStructPtr uintLogical = params->getUnsignedIntLogicalBufferStruct();
+        if( !uintLogical.isNull() )
+        {
+            OGRE_LOCK_MUTEX(uintLogical->mutex);
+
+            for(GpuLogicalIndexUseMap::const_iterator i = uintLogical->map.begin();
+                i != uintLogical->map.end(); ++i)
+            {
+                size_t logicalIndex = i->first;
+                const GpuLogicalIndexUse& logicalUse = i->second;
+
+                const GpuProgramParameters::AutoConstantEntry* autoEntry = 
+                    params->findUnsignedIntAutoConstantEntry(logicalIndex);
+                const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+                if (defaultParams)
+                {
+                    defaultAutoEntry = defaultParams->findUnsignedIntAutoConstantEntry(logicalIndex);
+                }
+
+                writeGpuProgramParameter("param_indexed", 
+                                         StringConverter::toString(logicalIndex), autoEntry, 
+                                         defaultAutoEntry, false, false, false, true,
+                                         logicalUse.physicalIndex, logicalUse.currentSize,
+                                         params, defaultParams, level, useMainBuffer);
+            }
+
+        }
+
+        // // bool params
+        // GpuLogicalBufferStructPtr boolLogical = params->getBoolLogicalBufferStruct();
+        // if( !boolLogical.isNull() )
+        // {
+        //     OGRE_LOCK_MUTEX(boolLogical->mutex);
+
+        //     for(GpuLogicalIndexUseMap::const_iterator i = boolLogical->map.begin();
+        //         i != boolLogical->map.end(); ++i)
+        //     {
+        //         size_t logicalIndex = i->first;
+        //         const GpuLogicalIndexUse& logicalUse = i->second;
+
+        //         const GpuProgramParameters::AutoConstantEntry* autoEntry = 
+        //             params->findBoolAutoConstantEntry(logicalIndex);
+        //         const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+        //         if (defaultParams)
+        //         {
+        //             defaultAutoEntry = defaultParams->findBoolAutoConstantEntry(logicalIndex);
+        //         }
+
+        //         writeGpuProgramParameter("param_indexed", 
+        //                                  StringConverter::toString(logicalIndex), autoEntry, 
+        //                                  defaultAutoEntry, false, false, false, false,
+        //                                  logicalUse.physicalIndex, logicalUse.currentSize,
+        //                                  params, defaultParams, level, useMainBuffer);
+        //     }
+
+        // }
 
     }
     //-----------------------------------------------------------------------
@@ -5081,7 +5262,8 @@ namespace Ogre
         const String& commandName, const String& identifier, 
         const GpuProgramParameters::AutoConstantEntry* autoEntry, 
         const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-        bool isFloat, bool isDouble, size_t physicalIndex, size_t physicalSize,
+        bool isFloat, bool isDouble, bool isInt, bool isUnsignedInt,
+        size_t physicalIndex, size_t physicalSize,
         const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
         const ushort level, const bool useMainBuffer)
     {
@@ -5108,7 +5290,7 @@ namespace Ogre
                 // both must be auto
                 // compare the auto values
                 different = (autoEntry->paramType != defaultAutoEntry->paramType
-                    || autoEntry->data != defaultAutoEntry->data);
+                             || autoEntry->data != defaultAutoEntry->data);
             }
             else
             {
@@ -5129,12 +5311,30 @@ namespace Ogre
                         defaultParams->getDoublePointer(physicalIndex),
                         sizeof(double) * physicalSize) != 0;
                 }
-                else
+                else if (isInt)
                 {
                     different = memcmp(
                         params->getIntPointer(physicalIndex), 
                         defaultParams->getIntPointer(physicalIndex),
                         sizeof(int) * physicalSize) != 0;
+                }
+                else if (isUnsignedInt)
+                {
+                    different = memcmp(
+                        params->getUnsignedIntPointer(physicalIndex),
+                        defaultParams->getUnsignedIntPointer(physicalIndex),
+                        sizeof(uint) * physicalSize) != 0;
+                }
+                else //if (isBool)
+                {
+                    // different = memcmp(
+                    //     params->getBoolPointer(physicalIndex), 
+                    //     defaultParams->getBoolPointer(physicalIndex),
+                    //     sizeof(bool) * physicalSize) != 0;
+                    different = memcmp(
+                        params->getUnsignedIntPointer(physicalIndex), 
+                        defaultParams->getUnsignedIntPointer(physicalIndex),
+                        sizeof(uint) * physicalSize) != 0;
                 }
             }
         }
@@ -5190,7 +5390,7 @@ namespace Ogre
 
                     writeValue("float" + countLabel, useMainBuffer);
                     // iterate through real constants
-                    for (size_t f = 0 ; f < physicalSize; ++f)
+                    for (size_t f = 0; f < physicalSize; ++f)
                     {
                         writeValue(StringConverter::toString(*pFloat++), useMainBuffer);
                     }
@@ -5201,25 +5401,49 @@ namespace Ogre
                     const double* pDouble = params->getDoublePointer(physicalIndex);
 
                     writeValue("double" + countLabel, useMainBuffer);
-                    // iterate through real constants
-                    for (size_t f = 0 ; f < physicalSize; ++f)
+                    // iterate through dobule constants
+                    for (size_t f = 0; f < physicalSize; ++f)
                     {
                         writeValue(StringConverter::toString(*pDouble++), useMainBuffer);
                     }
                 }
-                else
+                else if (isInt)
                 {
                     // Get pointer to start of values
                     const int* pInt = params->getIntPointer(physicalIndex);
 
                     writeValue("int" + countLabel, useMainBuffer);
-                    // iterate through real constants
-                    for (size_t f = 0 ; f < physicalSize; ++f)
+                    // iterate through int constants
+                    for (size_t f = 0; f < physicalSize; ++f)
                     {
                         writeValue(StringConverter::toString(*pInt++), useMainBuffer);
                     }
+                }
+                else if (isUnsignedInt) 
+                {
+                    // Get pointer to start of values
+                    const uint* pUInt = params->getUnsignedIntPointer(physicalIndex);
 
-                } // end if (float/int)
+                    writeValue("uint" + countLabel, useMainBuffer);
+                    // iterate through uint constants
+                    for (size_t f = 0; f < physicalSize; ++f)
+                    {
+                        writeValue(StringConverter::toString(*pUInt++), useMainBuffer);
+                    }
+                }
+                else //if (isBool)
+                {
+                    // Get pointer to start of values
+                    // const bool* pBool = params->getBoolPointer(physicalIndex);
+                    const uint* pBool = params->getUnsignedIntPointer(physicalIndex);
+
+                    writeValue("bool" + countLabel, useMainBuffer);
+                    // iterate through bool constants
+                    for (size_t f = 0; f < physicalSize; ++f)
+                    {
+                        writeValue(StringConverter::toString(*pBool++), useMainBuffer);
+                    }
+                }//// end if (float/int)
 
             }
 
@@ -5262,9 +5486,9 @@ namespace Ogre
                 while (currentParam != endParam)
                 {
                     if (currentParam->name != "type" &&
-                        currentParam->name !="assemble_code" &&
-                        currentParam->name !="micro_code" &&
-                        currentParam->name !="external_micro_code")
+                        currentParam->name != "assemble_code" &&
+                        currentParam->name != "micro_code" &&
+                        currentParam->name != "external_micro_code")
                     {
                         String paramstr = program->getParameter(currentParam->name);
                         if ((currentParam->name == "includes_skeletal_animation")

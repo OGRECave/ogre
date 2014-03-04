@@ -1,6 +1,6 @@
 #include "ProceduralTools.h"
 
-#include <Ogre.h>
+#include "Ogre.h"
 
 using namespace Ogre;
 
@@ -65,7 +65,7 @@ MeshPtr ProceduralTools::generateTetrahedra()
     tetrahedraSubMesh->indexData = new IndexData;
 
     tetrahedraSubMesh->vertexData->vertexDeclaration->addElement(0, 0, 
-        VET_FLOAT4, VES_POSITION);
+                                                                 VET_FLOAT4, VES_POSITION);
 
     HardwareVertexBufferSharedPtr vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
         tetrahedraSubMesh->vertexData->vertexDeclaration->getVertexSize(0), 

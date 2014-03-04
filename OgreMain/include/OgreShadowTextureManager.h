@@ -34,8 +34,6 @@ Torus Knot Software Ltd.
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgrePixelFormat.h"
-#include "OgreTexture.h"
-#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

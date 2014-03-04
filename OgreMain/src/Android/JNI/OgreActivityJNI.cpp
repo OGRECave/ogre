@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
 #include "OgreArchiveManager.h"
+#include "OgreViewport.h"
+
 #include "Android/OgreAndroidEGLWindow.h"
 #include "Android/OgreAPKFileSystemArchive.h"
 #include "Android/OgreAPKZipArchive.h"

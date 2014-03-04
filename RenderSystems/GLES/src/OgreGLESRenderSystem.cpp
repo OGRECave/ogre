@@ -39,6 +39,8 @@ THE SOFTWARE.
 #include "OgreGLESUtil.h"
 #include "OgreGLESPBRenderTexture.h"
 #include "OgreGLESFBORenderTexture.h"
+#include "OgreLogManager.h"
+#include "OgreViewport.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGLWindow.h"
@@ -260,6 +262,8 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported by OpenGL ES
         rsc->setCapability(RSC_VBO);
+        if(mGLSupport->checkExtension("GL_OES_element_index_uint"))
+            rsc->setCapability(RSC_32BIT_INDEX);
 
         // OpenGL ES - Check for these extensions too
         // For 1.1, http://www.khronos.org/registry/gles/api/1.1/glext.h
@@ -643,7 +647,7 @@ namespace Ogre {
 
     void GLESRenderSystem::_destroyDepthBuffer(RenderWindow* pWin)
     {
-        GLESContext *windowContext;
+        GLESContext *windowContext = 0;
         pWin->getCustomAttribute("GLCONTEXT", &windowContext);
         
         //1 Window <-> 1 Context, should be always true
@@ -686,9 +690,9 @@ namespace Ogre {
     {
         // TODO find a way to get error string
 //        const GLubyte *errString = gluErrorString (errCode);
-//        return (errString != 0) ? String((const char*) errString) : StringUtil::BLANK;
+//        return (errString != 0) ? String((const char*) errString) : BLANKSTRING;
 
-        return StringUtil::BLANK;
+        return BLANKSTRING;
     }
 
     VertexElementType GLESRenderSystem::getColourVertexElementType(void) const
@@ -2016,7 +2020,8 @@ namespace Ogre {
                                                 StencilOperation stencilFailOp,
                                                 StencilOperation depthFailOp,
                                                 StencilOperation passOp,
-                                                bool twoSidedOperation)
+                                                bool twoSidedOperation,
+                                                bool readBackAsTexture)
     {
         mStateCacheManager->setStencilMask(writeMask);
         glStencilFunc(convertCompareFunction(func), refValue, compareMask);

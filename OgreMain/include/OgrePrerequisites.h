@@ -29,9 +29,7 @@ THE SOFTWARE
 // Platform-specific stuff
 #include "OgrePlatform.h"
 
-// Needed for OGRE_WCHAR_T_STRINGS below
 #include <string>
-
 
 // configure memory tracking
 #if OGRE_DEBUG_MODE 
@@ -47,9 +45,6 @@ THE SOFTWARE
 #       define OGRE_MEMORY_TRACKER 0
 #   endif
 #endif
-
-
-
 
 namespace Ogre {
     // Define ogre version
@@ -78,34 +73,50 @@ namespace Ogre {
     #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
     #   if OGRE_COMP_VER >= 430
     #       define HashMap ::std::tr1::unordered_map
+    #       define HashMultiMap ::std::tr1::unordered_multimap
     #       define HashSet ::std::tr1::unordered_set
+    #       define HashMultiSet ::std::tr1::unordered_multiset
     #    else
     #       define HashMap ::__gnu_cxx::hash_map
+    #       define HashMultiMap ::__gnu_cxx::hash_multimap
     #       define HashSet ::__gnu_cxx::hash_set
+    #       define HashMultiSet ::__gnu_cxx::hash_multiset
     #    endif
     #elif OGRE_COMPILER == OGRE_COMPILER_CLANG
     #    if defined(_LIBCPP_VERSION)
     #       define HashMap ::std::unordered_map
+    #       define HashMultiMap ::std::unordered_multimap
     #       define HashSet ::std::unordered_set
+    #       define HashMultiSet ::std::unordered_multiset
     #    else
     #       define HashMap ::std::tr1::unordered_map
+    #       define HashMultiMap ::std::tr1::unordered_multimap
     #       define HashSet ::std::tr1::unordered_set
+    #       define HashMultiSet ::std::tr1::unordered_multiset
     #    endif
     #else
     #   if OGRE_COMPILER == OGRE_COMPILER_MSVC && !defined(_STLP_MSVC)
     #       if _MSC_FULL_VER >= 150030729 // VC++ 9.0 SP1+
     #           define HashMap ::std::tr1::unordered_map
+    #           define HashMultiMap ::std::tr1::unordered_multimap
     #           define HashSet ::std::tr1::unordered_set
+    #           define HashMultiSet ::std::tr1::unordered_multiset
     #       elif OGRE_THREAD_PROVIDER == 1
     #           define HashMap ::boost::unordered_map
+    #           define HashMultiMap ::boost::unordered_multimap
     #           define HashSet ::boost::unordered_set
+    #           define HashMultiSet ::boost::unordered_multiset
     #       else
     #           define HashMap ::std::unordered_map
+    #           define HashMultiMap ::std::unordered_multimap
     #           define HashSet ::std::unordered_set
+    #           define HashMultiSet ::std::unordered_multiset
     #       endif
     #   else
     #       define HashMap ::std::unordered_map
+    #       define HashMultiMap ::std::unordered_multimap
     #       define HashSet ::std::unordered_set
+    #       define HashMultiSet ::std::unordered_multiset
     #   endif
     #endif
 
@@ -119,11 +130,15 @@ namespace Ogre {
     typedef unsigned int uint;
     typedef unsigned long ulong;
 
+    #if __cplusplus >= 201103L
+    #define register
+    #endif
 // Pre-declare classes
 // Allows use of pointers in header files without including individual .h
 // so decreases dependencies between files
     struct Aabb;
     class Angle;
+    class AnimableValue;
     class Animation;
     class AnimationState;
     class AnimationStateSet;
@@ -154,6 +169,7 @@ namespace Ogre {
     template <typename T> class ControllerFunction;
     class ControllerManager;
     template <typename T> class ControllerValue;
+    class DataStream;
     class DefaultWorkQueue;
     class Degree;
     class DepthBuffer;
@@ -168,6 +184,10 @@ namespace Ogre {
     struct FrameEvent;
     class FrameListener;
     class Frustum;
+    struct GpuLogicalBufferStruct;
+    struct GpuNamedConstants;
+    class GpuProgramParameters;
+    class GpuSharedParameters;
     class GpuProgram;
     class GpuProgramManager;
     class GpuProgramUsage;
@@ -196,6 +216,7 @@ namespace Ogre {
     class Log;
     class LogManager;
     class LodStrategy;
+    class LodStrategyManager;
     class ManualResourceLoader;
     class ManualObject;
     class Material;
@@ -203,6 +224,7 @@ namespace Ogre {
     class Math;
     class Matrix3;
     class Matrix4;
+    class MemoryDataStream;
     class MemoryManager;
     class Mesh;
     class MeshSerializer;
@@ -237,10 +259,7 @@ namespace Ogre {
     class Plane;
     class PlaneBoundedVolume;
     class Plugin;
-    class PMWorker;
-    class PMInjector;
     class Pose;
-    class ProgressiveMeshGenerator;
     class Profile;
     class Profiler;
     class Quaternion;
@@ -263,6 +282,7 @@ namespace Ogre {
     class RenderTarget;
     class RenderTargetListener;
     class RenderTexture;
+    class RenderToVertexBuffer;
     class MultiRenderTarget;
     class RenderWindow;
     class RenderOperation;
@@ -281,6 +301,7 @@ namespace Ogre {
     class ScriptCompilerManager;
     class ScriptLoader;
     class Serializer;
+    class ShadowCameraSetup;
     class ShadowTextureManager;
     class SimpleMatrixAf4x3;
     class SimpleRenderable;
@@ -322,12 +343,21 @@ namespace Ogre {
     class CompositorManager2;
 
     template<typename T> class SharedPtr;
+    typedef SharedPtr<AnimableValue> AnimableValuePtr;
+    typedef SharedPtr<DataStream> DataStreamPtr;
     typedef SharedPtr<GpuProgram> GpuProgramPtr;
+    typedef SharedPtr<GpuNamedConstants> GpuNamedConstantsPtr;
+    typedef SharedPtr<GpuLogicalBufferStruct> GpuLogicalBufferStructPtr;
+    typedef SharedPtr<GpuSharedParameters> GpuSharedParametersPtr;
+    typedef SharedPtr<GpuProgramParameters> GpuProgramParametersSharedPtr;
     typedef SharedPtr<HighLevelGpuProgram> HighLevelGpuProgramPtr;
     typedef SharedPtr<Material> MaterialPtr;
+    typedef SharedPtr<MemoryDataStream> MemoryDataStreamPtr;
     typedef SharedPtr<Mesh> MeshPtr;
     typedef SharedPtr<PatchMesh> PatchMeshPtr;
+    typedef SharedPtr<RenderToVertexBuffer> RenderToVertexBufferSharedPtr;
     typedef SharedPtr<Resource> ResourcePtr;
+    typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
     typedef SharedPtr<Skeleton> SkeletonPtr;
     typedef SharedPtr<SkeletonDef> SkeletonDefPtr;
     typedef SharedPtr<Texture> TexturePtr;
@@ -509,9 +539,9 @@ namespace Ogre
     struct deque 
     { 
 #if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
-       typedef typename std::deque<T, A> type;    
-       typedef typename std::deque<T, A>::iterator iterator;
-       typedef typename std::deque<T, A>::const_iterator const_iterator;
+        typedef typename std::deque<T, A> type;    
+        typedef typename std::deque<T, A>::iterator iterator;
+        typedef typename std::deque<T, A>::const_iterator const_iterator;
 #else
         typedef typename std::deque<T> type;
         typedef typename std::deque<T>::iterator iterator;
@@ -537,9 +567,9 @@ namespace Ogre
     struct list 
     { 
 #if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
-       typedef typename std::list<T, A> type;
-       typedef typename std::list<T, A>::iterator iterator;
-       typedef typename std::list<T, A>::const_iterator const_iterator;
+        typedef typename std::list<T, A> type;
+        typedef typename std::list<T, A>::iterator iterator;
+        typedef typename std::list<T, A>::const_iterator const_iterator;
 #else
         typedef typename std::list<T> type;
         typedef typename std::list<T>::iterator iterator;
@@ -551,9 +581,9 @@ namespace Ogre
     struct set 
     { 
 #if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
-       typedef typename std::set<T, P, A> type;
-       typedef typename std::set<T, P, A>::iterator iterator;
-       typedef typename std::set<T, P, A>::const_iterator const_iterator;
+        typedef typename std::set<T, P, A> type;
+        typedef typename std::set<T, P, A>::iterator iterator;
+        typedef typename std::set<T, P, A>::const_iterator const_iterator;
 #else
         typedef typename std::set<T, P> type;
         typedef typename std::set<T, P>::iterator iterator;
@@ -565,9 +595,9 @@ namespace Ogre
     struct map 
     { 
 #if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
-       typedef typename std::map<K, V, P, A> type;
-       typedef typename std::map<K, V, P, A>::iterator iterator;
-       typedef typename std::map<K, V, P, A>::const_iterator const_iterator;
+        typedef typename std::map<K, V, P, A> type;
+        typedef typename std::map<K, V, P, A>::iterator iterator;
+        typedef typename std::map<K, V, P, A>::const_iterator const_iterator;
 #else
         typedef typename std::map<K, V, P> type;
         typedef typename std::map<K, V, P>::iterator iterator;

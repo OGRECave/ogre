@@ -29,13 +29,12 @@ THE SOFTWARE.
 #include "OgreAnimation.h"
 #include "OgreKeyFrame.h"
 #include "OgreException.h"
+#include "OgreEntity.h"
 #include "OgreSkeleton.h"
 #include "OgreOldBone.h"
-#include "OgreEntity.h"
-#include "OgreSubEntity.h"
 #include "OgreMesh.h"
-#include "OgreSubMesh.h"
-#include "OgreStringConverter.h"
+
+#include "OgreSubEntity.h"
 
 namespace Ogre {
 
@@ -51,7 +50,7 @@ namespace Ogre {
         , mKeyFrameTimesDirty(false)
         , mUseBaseKeyFrame(false)
         , mBaseKeyFrameTime(0.0f)
-        , mBaseKeyFrameAnimationName(StringUtil::BLANK)
+        , mBaseKeyFrameAnimationName(BLANKSTRING)
         , mContainer(0)
     {
     }
@@ -729,7 +728,7 @@ namespace Ogre {
         if (mUseBaseKeyFrame)
         {
             Animation* baseAnim = this;
-            if (mBaseKeyFrameAnimationName != StringUtil::BLANK && mContainer)
+            if (mBaseKeyFrameAnimationName != BLANKSTRING && mContainer)
                 baseAnim = mContainer->getAnimation(mBaseKeyFrameAnimationName);
             
             if (baseAnim)

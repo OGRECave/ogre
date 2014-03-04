@@ -37,9 +37,8 @@ THE SOFTWARE.
 #include "OgreSphere.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
-#include "OgreRenderSystemCapabilities.h"
 #include "OgreException.h"
-#include "OgreStringConverter.h"
+#include "OgreSceneNode.h"
 #include "OgreLogManager.h"
 #include <algorithm>
 
@@ -600,7 +599,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Can't assign material "  
                                                   " to BillboardSet of " + getName() + " because this "
                                                   "Material does not exist. Have you forgotten to define it in a "
-                                                  ".material script?");
+                                                  ".material script?", LML_CRITICAL);
             
             mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
             
@@ -732,7 +731,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Warning: BillboardSet " +
                 mName + " has point rendering enabled but is using a type "
                 "other than BBT_POINT, this may not give you the results you "
-                "expect.");
+                "expect.", LML_CRITICAL);
         }
 
         mVertexData = OGRE_NEW VertexData();

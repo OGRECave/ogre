@@ -31,8 +31,6 @@ THE SOFTWARE.
 #include "OgreOldSkeletonInstance.h"
 #include "OgreAnimationState.h"
 #include "OgreOptimisedUtil.h"
-#include "OgreSceneNode.h"
-#include "OgreStringConverter.h"
 #include "OgreCamera.h"
 #include "OgreSceneManager.h"
 #include "OgreException.h"

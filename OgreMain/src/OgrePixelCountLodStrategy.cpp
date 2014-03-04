@@ -38,44 +38,20 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    PixelCountLodStrategy::PixelCountLodStrategy(const String& name)
+    PixelCountLodStrategyBase::PixelCountLodStrategyBase(const String& name)
         : LodStrategy(name)
     { }
     //---------------------------------------------------------------------
-    Real PixelCountLodStrategy::getBaseValue() const
+    Real PixelCountLodStrategyBase::getBaseValue() const
     {
         // Use the maximum possible value as base
         return -std::numeric_limits<Real>::max();
     }
     //---------------------------------------------------------------------
-    Real PixelCountLodStrategy::transformBias(Real factor) const
+    Real PixelCountLodStrategyBase::transformBias(Real factor) const
     {
         // No transformation required for pixel count strategy
         return factor;
-    }
-    //---------------------------------------------------------------------
-    ushort PixelCountLodStrategy::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const
-    {
-        // Values are ascending (because they're turn to negative)
-        return getIndexAscending(value, meshLodUsageList);
-    }
-    //---------------------------------------------------------------------
-    ushort PixelCountLodStrategy::getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const
-    {
-        // Values are ascending (because they're turn to negative)
-        return getIndexAscending(value, materialLodValueArray);
-    }
-    //---------------------------------------------------------------------
-    void PixelCountLodStrategy::sort(Mesh::MeshLodUsageList& meshLodUsageList) const
-    {
-        // Sort ascending
-        sortAscending(meshLodUsageList);
-    }
-    //---------------------------------------------------------------------
-    bool PixelCountLodStrategy::isSorted(const Mesh::LodValueArray& values) const
-    {
-        // Check if values are sorted descending
-        return isSortedDescending(values);
     }
 
     /************************************************************************/
@@ -94,7 +70,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     AbsolutePixelCountLodStrategy::AbsolutePixelCountLodStrategy()
-        : PixelCountLodStrategy("pixel_count")
+        : PixelCountLodStrategyBase("pixel_count")
     { }
     //-----------------------------------------------------------------------
     Real AbsolutePixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
@@ -233,7 +209,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     ScreenRatioPixelCountLodStrategy::ScreenRatioPixelCountLodStrategy()
-        : PixelCountLodStrategy("screen_ratio_pixel_count")
+        : PixelCountLodStrategyBase("screen_ratio_pixel_count")
     { }
     //-----------------------------------------------------------------------
     Real ScreenRatioPixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const

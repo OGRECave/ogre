@@ -37,8 +37,10 @@ PlayPenPlugin::PlayPenPlugin()
     addSample(new PlayPen_testManualBlend());
     addSample(new PlayPen_testProjectSphere());
     addSample(new PlayPen_testCameraSetDirection());
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
     addSample(new PlayPen_testManualLOD());
     addSample(new PlayPen_testManualLODFromFile());
+#endif
     addSample(new PlayPen_testFullScreenSwitch());
     addSample(new PlayPen_testMorphAnimationWithNormals());
     addSample(new PlayPen_testMorphAnimationWithoutNormals());
@@ -365,7 +367,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //          if (rayResult.first)
 //          {
 //              testNode->setPosition(rayResult.second);
-//              StringUtil::StrStreamType str;
+//              StringStream str;
 //              str << "HIT: " << rayResult.second;
 //
 //              
@@ -8524,13 +8526,13 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //      // only use plugins.cfg if not static
 //#ifdef OGRE_STATIC_LIB
 //    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-//        Ogre::String workDir = Ogre::StringUtil::BLANK;
+//        Ogre::String workDir = Ogre::BLANKSTRING;
 //        workDir = Ogre::macBundlePath() + "/";
 //
-//      mRoot = new Root(StringUtil::BLANK, 
+//      mRoot = new Root(BLANKSTRING, 
 //                         workDir + "ogre.cfg", mResourcePath + "Ogre.log");
 //    #else
-//      mRoot = new Root(StringUtil::BLANK, 
+//      mRoot = new Root(BLANKSTRING, 
 //                         mResourcePath + "ogre.cfg", mResourcePath + "Ogre.log");
 //    #endif
 //        

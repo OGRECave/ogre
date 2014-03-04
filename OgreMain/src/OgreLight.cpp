@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreLight.h"
 
 #include "OgreException.h"
-#include "OgreSceneNode.h"
 #include "OgreCamera.h"
 #include "OgreSceneManager.h"
 
@@ -216,21 +215,6 @@ namespace Ogre {
                 (worldPos - mParentNode->_getDerivedPosition()).squaredLength();
         }
 
-    }
-    //-----------------------------------------------------------------------
-    const String& Light::getAnimableDictionaryName(void) const
-    {
-        return LightFactory::FACTORY_TYPE_NAME;
-    }
-    //-----------------------------------------------------------------------
-    void Light::initialiseAnimableDictionary(StringVector& vec) const
-    {
-        vec.push_back("diffuseColour");
-        vec.push_back("specularColour");
-        vec.push_back("attenuation");
-        vec.push_back("spotlightInner");
-        vec.push_back("spotlightOuter");
-        vec.push_back("spotlightFalloff");
     }
     //-----------------------------------------------------------------------
     class LightDiffuseColourValue : public AnimableValue

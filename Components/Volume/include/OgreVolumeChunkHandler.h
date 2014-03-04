@@ -31,10 +31,6 @@ THE SOFTWARE.
 #include "OgreWorkQueue.h"
 
 #include "OgreVolumePrerequisites.h"
-#include "OgreVolumeChunk.h"
-#include "OgreVolumeMeshBuilder.h"
-#include "OgreVolumeDualGridGenerator.h"
-#include "OgreVolumeOctreeNode.h"
 
 namespace Ogre {
 namespace Volume {
@@ -42,6 +38,9 @@ namespace Volume {
     /** Forward declaration.
     */
     class Chunk;
+    class MeshBuilder;
+    class DualGridGenerator;
+    class OctreeNode;
 
     /** Data being passed around while loading.
     */
@@ -95,10 +94,10 @@ namespace Volume {
         static const uint16 WORKQUEUE_LOAD_REQUEST;
 
         /// The workqueue.
-        WorkQueue* wq;
+        WorkQueue* mWQ;
 
         /// The workqueue channel.
-        uint16 workQueueChannel;
+        uint16 mWorkQueueChannel;
         
         /** Initializes the WorkQueue (once).
         */

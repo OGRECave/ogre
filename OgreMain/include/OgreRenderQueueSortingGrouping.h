@@ -30,9 +30,6 @@ THE SOFTWARE.
 
 // Precompiler options
 #include "OgrePrerequisites.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreMaterial.h"
-#include "OgreTechnique.h"
 #include "OgrePass.h"
 #include "OgreRadixSort.h"
 

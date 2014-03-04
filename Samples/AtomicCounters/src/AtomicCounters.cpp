@@ -20,7 +20,7 @@ extern "C" _OgreSampleExport void dllStartPlugin()
 
 extern "C" _OgreSampleExport void dllStopPlugin()
 {
-    Root::getSingleton().uninstallPlugin(sp); 
+    Root::getSingleton().uninstallPlugin(sp);
     OGRE_DELETE sp;
     delete s;
 }

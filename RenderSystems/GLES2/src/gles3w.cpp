@@ -1,6 +1,6 @@
 #include <GLES3/gles3w.h>
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(ANDROID)
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
 #include <EGL/egl.h>
@@ -55,6 +55,8 @@ static void open_libgl(void)
 {
     CFStringRef frameworkPath = CFSTR("/System/Library/Frameworks/OpenGLES.framework");
     NSString *sysVersion = [UIDevice currentDevice].systemVersion;
+    NSArray *sysVersionComponents = [sysVersion componentsSeparatedByString:@"."];
+
     BOOL isSimulator = ([[UIDevice currentDevice].model rangeOfString:@"Simulator"].location != NSNotFound);
     if(isSimulator)
     {
@@ -67,9 +69,10 @@ static void open_libgl(void)
 
         char tempPath[PATH_MAX];
         sprintf(tempPath,
-                "%s/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator%s.sdk/System/Library/Frameworks/OpenGLES.framework",
+                "%s/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator%s.%s.sdk/System/Library/Frameworks/OpenGLES.framework",
                 xcodePath.c_str(),
-                [sysVersion cStringUsingEncoding:NSUTF8StringEncoding]);
+                [[sysVersionComponents objectAtIndex:0] cStringUsingEncoding:NSUTF8StringEncoding],
+                [[sysVersionComponents objectAtIndex:1] cStringUsingEncoding:NSUTF8StringEncoding]);
         frameworkPath = CFStringCreateWithCString(kCFAllocatorDefault, tempPath, kCFStringEncodingUTF8);
     }
 
@@ -80,6 +83,7 @@ static void open_libgl(void)
     CFRelease(frameworkPath);
 
     bundle = CFBundleCreate(kCFAllocatorDefault, bundleURL);
+    
     assert(bundle != NULL);
 }
 

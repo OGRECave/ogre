@@ -28,12 +28,9 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreMeshSerializer.h"
-#include "OgreMeshFileFormat.h"
 #include "OgreMesh.h"
-#include "OgreSubMesh.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
-#include "OgreSkeleton.h"
 
 
 namespace Ogre {
@@ -47,9 +44,16 @@ namespace Ogre {
         // String identifiers have not always been 100% unified with OGRE version
         
         // Note MUST be added in reverse order so latest is first in the list
+
+        // This one is a little ugly, 1.10 is used for version 1.1 legacy meshes.
+        // So bump up to 1.100
+        mVersionData.push_back(OGRE_NEW MeshVersionData(
+            MESH_VERSION_1_10, "[MeshSerializer_v1.100]", 
+            OGRE_NEW MeshSerializerImpl()));
+
         mVersionData.push_back(OGRE_NEW MeshVersionData(
             MESH_VERSION_1_8, "[MeshSerializer_v1.8]", 
-            OGRE_NEW MeshSerializerImpl()));
+            OGRE_NEW MeshSerializerImpl_v1_8()));
 
         mVersionData.push_back(OGRE_NEW MeshVersionData(
             MESH_VERSION_1_7, "[MeshSerializer_v1.41]", 
@@ -188,7 +192,7 @@ namespace Ogre {
         {
             LogManager::getSingleton().logMessage("WARNING: " + pDest->getName() + 
                 " is an older format (" + ver + "); you should upgrade it as soon as possible" +
-                " using the OgreMeshUpgrade tool.");
+                " using the OgreMeshUpgrade tool.", LML_CRITICAL);
         }
 
         if(mListener)

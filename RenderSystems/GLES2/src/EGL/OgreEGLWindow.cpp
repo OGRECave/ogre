@@ -156,6 +156,7 @@ namespace Ogre {
 
         if (eglSwapBuffers(mEglDisplay, mEglSurface) == EGL_FALSE)
         {
+            EGL_CHECK_ERROR
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Fail to SwapBuffers",
                         __FUNCTION__);

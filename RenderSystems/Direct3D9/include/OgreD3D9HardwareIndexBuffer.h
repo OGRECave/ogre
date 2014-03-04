@@ -61,11 +61,10 @@ namespace Ogre {
         virtual void notifyOnDeviceReset(IDirect3DDevice9* d3d9Device);
 
         // Create the actual index buffer.
-        void createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool);
+        void createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool, bool updateNewBuffer);
     
         /// Get the D3D-specific index buffer
-        IDirect3DIndexBuffer9* getD3DIndexBuffer(void);     
-
+        IDirect3DIndexBuffer9* getD3DIndexBuffer(void);
     protected:
         struct BufferResources
         {

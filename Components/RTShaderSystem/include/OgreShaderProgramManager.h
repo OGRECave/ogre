@@ -28,11 +28,14 @@ THE SOFTWARE.
 #define _ShaderProgramManager_
 
 #include "OgreShaderPrerequisites.h"
-#include "OgreShaderProgram.h"
-#include "OgreShaderProgramWriter.h"
+#include "OgreSingleton.h"
+#include "OgreGpuProgram.h"
+#include "OgreStringVector.h"
 
-namespace Ogre {    
+namespace Ogre {
 namespace RTShader {
+
+    class ProgramWriter;
 
 /** \addtogroup Core
 *  @{
@@ -109,6 +112,7 @@ protected:
 
     //-----------------------------------------------------------------------------
     typedef map<String, GpuProgramPtr>::type            GpuProgramsMap;
+    typedef map<String, String>::type                   ProgramSourceToNameMap;
     typedef GpuProgramsMap::iterator                    GpuProgramsMapIterator;
     typedef GpuProgramsMap::const_iterator              GpuProgramsMapConstIterator;
 
@@ -232,6 +236,8 @@ protected:
     GpuProgramsMap mFragmentShaderMap;
     // The default program processors.
     ProgramProcessorList mDefaultProgramProcessors;
+    // map the source code of the shaders to a name for them
+    ProgramSourceToNameMap mProgramSourceToNameMap;
 
 private:
     friend class ProgramSet;

@@ -26,13 +26,22 @@ THE SOFTWARE
 #ifndef __OgreThreadHeadersBoost_H__
 #define __OgreThreadHeadersBoost_H__
 
-#if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GCC
+#if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GNUC
 #   pragma GCC diagnostic push
+#if OGRE_COMPILER == OGRE_COMPILER_GNUC
+#   pragma GCC diagnostic ignored "-Wpragmas"
+#elif OGRE_COMPILER == OGRE_COMPILER_CLANG
+#   pragma GCC diagnostic ignored "-Wdocumentation"
+#   pragma GCC diagnostic ignored "-Wconstexpr-not-const"
+#endif
 #   pragma GCC diagnostic ignored "-Wshadow"
 #   pragma GCC diagnostic ignored "-Wpadded"
 #   pragma GCC diagnostic ignored "-Wweak-vtables"
 #   pragma GCC diagnostic ignored "-Wall"
 #   pragma GCC diagnostic ignored "-Wshorten-64-to-32"
+#   pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#   pragma GCC diagnostic ignored "-Wunused-variable"
+#   pragma GCC diagnostic ignored "-Wundef"
 #endif
 
 #include <boost/thread/tss.hpp>
@@ -42,7 +51,7 @@ THE SOFTWARE
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/locks.hpp>
 
-#if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GCC
+#if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GNUC
 #   pragma GCC diagnostic pop
 #endif
 

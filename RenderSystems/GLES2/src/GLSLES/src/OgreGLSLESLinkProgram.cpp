@@ -68,9 +68,12 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLSLESLinkProgram::notifyOnContextLost()
     {
+        OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+        mGLProgramHandle = 0;
         mLinked = false;
         mTriedToLinkAndFailed = false;
         mUniformRefsBuilt = false;
+        mUniformCache->clearCache();
     }
     
     void GLSLESLinkProgram::notifyOnContextReset()
@@ -357,7 +360,6 @@ namespace Ogre {
                     case GCT_MATRIX_4X2:
                     case GCT_MATRIX_4X3:
                         break;
-
 #endif
                     case GCT_INT1:
                         OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize,
@@ -402,6 +404,7 @@ namespace Ogre {
                     case GCT_MATRIX_DOUBLE_4X2:
                     case GCT_MATRIX_DOUBLE_4X3:
                     case GCT_MATRIX_DOUBLE_4X4:
+                    default:
                         break;
 
                     } // End switch

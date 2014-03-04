@@ -29,9 +29,9 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-#include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
 #include "OgreVector4.h"
+#include "OgreColourValue.h"
 
 namespace Ogre {
 namespace RTShader {

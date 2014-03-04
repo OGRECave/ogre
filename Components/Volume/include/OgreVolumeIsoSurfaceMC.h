@@ -29,9 +29,15 @@ THE SOFTWARE.
 #define __Ogre_Volume_IsoSurfaceMC_H__
 
 #include "OgreVolumeIsoSurface.h"
+#include "OgreVector3.h"
+#include "OgreVector4.h"
+#include <float.h>
 
 namespace Ogre {
 namespace Volume {
+
+    class Source;
+    class MeshBuilder;
 
     /** Marching Cubes implementation like at
         http://local.wasp.uwa.edu.au/~pbourke/geometry/polygonise/

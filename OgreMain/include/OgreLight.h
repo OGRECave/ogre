@@ -30,7 +30,10 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreColourValue.h"
+#include "OgreVector4.h"
 #include "OgreMovableObject.h"
+#include "OgrePlaneBoundedVolume.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -398,7 +401,8 @@ namespace Ogre {
         void setCustomParameter(uint16 index, const Vector4& value);
 
         /** Gets the custom value associated with this Light at the given index.
-        @param index @see setCustomParameter for full details.
+        @param index Index of the parameter to retrieve
+        @see setCustomParameter for full details.
         */
         const Vector4& getCustomParameter(uint16 index) const;
 
@@ -446,10 +450,6 @@ namespace Ogre {
         bool isInLightRange(const Ogre::AxisAlignedBox& container) const;
     
     protected:
-        /// @copydoc AnimableObject::getAnimableDictionaryName
-        const String& getAnimableDictionaryName(void) const;
-        /// @copydoc AnimableObject::initialiseAnimableDictionary
-        void initialiseAnimableDictionary(StringVector& vec) const;
 
         LightTypes mLightType;
         ColourValue mDiffuse;

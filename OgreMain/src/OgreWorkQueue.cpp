@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreWorkQueue.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
+#include "OgreTimer.h"
 
 namespace Ogre {
     //---------------------------------------------------------------------
@@ -79,6 +79,8 @@ namespace Ogre {
         , mRequestCount(0)
         , mPaused(false)
         , mAcceptRequests(true)
+        , mShuttingDown(false)
+        , mIdleThreadRunning(false)
         , mIdleProcessed(0)
     {
     }
@@ -231,7 +233,7 @@ namespace Ogre {
             }
 #endif
         }
-        if(idleThread){
+        if(OGRE_THREAD_SUPPORT && idleThread){
             OGRE_LOCK_MUTEX(mIdleMutex);
             mIdleRequestQueue.push_back(req);
             if(!mIdleThreadRunning)
@@ -562,11 +564,14 @@ namespace Ogre {
         }
         else
         {
+            if (!r->getAborted())
+            {
             // no response, delete request
             LogManager::getSingleton().stream() << 
                 "DefaultWorkQueueBase('" << mName << "') warning: no handler processed request "
                 << r->getID() << ", channel " << r->getChannel()
                 << ", type " << r->getType();
+            }
             OGRE_DELETE r;
         }
 
@@ -624,7 +629,7 @@ namespace Ogre {
 
         Response* response = 0;
 
-        StringUtil::StrStreamType dbgMsg;
+        StringStream dbgMsg;
         dbgMsg <<
 #if OGRE_THREAD_SUPPORT
             OGRE_THREAD_CURRENT_ID
@@ -661,7 +666,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultWorkQueueBase::processResponse(Response* r)
     {
-        StringUtil::StrStreamType dbgMsg;
+        StringStream dbgMsg;
         dbgMsg << "thread:" <<
 #if OGRE_THREAD_SUPPORT
             OGRE_THREAD_CURRENT_ID

@@ -33,10 +33,11 @@ THE SOFTWARE.
 #include "OgreTerrain.h"
 #include "OgreWorkQueue.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreTerrainAutoUpdateLod.h"
 
 namespace Ogre
 {
+    class TerrainAutoUpdateLod;
+
     /** \addtogroup Optional Components
     *  @{
     */
