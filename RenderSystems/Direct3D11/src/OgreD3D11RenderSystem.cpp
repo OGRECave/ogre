@@ -2222,9 +2222,6 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()
     {
-    
-        if( !mActiveViewport )
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Cannot begin frame - no viewport selected.", "D3D11RenderSystem::_beginFrame" );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_endFrame()
@@ -2454,7 +2451,7 @@ bail:
                     "D3D11 device cannot set blend state\nError Description:" + errorDescription,
                     "D3D11RenderSystem::_render");
             }
-            if (mBoundGeometryProgram && mBindingType == TextureUnitState::BindingType::BT_GEOMETRY)
+            if (mBoundGeometryProgram && mBindingType == TextureUnitState::BT_GEOMETRY)
             {
                 {
                     mDevice.GetImmediateContext()->GSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
@@ -2536,7 +2533,7 @@ bail:
             }
             
             /// Vertex Shader binding
-            if (mBindingType == TextureUnitState::BindingType::BT_VERTEX)
+            if (mBindingType == TextureUnitState::BT_VERTEX)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
@@ -2566,7 +2563,7 @@ bail:
             }
 
             /// Compute Shader binding
-            if (mBoundComputeProgram && mBindingType == TextureUnitState::BindingType::BT_COMPUTE)
+            if (mBoundComputeProgram && mBindingType == TextureUnitState::BT_COMPUTE)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
@@ -2596,7 +2593,7 @@ bail:
             }
 
             /// Hull Shader binding
-            if (mBoundTessellationHullProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELLATION_HULL)
+            if (mBoundTessellationHullProgram && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
@@ -2626,7 +2623,7 @@ bail:
             }
             
             /// Domain Shader binding
-            if (mBoundTessellationDomainProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELLATION_DOMAIN)
+            if (mBoundTessellationDomainProgram && mBindingType == TextureUnitState::BT_TESSELLATION_DOMAIN)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
