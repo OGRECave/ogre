@@ -540,7 +540,6 @@ namespace Ogre {
 
         mRootBones.clear();
 
-        OldBone* currentBone;
         BoneList::const_iterator i;
         BoneList::const_iterator iend = mBoneList.end();
         for (i = mBoneList.begin(); i != iend; ++i)

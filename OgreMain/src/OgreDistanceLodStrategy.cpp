@@ -115,30 +115,6 @@ namespace Ogre {
     {
         return userValue;
     }
-    //-----------------------------------------------------------------------
-    ushort DistanceLodStrategyBase::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const
-    {
-        // Get index assuming ascending values
-        return getIndexAscending(value, meshLodUsageList);
-    }
-    //-----------------------------------------------------------------------
-    ushort DistanceLodStrategyBase::getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const
-    {
-        // Get index assuming ascending values
-        return getIndexAscending(value, materialLodValueArray);
-    }
-    //---------------------------------------------------------------------
-    bool DistanceLodStrategyBase::isSorted(const Mesh::LodValueArray& values) const
-    {
-        // Determine if sorted ascending
-        return isSortedAscending(values);
-    }
-        //---------------------------------------------------------------------
-    void DistanceLodStrategyBase::sort(Mesh::MeshLodUsageList& meshLodUsageList) const
-    {
-        // Sort ascending
-        return sortAscending(meshLodUsageList);
-    }
     //---------------------------------------------------------------------
     void DistanceLodStrategyBase::setReferenceView(Real viewportWidth, Real viewportHeight, Radian fovY)
     {

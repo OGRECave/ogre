@@ -53,29 +53,6 @@ namespace Ogre {
         // No transformation required for pixel count strategy
         return factor;
     }
-    //---------------------------------------------------------------------
-    ushort PixelCountLodStrategyBase::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const
-    {
-        // Values are ascending (because they're turn to negative)
-        return getIndexAscending(value, meshLodUsageList);
-    }
-    //---------------------------------------------------------------------
-    ushort PixelCountLodStrategyBase::getIndex(Real value, const Material::LodValueArray& materialLodValueArray) const
-    {
-        // Values are ascending (because they're turn to negative)
-        return getIndexAscending(value, materialLodValueArray);
-    }
-    //---------------------------------------------------------------------
-    void PixelCountLodStrategyBase::sort(Mesh::MeshLodUsageList& meshLodUsageList) const
-    {
-        // Sort ascending
-        sortAscending(meshLodUsageList);
-    }
-    //---------------------------------------------------------------------
-    bool PixelCountLodStrategyBase::isSorted(const Mesh::LodValueArray& values) const
-    {
-        return isSortedAscending(values);
-    }
 
     /************************************************************************/
     /*  AbsolutPixelCountLodStrategy                                        */
