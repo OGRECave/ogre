@@ -328,7 +328,7 @@ LogManager* logMgr = 0;
 Math* mth = 0;
 LodStrategyManager *lodMgr = 0;
 MaterialManager* matMgr = 0;
-SkeletonManager* skelMgr = 0;
+OldSkeletonManager* skelMgr = 0;
 MeshSerializer* meshSerializer = 0;
 XMLMeshSerializer* xmlMeshSerializer = 0;
 SkeletonSerializer* skeletonSerializer = 0;
@@ -461,7 +461,7 @@ void XMLToBinary(XmlOptions opts)
     else if (!stricmp(root->Value(), "skeleton"))
     {
         delete doc;
-        SkeletonPtr newSkel = SkeletonManager::getSingleton().create("conversion", 
+        SkeletonPtr newSkel = OldSkeletonManager::getSingleton().create("conversion", 
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.getPointer());
         if (opts.optimiseAnimations)
@@ -471,7 +471,7 @@ void XMLToBinary(XmlOptions opts)
         skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
 
         // Clean up the conversion skeleton
-        SkeletonManager::getSingleton().remove("conversion");
+        OldSkeletonManager::getSingleton().remove("conversion");
     }
     else
     {
@@ -491,7 +491,7 @@ void skeletonToXML(XmlOptions opts)
         exit(1);
     }
 
-    SkeletonPtr skel = SkeletonManager::getSingleton().create("conversion", 
+    SkeletonPtr skel = OldSkeletonManager::getSingleton().create("conversion", 
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     // pass false for freeOnClose to FileStreamDataStream since ifs is created locally on stack
@@ -501,7 +501,7 @@ void skeletonToXML(XmlOptions opts)
     xmlSkeletonSerializer->exportSkeleton(skel.getPointer(), opts.dest);
 
     // Clean up the conversion skeleton
-    SkeletonManager::getSingleton().remove("conversion");
+    OldSkeletonManager::getSingleton().remove("conversion");
 }
 
 int main(int numargs, char** args)
@@ -534,7 +534,7 @@ int main(int numargs, char** args)
         meshMgr = new MeshManager();
         matMgr = new MaterialManager();
         matMgr->initialise();
-        skelMgr = new SkeletonManager();
+        skelMgr = new OldSkeletonManager();
         meshSerializer = new MeshSerializer();
         xmlMeshSerializer = new XMLMeshSerializer();
         skeletonSerializer = new SkeletonSerializer();
