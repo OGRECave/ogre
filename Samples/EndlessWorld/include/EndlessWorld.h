@@ -297,7 +297,7 @@ protected:
 
         mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
         mTerrainGlobals->setCompositeMapDiffuse(l->getDiffuseColour());
-        mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
+        mTerrainGlobals->setLightMapDirection(l->getDerivedDirectionUpdated());
 
         // Configure default import settings for if we use imported image
         Terrain::ImportData& defaultimp = mTerrainGroup->getDefaultImportSettings();
@@ -408,6 +408,8 @@ protected:
         lightdir.normalise();
 
         Light* l = mSceneMgr->createLight();
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		lightNode->attachObject( l );
         l->setName("tstLight");
         l->setType(Light::LT_DIRECTIONAL);
         l->setDirection(lightdir);

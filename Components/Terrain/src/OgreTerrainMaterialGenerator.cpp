@@ -117,6 +117,8 @@ namespace Ogre
 
             // Just in case material relies on light auto params
             mCompositeMapLight = mCompositeMapSM->createLight();
+			SceneNode *lightNode = mCompositeMapSM->getRootSceneNode()->createChildSceneNode();
+			lightNode->attachObject( mCompositeMapLight );
             mCompositeMapLight->setType(Light::LT_DIRECTIONAL);
 
             RenderSystem* rSys = Root::getSingleton().getRenderSystem();
