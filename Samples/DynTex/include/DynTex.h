@@ -31,6 +31,10 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
+		//--------------------------------------------------------
+		//	TODO: Ray Scene Queries aren't yet working in 2.x !!!
+		//--------------------------------------------------------
+
         // shoot a ray from the cursor to the plane
         Ray ray = mTrayMgr->getCursorRay(mCamera);
         mCursorQuery->setRay(ray);
@@ -136,9 +140,11 @@ protected:
         ps->fastForward(30);
 
         // create a frosted screen in front of the camera, using our dynamic texture to "thaw" certain areas
-        Entity* ent = mSceneMgr->createEntity("Plane");
+		Entity* ent = mSceneMgr->createEntity(SceneManager::PT_PLANE,
+												ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+												SCENE_STATIC);
         ent->setMaterialName("Examples/Frost");
-        SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        SceneNode* node = mSceneMgr->getRootSceneNode( SCENE_STATIC )->createChildSceneNode( SCENE_STATIC );
         node->setPosition(0, 0, 50);
         node->attachObject(ent);
 

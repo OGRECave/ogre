@@ -3166,6 +3166,9 @@ namespace Ogre {
         }
 
         pushInnerChunk(stream);
+
+		pMesh->mMeshLodUsageList.reserve( pMesh->mNumLods );
+		pMesh->mLodValues.resize( pMesh->mNumLods, 0 );
         // Loop from 1 rather than 0 (full detail index is not in file)
         for (i = 1; i < pMesh->mNumLods; ++i)
         {
@@ -3564,6 +3567,8 @@ namespace Ogre {
             }
         }
         pushInnerChunk(stream);
+		pMesh->mMeshLodUsageList.reserve( pMesh->mNumLods );
+		pMesh->mLodValues.resize( pMesh->mNumLods, 0 );
         // Loop from 1 rather than 0 (full detail index is not in file)
         for (i = 1; i < pMesh->mNumLods; ++i)
         {

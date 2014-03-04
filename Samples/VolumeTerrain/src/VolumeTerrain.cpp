@@ -46,7 +46,9 @@ void Sample_VolumeTerrain::setupContent(void)
     mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
     // Light
+	SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     Light* directionalLight0 = mSceneMgr->createLight();
+	lightNode->attachObject( directionalLight0 );
     directionalLight0->setName("directionalLight0");
     directionalLight0->setType(Light::LT_DIRECTIONAL);
     directionalLight0->setDirection(Vector3((Real)1, (Real)-1, (Real)1));

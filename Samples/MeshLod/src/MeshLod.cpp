@@ -30,7 +30,9 @@ void Sample_MeshLod::setupContent()
     mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));  // set ambient light
 
     // make the scene's main light come from above
+	SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     Light* l = mSceneMgr->createLight();
+	lightNode->attachObject( l );
     l->setType(Light::LT_DIRECTIONAL);
     l->setDirection(Vector3::NEGATIVE_UNIT_Y);
 
@@ -139,7 +141,7 @@ void Sample_MeshLod::recreateEntity()
         mSceneMgr->destroyEntity(mMeshEntity);
         mMeshEntity = 0; // createEntity may throw exception, so it is safer to reset to 0.
     }
-    mMeshEntity = mSceneMgr->createEntity(mLodConfig.mesh->getName(), mLodConfig.mesh);
+    mMeshEntity = mSceneMgr->createEntity(mLodConfig.mesh);
     mMeshNode->attachObject(mMeshEntity);
 }
 void Sample_MeshLod::changeSelectedMesh( const String& name )
@@ -154,7 +156,7 @@ void Sample_MeshLod::changeSelectedMesh( const String& name )
         mTrayMgr->showOkDialog("Error", "Failed to load mesh!");
         return;
     }
-    mMeshEntity = mSceneMgr->createEntity(name, mLodConfig.mesh);
+    mMeshEntity = mSceneMgr->createEntity(mLodConfig.mesh);
     mMeshNode->attachObject(mMeshEntity);
     mCamera->setPosition(Vector3(0, 0, 0));
     mCamera->moveRelative(Vector3(0, 0, mLodConfig.mesh->getBoundingSphereRadius() * 2));
@@ -292,14 +294,15 @@ void Sample_MeshLod::forceLodLevel(int lodLevelID, bool forceDelayed)
 {
     mForcedLodLevel = lodLevelID;
     // These are the requirements for async Lod generation
-    if(!forceDelayed || !ENABLE_THREADING || OGRE_THREAD_SUPPORT == 0){
+	//TODO: Lod bias is not supported in 2.0 (is this is even worthwhile?)
+    /*if(!forceDelayed || !ENABLE_THREADING || OGRE_THREAD_SUPPORT == 0){
         if(lodLevelID == -1 || mLodConfig.mesh->getNumLodLevels() <= 1) {
             // Clear forced Lod level
             mMeshEntity->setMeshLodBias(1.0, 0, std::numeric_limits<unsigned short>::max());
         } else {
             mMeshEntity->setMeshLodBias(1.0, lodLevelID, lodLevelID);
         }
-    }
+    }*/
 }
 size_t Sample_MeshLod::getUniqueVertexCount( MeshPtr mesh )
 {
@@ -364,9 +367,16 @@ void Sample_MeshLod::removeLodLevel()
 
 Real Sample_MeshLod::getCameraDistance()
 {
-    if(mLodConfig.mesh->getBoundingSphereRadius() != 0.0){
+	//Technically, the "last viewport" is one frame behind. But viewport's resolution (which is
+	//needed by PixelCountLodStrategy) doesn't change every frame anyway. It could be a problem
+	//if you render to different RTTs with different aspect ratios and then you would need a
+	//compositor listener.
+	if(mLodConfig.mesh->getBoundingSphereRadius() != 0.0 && mCameraMan->getCamera()->getLastViewport() )
+	{
         return PixelCountLodStrategy::getSingleton().getValue(mMeshEntity, mCameraMan->getCamera());
-    } else {
+    }
+	else
+	{
         return 0.0;
     }
 }
@@ -559,7 +569,7 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
             mMeshEntity = 0;
         }
         mLodConfig.mesh->reload();
-        mMeshEntity = mSceneMgr->createEntity(mLodConfig.mesh->getName(), mLodConfig.mesh);
+        mMeshEntity = mSceneMgr->createEntity(mLodConfig.mesh);
         mMeshNode->attachObject(mMeshEntity);
         forceLodLevel(-1); // disable Lod level forcing
         //String filename("");

@@ -247,6 +247,7 @@ private:
         // our model is quite small, so reduce the clipping planes
         cam->setNearClipDistance(0.1);
         cam->setFarClipDistance(100);
+		cam->detachFromParent(); //Detach from root scene node
         mCameraNode->attachObject(cam);
 
         mPivotPitch = 0;
@@ -438,7 +439,7 @@ private:
         Vector3 goalOffset = mCameraGoal->_getDerivedPosition() - mCameraNode->getPosition();
         mCameraNode->translate(goalOffset * deltaTime * 9.0f);
         // always look at the pivot
-        mCameraNode->lookAt(mCameraPivot->_getDerivedPosition(), Node::TS_WORLD);
+		mCameraNode->lookAt(mCameraPivot->_getDerivedPositionUpdated(), Node::TS_WORLD);
     }
 
     void updateCameraGoal(Real deltaYaw, Real deltaPitch, Real deltaZoom)
@@ -453,7 +454,7 @@ private:
             mPivotPitch += deltaPitch;
         }
         
-        Real dist = mCameraGoal->_getDerivedPosition().distance(mCameraPivot->_getDerivedPosition());
+        Real dist = mCameraGoal->_getDerivedPosition().distance(mCameraPivot->_getDerivedPositionUpdated());
         Real distChange = deltaZoom * dist;
 
         // bound the zoom
