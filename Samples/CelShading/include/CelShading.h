@@ -39,7 +39,8 @@ public:
     bool frameRenderingQueued(const FrameEvent& evt)
     {
         // make the light revolve around our model if and only if the check box is checked
-        if (mMoveLight->isChecked()) mLightPivot->yaw(Degree(evt.timeSinceLastFrame * 30));
+		if (mMoveLight->isChecked())
+			mLightPivot->yaw(Degree(evt.timeSinceLastFrame * 30));
 
         return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
     }
@@ -54,12 +55,12 @@ protected:
 
         // create a basic point light with an offset
         Light* light = mSceneMgr->createLight();
-        SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-        lightNode->setPosition(20, 40, 50);
+		mLightPivot = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
         // attach the light to a pivot node
-        mLightPivot = lightNode->createChildSceneNode();
-        mLightPivot->attachObject(light);
+		SceneNode *lightNode = mLightPivot->createChildSceneNode();
+		lightNode->setPosition(20, 40, 50);
+		lightNode->attachObject(light);
 
         // create our model, give it the shader material, and place it at the origin
         Entity *ent = mSceneMgr->createEntity( "ogrehead.mesh",

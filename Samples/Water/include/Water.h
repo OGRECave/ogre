@@ -325,6 +325,7 @@ protected:
         SceneNode* camNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         camNode->translate(0, 500, PLANE_SIZE);
         camNode->yaw(Degree(-45));
+		mCamera->detachFromParent(); //Detach from root node
         camNode->attachObject(mCamera);
         
         // Create animated light node
@@ -541,8 +542,9 @@ protected:
         Real ty = ((sin(sines[2]) + sin(sines[3])) / 4 + 0.5 ) * (float)(COMPLEXITY-2) + 1 ;
         waterMesh->push(tx,ty, -headDepth);
         Real step = PLANE_SIZE / COMPLEXITY ;
-        headNode->resetToInitialState();
-        headNode->scale(3,3,3);
+		headNode->setPosition( Vector3::ZERO );
+		headNode->setOrientation( Quaternion::IDENTITY );
+		headNode->setScale( 3, 3, 3 );
         Vector3 newPos = Vector3(step*tx, headDepth, step*ty);
         Vector3 diffPos = newPos - oldPos ;
         Quaternion headRotation = Vector3::UNIT_Z.getRotationTo(diffPos);
