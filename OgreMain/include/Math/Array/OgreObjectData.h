@@ -134,7 +134,7 @@ namespace Ogre
             ++mWorldAabb;
             mLocalRadius        += ARRAY_PACKED_REALS;
             mWorldRadius        += ARRAY_PACKED_REALS;
-            mUpperDistance      +=ARRAY_PACKED_REALS;
+            mUpperDistance      += ARRAY_PACKED_REALS;
             mVisibilityFlags    += ARRAY_PACKED_REALS;
             mQueryFlags         += ARRAY_PACKED_REALS;
             mLightMask          += ARRAY_PACKED_REALS;

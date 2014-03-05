@@ -61,9 +61,6 @@ namespace Ogre {
         /// The scene manager for the current frame.
         SceneManager *mParentSceneManager;
 
-        /// Static member used to automatically generate names for SimpleRendaerable objects.
-        static uint msGenNameCount;
-
     public:
         /// Constructor
         SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager );

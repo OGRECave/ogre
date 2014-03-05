@@ -103,10 +103,14 @@ protected:
         snode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         snode->setPosition(Vector3(0,0,0));
         
-        vrend = new VolumeRenderable(32, 750.0f, "DynaTex");
+		vrend = new VolumeRenderable( Id::generateNewId<MovableObject>(),
+									  &mSceneMgr->_getEntityMemoryManager(SCENE_DYNAMIC),
+									  32, 750.0f, "DynaTex");
         snode->attachObject( vrend );
         
-        trend = new ThingRenderable(90.0f, 32, 7.5f);
+		trend = new ThingRenderable( Id::generateNewId<MovableObject>(),
+									 &mSceneMgr->_getEntityMemoryManager(SCENE_DYNAMIC),
+									 90.0f, 32, 7.5f );
         trend->setMaterial("Examples/VTDarkStuff");
         snode->attachObject(trend);
         

@@ -29,7 +29,8 @@ public:
         @param count    Number of quads
         @param qsize    Size of quads
      */
-    ThingRenderable(float radius, size_t count, float qsize);
+	ThingRenderable(Ogre::IdType id, Ogre::ObjectMemoryManager *objectMemoryManager,
+					float radius, size_t count, float qsize);
     ~ThingRenderable();
     /**
      * Retrieves ratios of the origin-centered bounding sphere for this

@@ -23,18 +23,14 @@ same license as the rest of the engine.
 */
 class VolumeRenderable: public Ogre::SimpleRenderable {
 public:
-    VolumeRenderable(size_t nSlices, float size, const Ogre::String & texture);
+	VolumeRenderable(Ogre::IdType id, Ogre::ObjectMemoryManager *objectMemoryManager,
+					 size_t nSlices, float size, const Ogre::String & texture);
     ~VolumeRenderable();
     
     // Copydoc Ogre::SimpleRenderable::notifyCurrentCamera
-    void _notifyCurrentCamera( Ogre::Camera* cam );
+    virtual void _updateRenderQueue(Ogre::RenderQueue* queue, Ogre::Camera *camera,
+                                    const Ogre::Camera *lodCamera);
     void getWorldTransforms( Ogre::Matrix4* xform ) const;
-    
-    /**
-     * Retrieves ratios of the origin-centered bounding sphere for this
-     * object.
-     */
-    Ogre::Real getBoundingRadius() const;
     
     /**
      * Returns the camera-relative squared depth of this renderable.
@@ -44,8 +40,7 @@ protected:
     void initialise();
 
     size_t mSlices;
-    float mSize;
-    float mRadius;
+	float mSize;
     Ogre::Matrix3 mFakeOrientation;
     Ogre::String mTexture;
     Ogre::TextureUnitState *mUnit;

@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    uint SimpleRenderable::msGenNameCount = 0;
-
     SimpleRenderable::SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager )
 		: MovableObject( id, objectMemoryManager, Ogre::RENDER_QUEUE_MAIN )
     , mWorldTransform(Matrix4::IDENTITY)
