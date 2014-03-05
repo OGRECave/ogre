@@ -74,14 +74,6 @@ namespace Ogre {
         /// Fixed axis to yaw around
         Vector3 mYawFixedAxis;
 
-        //TODO: Move auto tracking out of here. dark_sylinc
-        /// Auto tracking target
-        SceneNode* mAutoTrackTarget;
-        /// Tracking offset for fine tuning
-        Vector3 mAutoTrackOffset;
-        /// Local 'normal' direction vector
-        Vector3 mAutoTrackLocalDirection;
-
         /** Retrieves a the iterator to an attached object.
         @remarks Retrieves by object name, see alternate version to retrieve by index.
         Retrieving by name forces a linear search O(N), prefer using the index, which is O(1)
@@ -283,14 +275,7 @@ namespace Ogre {
         virtual void setAutoTracking(bool enabled, SceneNode* const target = 0, 
             const Vector3& localDirectionVector = Vector3::NEGATIVE_UNIT_Z,
             const Vector3& offset = Vector3::ZERO);
-        /** Get the auto tracking target for this node, if any. */
-        virtual SceneNode* getAutoTrackTarget(void) { return mAutoTrackTarget; }
-        /** Get the auto tracking offset for this node, if the node is auto tracking. */
-        virtual const Vector3& getAutoTrackOffset(void) { return mAutoTrackOffset; }
-        /** Get the auto tracking local direction for this node, if it is auto tracking. */
-        virtual const Vector3& getAutoTrackLocalDirection(void) { return mAutoTrackLocalDirection; }
-        /** Internal method used by OGRE to update auto-tracking cameras. */
-        void _autoTrack(void);
+
         /** Gets the parent of this SceneNode. */
         SceneNode* getParentSceneNode(void) const;
         /** Makes all objects attached to this node become visible / invisible.

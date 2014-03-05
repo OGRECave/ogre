@@ -542,8 +542,25 @@ namespace Ogre {
         SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
 
         /// Autotracking scene nodes
-        typedef set<SceneNode*>::type AutoTrackingSceneNodes;
-        AutoTrackingSceneNodes mAutoTrackingSceneNodes;
+		struct AutoTrackingSceneNode
+		{
+			SceneNode *source;
+			SceneNode *target;
+			/// Tracking offset for fine tuning
+			Vector3		offset;
+			/// Local 'normal' direction vector
+			Vector3		localDirection;
+
+			AutoTrackingSceneNode( SceneNode *_source, SceneNode *_target,
+								   const Vector3 &_offset, const Vector3 &_localDirection ) :
+				source( _source ), target( _target ),
+				offset( _offset ), localDirection( _localDirection )
+			{
+			}
+		};
+
+		typedef vector<AutoTrackingSceneNode>::type AutoTrackingSceneNodeVec;
+		AutoTrackingSceneNodeVec mAutoTrackingSceneNodes;
 
         // Sky params
         // Sky plane
@@ -2463,7 +2480,9 @@ namespace Ogre {
         virtual bool getShowBoundingBoxes() const;
 
         /** Internal method for notifying the manager that a SceneNode is autotracking. */
-        virtual void _notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack);
+		virtual void _addAutotrackingSceneNode( SceneNode* source, SceneNode* target,
+												const Vector3 &offset, const Vector3 &localDirection );
+		virtual void _removeAutotrackingSceneNode( SceneNode* source );
 
         
         /** Creates an AxisAlignedBoxSceneQuery for this scene manager. 

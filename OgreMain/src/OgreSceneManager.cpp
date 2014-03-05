@@ -662,28 +662,27 @@ void SceneManager::destroySceneNode( SceneNode* sn )
             "created with this SceneManager)", "SceneManager::destroySceneNode");
     }
 
-    SceneNodeList::iterator itor = mSceneNodes.begin() + sn->mGlobalIndex;
+	{
+		// For any scene nodes which are tracking this node
+		// (or if this node is a tracker), remove its entry.
+		AutoTrackingSceneNodeVec::iterator itor = mAutoTrackingSceneNodes.begin();
+		AutoTrackingSceneNodeVec::iterator end  = mAutoTrackingSceneNodes.end();
 
-    // Find any scene nodes which are tracking this node, and turn them off
-    AutoTrackingSceneNodes::iterator ai, aiend;
-    aiend = mAutoTrackingSceneNodes.end();
-    for (ai = mAutoTrackingSceneNodes.begin(); ai != aiend; )
-    {
-        // Pre-increment incase we delete
-        AutoTrackingSceneNodes::iterator curri = ai++;
-        SceneNode* n = *curri;
-        // Tracking this node
-        if (n->getAutoTrackTarget() == sn)
-        {
-            // turn off, this will notify SceneManager to remove
-            n->setAutoTracking(false);
-        }
-        // node is itself a tracker
-        else if (n == sn)
-        {
-            mAutoTrackingSceneNodes.erase(curri);
-        }
-    }
+		while( itor != end )
+		{
+			if( itor->source == sn || itor->target == sn )
+			{
+				itor = efficientVectorRemove( mAutoTrackingSceneNodes, itor );
+				end  = mAutoTrackingSceneNodes.end();
+			}
+			else
+			{
+				++itor;
+			}
+		}
+	}
+
+    SceneNodeList::iterator itor = mSceneNodes.begin() + sn->mGlobalIndex;
 
     // detach from parent (don't do this in destructor since bulk destruction
     // behaves differently)
@@ -2440,6 +2439,32 @@ void SceneManager::updateSceneGraph()
     updateInstanceManagers();
     updateAllBounds( mEntitiesMemoryManagerUpdateList );
     updateAllBounds( mLightsMemoryManagerCulledList );
+
+	{
+		// Auto-track nodes
+		AutoTrackingSceneNodeVec::const_iterator itor = mAutoTrackingSceneNodes.begin();
+		AutoTrackingSceneNodeVec::const_iterator end  = mAutoTrackingSceneNodes.end();
+
+		while( itor != end )
+		{
+			itor->source->lookAt( itor->target->_getDerivedPosition() + itor->offset,
+									 Node::TS_WORLD, itor->localDirection );
+			itor->source->_getDerivedPositionUpdated();
+			++itor;
+		}
+	}
+
+	{
+		// Auto-track camera if required
+		CameraList::const_iterator itor = mCameras.begin();
+		CameraList::const_iterator end  = mCameras.end();
+		while( itor != end )
+		{
+			(*itor)->_autoTrack();
+			++itor;
+		}
+	}
+
     buildLightList();
 
     //Reset the list of render RQs for all cameras that are in a PASS_SCENE (except shadow passes)
@@ -3779,16 +3804,23 @@ bool SceneManager::getShowBoundingBoxes() const
     return mShowBoundingBoxes;
 }
 //---------------------------------------------------------------------
-void SceneManager::_notifyAutotrackingSceneNode(SceneNode* node, bool autoTrack)
+void SceneManager::_addAutotrackingSceneNode( SceneNode* source, SceneNode* target,
+												const Vector3 &offset, const Vector3 &localDirection )
 {
-    if (autoTrack)
-    {
-        mAutoTrackingSceneNodes.insert(node);
-    }
-    else
-    {
-        mAutoTrackingSceneNodes.erase(node);
-    }
+	_removeAutotrackingSceneNode( source );
+	mAutoTrackingSceneNodes.push_back( AutoTrackingSceneNode( source, target, offset, localDirection ) );
+}
+//---------------------------------------------------------------------
+void SceneManager::_removeAutotrackingSceneNode( SceneNode* source )
+{
+	AutoTrackingSceneNodeVec::iterator itor = mAutoTrackingSceneNodes.begin();
+	AutoTrackingSceneNodeVec::iterator end  = mAutoTrackingSceneNodes.end();
+
+	while( itor != end && itor->source != source )
+		++itor;
+
+	if( itor != end )
+		efficientVectorRemove( mAutoTrackingSceneNodes, itor );
 }
 //---------------------------------------------------------------------
 void SceneManager::_suppressRenderStateChanges(bool suppress)

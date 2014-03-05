@@ -43,16 +43,14 @@ namespace Ogre {
                             SceneNode *parent )
         : Node( id, nodeMemoryManager, parent )
         , mCreator(creator)
-        , mYawFixed(false)
-        , mAutoTrackTarget(0)
+		, mYawFixed(false)
     {
     }
     //-----------------------------------------------------------------------
     SceneNode::SceneNode( const Transform &transformPtrs )
         : Node( transformPtrs )
         , mCreator(0)
-        , mYawFixed(false)
-        , mAutoTrackTarget(0)
+		, mYawFixed(false)
     {
     }
     //-----------------------------------------------------------------------
@@ -316,22 +314,14 @@ namespace Ogre {
             mCreator->registerSceneNodeListener( this );
     }
     //-----------------------------------------------------------------------
-    void SceneNode::setAutoTracking(bool enabled, SceneNode* const target, 
-        const Vector3& localDirectionVector,
-        const Vector3& offset)
+	void SceneNode::setAutoTracking( bool enabled, SceneNode* const target,
+									 const Vector3& localDirectionVector, const Vector3& offset )
     {
-        if (enabled)
-        {
-            mAutoTrackTarget = target;
-            mAutoTrackOffset = offset;
-            mAutoTrackLocalDirection = localDirectionVector;
-        }
-        else
-        {
-            mAutoTrackTarget = 0;
-        }
-        if (mCreator)
-            mCreator->_notifyAutotrackingSceneNode(this, enabled);
+		assert( mCreator && "Auto-Tracking only works with SceneNodes created by a SceneManager" );
+		if( enabled )
+			mCreator->_addAutotrackingSceneNode( this, target, offset, localDirectionVector );
+		else
+			mCreator->_removeAutotrackingSceneNode( this );
     }
     //-----------------------------------------------------------------------
     void SceneNode::setFixedYawAxis(bool useFixed, const Vector3& fixedAxis)
@@ -467,17 +457,7 @@ namespace Ogre {
         }
 
         setDirection( targetPoint - origin, relativeTo, localDirectionVector );
-    }
-    //-----------------------------------------------------------------------
-    void SceneNode::_autoTrack(void)
-    {
-        // NB assumes that all scene nodes have been updated
-        if (mAutoTrackTarget)
-        {
-            lookAt( mAutoTrackTarget->_getDerivedPosition() + mAutoTrackOffset, 
-                    TS_WORLD, mAutoTrackLocalDirection );
-        }
-    }
+	}
     //-----------------------------------------------------------------------
     SceneNode* SceneNode::getParentSceneNode(void) const
     {
