@@ -289,7 +289,7 @@ namespace Ogre {
 				FIFO, LRU
 			};
 
-			VertexCacheProfiler(unsigned int cachesize = 16, CacheType cachetype = FIFO )
+			VertexCacheProfiler(unsigned int cachesize = 16, CacheType /*cachetype*/ = FIFO )
 				: size ( cachesize ), tail (0), buffersize (0), hit (0), miss (0)
 			{
 				cache = OGRE_ALLOC_T(uint32, size, MEMCATEGORY_GEOMETRY);
