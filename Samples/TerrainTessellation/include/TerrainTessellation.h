@@ -244,7 +244,10 @@ protected:
         Vector3 lightdir(0.55, -0.3, 0.75);
         lightdir.normalise();
 
-        Light* l = mSceneMgr->createLight("tstLight");
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		Light* l = mSceneMgr->createLight();
+		lightNode->attachObject( l );
+		l->setName( "tstLight" );
         l->setType(Light::LT_DIRECTIONAL);
         l->setDirection(lightdir);
         l->setDiffuseColour(ColourValue::White);
@@ -279,7 +282,7 @@ protected:
     void setupLights()
     {
         mSceneMgr->setAmbientLight(ColourValue::Black); 
-        mViewport->setBackgroundColour(ColourValue(0.41f, 0.41f, 0.41f));
+		mBackgroundColour = ColourValue(0.41f, 0.41f, 0.41f);
     }
 
     void setupControls()

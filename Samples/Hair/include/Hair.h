@@ -219,7 +219,7 @@ protected:
     void setupLights()
     {
         mSceneMgr->setAmbientLight(ColourValue::Black); 
-        mViewport->setBackgroundColour(ColourValue(0.41f, 0.41f, 0.41f));
+		mBackgroundColour = ColourValue(0.41f, 0.41f, 0.41f);
     }
 
     void setupControls()
