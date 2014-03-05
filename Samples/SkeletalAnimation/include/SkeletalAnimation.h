@@ -42,6 +42,7 @@ public:
         mBoneBoundingBoxesItemName = "Bone AABBs";
     }
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     void setVisualiseBoundingBoxMode( VisualiseBoundingBoxMode mode )
     {
         mVisualiseBoundingBoxMode = mode;
@@ -61,6 +62,8 @@ public:
             }
         }
     }
+#endif
+
     void enableBoneBoundingBoxMode( bool enable )
     {
         // update bone bounding box mode for all models
@@ -72,8 +75,7 @@ public:
             {
                 if (Entity* ent = dynamic_cast<Entity*>( node->getAttachedObject( iObj ) ))
                 {
-                    ent->setUpdateBoundingBoxFromSkeleton( mBoneBoundingBoxes );
-                    Node::queueNeedUpdate( node );  // when turning off bone bounding boxes, need to force an update
+					ent->setUpdateBoundingBoxFromSkeleton( mBoneBoundingBoxes );
                 }
             }
         }
@@ -91,6 +93,7 @@ public:
             // handle keypresses
             switch (evt.key)
             {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
             case OIS::KC_V:
                 // toggle visualise bounding boxes
                 switch (mVisualiseBoundingBoxMode)
@@ -107,6 +110,7 @@ public:
                 }
                 return true;
                 break;
+#endif
 
             case OIS::KC_B:
                 {
@@ -176,12 +180,6 @@ protected:
                 Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
         }
 #endif*/
-        // set shadow properties
-        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
-        mSceneMgr->setShadowTextureSize(512);
-        mSceneMgr->setShadowColour(ColourValue(0.6, 0.6, 0.6));
-        mSceneMgr->setShadowTextureCount(2);
-
         // add a little ambient lighting
         mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
@@ -333,10 +331,10 @@ protected:
     void tweakSneakAnim()
     {
         // get the skeleton, animation, and the node track iterator
-        SkeletonPtr skel = SkeletonManager::getSingleton().load("jaiqua.skeleton",
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Skeleton>();
+		SkeletonPtr skel = OldSkeletonManager::getSingleton().load("jaiqua.skeleton",
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).staticCast<Skeleton>();
         Animation* anim = skel->getAnimation("Sneak");
-        Animation::NodeTrackIterator tracks = anim->getNodeTrackIterator();
+		Animation::OldNodeTrackIterator tracks = anim->getOldNodeTrackIterator();
 
         while (tracks.hasMoreElements())   // for every node track...
         {
@@ -380,8 +378,7 @@ protected:
         mModelNodes.clear();
         mAnimStates.clear();
         mAnimSpeeds.clear();
-        MeshManager::getSingleton().remove("floor");
-        mSceneMgr->destroyEntity("Jaiqua");
+		MeshManager::getSingleton().remove("floor");
 
 /*#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
         //To make glsles work the program will need to be provided with proper
