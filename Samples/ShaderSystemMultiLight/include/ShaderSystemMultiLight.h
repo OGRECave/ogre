@@ -221,7 +221,7 @@ protected:
         state.anim = mSceneMgr->createAnimation(animName, animPoints * animTimeBetweenPoints);
         state.anim->setInterpolationMode(Animation::IM_SPLINE);
 
-        state.track = state.anim->createNodeTrack(1, state.node);  // Create a node track for our animation
+		state.track = state.anim->createNodeTrack(state.node);  // Create a node track for our animation
 
         // Enter keyframes for our track to define a path for the light to follow
         Vector3 firstFramePos;
@@ -382,7 +382,7 @@ private:
     {
         SceneNode* node;
         Animation* anim;
-        NodeAnimationTrack* track;
+		NodeAnimationTrack* track;
         AnimationState* animState;
         Light* light;
         BillboardSet* bbs;

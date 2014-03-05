@@ -341,24 +341,374 @@ namespace Ogre {
     //---------------------------------------------------------------------
     NumericAnimationTrack* NumericAnimationTrack::_clone(Animation* newParent) const
     {
-        NumericAnimationTrack* newTrack = 
-            newParent->createNumericTrack(mHandle);
+		NumericAnimationTrack* newTrack =
+			newParent->createNumericTrack(mHandle);
         newTrack->mTargetAnim = mTargetAnim;
         populateClone(newTrack);
         return newTrack;
     }
     //---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	// Node specialisations
+	//---------------------------------------------------------------------
+	NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle)
+		: AnimationTrack(parent, handle), mTargetNode(0)
+		, mSplines(0), mSplineBuildNeeded(false)
+		, mUseShortestRotationPath(true)
+		,mInitialPosition( Vector3::ZERO )
+		,mInitialOrientation( Quaternion::IDENTITY )
+		,mInitialScale( Vector3::UNIT_SCALE )
+	{
+	}
+	//---------------------------------------------------------------------
+	NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle, Node* targetNode)
+		: AnimationTrack(parent, handle), mTargetNode(targetNode)
+		, mSplines(0), mSplineBuildNeeded(false)
+		, mUseShortestRotationPath(true)
+	{
+	}
+	//---------------------------------------------------------------------
+	NodeAnimationTrack::~NodeAnimationTrack()
+	{
+		OGRE_DELETE_T(mSplines, Splines, MEMCATEGORY_ANIMATION);
+	}
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const
+	{
+		if (mListener)
+		{
+			if (mListener->getInterpolatedKeyFrame(this, timeIndex, kf))
+				return;
+		}
+
+		TransformKeyFrame* kret = static_cast<TransformKeyFrame*>(kf);
+
+		// Keyframe pointers
+		KeyFrame *kBase1, *kBase2;
+		TransformKeyFrame *k1, *k2;
+		unsigned short firstKeyIndex;
+
+		Real t = this->getKeyFramesAtTime(timeIndex, &kBase1, &kBase2, &firstKeyIndex);
+		k1 = static_cast<TransformKeyFrame*>(kBase1);
+		k2 = static_cast<TransformKeyFrame*>(kBase2);
+
+		if (t == 0.0)
+		{
+			// Just use k1
+			kret->setRotation(k1->getRotation());
+			kret->setTranslate(k1->getTranslate());
+			kret->setScale(k1->getScale());
+		}
+		else
+		{
+			// Interpolate by t
+			Animation::InterpolationMode im = mParent->getInterpolationMode();
+			Animation::RotationInterpolationMode rim =
+				mParent->getRotationInterpolationMode();
+			Vector3 base;
+			switch(im)
+			{
+			case Animation::IM_LINEAR:
+				// Interpolate linearly
+				// Rotation
+				// Interpolate to nearest rotation if mUseShortestRotationPath set
+				if (rim == Animation::RIM_LINEAR)
+				{
+					kret->setRotation( Quaternion::nlerp(t, k1->getRotation(),
+						k2->getRotation(), mUseShortestRotationPath) );
+				}
+				else //if (rim == Animation::RIM_SPHERICAL)
+				{
+					kret->setRotation( Quaternion::Slerp(t, k1->getRotation(),
+						k2->getRotation(), mUseShortestRotationPath) );
+				}
+
+				// Translation
+				base = k1->getTranslate();
+				kret->setTranslate( base + ((k2->getTranslate() - base) * t) );
+
+				// Scale
+				base = k1->getScale();
+				kret->setScale( base + ((k2->getScale() - base) * t) );
+				break;
+
+			case Animation::IM_SPLINE:
+				// Spline interpolation
+
+				// Build splines if required
+				if (mSplineBuildNeeded)
+				{
+					buildInterpolationSplines();
+				}
+
+				// Rotation, take mUseShortestRotationPath into account
+				kret->setRotation( mSplines->rotationSpline.interpolate(firstKeyIndex, t,
+					mUseShortestRotationPath) );
+
+				// Translation
+				kret->setTranslate( mSplines->positionSpline.interpolate(firstKeyIndex, t) );
+
+				// Scale
+				kret->setScale( mSplines->scaleSpline.interpolate(firstKeyIndex, t) );
+
+				break;
+			}
+
+		}
+	}
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::apply(const TimeIndex& timeIndex, Real weight, Real scale)
+	{
+		applyToNode(mTargetNode, timeIndex, weight, scale);
+
+	}
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::resetNodeToInitialState(void)
+	{
+		mTargetNode->setPosition( mInitialPosition );
+		mTargetNode->setOrientation( mInitialOrientation );
+		mTargetNode->setScale( mInitialScale );
+	}
+	//---------------------------------------------------------------------
+	Node* NodeAnimationTrack::getAssociatedNode(void) const
+	{
+		return mTargetNode;
+	}
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::setAssociatedNode(Node* node)
+	{
+		mTargetNode = node;
+	}
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::applyToNode(Node* node, const TimeIndex& timeIndex, Real weight,
+		Real scl)
+	{
+		// Nothing to do if no keyframes or zero weight or no node
+		if (mKeyFrames.empty() || !weight || !node)
+			return;
+
+		TransformKeyFrame kf(0, timeIndex.getTimePos());
+		getInterpolatedKeyFrame(timeIndex, &kf);
+
+		// add to existing. Weights are not relative, but treated as absolute multipliers for the animation
+		Vector3 translate = kf.getTranslate() * weight * scl;
+		node->translate(translate);
+
+		// interpolate between no-rotation and full rotation, to point 'weight', so 0 = no rotate, 1 = full
+		Quaternion rotate;
+		Animation::RotationInterpolationMode rim =
+			mParent->getRotationInterpolationMode();
+		if (rim == Animation::RIM_LINEAR)
+		{
+			rotate = Quaternion::nlerp(weight, Quaternion::IDENTITY, kf.getRotation(), mUseShortestRotationPath);
+		}
+		else //if (rim == Animation::RIM_SPHERICAL)
+		{
+			rotate = Quaternion::Slerp(weight, Quaternion::IDENTITY, kf.getRotation(), mUseShortestRotationPath);
+		}
+		node->rotate(rotate);
+
+		Vector3 scale = kf.getScale();
+		// Not sure how to modify scale for cumulative anims... leave it alone
+		//scale = ((Vector3::UNIT_SCALE - kf.getScale()) * weight) + Vector3::UNIT_SCALE;
+		if (scale != Vector3::UNIT_SCALE)
+		{
+			if (scl != 1.0f)
+				scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * scl;
+			else if (weight != 1.0f)
+				scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * weight;
+		}
+		node->scale(scale);
+
+	}
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::buildInterpolationSplines(void) const
+	{
+		// Allocate splines if not exists
+		if (!mSplines)
+		{
+			mSplines = OGRE_NEW_T(Splines, MEMCATEGORY_ANIMATION);
+		}
+
+		// Cache to register for optimisation
+		Splines* splines = mSplines;
+
+		// Don't calc automatically, do it on request at the end
+		splines->positionSpline.setAutoCalculate(false);
+		splines->rotationSpline.setAutoCalculate(false);
+		splines->scaleSpline.setAutoCalculate(false);
+
+		splines->positionSpline.clear();
+		splines->rotationSpline.clear();
+		splines->scaleSpline.clear();
+
+		KeyFrameList::const_iterator i, iend;
+		iend = mKeyFrames.end(); // precall to avoid overhead
+		for (i = mKeyFrames.begin(); i != iend; ++i)
+		{
+			TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
+			splines->positionSpline.addPoint(kf->getTranslate());
+			splines->rotationSpline.addPoint(kf->getRotation());
+			splines->scaleSpline.addPoint(kf->getScale());
+		}
+
+		splines->positionSpline.recalcTangents();
+		splines->rotationSpline.recalcTangents();
+		splines->scaleSpline.recalcTangents();
+
+
+		mSplineBuildNeeded = false;
+	}
+
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::setUseShortestRotationPath(bool useShortestPath)
+	{
+		mUseShortestRotationPath = useShortestPath ;
+	}
+
+	//---------------------------------------------------------------------
+	bool NodeAnimationTrack::getUseShortestRotationPath() const
+	{
+		return mUseShortestRotationPath ;
+	}
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::_keyFrameDataChanged(void) const
+	{
+		mSplineBuildNeeded = true;
+	}
+	//---------------------------------------------------------------------
+	bool NodeAnimationTrack::hasNonZeroKeyFrames(void) const
+	{
+		KeyFrameList::const_iterator i = mKeyFrames.begin();
+		for (; i != mKeyFrames.end(); ++i)
+		{
+			// look for keyframes which have any component which is non-zero
+			// Since exporters can be a little inaccurate sometimes we use a
+			// tolerance value rather than looking for nothing
+			TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
+			Vector3 trans = kf->getTranslate();
+			Vector3 scale = kf->getScale();
+			Vector3 axis;
+			Radian angle;
+			kf->getRotation().ToAngleAxis(angle, axis);
+			Real tolerance = 1e-3f;
+			if (!trans.positionEquals(Vector3::ZERO, tolerance) ||
+				!scale.positionEquals(Vector3::UNIT_SCALE, tolerance) ||
+				!Math::RealEqual(angle.valueRadians(), 0.0f, tolerance))
+			{
+				return true;
+			}
+
+		}
+
+		return false;
+	}
+	//---------------------------------------------------------------------
+	void NodeAnimationTrack::optimise(void)
+	{
+		// Eliminate duplicate keyframes from 2nd to penultimate keyframe
+		// NB only eliminate middle keys from sequences of 5+ identical keyframes
+		// since we need to preserve the boundary keys in place, and we need
+		// 2 at each end to preserve tangents for spline interpolation
+		Vector3 lasttrans = Vector3::ZERO;
+		Vector3 lastscale = Vector3::ZERO;
+		Quaternion lastorientation;
+		KeyFrameList::iterator i = mKeyFrames.begin();
+		Radian quatTolerance(1e-3f);
+		list<unsigned short>::type removeList;
+		unsigned short k = 0;
+		ushort dupKfCount = 0;
+		for (; i != mKeyFrames.end(); ++i, ++k)
+		{
+			TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
+			Vector3 newtrans = kf->getTranslate();
+			Vector3 newscale = kf->getScale();
+			Quaternion neworientation = kf->getRotation();
+			// Ignore first keyframe; now include the last keyframe as we eliminate
+			// only k-2 in a group of 5 to ensure we only eliminate middle keys
+			if (i != mKeyFrames.begin() &&
+				newtrans.positionEquals(lasttrans) &&
+				newscale.positionEquals(lastscale) &&
+				neworientation.equals(lastorientation, quatTolerance))
+			{
+				++dupKfCount;
+
+				// 4 indicates this is the 5th duplicate keyframe
+				if (dupKfCount == 4)
+				{
+					// remove the 'middle' keyframe
+					removeList.push_back(k-2);
+					--dupKfCount;
+				}
+			}
+			else
+			{
+				// reset
+				dupKfCount = 0;
+				lasttrans = newtrans;
+				lastscale = newscale;
+				lastorientation = neworientation;
+			}
+		}
+
+		// Now remove keyframes, in reverse order to avoid index revocation
+		list<unsigned short>::type::reverse_iterator r = removeList.rbegin();
+		for (; r!= removeList.rend(); ++r)
+		{
+			removeKeyFrame(*r);
+		}
+
+
+	}
+	//--------------------------------------------------------------------------
+	KeyFrame* NodeAnimationTrack::createKeyFrameImpl(Real time)
+	{
+		return OGRE_NEW TransformKeyFrame(this, time);
+	}
+	//--------------------------------------------------------------------------
+	TransformKeyFrame* NodeAnimationTrack::createNodeKeyFrame(Real timePos)
+	{
+		return static_cast<TransformKeyFrame*>(createKeyFrame(timePos));
+	}
+	//--------------------------------------------------------------------------
+	TransformKeyFrame* NodeAnimationTrack::getNodeKeyFrame(unsigned short index) const
+	{
+		return static_cast<TransformKeyFrame*>(getKeyFrame(index));
+	}
+	//---------------------------------------------------------------------
+	NodeAnimationTrack* NodeAnimationTrack::_clone(Animation* newParent) const
+	{
+		NodeAnimationTrack* newTrack =
+			newParent->createNodeTrack(mTargetNode);
+		newTrack->mUseShortestRotationPath = mUseShortestRotationPath;
+		populateClone(newTrack);
+		return newTrack;
+	}
+	//--------------------------------------------------------------------------
+	void NodeAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+	{
+		const TransformKeyFrame* base = static_cast<const TransformKeyFrame*>(b);
+
+		for (KeyFrameList::iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+		{
+			TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
+			kf->setTranslate(kf->getTranslate() - base->getTranslate());
+			kf->setRotation(base->getRotation().Inverse() * kf->getRotation());
+			kf->setScale(kf->getScale() * (Vector3::UNIT_SCALE / base->getScale()));
+		}
+
+	}
     //---------------------------------------------------------------------
     // OldNode specialisations
     //---------------------------------------------------------------------
-    NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle)
+	OldNodeAnimationTrack::OldNodeAnimationTrack(Animation* parent, unsigned short handle)
         : AnimationTrack(parent, handle), mTargetNode(0)
         , mSplines(0), mSplineBuildNeeded(false)
         , mUseShortestRotationPath(true)
     {
     }
     //---------------------------------------------------------------------
-    NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle,
+	OldNodeAnimationTrack::OldNodeAnimationTrack(Animation* parent, unsigned short handle,
         OldNode* targetNode)
         : AnimationTrack(parent, handle), mTargetNode(targetNode)
         , mSplines(0), mSplineBuildNeeded(false)
@@ -366,12 +716,12 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    NodeAnimationTrack::~NodeAnimationTrack()
+	OldNodeAnimationTrack::~OldNodeAnimationTrack()
     {
         OGRE_DELETE_T(mSplines, Splines, MEMCATEGORY_ANIMATION);
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const
+	void OldNodeAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const
     {
         if (mListener)
         {
@@ -455,23 +805,23 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::apply(const TimeIndex& timeIndex, Real weight, Real scale)
+	void OldNodeAnimationTrack::apply(const TimeIndex& timeIndex, Real weight, Real scale)
     {
         applyToNode(mTargetNode, timeIndex, weight, scale);
 
     }
     //---------------------------------------------------------------------
-    OldNode* NodeAnimationTrack::getAssociatedNode(void) const
+	OldNode* OldNodeAnimationTrack::getAssociatedNode(void) const
     {
         return mTargetNode;
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::setAssociatedNode(OldNode* node)
+	void OldNodeAnimationTrack::setAssociatedNode(OldNode* node)
     {
         mTargetNode = node;
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::applyToNode(OldNode* node, const TimeIndex& timeIndex, Real weight,
+	void OldNodeAnimationTrack::applyToNode(OldNode* node, const TimeIndex& timeIndex, Real weight,
         Real scl)
     {
         // Nothing to do if no keyframes or zero weight or no node
@@ -513,7 +863,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::buildInterpolationSplines(void) const
+	void OldNodeAnimationTrack::buildInterpolationSplines(void) const
     {
         // Allocate splines if not exists
         if (!mSplines)
@@ -552,23 +902,23 @@ namespace Ogre {
     }
 
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::setUseShortestRotationPath(bool useShortestPath)
+	void OldNodeAnimationTrack::setUseShortestRotationPath(bool useShortestPath)
     {
         mUseShortestRotationPath = useShortestPath ;
     }
 
     //---------------------------------------------------------------------
-    bool NodeAnimationTrack::getUseShortestRotationPath() const
+	bool OldNodeAnimationTrack::getUseShortestRotationPath() const
     {
         return mUseShortestRotationPath ;
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::_keyFrameDataChanged(void) const
+	void OldNodeAnimationTrack::_keyFrameDataChanged(void) const
     {
         mSplineBuildNeeded = true;
     }
     //---------------------------------------------------------------------
-    bool NodeAnimationTrack::hasNonZeroKeyFrames(void) const
+	bool OldNodeAnimationTrack::hasNonZeroKeyFrames(void) const
     {
         KeyFrameList::const_iterator i = mKeyFrames.begin();
         for (; i != mKeyFrames.end(); ++i)
@@ -595,7 +945,7 @@ namespace Ogre {
         return false;
     }
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::optimise(void)
+	void OldNodeAnimationTrack::optimise(void)
     {
         // Eliminate duplicate keyframes from 2nd to penultimate keyframe
         // NB only eliminate middle keys from sequences of 5+ identical keyframes
@@ -652,31 +1002,31 @@ namespace Ogre {
 
     }
     //--------------------------------------------------------------------------
-    KeyFrame* NodeAnimationTrack::createKeyFrameImpl(Real time)
+	KeyFrame* OldNodeAnimationTrack::createKeyFrameImpl(Real time)
     {
         return OGRE_NEW TransformKeyFrame(this, time);
     }
     //--------------------------------------------------------------------------
-    TransformKeyFrame* NodeAnimationTrack::createNodeKeyFrame(Real timePos)
+	TransformKeyFrame* OldNodeAnimationTrack::createNodeKeyFrame(Real timePos)
     {
         return static_cast<TransformKeyFrame*>(createKeyFrame(timePos));
     }
     //--------------------------------------------------------------------------
-    TransformKeyFrame* NodeAnimationTrack::getNodeKeyFrame(unsigned short index) const
+	TransformKeyFrame* OldNodeAnimationTrack::getNodeKeyFrame(unsigned short index) const
     {
         return static_cast<TransformKeyFrame*>(getKeyFrame(index));
     }
     //---------------------------------------------------------------------
-    NodeAnimationTrack* NodeAnimationTrack::_clone(Animation* newParent) const
+	OldNodeAnimationTrack* OldNodeAnimationTrack::_clone(Animation* newParent) const
     {
-        NodeAnimationTrack* newTrack = 
-            newParent->createNodeTrack(mHandle, mTargetNode);
+		OldNodeAnimationTrack* newTrack =
+			newParent->createOldNodeTrack(mHandle, mTargetNode);
         newTrack->mUseShortestRotationPath = mUseShortestRotationPath;
         populateClone(newTrack);
         return newTrack;
     }
     //--------------------------------------------------------------------------
-    void NodeAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+	void OldNodeAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
     {
         const TransformKeyFrame* base = static_cast<const TransformKeyFrame*>(b);
         

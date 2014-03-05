@@ -232,15 +232,15 @@ namespace Ogre {
     class MeshManager;
     class MovableObject;
     class MovablePlane;
-    class Node;
-    class NodeAnimationTrack;
+	class Node;
     class NodeMemoryManager;
     class NumericAnimationTrack;
     class NumericKeyFrame;
     struct ObjectData;
     class ObjectMemoryManager;
+	class OldBone;
     class OldNode;
-    class OldBone;
+	class OldNodeAnimationTrack;
     class OldSkeletonInstance;
     class OldSkeletonManager;
     class Particle;

@@ -270,7 +270,7 @@ namespace Ogre {
         }
 
         // Write all tracks
-        Animation::NodeTrackIterator trackIt = anim->getNodeTrackIterator();
+		Animation::OldNodeTrackIterator trackIt = anim->getOldNodeTrackIterator();
         while(trackIt.hasMoreElements())
         {
             writeAnimationTrack(pSkel, trackIt.getNext());
@@ -281,7 +281,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void SkeletonSerializer::writeAnimationTrack(const Skeleton* pSkel, 
-        const NodeAnimationTrack* track)
+        const OldNodeAnimationTrack* track)
     {
         writeChunkHeader(SKELETON_ANIMATION_TRACK, calcAnimationTrackSize(pSkel, track));
 
@@ -388,7 +388,7 @@ namespace Ogre {
         }
 
         // Nested animation tracks
-        Animation::NodeTrackIterator trackIt = pAnim->getNodeTrackIterator();
+		Animation::OldNodeTrackIterator trackIt = pAnim->getOldNodeTrackIterator();
         while(trackIt.hasMoreElements())
         {
             size += calcAnimationTrackSize(pSkel, trackIt.getNext());
@@ -398,7 +398,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     size_t SkeletonSerializer::calcAnimationTrackSize(const Skeleton* pSkel, 
-        const NodeAnimationTrack* pTrack)
+        const OldNodeAnimationTrack* pTrack)
     {
         size_t size = SSTREAM_OVERHEAD_SIZE;
 
@@ -589,7 +589,7 @@ namespace Ogre {
         OldBone *targetBone = pSkel->getBone(boneHandle);
 
         // Create track
-        NodeAnimationTrack* pTrack = anim->createNodeTrack(boneHandle, targetBone);
+		OldNodeAnimationTrack* pTrack = anim->createOldNodeTrack(boneHandle, targetBone);
 
         // Keep looking for nested keyframes
         if (!stream->eof())
@@ -617,7 +617,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void SkeletonSerializer::readKeyFrame(DataStreamPtr& stream, NodeAnimationTrack* track, 
+    void SkeletonSerializer::readKeyFrame(DataStreamPtr& stream, OldNodeAnimationTrack* track, 
         Skeleton* pSkel)
     {
         // float time                    : The time position (seconds)

@@ -340,7 +340,7 @@ protected:
 
         while (tracks.hasMoreElements())   // for every node track...
         {
-            NodeAnimationTrack* track = tracks.getNext();
+            OldNodeAnimationTrack* track = tracks.getNext();
 
             // get the keyframe at the chopping point
             TransformKeyFrame oldKf(0, 0);

@@ -3392,10 +3392,16 @@ void SceneManager::_applySceneAnimations(void)
         Animation::NodeTrackIterator nodeTrackIt = anim->getNodeTrackIterator();
         while(nodeTrackIt.hasMoreElements())
         {
-            OldNode* nd = nodeTrackIt.getNext()->getAssociatedNode();
-            if (nd)
-                nd->resetToInitialState();
+			nodeTrackIt.getNext()->resetNodeToInitialState();
         }
+
+		Animation::OldNodeTrackIterator OldNodeTrackIt = anim->getOldNodeTrackIterator();
+		while(OldNodeTrackIt.hasMoreElements())
+		{
+			OldNode* nd = OldNodeTrackIt.getNext()->getAssociatedNode();
+			if (nd)
+				nd->resetToInitialState();
+		}
 
         Animation::NumericTrackIterator numTrackIt = anim->getNumericTrackIterator();
         while(numTrackIt.hasMoreElements())

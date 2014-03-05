@@ -3,6 +3,9 @@
 
 #include "SdkSample.h"
 
+#include "OgreBillboard.h"
+#include "OgrePredefinedControllers.h"
+
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -269,11 +272,8 @@ protected:
         Animation* anim = mSceneMgr->createAnimation("LightTrack", 20);
         anim->setInterpolationMode(Animation::IM_SPLINE);
 
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        // >> TODO: This needs to be back <<
-
-        // create a track to animate the camera's node
-        NodeAnimationTrack* track = anim->createNodeTrack(0, lightNode);
+		// create a track to animate the camera's node
+		NodeAnimationTrack* track = anim->createNodeTrack(lightNode);
 
         // create keyframes for our track
         track->createNodeKeyFrame(0)->setTranslate(Vector3(42, 77, -42));
@@ -288,8 +288,7 @@ protected:
         track->createNodeKeyFrame(18)->setTranslate(Vector3(35, 84, 0));
         track->createNodeKeyFrame(20)->setTranslate(Vector3(42, 77, -42));
 
-        lightNode->setPosition(track->getNodeKeyFrame(0)->getTranslate());
-#endif
+		lightNode->setPosition(track->getNodeKeyFrame(0)->getTranslate());
 
         // create a new animation state to track this
         mLightAnimState = mSceneMgr->createAnimationState("LightTrack");

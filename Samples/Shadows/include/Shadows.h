@@ -282,7 +282,7 @@ protected:
         // Spline it for nice curves
         anim->setInterpolationMode(Animation::IM_SPLINE);
         // Create a track to animate the camera's node
-        NodeAnimationTrack* track = anim->createNodeTrack(0, mLightNode);
+		NodeAnimationTrack* track = anim->createNodeTrack(mLightNode);
         // Setup keyframes
         TransformKeyFrame* key = track->createNodeKeyFrame(0); // A startposition
         key->setTranslate(Vector3(300,750,-700));

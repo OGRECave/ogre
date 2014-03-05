@@ -592,7 +592,7 @@ namespace Ogre {
 
             for (unsigned short ti = 0; ti < anim->getNumNodeTracks(); ++ti)
             {
-                NodeAnimationTrack* track = anim->getNodeTrack(ti);
+				OldNodeAnimationTrack* track = anim->getOldNodeTrack(ti);
                 of << "  -- AnimationTrack " << ti << " --" << std::endl;
                 of << "  Affects bone: " << ((OldBone*)track->getAssociatedNode())->getHandle() << std::endl;
                 of << "  Number of keyframes: " << track->getNumKeyFrames() << std::endl;
@@ -676,13 +676,13 @@ namespace Ogre {
             // Collect identity node tracks for all animations
             for (ai = mAnimationsList.begin(); ai != aiend; ++ai)
             {
-                ai->second->_collectIdentityNodeTracks(tracksToDestroy);
+				ai->second->_collectIdentityOldNodeTracks(tracksToDestroy);
             }
 
             // Destroy identity node tracks
             for (ai = mAnimationsList.begin(); ai != aiend; ++ai)
             {
-                ai->second->_destroyNodeTracks(tracksToDestroy);
+				ai->second->_destroyOldNodeTracks(tracksToDestroy);
             }
         }
 
@@ -948,12 +948,13 @@ namespace Ogre {
                 const DeltaTransform& deltaTransform = deltaTransforms[handle];
                 ushort dstHandle = boneHandleMap[handle];
 
-                if (srcAnimation->hasNodeTrack(handle))
+				if (srcAnimation->hasOldNodeTrack(handle))
                 {
                     // Clone track from source animation
 
-                    const NodeAnimationTrack* srcTrack = srcAnimation->getNodeTrack(handle);
-                    NodeAnimationTrack* dstTrack = dstAnimation->createNodeTrack(dstHandle, this->getBone(dstHandle));
+					const OldNodeAnimationTrack* srcTrack = srcAnimation->getOldNodeTrack(handle);
+					OldNodeAnimationTrack* dstTrack = dstAnimation->createOldNodeTrack(dstHandle,
+																			this->getBone(dstHandle));
                     dstTrack->setUseShortestRotationPath(srcTrack->getUseShortestRotationPath());
 
                     ushort numKeyFrames = srcTrack->getNumKeyFrames();
@@ -981,7 +982,8 @@ namespace Ogre {
                 {
                     // Create 'static' track for this bone
 
-                    NodeAnimationTrack* dstTrack = dstAnimation->createNodeTrack(dstHandle, this->getBone(dstHandle));
+					OldNodeAnimationTrack* dstTrack = dstAnimation->createOldNodeTrack(dstHandle,
+																		   this->getBone(dstHandle));
                     TransformKeyFrame* dstKeyFrame;
 
                     dstKeyFrame = dstTrack->createNodeKeyFrame(0);

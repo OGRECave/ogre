@@ -153,7 +153,7 @@ protected:
 
         SceneNode* node;
         Animation* anim;
-        NodeAnimationTrack* track;
+		NodeAnimationTrack* track;
         Light* light;
         BillboardSet* bbs;
         
@@ -164,9 +164,7 @@ protected:
         anim = mSceneMgr->createAnimation("Path1", 14);
         anim->setInterpolationMode(Animation::IM_SPLINE);
 
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        // >> TODO: This needs to be back <<
-        track = anim->createNodeTrack(1, node);  // Create a node track for our animation
+		track = anim->createNodeTrack(node);  // Create a node track for our animation
 
         // Enter keyframes for our track to define a path for the light to follow
         track->createNodeKeyFrame(0)->setTranslate(Vector3(50, 30, 0));
@@ -177,7 +175,6 @@ protected:
         track->createNodeKeyFrame(10)->setTranslate(Vector3(-150, -20, -100));
         track->createNodeKeyFrame(12)->setTranslate(Vector3(-50, -30, 0));
         track->createNodeKeyFrame(14)->setTranslate(Vector3(50, 30, 0));
-#endif
 
         // Create an animation state from the animation and enable it
         mYellowLightAnimState = mSceneMgr->createAnimationState("Path1");

@@ -135,7 +135,13 @@ namespace Ogre {
         @param handle Handle to give the track, used for accessing the track later. 
             Must be unique within this Animation.
         */
-        NodeAnimationTrack* createNodeTrack(unsigned short handle);
+		NodeAnimationTrack* createNodeTrack(void);
+
+		/** Creates a OldNodeAnimationTrack for animating a OldOldNode.
+		@param handle Handle to give the track, used for accessing the track later.
+			Must be unique within this Animation.
+		*/
+		OldNodeAnimationTrack* createOldNodeTrack(unsigned short handle);
 
         /** Creates a NumericAnimationTrack for animating any numeric value.
         @param handle Handle to give the track, used for accessing the track later. 
@@ -152,6 +158,16 @@ namespace Ogre {
         */
         VertexAnimationTrack* createVertexTrack(unsigned short handle, VertexAnimationType animType);
 
+		/** Creates a new AnimationTrack automatically associated with a OldNode.
+		@remarks
+			This method creates a standard AnimationTrack, but also associates it with a
+			target Node which will receive all keyframe effects.
+		@param handle Numeric handle to give the track, used for accessing the track later.
+			Must be unique within this Animation.
+		@param node A pointer to the OldNode object which will be affected by this track
+		*/
+		NodeAnimationTrack* createNodeTrack(Node* node);
+
         /** Creates a new AnimationTrack automatically associated with a OldNode. 
         @remarks
             This method creates a standard AnimationTrack, but also associates it with a
@@ -160,7 +176,7 @@ namespace Ogre {
             Must be unique within this Animation.
         @param node A pointer to the OldNode object which will be affected by this track
         */
-        NodeAnimationTrack* createNodeTrack(unsigned short handle, OldNode* node);
+		OldNodeAnimationTrack* createOldNodeTrack(unsigned short handle, OldNode* node);
 
         /** Creates a NumericAnimationTrack and associates it with an animable. 
         @param handle Handle to give the track, used for accessing the track later. 
@@ -180,13 +196,19 @@ namespace Ogre {
             VertexData* data, VertexAnimationType animType);
 
         /** Gets the number of NodeAnimationTrack objects contained in this animation. */
-        unsigned short getNumNodeTracks(void) const;
+		size_t getNumNodeTracks(void) const;
+
+		/** Gets a node track by it's handle. */
+		NodeAnimationTrack* getNodeTrack( size_t handle ) const;
+
+		/** Gets the number of OldNodeAnimationTrack objects contained in this animation. */
+		size_t getNumOldNodeTracks(void) const;
 
         /** Gets a node track by it's handle. */
-        NodeAnimationTrack* getNodeTrack(unsigned short handle) const;
+		OldNodeAnimationTrack* getOldNodeTrack(unsigned short handle) const;
 
         /** Does a track exist with the given handle? */
-        bool hasNodeTrack(unsigned short handle) const;
+		bool hasOldNodeTrack(unsigned short handle) const;
 
         /** Gets the number of NumericAnimationTrack objects contained in this animation. */
         unsigned short getNumNumericTracks(void) const;
@@ -205,9 +227,9 @@ namespace Ogre {
 
         /** Does a track exist with the given handle? */
         bool hasVertexTrack(unsigned short handle) const;
-        
-        /** Destroys the node track with the given handle. */
-        void destroyNodeTrack(unsigned short handle);
+
+		/** Destroys the node track with the given handle. */
+		void destroyOldNodeTrack(unsigned short handle);
 
         /** Destroys the numeric track with the given handle. */
         void destroyNumericTrack(unsigned short handle);
@@ -220,6 +242,7 @@ namespace Ogre {
 
         /** Removes and destroys all tracks making up this animation. */
         void destroyAllNodeTracks(void);
+		void destroyAllOldNodeTracks(void);
         /** Removes and destroys all tracks making up this animation. */
         void destroyAllNumericTracks(void);
         /** Removes and destroys all tracks making up this animation. */
@@ -367,8 +390,11 @@ namespace Ogre {
         /** Gets the default rotation interpolation mode for all animations. */
         static RotationInterpolationMode getDefaultRotationInterpolationMode(void);
 
-        typedef map<unsigned short, NodeAnimationTrack*>::type NodeTrackList;
-        typedef ConstMapIterator<NodeTrackList> NodeTrackIterator;
+		typedef vector<NodeAnimationTrack*>::type NodeTrackList;
+		typedef ConstVectorIterator<NodeTrackList> NodeTrackIterator;
+
+		typedef map<unsigned short, OldNodeAnimationTrack*>::type OldNodeTrackList;
+		typedef ConstMapIterator<OldNodeTrackList> OldNodeTrackIterator;
 
         typedef map<unsigned short, NumericAnimationTrack*>::type NumericTrackList;
         typedef ConstMapIterator<NumericTrackList> NumericTrackIterator;
@@ -378,10 +404,16 @@ namespace Ogre {
 
         /// Fast access to NON-UPDATEABLE node track list
         const NodeTrackList& _getNodeTrackList(void) const;
+		/// Fast access to NON-UPDATEABLE OldNode track list
+		const OldNodeTrackList& _getOldNodeTrackList(void) const;
 
         /// Get non-updateable iterator over node tracks
         NodeTrackIterator getNodeTrackIterator(void) const
         { return NodeTrackIterator(mNodeTrackList.begin(), mNodeTrackList.end()); }
+
+		/// Get non-updateable iterator over node tracks
+		OldNodeTrackIterator getOldNodeTrackIterator(void) const
+		{ return OldNodeTrackIterator(mOldNodeTrackList.begin(), mOldNodeTrackList.end()); }
         
         /// Fast access to NON-UPDATEABLE numeric track list
         const NumericTrackList& _getNumericTrackList(void) const;
@@ -428,11 +460,11 @@ namespace Ogre {
             tracks A list of track handle of non-identity node tracks, where this
             method will remove non-identity node track handles.
         */
-        void _collectIdentityNodeTracks(TrackHandleList& tracks) const;
+		void _collectIdentityOldNodeTracks(TrackHandleList& tracks) const;
 
-        /** Internal method for destroy given node tracks.
-        */
-        void _destroyNodeTracks(const TrackHandleList& tracks);
+		/** Internal method for destroy given node tracks.
+		*/
+		void _destroyOldNodeTracks(const TrackHandleList& tracks);
 
         /** Clone this animation.
         @note
@@ -501,8 +533,10 @@ namespace Ogre {
         AnimationContainer* getContainer();
         
     protected:
-        /// OldNode tracks, indexed by handle
+		/// Node tracks, indexed by handle
         NodeTrackList mNodeTrackList;
+		/// OldNode tracks, indexed by handle
+		OldNodeTrackList mOldNodeTrackList;
         /// Numeric tracks, indexed by handle
         NumericTrackList mNumericTrackList;
         /// Vertex tracks, indexed by handle
@@ -528,7 +562,7 @@ namespace Ogre {
         String mBaseKeyFrameAnimationName;
         AnimationContainer* mContainer;
 
-        void optimiseNodeTracks(bool discardIdentityTracks);
+		void optimiseOldNodeTracks(bool discardIdentityTracks);
         void optimiseVertexTracks(void);
 
         /// Internal method to build global keyframe time list

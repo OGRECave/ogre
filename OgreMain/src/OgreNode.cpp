@@ -50,10 +50,7 @@ namespace Ogre {
         IdObject( id ),
         mDepthLevel( 0 ),
         mParent( parent ),
-        mName( "" ),
-        mInitialPosition(Vector3::ZERO),
-        mInitialOrientation(Quaternion::IDENTITY),
-        mInitialScale(Vector3::UNIT_SCALE),
+		mName( "" ),
 #ifndef NDEBUG
         mCachedTransformOutOfDate( true ),
 #endif
@@ -77,10 +74,7 @@ namespace Ogre {
         IdObject( 0 ),
         mDepthLevel( 0 ),
         mParent( 0 ),
-        mName( "Dummy Node" ),
-        mInitialPosition(Vector3::ZERO),
-        mInitialOrientation(Quaternion::IDENTITY),
-        mInitialScale(Vector3::UNIT_SCALE),
+		mName( "Dummy Node" ),
 #ifndef NDEBUG
         mCachedTransformOutOfDate( true ),
 #endif
@@ -759,43 +753,9 @@ namespace Ogre {
     void Node::scale(Real x, Real y, Real z)
     {
         scale( Vector3( x, y, z ) );
-    }
+	}
     //-----------------------------------------------------------------------
-    void Node::setInitialState(void)
-    {
-        mInitialPosition    = mTransform.mPosition->getAsVector3( mTransform.mIndex );
-        mInitialOrientation = mTransform.mOrientation->getAsQuaternion( mTransform.mIndex );
-        mInitialScale       = mTransform.mScale->getAsVector3( mTransform.mIndex );
-    }
-    //-----------------------------------------------------------------------
-    void Node::resetToInitialState(void)
-    {
-        mTransform.mPosition->setFromVector3( mInitialPosition, mTransform.mIndex );
-        mTransform.mOrientation->setFromQuaternion( mInitialOrientation, mTransform.mIndex );
-        mTransform.mScale->setFromVector3( mInitialScale, mTransform.mIndex );
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& Node::getInitialPosition(void) const
-    {
-        return mInitialPosition;
-    }
-    //-----------------------------------------------------------------------
-    const Quaternion& Node::getInitialOrientation(void) const
-    {
-        return mInitialOrientation;
-
-    }
-    //-----------------------------------------------------------------------
-    const Vector3& Node::getInitialScale(void) const
-    {
-        return mInitialScale;
-    }
-    //-----------------------------------------------------------------------
-    Node::NodeVecIterator Node::getChildIterator(void)
+	Node::NodeVecIterator Node::getChildIterator(void)
     {
         return NodeVecIterator(mChildren.begin(), mChildren.end());
     }

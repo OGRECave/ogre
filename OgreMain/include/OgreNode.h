@@ -156,14 +156,6 @@ namespace Ogre {
         /** Internal method for creating a new child node - must be overridden per subclass. */
         virtual Node* createChildImpl( SceneMemoryMgrTypes sceneType ) = 0;
 
-        // TODO: Remove Initial position out of here (dark_sylinc)
-        /// The position to use as a base for keyframe animation
-        Vector3 mInitialPosition;
-        /// The orientation to use as a base for keyframe animation
-        Quaternion mInitialOrientation;
-        /// The scale to use as a base for keyframe animation
-        Vector3 mInitialScale;
-
 #ifndef NDEBUG
         mutable bool mCachedTransformOutOfDate;
 #endif
@@ -681,27 +673,6 @@ namespace Ogre {
             We don't pass by reference on purpose (avoid implicit aliasing)
         */
         static void updateAllTransforms( const size_t numNodes, Transform t );
-
-        /** Sets the current transform of this node to be the 'initial state' ie that
-            position / orientation / scale to be used as a basis for delta values used
-            in keyframe animation.
-        @remarks
-            You never need to call this method unless you plan to animate this node. If you do
-            plan to animate it, call this method once you've loaded the node with it's base state,
-            ie the state on which all keyframes are based.
-        @par
-            If you never call this method, the initial state is the identity transform, ie do nothing.
-        */
-        virtual void setInitialState(void);
-
-        /** Resets the position / orientation / scale of this node to it's initial state, see setInitialState for more info. */
-        virtual void resetToInitialState(void);
-
-        /** Gets the initial position of this node, see setInitialState for more info. 
-        @remarks
-            Also resets the cumulative animation weight used for blending.
-        */
-        virtual_l2 const Vector3& getInitialPosition(void) const;
         
         /** Gets the local position, relative to this node, of the given world-space position */
         virtual_l2 Vector3 convertWorldToLocalPosition( const Vector3 &worldPos );
@@ -716,12 +687,6 @@ namespace Ogre {
         /** Gets the world orientation of an orientation in the node local space
             useful for simple transforms that don't require a child node.*/
         virtual_l2 Quaternion convertLocalToWorldOrientation( const Quaternion &localOrientation );
-
-        /** Gets the initial orientation of this node, see setInitialState for more info. */
-        virtual_l2 const Quaternion& getInitialOrientation(void) const;
-
-        /** Gets the initial position of this node, see setInitialState for more info. */
-        virtual_l2 const Vector3& getInitialScale(void) const;
 
         /** Helper function, get the squared view depth.  */
         virtual Real getSquaredViewDepth(const Camera* cam) const;

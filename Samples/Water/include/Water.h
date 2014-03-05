@@ -332,10 +332,10 @@ protected:
         
         // set up spline animation of light node
         Animation* anim = mSceneMgr->createAnimation("WaterLight", 20);
-        NodeAnimationTrack *track ;
+		NodeAnimationTrack *track ;
         TransformKeyFrame *key ;
         // create a random spline for light
-        track = anim->createNodeTrack(0, lightNode);
+		track = anim->createNodeTrack(lightNode);
         track->createNodeKeyFrame(0);
         for(int ff=1;ff<=19;ff++) {
             key = track->createNodeKeyFrame(ff);

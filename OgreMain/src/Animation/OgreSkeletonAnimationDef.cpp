@@ -126,7 +126,7 @@ namespace Ogre
         //much memory to allocate, as we don't listen for resizes.
         //We also build a list of unique keyframe timestamps per block
         //(i.e. merge the keyframes from two bones that the same block)
-        Animation::NodeTrackIterator itor = animation->getNodeTrackIterator();
+		Animation::OldNodeTrackIterator itor = animation->getOldNodeTrackIterator();
         {
             //Count the number of blocks needed by counting the number of unique keyframes per block.
             //i.e. When ARRAY_PACKED_REALS = 4; if 2 bones are in the same block and have the same
@@ -138,7 +138,7 @@ namespace Ogre
             while( itor.hasMoreElements() )
             {
                 size_t boneIdx              = itor.peekNextKey();
-                NodeAnimationTrack *track   = itor.getNext();
+                OldNodeAnimationTrack *track   = itor.getNext();
 
                 if( track->getNumKeyFrames() > 0 )
                 {
@@ -201,9 +201,9 @@ namespace Ogre
                     if( it != slotToBone.end() )
                         boneIdx = it->second;
 
-                    if( animation->hasNodeTrack( boneIdx ) )
+					if( animation->hasOldNodeTrack( boneIdx ) )
                     {
-                        NodeAnimationTrack *oldTrack = animation->getNodeTrack( boneIdx );
+						OldNodeAnimationTrack *oldTrack = animation->getOldNodeTrack( boneIdx );
 
                         TransformKeyFrame originalKF( 0, fTime );
                         oldTrack->getInterpolatedKeyFrame( animation->_getTimeIndex( fTime ),

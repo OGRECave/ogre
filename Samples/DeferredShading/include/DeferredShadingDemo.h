@@ -471,7 +471,7 @@ protected:
         for(unsigned int x=0; x<nodes.size(); ++x)
         {
             // Create a track to animate the camera's node
-            NodeAnimationTrack* track = anim->createNodeTrack(x, nodes[x]);
+			NodeAnimationTrack* track = anim->createNodeTrack(nodes[x]);
             for(size_t y=0; y<=stations; ++y)
             {
                 // Setup keyframes

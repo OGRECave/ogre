@@ -37,7 +37,10 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
     {
         // Setup some basic lighting for our scene
         mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
-        mSceneMgr->createLight()->setPosition(20, 80, 50);
+		SceneNode *lightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		Light *light = mSceneMgr->createLight();
+		lightNode->attachObject( light );
+		lightNode->setPosition(20, 80, 50);
 
         mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox");
 
