@@ -35,6 +35,7 @@ THE SOFTWARE.
 #import "OgreGLUtil.h"
 #import "OgreGLRenderSystem.h"
 #import "OgrePixelBox.h"
+#import "OgreViewport.h"
 
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
