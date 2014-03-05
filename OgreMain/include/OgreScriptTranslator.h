@@ -32,12 +32,11 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "Compositor/OgreCompositorCommon.h"
 #include "OgreScriptCompiler.h"
+#include "OgreBlendMode.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre{
-    struct IdString;
-	enum SceneBlendFactor;
-    enum StencilOperation;
+	struct IdString;
     class TextureDefinitionBase;
 
     /** \addtogroup Core
