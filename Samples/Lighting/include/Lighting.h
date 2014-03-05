@@ -225,9 +225,7 @@ protected:
         anim = mSceneMgr->createAnimation("Path2", 10);
         anim->setInterpolationMode(Animation::IM_SPLINE);
 
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        // >> TODO: This needs to be back <<
-        track = anim->createNodeTrack(1, node);  // Create a node track for our animation
+		track = anim->createNodeTrack(node);  // Create a node track for our animation
 
         // Enter keyframes for our track to define a path for the light to follow
         track->createNodeKeyFrame(0)->setTranslate(Vector3(-50, 100, 0));
@@ -235,8 +233,7 @@ protected:
         track->createNodeKeyFrame(4)->setTranslate(Vector3(-200, 0, 40));
         track->createNodeKeyFrame(6)->setTranslate(Vector3(0, -150, 70));
         track->createNodeKeyFrame(8)->setTranslate(Vector3(50, 0, 30));
-        track->createNodeKeyFrame(10)->setTranslate(Vector3(-50, 100, 0));
-#endif
+		track->createNodeKeyFrame(10)->setTranslate(Vector3(-50, 100, 0));
 
         // Create an animation state from the animation and enable it
         mGreenLightAnimState = mSceneMgr->createAnimationState("Path2");
