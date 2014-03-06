@@ -121,6 +121,9 @@ namespace Ogre {
         WorldFragmentType mWorldFragmentType;
     
     public:
+        uint8 mFirstRq;
+        uint8 mLastRq;
+
         /** Standard constructor, should be called by SceneManager. */
         SceneQuery(SceneManager* mgr);
         virtual ~SceneQuery();

@@ -3232,7 +3232,8 @@ namespace Ogre {
         ~DefaultRaySceneQuery();
 
         /** See RayScenQuery. */
-        void execute(RaySceneQueryListener* listener);
+        virtual void execute(RaySceneQueryListener* listener);
+        bool execute( ObjectData objData, size_t numNodes, RaySceneQueryListener* listener );
     };
     /** Default implementation of SphereSceneQuery. */
     class _OgreExport DefaultSphereSceneQuery : public SphereSceneQuery

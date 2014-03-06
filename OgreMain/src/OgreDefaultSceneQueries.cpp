@@ -29,6 +29,9 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreRoot.h"
 
+#include "Math/Array/OgreMathlib.h"
+#include "Math/Array/OgreBooleanMask.h"
+
 namespace Ogre {
     //---------------------------------------------------------------------
     DefaultIntersectionSceneQuery::DefaultIntersectionSceneQuery(SceneManager* creator)
@@ -91,7 +94,7 @@ namespace Ogre {
                     SceneManager::MovableObjectIterator objItC = 
                         mParentSceneMgr->getMovableObjectIterator(
                             factItLater.getNext()->getType());
-                    while (objItC.hasMoreElements())
+                    while (objI7tC.hasMoreElements())
                     {
                         MovableObject* c = objItC.getNext();
                         // skip entire section if type doesn't match
@@ -176,43 +179,111 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultRaySceneQuery::execute(RaySceneQueryListener* listener)
     {
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        // Note that because we have no scene partitioning, we actually
-        // perform a complete scene search even if restricted results are
-        // requested; smarter scene manager queries can utilise the paritioning 
-        // of the scene in order to reduce the number of intersection tests 
-        // required to fulfil the query
+        assert( mFirstRq < mLastRq && "This query will never hit any result!" );
 
-        // Iterate over all movable types
-        Root::MovableObjectFactoryIterator factIt = 
-            Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
         {
-            SceneManager::MovableObjectIterator objItA = 
-                mParentSceneMgr->getMovableObjectIterator(
-                factIt.getNext()->getType());
-            while (objItA.hasMoreElements())
+            ObjectMemoryManager &memoryManager = mParentSceneMgr->_getEntityMemoryManager(
+                                                        static_cast<SceneMemoryMgrTypes>(i) );
+
+            const size_t numRenderQueues = memoryManager.getNumRenderQueues();
+
+            bool keepIterating = true;
+            size_t firstRq = std::min<size_t>( mFirstRq, numRenderQueues );
+            size_t lastRq  = std::min<size_t>( mLastRq,  numRenderQueues );
+
+            for( size_t j=firstRq; j<lastRq && keepIterating; ++j )
             {
-                MovableObject* a = objItA.getNext();
-                // skip whole group if type doesn't match
-                if (!(a->getTypeFlags() & mQueryTypeMask))
-                    break;
+                ObjectData objData;
+                const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
+                keepIterating = execute( objData, totalObjs, listener );
+            }
+        }
+    }
+    //---------------------------------------------------------------------
+    bool DefaultRaySceneQuery::execute( ObjectData objData, size_t numNodes,
+                                        RaySceneQueryListener* listener )
+    {
+        ArrayVector3 rayOrigin;
+        ArrayVector3 rayDir;
 
-                if( (a->getQueryFlags() & mQueryMask) &&
-                    a->isInScene())
+        ArrayInt ourQueryMask = Mathlib::SetAll( mQueryMask );
+
+        rayOrigin.setAll( mRay.getOrigin() );
+        rayDir.setAll( mRay.getDirection() );
+
+        for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+        {
+            ArrayReal distance = ARRAY_REAL_ZERO;
+            // Check origin inside first
+            ArrayMaskR hitMaskR = objData.mWorldAabb->contains( rayOrigin );
+
+            ArrayVector3 vMin = objData.mWorldAabb->getMinimum();
+            ArrayVector3 vMax = objData.mWorldAabb->getMaximum();
+
+            ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                        (objData.mVisibilityFlags);
+            ArrayInt * RESTRICT_ALIAS queryFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                        (objData.mQueryFlags);
+
+            // Check each face in turn
+            // Min x, y & z
+            for( size_t i=0; i<3; ++i )
+            {
+                ArrayReal t = vMin.mChunkBase[i] - rayOrigin.mChunkBase[i] / rayDir.mChunkBase[i];
+
+                //mask = t >= 0; works even if t is nan (t = 0 / 0)
+                ArrayMaskR mask = Mathlib::CompareGreaterEqual( t, ARRAY_REAL_ZERO );
+                ArrayVector3 hitPoint = rayOrigin + rayDir * t;
+
+                //hitMaskR |= t >= 0 && mWorldAabb->contains( hitPoint );
+                //distance = t >= 0 ? min( distance, t ) : t;
+                hitMaskR = Mathlib::Or( hitMaskR, Mathlib::And( mask,
+                                                    objData.mWorldAabb->contains( hitPoint ) ) );
+                distance = Mathlib::CmovRobust( Mathlib::Min( distance, t ), distance, mask );
+            }
+
+            // Max x, y & z
+            for( size_t i=0; i<3; ++i )
+            {
+                ArrayReal t = vMax.mChunkBase[i] - rayOrigin.mChunkBase[i] / rayDir.mChunkBase[i];
+
+                //mask = t >= 0; works even if t is nan (t = 0 / 0)
+                ArrayMaskR mask = Mathlib::CompareGreaterEqual( t, ARRAY_REAL_ZERO );
+                ArrayVector3 hitPoint = rayOrigin + rayDir * t;
+
+                //hitMaskR |= t >= 0 && mWorldAabb->contains( hitPoint );
+                //distance = t >= 0 ? min( distance, t ) : t;
+                hitMaskR = Mathlib::Or( hitMaskR, Mathlib::And( mask,
+                                                    objData.mWorldAabb->contains( hitPoint ) ) );
+                distance = Mathlib::CmovRobust( Mathlib::Min( distance, t ), distance, mask );
+            }
+
+            //hitMask = hitMask && ( (*queryFlags & ourQueryMask) != 0 ) && isVisble;
+            ArrayMaskI hitMask = CastRealToInt( hitMaskR );
+            hitMask = Mathlib::And( hitMask, Mathlib::TestFlags4( *queryFlags, ourQueryMask ) );
+            hitMask = Mathlib::And( hitMask,
+                                    Mathlib::TestFlags4( *visibilityFlags,
+                                        Mathlib::SetAll( VisibilityFlags::LAYER_VISIBILITY ) ) );
+
+            const uint32 scalarMask = BooleanMask4::getScalarMask( hitMask );
+            OGRE_ALIGNED_DECL( Real, scalarDistance[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
+            CastArrayToReal( scalarDistance, distance );
+
+            for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+            {
+                //Decompose the result for analyzing each MovableObject's
+                //There's no need to check objData.mOwner[j] is null because
+                //we set mVisibilityFlags to 0 on slot removals
+                if( IS_BIT_SET( j, scalarMask ) )
                 {
-                    // Do ray / box test
-                    std::pair<bool, Real> result =
-                        mRay.intersects(a->getWorldBoundingBox());
-
-                    if (result.first)
-                    {
-                        if (!listener->queryResult(a, result.second)) return;
-                    }
+                    if( !listener->queryResult( objData.mOwner[j], scalarDistance[j] ) )
+                        return false;
                 }
             }
         }
-#endif
+
+        return true;
     }
     //---------------------------------------------------------------------
     DefaultSphereSceneQuery::

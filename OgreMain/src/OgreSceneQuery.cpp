@@ -34,8 +34,10 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     SceneQuery::SceneQuery(SceneManager* mgr)
-        : mParentSceneMgr(mgr), mQueryMask(0xFFFFFFFF), 
-        mWorldFragmentType(SceneQuery::WFT_NONE)
+        : mParentSceneMgr(mgr), mQueryMask(0xFFFFFFFF),
+        mWorldFragmentType(SceneQuery::WFT_NONE),
+        mFirstRq( 0 ),
+        mLastRq( std::numeric_limits<uint8>::max() )
     {
         // default type mask to everything except lights & fx (previous behaviour)
         mQueryTypeMask = (0xFFFFFFFF & ~SceneManager::FX_TYPE_MASK) 

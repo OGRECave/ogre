@@ -556,7 +556,7 @@ namespace Ogre {
             ArrayMaskI finalMask = Mathlib::TestFlags4( CastRealToInt( mask ),
                                                         Mathlib::And( sceneFlags, *visibilityFlags ) );
             finalMask               = Mathlib::And( finalMask, isVisible );
-            ArrayMaskR receiverMask  = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
+            ArrayMaskR receiverMask = CastIntToReal( Mathlib::And( finalMask, isReceiver ) );
 
             //Merge with bounds only if they're visible & are receivers. We first merge,
             //then CMov its older value if the object isn't visible/receiver.

@@ -276,6 +276,15 @@ namespace Ogre
             return _mm_cmpgt_ps( a, b );
         }
 
+        /** Returns the result of "a >= b"
+        @return
+            r[i] = a[i] >= b[i] ? 0xffffffff : 0;
+        */
+        static inline __m128 CompareGreaterEqual( __m128 a, __m128 b )
+        {
+            return _mm_cmpge_ps( a, b );
+        }
+
         static inline ArrayReal SetAll( Real val )
         {
             return _mm_set_ps1( val );
@@ -299,6 +308,12 @@ namespace Ogre
         static inline ArrayReal Max( ArrayReal a, ArrayReal b )
         {
             return _mm_max_ps( a, b );
+        }
+
+        /// Returns the minimum value between a and b
+        static inline ArrayReal Min( ArrayReal a, ArrayReal b )
+        {
+            return _mm_min_ps( a, b );
         }
 
         /** Returns the minimum value of all elements in a
