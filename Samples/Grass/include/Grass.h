@@ -187,6 +187,11 @@ protected:
         HardwareVertexBufferSharedPtr vb = HardwareBufferManager::getSingleton().createVertexBuffer
             (decl->getVertexSize(0), sm->vertexData->vertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 
+        Vector3 vMin( std::numeric_limits<Real>::max(),
+                      std::numeric_limits<Real>::max(),
+                      std::numeric_limits<Real>::max() );
+        Vector3 vMax( -vMax );
+
         GrassVertex* verts = (GrassVertex*)vb->lock(HardwareBuffer::HBL_DISCARD);  // start filling in vertex data
 
         for (unsigned int i = 0; i < 3; i++)  // each grass mesh consists of 3 planes
@@ -205,17 +210,24 @@ protected:
 
                 // all normals point straight up
                 vert.nx = 0;
+
                 vert.ny = 1;
                 vert.nz = 0;
 
                 vert.u = j < 2 ? 0 : 1;
                 vert.v = j % 2;
+
+                Vector3 vertPos( vert.x, vert.y, vert.z );
+                vMax.makeCeil( vertPos );
+                vMin.makeFloor( vertPos );
             }
         }
 
         vb->unlock();  // commit vertex changes
 
         sm->vertexData->vertexBufferBinding->setBinding(0, vb);  // bind vertex buffer to our submesh
+
+        mesh->_setBounds( AxisAlignedBox( vMin, vMax ) );
 
         // create an index buffer
         sm->indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer

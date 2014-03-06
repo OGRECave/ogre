@@ -408,7 +408,7 @@ namespace Ogre {
             /// Assign a queued mesh to this region, read for final build
             void assign(QueuedSubMesh* qmesh);
             /// Build this region
-            void build();
+            void build( bool parentVisible );
             /// Get the region ID of this region
             uint32 getID(void) const { return mRegionID; }
             /// Get the centre point of the region

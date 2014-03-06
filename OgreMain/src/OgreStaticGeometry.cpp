@@ -166,9 +166,10 @@ namespace Ogre {
             // Make a name
             // Calculate the region centre
             Vector3 centre = getRegionCentre(x, y, z);
-            ret = OGRE_NEW Region( Id::generateNewId<MovableObject>(), 0, this, mOwner, index, centre );
+            ret = OGRE_NEW Region( Id::generateNewId<MovableObject>(),
+                                   &mOwner->_getEntityMemoryManager( SCENE_STATIC ),
+                                   this, mOwner, index, centre );
             mOwner->injectMovableObject(ret);
-            ret->setVisible(mVisible);
             ret->setCastShadows(mCastShadows);
             if (mRenderQueueIDSet)
             {
@@ -562,7 +563,7 @@ namespace Ogre {
         for (RegionMap::iterator ri = mRegionMap.begin();
             ri != mRegionMap.end(); ++ri)
         {
-            ri->second->build();
+            ri->second->build( mVisible );
             
             // Set the visibility flags on these regions
             ri->second->setVisibilityFlags(mVisibilityFlags);
@@ -775,11 +776,12 @@ namespace Ogre {
 
     }
     //--------------------------------------------------------------------------
-    void StaticGeometry::Region::build()
+    void StaticGeometry::Region::build( bool parentVisible )
     {
         // Create a node
         mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(SCENE_STATIC, mCentre);
         mNode->attachObject(this);
+        this->setVisible( parentVisible );
         // We need to create enough LOD buckets to deal with the highest LOD
         // we encountered in all the meshes queued
         for (ushort lod = 0; lod < mLodValues.size(); ++lod)
