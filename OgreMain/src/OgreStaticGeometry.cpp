@@ -709,11 +709,16 @@ namespace Ogre {
     StaticGeometry::Region::Region( IdType id, ObjectMemoryManager *objectMemoryManager,
                                     StaticGeometry* parent, SceneManager* mgr, uint32 regionID,
                                     const Vector3& centre ) :
-	MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
+        MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
         mParent(parent), mSceneMgr(mgr), mNode(0),
-        mRegionID(regionID), mCentre(centre), mBoundingRadius(0.0f),
-        mCurrentLod(0)
+        mRegionID(regionID), mCentre(centre)
     {
+        mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO,
+                                                   Vector3( -std::numeric_limits<Real>::max(),
+                                                            -std::numeric_limits<Real>::max(),
+                                                            -std::numeric_limits<Real>::max() ) ),
+                                             mObjectData.mIndex );
+        mLodMesh = &mLodValues;
     }
     //--------------------------------------------------------------------------
     StaticGeometry::Region::~Region()
@@ -760,20 +765,18 @@ namespace Ogre {
         // Make sure LOD levels are max of all at the requested level
         for (ushort lod = 1; lod < lodLevels; ++lod)
         {
-            const MeshLodUsage& meshLod =
-                qmesh->submesh->parent->getLodLevel(lod);
-            mLodValues[lod] = std::max(mLodValues[lod],
-                meshLod.value);
+            const MeshLodUsage& meshLod = qmesh->submesh->parent->getLodLevel(lod);
+            mLodValues[lod] = Ogre::max(mLodValues[lod], meshLod.value);
         }
 
         // update bounds
         // Transform world bounds relative to our centre
-        AxisAlignedBox localBounds(
-            qmesh->worldBounds.getMinimum() - mCentre,
-            qmesh->worldBounds.getMaximum() - mCentre);
-        mAABB.merge(localBounds);
-        mBoundingRadius = Math::boundingRadiusFromAABB(mAABB);
-
+        Aabb localAabb = Aabb::newFromExtents( qmesh->worldBounds.getMinimum() - mCentre,
+                                               qmesh->worldBounds.getMaximum() - mCentre );
+        Aabb regionAabb = mObjectData.mLocalAabb->getAsAabb( mObjectData.mIndex );
+        regionAabb.merge( localAabb );
+        mObjectData.mLocalAabb->setFromAabb( regionAabb, mObjectData.mIndex );
+        mObjectData.mLocalRadius[mObjectData.mIndex] = regionAabb.getRadius();
     }
     //--------------------------------------------------------------------------
     void StaticGeometry::Region::build( bool parentVisible )
@@ -801,8 +804,13 @@ namespace Ogre {
             lodBucket->build();
         }
 
-
-
+        mLodMaterial.reserve( mLodBucketList[0]->getNumMaterials() );
+        StaticGeometry::LODBucket::MaterialIterator matIt = mLodBucketList[0]->getMaterialIterator();
+        while( matIt.hasMoreElements() )
+        {
+            MaterialBucket *matBucket = matIt.getNext();
+            mLodMaterial.push_back( matBucket->getMaterial()->_getLodValues() );
+        }
     }
     //--------------------------------------------------------------------------
     const String& StaticGeometry::Region::getMovableType(void) const
@@ -811,14 +819,8 @@ namespace Ogre {
         return sType;
     }
     //--------------------------------------------------------------------------
-    void StaticGeometry::Region::_notifyCurrentCamera(Camera* cam)
+    /*void StaticGeometry::Region::_notifyCurrentCamera(Camera* cam)
     {
-        // Set camera
-        mCamera = cam;
-
-        // Cache squared view depth for use by GeometryBucket
-        mSquaredViewDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
-
         const LodStrategy *lodStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
 
         // Sanity check
@@ -829,17 +831,14 @@ namespace Ogre {
 
         // Store LOD value for this strategy
         mLodValue = lodValue;
-    }
-    //--------------------------------------------------------------------------
-    const AxisAlignedBox& StaticGeometry::Region::getBoundingBox(void) const
-    {
-        return mAABB;
-    }
+    }*/
     //--------------------------------------------------------------------------
     void StaticGeometry::Region::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
-        mLodBucketList[mCurrentLod]->addRenderables(queue, mRenderQueueID,
-            mLodValue);
+        // Cache squared view depth for use by GeometryBucket
+        mCamera = lodCamera;
+        mSquaredViewDepth = mParentNode->getSquaredViewDepth( lodCamera );
+        mLodBucketList[mCurrentMeshLod]->addRenderables(queue, mRenderQueueID, mCurrentMaterialLod);
     }
     //---------------------------------------------------------------------
     void StaticGeometry::Region::visitRenderables(Renderable::Visitor* visitor, 
@@ -857,45 +856,10 @@ namespace Ogre {
     {
         return LODIterator(mLodBucketList.begin(), mLodBucketList.end());
     }
-    //---------------------------------------------------------------------
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-    ShadowCaster::ShadowRenderableListIterator
-    StaticGeometry::Region::getShadowVolumeRenderableIterator(
-        ShadowTechnique shadowTechnique, const Light* light,
-        HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
-        bool extrude, Real extrusionDistance, unsigned long flags)
-    {
-        // Calculate the object space light details
-        Vector4 lightPos = light->getAs4DVector();
-        Matrix4 world2Obj = mParentNode->_getFullTransform().inverseAffine();
-        lightPos = world2Obj.transformAffine(lightPos);
-        Matrix3 world2Obj3x3;
-        world2Obj.extract3x3Matrix(world2Obj3x3);
-        extrusionDistance *= Math::Sqrt(std::min(std::min(world2Obj3x3.GetColumn(0).squaredLength(), world2Obj3x3.GetColumn(1).squaredLength()), world2Obj3x3.GetColumn(2).squaredLength()));
-
-        // per-LOD shadow lists & edge data
-        mLodBucketList[mCurrentLod]->updateShadowRenderables(
-            shadowTechnique, lightPos, indexBuffer, extrude, extrusionDistance, flags);
-        
-        EdgeData* edgeList = mLodBucketList[mCurrentLod]->getEdgeList();
-        ShadowRenderableList& shadowRendList = mLodBucketList[mCurrentLod]->getShadowRenderableList();
-
-        // Calc triangle light facing
-        updateEdgeListLightFacing(edgeList, lightPos);
-
-        // Generate indexes and update renderables
-        generateShadowVolume(edgeList, *indexBuffer, *indexBufferUsedSize,
-            light, shadowRendList, flags);
-
-
-        return ShadowCaster::ShadowRenderableListIterator(shadowRendList.begin(), shadowRendList.end());
-
-    }
-#endif
     //--------------------------------------------------------------------------
     EdgeData* StaticGeometry::Region::getEdgeList(void)
     {
-        return mLodBucketList[mCurrentLod]->getEdgeList();
+        return mLodBucketList[mCurrentMeshLod]->getEdgeList();
     }
     //--------------------------------------------------------------------------
     bool StaticGeometry::Region::hasEdgeList(void)
@@ -905,11 +869,14 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     void StaticGeometry::Region::dump(std::ofstream& of) const
     {
+        Aabb localAabb = mObjectData.mLocalAabb->getAsAabb( mObjectData.mIndex );
+        AxisAlignedBox localBox( localAabb.getMinimum(), localAabb.getMaximum() );
+
         of << "Region " << mRegionID << std::endl;
         of << "--------------------------" << std::endl;
         of << "Centre: " << mCentre << std::endl;
-        of << "Local AABB: " << mAABB << std::endl;
-        of << "Bounding radius: " << mBoundingRadius << std::endl;
+        of << "Local AABB: " << localBox << std::endl;
+        of << "Bounding radius: " << mObjectData.mLocalRadius[mObjectData.mIndex] << std::endl;
         of << "Number of LODs: " << mLodBucketList.size() << std::endl;
 
         for (LODBucketList::const_iterator i = mLodBucketList.begin();
@@ -997,14 +964,16 @@ namespace Ogre {
     }
     //--------------------------------------------------------------------------
     void StaticGeometry::LODBucket::addRenderables(RenderQueue* queue,
-        uint8 group, Real lodValue)
+        uint8 group, const FastArray<unsigned char> &currentMatLod )
     {
         // Just pass this on to child buckets
         MaterialBucketMap::iterator i, iend;
         iend =  mMaterialBucketMap.end();
+        FastArray<unsigned char>::const_iterator itMatLod = currentMatLod.begin();
         for (i = mMaterialBucketMap.begin(); i != iend; ++i)
         {
-            i->second->addRenderables(queue, group, lodValue);
+            assert( itMatLod < currentMatLod.end() );
+            i->second->addRenderables(queue, group, *itMatLod++);
         }
     }
     //--------------------------------------------------------------------------
@@ -1040,65 +1009,6 @@ namespace Ogre {
         }
 
     }
-    //---------------------------------------------------------------------
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-    void StaticGeometry::LODBucket::updateShadowRenderables(
-        ShadowTechnique shadowTechnique, const Vector4& lightPos, 
-        HardwareIndexBufferSharedPtr* indexBuffer, bool extrude, 
-        Real extrusionDistance, unsigned long flags /* = 0  */)
-    {
-        assert(indexBuffer && "Only external index buffers are supported right now");
-        assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
-            "Only 16-bit indexes supported for now");
-
-        // We need to search the edge list for silhouette edges
-        if (!mEdgeList)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "You enabled stencil shadows after the buid process!",
-                "StaticGeometry::LODBucket::getShadowVolumeRenderableIterator");
-        }
-
-        // Init shadow renderable list if required
-        bool init = mShadowRenderables.empty();
-
-        EdgeData::EdgeGroupList::iterator egi;
-        ShadowCaster::ShadowRenderableList::iterator si, siend;
-        LODShadowRenderable* esr = 0;
-        if (init)
-            mShadowRenderables.resize(mEdgeList->edgeGroups.size());
-
-        //bool updatedSharedGeomNormals = false;
-        siend = mShadowRenderables.end();
-        egi = mEdgeList->edgeGroups.begin();
-        for (si = mShadowRenderables.begin(); si != siend; ++si, ++egi)
-        {
-            if (init)
-            {
-                // Create a new renderable, create a separate light cap if
-                // we're using a vertex program (either for this model, or
-                // for extruding the shadow volume) since otherwise we can
-                // get depth-fighting on the light cap
-
-                *si = OGRE_NEW LODShadowRenderable(this, indexBuffer,
-                    egi->vertexData, mVertexProgramInUse || !extrude);
-            }
-            // Get shadow renderable
-            esr = static_cast<LODShadowRenderable*>(*si);
-            HardwareVertexBufferSharedPtr esrPositionBuffer = esr->getPositionBuffer();
-            // Extrude vertices in software if required
-            if (extrude)
-            {
-                mParent->extrudeVertices(esrPositionBuffer,
-                    egi->vertexData->vertexCount,
-                    lightPos, extrusionDistance);
-
-            }
-
-        }
-
-    }
-#endif
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     StaticGeometry::MaterialBucket::MaterialBucket(LODBucket* parent,
@@ -1173,16 +1083,13 @@ namespace Ogre {
         }
     }
     //--------------------------------------------------------------------------
-    void StaticGeometry::MaterialBucket::addRenderables(RenderQueue* queue,
-        uint8 group, Real lodValue)
+    void StaticGeometry::MaterialBucket::addRenderables(RenderQueue* queue, uint8 group, size_t materialLod)
     {
         // Get region
         Region *region = mParent->getParent();
 
-        size_t regionIdx = 0; //TODO!!!!!!
-
         // Determine the current material technique
-        mTechnique = mMaterial->getBestTechnique( region->mCurrentMaterialLod[regionIdx] );
+        mTechnique = mMaterial->getBestTechnique( region->mCurrentMaterialLod[materialLod] );
         GeometryBucketList::iterator i, iend;
         iend =  mGeometryBucketList.end();
         for (i = mGeometryBucketList.begin(); i != iend; ++i)

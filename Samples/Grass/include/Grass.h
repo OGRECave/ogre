@@ -190,7 +190,7 @@ protected:
         Vector3 vMin( std::numeric_limits<Real>::max(),
                       std::numeric_limits<Real>::max(),
                       std::numeric_limits<Real>::max() );
-        Vector3 vMax( -vMax );
+        Vector3 vMax( -vMin );
 
         GrassVertex* verts = (GrassVertex*)vb->lock(HardwareBuffer::HBL_DISCARD);  // start filling in vertex data
 

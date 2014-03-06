@@ -285,8 +285,8 @@ namespace Ogre {
             /// Build
             void build();
             /// Add children to the render queue
-            void addRenderables(RenderQueue* queue, uint8 group, 
-                Real lodValue);
+            void addRenderables(RenderQueue* queue, uint8 group,
+                size_t materialLod);
             /// Get the material for this bucket
             const MaterialPtr& getMaterial(void) const { return mMaterial; }
             /// Iterator over geometry
@@ -338,11 +338,12 @@ namespace Ogre {
             void build();
             /// Add children to the render queue
             void addRenderables(RenderQueue* queue, uint8 group, 
-                Real lodValue);
+                const FastArray<unsigned char> &currentMatLod);
             /// Iterator over the materials in this LOD
             typedef MapIterator<MaterialBucketMap> MaterialIterator;
             /// Get an iterator over the materials in this LOD
             MaterialIterator getMaterialIterator(void);
+            size_t getNumMaterials(void) const          { return mMaterialBucketMap.size(); }
             /// Dump contents for diagnostics
             void dump(std::ofstream& of) const;
             void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
@@ -380,14 +381,6 @@ namespace Ogre {
             Vector3 mCentre;
             /// LOD values as built up - use the max at each level
             Mesh::LodValueArray mLodValues;
-            /// Local AABB relative to region centre
-            AxisAlignedBox mAABB;
-            /// Local bounding radius
-            Real mBoundingRadius;
-            /// The current LOD level, as determined from the last camera
-            ushort mCurrentLod;
-            /// Current LOD value, passed on to do material LOD later
-            Real mLodValue;
             /// List of LOD buckets         
             LODBucketList mLodBucketList;
             /// List of lights for this region
@@ -395,7 +388,7 @@ namespace Ogre {
             /// The last frame that this light list was updated in
             mutable ulong mLightListUpdated;
             /// Current camera
-            Camera *mCamera;
+            Camera const *mCamera;
             /// Cached squared view depth value to avoid recalculation by GeometryBucket
             Real mSquaredViewDepth;
 
@@ -414,8 +407,6 @@ namespace Ogre {
             /// Get the centre point of the region
             const Vector3& getCentre(void) const { return mCentre; }
             const String& getMovableType(void) const;
-            void _notifyCurrentCamera(Camera* cam);
-            const AxisAlignedBox& getBoundingBox(void) const;
             void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
             /// @copydoc MovableObject::visitRenderables
             void visitRenderables(Renderable::Visitor* visitor, 
