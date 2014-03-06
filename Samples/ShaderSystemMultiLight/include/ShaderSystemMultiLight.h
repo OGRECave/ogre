@@ -113,8 +113,7 @@ public:
                 mLights[i].light->setDirection(Vector3::NEGATIVE_UNIT_Y);
             }
         }
-        
-                
+
         return SdkSample::frameRenderingQueued(evt);   // don't forget the parent class updates!
     }
 
@@ -139,6 +138,8 @@ protected:
         mTrayMgr->createCheckBox(TL_BOTTOM, TWIRL_LIGHTS_CHECKBOX, "Twirl Lights", 240)->setChecked(false, false);
         mTrayMgr->createCheckBox(TL_BOTTOM, DEBUG_MODE_CHECKBOX, "Show Grid", 240)->setChecked(false, false);
 
+        setupShaderGenerator();
+
         // Set our camera to orbit around the origin at a suitable distance
         mCamera->setPosition(0, 100, 600);
 
@@ -159,8 +160,6 @@ protected:
         head->setName("Head");
         head->setRenderQueueGroup(cPriorityMain);
         mSceneMgr->getRootSceneNode()->attachObject(head);
-
-        setupShaderGenerator();
 
         setupLights();
     }
@@ -184,8 +183,7 @@ protected:
         mGen->addSubRenderStateFactory(mSRSSegLightFactory);
         pMainRenderState->addTemplateSubRenderState(
             mGen->createSubRenderState(RTShaderSRSSegmentedLights::Type));  
-                    
-        
+
         mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
     }
 
@@ -200,7 +198,7 @@ protected:
         light->setDirection(Vector3(-1,-1,0).normalisedCopy());
         light->setDiffuseColour(ColourValue(0.1, 0.1, 0.1));
         light->setCastShadows(false);
-        
+
         for(unsigned int i = 0 ; i < cInitialLightCount ; ++i)
         {
             addSpotLight();

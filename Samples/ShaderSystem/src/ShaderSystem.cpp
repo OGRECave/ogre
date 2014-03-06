@@ -258,12 +258,15 @@ Light * Sample_ShaderSystem::getLightNamedFromSceneManager(const String &name)
 
 //-----------------------------------------------------------------------
 bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
-{   
+{
+    // Make this viewport work with shader generator scheme.
+    mSceneMgr->getCurrentViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
     if (getLightNamedFromSceneManager(SPOT_LIGHT_NAME) != NULL)
     {
         Light* light = getLightNamedFromSceneManager(SPOT_LIGHT_NAME);
 
-        light->setPosition(mCamera->getDerivedPosition() + mCamera->getDerivedUp() * 20.0);
+        light->getParentSceneNode()->setPosition(mCamera->getDerivedPosition() + mCamera->getDerivedUp() * 20.0);
         light->setDirection(mCamera->getDerivedDirection());
     }
 
@@ -443,15 +446,13 @@ void Sample_ShaderSystem::setupContent()
 
     // Take responsibility for updating the light count manually.
     schemRenderState->setLightCountAutoUpdate(false);
-    
-    setupUI();
 
+    mSceneMgr->updateSceneGraph();
+
+    setupUI();
 
     mCamera->setPosition(0.0, 300.0, 450.0);
     mCamera->lookAt(0.0, 150.0, 0.0);
-
-    // Make this viewport work with shader generator scheme.
-    mSceneMgr->getCurrentViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
     // Mark system as on.
     mDetailsPanel->setParamValue(11, "On");
@@ -846,7 +847,12 @@ void Sample_ShaderSystem::createDirectionalLight()
     Light*  light;
     Vector3 dir;
 
+    // create pivot node
+    mDirectionalLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+
     light = mSceneMgr->createLight();
+    light->setName(DIRECTIONAL_LIGHT_NAME);
+    mDirectionalLightNode->attachObject(light);
     light->setType(Light::LT_DIRECTIONAL);
     light->setCastShadows(true);
     dir.x = 0.5;
@@ -857,11 +863,6 @@ void Sample_ShaderSystem::createDirectionalLight()
     light->setDiffuseColour(0.65, 0.15, 0.15);
     light->setSpecularColour(0.5, 0.5, 0.5);
 
-    // create pivot node
-    mDirectionalLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-    mDirectionalLightNode->setName(DIRECTIONAL_LIGHT_NAME);
-    mDirectionalLightNode->attachObject(light);
-
     // Create billboard set.
     mBbsFlare = mSceneMgr->createBillboardSet();
     mBbsFlare->setMaterialName("Examples/Flare3");
@@ -869,7 +870,6 @@ void Sample_ShaderSystem::createDirectionalLight()
     mBbsFlare->setCastShadows(false);
     
     mDirectionalLightNode->attachObject(mBbsFlare);
-    mDirectionalLightNode->attachObject(light);
 }
 
 //-----------------------------------------------------------------------
@@ -878,7 +878,13 @@ void Sample_ShaderSystem::createPointLight()
     Light*  light;
     Vector3 dir;
 
+    // create pivot node
+    mPointLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+
     light = mSceneMgr->createLight();
+    light->setName(POINT_LIGHT_NAME);
+    mPointLightNode->attachObject(light);
+    mPointLightNode->setPosition(Vector3(200, 100, 0));
     light->setType(Light::LT_POINT);
     light->setCastShadows(false);
     dir.x = 0.5;
@@ -890,11 +896,6 @@ void Sample_ShaderSystem::createPointLight()
     light->setSpecularColour(0.5, 0.5, 0.5);    
     light->setAttenuation(200.0, 1.0, 0.0005, 0.0);
 
-    // create pivot node
-    mPointLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-    mPointLightNode->setName(POINT_LIGHT_NAME);
-    mPointLightNode->attachObject(light);
-
     BillboardSet* bbs;
     
     // Create billboard set.
@@ -904,9 +905,6 @@ void Sample_ShaderSystem::createPointLight()
     bbs->setCastShadows(false);
 
     mPointLightNode->attachObject(bbs);
-    SceneNode *node = mPointLightNode->createChildSceneNode();
-    node->setPosition(Vector3(200, 100, 0));
-    node->attachObject(light);
 }
 
 //-----------------------------------------------------------------------
@@ -915,7 +913,11 @@ void Sample_ShaderSystem::createSpotLight()
     Light*  light;
     Vector3 dir;
 
+    SceneNode *spotLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+
     light = mSceneMgr->createLight();
+    light->setName(SPOT_LIGHT_NAME);
+    spotLightNode->attachObject(light);
     light->setType(Light::LT_SPOTLIGHT);
     light->setCastShadows(false);
     dir.x = 0.0;
@@ -927,10 +929,6 @@ void Sample_ShaderSystem::createSpotLight()
     light->setDiffuseColour(0.15, 0.15, 0.65);
     light->setSpecularColour(0.5, 0.5, 0.5);    
     light->setAttenuation(1000.0, 1.0, 0.0005, 0.0);
-
-    SceneNode *spotLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-    spotLightNode->setName(SPOT_LIGHT_NAME);
-    spotLightNode->attachObject(light);
 }
 
 void Sample_ShaderSystem::addModelToScene(const String &  modelName)
@@ -1025,18 +1023,18 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
         {
             if (visible)
             {
-                if (mPointLightNode->isInSceneGraph() == false)
+                if (mPointLightNode->getParent() != mSceneMgr->getRootSceneNode())
                 {
                     mSceneMgr->getRootSceneNode()->addChild(mPointLightNode);
                 }
             }
             else
             {
-                if (mPointLightNode->isInSceneGraph() == true)
+                if (mPointLightNode->getParent() == mSceneMgr->getRootSceneNode())
                 {
                     mSceneMgr->getRootSceneNode()->removeChild(mPointLightNode);
                 }
-            }   
+            }
             getLightNamedFromSceneManager(lightName)->setVisible(visible);
         }
         
@@ -1100,7 +1098,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
     // No shadow
     if (menuIndex == 0)
     {
-        mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
+//        mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
         const Ogre::RTShader::SubRenderStateList& subRenderStateList = schemRenderState->getTemplateSubRenderStateList();
@@ -1134,12 +1132,12 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
     // Integrated shadow PSSM with 3 splits.
     else if (menuIndex == 1)
     {
-        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
-
-        // 3 textures per directional light
-        mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
-        mSceneMgr->setShadowTextureSettings(512, 3, PF_FLOAT32_R);
-        mSceneMgr->setShadowTextureSelfShadow(true);
+//        mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+//
+//        // 3 textures per directional light
+//        mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
+//        mSceneMgr->setShadowTextureSettings(512, 3, PF_FLOAT32_R);
+//        mSceneMgr->setShadowTextureSelfShadow(true);
 
         // Leave only directional light.
         mDirLightCheckBox->setChecked(true);
@@ -1171,7 +1169,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
         pssmSetup->setOptimalAdjustFactor(1, 1);
         pssmSetup->setOptimalAdjustFactor(2, 0.5);
 
-        mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(pssmSetup));
+//        mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(pssmSetup));
 
     
         Ogre::RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(Ogre::RTShader::IntegratedPSSM3::Type); 
@@ -1316,6 +1314,7 @@ void Sample_ShaderSystem::destroyPrivateResourceGroup()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::pickTargetObject( const OIS::MouseEvent &evt )
 {
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     int xPos   = evt.state.X.abs;
     int yPos   = evt.state.Y.abs;
     int width  = evt.state.width;
@@ -1340,6 +1339,7 @@ void Sample_ShaderSystem::pickTargetObject( const OIS::MouseEvent &evt )
         mTargetObj = curEntry.movable;
         mTargetObj ->getParentSceneNode()->showBoundingBox(true);       
     }
+#endif
 }
 
 //-----------------------------------------------------------------------
@@ -1358,7 +1358,7 @@ void Sample_ShaderSystem::updateTargetObjInfo()
     
     mTargetObjMatName->setCaption(targetObjMaterialName);
 
-    if (mViewport->getMaterialScheme() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+    if (mCamera->getLastViewport()->getMaterialScheme() == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
     {       
         MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(targetObjMaterialName);
 
@@ -1734,7 +1734,8 @@ ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
     textureAtlasSamplerFactory->addTexutreAtlasDefinition(taiFile, textureAtlasTable);
 
     //Generate the geometry that will seed the particle system
-    ManualObject* textureAtlasObject = mSceneMgr->createManualObject("TextureAtlasObject");
+    ManualObject* textureAtlasObject = mSceneMgr->createManualObject();
+    textureAtlasObject->setName("TextureAtlasObject");
 
     int sliceSize = 30.0;
     int wrapSize = 5.0;
