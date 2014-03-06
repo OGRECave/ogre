@@ -214,9 +214,10 @@ namespace Ogre {
 
         for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
         {
-            ArrayReal distance = ARRAY_REAL_ZERO;
             // Check origin inside first
             ArrayMaskR hitMaskR = objData.mWorldAabb->contains( rayOrigin );
+
+            ArrayReal distance = Mathlib::CmovRobust( ARRAY_REAL_ZERO, Mathlib::INFINITEA, hitMaskR );
 
             ArrayVector3 vMin = objData.mWorldAabb->getMinimum();
             ArrayVector3 vMax = objData.mWorldAabb->getMaximum();
@@ -230,11 +231,14 @@ namespace Ogre {
             // Min x, y & z
             for( size_t i=0; i<3; ++i )
             {
-                ArrayReal t = vMin.mChunkBase[i] - rayOrigin.mChunkBase[i] / rayDir.mChunkBase[i];
+                ArrayReal t = (vMin.mChunkBase[i] - rayOrigin.mChunkBase[i]) / rayDir.mChunkBase[i];
 
                 //mask = t >= 0; works even if t is nan (t = 0 / 0)
                 ArrayMaskR mask = Mathlib::CompareGreaterEqual( t, ARRAY_REAL_ZERO );
                 ArrayVector3 hitPoint = rayOrigin + rayDir * t;
+
+                //Fix accuracy issues for very thin aabbs
+                hitPoint.mChunkBase[i] = vMin.mChunkBase[i];
 
                 //hitMaskR |= t >= 0 && mWorldAabb->contains( hitPoint );
                 //distance = t >= 0 ? min( distance, t ) : t;
@@ -246,11 +250,14 @@ namespace Ogre {
             // Max x, y & z
             for( size_t i=0; i<3; ++i )
             {
-                ArrayReal t = vMax.mChunkBase[i] - rayOrigin.mChunkBase[i] / rayDir.mChunkBase[i];
+                ArrayReal t = (vMax.mChunkBase[i] - rayOrigin.mChunkBase[i]) / rayDir.mChunkBase[i];
 
                 //mask = t >= 0; works even if t is nan (t = 0 / 0)
                 ArrayMaskR mask = Mathlib::CompareGreaterEqual( t, ARRAY_REAL_ZERO );
                 ArrayVector3 hitPoint = rayOrigin + rayDir * t;
+
+                //Fix accuracy issues for very thin aabbs
+                hitPoint.mChunkBase[i] = vMax.mChunkBase[i];
 
                 //hitMaskR |= t >= 0 && mWorldAabb->contains( hitPoint );
                 //distance = t >= 0 ? min( distance, t ) : t;

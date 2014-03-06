@@ -713,6 +713,9 @@ namespace Ogre {
         mParent(parent), mSceneMgr(mgr), mNode(0),
         mRegionID(regionID), mCentre(centre)
     {
+
+        mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_STATICGEOMETRY_DEFAULT_MASK;
+
         mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO,
                                                    Vector3( -std::numeric_limits<Real>::max(),
                                                             -std::numeric_limits<Real>::max(),
@@ -738,11 +741,6 @@ namespace Ogre {
 
         // no need to delete queued meshes, these are managed in StaticGeometry
 
-    }
-    //--------------------------------------------------------------------------
-    uint32 StaticGeometry::Region::getTypeFlags(void) const
-    {
-        return SceneManager::STATICGEOMETRY_TYPE_MASK;
     }
     //--------------------------------------------------------------------------
     void StaticGeometry::Region::assign(QueuedSubMesh* qmesh)

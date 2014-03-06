@@ -607,9 +607,6 @@ namespace Ogre {
             It only returns the value of emitting flag.
         */
         bool getEmitting() const;
-
-        /// Override to return specific type flag
-        uint32 getTypeFlags(void) const;
     protected:
 
         /// Command objects

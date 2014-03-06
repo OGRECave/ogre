@@ -82,6 +82,7 @@ namespace Ogre {
           mLastParentXform(Matrix4::ZERO),
           mMeshStateCount(0)
     {
+        mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_ENTITY_DEFAULT_MASK;
     }
     //-----------------------------------------------------------------------
     Entity::Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh) :
@@ -111,6 +112,7 @@ namespace Ogre {
         mMeshStateCount(0)
     {
         _initialise();
+        mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_ENTITY_DEFAULT_MASK;
     }
     //-----------------------------------------------------------------------
     void Entity::_initialise(bool forceReinitialise)
@@ -1869,11 +1871,6 @@ namespace Ogre {
     void Entity::refreshAvailableAnimationState(void)
     {
         mMesh->_refreshAnimationState(mAnimationState);
-    }
-    //-----------------------------------------------------------------------
-    uint32 Entity::getTypeFlags(void) const
-    {
-        return SceneManager::ENTITY_TYPE_MASK;
     }
     //-----------------------------------------------------------------------
     VertexData* Entity::getVertexDataForBinding(void)

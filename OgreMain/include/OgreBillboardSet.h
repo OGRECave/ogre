@@ -812,9 +812,6 @@ namespace Ogre {
         /** Returns whether point rendering is enabled. */
         virtual bool isPointRenderingEnabled(void) const
         { return mPointRendering; }
-        
-        /// Override to return specific type flag
-        uint32 getTypeFlags(void) const;
 
         /** Set the auto update state of this billboard set.
         @remarks

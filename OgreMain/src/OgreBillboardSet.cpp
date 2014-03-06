@@ -77,6 +77,8 @@ namespace Ogre {
         setCastShadows( false );
         setTextureStacksAndSlices( 1, 1 );
 
+        mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_FX_DEFAULT_MASK;
+
         mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
     }
     //-----------------------------------------------------------------------
@@ -1072,11 +1074,6 @@ namespace Ogre {
     const Vector3& BillboardSet::getCommonUpVector(void) const
     {
         return mCommonUpVector;
-    }
-    //-----------------------------------------------------------------------
-    uint32 BillboardSet::getTypeFlags(void) const
-    {
-        return SceneManager::FX_TYPE_MASK;
     }
     //-----------------------------------------------------------------------
     void BillboardSet::genVertices(

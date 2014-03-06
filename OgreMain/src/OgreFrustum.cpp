@@ -73,6 +73,8 @@ namespace Ogre {
     {
         // Initialise material
         mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting");
+
+        mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_FRUSTUM_DEFAULT_MASK;
         
         // Alter superclass members
         setVisible( false );
@@ -312,11 +314,6 @@ namespace Ogre {
         }
 
         return true;
-    }
-    //---------------------------------------------------------------------
-    uint32 Frustum::getTypeFlags(void) const
-    {
-        return SceneManager::FRUSTUM_TYPE_MASK;
     }
     //-----------------------------------------------------------------------
     void Frustum::calcProjectionParameters(Real& left, Real& right, Real& bottom, Real& top) const

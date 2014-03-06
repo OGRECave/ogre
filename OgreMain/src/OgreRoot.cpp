@@ -1504,20 +1504,6 @@ namespace Ogre {
                 "Root::addMovableObjectFactory");
         }
 
-        if (fact->requestTypeFlags())
-        {
-            if (facti != mMovableObjectFactoryMap.end() && facti->second->requestTypeFlags())
-            {
-                // Copy type flags from the factory we're replacing
-                fact->_notifyTypeFlags(facti->second->getTypeFlags());
-            }
-            else
-            {
-                // Allocate new
-                fact->_notifyTypeFlags(_allocateNextMovableObjectTypeFlag());
-            }
-        }
-
         // Save
         mMovableObjectFactoryMap[fact->getType()] = fact;
 
@@ -1542,22 +1528,6 @@ namespace Ogre {
                 "Root::getMovableObjectFactory");
         }
         return i->second;
-    }
-    //---------------------------------------------------------------------
-    uint32 Root::_allocateNextMovableObjectTypeFlag(void)
-    {
-        if (mNextMovableObjectTypeFlag == SceneManager::USER_TYPE_MASK_LIMIT)
-        {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-                "Cannot allocate a type flag since "
-                "all the available flags have been used.",
-                "Root::_allocateNextMovableObjectTypeFlag");
-
-        }
-        uint32 ret = mNextMovableObjectTypeFlag;
-        mNextMovableObjectTypeFlag <<= 1;
-        return ret;
-
     }
     //---------------------------------------------------------------------
     void Root::removeMovableObjectFactory(MovableObjectFactory* fact)

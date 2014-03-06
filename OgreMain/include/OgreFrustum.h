@@ -468,9 +468,6 @@ namespace Ogre
         */
         virtual bool isVisible(const Vector3& vert, FrustumPlane* culledBy = 0) const;
 
-        /// Overridden from MovableObject::getTypeFlags
-        uint32 getTypeFlags(void) const;
-
         /** Overridden from MovableObject */
         const AxisAlignedBox& getBoundingBox(void) const;
 

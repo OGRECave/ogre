@@ -57,6 +57,8 @@ namespace Ogre {
         //mMinPixelSize should always be zero for lights otherwise lights will disapear
         mMinPixelSize = 0;
 
+        mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_LIGHT_DEFAULT_MASK;
+
         mObjectData.mLocalRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
         mObjectData.mWorldRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
     }
@@ -196,11 +198,6 @@ namespace Ogre {
             ret.w = 1.0;
         }
         return ret;
-    }
-    //-----------------------------------------------------------------------
-    uint32 Light::getTypeFlags(void) const
-    {
-        return SceneManager::LIGHT_TYPE_MASK;
     }
     //---------------------------------------------------------------------
     void Light::_calcTempSquareDist(const Vector3& worldPos)

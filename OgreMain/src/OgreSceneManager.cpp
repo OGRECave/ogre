@@ -78,13 +78,11 @@ THE SOFTWARE.
 namespace Ogre {
 
 //-----------------------------------------------------------------------
-uint32 SceneManager::WORLD_GEOMETRY_TYPE_MASK   = 0x80000000;
-uint32 SceneManager::ENTITY_TYPE_MASK           = 0x40000000;
-uint32 SceneManager::FX_TYPE_MASK               = 0x20000000;
-uint32 SceneManager::STATICGEOMETRY_TYPE_MASK   = 0x10000000;
-uint32 SceneManager::LIGHT_TYPE_MASK            = 0x08000000;
-uint32 SceneManager::FRUSTUM_TYPE_MASK          = 0x04000000;
-uint32 SceneManager::USER_TYPE_MASK_LIMIT         = SceneManager::FRUSTUM_TYPE_MASK;
+uint32 SceneManager::QUERY_ENTITY_DEFAULT_MASK         = 0x80000000;
+uint32 SceneManager::QUERY_FX_DEFAULT_MASK             = 0x40000000;
+uint32 SceneManager::QUERY_STATICGEOMETRY_DEFAULT_MASK = 0x20000000;
+uint32 SceneManager::QUERY_LIGHT_DEFAULT_MASK          = 0x10000000;
+uint32 SceneManager::QUERY_FRUSTUM_DEFAULT_MASK        = 0x08000000;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name, size_t numWorkerThreads,
                            InstancingTheadedCullingMethod threadedCullingMethod) :
@@ -1432,6 +1430,7 @@ void SceneManager::_setSkyPlane(
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
         mSkyPlaneEntity->setRenderQueueGroup( renderQueue );
+        mSkyPlaneEntity->setQueryFlags( 0 );
 
         MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
         objectMap->movableObjects.push_back( mSkyPlaneEntity );
@@ -1519,6 +1518,7 @@ void SceneManager::_setSkyBox(
                                                 &mEntityMemoryManager[SCENE_DYNAMIC] );
             mSkyBoxObj->setCastShadows(false);
             mSkyBoxObj->setRenderQueueGroup( renderQueue );
+            mSkyBoxObj->setQueryFlags( 0 );
             mSkyBoxNode->attachObject(mSkyBoxObj);
         }
         else
@@ -1761,6 +1761,7 @@ void SceneManager::_setSkyDome(
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
             mSkyDomeEntity[i]->setRenderQueueGroup( renderQueue );
+            mSkyDomeEntity[i]->setQueryFlags( 0 );
 
             MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
             objectMap->movableObjects.push_back( mSkyDomeEntity[i] );

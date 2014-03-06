@@ -69,7 +69,6 @@ namespace Ogre {
         , mListener(0)
         , mDebugDisplay(false)
         , mObjectMemoryManager( objectMemoryManager )
-        , mCreator(0)
         , mGlobalIndex( -1 )
         , mParentIndex( -1 )
     {
@@ -95,7 +94,6 @@ namespace Ogre {
         , mListener(0)
         , mDebugDisplay(false)
         , mObjectMemoryManager( 0 )
-        , mCreator(0)
         , mGlobalIndex( -1 )
         , mParentIndex( -1 )
     {
@@ -1014,18 +1012,6 @@ namespace Ogre {
         else
             outBox->setExtents( vMin, vMax );
     }
-    //-----------------------------------------------------------------------
-    uint32 MovableObject::getTypeFlags(void) const
-    {
-        if (mCreator)
-        {
-            return mCreator->getTypeFlags();
-        }
-        else
-        {
-            return 0xFFFFFFFF;
-        }
-    }
     //---------------------------------------------------------------------
     class MORecvShadVisitor : public Renderable::Visitor
     {
@@ -1059,7 +1045,6 @@ namespace Ogre {
                                 const NameValuePairList* params )
     {
         MovableObject* m = createInstanceImpl( id, objectMemoryManager, params );
-        m->_notifyCreator(this);
         m->_notifyManager(manager);
         return m;
     }

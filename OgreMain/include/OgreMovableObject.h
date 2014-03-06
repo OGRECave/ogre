@@ -114,9 +114,6 @@ namespace Ogre {
         /// The memory manager used to allocate the ObjectData.
         ObjectMemoryManager *mObjectMemoryManager;
 
-        /// Creator of this object (if created by a factory)
-        MovableObjectFactory* mCreator;
-
 #ifndef NDEBUG
         mutable bool mCachedAabbOutOfDate;
 #endif
@@ -158,10 +155,6 @@ namespace Ogre {
         */
         virtual ~MovableObject();
 
-        /** Notify the object of it's creator (internal use only) */
-        virtual void _notifyCreator(MovableObjectFactory* fact) { mCreator = fact; }
-        /** Get the creator of this object, if any (internal use only) */
-        virtual MovableObjectFactory*  _getCreator(void) const { return mCreator; }
         /** Notify the object of it's manager (internal use only) */
         void _notifyManager(SceneManager* man) { mManager = man; }
         /** Get the manager of this object, if any (internal use only) */
@@ -582,18 +575,6 @@ namespace Ogre {
         */
         bool getReceivesShadows();
 
-        /** Get the 'type flags' for this MovableObject.
-        @remarks
-            A type flag identifies the type of the MovableObject as a bitpattern. 
-            This is used for categorical inclusion / exclusion in SceneQuery
-            objects. By default, this method returns all ones for objects not 
-            created by a MovableObjectFactory (hence always including them); 
-            otherwise it returns the value assigned to the MovableObjectFactory.
-            Custom objects which don't use MovableObjectFactory will need to 
-            override this if they want to be included in queries.
-        */
-        virtual uint32 getTypeFlags(void) const;
-
         /** Method to allow a caller to abstractly iterate over the Renderable
             instances that this MovableObject will add to the render queue when
             asked, if any. 
@@ -634,14 +615,11 @@ namespace Ogre {
     class _OgreExport MovableObjectFactory : public MovableAlloc
     {
     protected:
-        /// Type flag, allocated if requested
-        uint32 mTypeFlag;
-
         /// Internal implementation of create method - must be overridden
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
                                                     const NameValuePairList* params = 0) = 0;
     public:
-        MovableObjectFactory() : mTypeFlag(0xFFFFFFFF) {}
+        MovableObjectFactory() {}
         virtual ~MovableObjectFactory() {}
         /// Get the type of the object to be created
         virtual const String& getType(void) const = 0;
@@ -656,38 +634,6 @@ namespace Ogre {
                                         SceneManager* manager, const NameValuePairList* params = 0);
         /** Destroy an instance of the object */
         virtual void destroyInstance(MovableObject* obj) = 0;
-
-        /** Does this factory require the allocation of a 'type flag', used to 
-            selectively include / exclude this type from scene queries?
-        @remarks
-            The default implementation here is to return 'false', ie not to 
-            request a unique type mask from Root. For objects that
-            never need to be excluded in SceneQuery results, that's fine, since
-            the default implementation of MovableObject::getTypeFlags is to return
-            all ones, hence matching any query type mask. However, if you want the
-            objects created by this factory to be filterable by queries using a 
-            broad type, you have to give them a (preferably unique) type mask - 
-            and given that you don't know what other MovableObject types are 
-            registered, Root will allocate you one. 
-        */
-        virtual bool requestTypeFlags(void) const { return false; }
-        /** Notify this factory of the type mask to apply. 
-        @remarks
-            This should normally only be called by Root in response to
-            a 'true' result from requestTypeMask. However, you can actually use
-            it yourself if you're careful; for example to assign the same mask
-            to a number of different types of object, should you always wish them
-            to be treated the same in queries.
-        */
-        void _notifyTypeFlags(uint32 flag) { mTypeFlag = flag; }
-
-        /** Gets the type flag for this factory.
-        @remarks
-            A type flag is like a query flag, except that it applies to all instances
-            of a certain type of object.
-        */
-        uint32 getTypeFlags(void) const { return mTypeFlag; }
-
     };
 
     class _OgreExport NullEntity : public MovableObject

@@ -140,13 +140,14 @@ protected:
         ps->fastForward(30);
 
         // create a frosted screen in front of the camera, using our dynamic texture to "thaw" certain areas
-		Entity* ent = mSceneMgr->createEntity(SceneManager::PT_PLANE, SCENE_STATIC);
+        Entity* ent = mSceneMgr->createEntity(SceneManager::PT_PLANE, SCENE_STATIC);
+        ent->setName( "Dynamic Tex Plane" );
         ent->setMaterialName("Examples/Frost");
         SceneNode* node = mSceneMgr->getRootSceneNode( SCENE_STATIC )->createChildSceneNode( SCENE_STATIC );
         node->setPosition(0, 0, 50);
         node->attachObject(ent);
 
-        mPlaneSize = ent->getWorldAabb().getSize().x;   // remember the size of the plane
+        mPlaneSize = ent->getWorldAabbUpdated().getSize().x;   // remember the size of the plane
 
         mCursorQuery = mSceneMgr->createRayQuery(Ray());  // create a ray scene query for the cursor
 

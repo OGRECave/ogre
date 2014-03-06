@@ -110,6 +110,8 @@ namespace Ogre {
 
         // Default to billboard renderer
         setRenderer("billboard");
+
+        mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_FX_DEFAULT_MASK;
     }
     //-----------------------------------------------------------------------
     ParticleSystem::~ParticleSystem()
@@ -1170,11 +1172,6 @@ namespace Ogre {
     {
         // Sort descending by squared distance
         return - (sortPos - p->mPosition).squaredLength();
-    }
-    //-----------------------------------------------------------------------
-    uint32 ParticleSystem::getTypeFlags(void) const
-    {
-        return SceneManager::FX_TYPE_MASK;
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::initialiseEmittedEmitters(void)

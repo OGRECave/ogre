@@ -116,7 +116,6 @@ namespace Ogre {
     protected:
         SceneManager* mParentSceneMgr;
         uint32 mQueryMask;
-        uint32 mQueryTypeMask;
         set<WorldFragmentType>::type mSupportedWorldFragments;
         WorldFragmentType mWorldFragmentType;
     
@@ -136,22 +135,17 @@ namespace Ogre {
             from this query if a bitwise AND operation between this mask value and the
             MovableObject::getQueryFlags value is non-zero. The application will
             have to decide what each of the bits means.
+            The default initial query mask of a SceneQuery is
+            SceneManager::QUERY_ENTITY_DEFAULT_MASK
+        @note
+            By default, Ogre uses @SceneManager::QUERY_ENTITY_DEFAULT_MASK and Co.
+            to set each type of MovableObject's default query mask. This behavior
+            can be overriden though, just set the masks you don't need to 0 before
+            creating those objects.
         */
         virtual void setQueryMask(uint32 mask);
         /** Returns the current mask for this query. */
         virtual uint32 getQueryMask(void) const;
-
-        /** Sets the type mask for results of this query.
-        @remarks
-            This method allows you to set a 'type mask' to limit the results of this
-            query to certain types of objects. Whilst setQueryMask deals with flags
-            set per instance of object, this method deals with setting a mask on 
-            flags set per type of object. Both may exclude an object from query
-            results.
-        */
-        virtual void setQueryTypeMask(uint32 mask);
-        /** Returns the current mask for this query. */
-        virtual uint32 getQueryTypeMask(void) const;
 
         /** Tells the query what kind of world geometry to return from queries;
             often the full renderable geometry is not what is needed. 

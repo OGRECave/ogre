@@ -1041,12 +1041,6 @@ namespace Ogre
         bool hasMovableObjectFactory(const String& typeName) const;
         /// Get a MovableObjectFactory for the given type
         MovableObjectFactory* getMovableObjectFactory(const String& typeName);
-        /** Allocate the next MovableObject type flag.
-        @remarks
-            This is done automatically if MovableObjectFactory::requestTypeFlags
-            returns true; don't call this manually unless you're sure you need to.
-        */
-        uint32 _allocateNextMovableObjectTypeFlag(void);
 
         typedef ConstMapIterator<MovableObjectFactoryMap> MovableObjectFactoryIterator;
         /** Return an iterator over all the MovableObjectFactory instances currently
