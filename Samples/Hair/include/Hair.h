@@ -29,7 +29,7 @@ public:
     {
         mInfo["Title"] = "Hair";
         mInfo["Description"] = "Sample for terrain, water tessellation and the use of displacement mapping";
-        mInfo["Thumbnail"] = "thumb_tesselation.png";
+        mInfo["Thumbnail"] = "thumb_tessellation.png";
         mInfo["Category"] = "Unsorted";
         mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
     }
@@ -46,7 +46,7 @@ public:
         }
         if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tesselation shaders. Sorry!",
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tessellation shaders. Sorry!",
                 "Sample_Hair:testCapabilities");
         }
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_5_0") &&

@@ -22,11 +22,16 @@ using namespace Ogre;
 using namespace Ogre::RTShader;
 
 String RTShaderSRSSegmentedLights::Type = "Segmented_PerPixelLighting";
+Light *RTShaderSRSSegmentedLights::msBlankLight = NULL;
 
 //-----------------------------------------------------------------------
 RTShaderSRSSegmentedLights::RTShaderSRSSegmentedLights()
 {
-    msBlankLight = SegmentedDynamicLightManager::getSingleton().getSceneManager()->createLight();
+    if(!msBlankLight)
+    {
+        msBlankLight = SegmentedDynamicLightManager::getSingleton().getSceneManager()->createLight();
+        SegmentedDynamicLightManager::getSingleton().getSceneManager()->createSceneNode()->attachObject( msBlankLight );
+    }
     mTrackVertexColourType          = TVC_NONE;
     mSpecularEnable                 = false;
     mUseSegmentedLightTexture       = false;

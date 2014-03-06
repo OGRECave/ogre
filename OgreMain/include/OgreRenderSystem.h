@@ -714,7 +714,7 @@ namespace Ogre
         */
         virtual void _setTexture(size_t unit, bool enabled, const String &texname);
 
-        /** Binds a texture to a vertex, geometry, compute, tesselation hull
+        /** Binds a texture to a vertex, geometry, compute, tessellation hull
         or tessellation domain sampler.
         @remarks
         Not all rendersystems support separate vertex samplers. For those that
@@ -727,8 +727,8 @@ namespace Ogre
         virtual void _setVertexTexture(size_t unit, const TexturePtr& tex);
         virtual void _setGeometryTexture(size_t unit, const TexturePtr& tex);
         virtual void _setComputeTexture(size_t unit, const TexturePtr& tex);
-        virtual void _setTesselationHullTexture(size_t unit, const TexturePtr& tex);
-        virtual void _setTesselationDomainTexture(size_t unit, const TexturePtr& tex);
+        virtual void _setTessellationHullTexture(size_t unit, const TexturePtr& tex);
+        virtual void _setTessellationDomainTexture(size_t unit, const TexturePtr& tex);
 
         /**
         Sets the texture coordinate set to use for a texture unit.

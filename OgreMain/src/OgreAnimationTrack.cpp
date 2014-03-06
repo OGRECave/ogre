@@ -353,11 +353,12 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	NodeAnimationTrack::NodeAnimationTrack(Animation* parent, unsigned short handle)
 		: AnimationTrack(parent, handle), mTargetNode(0)
-		, mSplines(0), mSplineBuildNeeded(false)
-		, mUseShortestRotationPath(true)
-		,mInitialPosition( Vector3::ZERO )
-		,mInitialOrientation( Quaternion::IDENTITY )
-		,mInitialScale( Vector3::UNIT_SCALE )
+		, mInitialPosition( Vector3::ZERO )
+		, mInitialOrientation( Quaternion::IDENTITY )
+		, mInitialScale( Vector3::UNIT_SCALE )
+        , mSplines(0)
+        , mSplineBuildNeeded(false)
+        , mUseShortestRotationPath(true)
 	{
 	}
 	//---------------------------------------------------------------------

@@ -406,6 +406,11 @@ void SceneManager::destroyAllCameras(void)
     }
 }
 //-----------------------------------------------------------------------
+void SceneManager::clearFrameData(void)
+{
+    mGlobalLightList.lights.clear();
+}
+//-----------------------------------------------------------------------
 Light* SceneManager::createLight()
 {
     const size_t totalNumObjects = mLightMemoryManager.getTotalNumObjects() + 1;

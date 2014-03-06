@@ -282,7 +282,7 @@ PatchData PatchConstantHS( InputPatch<HSIn_Heightfield, 1> inputPatch )
     PatchData output;
 
 	float distance_to_camera;
-	float tesselation_factor;
+	float tessellation_factor;
 	float inside_tessellation_factor=0;
 	float in_frustum=0;
 
@@ -309,25 +309,25 @@ PatchData PatchConstantHS( InputPatch<HSIn_Heightfield, 1> inputPatch )
 	if((in_frustum) || (g_FrustumCullInHS ==0))
 	{
 		distance_to_camera=length(g_CameraPosition.xz-inputPatch[0].origin-float2(0,inputPatch[0].size.y*0.5));
-		tesselation_factor=CalculateTessellationFactor(distance_to_camera);
-		output.Edges[0] =  tesselation_factor;
-		inside_tessellation_factor+=tesselation_factor;
+		tessellation_factor=CalculateTessellationFactor(distance_to_camera);
+		output.Edges[0] =  tessellation_factor;
+		inside_tessellation_factor+=tessellation_factor;
 
 
 		distance_to_camera=length(g_CameraPosition.xz-inputPatch[0].origin-float2(inputPatch[0].size.x*0.5,0));
-		tesselation_factor=CalculateTessellationFactor(distance_to_camera);
-		output.Edges[1] =  tesselation_factor;
-		inside_tessellation_factor+=tesselation_factor;
+		tessellation_factor=CalculateTessellationFactor(distance_to_camera);
+		output.Edges[1] =  tessellation_factor;
+		inside_tessellation_factor+=tessellation_factor;
 
 		distance_to_camera=length(g_CameraPosition.xz-inputPatch[0].origin-float2(inputPatch[0].size.x,inputPatch[0].size.y*0.5));
-		tesselation_factor=CalculateTessellationFactor(distance_to_camera);
-		output.Edges[2] =  tesselation_factor;
-		inside_tessellation_factor+=tesselation_factor;
+		tessellation_factor=CalculateTessellationFactor(distance_to_camera);
+		output.Edges[2] =  tessellation_factor;
+		inside_tessellation_factor+=tessellation_factor;
 
 		distance_to_camera=length(g_CameraPosition.xz-inputPatch[0].origin-float2(inputPatch[0].size.x*0.5,inputPatch[0].size.y));
-		tesselation_factor=CalculateTessellationFactor(distance_to_camera);
-		output.Edges[3] =  tesselation_factor;
-		inside_tessellation_factor+=tesselation_factor;
+		tessellation_factor=CalculateTessellationFactor(distance_to_camera);
+		output.Edges[3] =  tessellation_factor;
+		inside_tessellation_factor+=tessellation_factor;
 		output.Inside[0] = output.Inside[1] = inside_tessellation_factor*0.25;
 	}
 	else

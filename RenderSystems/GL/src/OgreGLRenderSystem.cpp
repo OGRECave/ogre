@@ -1624,12 +1624,12 @@ namespace Ogre {
         _setTexture(unit, true, tex);
     }
     //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setTesselationHullTexture( size_t unit, const TexturePtr &tex )
+    void GLRenderSystem::_setTessellationHullTexture( size_t unit, const TexturePtr &tex )
     {
         _setTexture(unit, true, tex);
     }
     //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setTesselationDomainTexture( size_t unit, const TexturePtr &tex )
+    void GLRenderSystem::_setTessellationDomainTexture( size_t unit, const TexturePtr &tex )
     {
         _setTexture(unit, true, tex);
     }

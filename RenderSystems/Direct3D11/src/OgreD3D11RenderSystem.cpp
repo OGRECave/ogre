@@ -1821,7 +1821,7 @@ bail:
             _setTexture(stage, true, tex);  
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTesselationHullTexture(size_t stage, const TexturePtr& tex)
+    void D3D11RenderSystem::_setTessellationHullTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())
             _setTexture(stage, false, tex);
@@ -1829,7 +1829,7 @@ bail:
             _setTexture(stage, true, tex);  
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTesselationDomainTexture(size_t stage, const TexturePtr& tex)
+    void D3D11RenderSystem::_setTessellationDomainTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())
             _setTexture(stage, false, tex);

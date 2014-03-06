@@ -105,10 +105,10 @@ namespace Ogre
 
     public:
         CompositorPassDef( CompositorPassType passType, uint32 rtIndex ) :
-            mPassType( passType ),
+            mPassType( passType ), mRtIndex( rtIndex ),
             mVpLeft( 0 ), mVpTop( 0 ),
             mVpWidth( 1 ), mVpHeight( 1 ), mShadowMapIdx( 0 ),
-            mNumInitialPasses( -1 ), mIdentifier( 0 ), mRtIndex( rtIndex ),
+            mNumInitialPasses( -1 ), mIdentifier( 0 ),
             mBeginRtUpdate( true ), mEndRtUpdate( true ),
             mIncludeOverlays( false ) {}
 

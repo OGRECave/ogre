@@ -193,6 +193,10 @@ protected:
 
     ManualObject* createTextureAtlasObject();
     void createMaterialForTexture( const String & texName, bool isTextureAtlasTexture );
+
+    /** Return current specular state. */
+    Light * getLightNamedFromSceneManager(const String &name);
+
     // Types.
 protected:
     typedef vector<Entity*>::type   EntityList;

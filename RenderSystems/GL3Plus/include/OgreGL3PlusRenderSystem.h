@@ -305,11 +305,11 @@ namespace Ogre {
         /** See
          RenderSystem
          */
-        void _setTesselationHullTexture(size_t unit, const TexturePtr &tex);
+        void _setTessellationHullTexture(size_t unit, const TexturePtr &tex);
         /** See
          RenderSystem
          */
-        void _setTesselationDomainTexture(size_t unit, const TexturePtr &tex);
+        void _setTessellationDomainTexture(size_t unit, const TexturePtr &tex);
         /** See
             RenderSystem
         */

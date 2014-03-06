@@ -201,12 +201,12 @@ material Compute
 
                         }
 
-                        // tesselation_hull_program_ref Compute/THS
+                        // tessellation_hull_program_ref Compute/THS
                         // {
 
                         // }
 
-                        // tesselation_domain_program_ref Compute/TDS
+                        // tessellation_domain_program_ref Compute/TDS
                         // {
 
                         // }

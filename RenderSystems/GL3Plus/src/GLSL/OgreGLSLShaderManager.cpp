@@ -91,11 +91,11 @@ namespace Ogre {
         {
             gpt = GPT_VERTEX_PROGRAM;
         }
-        else if (paramType->second == "tesselation_hull_program")
+        else if (paramType->second == "tessellation_hull_program")
         {
             gpt = GPT_HULL_PROGRAM;
         }
-        else if (paramType->second == "tesselation_domain_program")
+        else if (paramType->second == "tessellation_domain_program")
         {
             gpt = GPT_DOMAIN_PROGRAM;
         }

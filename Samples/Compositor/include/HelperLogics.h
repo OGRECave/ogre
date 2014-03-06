@@ -28,7 +28,6 @@ class SamplePostprocessWorkspaceListener : public Ogre::CompositorWorkspaceListe
     Ogre::Timer *timer;
 
     int mVpWidth, mVpHeight;
-    int mBloomSize;
     // Array params - have to pack in groups of 4 since this is how Cg generates them
     // also prevents dependent texture read problems if ops don't require swizzle
     float mBloomTexWeights[15][4];

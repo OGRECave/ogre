@@ -12,9 +12,9 @@ same license as the rest of the engine.
 -----------------------------------------------------------------------------
 */
 
-#include "HelperLogics.h"
-
 #include "Ogre.h"
+
+#include "HelperLogics.h"
 
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/Pass/OgreCompositorPassDef.h"

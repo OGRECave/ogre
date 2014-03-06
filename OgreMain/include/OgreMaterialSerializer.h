@@ -240,8 +240,8 @@ namespace Ogre {
         void writeTechnique(const Technique* pTech);
         void writePass(const Pass* pPass);
         void writeVertexProgramRef(const Pass* pPass);
-        void writeTesselationHullProgramRef(const Pass* pPass);
-        void writeTesselationDomainProgramRef(const Pass* pPass);
+        void writeTessellationHullProgramRef(const Pass* pPass);
+        void writeTessellationDomainProgramRef(const Pass* pPass);
         void writeShadowCasterVertexProgramRef(const Pass* pPass);
         void writeShadowCasterFragmentProgramRef(const Pass* pPass);
         void writeGeometryProgramRef(const Pass* pPass);
