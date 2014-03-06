@@ -54,6 +54,9 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
+        // Make this viewport work with shader generator scheme.
+        mCamera->getLastViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
         return SdkSample::frameRenderingQueued(evt);   // don't forget the parent class updates!
     }
 
@@ -123,12 +126,7 @@ protected:
         
         mSRSTextureFogFactory->setBackgroundTextureName("early_morning.jpg");
 
-        
-        
         mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-        // Make this viewport work with shader generator scheme.
-        mCamera->getLastViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
     }
 
 

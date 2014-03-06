@@ -243,12 +243,25 @@ void Sample_ShaderSystem::sliderMoved(Slider* slider)
     }
 }
 
+Light * Sample_ShaderSystem::getLightNamedFromSceneManager(const String &name)
+{
+    LightArray lightList = mSceneMgr->getGlobalLightList().lights;
+
+    for (unsigned int i = 0; i < lightList.size(); ++i)
+    {
+        if(lightList[i]->getName() == name)
+            return lightList[i];
+    }
+
+    return NULL;
+}
+
 //-----------------------------------------------------------------------
 bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
 {   
-    if (mSceneMgr->hasLight(SPOT_LIGHT_NAME))
+    if (getLightNamedFromSceneManager(SPOT_LIGHT_NAME) != NULL)
     {
-        Light* light = mSceneMgr->getLight(SPOT_LIGHT_NAME);
+        Light* light = getLightNamedFromSceneManager(SPOT_LIGHT_NAME);
 
         light->setPosition(mCamera->getDerivedPosition() + mCamera->getDerivedUp() * 20.0);
         light->setDirection(mCamera->getDerivedDirection());
@@ -267,7 +280,6 @@ bool Sample_ShaderSystem::frameRenderingQueued( const FrameEvent& evt )
     
     return SdkSample::frameRenderingQueued(evt);
 }
-
 
 //-----------------------------------------------------------------------
 //void Sample_ShaderSystem::setupView()
@@ -1005,7 +1017,7 @@ void Sample_ShaderSystem::updateInstancedViewports(bool enabled)
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible)
 {
-    if (mSceneMgr->hasLight(lightName))
+    if (getLightNamedFromSceneManager(lightName) != NULL)
     {       
         // Case it is the point light,
         // toggle its visibility and billboard set visibility.
@@ -1025,7 +1037,7 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
                     mSceneMgr->getRootSceneNode()->removeChild(mPointLightNode);
                 }
             }   
-            mSceneMgr->getLight(lightName)->setVisible(visible);
+            getLightNamedFromSceneManager(lightName)->setVisible(visible);
         }
         
         // Case it is the directional light,
@@ -1044,7 +1056,7 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
         // Spot light has no scene node representation.
         else
         {
-            mSceneMgr->getLight(lightName)->setVisible(visible);
+            getLightNamedFromSceneManager(lightName)->setVisible(visible);
         }   
 
         RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -1052,19 +1064,19 @@ void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible
         int lightCount[3] = {0};
 
         // Update point light count.
-        if (mSceneMgr->getLight(POINT_LIGHT_NAME)->isVisible())
+        if (getLightNamedFromSceneManager(POINT_LIGHT_NAME)->isVisible())
         {
             lightCount[0] = 1;
         }
 
         // Update directional light count.
-        if (mSceneMgr->getLight(DIRECTIONAL_LIGHT_NAME)->isVisible())
+        if (getLightNamedFromSceneManager(DIRECTIONAL_LIGHT_NAME)->isVisible())
         {
             lightCount[1] = 1;
         }
 
         // Update spot light count.
-        if (mSceneMgr->getLight(SPOT_LIGHT_NAME)->isVisible())
+        if (getLightNamedFromSceneManager(SPOT_LIGHT_NAME)->isVisible())
         {
             lightCount[2] = 1;
         }

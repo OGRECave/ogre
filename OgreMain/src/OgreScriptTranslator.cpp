@@ -7823,7 +7823,6 @@ namespace Ogre{
                     }
                     else
                     {
-                        bool val = true;
                         if(!getBoolean(prop->values.front(), &mPassDef->mIncludeOverlays))
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,

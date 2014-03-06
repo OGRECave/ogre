@@ -125,7 +125,7 @@ vertex_program Ogre/PNTrianglesTessellation/simple_tessellation_vs hlsl
 	}	
 }
 
-tessellation_hull_program Ogre/PNTrianglesTessellation/simple_tessellation_hs hlsl
+tesselation_hull_program Ogre/PNTrianglesTessellation/simple_tessellation_hs hlsl
 {
 	source simple_tessellation.hlsl
 	entry_point simple_tessellation_hs
@@ -137,7 +137,7 @@ tessellation_hull_program Ogre/PNTrianglesTessellation/simple_tessellation_hs hl
 	}
 }
 
-tessellation_domain_program Ogre/PNTrianglesTessellation/simple_tessellation_ds hlsl
+tesselation_domain_program Ogre/PNTrianglesTessellation/simple_tessellation_ds hlsl
 {
 	source simple_tessellation.hlsl
 	entry_point simple_tessellation_ds
@@ -173,11 +173,11 @@ material Ogre/SimpleTessellation
 			{
 			}
 						
-			tessellation_hull_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_hs
+			tesselation_hull_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_hs
 			{
 			}
 			
-			tessellation_domain_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ds
+			tesselation_domain_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ds
 			{
 			}
 			
@@ -196,7 +196,7 @@ material Ogre/SimpleTessellation
 // Adaptive tessellation - new shaders
 // just the hull shader is different from the simple tessellation
 
-tessellation_hull_program Ogre/PNTrianglesTessellation/adaptive_tessellation_hs hlsl
+tesselation_hull_program Ogre/PNTrianglesTessellation/adaptive_tessellation_hs hlsl
 {
 	source adaptive_tessellation.hlsl
 	entry_point color_tessellation_hs
@@ -222,12 +222,12 @@ material Ogre/AdaptiveTessellation
 			
 			}
 			
-			tessellation_hull_program_ref Ogre/PNTrianglesTessellation/adaptive_tessellation_hs
+			tesselation_hull_program_ref Ogre/PNTrianglesTessellation/adaptive_tessellation_hs
 			{
 			
 			}
 			
-			tessellation_domain_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ds
+			tesselation_domain_program_ref Ogre/PNTrianglesTessellation/simple_tessellation_ds
 			{
 			
 			}
@@ -262,7 +262,7 @@ vertex_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_vs 
 	}
 }
 
-tessellation_hull_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_hs hlsl
+tesselation_hull_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_hs hlsl
 {
 	source adaptivePNTriangles_tessellation.hlsl
 	entry_point color_tessellation_hs
@@ -276,7 +276,7 @@ tessellation_hull_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tesse
 	}
 }
 
-tessellation_domain_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_ds hlsl
+tesselation_domain_program Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_ds hlsl
 {
 	source adaptivePNTriangles_tessellation.hlsl
 	entry_point color_tessellation_ds
@@ -322,12 +322,12 @@ material Ogre/AdaptivePNTrianglesTessellation
 			
 			}
 			
-			tessellation_hull_program_ref Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_hs
+			tesselation_hull_program_ref Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_hs
 			{
 			
 			}
 			
-			tessellation_domain_program_ref Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_ds
+			tesselation_domain_program_ref Ogre/PNTrianglesTessellation/adaptivePNTriangles_tessellation_ds
 			{
 			
 			}

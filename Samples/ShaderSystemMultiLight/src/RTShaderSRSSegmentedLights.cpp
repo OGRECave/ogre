@@ -22,6 +22,7 @@ using namespace Ogre;
 using namespace Ogre::RTShader;
 
 String RTShaderSRSSegmentedLights::Type = "Segmented_PerPixelLighting";
+Light *RTShaderSRSSegmentedLights::msBlankLight = NULL;
 
 //-----------------------------------------------------------------------
 RTShaderSRSSegmentedLights::RTShaderSRSSegmentedLights()

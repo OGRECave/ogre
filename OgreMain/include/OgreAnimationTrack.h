@@ -416,7 +416,7 @@ namespace Ogre
 		mutable Splines* mSplines;
 		mutable bool mSplineBuildNeeded;
 		/// Defines if rotation is done using shortest path
-		mutable bool mUseShortestRotationPath ;
+		mutable bool mUseShortestRotationPath;
 	};
 
     /** Specialised AnimationTrack for dealing with node transforms.

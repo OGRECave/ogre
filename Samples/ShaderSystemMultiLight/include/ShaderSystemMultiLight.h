@@ -6,6 +6,7 @@
 #include "RTShaderSRSSegmentedLights.h"
 #include "OgreControllerManager.h"
 #include "OgreBillboard.h"
+#include "OgreNameGenerator.h"
 
 /*
 Part of the original guidelines under which the RTSS was created was to emulate the fixed pipeline mechanism as close as possible.  
@@ -94,6 +95,9 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
+        // Make this viewport work with shader generator scheme.
+        mCamera->getLastViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
         // Move the lights along their paths
         for(size_t i = 0 ; i < mLights.size() ; ++i)
         {
@@ -157,7 +161,7 @@ protected:
         mSceneMgr->getRootSceneNode()->attachObject(head);
 
         setupShaderGenerator();
-    
+
         setupLights();
     }
         
@@ -183,9 +187,6 @@ protected:
                     
         
         mGen->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-        // Make this viewport work with shader generator scheme.
-        mSceneMgr->getCurrentViewport()->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
     }
 
 
@@ -194,6 +195,7 @@ protected:
         mSceneMgr->setAmbientLight(ColourValue(0.1, 0.1, 0.1));
         // set the single directional light
         Light* light = mSceneMgr->createLight();
+        mSceneMgr->createSceneNode()->attachObject( light );
         light->setType(Light::LT_DIRECTIONAL);
         light->setDirection(Vector3(-1,-1,0).normalisedCopy());
         light->setDiffuseColour(ColourValue(0.1, 0.1, 0.1));
@@ -252,12 +254,12 @@ protected:
 
         // Attach a light with the same colour to the light node
         state.light = mSceneMgr->createLight();
+        state.node->attachObject(state.light);
         state.light->setCastShadows(false);
         state.light->setType(mLights.size() % 10 ? Light::LT_SPOTLIGHT : Light::LT_POINT);
         state.light->setDirection(Vector3::NEGATIVE_UNIT_Y);
         state.light->setAttenuation(200,0,0,0);
         state.light->setDiffuseColour(lightColor);
-        state.node->attachObject(state.light);
 
         // Attach a flare with the same colour to the light node
         state.bbs = mSceneMgr->createBillboardSet(1);
