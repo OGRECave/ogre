@@ -15,7 +15,7 @@ public:
     {
         mInfo["Title"] = "Island";
         mInfo["Description"] = "Sample for terrain, water tessellation and the use of displacement mapping";
-        mInfo["Thumbnail"] = "thumb_tesselation.png";
+        mInfo["Thumbnail"] = "thumb_tessellation.png";
         mInfo["Category"] = "Unsorted";
         mInfo["Help"] = "Top Left: Multi-frame\nTop Right: Scrolling\nBottom Left: Rotation\nBottom Right: Scaling";
     }
