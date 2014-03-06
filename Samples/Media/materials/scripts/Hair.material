@@ -513,7 +513,7 @@ vertex_program Ogre/Hair/InterpolateVSMultiStrandCollisions hlsl
 	}
 }
 
-tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrand hlsl
+tessellation_hull_program Ogre/Hair/InterpolateHSMultiStrand hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateHSMultiStrand
@@ -525,7 +525,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrand hlsl
 	}
 }
 
-tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandDepth hlsl
+tessellation_hull_program Ogre/Hair/InterpolateHSMultiStrandDepth hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateHSMultiStrandDepth
@@ -537,7 +537,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandDepth hlsl
 	}
 }
 
-tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandCollisions hlsl
+tessellation_hull_program Ogre/Hair/InterpolateHSMultiStrandCollisions hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateHSMultiStrandCollisions
@@ -549,7 +549,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSMultiStrandCollisions hlsl
 	}
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrand hlsl
+tessellation_domain_program Ogre/Hair/InterpolateDSMultiStrand hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateDSMultiStrand
@@ -570,7 +570,7 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrand hlsl
 	}
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandDepth hlsl
+tessellation_domain_program Ogre/Hair/InterpolateDSMultiStrandDepth hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateDSMultiStrandDepth
@@ -586,7 +586,7 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandDepth hlsl
 	}
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisions hlsl
+tessellation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisions hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateDSMultiStrandCollisions
@@ -598,7 +598,7 @@ tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisions hlsl
 	}
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisionsWithGS hlsl
+tessellation_domain_program Ogre/Hair/InterpolateDSMultiStrandCollisionsWithGS hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateDSMultiStrandCollisionsWithGS
@@ -1050,7 +1050,7 @@ geometry_program Ogre/Hair/GS_ARRAY hlsl
 	}	
 }
 
-tesselation_hull_program Ogre/Hair/InterpolateHSSingleStrand hlsl
+tessellation_hull_program Ogre/Hair/InterpolateHSSingleStrand hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateHSSingleStrand
@@ -1062,7 +1062,7 @@ tesselation_hull_program Ogre/Hair/InterpolateHSSingleStrand hlsl
 	}	
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_DEPTH hlsl
+tessellation_domain_program Ogre/Hair/InterpolateDSSingleStrand_DEPTH hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateHSSingleStrand
@@ -1079,7 +1079,7 @@ tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_DEPTH hlsl
 	}	
 }
 
-tesselation_domain_program Ogre/Hair/InterpolateDSSingleStrand_NORMAL hlsl
+tessellation_domain_program Ogre/Hair/InterpolateDSSingleStrand_NORMAL hlsl
 {
 	source Hair.hlsl
 	entry_point InterpolateDSSingleStrand_NORMAL
@@ -1530,12 +1530,12 @@ material Ogre/Hair/RenderHair
 			
 			}
 			
-			tesselation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrand
+			tessellation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrand
 			{
 			
 			}
 			
-			tesselation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrand
+			tessellation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrand
 			{
 			
 			}
@@ -1582,12 +1582,12 @@ material Ogre/Hair/RenderHair
 			
 			}
 			
-			tesselation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandDepth
+			tessellation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandDepth
 			{
 			
 			}
 			
-			tesselation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandDepth
+			tessellation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandDepth
 			{
 			
 			}
@@ -1614,12 +1614,12 @@ material Ogre/Hair/RenderHair
 			
 			}
 			
-			tesselation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandDepth
+			tessellation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandDepth
 			{
 			
 			}
 			
-			tesselation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandDepth
+			tessellation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandDepth
 			{
 			
 			}
@@ -1691,12 +1691,12 @@ material Ogre/Hair/RenderHair
 			
 			}
 			
-			tesselation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandCollisions
+			tessellation_hull_program_ref Ogre/Hair/InterpolateHSMultiStrandCollisions
 			{
 			
 			}
 			
-			tesselation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandCollisionsWithGS
+			tessellation_domain_program_ref Ogre/Hair/InterpolateDSMultiStrandCollisionsWithGS
 			{
 			
 			}
@@ -1842,12 +1842,12 @@ material Ogre/Hair/RenderHair
 			
 			}
 			
-			tesselation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
+			tessellation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
 			{
 			
 			}
 			
-			tesselation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_DEPTH
+			tessellation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_DEPTH
 			{
 			
 			}
@@ -1872,12 +1872,12 @@ material Ogre/Hair/RenderHair
 			
 			}
 			
-			tesselation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
+			tessellation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
 			{
 			
 			}
 			
-			tesselation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_DEPTH
+			tessellation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_DEPTH
 			{
 			
 			}
@@ -1904,12 +1904,12 @@ material Ogre/Hair/RenderHair
 			
 			}
 			
-			tesselation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
+			tessellation_hull_program_ref Ogre/Hair/InterpolateHSSingleStrand
 			{
 			
 			}
 			
-			tesselation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_NORMAL
+			tessellation_domain_program_ref Ogre/Hair/InterpolateDSSingleStrand_NORMAL
 			{
 			
 			}

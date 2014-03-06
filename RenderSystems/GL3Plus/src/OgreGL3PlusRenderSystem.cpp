@@ -995,12 +995,12 @@ namespace Ogre {
         _setTexture(unit, true, tex);
     }
 
-    void GL3PlusRenderSystem::_setTesselationHullTexture( size_t unit, const TexturePtr &tex )
+    void GL3PlusRenderSystem::_setTessellationHullTexture( size_t unit, const TexturePtr &tex )
     {
         _setTexture(unit, true, tex);
     }
 
-    void GL3PlusRenderSystem::_setTesselationDomainTexture( size_t unit, const TexturePtr &tex )
+    void GL3PlusRenderSystem::_setTessellationDomainTexture( size_t unit, const TexturePtr &tex )
     {
         _setTexture(unit, true, tex);
     }

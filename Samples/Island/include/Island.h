@@ -32,7 +32,7 @@ public:
         }
         if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tesselation shaders. Sorry!",
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tessellation shaders. Sorry!",
                 "Sample_Island:testCapabilities");
         }
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_5_0") &&

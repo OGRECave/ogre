@@ -59,7 +59,7 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
         }
         else if (!caps->hasCapability(RSC_TESSELLATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
         {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support tesselation programs, "
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support tessellation programs, "
                         "so you cannot run this sample. Sorry!",
                         "Sample_Compute::testCapabilities");
         }

@@ -17,7 +17,7 @@ vertex_program Ogre/Tessellation/VertexProgram unified
     delegate Ogre/Tessellation/VertexProgramGLSL
 }
 
-tesselation_hull_program Ogre/Tessellation/TessellationHullProgramHLSL hlsl
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgramHLSL hlsl
 {
     source Tessellation.hlsl
     entry_point HS
@@ -29,7 +29,7 @@ tesselation_hull_program Ogre/Tessellation/TessellationHullProgramHLSL hlsl
     }
 }
 
-tesselation_hull_program Ogre/Tessellation/TessellationHullProgramGLSL glsl
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgramGLSL glsl
 {
     source TessellationTh.glsl
     syntax glsl400
@@ -40,13 +40,13 @@ tesselation_hull_program Ogre/Tessellation/TessellationHullProgramGLSL glsl
     }
 }
 
-tesselation_hull_program Ogre/Tessellation/TessellationHullProgram unified
+tessellation_hull_program Ogre/Tessellation/TessellationHullProgram unified
 {
     delegate Ogre/Tessellation/TessellationHullProgramHLSL
     delegate Ogre/Tessellation/TessellationHullProgramGLSL
 }
 
-tesselation_domain_program Ogre/Tessellation/TessellationDomainProgramHLSL hlsl
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgramHLSL hlsl
 {
     source Tessellation.hlsl
     entry_point DS
@@ -58,7 +58,7 @@ tesselation_domain_program Ogre/Tessellation/TessellationDomainProgramHLSL hlsl
     }
 }
 
-tesselation_domain_program Ogre/Tessellation/TessellationDomainProgramGLSL glsl
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgramGLSL glsl
 {
     source TessellationTd.glsl
     syntax glsl400
@@ -69,7 +69,7 @@ tesselation_domain_program Ogre/Tessellation/TessellationDomainProgramGLSL glsl
     }
 }
 
-tesselation_domain_program Ogre/Tessellation/TessellationDomainProgram unified
+tessellation_domain_program Ogre/Tessellation/TessellationDomainProgram unified
 {
     delegate Ogre/Tessellation/TessellationDomainProgramHLSL
     delegate Ogre/Tessellation/TessellationDomainProgramGLSL
@@ -108,12 +108,12 @@ material Ogre/TessellationExample
 
             }
 
-            tesselation_hull_program_ref Ogre/Tessellation/TessellationHullProgram
+            tessellation_hull_program_ref Ogre/Tessellation/TessellationHullProgram
             {
 
             }
 
-            tesselation_domain_program_ref Ogre/Tessellation/TessellationDomainProgram
+            tessellation_domain_program_ref Ogre/Tessellation/TessellationDomainProgram
             {
 
             }

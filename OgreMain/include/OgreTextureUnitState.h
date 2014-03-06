@@ -1255,7 +1255,7 @@ protected:
 
         bool mIsDefaultAniso;
         bool mIsDefaultFiltering;
-        /// Binding type (fragment, vertex, tesselation hull and domain pipeline).
+        /// Binding type (fragment, vertex, tessellation hull and domain pipeline).
         BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
         ContentType mContentType;

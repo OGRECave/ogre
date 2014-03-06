@@ -4278,12 +4278,12 @@ namespace Ogre
 
             if(pPass->hasTessellationHullProgram())
             {
-                writeTesselationHullProgramRef(pPass);
+                writeTessellationHullProgramRef(pPass);
             }
 
             if(pPass->hasTessellationHullProgram())
             {
-                writeTesselationDomainProgramRef(pPass);
+                writeTessellationDomainProgramRef(pPass);
             }
             
             if (pPass->hasGeometryProgram())
@@ -4982,15 +4982,15 @@ namespace Ogre
             pPass->getVertexProgram(), pPass->getVertexProgramParameters());
     }
     //-----------------------------------------------------------------------
-    void MaterialSerializer::writeTesselationHullProgramRef(const Pass* pPass)
+    void MaterialSerializer::writeTessellationHullProgramRef(const Pass* pPass)
     {
-        writeGpuProgramRef("tesselation_hull_program_ref",
+        writeGpuProgramRef("tessellation_hull_program_ref",
             pPass->getTessellationHullProgram(), pPass->getTessellationHullProgramParameters());
     }
     //-----------------------------------------------------------------------
-    void MaterialSerializer::writeTesselationDomainProgramRef(const Pass* pPass)
+    void MaterialSerializer::writeTessellationDomainProgramRef(const Pass* pPass)
     {
-        writeGpuProgramRef("tesselation_domain_program_ref",
+        writeGpuProgramRef("tessellation_domain_program_ref",
             pPass->getTessellationDomainProgram(), pPass->getTessellationDomainProgramParameters());
     }
     //-----------------------------------------------------------------------

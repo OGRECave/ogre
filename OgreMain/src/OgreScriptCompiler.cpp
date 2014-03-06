@@ -994,8 +994,8 @@ namespace Ogre
         mIds["vertex_program"] = ID_VERTEX_PROGRAM;
         mIds["geometry_program"] = ID_GEOMETRY_PROGRAM;
         mIds["fragment_program"] = ID_FRAGMENT_PROGRAM;
-        mIds["tesselation_hull_program"] = ID_TESSELLATION_HULL_PROGRAM;
-        mIds["tesselation_domain_program"] = ID_TESSELLATION_DOMAIN_PROGRAM;
+        mIds["tessellation_hull_program"] = ID_TESSELLATION_HULL_PROGRAM;
+        mIds["tessellation_domain_program"] = ID_TESSELLATION_DOMAIN_PROGRAM;
         mIds["compute_program"] = ID_COMPUTE_PROGRAM;
         mIds["technique"] = ID_TECHNIQUE;
         mIds["pass"] = ID_PASS;
@@ -1003,8 +1003,8 @@ namespace Ogre
         mIds["vertex_program_ref"] = ID_VERTEX_PROGRAM_REF;
         mIds["geometry_program_ref"] = ID_GEOMETRY_PROGRAM_REF;
         mIds["fragment_program_ref"] = ID_FRAGMENT_PROGRAM_REF;
-        mIds["tesselation_hull_program_ref"] = ID_TESSELLATION_HULL_PROGRAM_REF;
-        mIds["tesselation_domain_program_ref"] = ID_TESSELLATION_DOMAIN_PROGRAM_REF;
+        mIds["tessellation_hull_program_ref"] = ID_TESSELLATION_HULL_PROGRAM_REF;
+        mIds["tessellation_domain_program_ref"] = ID_TESSELLATION_DOMAIN_PROGRAM_REF;
         mIds["compute_program_ref"] = ID_COMPUTE_PROGRAM_REF;
         mIds["shadow_caster_vertex_program_ref"] = ID_SHADOW_CASTER_VERTEX_PROGRAM_REF;
         mIds["shadow_caster_fragment_program_ref"] = ID_SHADOW_CASTER_FRAGMENT_PROGRAM_REF;

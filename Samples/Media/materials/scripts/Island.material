@@ -196,7 +196,7 @@ vertex_program Ogre/Island/PassThroughVS hlsl
 	}
 }
 
-tesselation_hull_program Ogre/Island/PatchHS hlsl
+tessellation_hull_program Ogre/Island/PatchHS hlsl
 {
 	source Island.hlsl
 	entry_point PatchHS
@@ -212,7 +212,7 @@ tesselation_hull_program Ogre/Island/PatchHS hlsl
 	}
 }
 
-tesselation_domain_program Ogre/Island/HeightFieldPatchDS hlsl
+tessellation_domain_program Ogre/Island/HeightFieldPatchDS hlsl
 {
 	source Island.hlsl
 	entry_point HeightFieldPatchDS
@@ -268,11 +268,11 @@ material Ogre/Island/RenderHeightfield
 			{
 			
 			}
-			tesselation_hull_program_ref Ogre/Island/PatchHS
+			tessellation_hull_program_ref Ogre/Island/PatchHS
 			{
 			
 			}
-			tesselation_domain_program_ref Ogre/Island/HeightFieldPatchDS
+			tessellation_domain_program_ref Ogre/Island/HeightFieldPatchDS
 			{
 			
 			}			
@@ -292,11 +292,11 @@ material Ogre/Island/RenderHeightfield
 			{
 			
 			}
-			tesselation_hull_program_ref Ogre/Island/PatchHS
+			tessellation_hull_program_ref Ogre/Island/PatchHS
 			{
 			
 			}
-			tesselation_domain_program_ref Ogre/Island/HeightFieldPatchDS
+			tessellation_domain_program_ref Ogre/Island/HeightFieldPatchDS
 			{
 			
 			}			
@@ -312,7 +312,7 @@ material Ogre/Island/RenderHeightfield
 	}
 }
 
-tesselation_domain_program Ogre/Island/WaterPatchDS hlsl
+tessellation_domain_program Ogre/Island/WaterPatchDS hlsl
 {
 	source Island.hlsl
 	entry_point WaterPatchDS
@@ -361,11 +361,11 @@ material Ogre/Island/RenderWater
 			{
 			
 			}
-			tesselation_hull_program_ref Ogre/Island/PatchHS
+			tessellation_hull_program_ref Ogre/Island/PatchHS
 			{
 			
 			}
-			tesselation_domain_program_ref Ogre/Island/WaterPatchDS
+			tessellation_domain_program_ref Ogre/Island/WaterPatchDS
 			{
 			
 			}			
