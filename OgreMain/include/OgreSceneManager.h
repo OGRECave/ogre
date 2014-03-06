@@ -1225,6 +1225,9 @@ namespace Ogre {
         */
         virtual Light* createLight();
 
+        /// Clears temporary buffers and other data that needs to live every frame.
+        void clearFrameData(void);
+
         const LightListInfo& getGlobalLightList(void) const { return mGlobalLightList; }
 
         /** Retrieve a set of clipping planes for a given light. 

@@ -1002,6 +1002,13 @@ namespace Ogre {
         if (!_updateAllRenderTargets())
             return false;
 
+        itor = mSceneManagerEnum->getSceneManagerIterator();
+        while( itor.hasMoreElements() )
+        {
+            SceneManager *sceneManager = itor.getNext();
+            sceneManager->clearFrameData();
+        }
+
         mFrameStats->addSample( mTimer->getMicroseconds() );
 
         return _fireFrameEnded();
@@ -1027,6 +1034,13 @@ namespace Ogre {
 
         if (!_updateAllRenderTargets(evt))
             return false;
+
+        itor = mSceneManagerEnum->getSceneManagerIterator();
+        while( itor.hasMoreElements() )
+        {
+            SceneManager *sceneManager = itor.getNext();
+            sceneManager->clearFrameData();
+        }
 
         now = mTimer->getMicroseconds();
         mFrameStats->addSample( now );
