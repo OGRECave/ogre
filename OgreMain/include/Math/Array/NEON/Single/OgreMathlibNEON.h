@@ -399,6 +399,15 @@ namespace Ogre
             return vcgtq_f32( a, b );
         }
 
+        /** Returns the result of "a >= b"
+        @return
+            r[i] = a[i] >= b[i] ? 0xffffffff : 0;
+        */
+        static inline ArrayMaskR CompareGreaterEqual( ArrayReal a, ArrayReal b )
+        {
+            return vcgeq_f32( a, b );
+        }
+
         static inline ArrayReal SetAll( Real val )
         {
             return vdupq_n_f32( val );

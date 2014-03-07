@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 
 #include "Math/Array/OgreMathlib.h"
+#include "Math/Array/OgreArraySphere.h"
 #include "Math/Array/OgreBooleanMask.h"
 
 namespace Ogre {
@@ -47,6 +48,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultIntersectionSceneQuery::execute(IntersectionSceneQueryListener* listener)
     {
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                     "IntersectionSceneQuery not yet ported to Ogre 2.x!",
+                     "DefaultIntersectionSceneQuery::execute");
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         // Iterate over all movable types
         Root::MovableObjectFactoryIterator factIt = 
@@ -139,31 +143,76 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
     {
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        // Iterate over all movable types
-        Root::MovableObjectFactoryIterator factIt = 
-            Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
-        {
-            SceneManager::MovableObjectIterator objItA = 
-                mParentSceneMgr->getMovableObjectIterator(
-                factIt.getNext()->getType());
-            while (objItA.hasMoreElements())
-            {
-                MovableObject* a = objItA.getNext();
-                // skip whole group if type doesn't match
-                if (!(a->getTypeFlags() & mQueryTypeMask))
-                    break;
+        assert( mFirstRq < mLastRq && "This query will never hit any result!" );
 
-                if ((a->getQueryFlags() & mQueryMask) && 
-                    a->isInScene() &&
-                    mAABB.intersects(a->getWorldBoundingBox()))
-                {
-                    if (!listener->queryResult(a)) return;
-                }
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+        {
+            ObjectMemoryManager &memoryManager = mParentSceneMgr->_getEntityMemoryManager(
+                                                        static_cast<SceneMemoryMgrTypes>(i) );
+
+            const size_t numRenderQueues = memoryManager.getNumRenderQueues();
+
+            bool keepIterating = true;
+            size_t firstRq = std::min<size_t>( mFirstRq, numRenderQueues );
+            size_t lastRq  = std::min<size_t>( mLastRq,  numRenderQueues );
+
+            for( size_t j=firstRq; j<lastRq && keepIterating; ++j )
+            {
+                ObjectData objData;
+                const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
+                keepIterating = execute( objData, totalObjs, listener );
             }
         }
+    }
+    //---------------------------------------------------------------------
+    bool DefaultAxisAlignedBoxSceneQuery::execute( ObjectData objData, size_t numNodes,
+                                                   SceneQueryListener* listener )
+    {
+        ArrayAabb aabb( ArrayVector3::ZERO, ArrayVector3::ZERO );
+        aabb.setAll( Aabb::newFromExtents( mAABB.getMinimum(), mAABB.getMaximum() ) );
+
+        ArrayInt ourQueryMask = Mathlib::SetAll( mQueryMask );
+
+        for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+        {
+            ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                        (objData.mVisibilityFlags);
+            ArrayInt * RESTRICT_ALIAS queryFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                        (objData.mQueryFlags);
+
+            //hitMask = hitMask && ( (*queryFlags & ourQueryMask) != 0 ) && isVisble;
+            ArrayMaskI hitMask = CastRealToInt( aabb.intersects( *objData.mWorldAabb ) );
+            hitMask = Mathlib::And( hitMask, Mathlib::TestFlags4( *queryFlags, ourQueryMask ) );
+            hitMask = Mathlib::And( hitMask,
+                                    Mathlib::TestFlags4( *visibilityFlags,
+                                        Mathlib::SetAll( VisibilityFlags::LAYER_VISIBILITY ) ) );
+
+            const uint32 scalarMask = BooleanMask4::getScalarMask( hitMask );
+
+            for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+            {
+                //Decompose the result for analyzing each MovableObject's
+                //There's no need to check objData.mOwner[j] is null because
+                //we set mVisibilityFlags to 0 on slot removals
+                if( IS_BIT_SET( j, scalarMask ) )
+                {
+                    if( !listener->queryResult( objData.mOwner[j] ) )
+                        return false;
+                }
+
+#ifndef NDEBUG
+                //Queries must be performed after all bounds have been updated
+                //(i.e. SceneManager::updateSceneGraph does this for you), and don't
+                //move the objects between that call and this query.
+                assert( !objData.mOwner[j]->isCachedAabbOutOfDate() &&
+                        "Perform the queries after MovableObject::updateAllBounds has been called!" );
 #endif
+            }
+
+            objData.advancePack();
+        }
+
+        return true;
     }
     //---------------------------------------------------------------------
     DefaultRaySceneQuery::
@@ -296,6 +345,8 @@ namespace Ogre {
                         "Perform the queries after MovableObject::updateAllBounds has been called!" );
 #endif
             }
+
+            objData.advancePack();
         }
 
         return true;
@@ -314,38 +365,80 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultSphereSceneQuery::execute(SceneQueryListener* listener)
     {
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
-        Sphere testSphere;
+        assert( mFirstRq < mLastRq && "This query will never hit any result!" );
 
-        // Iterate over all movable types
-        Root::MovableObjectFactoryIterator factIt = 
-            Root::getSingleton().getMovableObjectFactoryIterator();
-        while(factIt.hasMoreElements())
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
         {
-            SceneManager::MovableObjectIterator objItA = 
-                mParentSceneMgr->getMovableObjectIterator(
-                factIt.getNext()->getType());
-            while (objItA.hasMoreElements())
-            {
-                MovableObject* a = objItA.getNext();
-                // skip whole group if type doesn't match
-                if (!(a->getTypeFlags() & mQueryTypeMask))
-                    break;
-                // Skip unattached
-                if (!a->isInScene() || 
-                    !(a->getQueryFlags() & mQueryMask))
-                    continue;
+            ObjectMemoryManager &memoryManager = mParentSceneMgr->_getEntityMemoryManager(
+                                                        static_cast<SceneMemoryMgrTypes>(i) );
 
-                // Do sphere / sphere test
-                testSphere.setCenter(a->getParentNode()->_getDerivedPosition());
-                testSphere.setRadius(a->getBoundingRadius());
-                if (mSphere.intersects(testSphere))
-                {
-                    if (!listener->queryResult(a)) return;
-                }
+            const size_t numRenderQueues = memoryManager.getNumRenderQueues();
+
+            bool keepIterating = true;
+            size_t firstRq = std::min<size_t>( mFirstRq, numRenderQueues );
+            size_t lastRq  = std::min<size_t>( mLastRq,  numRenderQueues );
+
+            for( size_t j=firstRq; j<lastRq && keepIterating; ++j )
+            {
+                ObjectData objData;
+                const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
+                keepIterating = execute( objData, totalObjs, listener );
             }
         }
+    }
+    //---------------------------------------------------------------------
+    bool DefaultSphereSceneQuery::execute( ObjectData objData, size_t numNodes,
+                                           SceneQueryListener* listener )
+    {
+        ArraySphere ourSphere;
+        ourSphere.setAll( mSphere );
+
+        ArrayInt ourQueryMask = Mathlib::SetAll( mQueryMask );
+
+        for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
+        {
+            ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                        (objData.mVisibilityFlags);
+            ArrayInt * RESTRICT_ALIAS queryFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                        (objData.mQueryFlags);
+            ArrayReal * RESTRICT_ALIAS worldRadius = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+                                                                        (objData.mWorldRadius);
+
+            ArraySphere testSphere( *worldRadius, objData.mWorldAabb->mCenter );
+
+            //hitMask = hitMask && ( (*queryFlags & ourQueryMask) != 0 ) && isVisble;
+            ArrayMaskI hitMask = CastRealToInt( ourSphere.intersects( testSphere ) );
+            hitMask = Mathlib::And( hitMask, Mathlib::TestFlags4( *queryFlags, ourQueryMask ) );
+            hitMask = Mathlib::And( hitMask,
+                                    Mathlib::TestFlags4( *visibilityFlags,
+                                        Mathlib::SetAll( VisibilityFlags::LAYER_VISIBILITY ) ) );
+
+            const uint32 scalarMask = BooleanMask4::getScalarMask( hitMask );
+
+            for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+            {
+                //Decompose the result for analyzing each MovableObject's
+                //There's no need to check objData.mOwner[j] is null because
+                //we set mVisibilityFlags to 0 on slot removals
+                if( IS_BIT_SET( j, scalarMask ) )
+                {
+                    if( !listener->queryResult( objData.mOwner[j] ) )
+                        return false;
+                }
+
+#ifndef NDEBUG
+                //Queries must be performed after all bounds have been updated
+                //(i.e. SceneManager::updateSceneGraph does this for you), and don't
+                //move the objects between that call and this query.
+                assert( !objData.mOwner[j]->isCachedAabbOutOfDate() &&
+                        "Perform the queries after MovableObject::updateAllBounds has been called!" );
 #endif
+            }
+
+            objData.advancePack();
+        }
+
+        return true;
     }
     //---------------------------------------------------------------------
     DefaultPlaneBoundedVolumeListSceneQuery::
@@ -362,6 +455,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void DefaultPlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listener)
     {
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                     "PlaneBoundedVolumeListSceneQuery not yet ported to Ogre 2.x!",
+                     "DefaultPlaneBoundedVolumeListSceneQuery::execute");
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         // Iterate over all movable types
         Root::MovableObjectFactoryIterator factIt = 

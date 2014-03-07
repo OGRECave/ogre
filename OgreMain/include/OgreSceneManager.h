@@ -3240,7 +3240,8 @@ namespace Ogre {
         ~DefaultSphereSceneQuery();
 
         /** See SceneQuery. */
-        void execute(SceneQueryListener* listener);
+        virtual void execute(SceneQueryListener* listener);
+        bool execute( ObjectData objData, size_t numNodes, SceneQueryListener* listener );
     };
     /** Default implementation of PlaneBoundedVolumeListSceneQuery. */
     class _OgreExport DefaultPlaneBoundedVolumeListSceneQuery : public PlaneBoundedVolumeListSceneQuery
@@ -3260,7 +3261,8 @@ namespace Ogre {
         ~DefaultAxisAlignedBoxSceneQuery();
 
         /** See RayScenQuery. */
-        void execute(SceneQueryListener* listener);
+        virtual void execute(SceneQueryListener* listener);
+        bool execute( ObjectData objData, size_t numNodes, SceneQueryListener* listener );
     };
     
 
