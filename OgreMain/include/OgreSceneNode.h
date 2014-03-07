@@ -63,9 +63,6 @@ namespace Ogre {
         /// SceneManager which created this node
         SceneManager* mCreator;
 
-        /** @copydoc Node::updateFromParentImpl. */
-        virtual void updateFromParentImpl(void);
-
         /** See Node. */
         Node* createChildImpl( SceneMemoryMgrTypes sceneType );
 
@@ -310,9 +307,9 @@ namespace Ogre {
         /// As Node::getDebugRenderable, except scaling is automatically determined
         //virtual DebugRenderable* getDebugRenderable();
 
-
-
-
+#ifndef NDEBUG
+        virtual void _setCachedTransformOutOfDate(void);
+#endif
     };
     /** @} */
     /** @} */

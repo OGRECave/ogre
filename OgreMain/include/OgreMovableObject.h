@@ -75,8 +75,6 @@ namespace Ogre {
             virtual void objectAttached(MovableObject*) {}
             /** MovableObject has been detached from a node */
             virtual void objectDetached(MovableObject*) {}
-            /** MovableObject has been moved */
-            virtual void objectMoved(MovableObject*) {}
         };
 
     protected:
@@ -183,10 +181,6 @@ namespace Ogre {
 
         /** Detaches an object from a parent SceneNode if attached. */
         void detachFromParent(void);
-
-        /** Internal method called to notify the object that it has been moved.
-        */
-        virtual void _notifyMoved(void);
 
         /// @See Node::_callMemoryChangeListeners
         virtual void _notifyParentNodeMemoryChanged(void) {}
@@ -602,8 +596,10 @@ namespace Ogre {
         virtual bool isDebugDisplayEnabled(void) const { return mDebugDisplay; }
 
 
-
-
+#ifndef NDEBUG
+        void _setCachedAabbOutOfDate(void)                  { mCachedAabbOutOfDate = true; }
+        bool isCachedAabbOutOfDate() const                  { return mCachedAabbOutOfDate; }
+#endif
 
     };
 

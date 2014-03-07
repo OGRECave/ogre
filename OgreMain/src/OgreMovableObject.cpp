@@ -161,19 +161,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void MovableObject::_notifyMoved(void)
-    {
-#ifndef NDEBUG
-        mCachedAabbOutOfDate = true;
-#endif
-
-        // Notify listener if exists
-        if (mListener)
-        {
-            mListener->objectMoved(this);
-        }
-    }
-    //-----------------------------------------------------------------------
     bool MovableObject::isStatic() const
     {
         return mObjectMemoryManager->getMemoryManagerType() == SCENE_STATIC;

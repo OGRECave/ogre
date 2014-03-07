@@ -407,11 +407,6 @@ namespace Ogre
         mBatchOwner->_notifyStaticDirty();
     }
     //-----------------------------------------------------------------------
-    void InstancedEntity::_notifyMoved(void)
-    {
-        MovableObject::_notifyMoved();
-    }
-    //-----------------------------------------------------------------------
     void InstancedEntity::_notifyAttached( Node* parent )
     {
         bool different = (parent != mParentNode);

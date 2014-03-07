@@ -44,6 +44,12 @@ THE SOFTWARE.
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreBooleanMask.h"
 
+#ifndef NDEBUG
+    #define CACHED_TRANSFORM_OUT_OF_DATE() this->_setCachedTransformOutOfDate()
+#else
+    #define CACHED_TRANSFORM_OUT_OF_DATE() ((void)0)
+#endif
+
 namespace Ogre {
     //-----------------------------------------------------------------------
     Node::Node( IdType id, NodeMemoryManager *nodeMemoryManager, Node *parent ) :
@@ -417,10 +423,7 @@ namespace Ogre {
         assert(!q.isNaN() && "Invalid orientation supplied as parameter");
         q.normalise();
         mTransform.mOrientation->setFromQuaternion( q, mTransform.mIndex );
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
+        CACHED_TRANSFORM_OUT_OF_DATE();
     }
     //-----------------------------------------------------------------------
     void Node::setOrientation( Real w, Real x, Real y, Real z )
@@ -438,10 +441,7 @@ namespace Ogre {
     {
         assert(!pos.isNaN() && "Invalid vector supplied as parameter");
         mTransform.mPosition->setFromVector3( pos, mTransform.mIndex );
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
+        CACHED_TRANSFORM_OUT_OF_DATE();
     }
     //-----------------------------------------------------------------------
     void Node::setPosition(Real x, Real y, Real z)
@@ -503,10 +503,7 @@ namespace Ogre {
         }
 
         mTransform.mPosition->setFromVector3( position, mTransform.mIndex );
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
+        CACHED_TRANSFORM_OUT_OF_DATE();
     }
     //-----------------------------------------------------------------------
     void Node::translate(Real x, Real y, Real z, TransformSpace relativeTo)
@@ -578,10 +575,7 @@ namespace Ogre {
         }
 
         mTransform.mOrientation->setFromQuaternion( orientation, mTransform.mIndex );
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
+        CACHED_TRANSFORM_OUT_OF_DATE();
     }
 
     
@@ -696,10 +690,7 @@ namespace Ogre {
     {
         assert(!inScale.isNaN() && "Invalid vector supplied as parameter");
         mTransform.mScale->setFromVector3( inScale, mTransform.mIndex );
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
+        CACHED_TRANSFORM_OUT_OF_DATE();
     }
     //-----------------------------------------------------------------------
     void Node::setScale(Real x, Real y, Real z)
@@ -715,10 +706,7 @@ namespace Ogre {
     void Node::setInheritOrientation(bool inherit)
     {
         mTransform.mInheritOrientation[mTransform.mIndex] = inherit;
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
+        CACHED_TRANSFORM_OUT_OF_DATE();
     }
     //-----------------------------------------------------------------------
     bool Node::getInheritOrientation(void) const
@@ -729,10 +717,7 @@ namespace Ogre {
     void Node::setInheritScale(bool inherit)
     {
         mTransform.mInheritScale[mTransform.mIndex] = inherit;
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
+        CACHED_TRANSFORM_OUT_OF_DATE();
     }
     //-----------------------------------------------------------------------
     bool Node::getInheritScale(void) const
@@ -744,10 +729,7 @@ namespace Ogre {
     {
         mTransform.mScale->setFromVector3( mTransform.mScale->getAsVector3( mTransform.mIndex ) *
                                             inScale, mTransform.mIndex );
-
-#ifndef NDEBUG
-        mCachedTransformOutOfDate = true;
-#endif
+        CACHED_TRANSFORM_OUT_OF_DATE();
     }
     //-----------------------------------------------------------------------
     void Node::scale(Real x, Real y, Real z)
@@ -772,6 +754,22 @@ namespace Ogre {
         // NB use squared length rather than real depth to avoid square root
         return diff.squaredLength();
     }
+    //---------------------------------------------------------------------
+#ifndef NDEBUG
+    void Node::_setCachedTransformOutOfDate(void)
+    {
+        mCachedTransformOutOfDate = true;
+
+        NodeVec::const_iterator itor = mChildren.begin();
+        NodeVec::const_iterator end  = mChildren.end();
+
+        while( itor != end )
+        {
+            (*itor)->_setCachedTransformOutOfDate();
+            ++itor;
+        }
+    }
+#endif
     //---------------------------------------------------------------------
     Node::DebugRenderable* Node::getDebugRenderable(Real scaling)
     {
@@ -917,3 +915,4 @@ namespace Ogre {
     }
 }
 
+#undef CACHED_TRANSFORM_OUT_OF_DATE

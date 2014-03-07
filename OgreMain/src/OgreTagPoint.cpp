@@ -161,11 +161,6 @@ namespace Ogre {
                 mDerivedPosition += entityParentNode->_getDerivedPosition();
             }
         }
-
-        if (mChildObject)
-        {
-            mChildObject->_notifyMoved();
-        }
     }
     //-----------------------------------------------------------------------------
     const LightList& TagPoint::getLights(void) const

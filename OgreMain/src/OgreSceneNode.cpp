@@ -239,21 +239,6 @@ namespace Ogre {
         return Node::getDebugRenderable(sz);
     }*/
     //-----------------------------------------------------------------------
-    void SceneNode::updateFromParentImpl(void)
-    {
-        Node::updateFromParentImpl();
-
-        // Notify objects that it has been moved
-        ObjectVec::iterator itor = mAttachments.begin();
-        ObjectVec::iterator end  = mAttachments.end();
-
-        while( itor != end )
-        {
-            (*itor)->_notifyMoved();
-            ++itor;
-        }
-    }
-    //-----------------------------------------------------------------------
     Node* SceneNode::createChildImpl( SceneMemoryMgrTypes sceneType )
     {
         assert(mCreator);
@@ -532,4 +517,20 @@ namespace Ogre {
             }
         }
     }
+    //-----------------------------------------------------------------------
+#ifndef NDEBUG
+    void SceneNode::_setCachedTransformOutOfDate(void)
+    {
+        Node::_setCachedTransformOutOfDate();
+
+        ObjectVec::const_iterator itor = mAttachments.begin();
+        ObjectVec::const_iterator end  = mAttachments.end();
+
+        while( itor != end )
+        {
+            (*itor)->_setCachedAabbOutOfDate();
+            ++itor;
+        }
+    }
+#endif
 }

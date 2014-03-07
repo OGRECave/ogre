@@ -2446,30 +2446,30 @@ void SceneManager::updateSceneGraph()
     updateAllBounds( mEntitiesMemoryManagerUpdateList );
     updateAllBounds( mLightsMemoryManagerCulledList );
 
-	{
-		// Auto-track nodes
-		AutoTrackingSceneNodeVec::const_iterator itor = mAutoTrackingSceneNodes.begin();
-		AutoTrackingSceneNodeVec::const_iterator end  = mAutoTrackingSceneNodes.end();
+    {
+        // Auto-track nodes
+        AutoTrackingSceneNodeVec::const_iterator itor = mAutoTrackingSceneNodes.begin();
+        AutoTrackingSceneNodeVec::const_iterator end  = mAutoTrackingSceneNodes.end();
 
-		while( itor != end )
-		{
-			itor->source->lookAt( itor->target->_getDerivedPosition() + itor->offset,
-									 Node::TS_WORLD, itor->localDirection );
-			itor->source->_getDerivedPositionUpdated();
-			++itor;
-		}
-	}
+        while( itor != end )
+        {
+            itor->source->lookAt( itor->target->_getDerivedPosition() + itor->offset,
+                                     Node::TS_WORLD, itor->localDirection );
+            itor->source->_getDerivedPositionUpdated();
+            ++itor;
+        }
+    }
 
-	{
-		// Auto-track camera if required
-		CameraList::const_iterator itor = mCameras.begin();
-		CameraList::const_iterator end  = mCameras.end();
-		while( itor != end )
-		{
-			(*itor)->_autoTrack();
-			++itor;
-		}
-	}
+    {
+        // Auto-track camera if required
+        CameraList::const_iterator itor = mCameras.begin();
+        CameraList::const_iterator end  = mCameras.end();
+        while( itor != end )
+        {
+            (*itor)->_autoTrack();
+            ++itor;
+        }
+    }
 
     buildLightList();
 
@@ -3596,18 +3596,23 @@ void SceneManager::_queueSkiesForRendering(Camera* cam)
         // The plane position relative to the camera has already been set up
         mSkyPlaneNode->setPosition(cam->getDerivedPosition());
         mSkyPlaneNode->_getDerivedPositionUpdated();
+        mSkyPlaneEntity->getWorldAabbUpdated();
     }
 
     if (mSkyBoxNode)
     {
         mSkyBoxNode->setPosition(cam->getDerivedPosition());
         mSkyBoxNode->_getDerivedPositionUpdated();
+        mSkyBoxObj->getWorldAabbUpdated();
     }
 
     if (mSkyDomeNode)
     {
         mSkyDomeNode->setPosition(cam->getDerivedPosition());
         mSkyDomeNode->_getDerivedPositionUpdated();
+
+        for (size_t i = 0; i < 5; ++i)
+            mSkyDomeEntity[i]->getWorldAabbUpdated();
     }
 }
 //---------------------------------------------------------------------

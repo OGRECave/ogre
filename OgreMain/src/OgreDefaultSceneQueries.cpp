@@ -287,6 +287,14 @@ namespace Ogre {
                     if( !listener->queryResult( objData.mOwner[j], scalarDistance[j] ) )
                         return false;
                 }
+
+#ifndef NDEBUG
+                //Queries must be performed after all bounds have been updated
+                //(i.e. SceneManager::updateSceneGraph does this for you), and don't
+                //move the objects between that call and this query.
+                assert( !objData.mOwner[j]->isCachedAabbOutOfDate() &&
+                        "Perform the queries after MovableObject::updateAllBounds has been called!" );
+#endif
             }
         }
 

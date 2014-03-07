@@ -152,7 +152,6 @@ namespace Ogre {
         */
         virtual void updateFromParentImpl(void);
 
-
         /** Internal method for creating a new child node - must be overridden per subclass. */
         virtual Node* createChildImpl( SceneMemoryMgrTypes sceneType ) = 0;
 
@@ -733,6 +732,7 @@ namespace Ogre {
         virtual void _callMemoryChangeListeners(void) = 0;
 
 #ifndef NDEBUG
+        virtual void _setCachedTransformOutOfDate(void);
         bool isCachedTransformOutOfDate(void) const             { return mCachedTransformOutOfDate; }
 #endif
     };

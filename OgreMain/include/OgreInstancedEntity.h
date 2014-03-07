@@ -233,8 +233,6 @@ namespace Ogre
         /// @copydoc MovableObject::_notifyStaticDirty
         virtual void _notifyStaticDirty(void) const;
 
-        /// Overridden so we can tell the InstanceBatch it needs to update it's bounds
-        void _notifyMoved(void);
         /// Overloaded so we can register ourselves for updating our animations
         virtual void _notifyAttached( Node* parent );
 
