@@ -227,8 +227,10 @@ String PlayPen_testManualLOD::getLODMesh()
     MeshPtr msh1 = (MeshPtr)MeshManager::getSingleton().load("robot.mesh", 
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-    msh1->createManualLodLevel(200, "razor.mesh");
-    msh1->createManualLodLevel(500, "sphere.mesh");
+    LodConfig lodConfig(msh1);
+    lodConfig.createManualLodLevel(5, "razor.mesh");
+    lodConfig.createManualLodLevel(10, "sphere.mesh");
+    MeshLodGenerator().generateLodLevels(lodConfig);
 
     return msh1->getName();
 
@@ -286,8 +288,10 @@ String PlayPen_testManualLODFromFile::getLODMesh()
     MeshPtr msh1 = (MeshPtr)MeshManager::getSingleton().load("robot.mesh", 
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-    msh1->createManualLodLevel(200, "razor.mesh");
-    msh1->createManualLodLevel(500, "sphere.mesh");
+    LodConfig lodConfig(msh1);
+    lodConfig.createManualLodLevel(5, "razor.mesh");
+    lodConfig.createManualLodLevel(10, "sphere.mesh");
+    MeshLodGenerator().generateLodLevels(lodConfig);
 
     // this time, we save this data to a file and re-load it
 

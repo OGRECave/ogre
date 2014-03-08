@@ -31,10 +31,6 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
-		//--------------------------------------------------------
-		//	TODO: Ray Scene Queries aren't yet working in 2.x !!!
-		//--------------------------------------------------------
-
         // shoot a ray from the cursor to the plane
         Ray ray = mTrayMgr->getCursorRay(mCamera);
         mCursorQuery->setRay(ray);
