@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "OgreArchiveManager.h"
 #include "OgreFileSystem.h"
 #include "OgreConfigFile.h"
-#include "OgreSkeletonManager.h"
+#include "OgreOldSkeletonManager.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreMaterialManager.h"
@@ -84,7 +84,7 @@ void MeshSerializerTests::setUp()
     OGRE_NEW LodStrategyManager();
     OGRE_NEW DefaultHardwareBufferManager();
     OGRE_NEW MeshManager();
-    OGRE_NEW SkeletonManager();
+    OGRE_NEW OldSkeletonManager();
     ArchiveManager* archiveMgr = OGRE_NEW ArchiveManager();
     archiveMgr->addArchiveFactory(OGRE_NEW FileSystemArchiveFactory());
 
@@ -128,7 +128,7 @@ void MeshSerializerTests::setUp()
         copyFile(mMeshFullPath, mMeshFullPath + ".bak");
     }
     mSkeletonFullPath = "";
-    mSkeleton = SkeletonManager::getSingleton().load("jaiqua.skeleton", "Popular").staticCast<Skeleton>();
+    mSkeleton = OldSkeletonManager::getSingleton().load("jaiqua.skeleton", "Popular").staticCast<Skeleton>();
     getResourceFullPath(mSkeleton, mSkeletonFullPath);
     if (!copyFile(mSkeletonFullPath + ".bak", mSkeletonFullPath)) {
         // If there is no backup, create one.
@@ -166,7 +166,7 @@ void MeshSerializerTests::tearDown()
         mSkeleton.setNull();
     }
     OGRE_DELETE MeshManager::getSingletonPtr();
-    OGRE_DELETE SkeletonManager::getSingletonPtr();
+    OGRE_DELETE OldSkeletonManager::getSingletonPtr();
     OGRE_DELETE DefaultHardwareBufferManager::getSingletonPtr();
     OGRE_DELETE ArchiveManager::getSingletonPtr();
     OGRE_DELETE MaterialManager::getSingletonPtr();
@@ -359,11 +359,11 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
 
     if ((a->getNumLodLevels() > 1 || b->getNumLodLevels() > 1) &&
         ((version < MESH_VERSION_1_8 || (!isLodMixed(a) && !isLodMixed(b))) && // mixed lod only supported in v1.10+
-         (version < MESH_VERSION_1_4 || (a->getLodStrategy() == DistanceLodStrategy::getSingletonPtr() &&
-                                         b->getLodStrategy() == DistanceLodStrategy::getSingletonPtr())))) { // Lod Strategy only supported in v1.41+
+         (version < MESH_VERSION_1_4 || (a->getLodStrategyName() != DistanceLodStrategy::getSingletonPtr()->getName() &&
+                                         b->getLodStrategyName() != DistanceLodStrategy::getSingletonPtr()->getName())))) { // Lod Strategy only supported in v1.41+
         CPPUNIT_ASSERT(a->getNumLodLevels() == b->getNumLodLevels());
         CPPUNIT_ASSERT(a->hasManualLodLevel() == b->hasManualLodLevel());
-        CPPUNIT_ASSERT(a->getLodStrategy() == b->getLodStrategy());
+        CPPUNIT_ASSERT(a->getLodStrategyName() == b->getLodStrategyName());
 
         int numLods = a->getNumLodLevels();
         for (int i = 0; i < numLods; i++) {

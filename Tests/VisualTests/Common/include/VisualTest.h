@@ -147,7 +147,7 @@ class VisualTest : public OgreBites::Sample
     /** virtual so that advanced samples such as Sample_Compositor can override this method to change the default behavior
      *  if setupCompositor() is overridden, be aware @mBackgroundColour will be ignored
      */
-    virtual void setupCompositor()
+    virtual Ogre::CompositorWorkspace* setupCompositor()
     {
         Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
@@ -157,7 +157,7 @@ class VisualTest : public OgreBites::Sample
             compositorManager->createBasicWorkspaceDef( mInfo["Title"] + " Workspace", mBackgroundColour,
                                                         Ogre::IdString() );
         }
-        compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+        return compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
     }
 
     // a set of frame numbers at which to trigger screenshots
