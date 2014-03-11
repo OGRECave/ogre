@@ -62,10 +62,6 @@ namespace OgreBites
             mDetailsPanel = 0;
             mCursorWasVisible = false;
             mDragLook = false;
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-            mRightCamera = 0;
-            mRightViewport = 0;
-#endif
         }
 
         virtual ~SdkSample() {}
@@ -102,26 +98,6 @@ namespace OgreBites
                 mCamera->setOrientation(Ogre::StringConverter::parseQuaternion(state["CameraOrientation"]));
             }
         }
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		virtual bool frameStarted(const Ogre::FrameEvent& evt)
-		{
-			if (mWindow->isStereoEnabled() && NULL != mRightCamera)
-			{
-				mRightCamera->setPosition(mCamera->getPosition());
-				mRightCamera->setOrientation(mCamera->getOrientation());
-				mRightCamera->setNearClipDistance(mCamera->getNearClipDistance());
-				mRightCamera->setFarClipDistance(mCamera->getFarClipDistance());
-				mRightCamera->setAspectRatio(mCamera->getAspectRatio());
-				mRightCamera->setFocalLength(mCamera->getFocalLength());
-				Ogre::Vector2 frustumOffset = mCamera->getFrustumOffset();
-				mRightCamera->setFrustumOffset(-frustumOffset);
-				mRightCamera->moveRelative(Ogre::Vector3(-frustumOffset.x, -frustumOffset.y, 0.0f));
-			}
-
-			return true;
-		}
-#endif
 
         virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt)
         {
@@ -345,48 +321,6 @@ namespace OgreBites
             }   
 #endif // INCLUDE_RTSHADER_SYSTEM
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-            if (mWindow->isStereoEnabled())
-            {
-                // Swap the images for the left and right eyes
-                if (evt.key == OIS::KC_M)
-                {
-                    if (mWindow->isStereoEnabled() && NULL != mRightViewport)
-                    {
-                        Ogre::ColourBufferType temp = mViewport->getDrawBuffer();
-                        mViewport->setDrawBuffer(mRightViewport->getDrawBuffer());
-                        mRightViewport->setDrawBuffer(temp);
-                        mDetailsPanel->setParamValue("Swap Eyes", Ogre::StringConverter::toString(mViewport->getDrawBuffer() != Ogre::CBT_BACK_LEFT));
-                    }
-                }
-
-                // Decrease / Increase the focal length
-                if (evt.key == OIS::KC_COMMA)
-                {
-                    if (mCamera->getFocalLength() > 0.5)
-                        mCamera->setFocalLength(mCamera->getFocalLength() - 0.5f);
-                    mDetailsPanel->setParamValue("Focal Length", Ogre::StringConverter::toString(mCamera->getFocalLength()));
-                }
-                else if (evt.key == OIS::KC_PERIOD)
-                {
-                    mCamera->setFocalLength(mCamera->getFocalLength() + 0.5f);
-                    mDetailsPanel->setParamValue("Focal Length", Ogre::StringConverter::toString(mCamera->getFocalLength()));
-                }
-
-                // Decrease / Increase the frustum offset
-                if (evt.key == OIS::KC_LBRACKET)
-                {
-                    mCamera->setFrustumOffset(mCamera->getFrustumOffset().x + 0.1f, 0);
-                    mDetailsPanel->setParamValue("Frustum Offset", Ogre::StringConverter::toString(-mCamera->getFrustumOffset().x));
-                }
-                else if (evt.key == OIS::KC_RBRACKET)
-                {
-                    mCamera->setFrustumOffset(mCamera->getFrustumOffset().x - 0.1f, 0);
-                    mDetailsPanel->setParamValue("Frustum Offset", Ogre::StringConverter::toString(-mCamera->getFrustumOffset().x));
-                }
-            }
-#endif
-
 #if OGRE_PROFILING
             // Toggle visibility of profiler window
             else if (evt.key == OIS::KC_P)
@@ -542,16 +476,6 @@ namespace OgreBites
             // scene->getTechnique(0)->getOutputTargetPass()->setMaterialScheme(Ogre::Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme());
 #endif
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			if (mWindow->isStereoEnabled())
-			{
-				items.push_back("");
-				items.push_back("Swap Eyes");
-				items.push_back("Focal Length");
-				items.push_back("Frustum Offset");
-			}
-#endif
-
             mDetailsPanel = mTrayMgr->createParamsPanel(TL_NONE, "DetailsPanel", 200, items);
             mDetailsPanel->hide();
 
@@ -572,15 +496,6 @@ namespace OgreBites
             mDetailsPanel->setParamValue(13, "Low");
             mDetailsPanel->setParamValue(14, "0");
             mDetailsPanel->setParamValue(15, "0");                                                          
-#endif
-
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			if (mWindow->isStereoEnabled())
-			{
-				mDetailsPanel->setParamValue("Swap Eyes", Ogre::StringConverter::toString(mViewport->getDrawBuffer() != Ogre::CBT_BACK_LEFT));
-				mDetailsPanel->setParamValue("Focal Length", Ogre::StringConverter::toString(mCamera->getFocalLength()));
-				mDetailsPanel->setParamValue("Frustum Offset", Ogre::StringConverter::toString(-mCamera->getFrustumOffset().x));
-			}
 #endif
 
             setupContent();
@@ -612,18 +527,6 @@ namespace OgreBites
             mCamera->setAutoAspectRatio(true);
             mCamera->setNearClipDistance(5);
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-            if (mWindow->isStereoEnabled())
-            {
-                mCamera->setFocalLength(10.0f);
-                mCamera->setFrustumOffset(-0.05f, 0.0f);
-                mRightCamera = mSceneMgr->createCamera("RightMainCamera");
-                mRightViewport = mWindow->addViewport(mRightCamera, 1);
-                mViewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
-                mRightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
-            }
-#endif
-
             mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
         }
 
@@ -650,10 +553,6 @@ namespace OgreBites
         ParamsPanel* mDetailsPanel;         // sample details panel
         bool mCursorWasVisible;             // was cursor visible before dialog appeared
         bool mDragLook;                     // click and drag to free-look
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-        Ogre::Camera* mRightCamera;         // Right stereo camera
-        Ogre::Viewport* mRightViewport;     // Right stereo viewport
-#endif
     };
 }
 
