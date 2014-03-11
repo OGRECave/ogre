@@ -517,11 +517,24 @@ namespace Ogre {
         GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
         GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
 
+        GLint currentFBO = 0;
+        GLuint sampleFramebuffer = 0;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO));
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &sampleFramebuffer));
+        
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer));
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, currentFBO));
+        OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
+        
         // Read pixel data from the framebuffer
         OGRE_CHECK_GL_ERROR(glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                                          (GLsizei)width, (GLsizei)height,
                                          format, type, data));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
+        
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
+        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &sampleFramebuffer));
 
         // Create a CGImage with the pixel data
         // If your OpenGL ES content is opaque, use kCGImageAlphaNoneSkipLast to ignore the alpha channel
