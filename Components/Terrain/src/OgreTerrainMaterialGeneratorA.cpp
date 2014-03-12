@@ -348,10 +348,10 @@ namespace Ogre
             {
                 mShaderGen = OGRE_NEW ShaderHelperHLSL();
             }
-            else if (hmgr.isLanguageSupported("glsl"))
-            {
-                mShaderGen = OGRE_NEW ShaderHelperGLSL();
-            }
+//            else if (hmgr.isLanguageSupported("glsl"))
+//            {
+//                mShaderGen = OGRE_NEW ShaderHelperGLSL();
+//            }
             else if (hmgr.isLanguageSupported("glsles"))
             {
                 mShaderGen = OGRE_NEW ShaderHelperGLSLES();

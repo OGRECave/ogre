@@ -204,6 +204,8 @@ namespace Ogre
         mRootNode = sm->getRootSceneNode()->createChildSceneNode();
         sm->addListener(this);
 
+        Root::getSingleton().addFrameListener(this);
+
         WorkQueue* wq = Root::getSingleton().getWorkQueue();
         mWorkQueueChannel = wq->getChannel("Ogre/Terrain");
         wq->addRequestHandler(mWorkQueueChannel, this);
@@ -238,6 +240,7 @@ namespace Ogre
             mSceneMgr->destroySceneNode(mRootNode);
             mSceneMgr->removeListener(this);
         }
+        Root::getSingleton().removeFrameListener(this);
     }
     //---------------------------------------------------------------------
     const AxisAlignedBox& Terrain::getAABB() const
@@ -768,7 +771,7 @@ namespace Ogre
         }
 
         // Create & load quadtree
-        mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+        mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_DYNAMIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
         mQuadTree->prepare(stream);
 
         // stop uncompressing
@@ -902,7 +905,7 @@ namespace Ogre
         mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
         memset(mDeltaData, 0, sizeof(float) * numVertices);
 
-        mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+        mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_DYNAMIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
         mQuadTree->prepare();
 
         // calculate entire terrain
@@ -2256,12 +2259,11 @@ namespace Ogre
         return size*size - prevSize*prevSize;
     }
     //---------------------------------------------------------------------
-    void Terrain::preFindVisibleObjects(SceneManager* source, 
-        SceneManager::IlluminationRenderStage irs, Viewport* v)
+    bool Terrain::frameStarted(const FrameEvent& evt)
     {
         // Early-out
         if (!mIsLoaded)
-            return;
+            return true;
 
         // check deferred updates
         unsigned long currMillis = Root::getSingleton().getTimer()->getMilliseconds();
@@ -2276,7 +2278,17 @@ namespace Ogre
             if (!mCompositeMapUpdateCountdown)
                 updateCompositeMap();
         }
-        mLastMillis = currMillis;
+        return true;
+    }
+    //---------------------------------------------------------------------
+    void Terrain::preFindVisibleObjects(SceneManager* source, 
+        SceneManager::IlluminationRenderStage irs, Viewport* v)
+    {
+        // Early-out
+        if (!mIsLoaded)
+            return;
+
+        mLastMillis = Root::getSingleton().getTimer()->getMilliseconds();;
         // only calculate LOD once per LOD camera, per frame, per viewport height
         const Camera* lodCamera = source->getCameraInProgress()->getLodCamera();
         unsigned long frameNum = Root::getSingleton().getNextFrameNumber();
@@ -2534,6 +2546,9 @@ namespace Ogre
             }
             mMaterialGenerationCount = mMaterialGenerator->getChangeCount();
             mMaterialDirty = false;
+
+            if(mQuadTree)
+                mQuadTree->notifyMaterialChanged();
         }
         if (mMaterialParamsDirty)
         {
@@ -4575,7 +4590,7 @@ namespace Ogre
             mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
             memset(mDeltaData, 0, sizeof(float) * numVertices);
 
-            mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+            mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_DYNAMIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
             mQuadTree->prepare();
 
             // calculate entire terrain

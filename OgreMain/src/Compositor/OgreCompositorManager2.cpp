@@ -322,18 +322,21 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
                                              RenderTarget *finalRenderTarget, Camera *defaultCam,
-                                             IdString definitionName, bool bEnabled )
+                                             IdString definitionName, bool bEnabled, int position )
     {
         CompositorChannel channel;
         channel.target = finalRenderTarget;
-        return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled );
+        return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled, position );
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
                                              const CompositorChannel &finalRenderTarget,
-                                             Camera *defaultCam, IdString definitionName, bool bEnabled )
+                                             Camera *defaultCam, IdString definitionName,
+                                             bool bEnabled, int position )
     {
         validateAllNodes();
+
+        CompositorWorkspace *workspace = 0;
 
         CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( definitionName );
         if( itor == mWorkspaceDefs.end() )
@@ -344,13 +347,19 @@ namespace Ogre
         }
         else
         {
-            CompositorWorkspace* workspace = OGRE_NEW CompositorWorkspace(
+            workspace = OGRE_NEW CompositorWorkspace(
                                 Id::generateNewId<CompositorWorkspace>(), itor->second,
                                 finalRenderTarget, sceneManager, defaultCam, mRenderSystem, bEnabled );
-            mWorkspaces.push_back( workspace );
+
+            position = std::min<int>( position, mWorkspaces.size() );
+
+            if( position < 0 )
+                mWorkspaces.push_back( workspace );
+            else
+                mWorkspaces.insert( mWorkspaces.begin() + position, workspace );
         }
 
-        return mWorkspaces.back();
+        return workspace;
     }
     //-----------------------------------------------------------------------------------
     void CompositorManager2::removeWorkspace( CompositorWorkspace *workspace )

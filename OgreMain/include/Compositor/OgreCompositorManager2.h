@@ -200,13 +200,23 @@ namespace Ogre
             The unique name of the workspace definition
         @param bEnabled
             True if this workspace should start enabled, false otherwise.
+        @param position
+            If there are multiple workspaces, specifies the order in which this compositor
+            should be updated. i.e. "0" means this new workspace gets updated first. Note
+            that subsequent calls will place other workspaces to be updated first.
+            Typically you will want to update workspace that renders to the RenderWindow
+            last (depending on what you do with RTs, some OSes, like OS X, may not like
+            it).
+            Defaults to -1; which means update last.
         */
         CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
-                                            Camera *defaultCam, IdString definitionName, bool bEnabled );
+                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
+                                            int position=-1 );
 
         /// Overload that allows a full RenderTexture to be used as render target (see CubeMapping demo)
         CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
-                                            Camera *defaultCam, IdString definitionName, bool bEnabled );
+                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
+                                            int position=-1 );
 
         /// Removes the given workspace. Pointer is no longer valid after this call
         void removeWorkspace( CompositorWorkspace *workspace );
@@ -214,6 +224,8 @@ namespace Ogre
         /// Removes all workspaces. Make sure you don't hold any reference to a CompositorWorkpace!
         void removeAllWorkspaces(void);
         void removeAllWorkspaceDefinitions(void);
+
+        size_t getNumWorkspaces(void) const                         { return mWorkspaces.size(); }
 
         /** Removes all shadow nodes defs. Make sure there are no active nodes using the definition!
         @remarks

@@ -36,6 +36,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     class Terrain;
+    class CompositorWorkspace;
 
     /** \addtogroup Optional Components
     *  @{
@@ -402,6 +403,7 @@ namespace Ogre
         SceneManager* mCompositeMapSM;
         Camera* mCompositeMapCam;
         Texture* mCompositeMapRTT; // deliberately holding this by raw pointer to avoid shutdown issues
+        CompositorWorkspace *mWorkspace;
         ManualObject* mCompositeMapPlane;
         Light* mCompositeMapLight;
 

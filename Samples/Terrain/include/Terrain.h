@@ -645,33 +645,33 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         if (enabled)
         {
             // General scene setup
-            mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+//            mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
             mSceneMgr->setShadowFarDistance(3000);
 
             // 3 textures per directional light (PSSM)
-            mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
+//            mSceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_DIRECTIONAL, 3);
 
-            if (mPSSMSetup.isNull())
-            {
-                // shadow camera setup
-                PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
-                pssmSetup->setSplitPadding(mCamera->getNearClipDistance());
-                pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
-                pssmSetup->setOptimalAdjustFactor(0, 2);
-                pssmSetup->setOptimalAdjustFactor(1, 1);
-                pssmSetup->setOptimalAdjustFactor(2, 0.5);
-
-                mPSSMSetup.bind(pssmSetup);
-            }
-            mSceneMgr->setShadowCameraSetup(mPSSMSetup);
+//            if (mPSSMSetup.isNull())
+//            {
+//                // shadow camera setup
+//                PSSMShadowCameraSetup* pssmSetup = new PSSMShadowCameraSetup();
+//                pssmSetup->setSplitPadding(mCamera->getNearClipDistance());
+//                pssmSetup->calculateSplitPoints(3, mCamera->getNearClipDistance(), mSceneMgr->getShadowFarDistance());
+//                pssmSetup->setOptimalAdjustFactor(0, 2);
+//                pssmSetup->setOptimalAdjustFactor(1, 1);
+//                pssmSetup->setOptimalAdjustFactor(2, 0.5);
+//
+//                mPSSMSetup.bind(pssmSetup);
+//            }
+//            mSceneMgr->setShadowCameraSetup(mPSSMSetup);
 
             if (depthShadows)
             {
-                mSceneMgr->setShadowTextureCount(3);
-                mSceneMgr->setShadowTextureConfig(0, 2048, 2048, PF_FLOAT32_R);
-                mSceneMgr->setShadowTextureConfig(1, 1024, 1024, PF_FLOAT32_R);
-                mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_FLOAT32_R);
-                mSceneMgr->setShadowTextureSelfShadow(true);
+//                mSceneMgr->setShadowTextureCount(3);
+//                mSceneMgr->setShadowTextureConfig(0, 2048, 2048, PF_FLOAT32_R);
+//                mSceneMgr->setShadowTextureConfig(1, 1024, 1024, PF_FLOAT32_R);
+//                mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_FLOAT32_R);
+//                mSceneMgr->setShadowTextureSelfShadow(true);
                 mSceneMgr->setShadowCasterRenderBackFaces(true);
 
                 MaterialPtr houseMat = buildDepthShadowMaterial("fw12b.jpg");
@@ -682,11 +682,11 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             }
             else
             {
-                mSceneMgr->setShadowTextureCount(3);
-                mSceneMgr->setShadowTextureConfig(0, 2048, 2048, PF_X8B8G8R8);
-                mSceneMgr->setShadowTextureConfig(1, 1024, 1024, PF_X8B8G8R8);
-                mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_X8B8G8R8);
-                mSceneMgr->setShadowTextureSelfShadow(false);
+//                mSceneMgr->setShadowTextureCount(3);
+//                mSceneMgr->setShadowTextureConfig(0, 2048, 2048, PF_X8B8G8R8);
+//                mSceneMgr->setShadowTextureConfig(1, 1024, 1024, PF_X8B8G8R8);
+//                mSceneMgr->setShadowTextureConfig(2, 1024, 1024, PF_X8B8G8R8);
+//                mSceneMgr->setShadowTextureSelfShadow(false);
                 mSceneMgr->setShadowCasterRenderBackFaces(false);
                 mSceneMgr->setShadowTextureCasterMaterial(BLANKSTRING);
             }
@@ -698,7 +698,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         }
         else
         {
-            mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
+//            mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
         }
 
 
@@ -788,7 +788,11 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         Vector3 lightdir(0.55, -0.3, 0.75);
         lightdir.normalise();
 
-        Light* l = mSceneMgr->createLight("tstLight");
+        SceneNode *lnode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        Light* l = mSceneMgr->createLight();
+        l->setName("tstLight");
+        lnode->attachObject(l);
+
         l->setType(Light::LT_DIRECTIONAL);
         l->setDirection(lightdir);
         l->setDiffuseColour(ColourValue::White);
@@ -796,11 +800,15 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
         mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
+        ResourceGroupManager& resMgr = ResourceGroupManager::getSingleton();
+        resMgr.createResourceGroup("Terrain");
 
         mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
         mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
         mTerrainGroup->setOrigin(mTerrainPos);
         mTerrainGroup->setResourceGroup("Terrain");
+
+        mSceneMgr->updateSceneGraph();
 
         configureTerrainDefaults(l);
 #ifdef PAGING
@@ -841,7 +849,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         Quaternion rot;
         entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
         rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
-        SceneNode* sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
+        SceneNode* sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        sn->setPosition(entPos);
+        sn->rotate(rot);
         sn->setScale(Vector3(0.12, 0.12, 0.12));
         sn->attachObject(e);
         mHouseList.push_back(e);
@@ -850,7 +860,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         entPos = Vector3(mTerrainPos.x + 1850, 0, mTerrainPos.z + 1478);
         entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
         rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
-        sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
+        sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        sn->setPosition(entPos);
+        sn->rotate(rot);
         sn->setScale(Vector3(0.12, 0.12, 0.12));
         sn->attachObject(e);
         mHouseList.push_back(e);
@@ -859,7 +871,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         entPos = Vector3(mTerrainPos.x + 1970, 0, mTerrainPos.z + 2180);
         entPos.y = mTerrainGroup->getHeightAtWorldPosition(entPos) + 65.5 + mTerrainPos.y;
         rot.FromAngleAxis(Degree(Math::RangeRandom(-180, 180)), Vector3::UNIT_Y);
-        sn = mSceneMgr->getRootSceneNode()->createChildSceneNode(entPos, rot);
+        sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        sn->setPosition(entPos);
+        sn->rotate(rot);
         sn->setScale(Vector3(0.12, 0.12, 0.12));
         sn->attachObject(e);
         mHouseList.push_back(e);

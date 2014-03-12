@@ -91,7 +91,7 @@ namespace Ogre
         @param depth The depth that this node is at in the tree (or convenience)
         @param quadrant The index of the quadrant (0, 1, 2, 3)
         */
-        TerrainQuadTreeNode(Terrain* terrain, TerrainQuadTreeNode* parent, 
+        TerrainQuadTreeNode(ObjectMemoryManager *objectMemoryManager, Terrain* terrain, TerrainQuadTreeNode* parent,
             uint16 xoff, uint16 yoff, uint16 size, uint16 lod, uint16 depth, uint16 quadrant);
         virtual ~TerrainQuadTreeNode();
 
@@ -156,6 +156,9 @@ namespace Ogre
             LOD levels are lower detail.
         */
         const LodLevel* getLodLevel(uint16 lod);
+
+        /// Called when the Terrain changes its material.
+        void notifyMaterialChanged(void);
 
         /** Notify the node (and children) that deltas are going to be calculated for a given range.
         @remarks
@@ -278,7 +281,6 @@ namespace Ogre
         AxisAlignedBox mAABB; /// Relative to mLocalCentre
         Real mBoundingRadius; /// Relative to mLocalCentre
         int mCurrentLod; /// -1 = none (do not render)
-        unsigned short mMaterialLodIndex;
         float mLodTransition; /// 0-1 transition to lower LOD
         /// The child with the largest height delta 
         TerrainQuadTreeNode* mChildWithMaxHeightDelta;
@@ -334,7 +336,7 @@ namespace Ogre
         protected:
             TerrainQuadTreeNode* mParent;
         public:
-            Movable(TerrainQuadTreeNode* parent);
+            Movable(IdType id, ObjectMemoryManager *objectMemoryManager, TerrainQuadTreeNode* parent);
             virtual ~Movable();
             
             // necessary overrides
@@ -346,7 +348,9 @@ namespace Ogre
             bool isVisible(void) const;
             uint32 getVisibilityFlags(void) const;
             uint32 getQueryFlags(void) const;
-            bool getCastShadows(void) const;
+//            bool getCastShadows(void) const;
+
+            void setMaterialLodValues( const MaterialPtr &material );
 
         };
         Movable* mMovable;

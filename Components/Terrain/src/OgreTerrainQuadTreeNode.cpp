@@ -43,11 +43,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    extern const FastArray<Real> c_DefaultLodMesh;
+
     unsigned short TerrainQuadTreeNode::POSITION_BUFFER = 0;
     unsigned short TerrainQuadTreeNode::DELTA_BUFFER = 1;
 
     //---------------------------------------------------------------------
-    TerrainQuadTreeNode::TerrainQuadTreeNode(Terrain* terrain, 
+    TerrainQuadTreeNode::TerrainQuadTreeNode(ObjectMemoryManager *objectMemoryManager, Terrain* terrain,
         TerrainQuadTreeNode* parent, uint16 xoff, uint16 yoff, uint16 size, 
         uint16 lod, uint16 depth, uint16 quadrant)
         : mTerrain(terrain)
@@ -62,7 +64,6 @@ namespace Ogre
         , mQuadrant(quadrant)
         , mBoundingRadius(0)
         , mCurrentLod(-1)
-        , mMaterialLodIndex(0)
         , mLodTransition(0)
         , mChildWithMaxHeightDelta(0)
         , mSelfOrChildRendered(false)
@@ -79,10 +80,10 @@ namespace Ogre
             uint16 childLod = lod - 1; // LOD levels decrease down the tree (higher detail)
             uint16 childDepth = depth + 1;
             // create children
-            mChildren[0] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff, childSize, childLod, childDepth, 0);
-            mChildren[1] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff, childSize, childLod, childDepth, 1);
-            mChildren[2] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff, yoff + childOff, childSize, childLod, childDepth, 2);
-            mChildren[3] = OGRE_NEW TerrainQuadTreeNode(terrain, this, xoff + childOff, yoff + childOff, childSize, childLod, childDepth, 3);
+            mChildren[0] = OGRE_NEW TerrainQuadTreeNode(objectMemoryManager, terrain, this, xoff, yoff, childSize, childLod, childDepth, 0);
+            mChildren[1] = OGRE_NEW TerrainQuadTreeNode(objectMemoryManager, terrain, this, xoff + childOff, yoff, childSize, childLod, childDepth, 1);
+            mChildren[2] = OGRE_NEW TerrainQuadTreeNode(objectMemoryManager, terrain, this, xoff, yoff + childOff, childSize, childLod, childDepth, 2);
+            mChildren[3] = OGRE_NEW TerrainQuadTreeNode(objectMemoryManager, terrain, this, xoff + childOff, yoff + childOff, childSize, childLod, childDepth, 3);
 
             LodLevel* ll = OGRE_NEW LodLevel();
             // non-leaf nodes always render with minBatchSize vertices
@@ -132,10 +133,8 @@ namespace Ogre
         // would this be better?
         mTerrain->getPoint(midpointx, midpointy, 0, &mLocalCentre);
 
-        mMovable = OGRE_NEW Movable(this);
+        mMovable = OGRE_NEW Movable(Id::generateNewId<MovableObject>(), objectMemoryManager, this);
         mRend = OGRE_NEW Rend(this);
-
-    
     }
     //---------------------------------------------------------------------
     TerrainQuadTreeNode::~TerrainQuadTreeNode()
@@ -268,6 +267,8 @@ namespace Ogre
     }
     void TerrainQuadTreeNode::loadSelf()
     {
+//        mMovable->setMaterialLodValues( this->getMaterial() );
+
         createGpuVertexData();
         createGpuIndexData();
         if (!mLocalNode)
@@ -329,6 +330,16 @@ namespace Ogre
         assert(lod < mLodLevels.size());
 
         return mLodLevels[lod];
+    }
+    //---------------------------------------------------------------------
+    void TerrainQuadTreeNode::notifyMaterialChanged(void)
+    {
+        mMovable->setMaterialLodValues( this->getMaterial() );
+        for( size_t i=0; i<4; ++i )
+        {
+            if(!isLeaf())
+                mChildren[i]->notifyMaterialChanged();
+        }
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::preDeltaCalculation(const Rect& rect)
@@ -1263,14 +1274,6 @@ namespace Ogre
                 dist -= (mBoundingRadius * 0.5f);
             }
 
-            // Do material LOD
-            MaterialPtr material = getMaterial();
-            const LodStrategy *materialStrategy = LodStrategyManager::getSingleton().getDefaultStrategy();
-            Real lodValue = materialStrategy->getValue(mMovable, cam);
-
-            // Get the index at this biased depth
-            mMaterialLodIndex = materialStrategy->getIndex(lodValue, *material->_getLodValues());
-
             // For each LOD, the distance at which the LOD will transition *downwards*
             // is given by 
             // distTransition = maxDelta * cFactor;
@@ -1437,7 +1440,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     Technique* TerrainQuadTreeNode::getTechnique(void) const
     { 
-        return getMaterial()->getBestTechnique(mMaterialLodIndex, mRend); 
+        return getMaterial()->getBestTechnique( mMovable->getCurrentMaterialLod()[0], mRend);
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::getRenderOperation(RenderOperation& op)
@@ -1483,16 +1486,14 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    TerrainQuadTreeNode::Movable::Movable(TerrainQuadTreeNode* parent)
-		: MovableObject(0, new ObjectMemoryManager(), RENDER_QUEUE_MAIN), mParent(parent)
+    TerrainQuadTreeNode::Movable::Movable(IdType id, ObjectMemoryManager *objectMemoryManager, TerrainQuadTreeNode* parent)
+		: MovableObject(id, objectMemoryManager, RENDER_QUEUE_MAIN), mParent(parent)
     {
+        setCastShadows(TerrainGlobalOptions::getSingleton().getCastsDynamicShadows());
     }
     //---------------------------------------------------------------------
     TerrainQuadTreeNode::Movable::~Movable()
     {
-		//TODO: Having one ObjectMemoryManager per movable is a terrible idea (unless they're very few)
-		delete mObjectMemoryManager;
-		mObjectMemoryManager = 0;
     }
     //---------------------------------------------------------------------
     const String& TerrainQuadTreeNode::Movable::getMovableType(void) const
@@ -1543,9 +1544,22 @@ namespace Ogre
         mParent->visitRenderables(visitor, debugRenderables);   
     }
     //---------------------------------------------------------------------
-    bool TerrainQuadTreeNode::Movable::getCastShadows(void) const
+//    bool TerrainQuadTreeNode::Movable::getCastShadows(void) const
+//    {
+//        return mParent->getCastsShadows();
+//    }
+    //---------------------------------------------------------------------
+    void TerrainQuadTreeNode::Movable::setMaterialLodValues( const MaterialPtr &material )
     {
-        return mParent->getCastsShadows();
+        mLodMaterial.clear();
+        if( material.isNull() )
+        {
+            mLodMaterial.push_back( &c_DefaultLodMesh );
+        }
+        else
+        {
+            mLodMaterial.push_back( material->_getLodValues() );
+        }
     }
     //------------------------------------------------------------------------
     //---------------------------------------------------------------------

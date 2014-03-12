@@ -489,7 +489,7 @@ namespace OgreBites
             //const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
-                mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+//                mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
                 mDetailsPanel->setParamValue(11, "On");
             }
             mDetailsPanel->setParamValue(12, "Vertex");

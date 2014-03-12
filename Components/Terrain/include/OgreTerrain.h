@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreSceneManager.h"
+#include "OgreFrameListener.h"
 #include "OgreTerrainMaterialGenerator.h"
 #include "OgreTerrainLayerBlendMap.h"
 #include "OgreWorkQueue.h"
@@ -261,7 +262,7 @@ namespace Ogre
     </tr>
     </table>
     */
-    class _OgreTerrainExport Terrain : public SceneManager::Listener, 
+    class _OgreTerrainExport Terrain : public SceneManager::Listener, public FrameListener,
         public WorkQueue::RequestHandler, public WorkQueue::ResponseHandler, public TerrainAlloc
     {
     public:
@@ -603,7 +604,9 @@ namespace Ogre
 
         };
 
-        /** Tell this instance to use the given GpuBufferAllocator. 
+        virtual bool frameStarted(const FrameEvent& evt);
+
+        /** Tell this instance to use the given GpuBufferAllocator.
         @remarks
             May only be called when the terrain is not loaded.
         */

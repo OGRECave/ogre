@@ -62,6 +62,7 @@ namespace Ogre {
     class _OgreExport MovableObject : public AnimableObject, public MovableAlloc, public IdObject
     {
     public:
+        const FastArray<Real> c_DefaultLodMesh;
         /** Listener which gets called back on MovableObject events.
         */
         class _OgreExport Listener
@@ -548,6 +549,8 @@ namespace Ogre {
             as a return value) and for reading it's only accurate as at the last frame.
         */
         LightList* _getLightList() { return &mLightList; }
+
+        const FastArray<unsigned char>& getCurrentMaterialLod(void) const       { return mCurrentMaterialLod; }
 
         /** Sets whether or not this object will cast shadows.
         @remarks
