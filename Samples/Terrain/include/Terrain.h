@@ -753,6 +753,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         bool blankTerrain = false;
         //blankTerrain = true;
 
+        if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists("Terrain"))
+            Ogre::ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
+
         mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
         // Bugfix for D3D11 Render System because of pixel format incompatibility when using
