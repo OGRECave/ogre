@@ -490,12 +490,16 @@ namespace Ogre {
         target->getCustomAttribute("FBO", &fbo);
         if(fbo)
             fbo->bind();
-        else
             // Old style context (window/pbuffer) or copying render texture
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        // If we are using FSAA the correct buffer will be bound at another time.
+        else if(target->getFSAA() == 0)
+        {
             // The screen buffer is 1 on iOS
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 1));
+        }
 #else
+        else
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 #endif
     }

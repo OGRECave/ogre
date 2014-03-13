@@ -111,9 +111,6 @@ namespace Ogre {
         mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
 
-#if !(OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER <= 1500)
-        mBoolStateMap.reserve(10);
-#endif
         mBoolStateMap.clear();
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();

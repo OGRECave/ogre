@@ -53,6 +53,7 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGL2Window.h"
+#   include "OgreEAGLES2Context.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #   include "OgreAndroidEGLWindow.h"
 #   include "OgreAndroidEGLContext.h"
@@ -1100,7 +1101,11 @@ namespace Ogre {
         // this is mostly to avoid holding bound programs that might get deleted
         // outside via the resource manager
         unbindGpuProgram(GPT_VERTEX_PROGRAM);
-        unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
+		unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        static_cast<EAGLES2Context*>(mMainContext)->bindSampleFramebuffer();
+#endif
     }
 
     void GLES2RenderSystem::setVertexDeclaration(VertexDeclaration* decl)

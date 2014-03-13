@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "OgreShadowCameraSetupPSSM.h"
 #include "OgreLogManager.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
 #include <fstream>
 #include <string>
 
@@ -94,7 +96,8 @@ namespace Ogre
         {
             mShaderLanguage = "hlsl";
         }
-        else if (hmgr.isLanguageSupported("glsl"))
+        else if (hmgr.isLanguageSupported("glsl")
+                 && Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() >= 150)
         {
             mShaderLanguage = "glsl";
         }
@@ -348,7 +351,8 @@ namespace Ogre
             {
                 mShaderGen = OGRE_NEW ShaderHelperHLSL();
             }
-            else if (hmgr.isLanguageSupported("glsl"))
+            else if (hmgr.isLanguageSupported("glsl") &&
+                     Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion() >= 150)
             {
                 mShaderGen = OGRE_NEW ShaderHelperGLSL();
             }

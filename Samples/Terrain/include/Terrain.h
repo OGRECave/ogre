@@ -22,7 +22,6 @@ Also see acknowledgements in Readme.html
 #define TERRAIN_PAGE_MAX_Y 0
 
 #include "SdkSample.h"
-#include "OgrePageManager.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainGroup.h"
 #include "OgreTerrainQuadTreeNode.h"
@@ -857,7 +856,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         sn->attachObject(e);
         mHouseList.push_back(e);
 
-        mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox", 5000);
+        mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
 
 
     }
@@ -867,15 +866,24 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         if (mTerrainPaging)
         {
             OGRE_DELETE mTerrainPaging;
+            mTerrainPaging = 0;
             OGRE_DELETE mPageManager;
+            mPageManager = 0;
         }
-        else
+        else if(mTerrainGroup)
+        {
             OGRE_DELETE mTerrainGroup;
+            mTerrainGroup = 0;
+        }
 
-        if (mTerrainGlobals) 
+        if (mTerrainGlobals)
         {
             OGRE_DELETE mTerrainGlobals;
+            mTerrainGlobals = 0;
         }
+
+        ResourceGroupManager::getSingleton().destroyResourceGroup("Terrain");
+
         mHouseList.clear();
 
         SdkSample::_shutdown();

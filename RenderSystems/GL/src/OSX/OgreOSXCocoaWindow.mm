@@ -299,6 +299,7 @@ namespace Ogre {
             }
 
             mWindow = [mView window];
+            mIsExternal = true;
 
             // Add our window to the window event listener class
             WindowEventUtilities::_addRenderWindow(this);

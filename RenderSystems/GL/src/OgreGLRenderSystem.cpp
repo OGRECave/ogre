@@ -1326,7 +1326,7 @@ namespace Ogre {
         if (!lt)
         {
             // Disable in the scene
-            mStateCacheManager-> setEnabled(gl_index, false);
+            mStateCacheManager->setEnabled(gl_index, false);
         }
         else
         {
@@ -2003,10 +2003,11 @@ namespace Ogre {
     {
         bool a2c = false;
         static bool lasta2c = false;
+        bool enable = func != CMPF_ALWAYS_PASS;
 
-        mStateCacheManager->setEnabled(GL_ALPHA_TEST, func == CMPF_ALWAYS_PASS);
+        mStateCacheManager->setEnabled(GL_ALPHA_TEST, enable);
 
-        if(func != CMPF_ALWAYS_PASS)
+        if(enable)
         {
             a2c = alphaToCoverage;
             glAlphaFunc(convertCompareFunction(func), value / 255.0f);
@@ -2079,6 +2080,8 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                         "Cannot begin frame - no viewport selected.",
                         "GLRenderSystem::_beginFrame");
+
+        mCurrentContext->setCurrent();
 
         // Activate the viewport clipping
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
@@ -2153,7 +2156,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setDepthBufferCheckEnabled(bool enabled)
     {
-        mStateCacheManager->setClearDepth(1.0f);
+        if (enabled)
+        {
+            mStateCacheManager->setClearDepth(1.0f);
+        }
         mStateCacheManager->setEnabled(GL_DEPTH_TEST, enabled);
     }
     //-----------------------------------------------------------------------------
@@ -2172,11 +2178,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
-        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL, constantBias != 0 || slopeScaleBias != 0);
-        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_POINT, constantBias != 0 || slopeScaleBias != 0);
-        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_LINE, constantBias != 0 || slopeScaleBias != 0);
+        bool enable = constantBias != 0 || slopeScaleBias != 0;
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL, enable);
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_POINT, enable);
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_LINE, enable);
 
-        if (constantBias != 0 || slopeScaleBias != 0)
+        if (enable)
         {
             glPolygonOffset(-slopeScaleBias, -constantBias);
         }
@@ -3567,6 +3574,9 @@ namespace Ogre {
             {
                 // Enable / disable sRGB states
                 mStateCacheManager->setEnabled(GL_FRAMEBUFFER_SRGB_EXT, target->isHardwareGammaEnabled());
+                // Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE_EXT here before
+                // enabling, but GL spec says incapable surfaces ignore the setting
+                // anyway. We test the capability to enable isHardwareGammaEnabled.
             }
         }
     }
