@@ -22,6 +22,7 @@ Also see acknowledgements in Readme.html
 #define TERRAIN_PAGE_MAX_Y 0
 
 #include "SdkSample.h"
+#include "OgrePageManager.h"
 #include "OgreTerrain.h"
 #include "OgreTerrainGroup.h"
 #include "OgreTerrainQuadTreeNode.h"
