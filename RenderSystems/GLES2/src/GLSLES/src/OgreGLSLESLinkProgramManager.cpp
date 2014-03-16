@@ -91,7 +91,7 @@ namespace Ogre {
 			// Program object not found for key so need to create it
 			if (programFound == mLinkPrograms.end())
 			{
-				mActiveLinkProgram = new GLSLESLinkProgram(mActiveVertexGpuProgram,mActiveFragmentGpuProgram);
+				mActiveLinkProgram = OGRE_NEW GLSLESLinkProgram(mActiveVertexGpuProgram,mActiveFragmentGpuProgram);
 				mLinkPrograms[activeKey] = mActiveLinkProgram;
 			}
 			else
@@ -105,6 +105,61 @@ namespace Ogre {
 		if (mActiveLinkProgram) mActiveLinkProgram->activate();
 
 		return mActiveLinkProgram;
+	}
+
+	//-----------------------------------------------------------------------
+	GLSLESLinkProgram* GLSLESLinkProgramManager::getByProgram(GLSLESGpuProgram* gpuProgram)
+	{
+		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
+			currentProgram != mLinkPrograms.end(); ++currentProgram)
+		{
+			GLSLESLinkProgram* prgm = currentProgram->second;
+			if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
+			{
+				return prgm;
+			}
+		}
+
+		return NULL;
+	}
+
+	//-----------------------------------------------------------------------
+	bool GLSLESLinkProgramManager::destroyLinkProgram(GLSLESLinkProgram* linkProgram)
+	{
+		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
+			currentProgram != mLinkPrograms.end(); ++currentProgram)
+		{
+			GLSLESLinkProgram* prgm = currentProgram->second;
+			if(prgm == linkProgram)
+			{
+				mLinkPrograms.erase(mLinkPrograms.find(currentProgram->first));
+				OGRE_DELETE prgm;
+				return true;				
+			}
+		}
+
+		return false;
+	}
+
+	//-----------------------------------------------------------------------
+	void GLSLESLinkProgramManager::destroyAllByProgram(GLSLESGpuProgram* gpuProgram)
+	{
+		std::vector<uint64> keysToErase;
+		for (LinkProgramIterator currentProgram = mLinkPrograms.begin();
+			currentProgram != mLinkPrograms.end(); ++currentProgram)
+		{
+			GLSLESLinkProgram* prgm = currentProgram->second;
+			if(prgm->getVertexProgram() == gpuProgram || prgm->getFragmentProgram() == gpuProgram)
+			{
+				OGRE_DELETE prgm;
+				keysToErase.push_back(currentProgram->first);
+			}
+		}
+		
+		for(size_t i = 0; i < keysToErase.size(); ++i)
+		{
+			mLinkPrograms.erase(mLinkPrograms.find(keysToErase[i]));
+		}
 	}
 
 	//-----------------------------------------------------------------------
