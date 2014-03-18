@@ -21,7 +21,7 @@ enum ShaderSystemLightingModel
 class _OgreSampleClassExport InfiniteFrustum : public Frustum
 {
 public:
-    InfiniteFrustum() : Frustum(0, new ObjectMemoryManager())
+    InfiniteFrustum( ObjectMemoryManager *objMemoryManager ) : Frustum(0, objMemoryManager)
     {
         mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal = Vector3::NEGATIVE_UNIT_X;
         mFrustumPlanes[FRUSTUM_PLANE_LEFT].d = 9999999999999999999.0f;
@@ -217,6 +217,7 @@ protected:
     RTShader::SubRenderStateFactory*    mReflectionMapFactory;  // The custom reflection map shader extension factory.
     RTShader::SubRenderState*           mInstancedViewportsSubRenderState;// todo - doc
     bool                                mInstancedViewportsEnable;      // todo - doc
+    ObjectMemoryManager                 mObjectMemoryManager;           // For the mInfiniteFrustum
     InfiniteFrustum                     mInfiniteFrustum;               // todo - doc
     BillboardSet*                       mBbsFlare;                      // todo - doc
     bool                                mAddedLotsOfModels;             // todo - doc

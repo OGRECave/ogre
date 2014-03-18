@@ -58,6 +58,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 
 //-----------------------------------------------------------------------
 Sample_ShaderSystem::Sample_ShaderSystem() :
+    mInfiniteFrustum( &mObjectMemoryManager ),
     mLayeredBlendingEntity(NULL)
 {
     mInfo["Title"] = "Shader System";
