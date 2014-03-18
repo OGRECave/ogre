@@ -33,6 +33,16 @@ THE SOFTWARE.
 #include "OgreImage.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(_WINDOWS_)
+    //This snippet prevents breaking Unity builds in Win32
+    //(smarty FreeImage defines _WINDOWS_)
+    #define VC_EXTRALEAN
+    #define WIN32_LEAN_AND_MEAN
+    #define NOMINMAX
+    #include <windows.h>
+#endif
+
 #include <FreeImage.h>
 
 // freeimage 3.9.1~3.11.0 interoperability fix
