@@ -111,6 +111,7 @@ namespace Ogre
             mNumInitialPasses( -1 ), mIdentifier( 0 ),
             mBeginRtUpdate( true ), mEndRtUpdate( true ),
             mIncludeOverlays( false ) {}
+        virtual ~CompositorPassDef() {}
 
         CompositorPassType getType() const              { return mPassType; }
         uint32 getRtIndex(void) const                   { return mRtIndex; }
