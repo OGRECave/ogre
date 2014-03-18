@@ -71,7 +71,7 @@ namespace Ogre {
 
         destroy();
 
-        if(mWindow)
+        if(mWindow && !mIsExternal)
         {
             [mWindow release];
             mWindow = nil;
@@ -377,7 +377,8 @@ namespace Ogre {
 
             if(mWindow)
             {
-                [mWindow performClose:nil];
+                if(!mIsExternal)
+                    [mWindow performClose:nil];
 
                 if(mGLPixelFormat)
                 {
