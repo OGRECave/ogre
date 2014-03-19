@@ -203,6 +203,13 @@ namespace Ogre {
         mEmitters.erase(ei);
     }
     //-----------------------------------------------------------------------
+    void ParticleSystem::removeEmitter(ParticleEmitter* emitter)
+    {
+        mEmitters.erase(
+            remove(mEmitters.begin(), mEmitters.end(), emitter), mEmitters.end());
+        ParticleSystemManager::getSingleton()._destroyEmitter(emitter);
+    }
+    //-----------------------------------------------------------------------
     void ParticleSystem::removeAllEmitters(void)
     {
         // DON'T delete directly, we don't know what heap these have been created on
