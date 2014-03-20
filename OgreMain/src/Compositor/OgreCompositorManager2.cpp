@@ -199,6 +199,25 @@ namespace Ogre
         return mNodeDefinitions.find( nodeDefName ) != mNodeDefinitions.end();
     }
     //-----------------------------------------------------------------------------------
+    CompositorNodeDef* CompositorManager2::getNodeDefinitionNonConst( IdString nodeDefName ) const
+    {
+        CompositorNodeDef *retVal = 0;
+
+        CompositorNodeDefMap::const_iterator itor = mNodeDefinitions.find( nodeDefName );
+        if( itor == mNodeDefinitions.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Node definition with name '" +
+                            nodeDefName.getFriendlyText() + "' not found",
+                            "CompositorManager2::getNodeDefinitionNonConst" );
+        }
+        else
+        {
+            retVal = itor->second;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     const CompositorNodeDef* CompositorManager2::getNodeDefinition( IdString nodeDefName ) const
     {
         CompositorNodeDef const *retVal = 0;

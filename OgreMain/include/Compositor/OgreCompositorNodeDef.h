@@ -143,6 +143,12 @@ namespace Ogre
         */
         CompositorTargetDef* addTargetPass( const String &renderTargetName, uint32 rtIndex=0 );
 
+        /// Retrieves an existing pass by it's given index.
+        CompositorTargetDef* getTargetPass( size_t passIndex )  { return &mTargetPasses[passIndex]; }
+
+        /// Gets the number of passes in this node.
+        size_t getNumTargetPasses(void) const                   { return mTargetPasses.size(); }
+
         /** Reserves enough memory for all output channel mappings (efficient allocation, better than
             using linked lists or other containers with two level of indirections)
         @remarks
