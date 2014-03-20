@@ -205,9 +205,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::removeEmitter(ParticleEmitter* emitter)
     {
-        mEmitters.erase(
-            remove(mEmitters.begin(), mEmitters.end(), emitter), mEmitters.end());
-        ParticleSystemManager::getSingleton()._destroyEmitter(emitter);
+        ParticleEmitterList::iterator ei =
+            std::find(mEmitters.begin(), mEmitters.end(), emitter);
+        assert(
+            ei != mEmitters.end() &&
+            "Emitter is not a part of ParticleSystem!");
+        ParticleSystemManager::getSingleton()._destroyEmitter(*ei);
+        mEmitters.erase(ei);
     }
     //-----------------------------------------------------------------------
     void ParticleSystem::removeAllEmitters(void)
