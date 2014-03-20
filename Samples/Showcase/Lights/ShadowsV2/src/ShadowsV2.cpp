@@ -104,7 +104,7 @@ void Sample_ShadowsV2::setupContent(void)
 
     // create a mesh for our ground
     MeshManager::getSingleton().createPlane( "ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                        Plane(Vector3::UNIT_Y, 10), 1000, 1000, 1, 1, true, 1, 6, 6, Vector3::UNIT_Z );
+                        Plane(Vector3::UNIT_Y, -20), 1000, 1000, 1, 1, true, 1, 6, 6, Vector3::UNIT_Z );
 
     mFloorPlane = mSceneMgr->createEntity( "ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                             SCENE_STATIC );
@@ -118,4 +118,6 @@ void Sample_ShadowsV2::setupContent(void)
     penguin->setName( "Penguin" );
     penguin->setMaterialName( "Example_Shadows_Penguin" );
     mCasters.push_back( penguin );
+
+    mCamera->setPosition( 0, 20, 20.0f );
 }

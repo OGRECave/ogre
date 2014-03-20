@@ -41,20 +41,6 @@ material Examples_Shadows
 				tex_address_mode border
 				tex_border_colour 1 1 1 1
 			}
-
-			texture_unit
-			{
-				content_type shadow
-				tex_address_mode border
-				tex_border_colour 1 1 1 1
-			}
-
-			texture_unit
-			{
-				content_type shadow
-				tex_address_mode border
-				tex_border_colour 1 1 1 1
-			}
 		}
 	}
 }
@@ -72,11 +58,50 @@ material Examples_Shadows_pssm : Examples_Shadows
 			fragment_program_ref Examples_Shadows_pssm_glsl_ps
 			{
 			}
+			
+			texture_unit
+			{
+				//texture_alias DiffuseTex
+				texture KAMEN320x240.jpg
+			}
+
+			texture_unit
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+
+			texture_unit
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+
+			texture_unit
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
 		}
 	}
 }
 
-material Example_Shadows_Floor			: Examples_Shadows			{ set_texture_alias DiffuseTex KAMEN320x240.jpg }
-material Example_Shadows_Floor_pssm		: Examples_Shadows_pssm		{ set_texture_alias DiffuseTex KAMEN320x240.jpg }
-material Example_Shadows_Penguin		: Examples_Shadows			{ set_texture_alias DiffuseTex penguin.jpg }
-material Example_Shadows_Penguin_pssm	: Examples_Shadows_pssm		{ set_texture_alias DiffuseTex penguin.jpg }
+material Example_Shadows_Floor			: Examples_Shadows
+{
+	set_texture_alias DiffuseTex KAMEN320x240.jpg
+}
+material Example_Shadows_Floor_pssm		: Examples_Shadows_pssm
+{
+	set_texture_alias DiffuseTex KAMEN320x240.jpg
+}
+material Example_Shadows_Penguin		: Examples_Shadows
+{
+	set_texture_alias DiffuseTex penguin.jpg
+}
+material Example_Shadows_Penguin_pssm	: Examples_Shadows_pssm	
+{
+	set_texture_alias DiffuseTex penguin.jpg
+}
