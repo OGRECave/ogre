@@ -41,6 +41,11 @@ THE SOFTWARE.
 #include "OgreLodStrategy.h"
 #include <cstddef>
 
+// Ignore annoying warnings on GCC
+#if defined(__MINGW32__) || defined(__GNUC__)
+    #pragma GCC diagnostic ignored "-Wswitch"
+#endif
+
 namespace Ogre {
 
     //---------------------------------------------------------------------

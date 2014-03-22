@@ -94,6 +94,9 @@ _PS_CONST(cephes_log_q2, 0.693359375);
 
 #if defined (__MINGW32__)
 
+// Make sure to ignore annoying warning
+#pragma GCC diagnostic ignored "-Wcast-qual"
+
 /* the ugly part below: many versions of gcc used to be completely buggy with respect to some intrinsics
    The movehl_ps is fixed in mingw 3.4.5, but I found out that all the _mm_cmp* intrinsics were completely
    broken on my mingw gcc 3.4.5 ...

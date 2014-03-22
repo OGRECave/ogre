@@ -33,6 +33,10 @@ THE SOFTWARE.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+#ifdef __MINGW32__
+    // MinGW doesn't have "_Interlocked" functions, but those without "_" and in winbase.h
+    #include <winbase.h>
+#endif
 
 namespace Ogre
 {
@@ -49,21 +53,33 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void LightweightMutex::lock()
     {
-        if( _InterlockedIncrement( &mCounter ) > 1 )
-            WaitForSingleObject( mSemaphore, INFINITE );
+        #ifndef __MINGW32__
+            if( _InterlockedIncrement( &mCounter ) > 1 )
+                WaitForSingleObject( mSemaphore, INFINITE );
+        #else
+            if( InterlockedIncrement( &mCounter ) > 1 )
+                WaitForSingleObject( mSemaphore, INFINITE );
+        #endif
     }
     //-----------------------------------------------------------------------------------
     bool LightweightMutex::tryLock()
     {
-        long result = _InterlockedCompareExchange( &mCounter, 1, 0 );
+        #ifndef __MINGW32__
+            long result = _InterlockedCompareExchange( &mCounter, 1, 0 );
+        #else
+            long result = InterlockedCompareExchange( &mCounter, 1, 0 );
+        #endif
         return (result == 0);
     }
     //-----------------------------------------------------------------------------------
     void LightweightMutex::unlock()
     {
-        if( _InterlockedDecrement( &mCounter ) > 0 )
-        {
-            ReleaseSemaphore( mSemaphore, 1, NULL );
-        }
+        #ifndef __MINGW32__
+            if( _InterlockedDecrement( &mCounter ) > 0 )
+                ReleaseSemaphore( mSemaphore, 1, NULL );
+        #else
+            if( InterlockedDecrement( &mCounter ) > 0 )
+                ReleaseSemaphore( mSemaphore, 1, NULL );
+        #endif
     }
 }

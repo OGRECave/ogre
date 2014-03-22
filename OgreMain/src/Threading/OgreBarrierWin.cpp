@@ -34,7 +34,16 @@ THE SOFTWARE.
 #define NOMINMAX
 #include <windows.h>
 
-#include "intrin.h"
+#ifndef __MINGW32__
+	#include "intrin.h"
+#else
+    // MinGW needs some extra headers and define MemoryBarrier manually
+	#include <x86intrin.h>
+    #include <winbase.h>
+    #include <windef.h>
+
+    #define MemoryBarrier __sync_synchronize
+#endif
 
 namespace Ogre
 {
@@ -56,7 +65,11 @@ namespace Ogre
         volatile size_t idx = mIndex;
         MemoryBarrier();
 
-        LONG oldLockCount = _InterlockedExchangeAdd( &mLockCount, 1 );
+        #ifndef __MINGW32__
+            LONG oldLockCount = _InterlockedExchangeAdd( &mLockCount, 1 );
+        #else
+            LONG oldLockCount = InterlockedExchangeAdd( &mLockCount, 1 );
+        #endif
         if( oldLockCount != mNumThreads - 1 )
         {
             WaitForSingleObject( mSemaphores[idx], INFINITE );
