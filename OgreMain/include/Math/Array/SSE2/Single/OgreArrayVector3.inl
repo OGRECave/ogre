@@ -590,6 +590,32 @@ namespace Ogre
         aChunkBase[2] = MathlibSSE2::CmovRobust( aChunkBase[2], bChunkBase[2], mask );
     }
     //-----------------------------------------------------------------------------------
+    inline void ArrayVector3::loadFromAoS( const Real * RESTRICT_ALIAS src )
+    {
+        //Do not use the unpack version, use the shuffle. Shuffle is faster in k10 processors
+        //("The conceptual shuffle" http://developer.amd.com/community/blog/the-conceptual-shuffle/)
+        //and the unpack version uses 64-bit moves, which can cause store forwarding issues when
+        //then loading them with 128-bit movaps
+#define _MM_TRANSPOSE3_SRC_DST_PS(row0, row1, row2, row3, dst0, dst1, dst2) { \
+            __m128 tmp3, tmp2, tmp1, tmp0;                          \
+                                                                    \
+            tmp0   = _mm_shuffle_ps((row0), (row1), 0x44);          \
+            tmp2   = _mm_shuffle_ps((row0), (row1), 0xEE);          \
+            tmp1   = _mm_shuffle_ps((row2), (row3), 0x44);          \
+            tmp3   = _mm_shuffle_ps((row2), (row3), 0xEE);          \
+                                                                    \
+            (dst0) = _mm_shuffle_ps(tmp0, tmp1, 0x88);              \
+            (dst1) = _mm_shuffle_ps(tmp0, tmp1, 0xDD);              \
+            (dst2) = _mm_shuffle_ps(tmp2, tmp3, 0x88);              \
+        }
+
+        _MM_TRANSPOSE3_SRC_DST_PS(
+                            _mm_load_ps( &src[0] ), _mm_load_ps( &src[4] ),
+                            _mm_load_ps( &src[8] ), _mm_load_ps( &src[12] ),
+                            this->mChunkBase[0], this->mChunkBase[1],
+                            this->mChunkBase[2] );
+    }
+    //-----------------------------------------------------------------------------------
 
 #undef DEFINE_OPERATION
 #undef DEFINE_L_SCALAR_OPERATION
@@ -608,4 +634,6 @@ namespace Ogre
 #undef DEFINE_UPDATE_DIVISION
 #undef DEFINE_UPDATE_R_SCALAR_DIVISION
 #undef DEFINE_UPDATE_R_DIVISION
+
+#undef _MM_TRANSPOSE3_SRC_DST_PS
 }

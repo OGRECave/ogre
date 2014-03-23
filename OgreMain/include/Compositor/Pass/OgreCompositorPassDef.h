@@ -151,6 +151,9 @@ namespace Ogre
         CompositorPassDef* addPass( CompositorPassType passType );
 
         const CompositorPassDefVec& getCompositorPasses() const { return mCompositorPasses; }
+
+        /// @copydoc CompositorManager2::getNodeDefinitionNonConst
+        CompositorPassDefVec& getCompositorPassesNonConst()     { return mCompositorPasses; }
     };
 
     /** @} */

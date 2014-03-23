@@ -289,6 +289,73 @@ namespace Ogre
         
     }
     //-----------------------------------------------------------------------
+    void ConvexBody::define( const Vector3 corners[8] )
+    {
+        // ordering of the AAB points:
+        //      1-----2
+        //     /|    /|
+        //    / |   / |
+        //   5-----4  |
+        //   |  0--|--3
+        //   | /   | /
+        //   |/    |/
+        //   6-----7
+
+        Polygon *poly;
+
+        // reset body
+        reset();
+
+        // far
+        poly = allocatePolygon();
+        poly->insertVertex( corners[0] ); // 0
+        poly->insertVertex( corners[1] ); // 1
+        poly->insertVertex( corners[2] ); // 2
+        poly->insertVertex( corners[3] ); // 3
+        insertPolygon( poly );
+
+        // right
+        poly = allocatePolygon();
+        poly->insertVertex( corners[3] ); // 3
+        poly->insertVertex( corners[2] ); // 2
+        poly->insertVertex( corners[4] ); // 4
+        poly->insertVertex( corners[7] ); // 7
+        insertPolygon( poly ); 
+
+        // near
+        poly = allocatePolygon();
+        poly->insertVertex( corners[7] ); // 7
+        poly->insertVertex( corners[4] ); // 4
+        poly->insertVertex( corners[5] ); // 5
+        poly->insertVertex( corners[6] ); // 6
+        insertPolygon( poly );
+
+        // left
+        poly = allocatePolygon();
+        poly->insertVertex( corners[6] ); // 6
+        poly->insertVertex( corners[5] ); // 5
+        poly->insertVertex( corners[1] ); // 1
+        poly->insertVertex( corners[0] ); // 0
+        insertPolygon( poly ); 
+
+        // bottom
+        poly = allocatePolygon();
+        poly->insertVertex( corners[0] ); // 0 
+        poly->insertVertex( corners[3] ); // 3
+        poly->insertVertex( corners[7] ); // 7
+        poly->insertVertex( corners[6] ); // 6
+        insertPolygon( poly );
+
+        // top
+        poly = allocatePolygon();
+        poly->insertVertex( corners[4] ); // 4
+        poly->insertVertex( corners[2] ); // 2
+        poly->insertVertex( corners[1] ); // 1
+        poly->insertVertex( corners[5] ); // 5
+        insertPolygon( poly );
+        
+    }
+    //-----------------------------------------------------------------------
     void ConvexBody::clip(const AxisAlignedBox& aab)
     {
         // only process finite boxes

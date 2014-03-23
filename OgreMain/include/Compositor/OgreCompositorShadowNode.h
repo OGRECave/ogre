@@ -132,14 +132,6 @@ namespace Ogre
         size_t                  mLastFrame;
         LightArray              mShadowMapCastingLights;
 
-        /** Cached value. Contains the aabb of all culled receiver-only
-            objects during the camera render. We need to cache because the
-            SceneManager stores this data per RenderQueue, and we merge them
-            in @see mergeReceiversBoxes. The tighter the box, the higher the
-            shadow quality.
-        */
-        AxisAlignedBox          mReceiverBox;
-
         /** Cached value. Contains the aabb of all caster-only objects (filtered by
             camera's visibility flags) from the minimum RQ used by our shadow render
             passes, to the maximum RQ used. The tighter the box, the higher the
@@ -157,15 +149,10 @@ namespace Ogre
             camera. Early outs if we've already calculated our stuff for that camera in
             a previous call.
             Also updates internals lists for easy look up of lights <-> shadow maps
-        @remarks
-            Camera::mRenderedRqs may be modified by our call to mergeReceiversBoxes
         @param newCamera
             User camera to base our shadow map cameras from.
         */
         void buildClosestLightList(Camera *newCamera , const Camera *lodCamera);
-
-        /// Caches mReceiverBox merging all the RQs we may have to include w/ the given camera
-        void mergeReceiversBoxes( Camera* camera, const Camera *lodCamera );
 
         CompositorChannel createShadowTexture( const ShadowTextureDefinition &textureDef,
                                                 const RenderTarget *finalTarget );
@@ -188,9 +175,6 @@ namespace Ogre
         const LightList* setShadowMapsToPass( Renderable* rend, const Pass* pass,
                                                 AutoParamDataSource *autoParamDataSource,
                                                 size_t startLight );
-
-        /// @See mReceiverBox
-        const AxisAlignedBox& getReceiversBox(void) const   { return mReceiverBox; }
 
         /// @See mCastersBox
         const AxisAlignedBox& getCastersBox(void) const     { return mCastersBox; }

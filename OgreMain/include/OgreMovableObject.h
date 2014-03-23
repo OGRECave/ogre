@@ -235,8 +235,6 @@ namespace Ogre {
         @param outCulledObjects
             Out. List of objects that are (fully or partially) inside the frustum and
             should be rendered
-        @param outReceiversBox [out]
-            Bounds information from culled objects that are shadow receivers. Pointer can be null
         @param lodCamera
             Camera in which lod levels calculations are based (i.e. during shadow pass renders)
             Note however, we only use this camera to calulate if should be visible according to
@@ -245,27 +243,11 @@ namespace Ogre {
         typedef FastArray<MovableObject*> MovableObjectArray;
         static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
                                  uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
-                                 AxisAlignedBox *outReceiversBox, const Camera *lodCamera );
+                                 const Camera *lodCamera );
 
         /// @See InstancingTheadedCullingMethod, @see InstanceBatch::instanceBatchCullFrustumThreaded
         virtual void instanceBatchCullFrustumThreaded( const Frustum *frustum, const Camera *lodCamera,
                                                         uint32 combinedVisibilityFlags ) {}
-
-        /** Exactly the same as @see cullFrustum except that it doesn't produce outCulledObjects.
-            Only useful when a shadow node needs to know the receiver boxes of other Render queue
-            ranges that weren't calculated used in previous render scene passes.
-        @remarks
-            Because of the performance implication of this function, it's a copy-paste from cullFrustum,
-            instead of refactoring in such a way that the code base is shared by both calulcations
-            Ideally you shouldn't need this function (when a shadow node only renders the render queue
-            ranges already calculated)
-        @par
-            There's a small difference with cullFrustum, as this routine assumes non-shadow casters are
-            always included, since it's not meant to be called for casters-only (unlike cullFrustum).
-        */
-        static void cullReceiversBox( const size_t numNodes, ObjectData t, const Frustum *frustum,
-                                        uint32 sceneVisibilityFlags, AxisAlignedBox *outReceiversBox,
-                                        const Camera *lodCamera );
 
         /** @See SceneManager::cullLights & @see MovableObject::cullFrustum
             Produces the global list of visible lights that is needed in buildLightList

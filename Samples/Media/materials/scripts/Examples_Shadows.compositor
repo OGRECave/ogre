@@ -1,0 +1,49 @@
+compositor_node ExampleShadows_Node
+{
+	in 0 rt_renderwindow
+
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 1 0 1 1
+		}
+		pass render_scene
+		{
+			//This setting may be changed at runtime by C++
+			shadows				ExampleShadows_FocusedShadowNode
+		}
+	}
+}
+
+abstract shadow_map shadow_map_target
+{
+	pass clear
+	{
+		colour_value 1 1 1 1
+	}
+
+	pass render_scene {}
+}
+
+compositor_node_shadow ExampleShadows_FocusedShadowNode
+{
+    technique focused
+
+	shadow_map 0 2048 2048 PF_FLOAT32_R light 0 depth_pool 2
+
+	shadow_map 0 : shadow_map_target {}
+}
+
+compositor_node_shadow ExampleShadows_PssmShadowNode
+{
+	technique pssm
+
+	num_splits					3
+    pssm_lambda                 0.50
+    shadow_map 0 2048 2048 PF_FLOAT32_R light 0 split 0 depth_pool 2
+    shadow_map 1 1024 1024 PF_FLOAT32_R light 0 split 1 depth_pool 2
+    shadow_map 2 1024 1024 PF_FLOAT32_R light 0 split 2 depth_pool 2
+
+	shadow_map 0 1 2 : shadow_map_target {}
+}

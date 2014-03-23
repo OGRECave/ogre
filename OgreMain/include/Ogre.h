@@ -114,9 +114,9 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreShadowCameraSetup.h"
 #include "OgreShadowCameraSetupFocused.h"
-#include "OgreShadowCameraSetupLiSPSM.h"
+/*#include "OgreShadowCameraSetupLiSPSM.h"
 #include "OgreShadowCameraSetupPlaneOptimal.h"
-#include "OgreShadowCameraSetupPSSM.h"
+#include "OgreShadowCameraSetupPSSM.h"*/
 // .... more to come
 
 #endif

@@ -76,6 +76,10 @@ namespace Ogre
         */
         void define(const AxisAlignedBox& aab);
 
+        /** Build a new polygon representation from an axis-UNaligned box.
+        */
+        void define( const Vector3 corners[8] );
+
         /** Clips the body with a frustum. The resulting holes
             are filled with new polygons.
         */

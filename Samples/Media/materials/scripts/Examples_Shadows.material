@@ -1,0 +1,129 @@
+material Example_Shadows_DebugView
+{
+    technique
+    {
+        pass
+        {
+            vertex_program_ref Ogre/Compositor/StdQuad_vp
+            {
+            }
+
+            fragment_program_ref Example_Shadows_DebugView_ps
+            {
+            }
+
+            texture_unit
+            {
+            }
+        }
+    }
+}
+
+material Example_ShadowsCaster
+{
+	technique
+	{
+		pass
+		{
+            vertex_program_ref Example_ShadowsCaster_vs
+			{
+			}
+            fragment_program_ref Example_ShadowsCaster_ps
+			{
+			}
+		}
+	}
+}
+
+material Example_Shadows
+{
+	technique
+	{
+        shadow_caster_material Example_ShadowsCaster
+
+		pass
+		{
+            vertex_program_ref Example_Shadows_vs
+			{
+			}
+
+            fragment_program_ref Example_Shadows_ps
+			{
+			}
+
+			texture_unit
+			{
+				texture_alias DiffuseTex
+			}
+
+			texture_unit
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+		}
+	}
+}
+
+material Example_Shadows_pssm
+{
+	technique
+	{
+        shadow_caster_material Example_ShadowsCaster
+
+		pass
+		{
+            vertex_program_ref Example_Shadows_pssm_vs
+			{
+			}
+
+            fragment_program_ref Example_Shadows_pssm_ps
+			{
+			}
+			
+			texture_unit
+			{
+				texture_alias DiffuseTex
+			}
+
+			texture_unit
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+
+			texture_unit
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+
+			texture_unit
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+		}
+	}
+}
+
+material Example_Shadows_Floor			: Example_Shadows
+{
+	set_texture_alias DiffuseTex KAMEN320x240.jpg
+}
+material Example_Shadows_Floor_pssm		: Example_Shadows_pssm
+{
+	set_texture_alias DiffuseTex KAMEN320x240.jpg
+}
+material Example_Shadows_Penguin		: Example_Shadows
+{
+	set_texture_alias DiffuseTex penguin.jpg
+}
+material Example_Shadows_Penguin_pssm	: Example_Shadows_pssm
+{
+	set_texture_alias DiffuseTex penguin.jpg
+}

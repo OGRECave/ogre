@@ -118,8 +118,7 @@ namespace Ogre
             texDef->height  = 2048;
             texDef->formatList.push_back( PF_FLOAT32_R );
             //texDef->formatList.push_back( PF_A8B8G8R8 );
-            //texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-            texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
+            texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
         }
         {
             ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 1, 0, "MyFirstTex2", false );
@@ -127,8 +126,7 @@ namespace Ogre
             texDef->height  = 1024;
             texDef->formatList.push_back( PF_FLOAT32_R );
             //texDef->formatList.push_back( PF_A8B8G8R8 );
-            //texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-            texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
+            texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
         }
         {
             ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 2, 0, "MyFirstTex3", false );
@@ -136,8 +134,7 @@ namespace Ogre
             texDef->height  = 1024;
             texDef->formatList.push_back( PF_FLOAT32_R );
             //texDef->formatList.push_back( PF_A8B8G8R8 );
-            //texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-            texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
+            texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
         }
 
         shadowNode->setNumTargetPass( 3 );
@@ -197,6 +194,25 @@ namespace Ogre
     bool CompositorManager2::hasNodeDefinition( IdString nodeDefName ) const
     {
         return mNodeDefinitions.find( nodeDefName ) != mNodeDefinitions.end();
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorNodeDef* CompositorManager2::getNodeDefinitionNonConst( IdString nodeDefName ) const
+    {
+        CompositorNodeDef *retVal = 0;
+
+        CompositorNodeDefMap::const_iterator itor = mNodeDefinitions.find( nodeDefName );
+        if( itor == mNodeDefinitions.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Node definition with name '" +
+                            nodeDefName.getFriendlyText() + "' not found",
+                            "CompositorManager2::getNodeDefinitionNonConst" );
+        }
+        else
+        {
+            retVal = itor->second;
+        }
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     const CompositorNodeDef* CompositorManager2::getNodeDefinition( IdString nodeDefName ) const

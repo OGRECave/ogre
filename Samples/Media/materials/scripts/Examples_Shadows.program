@@ -1,0 +1,237 @@
+//---------------------------------------------------------------------------------------
+//  GLSL
+//---------------------------------------------------------------------------------------
+vertex_program Example_ShadowsCaster_glsl_vs glsl
+{
+	source Example_ShadowsVp.glsl
+
+	preprocessor_defines DEPTH_SHADOWCASTER=1
+
+	default_params
+	{
+		param_named_auto	worldViewProj		worldviewproj_matrix
+		param_named_auto	depthRange0			scene_depth_range
+		param_named			shadowConstantBias	float 0.001
+	}
+}
+
+fragment_program Example_ShadowsCaster_glsl_ps glsl
+{
+	source Example_ShadowsCasterFp.glsl
+}
+
+vertex_program Example_Shadows_glsl_vs glsl
+{
+	source Example_ShadowsVp.glsl
+
+	default_params
+	{
+		param_named_auto	worldViewProj		worldviewproj_matrix
+		param_named_auto	world				world_matrix
+
+		param_named_auto	depthRange0					shadow_scene_depth_range	0
+		param_named_auto	texViewProjMatrix0			texture_viewproj_matrix		0
+	}
+}
+
+vertex_program Example_Shadows_pssm_glsl_vs glsl : Example_Shadows_glsl_vs
+{
+	source Example_ShadowsVp.glsl
+
+	preprocessor_defines PSSM=1
+
+	default_params
+	{
+		param_named_auto	depthRange1					shadow_scene_depth_range	1
+		param_named_auto	depthRange2					shadow_scene_depth_range	2
+		param_named_auto	texViewProjMatrix1			texture_viewproj_matrix		1
+		param_named_auto	texViewProjMatrix2			texture_viewproj_matrix		2
+	}
+}
+
+fragment_program Example_Shadows_glsl_ps glsl
+{
+	source Example_ShadowsFp.glsl
+
+	default_params
+	{
+		param_named_auto	lightAmbient		ambient_light_colour
+        param_named_auto	lightPosition		light_position_array 8
+        param_named_auto	lightDiffuse		derived_light_diffuse_colour_array 8
+
+		param_named_auto	invShadowMapSize0	inverse_texture_size	1
+
+		param_named			diffuseMap			int 0
+		param_named			shadowMap0			int 1
+	}
+}
+
+fragment_program Example_Shadows_pssm_glsl_ps glsl : Example_Shadows_glsl_ps
+{
+	source Example_ShadowsFp.glsl
+
+	preprocessor_defines PSSM=1
+
+	default_params
+	{
+		param_named_auto	invShadowMapSize1	inverse_texture_size	2
+		param_named_auto	invShadowMapSize2	inverse_texture_size	3
+		param_named_auto	pssmSplits			pssm_splits				0
+
+		param_named			shadowMap1			int 2
+		param_named			shadowMap2			int 3
+	}
+}
+
+fragment_program Example_Shadows_DebugView_glsl_ps glsl
+{
+    source Example_ShadowsDebugViewFp.glsl
+
+    default_params
+    {
+        param_named			rt              	int 0
+    }
+}
+
+//---------------------------------------------------------------------------------------
+//  HLSL (DX9)
+//---------------------------------------------------------------------------------------
+vertex_program Example_ShadowsCaster_hlsl_vs hlsl
+{
+    source Example_Shadows_vs.hlsl
+    entry_point main_vs
+    target vs_3_0
+
+    preprocessor_defines DEPTH_SHADOWCASTER=1
+
+    default_params
+    {
+        param_named_auto	worldViewProj		worldviewproj_matrix
+        param_named_auto	depthRange0			scene_depth_range
+        param_named			shadowConstantBias	float 0.001
+    }
+}
+
+fragment_program Example_ShadowsCaster_hlsl_ps hlsl
+{
+    source Example_ShadowsCaster_ps.hlsl
+    entry_point main_ps
+    target ps_3_0
+}
+
+vertex_program Example_Shadows_hlsl_vs hlsl
+{
+    source Example_Shadows_vs.hlsl
+    entry_point main_vs
+    target vs_3_0
+
+    default_params
+    {
+        param_named_auto	worldViewProj		worldviewproj_matrix
+        param_named_auto	world				world_matrix
+
+        param_named_auto	depthRange0					shadow_scene_depth_range	0
+        param_named_auto	texViewProjMatrix0			texture_viewproj_matrix		0
+    }
+}
+
+vertex_program Example_Shadows_pssm_hlsl_vs hlsl : Example_Shadows_hlsl_vs
+{
+    source Example_Shadows_vs.hlsl
+    entry_point main_vs
+    target vs_3_0
+
+    preprocessor_defines PSSM=1
+
+    default_params
+    {
+        param_named_auto	depthRange1					shadow_scene_depth_range	1
+        param_named_auto	depthRange2					shadow_scene_depth_range	2
+        param_named_auto	texViewProjMatrix1			texture_viewproj_matrix		1
+        param_named_auto	texViewProjMatrix2			texture_viewproj_matrix		2
+    }
+}
+
+fragment_program Example_Shadows_hlsl_ps hlsl
+{
+    source Example_Shadows_ps.hlsl
+    entry_point main_ps
+    target ps_3_0
+
+    default_params
+    {
+        param_named_auto	lightAmbient		ambient_light_colour
+        param_named_auto	lightPosition		light_position_array 8
+        param_named_auto	lightDiffuse		derived_light_diffuse_colour_array 8
+
+        param_named_auto	invShadowMapSize0	inverse_texture_size	1
+    }
+}
+
+fragment_program Example_Shadows_pssm_hlsl_ps hlsl : Example_Shadows_hlsl_ps
+{
+    source Example_Shadows_ps.hlsl
+    entry_point main_ps
+    target ps_3_0
+
+    preprocessor_defines PSSM=1
+
+    default_params
+    {
+        param_named_auto	invShadowMapSize1	inverse_texture_size	2
+        param_named_auto	invShadowMapSize2	inverse_texture_size	3
+        param_named_auto	pssmSplits			pssm_splits				0
+    }
+}
+
+fragment_program Example_Shadows_DebugView_hlsl_ps hlsl
+{
+    source Example_ShadowsDebugView_ps.hlsl
+    entry_point main_ps
+    target ps_2_0
+}
+
+//---------------------------------------------------------------------------------------
+//  UNIFIED
+//---------------------------------------------------------------------------------------
+vertex_program Example_ShadowsCaster_vs unified
+{
+    delegate Example_ShadowsCaster_glsl_vs
+    delegate Example_ShadowsCaster_hlsl_vs
+}
+
+fragment_program Example_ShadowsCaster_ps unified
+{
+    delegate Example_ShadowsCaster_glsl_ps
+    delegate Example_ShadowsCaster_hlsl_ps
+}
+
+vertex_program Example_Shadows_vs unified
+{
+    delegate Example_Shadows_glsl_vs
+    delegate Example_Shadows_hlsl_vs
+}
+
+vertex_program Example_Shadows_pssm_vs unified
+{
+    delegate Example_Shadows_pssm_glsl_vs
+    delegate Example_Shadows_pssm_hlsl_vs
+}
+
+fragment_program Example_Shadows_ps unified
+{
+    delegate Example_Shadows_glsl_ps
+    delegate Example_Shadows_hlsl_ps
+}
+
+fragment_program Example_Shadows_pssm_ps unified
+{
+    delegate Example_Shadows_pssm_glsl_ps
+    delegate Example_Shadows_pssm_hlsl_ps
+}
+
+fragment_program Example_Shadows_DebugView_ps unified
+{
+    delegate Example_Shadows_DebugView_glsl_ps
+    delegate Example_Shadows_DebugView_hlsl_ps
+}

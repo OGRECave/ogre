@@ -6633,12 +6633,9 @@ namespace Ogre{
         td->hwGammaWrite    = hwGammaWrite;
         td->depthBufferId   = depthBufferId;
 
-        td->aggressiveFocusRegion   = defaultParams.aggressiveFocusRegion;
-        td->optimalAdjustFactor     = defaultParams.optimalAdjustFactor;
-        td->lightDirThreshold       = defaultParams.lightDirThreshold;
-        td->pssmLambda              = defaultParams.pssmLambda;
-        td->splitPadding            = defaultParams.splitPadding;
-        td->numSplits               = defaultParams.numSplits;
+        td->pssmLambda      = defaultParams.pssmLambda;
+        td->splitPadding    = defaultParams.splitPadding;
+        td->numSplits       = defaultParams.numSplits;
     }
     //-------------------------------------------------------------------------
     void CompositorShadowNodeTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
@@ -6746,8 +6743,6 @@ namespace Ogre{
                                 mShadowNodeDef->setDefaultTechnique( SHADOWMAP_PLANEOPTIMAL );
                             else if( str == "focused" )
                                 mShadowNodeDef->setDefaultTechnique( SHADOWMAP_FOCUSED );
-                            else if( str == "lispsm" )
-                                mShadowNodeDef->setDefaultTechnique( SHADOWMAP_LISPSM );
                             else if( str == "pssm" )
                                 mShadowNodeDef->setDefaultTechnique( SHADOWMAP_PSSM );
                             else
@@ -6820,68 +6815,6 @@ namespace Ogre{
 
                         AbstractNodeList::const_iterator it0 = prop->values.begin();
                         if( !getReal( *it0, &defaultParams.pssmLambda ) )
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                    }
-                    break;
-                case ID_USE_AGGRESSIVE_FOCUS_REGION:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                        }
-                        else if(prop->values.size() != 1)
-                        {
-                            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        }
-
-                        AbstractNodeList::const_iterator it0 = prop->values.begin();
-                        if( !getBoolean( *it0, &defaultParams.aggressiveFocusRegion ) )
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                    }
-                    break;
-                case ID_OPTIMAL_AJUST_FACTOR:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                        }
-                        else if(prop->values.size() != 1)
-                        {
-                            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        }
-
-                        AbstractNodeList::const_iterator it0 = prop->values.begin();
-                        if( !getReal( *it0, &defaultParams.optimalAdjustFactor ) )
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                    }
-                    break;
-                case ID_LIGHT_DIR_THRESHOLD:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                        }
-                        else if(prop->values.size() != 1)
-                        {
-                            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        }
-
-                        AbstractNodeList::const_iterator it0 = prop->values.begin();
-                        Real val;
-                        if( getReal( *it0, &val ) )
-                        {
-                            defaultParams.lightDirThreshold = Degree( val );
-                        }
-                        else
                         {
                             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
                             return;
