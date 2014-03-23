@@ -42,12 +42,12 @@ void main()
 
 #ifdef DEPTH_SHADOWCASTER
 	//Linear depth
-	psDepth	= (gl_Position.z - depthRange0.x + shadowConstantBias) * depthRange0.w;
+    psDepth	= (gl_Position.z - depthRange0.x + shadowConstantBias) * depthRange0.w;
 
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
-	gl_Position.z = gl_Position.z * (gl_Position.w * depthRange0.w);
+    gl_Position.z = gl_Position.z * (gl_Position.w * depthRange0.w);
 #else
 	psWorldPos	= (world * vertex).xyz;
 	psOutNorm	= mat3x3(world) * normal;
@@ -57,7 +57,7 @@ void main()
 	vec4 shadowWorldPos = vec4( psWorldPos, 1.0f );
 	psLightSpacePos0 = texViewProjMatrix0 * shadowWorldPos;
 	// Linear depth
-	psLightSpacePos0.z = (psLightSpacePos0.z - depthRange0.x) * depthRange0.w;
+    psLightSpacePos0.z = (psLightSpacePos0.z - depthRange0.x) * depthRange0.w;
 
 	#ifdef PSSM
 		psLightSpacePos1	= texViewProjMatrix1 * shadowWorldPos;

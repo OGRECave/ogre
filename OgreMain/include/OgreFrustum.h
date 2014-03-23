@@ -495,6 +495,10 @@ namespace Ogre
         /** Overridden from Renderable */
         const LightList& getLights(void) const;
 
+        void getCustomWorldSpaceCorners(
+                    ArrayVector3 outCorners[(8 + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS],
+                    Real customFarPlane ) const;
+
         /** Gets the world space corners of the frustum.
         @remarks
             The corners are ordered as follows: top-right near, 

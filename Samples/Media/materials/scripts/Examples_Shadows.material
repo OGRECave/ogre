@@ -1,3 +1,24 @@
+material Examples_Shadows_DebugView
+{
+    technique
+    {
+        pass
+        {
+            vertex_program_ref Ogre/Compositor/StdQuad_vp
+            {
+            }
+
+            fragment_program_ref Examples_Shadows_DebugView_glsl_ps
+            {
+            }
+
+            texture_unit
+            {
+            }
+        }
+    }
+}
+
 material Examples_Shadows_Caster
 {
 	technique
@@ -45,10 +66,12 @@ material Examples_Shadows
 	}
 }
 
-material Examples_Shadows_pssm : Examples_Shadows
+material Examples_Shadows_pssm
 {
 	technique
 	{
+		shadow_caster_material Examples_Shadows_Caster
+
 		pass
 		{
 			vertex_program_ref Examples_Shadows_pssm_glsl_vs
@@ -61,8 +84,7 @@ material Examples_Shadows_pssm : Examples_Shadows
 			
 			texture_unit
 			{
-				//texture_alias DiffuseTex
-				texture KAMEN320x240.jpg
+				texture_alias DiffuseTex
 			}
 
 			texture_unit

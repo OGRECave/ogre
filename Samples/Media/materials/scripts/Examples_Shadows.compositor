@@ -28,7 +28,7 @@ abstract shadow_map shadow_map_target
 
 compositor_node_shadow ExampleShadows_FocusedShadowNode
 {
-	technique focused
+    technique focused
 
 	shadow_map 0 2048 2048 PF_FLOAT32_R light 0 depth_pool 2
 
@@ -39,11 +39,11 @@ compositor_node_shadow ExampleShadows_PssmShadowNode
 {
 	technique pssm
 
-	optimal_adjust_factor		-25
 	num_splits					3
-	shadow_map 0 2048 2048 PF_FLOAT32_R light 0 split 0 depth_pool 2
-	shadow_map 1 1024 1024 PF_FLOAT32_R light 0 split 1 depth_pool 2
-	shadow_map 2 1024 1024 PF_FLOAT32_R light 0 split 2 depth_pool 2
+    pssm_lambda                 0.50
+    shadow_map 0 2048 2048 PF_FLOAT32_R light 0 split 0 depth_pool 2
+    shadow_map 1 1024 1024 PF_FLOAT32_R light 0 split 1 depth_pool 2
+    shadow_map 2 1024 1024 PF_FLOAT32_R light 0 split 2 depth_pool 2
 
 	shadow_map 0 1 2 : shadow_map_target {}
 }

@@ -179,7 +179,6 @@ namespace Ogre {
 
         /// Each frame it is set to all false. After rendering each RQ, it is set to true
         vector<bool>::type  mRenderedRqs;
-        AxisAlignedBoxVec   mReceiversBoxPerRenderQueue;
 
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
@@ -696,9 +695,6 @@ namespace Ogre {
 
         /// Returns true if the asked render queue has been rendered. False otherwise
         bool isRenderedRq( size_t rqId ) const          { return mRenderedRqs[rqId]; }
-        const AxisAlignedBoxVec& getReceiversBoxPerRenderQueue(void) const
-                                                        { return mReceiversBoxPerRenderQueue; }
-        AxisAlignedBoxVec& _getReceiversBoxPerRenderQueue(void) { return mReceiversBoxPerRenderQueue; }
         
     };
     /** @} */

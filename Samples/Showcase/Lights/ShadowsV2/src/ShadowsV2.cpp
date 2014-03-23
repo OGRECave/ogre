@@ -22,10 +22,12 @@ same license as the rest of the engine.
 #include "SamplePlugin.h"
 #include "ShadowsV2.h"
 
+#include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "Compositor/Pass/OgreCompositorPassDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
+#include "Compositor/OgreCompositorShadowNode.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -35,7 +37,7 @@ Sample_ShadowsV2::Sample_ShadowsV2()
     , mMainLight( 0 )
     , mMinFlareSize( 40 )
     , mMaxFlareSize( 80 )
-    , mPssm( false )
+    , mPssm( true )
 {
     mInfo["Title"] = "Shadows v2";
     mInfo["Description"] =
@@ -56,7 +58,7 @@ Sample_ShadowsV2::Sample_ShadowsV2()
     mInfo["Thumbnail"] = "thumb_shadows.png";
     mInfo["Category"] = "Showcase";
 }
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 CompositorWorkspace* Sample_ShadowsV2::setupCompositor(void)
 {
     //In Compositor sample, we show how to use clever rewiring of connections and
@@ -90,7 +92,7 @@ CompositorWorkspace* Sample_ShadowsV2::setupCompositor(void)
 
     return compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 }
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 void Sample_ShadowsV2::setupContent(void)
 {
     mSceneMgr->setAmbientLight( ColourValue( 0.1f, 0.1f, 0.1f ) );
@@ -100,7 +102,8 @@ void Sample_ShadowsV2::setupContent(void)
     mMainLight->setName( "Sun" );
     lightNode->attachObject( mMainLight );
     mMainLight->setType( Light::LT_DIRECTIONAL );
-    mMainLight->setDirection( Vector3( -0.1f, -1.0f, -0.25f ).normalisedCopy() );
+    mMainLight->setDirection( Vector3( -0.1f, -1.0f, -1.25f ).normalisedCopy() );
+    //mMainLight->setDirection( Vector3::NEGATIVE_UNIT_Y );
 
     // create a mesh for our ground
     MeshManager::getSingleton().createPlane( "ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -108,16 +111,92 @@ void Sample_ShadowsV2::setupContent(void)
 
     mFloorPlane = mSceneMgr->createEntity( "ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                             SCENE_STATIC );
-    mFloorPlane->setMaterialName( "Example_Shadows_Floor" );
-    mFloorPlane->setCastShadows( false );
+    mFloorPlane->setMaterialName( mPssm ? "Example_Shadows_Floor_pssm" : "Example_Shadows_Floor" );
+    mFloorPlane->setCastShadows( true );
     mSceneMgr->getRootSceneNode( SCENE_STATIC )->attachObject( mFloorPlane );
 
     Entity *penguin = mSceneMgr->createEntity( "penguin.mesh" );
     SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
     node->attachObject( penguin );
     penguin->setName( "Penguin" );
-    penguin->setMaterialName( "Example_Shadows_Penguin" );
+    penguin->setMaterialName( mPssm ? "Example_Shadows_Penguin_pssm" :"Example_Shadows_Penguin" );
     mCasters.push_back( penguin );
 
-    mCamera->setPosition( 0, 20, 20.0f );
+    mCamera->setPosition( 0, 20, 50.0f );
+    mCamera->lookAt( 0, 20, 0 );
+
+    //Shadow quality is very sensible to these settings. The defaults are insane
+    //(covers a huge distance) which is often not needed. Using more conservative
+    //values greatly improves quality
+    mSceneMgr->setShadowDirectionalLightExtrusionDistance( 200.0f );
+    mSceneMgr->setShadowFarDistance( 200.0f );
+    mCamera->setNearClipDistance( 0.1f );
+    mCamera->setFarClipDistance( 5000.0f );
+
+    createDebugOverlays();
+}
+//---------------------------------------------------------------------------------------
+void Sample_ShadowsV2::createDebugOverlays(void)
+{
+    ////////////////////////////////////////////////////////////
+    // BEGIN DEBUG
+    IdString shadowNodeName = mPssm ? "ExampleShadows_PssmShadowNode" : "ExampleShadows_FocusedShadowNode";
+
+    Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingletonPtr()->
+                                                            getByName("Examples_Shadows_DebugView");
+    Ogre::MaterialPtr DepthShadowTexture = baseWhite->clone("DepthShadowTexture0");
+    Ogre::TextureUnitState* textureUnit = DepthShadowTexture->getTechnique(0)->getPass(0)->
+                                                            getTextureUnitState(0);
+    CompositorShadowNode *shadowNode = mWorkspace->findShadowNode( shadowNodeName );
+    Ogre::TexturePtr tex = shadowNode->getLocalTextures()[0].textures[0];
+    textureUnit->setTextureName( tex->getName() );
+
+    if( mPssm )
+    {
+        DepthShadowTexture = baseWhite->clone("DepthShadowTexture1");
+        textureUnit = DepthShadowTexture->getTechnique(0)->getPass(0)->getTextureUnitState(0);
+        tex = shadowNode->getLocalTextures()[1].textures[0];
+        textureUnit->setTextureName(tex->getName());
+
+        DepthShadowTexture = baseWhite->clone("DepthShadowTexture2");
+        textureUnit = DepthShadowTexture->getTechnique(0)->getPass(0)->getTextureUnitState(0);
+        tex = shadowNode->getLocalTextures()[2].textures[0];
+        textureUnit->setTextureName(tex->getName());
+    }
+
+    Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
+    // Create an overlay
+    Overlay *debugOverlay = overlayManager.create( "OverlayName" );
+
+    // Create a panel
+    Ogre::OverlayContainer* panel = static_cast<Ogre::OverlayContainer*>(
+        overlayManager.createOverlayElement("Panel", "PanelName0"));
+    panel->setMetricsMode(Ogre::GMM_PIXELS);
+    panel->setPosition(10, 10);
+    panel->setDimensions(100, 100);
+    panel->setMaterialName("DepthShadowTexture0");
+    debugOverlay->add2D(panel);
+
+    if( mPssm )
+    {
+        panel = static_cast<Ogre::OverlayContainer*>(
+            overlayManager.createOverlayElement("Panel", "PanelName1"));
+        panel->setMetricsMode(Ogre::GMM_PIXELS);
+        panel->setPosition(120, 10);
+        panel->setDimensions(100, 100);
+        panel->setMaterialName("DepthShadowTexture1");
+        debugOverlay->add2D(panel);
+        panel = static_cast<Ogre::OverlayContainer*>(
+            overlayManager.createOverlayElement("Panel", "PanelName2"));
+        panel->setMetricsMode(Ogre::GMM_PIXELS);
+        panel->setPosition(230, 10);
+        panel->setDimensions(100, 100);
+        panel->setMaterialName("DepthShadowTexture2");
+        debugOverlay->add2D(panel);
+    }
+
+    debugOverlay->show();
+
+    // END DEBUG
+    ////////////////////////////////////////////////////////////
 }

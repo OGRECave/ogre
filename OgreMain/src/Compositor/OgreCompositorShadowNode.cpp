@@ -42,7 +42,6 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 
 #include "OgreShadowCameraSetupFocused.h"
-#include "OgreShadowCameraSetupLiSPSM.h"
 #include "OgreShadowCameraSetupPSSM.h"
 
 namespace Ogre
@@ -104,10 +103,10 @@ namespace Ogre
                     {
                         FocusedShadowCameraSetup *setup = OGRE_NEW FocusedShadowCameraSetup();
                         shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
-                        setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
+                        //setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
                     }
                     break;
-                case SHADOWMAP_LISPSM:
+                /*case SHADOWMAP_LISPSM:
                     {
                         LiSPSMShadowCameraSetup *setup = OGRE_NEW LiSPSMShadowCameraSetup();
                         shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
@@ -116,17 +115,17 @@ namespace Ogre
                         setup->setCameraLightDirectionThreshold( itor->lightDirThreshold );
                         setup->setUseSimpleOptimalAdjust( false );
                     }
-                    break;
+                    break;*/
                 case SHADOWMAP_PSSM:
                     {
                         PSSMShadowCameraSetup *setup = OGRE_NEW PSSMShadowCameraSetup();
                         shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
                         setup->calculateSplitPoints( itor->numSplits, 0.0f, 100.0f, 0.95f );
-                        setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
-                        setup->setOptimalAdjustFactor( itor->split, itor->optimalAdjustFactor );
                         setup->setSplitPadding( itor->splitPadding );
+                        /*setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
+                        setup->setOptimalAdjustFactor( itor->split, itor->optimalAdjustFactor );
                         setup->setCameraLightDirectionThreshold( itor->lightDirThreshold );
-                        setup->setUseSimpleOptimalAdjust( false );
+                        setup->setUseSimpleOptimalAdjust( false );*/
                     }
                     break;
                 default:
@@ -243,8 +242,6 @@ namespace Ogre
 
         mLastCamera = newCamera;
 
-        mergeReceiversBoxes( newCamera, lodCamera );
-
         const Viewport *viewport = newCamera->getLastViewport();
         const SceneManager *sceneManager = newCamera->getSceneManager();
         const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
@@ -326,39 +323,6 @@ namespace Ogre
         mCastersBox = sceneManager->_calculateCurrentCastersBox( viewport->getVisibilityMask(),
                                                                  mDefinition->mMinRq,
                                                                  mDefinition->mMaxRq );
-    }
-    //-----------------------------------------------------------------------------------
-    void CompositorShadowNode::mergeReceiversBoxes(Camera* camera , const Camera *lodCamera)
-    {
-        SceneManager *sceneManager = camera->getSceneManager();
-        const AxisAlignedBoxVec &boxesVec = camera->getReceiversBoxPerRenderQueue();
-
-        mReceiverBox.setNull();
-
-        //Finish the rqs that may be missing, i.e. those ranges that weren't drawn by a
-        //previous PASS_SCENE, thus we don't have all the receiver boxes we need.
-        const size_t minRq = std::min( mDefinition->mMinRq, boxesVec.size() );
-        const size_t maxRq = std::min( mDefinition->mMaxRq, boxesVec.size() );
-
-        for( size_t i=minRq; i<maxRq; ++i )
-        {
-            if( !camera->isRenderedRq( i ) )
-            {
-                size_t j = i+1;
-                while( j<maxRq && camera->isRenderedRq( j ) )
-                    ++j;
-
-                sceneManager->updateAllLods( lodCamera, 1.0f, i, j );
-                sceneManager->_cullReceiversBox( camera, lodCamera, i, j );
-                i = j;
-            }
-        }
-
-        AxisAlignedBoxVec::const_iterator itor = boxesVec.begin() + minRq;
-        AxisAlignedBoxVec::const_iterator end  = boxesVec.begin() + maxRq;
-
-        while( itor != end )
-            mReceiverBox.merge( *itor++ );
     }
     //-----------------------------------------------------------------------------------
     void CompositorShadowNode::_update( Camera* camera, const Camera *lodCamera,

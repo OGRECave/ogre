@@ -528,11 +528,7 @@ namespace Ogre {
         /// Current Viewport
         Viewport* mCurrentViewport;
 
-        typedef vector<AxisAlignedBoxVec>::type ReceiversBoxPerThread;
-
         CompositorShadowNode*   mCurrentShadowNode;
-        /// Used to calculate the bounds in different threads, then merged into mReceiversBoxPerRenderQueue
-        ReceiversBoxPerThread   mReceiversBoxPerThread;
 
         /// Root scene node
         SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
@@ -927,7 +923,6 @@ namespace Ogre {
         enum RequestType
         {
             CULL_FRUSTUM,
-            CALCULATE_RECEIVER_BOX,
             UPDATE_ALL_ANIMATIONS,
             UPDATE_ALL_TRANSFORMS,
             UPDATE_ALL_BOUNDS,
@@ -1006,9 +1001,6 @@ namespace Ogre {
         virtual void buildLightClip(const Light* l, PlaneList& planes);
         virtual void resetLightClip();
         virtual void checkCachedLightClippingInfo();
-
-        /// Merges the VisibleObjectsBoundsInfo data from all threads into one vobi per render queue
-        void collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 firstRq, uint8 lastRq );
 
         /// The active renderable visitor class - subclasses could override this
         SceneMgrQueuedRenderableVisitor* mActiveQueuedRenderableVisitor;
@@ -1104,9 +1096,6 @@ namespace Ogre {
             Must be unique for each worker thread
         */
         void cullFrustum( const CullFrustumRequest &request, size_t threadIdx );
-
-        /// @copydoc _cullReceiversBox
-        void cullReceiversBox( const CullFrustumRequest &request, size_t threadIdx );
 
         /** Builds a list of all lights that are visible by all queued cameras (this should be fed by
             Compositor). Then calls MovableObject::buildLightList with that list so that each
@@ -1746,10 +1735,6 @@ namespace Ogre {
 
         /// @See CompositorShadowNode remarks
         void _swapVisibleObjectsForShadowMapping();
-
-        /// @See _cullPhase01 and @see MovableObject::cullReceiversBox
-        virtual void _cullReceiversBox(Camera* camera, const Camera *lodCamera,
-                                       uint8 firstRq, uint8 lastRq );
 
         /** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks
@@ -3071,15 +3056,6 @@ namespace Ogre {
             valid during viewport update. */
         Camera* getCameraInProgress(void) const     { return mCameraInProgress; }
 
-        /** Returns a visibility boundary box of culled receivers
-            calculated with the active shadow node (already merged with the right
-            render queue ids.)
-        @remarks
-            Returns a null box if no active shadow node.
-            @See CompositorShadowNode::getReceiversBox
-        */
-        const AxisAlignedBox& getCurrentReceiversBox(void) const;
-
         AxisAlignedBox _calculateCurrentCastersBox( uint32 viewportVisibilityMask,
                                                     uint8 firstRq, uint8 lastRq ) const;
 
@@ -3175,7 +3151,6 @@ namespace Ogre {
             Will block until all threads are done.
         */
         void fireCullFrustumThreads( const CullFrustumRequest &request );
-        void fireCullReceiversBoxThreads( const CullFrustumRequest &request );
         void fireCullFrustumInstanceBatchThreads( const InstanceBatchCullRequest &request );
         void startWorkerThreads();
         void stopWorkerThreads();

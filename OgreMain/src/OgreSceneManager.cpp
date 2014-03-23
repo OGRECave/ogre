@@ -180,7 +180,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
     mVisibleObjects.resize( mNumWorkerThreads );
     mVisibleObjectsBackup.resize( mNumWorkerThreads );
     mTmpVisibleObjects.resize( mNumWorkerThreads );
-    mReceiversBoxPerThread.resize( mNumWorkerThreads );
 
     startWorkerThreads();
 
@@ -1128,18 +1127,6 @@ void SceneManager::_swapVisibleObjectsForShadowMapping()
     mVisibleObjects.swap( mVisibleObjectsBackup );
 }
 //-----------------------------------------------------------------------
-void SceneManager::_cullReceiversBox( Camera* camera, const Camera *lodCamera,
-                                      uint8 firstRq, uint8 lastRq )
-{
-    camera->_setRenderedRqs( firstRq, lastRq );
-
-    CullFrustumRequest cullRequest( firstRq, lastRq, &mEntitiesMemoryManagerCulledList,
-                                    camera, lodCamera );
-    fireCullReceiversBoxThreads( cullRequest );
-
-    //Now merge the bounds from all threads into one
-    collectVisibleBoundsInfoFromThreads( camera, firstRq, lastRq );
-}
 //-----------------------------------------------------------------------
 void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewport* vp,
                                  uint8 firstRq, uint8 lastRq )
@@ -1190,9 +1177,6 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
             CullFrustumRequest cullRequest( realFirstRq, realLastRq,
                                             &mEntitiesMemoryManagerCulledList, camera, lodCamera );
             fireCullFrustumThreads( cullRequest );
-
-            //Now merge the bounds from all threads into one
-            collectVisibleBoundsInfoFromThreads( camera, realFirstRq, realLastRq );
         }
     } // end lock on scene graph mutex
 }
@@ -2226,22 +2210,6 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
     MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + threadIdx);
     outVisibleObjects.clear();
 
-    AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + threadIdx);
-    {
-        if( aabbInfo.size() < request.lastRq )
-            aabbInfo.resize( request.lastRq );
-
-        //Reset the aabb infos.
-        AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + request.firstRq;
-        AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + request.lastRq;
-
-        while( itor != end )
-        {
-            itor->setNull();
-            ++itor;
-        }
-    }
-
     const Camera *camera    = request.camera;
     const Camera *lodCamera = request.lodCamera;
     ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
@@ -2275,65 +2243,7 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
 
             MovableObject::cullFrustum( numObjs, objData, camera,
                     camera->getLastViewport()->getVisibilityMask()&getVisibilityMask(),
-                    outVisibleObjects, &aabbInfo[i], lodCamera );
-        }
-
-        ++it;
-    }
-}
-//-----------------------------------------------------------------------
-void SceneManager::cullReceiversBox( const CullFrustumRequest &request, size_t threadIdx )
-{
-    AxisAlignedBoxVec &aabbInfo = *(mReceiversBoxPerThread.begin() + threadIdx);
-    {
-        if( aabbInfo.size() < request.lastRq )
-            aabbInfo.resize( request.lastRq );
-
-        //Reset the aabb infos.
-        AxisAlignedBoxVec::iterator itor = aabbInfo.begin() + request.firstRq;
-        AxisAlignedBoxVec::iterator end  = aabbInfo.begin() + request.lastRq;
-
-        while( itor != end )
-        {
-            itor->setNull();
-            ++itor;
-        }
-    }
-
-    const Camera *camera    = request.camera;
-    const Camera *lodCamera = request.lodCamera;
-    ObjectMemoryManagerVec::const_iterator it = request.objectMemManager->begin();
-    ObjectMemoryManagerVec::const_iterator en = request.objectMemManager->end();
-
-    while( it != en )
-    {
-        ObjectMemoryManager *memoryManager = *it;
-        const size_t numRenderQueues = memoryManager->getNumRenderQueues();
-
-        size_t firstRq = std::min<size_t>( request.firstRq, numRenderQueues );
-        size_t lastRq  = std::min<size_t>( request.lastRq,  numRenderQueues );
-
-        for( size_t i=firstRq; i<lastRq; ++i )
-        {
-            ObjectData objData;
-            const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
-
-            //Distribute the work evenly across all threads (not perfect), taking into
-            //account we need to distribute in multiples of ARRAY_PACKED_REALS
-            size_t numObjs  = ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
-            numObjs         = ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
-                                ARRAY_PACKED_REALS;
-
-            const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
-
-            //Prevent going out of bounds (usually in the last threadIdx, or
-            //when there are less entities than ARRAY_PACKED_REALS
-            numObjs = std::min( numObjs, totalObjs - toAdvance );
-            objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
-
-            MovableObject::cullReceiversBox( numObjs, objData, camera,
-                            camera->getLastViewport()->getVisibilityMask()&getVisibilityMask(),
-                            &aabbInfo[i], lodCamera );
+                    outVisibleObjects, lodCamera );
         }
 
         ++it;
@@ -4093,34 +4003,6 @@ void SceneManager::resetScissor()
     mDestRenderSystem->setScissorTest(false);
 }
 //---------------------------------------------------------------------
-void SceneManager::collectVisibleBoundsInfoFromThreads( Camera* camera, uint8 firstRq, uint8 lastRq )
-{
-    AxisAlignedBoxVec &boxes = camera->_getReceiversBoxPerRenderQueue();
-    if( boxes.size() < lastRq )
-        boxes.resize( lastRq );
-    for( size_t i=firstRq; i<lastRq; ++i )
-        boxes[i].setNull();
-
-    ReceiversBoxPerThread::const_iterator it = mReceiversBoxPerThread.begin();
-    ReceiversBoxPerThread::const_iterator en = mReceiversBoxPerThread.end();
-    while( it != en )
-    {
-        const AxisAlignedBoxVec &threadInfo = *it;
-        for( size_t i=firstRq; i<lastRq; ++i )
-            boxes[i].merge( threadInfo[i] );
-
-        ++it;
-    }
-}
-//---------------------------------------------------------------------
-const AxisAlignedBox& SceneManager::getCurrentReceiversBox(void) const
-{
-    if( !mCurrentShadowNode )
-        return AxisAlignedBox::BOX_NULL;
-    else
-        return mCurrentShadowNode->getReceiversBox();
-}
-//---------------------------------------------------------------------
 const AxisAlignedBox& SceneManager::getCurrentCastersBox(void) const
 {
     if( !mCurrentShadowNode )
@@ -5344,19 +5226,6 @@ void SceneManager::fireCullFrustumThreads( const CullFrustumRequest &request )
     mWorkerThreadsBarrier->sync(); //Wait them to complete
 }
 //---------------------------------------------------------------------
-void SceneManager::fireCullReceiversBoxThreads( const CullFrustumRequest &request )
-{
-    mCurrentCullFrustumRequest = request;
-    mRequestType = CALCULATE_RECEIVER_BOX;
-    //This is where I figuratively kill whoever made mutable variables inside a
-    //const function, silencing a race condition: Update the frustum planes now
-    //in case they weren't up to date.
-    mCurrentCullFrustumRequest.camera->getFrustumPlanes();
-    mCurrentCullFrustumRequest.lodCamera->getFrustumPlanes();
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
-}
-//---------------------------------------------------------------------
 void SceneManager::fireCullFrustumInstanceBatchThreads( const InstanceBatchCullRequest &request )
 {
     mInstanceBatchCullRequest = request;
@@ -5422,9 +5291,6 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
             {
             case CULL_FRUSTUM:
                 cullFrustum( mCurrentCullFrustumRequest, threadIdx );
-                break;
-            case CALCULATE_RECEIVER_BOX:
-                cullReceiversBox( mCurrentCullFrustumRequest, threadIdx );
                 break;
             case UPDATE_ALL_ANIMATIONS:
                 updateAllAnimationsThread( threadIdx );

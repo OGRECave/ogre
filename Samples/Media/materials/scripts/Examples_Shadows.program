@@ -79,3 +79,13 @@ fragment_program Examples_Shadows_pssm_glsl_ps glsl : Examples_Shadows_glsl_ps
 		param_named			shadowMap2			int 3
 	}
 }
+
+fragment_program Examples_Shadows_DebugView_glsl_ps glsl
+{
+    source Example_ShadowsDebugViewFp.glsl
+
+    default_params
+    {
+        param_named			rt              	int 0
+    }
+}

@@ -586,7 +586,7 @@ namespace Ogre
         const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
 
         MovableObject::cullFrustum( numObjs, objData, frustum, combinedVisibilityFlags,
-                                    mCulledInstances, (AxisAlignedBox*)0, lodCamera );
+                                    mCulledInstances, lodCamera );
     }
     //-----------------------------------------------------------------------
     const String& InstanceBatch::getMovableType(void) const

@@ -40,6 +40,8 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreMovablePlane.h"
 
+#include "Math/Array/OgreArrayMatrixAf4x3.h"
+
 namespace Ogre {
 
     String Frustum::msMovableType = "Frustum";
@@ -892,9 +894,71 @@ namespace Ogre {
         {
             updateWorldSpaceCornersImpl();
         }
-
     }
+    //-----------------------------------------------------------------------
+    void Frustum::getCustomWorldSpaceCorners(
+                ArrayVector3 outCorners[(8 + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS],
+                Real customFarPlane ) const
+    {
+        updateView();
 
+        ArrayMatrixAf4x3 eyeToWorld;
+        eyeToWorld.setAll( mViewMatrix.inverseAffine() );
+
+        // Note: Even though we can dealing with general projection matrix here,
+        //       but because it's incompatibly with infinite far plane, thus, we
+        //       still need to working with projection parameters.
+
+        // Calc near plane corners
+        Real nearLeft, nearRight, nearBottom, nearTop;
+        calcProjectionParameters(nearLeft, nearRight, nearBottom, nearTop);
+
+        // Treat infinite fardist as some arbitrary far value
+        Real farDist = (customFarPlane == 0) ? 100000 : customFarPlane;
+
+        // Calc far palne corners
+        Real radio = mProjType == PT_PERSPECTIVE ? farDist / mNearDist : 1;
+        Real farLeft = nearLeft * radio;
+        Real farRight = nearRight * radio;
+        Real farBottom = nearBottom * radio;
+        Real farTop = nearTop * radio;
+
+        ArrayVector3 corners[(8 + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS];
+
+        OGRE_ALIGNED_DECL( Real, scalarCorners[16 * (8 + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS],
+                           OGRE_SIMD_ALIGNMENT );
+        memset( scalarCorners, 0, sizeof( scalarCorners ) );
+
+        //near
+        scalarCorners[0] = nearRight;   scalarCorners[1] = nearTop;     scalarCorners[2] = -mNearDist;
+        scalarCorners[4] = nearLeft;    scalarCorners[5] = nearTop;     scalarCorners[6] = -mNearDist;
+        scalarCorners[8] = nearLeft;    scalarCorners[9] = nearBottom;  scalarCorners[10]= -mNearDist;
+        scalarCorners[12]= nearRight;   scalarCorners[13]= nearBottom;  scalarCorners[14]= -mNearDist;
+        scalarCorners[3] = scalarCorners[7] = scalarCorners[11] = scalarCorners[15] = 0;
+
+        // far
+        scalarCorners[16]= farRight;    scalarCorners[17]= farTop;      scalarCorners[18]= -farDist;
+        scalarCorners[20]= farLeft;     scalarCorners[21]= farTop;      scalarCorners[22]= -farDist;
+        scalarCorners[24]= farLeft;     scalarCorners[25]= farBottom;   scalarCorners[26]= -farDist;
+        scalarCorners[28]= farRight;    scalarCorners[29]= farBottom;   scalarCorners[30]= -farDist;
+        scalarCorners[19] = scalarCorners[23] = scalarCorners[27] = scalarCorners[31] = 0;
+
+        //For ARRAY_PACKED_REALS > 8; repeat the last point (to make
+        //functions like CollapseMin & CollapseMax work correctly)
+        for( size_t i=32; i<ARRAY_PACKED_REALS * 8; i += 4 )
+        {
+            scalarCorners[i+0] = farRight;
+            scalarCorners[i+1] = farBottom;
+            scalarCorners[i+2] = -farDist;
+            scalarCorners[i+3] = 0;
+        }
+
+        for( size_t i=0; i<(8 + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS; ++i )
+        {
+            corners[i].loadFromAoS( scalarCorners + i * ARRAY_PACKED_REALS * 4 );
+            outCorners[i] = eyeToWorld * corners[i];
+        }
+    }
     //-----------------------------------------------------------------------
     Real Frustum::getAspectRatio(void) const
     {

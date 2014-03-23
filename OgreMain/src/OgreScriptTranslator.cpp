@@ -6826,68 +6826,6 @@ namespace Ogre{
                         }
                     }
                     break;
-                case ID_USE_AGGRESSIVE_FOCUS_REGION:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                        }
-                        else if(prop->values.size() != 1)
-                        {
-                            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        }
-
-                        AbstractNodeList::const_iterator it0 = prop->values.begin();
-                        if( !getBoolean( *it0, &defaultParams.aggressiveFocusRegion ) )
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                    }
-                    break;
-                case ID_OPTIMAL_AJUST_FACTOR:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                        }
-                        else if(prop->values.size() != 1)
-                        {
-                            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        }
-
-                        AbstractNodeList::const_iterator it0 = prop->values.begin();
-                        if( !getReal( *it0, &defaultParams.optimalAdjustFactor ) )
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                    }
-                    break;
-                case ID_LIGHT_DIR_THRESHOLD:
-                    {
-                        if(prop->values.empty())
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                        }
-                        else if(prop->values.size() != 1)
-                        {
-                            compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
-                        }
-
-                        AbstractNodeList::const_iterator it0 = prop->values.begin();
-                        Real val;
-                        if( getReal( *it0, &val ) )
-                        {
-                            defaultParams.lightDirThreshold = Degree( val );
-                        }
-                        else
-                        {
-                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                            return;
-                        }
-                    }
-                    break;
                 case ID_SHADOW_MAP:
                 case ID_SHADOW_ATLAS:
                     translateShadowMapProperty( prop, compiler, prop->id == ID_SHADOW_ATLAS, defaultParams );
