@@ -188,7 +188,7 @@ fragment_program Example_Shadows_DebugView_hlsl_ps hlsl
 {
     source Example_ShadowsDebugView_ps.hlsl
     entry_point main_ps
-    target ps_3_0
+    target ps_2_0
 }
 
 //---------------------------------------------------------------------------------------
