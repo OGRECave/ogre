@@ -1,8 +1,4 @@
 
-#version 330
-
-#define FRAG_COLOR 0
-
 #define NUM_SHADOW_SAMPLES_1D 2.0
 #define SHADOW_FILTER_SCALE 0.5
 
@@ -25,7 +21,7 @@ float calcDepthShadowLod(sampler2D shadowMap, vec4 uv, float invShadowMapSize)
 		{
 			vec4 finalUv = offsetSample(uv, vec2(x, y), invShadowMapSize);
 			finalUv.xy /= finalUv.w;
-			float depth = textureLod( shadowMap, finalUv.xy, 0 ).x;
+            float depth = texture2DLod( shadowMap, finalUv.xy, 0 ).x;
 			if( depth >= 1 || depth >= uv.z )
 				shadow += 1.0;
 		}
@@ -64,21 +60,7 @@ float calcPSSMDepthShadow( sampler2D shadowMap0, sampler2D shadowMap1, sampler2D
 	return shadow;
 }
 
-in vec2 psUv;
-in vec3 psWorldPos;
-in vec3 psNorm;
-
-in vec4 psLightSpacePos0;
-
-#ifdef PSSM
-	in vec4 psLightSpacePos1;
-	in vec4 psLightSpacePos2;
-	in float psDepth;
-#endif
-
-layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
-
-#define NUM_LIGHTS 1
+#define NUM_LIGHTS 8
 
 uniform vec4 lightAmbient;
 uniform vec4 lightPosition[NUM_LIGHTS];
@@ -98,6 +80,18 @@ uniform sampler2D shadowMap2;
 
 void main()
 {
+    const vec2 psUv         = gl_TexCoord[0].xy;
+    const vec3 psWorldPos   = gl_TexCoord[1].xyz;
+    const vec3 psNorm       = gl_TexCoord[2].xyz;
+
+    const vec4 psLightSpacePos0 = gl_TexCoord[3].xyzw;
+
+    #ifdef PSSM
+        const vec4 psLightSpacePos1 = gl_TexCoord[4].xyzw;
+        const vec4 psLightSpacePos2 = gl_TexCoord[5].xyzw;
+        const float psDepth         = gl_TexCoord[6].x;
+    #endif
+
 #ifdef PSSM
 	float fShadow = calcPSSMDepthShadow( shadowMap0, shadowMap1, shadowMap2,
 									psLightSpacePos0, psLightSpacePos1, psLightSpacePos2,
@@ -110,22 +104,22 @@ void main()
 	vec3 negLightDir = lightPosition[0].xyz - (psWorldPos * lightPosition[0].w);
 	negLightDir	= normalize( negLightDir );
 	vec3 normal = normalize( psNorm );
-	outColour = max( 0, dot( negLightDir, normal ) ) * lightDiffuse[0] * fShadow + lightAmbient;
+    gl_FragColor = max( 0, dot( negLightDir, normal ) ) * lightDiffuse[0] * fShadow + lightAmbient;
 
 	int i=1;
 	for( i=1; i<NUM_LIGHTS; ++i )
 	{
 		vec3 negLightDir = lightPosition[i].xyz - (psWorldPos * lightPosition[i].w);
 		negLightDir	= normalize( negLightDir );
-		outColour += max( 0, dot( negLightDir, normal ) ) * lightDiffuse[i];
+        gl_FragColor += max( 0, dot( negLightDir, normal ) ) * lightDiffuse[i];
 	}
 
-	outColour *= texture( diffuseMap, psUv );
+    gl_FragColor *= texture2D( diffuseMap, psUv );
 
 	/*if( inDepth <= pssmSplits.x)
-		outColour.xyz = lerp( outColour.xyz, vec3( 0, 0, 1.0f ), 0.25f );
+        gl_FragColor.xyz = lerp( gl_FragColor.xyz, vec3( 0, 0, 1.0f ), 0.25f );
 	else if( inDepth <= pssmSplits.y)
-		outColour.xyz = lerp( outColour.xyz, vec3( 0, 1.0f, 0 ), 0.25f );
+        gl_FragColor.xyz = lerp( gl_FragColor.xyz, vec3( 0, 1.0f, 0 ), 0.25f );
 	else
-		outColour.xyz = lerp( outColour.xyz, vec3( 1.0f, 0, 0 ), 0.25f );*/
+        gl_FragColor.xyz = lerp( gl_FragColor.xyz, vec3( 1.0f, 0, 0 ), 0.25f );*/
 }
