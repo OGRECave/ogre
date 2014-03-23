@@ -78,7 +78,7 @@ in vec4 psLightSpacePos0;
 
 layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 
-#define NUM_LIGHTS 1
+#define NUM_LIGHTS 8
 
 uniform vec4 lightAmbient;
 uniform vec4 lightPosition[NUM_LIGHTS];

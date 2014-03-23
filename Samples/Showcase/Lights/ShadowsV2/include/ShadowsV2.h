@@ -31,12 +31,15 @@ protected:
     Ogre::Entity                        *mFloorPlane;
     Ogre::Light                         *mMainLight;
     Ogre::vector<Ogre::Light*>::type    mLights;
+    Ogre::SceneNode                     *mLightRootNode;
     Ogre::Real                          mMinFlareSize;
     Ogre::Real                          mMaxFlareSize;
     bool                                mPssm;  /// Whether to enable Parallel Split Shadow Mapping
 
 public:
     Sample_ShadowsV2();
+
+    virtual bool frameRenderingQueued( const Ogre::FrameEvent& evt );
 
 protected:
 
@@ -45,5 +48,6 @@ protected:
     // Just override the mandatory create scene method
     virtual void setupContent(void);
 
+    void createExtraLights(void);
     void createDebugOverlays(void);
 };

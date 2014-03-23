@@ -53,8 +53,8 @@ fragment_program Examples_Shadows_glsl_ps glsl
 	default_params
 	{
 		param_named_auto	lightAmbient		ambient_light_colour
-		param_named_auto	lightPosition		light_position_array 1
-		param_named_auto	lightDiffuse		derived_light_diffuse_colour_array 1
+        param_named_auto	lightPosition		light_position_array 8
+        param_named_auto	lightDiffuse		derived_light_diffuse_colour_array 8
 
 		param_named_auto	invShadowMapSize0	inverse_texture_size	1
 

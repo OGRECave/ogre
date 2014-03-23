@@ -133,7 +133,35 @@ void Sample_ShadowsV2::setupContent(void)
     mCamera->setNearClipDistance( 0.1f );
     mCamera->setFarClipDistance( 5000.0f );
 
+    createExtraLights();
     createDebugOverlays();
+}
+//---------------------------------------------------------------------------------------
+void Sample_ShadowsV2::createExtraLights(void)
+{
+    srand( 7907 ); //Prime number. For debugging, we want all runs to be deterministic
+    rand();
+
+    mLightRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+
+    //Create 7 more lights
+    for( size_t i=0; i<7; ++i )
+    {
+        SceneNode *lightNode = mLightRootNode->createChildSceneNode();
+        Light *light = mSceneMgr->createLight();
+        light->setName( "Extra Point Light" );
+        lightNode->attachObject( light );
+        light->setType( Light::LT_POINT );
+
+        light->setAttenuation( 1000.0f, 1.0f, 0.0f, 1.0f );
+
+        light->setDiffuseColour( (((unsigned int)rand()) % 255) / 255.0f * 0.25f,
+                                 (((unsigned int)rand()) % 255) / 255.0f * 0.25f,
+                                 (((unsigned int)rand()) % 255) / 255.0f * 0.25f );
+        lightNode->setPosition( ( (rand() / (Real)RAND_MAX) * 2.0f - 1.0f ) * 60.0f,
+                                ( (rand() / (Real)RAND_MAX) * 2.0f - 1.0f ) * 10.0f,
+                                ( (rand() / (Real)RAND_MAX) * 2.0f - 1.0f ) * 60.0f );
+    }
 }
 //---------------------------------------------------------------------------------------
 void Sample_ShadowsV2::createDebugOverlays(void)
@@ -199,4 +227,14 @@ void Sample_ShadowsV2::createDebugOverlays(void)
 
     // END DEBUG
     ////////////////////////////////////////////////////////////
+}
+//---------------------------------------------------------------------------------------
+bool Sample_ShadowsV2::frameRenderingQueued(const FrameEvent& evt)
+{
+    mLightRootNode->yaw( Radian( evt.timeSinceLastFrame ) );
+
+    Node *mainLightNode = mMainLight->getParentNode();
+    mainLightNode->yaw( Radian( -evt.timeSinceLastFrame * 0.1f ), Node::TS_PARENT );
+
+    return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
 }
