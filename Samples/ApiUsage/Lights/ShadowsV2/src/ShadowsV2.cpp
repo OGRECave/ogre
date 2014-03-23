@@ -171,7 +171,7 @@ void Sample_ShadowsV2::createDebugOverlays(void)
     IdString shadowNodeName = mPssm ? "ExampleShadows_PssmShadowNode" : "ExampleShadows_FocusedShadowNode";
 
     Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingletonPtr()->
-                                                            getByName("Examples_Shadows_DebugView");
+                                                            getByName("Example_Shadows_DebugView");
     Ogre::MaterialPtr DepthShadowTexture = baseWhite->clone("DepthShadowTexture0");
     Ogre::TextureUnitState* textureUnit = DepthShadowTexture->getTechnique(0)->getPass(0)->
                                                             getTextureUnitState(0);

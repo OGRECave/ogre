@@ -7,6 +7,7 @@ in vec2 uv0;
 
 #ifdef DEPTH_SHADOWCASTER
 	out float psDepth;
+    uniform float shadowConstantBias;
 #else
 	out vec2 psUv;
 	out vec3 psWorldPos;
@@ -24,17 +25,14 @@ in vec2 uv0;
 		uniform vec4 depthRange1;
 		uniform vec4 depthRange2;
 	#endif
+
+    uniform mat4x4 texViewProjMatrix0;
+    uniform mat4x4 world;
 #endif
 
 uniform mat4x4 worldViewProj;
 uniform vec4 depthRange0;
 
-#ifndef DEPTH_SHADOWCASTER
-	uniform mat4x4 texViewProjMatrix0;
-	uniform mat4x4 world;
-#endif
-
-uniform float shadowConstantBias;
 
 void main()
 {

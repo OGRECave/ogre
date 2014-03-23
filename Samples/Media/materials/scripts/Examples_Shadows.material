@@ -1,4 +1,4 @@
-material Examples_Shadows_DebugView
+material Example_Shadows_DebugView
 {
     technique
     {
@@ -8,7 +8,7 @@ material Examples_Shadows_DebugView
             {
             }
 
-            fragment_program_ref Examples_Shadows_DebugView_glsl_ps
+            fragment_program_ref Example_Shadows_DebugView_ps
             {
             }
 
@@ -19,35 +19,35 @@ material Examples_Shadows_DebugView
     }
 }
 
-material Examples_Shadows_Caster
+material Example_ShadowsCaster
 {
 	technique
 	{
 		pass
 		{
-			vertex_program_ref Examples_Shadows_Caster_glsl_vs
+            vertex_program_ref Example_ShadowsCaster_vs
 			{
 			}
-			fragment_program_ref Example_ShadowsCaster_glsl_ps
+            fragment_program_ref Example_ShadowsCaster_ps
 			{
 			}
 		}
 	}
 }
 
-material Examples_Shadows
+material Example_Shadows
 {
 	technique
 	{
-		shadow_caster_material Examples_Shadows_Caster
+        shadow_caster_material Example_ShadowsCaster
 
 		pass
 		{
-			vertex_program_ref Examples_Shadows_glsl_vs
+            vertex_program_ref Example_Shadows_vs
 			{
 			}
 
-			fragment_program_ref Examples_Shadows_glsl_ps
+            fragment_program_ref Example_Shadows_ps
 			{
 			}
 
@@ -66,19 +66,19 @@ material Examples_Shadows
 	}
 }
 
-material Examples_Shadows_pssm
+material Example_Shadows_pssm
 {
 	technique
 	{
-		shadow_caster_material Examples_Shadows_Caster
+        shadow_caster_material Example_ShadowsCaster
 
 		pass
 		{
-			vertex_program_ref Examples_Shadows_pssm_glsl_vs
+            vertex_program_ref Example_Shadows_pssm_vs
 			{
 			}
 
-			fragment_program_ref Examples_Shadows_pssm_glsl_ps
+            fragment_program_ref Example_Shadows_pssm_ps
 			{
 			}
 			
@@ -111,19 +111,19 @@ material Examples_Shadows_pssm
 	}
 }
 
-material Example_Shadows_Floor			: Examples_Shadows
+material Example_Shadows_Floor			: Example_Shadows
 {
 	set_texture_alias DiffuseTex KAMEN320x240.jpg
 }
-material Example_Shadows_Floor_pssm		: Examples_Shadows_pssm
+material Example_Shadows_Floor_pssm		: Example_Shadows_pssm
 {
 	set_texture_alias DiffuseTex KAMEN320x240.jpg
 }
-material Example_Shadows_Penguin		: Examples_Shadows
+material Example_Shadows_Penguin		: Example_Shadows
 {
 	set_texture_alias DiffuseTex penguin.jpg
 }
-material Example_Shadows_Penguin_pssm	: Examples_Shadows_pssm	
+material Example_Shadows_Penguin_pssm	: Example_Shadows_pssm
 {
 	set_texture_alias DiffuseTex penguin.jpg
 }
