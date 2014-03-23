@@ -13,9 +13,6 @@ macro( add_recursive dir retVal )
 	file( GLOB_RECURSE ${retVal} ${dir}/*.h ${dir}/*.cpp ${dir}/*.c )
 endmacro()
 
-# Visual Studio filters: Make them match the directory structure.
-set_property( GLOBAL PROPERTY USE_FOLDERS ON)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_recursive( ./src SOURCE_FILES )
