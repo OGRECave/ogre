@@ -118,8 +118,7 @@ namespace Ogre
             texDef->height  = 2048;
             texDef->formatList.push_back( PF_FLOAT32_R );
             //texDef->formatList.push_back( PF_A8B8G8R8 );
-            //texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-            texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
+            texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
         }
         {
             ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 1, 0, "MyFirstTex2", false );
@@ -127,8 +126,7 @@ namespace Ogre
             texDef->height  = 1024;
             texDef->formatList.push_back( PF_FLOAT32_R );
             //texDef->formatList.push_back( PF_A8B8G8R8 );
-            //texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-            texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
+            texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
         }
         {
             ShadowTextureDefinition *texDef = shadowNode->addShadowTextureDefinition( 2, 0, "MyFirstTex3", false );
@@ -136,8 +134,7 @@ namespace Ogre
             texDef->height  = 1024;
             texDef->formatList.push_back( PF_FLOAT32_R );
             //texDef->formatList.push_back( PF_A8B8G8R8 );
-            //texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
-            texDef->shadowMapTechnique = SHADOWMAP_LISPSM;
+            texDef->shadowMapTechnique = SHADOWMAP_FOCUSED;
         }
 
         shadowNode->setNumTargetPass( 3 );

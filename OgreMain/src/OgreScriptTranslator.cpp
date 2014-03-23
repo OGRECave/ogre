@@ -6633,12 +6633,9 @@ namespace Ogre{
         td->hwGammaWrite    = hwGammaWrite;
         td->depthBufferId   = depthBufferId;
 
-        td->aggressiveFocusRegion   = defaultParams.aggressiveFocusRegion;
-        td->optimalAdjustFactor     = defaultParams.optimalAdjustFactor;
-        td->lightDirThreshold       = defaultParams.lightDirThreshold;
-        td->pssmLambda              = defaultParams.pssmLambda;
-        td->splitPadding            = defaultParams.splitPadding;
-        td->numSplits               = defaultParams.numSplits;
+        td->pssmLambda      = defaultParams.pssmLambda;
+        td->splitPadding    = defaultParams.splitPadding;
+        td->numSplits       = defaultParams.numSplits;
     }
     //-------------------------------------------------------------------------
     void CompositorShadowNodeTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
@@ -6746,8 +6743,6 @@ namespace Ogre{
                                 mShadowNodeDef->setDefaultTechnique( SHADOWMAP_PLANEOPTIMAL );
                             else if( str == "focused" )
                                 mShadowNodeDef->setDefaultTechnique( SHADOWMAP_FOCUSED );
-                            else if( str == "lispsm" )
-                                mShadowNodeDef->setDefaultTechnique( SHADOWMAP_LISPSM );
                             else if( str == "pssm" )
                                 mShadowNodeDef->setDefaultTechnique( SHADOWMAP_PSSM );
                             else

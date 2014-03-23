@@ -103,29 +103,14 @@ namespace Ogre
                     {
                         FocusedShadowCameraSetup *setup = OGRE_NEW FocusedShadowCameraSetup();
                         shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
-                        //setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
                     }
                     break;
-                /*case SHADOWMAP_LISPSM:
-                    {
-                        LiSPSMShadowCameraSetup *setup = OGRE_NEW LiSPSMShadowCameraSetup();
-                        shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
-                        setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
-                        setup->setOptimalAdjustFactor( itor->optimalAdjustFactor );
-                        setup->setCameraLightDirectionThreshold( itor->lightDirThreshold );
-                        setup->setUseSimpleOptimalAdjust( false );
-                    }
-                    break;*/
                 case SHADOWMAP_PSSM:
                     {
                         PSSMShadowCameraSetup *setup = OGRE_NEW PSSMShadowCameraSetup();
                         shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
                         setup->calculateSplitPoints( itor->numSplits, 0.0f, 100.0f, 0.95f );
                         setup->setSplitPadding( itor->splitPadding );
-                        /*setup->setUseAggressiveFocusRegion( itor->aggressiveFocusRegion );
-                        setup->setOptimalAdjustFactor( itor->split, itor->optimalAdjustFactor );
-                        setup->setCameraLightDirectionThreshold( itor->lightDirThreshold );
-                        setup->setUseSimpleOptimalAdjust( false );*/
                     }
                     break;
                 default:

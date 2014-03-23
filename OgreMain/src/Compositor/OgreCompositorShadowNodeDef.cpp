@@ -232,10 +232,7 @@ namespace Ogre
                         bShared = true;
                     }
                 }
-                else if( it2->shadowMapTechnique == it1->shadowMapTechnique &&
-                         it2->aggressiveFocusRegion == it1->aggressiveFocusRegion &&
-                         it2->optimalAdjustFactor == it1->optimalAdjustFactor &&
-                         it2->lightDirThreshold == it1->lightDirThreshold )
+                else if( it2->shadowMapTechnique == it1->shadowMapTechnique )
                 {
                     it1->_setSharesSetupWithIdx( it2 - mShadowMapTexDefinitions.begin() );
                     bShared = true;
