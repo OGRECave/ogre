@@ -278,8 +278,8 @@ namespace Ogre
         }
 
         //Some padding
-        vMax += 1.0f;
-        vMin -= 1.0f;
+        vMax += 10.0f;
+        vMin -= 10.0f;
 
         texCam->setProjectionType( PT_ORTHOGRAPHIC );
         Vector3 shadowCameraPos = (vMin + vMax) * 0.5f;
