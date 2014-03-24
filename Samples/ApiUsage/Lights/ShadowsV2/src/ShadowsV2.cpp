@@ -45,6 +45,8 @@ Sample_ShadowsV2::Sample_ShadowsV2()
             "Shadow mapping involves setting up custom shaders and a proper compositor.\n\n"
             "This sample supports 8 different lights. Only the first one is a directional "
             "light and shadow caster. The rest of the lights are point lights.\n\n"
+            "By default this sample uses PSSM technique which gives the best quality. To "
+            "test the Focused technique, change the mPssm variable and recompile.\n\n"
             "Note in this CTP (Community Technology Preview) only directional shadow caster"
             " lights have been thoroughly tested. Point and Spot casters should work with "
             "propper shader tweaks, but this hasn't been tested yet.\n\n"
@@ -52,9 +54,16 @@ Sample_ShadowsV2::Sample_ShadowsV2()
             "   * Examples_Shadows.material\n"
             "   * Examples_Shadows.program\n"
             "   * Example_Shadows.compositor\n"
-            "   * Example_ShadowsVp.glsl\n"
+            "OpenGL\n"
             "   * Example_ShadowsCasterFp.glsl\n"
-            "   * Example_ShadowsFp.glsl";
+            "   * Example_ShadowsDebugViewFp.glsl\n"
+            "   * Example_ShadowsFp.glsl\n"
+            "   * Example_ShadowsVp.glsl\n"
+            "DX9\n"
+            "   * Example_Shadows_ps.hlsl\n"
+            "   * Example_Shadows_vs.hlsl\n"
+            "   * Example_ShadowsCaster_ps.hlsl\n"
+            "   * Example_ShadowsDebugView_ps.hlsl";
     mInfo["Thumbnail"] = "thumb_shadows.png";
     mInfo["Category"] = "API Usage";
 }
