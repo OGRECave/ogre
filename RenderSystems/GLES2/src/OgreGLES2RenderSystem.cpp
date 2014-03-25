@@ -2291,8 +2291,6 @@ namespace Ogre {
                 
         initialiseContext(win);
         
-        mGLSupport->initialiseExtensions();
-        
         static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
         
         _destroyDepthBuffer(win);
