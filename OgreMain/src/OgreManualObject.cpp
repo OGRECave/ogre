@@ -56,6 +56,8 @@ namespace Ogre {
           mAnyIndexed(false), mEdgeList(0), 
           mUseIdentityProjection(false), mUseIdentityView(false), mKeepDeclarationOrder(false)
     {
+        //Start with a null Aabb so that it can grow after calls to position()
+        mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
     }
     //-----------------------------------------------------------------------------
     ManualObject::~ManualObject()
