@@ -650,7 +650,7 @@ namespace Ogre {
         {
             GLint vSize[2];
             glGetIntegerv(GL_POINT_SIZE_RANGE,vSize);
-            rsc->setMaxPointSize(vSize[1]);
+            rsc->setMaxPointSize((Real)vSize[1]);
         }
 
         // Vertex texture fetching
@@ -2292,8 +2292,8 @@ namespace Ogre {
         Real tanThetaX = tanThetaY * aspect; //Math::Tan(thetaX);
         Real half_w = tanThetaX * nearPlane;
         Real half_h = tanThetaY * nearPlane;
-        Real iw = 1.0 / half_w;
-        Real ih = 1.0 / half_h;
+        Real iw = 1.0f / half_w;
+        Real ih = 1.0f / half_h;
         Real q;
         if (farPlane == 0)
         {
@@ -2301,7 +2301,7 @@ namespace Ogre {
         }
         else
         {
-            q = 2.0 / (farPlane - nearPlane);
+            q = 2.0f / (farPlane - nearPlane);
         }
         dest = Matrix4::ZERO;
         dest[0][0] = iw;
@@ -2578,7 +2578,7 @@ namespace Ogre {
             maxAnisotropy = largest_supported_anisotropy ?
                 static_cast<uint>(largest_supported_anisotropy) : 1;
         if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-            glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+            glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, (GLfloat)maxAnisotropy);
 
         mStateCacheManager->activateGLTextureUnit(0);
     }
