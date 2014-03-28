@@ -283,6 +283,32 @@ namespace Ogre {
         Real calculate(Real source);
 
     };
+
+    //-----------------------------------------------------------------------
+    /** Predefined controller function based on linear function interpolation.
+    */
+    class LinearControllerFunction : public ControllerFunction<Real> {
+        Real mFrequency;
+        std::vector<Real> mKeys;
+        std::vector<Real> mValues;
+    public:
+        /** Constructor, requires keys and values of the function to interpolate
+            @param
+                keys the x-values of the function sampling points. valid value range is [0,1).
+            @remarks
+                for simplicity and compability with the predefined ControllerValue classes the function range is limited to [0,1).
+                However you can use the frequency parameter to rescale the input values.
+            @param
+                values the function values f(x) of the function. order must match keys
+            @remarks
+                there must be the same amount of keys and values
+        */
+        LinearControllerFunction(const std::vector<Real>& keys, const std::vector<Real>& values, Real frequency = 1, bool deltaInput = true);
+
+        /** Overridden function.
+        */
+        Real calculate(Real source);
+    };
     //-----------------------------------------------------------------------
 	/** @} */
 	/** @} */
