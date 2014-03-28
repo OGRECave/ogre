@@ -300,6 +300,7 @@ namespace Ogre {
                         case GCT_SAMPLER1DSHADOW:
                         case GCT_SAMPLER2D:
                         case GCT_SAMPLER2DSHADOW:
+                        case GCT_SAMPLER2DARRAY:
                         case GCT_SAMPLER3D:
                         case GCT_SAMPLERCUBE:
                             shouldUpdate = mUniformCache->updateUniform(currentUniform->mLocation,
