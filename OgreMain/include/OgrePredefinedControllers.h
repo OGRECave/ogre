@@ -287,7 +287,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     /** Predefined controller function based on linear function interpolation.
     */
-    class LinearControllerFunction : public ControllerFunction<Real> {
+    class _OgreExport LinearControllerFunction : public ControllerFunction<Real> {
         Real mFrequency;
         std::vector<Real> mKeys;
         std::vector<Real> mValues;
