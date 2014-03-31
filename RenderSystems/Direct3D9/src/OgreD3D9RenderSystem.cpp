@@ -70,7 +70,7 @@ namespace Ogre
         ,mAllowDirectX9Ex(false)
         ,mIsDirectX9Ex(false)
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		,mStereoDriver (NULL)
+        ,mStereoDriver (NULL)
 #endif
     {
         LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " created." );
@@ -154,8 +154,8 @@ namespace Ogre
         }
         
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		OGRE_DELETE mStereoDriver;
-		mStereoDriver = NULL;
+        OGRE_DELETE mStereoDriver;
+        mStereoDriver = NULL;
 #endif
 
         LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " destroyed." );
@@ -326,13 +326,13 @@ namespace Ogre
         optEnableFixedPipeline.immutable = false;
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		optStereoMode.name = "Stereo Mode";
-		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
-		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
-		optStereoMode.currentValue = optStereoMode.possibleValues[0];
-		optStereoMode.immutable = false;
-		
-		mOptions[optStereoMode.name] = optStereoMode;
+        optStereoMode.name = "Stereo Mode";
+        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
+        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+        optStereoMode.currentValue = optStereoMode.possibleValues[0];
+        optStereoMode.immutable = false;
+
+        mOptions[optStereoMode.name] = optStereoMode;
 #endif
 
         mOptions[optDevice.name] = optDevice;
@@ -644,12 +644,6 @@ namespace Ogre
         mDriverVersion.release = HIWORD(mActiveD3DDriver->getAdapterIdentifier().DriverVersion.LowPart);
         mDriverVersion.build = LOWORD(mActiveD3DDriver->getAdapterIdentifier().DriverVersion.LowPart);
 
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		// Stereo driver must be created before device is created
-		StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
-		mStereoDriver = OGRE_NEW D3D9StereoDriverBridge(stereoMode);
-#endif
-
         // Create the device manager.
         mDeviceManager = OGRE_NEW D3D9DeviceManager();
 
@@ -842,7 +836,12 @@ namespace Ogre
                 "exists.  You cannot create a new window with this name.";
             OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "D3D9RenderSystem::_createRenderWindow" );
         }
-                
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        // Stereo driver must be created before device is created
+        createStereoDriver(miscParams);
+#endif
+
         D3D9RenderWindow* renderWindow = OGRE_NEW D3D9RenderWindow(mhInstance);
         
         renderWindow->create(name, width, height, fullScreen, miscParams);
@@ -872,9 +871,9 @@ namespace Ogre
         attachRenderTarget( *renderWindow );
         
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		// Must be called after device has been linked to window
-		D3D9StereoDriverBridge::getSingleton().addRenderWindow(renderWindow);
-		renderWindow->_validateStereo();
+        // Must be called after device has been linked to window
+        D3D9StereoDriverBridge::getSingleton().addRenderWindow(renderWindow);
+        renderWindow->_validateStereo();
 #endif
 
         return renderWindow;
@@ -1625,7 +1624,7 @@ namespace Ogre
     void D3D9RenderSystem::destroyRenderTarget(const String& name)
     {       
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		D3D9StereoDriverBridge::getSingleton().removeRenderWindow(name);
+        D3D9StereoDriverBridge::getSingleton().removeRenderWindow(name);
 #endif
 
         detachRenderTargetImpl(name);
@@ -3114,9 +3113,9 @@ namespace Ogre
                 // also make sure we validate the device; if this never went 
                 // through update() it won't be set
                 window->_validateDevice();
-				
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-				window->_validateStereo();
+                window->_validateStereo();
 #endif
             }
 
@@ -4509,12 +4508,27 @@ namespace Ogre
 
         fireEvent(name, &params);
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-	bool D3D9RenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
-	{
-		return D3D9StereoDriverBridge::getSingleton().setDrawBuffer(colourBuffer);
-	}
+    void D3D9RenderSystem::createStereoDriver(const NameValuePairList* miscParams)
+    {
+        // Get the value used to create the render system.  If none, get the parameter value used to create the window.
+        StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
+        if (stereoMode == SMT_NONE)
+        {
+            NameValuePairList::const_iterator iter = miscParams->find("stereoMode");
+            if (iter != miscParams->end())
+              stereoMode = StringConverter::parseStereoMode((*iter).second);
+        }
+
+        // Always create the stereo bridge regardless of the mode
+        mStereoDriver = OGRE_NEW D3D9StereoDriverBridge(stereoMode);
+    }
+    //---------------------------------------------------------------------
+    bool D3D9RenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+    {
+        return D3D9StereoDriverBridge::getSingleton().setDrawBuffer(colourBuffer);
+    }
+    //---------------------------------------------------------------------
 #endif
-	//---------------------------------------------------------------------
 }
