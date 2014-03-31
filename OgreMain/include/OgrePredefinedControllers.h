@@ -294,10 +294,10 @@ namespace Ogre {
     public:
         /** Constructor, requires keys and values of the function to interpolate
             @param
-                keys the x-values of the function sampling points. valid value range is [0,1).
+                keys the x-values of the function sampling points. Value range is [0,1]. Must include at least the keys 0 and 1.
             @remarks
-                for simplicity and compability with the predefined ControllerValue classes the function range is limited to [0,1).
-                However you can use the frequency parameter to rescale the input values.
+                for simplicity and compability with the predefined ControllerValue classes the function range is limited to [0,1].
+                However you can use the frequency parameter to rescale the input key values.
             @param
                 values the function values f(x) of the function. order must match keys
             @remarks
