@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreHlmsManager.h"
+//#include "OgreHlmsManager.h"
 
 namespace Ogre
 {

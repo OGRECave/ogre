@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class HlmsManager;
     class CompositorShadowNode;
 
     /** \addtogroup Core
@@ -118,8 +117,6 @@ namespace Ogre
         /// @See calculateHashFor
         virtual uint32 calculateRenderableHash(void) const;
 
-        virtual MaterialPtr prepareFor( Renderable *renderable, MovableObject *movableObject );
-
         void addRenderableCache( uint32 hash, const HlmsPropertyVec &renderableSetProperties );
         void addShaderCache( uint32 hash, GpuProgramPtr &vertexShader, GpuProgramPtr &geometryShader,
                              GpuProgramPtr &tesselationHullShader,
@@ -146,7 +143,7 @@ namespace Ogre
         @param movableObject
             The MovableObject the material will be used on (usually the parent of renderable)
         @return
-            A hash. This hash references property parameters cached in the HlmsManager.
+            A hash. This hash references property parameters that are already cached.
         */
         virtual uint32 calculateHashFor( Renderable *renderable, const HlmsParamVec &params );
 
@@ -156,9 +153,9 @@ namespace Ogre
             The shadow node currently in effect. Can be null.
         @return
             A hash and cached property parameters. Unlike @calculateHashFor, the cache
-            must be kept by the caller and not by the HlmsManager (because it may
-            change every frame and is one for the whole pass, but Mesh' properties
-            usually stay consistent through its lifetime but may differ per mesh)
+            must be kept by the caller and not by us (because it may change every frame
+            and is one for the whole pass, but Mesh' properties usually stay consistent
+            through its lifetime but may differ per mesh)
         */
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
                                            bool casterPass, bool dualParaboloid );

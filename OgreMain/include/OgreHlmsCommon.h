@@ -115,15 +115,15 @@ namespace Ogre
 
     typedef vector<HlmsProperty>::type HlmsPropertyVec;
 
-    bool OrderPropertyByIdString( const HlmsProperty &_left, const HlmsProperty &_right )
+    inline bool OrderPropertyByIdString( const HlmsProperty &_left, const HlmsProperty &_right )
     {
         return _left.keyName < _right.keyName;
     }
 
     typedef vector<std::pair<IdString, String>>::type HlmsParamVec;
 
-    bool OrderParamVecByKey( const std::pair<IdString, String> &_left,
-                             const std::pair<IdString, String> &_right )
+    inline bool OrderParamVecByKey( const std::pair<IdString, String> &_left,
+                                    const std::pair<IdString, String> &_right )
     {
         return _left.first < _right.second;
     }
@@ -166,11 +166,11 @@ namespace Ogre
         Vector3 fresnel;            //F0
 
         //TODO: Most likely these strings should be replaced by an index to the texture arrays.
-        String diffuseMap;
-        String normalMap;
-        String specularMap;
-        String detailMask;
-        String detailMap[4];
+        uint16 diffuseMap;
+        uint16 normalMap;
+        uint16 specularMap;
+        uint16 detailMask;
+        uint16 detailMap[4];
     };
 
     struct HlmsCache
@@ -217,7 +217,7 @@ namespace Ogre
 
     typedef vector<HlmsCache>::type HlmsCacheVec;
 
-    bool OrderCacheByHash( const HlmsCache &_left, const HlmsCache &_right )
+    inline bool OrderCacheByHash( const HlmsCache &_left, const HlmsCache &_right )
     {
         return _left.hash < _right.hash;
     }
