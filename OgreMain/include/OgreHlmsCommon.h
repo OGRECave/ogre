@@ -122,11 +122,95 @@ namespace Ogre
 
     typedef vector<std::pair<IdString, String>>::type HlmsParamVec;
 
+    bool OrderParamVecByKey( const std::pair<IdString, String> &_left,
+                             const std::pair<IdString, String> &_right )
+    {
+        return _left.first < _right.second;
+    }
+
+    struct HlmsParam
+    {
+        virtual ~HlmsParam() {}
+
+        CullingMode     cullMode;
+        PolygonMode     polygonMode;
+        bool            alphaToCoverageEnabled;
+        bool            colourWrite;
+        bool            depthCheck;
+        bool            depthWrite;
+        CompareFunction depthFunc;
+        float           depthBiasSlopeScale;
+
+        // Blending factors
+        SceneBlendFactor sourceBlendFactor;
+        SceneBlendFactor destBlendFactor;
+        SceneBlendFactor sourceBlendFactorAlpha;
+        SceneBlendFactor destBlendFactorAlpha;
+
+        // Used to determine if separate alpha blending should be used for color and alpha channels
+        bool            separateBlend;
+
+        //-------------------------------------------------------------------------
+        // Blending operations
+        SceneBlendOperation blendOperation;
+        SceneBlendOperation alphaBlendOperation;
+
+        /// Determines if we should use separate blending operations for color and alpha channels
+        bool                separateBlendOperation;
+    };
+
+    struct HlmsParamPbs : HlmsParam
+    {
+        ColourValue diffuseColour;  //kD
+        Vector3 specularColour;     //kS
+        Vector3 fresnel;            //F0
+
+        //TODO: Most likely these strings should be replaced by an index to the texture arrays.
+        String diffuseMap;
+        String normalMap;
+        String specularMap;
+        String detailMask;
+        String detailMap[4];
+    };
+
     struct HlmsCache
     {
         uint32          hash;
         HlmsPropertyVec setProperties;
-        GpuProgramPtr   gpuProgram;
+
+        GpuProgramPtr   vertexShader;
+        GpuProgramPtr   geometryShader;
+        GpuProgramPtr   tesselationHullShader;
+        GpuProgramPtr   tesselationDomainShader;
+        GpuProgramPtr   pixelShader;
+
+        /* This is state, independent of the shader being used
+        CullingMode     cullMode;
+        PolygonMode     polygonMode;
+        bool            alphaToCoverageEnabled;
+        bool            colourWrite;
+        bool            depthCheck;
+        bool            depthWrite;
+        CompareFunction depthFunc;
+        float           depthBiasSlopeScale;
+
+        // Blending factors
+        SceneBlendFactor sourceBlendFactor;
+        SceneBlendFactor destBlendFactor;
+        SceneBlendFactor sourceBlendFactorAlpha;
+        SceneBlendFactor destBlendFactorAlpha;
+
+        // Used to determine if separate alpha blending should be used for color and alpha channels
+        bool            separateBlend;
+
+        //-------------------------------------------------------------------------
+        // Blending operations
+        SceneBlendOperation blendOperation;
+        SceneBlendOperation alphaBlendOperation;
+
+        /// Determines if we should use separate blending operations for color and alpha channels
+        bool                separateBlendOperation;
+*/
 
         HlmsCache( uint32 _hash ) : hash( _hash ) {}
     };

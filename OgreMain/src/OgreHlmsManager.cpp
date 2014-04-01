@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    HlmsManager::HlmsManager()
+/*    HlmsManager::HlmsManager()
     {
     }
     //-----------------------------------------------------------------------------------
@@ -76,5 +76,5 @@ namespace Ogre
             return cache.gpuProgram;
 
         return GpuProgramPtr();
-    }
+    }*/
 }

@@ -46,11 +46,14 @@ namespace Ogre
     class _OgreExport Hlms : public PassAlloc
     {
     protected:
+        HlmsCacheVec    mRenderableCache;
+        HlmsCacheVec    mShaderCache;
+
         typedef std::map<IdString, String> PiecesMap;
         HlmsPropertyVec mSetProperties;
         PiecesMap       mPieces;
 
-        HlmsManager     *mHlmsManager;
+        //HlmsManager     *mHlmsManager;
 
         /** Inserts common properties about the current Renderable,
             such as hlms_skeleton hlms_uv_count, etc
@@ -112,14 +115,40 @@ namespace Ogre
         static size_t calculateLineCount(const String &buffer, size_t idx );
         static size_t calculateLineCount( const SubStringRef &subString );
 
+        /// @See calculateHashFor
         virtual uint32 calculateRenderableHash(void) const;
 
-
         virtual MaterialPtr prepareFor( Renderable *renderable, MovableObject *movableObject );
+
+        void addRenderableCache( uint32 hash, const HlmsPropertyVec &renderableSetProperties );
+        void addShaderCache( uint32 hash, GpuProgramPtr &vertexShader, GpuProgramPtr &geometryShader,
+                             GpuProgramPtr &tesselationHullShader,
+                             GpuProgramPtr &tesselationDomainShader, GpuProgramPtr &pixelShader );
+        const HlmsCache* getShaderCache( uint32 hash ) const;
+
+        /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
+            the value to 'inOut', otherwise leaves 'inOut' as is.
+        @return
+            True if the key was found (inOut was modified), false otherwise
+        @remarks
+            Assumes paramVec is sorted by key.
+        */
+        static bool findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut );
 
     public:
 		Hlms();
         virtual ~Hlms();
+
+        /** Called by the renderable when either it changes the material,
+            or its properties change (e.g. the mesh' uvs are stripped)
+        @param renderable
+            The renderable the material will be used on.
+        @param movableObject
+            The MovableObject the material will be used on (usually the parent of renderable)
+        @return
+            A hash. This hash references property parameters cached in the HlmsManager.
+        */
+        virtual uint32 calculateHashFor( Renderable *renderable, const HlmsParamVec &params );
 
         /** Called every frame by the Render Queue to cache the properties needed by this
             pass. i.e. Number of PSSM splits, number of shadow casting lights, etc
@@ -131,21 +160,11 @@ namespace Ogre
             change every frame and is one for the whole pass, but Mesh' properties
             usually stay consistent through its lifetime but may differ per mesh)
         */
-        virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode );
+        virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
+                                           bool casterPass, bool dualParaboloid );
 
-        /** Called by the renderable when either it changes the material,
-            or its properties change (e.g. the mesh' uvs are stripped)
-        @param renderable
-            The renderable the material will be used on.
-        @param movableObject
-            The MovableObject the material will be used on (usually the parent of renderable)
-        @return
-            A hash. This hash references property parameters cached in the HlmsManager.
-        */
-        virtual uint32 calculateHashFor( Renderable *renderable );
-
-        MaterialPtr getMaterial( const HlmsCache &passCache, Renderable *renderable,
-                                 MovableObject *movableObject );
+        const HlmsCache* getMaterial( const HlmsCache &passCache, Renderable *renderable,
+                                      MovableObject *movableObject, bool casterPass );
         //void generateFor();
     };
     /** @} */

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlms.h"
-#include "OgreHlmsManager.h"
+//#include "OgreHlmsManager.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
 
@@ -64,12 +64,14 @@ namespace Ogre
     const IdString HlmsPropertyDualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
     const IdString HlmsPropertyShadowCastingLights  = IdString( "hlms_shadow_casting_lights" );
     const IdString HlmsPropertyPssmSplits           = IdString( "hlms_pssm_splits" );
+    const IdString HlmsPropertyShadowCaster         = IdString( "hlms_shadowcaster" );
 
     //Change per material (hash can be cached on the renderable)
     const IdString PropertyDiffuseMap   = IdString( "diffuse_map" );
     const IdString PropertyNormalMap    = IdString( "normal_map" );
     const IdString PropertySpecularMap  = IdString( "specular_map" );
     const IdString PropertyEnvProbeMap  = IdString( "envprobe_map" );
+    const IdString PropertyAlphaTest    = IdString( "alpha_test" );
 
     const IdString *UvCountPtrs[8] =
     {
@@ -111,6 +113,7 @@ namespace Ogre
 
         setProperty( HlmsPropertyShadowCastingLights, 3 );
         setProperty( HlmsPropertyPssmSplits, 3 );
+        setProperty( HlmsPropertyShadowCaster, 0 );
 
         setProperty( HlmsPropertyLightsDirectionalShadow, 1 );
         setProperty( HlmsPropertyLightsPointShadow, 2 );
@@ -843,11 +846,6 @@ namespace Ogre
     uint32 Hlms::calculateRenderableHash(void) const
     {
         //Change per material (hash can be cached on the renderable)
-        /*const IdString PropertyDiffuseMap   = IdString( "diffuse_map" );
-        const IdString PropertyNormalMap    = IdString( "normal_map" );
-        const IdString PropertySpecularMap  = IdString( "specular_map" );
-        const IdString PropertyEnvProbeMap  = IdString( "envprobe_map" );*/
-
         uint32 hash = getProperty( HlmsPropertySkeleton ) |
                 (getProperty( HlmsPropertyBonesPerVertex )  << 1)|
                 (getProperty( HlmsPropertyNormal )          << 3)|
@@ -860,41 +858,21 @@ namespace Ogre
                 ((getProperty( HlmsPropertyUvCount4 ) - 1)  << 17)|
                 ((getProperty( HlmsPropertyUvCount5 ) - 1)  << 19)|
                 ((getProperty( HlmsPropertyUvCount6 ) - 1)  << 21)|
-                ((getProperty( HlmsPropertyUvCount7 ) - 1)  << 23);
+                ((getProperty( HlmsPropertyUvCount7 ) - 1)  << 23)|
+                (getProperty( PropertyDiffuseMap )          << 25)|
+                (getProperty( PropertyNormalMap )           << 26)|
+                (getProperty( PropertySpecularMap )         << 27)|
+                (getProperty( PropertyEnvProbeMap )         << 28)|
+                (getProperty( PropertyAlphaTest )           << 29);
         return hash;
     }
     //-----------------------------------------------------------------------------------
-    HlmsCache Hlms::preparePassHash( const CompositorShadowNode *shadowNode )
-    {
-        mSetProperties.clear();
-
-        if( shadowNode )
-        {
-            setProperty( HlmsPropertyShadowCastingLights, shadowNode->getNumShadowCastingLights() );
-            const vector<Real>::type *pssmSplits = shadowNode->getPssmSplits( 0 );
-            if( pssmSplits )
-                setProperty( HlmsPropertyPssmSplits, pssmSplits->size() );
-        }
-
-        uint32 hash = getProperty( HlmsPropertyDualParaboloidMapping ) |
-                (getProperty( HlmsPropertyShadowCastingLights )     << 1 )|
-                (getProperty( HlmsPropertyPssmSplits )              << 5 )|
-                (getProperty( HlmsPropertyLightsDirectionalShadow ) << 8 )|
-                (getProperty( HlmsPropertyLightsPointShadow )       << 12)|
-                (getProperty( HlmsPropertyLightsSpotShadow )        << 16);
-
-        HlmsCache retVal( hash );
-        retVal.setProperties = mSetProperties;
-
-        return retVal;
-    }
-    //-----------------------------------------------------------------------------------
-    uint32 Hlms::calculateHashFor( Renderable *renderable )
+    uint32 Hlms::calculateHashFor( Renderable *renderable, const HlmsParamVec &params )
     {
         mSetProperties.clear();
         mPieces.clear();
 
-        uint16 numWorldTransforms   = renderable->getNumWorldTransforms();//TODO: Remove virtualness
+        uint16 numWorldTransforms = renderable->getNumWorldTransforms();//TODO: Remove virtualness
 
         setProperty( HlmsPropertySkeleton, numWorldTransforms > 1 );
 
@@ -941,25 +919,160 @@ namespace Ogre
             ++itor;
         }
 
+        String paramVal;
+        if( findParamInVec( params, PropertyDiffuseMap, paramVal ) )
+            setProperty( PropertyDiffuseMap, 1 );
+        if( normalMappedCanBeSupported && findParamInVec( params, PropertyNormalMap, paramVal ) )
+            setProperty( PropertyNormalMap, 1 );
+        if( findParamInVec( params, PropertySpecularMap, paramVal ) )
+            setProperty( PropertySpecularMap, 1 );
+        if( findParamInVec( params, PropertyEnvProbeMap, paramVal ) )
+            setProperty( PropertyEnvProbeMap, 1 );
+        if( findParamInVec( params, PropertyAlphaTest, paramVal ) )
+            setProperty( PropertyAlphaTest, 1 );
+
         uint32 renderableHash = calculateRenderableHash();
-        mHlmsManager->addRenderableCache( renderableHash, mSetProperties );
+        this->addRenderableCache( renderableHash, mSetProperties );
+
+        //For shadow casters, turn normals off. UVs also off unless there's alpha testing.
+        setProperty( HlmsPropertyNormal, 0 );
+        setProperty( HlmsPropertyQTangent, 0 );
+        if( !findParamInVec( params, PropertyAlphaTest, paramVal ) )
+            setProperty( HlmsPropertyUvCount, 0 );
+        uint32 renderableCasterHash = calculateRenderableHash();
+        this->addRenderableCache( renderableCasterHash, mSetProperties );
 
         return renderableHash;
     }
     //-----------------------------------------------------------------------------------
-    MaterialPtr Hlms::getMaterial( const HlmsCache &passCache, Renderable *renderable,
-                                   MovableObject *movableObject )
+    HlmsCache Hlms::preparePassHash( const CompositorShadowNode *shadowNode,
+                                     bool casterPass, bool dualParaboloid )
     {
+        mSetProperties.clear();
+
+        if( !casterPass )
+        {
+            if( shadowNode )
+            {
+                setProperty( HlmsPropertyShadowCastingLights, shadowNode->getNumShadowCastingLights() );
+                const vector<Real>::type *pssmSplits = shadowNode->getPssmSplits( 0 );
+                if( pssmSplits )
+                    setProperty( HlmsPropertyPssmSplits, pssmSplits->size() );
+            }
+        }
+        else
+        {
+            setProperty( HlmsPropertyShadowCaster, casterPass );
+            setProperty( HlmsPropertyDualParaboloidMapping, dualParaboloid );
+
+        }
+
+        uint32 hash = getProperty( HlmsPropertyDualParaboloidMapping ) |
+                (getProperty( HlmsPropertyShadowCastingLights )     << 1 )|
+                (getProperty( HlmsPropertyPssmSplits )              << 5 )|
+                (getProperty( HlmsPropertyLightsDirectionalShadow ) << 8 )|
+                (getProperty( HlmsPropertyLightsPointShadow )       << 12)|
+                (getProperty( HlmsPropertyLightsSpotShadow )        << 16)|
+                (getProperty( HlmsPropertyShadowCaster )            << 20);
+
+        HlmsCache retVal( hash );
+        retVal.setProperties = mSetProperties;
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::addRenderableCache( uint32 hash, const HlmsPropertyVec &renderableSetProperties )
+    {
+        HlmsCache cache( hash );
+        HlmsCacheVec::iterator it = std::lower_bound( mRenderableCache.begin(), mRenderableCache.end(),
+                                                      cache, OrderCacheByHash );
+
+        if( it == mRenderableCache.end() || it->hash != hash )
+        {
+            cache.setProperties = renderableSetProperties;
+            mRenderableCache.insert( it, cache );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::addShaderCache( uint32 hash, GpuProgramPtr &vertexShader, GpuProgramPtr &geometryShader,
+                               GpuProgramPtr &tesselationHullShader,
+                               GpuProgramPtr &tesselationDomainShader, GpuProgramPtr &pixelShader )
+    {
+        HlmsCache cache( hash );
+        HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
+                                                      cache, OrderCacheByHash );
+
+        assert( it == mRenderableCache.end() || it->hash != hash &&
+                "Can't add the same shader to the cache twice! (or a hash collision happened)" );
+
+        cache.vertexShader              = vertexShader;
+        cache.geometryShader            = geometryShader;
+        cache.tesselationHullShader     = tesselationHullShader;
+        cache.tesselationDomainShader   = tesselationDomainShader;
+        cache.pixelShader               = pixelShader;
+        mRenderableCache.insert( it, cache );
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsCache* Hlms::getShaderCache( uint32 hash ) const
+    {
+        HlmsCache cache( hash );
+        HlmsCacheVec::const_iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
+                                                            cache, OrderCacheByHash );
+
+        if( it != mShaderCache.end() && it->hash == hash )
+            return &(*it);
+
+        return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    bool Hlms::findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut )
+    {
+        bool retVal = false;
+        HlmsParamVec::const_iterator it = std::lower_bound( paramVec.begin(), paramVec.end(),
+                                                            std::pair<IdString, String>( key, String() ),
+                                                            OrderParamVecByKey );
+        if( it != paramVec.end() && it->first == key )
+        {
+            inOut = it->second;
+            retVal = true;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsCache* Hlms::getMaterial( const HlmsCache &passCache, Renderable *renderable,
+                                        MovableObject *movableObject, bool casterPass )
+    {
+        /*getProperty( HlmsPropertySkeleton ) |
+                        (getProperty( HlmsPropertyBonesPerVertex )  << 1)|
+                        (getProperty( HlmsPropertyNormal )          << 3)|
+                        (getProperty( HlmsPropertyQTangent )        << 4)|
+                        (getProperty( HlmsPropertyUvCount )         << 5 )|
+                        ((getProperty( HlmsPropertyUvCount0 ) - 1)  << 9 )|
+                        ((getProperty( HlmsPropertyUvCount1 ) - 1)  << 11)|
+                        ((getProperty( HlmsPropertyUvCount2 ) - 1)  << 13)|
+                        ((getProperty( HlmsPropertyUvCount3 ) - 1)  << 15)|
+                        ((getProperty( HlmsPropertyUvCount4 ) - 1)  << 17)|
+                        ((getProperty( HlmsPropertyUvCount5 ) - 1)  << 19)|
+                        ((getProperty( HlmsPropertyUvCount6 ) - 1)  << 21)|
+                        ((getProperty( HlmsPropertyUvCount7 ) - 1)  << 23);*/
         uint32 finalHash;
         uint32 hash[2];
-        hash[0] = 0;//hash[0] = renderable->getHlmsHash TODO
+        hash[0] = 0;//hash[0] = casterPass ? renderable->getHlmsHash : renderable->getHlmsCasterHash TODO
         hash[1] = passCache.hash & (movableObject->getCastShadows() ? 0xffffffff : 0xffffffe1 );
         MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
 
-        mHlmsManager->getShaderCache( finalHash ); //TODO
+        HlmsCache const *retVal = this->getShaderCache( finalHash );
+
+        if( !retVal )
+        {
+            //TODO: Generate the shader
+        }
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::generateFor()
+    /*void Hlms::generateFor()
     {
         uint16 numWorldTransforms = 1;
         bool castShadows          = true;
@@ -967,7 +1080,7 @@ namespace Ogre
         /*std::ifstream inFile( "E:/Projects/Hlms/bin/Hlms/PBS/GLSL/VertexShader_vs.glsl",
                               std::ios::in | std::ios::binary );
         std::ofstream outFile( "E:/Projects/Hlms/bin/Hlms/PBS/GLSL/Output_vs.glsl",
-                               std::ios::out | std::ios::binary );*/
+                               std::ios::out | std::ios::binary );*//*
         std::ifstream inFile( "E:/Projects/Hlms/bin/Hlms/PBS/GLSL/PixelShader_ps.glsl",
                                       std::ios::in | std::ios::binary );
         std::ofstream outFile( "E:/Projects/Hlms/bin/Hlms/PBS/GLSL/Output_ps.glsl",
@@ -991,7 +1104,7 @@ namespace Ogre
         this->parseCounter( inString, outString );
 
         outFile.write( &outString[0], outString.size() );
-    }
+    }*/
     //-----------------------------------------------------------------------------------
     size_t Hlms::calculateLineCount( const String &buffer, size_t idx )
     {

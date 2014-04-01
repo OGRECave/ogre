@@ -201,7 +201,7 @@ namespace Ogre
             changes to or from a value lower than the supported shadow casting lights by the
             definition.
         */
-        size_t getNumShadowCastingLights(void) const        { mShadowMapCastingLights.size(); }
+        size_t getNumShadowCastingLights(void) const        { return mShadowMapCastingLights.size(); }
 
         /// @copydoc CompositorNode::finalTargetResized
         virtual void finalTargetResized( const RenderTarget *finalTarget );
