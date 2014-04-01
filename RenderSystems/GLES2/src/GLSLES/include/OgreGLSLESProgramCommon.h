@@ -59,7 +59,7 @@ namespace Ogre {
      
      */
 
-	class _OgreGLES2Export GLSLESProgramCommon
+	class _OgreGLES2Export GLSLESProgramCommon : public ResourceAlloc
 	{
 	protected:
 		/// Container of uniform references that are active in the program object
