@@ -28,91 +28,13 @@ THE SOFTWARE.
 #ifndef _OgreHlms_H_
 #define _OgreHlms_H_
 
-//#include "OgrePrerequisites.h"
-//#include "OgreHeaderPrefix.h"
-#define _OgreExport
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <map>
-typedef unsigned int uint32;
-typedef unsigned short uint16;
-typedef unsigned char uint8;
-typedef int int32;
-typedef short int16;
-typedef signed char int8;
-typedef unsigned __int64 uint64;
-typedef __int64 int64;
-
-#include "OgreIdString.h"
+#include "OgreHlmsCommon.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
-	typedef std::string String;
-    typedef std::vector<String> StringVec;
-
-    class SubStringRef
-    {
-        String const *mOriginal;
-        size_t  mStart;
-        size_t  mEnd;
-
-    public:
-        SubStringRef( const String *original, size_t start ) :
-            mOriginal( original ),
-            mStart( start ),
-            mEnd( original->size() )
-        {
-            assert( start <= original->size() );
-        }
-
-        SubStringRef( const String *original, size_t start, size_t end ) :
-            mOriginal( original ),
-            mStart( start ),
-            mEnd( end )
-        {
-            assert( start <= end );
-            assert( end <= original->size() );
-        }
-
-        SubStringRef( const String *original, String::const_iterator start ) :
-            mOriginal( original ),
-            mStart( start - original->begin() ),
-            mEnd( original->size() )
-        {
-        }
-
-        size_t find( char *value ) const
-        {
-            size_t retVal = mOriginal->find( value, mStart );
-            if( retVal >= mEnd )
-                retVal = String::npos;
-            else if( retVal != String::npos )
-                retVal -= mStart;
-
-            return retVal;
-        }
-
-        size_t find( const String &value ) const
-        {
-            size_t retVal = mOriginal->find( value, mStart );
-            if( retVal >= mEnd )
-                retVal = String::npos;
-            else if( retVal != String::npos )
-                retVal -= mStart;
-
-            return retVal;
-        }
-
-        void setStart( size_t newStart )            { mStart = std::min( newStart, mOriginal->size() ); }
-        void setEnd( size_t newEnd )                { mEnd = std::min( newEnd, mOriginal->size() ); }
-        size_t getStart(void) const                 { return mStart; }
-        size_t getEnd(void) const                   { return mEnd; }
-        size_t getSize(void) const                  { return mEnd - mStart; }
-        String::const_iterator begin() const        { return mOriginal->begin() + mStart; }
-        String::const_iterator end() const          { return mOriginal->begin() + mEnd; }
-        const String& getOriginalBuffer() const     { return *mOriginal; }
-    };
+    class HlmsManager;
+    class CompositorShadowNode;
 
     /** \addtogroup Core
     *  @{
@@ -120,38 +42,15 @@ namespace Ogre
     /** \addtogroup Resources
     *  @{
     */
-
-    struct HlmsParams
-    {
-        uint32      hash;
-        typedef std::vector<std::pair<IdString, String>> ParamVec;
-        ParamVec    params;
-    };
-
     /** HLMS stands for "High Level Material System". */
-    class _OgreExport Hlms //: public PassAlloc
+    class _OgreExport Hlms : public PassAlloc
     {
     protected:
-        struct Property
-        {
-            IdString    keyName;
-            int32       value;
-
-            Property( IdString _keyName, int32 _value ) :
-                keyName( _keyName ), value( _value ) {}
-        };
-
-        static bool OrderPropertyByIdString( const Property &_left, const Property &_right )
-        {
-            return _left.keyName < _right.keyName;
-        }
-
-        uint32 mHash;
-
-        typedef std::vector<Property> PropertyVec;
         typedef std::map<IdString, String> PiecesMap;
-        PropertyVec mSetProperties;
-        PiecesMap   mPieces;
+        HlmsPropertyVec mSetProperties;
+        PiecesMap       mPieces;
+
+        HlmsManager     *mHlmsManager;
 
         /** Inserts common properties about the current Renderable,
             such as hlms_skeleton hlms_uv_count, etc
@@ -207,28 +106,53 @@ namespace Ogre
         bool evaluateExpressionRecursive( ExpressionVec &expression, bool &outSyntaxError ) const;
         static size_t evaluateExpressionEnd( const SubStringRef &outSubString );
 
-        static void evaluateParamArgs( SubStringRef &outSubString, StringVec &outArgs,
+        static void evaluateParamArgs( SubStringRef &outSubString, StringVector &outArgs,
                                        bool &outSyntaxError );
 
         static size_t calculateLineCount(const String &buffer, size_t idx );
         static size_t calculateLineCount( const SubStringRef &subString );
-        /**
-        */
 
-        void updateHash();
+        virtual uint32 calculateRenderableHash(void) const;
+
+
+        virtual MaterialPtr prepareFor( Renderable *renderable, MovableObject *movableObject );
 
     public:
 		Hlms();
         virtual ~Hlms();
 
-        //MaterialPtr generateFor( Renderable *renderable, MovableObject *movableObject );
-        void generateFor();
+        /** Called every frame by the Render Queue to cache the properties needed by this
+            pass. i.e. Number of PSSM splits, number of shadow casting lights, etc
+        @param shadowNode
+            The shadow node currently in effect. Can be null.
+        @return
+            A hash and cached property parameters. Unlike @calculateHashFor, the cache
+            must be kept by the caller and not by the HlmsManager (because it may
+            change every frame and is one for the whole pass, but Mesh' properties
+            usually stay consistent through its lifetime but may differ per mesh)
+        */
+        virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode );
+
+        /** Called by the renderable when either it changes the material,
+            or its properties change (e.g. the mesh' uvs are stripped)
+        @param renderable
+            The renderable the material will be used on.
+        @param movableObject
+            The MovableObject the material will be used on (usually the parent of renderable)
+        @return
+            A hash. This hash references property parameters cached in the HlmsManager.
+        */
+        virtual uint32 calculateHashFor( Renderable *renderable );
+
+        MaterialPtr getMaterial( const HlmsCache &passCache, Renderable *renderable,
+                                 MovableObject *movableObject );
+        //void generateFor();
     };
     /** @} */
     /** @} */
 
 }
 
-//#include "OgreHeaderSuffix.h"
+#include "OgreHeaderSuffix.h"
 
 #endif

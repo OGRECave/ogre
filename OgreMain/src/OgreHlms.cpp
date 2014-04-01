@@ -26,21 +26,24 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreHlms.h"
+#include "OgreStableHeaders.h"
 
-#include <algorithm>
+#include "OgreHlms.h"
+#include "OgreHlmsManager.h"
+
+#include "Compositor/OgreCompositorShadowNode.h"
+
 //#include "OgreMovableObject.h"
 //#include "OgreRenderable.h"
-#include <fstream>
 
 namespace Ogre
 {
+    //Change per mesh (hash can be cached on the renderable)
     const IdString HlmsPropertySkeleton             = IdString( "hlms_skeleton" );
     const IdString HlmsPropertyBonesPerVertex       = IdString( "hlms_bones_per_vertex" );
 
-    const IdString HlmsPropertyDualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
-
     const IdString HlmsPropertyNormal               = IdString( "hlms_normal" );
+    const IdString HlmsPropertyQTangent             = IdString( "hlms_qtangent" );
 
     const IdString HlmsPropertyUvCount              = IdString( "hlms_uv_count" );
     const IdString HlmsPropertyUvCount0             = IdString( "hlms_uv_count0" );
@@ -52,17 +55,33 @@ namespace Ogre
     const IdString HlmsPropertyUvCount6             = IdString( "hlms_uv_count6" );
     const IdString HlmsPropertyUvCount7             = IdString( "hlms_uv_count7" );
 
+    //Change per frame (grouped together with scene pass)
     const IdString HlmsPropertyLightsDirectionalShadow  = IdString( "hlms_lights_directional_shadow" );
     const IdString HlmsPropertyLightsPointShadow        = IdString( "hlms_lights_point_shadow" );
     const IdString HlmsPropertyLightsSpotShadow         = IdString( "hlms_lights_spot_shadow" );
 
+    //Change per scene pass
+    const IdString HlmsPropertyDualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
     const IdString HlmsPropertyShadowCastingLights  = IdString( "hlms_shadow_casting_lights" );
     const IdString HlmsPropertyPssmSplits           = IdString( "hlms_pssm_splits" );
 
+    //Change per material (hash can be cached on the renderable)
     const IdString PropertyDiffuseMap   = IdString( "diffuse_map" );
     const IdString PropertyNormalMap    = IdString( "normal_map" );
     const IdString PropertySpecularMap  = IdString( "specular_map" );
     const IdString PropertyEnvProbeMap  = IdString( "envprobe_map" );
+
+    const IdString *UvCountPtrs[8] =
+    {
+        &HlmsPropertyUvCount0,
+        &HlmsPropertyUvCount1,
+        &HlmsPropertyUvCount2,
+        &HlmsPropertyUvCount3,
+        &HlmsPropertyUvCount4,
+        &HlmsPropertyUvCount5,
+        &HlmsPropertyUvCount6,
+        &HlmsPropertyUvCount7
+    };
 
     Hlms::Hlms()
     {
@@ -105,9 +124,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::setProperty( IdString key, int32 value )
     {
-        Property p( key, value );
-        PropertyVec::iterator it = std::lower_bound( mSetProperties.begin(), mSetProperties.end(),
-                                                     p, OrderPropertyByIdString );
+        HlmsProperty p( key, value );
+        HlmsPropertyVec::iterator it = std::lower_bound( mSetProperties.begin(), mSetProperties.end(),
+                                                         p, OrderPropertyByIdString );
         if( it == mSetProperties.end() || it->keyName != p.keyName )
             mSetProperties.insert( it, p );
         else
@@ -116,9 +135,10 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     int32 Hlms::getProperty(IdString key, int32 defaultVal ) const
     {
-        Property p( key, 0 );
-        PropertyVec::const_iterator it = std::lower_bound( mSetProperties.begin(), mSetProperties.end(),
-                                                           p, OrderPropertyByIdString );
+        HlmsProperty p( key, 0 );
+        HlmsPropertyVec::const_iterator it = std::lower_bound( mSetProperties.begin(),
+                                                               mSetProperties.end(),
+                                                               p, OrderPropertyByIdString );
         if( it != mSetProperties.end() && it->keyName == p.keyName )
             defaultVal = it->value;
 
@@ -263,7 +283,7 @@ namespace Ogre
                         syntaxError = true;
                     }
                     else if( !currentExpression->children.back().value.empty() &&
-                             c != currentExpression->children.back().value.back() )
+                             c != *(currentExpression->children.back().value.end()-1) )
                     {
                         currentExpression->children.push_back( Expression() );
                     }
@@ -404,7 +424,8 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::evaluateParamArgs( SubStringRef &outSubString, StringVec &outArgs, bool &outSyntaxError )
+    void Hlms::evaluateParamArgs( SubStringRef &outSubString, StringVector &outArgs,
+                                  bool &outSyntaxError )
     {
         size_t expEnd = evaluateExpressionEnd( outSubString );
 
@@ -515,7 +536,7 @@ namespace Ogre
         outBuffer.clear();
         outBuffer.reserve( inBuffer.size() );
 
-        StringVec argValues;
+        StringVector argValues;
         SubStringRef subString( &inBuffer, 0 );
         size_t pos = subString.find( "@foreach" );
 
@@ -634,7 +655,7 @@ namespace Ogre
         outBuffer.clear();
         outBuffer.reserve( inBuffer.size() );
 
-        StringVec argValues;
+        StringVector argValues;
         SubStringRef subString( &inBuffer, 0 );
         size_t pos = subString.find( "@piece" );
 
@@ -691,7 +712,7 @@ namespace Ogre
         outBuffer.clear();
         outBuffer.reserve( inBuffer.size() );
 
-        StringVec argValues;
+        StringVector argValues;
         SubStringRef subString( &inBuffer, 0 );
         size_t pos = subString.find( "@insertpiece" );
 
@@ -739,7 +760,7 @@ namespace Ogre
         outBuffer.clear();
         outBuffer.reserve( inBuffer.size() );
 
-        StringVec argValues;
+        StringVector argValues;
         SubStringRef subString( &inBuffer, 0 );
         size_t _pos[2];
         _pos[0] = subString.find( "@counter" );
@@ -819,40 +840,125 @@ namespace Ogre
         //return parseProperties( inBuffer, outBuffer );
     }
     //-----------------------------------------------------------------------------------
-    /*void Hlms::processParams( HlmsParams &inOutParams )
+    uint32 Hlms::calculateRenderableHash(void) const
     {
-        uint32 hash[2];
-        hash[0] = getProperty( HlmsPropertySkeleton ) |
-                (getProperty( HlmsPropertyDualParaboloidMapping ) << 1) |
-                (getProperty( HlmsPropertyUvCount ) << 2) |
-                ((getProperty( HlmsPropertyUvCount0 ) - 1) << 6 )|
-                ((getProperty( HlmsPropertyUvCount1 ) - 1) << 8 )|
-                ((getProperty( HlmsPropertyUvCount2 ) - 1) << 10)|
-                ((getProperty( HlmsPropertyUvCount3 ) - 1) << 12)|
-                ((getProperty( HlmsPropertyUvCount4 ) - 1) << 14)|
-                ((getProperty( HlmsPropertyUvCount5 ) - 1) << 16)|
-                ((getProperty( HlmsPropertyUvCount6 ) - 1) << 18)|
-                ((getProperty( HlmsPropertyUvCount7 ) - 1) << 20)|
-                (getProperty( HlmsPropertyShadowCastingLights ) << 22)|
-                (getProperty( HlmsPropertyPssmSplits ) << 26);
-        hash[1] = getProperty( HlmsPropertyLightsDirectionalShadow )|
-                (getProperty( HlmsPropertyLightsPointShadow ) << 4 )|
-                (getProperty( HlmsPropertyLightsSpotShadow )  << 8 )|
-                (getProperty( PropertyDiffuseMap )  << 12 ) |;
-                (getProperty( PropertyNormalMap )   << 13 ) |;
-                (getProperty( PropertySpecularMap ) << 14 ) |;
-                (getProperty( PropertyEnvProbeMap ) << 15 );
+        //Change per material (hash can be cached on the renderable)
+        /*const IdString PropertyDiffuseMap   = IdString( "diffuse_map" );
+        const IdString PropertyNormalMap    = IdString( "normal_map" );
+        const IdString PropertySpecularMap  = IdString( "specular_map" );
+        const IdString PropertyEnvProbeMap  = IdString( "envprobe_map" );*/
 
-        uint32 retVal = 0;
-        MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &retVal );
-        return retVal;
-    }*/
+        uint32 hash = getProperty( HlmsPropertySkeleton ) |
+                (getProperty( HlmsPropertyBonesPerVertex )  << 1)|
+                (getProperty( HlmsPropertyNormal )          << 3)|
+                (getProperty( HlmsPropertyQTangent )        << 4)|
+                (getProperty( HlmsPropertyUvCount )         << 5 )|
+                ((getProperty( HlmsPropertyUvCount0 ) - 1)  << 9 )|
+                ((getProperty( HlmsPropertyUvCount1 ) - 1)  << 11)|
+                ((getProperty( HlmsPropertyUvCount2 ) - 1)  << 13)|
+                ((getProperty( HlmsPropertyUvCount3 ) - 1)  << 15)|
+                ((getProperty( HlmsPropertyUvCount4 ) - 1)  << 17)|
+                ((getProperty( HlmsPropertyUvCount5 ) - 1)  << 19)|
+                ((getProperty( HlmsPropertyUvCount6 ) - 1)  << 21)|
+                ((getProperty( HlmsPropertyUvCount7 ) - 1)  << 23);
+        return hash;
+    }
     //-----------------------------------------------------------------------------------
-    /*MaterialPtr Hlms::generateFor( Renderable *renderable, MovableObject *movableObject )
+    HlmsCache Hlms::preparePassHash( const CompositorShadowNode *shadowNode )
     {
-        uint16 numWorldTransforms   = renderable->getNumWorldTransforms();//TODO
-        bool castShadows            = movableObject->getCastShadows();
-    }*/
+        mSetProperties.clear();
+
+        if( shadowNode )
+        {
+            setProperty( HlmsPropertyShadowCastingLights, shadowNode->getNumShadowCastingLights() );
+            const vector<Real>::type *pssmSplits = shadowNode->getPssmSplits( 0 );
+            if( pssmSplits )
+                setProperty( HlmsPropertyPssmSplits, pssmSplits->size() );
+        }
+
+        uint32 hash = getProperty( HlmsPropertyDualParaboloidMapping ) |
+                (getProperty( HlmsPropertyShadowCastingLights )     << 1 )|
+                (getProperty( HlmsPropertyPssmSplits )              << 5 )|
+                (getProperty( HlmsPropertyLightsDirectionalShadow ) << 8 )|
+                (getProperty( HlmsPropertyLightsPointShadow )       << 12)|
+                (getProperty( HlmsPropertyLightsSpotShadow )        << 16);
+
+        HlmsCache retVal( hash );
+        retVal.setProperties = mSetProperties;
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 Hlms::calculateHashFor( Renderable *renderable )
+    {
+        mSetProperties.clear();
+        mPieces.clear();
+
+        uint16 numWorldTransforms   = renderable->getNumWorldTransforms();//TODO: Remove virtualness
+
+        setProperty( HlmsPropertySkeleton, numWorldTransforms > 1 );
+
+        RenderOperation op;
+        renderable->getRenderOperation( op );
+        VertexDeclaration *vertexDecl = op.vertexData->vertexDeclaration;
+        const VertexDeclaration::VertexElementList &elementList = vertexDecl->getElements();
+        VertexDeclaration::VertexElementList::const_iterator itor = elementList.begin();
+        VertexDeclaration::VertexElementList::const_iterator end  = elementList.end();
+
+        uint numTexCoords = 0;
+        bool normalMappedCanBeSupported = false;
+        while( itor != end )
+        {
+            const VertexElement &vertexElem = *itor;
+            switch( vertexElem.getSemantic() )
+            {
+            case VES_NORMAL:
+                if( VertexElement::getTypeCount( vertexElem.getType() ) < 4 )
+                {
+                    setProperty( HlmsPropertyNormal, 1 );
+                }
+                else
+                {
+                    normalMappedCanBeSupported = true;
+                    setProperty( HlmsPropertyQTangent, 1 );
+                }
+                break;
+            case VES_TANGENT:
+                normalMappedCanBeSupported = true;
+                break;
+            case VES_TEXTURE_COORDINATES:
+                numTexCoords = std::max<uint>( numTexCoords, vertexElem.getIndex() + 1 );
+                setProperty( *UvCountPtrs[vertexElem.getIndex()],
+                              VertexElement::getTypeCount( vertexElem.getType() ) );
+                break;
+            case VES_BLEND_WEIGHTS:
+                setProperty( HlmsPropertyBonesPerVertex,
+                             VertexElement::getTypeCount( vertexElem.getType() ) );
+                break;
+            }
+
+            vertexElem.getType();
+            ++itor;
+        }
+
+        uint32 renderableHash = calculateRenderableHash();
+        mHlmsManager->addRenderableCache( renderableHash, mSetProperties );
+
+        return renderableHash;
+    }
+    //-----------------------------------------------------------------------------------
+    MaterialPtr Hlms::getMaterial( const HlmsCache &passCache, Renderable *renderable,
+                                   MovableObject *movableObject )
+    {
+        uint32 finalHash;
+        uint32 hash[2];
+        hash[0] = 0;//hash[0] = renderable->getHlmsHash TODO
+        hash[1] = passCache.hash & (movableObject->getCastShadows() ? 0xffffffff : 0xffffffe1 );
+        MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
+
+        mHlmsManager->getShaderCache( finalHash ); //TODO
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::generateFor()
     {
         uint16 numWorldTransforms = 1;

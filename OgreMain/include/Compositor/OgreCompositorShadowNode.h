@@ -197,6 +197,12 @@ namespace Ogre
         */
         const vector<Real>::type* getPssmSplits( size_t shadowMapIdx ) const;
 
+        /** The return value may change in the future, which happens when the number of lights
+            changes to or from a value lower than the supported shadow casting lights by the
+            definition.
+        */
+        size_t getNumShadowCastingLights(void) const        { mShadowMapCastingLights.size(); }
+
         /// @copydoc CompositorNode::finalTargetResized
         virtual void finalTargetResized( const RenderTarget *finalTarget );
     };
