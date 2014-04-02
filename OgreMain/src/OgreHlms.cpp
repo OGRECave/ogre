@@ -928,17 +928,24 @@ namespace Ogre
             setProperty( PropertySpecularMap, 1 );
         if( findParamInVec( params, PropertyEnvProbeMap, paramVal ) )
             setProperty( PropertyEnvProbeMap, 1 );
-        if( findParamInVec( params, PropertyAlphaTest, paramVal ) )
+        bool alphaTest = findParamInVec( params, PropertyAlphaTest, paramVal );
+        if( alphaTest )
             setProperty( PropertyAlphaTest, 1 );
 
         uint32 renderableHash = calculateRenderableHash();
         this->addRenderableCache( renderableHash, mSetProperties );
 
-        //For shadow casters, turn normals off. UVs also off unless there's alpha testing.
+        //For shadow casters, turn normals off. UVs & diffuse also off unless there's alpha testing.
         setProperty( HlmsPropertyNormal, 0 );
         setProperty( HlmsPropertyQTangent, 0 );
-        if( !findParamInVec( params, PropertyAlphaTest, paramVal ) )
+        setProperty( PropertyNormalMap, 0 );
+        setProperty( PropertySpecularMap, 0 );
+        setProperty( PropertyEnvProbeMap, 0 );
+        if( !alphaTest )
+        {
             setProperty( HlmsPropertyUvCount, 0 );
+            setProperty( PropertyDiffuseMap, 0 );
+        }
         uint32 renderableCasterHash = calculateRenderableHash();
         this->addRenderableCache( renderableCasterHash, mSetProperties );
 
@@ -1060,6 +1067,13 @@ namespace Ogre
         uint32 hash[2];
         hash[0] = 0;//hash[0] = casterPass ? renderable->getHlmsHash : renderable->getHlmsCasterHash TODO
         hash[1] = passCache.hash & (movableObject->getCastShadows() ? 0xffffffff : 0xffffffe1 );
+        if( casterPass )
+        {
+            hash[0] &= 0xe3ffffe7; //Remove normals, QTangents, all maps but diffuse.
+            //Remove UV count & diffuse tex if not alpha testing
+            hash[0] &= (hash[0] & 0x20000000) ? 0xfdfffe1f : 0xffffffff;
+        }
+
         MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
 
         HlmsCache const *retVal = this->getShaderCache( finalHash );
