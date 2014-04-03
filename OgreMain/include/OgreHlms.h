@@ -44,6 +44,16 @@ namespace Ogre
     /** HLMS stands for "High Level Material System". */
     class _OgreExport Hlms : public PassAlloc
     {
+        enum ShaderType
+        {
+            VertexShader,
+            PixelShader,
+            GeometryShader,
+            HullShader,
+            DomainShader,
+            NumShaderTypes
+        };
+
     protected:
         HlmsCacheVec    mRenderableCache;
         HlmsCacheVec    mShaderCache;
@@ -52,12 +62,24 @@ namespace Ogre
         HlmsPropertyVec mSetProperties;
         PiecesMap       mPieces;
 
+        Archive         *mDataFolder;
+        StringVector     mPieceFiles[5];
         //HlmsManager     *mHlmsManager;
 
         /** Inserts common properties about the current Renderable,
             such as hlms_skeleton hlms_uv_count, etc
         */
         void setCommonProperties();
+
+        /** Populates all mPieceFiles with all files in mDataFolder with suffix ending in
+                piece_vs    - Vertex Shader
+                piece_ps    - Pixel Shader
+                piece_gs    - Geometry Shader
+                piece_hs    - Hull Shader
+                piece_ds    - Domain Shader
+            Case insensitive.
+        */
+        void enumeratePieceFiles(void);
 
         void setProperty(IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
@@ -118,10 +140,15 @@ namespace Ogre
         virtual uint32 calculateRenderableHash(void) const;
 
         void addRenderableCache( uint32 hash, const HlmsPropertyVec &renderableSetProperties );
-        void addShaderCache( uint32 hash, GpuProgramPtr &vertexShader, GpuProgramPtr &geometryShader,
-                             GpuProgramPtr &tesselationHullShader,
-                             GpuProgramPtr &tesselationDomainShader, GpuProgramPtr &pixelShader );
+        const HlmsCache* getRenderableCache( uint32 hash ) const;
+        const HlmsCache* addShaderCache( uint32 hash, GpuProgramPtr &vertexShader,
+                                         GpuProgramPtr &geometryShader,
+                                         GpuProgramPtr &tesselationHullShader,
+                                         GpuProgramPtr &tesselationDomainShader,
+                                         GpuProgramPtr &pixelShader );
         const HlmsCache* getShaderCache( uint32 hash ) const;
+        const HlmsCache* createShaderCacheEntry( uint32 renderableHash, const HlmsCache &passCache,
+                                                 uint32 finalHash );
 
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
             the value to 'inOut', otherwise leaves 'inOut' as is.

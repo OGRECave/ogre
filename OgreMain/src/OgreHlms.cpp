@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 //#include "OgreHlmsManager.h"
 
+#include "OgreHighLevelGpuProgramManager.h"
+#include "OgreHighLevelGpuProgram.h"
+
 #include "Compositor/OgreCompositorShadowNode.h"
 
 //#include "OgreMovableObject.h"
@@ -41,6 +44,7 @@ namespace Ogre
     //Change per mesh (hash can be cached on the renderable)
     const IdString HlmsPropertySkeleton             = IdString( "hlms_skeleton" );
     const IdString HlmsPropertyBonesPerVertex       = IdString( "hlms_bones_per_vertex" );
+    const IdString HlmsPropertyPose                 = IdString( "hlms_pose" );
 
     const IdString HlmsPropertyNormal               = IdString( "hlms_normal" );
     const IdString HlmsPropertyQTangent             = IdString( "hlms_qtangent" );
@@ -85,8 +89,13 @@ namespace Ogre
         &HlmsPropertyUvCount7
     };
 
-    Hlms::Hlms()
+    const String ShaderFiles[] = { "VertexShader_vs", "PixelShader_ps", "GeometryShader_gs",
+                                   "HullShader_hs", "DomainShader_ds" };
+    const String PieceFilePatterns[] = { "piece_vs", "piece_ps", "piece_gs", "piece_hs", "piece_ds" };
+
+    Hlms::Hlms() : mDataFolder(0)
     {
+        enumeratePieceFiles();
     }
     //-----------------------------------------------------------------------------------
     Hlms::~Hlms()
@@ -123,6 +132,39 @@ namespace Ogre
         setProperty( PropertyNormalMap, 1 );
         setProperty( PropertySpecularMap, 1 );
         setProperty( PropertyEnvProbeMap, 1 );
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::enumeratePieceFiles(void)
+    {
+        StringVectorPtr stringVectorPtr = mDataFolder->list( false, false );
+
+        StringVector stringVectorLowerCase( *stringVectorPtr );
+
+        {
+            StringVector::iterator itor = stringVectorLowerCase.begin();
+            StringVector::iterator end  = stringVectorLowerCase.end();
+            while( itor != end )
+            {
+                std::transform( itor->begin(), itor->end(), itor->begin(), ::tolower );
+                ++itor;
+            }
+        }
+
+        StringVector::const_iterator itLowerCase = stringVectorLowerCase.begin();
+        StringVector::const_iterator itor = stringVectorPtr->begin();
+        StringVector::const_iterator end  = stringVectorPtr->end();
+
+        for( size_t i=0; i<sizeof( PieceFilePatterns ) / sizeof( String* ); ++i )
+        {
+            while( itor != end )
+            {
+                if( itLowerCase->find( PieceFilePatterns[i] ) != String::npos )
+                    mPieceFiles[i].push_back( *itor );
+
+                ++itLowerCase;
+                ++itor;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void Hlms::setProperty( IdString key, int32 value )
@@ -846,6 +888,7 @@ namespace Ogre
     uint32 Hlms::calculateRenderableHash(void) const
     {
         //Change per material (hash can be cached on the renderable)
+        //If you alter the bit shifting here, you'll have to change the masks in Hlms::getMaterial
         uint32 hash = getProperty( HlmsPropertySkeleton ) |
                 (getProperty( HlmsPropertyBonesPerVertex )  << 1)|
                 (getProperty( HlmsPropertyNormal )          << 3)|
@@ -863,7 +906,8 @@ namespace Ogre
                 (getProperty( PropertyNormalMap )           << 26)|
                 (getProperty( PropertySpecularMap )         << 27)|
                 (getProperty( PropertyEnvProbeMap )         << 28)|
-                (getProperty( PropertyAlphaTest )           << 29);
+                (getProperty( PropertyAlphaTest )           << 29)|
+                (getProperty( HlmsPropertyPose )            << 29);
         return hash;
     }
     //-----------------------------------------------------------------------------------
@@ -1001,9 +1045,24 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::addShaderCache( uint32 hash, GpuProgramPtr &vertexShader, GpuProgramPtr &geometryShader,
-                               GpuProgramPtr &tesselationHullShader,
-                               GpuProgramPtr &tesselationDomainShader, GpuProgramPtr &pixelShader )
+    const HlmsCache* Hlms::getRenderableCache( uint32 hash ) const
+    {
+        HlmsCache cache( hash );
+        HlmsCacheVec::const_iterator it = std::lower_bound( mRenderableCache.begin(),
+                                                            mRenderableCache.end(),
+                                                            cache, OrderCacheByHash );
+
+        if( it != mRenderableCache.end() && it->hash == hash )
+            return &(*it);
+
+        return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsCache* Hlms::addShaderCache( uint32 hash, GpuProgramPtr &vertexShader,
+                                           GpuProgramPtr &geometryShader,
+                                           GpuProgramPtr &tesselationHullShader,
+                                           GpuProgramPtr &tesselationDomainShader,
+                                           GpuProgramPtr &pixelShader )
     {
         HlmsCache cache( hash );
         HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
@@ -1017,7 +1076,8 @@ namespace Ogre
         cache.tesselationHullShader     = tesselationHullShader;
         cache.tesselationDomainShader   = tesselationDomainShader;
         cache.pixelShader               = pixelShader;
-        mRenderableCache.insert( it, cache );
+
+        return &(*mRenderableCache.insert( it, cache ));
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::getShaderCache( uint32 hash ) const
@@ -1030,6 +1090,91 @@ namespace Ogre
             return &(*it);
 
         return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsCache* Hlms::createShaderCacheEntry( uint32 renderableHash, const HlmsCache &passCache,
+                                                   uint32 finalHash )
+    {
+        //Set the properties by merging the cache from the pass, with the cache from renderable
+        mSetProperties.clear();
+        //If retVal is null, we did something wrong earlier
+        //(the cache should've been generated by now)
+        const HlmsCache *renderableCache = getRenderableCache( renderableHash );
+        mSetProperties.reserve( passCache.setProperties.size() +
+                                renderableCache->setProperties.size() );
+        mSetProperties.insert( mSetProperties.end(), renderableCache->setProperties.begin(),
+                               renderableCache->setProperties.end() );
+        {
+            HlmsPropertyVec::const_iterator itor = passCache.setProperties.begin();
+            HlmsPropertyVec::const_iterator end  = passCache.setProperties.end();
+
+            while( itor != end )
+            {
+                setProperty( itor->keyName, itor->value );
+                ++itor;
+            }
+        }
+
+        GpuProgramPtr shaders[NumShaderTypes];
+        //Generate the shaders
+        for( size_t i=0; i<NumShaderTypes; ++i )
+        {
+            //Collect pieces
+            mPieces.clear();
+            StringVector::const_iterator itor = mPieceFiles[i].begin();
+            StringVector::const_iterator end  = mPieceFiles[i].end();
+
+            while( itor != end )
+            {
+                DataStreamPtr inFile = mDataFolder->open( *itor );
+
+                String inString;
+                String outString;
+
+                inString.resize( inFile->size() );
+                inFile->read( &inString[0], inFile->size() );
+
+                this->parseForEach( inString, outString );
+                this->parseProperties( outString, inString );
+                this->collectPieces( inString, outString );
+                ++itor;
+            }
+
+            //Generate the shader file. TODO: Identify the file extension at runtime
+            DataStreamPtr inFile = mDataFolder->open( ShaderFiles[i] + ".glsl" );
+
+            String inString;
+            String outString;
+
+            inString.resize( inFile->size() );
+            inFile->read( &inString[0], inFile->size() );
+
+            this->parseForEach( inString, outString );
+            this->parseProperties( outString, inString );
+            this->collectPieces( inString, outString );
+            this->insertPieces( outString, inString );
+            this->parseCounter( inString, outString );
+
+            HighLevelGpuProgramManager *gpuProgramManager =
+                                                    HighLevelGpuProgramManager::getSingletonPtr();
+
+            HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
+                                "name", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                "glsl", static_cast<GpuProgramType>(i) );
+            gp->setSource( outString );
+
+            gp->setSkeletalAnimationIncluded( getProperty( HlmsPropertySkeleton ) != 0 );
+            gp->setMorphAnimationIncluded( false );
+            gp->setPoseAnimationIncluded( getProperty( HlmsPropertyPose ) );
+            gp->setVertexTextureFetchRequired( true );
+
+            shaders[i] = gp;
+        }
+
+        const HlmsCache* retVal = addShaderCache( finalHash, shaders[VertexShader],
+                                                  shaders[GeometryShader], shaders[HullShader],
+                                                  shaders[DomainShader], shaders[PixelShader] );
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     bool Hlms::findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut )
@@ -1050,19 +1195,6 @@ namespace Ogre
     const HlmsCache* Hlms::getMaterial( const HlmsCache &passCache, Renderable *renderable,
                                         MovableObject *movableObject, bool casterPass )
     {
-        /*getProperty( HlmsPropertySkeleton ) |
-                        (getProperty( HlmsPropertyBonesPerVertex )  << 1)|
-                        (getProperty( HlmsPropertyNormal )          << 3)|
-                        (getProperty( HlmsPropertyQTangent )        << 4)|
-                        (getProperty( HlmsPropertyUvCount )         << 5 )|
-                        ((getProperty( HlmsPropertyUvCount0 ) - 1)  << 9 )|
-                        ((getProperty( HlmsPropertyUvCount1 ) - 1)  << 11)|
-                        ((getProperty( HlmsPropertyUvCount2 ) - 1)  << 13)|
-                        ((getProperty( HlmsPropertyUvCount3 ) - 1)  << 15)|
-                        ((getProperty( HlmsPropertyUvCount4 ) - 1)  << 17)|
-                        ((getProperty( HlmsPropertyUvCount5 ) - 1)  << 19)|
-                        ((getProperty( HlmsPropertyUvCount6 ) - 1)  << 21)|
-                        ((getProperty( HlmsPropertyUvCount7 ) - 1)  << 23);*/
         uint32 finalHash;
         uint32 hash[2];
         hash[0] = 0;//hash[0] = casterPass ? renderable->getHlmsHash : renderable->getHlmsCasterHash TODO
@@ -1079,9 +1211,7 @@ namespace Ogre
         HlmsCache const *retVal = this->getShaderCache( finalHash );
 
         if( !retVal )
-        {
-            //TODO: Generate the shader
-        }
+            retVal = createShaderCacheEntry( hash[0], passCache, finalHash );
 
         return retVal;
     }
