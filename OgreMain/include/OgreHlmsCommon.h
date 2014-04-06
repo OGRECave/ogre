@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreIdString.h"
+#include "OgreBlendMode.h"
+#include "OgreVector3.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre

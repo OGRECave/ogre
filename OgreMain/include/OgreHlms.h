@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef _OgreHlms_H_
 #define _OgreHlms_H_
 
+#include "OgreStringVector.h"
 #include "OgreHlmsCommon.h"
 #include "OgreHeaderPrefix.h"
 
@@ -160,7 +161,7 @@ namespace Ogre
         static bool findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut );
 
     public:
-		Hlms();
+        Hlms( Archive *dataFolder );
         virtual ~Hlms();
 
         /** Called by the renderable when either it changes the material,

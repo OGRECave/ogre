@@ -93,7 +93,7 @@ namespace Ogre
                                    "HullShader_hs", "DomainShader_ds" };
     const String PieceFilePatterns[] = { "piece_vs", "piece_ps", "piece_gs", "piece_hs", "piece_ds" };
 
-    Hlms::Hlms() : mDataFolder(0)
+    Hlms::Hlms( Archive *dataFolder ) : mDataFolder( dataFolder )
     {
         enumeratePieceFiles();
     }
