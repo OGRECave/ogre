@@ -131,7 +131,7 @@ bool HlmsCmd::configure(void)
     if( mOpts.language == "glsl" )
     {
         RenderSystem *rs = mRoot->getRenderSystemByName("OpenGL 3+ Rendering Subsystem (ALPHA)");
-        rs->setConfigOption( "Colour Depth", "32" );
+        //rs->setConfigOption( "Colour Depth", "32" );
         rs->setConfigOption( "Display Frequency", "N/A" );
         rs->setConfigOption( "FSAA", "0" );
         rs->setConfigOption( "Fixed Pipeline Enabled", "No" );
@@ -218,6 +218,24 @@ void HlmsCmd::setupResources(void)
                 archName, typeName, secName);
         }
     }
+
+    const Ogre::ResourceGroupManager::LocationList genLocs =
+            Ogre::ResourceGroupManager::getSingleton().getResourceLocationList("General");
+    archName = genLocs.front()->archive->getName();
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+    archName = Ogre::macBundlePath() + "/Contents/Resources/Media";
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    archName = Ogre::macBundlePath() + "/Media";
+#else
+    archName = Ogre::StringUtil::replaceAll(archName, "Media/../../Tests/Media", "");
+    archName = Ogre::StringUtil::replaceAll(archName, "media/../../Tests/Media", "");
+#endif
+    typeName    = "FileSystem";
+    secName     = "Popular";
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation( archName + "/materials/programs/GLSL150",
+                                                                    typeName, secName );
+    Ogre::ResourceGroupManager::getSingleton().addResourceLocation( archName + "/materials/programs/GLSL400",
+                                                                    typeName, secName );
 }
 //-------------------------------------------------------------------------------------
 void HlmsCmd::createResourceListener(void)
