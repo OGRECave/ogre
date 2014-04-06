@@ -122,7 +122,7 @@ namespace Ogre
         return _left.keyName < _right.keyName;
     }
 
-    typedef vector<std::pair<IdString, String>>::type HlmsParamVec;
+    typedef vector< std::pair<IdString, String> >::type HlmsParamVec;
 
     inline bool OrderParamVecByKey( const std::pair<IdString, String> &_left,
                                     const std::pair<IdString, String> &_right )

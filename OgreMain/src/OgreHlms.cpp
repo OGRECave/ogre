@@ -192,7 +192,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::findBlockEnd( SubStringRef &outSubString, bool &syntaxError )
     {
-        char *blockNames[] =
+        const char *blockNames[] =
         {
             "foreach",
             "property",
@@ -241,7 +241,7 @@ namespace Ogre
         else
         {
             syntaxError = false;
-            printf( "Syntax Error at line %i: start block (e.g. @foreach; @property) "
+            printf( "Syntax Error at line %lu: start block (e.g. @foreach; @property) "
                     "without matching @end\n", calculateLineCount( outSubString ) );
         }
     }
@@ -350,7 +350,7 @@ namespace Ogre
             retVal = evaluateExpressionRecursive( outExpressions, syntaxError );
 
         if( syntaxError )
-            printf( "Syntax Error at line %i\n", calculateLineCount( subString ) );
+            printf( "Syntax Error at line %lu\n", calculateLineCount( subString ) );
 
         outSyntaxError = syntaxError;
 
@@ -462,7 +462,7 @@ namespace Ogre
         }
         else
         {
-            printf( "Syntax Error at line %i: opening parenthesis without matching closure\n",
+            printf( "Syntax Error at line %lu: opening parenthesis without matching closure\n",
                     calculateLineCount( outSubString ) );
         }
 
@@ -517,7 +517,7 @@ namespace Ogre
             {
                 if( expressionState == 2 )
                 {
-                    printf( "Syntax Error at line %i: ',' or ')' expected\n",
+                    printf( "Syntax Error at line %lu: ',' or ')' expected\n",
                             calculateLineCount( subString ) );
                     syntaxError = true;
                 }
@@ -532,7 +532,7 @@ namespace Ogre
         }
 
         if( syntaxError )
-            printf( "Syntax Error at line %i\n", calculateLineCount( subString ) );
+            printf( "Syntax Error at line %lu\n", calculateLineCount( subString ) );
 
         outSyntaxError = syntaxError;
     }
@@ -560,7 +560,7 @@ namespace Ogre
                 if( subString.find( counterVar ) == 0 )
                 {
                     char tmp[16];
-                    sprintf( tmp, "%i", passNum );
+                    sprintf( tmp, "%lu", passNum );
                     outBuffer += tmp;
                     itor += counterVar.size() + 1;
                 }
@@ -610,7 +610,7 @@ namespace Ogre
 
                 if( count < 0 )
                 {
-                    printf( "Invalid parameter at line %i (@foreach)."
+                    printf( "Invalid parameter at line %lu (@foreach)."
                             " '%s' is not a number nor a variable\n",
                             calculateLineCount( blockSubString ), argValues[0].c_str() );
                     syntaxError = true;
@@ -633,7 +633,7 @@ namespace Ogre
 
                     if( start < 0 )
                     {
-                        printf( "Invalid parameter at line %i (@foreach)."
+                        printf( "Invalid parameter at line %lu (@foreach)."
                                 " '%s' is not a number nor a variable\n",
                                 calculateLineCount( blockSubString ), argValues[2].c_str() );
                         syntaxError = true;
@@ -723,7 +723,7 @@ namespace Ogre
                 if( it != mPieces.end() )
                 {
                     syntaxError = true;
-                    printf( "Error at line %i: @piece '%s' already defined",
+                    printf( "Error at line %lu: @piece '%s' already defined",
                             calculateLineCount( subString ), argValues[0].c_str() );
                 }
                 else
@@ -740,7 +740,7 @@ namespace Ogre
             }
             else
             {
-                printf( "Syntax Error at line %i: @piece expects one parameter",
+                printf( "Syntax Error at line %lu: @piece expects one parameter",
                         calculateLineCount( subString ) );
             }
 
@@ -782,7 +782,7 @@ namespace Ogre
             }
             else
             {
-                printf( "Syntax Error at line %i: @insertpiece expects one parameter",
+                printf( "Syntax Error at line %lu: @insertpiece expects one parameter",
                         calculateLineCount( subString ) );
             }
 
@@ -853,7 +853,7 @@ namespace Ogre
             }
             else
             {
-                printf( "Syntax Error at line %i: @counter/@value expect one parameter",
+                printf( "Syntax Error at line %lu: @counter/@value expect one parameter",
                         calculateLineCount( subString ) );
             }
 
