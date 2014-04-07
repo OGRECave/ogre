@@ -182,6 +182,37 @@ void HlmsCmd::createScene(void)
     entity->getSubEntity(0)->setHlms( &hlms, params );
     HlmsCache passCache = hlms.preparePassHash( 0, false, false );
     const HlmsCache *finalCache = hlms.getMaterial( passCache, entity->getSubEntity(0), entity, false );
+
+    if( !finalCache->vertexShader.isNull() )
+    {
+        const String &source = finalCache->vertexShader->getSource();
+        std::ofstream outFile( "Output_vs.glsl", std::ios::out | std::ios::binary );
+        outFile.write( &source[0], source.size() );
+    }
+    if( !finalCache->geometryShader.isNull() )
+    {
+        const String &source = finalCache->geometryShader->getSource();
+        std::ofstream outFile( "Output_gs.glsl", std::ios::out | std::ios::binary );
+        outFile.write( &source[0], source.size() );
+    }
+    if( !finalCache->tesselationHullShader.isNull() )
+    {
+        const String &source = finalCache->tesselationHullShader->getSource();
+        std::ofstream outFile( "Output_hs.glsl", std::ios::out | std::ios::binary );
+        outFile.write( &source[0], source.size() );
+    }
+    if( !finalCache->tesselationDomainShader.isNull() )
+    {
+        const String &source = finalCache->tesselationDomainShader->getSource();
+        std::ofstream outFile( "Output_ds.glsl", std::ios::out | std::ios::binary );
+        outFile.write( &source[0], source.size() );
+    }
+    if( !finalCache->pixelShader.isNull() )
+    {
+        const String &source = finalCache->pixelShader->getSource();
+        std::ofstream outFile( "Output_ps.glsl", std::ios::out | std::ios::binary );
+        outFile.write( &source[0], source.size() );
+    }
 }
 //-------------------------------------------------------------------------------------
 void HlmsCmd::destroyScene(void)

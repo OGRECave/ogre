@@ -60,9 +60,9 @@ namespace Ogre
     const IdString HlmsPropertyUvCount7             = IdString( "hlms_uv_count7" );
 
     //Change per frame (grouped together with scene pass)
-    const IdString HlmsPropertyLightsDirectionalShadow  = IdString( "hlms_lights_directional_shadow" );
-    const IdString HlmsPropertyLightsPointShadow        = IdString( "hlms_lights_point_shadow" );
-    const IdString HlmsPropertyLightsSpotShadow         = IdString( "hlms_lights_spot_shadow" );
+    const IdString HlmsPropertyLightsDirectional    = IdString( "hlms_lights_directional" );
+    const IdString HlmsPropertyLightsPoint          = IdString( "hlms_lights_point" );
+    const IdString HlmsPropertyLightsSpot           = IdString( "hlms_lights_spot" );
 
     //Change per scene pass
     const IdString HlmsPropertyDualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
@@ -124,9 +124,9 @@ namespace Ogre
         setProperty( HlmsPropertyPssmSplits, 3 );
         setProperty( HlmsPropertyShadowCaster, 0 );
 
-        setProperty( HlmsPropertyLightsDirectionalShadow, 1 );
-        setProperty( HlmsPropertyLightsPointShadow, 2 );
-        setProperty( HlmsPropertyLightsSpotShadow, 3 );
+        setProperty( HlmsPropertyLightsDirectional, 1 );
+        setProperty( HlmsPropertyLightsPoint, 2 );
+        setProperty( HlmsPropertyLightsSpot, 3 );
 
         setProperty( PropertyDiffuseMap, 1 );
         setProperty( PropertyNormalMap, 1 );
@@ -964,6 +964,8 @@ namespace Ogre
             ++itor;
         }
 
+        setProperty( HlmsPropertyUvCount, numTexCoords );
+
         String paramVal;
         if( findParamInVec( params, PropertyDiffuseMap, paramVal ) )
             setProperty( PropertyDiffuseMap, 1 );
@@ -1012,6 +1014,14 @@ namespace Ogre
                 if( pssmSplits )
                     setProperty( HlmsPropertyPssmSplits, pssmSplits->size() );
             }
+            else
+            {
+                setProperty( HlmsPropertyShadowCastingLights, 0 );
+                setProperty( HlmsPropertyPssmSplits, 0 );
+                setProperty( HlmsPropertyLightsDirectional, 0 );
+                setProperty( HlmsPropertyLightsPoint, 0 );
+                setProperty( HlmsPropertyLightsSpot, 0 );
+            }
         }
         else
         {
@@ -1020,17 +1030,17 @@ namespace Ogre
 
             setProperty( HlmsPropertyShadowCastingLights, 0 );
             setProperty( HlmsPropertyPssmSplits, 0 );
-            setProperty( HlmsPropertyLightsDirectionalShadow, 0 );
-            setProperty( HlmsPropertyLightsPointShadow, 0 );
-            setProperty( HlmsPropertyLightsSpotShadow, 0 );
+            setProperty( HlmsPropertyLightsDirectional, 0 );
+            setProperty( HlmsPropertyLightsPoint, 0 );
+            setProperty( HlmsPropertyLightsSpot, 0 );
         }
 
         uint32 hash = getProperty( HlmsPropertyDualParaboloidMapping ) |
                 (getProperty( HlmsPropertyShadowCastingLights )     << 1 )|
                 (getProperty( HlmsPropertyPssmSplits )              << 5 )|
-                (getProperty( HlmsPropertyLightsDirectionalShadow ) << 8 )|
-                (getProperty( HlmsPropertyLightsPointShadow )       << 12)|
-                (getProperty( HlmsPropertyLightsSpotShadow )        << 16)|
+                (getProperty( HlmsPropertyLightsDirectional ) << 8 )|
+                (getProperty( HlmsPropertyLightsPoint )       << 12)|
+                (getProperty( HlmsPropertyLightsSpot )        << 16)|
                 (getProperty( HlmsPropertyShadowCaster )            << 20);
 
         HlmsCache retVal( hash );
@@ -1208,7 +1218,7 @@ namespace Ogre
     {
         uint32 finalHash;
         uint32 hash[2];
-        hash[0] = casterPass ? renderable->getHlmsHash() : renderable->getHlmsCasterHash();
+        hash[0] = casterPass ? renderable->getHlmsCasterHash() : renderable->getHlmsHash();
         hash[1] = passCache.hash & (movableObject->getCastShadows() ? 0xffffffff : 0xffffffe1 );
         if( casterPass )
         {
