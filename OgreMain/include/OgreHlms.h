@@ -189,9 +189,24 @@ namespace Ogre
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
                                            bool casterPass, bool dualParaboloid );
 
+        /** Retrieves an HlmsCache filled with the GPU programs to be used by the given
+            renderable. If the shaders have already been created (i.e. whether for this
+            renderable, or another one) it gets them from a cache. Otherwise we create it.
+            It assumes that renderable->setHlms( this, parameters ) has already called.
+        @param passCache
+            The cache returned by @preparePassHash.
+        @param renderable
+            The renderable the caller wants us to give the shaders.
+        @param movableObject
+            The MovableObject owner of the renderable (we need it to know if renderable
+            should cast shadows)
+        @param casterPass
+            True if this pass is the shadow mapping caster pass, false otherwise
+        @return
+            Structure containing all necessary shaders
+        */
         const HlmsCache* getMaterial( const HlmsCache &passCache, Renderable *renderable,
                                       MovableObject *movableObject, bool casterPass );
-        //void generateFor();
     };
     /** @} */
     /** @} */
