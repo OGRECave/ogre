@@ -94,6 +94,7 @@ namespace Ogre
 
         void initInputDevices(void);
         void processInputDevices(void);
+        void validateShaderSignatures( const D3D11HLSLProgram* progA, const D3D11HLSLProgram* progB ) const;
         
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
