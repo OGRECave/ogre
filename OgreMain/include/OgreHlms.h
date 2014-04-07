@@ -82,7 +82,7 @@ namespace Ogre
         */
         void enumeratePieceFiles(void);
 
-        void setProperty(IdString key, int32 value );
+        void setProperty( IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
 
         enum ExpressionType
@@ -137,9 +137,6 @@ namespace Ogre
         static size_t calculateLineCount(const String &buffer, size_t idx );
         static size_t calculateLineCount( const SubStringRef &subString );
 
-        /// @See calculateHashFor
-        virtual uint32 calculateRenderableHash(void) const;
-
         void addRenderableCache( uint32 hash, const HlmsPropertyVec &renderableSetProperties );
         const HlmsCache* getRenderableCache( uint32 hash ) const;
         const HlmsCache* addShaderCache( uint32 hash, GpuProgramPtr &vertexShader,
@@ -159,6 +156,9 @@ namespace Ogre
             Assumes paramVec is sorted by key.
         */
         static bool findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut );
+
+        /// @See calculateHashFor
+        virtual uint32 calculateRenderableHash(void) const;
 
     public:
         Hlms( Archive *dataFolder );
@@ -207,6 +207,9 @@ namespace Ogre
         */
         const HlmsCache* getMaterial( const HlmsCache &passCache, Renderable *renderable,
                                       MovableObject *movableObject, bool casterPass );
+
+        /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
+        void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
     };
     /** @} */
     /** @} */

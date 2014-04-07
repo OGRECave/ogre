@@ -74,7 +74,7 @@ namespace Ogre
         {
         }
 
-        size_t find( char *value ) const
+        size_t find( const char *value ) const
         {
             size_t retVal = mOriginal->find( value, mStart );
             if( retVal >= mEnd )
