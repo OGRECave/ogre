@@ -1178,9 +1178,12 @@ namespace Ogre
             if( shadowNode )
             {
                 setProperty( HlmsPropertyShadowCastingLights, shadowNode->getNumShadowCastingLights() );
+
+                int32 numPssmSplits = 0;
                 const vector<Real>::type *pssmSplits = shadowNode->getPssmSplits( 0 );
                 if( pssmSplits )
-                    setProperty( HlmsPropertyPssmSplits, pssmSplits->size() );
+                    numPssmSplits = static_cast<int32>( pssmSplits->size() );
+                setProperty( HlmsPropertyPssmSplits, numPssmSplits );
 
                 uint numLightsPerType[3];
                 memset( numLightsPerType, 0, sizeof( numLightsPerType ) );

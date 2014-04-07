@@ -341,6 +341,7 @@ namespace Ogre {
     class WireBoundingBox;
     class WorkQueue;
     class CompositorManager2;
+    class CompositorWorkspace;
 
     template<typename T> class SharedPtr;
     typedef SharedPtr<AnimableValue> AnimableValuePtr;

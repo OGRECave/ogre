@@ -44,6 +44,7 @@ class HlmsCmd
     Ogre::Camera        *mCamera;
     Ogre::SceneManager  *mSceneMgr;
     Ogre::RenderWindow  *mWindow;
+    Ogre::CompositorWorkspace *mWorkspace;
     Ogre::String        mResourcesCfg;
     Ogre::String        mPluginsCfg;
 

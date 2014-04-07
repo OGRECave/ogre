@@ -29,11 +29,19 @@ THE SOFTWARE.
 
 #include "HlmsCmd.h"
 
+#include "OgreAxisAlignedBox.h"
+#include "OgreSharedPtr.h"
 #include "Compositor/OgreCompositorManager2.h"
+#include "Compositor/OgreCompositorShadowNodeDef.h"
+#include "Compositor/OgreCompositorWorkspace.h"
+#include "Compositor/OgreCompositorShadowNode.h"
+#include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "OgreRoot.h"
 #include "OgreConfigFile.h"
 #include "OgreRenderWindow.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreCamera.h"
 
 #include "OgreStringVector.h"
 #include "OgreHlms.h"
@@ -177,6 +185,13 @@ void HlmsCmd::createScene(void)
     mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject( light );
     light->setType( Light::LT_DIRECTIONAL );
 
+    for( size_t i=0; i<4; ++i )
+    {
+        light = mSceneMgr->createLight();
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject( light );
+        light->setType( Light::LT_SPOTLIGHT );
+    }
+
     Entity *entity = mSceneMgr->createEntity( "penguin.mesh" );
     Archive *archive = ArchiveManager::getSingletonPtr()->load(
                     "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PBS/GLSL",
@@ -187,7 +202,10 @@ void HlmsCmd::createScene(void)
 
     mSceneMgr->updateSceneGraph();
 
-    HlmsCache passCache = hlms.preparePassHash( 0, false, false, mSceneMgr );
+    CompositorShadowNode *shadowNode = mWorkspace->findShadowNode( "HlmsCmd ShadowNode" );
+    shadowNode->_update( mCamera, mCamera, mSceneMgr );
+
+    HlmsCache passCache = hlms.preparePassHash( shadowNode, false, false, mSceneMgr );
     const HlmsCache *finalCache = hlms.getMaterial( passCache, entity->getSubEntity(0), entity, false );
 
     if( !finalCache->vertexShader.isNull() )
@@ -230,9 +248,65 @@ void HlmsCmd::createCompositor(void)
 {
     mRoot->initialiseCompositor();
     Ogre::CompositorManager2* compositorManager = mRoot->getCompositorManager2();
+
+    //Create a shadow node
+    CompositorShadowNodeDef *shadowNode = compositorManager->addShadowNodeDefinition(
+                                                                        "HlmsCmd ShadowNode" );
+    shadowNode->setNumShadowTextureDefinitions( 3 + 4 );
+    shadowNode->setDefaultTechnique( SHADOWMAP_PSSM );
+
+    size_t numSplits = 3;
+    for( size_t i=0; i<numSplits; ++i )
+    {
+        ShadowTextureDefinition *td = shadowNode->addShadowTextureDefinition( 0, i,
+                                             StringConverter::toString(i), false );
+        td->width           = 512;
+        td->height          = 512;
+        td->widthFactor     = 1.0f;
+        td->heightFactor    = 1.0f;
+        td->formatList.push_back( PF_FLOAT32_R );
+        td->depthBufferId   = 2;
+        td->numSplits       = numSplits;
+    }
+
+    shadowNode->setDefaultTechnique( SHADOWMAP_FOCUSED );
+    size_t numLights = 4;
+    for( size_t i=numSplits; i<numSplits+numLights; ++i )
+    {
+        ShadowTextureDefinition *td = shadowNode->addShadowTextureDefinition( i, 0,
+                                             StringConverter::toString(i), false );
+        td->width           = 512;
+        td->height          = 512;
+        td->widthFactor     = 1.0f;
+        td->heightFactor    = 1.0f;
+        td->formatList.push_back( PF_FLOAT32_R );
+        td->depthBufferId   = 2;
+    }
+
+    shadowNode->setNumTargetPass( numSplits+numLights );
+    for( size_t i=0; i<numSplits+numLights; ++i )
+    {
+        CompositorTargetDef *targetDef = shadowNode->addTargetPass( StringConverter::toString(i) );
+        targetDef->setNumPasses( 2 );
+        {
+            {
+                CompositorPassClearDef *passClear = static_cast<CompositorPassClearDef*>
+                                                        ( targetDef->addPass( PASS_CLEAR ) );
+                passClear->mColourValue = ColourValue::White;
+            }
+            {
+                CompositorPassSceneDef *passScene = static_cast<CompositorPassSceneDef*>
+                                                        ( targetDef->addPass( PASS_SCENE ) );
+                passScene->mIncludeOverlays = false;
+                passScene->mShadowMapIdx = i;
+            }
+        }
+    }
+
     const Ogre::IdString workspaceName = "Scene Workspace";
-    compositorManager->createBasicWorkspaceDef( workspaceName, Ogre::ColourValue( 0.7f, 0.3f, 0.1f ) );
-    compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
+    compositorManager->createBasicWorkspaceDef( workspaceName, Ogre::ColourValue( 0.7f, 0.3f, 0.1f ),
+                                                "HlmsCmd ShadowNode" );
+    mWorkspace = compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 }
 //-------------------------------------------------------------------------------------
 void HlmsCmd::setupResources(void)
@@ -305,8 +379,13 @@ void HlmsCmd::go(void)
     mRoot->clearEventTimes();
 
     bool bContinue = true;
-    for( size_t i=0; i<3 && !bContinue; ++i )
+
+    Ogre::WindowEventUtilities::messagePump();
+    bContinue = mRoot->renderOneFrame();
+    if( bContinue )
     {
+        // Create the scene
+        createScene();
         Ogre::WindowEventUtilities::messagePump();
         bContinue = mRoot->renderOneFrame();
     }
@@ -332,9 +411,6 @@ bool HlmsCmd::setup(void)
     createResourceListener();
     // Load resources
     loadResources();
-
-    // Create the scene
-    createScene();
 
     return true;
 };
