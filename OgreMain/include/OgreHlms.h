@@ -187,7 +187,8 @@ namespace Ogre
             through its lifetime but may differ per mesh)
         */
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
-                                           bool casterPass, bool dualParaboloid );
+                                           bool casterPass, bool dualParaboloid,
+                                           SceneManager *sceneManager );
 
         /** Retrieves an HlmsCache filled with the GPU programs to be used by the given
             renderable. If the shaders have already been created (i.e. whether for this

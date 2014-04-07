@@ -173,6 +173,10 @@ void HlmsCmd::createCamera(void)
 //-------------------------------------------------------------------------------------
 void HlmsCmd::createScene(void)
 {
+    Light *light = mSceneMgr->createLight();
+    mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject( light );
+    light->setType( Light::LT_DIRECTIONAL );
+
     Entity *entity = mSceneMgr->createEntity( "penguin.mesh" );
     Archive *archive = ArchiveManager::getSingletonPtr()->load(
                     "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PBS/GLSL",
@@ -180,7 +184,10 @@ void HlmsCmd::createScene(void)
     Hlms hlms( archive );
     HlmsParamVec params;
     entity->getSubEntity(0)->setHlms( &hlms, params );
-    HlmsCache passCache = hlms.preparePassHash( 0, false, false );
+
+    mSceneMgr->updateSceneGraph();
+
+    HlmsCache passCache = hlms.preparePassHash( 0, false, false, mSceneMgr );
     const HlmsCache *finalCache = hlms.getMaterial( passCache, entity->getSubEntity(0), entity, false );
 
     if( !finalCache->vertexShader.isNull() )

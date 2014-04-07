@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNode.h"
 
 #include "OgreLight.h"
+#include "OgreSceneManager.h"
 //#include "OgreMovableObject.h"
 //#include "OgreRenderable.h"
 
@@ -1167,8 +1168,8 @@ namespace Ogre
         outCasterHash   = renderableCasterHash;
     }
     //-----------------------------------------------------------------------------------
-    HlmsCache Hlms::preparePassHash( const CompositorShadowNode *shadowNode,
-                                     bool casterPass, bool dualParaboloid )
+    HlmsCache Hlms::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
+                                     bool dualParaboloid, SceneManager *sceneManager )
     {
         mSetProperties.clear();
 
@@ -1183,13 +1184,29 @@ namespace Ogre
 
                 uint numLightsPerType[3];
                 memset( numLightsPerType, 0, sizeof( numLightsPerType ) );
-                const FastArray<Light const *> &lights = shadowNode->getShadowCastingLights();
-                FastArray<Light const *>::const_iterator itor = lights.begin();
-                FastArray<Light const *>::const_iterator end  = lights.end();
-                while( itor != end )
                 {
-                    ++numLightsPerType[(*itor)->getType()];
-                    ++itor;
+                    const FastArray<Light const *> &lights = shadowNode->getShadowCastingLights();
+                    FastArray<Light const *>::const_iterator itor = lights.begin();
+                    FastArray<Light const *>::const_iterator end  = lights.end();
+                    while( itor != end )
+                    {
+                        ++numLightsPerType[(*itor)->getType()];
+                        ++itor;
+                    }
+                }
+
+                numLightsPerType[Light::LT_DIRECTIONAL] = 0;
+                {
+                    const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
+                    LightArray::const_iterator itor = globalLightList.lights.begin();
+                    LightArray::const_iterator end  = globalLightList.lights.end();
+
+                    while( itor != end )
+                    {
+                        if( (*itor)->getType() == Light::LT_DIRECTIONAL )
+                            ++numLightsPerType[Light::LT_DIRECTIONAL];
+                        ++itor;
+                    }
                 }
 
                 setProperty( HlmsPropertyLightsDirectional, numLightsPerType[Light::LT_DIRECTIONAL] );
@@ -1198,9 +1215,21 @@ namespace Ogre
             }
             else
             {
+                const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
+                LightArray::const_iterator itor = globalLightList.lights.begin();
+                LightArray::const_iterator end  = globalLightList.lights.end();
+
+                uint numDirLights = 0;
+                while( itor != end )
+                {
+                    if( (*itor)->getType() == Light::LT_DIRECTIONAL )
+                        ++numDirLights;
+                    ++itor;
+                }
+
                 setProperty( HlmsPropertyShadowCastingLights, 0 );
                 setProperty( HlmsPropertyPssmSplits, 0 );
-                setProperty( HlmsPropertyLightsDirectional, 0 );
+                setProperty( HlmsPropertyLightsDirectional, numDirLights );
                 setProperty( HlmsPropertyLightsPoint, 0 );
                 setProperty( HlmsPropertyLightsSpot, 0 );
             }
@@ -1220,9 +1249,9 @@ namespace Ogre
         uint32 hash = getProperty( HlmsPropertyDualParaboloidMapping ) |
                 (getProperty( HlmsPropertyShadowCastingLights )     << 1 )|
                 (getProperty( HlmsPropertyPssmSplits )              << 5 )|
-                (getProperty( HlmsPropertyLightsDirectional ) << 8 )|
-                (getProperty( HlmsPropertyLightsPoint )       << 12)|
-                (getProperty( HlmsPropertyLightsSpot )        << 16)|
+                (getProperty( HlmsPropertyLightsDirectional )       << 8 )|
+                (getProperty( HlmsPropertyLightsPoint )             << 12)|
+                (getProperty( HlmsPropertyLightsSpot )              << 16)|
                 (getProperty( HlmsPropertyShadowCaster )            << 20);
 
         HlmsCache retVal( hash );
