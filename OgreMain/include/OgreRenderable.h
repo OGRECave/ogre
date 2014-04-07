@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 #include "OgreException.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreHlms.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -409,10 +410,19 @@ namespace Ogre {
             mRenderSystemData = val; 
         }
 
+        uint32 getHlmsHash(void) const          { return mHlmsHash; }
+        uint32 getHlmsCasterHash(void) const    { return mHlmsCasterHash; }
+
+        void setHlms( Hlms *hlms, const HlmsParamVec &params )
+        {
+            hlms->calculateHashFor( this, params, mHlmsHash, mHlmsCasterHash );
+        }
 
     protected:
         typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
+        uint32 mHlmsHash;
+        uint32 mHlmsCasterHash;
         bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;
         bool mUseIdentityView;

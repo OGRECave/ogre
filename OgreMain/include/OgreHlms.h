@@ -173,7 +173,8 @@ namespace Ogre
         @return
             A hash. This hash references property parameters that are already cached.
         */
-        virtual uint32 calculateHashFor( Renderable *renderable, const HlmsParamVec &params );
+        virtual void calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
+                                       uint32 &outHash, uint32 &outCasterHash );
 
         /** Called every frame by the Render Queue to cache the properties needed by this
             pass. i.e. Number of PSSM splits, number of shadow casting lights, etc

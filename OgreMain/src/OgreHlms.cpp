@@ -911,7 +911,8 @@ namespace Ogre
         return hash;
     }
     //-----------------------------------------------------------------------------------
-    uint32 Hlms::calculateHashFor( Renderable *renderable, const HlmsParamVec &params )
+    void Hlms::calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
+                                 uint32 &outHash, uint32 &outCasterHash )
     {
         mSetProperties.clear();
         mPieces.clear();
@@ -993,7 +994,8 @@ namespace Ogre
         uint32 renderableCasterHash = calculateRenderableHash();
         this->addRenderableCache( renderableCasterHash, mSetProperties );
 
-        return renderableHash;
+        outHash         = renderableHash;
+        outCasterHash   = renderableCasterHash;
     }
     //-----------------------------------------------------------------------------------
     HlmsCache Hlms::preparePassHash( const CompositorShadowNode *shadowNode,
@@ -1016,6 +1018,11 @@ namespace Ogre
             setProperty( HlmsPropertyShadowCaster, casterPass );
             setProperty( HlmsPropertyDualParaboloidMapping, dualParaboloid );
 
+            setProperty( HlmsPropertyShadowCastingLights, 0 );
+            setProperty( HlmsPropertyPssmSplits, 0 );
+            setProperty( HlmsPropertyLightsDirectionalShadow, 0 );
+            setProperty( HlmsPropertyLightsPointShadow, 0 );
+            setProperty( HlmsPropertyLightsSpotShadow, 0 );
         }
 
         uint32 hash = getProperty( HlmsPropertyDualParaboloidMapping ) |
@@ -1068,7 +1075,7 @@ namespace Ogre
         HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
                                                       cache, OrderCacheByHash );
 
-        assert( it == mRenderableCache.end() || it->hash != hash &&
+        assert( it == mShaderCache.end() || it->hash != hash &&
                 "Can't add the same shader to the cache twice! (or a hash collision happened)" );
 
         cache.vertexShader              = vertexShader;
@@ -1077,7 +1084,7 @@ namespace Ogre
         cache.tesselationDomainShader   = tesselationDomainShader;
         cache.pixelShader               = pixelShader;
 
-        return &(*mRenderableCache.insert( it, cache ));
+        return &(*mShaderCache.insert( it, cache ));
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::getShaderCache( uint32 hash ) const
@@ -1141,34 +1148,38 @@ namespace Ogre
             }
 
             //Generate the shader file. TODO: Identify the file extension at runtime
-            DataStreamPtr inFile = mDataFolder->open( ShaderFiles[i] + ".glsl" );
+            const String filename = ShaderFiles[i] + ".glsl";
+            if( mDataFolder->exists( filename ) )
+            {
+                DataStreamPtr inFile = mDataFolder->open( filename );
 
-            String inString;
-            String outString;
+                String inString;
+                String outString;
 
-            inString.resize( inFile->size() );
-            inFile->read( &inString[0], inFile->size() );
+                inString.resize( inFile->size() );
+                inFile->read( &inString[0], inFile->size() );
 
-            this->parseForEach( inString, outString );
-            this->parseProperties( outString, inString );
-            this->collectPieces( inString, outString );
-            this->insertPieces( outString, inString );
-            this->parseCounter( inString, outString );
+                this->parseForEach( inString, outString );
+                this->parseProperties( outString, inString );
+                this->collectPieces( inString, outString );
+                this->insertPieces( outString, inString );
+                this->parseCounter( inString, outString );
 
-            HighLevelGpuProgramManager *gpuProgramManager =
-                                                    HighLevelGpuProgramManager::getSingletonPtr();
+                HighLevelGpuProgramManager *gpuProgramManager =
+                                                        HighLevelGpuProgramManager::getSingletonPtr();
 
-            HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
-                                "name", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                "glsl", static_cast<GpuProgramType>(i) );
-            gp->setSource( outString );
+                HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
+                                    "name", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                    "glsl", static_cast<GpuProgramType>(i) );
+                gp->setSource( outString );
 
-            gp->setSkeletalAnimationIncluded( getProperty( HlmsPropertySkeleton ) != 0 );
-            gp->setMorphAnimationIncluded( false );
-            gp->setPoseAnimationIncluded( getProperty( HlmsPropertyPose ) );
-            gp->setVertexTextureFetchRequired( true );
+                gp->setSkeletalAnimationIncluded( getProperty( HlmsPropertySkeleton ) != 0 );
+                gp->setMorphAnimationIncluded( false );
+                gp->setPoseAnimationIncluded( getProperty( HlmsPropertyPose ) );
+                gp->setVertexTextureFetchRequired( true );
 
-            shaders[i] = gp;
+                shaders[i] = gp;
+            }
         }
 
         const HlmsCache* retVal = addShaderCache( finalHash, shaders[VertexShader],
@@ -1197,7 +1208,7 @@ namespace Ogre
     {
         uint32 finalHash;
         uint32 hash[2];
-        hash[0] = 0;//hash[0] = casterPass ? renderable->getHlmsHash : renderable->getHlmsCasterHash TODO
+        hash[0] = casterPass ? renderable->getHlmsHash() : renderable->getHlmsCasterHash();
         hash[1] = passCache.hash & (movableObject->getCastShadows() ? 0xffffffff : 0xffffffe1 );
         if( casterPass )
         {

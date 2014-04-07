@@ -45,6 +45,8 @@ THE SOFTWARE.
 using namespace Ogre;
 using namespace std;
 
+#define _DEBUG
+
 int main( int numargs, char** args )
 {
     /*if (numargs < 2)
@@ -173,11 +175,11 @@ void HlmsCmd::createScene(void)
 {
     Entity *entity = mSceneMgr->createEntity( "penguin.mesh" );
     Archive *archive = ArchiveManager::getSingletonPtr()->load(
-                    "E:/Projects/SDK/Ogre2-Hlms/Samples/Media/Hlms/PBS/GLSL",
+                    "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PBS/GLSL",
                     "FileSystem", true );
     Hlms hlms( archive );
     HlmsParamVec params;
-    uint32 renderableHash = hlms.calculateHashFor( entity->getSubEntity(0), params );
+    entity->getSubEntity(0)->setHlms( &hlms, params );
     HlmsCache passCache = hlms.preparePassHash( 0, false, false );
     const HlmsCache *finalCache = hlms.getMaterial( passCache, entity->getSubEntity(0), entity, false );
 }
