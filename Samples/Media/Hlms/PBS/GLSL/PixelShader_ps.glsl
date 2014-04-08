@@ -152,14 +152,16 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 
 	//Fresnel term (Schlick's approximation)
 	//Formula:
-	//	lerp( (1 - V*H)^5, 1, F0 )
-	@insertpiece( FresnelType ) fresnel = F0 + pow( 1.0f - VdotH, 5.0f ) * (1.0f - F0);
+	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
+	//	fresnelD = lerp( (1 - N*L)^5, 1, 1 - F0 )
+	@insertpiece( FresnelType ) fresnelS = F0 + pow( 1.0f - VdotH, 5.0f ) * (1.0f - F0);
+	@insertpiece( FresnelType ) fresnelD = 1.0f - F0 + pow( 1.0f - NdotL, 5.0f ) * F0;
 
-@property( envprobe_map )	vec3 Rs = ( envColour * fresnel * R * G  ) / (4.0f * NdotV * NdotL);@end
-@property( !envprobe_map )	@insertpiece( FresnelType ) Rs = ( fresnel * R * G  ) / (4.0f * NdotV * NdotL);@end
+@property( envprobe_map )	vec3 Rs = ( envColour * fresnelS * R * G  ) / (4.0f * NdotV * NdotL);@end
+@property( !envprobe_map )	@insertpiece( FresnelType ) Rs = ( fresnelS * R * G  ) / (4.0f * NdotV * NdotL);@end
 
 	return NdotL * (kS * lightSpecular[lightIdx] * Rs @insertpiece( MulSpecularMapValue ) +
-				   kD * lightDiffuse[lightIdx] @insertpiece( MulDiffuseMapValue ));
+				   kD * lightDiffuse[lightIdx] * fresnelD @insertpiece( MulDiffuseMapValue ));
 }
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], psPosL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
