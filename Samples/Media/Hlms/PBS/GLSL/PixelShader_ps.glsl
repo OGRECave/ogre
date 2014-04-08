@@ -9,7 +9,9 @@ layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 @property( hlms_normal )
 in vec3 psPos;
 in vec3 psNormal;
-@property( normal_map )in vec3 psTangent;@end
+vec3 nNormal;
+@property( normal_map )in vec3 psTangent;
+vec3 nTangent;@end
 @end
 @property( hlms_pssm_splits )in float psDepth;@end
 @foreach( hlms_uv_count, n )
@@ -20,7 +22,7 @@ in vec4 psPosL@n;@end
 @property( hlms_lights_spot )uniform vec4 lightPosition[@value(hlms_lights_spot)];
 uniform vec3 lightDiffuse[@value(hlms_lights_spot)];
 uniform vec3 lightSpecular[@value(hlms_lights_spot)];
-uniform vec4 attenuation[@value(hlms_lights_attenuation)];
+uniform vec3 attenuation[@value(hlms_lights_attenuation)];
 uniform vec3 spotDirection[@value(hlms_lights_spotparams)];
 uniform vec3 spotParams[@value(hlms_lights_spotparams)];
 @end
@@ -115,8 +117,8 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 	vec3 lightDir = (psPos - lightPosition[lightIdx].xyz) * lightPosition[lightIdx].w;
 
 	vec3 halfWay= normalize( lightDir + viewDir );
-	float NdotL = dot( psNormal, lightDir );
-	float NdotH = dot( psNormal, halfWay );
+	float NdotL = dot( nNormal, lightDir );
+	float NdotH = dot( nNormal, halfWay );
 	float VdotH = dot( viewDir, halfWay );
 
 @property( diffuse_map )	vec4 diffuseCol = texture( texDiffuseMap, psUv0 );@end
@@ -164,10 +166,10 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 
 void main()
 {
-	psNormal = normalize( psNormal );
+	nNormal = normalize( psNormal );
 @property( normal_map )
-	psTangent = normalize( psTangent );
-	psNormal = getNormalMap( psNormal, psTangent, texNormalMap, psUv0 );
+	nTangent = normalize( psTangent );
+	nNormal = getNormalMap( nNormal, nTangent, texNormalMap, psUv0 );
 @end
 
 @property( hlms_pssm_splits )
@@ -184,7 +186,7 @@ void main()
 	float fDistance	= length( psPos );
 	float sqDistance= fDistance * fDistance;
 	vec3 viewDir	= psPos * (1.0f / fDistance);@end
-	float NdotV		= dot( psNormal, viewDir );
+	float NdotV		= dot( nNormal, viewDir );
 
 	vec3 finalColour = vec3(0);
 @property( hlms_lights_directional )

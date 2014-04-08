@@ -2483,6 +2483,10 @@ As spotlight_viewproj_matrix except it also includes the world matrix.
 Provides information about the depth range as viewed from the current camera being used to render. Provided as float4(minDepth, maxDepth, depthRange, 1 / depthRange).
 @item shadow_scene_depth_range
 Provides information about the depth range as viewed from the shadow camera relating to a selected light. Requires a light index parameter. Provided as float4(minDepth, maxDepth, depthRange, 1 / depthRange).
+@item shadow_scene_depth_range_array
+Same as shadow_scene_depth_range, but provides an array. The extra parameter indicates up to the Nth shadow mapping light.
+@item pssm_splits
+The 4 pssm split thresholds to select which cascade to use while shadow mapping. Requires a light index parameter. Provided as float4(f1stCascadeFar, f2ndCascadeFar, f3rdCascadeFar, f4thCascadeFar).
 @item shadow_colour
 The shadow colour (for modulative shadows) as set via SceneManager::setShadowColour.
 @item shadow_extrusion_distance
