@@ -114,12 +114,12 @@ vec3 qmul( vec4 q, vec3 v )
 
 vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 {
-	vec3 lightDir = (psPos - lightPosition[lightIdx].xyz) * lightPosition[lightIdx].w;
+	vec3 lightDir = lightPosition[lightIdx].xyz - psPos * lightPosition[lightIdx].w;
 
 	vec3 halfWay= normalize( lightDir + viewDir );
-	float NdotL = dot( nNormal, lightDir );
-	float NdotH = dot( nNormal, halfWay );
-	float VdotH = dot( viewDir, halfWay );
+	float NdotL = clamp( dot( nNormal, lightDir ), 0.0f, 1.0f );
+	float NdotH = dot( nNormal, halfWay ); //There is no need to saturate
+	float VdotH = dot( viewDir, halfWay ); //No saturation
 
 @property( diffuse_map )	vec4 diffuseCol = texture( texDiffuseMap, psUv0 );@end
 @property( specular_map )
@@ -133,10 +133,10 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 	//	Where alpha = NdotH and m = roughness
 	//	R = [ 1 / (m^2 x cos(alpha)^4 ] x [ e^( -tan(alpha)^2 / m^2 ) ]
 	//	R = [ 1 / (m^2 x cos(alpha)^4 ] x [ e^( ( cos(alpha)^2 - 1 )  /  (m^2 cos(alpha)^2 ) ]
-
-	float roughness_a = 1.0f / ( sqR * pow( NdotH, 4.0f ) );//( 1 / (m^2 x cos(alpha)^4 )
-	float roughness_b = NdotH * NdotH - 1.0f;	//( cos(alpha)^2 - 1 )
-	float roughness_c = sqR * NdotH * NdotH;	//( m^2 cos(alpha)^2 )
+	float NdotH_sq = NdotH * NdotH;
+	float roughness_a = 1.0f / ( sqR * NdotH_sq * NdotH_sq );//( 1 / (m^2 x cos(alpha)^4 )
+	float roughness_b = NdotH_sq - 1.0f;	//( cos(alpha)^2 - 1 )
+	float roughness_c = sqR * NdotH_sq;		//( m^2 cos(alpha)^2 )
 
 	float R = roughness_a * exp( roughness_b / roughness_c );
 
@@ -152,14 +152,14 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 
 	//Fresnel term (Schlick's approximation)
 	//Formula:
-	//	lerp( 1, (1 - V*H)^5, F0 )
+	//	lerp( (1 - V*H)^5, 1, F0 )
 	@insertpiece( FresnelType ) fresnel = F0 + pow( 1.0f - VdotH, 5.0f ) * (1.0f - F0);
 
 @property( envprobe_map )	vec3 Rs = ( envColour * fresnel * R * G  ) / (4.0f * NdotV * NdotL);@end
 @property( !envprobe_map )	@insertpiece( FresnelType ) Rs = ( fresnel * R * G  ) / (4.0f * NdotV * NdotL);@end
 
-	return max(0.0f, NdotL) * (kS[lightIdx] * lightSpecular[lightIdx] * Rs @insertpiece( MulSpecularMapValue ) +
-							   kD[lightIdx] * lightDiffuse[lightIdx] @insertpiece( MulDiffuseMapValue ));
+	return NdotL * (kS * lightSpecular[lightIdx] * Rs @insertpiece( MulSpecularMapValue ) +
+				   kD * lightDiffuse[lightIdx] @insertpiece( MulDiffuseMapValue ));
 }
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], psPosL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
@@ -185,8 +185,8 @@ void main()
 @property( hlms_lights_point || hlms_lights_spot )
 	float fDistance	= length( psPos );
 	float sqDistance= fDistance * fDistance;
-	vec3 viewDir	= psPos * (1.0f / fDistance);@end
-	float NdotV		= dot( nNormal, viewDir );
+	vec3 viewDir	= -psPos * (1.0f / fDistance);@end
+	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0f, 1.0f );
 
 	vec3 finalColour = vec3(0);
 @property( hlms_lights_directional )
