@@ -1,6 +1,29 @@
+#version 330
+
 /*#ifdef GL_ES
 precision mediump float;
 #endif*/
+#define FRAG_COLOR		0
+layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
+
+@property( hlms_normal )
+in vec3 psPos;
+in vec3 psNormal;
+@property( normal_map )in vec3 psTangent;@end
+@end
+@property( hlms_pssm_splits )in float psDepth;@end
+@foreach( hlms_uv_count, n )
+in vec@value( hlms_uv_count@n ) psUv@n;@end
+@foreach( hlms_num_shadow_maps, n )
+in vec4 psPosL@n;@end
+
+@property( hlms_lights_spot )uniform vec4 lightPosition[@value(hlms_lights_spot)];
+uniform vec3 lightDiffuse[@value(hlms_lights_spot)];
+uniform vec3 lightSpecular[@value(hlms_lights_spot)];
+uniform vec4 attenuation[@value(hlms_lights_attenuation)];
+uniform vec3 spotDirection[@value(hlms_lights_spotparams)];
+uniform vec3 spotParams[@value(hlms_lights_spotparams)];
+@end
 
 @property( hlms_fresnel_scalar )@piece( FresnelType )vec3@end@end
 @property( !hlms_fresnel_scalar ) @piece( FresnelType )float@end @end
@@ -27,23 +50,25 @@ uniform @insertpiece( FresnelType ) F0;
 @property( diffuse_map )@piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
 @property( specular_map )@piece( MulSpecularMapValue )* specularCol.xyz@end@end
 
-@property( hlms_shadow_casting_lights )
+@property( hlms_num_shadow_maps )
 @property( hlms_shadow_usues_depth_texture )#define SAMPLER2DSHADOW sampler2DShadow@end
 @property( !hlms_shadow_usues_depth_texture )#define SAMPLER2DSHADOW sampler2D@end
-uniform SAMPLER2DSHADOW texShadowMap[@value(hlms_shadow_casting_lights)];
+uniform vec2 invShadowMapSize[@value(hlms_num_shadow_maps)];
+uniform float pssmSplitPoints[@value(hlms_pssm_splits)];
+uniform SAMPLER2DSHADOW texShadowMap[@value(hlms_num_shadow_maps)];
 
-float calcDepthShadow( SAMPLER2DSHADOW shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
+float getShadow( SAMPLER2DSHADOW shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
 {
 @property( !hlms_shadow_usues_depth_texture )
 	const float fDepth = psPosLN.z;
 	const vec2 uv = psPosLN.xy / psPosLN.w;
-	const vec3 o = vec3( invShadowMapSize, -invTexSize.x ) * 0.3;
+	const vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
 
 	// 2x2 PCF
-	float c =	(fDepth <= textureLod(shadowMap, uv - o.xyy, 0).r) ? 1 : 0; // top left
-	c +=		(fDepth <= textureLod(shadowMap, uv - o.zyy, 0).r) ? 1 : 0; // top right
-	c +=		(fDepth <= textureLod(shadowMap, uv + o.zyy, 0).r) ? 1 : 0; // bottom left
-	c +=		(fDepth <= textureLod(shadowMap, uv + o.xyy, 0).r) ? 1 : 0; // bottom right
+	float c =	(fDepth <= textureLod(shadowMap, uv - o.xy, 0).r) ? 1 : 0; // top left
+	c +=		(fDepth <= textureLod(shadowMap, uv - o.zy, 0).r) ? 1 : 0; // top right
+	c +=		(fDepth <= textureLod(shadowMap, uv + o.zy, 0).r) ? 1 : 0; // bottom left
+	c +=		(fDepth <= textureLod(shadowMap, uv + o.xy, 0).r) ? 1 : 0; // bottom right
 
 	return c * 0.25;@end
 @property( hlms_shadow_usues_depth_texture )
@@ -99,7 +124,7 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 	vec4 specularCol = texture( texSpecularMap, psUv0 );
 	float ROUGHNESS = roughness * specularCol.w;
 @end
-	sqR = ROUGHNESS * ROUGHNESS;
+	float sqR = ROUGHNESS * ROUGHNESS;
 
 	//Roughness term (Beckmann distribution)
 	//Formula:
@@ -114,8 +139,8 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 	float R = roughness_a * exp( roughness_b / roughness_c );
 
 	vec3 reflDir = (-2.0f * dot( viewDir, halfWay )) * halfWay + viewDir;
-	//Should we be use R instead for selecting the mip?
-	vec3 envColour = textureLod( texEnvProbeMap, reflDir, ROUGHNESS ).xyz;
+@property( envprobe_map )	//Should we be use R instead for selecting the mip?
+	vec3 envColour = textureLod( texEnvProbeMap, reflDir, ROUGHNESS ).xyz;@end
 
 	//Geometric term
 	float shared_geo = 2.0f * NdotH / VdotH;
@@ -129,13 +154,13 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 	@insertpiece( FresnelType ) fresnel = F0 + pow( 1.0f - VdotH, 5.0f ) * (1.0f - F0);
 
 @property( envprobe_map )	vec3 Rs = ( envColour * fresnel * R * G  ) / (4.0f * NdotV * NdotL);@end
-@property( !envprobe_map )	vec3 Rs = ( fresnel * R * G  ) / (4.0f * NdotV * NdotL);@end
+@property( !envprobe_map )	@insertpiece( FresnelType ) Rs = ( fresnel * R * G  ) / (4.0f * NdotV * NdotL);@end
 
 	return max(0.0f, NdotL) * (kS[lightIdx] * lightSpecular[lightIdx] * Rs @insertpiece( MulSpecularMapValue ) +
-							   kD[lightIdx] * lightDiffuse[lightIdx] * @insertpiece( MulDiffuseMapValue ));
+							   kD[lightIdx] * lightDiffuse[lightIdx] @insertpiece( MulDiffuseMapValue ));
 }
 
-@property( hlms_shadow_casting_lights )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], psPosL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
+@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], psPosL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
 
 void main()
 {
@@ -161,10 +186,10 @@ void main()
 	vec3 viewDir	= psPos * (1.0f / fDistance);@end
 	float NdotV		= dot( psNormal, viewDir );
 
-	vec3 finalColour = 0;
+	vec3 finalColour = vec3(0);
 @property( hlms_lights_directional )
 	finalColour += cookTorrance( 0, viewDir, NdotV );
-@property( hlms_shadow_casting_lights )	finalColour *= fShadow;	//1st directional light's shadow@end
+@property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
 @end
 @foreach( hlms_lights_directional, n, 1 )
 	finalColour += cookTorrance( @n, viewDir, NdotV )@insertpiece( DarkenWithShadow );@end
@@ -200,4 +225,7 @@ void main()
 		tmpColour = cookTorrance( @n, viewDir, NdotV )@insertpiece( DarkenWithShadow ) * spotAtten;
 		finalColour += tmpColour * ( 1.0f / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * sqDistance ) );
 	}@end
+
+	outColour.xyz	= finalColour;
+	outColour.w		= 1.0f;
 }

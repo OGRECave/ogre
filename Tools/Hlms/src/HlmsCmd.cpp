@@ -53,7 +53,7 @@ THE SOFTWARE.
 using namespace Ogre;
 using namespace std;
 
-#define _DEBUG
+//#define _DEBUG
 
 int main( int numargs, char** args )
 {
@@ -165,10 +165,15 @@ bool HlmsCmd::configure(void)
 //-------------------------------------------------------------------------------------
 void HlmsCmd::chooseSceneManager(void)
 {
+#ifdef _DEBUG
+    const size_t numThreads = 1;
+    Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+#else
     const size_t numThreads = std::max<int>(1, Ogre::PlatformInformation::getNumLogicalCores());
     Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
     if( numThreads > 1 )
-        Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+        threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
+#endif
     mSceneMgr = Ogre::Root::getSingleton().createSceneManager( Ogre::ST_GENERIC, numThreads,
                                                                threadedCullingMethod);
 }

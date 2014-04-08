@@ -1,3 +1,4 @@
+#version 330
 
 in vec4 vertex;
 
@@ -21,9 +22,8 @@ in vec4 blendWeights;
 uniform mat4x3 worldMat[60];
 @end
 
-@property( hlms_shadowcaster )
-out float psDepth;
-uniform vec4 depthRange;
+@property( hlms_shadowcaster || hlms_pssm_splits )out float psDepth;@end
+@property( hlms_shadowcaster )uniform vec4 depthRange;
 uniform float shadowConstantBias;
 @end
 
@@ -35,11 +35,11 @@ in vec@value( hlms_uv_count@n ) uv@n;@end
 @foreach( hlms_uv_count, n )
 out vec@value( hlms_uv_count@n ) psUv@n;@end
 
-@foreach( hlms_shadow_casting_lights, n )
+@foreach( hlms_num_shadow_maps, n )
 out vec4 psPosL@n;@end
-@property( hlms_shadow_casting_lights )
-uniform mat4 texWorldViewProj[@value(hlms_shadow_casting_lights)];
-uniform vec4 shadowDepthRange[@value(hlms_shadow_casting_lights)];@end
+@property( hlms_num_shadow_maps )
+uniform mat4 texWorldViewProj[@value(hlms_num_shadow_maps)];
+uniform vec4 shadowDepthRange[@value(hlms_num_shadow_maps)];@end
 
 @property( !hlms_skeleton )
 @piece( local_vertex )vertex@end
@@ -55,15 +55,15 @@ uniform vec4 shadowDepthRange[@value(hlms_shadow_casting_lights)];@end
 @property( hlms_skeleton )@piece( SkeletonTransform )
 	int _idx = (int)(blendIndices[0]);
 	vec4 _localPos = (worldMat[_idx] * vertex) * blendWeights[0];
-	@property( hlms_normal )vec4 _localNorm = ((mat3)(worldMat[_idx]) * normal) * blendWeights[0];@end
-	@property( normal_map )vec4 _localTang = ((mat3)(worldMat[_idx]) * tangent) * blendWeights[0];@end
+	@property( hlms_normal )vec4 _localNorm = (mat3(worldMat[_idx]) * normal) * blendWeights[0];@end
+	@property( normal_map )vec4 _localTang = (mat3(worldMat[_idx]) * tangent) * blendWeights[0];@end
 
 	for( int i=0; i<@value( hlms_bones_per_vertex ); ++i )
 	{
 		_idx = (int)(blendIndices[i]);
 		_localPos += (worldMat[_idx] * vertex) * blendWeights[i];
-		@property( hlms_normal )_localNorm += ((mat3)(worldMat[_idx]) * normal) * blendWeights[i];@end
-		@property( normal_map )_localTang += ((mat3)(worldMat[_idx]) * tangent) * blendWeights[i];@end
+		@property( hlms_normal )_localNorm += (mat3(worldMat[_idx]) * normal) * blendWeights[i];@end
+		@property( normal_map )_localTang += (mat3(worldMat[_idx]) * tangent) * blendWeights[i];@end
 	}
 @end@end
 
@@ -72,8 +72,8 @@ uniform vec4 shadowDepthRange[@value(hlms_shadow_casting_lights)];@end
 @piece( VertexTransform )
 	//Lighting is in view space
 	@property( hlms_normal )psPos		= @insertpiece( CalculatePsPos );@end
-	@property( hlms_normal )psNormal	= (mat3)(worldView) * @insertpiece(local_normal);@end
-	@property( normal_map )psTangent	= (mat3)(worldView) * @insertpiece(local_tangent);@end
+	@property( hlms_normal )psNormal	= mat3(worldView) * @insertpiece(local_normal);@end
+	@property( normal_map )psTangent	= mat3(worldView) * @insertpiece(local_tangent);@end
 @property( !hlms_dual_paraboloid_mapping )
 	gl_Position = worldViewProj * @insertpiece(local_vertex);@end
 @property( hlms_dual_paraboloid_mapping )
@@ -87,11 +87,11 @@ uniform vec4 shadowDepthRange[@value(hlms_shadow_casting_lights)];@end
 	gl_Position.z	= (L - NearPlane) / (FarPlane - NearPlane);@end
 @end
 @piece( ShadowReceive )
-@foreach( hlms_shadow_casting_lights, n )
+@foreach( hlms_num_shadow_maps, n )
 	psPosL@n = texWorldViewProj[@n] * @insertpiece(local_vertex);@end
 @end
 
-int main()
+void main()
 {
 	@insertpiece( SkeletonTransform )
 	@insertpiece( VertexTransform )
@@ -99,9 +99,10 @@ int main()
 	psUv@n = uv@n;@end
 
 	@insertpiece( ShadowReceive )
-@foreach( hlms_shadow_casting_lights, n )
+@foreach( hlms_num_shadow_maps, n )
 	psPosL@n.z = (psPosL@n.z - shadowDepthRange[@n].x) - shadowDepthRange[@n].w;@end
 
+@property( hlms_pssm_splits )	psDepth = gl_Position.z;@end
 @property( hlms_shadowcaster )
 	//Linear depth
 	psDepth	= (gl_Position.z - depthRange.x + shadowConstantBias) * depthRange.w;
