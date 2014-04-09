@@ -95,8 +95,8 @@ private:
     bool initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr);
     void destroyRTShaderSystem();
 
-	Ogre::SceneNode*			m_pCubeNode;
-	Ogre::Entity*				m_pCubeEntity;
+	Ogre::SceneNode*			m_pOgreHeadNode;
+	Ogre::Entity*				m_pOgreHeadEntity;
     
 	bool					m_bShutdown;
 #ifdef INCLUDE_RTSHADER_SYSTEM
