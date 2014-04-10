@@ -3584,10 +3584,9 @@ bail:
 					// drop samples
 					--fsaa;
 
-					if (fsaa == 1)
+					if (fsaa == 0)
 					{
 						// ran out of options, no FSAA
-						fsaa = 0;
 						ok = true;
 					}
 				}
