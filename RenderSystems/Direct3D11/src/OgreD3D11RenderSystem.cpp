@@ -3292,21 +3292,21 @@ bail:
             break;
         case GPT_HULL_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveTessellationHullGpuProgramParameters.setNull();
                 mBoundTessellationHullProgram = NULL;
                 mDevice.GetImmediateContext()->HSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_DOMAIN_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveTessellationDomainGpuProgramParameters.setNull();
                 mBoundTessellationDomainProgram = NULL;
                 mDevice.GetImmediateContext()->DSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_COMPUTE_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveComputeGpuProgramParameters.setNull();
                 mBoundComputeProgram = NULL;
                 mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
             }
