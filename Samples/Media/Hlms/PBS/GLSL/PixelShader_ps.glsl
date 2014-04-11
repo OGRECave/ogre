@@ -125,7 +125,7 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 	vec3 halfWay= normalize( lightDir + viewDir );
 	float NdotL = clamp( dot( nNormal, lightDir ), 0.0f, 1.0f );
 	float NdotH = dot( nNormal, halfWay ); //There is no need to saturate
-	float VdotH = dot( viewDir, halfWay ); //No saturation
+	float VdotH = clamp( dot( viewDir, halfWay ), 0.0f, 1.0f );
 
 	float sqR = ROUGHNESS * ROUGHNESS;
 
