@@ -53,8 +53,6 @@ THE SOFTWARE.
 using namespace Ogre;
 using namespace std;
 
-//#define _DEBUG
-
 int main( int numargs, char** args )
 {
     /*if (numargs < 2)
@@ -165,7 +163,7 @@ bool HlmsCmd::configure(void)
 //-------------------------------------------------------------------------------------
 void HlmsCmd::chooseSceneManager(void)
 {
-#ifdef _DEBUG
+#if OGRE_DEBUG_MODE
     const size_t numThreads = 1;
     Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
 #else
@@ -208,7 +206,8 @@ void HlmsCmd::createScene(void)
     mSceneMgr->updateSceneGraph();
 
     CompositorShadowNode *shadowNode = mWorkspace->findShadowNode( "HlmsCmd ShadowNode" );
-    shadowNode->_update( mCamera, mCamera, mSceneMgr );
+    if( shadowNode )
+        shadowNode->_update( mCamera, mCamera, mSceneMgr );
 
     HlmsCache passCache = hlms.preparePassHash( shadowNode, false, false, mSceneMgr );
     const HlmsCache *finalCache = hlms.getMaterial( passCache, entity->getSubEntity(0), entity, false );
@@ -310,7 +309,7 @@ void HlmsCmd::createCompositor(void)
 
     const Ogre::IdString workspaceName = "Scene Workspace";
     compositorManager->createBasicWorkspaceDef( workspaceName, Ogre::ColourValue( 0.7f, 0.3f, 0.1f ),
-                                                "HlmsCmd ShadowNode" );
+                                                "HlmsCmd ShadowNode" /*IdString()*/ );
     mWorkspace = compositorManager->addWorkspace( mSceneMgr, mWindow, mCamera, workspaceName, true );
 }
 //-------------------------------------------------------------------------------------
@@ -368,7 +367,7 @@ void HlmsCmd::loadResources(void)
 //-------------------------------------------------------------------------------------
 void HlmsCmd::go(void)
 {
-#ifdef _DEBUG
+#if OGRE_DEBUG_MODE
     mResourcesCfg = "resources_d.cfg";
     mPluginsCfg = "plugins_d.cfg";
 #else

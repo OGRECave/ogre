@@ -22,9 +22,9 @@ in vec4 psPosL@n;@end
 @property( hlms_lights_spot )uniform vec4 lightPosition[@value(hlms_lights_spot)];
 uniform vec3 lightDiffuse[@value(hlms_lights_spot)];
 uniform vec3 lightSpecular[@value(hlms_lights_spot)];
-uniform vec3 attenuation[@value(hlms_lights_attenuation)];
-uniform vec3 spotDirection[@value(hlms_lights_spotparams)];
-uniform vec3 spotParams[@value(hlms_lights_spotparams)];
+@property(hlms_lights_attenuation)uniform vec3 attenuation[@value(hlms_lights_attenuation)];@end
+@property(hlms_lights_spotparams)uniform vec3 spotDirection[@value(hlms_lights_spotparams)];
+uniform vec3 spotParams[@value(hlms_lights_spotparams)];@end
 @end
 
 @property( hlms_fresnel_scalar )@piece( FresnelType )vec3@end@end
@@ -49,8 +49,14 @@ uniform @insertpiece( FresnelType ) F0;
 @property( hlms_cube_arrays_supported ) uniform samplerCubeArray	texEnvProbeMap;@end
 @property( !hlms_cube_arrays_supported ) uniform sampler2DArray	texEnvProbeMap;@end @end
 
-@property( diffuse_map )@piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
-@property( specular_map )@piece( MulSpecularMapValue )* specularCol.xyz@end@end
+@property( diffuse_map )vec4 diffuseCol;
+@piece( SampleDiffuseMap )	diffuseCol = texture( texDiffuseMap, psUv0 );@end
+@piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
+@property( specular_map )vec4 specularCol;
+float ROUGHNESS;
+@piece( SampleSpecularMap )	specularCol = texture( texSpecularMap, psUv0 );
+	ROUGHNESS = roughness * specularCol.w;@end
+@piece( MulSpecularMapValue )* specularCol.xyz@end@end
 
 @property( hlms_num_shadow_maps )
 @property( hlms_shadow_usues_depth_texture )#define SAMPLER2DSHADOW sampler2DShadow@end
@@ -121,11 +127,6 @@ vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
 	float NdotH = dot( nNormal, halfWay ); //There is no need to saturate
 	float VdotH = dot( viewDir, halfWay ); //No saturation
 
-@property( diffuse_map )	vec4 diffuseCol = texture( texDiffuseMap, psUv0 );@end
-@property( specular_map )
-	vec4 specularCol = texture( texSpecularMap, psUv0 );
-	float ROUGHNESS = roughness * specularCol.w;
-@end
 	float sqR = ROUGHNESS * ROUGHNESS;
 
 	//Roughness term (Beckmann distribution)
@@ -182,8 +183,10 @@ void main()
 		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], psPosL@n, invShadowMapSize[@counter(CurrentShadowMap)] );
 @end
 
+@insertpiece( SampleDiffuseMap )
+@insertpiece( SampleSpecularMap )
+
 	//Everything's in Camera space, we use Cook-Torrance lighting
-@property( !hlms_lights_point && hlms_lights_spot )	vec3 viewDir	= normalize( psPos );@end
 @property( hlms_lights_point || hlms_lights_spot )
 	float fDistance	= length( psPos );
 	float sqDistance= fDistance * fDistance;
@@ -210,7 +213,7 @@ void main()
 	}@end
 
 	//Spot lights
-	//spotParams[@value(spot_params)].x = cos( InnerAngle ) - cos( OuterAngle )
+	//spotParams[@value(spot_params)].x = 1.0f / cos( InnerAngle ) - cos( OuterAngle )
 	//spotParams[@value(spot_params)].y = cos( OuterAngle / 2 )
 	//spotParams[@value(spot_params)].z = falloff
 @foreach( hlms_lights_spot, n, hlms_lights_point )
@@ -223,7 +226,7 @@ void main()
 		float spotAtten = textureLod( texSpotLight, normalize( posInLightSpace ).xy ).x;
 	@end
 	@property( !hlms_lights_spot_textured )
-		float spotAtten = (spotCosAngle - spotParams[@value(spot_params)].y) * spotParams[@value(spot_params)].x;
+		float spotAtten = clamp( (spotCosAngle - spotParams[@value(spot_params)].y) * spotParams[@value(spot_params)].x, 0.0f, 1.0f );
 		spotAtten = pow( spotAtten, spotParams[@counter(spot_params)].z );
 	@end
 		tmpColour = cookTorrance( @n, viewDir, NdotV )@insertpiece( DarkenWithShadow ) * spotAtten;
