@@ -3280,6 +3280,9 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		bool colourMask = !mColourWrite[0] || !mColourWrite[1] 
 		|| !mColourWrite[2] || !mColourWrite[3]; 
 
+        if(mCurrentContext)
+			mCurrentContext->setCurrent();
+
 		GLbitfield flags = 0;
 		if (buffers & FBT_COLOUR)
 		{

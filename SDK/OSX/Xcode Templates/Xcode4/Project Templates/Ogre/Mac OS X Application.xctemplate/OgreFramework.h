@@ -111,14 +111,11 @@ public:
 	Ogre::Viewport*				m_pViewport;
 	Ogre::Log*                  m_pLog;
 	Ogre::Timer*				m_pTimer;
+    Ogre::OverlaySystem*        m_pOverlaySystem;
 	
 	OIS::InputManager*			m_pInputMgr;
 	OIS::Keyboard*				m_pKeyboard;
-#ifdef OGRE_IS_IOS
-	OIS::MultiTouch*			m_pMouse;
-#else
-	OIS::Mouse*					m_pMouse;
-#endif
+	OIS::Mouse*					m_pMouse;    
 
 protected:
    // Added for Mac compatibility

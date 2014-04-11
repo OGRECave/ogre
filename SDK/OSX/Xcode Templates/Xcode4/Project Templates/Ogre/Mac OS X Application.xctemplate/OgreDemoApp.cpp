@@ -1,9 +1,16 @@
+//|||||||||||||||||||||||||||||||||||||||||||||||
+
 #include "OgreDemoApp.h"
+
+#include <OgreLight.h>
+#include <OgreWindowEventUtilities.h>
+
+//|||||||||||||||||||||||||||||||||||||||||||||||
 
 DemoApp::DemoApp()
 {
-	m_pCubeNode		= 0;
-	m_pCubeEntity   = 0;
+	m_pOgreHeadNode			= 0;
+	m_pOgreHeadEntity		= 0;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -153,12 +160,12 @@ void DemoApp::startDemo()
 void DemoApp::setupDemoScene()
 {
 	OgreFramework::getSingletonPtr()->m_pSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
-    
+
 	OgreFramework::getSingletonPtr()->m_pSceneMgr->createLight("Light")->setPosition(75,75,75);
-    
-	m_pCubeEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("Cube", "ogrehead.mesh");
-	m_pCubeNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("CubeNode");
-	m_pCubeNode->attachObject(m_pCubeEntity);
+
+	m_pOgreHeadEntity = OgreFramework::getSingletonPtr()->m_pSceneMgr->createEntity("OgreHeadEntity", "ogrehead.mesh");
+	m_pOgreHeadNode = OgreFramework::getSingletonPtr()->m_pSceneMgr->getRootSceneNode()->createChildSceneNode("OgreHeadNode");
+	m_pOgreHeadNode->attachObject(m_pOgreHeadEntity);
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
