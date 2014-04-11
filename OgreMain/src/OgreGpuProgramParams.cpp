@@ -2878,7 +2878,7 @@ namespace Ogre
                     break;
                 case ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getShadowSceneDepthRange(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getShadowSceneDepthRange(l), i->elementCount);
                     break;
                 case ACT_SHADOW_COLOUR:
                     _writeRawConstant(i->physicalIndex, source->getShadowColour(), i->elementCount);

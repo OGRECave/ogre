@@ -118,10 +118,8 @@ vec3 qmul( vec4 q, vec3 v )
 }
 @end
 
-vec3 cookTorrance( int lightIdx, vec3 viewDir, float NdotV )
+vec3 cookTorrance( int lightIdx, vec3 lightDir, vec3 viewDir, float NdotV )
 {
-	vec3 lightDir = lightPosition[lightIdx].xyz - psPos * lightPosition[lightIdx].w;
-
 	vec3 halfWay= normalize( lightDir + viewDir );
 	float NdotL = clamp( dot( nNormal, lightDir ), 0.0f, 1.0f );
 	float NdotH = dot( nNormal, halfWay ); //There is no need to saturate
@@ -187,29 +185,33 @@ void main()
 @insertpiece( SampleSpecularMap )
 
 	//Everything's in Camera space, we use Cook-Torrance lighting
-@property( hlms_lights_point || hlms_lights_spot )
-	float fDistance	= length( psPos );
-	float sqDistance= fDistance * fDistance;
-	vec3 viewDir	= -psPos * (1.0f / fDistance);@end
-	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0f, 1.0f );
+@property( hlms_lights_spot )
+	vec3 viewDir	= normalize( -psPos );
+	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0f, 1.0f );@end
 
 	vec3 finalColour = vec3(0);
 @property( hlms_lights_directional )
-	finalColour += cookTorrance( 0, viewDir, NdotV );
+	finalColour += cookTorrance( 0, lightPosition[0].xyz, viewDir, NdotV );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
 @end
 @foreach( hlms_lights_directional, n, 1 )
-	finalColour += cookTorrance( @n, viewDir, NdotV )@insertpiece( DarkenWithShadow );@end
+	finalColour += cookTorrance( @n, lightPosition[@n].xyz, viewDir, NdotV )@insertpiece( DarkenWithShadow );@end
 
-@property( hlms_lights_point || hlms_lights_spot )	vec3 tmpColour;@end
-@property( hlms_lights_point || hlms_lights_spot )	float spotCosAngle;@end
+@property( hlms_lights_point || hlms_lights_spot )	vec3 lightDir;
+	float fDistance;
+	vec3 tmpColour;
+	float spotCosAngle;@end
 
 	//Point lights
 @foreach( hlms_lights_point, n, hlms_lights_directional )
+	lightDir = lightPosition[@n].xyz - psPos;
+	fDistance= length( lightDir );
 	if( fDistance <= attenuation[@value(atten)].x )
 	{
-		tmpColour = cookTorrance( @n, viewDir, NdotV )@insertpiece( DarkenWithShadow );
-		finalColour += tmpColour * ( 1.0f / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * sqDistance ) );
+		lightDir *= 1.0f / fDistance;
+		tmpColour = cookTorrance( @n, lightDir, viewDir, NdotV )@insertpiece( DarkenWithShadow );
+		float atten = 1.0f / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
+		finalColour += tmpColour * atten;
 	}@end
 
 	//Spot lights
@@ -217,10 +219,13 @@ void main()
 	//spotParams[@value(spot_params)].y = cos( OuterAngle / 2 )
 	//spotParams[@value(spot_params)].z = falloff
 @foreach( hlms_lights_spot, n, hlms_lights_point )
+	lightDir = lightPosition[@n].xyz - psPos;
+	fDistance= length( lightDir );
 @property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( psPos - lightPosition[@n].xyz ), spotDirection[@value(spot_params)] );@end
 @property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( psPos - lightPosition[@n].xyz ), zAxis( spotQuaternion[@value(spot_params)] ) );@end
 	if( fDistance <= attenuation[@value(atten)].x && spotCosAngle >= spotParams[@value(spot_params)].y )
 	{
+		lightDir *= 1.0f / fDistance;
 	@property( hlms_lights_spot_textured )
 		vec3 posInLightSpace = qmul( spotQuaternion[@value(spot_params)], psPos );
 		float spotAtten = textureLod( texSpotLight, normalize( posInLightSpace ).xy ).x;
@@ -229,8 +234,9 @@ void main()
 		float spotAtten = clamp( (spotCosAngle - spotParams[@value(spot_params)].y) * spotParams[@value(spot_params)].x, 0.0f, 1.0f );
 		spotAtten = pow( spotAtten, spotParams[@counter(spot_params)].z );
 	@end
-		tmpColour = cookTorrance( @n, viewDir, NdotV )@insertpiece( DarkenWithShadow ) * spotAtten;
-		finalColour += tmpColour * ( 1.0f / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * sqDistance ) );
+		tmpColour = cookTorrance( @n, lightDir, viewDir, NdotV )@insertpiece( DarkenWithShadow );
+		float atten = 1.0f / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
+		finalColour += tmpColour * (atten * spotAtten);
 	}@end
 
 	outColour.xyz	= finalColour;

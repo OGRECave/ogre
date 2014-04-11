@@ -100,7 +100,7 @@ void main()
 
 	@insertpiece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-	psPosL@n.z = (psPosL@n.z - shadowDepthRange[@n].x) - shadowDepthRange[@n].w;@end
+	psPosL@n.z = (psPosL@n.z - shadowDepthRange[@n].x) * shadowDepthRange[@n].w;@end
 
 @property( hlms_pssm_splits )	psDepth = gl_Position.z;@end
 @property( hlms_shadowcaster )
