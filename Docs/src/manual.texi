@@ -2331,8 +2331,6 @@ The 'power' scaling for a given light, useful in HDR rendering. This requires an
 As light_diffuse_colour, except the RGB channels of the passed colour have been pre-scaled by the light's power scaling as given by light_power.
 @item light_specular_colour_power_scaled
 As light_specular_colour, except the RGB channels of the passed colour have been pre-scaled by the light's power scaling as given by light_power.
-@item light_number
-When rendering, there is generally a list of lights available for use by all of the passes for a given object, and those lights may or may not be referenced in one or more passes. Sometimes it can be useful to know where in that overall list a given light light (as seen from a pass) is. For example if you use iterate once_per_light, the pass always sees the light as index 0, but in each iteration the actual light referenced is different. This binding lets you pass through the actual index of the light in that overall list. You just need to give it a parameter of the pass-relative light number and it will map it to the overall list index.
 @item light_diffuse_colour_array
 As light_diffuse_colour, except that this populates an array of parameters with a number of lights, and the 'extra_params' field refers to the number of 'nth closest' lights to be processed. This parameter is not compatible with light-based pass_iteration options but can be used for single-pass lighting.
 @item light_specular_colour_array
@@ -2483,6 +2481,10 @@ As spotlight_viewproj_matrix except it also includes the world matrix.
 Provides information about the depth range as viewed from the current camera being used to render. Provided as float4(minDepth, maxDepth, depthRange, 1 / depthRange).
 @item shadow_scene_depth_range
 Provides information about the depth range as viewed from the shadow camera relating to a selected light. Requires a light index parameter. Provided as float4(minDepth, maxDepth, depthRange, 1 / depthRange).
+@item shadow_scene_depth_range_array
+Same as shadow_scene_depth_range, but provides an array. The extra parameter indicates up to the Nth shadow mapping light.
+@item pssm_splits
+The 4 pssm split thresholds to select which cascade to use while shadow mapping. Requires a light index parameter. Provided as float4(f1stCascadeFar, f2ndCascadeFar, f3rdCascadeFar, f4thCascadeFar).
 @item shadow_colour
 The shadow colour (for modulative shadows) as set via SceneManager::setShadowColour.
 @item shadow_extrusion_distance

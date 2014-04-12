@@ -176,18 +176,6 @@ namespace Ogre {
         }
 
     }
-    //---------------------------------------------------------------------
-    float AutoParamDataSource::getLightNumber(size_t index) const
-    {
-        if (mCurrentLightList && index < mCurrentLightList->size())
-        {
-            return static_cast<float>( (*mCurrentLightList)[index].localIndex );
-        }
-        else
-        {
-            return 0.0f;
-        }
-    }
     //-----------------------------------------------------------------------------
     const ColourValue& AutoParamDataSource::getLightDiffuseColour(size_t index) const
     {

@@ -126,11 +126,9 @@ namespace Ogre
         /// One per shadow map (whether texture or atlas)
         ShadowMapCameraVec      mShadowMapCameras;
 
-        typedef FastArray<Light const *> LightArray;
-
         Camera const *          mLastCamera;
         size_t                  mLastFrame;
-        LightArray              mShadowMapCastingLights;
+        LightClosestArray       mShadowMapCastingLights;
 
         /** Cached value. Contains the aabb of all caster-only objects (filtered by
             camera's visibility flags) from the minimum RQ used by our shadow render
@@ -159,8 +157,8 @@ namespace Ogre
 
     public:
         CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
-                                CompositorWorkspace *workspace, RenderSystem *renderSys,
-                                const RenderTarget *finalTarget );
+                              CompositorWorkspace *workspace, RenderSystem *renderSys,
+                              const RenderTarget *finalTarget );
         ~CompositorShadowNode();
 
         /** Renders into the shadow map, executes passes
@@ -173,8 +171,8 @@ namespace Ogre
         virtual void postInitializePassScene( CompositorPassScene *pass );
 
         const LightList* setShadowMapsToPass( Renderable* rend, const Pass* pass,
-                                                AutoParamDataSource *autoParamDataSource,
-                                                size_t startLight );
+                                              AutoParamDataSource *autoParamDataSource,
+                                              size_t startLight );
 
         /// @See mCastersBox
         const AxisAlignedBox& getCastersBox(void) const     { return mCastersBox; }
@@ -196,6 +194,13 @@ namespace Ogre
             Returns null if shadowMapIdx is out of bounds, or is not a PSSM technique.
         */
         const vector<Real>::type* getPssmSplits( size_t shadowMapIdx ) const;
+
+        /** The return value may change in the future, which happens when the number of lights
+            changes to or from a value lower than the supported shadow casting lights by the
+            definition.
+        */
+        size_t getNumShadowCastingLights(void) const                { return mShadowMapCastingLights.size(); }
+        const LightClosestArray& getShadowCastingLights(void) const { return mShadowMapCastingLights; }
 
         /// @copydoc CompositorNode::finalTargetResized
         virtual void finalTargetResized( const RenderTarget *finalTarget );

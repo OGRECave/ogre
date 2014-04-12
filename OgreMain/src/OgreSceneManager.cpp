@@ -2959,8 +2959,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 {
                     if( mCurrentShadowNode )
                     {
-                        mCurrentShadowNode->setShadowMapsToPass( rend, pass, mAutoParamDataSource,
-                                                                 pass->getStartLight() );
+                        pLightListToUse = mCurrentShadowNode->setShadowMapsToPass( rend, pass,
+                                                                                   mAutoParamDataSource,
+                                                                                   pass->getStartLight() );
                     }
 
                     useLightsGpuProgram(pass, pLightListToUse);
@@ -3061,8 +3062,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 {
                     if( mCurrentShadowNode )
                     {
-                        mCurrentShadowNode->setShadowMapsToPass( rend, pass, mAutoParamDataSource,
-                                                                 pass->getStartLight() );
+                        lightList = mCurrentShadowNode->setShadowMapsToPass( rend, pass,
+                                                                             mAutoParamDataSource,
+                                                                             pass->getStartLight() );
                     }
 
                     useLightsGpuProgram( pass, lightList );

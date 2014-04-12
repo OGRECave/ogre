@@ -1126,13 +1126,6 @@ namespace Ogre {
             ACT_DERIVED_LIGHT_DIFFUSE_COLOUR_ARRAY,
             /// Array of derived light specular colours (count set by extra param)
             ACT_DERIVED_LIGHT_SPECULAR_COLOUR_ARRAY,
-            /** The absolute light number of a local light index. Each pass may have
-                a number of lights passed to it, and each of these lights will have
-                an index in the overall light list, which will differ from the local
-                light index due to factors like setStartLight and setIteratePerLight.
-                This binding provides the global light index for a local index.
-            */
-            ACT_LIGHT_NUMBER,
             /// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra param)
             ACT_LIGHT_CASTS_SHADOWS,
             /// Returns (int) 1 if the  given light casts shadows, 0 otherwise (index set in extra param)

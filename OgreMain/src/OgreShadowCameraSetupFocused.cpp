@@ -75,7 +75,7 @@ namespace Ogre
             if (out_proj != NULL)
             {
                 *out_proj = Matrix4::getScale(1, 1, -1);
-                //*out_proj = Matrix4::IDENTITY;
+                // *out_proj = Matrix4::IDENTITY;
             }
 
             // set up camera if requested
@@ -193,7 +193,7 @@ namespace Ogre
             texCam->setProjectionType( PT_ORTHOGRAPHIC );
             //Anything will do, there are no casters
             texCam->setPosition( Vector3::ZERO );
-            texCam->setOrthoWindow( 0, 0 );
+            texCam->setOrthoWindow( 1, 1 );
             texCam->setNearClipDistance( 1.0f );
             texCam->setFarClipDistance( 1.1f );
 

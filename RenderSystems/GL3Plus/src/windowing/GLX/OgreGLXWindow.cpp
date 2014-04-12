@@ -37,8 +37,8 @@
 #include "OgreGLXGLSupport.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreWindowEventUtilities.h"
-#include "OgrePixelBox.h"
 #include "OgreViewport.h"
+#include "OgrePixelBox.h"
 
 #include <iostream>
 #include <algorithm>
