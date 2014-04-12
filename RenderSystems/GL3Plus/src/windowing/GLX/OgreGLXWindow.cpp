@@ -37,6 +37,7 @@
 #include "OgreGLXGLSupport.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgrePixelBox.h"
 #include "OgreViewport.h"
 
 #include <iostream>
@@ -619,7 +620,7 @@ namespace Ogre
                 mHeight = height;
 
                 for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-                    (*it).second->_updateDimensions();
+                    (*it)->_updateDimensions();
             }
         }
     }
@@ -658,7 +659,7 @@ namespace Ogre
         mHeight = windowAttrib.height;
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
-            (*it).second->_updateDimensions();
+            (*it)->_updateDimensions();
     }
 
     //-------------------------------------------------------------------------------------------------//
