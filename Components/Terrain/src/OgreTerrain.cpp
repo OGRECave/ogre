@@ -3266,7 +3266,7 @@ namespace Ogre
             if (mCompositeMapRequired)
             {
                 gmreq.stage = GEN_COMPOSITE_MAP_MATERIAL;
-                gmreq.startTime = currentTime + TERRAIN_GENERATE_MATERIAL_INTERVAL_MS;
+				gmreq.startTime = currentTime + (gmreq.synchronous ? 0 : TERRAIN_GENERATE_MATERIAL_INTERVAL_MS);
                 Root::getSingleton().getWorkQueue()->addRequest(
                     mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
                     Any(gmreq), 0, gmreq.synchronous);
