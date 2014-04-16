@@ -98,7 +98,7 @@ namespace Ogre {
             access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
         // FIXME: Big stall here
-        void* pBuffer;
+        void* pBuffer = 0;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, access));
         //OGRE_CHECK_GL_ERROR(pBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
 
@@ -114,7 +114,6 @@ namespace Ogre {
         retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
         mLockedToScratch = false;
-
 
         mIsLocked = true;
         return retPtr;

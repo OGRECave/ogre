@@ -37,7 +37,7 @@
 
 #ifdef __OBJC__
 
-#define USE_DISPLAYLINK 0
+#define USE_DISPLAYLINK 1
 
 #import "OgreOSXCocoaWindow.h"
 #import <QuartzCore/CVDisplayLink.h>

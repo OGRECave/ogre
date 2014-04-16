@@ -98,7 +98,7 @@ namespace Ogre {
             access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
 
-        void* pBuffer;
+        void* pBuffer = 0;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, offset, length, access));
 
         if(pBuffer == 0)

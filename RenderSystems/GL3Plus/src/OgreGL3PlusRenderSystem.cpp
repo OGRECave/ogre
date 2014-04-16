@@ -159,6 +159,7 @@ namespace Ogre {
         mCurrentComputeShader = 0;
         mPolygonMode = GL_FILL;
         mEnableFixedPipeline = false;
+        mLargestSupportedAnisotropy = 0;
     }
 
     GL3PlusRenderSystem::~GL3PlusRenderSystem()
@@ -344,9 +345,7 @@ namespace Ogre {
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
         // Check for non-power-of-2 texture support
-        if (mGLSupport->checkExtension("GL_ARB_texture_rectangle") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") ||
-            gl3wIsSupported(3, 1))
-            rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
+        rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
         // Check for atomic counter support
         if (mGLSupport->checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
@@ -485,10 +484,7 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
-        {
-            rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
-        }
+        rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
 
         // Check for Float textures
         rsc->setCapability(RSC_TEXTURE_FLOAT);
@@ -900,28 +896,14 @@ namespace Ogre {
 
             if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
             {
-                if (gl3wIsSupported(3, 2))
-                {
-                    OGRE_CHECK_GL_ERROR(glEnable(GL_PROGRAM_POINT_SIZE));
-                }
-                else
-                {
-                    OGRE_CHECK_GL_ERROR(glEnable(GL_VERTEX_PROGRAM_POINT_SIZE));
-                }
+                OGRE_CHECK_GL_ERROR(glEnable(GL_PROGRAM_POINT_SIZE));
             }
         }
         else
         {
             if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
             {
-                if (gl3wIsSupported(3, 2))
-                {
-                    OGRE_CHECK_GL_ERROR(glDisable(GL_PROGRAM_POINT_SIZE));
-                }
-                else
-                {
-                    OGRE_CHECK_GL_ERROR(glDisable(GL_VERTEX_PROGRAM_POINT_SIZE));
-                }
+                OGRE_CHECK_GL_ERROR(glDisable(GL_PROGRAM_POINT_SIZE));
             }
         }
 
@@ -1707,15 +1689,6 @@ namespace Ogre {
         activateGLTextureUnit(0);
     }
 
-    GLfloat GL3PlusRenderSystem::_getCurrentAnisotropy(size_t unit)
-    {
-        GLfloat curAniso = 0;
-        OGRE_CHECK_GL_ERROR(glGetTexParameterfv(mTextureTypes[unit],
-                                                GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso));
-
-        return curAniso ? curAniso : 1;
-    }
-
     void GL3PlusRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
     {
         // TODO: Sampler objects, GL 3.3 or GL_ARB_sampler_objects required. For example:
@@ -1737,14 +1710,11 @@ namespace Ogre {
         if (!activateGLTextureUnit(unit))
             return;
 
-        GLfloat largest_supported_anisotropy = 0;
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy));
+        if (maxAnisotropy > mLargestSupportedAnisotropy)
+            maxAnisotropy = mLargestSupportedAnisotropy ?
+                static_cast<uint>(mLargestSupportedAnisotropy) : 1;
 
-        if (maxAnisotropy > largest_supported_anisotropy)
-            maxAnisotropy = largest_supported_anisotropy ?
-                static_cast<uint>(largest_supported_anisotropy) : 1;
-        if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-            OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
+        OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
 
         activateGLTextureUnit(0);
     }
@@ -1982,25 +1952,11 @@ namespace Ogre {
                 GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
                 if(hasInstanceData)
                 {
-                    if(mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || gl3wIsSupported(3, 2))
-                    {
-                        OGRE_CHECK_GL_ERROR(glDrawElementsInstancedBaseVertex(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances, op.vertexData->vertexStart));
-                    }
-                    else
-                    {
-                        OGRE_CHECK_GL_ERROR(glDrawElementsInstanced(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
-                    }
+                    OGRE_CHECK_GL_ERROR(glDrawElementsInstancedBaseVertex(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances, op.vertexData->vertexStart));
                 }
                 else
                 {
-                    if(mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || gl3wIsSupported(3, 2))
-                    {
-                        OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
-                    }
-                    else
-                    {
-                        OGRE_CHECK_GL_ERROR(glDrawRangeElements(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
-                    }
+                    OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
                 }
             } while (updatePassIterationRenderState());
         }
@@ -2282,21 +2238,20 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Using FSAA.");
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map") || gl3wIsSupported(3, 2))
+        if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-            // Some Apple NVIDIA hardware can't handle seamless cubemaps
-            if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
-#endif
-                // Enable seamless cube maps
-                OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_provoking_vertex") || gl3wIsSupported(3, 2))
-        {
-            // Set provoking vertex convention
-            OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
-        }
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        // Some Apple NVIDIA hardware can't handle seamless cubemaps
+        if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
+#endif
+            // Enable seamless cube maps
+            OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+
+        // Set provoking vertex convention
+        OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
 
         if (mGLSupport->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
         {
@@ -2324,8 +2279,8 @@ namespace Ogre {
         if (gl3wInit())
             LogManager::getSingleton().logMessage("Failed to initialize GL3W", LML_CRITICAL);
 
-        // Make sure that OpenGL 3.0+ is supported in this context
-        if (!gl3wIsSupported(3, 0))
+        // Make sure that OpenGL 3.3+ is supported in this context
+        if (!gl3wIsSupported(3, 3))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 3.0 is not supported",
