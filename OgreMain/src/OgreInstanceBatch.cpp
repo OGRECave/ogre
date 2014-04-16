@@ -294,7 +294,9 @@ namespace Ogre
         {
             //Only triangle list at the moment
             mRenderOperation.operationType  = RenderOperation::OT_TRIANGLE_LIST;
+#if OGRE_DEBUG_MODE
             mRenderOperation.srcRenderable  = this;
+#endif
             mRenderOperation.useIndexes = true;
             setupVertices( baseSubMesh );
             setupIndices( baseSubMesh );

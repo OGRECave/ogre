@@ -1231,7 +1231,9 @@ namespace Ogre {
     {
         op.indexData = mIndexData;
         op.operationType = RenderOperation::OT_TRIANGLE_LIST;
+#if OGRE_DEBUG_MODE
         op.srcRenderable = this;
+#endif
         op.useIndexes = true;
         op.vertexData = mVertexData;
     }
