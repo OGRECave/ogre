@@ -925,7 +925,10 @@ namespace Ogre {
 
         ArrayVector3 corners[(8 + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS];
 
-        OGRE_ALIGNED_DECL( Real, scalarCorners[16 * (8 + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS],
+        //We need 32 scalarCorners (8 vertices x 4 elements per vertex) but starting
+        //ARRAY_PACKED_REALS > 8; we need more to prevent buffer overruns
+        OGRE_ALIGNED_DECL( Real, scalarCorners[8 * 4 * (ARRAY_PACKED_REALS <= 8 ?
+                                               1 : (ARRAY_PACKED_REALS / 8))],
                            OGRE_SIMD_ALIGNMENT );
         memset( scalarCorners, 0, sizeof( scalarCorners ) );
 
