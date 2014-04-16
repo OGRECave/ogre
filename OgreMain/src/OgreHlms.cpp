@@ -1193,12 +1193,12 @@ namespace Ogre
                 uint numLightsPerType[3];
                 memset( numLightsPerType, 0, sizeof( numLightsPerType ) );
                 {
-                    const FastArray<Light const *> &lights = shadowNode->getShadowCastingLights();
-                    FastArray<Light const *>::const_iterator itor = lights.begin();
-                    FastArray<Light const *>::const_iterator end  = lights.end();
+                    const LightClosestArray &lights = shadowNode->getShadowCastingLights();
+                    LightClosestArray::const_iterator itor = lights.begin();
+                    LightClosestArray::const_iterator end  = lights.end();
                     while( itor != end )
                     {
-                        ++numLightsPerType[(*itor)->getType()];
+                        ++numLightsPerType[itor->light->getType()];
                         ++itor;
                     }
                 }

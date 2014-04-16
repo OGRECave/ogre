@@ -201,6 +201,8 @@ void HlmsCmd::createScene(void)
                     "FileSystem", true );
     Hlms hlms( archive );
     HlmsParamVec params;
+    params.insert( /*std::lower_bound( params.begin(), params.end(), )*/params.begin(),
+                   std::pair<IdString, String>( "envprobe_map", "example.dds" ) );
     entity->getSubEntity(0)->setHlms( &hlms, params );
 
     mSceneMgr->updateSceneGraph();
@@ -386,7 +388,7 @@ void HlmsCmd::go(void)
 
     Ogre::WindowEventUtilities::messagePump();
     bContinue = mRoot->renderOneFrame();
-    if( bContinue )
+    if( bContinue && !mRoot->endRenderingQueued() )
     {
         // Create the scene
         createScene();

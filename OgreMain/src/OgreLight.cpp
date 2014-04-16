@@ -139,6 +139,28 @@ namespace Ogre {
             setSpotAabb();
     }
     //-----------------------------------------------------------------------
+    void Light::setAttenuationBasedOnRadius( Real radius, Real lumThreshold )
+    {
+        assert( radius > 0.0f );
+        assert( lumThreshold >= 0.0f && lumThreshold < 1.0f );
+
+        mAttenuationConst   = 1.0f;
+        mAttenuationLinear  = 2.0f / radius;
+        mAttenuationQuad    = 1.0f / (radius * radius);
+
+        /*
+        lumThreshold = 1 / (c + l*r + q*d²)
+        c + l*d + q*d² = 1 / lumThreshold
+
+        if h = c - 1 / lumThreshold then
+            (h + l*d + q*d²) = 0
+            -l +- sqrt( l² - 4qh ) / 2a = d
+        */
+        Real h = mAttenuationConst - 1.0f / lumThreshold;
+        Real rootPart = sqrt( mAttenuationLinear * mAttenuationLinear - 4.0f * mAttenuationQuad * h );
+        mRange = (-mAttenuationLinear + rootPart) / (2.0f * mAttenuationQuad);
+    }
+    //-----------------------------------------------------------------------
     void Light::setAttenuation(Real range, Real constant,
                         Real linear, Real quadratic)
     {
