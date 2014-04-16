@@ -543,12 +543,11 @@ namespace Ogre {
         Light const *light;
         size_t      globalIndex; //Index to SceneManager::mGlobalLightList
         Real        distance;
-        size_t      localIndex; //Index to MovableObject::mLightList
 
-        LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ), localIndex(0) {}
-        LightClosest( Light *_light, size_t _globalIndex, Real _distance, size_t _localIndex ) :
+        LightClosest() : light( 0 ),globalIndex(0),distance( 0.0f ) {}
+        LightClosest( Light *_light, size_t _globalIndex, Real _distance ) :
             light( _light ), globalIndex( _globalIndex ),
-            distance( _distance ), localIndex( _localIndex ) {}
+            distance( _distance ) {}
 
         inline bool operator < ( const LightClosest &right ) const;
     };
@@ -569,6 +568,7 @@ namespace Ogre {
     };
     typedef HashedVector<LightClosest> LightList;
     typedef vector<LightClosest>::type LightClosestVec;
+    typedef FastArray<LightClosest> LightClosestArray;
 
     /// Constant blank string, useful for returning by ref where local does not exist
     const String BLANKSTRING;

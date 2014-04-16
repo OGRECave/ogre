@@ -764,8 +764,7 @@ namespace Ogre {
                     if( IS_BIT_SET( k, r ) )
                     {
                         LightList &lightList = objData.mOwner[k]->mLightList;
-                        lightList.push_back( LightClosest( *lightsIt, j, distance[k],
-                                                            lightList.size() ) );
+                        lightList.push_back( LightClosest( *lightsIt, lightList.size(), distance[k] ) );
                     }
                 }
 

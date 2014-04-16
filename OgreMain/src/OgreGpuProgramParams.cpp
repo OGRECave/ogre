@@ -125,7 +125,6 @@ namespace Ogre
         AutoConstantDefinition(ACT_DERIVED_LIGHT_DIFFUSE_COLOUR_ARRAY,  "derived_light_diffuse_colour_array",   4, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_DERIVED_LIGHT_SPECULAR_COLOUR_ARRAY, "derived_light_specular_colour_array",  4, ET_REAL, ACDT_INT),
 
-        AutoConstantDefinition(ACT_LIGHT_NUMBER,                      "light_number",  1, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_LIGHT_CASTS_SHADOWS,               "light_casts_shadows",  1, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_LIGHT_CASTS_SHADOWS_ARRAY,     "light_casts_shadows_array",  1, ET_REAL, ACDT_INT),
 
@@ -1471,7 +1470,6 @@ namespace Ogre
         case ACT_LIGHT_POWER_SCALE:
         case ACT_LIGHT_DIFFUSE_COLOUR_POWER_SCALED:
         case ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED:
-        case ACT_LIGHT_NUMBER:
         case ACT_LIGHT_CASTS_SHADOWS:
         case ACT_LIGHT_CASTS_SHADOWS_ARRAY:
         case ACT_LIGHT_ATTENUATION:
@@ -2891,9 +2889,6 @@ namespace Ogre
                     break;
                 case ACT_LIGHT_SPECULAR_COLOUR_POWER_SCALED:
                     _writeRawConstant(i->physicalIndex, source->getLightSpecularColourWithPower(i->data), i->elementCount);
-                    break;
-                case ACT_LIGHT_NUMBER:
-                    _writeRawConstant(i->physicalIndex, source->getLightNumber(i->data));
                     break;
                 case ACT_LIGHT_CASTS_SHADOWS:
                     _writeRawConstant(i->physicalIndex, source->getLightCastsShadows(i->data));

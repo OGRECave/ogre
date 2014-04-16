@@ -213,6 +213,79 @@ namespace Ogre
         return newChannel;
     }
     //-----------------------------------------------------------------------------------
+    //An Input Iterator that is the same as doing vector<int> val( N ); and goes in increasing
+    //order (i.e. val[0] = 0; val[1] = 1; val[n-1] = n-1) but doesn't occupy N elements in memory,
+    //just one.
+    struct MemoryLessInputIterator : public std::iterator<std::input_iterator_tag, size_t>
+    {
+        size_t index;
+        MemoryLessInputIterator( size_t startValue ) : index( startValue ) {}
+
+        MemoryLessInputIterator& operator ++() //Prefix increment
+        {
+            ++index;
+            return *this;
+        }
+
+        MemoryLessInputIterator operator ++(int) //Postfix increment
+        {
+            MemoryLessInputIterator copy = *this;
+            ++index;
+            return copy;
+        }
+
+        size_t operator *() const   { return index; }
+
+        bool operator == (const MemoryLessInputIterator &r) const    { return index == r.index; }
+        bool operator != (const MemoryLessInputIterator &r) const    { return index != r.index; }
+    };
+
+    class ShadowMappingLightCmp
+    {
+        LightListInfo const *mLightList;
+        uint32              mCombinedVisibilityFlags;
+        Vector3             mCameraPos;
+
+    public:
+        ShadowMappingLightCmp( LightListInfo const *lightList, uint32 combinedVisibilityFlags,
+                               const Vector3 &cameraPos ) :
+            mLightList( lightList ), mCombinedVisibilityFlags( combinedVisibilityFlags ), mCameraPos( cameraPos )
+        {
+        }
+
+        bool operator()( size_t _l, size_t _r ) const
+        {
+            uint32 visibilityMaskL = mLightList->visibilityMask[_l];
+            uint32 visibilityMaskR = mLightList->visibilityMask[_r];
+
+            if( (visibilityMaskL & mCombinedVisibilityFlags) &&
+                !(visibilityMaskL & mCombinedVisibilityFlags) )
+            {
+                return true;
+            }
+            else if( !(visibilityMaskL & mCombinedVisibilityFlags) &&
+                     (visibilityMaskL & mCombinedVisibilityFlags) )
+            {
+                return false;
+            }
+            else if( (visibilityMaskL & VisibilityFlags::LAYER_SHADOW_CASTER) &&
+                    !(visibilityMaskL & VisibilityFlags::LAYER_SHADOW_CASTER) )
+            {
+                return true;
+            }
+            else if( !(visibilityMaskL & VisibilityFlags::LAYER_SHADOW_CASTER) &&
+                     (visibilityMaskL & VisibilityFlags::LAYER_SHADOW_CASTER) )
+            {
+                return false;
+            }
+
+            Real fDistL = mCameraPos.distance( mLightList->boundingSphere[_l].getCenter() ) -
+                          mLightList->boundingSphere[_l].getRadius();
+            Real fDistR = mCameraPos.distance( mLightList->boundingSphere[_r].getCenter() ) -
+                          mLightList->boundingSphere[_r].getRadius();
+            return fDistL < fDistR;
+        }
+    };
     void CompositorShadowNode::buildClosestLightList( Camera *newCamera, const Camera *lodCamera )
     {
         const size_t currentFrameCount = mWorkspace->getFrameCount();
@@ -245,64 +318,29 @@ namespace Ogre
         int minIdx = -1;
         Real minMaxDistance = -std::numeric_limits<Real>::infinity();
 
-        //O(N*M) Complexity. Not my brightest moment. Feel free to improve this snippet,
-        //but profile it! (M tends to be very small, usually way below 8)
-        for( size_t i=0; i<numLights; ++i )
+        //mShadowMapCastingLights.resize( numLights, 0 );
+        vector<size_t>::type sortedIndexes;
+        sortedIndexes.resize( numLights, ~0 );
+        std::partial_sort_copy( MemoryLessInputIterator( 0 ),
+                            MemoryLessInputIterator( globalLightList.lights.size() ),
+                            sortedIndexes.begin(), sortedIndexes.end(),
+                            ShadowMappingLightCmp( &globalLightList, combinedVisibilityFlags, camPos ) );
+
+        vector<size_t>::type::const_iterator itor = sortedIndexes.begin();
+        vector<size_t>::type::const_iterator end  = sortedIndexes.end();
+
+        while( itor != end )
         {
-            Real minDistance = std::numeric_limits<Real>::max();
-            uint32 const * RESTRICT_ALIAS visibilityMask = globalLightList.visibilityMask;
-            Sphere const * RESTRICT_ALIAS boundingSphere = globalLightList.boundingSphere;
-            for( int j=0; j<static_cast<int>(globalLightList.lights.size()); ++j )
+            uint32 visibilityMask = globalLightList.visibilityMask[*itor];
+            if( !(visibilityMask & combinedVisibilityFlags) ||
+                !(visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) )
             {
-                if( *visibilityMask & combinedVisibilityFlags &&
-                    *visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER )
-                {
-                    const Real fDist = camPos.distance( boundingSphere->getCenter() ) -
-                                        boundingSphere->getRadius();
-                    if( fDist <= minDistance && fDist >= minMaxDistance )
-                    {
-                        bool bNewIdx = true;
-                        if( fDist == -std::numeric_limits<Real>::infinity() || //Direct. lights cause NaN
-                            Math::Abs( fDist - minMaxDistance ) < EPSILON )
-                        {
-                            //Rare case where two or more lights are equally distant
-                            //from the camera. Check whether we've already added it
-                            if( minIdx != j )
-                            {
-                                LightArray::const_iterator it = std::find(
-                                                                    mShadowMapCastingLights.begin(),
-                                                                    mShadowMapCastingLights.end(),
-                                                                    globalLightList.lights[j] );
-                                if( it != mShadowMapCastingLights.end() )
-                                    bNewIdx = false;
-                            }
-                            else
-                            {
-                                //Quick path, we don't need the linear search
-                                bNewIdx = false;
-                            }
-                        }
-
-                        if( bNewIdx )
-                        {
-                            minIdx = j;
-                            minDistance     = fDist;
-                            minMaxDistance  = fDist;
-                        }
-                    }
-                }
-
-                if( minIdx != -1 &&
-                    (mShadowMapCastingLights.empty() ||
-                    globalLightList.lights[minIdx] != mShadowMapCastingLights.back()) )
-                {
-                    mAffectedLights[minIdx] = true;
-                    mShadowMapCastingLights.push_back( globalLightList.lights[minIdx] );
-                }
-
-                ++visibilityMask;
-                ++boundingSphere;
+                break;
             }
+
+            mAffectedLights[*itor] = true;
+            mShadowMapCastingLights.push_back( LightClosest( globalLightList.lights[*itor], *itor, 0 ) );
+            ++itor;
         }
 
         mCastersBox = sceneManager->_calculateCurrentCastersBox( viewport->getVisibilityMask(),
@@ -328,11 +366,11 @@ namespace Ogre
         {
             if( itor->light < mShadowMapCastingLights.size() )
             {
-                Light const *light = mShadowMapCastingLights[itor->light];
+                Light const *light = mShadowMapCastingLights[itor->light].light;
 
                 Camera *texCamera = itShadowCamera->camera;
 
-                //Use the material scheme of the main viewport 
+                //Use the material scheme of the main viewport
                 //This is required to pick up the correct shadow_caster_material and similar properties.
                 texCamera->getLastViewport()->setMaterialScheme( viewport->getMaterialScheme() );
 
@@ -341,9 +379,14 @@ namespace Ogre
 
                 // set base
                 if( light->getType() != Light::LT_POINT )
-                    texCamera->setDirection( light->getDerivedDirection() );
+                {
+                    texCamera->setOrientation( light->getParentNode()->_getDerivedOrientation() *
+                                               Quaternion( Radian(Math::PI), Vector3::UNIT_Y ) );
+                }
                 if( light->getType() != Light::LT_DIRECTIONAL )
+                {
                     texCamera->setPosition( light->getParentNode()->_getDerivedPosition() );
+                }
 
                 if( itor->shadowMapTechnique == SHADOWMAP_PSSM )
                 {
@@ -412,11 +455,11 @@ namespace Ogre
             renderableLights contains 7 lights
             We rendered 3 shadow maps
             The material supports 4 lights per pass (because the user defined it so)
-        
+
         We have to look among the first 4 lights for those that are casting shadows
         and were actually rendered as a shadow map. We need to put those lights first
         in the list so their texture unit binding matches the light idx in the shader.
-        
+
         Being 'L' lights (regardles of what getCastShadows() says) and 'S' lights we
         rendered into the shadow maps, consider the following arrangement in
         renderableLights:
@@ -428,7 +471,7 @@ namespace Ogre
         The shader material may have support for up to 3 shadow maps, but the truth is the
         3rd shadow casting light was close to the camera, but too far from the object. It's
         more reasonable to pass as 3rd & 4th light those that were actually closer.
-        
+
         This approach diverges from Ogre 1.x, which would always pass all rendered shadow
         casting lights first, even if they were extremely far from the object.
 
@@ -440,38 +483,55 @@ namespace Ogre
             SSSLLLL
         */
 
-        size_t endLight = std::min( lightsPerPass, renderableLights.size() );
+        size_t shadowMapStart = std::min( startLight, mShadowMapCastingLights.size() );
+        size_t shadowMapEnd   = std::min( startLight + lightsPerPass, mShadowMapCastingLights.size() );
 
-        //Push all shadow casting lights first that are between range
-        //[startLight; startLight + lightsPerPass)
-        LightList::const_iterator itor = renderableLights.begin() + startLight;
-        LightList::const_iterator end  = renderableLights.begin() + endLight;
-        while( itor != end )
+        //Push **all** shadow casting lights first.
         {
-            if( mAffectedLights[itor->globalIndex] )
+            LightClosestArray::const_iterator itor = mShadowMapCastingLights.begin() + shadowMapStart;
+            LightClosestArray::const_iterator end  = mShadowMapCastingLights.begin() + shadowMapEnd;
+            while( itor != end )
+            {
                 mCurrentLightList.push_back( *itor );
-            ++itor;
+                ++itor;
+            }
         }
 
-        //Now again, but push non-shadow casting lights
-        itor = renderableLights.begin() + startLight;
-        end  = renderableLights.begin() + endLight;
-        while( itor != end )
+        //Now again, but push non-shadow casting lights (if there's room left)
         {
-            if( !mAffectedLights[itor->globalIndex] )
-                mCurrentLightList.push_back( *itor );
-            ++itor;
+            size_t slotsToSkip  = std::max<ssize_t>( startLight - mCurrentLightList.size(), 0 );
+            size_t slotsLeft    = std::max<ssize_t>( lightsPerPass - (shadowMapEnd - shadowMapStart), 0 );
+            LightList::const_iterator itor = renderableLights.begin();
+            LightList::const_iterator end  = renderableLights.end();
+            while( itor != end && slotsLeft > 0 )
+            {
+                if( !mAffectedLights[itor->globalIndex] )
+                {
+                    if( slotsToSkip > 0 )
+                    {
+                        --slotsToSkip;
+                    }
+                    else
+                    {
+                        mCurrentLightList.push_back( *itor );
+                        --slotsLeft;
+                    }
+                }
+                ++itor;
+            }
         }
 
         //Set the shadow map texture units
         {
             CompositorManager2 *compoMgr = mWorkspace->getCompositorManager();
 
+            assert( shadowMapStart < mDefinition->mShadowMapTexDefinitions.size() );
+
             size_t shadowIdx=0;
             CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator shadowTexItor =
-                                                        mDefinition->mShadowMapTexDefinitions.begin();
+                                        mDefinition->mShadowMapTexDefinitions.begin() + shadowMapStart;
             CompositorShadowNodeDef::ShadowMapTexDefVec::const_iterator shadowTexItorEnd  =
-                                                        mDefinition->mShadowMapTexDefinitions.end();
+                                        mDefinition->mShadowMapTexDefinitions.end();
             while( shadowTexItor != shadowTexItorEnd && shadowIdx < pass->getNumShadowContentTextures() )
             {
                 size_t texUnitIdx = pass->_getTextureUnitWithContentTypeIndex(
@@ -485,20 +545,11 @@ namespace Ogre
                 autoParamDataSource->setTextureProjector( mShadowMapCameras[shadowIdx].camera,
                                                             shadowIdx );
 
-                if( shadowTexItor->light < mCurrentLightList.size() &&
-                    mAffectedLights[mCurrentLightList[shadowTexItor->light].globalIndex] )
-                {
-                    //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
-                    //changes need to be done so that UV calculations land on the right place
-                    const TexturePtr& shadowTex = mLocalTextures[shadowIdx].textures[0];
-                    texUnit->_setTexturePtr( shadowTex );
-                }
-                else
-                {
-                    //Use blank texture
-                    texUnit->_setTexturePtr( compoMgr->getNullShadowTexture( shadowTexItor->formatList[0] ) );
-                    
-                }
+                //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
+                //changes need to be done so that UV calculations land on the right place
+                const TexturePtr& shadowTex = mLocalTextures[shadowIdx].textures[0];
+                texUnit->_setTexturePtr( shadowTex );
+
                 ++shadowIdx;
                 ++shadowTexItor;
             }
