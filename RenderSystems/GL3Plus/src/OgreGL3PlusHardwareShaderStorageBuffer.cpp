@@ -103,7 +103,7 @@ namespace Ogre {
         //FIXME Is this correct usage for shader storage buffers?
         access |= GL_MAP_UNSYNCHRONIZED_BIT;
 
-        void* pBuffer;
+        void* pBuffer = 0;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, offset, length, access));
 
         if(pBuffer == 0)

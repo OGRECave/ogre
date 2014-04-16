@@ -106,7 +106,7 @@ namespace Ogre {
 
         access |= GL_MAP_UNSYNCHRONIZED_BIT;
 
-        void* pBuffer;
+        void* pBuffer = 0;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, offset, length, access));
 
         if(pBuffer == 0)
