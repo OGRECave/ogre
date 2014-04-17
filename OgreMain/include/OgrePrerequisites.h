@@ -69,7 +69,7 @@ namespace Ogre {
         @note Not valid as a pointer to GPU buffers / parameters
         */
         typedef float Real;
-        typedef typedef uint32 RealAsUint;
+        typedef uint32 RealAsUint;
     #endif
 
     #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
@@ -201,6 +201,8 @@ namespace Ogre {
     class HighLevelGpuProgram;
     class HighLevelGpuProgramManager;
     class HighLevelGpuProgramFactory;
+    class HlmsDatablock;
+    class HlmsManager;
     class IndexData;
     class InstanceBatch;
     class InstanceBatchHW;

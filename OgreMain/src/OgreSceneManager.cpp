@@ -1343,15 +1343,14 @@ void SceneManager::setWorldGeometry(DataStreamPtr& stream,
         "SceneManager::setWorldGeometry");
 }
 //-----------------------------------------------------------------------
-void SceneManager::_setSkyPlane(
-                               bool enable,
+void SceneManager::_setSkyPlane(bool enable,
                                const Plane& plane,
                                const String& materialName,
+                               uint8 renderQueue,
                                Real gscale,
                                Real tiling,
-                               uint8 renderQueue,
-                               Real bow, 
-                               int xsegments, int ysegments, 
+                               Real bow,
+                               int xsegments, int ysegments,
                                const String& groupName)
 {
     if (enable)
@@ -1461,11 +1460,10 @@ void SceneManager::setSkyPlane(
         bow, xsegments, ysegments, groupName);
 }
 //-----------------------------------------------------------------------
-void SceneManager::_setSkyBox(
-                             bool enable,
+void SceneManager::_setSkyBox(bool enable,
                              const String& materialName,
-                             Real distance,
                              uint8 renderQueue,
+                             Real distance,
                              const Quaternion& orientation,
                              const String& groupName)
 {
@@ -1685,13 +1683,12 @@ void SceneManager::setSkyBox(
         orientation, groupName);
 }
 //-----------------------------------------------------------------------
-void SceneManager::_setSkyDome(
-                              bool enable,
+void SceneManager::_setSkyDome(bool enable,
                               const String& materialName,
+                              uint8 renderQueue,
                               Real curvature,
                               Real tiling,
                               Real distance,
-                              uint8 renderQueue,
                               const Quaternion& orientation,
                               int xsegments, int ysegments, int ySegmentsToKeep,
                               const String& groupName)

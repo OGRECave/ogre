@@ -148,6 +148,13 @@ namespace Ogre
         const HlmsCache* createShaderCacheEntry( uint32 renderableHash, const HlmsCache &passCache,
                                                  uint32 finalHash );
 
+        /// @See calculateHashFor
+        virtual uint32 calculateRenderableHash(void) const;
+
+    public:
+        Hlms( Archive *dataFolder );
+        virtual ~Hlms();
+
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
             the value to 'inOut', otherwise leaves 'inOut' as is.
         @return
@@ -156,13 +163,6 @@ namespace Ogre
             Assumes paramVec is sorted by key.
         */
         static bool findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut );
-
-        /// @See calculateHashFor
-        virtual uint32 calculateRenderableHash(void) const;
-
-    public:
-        Hlms( Archive *dataFolder );
-        virtual ~Hlms();
 
         /** Called by the renderable when either it changes the material,
             or its properties change (e.g. the mesh' uvs are stripped)

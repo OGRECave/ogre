@@ -1892,9 +1892,8 @@ namespace Ogre {
         */        
         virtual void _setSkyPlane(
             bool enable,
-            const Plane& plane, const String& materialName, Real scale = 1000,
-            Real tiling = 10, uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, Real bow = 0, 
-            int xsegments = 1, int ysegments = 1, 
+            const Plane& plane, const String& materialName, uint8 renderQueue, Real scale = 1000,
+            Real tiling = 10, Real bow = 0, int xsegments = 1, int ysegments = 1,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky plane' */
@@ -1988,8 +1987,8 @@ namespace Ogre {
                 The name of the resource group to which to assign the plane mesh.
         */
         virtual void _setSkyBox(
-            bool enable, const String& materialName, Real distance = 5000,
-            uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, const Quaternion& orientation = Quaternion::IDENTITY,
+            bool enable, const String& materialName, uint8 renderQueue, Real distance = 5000,
+            const Quaternion& orientation = Quaternion::IDENTITY,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
         /** Enables / disables a 'sky box' */
@@ -2113,8 +2112,8 @@ namespace Ogre {
                 The name of the resource group to which to assign the plane mesh.
                 */        
         virtual void _setSkyDome(
-            bool enable, const String& materialName, Real curvature = 10,
-            Real tiling = 8, Real distance = 4000, uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY,
+            bool enable, const String& materialName, uint8 renderQueue,
+            Real curvature = 10, Real tiling = 8, Real distance = 4000,
             const Quaternion& orientation = Quaternion::IDENTITY,
             int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);

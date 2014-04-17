@@ -138,9 +138,11 @@ namespace Ogre {
             boundaries. This can be handy for overlays where no matter what you want the overlay to 
             be rendered last.
         */
-        void addRenderable( Renderable* pRend, uint8 rqId, uint8 subId, RealAsUint depth );
+        void addRenderable( Renderable* pRend, uint8 rqId, uint8 subId, RealAsUint depth,
+                            bool casterPass );
 
         void render( uint8 firstRq, uint8 lastRq );
+        void renderES2( uint8 firstRq, uint8 lastRq );
     };
 
     /** @} */

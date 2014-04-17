@@ -412,6 +412,7 @@ namespace Ogre {
 
         uint32 getHlmsHash(void) const          { return mHlmsHash; }
         uint32 getHlmsCasterHash(void) const    { return mHlmsCasterHash; }
+        const HlmsDatablock* getDatablock(void) const   { return mHlmsDatablock; }
 
         void setHlms( Hlms *hlms, const HlmsParamVec &params )
         {
@@ -421,8 +422,9 @@ namespace Ogre {
     protected:
         typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
-        uint32 mHlmsHash;
-        uint32 mHlmsCasterHash;
+        uint32              mHlmsHash;
+        uint32              mHlmsCasterHash;
+        HlmsDatablock const *mHlmsDatablock;
         bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;
         bool mUseIdentityView;

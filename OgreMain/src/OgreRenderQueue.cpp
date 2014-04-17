@@ -37,27 +37,34 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreSceneManagerEnumerator.h"
 #include "OgreTechnique.h"
+#include "OgreHlmsDatablock.h"
 
 
 namespace Ogre
 {
-    const int SubRqIdBits           = 6;
+    const int SubRqIdBits           = 4;
     const int TransparencyBits      = 1;
-    const int MaterialBits          = 30;
-    const int MeshBits              = 10;
-    const int DepthBits             = 17;
+    const int MacroblockBits        = 10;
+    const int ShaderBits            = 9;    //The higher 3 bits contain HlmsTypes
+    const int MeshBits              = 14;
+    const int TextureBits           = 11;
+    const int DepthBits             = 15;
 
     #define OGRE_MAKE_MASK( x ) ( (1 << x) - 1 )
 
-    const int SubRqIdShift          = 64                - SubRqIdBits;      //58
-    const int TransparencyShift     = SubRqIdShift      - TransparencyBits; //57
-    const int MaterialShift         = TransparencyShift - MaterialBits;     //27
-    const int MeshShift             = MaterialShift     - MeshBits;         //17
-    const int DepthShift            = MeshShift         - DepthBits;        //0
+    const int SubRqIdShift          = 64                - SubRqIdBits;      //60
+    const int TransparencyShift     = SubRqIdShift      - TransparencyBits; //59
+    const int MacroblockShift       = TransparencyShift - MacroblockBits;   //49
+    const int ShaderShift           = MacroblockShift   - ShaderBits;       //40
+    const int MeshShift             = ShaderShift       - MeshBits;         //26
+    const int TextureShift          = MeshShift         - TextureBits;      //15
+    const int DepthShift            = TextureShift      - DepthBits;        //0
 
-    const int DepthShiftTransp      = TransparencyShift - DepthBits;        //40
-    const int MaterialShiftTransp   = DepthShiftTransp  - MaterialBits;     //10
-    const int MeshShiftTransp       = MaterialShiftTransp- MeshBits;         //0
+    const int DepthShiftTransp      = TransparencyShift - DepthBits;        //44
+    const int MacroblockShiftTransp = DepthShiftTransp  - MacroblockBits;   //34
+    const int ShaderShiftTransp     = MacroblockShiftTransp - ShaderBits;   //25
+    const int MeshShiftTransp       = ShaderShiftTransp - MeshBits;         //11
+    const int TextureShiftTransp    = MeshShiftTransp   - TextureBits;      //0
     //---------------------------------------------------------------------
     RenderQueue::RenderQueue()
     {
@@ -70,8 +77,8 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RenderQueue::clear(void)
     {
-        RenderQueueIdVec::iterator itor = mRenderQueues.begin();
-        RenderQueueIdVec::iterator end  = mRenderQueues.end();
+        RenderQueueGroupVec::iterator itor = mRenderQueues.begin();
+        RenderQueueGroupVec::iterator end  = mRenderQueues.end();
 
         while( itor != end )
         {
@@ -82,22 +89,23 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::addRenderable(Renderable* pRend, uint8 rqId, uint8 subId, RealAsUint depth )
+    void RenderQueue::addRenderable( Renderable* pRend, uint8 rqId, uint8 subId, RealAsUint depth,
+                                     bool casterPass )
     {
         assert( !mRenderQueues[rqId].mSorted &&
                 "Called addRenderable after render and before clear" );
         assert( subId < OGRE_MAKE_MASK( SubRqIdBits ) );
 
-        const MaterialPtr& material = pRend->getMaterial();
+        uint32 hlmsHash = casterPass ? pRend->getHlmsCasterHash() : pRend->getHlmsHash();
+        const HlmsDatablock *datablock = pRend->getDatablock();
 
-        Technique *technique = material->getBestTechnique( 0, pRend );
-        uint32 techniqueHash; //TODO
+        bool opaque = datablock->mIsOpaque;
 
-        Pass *pass = technique->getPass( 0 );
-        bool opaque = !pass->isTransparent();
+        uint16 macroblock = datablock->mMacroblockHash;
+        uint16 texturehash= datablock->mTextureHash;
 
         //Flip the float to deal with negative & positive numbers
-#if OGRE_DOUBLE_PRECISION == 1
+#if OGRE_DOUBLE_PRECISION == 0
         RealAsUint mask = -int(depth >> 31) | 0x80000000;
         depth = (depth ^ mask);
 #else
@@ -108,37 +116,102 @@ namespace Ogre
 
         RenderOperation op;
         pRend->getRenderOperation( op ); //TODO
-        //op.vertexData->
-        uint32 meshHash; //TODO
+        uint32 meshHash = op.vertexData->getId();
         //TODO: Account for skeletal animation in any of the hashes (preferently on the material side)
+        //TODO: Account for auto instancing animation in any of the hashes
 
         uint64 hash;
         if( opaque )
         {
             //Opaque objects are first sorted by material, then by mesh, then by depth front to back.
             hash =
-                ( (subId            & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
-                ( (opaque           & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
-                ( (techniqueHash    & OGRE_MAKE_MASK( MaterialBits ))       << MaterialShift )      |
-                ( (meshHash         & OGRE_MAKE_MASK( MeshBits ))           << MeshShift )          |
-                ( (quantizedDepth   & OGRE_MAKE_MASK( DepthBits ))          << DepthShift );
+                ( uint64(subId          & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
+                ( uint64(opaque         & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
+                ( uint64(macroblock     & OGRE_MAKE_MASK( MacroblockBits ))     << MacroblockShift )    |
+                ( uint64(hlmsHash       & OGRE_MAKE_MASK( ShaderBits ))         << ShaderShift )        |
+                ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShift )          |
+                ( uint64(texturehash    & OGRE_MAKE_MASK( TextureBits ))        << TextureShift )       |
+                ( uint64(quantizedDepth & OGRE_MAKE_MASK( DepthBits ))          << DepthShift );
         }
         else
         {
             //Transparent objects are sorted by depth back to front, then by material, then by mesh.
             quantizedDepth = quantizedDepth ^ 0xffffffff;
             hash =
-                ( (subId            & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
-                ( (transparent      & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
-                ( (quantizedDepth   & OGRE_MAKE_MASK( DepthBits ))          << DepthShiftTransp )   |
-                ( (techniqueHash    & OGRE_MAKE_MASK( MaterialBits ))       << MaterialShiftTransp )|
-                ( (meshHash         & OGRE_MAKE_MASK( MeshBits ))           << MeshShiftTransp );
+                ( uint64(subId          & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
+                ( uint64(opaque         & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
+                ( uint64(quantizedDepth & OGRE_MAKE_MASK( DepthBits ))          << DepthShiftTransp )   |
+                ( uint64(macroblock     & OGRE_MAKE_MASK( MacroblockBits ))    << MacroblockShiftTransp)|
+                ( uint64(hlmsHash       & OGRE_MAKE_MASK( ShaderBits ))         << ShaderShiftTransp )  |
+                ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShiftTransp );
         }
 
-        mRenderQueues[rqId].push_back( QueuedRenderable( hash, pRend ) );
+        mRenderQueues[rqId].mQueuedRenderables.push_back( QueuedRenderable( hash, pRend ) );
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::render( uint8 firstRq, uint8 lastRq )
+    /*void RenderQueue::render( uint8 firstRq, uint8 lastRq )
+    {
+        //mBatchesToRender.push_back( 0 ); TODO First batch is always dummy
+        float *texBufferPtr; //TODO
+
+        for( size_t i=firstRq; i<lastRq; ++i )
+        {
+            QueuedRenderableArray &queuedRenderables = mRenderQueues[i].mQueuedRenderables;
+
+            if( !mRenderQueues[i].mSorted )
+            {
+                std::sort( queuedRenderables.begin(), queuedRenderables.end() );
+                mRenderQueues[i].mSorted = true;
+            }
+
+            QueuedRenderableArray::const_iterator itor = queuedRenderables.begin();
+            QueuedRenderableArray::const_iterator end  = queuedRenderables.end();
+
+            while( itor != end )
+            {
+                const QueuedRenderable &queuedRenderable = *itor;
+                RenderOperation op;
+                queuedRenderable.renderable->getRenderOperation( op );
+
+                //TODO
+                uint32 renderOpHash;
+                size_t elementsPerInstance;
+
+                //const Hlms *hlms = queuedRenderable.renderable->getHlms();
+                //size_t hlmsElements = hlms->getNumElements( queuedRenderable.renderable );
+                //size_t elementsPerInstance = numWorldTransforms + hlmsElements;
+
+                Batch *batch = &mBatchesToRender.back();
+                if( batch->renderOpHash != renderOpHash ||
+                    batch->start + elementsPerInstance < batch->bufferBucket->numElements )
+                {
+                    mBatchesToRender.push_back( Batch() ); //TODO
+                    batch = &mBatchesToRender.back();
+                }
+
+                unsigned short numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
+                if( numWorldTransforms <= 1 )
+                {
+                    queuedRenderable.renderable->writeSingleTransform3x4( texBufferPtr );
+                    texBufferPtr += 12;
+                }
+                else
+                {
+                    queuedRenderable.renderable->writeAnimatedTransform3x4( texBufferPtr );
+                    texBufferPtr += 12 * numWorldTransforms;
+                }
+
+                hlms->writeElements( queuedRenderable.renderable, texBufferPtr );
+                texBufferPtr += hlmsElements;
+
+                ++batch->count;
+
+                //itor->
+                ++itor;
+            }
+        }
+    }*/
+    void RenderQueue::renderES2( uint8 firstRq, uint8 lastRq )
     {
         //mBatchesToRender.push_back( 0 ); TODO First batch is always dummy
         float *texBufferPtr; //TODO
