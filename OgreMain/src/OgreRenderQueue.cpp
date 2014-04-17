@@ -39,186 +39,165 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 
 
-namespace Ogre {
+namespace Ogre
+{
+    const int SubRqIdBits           = 6;
+    const int TransparencyBits      = 1;
+    const int MaterialBits          = 30;
+    const int MeshBits              = 10;
+    const int DepthBits             = 17;
 
+    #define OGRE_MAKE_MASK( x ) ( (1 << x) - 1 )
+
+    const int SubRqIdShift          = 64                - SubRqIdBits;      //58
+    const int TransparencyShift     = SubRqIdShift      - TransparencyBits; //57
+    const int MaterialShift         = TransparencyShift - MaterialBits;     //27
+    const int MeshShift             = MaterialShift     - MeshBits;         //17
+    const int DepthShift            = MeshShift         - DepthBits;        //0
+
+    const int DepthShiftTransp      = TransparencyShift - DepthBits;        //40
+    const int MaterialShiftTransp   = DepthShiftTransp  - MaterialBits;     //10
+    const int MeshShiftTransp       = MaterialShiftTransp- MeshBits;         //0
     //---------------------------------------------------------------------
     RenderQueue::RenderQueue()
-        : mRenderableListener(0)
     {
-        // Create the 'main' queue up-front since we'll always need that
-        mGroups.insert(
-            RenderQueueGroupMap::value_type(
-                RENDER_QUEUE_MAIN, 
-                OGRE_NEW RenderQueueGroup(this) )
-            );
-
-        // set default queue
-        mDefaultQueueGroup = RENDER_QUEUE_MAIN;
-        mDefaultRenderablePriority = OGRE_RENDERABLE_DEFAULT_PRIORITY;
-
+        mRenderQueues.resize( 255 );
     }
     //---------------------------------------------------------------------
     RenderQueue::~RenderQueue()
     {
-        
-        // trigger the pending pass updates, otherwise we could leak
-        Pass::processPendingPassUpdates();
-        
-        // Destroy the queues for good
-        RenderQueueGroupMap::iterator i, iend;
-        i = mGroups.begin();
-        iend = mGroups.end();
-        for (; i != iend; ++i)
-        {
-            OGRE_DELETE i->second;
-        }
-        mGroups.clear();
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::addRenderable(Renderable* pRend, uint8 groupID, ushort priority)
+    void RenderQueue::clear(void)
     {
-        // Find group
-        RenderQueueGroup* pGroup = getQueueGroup(groupID);
+        RenderQueueIdVec::iterator itor = mRenderQueues.begin();
+        RenderQueueIdVec::iterator end  = mRenderQueues.end();
 
-        Technique* pTech;
-
-        // tell material it's been used
-        if (!pRend->getMaterial().isNull())
-            pRend->getMaterial()->touch();
-
-        // Check material & technique supplied (the former since the default implementation
-        // of getTechnique is based on it for backwards compatibility
-        if(pRend->getMaterial().isNull() || !pRend->getTechnique())
+        while( itor != end )
         {
-            // Use default base white
-            MaterialPtr baseWhite = MaterialManager::getSingleton().getByName("BaseWhite");
-            pTech = baseWhite->getTechnique(0);
+            itor->mQueuedRenderables.clear();
+            itor->mSorted = false;
+            ++itor;
+        }
+
+    }
+    //-----------------------------------------------------------------------
+    void RenderQueue::addRenderable(Renderable* pRend, uint8 rqId, uint8 subId, RealAsUint depth )
+    {
+        assert( !mRenderQueues[rqId].mSorted &&
+                "Called addRenderable after render and before clear" );
+        assert( subId < OGRE_MAKE_MASK( SubRqIdBits ) );
+
+        const MaterialPtr& material = pRend->getMaterial();
+
+        Technique *technique = material->getBestTechnique( 0, pRend );
+        uint32 techniqueHash; //TODO
+
+        Pass *pass = technique->getPass( 0 );
+        bool opaque = !pass->isTransparent();
+
+        //Flip the float to deal with negative & positive numbers
+#if OGRE_DOUBLE_PRECISION == 1
+        RealAsUint mask = -int(depth >> 31) | 0x80000000;
+        depth = (depth ^ mask);
+#else
+        RealAsUint mask = -int64(depth >> 63) | 0x8000000000000000;
+        depth = (depth ^ mask) >> 32;
+#endif
+        uint32 quantizedDepth = static_cast<uint32>( depth );
+
+        RenderOperation op;
+        pRend->getRenderOperation( op ); //TODO
+        //op.vertexData->
+        uint32 meshHash; //TODO
+        //TODO: Account for skeletal animation in any of the hashes (preferently on the material side)
+
+        uint64 hash;
+        if( opaque )
+        {
+            //Opaque objects are first sorted by material, then by mesh, then by depth front to back.
+            hash =
+                ( (subId            & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
+                ( (opaque           & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
+                ( (techniqueHash    & OGRE_MAKE_MASK( MaterialBits ))       << MaterialShift )      |
+                ( (meshHash         & OGRE_MAKE_MASK( MeshBits ))           << MeshShift )          |
+                ( (quantizedDepth   & OGRE_MAKE_MASK( DepthBits ))          << DepthShift );
         }
         else
-            pTech = pRend->getTechnique();
-
-        if (mRenderableListener)
         {
-            // Allow listener to override technique and to abort
-            if (!mRenderableListener->renderableQueued(pRend, groupID, priority, 
-                &pTech, this))
-                return; // rejected
-
-            // tell material it's been used (incase changed)
-            pTech->getParent()->touch();
+            //Transparent objects are sorted by depth back to front, then by material, then by mesh.
+            quantizedDepth = quantizedDepth ^ 0xffffffff;
+            hash =
+                ( (subId            & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
+                ( (transparent      & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
+                ( (quantizedDepth   & OGRE_MAKE_MASK( DepthBits ))          << DepthShiftTransp )   |
+                ( (techniqueHash    & OGRE_MAKE_MASK( MaterialBits ))       << MaterialShiftTransp )|
+                ( (meshHash         & OGRE_MAKE_MASK( MeshBits ))           << MeshShiftTransp );
         }
-        
-        pGroup->addRenderable(pRend, pTech, priority);
 
+        mRenderQueues[rqId].push_back( QueuedRenderable( hash, pRend ) );
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::clear(bool destroyPassMaps)
+    void RenderQueue::render( uint8 firstRq, uint8 lastRq )
     {
-        // Clear the queues
-        SceneManagerEnumerator::SceneManagerIterator scnIt =
-            SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
+        //mBatchesToRender.push_back( 0 ); TODO First batch is always dummy
+        float *texBufferPtr; //TODO
 
-        // Note: We clear dirty passes from all RenderQueues in all 
-        // SceneManagers, because the following recalculation of pass hashes
-        // also considers all RenderQueues and could become inconsistent, otherwise.
-        while (scnIt.hasMoreElements())
+        for( size_t i=firstRq; i<lastRq; ++i )
         {
-            SceneManager* sceneMgr = scnIt.getNext();
-            RenderQueue* queue = sceneMgr->getRenderQueue();
+            QueuedRenderableArray &queuedRenderables = mRenderQueues[i].mQueuedRenderables;
 
-            RenderQueueGroupMap::iterator i, iend;
-            i = queue->mGroups.begin();
-            iend = queue->mGroups.end();
-            for (; i != iend; ++i)
+            if( !mRenderQueues[i].mSorted )
             {
-                i->second->clear(destroyPassMaps);
+                std::sort( queuedRenderables.begin(), queuedRenderables.end() );
+                mRenderQueues[i].mSorted = true;
             }
-        }
 
-        // Now trigger the pending pass updates
-        Pass::processPendingPassUpdates();
+            QueuedRenderableArray::const_iterator itor = queuedRenderables.begin();
+            QueuedRenderableArray::const_iterator end  = queuedRenderables.end();
 
-        // NB this leaves the items present (but empty)
-        // We're assuming that frame-by-frame, the same groups are likely to 
-        //  be used, so no point destroying the vectors and incurring the overhead
-        //  that would cause, let them be destroyed in the destructor.
-    }
-    //-----------------------------------------------------------------------
-    RenderQueue::QueueGroupIterator RenderQueue::_getQueueGroupIterator(void)
-    {
-        return QueueGroupIterator(mGroups.begin(), mGroups.end());
-    }
-    //-----------------------------------------------------------------------
-    RenderQueue::ConstQueueGroupIterator RenderQueue::_getQueueGroupIterator(void) const
-    {
-        return ConstQueueGroupIterator(mGroups.begin(), mGroups.end());
-    }
-    //-----------------------------------------------------------------------
-    void RenderQueue::addRenderable(Renderable* pRend, uint8 groupID)
-    {
-        addRenderable(pRend, groupID, mDefaultRenderablePriority);
-    }
-    //-----------------------------------------------------------------------
-    void RenderQueue::addRenderable(Renderable* pRend)
-    {
-        addRenderable(pRend, mDefaultQueueGroup, mDefaultRenderablePriority);
-    }
-    //-----------------------------------------------------------------------
-    uint8 RenderQueue::getDefaultQueueGroup(void) const
-    {
-        return mDefaultQueueGroup;
-    }
-    //-----------------------------------------------------------------------
-    void RenderQueue::setDefaultQueueGroup(uint8 grp)
-    {
-        mDefaultQueueGroup = grp;
-    }
-    //-----------------------------------------------------------------------
-    ushort RenderQueue::getDefaultRenderablePriority(void) const
-    {
-        return mDefaultRenderablePriority;
-    }
-    //-----------------------------------------------------------------------
-    void RenderQueue::setDefaultRenderablePriority(ushort priority)
-    {
-        mDefaultRenderablePriority = priority;
-    }
-    
-    
-    //-----------------------------------------------------------------------
-    RenderQueueGroup* RenderQueue::getQueueGroup(uint8 groupID)
-    {
-        // Find group
-        RenderQueueGroupMap::iterator groupIt;
-        RenderQueueGroup* pGroup;
+            while( itor != end )
+            {
+                const QueuedRenderable &queuedRenderable = *itor;
+                RenderOperation op;
+                queuedRenderable.renderable->getRenderOperation( op );
 
-        groupIt = mGroups.find(groupID);
-        if (groupIt == mGroups.end())
-        {
-            // Insert new
-            pGroup = OGRE_NEW RenderQueueGroup(this);
-            mGroups.insert(RenderQueueGroupMap::value_type(groupID, pGroup));
-        }
-        else
-        {
-            pGroup = groupIt->second;
-        }
+                //TODO
+                uint32 renderOpHash;
+                size_t elementsPerInstance;
 
-        return pGroup;
+                //const Hlms *hlms = queuedRenderable.renderable->getHlms();
+                //size_t hlmsElements = hlms->getNumElements( queuedRenderable.renderable );
+                //size_t elementsPerInstance = numWorldTransforms + hlmsElements;
 
-    }
-    //-----------------------------------------------------------------------
-    void RenderQueue::merge( const RenderQueue* rhs )
-    {
-        ConstQueueGroupIterator it = rhs->_getQueueGroupIterator( );
+                Batch *batch = &mBatchesToRender.back();
+                if( batch->renderOpHash != renderOpHash ||
+                    batch->start + elementsPerInstance < batch->bufferBucket->numElements )
+                {
+                    mBatchesToRender.push_back( Batch() ); //TODO
+                    batch = &mBatchesToRender.back();
+                }
 
-        while( it.hasMoreElements() )
-        {
-            uint8 groupID = it.peekNextKey();
-            RenderQueueGroup* pSrcGroup = it.getNext();
-            RenderQueueGroup* pDstGroup = getQueueGroup( groupID );
+                unsigned short numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
+                if( numWorldTransforms <= 1 )
+                {
+                    queuedRenderable.renderable->writeSingleTransform3x4( texBufferPtr );
+                    texBufferPtr += 12;
+                }
+                else
+                {
+                    queuedRenderable.renderable->writeAnimatedTransform3x4( texBufferPtr );
+                    texBufferPtr += 12 * numWorldTransforms;
+                }
 
-            pDstGroup->merge( pSrcGroup );
+                hlms->writeElements( queuedRenderable.renderable, texBufferPtr );
+                texBufferPtr += hlmsElements;
+
+                ++batch->count;
+
+                //itor->
+                ++itor;
+            }
         }
     }
 }
