@@ -130,49 +130,22 @@ namespace Ogre
         return _left.first < _right.second;
     }
 
-    struct HlmsParam
+    /** Up to 8 different HLMS generator types are allowed. The maximum values must be in sync
+        with ShaderBits in RenderQueue.cpp (the higher 3 bits)
+    */
+    enum HlmsTypes
     {
-        virtual ~HlmsParam() {}
+        HLMS_PBS,       /// Physically Based Shader Generator
+        HLMS_TOON,      /// Toon shading / Cel shading
+        HLMS_UI,        /// Made specifically for GUIs and overlays
 
-        CullingMode     cullMode;
-        PolygonMode     polygonMode;
-        bool            alphaToCoverageEnabled;
-        bool            colourWrite;
-        bool            depthCheck;
-        bool            depthWrite;
-        CompareFunction depthFunc;
-        float           depthBiasSlopeScale;
+        HLMS_USER0,
+        HLMS_USER1,
+        HLMS_USER2,
+        HLMS_USER3,
+        HLMS_USER4,
 
-        // Blending factors
-        SceneBlendFactor sourceBlendFactor;
-        SceneBlendFactor destBlendFactor;
-        SceneBlendFactor sourceBlendFactorAlpha;
-        SceneBlendFactor destBlendFactorAlpha;
-
-        // Used to determine if separate alpha blending should be used for color and alpha channels
-        bool            separateBlend;
-
-        //-------------------------------------------------------------------------
-        // Blending operations
-        SceneBlendOperation blendOperation;
-        SceneBlendOperation alphaBlendOperation;
-
-        /// Determines if we should use separate blending operations for color and alpha channels
-        bool                separateBlendOperation;
-    };
-
-    struct HlmsParamPbs : HlmsParam
-    {
-        ColourValue diffuseColour;  //kD
-        Vector3 specularColour;     //kS
-        Vector3 fresnel;            //F0
-
-        //TODO: Most likely these strings should be replaced by an index to the texture arrays.
-        uint16 diffuseMap;
-        uint16 normalMap;
-        uint16 specularMap;
-        uint16 detailMask;
-        uint16 detailMap[4];
+        HLMS_MAX = 8
     };
 
     struct HlmsCache
@@ -185,34 +158,6 @@ namespace Ogre
         GpuProgramPtr   tesselationHullShader;
         GpuProgramPtr   tesselationDomainShader;
         GpuProgramPtr   pixelShader;
-
-        /* This is state, independent of the shader being used
-        CullingMode     cullMode;
-        PolygonMode     polygonMode;
-        bool            alphaToCoverageEnabled;
-        bool            colourWrite;
-        bool            depthCheck;
-        bool            depthWrite;
-        CompareFunction depthFunc;
-        float           depthBiasSlopeScale;
-
-        // Blending factors
-        SceneBlendFactor sourceBlendFactor;
-        SceneBlendFactor destBlendFactor;
-        SceneBlendFactor sourceBlendFactorAlpha;
-        SceneBlendFactor destBlendFactorAlpha;
-
-        // Used to determine if separate alpha blending should be used for color and alpha channels
-        bool            separateBlend;
-
-        //-------------------------------------------------------------------------
-        // Blending operations
-        SceneBlendOperation blendOperation;
-        SceneBlendOperation alphaBlendOperation;
-
-        /// Determines if we should use separate blending operations for color and alpha channels
-        bool                separateBlendOperation;
-*/
 
         HlmsCache( uint32 _hash ) : hash( _hash ) {}
     };

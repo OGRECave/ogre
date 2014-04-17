@@ -28,53 +28,16 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-//#include "OgreHlmsManager.h"
+#include "OgreHlmsManager.h"
 
 namespace Ogre
 {
-/*    HlmsManager::HlmsManager()
+    HlmsManager::HlmsManager()
     {
+        memset( mRegisteredHlms, 0, sizeof( mRegisteredHlms ) );
     }
     //-----------------------------------------------------------------------------------
     HlmsManager::~HlmsManager()
     {
     }
-    //-----------------------------------------------------------------------------------
-    void HlmsManager::addRenderableCache(uint32 hash, const HlmsPropertyVec &renderableSetProperties )
-    {
-        HlmsCache cache( hash );
-        HlmsCacheVec::iterator it = std::lower_bound( mRenderableCache.begin(), mRenderableCache.end(),
-                                                      cache, OrderCacheByHash );
-
-        if( it == mRenderableCache.end() || it->hash != hash )
-        {
-            cache.setProperties = renderableSetProperties;
-            mRenderableCache.insert( it, cache );
-        }
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsManager::addShaderCache( uint32 hash, GpuProgramPtr &gpuProgram )
-    {
-        HlmsCache cache( hash );
-        HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
-                                                      cache, OrderCacheByHash );
-
-        assert( it == mRenderableCache.end() || it->hash != hash &&
-                "Can't add the same shader to the cache twice! (or a hash collision happened)" );
-
-        cache.gpuProgram = gpuProgram;
-        mRenderableCache.insert( it, cache );
-    }
-    //-----------------------------------------------------------------------------------
-    GpuProgramPtr HlmsManager::getShaderCache( uint32 hash ) const
-    {
-        HlmsCache cache( hash );
-        HlmsCacheVec::const_iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
-                                                            cache, OrderCacheByHash );
-
-        if( it != mShaderCache.end() && it->hash == hash )
-            return cache.gpuProgram;
-
-        return GpuProgramPtr();
-    }*/
 }

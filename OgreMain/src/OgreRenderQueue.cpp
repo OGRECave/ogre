@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreSceneManagerEnumerator.h"
 #include "OgreTechnique.h"
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsManager.h"
 
 
 namespace Ogre
@@ -66,7 +67,7 @@ namespace Ogre
     const int MeshShiftTransp       = ShaderShiftTransp - MeshBits;         //11
     const int TextureShiftTransp    = MeshShiftTransp   - TextureBits;      //0
     //---------------------------------------------------------------------
-    RenderQueue::RenderQueue()
+    RenderQueue::RenderQueue() : mHlmsManager( 0 )
     {
         mRenderQueues.resize( 255 );
     }
@@ -89,7 +90,8 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::addRenderable( Renderable* pRend, uint8 rqId, uint8 subId, RealAsUint depth,
+    void RenderQueue::addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
+                                     uint8 rqId, uint8 subId, RealAsUint depth,
                                      bool casterPass )
     {
         assert( !mRenderQueues[rqId].mSorted &&
@@ -116,7 +118,7 @@ namespace Ogre
 
         RenderOperation op;
         pRend->getRenderOperation( op ); //TODO
-        uint32 meshHash = op.vertexData->getId();
+        uint32 meshHash; //TODO
         //TODO: Account for skeletal animation in any of the hashes (preferently on the material side)
         //TODO: Account for auto instancing animation in any of the hashes
 
@@ -146,7 +148,8 @@ namespace Ogre
                 ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShiftTransp );
         }
 
-        mRenderQueues[rqId].mQueuedRenderables.push_back( QueuedRenderable( hash, pRend ) );
+        mRenderQueues[rqId].mQueuedRenderables.push_back( QueuedRenderable( hash, pRend,
+                                                                            pMovableObject ) );
     }
     //-----------------------------------------------------------------------
     /*void RenderQueue::render( uint8 firstRq, uint8 lastRq )
@@ -211,10 +214,11 @@ namespace Ogre
             }
         }
     }*/
-    void RenderQueue::renderES2( uint8 firstRq, uint8 lastRq )
+    void RenderQueue::renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq, bool casterPass )
     {
         //mBatchesToRender.push_back( 0 ); TODO First batch is always dummy
         float *texBufferPtr; //TODO
+        HlmsCache *passCache; //TODO
 
         for( size_t i=firstRq; i<lastRq; ++i )
         {
@@ -229,46 +233,50 @@ namespace Ogre
             QueuedRenderableArray::const_iterator itor = queuedRenderables.begin();
             QueuedRenderableArray::const_iterator end  = queuedRenderables.end();
 
+            HlmsMacroblock const *lastMacroblock = 0;
+            HlmsBlendblock const *lastBlendblock = 0;
+            VertexData const *lastVertexData = 0;
+            IndexData const *lastIndexData = 0;
+            //uint32 lastVertexDataId = ~0;
+
             while( itor != end )
             {
                 const QueuedRenderable &queuedRenderable = *itor;
                 RenderOperation op;
                 queuedRenderable.renderable->getRenderOperation( op );
+                uint32 hlmsHash = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
+                                               queuedRenderable.renderable->getHlmsHash();
+                const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
 
-                //TODO
-                uint32 renderOpHash;
-                size_t elementsPerInstance;
-
-                //const Hlms *hlms = queuedRenderable.renderable->getHlms();
-                //size_t hlmsElements = hlms->getNumElements( queuedRenderable.renderable );
-                //size_t elementsPerInstance = numWorldTransforms + hlmsElements;
-
-                Batch *batch = &mBatchesToRender.back();
-                if( batch->renderOpHash != renderOpHash ||
-                    batch->start + elementsPerInstance < batch->bufferBucket->numElements )
+                if( lastMacroblock != datablock->mMacroblock )
                 {
-                    mBatchesToRender.push_back( Batch() ); //TODO
-                    batch = &mBatchesToRender.back();
+                    /*mDestRenderSystem->_setMacroblock( datablock->mMacroblock );
+                     mDestRenderSystem->_setCullingMode( datablock->mMacroblock->mCullMode );
+                    mDestRenderSystem->_setPolygonMode( datablock->mMacroblock->mPolygonMode );*/
+                    lastMacroblock = datablock->mMacroblock;
                 }
 
-                unsigned short numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
-                if( numWorldTransforms <= 1 )
+                if( lastBlendblock != datablock->mBlendblock )
                 {
-                    queuedRenderable.renderable->writeSingleTransform3x4( texBufferPtr );
-                    texBufferPtr += 12;
-                }
-                else
-                {
-                    queuedRenderable.renderable->writeAnimatedTransform3x4( texBufferPtr );
-                    texBufferPtr += 12 * numWorldTransforms;
+                    //mDestRenderSystem->_setBlendblock( datablock->mBlendblock );
+                    lastBlendblock = datablock->mBlendblock;
                 }
 
-                hlms->writeElements( queuedRenderable.renderable, texBufferPtr );
-                texBufferPtr += hlmsElements;
+                if( lastVertexData != op.vertexData )
+                {
+                    lastVertexData = op.vertexData;
+                }
+                if( lastIndexData != op.indexData )
+                {
+                    lastIndexData = op.indexData;
+                }
 
-                ++batch->count;
+                Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
 
-                //itor->
+                const HlmsCache *hlmsCache = hlms->getMaterial( *passCache, queuedRenderable.renderable,
+                                                                queuedRenderable.movableObject,
+                                                                casterPass );
+
                 ++itor;
             }
         }

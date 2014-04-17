@@ -206,8 +206,8 @@ namespace Ogre
         @return
             Structure containing all necessary shaders
         */
-        const HlmsCache* getMaterial( const HlmsCache &passCache, Renderable *renderable,
-                                      MovableObject *movableObject, bool casterPass );
+        const HlmsCache* getMaterial( const HlmsCache &passCache, const Renderable *renderable,
+                                      const MovableObject *movableObject, bool casterPass );
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }

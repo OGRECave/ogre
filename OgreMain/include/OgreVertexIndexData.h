@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
-#include "OgreId.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -47,7 +46,7 @@ namespace Ogre {
 
 
     /** Summary class collecting together vertex source information. */
-    class _OgreExport VertexData : public VertexDataAlloc, public IdObject
+    class _OgreExport VertexData : public VertexDataAlloc
     {
     private:
         /// Protected copy constructor, to prevent misuse

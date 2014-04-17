@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlms.h"
-//#include "OgreHlmsManager.h"
 
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
@@ -1281,8 +1280,8 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    const HlmsCache* Hlms::getMaterial( const HlmsCache &passCache, Renderable *renderable,
-                                        MovableObject *movableObject, bool casterPass )
+    const HlmsCache* Hlms::getMaterial( const HlmsCache &passCache, const Renderable *renderable,
+                                        const MovableObject *movableObject, bool casterPass )
     {
         uint32 finalHash;
         uint32 hash[2];

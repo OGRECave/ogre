@@ -65,11 +65,19 @@ namespace Ogre {
     {
         struct QueuedRenderable
         {
-            uint64      hash;
-            Renderable  *renderable;
+            uint64              hash;
+            Renderable          *renderable;
+            MovableObject const *movableObject;
 
-            QueuedRenderable( uint64 _hash, Renderable *_renderable ) :
-                hash( _hash ), renderable( _renderable ) {}
+            QueuedRenderable() : hash( 0 ), renderable( 0 ), movableObject( 0 ) {}
+            QueuedRenderable( uint64 _hash, Renderable *_renderable,
+                              const MovableObject *_movableObject ) :
+                hash( _hash ), renderable( _renderable ), movableObject( _movableObject ) {}
+
+            bool operator < ( const QueuedRenderable &_r ) const
+            {
+                return this->hash < _r.hash;
+            }
         };
 
         typedef FastArray<QueuedRenderable> QueuedRenderableArray;
@@ -111,6 +119,7 @@ namespace Ogre {
         RenderQueueGroupVec mRenderQueues;
 
         BatchArray mBatchesToRender;
+        HlmsManager *mHlmsManager;
 
     public:
         RenderQueue();
@@ -138,11 +147,11 @@ namespace Ogre {
             boundaries. This can be handy for overlays where no matter what you want the overlay to 
             be rendered last.
         */
-        void addRenderable( Renderable* pRend, uint8 rqId, uint8 subId, RealAsUint depth,
-                            bool casterPass );
+        void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
+                            uint8 rqId, uint8 subId, RealAsUint depth, bool casterPass );
 
         void render( uint8 firstRq, uint8 lastRq );
-        void renderES2( uint8 firstRq, uint8 lastRq );
+        void renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq, bool casterPass );
     };
 
     /** @} */

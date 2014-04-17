@@ -43,16 +43,13 @@ namespace Ogre
     /** HLMS stands for "High Level Material System". */
     class _OgreExport HlmsManager : public PassAlloc
     {
-        HlmsCacheVec    mRenderableCache;
-        HlmsCacheVec    mShaderCache;
-
+        Hlms* mRegisteredHlms[HLMS_MAX];
     public:
         HlmsManager();
         virtual ~HlmsManager();
 
-        void addRenderableCache( uint32 hash, const HlmsPropertyVec &renderableSetProperties );
-        void addShaderCache( uint32 hash, GpuProgramPtr &gpuProgram );
-        GpuProgramPtr getShaderCache( uint32 hash ) const;
+        /// Returns a registered HLMS based on type
+        Hlms* getHlms( HlmsTypes type )                 { return mRegisteredHlms[type]; }
     };
     /** @} */
     /** @} */

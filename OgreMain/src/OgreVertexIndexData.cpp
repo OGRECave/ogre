@@ -36,8 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    VertexData::VertexData(HardwareBufferManagerBase* mgr) :
-        IdObject( Id::generateNewId<VertexData>() )
+    VertexData::VertexData(HardwareBufferManagerBase* mgr)
     {
         mMgr = mgr ? mgr : HardwareBufferManager::getSingletonPtr();
         vertexBufferBinding = mMgr->createVertexBufferBinding();
@@ -49,8 +48,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    VertexData::VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind) :
-        IdObject( Id::generateNewId<VertexData>() )
+    VertexData::VertexData(VertexDeclaration* dcl, VertexBufferBinding* bind)
     {
         // this is a fallback rather than actively used
         mMgr = HardwareBufferManager::getSingletonPtr();

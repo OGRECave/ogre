@@ -201,6 +201,7 @@ namespace Ogre {
     class HighLevelGpuProgram;
     class HighLevelGpuProgramManager;
     class HighLevelGpuProgramFactory;
+    class Hlms;
     class HlmsDatablock;
     class HlmsManager;
     class IndexData;

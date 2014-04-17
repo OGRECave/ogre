@@ -86,24 +86,6 @@ namespace Ogre
         bool                mSeparateBlendOperation;
     };
 
-    /** Up to 8 different HLMS generator types are allowed. The maximum values must be in sync
-        with ShaderBits in RenderQueue.cpp (the higher 3 bits)
-    */
-    enum HlmsTypes
-    {
-        HLMS_PBS,       /// Physically Based Shader Generator
-        HLMS_TOON,      /// Toon shading / Cel shading
-        HLMS_UI,        /// Made specifically for GUIs and overlays
-
-        HLMS_USER0,
-        HLMS_USER1,
-        HLMS_USER2,
-        HLMS_USER3,
-        HLMS_USER4,
-
-        HLMS_MAX = 8
-    };
-
     /** An hlms datablock contains individual information about a specific material. It consists of:
             * A const pointer to an @HlmsMacroblock we do not own and may be shared by other datablocks.
             * A const pointer to an @HlmsBlendblock we do not own and may be shared by other datablocks.
@@ -116,7 +98,7 @@ namespace Ogre
     {
     public:
         uint16  mMacroblockHash;        //Not all bits are used
-        uint16  mTextureHash;           //Not all bits are used
+        uint16  mTextureHash;
         uint8   mType;      /// @See HlmsTypes
         bool    mIsOpaque;  /// Cached based on mBlendblock data
         HlmsMacroblock const *mMacroblock;
@@ -137,14 +119,16 @@ namespace Ogre
     {
     public:
         float   mRoughness;
-        float   mkDr, mkDg, mkDb;
-        float   mkSr, mkSg, mkSb;
-        float   mFresnelR, mFresnelG, mFresnelB;
+        float   mkDr, mkDg, mkDb;                   //kD
+        float   mkSr, mkSg, mkSb;                   //kS
+        float   mFresnelR, mFresnelG, mFresnelB;    //F0
 
         TexturePtr  mDiffuseTex;
         TexturePtr  mNormalmapTex;
         TexturePtr  mSpecularTex;
         TexturePtr  mReflectionTex;
+        /*TexturePtr  mDetailMask;
+        TexturePtr  mDetailMap[4];*/
 
         HlmsPbsEs2Datablock( const HlmsMacroblock *macroblock, uint8 macroblockId,
                              const HlmsBlendblock *blendblock, uint8 blendblockId,

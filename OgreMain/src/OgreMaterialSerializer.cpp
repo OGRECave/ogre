@@ -381,6 +381,7 @@ namespace Ogre
         return false;
     }
     //-----------------------------------------------------------------------
+    extern CompareFunction convertCompareFunction(const String& param);
     CompareFunction convertCompareFunction(const String& param)
     {
         if (param == "always_fail")
