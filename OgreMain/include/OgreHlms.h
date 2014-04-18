@@ -35,6 +35,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     class CompositorShadowNode;
+    struct QueuedRenderable;
 
     /** \addtogroup Core
     *  @{
@@ -55,9 +56,11 @@ namespace Ogre
             NumShaderTypes
         };
 
+        typedef vector<HlmsPropertyVec>::type HlmsPropertyVecVec;
+
     protected:
-        HlmsCacheVec    mRenderableCache;
-        HlmsCacheVec    mShaderCache;
+        HlmsPropertyVecVec  mRenderableCache;
+        HlmsCacheVec        mShaderCache;
 
         typedef std::map<IdString, String> PiecesMap;
         HlmsPropertyVec mSetProperties;
@@ -66,6 +69,8 @@ namespace Ogre
         Archive         *mDataFolder;
         StringVector     mPieceFiles[5];
         //HlmsManager     *mHlmsManager;
+
+        HlmsTypes       mType;
 
         /** Inserts common properties about the current Renderable,
             such as hlms_skeleton hlms_uv_count, etc
@@ -137,8 +142,8 @@ namespace Ogre
         static size_t calculateLineCount(const String &buffer, size_t idx );
         static size_t calculateLineCount( const SubStringRef &subString );
 
-        void addRenderableCache( uint32 hash, const HlmsPropertyVec &renderableSetProperties );
-        const HlmsCache* getRenderableCache( uint32 hash ) const;
+        size_t addRenderableCache( const HlmsPropertyVec &renderableSetProperties );
+        const HlmsPropertyVec& getRenderableCache( uint32 hash ) const;
         const HlmsCache* addShaderCache( uint32 hash, GpuProgramPtr &vertexShader,
                                          GpuProgramPtr &geometryShader,
                                          GpuProgramPtr &tesselationHullShader,
@@ -148,11 +153,8 @@ namespace Ogre
         const HlmsCache* createShaderCacheEntry( uint32 renderableHash, const HlmsCache &passCache,
                                                  uint32 finalHash );
 
-        /// @See calculateHashFor
-        virtual uint32 calculateRenderableHash(void) const;
-
     public:
-        Hlms( Archive *dataFolder );
+        Hlms( HlmsTypes type, Archive *dataFolder );
         virtual ~Hlms();
 
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
@@ -206,8 +208,11 @@ namespace Ogre
         @return
             Structure containing all necessary shaders
         */
-        const HlmsCache* getMaterial( const HlmsCache &passCache, const Renderable *renderable,
-                                      const MovableObject *movableObject, bool casterPass );
+        const HlmsCache* getMaterial( HlmsCache const *lastReturnedValue, const HlmsCache &passCache,
+                                      const QueuedRenderable &queuedRenderable, bool casterPass );
+
+        virtual void fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                     bool casterPass ) = 0;
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }

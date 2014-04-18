@@ -1284,30 +1284,39 @@ namespace Ogre {
         mCurrentFragmentShader  = static_cast<GLSLShader*>( hlmsCache->pixelShader );
 
         mActiveVertexGpuProgramParameters.setNull();
+        mActiveGeometryGpuProgramParameters.setNull();
+        mActiveTessellationHullGpuProgramParameters.setNull();
+        mActiveTessellationDomainGpuProgramParameters.setNull();
+        mActiveFragmentGpuProgramParameters.setNull();
 
         if( mCurrentVertexShader )
         {
             mCurrentVertexShader->bind();
+            mActiveVertexGpuProgramParameters = mCurrentVertexShader->getDefaultParameters();
             mVertexProgramBound = true;
         }
         if( mCurrentGeometryShader )
         {
             mCurrentGeometryShader->bind();
+            mActiveGeometryGpuProgramParameters = mCurrentGeometryShader->getDefaultParameters();
             mGeometryProgramBound = true;
         }
         if( mCurrentHullShader )
         {
             mCurrentHullShader->bind();
+            mActiveTessellationHullGpuProgramParameters = mCurrentHullShader->getDefaultParameters();
             mTessellationHullProgramBound = true;
         }
         if( mCurrentDomainShader )
         {
             mCurrentDomainShader->bind();
+            mActiveTessellationDomainGpuProgramParameters = mCurrentDomainShader->getDefaultParameters();
             mTessellationDomainProgramBound = true;
         }
         if( mCurrentFragmentShader )
         {
             mCurrentFragmentSader->bind();
+            mActiveFragmentGpuProgramParameters = mCurrentFragmentSader->getDefaultParameters();
             mFragmentProgramBound = true;
         }
     }

@@ -12,6 +12,10 @@
 # Use same build type for components as main build
 set(OGRE_COMP_LIB_TYPE ${OGRE_LIB_TYPE})
 
+if (OGRE_BUILD_COMPONENT_HLMS_PBSES2)
+	add_subdirectory(Hlms/PbsEs2)
+endif ()
+
 if (OGRE_BUILD_COMPONENT_PAGING)
   add_subdirectory(Paging)
 endif ()

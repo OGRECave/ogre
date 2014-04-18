@@ -113,6 +113,11 @@ namespace Ogre
 
         HlmsProperty( IdString _keyName, int32 _value ) :
             keyName( _keyName ), value( _value ) {}
+
+        bool operator == ( const HlmsProperty &_r) const
+        {
+            return this->keyName == _r.keyName && this->value == _r.value;
+        }
     };
 
     typedef vector<HlmsProperty>::type HlmsPropertyVec;

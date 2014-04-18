@@ -373,6 +373,7 @@ cmake_dependent_option(OGRE_BUILD_PLATFORM_WINRT "Build Ogre for Metro style app
 cmake_dependent_option(OGRE_BUILD_PLATFORM_WINDOWS_PHONE "Build Ogre for Windows Phone" FALSE "WIN32" FALSE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)
 
+cmake_dependent_option(OGRE_BUILD_COMPONENT_HLMS_PBSES2 "Build HLMS Physically Based Shading for GL ES 2.0 component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PAGING "Build Paging component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_MESHLODGENERATOR "Build MeshLodGenerator component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TRUE "" FALSE)

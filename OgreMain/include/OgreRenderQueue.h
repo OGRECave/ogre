@@ -43,6 +43,24 @@ namespace Ogre {
     /** \addtogroup RenderSystem
     *  @{
     */
+
+    struct QueuedRenderable
+    {
+        uint64              hash;
+        Renderable          *renderable;
+        MovableObject const *movableObject;
+
+        QueuedRenderable() : hash( 0 ), renderable( 0 ), movableObject( 0 ) {}
+        QueuedRenderable( uint64 _hash, Renderable *_renderable,
+                          const MovableObject *_movableObject ) :
+            hash( _hash ), renderable( _renderable ), movableObject( _movableObject ) {}
+
+        bool operator < ( const QueuedRenderable &_r ) const
+        {
+            return this->hash < _r.hash;
+        }
+    };
+
     /** Enumeration of queue groups, by which the application may group queued renderables
         so that they are rendered together with events in between
     @remarks
@@ -63,23 +81,6 @@ namespace Ogre {
     */
     class _OgreExport RenderQueue : public RenderQueueAlloc
     {
-        struct QueuedRenderable
-        {
-            uint64              hash;
-            Renderable          *renderable;
-            MovableObject const *movableObject;
-
-            QueuedRenderable() : hash( 0 ), renderable( 0 ), movableObject( 0 ) {}
-            QueuedRenderable( uint64 _hash, Renderable *_renderable,
-                              const MovableObject *_movableObject ) :
-                hash( _hash ), renderable( _renderable ), movableObject( _movableObject ) {}
-
-            bool operator < ( const QueuedRenderable &_r ) const
-            {
-                return this->hash < _r.hash;
-            }
-        };
-
         typedef FastArray<QueuedRenderable> QueuedRenderableArray;
 
         struct RenderQueueGroup

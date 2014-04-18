@@ -43,10 +43,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const int SubRqIdBits           = 4;
+    const int SubRqIdBits           = 3;
     const int TransparencyBits      = 1;
     const int MacroblockBits        = 10;
-    const int ShaderBits            = 9;    //The higher 3 bits contain HlmsTypes
+    const int ShaderBits            = 10;    //The higher 3 bits contain HlmsTypes
     const int MeshBits              = 14;
     const int TextureBits           = 11;
     const int DepthBits             = 15;
@@ -233,10 +233,13 @@ namespace Ogre
             QueuedRenderableArray::const_iterator itor = queuedRenderables.begin();
             QueuedRenderableArray::const_iterator end  = queuedRenderables.end();
 
+            HlmsCache dummy( 0 );
+
             HlmsMacroblock const *lastMacroblock = 0;
             HlmsBlendblock const *lastBlendblock = 0;
             VertexData const *lastVertexData = 0;
             IndexData const *lastIndexData = 0;
+            HlmsCache const *lastHlmsCache = &dummy;
             //uint32 lastVertexDataId = ~0;
 
             while( itor != end )
@@ -271,9 +274,21 @@ namespace Ogre
 
                 Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
 
-                const HlmsCache *hlmsCache = hlms->getMaterial( *passCache, queuedRenderable.renderable,
-                                                                queuedRenderable.movableObject,
+                const HlmsCache *hlmsCache = hlms->getMaterial( lastHlmsCache, *passCache,
+                                                                queuedRenderable,
                                                                 casterPass );
+                if( lastHlmsCache != hlmsCache )
+                {
+                    rs->_setProgramsFromHlms( hlmsCache );
+                    lastHlmsCache = hlmsCache;
+                }
+
+                hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass );
+                /*GpuProgramParametersSharedPtr vpParams = hlmsCache->vertexShader->getDefaultParameters();
+                GpuProgramParametersSharedPtr psParams = hlmsCache->pixelShader->getDefaultParameters();
+
+                vpParams->getFloatPointer( 0 );
+                psParams->getFloatPointer( 0 );*/
 
                 ++itor;
             }
