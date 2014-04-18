@@ -910,6 +910,15 @@ namespace Ogre
         /** Get the current active viewport for rendering. */
         virtual Viewport* _getViewport(void);
 
+        /// @See HlmsMacroblock
+        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock ) = 0;
+
+        /// @See HlmsBlendblock
+        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock ) = 0;
+
+        /// @See HlmsCache
+        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache ) = 0;
+
         /** Sets the culling mode for the render system based on the 'vertex winding'.
         A typical way for the rendering engine to cull triangles is based on the
         'vertex winding' of triangles. Vertex winding refers to the direction in

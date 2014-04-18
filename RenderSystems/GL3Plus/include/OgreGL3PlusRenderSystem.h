@@ -349,6 +349,9 @@ namespace Ogre {
             RenderSystem
         */
         void _setViewport(Viewport *vp);
+        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
+        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
+        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
         /** See
             RenderSystem
         */

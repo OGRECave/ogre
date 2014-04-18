@@ -184,6 +184,7 @@ namespace Ogre {
         void bind(void);
         /// Unbind the shader in OpenGL.
         void unbind(void);
+        static void unbindAll(void);
         /// Execute the param binding functions for this shader.
         void bindParameters(GpuProgramParametersSharedPtr params, uint16 mask);
         /// Execute the pass iteration param binding functions for this shader.

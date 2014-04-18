@@ -70,20 +70,17 @@ namespace Ogre
     */
     struct HlmsBlendblock
     {
+        /// Used to determine if separate alpha blending should be used for color and alpha channels
+        bool                mSeparateBlend;
+
         SceneBlendFactor    mSourceBlendFactor;
         SceneBlendFactor    mDestBlendFactor;
         SceneBlendFactor    mSourceBlendFactorAlpha;
         SceneBlendFactor    mDestBlendFactorAlpha;
 
-        // Used to determine if separate alpha blending should be used for color and alpha channels
-        bool                mSeparateBlend;
-
         // Blending operations
         SceneBlendOperation mBlendOperation;
-        SceneBlendOperation mAlphaBlendOperation;
-
-        /// Determines if we should use separate blending operations for color and alpha channels
-        bool                mSeparateBlendOperation;
+        SceneBlendOperation mBlendOperationAlpha;
     };
 
     /** An hlms datablock contains individual information about a specific material. It consists of:

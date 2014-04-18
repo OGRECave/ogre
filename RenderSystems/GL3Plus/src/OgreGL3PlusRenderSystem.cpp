@@ -55,6 +55,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusVertexArrayObject.h"
+#include "OgreHlmsDatablock.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
@@ -1233,6 +1234,81 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
 
             vp->_clearUpdatedFlag();
+        }
+    }
+
+    void GL3PlusRenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
+    {
+        if( macroblock->mDepthCheck )
+            OGRE_CHECK_GL_ERROR(glEnable( GL_DEPTH_TEST ));
+        else
+            OGRE_CHECK_GL_ERROR(glDisable( GL_DEPTH_TEST ));
+        OGRE_CHECK_GL_ERROR(glDepthMask( macroblock->mDepthWrite ? GL_TRUE : GL_FALSE ));
+        OGRE_CHECK_GL_ERROR(glDepthFunc( convertCompareFunction(macroblock->mDepthFunc )));
+
+        _setDepthBias( macroblock->mDepthBiasConstant, macroblock->mDepthBiasSlopeScale );
+        _setCullingMode( macroblock->mCullMode );
+
+        if( macroblock->mAlphaToCoverageEnabled )
+            OGRE_CHECK_GL_ERROR(glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+        else
+            OGRE_CHECK_GL_ERROR(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+
+        mDepthWrite = macroblock->mDepthWrite;
+    }
+
+    void GL3PlusRenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
+    {
+        if( blendblock->mSeparateBlend )
+        {
+            _setSeparateSceneBlending(
+                                blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
+                                blendblock->mSourceBlendFactorAlpha, blendblock->mDestBlendFactorAlpha,
+                                blendblock->mBlendOperation, blendblock->mBlendOperationAlpha );
+        }
+        else
+        {
+            _setSceneBlending( blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
+                               blendblock->mBlendOperation );
+        }
+    }
+
+    void GL3PlusRenderSystem::_setProgramsFromHlms( const HlmsCache *hlmsCache )
+    {
+        GLSLShader::unbindAll();
+
+        mCurrentVertexShader    = static_cast<GLSLShader*>( hlmsCache->vertexShader );
+        mCurrentGeometryShader  = static_cast<GLSLShader*>( hlmsCache->geometryShader );
+        mCurrentHullShader      = static_cast<GLSLShader*>( hlmsCache->tesselationHullShader );
+        mCurrentDomainShader    = static_cast<GLSLShader*>( hlmsCache->tesselationDomainShader );
+        mCurrentFragmentShader  = static_cast<GLSLShader*>( hlmsCache->pixelShader );
+
+        mActiveVertexGpuProgramParameters.setNull();
+
+        if( mCurrentVertexShader )
+        {
+            mCurrentVertexShader->bind();
+            mVertexProgramBound = true;
+        }
+        if( mCurrentGeometryShader )
+        {
+            mCurrentGeometryShader->bind();
+            mGeometryProgramBound = true;
+        }
+        if( mCurrentHullShader )
+        {
+            mCurrentHullShader->bind();
+            mTessellationHullProgramBound = true;
+        }
+        if( mCurrentDomainShader )
+        {
+            mCurrentDomainShader->bind();
+            mTessellationDomainProgramBound = true;
+        }
+        if( mCurrentFragmentShader )
+        {
+            mCurrentFragmentSader->bind();
+            mFragmentProgramBound = true;
         }
     }
 

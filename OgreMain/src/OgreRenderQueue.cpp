@@ -250,15 +250,13 @@ namespace Ogre
 
                 if( lastMacroblock != datablock->mMacroblock )
                 {
-                    /*mDestRenderSystem->_setMacroblock( datablock->mMacroblock );
-                     mDestRenderSystem->_setCullingMode( datablock->mMacroblock->mCullMode );
-                    mDestRenderSystem->_setPolygonMode( datablock->mMacroblock->mPolygonMode );*/
+                    rs->_setHlmsMacroblock( datablock->mMacroblock );
                     lastMacroblock = datablock->mMacroblock;
                 }
 
                 if( lastBlendblock != datablock->mBlendblock )
                 {
-                    //mDestRenderSystem->_setBlendblock( datablock->mBlendblock );
+                    rs->_setHlmsBlendblock( datablock->mBlendblock );
                     lastBlendblock = datablock->mBlendblock;
                 }
 

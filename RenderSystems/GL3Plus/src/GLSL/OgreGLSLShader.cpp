@@ -873,6 +873,30 @@ namespace Ogre {
         }
     }
 
+    void GLSLShader::unbindAll(void)
+    {
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            GLSLSeparableProgramManager &glslManager = GLSLSeparableProgramManager::getSingleton();
+            glslManager.setActiveVertexShader(NULL);
+            glslManager.setActiveGeometryShader(NULL);
+            glslManager.setActiveTessHullShader(NULL);
+            glslManager.setActiveTessDomainShader(NULL);
+            glslManager.setActiveComputeShader(NULL);
+            glslManager.setActiveFragmentShader(NULL);
+        }
+        else
+        {
+            GLSLMonolithicProgramManager &glslManager = GLSLSeparableProgramManager::getSingleton();
+            glslManager.setActiveVertexShader(NULL);
+            glslManager.setActiveGeometryShader(NULL);
+            glslManager.setActiveHullShader(NULL);
+            glslManager.setActiveDomainShader(NULL);
+            glslManager.setActiveComputeShader(NULL);
+            glslManager.setActiveFragmentShader(NULL);
+        }
+    }
+
 
     void GLSLShader::bindParameters(GpuProgramParametersSharedPtr params, uint16 mask)
     {
