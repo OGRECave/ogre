@@ -40,6 +40,11 @@ namespace Ogre
                                       ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS );
     }
     //-----------------------------------------------------------------------------------
+    inline RealAsUint MovableObject::getCachedDistanceToCamera(void) const
+    {
+        return mObjectData.mDistanceToCamera[mObjectData.mIndex];
+    }
+    //-----------------------------------------------------------------------------------
     inline void MovableObject::setVisibilityFlags( uint32 flags )
     {
         mObjectData.mVisibilityFlags[mObjectData.mIndex] =
@@ -137,6 +142,16 @@ namespace Ogre
     {
         return (mObjectData.mVisibilityFlags[mObjectData.mIndex] &
                                                     VisibilityFlags::LAYER_SHADOW_CASTER) != 0;
+    }
+    //-----------------------------------------------------------------------------------
+    inline uint8 MovableObject::getRenderQueueGroup(void) const
+    {
+        return mRenderQueueID;
+    }
+    //-----------------------------------------------------------------------------------
+    inline uint8 MovableObject::getRenderQueueSubGroup(void) const
+    {
+        return mRenderQueuePriority;
     }
     //-----------------------------------------------------------------------------------
     inline SceneNode* MovableObject::getParentSceneNode(void) const

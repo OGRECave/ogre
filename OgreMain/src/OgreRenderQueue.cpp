@@ -91,9 +91,12 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------
     void RenderQueue::addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
-                                     uint8 rqId, uint8 subId, RealAsUint depth,
                                      bool casterPass )
     {
+        uint8 rqId  = pMovableObject->getRenderQueueGroup();
+        uint8 subId = pMovableObject->getRenderQueueSubGroup();
+        RealAsUint depth = pMovableObject->getCachedDistanceToCamera();
+
         assert( !mRenderQueues[rqId].mSorted &&
                 "Called addRenderable after render and before clear" );
         assert( subId < OGRE_MAKE_MASK( SubRqIdBits ) );
@@ -220,6 +223,15 @@ namespace Ogre
         float *texBufferPtr; //TODO
         HlmsCache *passCache; //TODO
 
+        HlmsCache dummy( 0 );
+
+        HlmsMacroblock const *lastMacroblock = 0;
+        HlmsBlendblock const *lastBlendblock = 0;
+        VertexData const *lastVertexData = 0;
+        IndexData const *lastIndexData = 0;
+        HlmsCache const *lastHlmsCache = &dummy;
+        //uint32 lastVertexDataId = ~0;
+
         for( size_t i=firstRq; i<lastRq; ++i )
         {
             QueuedRenderableArray &queuedRenderables = mRenderQueues[i].mQueuedRenderables;
@@ -232,15 +244,6 @@ namespace Ogre
 
             QueuedRenderableArray::const_iterator itor = queuedRenderables.begin();
             QueuedRenderableArray::const_iterator end  = queuedRenderables.end();
-
-            HlmsCache dummy( 0 );
-
-            HlmsMacroblock const *lastMacroblock = 0;
-            HlmsBlendblock const *lastBlendblock = 0;
-            VertexData const *lastVertexData = 0;
-            IndexData const *lastIndexData = 0;
-            HlmsCache const *lastHlmsCache = &dummy;
-            //uint32 lastVertexDataId = ~0;
 
             while( itor != end )
             {

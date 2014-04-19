@@ -578,7 +578,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    void InstanceBatch::instanceBatchCullFrustumThreadedImpl( const Frustum *frustum,
+    void InstanceBatch::instanceBatchCullFrustumThreadedImpl( const Camera *frustum,
                                                               const Camera *lodCamera,
                                                                 uint32 combinedVisibilityFlags )
     {

@@ -176,8 +176,8 @@ namespace Ogre
         /** Used by HW Basic & HW VTF techniques to cull from multiple threads.
             @see InstancingTheadedCullingMethod
         */
-        void instanceBatchCullFrustumThreadedImpl(const Frustum *frustum, const Camera *lodCamera,
-                                                    uint32 combinedVisibilityFlags );
+        void instanceBatchCullFrustumThreadedImpl( const Camera *frustum, const Camera *lodCamera,
+                                                   uint32 combinedVisibilityFlags );
 
     public:
         InstanceBatch( IdType id, ObjectMemoryManager *objectMemoryManager,

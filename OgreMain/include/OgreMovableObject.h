@@ -54,6 +54,8 @@ namespace Ogre {
     *  @{
     */
 
+    typedef vector<Renderable*>::type RenderableVec;
+
     /** Abstract class defining a movable object in a scene.
         @remarks
             Instances of this class are discrete, relatively small, movable objects
@@ -78,13 +80,14 @@ namespace Ogre {
             virtual void objectDetached(MovableObject*) {}
         };
 
+        RenderableVec   mRenderables;
     protected:
         /// Node to which this object is attached
         Node* mParentNode;
         /// The render queue to use when rendering this object
         uint8 mRenderQueueID;
         /// The render queue group to use when rendering this object
-        ushort mRenderQueuePriority;
+        uint8 mRenderQueuePriority;
         /// All the object data needed in SoA form
         ObjectData mObjectData;
         /// SceneManager holding this object (if applicable)
@@ -241,7 +244,7 @@ namespace Ogre {
             mUpperDistance
         */
         typedef FastArray<MovableObject*> MovableObjectArray;
-        static void cullFrustum( const size_t numNodes, ObjectData t, const Frustum *frustum,
+        static void cullFrustum( const size_t numNodes, ObjectData t, const Camera *frustum,
                                  uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
                                  const Camera *lodCamera );
 
@@ -377,10 +380,11 @@ namespace Ogre {
             enum RenderQueueGroupID for what kind of values can be used here.
         @param priority The priority within a group to use.
         */
-        virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+        virtual void setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority);
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
-        uint8 getRenderQueueGroup(void) const;
+        inline uint8 getRenderQueueGroup(void) const;
+        inline uint8 getRenderQueueSubGroup(void) const;
 
         /// Returns a direct access to the ObjectData state
         ObjectData& _getObjectData()                                        { return mObjectData; }
@@ -462,6 +466,8 @@ namespace Ogre {
         */
         static uint32 getDefaultQueryFlags() { return msDefaultQueryFlags; }
 
+        /// Returns the distance to camera as calculated in @cullFrustum
+        inline RealAsUint getCachedDistanceToCamera(void) const;
 
         /** Sets the visibility flags for this object.
         @remarks

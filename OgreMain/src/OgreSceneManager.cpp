@@ -1203,6 +1203,8 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
             VisibleObjectsPerThreadArray::const_iterator it = mVisibleObjects.begin();
             VisibleObjectsPerThreadArray::const_iterator en = mVisibleObjects.end();
 
+            bool casterPass = mIlluminationStage == IRS_RENDER_TO_TEXTURE;
+
             //TODO: _updateRenderQueue MIGHT be called in parallel
             firePreFindVisibleObjects(vp);
             while( it != en )
@@ -1212,7 +1214,16 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
                 while( itor != end )
                 {
-                    (*itor)->_updateRenderQueue( getRenderQueue(), camera, lodCamera );
+                    //(*itor)->_updateRenderQueue( getRenderQueue(), camera, lodCamera );
+                    RenderableVec::const_iterator itRend = (*itor)->mRenderables.begin();
+                    RenderableVec::const_iterator enRend = (*itor)->mRenderables.end();
+
+                    while( itRend != enRend )
+                    {
+                        mRenderQueue->addRenderable( *itRend, *itor, casterPass );
+                        ++itRend;
+                    }
+
                     ++itor;
                 }
                 ++it;
@@ -1240,8 +1251,11 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
     // Render scene content
     {
-        OgreProfileGroup("_renderVisibleObjects", OGREPROF_RENDERING);
-        _renderVisibleObjects();
+        //OgreProfileGroup("_renderVisibleObjects", OGREPROF_RENDERING);
+        //_renderVisibleObjects();
+        OgreProfileGroup("RenderQueue::render", OGREPROF_RENDERING);
+        mRenderQueue->renderES2( mDestRenderSystem, firstRq, lastRq,
+                                 mIlluminationStage == IRS_RENDER_TO_TEXTURE );
     }
 
     // Notify camera of vis faces

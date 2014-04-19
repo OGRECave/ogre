@@ -150,7 +150,7 @@ namespace Ogre {
             be rendered last.
         */
         void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
-                            uint8 rqId, uint8 subId, RealAsUint depth, bool casterPass );
+                            bool casterPass );
 
         void render( uint8 firstRq, uint8 lastRq );
         void renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq, bool casterPass );

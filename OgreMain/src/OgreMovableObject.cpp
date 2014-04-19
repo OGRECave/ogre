@@ -277,15 +277,10 @@ namespace Ogre {
         mRenderQueueID = queueID;
     }
     //-----------------------------------------------------------------------
-    void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+    void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority)
     {
         setRenderQueueGroup(queueID);
         mRenderQueuePriority = priority;
-    }
-    //-----------------------------------------------------------------------
-    uint8 MovableObject::getRenderQueueGroup(void) const
-    {
-        return mRenderQueueID;
     }
     //-----------------------------------------------------------------------
     const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
@@ -420,7 +415,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Frustum *frustum,
+    void MovableObject::cullFrustum( const size_t numNodes, ObjectData objData, const Camera *frustum,
                                      uint32 sceneVisibilityFlags, MovableObjectArray &outCulledObjects,
                                      const Camera *lodCamera )
     {
@@ -443,7 +438,8 @@ namespace Ogre {
             ArrayReal       planeNegD;
         };
 
-        ArrayVector3 lodCameraPos;
+        ArrayVector3 cameraPos, lodCameraPos;
+        cameraPos.setAll( frustum->getDerivedPosition() );
         lodCameraPos.setAll( lodCamera->getDerivedPosition() );
 
         // Flip the bit from shadow caster, and leave only that in "includeNonCasters"
@@ -474,6 +470,8 @@ namespace Ogre {
                                                                         (objData.mWorldRadius);
             ArrayReal * RESTRICT_ALIAS upperDistance = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
                                                                         (objData.mUpperDistance);
+            ArrayReal * RESTRICT_ALIAS distanceToCamera = reinterpret_cast<ArrayReal*RESTRICT_ALIAS>
+                                                                        (objData.mDistanceToCamera);
 
             //Test all 6 planes and AND the dot product. If one is false, then we're not visible
             ArrayReal dotResult;
@@ -527,6 +525,8 @@ namespace Ogre {
                                                         Mathlib::SetAll( LAYER_VISIBILITY ) ),
                                 Mathlib::TestFlags4( Mathlib::Or( *visibilityFlags, includeNonCasters ),
                                                         Mathlib::SetAll( LAYER_SHADOW_CASTER ) ) );
+
+            *distanceToCamera = cameraPos.distance( objData.mWorldAabb->mCenter ) - *worldRadius;
 
             //Fuse result with visibility flag
             // finalMask = ((visible|infinite_aabb) & sceneFlags & visibilityFlags) != 0 ? 0xffffffff : 0
