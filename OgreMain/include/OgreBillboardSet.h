@@ -321,7 +321,7 @@ namespace Ogre {
         */
         BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
                         unsigned int poolSize = 20, bool externalDataSource = false,
-                        uint8 renderQueueId=RENDER_QUEUE_MAIN );
+                        uint8 renderQueueId=0 );
 
         virtual ~BillboardSet();
 

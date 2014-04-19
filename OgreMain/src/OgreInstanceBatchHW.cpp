@@ -260,12 +260,13 @@ namespace Ogre
                                                const Camera *lodCamera )
     {
         //if( !mKeepStatic )
-        {
+        /*{
             //Completely override base functionality, since we don't cull on an "all-or-nothing" basis
             //and we don't support skeletal animation
+            //TODO: RENDER QUEUE
             if( (mRenderOperation.numberOfInstances = updateVertexBuffer( camera, lodCamera )) )
                 queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
-        }
+        }*/
         /*else
         {
             if( mManager->getCameraRelativeRendering() )

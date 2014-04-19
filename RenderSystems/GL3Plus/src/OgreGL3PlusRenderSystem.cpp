@@ -1240,9 +1240,13 @@ namespace Ogre {
     void GL3PlusRenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
     {
         if( macroblock->mDepthCheck )
+        {
             OGRE_CHECK_GL_ERROR(glEnable( GL_DEPTH_TEST ));
+        }
         else
+        {
             OGRE_CHECK_GL_ERROR(glDisable( GL_DEPTH_TEST ));
+        }
         OGRE_CHECK_GL_ERROR(glDepthMask( macroblock->mDepthWrite ? GL_TRUE : GL_FALSE ));
         OGRE_CHECK_GL_ERROR(glDepthFunc( convertCompareFunction(macroblock->mDepthFunc )));
 
@@ -1250,9 +1254,13 @@ namespace Ogre {
         _setCullingMode( macroblock->mCullMode );
 
         if( macroblock->mAlphaToCoverageEnabled )
+        {
             OGRE_CHECK_GL_ERROR(glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+        }
         else
+        {
             OGRE_CHECK_GL_ERROR(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+        }
 
         mDepthWrite = macroblock->mDepthWrite;
     }
@@ -1277,11 +1285,11 @@ namespace Ogre {
     {
         GLSLShader::unbindAll();
 
-        mCurrentVertexShader    = static_cast<GLSLShader*>( hlmsCache->vertexShader );
-        mCurrentGeometryShader  = static_cast<GLSLShader*>( hlmsCache->geometryShader );
-        mCurrentHullShader      = static_cast<GLSLShader*>( hlmsCache->tesselationHullShader );
-        mCurrentDomainShader    = static_cast<GLSLShader*>( hlmsCache->tesselationDomainShader );
-        mCurrentFragmentShader  = static_cast<GLSLShader*>( hlmsCache->pixelShader );
+        mCurrentVertexShader    = static_cast<GLSLShader*>( hlmsCache->vertexShader.get() );
+        mCurrentGeometryShader  = static_cast<GLSLShader*>( hlmsCache->geometryShader.get() );
+        mCurrentHullShader      = static_cast<GLSLShader*>( hlmsCache->tesselationHullShader.get() );
+        mCurrentDomainShader    = static_cast<GLSLShader*>( hlmsCache->tesselationDomainShader.get() );
+        mCurrentFragmentShader  = static_cast<GLSLShader*>( hlmsCache->pixelShader.get() );
 
         mActiveVertexGpuProgramParameters.setNull();
         mActiveGeometryGpuProgramParameters.setNull();
@@ -1315,8 +1323,8 @@ namespace Ogre {
         }
         if( mCurrentFragmentShader )
         {
-            mCurrentFragmentSader->bind();
-            mActiveFragmentGpuProgramParameters = mCurrentFragmentSader->getDefaultParameters();
+            mCurrentFragmentShader->bind();
+            mActiveFragmentGpuProgramParameters = mCurrentFragmentShader->getDefaultParameters();
             mFragmentProgramBound = true;
         }
     }

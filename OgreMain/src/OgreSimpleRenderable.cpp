@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     SimpleRenderable::SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager )
-		: MovableObject( id, objectMemoryManager, Ogre::RENDER_QUEUE_MAIN )
+        : MovableObject( id, objectMemoryManager, 0 )
     , mWorldTransform(Matrix4::IDENTITY)
     , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
@@ -87,12 +87,6 @@ namespace Ogre {
     const AxisAlignedBox& SimpleRenderable::getBoundingBox(void) const
     {
         return mBox;
-    }
-
-    void SimpleRenderable::_updateRenderQueue(RenderQueue* queue, Camera *camera,
-                                              const Camera *lodCamera)
-    {
-        queue->addRenderable( this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY); 
     }
 
     void SimpleRenderable::visitRenderables(Renderable::Visitor* visitor, 

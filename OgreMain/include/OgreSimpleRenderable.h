@@ -77,7 +77,6 @@ namespace Ogre {
         void setBoundingBox( const AxisAlignedBox& box );
         virtual const AxisAlignedBox& getBoundingBox(void) const;
 
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
         /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);

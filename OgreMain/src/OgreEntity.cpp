@@ -55,7 +55,7 @@ namespace Ogre {
     extern const FastArray<Real> c_DefaultLodMesh;
     //-----------------------------------------------------------------------
     Entity::Entity ( IdType id, ObjectMemoryManager *objectMemoryManager )
-		: MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
+        : MovableObject( id, objectMemoryManager, 0 ),
           mAnimationState(NULL),
           mSkelAnimVertexData(0),
           mTempVertexAnimInfo(),
@@ -86,7 +86,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     Entity::Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh) :
-		MovableObject(id, objectMemoryManager, RENDER_QUEUE_MAIN),
+        MovableObject(id, objectMemoryManager, 0),
         mMesh(mesh),
         mAnimationState(NULL),
         mSkelAnimVertexData(0),
@@ -474,7 +474,7 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
+    /*void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
         // Do nothing if not initialised yet
         if (!mInitialised)
@@ -563,7 +563,7 @@ namespace Ogre {
                 queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
             }
         }
-    }
+    }*/
     //-----------------------------------------------------------------------
     AnimationState* Entity::getAnimationState(const String& name) const
     {

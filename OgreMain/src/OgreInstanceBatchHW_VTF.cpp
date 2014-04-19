@@ -510,11 +510,12 @@ namespace Ogre
                                                   const Camera *lodCamera )
     {
         //if( !mKeepStatic )
-        {
+        /*{
+            TODO: RENDER QUEUE
             //Completely override base functionality, since we don't cull on an "all-or-nothing" basis
             if( (mRenderOperation.numberOfInstances = updateVertexTexture( camera, lodCamera )) )
                 queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
-        }
+        }*/
         /*else
         {
             if( mManager->getCameraRelativeRendering() )

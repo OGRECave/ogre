@@ -78,7 +78,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ParticleSystem::ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager,
                                     const String& resourceGroup )
-      : MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
+      : MovableObject( id, objectMemoryManager, 0 ),
         mBoundsAutoUpdate(true),
         mBoundsUpdateTime(10.0f),
         mUpdateRemainTime(0),

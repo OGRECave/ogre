@@ -39,8 +39,13 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                               bool casterPass )
+    void HlmsPbsEs2::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                     bool casterPass )
     {
+        GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
+        float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
+        //vsUniformBuffer = queuedRenderable;
+
+        //vsUniformBuffer worldViewProj
     }
 }

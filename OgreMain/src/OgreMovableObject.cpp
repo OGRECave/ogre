@@ -82,7 +82,7 @@ namespace Ogre {
     MovableObject::MovableObject( ObjectData *objectDataPtrs )
         : IdObject( 0 )
         , mParentNode(0)
-        , mRenderQueueID(RENDER_QUEUE_MAIN)
+        , mRenderQueueID(0)
         , mRenderQueuePriority(100)
         , mManager(0)
         , mLodMesh( &c_DefaultLodMesh )

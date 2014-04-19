@@ -376,7 +376,6 @@ namespace Ogre
         /** @copydoc MovableObject::getMovableType. */
         const String& getMovableType(void) const;
 
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
         void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
 
         // resolve ambiguity of get/setUserAny due to inheriting from Renderable and MovableObject

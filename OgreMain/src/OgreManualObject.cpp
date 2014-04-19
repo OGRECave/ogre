@@ -47,7 +47,7 @@ namespace Ogre {
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
     //-----------------------------------------------------------------------------
     ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
-		: MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
+        : MovableObject( id, objectMemoryManager, 0 ),
           mDynamic(false), mCurrentSection(0), mFirstVertex(true),
           mTempVertexPending(false),
           mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
@@ -900,7 +900,8 @@ namespace Ogre {
                 (rop->useIndexes && rop->indexData->indexCount == 0))
                 continue;
             
-            queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
+            //TODO: RENDER QUEUE ?
+            //queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
         }
     }
     //-----------------------------------------------------------------------------

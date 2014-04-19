@@ -981,15 +981,6 @@ namespace Ogre {
         return mBoundingBox;
     }
     //-----------------------------------------------------------------------
-    void Frustum::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
-    {
-        if (mDebugDisplay)
-        {
-            // Add self 
-            queue->addRenderable(this);
-        }
-    }
-    //-----------------------------------------------------------------------
     const String& Frustum::getMovableType(void) const
     {
         return msMovableType;

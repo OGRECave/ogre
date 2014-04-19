@@ -61,7 +61,7 @@ namespace Ogre {
         mHalfRegionDimensions(Vector3(500,500,500)),
         mOrigin(Vector3(0,0,0)),
         mVisible(true),
-        mRenderQueueID(RENDER_QUEUE_MAIN),
+        mRenderQueueID(0),
         mRenderQueueIDSet(false),
         mVisibilityFlags(Ogre::MovableObject::getDefaultVisibilityFlags())
     {
@@ -634,7 +634,6 @@ namespace Ogre {
     //--------------------------------------------------------------------------
     void StaticGeometry::setRenderQueueGroup(uint8 queueID)
     {
-        assert(queueID <= RENDER_QUEUE_MAX && "Render queue out of range!");
         mRenderQueueIDSet = true;
         mRenderQueueID = queueID;
         // tell any existing regions
@@ -709,7 +708,7 @@ namespace Ogre {
     StaticGeometry::Region::Region( IdType id, ObjectMemoryManager *objectMemoryManager,
                                     StaticGeometry* parent, SceneManager* mgr, uint32 regionID,
                                     const Vector3& centre ) :
-        MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
+        MovableObject( id, objectMemoryManager, 0 ),
         mParent(parent), mSceneMgr(mgr), mNode(0),
         mRegionID(regionID), mCentre(centre)
     {
@@ -1081,7 +1080,7 @@ namespace Ogre {
         }
     }
     //--------------------------------------------------------------------------
-    void StaticGeometry::MaterialBucket::addRenderables(RenderQueue* queue, uint8 group, size_t materialLod)
+    /*void StaticGeometry::MaterialBucket::addRenderables(RenderQueue* queue, uint8 group, size_t materialLod)
     {
         // Get region
         Region *region = mParent->getParent();
@@ -1095,7 +1094,7 @@ namespace Ogre {
             queue->addRenderable(*i, group);
         }
 
-    }
+    }*/
     //--------------------------------------------------------------------------
     String StaticGeometry::MaterialBucket::getGeometryFormatString(
         SubMeshLodGeometryLink* geom)

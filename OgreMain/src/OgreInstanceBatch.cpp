@@ -45,7 +45,7 @@ namespace Ogre
                                     const MaterialPtr &material, size_t instancesPerBatch,
                                     const Mesh::IndexMap *indexToBoneMap ) :
                 Renderable(),
-				MovableObject( id, objectMemoryManager, RENDER_QUEUE_MAIN ),
+                MovableObject( id, objectMemoryManager, 0 ),
                 mInstancesPerBatch( instancesPerBatch ),
                 mCreator( creator ),
                 mMaterial( material ),
@@ -627,11 +627,6 @@ namespace Ogre
     Technique* InstanceBatch::getTechnique( void ) const
     {
         return mMaterial->getBestTechnique( mCurrentMaterialLod[0], this );
-    }
-    //-----------------------------------------------------------------------
-    void InstanceBatch::_updateRenderQueue(RenderQueue* queue, Camera *camera , const Camera *lodCamera)
-    {
-        queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
     }
     //-----------------------------------------------------------------------
     void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )

@@ -887,7 +887,7 @@ namespace Ogre {
         }
         else
         {
-            GLSLMonolithicProgramManager &glslManager = GLSLSeparableProgramManager::getSingleton();
+            GLSLMonolithicProgramManager &glslManager = GLSLMonolithicProgramManager::getSingleton();
             glslManager.setActiveVertexShader(NULL);
             glslManager.setActiveGeometryShader(NULL);
             glslManager.setActiveHullShader(NULL);

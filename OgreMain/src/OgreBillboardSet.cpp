@@ -582,8 +582,6 @@ namespace Ogre {
             endBillboards();
             mBillboardDataChanged = false;
         }
-
-        queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
     }
 
     //-----------------------------------------------------------------------

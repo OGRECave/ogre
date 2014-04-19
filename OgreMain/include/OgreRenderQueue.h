@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __RenderQueue_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreSharedPtr.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreIteratorWrappers.h"
 
@@ -107,7 +108,7 @@ namespace Ogre {
             uint32          count;
             BufferBucket    *bufferBucket;
 
-            RenderOperation renderOperation;
+            //RenderOperation renderOperation;
         };
 
         static inline bool OrderSkeletonByHash( const Batch &_left, const Batch &_right )

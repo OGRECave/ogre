@@ -108,8 +108,6 @@ mFogColour(),
 mFogStart(0),
 mFogEnd(0),
 mFogDensity(0),
-mSpecialCaseQueueMode(SCRQM_EXCLUDE),
-mWorldGeometryRenderQueue(RENDER_QUEUE_WORLD_GEOMETRY_1),
 mLastFrameNumber(0),
 mResetIdentityView(false),
 mResetIdentityProj(false),
@@ -262,49 +260,6 @@ RenderQueue* SceneManager::getRenderQueue(void)
 void SceneManager::initRenderQueue(void)
 {
     mRenderQueue = OGRE_NEW RenderQueue();
-    mRenderQueue->getQueueGroup(RENDER_QUEUE_OVERLAY); //TODO: This feels hacky to get Overlays working
-}
-//-----------------------------------------------------------------------
-void SceneManager::addSpecialCaseRenderQueue(uint8 qid)
-{
-    mSpecialCaseQueueList.insert(qid);
-}
-//-----------------------------------------------------------------------
-void SceneManager::removeSpecialCaseRenderQueue(uint8 qid)
-{
-    mSpecialCaseQueueList.erase(qid);
-}
-//-----------------------------------------------------------------------
-void SceneManager::clearSpecialCaseRenderQueues(void)
-{
-    mSpecialCaseQueueList.clear();
-}
-//-----------------------------------------------------------------------
-void SceneManager::setSpecialCaseRenderQueueMode(SceneManager::SpecialCaseRenderQueueMode mode)
-{
-    mSpecialCaseQueueMode = mode;
-}
-//-----------------------------------------------------------------------
-SceneManager::SpecialCaseRenderQueueMode SceneManager::getSpecialCaseRenderQueueMode(void)
-{
-    return mSpecialCaseQueueMode;
-}
-//-----------------------------------------------------------------------
-bool SceneManager::isRenderQueueToBeProcessed(uint8 qid)
-{
-    bool inList = mSpecialCaseQueueList.find(qid) != mSpecialCaseQueueList.end();
-    return (inList && mSpecialCaseQueueMode == SCRQM_INCLUDE)
-        || (!inList && mSpecialCaseQueueMode == SCRQM_EXCLUDE);
-}
-//-----------------------------------------------------------------------
-void SceneManager::setWorldGeometryRenderQueue(uint8 qid)
-{
-    mWorldGeometryRenderQueue = qid;
-}
-//-----------------------------------------------------------------------
-uint8 SceneManager::getWorldGeometryRenderQueue(void)
-{
-    return mWorldGeometryRenderQueue;
 }
 //-----------------------------------------------------------------------
 Camera* SceneManager::createCamera( const String &name, bool isVisible, bool forCubemapping )
@@ -623,9 +578,8 @@ void SceneManager::clearScene(void)
     mSkyBoxNode = mSkyPlaneNode = mSkyDomeNode = 0;
     mSkyBoxEnabled = mSkyPlaneEnabled = mSkyDomeEnabled = false; 
 
-    // Clear render queue, empty completely
     if (mRenderQueue)
-        mRenderQueue->clear(true);
+        mRenderQueue->clear();
 
 }
 //-----------------------------------------------------------------------
@@ -1066,9 +1020,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 //-----------------------------------------------------------------------
 void SceneManager::prepareRenderQueue(void)
 {
+    /* TODO: RENDER QUEUE
     RenderQueue* q = getRenderQueue();
     // Clear the render queue
-    q->clear(Root::getSingleton().getRemoveRenderQueueStructuresOnClear());
+    q->clear();
 
     // Prep the ordering options
 
@@ -1118,7 +1073,7 @@ void SceneManager::prepareRenderQueue(void)
         }
 
         mLastRenderQueueInvocationCustom = false;
-    }
+    }*/
 
 }
 //-----------------------------------------------------------------------
@@ -1455,9 +1410,8 @@ void SceneManager::setSkyPlane(
                                int xsegments, int ysegments, 
                                const String& groupName)
 {
-    _setSkyPlane(enable, plane, materialName, gscale, tiling, 
-        static_cast<uint8>(drawFirst?RENDER_QUEUE_SKIES_EARLY: RENDER_QUEUE_SKIES_LATE), 
-        bow, xsegments, ysegments, groupName);
+    _setSkyPlane(enable, plane, materialName, gscale, tiling,
+                 0, bow, xsegments, ysegments, groupName);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_setSkyBox(bool enable,
@@ -1678,9 +1632,8 @@ void SceneManager::setSkyBox(
                              const Quaternion& orientation,
                              const String& groupName)
 {
-    _setSkyBox(enable, materialName, distance, 
-        static_cast<uint8>(drawFirst?RENDER_QUEUE_SKIES_EARLY: RENDER_QUEUE_SKIES_LATE), 
-        orientation, groupName);
+    _setSkyBox(enable, materialName, distance, 0,
+               orientation, groupName);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_setSkyDome(bool enable,
@@ -1779,8 +1732,7 @@ void SceneManager::setSkyDome(
                               const String& groupName)
 {
     _setSkyDome(enable, materialName, curvature, tiling, distance, 
-        static_cast<uint8>(drawFirst?RENDER_QUEUE_SKIES_EARLY: RENDER_QUEUE_SKIES_LATE), 
-        orientation, xsegments, ysegments, ySegmentsToKeep, groupName);
+                0, orientation, xsegments, ysegments, ySegmentsToKeep, groupName);
 }
 //-----------------------------------------------------------------------
 MeshPtr SceneManager::createSkyboxPlane(
@@ -2427,6 +2379,7 @@ void SceneManager::_renderVisibleObjects(void)
 //-----------------------------------------------------------------------
 void SceneManager::renderVisibleObjectsCustomSequence(RenderQueueInvocationSequence* seq)
 {
+    /* TODO: RENDER QUEUE
     firePreRenderQueues();
 
     RenderQueueInvocationIterator invocationIt = seq->iterator();
@@ -2434,10 +2387,6 @@ void SceneManager::renderVisibleObjectsCustomSequence(RenderQueueInvocationSeque
     {
         RenderQueueInvocation* invocation = invocationIt.getNext();
         uint8 qId = invocation->getRenderQueueGroupID();
-        // Skip this one if not to be processed
-        if (!isRenderQueueToBeProcessed(qId))
-            continue;
-
 
         bool repeatQueue = false;
         const String& invocationName = invocation->getInvocationName();
@@ -2469,11 +2418,12 @@ void SceneManager::renderVisibleObjectsCustomSequence(RenderQueueInvocationSeque
 
     }
 
-    firePostRenderQueues();
+    firePostRenderQueues();*/
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderVisibleObjectsDefaultSequence(void)
 {
+    /* TODO: RENDER QUEUE
     firePreRenderQueues();
 
     // Render each separate queue
@@ -2487,10 +2437,6 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
         // Get queue group id
         uint8 qId = queueIt.peekNextKey();
         RenderQueueGroup* pGroup = queueIt.getNext();
-        // Skip this one if not to be processed
-        if (!isRenderQueueToBeProcessed(qId))
-            continue;
-
 
         bool repeatQueue = false;
         do // for repeating queues
@@ -2525,7 +2471,7 @@ void SceneManager::renderVisibleObjectsDefaultSequence(void)
     } // for each queue group
 
     firePostRenderQueues();
-
+*/
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderTextureShadowCasterQueueGroupObjects(
