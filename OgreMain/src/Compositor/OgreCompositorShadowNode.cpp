@@ -46,6 +46,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const Matrix4 PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE(
+        0.5,    0,    0,  0.5,
+        0,   -0.5,    0,  0.5,
+        0,      0,    1,    0,
+        0,      0,    0,    1);
+
     CompositorShadowNode::CompositorShadowNode( IdType id, const CompositorShadowNodeDef *definition,
                                                 CompositorWorkspace *workspace, RenderSystem *renderSys,
                                                 const RenderTarget *finalTarget ) :
@@ -560,6 +566,20 @@ namespace Ogre
 
         outMin = 0.0f;
         outMax = 100000.0f;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorShadowNode::getMinMaxDepthRange( size_t shadowMapIdx,
+                                                    Real &outMin, Real &outMax ) const
+    {
+        outMin = mShadowMapCameras[shadowMapIdx].minDistance;
+        outMax = mShadowMapCameras[shadowMapIdx].maxDistance;
+    }
+    //-----------------------------------------------------------------------------------
+    Matrix4 CompositorShadowNode::getViewProjectionMatrix( size_t shadowMapIdx ) const
+    {
+        return PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE *
+                mShadowMapCameras[shadowMapIdx].camera->getProjectionMatrixWithRSDepth() *
+                mShadowMapCameras[shadowMapIdx].camera->getViewMatrix();
     }
     //-----------------------------------------------------------------------------------
     const vector<Real>::type* CompositorShadowNode::getPssmSplits( size_t shadowMapIdx ) const

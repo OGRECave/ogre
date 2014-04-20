@@ -43,53 +43,53 @@ THE SOFTWARE.
 namespace Ogre
 {
     //Change per mesh (hash can be cached on the renderable)
-    const IdString HlmsPropertySkeleton             = IdString( "hlms_skeleton" );
-    const IdString HlmsPropertyBonesPerVertex       = IdString( "hlms_bones_per_vertex" );
-    const IdString HlmsPropertyPose                 = IdString( "hlms_pose" );
+    const IdString Hlms::HlmsPropertySkeleton           = IdString( "hlms_skeleton" );
+    const IdString Hlms::HlmsPropertyBonesPerVertex     = IdString( "hlms_bones_per_vertex" );
+    const IdString Hlms::HlmsPropertyPose               = IdString( "hlms_pose" );
 
-    const IdString HlmsPropertyNormal               = IdString( "hlms_normal" );
-    const IdString HlmsPropertyQTangent             = IdString( "hlms_qtangent" );
+    const IdString Hlms::HlmsPropertyNormal             = IdString( "hlms_normal" );
+    const IdString Hlms::HlmsPropertyQTangent           = IdString( "hlms_qtangent" );
 
-    const IdString HlmsPropertyUvCount              = IdString( "hlms_uv_count" );
-    const IdString HlmsPropertyUvCount0             = IdString( "hlms_uv_count0" );
-    const IdString HlmsPropertyUvCount1             = IdString( "hlms_uv_count1" );
-    const IdString HlmsPropertyUvCount2             = IdString( "hlms_uv_count2" );
-    const IdString HlmsPropertyUvCount3             = IdString( "hlms_uv_count3" );
-    const IdString HlmsPropertyUvCount4             = IdString( "hlms_uv_count4" );
-    const IdString HlmsPropertyUvCount5             = IdString( "hlms_uv_count5" );
-    const IdString HlmsPropertyUvCount6             = IdString( "hlms_uv_count6" );
-    const IdString HlmsPropertyUvCount7             = IdString( "hlms_uv_count7" );
+    const IdString Hlms::HlmsPropertyUvCount            = IdString( "hlms_uv_count" );
+    const IdString Hlms::HlmsPropertyUvCount0           = IdString( "hlms_uv_count0" );
+    const IdString Hlms::HlmsPropertyUvCount1           = IdString( "hlms_uv_count1" );
+    const IdString Hlms::HlmsPropertyUvCount2           = IdString( "hlms_uv_count2" );
+    const IdString Hlms::HlmsPropertyUvCount3           = IdString( "hlms_uv_count3" );
+    const IdString Hlms::HlmsPropertyUvCount4           = IdString( "hlms_uv_count4" );
+    const IdString Hlms::HlmsPropertyUvCount5           = IdString( "hlms_uv_count5" );
+    const IdString Hlms::HlmsPropertyUvCount6           = IdString( "hlms_uv_count6" );
+    const IdString Hlms::HlmsPropertyUvCount7           = IdString( "hlms_uv_count7" );
 
     //Change per frame (grouped together with scene pass)
-    const IdString HlmsPropertyLightsDirectional    = IdString( "hlms_lights_directional" );
-    const IdString HlmsPropertyLightsPoint          = IdString( "hlms_lights_point" );
-    const IdString HlmsPropertyLightsSpot           = IdString( "hlms_lights_spot" );
-    const IdString HlmsPropertyLightsAttenuation    = IdString( "hlms_lights_attenuation" );
-    const IdString HlmsPropertyLightsSpotParams     = IdString( "hlms_lights_spotparams" );
+    const IdString Hlms::HlmsPropertyLightsDirectional  = IdString( "hlms_lights_directional" );
+    const IdString Hlms::HlmsPropertyLightsPoint        = IdString( "hlms_lights_point" );
+    const IdString Hlms::HlmsPropertyLightsSpot         = IdString( "hlms_lights_spot" );
+    const IdString Hlms::HlmsPropertyLightsAttenuation  = IdString( "hlms_lights_attenuation" );
+    const IdString Hlms::HlmsPropertyLightsSpotParams   = IdString( "hlms_lights_spotparams" );
 
     //Change per scene pass
-    const IdString HlmsPropertyDualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
-    const IdString HlmsPropertyNumShadowMaps        = IdString( "hlms_num_shadow_maps" );
-    const IdString HlmsPropertyPssmSplits           = IdString( "hlms_pssm_splits" );
-    const IdString HlmsPropertyShadowCaster         = IdString( "hlms_shadowcaster" );
+    const IdString Hlms::HlmsPropertyDualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
+    const IdString Hlms::HlmsPropertyNumShadowMaps      = IdString( "hlms_num_shadow_maps" );
+    const IdString Hlms::HlmsPropertyPssmSplits         = IdString( "hlms_pssm_splits" );
+    const IdString Hlms::HlmsPropertyShadowCaster       = IdString( "hlms_shadowcaster" );
 
     //Change per material (hash can be cached on the renderable)
-    const IdString PropertyDiffuseMap   = IdString( "diffuse_map" );
-    const IdString PropertyNormalMap    = IdString( "normal_map" );
-    const IdString PropertySpecularMap  = IdString( "specular_map" );
-    const IdString PropertyEnvProbeMap  = IdString( "envprobe_map" );
-    const IdString PropertyAlphaTest    = IdString( "alpha_test" );
+    const IdString Hlms::PropertyDiffuseMap   = IdString( "diffuse_map" );
+    const IdString Hlms::PropertyNormalMap    = IdString( "normal_map" );
+    const IdString Hlms::PropertySpecularMap  = IdString( "specular_map" );
+    const IdString Hlms::PropertyEnvProbeMap  = IdString( "envprobe_map" );
+    const IdString Hlms::PropertyAlphaTest    = IdString( "alpha_test" );
 
     const IdString *UvCountPtrs[8] =
     {
-        &HlmsPropertyUvCount0,
-        &HlmsPropertyUvCount1,
-        &HlmsPropertyUvCount2,
-        &HlmsPropertyUvCount3,
-        &HlmsPropertyUvCount4,
-        &HlmsPropertyUvCount5,
-        &HlmsPropertyUvCount6,
-        &HlmsPropertyUvCount7
+        &Hlms::HlmsPropertyUvCount0,
+        &Hlms::HlmsPropertyUvCount1,
+        &Hlms::HlmsPropertyUvCount2,
+        &Hlms::HlmsPropertyUvCount3,
+        &Hlms::HlmsPropertyUvCount4,
+        &Hlms::HlmsPropertyUvCount5,
+        &Hlms::HlmsPropertyUvCount6,
+        &Hlms::HlmsPropertyUvCount7
     };
 
     const String ShaderFiles[] = { "VertexShader_vs", "PixelShader_ps", "GeometryShader_gs",

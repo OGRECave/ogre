@@ -48,8 +48,24 @@ namespace Ogre
     */
     class _OgreExport HlmsPbsEs2 : public Hlms
     {
+        struct PassData
+        {
+            FastArray<float>    vertexShaderSharedBuffer;
+            FastArray<float>    pixelShaderSharedBuffer;
+
+            Matrix4 viewProjMatrix;
+            Matrix4 viewMatrix;
+        };
+
+        PassData    mPreparedPass;
+
     public:
         HlmsPbsEs2();
+        ~HlmsPbsEs2();
+
+        virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
+                                           bool casterPass, bool dualParaboloid,
+                                           SceneManager *sceneManager );
 
         virtual void fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                      bool casterPass );

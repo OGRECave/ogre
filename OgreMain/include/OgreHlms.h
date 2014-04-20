@@ -43,6 +43,7 @@ namespace Ogre
     /** \addtogroup Resources
     *  @{
     */
+
     /** HLMS stands for "High Level Material System". */
     class _OgreExport Hlms : public PassAlloc
     {
@@ -216,6 +217,43 @@ namespace Ogre
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
+
+        static const IdString HlmsPropertySkeleton;
+        static const IdString HlmsPropertyBonesPerVertex;
+        static const IdString HlmsPropertyPose;
+
+        static const IdString HlmsPropertyNormal;
+        static const IdString HlmsPropertyQTangent;
+
+        static const IdString HlmsPropertyUvCount;
+        static const IdString HlmsPropertyUvCount0;
+        static const IdString HlmsPropertyUvCount1;
+        static const IdString HlmsPropertyUvCount2;
+        static const IdString HlmsPropertyUvCount3;
+        static const IdString HlmsPropertyUvCount4;
+        static const IdString HlmsPropertyUvCount5;
+        static const IdString HlmsPropertyUvCount6;
+        static const IdString HlmsPropertyUvCount7;
+
+        //Change per frame (grouped together with scene pass)
+        static const IdString HlmsPropertyLightsDirectional;
+        static const IdString HlmsPropertyLightsPoint;
+        static const IdString HlmsPropertyLightsSpot;
+        static const IdString HlmsPropertyLightsAttenuation;
+        static const IdString HlmsPropertyLightsSpotParams;
+
+        //Change per scene pass
+        static const IdString HlmsPropertyDualParaboloidMapping;
+        static const IdString HlmsPropertyNumShadowMaps;
+        static const IdString HlmsPropertyPssmSplits;
+        static const IdString HlmsPropertyShadowCaster;
+
+        //Change per material (hash can be cached on the renderable)
+        static const IdString PropertyDiffuseMap;
+        static const IdString PropertyNormalMap;
+        static const IdString PropertySpecularMap;
+        static const IdString PropertyEnvProbeMap;
+        static const IdString PropertyAlphaTest;
     };
     /** @} */
     /** @} */

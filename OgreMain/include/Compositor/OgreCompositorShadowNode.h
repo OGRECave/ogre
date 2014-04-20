@@ -179,9 +179,13 @@ namespace Ogre
 
         /** Outputs the min & max depth range for the given camera. 0 & 100000 if camera not found
         @remarks
-            Performs linear search O(N)
+            Performs linear search O(N), except the overload that provides a shadowMapIdx
         */
         void getMinMaxDepthRange( const Frustum *shadowMapCamera, Real &outMin, Real &outMax ) const;
+        void getMinMaxDepthRange( size_t shadowMapIdx, Real &outMin, Real &outMax ) const;
+
+        /// Returns the texture view projection matrix for the given shadow map index
+        Matrix4 getViewProjectionMatrix( size_t shadowMapIdx ) const;
 
         /** Returns a list of points with the limits of each PSSM split in projection space
             for the given shadow map index.

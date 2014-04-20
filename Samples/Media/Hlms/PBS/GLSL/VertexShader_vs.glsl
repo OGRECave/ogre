@@ -17,18 +17,9 @@ out vec3 psNormal;
 
 @property( hlms_skeleton )
 in vec4 blendIndices;
-in vec4 blendWeights;
-
-uniform mat4x3 worldMat[60];
-@end
+in vec4 blendWeights;@end
 
 @property( hlms_shadowcaster || hlms_pssm_splits )out float psDepth;@end
-@property( hlms_shadowcaster )uniform vec4 depthRange;
-uniform float shadowConstantBias;
-@end
-
-uniform mat4 worldViewProj;
-uniform mat4 worldView;
 
 @foreach( hlms_uv_count, n )
 in vec@value( hlms_uv_count@n ) uv@n;@end
@@ -37,9 +28,19 @@ out vec@value( hlms_uv_count@n ) psUv@n;@end
 
 @foreach( hlms_num_shadow_maps, n )
 out vec4 psPosL@n;@end
+
+// START UNIFORM DECLARATION
 @property( hlms_num_shadow_maps )
+//Uniforms that change per pass
 uniform mat4 texWorldViewProj[@value(hlms_num_shadow_maps)];
 uniform vec4 shadowDepthRange[@value(hlms_num_shadow_maps)];@end
+@property( hlms_shadowcaster )uniform vec4 depthRange;@end
+//Uniforms that change per entity
+@property( hlms_shadowcaster )uniform float shadowConstantBias;@end
+@property( hlms_skeleton )uniform mat4x3 worldMat[60];@end
+@property( !hlms_shadowcaster )uniform mat4 worldView;@end
+uniform mat4 worldViewProj;
+// END UNIFORM DECLARATION
 
 @property( !hlms_skeleton )
 @piece( local_vertex )vertex@end

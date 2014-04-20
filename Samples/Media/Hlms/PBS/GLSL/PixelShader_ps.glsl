@@ -19,29 +19,33 @@ in vec@value( hlms_uv_count@n ) psUv@n;@end
 @foreach( hlms_num_shadow_maps, n )
 in vec4 psPosL@n;@end
 
+// START UNIFORM DECLARATION
+//Uniforms that change per pass
+@property( hlms_num_shadow_maps )uniform vec2 invShadowMapSize[@value(hlms_num_shadow_maps)];
+uniform float pssmSplitPoints[@value(hlms_pssm_splits)];@end
 @property( hlms_lights_spot )uniform vec4 lightPosition[@value(hlms_lights_spot)];
 uniform vec3 lightDiffuse[@value(hlms_lights_spot)];
 uniform vec3 lightSpecular[@value(hlms_lights_spot)];
 @property(hlms_lights_attenuation)uniform vec3 attenuation[@value(hlms_lights_attenuation)];@end
 @property(hlms_lights_spotparams)uniform vec3 spotDirection[@value(hlms_lights_spotparams)];
 uniform vec3 spotParams[@value(hlms_lights_spotparams)];@end
+@property( envprobe_map )uniform mat3 invViewMat; //This uniform depends on each renderable, but is the same for every pass@end
 @end
 
-@property( hlms_fresnel_scalar )@piece( FresnelType )vec3@end@end
-@property( !hlms_fresnel_scalar ) @piece( FresnelType )float@end @end
-@property( !specular_map )#define ROUGHNESS roughness@end
-
+//Uniforms that change per entity
 uniform float roughness;
-
 /* kD is already divided by PI to make it energy conserving.
-  (forumla is finalDiffuse = NdotL * surfaceDiffuse / PI)
+  (formula is finalDiffuse = NdotL * surfaceDiffuse / PI)
 */
 uniform vec3 kD;
 uniform vec3 kS;
-
+@property( hlms_fresnel_scalar )@piece( FresnelType )vec3@end@end
+@property( !hlms_fresnel_scalar ) @piece( FresnelType )float@end @end
 //Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 uniform @insertpiece( FresnelType ) F0;
+// END UNIFORM DECLARATION
 
+@property( !specular_map )#define ROUGHNESS roughness@end
 @property( diffuse_map )uniform sampler2DArray	texDiffuseMap;@end
 @property( normal_map )uniform sampler2DArray	texNormalMap;@end
 @property( specular_map )uniform sampler2DArray	texSpecularMap;@end
@@ -61,8 +65,6 @@ float ROUGHNESS;
 @property( hlms_num_shadow_maps )
 @property( hlms_shadow_usues_depth_texture )#define SAMPLER2DSHADOW sampler2DShadow@end
 @property( !hlms_shadow_usues_depth_texture )#define SAMPLER2DSHADOW sampler2D@end
-uniform vec2 invShadowMapSize[@value(hlms_num_shadow_maps)];
-uniform float pssmSplitPoints[@value(hlms_pssm_splits)];
 uniform SAMPLER2DSHADOW texShadowMap[@value(hlms_num_shadow_maps)];
 
 float getShadow( SAMPLER2DSHADOW shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
@@ -236,7 +238,7 @@ void main()
 
 @property( envprobe_map )
 	vec3 reflDir = 2.0f * dot( viewDir, nNormal ) * nNormal - viewDir;
-	vec3 envColour = textureLod( texEnvProbeMap, reflDir, ROUGHNESS * 12.0f ).xyz;
+	vec3 envColour = textureLod( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0f ).xyz;
 	envColour = envColour * envColour; //TODO: Cubemap Gamma correction broken in GL3+
 	finalColour += cookTorrance( reflDir, viewDir, NdotV, vec3( 0 ), vec3( envColour ) * (ROUGHNESS * ROUGHNESS) );@end
 
