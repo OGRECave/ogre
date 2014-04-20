@@ -58,7 +58,8 @@ namespace Ogre
         mIsOpaque( true ),
         mMacroblock( macroblock ),
         mBlendblock( blendblock ),
-        mOriginalParams( params )
+        mOriginalParams( params ),
+        mShadowConstantBias( 0.01f )
     {
     }
     //-----------------------------------------------------------------------------------

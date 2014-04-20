@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsPbsEs2.h"
+#include "OgreHlmsDatablock.h"
 
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
@@ -236,7 +237,17 @@ namespace Ogre
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
         float *psUniformBuffer = psParams->getFloatPointer( 0 );
 
+        //Sizes can't be equal (we also add more data)
+        assert( mPreparedPass.vertexShaderSharedBuffer.size() <
+                vpParams->getFloatConstantList().size() );
+        assert( mPreparedPass.pixelShaderSharedBuffer.size() <
+                psParams->getFloatConstantList().size() );
+
         //TODO: Check from Hash if we changed HlmsType, if so, rebind the textures.
+
+        assert( dynamic_cast<HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
+        HlmsPbsEs2Datablock *datablock = static_cast<HlmsPbsEs2Datablock*>(
+                                            queuedRenderable.renderable->getDatablock() );
 
         bool shadersChanged = true;
         if( shadersChanged )
@@ -251,18 +262,33 @@ namespace Ogre
         }
 
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
+
+        //---------------------------------------------------------------------------
+        //                          ---- VERTEX SHADER ----
+        //---------------------------------------------------------------------------
 #if !OGRE_DOUBLE_PRECISION
-        //mat4 mat4 worldView
+        //mat4 worldView
         Matrix4 tmp = mPreparedPass.viewMatrix * worldMat;
         memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
         vsUniformBuffer += 16;
-        //worldViewProj
+        //mat4 worldViewProj
         tmp = mPreparedPass.viewProjMatrix * worldMat;
         memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
         vsUniformBuffer += 16;
 #else
     #error Not Coded Yet! (can't use memcpy on Matrix4)
 #endif
+        if( casterPass )
+            *vsUniformBuffer++ = datablock->mShadowConstantBias;
+
+        //---------------------------------------------------------------------------
+        //                          ---- PIXEL SHADER ----
+        //---------------------------------------------------------------------------
+        memcpy( psUniformBuffer, &datablock->mRoughness, 7 * sizeof(float) + datablock->mFresnelTypeSize );
+        psUniformBuffer += 7 * sizeof(float) + datablock->mFresnelTypeSize;
+
+        //if( datablock->mTextureHash )
+
         //queuedRenderable.renderable->getWorldTransforms();
         //vsUniformBuffer = queuedRenderable;
 

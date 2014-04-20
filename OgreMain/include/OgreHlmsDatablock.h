@@ -102,6 +102,8 @@ namespace Ogre
         HlmsBlendblock const *mBlendblock;
         HlmsParamVec mOriginalParams;
 
+        float   mShadowConstantBias;
+
         HlmsDatablock( HlmsTypes type,
                        const HlmsMacroblock *macroblock, uint8 macroblockId,
                        const HlmsBlendblock *blendblock, uint8 blendblockId,
@@ -115,6 +117,7 @@ namespace Ogre
     class _OgreExport HlmsPbsEs2Datablock : public HlmsDatablock
     {
     public:
+        uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
         float   mRoughness;
         float   mkDr, mkDg, mkDb;                   //kD
         float   mkSr, mkSg, mkSb;                   //kS

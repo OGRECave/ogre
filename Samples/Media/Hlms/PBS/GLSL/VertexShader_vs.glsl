@@ -36,10 +36,10 @@ uniform mat4 texWorldViewProj[@value(hlms_num_shadow_maps)];
 uniform vec4 shadowDepthRange[@value(hlms_num_shadow_maps)];@end
 @property( hlms_shadowcaster )uniform vec4 depthRange;@end
 //Uniforms that change per entity
-@property( hlms_shadowcaster )uniform float shadowConstantBias;@end
 @property( hlms_skeleton )uniform mat4x3 worldMat[60];@end
 @property( !hlms_shadowcaster )uniform mat4 worldView;@end
 uniform mat4 worldViewProj;
+@property( hlms_shadowcaster )uniform float shadowConstantBias;@end
 // END UNIFORM DECLARATION
 
 @property( !hlms_skeleton )
