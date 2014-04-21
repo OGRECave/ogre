@@ -96,7 +96,10 @@ namespace Ogre
                                    "HullShader_hs", "DomainShader_ds" };
     const String PieceFilePatterns[] = { "piece_vs", "piece_ps", "piece_gs", "piece_hs", "piece_ds" };
 
-    Hlms::Hlms( HlmsTypes type, Archive *dataFolder ) : mDataFolder( dataFolder ), mType( type )
+    Hlms::Hlms( HlmsTypes type, Archive *dataFolder ) :
+        mDataFolder( dataFolder ),
+        mType( type ),
+        mRenderSystem( 0 )
     {
         enumeratePieceFiles();
     }
@@ -929,7 +932,7 @@ namespace Ogre
                                            GpuProgramPtr &tesselationDomainShader,
                                            GpuProgramPtr &pixelShader )
     {
-        HlmsCache cache( hash );
+        HlmsCache cache( hash, mType );
         HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
                                                       cache, OrderCacheByHash );
 
@@ -947,7 +950,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::getShaderCache( uint32 hash ) const
     {
-        HlmsCache cache( hash );
+        HlmsCache cache( hash, mType );
         HlmsCacheVec::const_iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
                                                             cache, OrderCacheByHash );
 
@@ -1240,7 +1243,7 @@ namespace Ogre
                 (getProperty( HlmsPropertyLightsSpot )              << 16)|
                 (getProperty( HlmsPropertyShadowCaster )            << 20);
 
-        HlmsCache retVal( hash );
+        HlmsCache retVal( hash, mType );
         retVal.setProperties = mSetProperties;
 
         return retVal;

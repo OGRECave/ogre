@@ -223,13 +223,14 @@ namespace Ogre
         float *texBufferPtr; //TODO
         HlmsCache *passCache; //TODO
 
-        HlmsCache dummy( 0 );
+        HlmsCache dummy( 0, HLMS_MAX );
 
         HlmsMacroblock const *lastMacroblock = 0;
         HlmsBlendblock const *lastBlendblock = 0;
         VertexData const *lastVertexData = 0;
         IndexData const *lastIndexData = 0;
         HlmsCache const *lastHlmsCache = &dummy;
+        uint32 lastTextureHash = 0;
         //uint32 lastVertexDataId = ~0;
 
         for( size_t i=firstRq; i<lastRq; ++i )
@@ -281,12 +282,13 @@ namespace Ogre
                                                                 queuedRenderable,
                                                                 casterPass );
                 if( lastHlmsCache != hlmsCache )
-                {
                     rs->_setProgramsFromHlms( hlmsCache );
-                    lastHlmsCache = hlmsCache;
-                }
 
-                hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass );
+                hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                      lastHlmsCache, lastTextureHash );
+
+                lastHlmsCache   = hlmsCache;
+                lastTextureHash = datablock->mTextureHash;
                 /*GpuProgramParametersSharedPtr vpParams = hlmsCache->vertexShader->getDefaultParameters();
                 GpuProgramParametersSharedPtr psParams = hlmsCache->pixelShader->getDefaultParameters();
 

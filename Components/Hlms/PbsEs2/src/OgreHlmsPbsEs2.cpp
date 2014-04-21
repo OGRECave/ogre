@@ -39,7 +39,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    HlmsPbsEs2::HlmsPbsEs2() : Hlms( mType, 0 )
+    HlmsPbsEs2::HlmsPbsEs2() : Hlms( HLMS_PBS, 0 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ namespace Ogre
 
             Matrix3 viewMatrix3, invViewMatrix3;
             viewMatrix.extract3x3Matrix( viewMatrix3 );
-            invViewMatrix3 = viewMatrix3.inverse();
+            invViewMatrix3 = viewMatrix3.Inverse();
 
             //vec2 invShadowMapSize
             for( int32 i=0; i<numShadowMaps; ++i )
@@ -112,7 +112,7 @@ namespace Ogre
             }
             //float pssmSplitPoints
             for( int32 i=0; i<numPssmSplits; ++i )
-                mPreparedPass.pixelShaderSharedBuffer.push_back( shadowNode->getPssmSplits(0)[i] );
+                mPreparedPass.pixelShaderSharedBuffer.push_back( (*shadowNode->getPssmSplits(0))[i] );
 
             if( shadowNode )
             {
@@ -230,7 +230,8 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsEs2::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass )
+                                     bool casterPass, const HlmsCache *lastCache,
+                                     uint32 lastTextureHash )
     {
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
@@ -243,15 +244,20 @@ namespace Ogre
         assert( mPreparedPass.pixelShaderSharedBuffer.size() <
                 psParams->getFloatConstantList().size() );
 
-        //TODO: Check from Hash if we changed HlmsType, if so, rebind the textures.
-
-        assert( dynamic_cast<HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
-        HlmsPbsEs2Datablock *datablock = static_cast<HlmsPbsEs2Datablock*>(
-                                            queuedRenderable.renderable->getDatablock() );
-
-        bool shadersChanged = true;
-        if( shadersChanged )
+        if( !lastCache || lastCache->type != HLMS_PBS )
         {
+            //We changed HlmsType, rebind the shared textures.
+            //TODO
+        }
+
+        assert( dynamic_cast<const HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
+        const HlmsPbsEs2Datablock *datablock = static_cast<const HlmsPbsEs2Datablock*>(
+                                                queuedRenderable.renderable->getDatablock() );
+
+        uint16 variabilityMask = GPV_GLOBAL;
+        if( cache != lastCache )
+        {
+            variabilityMask = GPV_ALL;
             memcpy( vsUniformBuffer, mPreparedPass.vertexShaderSharedBuffer.begin(),
                     sizeof(float) * mPreparedPass.vertexShaderSharedBuffer.size() );
             vsUniformBuffer += mPreparedPass.vertexShaderSharedBuffer.size();
@@ -284,14 +290,20 @@ namespace Ogre
         //---------------------------------------------------------------------------
         //                          ---- PIXEL SHADER ----
         //---------------------------------------------------------------------------
-        memcpy( psUniformBuffer, &datablock->mRoughness, 7 * sizeof(float) + datablock->mFresnelTypeSize );
-        psUniformBuffer += 7 * sizeof(float) + datablock->mFresnelTypeSize;
+        memcpy( psUniformBuffer, &datablock->mRoughness,
+                7 * sizeof(float) + datablock->mFresnelTypeSizeBytes );
+        psUniformBuffer += 7 * sizeof(float) + datablock->mFresnelTypeSizeBytes;
 
-        //if( datablock->mTextureHash )
+        if( datablock->mTextureHash != lastTextureHash )
+        {
+            //Rebind textures
+            //TODO
+        }
 
-        //queuedRenderable.renderable->getWorldTransforms();
-        //vsUniformBuffer = queuedRenderable;
+        assert( vsUniformBuffer - vpParams->getFloatPointer( 0 ) == vpParams->getFloatConstantList().size() );
+        assert( psUniformBuffer - psParams->getFloatPointer( 0 ) == psParams->getFloatConstantList().size() );
 
-        //vsUniformBuffer worldViewProj
+        mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, variabilityMask );
+        mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
     }
 }

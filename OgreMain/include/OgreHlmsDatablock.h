@@ -94,8 +94,8 @@ namespace Ogre
     class _OgreExport HlmsDatablock : public PassAlloc
     {
     public:
+        uint32  mTextureHash;           //TextureHash comes before macroblock for alignment reasons
         uint16  mMacroblockHash;        //Not all bits are used
-        uint16  mTextureHash;
         uint8   mType;      /// @See HlmsTypes
         bool    mIsOpaque;  /// Cached based on mBlendblock data
         HlmsMacroblock const *mMacroblock;

@@ -157,6 +157,7 @@ namespace Ogre
     {
         uint32          hash;
         HlmsPropertyVec setProperties;
+        HlmsTypes       type;
 
         GpuProgramPtr   vertexShader;
         GpuProgramPtr   geometryShader;
@@ -164,7 +165,7 @@ namespace Ogre
         GpuProgramPtr   tesselationDomainShader;
         GpuProgramPtr   pixelShader;
 
-        HlmsCache( uint32 _hash ) : hash( _hash ) {}
+        HlmsCache( uint32 _hash, HlmsTypes _type ) : hash( _hash ), type( _type ) {}
     };
 
     typedef vector<HlmsCache>::type HlmsCacheVec;

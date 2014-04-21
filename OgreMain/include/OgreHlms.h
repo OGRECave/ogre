@@ -71,6 +71,8 @@ namespace Ogre
         StringVector     mPieceFiles[5];
         //HlmsManager     *mHlmsManager;
 
+        RenderSystem    *mRenderSystem;
+
         HlmsTypes       mType;
 
         /** Inserts common properties about the current Renderable,
@@ -213,7 +215,8 @@ namespace Ogre
                                       const QueuedRenderable &queuedRenderable, bool casterPass );
 
         virtual void fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass ) = 0;
+                                     bool casterPass, const HlmsCache *lastCache,
+                                     uint32 lastTextureHash ) = 0;
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
