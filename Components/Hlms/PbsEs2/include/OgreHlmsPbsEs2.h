@@ -50,6 +50,7 @@ namespace Ogre
     {
         struct PassData
         {
+            FastArray<TexturePtr>   shadowMaps;
             FastArray<float>    vertexShaderSharedBuffer;
             FastArray<float>    pixelShaderSharedBuffer;
 
@@ -58,6 +59,10 @@ namespace Ogre
         };
 
         PassData    mPreparedPass;
+
+        virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
+                                                         const HlmsCache &passCache,
+                                                         uint32 finalHash );
 
     public:
         HlmsPbsEs2();

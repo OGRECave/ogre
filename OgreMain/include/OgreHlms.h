@@ -153,8 +153,9 @@ namespace Ogre
                                          GpuProgramPtr &tesselationDomainShader,
                                          GpuProgramPtr &pixelShader );
         const HlmsCache* getShaderCache( uint32 hash ) const;
-        const HlmsCache* createShaderCacheEntry( uint32 renderableHash, const HlmsCache &passCache,
-                                                 uint32 finalHash );
+        virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
+                                                         const HlmsCache &passCache,
+                                                         uint32 finalHash );
 
     public:
         Hlms( HlmsTypes type, Archive *dataFolder );

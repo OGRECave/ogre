@@ -39,12 +39,55 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const String c_vsPerObjectUniforms[] =
+    {
+        "worldView",
+        "worldViewProj"
+    };
+    const String c_psPerObjectUniforms[] =
+    {
+        "roughness",
+        "kD",
+        "kS",
+        "F0"
+    };
+
     HlmsPbsEs2::HlmsPbsEs2() : Hlms( HLMS_PBS, 0 )
     {
     }
     //-----------------------------------------------------------------------------------
     HlmsPbsEs2::~HlmsPbsEs2()
     {
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsCache* HlmsPbsEs2::createShaderCacheEntry( uint32 renderableHash,
+                                                         const HlmsCache &passCache,
+                                                         uint32 finalHash )
+    {
+        const HlmsCache *retVal = Hlms::createShaderCacheEntry( renderableHash, passCache, finalHash );
+
+        GpuNamedConstants *constantsDef;
+        //Nasty const_cast, but the refactor required to remove this is 100x nastier.
+        constantsDef = const_cast<GpuNamedConstants*>( &retVal->vertexShader->getConstantDefinitions() );
+        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String* ); ++i )
+        {
+            GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_vsPerObjectUniforms[i] );
+            if( it != constantsDef->map.end() )
+                it->second.variability = GPV_PER_OBJECT;
+        }
+
+        //Nasty const_cast, but the refactor required to remove this is 100x nastier.
+        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pixelShader->getConstantDefinitions() );
+        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String* ); ++i )
+        {
+            GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_psPerObjectUniforms[i] );
+            if( it != constantsDef->map.end() )
+                it->second.variability = GPV_PER_OBJECT;
+        }
+
+        //TODO: Set samplers.
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbsEs2::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
@@ -212,6 +255,10 @@ namespace Ogre
             //mat3 invViewMat
             for( size_t i=0; i<9; ++i )
                 mPreparedPass.pixelShaderSharedBuffer.push_back( (float)invViewMatrix3[0][i] );
+
+            mPreparedPass.shadowMaps.reserve( numShadowMaps );
+            for( int32 i=0; i<numShadowMaps; ++i )
+                mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
         }
         else
         {
@@ -233,6 +280,7 @@ namespace Ogre
                                      bool casterPass, const HlmsCache *lastCache,
                                      uint32 lastTextureHash )
     {
+        //cache->vertexShader->getConstantDefinitions().map;
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
@@ -247,14 +295,23 @@ namespace Ogre
         if( !lastCache || lastCache->type != HLMS_PBS )
         {
             //We changed HlmsType, rebind the shared textures.
-            //TODO
+            FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
+            FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
+
+            size_t texUnit = 0;
+            while( itor != end )
+            {
+                mRenderSystem->_setTexture( texUnit, true, *itor );
+                ++texUnit;
+                ++itor;
+            }
         }
 
         assert( dynamic_cast<const HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsEs2Datablock *datablock = static_cast<const HlmsPbsEs2Datablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
-        uint16 variabilityMask = GPV_GLOBAL;
+        uint16 variabilityMask = GPV_PER_OBJECT;
         if( cache != lastCache )
         {
             variabilityMask = GPV_ALL;
@@ -262,9 +319,13 @@ namespace Ogre
                     sizeof(float) * mPreparedPass.vertexShaderSharedBuffer.size() );
             vsUniformBuffer += mPreparedPass.vertexShaderSharedBuffer.size();
 
+            assert( !datablock->mReflectionTex.isNull() == getProperty( PropertyEnvProbeMap ) );
+
+            size_t psBufferElements = mPreparedPass.pixelShaderSharedBuffer.size() -
+                                        (datablock->mReflectionTex.isNull() ? 9 : 0);
             memcpy( psUniformBuffer, mPreparedPass.pixelShaderSharedBuffer.begin(),
-                    sizeof(float) * mPreparedPass.pixelShaderSharedBuffer.size() );
-            psUniformBuffer += mPreparedPass.pixelShaderSharedBuffer.size();
+                    sizeof(float) * psBufferElements );
+            psUniformBuffer += psBufferElements;
         }
 
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
@@ -297,7 +358,17 @@ namespace Ogre
         if( datablock->mTextureHash != lastTextureHash )
         {
             //Rebind textures
-            //TODO
+            size_t texUnit = mPreparedPass.shadowMaps.size();
+            mRenderSystem->_setTexture( texUnit, !datablock->mDiffuseTex.isNull(), datablock->mDiffuseTex );
+            texUnit += !datablock->mDiffuseTex.isNull();
+            mRenderSystem->_setTexture( texUnit, !datablock->mNormalmapTex.isNull(), datablock->mNormalmapTex );
+            texUnit += !datablock->mNormalmapTex.isNull();
+            mRenderSystem->_setTexture( texUnit, !datablock->mSpecularTex.isNull(), datablock->mSpecularTex );
+            texUnit += !datablock->mSpecularTex.isNull();
+            mRenderSystem->_setTexture( texUnit, !datablock->mReflectionTex.isNull(), datablock->mReflectionTex );
+            texUnit += !datablock->mReflectionTex.isNull();
+
+            mRenderSystem->_disableTextureUnitsFrom( texUnit );
         }
 
         assert( vsUniformBuffer - vpParams->getFloatPointer( 0 ) == vpParams->getFloatConstantList().size() );
