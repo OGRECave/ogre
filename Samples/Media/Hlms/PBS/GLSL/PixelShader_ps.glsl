@@ -124,8 +124,8 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 {
 	vec3 halfWay= normalize( lightDir + viewDir );
 	float NdotL = clamp( dot( nNormal, lightDir ), 0.0f, 1.0f );
-	float NdotH = dot( nNormal, halfWay ); //There is no need to saturate
-	float VdotH = clamp( dot( viewDir, halfWay ), 0.0f, 1.0f );
+	float NdotH = clamp( dot( nNormal, halfWay ), 0.0f, 1.0f );
+	float VdotH = clamp( dot( viewDir, halfWay ), 0.001f, 1.0f );
 
 	float sqR = ROUGHNESS * ROUGHNESS;
 
@@ -139,7 +139,8 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 	float roughness_b = NdotH_sq - 1.0f;	//( cos(alpha)^2 - 1 )
 	float roughness_c = sqR * NdotH_sq;		//( m^2 cos(alpha)^2 )
 
-	float R = roughness_a * exp( roughness_b / roughness_c );
+	//Avoid Inf * 0 = NaN; we need Inf * 0 = 0
+	float R = min( roughness_a, 65504.0f ) * exp( roughness_b / roughness_c );
 
 	//Geometric term
 	float shared_geo = 2.0f * NdotH / VdotH;
@@ -154,7 +155,8 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 	@insertpiece( FresnelType ) fresnelS = F0 + pow( 1.0f - VdotH, 5.0f ) * (1.0f - F0);
 	@insertpiece( FresnelType ) fresnelD = 1.0f - F0 + pow( 1.0f - NdotL, 5.0f ) * F0;
 
-	@insertpiece( FresnelType ) Rs = ( fresnelS * R * G  ) / (4.0f * NdotV * NdotL);
+	//Avoid very small denominators, they go to NaN or cause aliasing artifacts
+	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0f * NdotV * NdotL, 0.01f );
 
 	return NdotL * (kS * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
 					kD * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
@@ -240,7 +242,7 @@ void main()
 	vec3 reflDir = 2.0f * dot( viewDir, nNormal ) * nNormal - viewDir;
 	vec3 envColour = textureLod( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0f ).xyz;
 	envColour = envColour * envColour; //TODO: Cubemap Gamma correction broken in GL3+
-	finalColour += cookTorrance( reflDir, viewDir, NdotV, vec3( 0 ), vec3( envColour ) * (ROUGHNESS * ROUGHNESS) );@end
+	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS) );@end
 
 	outColour.xyz	= finalColour;
 	outColour.w		= 1.0f;
