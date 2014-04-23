@@ -153,9 +153,28 @@ namespace Ogre
                                          GpuProgramPtr &tesselationDomainShader,
                                          GpuProgramPtr &pixelShader );
         const HlmsCache* getShaderCache( uint32 hash ) const;
+
+        /** Creates a shader based on input parameters. Caller is responsible for ensuring
+            this shader hasn't already been created.
+            Shader template files will be processed and then compiled.
+        @param renderableHash
+            The hash calculated in from @calculateHashFor that lives in @Renderable
+        @param passCache
+            The return value of @preparePassHash
+        @param finalHash
+            A hash calculated on the pass' & renderable' hash. Must be unique. Caller is
+            responsible for ensuring this hash stays unique.
+        @param queuedRenderable
+            The renderable who owns the renderableHash. Not used by the base class, but
+            derived implementations may overload this function and take advantage of
+            some of the direct access it provides.
+        @return
+            The newly created shader.
+        */
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
-                                                         uint32 finalHash );
+                                                         uint32 finalHash,
+                                                         const QueuedRenderable &queuedRenderable );
 
     public:
         Hlms( HlmsTypes type, Archive *dataFolder );

@@ -961,7 +961,8 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::createShaderCacheEntry( uint32 renderableHash, const HlmsCache &passCache,
-                                                   uint32 finalHash )
+                                                   uint32 finalHash,
+                                                   const QueuedRenderable &queuedRenderable )
     {
         //Set the properties by merging the cache from the pass, with the cache from renderable
         mSetProperties.clear();
@@ -1267,7 +1268,10 @@ namespace Ogre
             lastReturnedValue = this->getShaderCache( finalHash );
 
             if( !lastReturnedValue )
-                lastReturnedValue = createShaderCacheEntry( hash[0], passCache, finalHash );
+            {
+                lastReturnedValue = createShaderCacheEntry( hash[0], passCache, finalHash,
+                                                            queuedRenderable );
+            }
         }
 
         return lastReturnedValue;

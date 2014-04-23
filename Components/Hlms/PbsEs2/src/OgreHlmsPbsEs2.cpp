@@ -62,9 +62,11 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     const HlmsCache* HlmsPbsEs2::createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
-                                                         uint32 finalHash )
+                                                         uint32 finalHash,
+                                                         const QueuedRenderable &queuedRenderable )
     {
-        const HlmsCache *retVal = Hlms::createShaderCacheEntry( renderableHash, passCache, finalHash );
+        const HlmsCache *retVal = Hlms::createShaderCacheEntry( renderableHash, passCache, finalHash,
+                                                                queuedRenderable );
 
         GpuNamedConstants *constantsDef;
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
@@ -85,7 +87,30 @@ namespace Ogre
                 it->second.variability = GPV_PER_OBJECT;
         }
 
-        //TODO: Set samplers.
+        //Set samplers.
+        GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
+
+        uint texUnit = 0;
+        for( texUnit=0; texUnit<mPreparedPass.shadowMaps.size(); ++texUnit )
+            psParams->setNamedConstant( "texShadowMap", texUnit );
+
+        assert( dynamic_cast<const HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
+        const HlmsPbsEs2Datablock *datablock = static_cast<const HlmsPbsEs2Datablock*>(
+                                                    queuedRenderable.renderable->getDatablock() );
+
+        assert( !datablock->mDiffuseTex.isNull()    == getProperty( PropertyDiffuseMap ) );
+        assert( !datablock->mNormalmapTex.isNull()  == getProperty( PropertyNormalMap ) );
+        assert( !datablock->mSpecularTex.isNull()   == getProperty( PropertySpecularMap ) );
+        assert( !datablock->mReflectionTex.isNull() == getProperty( PropertyEnvProbeMap ) );
+
+        if( !datablock->mDiffuseTex.isNull() )
+            psParams->setNamedConstant( "texDiffuseMap", texUnit++ );
+        if( !datablock->mNormalmapTex.isNull() )
+            psParams->setNamedConstant( "texNormalMap", texUnit++ );
+        if( !datablock->mSpecularTex.isNull() )
+            psParams->setNamedConstant( "texSpecularMap", texUnit++ );
+        if( !datablock->mReflectionTex.isNull() )
+            psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
 
         return retVal;
     }
@@ -280,7 +305,6 @@ namespace Ogre
                                      bool casterPass, const HlmsCache *lastCache,
                                      uint32 lastTextureHash )
     {
-        //cache->vertexShader->getConstantDefinitions().map;
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
@@ -359,14 +383,14 @@ namespace Ogre
         {
             //Rebind textures
             size_t texUnit = mPreparedPass.shadowMaps.size();
-            mRenderSystem->_setTexture( texUnit, !datablock->mDiffuseTex.isNull(), datablock->mDiffuseTex );
-            texUnit += !datablock->mDiffuseTex.isNull();
-            mRenderSystem->_setTexture( texUnit, !datablock->mNormalmapTex.isNull(), datablock->mNormalmapTex );
-            texUnit += !datablock->mNormalmapTex.isNull();
-            mRenderSystem->_setTexture( texUnit, !datablock->mSpecularTex.isNull(), datablock->mSpecularTex );
-            texUnit += !datablock->mSpecularTex.isNull();
-            mRenderSystem->_setTexture( texUnit, !datablock->mReflectionTex.isNull(), datablock->mReflectionTex );
-            texUnit += !datablock->mReflectionTex.isNull();
+            if( datablock->mDiffuseTex.isNull() )
+                mRenderSystem->_setTexture( texUnit++, true, datablock->mDiffuseTex );
+            if( datablock->mNormalmapTex.isNull() )
+                mRenderSystem->_setTexture( texUnit++, true, datablock->mNormalmapTex );
+            if( datablock->mSpecularTex.isNull() )
+                mRenderSystem->_setTexture( texUnit++, true, datablock->mSpecularTex );
+            if( datablock->mReflectionTex.isNull() )
+                mRenderSystem->_setTexture( texUnit++, true, datablock->mReflectionTex );
 
             mRenderSystem->_disableTextureUnitsFrom( texUnit );
         }

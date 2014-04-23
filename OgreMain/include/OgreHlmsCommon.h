@@ -165,6 +165,7 @@ namespace Ogre
         GpuProgramPtr   tesselationDomainShader;
         GpuProgramPtr   pixelShader;
 
+        HlmsCache() : hash( 0 ), type( HLMS_MAX ) {}
         HlmsCache( uint32 _hash, HlmsTypes _type ) : hash( _hash ), type( _type ) {}
     };
 

@@ -48,8 +48,11 @@ namespace Ogre
         HlmsManager();
         virtual ~HlmsManager();
 
-        /// Returns a registered HLMS based on type
+        /// Returns a registered HLMS based on type. May be null.
         Hlms* getHlms( HlmsTypes type )                 { return mRegisteredHlms[type]; }
+
+        void registerHlms( HlmsTypes type, Hlms *provider );
+        void unregisterHlms( HlmsTypes type );
     };
     /** @} */
     /** @} */

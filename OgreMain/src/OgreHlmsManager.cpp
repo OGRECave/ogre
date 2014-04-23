@@ -40,4 +40,25 @@ namespace Ogre
     HlmsManager::~HlmsManager()
     {
     }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::registerHlms( HlmsTypes type, Hlms *provider )
+    {
+        if( mRegisteredHlms[type] )
+        {
+            OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "Provider for HLMS type '" +
+                         StringConverter::toString( type ) + "' has already been set!",
+                         "HlmsManager::registerHlms" );
+        }
+
+        mRegisteredHlms[type] = provider;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::unregisterHlms( HlmsTypes type )
+    {
+        if( mRegisteredHlms[type] )
+        {
+            //TODO: Go through all the MovableObjects and remove the Hlms.
+            mRegisteredHlms[type] = 0;
+        }
+    }
 }

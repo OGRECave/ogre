@@ -217,11 +217,20 @@ namespace Ogre
             }
         }
     }*/
-    void RenderQueue::renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq, bool casterPass )
+    void RenderQueue::renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
+                                 bool casterPass, bool dualParaboloid )
     {
-        //mBatchesToRender.push_back( 0 ); TODO First batch is always dummy
-        float *texBufferPtr; //TODO
-        HlmsCache *passCache; //TODO
+        HlmsCache passCache[HLMS_MAX];
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+            if( hlms )
+            {
+                passCache[i] = hlms->preparePassHash( mSceneManager->getCurrentShadowNode(), casterPass,
+                                                      dualParaboloid, mSceneManager );
+            }
+        }
 
         HlmsCache dummy( 0, HLMS_MAX );
 
@@ -251,8 +260,8 @@ namespace Ogre
                 const QueuedRenderable &queuedRenderable = *itor;
                 RenderOperation op;
                 queuedRenderable.renderable->getRenderOperation( op );
-                uint32 hlmsHash = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
-                                               queuedRenderable.renderable->getHlmsHash();
+                /*uint32 hlmsHash = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
+                                               queuedRenderable.renderable->getHlmsHash();*/
                 const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
 
                 if( lastMacroblock != datablock->mMacroblock )
@@ -278,7 +287,8 @@ namespace Ogre
 
                 Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
 
-                const HlmsCache *hlmsCache = hlms->getMaterial( lastHlmsCache, *passCache,
+                const HlmsCache *hlmsCache = hlms->getMaterial( lastHlmsCache,
+                                                                passCache[datablock->mType],
                                                                 queuedRenderable,
                                                                 casterPass );
                 if( lastHlmsCache != hlmsCache )
@@ -287,13 +297,10 @@ namespace Ogre
                 hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
                                       lastHlmsCache, lastTextureHash );
 
+                rs->_render( op );
+
                 lastHlmsCache   = hlmsCache;
                 lastTextureHash = datablock->mTextureHash;
-                /*GpuProgramParametersSharedPtr vpParams = hlmsCache->vertexShader->getDefaultParameters();
-                GpuProgramParametersSharedPtr psParams = hlmsCache->pixelShader->getDefaultParameters();
-
-                vpParams->getFloatPointer( 0 );
-                psParams->getFloatPointer( 0 );*/
 
                 ++itor;
             }

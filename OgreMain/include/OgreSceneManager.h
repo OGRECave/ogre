@@ -2613,6 +2613,7 @@ namespace Ogre {
         virtual bool getShadowCasterRenderBackFaces() const { return mShadowCasterRenderBackFaces; }
 
         void _setCurrentShadowNode( CompositorShadowNode *shadowNode );
+        const CompositorShadowNode* getCurrentShadowNode(void) const    { return mCurrentShadowNode; }
 
         /** Sets the active compositor chain of the current scene being rendered.
             @note CompositorChain does this automatically, no need to call manually.

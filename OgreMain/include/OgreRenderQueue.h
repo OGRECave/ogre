@@ -122,6 +122,7 @@ namespace Ogre {
 
         BatchArray mBatchesToRender;
         HlmsManager *mHlmsManager;
+        SceneManager *mSceneManager;
 
     public:
         RenderQueue();
@@ -153,7 +154,8 @@ namespace Ogre {
                             bool casterPass );
 
         void render( uint8 firstRq, uint8 lastRq );
-        void renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq, bool casterPass );
+        void renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
+                        bool casterPass, bool dualParaboloid );
     };
 
     /** @} */
