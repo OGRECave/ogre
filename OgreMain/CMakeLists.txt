@@ -144,6 +144,9 @@ elseif (APPLE)
     set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
 elseif(ANDROID)
+  # required by OgrePlatformInformation.cpp
+  include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
+
   file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/Android/*.h")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/*.cpp"
       src/OgreSearchOps.cpp)
