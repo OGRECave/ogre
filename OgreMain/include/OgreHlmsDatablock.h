@@ -111,6 +111,10 @@ namespace Ogre
             * This type may be derived to contain additional information.
         Derived types can cache information present in mOriginalProperties as strings, like diffuse
         colour values, etc.
+
+        A datablock is the internal representation of the surface parameters (depth settings,
+        textures to be used, diffuse colour, specular colour, etc).
+        The notion of a datablock is the closest you'll get to a "material"
     */
     class _OgreExport HlmsDatablock : public PassAlloc
     {
@@ -120,7 +124,7 @@ namespace Ogre
         uint8   mType;      /// @See HlmsTypes
         bool    mIsOpaque;  /// Cached based on mBlendblock data
         HlmsMacroblock const *mMacroblock;
-        HlmsBlendblock const *mBlendblock;
+        HlmsBlendblock const *mBlendblock;  ///Don't set this directly, use @setBlendblock
         HlmsParamVec mOriginalParams;
 
         float   mShadowConstantBias;
@@ -131,6 +135,9 @@ namespace Ogre
                        const HlmsParamVec &params );
         virtual ~HlmsDatablock() {}
         virtual void calculateHash() {}
+
+        /// Call this function to set mBlendblock & mIsOpaque automatically based on input
+        void setBlendblock( HlmsBlendblock const *blendblock );
     };
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0

@@ -912,27 +912,33 @@ namespace Ogre
         return mRenderableCache[hash & 0x7f];
     }
     //-----------------------------------------------------------------------------------
-    HlmsDatablock* Hlms::createDatablockImpl( const HlmsParamVec &paramVec,
-                                              const HlmsMacroblock &macroblockRef,
-                                              const HlmsBlendblock &blendblockRef )
-    {
-        const HlmsMacroblock *macroblock = mHlmsManager->getMacroblock( macroblockRef );
-        const HlmsBlendblock *blendblock = mHlmsManager->getBlendblock( blendblockRef );
-
-        return OGRE_NEW HlmsDatablock( mType, macroblock, blendblock, paramVec );
-    }
-    //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::createDatablock( const HlmsParamVec &paramVec,
                                           const HlmsMacroblock &macroblockRef,
                                           const HlmsBlendblock &blendblockRef )
     {
-        HlmsDatablock *retVal = createDatablockImpl( paramVec, macroblockRef, blendblockRef );
+        String datablockName;
+        if( !findParamInVec( paramVec, "name", datablockName ) )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "paramVec must contain a 'name' entry!",
+                         "Hlms::createDatablock" );
+        }
+
+        IdString datablockNameId( datablockName );
+        if( mDatablocks.find( datablockNameId ) != mDatablocks.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "A material datablock with name '" +
+                         datablockName + "' already exists.", "Hlms::createDatablock" );
+        }
+
+        const HlmsMacroblock *macroblock = mHlmsManager->getMacroblock( macroblockRef );
+        const HlmsBlendblock *blendblock = mHlmsManager->getBlendblock( blendblockRef );
+
+        HlmsDatablock *retVal = OGRE_NEW HlmsDatablock( mType, macroblock, blendblock, paramVec );
+
+        mDatablocks[datablockNameId] = retVal;
 
         retVal->calculateHash();
-
-        /*HlmsDatablock *retVal;
-        retVal->mOriginalParams = paramVec;*/
-        return 0;
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     bool Hlms::findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut )

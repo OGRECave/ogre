@@ -68,10 +68,13 @@ namespace Ogre
         PiecesMap       mPieces;
 
         Archive         *mDataFolder;
-        StringVector     mPieceFiles[5];
+        StringVector    mPieceFiles[5];
         HlmsManager     *mHlmsManager;
 
         RenderSystem    *mRenderSystem;
+
+        typedef std::map<IdString, HlmsDatablock*> HlmsDatablockMap;
+        HlmsDatablockMap mDatablocks;
 
         HlmsTypes       mType;
 
@@ -176,14 +179,20 @@ namespace Ogre
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
 
-        virtual HlmsDatablock* createDatablockImpl( const HlmsParamVec &paramVec,
-                                                    const HlmsMacroblock &macroblockRef,
-                                                    const HlmsBlendblock &blendblockRef );
-
     public:
         Hlms( HlmsTypes type, Archive *dataFolder );
         virtual ~Hlms();
 
+        /** Creates a unique datablock that can be shared by multiple renderables.
+        @remarks
+            The name of the datablock must be in paramVec["name"] and must be unique
+        @param paramVec
+        @param macroblockRef
+            @See HlmsManager::getMacroblock
+        @param blendblockRef
+            @See HlmsManager::getBlendblock
+        @return
+        */
         virtual HlmsDatablock* createDatablock( const HlmsParamVec &paramVec,
                                                 const HlmsMacroblock &macroblockRef,
                                                 const HlmsBlendblock &blendblockRef );
