@@ -385,6 +385,7 @@ namespace Ogre
             WorldAabb,
             LocalRadius,
             WorldRadius,
+            DistanceToCamera,
             UpperDistance,
             VisibilityFlags,
             QueryFlags,

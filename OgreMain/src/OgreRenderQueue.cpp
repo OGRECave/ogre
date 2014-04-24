@@ -67,7 +67,9 @@ namespace Ogre
     const int MeshShiftTransp       = ShaderShiftTransp - MeshBits;         //11
     const int TextureShiftTransp    = MeshShiftTransp   - TextureBits;      //0
     //---------------------------------------------------------------------
-    RenderQueue::RenderQueue() : mHlmsManager( 0 )
+    RenderQueue::RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager ) :
+        mHlmsManager( hlmsManager ),
+        mSceneManager( sceneManager )
     {
         mRenderQueues.resize( 255 );
     }

@@ -125,7 +125,7 @@ namespace Ogre {
         SceneManager *mSceneManager;
 
     public:
-        RenderQueue();
+        RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager );
         ~RenderQueue();
 
         /** Empty the queue - should only be called by SceneManagers.

@@ -473,7 +473,7 @@ namespace Ogre {
 
         /// Queue of objects for rendering
         RenderQueue* mRenderQueue;
-        bool mLastRenderQueueInvocationCustom;
+        HlmsManager *mHlmsManager;
 
         /// Updated every frame, has enough memory to hold all lights.
         LightListInfo mGlobalLightList;
@@ -630,11 +630,6 @@ namespace Ogre {
         /// Mutex over the collection of MovableObject types
         OGRE_MUTEX(mMovableObjectCollectionMapMutex);
 
-        /** Internal method for initialising the render queue.
-        @remarks
-            Subclasses can use this to install their own RenderQueue implementation.
-        */
-        virtual void initRenderQueue(void);
         /// A pass designed to let us render shadow colour on white for texture shadows
         Pass* mShadowCasterPlainBlackPass;
         /** Internal method for turning a regular pass into a shadow caster pass.
@@ -2345,18 +2340,6 @@ namespace Ogre {
         virtual void manualRender(Renderable* rend, const Pass* pass, Viewport* vp, 
             const Matrix4& viewMatrix, const Matrix4& projMatrix, bool doBeginEndFrame = false,
             bool lightScissoringClipping = true, bool doLightIteration = true);
-
-        /** Retrieves the internal render queue, for advanced users only.
-        @remarks
-            The render queue is mainly used internally to manage the scene object 
-            rendering queue, it also exports some methods to allow advanced users 
-            to configure the behavior of rendering process.
-            Most methods provided by RenderQueue are supposed to be used 
-            internally only, you should reference to the RenderQueue API for 
-            more information. Do not access this directly unless you know what 
-            you are doing.
-        */
-        virtual RenderQueue* getRenderQueue(void);
 
         /** Registers a new RenderQueueListener which will be notified when render queues
             are processed.

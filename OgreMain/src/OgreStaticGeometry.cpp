@@ -1080,7 +1080,7 @@ namespace Ogre {
         }
     }
     //--------------------------------------------------------------------------
-    /*void StaticGeometry::MaterialBucket::addRenderables(RenderQueue* queue, uint8 group, size_t materialLod)
+    void StaticGeometry::MaterialBucket::addRenderables(RenderQueue* queue, uint8 group, size_t materialLod)
     {
         // Get region
         Region *region = mParent->getParent();
@@ -1089,12 +1089,13 @@ namespace Ogre {
         mTechnique = mMaterial->getBestTechnique( region->mCurrentMaterialLod[materialLod] );
         GeometryBucketList::iterator i, iend;
         iend =  mGeometryBucketList.end();
-        for (i = mGeometryBucketList.begin(); i != iend; ++i)
+        //TODO: RENDER QUEUE
+        /*for (i = mGeometryBucketList.begin(); i != iend; ++i)
         {
             queue->addRenderable(*i, group);
-        }
+        }*/
 
-    }*/
+    }
     //--------------------------------------------------------------------------
     String StaticGeometry::MaterialBucket::getGeometryFormatString(
         SubMeshLodGeometryLink* geom)

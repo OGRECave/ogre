@@ -65,6 +65,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreViewport.h"
+#include "OgreHlmsManager.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -89,8 +90,8 @@ SceneManager::SceneManager(const String& name, size_t numWorkerThreads,
 mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
 mName(name),
-mRenderQueue(0),
-mLastRenderQueueInvocationCustom(false),
+mRenderQueue( 0 ),
+mHlmsManager( 0 ),
 mAmbientLight(ColourValue::Black),
 mCameraInProgress(0),
 mCurrentViewport(0),
@@ -218,6 +219,9 @@ mGpuParamsDirty((uint16)GPV_ALL)
         mSceneRoot[i]->setName( "Ogre/SceneRoot" + StringConverter::toString( i ) );
         mSceneRoot[i]->_getDerivedPositionUpdated();
     }
+
+    mHlmsManager = OGRE_NEW HlmsManager();
+    mRenderQueue = OGRE_NEW RenderQueue( mHlmsManager, this );
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()
@@ -240,26 +244,21 @@ SceneManager::~SceneManager()
     OGRE_DELETE mSkyBoxObj;
 
     for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+    {
         OGRE_DELETE mSceneRoot[i];
+        mSceneRoot[i] = 0;
+    }
     OGRE_DELETE mFullScreenQuad;
     OGRE_DELETE mRenderQueue;
+    OGRE_DELETE mHlmsManager;
     OGRE_DELETE mAutoParamDataSource;
 
+    mFullScreenQuad         = 0;
+    mRenderQueue            = 0;
+    mHlmsManager            = 0;
+    mAutoParamDataSource    = 0;
+
     stopWorkerThreads();
-}
-//-----------------------------------------------------------------------
-RenderQueue* SceneManager::getRenderQueue(void)
-{
-    if (!mRenderQueue)
-    {
-        initRenderQueue();
-    }
-    return mRenderQueue;
-}
-//-----------------------------------------------------------------------
-void SceneManager::initRenderQueue(void)
-{
-    mRenderQueue = OGRE_NEW RenderQueue();
 }
 //-----------------------------------------------------------------------
 Camera* SceneManager::createCamera( const String &name, bool isVisible, bool forCubemapping )
@@ -3568,7 +3567,7 @@ bool SceneManager::fireRenderQueueStarted(uint8 id, const String& invocation)
     RenderQueueListenerList::iterator i, iend;
     bool skip = false;
 
-    RenderQueue *rq = getRenderQueue();
+    RenderQueue *rq = mRenderQueue;
 
     iend = mRenderQueueListeners.end();
     for (i = mRenderQueueListeners.begin(); i != iend; ++i)

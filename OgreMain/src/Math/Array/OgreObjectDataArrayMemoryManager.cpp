@@ -45,6 +45,7 @@ namespace Ogre
         6 * sizeof( Ogre::Real ),       //ArrayMemoryManager::WorldAabb
         1 * sizeof( Ogre::Real ),       //ArrayMemoryManager::LocalRadius
         1 * sizeof( Ogre::Real ),       //ArrayMemoryManager::WorldRadius
+        1 * sizeof( Ogre::RealAsUint ), //ArrayMemoryManager::DistanceToCamera
         1 * sizeof( Ogre::Real ),       //ArrayMemoryManager::SquaredUpperDistance
         1 * sizeof( Ogre::uint32 ),     //ArrayMemoryManager::VisibilityFlags
         1 * sizeof( Ogre::uint32 ),     //ArrayMemoryManager::QueryFlags
@@ -58,6 +59,7 @@ namespace Ogre
         cleanerArrayAabb,               //ArrayMemoryManager::WorldAabb
         cleanerFlat,                    //ArrayMemoryManager::LocalRadius
         cleanerFlat,                    //ArrayMemoryManager::WorldRadius
+        cleanerFlat,                    //ArrayMemoryManager::DistanceToCamera
         cleanerFlat,                    //ArrayMemoryManager::SquaredUpperDistance
         cleanerFlat,                    //ArrayMemoryManager::VisibilityFlags
         cleanerFlat,                    //ArrayMemoryManager::QueryFlags
@@ -109,6 +111,8 @@ namespace Ogre
                                                 nextSlotBase * mElementsMemSizes[LocalRadius] );
         outData.mWorldRadius        = reinterpret_cast<Real*>( mMemoryPools[WorldRadius] +
                                                 nextSlotBase * mElementsMemSizes[WorldRadius] );
+        outData.mDistanceToCamera   = reinterpret_cast<RealAsUint*>( mMemoryPools[DistanceToCamera] +
+                                                nextSlotBase * mElementsMemSizes[DistanceToCamera] );
         outData.mUpperDistance      = reinterpret_cast<Real*>( mMemoryPools[UpperDistance] +
                                                 nextSlotBase * mElementsMemSizes[UpperDistance] );
         outData.mVisibilityFlags    = reinterpret_cast<uint32*>( mMemoryPools[VisibilityFlags] +
@@ -124,6 +128,7 @@ namespace Ogre
         outData.mLocalAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
         outData.mWorldAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
         outData.mWorldRadius[nextSlotIdx]           = 0;
+        outData.mDistanceToCamera[nextSlotIdx]      = 0;
         outData.mUpperDistance[nextSlotIdx]         = std::numeric_limits<Real>::max();
         outData.mVisibilityFlags[nextSlotIdx]       = MovableObject::getDefaultVisibilityFlags();
         outData.mQueryFlags[nextSlotIdx]            = MovableObject::getDefaultQueryFlags();
