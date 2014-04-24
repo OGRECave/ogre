@@ -36,6 +36,7 @@ namespace Ogre
     extern CompareFunction convertCompareFunction(const String& param);
 
     HlmsMacroblock::HlmsMacroblock() :
+        mId( 0 ),
         mDepthCheck( true ),
         mDepthWrite( true ),
         mDepthFunc( CMPF_LESS_EQUAL ),
@@ -43,19 +44,35 @@ namespace Ogre
         mDepthBiasSlopeScale( 0 ),
         mAlphaToCoverageEnabled( false ),
         mCullMode( CULL_CLOCKWISE ),
-        mPolygonMode( PM_SOLID )
+        mPolygonMode( PM_SOLID ),
+        mRsData( 0 )
     {
-
+    }
+    HlmsBlendblock::HlmsBlendblock() :
+        mId( 0 ),
+        mSeparateBlend( false ),
+        mSourceBlendFactor( SBF_ONE ),
+        mDestBlendFactor( SBF_ZERO ),
+        mSourceBlendFactorAlpha( SBF_ONE ),
+        mDestBlendFactorAlpha( SBF_ZERO ),
+        mBlendOperation( SBO_ADD ),
+        mBlendOperationAlpha( SBO_ADD ),
+        mRsData( 0 )
+    {
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
-    HlmsDatablock::HlmsDatablock( HlmsTypes type, const HlmsMacroblock *macroblock, uint8 macroblockId,
-                                  const HlmsBlendblock *blendblock, uint8 blendblockId,
+    HlmsDatablock::HlmsDatablock( HlmsTypes type, const HlmsMacroblock *macroblock,
+                                  const HlmsBlendblock *blendblock,
                                   const HlmsParamVec &params ) :
-        mMacroblockHash( (((macroblockId) & 0x1F) << 5) | (blendblockId & 0x1F) ),
-        mTextureHash( ~0 ),
+        mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
+        mTextureHash( 0 ),
         mType( type ),
-        mIsOpaque( true ),
+        mIsOpaque( blendblock->mDestBlendFactor == SBF_ZERO &&
+                   blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
+                   blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
+                   blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
+                   blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA ),
         mMacroblock( macroblock ),
         mBlendblock( blendblock ),
         mOriginalParams( params ),
@@ -64,10 +81,10 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
-    HlmsPbsEs2Datablock::HlmsPbsEs2Datablock( const HlmsMacroblock *macroblock, uint8 macroblockId,
-                                              const HlmsBlendblock *blendblock, uint8 blendblockId,
+    HlmsPbsEs2Datablock::HlmsPbsEs2Datablock( const HlmsMacroblock *macroblock,
+                                              const HlmsBlendblock *blendblock,
                                               const HlmsParamVec &params ) :
-        HlmsDatablock( HLMS_PBS, macroblock, macroblockId, blendblock, blendblockId, params )
+        HlmsDatablock( HLMS_PBS, macroblock, blendblock, params )
     {
     }
     //-----------------------------------------------------------------------------------

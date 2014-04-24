@@ -71,7 +71,15 @@ namespace Ogre {
         */
         class RenderSystemData {}; 
     public:
-        Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false), mRenderSystemData(NULL) {}
+        Renderable() :
+            mHlmsHash( 0 ),
+            mHlmsCasterHash( 0 ),
+            mHlmsDatablock( 0 ),
+            mPolygonModeOverrideable(true),
+            mUseIdentityProjection(false),
+            mUseIdentityView(false),
+            mRenderSystemData(NULL)
+            {}
         /** Virtual destructor needed as class has virtual methods. */
         virtual ~Renderable() 
         {

@@ -69,7 +69,7 @@ namespace Ogre
 
         Archive         *mDataFolder;
         StringVector     mPieceFiles[5];
-        //HlmsManager     *mHlmsManager;
+        HlmsManager     *mHlmsManager;
 
         RenderSystem    *mRenderSystem;
 
@@ -176,9 +176,17 @@ namespace Ogre
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
 
+        virtual HlmsDatablock* createDatablockImpl( const HlmsParamVec &paramVec,
+                                                    const HlmsMacroblock &macroblockRef,
+                                                    const HlmsBlendblock &blendblockRef );
+
     public:
         Hlms( HlmsTypes type, Archive *dataFolder );
         virtual ~Hlms();
+
+        virtual HlmsDatablock* createDatablock( const HlmsParamVec &paramVec,
+                                                const HlmsMacroblock &macroblockRef,
+                                                const HlmsBlendblock &blendblockRef );
 
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
             the value to 'inOut', otherwise leaves 'inOut' as is.

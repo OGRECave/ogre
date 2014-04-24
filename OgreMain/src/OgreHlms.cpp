@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlms.h"
+#include "OgreHlmsManager.h"
 
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
@@ -909,6 +910,29 @@ namespace Ogre
     const HlmsPropertyVec& Hlms::getRenderableCache( uint32 hash ) const
     {
         return mRenderableCache[hash & 0x7f];
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsDatablock* Hlms::createDatablockImpl( const HlmsParamVec &paramVec,
+                                              const HlmsMacroblock &macroblockRef,
+                                              const HlmsBlendblock &blendblockRef )
+    {
+        const HlmsMacroblock *macroblock = mHlmsManager->getMacroblock( macroblockRef );
+        const HlmsBlendblock *blendblock = mHlmsManager->getBlendblock( blendblockRef );
+
+        return OGRE_NEW HlmsDatablock( mType, macroblock, blendblock, paramVec );
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsDatablock* Hlms::createDatablock( const HlmsParamVec &paramVec,
+                                          const HlmsMacroblock &macroblockRef,
+                                          const HlmsBlendblock &blendblockRef )
+    {
+        HlmsDatablock *retVal = createDatablockImpl( paramVec, macroblockRef, blendblockRef );
+
+        retVal->calculateHash();
+
+        /*HlmsDatablock *retVal;
+        retVal->mOriginalParams = paramVec;*/
+        return 0;
     }
     //-----------------------------------------------------------------------------------
     bool Hlms::findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut )

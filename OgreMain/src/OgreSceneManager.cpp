@@ -1272,7 +1272,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
-
+    mHlmsManager->_changeRenderSystem( sys );
 }
 
 

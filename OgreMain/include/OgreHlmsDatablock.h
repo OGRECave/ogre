@@ -47,6 +47,7 @@ namespace Ogre
     */
     struct HlmsMacroblock
     {
+        uint8               mId;
         bool                mDepthCheck;
         bool                mDepthWrite;
         CompareFunction     mDepthFunc;
@@ -56,8 +57,16 @@ namespace Ogre
         bool                mAlphaToCoverageEnabled;
         CullingMode         mCullMode;
         PolygonMode         mPolygonMode;
+        void                *mRsData;       ///Render-System specific data
 
         HlmsMacroblock();
+
+        bool operator != ( const HlmsMacroblock &_r ) const
+        {
+            //Don't include the ID in the comparision
+            return memcmp( &mDepthCheck, &_r.mDepthCheck,
+                           ((char*)&mPolygonMode - (char*)&mDepthCheck) + sizeof( PolygonMode ) ) != 0;
+        }
     };
 
     /** A blend block contains settings that rarely change, and thus are common to many materials.
@@ -70,6 +79,7 @@ namespace Ogre
     */
     struct HlmsBlendblock
     {
+        uint8               mId;
         /// Used to determine if separate alpha blending should be used for color and alpha channels
         bool                mSeparateBlend;
 
@@ -81,6 +91,17 @@ namespace Ogre
         // Blending operations
         SceneBlendOperation mBlendOperation;
         SceneBlendOperation mBlendOperationAlpha;
+
+        void                *mRsData;       ///Render-System specific data
+
+        HlmsBlendblock();
+        bool operator != ( const HlmsBlendblock &_r ) const
+        {
+            //Don't include the ID in the comparision
+            return memcmp( &mSeparateBlend, &_r.mSeparateBlend,
+                           ((char*)&mBlendOperationAlpha - (char*)&mSeparateBlend) +
+                                                    sizeof( SceneBlendOperation ) ) != 0;
+        }
     };
 
     /** An hlms datablock contains individual information about a specific material. It consists of:
@@ -94,8 +115,8 @@ namespace Ogre
     class _OgreExport HlmsDatablock : public PassAlloc
     {
     public:
-        uint32  mTextureHash;           //TextureHash comes before macroblock for alignment reasons
-        uint16  mMacroblockHash;        //Not all bits are used
+        uint32  mTextureHash;       //TextureHash comes before macroblock for alignment reasons
+        uint16  mMacroblockHash;    //Not all bits are used
         uint8   mType;      /// @See HlmsTypes
         bool    mIsOpaque;  /// Cached based on mBlendblock data
         HlmsMacroblock const *mMacroblock;
@@ -105,11 +126,11 @@ namespace Ogre
         float   mShadowConstantBias;
 
         HlmsDatablock( HlmsTypes type,
-                       const HlmsMacroblock *macroblock, uint8 macroblockId,
-                       const HlmsBlendblock *blendblock, uint8 blendblockId,
+                       const HlmsMacroblock *macroblock,
+                       const HlmsBlendblock *blendblock,
                        const HlmsParamVec &params );
         virtual ~HlmsDatablock() {}
-        virtual void calculateHash() = 0;
+        virtual void calculateHash() {}
     };
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
@@ -130,8 +151,8 @@ namespace Ogre
         /*TexturePtr  mDetailMask;
         TexturePtr  mDetailMap[4];*/
 
-        HlmsPbsEs2Datablock( const HlmsMacroblock *macroblock, uint8 macroblockId,
-                             const HlmsBlendblock *blendblock, uint8 blendblockId,
+        HlmsPbsEs2Datablock( const HlmsMacroblock *macroblock,
+                             const HlmsBlendblock *blendblock,
                              const HlmsParamVec &params );
 
         virtual void calculateHash();

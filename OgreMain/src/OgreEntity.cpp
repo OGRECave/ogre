@@ -152,6 +152,19 @@ namespace Ogre {
         // Build main subentity list
         buildSubEntityList(mMesh, &mSubEntityList);
 
+        {
+            //Without filling the renderables list, the RenderQueue won't
+            //catch our sub entities and thus we won't be rendered
+            mRenderables.reserve( mSubEntityList.size() );
+            SubEntityList::iterator itor = mSubEntityList.begin();
+            SubEntityList::iterator end  = mSubEntityList.end();
+            while( itor != end )
+            {
+                mRenderables.push_back( &(*itor) );
+                ++itor;
+            }
+        }
+
         for( size_t i=0; i<mSubEntityList.size(); ++i )
         {
             if( !mSubEntityList[i].getMaterial().isNull() )
@@ -210,6 +223,7 @@ namespace Ogre {
 
         // Delete submeshes
         mSubEntityList.clear();
+        mRenderables.clear();
         
         // Delete LOD entities
         LODEntityList::iterator li, liend;

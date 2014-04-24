@@ -29,16 +29,154 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsManager.h"
+#include "OgreRenderSystem.h"
 
 namespace Ogre
 {
-    HlmsManager::HlmsManager()
+    HlmsManager::HlmsManager() : mRenderSystem( 0 )
     {
         memset( mRegisteredHlms, 0, sizeof( mRegisteredHlms ) );
+
+        mActiveMacroblocks.reserve( OGRE_HLMS_NUM_MACROBLOCKS );
+        mFreeMacroblockIds.reserve( OGRE_HLMS_NUM_MACROBLOCKS );
+        for( uint8 i=0; i<OGRE_HLMS_NUM_MACROBLOCKS; ++i )
+        {
+            mMacroblocks[i].mId = i;
+            mFreeMacroblockIds.push_back( (OGRE_HLMS_NUM_MACROBLOCKS - 1) - i );
+        }
+
+        mActiveBlendblocks.reserve( OGRE_HLMS_NUM_BLENDBLOCKS );
+        mFreeBlendblockIds.reserve( OGRE_HLMS_NUM_BLENDBLOCKS );
+        for( uint8 i=0; i<OGRE_HLMS_NUM_BLENDBLOCKS; ++i )
+        {
+            mBlendblocks[i].mId = i;
+            mFreeBlendblockIds.push_back( (OGRE_HLMS_NUM_BLENDBLOCKS - 1) - i );
+        }
     }
     //-----------------------------------------------------------------------------------
     HlmsManager::~HlmsManager()
     {
+        assert( mRenderSystem || (mActiveMacroblocks.empty() && mActiveBlendblocks.empty()) );
+        renderSystemDestroyAllBlocks();
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsMacroblock* HlmsManager::getMacroblock( const HlmsMacroblock &baseParams )
+    {
+        assert( mRenderSystem && "A render system must be selected first!" );
+
+        BlockIdxVec::iterator itor = mActiveMacroblocks.begin();
+        BlockIdxVec::iterator end  = mActiveMacroblocks.end();
+
+        while( itor != end && mMacroblocks[*itor] != baseParams )
+            ++itor;
+
+        HlmsMacroblock const * retVal = 0;
+        if( itor != end )
+        {
+            //Already exists
+            retVal = &mMacroblocks[*itor];
+        }
+        else
+        {
+            if( mFreeMacroblockIds.empty() )
+            {
+                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                             "Can't have more than 32 active macroblocks! You have too "
+                             "many materials with different rasterizer state parameters.",
+                             "HlmsManager::getMacroblock" );
+            }
+
+            size_t idx = mFreeMacroblockIds.back();
+            mFreeMacroblockIds.pop_back();
+
+            mMacroblocks[idx] = baseParams;
+            mRenderSystem->_hlmsMacroblockCreated( &mMacroblocks[idx] );
+            mActiveMacroblocks.push_back( idx );
+
+            retVal = &mMacroblocks[idx];
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::destroyMacroblock( const HlmsMacroblock *macroblock )
+    {
+        if( &mMacroblocks[macroblock->mId] != macroblock )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                         "The macroblock wasn't created with this manager!",
+                         "HlmsManager::destroyMacroblock" );
+        }
+
+        mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[macroblock->mId] );
+        mMacroblocks[macroblock->mId].mRsData = 0;
+
+        BlockIdxVec::iterator itor = std::find( mActiveMacroblocks.begin(), mActiveMacroblocks.end(),
+                                                macroblock->mId );
+        assert( itor != mActiveMacroblocks.end() );
+        mActiveMacroblocks.erase( itor );
+
+        mFreeMacroblockIds.push_back( macroblock->mId );
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsBlendblock* HlmsManager::getBlendblock( const HlmsBlendblock &baseParams )
+    {
+        assert( mRenderSystem && "A render system must be selected first!" );
+
+        BlockIdxVec::iterator itor = mActiveBlendblocks.begin();
+        BlockIdxVec::iterator end  = mActiveBlendblocks.end();
+
+        while( itor != end && mBlendblocks[*itor] != baseParams )
+            ++itor;
+
+        HlmsBlendblock const * retVal = 0;
+        if( itor != end )
+        {
+            //Already exists
+            retVal = &mBlendblocks[*itor];
+        }
+        else
+        {
+            if( mFreeBlendblockIds.empty() )
+            {
+                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                             "Can't have more than 32 active Blendblocks! You have too "
+                             "many materials with different blend state parameters.",
+                             "HlmsManager::getBlendblock" );
+            }
+
+            size_t idx = mFreeBlendblockIds.back();
+            mFreeBlendblockIds.pop_back();
+
+            mBlendblocks[idx] = baseParams;
+            mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[idx] );
+            mActiveBlendblocks.push_back( idx );
+
+
+            retVal = &mBlendblocks[idx];
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::destroyBlendblock( const HlmsBlendblock *blendblock )
+    {
+        if( &mBlendblocks[blendblock->mId] != blendblock )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                         "The Blendblock wasn't created with this manager!",
+                         "HlmsManager::destroyBlendblock" );
+        }
+
+        mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[blendblock->mId] );
+        mBlendblocks[blendblock->mId].mRsData = 0;
+
+        BlockIdxVec::iterator itor = std::find( mActiveBlendblocks.begin(), mActiveBlendblocks.end(),
+                                                blendblock->mId );
+        assert( itor != mActiveBlendblocks.end() );
+        mActiveBlendblocks.erase( itor );
+
+        mFreeBlendblockIds.push_back( blendblock->mId );
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::registerHlms( HlmsTypes type, Hlms *provider )
@@ -57,8 +195,43 @@ namespace Ogre
     {
         if( mRegisteredHlms[type] )
         {
-            //TODO: Go through all the MovableObjects and remove the Hlms.
+            //TODO: Go through all the MovableObjects and remove the Hlms?
             mRegisteredHlms[type] = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::renderSystemDestroyAllBlocks(void)
+    {
+        if( mRenderSystem )
+        {
+            BlockIdxVec::const_iterator itor = mActiveMacroblocks.begin();
+            BlockIdxVec::const_iterator end  = mActiveMacroblocks.end();
+            while( itor != end )
+                mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[*itor++] );
+
+            itor = mActiveBlendblocks.begin();
+            end  = mActiveBlendblocks.end();
+            while( itor != end )
+                mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[*itor++] );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::_changeRenderSystem( RenderSystem *newRs )
+    {
+        renderSystemDestroyAllBlocks();
+        mRenderSystem = newRs;
+
+        if( mRenderSystem )
+        {
+            BlockIdxVec::const_iterator itor = mActiveMacroblocks.begin();
+            BlockIdxVec::const_iterator end  = mActiveMacroblocks.end();
+            while( itor != end )
+                mRenderSystem->_hlmsMacroblockCreated( &mMacroblocks[*itor++] );
+
+            itor = mActiveBlendblocks.begin();
+            end  = mActiveBlendblocks.end();
+            while( itor != end )
+                mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[*itor++] );
         }
     }
 }
