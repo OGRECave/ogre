@@ -335,6 +335,18 @@ namespace Ogre {
         return mSubEntityList.size();
     }
     //-----------------------------------------------------------------------
+    void Entity::setHlms( HlmsDatablock *datablock )
+    {
+        SubEntityList::iterator itor = mSubEntityList.begin();
+        SubEntityList::iterator end  = mSubEntityList.end();
+
+        while( itor != end )
+        {
+            itor->setHlms( datablock );
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
     Entity* Entity::clone( const String& newName) const
     {
         if (!mManager)

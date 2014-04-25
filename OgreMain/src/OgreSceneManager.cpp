@@ -166,6 +166,9 @@ mGpuParamsDirty((uint16)GPV_ALL)
         mSkyDomeEntity[i] = 0;
     }
 
+    mHlmsManager = OGRE_NEW HlmsManager();
+    mRenderQueue = OGRE_NEW RenderQueue( mHlmsManager, this );
+
     Root *root = Root::getSingletonPtr();
     if (root)
         _setDestinationRenderSystem(root->getRenderSystem());
@@ -219,9 +222,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
         mSceneRoot[i]->setName( "Ogre/SceneRoot" + StringConverter::toString( i ) );
         mSceneRoot[i]->_getDerivedPositionUpdated();
     }
-
-    mHlmsManager = OGRE_NEW HlmsManager();
-    mRenderQueue = OGRE_NEW RenderQueue( mHlmsManager, this );
 }
 //-----------------------------------------------------------------------
 SceneManager::~SceneManager()

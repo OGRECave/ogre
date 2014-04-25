@@ -65,8 +65,13 @@ namespace Ogre
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
 
+        virtual HlmsDatablock* createDatablockImpl( const HlmsParamVec &paramVec,
+                                                    const HlmsMacroblock *macroblock,
+                                                    const HlmsBlendblock *blendblock,
+                                                    IdString datablockName );
+
     public:
-        HlmsPbsEs2();
+        HlmsPbsEs2( Archive *dataFolder );
         ~HlmsPbsEs2();
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,

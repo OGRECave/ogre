@@ -302,6 +302,9 @@ namespace Ogre {
         */
         size_t getNumSubEntities(void) const;
 
+        /// Sets the given HLMS to all SubEntities
+        void setHlms( HlmsDatablock *datablock );
+
         /** Clones this entity and returns a pointer to the clone.
         @remarks
             Useful method for duplicating an entity. The new entity must be

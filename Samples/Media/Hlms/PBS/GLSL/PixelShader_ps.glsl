@@ -23,7 +23,7 @@ in vec4 psPosL@n;@end
 //Uniforms that change per pass
 @property( hlms_num_shadow_maps )uniform vec2 invShadowMapSize[@value(hlms_num_shadow_maps)];
 uniform float pssmSplitPoints[@value(hlms_pssm_splits)];@end
-@property( hlms_lights_spot )uniform vec4 lightPosition[@value(hlms_lights_spot)];
+@property( hlms_lights_spot )uniform vec3 lightPosition[@value(hlms_lights_spot)];
 uniform vec3 lightDiffuse[@value(hlms_lights_spot)];
 uniform vec3 lightSpecular[@value(hlms_lights_spot)];
 @property(hlms_lights_attenuation)uniform vec3 attenuation[@value(hlms_lights_attenuation)];@end
@@ -190,11 +190,11 @@ void main()
 
 	vec3 finalColour = vec3(0);
 @property( hlms_lights_directional )
-	finalColour += cookTorrance( lightPosition[0].xyz, viewDir, NdotV, lightDiffuse[0], lightSpecular[0] );
+	finalColour += cookTorrance( lightPosition[0], viewDir, NdotV, lightDiffuse[0], lightSpecular[0] );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
 @end
 @foreach( hlms_lights_directional, n, 1 )
-	finalColour += cookTorrance( lightPosition[@n].xyz, viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );@end
+	finalColour += cookTorrance( lightPosition[@n], viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );@end
 
 @property( hlms_lights_point || hlms_lights_spot )	vec3 lightDir;
 	float fDistance;
@@ -203,7 +203,7 @@ void main()
 
 	//Point lights
 @foreach( hlms_lights_point, n, hlms_lights_directional )
-	lightDir = lightPosition[@n].xyz - psPos;
+	lightDir = lightPosition[@n] - psPos;
 	fDistance= length( lightDir );
 	if( fDistance <= attenuation[@value(atten)].x )
 	{
@@ -218,10 +218,10 @@ void main()
 	//spotParams[@value(spot_params)].y = cos( OuterAngle / 2 )
 	//spotParams[@value(spot_params)].z = falloff
 @foreach( hlms_lights_spot, n, hlms_lights_point )
-	lightDir = lightPosition[@n].xyz - psPos;
+	lightDir = lightPosition[@n] - psPos;
 	fDistance= length( lightDir );
-@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( psPos - lightPosition[@n].xyz ), spotDirection[@value(spot_params)] );@end
-@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( psPos - lightPosition[@n].xyz ), zAxis( spotQuaternion[@value(spot_params)] ) );@end
+@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( psPos - lightPosition[@n] ), spotDirection[@value(spot_params)] );@end
+@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( psPos - lightPosition[@n] ), zAxis( spotQuaternion[@value(spot_params)] ) );@end
 	if( fDistance <= attenuation[@value(atten)].x && spotCosAngle >= spotParams[@value(spot_params)].y )
 	{
 		lightDir *= 1.0f / fDistance;

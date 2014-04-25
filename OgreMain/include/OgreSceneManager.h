@@ -2947,6 +2947,9 @@ namespace Ogre {
         */
         RenderSystem *getDestinationRenderSystem();
 
+        /// Gets the HlmsManager, which is needed to register generators at startup.
+        HlmsManager* getHlmsManager(void) const     { return mHlmsManager; }
+
         /** Gets the current viewport being rendered (advanced use only, only 
             valid during viewport update. */
         Viewport* getCurrentViewport(void) const { return mCurrentViewport; }

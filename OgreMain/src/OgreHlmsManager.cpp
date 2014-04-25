@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsManager.h"
+#include "OgreHlms.h"
 #include "OgreRenderSystem.h"
 
 namespace Ogre
@@ -36,6 +37,7 @@ namespace Ogre
     HlmsManager::HlmsManager() : mRenderSystem( 0 )
     {
         memset( mRegisteredHlms, 0, sizeof( mRegisteredHlms ) );
+        memset( mDeleteRegisteredOnExit, 0, sizeof( mDeleteRegisteredOnExit ) );
 
         mActiveMacroblocks.reserve( OGRE_HLMS_NUM_MACROBLOCKS );
         mFreeMacroblockIds.reserve( OGRE_HLMS_NUM_MACROBLOCKS );
@@ -58,6 +60,19 @@ namespace Ogre
     {
         assert( mRenderSystem || (mActiveMacroblocks.empty() && mActiveBlendblocks.empty()) );
         renderSystemDestroyAllBlocks();
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            if( mRegisteredHlms[i] )
+            {
+                mRegisteredHlms[i]->_notifyManager( this );
+                if( mDeleteRegisteredOnExit[i] )
+                {
+                    OGRE_DELETE mRegisteredHlms[i];
+                    mRegisteredHlms[i] = 0;
+                }
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     const HlmsMacroblock* HlmsManager::getMacroblock( const HlmsMacroblock &baseParams )
@@ -179,8 +194,10 @@ namespace Ogre
         mFreeBlendblockIds.push_back( blendblock->mId );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsManager::registerHlms( HlmsTypes type, Hlms *provider )
+    void HlmsManager::registerHlms( Hlms *provider, bool deleteOnExit )
     {
+        HlmsTypes type = provider->getType();
+
         if( mRegisteredHlms[type] )
         {
             OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "Provider for HLMS type '" +
@@ -188,7 +205,9 @@ namespace Ogre
                          "HlmsManager::registerHlms" );
         }
 
+        mDeleteRegisteredOnExit[type] = deleteOnExit;
         mRegisteredHlms[type] = provider;
+        mRegisteredHlms[type]->_notifyManager( this );
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::unregisterHlms( HlmsTypes type )
@@ -196,6 +215,9 @@ namespace Ogre
         if( mRegisteredHlms[type] )
         {
             //TODO: Go through all the MovableObjects and remove the Hlms?
+            mRegisteredHlms[type]->_notifyManager( 0 );
+            if( mDeleteRegisteredOnExit[type] )
+                OGRE_DELETE mRegisteredHlms[type];
             mRegisteredHlms[type] = 0;
         }
     }

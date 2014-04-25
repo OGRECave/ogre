@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsManager.h"
+#include "OgreHlms.h"
 
 
 namespace Ogre

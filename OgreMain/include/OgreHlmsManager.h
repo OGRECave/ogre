@@ -47,7 +47,8 @@ namespace Ogre
     /** HLMS stands for "High Level Material System". */
     class _OgreExport HlmsManager : public PassAlloc
     {
-        Hlms* mRegisteredHlms[HLMS_MAX];
+        Hlms    *mRegisteredHlms[HLMS_MAX];
+        bool    mDeleteRegisteredOnExit[HLMS_MAX];
 
         typedef vector<uint8>::type BlockIdxVec;
         HlmsMacroblock      mMacroblocks[OGRE_HLMS_NUM_MACROBLOCKS];
@@ -94,11 +95,24 @@ namespace Ogre
         /// @See getMacroblock. This is the same for blend states
         const HlmsBlendblock* getBlendblock( const HlmsBlendblock &baseParams );
 
-        /// Destroys a macroblock created by @getBlendblock. Note it performs an O(N) search,
-        /// but N <= OGRE_HLMS_NUM_BLENDBLOCKS
+        /// Destroys a macroblock created by @getBlendblock. Note it performs
+        /// an O(N) search, but N <= OGRE_HLMS_NUM_BLENDBLOCKS
         void destroyBlendblock( const HlmsBlendblock *Blendblock );
 
-        void registerHlms( HlmsTypes type, Hlms *provider );
+        /** Registers an HLMS provider. The type is retrieved from the provider. Two providers of
+            the same type cannot be registered at the same time (@see HlmsTypes) and will throw
+            an exception.
+        @param provider
+            The HLMS provider being registered.
+        @param deleteOnExit
+            True if we should delete the pointer using OGRE_DELETE when the provider is
+            unregistered or when this manager is destroyed. Otherwise it's caller's
+            responsability to free the pointer.
+        */
+        void registerHlms( Hlms *provider, bool deleteOnExit=true );
+
+        /// Unregisters an HLMS provider of the given type. Does nothing if no provider was registered.
+        /// @See registerHlms for details.
         void unregisterHlms( HlmsTypes type );
 
         void _changeRenderSystem( RenderSystem *newRs );

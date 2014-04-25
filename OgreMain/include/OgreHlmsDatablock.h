@@ -118,6 +118,12 @@ namespace Ogre
     */
     class _OgreExport HlmsDatablock : public PassAlloc
     {
+        //Non-hot variables first (can't put them last as HlmsDatablock may be derived and
+        //it's better if mShadowConstantBias is together with the derived type's variables
+        HlmsParamVec mOriginalParams;
+        Hlms    *mCreator;
+        IdString mName;
+
     public:
         uint32  mTextureHash;       //TextureHash comes before macroblock for alignment reasons
         uint16  mMacroblockHash;    //Not all bits are used
@@ -125,16 +131,20 @@ namespace Ogre
         bool    mIsOpaque;  /// Cached based on mBlendblock data
         HlmsMacroblock const *mMacroblock;
         HlmsBlendblock const *mBlendblock;  ///Don't set this directly, use @setBlendblock
-        HlmsParamVec mOriginalParams;
 
         float   mShadowConstantBias;
 
-        HlmsDatablock( HlmsTypes type,
+    public:
+        HlmsDatablock( IdString name, Hlms *creator,
                        const HlmsMacroblock *macroblock,
                        const HlmsBlendblock *blendblock,
                        const HlmsParamVec &params );
         virtual ~HlmsDatablock() {}
         virtual void calculateHash() {}
+
+        IdString getName(void) const                { return mName; }
+        Hlms* getCreator(void) const                { return mCreator; }
+        const HlmsParamVec& getOriginalParams(void) const   { return mOriginalParams; }
 
         /// Call this function to set mBlendblock & mIsOpaque automatically based on input
         void setBlendblock( HlmsBlendblock const *blendblock );
@@ -158,7 +168,8 @@ namespace Ogre
         /*TexturePtr  mDetailMask;
         TexturePtr  mDetailMap[4];*/
 
-        HlmsPbsEs2Datablock( const HlmsMacroblock *macroblock,
+        HlmsPbsEs2Datablock( IdString name, Hlms *creator,
+                             const HlmsMacroblock *macroblock,
                              const HlmsBlendblock *blendblock,
                              const HlmsParamVec &params );
 

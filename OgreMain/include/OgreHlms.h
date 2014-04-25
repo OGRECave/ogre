@@ -179,23 +179,51 @@ namespace Ogre
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
 
+        virtual HlmsDatablock* createDatablockImpl( const HlmsParamVec &paramVec,
+                                                    const HlmsMacroblock *macroblock,
+                                                    const HlmsBlendblock *blendblock,
+                                                    IdString datablockName );
+
     public:
         Hlms( HlmsTypes type, Archive *dataFolder );
         virtual ~Hlms();
 
+        HlmsTypes getType(void) const                       { return mType; }
+        void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
+
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks
             The name of the datablock must be in paramVec["name"] and must be unique
+            Throws if a datablock with the same name paramVec["name"] already exists
         @param paramVec
+            Key - String Value list of paramters. MUST BE SORTED.
         @param macroblockRef
             @See HlmsManager::getMacroblock
         @param blendblockRef
             @See HlmsManager::getBlendblock
         @return
+            Pointer to created Datablock
         */
-        virtual HlmsDatablock* createDatablock( const HlmsParamVec &paramVec,
-                                                const HlmsMacroblock &macroblockRef,
-                                                const HlmsBlendblock &blendblockRef );
+        HlmsDatablock* createDatablock( const HlmsParamVec &paramVec,
+                                        const HlmsMacroblock &macroblockRef,
+                                        const HlmsBlendblock &blendblockRef );
+
+        /** Finds an existing datablock based on its name (@see createDatablock)
+        @return
+            The datablock associated with that name. Null pointer if not found. Doesn't throw.
+        */
+        HlmsDatablock* getDatablock( IdString name ) const;
+
+        /** Destroys a datablocks given its name. Caller is responsible for ensuring
+            those pointers aren't still in use (i.e. dangling pointers)
+        @remarks
+            Throws if no datablock with the given name exists.
+        */
+        void destroyDatablock( IdString name );
+
+        /// Destroys all datablocks created with @createDatablock. Caller is responsible
+        /// for ensuring those pointers aren't still in use (i.e. dangling pointers)
+        void destroyAllDatablocks(void);
 
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
             the value to 'inOut', otherwise leaves 'inOut' as is.

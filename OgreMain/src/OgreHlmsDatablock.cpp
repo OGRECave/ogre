@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsDatablock.h"
+#include "OgreHlms.h"
 #include "OgreTexture.h"
 
 namespace Ogre
@@ -62,12 +63,15 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
-    HlmsDatablock::HlmsDatablock( HlmsTypes type, const HlmsMacroblock *macroblock,
+    HlmsDatablock::HlmsDatablock( IdString name, Hlms *creator, const HlmsMacroblock *macroblock,
                                   const HlmsBlendblock *blendblock,
                                   const HlmsParamVec &params ) :
+        mOriginalParams( params ),
+        mCreator( creator ),
+        mName( name ),
         mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
         mTextureHash( 0 ),
-        mType( type ),
+        mType( creator->getType() ),
         mIsOpaque( blendblock->mDestBlendFactor == SBF_ZERO &&
                    blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
                    blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
@@ -75,7 +79,6 @@ namespace Ogre
                    blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA ),
         mMacroblock( macroblock ),
         mBlendblock( blendblock ),
-        mOriginalParams( params ),
         mShadowConstantBias( 0.01f )
     {
     }
@@ -91,10 +94,15 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
-    HlmsPbsEs2Datablock::HlmsPbsEs2Datablock( const HlmsMacroblock *macroblock,
+    HlmsPbsEs2Datablock::HlmsPbsEs2Datablock( IdString name, Hlms *creator,
+                                              const HlmsMacroblock *macroblock,
                                               const HlmsBlendblock *blendblock,
                                               const HlmsParamVec &params ) :
-        HlmsDatablock( HLMS_PBS, macroblock, blendblock, params )
+        HlmsDatablock( name, creator, macroblock, blendblock, params ),
+        mFresnelTypeSizeBytes( 4 ),
+        mkDr( 0.079577472 ), mkDg( 0.079577472 ), mkDb( 0.079577472 ), //Max Diffuse = 1 / (4 * PI)
+        mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
+        mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f )
     {
     }
     //-----------------------------------------------------------------------------------

@@ -107,6 +107,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Hlms::~Hlms()
     {
+        destroyAllDatablocks();
     }
     //-----------------------------------------------------------------------------------
     void Hlms::setCommonProperties(void)
@@ -912,6 +913,14 @@ namespace Ogre
         return mRenderableCache[hash & 0x7f];
     }
     //-----------------------------------------------------------------------------------
+    HlmsDatablock* Hlms::createDatablockImpl( const HlmsParamVec &paramVec,
+                                              const HlmsMacroblock *macroblock,
+                                              const HlmsBlendblock *blendblock,
+                                              IdString datablockName )
+    {
+        return OGRE_NEW HlmsDatablock( datablockName, this, macroblock, blendblock, paramVec );
+    }
+    //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::createDatablock( const HlmsParamVec &paramVec,
                                           const HlmsMacroblock &macroblockRef,
                                           const HlmsBlendblock &blendblockRef )
@@ -933,12 +942,50 @@ namespace Ogre
         const HlmsMacroblock *macroblock = mHlmsManager->getMacroblock( macroblockRef );
         const HlmsBlendblock *blendblock = mHlmsManager->getBlendblock( blendblockRef );
 
-        HlmsDatablock *retVal = OGRE_NEW HlmsDatablock( mType, macroblock, blendblock, paramVec );
+        HlmsDatablock *retVal = createDatablockImpl( paramVec, macroblock, blendblock, datablockNameId );
 
         mDatablocks[datablockNameId] = retVal;
 
         retVal->calculateHash();
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsDatablock* Hlms::getDatablock( IdString name ) const
+    {
+        HlmsDatablock *retVal = 0;
+        HlmsDatablockMap::const_iterator itor = mDatablocks.find( name );
+        if( itor != mDatablocks.end() )
+            retVal = itor->second;
+
+        return itor->second;
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::destroyDatablock( IdString name )
+    {
+        HlmsDatablockMap::iterator itor = mDatablocks.find( name );
+        if( itor == mDatablocks.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                         "Can't find datablock with name '" + name.getFriendlyText() + "'",
+                         "Hlms::destroyDatablock" );
+        }
+
+        OGRE_DELETE itor->second;
+        mDatablocks.erase( itor );
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::destroyAllDatablocks(void)
+    {
+        HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
+        HlmsDatablockMap::const_iterator end  = mDatablocks.end();
+
+        while( itor != end )
+        {
+            OGRE_DELETE itor->second;
+            ++itor;
+        }
+
+        mDatablocks.clear();
     }
     //-----------------------------------------------------------------------------------
     bool Hlms::findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut )

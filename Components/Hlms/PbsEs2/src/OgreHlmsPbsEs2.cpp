@@ -52,7 +52,7 @@ namespace Ogre
         "F0"
     };
 
-    HlmsPbsEs2::HlmsPbsEs2() : Hlms( HLMS_PBS, 0 )
+    HlmsPbsEs2::HlmsPbsEs2( Archive *dataFolder ) : Hlms( HLMS_PBS, dataFolder )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ namespace Ogre
     HlmsCache HlmsPbsEs2::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                            bool dualParaboloid, SceneManager *sceneManager )
     {
-        HlmsCache retVal = preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
+        HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
         Camera *camera = sceneManager->getCameraInProgress();
         Matrix4 viewMatrix = camera->getViewMatrix(true);
 
@@ -310,10 +310,15 @@ namespace Ogre
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
         float *psUniformBuffer = psParams->getFloatPointer( 0 );
 
+        assert( dynamic_cast<const HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
+        const HlmsPbsEs2Datablock *datablock = static_cast<const HlmsPbsEs2Datablock*>(
+                                                queuedRenderable.renderable->getDatablock() );
+
         //Sizes can't be equal (we also add more data)
         assert( mPreparedPass.vertexShaderSharedBuffer.size() <
                 vpParams->getFloatConstantList().size() );
-        assert( mPreparedPass.pixelShaderSharedBuffer.size() <
+        assert( ( mPreparedPass.pixelShaderSharedBuffer.size() -
+                  (datablock->mReflectionTex.isNull() ? 9 : 0) ) <
                 psParams->getFloatConstantList().size() );
 
         if( !lastCache || lastCache->type != HLMS_PBS )
@@ -330,10 +335,6 @@ namespace Ogre
                 ++itor;
             }
         }
-
-        assert( dynamic_cast<const HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
-        const HlmsPbsEs2Datablock *datablock = static_cast<const HlmsPbsEs2Datablock*>(
-                                                queuedRenderable.renderable->getDatablock() );
 
         uint16 variabilityMask = GPV_PER_OBJECT;
         if( cache != lastCache )
@@ -377,7 +378,7 @@ namespace Ogre
         //---------------------------------------------------------------------------
         memcpy( psUniformBuffer, &datablock->mRoughness,
                 7 * sizeof(float) + datablock->mFresnelTypeSizeBytes );
-        psUniformBuffer += 7 * sizeof(float) + datablock->mFresnelTypeSizeBytes;
+        psUniformBuffer += 7 + (datablock->mFresnelTypeSizeBytes >> 2);
 
         if( datablock->mTextureHash != lastTextureHash )
         {
@@ -400,5 +401,13 @@ namespace Ogre
 
         mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, variabilityMask );
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsDatablock* HlmsPbsEs2::createDatablockImpl( const HlmsParamVec &paramVec,
+                                                    const HlmsMacroblock *macroblock,
+                                                    const HlmsBlendblock *blendblock,
+                                                    IdString datablockName )
+    {
+        return OGRE_NEW HlmsPbsEs2Datablock( datablockName, this, macroblock, blendblock, paramVec );
     }
 }
