@@ -1108,7 +1108,8 @@ namespace Ogre
                                                         HighLevelGpuProgramManager::getSingletonPtr();
 
                 HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
-                                    "name", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                    StringConverter::toString( finalHash ) + ShaderFiles[i],
+                                    ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
                                     "glsl", static_cast<GpuProgramType>(i) );
                 gp->setSource( outString );
 
