@@ -337,21 +337,23 @@ namespace Ogre
         }
 
         uint16 variabilityMask = GPV_PER_OBJECT;
+        size_t psBufferElements = mPreparedPass.pixelShaderSharedBuffer.size() -
+                                    (datablock->mReflectionTex.isNull() ? 9 : 0);
+
         if( cache != lastCache )
         {
             variabilityMask = GPV_ALL;
             memcpy( vsUniformBuffer, mPreparedPass.vertexShaderSharedBuffer.begin(),
                     sizeof(float) * mPreparedPass.vertexShaderSharedBuffer.size() );
-            vsUniformBuffer += mPreparedPass.vertexShaderSharedBuffer.size();
 
             assert( !datablock->mReflectionTex.isNull() == getProperty( PropertyEnvProbeMap ) );
 
-            size_t psBufferElements = mPreparedPass.pixelShaderSharedBuffer.size() -
-                                        (datablock->mReflectionTex.isNull() ? 9 : 0);
             memcpy( psUniformBuffer, mPreparedPass.pixelShaderSharedBuffer.begin(),
                     sizeof(float) * psBufferElements );
-            psUniformBuffer += psBufferElements;
         }
+
+        vsUniformBuffer += mPreparedPass.vertexShaderSharedBuffer.size();
+        psUniformBuffer += psBufferElements;
 
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
 
