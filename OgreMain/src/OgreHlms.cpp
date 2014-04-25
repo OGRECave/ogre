@@ -1354,6 +1354,11 @@ namespace Ogre
         return lastReturnedValue;
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::_changeRenderSystem( RenderSystem *newRs )
+    {
+        mRenderSystem = newRs;
+    }
+    //-----------------------------------------------------------------------------------
     /*void Hlms::generateFor()
     {
         uint16 numWorldTransforms = 1;

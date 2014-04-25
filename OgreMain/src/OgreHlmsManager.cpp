@@ -208,6 +208,7 @@ namespace Ogre
         mDeleteRegisteredOnExit[type] = deleteOnExit;
         mRegisteredHlms[type] = provider;
         mRegisteredHlms[type]->_notifyManager( this );
+        mRegisteredHlms[type]->_changeRenderSystem( mRenderSystem );
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::unregisterHlms( HlmsTypes type )
@@ -254,6 +255,12 @@ namespace Ogre
             end  = mActiveBlendblocks.end();
             while( itor != end )
                 mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[*itor++] );
+
+            for( size_t i=0; i<HLMS_MAX; ++i )
+            {
+                if( mRegisteredHlms[i] )
+                    mRegisteredHlms[i]->_changeRenderSystem( newRs );
+            }
         }
     }
 }

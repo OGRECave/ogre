@@ -286,6 +286,8 @@ namespace Ogre
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
 
+        void _changeRenderSystem( RenderSystem *newRs );
+
         static const IdString HlmsPropertySkeleton;
         static const IdString HlmsPropertyBonesPerVertex;
         static const IdString HlmsPropertyPose;

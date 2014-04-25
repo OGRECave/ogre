@@ -1204,6 +1204,8 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
             bool casterPass = mIlluminationStage == IRS_RENDER_TO_TEXTURE;
 
+            mRenderQueue->clear();
+
             //TODO: _updateRenderQueue MIGHT be called in parallel
             firePreFindVisibleObjects(vp);
             while( it != en )
