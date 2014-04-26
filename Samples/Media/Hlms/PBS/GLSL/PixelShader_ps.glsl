@@ -1,9 +1,9 @@
 #version 330
-
 /*#ifdef GL_ES
 precision mediump float;
 #endif*/
 #define FRAG_COLOR		0
+@property( !hlms_shadowcaster )
 layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 
 @property( hlms_normal )
@@ -63,11 +63,11 @@ float ROUGHNESS;
 @piece( MulSpecularMapValue )* specularCol.xyz@end@end
 
 @property( hlms_num_shadow_maps )
-@property( hlms_shadow_usues_depth_texture )#define SAMPLER2DSHADOW sampler2DShadow@end
-@property( !hlms_shadow_usues_depth_texture )#define SAMPLER2DSHADOW sampler2D@end
-uniform SAMPLER2DSHADOW texShadowMap[@value(hlms_num_shadow_maps)];
+@property( hlms_shadow_uses_depth_texture )@piece( SAMPLER2DSHADOW )sampler2DShadow@end @end
+@property( !hlms_shadow_uses_depth_texture )@piece( SAMPLER2DSHADOW )sampler2D@end @end
+uniform @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shadow_maps)];
 
-float getShadow( SAMPLER2DSHADOW shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
+float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
 {
 @property( !hlms_shadow_usues_depth_texture )
 	const float fDepth = psPosLN.z;
@@ -247,3 +247,12 @@ void main()
 	outColour.xyz	= finalColour;
 	outColour.w		= 1.0f;
 }
+@end
+@property( hlms_shadowcaster )
+in float psDepth;
+layout(location = FRAG_COLOR, index = 0) out float outColour;
+void main()
+{
+	outColour = psDepth;
+}
+@end

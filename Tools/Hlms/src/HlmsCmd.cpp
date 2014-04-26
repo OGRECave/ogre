@@ -45,6 +45,9 @@ THE SOFTWARE.
 
 #include "OgreStringVector.h"
 #include "OgreHlms.h"
+#include "OgreHlmsDatablock.h"
+#include "OgreHlmsManager.h"
+#include "OgreHlmsPbsEs2.h"
 #include "OgreArchiveManager.h"
 #include "OgreEntity.h"
 
@@ -199,11 +202,18 @@ void HlmsCmd::createScene(void)
     Archive *archive = ArchiveManager::getSingletonPtr()->load(
                     "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PBS/GLSL",
                     "FileSystem", true );
-    Hlms hlms( archive );
+    HlmsPbsEs2 *pbs = OGRE_NEW HlmsPbsEs2( archive );
+    HlmsManager *hlmsManager = mSceneMgr->getHlmsManager();
+    hlmsManager->registerHlms( pbs );
+
     HlmsParamVec params;
-    params.insert( /*std::lower_bound( params.begin(), params.end(), )*/params.begin(),
-                   std::pair<IdString, String>( "envprobe_map", "example.dds" ) );
-    entity->getSubEntity(0)->setHlms( &hlms, params );
+    /*params.insert( *//*std::lower_bound( params.begin(), params.end(), )*//*params.begin(),
+                   std::pair<IdString, String>( "envprobe_map", "example.dds" ) );*/
+    params.push_back( std::pair<IdString, String>( "name", "TEST MATERIAL" ) );
+    HlmsMacroblock macroblockRef;
+    HlmsBlendblock blendblockRef;
+    HlmsDatablock *datablock = pbs->createDatablock( params, macroblockRef, blendblockRef );
+    entity->setHlms( datablock );
 
     mSceneMgr->updateSceneGraph();
 
@@ -211,8 +221,14 @@ void HlmsCmd::createScene(void)
     if( shadowNode )
         shadowNode->_update( mCamera, mCamera, mSceneMgr );
 
-    HlmsCache passCache = hlms.preparePassHash( shadowNode, false, false, mSceneMgr );
-    const HlmsCache *finalCache = hlms.getMaterial( passCache, entity->getSubEntity(0), entity, false );
+    HlmsCache dummy( 0, HLMS_MAX );
+    HlmsCache const *lastHlmsCache = &dummy;
+
+    bool casterPass = false;
+    HlmsCache passCache = pbs->preparePassHash( shadowNode, casterPass, false, mSceneMgr );
+    QueuedRenderable queuedRenderable( 0, entity->getSubEntity(0), entity );
+    const HlmsCache *finalCache = pbs->getMaterial( lastHlmsCache, passCache,
+                                                    queuedRenderable, casterPass );
 
     if( !finalCache->vertexShader.isNull() )
     {

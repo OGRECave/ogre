@@ -91,8 +91,15 @@ namespace Ogre
         GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
 
         uint texUnit = 0;
-        for( texUnit=0; texUnit<mPreparedPass.shadowMaps.size(); ++texUnit )
-            psParams->setNamedConstant( "texShadowMap", texUnit );
+        if( !mPreparedPass.shadowMaps.empty() )
+        {
+            vector<int>::type shadowMaps;
+            shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
+            for( texUnit=0; texUnit<mPreparedPass.shadowMaps.size(); ++texUnit )
+                shadowMaps.push_back( texUnit );
+
+            psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
+        }
 
         assert( dynamic_cast<const HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsEs2Datablock *datablock = static_cast<const HlmsPbsEs2Datablock*>(
