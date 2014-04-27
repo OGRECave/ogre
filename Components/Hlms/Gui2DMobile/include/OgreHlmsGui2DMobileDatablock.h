@@ -110,7 +110,7 @@ namespace Ogre
              * alpha_test [compare_func]
                 When present, mAlphaTestThreshold is used.
                 compare_func is optional. Valid values are:
-                    less, less_equal, equal, greater, greater_equal
+                    less, less_equal, equal, greater, greater_equal, not_equal
                 Default compare_func: less
                 Example: alpha_test equal
         */

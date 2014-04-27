@@ -210,13 +210,44 @@ namespace Ogre
         if( findParamInVec( params, PropertyDiffuseMap, paramVal ) )
             setProperty( PropertyDiffuseMap, 1 );
 
+        PiecesMap pieces[NumShaderTypes];
+
         assert( dynamic_cast<const HlmsGui2DMobileDatablock*>( renderable->getDatablock() ) );
         const HlmsGui2DMobileDatablock *datablock = static_cast<const HlmsGui2DMobileDatablock*>(
                                                                     renderable->getDatablock() );
 
         setProperty( PropertyDiffuse, datablock->mHasColour );
-        setProperty( PropertyAlphaTest, datablock->mIsAlphaTested );
         setProperty( PropertyDiffuseMapCount, datablock->mNumTextureUnits );
+
+        if( datablock->mIsAlphaTested )
+        {
+            setProperty( PropertyAlphaTest, 1 );
+            Hlms::findParamInVec( params, PropertyAlphaTest, paramVal );
+            if( paramVal == "less" )
+                pieces[PixelShader]["alpha_test_cmp_func"] = "<";
+            else if( paramVal == "less_equal" )
+                pieces[PixelShader]["alpha_test_cmp_func"] = "<=";
+            else if( paramVal == "equal" )
+                pieces[PixelShader]["alpha_test_cmp_func"] = "==";
+            else if( paramVal == "greater" )
+                pieces[PixelShader]["alpha_test_cmp_func"] = ">";
+            else if( paramVal == "greater_equal" )
+                pieces[PixelShader]["alpha_test_cmp_func"] = ">=";
+            else if( paramVal == "not_equal" )
+                pieces[PixelShader]["alpha_test_cmp_func"] = "!=";
+            else if( !paramVal.empty() )
+            {
+                String paramValName;
+                Hlms::findParamInVec( params, "name", paramValName );
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             paramValName + ": unknown alpha_test cmp function '" + paramVal + "'",
+                             "HlmsGui2DMobile::calculateHashFor" );
+            }
+            else
+            {
+                pieces[PixelShader]["alpha_test_cmp_func"] = "==";
+            }
+        }
 
         //Deal with base texture
         if( Hlms::findParamInVec( params, PropertyDiffuseMapCount0, paramVal ) )
@@ -250,7 +281,7 @@ namespace Ogre
                             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                                          paramValName + ": diffuse_map's is trying to use more UV "
                                          "sets than the mesh has ( " + subString + "vs" +
-                                         StringConverter(numTexCoords) + " )",
+                                         StringConverter::toString(numTexCoords) + " )",
                                          "HlmsGui2DMobile::calculateHashFor" );
                         }
 
@@ -262,8 +293,6 @@ namespace Ogre
                 pos = nextPos;
             }
         }
-
-        PiecesMap pieces[NumShaderTypes];
 
         //Deal with top textures
         for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String* ); ++i )
