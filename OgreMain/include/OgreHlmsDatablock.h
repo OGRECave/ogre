@@ -118,6 +118,7 @@ namespace Ogre
     */
     class _OgreExport HlmsDatablock : public PassAlloc
     {
+    protected:
         //Non-hot variables first (can't put them last as HlmsDatablock may be derived and
         //it's better if mShadowConstantBias is together with the derived type's variables
         HlmsParamVec mOriginalParams;

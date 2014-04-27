@@ -70,9 +70,9 @@ uniform @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shadow_maps
 float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
 {
 @property( !hlms_shadow_usues_depth_texture )
-	const float fDepth = psPosLN.z;
-	const vec2 uv = psPosLN.xy / psPosLN.w;
-	const vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
+	float fDepth = psPosLN.z;
+	vec2 uv = psPosLN.xy / psPosLN.w;
+	vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
 
 	// 2x2 PCF
 	float c =	(fDepth <= textureLod(shadowMap, uv - o.xy, 0).r) ? 1 : 0; // top left

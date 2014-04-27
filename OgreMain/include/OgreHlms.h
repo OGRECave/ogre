@@ -47,6 +47,7 @@ namespace Ogre
     /** HLMS stands for "High Level Material System". */
     class _OgreExport Hlms : public PassAlloc
     {
+    protected:
         enum ShaderType
         {
             VertexShader,
@@ -57,13 +58,39 @@ namespace Ogre
             NumShaderTypes
         };
 
-        typedef vector<HlmsPropertyVec>::type HlmsPropertyVecVec;
+        typedef std::map<IdString, String> PiecesMap;
 
-    protected:
-        HlmsPropertyVecVec  mRenderableCache;
+        struct RenderableCache
+        {
+            HlmsPropertyVec setProperties;
+            PiecesMap       pieces[NumShaderTypes];
+
+            RenderableCache( const HlmsPropertyVec &properties,
+                             const PiecesMap *_pieces ) :
+                setProperties( properties )
+            {
+                if( _pieces )
+                {
+                    for( size_t i=0; i<NumShaderTypes; ++i )
+                        pieces[i] = _pieces[i];
+                }
+            }
+
+            bool operator == ( const RenderableCache &_r ) const
+            {
+                bool piecesEqual = true;
+                for( size_t i=0; i<NumShaderTypes; ++i )
+                    piecesEqual &= pieces[i] == _r.pieces[i];
+
+                return setProperties == _r.setProperties && piecesEqual;
+            }
+        };
+
+        typedef vector<RenderableCache>::type RenderableCacheVec;
+
+        RenderableCacheVec  mRenderableCache;
         HlmsCacheVec        mShaderCache;
 
-        typedef std::map<IdString, String> PiecesMap;
         HlmsPropertyVec mSetProperties;
         PiecesMap       mPieces;
 
@@ -148,8 +175,23 @@ namespace Ogre
         static size_t calculateLineCount(const String &buffer, size_t idx );
         static size_t calculateLineCount( const SubStringRef &subString );
 
-        size_t addRenderableCache( const HlmsPropertyVec &renderableSetProperties );
-        const HlmsPropertyVec& getRenderableCache( uint32 hash ) const;
+        /** Caches a set of properties (i.e. key-value pairs) & snippets of shaders. If an
+            exact entry exists in the cache, its index is returned. Otherwise a new entry
+            will be created.
+        @param renderableSetProperties
+            A vector containing key-value pairs of data
+        @param pieces
+            Shader snippets for each type of shader. Can be null. When not null, must hold
+            NumShaderTypes entries, i.e. String val = pieces[NumShaderTypes-1][IdString]
+        @return
+            The index to the cache entry.
+        */
+        size_t addRenderableCache( const HlmsPropertyVec &renderableSetProperties,
+                                   const PiecesMap *pieces );
+
+        /// Retrieves a cache entry using the returned value from @addRenderableCache
+        const RenderableCache& getRenderableCache( uint32 hash ) const;
+
         const HlmsCache* addShaderCache( uint32 hash, GpuProgramPtr &vertexShader,
                                          GpuProgramPtr &geometryShader,
                                          GpuProgramPtr &tesselationHullShader,
@@ -288,6 +330,8 @@ namespace Ogre
 
         void _changeRenderSystem( RenderSystem *newRs );
 
+        RenderSystem* getRenderSystem(void) const           { return mRenderSystem; }
+
         static const IdString HlmsPropertySkeleton;
         static const IdString HlmsPropertyBonesPerVertex;
         static const IdString HlmsPropertyPose;
@@ -324,6 +368,8 @@ namespace Ogre
         static const IdString PropertySpecularMap;
         static const IdString PropertyEnvProbeMap;
         static const IdString PropertyAlphaTest;
+
+        static const IdString *UvCountPtrs[8];
     };
     /** @} */
     /** @} */

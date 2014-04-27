@@ -72,6 +72,9 @@ namespace Ogre
         HlmsGui2DMobile( Archive *dataFolder );
         ~HlmsGui2DMobile();
 
+        virtual void calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
+                                       uint32 &outHash, uint32 &outCasterHash );
+
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
                                            bool casterPass, bool dualParaboloid,
                                            SceneManager *sceneManager );
@@ -79,6 +82,41 @@ namespace Ogre
         virtual void fillBuffersFor(const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                      bool casterPass, const HlmsCache *lastCache,
                                      uint32 lastTextureHash );
+
+        static const IdString PropertyDiffuse;
+        static const IdString PropertyDiffuseMapCount;
+        static const IdString PropertyDiffuseMapCount0;
+        static const IdString PropertyDiffuseMapCount1;
+        static const IdString PropertyDiffuseMapCount2;
+        static const IdString PropertyDiffuseMapCount3;
+        static const IdString PropertyDiffuseMapCount4;
+        static const IdString PropertyDiffuseMapCount5;
+        static const IdString PropertyDiffuseMapCount6;
+        static const IdString PropertyDiffuseMapCount7;
+        static const IdString PropertyDiffuseMapCount8;
+        static const IdString PropertyDiffuseMapCount9;
+        static const IdString PropertyDiffuseMapCount10;
+        static const IdString PropertyDiffuseMapCount11;
+        static const IdString PropertyDiffuseMapCount12;
+        static const IdString PropertyDiffuseMapCount13;
+        static const IdString PropertyDiffuseMapCount14;
+        static const IdString PropertyDiffuseMapCount15;
+
+        static const IdString PropertyBlendModeIdx1;
+        static const IdString PropertyBlendModeIdx2;
+        static const IdString PropertyBlendModeIdx3;
+        static const IdString PropertyBlendModeIdx4;
+        static const IdString PropertyBlendModeIdx5;
+        static const IdString PropertyBlendModeIdx6;
+        static const IdString PropertyBlendModeIdx7;
+        static const IdString PropertyBlendModeIdx8;
+        static const IdString PropertyBlendModeIdx9;
+        static const IdString PropertyBlendModeIdx10;
+        static const IdString PropertyBlendModeIdx11;
+        static const IdString PropertyBlendModeIdx12;
+        static const IdString PropertyBlendModeIdx13;
+        static const IdString PropertyBlendModeIdx14;
+        static const IdString PropertyBlendModeIdx15;
     };
 
     /** @} */
