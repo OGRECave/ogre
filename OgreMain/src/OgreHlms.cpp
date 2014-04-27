@@ -158,12 +158,12 @@ namespace Ogre
             }
         }
 
-        StringVector::const_iterator itLowerCase = stringVectorLowerCase.begin();
-        StringVector::const_iterator itor = stringVectorPtr->begin();
-        StringVector::const_iterator end  = stringVectorPtr->end();
-
         for( size_t i=0; i<sizeof( PieceFilePatterns ) / sizeof( String* ); ++i )
         {
+            StringVector::const_iterator itLowerCase = stringVectorLowerCase.begin();
+            StringVector::const_iterator itor = stringVectorPtr->begin();
+            StringVector::const_iterator end  = stringVectorPtr->end();
+
             while( itor != end )
             {
                 if( itLowerCase->find( PieceFilePatterns[i] ) != String::npos )

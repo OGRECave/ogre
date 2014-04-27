@@ -250,17 +250,64 @@ namespace Ogre
         }
 
         //Deal with base texture
-        if( Hlms::findParamInVec( params, PropertyDiffuseMapCount0, paramVal ) )
+        if( Hlms::findParamInVec( params, PropertyDiffuseMap, paramVal ) ||
+            Hlms::findParamInVec( params, "diffuse_map0", paramVal ) )
         {
-            setProperty( PropertyDiffuseMapCount0, 0 );
+            setProperty( PropertyDiffuseMap, 1 );
 
             size_t pos = paramVal.find_first_of( ' ' );
-            while( pos != String::npos )
+            while( pos < paramVal.size() )
             {
-                size_t nextPos = paramVal.find_first_of( ' ', pos );
-                if( pos != String::npos )
+                size_t nextPos = paramVal.find_first_of( ' ', pos + 1 );
+                nextPos = std::min( nextPos, paramVal.size() );
+
+                String subString = paramVal.substr( pos + 1, nextPos - pos - 1 );
+                uint val = StringConverter::parseUnsignedInt( subString, ~0 );
+                if( val >= 8 && val != ~0 )
                 {
-                    String subString = paramVal.substr( pos, nextPos );
+                    //It's a number, but UV sets can't be 8 or more
+                    String paramValName;
+                    Hlms::findParamInVec( params, "name", paramValName );
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 paramValName + ": diffuse_map's UV set must be in range [0; 8)."
+                                 " Actual value: " + paramVal,
+                                 "HlmsGui2DMobile::calculateHashFor" );
+                }
+                else if( val < 8 )
+                {
+                    if( val >= numTexCoords )
+                    {
+                        String paramValName;
+                        Hlms::findParamInVec( params, "name", paramVal );
+                        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                     paramValName + ": diffuse_map's is trying to use more UV "
+                                     "sets than the mesh has ( " + subString + "vs" +
+                                     StringConverter::toString(numTexCoords) + " )",
+                                     "HlmsGui2DMobile::calculateHashFor" );
+                    }
+
+                    //Valid UV set
+                    setProperty( PropertyDiffuseMapCount0, val );
+                }
+
+                pos = nextPos;
+            }
+        }
+
+        //Deal with top textures
+        for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String* ); ++i )
+        {
+            if( Hlms::findParamInVec( params, c_diffuseMap[i], paramVal ) )
+            {
+                pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] = "@insertpiece( NormalPremul )";
+
+                size_t pos = paramVal.find_first_of( ' ' );
+                while( pos < paramVal.size() )
+                {
+                    size_t nextPos = paramVal.find_first_of( ' ', pos + 1 );
+                    nextPos = std::min( nextPos, paramVal.size() );
+
+                    String subString = paramVal.substr( pos + 1, nextPos - pos - 1 );
                     uint val = StringConverter::parseUnsignedInt( subString, ~0 );
                     if( val >= 8 && val != ~0 )
                     {
@@ -274,76 +321,28 @@ namespace Ogre
                     }
                     else if( val < 8 )
                     {
-                        if( val >= numTexCoords )
-                        {
-                            String paramValName;
-                            Hlms::findParamInVec( params, "name", paramVal );
-                            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                         paramValName + ": diffuse_map's is trying to use more UV "
-                                         "sets than the mesh has ( " + subString + "vs" +
-                                         StringConverter::toString(numTexCoords) + " )",
-                                         "HlmsGui2DMobile::calculateHashFor" );
-                        }
-
                         //Valid UV set
-                        setProperty( PropertyDiffuseMapCount0, val );
+                        setProperty( *DiffuseMapCountPtrs[i][0], val );
                     }
-                }
-
-                pos = nextPos;
-            }
-        }
-
-        //Deal with top textures
-        for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String* ); ++i )
-        {
-            if( Hlms::findParamInVec( params, c_diffuseMap[i], paramVal ) )
-            {
-                setProperty( *DiffuseMapCountPtrs[i][0], 0 );
-
-                size_t pos = paramVal.find_first_of( ' ' );
-                while( pos != String::npos )
-                {
-                    size_t nextPos = paramVal.find_first_of( ' ', pos );
-                    if( pos != String::npos )
+                    else
                     {
-                        String subString = paramVal.substr( pos, nextPos );
-                        uint val = StringConverter::parseUnsignedInt( subString, ~0 );
-                        if( val >= 8 && val != ~0 )
+                        //Must be a blend
+                        const IdString *it = std::find( c_blendModes, c_blendModes +
+                                                        sizeof(c_blendModes) / sizeof( IdString* ),
+                                                        IdString( subString ) );
+
+                        if( it == c_blendModes + sizeof(c_blendModes) / sizeof( IdString* ) )
                         {
-                            //It's a number, but UV sets can't be 8 or more
                             String paramValName;
                             Hlms::findParamInVec( params, "name", paramValName );
                             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                         paramValName + ": diffuse_map's UV set must be in range [0; 8)."
-                                         " Actual value: " + paramVal,
+                                         paramValName + ": Invalid parameter. A blend mode or UV "
+                                         "set must be specified. Actual value: " + paramVal,
                                          "HlmsGui2DMobile::calculateHashFor" );
                         }
-                        else if( val < 8 )
-                        {
-                            //Valid UV set
-                            setProperty( *DiffuseMapCountPtrs[i][0], val );
-                        }
-                        else
-                        {
-                            //Must be a blend
-                            const IdString *it = std::find( c_blendModes, c_blendModes +
-                                                            sizeof(c_blendModes) / sizeof( IdString* ),
-                                                            IdString( subString ) );
 
-                            if( it == c_blendModes + sizeof(c_blendModes) / sizeof( IdString* ) )
-                            {
-                                String paramValName;
-                                Hlms::findParamInVec( params, "name", paramValName );
-                                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                             paramValName + ": Invalid parameter. A blend mode or UV "
-                                             "set must be specified. Actual value: " + paramVal,
-                                             "HlmsGui2DMobile::calculateHashFor" );
-                            }
-
-                            pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] =
-                                                            "@insertpiece( " + subString + " )";
-                        }
+                        pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] =
+                                                        "@insertpiece( " + subString + " )";
                     }
 
                     pos = nextPos;
@@ -411,6 +410,9 @@ namespace Ogre
             memcpy( psUniformBuffer, &datablock->mR, 4 * sizeof(float) );
             psUniformBuffer += 4;
         }
+
+        if( datablock->mIsAlphaTested )
+            *psUniformBuffer++ = datablock->mAlphaTestThreshold;
 
         if( datablock->mTextureHash != lastTextureHash )
         {

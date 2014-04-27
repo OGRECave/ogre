@@ -48,6 +48,8 @@ THE SOFTWARE.
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsPbsMobile.h"
+#include "OgreHlmsGui2DMobile.h"
+#include "OgreHlmsGui2DMobileDatablock.h"
 #include "OgreArchiveManager.h"
 #include "OgreEntity.h"
 
@@ -200,19 +202,30 @@ void HlmsCmd::createScene(void)
 
     Entity *entity = mSceneMgr->createEntity( "penguin.mesh" );
     Archive *archive = ArchiveManager::getSingletonPtr()->load(
-                    "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PBS/GLSL",
+                    "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PbsMobile/GLSL",
+                    "FileSystem", true );
+    Archive *archiveGui = ArchiveManager::getSingletonPtr()->load(
+                    "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/GuiMobile/GLSL",
                     "FileSystem", true );
     HlmsPbsMobile *pbs = OGRE_NEW HlmsPbsMobile( archive );
+    HlmsGui2DMobile *gui2d = OGRE_NEW HlmsGui2DMobile( archiveGui );
     HlmsManager *hlmsManager = mSceneMgr->getHlmsManager();
     hlmsManager->registerHlms( pbs );
+    hlmsManager->registerHlms( gui2d );
 
     HlmsParamVec params;
     /*params.insert( *//*std::lower_bound( params.begin(), params.end(), )*//*params.begin(),
                    std::pair<IdString, String>( "envprobe_map", "example.dds" ) );*/
     params.push_back( std::pair<IdString, String>( "name", "TEST MATERIAL" ) );
+    params.push_back( std::pair<IdString, String>( "diffuse_map0", "penguin.jpg 0" ) );
+    params.push_back( std::pair<IdString, String>( "diffuse_map1", "penguin.jpg 0 Add" ) );
+    std::sort( params.begin(), params.end(), OrderParamVecByKey );
     HlmsMacroblock macroblockRef;
     HlmsBlendblock blendblockRef;
-    HlmsDatablock *datablock = pbs->createDatablock( params, macroblockRef, blendblockRef );
+    //HlmsDatablock *datablock = pbs->createDatablock( params, macroblockRef, blendblockRef );
+    HlmsDatablock *datablock = gui2d->createDatablock( params, macroblockRef, blendblockRef );
+
+    Hlms *usedGenerator = gui2d;
     entity->setHlms( datablock );
 
     mSceneMgr->updateSceneGraph();
@@ -225,10 +238,10 @@ void HlmsCmd::createScene(void)
     HlmsCache const *lastHlmsCache = &dummy;
 
     bool casterPass = false;
-    HlmsCache passCache = pbs->preparePassHash( shadowNode, casterPass, false, mSceneMgr );
+    HlmsCache passCache = usedGenerator->preparePassHash( shadowNode, casterPass, false, mSceneMgr );
     QueuedRenderable queuedRenderable( 0, entity->getSubEntity(0), entity );
-    const HlmsCache *finalCache = pbs->getMaterial( lastHlmsCache, passCache,
-                                                    queuedRenderable, casterPass );
+    const HlmsCache *finalCache = usedGenerator->getMaterial( lastHlmsCache, passCache,
+                                                              queuedRenderable, casterPass );
 
     if( !finalCache->vertexShader.isNull() )
     {

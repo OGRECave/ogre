@@ -71,25 +71,25 @@ namespace Ogre
     {
         for( size_t i=0; i<sizeof(mTextureMatrices) / sizeof(Matrix4); ++i )
         {
-            mTextureMatrices[i+ 0] = 1.0f;
-            mTextureMatrices[i+ 1] = 0.0f;
-            mTextureMatrices[i+ 2] = 0.0f;
-            mTextureMatrices[i+ 3] = 0.0f;
+            mTextureMatrices[i*16 +  0] = 1.0f;
+            mTextureMatrices[i*16 +  1] = 0.0f;
+            mTextureMatrices[i*16 +  2] = 0.0f;
+            mTextureMatrices[i*16 +  3] = 0.0f;
 
-            mTextureMatrices[i+ 4] = 0.0f;
-            mTextureMatrices[i+ 5] = 1.0f;
-            mTextureMatrices[i+ 6] = 0.0f;
-            mTextureMatrices[i+ 7] = 0.0f;
+            mTextureMatrices[i*16 +  4] = 0.0f;
+            mTextureMatrices[i*16 +  5] = 1.0f;
+            mTextureMatrices[i*16 +  6] = 0.0f;
+            mTextureMatrices[i*16 +  7] = 0.0f;
 
-            mTextureMatrices[i+ 8] = 0.0f;
-            mTextureMatrices[i+ 9] = 0.0f;
-            mTextureMatrices[i+10] = 1.0f;
-            mTextureMatrices[i+11] = 0.0f;
+            mTextureMatrices[i*16 +  8] = 0.0f;
+            mTextureMatrices[i*16 +  9] = 0.0f;
+            mTextureMatrices[i*16 + 10] = 1.0f;
+            mTextureMatrices[i*16 + 11] = 0.0f;
 
-            mTextureMatrices[i+12] = 0.0f;
-            mTextureMatrices[i+13] = 0.0f;
-            mTextureMatrices[i+14] = 0.0f;
-            mTextureMatrices[i+15] = 1.0f;
+            mTextureMatrices[i*16 + 12] = 0.0f;
+            mTextureMatrices[i*16 + 13] = 0.0f;
+            mTextureMatrices[i*16 + 14] = 0.0f;
+            mTextureMatrices[i*16 + 15] = 1.0f;
         }
 
         memset( mTextureMatrixMap, 0xffffffff, sizeof(mTextureMatrixMap) );
@@ -108,6 +108,17 @@ namespace Ogre
             size_t pos = std::min( paramVal.find_first_of( ' ' ), paramVal.size() );
             mDiffuseTextures[mNumTextureUnits] = TextureManager::getSingleton().getByName(
                                                                 paramVal.substr( 0, pos ) );
+
+            if( mDiffuseTextures[mNumTextureUnits].isNull() )
+            {
+                //TODO: Assign blank texture
+                String paramValName;
+                Hlms::findParamInVec( params, "name", paramVal );
+                LogManager::getSingleton().logMessage( paramValName + ": WARNING Texture '" +
+                                                       paramVal.substr( 0, pos ) + "' not found" );
+                //mDiffuseTextures[mNumTextureUnits]
+            }
+
             ++mNumTextureUnits;
         }
 
@@ -115,18 +126,29 @@ namespace Ogre
         {
             if( Hlms::findParamInVec( params, c_diffuseMap[i], paramVal ) )
             {
-                if( mNumTextureUnits != i )
+                if( mNumTextureUnits != i + 1 )
                 {
                     Hlms::findParamInVec( params, "name", paramVal );
                     OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                                  paramVal + ": Can't leave gaps between texture units! '" +
-                                 c_diffuseMap[i] + "' was specified but the previous diffuse_map"
+                                 c_diffuseMap[i] + "' was specified but the previous diffuse_map "
                                  "is missing.", "HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock" );
                 }
 
                 size_t pos = std::min( paramVal.find_first_of( ' ' ), paramVal.size() );
                 mDiffuseTextures[mNumTextureUnits] = TextureManager::getSingleton().getByName(
                                                                     paramVal.substr( 0, pos ) );
+
+                if( mDiffuseTextures[mNumTextureUnits].isNull() )
+                {
+                    //TODO: Assign blank texture
+                    String paramValName;
+                    Hlms::findParamInVec( params, "name", paramVal );
+                    LogManager::getSingleton().logMessage( paramValName + ": WARNING Texture '" +
+                                                           paramVal.substr( 0, pos ) + "' not found" );
+                    //mDiffuseTextures[mNumTextureUnits]
+                }
+
                 ++mNumTextureUnits;
             }
         }

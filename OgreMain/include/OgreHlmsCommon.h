@@ -132,7 +132,7 @@ namespace Ogre
     inline bool OrderParamVecByKey( const std::pair<IdString, String> &_left,
                                     const std::pair<IdString, String> &_right )
     {
-        return _left.first < _right.second;
+        return _left.first < _right.first;
     }
 
     /** Up to 8 different HLMS generator types are allowed. The maximum values must be in sync
