@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreHlmsPbsEs2_H_
-#define _OgreHlmsPbsEs2_H_
+#ifndef _OgreHlmsGui2DMobile_H_
+#define _OgreHlmsGui2DMobile_H_
 
 #include "OgreHlms.h"
 #include "OgreHeaderPrefix.h"
@@ -43,19 +43,17 @@ namespace Ogre
     *  @{
     */
 
-    /** Physically based shading implementation specfically designed for OpenGL ES 2.0 and other
+    /** User Interface (2D) implementation specfically designed for OpenGL ES 2.0 and other
         RenderSystems which do not support uniform buffers.
     */
-    class _OgreExport HlmsPbsEs2 : public Hlms
+    class _OgreExport HlmsGui2DMobile : public Hlms
     {
         struct PassData
         {
-            FastArray<TexturePtr>   shadowMaps;
-            FastArray<float>    vertexShaderSharedBuffer;
-            FastArray<float>    pixelShaderSharedBuffer;
+            /*FastArray<float>    vertexShaderSharedBuffer;
+            FastArray<float>    pixelShaderSharedBuffer;*/
 
             Matrix4 viewProjMatrix;
-            Matrix4 viewMatrix;
         };
 
         PassData    mPreparedPass;
@@ -71,8 +69,8 @@ namespace Ogre
                                                     IdString datablockName );
 
     public:
-        HlmsPbsEs2( Archive *dataFolder );
-        ~HlmsPbsEs2();
+        HlmsGui2DMobile( Archive *dataFolder );
+        ~HlmsGui2DMobile();
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
                                            bool casterPass, bool dualParaboloid,

@@ -94,7 +94,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
-    HlmsPbsEs2Datablock::HlmsPbsEs2Datablock( IdString name, Hlms *creator,
+    HlmsPbsMobileDatablock::HlmsPbsMobileDatablock( IdString name, Hlms *creator,
                                               const HlmsMacroblock *macroblock,
                                               const HlmsBlendblock *blendblock,
                                               const HlmsParamVec &params ) :
@@ -107,7 +107,7 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsEs2Datablock::calculateHash()
+    void HlmsPbsMobileDatablock::calculateHash()
     {
         IdString hash;
         if( !mDiffuseTex.isNull() )

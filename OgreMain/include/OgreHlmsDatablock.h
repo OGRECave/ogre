@@ -152,7 +152,7 @@ namespace Ogre
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
     */
-    class _OgreExport HlmsPbsEs2Datablock : public HlmsDatablock
+    class _OgreExport HlmsPbsMobileDatablock : public HlmsDatablock
     {
     public:
         uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
@@ -168,7 +168,7 @@ namespace Ogre
         /*TexturePtr  mDetailMask;
         TexturePtr  mDetailMap[4];*/
 
-        HlmsPbsEs2Datablock( IdString name, Hlms *creator,
+        HlmsPbsMobileDatablock( IdString name, Hlms *creator,
                              const HlmsMacroblock *macroblock,
                              const HlmsBlendblock *blendblock,
                              const HlmsParamVec &params );

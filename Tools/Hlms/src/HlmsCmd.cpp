@@ -47,7 +47,7 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsManager.h"
-#include "OgreHlmsPbsEs2.h"
+#include "OgreHlmsPbsMobile.h"
 #include "OgreArchiveManager.h"
 #include "OgreEntity.h"
 
@@ -202,7 +202,7 @@ void HlmsCmd::createScene(void)
     Archive *archive = ArchiveManager::getSingletonPtr()->load(
                     "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PBS/GLSL",
                     "FileSystem", true );
-    HlmsPbsEs2 *pbs = OGRE_NEW HlmsPbsEs2( archive );
+    HlmsPbsMobile *pbs = OGRE_NEW HlmsPbsMobile( archive );
     HlmsManager *hlmsManager = mSceneMgr->getHlmsManager();
     hlmsManager->registerHlms( pbs );
 

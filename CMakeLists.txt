@@ -373,7 +373,14 @@ cmake_dependent_option(OGRE_BUILD_PLATFORM_WINRT "Build Ogre for Metro style app
 cmake_dependent_option(OGRE_BUILD_PLATFORM_WINDOWS_PHONE "Build Ogre for Windows Phone" FALSE "WIN32" FALSE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)
 
-cmake_dependent_option(OGRE_BUILD_COMPONENT_HLMS_PBSES2 "Build HLMS Physically Based Shading for GL ES 2.0 component" TRUE "" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_HLMS_PBS_MOBILE
+"PBS Stands for Physically Based Shading and it's the default material for most entities and meshes. This is the 'mobile' version for OpenGL ES 2.0.
+If you're targetting only GL ES 3.0 and above; you shouldn't use this component and use the non-mobile instead. Although this component may work with
+ES 3.0, GL3+ and even DX11 render systems, the mobile version uses uniform variables and limited shader based instancing, whereas non-mobile uses
+uniform buffers, texture arrays and true hardware instancing for lower API overhead" TRUE "" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_HLMS_GUI2D_MOBILE
+"GUI material system supporting texture animations, multiple diffuse texture units (aka multitexturing) with Photoshop-like blend modes. This is the
+'mobile' version for OpenGL ES 2.0. If you're targetting only GL ES 3.0 and above; you shouldn't use this component and use the non-mobile instead." TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PAGING "Build Paging component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_MESHLODGENERATOR "Build MeshLodGenerator component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TRUE "" FALSE)

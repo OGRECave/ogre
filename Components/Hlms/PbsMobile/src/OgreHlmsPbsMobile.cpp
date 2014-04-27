@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreHlmsPbsEs2.h"
+#include "OgreHlmsPbsMobile.h"
 #include "OgreHlmsDatablock.h"
 
 #include "OgreHighLevelGpuProgramManager.h"
@@ -52,15 +52,15 @@ namespace Ogre
         "F0"
     };
 
-    HlmsPbsEs2::HlmsPbsEs2( Archive *dataFolder ) : Hlms( HLMS_PBS, dataFolder )
+    HlmsPbsMobile::HlmsPbsMobile( Archive *dataFolder ) : Hlms( HLMS_PBS, dataFolder )
     {
     }
     //-----------------------------------------------------------------------------------
-    HlmsPbsEs2::~HlmsPbsEs2()
+    HlmsPbsMobile::~HlmsPbsMobile()
     {
     }
     //-----------------------------------------------------------------------------------
-    const HlmsCache* HlmsPbsEs2::createShaderCacheEntry( uint32 renderableHash,
+    const HlmsCache* HlmsPbsMobile::createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable )
@@ -101,8 +101,8 @@ namespace Ogre
             psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
         }
 
-        assert( dynamic_cast<const HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
-        const HlmsPbsEs2Datablock *datablock = static_cast<const HlmsPbsEs2Datablock*>(
+        assert( dynamic_cast<const HlmsPbsMobileDatablock*>( queuedRenderable.renderable->getDatablock() ) );
+        const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
                                                     queuedRenderable.renderable->getDatablock() );
 
         assert( !datablock->mDiffuseTex.isNull()    == getProperty( PropertyDiffuseMap ) );
@@ -122,7 +122,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    HlmsCache HlmsPbsEs2::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
+    HlmsCache HlmsPbsMobile::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                            bool dualParaboloid, SceneManager *sceneManager )
     {
         HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
@@ -308,7 +308,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsEs2::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+    void HlmsPbsMobile::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                      bool casterPass, const HlmsCache *lastCache,
                                      uint32 lastTextureHash )
     {
@@ -317,8 +317,8 @@ namespace Ogre
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
         float *psUniformBuffer = psParams->getFloatPointer( 0 );
 
-        assert( dynamic_cast<const HlmsPbsEs2Datablock*>( queuedRenderable.renderable->getDatablock() ) );
-        const HlmsPbsEs2Datablock *datablock = static_cast<const HlmsPbsEs2Datablock*>(
+        assert( dynamic_cast<const HlmsPbsMobileDatablock*>( queuedRenderable.renderable->getDatablock() ) );
+        const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
         //Sizes can't be equal (we also add more data)
@@ -412,11 +412,11 @@ namespace Ogre
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
     }
     //-----------------------------------------------------------------------------------
-    HlmsDatablock* HlmsPbsEs2::createDatablockImpl( const HlmsParamVec &paramVec,
+    HlmsDatablock* HlmsPbsMobile::createDatablockImpl( const HlmsParamVec &paramVec,
                                                     const HlmsMacroblock *macroblock,
                                                     const HlmsBlendblock *blendblock,
                                                     IdString datablockName )
     {
-        return OGRE_NEW HlmsPbsEs2Datablock( datablockName, this, macroblock, blendblock, paramVec );
+        return OGRE_NEW HlmsPbsMobileDatablock( datablockName, this, macroblock, blendblock, paramVec );
     }
 }
