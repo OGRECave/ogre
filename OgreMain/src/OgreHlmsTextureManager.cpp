@@ -158,15 +158,15 @@ namespace Ogre
         size_t xBlock = entryIdx % sqrtMaxTextures;
         size_t yBlock = entryIdx / sqrtMaxTextures;
 
-        size_t nextX = (entryIdx + 1) % sqrtMaxTextures;
-        size_t nextY = (entryIdx + 1) / sqrtMaxTextures;
+        size_t nextX = ( entryIdx % sqrtMaxTextures ) + 1;
+        size_t nextY = ( entryIdx / sqrtMaxTextures ) + 1;
 
         HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
-        const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * dst->getWidth(),
-                                                               yBlock * dst->getHeight(),
+        const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * srcImage.getWidth(),
+                                                               yBlock * srcImage.getHeight(),
                                                                0,
-                                                               nextX * dst->getWidth(),
-                                                               nextY * dst->getHeight(),
+                                                               nextX * srcImage.getWidth(),
+                                                               nextY * srcImage.getHeight(),
                                                                dst->getDepth() ),
                                                           HardwareBuffer::HBL_DISCARD );
         PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
@@ -356,11 +356,11 @@ namespace Ogre
                                             textureArray.sqrtMaxTextures );
                     }
 
-                    textureArray.entries.push_back( texName );
-                    mTextureArrays[mapType].push_back( textureArray );
-
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
                                                             mTextureArrays[mapType].size(), 0 ) );
+
+                    textureArray.entries.push_back( texName );
+                    mTextureArrays[mapType].push_back( textureArray );
                 }
             }
         }
