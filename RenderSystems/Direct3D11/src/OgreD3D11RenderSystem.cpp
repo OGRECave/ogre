@@ -1117,6 +1117,11 @@ bail:
         convertDomainShaderCaps(rsc);
         convertComputeShaderCaps(rsc);
 
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
+
+        if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_1)
+            rsc->setCapability(RSC_TEXTURE_CUBE_MAP_ARRAY);
+
         // Check support for dynamic linkage
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
         {

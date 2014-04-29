@@ -46,6 +46,9 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreHighLevelGpuProgram.h"
 
+#include "OgreHlms.h"
+#include "OgreHlmsManager.h"
+
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 #include "Compositor/OgreCompositorShadowNodeDef.h"
@@ -653,6 +656,307 @@ namespace Ogre{
         }
 
         return true;
+    }
+
+    /**************************************************************************
+     * HlmsTranslator
+     *************************************************************************/
+    /*HlmsTranslator::HlmsTranslator() : mHlms(0)
+    {
+    }*/
+
+    void HlmsTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+    {
+        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        if(obj->name.empty())
+        {
+            compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
+            return;
+        }
+
+        // Must have an HLMS type
+        if(obj->values.empty())
+        {
+            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, obj->file, obj->line,
+                               "HLMS materials require type declaration. i.e. 'hlms myMaterial pbs'.");
+            return;
+        }
+
+        // Get the type
+        String type;
+        if( !getString(obj->values.front(), &type) )
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
+            return;
+        }
+
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        Hlms *hlms = 0;
+        HlmsParamVec paramVec;
+
+        paramVec.reserve( obj->children.size() + 1 );
+        paramVec.push_back( std::pair<IdString, String>( "name", obj->name) );
+
+        if( type == "pbs" )
+            hlms = hlmsManager->getHlms( HLMS_PBS );
+        else if( type == "toon" )
+            hlms = hlmsManager->getHlms( HLMS_TOON );
+        else if( type == "gui" )
+            hlms = hlmsManager->getHlms( HLMS_GUI );
+        else
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, node->file, node->line,
+                               type + " is not a valid hlms type");
+        }
+
+        HlmsMacroblock macroblock;
+        HlmsBlendblock blendblock;
+        //obj->values
+
+        // Create the workspace definition*/
+        /*CreateCompositorScriptCompilerEvent evt(obj->file, obj->name, compiler->getResourceGroup());
+        bool processed = compiler->_fireEvent(&evt, (void*)&mWorkspaceDef);
+
+        if(!processed)
+        {
+            CompositorManager2 *compositorMgr = Root::getSingleton().getCompositorManager2();
+            mWorkspaceDef = compositorMgr->addWorkspaceDefinition( obj->name );
+        }
+
+        if(mWorkspaceDef == 0)
+        {
+            compiler->addError(ScriptCompiler::CE_OBJECTALLOCATIONERROR, obj->file, obj->line);
+            return;
+        }*/
+
+        obj->context = Any(hlms);
+
+        AbstractNodeList::iterator i = obj->children.begin();
+        try
+        {
+        for(i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_PROPERTY)
+            {
+                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                switch(prop->id)
+                {
+                case ID_DEPTH_CHECK:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "depth_check must have 1 argument");
+                    }
+                    else
+                    {
+                        if(!getBoolean(prop->values.front(), &macroblock.mDepthCheck))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "depth_check third argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+                        }
+                    }
+                    break;
+                case ID_DEPTH_WRITE:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "depth_write must have 1 argument");
+                    }
+                    else
+                    {
+                        if(!getBoolean(prop->values.front(), &macroblock.mDepthWrite))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "depth_write third argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+                        }
+
+                    }
+                    break;
+                case ID_DEPTH_BIAS:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "depth_bias must have at most 2 arguments");
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 0), i0 = i1++;
+                        if(getFloat(*i0, &macroblock.mDepthBiasConstant))
+                        {
+                            if(i1 != prop->values.end())
+                                getFloat(*i1, &macroblock.mDepthBiasSlopeScale);
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "depth_bias does not support \"" + (*i0)->getValue() + "\" for argument 1");
+                        }
+                    }
+                    break;
+                case ID_DEPTH_FUNC:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "depth_func must have 1 argument");
+                    }
+                    else
+                    {
+                        if(!getCompareFunction(prop->values.front(), &macroblock.mDepthFunc))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() + " is not a valid CompareFunction");
+                        }
+                    }
+                    break;
+                case ID_ALPHA_TO_COVERAGE:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "alpha_to_coverage must have 1 argument");
+                    }
+                    else
+                    {
+                        if(!getBoolean(prop->values.front(), &macroblock.mAlphaToCoverageEnabled))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "alpha_to_coverage argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+                        }
+                    }
+                    break;
+                case ID_POLYGON_MODE:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "polygon_mode must have at most 1 argument");
+                    }
+                    else
+                    {
+                        if(prop->values.front()->type == ANT_ATOM)
+                        {
+                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
+                            switch(atom->id)
+                            {
+                            case ID_SOLID:
+                                macroblock.mPolygonMode = PM_SOLID;
+                                break;
+                            case ID_POINTS:
+                                macroblock.mPolygonMode = PM_POINTS;
+                                break;
+                            case ID_WIREFRAME:
+                                macroblock.mPolygonMode = PM_WIREFRAME;
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   prop->values.front()->getValue() + " is not a valid polygon mode (solid, points, or wireframe)");
+                            }
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() + " is not a valid polygon mode (solid, points, or wireframe)");
+                        }
+                    }
+                    break;
+                case ID_CULL_MODE:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "cull_hardware must have at most 1 argument");
+                    }
+                    else
+                    {
+                        if(prop->values.front()->type == ANT_ATOM)
+                        {
+                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
+                            switch(atom->id)
+                            {
+                            case ID_CLOCKWISE:
+                                macroblock.mCullMode = CULL_CLOCKWISE;
+                                break;
+                            case ID_ANTICLOCKWISE:
+                                macroblock.mCullMode = CULL_ANTICLOCKWISE;
+                                break;
+                            case ID_NONE:
+                                macroblock.mCullMode = CULL_NONE;
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   prop->values.front()->getValue() + " is not a valid CullingMode");
+                            }
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() + " is not a valid CullingMode");
+                        }
+                    }
+                    break;
+                default:
+                    {
+                    String value;
+                    AbstractNodeList::const_iterator itor = prop->values.begin();
+                    AbstractNodeList::const_iterator end  = prop->values.end();
+                    if( itor != end )
+                    {
+                        if( (*itor)->type == ANT_ATOM )
+                            value += static_cast<AtomAbstractNode*>((*itor).get())->getValue();
+                        ++itor;
+                        while( itor != end )
+                        {
+                            if( (*itor)->type == ANT_ATOM )
+                                value += " " + static_cast<AtomAbstractNode*>((*itor).get())->getValue();
+                            ++itor;
+                        }
+                    }
+                    paramVec.push_back( std::pair<IdString, String>( prop->name, value ) );
+                    }
+                }
+            }
+            else
+            {
+                compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, (*i)->file, (*i)->line,
+                    "token not recognized");
+            }
+        }
+
+        std::sort( paramVec.begin(), paramVec.end(), OrderParamVecByKey );
+        hlms->createDatablock( paramVec, macroblock, blendblock );
+
+        }
+        catch( Exception &e )
+        {
+            if( i != obj->children.end() )
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, (*i)->file, (*i)->line);
+            throw e;
+        }
     }
 
     /**************************************************************************
@@ -7788,7 +8092,9 @@ namespace Ogre{
         {
             ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
             ObjectAbstractNode *parent = obj->parent ? reinterpret_cast<ObjectAbstractNode*>(obj->parent) : 0;
-            if(obj->id == ID_MATERIAL)
+            if(obj->id == ID_HLMS)
+                translator = &mHlmsTranslator;
+            else if(obj->id == ID_MATERIAL)
                 translator = &mMaterialTranslator;
             else if(obj->id == ID_TECHNIQUE && parent && parent->id == ID_MATERIAL)
                 translator = &mTechniqueTranslator;

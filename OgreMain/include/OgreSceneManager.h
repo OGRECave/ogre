@@ -473,7 +473,6 @@ namespace Ogre {
 
         /// Queue of objects for rendering
         RenderQueue* mRenderQueue;
-        HlmsManager *mHlmsManager;
 
         /// Updated every frame, has enough memory to hold all lights.
         LightListInfo mGlobalLightList;
@@ -2946,9 +2945,6 @@ namespace Ogre {
             gets sent
         */
         RenderSystem *getDestinationRenderSystem();
-
-        /// Gets the HlmsManager, which is needed to register generators at startup.
-        HlmsManager* getHlmsManager(void) const     { return mHlmsManager; }
 
         /** Gets the current viewport being rendered (advanced use only, only 
             valid during viewport update. */

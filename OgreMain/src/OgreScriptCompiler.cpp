@@ -1076,6 +1076,7 @@ namespace Ogre
         mIds["illumination_stage"] = ID_ILLUMINATION_STAGE;
         mIds["decal"] = ID_DECAL;
         mIds["cull_hardware"] = ID_CULL_HARDWARE;
+        mIds["cull_mode"] = ID_CULL_MODE;
         mIds["clockwise"] = ID_CLOCKWISE;
         mIds["anticlockwise"] = ID_ANTICLOCKWISE;
         mIds["cull_software"] = ID_CULL_SOFTWARE;
@@ -1294,6 +1295,8 @@ namespace Ogre
         mIds["fsaa"]                    = ID_FSAA;
         mIds["light"]                   = ID_LIGHT;
         mIds["split"]                   = ID_SPLIT;
+
+        mIds["hlms"]            = ID_HLMS;
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
         mIds["rtshader_system"] = ID_RT_SHADER_SYSTEM;

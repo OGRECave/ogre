@@ -223,29 +223,38 @@ namespace Ogre
         {
             setProperty( PropertyAlphaTest, 1 );
             Hlms::findParamInVec( params, PropertyAlphaTest, paramVal );
-            if( paramVal == "less" )
-                pieces[PixelShader]["alpha_test_cmp_func"] = "<";
-            else if( paramVal == "less_equal" )
-                pieces[PixelShader]["alpha_test_cmp_func"] = "<=";
-            else if( paramVal == "equal" )
-                pieces[PixelShader]["alpha_test_cmp_func"] = "==";
-            else if( paramVal == "greater" )
-                pieces[PixelShader]["alpha_test_cmp_func"] = ">";
-            else if( paramVal == "greater_equal" )
-                pieces[PixelShader]["alpha_test_cmp_func"] = ">=";
-            else if( paramVal == "not_equal" )
-                pieces[PixelShader]["alpha_test_cmp_func"] = "!=";
-            else if( !paramVal.empty() )
+
+            pieces[PixelShader]["alpha_test_cmp_func"] = "<";
+
+            StringVector vec = StringUtil::split( paramVal );
+
+            StringVector::const_iterator itor = vec.begin();
+            StringVector::const_iterator end  = vec.end();
+
+            while( itor != end )
             {
-                String paramValName;
-                Hlms::findParamInVec( params, "name", paramValName );
-                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             paramValName + ": unknown alpha_test cmp function '" + paramVal + "'",
-                             "HlmsGui2DMobile::calculateHashFor" );
-            }
-            else
-            {
-                pieces[PixelShader]["alpha_test_cmp_func"] = "==";
+                if( *itor == "less" )
+                    pieces[PixelShader]["alpha_test_cmp_func"] = "<";
+                else if( *itor == "less_equal" )
+                    pieces[PixelShader]["alpha_test_cmp_func"] = "<=";
+                else if( *itor == "equal" )
+                    pieces[PixelShader]["alpha_test_cmp_func"] = "==";
+                else if( *itor == "greater" )
+                    pieces[PixelShader]["alpha_test_cmp_func"] = ">";
+                else if( *itor == "greater_equal" )
+                    pieces[PixelShader]["alpha_test_cmp_func"] = ">=";
+                else if( *itor == "not_equal" )
+                    pieces[PixelShader]["alpha_test_cmp_func"] = "!=";
+                else if( StringConverter::parseReal( *itor, -1.0f ) == -1.0f )
+                {
+                    String paramValName;
+                    Hlms::findParamInVec( params, "name", paramValName );
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 paramValName + ": unknown alpha_test cmp function '" + *itor + "'",
+                                 "HlmsGui2DMobile::calculateHashFor" );
+                }
+
+                ++itor;
             }
         }
 
@@ -255,10 +264,10 @@ namespace Ogre
         {
             setProperty( PropertyDiffuseMap, 1 );
 
-            size_t pos = paramVal.find_first_of( ' ' );
+            size_t pos = paramVal.find_first_of( "\t\n " );
             while( pos < paramVal.size() )
             {
-                size_t nextPos = paramVal.find_first_of( ' ', pos + 1 );
+                size_t nextPos = paramVal.find_first_of( "\t\n ", pos + 1 );
                 nextPos = std::min( nextPos, paramVal.size() );
 
                 String subString = paramVal.substr( pos + 1, nextPos - pos - 1 );
@@ -301,10 +310,10 @@ namespace Ogre
             {
                 pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] = "@insertpiece( NormalPremul )";
 
-                size_t pos = paramVal.find_first_of( ' ' );
+                size_t pos = paramVal.find_first_of( "\t\n " );
                 while( pos < paramVal.size() )
                 {
-                    size_t nextPos = paramVal.find_first_of( ' ', pos + 1 );
+                    size_t nextPos = paramVal.find_first_of( "\t\n ", pos + 1 );
                     nextPos = std::min( nextPos, paramVal.size() );
 
                     String subString = paramVal.substr( pos + 1, nextPos - pos - 1 );

@@ -65,6 +65,7 @@ THE SOFTWARE.
 #include "Threading/OgreDefaultWorkQueue.h"
 #include "OgreFrameListener.h"
 #include "OgreNameGenerator.h"
+#include "OgreHlmsManager.h"
 #include "Animation/OgreSkeletonManager.h"
 #include "Compositor/OgreCompositorManager2.h"
 
@@ -247,6 +248,8 @@ namespace Ogre {
 
         mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
 
+        mHlmsManager = OGRE_NEW HlmsManager();
+
         mCompilerManager = OGRE_NEW ScriptCompilerManager();
 
         // Auto window
@@ -297,6 +300,10 @@ namespace Ogre {
 
         destroyAllRenderQueueInvocationSequences();
         OGRE_DELETE mExternalTextureSourceManager;
+
+        OGRE_DELETE mHlmsManager;
+        mHlmsManager = 0;
+
 #if OGRE_NO_FREEIMAGE == 0
         FreeImageCodec::shutdown();
 #endif
@@ -607,6 +614,9 @@ namespace Ogre {
         }
 
         mActiveRenderer = system;
+
+        mHlmsManager->_changeRenderSystem( mActiveRenderer );
+
         // Tell scene managers
         SceneManagerEnumerator::getSingleton().setRenderSystem(system);
 

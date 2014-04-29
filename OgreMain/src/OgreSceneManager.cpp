@@ -91,7 +91,6 @@ mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
 mName(name),
 mRenderQueue( 0 ),
-mHlmsManager( 0 ),
 mAmbientLight(ColourValue::Black),
 mCameraInProgress(0),
 mCurrentViewport(0),
@@ -166,12 +165,11 @@ mGpuParamsDirty((uint16)GPV_ALL)
         mSkyDomeEntity[i] = 0;
     }
 
-    mHlmsManager = OGRE_NEW HlmsManager();
-    mRenderQueue = OGRE_NEW RenderQueue( mHlmsManager, this );
-
     Root *root = Root::getSingletonPtr();
     if (root)
         _setDestinationRenderSystem(root->getRenderSystem());
+
+    mRenderQueue = OGRE_NEW RenderQueue( root->getHlmsManager(), this );
 
     // Setup default queued renderable visitor
     mActiveQueuedRenderableVisitor = &mDefaultQueuedRenderableVisitor;
@@ -250,12 +248,10 @@ SceneManager::~SceneManager()
     }
     OGRE_DELETE mFullScreenQuad;
     OGRE_DELETE mRenderQueue;
-    OGRE_DELETE mHlmsManager;
     OGRE_DELETE mAutoParamDataSource;
 
     mFullScreenQuad         = 0;
     mRenderQueue            = 0;
-    mHlmsManager            = 0;
     mAutoParamDataSource    = 0;
 
     stopWorkerThreads();
@@ -1274,10 +1270,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
-    mHlmsManager->_changeRenderSystem( sys );
 }
-
-
 //-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)
 {

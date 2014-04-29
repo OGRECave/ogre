@@ -207,6 +207,7 @@ namespace Ogre {
     class HlmsDatablock;
     class HlmsMacroblock;
     class HlmsManager;
+    class HlmsTextureManager;
     class IndexData;
     class InstanceBatch;
     class InstanceBatchHW;

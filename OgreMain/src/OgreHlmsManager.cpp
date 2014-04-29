@@ -30,14 +30,17 @@ THE SOFTWARE.
 
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
+#include "OgreHlmsTextureManager.h"
 #include "OgreRenderSystem.h"
 
 namespace Ogre
 {
-    HlmsManager::HlmsManager() : mRenderSystem( 0 )
+    HlmsManager::HlmsManager() : mRenderSystem( 0 ), mTextureManager( 0 )
     {
         memset( mRegisteredHlms, 0, sizeof( mRegisteredHlms ) );
         memset( mDeleteRegisteredOnExit, 0, sizeof( mDeleteRegisteredOnExit ) );
+
+        mTextureManager = OGRE_NEW HlmsTextureManager();
 
         mActiveMacroblocks.reserve( OGRE_HLMS_NUM_MACROBLOCKS );
         mFreeMacroblockIds.reserve( OGRE_HLMS_NUM_MACROBLOCKS );
@@ -60,6 +63,9 @@ namespace Ogre
     {
         assert( mRenderSystem || (mActiveMacroblocks.empty() && mActiveBlendblocks.empty()) );
         renderSystemDestroyAllBlocks();
+
+        OGRE_DELETE mTextureManager;
+        mTextureManager = 0;
 
         for( size_t i=0; i<HLMS_MAX; ++i )
         {
@@ -255,12 +261,15 @@ namespace Ogre
             end  = mActiveBlendblocks.end();
             while( itor != end )
                 mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[*itor++] );
+        }
 
-            for( size_t i=0; i<HLMS_MAX; ++i )
-            {
-                if( mRegisteredHlms[i] )
-                    mRegisteredHlms[i]->_changeRenderSystem( newRs );
-            }
+        mTextureManager->_changeRenderSystem( newRs );
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            if( mRegisteredHlms[i] )
+                mRegisteredHlms[i]->_changeRenderSystem( newRs );
         }
     }
+    //-----------------------------------------------------------------------------------
 }

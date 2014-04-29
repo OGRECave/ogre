@@ -97,10 +97,37 @@ namespace Ogre
         String paramVal;
 
         if( Hlms::findParamInVec( params, "diffuse", paramVal ) )
+        {
             mHasColour = true;
 
+            if( !paramVal.empty() )
+            {
+                ColourValue val = StringConverter::parseColourValue( paramVal );
+                mR = val.r;
+                mG = val.g;
+                mB = val.b;
+                mA = val.a;
+            }
+        }
+
         if( Hlms::findParamInVec( params, Hlms::PropertyAlphaTest, paramVal ) )
+        {
             mIsAlphaTested = true;
+
+            if( !paramVal.empty() )
+            {
+                StringVector vec = StringUtil::split( paramVal );
+                StringVector::const_iterator itor = vec.begin();
+                StringVector::const_iterator end  = vec.end();
+
+                Real val = -1.0f;
+                while( itor != end && val < 0 )
+                    val = StringConverter::parseReal( *itor++, -1.0f );
+
+                if( val >= 0 )
+                    mAlphaTestThreshold = val;
+            }
+        }
 
         if( Hlms::findParamInVec( params, Hlms::PropertyDiffuseMap, paramVal ) ||
             Hlms::findParamInVec( params, "diffuse_map0", paramVal ) )

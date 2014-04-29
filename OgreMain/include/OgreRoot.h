@@ -113,6 +113,7 @@ namespace Ogre
         Profiler* mProfiler;
         HighLevelGpuProgramManager* mHighLevelGpuProgramManager;
         ExternalTextureSourceManager* mExternalTextureSourceManager;
+        HlmsManager         *mHlmsManager;
         CompositorManager2 *mCompositorManager2;
         unsigned long mNextFrame;
         Real mFrameSmoothingTime;
@@ -313,6 +314,9 @@ namespace Ogre
         /** Retrieve a pointer to the currently selected render system.
         */
         RenderSystem* getRenderSystem(void);
+
+        /// Gets the HlmsManager, which is needed to register generators at startup.
+        HlmsManager* getHlmsManager(void) const                     { return mHlmsManager; }
 
         CompositorManager2* getCompositorManager2() const           { return mCompositorManager2; }
 

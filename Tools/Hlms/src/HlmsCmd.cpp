@@ -201,17 +201,6 @@ void HlmsCmd::createScene(void)
     }
 
     Entity *entity = mSceneMgr->createEntity( "penguin.mesh" );
-    Archive *archive = ArchiveManager::getSingletonPtr()->load(
-                    "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PbsMobile/GLSL",
-                    "FileSystem", true );
-    Archive *archiveGui = ArchiveManager::getSingletonPtr()->load(
-                    "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/GuiMobile/GLSL",
-                    "FileSystem", true );
-    HlmsPbsMobile *pbs = OGRE_NEW HlmsPbsMobile( archive );
-    HlmsGui2DMobile *gui2d = OGRE_NEW HlmsGui2DMobile( archiveGui );
-    HlmsManager *hlmsManager = mSceneMgr->getHlmsManager();
-    hlmsManager->registerHlms( pbs );
-    hlmsManager->registerHlms( gui2d );
 
     HlmsParamVec params;
     /*params.insert( *//*std::lower_bound( params.begin(), params.end(), )*//*params.begin(),
@@ -222,10 +211,10 @@ void HlmsCmd::createScene(void)
     std::sort( params.begin(), params.end(), OrderParamVecByKey );
     HlmsMacroblock macroblockRef;
     HlmsBlendblock blendblockRef;
-    //HlmsDatablock *datablock = pbs->createDatablock( params, macroblockRef, blendblockRef );
-    HlmsDatablock *datablock = gui2d->createDatablock( params, macroblockRef, blendblockRef );
 
-    Hlms *usedGenerator = gui2d;
+    HlmsManager *hlmsManager = mRoot->getHlmsManager();
+    Hlms *usedGenerator = hlmsManager->getHlms( HLMS_GUI );
+    HlmsDatablock *datablock = usedGenerator->createDatablock( params, macroblockRef, blendblockRef );
     entity->setHlms( datablock );
 
     mSceneMgr->updateSceneGraph();
@@ -346,6 +335,18 @@ void HlmsCmd::createCompositor(void)
 //-------------------------------------------------------------------------------------
 void HlmsCmd::setupResources(void)
 {
+    Archive *archivePbs = ArchiveManager::getSingletonPtr()->load(
+                    "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/PbsMobile/GLSL",
+                    "FileSystem", true );
+    Archive *archiveGui = ArchiveManager::getSingletonPtr()->load(
+                    "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/GuiMobile/GLSL",
+                    "FileSystem", true );
+    HlmsPbsMobile   *pbs    = OGRE_NEW HlmsPbsMobile( archivePbs );
+    HlmsGui2DMobile *gui2d  = OGRE_NEW HlmsGui2DMobile( archiveGui );
+    HlmsManager *hlmsManager = mRoot->getHlmsManager();
+    hlmsManager->registerHlms( pbs );
+    hlmsManager->registerHlms( gui2d );
+
     // Load resource paths from config file
     Ogre::ConfigFile cf;
     cf.load(mResourcesCfg);

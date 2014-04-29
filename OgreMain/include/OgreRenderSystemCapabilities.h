@@ -187,6 +187,10 @@ namespace Ogre
         RSC_READ_BACK_AS_TEXTURE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
         /// Explicit FSAA resolves (i.e. sample MSAA textures directly in the shader without resolving)
         RSC_EXPLICIT_FSAA_RESOLVE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 27),
+        /// TEX_TYPE_2D_ARRAY is supported
+        RSC_TEXTURE_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 28),
+        /// TEX_TYPE_CUBE_MAP_ARRAY is supported
+        RSC_TEXTURE_CUBE_MAP_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 29),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported
@@ -335,6 +339,12 @@ namespace Ogre
         ushort mFragmentProgramConstantBoolCount;
         /// The number of simultaneous render targets supported
         ushort mNumMultiRenderTargets;
+        /// Maximum texture width/height for 2D textures
+        ushort mMaxTextureResolution2D;
+        /// Maximum texture width/height for 3D (volume) textures
+        ushort mMaxTextureResolution3D;
+        /// Maximum texture width/height for cube maps
+        ushort mMaxTextureResolutionCubemap;
         /// The maximum point size
         Real mMaxPointSize;
         /// Are non-POW2 textures feature-limited?
@@ -688,6 +698,28 @@ namespace Ogre
         void setFragmentProgramConstantBoolCount(ushort c)
         {
             mFragmentProgramConstantBoolCount = c;           
+        }
+        /// Maximum resolution (width or height)
+        void setMaximumResolutions( ushort res2d, ushort res3d, ushort resCube )
+        {
+            mMaxTextureResolution2D = res2d;
+            mMaxTextureResolution3D = res3d;
+            mMaxTextureResolutionCubemap = resCube;
+        }
+        /// Maximum resolution (width or height)
+        ushort getMaximumResolution2D(void) const
+        {
+            return mMaxTextureResolution2D;
+        }
+        /// Maximum resolution (width or height)
+        ushort getMaximumResolution3D(void) const
+        {
+            return mMaxTextureResolution3D;
+        }
+        /// Maximum resolution (width or height)
+        ushort getMaximumResolutionCubemap(void) const
+        {
+            return mMaxTextureResolutionCubemap;
         }
         /// Maximum point screen size in pixels
         void setMaxPointSize(Real s)

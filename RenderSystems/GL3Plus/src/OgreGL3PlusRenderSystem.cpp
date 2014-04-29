@@ -362,6 +362,11 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_1D);
         rsc->setCapability(RSC_TEXTURE_3D);
 
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
+
+        if( mDriverVersion.major >= 4 || mGLSupport->checkExtension("GL_ARB_texture_cube_map_array") )
+            rsc->setCapability(RSC_TEXTURE_CUBE_MAP_ARRAY);
+
         // UBYTE4 always supported
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
 
@@ -370,6 +375,14 @@ namespace Ogre {
 
         // Check for hardware occlusion support
         rsc->setCapability(RSC_HWOCCLUSION);
+
+        GLint maxRes2d, maxRes3d, maxResCube;
+        OGRE_CHECK_GL_ERROR( glGetIntegerv( GL_MAX_TEXTURE_SIZE,            &maxRes2d ) );
+        OGRE_CHECK_GL_ERROR( glGetIntegerv( GL_MAX_3D_TEXTURE_SIZE,         &maxRes3d ) );
+        OGRE_CHECK_GL_ERROR( glGetIntegerv( GL_MAX_CUBE_MAP_TEXTURE_SIZE,   &maxResCube ) );
+
+        rsc->setMaximumResolutions( static_cast<ushort>(maxRes2d), static_cast<ushort>(maxRes3d),
+                                    static_cast<ushort>(maxResCube) );
 
         // Point size
         GLfloat psRange[2] = {0.0, 0.0};

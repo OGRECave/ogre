@@ -653,6 +653,7 @@ namespace Ogre
         ID_ILLUMINATION_STAGE,
             ID_DECAL,
         ID_CULL_HARDWARE,
+        ID_CULL_MODE,
             ID_CLOCKWISE,
             ID_ANTICLOCKWISE,
         ID_CULL_SOFTWARE,
@@ -869,6 +870,8 @@ namespace Ogre
                 ID_FSAA,
                 ID_LIGHT,
                 ID_SPLIT,
+
+        ID_HLMS,
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
         ID_RT_SHADER_SYSTEM,

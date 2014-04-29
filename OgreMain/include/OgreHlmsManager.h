@@ -60,6 +60,8 @@ namespace Ogre
 
         RenderSystem        *mRenderSystem;
 
+        HlmsTextureManager  *mTextureManager;
+
         void renderSystemDestroyAllBlocks(void);
 
     public:
@@ -98,6 +100,8 @@ namespace Ogre
         /// Destroys a macroblock created by @getBlendblock. Note it performs
         /// an O(N) search, but N <= OGRE_HLMS_NUM_BLENDBLOCKS
         void destroyBlendblock( const HlmsBlendblock *Blendblock );
+
+        HlmsTextureManager* getTextureManger(void) const    { return mTextureManager; }
 
         /** Registers an HLMS provider. The type is retrieved from the provider. Two providers of
             the same type cannot be registered at the same time (@see HlmsTypes) and will throw

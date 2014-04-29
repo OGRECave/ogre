@@ -67,14 +67,19 @@ namespace Ogre
     public:
         /** Valid parameters in params:
         @param params
-            * diffuse
+            * diffuse [r g b [a]]
                 If absent, the values of mR, mG, mB & mA will be ignored by the pixel shader.
+                When present, the rgba values can be specified.
+                Default: Absent
+                Default (when present): diffuse 1 1 1 1
 
             * diffuse_map <texture name> [#uv]
                 Name of the diffuse texture for the base image.
                 The #uv parameter is optional, and specifies the texcoord set that will
                 be used. Valid range is [0; 8)
                 If the Renderable doesn't have enough UV texcoords, HLMS will throw an exception.
+
+                Note: The UV set is evaluated when creating the Renderable cache.
 
             * diffuse_map0
                 Alias for diffuse_map
@@ -107,12 +112,15 @@ namespace Ogre
                 Default: All UV set animation/manipulation disabled.
                 Example: animate 0 1 2 3 4 5 6 7
 
-             * alpha_test [compare_func]
+             * alpha_test [compare_func] [threshold]
                 When present, mAlphaTestThreshold is used.
                 compare_func is optional. Valid values are:
                     less, less_equal, equal, greater, greater_equal, not_equal
-                Default compare_func: less
-                Example: alpha_test equal
+                Threshold is optional, and a value in the range (0; 1)
+                Default: alpha_test less 0.5
+                Example: alpha_test equal 0.1
+
+                Note:   The cmp function is evaluated when creating the renderable cache
         */
         HlmsGui2DMobileDatablock( IdString name, Hlms *creator,
                                   const HlmsMacroblock *macroblock,
