@@ -232,6 +232,7 @@ namespace Ogre
 
         HlmsTypes getType(void) const                       { return mType; }
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
+        HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
 
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks

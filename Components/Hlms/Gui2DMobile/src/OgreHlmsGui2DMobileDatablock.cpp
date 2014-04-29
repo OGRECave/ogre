@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "OgreHlmsGui2DMobileDatablock.h"
 #include "OgreHlms.h"
+#include "OgreHlmsManager.h"
+#include "OgreHlmsTextureManager.h"
 #include "OgreTexture.h"
 #include "OgreTextureManager.h"
 #include "OgreRenderSystem.h"
@@ -129,23 +131,24 @@ namespace Ogre
             }
         }
 
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
+
         if( Hlms::findParamInVec( params, Hlms::PropertyDiffuseMap, paramVal ) ||
             Hlms::findParamInVec( params, "diffuse_map0", paramVal ) )
         {
             size_t pos = std::min( paramVal.find_first_of( ' ' ), paramVal.size() );
-            mDiffuseTextures[mNumTextureUnits] = TextureManager::getSingleton().getByName(
-                                                                paramVal.substr( 0, pos ) );
+            /*mDiffuseTextures[mNumTextureUnits] = TextureManager::getSingleton().getByName(
+                                                                paramVal.substr( 0, pos ) );*/
 
-            if( mDiffuseTextures[mNumTextureUnits].isNull() )
-            {
-                //TODO: Assign blank texture
-                String paramValName;
-                Hlms::findParamInVec( params, "name", paramVal );
-                LogManager::getSingleton().logMessage( paramValName + ": WARNING Texture '" +
-                                                       paramVal.substr( 0, pos ) + "' not found" );
-                //mDiffuseTextures[mNumTextureUnits]
-            }
-
+            HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
+                                createOrRetrieveTexture( paramVal.substr( 0, pos ),
+                                                         HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
+            assert( !texLocation.texture->isTextureTypeArray() );
+            mDiffuseTextures[mNumTextureUnits]  = texLocation.texture;
+            mUvAtlasParams[mNumTextureUnits].uOffset    = texLocation.xIdx;
+            mUvAtlasParams[mNumTextureUnits].vOffset    = texLocation.yIdx;
+            mUvAtlasParams[mNumTextureUnits].invDivisor = 1.0f / texLocation.divisor;
             ++mNumTextureUnits;
         }
 
@@ -163,18 +166,14 @@ namespace Ogre
                 }
 
                 size_t pos = std::min( paramVal.find_first_of( ' ' ), paramVal.size() );
-                mDiffuseTextures[mNumTextureUnits] = TextureManager::getSingleton().getByName(
-                                                                    paramVal.substr( 0, pos ) );
-
-                if( mDiffuseTextures[mNumTextureUnits].isNull() )
-                {
-                    //TODO: Assign blank texture
-                    String paramValName;
-                    Hlms::findParamInVec( params, "name", paramVal );
-                    LogManager::getSingleton().logMessage( paramValName + ": WARNING Texture '" +
-                                                           paramVal.substr( 0, pos ) + "' not found" );
-                    //mDiffuseTextures[mNumTextureUnits]
-                }
+                HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
+                                    createOrRetrieveTexture( paramVal.substr( 0, pos ),
+                                                             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
+                assert( !texLocation.texture->isTextureTypeArray() );
+                mDiffuseTextures[mNumTextureUnits]  = texLocation.texture;
+                mUvAtlasParams[mNumTextureUnits].uOffset    = texLocation.xIdx;
+                mUvAtlasParams[mNumTextureUnits].vOffset    = texLocation.yIdx;
+                mUvAtlasParams[mNumTextureUnits].invDivisor = 1.0f / texLocation.divisor;
 
                 ++mNumTextureUnits;
             }

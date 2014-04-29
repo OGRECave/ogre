@@ -46,6 +46,14 @@ namespace Ogre
     {
         friend class HlmsGui2DMobile;
     protected:
+
+        struct UvAtlasParams
+        {
+            float uOffset;
+            float vOffset;
+            float invDivisor;
+        };
+
         /// Up to 8 matrices; RS APIs don't let us to pass through
         /// more than 8 UVs to the pixel shader anyway
         uint32  mNumTextureMatrices;
@@ -56,6 +64,8 @@ namespace Ogre
         uint8   mNumTextureUnits;
         float   mR, mG, mB, mA;
         float   mAlphaTestThreshold;
+
+        UvAtlasParams mUvAtlasParams[16];
 
         /// Up to 16 diffuse textures (they can re use UVs); which is the limit for a lot of HW
         /// Must be contiguous (i.e. if mDiffuseTextures[1] isn't used, mDiffuseTextures[2] can't be)

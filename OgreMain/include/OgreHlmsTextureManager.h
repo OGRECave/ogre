@@ -68,21 +68,20 @@ namespace Ogre
     */
     class _OgreExport HlmsTextureManager : public PassAlloc
     {
-        RenderSystem        *mRenderSystem;
+    public:
+        enum PackingMethod
+        {
+            TextureArrays,  //DX11, GL3+
+            Atlas           //Mobile
+        };
 
         struct DefaultTextureParameters
         {
-            enum Method
-            {
-                TextureArrays,  //DX11, GL3+
-                Atlas           //Mobile
-            };
-
             PixelFormat pixelFormat;    /// Unknown means assign based on the individual texture
             uint16      maxTexturesPerArray;
             bool        mipmaps;
             bool        hwGammaCorrection;
-            Method      packingMethod;
+            PackingMethod packingMethod;
 
             DefaultTextureParameters() :
                 pixelFormat( PF_UNKNOWN ), maxTexturesPerArray( 16 ),
@@ -101,6 +100,7 @@ namespace Ogre
             NUM_TEXTURE_TYPES
         };
 
+    protected:
         struct TextureArray
         {
             TexturePtr  texture;
@@ -136,6 +136,8 @@ namespace Ogre
             }
         };
 
+        RenderSystem        *mRenderSystem;
+
         typedef vector<TextureEntry>::type TextureEntryVec;
         typedef vector<TextureArray>::type TextureArrayVec;
 
@@ -144,6 +146,8 @@ namespace Ogre
 
         DefaultTextureParameters    mDefaultTextureParameters[NUM_TEXTURE_TYPES];
 
+        TexturePtr mBlankTexture;
+
         static void copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx );
         static void copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
                                         uint16 entryIdx, uint16 sqrtMaxTextures );
@@ -151,6 +155,8 @@ namespace Ogre
     public:
         HlmsTextureManager();
         virtual ~HlmsTextureManager();
+
+        void initialize(void);
 
         /** Called when the RenderSystem changes.
         @remarks
@@ -163,6 +169,7 @@ namespace Ogre
             TexturePtr  texture;
             uint16      xIdx;
             uint16      yIdx;
+            uint16      divisor;
         };
 
         /** Create a texture based on its name. If a texture with such name has already been
@@ -174,6 +181,14 @@ namespace Ogre
             documentation for an explanation of the differences.
             If the texture has already been created, this parameter is ignored.
         @return
+            retVal.texture The texture that should be bound
+
+            if packingMethond == TextureArrays
+                retVal.xIdx: The array index in the texture array.
+            if packingMethond == Atlas
+                retVal.xIdx: The U offset to apply to UVs
+                retVal.yIdx: The V offset to apply to UVs
+                retVal.divisor: The value the original UVs have to be divided for
         */
         TextureLocation createOrRetrieveTexture( const String &texName, TextureMapType mapType );
     };
@@ -182,6 +197,6 @@ namespace Ogre
 
 }
 
-//#include "OgreHeaderSuffix.h"
+#include "OgreHeaderSuffix.h"
 
 #endif

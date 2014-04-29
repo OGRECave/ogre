@@ -736,7 +736,12 @@ namespace Ogre {
     void Root::initialiseCompositor(void)
     {
         if( !mCompositorManager2 )
+        {
             mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );
+
+            //Do this now as we need the RS to be fully initialized
+            mHlmsManager->_changeRenderSystem( mActiveRenderer );
+        }
     }
     //-----------------------------------------------------------------------
     void Root::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)

@@ -55,47 +55,78 @@ namespace Ogre
         {
             const RenderSystemCapabilities *caps = mRenderSystem->getCapabilities();
 
-            if( caps->hasCapability(RSC_TEXTURE_2D_ARRAY) )
+            if( caps )
             {
-                for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
-                {
-                    mDefaultTextureParameters[i].packingMethod = DefaultTextureParameters::TextureArrays;
-                    mDefaultTextureParameters[i].maxTexturesPerArray = 40;
-                }
+                TextureType textureType = TEX_TYPE_2D;
 
-                mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 20;
-                if( !caps->hasCapability(RSC_TEXTURE_CUBE_MAP_ARRAY) )
+                if( caps->hasCapability(RSC_TEXTURE_2D_ARRAY) && false ) //TODO
+                {
+                    textureType = TEX_TYPE_2D_ARRAY;
+
+                    for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
+                    {
+                        mDefaultTextureParameters[i].packingMethod = TextureArrays;
+                        mDefaultTextureParameters[i].maxTexturesPerArray = 40;
+                    }
+
+                    mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 20;
+                    if( !caps->hasCapability(RSC_TEXTURE_CUBE_MAP_ARRAY) )
+                        mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 1;
+                }
+                else
+                {
+                    for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
+                    {
+                        mDefaultTextureParameters[i].packingMethod = Atlas;
+                        mDefaultTextureParameters[i].maxTexturesPerArray = 16;
+                    }
                     mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 1;
-            }
-            else
-            {
-                for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
-                {
-                    mDefaultTextureParameters[i].packingMethod = DefaultTextureParameters::Atlas;
-                    mDefaultTextureParameters[i].maxTexturesPerArray = 16;
+                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].maxTexturesPerArray  = 1;
+                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].maxTexturesPerArray = 1;
                 }
-                mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 1;
-                mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].maxTexturesPerArray  = 1;
-                mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].maxTexturesPerArray = 1;
-            }
 
-            // BC5 is the best, native (lossy) compressor for normal maps.
-            // DXT5 is like BC5, using the "store only in green and alpha channels" method.
-            // The last one is lossless, using UV8 to store uncompressed, and retrieve z = sqrt(x²+y²)
-            if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
-            {
-                mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat = PF_BC5_SNORM;
-                mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_BC5_SNORM;
-            }
-            else if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) )
-            {
-                mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat             = PF_DXT5;
-                mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat   = PF_DXT5;
-            }
-            else
-            {
-                mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat             = PF_R8G8_SNORM;
-                mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat   = PF_R8G8_SNORM;
+                // BC5 is the best, native (lossy) compressor for normal maps.
+                // DXT5 is like BC5, using the "store only in green and alpha channels" method.
+                // The last one is lossless, using UV8 to store uncompressed,
+                // and retrieve z = sqrt(x²+y²)
+                if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
+                {
+                    mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat = PF_BC5_SNORM;
+                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_BC5_SNORM;
+                }
+                else if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) )
+                {
+                    mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = PF_DXT5;
+                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_DXT5;
+                }
+                else
+                {
+                    mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = PF_R8G8_SNORM;
+                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_R8G8_SNORM;
+                }
+
+                mBlankTexture = TextureManager::getSingleton().createManual( "Hlms_Blanktexture",
+                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                textureType, 4, 4, 1, 0, PF_R8G8B8A8, TU_DEFAULT, 0,
+                                                true, 0, BLANKSTRING, false );
+
+                HardwarePixelBufferSharedPtr pixelBufferBuf = mBlankTexture->getBuffer(0);
+                const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0, 4, 4, 1 ),
+                                                                  HardwareBuffer::HBL_DISCARD );
+                uint8 *data = reinterpret_cast<uint8*>( currImage.data );
+                for( size_t y=0; y<currImage.getHeight(); ++y )
+                {
+                    for( size_t x=0; x<currImage.getWidth(); ++x )
+                    {
+                        *data++ = 255;
+                        *data++ = 255;
+                        *data++ = 255;
+                        *data++ = 255;
+                    }
+
+                    data += ( currImage.rowPitch - currImage.getWidth() ) * 4;
+                }
+                pixelBufferBuf->unlock();
             }
         }
     }
@@ -142,12 +173,17 @@ namespace Ogre
         pixelBufferBuf->unlock();
     }
     //-----------------------------------------------------------------------------------
-    HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture( const String &texName,
-                                                                       TextureMapType mapType )
+    HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture(
+                                                                        const String &texName,
+                                                                        TextureMapType mapType )
     {
         TextureEntry searchName( texName );
         TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
 
+        TextureLocation retVal;
+
+        try
+        {
         if( it == mEntries.end() || it->name != searchName.name )
         {
             Image image;
@@ -170,8 +206,7 @@ namespace Ogre
                     textureArray.texture->getFormat() == image.getFormat() )
                 {
                     //Bingo! Add this.
-                    if( mDefaultTextureParameters[mapType].packingMethod ==
-                            DefaultTextureParameters::TextureArrays )
+                    if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                     {
                         copyTextureToArray( image, textureArray.texture, textureArray.entries.size() );
                     }
@@ -225,8 +260,7 @@ namespace Ogre
                     uint limit = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                     uint limitSquared = mDefaultTextureParameters[mapType].maxTexturesPerArray;
 
-                    if( mDefaultTextureParameters[mapType].packingMethod ==
-                            DefaultTextureParameters::Atlas )
+                    if( mDefaultTextureParameters[mapType].packingMethod == Atlas )
                     {
                         limit        = static_cast<uint>( ceilf( sqrtf( limitSquared ) ) );
                         limitSquared = limit * limit;
@@ -240,8 +274,7 @@ namespace Ogre
 
                     depth = image.getDepth();
 
-                    if( mDefaultTextureParameters[mapType].packingMethod ==
-                            DefaultTextureParameters::TextureArrays )
+                    if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                     {
                         //Texture Arrays
                         width  = image.getWidth();
@@ -313,8 +346,7 @@ namespace Ogre
                                                 mDefaultTextureParameters[mapType].hwGammaCorrection,
                                                 0, BLANKSTRING, false );
 
-                    if( mDefaultTextureParameters[mapType].packingMethod ==
-                            DefaultTextureParameters::TextureArrays )
+                    if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                     {
                         copyTextureToArray( image, textureArray.texture, textureArray.entries.size() );
                     }
@@ -333,7 +365,6 @@ namespace Ogre
             }
         }
 
-        TextureLocation retVal;
         const TextureArray &texArray = mTextureArrays[it->mapType][it->arrayIdx];
         retVal.texture = texArray.texture;
 
@@ -341,11 +372,26 @@ namespace Ogre
         {
             retVal.xIdx = it->entryIdx % texArray.sqrtMaxTextures;
             retVal.yIdx = it->entryIdx / texArray.sqrtMaxTextures;
+            retVal.divisor= texArray.sqrtMaxTextures;
         }
         else
         {
             retVal.xIdx = it->entryIdx;
             retVal.yIdx = 0;
+            retVal.divisor= 1;
+        }
+        }
+        catch( Exception &e )
+        {
+            if( e.getNumber() != Exception::ERR_FILE_NOT_FOUND )
+                throw e;
+            else
+            {
+                retVal.texture  = mBlankTexture;
+                retVal.xIdx     = 0;
+                retVal.yIdx     = 0;
+                retVal.divisor  = 1;
+            }
         }
 
         return retVal;

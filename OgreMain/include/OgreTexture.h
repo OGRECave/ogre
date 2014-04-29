@@ -126,7 +126,7 @@ namespace Ogre {
 
         bool isTextureTypeArray(void) const
         {
-            return mTextureType != TEX_TYPE_2D_ARRAY;
+            return mTextureType == TEX_TYPE_2D_ARRAY;
         }
 
         /** Gets the number of mipmaps to be used for this texture.
