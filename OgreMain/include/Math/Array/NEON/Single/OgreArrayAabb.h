@@ -109,6 +109,12 @@ namespace Ogre
             aliasedReal[ARRAY_PACKED_REALS * 5 + index] = aabb.mHalfSize.z;     //Z
         }
 
+		void setAll( const Aabb &aabb )
+        {
+            mCenter.setAll( aabb.mCenter );
+            mHalfSize.setAll( aabb.mHalfSize );
+        }
+
         /// Gets the minimum corner of the box.
         inline ArrayVector3 getMinimum() const;
 
