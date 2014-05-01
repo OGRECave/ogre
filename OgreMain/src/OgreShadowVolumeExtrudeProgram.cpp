@@ -812,6 +812,7 @@ namespace Ogre {
                 GpuProgramManager::getSingleton().remove(programNames[v]);
             }
             mInitialised = false;
+			frgProgramName = "";
         }
     }
     //---------------------------------------------------------------------
