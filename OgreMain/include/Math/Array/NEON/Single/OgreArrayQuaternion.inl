@@ -165,7 +165,7 @@ namespace Ogre
         ArrayReal fAngle = MathlibNEON::ACos4( fCos );
 
         // mask = Abs( fCos ) < 1-epsilon
-        ArrayReal mask    = vcltq_f32( MathlibNEON::Abs4( fCos ), MathlibNEON::OneMinusEpsilon );
+        ArrayMaskR mask    = vcltq_f32( MathlibNEON::Abs4( fCos ), MathlibNEON::OneMinusEpsilon );
         ArrayReal fInvSin = MathlibNEON::InvNonZero4( fSin );
         ArrayReal oneSubT = vsubq_f32( MathlibNEON::ONE, fT );
         // fCoeff1 = Sin( fT * fAngle ) * fInvSin
@@ -195,11 +195,11 @@ namespace Ogre
     {
         //Flip the sign of rkQ when p.dot( q ) < 0 to get the shortest path
         ArrayReal signMask = vdupq_n_f32( -0.0f );
-        ArrayReal sign = vandq_s32( signMask, rkP.Dot( rkQ ) );
-        ArrayQuaternion tmpQ = ArrayQuaternion( veorq_s32( rkQ.mChunkBase[0], sign ),
-                                                veorq_s32( rkQ.mChunkBase[1], sign ),
-                                                veorq_s32( rkQ.mChunkBase[2], sign ),
-                                                veorq_s32( rkQ.mChunkBase[3], sign ) );
+        ArrayReal sign = vandq_f32( signMask, rkP.Dot( rkQ ) );
+        ArrayQuaternion tmpQ = ArrayQuaternion( veorq_f32( rkQ.mChunkBase[0], sign ),
+                                                veorq_f32( rkQ.mChunkBase[1], sign ),
+                                                veorq_f32( rkQ.mChunkBase[2], sign ),
+                                                veorq_f32( rkQ.mChunkBase[3], sign ) );
 
         ArrayQuaternion retVal(
                 _mm_madd_ps( fT, vsubq_f32( tmpQ.mChunkBase[0], rkP.mChunkBase[0] ), rkP.mChunkBase[0] ),
@@ -291,7 +291,7 @@ namespace Ogre
                                 vmulq_f32( mChunkBase[2], mChunkBase[2] ) ),    //y * y) +
                                 vmulq_f32( mChunkBase[3], mChunkBase[3] ) );    //z * z )
 
-        ArrayReal mask      = vcgtq_f32( sqLength, vdupq_n_f32(0.0f) ); //mask = sqLength > 0
+        ArrayMaskR mask     = vcgtq_f32( sqLength, vdupq_n_f32(0.0f) ); //mask = sqLength > 0
 
         //sqLength = sqLength > 0 ? sqLength : 1; so that invSqrt doesn't give NaNs or Infs
         //when 0 (to avoid using CmovRobust just to select the non-nan results)
@@ -470,7 +470,7 @@ namespace Ogre
         ArrayReal fSin      = MathlibNEON::Sin4( fAngle );
 
         //mask = Math::Abs(w) < 1.0 && Math::Abs(fSin) >= msEpsilon
-        ArrayReal mask = vandq_s32(
+        ArrayMaskR mask = vandq_u32(
                             vcltq_f32( MathlibNEON::Abs4( mChunkBase[0] ), MathlibNEON::ONE ),
                             vcgeq_f32( MathlibNEON::Abs4( fSin ), MathlibNEON::fEpsilon ) );
 

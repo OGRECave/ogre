@@ -71,14 +71,14 @@ namespace Ogre
         // ( abs( center.x - center2.x ) <= halfSize.x + halfSize2.x &&
         //   abs( center.y - center2.y ) <= halfSize.y + halfSize2.y &&
         //   abs( center.z - center2.z ) <= halfSize.z + halfSize2.z )
-        ArrayReal maskX = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[0] ),
+        ArrayMaskR maskX = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[0] ),
                                         sumHalfSizes.mChunkBase[0] );
-        ArrayReal maskY = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[1] ),
+        ArrayMaskR maskY = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[1] ),
                                         sumHalfSizes.mChunkBase[1] );
-        ArrayReal maskZ = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[2] ),
+        ArrayMaskR maskZ = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[2] ),
                                         sumHalfSizes.mChunkBase[2] );
         
-        return vandq_s32( vandq_s32( maskX, maskY ), maskZ );
+        return vandq_u32( vandq_u32( maskX, maskY ), maskZ );
     }
     //-----------------------------------------------------------------------------------
     inline ArrayReal ArrayAabb::volume(void) const
@@ -90,7 +90,7 @@ namespace Ogre
         return vmulq_f32( vmulq_f32( w, h ), d ); // w * h * d
     }
     //-----------------------------------------------------------------------------------
-    inline ArrayReal ArrayAabb::contains( const ArrayAabb &other ) const
+    inline ArrayMaskR ArrayAabb::contains( const ArrayAabb &other ) const
     {
         ArrayVector3 dist( mCenter - other.mCenter );
 
@@ -102,31 +102,31 @@ namespace Ogre
         // ( abs( dist.x ) + other.mHalfSize.x <= mHalfSize.x &&
         //   abs( dist.y ) + other.mHalfSize.y <= mHalfSize.y &&
         //   abs( dist.z ) + other.mHalfSize.z <= mHalfSize.z )
-        ArrayReal maskX = vcleq_f32( vaddq_f32( MathlibNEON::Abs4( dist.mChunkBase[0] ),
+        ArrayMaskR maskX = vcleq_f32( vaddq_f32( MathlibNEON::Abs4( dist.mChunkBase[0] ),
                                         other.mHalfSize.mChunkBase[0] ), mHalfSize.mChunkBase[0] );
-        ArrayReal maskY = vcleq_f32( vaddq_f32( MathlibNEON::Abs4( dist.mChunkBase[1] ),
+        ArrayMaskR maskY = vcleq_f32( vaddq_f32( MathlibNEON::Abs4( dist.mChunkBase[1] ),
                                         other.mHalfSize.mChunkBase[1] ), mHalfSize.mChunkBase[1] );
-        ArrayReal maskZ = vcleq_f32( vaddq_f32( MathlibNEON::Abs4( dist.mChunkBase[2] ),
+        ArrayMaskR maskZ = vcleq_f32( vaddq_f32( MathlibNEON::Abs4( dist.mChunkBase[2] ),
                                         other.mHalfSize.mChunkBase[2] ), mHalfSize.mChunkBase[2] );
 
-        return vandq_s32( vandq_s32( maskX, maskY ), maskZ );
+        return vandq_u32( vandq_u32( maskX, maskY ), maskZ );
     }
     //-----------------------------------------------------------------------------------
-    inline ArrayReal ArrayAabb::contains( const ArrayVector3 &v ) const
+    inline ArrayMaskR ArrayAabb::contains( const ArrayVector3 &v ) const
     {
         ArrayVector3 dist( mCenter - v );
 
         // ( abs( dist.x ) <= mHalfSize.x &&
         //   abs( dist.y ) <= mHalfSize.y &&
         //   abs( dist.z ) <= mHalfSize.z )
-        ArrayReal maskX = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[0] ),
+        ArrayMaskR maskX = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[0] ),
                                         mHalfSize.mChunkBase[0] );
-        ArrayReal maskY = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[1] ),
+        ArrayMaskR maskY = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[1] ),
                                         mHalfSize.mChunkBase[1] );
-        ArrayReal maskZ = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[2] ),
+        ArrayMaskR maskZ = vcleq_f32( MathlibNEON::Abs4( dist.mChunkBase[2] ),
                                         mHalfSize.mChunkBase[2] );
 
-        return vandq_s32( vandq_s32( maskX, maskY ), maskZ );
+        return vandq_u32( vandq_u32( maskX, maskY ), maskZ );
     }
     //-----------------------------------------------------------------------------------
     inline ArrayReal ArrayAabb::distance( const ArrayVector3 &v ) const

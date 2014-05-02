@@ -108,6 +108,14 @@ namespace Ogre
             aliasedReal[ARRAY_PACKED_REALS * 3 + index] = v.z;
         }
 
+		void setAll( const Quaternion &v )
+        {
+            mChunkBase[0] = vdupq_n_f32( v.w );
+            mChunkBase[1] = vdupq_n_f32( v.x );
+            mChunkBase[2] = vdupq_n_f32( v.y );
+            mChunkBase[3] = vdupq_n_f32( v.z );
+        }
+
         /// @copydoc Quaternion::FromAngleAxis
         inline void FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis );
 

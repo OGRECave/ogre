@@ -118,24 +118,24 @@ namespace Ogre
         sincos_ps( x, &outSin, &outCos );
     }
 
-    const ArrayReal BooleanMask4::mMasks[NUM_MASKS] =
+    const ArrayMaskR BooleanMask4::mMasks[NUM_MASKS] =
     {
-        (ArrayReal) { 0x00000000, 0x00000000, 0x00000000, 0x00000000 },//MASK_NONE
-        (ArrayReal) { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },//MASK_X
-        (ArrayReal) { 0x00000000, 0xffffffff, 0x00000000, 0x00000000 },//MASK_Y
-        (ArrayReal) { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },//MASK_XY
-        (ArrayReal) { 0x00000000, 0x00000000, 0xffffffff, 0x00000000 },//MASK_Z
-        (ArrayReal) { 0xffffffff, 0x00000000, 0xffffffff, 0x00000000 },//MASK_XZ
-        (ArrayReal) { 0x00000000, 0xffffffff, 0xffffffff, 0x00000000 },//MASK_YZ
-        (ArrayReal) { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },//MASK_XYZ
-        (ArrayReal) { 0x00000000, 0x00000000, 0x00000000, 0xffffffff },//MASK_W
-        (ArrayReal) { 0xffffffff, 0x00000000, 0x00000000, 0xffffffff },//MASK_XW
-        (ArrayReal) { 0x00000000, 0xffffffff, 0x00000000, 0xffffffff },//MASK_YW
-        (ArrayReal) { 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff },//MASK_XYW
-        (ArrayReal) { 0x00000000, 0x00000000, 0xffffffff, 0xffffffff },//MASK_ZW
-        (ArrayReal) { 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff },//MASK_XZW
-        (ArrayReal) { 0x00000000, 0xffffffff, 0xffffffff, 0xffffffff },//MASK_YZW
-        (ArrayReal) { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff } //MASK_XYZW
+        (ArrayMaskR) { 0x00000000, 0x00000000, 0x00000000, 0x00000000 },//MASK_NONE
+        (ArrayMaskR) { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },//MASK_X
+        (ArrayMaskR) { 0x00000000, 0xffffffff, 0x00000000, 0x00000000 },//MASK_Y
+        (ArrayMaskR) { 0xffffffff, 0xffffffff, 0x00000000, 0x00000000 },//MASK_XY
+        (ArrayMaskR) { 0x00000000, 0x00000000, 0xffffffff, 0x00000000 },//MASK_Z
+        (ArrayMaskR) { 0xffffffff, 0x00000000, 0xffffffff, 0x00000000 },//MASK_XZ
+        (ArrayMaskR) { 0x00000000, 0xffffffff, 0xffffffff, 0x00000000 },//MASK_YZ
+        (ArrayMaskR) { 0xffffffff, 0xffffffff, 0xffffffff, 0x00000000 },//MASK_XYZ
+        (ArrayMaskR) { 0x00000000, 0x00000000, 0x00000000, 0xffffffff },//MASK_W
+        (ArrayMaskR) { 0xffffffff, 0x00000000, 0x00000000, 0xffffffff },//MASK_XW
+        (ArrayMaskR) { 0x00000000, 0xffffffff, 0x00000000, 0xffffffff },//MASK_YW
+        (ArrayMaskR) { 0xffffffff, 0xffffffff, 0x00000000, 0xffffffff },//MASK_XYW
+        (ArrayMaskR) { 0x00000000, 0x00000000, 0xffffffff, 0xffffffff },//MASK_ZW
+        (ArrayMaskR) { 0xffffffff, 0x00000000, 0xffffffff, 0xffffffff },//MASK_XZW
+        (ArrayMaskR) { 0x00000000, 0xffffffff, 0xffffffff, 0xffffffff },//MASK_YZW
+        (ArrayMaskR) { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff } //MASK_XYZW
     };
 }
 #endif

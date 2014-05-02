@@ -216,9 +216,9 @@ namespace Ogre
     inline ArrayVector3 ArrayVector3::operator - () const
     {
         return ArrayVector3(
-            veorq_s32( mChunkBase[0], MathlibNEON::SIGN_MASK ), //-x
-            veorq_s32( mChunkBase[1], MathlibNEON::SIGN_MASK ), //-y
-            veorq_s32( mChunkBase[2], MathlibNEON::SIGN_MASK ) );   //-z
+            veorq_f32( mChunkBase[0], MathlibNEON::SIGN_MASK ), //-x
+            veorq_f32( mChunkBase[1], MathlibNEON::SIGN_MASK ), //-y
+            veorq_f32( mChunkBase[2], MathlibNEON::SIGN_MASK ) );   //-z
     }
     //-----------------------------------------------------------------------------------
 
@@ -254,7 +254,7 @@ namespace Ogre
     DEFINE_L_DIVISION( ArrayReal, ArrayVector3, /, vdivq_f32 );
     DEFINE_R_DIVISION( ArrayVector3, ArrayReal, /, vmulq_f32 );
 
-    inline ArrayVector3 ArrayVector3::Cmov4( const ArrayVector3 &arg1, const ArrayVector3 &arg2, ArrayReal mask )
+    inline ArrayVector3 ArrayVector3::Cmov4( const ArrayVector3 &arg1, const ArrayVector3 &arg2, ArrayMaskR mask )
     {
         return ArrayVector3(
                 MathlibNEON::Cmov4( arg1.mChunkBase[0], arg2.mChunkBase[0], mask ),
@@ -404,9 +404,9 @@ namespace Ogre
     {
         // x = 1.0f | (x & 0x80000000)
         ArrayReal signMask = vdupq_n_f32( -0.0f );
-        mChunkBase[0] = vorrq_f32( MathlibNEON::ONE, vandq_s32( signMask, mChunkBase[0] ) );
-        mChunkBase[1] = vorrq_f32( MathlibNEON::ONE, vandq_s32( signMask, mChunkBase[1] ) );
-        mChunkBase[2] = vorrq_f32( MathlibNEON::ONE, vandq_s32( signMask, mChunkBase[2] ) );
+        mChunkBase[0] = vorrq_f32( MathlibNEON::ONE, vandq_f32( signMask, mChunkBase[0] ) );
+        mChunkBase[1] = vorrq_f32( MathlibNEON::ONE, vandq_f32( signMask, mChunkBase[1] ) );
+        mChunkBase[2] = vorrq_f32( MathlibNEON::ONE, vandq_f32( signMask, mChunkBase[2] ) );
     }
     //-----------------------------------------------------------------------------------
     inline ArrayVector3 ArrayVector3::perpendicular( void ) const
@@ -470,7 +470,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     inline int ArrayVector3::isNaN( void ) const
     {
-        ArrayInt mask = vandq_s32( vandq_s32(
+        ArrayMaskR mask = vandq_u32( vandq_u32(
             vceqq_f32( mChunkBase[0], mChunkBase[0] ),
             vceqq_f32( mChunkBase[1], mChunkBase[1] ) ),
             vceqq_f32( mChunkBase[2], mChunkBase[2] ) );
@@ -495,21 +495,21 @@ namespace Ogre
 
         //xVec = x > 0 ? Vector3::UNIT_X : Vector3::NEGATIVE_UNIT_X;
         ArrayReal sign = MathlibNEON::Cmov4( vdupq_n_f32( 1.0f ), vdupq_n_f32( -1.0f ),
-                                            vcgtq_f32( mChunkBase[0], vdupq_n_f32(0.0f) ) );
+                                             vcgtq_f32( mChunkBase[0], vdupq_n_f32(0.0f) ) );
         ArrayVector3 xVec( sign, vdupq_n_f32(0.0f), vdupq_n_f32(0.0f) );
 
         //yVec = y > 0 ? Vector3::UNIT_Y : Vector3::NEGATIVE_UNIT_Y;
         sign = MathlibNEON::Cmov4( vdupq_n_f32( 1.0f ), vdupq_n_f32( -1.0f ),
-                                    vcgtq_f32( mChunkBase[1], vdupq_n_f32(0.0f) ) );
+                                   vcgtq_f32( mChunkBase[1], vdupq_n_f32(0.0f) ) );
         ArrayVector3 yVec( vdupq_n_f32(0.0f), sign, vdupq_n_f32(0.0f) );
 
         //zVec = z > 0 ? Vector3::UNIT_Z : Vector3::NEGATIVE_UNIT_Z;
         sign = MathlibNEON::Cmov4( vdupq_n_f32( 1.0f ), vdupq_n_f32( -1.0f ),
-                                    vcgtq_f32( mChunkBase[2], vdupq_n_f32(0.0f) ) );
+                                   vcgtq_f32( mChunkBase[2], vdupq_n_f32(0.0f) ) );
         ArrayVector3 zVec( vdupq_n_f32(0.0f), vdupq_n_f32(0.0f), sign );
 
         //xVec = absx > absz ? xVec : zVec
-        ArrayReal mask = vcgtq_f32( absx, absz );
+        ArrayMaskR mask = vcgtq_f32( absx, absz );
         xVec.mChunkBase[0] = MathlibNEON::Cmov4( xVec.mChunkBase[0], zVec.mChunkBase[0], mask );
         xVec.mChunkBase[2] = MathlibNEON::Cmov4( xVec.mChunkBase[2], zVec.mChunkBase[2], mask );
 
@@ -597,7 +597,7 @@ namespace Ogre
         return Vector3( vals[0], vals[1], vals[2] );
     }
     //-----------------------------------------------------------------------------------
-    inline void ArrayVector3::Cmov4( ArrayReal mask, const ArrayVector3 &replacement )
+    inline void ArrayVector3::Cmov4( ArrayMaskR mask, const ArrayVector3 &replacement )
     {
         ArrayReal * RESTRICT_ALIAS aChunkBase = mChunkBase;
         const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.mChunkBase;
@@ -606,13 +606,38 @@ namespace Ogre
         aChunkBase[2] = MathlibNEON::Cmov4( aChunkBase[2], bChunkBase[2], mask );
     }
     //-----------------------------------------------------------------------------------
-    inline void ArrayVector3::CmovRobust( ArrayReal mask, const ArrayVector3 &replacement )
+    inline void ArrayVector3::CmovRobust( ArrayMaskR mask, const ArrayVector3 &replacement )
     {
         ArrayReal * RESTRICT_ALIAS aChunkBase = mChunkBase;
         const ArrayReal * RESTRICT_ALIAS bChunkBase = replacement.mChunkBase;
         aChunkBase[0] = MathlibNEON::CmovRobust( aChunkBase[0], bChunkBase[0], mask );
         aChunkBase[1] = MathlibNEON::CmovRobust( aChunkBase[1], bChunkBase[1], mask );
         aChunkBase[2] = MathlibNEON::CmovRobust( aChunkBase[2], bChunkBase[2], mask );
+    }
+    //-----------------------------------------------------------------------------------
+    inline void ArrayVector3::loadFromAoS( const Real * RESTRICT_ALIAS src )
+    {
+        //Do not use the unpack version, use the shuffle. Shuffle is faster in k10 processors
+        //("The conceptual shuffle" http://developer.amd.com/community/blog/the-conceptual-shuffle/)
+        //and the unpack version uses 64-bit moves, which can cause store forwarding issues when
+        //then loading them with 128-bit movaps
+#define _MM_TRANSPOSE3_SRC_DST_PS(row0, row1, row2, row3, dst0, dst1, dst2) { \
+            float32x4x4_t tmp0, tmp1;               \
+            tmp0.val[0] = row0;                     \
+            tmp0.val[1] = row1;                     \
+            tmp0.val[2] = row2;                     \
+            tmp0.val[3] = row3;                     \
+            vst4q_f32((float32_t*)&tmp1, tmp0);     \
+            dst0 = tmp1.val[0];                     \
+            dst1 = tmp1.val[1];                     \
+            dst2 = tmp1.val[2];                     \
+        }
+
+        _MM_TRANSPOSE3_SRC_DST_PS(
+                            vld1q_f32( &src[0] ), vld1q_f32( &src[4] ),
+                            vld1q_f32( &src[8] ), vld1q_f32( &src[12] ),
+                            this->mChunkBase[0], this->mChunkBase[1],
+                            this->mChunkBase[2] );
     }
     //-----------------------------------------------------------------------------------
 
