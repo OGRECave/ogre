@@ -35,6 +35,7 @@ THE SOFTWARE
 #include "OgreFont.h"
 #include "OgreFontManager.h"
 #include "OgreOverlayElement.h"
+#include "OgreHlmsDatablock.h"
 
 namespace Ogre {
 
@@ -626,6 +627,13 @@ namespace Ogre {
         {
             updateColours();
             mColoursChanged = false;
+        }
+
+        if( !mHlmsDatablock || !mFont->isLoaded() ||
+             mHlmsDatablock->getName() != mFont->getHlmsDatablock()->getName() )
+        {
+            mFont->load();
+            this->setHlms( mFont->getHlmsDatablock() );
         }
     }
     //---------------------------------------------------------------------------------------------

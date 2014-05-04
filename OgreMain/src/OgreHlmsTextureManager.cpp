@@ -250,10 +250,11 @@ namespace Ogre
                                                                                    defaultPixelFormat,
                                                 mDefaultTextureParameters[mapType].hwGammaCorrection );
                     textureArray.entries.push_back( texName );
-                    mTextureArrays[mapType].push_back( textureArray );
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
                                                             mTextureArrays[mapType].size(), 0 ) );
+
+                    mTextureArrays[mapType].push_back( textureArray );
                 }
                 else
                 {

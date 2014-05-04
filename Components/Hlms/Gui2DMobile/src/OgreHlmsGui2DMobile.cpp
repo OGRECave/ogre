@@ -372,7 +372,9 @@ namespace Ogre
         Camera *camera = sceneManager->getCameraInProgress();
         Matrix4 viewMatrix = camera->getViewMatrix(true);
 
-        mPreparedPass.viewProjMatrix    = camera->getProjectionMatrix() * viewMatrix; //TODO
+        //mPreparedPass.viewProjMatrix    = camera->getProjectionMatrix() * viewMatrix; //TODO
+        //mPreparedPass.viewProjMatrix    = camera->getProjectionMatrix() * viewMatrix;
+        mPreparedPass.viewProjMatrix    = Matrix4::IDENTITY;
 
         return retVal;
     }
@@ -425,6 +427,15 @@ namespace Ogre
 
         if( datablock->mIsAlphaTested )
             *psUniformBuffer++ = datablock->mAlphaTestThreshold;
+
+#if OGRE_DEBUG_MODE
+        {
+            IdString oldHash = datablock->mTextureHash;
+            const_cast<HlmsGui2DMobileDatablock*>(datablock)->calculateHash();
+            assert( oldHash == datablock->mTextureHash &&
+                    "Forgot to call calculateHash after modifying a texture to datablock" );
+        }
+#endif
 
         if( datablock->mTextureHash != lastTextureHash )
         {

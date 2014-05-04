@@ -35,6 +35,11 @@ THE SOFTWARE
 #include "OgreTechnique.h"
 #include "OgreBitwise.h"
 
+#include "OgreRoot.h"
+#include "OgreHlmsManager.h"
+#include "OgreHlms.h"
+#include "OgreHlmsGui2DMobileDatablock.h"
+
 #define generic _generic    // keyword for C++/CX
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -57,7 +62,8 @@ namespace Ogre
     Font::Font(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         :Resource (creator, name, handle, group, isManual, loader),
-        mType(FT_TRUETYPE), mCharacterSpacer(5), mTtfSize(0), mTtfResolution(0), mTtfMaxBearingY(0), mAntialiasColour(false)
+        mType(FT_TRUETYPE), mCharacterSpacer(5), mTtfSize(0), mTtfResolution(0), mTtfMaxBearingY(0),
+        mHlmsDatablock(0), mAntialiasColour(false)
     {
 
         if (createParamDictionary("Font"))
@@ -187,6 +193,41 @@ namespace Ogre
             blendByAlpha = mTexture->hasAlpha();
             texLayer = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(mSource);
         }
+
+        Hlms *hlmsGui = Root::getSingleton().getHlmsManager()->getHlms( HLMS_GUI );
+
+        HlmsMacroblock macroblock;
+        HlmsBlendblock blendblock;
+        macroblock.mCullMode = CULL_NONE;
+        macroblock.mDepthCheck = false;
+        macroblock.mDepthWrite = false;
+        if (blendByAlpha)
+        {
+            blendblock.mSourceBlendFactor       = SBF_SOURCE_ALPHA;
+            blendblock.mSourceBlendFactor       = SBF_SOURCE_ALPHA;
+            blendblock.mDestBlendFactor         = SBF_ONE_MINUS_SOURCE_ALPHA;
+            blendblock.mDestBlendFactorAlpha    = SBF_ONE_MINUS_SOURCE_ALPHA;
+        }
+        else
+        {
+            blendblock.mSourceBlendFactor       = SBF_ONE;
+            blendblock.mSourceBlendFactor       = SBF_ONE;
+            blendblock.mDestBlendFactor         = SBF_ONE;
+            blendblock.mDestBlendFactorAlpha    = SBF_ONE;
+        }
+
+        HlmsParamVec paramsVec;
+        paramsVec.push_back( std::pair<IdString, String>( "name", "Fonts/" + mName ) );
+        paramsVec.push_back( std::pair<IdString, String>( "diffuse_map", mTexture->getName() ) );
+        std::sort( paramsVec.begin(), paramsVec.end() );
+
+        mHlmsDatablock = hlmsGui->createDatablock( paramsVec, macroblock, blendblock );
+
+        assert( dynamic_cast<HlmsGui2DMobileDatablock*>( mHlmsDatablock ) );
+
+        HlmsGui2DMobileDatablock *guiDatablock = static_cast<HlmsGui2DMobileDatablock*>(mHlmsDatablock);
+        guiDatablock->setTexture( 0, mTexture );
+        guiDatablock->calculateHash();
 
         // Make sure material is aware of colour per vertex.
         mMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);

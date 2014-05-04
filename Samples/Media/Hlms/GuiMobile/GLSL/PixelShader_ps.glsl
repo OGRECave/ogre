@@ -21,7 +21,7 @@ void main()
 {
 @property( !diffuse_map )
 @property( hlms_colour )	outColour = psColour;@end
-@property( !hlms_colour )	outColour = vec4(0);@end
+@property( !hlms_colour )	outColour = vec4(0, 0, 0, 1);@end
 @end
 
 @property( diffuse_map )

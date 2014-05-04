@@ -160,6 +160,7 @@ namespace Ogre
 
         /// The material which is generated for this font
         MaterialPtr mMaterial;
+        HlmsDatablock *mHlmsDatablock;
 
         /// Texture pointer
         TexturePtr mTexture;
@@ -386,6 +387,16 @@ namespace Ogre
         {
             return mMaterial;
         }
+
+        /** Gets the HLMS Datablock generated for this font
+        @remarks
+            This will only be valid after the Font has been loaded.
+        */
+        inline HlmsDatablock* getHlmsDatablock()
+        {
+            return mHlmsDatablock;
+        }
+
         /** Sets whether or not the colour of this font is antialiased as it is generated
             from a true type font.
         @remarks
