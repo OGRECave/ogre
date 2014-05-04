@@ -74,20 +74,15 @@ namespace Ogre {
             mHlmsHash( 0 ),
             mHlmsCasterHash( 0 ),
             mHlmsDatablock( 0 ),
+            mHlmsGlobalIndex( ~0 ),
             mPolygonModeOverrideable(true),
             mUseIdentityProjection(false),
             mUseIdentityView(false),
             mRenderSystemData(NULL)
             {}
         /** Virtual destructor needed as class has virtual methods. */
-        virtual ~Renderable() 
-        {
-            if (mRenderSystemData)
-            {
-                delete mRenderSystemData;
-                mRenderSystemData = NULL;
-            }
-        }
+        virtual ~Renderable();
+
         /** Retrieves a weak reference to the material this renderable object uses.
         @remarks
             Note that the Renderable also has the option to override the getTechnique method
@@ -211,13 +206,6 @@ namespace Ogre {
         @see Renderable::setUseIdentityView
         */
         bool getUseIdentityView(void) const { return mUseIdentityView; }
-
-        /** Returns the camera-relative squared depth of this renderable.
-        @remarks
-            Used to sort transparent objects. Squared depth is used rather than
-            actual depth to avoid having to perform a square root on the result.
-        */
-        virtual Real getSquaredViewDepth(const Camera* cam) const = 0;
 
         /** Gets a list of lights, ordered relative to how close they are to this renderable.
         @remarks
@@ -423,14 +411,26 @@ namespace Ogre {
         uint32 getHlmsCasterHash(void) const    { return mHlmsCasterHash; }
         const HlmsDatablock* getDatablock(void) const   { return mHlmsDatablock; }
 
-        void setHlms( const HlmsDatablock *datablock );
+        /// Assigns a datablock (i.e. HLMS Material) to this renderable
+        void setHlms( HlmsDatablock *datablock );
+
+        /// Manually sets the hlms hashes. Don't call this directly
+        void _setHlmsHashes( uint32 hash, uint32 casterHash );
 
     protected:
         typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
         uint32              mHlmsHash;
         uint32              mHlmsCasterHash;
-        HlmsDatablock const *mHlmsDatablock;
+        HlmsDatablock       *mHlmsDatablock;
+
+        /** Index in the vector holding this Rendrable reference in the HLMS datablock.
+            Used for O(1) removals.
+        @remarks
+            Despite being public, Do NOT modify it manually.
+        */
+        public: uint32      mHlmsGlobalIndex;
+    protected:
         bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;
         bool mUseIdentityView;

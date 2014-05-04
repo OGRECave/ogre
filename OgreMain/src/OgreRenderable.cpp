@@ -33,11 +33,36 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    void Renderable::setHlms( const HlmsDatablock *datablock )
+    Renderable::~Renderable()
     {
-        mHlmsDatablock = datablock;
-        datablock->getCreator()->calculateHashFor( this, datablock->getOriginalParams(),
-                                                   mHlmsHash, mHlmsCasterHash );
-    }
-}
+        if( mHlmsDatablock )
+        {
+            mHlmsDatablock->_unlinkRenderable( this );
+            mHlmsDatablock = 0;
+        }
 
+        if (mRenderSystemData)
+        {
+            delete mRenderSystemData;
+            mRenderSystemData = NULL;
+        }
+    }
+
+    void Renderable::setHlms( HlmsDatablock *datablock )
+    {
+        if( mHlmsDatablock )
+            mHlmsDatablock->_unlinkRenderable( this );
+
+        mHlmsDatablock = datablock;
+        mHlmsDatablock->_linkRenderable( this );
+        mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
+                                                        mHlmsHash, mHlmsCasterHash );
+    }
+
+    void Renderable::_setHlmsHashes( uint32 hash, uint32 casterHash )
+    {
+        mHlmsHash       = hash;
+        mHlmsCasterHash = casterHash;
+    }
+
+}

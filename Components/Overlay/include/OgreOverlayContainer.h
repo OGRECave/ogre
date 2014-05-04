@@ -107,13 +107,7 @@ namespace Ogre {
         virtual void _update(void);
 
         /** Overridden from OverlayElement. */
-        virtual ushort _notifyZOrder(ushort newZOrder);
-
-        /** Overridden from OverlayElement. */
         virtual void _notifyViewport();
-
-        /** Overridden from OverlayElement. */
-        virtual void _notifyWorldTransforms(const Matrix4& xform);
 
         /** Overridden from OverlayElement. */
         virtual void _notifyParent(OverlayContainer* parent, Overlay* overlay);

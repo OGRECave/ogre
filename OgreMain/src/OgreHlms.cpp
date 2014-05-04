@@ -100,7 +100,8 @@ namespace Ogre
     Hlms::Hlms( HlmsTypes type, Archive *dataFolder ) :
         mDataFolder( dataFolder ),
         mType( type ),
-        mRenderSystem( 0 )
+        mRenderSystem( 0 ),
+        mDebugOutput( true )
     {
         enumeratePieceFiles();
     }
@@ -960,7 +961,7 @@ namespace Ogre
         if( itor != mDatablocks.end() )
             retVal = itor->second;
 
-        return itor->second;
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void Hlms::destroyDatablock( IdString name )
@@ -1108,6 +1109,15 @@ namespace Ogre
                 this->collectPieces( inString, outString );
                 this->insertPieces( outString, inString );
                 this->parseCounter( inString, outString );
+
+                if( mDebugOutput )
+                {
+                    std::ofstream outFile( (mOutputPath + "./" +
+                                           StringConverter::toString( finalHash ) +
+                                           ShaderFiles[i]).c_str(),
+                                           std::ios::out | std::ios::binary );
+                    outFile.write( &outString[0], outString.size() );
+                }
 
                 HighLevelGpuProgramManager *gpuProgramManager =
                                                         HighLevelGpuProgramManager::getSingletonPtr();

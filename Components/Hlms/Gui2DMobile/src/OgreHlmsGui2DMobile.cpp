@@ -393,7 +393,10 @@ namespace Ogre
 
         uint16 variabilityMask = cache != lastCache ? GPV_ALL : GPV_PER_OBJECT;
 
-        const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
+        //const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
+        Matrix4 worldMat;
+        assert( queuedRenderable.renderable->getNumWorldTransforms() == 1 );
+        queuedRenderable.renderable->getWorldTransforms( &worldMat );
 
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----

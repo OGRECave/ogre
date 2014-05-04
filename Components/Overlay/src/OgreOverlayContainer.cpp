@@ -82,10 +82,7 @@ namespace Ogre {
         mChildren.insert(ChildMap::value_type(name, elem));
         // tell child about parent & Z-order
         elem->_notifyParent(this, mOverlay);
-        elem->_notifyZOrder(mZOrder + 1);
-        elem->_notifyWorldTransforms(mXForm);
         elem->_notifyViewport();
-
     }
     //---------------------------------------------------------------------
     void OverlayContainer::addChildImpl(OverlayContainer* cont)
@@ -230,35 +227,6 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    ushort OverlayContainer::_notifyZOrder(ushort newZOrder)
-    {
-        OverlayElement::_notifyZOrder(newZOrder);
-        // One for us
-        newZOrder++; 
-
-        // Update children
-        ChildIterator it = getChildIterator();
-        while (it.hasMoreElements())
-        {
-            // Children "consume" Z-order values, so keep track of them
-            newZOrder = it.getNext()->_notifyZOrder(newZOrder);
-        }
-
-        return newZOrder;
-    }
-    //---------------------------------------------------------------------
-    void OverlayContainer::_notifyWorldTransforms(const Matrix4& xform)
-    {
-        OverlayElement::_notifyWorldTransforms(xform);
-
-        // Update children
-        ChildIterator it = getChildIterator();
-        while (it.hasMoreElements())
-        {
-            it.getNext()->_notifyWorldTransforms(xform);
-        }
-    }
-    //---------------------------------------------------------------------
     void OverlayContainer::_notifyViewport()
     {
         OverlayElement::_notifyViewport();
@@ -309,8 +277,6 @@ namespace Ogre {
 
         OverlayElement* ret = NULL;
 
-        int currZ = -1;
-
         if (mVisible)
         {
             ret = OverlayElement::findElementAt(x,y);   //default to the current container if no others are found
@@ -322,20 +288,14 @@ namespace Ogre {
                     OverlayElement* currentOverlayElement = it.getNext();
                     if (currentOverlayElement->isVisible() && currentOverlayElement->isEnabled())
                     {
-                        int z = currentOverlayElement->getZOrder();
-                        if (z > currZ)
-                        {
-                            OverlayElement* elementFound = currentOverlayElement->findElementAt(x ,y );
-                            if (elementFound)
-                            {
-                                currZ = z;
-                                ret = elementFound;
-                            }
-                        }
+                        OverlayElement* elementFound = currentOverlayElement->findElementAt(x ,y );
+                        if (elementFound)
+                            ret = elementFound;
                     }
                 }
             }
         }
+
         return ret;
     }
 

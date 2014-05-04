@@ -93,6 +93,50 @@ namespace Ogre
                     blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsDatablock::_linkRenderable( Renderable *renderable )
+    {
+        assert( renderable->mHlmsGlobalIndex == ~0 &&
+                "Renderable must be unlinked before being linked again!" );
+
+        renderable->mHlmsGlobalIndex = mLinkedRenderables.size();
+        mLinkedRenderables.push_back( renderable );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsDatablock::_unlinkRenderable( Renderable *renderable )
+    {
+        if( renderable->mHlmsGlobalIndex >= mLinkedRenderables.size() ||
+            renderable != *(mLinkedRenderables.begin() + renderable->mHlmsGlobalIndex) )
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "A Renderable had it's mHlmsGlobalIndex out of "
+                "date!!! (or the Renderable wasn't being tracked by this datablock)",
+                "HlmsDatablock::_removeRenderable" );
+        }
+
+        vector<Renderable*>::type::iterator itor = mLinkedRenderables.begin() +
+                                                    renderable->mHlmsGlobalIndex;
+        itor = efficientVectorRemove( mLinkedRenderables, itor );
+
+        //The Renderable that was at the end got swapped and has now a different index
+        if( itor != mLinkedRenderables.end() )
+            (*itor)->mHlmsGlobalIndex = itor - mLinkedRenderables.begin();
+
+        renderable->mHlmsGlobalIndex = ~0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsDatablock::flushRenderables(void)
+    {
+        vector<Renderable*>::type::const_iterator itor = mLinkedRenderables.begin();
+        vector<Renderable*>::type::const_iterator end  = mLinkedRenderables.end();
+
+        while( itor != end )
+        {
+            uint32 hash, casterHash;
+            mCreator->calculateHashFor( *itor, mOriginalParams, hash, casterHash );
+            (*itor)->_setHlmsHashes( hash, casterHash );
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     HlmsPbsMobileDatablock::HlmsPbsMobileDatablock( IdString name, Hlms *creator,
                                               const HlmsMacroblock *macroblock,

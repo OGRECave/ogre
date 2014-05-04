@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgreOverlayPrerequisites.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreMatrix4.h"
+#include "OgreMovableObject.h"
 
 namespace Ogre {
 
@@ -66,15 +66,12 @@ namespace Ogre {
         don't want the overlay displayed in the smaller viewports. You turn this off for 
         a specific viewport by calling the Viewport::setDisplayOverlays method.
     */
-    class _OgreOverlayExport Overlay : public OverlayAlloc
+    class _OgreOverlayExport Overlay : public MovableObject
     {
 
     public:
               typedef list<OverlayContainer*>::type OverlayContainerList;
     protected:
-        String mName;
-        /// Internal root node, used as parent for 3D objects
-        SceneNode* mRootNode;
         /** 2D elements
             OverlayContainers, linked list for easy sorting by zorder later
             Not a map because sort can be saved since changes infrequent (unlike render queue) */
@@ -89,39 +86,36 @@ namespace Ogre {
 
         mutable Matrix4 mTransform;
         mutable bool mTransformOutOfDate;
-        bool mTransformUpdated;
-        ulong mZOrder;
-        bool mVisible;
         bool mInitialised;
         String mOrigin;
         /** Internal lazy update method. */
         void updateTransform(void) const;
         /** Internal method for initialising an overlay */
         void initialise(void);
-        /** Internal method for updating container elements' Z-ordering */
-        void assignZOrders(void);
 
     public:
         /// Constructor: do not call direct, use OverlayManager::create
-        Overlay(const String& name);
+        Overlay( const String& name, IdType id,
+                 ObjectMemoryManager *objectMemoryManager, uint8 renderQueueId );
         virtual ~Overlay();
+
+        /** Returns the type name of this object. */
+        virtual const String& getMovableType(void) const;
+
+        virtual void visitRenderables( Renderable::Visitor* visitor,
+                                       bool debugRenderables = false ) {}
 
 
         OverlayContainer* getChild(const String& name);
-
-        /** Gets the name of this overlay. */
-        const String& getName(void) const;
         
         /** Alters the Z-order of this overlay. 
         @remarks
-            Values between 0 and 650 are valid here.
+            Values between 0 and 2^DepthBits - 1 are valid here.
+            DepthBits is defined in RenderQueue.cpp
         */
-        void setZOrder(ushort zorder);
+        void setZOrder( uint16 zorder );
         /** Gets the Z-order of this overlay. */
-        ushort getZOrder(void) const;
-
-        /** Gets whether the overlay is displayed or not. */
-        bool isVisible(void) const;
+        uint16 getZOrder(void) const;
 
         /** Gets whether the overlay is initialised or not. */
         bool isInitialised(void) const { return mInitialised; }
@@ -244,7 +238,7 @@ namespace Ogre {
         void _getWorldTransforms(Matrix4* xform) const;
 
         /** Internal method to put the overlay contents onto the render queue. */
-        void _findVisibleObjects(Camera* cam, RenderQueue* queue);
+        virtual void _updateRenderQueue( RenderQueue *queue, Camera *camera, const Camera *lodCamera );
 
         /** This returns a OverlayElement at position x,y. */
         virtual OverlayElement* findElementAt(Real x, Real y);

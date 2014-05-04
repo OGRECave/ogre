@@ -103,6 +103,9 @@ namespace Ogre
         typedef std::map<IdString, HlmsDatablock*> HlmsDatablockMap;
         HlmsDatablockMap mDatablocks;
 
+        String          mOutputPath;
+        bool            mDebugOutput;
+
         HlmsTypes       mType;
 
         /** Inserts common properties about the current Renderable,

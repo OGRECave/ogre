@@ -21,5 +21,5 @@ void main()
 @property( hlms_colour )	psColour = colour;@end
 
 @foreach( hlms_uv_count, n )
-	psUv@n = uv@n @property( hlms_texture_matrix_count@n ) * texture_matrix[@counter(CurrentTexMatrix)]@end;@end
+	psUv@n = uv@n @property( hlms_texture_matrix_count@n ) * texture_matrix[@counter(CurrentTexMatrix)]@end ;@end
 }

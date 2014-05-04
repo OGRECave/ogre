@@ -159,32 +159,6 @@ namespace Ogre {
                 : camera(cam)
             {
             }
-
-            bool _OgreExport operator()(const RenderablePass& a, const RenderablePass& b) const
-            {
-                if (a.renderable == b.renderable)
-                {
-                    // Same renderable, sort by pass hash
-                    return a.pass->getHash() < b.pass->getHash();
-                }
-                else
-                {
-                    // Different renderables, sort by depth
-                    Real adepth = a.renderable->getSquaredViewDepth(camera);
-                    Real bdepth = b.renderable->getSquaredViewDepth(camera);
-                    if (Math::RealEqual(adepth, bdepth))
-                    {
-                        // Must return deterministic result, doesn't matter what
-                        return a.pass < b.pass;
-                    }
-                    else
-                    {
-                        // Sort DESCENDING by depth (i.e. far objects first)
-                        return (adepth > bdepth);
-                    }
-                }
-
-            }
         };
 
         /** Vector of RenderablePass objects, this is built on the assumption that
@@ -203,30 +177,6 @@ namespace Ogre {
                 return p.pass->getHash();
             }
         };
-
-        /// Radix sorter for accessing sort value 1 (Pass)
-        static RadixSort<RenderablePassList, RenderablePass, uint32> msRadixSorter1;
-
-        /// Functor for descending sort value 2 for radix sort (distance)
-        struct RadixSortFunctorDistance
-        {
-            const Camera* camera;
-
-            RadixSortFunctorDistance(const Camera* cam)
-                : camera(cam)
-            {
-            }
-
-            float operator()(const RenderablePass& p) const
-            {
-                // Sort DESCENDING by depth (ie far objects first), use negative distance
-                // here because radix sorter always dealing with accessing sort
-                return static_cast<float>(- p.renderable->getSquaredViewDepth(camera));
-            }
-        };
-
-        /// Radix sorter for sort value 2 (distance)
-        static RadixSort<RenderablePassList, RenderablePass, float> msRadixSorter2;
 
         /// Bitmask of the organisation modes requested
         uint8 mOrganisationMode;

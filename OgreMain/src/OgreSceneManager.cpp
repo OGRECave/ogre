@@ -1232,6 +1232,10 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
         {
             _queueSkiesForRendering(camera);
         }
+
+        //TODO: Remove this hacky listener (mostly needed by OverlayManager)
+        for( uint8 i=firstRq; i<lastRq; ++i )
+            fireRenderQueueStarted( i, BLANKSTRING );
     } // end lock on scene graph mutex
 
     mDestRenderSystem->_beginGeometryCount();
@@ -2493,7 +2497,7 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
     // _cullPhase01
 
     // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
+    /*RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
     // Override auto param ambient to force vertex programs and fixed function to 
     // Use shadow colour as caster colour if modulative
@@ -2522,7 +2526,7 @@ void SceneManager::renderTextureShadowCasterQueueGroupObjects(
 
     // reset ambient light
     mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
-    mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);
+    mDestRenderSystem->setAmbientLight(mAmbientLight.r, mAmbientLight.g, mAmbientLight.b);*/
 }
 //-----------------------------------------------------------------------
 void SceneManager::SceneMgrQueuedRenderableVisitor::visit(Renderable* r)
@@ -2596,11 +2600,11 @@ void SceneManager::renderObjects(const QueuedRenderableCollection& objs,
                                  bool lightScissoringClipping,
                                  bool doLightIteration)
 {
-    mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
+    /*mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
     mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
     mActiveQueuedRenderableVisitor->scissoring = lightScissoringClipping;
     // Use visitor
-    objs.acceptVisitor(mActiveQueuedRenderableVisitor, om);
+    objs.acceptVisitor(mActiveQueuedRenderableVisitor, om);*/
 }
 //-----------------------------------------------------------------------
 void SceneManager::_renderQueueGroupObjects(RenderQueueGroup* pGroup, 
@@ -2627,7 +2631,7 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
 {
     // Basic render loop
     // Iterate through priorities
-    RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
+    /*RenderQueueGroup::PriorityMapIterator groupIt = pGroup->getIterator();
 
     while (groupIt.hasMoreElements())
     {
@@ -2645,7 +2649,7 @@ void SceneManager::renderBasicQueueGroupObjects(RenderQueueGroup* pGroup,
             QueuedRenderableCollection::OM_SORT_DESCENDING, true, true);
 
 
-    }// for each priority
+    }// for each priority*/
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderTransparentShadowCasterObjects(
@@ -2653,7 +2657,7 @@ void SceneManager::renderTransparentShadowCasterObjects(
     QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping, 
     bool doLightIteration)
 {
-    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = true;
+    /*mActiveQueuedRenderableVisitor->transparentShadowCastersMode = true;
     mActiveQueuedRenderableVisitor->autoLights = doLightIteration;
     mActiveQueuedRenderableVisitor->scissoring = lightScissoringClipping;
     
@@ -2661,7 +2665,7 @@ void SceneManager::renderTransparentShadowCasterObjects(
     objs.acceptVisitor(mActiveQueuedRenderableVisitor, 
         QueuedRenderableCollection::OM_SORT_DESCENDING);
 
-    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;
+    mActiveQueuedRenderableVisitor->transparentShadowCastersMode = false;*/
 }
 //-----------------------------------------------------------------------
 void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass, 

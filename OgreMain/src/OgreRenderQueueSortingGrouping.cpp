@@ -32,14 +32,8 @@ THE SOFTWARE.
 
 namespace Ogre {
     // Init statics
-    RadixSort<QueuedRenderableCollection::RenderablePassList,
-        RenderablePass, uint32> QueuedRenderableCollection::msRadixSorter1;
-    RadixSort<QueuedRenderableCollection::RenderablePassList,
-        RenderablePass, float> QueuedRenderableCollection::msRadixSorter2;
-
-
     //-----------------------------------------------------------------------
-    RenderPriorityGroup::RenderPriorityGroup(RenderQueueGroup* parent)
+/*    RenderPriorityGroup::RenderPriorityGroup(RenderQueueGroup* parent)
         : mParent(parent)
     {
         // Initialise collection sorting options
@@ -424,7 +418,7 @@ namespace Ogre {
             dstGroup->second->insert( dstGroup->second->end(), srcGroup->second->begin(), srcGroup->second->end() );
         }
     }
-
+*/
 
 }
 

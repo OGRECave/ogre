@@ -121,9 +121,20 @@ namespace Ogre
     protected:
         //Non-hot variables first (can't put them last as HlmsDatablock may be derived and
         //it's better if mShadowConstantBias is together with the derived type's variables
+        /// List of renderables currently using this datablock
+        vector<Renderable*>::type mLinkedRenderables;
         HlmsParamVec mOriginalParams;
         Hlms    *mCreator;
         IdString mName;
+
+        /** Updates the mHlmsHash & mHlmsCasterHash for all linked renderables, which may have
+            if a sensitive setting has changed that would need a different shader to be created
+        @remarks
+            The operation itself isn't expensive, but the need to call this function indicates
+            that another shader will be created (unless already cached too). If so, doing that
+            will be slow.
+        */
+        void flushRenderables(void);
 
     public:
         uint32  mTextureHash;       //TextureHash comes before macroblock for alignment reasons
@@ -149,6 +160,9 @@ namespace Ogre
 
         /// Call this function to set mBlendblock & mIsOpaque automatically based on input
         void setBlendblock( HlmsBlendblock const *blendblock );
+
+        void _linkRenderable( Renderable *renderable );
+        void _unlinkRenderable( Renderable *renderable );
     };
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0

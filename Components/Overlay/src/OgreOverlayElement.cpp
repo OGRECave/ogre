@@ -28,6 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreRoot.h"
+#include "OgreHlmsManager.h"
+#include "OgreHlms.h"
 #include "OgreRenderSystem.h"
 #include "OgreOverlayElement.h"
 #include "OgreOverlay.h"
@@ -76,7 +78,6 @@ namespace Ogre {
       , mDerivedOutOfDate(true)
       , mGeomPositionsOutOfDate(true)
       , mGeomUVsOutOfDate(true)
-      , mZOrder(0)
       , mEnabled(true)
       , mInitialised(false)
       , mSourceTemplate(0)
@@ -321,7 +322,7 @@ namespace Ogre {
     void OverlayElement::setMaterialName(const String& matName)
     {
         mMaterialName = matName;
-        if (matName != BLANKSTRING)
+        /*if (matName != BLANKSTRING)
         {
             mMaterial = MaterialManager::getSingleton().getByName(matName);
             if (mMaterial.isNull())
@@ -335,7 +336,7 @@ namespace Ogre {
         else
         {
             mMaterial.setNull();
-        }
+        }*/
     }
     //---------------------------------------------------------------------
     const MaterialPtr& OverlayElement::getMaterial(void) const
@@ -422,6 +423,14 @@ namespace Ogre {
             updateTextureGeometry();
             mGeomUVsOutOfDate = false;
         } 
+
+        if( mInitialised && (!mHlmsDatablock || mHlmsDatablock->getName() != mMaterialName) )
+        {
+            HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+            Hlms *hlms = hlmsManager->getHlms( HLMS_GUI );
+            HlmsDatablock *datablock = hlms->getDatablock( mMaterialName );
+            this->setHlms( datablock );
+        }
     }
     //---------------------------------------------------------------------
     void OverlayElement::_updateFromParent(void)
@@ -560,17 +569,6 @@ namespace Ogre {
         clippingRegion = mClippingRegion;
     }
     //---------------------------------------------------------------------
-    ushort OverlayElement::_notifyZOrder(ushort newZOrder)
-    {
-        mZOrder = newZOrder;
-        return mZOrder + 1;
-    }
-    //---------------------------------------------------------------------
-    void OverlayElement::_notifyWorldTransforms(const Matrix4& xform)
-    {
-        mXForm = xform;
-    }
-    //---------------------------------------------------------------------
     void OverlayElement::_notifyViewport()
     {
         switch (mMetricsMode)
@@ -622,8 +620,8 @@ namespace Ogre {
     {
         if (mVisible)
         {
-            queue->addRenderable(this, RENDER_QUEUE_OVERLAY, mZOrder);
-        }      
+            queue->addRenderable( this, mOverlay, false );
+        }
     }
     //---------------------------------------------------------------------
     void OverlayElement::visitRenderables(Renderable::Visitor* visitor, 
