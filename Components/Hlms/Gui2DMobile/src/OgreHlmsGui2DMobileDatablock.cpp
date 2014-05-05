@@ -39,9 +39,17 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    extern const String c_diffuseMap[15];
-    const String c_diffuseMap[15] =
+    extern const String c_blendModes[];
+    const String c_blendModes[] =
     {
+        "NormalNonPremul", "NormalPremul", "Add", "Subtract", "Multiply",
+        "Multiply2x", "Screen", "Overlay", "Lighten", "Darken", "GrainExtract",
+        "GrainMerge", "Difference"
+    };
+
+    const String c_diffuseMap[16] =
+    {
+        "diffuse_map",
         "diffuse_map1",
         "diffuse_map2",
         "diffuse_map3",
@@ -69,7 +77,8 @@ namespace Ogre
         mIsAlphaTested( false ),
         mNumTextureUnits( 0 ),
         mR( 1.0f ), mG( 1.0f ), mB( 1.0f ), mA( 1.0f ),
-        mAlphaTestThreshold( 0.5f )
+        mAlphaTestThreshold( 0.5f ),
+        mShaderCreationData( 0 )
     {
         for( size_t i=0; i<sizeof(mTextureMatrices) / sizeof(Matrix4); ++i )
         {
@@ -94,7 +103,7 @@ namespace Ogre
             mTextureMatrices[i*16 + 15] = 1.0f;
         }
 
-        memset( mTextureMatrixMap, 0xffffffff, sizeof(mTextureMatrixMap) );
+        mShaderCreationData = new ShaderCreationData();
 
         String paramVal;
 
@@ -115,65 +124,108 @@ namespace Ogre
         if( Hlms::findParamInVec( params, Hlms::PropertyAlphaTest, paramVal ) )
         {
             mIsAlphaTested = true;
+            mShaderCreationData->alphaTestCmp = CMPF_LESS;
 
             if( !paramVal.empty() )
             {
                 StringVector vec = StringUtil::split( paramVal );
+
                 StringVector::const_iterator itor = vec.begin();
                 StringVector::const_iterator end  = vec.end();
 
-                Real val = -1.0f;
-                while( itor != end && val < 0 )
-                    val = StringConverter::parseReal( *itor++, -1.0f );
+                while( itor != end )
+                {
+                    if( *itor == "less" )
+                        mShaderCreationData->alphaTestCmp = CMPF_LESS;
+                    else if( *itor == "less_equal" )
+                        mShaderCreationData->alphaTestCmp = CMPF_LESS_EQUAL;
+                    else if( *itor == "equal" )
+                        mShaderCreationData->alphaTestCmp = CMPF_EQUAL;
+                    else if( *itor == "greater" )
+                        mShaderCreationData->alphaTestCmp = CMPF_GREATER;
+                    else if( *itor == "greater_equal" )
+                        mShaderCreationData->alphaTestCmp = CMPF_GREATER_EQUAL;
+                    else if( *itor == "not_equal" )
+                        mShaderCreationData->alphaTestCmp = CMPF_NOT_EQUAL;
+                    else
+                    {
+                        Real val = -1.0f;
+                        val = StringConverter::parseReal( *itor, -1.0f );
+                        if( val >= 0 )
+                        {
+                            mAlphaTestThreshold = val;
+                        }
+                        else
+                        {
+                            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                         mName.getFriendlyText() + ": unknown alpha_test cmp function "
+                                         "'" + *itor + "'",
+                                         "HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock" );
+                        }
+                    }
 
-                if( val >= 0 )
-                    mAlphaTestThreshold = val;
+                    ++itor;
+                }
             }
         }
 
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
 
-        if( Hlms::findParamInVec( params, Hlms::PropertyDiffuseMap, paramVal ) ||
-            Hlms::findParamInVec( params, "diffuse_map0", paramVal ) )
-        {
-            size_t pos = std::min( paramVal.find_first_of( ' ' ), paramVal.size() );
-            /*mDiffuseTextures[mNumTextureUnits] = TextureManager::getSingleton().getByName(
-                                                                paramVal.substr( 0, pos ) );*/
-
-            HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
-                                createOrRetrieveTexture( paramVal.substr( 0, pos ),
-                                                         HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
-            assert( !texLocation.texture->isTextureTypeArray() );
-            mDiffuseTextures[mNumTextureUnits]  = texLocation.texture;
-            mUvAtlasParams[mNumTextureUnits].uOffset    = texLocation.xIdx;
-            mUvAtlasParams[mNumTextureUnits].vOffset    = texLocation.yIdx;
-            mUvAtlasParams[mNumTextureUnits].invDivisor = 1.0f / texLocation.divisor;
-            ++mNumTextureUnits;
-        }
-
         for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String* ); ++i )
         {
             if( Hlms::findParamInVec( params, c_diffuseMap[i], paramVal ) )
             {
-                if( mNumTextureUnits != i + 1 )
+                if( mNumTextureUnits != i )
                 {
-                    Hlms::findParamInVec( params, "name", paramVal );
                     OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                 paramVal + ": Can't leave gaps between texture units! '" +
-                                 c_diffuseMap[i] + "' was specified but the previous diffuse_map "
+                                 mName.getFriendlyText() + ": Can't leave gaps between texture units! '"
+                                 + c_diffuseMap[i] + "' was specified but the previous diffuse_map "
                                  "is missing.", "HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock" );
                 }
 
-                size_t pos = std::min( paramVal.find_first_of( ' ' ), paramVal.size() );
-                HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
-                                    createOrRetrieveTexture( paramVal.substr( 0, pos ),
-                                                             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
-                assert( !texLocation.texture->isTextureTypeArray() );
-                mDiffuseTextures[mNumTextureUnits]  = texLocation.texture;
-                mUvAtlasParams[mNumTextureUnits].uOffset    = texLocation.xIdx;
-                mUvAtlasParams[mNumTextureUnits].vOffset    = texLocation.yIdx;
-                mUvAtlasParams[mNumTextureUnits].invDivisor = 1.0f / texLocation.divisor;
+                StringVector vec = StringUtil::split( paramVal );
+
+                StringVector::const_iterator itor = vec.begin();
+                StringVector::const_iterator end  = vec.end();
+
+                while( itor != end )
+                {
+                    uint val = StringConverter::parseUnsignedInt( *itor, ~0 );
+
+                    if( val != ~0 )
+                    {
+                        //It's a number, must be an UV Set
+                        setTextureUvSetForTexture( i, val );
+                    }
+                    else
+                    {
+                        //Is it a blend mode?
+                        const String *it = std::find( c_blendModes, c_blendModes +
+                                                      sizeof(c_blendModes) / sizeof( String* ),
+                                                      *itor );
+
+                        if( it == c_blendModes + sizeof(c_blendModes) / sizeof( String* ) )
+                        {
+                            //Not blend mode, try loading a texture
+                            HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
+                                   createOrRetrieveTexture( *itor,
+                                                            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
+                            assert( !texLocation.texture->isTextureTypeArray() );
+                            mDiffuseTextures[i]         = texLocation.texture;
+                            mUvAtlasParams[i].uOffset   = texLocation.xIdx;
+                            mUvAtlasParams[i].vOffset   = texLocation.yIdx;
+                            mUvAtlasParams[i].invDivisor= 1.0f / texLocation.divisor;
+                        }
+                        else
+                        {
+                            //It's a blend mode
+                            mShaderCreationData->mBlendModes[i] = (it - c_blendModes);
+                        }
+                    }
+
+                    ++itor;
+                }
 
                 ++mNumTextureUnits;
             }
@@ -182,8 +234,7 @@ namespace Ogre
         size_t maxTextureUnits = mCreator->getRenderSystem()->getCapabilities()->getNumTextureUnits();
         if( mNumTextureUnits > maxTextureUnits )
         {
-            Hlms::findParamInVec( params, "name", paramVal );
-            LogManager::getSingleton().logMessage( "WARNING: material '" + paramVal +
+            LogManager::getSingleton().logMessage( "WARNING: material '" + mName.getFriendlyText() +
                     "' exceeds the maximum number of " + StringConverter::toString( maxTextureUnits ) +
                     " texture units supported by this hardware.", LML_CRITICAL );
             mNumTextureUnits = maxTextureUnits;
@@ -198,31 +249,36 @@ namespace Ogre
 
                 if( val >= 8 )
                 {
-                    Hlms::findParamInVec( params, "name", paramVal );
                     OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                 paramVal + ": animate parameters must be in range [0; 8)",
+                                 mName.getFriendlyText() +
+                                 ": animate parameters must be in range [0; 8)",
                                  "HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock" );
                 }
 
-                if( mTextureMatrixMap[val] == 1 )
+                if( mShaderCreationData->mTextureMatrixMap[val] == 1 )
                 {
-                    Hlms::findParamInVec( params, "name", paramVal );
                     LogManager::getSingleton().logMessage( "WARNING: specified same UV set twice "
-                            "in material '" + paramVal + "'; parameter 'animate'. Are you sure this "
-                            "is correct?", LML_CRITICAL );
+                            "in material '" + mName.getFriendlyText() +
+                            "'; parameter 'animate'. Are you sure this is correct?", LML_CRITICAL );
                 }
 
-                mTextureMatrixMap[val] = 1;
+                mShaderCreationData->mTextureMatrixMap[val] = 1;
 
                 pos = paramVal.find_first_of( ' ' );
             }
 
             for( size_t i=0; i<8; ++i )
             {
-                if( mTextureMatrixMap[i] == 1 )
-                    mTextureMatrixMap[i] = mNumTextureMatrices++;
+                if( mShaderCreationData->mTextureMatrixMap[i] == 1 )
+                    mShaderCreationData->mTextureMatrixMap[i] = mNumTextureMatrices++;
             }
         }
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsGui2DMobileDatablock::~HlmsGui2DMobileDatablock()
+    {
+        delete mShaderCreationData;
+        mShaderCreationData = 0;
     }
     //-----------------------------------------------------------------------------------
     void HlmsGui2DMobileDatablock::calculateHash()
@@ -251,7 +307,8 @@ namespace Ogre
         mAlphaTestThreshold = alphaThreshold;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobileDatablock::setTexture( uint8 texUnit, TexturePtr &newTexture )
+    void HlmsGui2DMobileDatablock::setTexture( uint8 texUnit, TexturePtr &newTexture,
+                                               const UvAtlasParams &atlasParams )
     {
         if( texUnit >= mNumTextureUnits )
         {
@@ -265,6 +322,75 @@ namespace Ogre
                          mName.getFriendlyText() + "'", "HlmsGui2DMobileDatablock::setTexture" );
         }
 
-        mDiffuseTextures[texUnit] = newTexture;
+        mDiffuseTextures[texUnit]   = newTexture;
+        mUvAtlasParams[texUnit]     = atlasParams;
+        calculateHash();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsGui2DMobileDatablock::enableTextureUnits( uint8 until )
+    {
+        assert( until > 0 && until <= 16 );
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
+        HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->getBlankTexture();
+        assert( !texLocation.texture->isTextureTypeArray() );
+
+        for( size_t i=mNumTextureUnits; i<until; ++i )
+        {
+            mDiffuseTextures[i]         = texLocation.texture;
+            mUvAtlasParams[i].uOffset   = texLocation.xIdx;
+            mUvAtlasParams[i].vOffset   = texLocation.yIdx;
+            mUvAtlasParams[i].invDivisor= 1.0f / texLocation.divisor;
+        }
+
+        mNumTextureUnits = std::max( mNumTextureUnits, until );
+
+        flushRenderables();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsGui2DMobileDatablock::disableTextureUnits( uint8 from )
+    {
+        assert( from < 16 );
+
+        for( size_t i=from; i<mNumTextureUnits; ++i )
+            mDiffuseTextures[i].setNull();
+
+        mNumTextureUnits = std::min( mNumTextureUnits, from );
+
+        flushRenderables();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsGui2DMobileDatablock::setTextureUvSetForTexture( uint8 texUnit, uint8 uvSet )
+    {
+        if( texUnit >= mNumTextureUnits )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture unit out of range in datablock '" +
+                         mName.getFriendlyText() + "' attempted value: " +
+                         StringConverter::toString( texUnit ),
+                         "HlmsGui2DMobileDatablock::setTextureUvSetForTexture" );
+        }
+
+        if( uvSet >= 8 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "UV Set must be in range [0; 8) in datablock '" +
+                         mName.getFriendlyText() + "'; attempted value: " +
+                         StringConverter::toString( uvSet ),
+                         "HlmsGui2DMobileDatablock::setTextureUvSetForTexture" );
+        }
+
+        mShaderCreationData->mUvSetForTexture[texUnit] = uvSet;
+
+        flushRenderables();
+    }
+    //-----------------------------------------------------------------------------------
+    uint8 HlmsGui2DMobileDatablock::getNumUvSets(void) const
+    {
+        uint8 retVal = 0;
+
+        for( size_t i=0; i<mNumTextureUnits; ++i )
+            retVal = std::max<uint8>( mShaderCreationData->mUvSetForTexture[i] + 1, retVal );
+
+        return retVal;
     }
 }

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
+#include "OgreHlmsGui2DMobileDatablock.h"
 #include "OgreRenderSystem.h"
 
 namespace Ogre {
@@ -249,10 +250,15 @@ namespace Ogre {
     void PanelOverlayElement::updateTextureGeometry(void)
     {
         // Generate for as many texture layers as there are in material
-        if (!mMaterial.isNull() && mInitialised)
+        if (!mMaterialName.empty() && mInitialised)
         {
-            // Assume one technique and pass for the moment
-            size_t numLayers = mMaterial->getTechnique(0)->getPass(0)->getNumTextureUnitStates();
+            HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+            Hlms *hlms = hlmsManager->getHlms( HLMS_GUI );
+            HlmsDatablock *datablock = hlms->getDatablock( mMaterialName );
+            assert( dynamic_cast<HlmsGui2DMobileDatablock*>( datablock ) );
+
+            HlmsGui2DMobileDatablock *guiDatablock = static_cast<HlmsGui2DMobileDatablock*>(datablock);
+            uint8 numLayers = guiDatablock->getNumUvSets();
 
             VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
             // Check the number of texcoords we have in our buffer now

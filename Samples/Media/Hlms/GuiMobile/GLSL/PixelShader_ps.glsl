@@ -15,7 +15,7 @@ in vec@value( hlms_uv_count@n ) psUv@n;@end
 @property( alpha_test )uniform float alpha_test_threshold;@end
 // END UNIFORM DECLARATION
 
-@property( diffuse_map )uniform sampler2D	texDiffuseMap[@value( diffuse_map_count )];@end
+@property( diffuse_map )uniform sampler2D	texDiffuseMap[@value( diffuse_map )];@end
 
 void main()
 {
@@ -34,10 +34,10 @@ void main()
 
 	//Group all texture loads together to help the GPU to hide the
 	//latency (bad GL ES2 drivers won't optimize this automatically)
-@foreach( diffuse_map_count, n, 1 )
+@foreach( diffuse_map, n, 1 )
 	vec4 topImage@n = texture( texDiffuseMap[@n], psUv@value( diffuse_map_count@n ) );@end
 
-@foreach( diffuse_map_count, n, 1 )
+@foreach( diffuse_map, n, 1 )
 	@insertpiece( blend_mode_idx@n )@end
 
 @property( diffuse_map )@property( hlms_colour )	outColour *= psColour;@end @end

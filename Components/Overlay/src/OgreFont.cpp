@@ -217,16 +217,15 @@ namespace Ogre
         }
 
         HlmsParamVec paramsVec;
-        paramsVec.push_back( std::pair<IdString, String>( "name", "Fonts/" + mName ) );
         paramsVec.push_back( std::pair<IdString, String>( "diffuse_map", mTexture->getName() ) );
         std::sort( paramsVec.begin(), paramsVec.end() );
 
-        mHlmsDatablock = hlmsGui->createDatablock( paramsVec, macroblock, blendblock );
+        mHlmsDatablock = hlmsGui->createDatablock( "Fonts/" + mName, macroblock, blendblock, paramsVec );
 
         assert( dynamic_cast<HlmsGui2DMobileDatablock*>( mHlmsDatablock ) );
 
         HlmsGui2DMobileDatablock *guiDatablock = static_cast<HlmsGui2DMobileDatablock*>(mHlmsDatablock);
-        guiDatablock->setTexture( 0, mTexture );
+        guiDatablock->setTexture( 0, mTexture, HlmsGui2DMobileDatablock::UvAtlasParams() );
         guiDatablock->calculateHash();
 
         // Make sure material is aware of colour per vertex.

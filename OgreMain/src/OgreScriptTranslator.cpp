@@ -694,8 +694,7 @@ namespace Ogre{
         Hlms *hlms = 0;
         HlmsParamVec paramVec;
 
-        paramVec.reserve( obj->children.size() + 1 );
-        paramVec.push_back( std::pair<IdString, String>( "name", obj->name) );
+        paramVec.reserve( obj->children.size() );
 
         if( type == "pbs" )
             hlms = hlmsManager->getHlms( HLMS_PBS );
@@ -948,7 +947,7 @@ namespace Ogre{
         }
 
         std::sort( paramVec.begin(), paramVec.end(), OrderParamVecByKey );
-        hlms->createDatablock( paramVec, macroblock, blendblock );
+        hlms->createDatablock( obj->name, macroblock, blendblock, paramVec );
 
         }
         catch( Exception &e )

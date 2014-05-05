@@ -63,10 +63,10 @@ namespace Ogre
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
 
-        virtual HlmsDatablock* createDatablockImpl( const HlmsParamVec &paramVec,
+        virtual HlmsDatablock* createDatablockImpl( IdString datablockName,
                                                     const HlmsMacroblock *macroblock,
                                                     const HlmsBlendblock *blendblock,
-                                                    IdString datablockName );
+                                                    const HlmsParamVec &paramVec );
 
     public:
         HlmsGui2DMobile( Archive *dataFolder );
@@ -83,8 +83,17 @@ namespace Ogre
                                      bool casterPass, const HlmsCache *lastCache,
                                      uint32 lastTextureHash );
 
+        static const IdString PropertyTexMatrixCount;
+        static const IdString PropertyTexMatrixCount0;
+        static const IdString PropertyTexMatrixCount1;
+        static const IdString PropertyTexMatrixCount2;
+        static const IdString PropertyTexMatrixCount3;
+        static const IdString PropertyTexMatrixCount4;
+        static const IdString PropertyTexMatrixCount5;
+        static const IdString PropertyTexMatrixCount6;
+        static const IdString PropertyTexMatrixCount7;
+
         static const IdString PropertyDiffuse;
-        static const IdString PropertyDiffuseMapCount;
         static const IdString PropertyDiffuseMapCount0;
         static const IdString PropertyDiffuseMapCount1;
         static const IdString PropertyDiffuseMapCount2;
@@ -102,6 +111,7 @@ namespace Ogre
         static const IdString PropertyDiffuseMapCount14;
         static const IdString PropertyDiffuseMapCount15;
 
+        static const IdString PropertyBlendModeIdx0;
         static const IdString PropertyBlendModeIdx1;
         static const IdString PropertyBlendModeIdx2;
         static const IdString PropertyBlendModeIdx3;

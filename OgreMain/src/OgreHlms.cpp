@@ -917,38 +917,30 @@ namespace Ogre
         return mRenderableCache[hash & 0x7f];
     }
     //-----------------------------------------------------------------------------------
-    HlmsDatablock* Hlms::createDatablockImpl( const HlmsParamVec &paramVec,
+    HlmsDatablock* Hlms::createDatablockImpl( IdString datablockName,
                                               const HlmsMacroblock *macroblock,
                                               const HlmsBlendblock *blendblock,
-                                              IdString datablockName )
+                                              const HlmsParamVec &paramVec )
     {
         return OGRE_NEW HlmsDatablock( datablockName, this, macroblock, blendblock, paramVec );
     }
     //-----------------------------------------------------------------------------------
-    HlmsDatablock* Hlms::createDatablock( const HlmsParamVec &paramVec,
-                                          const HlmsMacroblock &macroblockRef,
-                                          const HlmsBlendblock &blendblockRef )
+    HlmsDatablock* Hlms::createDatablock( IdString name, const HlmsMacroblock &macroblockRef,
+                                          const HlmsBlendblock &blendblockRef,
+                                          const HlmsParamVec &paramVec )
     {
-        String datablockName;
-        if( !findParamInVec( paramVec, "name", datablockName ) )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "paramVec must contain a 'name' entry!",
-                         "Hlms::createDatablock" );
-        }
-
-        IdString datablockNameId( datablockName );
-        if( mDatablocks.find( datablockNameId ) != mDatablocks.end() )
+        if( mDatablocks.find( name ) != mDatablocks.end() )
         {
             OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "A material datablock with name '" +
-                         datablockName + "' already exists.", "Hlms::createDatablock" );
+                         name.getFriendlyText() + "' already exists.", "Hlms::createDatablock" );
         }
 
         const HlmsMacroblock *macroblock = mHlmsManager->getMacroblock( macroblockRef );
         const HlmsBlendblock *blendblock = mHlmsManager->getBlendblock( blendblockRef );
 
-        HlmsDatablock *retVal = createDatablockImpl( paramVec, macroblock, blendblock, datablockNameId );
+        HlmsDatablock *retVal = createDatablockImpl( name, macroblock, blendblock, paramVec );
 
-        mDatablocks[datablockNameId] = retVal;
+        mDatablocks[name] = retVal;
 
         retVal->calculateHash();
         return retVal;

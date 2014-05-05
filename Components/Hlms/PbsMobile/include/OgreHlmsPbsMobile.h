@@ -65,10 +65,10 @@ namespace Ogre
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
 
-        virtual HlmsDatablock* createDatablockImpl( const HlmsParamVec &paramVec,
+        virtual HlmsDatablock* createDatablockImpl( IdString datablockName,
                                                     const HlmsMacroblock *macroblock,
                                                     const HlmsBlendblock *blendblock,
-                                                    IdString datablockName );
+                                                    const HlmsParamVec &paramVec );
 
     public:
         HlmsPbsMobile( Archive *dataFolder );

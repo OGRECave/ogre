@@ -224,10 +224,10 @@ namespace Ogre
                                                          uint32 finalHash,
                                                          const QueuedRenderable &queuedRenderable );
 
-        virtual HlmsDatablock* createDatablockImpl( const HlmsParamVec &paramVec,
+        virtual HlmsDatablock* createDatablockImpl( IdString datablockName,
                                                     const HlmsMacroblock *macroblock,
                                                     const HlmsBlendblock *blendblock,
-                                                    IdString datablockName );
+                                                    const HlmsParamVec &paramVec );
 
     public:
         Hlms( HlmsTypes type, Archive *dataFolder );
@@ -241,18 +241,20 @@ namespace Ogre
         @remarks
             The name of the datablock must be in paramVec["name"] and must be unique
             Throws if a datablock with the same name paramVec["name"] already exists
-        @param paramVec
-            Key - String Value list of paramters. MUST BE SORTED.
+        @param name
+            Name of the Datablock, must be unique within all Hlms types, not just this one.
         @param macroblockRef
             @See HlmsManager::getMacroblock
         @param blendblockRef
             @See HlmsManager::getBlendblock
+        @param paramVec
+            Key - String Value list of paramters. MUST BE SORTED.
         @return
             Pointer to created Datablock
         */
-        HlmsDatablock* createDatablock( const HlmsParamVec &paramVec,
-                                        const HlmsMacroblock &macroblockRef,
-                                        const HlmsBlendblock &blendblockRef );
+        HlmsDatablock* createDatablock( IdString name, const HlmsMacroblock &macroblockRef,
+                                        const HlmsBlendblock &blendblockRef,
+                                        const HlmsParamVec &paramVec );
 
         /** Finds an existing datablock based on its name (@see createDatablock)
         @return

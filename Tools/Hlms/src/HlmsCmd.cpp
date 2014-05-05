@@ -205,7 +205,6 @@ void HlmsCmd::createScene(void)
     HlmsParamVec params;
     /*params.insert( *//*std::lower_bound( params.begin(), params.end(), )*//*params.begin(),
                    std::pair<IdString, String>( "envprobe_map", "example.dds" ) );*/
-    params.push_back( std::pair<IdString, String>( "name", "TEST MATERIAL" ) );
     params.push_back( std::pair<IdString, String>( "diffuse_map0", "penguin.jpg 0" ) );
     params.push_back( std::pair<IdString, String>( "diffuse_map1", "penguin.jpg 0 Add" ) );
     std::sort( params.begin(), params.end(), OrderParamVecByKey );
@@ -214,7 +213,8 @@ void HlmsCmd::createScene(void)
 
     HlmsManager *hlmsManager = mRoot->getHlmsManager();
     Hlms *usedGenerator = hlmsManager->getHlms( HLMS_GUI );
-    HlmsDatablock *datablock = usedGenerator->createDatablock( params, macroblockRef, blendblockRef );
+    HlmsDatablock *datablock = usedGenerator->createDatablock( "TEST MATERIAL", macroblockRef,
+                                                               blendblockRef, params );
     entity->setHlms( datablock );
 
     mSceneMgr->updateSceneGraph();

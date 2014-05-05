@@ -39,21 +39,41 @@ namespace Ogre
     */
     /** \addtogroup Material
     *  @{
-    */
+    */#
 
     /// Contains information needed by the UI (2D) for OpenGL ES 2.0
     class _OgreExport HlmsGui2DMobileDatablock : public HlmsDatablock
     {
         friend class HlmsGui2DMobile;
-    protected:
 
+        struct ShaderCreationData
+        {
+            /// Maps UV coordinate sets to mTextureMatrices starting index.
+            uint8           mTextureMatrixMap[8];
+            CompareFunction alphaTestCmp;
+
+            /// One per texture unit. Specifies which UV set we will use.
+            uint8           mUvSetForTexture[16];
+            uint8           mBlendModes[16];
+
+            ShaderCreationData() : alphaTestCmp( CMPF_ALWAYS_PASS )
+            {
+                memset( mTextureMatrixMap, 0xffffffff, sizeof(mTextureMatrixMap) );
+                memset( mUvSetForTexture, 0, sizeof(mUvSetForTexture) );
+                memset( mBlendModes, 0, sizeof(mBlendModes) );
+            }
+        };
+
+    public:
         struct UvAtlasParams
         {
             float uOffset;
             float vOffset;
             float invDivisor;
+            UvAtlasParams() : uOffset( 0 ), vOffset( 0 ), invDivisor( 1.0f ) {}
         };
 
+    protected:
         /// Up to 8 matrices; RS APIs don't let us to pass through
         /// more than 8 UVs to the pixel shader anyway
         uint32  mNumTextureMatrices;
@@ -71,8 +91,10 @@ namespace Ogre
         /// Must be contiguous (i.e. if mDiffuseTextures[1] isn't used, mDiffuseTextures[2] can't be)
         TexturePtr mDiffuseTextures[16];
 
-        /// Maps UV coordinate sets to mTextureMatrices starting index.
-        uint8   mTextureMatrixMap[8];
+        /// The data in this structure only affects shader generation (thus modifying it implies
+        /// generating a new shader; i.e. a call to flushRenderables()). Because this data
+        /// is not needed while iterating (updating constants), it's dynamically allocated
+        ShaderCreationData *mShaderCreationData;
 
     public:
         /** Valid parameters in params:
@@ -90,9 +112,6 @@ namespace Ogre
                 If the Renderable doesn't have enough UV texcoords, HLMS will throw an exception.
 
                 Note: The UV set is evaluated when creating the Renderable cache.
-
-            * diffuse_map0
-                Alias for diffuse_map
 
             * diffuse_map1 <texture name> [blendmode] [#uv]
                 Name of the diffuse texture that will be layered on top of the base image.
@@ -136,6 +155,7 @@ namespace Ogre
                                   const HlmsMacroblock *macroblock,
                                   const HlmsBlendblock *blendblock,
                                   const HlmsParamVec &params );
+        virtual ~HlmsGui2DMobileDatablock();
 
         virtual void calculateHash();
 
@@ -163,11 +183,56 @@ namespace Ogre
             ID of the texture unit. Must be in range [0; mNumTextureUnits) otherwise throws.
         @param newTexture
             Texture to change to. Can't be null, otherwise throws (use a blank texture).
+        @param atlasParams
+            The atlas offsets in case this texture is an atlas or an array texture
         */
-        void setTexture( uint8 texUnit, TexturePtr &newTexture );
+        void setTexture( uint8 texUnit, TexturePtr &newTexture, const UvAtlasParams &atlasParams );
+
+        /** Enables all texture units until the 'until' parameter. All the tex units in the
+            range [0; until) will be enabled.
+        @remarks
+            When enabling a texture unit that was disabled, a blank dummy texture will be
+            assigned to that unit.
+        @par
+            If the datablock had 6 texture units enabled and 'until' is 5; nothing will happen
+        @par
+            Calling this function implies calling @see HlmsDatablock::flushRenderables. If
+            the another shader must be created, it could cause a stall.
+        @param until
+            A value in the range (0; 16].
+        */
+        void enableTextureUnits( uint8 until );
+
+        /** Disables all texture units starting from the 'from' parameter, inclusive. All the
+            tex. units in the range [from; 16) will be removed.
+        @remarks
+            If the datablock had 6 texture units enabled and 'from' is 7; nothing will happen.
+            Disabling a texture unit will release the TexturePtr.
+        @par
+            Calling this function implies calling @see HlmsDatablock::flushRenderables. If
+            the another shader must be created, it could cause a stall.
+        @param from
+            A value in the range [0; 16)
+        */
+        void disableTextureUnits( uint8 from );
+
+        /** Sets the set of UVs that will be used to sample from the texture unit.
+        @remarks
+            Calling this function implies calling @see HlmsDatablock::flushRenderables. If
+            the another shader must be created, it could cause a stall.
+        @param texUnit
+            ID of the texture unit. Must be in range [0; mNumTextureUnits) otherwise throws.
+        @param uvSet
+            The uv set. Must be in range [0; 8) otherwise throws. If the datablock is assigned
+            to a mesh that has less UV sets than required, it will throw during the assignment.
+        */
+        void setTextureUvSetForTexture( uint8 texUnit, uint8 uvSet );
 
         /// Returns the number of texture units.
         uint8 getNumTextureUnits(void) const            { return mNumTextureUnits; }
+
+        /// Calculates the amount of UV sets used by the datablock
+        uint8 getNumUvSets(void) const;
     };
 
     /** @} */

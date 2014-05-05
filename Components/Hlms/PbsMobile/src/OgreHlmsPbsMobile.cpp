@@ -412,10 +412,10 @@ namespace Ogre
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
     }
     //-----------------------------------------------------------------------------------
-    HlmsDatablock* HlmsPbsMobile::createDatablockImpl( const HlmsParamVec &paramVec,
-                                                    const HlmsMacroblock *macroblock,
-                                                    const HlmsBlendblock *blendblock,
-                                                    IdString datablockName )
+    HlmsDatablock* HlmsPbsMobile::createDatablockImpl( IdString datablockName,
+                                                       const HlmsMacroblock *macroblock,
+                                                       const HlmsBlendblock *blendblock,
+                                                       const HlmsParamVec &paramVec )
     {
         return OGRE_NEW HlmsPbsMobileDatablock( datablockName, this, macroblock, blendblock, paramVec );
     }

@@ -397,4 +397,15 @@ namespace Ogre
 
         return retVal;
     }
+    //-----------------------------------------------------------------------------------
+    HlmsTextureManager::TextureLocation HlmsTextureManager::getBlankTexture(void) const
+    {
+        TextureLocation retVal;
+        retVal.texture  = mBlankTexture;
+        retVal.xIdx     = 0;
+        retVal.yIdx     = 0;
+        retVal.divisor  = 1;
+
+        return retVal;
+    }
 }

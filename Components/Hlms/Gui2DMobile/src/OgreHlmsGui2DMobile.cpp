@@ -39,8 +39,17 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount      = IdString( "hlms_texture_matrix_count" );
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount0     = IdString( "hlms_texture_matrix_count0" );
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount1     = IdString( "hlms_texture_matrix_count1" );
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount2     = IdString( "hlms_texture_matrix_count2" );
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount3     = IdString( "hlms_texture_matrix_count3" );
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount4     = IdString( "hlms_texture_matrix_count4" );
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount5     = IdString( "hlms_texture_matrix_count5" );
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount6     = IdString( "hlms_texture_matrix_count6" );
+    const IdString HlmsGui2DMobile::PropertyTexMatrixCount7     = IdString( "hlms_texture_matrix_count7" );
+
     const IdString HlmsGui2DMobile::PropertyDiffuse             = IdString( "diffuse" );
-    const IdString HlmsGui2DMobile::PropertyDiffuseMapCount     = IdString( "diffuse_map_count" );
     const IdString HlmsGui2DMobile::PropertyDiffuseMapCount0    = IdString( "diffuse_map_count0" );
     const IdString HlmsGui2DMobile::PropertyDiffuseMapCount1    = IdString( "diffuse_map_count1" );
     const IdString HlmsGui2DMobile::PropertyDiffuseMapCount2    = IdString( "diffuse_map_count2" );
@@ -58,6 +67,7 @@ namespace Ogre
     const IdString HlmsGui2DMobile::PropertyDiffuseMapCount14   = IdString( "diffuse_map_count14" );
     const IdString HlmsGui2DMobile::PropertyDiffuseMapCount15   = IdString( "diffuse_map_count15" );
 
+    const IdString HlmsGui2DMobile::PropertyBlendModeIdx0       = IdString( "blend_mode_idx0" );
     const IdString HlmsGui2DMobile::PropertyBlendModeIdx1       = IdString( "blend_mode_idx1" );
     const IdString HlmsGui2DMobile::PropertyBlendModeIdx2       = IdString( "blend_mode_idx2" );
     const IdString HlmsGui2DMobile::PropertyBlendModeIdx3       = IdString( "blend_mode_idx3" );
@@ -74,17 +84,11 @@ namespace Ogre
     const IdString HlmsGui2DMobile::PropertyBlendModeIdx14      = IdString( "blend_mode_idx14" );
     const IdString HlmsGui2DMobile::PropertyBlendModeIdx15      = IdString( "blend_mode_idx15" );
 
+    extern const String c_blendModes[];
 
-    const IdString c_blendModes[] =
+    const IdString *DiffuseMapCountPtrs[16][2] =
     {
-        "NormalNonPremul", "NormalPremul", "Add", "Subtract", "Multiply",
-        "Multiply2x", "Screen", "Overlay", "Lighten", "Darken", "GrainExtract",
-        "GrainMerge", "Difference"
-    };
-
-    extern const String c_diffuseMap[15];
-    const IdString *DiffuseMapCountPtrs[15][2] =
-    {
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount0, &HlmsGui2DMobile::PropertyBlendModeIdx0 },
         { &HlmsGui2DMobile::PropertyDiffuseMapCount1, &HlmsGui2DMobile::PropertyBlendModeIdx1 },
         { &HlmsGui2DMobile::PropertyDiffuseMapCount2, &HlmsGui2DMobile::PropertyBlendModeIdx2 },
         { &HlmsGui2DMobile::PropertyDiffuseMapCount3, &HlmsGui2DMobile::PropertyBlendModeIdx3 },
@@ -100,6 +104,19 @@ namespace Ogre
         { &HlmsGui2DMobile::PropertyDiffuseMapCount13, &HlmsGui2DMobile::PropertyBlendModeIdx13 },
         { &HlmsGui2DMobile::PropertyDiffuseMapCount14, &HlmsGui2DMobile::PropertyBlendModeIdx14 },
         { &HlmsGui2DMobile::PropertyDiffuseMapCount15, &HlmsGui2DMobile::PropertyBlendModeIdx15 }
+    };
+
+
+    const IdString *TexCoordAnimationMatrix[8] =
+    {
+        &HlmsGui2DMobile::PropertyTexMatrixCount0,
+        &HlmsGui2DMobile::PropertyTexMatrixCount1,
+        &HlmsGui2DMobile::PropertyTexMatrixCount2,
+        &HlmsGui2DMobile::PropertyTexMatrixCount3,
+        &HlmsGui2DMobile::PropertyTexMatrixCount4,
+        &HlmsGui2DMobile::PropertyTexMatrixCount5,
+        &HlmsGui2DMobile::PropertyTexMatrixCount6,
+        &HlmsGui2DMobile::PropertyTexMatrixCount7
     };
 
     const String c_vsPerObjectUniforms[] =
@@ -217,147 +234,48 @@ namespace Ogre
                                                                     renderable->getDatablock() );
 
         setProperty( PropertyDiffuse, datablock->mHasColour );
-        setProperty( PropertyDiffuseMapCount, datablock->mNumTextureUnits );
+        setProperty( PropertyDiffuseMap, datablock->mNumTextureUnits );
 
         if( datablock->mIsAlphaTested )
         {
             setProperty( PropertyAlphaTest, 1 );
-            Hlms::findParamInVec( params, PropertyAlphaTest, paramVal );
 
-            pieces[PixelShader]["alpha_test_cmp_func"] = "<";
-
-            StringVector vec = StringUtil::split( paramVal );
-
-            StringVector::const_iterator itor = vec.begin();
-            StringVector::const_iterator end  = vec.end();
-
-            while( itor != end )
+            switch( datablock->mShaderCreationData->alphaTestCmp )
             {
-                if( *itor == "less" )
-                    pieces[PixelShader]["alpha_test_cmp_func"] = "<";
-                else if( *itor == "less_equal" )
-                    pieces[PixelShader]["alpha_test_cmp_func"] = "<=";
-                else if( *itor == "equal" )
-                    pieces[PixelShader]["alpha_test_cmp_func"] = "==";
-                else if( *itor == "greater" )
-                    pieces[PixelShader]["alpha_test_cmp_func"] = ">";
-                else if( *itor == "greater_equal" )
-                    pieces[PixelShader]["alpha_test_cmp_func"] = ">=";
-                else if( *itor == "not_equal" )
-                    pieces[PixelShader]["alpha_test_cmp_func"] = "!=";
-                else if( StringConverter::parseReal( *itor, -1.0f ) == -1.0f )
-                {
-                    String paramValName;
-                    Hlms::findParamInVec( params, "name", paramValName );
-                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                 paramValName + ": unknown alpha_test cmp function '" + *itor + "'",
-                                 "HlmsGui2DMobile::calculateHashFor" );
-                }
-
-                ++itor;
+            case CMPF_LESS:             pieces[PixelShader]["alpha_test_cmp_func"] = "<"; break;
+            case CMPF_LESS_EQUAL:       pieces[PixelShader]["alpha_test_cmp_func"] = "<="; break;
+            case CMPF_EQUAL:            pieces[PixelShader]["alpha_test_cmp_func"] = "=="; break;
+            case CMPF_GREATER:          pieces[PixelShader]["alpha_test_cmp_func"] = ">"; break;
+            case CMPF_GREATER_EQUAL:    pieces[PixelShader]["alpha_test_cmp_func"] = ">="; break;
+            case CMPF_NOT_EQUAL:        pieces[PixelShader]["alpha_test_cmp_func"] = "!="; break;
+            default:
+                break;
             }
         }
 
-        //Deal with base texture
-        if( Hlms::findParamInVec( params, PropertyDiffuseMap, paramVal ) ||
-            Hlms::findParamInVec( params, "diffuse_map0", paramVal ) )
+        for( size_t i=0; i<datablock->mNumTextureUnits; ++i )
         {
-            setProperty( PropertyDiffuseMap, 1 );
+            const uint8 uvSet = datablock->mShaderCreationData->mUvSetForTexture[i];
+            const uint8 blendModeIdx = datablock->mShaderCreationData->mBlendModes[i];
 
-            size_t pos = paramVal.find_first_of( "\t\n " );
-            while( pos < paramVal.size() )
+            if( uvSet >= numTexCoords )
             {
-                size_t nextPos = paramVal.find_first_of( "\t\n ", pos + 1 );
-                nextPos = std::min( nextPos, paramVal.size() );
-
-                String subString = paramVal.substr( pos + 1, nextPos - pos - 1 );
-                uint val = StringConverter::parseUnsignedInt( subString, ~0 );
-                if( val >= 8 && val != ~0 )
-                {
-                    //It's a number, but UV sets can't be 8 or more
-                    String paramValName;
-                    Hlms::findParamInVec( params, "name", paramValName );
-                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                 paramValName + ": diffuse_map's UV set must be in range [0; 8)."
-                                 " Actual value: " + paramVal,
-                                 "HlmsGui2DMobile::calculateHashFor" );
-                }
-                else if( val < 8 )
-                {
-                    if( val >= numTexCoords )
-                    {
-                        String paramValName;
-                        Hlms::findParamInVec( params, "name", paramVal );
-                        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                     paramValName + ": diffuse_map's is trying to use more UV "
-                                     "sets than the mesh has ( " + subString + "vs" +
-                                     StringConverter::toString(numTexCoords) + " )",
-                                     "HlmsGui2DMobile::calculateHashFor" );
-                    }
-
-                    //Valid UV set
-                    setProperty( PropertyDiffuseMapCount0, val );
-                }
-
-                pos = nextPos;
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             datablock->getName().getFriendlyText() +
+                             ": diffuse_map's is trying to use more UV sets than the mesh "
+                             "has ( " + StringConverter::toString(uvSet) + " vs " +
+                             StringConverter::toString(numTexCoords) + " )",
+                             "HlmsGui2DMobile::calculateHashFor" );
             }
+
+            setProperty( *DiffuseMapCountPtrs[i][0], uvSet );
+            pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] = "@insertpiece( " +
+                                                                c_blendModes[blendModeIdx] + ")";
         }
 
-        //Deal with top textures
-        for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String* ); ++i )
-        {
-            if( Hlms::findParamInVec( params, c_diffuseMap[i], paramVal ) )
-            {
-                pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] = "@insertpiece( NormalPremul )";
-
-                size_t pos = paramVal.find_first_of( "\t\n " );
-                while( pos < paramVal.size() )
-                {
-                    size_t nextPos = paramVal.find_first_of( "\t\n ", pos + 1 );
-                    nextPos = std::min( nextPos, paramVal.size() );
-
-                    String subString = paramVal.substr( pos + 1, nextPos - pos - 1 );
-                    uint val = StringConverter::parseUnsignedInt( subString, ~0 );
-                    if( val >= 8 && val != ~0 )
-                    {
-                        //It's a number, but UV sets can't be 8 or more
-                        String paramValName;
-                        Hlms::findParamInVec( params, "name", paramValName );
-                        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                     paramValName + ": diffuse_map's UV set must be in range [0; 8)."
-                                     " Actual value: " + paramVal,
-                                     "HlmsGui2DMobile::calculateHashFor" );
-                    }
-                    else if( val < 8 )
-                    {
-                        //Valid UV set
-                        setProperty( *DiffuseMapCountPtrs[i][0], val );
-                    }
-                    else
-                    {
-                        //Must be a blend
-                        const IdString *it = std::find( c_blendModes, c_blendModes +
-                                                        sizeof(c_blendModes) / sizeof( IdString* ),
-                                                        IdString( subString ) );
-
-                        if( it == c_blendModes + sizeof(c_blendModes) / sizeof( IdString* ) )
-                        {
-                            String paramValName;
-                            Hlms::findParamInVec( params, "name", paramValName );
-                            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                         paramValName + ": Invalid parameter. A blend mode or UV "
-                                         "set must be specified. Actual value: " + paramVal,
-                                         "HlmsGui2DMobile::calculateHashFor" );
-                        }
-
-                        pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] =
-                                                        "@insertpiece( " + subString + " )";
-                    }
-
-                    pos = nextPos;
-                }
-            }
-        }
+        setProperty( PropertyTexMatrixCount, datablock->mNumTextureMatrices );
+        for( size_t i=0; i<datablock->mNumTextureMatrices; ++i )
+            setProperty( *TexCoordAnimationMatrix[i], 1 );
 
         uint32 renderableHash = this->addRenderableCache( mSetProperties, pieces );
 
@@ -373,7 +291,6 @@ namespace Ogre
         Matrix4 viewMatrix = camera->getViewMatrix(true);
 
         //mPreparedPass.viewProjMatrix    = camera->getProjectionMatrix() * viewMatrix; //TODO
-        //mPreparedPass.viewProjMatrix    = camera->getProjectionMatrix() * viewMatrix;
         mPreparedPass.viewProjMatrix    = Matrix4::IDENTITY;
 
         return retVal;
@@ -456,10 +373,10 @@ namespace Ogre
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
     }
     //-----------------------------------------------------------------------------------
-    HlmsDatablock* HlmsGui2DMobile::createDatablockImpl( const HlmsParamVec &paramVec,
+    HlmsDatablock* HlmsGui2DMobile::createDatablockImpl( IdString datablockName,
                                                          const HlmsMacroblock *macroblock,
                                                          const HlmsBlendblock *blendblock,
-                                                         IdString datablockName )
+                                                         const HlmsParamVec &paramVec )
     {
         return OGRE_NEW HlmsGui2DMobileDatablock( datablockName, this, macroblock, blendblock, paramVec );
     }

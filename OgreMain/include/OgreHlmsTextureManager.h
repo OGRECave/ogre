@@ -191,6 +191,9 @@ namespace Ogre
                 retVal.divisor: The value the original UVs have to be divided for
         */
         TextureLocation createOrRetrieveTexture( const String &texName, TextureMapType mapType );
+
+        /// Returns the precreated blank texture
+        TextureLocation getBlankTexture(void) const;
     };
     /** @} */
     /** @} */
