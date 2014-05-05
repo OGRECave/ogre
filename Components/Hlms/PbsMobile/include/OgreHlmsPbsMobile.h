@@ -46,7 +46,7 @@ namespace Ogre
     /** Physically based shading implementation specfically designed for OpenGL ES 2.0 and other
         RenderSystems which do not support uniform buffers.
     */
-    class _OgreExport HlmsPbsMobile : public Hlms
+    class _OgreHlmsPbsMobileExport HlmsPbsMobile : public Hlms
     {
         struct PassData
         {

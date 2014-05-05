@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef _OgreHlmsGui2DMobile_H_
 #define _OgreHlmsGui2DMobile_H_
 
+#include "OgreHlmsGui2DMobilePrerequisites.h"
 #include "OgreHlms.h"
 #include "OgreHeaderPrefix.h"
 
@@ -46,7 +47,7 @@ namespace Ogre
     /** User Interface (2D) implementation specfically designed for OpenGL ES 2.0 and other
         RenderSystems which do not support uniform buffers.
     */
-    class _OgreExport HlmsGui2DMobile : public Hlms
+    class _OgreHlmsGui2DMobileExport HlmsGui2DMobile : public Hlms
     {
         struct PassData
         {

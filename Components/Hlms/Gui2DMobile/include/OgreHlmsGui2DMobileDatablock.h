@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef _OgreHlmsGui2DMobileDatablock_H_
 #define _OgreHlmsGui2DMobileDatablock_H_
 
+#include "OgreHlmsGui2DMobilePrerequisites.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
@@ -42,7 +43,7 @@ namespace Ogre
     */#
 
     /// Contains information needed by the UI (2D) for OpenGL ES 2.0
-    class _OgreExport HlmsGui2DMobileDatablock : public HlmsDatablock
+    class _OgreHlmsGui2DMobileExport HlmsGui2DMobileDatablock : public HlmsDatablock
     {
         friend class HlmsGui2DMobile;
 
