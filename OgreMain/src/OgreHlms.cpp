@@ -51,6 +51,8 @@ namespace Ogre
     const IdString Hlms::HlmsPropertyNormal             = IdString( "hlms_normal" );
     const IdString Hlms::HlmsPropertyQTangent           = IdString( "hlms_qtangent" );
 
+    const IdString Hlms::HlmsPropertyColour             = IdString( "hlms_colour" );
+
     const IdString Hlms::HlmsPropertyUvCount            = IdString( "hlms_uv_count" );
     const IdString Hlms::HlmsPropertyUvCount0           = IdString( "hlms_uv_count0" );
     const IdString Hlms::HlmsPropertyUvCount1           = IdString( "hlms_uv_count1" );
@@ -1171,6 +1173,9 @@ namespace Ogre
                 break;
             case VES_TANGENT:
                 normalMappedCanBeSupported = true;
+                break;
+            case VES_DIFFUSE:
+                setProperty( HlmsPropertyColour, 1 );
                 break;
             case VES_TEXTURE_COORDINATES:
                 numTexCoords = std::max<uint>( numTexCoords, vertexElem.getIndex() + 1 );

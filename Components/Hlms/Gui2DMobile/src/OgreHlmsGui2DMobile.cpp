@@ -208,6 +208,9 @@ namespace Ogre
             const VertexElement &vertexElem = *itor;
             switch( vertexElem.getSemantic() )
             {
+            case VES_DIFFUSE:
+                setProperty( HlmsPropertyColour, 1 );
+                break;
             case VES_TEXTURE_COORDINATES:
                 numTexCoords = std::max<uint>( numTexCoords, vertexElem.getIndex() + 1 );
                 setProperty( *UvCountPtrs[vertexElem.getIndex()],

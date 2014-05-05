@@ -345,6 +345,8 @@ namespace Ogre
         static const IdString HlmsPropertyNormal;
         static const IdString HlmsPropertyQTangent;
 
+        static const IdString HlmsPropertyColour;
+
         static const IdString HlmsPropertyUvCount;
         static const IdString HlmsPropertyUvCount0;
         static const IdString HlmsPropertyUvCount1;
