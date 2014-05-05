@@ -918,6 +918,275 @@ namespace Ogre{
                         }
                     }
                     break;
+                case ID_SCENE_BLEND:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "scene_blend supports at most 2 arguments");
+                    }
+                    else if(prop->values.size() == 1)
+                    {
+                        if(prop->values.front()->type == ANT_ATOM)
+                        {
+                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
+                            switch(atom->id)
+                            {
+                            case ID_ADD:
+                                Pass::_getBlendFlags( SBT_ADD,
+                                                      blendblock.mSourceBlendFactor,
+                                                      blendblock.mDestBlendFactor );
+                                break;
+                            case ID_MODULATE:
+                                Pass::_getBlendFlags( SBT_MODULATE,
+                                                      blendblock.mSourceBlendFactor,
+                                                      blendblock.mDestBlendFactor );
+                                break;
+                            case ID_COLOUR_BLEND:
+                                Pass::_getBlendFlags( SBT_TRANSPARENT_COLOUR,
+                                                      blendblock.mSourceBlendFactor,
+                                                      blendblock.mDestBlendFactor );
+                                break;
+                            case ID_ALPHA_BLEND:
+                                Pass::_getBlendFlags( SBT_TRANSPARENT_ALPHA,
+                                                      blendblock.mSourceBlendFactor,
+                                                      blendblock.mDestBlendFactor );
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   "scene_blend does not support \"" + prop->values.front()->getValue() + "\" for argument 1");
+                            }
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "scene_blend does not support \"" + prop->values.front()->getValue() + "\" for argument 1");
+                        }
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
+                        if( !getSceneBlendFactor(*i0, &blendblock.mSourceBlendFactor) ||
+                            !getSceneBlendFactor(*i1, &blendblock.mDestBlendFactor) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "scene_blend does not support \"" + (*i0)->getValue() + "\" and \"" + (*i1)->getValue() + "\" as arguments");
+                        }
+                    }
+                    break;
+                case ID_SEPARATE_SCENE_BLEND:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() == 3)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "separate_scene_blend must have 2 or 4 arguments");
+                    }
+                    else if(prop->values.size() > 4)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "separate_scene_blend must have 2 or 4 arguments");
+                    }
+                    else if(prop->values.size() == 2)
+                    {
+                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
+                        if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM)
+                        {
+                            AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(), *atom1 = (AtomAbstractNode*)(*i1).get();
+                            SceneBlendType sbt0, sbt1;
+                            switch(atom0->id)
+                            {
+                            case ID_ADD:
+                                sbt0 = SBT_ADD;
+                                break;
+                            case ID_MODULATE:
+                                sbt0 = SBT_MODULATE;
+                                break;
+                            case ID_COLOUR_BLEND:
+                                sbt0 = SBT_TRANSPARENT_COLOUR;
+                                break;
+                            case ID_ALPHA_BLEND:
+                                sbt0 = SBT_TRANSPARENT_ALPHA;
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   "separate_scene_blend does not support \"" + atom0->value + "\" as argument 1");
+                                return;
+                            }
+
+                            switch(atom1->id)
+                            {
+                            case ID_ADD:
+                                sbt1 = SBT_ADD;
+                                break;
+                            case ID_MODULATE:
+                                sbt1 = SBT_MODULATE;
+                                break;
+                            case ID_COLOUR_BLEND:
+                                sbt1 = SBT_TRANSPARENT_COLOUR;
+                                break;
+                            case ID_ALPHA_BLEND:
+                                sbt1 = SBT_TRANSPARENT_ALPHA;
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   "separate_scene_blend does not support \"" + atom1->value + "\" as argument 2");
+                                return;
+                            }
+
+                            Pass::_getBlendFlags( sbt0,
+                                                  blendblock.mSourceBlendFactor,
+                                                  blendblock.mDestBlendFactor );
+                            Pass::_getBlendFlags( sbt0,
+                                                  blendblock.mSourceBlendFactorAlpha,
+                                                  blendblock.mDestBlendFactorAlpha );
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "separate_scene_blend does not support \"" + (*i0)->getValue() + "\" as argument 1");
+                        }
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1),
+                            i2 = getNodeAt(prop->values, 2), i3 = getNodeAt(prop->values, 3);
+                        if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM && (*i2)->type == ANT_ATOM && (*i3)->type == ANT_ATOM)
+                        {
+                            SceneBlendFactor sbf0, sbf1, sbf2, sbf3;
+                            if( !getSceneBlendFactor(*i0, &blendblock.mSourceBlendFactor) ||
+                                !getSceneBlendFactor(*i1, &blendblock.mDestBlendFactor) ||
+                                !getSceneBlendFactor(*i2, &blendblock.mSourceBlendFactorAlpha) ||
+                                !getSceneBlendFactor(*i3, &blendblock.mDestBlendFactorAlpha) )
+                            {
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   "one of the arguments to separate_scene_blend is not a valid scene blend factor directive");
+                            }
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               "one of the arguments to separate_scene_blend is not a valid scene blend factor directive");
+                        }
+                    }
+                    break;
+                case ID_SCENE_BLEND_OP:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "scene_blend_op must have 1 argument");
+                    }
+                    else
+                    {
+                        if(prop->values.front()->type == ANT_ATOM)
+                        {
+                            AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(prop->values.front().get());
+                            switch(atom->id)
+                            {
+                            case ID_ADD:
+                                blendblock.mBlendOperation = SBO_ADD;
+                                break;
+                            case ID_SUBTRACT:
+                                blendblock.mBlendOperation = SBO_SUBTRACT;
+                                break;
+                            case ID_REVERSE_SUBTRACT:
+                                blendblock.mBlendOperation = SBO_REVERSE_SUBTRACT;
+                                break;
+                            case ID_MIN:
+                                blendblock.mBlendOperation = SBO_MIN;
+                                break;
+                            case ID_MAX:
+                                blendblock.mBlendOperation = SBO_MAX;
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   atom->value + ": unrecognized argument");
+                            }
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() + ": unrecognized argument");
+                        }
+                    }
+                    break;
+                case ID_SEPARATE_SCENE_BLEND_OP:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() != 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "separate_scene_blend_op must have 2 arguments");
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
+                        if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM)
+                        {
+                            AtomAbstractNode *atom0 = reinterpret_cast<AtomAbstractNode*>((*i0).get()),
+                                *atom1 = reinterpret_cast<AtomAbstractNode*>((*i1).get());
+                            switch(atom0->id)
+                            {
+                            case ID_ADD:
+                                blendblock.mBlendOperation = SBO_ADD;
+                                break;
+                            case ID_SUBTRACT:
+                                blendblock.mBlendOperation = SBO_SUBTRACT;
+                                break;
+                            case ID_REVERSE_SUBTRACT:
+                                blendblock.mBlendOperation = SBO_REVERSE_SUBTRACT;
+                                break;
+                            case ID_MIN:
+                                blendblock.mBlendOperation = SBO_MIN;
+                                break;
+                            case ID_MAX:
+                                blendblock.mBlendOperation = SBO_MAX;
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   atom0->value + ": unrecognized first argument");
+                            }
+
+                            switch(atom1->id)
+                            {
+                            case ID_ADD:
+                                blendblock.mBlendOperationAlpha = SBO_ADD;
+                                break;
+                            case ID_SUBTRACT:
+                                blendblock.mBlendOperationAlpha = SBO_SUBTRACT;
+                                break;
+                            case ID_REVERSE_SUBTRACT:
+                                blendblock.mBlendOperationAlpha = SBO_REVERSE_SUBTRACT;
+                                break;
+                            case ID_MIN:
+                                blendblock.mBlendOperationAlpha = SBO_MIN;
+                                break;
+                            case ID_MAX:
+                                blendblock.mBlendOperationAlpha = SBO_MAX;
+                                break;
+                            default:
+                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                   atom1->value + ": unrecognized second argument");
+                            }
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               prop->values.front()->getValue() + ": unrecognized argument");
+                        }
+                    }
+                    break;
                 default:
                     {
                     String value;

@@ -237,10 +237,10 @@ namespace Ogre {
         UserObjectBindings  mUserObjectBindings;
         
 
-        /// Used to get scene blending flags from a blending type
-        void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
-
     public:
+        /// Used to get scene blending flags from a blending type
+        static void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
+
         typedef set<Pass*>::type PassSet;
     protected:
         /// List of Passes whose hashes need recalculating
