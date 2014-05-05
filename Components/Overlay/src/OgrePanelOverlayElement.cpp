@@ -182,7 +182,7 @@ namespace Ogre {
         if (mVisible)
         {
 
-            if (!mTransparent && !mMaterial.isNull())
+            if (!mTransparent && !mMaterialName.empty())
             {
                 OverlayElement::_updateRenderQueue(queue, camera, lodCamera);
             }

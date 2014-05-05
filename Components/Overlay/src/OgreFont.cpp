@@ -256,6 +256,9 @@ namespace Ogre
             mMaterial.setNull();
         }
 
+        mHlmsDatablock->getCreator()->destroyDatablock( mHlmsDatablock->getName() );
+        mHlmsDatablock = 0;
+
         if (!mTexture.isNull())
         {
             mTexture->unload();
