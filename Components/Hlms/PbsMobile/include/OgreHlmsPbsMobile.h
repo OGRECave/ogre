@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef _OgreHlmsPbsMobile_H_
 #define _OgreHlmsPbsMobile_H_
 
+#include "OgreHlmsPbsMobilePrerequisites.h"
 #include "OgreHlms.h"
 #include "OgreHeaderPrefix.h"
 
