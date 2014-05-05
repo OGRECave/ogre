@@ -161,7 +161,7 @@ namespace Ogre
             }
         }
 
-        for( size_t i=0; i<sizeof( PieceFilePatterns ) / sizeof( String* ); ++i )
+        for( size_t i=0; i<NumShaderTypes; ++i )
         {
             StringVector::const_iterator itLowerCase = stringVectorLowerCase.begin();
             StringVector::const_iterator itor = stringVectorPtr->begin();

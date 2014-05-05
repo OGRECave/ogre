@@ -172,7 +172,7 @@ namespace Ogre
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
 
-        for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String* ); ++i )
+        for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String ); ++i )
         {
             if( Hlms::findParamInVec( params, c_diffuseMap[i], paramVal ) )
             {
@@ -202,10 +202,10 @@ namespace Ogre
                     {
                         //Is it a blend mode?
                         const String *it = std::find( c_blendModes, c_blendModes +
-                                                      sizeof(c_blendModes) / sizeof( String* ),
+                                                      sizeof(c_blendModes) / sizeof( String ),
                                                       *itor );
 
-                        if( it == c_blendModes + sizeof(c_blendModes) / sizeof( String* ) )
+                        if( it == c_blendModes + sizeof(c_blendModes) / sizeof( String ) )
                         {
                             //Not blend mode, try loading a texture
                             HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->

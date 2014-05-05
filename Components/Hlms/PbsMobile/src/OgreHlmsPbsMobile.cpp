@@ -71,7 +71,7 @@ namespace Ogre
         GpuNamedConstants *constantsDef;
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
         constantsDef = const_cast<GpuNamedConstants*>( &retVal->vertexShader->getConstantDefinitions() );
-        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String* ); ++i )
+        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_vsPerObjectUniforms[i] );
             if( it != constantsDef->map.end() )
@@ -80,7 +80,7 @@ namespace Ogre
 
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
         constantsDef = const_cast<GpuNamedConstants*>( &retVal->pixelShader->getConstantDefinitions() );
-        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String* ); ++i )
+        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_psPerObjectUniforms[i] );
             if( it != constantsDef->map.end() )

@@ -1058,7 +1058,6 @@ namespace Ogre{
                             i2 = getNodeAt(prop->values, 2), i3 = getNodeAt(prop->values, 3);
                         if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM && (*i2)->type == ANT_ATOM && (*i3)->type == ANT_ATOM)
                         {
-                            SceneBlendFactor sbf0, sbf1, sbf2, sbf3;
                             if( !getSceneBlendFactor(*i0, &blendblock.mSourceBlendFactor) ||
                                 !getSceneBlendFactor(*i1, &blendblock.mDestBlendFactor) ||
                                 !getSceneBlendFactor(*i2, &blendblock.mSourceBlendFactorAlpha) ||

@@ -45,7 +45,7 @@ namespace Ogre
         This is very analogous to D3D11_RASTERIZER_DESC. @See HlmsDatablock
         Up to 32 different blocks are allowed!
     */
-    struct HlmsMacroblock
+    struct _OgreExport HlmsMacroblock
     {
         uint8               mId;
         bool                mDepthCheck;
@@ -77,7 +77,7 @@ namespace Ogre
               Transparent materials are sorted differently than opaque ones.
         Up to 32 different blocks are allowed!
     */
-    struct HlmsBlendblock
+    struct _OgreExport HlmsBlendblock
     {
         uint8               mId;
         /// Used to determine if separate alpha blending should be used for color and alpha channels

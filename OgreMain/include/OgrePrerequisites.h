@@ -202,10 +202,10 @@ namespace Ogre {
     class HighLevelGpuProgramManager;
     class HighLevelGpuProgramFactory;
     class Hlms;
-    class HlmsBlendblock;
+    struct HlmsBlendblock;
     struct HlmsCache;
     class HlmsDatablock;
-    class HlmsMacroblock;
+    struct HlmsMacroblock;
     class HlmsManager;
     class HlmsTextureManager;
     class IndexData;

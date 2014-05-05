@@ -147,7 +147,7 @@ namespace Ogre
         GpuNamedConstants *constantsDef;
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
         constantsDef = const_cast<GpuNamedConstants*>( &retVal->vertexShader->getConstantDefinitions() );
-        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String* ); ++i )
+        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_vsPerObjectUniforms[i] );
             if( it != constantsDef->map.end() )
@@ -156,7 +156,7 @@ namespace Ogre
 
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
         constantsDef = const_cast<GpuNamedConstants*>( &retVal->pixelShader->getConstantDefinitions() );
-        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String* ); ++i )
+        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_psPerObjectUniforms[i] );
             if( it != constantsDef->map.end() )
@@ -307,7 +307,13 @@ namespace Ogre
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
+#if _SECURE_SCL
+        float *psUniformBuffer = 0;
+        if( !psParams->getFloatConstantList().empty() )
+            psUniformBuffer = psParams->getFloatPointer( 0 );
+#else
         float *psUniformBuffer = psParams->getFloatPointer( 0 );
+#endif
 
         assert( dynamic_cast<const HlmsGui2DMobileDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsGui2DMobileDatablock *datablock = static_cast<const HlmsGui2DMobileDatablock*>(
@@ -370,7 +376,13 @@ namespace Ogre
         }
 
         assert( vsUniformBuffer - vpParams->getFloatPointer( 0 ) == vpParams->getFloatConstantList().size() );
+
+#if _SECURE_SCL
+        if( !psParams->getFloatConstantList().empty() )
+            assert( psUniformBuffer - psParams->getFloatPointer( 0 ) == psParams->getFloatConstantList().size() );
+#else
         assert( psUniformBuffer - psParams->getFloatPointer( 0 ) == psParams->getFloatConstantList().size() );
+#endif
 
         mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, variabilityMask );
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
