@@ -146,10 +146,14 @@ namespace Ogre
 		case NO_ERROR:
 			break;
 		case E_INVALIDARG:
-			res = res + "invalid parameters were passed.\n";
+			res.append("invalid parameters were passed.\n");
 			break;
 		default:
-			;//assert(false); // unknown HRESULT
+			{
+			char tmp[64];
+			sprintf(tmp, "hr = 0x%08X\n", lastResult);
+			res.append(tmp);
+			}
 		}
 
 		if (mInfoQueue != NULL)

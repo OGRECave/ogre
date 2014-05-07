@@ -109,11 +109,11 @@ namespace Ogre {
 		{
 		case TEX_TYPE_1D:
 			{  
-				mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
 				if (mDevice.isError())
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 						"D3D11 device cannot map 1D texture\nError Description:" + errorDescription,
 						"D3D11HardwarePixelBuffer::_map");
 				}
@@ -122,12 +122,12 @@ namespace Ogre {
 		case TEX_TYPE_CUBE_MAP:
 		case TEX_TYPE_2D:
 			{
-				mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1), 
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1), 
 					flags, 0, &pMappedResource);
 				if (mDevice.isError())
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 						"D3D11 device cannot map 2D texture\nError Description:" + errorDescription,
 						"D3D11HardwarePixelBuffer::_map");
 				}
@@ -135,12 +135,12 @@ namespace Ogre {
 			break;
 		case TEX_TYPE_2D_ARRAY:
 			{
-				mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1), 
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1), 
 					flags, 0, &pMappedResource);
 				if (mDevice.isError())
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 						"D3D11 device cannot map 2D texture array\nError Description:" + errorDescription,
 						"D3D11HardwarePixelBuffer::_map");
 				}
@@ -148,12 +148,12 @@ namespace Ogre {
 			break;
 		case TEX_TYPE_3D:
 			{
-				mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
 
 				if (mDevice.isError())
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 						"D3D11 device cannot map 3D texture\nError Description:" + errorDescription,
 						"D3D11HardwarePixelBuffer::lockImpl");
 				}

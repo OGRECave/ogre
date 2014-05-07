@@ -90,7 +90,7 @@ namespace Ogre {
 		if (FAILED(hr) || mDevice.isError())
 		{
 			String msg = device.getErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Cannot create D3D11 buffer: " + msg, 
 				"D3D11HardwareBuffer::D3D11HardwareBuffer");
 		}
@@ -123,7 +123,7 @@ namespace Ogre {
 			if (FAILED(hr) || mDevice.isError())
 			{
 				String msg = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Cannot create D3D11 buffer: " + msg, 
 					"D3D11HardwareBuffer::D3D11HardwareBuffer");
 			}
@@ -172,7 +172,7 @@ namespace Ogre {
 			if (FAILED(hr) || mDevice.isError())
 			{
 				String msg = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Error calling Map: " + msg, 
 					"D3D11HardwareBuffer::lockImpl");
 			}
