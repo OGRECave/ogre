@@ -139,6 +139,7 @@ namespace Ogre {
 
     void GL3PlusTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
         OGRE_CHECK_GL_ERROR(glBindTexture(mTarget, mTextureID));
 
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
@@ -196,7 +197,7 @@ namespace Ogre {
                         "GL3PlusTextureBuffer::upload");
         }
 
-        if (PixelUtil::isCompressed(data.format))
+        if( PixelUtil::isCompressed(data.format) )
         {
             if (data.format != mFormat || !data.isConsecutive())
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -209,8 +210,6 @@ namespace Ogre {
             switch(mTarget)
             {
             case GL_TEXTURE_1D:
-                // Some systems (e.g. old Apple) don't like compressed
-                // subimage calls so prefer non-sub versions.
                 OGRE_CHECK_GL_ERROR(glCompressedTexSubImage1D(
                     GL_TEXTURE_1D, mLevel,
                     dest.left,
@@ -244,14 +243,12 @@ namespace Ogre {
         {
             if (data.getWidth() != data.rowPitch)
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch));
-            if (data.getHeight() * data.getWidth() != data.slicePitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-            if (data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
-            if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
+            if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3)
+            {
                 // Standard alignment of 4 is not right.
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
             }
+
             switch(mTarget)
             {
             case GL_TEXTURE_1D:
@@ -298,19 +295,16 @@ namespace Ogre {
 
         // Restore defaults.
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
     }
 
-
     void GL3PlusTextureBuffer::download(const PixelBox &data)
     {
-        if (data.getWidth() != getWidth() ||
+        /*if (data.getWidth() != getWidth() ||
             data.getHeight() != getHeight() ||
             data.getDepth() != getDepth())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL",
-                        "GL3PlusTextureBuffer::download");
+                        "GL3PlusTextureBuffer::download");*/
 
         // Upload data to PBO
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
@@ -341,12 +335,6 @@ namespace Ogre {
         }
         else
         {
-            if (data.getWidth() != data.rowPitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, data.rowPitch));
-            if (data.getHeight()*data.getWidth() != data.slicePitch)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth())));
-            if (data.left > 0 || data.top > 0 || data.front > 0)
-                OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front));
             if ((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
                 // Standard alignment of 4 is not right
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
@@ -358,9 +346,6 @@ namespace Ogre {
                                               0));
 
             // Restore defaults
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, 0));
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, 0));
             OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         }
 
@@ -368,20 +353,23 @@ namespace Ogre {
         uint32 width = mWidth;
         uint32 height = mHeight;
         uint32 depth = mDepth;
+
         for(GLint i = 0; i < mLevel; i++)
         {
             offsetInBytes += PixelUtil::getMemorySize(width, height, depth, data.format);
-
             if (width > 1)
-                width = width / 2;
+                width >>= 1;
             if (height > 1)
-                height = height / 2;
+                height >>= 1;
             if (depth > 1)
-                depth = depth / 2;
+                depth >>= 1;
         }
 
+        offsetInBytes += PixelUtil::getMemorySize( width, height, data.front, mFormat );
+        size_t sizeInBytes = PixelUtil::getMemorySize( width, height, data.getDepth(), data.format );
+
         void* pBuffer;
-        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_PACK_BUFFER, offsetInBytes, mSizeInBytes, GL_MAP_READ_BIT));
+        OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_PIXEL_PACK_BUFFER, offsetInBytes, sizeInBytes, GL_MAP_READ_BIT));
 
         if (pBuffer == 0)
         {
@@ -391,7 +379,52 @@ namespace Ogre {
         }
 
         // Copy to destination buffer
-        memcpy(data.data, pBuffer, mSizeInBytes);
+        if( data.getWidth() == width && data.getHeight() == height )
+        {
+            memcpy( data.data, pBuffer, data.getConsecutiveSize() );
+        }
+        else
+        {
+            uint32 blockWidth  = PixelUtil::getCompressedBlockWidth( mFormat );
+            uint32 blockHeight = PixelUtil::getCompressedBlockHeight( mFormat );
+            uint32 blockResolution = blockWidth * blockHeight;
+            if( !blockWidth || !blockHeight )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                            "Cannot transfer subregions of the image when compressed by format " +
+                             PixelUtil::getFormatName( mFormat ) +
+                             ". You must download the entire image.",
+                            "GL3PlusTextureBuffer::download");
+            }
+
+            if( data.left % blockWidth || data.right % blockWidth ||
+                data.top % blockHeight || data.bottom % blockHeight )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                            "Image downloads from GPU for the compressed format " +
+                             PixelUtil::getFormatName( mFormat ) +
+                             " requires subregions to be aligned to " +
+                             StringConverter::toString( blockWidth ) + "x" +
+                             StringConverter::toString( blockHeight ) +  " blocks",
+                             "GL3PlusTextureBuffer::download");
+            }
+
+            size_t blockSize = PixelUtil::getMemorySize( blockWidth, blockHeight, 1, mFormat );
+
+            for( size_t z=0; z<data.getDepth(); ++z )
+            {
+                size_t dstZ = z * ( (data.getWidth() * data.getHeight()) / blockResolution );
+                size_t srcZ = z * ( (width * height) / blockResolution );
+                for( size_t y=data.top; y<data.bottom; y += blockHeight )
+                {
+                    size_t dstY = ((y - data.top) * data.getWidth()) / blockResolution;
+                    size_t srcY = (y * width) / blockResolution;
+                    memcpy( (uint8*)(data.data) + ( (dstZ + dstY) * blockSize ),
+                            (uint8*)(pBuffer) + ( (srcZ + srcY + data.left / blockWidth) * blockSize ),
+                            (data.getWidth() / blockWidth) * blockSize );
+                }
+            }
+        }
 
         GLboolean mapped;
         OGRE_CHECK_GL_ERROR(mapped = glUnmapBuffer(GL_PIXEL_PACK_BUFFER));

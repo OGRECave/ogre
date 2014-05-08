@@ -40,7 +40,7 @@ namespace Ogre
     */
     /** \addtogroup Material
     *  @{
-    */#
+    */
 
     /// Contains information needed by the UI (2D) for OpenGL ES 2.0
     class _OgreHlmsGui2DMobileExport HlmsGui2DMobileDatablock : public HlmsDatablock
@@ -56,12 +56,14 @@ namespace Ogre
             /// One per texture unit. Specifies which UV set we will use.
             uint8           mUvSetForTexture[16];
             uint8           mBlendModes[16];
+            bool            mTextureIsAtlas[16];
 
             ShaderCreationData() : alphaTestCmp( CMPF_ALWAYS_PASS )
             {
                 memset( mTextureMatrixMap, 0xffffffff, sizeof(mTextureMatrixMap) );
                 memset( mUvSetForTexture, 0, sizeof(mUvSetForTexture) );
                 memset( mBlendModes, 0, sizeof(mBlendModes) );
+                memset( mTextureIsAtlas, 0, sizeof(mTextureIsAtlas) );
             }
         };
 
@@ -83,6 +85,7 @@ namespace Ogre
         bool    mHasColour;         /// When false; mR, mG, mB & mA aren't passed to the pixel shader
         bool    mIsAlphaTested;
         uint8   mNumTextureUnits;
+        uint8   mNumUvAtlas;
         float   mR, mG, mB, mA;
         float   mAlphaTestThreshold;
 
@@ -106,15 +109,15 @@ namespace Ogre
                 Default: Absent
                 Default (when present): diffuse 1 1 1 1
 
-            * diffuse_map <texture name> [#uv]
-                Name of the diffuse texture for the base image.
+            * diffuse_map [texture name] [#uv]
+                Name of the diffuse texture for the base image (optional, otherwise a dummy is set)
                 The #uv parameter is optional, and specifies the texcoord set that will
                 be used. Valid range is [0; 8)
                 If the Renderable doesn't have enough UV texcoords, HLMS will throw an exception.
 
                 Note: The UV set is evaluated when creating the Renderable cache.
 
-            * diffuse_map1 <texture name> [blendmode] [#uv]
+            * diffuse_map1 [texture name] [blendmode] [#uv]
                 Name of the diffuse texture that will be layered on top of the base image.
                 The #uv parameter is optional. Valid range is [0; 8)
                 The blendmode parameter is optional. Valid values are:
@@ -126,9 +129,6 @@ namespace Ogre
                 Default blendmode:      NormalPremul
                 Default uv:             0
                 Example: diffuse_map1 myTexture.png Add 3
-
-                Note:   Blend modes and UV sets can't be changed afterwards.
-                        You'll need to create a new Datablock.
 
              * diffuse_map2 through diffuse_map16
                 Same as diffuse_map1 but for subsequent layers to be applied on top of the previous
@@ -149,8 +149,6 @@ namespace Ogre
                 Threshold is optional, and a value in the range (0; 1)
                 Default: alpha_test less 0.5
                 Example: alpha_test equal 0.1
-
-                Note:   The cmp function is evaluated when creating the renderable cache
         */
         HlmsGui2DMobileDatablock( IdString name, Hlms *creator,
                                   const HlmsMacroblock *macroblock,

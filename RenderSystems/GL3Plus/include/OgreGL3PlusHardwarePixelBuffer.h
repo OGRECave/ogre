@@ -49,7 +49,7 @@ namespace Ogre {
         LockOptions mCurrentLockOptions;
 
         // Buffer allocation/freeage
-        void allocateBuffer();
+        void allocateBuffer( size_t bytes );
 
         void freeBuffer();
 

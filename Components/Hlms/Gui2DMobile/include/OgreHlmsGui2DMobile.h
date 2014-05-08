@@ -128,6 +128,24 @@ namespace Ogre
         static const IdString PropertyBlendModeIdx13;
         static const IdString PropertyBlendModeIdx14;
         static const IdString PropertyBlendModeIdx15;
+
+        static const IdString PropertyUvAtlas;
+        static const IdString PropertyUvAtlas0;
+        static const IdString PropertyUvAtlas1;
+        static const IdString PropertyUvAtlas2;
+        static const IdString PropertyUvAtlas3;
+        static const IdString PropertyUvAtlas4;
+        static const IdString PropertyUvAtlas5;
+        static const IdString PropertyUvAtlas6;
+        static const IdString PropertyUvAtlas7;
+        static const IdString PropertyUvAtlas8;
+        static const IdString PropertyUvAtlas9;
+        static const IdString PropertyUvAtlas10;
+        static const IdString PropertyUvAtlas11;
+        static const IdString PropertyUvAtlas12;
+        static const IdString PropertyUvAtlas13;
+        static const IdString PropertyUvAtlas14;
+        static const IdString PropertyUvAtlas15;
     };
 
     /** @} */

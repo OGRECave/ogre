@@ -76,6 +76,7 @@ namespace Ogre
         mHasColour( false ),
         mIsAlphaTested( false ),
         mNumTextureUnits( 0 ),
+        mNumUvAtlas( 0 ),
         mR( 1.0f ), mG( 1.0f ), mB( 1.0f ), mA( 1.0f ),
         mAlphaTestThreshold( 0.5f ),
         mShaderCreationData( 0 )
@@ -184,6 +185,8 @@ namespace Ogre
                                  "is missing.", "HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock" );
                 }
 
+                mDiffuseTextures[i] = hlmsTextureManager->getBlankTexture().texture;
+
                 StringVector vec = StringUtil::split( paramVal );
 
                 StringVector::const_iterator itor = vec.begin();
@@ -198,7 +201,7 @@ namespace Ogre
                         //It's a number, must be an UV Set
                         setTextureUvSetForTexture( i, val );
                     }
-                    else
+                    else if( !itor->empty() )
                     {
                         //Is it a blend mode?
                         const String *it = std::find( c_blendModes, c_blendModes +
@@ -212,10 +215,19 @@ namespace Ogre
                                    createOrRetrieveTexture( *itor,
                                                             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
                             assert( !texLocation.texture->isTextureTypeArray() );
-                            mDiffuseTextures[i]         = texLocation.texture;
-                            mUvAtlasParams[i].uOffset   = texLocation.xIdx;
-                            mUvAtlasParams[i].vOffset   = texLocation.yIdx;
-                            mUvAtlasParams[i].invDivisor= 1.0f / texLocation.divisor;
+                            mDiffuseTextures[i] = texLocation.texture;
+
+                            if( texLocation.xIdx != 0 || texLocation.yIdx != 0 ||
+                                texLocation.divisor != 1 )
+                            {
+                                mUvAtlasParams[mNumUvAtlas].uOffset   = texLocation.xIdx /
+                                                                            (float)texLocation.divisor;
+                                mUvAtlasParams[mNumUvAtlas].vOffset   = texLocation.yIdx /
+                                                                            (float)texLocation.divisor;
+                                mUvAtlasParams[mNumUvAtlas].invDivisor= 1.0f / texLocation.divisor;
+                                mShaderCreationData->mTextureIsAtlas[i] = true;
+                                ++mNumUvAtlas;
+                            }
                         }
                         else
                         {
@@ -323,7 +335,36 @@ namespace Ogre
         }
 
         mDiffuseTextures[texUnit]   = newTexture;
-        mUvAtlasParams[texUnit]     = atlasParams;
+
+        size_t uvAtlasIdx = 0;
+        for( size_t i=0; i<texUnit; ++i )
+            uvAtlasIdx += mShaderCreationData->mTextureIsAtlas[i];
+
+        if( atlasParams.uOffset != 0 || atlasParams.vOffset != 0 || atlasParams.invDivisor != 1.0f )
+        {
+            if( mShaderCreationData->mTextureIsAtlas[texUnit] == false )
+            {
+                //The previous texture wasn't an atlas, we need to make room for the params
+                memmove( mUvAtlasParams + uvAtlasIdx + 1, mUvAtlasParams + uvAtlasIdx,
+                         sizeof(UvAtlasParams) * (mNumTextureUnits - uvAtlasIdx - 1) );
+                mShaderCreationData->mTextureIsAtlas[texUnit] = true;
+                ++mNumUvAtlas;
+            }
+
+            mUvAtlasParams[uvAtlasIdx] = atlasParams;
+        }
+        else
+        {
+            if( mShaderCreationData->mTextureIsAtlas[texUnit] == true )
+            {
+                //The new texture isn't an atlas, we need to keep everything contiguous
+                memmove( mUvAtlasParams + uvAtlasIdx, mUvAtlasParams + uvAtlasIdx + 1,
+                         sizeof(UvAtlasParams) * (mNumTextureUnits - uvAtlasIdx - 1) );
+                mShaderCreationData->mTextureIsAtlas[texUnit] = false;
+                --mNumUvAtlas;
+            }
+        }
+
         calculateHash();
     }
     //-----------------------------------------------------------------------------------
@@ -342,6 +383,7 @@ namespace Ogre
             mUvAtlasParams[i].uOffset   = texLocation.xIdx;
             mUvAtlasParams[i].vOffset   = texLocation.yIdx;
             mUvAtlasParams[i].invDivisor= 1.0f / texLocation.divisor;
+            mShaderCreationData->mTextureIsAtlas[i] = false;
         }
 
         mNumTextureUnits = std::max( mNumTextureUnits, until );
@@ -354,7 +396,11 @@ namespace Ogre
         assert( from < 16 );
 
         for( size_t i=from; i<mNumTextureUnits; ++i )
+        {
             mDiffuseTextures[i].setNull();
+            mNumUvAtlas -= mShaderCreationData->mTextureIsAtlas[i];
+            mShaderCreationData->mTextureIsAtlas[i] = false;
+        }
 
         mNumTextureUnits = std::min( mNumTextureUnits, from );
 

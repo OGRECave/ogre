@@ -335,6 +335,34 @@ namespace Ogre {
                 case, this does serious magic.
         */
         static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format);
+
+        /** Returns the minimum width for block compressed schemes. ie. DXT1 compresses in blocks
+            of 4x4 pixels. A texture with a width of 2 is just padded to 4.
+            When building UV atlases composed of already compressed data being stitched together,
+            the block size is very important to know as the resolution of the individual textures
+            must be a multiple of this size.
+         @remarks
+            If the format is not compressed, returns 1.
+         @par
+            The function can return a value of 0 (as happens with PVRTC & ETC1 compression); this is
+            because although they may compress in blocks (i.e. PVRTC uses a 4x4 or 8x4 block), this
+            information is useless as the compression scheme doesn't have isolated blocks (modifying
+            a single pixel can change the binary data of the entire stream) making it useless for
+            subimage sampling or creating UV atlas.
+         @param format
+            The format to query for. Can be compressed or not.
+         @param apiStrict
+            When true, obeys the rules of most APIs (i.e. ETC1 can't update subregions according to
+            GLES specs). When false, becomes more practical if manipulating by hand (i.e. ETC1's
+            subregions can be updated just fine by @bulkCompressedSubregion)
+         @return
+            The width of compression block, in pixels. Can be 0 (see remarks). If format is not
+            compressed, returns 1.
+        */
+        static uint32 getCompressedBlockWidth( PixelFormat format, bool apiStrict=true );
+
+        /// @See getCompressedBlockWidth
+        static uint32 getCompressedBlockHeight( PixelFormat format, bool apiStrict=true );
         
         /** Returns the property flags for this pixel format
           @return
@@ -511,6 +539,32 @@ namespace Ogre {
             dimensions. In case the source and destination format match, a plain copy is done.
         */
         static void bulkPixelConversion(const PixelBox &src, const PixelBox &dst);
+
+        /** Emplaces the binary compressed data from src into a subregion of dst.
+        @param  src
+            PixelBox containing the source pixels, pitches and format.
+            Data must be consecutive
+        @param  dst
+            PixelBox containing the destination pixels, pitches and format.
+            Data must be consecutive
+        @param dstRegion
+            The region on dst where src will be emplaced. dstRegion's resolution must
+            match that of src. dstRegion must be within dst's bounds.
+        @remarks
+            The source and destination must have the same the same format.
+        @par
+            Each compression format may enforce different requirements. Most notably
+            the subregions' bounds must be aligned to a certain boundary (usually to
+            multiples of 4). If these requirements aren't met, an exception will be
+            thrown.
+        @par
+            Some formats (i.e. PVRTC) don't support subregions at all, and thus
+            an exception will be thrown.
+        @par
+            @See getCompressedBlockWidth
+        */
+        static void bulkCompressedSubregion( const PixelBox &src, const PixelBox &dst,
+                                             const Box &dstRegion );
 
         /** Flips pixels inplace in vertical direction.
             @param  box         PixelBox containing pixels, pitches and format

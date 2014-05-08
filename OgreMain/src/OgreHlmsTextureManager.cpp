@@ -32,10 +32,11 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
-    HlmsTextureManager::HlmsTextureManager() : mRenderSystem( 0 )
+    HlmsTextureManager::HlmsTextureManager() : mRenderSystem( 0 ), mTextureId( 0 )
     {
         mDefaultTextureParameters[TEXTURE_TYPE_DIFFUSE].hwGammaCorrection   = true;
         mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat         = PF_BC5_SNORM;
@@ -78,7 +79,7 @@ namespace Ogre
                     for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
                     {
                         mDefaultTextureParameters[i].packingMethod = Atlas;
-                        mDefaultTextureParameters[i].maxTexturesPerArray = 16;
+                        mDefaultTextureParameters[i].maxTexturesPerArray = 1;
                     }
                     mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 1;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].maxTexturesPerArray  = 1;
@@ -161,16 +162,38 @@ namespace Ogre
         size_t nextX = ( entryIdx % sqrtMaxTextures ) + 1;
         size_t nextY = ( entryIdx / sqrtMaxTextures ) + 1;
 
-        HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
-        const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * srcImage.getWidth(),
-                                                               yBlock * srcImage.getHeight(),
-                                                               0,
-                                                               nextX * srcImage.getWidth(),
-                                                               nextY * srcImage.getHeight(),
-                                                               dst->getDepth() ),
-                                                          HardwareBuffer::HBL_DISCARD );
-        PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
-        pixelBufferBuf->unlock();
+        /*if( sqrtMaxTextures > 1 && PixelUtil::isCompressed( dst->getFormat() ) )
+        {
+            HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
+            const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0,
+                                                                   dst->getWidth(),
+                                                                   dst->getHeight(),
+                                                                   dst->getDepth() ),
+                                                              HardwareBuffer::HBL_DISCARD );
+                                                              //HardwareBuffer::HBL_NORMAL );
+            PixelUtil::bulkCompressedSubregion( srcImage.getPixelBox(), currImage,
+                                                Box( xBlock * srcImage.getWidth(),
+                                                     yBlock * srcImage.getHeight(),
+                                                     0,
+                                                     nextX * srcImage.getWidth(),
+                                                     nextY * srcImage.getHeight(),
+                                                     dst->getDepth() ) );
+            pixelBufferBuf->unlock();
+        }
+        else*/
+        {
+            HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
+            const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * srcImage.getWidth(),
+                                                                   yBlock * srcImage.getHeight(),
+                                                                   0,
+                                                                   nextX * srcImage.getWidth(),
+                                                                   nextY * srcImage.getHeight(),
+                                                                   dst->getDepth() ),
+                                                              //HardwareBuffer::HBL_DISCARD );
+                                                              HardwareBuffer::HBL_NO_OVERWRITE );
+            PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
+            pixelBufferBuf->unlock();
+        }
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture(
@@ -189,6 +212,12 @@ namespace Ogre
             Image image;
             image.load( texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
 
+            PixelFormat imageFormat = image.getFormat();
+            if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 )
+                imageFormat = PF_A8R8G8B8;
+            else if( imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 )
+                imageFormat = PF_A8B8G8R8;
+
             //Find an array where we can put it. If there is none, we'll have have to create a new one
             TextureArrayVec::iterator itor = mTextureArrays[mapType].begin();
             TextureArrayVec::iterator end  = mTextureArrays[mapType].end();
@@ -198,12 +227,15 @@ namespace Ogre
             while( itor != end && !bFound )
             {
                 TextureArray &textureArray = *itor;
+
+                size_t arrayTexWidth = textureArray.texture->getWidth() / textureArray.sqrtMaxTextures;
+                size_t arrayTexHeight= textureArray.texture->getHeight() / textureArray.sqrtMaxTextures;
                 if( textureArray.automatic &&
                     textureArray.entries.size() < textureArray.maxTextures &&
-                    textureArray.texture->getWidth()  == image.getWidth()  &&
-                    textureArray.texture->getHeight() == image.getHeight() &&
+                    arrayTexWidth  == image.getWidth()  &&
+                    arrayTexHeight == image.getHeight() &&
                     textureArray.texture->getDepth()  == image.getDepth()  &&
-                    textureArray.texture->getFormat() == image.getFormat() )
+                    textureArray.texture->getFormat() == imageFormat )
                 {
                     //Bingo! Add this.
                     if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
@@ -213,7 +245,7 @@ namespace Ogre
                     else
                     {
                         copyTextureToAtlas( image, textureArray.texture,
-                                            textureArray.entries.size(), textureArray.maxTextures );
+                                            textureArray.entries.size(), textureArray.sqrtMaxTextures );
                     }
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
@@ -336,14 +368,16 @@ namespace Ogre
                         }
                     }
 
-                    textureArray.texture = TextureManager::getSingleton().createManual( "TODO",
+                    textureArray.texture = TextureManager::getSingleton().createManual(
+                                                "HlmsTextureManager/" +
+                                                StringConverter::toString( mTextureId++ ),
                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                 texType, width, height, depth,
                                                 mDefaultTextureParameters[mapType].mipmaps ?
                                                                                         MIP_DEFAULT : 0,
-                                                defaultPixelFormat == PF_UNKNOWN ? image.getFormat() :
+                                                defaultPixelFormat == PF_UNKNOWN ? imageFormat :
                                                                                    defaultPixelFormat,
-                                                TU_DEFAULT, 0,
+                                                TU_DEFAULT & ~TU_AUTOMIPMAP, 0,
                                                 mDefaultTextureParameters[mapType].hwGammaCorrection,
                                                 0, BLANKSTRING, false );
 
@@ -388,6 +422,7 @@ namespace Ogre
                 throw e;
             else
             {
+                LogManager::getSingleton().logMessage( LML_CRITICAL, e.getFullDescription() );
                 retVal.texture  = mBlankTexture;
                 retVal.xIdx     = 0;
                 retVal.yIdx     = 0;

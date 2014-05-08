@@ -145,6 +145,7 @@ namespace Ogre
         TextureArrayVec     mTextureArrays[NUM_TEXTURE_TYPES];
 
         DefaultTextureParameters    mDefaultTextureParameters[NUM_TEXTURE_TYPES];
+        size_t              mTextureId;
 
         TexturePtr mBlankTexture;
 

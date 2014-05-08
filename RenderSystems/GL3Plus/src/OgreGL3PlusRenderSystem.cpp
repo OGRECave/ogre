@@ -2362,10 +2362,10 @@ namespace Ogre {
         if (mGLSupport->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
         {
 #if OGRE_DEBUG_MODE
-            OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
-            OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
             OGRE_CHECK_GL_ERROR(glDebugMessageCallbackARB(&GLDebugCallback, NULL));
             OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 0, NULL, GL_TRUE));
+            OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
+            OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
 #endif
         }
     }

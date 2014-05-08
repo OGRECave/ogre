@@ -217,7 +217,7 @@ namespace Ogre
         }
 
         HlmsParamVec paramsVec;
-        paramsVec.push_back( std::pair<IdString, String>( "diffuse_map", mTexture->getName() ) );
+        paramsVec.push_back( std::pair<IdString, String>( "diffuse_map", "" ) );
         std::sort( paramsVec.begin(), paramsVec.end() );
 
         mHlmsDatablock = hlmsGui->createDatablock( "Fonts/" + mName, macroblock, blendblock, paramsVec );

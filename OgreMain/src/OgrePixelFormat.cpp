@@ -158,6 +158,64 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    uint32 PixelUtil::getCompressedBlockWidth( PixelFormat format, bool apiStrict )
+    {
+        switch(format)
+        {
+            // These formats work by dividing the image into 4x4 blocks, then encoding each
+            // 4x4 block with a certain number of bytes.
+            case PF_DXT1:
+            case PF_DXT2:
+            case PF_DXT3:
+            case PF_DXT4:
+            case PF_DXT5:
+            case PF_BC4_SNORM:
+            case PF_BC4_UNORM:
+            case PF_BC5_SNORM:
+            case PF_BC5_UNORM:
+            case PF_BC6H_SF16:
+            case PF_BC6H_UF16:
+            case PF_BC7_UNORM:
+            case PF_BC7_UNORM_SRGB:
+            case PF_ETC2_RGB8:
+            case PF_ETC2_RGBA8:
+            case PF_ETC2_RGB8A1:
+            case PF_ATC_RGB:
+            case PF_ATC_RGBA_EXPLICIT_ALPHA:
+            case PF_ATC_RGBA_INTERPOLATED_ALPHA:
+                return 4;
+
+            case PF_ETC1_RGB8:
+                return apiStrict ? 0 : 4;
+
+            // Size calculations from the PVRTC OpenGL extension spec
+            // http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt
+            //  "Sub-images are not supportable because the PVRTC
+            //  algorithm uses significant adjacency information, so there is
+            //  no discrete block of texels that can be decoded as a standalone
+            //  sub-unit, and so it follows that no stand alone sub-unit of
+            //  data can be loaded without changing the decoding of surrounding
+            //  texels."
+            // In other words, if the user wants atlas, they can't be automatic
+            case PF_PVRTC_RGB2:
+            case PF_PVRTC_RGBA2:
+            case PF_PVRTC2_2BPP:
+            case PF_PVRTC_RGB4:
+            case PF_PVRTC_RGBA4:
+            case PF_PVRTC2_4BPP:
+                return 0;
+
+            default:
+                assert( !isCompressed( format ) );
+                return 1;
+        }
+    }
+    //-----------------------------------------------------------------------
+    uint32 PixelUtil::getCompressedBlockHeight( PixelFormat format, bool apiStrict )
+    {
+        return getCompressedBlockWidth( format, apiStrict );
+    }
+    //-----------------------------------------------------------------------
     size_t PixelUtil::getNumElemBits( PixelFormat format )
     {
         return getDescriptionFor(format).elemBytes * 8;
@@ -691,6 +749,66 @@ namespace Ogre {
                  dst(count, 1, 1, dstFormat, destp);
 
         bulkPixelConversion(src, dst);
+    }
+    //-----------------------------------------------------------------------
+    void PixelUtil::bulkCompressedSubregion( const PixelBox &src, const PixelBox &dst,
+                                             const Box &dstRegion )
+    {
+        assert(src.getWidth()  == dstRegion.getWidth() &&
+               src.getHeight() == dstRegion.getHeight() &&
+               src.getDepth()  == dstRegion.getDepth());
+
+        assert( dst.contains( dstRegion ) );
+        assert( dst.format == src.format );
+        assert( src.isConsecutive() && dst.isConsecutive() );
+
+        if( src.getWidth()  == dst.getWidth() &&
+            src.getHeight() == dst.getHeight() &&
+            src.getDepth()  == dst.getDepth() )
+        {
+            bulkPixelConversion( src, dst );
+            return;
+        }
+
+        uint32 blockWidth  = PixelUtil::getCompressedBlockWidth( dst.format, false );
+        uint32 blockHeight = PixelUtil::getCompressedBlockHeight( dst.format, false );
+        uint32 blockResolution = blockWidth * blockHeight;
+        if( !blockWidth || !blockHeight )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                        "Cannot transfer subregions of the image when compressed by format "
+                         + PixelUtil::getFormatName( dst.format ) +
+                         ". You must update the entire image.",
+                        "PixelUtil::bulkCompressedSubregion");
+        }
+
+        if( dstRegion.left % blockWidth || dstRegion.right % blockWidth ||
+            dstRegion.top % blockHeight || dstRegion.bottom % blockHeight )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                        "Image transfers for the compressed format " +
+                         PixelUtil::getFormatName( dst.format ) +
+                         " requires subregions to be aligned to " +
+                         StringConverter::toString( blockWidth ) + "x" +
+                         StringConverter::toString( blockHeight ) +  " blocks",
+                         "PixelUtil::bulkPixelConversion");
+        }
+
+        size_t blockSize = PixelUtil::getMemorySize( blockWidth, blockHeight, 1, dst.format );
+
+        for( size_t z=dstRegion.front; z<dstRegion.back; ++z )
+        {
+            size_t dstZ = z * ( (dst.getWidth() * dst.getHeight()) / blockResolution );
+            size_t srcZ = z * ( (src.getWidth() * src.getHeight()) / blockResolution );
+            for( size_t y=dstRegion.top; y<dstRegion.bottom; y += blockHeight )
+            {
+                size_t dstY = ((y - dst.top) * dst.getWidth()) / blockResolution;
+                size_t srcY = (y * src.getWidth()) / blockResolution;
+                memcpy( (uint8*)(dst.data) + ( (dstZ + dstY + dstRegion.left / blockWidth) * blockSize ),
+                        (uint8*)(src.data) + ( (srcZ + srcY ) * blockSize ),
+                        (dstRegion.getWidth() / blockWidth) * blockSize );
+            }
+        }
     }
     //-----------------------------------------------------------------------
     void PixelUtil::bulkPixelConversion(const PixelBox &src, const PixelBox &dst)

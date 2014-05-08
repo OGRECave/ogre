@@ -84,26 +84,60 @@ namespace Ogre
     const IdString HlmsGui2DMobile::PropertyBlendModeIdx14      = IdString( "blend_mode_idx14" );
     const IdString HlmsGui2DMobile::PropertyBlendModeIdx15      = IdString( "blend_mode_idx15" );
 
+    const IdString HlmsGui2DMobile::PropertyUvAtlas             = IdString( "uv_atlas" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas0            = IdString( "uv_atlas0" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas1            = IdString( "uv_atlas1" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas2            = IdString( "uv_atlas2" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas3            = IdString( "uv_atlas3" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas4            = IdString( "uv_atlas4" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas5            = IdString( "uv_atlas5" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas6            = IdString( "uv_atlas6" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas7            = IdString( "uv_atlas7" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas8            = IdString( "uv_atlas8" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas9            = IdString( "uv_atlas9" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas10           = IdString( "uv_atlas10" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas11           = IdString( "uv_atlas11" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas12           = IdString( "uv_atlas12" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas13           = IdString( "uv_atlas13" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas14           = IdString( "uv_atlas14" );
+    const IdString HlmsGui2DMobile::PropertyUvAtlas15           = IdString( "uv_atlas15" );
+
     extern const String c_blendModes[];
 
-    const IdString *DiffuseMapCountPtrs[16][2] =
+    const IdString *DiffuseMapCountPtrs[16][3] =
     {
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount0, &HlmsGui2DMobile::PropertyBlendModeIdx0 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount1, &HlmsGui2DMobile::PropertyBlendModeIdx1 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount2, &HlmsGui2DMobile::PropertyBlendModeIdx2 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount3, &HlmsGui2DMobile::PropertyBlendModeIdx3 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount4, &HlmsGui2DMobile::PropertyBlendModeIdx4 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount5, &HlmsGui2DMobile::PropertyBlendModeIdx5 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount6, &HlmsGui2DMobile::PropertyBlendModeIdx6 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount7, &HlmsGui2DMobile::PropertyBlendModeIdx7 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount8, &HlmsGui2DMobile::PropertyBlendModeIdx8 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount9, &HlmsGui2DMobile::PropertyBlendModeIdx9 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount10, &HlmsGui2DMobile::PropertyBlendModeIdx10 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount11, &HlmsGui2DMobile::PropertyBlendModeIdx11 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount12, &HlmsGui2DMobile::PropertyBlendModeIdx12 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount13, &HlmsGui2DMobile::PropertyBlendModeIdx13 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount14, &HlmsGui2DMobile::PropertyBlendModeIdx14 },
-        { &HlmsGui2DMobile::PropertyDiffuseMapCount15, &HlmsGui2DMobile::PropertyBlendModeIdx15 }
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount0, &HlmsGui2DMobile::PropertyBlendModeIdx0,
+          &HlmsGui2DMobile::PropertyUvAtlas0 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount1, &HlmsGui2DMobile::PropertyBlendModeIdx1,
+          &HlmsGui2DMobile::PropertyUvAtlas1 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount2, &HlmsGui2DMobile::PropertyBlendModeIdx2,
+          &HlmsGui2DMobile::PropertyUvAtlas2 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount3, &HlmsGui2DMobile::PropertyBlendModeIdx3,
+          &HlmsGui2DMobile::PropertyUvAtlas3 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount4, &HlmsGui2DMobile::PropertyBlendModeIdx4,
+          &HlmsGui2DMobile::PropertyUvAtlas4 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount5, &HlmsGui2DMobile::PropertyBlendModeIdx5,
+          &HlmsGui2DMobile::PropertyUvAtlas5 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount6, &HlmsGui2DMobile::PropertyBlendModeIdx6,
+          &HlmsGui2DMobile::PropertyUvAtlas6 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount7, &HlmsGui2DMobile::PropertyBlendModeIdx7,
+          &HlmsGui2DMobile::PropertyUvAtlas7 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount8, &HlmsGui2DMobile::PropertyBlendModeIdx8,
+          &HlmsGui2DMobile::PropertyUvAtlas8 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount9, &HlmsGui2DMobile::PropertyBlendModeIdx9,
+          &HlmsGui2DMobile::PropertyUvAtlas9 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount10, &HlmsGui2DMobile::PropertyBlendModeIdx10,
+          &HlmsGui2DMobile::PropertyUvAtlas10 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount11, &HlmsGui2DMobile::PropertyBlendModeIdx11,
+          &HlmsGui2DMobile::PropertyUvAtlas11 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount12, &HlmsGui2DMobile::PropertyBlendModeIdx12,
+          &HlmsGui2DMobile::PropertyUvAtlas12 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount13, &HlmsGui2DMobile::PropertyBlendModeIdx13,
+          &HlmsGui2DMobile::PropertyUvAtlas13 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount14, &HlmsGui2DMobile::PropertyBlendModeIdx14,
+          &HlmsGui2DMobile::PropertyUvAtlas14 },
+        { &HlmsGui2DMobile::PropertyDiffuseMapCount15, &HlmsGui2DMobile::PropertyBlendModeIdx15,
+          &HlmsGui2DMobile::PropertyUvAtlas15 },
     };
 
 
@@ -121,11 +155,14 @@ namespace Ogre
 
     const String c_vsPerObjectUniforms[] =
     {
-        "worldViewProj"
+        "worldViewProj",
+        "texture_matrix"
     };
     const String c_psPerObjectUniforms[] =
     {
-        "constColour"
+        "constColour",
+        "alpha_test_threshold",
+        "atlasOffsets"
     };
 
     HlmsGui2DMobile::HlmsGui2DMobile( Archive *dataFolder ) : Hlms( HLMS_GUI, dataFolder )
@@ -156,7 +193,7 @@ namespace Ogre
 
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
         constantsDef = const_cast<GpuNamedConstants*>( &retVal->pixelShader->getConstantDefinitions() );
-        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
+        for( size_t i=0; i<sizeof( c_psPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_psPerObjectUniforms[i] );
             if( it != constantsDef->map.end() )
@@ -256,6 +293,7 @@ namespace Ogre
             }
         }
 
+        setProperty( PropertyUvAtlas, datablock->mNumUvAtlas );
         for( size_t i=0; i<datablock->mNumTextureUnits; ++i )
         {
             const uint8 uvSet = datablock->mShaderCreationData->mUvSetForTexture[i];
@@ -274,6 +312,8 @@ namespace Ogre
             setProperty( *DiffuseMapCountPtrs[i][0], uvSet );
             pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] = "@insertpiece( " +
                                                                 c_blendModes[blendModeIdx] + ")";
+            setProperty( *DiffuseMapCountPtrs[i][2],
+                         datablock->mShaderCreationData->mTextureIsAtlas[i] );
         }
 
         setProperty( PropertyTexMatrixCount, datablock->mNumTextureMatrices );
@@ -353,6 +393,11 @@ namespace Ogre
 
         if( datablock->mIsAlphaTested )
             *psUniformBuffer++ = datablock->mAlphaTestThreshold;
+
+        memcpy( psUniformBuffer, datablock->mUvAtlasParams,
+                datablock->mNumUvAtlas * sizeof( HlmsGui2DMobileDatablock::UvAtlasParams ) );
+        psUniformBuffer += datablock->mNumUvAtlas * (sizeof( HlmsGui2DMobileDatablock::UvAtlasParams ) /
+                                                     sizeof(float) );
 
 #if OGRE_DEBUG_MODE
         {

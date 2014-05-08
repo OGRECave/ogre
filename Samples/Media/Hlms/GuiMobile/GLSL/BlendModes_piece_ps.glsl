@@ -84,3 +84,6 @@
 						 abs(outColour.xyz - topImage@value(t).xyz),
 						 topImage@value(t).a );
 @end
+
+@foreach( 16, n )
+@property( uv_atlas@n ) @piece( atlasOffset@n )* atlasOffsets[@n].z + atlasOffsets[@n].xy @end @end @end
