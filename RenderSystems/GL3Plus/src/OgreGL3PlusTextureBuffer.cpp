@@ -45,7 +45,7 @@ namespace Ogre {
     GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id,
                                                GLint face, GLint level, Usage usage,
                                                bool writeGamma, uint fsaa)
-        : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
+        : GL3PlusHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, writeGamma, usage),
           mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level), mSliceTRT(0)
     {
         // devise mWidth, mHeight and mDepth and mFormat
@@ -204,7 +204,7 @@ namespace Ogre {
                             "Compressed images must be consecutive and in the designated source format",
                             "GL3PlusTextureBuffer::upload");
 
-            GLenum format = GL3PlusPixelUtil::getClosestGLInternalFormat(mFormat);
+            GLenum format = GL3PlusPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
             // Data must be consecutive and at beginning of buffer as
             // PixelStorei not allowed for compressed formats.
             switch(mTarget)

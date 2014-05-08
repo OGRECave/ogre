@@ -79,7 +79,7 @@ namespace Ogre
                     for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
                     {
                         mDefaultTextureParameters[i].packingMethod = Atlas;
-                        mDefaultTextureParameters[i].maxTexturesPerArray = 1;
+                        mDefaultTextureParameters[i].maxTexturesPerArray = 16;
                     }
                     mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 1;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].maxTexturesPerArray  = 1;

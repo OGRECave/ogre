@@ -42,8 +42,9 @@ namespace Ogre {
 
     GL3PlusHardwarePixelBuffer::GL3PlusHardwarePixelBuffer(uint32 inWidth, uint32 inHeight,
                                                            uint32 inDepth, PixelFormat inFormat,
+                                                           bool hwGamma,
                                                            HardwareBuffer::Usage usage)
-        : HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false, false),
+        : HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, hwGamma, usage, false, false),
           mBuffer(inWidth, inHeight, inDepth, inFormat),
           mGLInternalFormat(GL_NONE)
     {
@@ -221,7 +222,7 @@ namespace Ogre {
         GLenum format, uint32 width, uint32 height, GLsizei numSamples)
         : GL3PlusHardwarePixelBuffer(
             width, height, 1,
-            GL3PlusPixelUtil::getClosestOGREFormat(format), HBU_WRITE_ONLY),
+            GL3PlusPixelUtil::getClosestOGREFormat(format), false, HBU_WRITE_ONLY),
           mRenderbufferID(0)
     {
         mGLInternalFormat = format;
