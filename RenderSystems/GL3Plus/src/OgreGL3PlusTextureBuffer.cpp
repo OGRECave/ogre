@@ -588,7 +588,7 @@ namespace Ogre {
         if (!fboMan->checkFormat(mFormat))
         {
             // If target format not directly supported, create intermediate texture
-            GLenum tempFormat = GL3PlusPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
+            GLenum tempFormat = GL3PlusPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat),false);
             OGRE_CHECK_GL_ERROR(glGenTextures(1, &tempTex));
             OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, tempTex));
             OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0));

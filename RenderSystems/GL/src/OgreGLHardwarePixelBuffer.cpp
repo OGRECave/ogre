@@ -40,9 +40,9 @@ THE SOFTWARE.
 namespace Ogre {
 //----------------------------------------------------------------------------- 
 GLHardwarePixelBuffer::GLHardwarePixelBuffer(uint32 inWidth, uint32 inHeight, uint32 inDepth,
-                PixelFormat inFormat,
+                PixelFormat inFormat, bool hwGamma,
                 HardwareBuffer::Usage usage):
-      HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false, false),
+      HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, hwGamma, usage, false, false),
       mBuffer(inWidth, inHeight, inDepth, inFormat),
       mGLInternalFormat(GL_NONE)
 {
@@ -198,9 +198,9 @@ void GLHardwarePixelBuffer::bindToFramebuffer(GLenum attachment, uint32 zoffset)
 GLTextureBuffer::GLTextureBuffer(GLSupport& support, const String &baseName, GLenum target, GLuint id,
                                  GLint face, GLint level, Usage usage, bool crappyCard, 
                                  bool writeGamma, uint fsaa):
-    GLHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
+    GLHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, writeGamma, usage),
     mTarget(target), mFaceTarget(0), mTextureID(id), mFace(face), mLevel(level),
-    mSoftwareMipmap(crappyCard), mHwGamma(writeGamma), mSliceTRT(0), mGLSupport(support)
+    mSoftwareMipmap(crappyCard), mSliceTRT(0), mGLSupport(support)
 {
     // devise mWidth, mHeight and mDepth and mFormat
     GLint value = 0;
