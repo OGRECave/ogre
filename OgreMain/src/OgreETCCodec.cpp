@@ -303,7 +303,7 @@ namespace Ogre {
         imgData->depth = 1;
         imgData->width = header.pixelWidth;
         imgData->height = header.pixelHeight;
-        imgData->num_mipmaps = static_cast<ushort>(header.numberOfMipmapLevels - 1);
+        imgData->num_mipmaps = static_cast<uint8>(header.numberOfMipmapLevels - 1);
 
         switch(header.glInternalFormat)
         {
