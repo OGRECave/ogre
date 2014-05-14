@@ -1661,7 +1661,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	uint32 ScriptCompilerManager::registerCustomWordId(const String &word)
 	{
-		OGRE_THREAD_POINTER_GET(mScriptCompiler)->registerCustomWordId(word);
+		return OGRE_THREAD_POINTER_GET(mScriptCompiler)->registerCustomWordId(word);
 	}
 	//-----------------------------------------------------------------------
 	void ScriptCompilerManager::addScriptPattern(const String &pattern)
