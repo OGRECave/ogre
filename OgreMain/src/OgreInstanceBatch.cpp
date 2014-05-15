@@ -76,7 +76,8 @@ namespace Ogre
         }
 
         mLodMesh = meshReference->_getLodValueArray();
-        mLodMaterial[0] = mMaterial->_getLodValues();
+        mLodMaterial = mMaterial->_getLodValues();
+        mRenderables.resize( 1, this );
 
         mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
 
@@ -626,7 +627,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     Technique* InstanceBatch::getTechnique( void ) const
     {
-        return mMaterial->getBestTechnique( mCurrentMaterialLod[0], this );
+        return mMaterial->getBestTechnique( mCurrentMaterialLod, this );
     }
     //-----------------------------------------------------------------------
     void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )

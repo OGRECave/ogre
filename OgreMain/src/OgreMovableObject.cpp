@@ -43,7 +43,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     using namespace VisibilityFlags;
-    const FastArray<Real> c_DefaultLodMesh = FastArray<Real>( 1, std::numeric_limits<Real>::max() );
+    const FastArray<Real> MovableObject::c_DefaultLodMesh = FastArray<Real>( 1, std::numeric_limits<Real>::max() );
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     const String NullEntity::msMovableType = "NullEntity";
@@ -69,8 +69,6 @@ namespace Ogre {
         , mGlobalIndex( -1 )
         , mParentIndex( -1 )
     {
-        mLodMaterial.resize( 1, &c_DefaultLodMesh );
-        mCurrentMaterialLod.resize( 1, 0 );
         if (Root::getSingletonPtr())
             mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
 
@@ -94,8 +92,6 @@ namespace Ogre {
         , mGlobalIndex( -1 )
         , mParentIndex( -1 )
     {
-        mLodMaterial.resize( 1, &c_DefaultLodMesh );
-        mCurrentMaterialLod.resize( 1, 0 );
         if (Root::getSingletonPtr())
             mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
     }

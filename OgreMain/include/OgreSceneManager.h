@@ -878,6 +878,8 @@ namespace Ogre {
         */
         virtual void _resumeRendering(RenderContext* context);
 
+        typedef vector<CompositorTexture>::type CompositorTextureVec;
+
     protected:
         Real mDefaultShadowFarDist;
         Real mDefaultShadowFarDistSquared;
@@ -890,7 +892,6 @@ namespace Ogre {
         GpuProgramParametersSharedPtr mShadowTextureCustomCasterVPParams;
         GpuProgramParametersSharedPtr mShadowTextureCustomCasterFPParams;
 
-        typedef vector<CompositorTexture>::type CompositorTextureVec;
         CompositorTextureVec        mCompositorTextures;
 
         /// Visibility mask used to show / hide objects
@@ -1353,6 +1354,8 @@ namespace Ogre {
             The actual texture(s) associated with that name
         */
         void _addCompositorTexture( IdString name, const TextureVec *texs );
+
+        const CompositorTextureVec& getCompositorTextures(void) const   { return mCompositorTextures; }
 
         /// Gets the number of currently active compositor textures
         size_t getNumCompositorTextures(void) const         { return mCompositorTextures.size(); }

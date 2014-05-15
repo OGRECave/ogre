@@ -145,9 +145,7 @@ namespace Ogre {
             mSkeletonInstance->load();
         }
 
-        mCurrentMaterialLod.resize( mMesh->getNumSubMeshes(), 0 );
         mLodMesh = mMesh->_getLodValueArray();
-        mLodMaterial.resize( mMesh->getNumSubMeshes(), 0 );
 
         // Build main subentity list
         buildSubEntityList(mMesh, &mSubEntityList);
@@ -163,14 +161,6 @@ namespace Ogre {
                 mRenderables.push_back( &(*itor) );
                 ++itor;
             }
-        }
-
-        for( size_t i=0; i<mSubEntityList.size(); ++i )
-        {
-            if( !mSubEntityList[i].getMaterial().isNull() )
-                mLodMaterial[i] = mSubEntityList[i].getMaterial()->_getLodValues();
-            else
-                mLodMaterial[i] = &c_DefaultLodMesh;
         }
 
         // Check if mesh is using manual LOD

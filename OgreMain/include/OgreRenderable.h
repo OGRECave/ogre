@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 #include "OgreException.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreLodStrategy.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -70,16 +71,8 @@ namespace Ogre {
         */
         class RenderSystemData {}; 
     public:
-        Renderable() :
-            mHlmsHash( 0 ),
-            mHlmsCasterHash( 0 ),
-            mHlmsDatablock( 0 ),
-            mHlmsGlobalIndex( ~0 ),
-            mPolygonModeOverrideable(true),
-            mUseIdentityProjection(false),
-            mUseIdentityView(false),
-            mRenderSystemData(NULL)
-            {}
+        Renderable();
+
         /** Virtual destructor needed as class has virtual methods. */
         virtual ~Renderable();
 
@@ -417,12 +410,18 @@ namespace Ogre {
         /// Manually sets the hlms hashes. Don't call this directly
         void _setHlmsHashes( uint32 hash, uint32 casterHash );
 
+        uint8 getCurrentMaterialLod(void) const { return mCurrentMaterialLod; }
+
+        friend void LodStrategy::lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
+
     protected:
         typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
         uint32              mHlmsHash;
         uint32              mHlmsCasterHash;
         HlmsDatablock       *mHlmsDatablock;
+        uint8                   mCurrentMaterialLod;
+        FastArray<Real> const   *mLodMaterial;
 
         /** Index in the vector holding this Rendrable reference in the HLMS datablock.
             Used for O(1) removals.

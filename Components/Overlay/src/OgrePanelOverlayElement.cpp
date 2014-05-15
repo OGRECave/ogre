@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
 #include "OgreHlmsGui2DMobileDatablock.h"
+#include "OgreHlms.h"
+#include "OgreHlmsManager.h"
 #include "OgreRenderSystem.h"
 
 namespace Ogre {

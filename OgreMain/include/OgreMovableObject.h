@@ -54,7 +54,7 @@ namespace Ogre {
     *  @{
     */
 
-    typedef vector<Renderable*>::type RenderableVec;
+    typedef FastArray<Renderable*> RenderableArray;
 
     /** Abstract class defining a movable object in a scene.
         @remarks
@@ -64,7 +64,8 @@ namespace Ogre {
     class _OgreExport MovableObject : public AnimableObject, public MovableAlloc, public IdObject
     {
     public:
-        const FastArray<Real> c_DefaultLodMesh;
+        static const FastArray<Real> c_DefaultLodMesh;
+
         /** Listener which gets called back on MovableObject events.
         */
         class _OgreExport Listener
@@ -80,7 +81,7 @@ namespace Ogre {
             virtual void objectDetached(MovableObject*) {}
         };
 
-        RenderableVec   mRenderables;
+        RenderableArray   mRenderables;
     protected:
         /// Node to which this object is attached
         Node* mParentNode;
@@ -93,11 +94,9 @@ namespace Ogre {
         /// SceneManager holding this object (if applicable)
         SceneManager* mManager;
 
-        //One for each submesh/material/Renderable
+        //One for each submesh/Renderable
         FastArray<Real> const               *mLodMesh;
-        FastArray< FastArray<Real> const * > mLodMaterial;
         unsigned char                       mCurrentMeshLod;
-        FastArray<unsigned char>            mCurrentMaterialLod;
 
         /// Minimum pixel size to still render
         Real mMinPixelSize;
@@ -537,8 +536,6 @@ namespace Ogre {
             as a return value) and for reading it's only accurate as at the last frame.
         */
         LightList* _getLightList() { return &mLightList; }
-
-        const FastArray<unsigned char>& getCurrentMaterialLod(void) const       { return mCurrentMaterialLod; }
 
         /** Sets whether or not this object will cast shadows.
         @remarks

@@ -800,14 +800,6 @@ namespace Ogre {
             // now build
             lodBucket->build();
         }
-
-        mLodMaterial.reserve( mLodBucketList[0]->getNumMaterials() );
-        StaticGeometry::LODBucket::MaterialIterator matIt = mLodBucketList[0]->getMaterialIterator();
-        while( matIt.hasMoreElements() )
-        {
-            MaterialBucket *matBucket = matIt.getNext();
-            mLodMaterial.push_back( matBucket->getMaterial()->_getLodValues() );
-        }
     }
     //--------------------------------------------------------------------------
     const String& StaticGeometry::Region::getMovableType(void) const
@@ -835,7 +827,7 @@ namespace Ogre {
         // Cache squared view depth for use by GeometryBucket
         mCamera = lodCamera;
         mSquaredViewDepth = mParentNode->getSquaredViewDepth( lodCamera );
-        mLodBucketList[mCurrentMeshLod]->addRenderables(queue, mRenderQueueID, mCurrentMaterialLod);
+        mLodBucketList[mCurrentMeshLod]->addRenderables(queue, mRenderQueueID, 0);
     }
     //---------------------------------------------------------------------
     void StaticGeometry::Region::visitRenderables(Renderable::Visitor* visitor, 
@@ -1086,10 +1078,11 @@ namespace Ogre {
         Region *region = mParent->getParent();
 
         // Determine the current material technique
-        mTechnique = mMaterial->getBestTechnique( region->mCurrentMaterialLod[materialLod] );
+        mTechnique = mMaterial->getBestTechnique( 0 );
         GeometryBucketList::iterator i, iend;
         iend =  mGeometryBucketList.end();
         //TODO: RENDER QUEUE
+        //TODO: mCurrentMeshLod
         /*for (i = mGeometryBucketList.begin(); i != iend; ++i)
         {
             queue->addRenderable(*i, group);

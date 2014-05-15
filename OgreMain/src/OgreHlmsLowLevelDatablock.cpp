@@ -25,58 +25,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
 #include "OgreStableHeaders.h"
 
-#include "OgreRenderable.h"
-#include "OgreHlmsDatablock.h"
-#include "OgreHlms.h"
+#include "OgreHlmsLowLevelDatablock.h"
 
 namespace Ogre
 {
-    Renderable::Renderable() :
-        mHlmsHash( 0 ),
-        mHlmsCasterHash( 0 ),
-        mHlmsDatablock( 0 ),
-        mLodMaterial( &MovableObject::c_DefaultLodMesh ),
-        mCurrentMaterialLod( 0 ),
-        mHlmsGlobalIndex( ~0 ),
-        mPolygonModeOverrideable( true ),
-        mUseIdentityProjection( false ),
-        mUseIdentityView( false ),
-        mRenderSystemData( NULL )
+    //-----------------------------------------------------------------------------------
+    HlmsLowLevelDatablock::HlmsLowLevelDatablock( IdString name, Hlms *creator,
+                                                  const HlmsMacroblock *macroblock,
+                                                  const HlmsBlendblock *blendblock,
+                                                  const HlmsParamVec &params ) :
+        HlmsDatablock( name, creator, macroblock, blendblock, params )
     {
     }
-
-    Renderable::~Renderable()
+    //-----------------------------------------------------------------------------------
+    HlmsLowLevelDatablock::~HlmsLowLevelDatablock()
     {
-        if( mHlmsDatablock )
-        {
-            mHlmsDatablock->_unlinkRenderable( this );
-            mHlmsDatablock = 0;
-        }
-
-        if (mRenderSystemData)
-        {
-            delete mRenderSystemData;
-            mRenderSystemData = NULL;
-        }
     }
-
-    void Renderable::setHlms( HlmsDatablock *datablock )
-    {
-        if( mHlmsDatablock )
-            mHlmsDatablock->_unlinkRenderable( this );
-
-        mHlmsDatablock = datablock;
-        mHlmsDatablock->_linkRenderable( this );
-        mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
-                                                        mHlmsHash, mHlmsCasterHash );
-    }
-
-    void Renderable::_setHlmsHashes( uint32 hash, uint32 casterHash )
-    {
-        mHlmsHash       = hash;
-        mHlmsCasterHash = casterHash;
-    }
-
 }
