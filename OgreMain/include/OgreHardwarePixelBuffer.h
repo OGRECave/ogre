@@ -62,6 +62,8 @@ namespace Ogre {
         size_t mRowPitch, mSlicePitch;
         /// Internal format
         PixelFormat mFormat;
+        /// Whether HW Gamma is used
+        bool mHwGamma;
         /// Currently locked region (local coords)
         PixelBox mCurrentLock;
         /// The current locked box of this surface (entire surface coords)
@@ -83,7 +85,7 @@ namespace Ogre {
     public:
         /// Should be called by HardwareBufferManager
         HardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
-                PixelFormat mFormat,
+                PixelFormat mFormat, bool hwGamma,
                 HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer);
         ~HardwarePixelBuffer();
 

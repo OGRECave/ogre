@@ -57,7 +57,7 @@ namespace Ogre {
     public:
         /// Should be called by HardwareBufferManager
         GLHardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
-                PixelFormat mFormat,
+                PixelFormat mFormat, bool hwGamma,
                 HardwareBuffer::Usage usage);
         
         /// @copydoc HardwarePixelBuffer::blitFromMemory
@@ -115,7 +115,6 @@ namespace Ogre {
         GLint mFace;
         GLint mLevel;
         bool mSoftwareMipmap;       // Use GLU for mip mapping
-        bool mHwGamma;
 
         typedef vector<RenderTexture*>::type SliceTRT;
         SliceTRT mSliceTRT;

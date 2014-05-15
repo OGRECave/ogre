@@ -292,7 +292,7 @@ namespace Ogre {
             mProps[x].valid = false;
 
             // Fetch GL format token
-            GLenum fmt = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x);
+            GLenum fmt = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x, false);
             GLenum fmt2 = GL3PlusPixelUtil::getGLOriginFormat((PixelFormat)x);
             GLenum type = GL3PlusPixelUtil::getGLOriginDataType((PixelFormat)x);
             if(fmt == GL_NONE && x != 0)

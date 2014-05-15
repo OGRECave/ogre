@@ -57,14 +57,14 @@ namespace Ogre {
             @param mFormat The pixel format
             @param hwGamma Whether a hardware gamma-corrected version is requested
         */
-        static GLenum getGLInternalFormat(PixelFormat format, bool hwGamma = false);
+        static GLenum getGLInternalFormat(PixelFormat format, bool hwGamma);
 
         /** Takes the OGRE pixel format and returns the type that must be provided
             to GL as internal format. If no match exists, returns the closest match.
             @param mFormat The pixel format
             @param hwGamma Whether a hardware gamma-corrected version is requested
         */
-        static GLenum getClosestGLInternalFormat(PixelFormat format, bool hwGamma = false);
+        static GLenum getClosestGLInternalFormat(PixelFormat format, bool hwGamma);
 
         /** Takes the OGRE pixel format and returns the type that must be provided
             to GL as internal format for image load/store. GL_NONE if no match exists.
