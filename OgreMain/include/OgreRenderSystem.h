@@ -223,17 +223,6 @@ namespace Ogre
         */
         virtual void setAmbientLight(float r, float g, float b) = 0;
 
-        /** Sets the type of light shading required (default = Gouraud).
-        */
-        virtual void setShadingType(ShadeOptions so) = 0;
-
-        /** Sets whether or not dynamic lighting is enabled.
-        @param
-        enabled If true, dynamic lighting is performed on geometry with normals supplied, geometry without
-        normals will not be displayed. If false, no lighting is applied and all geometry will be full brightness.
-        */
-        virtual void setLightingEnabled(bool enabled) = 0;
-
         /** Sets whether or not W-buffers are enabled if they are available for this renderer.
         @param
         enabled If true and the renderer supports them W-buffers will be used.  If false 
@@ -1003,19 +992,6 @@ namespace Ogre
 
         */
         virtual void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) = 0;
-        /** Sets the fogging mode for future geometry.
-        @param mode Set up the mode of fog as described in the FogMode enum, or set to FOG_NONE to turn off.
-        @param colour The colour of the fog. Either set this to the same as your viewport background colour,
-        or to blend in with a skydome or skybox.
-        @param expDensity The density of the fog in FOG_EXP or FOG_EXP2 mode, as a value between 0 and 1. The default is 1. i.e. completely opaque, lower values can mean
-        that fog never completely obscures the scene.
-        @param linearStart Distance at which linear fog starts to encroach. The distance must be passed
-        as a parametric value between 0 and 1, with 0 being the near clipping plane, and 1 being the far clipping plane. Only applicable if mode is FOG_LINEAR.
-        @param linearEnd Distance at which linear fog becomes completely opaque.The distance must be passed
-        as a parametric value between 0 and 1, with 0 being the near clipping plane, and 1 being the far clipping plane. Only applicable if mode is FOG_LINEAR.
-        */
-        virtual void _setFog(FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0) = 0;
-
 
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
         virtual void _beginGeometryCount(void);
@@ -1186,18 +1162,6 @@ namespace Ogre
         virtual void setVertexDeclaration(VertexDeclaration* decl) = 0;
         /** Sets the current vertex buffer binding state. */
         virtual void setVertexBufferBinding(VertexBufferBinding* binding) = 0;
-
-        /** Sets whether or not normals are to be automatically normalised.
-        @remarks
-        This is useful when, for example, you are scaling SceneNodes such that
-        normals may not be unit-length anymore. Note though that this has an
-        overhead so should not be turn on unless you really need it.
-        @par
-        You should not normally call this direct unless you are rendering
-        world geometry; set it on the Renderable because otherwise it will be
-        overridden by material settings. 
-        */
-        virtual void setNormaliseNormals(bool normalise) = 0;
 
         /**
         Render something to the active viewport.

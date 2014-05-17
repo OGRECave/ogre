@@ -1149,8 +1149,6 @@ namespace Ogre {
 
         /// Is this loaded?
         bool isLoaded(void) const;
-        /** Tells the class that it needs recompilation. */
-        void _notifyNeedsRecompile(void);
 
         /** Set the name of the Texture Unit State.
         @remarks

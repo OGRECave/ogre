@@ -101,26 +101,6 @@ namespace Ogre {
             virtual void OldNodeDetached(const OldNode*) {}
         };
 
-        /** Inner class for displaying debug renderable for OldNode. */
-        class DebugRenderable : public Renderable, public NodeAlloc
-        {
-        protected:
-            OldNode* mParent;
-            MeshPtr mMeshPtr;
-            MaterialPtr mMat;
-            Real mScaling;
-        public:
-            DebugRenderable(OldNode* parent);
-            ~DebugRenderable();
-            const MaterialPtr& getMaterial(void) const;
-            void getRenderOperation(RenderOperation& op);
-            void getWorldTransforms(Matrix4* xform) const;
-            Real getSquaredViewDepth(const Camera* cam) const;
-            const LightList& getLights(void) const;
-            void setScaling(Real s) { mScaling = s; }
-
-        };
-
     protected:
         /// Pointer to parent OldNode
         OldNode* mParent;
@@ -226,8 +206,6 @@ namespace Ogre {
 
         typedef vector<OldNode*>::type QueuedUpdates;
         static QueuedUpdates msQueuedUpdates;
-
-        DebugRenderable* mDebug;
 
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;
@@ -725,9 +703,6 @@ namespace Ogre {
         virtual void requestUpdate(OldNode* child, bool forceParentUpdate = false);
         /** Called by children to notify their parent that they no longer need an update. */
         virtual void cancelUpdate(OldNode* child);
-
-        /** Get a debug renderable for rendering the OldNode.  */
-        virtual DebugRenderable* getDebugRenderable(Real scaling);
 
         /** Queue a 'needUpdate' call to a OldNode safely.
         @remarks

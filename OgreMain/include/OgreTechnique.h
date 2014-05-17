@@ -50,23 +50,12 @@ namespace Ogre {
     class _OgreExport Technique : public TechniqueAlloc
     {
     protected:
-        /// Illumination pass state type
-        enum IlluminationPassesState
-        {
-            IPS_COMPILE_DISABLED = -1,
-            IPS_NOT_COMPILED = 0,
-            IPS_COMPILED = 1
-        };
-
         typedef vector<Pass*>::type Passes;
         /// List of primary passes
         Passes mPasses;
-        /// List of derived passes, categorised into IlluminationStage (ordered)
-        IlluminationPassList mIlluminationPasses;
         // Raw pointer since we don't want child to stop parent's destruction
         Material* mParent;
         bool mIsSupported;
-        IlluminationPassesState mIlluminationPassesCompilationPhase;
         /// LOD level
         unsigned short mLodIndex;
         /** Scheme index, derived from scheme name but the names are held on
@@ -75,12 +64,6 @@ namespace Ogre {
         unsigned short mSchemeIndex;
         /// Optional name for the technique
         String mName;
-
-        /// Internal method for clearing illumination pass list
-        void clearIlluminationPasses(void);
-        /// Internal method - check for manually assigned illumination passes
-        bool checkManuallyOrganisedIlluminationPasses();
-
 
         /** When casting shadow, if not using default Ogre shadow casting material, or 
         * nor using fixed function casting, mShadowCasterMaterial let you customize per material
@@ -153,8 +136,6 @@ namespace Ogre {
         bool checkGPURules(StringStream& errors);
         /// Internal method for checking hardware support
         bool checkHardwareSupport(bool autoManageTextureUnits, StringStream& compileErrors);
-        /** Internal method for splitting the passes into illumination passes. */        
-        void _compileIlluminationPasses(void);
         size_t calculateSize(void) const;
 
         /** Creates a new Pass for this Technique.
@@ -187,9 +168,6 @@ namespace Ogre {
         typedef VectorIterator<Passes> PassIterator;
         /** Gets an iterator over the passes in this Technique. */
         const PassIterator getPassIterator(void);
-        typedef VectorIterator<IlluminationPassList> IlluminationPassIterator;
-        /** Gets an iterator over the illumination-stage categorised passes. */
-        const IlluminationPassIterator getIlluminationPassIterator(void);
         /// Gets the parent Material
         Material* getParent(void) const { return mParent; }
 
@@ -208,20 +186,6 @@ namespace Ogre {
             the whole Technique as transparent.
         */
         bool isTransparent(void) const;
-
-        /** Returns true if this Technique has transparent sorting enabled. 
-        @remarks
-            This basically boils down to whether the first pass
-            has transparent sorting enabled or not
-        */
-        bool isTransparentSortingEnabled(void) const;
-
-        /** Returns true if this Technique has transparent sorting forced. 
-        @remarks
-            This basically boils down to whether the first pass
-            has transparent sorting forced or not
-        */
-        bool isTransparentSortingForced(void) const;
 
         /** Internal prepare method, derived from call to Material::prepare. */
         void _prepare(void);
@@ -353,36 +317,6 @@ namespace Ogre {
         */
         void setSelfIllumination(const ColourValue& selfIllum);
 
-        /** Sets whether or not each Pass renders with depth-buffer checking on or not.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setDepthCheckEnabled
-        */
-        void setDepthCheckEnabled(bool enabled);
-
-        /** Sets whether or not each Pass renders with depth-buffer writing on or not.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setDepthWriteEnabled
-        */
-        void setDepthWriteEnabled(bool enabled);
-
-        /** Sets the function used to compare depth values when depth checking is on.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setDepthFunction
-        */
-        void setDepthFunction( CompareFunction func );
-
         /** Sets whether or not colour buffer writing is enabled for each Pass.
         @note
             This property actually exists on the Pass class. For simplicity, this method allows 
@@ -392,36 +326,6 @@ namespace Ogre {
         @see Pass::setColourWriteEnabled
         */
         void setColourWriteEnabled(bool enabled);
-
-        /** Sets the culling mode for each pass  based on the 'vertex winding'.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setCullingMode
-        */
-        void setCullingMode( CullingMode mode );
-
-        /** Sets the manual culling mode, performed by CPU rather than hardware.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setManualCullingMode
-        */
-        void setManualCullingMode( ManualCullingMode mode );
-
-        /** Sets whether or not dynamic lighting is enabled for every Pass.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setLightingEnabled
-        */
-        void setLightingEnabled(bool enabled);
 
         /** Sets the type of light shading required
         @note
@@ -447,16 +351,6 @@ namespace Ogre {
             const ColourValue& colour = ColourValue::White,
             Real expDensity = 0.001, Real linearStart = 0.0, Real linearEnd = 1.0 );
 
-        /** Sets the depth bias to be used for each Pass.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setDepthBias
-        */
-        void setDepthBias(float constantBias, float slopeScaleBias);
-
         /** Set texture filtering for every texture unit in every Pass
         @note
             This property actually exists on the TextureUnitState class
@@ -476,45 +370,25 @@ namespace Ogre {
         */
         void setTextureAnisotropy(unsigned int maxAniso);
 
-        /** Sets the kind of blending every pass has with the existing contents of the scene.
+        /** Sets the macroblock every pass has with the existing contents of the scene.
         @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
+            This property actually exists on the Pass class. For simplicity, this method allows
+            you to set these properties for every current Pass within this Technique. If
             you need more precision, retrieve the Pass instance and set the
             property there.
-        @see Pass::setSceneBlending
+        @see Pass::setBlendblock
         */
-        void setSceneBlending( const SceneBlendType sbt );
+        void setMacroblock( const HlmsMacroblock *macroblock );
 
-        /** Sets the kind of blending every pass has with the existing contents of the scene, using individual factors both color and alpha channels
+        /** Sets the blendblock every pass has with the existing contents of the scene.
         @note
             This property actually exists on the Pass class. For simplicity, this method allows 
             you to set these properties for every current Pass within this Technique. If 
             you need more precision, retrieve the Pass instance and set the
             property there.
-        @see Pass::setSeparateSceneBlending
+        @see Pass::setBlendblock
         */
-        void setSeparateSceneBlending( const SceneBlendType sbt, const SceneBlendType sbta );
-
-        /** Allows very fine control of blending every Pass with the existing contents of the scene.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setSceneBlending
-        */
-        void setSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor);
-
-        /** Allows very fine control of blending every Pass with the existing contents of the scene, using individual factors both color and alpha channels
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setSeparateSceneBlending
-        */
-        void setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha);
+        void setBlendblock( const HlmsBlendblock *blendblock );
 
         /** Assigns a level-of-detail (LOD) index to this Technique.
         @remarks

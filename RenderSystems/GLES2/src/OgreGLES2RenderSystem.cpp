@@ -1211,10 +1211,6 @@ namespace Ogre {
         mStateCacheManager->setColourMask(red, green, blue, alpha);
     }
 
-    void GLES2RenderSystem::_setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end)
-    {
-    }
-
     void GLES2RenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
                                                   Matrix4& dest,
                                                   bool forGpuProgram)

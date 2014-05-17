@@ -51,7 +51,6 @@ namespace Ogre {
         , mShowOverlays(true)
         , mShowSkies(true)
         , mVisibilityMask(0)
-        , mRQSequence(0)
         , mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
     {           
         // Set the default orientation mode
@@ -276,30 +275,6 @@ namespace Ogre {
     bool Viewport::getSkiesEnabled(void) const
     {
         return mShowSkies;
-    }
-    //-----------------------------------------------------------------------
-    void Viewport::setRenderQueueInvocationSequenceName(const String& sequenceName)
-    {
-        mRQSequenceName = sequenceName;
-        if (mRQSequenceName.empty())
-        {
-            mRQSequence = 0;
-        }
-        else
-        {
-            mRQSequence =
-                Root::getSingleton().getRenderQueueInvocationSequence(mRQSequenceName);
-        }
-    }
-    //-----------------------------------------------------------------------
-    const String& Viewport::getRenderQueueInvocationSequenceName(void) const
-    {
-        return mRQSequenceName;
-    }
-    //-----------------------------------------------------------------------
-    RenderQueueInvocationSequence* Viewport::_getRenderQueueInvocationSequence(void)
-    {
-        return mRQSequence;
     }
     //-----------------------------------------------------------------------
     void Viewport::pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv)

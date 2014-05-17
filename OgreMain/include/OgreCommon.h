@@ -140,7 +140,7 @@ namespace Ogre {
         FO_ANISOTROPIC
     };
 
-    /** Light shading modes. */
+    /** Light shading modes. DEPRECATED */
     enum ShadeOptions
     {
         SO_FLAT,
@@ -162,7 +162,19 @@ namespace Ogre {
     };
 
     /** Hardware culling modes based on vertex winding.
-        This setting applies to how the hardware API culls triangles it is sent. */
+        This setting applies to how the hardware API culls triangles it is sent.
+    @par
+        A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
+        triangles. Vertex winding refers to the direction in which the vertices are passed or indexed
+        to in the rendering operation as viewed from the camera, and will wither be clockwise or
+        anticlockwise (that's 'counterclockwise' for you Americans out there ;) The default is
+        CULL_CLOCKWISE i.e. that only triangles whose vertices are passed/indexed in anticlockwise order
+        are rendered - this is a common approach and is used in 3D studio models for example. You can
+        alter this culling mode if you wish but it is not advised unless you know what you are doing.
+    @par
+        You may wish to use the CULL_NONE option for mesh data that you cull yourself where the vertex
+        winding is uncertain.
+    */
     enum CullingMode
     {
         /// Hardware never culls triangles and renders everything it receives.
@@ -171,21 +183,6 @@ namespace Ogre {
         CULL_CLOCKWISE = 2,
         /// Hardware culls triangles whose vertices are listed anticlockwise in the view.
         CULL_ANTICLOCKWISE = 3
-    };
-
-    /** Manual culling modes based on vertex normals.
-        This setting applies to how the software culls triangles before sending them to the 
-        hardware API. This culling mode is used by scene managers which choose to implement it -
-        normally those which deal with large amounts of fixed world geometry which is often 
-        planar (software culling movable variable geometry is expensive). */
-    enum ManualCullingMode
-    {
-        /// No culling so everything is sent to the hardware.
-        MANUAL_CULL_NONE = 1,
-        /// Cull triangles whose normal is pointing away from the camera (default).
-        MANUAL_CULL_BACK = 2,
-        /// Cull triangles whose normal is pointing towards the camera.
-        MANUAL_CULL_FRONT = 3
     };
 
     /** Enumerates the wave types usable with the Ogre engine. */

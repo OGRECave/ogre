@@ -56,7 +56,6 @@ THE SOFTWARE.
 #include "OgreRibbonTrail.h"
 #include "OgreLight.h"
 #include "OgreManualObject.h"
-#include "OgreRenderQueueInvocation.h"
 #include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
 #include "OgreFrameStats.h"
@@ -66,6 +65,7 @@ THE SOFTWARE.
 #include "OgreFrameListener.h"
 #include "OgreNameGenerator.h"
 #include "OgreHlmsManager.h"
+#include "OgreHlmsLowLevel.h"
 #include "Animation/OgreSkeletonManager.h"
 #include "Compositor/OgreCompositorManager2.h"
 
@@ -248,7 +248,8 @@ namespace Ogre {
 
         mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
 
-        mHlmsManager = OGRE_NEW HlmsManager();
+        mHlmsManager        = OGRE_NEW HlmsManager();
+        mHlmsLowLevelProxy  = OGRE_NEW HlmsLowLevel();
 
         mCompilerManager = OGRE_NEW ScriptCompilerManager();
 
@@ -298,8 +299,10 @@ namespace Ogre {
         OGRE_DELETE mShadowTextureManager;
         OGRE_DELETE mRenderSystemCapabilitiesManager;
 
-        destroyAllRenderQueueInvocationSequences();
         OGRE_DELETE mExternalTextureSourceManager;
+
+        OGRE_DELETE mHlmsLowLevelProxy;
+        mHlmsLowLevelProxy = 0;
 
         OGRE_DELETE mHlmsManager;
         mHlmsManager = 0;
@@ -340,7 +343,6 @@ namespace Ogre {
 
         unloadPlugins();
         OGRE_DELETE mMaterialManager;
-        Pass::processPendingPassUpdates(); // make sure passes are cleaned
         OGRE_DELETE mResourceBackgroundQueue;
         OGRE_DELETE mResourceGroupManager;
 
@@ -741,6 +743,9 @@ namespace Ogre {
 
             //Do this now as we need the RS to be fully initialized
             mHlmsManager->_changeRenderSystem( mActiveRenderer );
+
+            if( !mHlmsManager->getHlms( mHlmsLowLevelProxy->getType() ) )
+                mHlmsManager->registerHlms( mHlmsLowLevelProxy, false );
         }
     }
     //-----------------------------------------------------------------------
@@ -1577,61 +1582,6 @@ namespace Ogre {
             mMovableObjectFactoryMap.end());
 
     }
-    //---------------------------------------------------------------------
-    RenderQueueInvocationSequence* Root::createRenderQueueInvocationSequence(
-        const String& name)
-    {
-        RenderQueueInvocationSequenceMap::iterator i =
-            mRQSequenceMap.find(name);
-        if (i != mRQSequenceMap.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-                "RenderQueueInvocationSequence with the name " + name +
-                    " already exists.",
-                "Root::createRenderQueueInvocationSequence");
-        }
-        RenderQueueInvocationSequence* ret = OGRE_NEW RenderQueueInvocationSequence(name);
-        mRQSequenceMap[name] = ret;
-        return ret;
-    }
-    //---------------------------------------------------------------------
-    RenderQueueInvocationSequence* Root::getRenderQueueInvocationSequence(
-        const String& name)
-    {
-        RenderQueueInvocationSequenceMap::iterator i =
-            mRQSequenceMap.find(name);
-        if (i == mRQSequenceMap.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
-                "RenderQueueInvocationSequence with the name " + name +
-                " not found.",
-                "Root::getRenderQueueInvocationSequence");
-        }
-        return i->second;
-    }
-    //---------------------------------------------------------------------
-    void Root::destroyRenderQueueInvocationSequence(
-        const String& name)
-    {
-        RenderQueueInvocationSequenceMap::iterator i =
-            mRQSequenceMap.find(name);
-        if (i != mRQSequenceMap.end())
-        {
-            OGRE_DELETE i->second;
-            mRQSequenceMap.erase(i);
-        }
-    }
-    //---------------------------------------------------------------------
-    void Root::destroyAllRenderQueueInvocationSequences(void)
-    {
-        for (RenderQueueInvocationSequenceMap::iterator i = mRQSequenceMap.begin();
-            i != mRQSequenceMap.end(); ++i)
-        {
-            OGRE_DELETE i->second;
-        }
-        mRQSequenceMap.clear();
-    }
-
     //---------------------------------------------------------------------
     unsigned int Root::getDisplayMonitorCount() const
     {

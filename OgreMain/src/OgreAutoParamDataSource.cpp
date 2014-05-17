@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 #include "OgreColourValue.h"
 #include "OgreSceneNode.h"
+#include "OgrePass.h"
 #include "OgreViewport.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -572,7 +573,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Real AutoParamDataSource::getSurfaceAlphaRejectionValue(void) const
     {
-        return static_cast<Real>(static_cast<unsigned int>(mCurrentPass->getAlphaRejectValue())) / 255.0f;
+        return mCurrentPass->getAlphaRejectValue() * 0.003921569f; //1 / 255
     }
     //-----------------------------------------------------------------------------
     ColourValue AutoParamDataSource::getDerivedAmbientLightColour(void) const

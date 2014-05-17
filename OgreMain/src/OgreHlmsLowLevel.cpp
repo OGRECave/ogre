@@ -127,6 +127,24 @@ namespace Ogre
         mAutoParamDataSource->setWorldMatrices( mTempXform, numMatrices );
         mAutoParamDataSource->setCurrentPass( pass );
 
+        if( pass->getFogOverride() )
+        {
+            mAutoParamDataSource->setFog( pass->getFogMode(), pass->getFogColour(),
+                                          pass->getFogDensity(), pass->getFogStart(),
+                                          pass->getFogEnd() );
+        }
+        else
+        {
+            mAutoParamDataSource->setFog( mCurrentSceneManager->getFogMode(),
+                                          mCurrentSceneManager->getFogColour(),
+                                          mCurrentSceneManager->getFogDensity(),
+                                          mCurrentSceneManager->getFogStart(),
+                                          mCurrentSceneManager->getFogEnd() );
+        }
+
+        bool colWrite = pass->getColourWriteEnabled();
+        mRenderSystem->_setColourBufferWriteEnabled( colWrite, colWrite, colWrite, colWrite );
+
         Pass::ConstTextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
         size_t unit = 0;
         while( texIter.hasMoreElements() )

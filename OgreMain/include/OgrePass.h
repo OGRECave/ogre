@@ -43,18 +43,6 @@ namespace Ogre {
     /** \addtogroup Materials
      *  @{
      */
-    /// Categorisation of passes for the purpose of additive lighting
-    enum IlluminationStage
-    {
-        /// Part of the rendering which occurs without any kind of direct lighting
-        IS_AMBIENT,
-        /// Part of the rendering which occurs per light
-        IS_PER_LIGHT,
-        /// Post-lighting rendering
-        IS_DECAL,
-        /// Not determined
-        IS_UNKNOWN
-    };
 
     /** Class defining a single pass of a Technique (of a Material), i.e.
         a single rendering call.
@@ -98,8 +86,6 @@ namespace Ogre {
         Technique* mParent;
         unsigned short mIndex; /// Pass index
         String mName; /// Optional name for the pass
-        uint32 mHash; /// Pass hash
-        bool mHashDirtyQueued; /// Needs to be dirtied when next loaded
         //-------------------------------------------------------------------------
         // Colour properties, only applicable in fixed-function passes
         ColourValue mAmbient;
@@ -109,35 +95,7 @@ namespace Ogre {
         Real mShininess;
         TrackVertexColourType mTracking;
         //-------------------------------------------------------------------------
-
-        //-------------------------------------------------------------------------
-        // Blending factors
-        SceneBlendFactor mSourceBlendFactor;
-        SceneBlendFactor mDestBlendFactor;
-        SceneBlendFactor mSourceBlendFactorAlpha;
-        SceneBlendFactor mDestBlendFactorAlpha;
-
-        // Used to determine if separate alpha blending should be used for color and alpha channels
-        bool mSeparateBlend;
-
-        //-------------------------------------------------------------------------
-        // Blending operations
-        SceneBlendOperation mBlendOperation;
-        SceneBlendOperation mAlphaBlendOperation;
-
-        /// Determines if we should use separate blending operations for color and alpha channels
-        bool mSeparateBlendOperation;
-
-        //-------------------------------------------------------------------------
-
-        //-------------------------------------------------------------------------
-        // Depth buffer settings
-        bool mDepthCheck;
-        bool mDepthWrite;
-        CompareFunction mDepthFunc;
-        float mDepthBiasConstant;
-        float mDepthBiasSlopeScale;
-        float mDepthBiasPerIteration;
+        HlmsDatablock *mDatablock;
 
         /// Colour buffer settings
         bool mColourWrite;
@@ -145,22 +103,9 @@ namespace Ogre {
         // Alpha reject settings
         CompareFunction mAlphaRejectFunc;
         unsigned char mAlphaRejectVal;
-        bool mAlphaToCoverageEnabled;
-
-        /// Transparent depth sorting
-        bool mTransparentSorting;
-        /// Transparent depth sorting forced
-        bool mTransparentSortingForced;
-        //-------------------------------------------------------------------------
 
         //-------------------------------------------------------------------------
-        // Culling mode
-        CullingMode mCullMode;
-        ManualCullingMode mManualCullMode;
-        //-------------------------------------------------------------------------
 
-        /// Lighting enabled?
-        bool mLightingEnabled;
         /// Max simultaneous lights
         unsigned short mMaxSimultaneousLights;
         /// Starting light index
@@ -177,10 +122,7 @@ namespace Ogre {
 
         /// Shading options
         ShadeOptions mShadeOptions;
-        /// Polygon mode
-        PolygonMode mPolygonMode;
         /// Normalisation
-        bool mNormaliseNormals;
         bool mPolygonModeOverrideable;
         //-------------------------------------------------------------------------
         // Fog
@@ -212,8 +154,6 @@ namespace Ogre {
         GpuProgramUsage *mTessellationDomainProgramUsage;
         /// Compute program details
         GpuProgramUsage *mComputeProgramUsage;
-        /// Is this pass queued for deletion?
-        bool mQueuedForDeletion;
         /// Number of pass iterations to perform
         size_t mPassIterationCount;
         /// Point size, applies when not using per-vertex point size
@@ -231,8 +171,6 @@ namespace Ogre {
         bool mLightScissoring;
         /// User clip planes for light?
         bool mLightClipPlanes;
-        /// Illumination stage?
-        IlluminationStage mIlluminationStage;
         /// User objects binding.
         UserObjectBindings  mUserObjectBindings;
         
@@ -241,14 +179,6 @@ namespace Ogre {
         /// Used to get scene blending flags from a blending type
         static void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
 
-        typedef set<Pass*>::type PassSet;
-    protected:
-        /// List of Passes whose hashes need recalculating
-        static PassSet msDirtyHashList;
-        /// The place where passes go to die
-        static PassSet msPassGraveyard;
-        /// The Pass hash functor
-        static HashFunc* msHashFunc;
     public:
         OGRE_STATIC_MUTEX(msDirtyHashListMutex);
         OGRE_STATIC_MUTEX(msPassGraveyardMutex);
@@ -623,204 +553,8 @@ namespace Ogre {
         */
         void removeShadowContentTypeLookup( size_t textureUnitIndex );
 
-        /** Sets the kind of blending this pass has with the existing contents of the scene.
-            @remarks
-            Whereas the texture blending operations seen in the TextureUnitState class are concerned with
-            blending between texture layers, this blending is about combining the output of the Pass
-            as a whole with the existing contents of the rendering target. This blending therefore allows
-            object transparency and other special effects. If all passes in a technique have a scene
-            blend, then the whole technique is considered to be transparent.
-            @par
-            This method allows you to select one of a number of predefined blending types. If you require more
-            control than this, use the alternative version of this method which allows you to specify source and
-            destination blend factors.
-            @note
-            This method is applicable for both the fixed-function and programmable pipelines.
-            @param
-            sbt One of the predefined SceneBlendType blending types
-        */
-        void setSceneBlending( const SceneBlendType sbt );
-
-        /** Sets the kind of blending this pass has with the existing contents of the scene, separately for color and alpha channels
-            @remarks
-            Whereas the texture blending operations seen in the TextureUnitState class are concerned with
-            blending between texture layers, this blending is about combining the output of the Pass
-            as a whole with the existing contents of the rendering target. This blending therefore allows
-            object transparency and other special effects. If all passes in a technique have a scene
-            blend, then the whole technique is considered to be transparent.
-            @par
-            This method allows you to select one of a number of predefined blending types. If you require more
-            control than this, use the alternative version of this method which allows you to specify source and
-            destination blend factors.
-            @note
-            This method is applicable for both the fixed-function and programmable pipelines.
-            @param
-            sbt One of the predefined SceneBlendType blending types for the color channel
-            @param
-            sbta One of the predefined SceneBlendType blending types for the alpha channel
-        */
-        void setSeparateSceneBlending( const SceneBlendType sbt, const SceneBlendType sbta );
-
-        /** Allows very fine control of blending this Pass with the existing contents of the scene.
-            @remarks
-            Whereas the texture blending operations seen in the TextureUnitState class are concerned with
-            blending between texture layers, this blending is about combining the output of the material
-            as a whole with the existing contents of the rendering target. This blending therefore allows
-            object transparency and other special effects.
-            @par
-            This version of the method allows complete control over the blending operation, by specifying the
-            source and destination blending factors. The result of the blending operation is:
-            <span align="center">
-            final = (texture * sourceFactor) + (pixel * destFactor)
-            </span>
-            @par
-            Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
-            enumerated type.
-            @param
-            sourceFactor The source factor in the above calculation, i.e. multiplied by the texture colour components.
-            @param
-            destFactor The destination factor in the above calculation, i.e. multiplied by the pixel colour components.
-            @note
-            This method is applicable for both the fixed-function and programmable pipelines.
-        */
-        void setSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor);
-
-        /** Allows very fine control of blending this Pass with the existing contents of the scene.
-        @remarks
-        Whereas the texture blending operations seen in the TextureUnitState class are concerned with
-        blending between texture layers, this blending is about combining the output of the material
-        as a whole with the existing contents of the rendering target. This blending therefore allows
-        object transparency and other special effects.
-        @par
-        This version of the method allows complete control over the blending operation, by specifying the
-        source and destination blending factors. The result of the blending operation is:
-        <span align="center">
-        final = (texture * sourceFactor) + (pixel * destFactor)
-        </span>
-        @par
-        Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
-        enumerated type.
-        @param
-        sourceFactor The source factor in the above calculation, i.e. multiplied by the texture colour components.
-        @param
-        destFactor The destination factor in the above calculation, i.e. multiplied by the pixel colour components.
-        @param
-        sourceFactorAlpha The alpha source factor in the above calculation, i.e. multiplied by the texture alpha component.
-        @param
-        destFactorAlpha The alpha destination factor in the above calculation, i.e. multiplied by the pixel alpha component.
-        @note
-        This method is applicable for both the fixed-function and programmable pipelines.
-        */
-        void setSeparateSceneBlending( const SceneBlendFactor sourceFactor, const SceneBlendFactor destFactor, const SceneBlendFactor sourceFactorAlpha, const SceneBlendFactor destFactorAlpha );
-
-        /** Return true if this pass uses separate scene blending */
-        bool hasSeparateSceneBlending() const;
-
-        /** Retrieves the source blending factor for the material (as set using Materiall::setSceneBlending).
-         */
-        SceneBlendFactor getSourceBlendFactor() const;
-
-        /** Retrieves the destination blending factor for the material (as set using Materiall::setSceneBlending).
-         */
-        SceneBlendFactor getDestBlendFactor() const;
-
-        /** Retrieves the alpha source blending factor for the material (as set using Materiall::setSeparateSceneBlending).
-        */
-        SceneBlendFactor getSourceBlendFactorAlpha() const;
-
-        /** Retrieves the alpha destination blending factor for the material (as set using Materiall::setSeparateSceneBlending).
-        */
-        SceneBlendFactor getDestBlendFactorAlpha() const;
-
-        /** Sets the specific operation used to blend source and destination pixels together.
-            @remarks 
-            By default this operation is +, which creates this equation
-            <span align="center">
-            final = (texture * sourceFactor) + (pixel * destFactor)
-            </span>
-            By setting this to something other than SBO_ADD you can change the operation to achieve
-            a different effect.
-            @param op The blending operation mode to use for this pass
-        */
-        void setSceneBlendingOperation(SceneBlendOperation op);
-
-        /** Sets the specific operation used to blend source and destination pixels together.
-            @remarks 
-            By default this operation is +, which creates this equation
-            <span align="center">
-            final = (texture * sourceFactor) + (pixel * destFactor)
-            </span>
-            By setting this to something other than SBO_ADD you can change the operation to achieve
-            a different effect.
-            This function allows more control over blending since it allows you to select different blending
-            modes for the color and alpha channels
-            @param op The blending operation mode to use for color channels in this pass
-            @param alphaOp The blending operation mode to use for alpha channels in this pass
-        */
-        void setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
-
-        /** Returns true if this pass uses separate scene blending operations. */
-        bool hasSeparateSceneBlendingOperations() const;
-
-        /** Returns the current blending operation */
-        SceneBlendOperation getSceneBlendingOperation() const;
-
-        /** Returns the current alpha blending operation */
-        SceneBlendOperation getSceneBlendingOperationAlpha() const;
-
         /** Returns true if this pass has some element of transparency. */
         bool isTransparent(void) const;
-
-        /** Sets whether or not this pass renders with depth-buffer checking on or not.
-        @remarks
-        If depth-buffer checking is on, whenever a pixel is about to be written to the frame buffer
-        the depth buffer is checked to see if the pixel is in front of all other pixels written at that
-        point. If not, the pixel is not written.
-        @par
-        If depth checking is off, pixels are written no matter what has been rendered before.
-        Also see setDepthFunction for more advanced depth check configuration.
-        @see
-        setDepthFunction
-        */
-        void setDepthCheckEnabled(bool enabled);
-
-        /** Returns whether or not this pass renders with depth-buffer checking on or not.
-            @see
-            setDepthCheckEnabled
-        */
-        bool getDepthCheckEnabled(void) const;
-
-        /** Sets whether or not this pass renders with depth-buffer writing on or not.
-            @remarks
-            If depth-buffer writing is on, whenever a pixel is written to the frame buffer
-            the depth buffer is updated with the depth value of that new pixel, thus affecting future
-            rendering operations if future pixels are behind this one.
-            @par
-            If depth writing is off, pixels are written without updating the depth buffer Depth writing should
-            normally be on but can be turned off when rendering static backgrounds or when rendering a collection
-            of transparent objects at the end of a scene so that they overlap each other correctly.
-        */
-        void setDepthWriteEnabled(bool enabled);
-
-        /** Returns whether or not this pass renders with depth-buffer writing on or not.
-            @see
-            setDepthWriteEnabled
-        */
-        bool getDepthWriteEnabled(void) const;
-
-        /** Sets the function used to compare depth values when depth checking is on.
-            @remarks
-            If depth checking is enabled (see setDepthCheckEnabled) a comparison occurs between the depth
-            value of the pixel to be written and the current contents of the buffer. This comparison is
-            normally CMPF_LESS_EQUAL, i.e. the pixel is written if it is closer (or at the same distance)
-            than the current contents. If you wish you can change this comparison using this method.
-        */
-        void setDepthFunction( CompareFunction func );
-        /** Returns the function used to compare depth values when depth checking is on.
-            @see
-            setDepthFunction
-        */
-        CompareFunction getDepthFunction(void) const;
 
         /** Sets whether or not colour buffer writing is enabled for this Pass.
         @remarks
@@ -835,60 +569,6 @@ namespace Ogre {
         void setColourWriteEnabled(bool enabled);
         /** Determines if colour buffer writing is enabled for this pass. */
         bool getColourWriteEnabled(void) const;
-
-        /** Sets the culling mode for this pass  based on the 'vertex winding'.
-            @remarks
-            A typical way for the rendering engine to cull triangles is based on the 'vertex winding' of
-            triangles. Vertex winding refers to the direction in which the vertices are passed or indexed
-            to in the rendering operation as viewed from the camera, and will wither be clockwise or
-            anticlockwise (that's 'counterclockwise' for you Americans out there ;) The default is
-            CULL_CLOCKWISE i.e. that only triangles whose vertices are passed/indexed in anticlockwise order
-            are rendered - this is a common approach and is used in 3D studio models for example. You can
-            alter this culling mode if you wish but it is not advised unless you know what you are doing.
-            @par
-            You may wish to use the CULL_NONE option for mesh data that you cull yourself where the vertex
-            winding is uncertain.
-        */
-        void setCullingMode( CullingMode mode );
-
-        /** Returns the culling mode for geometry rendered with this pass. See setCullingMode for more information.
-         */
-        CullingMode getCullingMode(void) const;
-
-        /** Sets the manual culling mode, performed by CPU rather than hardware.
-            @remarks
-            In some situations you want to use manual culling of triangles rather than sending the
-            triangles to the hardware and letting it cull them. This setting only takes effect on SceneManager's
-            that use it (since it is best used on large groups of planar world geometry rather than on movable
-            geometry since this would be expensive), but if used can cull geometry before it is sent to the
-            hardware.
-            @note
-            The default for this setting is MANUAL_CULL_BACK.
-            @param
-            mode The mode to use - see enum ManualCullingMode for details
-
-        */
-        void setManualCullingMode( ManualCullingMode mode );
-
-        /** Retrieves the manual culling mode for this pass
-            @see
-            setManualCullingMode
-        */
-        ManualCullingMode getManualCullingMode(void) const;
-
-        /** Sets whether or not dynamic lighting is enabled.
-            @param
-            enabled
-            If true, dynamic lighting is performed on geometry with normals supplied, geometry without
-            normals will not be displayed.
-            @par
-            If false, no lighting is applied and all geometry will be full brightness.
-        */
-        void setLightingEnabled(bool enabled);
-
-        /** Returns whether or not dynamic lighting is enabled.
-         */
-        bool getLightingEnabled(void) const;
 
         /** Sets the maximum number of lights to be used by this pass.
             @remarks
@@ -930,16 +610,6 @@ namespace Ogre {
         /** Returns the type of light shading to be used.
          */
         ShadeOptions getShadingMode(void) const;
-
-        /** Sets the type of polygon rendering required
-        @note
-        The default shading method is Solid
-        */
-        void setPolygonMode( PolygonMode mode );
-
-        /** Returns the type of light shading to be used.
-        */
-        PolygonMode getPolygonMode(void) const;
 
         /** Sets whether this pass's chosen detail level can be
             overridden (downgraded) by the camera setting. 
@@ -1025,59 +695,27 @@ namespace Ogre {
         */
         Real getFogDensity(void) const;
 
-        /** Sets the depth bias to be used for this material.
-        @remarks
-            When polygons are coplanar, you can get problems with 'depth fighting' where
-            the pixels from the two polys compete for the same screen pixel. This is particularly
-            a problem for decals (polys attached to another surface to represent details such as
-            bulletholes etc.).
-        @par
-            A way to combat this problem is to use a depth bias to adjust the depth buffer value
-            used for the decal such that it is slightly higher than the true value, ensuring that
-            the decal appears on top. There are two aspects to the biasing, a constant
-            bias value and a slope-relative biasing value, which varies according to the
-            maximum depth slope relative to the camera, ie:
-            <pre>finalBias = maxSlope * slopeScaleBias + constantBias</pre>
-            Note that slope scale bias, whilst more accurate, may be ignored by old hardware.
-            @param constantBias The constant bias value, expressed as a factor of the
-            minimum observable depth
-        @param slopeScaleBias The slope-relative bias value, expressed as a factor
-            of the depth slope
-        */
-        void setDepthBias(float constantBias, float slopeScaleBias = 0.0f);
+        /// Changes the current macroblock for a new one. Pointer can't be null
+        void setMacroblock( const HlmsMacroblock *macroblock );
 
-        /** Retrieves the const depth bias value as set by setDepthBias. */
-        float getDepthBiasConstant(void) const;
-        /** Retrieves the slope-scale depth bias value as set by setDepthBias. */
-        float getDepthBiasSlopeScale(void) const;
-        /** Sets a factor which derives an additional depth bias from the number 
-            of times a pass is iterated.
-        @remarks
-            The Final depth bias will be the constant depth bias as set through
-            setDepthBias, plus this value times the iteration number. 
+        /** Retrieves current macroblock. Don't const_cast the return value to modify it.
+            @See HlmsDatablock remarks.
         */
-        void setIterationDepthBias(float biasPerIteration);
-        /** Gets a factor which derives an additional depth bias from the number 
-            of times a pass is iterated.
-        */
-        float getIterationDepthBias() const;
+        const HlmsMacroblock* getMacroblock(void) const;
 
-        /** Sets the way the pass will have use alpha to totally reject pixels from the pipeline.
-        @remarks
-            The default is CMPF_ALWAYS_PASS i.e. alpha is not used to reject pixels.
-        @param func The comparison which must pass for the pixel to be written.
-        @param value 1 byte value against which alpha values will be tested(0-255)
-        @param alphaToCoverageEnabled Whether to enable alpha to coverage support
-        @note
-            This option applies in both the fixed function and the programmable pipeline.
+        /// Changes the current blendblock for a new one. Pointer can't be null
+        void setBlendblock( const HlmsBlendblock *blendblock );
+
+        /** Retrieves current blendblock. Don't const_cast the return value to modify it.
+            @See HlmsDatablock remarks.
         */
-        void setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverageEnabled = false);
+        const HlmsBlendblock* getBlendblock(void) const;
 
         /** Sets the alpha reject function. See setAlphaRejectSettings for more information.
         */
         void setAlphaRejectFunction(CompareFunction func);
 
-        /** Gets the alpha reject value. See setAlphaRejectSettings for more information.
+		/** Gets the alpha reject value. See setAlphaRejectSettings for more information.
         */
         void setAlphaRejectValue(unsigned char val);
 
@@ -1088,52 +726,6 @@ namespace Ogre {
         /** Gets the alpha reject value. See setAlphaRejectSettings for more information.
         */
         unsigned char getAlphaRejectValue(void) const { return mAlphaRejectVal; }
-
-        /** Sets whether to use alpha to coverage (A2C) when blending alpha rejected values. 
-        @remarks
-            Alpha to coverage performs multisampling on the edges of alpha-rejected
-            textures to produce a smoother result. It is only supported when multisampling
-            is already enabled on the render target, and when the hardware supports
-            alpha to coverage (see RenderSystemCapabilities). 
-        */
-        void setAlphaToCoverageEnabled(bool enabled);
-
-        /** Gets whether to use alpha to coverage (A2C) when blending alpha rejected values. 
-        */
-        bool isAlphaToCoverageEnabled() const { return mAlphaToCoverageEnabled; }
-
-        /** Sets whether or not transparent sorting is enabled.
-        @param enabled
-            If false depth sorting of this material will be disabled.
-        @remarks
-            By default all transparent materials are sorted such that renderables furthest
-            away from the camera are rendered first. This is usually the desired behaviour
-            but in certain cases this depth sorting may be unnecessary and undesirable. If
-            for example it is necessary to ensure the rendering order does not change from
-            one frame to the next.
-        @note
-            This will have no effect on non-transparent materials.
-        */
-        void setTransparentSortingEnabled(bool enabled);
-
-        /** Returns whether or not transparent sorting is enabled.
-        */
-        bool getTransparentSortingEnabled(void) const;
-
-        /** Sets whether or not transparent sorting is forced.
-        @param enabled
-            If true depth sorting of this material will be depend only on the value of
-            getTransparentSortingEnabled().
-        @remarks
-            By default even if transparent sorting is enabled, depth sorting will only be
-            performed when the material is transparent and depth write/check are disabled.
-            This function disables these extra conditions.
-        */
-        void setTransparentSortingForced(bool enabled);
-
-        /** Returns whether or not transparent sorting is forced.
-        */
-        bool getTransparentSortingForced(void) const;
 
         /** Sets whether or not this pass should iterate per light or number of
             lights which can affect the object being rendered.
@@ -1389,19 +981,6 @@ namespace Ogre {
         /** Gets the geometry program used by this pass, only available after _load(). */
         const GpuProgramPtr& getGeometryProgram(void) const;
 
-        /** Splits this Pass to one which can be handled in the number of
-            texture units specified.
-        @remarks
-            Only works on non-programmable passes, programmable passes cannot be
-            split, it's up to the author to ensure that there is a fallback Technique
-            for less capable cards.
-        @param numUnits The target number of texture units
-        @return A new Pass which contains the remaining units, and a scene_blend
-                setting appropriate to approximate the multitexture. This Pass will be
-                attached to the parent Technique of this Pass.
-        */
-        Pass* _split(unsigned short numUnits);
-
         /** Internal method to adjust pass index. */
         void _notifyIndex(unsigned short index);
 
@@ -1415,25 +994,6 @@ namespace Ogre {
         void _unload(void);
         /// Is this loaded?
         bool isLoaded(void) const;
-
-        /** Gets the 'hash' of this pass, ie a precomputed number to use for sorting
-            @remarks
-            This hash is used to sort passes, and for this reason the pass is hashed
-            using firstly its index (so that all passes are rendered in order), then
-            by the textures which it's TextureUnitState instances are using.
-        */
-        uint32 getHash(void) const { return mHash; }
-        /// Mark the hash as dirty
-        void _dirtyHash(void);
-        /** Internal method for recalculating the hash.
-        @remarks
-            Do not call this unless you are sure the old hash is not still being
-            used by anything. If in doubt, call _dirtyHash if you want to force
-            recalculation of the has next time.
-        */
-        void _recalculateHash(void);
-        /** Tells the pass that it needs recompilation. */
-        void _notifyNeedsRecompile(void);
 
         /** Update automatic parameters.
         @param source The source of the parameters
@@ -1468,45 +1028,6 @@ namespace Ogre {
             @see TextureUnitState::setTextureAnisotropy
         */
         void setTextureAnisotropy(unsigned int maxAniso);
-        /** If set to true, this forces normals to be normalised dynamically 
-            by the hardware for this pass.
-        @remarks
-            This option can be used to prevent lighting variations when scaling an
-            object - normally because this scaling is hardware based, the normals 
-            get scaled too which causes lighting to become inconsistent. By default the
-            SceneManager detects scaled objects and does this for you, but 
-            this has an overhead so you might want to turn that off through
-            SceneManager::setNormaliseNormalsOnScale(false) and only do it per-Pass
-            when you need to.
-        */
-        void setNormaliseNormals(bool normalise) { mNormaliseNormals = normalise; }
-
-        /** Returns true if this pass has auto-normalisation of normals set. */
-        bool getNormaliseNormals(void) const {return mNormaliseNormals; }
-
-        /** Static method to retrieve all the Passes which need their
-            hash values recalculated.
-        */
-        static const PassSet& getDirtyHashList(void)
-        { return msDirtyHashList; }
-        /** Static method to retrieve all the Passes which are pending deletion.
-         */
-        static const PassSet& getPassGraveyard(void)
-        { return msPassGraveyard; }
-        /** Static method to reset the list of passes which need their hash
-            values recalculated.
-        @remarks
-            For performance, the dirty list is not updated progressively as
-            the hashes are recalculated, instead we expect the processor of the
-            dirty hash list to clear the list when they are done.
-        */
-        static void clearDirtyHashList(void);
-
-        /** Process all dirty and pending deletion passes. */
-        static void processPendingPassUpdates(void);
-
-        /** Queue this pass for deletion when appropriate. */
-        void queueForDeletion(void);
 
         /** Returns whether this pass is ambient only.
          */
@@ -1598,78 +1119,6 @@ namespace Ogre {
             bounding the area covered by the light.
         */
         bool getLightClipPlanesEnabled() const { return mLightClipPlanes; }
-
-        /** Manually set which illumination stage this pass is a member of.
-        @remarks
-            When using an additive lighting mode (SHADOWTYPE_STENCIL_ADDITIVE or
-            SHADOWTYPE_TEXTURE_ADDITIVE), the scene is rendered in 3 discrete
-            stages, ambient (or pre-lighting), per-light (once per light, with 
-            shadowing) and decal (or post-lighting). Usually OGRE figures out how
-            to categorise your passes automatically, but there are some effects you
-            cannot achieve without manually controlling the illumination. For example
-            specular effects are muted by the typical sequence because all textures
-            are saved until the IS_DECAL stage which mutes the specular effect. 
-            Instead, you could do texturing within the per-light stage if it's
-            possible for your material and thus add the specular on after the
-            decal texturing, and have no post-light rendering. 
-        @par
-            If you assign an illumination stage to a pass you have to assign it
-            to all passes in the technique otherwise it will be ignored. Also note
-            that whilst you can have more than one pass in each group, they cannot
-            alternate, ie all ambient passes will be before all per-light passes, 
-            which will also be before all decal passes. Within their categories
-            the passes will retain their ordering though.
-        */
-        void setIlluminationStage(IlluminationStage is) { mIlluminationStage = is; }
-        /// Get the manually assigned illumination stage, if any
-        IlluminationStage getIlluminationStage() const { return mIlluminationStage; }
-        /** There are some default hash functions used to order passes so that
-            render state changes are minimised, this enumerates them.
-        */
-        enum BuiltinHashFunction
-        {
-            /** Try to minimise the number of texture changes. */
-            MIN_TEXTURE_CHANGE,
-            /** Try to minimise the number of GPU program changes.
-            @note Only really useful if you use GPU programs for all of your
-                materials. 
-            */
-            MIN_GPU_PROGRAM_CHANGE
-        };
-        /** Sets one of the default hash functions to be used.
-        @remarks
-            You absolutely must not change the hash function whilst any Pass instances
-            exist in the render queue. The only time you can do this is either
-            before you render anything, or directly after you manuall call
-            RenderQueue::clear(true) to completely destroy the queue structures.
-            The default is MIN_TEXTURE_CHANGE.
-        @note
-            You can also implement your own hash function, see the alternate version
-            of this method.
-        @see HashFunc
-        */
-        static void setHashFunction(BuiltinHashFunction builtin);
-
-        /** Set the hash function used for all passes.
-        @remarks
-            You absolutely must not change the hash function whilst any Pass instances
-            exist in the render queue. The only time you can do this is either
-            before you render anything, or directly after you manuall call
-            RenderQueue::clear(true) to completely destroy the queue structures.
-        @note
-            You can also use one of the built-in hash functions, see the alternate version
-            of this method. The default is MIN_TEXTURE_CHANGE.
-        @see HashFunc
-        */
-        static void setHashFunction(HashFunc* hashFunc) { msHashFunc = hashFunc; }
-
-        /** Get the hash function used for all passes.
-        */
-        static HashFunc* getHashFunction(void) { return msHashFunc; }
-
-        /** Get the builtin hash function.
-        */
-        static HashFunc* getBuiltinHashFunction(BuiltinHashFunction builtin);
 
         /** Return an instance of user objects binding associated with this class.
         You can use it to associate one or more custom objects with this class instance.
@@ -1771,30 +1220,6 @@ namespace Ogre {
         /** Gets the Tessellation EHull program used by this pass, only available after _load(). */
         const GpuProgramPtr& getComputeProgram(void) const;
     };
-
-    /** Struct recording a pass which can be used for a specific illumination stage.
-        @remarks
-        This structure is used to record categorised passes which fit into a
-        number of distinct illumination phases - ambient, diffuse / specular
-        (per-light) and decal (post-lighting texturing).
-        An original pass may fit into one of these categories already, or it
-        may require splitting into its component parts in order to be categorised
-        properly.
-    */
-    struct IlluminationPass : public PassAlloc
-    {
-        IlluminationStage stage;
-        /// The pass to use in this stage
-        Pass* pass;
-        /// Whether this pass is one which should be deleted itself
-        bool destroyOnShutdown;
-        /// The original pass which spawned this one
-        Pass* originalPass;
-
-        IlluminationPass() {}
-    };
-
-    typedef vector<IlluminationPass*>::type IlluminationPassList;
 
     /** @} */
     /** @} */

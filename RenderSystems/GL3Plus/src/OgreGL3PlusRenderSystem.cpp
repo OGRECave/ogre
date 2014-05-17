@@ -343,7 +343,6 @@ namespace Ogre {
 
         // Blending support
         rsc->setCapability(RSC_BLENDING);
-        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
         // Check for non-power-of-2 texture support
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
@@ -1479,10 +1478,6 @@ namespace Ogre {
         mColourWrite[1] = blue;
         mColourWrite[2] = green;
         mColourWrite[3] = alpha;
-    }
-
-    void GL3PlusRenderSystem::_setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end)
-    {
     }
 
     void GL3PlusRenderSystem::_convertProjectionMatrix(const Matrix4& matrix,

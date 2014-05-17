@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "OgreRenderQueue.h"
 
 #include "OgreMaterial.h"
-#include "OgreRenderQueueSortingGrouping.h"
 #include "OgrePass.h"
 #include "OgreMaterialManager.h"
 #include "OgreSceneManager.h"

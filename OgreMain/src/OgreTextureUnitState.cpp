@@ -80,12 +80,6 @@ namespace Ogre {
         mAlphaBlendMode.source2 = LBS_CURRENT;
         setColourOperation(LBO_MODULATE);
         setTextureAddressingMode(TAM_WRAP);
-
-        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-        {
-            mParent->_dirtyHash();
-        }
-
     }
 
     //-----------------------------------------------------------------------
@@ -139,12 +133,6 @@ namespace Ogre {
 
         setTextureName(texName);
         setTextureCoordSet(texCoordSet);
-
-        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-        {
-            mParent->_dirtyHash();
-        }
-
     }
     //-----------------------------------------------------------------------
     TextureUnitState::~TextureUnitState()
@@ -179,12 +167,6 @@ namespace Ogre {
         if (isLoaded())
         {
             _load();
-        }
-
-        // Tell parent to recalculate hash
-        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-        {
-            mParent->_dirtyHash();
         }
 
         return *this;
@@ -230,13 +212,7 @@ namespace Ogre {
             {
                 _load(); // reload
             }
-            // Tell parent to recalculate hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
-            }
         }
-
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTexture( const TexturePtr& texPtr)
@@ -271,11 +247,6 @@ namespace Ogre {
             if (isLoaded())
             {
                 _load(); // reload
-            }
-            // Tell parent to recalculate hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
             }
         }
     }
@@ -367,8 +338,6 @@ namespace Ogre {
             mFrames[i] = names[i];
             mFramePtrs[i].setNull();
         }
-        // Tell parent we need recompiling, will cause reload too
-        mParent->_notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setCubicTexture( const TexturePtr* const texPtrs, bool forUVW )
@@ -388,8 +357,6 @@ namespace Ogre {
             mFrames[i] = texPtrs[i]->getName();
             mFramePtrs[i] = texPtrs[i];
         }
-        // Tell parent we need recompiling, will cause reload too
-        mParent->_notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::isCubic(void) const
@@ -422,11 +389,6 @@ namespace Ogre {
             {
                 _load(); // reload
             }
-            // Tell parent to recalculate hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
-            }
         }
         else // raise exception for frameNumber out of bounds
         {
@@ -450,13 +412,7 @@ namespace Ogre {
         {
             _load();
         }
-        // Tell parent to recalculate hash
-        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-        {
-            mParent->_dirtyHash();
-        }
     }
-
     //-----------------------------------------------------------------------
     void TextureUnitState::deleteFrameTextureName(const size_t frameNumber)
     {
@@ -469,11 +425,6 @@ namespace Ogre {
             if (isLoaded())
             {
                 _load();
-            }
-            // Tell parent to recalculate hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
             }
         }
         else
@@ -516,12 +467,6 @@ namespace Ogre {
         {
             _load();
         }
-        // Tell parent to recalculate hash
-        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-        {
-            mParent->_dirtyHash();
-        }
-
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setAnimatedTextureName(const String* const names, unsigned int numFrames, Real duration)
@@ -547,11 +492,6 @@ namespace Ogre {
         {
             _load();
         }
-        // Tell parent to recalculate hash
-        if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-        {
-            mParent->_dirtyHash();
-        }
     }
     //-----------------------------------------------------------------------
     std::pair< size_t, size_t > TextureUnitState::getTextureDimensions( unsigned int frame ) const
@@ -570,11 +510,6 @@ namespace Ogre {
         if (frameNumber < mFrames.size())
         {
             mCurrentFrame = frameNumber;
-            // this will affect the hash
-            if( Pass::getHashFunction() == Pass::getBuiltinHashFunction( Pass::MIN_TEXTURE_CHANGE ) )
-            {
-                mParent->_dirtyHash();
-            }
         }
         else
         {
@@ -1443,11 +1378,6 @@ namespace Ogre {
     bool TextureUnitState::isLoaded(void) const
     {
         return mParent->isLoaded();
-    }
-    //-----------------------------------------------------------------------
-    void TextureUnitState::_notifyNeedsRecompile(void)
-    {
-        mParent->_notifyNeedsRecompile();
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::hasViewRelativeTextureCoordinateGeneration(void) const

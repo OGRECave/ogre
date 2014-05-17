@@ -42,19 +42,6 @@ namespace Ogre {
     /** \addtogroup Materials
     *  @{
     */
-    /** Enum to identify material sections. */
-    enum MaterialScriptSection
-    {
-        MSS_NONE,
-        MSS_MATERIAL,
-        MSS_TECHNIQUE,
-        MSS_PASS,
-        MSS_TEXTUREUNIT,
-        MSS_PROGRAM_REF,
-        MSS_PROGRAM,
-        MSS_DEFAULT_PARAMETERS,
-        MSS_TEXTURESOURCE
-    };
     /** Struct for holding a program definition which is in progress. */
     struct MaterialScriptProgramDefinition
     {
@@ -69,34 +56,6 @@ namespace Ogre {
         bool usesVertexTextureFetch;
         vector<std::pair<String, String> >::type customParameters;
     };
-    /** Struct for holding the script context while parsing. */
-    struct MaterialScriptContext 
-    {
-        MaterialScriptSection section;
-        String groupName;
-        MaterialPtr material;
-        Technique* technique;
-        Pass* pass;
-        TextureUnitState* textureUnit;
-        GpuProgramPtr program; /// Used when referencing a program, not when defining it
-        bool isVertexProgramShadowCaster; /// When referencing, are we in context of shadow caster
-        bool isFragmentProgramShadowCaster; /// When referencing, are we in context of shadow caster
-        GpuProgramParametersSharedPtr programParams;
-        ushort numAnimationParametrics;
-        MaterialScriptProgramDefinition* programDef; /// This is used while defining a program
-
-        int techLev,    //Keep track of what tech, pass, and state level we are in
-            passLev,
-            stateLev;
-        StringVector defaultParamLines;
-
-        /// Error reporting state
-        size_t lineNo;
-        String filename;
-        AliasTextureNamePairList textureAliases;
-    };
-    /// Function def for material attribute parser; return value determines if the next line should be {
-    typedef bool (*ATTRIBUTE_PARSER)(String& params, MaterialScriptContext& context);
 
     /** Class for serializing Materials to / from a .material script.*/
     class _OgreExport MaterialSerializer : public SerializerAlloc
@@ -197,44 +156,11 @@ namespace Ogre {
         };
 
     protected:
-        /// Keyword-mapped attribute parsers.
-        typedef map<String, ATTRIBUTE_PARSER>::type AttribParserList;
-
-        MaterialScriptContext mScriptContext;
-
-        /** internal method for parsing a material
-        @return true if it expects the next line to be a {
-        */
-        bool parseScriptLine(String& line);
-        /** internal method for finding & invoking an attribute parser. */
-        bool invokeParser(String& line, AttribParserList& parsers);
-        /** Internal method for saving a program definition which has been
-            built up.
-        */
-        void finishProgramDefinition(void);
-        /// Parsers for the root of the material script
-        AttribParserList mRootAttribParsers;
-        /// Parsers for the material section of a script
-        AttribParserList mMaterialAttribParsers;
-        /// Parsers for the technique section of a script
-        AttribParserList mTechniqueAttribParsers;
-        /// Parsers for the pass section of a script
-        AttribParserList mPassAttribParsers;
-        /// Parsers for the texture unit section of a script
-        AttribParserList mTextureUnitAttribParsers;
-        /// Parsers for the program reference section of a script
-        AttribParserList mProgramRefAttribParsers;
-        /// Parsers for the program definition section of a script
-        AttribParserList mProgramAttribParsers;
-        /// Parsers for the program definition section of a script
-        AttribParserList mProgramDefaultParamAttribParsers;
-
         /// Listeners list of this Serializer.
         typedef vector<Listener*>::type         ListenerList;
         typedef ListenerList::iterator          ListenerListIterator;
         typedef ListenerList::const_iterator    ListenerListConstIterator;
         ListenerList mListeners;
-
 
         void writeMaterial(const MaterialPtr& pMat, const String& materialName = "");
         void writeTechnique(const Technique* pTech);
@@ -356,10 +282,6 @@ namespace Ogre {
         const String &getQueuedAsString() const;
         /** Clears the internal buffer */
         void clearQueue();
-
-        /** Parses a Material script file passed as a stream.
-        */
-        void parseScript(DataStreamPtr& stream, const String& groupName);
 
         /** Register a listener to this Serializer.
         @see MaterialSerializer::Listener

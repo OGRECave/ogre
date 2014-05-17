@@ -41,7 +41,6 @@ Torus Knot Software Ltd.
 #include "OgreAutoParamDataSource.h"
 #include "OgreAnimationState.h"
 #include "OgreRenderQueue.h"
-#include "OgreRenderQueueSortingGrouping.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreShadowTextureManager.h"
 #include "OgreInstanceManager.h"
@@ -399,35 +398,6 @@ namespace Ogre {
                         { (void)source; }
         };
 
-        /** Inner helper class to implement the visitor pattern for rendering objects
-            in a queue. 
-        */
-        class _OgreExport SceneMgrQueuedRenderableVisitor : public QueuedRenderableVisitor
-        {
-        protected:
-            /// Pass that was actually used at the grouping level
-            const Pass* mUsedPass;
-        public:
-            SceneMgrQueuedRenderableVisitor() 
-                :transparentShadowCastersMode(false) {}
-            ~SceneMgrQueuedRenderableVisitor() {}
-            void visit(Renderable* r);
-            bool visit(const Pass* p);
-            void visit(RenderablePass* rp);
-
-            /// Target SM to send renderables to
-            SceneManager* targetSceneMgr;
-            /// Are we in transparent shadow caster mode?
-            bool transparentShadowCastersMode;
-            /// Automatic light handling?
-            bool autoLights;
-            /// Scissoring if requested?
-            bool scissoring;
-
-        };
-        /// Allow visitor helper to access protected methods
-        friend class SceneMgrQueuedRenderableVisitor;
-
     protected:
         /// Subclasses can override this to ensure their specialised SceneNode is used.
         virtual SceneNode* createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType );
@@ -576,7 +546,6 @@ namespace Ogre {
         bool mResetIdentityView;
         bool mResetIdentityProj;
 
-        bool mNormaliseNormalsOnScale;
         bool mFlipCullingOnNegativeScale;
         CullingMode mPassCullingMode;
 
@@ -732,10 +701,6 @@ namespace Ogre {
         /** Flag that indicates if all of the scene node's bounding boxes should be shown as a wireframe. */
         bool mShowBoundingBoxes;      
 
-        /** Internal method for rendering all objects using the default queue sequence. */
-        virtual void renderVisibleObjectsDefaultSequence(void);
-        /** Internal method for rendering all objects using a custom queue sequence. */
-        virtual void renderVisibleObjectsCustomSequence(RenderQueueInvocationSequence* s);
         /** Internal method for preparing the render queue for use with each render. */
         virtual void prepareRenderQueue(void);
 
@@ -947,28 +912,6 @@ namespace Ogre {
         /// Suppress render state changes?
         bool mSuppressRenderStateChanges;
 
-        GpuProgramParametersSharedPtr mInfiniteExtrusionParams;
-        GpuProgramParametersSharedPtr mFiniteExtrusionParams;
-        /** Render a group in the ordinary way */
-        virtual_l1 void renderBasicQueueGroupObjects(RenderQueueGroup* pGroup, 
-            QueuedRenderableCollection::OrganisationMode om);
-        /** Render a group rendering only shadow casters. */
-        virtual_l1 void renderTextureShadowCasterQueueGroupObjects(RenderQueueGroup* group, 
-            QueuedRenderableCollection::OrganisationMode om);
-
-        /** Render a set of objects, see renderSingleObject for param definitions */
-        virtual_l1 void renderObjects(const QueuedRenderableCollection& objs, 
-            QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
-            bool doLightIteration);
-        /** Render those objects in the transparent pass list which have shadow casting forced on
-        @remarks
-            This function is intended to be used to render the shadows of transparent objects which have
-            transparency_casts_shadows set to 'on' in their material
-        */
-        virtual_l1 void renderTransparentShadowCasterObjects(const QueuedRenderableCollection& objs, 
-            QueuedRenderableCollection::OrganisationMode om, bool lightScissoringClipping,
-            bool doLightIteration);
-
         /// Set up a scissor rectangle from a group of lights
         virtual ClipResult buildAndSetScissor(const LightList& ll, const Camera* cam);
         /// Update a scissor rectangle from a single light
@@ -979,11 +922,6 @@ namespace Ogre {
         virtual void buildLightClip(const Light* l, PlaneList& planes);
         virtual void resetLightClip();
         virtual void checkCachedLightClippingInfo();
-
-        /// The active renderable visitor class - subclasses could override this
-        SceneMgrQueuedRenderableVisitor* mActiveQueuedRenderableVisitor;
-        /// Storage for default renderable visitor
-        SceneMgrQueuedRenderableVisitor mDefaultQueuedRenderableVisitor;
 
         /// Whether to use camera-relative rendering
         Matrix4 mCachedViewMatrix;
@@ -1708,10 +1646,6 @@ namespace Ogre {
             Uses the internally stored AnimationState objects to apply animation to SceneNodes.
         */
         virtual void _applySceneAnimations(void);
-
-        /** Sends visible objects found during _cullPhase01 to the rendering engine.
-        */
-        virtual void _renderVisibleObjects(void);
 
         /// @See CompositorShadowNode remarks
         void _swapVisibleObjectsForShadowMapping();
@@ -2825,21 +2759,6 @@ namespace Ogre {
         */
         virtual bool getFindVisibleObjects(void) { return mFindVisibleObjects; }
 
-        /** Set whether to automatically normalise normals on objects whenever they
-            are scaled.
-        @remarks
-            Scaling can distort normals so the default behaviour is to compensate
-            for this, but it has a cost. If you would prefer to manually manage 
-            this, set this option to 'false' and use Pass::setNormaliseNormals
-            only when needed.
-        */
-        virtual void setNormaliseNormalsOnScale(bool n) { mNormaliseNormalsOnScale = n; }
-
-        /** Get whether to automatically normalise normals on objects whenever they
-            are scaled.
-        */
-        virtual bool getNormaliseNormalsOnScale() const { return mNormaliseNormalsOnScale; }
-
         /** Set whether to automatically flip the culling mode on objects whenever they
             are negatively scaled.
         @remarks
@@ -2916,33 +2835,6 @@ namespace Ogre {
                 current dirty state.
         */
         virtual void _markGpuParamsDirty(uint16 mask);
-
-        /** Render the objects in a given queue group 
-        @remarks You should only call this from a RenderQueueInvocation implementation
-        */
-        virtual void _renderQueueGroupObjects(RenderQueueGroup* group, 
-            QueuedRenderableCollection::OrganisationMode om);
-
-        /** Advanced method for supplying an alternative visitor, used for parsing the
-            render queues and sending the results to the renderer.
-        @remarks
-            You can use this method to insert your own implementation of the 
-            QueuedRenderableVisitor interface, which receives calls as the queued
-            renderables are parsed in a given order (determined by RenderQueueInvocationSequence)
-            and are sent to the renderer. If you provide your own implementation of
-            this visitor, you are responsible for either calling the rendersystem, 
-            or passing the calls on to the base class implementation.
-        @note
-            Ownership is not taken of this pointer, you are still required to 
-            delete it yourself once you're finished.
-        @param visitor Your implementation of SceneMgrQueuedRenderableVisitor. 
-            If you pass 0, the default implementation will be used.
-        */
-        void setQueuedRenderableVisitor(SceneMgrQueuedRenderableVisitor* visitor);
-
-        /** Gets the current visitor object which processes queued renderables. */
-        SceneMgrQueuedRenderableVisitor* getQueuedRenderableVisitor(void) const;
-
 
         /** Get the rendersystem subclass to which the output of this Scene Manager
             gets sent

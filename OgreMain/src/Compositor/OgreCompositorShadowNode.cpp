@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
+#include "OgrePass.h"
 
 #include "OgreShadowCameraSetupFocused.h"
 #include "OgreShadowCameraSetupPSSM.h"

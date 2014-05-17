@@ -97,7 +97,7 @@ namespace Ogre {
         };
 
         /** Inner class for displaying debug renderable for Node. */
-        class DebugRenderable : public Renderable, public NodeAlloc
+        /*class DebugRenderable : public Renderable, public NodeAlloc
         {
         protected:
             Node* mParent;
@@ -114,7 +114,7 @@ namespace Ogre {
             const LightList& getLights(void) const;
             void setScaling(Real s) { mScaling = s; }
 
-        };
+        };*/
 
     protected:
         /// Depth level in the hierarchy tree (0: Root node, 1: Child of root, etc)
@@ -164,8 +164,6 @@ namespace Ogre {
 
         /// The memory manager used to allocate the Transform.
         NodeMemoryManager *mNodeMemoryManager;
-
-        DebugRenderable* mDebug;
 
         /// User objects binding.
         UserObjectBindings mUserObjectBindings;
@@ -689,9 +687,6 @@ namespace Ogre {
 
         /** Helper function, get the squared view depth.  */
         virtual Real getSquaredViewDepth(const Camera* cam) const;
-
-        /** Get a debug renderable for rendering the Node.  */
-        virtual DebugRenderable* getDebugRenderable(Real scaling);
 
         /** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
             Sets any kind of user value on this object.

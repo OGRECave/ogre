@@ -205,6 +205,7 @@ namespace Ogre {
     struct HlmsBlendblock;
     struct HlmsCache;
     class HlmsDatablock;
+    class HlmsLowLevel;
     struct HlmsMacroblock;
     class HlmsManager;
     class HlmsTextureManager;
@@ -279,9 +280,6 @@ namespace Ogre {
     class Renderable;
     class RenderPriorityGroup;
     class RenderQueue;
-    class RenderQueueGroup;
-    class RenderQueueInvocation;
-    class RenderQueueInvocationSequence;
     class RenderQueueListener;
     class RenderObjectListener;
     class RenderSystem;

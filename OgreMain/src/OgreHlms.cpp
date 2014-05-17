@@ -111,6 +111,12 @@ namespace Ogre
     Hlms::~Hlms()
     {
         destroyAllDatablocks();
+
+        if( mHlmsManager )
+        {
+            mHlmsManager->unregisterHlms( mType );
+            mHlmsManager = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     void Hlms::setCommonProperties(void)

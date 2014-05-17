@@ -203,6 +203,7 @@ namespace Ogre
         macroblock.mDepthWrite = false;
         if (blendByAlpha)
         {
+            //Alpha blending
             blendblock.mSourceBlendFactor       = SBF_SOURCE_ALPHA;
             blendblock.mSourceBlendFactor       = SBF_SOURCE_ALPHA;
             blendblock.mDestBlendFactor         = SBF_ONE_MINUS_SOURCE_ALPHA;
@@ -210,6 +211,7 @@ namespace Ogre
         }
         else
         {
+            //Add
             blendblock.mSourceBlendFactor       = SBF_ONE;
             blendblock.mSourceBlendFactor       = SBF_ONE;
             blendblock.mDestBlendFactor         = SBF_ONE;
@@ -234,18 +236,6 @@ namespace Ogre
         texLayer->setTextureAddressingMode( TextureUnitState::TAM_CLAMP );
         // Allow min/mag filter, but no mip
         texLayer->setTextureFiltering(FO_LINEAR, FO_LINEAR, FO_NONE);
-
-
-        // Set up blending
-        if (blendByAlpha)
-        {
-            mMaterial->setSceneBlending( SBT_TRANSPARENT_ALPHA );
-        }
-        else
-        {
-            // Use add if no alpha (assume black background)
-            mMaterial->setSceneBlending(SBT_ADD);
-        }
     }
     //---------------------------------------------------------------------
     void Font::unloadImpl()

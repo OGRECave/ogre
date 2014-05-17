@@ -1742,14 +1742,6 @@ bail:
     {
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setShadingType( ShadeOptions so )
-    {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setLightingEnabled( bool enabled )
-    {
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setViewMatrix( const Matrix4 &m )
     {
     }
@@ -2015,10 +2007,6 @@ bail:
             val |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
 
         mBlendDesc.RenderTarget[0].RenderTargetWriteMask = val; 
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setFog( FogMode mode, const ColourValue& colour, Real densitiy, Real start, Real end )
-    {
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setPolygonMode(PolygonMode level)
@@ -3106,10 +3094,6 @@ bail:
 
             break;
         }
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setNormaliseNormals(bool normalise)
-    {
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::bindGpuProgram(GpuProgram* prg)

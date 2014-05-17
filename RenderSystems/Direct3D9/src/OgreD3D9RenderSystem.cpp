@@ -1723,22 +1723,6 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::setShadingType( ShadeOptions so )
-    {
-        HRESULT hr = __SetRenderState( D3DRS_SHADEMODE, D3D9Mappings::get(so) );
-        if( FAILED( hr ) )
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-            "Failed to set render stat D3DRS_SHADEMODE", "D3D9RenderSystem::setShadingType" );
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::setLightingEnabled( bool enabled )
-    {
-        HRESULT hr;
-        if( FAILED( hr = __SetRenderState( D3DRS_LIGHTING, enabled ) ) )
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-            "Failed to set render state D3DRS_LIGHTING", "D3D9RenderSystem::setLightingEnabled" );
-    }
-    //---------------------------------------------------------------------
     void D3D9RenderSystem::setD3D9Light( size_t index, const Light* lt )
     {
         HRESULT hr;
@@ -2660,46 +2644,6 @@ namespace Ogre
             "D3D9RenderSystem::_setColourBufferWriteEnabled");
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setFog( FogMode mode, const ColourValue& colour, Real densitiy, Real start, Real end )
-    {
-        HRESULT hr;
-
-        D3DRENDERSTATETYPE fogType, fogTypeNot;
-
-        if (mDeviceManager->getActiveDevice()->getD3D9DeviceCaps().RasterCaps & D3DPRASTERCAPS_FOGTABLE)
-        {
-            fogType = D3DRS_FOGTABLEMODE;
-            fogTypeNot = D3DRS_FOGVERTEXMODE;
-        }
-        else
-        {
-            fogType = D3DRS_FOGVERTEXMODE;
-            fogTypeNot = D3DRS_FOGTABLEMODE;
-        }
-
-        if( mode == FOG_NONE)
-        {
-            // just disable
-            hr = __SetRenderState(fogType, D3DFOG_NONE );
-            hr = __SetRenderState(D3DRS_FOGENABLE, FALSE);
-        }
-        else
-        {
-            // Allow fog
-            hr = __SetRenderState( D3DRS_FOGENABLE, TRUE );
-            hr = __SetRenderState( fogTypeNot, D3DFOG_NONE );
-            hr = __SetRenderState( fogType, D3D9Mappings::get(mode) );
-
-            hr = __SetRenderState( D3DRS_FOGCOLOR, colour.getAsARGB() );
-            hr = __SetFloatRenderState( D3DRS_FOGSTART, start );
-            hr = __SetFloatRenderState( D3DRS_FOGEND, end );
-            hr = __SetFloatRenderState( D3DRS_FOGDENSITY, densitiy );
-        }
-
-        if( FAILED( hr ) )
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting render state", "D3D9RenderSystem::_setFog" );
-    }
-    //---------------------------------------------------------------------
     void D3D9RenderSystem::_setPolygonMode(PolygonMode level)
     {
         HRESULT hr = __SetRenderState(D3DRS_FILLMODE, D3D9Mappings::get(level));
@@ -3529,12 +3473,6 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to DrawPrimitive : " + msg, "D3D9RenderSystem::_render" );
         }
 
-    }
-    //---------------------------------------------------------------------
-    void D3D9RenderSystem::setNormaliseNormals(bool normalise)
-    {
-        __SetRenderState(D3DRS_NORMALIZENORMALS, 
-            normalise ? TRUE : FALSE);
     }
     //---------------------------------------------------------------------
     void D3D9RenderSystem::bindGpuProgram(GpuProgram* prg)

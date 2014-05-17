@@ -31,16 +31,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreMath.h"
 
-// Dependencies on render-related types due to ability to render node
-#include "OgreMaterialManager.h"
-#include "OgreMeshManager.h"
-#include "OgreMesh.h"
-#include "OgreSubMesh.h"
-#include "OgreCamera.h"
-#include "OgreTechnique.h"
-#include "OgrePass.h"
-#include "OgreManualObject.h"
-
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreBooleanMask.h"
 
@@ -62,7 +52,6 @@ namespace Ogre {
 #endif
         mListener( 0 ),
         mNodeMemoryManager( nodeMemoryManager ),
-        mDebug( 0 ),
         mGlobalIndex( -1 ),
         mParentIndex( -1 )
     {
@@ -86,7 +75,6 @@ namespace Ogre {
 #endif
         mListener( 0 ),
         mNodeMemoryManager( 0 ),
-        mDebug( 0 ),
         mGlobalIndex( -1 ),
         mParentIndex( -1 )
     {
@@ -95,9 +83,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Node::~Node()
     {
-        OGRE_DELETE mDebug;
-        mDebug = 0;
-
         // Call listener (note, only called if there's something to do)
         if( mListener )
         {
@@ -771,18 +756,8 @@ namespace Ogre {
     }
 #endif
     //---------------------------------------------------------------------
-    Node::DebugRenderable* Node::getDebugRenderable(Real scaling)
-    {
-        if (!mDebug)
-        {
-            mDebug = OGRE_NEW DebugRenderable(this);
-        }
-        mDebug->setScaling(scaling);
-        return mDebug;
-    }
     //---------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    Node::DebugRenderable::DebugRenderable(Node* parent)
+    /*Node::DebugRenderable::DebugRenderable(Node* parent)
         : mParent(parent)
     {
         String matName = "Ogre/Debug/AxesMat";
@@ -804,11 +779,11 @@ namespace Ogre {
         if (mMeshPtr.isNull())
         {
             ManualObject mo( 0, 0 );
-            mo.begin(mMat->getName());
+            mo.begin(mMat->getName());*/
             /* 3 axes, each made up of 2 of these (base plane = XY)
              *   .------------|\
              *   '------------|/
-             */
+             *//*
             mo.estimateVertexCount(7 * 2 * 3);
             mo.estimateIndexCount(3 * 2 * 3);
             Quaternion quat[6];
@@ -912,7 +887,7 @@ namespace Ogre {
         // Nodes should not be lit by the scene, this will not get called
         static LightList ll;
         return ll;
-    }
+    }*/
 }
 
 #undef CACHED_TRANSFORM_OUT_OF_DATE

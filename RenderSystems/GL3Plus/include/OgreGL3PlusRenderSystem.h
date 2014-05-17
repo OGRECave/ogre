@@ -209,14 +209,6 @@ namespace Ogre {
             RenderSystem
         */
         void setAmbientLight(float r, float g, float b) { };   // Not supported
-        /** See
-            RenderSystem
-        */
-        void setShadingType(ShadeOptions so) { };   // Not supported
-        /** See
-            RenderSystem
-        */
-        void setLightingEnabled(bool enabled) { };   // Not supported
 
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height,
@@ -248,10 +240,6 @@ namespace Ogre {
             RenderSystem
         */
         VertexElementType getColourVertexElementType(void) const;
-        /** See
-            RenderSystem
-        */
-        void setNormaliseNormals(bool normalise) { };   // Not supported
 
         // -----------------------------
         // Low-level overridden members
@@ -388,10 +376,6 @@ namespace Ogre {
             RenderSystem
         */
         void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
-        /** See
-            RenderSystem
-        */
-        void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end);
         /** See
             RenderSystem
         */

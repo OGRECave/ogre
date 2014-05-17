@@ -51,7 +51,23 @@ namespace Ogre
         bool                mDepthCheck;
         bool                mDepthWrite;
         CompareFunction     mDepthFunc;
+
+        /// When polygons are coplanar, you can get problems with 'depth fighting' where
+        /// the pixels from the two polys compete for the same screen pixel. This is particularly
+        /// a problem for decals (polys attached to another surface to represent details such as
+        /// bulletholes etc.).
+        ///
+        /// A way to combat this problem is to use a depth bias to adjust the depth buffer value
+        /// used for the decal such that it is slightly higher than the true value, ensuring that
+        /// the decal appears on top. There are two aspects to the biasing, a constant
+        /// bias value and a slope-relative biasing value, which varies according to the
+        ///  maximum depth slope relative to the camera, ie:
+        /// <pre>finalBias = maxSlope * slopeScaleBias + constantBias</pre>
+        /// Note that slope scale bias, whilst more accurate, may be ignored by old hardware.
+        ///
+        /// The constant bias value, expressed as a factor of the minimum observable depth
         float               mDepthBiasConstant;
+        /// The slope-relative bias value, expressed as a factor of the depth slope
         float               mDepthBiasSlopeScale;
 
         bool                mAlphaToCoverageEnabled;
@@ -95,6 +111,7 @@ namespace Ogre
         void                *mRsData;       ///Render-System specific data
 
         HlmsBlendblock();
+
         bool operator != ( const HlmsBlendblock &_r ) const
         {
             //Don't include the ID in the comparision
@@ -115,6 +132,13 @@ namespace Ogre
         A datablock is the internal representation of the surface parameters (depth settings,
         textures to be used, diffuse colour, specular colour, etc).
         The notion of a datablock is the closest you'll get to a "material"
+    @remarks
+        Macro- & Blendblocks are immutable, hence const pointers. Trying to const cast these
+        pointers in order to modify them may work on certain RenderSystems (i.e. GLES2) but
+        will seriously break on other RenderSystems (i.e. D3D11).
+    @par
+        If you need to change a macroblock, create a new one (HlmsManager keeps them cached
+        if already created) and change the entire pointer.
     */
     class _OgreExport HlmsDatablock : public PassAlloc
     {

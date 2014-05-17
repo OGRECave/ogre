@@ -262,24 +262,6 @@ namespace Ogre {
         */
         uint getVisibilityMask(void) const { return mVisibilityMask; }
 
-        /** Sets the use of a custom RenderQueueInvocationSequence for
-            rendering this target.
-        @remarks
-            RenderQueueInvocationSequence instances are managed through Root. By
-            setting this, you are indicating that you wish this RenderTarget to
-            be updated using a custom sequence of render queue invocations, with
-            potentially customised ordering and render state options. You should
-            create the named sequence through Root first, then set the name here.
-        @param sequenceName The name of the RenderQueueInvocationSequence to use. If you
-            specify a blank string, behaviour will return to the default render
-            queue management.
-        */
-        virtual void setRenderQueueInvocationSequenceName(const String& sequenceName);
-        /** Gets the name of the render queue invocation sequence for this target. */
-        virtual const String& getRenderQueueInvocationSequenceName(void) const;
-        /// Get the invocation sequence - will return null if using standard
-        RenderQueueInvocationSequence* _getRenderQueueInvocationSequence(void);
-
         /** Convert oriented input point coordinates to screen coordinates. */
         void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv);
         void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
@@ -299,9 +281,6 @@ namespace Ogre {
         bool mShowOverlays;
         bool mShowSkies;
         uint32 mVisibilityMask;
-        // Render queue invocation sequence name
-        String mRQSequenceName;
-        RenderQueueInvocationSequence* mRQSequence;
         /// Material scheme
         String mMaterialSchemeName;
         /// Viewport orientation mode

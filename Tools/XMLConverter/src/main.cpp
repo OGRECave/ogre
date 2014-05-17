@@ -569,8 +569,6 @@ int main(int numargs, char** args)
         retCode = 1;
     }
 
-    Pass::processPendingPassUpdates(); // make sure passes are cleaned up
-
     delete xmlSkeletonSerializer;
     delete skeletonSerializer;
     delete xmlMeshSerializer;
