@@ -336,9 +336,6 @@ namespace Ogre
         RenderWindow* initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window",
                                     const String& customCapabilitiesConfig = BLANKSTRING);
 
-		/// Call this function after Root::initialise and having set at least one RenderWindow
-        void initialiseCompositor(void);
-
 		/** Returns whether the system is initialised or not. */
 		bool isInitialised(void) const { return mIsInitialised; }
 

@@ -301,12 +301,6 @@ namespace Ogre {
 
         OGRE_DELETE mExternalTextureSourceManager;
 
-        OGRE_DELETE mHlmsLowLevelProxy;
-        mHlmsLowLevelProxy = 0;
-
-        OGRE_DELETE mHlmsManager;
-        mHlmsManager = 0;
-
 #if OGRE_NO_FREEIMAGE == 0
         FreeImageCodec::shutdown();
 #endif
@@ -341,8 +335,15 @@ namespace Ogre {
         OGRE_DELETE mControllerManager;
         OGRE_DELETE mHighLevelGpuProgramManager;
 
-        unloadPlugins();
         OGRE_DELETE mMaterialManager;
+
+        OGRE_DELETE mHlmsLowLevelProxy;
+        mHlmsLowLevelProxy = 0;
+        OGRE_DELETE mHlmsManager;
+        mHlmsManager = 0;
+
+        unloadPlugins();
+
         OGRE_DELETE mResourceBackgroundQueue;
         OGRE_DELETE mResourceGroupManager;
 
@@ -733,20 +734,6 @@ namespace Ogre {
 
         return mAutoWindow;
 
-    }
-    //-----------------------------------------------------------------------
-    void Root::initialiseCompositor(void)
-    {
-        if( !mCompositorManager2 )
-        {
-            mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );
-
-            //Do this now as we need the RS to be fully initialized
-            mHlmsManager->_changeRenderSystem( mActiveRenderer );
-
-            if( !mHlmsManager->getHlms( mHlmsLowLevelProxy->getType() ) )
-                mHlmsManager->registerHlms( mHlmsLowLevelProxy, false );
-        }
     }
     //-----------------------------------------------------------------------
     void Root::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)
@@ -1468,8 +1455,14 @@ namespace Ogre {
             // Background loader
             mResourceBackgroundQueue->initialise();
             mWorkQueue->startup();
+            //Do this now as we need the RS to be fully initialized
+            mHlmsManager->_changeRenderSystem( mActiveRenderer );
+
+            if( !mHlmsManager->getHlms( mHlmsLowLevelProxy->getType() ) )
+                mHlmsManager->registerHlms( mHlmsLowLevelProxy, false );
             // Initialise material manager
             mMaterialManager->initialise();
+            mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );
             // Init particle systems manager
             mParticleManager->_initialise();
             // Init mesh manager

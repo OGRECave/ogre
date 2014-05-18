@@ -151,8 +151,9 @@ namespace Ogre {
         mFogEnd = oth.mFogEnd;
         mFogDensity = oth.mFogDensity;
 
-        // Copy datablock pointer
-        *mDatablock = *oth.mDatablock;
+        // The datablock belongs to us, so we don't copy everything (overwrites critical data)
+        mDatablock->mMacroblock = oth.mDatablock->mMacroblock;
+        mDatablock->setBlendblock( oth.mDatablock->mBlendblock );
 
         mAlphaRejectFunc = oth.mAlphaRejectFunc;
         mAlphaRejectVal = oth.mAlphaRejectVal;

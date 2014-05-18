@@ -153,6 +153,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::enumeratePieceFiles(void)
     {
+        if( !mDataFolder )
+            return; //Some Hlms implementations may not use template files at all
+
         StringVectorPtr stringVectorPtr = mDataFolder->list( false, false );
 
         StringVector stringVectorLowerCase( *stringVectorPtr );

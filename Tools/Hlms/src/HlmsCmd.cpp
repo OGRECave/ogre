@@ -270,7 +270,6 @@ void HlmsCmd::destroyScene(void)
 //-------------------------------------------------------------------------------------
 void HlmsCmd::createCompositor(void)
 {
-    mRoot->initialiseCompositor();
     Ogre::CompositorManager2* compositorManager = mRoot->getCompositorManager2();
 
     //Create a shadow node

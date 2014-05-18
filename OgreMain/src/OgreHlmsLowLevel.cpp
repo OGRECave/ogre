@@ -48,10 +48,13 @@ namespace Ogre
         mAutoParamDataSource( 0 ),
         mCurrentSceneManager( 0 )
     {
+        mAutoParamDataSource = OGRE_NEW AutoParamDataSource();
     }
     //-----------------------------------------------------------------------------------
     HlmsLowLevel::~HlmsLowLevel()
     {
+        OGRE_DELETE mAutoParamDataSource;
+        mAutoParamDataSource = 0;
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* HlmsLowLevel::createShaderCacheEntry( uint32 renderableHash,

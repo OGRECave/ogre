@@ -61,7 +61,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsManager::~HlmsManager()
     {
-        assert( mRenderSystem || (mActiveMacroblocks.empty() && mActiveBlendblocks.empty()) );
         renderSystemDestroyAllBlocks();
 
         OGRE_DELETE mTextureManager;
@@ -71,7 +70,7 @@ namespace Ogre
         {
             if( mRegisteredHlms[i] )
             {
-                mRegisteredHlms[i]->_notifyManager( this );
+                mRegisteredHlms[i]->_notifyManager( 0 );
                 if( mDeleteRegisteredOnExit[i] )
                 {
                     OGRE_DELETE mRegisteredHlms[i];
