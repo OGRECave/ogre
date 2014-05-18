@@ -100,7 +100,16 @@ namespace Ogre
 
         RenderSystem    *mRenderSystem;
 
-        typedef std::map<IdString, HlmsDatablock*> HlmsDatablockMap;
+        struct DatablockEntry
+        {
+            HlmsDatablock   *datablock;
+            bool            visibleToManager;
+            DatablockEntry() : datablock( 0 ), visibleToManager( false ) {}
+            DatablockEntry( HlmsDatablock *_datablock, bool _visibleToManager ) :
+                datablock( _datablock ), visibleToManager( _visibleToManager ) {}
+        };
+
+        typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
         HlmsDatablockMap mDatablocks;
 
         String          mOutputPath;
@@ -249,12 +258,15 @@ namespace Ogre
             @See HlmsManager::getBlendblock
         @param paramVec
             Key - String Value list of paramters. MUST BE SORTED.
+        @param visibleToManager
+            When false, HlmsManager::getDatablock won't find this datablock. True by default
         @return
             Pointer to created Datablock
         */
         HlmsDatablock* createDatablock( IdString name, const HlmsMacroblock &macroblockRef,
                                         const HlmsBlendblock &blendblockRef,
-                                        const HlmsParamVec &paramVec );
+                                        const HlmsParamVec &paramVec,
+                                        bool visibleToManager=true );
 
         /** Finds an existing datablock based on its name (@see createDatablock)
         @return

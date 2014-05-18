@@ -935,7 +935,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::createDatablock( IdString name, const HlmsMacroblock &macroblockRef,
                                           const HlmsBlendblock &blendblockRef,
-                                          const HlmsParamVec &paramVec )
+                                          const HlmsParamVec &paramVec, bool visibleToManager )
     {
         if( mDatablocks.find( name ) != mDatablocks.end() )
         {
@@ -948,9 +948,13 @@ namespace Ogre
 
         HlmsDatablock *retVal = createDatablockImpl( name, macroblock, blendblock, paramVec );
 
-        mDatablocks[name] = retVal;
+        mDatablocks[name] = DatablockEntry( retVal, visibleToManager );
 
         retVal->calculateHash();
+
+        if( visibleToManager )
+            mHlmsManager->_datablockAdded( retVal );
+
         return retVal;
     }
     //-----------------------------------------------------------------------------------
@@ -959,7 +963,7 @@ namespace Ogre
         HlmsDatablock *retVal = 0;
         HlmsDatablockMap::const_iterator itor = mDatablocks.find( name );
         if( itor != mDatablocks.end() )
-            retVal = itor->second;
+            retVal = itor->second.datablock;
 
         return retVal;
     }
@@ -974,7 +978,10 @@ namespace Ogre
                          "Hlms::destroyDatablock" );
         }
 
-        OGRE_DELETE itor->second;
+        if( itor->second.visibleToManager )
+            mHlmsManager->_datablockDestroyed( name );
+
+        OGRE_DELETE itor->second.datablock;
         mDatablocks.erase( itor );
     }
     //-----------------------------------------------------------------------------------
@@ -985,7 +992,7 @@ namespace Ogre
 
         while( itor != end )
         {
-            OGRE_DELETE itor->second;
+            OGRE_DELETE itor->second.datablock;
             ++itor;
         }
 

@@ -65,24 +65,10 @@ namespace Ogre {
     */
     class _OgreExport Pass : public PassAlloc
     {
-    public:
-        /** Definition of a functor for calculating the hashcode of a Pass.
-        @remarks
-            The hashcode of a Pass is used to sort Passes for rendering, in order
-            to reduce the number of render state changes. Each Pass represents a
-            single unique set of states, but by ordering them, state changes can
-            be minimised between passes. An implementation of this functor should
-            order passes so that the elements that you want to keep constant are
-            sorted next to each other.
-        @see Pass::setHashFunc
-        */
-        struct HashFunc
-        {
-            virtual uint32 operator()(const Pass* p) const = 0;
-            /// Need virtual destructor in case subclasses use it
-            virtual ~HashFunc() {}
-        };
     protected:
+        /// Increments on the constructor, in order to create a unique datablock for each material pass
+        static AtomicScalar<uint32> mId;
+
         Technique* mParent;
         unsigned short mIndex; /// Pass index
         String mName; /// Optional name for the pass

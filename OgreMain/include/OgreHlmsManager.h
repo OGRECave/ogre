@@ -62,6 +62,9 @@ namespace Ogre
 
         HlmsTextureManager  *mTextureManager;
 
+        typedef std::map<IdString, HlmsDatablock*> HlmsDatablockMap;
+        HlmsDatablockMap mRegisteredDatablocks;
+
         void renderSystemDestroyAllBlocks(void);
 
     public:
@@ -100,6 +103,44 @@ namespace Ogre
         /// Destroys a macroblock created by @getBlendblock. Note it performs
         /// an O(N) search, but N <= OGRE_HLMS_NUM_BLENDBLOCKS
         void destroyBlendblock( const HlmsBlendblock *Blendblock );
+
+        /** Internal function used by Hlms types to tell us a datablock has been created
+            so that we can return it when the user calls @getDatablock.
+        @remarks
+            Throws if a datablock with the same name has already been registered.
+            Don't call this function directly unless you know what you're doing.
+        */
+        void _datablockAdded( HlmsDatablock *datablock );
+
+        /// Internal function to inform us that the datablock with the input name has been destroyed
+        void _datablockDestroyed( IdString name );
+
+        /** Retrieves an exisiting datablock (i.e. material) based on its name, regardless of
+            which HLMS type it belongs to.
+        @remarks
+            If the datablock was created with the flag visibleByManager = false; you can't
+            retrieve it using this function. If that's the case, get the appropiate Hlms
+            using @getHlms and then call @Hlms::getDatablock on it
+        @par
+            Throws if the material/datablock with that name wasn't found
+            (note that Hlms::getDatablock doesn't throw!!!)
+        @param name
+            Unique name of the datablock. Datablock names are unique within the same Hlms
+            type. If two types create a datablock with the same name and both attempt to
+            make it globally visible to this manager, we will throw on creation.
+        @return
+            Pointer to the datablock
+        */
+        HlmsDatablock* getDatablock( IdString name ) const;
+
+        /// @See getDatablock. Exactly the same, but returns null pointer if it wasn't found,
+        /// instead of throwing.
+        HlmsDatablock* getDatablockNoThrow( IdString name ) const;
+
+        /// Alias function. @See getDatablock, as many beginners will probably think of the word
+        /// "Material" first. Datablock is a more technical (and accurate) name of what it does
+        /// (it's a block.. of data). Prefer calling getDatablock directly.
+        HlmsDatablock* getMaterial( IdString name ) const   { return getDatablock( name ); }
 
         HlmsTextureManager* getTextureManger(void) const    { return mTextureManager; }
 

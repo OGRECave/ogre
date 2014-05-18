@@ -35,8 +35,12 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreStringConverter.h"
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsManager.h"
+#include "OgreHlms.h"
 
 namespace Ogre {
+    AtomicScalar<uint32> Pass::mId = 0;
+
     //-----------------------------------------------------------------------------
     Pass::Pass(Technique* parent, unsigned short index)
         : mParent(parent)
@@ -89,6 +93,10 @@ namespace Ogre {
         // default name to index
         mName = StringConverter::toString(mIndex);
 
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
+        mDatablock = hlms->createDatablock( IdString( mId++ ), HlmsMacroblock(),
+                                            HlmsBlendblock(), HlmsParamVec(), false );
    }
 
     //-----------------------------------------------------------------------------
@@ -98,6 +106,11 @@ namespace Ogre {
         mGeometryProgramUsage(0), mTessellationHullProgramUsage(0)
         , mTessellationDomainProgramUsage(0), mComputeProgramUsage(0), mPassIterationCount(1)
     {
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
+        mDatablock = hlms->createDatablock( IdString( mId++ ), HlmsMacroblock(),
+                                            HlmsBlendblock(), HlmsParamVec(), false );
+
         *this = oth;
         mParent = parent;
         mIndex = index;
@@ -113,6 +126,11 @@ namespace Ogre {
         OGRE_DELETE mComputeProgramUsage;
         OGRE_DELETE mShadowCasterVertexProgramUsage;
         OGRE_DELETE mShadowCasterFragmentProgramUsage;
+
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
+        hlms->destroyDatablock( mDatablock->getName() );
+        mDatablock = 0;
     }
     //-----------------------------------------------------------------------------
     Pass& Pass::operator=(const Pass& oth)

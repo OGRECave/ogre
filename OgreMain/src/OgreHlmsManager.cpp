@@ -200,6 +200,59 @@ namespace Ogre
         mFreeBlendblockIds.push_back( blendblock->mId );
     }
     //-----------------------------------------------------------------------------------
+    void HlmsManager::_datablockAdded( HlmsDatablock *datablock )
+    {
+        IdString datablockName = datablock->getName();
+        if( mRegisteredDatablocks.find( datablockName ) != mRegisteredDatablocks.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "HLMS Datablock '" +
+                         datablockName.getFriendlyText() + "' already exists, probably "
+                         "created by another type of HLMS",
+                         "HlmsManager::_datablockAdded" );
+        }
+
+        mRegisteredDatablocks[datablockName] = datablock;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::_datablockDestroyed( IdString name )
+    {
+        HlmsDatablockMap::iterator itor = mRegisteredDatablocks.find( name );
+
+        assert( itor != mRegisteredDatablocks.end() );
+
+        if( itor != mRegisteredDatablocks.end() )
+        {
+            //We don't delete the pointer, as we don't own it (the Hlms class owns it)
+            mRegisteredDatablocks.erase( itor );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsDatablock* HlmsManager::getDatablock( IdString name ) const
+    {
+        HlmsDatablock *retVal = getDatablockNoThrow( name );
+
+        if( !retVal )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Can't find HLMS datablock material '" +
+                         name.getFriendlyText() + "'. It may not be visible to this manager, try "
+                         "finding it by retrieving getHlms()->getDatablock()",
+                         "HlmsManager::getDatablock" );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsDatablock* HlmsManager::getDatablockNoThrow( IdString name ) const
+    {
+        HlmsDatablock *retVal = 0;
+
+        HlmsDatablockMap::const_iterator itor = mRegisteredDatablocks.find( name );
+        if( itor != mRegisteredDatablocks.end() )
+            retVal = itor->second;
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsManager::registerHlms( Hlms *provider, bool deleteOnExit )
     {
         HlmsTypes type = provider->getType();
