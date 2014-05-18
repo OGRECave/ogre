@@ -61,6 +61,8 @@ namespace Ogre {
                 return mTextureID;
             }
             
+            void getCustomAttribute(const String& name, void* pData);
+            
         protected:
             /// @copydoc Texture::createInternalResourcesImpl
             void createInternalResourcesImpl(void);
