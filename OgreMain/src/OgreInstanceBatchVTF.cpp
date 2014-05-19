@@ -60,13 +60,13 @@ namespace Ogre
                 mForceOneWeight(false),
                 mUseOneWeight(false)
     {
-        cloneMaterial( mMaterial );
+        cloneMaterial( material );
     }
 
     BaseInstanceBatchVTF::~BaseInstanceBatchVTF()
     {
         //Remove cloned caster materials (if any)
-        Material::TechniqueIterator techItor = mMaterial->getTechniqueIterator();
+        Material::TechniqueIterator techItor = getMaterial()->getTechniqueIterator();
         while( techItor.hasMoreElements() )
         {
             Technique *technique = techItor.getNext();
@@ -76,7 +76,7 @@ namespace Ogre
         }
 
         //Remove cloned material
-        MaterialManager::getSingleton().remove( mMaterial->getName() );
+        MaterialManager::getSingleton().remove( getMaterial()->getName() );
 
         //Remove the VTF texture
         if( !mMatrixTexture.isNull() )
@@ -111,7 +111,7 @@ namespace Ogre
         MatMap clonedMaterials;
 
         //We need to clone the material so we can have different textures for each batch.
-        mMaterial = material->clone( mName + "/VTFMaterial" );
+        setMaterial( material->clone( mName + "/VTFMaterial" ) );
 
         //Now do the same with the techniques which have a material shadow caster
         Material::TechniqueIterator techItor = material->getTechniqueIterator();
@@ -300,7 +300,8 @@ namespace Ogre
                                         0, PF_FLOAT32_RGBA, TU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 
         //Set our cloned material to use this custom texture!
-        setupMaterialToUseVTF( texType, mMaterial );
+        MaterialPtr material = getMaterial();
+        setupMaterialToUseVTF( texType, material );
     }
 
     //-----------------------------------------------------------------------

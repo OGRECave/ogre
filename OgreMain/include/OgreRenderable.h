@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreCommon.h"
 
+#include "OgreIdString.h"
 #include "OgreGpuProgram.h"
 #include "OgreGpuProgramParams.h"
 #include "OgreMatrix4.h"
@@ -76,20 +77,17 @@ namespace Ogre {
         /** Virtual destructor needed as class has virtual methods. */
         virtual ~Renderable();
 
-        /** Retrieves a weak reference to the material this renderable object uses.
-        @remarks
-            Note that the Renderable also has the option to override the getTechnique method
-            to specify a particular Technique to use instead of the best one available.
-        */
-        //const MaterialPtr& getMaterial(void) const;
-        virtual const MaterialPtr& getMaterial(void) const = 0;
+        /// Sets the name of the Material to be used. Prefer using HLMS @See setHlms
+        void setMaterialName( const String& name, const String& groupName );
 
-        /** Retrieves a pointer to the Material Technique this renderable object uses.
-        @remarks
-            This is to allow Renderables to use a chosen Technique if they wish, otherwise
-            they will use the best Technique available for the Material they are using.
+        /// Sets the given material. Overrides HLMS materials.
+        virtual void setMaterial( const MaterialPtr& material );
+
+        /** Retrieves the material this renderable object uses. It may be null if it's using
+            the HLMS. @See getDatablock
         */
-        Technique* getTechnique(void) const { return getMaterial()->getBestTechnique(0, this); }
+        MaterialPtr getMaterial(void) const;
+
         /** Gets the render operation required to send this object to the frame buffer.
         */
         virtual void getRenderOperation(RenderOperation& op) = 0;
@@ -402,7 +400,13 @@ namespace Ogre {
 
         uint32 getHlmsHash(void) const          { return mHlmsHash; }
         uint32 getHlmsCasterHash(void) const    { return mHlmsCasterHash; }
-        const HlmsDatablock* getDatablock(void) const   { return mHlmsDatablock; }
+        HlmsDatablock* getDatablock(void) const { return mHlmsDatablock; }
+
+        /** Assigns a datablock (i.e. HLMS material) based on its unique name.
+        @remarks
+            An null IdString() is valid, it will use the default material
+        */
+        void setHlms( IdString datablockName );
 
         /// Assigns a datablock (i.e. HLMS Material) to this renderable
         void setHlms( HlmsDatablock *datablock );

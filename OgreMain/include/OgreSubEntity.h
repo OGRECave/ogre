@@ -78,9 +78,6 @@ namespace Ogre {
         /// Pointer to parent.
         Entity* mParentEntity;
 
-        /// Cached pointer to material.
-        MaterialPtr mMaterialPtr;
-
         /// Pointer to the SubMesh defining geometry.
         SubMesh* mSubMesh;
 
@@ -113,25 +110,13 @@ namespace Ogre {
         void prepareTempBlendBuffers(void);
 
     public:
-        /** Gets the name of the Material in use by this instance.
-        */
-        const String& getMaterialName() const;
-
-        /** Sets the name of the Material to be used.
-            @remarks
-                By default a SubEntity uses the default Material that the SubMesh
-                uses. This call can alter that so that the Material is different
-                for this instance.
-        */
-        void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
-
         /** Sets a Material to be used.
             @remarks
                 By default a SubEntity uses the default Material that the SubMesh
                 uses. This call can alter that so that the Material is different
                 for this instance.
         */
-        void setMaterial( const MaterialPtr& material );
+        virtual void setMaterial( const MaterialPtr& material );
 
         /** Accessor method to read mesh data.
         */
@@ -139,14 +124,6 @@ namespace Ogre {
 
         /** Accessor to get parent Entity */
         Entity* getParent(void) const { return mParentEntity; }
-
-        /** Overridden - see Renderable.
-        */
-        const MaterialPtr& getMaterial(void) const;
-
-        /** Overridden - see Renderable.
-        */
-        Technique* getTechnique(void) const;
 
         /** Overridden - see Renderable.
         */

@@ -144,11 +144,11 @@ namespace Ogre
         HLMS_PBS,       /// Physically Based Shader Generator
         HLMS_TOON,      /// Toon shading / Cel shading
         HLMS_GUI,       /// Made specifically for GUIs and overlays
+        HLMS_FX,        /// For particle FXs, self-iluminating, etc
 
         HLMS_USER0,
         HLMS_USER1,
         HLMS_USER2,
-        HLMS_USER3,
 
         HLMS_MAX = 8
     };

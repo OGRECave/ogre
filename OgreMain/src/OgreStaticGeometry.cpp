@@ -303,7 +303,7 @@ namespace Ogre {
             // Get the geometry for this SubMesh
             q->submesh = se->getSubMesh();
             q->geometryLodList = determineGeometry(q->submesh);
-            q->materialName = se->getMaterialName();
+            q->materialName = se->getMaterial()->getName();
             q->orientation = orientation;
             q->position = position;
             q->scale = scale;

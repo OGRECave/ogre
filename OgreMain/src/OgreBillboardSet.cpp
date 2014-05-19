@@ -39,6 +39,8 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreException.h"
 #include "OgreSceneNode.h"
+#include "OgreHlms.h"
+#include "OgreHlmsManager.h"
 #include "OgreLogManager.h"
 #include <algorithm>
 
@@ -72,7 +74,10 @@ namespace Ogre {
         mBillboardDataChanged(true)
     {
         setDefaultDimensions( 100, 100 );
-        setMaterialName( "BaseWhite" );
+
+        Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
+        setHlms( hlms->getDatablock( IdString() ) );
+
         setPoolSize( poolSize );
         setCastShadows( false );
         setTextureStacksAndSlices( 1, 1 );
@@ -272,30 +277,6 @@ namespace Ogre {
     {
         return mDefaultHeight;
     }
-    //-----------------------------------------------------------------------
-    void BillboardSet::setMaterialName( const String& name , const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */ )
-    {
-        mMaterialName = name;
-
-        mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
-
-        if (mMaterial.isNull())
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
-                "BillboardSet::setMaterialName" );
-
-        /* Ensure that the new material was loaded (will not load again if
-           already loaded anyway)
-        */
-        mMaterial->load();
-        mLodMaterial = mMaterial->_getLodValues();
-    }
-
-    //-----------------------------------------------------------------------
-    const String& BillboardSet::getMaterialName(void) const
-    {
-        return mMaterialName;
-    }
-
     //-----------------------------------------------------------------------
     void BillboardSet::_sortBillboards( Camera* cam)
     {
@@ -583,43 +564,6 @@ namespace Ogre {
             mBillboardDataChanged = false;
         }
     }
-
-    //-----------------------------------------------------------------------
-    const MaterialPtr& BillboardSet::getMaterial(void) const
-    {
-        return mMaterial;
-    }
-
-    void BillboardSet::setMaterial( const MaterialPtr& material )
-    {
-        mMaterial = material;
-        
-        if (mMaterial.isNull())
-        {
-            LogManager::getSingleton().logMessage("Can't assign material "  
-                                                  " to BillboardSet of " + getName() + " because this "
-                                                  "Material does not exist. Have you forgotten to define it in a "
-                                                  ".material script?", LML_CRITICAL);
-            
-            mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
-            
-            if (mMaterial.isNull())
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
-                            "to BillboardSet " + getName() + ". Did "
-                            "you forget to call MaterialManager::initialise()?",
-                            "BillboardSet::setMaterial");
-            }
-        }
-        
-        mMaterialName = mMaterial->getName();
-        
-        // Ensure new material loaded (will not load again if already loaded)
-        mMaterial->load();
-
-        mLodMaterial = mMaterial->_getLodValues();
-    }
-
     //-----------------------------------------------------------------------
     void BillboardSet::getRenderOperation(RenderOperation& op)
     {

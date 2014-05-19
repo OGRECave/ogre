@@ -39,6 +39,8 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreLogManager.h"
 #include "OgreViewport.h"
+#include "OgreHlmsManager.h"
+#include "OgreHlms.h"
 
 #include <limits>
 
@@ -92,8 +94,9 @@ namespace Ogre {
 
         mVertexData->vertexStart = 0;
         // index data set up later
-        // set basic white material
-        this->setMaterialName("BaseWhiteNoLighting");
+
+        Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
+        setHlms( hlms->getDatablock( IdString() ) );
 
     }
     //-----------------------------------------------------------------------
@@ -697,35 +700,6 @@ namespace Ogre {
     {
         updateBoundingBox();
         return mAABB;
-    }
-    //-----------------------------------------------------------------------
-    const MaterialPtr& BillboardChain::getMaterial(void) const
-    {
-        return mMaterial;
-    }
-    //-----------------------------------------------------------------------
-    void BillboardChain::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
-    {
-        mMaterialName = name;
-        mMaterial = MaterialManager::getSingleton().getByName(mMaterialName, groupName);
-
-        if (mMaterial.isNull())
-        {
-            LogManager::getSingleton().logMessage("Can't assign material " + name +
-                " to BillboardChain " + mName + " because this "
-                "Material does not exist. Have you forgotten to define it in a "
-                ".material script?", LML_CRITICAL);
-            mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting");
-            if (mMaterial.isNull())
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
-                    "to BillboardChain of " + mName + ". Did "
-                    "you forget to call MaterialManager::initialise()?",
-                    "BillboardChain.setMaterialName");
-            }
-        }
-        // Ensure new material loaded (will not load again if already loaded)
-        mMaterial->load();
     }
     //-----------------------------------------------------------------------
     const String& BillboardChain::getMovableType(void) const

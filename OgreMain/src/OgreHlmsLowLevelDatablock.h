@@ -47,6 +47,8 @@ namespace Ogre
         friend class HlmsLowLevel;
 
     public:
+        MaterialPtr mProxyMaterial;
+
         HlmsLowLevelDatablock( IdString name, Hlms *creator,
                                const HlmsMacroblock *macroblock,
                                const HlmsBlendblock *blendblock,

@@ -552,10 +552,6 @@ namespace Ogre {
         inline void setCastShadows( bool enabled );
         /** Returns whether shadow casting is enabled for this object. */
         inline bool getCastShadows(void) const;
-        /** Returns whether the Material of any Renderable that this MovableObject will add to 
-            the render queue will receive shadows. 
-        */
-        bool getReceivesShadows();
 
         /** Method to allow a caller to abstractly iterate over the Renderable
             instances that this MovableObject will add to the render queue when

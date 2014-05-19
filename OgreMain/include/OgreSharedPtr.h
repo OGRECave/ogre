@@ -281,6 +281,22 @@ namespace Ogre {
             }
         }
 
+        inline void _manualSetNull(void)
+        {
+            pRep = 0;
+            pInfo = 0;
+        }
+        inline void _manualAquire(void) { assert(pInfo); ++pInfo->useCount; }
+        inline void _manualRelease(void)
+        {
+            if (pRep)
+            {
+                assert(pInfo);
+                if(--pInfo->useCount == 0)
+                    destroy();
+            }
+        }
+
     protected:
 
         inline void release(void)

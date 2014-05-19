@@ -328,7 +328,6 @@ namespace Ogre {
             mUseIdentityProjection = true;
             mUseIdentityView = true;
         }
-        const MaterialPtr& getMaterial(void) const { return mParent->mBorderMaterial; }
         void getRenderOperation(RenderOperation& op) { op = mParent->mRenderOp2; }
         void getWorldTransforms(Matrix4* xform) const { mParent->getWorldTransforms(xform); }
         unsigned short getNumWorldTransforms(void) const { return 1; }

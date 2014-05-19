@@ -254,16 +254,10 @@ namespace Ogre {
         */
         void setFaceCamera( bool faceCamera, const Vector3 &normalVector=Vector3::UNIT_X );
 
-        /// Get the material name in use
-        virtual const String& getMaterialName(void) const { return mMaterialName; }
-        /// Set the material name to use for rendering
-        virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
-
 
         // Overridden members follow
         Real getSquaredViewDepth(const Camera* cam) const;
         const AxisAlignedBox& getBoundingBox(void) const;
-        const MaterialPtr& getMaterial(void) const;
         const String& getMovableType(void) const;
         void _updateRenderQueue(RenderQueue *, Camera *camera, const Camera *lodCamera);
         void getRenderOperation(RenderOperation &);
@@ -306,9 +300,6 @@ namespace Ogre {
         mutable AxisAlignedBox mAABB;
         /// Bounding radius
         mutable Real mRadius;
-        /// Material 
-        String mMaterialName;
-        MaterialPtr mMaterial;
         /// Texture coord direction
         TexCoordDirection mTexCoordDir;
         /// Other texture coord range

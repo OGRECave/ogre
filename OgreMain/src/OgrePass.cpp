@@ -34,9 +34,10 @@ THE SOFTWARE.
 #include "OgreGpuProgramUsage.h"
 #include "OgreTextureUnitState.h"
 #include "OgreStringConverter.h"
-#include "OgreHlmsDatablock.h"
+#include "OgreHlmsLowLevelDatablock.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre {
     AtomicScalar<uint32> Pass::mId = 0;
@@ -95,8 +96,21 @@ namespace Ogre {
 
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
-        mDatablock = hlms->createDatablock( IdString( mId++ ), HlmsMacroblock(),
-                                            HlmsBlendblock(), HlmsParamVec(), false );
+        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId++ ), HlmsMacroblock(),
+                                                          HlmsBlendblock(), HlmsParamVec(), false );
+
+        Material *parentMaterial = parent->getParent();
+
+        assert( dynamic_cast<HlmsLowLevelDatablock*>( datablock ) );
+        mDatablock = static_cast<HlmsLowLevelDatablock*>( datablock );
+        mDatablock->mProxyMaterial = MaterialManager::getSingleton().getByName(
+                                                        parentMaterial->getName(),
+                                                        parentMaterial->getGroup() );
+        //The Pass owns the datablock. If we don't decrement the ref count, the
+        //datablock will own the pass. However we still need SharedPtrs so that
+        //if other the Ptr is retrieved from the datablock, the ref. counted is
+        //incremented
+        mDatablock->mProxyMaterial._manualRelease();
    }
 
     //-----------------------------------------------------------------------------
@@ -108,8 +122,21 @@ namespace Ogre {
     {
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
-        mDatablock = hlms->createDatablock( IdString( mId++ ), HlmsMacroblock(),
-                                            HlmsBlendblock(), HlmsParamVec(), false );
+        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId++ ), HlmsMacroblock(),
+                                                          HlmsBlendblock(), HlmsParamVec(), false );
+
+        Material *parentMaterial = parent->getParent();
+
+        assert( dynamic_cast<HlmsLowLevelDatablock*>( datablock ) );
+        mDatablock = static_cast<HlmsLowLevelDatablock*>( datablock );
+        mDatablock->mProxyMaterial = MaterialManager::getSingleton().getByName(
+                                                        parentMaterial->getName(),
+                                                        parentMaterial->getGroup() );
+        //The Pass owns the datablock. If we don't decrement the ref count, the
+        //datablock will own the pass. However we still need SharedPtrs so that
+        //if other the Ptr is retrieved from the datablock, the ref. counted is
+        //incremented
+        mDatablock->mProxyMaterial._manualRelease();
 
         *this = oth;
         mParent = parent;
@@ -126,6 +153,9 @@ namespace Ogre {
         OGRE_DELETE mComputeProgramUsage;
         OGRE_DELETE mShadowCasterVertexProgramUsage;
         OGRE_DELETE mShadowCasterFragmentProgramUsage;
+
+        //The proxy should not destroy the material.
+        mDatablock->mProxyMaterial._manualSetNull();
 
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
@@ -733,6 +763,11 @@ namespace Ogre {
 
         source = SBF_ONE;
         dest = SBF_ZERO;
+    }
+    //-----------------------------------------------------------------------
+    HlmsDatablock* Pass::_getDatablock(void) const
+    {
+        return mDatablock;
     }
     //-----------------------------------------------------------------------
     void Pass::setMacroblock( const HlmsMacroblock *macroblock )

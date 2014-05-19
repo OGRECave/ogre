@@ -107,8 +107,6 @@ namespace Ogre
         InstanceManager     *mCreator;
         ObjectMemoryManager mLocalObjectMemoryManager; ///Only one render queue is used
 
-        MaterialPtr         mMaterial;
-
         MeshPtr             mMeshReference;
         Mesh::IndexMap const *mIndexToBoneMap;
 
@@ -361,8 +359,6 @@ namespace Ogre
         const Vector4& _getCustomParam( InstancedEntity *instancedEntity, unsigned char idx );
 
         //Renderable overloads
-        /** @copydoc Renderable::getMaterial. */
-        const MaterialPtr& getMaterial(void) const      { return mMaterial; }
         /** @copydoc Renderable::getRenderOperation. */
         void getRenderOperation( RenderOperation& op )  { op = mRenderOperation; }
 
@@ -370,8 +366,6 @@ namespace Ogre
         Real getSquaredViewDepth( const Camera* cam ) const;
         /** @copydoc Renderable::getLights. */
         const LightList& getLights( void ) const;
-        /** @copydoc Renderable::getTechnique. */
-        Technique* getTechnique(void) const;
 
         /** @copydoc MovableObject::getMovableType. */
         const String& getMovableType(void) const;

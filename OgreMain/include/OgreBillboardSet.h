@@ -121,11 +121,6 @@ namespace Ogre {
         /// Default height of each billboard
         Real mDefaultHeight;
 
-        /// Name of the material to use
-        String mMaterialName;
-        /// Pointer to the material to use
-        MaterialPtr mMaterial;
-
         /// True if no billboards in this set have been resized - greater efficiency.
         bool mAllDefaultSize;
 
@@ -516,17 +511,6 @@ namespace Ogre {
         /** See setDefaultDimensions - this gets 1 component individually. */
         virtual Real getDefaultHeight(void) const;
 
-        /** Sets the name of the material to be used for this billboard set.
-        @param name
-            The new name of the material to use for this set.
-        */
-        virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
-
-        /** Sets the name of the material to be used for this billboard set.
-        @return The name of the material that is used for this set.
-        */
-        virtual const String& getMaterialName(void) const;
-
         /** Overridden from MovableObject
         @see
             MovableObject
@@ -555,18 +539,6 @@ namespace Ogre {
             MovableObject
         */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
-
-        /** Overridden from MovableObject
-        @see
-            MovableObject
-        */
-        virtual const MaterialPtr& getMaterial(void) const;
-
-        /** Sets the name of the material to be used for this billboard set.
-        @param material
-            The new material to use for this set.
-         */
-        virtual void setMaterial( const MaterialPtr& material );
 
         /** Overridden from MovableObject
         @see

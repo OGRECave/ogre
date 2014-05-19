@@ -48,7 +48,6 @@ namespace Ogre
                 MovableObject( id, objectMemoryManager, 0 ),
                 mInstancesPerBatch( instancesPerBatch ),
                 mCreator( creator ),
-                mMaterial( material ),
                 mMeshReference( meshReference ),
                 mIndexToBoneMap( indexToBoneMap ),
                 mTechnSupportsSkeletal( SKELETONS_SUPPORTED ),
@@ -75,8 +74,9 @@ namespace Ogre
             assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
         }
 
+        this->setMaterial( material );
         mLodMesh = meshReference->_getLodValueArray();
-        mLodMaterial = mMaterial->_getLodValues();
+        mLodMaterial = material->_getLodValues();
         mRenderables.resize( 1, this );
 
         mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
@@ -623,11 +623,6 @@ namespace Ogre
     const LightList& InstanceBatch::getLights( void ) const
     {
         return queryLights();
-    }
-    //-----------------------------------------------------------------------
-    Technique* InstanceBatch::getTechnique( void ) const
-    {
-        return mMaterial->getBestTechnique( mCurrentMaterialLod, this );
     }
     //-----------------------------------------------------------------------
     void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )

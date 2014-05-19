@@ -81,7 +81,7 @@ namespace Ogre {
         Real mShininess;
         TrackVertexColourType mTracking;
         //-------------------------------------------------------------------------
-        HlmsDatablock *mDatablock;
+        HlmsLowLevelDatablock *mDatablock;
 
         /// Colour buffer settings
         bool mColourWrite;
@@ -680,6 +680,9 @@ namespace Ogre {
             Only valid if getFogOverride is true.
         */
         Real getFogDensity(void) const;
+
+        /// Gets the internal datablock that acts as proxy for us
+        HlmsDatablock* _getDatablock(void) const;
 
         /// Changes the current macroblock for a new one. Pointer can't be null
         void setMacroblock( const HlmsMacroblock *macroblock );

@@ -354,7 +354,7 @@ namespace Ogre {
             unsigned int n = 0;
             for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i, ++n)
             {
-                newEnt->getSubEntity(n)->setMaterialName(i->getMaterialName());
+                newEnt->getSubEntity(n)->setHlms( i->getDatablock() );
             }
             if (mAnimationState)
             {

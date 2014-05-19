@@ -55,8 +55,9 @@ namespace Ogre
     {
         const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 
-        mMaterial->load();
-        Technique *technique = mMaterial->getBestTechnique();
+        MaterialPtr material = getMaterial();
+        material->load();
+        Technique *technique = material->getBestTechnique();
         if( technique )
         {
             GpuProgramParametersSharedPtr vertexParam = technique->getPass(0)->getVertexProgramParameters();
@@ -103,7 +104,7 @@ namespace Ogre
                         {
                             LogManager::getSingleton().logMessage( "InstanceBatchShader: Mesh " +
                                         mMeshReference->getName() + " using material " +
-                                        mMaterial->getName() + " contains many bones. The amount of "
+                                        material->getName() + " contains many bones. The amount of "
                                         "instances per batch is very low. Performance benefits will "
                                         "be minimal, if any. It might be even slower!",
                                         LML_NORMAL );
@@ -116,7 +117,7 @@ namespace Ogre
 
             //Reaching here means material is supported, but malformed
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Material '" + mMaterial->getName() + "' is malformed for this instancing technique",
+            "Material '" + material->getName() + "' is malformed for this instancing technique",
             "InstanceBatchShader::calculateMaxNumInstances");
         }
 

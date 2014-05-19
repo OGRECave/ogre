@@ -73,9 +73,6 @@ namespace Ogre {
         mObliqueDepthProjection(false), 
         mLinkedObliqueProjPlane(0)
     {
-        // Initialise material
-        mMaterial = MaterialManager::getSingleton().getByName("BaseWhiteNoLighting");
-
         mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_FRUSTUM_DEFAULT_MASK;
         
         // Alter superclass members
@@ -992,11 +989,6 @@ namespace Ogre {
         return (mFarDist == 0)? 100000 : mFarDist;
     }
 #endif
-    //-----------------------------------------------------------------------
-    const MaterialPtr& Frustum::getMaterial(void) const
-    {
-        return mMaterial;
-    }
     //-----------------------------------------------------------------------
     void Frustum::getRenderOperation(RenderOperation& op) 
     {
