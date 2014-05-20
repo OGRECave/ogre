@@ -49,8 +49,8 @@ namespace Ogre {
         GPT_VERTEX_PROGRAM,
         GPT_FRAGMENT_PROGRAM,
         GPT_GEOMETRY_PROGRAM,
-        GPT_DOMAIN_PROGRAM,
         GPT_HULL_PROGRAM,
+        GPT_DOMAIN_PROGRAM,
         GPT_COMPUTE_PROGRAM
     };
 

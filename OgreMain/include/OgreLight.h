@@ -157,6 +157,33 @@ namespace Ogre {
         */
         const ColourValue& getSpecularColour(void) const            { return mSpecular; }
 
+        /** Sets the attenuation parameters (range, constant, linear & quadratic, @see setAttenuation)
+            based on a given radius.
+        @remarks
+            The actual attenuation formula is:
+                            1
+            --------------------------------
+              ( (distance / radius) + 1 )²
+            Which can be derived as:
+                            1
+            --------------------------------
+               1 + 2/r * d + 1 / r² * d²
+
+            The original formula never ends, that is the range is infinity. This function calculates
+            a range based on "lumThreshold": When the luminosity past certain distance is below the
+            established threshold, the light calculations are cut.
+        @param radius
+            The radius of the light. i.e. A light bulb is a couple centimeters, the sun is ~696km
+            Note: Having a radius = 2 doesn't mean that at distance = 2 the pixel is lit 100%
+            (at r = d; the pixel is lit by 25%)
+        @param lumThreshold
+            Value in the range [0; 1)
+            Sets range at which the luminance (in percentage) of a point would go below the threshold.
+            For example lumThreshold = 0 means the attenuation range is infinity; lumThreshold = 1 means
+            the range is set to 0.
+        */
+        void setAttenuationBasedOnRadius(Real radius, Real lumThreshold);
+
         /** Sets the attenuation parameters of the light source i.e. how it diminishes with distance.
         @remarks
             Lights normally get fainter the further they are away. Also, each light is given a maximum range

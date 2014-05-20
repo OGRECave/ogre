@@ -2719,7 +2719,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     RenderOperation ro;
 
     OgreProfileBeginGPUEvent("Material: " + pass->getParent()->getParent()->getName());
+#if OGRE_DEBUG_MODE
     ro.srcRenderable = rend;
+#endif
 
     GpuProgram* vprog = pass->hasVertexProgram() ? pass->getVertexProgram().get() : 0;
 

@@ -107,8 +107,11 @@ namespace Ogre {
 
         /// Index data - only valid if useIndexes is true
         IndexData *indexData;
+
+#if OGRE_DEBUG_MODE
         /// Debug pointer back to renderable which created this
         const Renderable* srcRenderable;
+#endif
 
         /// The number of instances for the render operation - this option is supported
         /// in only a part of the render systems.
@@ -123,7 +126,11 @@ namespace Ogre {
 
     RenderOperation() :
         vertexData(0), operationType(OT_TRIANGLE_LIST), useIndexes(true),
-            indexData(0), srcRenderable(0), numberOfInstances(1),
+            indexData(0),
+#if OGRE_DEBUG_MODE
+            srcRenderable(0),
+#endif
+            numberOfInstances(1),
             renderToVertexBuffer(false),
             useGlobalInstancingVertexBufferIsAvailable(true)
             {}

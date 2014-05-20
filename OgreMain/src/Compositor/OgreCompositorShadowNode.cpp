@@ -449,40 +449,6 @@ namespace Ogre
 
         const LightList& renderableLights = rend->getLights();
 
-        /*
-        renderableLights contains a list of closest lights to the renderable
-        Let's take this example:
-            renderableLights contains 7 lights
-            We rendered 3 shadow maps
-            The material supports 4 lights per pass (because the user defined it so)
-
-        We have to look among the first 4 lights for those that are casting shadows
-        and were actually rendered as a shadow map. We need to put those lights first
-        in the list so their texture unit binding matches the light idx in the shader.
-
-        Being 'L' lights (regardles of what getCastShadows() says) and 'S' lights we
-        rendered into the shadow maps, consider the following arrangement in
-        renderableLights:
-            LSSL LSL
-                 ^
-                 5th light
-        So we have to take the first 4 lights and send them to the shader as the following:
-            SSLL
-        The shader material may have support for up to 3 shadow maps, but the truth is the
-        3rd shadow casting light was close to the camera, but too far from the object. It's
-        more reasonable to pass as 3rd & 4th light those that were actually closer.
-
-        This approach diverges from Ogre 1.x, which would always pass all rendered shadow
-        casting lights first, even if they were extremely far from the object.
-
-        Check those lights within startLight & maxLights that are
-        also shadow maps, and send them first (sorted by distance)
-
-        If the number of lights per pass would be 7 or more, then we wouldn't have
-        any issues, and pass to the shader:
-            SSSLLLL
-        */
-
         size_t shadowMapStart = std::min( startLight, mShadowMapCastingLights.size() );
         size_t shadowMapEnd   = std::min( startLight + lightsPerPass, mShadowMapCastingLights.size() );
 
@@ -499,8 +465,8 @@ namespace Ogre
 
         //Now again, but push non-shadow casting lights (if there's room left)
         {
-            size_t slotsToSkip  = std::max<ssize_t>( startLight - mCurrentLightList.size(), 0 );
-            size_t slotsLeft    = std::max<ssize_t>( lightsPerPass - (shadowMapEnd - shadowMapStart), 0 );
+            size_t slotsToSkip  = std::max<signed>( startLight - mCurrentLightList.size(), 0 );
+            size_t slotsLeft    = std::max<signed>( lightsPerPass - (shadowMapEnd - shadowMapStart), 0 );
             LightList::const_iterator itor = renderableLights.begin();
             LightList::const_iterator end  = renderableLights.end();
             while( itor != end && slotsLeft > 0 )

@@ -524,7 +524,7 @@ namespace Ogre
         if (! fbConfig)
         {
             int minAttribs[] = {
-                GLX_DRAWABLE_TYPE,  GLX_WINDOW_BIT | GLX_PIXMAP_BIT,
+                GLX_DRAWABLE_TYPE,  GLX_WINDOW_BIT || GLX_PIXMAP_BIT,
                 GLX_RENDER_TYPE,        GLX_RGBA_BIT,
                 GLX_RED_SIZE,      1,
                 GLX_BLUE_SIZE,    1,
