@@ -51,6 +51,9 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreGLES2StateCacheManager.h"
 
+#include "OgreHlmsDatablock.h"
+#include "GLSLES/include/OgreGLSLESGpuProgram.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGL2Window.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -302,7 +305,7 @@ namespace Ogre {
 
         // Blending support
         rsc->setCapability(RSC_BLENDING);
-        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
+        //rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
         // DOT3 support is standard
         rsc->setCapability(RSC_DOT3);
@@ -1078,6 +1081,74 @@ namespace Ogre {
             }
             
             vp->_clearUpdatedFlag();
+        }
+    }
+
+    void GLES2RenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
+    {
+        if( macroblock->mDepthCheck )
+        {
+            OGRE_CHECK_GL_ERROR(glEnable( GL_DEPTH_TEST ));
+        }
+        else
+        {
+            OGRE_CHECK_GL_ERROR(glDisable( GL_DEPTH_TEST ));
+        }
+        OGRE_CHECK_GL_ERROR(glDepthMask( macroblock->mDepthWrite ? GL_TRUE : GL_FALSE ));
+        OGRE_CHECK_GL_ERROR(glDepthFunc( convertCompareFunction(macroblock->mDepthFunc )));
+
+        _setDepthBias( macroblock->mDepthBiasConstant, macroblock->mDepthBiasSlopeScale );
+        _setCullingMode( macroblock->mCullMode );
+
+        if( macroblock->mAlphaToCoverageEnabled )
+        {
+            OGRE_CHECK_GL_ERROR(glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+        }
+        else
+        {
+            OGRE_CHECK_GL_ERROR(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+        }
+    }
+
+    void GLES2RenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
+    {
+        if( blendblock->mSeparateBlend )
+        {
+            _setSeparateSceneBlending(
+                                blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
+                                blendblock->mSourceBlendFactorAlpha, blendblock->mDestBlendFactorAlpha,
+                                blendblock->mBlendOperation, blendblock->mBlendOperationAlpha );
+        }
+        else
+        {
+            _setSceneBlending( blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
+                               blendblock->mBlendOperation );
+        }
+    }
+
+    void GLES2RenderSystem::_setProgramsFromHlms( const HlmsCache *hlmsCache )
+    {
+        GLSLESGpuProgram::unbindAll();
+
+        mCurrentVertexProgram   = static_cast<GLES2GpuProgram*>
+                                        ( hlmsCache->vertexShader->_getBindingDelegate() );
+        mCurrentFragmentProgram = static_cast<GLES2GpuProgram*>
+                                        ( hlmsCache->pixelShader->_getBindingDelegate() );
+
+        mActiveVertexGpuProgramParameters.setNull();
+        mActiveFragmentGpuProgramParameters.setNull();
+
+        if( mCurrentVertexProgram )
+        {
+            mCurrentVertexProgram->bindProgram();
+            mActiveVertexGpuProgramParameters = mCurrentVertexProgram->getDefaultParameters();
+            mVertexProgramBound = true;
+        }
+        if( mCurrentFragmentProgram )
+        {
+            mCurrentFragmentProgram->bindProgram();
+            mActiveFragmentGpuProgramParameters = mCurrentFragmentProgram->getDefaultParameters();
+            mFragmentProgramBound = true;
         }
     }
 

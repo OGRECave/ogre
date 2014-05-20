@@ -150,6 +150,22 @@ namespace Ogre {
             }
         }
     }
+    //-----------------------------------------------------------------------------
+    void GLSLESGpuProgram::unbindAll(void)
+    {
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            GLSLESProgramPipelineManager &glslManager = GLSLESProgramPipelineManager::getSingleton();
+            glslManager.setActiveVertexLinkProgram(NULL);
+            glslManager.setActiveFragmentLinkProgram(NULL);
+        }
+        else
+        {
+            GLSLESLinkProgramManager &glslManager = GLSLESLinkProgramManager::getSingleton();
+            glslManager.setActiveVertexShader( NULL );
+            glslManager.setActiveFragmentShader( NULL );
+        }
+    }
 
     //-----------------------------------------------------------------------------
     void GLSLESGpuProgram::bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask)

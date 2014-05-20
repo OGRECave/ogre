@@ -43,9 +43,9 @@ THE SOFTWARE.
 
 namespace Ogre {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
-                                                     uint32 depth, PixelFormat format,
+                                                     uint32 depth, PixelFormat format, bool hwGamma,
                                                      HardwareBuffer::Usage usage)
-        : HardwarePixelBuffer(width, height, depth, format, usage, false, false),
+        : HardwarePixelBuffer(width, height, depth, format, hwGamma, usage, false, false),
           mBuffer(width, height, depth, format),
           mGLInternalFormat(GL_NONE)
     {
@@ -231,7 +231,7 @@ namespace Ogre {
                                            GLint width, GLint height, GLint depth, GLint internalFormat, GLint format,
                                            GLint face, GLint level, Usage usage, bool crappyCard, 
                                            bool writeGamma, uint fsaa)
-    : GLES2HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
+    : GLES2HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, writeGamma, usage),
         mTarget(target), mTextureID(id), mBufferId(0), mFace(face), mLevel(level), mSoftwareMipmap(crappyCard)
     {
         getGLES2SupportRef()->getStateCacheManager()->bindGLTexture(mTarget, mTextureID);
@@ -1152,7 +1152,7 @@ namespace Ogre {
     //********* GLES2RenderBuffer
     //----------------------------------------------------------------------------- 
     GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples):
-    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, GL_RGBA), HBU_WRITE_ONLY)
+    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, GL_RGBA), false, HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;
         mNumSamples = numSamples;

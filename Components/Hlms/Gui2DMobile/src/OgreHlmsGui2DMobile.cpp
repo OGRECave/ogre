@@ -375,7 +375,7 @@ namespace Ogre
         memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
         vsUniformBuffer += 16;
 #else
-    #error Not Coded Yet! (can't use memcpy on Matrix4)
+    #error Not Coded Yet! (cannot use memcpy on Matrix4)
 #endif
 
         memcpy( vsUniformBuffer, datablock->mTextureMatrices,

@@ -1384,6 +1384,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::_changeRenderSystem( RenderSystem *newRs )
     {
+		mShaderCache.clear();
         mRenderSystem = newRs;
     }
     //-----------------------------------------------------------------------------------

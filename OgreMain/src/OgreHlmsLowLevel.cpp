@@ -78,11 +78,16 @@ namespace Ogre
         //We push into mShaderCache then clear each pass so that we can return unique references.
         //Feels a bit hacky but gets the job done.
         HlmsCache cache( 0, HLMS_LOW_LEVEL );
-        cache.vertexShader              = pass->getVertexProgram();
-        cache.geometryShader            = pass->getGeometryProgram();
-        cache.tesselationHullShader     = pass->getTessellationHullProgram();
-        cache.tesselationDomainShader   = pass->getTessellationDomainProgram();
-        cache.pixelShader               = pass->getFragmentProgram();
+        if( pass->hasVertexProgram() )
+            cache.vertexShader              = pass->getVertexProgram();
+        if( pass->hasGeometryProgram() )
+            cache.geometryShader            = pass->getGeometryProgram();
+        if( pass->hasTessellationHullProgram() )
+            cache.tesselationHullShader     = pass->getTessellationHullProgram();
+        if( pass->hasTessellationDomainProgram() )
+            cache.tesselationDomainShader   = pass->getTessellationDomainProgram();
+        if( pass->hasFragmentProgram() )
+            cache.pixelShader               = pass->getFragmentProgram();
         mShaderCache.push_back( cache );
 
         return &mShaderCache.back();
