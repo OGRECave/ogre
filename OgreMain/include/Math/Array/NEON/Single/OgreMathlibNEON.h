@@ -43,7 +43,7 @@ namespace Ogre
     // See http://rcl-rs-vvg.blogspot.com/2010/08/simd-etudes.html
 
     // Similar to _mm_movemask_ps
-    static inline int vmovemaskq_u32( uint32x4_t conditions )
+    static inline uint32 vmovemaskq_u32( uint32x4_t conditions )
     {
         const uint32x4_t qMask = { 1, 2, 4, 8 };
         const uint32x4_t qAnded = vandq_u32( conditions, qMask );
@@ -67,8 +67,11 @@ namespace Ogre
 
     static inline ArrayReal vnand_f32(ArrayReal a, ArrayReal b)
     {
-        return (ArrayReal)vandq_s32(vmvnq_s32((ArrayInt)a), (ArrayInt)b);
+        return vreinterpretq_f32_u32( vandq_u32( vmvnq_u32(vreinterpretq_u32_f32(a)),
+                                                 vreinterpretq_u32_f32(b) ) );
     }
+
+#define vnand_u32( a, b ) vandq_u32( vmvnq_u32(a), b )
 
     static inline ArrayReal vorrq_f32(ArrayReal a, ArrayReal b)
     {
@@ -83,6 +86,10 @@ namespace Ogre
         const ArrayReal inv1 = vmulq_f32(step0, inv0);
         return vmulq_f32( num, inv1 );
     }
+
+#define vandq_f32( a, b ) vreinterpretq_f32_u32( vandq_u32( vreinterpretq_u32_f32( a ), vreinterpretq_u32_f32( b ) ) )
+#define veorq_f32( a, b ) vreinterpretq_f32_u32( veorq_u32( vreinterpretq_u32_f32( a ), vreinterpretq_u32_f32( b ) ) )
+#define vandq_f32u32( a, b ) vreinterpretq_f32_u32( vandq_u32( vreinterpretq_u32_f32( a ), b ) )
 
 #define _MM_SHUFFLE(z, y, x, w) (((z) << 6) | ((y) << 4) | ((x) << 2) | (w))
 
@@ -161,9 +168,9 @@ namespace Ogre
         return (ArrayReal) { x, y, z, w };
     }
 
-    inline ArrayReal vcneqq_f32(ArrayReal a, ArrayReal b)
+    inline uint32x4_t vcneqq_f32(ArrayReal a, ArrayReal b)
     {
-        return (ArrayReal)vceqq_f32(vceqq_f32(a, b), vdupq_n_f32( 0.0f ));
+        return vceqq_u32(vceqq_f32(a, b), vdupq_n_u32( 0 ));
     }
 
     class ArrayRadian
@@ -196,12 +203,12 @@ namespace Ogre
         inline ArrayRadian operator / ( ArrayReal f ) const;
         inline ArrayRadian& operator /= ( ArrayReal f );
 
-        inline ArrayReal operator <  ( const ArrayRadian& r ) const;
-        inline ArrayReal operator <= ( const ArrayRadian& r ) const;
-        inline ArrayReal operator == ( const ArrayRadian& r ) const;
-        inline ArrayReal operator != ( const ArrayRadian& r ) const;
-        inline ArrayReal operator >= ( const ArrayRadian& r ) const;
-        inline ArrayReal operator >  ( const ArrayRadian& r ) const;
+        inline ArrayMaskR operator <  ( const ArrayRadian& r ) const;
+        inline ArrayMaskR operator <= ( const ArrayRadian& r ) const;
+        inline ArrayMaskR operator == ( const ArrayRadian& r ) const;
+        inline ArrayMaskR operator != ( const ArrayRadian& r ) const;
+        inline ArrayMaskR operator >= ( const ArrayRadian& r ) const;
+        inline ArrayMaskR operator >  ( const ArrayRadian& r ) const;
     };
 
     class _OgreExport MathlibNEON
@@ -272,7 +279,7 @@ namespace Ogre
 #endif
 
             ArrayReal t = vsubq_f32( arg1, arg2 );              // t = arg1 - arg2
-            return vaddq_f32( arg2, vandq_s32( t, mask ) ); // r = arg2 + (t & mask)
+            return vaddq_f32( arg2, vandq_f32u32( t, mask ) ); // r = arg2 + (t & mask)
         }
 
         /** Robust, branchless conditional move for a 128-bit value.
@@ -301,14 +308,16 @@ namespace Ogre
                     else
                         arg2[i];
         */
-        #
-        static inline ArrayReal CmovRobust( ArrayReal arg1, ArrayReal arg2, ArrayReal mask )
+        static inline ArrayReal CmovRobust( ArrayReal arg1, ArrayReal arg2, ArrayMaskR mask )
         {
-            return vorrq_f32( vandq_s32( arg1, mask ), vnand_f32( mask, arg2 ) );
+            return vreinterpretq_f32_u32(
+                    vorrq_u32( vandq_u32( vreinterpretq_u32_f32( arg1 ), mask ),
+                               vnand_u32( mask, vreinterpretq_u32_f32( arg2 ) ) ) );
         }
         static inline ArrayInt CmovRobust( ArrayInt arg1, ArrayInt arg2, ArrayMaskI mask )
         {
-            return vorrq_s32( vandq_s32( arg1, mask ), vnand_s32( mask, arg2 ) );
+            return vorrq_s32( vandq_s32( arg1, vreinterpretq_s32_u32( mask ) ),
+                              vnand_s32( vreinterpretq_s32_u32( mask ), arg2 ) );
         }
 
         /** Returns the result of "a & b"
@@ -317,11 +326,23 @@ namespace Ogre
         */
         static inline ArrayReal And( ArrayReal a, ArrayReal b )
         {
-            return vandq_s32( a, b );
+            return vandq_f32( a, b );
         }
         static inline ArrayInt And( ArrayInt a, ArrayInt b )
         {
             return vandq_s32( a, b );
+        }
+        static inline ArrayInt And( ArrayInt a, ArrayMaskI b )
+        {
+            return vandq_s32( a, vreinterpretq_s32_u32( b ) );
+        }
+        static inline ArrayMaskI And( ArrayMaskI a, ArrayInt b )
+        {
+            return vreinterpretq_u32_s32( vandq_s32( vreinterpretq_s32_u32( a ), b ) );
+        }
+        static inline ArrayMaskI And( ArrayMaskI a, ArrayMaskI b )
+        {
+            return vandq_u32( a, b );
         }
 
         /** Returns the result of "a & b"
@@ -343,20 +364,37 @@ namespace Ogre
         @return
             r[i] = (a[i] & b[i]) ? 0xffffffff : 0;
         */
-        static inline ArrayInt TestFlags4( ArrayInt a, ArrayInt b )
+        static inline ArrayMaskI TestFlags4( ArrayInt a, ArrayInt b )
         {
             // !( (a & b) == 0 ) --> ( (a & b) == 0 ) ^ -1
-            return veorq_s32( vceqq_s32( vandq_s32( a, b ), vdupq_n_s32(0) ),
-                                    vdupq_n_s32( -1 ) );
+            return veorq_u32( vceqq_s32( vandq_s32( a, b ), vdupq_n_s32(0) ),
+                                    vdupq_n_u32( ~0 ) );
         }
+        static inline ArrayMaskI TestFlags4( ArrayInt a, ArrayMaskI b )
+        {
+            // !( (a & b) == 0 ) --> ( (a & b) == 0 ) ^ -1
+            return veorq_u32( vceqq_u32( vandq_u32( vreinterpretq_u32_s32( a ), b ),
+                                     vdupq_n_u32(0) ), vdupq_n_u32( ~0 ) );
+        }
+        static inline ArrayMaskI TestFlags4( ArrayMaskI a,  ArrayInt b )
+        {
+            // !( (a & b) == 0 ) --> ( (a & b) == 0 ) ^ -1
+            return veorq_u32( vceqq_u32( vandq_u32( a, vreinterpretq_u32_s32( b ) ),
+                                     vdupq_n_u32(0) ), vdupq_n_u32( ~0 ) );
+        }
+
 
         /** Returns the result of "a & ~b"
         @return
             r[i] = a[i] & ~b[i];
         */
-        static inline ArrayInt AndNot( ArrayInt a, ArrayInt b )
+        /*static inline ArrayInt AndNot( ArrayInt a, ArrayInt b )
         {
             return vnand_s32( b, a );
+        }*/
+        static inline ArrayMaskI AndNot( ArrayMaskI a, ArrayMaskI b )
+        {
+            return vnand_u32( b, a );
         }
 
         /** Returns the result of "a | b"
@@ -371,12 +409,16 @@ namespace Ogre
         {
             return vorrq_s32( a, b );
         }
+        static inline ArrayMaskI Or( ArrayMaskI a, ArrayMaskI b )
+        {
+            return vorrq_u32( a, b );
+        }
 
         /** Returns the result of "a < b"
         @return
             r[i] = a[i] < b[i] ? 0xffffffff : 0;
         */
-        static inline ArrayReal CompareLess( ArrayReal a, ArrayReal b )
+        static inline ArrayMaskR CompareLess( ArrayReal a, ArrayReal b )
         {
             return vcltq_f32( a, b );
         }
@@ -385,7 +427,7 @@ namespace Ogre
          @return
          r[i] = a[i] <= b[i] ? 0xffffffff : 0;
          */
-        static inline ArrayReal CompareLessEqual( ArrayReal a, ArrayReal b )
+        static inline ArrayMaskR CompareLessEqual( ArrayReal a, ArrayReal b )
         {
             return vcleq_f32( a, b );
         }
@@ -394,7 +436,7 @@ namespace Ogre
         @return
             r[i] = a[i] > b[i] ? 0xffffffff : 0;
         */
-        static inline ArrayReal CompareGreater( ArrayReal a, ArrayReal b )
+        static inline ArrayMaskR CompareGreater( ArrayReal a, ArrayReal b )
         {
             return vcgtq_f32( a, b );
         }
@@ -422,7 +464,7 @@ namespace Ogre
         @return
             r[i] = a[i] == Inf ? 0xffffffff : 0;
         */
-        static inline ArrayReal isInfinity( ArrayReal a )
+        static inline ArrayMaskR isInfinity( ArrayReal a )
         {
             return vceqq_f32( a, MathlibNEON::INFINITEA );
         }
@@ -431,6 +473,12 @@ namespace Ogre
         static inline ArrayReal Max( ArrayReal a, ArrayReal b )
         {
             return vmaxq_f32( a, b );
+        }
+
+		/// Returns the minimum value between a and b
+        static inline ArrayReal Min( ArrayReal a, ArrayReal b )
+        {
+            return vminq_f32( a, b );
         }
 
         /** Returns the minimum value of all elements in a
@@ -489,7 +537,9 @@ namespace Ogre
             ArrayReal inv = vrecpeq_f32( val );
             ArrayReal twoRcp    = vaddq_f32( inv, inv );                    //2 * rcp( f )
             ArrayReal rightSide = vmulq_f32( val, vmulq_f32( inv, inv ) );  //f * rcp( f ) * rcp( f )
-            rightSide = vandq_s32( rightSide, vcneqq_f32( val, vdupq_n_f32(0.0f) ) ); //Nuke this NaN
+            rightSide = vreinterpretq_f32_u32(
+                         vandq_u32( vreinterpretq_u32_f32( rightSide ),
+                                    vcneqq_f32( val, vdupq_n_f32(0.0f) ) ) ); //Nuke this NaN
             return vsubq_f32( twoRcp, rightSide );
         }
 
@@ -547,7 +597,9 @@ namespace Ogre
 
             ArrayReal halfInvSqrt= vmulq_f32( HALF, invSqrt );                      //0.5 * rsqrt( f )
             ArrayReal rightSide  = vmulq_f32( invSqrt, vmulq_f32( f, invSqrt ) );   //f * rsqrt( f ) * rsqrt( f )
-            rightSide = vandq_s32( rightSide, vcneqq_f32( f, vdupq_n_f32(0.0f) ) );//Nuke this NaN
+            rightSide = vreinterpretq_f32_u32(
+                            vandq_u32( vreinterpretq_u32_f32( rightSide ),
+                                        vcneqq_f32( f, vdupq_n_f32(0.0f) ) ));//Nuke this NaN
             return vmulq_f32( halfInvSqrt, vsubq_f32( THREE, rightSide ) );     //halfInvSqrt*(3 - rightSide)
         }
 

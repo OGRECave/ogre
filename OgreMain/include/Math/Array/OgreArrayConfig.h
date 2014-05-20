@@ -89,10 +89,10 @@ THE SOFTWARE.
             #define ARRAY_PACKED_REALS 4
             namespace Ogre {
                 typedef float32x4_t ArrayReal;
-                typedef float32x4_t ArrayMaskR;
+                typedef uint32x4_t ArrayMaskR;
 
                 #define ARRAY_REAL_ZERO vdupq_n_f32( 0.0f )
-                #define ARRAY_INT_ZERO vdupq_n_s32( 0.0f )
+                #define ARRAY_INT_ZERO vdupq_n_u32( 0 )
 
                 class ArrayRadian;
             }
@@ -121,7 +121,7 @@ THE SOFTWARE.
 
         namespace Ogre {
             typedef int32x4_t ArrayInt;
-            typedef int32x4_t ArrayMaskI;
+            typedef uint32x4_t ArrayMaskI;
         }
 
         ///r = (a * b) + c
@@ -130,8 +130,10 @@ THE SOFTWARE.
         #define _mm_nmsub_ps( a, b, c )     vmlsq_f32( c, a, b )
 
         /// Does not convert, just cast ArrayReal to ArrayInt
-        #define CastRealToInt( x )          vreinterpretq_s32_f32( x )
-        #define CastIntToReal( x )          vreinterpretq_f32_s32( x )
+        //#define CastRealToInt( x )          vreinterpretq_s32_f32( x )
+        //#define CastIntToReal( x )          vreinterpretq_f32_s32( x )
+        #define CastRealToInt( x )          ( x )
+        #define CastIntToReal( x )          ( x )
         /// Input must be 16-byte aligned
         #define CastArrayToReal( outFloatPtr, arraySimd )       vst1q_f32( outFloatPtr, arraySimd )
 

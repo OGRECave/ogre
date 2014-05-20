@@ -110,13 +110,13 @@ namespace Ogre
         }
 
         /// @copydoc Sphere::intersects()
-        inline ArrayReal intersects( const ArraySphere &s ) const;
+        inline ArrayMaskR intersects( const ArraySphere &s ) const;
 
         /// @copydoc Sphere::intersects()
-        inline ArrayReal intersects( const ArrayAabb &aabb ) const;
+        inline ArrayMaskR intersects( const ArrayAabb &aabb ) const;
 
         /// @copydoc Sphere::intersects()
-        inline ArrayReal intersects( const ArrayVector3 &v ) const;
+        inline ArrayMaskR intersects( const ArrayVector3 &v ) const;
     };
     /** @} */
     /** @} */

@@ -92,7 +92,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     inline ArrayRadian ArrayRadian::operator - () const
     {
-        return ArrayRadian( veorq_s32( mRad, MathlibNEON::SIGN_MASK ) );
+        return ArrayRadian( veorq_f32( mRad, MathlibNEON::SIGN_MASK ) );
     }
     //-----------------------------------------------------------------------------------
     inline ArrayRadian ArrayRadian::operator - ( const ArrayRadian& r ) const
@@ -133,12 +133,12 @@ namespace Ogre
         return *this;
     }
 
-    inline ArrayReal ArrayRadian::operator <  ( const ArrayRadian& r ) const { return vcltq_f32( mRad, r.mRad ); }
-    inline ArrayReal ArrayRadian::operator <= ( const ArrayRadian& r ) const { return vcleq_f32( mRad, r.mRad ); }
-    inline ArrayReal ArrayRadian::operator == ( const ArrayRadian& r ) const { return vceqq_f32( mRad, r.mRad ); }
-    inline ArrayReal ArrayRadian::operator != ( const ArrayRadian& r ) const { return vcneqq_f32( mRad, r.mRad );}
-    inline ArrayReal ArrayRadian::operator >= ( const ArrayRadian& r ) const { return vcgeq_f32( mRad, r.mRad ); }
-    inline ArrayReal ArrayRadian::operator >  ( const ArrayRadian& r ) const { return vcgtq_f32( mRad, r.mRad ); }
+    inline ArrayMaskR ArrayRadian::operator <  ( const ArrayRadian& r ) const { return vcltq_f32( mRad, r.mRad ); }
+    inline ArrayMaskR ArrayRadian::operator <= ( const ArrayRadian& r ) const { return vcleq_f32( mRad, r.mRad ); }
+    inline ArrayMaskR ArrayRadian::operator == ( const ArrayRadian& r ) const { return vceqq_f32( mRad, r.mRad ); }
+    inline ArrayMaskR ArrayRadian::operator != ( const ArrayRadian& r ) const { return vcneqq_f32( mRad, r.mRad );}
+    inline ArrayMaskR ArrayRadian::operator >= ( const ArrayRadian& r ) const { return vcgeq_f32( mRad, r.mRad ); }
+    inline ArrayMaskR ArrayRadian::operator >  ( const ArrayRadian& r ) const { return vcgtq_f32( mRad, r.mRad ); }
 
     //-----------------------------------------------------------------------------------
     inline ArrayReal MathlibNEON::Modf4( ArrayReal x, ArrayReal &outIntegral )
@@ -153,7 +153,7 @@ namespace Ogre
         // Sony Computer Entertainment Inc. (BSD style license) See
         // header for details. Adapted/ported to Ogre intrinsics.
         ArrayReal xabs = Abs4( x );
-        ArrayReal select = vcltq_f32( x, vdupq_n_f32(0.0f) );
+        ArrayMaskR select = vcltq_f32( x, vdupq_n_f32(0.0f) );
         ArrayReal t1 = vrsqrteq_f32( vsubq_f32( ONE, xabs ) );
         
         /* Instruction counts can be reduced if the polynomial was

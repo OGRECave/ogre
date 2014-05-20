@@ -29,7 +29,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     //-----------------------------------------------------------------------------------
-    inline ArrayReal ArraySphere::intersects( const ArraySphere &s ) const
+    inline ArrayMaskR ArraySphere::intersects( const ArraySphere &s ) const
     {
         ArrayReal sqRadius  = vaddq_f32( mRadius, s.mRadius );
         sqRadius            = vmulq_f32( sqRadius, sqRadius );
@@ -38,7 +38,7 @@ namespace Ogre
         return vcleq_f32( sqDist, sqRadius ); // sqDist <= sqRadius
     }
     //-----------------------------------------------------------------------------------
-    inline ArrayReal ArraySphere::intersects( const ArrayVector3 &v ) const
+    inline ArrayMaskR ArraySphere::intersects( const ArrayVector3 &v ) const
     {
         ArrayReal sqRadius  = vmulq_f32( mRadius, mRadius );
         ArrayReal sqDist    = mCenter.squaredDistance( v );

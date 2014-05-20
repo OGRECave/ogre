@@ -344,6 +344,21 @@ namespace Ogre
         */
         inline static ArrayVector3 Cmov4( const ArrayVector3 &arg1, const ArrayVector3 &arg2, ArrayMaskR mask );
 
+		/** Converts 4 ARRAY_PACKED_REALS reals into this ArrayVector3
+        @remarks
+            'src' must be aligned and assumed to have enough memory for ARRAY_PACKED_REALS Vector3
+            i.e. on SSE2 you can construct src as:
+                OGRE_ALIGNED_DECL( Real, vals[ARRAY_PACKED_REALS * 4], OGRE_SIMD_ALIGNMENT ) =
+                {
+                    x0, y0, z0, 0,
+                    x1, y1, z1, 0,
+                    x2, y2, z2, 0,
+                    x3, y3, z3, 0,
+                }
+            @See Frustum::getCustomWorldSpaceCorners implementation for an actual, advanced use case.
+        */
+        inline void loadFromAoS( const Real * RESTRICT_ALIAS src );
+
         static const ArrayVector3 ZERO;
         static const ArrayVector3 UNIT_X;
         static const ArrayVector3 UNIT_Y;

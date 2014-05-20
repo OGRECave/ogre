@@ -28,13 +28,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    inline ArrayReal BooleanMask4::getMask( bool x, bool y, bool z, bool w )
+    inline ArrayMaskR BooleanMask4::getMask( bool x, bool y, bool z, bool w )
     {
         size_t idx = (size_t)x | ( (size_t)y << 1 ) | ( (size_t)z << 2 ) | ( (size_t)w << 3 );
         return mMasks[idx];
     }
 
-    inline ArrayReal BooleanMask4::getMask( bool b[4] )
+    inline ArrayMaskR BooleanMask4::getMask( bool b[4] )
     {
         size_t idx = (size_t)b[0] | ( (size_t)b[1] << 1 ) | ( (size_t)b[2] << 2 ) | ( (size_t)b[3] << 3 );
         return mMasks[idx];
@@ -51,14 +51,14 @@ namespace Ogre
         return ( *reinterpret_cast<uint32*>(mask0) & *reinterpret_cast<uint32*>(mask1) ) == 0x01010101;
     }
     //--------------------------------------------------------------------------------------
-    inline uint32 BooleanMask4::getScalarMask( ArrayReal mask )
+    inline uint32 BooleanMask4::getScalarMask( ArrayMaskR mask )
     {
-        return static_cast<uint32>( vmovemaskq_u32( mask ) );
+        return vmovemaskq_u32( mask );
     }
     //--------------------------------------------------------------------------------------
     inline uint32 BooleanMask4::getScalarMask( ArrayInt mask )
     {
-        return static_cast<uint32>( vmovemaskq_u32( mask ) );
+        return vmovemaskq_u32( vreinterpretq_u32_s32( mask ) );
     }
 
     #define IS_SET_MASK_X( intMask ) ((intMask & MASK_W) != 0)
