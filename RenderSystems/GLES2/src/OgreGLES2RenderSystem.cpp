@@ -386,12 +386,14 @@ namespace Ogre {
 #endif
 
         // ES 3 always supports NPOT textures
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || gleswIsSupported(3, 0))
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
             rsc->setNonPOW2TexturesLimited(false);
         }
         else
+#endif
         {
             rsc->setNonPOW2TexturesLimited(true);
         }
@@ -2291,8 +2293,6 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("********************************************");
                 
         initialiseContext(win);
-        
-        mGLSupport->initialiseExtensions();
         
         static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
         

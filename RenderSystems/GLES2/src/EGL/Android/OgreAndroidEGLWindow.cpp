@@ -237,6 +237,8 @@ namespace Ogre {
 
     void AndroidEGLWindow::_destroyInternalResources()
     {
+        mContext->setCurrent();
+        
         GLES2RenderSystem::getResourceManager()->notifyOnContextLost();
         mContext->_destroyInternalResources();
         
@@ -358,9 +360,7 @@ namespace Ogre {
             mClosed = false;
             
             mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
-            mContext->setCurrent();
-            
-            windowMovedOrResized();
+
             static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
         }
     }

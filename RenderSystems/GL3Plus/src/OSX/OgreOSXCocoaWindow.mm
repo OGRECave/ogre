@@ -31,17 +31,14 @@ THE SOFTWARE.
 #import "OgreLogManager.h"
 #import "OgreStringConverter.h"
 #import "OgreWindowEventUtilities.h"
-#import "OgreGLPixelFormat.h"
-#import "OgreGLUtil.h"
-#import "OgreGLRenderSystem.h"
-#import "OgreViewport.h"
+#import "OgreGL3PlusPixelFormat.h"
 
+#import "OgreGL3PlusRenderSystem.h"
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
-#import <iomanip>
 
-@implementation OgreWindow
+@implementation OgreGL3PlusWindow
 
 - (BOOL)canBecomeKeyWindow
 {
@@ -62,15 +59,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    OSXCocoaWindow::OSXCocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOrigin(NSZeroPoint),
+    CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOrigin(NSZeroPoint),
         mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""),
-        mUseNSView(false), mContentScalingFactor(1.0), mContentScalingSupported(false)
+        mUseNSView(false), mContentScalingFactor(1.0)
     {
-        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-        mContentScalingSupported = dynamic_cast<OSXGLSupport*>(rs->getGLSupportRef())->OSVersionIsAtLeast("10.7");
     }
 
-    OSXCocoaWindow::~OSXCocoaWindow()
+    CocoaWindow::~CocoaWindow()
     {
 		[mGLContext clearDrawable];
 
@@ -89,7 +84,7 @@ namespace Ogre {
         }
     }
 	
-	void OSXCocoaWindow::create(const String& name, unsigned int width, unsigned int height,
+	void CocoaWindow::create(const String& name, unsigned int width, unsigned int height,
 	            bool fullScreen, const NameValuePairList *miscParams)
     {
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -129,8 +124,9 @@ namespace Ogre {
 		int winx = 0, winy = 0;
 		int depth = 32;
         NameValuePairList::const_iterator opt;
-        mIsFullScreen = fullScreen;
 		
+        mIsFullScreen = fullScreen;
+
 		if(miscParams)
 		{
 			opt = miscParams->find("title");
@@ -145,9 +141,9 @@ namespace Ogre {
 			if(opt != miscParams->end())
 				winy = (int)NSHeight([[NSScreen mainScreen] frame]) - StringConverter::parseUnsignedInt(opt->second) - height;
 
-            opt = miscParams->find("hidden");
-            if (opt != miscParams->end())
-                hidden = StringConverter::parseBool(opt->second);
+			opt = miscParams->find("hidden");
+			if (opt != miscParams->end())
+				hidden = StringConverter::parseBool(opt->second);
 
 			opt = miscParams->find("depthBuffer");
 			if(opt != miscParams->end())
@@ -157,32 +153,26 @@ namespace Ogre {
 			if(opt != miscParams->end())
 				fsaa_samples = StringConverter::parseUnsignedInt(opt->second);
 			
-            opt = miscParams->find("gamma");
+			opt = miscParams->find("gamma");
 			if(opt != miscParams->end())
 				mHwGamma = StringConverter::parseBool(opt->second);
+
+            opt = miscParams->find("vsync");
+			if(opt != miscParams->end())
+				mVSync = StringConverter::parseBool(opt->second);
 
 			opt = miscParams->find("colourDepth");
 			if(opt != miscParams->end())
 				depth = StringConverter::parseUnsignedInt(opt->second);
 
-            opt = miscParams->find("Full Screen");
-            if(opt != miscParams->end())
-                fullScreen = StringConverter::parseBool(opt->second);
+			opt = miscParams->find("Full Screen");
+			if(opt != miscParams->end())
+				fullScreen = StringConverter::parseBool(opt->second);
 
             opt = miscParams->find("contentScalingFactor");
             if(opt != miscParams->end())
                 mContentScalingFactor = StringConverter::parseReal(opt->second);
-				
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			opt = miscParams->find("stereoMode");
-			if (opt != miscParams->end())
-			{
-				StereoModeType stereoMode = StringConverter::parseStereoMode(opt->second);
-				if (SMT_NONE != stereoMode)
-					mStereoEnabled = true;
-			}
-#endif
-        }
+        }		
 
         if(miscParams->find("externalGLContext") == miscParams->end())
         {
@@ -193,6 +183,10 @@ namespace Ogre {
             // Useful if there is ambiguity
             attribs[i++] = NSOpenGLPFAScreenMask;
             attribs[i++] = (NSOpenGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(CGMainDisplayID());
+
+            // Specify that we want to use the OpenGL 3.2 Core profile
+            attribs[i++] = NSOpenGLPFAOpenGLProfile;
+            attribs[i++] = NSOpenGLProfileVersion3_2Core;
 
             // Specifying "NoRecovery" gives us a context that cannot fall back to the software renderer.
             // This makes the View-based context a compatible with the fullscreen context, enabling us to use
@@ -207,12 +201,12 @@ namespace Ogre {
 
             attribs[i++] = NSOpenGLPFAAlphaSize;
             attribs[i++] = (NSOpenGLPixelFormatAttribute) 8;
-            
+
             attribs[i++] = NSOpenGLPFAStencilSize;
             attribs[i++] = (NSOpenGLPixelFormatAttribute) 8;
 
             attribs[i++] = NSOpenGLPFADepthSize;
-            attribs[i++] = (NSOpenGLPixelFormatAttribute) (hasDepthBuffer? 16 : 0);
+            attribs[i++] = (NSOpenGLPixelFormatAttribute) depth;
             
             if(fsaa_samples > 0)
             {
@@ -224,18 +218,13 @@ namespace Ogre {
                 attribs[i++] = (NSOpenGLPixelFormatAttribute) fsaa_samples;
             }
             
-#if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			if (mStereoEnabled)
-				attribs[i++] = NSOpenGLPFAStereo;
-#endif
-
             attribs[i++] = (NSOpenGLPixelFormatAttribute) 0;
 
-            mGLPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes: attribs];
+            mGLPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
         }
 
-        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-        OSXCocoaContext *mainContext = (OSXCocoaContext*)rs->_getMainContext();
+        GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+        CocoaContext *mainContext = (CocoaContext*)rs->_getMainContext();
         NSOpenGLContext *shareContext = mainContext == 0 ? nil : mainContext->getContext();
 
         if(miscParams)
@@ -251,16 +240,16 @@ namespace Ogre {
             mGLContext = [[NSOpenGLContext alloc] initWithFormat:mGLPixelFormat shareContext:shareContext];
         }
 
-        // Set vsync by default to save battery and reduce tearing
-        GLint swapInterval = 1;
+        // Set vsync
+        GLint swapInterval = (GLint)mVSync;
         [mGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
 
         if(miscParams)
             opt = miscParams->find("externalWindowHandle");
-
+        
         // Make active
         setHidden(hidden);
-        mActive = true;
+		mActive = true;
         mClosed = false;
         mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
         mWidth = width;
@@ -276,7 +265,7 @@ namespace Ogre {
         {
             NameValuePairList::const_iterator param_useNSView_pair;
             param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
-
+            
             if(param_useNSView_pair != miscParams->end())
                 if(param_useNSView_pair->second == "true")
                     mUseNSView = true;
@@ -288,8 +277,8 @@ namespace Ogre {
                 NSView *nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
                 mView = nsview;
             } else {
-                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreView*");
-                OgreView *view = (OgreView*)StringConverter::parseUnsignedLong(opt->second);
+                LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGL3PlusView*");
+                OgreGL3PlusView *view = (OgreGL3PlusView*)StringConverter::parseUnsignedLong(opt->second);
                 [view setOgreWindow:this];
                 mView = view;
             
@@ -299,21 +288,20 @@ namespace Ogre {
             }
 
             mWindow = [mView window];
-            mIsExternal = true;
-
+            
             // Add our window to the window event listener class
             WindowEventUtilities::_addRenderWindow(this);
         }
 
         // Create register the context with the rendersystem and associate it with this window
-        mContext = OGRE_NEW OSXCocoaContext(mGLContext, mGLPixelFormat);
+        mContext = OGRE_NEW CocoaContext(mGLContext, mGLPixelFormat);
         mContext->mBackingWidth = mWidth * mContentScalingFactor;
         mContext->mBackingHeight = mHeight * mContentScalingFactor;
 
 		// Create the window delegate instance to handle window resizing and other window events
-        mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
+        mWindowDelegate = [[CocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
 
-        if(mContentScalingSupported && mContentScalingFactor > 1.0)
+        if(mContentScalingFactor > 1.0)
             [mView setWantsBestResolutionOpenGLSurface:YES];
 
         CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
@@ -324,7 +312,7 @@ namespace Ogre {
             [mGLContext setView:mView];
         [mGLContext makeCurrentContext];
 
-#if OGRE_DEBUG_MODE && defined(MAC_OS_X_VERSION_10_7)
+#if OGRE_DEBUG_MODE
         // Crash on functions that have been removed from the API
         CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCECrashOnRemovedFunctions);
 #endif
@@ -332,12 +320,9 @@ namespace Ogre {
         // Enable GL multithreading
         CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCEMPEngine);
 
-        // Fix garbage screen
-        glViewport(0, 0, mWidth, mHeight);
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
-        
         [mGLContext update];
+
+//        rs->clearFrameBuffer(FBT_COLOUR);
 
         [mGLContext flushBuffer];
         CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
@@ -351,31 +336,31 @@ namespace Ogre {
         LogManager::getSingleton().logMessage(ss.str());
     }
 
-    unsigned int OSXCocoaWindow::getWidth() const
+    unsigned int CocoaWindow::getWidth() const
     {
         NSRect winFrame;
-        if(mContentScalingSupported && mContentScalingFactor > 1.0)
+        if(mContentScalingFactor > 1.0)
             winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
         return (unsigned int) winFrame.size.width;
     }
 
-    unsigned int OSXCocoaWindow::getHeight() const
+    unsigned int CocoaWindow::getHeight() const
     {
         NSRect winFrame;
-        if(mContentScalingSupported && mContentScalingFactor > 1.0)
+        if(mContentScalingFactor > 1.0)
             winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mView frame]]];
         else
             winFrame = [mView frame];
         return (unsigned int) winFrame.size.height;
     }
 
-    void OSXCocoaWindow::destroy(void)
+    void CocoaWindow::destroy(void)
     {
         if(!mIsFullScreen)
         {
-            // Unregister and destroy OGRE GLContext
+            // Unregister and destroy OGRE GL3PlusContext
             OGRE_DELETE mContext;
             
             if(!mIsExternal)
@@ -400,7 +385,6 @@ namespace Ogre {
                     [mGLPixelFormat release];
                     mGLPixelFormat = nil;
                 }
-
             }
 		}
 		
@@ -408,17 +392,17 @@ namespace Ogre {
         mClosed = true;
     }
 
-    bool OSXCocoaWindow::isActive() const
+    bool CocoaWindow::isActive() const
     {
         return mActive;
     }
 
-    bool OSXCocoaWindow::isClosed() const
+    bool CocoaWindow::isClosed() const
     {
         return false;
     }
 
-    void OSXCocoaWindow::setHidden(bool hidden)
+    void CocoaWindow::setHidden(bool hidden)
     {
         mHidden = hidden;
         if (!mIsExternal)
@@ -430,7 +414,7 @@ namespace Ogre {
         }
     }
 
-	void OSXCocoaWindow::setVSyncEnabled(bool vsync)
+	void CocoaWindow::setVSyncEnabled(bool vsync)
 	{
         mVSync = vsync;
         mContext->setCurrent();
@@ -444,12 +428,12 @@ namespace Ogre {
             [mGLContext makeCurrentContext];
 	}
     
-	bool OSXCocoaWindow::isVSyncEnabled() const
+	bool CocoaWindow::isVSyncEnabled() const
 	{
         return mVSync;
 	}
 
-    void OSXCocoaWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    void CocoaWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
         if ((dst.right > mWidth) ||
             (dst.bottom > mHeight) ||
@@ -465,8 +449,8 @@ namespace Ogre {
             buffer = mIsFullScreen? FB_FRONT : FB_BACK;
         }
         
-        GLenum format = GLPixelUtil::getGLOriginFormat(dst.format);
-        GLenum type = GLPixelUtil::getGLOriginDataType(dst.format);
+        GLenum format = Ogre::GL3PlusPixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = Ogre::GL3PlusPixelUtil::getGLOriginDataType(dst.format);
         
         if ((format == GL_NONE) || (type == 0))
         {
@@ -477,26 +461,26 @@ namespace Ogre {
         
         if(dst.getWidth() != dst.rowPitch)
         {
-            glPixelStorei(GL_PACK_ROW_LENGTH, static_cast<GLint>(dst.rowPitch));
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, static_cast<GLint>(dst.rowPitch)));
         }
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
             // Standard alignment of 4 is not right
-            glPixelStorei(GL_PACK_ALIGNMENT, 1);
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
         }
         
-        glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
+        OGRE_CHECK_GL_ERROR(glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK));
+        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.getTopLeftFrontPixelPtr());
+                     format, type, dst.getTopLeftFrontPixelPtr()));
         
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
-        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
         
         PixelUtil::bulkPixelVerticalFlip(dst);
     }
 
-    void OSXCocoaWindow::reposition(int left, int top)
+    void CocoaWindow::reposition(int left, int top)
     {
 		if(!mWindow)
             return;
@@ -512,11 +496,11 @@ namespace Ogre {
 		[mWindow setFrame:frame display:YES];
     }
 
-    void OSXCocoaWindow::resize(unsigned int width, unsigned int height)
+    void CocoaWindow::resize(unsigned int width, unsigned int height)
     {
 		if(!mWindow)
             return;
-        
+
         if(mIsFullScreen)
             return;
 
@@ -558,7 +542,7 @@ namespace Ogre {
 		[mGLContext update];
     }
 
-    void OSXCocoaWindow::windowResized()
+    void CocoaWindow::windowResized()
     {
         // Ensure the context is current
         if(!mIsFullScreen)
@@ -580,20 +564,20 @@ namespace Ogre {
             mTop = screenFrame.size.height - viewFrame.size.height;
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
-        
+
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it) 
         { 
             (*it).second->_updateDimensions(); 
         }
     }
 
-    void OSXCocoaWindow::windowHasResized()
+    void CocoaWindow::windowHasResized()
     {
         // Ensure the context is current
         [mGLContext flushBuffer];
     }
     
-    void OSXCocoaWindow::windowMovedOrResized()
+    void CocoaWindow::windowMovedOrResized()
     {
         NSRect winFrame = [mWindow frame];
         NSRect viewFrame = [mView frame];
@@ -612,7 +596,7 @@ namespace Ogre {
 		[mGLContext update];
     }
 
-    void OSXCocoaWindow::swapBuffers()
+    void CocoaWindow::swapBuffers()
     {
         CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
         [mGLContext makeCurrentContext];
@@ -625,11 +609,11 @@ namespace Ogre {
     }
 	
 	//-------------------------------------------------------------------------------------------------//
-	void OSXCocoaWindow::getCustomAttribute( const String& name, void* pData )
+	void CocoaWindow::getCustomAttribute( const String& name, void* pData )
 	{
 		if( name == "GLCONTEXT" ) 
 		{
-			*static_cast<OSXContext**>(pData) = mContext;
+			*static_cast<CocoaContext**>(pData) = mContext;
 			return;
 		} 
 		else if( name == "WINDOW" ) 
@@ -655,7 +639,7 @@ namespace Ogre {
 		
 	}
 
-    void OSXCocoaWindow::createNewWindow(unsigned int width, unsigned int height, String title)
+    void CocoaWindow::createNewWindow(unsigned int width, unsigned int height, String title)
     {
         // Get the dimensions of the display. We will use it for the window size but not context resolution
         NSRect windowRect = NSZeroRect;
@@ -667,18 +651,18 @@ namespace Ogre {
         else
             windowRect = NSMakeRect(0.0, 0.0, width, height);
 
-        mWindow = [[OgreWindow alloc] initWithContentRect:windowRect
+        mWindow = [[OgreGL3PlusWindow alloc] initWithContentRect:windowRect
                                               styleMask:mIsFullScreen ? NSBorderlessWindowMask : NSResizableWindowMask|NSTitledWindowMask
                                                 backing:NSBackingStoreBuffered
                                                   defer:YES];
         [mWindow setTitle:[NSString stringWithCString:title.c_str() encoding:NSUTF8StringEncoding]];
         mWindowTitle = title;
 
-        mView = [[OgreView alloc] initWithGLOSXWindow:this];
+        mView = [[OgreGL3PlusView alloc] initWithGLOSXWindow:this];
 
         _setWindowParameters();
 
-//        GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+//        GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
 //        rs->clearFrameBuffer(FBT_COLOUR);
 
         // Show window
@@ -689,15 +673,11 @@ namespace Ogre {
         WindowEventUtilities::_addRenderWindow(this);
     }
 
-    void OSXCocoaWindow::createWindowFromExternal(NSView *viewRef)
+    void CocoaWindow::createWindowFromExternal(NSView *viewRef)
     {
         LogManager::getSingleton().logMessage("Creating external window");
 
-        NSRect viewBounds;
-        if(mContentScalingSupported)
-            viewBounds = [mView convertRectToBacking:[mView bounds]];
-        else
-            viewBounds = [mView bounds];
+        NSRect viewBounds = [mView convertRectToBacking:[mView bounds]];
 
         mWindow = [viewRef window];
 
@@ -710,11 +690,11 @@ namespace Ogre {
         bufferRect[3] = viewBounds.size.height;   // height of buffer rect 
         CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
         CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
-
+        
         mIsExternal = true;
     }
 
-    void OSXCocoaWindow::_setWindowParameters(void)
+    void CocoaWindow::_setWindowParameters(void)
     {
         if(mWindow)
         {
@@ -724,8 +704,7 @@ namespace Ogre {
                 // This ensures that it will scale to the full screen size
                 NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
                 NSRect backingRect = NSZeroRect;
-
-                if(mContentScalingSupported && mContentScalingFactor > 1.0)
+                if(mContentScalingFactor > 1.0)
                     backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
                 else
                     backingRect = mainDisplayRect;
@@ -745,7 +724,7 @@ namespace Ogre {
                 [mWindow setContentView:mView];
                 [mWindow setFrameOrigin:NSZeroPoint];
                 [mWindow setLevel:NSMainMenuWindowLevel+1];
-
+                
                 mWindowOrigin = mWindow.frame.origin;
                 mLeft = mTop = 0;
             }
@@ -779,21 +758,21 @@ namespace Ogre {
         }
     }
 
-    void OSXCocoaWindow::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
+    void CocoaWindow::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
     {
         if (mIsFullScreen != fullScreen || width != mWidth || height != mHeight)
         {
             // Set the full screen flag
 			mIsFullScreen = fullScreen;
 
-                // Create a window if we haven't already, existence check is done within the functions
-                if(!mWindow)
-                {
-                    if(mIsExternal)
-                        createWindowFromExternal(mView);
-                    else
-                        createNewWindow(width, height, mWindowTitle);
-                }
+            // Create a window if we haven't already, existence check is done within the functions
+            if(!mWindow)
+            {
+                if(mIsExternal)
+                    createWindowFromExternal(mView);
+                else
+                    createNewWindow(width, height, mWindowTitle);
+            }
 
             _setWindowParameters();
 
