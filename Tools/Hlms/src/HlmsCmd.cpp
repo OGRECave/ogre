@@ -215,7 +215,7 @@ void HlmsCmd::createScene(void)
     Hlms *usedGenerator = hlmsManager->getHlms( HLMS_GUI );
     HlmsDatablock *datablock = usedGenerator->createDatablock( "TEST MATERIAL", macroblockRef,
                                                                blendblockRef, params );
-    entity->setHlms( datablock );
+    entity->setDatablock( datablock );
 
     mSceneMgr->updateSceneGraph();
 
