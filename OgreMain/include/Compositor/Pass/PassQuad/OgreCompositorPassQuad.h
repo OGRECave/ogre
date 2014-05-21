@@ -98,6 +98,7 @@ namespace Ogre
         virtual void execute( const Camera *lodCamera );
 
         /// Don't make this const (useful for compile-time multithreading errors)
+        /// Pointer can be null if using HLMS
         Pass* getPass(void)                                     { return mPass; }
     };
 

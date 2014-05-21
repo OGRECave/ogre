@@ -325,14 +325,14 @@ namespace Ogre {
         return mSubEntityList.size();
     }
     //-----------------------------------------------------------------------
-    void Entity::setHlms( HlmsDatablock *datablock )
+    void Entity::setDatablock( HlmsDatablock *datablock )
     {
         SubEntityList::iterator itor = mSubEntityList.begin();
         SubEntityList::iterator end  = mSubEntityList.end();
 
         while( itor != end )
         {
-            itor->setHlms( datablock );
+            itor->setDatablock( datablock );
             ++itor;
         }
     }
@@ -354,7 +354,7 @@ namespace Ogre {
             unsigned int n = 0;
             for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i, ++n)
             {
-                newEnt->getSubEntity(n)->setHlms( i->getDatablock() );
+                newEnt->getSubEntity(n)->setDatablock( i->getDatablock() );
             }
             if (mAnimationState)
             {

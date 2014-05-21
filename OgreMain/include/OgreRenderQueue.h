@@ -92,8 +92,6 @@ namespace Ogre {
             RenderQueueGroup() : mSorted( false ) {}
         };
 
-        typedef vector<RenderQueueGroup>::type RenderQueueGroupVec;
-
         struct BufferBucket
         {
             TexturePtr  texBuffer;
@@ -118,21 +116,33 @@ namespace Ogre {
 
         typedef FastArray<Batch> BatchArray;
 
-        RenderQueueGroupVec mRenderQueues;
+        RenderQueueGroup mRenderQueues[256];
 
         BatchArray mBatchesToRender;
         HlmsManager *mHlmsManager;
         SceneManager *mSceneManager;
 
+        HlmsMacroblock const    *mLastMacroblock;
+        HlmsBlendblock const    *mLastBlendblock;
+        VertexData const        *mLastVertexData;
+        IndexData const         *mLastIndexData;
+        HlmsCache const         *mLastHlmsCache;
+        uint32                  mLastTextureHash;
+
     public:
         RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager );
         ~RenderQueue();
 
-        /** Empty the queue - should only be called by SceneManagers.
-        @param destroyPassMaps Set to true to destroy all pass maps so that
-            the queue is completely clean (useful when switching scene managers)
-        */
+        /// Empty the queue - should only be called by SceneManagers.
         void clear(void);
+
+        /** The RenderQueue keeps track of API state to avoid redundant state change passes
+            Calling this function forces the RenderQueue to re-set the Macro- & Blendblocks,
+            shaders, and any other API dependendant calls on the next render.
+        @remarks
+            Calling this function inside render or renderES2 won't have any effect.
+        */
+        void flushState(void);
 
         /** Add a renderable object to the queue.
         @remarks
@@ -156,6 +166,10 @@ namespace Ogre {
         void render( uint8 firstRq, uint8 lastRq );
         void renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
                         bool casterPass, bool dualParaboloid );
+
+        /// Don't call this too often.
+        void renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
+                                 RenderSystem *rs, bool casterPass, bool dualParaboloid );
     };
 
     /** @} */

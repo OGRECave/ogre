@@ -76,7 +76,7 @@ namespace Ogre {
         setDefaultDimensions( 100, 100 );
 
         Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
-        setHlms( hlms->getDatablock( IdString() ) );
+        setDatablock( hlms->getDatablock( IdString() ) );
 
         setPoolSize( poolSize );
         setCastShadows( false );

@@ -4508,6 +4508,13 @@ void SceneManager::extractAllMovableObjectsByType(const String& typeName)
     }
 }
 //---------------------------------------------------------------------
+void SceneManager::_renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
+                                        bool casterPass, bool dualParaboloid )
+{
+    mRenderQueue->renderSingleObject( pRend, pMovableObject, mDestRenderSystem,
+                                      casterPass, dualParaboloid );
+}
+//---------------------------------------------------------------------
 void SceneManager::_injectRenderWithPass( Pass *pass, Renderable *rend, Camera *activeCamera,
                                           bool shadowDerivation, bool doLightIteration )
 {

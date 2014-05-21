@@ -68,28 +68,6 @@ namespace Ogre
                 mHorizonalTexelOffset( horizonalTexelOffset ),
                 mVerticalTexelOffset( verticalTexelOffset )
     {
-        MaterialPtr material = MaterialManager::getSingleton().getByName( mDefinition->mMaterialName );
-        if( material.isNull() )
-        {
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find material '" +
-                         mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
-        }
-        material->load();
-
-        if( !material->getBestTechnique() )
-        {
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find best technique for material '" +
-                         mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
-        }
-
-        if( !material->getBestTechnique()->getPass( 0 ) )
-        {
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Best technique must have a Pass! Material '" +
-                         mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
-        }
-
-        mPass = material->getBestTechnique()->getPass( 0 );
-
         const CompositorWorkspace *workspace = parentNode->getWorkspace();
 
         if( mDefinition->mUseQuad ||
@@ -100,6 +78,37 @@ namespace Ogre
         else
         {
             mFsRect = workspace->getCompositorManager()->getSharedFullscreenTriangle();
+        }
+
+        if( mDefinition->mMaterialIsHlms )
+        {
+            mFsRect->setDatablock( mDefinition->mMaterialName );
+        }
+        else
+        {
+            MaterialPtr material = MaterialManager::getSingleton().getByName( mDefinition->mMaterialName );
+            if( material.isNull() )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find material '" +
+                             mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
+            }
+            material->load();
+
+            if( !material->getBestTechnique() )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find best technique for material '" +
+                             mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
+            }
+
+            if( !material->getBestTechnique()->getPass( 0 ) )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Best technique must have a Pass! Material '" +
+                             mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
+            }
+
+            mPass = material->getBestTechnique()->getPass( 0 );
+
+            mFsRect->setMaterial( material );
         }
 
         if( mDefinition->mCameraName != IdString() )
@@ -122,19 +131,24 @@ namespace Ogre
         if( mDefinition->mBeginRtUpdate )
             mTarget->_beginUpdate();
 
-        //Set the material textures every frame (we don't clone the material)
-        const CompositorPassQuadDef::TextureSources &textureSources = mDefinition->getTextureSources();
-        CompositorPassQuadDef::TextureSources::const_iterator itor = textureSources.begin();
-        CompositorPassQuadDef::TextureSources::const_iterator end  = textureSources.end();
-        while( itor != end )
+        if( mPass )
         {
-            if( itor->texUnitIdx < mPass->getNumTextureUnitStates() )
+            //Set the material textures every frame (we don't clone the material)
+            const CompositorPassQuadDef::TextureSources &textureSources =
+                                                                mDefinition->getTextureSources();
+            CompositorPassQuadDef::TextureSources::const_iterator itor = textureSources.begin();
+            CompositorPassQuadDef::TextureSources::const_iterator end  = textureSources.end();
+            while( itor != end )
             {
-                TextureUnitState *tu = mPass->getTextureUnitState( itor->texUnitIdx );
-                tu->setTexture( mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex ) );
-            }
+                if( itor->texUnitIdx < mPass->getNumTextureUnitStates() )
+                {
+                    TextureUnitState *tu = mPass->getTextureUnitState( itor->texUnitIdx );
+                    tu->setTexture( mParentNode->getDefinedTexture( itor->textureName,
+                                                                    itor->mrtIndex ) );
+                }
 
-            ++itor;
+                ++itor;
+            }
         }
 
         const Real hOffset = 2.0f * mHorizonalTexelOffset / mTarget->getWidth();
@@ -166,7 +180,8 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
-        sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
+        //sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
+        sceneManager->_renderSingleObject( mFsRect, 0, false, false );
 
         if( listener )
             listener->passPosExecute( this );

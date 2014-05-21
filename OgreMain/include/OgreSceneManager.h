@@ -2774,6 +2774,9 @@ namespace Ogre {
         */
         virtual bool getFlipCullingOnNegativeScale() const { return mFlipCullingOnNegativeScale; }
 
+        virtual void _renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
+                                          bool casterPass, bool dualParaboloid );
+
         /** Render something as if it came from the current queue.
             @param pass     Material pass to use for setting up this quad.
             @param rend     Renderable to render

@@ -175,30 +175,13 @@ namespace Ogre
         vbuf->unlock();
 
         // set basic white material
-        this->setMaterial( "BaseWhiteNoLighting" );
+        this->setMaterialName( "BaseWhiteNoLighting",
+                               ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME );
     }
     //-----------------------------------------------------------------------------------
     Rectangle2D::~Rectangle2D()
     {
         OGRE_DELETE mRenderOp.vertexData;
-    }
-    //-----------------------------------------------------------------------------------
-    void Rectangle2D::setMaterial( const String& matName )
-    {
-        mMaterial = MaterialManager::getSingleton().getByName( matName );
-        if( mMaterial.isNull() )
-        {
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + matName,
-                        "Rectangle2D::setMaterial" );
-        }
-    
-        // Won't load twice anyway
-        mMaterial->load();
-    }
-    //-----------------------------------------------------------------------------------
-    const MaterialPtr& Rectangle2D::getMaterial(void) const
-    {
-        return mMaterial;
     }
     //-----------------------------------------------------------------------------------
     void Rectangle2D::setCorners( Real left, Real top, Real width, Real height )

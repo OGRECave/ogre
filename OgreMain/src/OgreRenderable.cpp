@@ -68,13 +68,13 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void Renderable::setHlms( IdString datablockName )
+    void Renderable::setDatablock( IdString datablockName )
     {
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-        setHlms( hlmsManager->getDatablock( datablockName ) );
+        setDatablock( hlmsManager->getDatablock( datablockName ) );
     }
     //-----------------------------------------------------------------------------------
-    void Renderable::setHlms( HlmsDatablock *datablock )
+    void Renderable::setDatablock( HlmsDatablock *datablock )
     {
         if( mHlmsDatablock )
             mHlmsDatablock->_unlinkRenderable( this );
@@ -101,7 +101,7 @@ namespace Ogre
                 " because this Material does not exist. Have you forgotten to define it in a "
                 ".material script?", LML_CRITICAL );
 
-            setHlms( IdString() );
+            setDatablock( IdString() );
         }
         else
         {
@@ -113,7 +113,7 @@ namespace Ogre
     {
         // Ensure new material loaded (will not load again if already loaded)
         material->load();
-        setHlms( material->getTechnique(0)->getPass(0)->_getDatablock() );
+        setDatablock( material->getTechnique(0)->getPass(0)->_getDatablock() );
         mLodMaterial = material->_getLodValues();
     }
     //-----------------------------------------------------------------------------------

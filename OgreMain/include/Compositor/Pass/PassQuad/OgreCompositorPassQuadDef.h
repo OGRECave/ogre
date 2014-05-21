@@ -87,6 +87,7 @@ namespace Ogre
         */
         bool    mIsResolve;
 
+        bool    mMaterialIsHlms;    /// If true, mMaterialName is an Hlms material
         String  mMaterialName;
 
         /** Type of frustum corners to pass in the quad normals.
@@ -100,6 +101,7 @@ namespace Ogre
             mParentNodeDef( parentNodeDef ),
             mUseQuad( false ),
             mIsResolve( false ),
+            mMaterialIsHlms( false ),
             mFrustumCorners( NO_CORNERS )
         {
         }

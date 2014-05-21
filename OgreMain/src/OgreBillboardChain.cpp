@@ -96,7 +96,7 @@ namespace Ogre {
         // index data set up later
 
         Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
-        setHlms( hlms->getDatablock( IdString() ) );
+        setDatablock( hlms->getDatablock( IdString() ) );
 
     }
     //-----------------------------------------------------------------------

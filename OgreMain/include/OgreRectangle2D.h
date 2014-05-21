@@ -56,7 +56,6 @@ namespace Ogre {
 
         bool        mQuad;
 
-        MaterialPtr mMaterial;
         RenderOperation mRenderOp;
 
         void initRectangle2D(void);
@@ -84,8 +83,6 @@ namespace Ogre {
 
         Real getSquaredViewDepth(const Camera* cam) const   { (void)cam; return 0; }
 
-        void setMaterial( const String& matName );
-        virtual const MaterialPtr& getMaterial(void) const;
         virtual void getWorldTransforms( Matrix4* xform ) const;
         virtual void getRenderOperation( RenderOperation& op );
         virtual const LightList& getLights(void) const;

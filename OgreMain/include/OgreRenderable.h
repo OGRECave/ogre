@@ -406,10 +406,10 @@ namespace Ogre {
         @remarks
             An null IdString() is valid, it will use the default material
         */
-        void setHlms( IdString datablockName );
+        void setDatablock( IdString datablockName );
 
         /// Assigns a datablock (i.e. HLMS Material) to this renderable
-        void setHlms( HlmsDatablock *datablock );
+        void setDatablock( HlmsDatablock *datablock );
 
         /// Manually sets the hlms hashes. Don't call this directly
         void _setHlmsHashes( uint32 hash, uint32 casterHash );

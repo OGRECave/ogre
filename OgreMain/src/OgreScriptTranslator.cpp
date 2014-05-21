@@ -7640,6 +7640,7 @@ namespace Ogre{
                         }
                     }
                     break;
+                case ID_HLMS:
                 case ID_MATERIAL:
                     if(prop->values.empty())
                     {
@@ -7653,6 +7654,8 @@ namespace Ogre{
                     }
                     else
                     {
+                        passQuad->mMaterialIsHlms = prop->id == ID_HLMS;
+
                         String val;
                         if( !getString(prop->values.front(), &passQuad->mMaterialName) )
                         {
