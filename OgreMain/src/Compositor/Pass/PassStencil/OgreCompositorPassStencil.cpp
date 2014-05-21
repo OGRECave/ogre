@@ -83,5 +83,8 @@ namespace Ogre
                                     mDefinition->mStencilMask, 0xFFFFFFFF, mDefinition->mStencilFailOp,
                                     mDefinition->mStencilDepthFailOp, mDefinition->mStencilPassOp,
                                     mDefinition->mTwoSided );
+
+        if( listener )
+            listener->passPosExecute( this );
     }
 }

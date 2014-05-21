@@ -168,6 +168,9 @@ namespace Ogre
 
         sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
 
+        if( listener )
+            listener->passPosExecute( this );
+
         //Call endUpdate if we're the last pass in a row to use this RT
         if( mDefinition->mEndRtUpdate )
             mTarget->_endUpdate();

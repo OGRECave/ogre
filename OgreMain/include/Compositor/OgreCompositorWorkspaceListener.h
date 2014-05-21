@@ -54,6 +54,11 @@ namespace Ogre
             Warning: calling pass->execute can result in recursive calls.
         */
         virtual void passPreExecute( CompositorPass *pass ) {}
+
+        /** Called after a pass has been executed.
+            Warning: calling pass->execute can result in recursive calls.
+        */
+        virtual void passPosExecute( CompositorPass *pass ) {}
     };
 
     /** @} */

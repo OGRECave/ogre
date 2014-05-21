@@ -69,5 +69,8 @@ namespace Ogre
 
         mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
                             mDefinition->mDepthValue, mDefinition->mStencilValue );
+
+        if( listener )
+            listener->passPosExecute( this );
     }
 }
