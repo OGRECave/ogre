@@ -116,6 +116,7 @@ namespace Ogre
         bool            mDebugOutput;
 
         HlmsTypes       mType;
+        IdString        mTypeName;
 
         /** Inserts common properties about the current Renderable,
             such as hlms_skeleton hlms_uv_count, etc
@@ -239,10 +240,11 @@ namespace Ogre
                                                     const HlmsParamVec &paramVec );
 
     public:
-        Hlms( HlmsTypes type, Archive *dataFolder );
+        Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder );
         virtual ~Hlms();
 
         HlmsTypes getType(void) const                       { return mType; }
+        IdString getTypeName(void) const                    { return mTypeName; }
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
         HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
 

@@ -44,7 +44,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     HlmsLowLevel::HlmsLowLevel() :
-        Hlms( HLMS_LOW_LEVEL, 0 ),
+        Hlms( HLMS_LOW_LEVEL, IdString(), 0 ),
         mAutoParamDataSource( 0 ),
         mCurrentSceneManager( 0 )
     {

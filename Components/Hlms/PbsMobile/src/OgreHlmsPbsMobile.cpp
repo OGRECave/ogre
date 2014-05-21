@@ -52,7 +52,7 @@ namespace Ogre
         "F0"
     };
 
-    HlmsPbsMobile::HlmsPbsMobile( Archive *dataFolder ) : Hlms( HLMS_PBS, dataFolder )
+    HlmsPbsMobile::HlmsPbsMobile( Archive *dataFolder ) : Hlms( HLMS_PBS, "pbs", dataFolder )
     {
     }
     //-----------------------------------------------------------------------------------

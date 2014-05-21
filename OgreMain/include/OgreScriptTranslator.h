@@ -132,8 +132,6 @@ namespace Ogre{
      *************************************************************************/
     class _OgreExport HlmsTranslator : public ScriptTranslator
     {
-    /*protected:
-        Hlms *mHlms;*/
     public:
         //HlmsTranslator();
         void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);

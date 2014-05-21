@@ -661,7 +661,7 @@ namespace Ogre{
     /**************************************************************************
      * HlmsTranslator
      *************************************************************************/
-    /*HlmsTranslator::HlmsTranslator() : mHlms(0)
+    /*HlmsTranslator::HlmsTranslator()
     {
     }*/
 
@@ -696,16 +696,20 @@ namespace Ogre{
 
         paramVec.reserve( obj->children.size() );
 
-        if( type == "pbs" )
-            hlms = hlmsManager->getHlms( HLMS_PBS );
-        else if( type == "toon" )
-            hlms = hlmsManager->getHlms( HLMS_TOON );
-        else if( type == "gui" )
-            hlms = hlmsManager->getHlms( HLMS_GUI );
-        else
+        const IdString idType( type );
+        for( size_t i=0; i<HLMS_MAX && !hlms; ++i )
+        {
+            hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+
+            if( hlms && idType != hlms->getTypeName() )
+                hlms = 0; //This one isn't, keep looking
+        }
+
+        if( !hlms )
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, node->file, node->line,
                                type + " is not a valid hlms type");
+            return;
         }
 
         HlmsMacroblock macroblock;

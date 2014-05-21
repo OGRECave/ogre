@@ -165,7 +165,7 @@ namespace Ogre
         "atlasOffsets"
     };
 
-    HlmsGui2DMobile::HlmsGui2DMobile( Archive *dataFolder ) : Hlms( HLMS_GUI, dataFolder )
+    HlmsGui2DMobile::HlmsGui2DMobile( Archive *dataFolder ) : Hlms( HLMS_GUI, "gui", dataFolder )
     {
     }
     //-----------------------------------------------------------------------------------
