@@ -117,6 +117,7 @@ namespace Ogre
         TextureVec              mNullTextureList;
         Rectangle2D             *mSharedTriangleFS;
         Rectangle2D             *mSharedQuadFS;
+        ObjectMemoryManager     *mDummyObjectMemoryManager;
 
         void validateNodes(void);
 

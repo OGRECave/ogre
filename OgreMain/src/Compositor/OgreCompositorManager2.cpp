@@ -38,6 +38,8 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 
+#include "Math/Array/OgreObjectMemoryManager.h"
+
 #include "OgreRectangle2D.h"
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
@@ -73,10 +75,12 @@ namespace Ogre
         mFrameCount( 0 ),
         mRenderSystem( renderSystem ),
         mSharedTriangleFS( 0 ),
-        mSharedQuadFS( 0 )
+        mSharedQuadFS( 0 ),
+        mDummyObjectMemoryManager( 0 )
     {
-        mSharedTriangleFS   = OGRE_NEW Rectangle2D( false );
-        mSharedQuadFS       = OGRE_NEW Rectangle2D( true );
+        mDummyObjectMemoryManager = new ObjectMemoryManager();
+        mSharedTriangleFS   = OGRE_NEW Rectangle2D( false, 0, mDummyObjectMemoryManager );
+        mSharedQuadFS       = OGRE_NEW Rectangle2D( true, 0, mDummyObjectMemoryManager );
 
         //----------------------------------------------------------------
         // Create a default Node & Workspace for basic rendering:
@@ -189,6 +193,9 @@ namespace Ogre
         mSharedTriangleFS = 0;
         OGRE_DELETE mSharedQuadFS;
         mSharedQuadFS = 0;
+
+        delete mDummyObjectMemoryManager;
+        mDummyObjectMemoryManager = 0;
     }
     //-----------------------------------------------------------------------------------
     bool CompositorManager2::hasNodeDefinition( IdString nodeDefName ) const

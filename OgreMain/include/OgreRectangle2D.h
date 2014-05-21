@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#include "OgreMovableObject.h"
 #include "OgreRenderable.h"
 
 namespace Ogre {
@@ -47,7 +48,7 @@ namespace Ogre {
     Beginning Ogre 2.0, it supports building a full screen triangle instead
     of rectangle. Position & UVs are in the first source. Normals are in the second one
     */
-    class _OgreExport Rectangle2D : public Renderable, public MovableAlloc
+    class _OgreExport Rectangle2D : public Renderable, public MovableObject
     {
     protected:
         Vector3     mPosition;
@@ -61,7 +62,7 @@ namespace Ogre {
         void initRectangle2D(void);
 
     public:
-        Rectangle2D( bool bQuad );
+        Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager );
         ~Rectangle2D();
 
         /** Sets the corners of the rectangle, in relative coordinates.
@@ -86,6 +87,11 @@ namespace Ogre {
         virtual void getWorldTransforms( Matrix4* xform ) const;
         virtual void getRenderOperation( RenderOperation& op );
         virtual const LightList& getLights(void) const;
+
+        /** Returns the type name of this object. */
+        virtual const String& getMovableType(void) const;
+
+        virtual void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false) {}
 
     };
     /** @} */
