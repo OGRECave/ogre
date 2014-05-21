@@ -650,7 +650,7 @@ namespace Ogre {
                 HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
                 Hlms *hlms = hlmsManager->getHlms( HLMS_GUI );
                 HlmsDatablock *datablock = hlms->getDatablock( mBorderMaterialName );
-                mBorderRenderable->setHlms( datablock );
+                mBorderRenderable->setDatablock( datablock );
             }
         }
 

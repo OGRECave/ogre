@@ -631,7 +631,7 @@ namespace Ogre {
              mHlmsDatablock->getName() != mFont->getHlmsDatablock()->getName() )
         {
             mFont->load();
-            this->setHlms( mFont->getHlmsDatablock() );
+            this->setDatablock( mFont->getHlmsDatablock() );
         }
     }
     //---------------------------------------------------------------------------------------------
