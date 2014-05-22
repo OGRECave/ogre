@@ -279,9 +279,9 @@ namespace Ogre
         }
 
         SubStringRef subString( &outSubString.getOriginalBuffer(), outSubString.getStart(),
-								 outSubString.getStart() + expEnd );
+                                 outSubString.getStart() + expEnd );
 
-		outSubString = SubStringRef( &outSubString.getOriginalBuffer(),
+        outSubString = SubStringRef( &outSubString.getOriginalBuffer(),
                                      outSubString.getStart() + expEnd + 1 );
 
         bool textStarted = false;
@@ -316,13 +316,13 @@ namespace Ogre
             }
             else if( c == ')' )
             {
-				if( expressionParents.empty() )
-					syntaxError = true;
-				else
-				{
-					currentExpression = expressionParents.back();
-					expressionParents.pop_back();
-				}
+                if( expressionParents.empty() )
+                    syntaxError = true;
+                else
+                {
+                    currentExpression = expressionParents.back();
+                    expressionParents.pop_back();
+                }
 
                 textStarted = false;
             }
@@ -1143,7 +1143,9 @@ namespace Ogre
                 gp->setSkeletalAnimationIncluded( getProperty( HlmsPropertySkeleton ) != 0 );
                 gp->setMorphAnimationIncluded( false );
                 gp->setPoseAnimationIncluded( getProperty( HlmsPropertyPose ) );
-                gp->setVertexTextureFetchRequired( true );
+                gp->setVertexTextureFetchRequired( false );
+
+                gp->load();
 
                 shaders[i] = gp;
             }
@@ -1386,7 +1388,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::_changeRenderSystem( RenderSystem *newRs )
     {
-		mShaderCache.clear();
+        mShaderCache.clear();
         mRenderSystem = newRs;
 
         mShaderProfile = "unset!";
@@ -1423,7 +1425,7 @@ namespace Ogre
         String outString;
 
         inFile.seekg( 0, std::ios::end );
-		inString.resize( inFile.tellg() );
+        inString.resize( inFile.tellg() );
         inFile.seekg( 0, std::ios::beg );
 
         inFile.read( &inString[0], inString.size() );
