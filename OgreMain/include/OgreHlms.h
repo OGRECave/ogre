@@ -112,6 +112,7 @@ namespace Ogre
         typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
         HlmsDatablockMap mDatablocks;
 
+        String          mShaderProfile; /// "glsl", "glsles", "hlsl"
         String          mOutputPath;
         bool            mDebugOutput;
 

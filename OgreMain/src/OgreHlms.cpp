@@ -104,6 +104,7 @@ namespace Ogre
         mType( type ),
         mTypeName( typeName ),
         mRenderSystem( 0 ),
+        mShaderProfile( "unset!" ),
         mDebugOutput( true )
     {
         enumeratePieceFiles();
@@ -1136,7 +1137,7 @@ namespace Ogre
                 HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
                                     StringConverter::toString( finalHash ) + ShaderFiles[i],
                                     ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                    "glsl", static_cast<GpuProgramType>(i) );
+                                    mShaderProfile, static_cast<GpuProgramType>(i) );
                 gp->setSource( outString );
 
                 gp->setSkeletalAnimationIncluded( getProperty( HlmsPropertySkeleton ) != 0 );
@@ -1387,6 +1388,21 @@ namespace Ogre
     {
 		mShaderCache.clear();
         mRenderSystem = newRs;
+
+        mShaderProfile = "unset!";
+
+        if( mRenderSystem )
+        {
+            //Prefer glsl over glsles
+            const String shaderProfiles[3] = { "hlsl", "glsles", "glsl" };
+            const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();
+
+            for( size_t i=0; i<3; ++i )
+            {
+                if( capabilities->isShaderProfileSupported( shaderProfiles[i] ) )
+                    mShaderProfile = shaderProfiles[i];
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     /*void Hlms::generateFor()
