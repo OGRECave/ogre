@@ -181,7 +181,7 @@ namespace Ogre
             listener->passPreExecute( this );
 
         //sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
-        sceneManager->_renderSingleObject( mFsRect, 0, false, false );
+        sceneManager->_renderSingleObject( mFsRect, mFsRect, false, false );
 
         if( listener )
             listener->passPosExecute( this );
