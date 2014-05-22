@@ -1887,9 +1887,6 @@ bail:
     void D3D11RenderSystem::_setTextureCoordCalculation( size_t stage, TexCoordCalcMethod m,
         const Frustum* frustum)
     {
-        // record the stage state
-        mTexStageDesc[stage].autoTexCoordType = m;
-        mTexStageDesc[stage].frustum = frustum;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
@@ -1918,10 +1915,6 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureBlendMode( size_t stage, const LayerBlendModeEx& bm )
     {
-        if (bm.blendType == LBT_COLOUR)
-        {
-            mTexStageDesc[stage].layerBlendMode = bm;
-        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op /*= SBO_ADD*/ )
@@ -4091,7 +4084,6 @@ bail:
         // set stages desc. to defaults
         for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
         {
-            mTexStageDesc[n].autoTexCoordType = TEXCALC_NONE;
             mTexStageDesc[n].coordIndex = 0;
             mTexStageDesc[n].pTex = 0;
         }
