@@ -1069,6 +1069,9 @@ namespace Ogre {
         mResourceBackgroundQueue->shutdown();
         mWorkQueue->shutdown();
 
+		OGRE_DELETE mCompositorManager2;
+        mCompositorManager2 = 0;
+
         SceneManagerEnumerator::getSingleton().shutdownAll();
         shutdownPlugins();
 
@@ -1076,9 +1079,6 @@ namespace Ogre {
 
         // Destroy pools
         ConvexBody::_destroyPool();
-
-        OGRE_DELETE mCompositorManager2;
-        mCompositorManager2 = 0;
 
         mIsInitialised = false;
 
