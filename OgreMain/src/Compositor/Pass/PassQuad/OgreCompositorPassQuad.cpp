@@ -63,6 +63,7 @@ namespace Ogre
                 CompositorPass( definition, target, parentNode ),
                 mDefinition( definition ),
                 mFsRect( 0 ),
+                mDatablock( 0 ),
                 mPass( 0 ),
                 mCamera( 0 ),
                 mHorizonalTexelOffset( horizonalTexelOffset ),
@@ -110,6 +111,8 @@ namespace Ogre
 
             mFsRect->setMaterial( material );
         }
+
+        mDatablock = mFsRect->getDatablock();
 
         if( mDefinition->mCameraName != IdString() )
             mCamera = workspace->findCamera( mDefinition->mCameraName );
@@ -181,6 +184,7 @@ namespace Ogre
             listener->passPreExecute( this );
 
         //sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
+        mFsRect->setDatablock( mDatablock );
         sceneManager->_renderSingleObject( mFsRect, mFsRect, false, false );
 
         if( listener )

@@ -76,13 +76,16 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Renderable::setDatablock( HlmsDatablock *datablock )
     {
-        if( mHlmsDatablock )
-            mHlmsDatablock->_unlinkRenderable( this );
+        if( mHlmsDatablock != datablock )
+        {
+            if( mHlmsDatablock )
+                mHlmsDatablock->_unlinkRenderable( this );
 
-        mHlmsDatablock = datablock;
-        mHlmsDatablock->_linkRenderable( this );
-        mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
-                                                        mHlmsHash, mHlmsCasterHash );
+            mHlmsDatablock = datablock;
+            mHlmsDatablock->_linkRenderable( this );
+            mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
+                                                            mHlmsHash, mHlmsCasterHash );
+        }
     }
     //-----------------------------------------------------------------------------------
     void Renderable::_setHlmsHashes( uint32 hash, uint32 casterHash )

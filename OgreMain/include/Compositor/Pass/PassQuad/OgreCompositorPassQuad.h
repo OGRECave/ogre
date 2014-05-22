@@ -84,6 +84,7 @@ namespace Ogre
         CompositorPassQuadDef const *mDefinition;
     protected:
         Rectangle2D     *mFsRect;
+        HlmsDatablock   *mDatablock;
         Pass            *mPass;
         Camera          *mCamera;
 
