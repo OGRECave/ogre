@@ -224,9 +224,6 @@ namespace Ogre {
         }
 
         pLog->logMessage(
-            " * Scissor Rectangle: "
-            + StringConverter::toString(hasCapability(RSC_SCISSOR_TEST), true));
-        pLog->logMessage(
             " * Hardware Occlusion Query: "
             + StringConverter::toString(hasCapability(RSC_HWOCCLUSION), true));
         pLog->logMessage(

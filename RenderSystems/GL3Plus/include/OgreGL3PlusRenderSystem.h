@@ -89,6 +89,9 @@ namespace Ogre {
         /// Store last depth write state
         bool mDepthWrite;
 
+        /// Store last scissor enable state
+        bool mScissorsEnabled;
+
         /// Store last stencil mask state
         uint32 mStencilWriteMask;
 
@@ -158,6 +161,8 @@ namespace Ogre {
                                      vector<GLuint>::type &attribsBound,
                                      vector<GLuint>::type &instanceAttribsBound,
                                      bool updateVAO);
+
+        void transformViewportCoords( int x, int &y, int width, int height );
 
     public:
         // Default constructor / destructor
@@ -459,10 +464,6 @@ namespace Ogre {
             RenderSystem
         */
         void _render(const RenderOperation& op);
-        /** See
-            RenderSystem
-        */
-        void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
 
         void clearFrameBuffer(unsigned int buffers,
                               const ColourValue& colour = ColourValue::Black,

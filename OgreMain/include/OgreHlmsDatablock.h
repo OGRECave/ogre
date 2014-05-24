@@ -71,6 +71,7 @@ namespace Ogre
         float               mDepthBiasSlopeScale;
 
         bool                mAlphaToCoverageEnabled;
+        bool                mScissorTestEnabled;
         CullingMode         mCullMode;
         PolygonMode         mPolygonMode;
         void                *mRsData;       ///Render-System specific data

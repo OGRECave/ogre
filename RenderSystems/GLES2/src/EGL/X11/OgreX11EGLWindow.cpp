@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreViewport.h"
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGLES2RenderSystem.h"
@@ -355,7 +356,7 @@ namespace Ogre {
 
                 for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
                 {
-                    (*it).second->_updateDimensions();
+                    (*it)->_updateDimensions();
                 }
             }
         }
@@ -400,7 +401,7 @@ namespace Ogre {
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
-            (*it).second->_updateDimensions();
+            (*it)->_updateDimensions();
         }
     }
     void X11EGLWindow::switchFullScreen(bool fullscreen)

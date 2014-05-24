@@ -95,6 +95,8 @@ namespace Ogre {
             /// List of background thread contexts
             GLES2ContextList mBackgroundContextList;
 
+            bool mScissorsEnabled;
+
             GLES2GpuProgramManager *mGpuProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
 #if !OGRE_NO_GLES2_CG_SUPPORT
@@ -129,6 +131,8 @@ namespace Ogre {
                                         vector<GLuint>::type &attribsBound,
                                         vector<GLuint>::type &instanceAttribsBound,
                                         bool updateVAO);
+
+            void correctViewport( GLint x, GLint &y, GLint &w, GLint &h, RenderTarget *renderTarget );
 
             // Mipmap count of the actual bounded texture
             size_t mCurTexMipCount;
@@ -422,10 +426,6 @@ namespace Ogre {
              RenderSystem
              */
             void _render(const RenderOperation& op);
-            /** See
-             RenderSystem
-             */
-            void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
 
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,

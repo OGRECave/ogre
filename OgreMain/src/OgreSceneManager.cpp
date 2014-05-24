@@ -2615,10 +2615,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                     mDestRenderSystem->_render(ro);
                 rend->postRender(this, mDestRenderSystem);
 
-                if (scissored == CLIPPED_SOME)
+                /*if (scissored == CLIPPED_SOME)
                     resetScissor();
                 if (clipped == CLIPPED_SOME)
-                    resetLightClip();
+                    resetLightClip();*/
             } // possibly iterate per light
         }
         else // no automatic light processing
@@ -2685,10 +2685,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                         mDestRenderSystem->_render(ro);
                     rend->postRender(this, mDestRenderSystem);
                 }
-                if (scissored == CLIPPED_SOME)
+                /*if (scissored == CLIPPED_SOME)
                     resetScissor();
                 if (clipped == CLIPPED_SOME)
-                    resetLightClip();
+                    resetLightClip();*/
                 
             } // !skipBecauseOfLightType
         }
@@ -3512,9 +3512,7 @@ const RealRect& SceneManager::getLightScissorRect( const Light* l, const Camera*
 //---------------------------------------------------------------------
 ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* cam)
 {
-    if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_SCISSOR_TEST))
-        return CLIPPED_NONE;
-
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     RealRect finalRect;
     // init (inverted since we want to grow from nothing)
     finalRect.left = finalRect.bottom = 1.0f;
@@ -3564,6 +3562,7 @@ ClipResult SceneManager::buildAndSetScissor(const LightList& ll, const Camera* c
         return CLIPPED_SOME;
     }
     else
+#endif
         return CLIPPED_NONE;
 
 }
@@ -3573,14 +3572,6 @@ void SceneManager::buildScissor(const Light* light, const Camera* cam, RealRect&
     // Project the sphere onto the camera
     Sphere sphere(light->getParentNode()->_getDerivedPosition(), light->getAttenuationRange());
     cam->projectSphere(sphere, &(rect.left), &(rect.top), &(rect.right), &(rect.bottom));
-}
-//---------------------------------------------------------------------
-void SceneManager::resetScissor()
-{
-    if (!mDestRenderSystem->getCapabilities()->hasCapability(RSC_SCISSOR_TEST))
-        return;
-
-    mDestRenderSystem->setScissorTest(false);
 }
 //---------------------------------------------------------------------
 const AxisAlignedBox& SceneManager::getCurrentCastersBox(void) const

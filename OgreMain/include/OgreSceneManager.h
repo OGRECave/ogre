@@ -916,7 +916,6 @@ namespace Ogre {
         virtual ClipResult buildAndSetScissor(const LightList& ll, const Camera* cam);
         /// Update a scissor rectangle from a single light
         virtual void buildScissor(const Light* l, const Camera* cam, RealRect& rect);
-        virtual void resetScissor();
         /// Build a set of user clip planes from a single non-directional light
         virtual ClipResult buildAndSetLightClip(const LightList& ll);
         virtual void buildLightClip(const Light* l, PlaneList& planes);

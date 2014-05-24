@@ -114,6 +114,7 @@ namespace Ogre {
 
     GL3PlusRenderSystem::GL3PlusRenderSystem()
         : mDepthWrite(true),
+          mScissorsEnabled(false),
           mStencilWriteMask(0xFFFFFFFF),
           mShaderManager(0),
           mGLSLShaderFactory(0),
@@ -350,9 +351,6 @@ namespace Ogre {
         // Check for atomic counter support
         if (mGLSupport->checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
             rsc->setCapability(RSC_ATOMIC_COUNTERS);
-
-        // Scissor test is standard
-        rsc->setCapability(RSC_SCISSOR_TEST);
 
         // As are user clipping planes
         rsc->setCapability(RSC_USER_CLIP_PLANES);
@@ -1242,6 +1240,17 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(glViewport(x, y, w, h));
 
+            w = vp->getScissorActualWidth();
+            h = vp->getScissorActualHeight();
+            x = vp->getScissorActualLeft();
+            y = vp->getScissorActualTop();
+
+            if (target && !target->requiresTextureFlipping())
+            {
+                // Convert "upper-left" corner to "lower-left"
+                y = target->getHeight() - h - y;
+            }
+
             // Configure the viewport clipping
             OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
 
@@ -1274,7 +1283,17 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
         }
 
-        mDepthWrite = macroblock->mDepthWrite;
+        if( macroblock->mScissorTestEnabled )
+        {
+            OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
+        }
+        else
+        {
+            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
+        }
+
+        mDepthWrite         = macroblock->mDepthWrite;
+        mScissorsEnabled    = macroblock->mScissorTestEnabled;
     }
 
     void GL3PlusRenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
@@ -1343,14 +1362,10 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_beginFrame(void)
     {
-        OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
     }
 
     void GL3PlusRenderSystem::_endFrame(void)
     {
-        // Deactivate the viewport clipping.
-        OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
-
         OGRE_CHECK_GL_ERROR(glDisable(GL_DEPTH_CLAMP));
 
         // unbind GPU programs at end of frame
@@ -2115,51 +2130,6 @@ namespace Ogre {
         mRenderInstanceAttribsBound.clear();
     }
 
-    void GL3PlusRenderSystem::setScissorTest(bool enabled, size_t left,
-                                             size_t top, size_t right,
-                                             size_t bottom)
-    {
-        // If request texture flipping, use "upper-left", otherwise use "lower-left"
-        bool flipping = mActiveRenderTarget->requiresTextureFlipping();
-        //  GL measures from the bottom, not the top
-        size_t targetHeight = mActiveRenderTarget->getHeight();
-        // Calculate the "lower-left" corner of the viewport
-        uint64 x = 0, y = 0, w = 0, h = 0;
-
-        if (enabled)
-        {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
-            // NB GL uses width / height rather than right / bottom
-            x = left;
-            if (flipping)
-                y = top;
-            else
-                y = targetHeight - bottom;
-            w = right - left;
-            h = bottom - top;
-            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
-                                          static_cast<GLsizei>(y),
-                                          static_cast<GLsizei>(w),
-                                          static_cast<GLsizei>(h)));
-        }
-        else
-        {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
-            // GL requires you to reset the scissor when disabling
-            w = mActiveViewport->getActualWidth();
-            h = mActiveViewport->getActualHeight();
-            x = mActiveViewport->getActualLeft();
-            if (flipping)
-                y = mActiveViewport->getActualTop();
-            else
-                y = targetHeight - mActiveViewport->getActualTop() - h;
-            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
-                                          static_cast<GLsizei>(y),
-                                          static_cast<GLsizei>(w),
-                                          static_cast<GLsizei>(h)));
-        }
-    }
-
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,
                                                const ColourValue& colour,
                                                Real depth, unsigned short stencil)
@@ -2196,39 +2166,62 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glClearStencil(stencil));
         }
 
-        // Should be enable scissor test due the clear region is
-        // relied on scissor box bounds.
-        GLboolean scissorTestEnabled = glIsEnabled(GL_SCISSOR_TEST);
-        if (!scissorTestEnabled)
+        RenderTarget* target = mActiveViewport->getTarget();
+        bool scissorsNeeded = mActiveViewport->getActualLeft() != 0 ||
+                                mActiveViewport->getActualTop() != 0 ||
+                                mActiveViewport->getActualWidth() != target->getWidth() ||
+                                mActiveViewport->getActualHeight() != target->getHeight();
+
+        if( scissorsNeeded )
         {
+            //We clear the viewport area. The Viewport may not
+            //coincide with the current clipping region
+            GLsizei x, y, w, h;
+            w = mActiveViewport->getActualWidth();
+            h = mActiveViewport->getActualHeight();
+            x = mActiveViewport->getActualLeft();
+            y = mActiveViewport->getActualTop();
+
+            if( !target->requiresTextureFlipping() )
+            {
+                // Convert "upper-left" corner to "lower-left"
+                y = target->getHeight() - h - y;
+            }
+
+            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+        }
+
+        if( scissorsNeeded && !mScissorsEnabled )
+        {
+            // Clear the buffers
+            // Subregion clears need scissort tests enabled.
             OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
-        }
-
-        // Sets the scissor box as same as viewport
-        GLint viewport[4], scissor[4];
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_SCISSOR_BOX, scissor));
-        bool scissorBoxDifference =
-            viewport[0] != scissor[0] || viewport[1] != scissor[1] ||
-            viewport[2] != scissor[2] || viewport[3] != scissor[3];
-        if (scissorBoxDifference)
-        {
-            OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
-        }
-
-        // Clear buffers
-        OGRE_CHECK_GL_ERROR(glClear(flags));
-
-        // Restore scissor box
-        if (scissorBoxDifference)
-        {
-            OGRE_CHECK_GL_ERROR(glScissor(scissor[0], scissor[1], scissor[2], scissor[3]));
-        }
-
-        // Restore scissor test
-        if (!scissorTestEnabled)
-        {
+            OGRE_CHECK_GL_ERROR(glClear(flags));
             OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
+        }
+        else
+        {
+            // Clear the buffers
+            // Either clearing the whole screen, or scissor test is already enabled.
+            OGRE_CHECK_GL_ERROR(glClear(flags));
+        }
+
+        if( scissorsNeeded )
+        {
+            //Restore the clipping region
+            GLsizei x, y, w, h;
+            w = mActiveViewport->getScissorActualWidth();
+            h = mActiveViewport->getScissorActualHeight();
+            x = mActiveViewport->getScissorActualLeft();
+            y = mActiveViewport->getScissorActualTop();
+
+            if( !target->requiresTextureFlipping() )
+            {
+                // Convert "upper-left" corner to "lower-left"
+                y = target->getHeight() - h - y;
+            }
+
+            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
         }
 
         // Reset buffer write state

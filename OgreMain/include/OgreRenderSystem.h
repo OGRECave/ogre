@@ -1256,20 +1256,6 @@ namespace Ogre
         */
         virtual bool getInvertVertexWinding(void) const;
 
-        /** Sets the 'scissor region' i.e. the region of the target in which rendering can take place.
-        @remarks
-        This method allows you to 'mask off' rendering in all but a given rectangular area
-        as identified by the parameters to this method.
-        @note
-        Not all systems support this method. Check the RenderSystemCapabilities for the
-        RSC_SCISSOR_TEST capability to see if it is supported.
-        @param enabled True to enable the scissor test, false to disable it.
-        @param left, top, right, bottom The location of the corners of the rectangle, expressed in
-        <i>pixels</i>.
-        */
-        virtual void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, 
-            size_t right = 800, size_t bottom = 600) = 0;
-
         /** Clears one or more frame buffers on the active render target. 
         @param buffers Combination of one or more elements of FrameBufferType
         denoting which buffers are to be cleared

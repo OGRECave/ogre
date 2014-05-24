@@ -44,6 +44,7 @@ namespace Ogre
         mDepthBiasConstant( 0 ),
         mDepthBiasSlopeScale( 0 ),
         mAlphaToCoverageEnabled( false ),
+        mScissorTestEnabled( false ),
         mCullMode( CULL_CLOCKWISE ),
         mPolygonMode( PM_SOLID ),
         mRsData( 0 )
