@@ -154,12 +154,14 @@ namespace Ogre
             }
         }
 
-        const Real hOffset = 2.0f * mHorizonalTexelOffset / mTarget->getWidth();
-        const Real vOffset = 2.0f * mVerticalTexelOffset / mTarget->getHeight();
+        if( mHorizonalTexelOffset != 0 || mVerticalTexelOffset != 0 )
+        {
+            const Real hOffset = 2.0f * mHorizonalTexelOffset / mTarget->getWidth();
+            const Real vOffset = 2.0f * mVerticalTexelOffset / mTarget->getHeight();
 
-        //The rectangle is shared, set the corners each time
-        mFsRect->setCorners( mDefinition->mVpLeft + hOffset, mDefinition->mVpTop - vOffset,
-                             mDefinition->mVpWidth, mDefinition->mVpHeight );
+            //The rectangle is shared, set the corners each time
+            mFsRect->setCorners( 0.0f + hOffset, 0.0f - vOffset, 1.0f, 1.0f );
+        }
 
         if( mDefinition->mFrustumCorners == CompositorPassQuadDef::VIEW_SPACE_CORNERS )
         {
