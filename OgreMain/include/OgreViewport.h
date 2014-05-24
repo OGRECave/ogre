@@ -155,13 +155,17 @@ namespace Ogre {
         /** Gets one of the actual dimensions of the viewport, a value in
             pixels.
         */
-
         int getActualHeight(void) const;
+
+        int getScissorLeft(void) const                  { return mScissorRelLeft; }
+        int getScissorTop(void) const                   { return mScissorRelTop; }
+        int getScissorWidth(void) const                 { return mScissorRelWidth; }
+        int getScissorHeight(void) const                { return mScissorRelHeight; }
 
         int getScissorActualLeft(void) const            { return mScissorActLeft; }
         int getScissorActualTop(void) const             { return mScissorActTop; }
         int getScissorActualWidth(void) const           { return mScissorActWidth; }
-        int getScissorActualHeight(void) const          { return mScissorRelHeight; }
+        int getScissorActualHeight(void) const          { return mScissorActHeight; }
 
         /** Sets the dimensions (after creation).
         @param left

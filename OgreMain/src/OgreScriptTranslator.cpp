@@ -8100,10 +8100,10 @@ namespace Ogre{
                 {
                 case ID_VIEWPORT:
                     {
-                        if(prop->values.size() != 4)
+                        if(prop->values.size() != 4 || prop->values.size() != 8)
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                "4 numeric arguments expected");
+                                                "4 or 8 numeric arguments expected");
                             return;
                         }
                         AbstractNodeList::const_iterator it3 = prop->values.begin();
@@ -8114,7 +8114,30 @@ namespace Ogre{
                         if( !getFloat( *it0, &mPassDef->mVpLeft ) || !getFloat( *it1, &mPassDef->mVpTop ) ||
                             !getFloat( *it2, &mPassDef->mVpWidth ) || !getFloat( *it3, &mPassDef->mVpHeight ) )
                         {
-                             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                                compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        }
+
+                        if( prop->values.size() == 8 )
+                        {
+                            AbstractNodeList::const_iterator it7 = it3;
+                            AbstractNodeList::const_iterator it4 = it7++;
+                            AbstractNodeList::const_iterator it5 = it7++;
+                            AbstractNodeList::const_iterator it6 = it7++;
+
+                            if( !getFloat( *it4, &mPassDef->mVpScissorLeft ) ||
+                                !getFloat( *it5, &mPassDef->mVpScissorTop ) ||
+                                !getFloat( *it6, &mPassDef->mVpScissorWidth ) ||
+                                !getFloat( *it7, &mPassDef->mVpScissorHeight ) )
+                            {
+                                 compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                            }
+                        }
+                        else
+                        {
+                            mPassDef->mVpScissorLeft    = mPassDef->mVpLeft;
+                            mPassDef->mVpScissorTop     = mPassDef->mVpTop;
+                            mPassDef->mVpScissorWidth   = mPassDef->mVpWidth;
+                            mPassDef->mVpScissorHeight  	= mPassDef->mVpHeight;
                         }
                     }
                     break;

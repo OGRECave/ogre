@@ -61,6 +61,10 @@ namespace Ogre
                 Math::Abs( vp->getTop() - mDefinition->mVpTop )     < EPSILON &&
                 Math::Abs( vp->getWidth() - mDefinition->mVpWidth ) < EPSILON &&
                 Math::Abs( vp->getHeight() - mDefinition->mVpHeight )<EPSILON &&
+                Math::Abs( vp->getScissorLeft() - mDefinition->mVpScissorLeft )   < EPSILON &&
+                Math::Abs( vp->getScissorTop() - mDefinition->mVpScissorTop )     < EPSILON &&
+                Math::Abs( vp->getScissorWidth() - mDefinition->mVpScissorWidth ) < EPSILON &&
+                Math::Abs( vp->getScissorHeight() - mDefinition->mVpScissorHeight )<EPSILON &&
                 vp->getOverlaysEnabled() == mDefinition->mIncludeOverlays )
             {
                 mViewport = vp;
