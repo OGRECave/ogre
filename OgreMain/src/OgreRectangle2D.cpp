@@ -37,7 +37,7 @@ namespace Ogre
             MovableObject( id, objectMemoryManager, 255 ),
             mPosition( Vector3::ZERO ),
             mOrientation( Quaternion::IDENTITY ),
-            mScale( Vector3::ZERO ),
+            mScale( Vector3::UNIT_SCALE ),
             mQuad( bQuad )
     {
         initRectangle2D();
