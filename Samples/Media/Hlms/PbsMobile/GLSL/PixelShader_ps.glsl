@@ -1,10 +1,12 @@
-#version 330
+@property( GL3+ )#version 330@end
+@property( !GL3+ )#define in varying@end
 /*#ifdef GL_ES
 precision mediump float;
 #endif*/
 #define FRAG_COLOR		0
 @property( !hlms_shadowcaster )
-layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
+@property( GL3+ )layout(location = FRAG_COLOR, index = 0) out vec4 outColour;@end
+@property( !GL3+ )#define outColour gl_FragColor@end
 
 @property( hlms_normal )
 in vec3 psPos;
@@ -253,6 +255,9 @@ in float psDepth;
 layout(location = FRAG_COLOR, index = 0) out float outColour;
 void main()
 {
-	outColour = psDepth;
+@property( GL3+ )
+	outColour = psDepth;@end
+@property( !GL3+ )
+	gl_FragColor.x = psDepth;@end
 }
 @end

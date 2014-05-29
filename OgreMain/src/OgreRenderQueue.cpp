@@ -94,7 +94,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::flushState(void)
+    void RenderQueue::clearState(void)
     {
         mLastMacroblock = 0;
         mLastBlendblock = 0;

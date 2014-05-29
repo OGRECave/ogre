@@ -353,6 +353,7 @@ void SceneManager::destroyAllCameras(void)
 void SceneManager::clearFrameData(void)
 {
     mGlobalLightList.lights.clear();
+    mRenderQueue->clearState();
 }
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight()

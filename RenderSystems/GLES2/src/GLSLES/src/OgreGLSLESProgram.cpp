@@ -419,7 +419,7 @@ namespace Ogre {
     Ogre::GpuProgramParametersSharedPtr GLSLESProgram::createParameters( void )
     {
         GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
-        params->setTransposeMatrices(true);
+        //params->setTransposeMatrices(true);
         return params;
     }
     //-----------------------------------------------------------------------

@@ -50,6 +50,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreLodStrategy.h"
 #include "OgreLodListener.h"
 #include "OgreMaterialManager.h"
+#include "OgreHlmsManager.h"
 
 namespace Ogre {
     extern const FastArray<Real> c_DefaultLodMesh;
@@ -335,6 +336,14 @@ namespace Ogre {
             itor->setDatablock( datablock );
             ++itor;
         }
+    }
+	//-----------------------------------------------------------------------
+    void Entity::setDatablock( IdString datablockName )
+    {
+		HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+		HlmsDatablock *datablock = hlmsManager->getDatablock( datablockName );
+
+		setDatablock( datablock );
     }
     //-----------------------------------------------------------------------
     Entity* Entity::clone( const String& newName) const

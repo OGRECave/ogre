@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreHlmsPbsMobile.h"
 #include "OgreHlmsDatablock.h"
 
+#include "OgreViewport.h"
+#include "OgreRenderTarget.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
 
@@ -129,7 +131,17 @@ namespace Ogre
         Camera *camera = sceneManager->getCameraInProgress();
         Matrix4 viewMatrix = camera->getViewMatrix(true);
 
-        mPreparedPass.viewProjMatrix    = camera->getProjectionMatrix() * viewMatrix;
+        Matrix4 projectionMatrix = camera->getProjectionMatrixWithRSDepth();
+
+        if( sceneManager->getCurrentViewport()->getTarget()->requiresTextureFlipping() )
+        {
+            projectionMatrix[1][0] = -projectionMatrix[1][0];
+            projectionMatrix[1][1] = -projectionMatrix[1][1];
+            projectionMatrix[1][2] = -projectionMatrix[1][2];
+            projectionMatrix[1][3] = -projectionMatrix[1][3];
+        }
+
+        mPreparedPass.viewProjMatrix    = projectionMatrix * viewMatrix;
         mPreparedPass.viewMatrix        = viewMatrix;
 
         if( !casterPass )
@@ -369,7 +381,7 @@ namespace Ogre
         //---------------------------------------------------------------------------
 #if !OGRE_DOUBLE_PRECISION
         //mat4 worldView
-        Matrix4 tmp = mPreparedPass.viewMatrix * worldMat;
+        Matrix4 tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
         memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
         vsUniformBuffer += 16;
         //mat4 worldViewProj

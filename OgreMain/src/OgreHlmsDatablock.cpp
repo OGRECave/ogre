@@ -145,7 +145,7 @@ namespace Ogre
                                               const HlmsParamVec &params ) :
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
         mFresnelTypeSizeBytes( 4 ),
-        mRoughness( 0.1f ),
+        mRoughness( 0.8f ),
         mkDr( 0.318309886 ), mkDg( 0.318309886 ), mkDb( 0.318309886 ), //Max Diffuse = 1 / PI
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
         mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f )

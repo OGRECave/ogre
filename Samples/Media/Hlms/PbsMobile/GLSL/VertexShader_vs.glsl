@@ -1,4 +1,6 @@
-#version 330
+@property( GL3+ )#version 330@end
+@property( !GL3+ )#define in attribute
+#define out varying@end
 
 in vec4 vertex;
 

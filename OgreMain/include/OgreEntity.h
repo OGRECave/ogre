@@ -302,8 +302,11 @@ namespace Ogre {
         */
         size_t getNumSubEntities(void) const;
 
-        /// Sets the given HLMS databloock to all SubEntities
+        /// Sets the given HLMS datablock to all SubEntities
         void setDatablock( HlmsDatablock *datablock );
+
+		/// Sets the given HLMS datablock to all SubEntities
+        void setDatablock( IdString datablockName );
 
         /** Clones this entity and returns a pointer to the clone.
         @remarks

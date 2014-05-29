@@ -83,6 +83,8 @@ namespace Ogre
     const IdString Hlms::PropertyEnvProbeMap  = IdString( "envprobe_map" );
     const IdString Hlms::PropertyAlphaTest    = IdString( "alpha_test" );
 
+    const IdString PropertyGL3Plus            = IdString( "GL3+" );
+
     const IdString *Hlms::UvCountPtrs[8] =
     {
         &Hlms::HlmsPropertyUvCount0,
@@ -1084,6 +1086,9 @@ namespace Ogre
         {
             //Collect pieces
             mPieces = renderableCache.pieces[i];
+
+            if( mShaderProfile == "glsl" ) //TODO: String comparision
+                setProperty( PropertyGL3Plus, 330 );
 
             StringVector::const_iterator itor = mPieceFiles[i].begin();
             StringVector::const_iterator end  = mPieceFiles[i].end();

@@ -142,7 +142,7 @@ namespace Ogre {
         @remarks
             Calling this function inside render or renderES2 won't have any effect.
         */
-        void flushState(void);
+        void clearState(void);
 
         /** Add a renderable object to the queue.
         @remarks
