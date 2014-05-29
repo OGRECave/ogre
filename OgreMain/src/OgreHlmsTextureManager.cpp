@@ -109,7 +109,7 @@ namespace Ogre
                 mBlankTexture = TextureManager::getSingleton().createManual( "Hlms_Blanktexture",
                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                 textureType, 4, 4, 1, 0, PF_R8G8B8A8, TU_DEFAULT, 0,
-                                                true, 0, BLANKSTRING, false );
+                                                false, 0, BLANKSTRING, false );
 
                 HardwarePixelBufferSharedPtr pixelBufferBuf = mBlankTexture->getBuffer(0);
                 const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0, 4, 4, 1 ),
