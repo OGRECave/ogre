@@ -28,6 +28,7 @@ THE SOFTWARE
 
 // Platform-specific stuff
 #include "OgrePlatform.h"
+#include "OgreWorkarounds.h"
 
 #include <string>
 

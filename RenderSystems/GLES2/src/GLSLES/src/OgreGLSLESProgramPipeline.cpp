@@ -329,15 +329,15 @@ namespace Ogre
                             break;
                         case GCT_MATRIX_2X2:
                             OGRE_CHECK_GL_ERROR(glProgramUniformMatrix2fvEXT(progID, currentUniform->mLocation, glArraySize, 
-                                                                             GL_TRUE, params->getFloatPointer(def->physicalIndex)));
+                                                                             GL_FALSE, params->getFloatPointer(def->physicalIndex)));
                             break;
                         case GCT_MATRIX_3X3:
                             OGRE_CHECK_GL_ERROR(glProgramUniformMatrix3fvEXT(progID, currentUniform->mLocation, glArraySize, 
-                                                                             GL_TRUE, params->getFloatPointer(def->physicalIndex)));
+                                                                             GL_FALSE, params->getFloatPointer(def->physicalIndex)));
                             break;
                         case GCT_MATRIX_4X4:
                             OGRE_CHECK_GL_ERROR(glProgramUniformMatrix4fvEXT(progID, currentUniform->mLocation, glArraySize, 
-                                                                             GL_TRUE, params->getFloatPointer(def->physicalIndex)));
+                                                                             GL_FALSE, params->getFloatPointer(def->physicalIndex)));
                             break;
                         case GCT_INT1:
                             OGRE_CHECK_GL_ERROR(glProgramUniform1ivEXT(progID, currentUniform->mLocation, glArraySize, 

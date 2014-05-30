@@ -9,40 +9,40 @@ precision mediump float;
 @property( !GL3+ )#define outColour gl_FragColor@end
 
 @property( hlms_normal )
-in vec3 psPos;
-in vec3 psNormal;
-vec3 nNormal;
-@property( normal_map )in vec3 psTangent;
-vec3 nTangent;@end
+in mediump vec3 psPos;
+in mediump vec3 psNormal;
+mediump vec3 nNormal;
+@property( normal_map )in mediump vec3 psTangent;
+mediump vec3 nTangent;@end
 @end
 @property( hlms_pssm_splits )in float psDepth;@end
 @foreach( hlms_uv_count, n )
-in vec@value( hlms_uv_count@n ) psUv@n;@end
+in mediump vec@value( hlms_uv_count@n ) psUv@n;@end
 @foreach( hlms_num_shadow_maps, n )
-in vec4 psPosL@n;@end
+in highp vec4 psPosL@n;@end
 
 // START UNIFORM DECLARATION
 //Uniforms that change per pass
-@property( hlms_num_shadow_maps )uniform vec2 invShadowMapSize[@value(hlms_num_shadow_maps)];
-uniform float pssmSplitPoints[@value(hlms_pssm_splits)];@end
-@property( hlms_lights_spot )uniform vec3 lightPosition[@value(hlms_lights_spot)];
-uniform vec3 lightDiffuse[@value(hlms_lights_spot)];
-uniform vec3 lightSpecular[@value(hlms_lights_spot)];
-@property(hlms_lights_attenuation)uniform vec3 attenuation[@value(hlms_lights_attenuation)];@end
-@property(hlms_lights_spotparams)uniform vec3 spotDirection[@value(hlms_lights_spotparams)];
-uniform vec3 spotParams[@value(hlms_lights_spotparams)];@end
-@property( envprobe_map )uniform mat3 invViewMat; //This uniform depends on each renderable, but is the same for every pass@end
+@property( hlms_num_shadow_maps )uniform mediump vec2 invShadowMapSize[@value(hlms_num_shadow_maps)];
+uniform mediump float pssmSplitPoints[@value(hlms_pssm_splits)];@end
+@property( hlms_lights_spot )uniform mediump vec3 lightPosition[@value(hlms_lights_spot)];
+uniform mediump vec3 lightDiffuse[@value(hlms_lights_spot)];
+uniform mediump vec3 lightSpecular[@value(hlms_lights_spot)];
+@property(hlms_lights_attenuation)uniform mediump vec3 attenuation[@value(hlms_lights_attenuation)];@end
+@property(hlms_lights_spotparams)uniform mediump vec3 spotDirection[@value(hlms_lights_spotparams)];
+uniform mediump vec3 spotParams[@value(hlms_lights_spotparams)];@end
+@property( envprobe_map )uniform highp mat3 invViewMat; //This uniform depends on each renderable, but is the same for every pass@end
 @end
 
 //Uniforms that change per entity
-uniform float roughness;
+uniform lowp float roughness;
 /* kD is already divided by PI to make it energy conserving.
   (formula is finalDiffuse = NdotL * surfaceDiffuse / PI)
 */
-uniform vec3 kD;
-uniform vec3 kS;
-@property( hlms_fresnel_scalar )@piece( FresnelType )vec3@end@end
-@property( !hlms_fresnel_scalar ) @piece( FresnelType )float@end @end
+uniform lowp vec3 kD;
+uniform lowp vec3 kS;
+@property( hlms_fresnel_scalar )@piece( FresnelType )lowp vec3@end@end
+@property( !hlms_fresnel_scalar ) @piece( FresnelType )lowp float@end @end
 //Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 uniform @insertpiece( FresnelType ) F0;
 // END UNIFORM DECLARATION
@@ -55,11 +55,11 @@ uniform @insertpiece( FresnelType ) F0;
 @property( hlms_cube_arrays_supported ) uniform samplerCubeArray	texEnvProbeMap;@end
 @property( !hlms_cube_arrays_supported ) uniform sampler2DArray	texEnvProbeMap;@end @end
 
-@property( diffuse_map )vec4 diffuseCol;
+@property( diffuse_map )lowp vec4 diffuseCol;
 @piece( SampleDiffuseMap )	diffuseCol = texture( texDiffuseMap, psUv0 );@end
 @piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
-@property( specular_map )vec4 specularCol;
-float ROUGHNESS;
+@property( specular_map )lowp vec4 specularCol;
+lowp float ROUGHNESS;
 @piece( SampleSpecularMap )	specularCol = texture( texSpecularMap, psUv0 );
 	ROUGHNESS = roughness * specularCol.w;@end
 @piece( MulSpecularMapValue )* specularCol.xyz@end@end
@@ -69,15 +69,15 @@ float ROUGHNESS;
 @property( !hlms_shadow_uses_depth_texture )@piece( SAMPLER2DSHADOW )sampler2D@end @end
 uniform @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shadow_maps)];
 
-float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
+lowp float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, highp vec4 psPosLN, mediump vec2 invShadowMapSize )
 {
 @property( !hlms_shadow_usues_depth_texture )
-	float fDepth = psPosLN.z;
-	vec2 uv = psPosLN.xy / psPosLN.w;
-	vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
+	highp float fDepth = psPosLN.z;
+	mediump vec2 uv = psPosLN.xy / psPosLN.w;
+	highp vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
 
 	// 2x2 PCF
-	float c =	(fDepth <= textureLod(shadowMap, uv - o.xy, 0).r) ? 1 : 0; // top left
+	highp float c =	(fDepth <= textureLod(shadowMap, uv - o.xy, 0).r) ? 1 : 0; // top left
 	c +=		(fDepth <= textureLod(shadowMap, uv - o.zy, 0).r) ? 1 : 0; // top right
 	c +=		(fDepth <= textureLod(shadowMap, uv + o.zy, 0).r) ? 1 : 0; // bottom left
 	c +=		(fDepth <= textureLod(shadowMap, uv + o.xy, 0).r) ? 1 : 0; // bottom right
@@ -88,10 +88,10 @@ float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec2 i
 }
 @end
 
-@property( hlms_lights_spot_textured )vec3 zAxis( vec4 qQuat )
+@property( hlms_lights_spot_textured )mediump vec3 zAxis( mediump vec4 qQuat )
 {
-	Real fTy  = 2.0f * qQuat.y;
-	Real fTz  = 2.0f * qQuat.z;
+	Real fTy  = 2.0 * qQuat.y;
+	Real fTz  = 2.0 * qQuat.z;
 	Real fTwy = fTy * qQuat.w;
 	Real fTwz = fTz * qQuat.w;
 	Real fTxy = fTy * qQuat.x;
@@ -99,66 +99,66 @@ float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec2 i
 	Real fTyy = fTy * qQuat.y;
 	Real fTzz = fTz * qQuat.z;
 
-	return vec3( 1.0f-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy );
+	return mediump vec3( 1.0-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy );
 }
-vec3 qmul( vec4 q, vec3 v )
+mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 {
-	return v + 2.0f * cross( cross( v, q.xyz ) + q.w * v, q.xyz );
+	return v + 2.0 * cross( cross( v, q.xyz ) + q.w * v, q.xyz );
 }
 @end
 
-@property( normal_map )vec3 getNormalMap( vec3 vNormal, vec3 vTangent, sampler2D normalMap, vec2 uv0 )
+@property( normal_map )mediump vec3 getNormalMap( mediump vec3 vNormal, mediump vec3 vTangent, lowp sampler2D normalMap, lowp vec2 uv0 )
 {
 	//Get the TBN matrix
-	vec3 vBinormal	= cross( vTangent, vNormal );
-	mat3 TBN = transpose( mat3( vTangent, vBinormal, vNormal ) );
+	mediump vec3 vBinormal	= cross( vTangent, vNormal );
+	mediump mat3 TBN = transpose( mat3( vTangent, vBinormal, vNormal ) );
 
 	//Normal texture must be in U8V8 format!
-	vec3 tsNormal;
+	mediump vec3 tsNormal;
 	tsNormal.xy = texture( normalMap, uv0 ).xy;
-	tsNormal.z	= sqrt( 1.0f - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
+	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
 	return normalize( mul( TBN, tsNormal ) );
 }
 @end
 
-vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lightSpecular )
+mediump vec3 cookTorrance( mediump vec3 lightDir, mediump vec3 viewDir, lowp float NdotV, mediump vec3 lightDiffuse, mediump vec3 lightSpecular )
 {
-	vec3 halfWay= normalize( lightDir + viewDir );
-	float NdotL = clamp( dot( nNormal, lightDir ), 0.0f, 1.0f );
-	float NdotH = clamp( dot( nNormal, halfWay ), 0.0f, 1.0f );
-	float VdotH = clamp( dot( viewDir, halfWay ), 0.001f, 1.0f );
+	mediump vec3 halfWay= normalize( lightDir + viewDir );
+	lowp float NdotL = clamp( dot( nNormal, lightDir ), 0.0, 1.0 );
+	lowp float NdotH = clamp( dot( nNormal, halfWay ), 0.0, 1.0 );
+	lowp float VdotH = clamp( dot( viewDir, halfWay ), 0.001, 1.0 );
 
-	float sqR = ROUGHNESS * ROUGHNESS;
+	lowp float sqR = ROUGHNESS * ROUGHNESS;
 
 	//Roughness term (Beckmann distribution)
 	//Formula:
 	//	Where alpha = NdotH and m = roughness
 	//	R = [ 1 / (m^2 x cos(alpha)^4 ] x [ e^( -tan(alpha)^2 / m^2 ) ]
 	//	R = [ 1 / (m^2 x cos(alpha)^4 ] x [ e^( ( cos(alpha)^2 - 1 )  /  (m^2 cos(alpha)^2 ) ]
-	float NdotH_sq = NdotH * NdotH;
-	float roughness_a = 1.0f / ( 3.141592654f * sqR * NdotH_sq * NdotH_sq );//( 1 / (m^2 x cos(alpha)^4 )
-	float roughness_b = NdotH_sq - 1.0f;	//( cos(alpha)^2 - 1 )
-	float roughness_c = sqR * NdotH_sq;		//( m^2 cos(alpha)^2 )
+	mediump float NdotH_sq = NdotH * NdotH;
+	highp float roughness_a = 1.0 / ( 3.141592654 * sqR * NdotH_sq * NdotH_sq );//( 1 / (m^2 x cos(alpha)^4 )
+	highp float roughness_b = NdotH_sq - 1.0;	//( cos(alpha)^2 - 1 )
+	highp float roughness_c = sqR * NdotH_sq;		//( m^2 cos(alpha)^2 )
 
 	//Avoid Inf * 0 = NaN; we need Inf * 0 = 0
-	float R = min( roughness_a, 65504.0f ) * exp( roughness_b / roughness_c );
+	highp float R = min( roughness_a, 65504.0 ) * exp( roughness_b / roughness_c );
 
 	//Geometric term
-	float shared_geo = 2.0f * NdotH / VdotH;
-	float geo_b	= shared_geo * NdotV;
-	float geo_c	= shared_geo * NdotL;
-	float G	 	= min( 1.0f, min( geo_b, geo_c ) );
+	highp float shared_geo = 2.0 * NdotH / VdotH;
+	highp float geo_b	= shared_geo * NdotV;
+	highp float geo_c	= shared_geo * NdotL;
+	highp float G	 	= min( 1.0, min( geo_b, geo_c ) );
 
 	//Fresnel term (Schlick's approximation)
 	//Formula:
 	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
 	//	fresnelD = lerp( (1 - N*L)^5, 1, 1 - F0 )
-	@insertpiece( FresnelType ) fresnelS = F0 + pow( 1.0f - VdotH, 5.0f ) * (1.0f - F0);
-	@insertpiece( FresnelType ) fresnelD = 1.0f - F0 + pow( 1.0f - NdotL, 5.0f ) * F0;
+	@insertpiece( FresnelType ) fresnelS = F0 + pow( 1.0 - VdotH, 5.0 ) * (1.0 - F0);
+	@insertpiece( FresnelType ) fresnelD = 1.0 - F0 + pow( 1.0 - NdotL, 5.0 ) * F0;
 
 	//Avoid very small denominators, they go to NaN or cause aliasing artifacts
-	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0f * NdotV * NdotL, 0.01f );
+	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
 
 	return NdotL * (kS * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
 					kD * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
@@ -175,7 +175,7 @@ void main()
 @end
 
 @property( hlms_pssm_splits )
-	float fShadow = 1.0f;
+	lowp float fShadow = 1.0;
 	if( psDepth <= pssmSplitPoints[@value(CurrentShadowMap)] )
 		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], psPosL0, invShadowMapSize[@counter(CurrentShadowMap)] );@end
 @foreach( hlms_pssm_splits, n, 1 )	else if( psDepth <= pssmSplitPoints[@value(CurrentShadowMap)] )
@@ -187,10 +187,10 @@ void main()
 
 	//Everything's in Camera space, we use Cook-Torrance lighting
 @property( hlms_lights_spot || envprobe_map )
-	vec3 viewDir	= normalize( -psPos );
-	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0f, 1.0f );@end
+	mediump vec3 viewDir	= normalize( -psPos );
+	lowp float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 
-	vec3 finalColour = vec3(0);
+	mediump vec3 finalColour = vec3(0);
 @property( hlms_lights_directional )
 	finalColour += cookTorrance( lightPosition[0], viewDir, NdotV, lightDiffuse[0], lightSpecular[0] );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
@@ -198,10 +198,10 @@ void main()
 @foreach( hlms_lights_directional, n, 1 )
 	finalColour += cookTorrance( lightPosition[@n], viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );@end
 
-@property( hlms_lights_point || hlms_lights_spot )	vec3 lightDir;
-	float fDistance;
-	vec3 tmpColour;
-	float spotCosAngle;@end
+@property( hlms_lights_point || hlms_lights_spot )	mediump vec3 lightDir;
+	mediump float fDistance;
+	mediump vec3 tmpColour;
+	mediump float spotCosAngle;@end
 
 	//Point lights
 @foreach( hlms_lights_point, n, hlms_lights_directional )
@@ -209,14 +209,14 @@ void main()
 	fDistance= length( lightDir );
 	if( fDistance <= attenuation[@value(atten)].x )
 	{
-		lightDir *= 1.0f / fDistance;
+		lightDir *= 1.0 / fDistance;
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );
-		float atten = 1.0f / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
+		mediump float atten = 1.0 / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
 	//Spot lights
-	//spotParams[@value(spot_params)].x = 1.0f / cos( InnerAngle ) - cos( OuterAngle )
+	//spotParams[@value(spot_params)].x = 1.0 / cos( InnerAngle ) - cos( OuterAngle )
 	//spotParams[@value(spot_params)].y = cos( OuterAngle / 2 )
 	//spotParams[@value(spot_params)].z = falloff
 @foreach( hlms_lights_spot, n, hlms_lights_point )
@@ -226,32 +226,32 @@ void main()
 @property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( psPos - lightPosition[@n] ), zAxis( spotQuaternion[@value(spot_params)] ) );@end
 	if( fDistance <= attenuation[@value(atten)].x && spotCosAngle >= spotParams[@value(spot_params)].y )
 	{
-		lightDir *= 1.0f / fDistance;
+		lightDir *= 1.0 / fDistance;
 	@property( hlms_lights_spot_textured )
-		vec3 posInLightSpace = qmul( spotQuaternion[@value(spot_params)], psPos );
-		float spotAtten = textureLod( texSpotLight, normalize( posInLightSpace ).xy ).x;
+		mediump vec3 posInLightSpace = qmul( spotQuaternion[@value(spot_params)], psPos );
+		lowp float spotAtten = textureLod( texSpotLight, normalize( posInLightSpace ).xy ).x;
 	@end
 	@property( !hlms_lights_spot_textured )
-		float spotAtten = clamp( (spotCosAngle - spotParams[@value(spot_params)].y) * spotParams[@value(spot_params)].x, 0.0f, 1.0f );
+		mediump float spotAtten = clamp( (spotCosAngle - spotParams[@value(spot_params)].y) * spotParams[@value(spot_params)].x, 0.0, 1.0 );
 		spotAtten = pow( spotAtten, spotParams[@counter(spot_params)].z );
 	@end
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );
-		float atten = 1.0f / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
+		mediump float atten = 1.0 / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
 
 @property( envprobe_map )
-	vec3 reflDir = 2.0f * dot( viewDir, nNormal ) * nNormal - viewDir;
-	vec3 envColour = textureLod( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0f ).xyz;
+	mediump vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
+	mediump vec3 envColour = textureLod( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0 ).xyz;
 	envColour = envColour * envColour; //TODO: Cubemap Gamma correction broken in GL3+
 	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS) );@end
 
 	outColour.xyz	= finalColour;
-	outColour.w		= 1.0f;
+	outColour.w		= 1.0;
 }
 @end
 @property( hlms_shadowcaster )
-in float psDepth;
+in highp float psDepth;
 layout(location = FRAG_COLOR, index = 0) out float outColour;
 void main()
 {
