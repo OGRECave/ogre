@@ -47,8 +47,8 @@ namespace Ogre {
 #endif
     class GLSLESGpuProgram;
     class HardwareBufferManager;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    class AndroidResourceManager;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    class GLES2ManagedResourceManager;
 #endif
     
     /**
@@ -517,12 +517,12 @@ namespace Ogre {
             /// @copydoc RenderSystem::markProfileEvent
             virtual void markProfileEvent( const String &eventName );
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             void resetRenderer(RenderWindow* pRenderWnd);
         
-            static AndroidResourceManager* getResourceManager();
+            static GLES2ManagedResourceManager* getResourceManager();
     private:
-            static AndroidResourceManager* mResourceManager;
+            static GLES2ManagedResourceManager* mResourceManager;
 #endif
     };
 }

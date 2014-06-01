@@ -65,7 +65,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glUseProgram( mGLProgramHandle ));
         }
     }
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLSLESLinkProgram::notifyOnContextLost()
     {
         OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));

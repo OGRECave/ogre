@@ -52,6 +52,8 @@ THE SOFTWARE.
 # include "iOS/OgreErrorDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 # include "Android/OgreErrorDialogImp.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#include "Emscripten/OgreErrorDialogImp.h"
 #endif
 
 #endif

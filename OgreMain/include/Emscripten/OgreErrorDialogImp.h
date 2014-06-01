@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -25,35 +25,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __CommonConfigDialog_H__
-#define __CommonConfigDialog_H__
+#ifndef __EmscriptenErrorDialog_H__
+#define __EmscriptenErrorDialog_H__
 
 #include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
 
-// Bring in the specific platform's header file: first allow forced override
-#if defined OGRE_GUI_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_gtk
-# include "gtk/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_GLX
-# include "GLX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-# include "WIN32/OgreConfigDialogImpWinRT.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-# include "GLX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
-# include "NaCl/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iOS/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-# include "Emscripten/OgreConfigDialogImp.h"
-#endif
+namespace Ogre
+{
+    /** Class for displaying the error dialog if Ogre fails badly. */
+    class _OgreExport ErrorDialog
+    {
+    public:
+        ErrorDialog();
 
+        /**
+        @remarks
+            Displays the error dialog.
+        @param
+            errorMessage The error message which has caused the failure.
+        @param
+            logName Optional name of the log to display in the detail pane.
+        */
+        void display(const String& errorMessage, String logName = "");
+    };
+}
 #endif

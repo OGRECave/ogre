@@ -387,6 +387,8 @@ namespace Ogre {
             msGPUVendorStrings[GPU_MS_WARP] = "ms warp";
             msGPUVendorStrings[GPU_ARM] = "arm";
             msGPUVendorStrings[GPU_QUALCOMM] = "qualcomm";
+            msGPUVendorStrings[GPU_MOZILLA] = "mozilla";
+            msGPUVendorStrings[GPU_WEBKIT] = "webkit";
         }
     }
 

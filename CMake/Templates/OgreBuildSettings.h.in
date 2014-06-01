@@ -79,6 +79,4 @@
 
 #cmakedefine RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
-#cmakedefine __FLASHCC__
-
 #endif

@@ -52,6 +52,13 @@ if (OGRE_BUILD_PLATFORM_NACL)
 
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
+elseif (EMSCRIPTEN)
+  include_directories(include/Emscripten)
+
+  file(GLOB PLATFORM_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten/*.h)
+  file(GLOB PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Emscripten/*.cpp src/OgreSearchOps.cpp)
+
+  set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (WIN32)
   if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
     include_directories("include/WIN32")
@@ -152,15 +159,6 @@ elseif(ANDROID)
       src/OgreSearchOps.cpp)
 
   set(PLATFORM_HEADER_INSTALL "Android")
-elseif(FLASHCC)
-  set(PLATFORM_HEADERS
-    include/FlashCC/OgreTimerImp.h
-  )
-  set(PLATFORM_SOURCE_FILES
-    src/FlashCC/OgreTimer.cpp
-  )
-
-  set(PLATFORM_HEADER_INSTALL "FlashCC")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
 

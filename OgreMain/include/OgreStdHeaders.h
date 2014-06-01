@@ -99,7 +99,7 @@ extern "C" {
 #  endif
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 extern "C" {
 
 #   include <unistd.h>
@@ -114,6 +114,10 @@ extern "C" {
 #   include <sys/param.h>
 #   include <CoreFoundation/CoreFoundation.h>
 }
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#   include <emscripten/emscripten.h>
 #endif
 
 #if defined ( OGRE_GCC_VISIBILITY ) && ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE && !__LP64__) && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS)

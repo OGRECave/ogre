@@ -25,35 +25,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __CommonConfigDialog_H__
-#define __CommonConfigDialog_H__
 
-#include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
+#include "OgreEmscriptenEGLContext.h"
 
-// Bring in the specific platform's header file: first allow forced override
-#if defined OGRE_GUI_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_gtk
-# include "gtk/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_GLX
-# include "GLX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-# include "WIN32/OgreConfigDialogImpWinRT.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-# include "GLX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
-# include "NaCl/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iOS/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-# include "Emscripten/OgreConfigDialogImp.h"
-#endif
-
-#endif
+namespace Ogre {
+    EmscriptenEGLContext::EmscriptenEGLContext(EGLDisplay eglDisplay, 
+					       const EGLSupport* glsupport,
+					       ::EGLConfig glconfig,
+					       ::EGLSurface drawable)
+    : EGLContext(eglDisplay, glsupport, glconfig, drawable)
+    {
+    }
+    
+    EmscriptenEGLContext::~EmscriptenEGLContext()
+    {
+    }
+    
+    GLES2Context* EmscriptenEGLContext::clone() const
+    {
+        return new EmscriptenEGLContext(mEglDisplay, mGLSupport, mConfig, mDrawable);
+    }
+}
