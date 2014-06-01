@@ -231,7 +231,9 @@ namespace Ogre {
         if(stencil)
         {
             rsc->setCapability(RSC_HWSTENCIL);
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
             rsc->setCapability(RSC_TWO_SIDED_STENCIL);
+#endif
             rsc->setStencilBufferBitDepth(stencil);
         }
 
@@ -419,8 +421,14 @@ namespace Ogre {
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
         
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0))
-            rsc->setCapability(RSC_VAO);
+#if OGRE_NO_GLES2_VAO_SUPPORT == 0
+#   if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0) || emscripten_get_compiler_setting("LEGACY_GL_EMULATION"))
+#   else
+            if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0))
+#   endif
+                rsc->setCapability(RSC_VAO);
+#endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         if (mGLSupport->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))

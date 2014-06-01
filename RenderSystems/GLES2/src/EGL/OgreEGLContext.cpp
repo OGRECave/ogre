@@ -80,11 +80,9 @@ namespace Ogre {
 
         setCurrent();
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         // Initialise GL3W
         if (gleswInit())
             LogManager::getSingleton().logMessage("Failed to initialize GL3W");
-#endif
     }
     
     void EGLContext::_destroyInternalResources()
