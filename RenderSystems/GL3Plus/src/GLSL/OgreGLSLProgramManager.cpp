@@ -892,6 +892,7 @@ namespace Ogre {
             if (!inLargerString)
             {
                 String::size_type endPos;
+                String typeString;
                 GpuSharedParametersPtr blockSharedParams;
 
                 // Check for a type. If there is one, then the
@@ -900,7 +901,16 @@ namespace Ogre {
                 String::size_type lineEndPos = src.find_first_of("\n\r", currPos);
                 line = src.substr(currPos, lineEndPos - currPos);
                 StringVector parts = StringUtil::split(line, " \t");
-                StringToEnumMap::iterator typei = mTypeEnumMap.find(parts.front());
+
+                // Skip over precision keywords
+                if(StringUtil::match((parts.front()), "lowp") ||
+                   StringUtil::match((parts.front()), "mediump") ||
+                   StringUtil::match((parts.front()), "highp"))
+                    typeString = parts[1];
+                else
+                    typeString = parts[0];
+
+                StringToEnumMap::iterator typei = mTypeEnumMap.find(typeString);
                 if (typei == mTypeEnumMap.end())
                 {
                     // Gobble up the external name

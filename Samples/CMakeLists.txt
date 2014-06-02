@@ -48,14 +48,8 @@ if (OGRE_BUILD_SAMPLES)
   if (OGRE_BUILD_RENDERSYSTEM_D3D11)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_Direct3D11)
   endif ()
-  if (OGRE_BUILD_RENDERSYSTEM_GL)
-  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL)
-  endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL3Plus)
-  endif ()
-  if (OGRE_BUILD_RENDERSYSTEM_GLES)
-  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GLES2)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES2)
@@ -74,14 +68,6 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
-    if (OGRE_BUILD_RENDERSYSTEM_GL)
-      	include_directories(
-	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/include
-		    ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
-    		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
-	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
-		    )
-	endif()
     if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
       	include_directories(
 	    	${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
@@ -163,7 +149,7 @@ if (OGRE_BUILD_COMPONENT_VOLUME)
 endif ()
   add_subdirectory(Water)
 
-if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
+if (NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(CelShading)
   add_subdirectory(DeferredShading)
   add_subdirectory(CubeMapping)

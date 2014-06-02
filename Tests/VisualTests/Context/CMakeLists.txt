@@ -69,14 +69,8 @@ endif ()
 if (OGRE_BUILD_RENDERSYSTEM_D3D11)
     add_dependencies(TestContext RenderSystem_Direct3D11)
 endif ()
-if (OGRE_BUILD_RENDERSYSTEM_GL)
-    add_dependencies(TestContext RenderSystem_GL)
-endif ()
 if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
     add_dependencies(TestContext RenderSystem_GL3Plus)
-endif ()
-if (OGRE_BUILD_RENDERSYSTEM_GLES)
-    add_dependencies(TestContext RenderSystem_GLES)
 endif ()
 if (OGRE_BUILD_RENDERSYSTEM_GLES2)
     add_dependencies(TestContext RenderSystem_GLES2)
@@ -146,12 +140,6 @@ if (APPLE)
 	)
 
 	# now plugins
-	if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_SDK_BUILD)
-		add_custom_command(TARGET TestContext POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/RenderSystem_GL.framework 
-			${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
-			)
-	endif ()
 	if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
 			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/RenderSystem_GL3Plus.framework 
