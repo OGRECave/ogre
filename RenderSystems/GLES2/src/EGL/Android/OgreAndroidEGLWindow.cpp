@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
 #include "OgreAndroidEGLContext.h"
-#include "OgreAndroidResourceManager.h"
+#include "OgreGLES2ManagedResourceManager.h"
 #include "OgreViewport.h"
 
 #include <iostream>
