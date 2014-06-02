@@ -109,6 +109,7 @@ namespace Ogre {
                         "GLES2HardwarePixelBuffer::blitFromMemory");
         }
 
+        bool freeScaledBuffer = false;
         PixelBox scaled;
 
         if (src.getWidth() != dstBox.getWidth() ||
@@ -138,6 +139,7 @@ namespace Ogre {
 
             if (src.format == PF_R8G8B8)
             {
+                freeScaledBuffer = true;
                 size_t srcSize = PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(), src.format);
                 scaled.format = PF_B8G8R8;
                 scaled.data = new uint8[srcSize];
@@ -155,6 +157,11 @@ namespace Ogre {
 
         upload(scaled, dstBox);
         freeBuffer();
+        
+        if (freeScaledBuffer)
+        {
+            delete[] (uint8*)scaled.data;
+        }
     }
 
     void GLES2HardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBox &dst)
