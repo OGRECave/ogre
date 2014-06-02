@@ -231,9 +231,7 @@ namespace Ogre {
         if(stencil)
         {
             rsc->setCapability(RSC_HWSTENCIL);
-#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
             rsc->setCapability(RSC_TWO_SIDED_STENCIL);
-#endif
             rsc->setStencilBufferBitDepth(stencil);
         }
 
@@ -315,7 +313,10 @@ namespace Ogre {
         rsc->setVertexTextureUnitsShared(true);
 
         // Hardware support mipmapping
-        rsc->setCapability(RSC_AUTOMIPMAP);
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        if (rsc->getVendor() != Ogre::GPU_MOZILLA)
+#endif
+            rsc->setCapability(RSC_AUTOMIPMAP);
 
         // Blending support
         rsc->setCapability(RSC_BLENDING);
@@ -402,7 +403,7 @@ namespace Ogre {
 #endif
 
         // ES 3 always supports NPOT textures
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID &&  OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || gleswIsSupported(3, 0))
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);

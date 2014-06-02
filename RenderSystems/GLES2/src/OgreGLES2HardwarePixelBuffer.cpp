@@ -1094,54 +1094,122 @@ namespace Ogre {
         GLsizei width;
         GLsizei height;
         GLsizei depth;
-        PixelBox scaled = data;
-        scaled.data = data.data;
-        scaled.left = data.left;
-        scaled.right = data.right;
-        scaled.top = data.top;
-        scaled.bottom = data.bottom;
-        scaled.front = data.front;
-        scaled.back = data.back;
-
-        width = (GLsizei)data.getWidth();
-        height = (GLsizei)data.getHeight();
-        depth = (GLsizei)data.getDepth();
-
-        GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
-        GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
-        GLenum internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
-
-#if OGRE_NO_GLES3_SUPPORT == 0
-        // In GL ES 3, the internalformat and format parameters do not need to be identical
-        internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
-#endif
-        switch(mTarget)
+        PixelBox scaled;
+        scaled.format = data.format;
+        scaled.left = 0;
+        scaled.right = mWidth;
+        scaled.top = 0;
+        scaled.bottom = mHeight;
+        scaled.front = 0;
+        scaled.back = mDepth;
+        scaled.setConsecutive();
+       
+        if (scaled.format == PF_R8G8B8)
         {
-            case GL_TEXTURE_2D:
-            case GL_TEXTURE_CUBE_MAP:
-                OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
-                                                 mLevel,
-                                                 internalFormat,
-                                                 width, height,
-                                                 0,
-                                                 glFormat,
-                                                 dataType,
-                                                 scaled.data));
-                break;
-#if OGRE_NO_GLES3_SUPPORT == 0
-            case GL_TEXTURE_3D:
-            case GL_TEXTURE_2D_ARRAY:
-                OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
-                                                 mLevel,
-                                                 internalFormat,
-                                                 width, height, depth,
-                                                 0,
-                                                 glFormat,
-                                                 dataType,
-                                                 scaled.data));
-                break;
-#endif
+            size_t srcSize = PixelUtil::getMemorySize(data.getWidth(), data.getHeight(), data.getDepth(), data.format);
+            scaled.format = PF_B8G8R8;
+            scaled.data = new uint8[srcSize];
+            memcpy(scaled.data, data.data, srcSize);
+            PixelUtil::bulkPixelConversion(data, scaled);
         }
+        else
+        {
+            size_t srcSize = scaled.getConsecutiveSize();
+            scaled.data = new uint8[srcSize];
+            Image::scale(data, scaled);
+        }
+        GLint maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
+        GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
+        
+        for (GLint level = 0; level <= maxMips; ++level)
+        {
+            width = (GLsizei)scaled.getWidth();
+            height = (GLsizei)scaled.getHeight();
+            depth = (GLsizei)scaled.getDepth();
+            
+            switch(mTarget)
+            {
+                case GL_TEXTURE_2D:
+                case GL_TEXTURE_CUBE_MAP:
+                    OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
+                                                     level,
+                                                     mGLInternalFormat,
+                                                     width, height,
+                                                     0,
+                                                     mGLInternalFormat,
+                                                     dataType,
+                                                     scaled.data));
+                    break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+                case GL_TEXTURE_3D:
+                case GL_TEXTURE_2D_ARRAY:
+                    OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
+                                                     level,
+                                                     mGLInternalFormat,
+                                                     width, height, depth,
+                                                     0,
+                                                     mGLInternalFormat,
+                                                     dataType,
+                                                     scaled.data));
+                    break;
+#endif
+            }
+            
+            bool squashX = (width > 1);
+            bool squashY = (height > 1);
+#if OGRE_NO_GLES3_SUPPORT == 0
+            bool squashZ = (mTarget == GL_TEXTURE_3D && depth > 1);
+#else
+            bool squashZ = false;
+#endif
+            if (squashX || squashY || squashZ)
+            {
+                size_t xMax = squashX ? width >> 1 : width;
+                size_t yMax = squashY ? height >> 1 : height;
+                size_t zMax = squashZ ? depth >> 1 : depth;
+                PixelBox newBox(xMax, yMax, zMax, scaled.format, scaled.data);
+                size_t xMask, yMask, zMask;
+                size_t mask = 1;
+                if (squashX)
+                {
+                    xMask = mask;
+                    mask <<= 1;
+                }
+                if (squashY)
+                {
+                    yMask = mask;
+                    mask <<= 1;
+                }
+                if (squashZ)
+                {
+                    zMask = mask;
+                    mask <<= 1;
+                }
+                // Generate next mipmap level by averaging together consecutive pixels from this level
+                for (size_t z = 0; z < zMax; ++z)
+                {
+                    for (size_t y = 0; y < yMax; ++y)
+                    {
+                        for (size_t x = 0; x < xMax; ++x)
+                        {
+                            ColourValue sum = ColourValue::ZERO;
+                            for (size_t i = 0; i < mask; ++i)
+                            {
+                                sum += scaled.getColourAt(squashX ? (x << 1) | (i & xMask ? 1 : 0) : x,
+                                                          squashY ? (y << 1) | (i & yMask ? 1 : 0) : y,
+                                                          squashZ ? (z << 1) | (i & zMask ? 1 : 0) : z);
+                            }
+                            newBox.setColourAt(sum / mask, x, y, z);
+                        }
+                    }
+                }
+                
+                scaled = newBox;
+            }
+        }
+        
+        delete[] (uint8*)scaled.data;
+        scaled.data = NULL;
     }
     
     //********* GLES2RenderBuffer
