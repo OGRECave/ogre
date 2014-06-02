@@ -499,8 +499,8 @@ namespace Ogre
 
         //Now again, but push non-shadow casting lights (if there's room left)
         {
-            size_t slotsToSkip  = std::max<int32>( startLight - mCurrentLightList.size(), 0 );
-            size_t slotsLeft    = std::max<int32>( lightsPerPass - (shadowMapEnd - shadowMapStart), 0 );
+            size_t slotsToSkip  = std::max<ptrdiff_t>( startLight - mCurrentLightList.size(), 0 );
+            size_t slotsLeft    = std::max<ptrdiff_t>( lightsPerPass - (shadowMapEnd - shadowMapStart), 0 );
             LightList::const_iterator itor = renderableLights.begin();
             LightList::const_iterator end  = renderableLights.end();
             while( itor != end && slotsLeft > 0 )
