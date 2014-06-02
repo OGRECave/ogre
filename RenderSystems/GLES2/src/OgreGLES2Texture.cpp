@@ -485,7 +485,7 @@ namespace Ogre {
         mTextureID = 0;
     }
     
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2Texture::notifyOnContextLost()
     {
         if (!mIsManual) 
@@ -595,4 +595,11 @@ namespace Ogre {
         assert(idx < mSurfaceList.size());
         return mSurfaceList[idx];
     }
+    
+    void GLES2Texture::getCustomAttribute(const String& name, void* pData)
+	{
+		if (name == "GLID")
+			*static_cast<GLuint*>(pData) = mTextureID;
+	}
+
 }

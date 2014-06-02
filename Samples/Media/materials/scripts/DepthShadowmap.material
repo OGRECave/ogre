@@ -495,13 +495,8 @@ material Ogre/DepthShadowmap/Receiver/RockWall
 			ambient 1 1 1
 			diffuse 0 0 0 
 			specular 0 0 0 0 
-			// Really basic vertex program
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
+			
+			depth_bias -1
 		}
 		// Now do the lighting pass
 		// NB we don't do decal texture here because this is repeated per light
@@ -516,7 +511,7 @@ material Ogre/DepthShadowmap/Receiver/RockWall
 
 		
 			scene_blend add
-
+			
 			// Vertex program reference
 			vertex_program_ref Ogre/DepthShadowmap/ReceiverVP
 			{
@@ -543,15 +538,12 @@ material Ogre/DepthShadowmap/Receiver/RockWall
 			// base colours, not needed for rendering, but as information
 			// to lighting pass categorisation routine
 			lighting off
-			// Really basic vertex program
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-				param_named ambient float4 1 1 1 1
-			}
+
 
 			scene_blend dest_colour zero
 
-
+			depth_bias 1
+			
 			texture_unit
 			{
 				texture rockwall.tga
@@ -579,13 +571,8 @@ material Ogre/DepthShadowmap/Receiver/Athene
 			ambient 1 1 1
 			diffuse 0 0 0 
 			specular 0 0 0 0 
-			// Really basic vertex program
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
+			
+			depth_bias -1
 		}
 		// Now do the lighting pass
 		// NB we don't do decal texture here because this is repeated per light
@@ -597,7 +584,6 @@ material Ogre/DepthShadowmap/Receiver/Athene
 			
 			// do this for each light
 			iteration once_per_light
-
 		
 			scene_blend add
 
@@ -641,16 +627,11 @@ material Ogre/DepthShadowmap/Receiver/Athene
 			// base colours, not needed for rendering, but as information
 			// to lighting pass categorisation routine
 			lighting off
-			// Really basic vertex program
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-				param_named ambient float4 1 1 1 1
-			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
+			
 			scene_blend dest_colour zero
 
+			depth_bias 1
+			
 			texture_unit
 			{
 				texture egyptrockyfull.jpg 

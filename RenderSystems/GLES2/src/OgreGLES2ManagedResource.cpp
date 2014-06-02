@@ -25,51 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __AndroidResourceManager_H__
-#define __AndroidResourceManager_H__
+#include "OgreGLES2ManagedResource.h"
+#include "OgreGLES2ManagedResourceManager.h"
+#include "OgreGLES2RenderSystem.h"
 
-#include "OgreGLES2Prerequisites.h"
+namespace Ogre
+{
+    GLES2ManagedResource::GLES2ManagedResource()
+    {               
+        GLES2RenderSystem::getResourceManager()->_notifyResourceCreated(static_cast<GLES2ManagedResource*>(this));
+    }
 
-namespace Ogre {
-    class AndroidEGLContext;
-    class AndroidResource;
-    
-    class _OgrePrivate AndroidResourceManager : public ResourceAlloc
-    {
-    // Interface.
-    public:
-
-        // Called immediately after the Android context has entered a lost state.
-        void notifyOnContextLost();
-        
-        // Called immediately after the Android context has been reset.
-        void notifyOnContextReset();
-        
-        AndroidResourceManager();
-        ~AndroidResourceManager();      
-
-    // Friends.
-    protected:
-        friend class AndroidResource;
-    
-    // Types.
-    protected:
-        typedef vector<AndroidResource*>::type  ResourceContainer;
-        typedef ResourceContainer::iterator     ResourceContainerIterator;
-
-    // Protected methods.
-    protected:
-        
-        // Called when new resource created.
-        void _notifyResourceCreated     (AndroidResource* pResource);
-
-        // Called when resource is about to be destroyed.
-        void _notifyResourceDestroyed   (AndroidResource* pResource);
-                
-    // Attributes.
-    protected:      
-        ResourceContainer           mResources;
-    };
+    GLES2ManagedResource::~GLES2ManagedResource()
+    {   
+        GLES2RenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<GLES2ManagedResource*>(this));
+    }
 }
-
-#endif

@@ -75,7 +75,7 @@ void receiverFP(
 	
 	out float4 result		: COLOR)
 {
-	shadowUV.xy = shadowUV.xy / shadowUV.w;
+	shadowUV = shadowUV / shadowUV.w;
 	float centerdepth = tex2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation
@@ -203,7 +203,7 @@ void normalMapShadowReceiverFp(
 	float4 vertexColour = lightColour * dot(bumpVec, lightVec);
 
 	// point on shadowmap
-	shadowUV.xy = shadowUV.xy / shadowUV.w;
+	shadowUV = shadowUV / shadowUV.w;
 	float centerdepth = tex2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation

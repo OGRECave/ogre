@@ -187,8 +187,8 @@ void OSXGL3PlusSupport::addConfig( void )
 		}
 	}
 	
-        // Release memory
-        CFRelease(displayModes);
+    // Release memory
+    CFRelease(displayModes);
 
 	// Sort the modes...
 	CFArraySortValues(goodModes, CFRangeMake(0, CFArrayGetCount(goodModes)), 

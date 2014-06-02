@@ -695,6 +695,10 @@ namespace Ogre
     {
         ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
         DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        if ( isHardwareGammaEnabled() )
+        {
+            format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        }
         mSwapChainDesc.BufferDesc.Width     = mWidth;
         mSwapChainDesc.BufferDesc.Height    = mHeight;
         mSwapChainDesc.BufferDesc.Format    = format;
@@ -1252,7 +1256,6 @@ namespace Ogre
 
         D3D11RenderWindowBase::getCustomAttribute(name, pData);
     }
-    //---------------------------------------------------------------------
 #endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 #pragma endregion
 }

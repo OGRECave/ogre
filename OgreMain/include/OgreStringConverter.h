@@ -29,6 +29,7 @@ THE SOFTWARE.
 #ifndef __StringConverter_H__
 #define __StringConverter_H__
 
+#include "OgreCommon.h"
 #include "OgrePrerequisites.h"
 #include "OgreStringVector.h"
 #include "OgreColourValue.h"
@@ -286,7 +287,7 @@ namespace Ogre {
     protected:
         static String msDefaultStringLocale;
         static std::locale msLocale;
-        static bool msUseLocale;
+        static bool msUseLocale;		
     };
 
     /** @} */

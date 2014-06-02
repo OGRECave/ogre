@@ -888,6 +888,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultDimensions( Real width, Real height )
     {
+        assert(width >= 0 && height >= 0 && "Particle dimensions can not be negative");
         mDefaultWidth = width;
         mDefaultHeight = height;
         if (mRenderer)
@@ -898,6 +899,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultWidth(Real width)
     {
+        assert(width >= 0 && "Particle dimensions can not be negative");
         mDefaultWidth = width;
         if (mRenderer)
         {
@@ -912,6 +914,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultHeight(Real height)
     {
+        assert(height >= 0 && "Particle dimensions can not be negative");
         mDefaultHeight = height;
         if (mRenderer)
         {

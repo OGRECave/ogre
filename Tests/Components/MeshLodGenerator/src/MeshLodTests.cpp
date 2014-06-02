@@ -255,6 +255,6 @@ void MeshLodTests::setTestLodConfig(LodConfig& config)
 }
 bool MeshLodTests::isEqual(Real a, Real b)
 {
-    Real absoluteError = std::abs(a * 0.05);
+    Real absoluteError = static_cast<Real>(std::abs(a * 0.05));
     return ((a - absoluteError) <= b) && ((a + absoluteError) >= b);
 }

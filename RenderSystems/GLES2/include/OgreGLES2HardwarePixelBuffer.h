@@ -118,7 +118,7 @@ namespace Ogre {
             // Blitting implementation
             void blitFromTexture(GLES2TextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
             
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // Friends.
         protected:
             friend class GLES2Texture;
