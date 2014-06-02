@@ -71,6 +71,9 @@ THE SOFTWARE.
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
 #endif
+#if OGRE_NO_STBI_CODEC == 0
+#include "OgreSTBICodec.h"
+#endif
 #if OGRE_NO_ZIP_ARCHIVE == 0
 #include "OgreZip.h"
 #endif
@@ -236,8 +239,9 @@ namespace Ogre {
 #if OGRE_NO_ETC_CODEC == 0
         ETCCodec::startup();
 #endif
-
-
+#if OGRE_NO_STBI_CODEC == 0
+        STBIImageCodec::startup();
+#endif
 
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
@@ -300,6 +304,9 @@ namespace Ogre {
 #endif
 #if OGRE_NO_ETC_CODEC == 0
         ETCCodec::shutdown();
+#endif
+#if OGRE_NO_STBI_CODEC == 0
+        STBIImageCodec::shutdown();
 #endif
 #if OGRE_PROFILING
         OGRE_DELETE mProfiler;

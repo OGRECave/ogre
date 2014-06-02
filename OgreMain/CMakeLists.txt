@@ -231,10 +231,14 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_FREEIMAGE)
-  list(APPEND HEADER_FILES include/OgreFreeImageCodec.h)
-  list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
-  list(APPEND LIBRARIES    "${FreeImage_LIBRARIES}")
+  list(APPEND HEADER_FILES include/OgreSTBICodec.h)
+  list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp  src/stbi/stb_image.c)
 endif()
+
+if (OGRE_CONFIG_ENABLE_STBI)
+  list(APPEND HEADER_FILES include/OgreDDSCodec.h)
+  list(APPEND SOURCE_FILES src/OgreDDSCodec.cpp)
+endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
   list(APPEND HEADER_FILES include/OgreDDSCodec.h)
