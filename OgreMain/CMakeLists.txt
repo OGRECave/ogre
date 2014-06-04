@@ -31,6 +31,7 @@ list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImage
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreETCCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreZip.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreAPKZipArchive.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSTBICodec.h"
 )
 
 # Remove optional source files
@@ -41,6 +42,7 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreZip.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreAPKZipArchive.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp"
 )
 
 # Add platform specific files
@@ -233,6 +235,7 @@ endif ()
 if (OGRE_CONFIG_ENABLE_FREEIMAGE)
   list(APPEND HEADER_FILES include/OgreFreeImageCodec.h)
   list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
+  list(APPEND LIBRARIES    "${FreeImage_LIBRARIES}")
 endif()
 
 if (OGRE_CONFIG_ENABLE_STBI)
