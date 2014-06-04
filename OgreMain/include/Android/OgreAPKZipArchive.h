@@ -62,6 +62,12 @@ namespace Ogre{
             ZipArchive * resZipArchive = OGRE_NEW ZipArchive(apkName, "APKZip", mPluginIo);
             return resZipArchive;
         }
+
+		virtual void convertPath( String &inOutPath ) const
+		{
+			if( inOutPath.size() > 0 && inOutPath[0] == '/' )
+				inOutPath.erase( inOutPath.begin() );
+		}
     };
 }
 

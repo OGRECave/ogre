@@ -52,26 +52,28 @@ namespace Ogre {
     {
     }
     //-----------------------------------------------------------------------
-    Archive* ArchiveManager::load( const String& filename, const String& archiveType, bool readOnly)
+    Archive* ArchiveManager::load( const String& _filename, const String& archiveType, bool readOnly)
     {
+		// Search factories
+		ArchiveFactoryMap::iterator it = mArchFactories.find(archiveType);
+		if( it == mArchFactories.end() )
+        {
+            // Factory not found
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find an archive factory "
+                "to deal with archive of type " + archiveType, "ArchiveManager::load");
+        }
+
+		String filename = _filename;
+		it->second->convertPath( filename );
+
         ArchiveMap::iterator i = mArchives.find(filename);
         Archive* pArch = 0;
 
         if (i == mArchives.end())
         {
-            // Search factories
-            ArchiveFactoryMap::iterator it = mArchFactories.find(archiveType);
-            if (it == mArchFactories.end())
-            {
-                // Factory not found
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find an archive factory "
-                    "to deal with archive of type " + archiveType, "ArchiveManager::load");
-            }
-
             pArch = it->second->createInstance(filename, readOnly);
             pArch->load();
             mArchives[filename] = pArch;
-
         }
         else
         {

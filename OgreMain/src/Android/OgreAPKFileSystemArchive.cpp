@@ -177,4 +177,10 @@ namespace Ogre{
         return type;
     }
 
+	void APKFileSystemArchiveFactory::convertPath( String &inOutPath ) const
+    {
+        if( inOutPath.size() > 0 && inOutPath[0] == '/' )
+            inOutPath.erase( inOutPath.begin() );
+    }
+
 }

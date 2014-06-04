@@ -94,6 +94,8 @@ namespace Ogre{
         }
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance( Archive* arch) { OGRE_DELETE arch; }
+
+		virtual void convertPath( String& inOutPath ) const;
     private:
         AAssetManager* mAssetMgr;
     };
