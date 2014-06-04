@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreSTBICodec.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
-#include "stbi/stb_image.c"
+#include "stbi/stb_image.h"
 
 namespace Ogre {
 
