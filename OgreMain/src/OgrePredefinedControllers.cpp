@@ -347,5 +347,24 @@ namespace Ogre
 
 
     }
+    //-----------------------------------------------------------------------
+    // LinearControllerFunction
+    //-----------------------------------------------------------------------
+    LinearControllerFunction::LinearControllerFunction(const std::vector<Real>& keys, const std::vector<Real>& values, Real frequency, bool deltaInput) :
+            ControllerFunction<Real>(deltaInput), mFrequency(frequency), mKeys(keys), mValues(values) {
+        assert(mKeys.size() == mValues.size());
+    }
+    //-----------------------------------------------------------------------
+    Real LinearControllerFunction::calculate(Real source) {
+        Real input = getAdjustedInput(source*mFrequency);
+
+        std::vector<Real>::iterator ifirst = std::lower_bound(mKeys.begin(), mKeys.end(), input);
+        size_t idx = ifirst - mKeys.begin() - 1;
+
+        assert(ifirst != mKeys.end());
+
+        Real alpha = (input - mKeys[idx])/(mKeys[idx + 1] - mKeys[idx]);
+        return mValues[idx] + alpha * (mValues[idx + 1] - mValues[idx]);
+    }
 }
 
