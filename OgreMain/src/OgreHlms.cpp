@@ -940,6 +940,13 @@ namespace Ogre
         return OGRE_NEW HlmsDatablock( datablockName, this, macroblock, blendblock, paramVec );
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::reloadFrom( Archive *newDataFolder )
+    {
+        mShaderCache.clear();
+        mDataFolder = newDataFolder;
+        enumeratePieceFiles();
+    }
+    //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::createDatablock( IdString name, const HlmsMacroblock &macroblockRef,
                                           const HlmsBlendblock &blendblockRef,
                                           const HlmsParamVec &paramVec, bool visibleToManager )

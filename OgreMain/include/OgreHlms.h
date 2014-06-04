@@ -249,6 +249,19 @@ namespace Ogre
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
         HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
 
+        /** Destroys all the cached shaders and in the next opportunity will recreate them
+            from the new location. This is very useful for fast iteration and real-time
+            editing of Hlms shader templates.
+        @remarks
+            Calling with null pointer is possible and will only invalidate existing shaders
+            but you should provide a valid pointer before we start generating the first
+            shader (or else crash).
+        @par
+            Existing datablock materials won't be reloaded from files, so their properties
+            won't change (i.e. changed from blue to red), but the shaders will.
+        */
+        virtual void reloadFrom( Archive *newDataFolder );
+
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks
             The name of the datablock must be in paramVec["name"] and must be unique
