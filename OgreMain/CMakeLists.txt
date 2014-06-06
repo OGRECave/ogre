@@ -74,6 +74,7 @@ list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImage
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreETCCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreZip.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreAPKZipArchive.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreSTBICodec.h"
 )
 
 # Remove optional source files
@@ -84,6 +85,7 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreZip.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreAPKZipArchive.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp"
 )
 
 if (OGRE_SIMD_SSE2)
@@ -312,6 +314,11 @@ if (OGRE_CONFIG_ENABLE_FREEIMAGE)
   list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
   list(APPEND LIBRARIES    "${FreeImage_LIBRARIES}")
 endif()
+
+if (OGRE_CONFIG_ENABLE_STBI)
+  list(APPEND HEADER_FILES include/OgreSTBICodec.h)
+  list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp  src/stbi/stb_image.c)
+endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
   list(APPEND HEADER_FILES include/OgreDDSCodec.h)

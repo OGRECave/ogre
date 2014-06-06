@@ -31,8 +31,8 @@ THE SOFTWARE.
 
 #include "OgreEGLWindow.h"
 #include "OgreEmscriptenEGLSupport.h"
+#include <emscripten/html5.h>
 
-struct EmscriptenFullscreenChangeEvent;
 
 #ifndef EGL_COVERAGE_BUFFERS_NV
 #define EGL_COVERAGE_BUFFERS_NV 0x30E0
@@ -52,6 +52,8 @@ namespace Ogre {
         uint mMaxStencilSize;
         uint mMSAA;
         uint mCSAA;
+        uint mOldWidth;
+        uint mOldHeight;
         
     protected:
         virtual EGLContext * createEGLContext() const;
@@ -62,9 +64,11 @@ namespace Ogre {
         virtual void resize(unsigned int width, unsigned int height);
         virtual void windowMovedOrResized();
         virtual void switchFullScreen(bool fullscreen);
-        static int fullscreenCallback(int eventType, const EmscriptenFullscreenChangeEvent* event, void* origin);
-        static int contextLostCallback(int eventType, const void *reserved, void *userData);
-        static int contextRestoredCallback(int eventType, const void *reserved, void *userData);
+        
+        static EM_BOOL canvasWindowResized(int eventType, const EmscriptenUiEvent *uiEvent, void *userData);
+        static EM_BOOL fullscreenCallback(int eventType, const EmscriptenFullscreenChangeEvent* event, void* userData);
+        static EM_BOOL contextLostCallback(int eventType, const void *reserved, void *userData);
+        static EM_BOOL contextRestoredCallback(int eventType, const void *reserved, void *userData);
    
     public:
         EmscriptenEGLWindow(EmscriptenEGLSupport* glsupport);
