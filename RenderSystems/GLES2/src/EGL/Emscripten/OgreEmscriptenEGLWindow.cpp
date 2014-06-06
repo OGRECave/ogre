@@ -41,8 +41,6 @@ THE SOFTWARE.
 #include "OgreEmscriptenEGLContext.h"
 #include "OgreViewport.h"
 
-#include <emscripten/html5.h>
-
 #include <iostream>
 #include <algorithm>
 #include <climits>
@@ -57,12 +55,18 @@ namespace Ogre {
           mMSAA(0),
           mCSAA(0)
     {
+        emscripten_set_fullscreenchange_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::fullscreenCallback);
+        emscripten_set_webglcontextlost_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextLostCallback);
+        emscripten_set_webglcontextrestored_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
+        emscripten_set_resize_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
     }
 
     EmscriptenEGLWindow::~EmscriptenEGLWindow()
     {
-        emscripten_set_fullscreenchange_callback("#canvas", nullptr, 0, nullptr);
-        emscripten_set_resize_callback("#canvas", nullptr, 0, nullptr);
+        emscripten_set_fullscreenchange_callback(NULL, NULL, 0, NULL);
+        emscripten_set_resize_callback(NULL, NULL, 0, NULL);
+        emscripten_set_webglcontextlost_callback(NULL, NULL, 0, NULL);
+        emscripten_set_webglcontextrestored_callback(NULL, NULL, 0, NULL);
     }
 
     EGLContext* EmscriptenEGLWindow::createEGLContext() const
@@ -92,7 +96,10 @@ namespace Ogre {
     {
         mWidth = width;
         mHeight = height;
+        
         emscripten_set_canvas_size(mWidth, mHeight);
+        LogManager::getSingleton().logMessage("EmscriptenEGLWindow::resize w:" + Ogre::StringConverter::toString(mWidth) + " h:" + Ogre::StringConverter::toString(mHeight));
+        
         windowMovedOrResized();
     }
 
@@ -110,7 +117,7 @@ namespace Ogre {
     void EmscriptenEGLWindow::switchFullScreen(bool fullscreen)
     {
         if(fullscreen)
-            emscripten_request_fullscreen("#canvas", 1);
+            emscripten_request_fullscreen(NULL, 1);
         else
             emscripten_exit_fullscreen();
     }
@@ -215,10 +222,8 @@ namespace Ogre {
         mContext = createEGLContext();
         mContext->setCurrent();
         emscripten_set_canvas_size(width, height);
-        emscripten_set_fullscreenchange_callback("#canvas", (void*)this, 1, fullscreenCallback);
-        emscripten_set_webglcontextlost_callback("#canvas", (void*)this, 1, contextLostCallback);
-        emscripten_set_webglcontextrestored_callback("#canvas", (void*)this, 1, contextRestoredCallback);
-        
+        mOldWidth = width;
+        mOldHeight = height;
         switchFullScreen(fullScreen);
         
         EGL_CHECK_ERROR
@@ -365,20 +370,30 @@ namespace Ogre {
         // Not used on emscripten
     }
 
-    EM_BOOL EmscriptenEGLWindow::fullscreenCallback(int eventType, const EmscriptenFullscreenChangeEvent* event, void* origin)
+    EM_BOOL EmscriptenEGLWindow::canvasWindowResized(int eventType, const EmscriptenUiEvent *uiEvent, void *userData)
     {
-        static_cast<EmscriptenEGLWindow*>(origin)->mIsFullScreen = event->isFullscreen;
+        EmscriptenEGLWindow* thiz = static_cast<EmscriptenEGLWindow*>(userData);
+        //thiz->resize(event->documentBodyClientWidth, event->documentBodyClientHeight);
+        return EMSCRIPTEN_RESULT_SUCCESS;
+    }
+    
+    EM_BOOL EmscriptenEGLWindow::fullscreenCallback(int eventType, const EmscriptenFullscreenChangeEvent* event, void* userData)
+    {
+        EmscriptenEGLWindow* thiz = static_cast<EmscriptenEGLWindow*>(userData);
+        
+        thiz->mIsFullScreen = event->isFullscreen;
         if (event->isFullscreen)
         {
-            static_cast<EmscriptenEGLWindow*>(origin)->mWidth = event->screenWidth;
-            static_cast<EmscriptenEGLWindow*>(origin)->mHeight = event->screenHeight;
+            thiz->mOldWidth = thiz->mWidth;
+            thiz->mOldHeight = thiz->mHeight;
+            thiz->resize(event->screenWidth, event->screenHeight);
         }
         else
         {
-            static_cast<EmscriptenEGLWindow*>(origin)->mWidth = event->elementWidth;
-            static_cast<EmscriptenEGLWindow*>(origin)->mHeight = event->elementHeight;
+            thiz->resize(thiz->mOldWidth, thiz->mOldHeight);
         }
-        static_cast<EmscriptenEGLWindow*>(origin)->windowMovedOrResized();
-        return 0;
+    
+        thiz->windowMovedOrResized();
+        return EMSCRIPTEN_RESULT_SUCCESS;
     }
 }
