@@ -110,7 +110,7 @@ namespace Ogre {
             // Notify viewports of resize
             ViewportList::iterator it = mViewportList.begin();
             while( it != mViewportList.end() )
-                (*it++).second->_updateDimensions();
+                (*it++)->_updateDimensions();
         }
     }
     

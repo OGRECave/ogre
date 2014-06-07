@@ -107,6 +107,14 @@ namespace Ogre
             aliasedReal[ARRAY_PACKED_REALS * 2 + index] = v.y;
             aliasedReal[ARRAY_PACKED_REALS * 3 + index] = v.z;
         }
+        
+        void setAll( const Quaternion &v )
+        {
+            w = v.w;
+            x = v.x;
+            y = v.y;
+            z = v.z;
+        }
 
         /// @copydoc Quaternion::FromAngleAxis
         inline void FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis );

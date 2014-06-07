@@ -447,7 +447,14 @@ namespace Ogre
         aChunkBase[2] = MathlibC::CmovRobust( aChunkBase[2], bChunkBase[2], mask );
     }
     //-----------------------------------------------------------------------------------
-
+    inline void ArrayVector3::loadFromAoS( const Real * RESTRICT_ALIAS src )
+    {
+        mChunkBase[0] = src[0];
+        mChunkBase[1] = src[1];
+        mChunkBase[2] = src[2];
+    }
+    //-----------------------------------------------------------------------------------
+    
 #undef DEFINE_OPERATION
 #undef DEFINE_L_OPERATION
 #undef DEFINE_R_OPERATION
