@@ -2941,6 +2941,9 @@ namespace Ogre {
         IlluminationRenderStage _getCurrentRenderStage() const {return mIlluminationStage;}
 
     protected:
+
+        void fireWorkerThreadsAndWait(void);
+
         /** Launches cullFrustum on all worker threads with the requested parameters
         @remarks
             Will block until all threads are done.

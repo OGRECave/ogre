@@ -1937,8 +1937,7 @@ void SceneManager::updateAnimationTransforms( BySkeletonDef &bySkeletonDef, size
 void SceneManager::updateAllAnimations()
 {
     mRequestType = UPDATE_ALL_ANIMATIONS;
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //-----------------------------------------------------------------------
 void SceneManager::updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx )
@@ -1983,8 +1982,7 @@ void SceneManager::updateAllTransforms()
             //Send them to worker threads (dark_sylinc). We need to go depth by depth because
             //we may depend on parents which could be processed by different threads.
             mUpdateTransformRequest = UpdateTransformRequest( t, nodesPerThread, numNodes );
-            mWorkerThreadsBarrier->sync(); //Fire threads
-            mWorkerThreadsBarrier->sync(); //Wait them to complete
+            fireWorkerThreadsAndWait();
             //Node::updateAllTransforms( numNodes, t );
         }
 
@@ -2041,8 +2039,7 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 {
     mUpdateBoundsRequest    = &objectMemManager;
     mRequestType            = UPDATE_ALL_BOUNDS;
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //-----------------------------------------------------------------------
 void SceneManager::updateAllLodsThread( const UpdateLodRequest &request, size_t threadIdx )
@@ -2095,8 +2092,7 @@ void SceneManager::updateAllLods( const Camera *lodCamera, Real lodBias, uint8 f
     mUpdateLodRequest.camera->getFrustumPlanes();
     mUpdateLodRequest.lodCamera->getFrustumPlanes();
 
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //-----------------------------------------------------------------------
 void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request,
@@ -4198,8 +4194,7 @@ void SceneManager::updateInstanceManagers(void)
 {
     // First update the individual instances from multiple threads
     mRequestType = UPDATE_INSTANCE_MANAGERS;
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 
     // Now perform the final pass from a single thread
     InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
@@ -4777,6 +4772,15 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
     }
 
 }
+void SceneManager::fireWorkerThreadsAndWait(void)
+{
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    _updateWorkerThread( (void*)0 );
+#else
+    mWorkerThreadsBarrier->sync(); //Fire threads
+    mWorkerThreadsBarrier->sync(); //Wait them to complete
+#endif
+}
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void SceneManager::fireCullFrustumThreads( const CullFrustumRequest &request )
@@ -4788,8 +4792,7 @@ void SceneManager::fireCullFrustumThreads( const CullFrustumRequest &request )
     //in case they weren't up to date.
     mCurrentCullFrustumRequest.camera->getFrustumPlanes();
     mCurrentCullFrustumRequest.lodCamera->getFrustumPlanes();
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //---------------------------------------------------------------------
 void SceneManager::fireCullFrustumInstanceBatchThreads( const InstanceBatchCullRequest &request )
@@ -4798,23 +4801,29 @@ void SceneManager::fireCullFrustumInstanceBatchThreads( const InstanceBatchCullR
     mRequestType = CULL_FRUSTUM_INSTANCEDENTS;
     mInstanceBatchCullRequest.frustum->getFrustumPlanes(); // Ensure they're up to date.
     mInstanceBatchCullRequest.lodCamera->getFrustumPlanes(); // Ensure they're up to date.
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //---------------------------------------------------------------------
 void SceneManager::executeUserScalableTask( UniformScalableTask *task, bool bBlock )
 {
     mRequestType = USER_UNIFORM_SCALABLE_TASK;
     mUserTask = task;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    _updateWorkerThread( (void*)0 );
+#else
     mWorkerThreadsBarrier->sync(); //Fire threads
     if( bBlock )
         mWorkerThreadsBarrier->sync(); //Wait them to complete
+#endif
 }
 //---------------------------------------------------------------------
 void SceneManager::waitForPendingUserScalableTask()
 {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     assert( mRequestType == USER_UNIFORM_SCALABLE_TASK );
     mWorkerThreadsBarrier->sync(); //Wait them to complete
+#endif
 }
 //---------------------------------------------------------------------
 unsigned long updateWorkerThread( ThreadHandle *threadHandle )
@@ -4847,12 +4856,14 @@ void SceneManager::stopWorkerThreads()
 //---------------------------------------------------------------------
 unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     size_t threadIdx = threadHandle->getThreadIdx();
     while( !mExitWorkerThreads )
     {
         mWorkerThreadsBarrier->sync();
         if( !mExitWorkerThreads )
         {
+#endif
             switch( mRequestType )
             {
             case CULL_FRUSTUM:
@@ -4882,9 +4893,11 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
             default:
                 break;
             }
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
             mWorkerThreadsBarrier->sync();
         }
     }
+#endif
 
     return 0;
 }
