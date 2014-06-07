@@ -82,6 +82,10 @@ namespace Ogre
         virtual void fillBuffersFor(const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                      bool casterPass, const HlmsCache *lastCache,
                                      uint32 lastTextureHash );
+
+        static const IdString PropertyHwGammaRead;
+        static const IdString PropertyHwGammaWrite;
+        static const IdString PropertySignedIntTex;
     };
 
     /** @} */

@@ -455,7 +455,14 @@ namespace Ogre {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
 
+        if (mGLSupport->checkExtension("GL_EXT_sRGB") || gleswIsSupported(3, 0))
+        {
+            rsc->setCapability( RSC_HW_GAMMA );
+        }
+
 #if OGRE_NO_GLES3_SUPPORT == 0
+        rsc->setCapability( RSC_TEXTURE_SIGNED_INT );
+
         // Check if render to vertex buffer (transform feedback in OpenGL)
         rsc->setCapability(RSC_HWRENDER_TO_VERTEX_BUFFER);
 #endif

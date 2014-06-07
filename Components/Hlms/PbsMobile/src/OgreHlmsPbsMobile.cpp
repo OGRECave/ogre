@@ -41,6 +41,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const IdString HlmsPbsMobile::PropertyHwGammaRead   = IdString( "hw_gamma_read" );
+    const IdString HlmsPbsMobile::PropertyHwGammaWrite  = IdString( "hw_gamma_write" );
+    const IdString HlmsPbsMobile::PropertySignedIntTex  = IdString( "signed_int_textures" );
+
     const String c_vsPerObjectUniforms[] =
     {
         "worldView",
@@ -128,12 +132,21 @@ namespace Ogre
                                            bool dualParaboloid, SceneManager *sceneManager )
     {
         HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
+
+        RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+
+        const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();
+        setProperty( PropertyHwGammaRead, capabilities->hasCapability( RSC_HW_GAMMA ) );
+        setProperty( PropertyHwGammaWrite, capabilities->hasCapability( RSC_HW_GAMMA ) &&
+                                           renderTarget->isHardwareGammaEnabled() );
+        setProperty( PropertySignedIntTex, capabilities->hasCapability( RSC_TEXTURE_SIGNED_INT ) );
+
         Camera *camera = sceneManager->getCameraInProgress();
         Matrix4 viewMatrix = camera->getViewMatrix(true);
 
         Matrix4 projectionMatrix = camera->getProjectionMatrixWithRSDepth();
 
-        if( sceneManager->getCurrentViewport()->getTarget()->requiresTextureFlipping() )
+        if( renderTarget->requiresTextureFlipping() )
         {
             projectionMatrix[1][0] = -projectionMatrix[1][0];
             projectionMatrix[1][1] = -projectionMatrix[1][1];
