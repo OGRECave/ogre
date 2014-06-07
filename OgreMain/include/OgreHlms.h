@@ -359,6 +359,19 @@ namespace Ogre
                                      bool casterPass, const HlmsCache *lastCache,
                                      uint32 lastTextureHash ) = 0;
 
+        /** Call to output the automatically generated shaders (which are usually made from templates)
+            on the given folder for inspection, analyzing, debugging, etc.
+        @remarks
+            The shader will be dumped when it is generated, not when this function gets called.
+            You should call this function at start up
+        @param enableDebugOutput
+            Whether to enable or disable dumping the shaders into a folder
+        @param path
+            Path location on where to dump it. Should end with slash for proper concatenation
+            (i.e. C:/path/ instead of C:/path; or /home/user/ instead of /home/user)
+        */
+        void setDebugOutputPath( bool enableDebugOutput, const String &path = BLANKSTRING );
+
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
 
