@@ -4775,7 +4775,7 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 void SceneManager::fireWorkerThreadsAndWait(void)
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-    _updateWorkerThread( (void*)0 );
+    _updateWorkerThread( NULL );
 #else
     mWorkerThreadsBarrier->sync(); //Fire threads
     mWorkerThreadsBarrier->sync(); //Wait them to complete
@@ -4810,7 +4810,7 @@ void SceneManager::executeUserScalableTask( UniformScalableTask *task, bool bBlo
     mUserTask = task;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-    _updateWorkerThread( (void*)0 );
+    _updateWorkerThread( NULL );
 #else
     mWorkerThreadsBarrier->sync(); //Fire threads
     if( bBlock )
@@ -4835,6 +4835,7 @@ THREAD_DECLARE( updateWorkerThread );
 //---------------------------------------------------------------------
 void SceneManager::startWorkerThreads()
 {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     mWorkerThreadsBarrier = new Barrier( mNumWorkerThreads+1 );
     mWorkerThreads.reserve( mNumWorkerThreads );
     for( size_t i=0; i<mNumWorkerThreads; ++i )
@@ -4842,16 +4843,19 @@ void SceneManager::startWorkerThreads()
         ThreadHandlePtr th = Threads::CreateThread( THREAD_GET( updateWorkerThread ), i, this );
         mWorkerThreads.push_back( th );
     }
+#endif
 }
 //---------------------------------------------------------------------
 void SceneManager::stopWorkerThreads()
 {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     mExitWorkerThreads = true;
     mWorkerThreadsBarrier->sync(); // Wake up worker threads so they stop
     Threads::WaitForThreads( mWorkerThreads );
 
     delete mWorkerThreadsBarrier;
     mWorkerThreadsBarrier = 0;
+#endif
 }
 //---------------------------------------------------------------------
 unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
@@ -4863,6 +4867,8 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
         mWorkerThreadsBarrier->sync();
         if( !mExitWorkerThreads )
         {
+#else
+    size_t threadIdx = 0;
 #endif
             switch( mRequestType )
             {
