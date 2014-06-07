@@ -1110,6 +1110,8 @@ bail:
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_HWOCCLUSION);
         rsc->setCapability(RSC_HWOCCLUSION_ASYNCHRONOUS);
+        rsc->setCapability(RSC_HW_GAMMA);
+        rsc->setCapability(RSC_TEXTURE_SIGNED_INT);
 
         convertVertexShaderCaps(rsc);
         convertPixelShaderCaps(rsc);

@@ -48,19 +48,21 @@ uniform @insertpiece( FresnelType ) F0;
 // END UNIFORM DECLARATION
 
 @property( !specular_map )#define ROUGHNESS roughness@end
-@property( diffuse_map )uniform sampler2DArray	texDiffuseMap;@end
-@property( normal_map )uniform sampler2DArray	texNormalMap;@end
-@property( specular_map )uniform sampler2DArray	texSpecularMap;@end
+@property( diffuse_map )uniform lowp sampler2D	texDiffuseMap;@end
+@property( normal_map )uniform lowp sampler2D	texNormalMap;@end
+@property( specular_map )uniform lowp sampler2D	texSpecularMap;@end
 @property( envprobe_map )
-@property( hlms_cube_arrays_supported ) uniform samplerCubeArray	texEnvProbeMap;@end
-@property( !hlms_cube_arrays_supported ) uniform sampler2DArray	texEnvProbeMap;@end @end
+@property( hlms_cube_arrays_supported ) uniform lowp samplerCube	texEnvProbeMap;@end
+@property( !hlms_cube_arrays_supported ) uniform lowp sampler2D	texEnvProbeMap;@end @end
 
 @property( diffuse_map )lowp vec4 diffuseCol;
-@piece( SampleDiffuseMap )	diffuseCol = texture( texDiffuseMap, psUv0 );@end
+@piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv0 );
+@property( !hw_gamma_read )	//Gamma to linear space
+	diffuseCol = diffuseCol * diffuseCol;@end @end
 @piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
 @property( specular_map )lowp vec4 specularCol;
 lowp float ROUGHNESS;
-@piece( SampleSpecularMap )	specularCol = texture( texSpecularMap, psUv0 );
+@piece( SampleSpecularMap )	specularCol = texture2D( texSpecularMap, psUv0 );
 	ROUGHNESS = roughness * specularCol.w;@end
 @piece( MulSpecularMapValue )* specularCol.xyz@end@end
 
@@ -77,14 +79,14 @@ lowp float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, highp vec4 psPo
 	highp vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
 
 	// 2x2 PCF
-	highp float c =	(fDepth <= textureLod(shadowMap, uv - o.xy, 0).r) ? 1 : 0; // top left
-	c +=		(fDepth <= textureLod(shadowMap, uv - o.zy, 0).r) ? 1 : 0; // top right
-	c +=		(fDepth <= textureLod(shadowMap, uv + o.zy, 0).r) ? 1 : 0; // bottom left
-	c +=		(fDepth <= textureLod(shadowMap, uv + o.xy, 0).r) ? 1 : 0; // bottom right
+	highp float c =	(fDepth <= texture2D(shadowMap, uv - o.xy).r) ? 1 : 0; // top left
+	c +=		(fDepth <= texture2D(shadowMap, uv - o.zy).r) ? 1 : 0; // top right
+	c +=		(fDepth <= texture2D(shadowMap, uv + o.zy).r) ? 1 : 0; // bottom left
+	c +=		(fDepth <= texture2D(shadowMap, uv + o.xy).r) ? 1 : 0; // bottom right
 
 	return c * 0.25;@end
 @property( hlms_shadow_usues_depth_texture )
-	return textureLod( shadowMap, psPosLN.xyz, 0 ).x;@end
+	return texture2D( shadowMap, psPosLN.xyz, 0 ).x;@end
 }
 @end
 
@@ -113,9 +115,15 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 	mediump vec3 vBinormal	= cross( vTangent, vNormal );
 	mediump mat3 TBN = transpose( mat3( vTangent, vBinormal, vNormal ) );
 
-	//Normal texture must be in U8V8 format!
+
 	mediump vec3 tsNormal;
-	tsNormal.xy = texture( normalMap, uv0 ).xy;
+@property( signed_int_textures )
+	//Normal texture must be in U8V8 or BC5 format!
+	tsNormal.xy = texture2D( normalMap, uv0 ).xy;
+@end @property( !signed_int_textures )
+	//Normal texture must be in LA format!
+	tsNormal.xy = texture2D( normalMap, uv0 ).xw * 2.0 + 1.0;
+@end
 	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
 	return normalize( mul( TBN, tsNormal ) );
@@ -229,7 +237,7 @@ void main()
 		lightDir *= 1.0 / fDistance;
 	@property( hlms_lights_spot_textured )
 		mediump vec3 posInLightSpace = qmul( spotQuaternion[@value(spot_params)], psPos );
-		lowp float spotAtten = textureLod( texSpotLight, normalize( posInLightSpace ).xy ).x;
+		lowp float spotAtten = texture2D( texSpotLight, normalize( posInLightSpace ).xy ).x;
 	@end
 	@property( !hlms_lights_spot_textured )
 		mediump float spotAtten = clamp( (spotCosAngle - spotParams[@value(spot_params)].y) * spotParams[@value(spot_params)].x, 0.0, 1.0 );
@@ -242,11 +250,16 @@ void main()
 
 @property( envprobe_map )
 	mediump vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	mediump vec3 envColour = textureLod( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0 ).xyz;
+	mediump vec3 envColour = texture2D( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0 ).xyz;
 	envColour = envColour * envColour; //TODO: Cubemap Gamma correction broken in GL3+
 	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS) );@end
 
+@property( !hw_gamma_write )
+	//Linear to Gamma space
+	outColour.xyz	= sqrt( finalColour );
+@end @property( hw_gamma_read )
 	outColour.xyz	= finalColour;
+@end
 	outColour.w		= 1.0;
 }
 @end

@@ -1398,6 +1398,12 @@ namespace Ogre
         return lastReturnedValue;
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::setDebugOutputPath( bool enableDebugOutput, const String &path )
+    {
+        mDebugOutput	= enableDebugOutput;
+        mOutputPath		= path;
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::_changeRenderSystem( RenderSystem *newRs )
     {
         mShaderCache.clear();

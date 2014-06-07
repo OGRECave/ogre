@@ -86,6 +86,10 @@ namespace Ogre
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].maxTexturesPerArray = 1;
                 }
 
+                bool hwGammaCorrection = caps->hasCapability( RSC_HW_GAMMA );
+                mDefaultTextureParameters[TEXTURE_TYPE_DIFFUSE].hwGammaCorrection   = hwGammaCorrection;
+                mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].hwGammaCorrection    = hwGammaCorrection;
+
                 // BC5 is the best, native (lossy) compressor for normal maps.
                 // DXT5 is like BC5, using the "store only in green and alpha channels" method.
                 // The last one is lossless, using UV8 to store uncompressed,
@@ -102,8 +106,10 @@ namespace Ogre
                 }
                 else
                 {
-                    mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = PF_R8G8_SNORM;
-                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_R8G8_SNORM;
+                    PixelFormat pf = caps->hasCapability( RSC_TEXTURE_SIGNED_INT ) ? PF_R8G8_SNORM :
+                                                                                     PF_BYTE_LA;
+                    mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = pf;
+                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = pf;
                 }
 
                 mBlankTexture = TextureManager::getSingleton().createManual( "Hlms_Blanktexture",
