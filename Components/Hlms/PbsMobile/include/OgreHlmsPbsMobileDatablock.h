@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef _OgreHlmsPbsMobileDatablock_H_
 #define _OgreHlmsPbsMobileDatablock_H_
 
+#include "OgreHlmsPbsMobilePrerequisites.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsTextureManager.h"
 
@@ -51,7 +52,7 @@ namespace Ogre
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
     */
-    class _OgreExport HlmsPbsMobileDatablock : public HlmsDatablock
+	class _OgreHlmsPbsMobileExport HlmsPbsMobileDatablock : public HlmsDatablock
     {
         friend class HlmsPbsMobile;
 
