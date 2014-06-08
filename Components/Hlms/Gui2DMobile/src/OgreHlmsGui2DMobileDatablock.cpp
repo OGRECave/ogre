@@ -346,7 +346,7 @@ namespace Ogre
             {
                 //The previous texture wasn't an atlas, we need to make room for the params
                 memmove( mUvAtlasParams + uvAtlasIdx + 1, mUvAtlasParams + uvAtlasIdx,
-                         sizeof(UvAtlasParams) * (mNumTextureUnits - uvAtlasIdx - 1) );
+                         sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx - 1) );
                 mShaderCreationData->mTextureIsAtlas[texUnit] = true;
                 ++mNumUvAtlas;
             }
@@ -359,7 +359,7 @@ namespace Ogre
             {
                 //The new texture isn't an atlas, we need to keep everything contiguous
                 memmove( mUvAtlasParams + uvAtlasIdx, mUvAtlasParams + uvAtlasIdx + 1,
-                         sizeof(UvAtlasParams) * (mNumTextureUnits - uvAtlasIdx - 1) );
+                         sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx - 1) );
                 mShaderCreationData->mTextureIsAtlas[texUnit] = false;
                 --mNumUvAtlas;
             }

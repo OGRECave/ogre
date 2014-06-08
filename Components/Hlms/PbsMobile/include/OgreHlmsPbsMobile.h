@@ -71,6 +71,9 @@ namespace Ogre
                                                     const HlmsBlendblock *blendblock,
                                                     const HlmsParamVec &paramVec );
 
+        virtual void calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params );
+        virtual void calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params );
+
     public:
         HlmsPbsMobile( Archive *dataFolder );
         ~HlmsPbsMobile();
@@ -86,6 +89,8 @@ namespace Ogre
         static const IdString PropertyHwGammaRead;
         static const IdString PropertyHwGammaWrite;
         static const IdString PropertySignedIntTex;
+
+        static const IdString PropertyUvAtlas;
     };
 
     /** @} */

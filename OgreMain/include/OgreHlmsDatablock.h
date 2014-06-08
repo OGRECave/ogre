@@ -177,6 +177,8 @@ namespace Ogre
                        const HlmsBlendblock *blendblock,
                        const HlmsParamVec &params );
         virtual ~HlmsDatablock() {}
+
+        /// Calculates the hashes needed for sorting by the RenderQueue (i.e. mTextureHash)
         virtual void calculateHash() {}
 
         IdString getName(void) const                { return mName; }
@@ -188,32 +190,6 @@ namespace Ogre
 
         void _linkRenderable( Renderable *renderable );
         void _unlinkRenderable( Renderable *renderable );
-    };
-
-    /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
-    */
-    class _OgreExport HlmsPbsMobileDatablock : public HlmsDatablock
-    {
-    public:
-        uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
-        float   mRoughness;
-        float   mkDr, mkDg, mkDb;                   //kD
-        float   mkSr, mkSg, mkSb;                   //kS
-        float   mFresnelR, mFresnelG, mFresnelB;    //F0
-
-        TexturePtr  mDiffuseTex;
-        TexturePtr  mNormalmapTex;
-        TexturePtr  mSpecularTex;
-        TexturePtr  mReflectionTex;
-        /*TexturePtr  mDetailMask;
-        TexturePtr  mDetailMap[4];*/
-
-        HlmsPbsMobileDatablock( IdString name, Hlms *creator,
-                             const HlmsMacroblock *macroblock,
-                             const HlmsBlendblock *blendblock,
-                             const HlmsParamVec &params );
-
-        virtual void calculateHash();
     };
 
     /** @} */

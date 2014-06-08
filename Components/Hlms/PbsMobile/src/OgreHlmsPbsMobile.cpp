@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsPbsMobile.h"
-#include "OgreHlmsDatablock.h"
+#include "OgreHlmsPbsMobileDatablock.h"
 
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
@@ -45,6 +45,8 @@ namespace Ogre
     const IdString HlmsPbsMobile::PropertyHwGammaWrite  = IdString( "hw_gamma_write" );
     const IdString HlmsPbsMobile::PropertySignedIntTex  = IdString( "signed_int_textures" );
 
+    const IdString HlmsPbsMobile::PropertyUvAtlas       = IdString( "uv_atlas" );
+
     const String c_vsPerObjectUniforms[] =
     {
         "worldView",
@@ -55,7 +57,8 @@ namespace Ogre
         "roughness",
         "kD",
         "kS",
-        "F0"
+        "F0",
+        "atlasOffsets"
     };
 
     HlmsPbsMobile::HlmsPbsMobile( Archive *dataFolder ) : Hlms( HLMS_PBS, "pbs", dataFolder )
@@ -96,7 +99,7 @@ namespace Ogre
         //Set samplers.
         GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
 
-        uint texUnit = 0;
+        int texUnit = 0;
         if( !mPreparedPass.shadowMaps.empty() )
         {
             vector<int>::type shadowMaps;
@@ -111,21 +114,36 @@ namespace Ogre
         const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
                                                     queuedRenderable.renderable->getDatablock() );
 
-        assert( !datablock->mDiffuseTex.isNull()    == getProperty( PropertyDiffuseMap ) );
-        assert( !datablock->mNormalmapTex.isNull()  == getProperty( PropertyNormalMap ) );
-        assert( !datablock->mSpecularTex.isNull()   == getProperty( PropertySpecularMap ) );
-        assert( !datablock->mReflectionTex.isNull() == getProperty( PropertyEnvProbeMap ) );
+        assert( !datablock->mTexture[PBSM_DIFFUSE].isNull()     == getProperty( PropertyDiffuseMap ) );
+        assert( !datablock->mTexture[PBSM_NORMAL].isNull()      == getProperty( PropertyNormalMap ) );
+        assert( !datablock->mTexture[PBSM_SPECULAR].isNull()    == getProperty( PropertySpecularMap ) );
+        assert( !datablock->mTexture[PBSM_REFLECTION].isNull()  == getProperty( PropertyEnvProbeMap ) );
 
-        if( !datablock->mDiffuseTex.isNull() )
+        if( !datablock->mTexture[PBSM_DIFFUSE].isNull() )
             psParams->setNamedConstant( "texDiffuseMap", texUnit++ );
-        if( !datablock->mNormalmapTex.isNull() )
+        if( !datablock->mTexture[PBSM_NORMAL].isNull() )
             psParams->setNamedConstant( "texNormalMap", texUnit++ );
-        if( !datablock->mSpecularTex.isNull() )
+        if( !datablock->mTexture[PBSM_SPECULAR].isNull() )
             psParams->setNamedConstant( "texSpecularMap", texUnit++ );
-        if( !datablock->mReflectionTex.isNull() )
+        if( !datablock->mTexture[PBSM_REFLECTION].isNull() )
             psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobile::calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params )
+    {
+        assert( dynamic_cast<HlmsPbsMobileDatablock*>( renderable->getDatablock() ) );
+        HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
+                                                        renderable->getDatablock() );
+        setProperty( PropertyUvAtlas, datablock->mNumUvAtlas );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobile::calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params )
+    {
+        HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
+                                                        renderable->getDatablock() );
+        setProperty( PropertyUvAtlas, datablock->mNumUvAtlasCaster );
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbsMobile::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
@@ -140,6 +158,8 @@ namespace Ogre
         setProperty( PropertyHwGammaWrite, capabilities->hasCapability( RSC_HW_GAMMA ) &&
                                            renderTarget->isHardwareGammaEnabled() );
         setProperty( PropertySignedIntTex, capabilities->hasCapability( RSC_TEXTURE_SIGNED_INT ) );
+
+        retVal.setProperties = mSetProperties;
 
         Camera *camera = sceneManager->getCameraInProgress();
         Matrix4 viewMatrix = camera->getViewMatrix(true);
@@ -220,7 +240,8 @@ namespace Ogre
                 //vec3 lightPosition[numLights]
                 for( int32 i=0; i<numLights; ++i )
                 {
-                    Vector4 lightPos = lights[i].light->getAs4DVector();
+                    Vector4 lightPos4 = lights[i].light->getAs4DVector();
+                    Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.x );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.y );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.z );
@@ -284,7 +305,8 @@ namespace Ogre
                 for( int32 i=0; i<numLights; ++i )
                 {
                     assert( globalLightList.lights[i]->getType() == Light::LT_DIRECTIONAL );
-                    Vector4 lightPos = globalLightList.lights[i]->getAs4DVector();
+                    Vector4 lightPos4 = globalLightList.lights[i]->getAs4DVector();
+                    Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.x );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.y );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.z );
@@ -350,7 +372,7 @@ namespace Ogre
         assert( mPreparedPass.vertexShaderSharedBuffer.size() <
                 vpParams->getFloatConstantList().size() );
         assert( ( mPreparedPass.pixelShaderSharedBuffer.size() -
-                  (datablock->mReflectionTex.isNull() ? 9 : 0) ) <
+                  (datablock->mTexture[PBSM_REFLECTION].isNull() ? 9 : 0) ) <
                 psParams->getFloatConstantList().size() );
 
         if( !lastCache || lastCache->type != HLMS_PBS )
@@ -359,18 +381,21 @@ namespace Ogre
             FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
             FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
 
-            size_t texUnit = 0;
-            while( itor != end )
+            if( !casterPass )
             {
-                mRenderSystem->_setTexture( texUnit, true, *itor );
-                ++texUnit;
-                ++itor;
+                size_t texUnit = 0;
+                while( itor != end )
+                {
+                    mRenderSystem->_setTexture( texUnit, true, *itor );
+                    ++texUnit;
+                    ++itor;
+                }
             }
         }
 
         uint16 variabilityMask = GPV_PER_OBJECT;
         size_t psBufferElements = mPreparedPass.pixelShaderSharedBuffer.size() -
-                                    (datablock->mReflectionTex.isNull() ? 9 : 0);
+                                    (datablock->mTexture[PBSM_REFLECTION].isNull() ? 9 : 0);
 
         if( cache != lastCache )
         {
@@ -378,7 +403,7 @@ namespace Ogre
             memcpy( vsUniformBuffer, mPreparedPass.vertexShaderSharedBuffer.begin(),
                     sizeof(float) * mPreparedPass.vertexShaderSharedBuffer.size() );
 
-            assert( !datablock->mReflectionTex.isNull() == getProperty( PropertyEnvProbeMap ) );
+            assert( !datablock->mTexture[PBSM_REFLECTION].isNull() == getProperty( PropertyEnvProbeMap ) );
 
             memcpy( psUniformBuffer, mPreparedPass.pixelShaderSharedBuffer.begin(),
                     sizeof(float) * psBufferElements );
@@ -417,24 +442,42 @@ namespace Ogre
         //---------------------------------------------------------------------------
         //                          ---- PIXEL SHADER ----
         //---------------------------------------------------------------------------
-        memcpy( psUniformBuffer, &datablock->mRoughness,
-                7 * sizeof(float) + datablock->mFresnelTypeSizeBytes );
-        psUniformBuffer += 7 + (datablock->mFresnelTypeSizeBytes >> 2);
-
-        if( datablock->mTextureHash != lastTextureHash )
+        if( !casterPass )
         {
-            //Rebind textures
-            size_t texUnit = mPreparedPass.shadowMaps.size();
-            if( datablock->mDiffuseTex.isNull() )
-                mRenderSystem->_setTexture( texUnit++, true, datablock->mDiffuseTex );
-            if( datablock->mNormalmapTex.isNull() )
-                mRenderSystem->_setTexture( texUnit++, true, datablock->mNormalmapTex );
-            if( datablock->mSpecularTex.isNull() )
-                mRenderSystem->_setTexture( texUnit++, true, datablock->mSpecularTex );
-            if( datablock->mReflectionTex.isNull() )
-                mRenderSystem->_setTexture( texUnit++, true, datablock->mReflectionTex );
+            //float roughness
+            //vec3 kD;
+            //vec3 kS;
+            //vec3 F0; or float F0;
+            memcpy( psUniformBuffer, &datablock->mRoughness,
+                    7 * sizeof(float) + datablock->mFresnelTypeSizeBytes );
+            psUniformBuffer += 7 + (datablock->mFresnelTypeSizeBytes >> 2);
 
-            mRenderSystem->_disableTextureUnitsFrom( texUnit );
+            //vec3 atlasOffsets[3]; (up to three, can be zero)
+            memcpy( psUniformBuffer, &datablock->mUvAtlasParams,
+                    datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) );
+            psUniformBuffer += datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) /
+                                sizeof( float );
+
+            if( datablock->mTextureHash != lastTextureHash )
+            {
+                //Rebind textures
+                size_t texUnit = mPreparedPass.shadowMaps.size();
+                for( size_t i=0; i<PBSM_REFLECTION; ++i )
+                {
+                    if( !datablock->mTexture[i].isNull() )
+                        mRenderSystem->_setTexture( texUnit++, true, datablock->mTexture[i] );
+                }
+
+                mRenderSystem->_disableTextureUnitsFrom( texUnit );
+            }
+        }
+        else
+        {
+            //vec3 atlasOffsets[3]; (up to three, can be zero)
+            memcpy( psUniformBuffer, &datablock->mUvAtlasParams,
+                    datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) );
+            psUniformBuffer += datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) /
+                                sizeof( float );
         }
 
         assert( vsUniformBuffer - vpParams->getFloatPointer( 0 ) == vpParams->getFloatConstantList().size() );

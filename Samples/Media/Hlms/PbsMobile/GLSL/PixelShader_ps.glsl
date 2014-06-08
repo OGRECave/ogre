@@ -45,6 +45,7 @@ uniform lowp vec3 kS;
 @property( !hlms_fresnel_scalar ) @piece( FresnelType )lowp float@end @end
 //Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 uniform @insertpiece( FresnelType ) F0;
+@property( uv_atlas )uniform mediump vec3 atlasOffsets[@value( uv_atlas )];@end
 // END UNIFORM DECLARATION
 
 @property( !specular_map )#define ROUGHNESS roughness@end
@@ -56,13 +57,13 @@ uniform @insertpiece( FresnelType ) F0;
 @property( !hlms_cube_arrays_supported ) uniform lowp sampler2D	texEnvProbeMap;@end @end
 
 @property( diffuse_map )lowp vec4 diffuseCol;
-@piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv0 );
+@piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv0 * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
 @property( !hw_gamma_read )	//Gamma to linear space
 	diffuseCol = diffuseCol * diffuseCol;@end @end
 @piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
 @property( specular_map )lowp vec4 specularCol;
 lowp float ROUGHNESS;
-@piece( SampleSpecularMap )	specularCol = texture2D( texSpecularMap, psUv0 );
+@piece( SampleSpecularMap )	specularCol = texture2D( texSpecularMap, psUv0 * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
 	ROUGHNESS = roughness * specularCol.w;@end
 @piece( MulSpecularMapValue )* specularCol.xyz@end@end
 
@@ -119,10 +120,10 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 	mediump vec3 tsNormal;
 @property( signed_int_textures )
 	//Normal texture must be in U8V8 or BC5 format!
-	tsNormal.xy = texture2D( normalMap, uv0 ).xy;
+	tsNormal.xy = texture2D( normalMap, uv0 * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = texture2D( normalMap, uv0 ).xw * 2.0 + 1.0;
+	tsNormal.xy = texture2D( normalMap, uv0  * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xw * 2.0 + 1.0;
 @end
 	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
@@ -257,7 +258,7 @@ void main()
 @property( !hw_gamma_write )
 	//Linear to Gamma space
 	outColour.xyz	= sqrt( finalColour );
-@end @property( hw_gamma_read )
+@end @property( hw_gamma_write )
 	outColour.xyz	= finalColour;
 @end
 	outColour.w		= 1.0;

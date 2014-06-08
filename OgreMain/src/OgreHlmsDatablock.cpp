@@ -138,32 +138,4 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------------
-    HlmsPbsMobileDatablock::HlmsPbsMobileDatablock( IdString name, Hlms *creator,
-                                              const HlmsMacroblock *macroblock,
-                                              const HlmsBlendblock *blendblock,
-                                              const HlmsParamVec &params ) :
-        HlmsDatablock( name, creator, macroblock, blendblock, params ),
-        mFresnelTypeSizeBytes( 4 ),
-        mRoughness( 0.1f ),
-        mkDr( 0.318309886 ), mkDg( 0.318309886 ), mkDb( 0.318309886 ), //Max Diffuse = 1 / PI
-        mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
-        mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f )
-    {
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsPbsMobileDatablock::calculateHash()
-    {
-        IdString hash;
-        if( !mDiffuseTex.isNull() )
-            hash += IdString( mDiffuseTex->getName() );
-        if( !mNormalmapTex.isNull() )
-            hash += IdString( mNormalmapTex->getName() );
-        if( !mSpecularTex.isNull() )
-            hash += IdString( mSpecularTex->getName() );
-        if( !mReflectionTex.isNull() )
-            hash += IdString( mReflectionTex->getName() );
-
-        mTextureHash = hash.mHash;
-    }
 }

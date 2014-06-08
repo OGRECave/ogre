@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    GLES2ManagedResource::GLES2ManagedResource()
+    /*GLES2ManagedResource::GLES2ManagedResource()
     {               
         GLES2RenderSystem::getResourceManager()->_notifyResourceCreated(static_cast<GLES2ManagedResource*>(this));
     }
@@ -39,5 +39,5 @@ namespace Ogre
     GLES2ManagedResource::~GLES2ManagedResource()
     {   
         GLES2RenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<GLES2ManagedResource*>(this));
-    }
+    }*/
 }

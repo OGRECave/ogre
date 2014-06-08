@@ -1241,6 +1241,8 @@ namespace Ogre
         if( alphaTest )
             setProperty( PropertyAlphaTest, 1 );
 
+        calculateHashForPreCreate( renderable, params );
+
         uint32 renderableHash = this->addRenderableCache( mSetProperties, 0 );
 
         //For shadow casters, turn normals off. UVs & diffuse also off unless there's alpha testing.
@@ -1254,6 +1256,7 @@ namespace Ogre
             setProperty( HlmsPropertyUvCount, 0 );
             setProperty( PropertyDiffuseMap, 0 );
         }
+        calculateHashForPreCaster( renderable, params );
         uint32 renderableCasterHash = this->addRenderableCache( mSetProperties, 0 );
 
         outHash         = renderableHash;

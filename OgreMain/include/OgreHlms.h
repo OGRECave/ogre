@@ -240,6 +240,9 @@ namespace Ogre
                                                     const HlmsBlendblock *blendblock,
                                                     const HlmsParamVec &paramVec );
 
+        virtual void calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params ) {}
+        virtual void calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params ) {}
+
     public:
         Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder );
         virtual ~Hlms();
