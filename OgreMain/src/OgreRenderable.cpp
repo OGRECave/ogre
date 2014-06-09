@@ -82,9 +82,27 @@ namespace Ogre
                 mHlmsDatablock->_unlinkRenderable( this );
 
             mHlmsDatablock = datablock;
+            try
+            {
+                mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
+                                                                mHlmsHash, mHlmsCasterHash );
+            }
+            catch( Exception &e )
+            {
+                LogManager::getSingleton().logMessage( e.getFullDescription() );
+                LogManager::getSingleton().logMessage( "Couldn't apply datablock '" +
+                                                       datablock->getName().getFriendlyText() + "' to "
+                                                       "this renderable. Using default one. Check "
+                                                       "previous log messages to see if there's more "
+                                                       "information.", LML_CRITICAL );
+
+                //Use the default datablock from the same HLMS as the one the user wanted us to apply
+                mHlmsDatablock = mHlmsDatablock->getCreator()->getDefaultDatablock();
+                mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
+                                                                mHlmsHash, mHlmsCasterHash );
+            }
+
             mHlmsDatablock->_linkRenderable( this );
-            mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
-                                                            mHlmsHash, mHlmsCasterHash );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -104,7 +122,8 @@ namespace Ogre
                 " because this Material does not exist. Have you forgotten to define it in a "
                 ".material script?", LML_CRITICAL );
 
-            setDatablock( IdString() );
+            HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+            setDatablock( hlmsManager->getDefaultDatablock() );
         }
         else
         {

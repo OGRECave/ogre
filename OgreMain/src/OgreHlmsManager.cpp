@@ -32,10 +32,11 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 #include "OgreHlmsTextureManager.h"
 #include "OgreRenderSystem.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
-    HlmsManager::HlmsManager() : mRenderSystem( 0 ), mTextureManager( 0 )
+    HlmsManager::HlmsManager() : mRenderSystem( 0 ), mTextureManager( 0 ), mDefaultHlmsType( HLMS_PBS )
     {
         memset( mRegisteredHlms, 0, sizeof( mRegisteredHlms ) );
         memset( mDeleteRegisteredOnExit, 0, sizeof( mDeleteRegisteredOnExit ) );
@@ -228,20 +229,21 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsManager::getDatablock( IdString name ) const
     {
-        HlmsDatablock *retVal = getDatablockNoThrow( name );
+        HlmsDatablock *retVal = getDatablockNoDefault( name );
 
         if( !retVal )
         {
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Can't find HLMS datablock material '" +
+            LogManager::getSingleton().logMessage( "Can't find HLMS datablock material '" +
                          name.getFriendlyText() + "'. It may not be visible to this manager, try "
-                         "finding it by retrieving getHlms()->getDatablock()",
-                         "HlmsManager::getDatablock" );
+                         "finding it by retrieving getHlms()->getDatablock()", LML_CRITICAL );
+
+            retVal = getDefaultDatablock();
         }
 
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    HlmsDatablock* HlmsManager::getDatablockNoThrow( IdString name ) const
+    HlmsDatablock* HlmsManager::getDatablockNoDefault( IdString name ) const
     {
         HlmsDatablock *retVal = 0;
 
@@ -250,6 +252,11 @@ namespace Ogre
             retVal = itor->second;
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsDatablock* HlmsManager::getDefaultDatablock(void) const
+    {
+        return mRegisteredHlms[mDefaultHlmsType]->getDefaultDatablock();
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::registerHlms( Hlms *provider, bool deleteOnExit )

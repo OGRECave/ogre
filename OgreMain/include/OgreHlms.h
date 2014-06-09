@@ -116,6 +116,9 @@ namespace Ogre
         String          mOutputPath;
         bool            mDebugOutput;
 
+        /// The default datablock occupies the name IdString(); which is not the same as IdString("")
+        HlmsDatablock   *mDefaultDatablock;
+
         HlmsTypes       mType;
         IdString        mTypeName;
 
@@ -240,6 +243,8 @@ namespace Ogre
                                                     const HlmsBlendblock *blendblock,
                                                     const HlmsParamVec &paramVec );
 
+        virtual HlmsDatablock* createDefaultDatablock(void);
+
         virtual void calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params ) {}
         virtual void calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params ) {}
 
@@ -303,6 +308,9 @@ namespace Ogre
         /// Destroys all datablocks created with @createDatablock. Caller is responsible
         /// for ensuring those pointers aren't still in use (i.e. dangling pointers)
         void destroyAllDatablocks(void);
+
+        /// @copydoc HlmsManager::getDefaultDatablock
+        HlmsDatablock* getDefaultDatablock(void) const;
 
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
             the value to 'inOut', otherwise leaves 'inOut' as is.
