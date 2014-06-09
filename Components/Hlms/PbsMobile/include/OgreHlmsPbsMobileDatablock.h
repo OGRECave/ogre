@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef _OgreHlmsPbsMobileDatablock_H_
 #define _OgreHlmsPbsMobileDatablock_H_
 
+#include "OgreHlmsPbsMobilePrerequisites.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsTextureManager.h"
 
