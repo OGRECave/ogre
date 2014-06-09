@@ -53,6 +53,7 @@ THE SOFTWARE.
 #include "OgreD3D9ResourceManager.h"
 #include "OgreD3D9DepthBuffer.h"
 #include "OgreRenderOperation.h"
+#include "OgreHlmsDatablock.h"
 
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 
@@ -893,7 +894,6 @@ namespace Ogre
         rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_DOT3);
         rsc->setCapability(RSC_CUBEMAPPING);        
-        rsc->setCapability(RSC_SCISSOR_TEST);       
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);      
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_HWOCCLUSION);        
@@ -913,7 +913,6 @@ namespace Ogre
         rsc->setCapability(RSC_PERSTAGECONSTANT);
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setStencilBufferBitDepth(8);
-        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
         rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
         rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
         rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
@@ -976,8 +975,8 @@ namespace Ogre
                 rsc->unsetCapability(RSC_DOT3);
 
             // Scissor test
-            if ((rkCurCaps.RasterCaps & D3DPRASTERCAPS_SCISSORTEST) == 0)
-                rsc->unsetCapability(RSC_SCISSOR_TEST);
+            //if ((rkCurCaps.RasterCaps & D3DPRASTERCAPS_SCISSORTEST) == 0)
+            //    rsc->unsetCapability(RSC_SCISSOR_TEST);
 
 
             // Two-sided stencil
@@ -1055,8 +1054,8 @@ namespace Ogre
                 rsc->unsetCapability(RSC_PERSTAGECONSTANT);
 
             // Advanced blend operations? min max subtract rev 
-            if((rkCurCaps.PrimitiveMiscCaps & D3DPMISCCAPS_BLENDOP) == 0)
-                rsc->unsetCapability(RSC_ADVANCED_BLEND_OPERATIONS);
+            //if((rkCurCaps.PrimitiveMiscCaps & D3DPMISCCAPS_BLENDOP) == 0)
+            //   rsc->unsetCapability(RSC_ADVANCED_BLEND_OPERATIONS);
         }               
                                     
         // Blending between stages supported
@@ -3114,9 +3113,85 @@ namespace Ogre
             // Set sRGB write mode
             __SetRenderState(D3DRS_SRGBWRITEENABLE, target->isHardwareGammaEnabled());
 
+			if (FAILED(hr = __SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE)))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to enable scissor rendering state; " + getErrorDescription(hr),
+					"D3D9RenderSystem::setScissorTest");
+			}
+
+			setScissorTest(true, vp->getScissorActualLeft(), vp->getScissorActualTop(),
+				vp->getScissorActualTop() + vp->getScissorActualWidth(), vp->getScissorActualLeft() + vp->getScissorActualWidth());
+
             vp->_clearUpdatedFlag();
         }
-    }
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_setHlmsMacroblock(const HlmsMacroblock *macroblock)
+	{
+		_setDepthBufferCheckEnabled(macroblock->mDepthCheck);
+		_setDepthBufferWriteEnabled(macroblock->mDepthWrite);
+		_setDepthBufferFunction(macroblock->mDepthFunc);
+
+		_setDepthBias(macroblock->mDepthBiasConstant, macroblock->mDepthBiasSlopeScale);
+		_setCullingMode(macroblock->mCullMode);
+
+		if (macroblock->mAlphaToCoverageEnabled)
+		{
+			_setAlphaRejectSettings(CMPF_GREATER_EQUAL, (DWORD)0x00000001, true);
+		}
+		else
+		{
+			_setAlphaRejectSettings(CMPF_GREATER_EQUAL, (DWORD)0x00000001, false);
+		}
+
+		if (macroblock->mScissorTestEnabled)
+		{
+			setScissorTest(true, mActiveViewport->getScissorActualLeft(), mActiveViewport->getScissorActualTop(),
+				mActiveViewport->getScissorActualTop() + mActiveViewport->getScissorActualWidth(),
+				mActiveViewport->getScissorActualLeft() + mActiveViewport->getScissorActualWidth());
+		}
+		else
+		{
+			setScissorTest(false);
+		}
+
+		_setDepthBufferWriteEnabled(macroblock->mDepthWrite);
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_setHlmsBlendblock(const HlmsBlendblock *blendblock)
+	{
+		if (blendblock->mSeparateBlend)
+		{
+			_setSeparateSceneBlending(
+				blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
+				blendblock->mSourceBlendFactorAlpha, blendblock->mDestBlendFactorAlpha,
+				blendblock->mBlendOperation, blendblock->mBlendOperationAlpha);
+		}
+		else
+		{
+			_setSceneBlending(blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
+				blendblock->mBlendOperation);
+		}
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_setProgramsFromHlms(const HlmsCache *hlmsCache)
+	{
+		unbindGpuProgram(GPT_VERTEX_PROGRAM);
+		unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
+
+		GpuProgram* vertexPrgm = hlmsCache->vertexShader.get();
+		GpuProgram* fragmentPrgm = hlmsCache->pixelShader.get();
+
+		if (vertexPrgm)
+		{
+			bindGpuProgram(vertexPrgm);
+		}
+
+		if (fragmentPrgm)
+		{
+			bindGpuProgram(fragmentPrgm);
+		}
+	}
     //---------------------------------------------------------------------
     void D3D9RenderSystem::_beginFrame()
     {
