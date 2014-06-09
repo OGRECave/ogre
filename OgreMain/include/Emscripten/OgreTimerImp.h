@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __FlashCCTimer_H__
-#define __FlashCCTimer_H__
+#ifndef __EmscriptenTimer_H__
+#define __EmscriptenTimer_H__
 
 #include "OgrePrerequisites.h"
 
@@ -37,7 +37,7 @@ namespace Ogre
     class _OgreExport Timer : public TimerAlloc
     {
     private:
-        struct timeval start;
+        double start;
         clock_t zeroClock;
     public:
         Timer();

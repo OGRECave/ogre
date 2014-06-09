@@ -57,12 +57,15 @@ THE SOFTWARE.
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #   include "OgreAndroidEGLWindow.h"
 #   include "OgreAndroidEGLContext.h"
-#   include "OgreAndroidResourceManager.h"
-Ogre::AndroidResourceManager* Ogre::GLES2RenderSystem::mResourceManager = NULL;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
 #   include "OgreNaClWindow.h"
 #else
 #   include "OgreEGLWindow.h"
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#   include "OgreGLES2ManagedResourceManager.h"
+Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = NULL;
 #endif
 
 // Convenience macro from ARB_vertex_buffer_object spec
@@ -90,8 +93,8 @@ namespace Ogre {
 
         mEnableFixedPipeline = false;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        mResourceManager = OGRE_NEW AndroidResourceManager();
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        mResourceManager = OGRE_NEW GLES2ManagedResourceManager();
 #endif
         
         mStateCacheManager = OGRE_NEW GLES2StateCacheManager();
@@ -138,7 +141,7 @@ namespace Ogre {
         OGRE_DELETE mStateCacheManager;
         mStateCacheManager = 0;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         if (mResourceManager != NULL)
         {
             OGRE_DELETE mResourceManager;
@@ -210,6 +213,8 @@ namespace Ogre {
             rsc->setVendor(GPU_ARM);
         else if (strstr(vendorName, "Qualcomm"))
             rsc->setVendor(GPU_QUALCOMM);
+        else if (strstr(vendorName, "Mozilla"))
+            rsc->setVendor(GPU_MOZILLA);
         else
             rsc->setVendor(GPU_UNKNOWN);
 
@@ -251,25 +256,34 @@ namespace Ogre {
             mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") ||
             mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc") ||
             mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
-            mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture"))
+            mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
+            mGLSupport->checkExtension("WEBGL_compressed_texture_s3tc") ||
+            mGLSupport->checkExtension("WEBGL_compressed_texture_atc") ||
+            mGLSupport->checkExtension("WEBGL_compressed_texture_pvrtc") ||
+            mGLSupport->checkExtension("WEBGL_compressed_texture_etc1"))
+
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 
             if(mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
-               mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc2"))
+               mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc2") ||
+               mGLSupport->checkExtension("WEBGL_compressed_texture_pvrtc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
                 
-            if(mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") && 
-               mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc"))
+            if((mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") &&
+               mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc")) ||
+               mGLSupport->checkExtension("WEBGL_compressed_texture_s3tc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
 
-            if(mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture"))
+            if(mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
+               mGLSupport->checkExtension("WEBGL_compressed_texture_etc1"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC1);
 
             if(gleswIsSupported(3, 0))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC2);
 
-            if(mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture"))
+            if(mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
+               mGLSupport->checkExtension("WEBGL_compressed_texture_atc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ATC);
         }
 
@@ -299,7 +313,10 @@ namespace Ogre {
         rsc->setVertexTextureUnitsShared(true);
 
         // Hardware support mipmapping
-        rsc->setCapability(RSC_AUTOMIPMAP);
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        if (rsc->getVendor() != Ogre::GPU_MOZILLA)
+#endif
+            rsc->setCapability(RSC_AUTOMIPMAP);
 
         // Blending support
         rsc->setCapability(RSC_BLENDING);
@@ -386,12 +403,14 @@ namespace Ogre {
 #endif
 
         // ES 3 always supports NPOT textures
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || gleswIsSupported(3, 0))
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
             rsc->setNonPOW2TexturesLimited(false);
         }
         else
+#endif
         {
             rsc->setNonPOW2TexturesLimited(true);
         }
@@ -403,8 +422,14 @@ namespace Ogre {
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
         
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0))
-            rsc->setCapability(RSC_VAO);
+#if OGRE_NO_GLES2_VAO_SUPPORT == 0
+#   if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0) || emscripten_get_compiler_setting("LEGACY_GL_EMULATION"))
+#   else
+            if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0))
+#   endif
+                rsc->setCapability(RSC_VAO);
+#endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         if (mGLSupport->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
@@ -791,7 +816,7 @@ namespace Ogre {
 
         if (enabled)
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             mCurTexMipCount = 0;
 #endif
             GLuint texID =  0;
@@ -801,7 +826,7 @@ namespace Ogre {
                 tex->touch();
                 mTextureTypes[stage] = tex->getGLES2TextureTarget();
                 texID = tex->getGLID();
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
                 mCurTexMipCount = tex->getNumMipmaps();
 #endif
             }
@@ -1497,7 +1522,7 @@ namespace Ogre {
                 FilterOptions magFilter, FilterOptions mipFilter)
     {       
         mMipFilter = mipFilter;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         if(mCurTexMipCount == 0 && mMipFilter != FO_NONE)
         {
             mMipFilter = FO_NONE;           
@@ -2283,7 +2308,7 @@ namespace Ogre {
            glInsertEventMarkerEXT(0, eventName.c_str());
     }
     //---------------------------------------------------------------------
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2RenderSystem::resetRenderer(RenderWindow* win)
     {
         LogManager::getSingleton().logMessage("********************************************");
@@ -2291,8 +2316,6 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("********************************************");
                 
         initialiseContext(win);
-        
-        mGLSupport->initialiseExtensions();
         
         static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
         
@@ -2313,7 +2336,7 @@ namespace Ogre {
         _setRenderTarget(win);
     }
     
-    AndroidResourceManager* GLES2RenderSystem::getResourceManager()
+    GLES2ManagedResourceManager* GLES2RenderSystem::getResourceManager()
     {
         return GLES2RenderSystem::mResourceManager;
     }

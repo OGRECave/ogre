@@ -217,6 +217,8 @@ namespace Ogre {
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
         rsys->_setViewport(this->getViewport(0));
 
+		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
 #if OGRE_NO_GLES3_SUPPORT == 0
         if(dst.getWidth() != dst.rowPitch)
             glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);

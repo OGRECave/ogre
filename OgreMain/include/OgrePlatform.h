@@ -40,8 +40,8 @@ namespace Ogre {
 #define OGRE_PLATFORM_ANDROID 5
 #define OGRE_PLATFORM_NACL 6
 #define OGRE_PLATFORM_WINRT 7
-#define OGRE_PLATFORM_FLASHCC 8
-
+#define OGRE_PLATFORM_EMSCRIPTEN 8
+    
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
 #define OGRE_COMPILER_BORL 3
@@ -129,8 +129,8 @@ namespace Ogre {
 #   else
 #       define OGRE_PLATFORM OGRE_PLATFORM_WIN32
 #   endif
-#elif defined(__FLASHCC__)
-#   define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
+#elif defined(__EMSCRIPTEN__)
+#   define OGRE_PLATFORM OGRE_PLATFORM_EMSCRIPTEN
 #elif defined( __APPLE_CC__)
     // Device                                                     Simulator
     // Both requiring OS version 6.0 or greater
@@ -239,9 +239,9 @@ namespace Ogre {
 #endif // OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
 //----------------------------------------------------------------------------
-// Linux/Apple/iOS/Android/NaCl Settings
+// Linux/Apple/iOS/Android/NaCl/Emscripten Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
+    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
@@ -283,20 +283,6 @@ namespace Ogre {
 #   endif
 #   ifndef CLOCKS_PER_SEC
 #       define CLOCKS_PER_SEC  1000
-#   endif
-#endif
-    
-//----------------------------------------------------------------------------
-// FlashCC Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
-#   ifdef OGRE_UNICODE_SUPPORT
-#       undef OGRE_UNICODE_SUPPORT
-#   endif
-#   define OGRE_UNICODE_SUPPORT 0
-#   ifdef DEBUG
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
 #   endif
 #endif
 
