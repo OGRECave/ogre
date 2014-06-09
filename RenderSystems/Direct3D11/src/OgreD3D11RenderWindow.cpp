@@ -162,8 +162,8 @@ namespace Ogre
 
 		if( FAILED(hr) )
 		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to create rendertagert view\nError Description:" + errorDescription,
 				"D3D11RenderWindow::_createSizeDependedD3DResources");
 		}
@@ -191,7 +191,7 @@ namespace Ogre
 			if( FAILED(hr) || mDevice.isError())
 			{
 				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Unable to create depth texture\nError Description:" + errorDescription,
 					"D3D11RenderWindow::_createSizeDependedD3DResources");
 			}
@@ -209,8 +209,8 @@ namespace Ogre
                 
 			if( FAILED(hr) )
 			{
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Unable to create depth stencil view\nError Description:" + errorDescription,
 					"D3D11RenderWindow::_createSizeDependedD3DResources");
 			}
@@ -268,7 +268,7 @@ namespace Ogre
 		HRESULT hr = mDevice->QueryInterface( __uuidof(IDXGIDeviceN), (void**)&pDXGIDevice );
 		if( FAILED(hr) )
 		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to query a DXGIDevice",
 				"D3D11RenderWindowBase::_queryDxgiDevice");
 		}
@@ -349,7 +349,7 @@ namespace Ogre
                 if (FAILED(hr) || mDevice.isError())
                 {
                         String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                                 "Error creating texture\nError Description:" + errorDescription, 
                                 "D3D11RenderWindow::copyContentsToMemory" );
                 }
@@ -375,7 +375,7 @@ namespace Ogre
         if (FAILED(hr) || mDevice.isError())
         {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                         "Error creating texture\nError Description:" + errorDescription, 
                         "D3D11RenderWindow::copyContentsToMemory" );
         }
@@ -436,7 +436,7 @@ namespace Ogre
 
         if (FAILED(hr))
 		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to create swap chain",
 				"D3D11RenderWindowSwapChainBased::_createSwapChain");
 		}
@@ -450,7 +450,7 @@ namespace Ogre
 		HRESULT hr = mpSwapChain->GetBuffer( 0,  __uuidof( ID3D11Texture2D ), (LPVOID*)&mpBackBuffer  );
 		if( FAILED(hr) )
 		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to Get Back Buffer for swap chain",
 				"D3D11RenderWindow::_createSizeDependedD3DResources");
 		}
@@ -495,7 +495,7 @@ namespace Ogre
 			HRESULT hr = mpSwapChain->Present(1, 0); // flip presentation model swap chains have another semantic for first parameter
 #endif
 			if( FAILED(hr) )
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers" );
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers");
 		}
 	}
 	//---------------------------------------------------------------------
@@ -1153,7 +1153,7 @@ namespace Ogre
 		HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
 		if( FAILED(hr) )
 		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to Create Back Buffer",
 				"D3D11RenderWindowImageSource::_createSizeDependedD3DResources");
 		}
@@ -1196,7 +1196,7 @@ namespace Ogre
 
 		if(FAILED(hr))
 		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to Get DXGI surface for SurfaceImageSource",
 				"D3D11RenderWindowImageSource::swapBuffers");
 		}
@@ -1206,7 +1206,7 @@ namespace Ogre
 		SAFE_RELEASE(dxgiSurface);
 		if(FAILED(hr))
 		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to convert DXGI surface to D3D11 texture",
 				"D3D11RenderWindowImageSource::swapBuffers");
 		}
@@ -1219,7 +1219,7 @@ namespace Ogre
 
 		if( FAILED(hr) )
 		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Drawing into SurfaceImageSource failed",
 				"D3D11RenderWindowImageSource::swapBuffers");
 		}

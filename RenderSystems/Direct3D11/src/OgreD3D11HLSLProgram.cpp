@@ -60,7 +60,7 @@ namespace Ogre {
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "D3D11 device Cannot create constant buffer.\nError Description:" + errorDescription,
                 "D3D11HLSLProgram::createConstantBuffer");  
         }
@@ -493,7 +493,7 @@ namespace Ogre {
             String message = "Cannot assemble D3D11 high-level shader " + mName + " Errors:\n" +
                 static_cast<const char*>(errors->GetBufferPointer());
             errors->Release();
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
                 "D3D11HLSLProgram::loadFromSource");
         }
         else
@@ -513,7 +513,7 @@ namespace Ogre {
             {
                 String message = "Cannot reflect D3D11 high-level shader " + mName + " Errors:\n" +
                     static_cast<const char*>(errors->GetBufferPointer());
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
                     "D3D11HLSLProgram::loadFromSource");
             }
 
@@ -524,7 +524,7 @@ namespace Ogre {
             {
                 String message = "Cannot get reflect info for D3D11 high-level shader " + mName + " Errors:\n" +
                     static_cast<const char*>(errors->GetBufferPointer());
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
                     "D3D11HLSLProgram::loadFromSource");
             }
 
@@ -573,7 +573,7 @@ namespace Ogre {
 					{
 						String message = "Cannot reflect constant buffer of D3D11 high-level shader " + mName + " Errors:\n" +
 							static_cast<const char*>(errors->GetBufferPointer());
-						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
+						OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
 							"D3D11HLSLProgram::loadFromSource");
 					}
 
@@ -598,7 +598,7 @@ namespace Ogre {
 						{
 							String message = "Cannot reflect constant buffer variable of D3D11 high-level shader " + mName + " Errors:\n" +
 								static_cast<const char*>(errors->GetBufferPointer());
-							OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
+							OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
 								"D3D11HLSLProgram::loadFromSource");
 						}
 
@@ -1276,7 +1276,7 @@ namespace Ogre {
         // automatically, we have to do it by hand
         if (FAILED(hr))
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_INTERNAL_ERROR, hr,
                 "Cannot retrieve constant description from HLSL program.", 
                 "D3D11HLSLProgram::processParamElement");
         }
@@ -1613,7 +1613,8 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot create D3D11 vertex shader " + mName + " from microcode.\nError Description:" + errorDescription,
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, 
+                    "Cannot create D3D11 vertex shader " + mName + " from microcode.\nError Description:" + errorDescription,
                     "D3D11GpuVertexProgram::loadFromMicrocode");
             }
         }
@@ -1640,7 +1641,8 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot create D3D11 Pixel shader " + mName + " from microcode.\nError Description:" + errorDescription,
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Cannot create D3D11 Pixel shader " + mName + " from microcode.\nError Description:" + errorDescription,
                     "D3D11GpuPixelProgram::loadFromMicrocode");
             }
         }
@@ -1744,7 +1746,8 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot create D3D11 Geometry shader " + mName + " from microcode.\nError Description:" + errorDescription,
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, 
+                    "Cannot create D3D11 Geometry shader " + mName + " from microcode.\nError Description:" + errorDescription,
                     "D3D11GpuPixelProgram::loadFromMicrocode");
             }
         }
@@ -1769,7 +1772,8 @@ namespace Ogre {
 			if (FAILED(hr) || mDevice.isError())
 			{
 				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot create D3D11 Hull shader " + mName + " from microcode.\nError Description:" + errorDescription,
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+					"Cannot create D3D11 Hull shader " + mName + " from microcode.\nError Description:" + errorDescription,
 					"D3D11GpuPixelProgram::loadFromMicrocode");
 			}
 		}
@@ -1794,7 +1798,8 @@ namespace Ogre {
 			if (FAILED(hr) || mDevice.isError())
 			{
 				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot create D3D11 Domain shader " + mName + " from microcode.\nError Description:" + errorDescription,
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+					"Cannot create D3D11 Domain shader " + mName + " from microcode.\nError Description:" + errorDescription,
 					"D3D11GpuPixelProgram::loadFromMicrocode");
 			}
 		}
@@ -1819,7 +1824,8 @@ namespace Ogre {
 			if (FAILED(hr) || mDevice.isError())
 			{
 				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Cannot create D3D11 Compute shader " + mName + " from microcode.\nError Description:" + errorDescription,
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+					"Cannot create D3D11 Compute shader " + mName + " from microcode.\nError Description:" + errorDescription,
 					"D3D11GpuPixelProgram::loadFromMicrocode");
 			}
 		}

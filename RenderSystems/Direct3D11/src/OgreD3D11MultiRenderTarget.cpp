@@ -71,11 +71,9 @@ namespace Ogre
 				PixelUtil::getNumElemBits(targets[y]->getFormat()) != 
 				PixelUtil::getNumElemBits(buffer->getFormat()))
 			{
-				OGRE_EXCEPT(
-					Exception::ERR_INVALIDPARAMS, 
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 					"MultiRenderTarget surfaces are not of same size or bit depth", 
-					"D3D11MultiRenderTarget::bindSurface"
-					);
+					"D3D11MultiRenderTarget::bindSurface");
 			}
 		}
 
