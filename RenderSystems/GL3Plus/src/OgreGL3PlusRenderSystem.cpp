@@ -2380,7 +2380,7 @@ namespace Ogre {
         if (!gl3wIsSupported(3, 3))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "OpenGL 3.0 is not supported",
+                        "OpenGL 3.3 is not supported. Please update your graphics card drivers.",
                         "GL3PlusRenderSystem::initialiseContext");
         }
 

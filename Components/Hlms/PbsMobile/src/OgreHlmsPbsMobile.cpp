@@ -70,9 +70,9 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* HlmsPbsMobile::createShaderCacheEntry( uint32 renderableHash,
-                                                         const HlmsCache &passCache,
-                                                         uint32 finalHash,
-                                                         const QueuedRenderable &queuedRenderable )
+                                                            const HlmsCache &passCache,
+                                                            uint32 finalHash,
+                                                            const QueuedRenderable &queuedRenderable )
     {
         const HlmsCache *retVal = Hlms::createShaderCacheEntry( renderableHash, passCache, finalHash,
                                                                 queuedRenderable );
@@ -137,6 +137,15 @@ namespace Ogre
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
                                                         renderable->getDatablock() );
         setProperty( PropertyUvAtlas, datablock->mNumUvAtlas );
+
+        String paramVal;
+        if( !getProperty( PropertyNormalMap ) && findParamInVec( params, PropertyNormalMap, paramVal ) )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Renderable can't use normalmaps but datablock wants normalmaps. "
+                         "Generate Tangents for this mesh to fix the problem or use a "
+                         "datablock without normal maps.", "HlmsPbsMobile::calculateHashForPreCreate" );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobile::calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params )

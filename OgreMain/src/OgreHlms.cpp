@@ -107,7 +107,8 @@ namespace Ogre
         mTypeName( typeName ),
         mRenderSystem( 0 ),
         mShaderProfile( "unset!" ),
-        mDebugOutput( true )
+        mDebugOutput( true ),
+        mDefaultDatablock( 0 )
     {
         enumeratePieceFiles();
     }
@@ -940,6 +941,11 @@ namespace Ogre
         return OGRE_NEW HlmsDatablock( datablockName, this, macroblock, blendblock, paramVec );
     }
     //-----------------------------------------------------------------------------------
+    HlmsDatablock* Hlms::createDefaultDatablock(void)
+    {
+        return createDatablock( IdString(), HlmsMacroblock(), HlmsBlendblock(), HlmsParamVec(), false );
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::reloadFrom( Archive *newDataFolder )
     {
         mShaderCache.clear();
@@ -1011,6 +1017,11 @@ namespace Ogre
         }
 
         mDatablocks.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsDatablock* Hlms::getDefaultDatablock(void) const
+    {
+        return mDefaultDatablock;
     }
     //-----------------------------------------------------------------------------------
     bool Hlms::findParamInVec( const HlmsParamVec &paramVec, IdString key, String &inOut )
@@ -1425,6 +1436,9 @@ namespace Ogre
                 if( capabilities->isShaderProfileSupported( shaderProfiles[i] ) )
                     mShaderProfile = shaderProfiles[i];
             }
+
+            if( !mDefaultDatablock )
+                mDefaultDatablock = createDefaultDatablock();
         }
     }
     //-----------------------------------------------------------------------------------

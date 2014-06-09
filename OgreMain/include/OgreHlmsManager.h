@@ -65,6 +65,8 @@ namespace Ogre
         typedef std::map<IdString, HlmsDatablock*> HlmsDatablockMap;
         HlmsDatablockMap mRegisteredDatablocks;
 
+        HlmsTypes           mDefaultHlmsType;
+
         void renderSystemDestroyAllBlocks(void);
 
     public:
@@ -122,8 +124,8 @@ namespace Ogre
             retrieve it using this function. If that's the case, get the appropiate Hlms
             using @getHlms and then call @Hlms::getDatablock on it
         @par
-            Throws if the material/datablock with that name wasn't found
-            (note that Hlms::getDatablock doesn't throw!!!)
+            If the material/datablock with that name wasn't found, returns a default one
+            (note that Hlms::getDatablock doesn't do this!!!)
         @param name
             Unique name of the datablock. Datablock names are unique within the same Hlms
             type. If two types create a datablock with the same name and both attempt to
@@ -134,8 +136,8 @@ namespace Ogre
         HlmsDatablock* getDatablock( IdString name ) const;
 
         /// @See getDatablock. Exactly the same, but returns null pointer if it wasn't found,
-        /// instead of throwing.
-        HlmsDatablock* getDatablockNoThrow( IdString name ) const;
+        /// instead of going fallback to default.
+        HlmsDatablock* getDatablockNoDefault( IdString name ) const;
 
         /// Alias function. @See getDatablock, as many beginners will probably think of the word
         /// "Material" first. Datablock is a more technical (and accurate) name of what it does
@@ -143,6 +145,11 @@ namespace Ogre
         HlmsDatablock* getMaterial( IdString name ) const   { return getDatablock( name ); }
 
         HlmsTextureManager* getTextureManger(void) const    { return mTextureManager; }
+
+        void useDefaultDatablockFrom( HlmsTypes type )      { mDefaultHlmsType = type; }
+
+        /// Datablock to use when another datablock failed or none was specified.
+        HlmsDatablock* getDefaultDatablock(void) const;
 
         /** Registers an HLMS provider. The type is retrieved from the provider. Two providers of
             the same type cannot be registered at the same time (@see HlmsTypes) and will throw

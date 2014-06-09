@@ -94,7 +94,7 @@ namespace Ogre
                 // DXT5 is like BC5, using the "store only in green and alpha channels" method.
                 // The last one is lossless, using UV8 to store uncompressed,
                 // and retrieve z = sqrt(x²+y²)
-                if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
+                /*if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
                 {
                     mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat = PF_BC5_SNORM;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_BC5_SNORM;
@@ -104,7 +104,7 @@ namespace Ogre
                     mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = PF_DXT5;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_DXT5;
                 }
-                else
+                else*/
                 {
                     PixelFormat pf = caps->hasCapability( RSC_TEXTURE_SIGNED_INT ) ? PF_R8G8_SNORM :
                                                                                      PF_BYTE_LA;
