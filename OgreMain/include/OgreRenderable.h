@@ -148,6 +148,8 @@ namespace Ogre {
         */
         virtual unsigned short getNumWorldTransforms(void) const { return 1; }
 
+        bool hasSkeletonAnimation(void) const               { return mHasSkeletonAnimation; }
+
         /** Sets whether or not to use an 'identity' projection.
         @remarks
             Usually Renderable objects will use a projection matrix as determined
@@ -409,7 +411,7 @@ namespace Ogre {
         void setDatablock( IdString datablockName );
 
         /// Assigns a datablock (i.e. HLMS Material) to this renderable
-        void setDatablock( HlmsDatablock *datablock );
+        virtual void setDatablock( HlmsDatablock *datablock );
 
         /// Manually sets the hlms hashes. Don't call this directly
         void _setHlmsHashes( uint32 hash, uint32 casterHash );
@@ -424,6 +426,8 @@ namespace Ogre {
         uint32              mHlmsHash;
         uint32              mHlmsCasterHash;
         HlmsDatablock       *mHlmsDatablock;
+        //TODO: (refactor) Change this bool for the skeleton pointer.
+        bool                    mHasSkeletonAnimation;
         uint8                   mCurrentMaterialLod;
         FastArray<Real> const   *mLodMaterial;
 

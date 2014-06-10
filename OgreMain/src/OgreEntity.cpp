@@ -197,6 +197,27 @@ namespace Ogre {
 
         reevaluateVertexProcessing();
 
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        size_t numSubMeshes = mMesh->getNumSubMeshes();
+        for( size_t i=0; i<numSubMeshes; ++i )
+        {
+            SubMesh *subMesh = mMesh->getSubMesh(i);
+            if( subMesh->isMatInitialised() )
+            {
+                //Give preference to HLMS materials of the same name
+                HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault(
+                                                    subMesh->getMaterialName() );
+                if( datablock )
+                {
+                    mSubEntityList[i].setDatablock( datablock );
+                }
+                else
+                {
+                    mSubEntityList[i].setMaterialName( subMesh->getMaterialName(), mMesh->getGroup() );
+                }
+            }
+        }
+
         Aabb aabb( mMesh->getBounds().getCenter(), mMesh->getBounds().getHalfSize() );
         mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
         mObjectData.mWorldAabb->setFromAabb( aabb, mObjectData.mIndex );
@@ -1281,8 +1302,6 @@ namespace Ogre {
         {
             subMesh = mesh->getSubMesh(i);
             sublist->push_back( SubEntity( this, subMesh ) );
-            if (subMesh->isMatInitialised())
-                sublist->back().setMaterialName(subMesh->getMaterialName(), mesh->getGroup());
         }
     }
     //-----------------------------------------------------------------------
@@ -1592,7 +1611,33 @@ namespace Ogre {
         for (i = mSubEntityList.begin(); i != iend; ++i)
         {
             SubEntity &sub = *i;
+
             const MaterialPtr& m = sub.getMaterial();
+
+            if( m.isNull() )
+            {
+                HlmsDatablock *datablock = sub.getDatablock();
+                mVertexProgramInUse = true;
+                if (hasSkeleton())
+                {
+                    VertexAnimationType animType = VAT_NONE;
+                    if (sub.getSubMesh()->useSharedVertices)
+                    {
+                        animType = mMesh->getSharedVertexDataAnimationType();
+                    }
+                    else
+                    {
+                        animType = sub.getSubMesh()->getVertexAnimationType();
+                    }
+
+                    //Disable hw animation if there are morph and pose animations, at least for now.
+                    //Enable if there's only skeleton animation
+                    return animType == VAT_NONE;
+                }
+
+                return false;
+            }
+
             // Make sure it's loaded
             m->load();
             Technique* t = m->getBestTechnique(0, &sub);

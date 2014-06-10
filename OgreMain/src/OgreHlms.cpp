@@ -601,6 +601,139 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+        int setOp( int op1, int op2 ) { return op2; }
+        int addOp( int op1, int op2 ) { return op1 + op2; }
+        int subOp( int op1, int op2 ) { return op1 - op2; }
+        int mulOp( int op1, int op2 ) { return op1 * op2; }
+        int divOp( int op1, int op2 ) { return op1 / op2; }
+        int modOp( int op1, int op2 ) { return op1 % op2; }
+
+        struct Operation
+        {
+            const char *opName;
+            size_t length;
+            int (*opFunc)(int, int);
+            Operation( const char *_name, size_t len, int (*_opFunc)(int, int) ) :
+                opName( _name ), length( len ), opFunc( _opFunc ) {}
+        };
+
+        const Operation c_operations[6] =
+        {
+            Operation( "pset", sizeof( "@pset" ), &setOp ),
+            Operation( "padd", sizeof( "@padd" ), &addOp ),
+            Operation( "psub", sizeof( "@psub" ), &subOp ),
+            Operation( "pmul", sizeof( "@pmul" ), &mulOp ),
+            Operation( "pdiv", sizeof( "@pdiv" ), &divOp ),
+            Operation( "pmod", sizeof( "@pmod" ), &modOp )
+        };
+    //-----------------------------------------------------------------------------------
+    bool Hlms::parseMath( const String &inBuffer, String &outBuffer )
+    {
+        outBuffer.clear();
+        outBuffer.reserve( inBuffer.size() );
+
+        StringVector argValues;
+        SubStringRef subString( &inBuffer, 0 );
+
+        size_t pos;
+        pos = subString.find( "@" );
+        size_t keyword = ~0;
+
+        while( pos != String::npos && keyword == ~0 )
+        {
+            size_t maxSize = subString.findFirstOf( " \t(", pos + 1 );
+            maxSize = maxSize == String::npos ? subString.getSize() : maxSize;
+            SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
+                                                subString.getStart() + maxSize );
+
+            for( size_t i=0; i<6 && keyword == ~0; ++i )
+            {
+                if( keywordStr.matchEqual( c_operations[i].opName ) )
+                    keyword = i;
+            }
+
+            if( keyword == ~0 )
+                pos = subString.find( "@", pos + 1 );
+        }
+
+        bool syntaxError = false;
+
+        while( pos != String::npos && !syntaxError )
+        {
+            //Copy what comes before the block
+            copy( outBuffer, subString, pos );
+
+            subString.setStart( subString.getStart() + pos + c_operations[keyword].length );
+            evaluateParamArgs( subString, argValues, syntaxError );
+
+            syntaxError |= argValues.size() < 2 || argValues.size() > 3;
+
+            if( !syntaxError )
+            {
+                IdString dstProperty;
+                IdString srcProperty;
+                int op1Value;
+                int op2Value;
+
+                dstProperty = argValues[0];
+                size_t idx  = 1;
+                srcProperty = dstProperty;
+                if( argValues.size() == 3 )
+                    srcProperty = argValues[idx++];
+                op1Value    = getProperty( srcProperty );
+                op2Value    = StringConverter::parseInt( argValues[idx],
+                                                         -std::numeric_limits<int>::max() );
+
+                if( op2Value == -std::numeric_limits<int>::max() )
+                {
+                    //Not a number, interpret as property
+                    op2Value = getProperty( argValues[idx] );
+                }
+
+                int result = c_operations[keyword].opFunc( op1Value, op2Value );
+                setProperty( dstProperty, result );
+            }
+            else
+            {
+                size_t lineCount = calculateLineCount( subString );
+                if( keyword <= 1 )
+                {
+                    printf( "Syntax Error at line %lu: @%s expects one parameter",
+                            lineCount, c_operations[keyword].opName );
+                }
+                else
+                {
+                    printf( "Syntax Error at line %lu: @%s expects two or three parameters",
+                            lineCount, c_operations[keyword].opName );
+                }
+            }
+
+            pos = subString.find( "@" );
+            keyword = ~0;
+
+            while( pos != String::npos && keyword == ~0 )
+            {
+                size_t maxSize = subString.findFirstOf( " \t(", pos + 1 );
+                maxSize = maxSize == String::npos ? subString.getSize() : maxSize;
+                SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
+                                                    subString.getStart() + maxSize );
+
+                for( size_t i=0; i<6 && keyword == ~0; ++i )
+                {
+                    if( keywordStr.matchEqual( c_operations[i].opName ) )
+                        keyword = i;
+                }
+
+                if( keyword == ~0 )
+                    pos = subString.find( "@", pos + 1 );
+            }
+        }
+
+        copy( outBuffer, subString, subString.getSize() );
+
+        return syntaxError;
+    }
+    //-----------------------------------------------------------------------------------
     bool Hlms::parseForEach( const String &inBuffer, String &outBuffer ) const
     {
         outBuffer.clear();
@@ -825,6 +958,18 @@ namespace Ogre
         return syntaxError;
     }
     //-----------------------------------------------------------------------------------
+        const Operation c_counterOperations[8] =
+        {
+            Operation( "counter", sizeof( "@counter" ), 0 ),
+            Operation( "value", sizeof( "@value" ), 0 ),
+            Operation( "set", sizeof( "@set" ), &setOp ),
+            Operation( "add", sizeof( "@add" ), &addOp ),
+            Operation( "sub", sizeof( "@sub" ), &subOp ),
+            Operation( "mul", sizeof( "@mul" ), &mulOp ),
+            Operation( "div", sizeof( "@div" ), &divOp ),
+            Operation( "mod", sizeof( "@mod" ), &modOp )
+        };
+    //-----------------------------------------------------------------------------------
     bool Hlms::parseCounter( const String &inBuffer, String &outBuffer )
     {
         outBuffer.clear();
@@ -832,21 +977,25 @@ namespace Ogre
 
         StringVector argValues;
         SubStringRef subString( &inBuffer, 0 );
-        size_t _pos[2];
-        _pos[0] = subString.find( "@counter" );
-        _pos[1] = subString.find( "@value" );
-        size_t pos;
 
-        int keyword = 0;
-        if( _pos[0] <= _pos[1] )
+        size_t pos;
+        pos = subString.find( "@" );
+        size_t keyword = ~0;
+
+        if( pos != String::npos )
         {
-            keyword = 0;
-            pos = _pos[0];
-        }
-        else
-        {
-            keyword = 1;
-            pos = _pos[1];
+            size_t maxSize = subString.findFirstOf( " \t(", pos + 1 );
+            SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
+                                                subString.getStart() + maxSize );
+
+            for( size_t i=0; i<8 && keyword == ~0; ++i )
+            {
+                if( keywordStr.matchEqual( c_counterOperations[i].opName ) )
+                    keyword = i;
+            }
+
+            if( keyword == ~0 )
+                pos = String::npos;
         }
 
         bool syntaxError = false;
@@ -856,43 +1005,92 @@ namespace Ogre
             //Copy what comes before the block
             copy( outBuffer, subString, pos );
 
-            subString.setStart( subString.getStart() + pos +
-                                (keyword == 0 ? sizeof( "@counter" ) : sizeof( "@value" )) );
+            subString.setStart( subString.getStart() + pos + c_counterOperations[keyword].length );
             evaluateParamArgs( subString, argValues, syntaxError );
 
-            syntaxError |= argValues.size() != 1;
+            if( keyword <= 1 )
+                syntaxError |= argValues.size() != 1;
+            else
+                syntaxError |= argValues.size() < 2 || argValues.size() > 3;
 
             if( !syntaxError )
             {
-                const IdString propertyKey( argValues[0] );
-                int32 count = getProperty( propertyKey );
-                char tmp[16];
-                sprintf( tmp, "%i", count );
-                outBuffer += tmp;
+                IdString dstProperty;
+                IdString srcProperty;
+                int op1Value;
+                int op2Value;
 
-                if( keyword == 0 )
+                if( argValues.size() == 1 )
                 {
-                    ++count;
-                    setProperty( propertyKey, count );
+                    dstProperty = argValues[0];
+                    srcProperty = dstProperty;
+                    op1Value    = getProperty( srcProperty );
+                    op2Value    = op1Value;
+
+                    //@value & @counter write, the others are invisible
+                    char tmp[16];
+                    sprintf( tmp, "%i", op1Value );
+                    outBuffer += tmp;
+
+                    if( keyword == 0 )
+                    {
+                        ++op1Value;
+                        setProperty( dstProperty, op1Value );
+                    }
+                }
+                else
+                {
+                    dstProperty = argValues[0];
+                    size_t idx  = 1;
+                    srcProperty = dstProperty;
+                    if( argValues.size() == 3 )
+                        srcProperty = argValues[idx++];
+                    op1Value    = getProperty( srcProperty );
+                    op2Value    = StringConverter::parseInt( argValues[idx],
+                                                             -std::numeric_limits<int>::max() );
+
+                    if( op2Value == -std::numeric_limits<int>::max() )
+                    {
+                        //Not a number, interpret as property
+                        op2Value = getProperty( argValues[idx] );
+                    }
+
+                    int result = c_counterOperations[keyword].opFunc( op1Value, op2Value );
+                    setProperty( dstProperty, result );
                 }
             }
             else
             {
-                printf( "Syntax Error at line %lu: @counter/@value expect one parameter",
-                        calculateLineCount( subString ) );
+                size_t lineCount = calculateLineCount( subString );
+                if( keyword <= 1 )
+                {
+                    printf( "Syntax Error at line %lu: @%s expects one parameter",
+                            lineCount, c_counterOperations[keyword].opName );
+                }
+                else
+                {
+                    printf( "Syntax Error at line %lu: @%s expects two or three parameters",
+                            lineCount, c_counterOperations[keyword].opName );
+                }
             }
 
-            _pos[0] = subString.find( "@counter" );
-            _pos[1] = subString.find( "@value" );
-            if( _pos[0] <= _pos[1] )
+            pos = subString.find( "@" );
+            keyword = ~0;
+
+            if( pos != String::npos )
             {
-                keyword = 0;
-                pos = _pos[0];
-            }
-            else
-            {
-                keyword = 1;
-                pos = _pos[1];
+                size_t maxSize = subString.findFirstOf( " \t(", pos + 1 );
+                SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
+                                                    subString.getStart() + maxSize );
+
+                for( size_t i=0; i<8 && keyword == ~0; ++i )
+                {
+                    if( keywordStr.matchEqual( c_counterOperations[i].opName ) )
+                        keyword = i;
+                }
+
+                if( keyword == ~0 )
+                    pos = String::npos;
             }
         }
 
@@ -1121,9 +1319,10 @@ namespace Ogre
                 inString.resize( inFile->size() );
                 inFile->read( &inString[0], inFile->size() );
 
-                this->parseForEach( inString, outString );
-                this->parseProperties( outString, inString );
-                this->collectPieces( inString, outString );
+                this->parseMath( inString, outString );
+                this->parseForEach( outString, inString );
+                this->parseProperties( inString, outString );
+                this->collectPieces( outString, inString );
                 ++itor;
             }
 
@@ -1139,11 +1338,14 @@ namespace Ogre
                 inString.resize( inFile->size() );
                 inFile->read( &inString[0], inFile->size() );
 
-                this->parseForEach( inString, outString );
-                this->parseProperties( outString, inString );
-                this->collectPieces( inString, outString );
-                this->insertPieces( outString, inString );
-                this->parseCounter( inString, outString );
+                this->parseMath( inString, outString );
+                this->parseForEach( outString, inString );
+                this->parseProperties( inString, outString );
+                this->collectPieces( outString, inString );
+                this->insertPieces( inString, outString );
+                this->parseCounter( outString, inString );
+
+                outString.swap( inString );
 
                 if( mDebugOutput )
                 {
@@ -1185,9 +1387,7 @@ namespace Ogre
     {
         mSetProperties.clear();
 
-        uint16 numWorldTransforms = renderable->getNumWorldTransforms();//TODO: Remove virtualness
-
-        setProperty( HlmsPropertySkeleton, numWorldTransforms > 1 );
+        setProperty( HlmsPropertySkeleton, renderable->hasSkeletonAnimation() );
 
         RenderOperation op;
         renderable->getRenderOperation( op );

@@ -164,6 +164,7 @@ namespace Ogre
         static void copy( String &outBuffer, const SubStringRef &inSubString, size_t length );
         static void repeat( String &outBuffer, const SubStringRef &inSubString, size_t length,
                             size_t passNum, const String &counterVar );
+        bool parseMath( const String &inBuffer, String &outBuffer );
         bool parseForEach( const String &inBuffer, String &outBuffer ) const;
         bool parseProperties( String &inBuffer, String &outBuffer ) const;
         bool collectPieces( const String &inBuffer, String &outBuffer );

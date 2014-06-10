@@ -32,15 +32,17 @@ out vec@value( hlms_uv_count@n ) psUv@n;@end
 out vec4 psPosL@n;@end
 
 // START UNIFORM DECLARATION
-@property( hlms_num_shadow_maps )
+@property( !hlms_shadowcaster )@property( hlms_num_shadow_maps )
 //Uniforms that change per pass
 uniform mat4 texWorldViewProj[@value(hlms_num_shadow_maps)];
-uniform vec4 shadowDepthRange[@value(hlms_num_shadow_maps)];@end
+uniform vec4 shadowDepthRange[@value(hlms_num_shadow_maps)];@end @end
 @property( hlms_shadowcaster )uniform vec4 depthRange;@end
-//Uniforms that change per entity
-@property( hlms_skeleton )uniform mat4x3 worldMat[60];@end
-@property( !hlms_shadowcaster )uniform mat4 worldView;@end
+//Uniforms that change per pass (skeleton anim) or per entity (non-skeleton anim)
+//Note: worldView becomes "view" and worldViewProj "viewProj" on skel. anim.
 uniform mat4 worldViewProj;
+@property( !hlms_shadowcaster )uniform mat4 worldView;@end
+//Uniforms that change per entity
+@property( hlms_skeleton )uniform vec4 worldMat[180]; //180 = 60 matrices * 3 rows per matrix@end
 @property( hlms_shadowcaster )uniform float shadowConstantBias;@end
 // END UNIFORM DECLARATION
 
@@ -56,19 +58,48 @@ uniform mat4 worldViewProj;
 @end
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
-	int _idx = (int)(blendIndices[0]);
-	vec4 _localPos = (worldMat[_idx] * vertex) * blendWeights[0];
-	@property( hlms_normal )vec4 _localNorm = (mat3(worldMat[_idx]) * normal) * blendWeights[0];@end
-	@property( normal_map )vec4 _localTang = (mat3(worldMat[_idx]) * tangent) * blendWeights[0];@end
+	int _idx = int(blendIndices[0] * 3);
+	vec4 _localPos;
+	_localPos.x = dot( worldMat[_idx + 0], vertex );
+	_localPos.y = dot( worldMat[_idx + 1], vertex );
+	_localPos.z = dot( worldMat[_idx + 2], vertex );
+	_localPos *= blendWeights[0];
+	@property( hlms_normal )vec3 _localNorm;
+	_localNorm.x = dot( worldMat[_idx + 0].xyz, normal );
+	_localNorm.y = dot( worldMat[_idx + 1].xyz, normal );
+	_localNorm.z = dot( worldMat[_idx + 2].xyz, normal );
+	_localNorm *= blendWeights[0];@end
+	@property( normal_map )vec3 _localTang;
+	_localTang.x = dot( worldMat[_idx + 0].xyz, tangent );
+	_localTang.y = dot( worldMat[_idx + 1].xyz, tangent );
+	_localTang.z = dot( worldMat[_idx + 2].xyz, tangent );
+	_localTang *= blendWeights[0];@end
 
-	for( int i=0; i<@value( hlms_bones_per_vertex ); ++i )
+	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
+	@property( NeedsMoreThan1BonePerVertex )
+	for( int i=1; i<@value( hlms_bones_per_vertex ); ++i )
 	{
-		_idx = (int)(blendIndices[i]);
-		_localPos += (worldMat[_idx] * vertex) * blendWeights[i];
-		@property( hlms_normal )_localNorm += (mat3(worldMat[_idx]) * normal) * blendWeights[i];@end
-		@property( normal_map )_localTang += (mat3(worldMat[_idx]) * tangent) * blendWeights[i];@end
+		_idx = int(blendIndices[i] * 3);
+		vec4 tmp;
+		tmp.x = dot( worldMat[_idx + 0], vertex );
+		tmp.y = dot( worldMat[_idx + 1], vertex );
+		tmp.z = dot( worldMat[_idx + 2], vertex );
+		_localPos += tmp * blendWeights[i];
+		@property( hlms_normal )vec3 _localNorm;
+		tmp.x = dot( worldMat[_idx + 0].xyz, normal );
+		tmp.y = dot( worldMat[_idx + 1].xyz, normal );
+		tmp.z = dot( worldMat[_idx + 2].xyz, normal );
+		_localNorm += tmp.xyz * blendWeights[i];@end
+		@property( normal_map )vec3 _localTang;
+		tmp.x = dot( worldMat[_idx + 0].xyz, tangent );
+		tmp.y = dot( worldMat[_idx + 1].xyz, tangent );
+		tmp.z = dot( worldMat[_idx + 2].xyz, tangent );
+		_localTang += tmp.xyz * blendWeights[i];@end
 	}
-@end@end
+	@end
+
+	_localPos.w = 1.0;
+@end @end
 
 @piece( CalculatePsPos )(worldView * @insertpiece(local_vertex)).xyz@end
 
@@ -101,12 +132,13 @@ void main()
 @foreach( hlms_uv_count, n )
 	psUv@n = uv@n;@end
 
+@property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
 	psPosL@n.z = (psPosL@n.z - shadowDepthRange[@n].x) * shadowDepthRange[@n].w;@end
 
 @property( hlms_pssm_splits )	psDepth = gl_Position.z;@end
-@property( hlms_shadowcaster )
+@end @property( hlms_shadowcaster )
 	//Linear depth
 	psDepth	= (gl_Position.z - depthRange.x + shadowConstantBias) * depthRange.w;
 

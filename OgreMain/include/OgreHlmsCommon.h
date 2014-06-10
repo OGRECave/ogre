@@ -74,9 +74,9 @@ namespace Ogre
         {
         }
 
-        size_t find( const char *value ) const
+        size_t find( const char *value, size_t pos=0 ) const
         {
-            size_t retVal = mOriginal->find( value, mStart );
+            size_t retVal = mOriginal->find( value, mStart + pos );
             if( retVal >= mEnd )
                 retVal = String::npos;
             else if( retVal != String::npos )
@@ -94,6 +94,27 @@ namespace Ogre
                 retVal -= mStart;
 
             return retVal;
+        }
+
+        size_t findFirstOf( const char *c, size_t pos ) const
+        {
+            size_t retVal = mOriginal->find_first_of( c, mStart + pos );
+            if( retVal >= mEnd )
+                retVal = String::npos;
+            else if( retVal != String::npos )
+                retVal -= mStart;
+
+            return retVal;
+        }
+
+        bool matchEqual( const char *stringCompare ) const
+        {
+            const char *origStr = mOriginal->c_str() + mStart;
+            ptrdiff_t length = mEnd - mStart;
+            while( *origStr == *stringCompare && *origStr && --length )
+                ++origStr, ++stringCompare;
+
+            return length == 0 && *origStr == *stringCompare;
         }
 
         void setStart( size_t newStart )            { mStart = std::min( newStart, mOriginal->size() ); }

@@ -118,6 +118,8 @@ namespace Ogre {
         */
         virtual void setMaterial( const MaterialPtr& material );
 
+        virtual void setDatablock( HlmsDatablock *datablock );
+
         /** Accessor method to read mesh data.
         */
         SubMesh* getSubMesh(void) const;

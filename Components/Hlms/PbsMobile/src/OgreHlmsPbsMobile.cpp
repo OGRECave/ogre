@@ -50,7 +50,8 @@ namespace Ogre
     const String c_vsPerObjectUniforms[] =
     {
         "worldView",
-        "worldViewProj"
+        "worldViewProj",
+        "worldMat"
     };
     const String c_psPerObjectUniforms[] =
     {
@@ -80,7 +81,8 @@ namespace Ogre
         GpuNamedConstants *constantsDef;
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
         constantsDef = const_cast<GpuNamedConstants*>( &retVal->vertexShader->getConstantDefinitions() );
-        for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
+        bool hasSkeleton = getProperty( HlmsPropertySkeleton );
+        for( size_t i=hasSkeleton ? 2 : 0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_vsPerObjectUniforms[i] );
             if( it != constantsDef->map.end() )
@@ -190,7 +192,7 @@ namespace Ogre
         {
             int32 numShadowMaps = getProperty( HlmsPropertyNumShadowMaps );
             mPreparedPass.vertexShaderSharedBuffer.clear();
-            mPreparedPass.vertexShaderSharedBuffer.reserve( (16 + 2) * numShadowMaps );
+            mPreparedPass.vertexShaderSharedBuffer.reserve( (16 + 2) * numShadowMaps + 16 * 2 );
 
             //---------------------------------------------------------------------------
             //                          ---- VERTEX SHADER ----
@@ -212,6 +214,15 @@ namespace Ogre
                 mPreparedPass.vertexShaderSharedBuffer.push_back( fNear );
                 mPreparedPass.vertexShaderSharedBuffer.push_back( 1.0f / depthRange );
             }
+            //mat4 worldView (it's actually view)
+            for( size_t i=0; i<16; ++i )
+            {
+                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)mPreparedPass.
+                                                                    viewProjMatrix[0][i] );
+            }
+            //mat4 worldViewProj (it's actually viewProj)
+            for( size_t i=0; i<16; ++i )
+                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)viewMatrix[0][i] );
 
             //---------------------------------------------------------------------------
             //                          ---- PIXEL SHADER ----
@@ -351,7 +362,7 @@ namespace Ogre
         else
         {
             mPreparedPass.vertexShaderSharedBuffer.clear();
-            mPreparedPass.vertexShaderSharedBuffer.reserve( 2 );
+            mPreparedPass.vertexShaderSharedBuffer.reserve( 2 + 16 );
 
             //vec2 depthRange;
             Real fNear, fFar;
@@ -359,6 +370,13 @@ namespace Ogre
             const Real depthRange = fFar - fNear;
             mPreparedPass.vertexShaderSharedBuffer.push_back( fNear );
             mPreparedPass.vertexShaderSharedBuffer.push_back( 1.0f / depthRange );
+
+            //mat4 worldViewProj (it's actually viewProj)
+            for( size_t i=0; i<16; ++i )
+            {
+                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)mPreparedPass.
+                                                                    viewProjMatrix[0][i] );
+            }
         }
 
         return retVal;
@@ -376,13 +394,6 @@ namespace Ogre
         assert( dynamic_cast<const HlmsPbsMobileDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
-
-        //Sizes can't be equal (we also add more data)
-        assert( mPreparedPass.vertexShaderSharedBuffer.size() <
-                vpParams->getFloatConstantList().size() );
-        assert( ( mPreparedPass.pixelShaderSharedBuffer.size() -
-                  (datablock->mTexture[PBSM_REFLECTION].isNull() ? 9 : 0) ) <
-                psParams->getFloatConstantList().size() );
 
         if( !lastCache || lastCache->type != HLMS_PBS )
         {
@@ -406,11 +417,21 @@ namespace Ogre
         size_t psBufferElements = mPreparedPass.pixelShaderSharedBuffer.size() -
                                     (datablock->mTexture[PBSM_REFLECTION].isNull() ? 9 : 0);
 
+        bool hasSkeletonAnimation = queuedRenderable.renderable->hasSkeletonAnimation();
+        size_t sharedViewTransfElem = hasSkeletonAnimation ? 0 : (16 * (2 - casterPass));
+
+        //Sizes can't be equal (we also add more data)
+        assert( mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem <
+                vpParams->getFloatConstantList().size() );
+        assert( ( mPreparedPass.pixelShaderSharedBuffer.size() -
+                  (datablock->mTexture[PBSM_REFLECTION].isNull() ? 9 : 0) ) <
+                psParams->getFloatConstantList().size() );
+
         if( cache != lastCache )
         {
             variabilityMask = GPV_ALL;
             memcpy( vsUniformBuffer, mPreparedPass.vertexShaderSharedBuffer.begin(),
-                    sizeof(float) * mPreparedPass.vertexShaderSharedBuffer.size() );
+                    sizeof(float) * (mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem) );
 
             assert( !datablock->mTexture[PBSM_REFLECTION].isNull() == getProperty( PropertyEnvProbeMap ) );
 
@@ -418,7 +439,7 @@ namespace Ogre
                     sizeof(float) * psBufferElements );
         }
 
-        vsUniformBuffer += mPreparedPass.vertexShaderSharedBuffer.size();
+        vsUniformBuffer += mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem;
         psUniformBuffer += psBufferElements;
 
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
@@ -427,24 +448,44 @@ namespace Ogre
         //                          ---- VERTEX SHADER ----
         //---------------------------------------------------------------------------
 #if !OGRE_DOUBLE_PRECISION
-        //mat4 worldView
-        Matrix4 tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
-#ifdef OGRE_GLES2_WORKAROUND_1
-        //On GLES2, there is a bug in PowerVR SGX 540 where glProgramUniformMatrix4fvEXT doesn't
-        tmp = tmp.transpose();
-#endif
-        memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
-        vsUniformBuffer += 16;
-        //mat4 worldViewProj
-        tmp = mPreparedPass.viewProjMatrix * worldMat;
-#ifdef OGRE_GLES2_WORKAROUND_1
-        tmp = tmp.transpose();
-#endif
-        memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
-        vsUniformBuffer += 16;
+        if( !hasSkeletonAnimation )
+        {
+            //mat4 worldView
+            Matrix4 tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
+    #ifdef OGRE_GLES2_WORKAROUND_1
+            //On GLES2, there is a bug in PowerVR SGX 540 where glProgramUniformMatrix4fvEXT doesn't
+            tmp = tmp.transpose();
+    #endif
+            memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
+            vsUniformBuffer += 16;
+            //mat4 worldViewProj
+            tmp = mPreparedPass.viewProjMatrix * worldMat;
+    #ifdef OGRE_GLES2_WORKAROUND_1
+            tmp = tmp.transpose();
+    #endif
+            memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
+            vsUniformBuffer += 16;
+        }
+        else
+        {
+            uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
+            assert( numWorldTransforms <= 60 );
+
+            //TODO: Don't rely on a virtual function + make a direct 4x3 copy
+            Matrix4 tmp[60];
+            queuedRenderable.renderable->getWorldTransforms( tmp );
+            for( size_t i=0; i<numWorldTransforms; ++i )
+            {
+                memcpy( vsUniformBuffer, &tmp[i], 12 * sizeof(float) );
+                vsUniformBuffer += 12;
+            }
+
+            vsUniformBuffer += (60 - numWorldTransforms) * 12;
+        }
 #else
     #error Not Coded Yet! (cannot use memcpy on Matrix4)
 #endif
+
         if( casterPass )
             *vsUniformBuffer++ = datablock->mShadowConstantBias;
 
