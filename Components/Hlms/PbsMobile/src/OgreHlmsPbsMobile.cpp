@@ -450,17 +450,17 @@ namespace Ogre
 #if !OGRE_DOUBLE_PRECISION
         if( !hasSkeletonAnimation )
         {
-            //mat4 worldView
-            Matrix4 tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
+            //mat4 worldViewProj
+            Matrix4 tmp = mPreparedPass.viewProjMatrix * worldMat;
     #ifdef OGRE_GLES2_WORKAROUND_1
-            //On GLES2, there is a bug in PowerVR SGX 540 where glProgramUniformMatrix4fvEXT doesn't
             tmp = tmp.transpose();
     #endif
             memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
             vsUniformBuffer += 16;
-            //mat4 worldViewProj
-            tmp = mPreparedPass.viewProjMatrix * worldMat;
+            //mat4 worldView
+            tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
     #ifdef OGRE_GLES2_WORKAROUND_1
+            //On GLES2, there is a bug in PowerVR SGX 540 where glProgramUniformMatrix4fvEXT doesn't
             tmp = tmp.transpose();
     #endif
             memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );

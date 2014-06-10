@@ -363,8 +363,8 @@ namespace Ogre
 
                         if( width  > maxResolution || height > maxResolution )
                         {
-                            limit = maxResolution / width;
-                            limit = std::min<uint>( limit, maxResolution / height );
+                            limit = maxResolution / image.getWidth();
+                            limit = std::min<uint>( limit, maxResolution / image.getHeight() );
 
                             textureArray.maxTextures     = limit * limit;
                             textureArray.sqrtMaxTextures = limit;
