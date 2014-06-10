@@ -276,7 +276,10 @@ namespace Ogre
         void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
         void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
-        void _setViewport( Viewport *vp );      
+		void _setViewport(Viewport *vp);
+		virtual void _setHlmsMacroblock(const HlmsMacroblock *macroblock);
+		virtual void _setHlmsBlendblock(const HlmsBlendblock *blendblock);
+		virtual void _setProgramsFromHlms(const HlmsCache *hlmsCache);
         void _beginFrame();
         virtual RenderSystemContext* _pauseFrame(void);
         virtual void _resumeFrame(RenderSystemContext* context);
