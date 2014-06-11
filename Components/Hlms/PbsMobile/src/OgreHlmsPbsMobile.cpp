@@ -214,15 +214,30 @@ namespace Ogre
                 mPreparedPass.vertexShaderSharedBuffer.push_back( fNear );
                 mPreparedPass.vertexShaderSharedBuffer.push_back( 1.0f / depthRange );
             }
+
+#ifdef OGRE_GLES2_WORKAROUND_1
+            Matrix4 tmp = mPreparedPass.viewProjMatrix.transpose();
+#endif
             //mat4 worldView (it's actually view)
             for( size_t i=0; i<16; ++i )
             {
+#ifdef OGRE_GLES2_WORKAROUND_1
+                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)tmp[0][i] );
+#else
                 mPreparedPass.vertexShaderSharedBuffer.push_back( (float)mPreparedPass.
                                                                     viewProjMatrix[0][i] );
+#endif
             }
+#ifdef OGRE_GLES2_WORKAROUND_1
+            tmp = viewMatrix.transpose();
+            //mat4 worldViewProj (it's actually viewProj)
+            for( size_t i=0; i<16; ++i )
+                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)tmp[0][i] );
+#else
             //mat4 worldViewProj (it's actually viewProj)
             for( size_t i=0; i<16; ++i )
                 mPreparedPass.vertexShaderSharedBuffer.push_back( (float)viewMatrix[0][i] );
+#endif
 
             //---------------------------------------------------------------------------
             //                          ---- PIXEL SHADER ----

@@ -58,7 +58,7 @@ uniform mat4 worldViewProj;
 @end
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
-	int _idx = int(blendIndices[0] * 3);
+	int _idx = int(blendIndices[0] * 3.0);
 	vec4 _localPos;
 	_localPos.x = dot( worldMat[_idx + 0], vertex );
 	_localPos.y = dot( worldMat[_idx + 1], vertex );
@@ -79,7 +79,7 @@ uniform mat4 worldViewProj;
 	@property( NeedsMoreThan1BonePerVertex )
 	for( int i=1; i<@value( hlms_bones_per_vertex ); ++i )
 	{
-		_idx = int(blendIndices[i] * 3);
+		_idx = int(blendIndices[i] * 3.0);
 		vec4 tmp;
 		tmp.x = dot( worldMat[_idx + 0], vertex );
 		tmp.y = dot( worldMat[_idx + 1], vertex );

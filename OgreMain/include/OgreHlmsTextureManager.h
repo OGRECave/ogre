@@ -195,6 +195,8 @@ namespace Ogre
 
         /// Returns the precreated blank texture
         TextureLocation getBlankTexture(void) const;
+
+        DefaultTextureParameters* getDefaultTextureParameters(void) { return mDefaultTextureParameters; }
     };
     /** @} */
     /** @} */
