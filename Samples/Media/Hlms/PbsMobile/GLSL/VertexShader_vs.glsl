@@ -76,26 +76,23 @@ uniform mat4 worldViewProj;
 	_localTang *= blendWeights[0];@end
 
 	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
-	@property( NeedsMoreThan1BonePerVertex )
-	for( int i=1; i<@value( hlms_bones_per_vertex ); ++i )
-	{
-		_idx = int(blendIndices[i] * 3.0);
-		vec4 tmp;
-		tmp.x = dot( worldMat[_idx + 0], vertex );
-		tmp.y = dot( worldMat[_idx + 1], vertex );
-		tmp.z = dot( worldMat[_idx + 2], vertex );
-		_localPos += tmp * blendWeights[i];
-		@property( hlms_normal )vec3 _localNorm;
-		tmp.x = dot( worldMat[_idx + 0].xyz, normal );
-		tmp.y = dot( worldMat[_idx + 1].xyz, normal );
-		tmp.z = dot( worldMat[_idx + 2].xyz, normal );
-		_localNorm += tmp.xyz * blendWeights[i];@end
-		@property( normal_map )vec3 _localTang;
-		tmp.x = dot( worldMat[_idx + 0].xyz, tangent );
-		tmp.y = dot( worldMat[_idx + 1].xyz, tangent );
-		tmp.z = dot( worldMat[_idx + 2].xyz, tangent );
-		_localTang += tmp.xyz * blendWeights[i];@end
-	}
+	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;@end
+	@foreach( hlms_bones_per_vertex, n, 1 )
+	_idx = int(blendIndices[@n] * 3.0);
+	tmp.x = dot( worldMat[_idx + 0], vertex );
+	tmp.y = dot( worldMat[_idx + 1], vertex );
+	tmp.z = dot( worldMat[_idx + 2], vertex );
+	_localPos += tmp * blendWeights[@n];
+	@property( hlms_normal )
+	tmp.x = dot( worldMat[_idx + 0].xyz, normal );
+	tmp.y = dot( worldMat[_idx + 1].xyz, normal );
+	tmp.z = dot( worldMat[_idx + 2].xyz, normal );
+	_localNorm += tmp.xyz * blendWeights[@n];@end
+	@property( normal_map )
+	tmp.x = dot( worldMat[_idx + 0].xyz, tangent );
+	tmp.y = dot( worldMat[_idx + 1].xyz, tangent );
+	tmp.z = dot( worldMat[_idx + 2].xyz, tangent );
+	_localTang += tmp.xyz * blendWeights[@n];@end
 	@end
 
 	_localPos.w = 1.0;

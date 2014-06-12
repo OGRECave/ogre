@@ -763,17 +763,18 @@ namespace Ogre
                 if( argValues[0].c_str() == endPtr )
                 {
                     //This isn't a number. Let's try if it's a variable
-                    count = getProperty( argValues[0], -1 );
+                    //count = getProperty( argValues[0], -1 );
+					count = getProperty( argValues[0], 0 );
                 }
 
-                if( count < 0 )
+                /*if( count < 0 )
                 {
                     printf( "Invalid parameter at line %lu (@foreach)."
                             " '%s' is not a number nor a variable\n",
                             calculateLineCount( blockSubString ), argValues[0].c_str() );
                     syntaxError = true;
                     count = 0;
-                }
+                }*/
 
                 String counterVar;
                 if( argValues.size() > 1 )
