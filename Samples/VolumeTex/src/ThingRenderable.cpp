@@ -31,7 +31,7 @@ ThingRenderable::ThingRenderable( IdType id, ObjectMemoryManager *objectMemoryMa
 	mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
 	mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
 
-    mBox = AxisAlignedBox::AxisAlignedBox( aabb.getMinimum(), aabb.getMaximum() );
+    mBox = AxisAlignedBox( aabb.getMinimum(), aabb.getMaximum() );
 
     initialise();
     fillBuffer();
