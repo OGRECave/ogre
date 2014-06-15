@@ -286,8 +286,9 @@ namespace Ogre {
                 ArrayMaskR mask = Mathlib::CompareGreaterEqual( t, ARRAY_REAL_ZERO );
                 ArrayVector3 hitPoint = rayOrigin + rayDir * t;
 
-                //Fix accuracy issues for very thin aabbs
-                hitPoint.mChunkBase[i] = vMin.mChunkBase[i];
+                //Fix accuracy issues (this value will lay exactly in the extend,
+				//but often is slightly beyond it, causing the test to fail)
+                hitPoint.mChunkBase[i] = objData.mWorldAabb->mCenter.mChunkBase[i];
 
                 //hitMaskR |= t >= 0 && mWorldAabb->contains( hitPoint );
                 //distance = t >= 0 ? min( distance, t ) : t;
@@ -305,8 +306,9 @@ namespace Ogre {
                 ArrayMaskR mask = Mathlib::CompareGreaterEqual( t, ARRAY_REAL_ZERO );
                 ArrayVector3 hitPoint = rayOrigin + rayDir * t;
 
-                //Fix accuracy issues for very thin aabbs
-                hitPoint.mChunkBase[i] = vMax.mChunkBase[i];
+                //Fix accuracy issues (this value will lay exactly in the extend,
+				//but often is slightly beyond it, causing the test to fail)
+                hitPoint.mChunkBase[i] = objData.mWorldAabb->mCenter.mChunkBase[i];
 
                 //hitMaskR |= t >= 0 && mWorldAabb->contains( hitPoint );
                 //distance = t >= 0 ? min( distance, t ) : t;
