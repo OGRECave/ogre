@@ -5,6 +5,25 @@
 
 namespace Ogre{
 
+	static std::map<String, std::vector< String > > mFiles;
+
+	bool IsFolderParsed( String Folder ) {
+		bool parsed = false;
+		std::map<String, std::vector< String > >::iterator iter = mFiles.find( Folder );
+		if(iter != mFiles.end()) parsed = true;
+		return parsed;
+	}
+
+	void ParseFolder( AAssetManager* AssetMgr, String Folder ) {
+		std::vector<String> mFilenames;
+		AAssetDir* dir = AAssetManager_openDir(AssetMgr, Folder.c_str());
+		const char* fileName = NULL;
+		while((fileName = AAssetDir_getNextFileName(dir)) != NULL) {
+			mFilenames.push_back( String( fileName ) );
+		}
+		mFiles.insert( std::make_pair( Folder, mFilenames ) );
+	}
+
 	APKFileSystemArchive::APKFileSystemArchive(const String& name, const String& archType, AAssetManager* assetMgr)
 		:Archive(name, archType), mAssetMgr(assetMgr)
 	{
@@ -14,10 +33,17 @@ namespace Ogre{
         mPathPreFix = mName;
         if (mPathPreFix.size() > 0)
         	mPathPreFix += "/";
+			
+		if(!IsFolderParsed( mName )) {
+			ParseFolder( mAssetMgr, mName );
+		}			
 	}
 
 	APKFileSystemArchive::~APKFileSystemArchive()
 	{
+		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
+		iter->second.clear(); 
+		mFiles.erase( iter );  	
 		unload();
 	}
 
@@ -65,91 +91,75 @@ namespace Ogre{
 	StringVectorPtr APKFileSystemArchive::list(bool recursive, bool dirs)
 	{
 		StringVectorPtr files(new StringVector);
-
-		AAssetDir* dir = AAssetManager_openDir(mAssetMgr, mName.c_str());
-		const char* fileName = NULL;
-		while((fileName = AAssetDir_getNextFileName(dir)) != NULL)
+		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
+		std::vector< String > fileList = iter->second;
+		for( size_t i = 0; i < fileList.size(); i++ )
 		{
-			files->push_back(fileName);
+			files->push_back(fileList[i]);
 		}
-		AAssetDir_close(dir);
-
 		return files;
 	}
 
 	FileInfoListPtr APKFileSystemArchive::listFileInfo(bool recursive, bool dirs)
 	{
 		FileInfoListPtr files(new FileInfoList);
-
-		AAssetDir* dir = AAssetManager_openDir(mAssetMgr, mName.c_str());
-		const char* fileName = NULL;
-		while((fileName = AAssetDir_getNextFileName(dir)) != NULL)
+		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
+		std::vector< String > fileList = iter->second;
+		for( size_t i = 0; i < fileList.size(); i++ )
 		{
-			AAsset* asset = AAssetManager_open(mAssetMgr, (mPathPreFix + String(fileName)).c_str(), AASSET_MODE_UNKNOWN);
+			AAsset* asset = AAssetManager_open(mAssetMgr, (mPathPreFix + fileList[i]).c_str(), AASSET_MODE_UNKNOWN);
 			if(asset)
 			{
 				FileInfo info;
 				info.archive = this;
-				info.filename = fileName;
+				info.filename = fileList[i];
 				info.path = mName;
-				info.basename = fileName;
+				info.basename = fileList[i];
 				info.compressedSize = AAsset_getLength(asset);
 				info.uncompressedSize = info.compressedSize;
 				files->push_back(info);
-
 				AAsset_close(asset);
 			}
-
 		}
-		AAssetDir_close(dir);
-
 		return files;
 	}
 
 	StringVectorPtr APKFileSystemArchive::find(const String& pattern, bool recursive, bool dirs)
 	{
 		StringVectorPtr files(new StringVector);
-
-		AAssetDir* dir = AAssetManager_openDir(mAssetMgr, mName.c_str());
-		const char* fileName = NULL;
-		while((fileName = AAssetDir_getNextFileName(dir)) != NULL)
+		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
+		std::vector< String > fileList = iter->second;
+		for( size_t i = 0; i < fileList.size(); i++ ) 
 		{
-			if(StringUtil::match(fileName, pattern))
-					files->push_back(fileName);
+			if(StringUtil::match(fileList[i], pattern))
+				files->push_back(fileList[i]);
 		}
-		AAssetDir_close(dir);
-
 		return files;
 	}
 
 	FileInfoListPtr APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs) const
 	{
 		FileInfoListPtr files(new FileInfoList);
-
-		AAssetDir* dir = AAssetManager_openDir(mAssetMgr, mName.c_str());
-		const char* fileName = NULL;
-		while((fileName = AAssetDir_getNextFileName(dir)) != NULL)
+		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
+		std::vector< String > fileList = iter->second;
+		for( size_t i = 0; i < fileList.size(); i++ ) 
 		{
-			if(StringUtil::match(fileName, pattern))
+			if(StringUtil::match(fileList[i], pattern)) 
 			{
-				AAsset* asset = AAssetManager_open(mAssetMgr, (mPathPreFix + String(fileName)).c_str(), AASSET_MODE_UNKNOWN);
-				if(asset)
-				{
+				AAsset* asset = AAssetManager_open(mAssetMgr, (mPathPreFix + fileList[i]).c_str(), AASSET_MODE_UNKNOWN);
+				if(asset) {
 					FileInfo info;
 					info.archive = this;
-					info.filename = fileName;
+					info.filename = fileList[i];
 					info.path = mName;
-					info.basename = fileName;
+					info.basename = fileList[i];
 					info.compressedSize = AAsset_getLength(asset);
 					info.uncompressedSize = info.compressedSize;
 					files->push_back(info);
-
 					AAsset_close(asset);
 				}
 			}
 		}
-		AAssetDir_close(dir);
-
 		return files;
 	}
 
