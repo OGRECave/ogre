@@ -97,9 +97,20 @@ namespace Ogre
                                                        "previous log messages to see if there's more "
                                                        "information.", LML_CRITICAL );
 
-                //Use the default datablock from the same HLMS as the one the user wanted us to apply
-                mHlmsDatablock = mHlmsDatablock->getCreator()->getDefaultDatablock();
-                mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
+                
+                if( mHlmsDatablock->mType == HLMS_LOW_LEVEL )
+                {
+                    HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+                    mHlmsDatablock = hlmsManager->getDefaultDatablock();
+                }
+                else
+                {
+                    //Try to use the default datablock from the same
+                    //HLMS as the one the user wanted us to apply
+                    mHlmsDatablock = mHlmsDatablock->getCreator()->getDefaultDatablock();
+                }
+                mHlmsDatablock->getCreator()->calculateHashFor( this,
+                                                                mHlmsDatablock->getOriginalParams(),
                                                                 mHlmsHash, mHlmsCasterHash );
             }
 

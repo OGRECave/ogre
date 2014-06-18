@@ -174,10 +174,6 @@ namespace Ogre
         }
 
         vbuf->unlock();
-
-        // set basic white material
-        this->setMaterialName( "BaseWhiteNoLighting",
-                               ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME );
     }
     //-----------------------------------------------------------------------------------
     Rectangle2D::~Rectangle2D()

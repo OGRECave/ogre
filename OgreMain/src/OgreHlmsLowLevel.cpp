@@ -96,6 +96,28 @@ namespace Ogre
     void HlmsLowLevel::calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
                                          uint32 &outHash, uint32 &outCasterHash )
     {
+        const MaterialPtr &mat = renderable->getMaterial();
+
+        Material::TechniqueIterator techniqueIt = mat->getTechniqueIterator();
+        while( techniqueIt.hasMoreElements() )
+        {
+            Technique *technique = techniqueIt.getNext();
+            Technique::PassIterator passIt = technique->getPassIterator();
+
+            while( passIt.hasMoreElements() )
+            {
+                Pass *pass = passIt.getNext();
+
+                if( !pass->isProgrammable() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "Fixed Function pipeline is no longer allowed nor supported. "
+                                 "The material " + mat->getName() + " must use shaders",
+                                 "HlmsLowLevel::calculateHashFor" );
+                }
+            }
+        }
+
         outHash         = 0;
         outCasterHash   = 0;
     }
