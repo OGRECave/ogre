@@ -83,6 +83,12 @@ namespace Ogre
         mShadowConstantBias( 0.01f )
     {
     }
+    HlmsDatablock::~HlmsDatablock()
+    {
+        assert( mLinkedRenderables.empty() &&
+                "This Datablock is still being used by some Renderables."
+                " Change their Datablocks before destroying this." );
+    }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setBlendblock( HlmsBlendblock const *blendblock )
     {
