@@ -33,9 +33,9 @@
   start looking, visit the <a href="http://www.ogre3d.org">main OGRE website</a> and dip into the <a href="http://www.ogre3d.org/support">community areas</a>
   like the <a href="http://www.ogre3d.org/wiki">wiki</a> and the <a href="http://www.ogre3d.org/forums/">forums</a> to get some assistance. 
   
-  @subsection s2 License
+  @subsection s3 License
   
-	<div>The OGRE rendering engine itself is licensed under a <a href="http://opensource.org/licenses/MIT/">MIT license</a>. More details can be found <a href="http://www.ogre3d.org/licensing/">here</a>.<br />
+	<div>The OGRE rendering engine itself is licensed under the <a href="http://opensource.org/licenses/MIT/">MIT License</a>. More details can be found <a href="http://www.ogre3d.org/licensing/">here</a>.<br />
 	This documentation work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.<br />	
 	<i>Copyright &copy; 2014 Torus Knot Software Ltd</i>
 	<img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></div>
