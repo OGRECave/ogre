@@ -1575,6 +1575,30 @@ namespace Ogre {
         {
             SubEntity &sub = *i;
             const MaterialPtr& m = sub.getMaterial();
+
+            if( m.isNull() )
+            {
+                mVertexProgramInUse = true;
+                if (hasSkeleton())
+                {
+                    VertexAnimationType animType = VAT_NONE;
+                    if (sub.getSubMesh()->useSharedVertices)
+                    {
+                        animType = mMesh->getSharedVertexDataAnimationType();
+                    }
+                    else
+                    {
+                        animType = sub.getSubMesh()->getVertexAnimationType();
+                    }
+
+                    //Disable hw animation if there are morph and pose animations, at least for now.
+                    //Enable if there's only skeleton animation
+                    return animType == VAT_NONE;
+                }
+
+                return false;
+            }
+
             // Make sure it's loaded
             m->load();
             Technique* t = m->getBestTechnique(0, &sub);
