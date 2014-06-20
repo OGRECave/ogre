@@ -74,7 +74,7 @@ THE SOFTWARE.
         }\
         delete threadHandle;\
         \
-        return 0;\
+        return (void*)retVal;\
     }
 #endif
 

@@ -1616,7 +1616,6 @@ namespace Ogre {
 
             if( m.isNull() )
             {
-                HlmsDatablock *datablock = sub.getDatablock();
                 mVertexProgramInUse = true;
                 if (hasSkeleton())
                 {

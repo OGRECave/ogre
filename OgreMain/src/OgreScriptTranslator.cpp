@@ -1046,7 +1046,7 @@ namespace Ogre{
                             Pass::_getBlendFlags( sbt0,
                                                   blendblock.mSourceBlendFactor,
                                                   blendblock.mDestBlendFactor );
-                            Pass::_getBlendFlags( sbt0,
+                            Pass::_getBlendFlags( sbt1,
                                                   blendblock.mSourceBlendFactorAlpha,
                                                   blendblock.mDestBlendFactorAlpha );
                         }
@@ -1906,7 +1906,7 @@ namespace Ogre{
                             Pass::_getBlendFlags( sbt0,
                                                   blendblock.mSourceBlendFactor,
                                                   blendblock.mDestBlendFactor );
-                            Pass::_getBlendFlags( sbt0,
+                            Pass::_getBlendFlags( sbt1,
                                                   blendblock.mSourceBlendFactorAlpha,
                                                   blendblock.mDestBlendFactorAlpha );
                         }
