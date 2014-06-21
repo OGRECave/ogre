@@ -47,7 +47,7 @@ namespace Ogre
         mNumUvAtlas( 0 ),
         mNumUvAtlasCaster( 0 ),
         mRoughness( 0.1f ),
-        mkDr( 0.318309886 ), mkDg( 0.318309886 ), mkDb( 0.318309886 ), //Max Diffuse = 1 / PI
+        mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
         mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f )
     {

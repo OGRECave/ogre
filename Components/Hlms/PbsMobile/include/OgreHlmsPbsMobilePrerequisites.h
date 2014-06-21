@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define _OgreHlmsPbsMobilePrerequisites_H_
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#   if defined( OGRE_STATIC_LIB )
+#   if defined( OGRE_STATIC_LIB ) || defined( OGRE_PBS_MOBILE_STATIC_LIB )
 #       define _OgreHlmsPbsMobileExport
 #   else
 #       if defined( OgreHlmsPbsMobile_EXPORTS )

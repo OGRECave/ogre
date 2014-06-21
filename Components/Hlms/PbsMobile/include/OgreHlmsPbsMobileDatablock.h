@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreHlmsPbsMobilePrerequisites.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsTextureManager.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {

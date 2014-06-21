@@ -81,7 +81,7 @@ namespace Ogre
         GpuNamedConstants *constantsDef;
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
         constantsDef = const_cast<GpuNamedConstants*>( &retVal->vertexShader->getConstantDefinitions() );
-        bool hasSkeleton = getProperty( HlmsPropertySkeleton );
+        bool hasSkeleton = getProperty( HlmsPropertySkeleton ) != 0;
         for( size_t i=hasSkeleton ? 2 : 0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_vsPerObjectUniforms[i] );
@@ -106,7 +106,7 @@ namespace Ogre
         {
             vector<int>::type shadowMaps;
             shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
-            for( texUnit=0; texUnit<mPreparedPass.shadowMaps.size(); ++texUnit )
+            for( texUnit=0; texUnit<(int)mPreparedPass.shadowMaps.size(); ++texUnit )
                 shadowMaps.push_back( texUnit );
 
             psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
