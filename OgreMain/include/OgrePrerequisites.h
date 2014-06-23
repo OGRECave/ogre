@@ -153,6 +153,7 @@ namespace Ogre {
     class Archive;
     class ArchiveFactory;
     class ArchiveManager;
+    class AsyncTicket;
     class AutoParamDataSource;
     class AxisAlignedBox;
     class AxisAlignedBoxSceneQuery;
@@ -163,6 +164,8 @@ namespace Ogre {
     class Bone;
     class BoneMemoryManager;
     struct BoneTransform;
+    class BufferInterface;
+    class BufferPacked;
     class Camera;
     class Codec;
     class ColourValue;
@@ -211,6 +214,7 @@ namespace Ogre {
     class HlmsManager;
     class HlmsTextureManager;
     class IndexData;
+    class IndexBufferPacked;
     class InstanceBatch;
     class InstanceBatchHW;
     class InstanceBatchHW_VTF;
@@ -337,12 +341,14 @@ namespace Ogre {
     class TransformKeyFrame;
     class Timer;
     class UserObjectBindings;
+    class VaoManager;
     class Vector2;
     class Vector3;
     class Vector4;
     class Viewport;
     class VertexAnimationTrack;
     class VertexBufferBinding;
+    class VertexBufferPacked;
     class VertexData;
     class VertexDeclaration;
     class VertexMorphKeyFrame;

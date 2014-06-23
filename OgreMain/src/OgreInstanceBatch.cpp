@@ -302,6 +302,8 @@ namespace Ogre
             setupVertices( baseSubMesh );
             setupIndices( baseSubMesh );
 
+            mRenderOperation.meshIndex = ++RenderOperation::MeshIndexId;
+
             createAllInstancedEntities();
         }
 

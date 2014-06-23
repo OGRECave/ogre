@@ -43,6 +43,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    AtomicScalar<uint32> RenderOperation::MeshIndexId( 0 );
+
     const HlmsCache c_dummyCache( 0, HLMS_MAX );
 
     const int SubRqIdBits           = 3;
@@ -135,7 +137,7 @@ namespace Ogre
 
         RenderOperation op;
         pRend->getRenderOperation( op ); //TODO
-        uint32 meshHash; //TODO
+        uint32 meshHash = op.meshIndex;
         //TODO: Account for skeletal animation in any of the hashes (preferently on the material side)
         //TODO: Account for auto instancing animation in any of the hashes
 

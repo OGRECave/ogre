@@ -71,6 +71,8 @@ namespace Ogre {
         /// Indicates if this submesh shares vertex data with other meshes or whether it has it's own vertices.
         bool useSharedVertices;
 
+        uint32 renderOpMeshIndex;
+
         /// The render operation type used to render this submesh
         RenderOperation::OperationType operationType;
 

@@ -67,7 +67,7 @@ static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum severity,
                                      GLsizei length,
                                      const GLchar* message,
-                                     GLvoid* userParam)
+                                     const void* userParam)
 {
     char debSource[32], debType[32], debSev[32];
 

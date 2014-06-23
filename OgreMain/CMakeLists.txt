@@ -57,7 +57,7 @@ add_filtered_std("Hash")
 add_filtered_std("Math/Array")
 add_filtered_std("Math/Simple")
 add_filtered_std("Math/Simple/C")
-
+add_filtered_std("Vao")
 
 list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
     src/OgreImageResampler.h

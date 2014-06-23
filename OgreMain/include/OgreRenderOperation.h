@@ -93,6 +93,17 @@ namespace Ogre {
             OT_PATCH_32_CONTROL_POINT   = 38
         };
 
+        static AtomicScalar<uint32> MeshIndexId;
+
+        /// This index is set to 0 by default. The RenderQueue will sort by mesh using this index.
+        /// Two different RenderOperations may have the same meshIndex, but if so, performance could
+        /// be degraded (it would hinder auto instancing, forces rebinding of the vertex & index buffer
+        /// per Renderable, etc)
+        /// It is the implementation's responsability to assign a (unique if possible) index.
+        /// The static variable MeshIndexId is provided as an incrementing ID, but you're not forced to
+        /// use it
+        uint32 meshIndex;
+
         /// Vertex source data
         VertexData *vertexData;
 
@@ -125,7 +136,10 @@ namespace Ogre {
         bool useGlobalInstancingVertexBufferIsAvailable;
 
     RenderOperation() :
-        vertexData(0), operationType(OT_TRIANGLE_LIST), useIndexes(true),
+            meshIndex(0),
+            vertexData(0),
+            operationType(OT_TRIANGLE_LIST),
+            useIndexes(true),
             indexData(0),
 #if OGRE_DEBUG_MODE
             srcRenderable(0),

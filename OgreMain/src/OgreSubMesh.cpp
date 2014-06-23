@@ -36,6 +36,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubMesh::SubMesh()
         : useSharedVertices(true)
+        , renderOpMeshIndex(++RenderOperation::MeshIndexId)
         , operationType(RenderOperation::OT_TRIANGLE_LIST)
         , vertexData(0)
         , parent(0)
@@ -91,7 +92,7 @@ namespace Ogre {
         }
         ro.operationType = operationType;
         ro.vertexData = useSharedVertices? parent->sharedVertexData : vertexData;
-
+        ro.meshIndex = renderOpMeshIndex;
     }
     //-----------------------------------------------------------------------
     void SubMesh::addBoneAssignment(const VertexBoneAssignment& vertBoneAssign)
