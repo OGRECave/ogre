@@ -543,11 +543,22 @@ namespace Ogre
         WorkspaceVec::const_iterator itor = mWorkspaces.begin();
         WorkspaceVec::const_iterator end  = mWorkspaces.end();
 
+        vector<RenderTarget*>::type swappedTargets;
+        swappedTargets.reserve( mWorkspaces.size() );
+
         while( itor != end )
         {
             CompositorWorkspace *workspace = (*itor);
-            if( workspace->getEnabled() && workspace->isValid() )
+
+            RenderTarget *finalTarget = workspace->getFinalTarget();
+            bool alreadySwapped = std::find( swappedTargets.begin(),
+                                             swappedTargets.end(), finalTarget ) != swappedTargets.end();
+
+            if( workspace->getEnabled() && workspace->isValid() && !alreadySwapped )
+            {
                 workspace->_swapFinalTarget();
+                swappedTargets.push_back( finalTarget );
+            }
 
             ++itor;
         }

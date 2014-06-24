@@ -249,6 +249,9 @@ namespace Ogre
 
         SceneManager* getSceneManager() const               { return mSceneManager; }
 
+        /// Returns the RenderTarget we're rendering to. May be null.
+        RenderTarget* getFinalTarget(void) const            { return mRenderWindow.target; }
+
         uint8 getViewportModifierMask(void) const           { return mViewportModifierMask; }
         const Vector4& getViewportModifier(void) const      { return mViewportModifier; }
 
