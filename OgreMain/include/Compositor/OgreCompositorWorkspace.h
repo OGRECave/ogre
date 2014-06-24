@@ -97,6 +97,10 @@ namespace Ogre
         uint                    mCurrentWidth;
         uint                    mCurrentHeight;
 
+        uint8                   mExecutionMask;
+        uint8                   mViewportModifierMask;
+        Vector4                 mViewportModifier;
+
         /// Creates all the node instances from our definition
         void createAllNodes(void);
 
@@ -126,7 +130,9 @@ namespace Ogre
     public:
         CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
                                 const CompositorChannel &finalRenderTarget, SceneManager *sceneManager,
-                                Camera *defaultCam, RenderSystem *renderSys, bool bEnabled );
+                                Camera *defaultCam, RenderSystem *renderSys, bool bEnabled,
+                                uint8 executionMask, uint8 viewportModifierMask,
+                                const Vector4 &vpOffsetScale );
         virtual ~CompositorWorkspace();
 
         const CompositorChannel& getGlobalTexture( IdString name ) const;
@@ -242,6 +248,11 @@ namespace Ogre
         Camera* getDefaultCamera() const                    { return mDefaultCamera; }
 
         SceneManager* getSceneManager() const               { return mSceneManager; }
+
+        uint8 getViewportModifierMask(void) const           { return mViewportModifierMask; }
+        const Vector4& getViewportModifier(void) const      { return mViewportModifier; }
+
+        uint8 getExecutionMask(void) const                  { return mExecutionMask; }
 
         /// Gets the compositor manager (non const)
         CompositorManager2* getCompositorManager();

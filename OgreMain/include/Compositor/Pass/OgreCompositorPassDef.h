@@ -107,6 +107,9 @@ namespace Ogre
         */
         bool                mIncludeOverlays;
 
+        uint8               mExecutionMask;
+        uint8               mViewportModifierMask;
+
     public:
         CompositorPassDef( CompositorPassType passType, uint32 rtIndex ) :
             mPassType( passType ), mRtIndex( rtIndex ),
@@ -117,7 +120,9 @@ namespace Ogre
             mShadowMapIdx( 0 ),
             mNumInitialPasses( -1 ), mIdentifier( 0 ),
             mBeginRtUpdate( true ), mEndRtUpdate( true ),
-            mIncludeOverlays( false ) {}
+            mIncludeOverlays( false ),
+            mExecutionMask( 0xFF ),
+            mViewportModifierMask( 0xFF ) {}
         virtual ~CompositorPassDef() {}
 
         CompositorPassType getType() const              { return mPassType; }

@@ -640,20 +640,20 @@ namespace Ogre
         pos = subString.find( "@" );
         size_t keyword = ~0;
 
-        while( pos != String::npos && keyword == (unsigned)~0 )
+        while( pos != String::npos && keyword == (size_t)~0 )
         {
             size_t maxSize = subString.findFirstOf( " \t(", pos + 1 );
             maxSize = maxSize == String::npos ? subString.getSize() : maxSize;
             SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                 subString.getStart() + maxSize );
 
-            for( size_t i=0; i<6 && keyword == (unsigned)~0; ++i )
+            for( size_t i=0; i<6 && keyword == (size_t)~0; ++i )
             {
                 if( keywordStr.matchEqual( c_operations[i].opName ) )
                     keyword = i;
             }
 
-            if( keyword == (unsigned)~0 )
+            if( keyword == (size_t)~0 )
                 pos = subString.find( "@", pos + 1 );
         }
 
@@ -712,20 +712,20 @@ namespace Ogre
             pos = subString.find( "@" );
             keyword = ~0;
 
-            while( pos != String::npos && keyword == (unsigned)~0 )
+            while( pos != String::npos && keyword == (size_t)~0 )
             {
                 size_t maxSize = subString.findFirstOf( " \t(", pos + 1 );
                 maxSize = maxSize == String::npos ? subString.getSize() : maxSize;
                 SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                     subString.getStart() + maxSize );
 
-                for( size_t i=0; i<6 && keyword == (unsigned)~0; ++i )
+                for( size_t i=0; i<6 && keyword == (size_t)~0; ++i )
                 {
                     if( keywordStr.matchEqual( c_operations[i].opName ) )
                         keyword = i;
                 }
 
-                if( keyword == (unsigned)~0 )
+                if( keyword == (size_t)~0 )
                     pos = subString.find( "@", pos + 1 );
             }
         }
@@ -990,13 +990,13 @@ namespace Ogre
             SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                 subString.getStart() + maxSize );
 
-            for( size_t i=0; i<8 && keyword == (unsigned)~0; ++i )
+            for( size_t i=0; i<8 && keyword == (size_t)~0; ++i )
             {
                 if( keywordStr.matchEqual( c_counterOperations[i].opName ) )
                     keyword = i;
             }
 
-            if( keyword == (unsigned)~0 )
+            if( keyword == (size_t)~0 )
                 pos = String::npos;
         }
 
@@ -1085,13 +1085,13 @@ namespace Ogre
                 SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                     subString.getStart() + maxSize );
 
-                for( size_t i=0; i<8 && keyword == (unsigned)~0; ++i )
+                for( size_t i=0; i<8 && keyword == (size_t)~0; ++i )
                 {
                     if( keywordStr.matchEqual( c_counterOperations[i].opName ) )
                         keyword = i;
                 }
 
-                if( keyword == (unsigned)~0 )
+                if( keyword == (size_t)~0 )
                     pos = String::npos;
             }
         }

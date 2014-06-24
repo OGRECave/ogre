@@ -185,6 +185,50 @@ namespace Ogre
 
         /** Main function to start rendering. Creates a workspace instance based on a
             workspace definition.
+        @remarks
+            When rendering in stereo using split screen (or when the screen is split
+            to support multiplayer) you can use viewportModifier, vpModifierMask and
+            executionMask parameters to control how the entire workspace renders to
+            a portion of the screen while using two (or more) workspaces without
+            having to duplicate the nodes just to alter their viewport parameters.
+
+            viewportModifier controls how to stretch the viewport in each pass,
+            vpModifierMask controls which passes will ignore the stretching, and
+            executionMask controls which passes get skipped.
+
+            All passes have a default executionMask = 0xFF vpModifierMask = 0xFF
+            except for clear passes which default to
+            executionMask = 0x01 vpModifierMask = 0x00
+
+            The reasoning behind this is that often you want to clear the whole renderTarget
+            the first time (it's GPU-friendly to discard the entire buffer; aka
+            vpModifierMask = 0), but the second time you don't want the clear to be executed
+            at all to prevent overwritting the contents from the first pass (executionMask = 1).
+        @par
+
+            Example, stereo (split screen):
+            //Render Eye0 to the left side of the screen
+            m_workspaceEye0 = mgr->addWorkspace( sceneManager, renderTarget,
+                                                 eyeCamera0, "MainWorkspace", true,
+                                                 -1, Vector4( 0, 0, 0.5f, 1 ),
+                                                 0x01, 0x01 );
+            //Render Eye1 to the right side of the screen
+            m_workspaceEye1 = mgr->addWorkspace( sceneManager, renderTarget,
+                                                 eyeCamera1, "MainWorkspace", true,
+                                                 -1, Vector4( 0.5f, 0, 0.5f, 1 ),
+                                                 0x02, 0x02 );
+        @par
+
+            Example, split screen, multiplayer, 4 players (e.g. Mario Kart (R)-like games)
+            for( int i=0; i<4; ++i )
+            {
+                Vector4 vpModifier( (i % 2) * 0.5f, (i >> 1) * 0.5f, 0.25f, 0.25f );
+                m_workspace[i] = mgr->addWorkspace( sceneManager, renderTarget,
+                                                    playerCam[i], "MainWorkspace", true,
+                                                    -1, vpModifier,
+                                                    (1 << i), (1 << i) );
+            }
+
         @param sceneManager
             The SceneManager this workspace will be associated with. You can have multiple
             scene managers, each with multiple workspaces. Those workspaces can be set to
@@ -215,15 +259,41 @@ namespace Ogre
             last (depending on what you do with RTs, some OSes, like OS X, may not like
             it).
             Defaults to -1; which means update last.
+        @param vpOffsetScale
+            The viewport of every pass from every node will be offseted and scaled by
+            the following formula:
+                left    += vpOffsetScale.x;
+                top     += vpOffsetScale.y;
+                width   *= vpOffsetScale.z;
+                height  *= vpOffsetScale.w;
+            This affects both the viewport dimensions as well as the scissor rect.
+        @param vpModifierMask
+            An 8-bit mask that will be AND'ed with the viewport modifier mask of each pass
+            from every node. When the result is zero, the previous parameter "viewportModifier"
+            isn't applied to that pass.
+
+            This is useful when you want to apply a pass (like Clear) to the whole render
+            target and not just to the scaled region.
+        @param executionMask
+            An 8-bit mask that will be AND'ed with the execution mask of each pass from
+            every node. When the result is zero, the pass isn't executed. See remarks
+            on how to use this for efficient Stereo or split screen.
+
+            This is useful when you want to skip a pass (like Clear) when rendering the second
+            eye (or the second split from the second player).
         */
         CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
                                             Camera *defaultCam, IdString definitionName, bool bEnabled,
-                                            int position=-1 );
+                                            int position=-1,
+                                            const Vector4 &vpOffsetScale = Vector4::ZERO,
+                                            uint8 vpModifierMask=0x00, uint8 executionMask=0xFF );
 
         /// Overload that allows a full RenderTexture to be used as render target (see CubeMapping demo)
         CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
-                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
-                                            int position=-1 );
+                                           Camera *defaultCam, IdString definitionName, bool bEnabled,
+                                           int position=-1,
+                                           const Vector4 &vpOffsetScale = Vector4::ZERO,
+                                           uint8 vpModifierMask=0x00, uint8 executionMask=0xFF );
 
         /// Removes the given workspace. Pointer is no longer valid after this call
         void removeWorkspace( CompositorWorkspace *workspace );

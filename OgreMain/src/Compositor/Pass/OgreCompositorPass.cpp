@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/OgreCompositorChannel.h"
+#include "Compositor/OgreCompositorNode.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderTexture.h"
@@ -53,18 +55,34 @@ namespace Ogre
 
         const Real EPSILON = 1e-6f;
 
+        CompositorWorkspace *workspace = mParentNode->getWorkspace();
+        uint8 workspaceVpMask = workspace->getViewportModifierMask();
+
+        bool applyModifier = (workspaceVpMask & mDefinition->mViewportModifierMask) != 0;
+        Vector4 vpModifier = applyModifier ? workspace->getViewportModifier() : Vector4( 0, 0, 1, 1 );
+
+        Real left   = mDefinition->mVpLeft      + vpModifier.x;
+        Real top    = mDefinition->mVpTop       + vpModifier.y;
+        Real width  = mDefinition->mVpWidth     * vpModifier.z;
+        Real height = mDefinition->mVpHeight    * vpModifier.w;
+
+        Real scLeft   = mDefinition->mVpScissorLeft     + vpModifier.x;
+        Real scTop    = mDefinition->mVpScissorTop      + vpModifier.y;
+        Real scWidth  = mDefinition->mVpScissorWidth    * vpModifier.z;
+        Real scHeight = mDefinition->mVpScissorHeight   * vpModifier.w;
+
         const unsigned short numViewports = mTarget->getNumViewports();
         for( unsigned short i=0; i<numViewports && !mViewport; ++i )
         {
             Viewport *vp = mTarget->getViewport(i);
-            if( Math::Abs( vp->getLeft() - mDefinition->mVpLeft )   < EPSILON &&
-                Math::Abs( vp->getTop() - mDefinition->mVpTop )     < EPSILON &&
-                Math::Abs( vp->getWidth() - mDefinition->mVpWidth ) < EPSILON &&
-                Math::Abs( vp->getHeight() - mDefinition->mVpHeight )<EPSILON &&
-                Math::Abs( vp->getScissorLeft() - mDefinition->mVpScissorLeft )   < EPSILON &&
-                Math::Abs( vp->getScissorTop() - mDefinition->mVpScissorTop )     < EPSILON &&
-                Math::Abs( vp->getScissorWidth() - mDefinition->mVpScissorWidth ) < EPSILON &&
-                Math::Abs( vp->getScissorHeight() - mDefinition->mVpScissorHeight )<EPSILON &&
+            if( Math::Abs( vp->getLeft() - left )   < EPSILON &&
+                Math::Abs( vp->getTop() - top )     < EPSILON &&
+                Math::Abs( vp->getWidth() - width ) < EPSILON &&
+                Math::Abs( vp->getHeight() - height )<EPSILON &&
+                Math::Abs( vp->getScissorLeft() - scLeft )   < EPSILON &&
+                Math::Abs( vp->getScissorTop() - scTop )     < EPSILON &&
+                Math::Abs( vp->getScissorWidth() - scWidth ) < EPSILON &&
+                Math::Abs( vp->getScissorHeight() - scHeight )<EPSILON &&
                 vp->getOverlaysEnabled() == mDefinition->mIncludeOverlays )
             {
                 mViewport = vp;
@@ -73,8 +91,8 @@ namespace Ogre
 
         if( !mViewport )
         {
-            mViewport = mTarget->addViewport( mDefinition->mVpLeft, mDefinition->mVpTop,
-                                                mDefinition->mVpWidth, mDefinition->mVpHeight );
+            mViewport = mTarget->addViewport( left, top, width, height );
+            mViewport->setScissors( scLeft, scTop, scWidth, scHeight );
             mViewport->setOverlaysEnabled( mDefinition->mIncludeOverlays );
         }
     }
@@ -137,14 +155,34 @@ namespace Ogre
 
             mViewport = 0;
 
+            CompositorWorkspace *workspace = mParentNode->getWorkspace();
+            uint8 workspaceVpMask = workspace->getViewportModifierMask();
+
+            bool applyModifier = (workspaceVpMask & mDefinition->mViewportModifierMask) != 0;
+            Vector4 vpModifier = applyModifier ? workspace->getViewportModifier() : Vector4( 0, 0, 1, 1 );
+
+            Real left   = mDefinition->mVpLeft      + vpModifier.x;
+            Real top    = mDefinition->mVpTop       + vpModifier.y;
+            Real width  = mDefinition->mVpWidth     * vpModifier.z;
+            Real height = mDefinition->mVpHeight    * vpModifier.w;
+
+            Real scLeft   = mDefinition->mVpScissorLeft     + vpModifier.x;
+            Real scTop    = mDefinition->mVpScissorTop      + vpModifier.y;
+            Real scWidth  = mDefinition->mVpScissorWidth    * vpModifier.z;
+            Real scHeight = mDefinition->mVpScissorHeight   * vpModifier.w;
+
             const unsigned short numViewports = mTarget->getNumViewports();
             for( unsigned short i=0; i<numViewports && !mViewport; ++i )
             {
                 Viewport *vp = mTarget->getViewport(i);
-                if( Math::Abs( vp->getLeft() - mDefinition->mVpLeft )   < EPSILON &&
-                    Math::Abs( vp->getTop() - mDefinition->mVpTop )     < EPSILON &&
-                    Math::Abs( vp->getWidth() - mDefinition->mVpWidth ) < EPSILON &&
-                    Math::Abs( vp->getHeight() - mDefinition->mVpHeight )<EPSILON &&
+                if( Math::Abs( vp->getLeft() - left )   < EPSILON &&
+                    Math::Abs( vp->getTop() - top )     < EPSILON &&
+                    Math::Abs( vp->getWidth() - width ) < EPSILON &&
+                    Math::Abs( vp->getHeight() - height )<EPSILON &&
+                    Math::Abs( vp->getScissorLeft() - scLeft )   < EPSILON &&
+                    Math::Abs( vp->getScissorTop() - scTop )     < EPSILON &&
+                    Math::Abs( vp->getScissorWidth() - scWidth ) < EPSILON &&
+                    Math::Abs( vp->getScissorHeight() - scHeight )<EPSILON &&
                     vp->getOverlaysEnabled() == mDefinition->mIncludeOverlays )
                 {
                     mViewport = vp;
@@ -154,7 +192,8 @@ namespace Ogre
             if( !mViewport )
             {
                 mViewport = mTarget->addViewport( mDefinition->mVpLeft, mDefinition->mVpTop,
-                                                    mDefinition->mVpWidth, mDefinition->mVpHeight );
+                                                  mDefinition->mVpWidth, mDefinition->mVpHeight );
+                mViewport->setScissors( scLeft, scTop, scWidth, scHeight );
                 mViewport->setOverlaysEnabled( mDefinition->mIncludeOverlays );
             }
         }
