@@ -243,6 +243,9 @@ namespace Ogre
 
         SceneManager* getSceneManager() const               { return mSceneManager; }
 
+        /// Returns the RenderTarget we're rendering to. May be null.
+        RenderTarget* getFinalTarget(void) const            { return mRenderWindow.target; }
+
         /// Gets the compositor manager (non const)
         CompositorManager2* getCompositorManager();
 
