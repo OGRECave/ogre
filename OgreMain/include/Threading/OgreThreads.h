@@ -49,7 +49,7 @@ THE SOFTWARE.
     unsigned long OGRE_THREAD_CALL_CONVENTION threadFunction##_internal( void *argName )\
     {\
         unsigned long retVal = 0;\
-        ThreadHandle *threadHandle( reinterpret_cast<ThreadHandle*>( argName ) );\
+        Ogre::ThreadHandle *threadHandle( reinterpret_cast<Ogre::ThreadHandle*>( argName ) );\
         try {\
             retVal = threadFunction( threadHandle );\
         }\
