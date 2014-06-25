@@ -91,6 +91,8 @@ namespace Ogre
         Viewport* getViewport() const       { return mViewport; }
 
         const CompositorPassDef* getDefinition(void) const  { return mDefinition; }
+
+		const CompositorNode* getParent(void) { return mParentNode; }
     };
 
     /** @} */

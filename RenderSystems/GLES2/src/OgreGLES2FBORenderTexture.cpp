@@ -302,7 +302,7 @@ namespace Ogre {
     */
     void GLES2FBOManager::detectFBOFormats()
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN //|| OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         // TODO: Fix that probing all formats slows down startup not just on the web also on Android / iOS
         for(size_t x = 0; x < PF_COUNT; ++x)
         {
