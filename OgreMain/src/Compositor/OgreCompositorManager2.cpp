@@ -345,17 +345,22 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
                                              RenderTarget *finalRenderTarget, Camera *defaultCam,
-                                             IdString definitionName, bool bEnabled, int position )
+                                             IdString definitionName, bool bEnabled, int position,
+                                             const Vector4 &vpOffsetScale,
+                                             uint8 vpModifierMask, uint8 executionMask )
     {
         CompositorChannel channel;
         channel.target = finalRenderTarget;
-        return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled, position );
+        return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled, position,
+                             vpOffsetScale, vpModifierMask, executionMask );
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
                                              const CompositorChannel &finalRenderTarget,
                                              Camera *defaultCam, IdString definitionName,
-                                             bool bEnabled, int position )
+                                             bool bEnabled, int position,
+                                             const Vector4 &vpOffsetScale,
+                                             uint8 vpModifierMask, uint8 executionMask )
     {
         validateAllNodes();
 
@@ -372,7 +377,8 @@ namespace Ogre
         {
             workspace = OGRE_NEW CompositorWorkspace(
                                 Id::generateNewId<CompositorWorkspace>(), itor->second,
-                                finalRenderTarget, sceneManager, defaultCam, mRenderSystem, bEnabled );
+                                finalRenderTarget, sceneManager, defaultCam, mRenderSystem,
+                                bEnabled, executionMask, vpModifierMask, vpOffsetScale );
 
             position = std::min<int>( position, mWorkspaces.size() );
 
@@ -537,11 +543,22 @@ namespace Ogre
         WorkspaceVec::const_iterator itor = mWorkspaces.begin();
         WorkspaceVec::const_iterator end  = mWorkspaces.end();
 
+        vector<RenderTarget*>::type swappedTargets;
+        swappedTargets.reserve( mWorkspaces.size() );
+
         while( itor != end )
         {
             CompositorWorkspace *workspace = (*itor);
-            if( workspace->getEnabled() && workspace->isValid() )
+
+            RenderTarget *finalTarget = workspace->getFinalTarget();
+            bool alreadySwapped = std::find( swappedTargets.begin(),
+                                             swappedTargets.end(), finalTarget ) != swappedTargets.end();
+
+            if( workspace->getEnabled() && workspace->isValid() && !alreadySwapped )
+            {
                 workspace->_swapFinalTarget();
+                swappedTargets.push_back( finalTarget );
+            }
 
             ++itor;
         }
