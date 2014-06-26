@@ -92,7 +92,7 @@ namespace Ogre
 
         const CompositorPassDef* getDefinition(void) const  { return mDefinition; }
 
-		const CompositorNode* getParent(void) { return mParentNode; }
+		const CompositorNode* getParentNode(void) const		{ return mParentNode; }
     };
 
     /** @} */
