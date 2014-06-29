@@ -78,8 +78,9 @@ namespace Ogre {
 
     PixelBox GL3PlusHardwarePixelBuffer::lockImpl( const Image::Box &lockBox, LockOptions options )
     {
-        allocateBuffer( PixelUtil::getMemorySize( lockBox.getWidth(), lockBox.getHeight(),
-                                                  lockBox.getDepth(), mFormat ) );
+        //Allocate memory for the entire image, as the buffer
+        //maynot be freed and be reused in subsequent calls.
+        allocateBuffer( PixelUtil::getMemorySize( mWidth, mHeight, mDepth, mFormat ) );
 
         mBuffer = PixelBox( lockBox.getWidth(), lockBox.getHeight(),
                             lockBox.getDepth(), mFormat, mBuffer.data );
@@ -110,7 +111,7 @@ namespace Ogre {
         }
         freeBuffer();
 
-        mBuffer = PixelBox( mWidth, mHeight, mDepth, mFormat );
+        mBuffer = PixelBox( mWidth, mHeight, mDepth, mFormat, mBuffer.data );
     }
 
     void GL3PlusHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
