@@ -2885,6 +2885,10 @@ namespace Ogre{
                 }
             }
         }
+
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        mPass->setMacroblock( hlmsManager->getMacroblock( macroblock ) );
+        mPass->setBlendblock( hlmsManager->getBlendblock( blendblock ) );
     }
     //-------------------------------------------------------------------------
     void PassTranslator::translateFragmentProgramRef(Ogre::ScriptCompiler *compiler, Ogre::ObjectAbstractNode *node)
