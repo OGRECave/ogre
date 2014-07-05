@@ -82,9 +82,47 @@ namespace Ogre
             StrideChangerVec    strideChangers;
         };
 
+        struct Vao
+        {
+            GLuint vaoName;
+
+            struct VertexBinding
+            {
+                GLuint              vertexBufferVbo;
+                VertexElement2Vec   vertexElements;
+                GLsizei             stride;
+
+                //OpenGL supports this parameter per attribute, but
+                //we're a bit more conservative and do it per buffer
+                GLuint              instancingDivisor;
+
+                bool operator == ( const VertexBinding &_r ) const
+                {
+                    return vertexBufferVbo == _r.vertexBufferVbo &&
+                            vertexElements == _r.vertexElements &&
+                            stride == _r.stride &&
+                            instancingDivisor == _r.instancingDivisor;
+                }
+            };
+
+            typedef vector<VertexBinding>::type VertexBindingVec;
+
+            VertexBindingVec    vertexBuffers;
+            GLuint              indexBufferVbo;
+        };
+
         typedef vector<Vbo>::type VboVec;
+        typedef vector<Vao>::type VaoVec;
+        typedef map<VertexElement2Vec, Vbo>::type VboMap;
+
         VboVec  mVbos[MAX_VBO_FLAG];
+        /// MultiSource VBOs request a block from mVbo (i.e. they call allocateVbo) and thus do not
+        /// own the vboName. For the rest, the way they manage free blocks is almost the same as
+        /// with regular mVbos.
+        VboMap  mMultiSourceVbos[MAX_VBO_FLAG];
         size_t  mDefaultPoolSize[MAX_VBO_FLAG];
+
+        VaoVec  mVaos;
 
         /// True if ARB_buffer_storage is supported (Persistent Mapping and immutable buffers)
         bool    mArbBufferStorage;
@@ -144,12 +182,18 @@ namespace Ogre
                                                             uint32 bytesPerElement,
                                                             BufferType bufferType,
                                                             void *initialData, bool keepAsShadow,
-                                                            const VertexElement2Vec &vertexElements );
+                                                            const VertexElement2Vec &vertexElements,
+                                                            bool multiSource );
 
         virtual IndexBufferPacked* createIndexBufferImpl( size_t numElements,
                                                           uint32 bytesPerElement,
                                                           BufferType bufferType,
                                                           void *initialData, bool keepAsShadow );
+
+        GLuint createVao( const Vao &vaoRef );
+
+        virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
+                                                                IndexBufferPacked *indexBuffer ) = 0;
     public:
         GL3PlusVaoManager();
         virtual ~GL3PlusVaoManager();

@@ -60,13 +60,16 @@ namespace Ogre
                                                             uint32 bytesPerElement,
                                                             BufferType bufferType,
                                                             void *initialData, bool keepAsShadow,
-                                                            const VertexElement2Vec &vertexElements )
-                                                            = 0;
+                                                            const VertexElement2Vec &vertexElements,
+                                                            bool multiSource ) = 0;
 
         virtual IndexBufferPacked* createIndexBufferImpl( size_t numElements,
                                                           uint32 bytesPerElement,
                                                           BufferType bufferType,
                                                           void *initialData, bool keepAsShadow ) = 0;
+
+        virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
+                                                                IndexBufferPacked *indexBuffer ) = 0;
 
     public:
         VaoManager();
@@ -77,6 +80,9 @@ namespace Ogre
         @param vertexElements
             A list of element bindings for this vertex buffer. Once created, changing VertexElements
             is not possible, you'll have to create another Vertex Buffer.
+        @param multiSource
+            Whether this VertexBuffer will be bound to anything other than buffer source 0 (i.e.
+            rendering with multiple vertex buffers). @See VertexBufferPacked::mMultiSource.
         @param numVertices
             The number of vertices for this vertex
         @param bufferType
@@ -92,8 +98,9 @@ namespace Ogre
             The desired vertex buffer pointer
         */
         VertexBufferPacked* createVertexBuffer( const VertexElement2Vec &vertexElements,
-                                                size_t numVertices, BufferType bufferType,
-                                                void *initialData, bool keepAsShadow );
+                                                bool multiSource, size_t numVertices,
+                                                BufferType bufferType, void *initialData,
+                                                bool keepAsShadow );
 
         /** Creates an index buffer based on the given parameters. Behind the scenes, the buffer
             is actually part of much larger buffer, in order to reduce bindings at runtime.
@@ -109,6 +116,19 @@ namespace Ogre
         IndexBufferPacked* createIndexBuffer( IndexBufferPacked::IndexType indexType,
                                               size_t numIndices, BufferType bufferType,
                                               void *initialData, bool keepAsShadow );
+
+        /** Creates a VertexArrayObject that binds all the vertex buffers with their respective
+            declarations, and the index buffers. The returned value is immutable and thus cannot
+            be modified.
+        @param vertexBuffers
+            An array of vertex buffers to be bound to the vertex array object.
+        @param indexBuffer
+            The index buffer to be bound.
+        @return
+            VertexArrayObject that can be rendered.
+        */
+        const VertexArrayObject* createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
+                                                          IndexBufferPacked *indexBuffer );
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks

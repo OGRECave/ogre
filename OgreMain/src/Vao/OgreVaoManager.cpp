@@ -62,8 +62,9 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     VertexBufferPacked* VaoManager::createVertexBuffer( const VertexElement2Vec &vertexElements,
-                                                        size_t numVertices, BufferType bufferType,
-                                                        void *initialData, bool keepAsShadow )
+                                                        bool multiSource, size_t numVertices,
+                                                        BufferType bufferType, void *initialData,
+                                                        bool keepAsShadow )
     {
         VertexElement2Vec::const_iterator itor = vertexElements.begin();
         VertexElement2Vec::const_iterator end  = vertexElements.end();
@@ -77,7 +78,7 @@ namespace Ogre
         }
 
         return createVertexBufferImpl( numVertices, bytesPerVertex, bufferType,
-                                       initialData, keepAsShadow, vertexElements );
+                                       initialData, keepAsShadow, vertexElements, multiSource );
     }
     //-----------------------------------------------------------------------------------
     IndexBufferPacked* VaoManager::createIndexBuffer( IndexBufferPacked::IndexType indexType,
@@ -86,6 +87,32 @@ namespace Ogre
     {
         return createIndexBufferImpl( numIndices, indexType == IndexBufferPacked::IT_16BIT ? 2 : 4,
                                       bufferType, initialData, keepAsShadow );
+    }
+    //-----------------------------------------------------------------------------------
+    const VertexArrayObject *VaoManager::createVertexArrayObject(
+                                                            const VertexBufferPackedVec &vertexBuffers,
+                                                            IndexBufferPacked *indexBuffer )
+    {
+        if( vertexBuffers.size() > 1 )
+        {
+            VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
+            VertexBufferPackedVec::const_iterator end  = vertexBuffers.end();
+
+            while( itor != end )
+            {
+                if( !(*itor)->isMultiSource() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 "Cannot use a non-multisource vertex buffer "
+                                 "in a multisource declaration",
+                                 "VaoManager::createVertexArrayObject" );
+                }
+
+                ++itor;
+            }
+        }
+
+        return createVertexArrayObjectImpl( vertexBuffers, indexBuffer );
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* VaoManager::getStagingBuffer( size_t minSizeBytes, bool forUpload )

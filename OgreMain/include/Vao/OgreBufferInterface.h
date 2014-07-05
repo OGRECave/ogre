@@ -36,7 +36,7 @@ namespace Ogre
     /** Most (if not all) buffers, can be treated with the same code.
         Hence most equivalent functionality is encapsulated here.
     */
-    class BufferInterface
+    class _OgreExport BufferInterface
     {
     protected:
         BufferPacked *mBuffer;

@@ -30,14 +30,23 @@ THE SOFTWARE.
 #define _Ogre_VertexArrayObject_H_
 
 #include "OgrePrerequisites.h"
+#include "OgreVertexBufferPacked.h"
 
 namespace Ogre
 {
-    struct VertexArrayObject
+    typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
+
+    struct VertexArrayObject : public VertexArrayObjectAlloc
     {
-        typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
         VertexBufferPackedVec   mVertexBuffers;
         IndexBufferPacked       *mIndexBuffer;
+
+        VertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
+                           IndexBufferPacked *indexBuffer ) :
+            mVertexBuffers( vertexBuffers ),
+            mIndexBuffer( indexBuffer )
+        {
+        }
     };
 }
 

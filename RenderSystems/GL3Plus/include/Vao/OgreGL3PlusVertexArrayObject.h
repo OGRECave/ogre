@@ -26,23 +26,26 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "Vao/OgreVertexBufferPacked.h"
+#ifndef _Ogre_GL3PlusVertexArrayObject_H_
+#define _Ogre_GL3PlusVertexArrayObject_H_
+
+#include "OgreGL3PlusPrerequisites.h"
+
+#include "Vao/OgreVertexArrayObject.h"
 
 namespace Ogre
 {
-    VertexBufferPacked::VertexBufferPacked(size_t internalBufferStart, size_t numElements,
-                                            uint32 bytesPerElement, BufferType bufferType,
-                                            void *initialData, bool keepAsShadow,
-                                            VaoManager *vaoManager, BufferInterface *bufferInterface,
-                                            const VertexElement2Vec &vertexElements, bool multiSource ) :
-        BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
-                      initialData, keepAsShadow, vaoManager, bufferInterface ),
-        mVertexElements( vertexElements ),
-        mMultiSource( multiSource )
+    struct _OgreGL3PlusExport GL3PlusVertexArrayObject : public VertexArrayObject
     {
-    }
-    //-----------------------------------------------------------------------------------
-    VertexBufferPacked::~VertexBufferPacked()
-    {
-    }
+        GLuint mVaoName;
+
+        GL3PlusVertexArrayObject( GLuint vaoName, const VertexBufferPackedVec &vertexBuffers,
+                                  IndexBufferPacked *indexBuffer ) :
+            VertexArrayObject( vertexBuffers, indexBuffer ),
+            mVaoName( vaoName )
+        {
+        }
+    };
 }
+
+#endif

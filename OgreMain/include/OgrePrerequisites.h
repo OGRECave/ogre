@@ -348,6 +348,7 @@ namespace Ogre {
     class Vector4;
     class Viewport;
     class VertexAnimationTrack;
+    struct VertexArrayObject;
     class VertexBufferBinding;
     class VertexBufferPacked;
     class VertexData;

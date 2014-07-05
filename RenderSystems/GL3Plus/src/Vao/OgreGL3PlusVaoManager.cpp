@@ -28,6 +28,10 @@ THE SOFTWARE.
 
 #include "Vao/OgreGL3PlusVaoManager.h"
 #include "Vao/OgreGL3PlusStagingBuffer.h"
+#include "Vao/OgreGL3PlusVertexArrayObject.h"
+#include "Vao/OgreGL3PlusBufferInterface.h"
+
+#include "OgreGL3PlusHardwareBufferManager.h" //GL3PlusHardwareBufferManager::getGLType
 
 #include "OgreTimer.h"
 
@@ -250,7 +254,8 @@ namespace Ogre
                                                                    uint32 bytesPerElement,
                                                                    BufferType bufferType,
                                                                    void *initialData, bool keepAsShadow,
-                                                                   const VertexElement2Vec &vElements )
+                                                                   const VertexElement2Vec &vElements,
+                                                                   bool multiSource )
     {
         size_t vboIdx;
         size_t bufferOffset;
@@ -258,6 +263,129 @@ namespace Ogre
         allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, vboIdx, bufferOffset );
 
         return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    GLuint GL3PlusVaoManager::createVao( const Vao &vaoRef )
+    {
+        GLuint vaoName;
+        OCGLE( glGenVertexArrays( 1, &vaoName ) );
+        OCGLE( glBindVertexArray( vaoName ) );
+
+        size_t attributeIndex = 0;
+
+        for( size_t i=0; i<vaoRef.vertexBuffers.size(); ++i )
+        {
+            const Vao::VertexBinding &binding = vaoRef.vertexBuffers[i];
+
+            glBindBuffer( GL_ARRAY_BUFFER, binding.vertexBufferVbo );
+
+            VertexElement2Vec::const_iterator it = binding.vertexElements.begin();
+            VertexElement2Vec::const_iterator en = binding.vertexElements.end();
+
+            while( it != en )
+            {
+                GLint typeCount = VertexElement::getTypeCount( it->mType );
+                GLboolean normalised = GL_FALSE;
+
+                switch( it->mType )
+                {
+                case VET_COLOUR:
+                case VET_COLOUR_ABGR:
+                case VET_COLOUR_ARGB:
+                    // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+                    // VertexElement::getTypeCount treats them as 1 (RGBA)
+                    // Also need to normalise the fixed-point data
+                    typeCount = 4;
+                    normalised = GL_TRUE;
+                    break;
+                default:
+                    break;
+                };
+
+                switch( VertexElement::getBaseType( it->mType ) )
+                {
+                default:
+                case VET_FLOAT1:
+                    OCGLE( glVertexAttribPointer( attributeIndex, typeCount,
+                                                  GL3PlusHardwareBufferManager::getGLType( it->mType ),
+                                                  normalised, binding.stride, 0 ) );
+                    break;
+                case VET_DOUBLE1:
+                    OCGLE( glVertexAttribLPointer( attributeIndex, typeCount,
+                                                   GL3PlusHardwareBufferManager::getGLType( it->mType ),
+                                                   binding.stride, 0 ) );
+                    break;
+                }
+
+                OCGLE( glVertexAttribDivisor( attributeIndex, binding.instancingDivisor ) );
+                OCGLE( glEnableVertexAttribArray( attributeIndex ) );
+
+                ++attributeIndex;
+                ++it;
+            }
+
+            OCGLE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
+        }
+
+        OCGLE( glBindVertexArray( 0 ) );
+
+        return vaoName;
+    }
+    //-----------------------------------------------------------------------------------
+    VertexArrayObject* GL3PlusVaoManager::createVertexArrayObjectImpl(
+                                                            const VertexBufferPackedVec &vertexBuffers,
+                                                            IndexBufferPacked *indexBuffer )
+    {
+        Vao vao;
+
+        vao.vertexBuffers.reserve( vertexBuffers.size() );
+
+        {
+            VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
+            VertexBufferPackedVec::const_iterator end  = vertexBuffers.end();
+
+            while( itor != end )
+            {
+                Vao::VertexBinding vertexBinding;
+                vertexBinding.vertexBufferVbo = static_cast<GL3PlusBufferInterface*>(
+                                                    (*itor)->getBufferInterface() )->getVboName();
+                vertexBinding.vertexElements = (*itor)->getVertexElements();
+                ++itor;
+            }
+        }
+
+        vao.indexBufferVbo  = static_cast<GL3PlusBufferInterface*>(
+                                indexBuffer->getBufferInterface() )->getVboName();
+
+        bool bFound = false;
+        VaoVec::const_iterator itor = mVaos.begin();
+        VaoVec::const_iterator end  = mVaos.end();
+
+        while( itor != end && !bFound )
+        {
+            if( itor->indexBufferVbo == vao.indexBufferVbo &&
+                itor->vertexBuffers == vao.vertexBuffers )
+            {
+                bFound = true;
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+
+        if( !bFound )
+        {
+            vao.vaoName = createVao( vao );
+            mVaos.push_back( vao );
+            itor = mVaos.begin() + mVaos.size() - 1;
+        }
+
+        GL3PlusVertexArrayObject *retVal = OGRE_NEW GL3PlusVertexArrayObject( itor->vaoName,
+                                                                              vertexBuffers,
+                                                                              indexBuffer );
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* GL3PlusVaoManager::createStagingBuffer( size_t sizeBytes, bool forUpload )

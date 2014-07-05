@@ -336,6 +336,7 @@ namespace Ogre
     typedef ResourceAllocatedObject     TextureUnitStateAlloc;
     typedef GeneralAllocatedObject      UtilityAlloc;
     typedef GeometryAllocatedObject     VertexDataAlloc;
+    typedef GeometryAllocatedObject     VertexArrayObjectAlloc;
     typedef RenderSysAllocatedObject    ViewportAlloc;
     typedef SceneCtlAllocatedObject     LodAlloc;
     typedef GeneralAllocatedObject      FileSystemLayerAlloc;
