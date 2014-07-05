@@ -85,8 +85,6 @@ namespace Ogre
         typedef vector<Vbo>::type VboVec;
         VboVec  mVbos[MAX_VBO_FLAG];
         size_t  mDefaultPoolSize[MAX_VBO_FLAG];
-        uint8   mDynamicBufferMultiplier;
-        uint8   mDynamicBufferCurrentFrame;
 
         /// True if ARB_buffer_storage is supported (Persistent Mapping and immutable buffers)
         bool    mArbBufferStorage;
@@ -153,6 +151,7 @@ namespace Ogre
                                                           BufferType bufferType,
                                                           void *initialData, bool keepAsShadow );
     public:
+        GL3PlusVaoManager();
         virtual ~GL3PlusVaoManager();
 
         bool supportsArbBufferStorage(void) const       { return mArbBufferStorage; }
@@ -163,6 +162,8 @@ namespace Ogre
             it when you're done using it.
         */
         virtual StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload );
+
+        virtual void update(void);
 
         uint8 getDynamicBufferCurrentFrame(void) const;
         uint8 getDynamicBufferMultiplier(void) const        { return mDynamicBufferMultiplier; }

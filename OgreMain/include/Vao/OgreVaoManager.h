@@ -50,6 +50,11 @@ namespace Ogre
     protected:
         /// [0] = for uploads, [1] = for downloads
         StagingBufferVec mStagingBuffers[2];
+        StagingBufferVec mZeroRefStagingBuffers[2];
+
+        uint8           mDynamicBufferMultiplier;
+        uint8           mDynamicBufferCurrentFrame;
+        unsigned long   mNextStagingBufferTimestampCheckpoint;
 
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
@@ -113,13 +118,13 @@ namespace Ogre
         virtual StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload ) = 0;
 
         /** Retrieves a staging buffer for use. We'll search for existing ones that can
-            hold minSizeBytes. We first prioritize those that won't cause a full stall.
-            If we can't find any, we'll return a buffer that can hold the request but
-            will full-stall.
-            If we can't find any buffer that can hold the requested bytes, we create a
-            new one.
+            hold minSizeBytes. We first prioritize those that won't cause a stall at all.
+            Then those that will cause a partial stall, and otherwise return one that will
+            cause full stall.
+            If we can't find any existing buffer that can hold the requested number bytes,
+            we'll create a new one.
         @remarks
-            The reference count is increase before returning the staging buffer.
+            The reference count is increasesd before returning the staging buffer.
             You should decrease the reference count after you're done with the returned
             pointer. @See StagingBuffer::removeReferenceCount regarding ref. counting.
         @param sizeBytes
@@ -131,6 +136,10 @@ namespace Ogre
             The staging buffer.
         */
         StagingBuffer* getStagingBuffer( size_t minSizeBytes, bool forUpload );
+
+        void _notifyStagingBufferEnteredZeroRef( StagingBuffer *stagingBuffer );
+        void _notifyStagingBufferLeftZeroRef( StagingBuffer *stagingBuffer );
+
 
         Timer* getTimer(void)               { return mTimer; }
     };

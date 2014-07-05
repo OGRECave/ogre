@@ -43,9 +43,9 @@ namespace Ogre
         mMappingState( MS_UNMAPPED ),
         mMappingStart( 0 ),
         mMappingCount( 0 ),
-        mRefCount( 0 ),
+        mRefCount( 1 ),
         mLifetimeThreshold( vaoManager->mDefaultStagingBufferLifetime ),
-        mLastUsedTimeStamp( vaoManager->getTimer()->getMilliseconds() )
+        mLastUsedTimestamp( vaoManager->getTimer()->getMilliseconds() )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -111,11 +111,24 @@ namespace Ogre
         mMappingStart = mMappingStart % mSizeBytes;
     }
     //-----------------------------------------------------------------------------------
+    void StagingBuffer::addReferenceCount(void)
+    {
+        ++mRefCount;
+
+        if( mRefCount == 1 )
+            mVaoManager->_notifyStagingBufferLeftZeroRef( this );
+    }
+    //-----------------------------------------------------------------------------------
     void StagingBuffer::removeReferenceCount(void)
     {
         Timer *timer = mVaoManager->getTimer();
         --mRefCount;
-        mLastUsedTimeStamp = timer->getMilliseconds();
+
+        assert( mRefCount >= 0 );
+        mLastUsedTimestamp = timer->getMilliseconds();
+
+        if( mRefCount == 0 )
+            mVaoManager->_notifyStagingBufferEnteredZeroRef( this );
     }
 
     //-----------------------------------------------------------------------------------

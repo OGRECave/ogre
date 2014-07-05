@@ -29,8 +29,18 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusVaoManager.h"
 #include "Vao/OgreGL3PlusStagingBuffer.h"
 
+#include "OgreTimer.h"
+
 namespace Ogre
 {
+    GL3PlusVaoManager::GL3PlusVaoManager()
+    {
+        //Keep pools of 128MB each for static meshes
+        mDefaultPoolSize[CPU_INACCESSIBLE]  = 128 * 1024 * 1024;
+        //Keep pools of 32MB each for dynamic vertex buffers
+        mDefaultPoolSize[CPU_ACCESSIBLE]    = 32 * 1024 * 1024;
+    }
+    //-----------------------------------------------------------------------------------
     GL3PlusVaoManager::~GL3PlusVaoManager()
     {
         vector<GLuint>::type bufferNames;
@@ -269,10 +279,64 @@ namespace Ogre
 
         GL3PlusStagingBuffer *stagingBuffer = OGRE_NEW GL3PlusStagingBuffer( 0, sizeBytes, this,
                                                                              forUpload, bufferName );
-        stagingBuffer->addReferenceCount();
         mStagingBuffers[forUpload].push_back( stagingBuffer );
 
         return stagingBuffer;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::update(void)
+    {
+        unsigned long currentTimeMs = mTimer->getMilliseconds();
+
+        FastArray<GLuint> bufferNames;
+
+        if( currentTimeMs >= mNextStagingBufferTimestampCheckpoint )
+        {
+            mNextStagingBufferTimestampCheckpoint = (unsigned long)(~0);
+
+            for( size_t i=0; i<2; ++i )
+            {
+                StagingBufferVec::iterator itor = mZeroRefStagingBuffers[i].begin();
+                StagingBufferVec::iterator end  = mZeroRefStagingBuffers[i].end();
+
+                while( itor != end )
+                {
+                    StagingBuffer *stagingBuffer = *itor;
+
+                    mNextStagingBufferTimestampCheckpoint = std::min(
+                                                    mNextStagingBufferTimestampCheckpoint,
+                                                    stagingBuffer->getLastUsedTimestamp() +
+                                                    currentTimeMs );
+
+                    if( stagingBuffer->getLastUsedTimestamp() - currentTimeMs >
+                        stagingBuffer->getLifetimeThreshold() )
+                    {
+                        bufferNames.push_back( static_cast<GL3PlusStagingBuffer*>(
+                                                    stagingBuffer)->getBufferName() );
+
+                        //We have to remove it from two lists.
+                        StagingBufferVec::iterator itFullList = std::find( mStagingBuffers[i].begin(),
+                                                                           mStagingBuffers[i].end(),
+                                                                           stagingBuffer );
+                        efficientVectorRemove( mStagingBuffers[i], itFullList );
+                        delete *itor;
+
+                        itor = efficientVectorRemove( mZeroRefStagingBuffers[i], itor );
+                        end  = mZeroRefStagingBuffers[i].end();
+                    }
+                    else
+                    {
+                        ++itor;
+                    }
+                }
+            }
+        }
+
+        if( !bufferNames.empty() )
+        {
+            glDeleteBuffers( bufferNames.size(), &bufferNames[0] );
+            bufferNames.clear();
+        }
     }
     //-----------------------------------------------------------------------------------
     /*IndexBufferPacked* GL3PlusVaoManager::createIndexBufferImpl( IndexBufferPacked::IndexType indexType,

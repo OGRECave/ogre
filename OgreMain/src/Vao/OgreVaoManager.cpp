@@ -29,12 +29,16 @@ THE SOFTWARE.
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreStagingBuffer.h"
 #include "OgreTimer.h"
+#include "OgreCommon.h"
 
 namespace Ogre
 {
     VaoManager::VaoManager() :
         mTimer( 0 ),
-        mDefaultStagingBufferLifetime( 300000 ) //5 minutes
+        mDefaultStagingBufferLifetime( 300000 ), //5 minutes
+        mNextStagingBufferTimestampCheckpoint( ~0 ),
+        mDynamicBufferMultiplier( 3 ),
+        mDynamicBufferCurrentFrame( 0 )
     {
         mTimer = OGRE_NEW Timer();
     }
@@ -86,32 +90,55 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     StagingBuffer* VaoManager::getStagingBuffer( size_t minSizeBytes, bool forUpload )
     {
+        StagingBuffer *candidates[NUM_STALL_TYPES];
+        memset( candidates, 0, sizeof( candidates ) );
+
         StagingBufferVec::const_iterator itor = mStagingBuffers[forUpload].begin();
         StagingBufferVec::const_iterator end  = mStagingBuffers[forUpload].end();
 
-        while( itor != end && minSizeBytes < (*itor)->getMaxSize() &&
-               (*itor)->willStall( minSizeBytes ) != STALL_FULL )
+        while( itor != end && minSizeBytes < (*itor)->getMaxSize() )
         {
+            StagingStallType stallType = (*itor)->willStall( minSizeBytes );
+            candidates[stallType] = *itor;
+
+            //This is best case scenario, we can stop looking.
+            if( stallType == STALL_NONE )
+                break;
+
             ++itor;
         }
 
-        if( itor == end )
+        StagingBuffer *retVal = candidates[STALL_FULL];
+
+        for( size_t i=0; i<NUM_STALL_TYPES && !retVal; ++i )
+            retVal = candidates[i];
+
+        if( !retVal )
         {
-            //Look again, but this time don't care if we cause a full stall
-            itor = mStagingBuffers[forUpload].begin();
-            while( itor != end && minSizeBytes < (*itor)->getMaxSize() )
-                ++itor;
+            //No buffer is large enough. Get a new one.
+            retVal = createStagingBuffer( minSizeBytes, forUpload );
+        }
+        else
+        {
+            retVal->addReferenceCount();
         }
 
-        if( itor == end )
-        {
-            //No buffer is large enough. Return a new one.
-            return createStagingBuffer( minSizeBytes, forUpload );
-        }
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::_notifyStagingBufferEnteredZeroRef( StagingBuffer *stagingBuffer )
+    {
+        mZeroRefStagingBuffers[stagingBuffer->getUploadOnly()].push_back( stagingBuffer );
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::_notifyStagingBufferLeftZeroRef( StagingBuffer *stagingBuffer )
+    {
+        StagingBufferVec &zeroRefStagingBuffers = mZeroRefStagingBuffers[stagingBuffer->getUploadOnly()];
+        StagingBufferVec::iterator itor = std::find( zeroRefStagingBuffers.begin(),
+                                                     zeroRefStagingBuffers.end(), stagingBuffer );
 
-        (*itor)->addReferenceCount();
-
-        return *itor;
+        assert( itor != zeroRefStagingBuffers.end() );
+        efficientVectorRemove( zeroRefStagingBuffers, itor );
     }
 }
 

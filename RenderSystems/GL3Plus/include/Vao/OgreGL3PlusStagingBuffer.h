@@ -45,6 +45,8 @@ namespace Ogre
     class _OgreGL3PlusExport GL3PlusStagingBuffer : public StagingBuffer
     {
     protected:
+        /// mVboName is not deleted by us (the VaoManager does) as we may have
+        /// only been assigned a chunk of the buffer, not the whole thing.
         GLuint  mVboName;
         void    *mMappedPtr;
 

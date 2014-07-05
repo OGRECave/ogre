@@ -47,7 +47,9 @@ namespace Ogre
         /// The whole pipeline is brought to a stop. We have to wait for the GPU
         /// to finish all operations issued so far. This can be very expensive.
         /// Grab a different StagingBuffer.
-        STALL_FULL
+        STALL_FULL,
+
+        NUM_STALL_TYPES
     };
 
     /** A staging buffer is a buffer that resides on the GPU and be written to/from both CPU & GPU
@@ -110,9 +112,10 @@ namespace Ogre
         size_t          mMappingStart;
         size_t          mMappingCount;
 
+        /// Manual reference count. Note on creation it starts already at 1.
         int16           mRefCount;
         uint32          mLifetimeThreshold;
-        unsigned long   mLastUsedTimeStamp;
+        unsigned long   mLastUsedTimestamp;
 
         void mapChecks( size_t sizeBytes );
 
@@ -123,6 +126,10 @@ namespace Ogre
         StagingBuffer( size_t internalBufferStart, size_t sizeBytes,
                        VaoManager *vaoManager, bool uploadOnly );
         virtual ~StagingBuffer();
+
+        /// When true, this buffer can only be used for uploading to GPU.
+        /// When false, can only be used for downloading from GPU
+        bool getUploadOnly(void) const                  { return mUploadOnly; }
 
         /** Returns true if our next call to @map() with the same parameters will stall.
             @See StagingStallType
@@ -154,7 +161,7 @@ namespace Ogre
         size_t getMaxSize(void)                     { return mSizeBytes; }
 
         /// Adds a reference count to the StagingBuffer. @See removeReferenceCount
-        void addReferenceCount(void)                { ++mRefCount; }
+        void addReferenceCount(void);
 
         /** Decreases the reference count by one. StagingBuffers are manually reference counted.
             The first reason is performance. The second main reason is that the pointer doesn't
@@ -176,6 +183,15 @@ namespace Ogre
             StagingBuffer will be freed.
         */
         void removeReferenceCount(void);
+
+        uint16 getReferenceCount(void) const        { return mRefCount; }
+
+        /// Returns the time in milliseconds in which a StagingBuffer should
+        /// live with a reference count of 0 before being deleted.
+        uint32 getLifetimeThreshold(void)           { return mLifetimeThreshold; }
+
+        /// Returns the time in millisecond when the ref. count became 0.
+        unsigned long getLastUsedTimestamp(void)    { return mLastUsedTimestamp; }
     };
 }
 
