@@ -27,8 +27,10 @@ THE SOFTWARE.
 */
 
 #include "Vao/OgreStagingBuffer.h"
+#include "Vao/OgreVaoManager.h"
 #include "OgreException.h"
 #include "OgreStringConverter.h"
+#include "OgreTimer.h"
 
 namespace Ogre
 {
@@ -40,7 +42,10 @@ namespace Ogre
         mVaoManager( vaoManager ),
         mMappingState( MS_UNMAPPED ),
         mMappingStart( 0 ),
-        mMappingCount( 0 )
+        mMappingCount( 0 ),
+        mRefCount( 0 ),
+        mLifetimeThreshold( vaoManager->mDefaultStagingBufferLifetime ),
+        mLastUsedTimeStamp( vaoManager->getTimer()->getMilliseconds() )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -92,8 +97,12 @@ namespace Ogre
         if( mMappingState != MS_MAPPED )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Unmapping an unmapped buffer!",
-                         "GL3PlusStagingBuffer::unmap" );
+                         "StagingBuffer::unmap" );
         }
+
+        assert( (!mUploadOnly && !destinations && !numDestinations ||
+                mUploadOnly && destinations && numDestinations) &&
+                "Using an upload staging-buffer for downloads or vice-versa." );
 
         unmapImpl( destinations, numDestinations );
 
@@ -101,5 +110,13 @@ namespace Ogre
         mMappingStart += mMappingCount;
         mMappingStart = mMappingStart % mSizeBytes;
     }
+    //-----------------------------------------------------------------------------------
+    void StagingBuffer::removeReferenceCount(void)
+    {
+        Timer *timer = mVaoManager->getTimer();
+        --mRefCount;
+        mLastUsedTimeStamp = timer->getMilliseconds();
+    }
+
     //-----------------------------------------------------------------------------------
 }

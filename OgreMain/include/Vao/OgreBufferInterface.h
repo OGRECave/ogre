@@ -42,7 +42,7 @@ namespace Ogre
         BufferPacked *mBuffer;
 
     public:
-        virtual void upload( void *data, size_t elementStart, size_t elementCount ) = 0;
+        void upload( void *data, size_t elementStart, size_t elementCount );
 
         virtual void* map( size_t elementStart, size_t elementCount, MappingState prevMappingState ) = 0;
         virtual void unmap( UnmapOptions unmapOption ) = 0;

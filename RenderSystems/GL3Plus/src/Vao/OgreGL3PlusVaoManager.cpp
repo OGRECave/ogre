@@ -27,9 +27,47 @@ THE SOFTWARE.
 */
 
 #include "Vao/OgreGL3PlusVaoManager.h"
+#include "Vao/OgreGL3PlusStagingBuffer.h"
 
 namespace Ogre
 {
+    GL3PlusVaoManager::~GL3PlusVaoManager()
+    {
+        vector<GLuint>::type bufferNames;
+
+        bufferNames.reserve( mStagingBuffers[0].size() + mStagingBuffers[1].size() );
+
+        for( size_t i=0; i<2; ++i )
+        {
+            StagingBufferVec::const_iterator itor = mStagingBuffers[i].begin();
+            StagingBufferVec::const_iterator end  = mStagingBuffers[i].end();
+
+            while( itor != end )
+            {
+                bufferNames.push_back( static_cast<GL3PlusStagingBuffer*>(*itor)->getBufferName() );
+                ++itor;
+            }
+        }
+
+        for( size_t i=0; i<MAX_VBO_FLAG; ++i )
+        {
+            VboVec::const_iterator itor = mVbos[i].begin();
+            VboVec::const_iterator end  = mVbos[i].end();
+
+            while( itor != end )
+            {
+                bufferNames.push_back( itor->vboName );
+                ++itor;
+            }
+        }
+
+        if( !bufferNames.empty() )
+        {
+            glDeleteBuffers( bufferNames.size(), &bufferNames[0] );
+            bufferNames.clear();
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void GL3PlusVaoManager::allocateVbo( size_t sizeBytes, size_t bytesPerElement, BufferType bufferType,
                                          size_t &outVboIdx, size_t &outBufferOffset )
     {
@@ -212,62 +250,29 @@ namespace Ogre
         return 0;
     }
     //-----------------------------------------------------------------------------------
-    const GLStagingBuffer& GL3PlusVaoManager::getStagingBuffer( size_t sizeBytes, bool forUpload )
+    StagingBuffer* GL3PlusVaoManager::createStagingBuffer( size_t sizeBytes, bool forUpload )
     {
-        /*GLStagingBufferVec::iterator itor = mStagingBuffers[forUpload].begin();
-        GLStagingBufferVec::iterator end  = mStagingBuffers[forUpload].end();
+        GLuint bufferName;
+        GLenum target = forUpload ? GL_COPY_READ_BUFFER : GL_COPY_WRITE_BUFFER;
+        OCGLE( glGenBuffers( 1, &bufferName ) );
+        OCGLE( glBindBuffer( target, bufferName ) );
 
-        size_t bestBufferIdx = 0;
-
-        while( itor != end )
+        if( mArbBufferStorage )
         {
-            const GLStagingBuffer &bestBuffer = mStagingBuffers[forUpload][bestBufferIdx];
-            GLStagingBuffer &stagingBuffer = *itor;
-            if( stagingBuffer.bufferSize <= bestBuffer.bufferSize &&
-                stagingBuffer.framesSinceLastUse >= mMinStagingFrameLatency[forUpload] &&
-                ( stagingBuffer.framesSinceLastUse >= bestBuffer.framesSinceLastUse ||
-                  stagingBuffer.framesSinceLastUse >= mMaxStagingFrameLatency[forUpload] ) )
-            {
-                bestBufferIdx = itor - mStagingBuffers[forUpload].begin();
-            }
-
-            ++itor;
-        }
-
-        if( mStagingBuffers[forUpload].empty() ||
-            mStagingBuffers[forUpload][bestBufferIdx].framesSinceLastUse <
-                                        mMinStagingFrameLatency[forUpload] )
-        {
-            GLStagingBuffer newStageBuffer( sizeBytes, forUpload ? GL_COPY_READ_BUFFER :
-                                                                   GL_COPY_WRITE_BUFFER );
-
-            OCGLE( glGenBuffers( 1, &newStageBuffer.bufferName ) );
-            OCGLE( glBindBuffer( newStageBuffer.target, newStageBuffer.bufferName ) );
-
-            //TODO: Check out of memory errors.
-            if( mArbBufferStorage )
-            {
-                OCGLE( glBufferStorage( newStageBuffer.target, sizeBytes, 0,
-                                        forUpload ? GL_MAP_WRITE_BIT : GL_MAP_READ_BIT ) );
-            }
-            else
-            {
-                OCGLE( glBufferData( newStageBuffer.target, sizeBytes, 0, GL_STREAM_COPY ) );
-            }
-
-            bestBufferIdx = mStagingBuffers[forUpload].size();
-            mStagingBuffers[forUpload].push_back( newStageBuffer );
-
-            return mStagingBuffers[forUpload].back();
+            OCGLE( glBufferStorage( target, sizeBytes, 0,
+                                    forUpload ? GL_MAP_WRITE_BIT : GL_MAP_READ_BIT ) );
         }
         else
         {
-            GLStagingBuffer &retVal = mStagingBuffers[forUpload][bestBufferIdx];
-            retVal.framesSinceLastUse = 0;
-            OCGLE( glBindBuffer( retVal.target, retVal.bufferName ) );
+            OCGLE( glBufferData( target, sizeBytes, 0, forUpload ? GL_STREAM_DRAW : GL_STREAM_READ ) );
+        }
 
-            return retVal;
-        }*/
+        GL3PlusStagingBuffer *stagingBuffer = OGRE_NEW GL3PlusStagingBuffer( 0, sizeBytes, this,
+                                                                             forUpload, bufferName );
+        stagingBuffer->addReferenceCount();
+        mStagingBuffers[forUpload].push_back( stagingBuffer );
+
+        return stagingBuffer;
     }
     //-----------------------------------------------------------------------------------
     /*IndexBufferPacked* GL3PlusVaoManager::createIndexBufferImpl( IndexBufferPacked::IndexType indexType,

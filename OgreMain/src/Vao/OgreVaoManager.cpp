@@ -27,9 +27,36 @@ THE SOFTWARE.
 */
 
 #include "Vao/OgreVaoManager.h"
+#include "Vao/OgreStagingBuffer.h"
+#include "OgreTimer.h"
 
 namespace Ogre
 {
+    VaoManager::VaoManager() :
+        mTimer( 0 ),
+        mDefaultStagingBufferLifetime( 300000 ) //5 minutes
+    {
+        mTimer = OGRE_NEW Timer();
+    }
+    //-----------------------------------------------------------------------------------
+    VaoManager::~VaoManager()
+    {
+        for( size_t i=0; i<2; ++i )
+        {
+            StagingBufferVec::const_iterator itor = mStagingBuffers[i].begin();
+            StagingBufferVec::const_iterator end  = mStagingBuffers[i].end();
+
+            while( itor != end )
+            {
+                OGRE_DELETE *itor;
+                ++itor;
+            }
+        }
+
+        OGRE_DELETE mTimer;
+        mTimer = 0;
+    }
+    //-----------------------------------------------------------------------------------
     VertexBufferPacked* VaoManager::createVertexBuffer( const VertexElement2Vec &vertexElements,
                                                         size_t numVertices, BufferType bufferType,
                                                         void *initialData, bool keepAsShadow )
@@ -55,6 +82,36 @@ namespace Ogre
     {
         return createIndexBufferImpl( numIndices, indexType == IndexBufferPacked::IT_16BIT ? 2 : 4,
                                       bufferType, initialData, keepAsShadow );
+    }
+    //-----------------------------------------------------------------------------------
+    StagingBuffer* VaoManager::getStagingBuffer( size_t minSizeBytes, bool forUpload )
+    {
+        StagingBufferVec::const_iterator itor = mStagingBuffers[forUpload].begin();
+        StagingBufferVec::const_iterator end  = mStagingBuffers[forUpload].end();
+
+        while( itor != end && minSizeBytes < (*itor)->getMaxSize() &&
+               (*itor)->willStall( minSizeBytes ) != STALL_FULL )
+        {
+            ++itor;
+        }
+
+        if( itor == end )
+        {
+            //Look again, but this time don't care if we cause a full stall
+            itor = mStagingBuffers[forUpload].begin();
+            while( itor != end && minSizeBytes < (*itor)->getMaxSize() )
+                ++itor;
+        }
+
+        if( itor == end )
+        {
+            //No buffer is large enough. Return a new one.
+            return createStagingBuffer( minSizeBytes, forUpload );
+        }
+
+        (*itor)->addReferenceCount();
+
+        return *itor;
     }
 }
 

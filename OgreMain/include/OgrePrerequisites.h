@@ -324,6 +324,7 @@ namespace Ogre {
     class SkeletonManager;
     class Sphere;
     class SphereSceneQuery;
+    class StagingBuffer;
     class StaticGeometry;
     class StreamSerialiser;
     class StringConverter;

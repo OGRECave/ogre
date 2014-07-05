@@ -70,7 +70,7 @@ namespace Ogre
     @par
         Staging buffers can't be persistently mapped, since it beats the point.
     */
-    class StagingBuffer
+    class StagingBuffer : public StagingBufferAlloc
     {
     public:
         struct Destination
@@ -110,6 +110,10 @@ namespace Ogre
         size_t          mMappingStart;
         size_t          mMappingCount;
 
+        int16           mRefCount;
+        uint32          mLifetimeThreshold;
+        unsigned long   mLastUsedTimeStamp;
+
         void mapChecks( size_t sizeBytes );
 
         virtual void* mapImpl( size_t sizeBytes ) = 0;
@@ -148,6 +152,30 @@ namespace Ogre
                                 { unmap( &destinations.front(), destinations.size() ); }
 
         size_t getMaxSize(void)                     { return mSizeBytes; }
+
+        /// Adds a reference count to the StagingBuffer. @See removeReferenceCount
+        void addReferenceCount(void)                { ++mRefCount; }
+
+        /** Decreases the reference count by one. StagingBuffers are manually reference counted.
+            The first reason is performance. The second main reason is that the pointer doesn't
+            get immediately deleted when the reference hits 0.
+        @par
+            Instead, a reference count of 0 means the Vao manager will monitor its lifetime.
+            If it has been 0 for too long (past certain time threshold) the Vao manager will
+            destroy this staging buffer.
+        @par
+            Meanwhile, the Staging Buffer will live in a pool until it's requested again or
+            the time threshold is met. This prevents unwanted hiccups due to buffers getting
+            recreated and destroyed all the time.
+            Keep a non-zero ref. count to ensure the StagingBuffer won't be deleted due
+            to timeouts (i.e. you know this buffer will get used at long regular intervals,
+            like once every 15 minutes)
+        @par
+            Having a non-zero reference count doesn't mean the pointer will live forever though,
+            as the memory is owned by the VaoManager: if the VaoManager is shutdown, this
+            StagingBuffer will be freed.
+        */
+        void removeReferenceCount(void);
     };
 }
 

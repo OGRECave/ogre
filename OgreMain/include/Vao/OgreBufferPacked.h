@@ -77,6 +77,7 @@ namespace Ogre
 
     class BufferPacked
     {
+        friend class BufferInterface;
         friend class GL3PlusBufferInterface;
 
     protected:
@@ -106,9 +107,6 @@ namespace Ogre
         size_t          mLastMappingCount;
 
         void *mShadowCopy;
-
-        virtual void* mapImpl( size_t elementStart, size_t elementCount, MappingState prevMappingState ) = 0;
-        virtual void unmapImpl( bool unmapPersistent ) = 0;
 
     public:
 

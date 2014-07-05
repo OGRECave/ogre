@@ -36,21 +36,37 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    typedef vector<StagingBuffer*>::type StagingBufferVec;
+
     class _OgreExport VaoManager
     {
     protected:
+        Timer *mTimer;
+
+    public:
+        /// In millseconds. Note: Changing this value won't affect existing staging buffers.
+        uint32 mDefaultStagingBufferLifetime;
+
+    protected:
+        /// [0] = for uploads, [1] = for downloads
+        StagingBufferVec mStagingBuffers[2];
+
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
                                                             BufferType bufferType,
                                                             void *initialData, bool keepAsShadow,
-                                                            const VertexElement2Vec &vertexElements );
+                                                            const VertexElement2Vec &vertexElements )
+                                                            = 0;
 
         virtual IndexBufferPacked* createIndexBufferImpl( size_t numElements,
                                                           uint32 bytesPerElement,
                                                           BufferType bufferType,
-                                                          void *initialData, bool keepAsShadow );
+                                                          void *initialData, bool keepAsShadow ) = 0;
 
     public:
+        VaoManager();
+        virtual ~VaoManager();
+
         /** Creates a vertex buffer based on the given parameters. Behind the scenes, the vertex buffer
             is part of much larger vertex buffer, in order to reduce bindings at runtime.
         @param vertexElements
@@ -88,6 +104,35 @@ namespace Ogre
         IndexBufferPacked* createIndexBuffer( IndexBufferPacked::IndexType indexType,
                                               size_t numIndices, BufferType bufferType,
                                               void *initialData, bool keepAsShadow );
+
+        /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
+        @remarks
+            The returned buffer starts with a reference count of 1. You should decrease
+            it when you're done using it.
+        */
+        virtual StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload ) = 0;
+
+        /** Retrieves a staging buffer for use. We'll search for existing ones that can
+            hold minSizeBytes. We first prioritize those that won't cause a full stall.
+            If we can't find any, we'll return a buffer that can hold the request but
+            will full-stall.
+            If we can't find any buffer that can hold the requested bytes, we create a
+            new one.
+        @remarks
+            The reference count is increase before returning the staging buffer.
+            You should decrease the reference count after you're done with the returned
+            pointer. @See StagingBuffer::removeReferenceCount regarding ref. counting.
+        @param sizeBytes
+            Minimum size, in bytes, of the staging buffer.
+            The returned buffer may be bigger.
+        @param forUpload
+            True if it should be used to upload data to GPU, false to download.
+        @return
+            The staging buffer.
+        */
+        StagingBuffer* getStagingBuffer( size_t minSizeBytes, bool forUpload );
+
+        Timer* getTimer(void)               { return mTimer; }
     };
 }
 

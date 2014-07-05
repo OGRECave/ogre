@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "Vao/OgreGL3PlusBufferInterface.h"
 #include "Vao/OgreGL3PlusVaoManager.h"
+#include "Vao/OgreGL3PlusStagingBuffer.h"
 
 namespace Ogre
 {
@@ -40,47 +41,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     GL3PlusBufferInterface::~GL3PlusBufferInterface()
     {
-    }
-    //-----------------------------------------------------------------------------------
-    void GL3PlusBufferInterface::upload( void *data, size_t elementStart, size_t elementCount )
-    {
-        if( mBuffer->mBufferType == BT_DYNAMIC )
-        {
-            void *dstData = this->map( elementStart, elementCount, MS_MAPPED );
-            memcpy( dstData, data, elementCount * mBuffer->mBytesPerElement );
-            this->unmap( UO_UNMAP_ALL );
-        }
-        else
-        {
-            size_t bytesPerElement = mBuffer->mBytesPerElement;
-
-            //Get a staging buffer (will bind to GL_COPY_READ_BUFFER)
-            GL3PlusVaoManager *vaoManager = static_cast<GL3PlusVaoManager*>(mBuffer->mVaoManager);
-            vaoManager->getStagingBuffer( elementCount * bytesPerElement, true );
-            OCGLE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
-
-            //Map and memcpy the data (CPU -> GPU)
-            void *dstData = 0;
-            OCGLE(
-                dstData = glMapBufferRange( GL_COPY_READ_BUFFER,
-                                            0,
-                                            elementCount * bytesPerElement,
-                                            GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT |
-                                            GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT ) );
-
-            memcpy( dstData, data, elementCount * bytesPerElement );
-
-            OCGLE( glFlushMappedBufferRange( GL_COPY_READ_BUFFER,
-                                             0,
-                                             elementCount * bytesPerElement ) );
-            OCGLE( glUnmapBuffer( GL_COPY_READ_BUFFER ) );
-
-            //Copy data from Staging to real buffer (GPU -> GPU)
-            OCGLE( glCopyBufferSubData( GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
-                                        0,
-                                        elementStart * bytesPerElement,
-                                        elementCount * bytesPerElement ) );
-        }
     }
     //-----------------------------------------------------------------------------------
     void* GL3PlusBufferInterface::map( size_t elementStart, size_t elementCount,

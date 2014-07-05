@@ -327,6 +327,7 @@ namespace Ogre
     typedef ScriptingAllocatedObject    ScriptCompilerAlloc;
     typedef ScriptingAllocatedObject    ScriptTranslatorAlloc;
     typedef SceneCtlAllocatedObject     ShadowDataAlloc;
+    typedef GeometryAllocatedObject     StagingBufferAlloc;
     typedef GeneralAllocatedObject      StreamAlloc;
     typedef SceneObjAllocatedObject     SubEntityAlloc;
     typedef ResourceAllocatedObject     SubMeshAlloc;
