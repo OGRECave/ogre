@@ -60,8 +60,13 @@ namespace Ogre
                                                             uint32 bytesPerElement,
                                                             BufferType bufferType,
                                                             void *initialData, bool keepAsShadow,
-                                                            const VertexElement2Vec &vertexElements,
-                                                            bool multiSource ) = 0;
+                                                            const VertexElement2Vec &vertexElements )
+                                                            = 0;
+
+        virtual MultiSourceVertexBufferPool* createMultiSourceVertexBufferPoolImpl(
+                                                    const VertexElement2VecVec &vertexElementsBySource,
+                                                    size_t maxNumVertices, size_t totalBytesPerVertex,
+                                                    BufferType bufferType ) = 0;
 
         virtual IndexBufferPacked* createIndexBufferImpl( size_t numElements,
                                                           uint32 bytesPerElement,
@@ -75,14 +80,14 @@ namespace Ogre
         VaoManager();
         virtual ~VaoManager();
 
+        /// Returns the size of a single vertex buffer source with the given declaration, in bytes
+        static uint32 calculateVertexSize( const VertexElement2Vec &vertexElements );
+
         /** Creates a vertex buffer based on the given parameters. Behind the scenes, the vertex buffer
             is part of much larger vertex buffer, in order to reduce bindings at runtime.
         @param vertexElements
             A list of element bindings for this vertex buffer. Once created, changing VertexElements
             is not possible, you'll have to create another Vertex Buffer.
-        @param multiSource
-            Whether this VertexBuffer will be bound to anything other than buffer source 0 (i.e.
-            rendering with multiple vertex buffers). @See VertexBufferPacked::mMultiSource.
         @param numVertices
             The number of vertices for this vertex
         @param bufferType
@@ -98,9 +103,12 @@ namespace Ogre
             The desired vertex buffer pointer
         */
         VertexBufferPacked* createVertexBuffer( const VertexElement2Vec &vertexElements,
-                                                bool multiSource, size_t numVertices,
-                                                BufferType bufferType, void *initialData,
-                                                bool keepAsShadow );
+                                                size_t numVertices, BufferType bufferType,
+                                                void *initialData, bool keepAsShadow );
+
+        MultiSourceVertexBufferPool* createMultiSourceVertexBufferPool(
+                                const VertexElement2VecVec &vertexElementsBySource,
+                                size_t maxNumVertices, BufferType bufferType );
 
         /** Creates an index buffer based on the given parameters. Behind the scenes, the buffer
             is actually part of much larger buffer, in order to reduce bindings at runtime.
@@ -162,6 +170,8 @@ namespace Ogre
 
 
         Timer* getTimer(void)               { return mTimer; }
+
+        uint8 getDynamicBufferMultiplier(void) const        { return mDynamicBufferMultiplier; }
     };
 }
 

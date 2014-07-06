@@ -61,27 +61,37 @@ namespace Ogre
         /// Multisource VertexArrayObjects is when VertexArrayObject::mVertexBuffers.size() is greater
         /// than 1 (i.e. have position in one vertex buffer, UVs in another.)
         /// A VertexBuffer created for multisource can be used/bound for rendering with just one buffer
-        /// source (i.e. just bind the position buffer during the shadow map pass).
-        /// But a VertexBuffer not created for multisource cannot be bound with together with other
-        /// buffers.
+        /// source (i.e. just bind the position buffer during the shadow map pass) or bound together
+        /// with buffers that have the same mMultiSourceId and mMultiSourcePool.
+        /// But a VertexBuffer not created for multisource cannot be bound together with other buffers.
         ///
         /// Before you're tempted into creating all your Vertex Buffers as multisource indiscriminately,
         /// the main issue is that multisource vertex buffers can heavily fragment GPU memory managed
         /// by the VaoManager (unless you know in advance the full number of vertices you need per
         /// vertex declaration and reserve this size) or waste a lot of GPU RAM, and/or increase
         /// the draw call count.
-        bool mMultiSource;
+        size_t                      mMultiSourceId;
+        MultiSourceVertexBufferPool *mMultiSourcePool;
 
     public:
         VertexBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
                             BufferType bufferType, void *initialData, bool keepAsShadow,
                             VaoManager *vaoManager, BufferInterface *bufferInterface,
-                            const VertexElement2Vec &vertexElements, bool multiSource );
+                            const VertexElement2Vec &vertexElements, size_t multiSourceId,
+                            MultiSourceVertexBufferPool *multiSourcePool );
         ~VertexBufferPacked();
 
-        bool isMultiSource(void) const                          { return mMultiSource; }
-
         const VertexElement2Vec& getVertexElements(void) const  { return mVertexElements; }
+
+        size_t getMultiSourceId(void)                           { return mMultiSourceId; }
+
+        /// Return value may be null
+        MultiSourceVertexBufferPool* getMultiSourcePool(void)   { return mMultiSourcePool; }
+
+        //TODO
+        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
+        //TODO
+        virtual void disposeTicket( AsyncTicket *ticket ) {}
     };
 
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;

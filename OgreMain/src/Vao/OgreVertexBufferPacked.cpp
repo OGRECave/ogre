@@ -30,15 +30,18 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    VertexBufferPacked::VertexBufferPacked(size_t internalBufferStart, size_t numElements,
+    VertexBufferPacked::VertexBufferPacked( size_t internalBufferStart, size_t numElements,
                                             uint32 bytesPerElement, BufferType bufferType,
                                             void *initialData, bool keepAsShadow,
                                             VaoManager *vaoManager, BufferInterface *bufferInterface,
-                                            const VertexElement2Vec &vertexElements, bool multiSource ) :
+                                            const VertexElement2Vec &vertexElements,
+                                            size_t multiSourceId,
+                                            MultiSourceVertexBufferPool *multiSourcePool ) :
         BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
                       initialData, keepAsShadow, vaoManager, bufferInterface ),
         mVertexElements( vertexElements ),
-        mMultiSource( multiSource )
+        mMultiSourceId( multiSourceId ),
+        mMultiSourcePool( multiSourcePool )
     {
     }
     //-----------------------------------------------------------------------------------

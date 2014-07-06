@@ -75,7 +75,7 @@ namespace Ogre
         UO_KEEP_PERSISTENT
     };
 
-    class _OgreExport BufferPacked
+    class _OgreExport BufferPacked : public BufferPackedAlloc
     {
         friend class BufferInterface;
         friend class GL3PlusBufferInterface;

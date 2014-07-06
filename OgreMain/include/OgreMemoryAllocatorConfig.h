@@ -296,6 +296,7 @@ namespace Ogre
     typedef GeneralAllocatedObject      ArchiveAlloc;
     typedef GeometryAllocatedObject     BatchedGeometryAlloc;
     typedef RenderSysAllocatedObject    BufferAlloc;
+    typedef GeometryAllocatedObject     BufferPackedAlloc;
     typedef GeneralAllocatedObject      CodecAlloc;
     typedef ResourceAllocatedObject     CompositorInstAlloc;
     typedef GeneralAllocatedObject      ConfigAlloc;

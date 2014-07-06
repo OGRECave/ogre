@@ -247,6 +247,7 @@ namespace Ogre {
     class MeshManager;
     class MovableObject;
     class MovablePlane;
+    class MultiSourceVertexBufferPool;
 	class Node;
     class NodeMemoryManager;
     class NumericAnimationTrack;

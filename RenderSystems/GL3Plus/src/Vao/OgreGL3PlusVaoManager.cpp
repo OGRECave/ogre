@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusStagingBuffer.h"
 #include "Vao/OgreGL3PlusVertexArrayObject.h"
 #include "Vao/OgreGL3PlusBufferInterface.h"
+#include "Vao/OgreGL3PlusMultiSourceVertexBufferPool.h"
 
 #include "OgreGL3PlusHardwareBufferManager.h" //GL3PlusHardwareBufferManager::getGLType
 
@@ -193,6 +194,9 @@ namespace Ogre
             bestVbo.strideChangers.insert( itStride, StrideChanger( newOffset, padding ) );
         }
 
+        if( bestBlock.size == 0 )
+            mVbos[vboFlag].erase( mVbos[vboFlag].begin() + bestVboIdx );
+
         outVboIdx       = bestVboIdx;
         outBufferOffset = newOffset;
     }
@@ -211,6 +215,8 @@ namespace Ogre
         {
             bufferOffset    -= itStride->paddedBytes;
             sizeBytes       += itStride->paddedBytes;
+
+            vbo.strideChangers.erase( itStride );
         }
 
         //See if we're contiguous to a free block and make that block grow.
@@ -232,21 +238,24 @@ namespace Ogre
                 size_t idx = itor - blocks.begin();
                 efficientVectorRemove( blocks, blockToMerge );
 
-                mergeContiguousBlocks( blocks.begin() + idx, blocks );
-                return;
+                blockToMerge = blocks.begin() + idx;
+                itor = blocks.begin();
+                end  = blocks.end();
             }
-
-            if( blockToMerge->offset + blockToMerge->size == itor->offset )
+            else if( blockToMerge->offset + blockToMerge->size == itor->offset )
             {
                 blockToMerge->size += itor->size;
                 size_t idx = blockToMerge - blocks.begin();
                 efficientVectorRemove( blocks, itor );
 
-                mergeContiguousBlocks( blocks.begin() + idx, blocks );
-                return;
+                blockToMerge = blocks.begin() + idx;
+                itor = blocks.begin();
+                end  = blocks.end();
             }
-
-            ++itor;
+            else
+            {
+                ++itor;
+            }
         }
     }
     //-----------------------------------------------------------------------------------
@@ -254,8 +263,7 @@ namespace Ogre
                                                                    uint32 bytesPerElement,
                                                                    BufferType bufferType,
                                                                    void *initialData, bool keepAsShadow,
-                                                                   const VertexElement2Vec &vElements,
-                                                                   bool multiSource )
+                                                                   const VertexElement2Vec &vElements )
     {
         size_t vboIdx;
         size_t bufferOffset;
@@ -263,6 +271,29 @@ namespace Ogre
         allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, vboIdx, bufferOffset );
 
         return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    MultiSourceVertexBufferPool* GL3PlusVaoManager::createMultiSourceVertexBufferPoolImpl(
+                                                const VertexElement2VecVec &vertexElementsBySource,
+                                                size_t maxNumVertices, size_t totalBytesPerVertex,
+                                                BufferType bufferType )
+    {
+        size_t vboIdx;
+        size_t bufferOffset;
+
+        allocateVbo( maxNumVertices * totalBytesPerVertex, totalBytesPerVertex,
+                     bufferType, vboIdx, bufferOffset );
+
+        VboFlag vboFlag = CPU_INACCESSIBLE;
+
+        if( bufferType == BT_DYNAMIC )
+            vboFlag = CPU_ACCESSIBLE;
+
+        const Vbo &vbo = mVbos[vboFlag][vboIdx];
+
+        return OGRE_NEW GL3PlusMultiSourceVertexBufferPool( vboIdx, vbo.vboName, vertexElementsBySource,
+                                                            maxNumVertices, bufferType,
+                                                            bufferOffset, this );
     }
     //-----------------------------------------------------------------------------------
     GLuint GL3PlusVaoManager::createVao( const Vao &vaoRef )

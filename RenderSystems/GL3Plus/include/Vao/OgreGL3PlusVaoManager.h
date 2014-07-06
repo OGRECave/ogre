@@ -44,6 +44,7 @@ namespace Ogre
             MAX_VBO_FLAG
         };
 
+    public:
         struct Block
         {
             size_t offset;
@@ -73,6 +74,7 @@ namespace Ogre
         typedef vector<Block>::type BlockVec;
         typedef vector<StrideChanger>::type StrideChangerVec;
 
+    protected:
         struct Vbo
         {
             GLuint vboName;
@@ -163,11 +165,12 @@ namespace Ogre
         void deallocateVbo( size_t vboIdx, size_t bufferOffset, size_t sizeBytes,
                             BufferType bufferType );
 
+    public:
         /** Starts with "blockToMerge" and recursively merges all blocks which
             end up being affected by "blockToMerge".
         @remarks
-            Example: if "blocks" contains A, C, E, and blockToMerge is B,
-            then A will be merged with B, and a recursive call will merge AB with C
+            Example: if "blocks" contains C, A, E, B and blockToMerge is B,
+            then A will be merged with B, then AB will be merged with C
             So now "blocks" contains ABC and E.
         @param blockToMerge
             Iterator to a block to merge. Must belong to "blocks". Iterator may
@@ -175,15 +178,20 @@ namespace Ogre
         @param blocks
             Vector of blocks where blockToMerge belongs to.
         */
-        void mergeContiguousBlocks( BlockVec::iterator blockToMerge,
-                                    BlockVec &blocks );
+        static void mergeContiguousBlocks( BlockVec::iterator blockToMerge,
+                                           BlockVec &blocks );
 
+    protected:
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
                                                             BufferType bufferType,
                                                             void *initialData, bool keepAsShadow,
-                                                            const VertexElement2Vec &vertexElements,
-                                                            bool multiSource );
+                                                            const VertexElement2Vec &vertexElements );
+
+        virtual MultiSourceVertexBufferPool* createMultiSourceVertexBufferPoolImpl(
+                                            const VertexElement2VecVec &vertexElementsBySource,
+                                            size_t maxNumVertices, size_t totalBytesPerVertex,
+                                            BufferType bufferType );
 
         virtual IndexBufferPacked* createIndexBufferImpl( size_t numElements,
                                                           uint32 bytesPerElement,
