@@ -72,13 +72,14 @@ namespace Ogre
         /// the draw call count.
         size_t                      mMultiSourceId;
         MultiSourceVertexBufferPool *mMultiSourcePool;
+        uint8                       mSourceIdx;
 
     public:
         VertexBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
                             BufferType bufferType, void *initialData, bool keepAsShadow,
                             VaoManager *vaoManager, BufferInterface *bufferInterface,
                             const VertexElement2Vec &vertexElements, size_t multiSourceId,
-                            MultiSourceVertexBufferPool *multiSourcePool );
+                            MultiSourceVertexBufferPool *multiSourcePool, uint8 sourceIdx );
         ~VertexBufferPacked();
 
         const VertexElement2Vec& getVertexElements(void) const  { return mVertexElements; }
@@ -87,6 +88,13 @@ namespace Ogre
 
         /// Return value may be null
         MultiSourceVertexBufferPool* getMultiSourcePool(void)   { return mMultiSourcePool; }
+
+        /// Source index reference assigned by the MultiSourceVertexBufferPool.
+        /// This value does not restrict the fact that you can actually assign this buffer to
+        /// another index (as long as it's with another buffer with the same multisource ID
+        /// and pool). This value is for internal use.
+        /// Always 0 for non-multisource vertex buffers.
+        uint8 _getSourceIndex(void) const                       { return mSourceIdx; }
 
         //TODO
         virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }

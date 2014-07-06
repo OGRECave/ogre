@@ -42,6 +42,8 @@ namespace Ogre
         BufferPacked *mBuffer;
 
     public:
+        virtual ~BufferInterface() {}
+
         void upload( void *data, size_t elementStart, size_t elementCount );
 
         virtual void* map( size_t elementStart, size_t elementCount, MappingState prevMappingState ) = 0;

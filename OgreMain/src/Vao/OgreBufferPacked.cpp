@@ -74,6 +74,9 @@ namespace Ogre
             OGRE_FREE_SIMD( mShadowCopy, MEMCATEGORY_GEOMETRY );
             mShadowCopy = 0;
         }
+
+        delete mBufferInterface;
+        mBufferInterface = 0;
     }
     //-----------------------------------------------------------------------------------
     void BufferPacked::upload( void *data, size_t elementStart, size_t elementCount )

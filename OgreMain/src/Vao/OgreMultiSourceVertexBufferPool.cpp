@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "Vao/OgreMultiSourceVertexBufferPool.h"
 #include "Vao/OgreVaoManager.h"
 
+#include "OgreStringConverter.h"
+
 namespace Ogre
 {
     MultiSourceVertexBufferPool::MultiSourceVertexBufferPool(
@@ -66,24 +68,51 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    /*VertexBufferPacked* MultiSourceVertexBufferPool::createVertexBuffer(
-                                                    VertexBufferPackedVec &outVertexBuffers,
-                                                    size_t numVertices,
-                                                    void **initialData, bool keepAsShadow )
+    void MultiSourceVertexBufferPool::destroyVertexBuffers( VertexBufferPackedVec &inOutVertexBuffers )
     {
-        VertexElement2Vec::const_iterator itor = vertexElements.begin();
-        VertexElement2Vec::const_iterator end  = vertexElements.end();
+        //First check that all of the buffers have been handed to us
+        if( inOutVertexBuffers.size() != mVertexElementsBySource.size() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "We were expecting a list of " +
+                         StringConverter::toString( mVertexElementsBySource.size() ) +
+                         " buffers, user provided " + StringConverter::toString( inOutVertexBuffers.size() ),
+                         "MultiSourceVertexBufferPool::destroyVertexBuffers" );
+        }
 
-        uint32 bytesPerVertex = 0;
+        size_t multiSourceId = inOutVertexBuffers[0]->getMultiSourceId();
+
+        VertexBufferPackedVec::const_iterator itor = inOutVertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator end  = inOutVertexBuffers.end();
 
         while( itor != end )
         {
-            bytesPerVertex += VertexElement::getTypeSize( itor->mType );
+            if( (*itor)->getMultiSourcePool() != this )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Vertex buffer doesn't belong to this pool!",
+                             "MultiSourceVertexBufferPool::destroyVertexBuffers" );
+            }
+
+            if( multiSourceId != (*itor)->getMultiSourceId() )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "You must provide all the vertex buffers that "
+                             "were returned by createVertexBuffers!",
+                             "MultiSourceVertexBufferPool::destroyVertexBuffers" );
+            }
+
             ++itor;
         }
 
-        return createVertexBufferImpl( numVertices, bytesPerVertex, bufferType,
-                                       initialData, keepAsShadow, vertexElements, multiSource );
-    }*/
+        destroyVertexBuffersImpl( inOutVertexBuffers );
+
+        itor = inOutVertexBuffers.begin();
+
+        while( itor != end )
+            delete *itor++;
+
+        inOutVertexBuffers.clear();
+    }
 }
 

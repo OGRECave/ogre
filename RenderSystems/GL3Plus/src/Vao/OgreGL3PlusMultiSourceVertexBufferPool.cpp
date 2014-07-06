@@ -98,7 +98,7 @@ namespace Ogre
 
         if( vertexOffset == mMaxVertices )
         {
-            for( size_t i=0; i<mBytesPerVertexPerSource.size(); ++i )
+            for( size_t i=0; i<mVertexElementsBySource.size(); ++i )
             {
                 GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface(
                                                                             GL_ARRAY_BUFFER, mVboName );
@@ -111,9 +111,22 @@ namespace Ogre
                                                  numVertices, mBytesPerVertexPerSource[i], mBufferType,
                                                  _initialData, keepAsShadow, mVaoManager,
                                                  bufferInterface, mVertexElementsBySource[i],
-                                                 vertexOffset, this ) );
+                                                 vertexOffset, this, i ) );
             }
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusMultiSourceVertexBufferPool::destroyVertexBuffersImpl(
+                                                    VertexBufferPackedVec &inOutVertexBuffers )
+    {
+        //Any of the vertex buffers will do (base class already checked they're all from the same group).
+        VertexBufferPacked *vertexBuffer = inOutVertexBuffers[0];
+        uint32 numVertices = vertexBuffer->getNumElements();
+        if( mBufferType == BT_DYNAMIC )
+            numVertices *= mVaoManager->getDynamicBufferMultiplier();
+
+        deallocateVbo( vertexBuffer->_getInternalBufferStart() - mInternalBufferStart -
+                       mSourceOffset[vertexBuffer->_getSourceIndex()], numVertices );
     }
 }
 

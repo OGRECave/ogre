@@ -36,12 +36,14 @@ namespace Ogre
                                             VaoManager *vaoManager, BufferInterface *bufferInterface,
                                             const VertexElement2Vec &vertexElements,
                                             size_t multiSourceId,
-                                            MultiSourceVertexBufferPool *multiSourcePool ) :
+                                            MultiSourceVertexBufferPool *multiSourcePool,
+                                            uint8 sourceIdx ) :
         BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
                       initialData, keepAsShadow, vaoManager, bufferInterface ),
         mVertexElements( vertexElements ),
         mMultiSourceId( multiSourceId ),
-        mMultiSourcePool( multiSourcePool )
+        mMultiSourcePool( multiSourcePool ),
+        mSourceIdx( sourceIdx )
     {
     }
     //-----------------------------------------------------------------------------------

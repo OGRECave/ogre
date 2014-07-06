@@ -160,6 +160,8 @@ namespace Ogre
         uint32 getNumElements(void) const       { return mNumElements; }
         uint32 getBytesPerElement(void) const   { return mBytesPerElement; }
         uint32 getTotalSizeBytes(void) const    { return mNumElements * mBytesPerElement; }
+
+        size_t _getInternalBufferStart(void) const                  { return mInternalBufferStart; }
     };
 }
 

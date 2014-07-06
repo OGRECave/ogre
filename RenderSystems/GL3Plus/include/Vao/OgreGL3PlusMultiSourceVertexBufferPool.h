@@ -58,6 +58,8 @@ namespace Ogre
         /// Deallocates a buffer allocated with @allocateVbo. All params are in vertices, not bytes.
         void deallocateVbo( size_t bufferOffset, size_t numVertices );
 
+        virtual void destroyVertexBuffersImpl( VertexBufferPackedVec &inOutVertexBuffers );
+
     public:
         GL3PlusMultiSourceVertexBufferPool( size_t vboPoolIndex, GLuint vboName,
                                             const VertexElement2VecVec &vertexElementsBySource,

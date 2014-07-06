@@ -70,6 +70,8 @@ namespace Ogre
         vector<size_t>::type    mSourceOffset;          /// Where each source starts, in vertices
         VaoManager              *mVaoManager;
 
+        virtual void destroyVertexBuffersImpl( VertexBufferPackedVec &inOutVertexBuffers ) = 0;
+
     public:
         MultiSourceVertexBufferPool( const VertexElement2VecVec &vertexElementsBySource,
                                      size_t maxVertices, BufferType bufferType,
@@ -108,8 +110,17 @@ namespace Ogre
         @return
             The desired vertex buffer pointer
         */
-        void createVertexBuffers( VertexBufferPackedVec &outVertexBuffers, size_t numVertices,
-                                  void **initialData, bool keepAsShadow );
+        virtual void createVertexBuffers( VertexBufferPackedVec &outVertexBuffers, size_t numVertices,
+                                          void **initialData, bool keepAsShadow ) = 0;
+
+        /** Destroys all the buffers returned from a call to createVertexBuffers.
+            All the returned buffers from that call must be supplied. Not one more, not one less.
+            They can be in any order, though.
+        @param inOutVertexBuffers [in] [out]
+            In: The list of buffers that was returned by createVertexBuffers. Can be sorted in any order
+            Out: Cleared list.
+        */
+        void destroyVertexBuffers( VertexBufferPackedVec &inOutVertexBuffers );
     };
 }
 
