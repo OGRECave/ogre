@@ -114,5 +114,10 @@ namespace Ogre
 
         inOutVertexBuffers.clear();
     }
+    //-----------------------------------------------------------------------------------
+    size_t MultiSourceVertexBufferPool::getBytesOffsetToSource( uint8 sourceIdx ) const
+    {
+        return mSourceOffset[sourceIdx] * mBytesPerVertexPerSource[sourceIdx];
+    }
 }
 

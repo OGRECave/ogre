@@ -93,6 +93,7 @@ namespace Ogre
                 GLuint              vertexBufferVbo;
                 VertexElement2Vec   vertexElements;
                 GLsizei             stride;
+                size_t              offset;
 
                 //OpenGL supports this parameter per attribute, but
                 //we're a bit more conservative and do it per buffer
@@ -103,6 +104,7 @@ namespace Ogre
                     return vertexBufferVbo == _r.vertexBufferVbo &&
                             vertexElements == _r.vertexElements &&
                             stride == _r.stride &&
+                            offset == _r.offset &&
                             instancingDivisor == _r.instancingDivisor;
                 }
             };
@@ -187,6 +189,8 @@ namespace Ogre
                                                             BufferType bufferType,
                                                             void *initialData, bool keepAsShadow,
                                                             const VertexElement2Vec &vertexElements );
+
+        virtual void destroyVertexBufferImpl( VertexBufferPacked *vertexBuffer );
 
         virtual MultiSourceVertexBufferPool* createMultiSourceVertexBufferPoolImpl(
                                             const VertexElement2VecVec &vertexElementsBySource,

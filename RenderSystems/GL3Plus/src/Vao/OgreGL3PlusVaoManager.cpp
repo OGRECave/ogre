@@ -206,6 +206,9 @@ namespace Ogre
     {
         VboFlag vboFlag = bufferType == BT_DYNAMIC ? CPU_ACCESSIBLE: CPU_INACCESSIBLE;
 
+        if( bufferType == BT_DYNAMIC )
+            sizeBytes *= mDynamicBufferMultiplier;
+
         Vbo &vbo = mVbos[vboFlag][vboIdx];
         StrideChangerVec::iterator itStride = std::lower_bound( vbo.strideChangers.begin(),
                                                                 vbo.strideChangers.end(),
@@ -270,7 +273,29 @@ namespace Ogre
 
         allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, vboIdx, bufferOffset );
 
-        return 0;
+        VboFlag vboFlag = CPU_INACCESSIBLE;
+
+        if( bufferType == BT_DYNAMIC )
+            vboFlag = CPU_ACCESSIBLE;
+
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
+                                                                    GL_ARRAY_BUFFER,
+                                                                    mVbos[vboFlag][vboIdx].vboName );
+
+        return  OGRE_NEW VertexBufferPacked( bufferOffset, numElements, bytesPerElement,
+                                             bufferType, initialData, keepAsShadow,
+                                             this, bufferInterface, vElements, 0, 0, 0 );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::destroyVertexBufferImpl( VertexBufferPacked *vertexBuffer )
+    {
+        GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                                                        vertexBuffer->getBufferInterface() );
+
+
+        deallocateVbo( bufferInterface->getVboPoolIndex(), vertexBuffer->_getInternalBufferStart(),
+                       vertexBuffer->getNumElements() * vertexBuffer->getBytesPerElement(),
+                       vertexBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
     MultiSourceVertexBufferPool* GL3PlusVaoManager::createMultiSourceVertexBufferPoolImpl(
@@ -378,9 +403,20 @@ namespace Ogre
             while( itor != end )
             {
                 Vao::VertexBinding vertexBinding;
-                vertexBinding.vertexBufferVbo = static_cast<GL3PlusBufferInterface*>(
-                                                    (*itor)->getBufferInterface() )->getVboName();
-                vertexBinding.vertexElements = (*itor)->getVertexElements();
+                vertexBinding.vertexBufferVbo   = static_cast<GL3PlusBufferInterface*>(
+                                                        (*itor)->getBufferInterface() )->getVboName();
+                vertexBinding.vertexElements    = (*itor)->getVertexElements();
+                vertexBinding.stride            = calculateVertexSize( vertexBinding.vertexElements );
+                vertexBinding.offset            = 0;
+                vertexBinding.instancingDivisor = 0;
+
+                const MultiSourceVertexBufferPool *multiSourcePool = (*itor)->getMultiSourcePool();
+                if( multiSourcePool )
+                {
+                    vertexBinding.offset = multiSourcePool->getBytesOffsetToSource(
+                                                            (*itor)->_getSourceIndex() );
+                }
+
                 ++itor;
             }
         }

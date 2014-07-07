@@ -32,7 +32,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    GL3PlusBufferInterface::GL3PlusBufferInterface( GLenum target, GLuint vboName ) :
+    GL3PlusBufferInterface::GL3PlusBufferInterface( size_t vboPoolIdx, GLenum target, GLuint vboName ) :
+        mVboPoolIdx( vboPoolIdx ),
         mTarget( target ),
         mVboName( vboName ),
         mMappedPtr( 0 )

@@ -121,6 +121,8 @@ namespace Ogre
             Out: Cleared list.
         */
         void destroyVertexBuffers( VertexBufferPackedVec &inOutVertexBuffers );
+
+        size_t getBytesOffsetToSource( uint8 sourceIdx ) const;
     };
 }
 

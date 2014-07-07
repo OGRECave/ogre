@@ -41,6 +41,7 @@ namespace Ogre
     class GL3PlusBufferInterface : public BufferInterface
     {
     protected:
+        size_t  mVboPoolIdx;
         GLenum  mTarget;
         GLuint  mVboName;
         void    *mMappedPtr;
@@ -48,9 +49,10 @@ namespace Ogre
         BufferPacked *mBuffer;
 
     public:
-        GL3PlusBufferInterface( GLenum target, GLuint vboName );
+        GL3PlusBufferInterface( size_t vboPoolIdx, GLenum target, GLuint vboName );
         ~GL3PlusBufferInterface();
 
+        size_t getVboPoolIndex(void)                { return mVboPoolIdx; }
         GLenum getTarget(void)                      { return mTarget; }
         GLuint getVboName(void) const               { return mVboName; }
 

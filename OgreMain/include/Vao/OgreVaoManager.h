@@ -56,12 +56,16 @@ namespace Ogre
         uint8           mDynamicBufferCurrentFrame;
         unsigned long   mNextStagingBufferTimestampCheckpoint;
 
+        VertexBufferPackedVec   mVertexBuffers;
+
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
                                                             BufferType bufferType,
                                                             void *initialData, bool keepAsShadow,
                                                             const VertexElement2Vec &vertexElements )
                                                             = 0;
+
+        virtual void destroyVertexBufferImpl( VertexBufferPacked *vertexBuffer ) = 0;
 
         virtual MultiSourceVertexBufferPool* createMultiSourceVertexBufferPoolImpl(
                                                     const VertexElement2VecVec &vertexElementsBySource,
@@ -109,6 +113,14 @@ namespace Ogre
         MultiSourceVertexBufferPool* createMultiSourceVertexBufferPool(
                                 const VertexElement2VecVec &vertexElementsBySource,
                                 size_t maxNumVertices, BufferType bufferType );
+
+        /** Destroys the given vertex buffer created with createVertexBuffer.
+            NOTE: Vertex Buffers created by a MultiSourceVertexBufferPool
+            must be freed by the pool that created it, don't use this function for those.
+        @remarks
+            Performs an O(N) lookup. Where N is the number of created vertex buffers
+        */
+        void destroyVertexBuffer( VertexBufferPacked *vertexBuffer );
 
         /** Creates an index buffer based on the given parameters. Behind the scenes, the buffer
             is actually part of much larger buffer, in order to reduce bindings at runtime.

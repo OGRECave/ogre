@@ -83,8 +83,37 @@ namespace Ogre
     {
         uint32 bytesPerVertex = calculateVertexSize( vertexElements );
 
-        return createVertexBufferImpl( numVertices, bytesPerVertex, bufferType,
-                                       initialData, keepAsShadow, vertexElements );
+        VertexBufferPacked *retVal = createVertexBufferImpl( numVertices, bytesPerVertex, bufferType,
+                                                             initialData, keepAsShadow, vertexElements );
+
+        mVertexBuffers.push_back( retVal );
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::destroyVertexBuffer( VertexBufferPacked *vertexBuffer )
+    {
+        if( vertexBuffer->getMultiSourcePool() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Vertex Buffer belongs to a Multisource pool, not this VaoManager",
+                         "VaoManager::destroyVertexBuffer" );
+        }
+
+        VertexBufferPackedVec::iterator itor = std::find( mVertexBuffers.begin(),
+                                                          mVertexBuffers.end(), vertexBuffer );
+
+        if( itor == mVertexBuffers.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Vertex Buffer has already been destroyed or "
+                         "doesn't belong to this VaoManager.",
+                         "VaoManager::destroyVertexBuffer" );
+        }
+
+        destroyVertexBufferImpl( vertexBuffer );
+
+        OGRE_DELETE vertexBuffer;
+        efficientVectorRemove( mVertexBuffers, itor );
     }
     //-----------------------------------------------------------------------------------
     IndexBufferPacked* VaoManager::createIndexBuffer( IndexBufferPacked::IndexType indexType,
