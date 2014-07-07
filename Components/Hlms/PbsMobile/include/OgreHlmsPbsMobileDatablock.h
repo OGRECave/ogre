@@ -164,6 +164,8 @@ namespace Ogre
         */
         void setFresnel( const Vector3 &fresnel, bool separateFresnel );
 
+        bool hasSeparateFresnel(void) const         { return mFresnelTypeSizeBytes != 4; }
+
         /** Sets a new texture for rendering
         @param UvAtlasParams
             Type of the texture.
