@@ -364,12 +364,12 @@ namespace Ogre
                 case VET_FLOAT1:
                     OCGLE( glVertexAttribPointer( attributeIndex, typeCount,
                                                   GL3PlusHardwareBufferManager::getGLType( it->mType ),
-                                                  normalised, binding.stride, 0 ) );
+                                                  normalised, binding.stride, (void*)binding.offset ) );
                     break;
                 case VET_DOUBLE1:
                     OCGLE( glVertexAttribLPointer( attributeIndex, typeCount,
                                                    GL3PlusHardwareBufferManager::getGLType( it->mType ),
-                                                   binding.stride, 0 ) );
+                                                   binding.stride, (void*)binding.offset ) );
                     break;
                 }
 
