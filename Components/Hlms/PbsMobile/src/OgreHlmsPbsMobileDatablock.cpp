@@ -199,6 +199,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    Vector3 HlmsPbsMobileDatablock::getFresnel(void) const
+    {
+        return Vector3( mFresnelR, mFresnelG, mFresnelB );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setTexture( PbsMobileTextureTypes texType, TexturePtr &newTexture,
                                              const UvAtlasParams &atlasParams )
     {

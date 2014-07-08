@@ -164,6 +164,13 @@ namespace Ogre
         */
         void setFresnel( const Vector3 &fresnel, bool separateFresnel );
 
+        /// Returns the current fresnel. Note: when hasSeparateFresnel returns false,
+        /// the Y and Z components still correspond to mFresnelG & mFresnelB just
+        /// in case you want to preserve this data (i.e. toggling separate fresnel
+        /// often (which is not a good idea though, in terms of performance)
+        Vector3 getFresnel(void) const;
+
+        /// Whether the same fresnel term is used for RGB, or individual ones for each channel
         bool hasSeparateFresnel(void) const         { return mFresnelTypeSizeBytes != 4; }
 
         /** Sets a new texture for rendering
