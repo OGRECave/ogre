@@ -91,6 +91,7 @@ namespace Ogre
         static const IdString PropertySignedIntTex;
 
         static const IdString PropertyUvAtlas;
+        static const IdString PropertyFresnelScalar;
     };
 
     /** @} */

@@ -41,8 +41,8 @@ uniform lowp float roughness;
 */
 uniform lowp vec3 kD;
 uniform lowp vec3 kS;
-@property( hlms_fresnel_scalar )@piece( FresnelType )lowp vec3@end@end
-@property( !hlms_fresnel_scalar ) @piece( FresnelType )lowp float@end @end
+@property( fresnel_scalar )@piece( FresnelType )lowp vec3@end@end
+@property( !fresnel_scalar ) @piece( FresnelType )lowp float@end @end
 //Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 uniform @insertpiece( FresnelType ) F0;
 @property( uv_atlas )uniform mediump vec3 atlasOffsets[@value( uv_atlas )];@end

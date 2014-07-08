@@ -46,6 +46,7 @@ namespace Ogre
     const IdString HlmsPbsMobile::PropertySignedIntTex  = IdString( "signed_int_textures" );
 
     const IdString HlmsPbsMobile::PropertyUvAtlas       = IdString( "uv_atlas" );
+    const IdString HlmsPbsMobile::PropertyFresnelScalar = IdString( "fresnel_scalar" );
 
     const String c_vsPerObjectUniforms[] =
     {
@@ -139,6 +140,7 @@ namespace Ogre
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
                                                         renderable->getDatablock() );
         setProperty( PropertyUvAtlas, datablock->mNumUvAtlas );
+        setProperty( PropertyFresnelScalar, datablock->mFresnelTypeSizeBytes != 4 );
 
         String paramVal;
         if( !getProperty( PropertyNormalMap ) && findParamInVec( params, PropertyNormalMap, paramVal ) )
@@ -155,6 +157,7 @@ namespace Ogre
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
                                                         renderable->getDatablock() );
         setProperty( PropertyUvAtlas, datablock->mNumUvAtlasCaster );
+        setProperty( PropertyFresnelScalar, 0 );
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbsMobile::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
