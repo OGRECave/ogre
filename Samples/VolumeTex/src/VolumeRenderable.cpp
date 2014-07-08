@@ -38,7 +38,7 @@ VolumeRenderable::VolumeRenderable(IdType id, ObjectMemoryManager *objectMemoryM
     mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
     mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
 
-    mBox = AxisAlignedBox::AxisAlignedBox( aabb.getMinimum(), aabb.getMaximum() );
+    mBox = AxisAlignedBox( aabb.getMinimum(), aabb.getMaximum() );
     
     // No shadows
     setCastShadows(false);
