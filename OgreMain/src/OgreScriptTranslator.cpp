@@ -1226,7 +1226,6 @@ namespace Ogre{
         {
             if( i != obj->children.end() )
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, (*i)->file, (*i)->line);
-            throw e;
         }
     }
 
