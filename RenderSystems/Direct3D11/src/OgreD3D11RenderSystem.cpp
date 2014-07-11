@@ -53,15 +53,6 @@ THE SOFTWARE.
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(_WIN32_WINNT_WIN8)
-#define USE_DXERR_LIBRARY
-#endif
-
-#ifdef USE_DXERR_LIBRARY
-// DXGetErrorDescription
-#include "DXErr.h"
-#endif
-
 //#ifdef OGRE_PROFILING == 1 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 //#include "d3d9.h"
 //#endif
@@ -772,15 +763,8 @@ bail:
 
 			if(FAILED(hr))         
  			{
-				StringStream error;
-#ifdef USE_DXERR_LIBRARY
-				error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
-#else
-				error<<"Failed to create Direct3D11 object. D3D11CreateDeviceN returned this error code: "<<std::endl<<(hr)<<std::endl;
-#endif
-
-				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-					error.str(), 
+				OGRE_EXCEPT_EX( Exception::ERR_INTERNAL_ERROR, hr,
+					"Failed to create Direct3D11 object.", 
 					"D3D11RenderSystem::D3D11RenderSystem" );
 			}
 
@@ -1456,7 +1440,7 @@ bail:
 		if( FAILED(hr) || mDevice.isError())
 		{
 			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to create depth texture\nError Description:" + errorDescription,
 				"D3D11RenderSystem::_createDepthBufferFor");
 		}
@@ -1479,8 +1463,8 @@ bail:
 		SAFE_RELEASE( pDepthStencil );
 		if( FAILED(hr) )
 		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Unable to create depth stencil view\nError Description:" + errorDescription,
 				"D3D11RenderSystem::_createDepthBufferFor");
 		}
@@ -2287,8 +2271,8 @@ bail:
 			HRESULT hr = mDevice->CreateBlendState(&mBlendDesc, &opState->mBlendState) ;
 			if (FAILED(hr))
 			{
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Failed to create blend state\nError Description:" + errorDescription, 
 					"D3D11RenderSystem::_render" );
 			}
@@ -2302,8 +2286,8 @@ bail:
 			hr = mDevice->CreateRasterizerState(&mRasterizerDesc, &opState->mRasterizer) ;
 			if (FAILED(hr))
 			{
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Failed to create rasterizer state\nError Description:" + errorDescription, 
 					"D3D11RenderSystem::_render" );
 			}
@@ -2311,8 +2295,8 @@ bail:
 			hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, &opState->mDepthStencilState) ;
 			if (FAILED(hr))
 			{
-				String errorDescription = mDevice.getErrorDescription();
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Failed to create depth stencil state\nError Description:" + errorDescription, 
 					"D3D11RenderSystem::_render" );
 			}
@@ -2349,8 +2333,8 @@ bail:
 				HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState) ;
 				if (FAILED(hr))
 				{
-					String errorDescription = mDevice.getErrorDescription();
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 						"Failed to create sampler state\nError Description:" + errorDescription,
 						"D3D11RenderSystem::_render" );
 				}
@@ -3176,9 +3160,9 @@ bail:
 				hr = mDevice.GetClassLinkage()->CreateClassInstance(subroutineName.c_str(), 0, 0, 0, 0, &instance);
 				if (FAILED(hr) || instance == 0)
 				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-								"Shader subroutine with name " + subroutineName + " doesn't exist.",
-								"D3D11RenderSystem::setSubroutineName");
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+						"Shader subroutine with name " + subroutineName + " doesn't exist.",
+						"D3D11RenderSystem::setSubroutineName");
 				}
 			}
 
@@ -3610,7 +3594,7 @@ bail:
 		hr = CreateDXGIFactory1( __uuidof(IDXGIFactoryN), (void**)&mpDXGIFactory );
 		if( FAILED(hr) )
 		{
-			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+			OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr, 
 				"Failed to create Direct3D11 DXGIFactory1", 
 				"D3D11RenderSystem::D3D11RenderSystem" );
 		}
@@ -3689,13 +3673,7 @@ bail:
 
 		if(FAILED(hr))
 		{
-			StringStream error;
-#ifdef USE_DXERR_LIBRARY
-			error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
-#else
-			error<<"Failed to create Direct3D11 object."<<std::endl<<std::hex<<hr<<std::endl;
-#endif
-			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Failed to create Direct3D11 object", 
 				"D3D11RenderSystem::D3D11RenderSystem" );
 		}
@@ -3723,7 +3701,7 @@ bail:
 			return;
 		}
 
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found.", "RenderSystem::getCustomAttribute");
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found: " + name, "RenderSystem::getCustomAttribute");
     }
 	//---------------------------------------------------------------------
 	bool D3D11RenderSystem::_getDepthBufferCheckEnabled( void )

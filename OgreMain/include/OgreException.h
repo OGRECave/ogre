@@ -169,18 +169,6 @@ namespace Ogre {
     };
 
 
-	/** Template struct which creates a distinct type for each exception code.
-	@note
-	This is useful because it allows us to create an overloaded method
-	for returning different exception types by value without ambiguity. 
-	From 'Modern C++ Design' (Alexandrescu 2001).
-	*/
-	template <int num>
-	struct ExceptionCodeType
-	{
-		enum { number = num };
-	};
-
 	// Specialised exceptions allowing each to be caught specifically
 	// backwards-compatible since exception codes still used
 
@@ -240,14 +228,8 @@ namespace Ogre {
 	};
 
 
-	/** Class implementing dispatch methods in order to construct by-value
-		exceptions of a derived type based just on an exception code.
-	@remarks
-		This nicely handles construction of derived Exceptions by value (needed
-		for throwing) without suffering from ambiguity - each code is turned into
-		a distinct type so that methods can be overloaded. This allows OGRE_EXCEPT
-		to stay small in implementation (desirable since it is embedded) whilst
-		still performing rich code-to-type mapping. 
+	/** Class implementing dispatch method in order to construct by-value
+		exceptions of a derived type based on an exception code.
 	*/
 	class ExceptionFactory
 	{
@@ -255,84 +237,35 @@ namespace Ogre {
 		/// Private constructor, no construction
 		ExceptionFactory() {}
 	public:
-		static UnimplementedException create(
-			ExceptionCodeType<Exception::ERR_NOT_IMPLEMENTED> /*code*/, 
-			const String& desc, 
+		static OGRE_NORETURN void throwException(
+			Exception::ExceptionCodes code, int number,
+			const String& desc,
 			const String& src, const char* file, long line)
 		{
-			return UnimplementedException(Exception::ERR_NOT_IMPLEMENTED, desc, src, file, line);
+			switch (code)
+			{
+			case Exception::ERR_CANNOT_WRITE_TO_FILE:	throw IOException(number, desc, src, file, line);
+			case Exception::ERR_INVALID_STATE:			throw InvalidStateException(number, desc, src, file, line);
+			case Exception::ERR_INVALIDPARAMS:			throw InvalidParametersException(number, desc, src, file, line);
+			case Exception::ERR_RENDERINGAPI_ERROR:		throw RenderingAPIException(number, desc, src, file, line);
+			case Exception::ERR_DUPLICATE_ITEM:			throw ItemIdentityException(number, desc, src, file, line);
+			case Exception::ERR_ITEM_NOT_FOUND:			throw ItemIdentityException(number, desc, src, file, line);
+			case Exception::ERR_FILE_NOT_FOUND:			throw FileNotFoundException(number, desc, src, file, line);
+			case Exception::ERR_INTERNAL_ERROR:			throw InternalErrorException(number, desc, src, file, line);
+			case Exception::ERR_RT_ASSERTION_FAILED:	throw RuntimeAssertionException(number, desc, src, file, line);
+			case Exception::ERR_NOT_IMPLEMENTED:		throw UnimplementedException(number, desc, src, file, line);
+			default:									throw Exception(number, desc, src, "Exception", file, line);
+			}
 		}
-		static FileNotFoundException create(
-			ExceptionCodeType<Exception::ERR_FILE_NOT_FOUND> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return FileNotFoundException(Exception::ERR_FILE_NOT_FOUND, desc, src, file, line);
-		}
-		static IOException create(
-			ExceptionCodeType<Exception::ERR_CANNOT_WRITE_TO_FILE> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return IOException(Exception::ERR_CANNOT_WRITE_TO_FILE, desc, src, file, line);
-		}
-		static InvalidStateException create(
-			ExceptionCodeType<Exception::ERR_INVALID_STATE> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return InvalidStateException(Exception::ERR_INVALID_STATE, desc, src, file, line);
-		}
-		static InvalidParametersException create(
-			ExceptionCodeType<Exception::ERR_INVALIDPARAMS> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return InvalidParametersException(Exception::ERR_INVALIDPARAMS, desc, src, file, line);
-		}
-		static ItemIdentityException create(
-			ExceptionCodeType<Exception::ERR_ITEM_NOT_FOUND> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return ItemIdentityException(Exception::ERR_ITEM_NOT_FOUND, desc, src, file, line);
-		}
-		static ItemIdentityException create(
-			ExceptionCodeType<Exception::ERR_DUPLICATE_ITEM> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return ItemIdentityException(Exception::ERR_DUPLICATE_ITEM, desc, src, file, line);
-		}
-		static InternalErrorException create(
-			ExceptionCodeType<Exception::ERR_INTERNAL_ERROR> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return InternalErrorException(Exception::ERR_INTERNAL_ERROR, desc, src, file, line);
-		}
-		static RenderingAPIException create(
-			ExceptionCodeType<Exception::ERR_RENDERINGAPI_ERROR> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return RenderingAPIException(Exception::ERR_RENDERINGAPI_ERROR, desc, src, file, line);
-		}
-		static RuntimeAssertionException create(
-			ExceptionCodeType<Exception::ERR_RT_ASSERTION_FAILED> /*code*/, 
-			const String& desc, 
-			const String& src, const char* file, long line)
-		{
-			return RuntimeAssertionException(Exception::ERR_RT_ASSERTION_FAILED, desc, src, file, line);
-		}
-
 	};
 	
 
 	
 #ifndef OGRE_EXCEPT
-#define OGRE_EXCEPT(num, desc, src) throw Ogre::ExceptionFactory::create( \
-	Ogre::ExceptionCodeType<num>(), desc, src, __FILE__, __LINE__ );
+#define OGRE_EXCEPT(code, desc, src)         Ogre::ExceptionFactory::throwException(code, code, desc, src, __FILE__, __LINE__)
+#define OGRE_EXCEPT_EX(code, num, desc, src) Ogre::ExceptionFactory::throwException(code, num, desc, src, __FILE__, __LINE__)
+#else
+#define OGRE_EXCEPT_EX(code, num, desc, src) OGRE_EXCEPT(code, desc, src)
 #endif
 	/** @} */
 	/** @} */

@@ -217,10 +217,11 @@ namespace Ogre {
 
 			if (FAILED(hr)|| mlpD3DDevice.isError())
 			{
-				String errorDescription = mlpD3DDevice.getErrorDescription();
+				String errorDescription = mlpD3DDevice.getErrorDescription(hr);
                 errorDescription += "\nBound shader name: " + boundVertexProgram->getName();
 
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D11 vertex declaration"+errorDescription , 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+					"Unable to set D3D11 vertex declaration" + errorDescription,
 					"D3D11VertexDeclaration::getILayoutByShader");
 			}
 

@@ -39,21 +39,21 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
+    /** \addtogroup Core
+     *  @{
+     */
+    /** \addtogroup Resources
+     *  @{
+     */
     /** Information about a file/directory within the archive will be
     returned using a FileInfo struct.
     @see
     Archive
     */
     struct FileInfo {
-		/// The archive in which the file has been found (for info when performing
-		/// multi-Archive searches, note you should still open through ResourceGroupManager)
-		const Archive* archive;
+        /// The archive in which the file has been found (for info when performing
+        /// multi-Archive searches, note you should still open through ResourceGroupManager)
+        const Archive* archive;
         /// The file's fully qualified name
         String filename;
         /// Path name; separated by '/' and ending with '/'
@@ -92,8 +92,8 @@ namespace Ogre {
         String mName; 
         /// Archive type code
         String mType;
-		/// Read-only flag
-		bool mReadOnly;
+        /// Read-only flag
+        bool mReadOnly;
     public:
 
 
@@ -106,8 +106,8 @@ namespace Ogre {
         */
         virtual ~Archive() {}
 
-		/// Get the name of this archive
-		const String& getName(void) const { return mName; }
+        /// Get the name of this archive
+        const String& getName(void) const { return mName; }
 
         /// Returns whether this archive is case sensitive in the way it matches files
         virtual bool isCaseSensitive(void) const = 0;
@@ -128,10 +128,10 @@ namespace Ogre {
         */
         virtual void unload() = 0;
 
-		/** Reports whether this Archive is read-only, or whether the contents
-			can be updated. 
-		*/
-		virtual bool isReadOnly() const { return mReadOnly; }
+        /** Reports whether this Archive is read-only, or whether the contents
+            can be updated. 
+        */
+        virtual bool isReadOnly() const { return mReadOnly; }
 
         /** Open a stream on a given file. 
         @note
@@ -146,31 +146,19 @@ namespace Ogre {
         */
         virtual DataStreamPtr open(const String& filename, bool readOnly = true) const = 0;
 
-		/** Create a new file (or overwrite one already there). 
-		@note If the archive is read-only then this method will fail.
-		@param filename The fully qualified name of the file
-		@return A shared pointer to a DataStream which can be used to 
-		read / write the file. 
-		*/
-		virtual DataStreamPtr create(const String& filename) const
-		{
-                        (void)filename;
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-				"This archive does not support creation of files.", 
-				"Archive::create");
-		}
+        /** Create a new file (or overwrite one already there). 
+            @note If the archive is read-only then this method will fail.
+            @param filename The fully qualified name of the file
+            @return A shared pointer to a DataStream which can be used to 
+            read / write the file. 
+        */
+        virtual DataStreamPtr create(const String& filename) const;
 
-		/** Delete a named file.
-		@remarks Not possible on read-only archives
-		@param filename The fully qualified name of the file
-		*/
-		virtual void remove(const String& filename) const
-		{
-                        (void)filename;
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-				"This archive does not support removal of files.", 
-				"Archive::remove");
-		}
+        /** Delete a named file.
+            @remarks Not possible on read-only archives
+            @param filename The fully qualified name of the file
+        */
+        virtual void remove(const String& filename) const;
 
         /** List all file names in the archive.
         @note
@@ -212,8 +200,8 @@ namespace Ogre {
         /** Find out if the named file exists (note: fully qualified filename required) */
         virtual bool exists(const String& filename) = 0; 
 
-		/** Retrieve the modification time of a given file */
-		virtual time_t getModifiedTime(const String& filename) = 0; 
+        /** Retrieve the modification time of a given file */
+        virtual time_t getModifiedTime(const String& filename) = 0; 
 
 
         /** Find all files or directories matching a given pattern in this
@@ -233,8 +221,8 @@ namespace Ogre {
         const String& getType(void) const { return mType; }
         
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

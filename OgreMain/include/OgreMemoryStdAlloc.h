@@ -64,7 +64,7 @@ namespace Ogre
 #endif
             )
 		{
-			void* ptr = malloc(count);
+			void* ptr = new unsigned char[count];
 #if OGRE_MEMORY_TRACKER
 			// this alloc policy doesn't do pools
 			MemoryTracker::get()._recordAlloc(ptr, count, 0, file, line, func);
@@ -77,7 +77,7 @@ namespace Ogre
 #if OGRE_MEMORY_TRACKER
 			MemoryTracker::get()._recordDealloc(ptr);
 #endif
-			free(ptr);
+			delete[]((unsigned char*)ptr);
 		}
 
 		/// Get the maximum size of a single allocation

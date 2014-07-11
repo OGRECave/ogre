@@ -375,8 +375,9 @@ namespace Ogre
 		if (FAILED(hr) || mDevice.isError())
 		{
 			this->freeInternalResources();
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error creating texture\nError Description:" + errorDescription, 
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+				"Error creating texture\nError Description:" + errorDescription,
 				"D3D11Texture::_create1DTex" );
 		}
 
@@ -404,7 +405,7 @@ namespace Ogre
 		if (FAILED(hr) || mDevice.isError())
 		{
 			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
 				"D3D11Texture::_create1DTex");
 		}
@@ -509,7 +510,7 @@ namespace Ogre
 		{
 			this->freeInternalResources();
 			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Error creating texture\nError Description:" + errorDescription, 
 				"D3D11Texture::_create2DTex" );
 		}
@@ -576,7 +577,7 @@ namespace Ogre
 		if (FAILED(hr) || mDevice.isError())
 		{
 			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
 				"D3D11Texture::_create2DTex");
 		}
@@ -628,7 +629,7 @@ namespace Ogre
 		{
 			this->freeInternalResources();
 			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"Error creating texture\nError Description:" + errorDescription, 
 				"D3D11Texture::_create3DTex" );
 		}
@@ -655,7 +656,7 @@ namespace Ogre
 		if (FAILED(hr) || mDevice.isError())
 		{
 			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 				"D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
 				"D3D11Texture::_create3DTex");
 		}
@@ -1064,8 +1065,9 @@ namespace Ogre
 
 		if (FAILED(hr) || mDevice.isError())
 		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error creating Render Target View\nError Description:" + errorDescription, 
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+				"Error creating Render Target View\nError Description:" + errorDescription,
 				"D3D11RenderTexture::rebind" );
 		}
 	}

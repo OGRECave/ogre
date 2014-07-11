@@ -110,7 +110,7 @@ namespace Ogre {
 		if (FAILED(hr))
 		{
 		String msg = DXGetErrorDescription(hr);
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+		OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 		"Cannot create D3D11 Index buffer: " + msg, 
 		"D3D11HardwareIndexBuffer::D3D11HardwareIndexBuffer");
 		}

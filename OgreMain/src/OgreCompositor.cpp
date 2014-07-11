@@ -386,7 +386,8 @@ TexturePtr Compositor::getTextureInstance(const String& name, size_t mrtIndex)
 	}
 
 	OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Non-existent global texture name", 
-		"Compositor::getTextureInstance")
+		"Compositor::getTextureInstance");
+        
 }
 //---------------------------------------------------------------------
 RenderTarget* Compositor::getRenderTarget(const String& name)

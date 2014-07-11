@@ -468,7 +468,7 @@ namespace Ogre {
 	}
 
     //--------------------------------------------------------------------------
-    void Texture::getCustomAttribute(const String& /*name*/, void* /*pData*/)
+    void Texture::getCustomAttribute(const String&, void*)
     {
     } 
 
