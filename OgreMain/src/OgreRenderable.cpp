@@ -43,6 +43,7 @@ namespace Ogre
         mHlmsHash( 0 ),
         mHlmsCasterHash( 0 ),
         mHlmsDatablock( 0 ),
+        mRenderQueueSubGroup( 0 ),
         mHasSkeletonAnimation( false ),
         mCurrentMaterialLod( 0 ),
         mLodMaterial( &MovableObject::c_DefaultLodMesh ),

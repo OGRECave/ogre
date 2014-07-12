@@ -108,7 +108,7 @@ namespace Ogre
                                      bool casterPass )
     {
         uint8 rqId  = pMovableObject->getRenderQueueGroup();
-        uint8 subId = pMovableObject->getRenderQueueSubGroup();
+        uint8 subId = pRend->getRenderQueueSubGroup();
         RealAsUint depth = pMovableObject->getCachedDistanceToCamera();
 
         assert( !mRenderQueues[rqId].mSorted &&

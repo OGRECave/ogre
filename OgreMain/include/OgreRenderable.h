@@ -420,12 +420,30 @@ namespace Ogre {
 
         friend void LodStrategy::lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
 
+        /** Sets the render queue sub group.
+        @remarks
+            Within the same RenderQueue ID, you may want to have the renderables to have a
+            specific order (i.e. have a mesh, but the hair submesh with alpha blending
+            needs to be rendered last).
+        @par
+            RenderQueue Subgroups are useful for manually sorting objects, just like
+            RenderQueue IDs. However, RenderQueue IDs can also be useful for skipping
+            large number of objects through clever compositing and thus a performance
+            optimization. Subgroups cannot be used for such optimizations.
+        @param subGroup
+            The sub group. This value can't exceed OGRE_MAKE_MASK( SubRqIdBits )
+            @See RenderQueue
+        */
+        void setRenderQueueSubGroup( uint8 subGroup )   { mRenderQueueSubGroup = subGroup; }
+        uint8 getRenderQueueSubGroup(void) const        { return mRenderQueueSubGroup; }
+
     protected:
         typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
         uint32              mHlmsHash;
         uint32              mHlmsCasterHash;
         HlmsDatablock       *mHlmsDatablock;
+        uint8               mRenderQueueSubGroup;
         //TODO: (refactor) Change this bool for the skeleton pointer.
         bool                    mHasSkeletonAnimation;
         uint8                   mCurrentMaterialLod;

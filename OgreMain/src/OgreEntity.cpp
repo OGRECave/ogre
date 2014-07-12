@@ -358,13 +358,13 @@ namespace Ogre {
             ++itor;
         }
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void Entity::setDatablock( IdString datablockName )
     {
-		HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-		HlmsDatablock *datablock = hlmsManager->getDatablock( datablockName );
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        HlmsDatablock *datablock = hlmsManager->getDatablock( datablockName );
 
-		setDatablock( datablock );
+        setDatablock( datablock );
     }
     //-----------------------------------------------------------------------
     Entity* Entity::clone( const String& newName) const
@@ -417,15 +417,36 @@ namespace Ogre {
             i->setMaterial(material);
         }
     }
-	//-----------------------------------------------------------------------
-	void Entity::setUpdateBoundingBoxFromSkeleton(bool update)
-	{
-		mUpdateBoundingBoxFromSkeleton = update;
-		if (mMesh->isLoaded() && mMesh->getBoneBoundingRadius() == Real(0))
-		{
-			mMesh->_computeBoneBoundingRadius();
-		}
-	}
+    //-----------------------------------------------------------------------
+    void Entity::setRenderQueueSubGroup( uint8 subGroup )
+    {
+        // Set for all subentities
+        SubEntityList::iterator i;
+        for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i)
+            i->setRenderQueueSubGroup( subGroup );
+#if !OGRE_NO_MESHLOD
+        // Set render queue for all manual LOD entities
+        if (mMesh->hasManualLodLevel())
+        {
+            LODEntityList::iterator li, liend;
+            liend = mLodEntityList.end();
+            for (li = mLodEntityList.begin(); li != liend; ++li)
+            {
+                if(*li != this)
+                    (*li)->setRenderQueueSubGroup( subGroup );
+            }
+        }
+#endif
+    }
+    //-----------------------------------------------------------------------
+    void Entity::setUpdateBoundingBoxFromSkeleton(bool update)
+    {
+        mUpdateBoundingBoxFromSkeleton = update;
+        if (mMesh->isLoaded() && mMesh->getBoneBoundingRadius() == Real(0))
+        {
+            mMesh->_computeBoneBoundingRadius();
+        }
+    }
     //-----------------------------------------------------------------------
     void Entity::_notifyCurrentCamera(Camera* cam)
     {
@@ -1272,7 +1293,7 @@ namespace Ogre {
     {
         return mDisplaySkeleton;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     Entity* Entity::getManualLodLevel(size_t index) const
     {
 #if !OGRE_NO_MESHLOD
@@ -1284,7 +1305,7 @@ namespace Ogre {
         return NULL;
 #endif
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     size_t Entity::getNumManualLodLevels(void) const
     {
         return mLodEntityList.size();
@@ -1836,22 +1857,6 @@ namespace Ogre {
             }
         }
 #endif
-    }
-    //-----------------------------------------------------------------------
-    void Entity::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
-    {
-        MovableObject::setRenderQueueGroupAndPriority(queueID, priority);
-
-        // Set render queue for all manual LOD entities
-        if (mMesh->hasManualLodLevel())
-        {
-            LODEntityList::iterator li, liend;
-            liend = mLodEntityList.end();
-            for (li = mLodEntityList.begin(); li != liend; ++li)
-            {
-                (*li)->setRenderQueueGroupAndPriority(queueID, priority);
-            }
-        }
     }
     //-----------------------------------------------------------------------
     void Entity::shareSkeletonInstanceWith(Entity* entity)

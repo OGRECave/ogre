@@ -58,7 +58,6 @@ namespace Ogre {
         : IdObject( id )
         , mParentNode(0)
         , mRenderQueueID(renderQueueId)
-        , mRenderQueuePriority(0)
         , mManager(0)
         , mLodMesh( &c_DefaultLodMesh )
         , mCurrentMeshLod( 0 )
@@ -81,7 +80,6 @@ namespace Ogre {
         : IdObject( 0 )
         , mParentNode(0)
         , mRenderQueueID(0)
-        , mRenderQueuePriority(0)
         , mManager(0)
         , mLodMesh( &c_DefaultLodMesh )
         , mCurrentMeshLod( 0 )
@@ -271,12 +269,6 @@ namespace Ogre {
             mObjectMemoryManager->objectMoved( mObjectData, mRenderQueueID, queueID );
 
         mRenderQueueID = queueID;
-    }
-    //-----------------------------------------------------------------------
-    void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority)
-    {
-        setRenderQueueGroup(queueID);
-        mRenderQueuePriority = priority;
     }
     //-----------------------------------------------------------------------
     const Matrix4& MovableObject::_getParentNodeFullTransform(void) const

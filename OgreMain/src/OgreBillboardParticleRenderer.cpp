@@ -262,9 +262,9 @@ namespace Ogre {
         mBillboardSet->setRenderQueueGroup(queueID);
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+    void BillboardParticleRenderer::setRenderQueueSubGroup( uint8 subGroup )
     {
-        mBillboardSet->setRenderQueueGroupAndPriority(queueID, priority);
+        mBillboardSet->setRenderQueueSubGroup( subGroup );
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRenderer::setKeepParticlesInLocalSpace(bool keepLocal)

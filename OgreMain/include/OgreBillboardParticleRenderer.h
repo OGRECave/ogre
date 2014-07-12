@@ -222,8 +222,8 @@ namespace Ogre {
         void _notifyDefaultDimensions(Real width, Real height);
         /// @copydoc ParticleSystemRenderer::setRenderQueueGroup
         void setRenderQueueGroup(uint8 queueID);
-        /// @copydoc MovableObject::setRenderQueueGroupAndPriority
-        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+        /// @copydoc Renderable::setRenderQueueSubGroup
+        void setRenderQueueSubGroup( uint8 subGroup );
         /// @copydoc ParticleSystemRenderer::setKeepParticlesInLocalSpace
         void setKeepParticlesInLocalSpace(bool keepLocal);
         /// @copydoc ParticleSystemRenderer::_getSortMode

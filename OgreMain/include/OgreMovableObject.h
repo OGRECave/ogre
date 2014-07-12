@@ -87,8 +87,6 @@ namespace Ogre {
         Node* mParentNode;
         /// The render queue to use when rendering this object
         uint8 mRenderQueueID;
-        /// The render queue group to use when rendering this object
-        uint8 mRenderQueuePriority;
         /// All the object data needed in SoA form
         ObjectData mObjectData;
         /// SceneManager holding this object (if applicable)
@@ -364,26 +362,8 @@ namespace Ogre {
         */
         virtual void setRenderQueueGroup(uint8 queueID);
 
-        /** Sets the render queue group and group priority this entity will be rendered through.
-        @remarks
-            Render queues are grouped to allow you to more tightly control the ordering
-            of rendered objects. Within a single render group there another type of grouping
-            called priority which allows further control.  If you do not call this method, 
-            all Entity objects default to the default queue and priority 
-            (RenderQueue::getDefaultQueueGroup, RenderQueue::getDefaultRenderablePriority), 
-            which is fine for most objects. You may want to alter this if you want this entity 
-            to always appear in front of other objects, e.g. for a 3D menu system or such.
-        @par
-            See RenderQueue for more details.
-        @param queueID Enumerated value of the queue group to use. See the
-            enum RenderQueueGroupID for what kind of values can be used here.
-        @param priority The priority within a group to use.
-        */
-        virtual void setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority);
-
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
         inline uint8 getRenderQueueGroup(void) const;
-        inline uint8 getRenderQueueSubGroup(void) const;
 
         /// Returns a direct access to the ObjectData state
         ObjectData& _getObjectData()                                        { return mObjectData; }

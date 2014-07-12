@@ -224,7 +224,7 @@ namespace Ogre {
         bool mSkipAnimStateUpdates;
         /// Flag indicating whether to update the main entity skeleton even when an LOD is displayed.
         bool mAlwaysUpdateMainSkeleton;
-		/// Flag indicating whether to update the bounding box from the bones of the skeleton.
+        /// Flag indicating whether to update the bounding box from the bones of the skeleton.
         bool mUpdateBoundingBoxFromSkeleton;
 
         /** List of LOD Entity instances (for manual LODs).
@@ -305,7 +305,7 @@ namespace Ogre {
         /// Sets the given HLMS datablock to all SubEntities
         void setDatablock( HlmsDatablock *datablock );
 
-		/// Sets the given HLMS datablock to all SubEntities
+        /// Sets the given HLMS datablock to all SubEntities
         void setDatablock( IdString datablockName );
 
         /** Clones this entity and returns a pointer to the clone.
@@ -340,15 +340,22 @@ namespace Ogre {
         */
         void setMaterial(const MaterialPtr& material);
 
+        /** Sets the RenderQueue subgroup ID for the whole of this entity.
+        @remarks
+            This is a shortcut method to set all the subgroups for all
+            subentities of this entity. Only use this method is you want to
+            set the same subgroup for all subentities or if you know there
+            is only one. Otherwise call getSubEntity() and call the same
+            method on the individual SubEntity.
+        */
+        void setRenderQueueSubGroup( uint8 subGroup );
+
         /** @copydoc MovableObject::_notifyCurrentCamera.
         */
         void _notifyCurrentCamera(Camera* cam);
 
         /// @copydoc MovableObject::setRenderQueueGroup.
         void setRenderQueueGroup(uint8 queueID);
-
-        /// @copydoc MovableObject::setRenderQueueGroupAndPriority.
-        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
         /** @copydoc MovableObject::_updateRenderQueue.
         */
@@ -385,7 +392,7 @@ namespace Ogre {
         */
         bool getDisplaySkeleton(void) const;
 
-		/** Gets a pointer to the entity representing the numbered manual level of detail.
+        /** Gets a pointer to the entity representing the numbered manual level of detail.
         @remarks
             The zero-based index never includes the original entity, unlike
             Mesh::getLodLevel.
