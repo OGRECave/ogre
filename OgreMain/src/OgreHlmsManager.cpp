@@ -111,6 +111,7 @@ namespace Ogre
             mFreeMacroblockIds.pop_back();
 
             mMacroblocks[idx] = baseParams;
+            mMacroblocks[idx].mId = idx; //Restore the ID which has just been overwritten.
             mRenderSystem->_hlmsMacroblockCreated( &mMacroblocks[idx] );
             mActiveMacroblocks.push_back( idx );
 
