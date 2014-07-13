@@ -1219,7 +1219,7 @@ namespace Ogre{
         }
 
         std::sort( paramVec.begin(), paramVec.end(), OrderParamVecByKey );
-        hlms->createDatablock( obj->name, macroblock, blendblock, paramVec );
+        hlms->createDatablock( obj->name, obj->name, macroblock, blendblock, paramVec );
 
         }
         catch( Exception &e )

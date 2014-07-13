@@ -1143,7 +1143,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::createDefaultDatablock(void)
     {
-        return createDatablock( IdString(), HlmsMacroblock(), HlmsBlendblock(), HlmsParamVec(), false );
+        return createDatablock( IdString(), "[Default]",
+                                HlmsMacroblock(), HlmsBlendblock(), HlmsParamVec(), false );
     }
     //-----------------------------------------------------------------------------------
     void Hlms::reloadFrom( Archive *newDataFolder )
@@ -1153,7 +1154,8 @@ namespace Ogre
         enumeratePieceFiles();
     }
     //-----------------------------------------------------------------------------------
-    HlmsDatablock* Hlms::createDatablock( IdString name, const HlmsMacroblock &macroblockRef,
+    HlmsDatablock* Hlms::createDatablock( IdString name, const String &refName,
+                                          const HlmsMacroblock &macroblockRef,
                                           const HlmsBlendblock &blendblockRef,
                                           const HlmsParamVec &paramVec, bool visibleToManager )
     {
@@ -1168,7 +1170,7 @@ namespace Ogre
 
         HlmsDatablock *retVal = createDatablockImpl( name, macroblock, blendblock, paramVec );
 
-        mDatablocks[name] = DatablockEntry( retVal, visibleToManager );
+        mDatablocks[name] = DatablockEntry( retVal, visibleToManager, refName );
 
         retVal->calculateHash();
 
@@ -1184,6 +1186,16 @@ namespace Ogre
         HlmsDatablockMap::const_iterator itor = mDatablocks.find( name );
         if( itor != mDatablocks.end() )
             retVal = itor->second.datablock;
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    const String* Hlms::getFullNameString( IdString name ) const
+    {
+        String const *retVal = 0;
+        HlmsDatablockMap::const_iterator itor = mDatablocks.find( name );
+        if( itor != mDatablocks.end() )
+            retVal = &itor->second.name;
 
         return retVal;
     }

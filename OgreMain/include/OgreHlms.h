@@ -47,6 +47,19 @@ namespace Ogre
     /** HLMS stands for "High Level Material System". */
     class _OgreExport Hlms : public PassAlloc
     {
+    public:
+        struct DatablockEntry
+        {
+            HlmsDatablock   *datablock;
+            bool            visibleToManager;
+            String			name;
+            DatablockEntry() : datablock( 0 ), visibleToManager( false ) {}
+            DatablockEntry( HlmsDatablock *_datablock, bool _visibleToManager, const String &_name ) :
+                datablock( _datablock ), visibleToManager( _visibleToManager ), name( _name ) {}
+        };
+
+        typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
+
     protected:
         enum ShaderType
         {
@@ -100,16 +113,6 @@ namespace Ogre
 
         RenderSystem    *mRenderSystem;
 
-        struct DatablockEntry
-        {
-            HlmsDatablock   *datablock;
-            bool            visibleToManager;
-            DatablockEntry() : datablock( 0 ), visibleToManager( false ) {}
-            DatablockEntry( HlmsDatablock *_datablock, bool _visibleToManager ) :
-                datablock( _datablock ), visibleToManager( _visibleToManager ) {}
-        };
-
-        typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
         HlmsDatablockMap mDatablocks;
 
         String          mShaderProfile; /// "glsl", "glsles", "hlsl"
@@ -277,6 +280,11 @@ namespace Ogre
             Throws if a datablock with the same name paramVec["name"] already exists
         @param name
             Name of the Datablock, must be unique within all Hlms types, not just this one.
+            99% you want this to be IdString( refName ); however this is not enforced.
+        @param refName
+            Name of the Datablock. The engine doesn't use this value at all. It is only
+            useful for UI editors which want to enumerate all existing datablocks and
+            display its name to the user.
         @param macroblockRef
             @See HlmsManager::getMacroblock
         @param blendblockRef
@@ -288,7 +296,8 @@ namespace Ogre
         @return
             Pointer to created Datablock
         */
-        HlmsDatablock* createDatablock( IdString name, const HlmsMacroblock &macroblockRef,
+        HlmsDatablock* createDatablock( IdString name, const String &refName,
+                                        const HlmsMacroblock &macroblockRef,
                                         const HlmsBlendblock &blendblockRef,
                                         const HlmsParamVec &paramVec,
                                         bool visibleToManager=true );
@@ -298,6 +307,14 @@ namespace Ogre
             The datablock associated with that name. Null pointer if not found. Doesn't throw.
         */
         HlmsDatablock* getDatablock( IdString name ) const;
+
+        /// Returns the string name associated with its hashed name (this was
+        /// passed as refName in @createDatablock). Returns null ptr if
+        /// not found.
+        /// The reason this String doesn't live in HlmsDatablock is to prevent
+        /// cache trashing (datablocks are hot iterated every frame, and the
+        /// full name is rarely ever used)
+        const String* getFullNameString( IdString name ) const;
 
         /** Destroys a datablocks given its name. Caller is responsible for ensuring
             those pointers aren't still in use (i.e. dangling pointers)
@@ -312,6 +329,9 @@ namespace Ogre
 
         /// @copydoc HlmsManager::getDefaultDatablock
         HlmsDatablock* getDefaultDatablock(void) const;
+
+        /// Returns all datablocks owned by this Hlms, including the default one.
+        const HlmsDatablockMap& getDatablockMap(void) const	{ return mDatablocks; }
 
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
             the value to 'inOut', otherwise leaves 'inOut' as is.

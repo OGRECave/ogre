@@ -96,7 +96,7 @@ namespace Ogre {
 
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
-        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId++ ), HlmsMacroblock(),
+        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId++ ), "", HlmsMacroblock(),
                                                           HlmsBlendblock(), HlmsParamVec(), false );
 
         Material *parentMaterial = parent->getParent();
@@ -122,7 +122,7 @@ namespace Ogre {
     {
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
-        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId++ ), HlmsMacroblock(),
+        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId++ ), "", HlmsMacroblock(),
                                                           HlmsBlendblock(), HlmsParamVec(), false );
 
         Material *parentMaterial = parent->getParent();
