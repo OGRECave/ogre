@@ -124,6 +124,12 @@ namespace Ogre
                                       bufferType, initialData, keepAsShadow );
     }
     //-----------------------------------------------------------------------------------
+    void VaoManager::destroyIndexBuffer( IndexBufferPacked *indexBuffer )
+    {
+        destroyIndexBufferImpl( indexBuffer );
+        OGRE_DELETE indexBuffer;
+    }
+    //-----------------------------------------------------------------------------------
     const VertexArrayObject *VaoManager::createVertexArrayObject(
                                                             const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer )

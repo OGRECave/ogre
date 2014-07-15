@@ -56,6 +56,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreHlmsDatablock.h"
+#include "Vao/OgreGL3PlusVertexArrayObject.h"
+#include "Vao/OgreIndexBufferPacked.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
@@ -2128,6 +2130,33 @@ namespace Ogre {
 
         mRenderAttribsBound.clear();
         mRenderInstanceAttribsBound.clear();
+    }
+
+    virtual void _setVertexArrayObject( const VertexArrayObject *_vao )
+    {
+        if( _vao )
+        {
+            const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( _vao );
+            OGRE_CHECK_GL_ERROR( glBindVertexArray( vao->mVaoName ) );
+        }
+        else
+        {
+            OGRE_CHECK_GL_ERROR( glBindVertexArray( 0 ) );
+        }
+    }
+
+    virtual void _render( const VertexArrayObject *_vao )
+    {
+        const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( _vao );
+
+        GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
+                                                            GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+
+        //glMultiDrawElementsBaseVertex
+        //glMultiDrawElementsIndirect
+        glDrawElementsInstancedBaseVertex( primType, vao->mIndexBuffer->getNumElements(), indexType,
+                                           vao->mIndexBuffer->_getInternalBufferStart(), 1,
+                                           vao->mVertexBuffers[0]->_getInternalBufferStart() );
     }
 
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,

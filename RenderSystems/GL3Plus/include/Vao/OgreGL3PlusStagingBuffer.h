@@ -69,6 +69,11 @@ namespace Ogre
             {
                 assert( _start <= _end );
             }
+            ~Fence()
+            {
+                glDeleteSync( fenceName );
+                fenceName = 0;
+            }
 
             bool overlaps( const Fence &fence ) const
             {

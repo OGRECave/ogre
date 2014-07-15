@@ -44,6 +44,8 @@ namespace Ogre
         mDefaultPoolSize[CPU_INACCESSIBLE]  = 128 * 1024 * 1024;
         //Keep pools of 32MB each for dynamic vertex buffers
         mDefaultPoolSize[CPU_ACCESSIBLE]    = 32 * 1024 * 1024;
+
+        mFrameSyncVec.resize( mDynamicBufferMultiplier, 0 );
     }
     //-----------------------------------------------------------------------------------
     GL3PlusVaoManager::~GL3PlusVaoManager()
@@ -78,8 +80,17 @@ namespace Ogre
 
         if( !bufferNames.empty() )
         {
-            glDeleteBuffers( bufferNames.size(), &bufferNames[0] );
+            OCGLE( glDeleteBuffers( bufferNames.size(), &bufferNames[0] ) );
             bufferNames.clear();
+        }
+
+        GLSyncVec::const_iterator itor = mFrameSyncVec.begin();
+        GLSyncVec::const_iterator end  = mFrameSyncVec.end();
+
+        while( itor != end )
+        {
+            OCGLE( glDeleteSync( *itor ) );
+            ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -281,10 +292,15 @@ namespace Ogre
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
                                                                     GL_ARRAY_BUFFER,
                                                                     mVbos[vboFlag][vboIdx].vboName );
+        VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
+                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bufferType, initialData, keepAsShadow,
+                                                        this, bufferInterface, vElements, 0, 0, 0 );
 
-        return  OGRE_NEW VertexBufferPacked( bufferOffset, numElements, bytesPerElement,
-                                             bufferType, initialData, keepAsShadow,
-                                             this, bufferInterface, vElements, 0, 0, 0 );
+        if( initialData )
+            bufferInterface->upload( initialData, 0, numElements );
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusVaoManager::destroyVertexBufferImpl( VertexBufferPacked *vertexBuffer )
@@ -319,6 +335,46 @@ namespace Ogre
         return OGRE_NEW GL3PlusMultiSourceVertexBufferPool( vboIdx, vbo.vboName, vertexElementsBySource,
                                                             maxNumVertices, bufferType,
                                                             bufferOffset, this );
+    }
+    //-----------------------------------------------------------------------------------
+    IndexBufferPacked* GL3PlusVaoManager::createIndexBufferImpl( size_t numElements,
+                                                                 uint32 bytesPerElement,
+                                                                 BufferType bufferType,
+                                                                 void *initialData, bool keepAsShadow )
+    {
+        size_t vboIdx;
+        size_t bufferOffset;
+
+        allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, vboIdx, bufferOffset );
+
+        VboFlag vboFlag = CPU_INACCESSIBLE;
+
+        if( bufferType == BT_DYNAMIC )
+            vboFlag = CPU_ACCESSIBLE;
+
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
+                                                                    GL_ARRAY_BUFFER,
+                                                                    mVbos[vboFlag][vboIdx].vboName );
+        IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
+                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bufferType, initialData, keepAsShadow,
+                                                        this, bufferInterface );
+
+        if( initialData )
+            bufferInterface->upload( initialData, 0, numElements );
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::destroyIndexBufferImpl( IndexBufferPacked *indexBuffer )
+    {
+        GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                                                        indexBuffer->getBufferInterface() );
+
+
+        deallocateVbo( bufferInterface->getVboPoolIndex(), indexBuffer->_getInternalBufferStart(),
+                       indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
+                       indexBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
     GLuint GL3PlusVaoManager::createVao( const Vao &vaoRef )
@@ -423,6 +479,7 @@ namespace Ogre
 
         vao.indexBufferVbo  = static_cast<GL3PlusBufferInterface*>(
                                 indexBuffer->getBufferInterface() )->getVboName();
+        vao.indexType       = indexBuffer->getIndexType();
 
         bool bFound = false;
         VaoVec::const_iterator itor = mVaos.begin();
@@ -431,6 +488,7 @@ namespace Ogre
         while( itor != end && !bFound )
         {
             if( itor->indexBufferVbo == vao.indexBufferVbo &&
+                itor->indexType == vao.indexType &&
                 itor->vertexBuffers == vao.vertexBuffers )
             {
                 bFound = true;
@@ -529,9 +587,13 @@ namespace Ogre
 
         if( !bufferNames.empty() )
         {
-            glDeleteBuffers( bufferNames.size(), &bufferNames[0] );
+            OCGLE( glDeleteBuffers( bufferNames.size(), &bufferNames[0] ) );
             bufferNames.clear();
         }
+
+        OCGLE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
+        OCGLE( mFrameSyncVec[mDynamicBufferCurrentFrame] = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
+        mDynamicBufferCurrentFrame = (mDynamicBufferCurrentFrame + 1) % mDynamicBufferMultiplier;
     }
     //-----------------------------------------------------------------------------------
     /*IndexBufferPacked* GL3PlusVaoManager::createIndexBufferImpl( IndexBufferPacked::IndexType indexType,

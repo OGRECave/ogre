@@ -77,6 +77,8 @@ namespace Ogre
                                                           BufferType bufferType,
                                                           void *initialData, bool keepAsShadow ) = 0;
 
+        virtual void destroyIndexBufferImpl( IndexBufferPacked *indexBuffer ) = 0;
+
         virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
                                                                 IndexBufferPacked *indexBuffer ) = 0;
 
@@ -136,6 +138,12 @@ namespace Ogre
         IndexBufferPacked* createIndexBuffer( IndexBufferPacked::IndexType indexType,
                                               size_t numIndices, BufferType bufferType,
                                               void *initialData, bool keepAsShadow );
+
+        /** Destroys the given vertex buffer created with createVertexBuffer.
+        @param indexBuffer
+            Index Buffer created with createIndexBuffer
+        */
+        void destroyIndexBuffer( IndexBufferPacked *indexBuffer );
 
         /** Creates a VertexArrayObject that binds all the vertex buffers with their respective
             declarations, and the index buffers. The returned value is immutable and thus cannot

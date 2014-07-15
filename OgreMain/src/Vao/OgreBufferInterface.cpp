@@ -32,6 +32,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    BufferInterface::BufferInterface() :
+        mBuffer( 0 )
+    {
+    }
+    //-----------------------------------------------------------------------------------
     void BufferInterface::upload( void *data, size_t elementStart, size_t elementCount )
     {
         if( mBuffer->mBufferType == BT_DYNAMIC )

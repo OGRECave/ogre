@@ -113,11 +113,13 @@ namespace Ogre
 
             VertexBindingVec    vertexBuffers;
             GLuint              indexBufferVbo;
+            IndexBufferPacked::IndexType indexType;
         };
 
         typedef vector<Vbo>::type VboVec;
         typedef vector<Vao>::type VaoVec;
         typedef map<VertexElement2Vec, Vbo>::type VboMap;
+        typedef vector<GLsync>::type GLSyncVec;
 
         VboVec  mVbos[MAX_VBO_FLAG];
         /// MultiSource VBOs request a block from mVbo (i.e. they call allocateVbo) and thus do not
@@ -127,6 +129,8 @@ namespace Ogre
         size_t  mDefaultPoolSize[MAX_VBO_FLAG];
 
         VaoVec  mVaos;
+
+        GLSyncVec mFrameSyncVec;
 
         /// True if ARB_buffer_storage is supported (Persistent Mapping and immutable buffers)
         bool    mArbBufferStorage;
@@ -201,6 +205,8 @@ namespace Ogre
                                                           uint32 bytesPerElement,
                                                           BufferType bufferType,
                                                           void *initialData, bool keepAsShadow );
+
+        virtual void destroyIndexBufferImpl( IndexBufferPacked *indexBuffer );
 
         GLuint createVao( const Vao &vaoRef );
 

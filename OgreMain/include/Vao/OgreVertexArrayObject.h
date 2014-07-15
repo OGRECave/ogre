@@ -38,11 +38,16 @@ namespace Ogre
 
     struct VertexArrayObject : public VertexArrayObjectAlloc
     {
+        /// ID used for the RenderQueue to sort by VAOs. This ID
+        /// may be shared by many VertexArrayObject instances
+        uint32 mRenderQueueId;
+
         VertexBufferPackedVec   mVertexBuffers;
         IndexBufferPacked       *mIndexBuffer;
 
-        VertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
+        VertexArrayObject( uint32 renderQueueId, const VertexBufferPackedVec &vertexBuffers,
                            IndexBufferPacked *indexBuffer ) :
+            mRenderQueueId( renderQueueId ),
             mVertexBuffers( vertexBuffers ),
             mIndexBuffer( indexBuffer )
         {

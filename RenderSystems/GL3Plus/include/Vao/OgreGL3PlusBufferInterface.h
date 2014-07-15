@@ -46,8 +46,6 @@ namespace Ogre
         GLuint  mVboName;
         void    *mMappedPtr;
 
-        BufferPacked *mBuffer;
-
     public:
         GL3PlusBufferInterface( size_t vboPoolIdx, GLenum target, GLuint vboName );
         ~GL3PlusBufferInterface();

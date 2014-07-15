@@ -47,6 +47,8 @@ namespace Ogre
         mBufferInterface( bufferInterface ),
         mShadowCopy( 0 )
     {
+        mBufferInterface->_notifyBuffer( this );
+
         if( !initialData && mBufferType == BT_IMMUTABLE )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,

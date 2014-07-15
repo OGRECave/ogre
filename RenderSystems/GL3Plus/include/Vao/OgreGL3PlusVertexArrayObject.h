@@ -41,7 +41,7 @@ namespace Ogre
 
         GL3PlusVertexArrayObject( GLuint vaoName, const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer ) :
-            VertexArrayObject( vertexBuffers, indexBuffer ),
+            VertexArrayObject( static_cast<uint32>(vaoName), vertexBuffers, indexBuffer ),
             mVaoName( vaoName )
         {
         }

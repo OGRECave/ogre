@@ -1177,6 +1177,15 @@ namespace Ogre
         */
         virtual void _render(const RenderOperation& op);
 
+        /** Part of the low level rendering interface. Tells the RS which VAO will be bound now.
+            (i.e. Vertex Formats, buffers being bound, etc.)
+            You don't need to rebind if the VAO's mRenderQueueId is the same as previous call.
+        */
+        virtual void _setVertexArrayObject( const VertexArrayObject *vao ) = 0;
+
+        /// Renders the VAO. Assumes _setVertexArrayObject has already been called.
+        virtual void _render( const VertexArrayObject *vao );
+
         virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot);
 
         /** Gets the capabilities of the render system. */
