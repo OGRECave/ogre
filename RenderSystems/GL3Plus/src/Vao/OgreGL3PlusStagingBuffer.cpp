@@ -188,10 +188,13 @@ namespace Ogre
 
             assert( dst.destination->getBufferType() == BT_DEFAULT );
 
+            GLintptr dstOffset = dst.dstOffset + dst.destination->_getInternalBufferStart() *
+                                                        dst.destination->getBytesPerElement();
+
             OCGLE( glBindBuffer( oppositeTarget, bufferInterface->getVboName() ) );
             OCGLE( glCopyBufferSubData( target, oppositeTarget,
                                         mInternalBufferStart + mMappingStart + dst.srcOffset,
-                                        dst.dstOffset, dst.length ) );
+                                        dstOffset, dst.length ) );
         }
 
         //Add fence to this region (or at least, track the hazard).
