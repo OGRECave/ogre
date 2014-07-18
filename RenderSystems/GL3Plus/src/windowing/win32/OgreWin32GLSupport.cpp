@@ -40,6 +40,8 @@
 using namespace Ogre;
 
 namespace Ogre {
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = 0;
+
     Win32GLSupport::Win32GLSupport()
         : mInitialWindow(0)
         , mHasPixelFormatARB(false)
@@ -525,6 +527,9 @@ namespace Ogre {
             HDC oldhdc = wglGetCurrentDC();
             // if wglMakeCurrent fails, wglGetProcAddress will return null
             wglMakeCurrent(hdc, hrc);
+
+            wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)
+                                            wglGetProcAddress("wglCreateContextAttribsARB");
             
             PFNWGLGETEXTENSIONSSTRINGARBPROC _wglGetExtensionsStringARB =
                 (PFNWGLGETEXTENSIONSSTRINGARBPROC)
@@ -595,6 +600,15 @@ namespace Ogre {
         // clean up our dummy window and class
         DestroyWindow(hwnd);
         UnregisterClass(dummyText, hinst);
+
+        if( !wglCreateContextAttribsARB )
+        {
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "WGL_ARB_create_context extension required for OpenGL 3.3."
+                         " Update your graphics card driver, or your card doesn't "
+                         "support OpenGL 3.3",
+                         "Win32GLSupport::initialiseWGL" );
+        }
     }
 
     LRESULT Win32GLSupport::dummyWndProc(HWND hwnd, UINT umsg, WPARAM wp, LPARAM lp)

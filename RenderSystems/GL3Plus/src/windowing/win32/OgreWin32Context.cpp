@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
+#include "windowing/win32/OgreWin32GLSupport.h"
 
 namespace Ogre {
 
@@ -61,28 +62,29 @@ namespace Ogre {
 
     GL3PlusContext* Win32Context::clone() const
     {
-        // Create new context based on own HDC
-        HGLRC newCtx = wglCreateContext(mHDC);
+        const int attribList[] =
+        {
+            WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+            WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+
+            WGL_CONTEXT_FLAGS_ARB,
+        #if OGRE_DEBUG_MODE
+                WGL_CONTEXT_DEBUG_BIT_ARB |
+        #endif
+                WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+            0, 0
+        };
+
+        // Create new context based on own HDC (shared with ours)
+        HGLRC newCtx = wglCreateContextAttribsARB( mHDC, mGlrc, attribList );
         
         if (!newCtx)
         {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                "Error calling wglCreateContext", "Win32Context::clone");
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                         "Error calling wglCreateContextAttribsARB: " + translateWGLError(),
+                         "Win32Context::clone" );
         }
-
-        HGLRC oldrc = wglGetCurrentContext();
-        HDC oldhdc = wglGetCurrentDC();
-        wglMakeCurrent(NULL, NULL);
-        // Share lists with old context
-        if (!wglShareLists(mGlrc, newCtx))
-        {
-            String errorMsg = translateWGLError();
-            wglDeleteContext(newCtx);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("wglShareLists() failed: ") + errorMsg, "Win32Context::clone");
-        }
-        // restore old context
-        wglMakeCurrent(oldhdc, oldrc);
-        
 
         return new Win32Context(mHDC, newCtx);
     }

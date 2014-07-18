@@ -435,23 +435,40 @@ namespace Ogre {
             mHwGamma = testHwGamma;
             mFSAA = testFsaa;
         }
-        if (!mIsExternalGLContext)
-        {
-            mGlrc = wglCreateContext(mHDC);
-            if (!mGlrc)
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "wglCreateContext failed: " + translateWGLError(), "Win32Window::create");
-        }
 
-        if (old_context && old_context != mGlrc)
+        if( !mIsExternalGLContext )
         {
-            // Share lists with old context
-            if (!wglShareLists(old_context, mGlrc))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglShareLists() failed", " Win32Window::create");
+            const int attribList[] =
+            {
+                WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+                WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+
+                WGL_CONTEXT_FLAGS_ARB,
+            #if OGRE_DEBUG_MODE
+                    WGL_CONTEXT_DEBUG_BIT_ARB |
+            #endif
+                    WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+                WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+                0, 0
+            };
+
+            // New context is shared with previous one
+            mGlrc = wglCreateContextAttribsARB( mHDC, old_context, attribList );
+
+            if (!mGlrc)
+            {
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "wglCreateContextAttribsARB failed: " + translateWGLError(),
+                            "Win32Window::create");
+            }
         }
 
         if (!wglMakeCurrent(mHDC, mGlrc))
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglMakeCurrent", "Win32Window::create");
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "wglMakeCurrent failed: " + translateWGLError(),
+                        "Win32Window::create");
+        }
 
         // Do not change vsync if the external window has the OpenGL control
         if (!mIsExternalGLControl) {
