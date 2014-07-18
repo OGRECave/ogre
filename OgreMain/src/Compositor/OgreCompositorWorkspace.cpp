@@ -60,6 +60,9 @@ namespace Ogre
             mViewportModifierMask( viewportModifierMask ),
             mViewportModifier( vpOffsetScale )
     {
+        assert( !defaultCam || (defaultCam->getSceneManager() == sceneManager) &&
+                "Camera was created with a different SceneManager than supplied" );
+
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
                                                 id, true, mRenderWindow.target, mRenderSys );
