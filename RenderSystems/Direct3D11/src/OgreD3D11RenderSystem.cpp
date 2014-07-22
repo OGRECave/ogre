@@ -637,7 +637,12 @@ bail:
 
             if ("No information queue exceptions" == infoQType)
             {
+#if OGRE_DEBUG_MODE
+                // a debug build should always enable the debug layer and report errors
+                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
+#else
                 D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_NO_EXCEPTION);
+#endif
             }
             else if ("Corruption" == infoQType)
             {
