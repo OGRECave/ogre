@@ -44,57 +44,57 @@ THE SOFTWARE.
 namespace Ogre
 {
     //Change per mesh (hash can be cached on the renderable)
-    const IdString Hlms::HlmsPropertySkeleton           = IdString( "hlms_skeleton" );
-    const IdString Hlms::HlmsPropertyBonesPerVertex     = IdString( "hlms_bones_per_vertex" );
-    const IdString Hlms::HlmsPropertyPose               = IdString( "hlms_pose" );
+    const IdString HlmsBaseProp::Skeleton           = IdString( "hlms_skeleton" );
+    const IdString HlmsBaseProp::BonesPerVertex     = IdString( "hlms_bones_per_vertex" );
+    const IdString HlmsBaseProp::Pose               = IdString( "hlms_pose" );
 
-    const IdString Hlms::HlmsPropertyNormal             = IdString( "hlms_normal" );
-    const IdString Hlms::HlmsPropertyQTangent           = IdString( "hlms_qtangent" );
+    const IdString HlmsBaseProp::Normal             = IdString( "hlms_normal" );
+    const IdString HlmsBaseProp::QTangent           = IdString( "hlms_qtangent" );
 
-    const IdString Hlms::HlmsPropertyColour             = IdString( "hlms_colour" );
+    const IdString HlmsBaseProp::Colour             = IdString( "hlms_colour" );
 
-    const IdString Hlms::HlmsPropertyUvCount            = IdString( "hlms_uv_count" );
-    const IdString Hlms::HlmsPropertyUvCount0           = IdString( "hlms_uv_count0" );
-    const IdString Hlms::HlmsPropertyUvCount1           = IdString( "hlms_uv_count1" );
-    const IdString Hlms::HlmsPropertyUvCount2           = IdString( "hlms_uv_count2" );
-    const IdString Hlms::HlmsPropertyUvCount3           = IdString( "hlms_uv_count3" );
-    const IdString Hlms::HlmsPropertyUvCount4           = IdString( "hlms_uv_count4" );
-    const IdString Hlms::HlmsPropertyUvCount5           = IdString( "hlms_uv_count5" );
-    const IdString Hlms::HlmsPropertyUvCount6           = IdString( "hlms_uv_count6" );
-    const IdString Hlms::HlmsPropertyUvCount7           = IdString( "hlms_uv_count7" );
+    const IdString HlmsBaseProp::UvCount            = IdString( "hlms_uv_count" );
+    const IdString HlmsBaseProp::UvCount0           = IdString( "hlms_uv_count0" );
+    const IdString HlmsBaseProp::UvCount1           = IdString( "hlms_uv_count1" );
+    const IdString HlmsBaseProp::UvCount2           = IdString( "hlms_uv_count2" );
+    const IdString HlmsBaseProp::UvCount3           = IdString( "hlms_uv_count3" );
+    const IdString HlmsBaseProp::UvCount4           = IdString( "hlms_uv_count4" );
+    const IdString HlmsBaseProp::UvCount5           = IdString( "hlms_uv_count5" );
+    const IdString HlmsBaseProp::UvCount6           = IdString( "hlms_uv_count6" );
+    const IdString HlmsBaseProp::UvCount7           = IdString( "hlms_uv_count7" );
 
     //Change per frame (grouped together with scene pass)
-    const IdString Hlms::HlmsPropertyLightsDirectional  = IdString( "hlms_lights_directional" );
-    const IdString Hlms::HlmsPropertyLightsPoint        = IdString( "hlms_lights_point" );
-    const IdString Hlms::HlmsPropertyLightsSpot         = IdString( "hlms_lights_spot" );
-    const IdString Hlms::HlmsPropertyLightsAttenuation  = IdString( "hlms_lights_attenuation" );
-    const IdString Hlms::HlmsPropertyLightsSpotParams   = IdString( "hlms_lights_spotparams" );
+    const IdString HlmsBaseProp::LightsDirectional  = IdString( "hlms_lights_directional" );
+    const IdString HlmsBaseProp::LightsPoint        = IdString( "hlms_lights_point" );
+    const IdString HlmsBaseProp::LightsSpot         = IdString( "hlms_lights_spot" );
+    const IdString HlmsBaseProp::LightsAttenuation  = IdString( "hlms_lights_attenuation" );
+    const IdString HlmsBaseProp::LightsSpotParams   = IdString( "hlms_lights_spotparams" );
 
     //Change per scene pass
-    const IdString Hlms::HlmsPropertyDualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
-    const IdString Hlms::HlmsPropertyNumShadowMaps      = IdString( "hlms_num_shadow_maps" );
-    const IdString Hlms::HlmsPropertyPssmSplits         = IdString( "hlms_pssm_splits" );
-    const IdString Hlms::HlmsPropertyShadowCaster       = IdString( "hlms_shadowcaster" );
+    const IdString HlmsBaseProp::DualParaboloidMapping= IdString( "hlms_dual_paraboloid_mapping" );
+    const IdString HlmsBaseProp::NumShadowMaps      = IdString( "hlms_num_shadow_maps" );
+    const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
+    const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
 
     //Change per material (hash can be cached on the renderable)
-    const IdString Hlms::PropertyDiffuseMap   = IdString( "diffuse_map" );
-    const IdString Hlms::PropertyNormalMap    = IdString( "normal_map" );
-    const IdString Hlms::PropertySpecularMap  = IdString( "specular_map" );
-    const IdString Hlms::PropertyEnvProbeMap  = IdString( "envprobe_map" );
-    const IdString Hlms::PropertyAlphaTest    = IdString( "alpha_test" );
+    const IdString HlmsBaseProp::DiffuseMap     = IdString( "diffuse_map" );
+    const IdString HlmsBaseProp::NormalMap      = IdString( "normal_map" );
+    const IdString HlmsBaseProp::SpecularMap    = IdString( "specular_map" );
+    const IdString HlmsBaseProp::EnvProbeMap    = IdString( "envprobe_map" );
+    const IdString HlmsBaseProp::AlphaTest      = IdString( "alpha_test" );
 
-    const IdString PropertyGL3Plus            = IdString( "GL3+" );
+    const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
 
-    const IdString *Hlms::UvCountPtrs[8] =
+    const IdString *HlmsBaseProp::UvCountPtrs[8] =
     {
-        &Hlms::HlmsPropertyUvCount0,
-        &Hlms::HlmsPropertyUvCount1,
-        &Hlms::HlmsPropertyUvCount2,
-        &Hlms::HlmsPropertyUvCount3,
-        &Hlms::HlmsPropertyUvCount4,
-        &Hlms::HlmsPropertyUvCount5,
-        &Hlms::HlmsPropertyUvCount6,
-        &Hlms::HlmsPropertyUvCount7
+        &HlmsBaseProp::UvCount0,
+        &HlmsBaseProp::UvCount1,
+        &HlmsBaseProp::UvCount2,
+        &HlmsBaseProp::UvCount3,
+        &HlmsBaseProp::UvCount4,
+        &HlmsBaseProp::UvCount5,
+        &HlmsBaseProp::UvCount6,
+        &HlmsBaseProp::UvCount7
     };
 
     const String ShaderFiles[] = { "VertexShader_vs", "PixelShader_ps", "GeometryShader_gs",
@@ -130,31 +130,31 @@ namespace Ogre
         uint16 numWorldTransforms = 2;
         //bool castShadows          = true;
 
-        setProperty( HlmsPropertySkeleton, numWorldTransforms > 1 );
-        setProperty( HlmsPropertyUvCount, 2 );
+        setProperty( HlmsBaseProp::Skeleton, numWorldTransforms > 1 );
+        setProperty( HlmsBaseProp::UvCount, 2 );
         setProperty( "true", 1 );
         setProperty( "false", 0 );
 
-        setProperty( HlmsPropertyDualParaboloidMapping, 0 );
+        setProperty( HlmsBaseProp::DualParaboloidMapping, 0 );
 
-        setProperty( HlmsPropertyNormal, 1 );
+        setProperty( HlmsBaseProp::Normal, 1 );
 
-        setProperty( HlmsPropertyUvCount0, 2 );
-        setProperty( HlmsPropertyUvCount1, 4 );
-        setProperty( HlmsPropertyBonesPerVertex, 4 );
+        setProperty( HlmsBaseProp::UvCount0, 2 );
+        setProperty( HlmsBaseProp::UvCount1, 4 );
+        setProperty( HlmsBaseProp::BonesPerVertex, 4 );
 
-        setProperty( HlmsPropertyNumShadowMaps, 3 );
-        setProperty( HlmsPropertyPssmSplits, 3 );
-        setProperty( HlmsPropertyShadowCaster, 0 );
+        setProperty( HlmsBaseProp::NumShadowMaps, 3 );
+        setProperty( HlmsBaseProp::PssmSplits, 3 );
+        setProperty( HlmsBaseProp::ShadowCaster, 0 );
 
-        setProperty( HlmsPropertyLightsDirectional, 1 );
-        setProperty( HlmsPropertyLightsPoint, 2 );
-        setProperty( HlmsPropertyLightsSpot, 3 );
+        setProperty( HlmsBaseProp::LightsDirectional, 1 );
+        setProperty( HlmsBaseProp::LightsPoint, 2 );
+        setProperty( HlmsBaseProp::LightsSpot, 3 );
 
-        setProperty( PropertyDiffuseMap, 1 );
-        setProperty( PropertyNormalMap, 1 );
-        setProperty( PropertySpecularMap, 1 );
-        setProperty( PropertyEnvProbeMap, 1 );
+        setProperty( HlmsBaseProp::DiffuseMap, 1 );
+        setProperty( HlmsBaseProp::NormalMap, 1 );
+        setProperty( HlmsBaseProp::SpecularMap, 1 );
+        setProperty( HlmsBaseProp::EnvProbeMap, 1 );
     }
     //-----------------------------------------------------------------------------------
     void Hlms::enumeratePieceFiles(void)
@@ -1318,7 +1318,7 @@ namespace Ogre
             mPieces = renderableCache.pieces[i];
 
             if( mShaderProfile == "glsl" ) //TODO: String comparision
-                setProperty( PropertyGL3Plus, 330 );
+                setProperty( HlmsBaseProp::GL3Plus, 330 );
 
             StringVector::const_iterator itor = mPieceFiles[i].begin();
             StringVector::const_iterator end  = mPieceFiles[i].end();
@@ -1379,9 +1379,9 @@ namespace Ogre
                                     mShaderProfile, static_cast<GpuProgramType>(i) );
                 gp->setSource( outString );
 
-                gp->setSkeletalAnimationIncluded( getProperty( HlmsPropertySkeleton ) != 0 );
+                gp->setSkeletalAnimationIncluded( getProperty( HlmsBaseProp::Skeleton ) != 0 );
                 gp->setMorphAnimationIncluded( false );
-                gp->setPoseAnimationIncluded( getProperty( HlmsPropertyPose ) );
+                gp->setPoseAnimationIncluded( getProperty( HlmsBaseProp::Pose ) );
                 gp->setVertexTextureFetchRequired( false );
 
                 gp->load();
@@ -1401,7 +1401,7 @@ namespace Ogre
     {
         mSetProperties.clear();
 
-        setProperty( HlmsPropertySkeleton, renderable->hasSkeletonAnimation() );
+        setProperty( HlmsBaseProp::Skeleton, renderable->hasSkeletonAnimation() );
 
         RenderOperation op;
         renderable->getRenderOperation( op );
@@ -1420,27 +1420,27 @@ namespace Ogre
             case VES_NORMAL:
                 if( VertexElement::getTypeCount( vertexElem.getType() ) < 4 )
                 {
-                    setProperty( HlmsPropertyNormal, 1 );
+                    setProperty( HlmsBaseProp::Normal, 1 );
                 }
                 else
                 {
                     normalMappedCanBeSupported = true;
-                    setProperty( HlmsPropertyQTangent, 1 );
+                    setProperty( HlmsBaseProp::QTangent, 1 );
                 }
                 break;
             case VES_TANGENT:
                 normalMappedCanBeSupported = true;
                 break;
             case VES_DIFFUSE:
-                setProperty( HlmsPropertyColour, 1 );
+                setProperty( HlmsBaseProp::Colour, 1 );
                 break;
             case VES_TEXTURE_COORDINATES:
                 numTexCoords = std::max<uint>( numTexCoords, vertexElem.getIndex() + 1 );
-                setProperty( *UvCountPtrs[vertexElem.getIndex()],
+                setProperty( *HlmsBaseProp::UvCountPtrs[vertexElem.getIndex()],
                               VertexElement::getTypeCount( vertexElem.getType() ) );
                 break;
             case VES_BLEND_WEIGHTS:
-                setProperty( HlmsPropertyBonesPerVertex,
+                setProperty( HlmsBaseProp::BonesPerVertex,
                              VertexElement::getTypeCount( vertexElem.getType() ) );
                 break;
             default:
@@ -1451,38 +1451,40 @@ namespace Ogre
             ++itor;
         }
 
-        setProperty( HlmsPropertyUvCount, numTexCoords );
+        setProperty( HlmsBaseProp::UvCount, numTexCoords );
 
         String paramVal;
-        if( findParamInVec( params, PropertyDiffuseMap, paramVal ) )
-            setProperty( PropertyDiffuseMap, 1 );
-        if( normalMappedCanBeSupported && findParamInVec( params, PropertyNormalMap, paramVal ) )
-            setProperty( PropertyNormalMap, 1 );
-        if( findParamInVec( params, PropertySpecularMap, paramVal ) )
-            setProperty( PropertySpecularMap, 1 );
-        if( findParamInVec( params, PropertyEnvProbeMap, paramVal ) )
-            setProperty( PropertyEnvProbeMap, 1 );
-        bool alphaTest = findParamInVec( params, PropertyAlphaTest, paramVal );
+        if( findParamInVec( params, HlmsBaseProp::DiffuseMap, paramVal ) )
+            setProperty( HlmsBaseProp::DiffuseMap, 1 );
+        if( normalMappedCanBeSupported && findParamInVec( params, HlmsBaseProp::NormalMap, paramVal ) )
+            setProperty( HlmsBaseProp::NormalMap, 1 );
+        if( findParamInVec( params, HlmsBaseProp::SpecularMap, paramVal ) )
+            setProperty( HlmsBaseProp::SpecularMap, 1 );
+        if( findParamInVec( params, HlmsBaseProp::EnvProbeMap, paramVal ) )
+            setProperty( HlmsBaseProp::EnvProbeMap, 1 );
+        bool alphaTest = findParamInVec( params, HlmsBaseProp::AlphaTest, paramVal );
         if( alphaTest )
-            setProperty( PropertyAlphaTest, 1 );
+            setProperty( HlmsBaseProp::AlphaTest, 1 );
 
-        calculateHashForPreCreate( renderable, params );
+        PiecesMap pieces[NumShaderTypes];
+        calculateHashForPreCreate( renderable, params, pieces );
 
-        uint32 renderableHash = this->addRenderableCache( mSetProperties, 0 );
+        uint32 renderableHash = this->addRenderableCache( mSetProperties, pieces );
 
         //For shadow casters, turn normals off. UVs & diffuse also off unless there's alpha testing.
-        setProperty( HlmsPropertyNormal, 0 );
-        setProperty( HlmsPropertyQTangent, 0 );
-        setProperty( PropertyNormalMap, 0 );
-        setProperty( PropertySpecularMap, 0 );
-        setProperty( PropertyEnvProbeMap, 0 );
+        setProperty( HlmsBaseProp::Normal, 0 );
+        setProperty( HlmsBaseProp::QTangent, 0 );
+        setProperty( HlmsBaseProp::NormalMap, 0 );
+        setProperty( HlmsBaseProp::SpecularMap, 0 );
+        setProperty( HlmsBaseProp::EnvProbeMap, 0 );
         if( !alphaTest )
         {
-            setProperty( HlmsPropertyUvCount, 0 );
-            setProperty( PropertyDiffuseMap, 0 );
+            setProperty( HlmsBaseProp::UvCount, 0 );
+            setProperty( HlmsBaseProp::DiffuseMap, 0 );
         }
-        calculateHashForPreCaster( renderable, params );
-        uint32 renderableCasterHash = this->addRenderableCache( mSetProperties, 0 );
+        PiecesMap piecesCaster[NumShaderTypes];
+        calculateHashForPreCaster( renderable, params, piecesCaster );
+        uint32 renderableCasterHash = this->addRenderableCache( mSetProperties, piecesCaster );
 
         outHash         = renderableHash;
         outCasterHash   = renderableCasterHash;
@@ -1501,12 +1503,12 @@ namespace Ogre
                 const vector<Real>::type *pssmSplits = shadowNode->getPssmSplits( 0 );
                 if( pssmSplits )
                     numPssmSplits = static_cast<int32>( pssmSplits->size() - 1 );
-                setProperty( HlmsPropertyPssmSplits, numPssmSplits );
+                setProperty( HlmsBaseProp::PssmSplits, numPssmSplits );
 
                 size_t numShadowMaps = shadowNode->getNumShadowCastingLights();
                 if( numPssmSplits )
                     numShadowMaps += numPssmSplits - 1;
-                setProperty( HlmsPropertyNumShadowMaps, numShadowMaps );
+                setProperty( HlmsBaseProp::NumShadowMaps, numShadowMaps );
 
                 uint numLightsPerType[3];
                 memset( numLightsPerType, 0, sizeof( numLightsPerType ) );
@@ -1535,18 +1537,18 @@ namespace Ogre
                     }
                 }
 
-                setProperty( HlmsPropertyLightsAttenuation, numLightsPerType[Light::LT_POINT] +
-                                                            numLightsPerType[Light::LT_SPOTLIGHT] );
-                setProperty( HlmsPropertyLightsSpotParams,  numLightsPerType[Light::LT_SPOTLIGHT] );
+                setProperty( HlmsBaseProp::LightsAttenuation, numLightsPerType[Light::LT_POINT] +
+                                                              numLightsPerType[Light::LT_SPOTLIGHT] );
+                setProperty( HlmsBaseProp::LightsSpotParams,  numLightsPerType[Light::LT_SPOTLIGHT] );
 
 
                 numLightsPerType[Light::LT_POINT]       += numLightsPerType[Light::LT_DIRECTIONAL];
                 numLightsPerType[Light::LT_SPOTLIGHT]   += numLightsPerType[Light::LT_POINT];
 
                 //The value is cummulative for each type (order: Directional, point, spot)
-                setProperty( HlmsPropertyLightsDirectional, numLightsPerType[Light::LT_DIRECTIONAL] );
-                setProperty( HlmsPropertyLightsPoint,       numLightsPerType[Light::LT_POINT] );
-                setProperty( HlmsPropertyLightsSpot,        numLightsPerType[Light::LT_SPOTLIGHT] );
+                setProperty( HlmsBaseProp::LightsDirectional, numLightsPerType[Light::LT_DIRECTIONAL] );
+                setProperty( HlmsBaseProp::LightsPoint,       numLightsPerType[Light::LT_POINT] );
+                setProperty( HlmsBaseProp::LightsSpot,        numLightsPerType[Light::LT_SPOTLIGHT] );
             }
             else
             {
@@ -1562,36 +1564,36 @@ namespace Ogre
                     ++itor;
                 }
 
-                setProperty( HlmsPropertyNumShadowMaps, 0 );
-                setProperty( HlmsPropertyPssmSplits, 0 );
-                setProperty( HlmsPropertyLightsAttenuation, 0 );
-                setProperty( HlmsPropertyLightsSpotParams,  0 );
-                setProperty( HlmsPropertyLightsDirectional, numDirLights );
-                setProperty( HlmsPropertyLightsPoint,       numDirLights );
-                setProperty( HlmsPropertyLightsSpot,        numDirLights );
+                setProperty( HlmsBaseProp::NumShadowMaps, 0 );
+                setProperty( HlmsBaseProp::PssmSplits, 0 );
+                setProperty( HlmsBaseProp::LightsAttenuation, 0 );
+                setProperty( HlmsBaseProp::LightsSpotParams,  0 );
+                setProperty( HlmsBaseProp::LightsDirectional, numDirLights );
+                setProperty( HlmsBaseProp::LightsPoint,       numDirLights );
+                setProperty( HlmsBaseProp::LightsSpot,        numDirLights );
             }
         }
         else
         {
-            setProperty( HlmsPropertyShadowCaster, casterPass );
-            setProperty( HlmsPropertyDualParaboloidMapping, dualParaboloid );
+            setProperty( HlmsBaseProp::ShadowCaster, casterPass );
+            setProperty( HlmsBaseProp::DualParaboloidMapping, dualParaboloid );
 
-            setProperty( HlmsPropertyNumShadowMaps, 0 );
-            setProperty( HlmsPropertyPssmSplits, 0 );
-            setProperty( HlmsPropertyLightsAttenuation, 0 );
-            setProperty( HlmsPropertyLightsSpotParams,  0 );
-            setProperty( HlmsPropertyLightsDirectional, 0 );
-            setProperty( HlmsPropertyLightsPoint,       0 );
-            setProperty( HlmsPropertyLightsSpot,        0 );
+            setProperty( HlmsBaseProp::NumShadowMaps, 0 );
+            setProperty( HlmsBaseProp::PssmSplits, 0 );
+            setProperty( HlmsBaseProp::LightsAttenuation, 0 );
+            setProperty( HlmsBaseProp::LightsSpotParams,  0 );
+            setProperty( HlmsBaseProp::LightsDirectional, 0 );
+            setProperty( HlmsBaseProp::LightsPoint,       0 );
+            setProperty( HlmsBaseProp::LightsSpot,        0 );
         }
 
-        uint32 hash = getProperty( HlmsPropertyDualParaboloidMapping ) |
-                (getProperty( HlmsPropertyNumShadowMaps )           << 1 )|
-                (getProperty( HlmsPropertyPssmSplits )              << 5 )|
-                (getProperty( HlmsPropertyLightsDirectional )       << 8 )|
-                (getProperty( HlmsPropertyLightsPoint )             << 12)|
-                (getProperty( HlmsPropertyLightsSpot )              << 16)|
-                (getProperty( HlmsPropertyShadowCaster )            << 20);
+        uint32 hash = getProperty( HlmsBaseProp::DualParaboloidMapping ) |
+                (getProperty( HlmsBaseProp::NumShadowMaps )         << 1 )|
+                (getProperty( HlmsBaseProp::PssmSplits )            << 5 )|
+                (getProperty( HlmsBaseProp::LightsDirectional )     << 8 )|
+                (getProperty( HlmsBaseProp::LightsPoint )           << 12)|
+                (getProperty( HlmsBaseProp::LightsSpot )            << 16)|
+                (getProperty( HlmsBaseProp::ShadowCaster )          << 20);
 
         HlmsCache retVal( hash, mType );
         retVal.setProperties = mSetProperties;

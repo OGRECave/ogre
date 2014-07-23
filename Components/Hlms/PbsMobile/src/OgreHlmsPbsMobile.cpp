@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsPbsMobile.h"
 #include "OgreHlmsPbsMobileDatablock.h"
+#include "OgrePbsMobileShaderCreationData.h"
 
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
@@ -41,12 +42,58 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const IdString HlmsPbsMobile::PropertyHwGammaRead   = IdString( "hw_gamma_read" );
-    const IdString HlmsPbsMobile::PropertyHwGammaWrite  = IdString( "hw_gamma_write" );
-    const IdString HlmsPbsMobile::PropertySignedIntTex  = IdString( "signed_int_textures" );
+    const IdString PbsMobileProperty::HwGammaRead       = IdString( "hw_gamma_read" );
+    const IdString PbsMobileProperty::HwGammaWrite      = IdString( "hw_gamma_write" );
+    const IdString PbsMobileProperty::SignedIntTex      = IdString( "signed_int_textures" );
 
-    const IdString HlmsPbsMobile::PropertyUvAtlas       = IdString( "uv_atlas" );
-    const IdString HlmsPbsMobile::PropertyFresnelScalar = IdString( "fresnel_scalar" );
+    const IdString PbsMobileProperty::UvAtlas           = IdString( "uv_atlas" );
+    const IdString PbsMobileProperty::FresnelScalar     = IdString( "fresnel_scalar" );
+
+    const IdString PbsMobileProperty::UvDiffuse         = IdString( "uv_diffuse" );
+    const IdString PbsMobileProperty::UvSpecular        = IdString( "uv_specular" );
+    const IdString PbsMobileProperty::UvNormal          = IdString( "uv_normal" );
+    const IdString PbsMobileProperty::DetailMaps        = IdString( "detail_maps" );
+
+    const IdString PbsMobileProperty::DetailMapSwizzle0 = IdString( "detail_map_swizzle0" );
+    const IdString PbsMobileProperty::DetailMapSwizzle1 = IdString( "detail_map_swizzle1" );
+    const IdString PbsMobileProperty::DetailMapSwizzle2 = IdString( "detail_map_swizzle2" );
+    const IdString PbsMobileProperty::DetailMapSwizzle3 = IdString( "detail_map_swizzle3" );
+
+    const IdString PbsMobileProperty::UvDetail0         = IdString( "uv_detail0" );
+
+    const IdString PbsMobileProperty::BlendModeIndex0   = IdString( "blend_mode_idx0" );
+    const IdString PbsMobileProperty::BlendModeIndex1   = IdString( "blend_mode_idx1" );
+    const IdString PbsMobileProperty::BlendModeIndex2   = IdString( "blend_mode_idx2" );
+    const IdString PbsMobileProperty::BlendModeIndex3   = IdString( "blend_mode_idx3" );
+
+    const IdString *PbsMobileProperty::UvSourcePtrs[NUM_PBSM_SOURCES] =
+    {
+        &PbsMobileProperty::UvDiffuse,
+        &PbsMobileProperty::UvSpecular,
+        &PbsMobileProperty::UvNormal,
+        &PbsMobileProperty::UvDetail0,
+        &PbsMobileProperty::UvDetail1,
+        &PbsMobileProperty::UvDetail2,
+        &PbsMobileProperty::UvDetail3
+    };
+
+    const IdString *PbsMobileProperty::DetailMapSwizzles[4] =
+    {
+        &PbsMobileProperty::DetailMapSwizzle0,
+        &PbsMobileProperty::DetailMapSwizzle1,
+        &PbsMobileProperty::DetailMapSwizzle2,
+        &PbsMobileProperty::DetailMapSwizzle3,
+    };
+
+    const IdString *PbsMobileProperty::BlendModes[4] =
+    {
+        &PbsMobileProperty::BlendModeIndex0,
+        &PbsMobileProperty::BlendModeIndex1,
+        &PbsMobileProperty::BlendModeIndex2,
+        &PbsMobileProperty::BlendModeIndex3
+    };
+
+    extern const String c_blendModes[];
 
     const String c_vsPerObjectUniforms[] =
     {
@@ -82,7 +129,7 @@ namespace Ogre
         GpuNamedConstants *constantsDef;
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
         constantsDef = const_cast<GpuNamedConstants*>( &retVal->vertexShader->getConstantDefinitions() );
-        bool hasSkeleton = getProperty( HlmsPropertySkeleton ) != 0;
+        bool hasSkeleton = getProperty( HlmsBaseProp::Skeleton ) != 0;
         for( size_t i=hasSkeleton ? 2 : 0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_vsPerObjectUniforms[i] );
@@ -117,10 +164,10 @@ namespace Ogre
         const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
                                                     queuedRenderable.renderable->getDatablock() );
 
-        assert( !datablock->mTexture[PBSM_DIFFUSE].isNull()     == getProperty( PropertyDiffuseMap ) );
-        assert( !datablock->mTexture[PBSM_NORMAL].isNull()      == getProperty( PropertyNormalMap ) );
-        assert( !datablock->mTexture[PBSM_SPECULAR].isNull()    == getProperty( PropertySpecularMap ) );
-        assert( !datablock->mTexture[PBSM_REFLECTION].isNull()  == getProperty( PropertyEnvProbeMap ) );
+        assert( !datablock->mTexture[PBSM_DIFFUSE].isNull()   == getProperty( HlmsBaseProp::DiffuseMap ) );
+        assert( !datablock->mTexture[PBSM_NORMAL].isNull()    == getProperty( HlmsBaseProp::NormalMap ) );
+        assert( !datablock->mTexture[PBSM_SPECULAR].isNull()  == getProperty( HlmsBaseProp::SpecularMap ) );
+        assert( !datablock->mTexture[PBSM_REFLECTION].isNull()== getProperty( HlmsBaseProp::EnvProbeMap ) );
 
         if( !datablock->mTexture[PBSM_DIFFUSE].isNull() )
             psParams->setNamedConstant( "texDiffuseMap", texUnit++ );
@@ -134,16 +181,68 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsMobile::calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params )
+    void HlmsPbsMobile::calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params,
+                                                   PiecesMap *inOutPieces )
     {
         assert( dynamic_cast<HlmsPbsMobileDatablock*>( renderable->getDatablock() ) );
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
                                                         renderable->getDatablock() );
-        setProperty( PropertyUvAtlas, datablock->mNumUvAtlas );
-        setProperty( PropertyFresnelScalar, datablock->mFresnelTypeSizeBytes != 4 );
+        setProperty( PbsMobileProperty::UvAtlas, datablock->mNumUvAtlas );
+        setProperty( PbsMobileProperty::FresnelScalar, datablock->mFresnelTypeSizeBytes != 4 );
+
+        for( size_t i=0; i<PBSM_SOURCE_DETAIL0; ++i )
+        {
+            uint8 uvSource = datablock->mShaderCreationData->uvSource[i];
+            setProperty( *PbsMobileProperty::UvSourcePtrs[i], uvSource );
+
+            if( !datablock->mTexture[i].isNull() &&
+                getProperty( *HlmsBaseProp::UvCountPtrs[uvSource] ) < 2 )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                             "Renderable needs at least 2 coordinates in UV set #" +
+                             StringConverter::toString( uvSource ) +
+                             ". Either change the mesh, or change the UV source settings",
+                             "HlmsPbsMobile::calculateHashForPreCreate" );
+            }
+        }
+
+        size_t validDetailMaps = 0;
+        for( size_t i=0; i<4; ++i )
+        {
+            uint8 blendMode = datablock->mShaderCreationData->blendModes[i];
+            inOutPieces[PixelShader][*PbsMobileProperty::BlendModes[i]] = "@insertpiece( " +
+                                                                            c_blendModes[blendMode] + ")";
+
+            //If Detail map 0 doesn't exists but Detail map 1 does;
+            //then DetailMapSwizzle0 must reference the swizzle 'y'
+            //Same happens with the UV sources.
+            if( !datablock->mTexture[PBSM_DETAIL0 + i].isNull() ||
+                !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
+            {
+                const char *swizzles[4] = { "x", "y", "z", "w" };
+                IdString detailMapSwizzleN = *PbsMobileProperty::DetailMapSwizzles[validDetailMaps];
+                inOutPieces[PixelShader][detailMapSwizzleN] = swizzles[i];
+
+                uint8 uvSource = datablock->mShaderCreationData->uvSource[i];
+                setProperty( *PbsMobileProperty::UvSourcePtrs[PBSM_SOURCE_DETAIL0 + validDetailMaps],
+                             uvSource );
+
+                if( getProperty( *HlmsBaseProp::UvCountPtrs[uvSource] ) < 2 )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                                 "Renderable needs at least 2 coordinates in UV set #" +
+                                 StringConverter::toString( uvSource ) +
+                                 ". Either change the mesh, or change the UV source settings",
+                                 "HlmsPbsMobile::calculateHashForPreCreate" );
+                }
+
+                ++validDetailMaps;
+            }
+        }
 
         String paramVal;
-        if( !getProperty( PropertyNormalMap ) && findParamInVec( params, PropertyNormalMap, paramVal ) )
+        if( !getProperty( HlmsBaseProp::NormalMap ) &&
+            findParamInVec( params, HlmsBaseProp::NormalMap, paramVal ) )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "Renderable can't use normalmaps but datablock wants normalmaps. "
@@ -152,26 +251,28 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsMobile::calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params )
+    void HlmsPbsMobile::calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params,
+                                                   PiecesMap *inOutPieces )
     {
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
                                                         renderable->getDatablock() );
-        setProperty( PropertyUvAtlas, datablock->mNumUvAtlasCaster );
-        setProperty( PropertyFresnelScalar, 0 );
+        setProperty( PbsMobileProperty::UvAtlas, datablock->mNumUvAtlasCaster );
+        setProperty( PbsMobileProperty::FresnelScalar, 0 );
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbsMobile::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
-                                           bool dualParaboloid, SceneManager *sceneManager )
+                                              bool dualParaboloid, SceneManager *sceneManager )
     {
         HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
 
         const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();
-        setProperty( PropertyHwGammaRead, capabilities->hasCapability( RSC_HW_GAMMA ) );
-        setProperty( PropertyHwGammaWrite, capabilities->hasCapability( RSC_HW_GAMMA ) &&
-                                           renderTarget->isHardwareGammaEnabled() );
-        setProperty( PropertySignedIntTex, capabilities->hasCapability( RSC_TEXTURE_SIGNED_INT ) );
+        setProperty( PbsMobileProperty::HwGammaRead, capabilities->hasCapability( RSC_HW_GAMMA ) );
+        setProperty( PbsMobileProperty::HwGammaWrite, capabilities->hasCapability( RSC_HW_GAMMA ) &&
+                                                        renderTarget->isHardwareGammaEnabled() );
+        setProperty( PbsMobileProperty::SignedIntTex, capabilities->hasCapability(
+                                                            RSC_TEXTURE_SIGNED_INT ) );
 
         retVal.setProperties = mSetProperties;
 
@@ -193,7 +294,7 @@ namespace Ogre
 
         if( !casterPass )
         {
-            int32 numShadowMaps = getProperty( HlmsPropertyNumShadowMaps );
+            int32 numShadowMaps = getProperty( HlmsBaseProp::NumShadowMaps );
             mPreparedPass.vertexShaderSharedBuffer.clear();
             mPreparedPass.vertexShaderSharedBuffer.reserve( (16 + 2) * numShadowMaps + 16 * 2 );
 
@@ -245,10 +346,10 @@ namespace Ogre
             //---------------------------------------------------------------------------
             //                          ---- PIXEL SHADER ----
             //---------------------------------------------------------------------------
-            int32 numPssmSplits     = getProperty( HlmsPropertyPssmSplits );
-            int32 numLights         = getProperty( HlmsPropertyLightsSpot );
-            int32 numAttenLights    = getProperty( HlmsPropertyLightsAttenuation );
-            int32 numSpotlights     = getProperty( HlmsPropertyLightsSpotParams );
+            int32 numPssmSplits     = getProperty( HlmsBaseProp::PssmSplits );
+            int32 numLights         = getProperty( HlmsBaseProp::LightsSpot );
+            int32 numAttenLights    = getProperty( HlmsBaseProp::LightsAttenuation );
+            int32 numSpotlights     = getProperty( HlmsBaseProp::LightsSpotParams );
             mPreparedPass.pixelShaderSharedBuffer.clear();
             mPreparedPass.pixelShaderSharedBuffer.reserve( 2 * numShadowMaps + numPssmSplits +
                                                            9 * numLights + 3 * numAttenLights +
@@ -451,7 +552,8 @@ namespace Ogre
             memcpy( vsUniformBuffer, mPreparedPass.vertexShaderSharedBuffer.begin(),
                     sizeof(float) * (mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem) );
 
-            assert( !datablock->mTexture[PBSM_REFLECTION].isNull() == getProperty( PropertyEnvProbeMap ) );
+            assert( !datablock->mTexture[PBSM_REFLECTION].isNull() ==
+                    getProperty( HlmsBaseProp::EnvProbeMap ) );
 
             memcpy( psUniformBuffer, mPreparedPass.pixelShaderSharedBuffer.begin(),
                     sizeof(float) * psBufferElements );

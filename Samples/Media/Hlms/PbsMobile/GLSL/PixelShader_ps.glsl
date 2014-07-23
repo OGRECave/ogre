@@ -55,15 +55,18 @@ uniform @insertpiece( FresnelType ) F0;
 @property( envprobe_map )
 @property( hlms_cube_arrays_supported ) uniform lowp samplerCube	texEnvProbeMap;@end
 @property( !hlms_cube_arrays_supported ) uniform lowp sampler2D	texEnvProbeMap;@end @end
+@foreach( detail_maps, n )
+	uniform lowp sampler2D texDetailMap@n;
+	@property( detail_normal_map )uniform lowp sampler2D	texDetailNormalMap@n;@end @end
 
 @property( diffuse_map )lowp vec4 diffuseCol;
-@piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv0 * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
+@piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv@value(uv_diffuse).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
 @property( !hw_gamma_read )	//Gamma to linear space
 	diffuseCol = diffuseCol * diffuseCol;@end @end
 @piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
 @property( specular_map )lowp vec4 specularCol;
 lowp float ROUGHNESS;
-@piece( SampleSpecularMap )	specularCol = texture2D( texSpecularMap, psUv0 * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
+@piece( SampleSpecularMap )	specularCol = texture2D( texSpecularMap, psUv@value(uv_specular).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
 	ROUGHNESS = roughness * specularCol.w;@end
 @piece( MulSpecularMapValue )* specularCol.xyz@end@end
 
@@ -110,13 +113,8 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 }
 @end
 
-@property( normal_map )mediump vec3 getNormalMap( mediump vec3 vNormal, mediump vec3 vTangent, lowp sampler2D normalMap, lowp vec2 uv0 )
+@property( normal_map )mediump vec3 getTSNormal( mediump mat3 TBN, lowp sampler2D normalMap, lowp vec2 uv0 )
 {
-	//Get the TBN matrix
-	mediump vec3 vBinormal	= cross( vTangent, vNormal );
-	mediump mat3 TBN = transpose( mat3( vTangent, vBinormal, vNormal ) );
-
-
 	mediump vec3 tsNormal;
 @property( signed_int_textures )
 	//Normal texture must be in U8V8 or BC5 format!
@@ -125,9 +123,9 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 	//Normal texture must be in LA format!
 	tsNormal.xy = texture2D( normalMap, uv0  * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xw * 2.0 + 1.0;
 @end
-	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
+	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
 
-	return normalize( mul( TBN, tsNormal ) );
+	return tsNormal;
 }
 @end
 
@@ -177,10 +175,27 @@ mediump vec3 cookTorrance( mediump vec3 lightDir, mediump vec3 viewDir, lowp flo
 
 void main()
 {
+@property( detail_maps )
+	lowp vec4 detailWeights = vec4( 1.0 );
+	//Group all texture loads together to help the GPU hide the
+	//latency (bad GL ES2 drivers won't optimize this automatically)
+@end
+@foreach( detail_maps, n )
+	lowp vec4 detailCol@n	= texture2D( texDetailMap@n, psUv@value(uv_detail@n).xy );
+	mediump vec3 vDetail@n	= getTSNormal( texDetailNormalMap@n, psUv@value(uv_detail@n).xy ) * weight[@n];
+	@property( !hw_gamma_read )//Gamma to linear space
+	detailCol.xyz = detailCol.xyz * detailCol.xyz;@end
+@end
+
 	nNormal = normalize( psNormal );
 @property( normal_map )
 	nTangent = normalize( psTangent );
-	nNormal = getNormalMap( nNormal, nTangent, texNormalMap, psUv0 );
+
+	//Get the TBN matrix
+	mediump vec3 vBinormal	= cross( vTangent, vNormal );
+	mediump mat3 TBN		= transpose( mat3( vTangent, vBinormal, vNormal ) );
+
+	nNormal = getTSNormal( texNormalMap, psUv@value(uv_normal).xy );
 @end
 
 @property( hlms_pssm_splits )
@@ -193,6 +208,19 @@ void main()
 
 @insertpiece( SampleDiffuseMap )
 @insertpiece( SampleSpecularMap )
+
+@foreach( detail_maps, n )
+	detailCol@n.w *= detailWeights.@insertpiece(detail_map_swizzle@n);
+	@insertpiece( blend_mode_idx@n )
+	@property( detail_normal_map )
+		nNormal.xy	+= vDetail@n.xy;
+		nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_map_swizzle@n);
+	@end
+@end
+
+@property( normal_map )
+	nNormal = normalize( mul( TBN, nNormal ) );
+@end
 
 	//Everything's in Camera space, we use Cook-Torrance lighting
 @property( hlms_lights_spot || envprobe_map )

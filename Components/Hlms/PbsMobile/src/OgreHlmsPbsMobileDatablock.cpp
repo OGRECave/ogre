@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsTextureManager.h"
+#include "OgrePbsMobileShaderCreationData.h"
 #include "OgreTexture.h"
 #include "OgreLogManager.h"
 
@@ -49,8 +50,11 @@ namespace Ogre
         mRoughness( 0.1f ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
-        mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f )
+        mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f ),
+        mShaderCreationData( 0 )
     {
+        mShaderCreationData = new PbsMobileShaderCreationData();
+
         String paramVal;
 
         if( Hlms::findParamInVec( params, "diffuse", paramVal ) )
@@ -134,10 +138,16 @@ namespace Ogre
         calculateHash();
     }
     //-----------------------------------------------------------------------------------
+    HlmsPbsMobileDatablock::~HlmsPbsMobileDatablock()
+    {
+        delete mShaderCreationData;
+        mShaderCreationData = 0;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::calculateHash()
     {
         IdString hash;
-        for( size_t i=0; i<PBSM_REFLECTION; ++i )
+        for( size_t i=0; i<PBSM_MAX_TEXTURE_TYPES; ++i )
         {
             if( !mTexture[i].isNull() )
                 hash += IdString( mTexture[i]->getName() );
@@ -233,8 +243,6 @@ namespace Ogre
                              sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx - 1) );
                     --mNumUvAtlas;
                 }
-
-                flushRenderables();
             }
 
             if( !newTexture.isNull() )
@@ -243,6 +251,39 @@ namespace Ogre
             }
         }
 
+        if( oldTexExisted != newTexture.isNull() )
+            flushRenderables();
+
         calculateHash();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setTextureUvSource( PbsMobileUvSourceType sourceType, uint8 uvSet )
+    {
+        if( uvSet >= 8 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "UV set must be in rage in range [0; 8)",
+                         "HlmsPbsMobileDatablock::setTextureUvSource" );
+        }
+
+        if( mShaderCreationData->uvSource[sourceType] != uvSet )
+        {
+            mShaderCreationData->uvSource[sourceType] = uvSet;
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setDetailMapBlendMode( uint8 detailMap, PbsMobileBlendModes blendMode )
+    {
+        if( detailMap >= 4 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Details maps are in range [0; 4)",
+                         "HlmsPbsMobileDatablock::setDetailMapBlendMode" );
+        }
+
+        if( mShaderCreationData->blendModes[detailMap] != blendMode )
+        {
+            mShaderCreationData->blendModes[detailMap] = blendMode;
+            flushRenderables();
+        }
     }
 }

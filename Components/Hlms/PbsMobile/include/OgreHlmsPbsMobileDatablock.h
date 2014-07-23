@@ -42,20 +42,21 @@ namespace Ogre
     *  @{
     */
 
-    enum PbsMobileTextureTypes
-    {
-        PBSM_DIFFUSE,
-        PBSM_NORMAL,
-        PBSM_SPECULAR,
-        PBSM_REFLECTION,
-        PBSM_MAX_TEXTURE_TYPES
-    };
+    struct PbsMobileShaderCreationData;
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
     */
     class _OgreHlmsPbsMobileExport HlmsPbsMobileDatablock : public HlmsDatablock
     {
         friend class HlmsPbsMobile;
+    public:
+        struct UvAtlasParams
+        {
+            float uOffset;
+            float vOffset;
+            float invDivisor;
+            UvAtlasParams() : uOffset( 0 ), vOffset( 0 ), invDivisor( 1.0f ) {}
+        };
 
     protected:
         uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
@@ -70,25 +71,21 @@ namespace Ogre
     protected:
         float   mFresnelR, mFresnelG, mFresnelB;    //F0
 
-    public:
-        struct UvAtlasParams
-        {
-            float uOffset;
-            float vOffset;
-            float invDivisor;
-            UvAtlasParams() : uOffset( 0 ), vOffset( 0 ), invDivisor( 1.0f ) {}
-        };
-
     protected:
         UvAtlasParams mUvAtlasParams[3];
 
         TexturePtr  mTexture[PBSM_MAX_TEXTURE_TYPES];
 
+        /// The data in this structure only affects shader generation (thus modifying it implies
+        /// generating a new shader; i.e. a call to flushRenderables()). Because this data
+        /// is not needed while iterating (updating constants), it's dynamically allocated
+        PbsMobileShaderCreationData *mShaderCreationData;
+
+
         void setTexture( const String &name, HlmsTextureManager::TextureMapType textureMapType,
                          TexturePtr &outTexture, UvAtlasParams &outAtlasParams );
 
     public:
-
         /** Valid parameters in params:
         @param params
             * fresnel <value [g, b]>
@@ -133,6 +130,7 @@ namespace Ogre
                              const HlmsMacroblock *macroblock,
                              const HlmsBlendblock *blendblock,
                              const HlmsParamVec &params );
+        virtual ~HlmsPbsMobileDatablock();
 
         /// Sets the diffuse colour. The colour will be divided by PI for energy conservation.
         void setDiffuse( const Vector3 &diffuseColour );
@@ -185,6 +183,25 @@ namespace Ogre
         */
         void setTexture( PbsMobileTextureTypes texType, TexturePtr &newTexture,
                          const UvAtlasParams &atlasParams );
+
+        /** Sets which UV set to use for the given texture.
+            Calling this function triggers a HlmsDatablock::flushRenderables.
+        @param uvSet
+            UV coordinate set. Value must be between in range [0; 8)
+        */
+        void setTextureUvSource( PbsMobileUvSourceType sourceType, uint8 uvSet );
+
+        /** Changes the blend mode of the detail map. Calling this function triggers a
+            HlmsDatablock::flushRenderables even if you never use detail maps (they
+            affect the cache's hash)
+        @remarks
+            This parameter only affects the diffuse detail map. Not the normal map.
+        @param detailMap
+            Value in the range [0; 4)
+        @param blendMode
+            Blend mode
+        */
+        void setDetailMapBlendMode( uint8 detailMap, PbsMobileBlendModes blendMode );
 
         virtual void calculateHash();
     };

@@ -35,7 +35,7 @@ void main()
 	if( outColour.a @insertpiece( alpha_test_cmp_func ) alpha_test_threshold )
 		discard;@end
 
-	//Group all texture loads together to help the GPU to hide the
+	//Group all texture loads together to help the GPU hide the
 	//latency (bad GL ES2 drivers won't optimize this automatically)
 @foreach( diffuse_map, n, 1 )
 	lowp vec4 topImage@n = texture( texDiffuseMap[@n], psUv@value( diffuse_map_count@n ) @insertpiece( atlasOffset@n ));@end

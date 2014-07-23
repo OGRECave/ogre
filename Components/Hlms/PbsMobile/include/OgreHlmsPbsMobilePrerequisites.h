@@ -48,4 +48,56 @@ THE SOFTWARE.
 #   define _OgreHlmsPbsMobileExport
 #endif 
 
+namespace Ogre
+{
+    enum PbsMobileTextureTypes
+    {
+        PBSM_DIFFUSE,
+        PBSM_NORMAL,
+        PBSM_SPECULAR,
+        PBSM_REFLECTION,
+        PBSM_DETAIL0,
+        PBSM_DETAIL1,
+        PBSM_DETAIL2,
+        PBSM_DETAIL3,
+        PBSM_DETAIL0_NM,
+        PBSM_DETAIL1_NM,
+        PBSM_DETAIL2_NM,
+        PBSM_DETAIL3_NM,
+        PBSM_MAX_TEXTURE_TYPES
+    };
+
+    enum PbsMobileUvSourceType
+    {
+        PBSM_SOURCE_DIFFUSE,
+        PBSM_SOURCE_NORMAL,
+        PBSM_SOURCE_SPECULAR,
+        PBSM_SOURCE_DETAIL0,
+        PBSM_SOURCE_DETAIL1,
+        PBSM_SOURCE_DETAIL2,
+        PBSM_SOURCE_DETAIL3,
+        NUM_PBSM_SOURCES
+    };
+
+    enum PbsMobileBlendModes
+    {
+        /// Regular alpha blending
+        PBSM_BLEND_NORMAL_NON_PREMUL,
+        /// Premultiplied alpha blending
+        PBSM_BLEND_NORMAL_PREMUL,
+        PBSM_BLEND_ADD,
+        PBSM_BLEND_SUBTRACT,
+        PBSM_BLEND_MULTIPLY,
+        PBSM_BLEND_MULTIPLY2X,
+        PBSM_BLEND_SCREEN,
+        PBSM_BLEND_OVERLAY,
+        PBSM_BLEND_LIGHTEN,
+        PBSM_BLEND_DARKEN,
+        PBSM_BLEND_GRAIN_EXTRACT,
+        PBSM_BLEND_GRAIN_MERGE,
+        PBSM_BLEND_DIFFERENCE,
+        NUM_PBSM_BLEND_MODES
+    };
+}
+
 #endif

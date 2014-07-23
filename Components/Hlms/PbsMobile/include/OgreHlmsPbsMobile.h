@@ -71,8 +71,10 @@ namespace Ogre
                                                     const HlmsBlendblock *blendblock,
                                                     const HlmsParamVec &paramVec );
 
-        virtual void calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params );
-        virtual void calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params );
+        virtual void calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params,
+                                                PiecesMap *inOutPieces );
+        virtual void calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params,
+                                                PiecesMap *inOutPieces );
 
     public:
         HlmsPbsMobile( Archive *dataFolder );
@@ -85,14 +87,41 @@ namespace Ogre
         virtual void fillBuffersFor(const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                      bool casterPass, const HlmsCache *lastCache,
                                      uint32 lastTextureHash );
-
-        static const IdString PropertyHwGammaRead;
-        static const IdString PropertyHwGammaWrite;
-        static const IdString PropertySignedIntTex;
-
-        static const IdString PropertyUvAtlas;
-        static const IdString PropertyFresnelScalar;
     };
+
+	struct _OgreHlmsPbsMobileExport PbsMobileProperty
+    {
+        static const IdString HwGammaRead;
+        static const IdString HwGammaWrite;
+        static const IdString SignedIntTex;
+
+        static const IdString UvAtlas;
+        static const IdString FresnelScalar;
+
+        static const IdString UvDiffuse;
+        static const IdString UvSpecular;
+        static const IdString UvNormal;
+        static const IdString DetailMaps;
+
+        static const IdString UvDetail0;
+        static const IdString UvDetail1;
+        static const IdString UvDetail2;
+        static const IdString UvDetail3;
+
+        static const IdString DetailMapSwizzle0;
+        static const IdString DetailMapSwizzle1;
+        static const IdString DetailMapSwizzle2;
+        static const IdString DetailMapSwizzle3;
+
+        static const IdString BlendModeIndex0;
+        static const IdString BlendModeIndex1;
+        static const IdString BlendModeIndex2;
+        static const IdString BlendModeIndex3;
+
+        static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
+        static const IdString *BlendModes[4];
+        static const IdString *DetailMapSwizzles[4];
+	};
 
     /** @} */
     /** @} */

@@ -127,7 +127,7 @@ namespace Ogre
         const String& getOriginalBuffer() const     { return *mOriginal; }
     };
 
-    struct HlmsProperty
+    struct _OgreExport HlmsProperty
     {
         IdString    keyName;
         int32       value;
