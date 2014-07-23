@@ -117,6 +117,9 @@ namespace Ogre {
             void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
             // Blitting implementation
             void blitFromTexture(GL3PlusTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
+
+            // Additional binding function (original bindToFramebuffer is inherited, so we can not alter it's parameters)
+            void _bindToFramebuffer(GLenum attachment, uint32 zoffset, GLenum which);
         protected:
             // In case this is a texture level
             GLenum mTarget;
