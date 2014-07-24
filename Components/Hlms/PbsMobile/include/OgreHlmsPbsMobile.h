@@ -75,10 +75,8 @@ namespace Ogre
 
         void setDetailMapProperties( bool diffuseMaps, HlmsPbsMobileDatablock *datablock, PiecesMap *inOutPieces );
 
-        virtual void calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params,
-                                                PiecesMap *inOutPieces );
-        virtual void calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params,
-                                                PiecesMap *inOutPieces );
+        virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
+        virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );
 
     public:
         HlmsPbsMobile( Archive *dataFolder );
@@ -98,6 +96,13 @@ namespace Ogre
         static const IdString HwGammaRead;
         static const IdString HwGammaWrite;
         static const IdString SignedIntTex;
+
+        static const IdString DiffuseMap;
+        static const IdString NormalMapTex;
+        static const IdString SpecularMap;
+        static const IdString EnvProbeMap;
+
+        static const IdString NormalMap;
 
         static const IdString UvAtlas;
         static const IdString FresnelScalar;

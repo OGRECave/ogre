@@ -50,6 +50,7 @@ namespace Ogre
 
     const IdString HlmsBaseProp::Normal             = IdString( "hlms_normal" );
     const IdString HlmsBaseProp::QTangent           = IdString( "hlms_qtangent" );
+    const IdString HlmsBaseProp::Tangent            = IdString( "hlms_tangent" );
 
     const IdString HlmsBaseProp::Colour             = IdString( "hlms_colour" );
 
@@ -77,10 +78,6 @@ namespace Ogre
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
 
     //Change per material (hash can be cached on the renderable)
-    const IdString HlmsBaseProp::DiffuseMap     = IdString( "diffuse_map" );
-    const IdString HlmsBaseProp::NormalMap      = IdString( "normal_map" );
-    const IdString HlmsBaseProp::SpecularMap    = IdString( "specular_map" );
-    const IdString HlmsBaseProp::EnvProbeMap    = IdString( "envprobe_map" );
     const IdString HlmsBaseProp::AlphaTest      = IdString( "alpha_test" );
 
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
@@ -150,11 +147,6 @@ namespace Ogre
         setProperty( HlmsBaseProp::LightsDirectional, 1 );
         setProperty( HlmsBaseProp::LightsPoint, 2 );
         setProperty( HlmsBaseProp::LightsSpot, 3 );
-
-        setProperty( HlmsBaseProp::DiffuseMap, 1 );
-        setProperty( HlmsBaseProp::NormalMap, 1 );
-        setProperty( HlmsBaseProp::SpecularMap, 1 );
-        setProperty( HlmsBaseProp::EnvProbeMap, 1 );
     }
     //-----------------------------------------------------------------------------------
     void Hlms::enumeratePieceFiles(void)
@@ -414,6 +406,7 @@ namespace Ogre
                 ((exp.type == EXPR_VAR || exp.type == EXPR_OBJECT) && !lastExpWasOperator ) )
             {
                 syntaxError = true;
+                printf( "Unrecognized token '%s'", exp.value );
             }
             else if( exp.type == EXPR_OPERATOR_OR || exp.type == EXPR_OPERATOR_AND )
             {
@@ -1396,8 +1389,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
-                                 uint32 &outHash, uint32 &outCasterHash )
+    void Hlms::calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash )
     {
         mSetProperties.clear();
 
@@ -1411,7 +1403,6 @@ namespace Ogre
         VertexDeclaration::VertexElementList::const_iterator end  = elementList.end();
 
         uint numTexCoords = 0;
-        bool normalMappedCanBeSupported = false;
         while( itor != end )
         {
             const VertexElement &vertexElem = *itor;
@@ -1424,12 +1415,11 @@ namespace Ogre
                 }
                 else
                 {
-                    normalMappedCanBeSupported = true;
                     setProperty( HlmsBaseProp::QTangent, 1 );
                 }
                 break;
             case VES_TANGENT:
-                normalMappedCanBeSupported = true;
+                setProperty( HlmsBaseProp::Tangent, 1 );
                 break;
             case VES_DIFFUSE:
                 setProperty( HlmsBaseProp::Colour, 1 );
@@ -1453,37 +1443,24 @@ namespace Ogre
 
         setProperty( HlmsBaseProp::UvCount, numTexCoords );
 
-        String paramVal;
-        if( findParamInVec( params, HlmsBaseProp::DiffuseMap, paramVal ) )
-            setProperty( HlmsBaseProp::DiffuseMap, 1 );
-        if( normalMappedCanBeSupported && findParamInVec( params, HlmsBaseProp::NormalMap, paramVal ) )
-            setProperty( HlmsBaseProp::NormalMap, 1 );
-        if( findParamInVec( params, HlmsBaseProp::SpecularMap, paramVal ) )
-            setProperty( HlmsBaseProp::SpecularMap, 1 );
-        if( findParamInVec( params, HlmsBaseProp::EnvProbeMap, paramVal ) )
-            setProperty( HlmsBaseProp::EnvProbeMap, 1 );
-        bool alphaTest = findParamInVec( params, HlmsBaseProp::AlphaTest, paramVal );
-        if( alphaTest )
-            setProperty( HlmsBaseProp::AlphaTest, 1 );
+        HlmsDatablock *datablock = renderable->getDatablock();
+
+        setProperty( HlmsBaseProp::AlphaTest, datablock->getAlphaTest() );
 
         PiecesMap pieces[NumShaderTypes];
-        calculateHashForPreCreate( renderable, params, pieces );
+        calculateHashForPreCreate( renderable, pieces );
 
         uint32 renderableHash = this->addRenderableCache( mSetProperties, pieces );
 
         //For shadow casters, turn normals off. UVs & diffuse also off unless there's alpha testing.
         setProperty( HlmsBaseProp::Normal, 0 );
         setProperty( HlmsBaseProp::QTangent, 0 );
-        setProperty( HlmsBaseProp::NormalMap, 0 );
-        setProperty( HlmsBaseProp::SpecularMap, 0 );
-        setProperty( HlmsBaseProp::EnvProbeMap, 0 );
-        if( !alphaTest )
+        if( !datablock->getAlphaTest() )
         {
             setProperty( HlmsBaseProp::UvCount, 0 );
-            setProperty( HlmsBaseProp::DiffuseMap, 0 );
         }
         PiecesMap piecesCaster[NumShaderTypes];
-        calculateHashForPreCaster( renderable, params, piecesCaster );
+        calculateHashForPreCaster( renderable, piecesCaster );
         uint32 renderableCasterHash = this->addRenderableCache( mSetProperties, piecesCaster );
 
         outHash         = renderableHash;

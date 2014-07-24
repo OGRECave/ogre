@@ -86,8 +86,7 @@ namespace Ogre
             mHlmsDatablock = datablock;
             try
             {
-                mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
-                                                                mHlmsHash, mHlmsCasterHash );
+                mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsHash, mHlmsCasterHash );
             }
             catch( Exception &e )
             {
@@ -110,9 +109,7 @@ namespace Ogre
                     //HLMS as the one the user wanted us to apply
                     mHlmsDatablock = mHlmsDatablock->getCreator()->getDefaultDatablock();
                 }
-                mHlmsDatablock->getCreator()->calculateHashFor( this,
-                                                                mHlmsDatablock->getOriginalParams(),
-                                                                mHlmsHash, mHlmsCasterHash );
+                mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsHash, mHlmsCasterHash );
             }
 
             mHlmsDatablock->_linkRenderable( this );

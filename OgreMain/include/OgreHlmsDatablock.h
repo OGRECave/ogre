@@ -148,7 +148,6 @@ namespace Ogre
         //it's better if mShadowConstantBias is together with the derived type's variables
         /// List of renderables currently using this datablock
         vector<Renderable*>::type mLinkedRenderables;
-        HlmsParamVec mOriginalParams;
         Hlms    *mCreator;
         IdString mName;
 
@@ -168,7 +167,10 @@ namespace Ogre
         bool    mIsOpaque;  /// Cached based on mBlendblock data
         HlmsMacroblock const *mMacroblock;
         HlmsBlendblock const *mBlendblock;  ///Don't set this directly, use @setBlendblock
-
+    protected:
+        bool    mAlphaTest;
+    public:
+        float   mAlphaTestThreshold;
         float   mShadowConstantBias;
 
     public:
@@ -183,13 +185,17 @@ namespace Ogre
 
         IdString getName(void) const                { return mName; }
         Hlms* getCreator(void) const                { return mCreator; }
-        const HlmsParamVec& getOriginalParams(void) const   { return mOriginalParams; }
 
         /// Call this function to set mBlendblock & mIsOpaque automatically based on input
         void setBlendblock( HlmsBlendblock const *blendblock );
 
         void _linkRenderable( Renderable *renderable );
         void _unlinkRenderable( Renderable *renderable );
+
+        /// Enables or disables alpha testing. Calling this function triggers
+        /// a HlmsDatablock::flushRenderables
+        void setAlphaTest( bool bEnabled );
+        bool getAlphaTest(void) const               { return mAlphaTest; }
     };
 
     /** @} */

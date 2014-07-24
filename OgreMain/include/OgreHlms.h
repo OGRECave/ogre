@@ -249,10 +249,8 @@ namespace Ogre
 
         virtual HlmsDatablock* createDefaultDatablock(void);
 
-        virtual void calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params,
-                                                PiecesMap *inOutPieces ) {}
-        virtual void calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params,
-                                                PiecesMap *inOutPieces ) {}
+        virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces ) {}
+        virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces ) {}
 
     public:
         Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder );
@@ -353,8 +351,7 @@ namespace Ogre
         @return
             A hash. This hash references property parameters that are already cached.
         */
-        virtual void calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
-                                       uint32 &outHash, uint32 &outCasterHash );
+        virtual void calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash );
 
         /** Called every frame by the Render Queue to cache the properties needed by this
             pass. i.e. Number of PSSM splits, number of shadow casting lights, etc
@@ -424,6 +421,7 @@ namespace Ogre
 
         static const IdString Normal;
         static const IdString QTangent;
+        static const IdString Tangent;
 
         static const IdString Colour;
 
@@ -451,10 +449,6 @@ namespace Ogre
         static const IdString ShadowCaster;
 
         //Change per material (hash can be cached on the renderable)
-        static const IdString DiffuseMap;
-        static const IdString NormalMap;
-        static const IdString SpecularMap;
-        static const IdString EnvProbeMap;
         static const IdString AlphaTest;
 
         static const IdString GL3Plus;

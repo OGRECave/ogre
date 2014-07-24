@@ -46,6 +46,13 @@ namespace Ogre
     const IdString PbsMobileProperty::HwGammaWrite      = IdString( "hw_gamma_write" );
     const IdString PbsMobileProperty::SignedIntTex      = IdString( "signed_int_textures" );
 
+    const IdString PbsMobileProperty::DiffuseMap        = IdString( "diffuse_map" );
+    const IdString PbsMobileProperty::NormalMapTex      = IdString( "normal_map_tex" );
+    const IdString PbsMobileProperty::SpecularMap       = IdString( "specular_map" );
+    const IdString PbsMobileProperty::EnvProbeMap       = IdString( "envprobe_map" );
+
+    const IdString PbsMobileProperty::NormalMap         = IdString( "normal_map" );
+
     const IdString PbsMobileProperty::UvAtlas           = IdString( "uv_atlas" );
     const IdString PbsMobileProperty::FresnelScalar     = IdString( "fresnel_scalar" );
 
@@ -191,10 +198,10 @@ namespace Ogre
         const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
                                                     queuedRenderable.renderable->getDatablock() );
 
-        assert( !datablock->mTexture[PBSM_DIFFUSE].isNull()   == getProperty( HlmsBaseProp::DiffuseMap ) );
-        assert( !datablock->mTexture[PBSM_NORMAL].isNull()    == getProperty( HlmsBaseProp::NormalMap ) );
-        assert( !datablock->mTexture[PBSM_SPECULAR].isNull()  == getProperty( HlmsBaseProp::SpecularMap ) );
-        assert( !datablock->mTexture[PBSM_REFLECTION].isNull()== getProperty( HlmsBaseProp::EnvProbeMap ) );
+        assert( !datablock->mTexture[PBSM_DIFFUSE].isNull()   == getProperty( PbsMobileProperty::DiffuseMap ) );
+        assert( !datablock->mTexture[PBSM_NORMAL].isNull()    == getProperty( PbsMobileProperty::NormalMap ) );
+        assert( !datablock->mTexture[PBSM_SPECULAR].isNull()  == getProperty( PbsMobileProperty::SpecularMap ) );
+        assert( !datablock->mTexture[PBSM_REFLECTION].isNull()== getProperty( PbsMobileProperty::EnvProbeMap ) );
 
         if( !datablock->mTexture[PBSM_DIFFUSE].isNull() )
             psParams->setNamedConstant( "texDiffuseMap", texUnit++ );
@@ -204,6 +211,28 @@ namespace Ogre
             psParams->setNamedConstant( "texSpecularMap", texUnit++ );
         if( !datablock->mTexture[PBSM_REFLECTION].isNull() )
             psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
+
+        size_t validDetailMaps = 0;
+        for( size_t i=PBSM_DETAIL0; i<=PBSM_DETAIL3; ++i )
+        {
+            if( !datablock->mTexture[i].isNull() )
+            {
+                psParams->setNamedConstant( "texDetailMap[" +
+                                            StringConverter::toString( validDetailMaps++ ) + "]",
+                                            texUnit++ );
+            }
+        }
+
+        validDetailMaps = 0;
+        for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
+        {
+            if( !datablock->mTexture[i].isNull() )
+            {
+                psParams->setNamedConstant( "texDetailNormalMap[" +
+                                            StringConverter::toString( validDetailMaps++ ) + "]",
+                                            texUnit++ );
+            }
+        }
 
         return retVal;
     }
@@ -257,8 +286,7 @@ namespace Ogre
                                    PbsMobileProperty::DetailMapsNormal, validDetailMaps );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsMobile::calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params,
-                                                   PiecesMap *inOutPieces )
+    void HlmsPbsMobile::calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces )
     {
         assert( dynamic_cast<HlmsPbsMobileDatablock*>( renderable->getDatablock() ) );
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
@@ -285,24 +313,55 @@ namespace Ogre
         setDetailMapProperties( true, datablock, inOutPieces );
         setDetailMapProperties( false, datablock, inOutPieces );
 
-        String paramVal;
-        if( !getProperty( HlmsBaseProp::NormalMap ) &&
-            findParamInVec( params, HlmsBaseProp::NormalMap, paramVal ) )
+        setProperty( PbsMobileProperty::DiffuseMap,     !datablock->mTexture[PBSM_DIFFUSE].isNull() );
+        setProperty( PbsMobileProperty::NormalMapTex,   !datablock->mTexture[PBSM_NORMAL].isNull() );
+        setProperty( PbsMobileProperty::SpecularMap,    !datablock->mTexture[PBSM_SPECULAR].isNull() );
+        setProperty( PbsMobileProperty::EnvProbeMap,    !datablock->mTexture[PBSM_REFLECTION].isNull() );
+
+        bool usesNormalMap = !datablock->mTexture[PBSM_NORMAL].isNull();
+        for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
+            usesNormalMap |= !datablock->mTexture[PBSM_NORMAL].isNull();
+        setProperty( PbsMobileProperty::NormalMap, usesNormalMap );
+
+        /*setProperty( HlmsBaseProp::, !datablock->mTexture[PBSM_DETAIL0].isNull() );
+        setProperty( HlmsBaseProp::DiffuseMap, !datablock->mTexture[PBSM_DETAIL1].isNull() );*/
+        bool normalMapCanBeSupported = (getProperty( HlmsBaseProp::Normal ) &&
+                                        getProperty( HlmsBaseProp::Tangent )) ||
+                                        getProperty( HlmsBaseProp::QTangent, 1 );
+
+        if( !normalMapCanBeSupported && usesNormalMap )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                         "Renderable can't use normalmaps but datablock wants normalmaps. "
+                         "Renderable can't use normal maps but datablock wants normal maps. "
                          "Generate Tangents for this mesh to fix the problem or use a "
                          "datablock without normal maps.", "HlmsPbsMobile::calculateHashForPreCreate" );
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsMobile::calculateHashForPreCaster( Renderable *renderable, const HlmsParamVec &params,
-                                                   PiecesMap *inOutPieces )
+    void HlmsPbsMobile::calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces )
     {
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
                                                         renderable->getDatablock() );
         setProperty( PbsMobileProperty::UvAtlas, datablock->mNumUvAtlasCaster );
-        setProperty( PbsMobileProperty::FresnelScalar, 0 );
+
+        HlmsPropertyVec::iterator itor = mSetProperties.begin();
+        HlmsPropertyVec::iterator end  = mSetProperties.end();
+
+        while( itor != end )
+        {
+            if( itor->keyName != PbsMobileProperty::UvAtlas &&
+                itor->keyName != PbsMobileProperty::HwGammaRead &&
+                itor->keyName != PbsMobileProperty::UvDiffuse &&
+                itor->keyName != HlmsBaseProp::Skeleton &&
+                itor->keyName != HlmsBaseProp::BonesPerVertex &&
+                itor->keyName != HlmsBaseProp::DualParaboloidMapping &&
+                itor->keyName != HlmsBaseProp::AlphaTest )
+            {
+                itor->value = 0;
+            }
+
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbsMobile::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
@@ -598,7 +657,7 @@ namespace Ogre
                     sizeof(float) * (mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem) );
 
             assert( !datablock->mTexture[PBSM_REFLECTION].isNull() ==
-                    getProperty( HlmsBaseProp::EnvProbeMap ) );
+                    getProperty( PbsMobileProperty::EnvProbeMap ) );
 
             memcpy( psUniformBuffer, mPreparedPass.pixelShaderSharedBuffer.begin(),
                     sizeof(float) * psBufferElements );

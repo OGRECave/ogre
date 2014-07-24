@@ -67,7 +67,6 @@ namespace Ogre
     HlmsDatablock::HlmsDatablock( IdString name, Hlms *creator, const HlmsMacroblock *macroblock,
                                   const HlmsBlendblock *blendblock,
                                   const HlmsParamVec &params ) :
-        mOriginalParams( params ),
         mCreator( creator ),
         mName( name ),
         mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
@@ -80,6 +79,8 @@ namespace Ogre
                    blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA ),
         mMacroblock( macroblock ),
         mBlendblock( blendblock ),
+        mAlphaTest( false ),
+        mAlphaTestThreshold( 0.5f ),
         mShadowConstantBias( 0.01f )
     {
     }
@@ -130,6 +131,15 @@ namespace Ogre
         renderable->mHlmsGlobalIndex = ~0;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsDatablock::setAlphaTest( bool bEnabled )
+    {
+        if( bEnabled != mAlphaTest )
+        {
+            mAlphaTest = bEnabled;
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsDatablock::flushRenderables(void)
     {
         vector<Renderable*>::type::const_iterator itor = mLinkedRenderables.begin();
@@ -138,7 +148,7 @@ namespace Ogre
         while( itor != end )
         {
             uint32 hash, casterHash;
-            mCreator->calculateHashFor( *itor, mOriginalParams, hash, casterHash );
+            mCreator->calculateHashFor( *itor, hash, casterHash );
             (*itor)->_setHlmsHashes( hash, casterHash );
             ++itor;
         }

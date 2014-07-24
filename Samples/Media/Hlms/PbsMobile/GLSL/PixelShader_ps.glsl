@@ -53,11 +53,10 @@ uniform @insertpiece( FresnelType ) F0;
 @property( normal_map )uniform lowp sampler2D	texNormalMap;@end
 @property( specular_map )uniform lowp sampler2D	texSpecularMap;@end
 @property( envprobe_map )
-@property( hlms_cube_arrays_supported ) uniform lowp samplerCube	texEnvProbeMap;@end
-@property( !hlms_cube_arrays_supported ) uniform lowp sampler2D	texEnvProbeMap;@end @end
-@foreach( detail_maps, n )
-	uniform lowp sampler2D texDetailMap@n;
-	@property( detail_normal_map )uniform lowp sampler2D	texDetailNormalMap@n;@end @end
+@property( hlms_cube_arrays_supported )uniform lowp samplerCube	texEnvProbeMap;@end
+@property( !hlms_cube_arrays_supported )uniform lowp sampler2D	texEnvProbeMap;@end @end
+@property( detail_maps_diffuse )uniform lowp sampler2D	texDetailMap[@value( detail_maps_diffuse )];@end
+@property( detail_maps_normals )uniform lowp sampler2D	texDetailNormalMap[@value( detail_maps_normals )];@end
 
 @property( diffuse_map )lowp vec4 diffuseCol;
 @piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv@value(uv_diffuse).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
@@ -175,21 +174,21 @@ mediump vec3 cookTorrance( mediump vec3 lightDir, mediump vec3 viewDir, lowp flo
 
 void main()
 {
-@property( detail_maps_diffuse|detail_maps_normals )
+@property( detail_maps_diffuse || detail_maps_normals )
 	lowp vec4 detailWeights = vec4( 1.0 );
 	//Group all texture loads together to help the GPU hide the
 	//latency (bad GL ES2 drivers won't optimize this automatically)
 @end
 
 @foreach( detail_maps_diffuse, n )
-	lowp vec4 detailCol@n	= texture2D( texDetailMap@n, psUv@value(uv_detail@n).xy );
+	lowp vec4 detailCol@n	= texture2D( texDetailMap[@n], psUv@value(uv_detail@n).xy );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol.xyz = detailCol.xyz * detailCol.xyz;@end
 	detailWeights.@insertpiece(detail_diffuse_swizzle@n) *= detailCol@n.w;
 	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
 @end
 @foreach( detail_maps_normal, n )
-	mediump vec3 vDetail@n	= getTSNormal( texDetailNormalMap@n, psUv@value(uv_detail_nm@n).xy ) * detailWeights[@n];@end
+	mediump vec3 vDetail@n	= getTSNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy ) * detailWeights[@n];@end
 
 @property( !normal_map )
 	nNormal = normalize( psNormal );
