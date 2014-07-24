@@ -169,7 +169,7 @@ namespace Ogre
             key = "detail_blend_mode" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
-                for( size_t j=0; j<NUM_PBSM_BLEND_MODES; ++i )
+                for( size_t j=0; j<NUM_PBSM_BLEND_MODES; ++j )
                 {
                     String blendModeLowerCase;
                     blendModeLowerCase.resize( c_blendModes[j].size() );

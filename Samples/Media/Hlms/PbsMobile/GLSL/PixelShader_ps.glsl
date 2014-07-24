@@ -188,7 +188,7 @@ void main()
 	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
 @end
 @foreach( detail_maps_normal, n )
-	mediump vec3 vDetail@n	= getTSNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy ) * detailWeights[@n];@end
+	mediump vec3 vDetail@n	= getTSNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy ) * detailWeights.@insertpiece(detail_normal_swizzle@n);@end
 
 @property( !normal_map )
 	nNormal = normalize( psNormal );

@@ -279,6 +279,8 @@ namespace Ogre
                                  ". Either change the mesh, or change the UV source settings",
                                  "HlmsPbsMobile::setDetailMapProperties" );
                 }
+
+                ++validDetailMaps;
             }
         }
 
@@ -736,7 +738,7 @@ namespace Ogre
             {
                 //Rebind textures
                 size_t texUnit = mPreparedPass.shadowMaps.size();
-                for( size_t i=0; i<PBSM_REFLECTION; ++i )
+                for( size_t i=0; i<PBSM_MAX_TEXTURE_TYPES; ++i )
                 {
                     if( !datablock->mTexture[i].isNull() )
                         mRenderSystem->_setTexture( texUnit++, true, datablock->mTexture[i] );
