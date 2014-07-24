@@ -142,6 +142,11 @@ namespace Ogre
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_SPECULAR,
                         mTexture[PBSM_SPECULAR], &mUvAtlasParams[mNumUvAtlas++] );
         }
+        if( Hlms::findParamInVec( params, "detail_weight_map", paramVal ) )
+        {
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL,
+                        mTexture[PBSM_DETAIL_WEIGHT], 0 );
+        }
 
         if( Hlms::findParamInVec( params, "uv_diffuse_map", paramVal ) )
             setTextureUvSource( PBSM_SOURCE_DIFFUSE, StringConverter::parseUnsignedInt( paramVal ) );
@@ -149,6 +154,11 @@ namespace Ogre
             setTextureUvSource( PBSM_SOURCE_NORMAL, StringConverter::parseUnsignedInt( paramVal ) );
         if( Hlms::findParamInVec( params, "uv_specular_map", paramVal ) )
             setTextureUvSource( PBSM_SOURCE_SPECULAR, StringConverter::parseUnsignedInt( paramVal ) );
+        if( Hlms::findParamInVec( params, "uv_detail_weight_map", paramVal ) )
+        {
+            setTextureUvSource( PBSM_SOURCE_DETAIL_WEIGHT,
+                                StringConverter::parseUnsignedInt( paramVal ) );
+        }
 
         for( size_t i=0; i<4; ++i )
         {

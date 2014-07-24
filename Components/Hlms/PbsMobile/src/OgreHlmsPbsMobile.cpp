@@ -50,6 +50,7 @@ namespace Ogre
     const IdString PbsMobileProperty::NormalMapTex      = IdString( "normal_map_tex" );
     const IdString PbsMobileProperty::SpecularMap       = IdString( "specular_map" );
     const IdString PbsMobileProperty::EnvProbeMap       = IdString( "envprobe_map" );
+    const IdString PbsMobileProperty::DetailWeightMap   = IdString( "detail_weight_map" );
 
     const IdString PbsMobileProperty::NormalMap         = IdString( "normal_map" );
 
@@ -59,6 +60,7 @@ namespace Ogre
     const IdString PbsMobileProperty::UvDiffuse         = IdString( "uv_diffuse" );
     const IdString PbsMobileProperty::UvSpecular        = IdString( "uv_specular" );
     const IdString PbsMobileProperty::UvNormal          = IdString( "uv_normal" );
+    const IdString PbsMobileProperty::UvDetailWeight    = IdString( "uv_detail_weight" );
 
     const IdString PbsMobileProperty::UvDetail0         = IdString( "uv_detail0" );
     const IdString PbsMobileProperty::UvDetail1         = IdString( "uv_detail1" );
@@ -91,8 +93,9 @@ namespace Ogre
     const IdString *PbsMobileProperty::UvSourcePtrs[NUM_PBSM_SOURCES] =
     {
         &PbsMobileProperty::UvDiffuse,
-        &PbsMobileProperty::UvSpecular,
         &PbsMobileProperty::UvNormal,
+        &PbsMobileProperty::UvSpecular,
+        &PbsMobileProperty::UvDetailWeight,
         &PbsMobileProperty::UvDetail0,
         &PbsMobileProperty::UvDetail1,
         &PbsMobileProperty::UvDetail2,
@@ -211,6 +214,8 @@ namespace Ogre
             psParams->setNamedConstant( "texSpecularMap", texUnit++ );
         if( !datablock->mTexture[PBSM_REFLECTION].isNull() )
             psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
+        if( !datablock->mTexture[PBSM_DETAIL_WEIGHT].isNull() )
+            psParams->setNamedConstant( "texDetailWeightMap", texUnit++ );
 
         size_t validDetailMaps = 0;
         for( size_t i=PBSM_DETAIL0; i<=PBSM_DETAIL3; ++i )
@@ -319,6 +324,7 @@ namespace Ogre
         setProperty( PbsMobileProperty::NormalMapTex,   !datablock->mTexture[PBSM_NORMAL].isNull() );
         setProperty( PbsMobileProperty::SpecularMap,    !datablock->mTexture[PBSM_SPECULAR].isNull() );
         setProperty( PbsMobileProperty::EnvProbeMap,    !datablock->mTexture[PBSM_REFLECTION].isNull() );
+        setProperty( PbsMobileProperty::DetailWeightMap,!datablock->mTexture[PBSM_DETAIL_WEIGHT].isNull() );
 
         bool usesNormalMap = !datablock->mTexture[PBSM_NORMAL].isNull();
         for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )

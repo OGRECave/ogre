@@ -121,6 +121,12 @@ namespace Ogre
             * normal_map <texture name>
                 Name of the normal texture for the base image (optional) for normal mapping
 
+            * detail_weight_map <texture name>
+                Texture that when present, will be used as mask/weight for the 4 detail maps.
+                The R channel is used for detail map #0; the G for detail map #1, B for #2,
+                and Alpha for #3.
+                This affects both the diffuse and normal-mapped detail maps.
+
             * detail_map0 <texture name>
             * Similar: detail_map1, detail_map2, detail_map3
                 Name of the detail map to be used on top of the diffuse colour.
@@ -140,7 +146,8 @@ namespace Ogre
                 there is no detail_map
 
             * uv_diffuse_map <uv>
-            * Similar: uv_specular_map, uv_normal_map, uv_detail_mapN, uv_detail_normal_mapN
+            * Similar: uv_specular_map, uv_normal_map, uv_detail_mapN, uv_detail_normal_mapN,
+            *          uv_detail_weight_map
             * where N is a number between 0 and 3.
                 UV set to use for the particular texture map.
                 The UV value must be in range [0; 8)

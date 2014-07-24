@@ -55,6 +55,7 @@ uniform @insertpiece( FresnelType ) F0;
 @property( envprobe_map )
 @property( hlms_cube_arrays_supported )uniform lowp samplerCube	texEnvProbeMap;@end
 @property( !hlms_cube_arrays_supported )uniform lowp sampler2D	texEnvProbeMap;@end @end
+@property( detail_weight_map )uniform lowp sampler2D	texDetailWeightMap;@end
 @property( detail_maps_diffuse )uniform lowp sampler2D	texDetailMap[@value( detail_maps_diffuse )];@end
 @property( detail_maps_normals )uniform lowp sampler2D	texDetailNormalMap[@value( detail_maps_normals )];@end
 
@@ -175,7 +176,11 @@ mediump vec3 cookTorrance( mediump vec3 lightDir, mediump vec3 viewDir, lowp flo
 void main()
 {
 @property( detail_maps_diffuse || detail_maps_normals )
-	lowp vec4 detailWeights = vec4( 1.0 );
+	@property( detail_weight_map )
+		lowp vec4 detailWeights = texture2D( texDetailWeightMap, psUv@value(uv_detail_weight).xy );
+	@end @property( !detail_weight_map )
+		lowp vec4 detailWeights = vec4( 1.0 );
+	@end
 	//Group all texture loads together to help the GPU hide the
 	//latency (bad GL ES2 drivers won't optimize this automatically)
 @end
