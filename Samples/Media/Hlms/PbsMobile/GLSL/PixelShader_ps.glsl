@@ -13,7 +13,7 @@ in mediump vec3 psPos;
 in mediump vec3 psNormal;
 mediump vec3 nNormal;
 @property( normal_map )in mediump vec3 psTangent;
-mediump vec3 nTangent;@end
+mediump vec3 vTangent;@end
 @end
 @property( hlms_pssm_splits )in float psDepth;@end
 @foreach( hlms_uv_count, n )
@@ -113,7 +113,7 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 }
 @end
 
-@property( normal_map )mediump vec3 getTSNormal( mediump mat3 TBN, lowp sampler2D normalMap, lowp vec2 uv0 )
+@property( normal_map )mediump vec3 getTSNormal( lowp sampler2D normalMap, lowp vec2 uv0 )
 {
 	mediump vec3 tsNormal;
 @property( signed_int_textures )
@@ -198,11 +198,12 @@ void main()
 @property( !normal_map )
 	nNormal = normalize( psNormal );
 @end @property( normal_map )
-	nTangent = normalize( psTangent );
+	mediump vec3 geomNormal = normalize( psNormal );
+	vTangent = normalize( psTangent );
 
 	//Get the TBN matrix
-	mediump vec3 vBinormal	= cross( vTangent, vNormal );
-	mediump mat3 TBN		= transpose( mat3( vTangent, vBinormal, normalize( psNormal ) ) );
+	mediump vec3 vBinormal	= cross( vTangent, geomNormal );
+	mediump mat3 TBN		= transpose( mat3( vTangent, vBinormal, geomNormal ) );
 
 	nNormal = getTSNormal( texNormalMap, psUv@value(uv_normal).xy );
 @end
