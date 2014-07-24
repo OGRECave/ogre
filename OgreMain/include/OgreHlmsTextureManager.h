@@ -193,6 +193,14 @@ namespace Ogre
         */
         TextureLocation createOrRetrieveTexture( const String &texName, TextureMapType mapType );
 
+        /// See other overload. This one allows aliasing a texture. If you have
+        /// "VERY_TECHNICAL_NAME_HASH_1234.png" as texName, you can make your first
+        /// call with aliasName as "Tree Wood", and the next calls to
+        /// createOrRetrieveTexture( "Tree Wood", mapType ) will refer to this texture
+        TextureLocation createOrRetrieveTexture( const String &aliasName,
+                                                 const String &texName,
+                                                 TextureMapType mapType );
+
         /// Returns the precreated blank texture
         TextureLocation getBlankTexture(void) const;
 

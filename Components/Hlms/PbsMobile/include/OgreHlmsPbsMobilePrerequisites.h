@@ -76,7 +76,14 @@ namespace Ogre
         PBSM_SOURCE_DETAIL1,
         PBSM_SOURCE_DETAIL2,
         PBSM_SOURCE_DETAIL3,
-        NUM_PBSM_SOURCES
+        NUM_PBSM_SOURCES,
+
+        //For internal use, don't use these!
+        PBSM_SOURCE_INTERNAL_DETAIL_NM0 = NUM_PBSM_SOURCES,
+        PBSM_SOURCE_INTERNAL_DETAIL_NM1,
+        PBSM_SOURCE_INTERNAL_DETAIL_NM2,
+        PBSM_SOURCE_INTERNAL_DETAIL_NM3,
+        NUM_PBSM_INTERNAL_SOURCES
     };
 
     enum PbsMobileBlendModes

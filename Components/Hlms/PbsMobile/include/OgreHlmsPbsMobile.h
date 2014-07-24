@@ -44,6 +44,8 @@ namespace Ogre
     *  @{
     */
 
+    class HlmsPbsMobileDatablock;
+
     /** Physically based shading implementation specfically designed for OpenGL ES 2.0 and other
         RenderSystems which do not support uniform buffers.
     */
@@ -70,6 +72,8 @@ namespace Ogre
                                                     const HlmsMacroblock *macroblock,
                                                     const HlmsBlendblock *blendblock,
                                                     const HlmsParamVec &paramVec );
+
+        void setDetailMapProperties( bool diffuseMaps, HlmsPbsMobileDatablock *datablock, PiecesMap *inOutPieces );
 
         virtual void calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params,
                                                 PiecesMap *inOutPieces );
@@ -101,26 +105,39 @@ namespace Ogre
         static const IdString UvDiffuse;
         static const IdString UvSpecular;
         static const IdString UvNormal;
-        static const IdString DetailMaps;
 
         static const IdString UvDetail0;
         static const IdString UvDetail1;
         static const IdString UvDetail2;
         static const IdString UvDetail3;
 
-        static const IdString DetailMapSwizzle0;
-        static const IdString DetailMapSwizzle1;
-        static const IdString DetailMapSwizzle2;
-        static const IdString DetailMapSwizzle3;
+        static const IdString UvDetailNm0;
+        static const IdString UvDetailNm1;
+        static const IdString UvDetailNm2;
+        static const IdString UvDetailNm3;
+
+        static const IdString DetailMapsDiffuse;
+        static const IdString DetailMapsNormal;
 
         static const IdString BlendModeIndex0;
         static const IdString BlendModeIndex1;
         static const IdString BlendModeIndex2;
         static const IdString BlendModeIndex3;
 
-        static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
+        static const IdString DetailDiffuseSwizzle0;
+        static const IdString DetailDiffuseSwizzle1;
+        static const IdString DetailDiffuseSwizzle2;
+        static const IdString DetailDiffuseSwizzle3;
+
+        static const IdString DetailNormalSwizzle0;
+        static const IdString DetailNormalSwizzle1;
+        static const IdString DetailNormalSwizzle2;
+        static const IdString DetailNormalSwizzle3;
+
+        static const IdString *UvSourcePtrs[NUM_PBSM_INTERNAL_SOURCES];
         static const IdString *BlendModes[4];
-        static const IdString *DetailMapSwizzles[4];
+        static const IdString *DetailDiffuseSwizzles[4];
+        static const IdString *DetailNormalSwizzles[4];
 	};
 
     /** @} */

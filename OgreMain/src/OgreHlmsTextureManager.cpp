@@ -205,7 +205,15 @@ namespace Ogre
                                                                         const String &texName,
                                                                         TextureMapType mapType )
     {
-        TextureEntry searchName( texName );
+        return createOrRetrieveTexture( texName, texName, mapType );
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture(
+                                                                        const String &aliasName,
+                                                                        const String &texName,
+                                                                        TextureMapType mapType )
+    {
+        TextureEntry searchName( aliasName );
         TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
 
         TextureLocation retVal;
@@ -215,7 +223,7 @@ namespace Ogre
         if( it == mEntries.end() || it->name != searchName.name )
         {
             Image image;
-            image.load( texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+			image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
             PixelFormat imageFormat = image.getFormat();
             if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 )
@@ -257,7 +265,7 @@ namespace Ogre
                                                             itor - mTextureArrays[mapType].begin(),
                                                             textureArray.entries.size() ) );
 
-                    textureArray.entries.push_back( texName );
+                    textureArray.entries.push_back( aliasName );
 
                     bFound = true;
                 }
@@ -269,6 +277,8 @@ namespace Ogre
             {
                 PixelFormat defaultPixelFormat = mDefaultTextureParameters[mapType].pixelFormat;
                 //Create a new array
+                /* Disabled to support the same texture being loaded twice with
+                   different parameters, and a different alias.
                 if( mDefaultTextureParameters[mapType].maxTexturesPerArray == 1 )
                 {
                     TextureType texType = TEX_TYPE_2D;
@@ -286,14 +296,14 @@ namespace Ogre
                                                 defaultPixelFormat == PF_UNKNOWN ? image.getFormat() :
                                                                                    defaultPixelFormat,
                                                 mDefaultTextureParameters[mapType].hwGammaCorrection );
-                    textureArray.entries.push_back( texName );
+                    textureArray.entries.push_back( aliasName );
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
                                                             mTextureArrays[mapType].size(), 0 ) );
 
                     mTextureArrays[mapType].push_back( textureArray );
                 }
-                else
+                else*/
                 {
                     uint limit = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                     uint limitSquared = mDefaultTextureParameters[mapType].maxTexturesPerArray;
@@ -399,7 +409,7 @@ namespace Ogre
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
                                                             mTextureArrays[mapType].size(), 0 ) );
 
-                    textureArray.entries.push_back( texName );
+                    textureArray.entries.push_back( aliasName );
                     mTextureArrays[mapType].push_back( textureArray );
                 }
             }

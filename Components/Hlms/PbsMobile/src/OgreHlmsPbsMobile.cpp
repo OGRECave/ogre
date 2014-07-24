@@ -52,21 +52,36 @@ namespace Ogre
     const IdString PbsMobileProperty::UvDiffuse         = IdString( "uv_diffuse" );
     const IdString PbsMobileProperty::UvSpecular        = IdString( "uv_specular" );
     const IdString PbsMobileProperty::UvNormal          = IdString( "uv_normal" );
-    const IdString PbsMobileProperty::DetailMaps        = IdString( "detail_maps" );
-
-    const IdString PbsMobileProperty::DetailMapSwizzle0 = IdString( "detail_map_swizzle0" );
-    const IdString PbsMobileProperty::DetailMapSwizzle1 = IdString( "detail_map_swizzle1" );
-    const IdString PbsMobileProperty::DetailMapSwizzle2 = IdString( "detail_map_swizzle2" );
-    const IdString PbsMobileProperty::DetailMapSwizzle3 = IdString( "detail_map_swizzle3" );
 
     const IdString PbsMobileProperty::UvDetail0         = IdString( "uv_detail0" );
+    const IdString PbsMobileProperty::UvDetail1         = IdString( "uv_detail1" );
+    const IdString PbsMobileProperty::UvDetail2         = IdString( "uv_detail2" );
+    const IdString PbsMobileProperty::UvDetail3         = IdString( "uv_detail3" );
+
+    const IdString PbsMobileProperty::UvDetailNm0       = IdString( "uv_detail_nm0" );
+    const IdString PbsMobileProperty::UvDetailNm1       = IdString( "uv_detail_nm1" );
+    const IdString PbsMobileProperty::UvDetailNm2       = IdString( "uv_detail_nm2" );
+    const IdString PbsMobileProperty::UvDetailNm3       = IdString( "uv_detail_nm3" );
 
     const IdString PbsMobileProperty::BlendModeIndex0   = IdString( "blend_mode_idx0" );
     const IdString PbsMobileProperty::BlendModeIndex1   = IdString( "blend_mode_idx1" );
     const IdString PbsMobileProperty::BlendModeIndex2   = IdString( "blend_mode_idx2" );
     const IdString PbsMobileProperty::BlendModeIndex3   = IdString( "blend_mode_idx3" );
 
-    const IdString *PbsMobileProperty::UvSourcePtrs[NUM_PBSM_SOURCES] =
+    const IdString PbsMobileProperty::DetailMapsDiffuse = IdString( "detail_maps_diffuse" );
+    const IdString PbsMobileProperty::DetailMapsNormal  = IdString( "detail_maps_normal" );
+
+    const IdString PbsMobileProperty::DetailDiffuseSwizzle0 = IdString( "detail_diffuse_swizzle0" );
+    const IdString PbsMobileProperty::DetailDiffuseSwizzle1 = IdString( "detail_diffuse_swizzle1" );
+    const IdString PbsMobileProperty::DetailDiffuseSwizzle2 = IdString( "detail_diffuse_swizzle2" );
+    const IdString PbsMobileProperty::DetailDiffuseSwizzle3 = IdString( "detail_diffuse_swizzle3" );
+
+    const IdString PbsMobileProperty::DetailNormalSwizzle0  = IdString( "detail_normal_swizzle0" );
+    const IdString PbsMobileProperty::DetailNormalSwizzle1  = IdString( "detail_normal_swizzle1" );
+    const IdString PbsMobileProperty::DetailNormalSwizzle2  = IdString( "detail_normal_swizzle2" );
+    const IdString PbsMobileProperty::DetailNormalSwizzle3  = IdString( "detail_normal_swizzle3" );
+
+    const IdString *PbsMobileProperty::UvSourcePtrs[NUM_PBSM_INTERNAL_SOURCES] =
     {
         &PbsMobileProperty::UvDiffuse,
         &PbsMobileProperty::UvSpecular,
@@ -74,15 +89,27 @@ namespace Ogre
         &PbsMobileProperty::UvDetail0,
         &PbsMobileProperty::UvDetail1,
         &PbsMobileProperty::UvDetail2,
-        &PbsMobileProperty::UvDetail3
+        &PbsMobileProperty::UvDetail3,
+        &PbsMobileProperty::UvDetailNm0,
+        &PbsMobileProperty::UvDetailNm1,
+        &PbsMobileProperty::UvDetailNm2,
+        &PbsMobileProperty::UvDetailNm3
     };
 
-    const IdString *PbsMobileProperty::DetailMapSwizzles[4] =
+    const IdString *PbsMobileProperty::DetailDiffuseSwizzles[4] =
     {
-        &PbsMobileProperty::DetailMapSwizzle0,
-        &PbsMobileProperty::DetailMapSwizzle1,
-        &PbsMobileProperty::DetailMapSwizzle2,
-        &PbsMobileProperty::DetailMapSwizzle3,
+        &PbsMobileProperty::DetailDiffuseSwizzle0,
+        &PbsMobileProperty::DetailDiffuseSwizzle1,
+        &PbsMobileProperty::DetailDiffuseSwizzle2,
+        &PbsMobileProperty::DetailDiffuseSwizzle3,
+    };
+
+    const IdString *PbsMobileProperty::DetailNormalSwizzles[4] =
+    {
+        &PbsMobileProperty::DetailNormalSwizzle0,
+        &PbsMobileProperty::DetailNormalSwizzle1,
+        &PbsMobileProperty::DetailNormalSwizzle2,
+        &PbsMobileProperty::DetailNormalSwizzle3,
     };
 
     const IdString *PbsMobileProperty::BlendModes[4] =
@@ -181,6 +208,55 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbsMobile::setDetailMapProperties( bool diffuseMaps, HlmsPbsMobileDatablock *datablock,
+                                                PiecesMap *inOutPieces )
+    {
+        PbsMobileTextureTypes detailTextureStart    = diffuseMaps ? PBSM_DETAIL0 : PBSM_DETAIL0_NM;
+        PbsMobileUvSourceType sourceStart           = diffuseMaps ? PBSM_SOURCE_DETAIL0 :
+                                                                    PBSM_SOURCE_INTERNAL_DETAIL_NM0;
+        const IdString **detailSwizzles = diffuseMaps ? PbsMobileProperty::DetailDiffuseSwizzles :
+                                                        PbsMobileProperty::DetailNormalSwizzles;
+
+        size_t validDetailMaps = 0;
+        for( size_t i=0; i<4; ++i )
+        {
+            uint8 blendMode = datablock->mShaderCreationData->blendModes[i];
+
+            //If Detail map 0 doesn't exists but Detail map 1 does;
+            //then DetailDiffuseSwizzle0 must reference the swizzle 'y'
+            //Same happens with the UV sources (the UV sources[1] end up
+            //actually as sources[0], etc).
+            if( !datablock->mTexture[detailTextureStart + i].isNull() )
+            {
+                if( diffuseMaps )
+                {
+                    inOutPieces[PixelShader][*PbsMobileProperty::BlendModes[validDetailMaps]] =
+                                                "@insertpiece( " + c_blendModes[blendMode] + ")";
+                }
+
+                const char *swizzles[4] = { "x", "y", "z", "w" };
+                IdString swizzleN = *detailSwizzles[validDetailMaps];
+                inOutPieces[PixelShader][swizzleN] = swizzles[i];
+
+                uint8 uvSource = datablock->mShaderCreationData->uvSource[PBSM_SOURCE_DETAIL0 + i];
+                setProperty( *PbsMobileProperty::UvSourcePtrs[sourceStart + validDetailMaps],
+                             uvSource );
+
+                if( getProperty( *HlmsBaseProp::UvCountPtrs[uvSource] ) < 2 )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                                 "Renderable needs at least 2 coordinates in UV set #" +
+                                 StringConverter::toString( uvSource ) +
+                                 ". Either change the mesh, or change the UV source settings",
+                                 "HlmsPbsMobile::setDetailMapProperties" );
+                }
+            }
+        }
+
+        setProperty( diffuseMaps ? PbsMobileProperty::DetailMapsDiffuse :
+                                   PbsMobileProperty::DetailMapsNormal, validDetailMaps );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsMobile::calculateHashForPreCreate( Renderable *renderable, const HlmsParamVec &params,
                                                    PiecesMap *inOutPieces )
     {
@@ -206,39 +282,8 @@ namespace Ogre
             }
         }
 
-        size_t validDetailMaps = 0;
-        for( size_t i=0; i<4; ++i )
-        {
-            uint8 blendMode = datablock->mShaderCreationData->blendModes[i];
-            inOutPieces[PixelShader][*PbsMobileProperty::BlendModes[i]] = "@insertpiece( " +
-                                                                            c_blendModes[blendMode] + ")";
-
-            //If Detail map 0 doesn't exists but Detail map 1 does;
-            //then DetailMapSwizzle0 must reference the swizzle 'y'
-            //Same happens with the UV sources.
-            if( !datablock->mTexture[PBSM_DETAIL0 + i].isNull() ||
-                !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
-            {
-                const char *swizzles[4] = { "x", "y", "z", "w" };
-                IdString detailMapSwizzleN = *PbsMobileProperty::DetailMapSwizzles[validDetailMaps];
-                inOutPieces[PixelShader][detailMapSwizzleN] = swizzles[i];
-
-                uint8 uvSource = datablock->mShaderCreationData->uvSource[i];
-                setProperty( *PbsMobileProperty::UvSourcePtrs[PBSM_SOURCE_DETAIL0 + validDetailMaps],
-                             uvSource );
-
-                if( getProperty( *HlmsBaseProp::UvCountPtrs[uvSource] ) < 2 )
-                {
-                    OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                                 "Renderable needs at least 2 coordinates in UV set #" +
-                                 StringConverter::toString( uvSource ) +
-                                 ". Either change the mesh, or change the UV source settings",
-                                 "HlmsPbsMobile::calculateHashForPreCreate" );
-                }
-
-                ++validDetailMaps;
-            }
-        }
+        setDetailMapProperties( true, datablock, inOutPieces );
+        setDetailMapProperties( false, datablock, inOutPieces );
 
         String paramVal;
         if( !getProperty( HlmsBaseProp::NormalMap ) &&

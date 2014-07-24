@@ -38,6 +38,14 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    extern const String c_blendModes[];
+    const String c_blendModes[] =
+    {
+        "NormalNonPremul", "NormalPremul", "Add", "Subtract", "Multiply",
+        "Multiply2x", "Screen", "Overlay", "Lighten", "Darken", "GrainExtract",
+        "GrainMerge", "Difference"
+    };
+
     //-----------------------------------------------------------------------------------
     HlmsPbsMobileDatablock::HlmsPbsMobileDatablock( IdString name, Hlms *creator,
                                               const HlmsMacroblock *macroblock,

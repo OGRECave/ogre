@@ -175,25 +175,30 @@ mediump vec3 cookTorrance( mediump vec3 lightDir, mediump vec3 viewDir, lowp flo
 
 void main()
 {
-@property( detail_maps )
+@property( detail_maps_diffuse|detail_maps_normals )
 	lowp vec4 detailWeights = vec4( 1.0 );
 	//Group all texture loads together to help the GPU hide the
 	//latency (bad GL ES2 drivers won't optimize this automatically)
 @end
-@foreach( detail_maps, n )
-	lowp vec4 detailCol@n	= texture2D( texDetailMap@n, psUv@value(uv_detail@n).xy );
-	mediump vec3 vDetail@n	= getTSNormal( texDetailNormalMap@n, psUv@value(uv_detail@n).xy ) * weight[@n];
-	@property( !hw_gamma_read )//Gamma to linear space
-	detailCol.xyz = detailCol.xyz * detailCol.xyz;@end
-@end
 
+@foreach( detail_maps_diffuse, n )
+	lowp vec4 detailCol@n	= texture2D( texDetailMap@n, psUv@value(uv_detail@n).xy );
+	@property( !hw_gamma_read )//Gamma to linear space
+		detailCol.xyz = detailCol.xyz * detailCol.xyz;@end
+	detailWeights.@insertpiece(detail_diffuse_swizzle@n) *= detailCol@n.w;
+	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
+@end
+@foreach( detail_maps_normal, n )
+	mediump vec3 vDetail@n	= getTSNormal( texDetailNormalMap@n, psUv@value(uv_detail_nm@n).xy ) * detailWeights[@n];@end
+
+@property( !normal_map )
 	nNormal = normalize( psNormal );
-@property( normal_map )
+@end @property( normal_map )
 	nTangent = normalize( psTangent );
 
 	//Get the TBN matrix
 	mediump vec3 vBinormal	= cross( vTangent, vNormal );
-	mediump mat3 TBN		= transpose( mat3( vTangent, vBinormal, vNormal ) );
+	mediump mat3 TBN		= transpose( mat3( vTangent, vBinormal, normalize( psNormal ) ) );
 
 	nNormal = getTSNormal( texNormalMap, psUv@value(uv_normal).xy );
 @end
@@ -209,14 +214,12 @@ void main()
 @insertpiece( SampleDiffuseMap )
 @insertpiece( SampleSpecularMap )
 
-@foreach( detail_maps, n )
-	detailCol@n.w *= detailWeights.@insertpiece(detail_map_swizzle@n);
-	@insertpiece( blend_mode_idx@n )
-	@property( detail_normal_map )
-		nNormal.xy	+= vDetail@n.xy;
-		nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_map_swizzle@n);
-	@end
-@end
+@foreach( detail_maps_diffuse, n )
+	@insertpiece( blend_mode_idx@n ) @end
+
+@foreach( detail_maps_normal, n )
+	nNormal.xy	+= vDetail@n.xy;
+	nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle@n);@end
 
 @property( normal_map )
 	nNormal = normalize( mul( TBN, nNormal ) );
