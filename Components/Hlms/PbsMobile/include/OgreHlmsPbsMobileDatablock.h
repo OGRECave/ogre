@@ -83,7 +83,7 @@ namespace Ogre
 
 
         void setTexture( const String &name, HlmsTextureManager::TextureMapType textureMapType,
-                         TexturePtr &outTexture, UvAtlasParams &outAtlasParams );
+                         TexturePtr &outTexture, UvAtlasParams *outAtlasParams );
 
     public:
         /** Valid parameters in params:
@@ -109,9 +109,6 @@ namespace Ogre
 
             * diffuse_map <texture name>
                 Name of the diffuse texture for the base image (optional)
-                You can make it present but leave blank. A dummy texture will be assigned
-                When not present, the diffuse texture sampling is left out from the
-                pixel shader.
 
             * specular <r g b>
                 Specifies the RGB specular colour. "kS" in most books about PBS
@@ -119,17 +116,39 @@ namespace Ogre
 
             * specular_map <texture name>
                 Name of the specular texture for the base image (optional)
-                When not present, the specular texture is left out from the pixel shader
                 Note: The alpha channel will be multiplied against the roughness value.
 
             * normal_map <texture name>
                 Name of the normal texture for the base image (optional) for normal mapping
-                When not present, the normal mapping is left out from the pixel & vertex shaders
+
+            * detail_map0 <texture name>
+            * Similar: detail_map1, detail_map2, detail_map3
+                Name of the detail map to be used on top of the diffuse colour.
+                There can be gaps (i.e. set detail maps 0 and 2 but not 1)
+
+            * detail_blend_mode0 <blend_mode>
+            * Similar: detail_blend_mode1, detail_blend_mode2, detail_blend_mode3
+                Blend mode to use for each detail map. Valid values are:
+                    "NormalNonPremul", "NormalPremul", "Add", "Subtract", "Multiply",
+                    "Multiply2x", "Screen", "Overlay", "Lighten", "Darken",
+                    "GrainExtract", "GrainMerge", "Difference"
+
+            * detail_normal_map0 <texture name>
+            * Similar: detail_normal_map1, detail_normal_map2, detail_normal_map3
+                Name of the detail map's normal map to be used.
+                It's not affected by blend mode. May be used even if
+                there is no detail_map
+
+            * uv_diffuse_map <uv>
+            * Similar: uv_specular_map, uv_normal_map, uv_detail_mapN, uv_detail_normal_mapN
+            * where N is a number between 0 and 3.
+                UV set to use for the particular texture map.
+                The UV value must be in range [0; 8)
         */
         HlmsPbsMobileDatablock( IdString name, Hlms *creator,
-                             const HlmsMacroblock *macroblock,
-                             const HlmsBlendblock *blendblock,
-                             const HlmsParamVec &params );
+                                const HlmsMacroblock *macroblock,
+                                const HlmsBlendblock *blendblock,
+                                const HlmsParamVec &params );
         virtual ~HlmsPbsMobileDatablock();
 
         /// Sets the diffuse colour. The colour will be divided by PI for energy conservation.
@@ -186,6 +205,10 @@ namespace Ogre
 
         /** Sets which UV set to use for the given texture.
             Calling this function triggers a HlmsDatablock::flushRenderables.
+        @param sourceType
+            Source texture to modify. Note that we don't enforce
+            PBSM_SOURCE_DETAIL0 = PBSM_SOURCE_DETAIL_NM0, but you probably
+            want to have both textures using the same UV source.
         @param uvSet
             UV coordinate set. Value must be between in range [0; 8)
         */

@@ -139,7 +139,7 @@ namespace Ogre
         static const IdString DetailNormalSwizzle2;
         static const IdString DetailNormalSwizzle3;
 
-        static const IdString *UvSourcePtrs[NUM_PBSM_INTERNAL_SOURCES];
+        static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
         static const IdString *BlendModes[4];
         static const IdString *DetailDiffuseSwizzles[4];
         static const IdString *DetailNormalSwizzles[4];

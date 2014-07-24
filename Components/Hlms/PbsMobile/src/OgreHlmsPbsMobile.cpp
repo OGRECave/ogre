@@ -88,7 +88,7 @@ namespace Ogre
     const IdString PbsMobileProperty::DetailNormalSwizzle2  = IdString( "detail_normal_swizzle2" );
     const IdString PbsMobileProperty::DetailNormalSwizzle3  = IdString( "detail_normal_swizzle3" );
 
-    const IdString *PbsMobileProperty::UvSourcePtrs[NUM_PBSM_INTERNAL_SOURCES] =
+    const IdString *PbsMobileProperty::UvSourcePtrs[NUM_PBSM_SOURCES] =
     {
         &PbsMobileProperty::UvDiffuse,
         &PbsMobileProperty::UvSpecular,
@@ -242,7 +242,7 @@ namespace Ogre
     {
         PbsMobileTextureTypes detailTextureStart    = diffuseMaps ? PBSM_DETAIL0 : PBSM_DETAIL0_NM;
         PbsMobileUvSourceType sourceStart           = diffuseMaps ? PBSM_SOURCE_DETAIL0 :
-                                                                    PBSM_SOURCE_INTERNAL_DETAIL_NM0;
+                                                                    PBSM_SOURCE_DETAIL0_NM;
         const IdString **detailSwizzles = diffuseMaps ? PbsMobileProperty::DetailDiffuseSwizzles :
                                                         PbsMobileProperty::DetailNormalSwizzles;
 
@@ -267,7 +267,7 @@ namespace Ogre
                 IdString swizzleN = *detailSwizzles[validDetailMaps];
                 inOutPieces[PixelShader][swizzleN] = swizzles[i];
 
-                uint8 uvSource = datablock->mShaderCreationData->uvSource[PBSM_SOURCE_DETAIL0 + i];
+                uint8 uvSource = datablock->mShaderCreationData->uvSource[sourceStart + i];
                 setProperty( *PbsMobileProperty::UvSourcePtrs[sourceStart + validDetailMaps],
                              uvSource );
 

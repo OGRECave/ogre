@@ -130,17 +130,71 @@ namespace Ogre
         if( Hlms::findParamInVec( params, "diffuse_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
-                        mTexture[PBSM_DIFFUSE], mUvAtlasParams[mNumUvAtlas++] );
+                        mTexture[PBSM_DIFFUSE], &mUvAtlasParams[mNumUvAtlas++] );
         }
         if( Hlms::findParamInVec( params, "normal_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_NORMALS,
-                        mTexture[PBSM_NORMAL], mUvAtlasParams[mNumUvAtlas++] );
+                        mTexture[PBSM_NORMAL], &mUvAtlasParams[mNumUvAtlas++] );
         }
         if( Hlms::findParamInVec( params, "specular_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_SPECULAR,
-                        mTexture[PBSM_SPECULAR], mUvAtlasParams[mNumUvAtlas++] );
+                        mTexture[PBSM_SPECULAR], &mUvAtlasParams[mNumUvAtlas++] );
+        }
+
+        if( Hlms::findParamInVec( params, "uv_diffuse_map", paramVal ) )
+            setTextureUvSource( PBSM_SOURCE_DIFFUSE, StringConverter::parseUnsignedInt( paramVal ) );
+        if( Hlms::findParamInVec( params, "uv_normal_map", paramVal ) )
+            setTextureUvSource( PBSM_SOURCE_NORMAL, StringConverter::parseUnsignedInt( paramVal ) );
+        if( Hlms::findParamInVec( params, "uv_specular_map", paramVal ) )
+            setTextureUvSource( PBSM_SOURCE_SPECULAR, StringConverter::parseUnsignedInt( paramVal ) );
+
+        for( size_t i=0; i<4; ++i )
+        {
+            String key = "detail_map" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL,
+                            mTexture[PBSM_DETAIL0 + i], 0 );
+            }
+
+            key = "detail_normal_map" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+                            mTexture[PBSM_DETAIL0_NM + i], 0 );
+            }
+
+            key = "detail_blend_mode" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                for( size_t j=0; j<NUM_PBSM_BLEND_MODES; ++i )
+                {
+                    String blendModeLowerCase;
+                    blendModeLowerCase.resize( c_blendModes[j].size() );
+                    std::transform( c_blendModes[j].begin(), c_blendModes[j].end(),
+                                    blendModeLowerCase.begin(), ::tolower );
+                    StringUtil::toLowerCase( paramVal );
+
+                    if( blendModeLowerCase == paramVal )
+                        setDetailMapBlendMode( i, static_cast<PbsMobileBlendModes>( j ) );
+                }
+            }
+
+            key = "uv_detail_map" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                setTextureUvSource( static_cast<PbsMobileUvSourceType>( PBSM_SOURCE_DETAIL0 + i ),
+                                    StringConverter::parseUnsignedInt( paramVal ) );
+            }
+
+            key = "uv_detail_normal_map" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                setTextureUvSource( static_cast<PbsMobileUvSourceType>( PBSM_SOURCE_DETAIL0_NM + i ),
+                                    StringConverter::parseUnsignedInt( paramVal ) );
+            }
         }
 
         calculateHash();
@@ -166,7 +220,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setTexture( const String &name,
                                              HlmsTextureManager::TextureMapType textureMapType,
-                                             TexturePtr &outTexture, UvAtlasParams &outAtlasParams )
+                                             TexturePtr &outTexture, UvAtlasParams *outAtlasParams )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
@@ -176,9 +230,13 @@ namespace Ogre
         assert( !texLocation.texture->isTextureTypeArray() );
 
         outTexture = texLocation.texture;
-        outAtlasParams.uOffset   = texLocation.xIdx / (float)texLocation.divisor;
-        outAtlasParams.vOffset   = texLocation.yIdx / (float)texLocation.divisor;
-        outAtlasParams.invDivisor= 1.0f / texLocation.divisor;
+
+        if( outAtlasParams )
+        {
+            outAtlasParams->uOffset   = texLocation.xIdx / (float)texLocation.divisor;
+            outAtlasParams->vOffset   = texLocation.yIdx / (float)texLocation.divisor;
+            outAtlasParams->invDivisor= 1.0f / texLocation.divisor;
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setDiffuse( const Vector3 &diffuseColour )
