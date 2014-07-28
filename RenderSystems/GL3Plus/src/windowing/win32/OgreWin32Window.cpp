@@ -445,9 +445,8 @@ namespace Ogre {
 
                 WGL_CONTEXT_FLAGS_ARB,
             #if OGRE_DEBUG_MODE
-                    WGL_CONTEXT_DEBUG_BIT_ARB |
+                    WGL_CONTEXT_DEBUG_BIT_ARB,
             #endif
-                    WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
                 WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
                 0, 0
             };

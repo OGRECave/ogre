@@ -49,6 +49,8 @@ namespace Ogre
     const IdString HlmsGui2DMobile::PropertyTexMatrixCount6     = IdString( "hlms_texture_matrix_count6" );
     const IdString HlmsGui2DMobile::PropertyTexMatrixCount7     = IdString( "hlms_texture_matrix_count7" );
 
+    const IdString Gui2DMobileProp::DiffuseMap                  = IdString( "diffuse_map" );
+
     const IdString HlmsGui2DMobile::PropertyDiffuse             = IdString( "diffuse" );
     const IdString HlmsGui2DMobile::PropertyDiffuseMapCount0    = IdString( "diffuse_map_count0" );
     const IdString HlmsGui2DMobile::PropertyDiffuseMapCount1    = IdString( "diffuse_map_count1" );
@@ -225,12 +227,12 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobile::calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
-                                            uint32 &outHash, uint32 &outCasterHash )
+    void HlmsGui2DMobile::calculateHashFor( Renderable *renderable, uint32 &outHash,
+                                            uint32 &outCasterHash )
     {
         mSetProperties.clear();
 
-        setProperty( HlmsPropertySkeleton, 0 );
+        setProperty( HlmsBaseProp::Skeleton, 0 );
 
         RenderOperation op;
         renderable->getRenderOperation( op );
@@ -246,11 +248,11 @@ namespace Ogre
             switch( vertexElem.getSemantic() )
             {
             case VES_DIFFUSE:
-                setProperty( HlmsPropertyColour, 1 );
+                setProperty( HlmsBaseProp::Colour, 1 );
                 break;
             case VES_TEXTURE_COORDINATES:
                 numTexCoords = std::max<uint>( numTexCoords, vertexElem.getIndex() + 1 );
-                setProperty( *UvCountPtrs[vertexElem.getIndex()],
+                setProperty( *HlmsBaseProp::UvCountPtrs[vertexElem.getIndex()],
                               VertexElement::getTypeCount( vertexElem.getType() ) );
                 break;
             default:
@@ -261,11 +263,7 @@ namespace Ogre
             ++itor;
         }
 
-        setProperty( HlmsPropertyUvCount, numTexCoords );
-
-        String paramVal;
-        if( findParamInVec( params, PropertyDiffuseMap, paramVal ) )
-            setProperty( PropertyDiffuseMap, 1 );
+        setProperty( HlmsBaseProp::UvCount, numTexCoords );
 
         PiecesMap pieces[NumShaderTypes];
 
@@ -274,11 +272,11 @@ namespace Ogre
                                                                     renderable->getDatablock() );
 
         setProperty( PropertyDiffuse, datablock->mHasColour );
-        setProperty( PropertyDiffuseMap, datablock->mNumTextureUnits );
+        setProperty( Gui2DMobileProp::DiffuseMap, datablock->mNumTextureUnits );
 
         if( datablock->mIsAlphaTested )
         {
-            setProperty( PropertyAlphaTest, 1 );
+            setProperty( HlmsBaseProp::AlphaTest, 1 );
 
             switch( datablock->mShaderCreationData->alphaTestCmp )
             {

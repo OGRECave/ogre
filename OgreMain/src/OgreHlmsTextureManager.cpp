@@ -40,8 +40,10 @@ namespace Ogre
     {
         mDefaultTextureParameters[TEXTURE_TYPE_DIFFUSE].hwGammaCorrection   = true;
         mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat         = PF_BC5_SNORM;
+        mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].isNormalMap         = true;
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].hwGammaCorrection    = true;
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat=PF_BC5_SNORM;
+        mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].isNormalMap = true;
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::~HlmsTextureManager()
@@ -79,7 +81,7 @@ namespace Ogre
                     for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
                     {
                         mDefaultTextureParameters[i].packingMethod = Atlas;
-                        mDefaultTextureParameters[i].maxTexturesPerArray = 16;
+                        mDefaultTextureParameters[i].maxTexturesPerArray = 1;
                     }
                     mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 1;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].maxTexturesPerArray  = 1;
@@ -94,7 +96,7 @@ namespace Ogre
                 // DXT5 is like BC5, using the "store only in green and alpha channels" method.
                 // The last one is lossless, using UV8 to store uncompressed,
                 // and retrieve z = sqrt(x²+y²)
-                if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
+                /*if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
                 {
                     mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat = PF_BC5_SNORM;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_BC5_SNORM;
@@ -104,7 +106,7 @@ namespace Ogre
                     mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = PF_DXT5;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_DXT5;
                 }
-                else
+                else*/
                 {
                     PixelFormat pf = caps->hasCapability( RSC_TEXTURE_SIGNED_INT ) ? PF_R8G8_SNORM :
                                                                                      PF_BYTE_LA;
@@ -158,8 +160,9 @@ namespace Ogre
         pixelBufferBuf->unlock();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsTextureManager::copyTextureToAtlas(const Image &srcImage, TexturePtr dst,
-                                          uint16 entryIdx, uint16 sqrtMaxTextures )
+    void HlmsTextureManager::copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
+                                                 uint16 entryIdx, uint16 sqrtMaxTextures,
+                                                 bool isNormalMap )
     {
         //TODO: Deal with mipmaps (& cubemaps & 3D? does it work?).
         size_t xBlock = entryIdx % sqrtMaxTextures;
@@ -196,7 +199,10 @@ namespace Ogre
                                                                    nextY * srcImage.getHeight(),
                                                                    dst->getDepth() ),
                                                               HardwareBuffer::HBL_DISCARD );
-            PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
+            if( isNormalMap )
+                PixelUtil::convertForNormalMapping( srcImage.getPixelBox(), currImage );
+            else
+                PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
             pixelBufferBuf->unlock();
         }
     }
@@ -258,7 +264,8 @@ namespace Ogre
                     else
                     {
                         copyTextureToAtlas( image, textureArray.texture,
-                                            textureArray.entries.size(), textureArray.sqrtMaxTextures );
+                                            textureArray.entries.size(), textureArray.sqrtMaxTextures,
+                                            textureArray.isNormalMap );
                     }
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
@@ -314,7 +321,8 @@ namespace Ogre
                         limitSquared = limit * limit;
                     }
 
-                    TextureArray textureArray( limit, limitSquared, true );
+                    TextureArray textureArray( limit, limitSquared, true,
+                                               mDefaultTextureParameters[mapType].isNormalMap );
 
                     TextureType texType = TEX_TYPE_2D;
 
@@ -403,7 +411,7 @@ namespace Ogre
                     else
                     {
                         copyTextureToAtlas( image, textureArray.texture, textureArray.entries.size(),
-                                            textureArray.sqrtMaxTextures );
+                                            textureArray.sqrtMaxTextures, textureArray.isNormalMap );
                     }
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,

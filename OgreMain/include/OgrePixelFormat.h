@@ -540,6 +540,14 @@ namespace Ogre {
         */
         static void bulkPixelConversion(const PixelBox &src, const PixelBox &dst);
 
+        /** Converts the input source to either PF_R8G8_SNORM or PF_BYTE_LA.
+            dst must be one of either formats.
+            @param  src         PixelBox containing the source pixels, pitches and format
+            @param  dst         PixelBox containing the destination pixels, pitches and format
+            @remarks The source and destination boxes must have the same dimensions.
+        */
+        static void convertForNormalMapping(const PixelBox &src, const PixelBox &dst);
+
         /** Emplaces the binary compressed data from src into a subregion of dst.
         @param  src
             PixelBox containing the source pixels, pitches and format.

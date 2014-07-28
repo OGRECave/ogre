@@ -406,7 +406,7 @@ namespace Ogre
                 ((exp.type == EXPR_VAR || exp.type == EXPR_OBJECT) && !lastExpWasOperator ) )
             {
                 syntaxError = true;
-                printf( "Unrecognized token '%s'", exp.value );
+                printf( "Unrecognized token '%s'", exp.value.c_str() );
             }
             else if( exp.type == EXPR_OPERATOR_OR || exp.type == EXPR_OPERATOR_AND )
             {

@@ -122,7 +122,7 @@ namespace Ogre
             }
         }
 
-        if( Hlms::findParamInVec( params, Hlms::PropertyAlphaTest, paramVal ) )
+        if( Hlms::findParamInVec( params, HlmsBaseProp::AlphaTest, paramVal ) )
         {
             mIsAlphaTested = true;
             mShaderCreationData->alphaTestCmp = CMPF_LESS;

@@ -222,7 +222,9 @@ namespace Ogre
         paramsVec.push_back( std::pair<IdString, String>( "diffuse_map", "" ) );
         std::sort( paramsVec.begin(), paramsVec.end() );
 
-        mHlmsDatablock = hlmsGui->createDatablock( "Fonts/" + mName, macroblock, blendblock, paramsVec );
+        String datablockName = "Fonts/" + mName;
+        mHlmsDatablock = hlmsGui->createDatablock( datablockName, datablockName,
+                                                   macroblock, blendblock, paramsVec );
 
         assert( dynamic_cast<HlmsGui2DMobileDatablock*>( mHlmsDatablock ) );
 

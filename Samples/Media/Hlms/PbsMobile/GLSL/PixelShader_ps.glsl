@@ -203,7 +203,7 @@ void main()
 
 	//Get the TBN matrix
 	mediump vec3 vBinormal	= cross( vTangent, geomNormal );
-	mediump mat3 TBN		= transpose( mat3( vTangent, vBinormal, geomNormal ) );
+	mediump mat3 TBN		= mat3( vTangent, vBinormal, geomNormal );
 
 	nNormal = getTSNormal( texNormalMap, psUv@value(uv_normal).xy );
 @end

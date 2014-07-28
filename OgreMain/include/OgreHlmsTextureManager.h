@@ -82,11 +82,12 @@ namespace Ogre
             bool        mipmaps;
             bool        hwGammaCorrection;
             PackingMethod packingMethod;
+            bool        isNormalMap;
 
             DefaultTextureParameters() :
                 pixelFormat( PF_UNKNOWN ), maxTexturesPerArray( 16 ),
                 mipmaps( true ), hwGammaCorrection( false ),
-                packingMethod( TextureArrays ) {}
+                packingMethod( TextureArrays ), isNormalMap( false ) {}
         };
 
         enum TextureMapType
@@ -107,11 +108,13 @@ namespace Ogre
             uint16      sqrtMaxTextures;
             uint16      maxTextures;
             bool        automatic;
+            bool        isNormalMap;
 
             StringVector entries;
 
-            TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic ) :
-                sqrtMaxTextures( _sqrtMaxTextures ), maxTextures( _maxTextures ), automatic( _automatic )
+            TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic, bool _isNormalMap ) :
+                sqrtMaxTextures( _sqrtMaxTextures ), maxTextures( _maxTextures ),
+                automatic( _automatic ), isNormalMap( _isNormalMap )
             {
                 entries.reserve( maxTextures );
             }
@@ -151,7 +154,8 @@ namespace Ogre
 
         static void copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx );
         static void copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
-                                        uint16 entryIdx, uint16 sqrtMaxTextures );
+                                        uint16 entryIdx, uint16 sqrtMaxTextures,
+                                        bool isNormalMap );
 
     public:
         HlmsTextureManager();

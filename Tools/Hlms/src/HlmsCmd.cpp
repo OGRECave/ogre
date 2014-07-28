@@ -213,8 +213,8 @@ void HlmsCmd::createScene(void)
 
     HlmsManager *hlmsManager = mRoot->getHlmsManager();
     Hlms *usedGenerator = hlmsManager->getHlms( HLMS_GUI );
-    HlmsDatablock *datablock = usedGenerator->createDatablock( "TEST MATERIAL", macroblockRef,
-                                                               blendblockRef, params );
+    HlmsDatablock *datablock = usedGenerator->createDatablock( "TEST MATERIAL", "TEST MATERIAL",
+                                                               macroblockRef, blendblockRef, params );
     entity->setDatablock( datablock );
 
     mSceneMgr->updateSceneGraph();
