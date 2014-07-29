@@ -93,7 +93,7 @@ namespace Ogre
         enum TextureMapType
         {
             TEXTURE_TYPE_DIFFUSE,
-            TEXTURE_TYPE_SPECULAR,
+            TEXTURE_TYPE_MONOCHROME,
             TEXTURE_TYPE_NORMALS,
             TEXTURE_TYPE_ENV_MAP,
             TEXTURE_TYPE_DETAIL,

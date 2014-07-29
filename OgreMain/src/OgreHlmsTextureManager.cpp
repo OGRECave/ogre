@@ -39,6 +39,7 @@ namespace Ogre
     HlmsTextureManager::HlmsTextureManager() : mRenderSystem( 0 ), mTextureId( 0 )
     {
         mDefaultTextureParameters[TEXTURE_TYPE_DIFFUSE].hwGammaCorrection   = true;
+        mDefaultTextureParameters[TEXTURE_TYPE_MONOCHROME].pixelFormat      = PF_L8;
         mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat         = PF_BC5_SNORM;
         mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].isNormalMap         = true;
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].hwGammaCorrection    = true;

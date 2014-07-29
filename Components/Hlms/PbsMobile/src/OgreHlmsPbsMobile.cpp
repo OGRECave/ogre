@@ -49,6 +49,7 @@ namespace Ogre
     const IdString PbsMobileProperty::DiffuseMap        = IdString( "diffuse_map" );
     const IdString PbsMobileProperty::NormalMapTex      = IdString( "normal_map_tex" );
     const IdString PbsMobileProperty::SpecularMap       = IdString( "specular_map" );
+    const IdString PbsMobileProperty::RoughnessMap      = IdString( "roughness_map" );
     const IdString PbsMobileProperty::EnvProbeMap       = IdString( "envprobe_map" );
     const IdString PbsMobileProperty::DetailWeightMap   = IdString( "detail_weight_map" );
 
@@ -58,8 +59,9 @@ namespace Ogre
     const IdString PbsMobileProperty::FresnelScalar     = IdString( "fresnel_scalar" );
 
     const IdString PbsMobileProperty::UvDiffuse         = IdString( "uv_diffuse" );
-    const IdString PbsMobileProperty::UvSpecular        = IdString( "uv_specular" );
     const IdString PbsMobileProperty::UvNormal          = IdString( "uv_normal" );
+    const IdString PbsMobileProperty::UvSpecular        = IdString( "uv_specular" );
+    const IdString PbsMobileProperty::UvRoughness       = IdString( "uv_roughness" );
     const IdString PbsMobileProperty::UvDetailWeight    = IdString( "uv_detail_weight" );
 
     const IdString PbsMobileProperty::UvDetail0         = IdString( "uv_detail0" );
@@ -95,6 +97,7 @@ namespace Ogre
         &PbsMobileProperty::UvDiffuse,
         &PbsMobileProperty::UvNormal,
         &PbsMobileProperty::UvSpecular,
+        &PbsMobileProperty::UvRoughness,
         &PbsMobileProperty::UvDetailWeight,
         &PbsMobileProperty::UvDetail0,
         &PbsMobileProperty::UvDetail1,
@@ -202,7 +205,7 @@ namespace Ogre
                                                     queuedRenderable.renderable->getDatablock() );
 
         assert( !datablock->mTexture[PBSM_DIFFUSE].isNull()   == getProperty( PbsMobileProperty::DiffuseMap ) );
-        assert( !datablock->mTexture[PBSM_NORMAL].isNull()    == getProperty( PbsMobileProperty::NormalMap ) );
+        assert( !datablock->mTexture[PBSM_NORMAL].isNull()    == getProperty( PbsMobileProperty::NormalMapTex ) );
         assert( !datablock->mTexture[PBSM_SPECULAR].isNull()  == getProperty( PbsMobileProperty::SpecularMap ) );
         assert( !datablock->mTexture[PBSM_REFLECTION].isNull()== getProperty( PbsMobileProperty::EnvProbeMap ) );
 
@@ -323,6 +326,7 @@ namespace Ogre
         setProperty( PbsMobileProperty::DiffuseMap,     !datablock->mTexture[PBSM_DIFFUSE].isNull() );
         setProperty( PbsMobileProperty::NormalMapTex,   !datablock->mTexture[PBSM_NORMAL].isNull() );
         setProperty( PbsMobileProperty::SpecularMap,    !datablock->mTexture[PBSM_SPECULAR].isNull() );
+        setProperty( PbsMobileProperty::RoughnessMap,   !datablock->mTexture[PBSM_ROUGHNESS].isNull() );
         setProperty( PbsMobileProperty::EnvProbeMap,    !datablock->mTexture[PBSM_REFLECTION].isNull() );
         setProperty( PbsMobileProperty::DetailWeightMap,!datablock->mTexture[PBSM_DETAIL_WEIGHT].isNull() );
 
@@ -734,7 +738,7 @@ namespace Ogre
                     7 * sizeof(float) + datablock->mFresnelTypeSizeBytes );
             psUniformBuffer += 7 + (datablock->mFresnelTypeSizeBytes >> 2);
 
-            //vec3 atlasOffsets[3]; (up to three, can be zero)
+            //vec3 atlasOffsets[4]; (up to four, can be zero)
             memcpy( psUniformBuffer, &datablock->mUvAtlasParams,
                     datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) );
             psUniformBuffer += datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) /
@@ -763,7 +767,7 @@ namespace Ogre
         }
         else
         {
-            //vec3 atlasOffsets[3]; (up to three, can be zero)
+            //vec3 atlasOffsets[4]; (up to four, can be zero)
             memcpy( psUniformBuffer, &datablock->mUvAtlasParams,
                     datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) );
             psUniformBuffer += datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) /

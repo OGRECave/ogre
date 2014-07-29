@@ -100,6 +100,7 @@ namespace Ogre
         static const IdString DiffuseMap;
         static const IdString NormalMapTex;
         static const IdString SpecularMap;
+        static const IdString RoughnessMap;
         static const IdString EnvProbeMap;
         static const IdString DetailWeightMap;
 
@@ -109,8 +110,9 @@ namespace Ogre
         static const IdString FresnelScalar;
 
         static const IdString UvDiffuse;
-        static const IdString UvSpecular;
         static const IdString UvNormal;
+        static const IdString UvSpecular;
+        static const IdString UvRoughness;
         static const IdString UvDetailWeight;
 
         static const IdString UvDetail0;

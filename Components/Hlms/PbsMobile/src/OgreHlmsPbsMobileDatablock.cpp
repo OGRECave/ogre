@@ -139,8 +139,13 @@ namespace Ogre
         }
         if( Hlms::findParamInVec( params, "specular_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_SPECULAR,
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
                         mTexture[PBSM_SPECULAR], &mUvAtlasParams[mNumUvAtlas++] );
+        }
+        if( Hlms::findParamInVec( params, "roughness_map", paramVal ) )
+        {
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
+                        mTexture[PBSM_ROUGHNESS], &mUvAtlasParams[mNumUvAtlas++] );
         }
         if( Hlms::findParamInVec( params, "detail_weight_map", paramVal ) )
         {
@@ -154,6 +159,8 @@ namespace Ogre
             setTextureUvSource( PBSM_SOURCE_NORMAL, StringConverter::parseUnsignedInt( paramVal ) );
         if( Hlms::findParamInVec( params, "uv_specular_map", paramVal ) )
             setTextureUvSource( PBSM_SOURCE_SPECULAR, StringConverter::parseUnsignedInt( paramVal ) );
+        if( Hlms::findParamInVec( params, "uv_roughness_map", paramVal ) )
+            setTextureUvSource( PBSM_SOURCE_ROUGHNESS, StringConverter::parseUnsignedInt( paramVal ) );
         if( Hlms::findParamInVec( params, "uv_detail_weight_map", paramVal ) )
         {
             setTextureUvSource( PBSM_SOURCE_DETAIL_WEIGHT,
@@ -296,7 +303,7 @@ namespace Ogre
         bool oldTexExisted = mTexture[texType].isNull();
         mTexture[texType] = newTexture;
 
-        if( texType <= PBSM_SPECULAR )
+        if( texType <= PBSM_ROUGHNESS )
         {
             size_t uvAtlasIdx = 0;
 

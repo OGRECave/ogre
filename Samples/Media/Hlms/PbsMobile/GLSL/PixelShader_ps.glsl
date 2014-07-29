@@ -48,10 +48,11 @@ uniform @insertpiece( FresnelType ) F0;
 @property( uv_atlas )uniform mediump vec3 atlasOffsets[@value( uv_atlas )];@end
 // END UNIFORM DECLARATION
 
-@property( !specular_map )#define ROUGHNESS roughness@end
+@property( !roughness_map )#define ROUGHNESS roughness@end
 @property( diffuse_map )uniform lowp sampler2D	texDiffuseMap;@end
-@property( normal_map )uniform lowp sampler2D	texNormalMap;@end
+@property( normal_map_tex )uniform lowp sampler2D	texNormalMap;@end
 @property( specular_map )uniform lowp sampler2D	texSpecularMap;@end
+@property( roughness_map )uniform lowp sampler2D	texRoughnessMap;@end
 @property( envprobe_map )
 @property( hlms_cube_arrays_supported )uniform lowp samplerCube	texEnvProbeMap;@end
 @property( !hlms_cube_arrays_supported )uniform lowp sampler2D	texEnvProbeMap;@end @end
@@ -64,11 +65,12 @@ uniform @insertpiece( FresnelType ) F0;
 @property( !hw_gamma_read )	//Gamma to linear space
 	diffuseCol = diffuseCol * diffuseCol;@end @end
 @piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
-@property( specular_map )lowp vec4 specularCol;
-lowp float ROUGHNESS;
-@piece( SampleSpecularMap )	specularCol = texture2D( texSpecularMap, psUv@value(uv_specular).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
-	ROUGHNESS = roughness * specularCol.w;@end
-@piece( MulSpecularMapValue )* specularCol.xyz@end@end
+@property( specular_map )lowp vec3 specularCol;
+@piece( SampleSpecularMap )	specularCol = texture2D( texSpecularMap, psUv@value(uv_specular).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xyz;@end
+@piece( MulSpecularMapValue )* specularCol@end@end
+@property( roughness_map )lowp float ROUGHNESS;
+@piece( SampleRoughnessMap )ROUGHNESS = roughness * texture2D( texRoughnessMap, psUv@value(uv_roughness).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).x;@end
+@end
 
 @property( hlms_num_shadow_maps )
 @property( hlms_shadow_uses_depth_texture )@piece( SAMPLER2DSHADOW )sampler2DShadow@end @end
@@ -205,7 +207,7 @@ void main()
 	mediump vec3 vBinormal	= cross( vTangent, geomNormal );
 	mediump mat3 TBN		= mat3( vTangent, vBinormal, geomNormal );
 
-	nNormal = getTSNormal( texNormalMap, psUv@value(uv_normal).xy );
+	@property( normal_map_tex )nNormal = getTSNormal( texNormalMap, psUv@value(uv_normal).xy );@end
 @end
 
 @property( hlms_pssm_splits )
@@ -218,11 +220,22 @@ void main()
 
 @insertpiece( SampleDiffuseMap )
 @insertpiece( SampleSpecularMap )
+@insertpiece( SampleRoughnessMap )
 
 @foreach( detail_maps_diffuse, n )
 	@insertpiece( blend_mode_idx@n ) @end
 
-@foreach( detail_maps_normal, n )
+@property( normal_map_tex )
+	@piece( detail0_nm_op_sum )+=@end
+	@piece( detail0_nm_op_mul )*=@end
+@end @property( !normal_map_tex )
+	@piece( detail0_nm_op_sum )=@end
+	@piece( detail0_nm_op_mul )=@end
+@end
+@property( normal_map_tex )
+	nNormal.xy	@insertpiece( detail0_nm_op_sum ) vDetail0.xy;
+	nNormal.z	@insertpiece( detail0_nm_op_mul ) vDetail0.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle0);@end
+@foreach( detail_maps_normal, n, 1 )
 	nNormal.xy	+= vDetail@n.xy;
 	nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle@n);@end
 

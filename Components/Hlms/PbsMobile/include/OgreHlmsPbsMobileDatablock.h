@@ -72,7 +72,7 @@ namespace Ogre
         float   mFresnelR, mFresnelG, mFresnelB;    //F0
 
     protected:
-        UvAtlasParams mUvAtlasParams[3];
+        UvAtlasParams mUvAtlasParams[4];
 
         TexturePtr  mTexture[PBSM_MAX_TEXTURE_TYPES];
 
@@ -115,8 +115,12 @@ namespace Ogre
                 Default: specular 1 1 1 1
 
             * specular_map <texture name>
-                Name of the specular texture for the base image (optional)
-                Note: The alpha channel will be multiplied against the roughness value.
+                Name of the specular texture for the base image (optional).
+
+            * roughness_map <texture name>
+                Name of the roughness texture for the base image (optional)
+                Note: Only the Red channel will be used, and the texture will be converted to
+                an efficient monochrome representation.
 
             * normal_map <texture name>
                 Name of the normal texture for the base image (optional) for normal mapping
