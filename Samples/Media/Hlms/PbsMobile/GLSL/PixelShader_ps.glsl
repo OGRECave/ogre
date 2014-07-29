@@ -227,7 +227,7 @@ void main()
 	nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle@n);@end
 
 @property( normal_map )
-	nNormal = normalize( mul( TBN, nNormal ) );
+	nNormal = normalize( TBN * nNormal );
 @end
 
 	//Everything's in Camera space, we use Cook-Torrance lighting
