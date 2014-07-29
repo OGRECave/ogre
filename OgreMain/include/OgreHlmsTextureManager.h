@@ -51,17 +51,17 @@ namespace Ogre
         Its other main job is to provide UV atlas on the fly and/or texture arrays
         on the fly. To do that, we group textures into categories:
             * @TEXTURE_TYPE_DIFFUSE
-            * @TEXTURE_TYPE_SPECULAR
+            * @TEXTURE_TYPE_MONOCHROME
             * @TEXTURE_TYPE_NORMALS
             * @TEXTURE_TYPE_ENV_MAP
             * @TEXTURE_TYPE_DETAIL
-            * TEXTURE_TYPE_DETAIL_NORMAL_MAP
+            * @TEXTURE_TYPE_DETAIL_NORMAL_MAP
         Different categories have different default parameters. By default
         all types try to use array textures unless the RenderSystem API doesn't
         support it (in which case fallbacks to UV atlas).
     @par
         For example, Diffuse & detail textures enable hardware gamma correction.
-        Normal maps attempt to use BC5 compression, DXT5, or uncompress UV8,
+        Normal maps attempt to use BC5 compression, or uncompress UV8,
         in that order (depends on HW support).
         Detail maps default to not using UV atlas when texture arrays aren't
         supported (because detail maps are often meant to be tileable), etc
