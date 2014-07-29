@@ -747,7 +747,15 @@ namespace Ogre
                 for( size_t i=0; i<PBSM_MAX_TEXTURE_TYPES; ++i )
                 {
                     if( !datablock->mTexture[i].isNull() )
+                    {
+                        //TODO: Make this configurable;
                         mRenderSystem->_setTexture( texUnit++, true, datablock->mTexture[i] );
+                        TextureUnitState::UVWAddressingMode mode;
+                        mode.u = TextureUnitState::TAM_WRAP;
+                        mode.v = TextureUnitState::TAM_WRAP;
+                        mode.w = TextureUnitState::TAM_WRAP;
+                        mRenderSystem->_setTextureAddressingMode( texUnit-1, mode );
+                    }
                 }
 
                 mRenderSystem->_disableTextureUnitsFrom( texUnit );

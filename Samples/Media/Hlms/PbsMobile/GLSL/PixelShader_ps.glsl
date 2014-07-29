@@ -57,7 +57,7 @@ uniform @insertpiece( FresnelType ) F0;
 @property( !hlms_cube_arrays_supported )uniform lowp sampler2D	texEnvProbeMap;@end @end
 @property( detail_weight_map )uniform lowp sampler2D	texDetailWeightMap;@end
 @property( detail_maps_diffuse )uniform lowp sampler2D	texDetailMap[@value( detail_maps_diffuse )];@end
-@property( detail_maps_normals )uniform lowp sampler2D	texDetailNormalMap[@value( detail_maps_normals )];@end
+@property( detail_maps_normal )uniform lowp sampler2D	texDetailNormalMap[@value( detail_maps_normal )];@end
 
 @property( diffuse_map )lowp vec4 diffuseCol;
 @piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv@value(uv_diffuse).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
@@ -175,7 +175,7 @@ mediump vec3 cookTorrance( mediump vec3 lightDir, mediump vec3 viewDir, lowp flo
 
 void main()
 {
-@property( detail_maps_diffuse || detail_maps_normals )
+@property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
 		lowp vec4 detailWeights = texture2D( texDetailWeightMap, psUv@value(uv_detail_weight).xy );
 	@end @property( !detail_weight_map )
