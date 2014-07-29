@@ -72,6 +72,7 @@ namespace Ogre
     RenderQueue::RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager ) :
         mHlmsManager( hlmsManager ),
         mSceneManager( sceneManager ),
+        mLastWasCasterPass( false ),
         mLastMacroblock( 0 ),
         mLastBlendblock( 0 ),
         mLastVertexData( 0 ),
@@ -96,6 +97,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RenderQueue::clearState(void)
     {
+        mLastWasCasterPass = false;
         mLastMacroblock = 0;
         mLastBlendblock = 0;
         mLastVertexData = 0;
@@ -135,7 +137,7 @@ namespace Ogre
 
         RenderOperation op;
         pRend->getRenderOperation( op ); //TODO
-        uint32 meshHash; //TODO
+        uint32 meshHash = 0; //TODO
         //TODO: Account for skeletal animation in any of the hashes (preferently on the material side)
         //TODO: Account for auto instancing animation in any of the hashes
 
@@ -234,6 +236,12 @@ namespace Ogre
     void RenderQueue::renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
                                  bool casterPass, bool dualParaboloid )
     {
+        if( mLastWasCasterPass != casterPass )
+        {
+            clearState();
+            mLastWasCasterPass = casterPass;
+        }
+
         HlmsCache passCache[HLMS_MAX];
 
         for( size_t i=0; i<HLMS_MAX; ++i )
@@ -306,13 +314,12 @@ namespace Ogre
                 if( lastHlmsCache != hlmsCache )
                     rs->_setProgramsFromHlms( hlmsCache );
 
-                hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                      lastHlmsCache, lastTextureHash );
+                lastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                                        lastHlmsCache, lastTextureHash );
 
                 rs->_render( op );
 
                 lastHlmsCache   = hlmsCache;
-                lastTextureHash = datablock->mTextureHash;
 
                 ++itor;
             }
@@ -329,6 +336,12 @@ namespace Ogre
     void RenderQueue::renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                           RenderSystem *rs, bool casterPass, bool dualParaboloid )
     {
+        if( mLastWasCasterPass != casterPass )
+        {
+            clearState();
+            mLastWasCasterPass = casterPass;
+        }
+
         const HlmsDatablock *datablock = pRend->getDatablock();
 
         Hlms *hlms = datablock->getCreator();
@@ -367,13 +380,12 @@ namespace Ogre
         if( mLastHlmsCache != hlmsCache )
             rs->_setProgramsFromHlms( hlmsCache );
 
-        hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                              mLastHlmsCache, mLastTextureHash );
+        mLastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                                 mLastHlmsCache, mLastTextureHash );
 
         rs->_render( op );
 
         mLastHlmsCache   = hlmsCache;
-        mLastTextureHash = datablock->mTextureHash;
     }
 }
 

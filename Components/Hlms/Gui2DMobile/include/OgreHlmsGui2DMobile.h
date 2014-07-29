@@ -79,9 +79,9 @@ namespace Ogre
                                            bool casterPass, bool dualParaboloid,
                                            SceneManager *sceneManager );
 
-        virtual void fillBuffersFor(const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass, const HlmsCache *lastCache,
-                                     uint32 lastTextureHash );
+        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                       bool casterPass, const HlmsCache *lastCache,
+                                       uint32 lastTextureHash );
 
         static const IdString PropertyTexMatrixCount;
         static const IdString PropertyTexMatrixCount0;

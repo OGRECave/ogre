@@ -337,10 +337,10 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobile::fillBuffersFor( const HlmsCache *cache,
-                                          const QueuedRenderable &queuedRenderable,
-                                          bool casterPass, const HlmsCache *lastCache,
-                                          uint32 lastTextureHash )
+    uint32 HlmsGui2DMobile::fillBuffersFor( const HlmsCache *cache,
+                                            const QueuedRenderable &queuedRenderable,
+                                            bool casterPass, const HlmsCache *lastCache,
+                                            uint32 lastTextureHash )
     {
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
@@ -429,6 +429,8 @@ namespace Ogre
 
         mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, variabilityMask );
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
+
+        return datablock->mTextureHash;
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsGui2DMobile::createDatablockImpl( IdString datablockName,

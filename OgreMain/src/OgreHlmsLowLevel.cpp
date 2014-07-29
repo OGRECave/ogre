@@ -140,10 +140,10 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsLowLevel::fillBuffersFor( const HlmsCache *cache,
-                                       const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, const HlmsCache *lastCache,
-                                       uint32 lastTextureHash )
+    uint32 HlmsLowLevel::fillBuffersFor( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, const HlmsCache *lastCache,
+                                         uint32 lastTextureHash )
     {
         Renderable *renderable = queuedRenderable.renderable;
         unsigned short numMatrices = renderable->getNumWorldTransforms();
@@ -246,6 +246,8 @@ namespace Ogre
             mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM,
                                                      pass->getFragmentProgramParameters(), GPV_ALL );
         }
+
+        return 0;
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsLowLevel::createDatablockImpl( IdString datablockName,

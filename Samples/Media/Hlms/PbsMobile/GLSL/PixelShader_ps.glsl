@@ -15,7 +15,7 @@ mediump vec3 nNormal;
 @property( normal_map )in mediump vec3 psTangent;
 mediump vec3 vTangent;@end
 @end
-@property( hlms_pssm_splits )in float psDepth;@end
+@property( hlms_pssm_splits )in highp float psDepth;@end
 @foreach( hlms_uv_count, n )
 in mediump vec@value( hlms_uv_count@n ) psUv@n;@end
 @foreach( hlms_num_shadow_maps, n )
@@ -75,9 +75,9 @@ uniform @insertpiece( FresnelType ) F0;
 @property( hlms_num_shadow_maps )
 @property( hlms_shadow_uses_depth_texture )@piece( SAMPLER2DSHADOW )sampler2DShadow@end @end
 @property( !hlms_shadow_uses_depth_texture )@piece( SAMPLER2DSHADOW )sampler2D@end @end
-uniform @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shadow_maps)];
+uniform highp @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shadow_maps)];
 
-lowp float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, highp vec4 psPosLN, mediump vec2 invShadowMapSize )
+lowp float getShadow( highp @insertpiece( SAMPLER2DSHADOW ) shadowMap, highp vec4 psPosLN, mediump vec2 invShadowMapSize )
 {
 @property( !hlms_shadow_usues_depth_texture )
 	highp float fDepth = psPosLN.z;
@@ -232,7 +232,7 @@ void main()
 	@piece( detail0_nm_op_sum )=@end
 	@piece( detail0_nm_op_mul )=@end
 @end
-@property( normal_map_tex )
+@property( detail_maps_normal )
 	nNormal.xy	@insertpiece( detail0_nm_op_sum ) vDetail0.xy;
 	nNormal.z	@insertpiece( detail0_nm_op_mul ) vDetail0.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle0);@end
 @foreach( detail_maps_normal, n, 1 )

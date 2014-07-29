@@ -204,41 +204,58 @@ namespace Ogre
         const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
                                                     queuedRenderable.renderable->getDatablock() );
 
-        assert( !datablock->mTexture[PBSM_DIFFUSE].isNull()   == getProperty( PbsMobileProperty::DiffuseMap ) );
-        assert( !datablock->mTexture[PBSM_NORMAL].isNull()    == getProperty( PbsMobileProperty::NormalMapTex ) );
-        assert( !datablock->mTexture[PBSM_SPECULAR].isNull()  == getProperty( PbsMobileProperty::SpecularMap ) );
-        assert( !datablock->mTexture[PBSM_REFLECTION].isNull()== getProperty( PbsMobileProperty::EnvProbeMap ) );
-
-        if( !datablock->mTexture[PBSM_DIFFUSE].isNull() )
-            psParams->setNamedConstant( "texDiffuseMap", texUnit++ );
-        if( !datablock->mTexture[PBSM_NORMAL].isNull() )
-            psParams->setNamedConstant( "texNormalMap", texUnit++ );
-        if( !datablock->mTexture[PBSM_SPECULAR].isNull() )
-            psParams->setNamedConstant( "texSpecularMap", texUnit++ );
-        if( !datablock->mTexture[PBSM_REFLECTION].isNull() )
-            psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
-        if( !datablock->mTexture[PBSM_DETAIL_WEIGHT].isNull() )
-            psParams->setNamedConstant( "texDetailWeightMap", texUnit++ );
-
-        size_t validDetailMaps = 0;
-        for( size_t i=PBSM_DETAIL0; i<=PBSM_DETAIL3; ++i )
+        if( getProperty( PbsMobileProperty::DiffuseMap ) )
         {
-            if( !datablock->mTexture[i].isNull() )
+            assert( !datablock->mTexture[PBSM_DIFFUSE].isNull() );
+            psParams->setNamedConstant( "texDiffuseMap", texUnit++ );
+        }
+        if( getProperty( PbsMobileProperty::NormalMapTex ) )
+        {
+            assert( !datablock->mTexture[PBSM_NORMAL].isNull() );
+            psParams->setNamedConstant( "texNormalMap", texUnit++ );
+        }
+        if( getProperty( PbsMobileProperty::SpecularMap ) )
+        {
+            assert( !datablock->mTexture[PBSM_SPECULAR].isNull() );
+            psParams->setNamedConstant( "texSpecularMap", texUnit++ );
+        }
+        if( getProperty( PbsMobileProperty::EnvProbeMap ) )
+        {
+            assert( !datablock->mTexture[PBSM_REFLECTION].isNull() );
+            psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
+        }
+        if( getProperty( PbsMobileProperty::DetailWeightMap ) )
+        {
+            assert( !datablock->mTexture[PBSM_DETAIL_WEIGHT].isNull() );
+            psParams->setNamedConstant( "texDetailWeightMap", texUnit++ );
+        }
+
+        if( getProperty( PbsMobileProperty::DetailMapsDiffuse ) )
+        {
+            size_t validDetailMaps = 0;
+            for( size_t i=PBSM_DETAIL0; i<=PBSM_DETAIL3; ++i )
             {
-                psParams->setNamedConstant( "texDetailMap[" +
-                                            StringConverter::toString( validDetailMaps++ ) + "]",
-                                            texUnit++ );
+                if( !datablock->mTexture[i].isNull() )
+                {
+                    assert( !datablock->mTexture[i].isNull() );
+                    psParams->setNamedConstant( "texDetailMap[" +
+                                                StringConverter::toString( validDetailMaps++ ) + "]",
+                                                texUnit++ );
+                }
             }
         }
 
-        validDetailMaps = 0;
-        for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
+        if( getProperty( PbsMobileProperty::DetailMapsNormal ) )
         {
-            if( !datablock->mTexture[i].isNull() )
+            size_t validDetailMaps = 0;
+            for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
             {
-                psParams->setNamedConstant( "texDetailNormalMap[" +
-                                            StringConverter::toString( validDetailMaps++ ) + "]",
-                                            texUnit++ );
+                if( !datablock->mTexture[i].isNull() )
+                {
+                    psParams->setNamedConstant( "texDetailNormalMap[" +
+                                                StringConverter::toString( validDetailMaps++ ) + "]",
+                                                texUnit++ );
+                }
             }
         }
 
@@ -590,6 +607,7 @@ namespace Ogre
             for( size_t i=0; i<9; ++i )
                 mPreparedPass.pixelShaderSharedBuffer.push_back( (float)invViewMatrix3[0][i] );
 
+            mPreparedPass.shadowMaps.clear();
             mPreparedPass.shadowMaps.reserve( numShadowMaps );
             for( int32 i=0; i<numShadowMaps; ++i )
                 mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
@@ -598,6 +616,7 @@ namespace Ogre
         {
             mPreparedPass.vertexShaderSharedBuffer.clear();
             mPreparedPass.vertexShaderSharedBuffer.reserve( 2 + 16 );
+            mPreparedPass.pixelShaderSharedBuffer.clear();
 
             //vec2 depthRange;
             Real fNear, fFar;
@@ -617,14 +636,21 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsMobile::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass, const HlmsCache *lastCache,
-                                     uint32 lastTextureHash )
+    uint32 HlmsPbsMobile::fillBuffersFor( const HlmsCache *cache,
+                                          const QueuedRenderable &queuedRenderable,
+                                          bool casterPass, const HlmsCache *lastCache,
+                                          uint32 lastTextureHash )
     {
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
+#if _SECURE_SCL
+        float *psUniformBuffer = 0;
+        if( !psParams->getFloatConstantList().empty() )
+            psUniformBuffer = psParams->getFloatPointer( 0 );
+#else
         float *psUniformBuffer = psParams->getFloatPointer( 0 );
+#endif
 
         assert( dynamic_cast<const HlmsPbsMobileDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
@@ -650,7 +676,8 @@ namespace Ogre
 
         uint16 variabilityMask = GPV_PER_OBJECT;
         size_t psBufferElements = mPreparedPass.pixelShaderSharedBuffer.size() -
-                                    (datablock->mTexture[PBSM_REFLECTION].isNull() ? 9 : 0);
+                                    ((!casterPass && datablock->mTexture[PBSM_REFLECTION].isNull()) ?
+                                                                                            9 : 0);
 
         bool hasSkeletonAnimation = queuedRenderable.renderable->hasSkeletonAnimation();
         size_t sharedViewTransfElem = hasSkeletonAnimation ? 0 : (16 * (2 - casterPass));
@@ -659,7 +686,7 @@ namespace Ogre
         assert( mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem <
                 vpParams->getFloatConstantList().size() );
         assert( ( mPreparedPass.pixelShaderSharedBuffer.size() -
-                  (datablock->mTexture[PBSM_REFLECTION].isNull() ? 9 : 0) ) <
+                  ((!casterPass && datablock->mTexture[PBSM_REFLECTION].isNull()) ? 9 : 0) ) <=
                 psParams->getFloatConstantList().size() );
 
         if( cache != lastCache )
@@ -699,8 +726,8 @@ namespace Ogre
             //On GLES2, there is a bug in PowerVR SGX 540 where glProgramUniformMatrix4fvEXT doesn't
             tmp = tmp.transpose();
     #endif
-            memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
-            vsUniformBuffer += 16;
+            memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) * !casterPass );
+            vsUniformBuffer += 16 * !casterPass;
         }
         else
         {
@@ -724,6 +751,8 @@ namespace Ogre
 
         if( casterPass )
             *vsUniformBuffer++ = datablock->mShadowConstantBias;
+
+        uint32 retVal;
 
         //---------------------------------------------------------------------------
         //                          ---- PIXEL SHADER ----
@@ -764,21 +793,30 @@ namespace Ogre
 
                 mRenderSystem->_disableTextureUnitsFrom( texUnit );
             }
+
+            retVal = datablock->mTextureHash;
         }
         else
         {
+            if( lastTextureHash )
+                mRenderSystem->_disableTextureUnitsFrom( 0 );
+            retVal = 0;
+
             //vec3 atlasOffsets[4]; (up to four, can be zero)
-            memcpy( psUniformBuffer, &datablock->mUvAtlasParams,
+            /*memcpy( psUniformBuffer, &datablock->mUvAtlasParams,
                     datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) );
             psUniformBuffer += datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) /
-                                sizeof( float );
+                                sizeof( float );*/
         }
 
         assert( vsUniformBuffer - vpParams->getFloatPointer( 0 ) == vpParams->getFloatConstantList().size() );
-        assert( psUniformBuffer - psParams->getFloatPointer( 0 ) == psParams->getFloatConstantList().size() );
+        assert( (!psParams->getFloatConstantList().size() && !psUniformBuffer) ||
+                (psUniformBuffer - psParams->getFloatPointer( 0 ) == psParams->getFloatConstantList().size()) );
 
         mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, variabilityMask );
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsPbsMobile::createDatablockImpl( IdString datablockName,

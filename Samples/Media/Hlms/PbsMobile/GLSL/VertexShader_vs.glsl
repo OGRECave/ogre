@@ -35,8 +35,8 @@ out vec4 psPosL@n;@end
 @property( !hlms_shadowcaster )@property( hlms_num_shadow_maps )
 //Uniforms that change per pass
 uniform mat4 texWorldViewProj[@value(hlms_num_shadow_maps)];
-uniform vec4 shadowDepthRange[@value(hlms_num_shadow_maps)];@end @end
-@property( hlms_shadowcaster )uniform vec4 depthRange;@end
+uniform vec2 shadowDepthRange[@value(hlms_num_shadow_maps)];@end @end
+@property( hlms_shadowcaster )uniform vec2 depthRange;@end
 //Uniforms that change per pass (skeleton anim) or per entity (non-skeleton anim)
 //Note: worldView becomes "view" and worldViewProj "viewProj" on skel. anim.
 uniform mat4 worldViewProj;
@@ -132,16 +132,16 @@ void main()
 @property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-	psPosL@n.z = (psPosL@n.z - shadowDepthRange[@n].x) * shadowDepthRange[@n].w;@end
+	psPosL@n.z = (psPosL@n.z - shadowDepthRange[@n].x) * shadowDepthRange[@n].y;@end
 
 @property( hlms_pssm_splits )	psDepth = gl_Position.z;@end
 @end @property( hlms_shadowcaster )
 	//Linear depth
-	psDepth	= (gl_Position.z - depthRange.x + shadowConstantBias) * depthRange.w;
+	psDepth	= (gl_Position.z - depthRange.x + shadowConstantBias) * depthRange.y;
 
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
-	gl_Position.z = gl_Position.z * (gl_Position.w * depthRange.w);
+	gl_Position.z = gl_Position.z * (gl_Position.w * depthRange.y);
 @end
 }

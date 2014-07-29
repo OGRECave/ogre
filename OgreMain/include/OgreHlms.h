@@ -386,9 +386,23 @@ namespace Ogre
         const HlmsCache* getMaterial( HlmsCache const *lastReturnedValue, const HlmsCache &passCache,
                                       const QueuedRenderable &queuedRenderable, bool casterPass );
 
-        virtual void fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass, const HlmsCache *lastCache,
-                                     uint32 lastTextureHash ) = 0;
+        /** Fills the constant buffers. Gets executed right before drawing the mesh.
+        @param cache
+            Current cache of Shaders to be used.
+        @param queuedRenderable
+            The Renderable-MovableObject pair about to be rendered.
+        @param casterPass
+            Whether this is a shadow mapping caster pass.
+        @param lastCache
+            The cache of shaders that was the used by the previous renderable.
+        @param lastTextureHash
+            Last Texture Hash, used to let the Hlms know whether the textures should be changed again
+        @return
+            New Texture hash (may be equal or different to lastTextureHash).
+        */
+        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                       bool casterPass, const HlmsCache *lastCache,
+                                       uint32 lastTextureHash ) = 0;
 
         /** Call to output the automatically generated shaders (which are usually made from templates)
             on the given folder for inspection, analyzing, debugging, etc.
