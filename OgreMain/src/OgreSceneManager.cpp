@@ -1137,7 +1137,9 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
             if( mInstancingThreadedCullingMethod == INSTANCING_CULLING_THREADED )
             {
                 fireCullFrustumInstanceBatchThreads( InstanceBatchCullRequest( camera, lodCamera,
-                                                     vp->getVisibilityMask()&getVisibilityMask() ) );
+                                                     (vp->getVisibilityMask() & getVisibilityMask()) |
+                                                     (vp->getVisibilityMask() &
+                                                       ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS) ) );
             }
 
             //mVisibleObjects should be filled in phase 01
@@ -2146,7 +2148,9 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
             objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
             MovableObject::cullFrustum( numObjs, objData, camera,
-                    camera->getLastViewport()->getVisibilityMask()&getVisibilityMask(),
+                    (camera->getLastViewport()->getVisibilityMask() & getVisibilityMask()) |
+                    (camera->getLastViewport()->getVisibilityMask() &
+                                        ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
                     outVisibleObjects, lodCamera );
         }
 
@@ -3619,7 +3623,9 @@ AxisAlignedBox SceneManager::_calculateCurrentCastersBox( uint32 viewportVisibil
             const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
             MovableObject::calculateCastersBox( numObjs, objData,
-                                                viewportVisibilityMask&getVisibilityMask(),
+                                                (viewportVisibilityMask&getVisibilityMask()) |
+                                                (viewportVisibilityMask &
+                                                 ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
                                                 &tmpBox );
             retVal.merge( tmpBox );
         }
@@ -4524,7 +4530,9 @@ RenderSystem *SceneManager::getDestinationRenderSystem()
 uint32 SceneManager::_getCombinedVisibilityMask(void) const
 {
     return mCurrentViewport ?
-        mCurrentViewport->getVisibilityMask() & mVisibilityMask : mVisibilityMask;
+        (mCurrentViewport->getVisibilityMask() & mVisibilityMask) |
+        (mCurrentViewport->getVisibilityMask() & ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS) :
+                mVisibilityMask;
 
 }
 //-----------------------------------------------------------------------------------
