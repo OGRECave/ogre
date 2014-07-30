@@ -626,7 +626,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 
-#include "OgreHeaderSuffix.h"
+#include "OgreHeaderPrefix.h"
 
 } // namespace Ogre
 #endif // _LIGHT_H__

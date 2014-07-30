@@ -136,9 +136,9 @@ namespace Ogre
 
 }// namespace Ogre
 
-#include "OgreHeaderSuffix.h"
-
 #endif 
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __MemoryNedAlloc_H__
 
