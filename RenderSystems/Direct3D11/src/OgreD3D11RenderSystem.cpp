@@ -637,7 +637,12 @@ bail:
 
             if ("No information queue exceptions" == infoQType)
             {
+#if OGRE_DEBUG_MODE
+                // a debug build should always enable the debug layer and report errors
+                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
+#else
                 D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_NO_EXCEPTION);
+#endif
             }
             else if ("Corruption" == infoQType)
             {
@@ -2312,38 +2317,6 @@ bail:
 
         mLastVertexSourceCount = binds.size();      
     }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::validateShaderSignatures( const D3D11HLSLProgram* progA, const D3D11HLSLProgram* progB ) const
-    {
-        // compare inputs of progB with outputs of progA to see if they are compatible
-        assert( progA );
-        assert( progB );
-        unsigned int inputCount = progB->getNumInputs();
-        if ( inputCount > progA->getNumOutputs() )
-        {
-            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                "Shader " + progA->getName() + " produces not enough output parameters for shader " + progB->getName(),
-                "D3D11RenderSystem::validateShaderSignatures" );
-        }
-        else
-        {
-            for ( unsigned int i = 0; i < inputCount; ++i )
-            {
-                const D3D11_SIGNATURE_PARAMETER_DESC& out = progA->getOutputParamDesc( i );
-                const D3D11_SIGNATURE_PARAMETER_DESC& in  = progB->getInputParamDesc( i );
-                if ( strcmp( in.SemanticName, out.SemanticName ) != 0 ||
-                    in.SemanticIndex != out.SemanticIndex ||
-                    in.ComponentType != out.ComponentType ||
-                    in.Mask != out.Mask
-                    )
-                {
-                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                        "Shader " + progA->getName() + " does not produce output parameters that are compatible with the inputs of shader " + progB->getName(),
-                        "D3D11RenderSystem::validateShaderSignatures" );
-                }
-            }
-        }
-    }
 
     //---------------------------------------------------------------------
     // TODO: Move this class to the right place.
@@ -2928,33 +2901,7 @@ bail:
                 break;
             }
         }
-#if OGRE_DEBUG_MODE
-        {
-            if ( mBoundTessellationHullProgram )
-            {
-                validateShaderSignatures( mBoundVertexProgram, mBoundTessellationHullProgram );
-                validateShaderSignatures( mBoundTessellationHullProgram, mBoundTessellationDomainProgram ); // if hull exists, so does domain
-                if ( mBoundGeometryProgram )
-                {
-                    validateShaderSignatures( mBoundTessellationDomainProgram, mBoundGeometryProgram );
-                    validateShaderSignatures( mBoundGeometryProgram, mBoundFragmentProgram );
-                }
-                else
-                {
-                    validateShaderSignatures( mBoundTessellationDomainProgram, mBoundFragmentProgram );
-                }
-            }
-            else if ( mBoundGeometryProgram )
-            {
-                validateShaderSignatures( mBoundVertexProgram, mBoundGeometryProgram );
-                validateShaderSignatures( mBoundGeometryProgram, mBoundFragmentProgram );
-            }
-            else
-            {
-                validateShaderSignatures( mBoundVertexProgram, mBoundFragmentProgram );
-            }
-        }
-#endif
+        
         if (primCount)
         {
             // Issue the op
