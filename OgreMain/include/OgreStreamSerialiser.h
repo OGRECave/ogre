@@ -348,8 +348,6 @@ namespace Ogre
 		virtual void checkStream(bool failOnEof = false, 
 			bool validateReadable = false, bool validateWriteable = false) const;
 
-		virtual void flipEndian(void * pData, size_t size, size_t count);
-		virtual void flipEndian(void * pData, size_t size);
 		virtual void determineEndianness();
 		virtual Chunk* popChunk(uint id);
 

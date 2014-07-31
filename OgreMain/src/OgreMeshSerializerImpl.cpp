@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreMesh.h"
 #include "OgreSubMesh.h"
+#include "OgreBitwise.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreSkeleton.h"
@@ -1577,7 +1578,7 @@ namespace Ogre {
 					default:
 						assert(false); // Should never happen
 				};
-                Serializer::flipEndian(pElem, typeSize,
+				Bitwise::bswapChunks(pElem, typeSize,
 					VertexElement::getTypeCount((*ei).getType()));
 
 			}
