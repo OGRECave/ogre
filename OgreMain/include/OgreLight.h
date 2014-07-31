@@ -69,6 +69,8 @@ namespace Ogre {
     */
     class _OgreExport Light : public MovableObject
     {
+        void resetAabb(void);
+        void updateLightBounds(void);
     public:
         /// Temp tag used for sorting
         Real tempSquareDist;
@@ -101,9 +103,6 @@ namespace Ogre {
         /** Returns the light type.
         */
         LightTypes getType(void) const                              { return mLightType; }
-
-        /// Sets the Aabb (local space) for this light when it's of type spot
-        void setSpotAabb(void);
 
         /** Sets the colour of the diffuse light given off by this source.
         @remarks
@@ -235,6 +234,32 @@ namespace Ogre {
             Try to cache the value instead of calling it multiple times in the same scope
         */
         Vector3 getDirection(void) const;
+
+        /** A Light must always have a Node attached to it. The direction is taken from
+            the node's orientation, and thus setDirection modifies the attached node directly.
+        @par
+            However, when changing the range and the spot falloff; the node is not affected.
+            This is intentional in case you want to create (e.g.) a node for a flashlight,
+            and attach both the flashlight entity and the light to the same node; thus
+            controlling the node moves both the flashlight and its visual effect.
+        @par
+            Despite this, there are cases where you want the changes to this light to be
+            reflected in the parent node: The most common example are light volumes in
+            deferred shading setups, and debug objects.
+        @remarks
+            This setting is only useful for non-directional lights.
+            For point lights, the scale is calculated as setSize( range, range, range )
+            which means a light volume should be a sphere of radius = 1;
+        @par
+            For spot lights, the scale is calc. as
+                setSize( tan( outerAngle * 0.5 * range ), tan( outerAngle * 0.5 * range ), range );
+            which means a light volume should be a cone with Z = 1, and X & Y = 2
+        @param bAffect
+            When true, the scene node is affected and modified by changes to range and falloff.
+        */
+        void setAffectParentNode( bool bAffect );
+
+        bool getAffectParentNode(void) const                        { return mAffectParentNode; }
 
         /** Sets the range of a spotlight, i.e. the angle of the inner and outer cones
             and the rate of falloff between them.
@@ -492,6 +517,7 @@ namespace Ogre {
         Real mAttenuationQuad;
         Real mPowerScale;
         bool mOwnShadowFarDist;
+        bool mAffectParentNode;
         Real mShadowFarDist;
         Real mShadowFarDistSquared;
 
