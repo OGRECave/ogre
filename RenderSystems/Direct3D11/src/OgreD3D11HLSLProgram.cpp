@@ -457,19 +457,24 @@ namespace Ogre {
 
         ID3DBlob * pMicroCode;
 
+#ifdef OGRE_DEBUG_MODE
+		const char* filename = mFilename.c_str();
+#else
+		const char* filename = NULL;
+#endif
 
         HRESULT hr = D3DCompile(
-            mSource.c_str(),	// [in] Pointer to the shader in memory. 
-            mSource.size(),		// [in] Size of the shader in memory.  
-            NULL,				// [in] The name of the file that contains the shader code. 
-            pDefines,			// [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D_SHADER_MACRO. If not used, set this to NULL. 
-            &includeHandler,	// [in] Optional. Pointer to an ID3DInclude Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include. 
-            mEntryPoint.c_str(),// [in] Name of the shader-entrypoint function where shader execution begins. 
-            target,	// [in] A string that specifies the shader model; can be any profile in shader model 4 or higher. 
-            compileFlags,		// [in] Effect compile flags - no D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY at the first try...
-            NULL,				// [in] Effect compile flags
-            &pMicroCode,		// [out] A pointer to an ID3DBlob Interface which contains the compiled shader, as well as any embedded debug and symbol-table information. 
-            &errors			// [out] A pointer to an ID3DBlob Interface which contains a listing of errors and warnings that occurred during compilation. These errors and warnings are identical to the the debug output from a debugger.
+            mSource.c_str(),      // [in] Pointer to the shader in memory. 
+            mSource.size(),       // [in] Size of the shader in memory.  
+            filename,             // [in] The name of the file that contains the shader code. 
+            pDefines,             // [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D_SHADER_MACRO. If not used, set this to NULL. 
+            &includeHandler,      // [in] Optional. Pointer to an ID3DInclude Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include. 
+            mEntryPoint.c_str(),  // [in] Name of the shader-entrypoint function where shader execution begins. 
+            target,               // [in] A string that specifies the shader model; can be any profile in shader model 4 or higher. 
+            compileFlags,         // [in] Effect compile flags - no D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY at the first try...
+            NULL,                 // [in] Effect compile flags
+            &pMicroCode,          // [out] A pointer to an ID3DBlob Interface which contains the compiled shader, as well as any embedded debug and symbol-table information. 
+            &errors               // [out] A pointer to an ID3DBlob Interface which contains a listing of errors and warnings that occurred during compilation. These errors and warnings are identical to the the debug output from a debugger.
             );
 
 #if 0 // this is how you disassemble
