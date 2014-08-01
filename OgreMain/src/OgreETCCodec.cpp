@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
+#include "OgreBitwise.h"
 
 #define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define KTX_ENDIAN_REF      (0x04030201)
@@ -170,25 +171,17 @@ namespace Ogre {
         return mType;
     }
     //---------------------------------------------------------------------    
-    void ETCCodec::flipEndian(void * pData, size_t size, size_t count) const
+    void ETCCodec::flipEndian(void * pData, size_t size, size_t count)
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		for(unsigned int index = 0; index < count; index++)
-        {
-            flipEndian((void *)((long)pData + (index * size)), size);
-        }
+		Bitwise::bswapChunks(pData, size, count);
 #endif
     }
     //---------------------------------------------------------------------    
-    void ETCCodec::flipEndian(void * pData, size_t size) const
+    void ETCCodec::flipEndian(void * pData, size_t size)
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
-        {
-            char swapByte = *(char *)((long)pData + byteIndex);
-            *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
-            *(char *)((long)pData + size - byteIndex - 1) = swapByte;
-        }
+        Bitwise::bswapBuffer(pData, size);
 #endif
     }
     //---------------------------------------------------------------------    
@@ -198,7 +191,7 @@ namespace Ogre {
 		{
 			uint32 fileType;
 			memcpy(&fileType, magicNumberPtr, sizeof(uint32));
-			flipEndian(&fileType, sizeof(uint32), 1);
+			flipEndian(&fileType, sizeof(uint32));
 
 			if (PKM_MAGIC == fileType)
 				return String("pkm");
@@ -300,7 +293,7 @@ namespace Ogre {
 			return false;
 
 		if (header.endianness == KTX_ENDIAN_REF_REV)
-			flipEndian(&header.glType, sizeof(uint32), 1);
+			flipEndian(&header.glType, sizeof(uint32));
 
         ImageData *imgData = OGRE_NEW ImageData();
         imgData->depth = 1;

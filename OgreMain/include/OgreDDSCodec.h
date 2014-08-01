@@ -52,8 +52,8 @@ namespace Ogre {
     private:
         String mType;
 
-    	void flipEndian(void * pData, size_t size, size_t count) const;
-	    void flipEndian(void * pData, size_t size) const;
+		static void flipEndian(void * pData, size_t size, size_t count);	// invokes Bitwise::bswapChunks() if OGRE_ENDIAN_BIG
+		static void flipEndian(void * pData, size_t size);					// invokes Bitwise::bswapBuffer() if OGRE_ENDIAN_BIG
 
 		PixelFormat convertFourCCFormat(uint32 fourcc) const;
 		PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
