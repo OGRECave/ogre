@@ -120,7 +120,7 @@ namespace Ogre
         uint32 hlmsHash = casterPass ? pRend->getHlmsCasterHash() : pRend->getHlmsHash();
         const HlmsDatablock *datablock = pRend->getDatablock();
 
-        bool opaque = datablock->mIsOpaque;
+        bool transparent = datablock->mIsTransparent;
 
         uint16 macroblock = datablock->mMacroblockHash;
         uint16 texturehash= datablock->mTextureHash;
@@ -142,12 +142,12 @@ namespace Ogre
         //TODO: Account for auto instancing animation in any of the hashes
 
         uint64 hash;
-        if( opaque )
+        if( transparent )
         {
             //Opaque objects are first sorted by material, then by mesh, then by depth front to back.
             hash =
                 ( uint64(subId          & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
-                ( uint64(opaque         & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
+                ( uint64(transparent    & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
                 ( uint64(macroblock     & OGRE_MAKE_MASK( MacroblockBits ))     << MacroblockShift )    |
                 ( uint64(hlmsHash       & OGRE_MAKE_MASK( ShaderBits ))         << ShaderShift )        |
                 ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShift )          |
@@ -160,7 +160,7 @@ namespace Ogre
             quantizedDepth = quantizedDepth ^ 0xffffffff;
             hash =
                 ( uint64(subId          & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
-                ( uint64(opaque         & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
+                ( uint64(transparent    & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
                 ( uint64(quantizedDepth & OGRE_MAKE_MASK( DepthBits ))          << DepthShiftTransp )   |
                 ( uint64(macroblock     & OGRE_MAKE_MASK( MacroblockBits ))    << MacroblockShiftTransp)|
                 ( uint64(hlmsHash       & OGRE_MAKE_MASK( ShaderBits ))         << ShaderShiftTransp )  |

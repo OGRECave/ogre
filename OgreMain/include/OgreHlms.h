@@ -48,6 +48,13 @@ namespace Ogre
     class _OgreExport Hlms : public PassAlloc
     {
     public:
+        enum LightGatheringMode
+        {
+            LightGatherForward,
+            LightGatherForwardPlus,
+            LightGatherDeferred
+        };
+
         struct DatablockEntry
         {
             HlmsDatablock   *datablock;
@@ -110,6 +117,9 @@ namespace Ogre
         Archive         *mDataFolder;
         StringVector    mPieceFiles[5];
         HlmsManager     *mHlmsManager;
+
+        LightGatheringMode  mLightGatheringMode;
+        uint16              mNumLightsLimit;
 
         RenderSystem    *mRenderSystem;
 

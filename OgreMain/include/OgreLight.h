@@ -69,8 +69,8 @@ namespace Ogre {
     */
     class _OgreExport Light : public MovableObject
     {
-        void resetAabb(void);
-        void updateLightBounds(void);
+		void resetAabb(void);
+		void updateLightBounds(void);
     public:
         /// Temp tag used for sorting
         Real tempSquareDist;
@@ -85,7 +85,9 @@ namespace Ogre {
             /// Directional lights simulate parallel light beams from a distant source, hence have direction but no position
             LT_DIRECTIONAL = 1,
             /// Spotlights simulate a cone of light from a source so require position and direction, plus extra values for falloff
-            LT_SPOTLIGHT = 2
+            LT_SPOTLIGHT = 2,
+
+            NUM_LIGHT_TYPES
         };
 
         /** Normal constructor. Should not be called directly, but rather the SceneManager::createLight method should be used.
@@ -162,26 +164,32 @@ namespace Ogre {
             The actual attenuation formula is:
                             1
             --------------------------------
-              ( (distance / radius) + 1 )²
-            Which can be derived as:
-                            1
-            --------------------------------
-               1 + 2/r * d + 1 / r² * d²
+            (distance / radius)² * 0.5 + 0.5
 
             The original formula never ends, that is the range is infinity. This function calculates
             a range based on "lumThreshold": When the luminosity past certain distance is below the
             established threshold, the light calculations are cut.
         @param radius
-            The radius of the light. i.e. A light bulb is a couple centimeters, the sun is ~696km
-            Note: Having a radius = 2 doesn't mean that at distance = 2 the pixel is lit 100%
-            (at r = d; the pixel is lit by 25%)
+            The radius of the light. i.e. A light bulb is a couple centimeters, the sun is ~696km;
+            but be sure to be consistent in the unit of measurement you use (i.e. don't use km if
+            your default unit is in meters).
+            Note: Having a radius = 2 means that at distance = 2 the pixel is lit 100%
+            Anything inside that radius (which is supposedly impossible) will have more than 100%
+            light power.
         @param lumThreshold
             Value in the range [0; 1)
             Sets range at which the luminance (in percentage) of a point would go below the threshold.
             For example lumThreshold = 0 means the attenuation range is infinity; lumThreshold = 1 means
             the range is set to 0.
+        @par
+            The value you want as threshold to use depends on your HDR pipeline and the power of the
+            light. For example, with a power = 1 in LDR, a lumThreshold < 1 / 255 (roughly 0.00392)
+            is pointless. Past that point the actual RGB value will always be (0, 0, 0).
+            But for an LDR pipeline with a light power of 50, lumThreshold < 1 / (255 * 50) is
+            pointless. For an HDR pipeline, the answer is more faint, as it depends on the threshold
+            of your HDR tonemapping past which it stops adjusting the exposure.
         */
-        void setAttenuationBasedOnRadius(Real radius, Real lumThreshold);
+        void setAttenuationBasedOnRadius( Real radius, Real lumThreshold);
 
         /** Sets the attenuation parameters of the light source i.e. how it diminishes with distance.
         @remarks
@@ -235,31 +243,31 @@ namespace Ogre {
         */
         Vector3 getDirection(void) const;
 
-        /** A Light must always have a Node attached to it. The direction is taken from
-            the node's orientation, and thus setDirection modifies the attached node directly.
-        @par
-            However, when changing the range and the spot falloff; the node is not affected.
-            This is intentional in case you want to create (e.g.) a node for a flashlight,
-            and attach both the flashlight entity and the light to the same node; thus
-            controlling the node moves both the flashlight and its visual effect.
-        @par
-            Despite this, there are cases where you want the changes to this light to be
-            reflected in the parent node: The most common example are light volumes in
-            deferred shading setups, and debug objects.
-        @remarks
-            This setting is only useful for non-directional lights.
-            For point lights, the scale is calculated as setSize( range, range, range )
-            which means a light volume should be a sphere of radius = 1;
-        @par
-            For spot lights, the scale is calc. as
-                setSize( tan( outerAngle * 0.5 * range ), tan( outerAngle * 0.5 * range ), range );
-            which means a light volume should be a cone with Z = 1, and X & Y = 2
-        @param bAffect
-            When true, the scene node is affected and modified by changes to range and falloff.
-        */
-        void setAffectParentNode( bool bAffect );
+		/** A Light must always have a Node attached to it. The direction is taken from
+			the node's orientation, and thus setDirection modifies the attached node directly.
+		@par
+			However, when changing the range and the spot falloff; the node is not affected.
+			This is intentional in case you want to create (e.g.) a node for a flashlight,
+			and attach both the flashlight entity and the light to the same node; thus
+			controlling the node moves both the flashlight and its visual effect.
+		@par
+			Despite this, there are cases where you want the changes to this light to be
+			reflected in the parent node: The most common example are light volumes in
+			deferred shading setups, and debug objects.
+		@remarks
+			This setting is only useful for non-directional lights.
+			For point lights, the scale is calculated as setSize( range, range, range )
+			which means a light volume should be a sphere of radius = 1;
+		@par
+			For spot lights, the scale is calc. as
+				setSize( tan( outerAngle * 0.5 * range ), tan( outerAngle * 0.5 * range ), range );
+			which means a light volume should be a cone with Z = 1, and X & Y = 2
+		@param bAffect
+			When true, the scene node is affected and modified by changes to range and falloff.
+		*/
+		void setAffectParentNode( bool bAffect );
 
-        bool getAffectParentNode(void) const                        { return mAffectParentNode; }
+		bool getAffectParentNode(void) const                        { return mAffectParentNode; }
 
         /** Sets the range of a spotlight, i.e. the angle of the inner and outer cones
             and the rate of falloff between them.
@@ -517,7 +525,7 @@ namespace Ogre {
         Real mAttenuationQuad;
         Real mPowerScale;
         bool mOwnShadowFarDist;
-        bool mAffectParentNode;
+		bool mAffectParentNode;
         Real mShadowFarDist;
         Real mShadowFarDistSquared;
 

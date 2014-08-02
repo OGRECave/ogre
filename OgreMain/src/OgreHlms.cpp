@@ -101,6 +101,8 @@ namespace Ogre
     Hlms::Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder ) :
         mDataFolder( dataFolder ),
         mHlmsManager( 0 ),
+        mLightGatheringMode( LightGatherForward ),
+        mNumLightsLimit( 8 ),
         mRenderSystem( 0 ),
         mShaderProfile( "unset!" ),
         mDebugOutput( true ),
@@ -1486,10 +1488,16 @@ namespace Ogre
                 if( numPssmSplits )
                     numShadowMaps += numPssmSplits - 1;
                 setProperty( HlmsBaseProp::NumShadowMaps, numShadowMaps );
+            }
 
-                uint numLightsPerType[3];
-                memset( numLightsPerType, 0, sizeof( numLightsPerType ) );
+            uint numLightsPerType[Light::NUM_LIGHT_TYPES];
+            memset( numLightsPerType, 0, sizeof( numLightsPerType ) );
+
+            if( mLightGatheringMode == LightGatherForwardPlus )
+            {
+                if( shadowNode )
                 {
+                    //Gather shadow casting lights, regardless of their type.
                     const LightClosestArray &lights = shadowNode->getShadowCastingLights();
                     LightClosestArray::const_iterator itor = lights.begin();
                     LightClosestArray::const_iterator end  = lights.end();
@@ -1500,6 +1508,7 @@ namespace Ogre
                     }
                 }
 
+                //Always gather directional lights.
                 numLightsPerType[Light::LT_DIRECTIONAL] = 0;
                 {
                     const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
@@ -1513,42 +1522,36 @@ namespace Ogre
                         ++itor;
                     }
                 }
-
-                setProperty( HlmsBaseProp::LightsAttenuation, numLightsPerType[Light::LT_POINT] +
-                                                              numLightsPerType[Light::LT_SPOTLIGHT] );
-                setProperty( HlmsBaseProp::LightsSpotParams,  numLightsPerType[Light::LT_SPOTLIGHT] );
-
-
-                numLightsPerType[Light::LT_POINT]       += numLightsPerType[Light::LT_DIRECTIONAL];
-                numLightsPerType[Light::LT_SPOTLIGHT]   += numLightsPerType[Light::LT_POINT];
-
-                //The value is cummulative for each type (order: Directional, point, spot)
-                setProperty( HlmsBaseProp::LightsDirectional, numLightsPerType[Light::LT_DIRECTIONAL] );
-                setProperty( HlmsBaseProp::LightsPoint,       numLightsPerType[Light::LT_POINT] );
-                setProperty( HlmsBaseProp::LightsSpot,        numLightsPerType[Light::LT_SPOTLIGHT] );
             }
-            else
+            else if( mLightGatheringMode == LightGatherForward )
             {
+                //Gather all lights.
                 const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
                 LightArray::const_iterator itor = globalLightList.lights.begin();
                 LightArray::const_iterator end  = globalLightList.lights.end();
 
-                uint numDirLights = 0;
-                while( itor != end )
+                size_t numTotalLights = 0;
+
+                while( itor != end && numTotalLights < mNumLightsLimit )
                 {
-                    if( (*itor)->getType() == Light::LT_DIRECTIONAL )
-                        ++numDirLights;
+                    ++numLightsPerType[(*itor)->getType()];
+                    ++numTotalLights;
                     ++itor;
                 }
-
-                setProperty( HlmsBaseProp::NumShadowMaps, 0 );
-                setProperty( HlmsBaseProp::PssmSplits, 0 );
-                setProperty( HlmsBaseProp::LightsAttenuation, 0 );
-                setProperty( HlmsBaseProp::LightsSpotParams,  0 );
-                setProperty( HlmsBaseProp::LightsDirectional, numDirLights );
-                setProperty( HlmsBaseProp::LightsPoint,       numDirLights );
-                setProperty( HlmsBaseProp::LightsSpot,        numDirLights );
             }
+
+            setProperty( HlmsBaseProp::LightsAttenuation, numLightsPerType[Light::LT_POINT] +
+                                                          numLightsPerType[Light::LT_SPOTLIGHT] );
+            setProperty( HlmsBaseProp::LightsSpotParams,  numLightsPerType[Light::LT_SPOTLIGHT] );
+
+
+            numLightsPerType[Light::LT_POINT]       += numLightsPerType[Light::LT_DIRECTIONAL];
+            numLightsPerType[Light::LT_SPOTLIGHT]   += numLightsPerType[Light::LT_POINT];
+
+            //The value is cummulative for each type (order: Directional, point, spot)
+            setProperty( HlmsBaseProp::LightsDirectional, numLightsPerType[Light::LT_DIRECTIONAL] );
+            setProperty( HlmsBaseProp::LightsPoint,       numLightsPerType[Light::LT_POINT] );
+            setProperty( HlmsBaseProp::LightsSpot,        numLightsPerType[Light::LT_SPOTLIGHT] );
         }
         else
         {

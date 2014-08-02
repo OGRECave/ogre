@@ -72,11 +72,11 @@ namespace Ogre
         mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
         mTextureHash( 0 ),
         mType( creator->getType() ),
-        mIsOpaque( blendblock->mDestBlendFactor == SBF_ZERO &&
-                   blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
-                   blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
-                   blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
-                   blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA ),
+        mIsTransparent( !( blendblock->mDestBlendFactor == SBF_ZERO &&
+                           blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
+                           blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
+                           blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
+                           blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA ) ),
         mMacroblock( macroblock ),
         mBlendblock( blendblock ),
         mAlphaTest( false ),
@@ -94,11 +94,11 @@ namespace Ogre
     void HlmsDatablock::setBlendblock( HlmsBlendblock const *blendblock )
     {
         mBlendblock = blendblock;
-        mIsOpaque = blendblock->mDestBlendFactor == SBF_ZERO &&
-                    blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
-                    blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
-                    blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
-                    blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA;
+        mIsTransparent = !( blendblock->mDestBlendFactor == SBF_ZERO &&
+                            blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
+                            blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
+                            blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
+                            blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA );
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::_linkRenderable( Renderable *renderable )

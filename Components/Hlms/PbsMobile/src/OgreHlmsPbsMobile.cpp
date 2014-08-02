@@ -570,13 +570,14 @@ namespace Ogre
             }
             else
             {
+                int32 numDirectionalLights = getProperty( HlmsBaseProp::LightsDirectional );
+
                 //No shadow maps, only pass directional lights
                 const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
 
                 //vec3 lightPosition[numLights]
                 for( int32 i=0; i<numLights; ++i )
                 {
-                    assert( globalLightList.lights[i]->getType() == Light::LT_DIRECTIONAL );
                     Vector4 lightPos4 = globalLightList.lights[i]->getAs4DVector();
                     Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.x );
@@ -600,6 +601,44 @@ namespace Ogre
                     mPreparedPass.pixelShaderSharedBuffer.push_back( colour.r );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( colour.g );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( colour.b );
+                }
+                //vec3 attenuation[numAttenLights]
+                for( int32 i=numLights - numAttenLights; i<numLights; ++i )
+                {
+                    assert( globalLightList.lights[i]->getType() != Light::LT_DIRECTIONAL );
+                    Real attenRange     = globalLightList.lights[i]->getAttenuationRange();
+                    Real attenLinear    = globalLightList.lights[i]->getAttenuationLinear();
+                    Real attenQuadratic = globalLightList.lights[i]->getAttenuationQuadric();
+                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenRange );
+                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenLinear );
+                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenQuadratic );
+                }
+                //vec3 spotDirection[numSpotlights]
+                for( int32 i=numDirectionalLights; i<numLights; ++i )
+                {
+                    if( globalLightList.lights[i]->getType() == Light::LT_SPOTLIGHT )
+                    {
+                        Vector3 spotDir = viewMatrix3 * globalLightList.lights[i]->getDerivedDirection();
+                        mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.x );
+                        mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.y );
+                        mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.z );
+                    }
+                }
+                //vec3 spotParams[numSpotlights]
+                for( int32 i=numDirectionalLights; i<numLights; ++i )
+                {
+                    if( globalLightList.lights[i]->getType() == Light::LT_SPOTLIGHT )
+                    {
+                        Radian innerAngle = globalLightList.lights[i]->getSpotlightInnerAngle();
+                        Radian outerAngle = globalLightList.lights[i]->getSpotlightOuterAngle();
+                        mPreparedPass.pixelShaderSharedBuffer.push_back( 1.0f /
+                                            ( cosf( innerAngle.valueRadians() * 0.5f ) -
+                                              cosf( outerAngle.valueRadians() * 0.5f ) ) );
+                        mPreparedPass.pixelShaderSharedBuffer.push_back(
+                                            cosf( outerAngle.valueRadians() * 0.5f ) );
+                        mPreparedPass.pixelShaderSharedBuffer.push_back(
+                                            globalLightList.lights[i]->getSpotlightFalloff() );
+                    }
                 }
             }
 

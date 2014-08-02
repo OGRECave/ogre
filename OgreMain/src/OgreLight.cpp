@@ -43,10 +43,10 @@ namespace Ogre {
           mSpotInner(Degree(30.0f)),
           mSpotFalloff(1.0f),
           mSpotNearClip(0.0f),
-          mRange(100000),
-          mAttenuationConst(1.0f),
+          mRange(23.0f),
+          mAttenuationConst(0.5f),
           mAttenuationLinear(0.0f),
-          mAttenuationQuad(0.0f),
+          mAttenuationQuad(0.5f),
           mPowerScale(1.0f),
           mOwnShadowFarDist(false),
           mAffectParentNode(false),
@@ -139,12 +139,12 @@ namespace Ogre {
         assert( radius > 0.0f );
         assert( lumThreshold >= 0.0f && lumThreshold < 1.0f );
 
-        mAttenuationConst   = 1.0f;
-        mAttenuationLinear  = 2.0f / radius;
-        mAttenuationQuad    = 1.0f / (radius * radius);
+		mAttenuationConst   = 0.5f;
+		mAttenuationLinear  = 0.0f;
+		mAttenuationQuad    = 0.5f / (radius * radius);
 
         /*
-        lumThreshold = 1 / (c + l*r + q*d²)
+		lumThreshold = 1 / (c + l*d + q*d²)
         c + l*d + q*d² = 1 / lumThreshold
 
         if h = c - 1 / lumThreshold then

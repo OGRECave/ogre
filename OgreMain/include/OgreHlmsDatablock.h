@@ -163,8 +163,8 @@ namespace Ogre
     public:
         uint32  mTextureHash;       //TextureHash comes before macroblock for alignment reasons
         uint16  mMacroblockHash;    //Not all bits are used
-        uint8   mType;      /// @See HlmsTypes
-        bool    mIsOpaque;  /// Cached based on mBlendblock data
+        uint8   mType;              /// @See HlmsTypes
+        bool    mIsTransparent;     /// Cached based on mBlendblock data
         HlmsMacroblock const *mMacroblock;
         HlmsBlendblock const *mBlendblock;  ///Don't set this directly, use @setBlendblock
     protected:
@@ -186,7 +186,7 @@ namespace Ogre
         IdString getName(void) const                { return mName; }
         Hlms* getCreator(void) const                { return mCreator; }
 
-        /// Call this function to set mBlendblock & mIsOpaque automatically based on input
+        /// Call this function to set mBlendblock & mIsTransparent automatically based on input
         void setBlendblock( HlmsBlendblock const *blendblock );
 
         void _linkRenderable( Renderable *renderable );
