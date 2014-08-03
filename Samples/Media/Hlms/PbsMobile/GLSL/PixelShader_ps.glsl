@@ -54,8 +54,8 @@ uniform @insertpiece( FresnelType ) F0;
 @property( specular_map )uniform lowp sampler2D	texSpecularMap;@end
 @property( roughness_map )uniform lowp sampler2D	texRoughnessMap;@end
 @property( envprobe_map )
-@property( hlms_cube_arrays_supported )uniform lowp samplerCube	texEnvProbeMap;@end
-@property( !hlms_cube_arrays_supported )uniform lowp sampler2D	texEnvProbeMap;@end @end
+@property( !hlms_cube_arrays_supported )uniform lowp samplerCube	texEnvProbeMap;@end
+@property( !hlms_cube_arrays_supported && false )uniform lowp sampler2D	texEnvProbeMap;@end @end
 @property( detail_weight_map )uniform lowp sampler2D	texDetailWeightMap;@end
 @property( detail_maps_diffuse )uniform lowp sampler2D	texDetailMap[@value( detail_maps_diffuse )];@end
 @property( detail_maps_normal )uniform lowp sampler2D	texDetailNormalMap[@value( detail_maps_normal )];@end
@@ -300,8 +300,9 @@ void main()
 
 @property( envprobe_map )
 	mediump vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	mediump vec3 envColour = texture2D( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0 ).xyz;
-	envColour = envColour * envColour; //TODO: Cubemap Gamma correction broken in GL3+
+	mediump vec3 envColour = textureCubeLod( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0 ).xyz;
+	@property( !hw_gamma_read )//Gamma to linear space
+	envColour = envColour * envColour;@end
 	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS) );@end
 
 @property( !hw_gamma_write )

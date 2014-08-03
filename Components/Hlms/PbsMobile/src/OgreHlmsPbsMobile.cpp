@@ -734,9 +734,6 @@ namespace Ogre
             memcpy( vsUniformBuffer, mPreparedPass.vertexShaderSharedBuffer.begin(),
                     sizeof(float) * (mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem) );
 
-            assert( !datablock->mTexture[PBSM_REFLECTION].isNull() ==
-                    getProperty( PbsMobileProperty::EnvProbeMap ) );
-
             memcpy( psUniformBuffer, mPreparedPass.pixelShaderSharedBuffer.begin(),
                     sizeof(float) * psBufferElements );
         }
@@ -827,6 +824,13 @@ namespace Ogre
                         mode.v = TextureUnitState::TAM_WRAP;
                         mode.w = TextureUnitState::TAM_WRAP;
                         mRenderSystem->_setTextureAddressingMode( texUnit-1, mode );
+
+                        //TODO: This is temporary, must create TextureState blocks
+                        if( i == PBSM_REFLECTION )
+                        {
+                            mRenderSystem->_setTextureUnitFiltering( texUnit-1,
+                                                                     FO_LINEAR, FO_LINEAR, FO_LINEAR );
+                        }
                     }
                 }
 

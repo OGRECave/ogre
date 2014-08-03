@@ -156,6 +156,7 @@ namespace Ogre
         static void copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
                                         uint16 entryIdx, uint16 sqrtMaxTextures,
                                         bool isNormalMap );
+        static void copy3DTexture( const Image &srcImage, TexturePtr dst, uint16 sliceStart, uint16 sliceEnd );
 
     public:
         HlmsTextureManager();

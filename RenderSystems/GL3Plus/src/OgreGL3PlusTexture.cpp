@@ -227,7 +227,7 @@ namespace Ogre {
                     for(int face = 0; face < 6; face++) {
                         OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
                                                                    width, height, 0,
-                                                                   size, NULL));
+                                                                   size / depth, NULL));
                     }
                     break;
                 default:

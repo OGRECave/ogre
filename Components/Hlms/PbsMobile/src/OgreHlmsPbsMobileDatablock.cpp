@@ -152,6 +152,11 @@ namespace Ogre
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL,
                         mTexture[PBSM_DETAIL_WEIGHT], 0 );
         }
+        if( Hlms::findParamInVec( params, "reflection_map", paramVal ) )
+        {
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_ENV_MAP,
+                        mTexture[PBSM_REFLECTION], 0 );
+        }
 
         if( Hlms::findParamInVec( params, "uv_diffuse_map", paramVal ) )
             setTextureUvSource( PBSM_SOURCE_DIFFUSE, StringConverter::parseUnsignedInt( paramVal ) );

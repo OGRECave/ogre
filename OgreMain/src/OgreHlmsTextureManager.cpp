@@ -45,6 +45,7 @@ namespace Ogre
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].hwGammaCorrection    = true;
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat=PF_BC5_SNORM;
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].isNormalMap = true;
+        mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].hwGammaCorrection   = true;
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::~HlmsTextureManager()
@@ -153,8 +154,8 @@ namespace Ogre
         //  See Texture::_loadImages
         HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
         const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, entryIdx,
-                                                               dst->getWidth(),
-                                                               dst->getHeight(),
+                                                               pixelBufferBuf->getWidth(),
+                                                               pixelBufferBuf->getHeight(),
                                                                entryIdx + 1 ),
                                                           HardwareBuffer::HBL_DISCARD );
         PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
@@ -205,6 +206,27 @@ namespace Ogre
             else
                 PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
             pixelBufferBuf->unlock();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::copy3DTexture( const Image &srcImage, TexturePtr dst,
+                                            uint16 sliceStart, uint16 sliceEnd )
+    {
+        for( uint16 i=sliceStart; i<sliceEnd; ++i )
+        {
+            uint8 minMipmaps = std::min( srcImage.getNumMipmaps(), dst->getNumMipmaps() ) + 1;
+            for( uint8 j=0; j<minMipmaps; ++j )
+            {
+                HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer( i, j );
+                const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0,
+                                                                       pixelBufferBuf->getWidth(),
+                                                                       pixelBufferBuf->getHeight(),
+                                                                       1 ),
+                                                                  HardwareBuffer::HBL_DISCARD );
+
+                PixelUtil::bulkPixelConversion( srcImage.getPixelBox( i - sliceStart, j ), currImage );
+                pixelBufferBuf->unlock();
+            }
         }
     }
     //-----------------------------------------------------------------------------------
@@ -405,14 +427,22 @@ namespace Ogre
                                                 mDefaultTextureParameters[mapType].hwGammaCorrection,
                                                 0, BLANKSTRING, false );
 
-                    if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
+                    if( texType != TEX_TYPE_3D && texType != TEX_TYPE_CUBE_MAP )
                     {
-                        copyTextureToArray( image, textureArray.texture, textureArray.entries.size() );
+                        if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
+                        {
+                            copyTextureToArray( image, textureArray.texture, textureArray.entries.size() );
+                        }
+                        else
+                        {
+                            copyTextureToAtlas( image, textureArray.texture, textureArray.entries.size(),
+                                                textureArray.sqrtMaxTextures, textureArray.isNormalMap );
+                        }
                     }
                     else
                     {
-                        copyTextureToAtlas( image, textureArray.texture, textureArray.entries.size(),
-                                            textureArray.sqrtMaxTextures, textureArray.isNormalMap );
+                        copy3DTexture( image, textureArray.texture, 0,
+                                       std::max( image.getNumFaces(), image.getDepth() ) );
                     }
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,

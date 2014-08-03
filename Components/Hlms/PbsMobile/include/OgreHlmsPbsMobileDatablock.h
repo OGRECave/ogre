@@ -149,6 +149,10 @@ namespace Ogre
                 It's not affected by blend mode. May be used even if
                 there is no detail_map
 
+            * reflection_map <texture name>
+                Name of the reflection map. Must be a cubemap. Doesn't use an UV set because
+                the tex. coords are automatically calculated.
+
             * uv_diffuse_map <uv>
             * Similar: uv_specular_map, uv_normal_map, uv_detail_mapN, uv_detail_normal_mapN,
             *          uv_detail_weight_map
