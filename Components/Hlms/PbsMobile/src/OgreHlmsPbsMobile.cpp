@@ -817,20 +817,9 @@ namespace Ogre
                 {
                     if( !datablock->mTexture[i].isNull() )
                     {
-                        //TODO: Make this configurable;
-                        mRenderSystem->_setTexture( texUnit++, true, datablock->mTexture[i] );
-                        TextureUnitState::UVWAddressingMode mode;
-                        mode.u = TextureUnitState::TAM_WRAP;
-                        mode.v = TextureUnitState::TAM_WRAP;
-                        mode.w = TextureUnitState::TAM_WRAP;
-                        mRenderSystem->_setTextureAddressingMode( texUnit-1, mode );
-
-                        //TODO: This is temporary, must create TextureState blocks
-                        if( i == PBSM_REFLECTION )
-                        {
-                            mRenderSystem->_setTextureUnitFiltering( texUnit-1,
-                                                                     FO_LINEAR, FO_LINEAR, FO_LINEAR );
-                        }
+                        mRenderSystem->_setTexture( texUnit, true, datablock->mTexture[i] );
+                        mRenderSystem->_setHlmsSamplerblock( texUnit, datablock->mSamplerblocks[i] );
+                        ++texUnit;
                     }
                 }
 

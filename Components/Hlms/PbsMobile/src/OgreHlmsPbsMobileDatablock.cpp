@@ -62,6 +62,7 @@ namespace Ogre
         mShaderCreationData( 0 )
     {
         mShaderCreationData = new PbsMobileShaderCreationData();
+        memset( mSamplerblocks, 0, sizeof( mSamplerblocks ) );
 
         String paramVal;
 
@@ -127,35 +128,44 @@ namespace Ogre
             }
         }
 
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
         if( Hlms::findParamInVec( params, "diffuse_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
                         mTexture[PBSM_DIFFUSE], &mUvAtlasParams[mNumUvAtlas++] );
+
+            mSamplerblocks[PBSM_DIFFUSE] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "normal_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_NORMALS,
                         mTexture[PBSM_NORMAL], &mUvAtlasParams[mNumUvAtlas++] );
+            mSamplerblocks[PBSM_NORMAL] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "specular_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
                         mTexture[PBSM_SPECULAR], &mUvAtlasParams[mNumUvAtlas++] );
+            mSamplerblocks[PBSM_SPECULAR] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "roughness_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
                         mTexture[PBSM_ROUGHNESS], &mUvAtlasParams[mNumUvAtlas++] );
+            mSamplerblocks[PBSM_ROUGHNESS] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "detail_weight_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL,
                         mTexture[PBSM_DETAIL_WEIGHT], 0 );
+            mSamplerblocks[PBSM_DETAIL_WEIGHT] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "reflection_map", paramVal ) )
         {
             setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_ENV_MAP,
                         mTexture[PBSM_REFLECTION], 0 );
+            mSamplerblocks[PBSM_REFLECTION] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
 
         if( Hlms::findParamInVec( params, "uv_diffuse_map", paramVal ) )
@@ -172,6 +182,12 @@ namespace Ogre
                                 StringConverter::parseUnsignedInt( paramVal ) );
         }
 
+        //Detail maps default to wrap mode.
+        HlmsSamplerblock detailSamplerRef;
+        detailSamplerRef.mU = TAM_WRAP;
+        detailSamplerRef.mV = TAM_WRAP;
+        detailSamplerRef.mW = TAM_WRAP;
+
         for( size_t i=0; i<4; ++i )
         {
             String key = "detail_map" + StringConverter::toString( i );
@@ -179,6 +195,7 @@ namespace Ogre
             {
                 setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL,
                             mTexture[PBSM_DETAIL0 + i], 0 );
+                mSamplerblocks[PBSM_DETAIL0 + i] = hlmsManager->getSamplerblock( detailSamplerRef );
             }
 
             key = "detail_normal_map" + StringConverter::toString( i );
@@ -186,6 +203,7 @@ namespace Ogre
             {
                 setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
                             mTexture[PBSM_DETAIL0_NM + i], 0 );
+                mSamplerblocks[PBSM_DETAIL0_NM + i] = hlmsManager->getSamplerblock( detailSamplerRef );
             }
 
             key = "detail_blend_mode" + StringConverter::toString( i );
@@ -234,7 +252,10 @@ namespace Ogre
         for( size_t i=0; i<PBSM_MAX_TEXTURE_TYPES; ++i )
         {
             if( !mTexture[i].isNull() )
+            {
                 hash += IdString( mTexture[i]->getName() );
+                hash += IdString( mSamplerblocks[i]->mId );
+            }
         }
 
         mTextureHash = hash.mHash;
@@ -340,9 +361,34 @@ namespace Ogre
         }
 
         if( oldTexExisted != newTexture.isNull() )
+        {
+            if( !mSamplerblocks[texType] )
+            {
+                HlmsSamplerblock samplerBlockRef;
+                if( texType >= PBSM_DETAIL0 && texType <= PBSM_DETAIL3_NM )
+                {
+                    //Detail maps default to wrap mode.
+                    samplerBlockRef.mU = TAM_WRAP;
+                    samplerBlockRef.mV = TAM_WRAP;
+                    samplerBlockRef.mW = TAM_WRAP;
+                }
+
+                HlmsManager *hlmsManager = mCreator->getHlmsManager();
+                mSamplerblocks[texType] = hlmsManager->getSamplerblock( samplerBlockRef );
+            }
+
             flushRenderables();
+        }
 
         calculateHash();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setSamplerblock( PbsMobileTextureTypes texType,
+                                                  const HlmsSamplerblock &params )
+    {
+        //TODO: Remove old sampler block (ref count, probably).
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        mSamplerblocks[texType] = hlmsManager->getSamplerblock( params );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setTextureUvSource( PbsMobileUvSourceType sourceType, uint8 uvSet )

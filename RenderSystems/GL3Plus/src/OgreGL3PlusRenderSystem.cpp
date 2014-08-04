@@ -56,6 +56,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsSamplerblock.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
@@ -161,7 +162,7 @@ namespace Ogre {
         mCurrentComputeShader = 0;
         mPolygonMode = GL_FILL;
         mEnableFixedPipeline = false;
-        mLargestSupportedAnisotropy = 0;
+        mLargestSupportedAnisotropy = 1;
     }
 
     GL3PlusRenderSystem::~GL3PlusRenderSystem()
@@ -1006,6 +1007,22 @@ namespace Ogre {
         mTextureCoordIndex[stage] = index;
     }
 
+    GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
+    {
+        switch (tam)
+        {
+        default:
+        case TAM_WRAP:
+            return GL_REPEAT;
+        case TAM_MIRROR:
+            return GL_MIRRORED_REPEAT;
+        case TAM_CLAMP:
+            return GL_CLAMP_TO_EDGE;
+        case TAM_BORDER:
+            return GL_CLAMP_TO_BORDER;
+        }
+    }
+
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
     {
         switch (tam)
@@ -1045,13 +1062,10 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setTextureMipmapBias(size_t stage, float bias)
     {
-        if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
+        if (activateGLTextureUnit(stage))
         {
-            if (activateGLTextureUnit(stage))
-            {
-                OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[stage], GL_TEXTURE_LOD_BIAS, bias));
-                activateGLTextureUnit(0);
-            }
+            OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[stage], GL_TEXTURE_LOD_BIAS, bias));
+            activateGLTextureUnit(0);
         }
     }
 
@@ -1261,6 +1275,148 @@ namespace Ogre {
         }
     }
 
+    void GL3PlusRenderSystem::_hlmsSamplerblockCreated( HlmsSamplerblock *newBlock )
+    {
+        GLuint samplerName;
+        glGenSamplers( 1, &samplerName );
+
+        GLint minFilter, magFilter;
+        switch( newBlock->mMinFilter )
+        {
+        case FO_ANISOTROPIC:
+        case FO_LINEAR:
+            switch( newBlock->mMipFilter )
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // linear min, linear mip
+                minFilter = GL_LINEAR_MIPMAP_LINEAR;
+                break;
+            case FO_POINT:
+                // linear min, point mip
+                minFilter = GL_LINEAR_MIPMAP_NEAREST;
+                break;
+            case FO_NONE:
+                // linear min, no mip
+                minFilter = GL_LINEAR;
+                break;
+            }
+            break;
+        case FO_POINT:
+        case FO_NONE:
+            switch( newBlock->mMipFilter )
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // nearest min, linear mip
+                minFilter = GL_NEAREST_MIPMAP_LINEAR;
+                break;
+            case FO_POINT:
+                // nearest min, point mip
+                minFilter = GL_NEAREST_MIPMAP_NEAREST;
+                break;
+            case FO_NONE:
+                // nearest min, no mip
+                minFilter = GL_NEAREST;
+                break;
+            }
+            break;
+        }
+
+        magFilter = newBlock->mMagFilter <= FO_POINT ? GL_NEAREST : GL_LINEAR;
+
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_MIN_FILTER, minFilter ) );
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_MAG_FILTER, magFilter ) );
+
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_WRAP_S,
+                                   getTextureAddressingMode( newBlock->mU ) ) );
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_WRAP_T,
+                                   getTextureAddressingMode( newBlock->mV ) ) );
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_WRAP_R,
+                                   getTextureAddressingMode( newBlock->mW ) ) );
+
+        OCGE( glSamplerParameterfv( samplerName, GL_TEXTURE_BORDER_COLOR,
+                                    newBlock->mBorderColour.ptr() ) );
+        OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_LOD_BIAS, newBlock->mMipLodBias ) );
+        OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MIN_LOD, newBlock->mMinLod ) );
+        OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MAX_LOD, newBlock->mMaxLod ) );
+
+        if( newBlock->mCompareFunction != NUM_COMPARE_FUNCTIONS )
+        {
+            OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_COMPARE_MODE,
+                                       GL_COMPARE_REF_TO_TEXTURE ) );
+            OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_COMPARE_FUNC,
+                                       convertCompareFunction( newBlock->mCompareFunction ) ) );
+        }
+
+        if( mCurrentCapabilities->hasCapability(RSC_ANISOTROPY) )
+        {
+            OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                                       newBlock->mMaxAnisotropy ) );
+        }
+
+        newBlock->mRsData = (void*)samplerName;
+
+        /*GL3PlusHlmsSamplerblock *glSamplerblock = new GL3PlusHlmsSamplerblock();
+
+        switch( newBlock->mMinFilter )
+        {
+        case FO_ANISOTROPIC:
+        case FO_LINEAR:
+            switch( newBlock->mMipFilter )
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // linear min, linear mip
+                glSamplerblock->mMinFilter = GL_LINEAR_MIPMAP_LINEAR;
+                break;
+            case FO_POINT:
+                // linear min, point mip
+                glSamplerblock->mMinFilter = GL_LINEAR_MIPMAP_NEAREST;
+                break;
+            case FO_NONE:
+                // linear min, no mip
+                glSamplerblock->mMinFilter = GL_LINEAR;
+                break;
+            }
+            break;
+        case FO_POINT:
+        case FO_NONE:
+            switch( newBlock->mMipFilter )
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // nearest min, linear mip
+                glSamplerblock->mMinFilter = GL_NEAREST_MIPMAP_LINEAR;
+                break;
+            case FO_POINT:
+                // nearest min, point mip
+                glSamplerblock->mMinFilter = GL_NEAREST_MIPMAP_NEAREST;
+                break;
+            case FO_NONE:
+                // nearest min, no mip
+                glSamplerblock->mMinFilter = GL_NEAREST;
+                break;
+            }
+            break;
+        }
+
+        glSamplerblock->mMagFilter = newBlock->mMagFilter <= FO_POINT ? GL_NEAREST : GL_LINEAR;
+        glSamplerblock->mU  = getTextureAddressingMode( newBlock->mU );
+        glSamplerblock->mV  = getTextureAddressingMode( newBlock->mV );
+        glSamplerblock->mW  = getTextureAddressingMode( newBlock->mW );
+
+        glSamplerblock->mAnisotropy = std::min( newBlock->mMaxAnisotropy, mLargestSupportedAnisotrop );
+
+        newBlock->mRsData = glSamplerblock;*/
+    }
+
+    void GL3PlusRenderSystem::_hlmsSamplerblockDestroyed( HlmsSamplerblock *block )
+    {
+        GLuint samplerName = reinterpret_cast<GLuint>( block->mRsData );
+        glDeleteSamplers( 1, &samplerName );
+    }
+
     void GL3PlusRenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
     {
         if( macroblock->mDepthCheck )
@@ -1313,6 +1469,42 @@ namespace Ogre {
             _setSceneBlending( blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
                                blendblock->mBlendOperation );
         }
+    }
+
+    void GL3PlusRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
+    {
+        if( !samplerblock )
+            glBindSampler( texUnit, 0 );
+        else
+            glBindSampler( texUnit, reinterpret_cast<GLuint>( samplerblock->mRsData ) );
+        /*if (!activateGLTextureUnit(texUnit))
+            return;
+
+        GL3PlusHlmsSamplerblock *glSamplerblock = reinterpret_cast<GL3PlusHlmsSamplerblock*>(
+                                                                                samplerblock->mRsData );
+
+        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[unit], GL_TEXTURE_MIN_FILTER,
+                                             glSamplerblock->mMinFilter) );
+        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[unit], GL_TEXTURE_MAG_FILTER,
+                                             glSamplerblock->mMagFilter));
+
+        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S, glSamplerblock->mU ));
+        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T, glSamplerblock->mV ));
+        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R, glSamplerblock->mW ));
+
+        OGRE_CHECK_GL_ERROR(glTexParameterf( mTextureTypes[stage], GL_TEXTURE_LOD_BIAS,
+                                             samplerblock->mMipLodBias ));
+
+        OGRE_CHECK_GL_ERROR(glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR,
+                                              reinterpret_cast<GLfloat*>(
+                                                    &samplerblock->mBorderColour ) ));
+
+        OGRE_CHECK_GL_ERROR(glTexParameterf( mTextureTypes[stage], GL_TEXTURE_MIN_LOD,
+                                             samplerblock->mMinLod ));
+        OGRE_CHECK_GL_ERROR(glTexParameterf( mTextureTypes[stage], GL_TEXTURE_MAX_LOD,
+                                             samplerblock->mMaxLod ));
+
+        activateGLTextureUnit(0);*/
     }
 
     void GL3PlusRenderSystem::_setProgramsFromHlms( const HlmsCache *hlmsCache )

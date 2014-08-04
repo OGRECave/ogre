@@ -707,6 +707,8 @@ namespace Ogre
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block ) {}
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock ) {}
         virtual void _hlmsBlendblockDestroyed( HlmsBlendblock *block ) {}
+        virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock ) {}
+        virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block ) {}
 
         /** Binds a texture to a vertex, geometry, compute, tessellation hull
         or tessellation domain sampler.
@@ -909,6 +911,9 @@ namespace Ogre
 
         /// @See HlmsBlendblock
         virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock ) = 0;
+
+        /// @See HlmsSamplerblock
+        virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock ) = 0;
 
         /// @See HlmsCache
         virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache ) = 0;

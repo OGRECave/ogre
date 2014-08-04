@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsCommon.h"
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsSamplerblock.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -43,6 +44,7 @@ namespace Ogre
 
 #define OGRE_HLMS_NUM_MACROBLOCKS 32
 #define OGRE_HLMS_NUM_BLENDBLOCKS 32
+#define OGRE_HLMS_NUM_SAMPLERBLOCKS 64
 
     /** HLMS stands for "High Level Material System". */
     class _OgreExport HlmsManager : public PassAlloc
@@ -53,10 +55,13 @@ namespace Ogre
         typedef vector<uint8>::type BlockIdxVec;
         HlmsMacroblock      mMacroblocks[OGRE_HLMS_NUM_MACROBLOCKS];
         HlmsBlendblock      mBlendblocks[OGRE_HLMS_NUM_BLENDBLOCKS];
+        HlmsSamplerblock    mSamplerblocks[OGRE_HLMS_NUM_SAMPLERBLOCKS];
         BlockIdxVec         mActiveMacroblocks;
         BlockIdxVec         mActiveBlendblocks;
+        BlockIdxVec         mActiveSamplerblocks;
         BlockIdxVec         mFreeMacroblockIds;
         BlockIdxVec         mFreeBlendblockIds;
+        BlockIdxVec         mFreeSamplerblockIds;
 
         RenderSystem        *mRenderSystem;
 
@@ -105,6 +110,18 @@ namespace Ogre
         /// Destroys a macroblock created by @getBlendblock. Note it performs
         /// an O(N) search, but N <= OGRE_HLMS_NUM_BLENDBLOCKS
         void destroyBlendblock( const HlmsBlendblock *Blendblock );
+
+        /** @See getMacroblock. This is the same for Sampler states
+        @remarks
+            The input is a hard copy because it may be modified if invalid parameters are detected
+            (i.e. specifying anisotropic level higher than 1, but no anisotropic filter)
+            A warning on the log will be generated in such cases.
+        */
+        const HlmsSamplerblock* getSamplerblock( HlmsSamplerblock baseParams );
+
+        /// Destroys a macroblock created by @getSamplerblock. Note it performs
+        /// an O(N) search, but N <= OGRE_HLMS_NUM_SamplerBLOCKS
+        void destroySamplerblock( const HlmsSamplerblock *Samplerblock );
 
         /** Internal function used by Hlms types to tell us a datablock has been created
             so that we can return it when the user calls @getDatablock.

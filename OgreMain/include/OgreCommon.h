@@ -80,7 +80,8 @@ namespace Ogre {
         CMPF_EQUAL,
         CMPF_NOT_EQUAL,
         CMPF_GREATER_EQUAL,
-        CMPF_GREATER
+        CMPF_GREATER,
+        NUM_COMPARE_FUNCTIONS,
     };
 
     /// Enum describing the various actions which can be taken on the stencil buffer

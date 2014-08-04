@@ -33,6 +33,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
+#include "OgreHlmsSamplerblock.h"
 #include "OgreGLSLShader.h"
 
 namespace Ogre {
@@ -152,6 +153,7 @@ namespace Ogre {
         GLSLShader* mCurrentDomainShader;
         GLSLShader* mCurrentComputeShader;
 
+        GLint getTextureAddressingMode(TextureAddressingMode tam) const;
         GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
@@ -342,8 +344,11 @@ namespace Ogre {
             RenderSystem
         */
         void _setViewport(Viewport *vp);
+        virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
+        virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
         virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
         virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
+        virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
         virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
         /** See
             RenderSystem

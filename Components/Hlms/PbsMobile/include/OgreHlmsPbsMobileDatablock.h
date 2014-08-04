@@ -74,7 +74,8 @@ namespace Ogre
     protected:
         UvAtlasParams mUvAtlasParams[4];
 
-        TexturePtr  mTexture[PBSM_MAX_TEXTURE_TYPES];
+        TexturePtr              mTexture[PBSM_MAX_TEXTURE_TYPES];
+        HlmsSamplerblock const  *mSamplerblocks[PBSM_MAX_TEXTURE_TYPES];
 
         /// The data in this structure only affects shader generation (thus modifying it implies
         /// generating a new shader; i.e. a call to flushRenderables()). Because this data
@@ -217,6 +218,15 @@ namespace Ogre
         */
         void setTexture( PbsMobileTextureTypes texType, TexturePtr &newTexture,
                          const UvAtlasParams &atlasParams );
+
+        /** Sets a new sampler block to be associated with the texture
+            (i.e. filtering mode, addressing modes, etc).
+        @param texType
+            Type of texture.
+        @param params
+            The sampler block to use as reference.
+        */
+        void setSamplerblock( PbsMobileTextureTypes texType, const HlmsSamplerblock &params );
 
         /** Sets which UV set to use for the given texture.
             Calling this function triggers a HlmsDatablock::flushRenderables.

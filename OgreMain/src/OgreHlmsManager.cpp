@@ -58,6 +58,14 @@ namespace Ogre
             mBlendblocks[i].mId = i;
             mFreeBlendblockIds.push_back( (OGRE_HLMS_NUM_BLENDBLOCKS - 1) - i );
         }
+
+        mActiveSamplerblocks.reserve( OGRE_HLMS_NUM_SAMPLERBLOCKS );
+        mFreeSamplerblockIds.reserve( OGRE_HLMS_NUM_SAMPLERBLOCKS );
+        for( uint8 i=0; i<OGRE_HLMS_NUM_SAMPLERBLOCKS; ++i )
+        {
+            mSamplerblocks[i].mId = i;
+            mFreeSamplerblockIds.push_back( (OGRE_HLMS_NUM_SAMPLERBLOCKS - 1) - i );
+        }
     }
     //-----------------------------------------------------------------------------------
     HlmsManager::~HlmsManager()
@@ -199,6 +207,89 @@ namespace Ogre
         mActiveBlendblocks.erase( itor );
 
         mFreeBlendblockIds.push_back( blendblock->mId );
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsSamplerblock* HlmsManager::getSamplerblock( HlmsSamplerblock baseParams )
+    {
+        assert( mRenderSystem && "A render system must be selected first!" );
+
+        bool errorsFixed = false;
+
+        if( baseParams.mMaxAnisotropy < 1.0f )
+        {
+            baseParams.mMaxAnisotropy = 1.0f;
+            LogManager::getSingleton().logMessage( "WARNING: Max anisotropy can't be lower than 1" );
+        }
+
+        if( baseParams.mMinFilter != FO_ANISOTROPIC && baseParams.mMagFilter != FO_ANISOTROPIC &&
+            baseParams.mMipFilter != FO_ANISOTROPIC && baseParams.mMaxAnisotropy > 1.0f )
+        {
+            baseParams.mMaxAnisotropy = 1.0f;
+            LogManager::getSingleton().logMessage( "WARNING: Max anisotropy must be 1 if no anisotropic "
+                                                   "filter is used." );
+        }
+
+        if( errorsFixed )
+        {
+            LogManager::getSingleton().logMessage( "WARNING: Invalid sampler block parameters detected."
+                                                   " They've been corrected." );
+        }
+
+        BlockIdxVec::iterator itor = mActiveSamplerblocks.begin();
+        BlockIdxVec::iterator end  = mActiveSamplerblocks.end();
+
+        while( itor != end && mSamplerblocks[*itor] != baseParams )
+            ++itor;
+
+        HlmsSamplerblock const * retVal = 0;
+        if( itor != end )
+        {
+            //Already exists
+            retVal = &mSamplerblocks[*itor];
+        }
+        else
+        {
+            if( mFreeSamplerblockIds.empty() )
+            {
+                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                             "Can't have more than " +
+                             StringConverter::toString( OGRE_HLMS_NUM_SAMPLERBLOCKS ) +
+                             " active Samplerblocks! You have too "
+                             "many materials with different Sampler state parameters.",
+                             "HlmsManager::getSamplerblock" );
+            }
+
+            size_t idx = mFreeSamplerblockIds.back();
+            mFreeSamplerblockIds.pop_back();
+
+            mSamplerblocks[idx] = baseParams;
+            mRenderSystem->_hlmsSamplerblockCreated( &mSamplerblocks[idx] );
+            mActiveSamplerblocks.push_back( idx );
+
+            retVal = &mSamplerblocks[idx];
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::destroySamplerblock( const HlmsSamplerblock *samplerblock )
+    {
+        if( &mSamplerblocks[samplerblock->mId] != samplerblock )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                         "The Samplerblock wasn't created with this manager!",
+                         "HlmsManager::destroySamplerblock" );
+        }
+
+        mRenderSystem->_hlmsSamplerblockDestroyed( &mSamplerblocks[samplerblock->mId] );
+        mSamplerblocks[samplerblock->mId].mRsData = 0;
+
+        BlockIdxVec::iterator itor = std::find( mActiveSamplerblocks.begin(), mActiveSamplerblocks.end(),
+                                                samplerblock->mId );
+        assert( itor != mActiveSamplerblocks.end() );
+        mActiveSamplerblocks.erase( itor );
+
+        mFreeSamplerblockIds.push_back( samplerblock->mId );
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::_datablockAdded( HlmsDatablock *datablock )
