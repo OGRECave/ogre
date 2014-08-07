@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsTextureManager.h"
+#include "OgreHlmsTexturePack.h"
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
@@ -485,6 +486,168 @@ namespace Ogre
         }
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsTextureManager::getTexturePackParameters( const HlmsTexturePack &pack, uint32 &outWidth,
+                                                       uint32 &outHeight, uint32 &outDepth,
+                                                       PixelFormat &outPixelFormat ) const
+    {
+        HlmsTexturePack::TextureEntryVec::const_iterator itor = pack.textureEntry.begin();
+        HlmsTexturePack::TextureEntryVec::const_iterator end  = pack.textureEntry.end();
+
+        while( itor != end )
+        {
+            const HlmsTexturePack::TextureEntry &texInfo = *itor;
+
+            StringVector::const_iterator itPath = texInfo.paths.begin();
+            StringVector::const_iterator enPath = texInfo.paths.end();
+
+            while( itPath != enPath )
+            {
+                try
+                {
+                    Image image;
+                    image.load( *itPath, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+                    outWidth    = image.getWidth();
+                    outHeight   = image.getHeight();
+                    outDepth    = std::max( image.getDepth(), image.getNumFaces() );
+                    outPixelFormat = image.getFormat();
+
+                    return true;
+                }
+                catch( ... )
+                {
+                }
+
+                ++itPath;
+            }
+
+            ++itor;
+        }
+
+        return false;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::createFromTexturePack( const HlmsTexturePack &pack )
+    {
+        uint32 width = 0, height = 0, depth = 0;
+        PixelFormat pixelFormat;
+        uint8 numMipmaps = 0;
+
+        if( !getTexturePackParameters( pack, width, height, depth, pixelFormat ) )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Could not derive the texture properties "
+                         "for texture pack '" + pack.name + "'",
+                         "HlmsTextureManager::createFromTexturePack" );
+        }
+
+        if( pack.pixelFormat != PF_UNKNOWN )
+            pixelFormat = pack.pixelFormat;
+
+        if( pack.hasMipmaps )
+        {
+            uint32 heighestRes = std::max( std::max( width, height ), depth );
+            numMipmaps = static_cast<uint8>( floorf( log2f( static_cast<float>(heighestRes) ) ) );
+        }
+
+        if( pack.textureType == TEX_TYPE_CUBE_MAP )
+        {
+            HlmsTexturePack::TextureEntryVec::const_iterator itor = pack.textureEntry.begin();
+            HlmsTexturePack::TextureEntryVec::const_iterator end  = pack.textureEntry.end();
+
+            while( itor != end )
+            {
+                const HlmsTexturePack::TextureEntry &texInfo = *itor;
+
+                TextureEntry searchName( texInfo.name );
+                TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(),
+                                                                 searchName );
+
+                if( it != mEntries.end() )
+                {
+                    LogManager::getSingleton().logMessage( "ERROR: A texture by the name '" +
+                                                           texInfo.name  + "' already exists!" );
+                    ++itor;
+                    continue;
+                }
+
+                assert( !texInfo.paths.empty() ) ;
+
+                if( texInfo.paths.size() != 1 )
+                {
+                    //Multiple files
+                    assert( !(texInfo.paths.size() % 6) &&
+                            "For cubemaps, the number of files must be multiple of 6!" );
+
+                    Image cubeMap;
+                    size_t cubeMapSize = PixelUtil::getMemorySize( width, height, 6, pixelFormat );
+                    cubeMap.loadDynamicImage( OGRE_ALLOC_T( uchar, cubeMapSize, MEMCATEGORY_GENERAL ),
+                                              width, height, 1, pixelFormat, true, 6 );
+                    for( size_t i=0; i<6; ++i )
+                    {
+                        Image image;
+                        image.load( texInfo.paths[i],
+                                    ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
+                        if( image.getWidth() != width && image.getHeight() != height )
+                        {
+                            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, texInfo.paths[i] +
+                                         ": All textures in the same pack must have the "
+                                         "same resolution!",
+                                         "HlmsTextureManager::createFromTexturePack" );
+                        }
+
+                        PixelUtil::bulkPixelConversion( image.getPixelBox( 0 ), cubeMap.getPixelBox( i ) );
+                    }
+
+                    TextureArray textureArray( 1, 1, false, false );
+
+                    textureArray.texture = TextureManager::getSingleton().createManual(
+                                                "HlmsTextureManager/" +
+                                                StringConverter::toString( mTextureId++ ),
+                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                pack.textureType, width, height, depth, numMipmaps,
+                                                pixelFormat, TU_DEFAULT & ~TU_AUTOMIPMAP, 0,
+                                                pack.hwGammaCorrection, 0, BLANKSTRING, false );
+
+                    if( pack.hasMipmaps )
+                    {
+                        if( !cubeMap.generateMipmaps( pack.hwGammaCorrection, Image::FILTER_GAUSSIAN ) )
+                        {
+                            LogManager::getSingleton().logMessage( "Couldn't generate mipmaps for '" +
+                                                                    texInfo.name + "'", LML_CRITICAL );
+                        }
+                    }
+
+                    copy3DTexture( cubeMap, textureArray.texture, 0, 6 );
+
+                    it = mEntries.insert( it, TextureEntry( searchName.name, TEXTURE_TYPE_ENV_MAP,
+                                                            mTextureArrays[TEXTURE_TYPE_ENV_MAP].size(), 0 ) );
+
+                    textureArray.entries.push_back( texInfo.name );
+                    mTextureArrays[TEXTURE_TYPE_ENV_MAP].push_back( textureArray );
+                }
+                else
+                {
+                    OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                                 "Oops! Work in Progress, sorry!",
+                                 "HlmsTextureManager::createFromTexturePack" );
+                    //TODO
+                    /*if( image.getNumMipmaps() != numMipmaps )
+                    {
+                        image.generateMipmaps();
+                    }*/
+                }
+
+                ++itor;
+            }
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                         "Oops! Work in Progress, sorry!",
+                         "HlmsTextureManager::createFromTexturePack" );
+        }
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureLocation HlmsTextureManager::getBlankTexture(void) const

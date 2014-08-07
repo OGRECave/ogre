@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreMath.h"
 #include "OgrePixelBox.h"
 #include "OgreImageResampler.h"
+#include "OgreImageDownsampler.h"
 #include "OgreResourceGroupManager.h"
 
 namespace Ogre {
@@ -576,6 +577,171 @@ namespace Ogre {
 
         // scale the image from temp into our resized buffer
         Image::scale(temp.getPixelBox(), getPixelBox(), filter);
+    }
+    //-----------------------------------------------------------------------------
+    bool Image::generateMipmaps( bool gammaCorrected, Filter filter )
+    {
+        // resizing dynamic images is not supported
+        assert(mAutoDelete);
+        assert(mDepth == 1);
+
+        ImageDownsampler2D *downsampler2DFunc       = 0;
+        ImageDownsamplerCube *downsamplerCubeFunc   = 0;
+
+        switch( mFormat )
+        {
+        case PF_L8:
+            if( !gammaCorrected )
+            {
+                downsampler2DFunc   = downscale2x_X8;
+                downsamplerCubeFunc = downscale2x_X8_cube;
+            }
+            else
+            {
+                downsampler2DFunc   = downscale2x_sRGB_X8;
+                downsamplerCubeFunc = downscale2x_sRGB_X8_cube;
+            }
+            break;
+        case PF_A8:
+            if( !gammaCorrected )
+            {
+                downsampler2DFunc   = downscale2x_A8;
+                downsamplerCubeFunc = downscale2x_A8_cube;
+            }
+            else
+            {
+                downsampler2DFunc   = downscale2x_sRGB_A8;
+                downsamplerCubeFunc = downscale2x_sRGB_A8_cube;
+            }
+            break;
+        case PF_BYTE_LA:
+            if( !gammaCorrected )
+            {
+                downsampler2DFunc   = downscale2x_XA88;
+                downsamplerCubeFunc = downscale2x_XA88_cube;
+            }
+            else
+            {
+                downsampler2DFunc   = downscale2x_sRGB_XA88;
+                downsamplerCubeFunc = downscale2x_sRGB_XA88_cube;
+            }
+            break;
+        case PF_R8G8B8: case PF_B8G8R8:
+            if( !gammaCorrected )
+            {
+                downsampler2DFunc   = downscale2x_XXX888;
+                downsamplerCubeFunc = downscale2x_XXX888_cube;
+            }
+            else
+            {
+                downsampler2DFunc   = downscale2x_sRGB_XXX888;
+                downsamplerCubeFunc = downscale2x_sRGB_XXX888_cube;
+            }
+            break;
+        case PF_R8G8B8A8: case PF_B8G8R8A8:
+            if( !gammaCorrected )
+            {
+                downsampler2DFunc   = downscale2x_XXXA8888;
+                downsamplerCubeFunc = downscale2x_XXXA8888_cube;
+            }
+            else
+            {
+                downsampler2DFunc   = downscale2x_sRGB_XXXA8888;
+                downsamplerCubeFunc = downscale2x_sRGB_XXXA8888_cube;
+            }
+            break;
+        case PF_A8B8G8R8: case PF_A8R8G8B8:
+        case PF_X8B8G8R8: case PF_X8R8G8B8:
+            if( !gammaCorrected )
+            {
+                downsampler2DFunc   = downscale2x_AXXX8888;
+                downsamplerCubeFunc = downscale2x_AXXX8888_cube;
+            }
+            else
+            {
+                downsampler2DFunc   = downscale2x_sRGB_AXXX8888;
+                downsamplerCubeFunc = downscale2x_sRGB_AXXX8888_cube;
+            }
+            break;
+        }
+
+        if( (mDepth == 1 && getNumFaces() == 1 && !downsampler2DFunc) ||
+            (getNumFaces() == 6 && !downsamplerCubeFunc) )
+        {
+            return false;
+        }
+
+        // reassign buffer to temp image, make sure auto-delete is true
+        Image temp;
+        temp.loadDynamicImage(mBuffer, mWidth, mHeight, mDepth, mFormat, true, getNumFaces());
+        // do not delete[] mBuffer!  temp will destroy it
+
+        // Allocate new buffer
+        uint32 heighestRes = std::max( std::max( mWidth, mHeight ), mDepth );
+        mNumMipmaps = static_cast<uint8>( floorf( log2f( static_cast<float>(heighestRes) ) ) );
+        mBufSize    = calculateSize(mNumMipmaps, getNumFaces(), mWidth, mHeight, mDepth, mFormat);
+        mBuffer     = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
+
+        for( size_t i=0; i<6; ++i )
+        {
+            PixelBox tempBox = temp.getPixelBox( i );
+            memcpy( this->getPixelBox( i ).data, tempBox.data, tempBox.getConsecutiveSize() );
+        }
+
+        uint32 dstWidth  = mWidth;
+        uint32 dstHeight = mHeight;
+
+        int filterIdx = 1;
+
+        switch( filter )
+        {
+        case FILTER_NEAREST:
+            filterIdx = 0; break;
+        case FILTER_LINEAR:
+        case FILTER_BILINEAR:
+            filterIdx = 1; break;
+        case FILTER_GAUSSIAN:
+            filterIdx = 2; break;
+        }
+
+        const FilterKernel &chosenFilter = c_filterKernels[filterIdx];
+
+        for( uint8 i=1; i<mNumMipmaps + 1; ++i )
+        {
+            uint32 srcWidth    = dstWidth;
+            uint32 srcHeight   = dstHeight;
+            dstWidth   = std::max<uint32>( 1, dstWidth >> 1 );
+            dstHeight  = std::max<uint32>( 1, dstHeight >> 1 );
+
+            if( hasFlag( IF_CUBEMAP ) )
+            {
+                uint8 const *upFaces[6];
+                for( size_t j=0; j<6; ++j )
+                    upFaces[j] = reinterpret_cast<uint8*>( this->getPixelBox( j, i - 1 ).data );
+
+                for( size_t j=0; j<6; ++j )
+                {
+                    PixelBox downFace = this->getPixelBox( j, i );
+                    (*downsamplerCubeFunc)( reinterpret_cast<uint8*>( downFace.data ), upFaces,
+                                            dstWidth, dstHeight, srcWidth, srcHeight,
+                                            chosenFilter.kernel,
+                                            chosenFilter.kernelStartX, chosenFilter.kernelEndX,
+                                            chosenFilter.kernelStartY, chosenFilter.kernelEndY,
+                                            j );
+                }
+            }
+            else
+            {
+                (*downsampler2DFunc)( reinterpret_cast<uint8*>( this->getPixelBox( 0, i ).data ),
+                                      reinterpret_cast<uint8*>( this->getPixelBox( 0, i - 1 ).data ),
+                                      dstWidth, dstHeight, srcWidth,
+                                      chosenFilter.kernel,
+                                      chosenFilter.kernelStartX, chosenFilter.kernelEndX,
+                                      chosenFilter.kernelStartY, chosenFilter.kernelEndY );
+            }
+        }
+
+        return true;
     }
     //-----------------------------------------------------------------------
     void Image::scale(const PixelBox &src, const PixelBox &scaled, Filter filter) 

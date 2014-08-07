@@ -453,7 +453,8 @@ namespace Ogre {
             FILTER_BILINEAR,
             FILTER_BOX,
             FILTER_TRIANGLE,
-            FILTER_BICUBIC
+            FILTER_BICUBIC,
+            FILTER_GAUSSIAN
         };
         /** Scale a 1D, 2D or 3D image volume. 
             @param  src         PixelBox containing the source pointer, dimensions and format
@@ -466,6 +467,22 @@ namespace Ogre {
         
         /** Resize a 2D image, applying the appropriate filter. */
         void resize(ushort width, ushort height, Filter filter = FILTER_BILINEAR);
+
+        /** Generates the mipmaps for this image. For Cubemaps, the filtering is seamless; and a
+            gaussian filter is recommended although it's slow.
+        @remarks
+            Cannot handle compressed formats.
+            Gaussian filter is implemented with a generic 1-pass convolution matrix, which in
+            turn means it is O( N^N ) instead of a 2-pass filter which is O( 2^N ); where
+            N is the number of taps. The Gaussian filter is 5x5
+        @param gammaCorrected
+            True if the filter should be applied in linear space.
+        @param filter
+            The type of filter to use.
+        @return
+            False if failed to generate and mipmaps properties won't be changed. True on success.
+        */
+        bool generateMipmaps( bool gammaCorrected, Filter filter = FILTER_BILINEAR );
         
         /// Static function to calculate size in bytes from the number of mipmaps, faces and the dimensions
         static size_t calculateSize(size_t mipmaps, size_t faces, uint32 width, uint32 height, uint32 depth, PixelFormat format);

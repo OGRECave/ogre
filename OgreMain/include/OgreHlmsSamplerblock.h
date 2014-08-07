@@ -28,7 +28,6 @@ THE SOFTWARE.
 #ifndef _OgreHlmsSamplerblock_H_
 #define _OgreHlmsSamplerblock_H_
 
-#include "OgreStringVector.h"
 #include "OgreHlmsCommon.h"
 #include "OgreHeaderPrefix.h"
 

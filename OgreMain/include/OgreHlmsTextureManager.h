@@ -158,6 +158,11 @@ namespace Ogre
                                         bool isNormalMap );
         static void copy3DTexture( const Image &srcImage, TexturePtr dst, uint16 sliceStart, uint16 sliceEnd );
 
+        /// Looks for the first image it can successfully load from the pack, and extracts its parameters.
+        /// Returns false if failed to retrieve parameters.
+        bool getTexturePackParameters( const HlmsTexturePack &pack, uint32 &outWidth, uint32 &outHeight,
+                                       uint32 &outDepth, PixelFormat &outPixelFormat ) const;
+
     public:
         HlmsTextureManager();
         virtual ~HlmsTextureManager();
@@ -205,6 +210,8 @@ namespace Ogre
         TextureLocation createOrRetrieveTexture( const String &aliasName,
                                                  const String &texName,
                                                  TextureMapType mapType );
+
+        void createFromTexturePack( const HlmsTexturePack &pack );
 
         /// Returns the precreated blank texture
         TextureLocation getBlankTexture(void) const;
