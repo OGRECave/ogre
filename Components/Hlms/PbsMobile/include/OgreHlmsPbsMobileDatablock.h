@@ -74,8 +74,8 @@ namespace Ogre
     protected:
         UvAtlasParams mUvAtlasParams[4];
 
-        TexturePtr              mTexture[PBSM_MAX_TEXTURE_TYPES];
-        HlmsSamplerblock const  *mSamplerblocks[PBSM_MAX_TEXTURE_TYPES];
+        TexturePtr              mTexture[NUM_PBSM_TEXTURE_TYPES];
+        HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
 
         /// The data in this structure only affects shader generation (thus modifying it implies
         /// generating a new shader; i.e. a call to flushRenderables()). Because this data
@@ -228,16 +228,19 @@ namespace Ogre
         */
         void setSamplerblock( PbsMobileTextureTypes texType, const HlmsSamplerblock &params );
 
+        const HlmsSamplerblock* getSamplerblock( PbsMobileTextureTypes texType ) const;
+
         /** Sets which UV set to use for the given texture.
             Calling this function triggers a HlmsDatablock::flushRenderables.
         @param sourceType
             Source texture to modify. Note that we don't enforce
             PBSM_SOURCE_DETAIL0 = PBSM_SOURCE_DETAIL_NM0, but you probably
             want to have both textures using the same UV source.
+            Must be lower than NUM_PBSM_SOURCES.
         @param uvSet
             UV coordinate set. Value must be between in range [0; 8)
         */
-        void setTextureUvSource( PbsMobileUvSourceType sourceType, uint8 uvSet );
+        void setTextureUvSource( PbsMobileTextureTypes sourceType, uint8 uvSet );
 
         /** Changes the blend mode of the detail map. Calling this function triggers a
             HlmsDatablock::flushRenderables even if you never use detail maps (they

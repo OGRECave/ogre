@@ -169,16 +169,16 @@ namespace Ogre
         }
 
         if( Hlms::findParamInVec( params, "uv_diffuse_map", paramVal ) )
-            setTextureUvSource( PBSM_SOURCE_DIFFUSE, StringConverter::parseUnsignedInt( paramVal ) );
+            setTextureUvSource( PBSM_DIFFUSE, StringConverter::parseUnsignedInt( paramVal ) );
         if( Hlms::findParamInVec( params, "uv_normal_map", paramVal ) )
-            setTextureUvSource( PBSM_SOURCE_NORMAL, StringConverter::parseUnsignedInt( paramVal ) );
+            setTextureUvSource( PBSM_NORMAL, StringConverter::parseUnsignedInt( paramVal ) );
         if( Hlms::findParamInVec( params, "uv_specular_map", paramVal ) )
-            setTextureUvSource( PBSM_SOURCE_SPECULAR, StringConverter::parseUnsignedInt( paramVal ) );
+            setTextureUvSource( PBSM_SPECULAR, StringConverter::parseUnsignedInt( paramVal ) );
         if( Hlms::findParamInVec( params, "uv_roughness_map", paramVal ) )
-            setTextureUvSource( PBSM_SOURCE_ROUGHNESS, StringConverter::parseUnsignedInt( paramVal ) );
+            setTextureUvSource( PBSM_ROUGHNESS, StringConverter::parseUnsignedInt( paramVal ) );
         if( Hlms::findParamInVec( params, "uv_detail_weight_map", paramVal ) )
         {
-            setTextureUvSource( PBSM_SOURCE_DETAIL_WEIGHT,
+            setTextureUvSource( PBSM_DETAIL_WEIGHT,
                                 StringConverter::parseUnsignedInt( paramVal ) );
         }
 
@@ -225,14 +225,14 @@ namespace Ogre
             key = "uv_detail_map" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
-                setTextureUvSource( static_cast<PbsMobileUvSourceType>( PBSM_SOURCE_DETAIL0 + i ),
+                setTextureUvSource( static_cast<PbsMobileTextureTypes>( PBSM_DETAIL0 + i ),
                                     StringConverter::parseUnsignedInt( paramVal ) );
             }
 
             key = "uv_detail_normal_map" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
-                setTextureUvSource( static_cast<PbsMobileUvSourceType>( PBSM_SOURCE_DETAIL0_NM + i ),
+                setTextureUvSource( static_cast<PbsMobileTextureTypes>( PBSM_DETAIL0_NM + i ),
                                     StringConverter::parseUnsignedInt( paramVal ) );
             }
         }
@@ -249,7 +249,7 @@ namespace Ogre
     void HlmsPbsMobileDatablock::calculateHash()
     {
         IdString hash;
-        for( size_t i=0; i<PBSM_MAX_TEXTURE_TYPES; ++i )
+        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
         {
             if( !mTexture[i].isNull() )
             {
@@ -391,11 +391,23 @@ namespace Ogre
         mSamplerblocks[texType] = hlmsManager->getSamplerblock( params );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsMobileDatablock::setTextureUvSource( PbsMobileUvSourceType sourceType, uint8 uvSet )
+    const HlmsSamplerblock* HlmsPbsMobileDatablock::getSamplerblock(
+                                                                PbsMobileTextureTypes texType ) const
+    {
+        return mSamplerblocks[texType];
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setTextureUvSource( PbsMobileTextureTypes sourceType, uint8 uvSet )
     {
         if( uvSet >= 8 )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "UV set must be in rage in range [0; 8)",
+                         "HlmsPbsMobileDatablock::setTextureUvSource" );
+        }
+
+        if( sourceType >= NUM_PBSM_SOURCES )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid sourceType",
                          "HlmsPbsMobileDatablock::setTextureUvSource" );
         }
 

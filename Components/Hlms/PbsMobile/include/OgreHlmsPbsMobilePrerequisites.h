@@ -56,7 +56,6 @@ namespace Ogre
         PBSM_NORMAL,
         PBSM_SPECULAR,
         PBSM_ROUGHNESS,
-        PBSM_REFLECTION,
         PBSM_DETAIL_WEIGHT,
         PBSM_DETAIL0,
         PBSM_DETAIL1,
@@ -66,25 +65,9 @@ namespace Ogre
         PBSM_DETAIL1_NM,
         PBSM_DETAIL2_NM,
         PBSM_DETAIL3_NM,
-        PBSM_MAX_TEXTURE_TYPES
-    };
-
-    enum PbsMobileUvSourceType
-    {
-        PBSM_SOURCE_DIFFUSE,
-        PBSM_SOURCE_NORMAL,
-        PBSM_SOURCE_SPECULAR,
-        PBSM_SOURCE_ROUGHNESS,
-        PBSM_SOURCE_DETAIL_WEIGHT,
-        PBSM_SOURCE_DETAIL0,
-        PBSM_SOURCE_DETAIL1,
-        PBSM_SOURCE_DETAIL2,
-        PBSM_SOURCE_DETAIL3,
-        PBSM_SOURCE_DETAIL0_NM,
-        PBSM_SOURCE_DETAIL1_NM,
-        PBSM_SOURCE_DETAIL2_NM,
-        PBSM_SOURCE_DETAIL3_NM,
-        NUM_PBSM_SOURCES
+        PBSM_REFLECTION,
+        NUM_PBSM_SOURCES = PBSM_REFLECTION,
+        NUM_PBSM_TEXTURE_TYPES
     };
 
     enum PbsMobileBlendModes

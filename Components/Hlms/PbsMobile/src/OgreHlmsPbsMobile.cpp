@@ -266,8 +266,6 @@ namespace Ogre
                                                 PiecesMap *inOutPieces )
     {
         PbsMobileTextureTypes detailTextureStart    = diffuseMaps ? PBSM_DETAIL0 : PBSM_DETAIL0_NM;
-        PbsMobileUvSourceType sourceStart           = diffuseMaps ? PBSM_SOURCE_DETAIL0 :
-                                                                    PBSM_SOURCE_DETAIL0_NM;
         const IdString **detailSwizzles = diffuseMaps ? PbsMobileProperty::DetailDiffuseSwizzles :
                                                         PbsMobileProperty::DetailNormalSwizzles;
 
@@ -292,8 +290,8 @@ namespace Ogre
                 IdString swizzleN = *detailSwizzles[validDetailMaps];
                 inOutPieces[PixelShader][swizzleN] = swizzles[i];
 
-                uint8 uvSource = datablock->mShaderCreationData->uvSource[sourceStart + i];
-                setProperty( *PbsMobileProperty::UvSourcePtrs[sourceStart + validDetailMaps],
+                uint8 uvSource = datablock->mShaderCreationData->uvSource[detailTextureStart + i];
+                setProperty( *PbsMobileProperty::UvSourcePtrs[detailTextureStart + validDetailMaps],
                              uvSource );
 
                 if( getProperty( *HlmsBaseProp::UvCountPtrs[uvSource] ) < 2 )
@@ -321,7 +319,7 @@ namespace Ogre
         setProperty( PbsMobileProperty::UvAtlas, datablock->mNumUvAtlas );
         setProperty( PbsMobileProperty::FresnelScalar, datablock->mFresnelTypeSizeBytes != 4 );
 
-        for( size_t i=0; i<PBSM_SOURCE_DETAIL0; ++i )
+        for( size_t i=0; i<PBSM_DETAIL0; ++i )
         {
             uint8 uvSource = datablock->mShaderCreationData->uvSource[i];
             setProperty( *PbsMobileProperty::UvSourcePtrs[i], uvSource );
@@ -813,7 +811,7 @@ namespace Ogre
             {
                 //Rebind textures
                 size_t texUnit = mPreparedPass.shadowMaps.size();
-                for( size_t i=0; i<PBSM_MAX_TEXTURE_TYPES; ++i )
+                for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
                 {
                     if( !datablock->mTexture[i].isNull() )
                     {
