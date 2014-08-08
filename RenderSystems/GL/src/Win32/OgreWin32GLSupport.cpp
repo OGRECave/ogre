@@ -484,9 +484,9 @@ namespace Ogre {
 #ifdef OGRE_STATIC_LIB
 		HINSTANCE hinst = GetModuleHandle( NULL );
 #else
-		static DWORD staticVar;
+		static const TCHAR staticVar;
 		HINSTANCE hinst = NULL;
-		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCTSTR>(&staticVar), &hinst);
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hinst);
 #endif
 		
 		WNDCLASS dummyClass;

@@ -80,9 +80,9 @@ namespace Ogre {
 #ifdef OGRE_STATIC_LIB
 		HINSTANCE hInst = GetModuleHandle( NULL );
 #else
-		static DWORD staticVar;
+		static const TCHAR staticVar;
 		HINSTANCE hInst = NULL;
-		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCTSTR>(&staticVar), &hInst);
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
 #endif
 
 		mWindow = 0;
