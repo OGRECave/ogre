@@ -131,6 +131,7 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
+    struct GLES2HlmsSamplerblock;
     class GLES2GpuProgram;
     class GLES2Texture;
     typedef SharedPtr<GLES2GpuProgram> GLES2GpuProgramPtr;
@@ -301,6 +302,8 @@ namespace Ogre {
 #else
 #   define OGRE_CHECK_GL_ERROR(glFunc) { glFunc; }
 #endif
+
+#define OCGE OGRE_CHECK_GL_ERROR
 
 #if ENABLE_GL_CHECK
     #define EGL_CHECK_ERROR \

@@ -663,6 +663,8 @@ namespace Ogre {
                 downsamplerCubeFunc = downscale2x_sRGB_AXXX8888_cube;
             }
             break;
+        default: //Keep compiler happy
+            break;
         }
 
         if( (mDepth == 1 && getNumFaces() == 1 && !downsampler2DFunc) ||
@@ -702,6 +704,8 @@ namespace Ogre {
             filterIdx = 1; break;
         case FILTER_GAUSSIAN:
             filterIdx = 2; break;
+        default: // Keep compiler happy
+            break;
         }
 
         const FilterKernel &chosenFilter = c_filterKernels[filterIdx];

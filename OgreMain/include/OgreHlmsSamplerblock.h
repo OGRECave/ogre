@@ -71,7 +71,7 @@ namespace Ogre
         TextureAddressingMode   mW;
 
         float               mMipLodBias;
-        bool                mMaxAnisotropy;
+        float               mMaxAnisotropy;
         /// Defaults to NUM_COMPARE_FUNCTIONS which means disabled.
         CompareFunction     mCompareFunction;
         ColourValue         mBorderColour;

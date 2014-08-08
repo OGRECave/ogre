@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
+#include "OgreGLES2HlmsSamplerblock.h"
 #include "OgreGLES2Support.h"
 #include "OgreGLES2StateCacheManager.h"
 #include "OgreRoot.h"
@@ -68,7 +69,11 @@ namespace Ogre {
                              ResourceHandle handle, const String& group, bool isManual,
                              ManualResourceLoader* loader, GLES2Support& support)
         : Texture(creator, name, handle, group, isManual, loader),
-          mTextureID(0), mGLSupport(support)
+          mTextureID(0),
+#if OGRE_NO_GLES3_SUPPORT != 0
+          mLastBoundSamplerblockRsId(0),
+#endif
+          mGLSupport(support)
     {
     }
 
@@ -601,5 +606,40 @@ namespace Ogre {
 		if (name == "GLID")
 			*static_cast<GLuint*>(pData) = mTextureID;
 	}
+
+#if OGRE_NO_GLES3_SUPPORT != 0
+    void GLES2Texture::bindSamplerBlock( GLES2HlmsSamplerblock *samplerblock )
+    {
+        mLastBoundSamplerblockRsId = samplerblock->mInternalId;
+
+        GLenum target = getGLES2TextureTarget();
+
+        GLES2StateCacheManager *stateCacheManager = mGLSupport.getStateCacheManager();
+
+        stateCacheManager->setTexParameteri( target, GL_TEXTURE_MIN_FILTER, samplerblock->mMinFilter );
+        stateCacheManager->setTexParameteri( target, GL_TEXTURE_MIN_FILTER, samplerblock->mMinFilter );
+        stateCacheManager->setTexParameteri( target, GL_TEXTURE_MAG_FILTER, samplerblock->mMagFilter );
+
+        stateCacheManager->setTexParameteri( target, GL_TEXTURE_WRAP_S, samplerblock->mU );
+        stateCacheManager->setTexParameteri( target, GL_TEXTURE_WRAP_T, samplerblock->mV );
+
+        if( samplerblock->mAnisotropy != 0 )
+        {
+            stateCacheManager->setTexParameterf( target, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                                                 samplerblock->mAnisotropy );
+        }
+
+        //stateCacheManager->setTexParameteri( target, GL_TEXTURE_WRAP_R_OES, samplerblock->mW );
+
+        /*stateCacheManager->setTexParameterf( target, GL_TEXTURE_LOD_BIAS, samplerblock->mMipLodBias );
+
+        OCGE( glTexParameterfv( target, GL_TEXTURE_BORDER_COLOR,
+                                              reinterpret_cast<GLfloat*>(
+                                                    &samplerblock->mBorderColour ) ) );
+
+        stateCacheManager->setTexParameterf( target, GL_TEXTURE_MIN_LOD, samplerblock->mMinLod );
+        stateCacheManager->setTexParameterf( target, GL_TEXTURE_MAX_LOD, samplerblock->mMaxLod );*/
+    }
+#endif
 
 }

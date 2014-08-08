@@ -278,9 +278,9 @@ namespace Ogre {
 
             // Check each face in turn
             // Min x, y & z
-            for( size_t i=0; i<3; ++i )
+            for( size_t j=0; j<3; ++j )
             {
-                ArrayReal t = (vMin.mChunkBase[i] - rayOrigin.mChunkBase[i]) / rayDir.mChunkBase[i];
+                ArrayReal t = (vMin.mChunkBase[j] - rayOrigin.mChunkBase[j]) / rayDir.mChunkBase[j];
 
                 //mask = t >= 0; works even if t is nan (t = 0 / 0)
                 ArrayMaskR mask = Mathlib::CompareGreaterEqual( t, ARRAY_REAL_ZERO );
@@ -288,7 +288,7 @@ namespace Ogre {
 
                 //Fix accuracy issues (this value will lay exactly in the extend,
 				//but often is slightly beyond it, causing the test to fail)
-                hitPoint.mChunkBase[i] = objData.mWorldAabb->mCenter.mChunkBase[i];
+                hitPoint.mChunkBase[j] = objData.mWorldAabb->mCenter.mChunkBase[j];
 
                 //hitMaskR |= t >= 0 && mWorldAabb->contains( hitPoint );
                 //distance = t >= 0 ? min( distance, t ) : t;
@@ -298,9 +298,9 @@ namespace Ogre {
             }
 
             // Max x, y & z
-            for( size_t i=0; i<3; ++i )
+            for( size_t j=0; j<3; ++j )
             {
-                ArrayReal t = (vMax.mChunkBase[i] - rayOrigin.mChunkBase[i]) / rayDir.mChunkBase[i];
+                ArrayReal t = (vMax.mChunkBase[j] - rayOrigin.mChunkBase[j]) / rayDir.mChunkBase[j];
 
                 //mask = t >= 0; works even if t is nan (t = 0 / 0)
                 ArrayMaskR mask = Mathlib::CompareGreaterEqual( t, ARRAY_REAL_ZERO );
@@ -308,7 +308,7 @@ namespace Ogre {
 
                 //Fix accuracy issues (this value will lay exactly in the extend,
 				//but often is slightly beyond it, causing the test to fail)
-                hitPoint.mChunkBase[i] = objData.mWorldAabb->mCenter.mChunkBase[i];
+                hitPoint.mChunkBase[j] = objData.mWorldAabb->mCenter.mChunkBase[j];
 
                 //hitMaskR |= t >= 0 && mWorldAabb->contains( hitPoint );
                 //distance = t >= 0 ? min( distance, t ) : t;

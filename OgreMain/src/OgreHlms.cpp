@@ -240,8 +240,8 @@ namespace Ogre
                 {
                     for( size_t i=0; i<sizeof( blockNames ) / sizeof( char* ); ++i )
                     {
-                        size_t idx = subString.find( blockNames[i] );
-                        if( idx == 0 )
+                        size_t idxBlock = subString.find( blockNames[i] );
+                        if( idxBlock == 0 )
                         {
                             it = subString.begin() + strlen( blockNames[i] );
                             ++nesting;

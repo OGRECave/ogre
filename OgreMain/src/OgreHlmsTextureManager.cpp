@@ -443,7 +443,7 @@ namespace Ogre
                     else
                     {
                         copy3DTexture( image, textureArray.texture, 0,
-                                       std::max( image.getNumFaces(), image.getDepth() ) );
+                                       std::max<uint32>( image.getNumFaces(), image.getDepth() ) );
                     }
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
@@ -510,7 +510,7 @@ namespace Ogre
                     image.load( *itPath, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
                     outWidth    = image.getWidth();
                     outHeight   = image.getHeight();
-                    outDepth    = std::max( image.getDepth(), image.getNumFaces() );
+                    outDepth    = std::max<uint32>( image.getDepth(), image.getNumFaces() );
                     outPixelFormat = image.getFormat();
 
                     return true;

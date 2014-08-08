@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsSamplerblock.h"
+#include <float.h>
 
 namespace Ogre
 {
@@ -41,7 +42,7 @@ namespace Ogre
         mV( TAM_CLAMP ),
         mW( TAM_CLAMP ),
         mMipLodBias( 0.0f ),
-        mMaxAnisotropy( 1 ),
+        mMaxAnisotropy( 1.0f ),
         mCompareFunction( NUM_COMPARE_FUNCTIONS ),
         mBorderColour( ColourValue::White ),
         mMinLod( -FLT_MAX ),

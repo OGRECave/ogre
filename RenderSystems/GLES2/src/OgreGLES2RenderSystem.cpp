@@ -50,8 +50,12 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreGLES2StateCacheManager.h"
+#if OGRE_NO_GLES3_SUPPORT != 0
+    #include "OgreGLES2HlmsSamplerblock.h"
+#endif
 
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsSamplerblock.h"
 #include "GLSLES/include/OgreGLSLESGpuProgram.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -79,10 +83,12 @@ using namespace std;
 namespace Ogre {
 
     GLES2RenderSystem::GLES2RenderSystem()
-        : mGpuProgramManager(0),
+        : mSamplerblocksInternalIdCount(0),
+          mGpuProgramManager(0),
           mGLSLESProgramFactory(0),
           mHardwareBufferManager(0),
           mRTTManager(0),
+          mLargestSupportedAnisotropy(0),
           mCurTexMipCount(0)
     {
         mViewport[0] = 0;
@@ -516,6 +522,8 @@ namespace Ogre {
 
     void GLES2RenderSystem::shutdown(void)
     {
+        for( int i=0; i<OGRE_MAX_TEXTURE_LAYERS; ++i )
+            mBoundTextures[i].setNull();
 
         // Deleting the GLSL program factory
         if (mGLSLESProgramFactory)
@@ -839,6 +847,7 @@ namespace Ogre {
                 // Note used
                 tex->touch();
                 mTextureTypes[stage] = tex->getGLES2TextureTarget();
+                mBoundTextures[stage] = tex;
                 texID = tex->getGLID();
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
                 mCurTexMipCount = tex->getNumMipmaps();
@@ -848,6 +857,7 @@ namespace Ogre {
             {
                 // Assume 2D
                 mTextureTypes[stage] = GL_TEXTURE_2D;
+                mBoundTextures[stage].setNull();
                 texID = static_cast<GLES2TextureManager*>(mTextureManager)->getWarningTextureID();
             }
 
@@ -856,6 +866,7 @@ namespace Ogre {
         else
         {
             // Bind zero texture
+            mBoundTextures[stage].setNull();
             mStateCacheManager->bindGLTexture(GL_TEXTURE_2D, 0);
         }
 
@@ -865,6 +876,21 @@ namespace Ogre {
     void GLES2RenderSystem::_setTextureCoordSet(size_t stage, size_t index)
     {
         mTextureCoordIndex[stage] = index;
+    }
+
+    GLint GLES2RenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
+    {
+        switch (tam)
+        {
+            case TextureUnitState::TAM_CLAMP:
+            case TextureUnitState::TAM_BORDER:
+                return GL_CLAMP_TO_EDGE;
+            case TextureUnitState::TAM_MIRROR:
+                return GL_MIRRORED_REPEAT;
+            case TextureUnitState::TAM_WRAP:
+            default:
+                return GL_REPEAT;
+        }
     }
 
     GLint GLES2RenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
@@ -1134,6 +1160,117 @@ namespace Ogre {
         }
     }
 
+    void GLES2RenderSystem::_hlmsSamplerblockCreated( HlmsSamplerblock *newBlock )
+    {
+#if OGRE_NO_GLES3_SUPPORT == 0
+        GLuint samplerName;
+        glGenSamplers( 1, &samplerName );
+#endif
+
+        GLint minFilter, magFilter;
+        switch( newBlock->mMinFilter )
+        {
+        case FO_ANISOTROPIC:
+        case FO_LINEAR:
+            switch( newBlock->mMipFilter )
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // linear min, linear mip
+                minFilter = GL_LINEAR_MIPMAP_LINEAR;
+                break;
+            case FO_POINT:
+                // linear min, point mip
+                minFilter = GL_LINEAR_MIPMAP_NEAREST;
+                break;
+            case FO_NONE:
+                // linear min, no mip
+                minFilter = GL_LINEAR;
+                break;
+            }
+            break;
+        case FO_POINT:
+        case FO_NONE:
+            switch( newBlock->mMipFilter )
+            {
+            case FO_ANISOTROPIC:
+            case FO_LINEAR:
+                // nearest min, linear mip
+                minFilter = GL_NEAREST_MIPMAP_LINEAR;
+                break;
+            case FO_POINT:
+                // nearest min, point mip
+                minFilter = GL_NEAREST_MIPMAP_NEAREST;
+                break;
+            case FO_NONE:
+                // nearest min, no mip
+                minFilter = GL_NEAREST;
+                break;
+            }
+            break;
+        }
+
+        magFilter = newBlock->mMagFilter <= FO_POINT ? GL_NEAREST : GL_LINEAR;
+
+#if OGRE_NO_GLES3_SUPPORT == 0
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_MIN_FILTER, minFilter ) );
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_MAG_FILTER, magFilter ) );
+
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_WRAP_S,
+                                   getTextureAddressingMode( newBlock->mU ) ) );
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_WRAP_T,
+                                   getTextureAddressingMode( newBlock->mV ) ) );
+        OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_WRAP_R,
+                                   getTextureAddressingMode( newBlock->mW ) ) );
+
+        OCGE( glSamplerParameterfv( samplerName, GL_TEXTURE_BORDER_COLOR,
+                                    newBlock->mBorderColour.ptr() ) );
+        OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_LOD_BIAS, newBlock->mMipLodBias ) );
+        OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MIN_LOD, newBlock->mMinLod ) );
+        OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MAX_LOD, newBlock->mMaxLod ) );
+
+        if( newBlock->mCompareFunction != NUM_COMPARE_FUNCTIONS )
+        {
+            OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_COMPARE_MODE,
+                                       GL_COMPARE_REF_TO_TEXTURE ) );
+            OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_COMPARE_FUNC,
+                                       convertCompareFunction( newBlock->mCompareFunction ) ) );
+        }
+
+        if( mCurrentCapabilities->hasCapability(RSC_ANISOTROPY) )
+        {
+            OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+                                       newBlock->mMaxAnisotropy ) );
+        }
+
+        newBlock->mRsData = (void*)samplerName;
+#else
+        GLES2HlmsSamplerblock *glSamplerblock = new GLES2HlmsSamplerblock();
+        glSamplerblock->mInternalId= ++mSamplerblocksInternalIdCount;
+        glSamplerblock->mMinFilter = minFilter;
+        glSamplerblock->mMagFilter = magFilter;
+        glSamplerblock->mU  = getTextureAddressingMode( newBlock->mU );
+        glSamplerblock->mV  = getTextureAddressingMode( newBlock->mV );
+        glSamplerblock->mW  = getTextureAddressingMode( newBlock->mW );
+
+        glSamplerblock->mAnisotropy = std::min( newBlock->mMaxAnisotropy, mLargestSupportedAnisotropy );
+
+        newBlock->mRsData = glSamplerblock;
+#endif
+    }
+
+    void GLES2RenderSystem::_hlmsSamplerblockDestroyed( HlmsSamplerblock *block )
+    {
+#if OGRE_NO_GLES3_SUPPORT == 0
+        GLuint samplerName = reinterpret_cast<GLuint>( block->mRsData );
+        glDeleteSamplers( 1, &samplerName );
+#else
+        GLES2HlmsSamplerblock *glSamplerblock = reinterpret_cast<GLES2HlmsSamplerblock*>(block->mRsData);
+        delete glSamplerblock;
+        block->mRsData = 0;
+#endif
+    }
+
     void GLES2RenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
     {
         if( macroblock->mDepthCheck )
@@ -1185,6 +1322,30 @@ namespace Ogre {
             _setSceneBlending( blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
                                blendblock->mBlendOperation );
         }
+    }
+
+    void GLES2RenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
+    {
+#if OGRE_NO_GLES3_SUPPORT == 0
+        if( !samplerblock )
+            glBindSampler( texUnit, 0 );
+        else
+            glBindSampler( texUnit, reinterpret_cast<GLuint>( samplerblock->mRsData ) );
+#else
+        GLES2HlmsSamplerblock *glSamplerblock = reinterpret_cast<GLES2HlmsSamplerblock*>(
+                                                                                samplerblock->mRsData );
+
+        if( !mBoundTextures[texUnit].isNull() &&
+            mBoundTextures[texUnit]->getLastBoundSamplerblockRsId() != glSamplerblock->mInternalId )
+        {
+            if (!mStateCacheManager->activateGLTextureUnit(texUnit))
+                return;
+
+            mBoundTextures[texUnit]->bindSamplerBlock( glSamplerblock );
+
+            mStateCacheManager->activateGLTextureUnit(0);
+        }
+#endif
     }
 
     void GLES2RenderSystem::_setProgramsFromHlms( const HlmsCache *hlmsCache )
@@ -2083,6 +2244,9 @@ namespace Ogre {
         // Enable primitive restarting with fixed indices depending upon the data type
         OGRE_CHECK_GL_ERROR(glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX));
 #endif
+
+        if( mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic") )
+            OCGE( glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy) );
     }
 
     void GLES2RenderSystem::initialiseContext(RenderWindow* primary)
@@ -2157,6 +2321,8 @@ namespace Ogre {
                 return GL_GEQUAL;
             case CMPF_GREATER:
                 return GL_GREATER;
+            case NUM_COMPARE_FUNCTIONS:
+                return GL_ALWAYS; // To keep compiler happy
         };
         // To keep compiler happy
         return GL_ALWAYS;

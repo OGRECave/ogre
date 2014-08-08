@@ -69,8 +69,8 @@ namespace Ogre
                                   const HlmsParamVec &params ) :
         mCreator( creator ),
         mName( name ),
-        mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
         mTextureHash( 0 ),
+        mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
         mType( creator->getType() ),
         mIsTransparent( !( blendblock->mDestBlendFactor == SBF_ZERO &&
                            blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
@@ -103,7 +103,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::_linkRenderable( Renderable *renderable )
     {
-        assert( renderable->mHlmsGlobalIndex == ~0 &&
+        assert( renderable->mHlmsGlobalIndex == (uint32)~0 &&
                 "Renderable must be unlinked before being linked again!" );
 
         renderable->mHlmsGlobalIndex = mLinkedRenderables.size();

@@ -62,6 +62,11 @@ namespace Ogre {
             
             void getCustomAttribute(const String& name, void* pData);
 
+#if OGRE_NO_GLES3_SUPPORT != 0
+            void bindSamplerBlock( GLES2HlmsSamplerblock *samplerblock );
+            uint32 getLastBoundSamplerblockRsId(void) const { return mLastBoundSamplerblockRsId; }
+#endif
+
         protected:
             /// @copydoc Texture::createInternalResourcesImpl
             void createInternalResourcesImpl(void);
@@ -103,6 +108,9 @@ namespace Ogre {
 
         private:
             GLuint mTextureID;
+#if OGRE_NO_GLES3_SUPPORT != 0
+            uint32 mLastBoundSamplerblockRsId;
+#endif
             GLES2Support& mGLSupport;
             
             /// Vector of pointers to subsurfaces

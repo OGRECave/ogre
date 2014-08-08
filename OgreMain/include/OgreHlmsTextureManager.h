@@ -130,8 +130,8 @@ namespace Ogre
             TextureEntry( IdString _name ) :
                 name( _name ), mapType( NUM_TEXTURE_TYPES ), arrayIdx( ~0 ), entryIdx( ~0 ) {}
 
-            TextureEntry( IdString _name, TextureMapType _mapType, uint16 arrayIdx, uint16 entryIdx ) :
-                name( _name ), mapType( _mapType ), arrayIdx( arrayIdx), entryIdx( entryIdx ) {}
+            TextureEntry( IdString _name, TextureMapType _mapType, uint16 _arrayIdx, uint16 _entryIdx ) :
+                name( _name ), mapType( _mapType ), arrayIdx( _arrayIdx ), entryIdx( _entryIdx ) {}
 
             inline bool operator < ( const TextureEntry &_right ) const
             {
