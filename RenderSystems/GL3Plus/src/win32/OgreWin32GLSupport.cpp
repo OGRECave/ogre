@@ -476,11 +476,9 @@ namespace Ogre {
 #ifdef OGRE_STATIC_LIB
 		HINSTANCE hinst = GetModuleHandle( NULL );
 #else
-#  if OGRE_DEBUG_MODE == 1
-		HINSTANCE hinst = GetModuleHandle("RenderSystem_GL_d.dll");
-#  else
-		HINSTANCE hinst = GetModuleHandle("RenderSystem_GL.dll");
-#  endif
+		static const TCHAR staticVar;
+		HINSTANCE hinst = NULL;
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hinst);
 #endif
 		
 		WNDCLASS dummyClass;
