@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreStagingBuffer.h"
+#include "Vao/OgreVertexArrayObject.h"
 #include "OgreTimer.h"
 #include "OgreCommon.h"
 
@@ -99,8 +100,8 @@ namespace Ogre
                          "VaoManager::destroyVertexBuffer" );
         }
 
-        VertexBufferPackedVec::iterator itor = std::find( mVertexBuffers.begin(),
-                                                          mVertexBuffers.end(), vertexBuffer );
+        BufferPackedVec::iterator itor = std::find( mVertexBuffers.begin(),
+                                                    mVertexBuffers.end(), vertexBuffer );
 
         if( itor == mVertexBuffers.end() )
         {
@@ -112,7 +113,6 @@ namespace Ogre
 
         destroyVertexBufferImpl( vertexBuffer );
 
-        OGRE_DELETE vertexBuffer;
         efficientVectorRemove( mVertexBuffers, itor );
     }
     //-----------------------------------------------------------------------------------
@@ -120,14 +120,30 @@ namespace Ogre
                                                       size_t numIndices, BufferType bufferType,
                                                       void *initialData, bool keepAsShadow )
     {
-        return createIndexBufferImpl( numIndices, indexType == IndexBufferPacked::IT_16BIT ? 2 : 4,
-                                      bufferType, initialData, keepAsShadow );
+        IndexBufferPacked *retVal;
+        retVal = createIndexBufferImpl( numIndices, indexType == IndexBufferPacked::IT_16BIT ? 2 : 4,
+                                        bufferType, initialData, keepAsShadow );
+        mIndexBuffers.push_back( retVal );
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyIndexBuffer( IndexBufferPacked *indexBuffer )
     {
+        BufferPackedVec::iterator itor = std::find( mIndexBuffers.begin(),
+                                                    mIndexBuffers.end(), indexBuffer );
+
+        if( itor == mIndexBuffers.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Index Buffer has already been destroyed or "
+                         "doesn't belong to this VaoManager.",
+                         "VaoManager::destroyIndexBuffer" );
+        }
+
         destroyIndexBufferImpl( indexBuffer );
-        OGRE_DELETE indexBuffer;
+        OGRE_DELETE *itor;
+
+        efficientVectorRemove( mIndexBuffers, itor );
     }
     //-----------------------------------------------------------------------------------
     VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
@@ -167,12 +183,53 @@ namespace Ogre
             }
         }
 
-        return createVertexArrayObjectImpl( vertexBuffers, indexBuffer, opType );
+        VertexArrayObject *retVal;
+        retVal = createVertexArrayObjectImpl( vertexBuffers, indexBuffer, opType );
+        mVertexArrayObjects.push_back( retVal );
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyVertexArrayObject( VertexArrayObject *vao )
     {
+        VertexArrayObjectVec::iterator itor = std::find( mVertexArrayObjects.begin(),
+                                                         mVertexArrayObjects.end(), vao );
+
+        if( itor == mVertexArrayObjects.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Vertex Array Object has already been destroyed or "
+                         "doesn't belong to this VaoManager.",
+                         "VaoManager::destroyVertexArrayObject" );
+        }
+
         destroyVertexArrayObjectImpl( vao );
+
+        efficientVectorRemove( mVertexArrayObjects, itor );
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::destroyAllVertexArrayObjects(void)
+    {
+        VertexArrayObjectVec::const_iterator itor = mVertexArrayObjects.begin();
+        VertexArrayObjectVec::const_iterator end  = mVertexArrayObjects.end();
+
+        while( itor != end )
+        {
+            destroyVertexArrayObjectImpl( *itor );
+            ++itor;
+        }
+
+        mVertexArrayObjects.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::deleteAllBuffers( BufferPackedVec &buffersContainer )
+    {
+        BufferPackedVec::const_iterator itor = buffersContainer.begin();
+        BufferPackedVec::const_iterator end  = buffersContainer.end();
+
+        while( itor != end )
+            OGRE_DELETE *itor++;
+
+        buffersContainer.clear();
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* VaoManager::getStagingBuffer( size_t minSizeBytes, bool forUpload )

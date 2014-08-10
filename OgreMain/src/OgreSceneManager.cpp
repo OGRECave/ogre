@@ -114,7 +114,6 @@ mFlipCullingOnNegativeScale(true),
 mShadowCasterPlainBlackPass(0),
 mDisplayNodes(false),
 mShowBoundingBoxes(false),
-mActiveCompositorChain(0),
 mLateMaterialResolving(false),
 mShadowColour(ColourValue(0.25, 0.25, 0.25)),
 mShadowIndexBufferUsedSize(0),
@@ -3949,7 +3948,6 @@ SceneManager::RenderContext* SceneManager::_pauseRendering()
     context->renderQueue = mRenderQueue;
     context->viewport = mCurrentViewport;
     context->camera = mCameraInProgress;
-    context->activeChain = _getActiveCompositorChain();
 
     context->rsContext = mDestRenderSystem->_pauseFrame();
     mRenderQueue = 0;
@@ -3960,7 +3958,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
 {
     delete mRenderQueue;
     mRenderQueue = context->renderQueue;
-    _setActiveCompositorChain(context->activeChain);
     Ogre::Viewport* vp = context->viewport;
     Ogre::Camera* camera = context->camera;
 

@@ -58,17 +58,17 @@ namespace Ogre
                 mPrimType[1] = GL_LINES_ADJACENCY;
                 break;
             case RenderOperation::OT_LINE_STRIP:
-                mPrimType[0] = GL_LINE_STRIP_ADJACENCY;
-                mPrimType[1] = GL_LINE_STRIP;
+                mPrimType[0] = GL_LINE_STRIP;
+                mPrimType[1] = GL_LINE_STRIP_ADJACENCY;
                 break;
             default:
             case RenderOperation::OT_TRIANGLE_LIST:
-                mPrimType[0] = GL_TRIANGLES_ADJACENCY;
-                mPrimType[1] = GL_TRIANGLES;
+                mPrimType[0] = GL_TRIANGLES;
+                mPrimType[1] = GL_TRIANGLES_ADJACENCY;
                 break;
             case RenderOperation::OT_TRIANGLE_STRIP:
-                mPrimType[0] = GL_TRIANGLE_STRIP_ADJACENCY;
-                mPrimType[1] = GL_TRIANGLE_STRIP;
+                mPrimType[0] = GL_TRIANGLE_STRIP;
+                mPrimType[1] = GL_TRIANGLE_STRIP_ADJACENCY;
                 break;
             case RenderOperation::OT_TRIANGLE_FAN:
                 mPrimType[0] = GL_TRIANGLE_FAN;

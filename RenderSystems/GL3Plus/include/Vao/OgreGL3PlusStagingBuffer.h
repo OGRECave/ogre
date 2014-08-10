@@ -71,7 +71,8 @@ namespace Ogre
             }
             ~Fence()
             {
-                glDeleteSync( fenceName );
+                if( fenceName )
+                    glDeleteSync( fenceName );
                 fenceName = 0;
             }
 

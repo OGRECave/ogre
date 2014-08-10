@@ -37,7 +37,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    typedef vector<StagingBuffer*>::type StagingBufferVec;
+    typedef vector<StagingBuffer*>::type        StagingBufferVec;
+    typedef vector<VertexArrayObject*>::type    VertexArrayObjectVec;
 
     class _OgreExport VaoManager : public RenderSysAlloc
     {
@@ -57,7 +58,9 @@ namespace Ogre
         uint8           mDynamicBufferCurrentFrame;
         unsigned long   mNextStagingBufferTimestampCheckpoint;
 
-        VertexBufferPackedVec   mVertexBuffers;
+        BufferPackedVec         mVertexBuffers;
+        BufferPackedVec         mIndexBuffers;
+        VertexArrayObjectVec    mVertexArrayObjects;
 
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
@@ -85,6 +88,16 @@ namespace Ogre
                                                                 RenderOperation::OperationType opType ) = 0;
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao ) = 0;
+
+        /// Destroys all created VAOs. Warning: If you still have references to
+        /// those pointers, they will become dangling. Don't call this if you
+        /// are unsure; unless you're shutting down. It gets called automatically
+        /// on shutdown though.
+        void destroyAllVertexArrayObjects(void);
+
+        /// Just deletes the pointers, but may not destroy/free the API constructs.
+        /// Utility helper for derived classes. Also clears the container.
+        static void deleteAllBuffers( BufferPackedVec &buffersContainer );
 
     public:
         VaoManager();

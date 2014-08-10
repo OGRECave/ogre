@@ -1233,6 +1233,8 @@ namespace Ogre
         /** Returns whether or not a Gpu program of the given type is currently bound. */
         virtual bool isGpuProgramBound(GpuProgramType gptype);
 
+        VaoManager* getVaoManager(void) const           { return mVaoManager; }
+
         /**
          * Gets the native shading language version for this render system.
          * Formatted so that it can be used within a shading program. 

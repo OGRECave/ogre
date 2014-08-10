@@ -140,7 +140,6 @@ namespace Ogre {
     struct MovableObjectLodChangedEvent;
     struct EntityMeshLodChangedEvent;
     struct EntityMaterialLodChangedEvent;
-    class CompositorChain;
     class CompositorShadowNode;
     class UniformScalableTask;
 
@@ -732,7 +731,6 @@ namespace Ogre {
         /// Utility class for calculating automatic parameters for gpu programs
         AutoParamDataSource* mAutoParamDataSource;
 
-        CompositorChain* mActiveCompositorChain;
         bool mLateMaterialResolving;
 
         ColourValue mShadowColour;
@@ -814,7 +812,6 @@ namespace Ogre {
             RenderQueue* renderQueue;   
             Viewport* viewport;
             Camera* camera;
-            CompositorChain* activeChain;
             RenderSystem::RenderSystemContext* rsContext;
         };
 
@@ -2533,11 +2530,6 @@ namespace Ogre {
         void _setCurrentShadowNode( CompositorShadowNode *shadowNode );
         const CompositorShadowNode* getCurrentShadowNode(void) const    { return mCurrentShadowNode; }
 
-        /** Sets the active compositor chain of the current scene being rendered.
-            @note CompositorChain does this automatically, no need to call manually.
-        */
-        virtual void _setActiveCompositorChain(CompositorChain* chain) { mActiveCompositorChain = chain; }
-
         /** Sets whether to use late material resolving or not. If set, materials will be resolved
             from the materials at the pass-setting stage and not at the render queue building stage.
             This is useful when the active material scheme during the render queue building stage
@@ -2548,9 +2540,6 @@ namespace Ogre {
         /** Gets whether using late material resolving or not.
             @see setLateMaterialResolving */
         virtual bool isLateMaterialResolving() const { return mLateMaterialResolving; }
-
-        /** Gets the active compositor chain of the current scene being rendered */
-        virtual CompositorChain* _getActiveCompositorChain() const { return mActiveCompositorChain; }
 
         /** Add a listener which will get called back on scene manager events.
         */

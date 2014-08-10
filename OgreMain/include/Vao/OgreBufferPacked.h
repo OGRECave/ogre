@@ -163,6 +163,8 @@ namespace Ogre
 
         size_t _getInternalBufferStart(void) const              { return mInternalBufferStart; }
     };
+
+    typedef vector<BufferPacked*>::type BufferPackedVec;
 }
 
 #endif

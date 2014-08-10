@@ -692,7 +692,8 @@ namespace Ogre {
             initialiseContext(win);
 
             assert( !mVaoManager );
-            mVaoManager = OGRE_NEW GL3PlusVaoManager();
+            mVaoManager = OGRE_NEW GL3PlusVaoManager(
+                                            mGLSupport->checkExtension("GL_ARB_buffer_storage") );
 
             StringVector tokens = StringUtil::split(mGLSupport->getGLVersion(), ".");
             if (!tokens.empty())
@@ -2163,6 +2164,14 @@ namespace Ogre {
     void GL3PlusRenderSystem::_render( const VertexArrayObject *_vao )
     {
         RenderSystem::_render( _vao );
+
+        GLSLSeparableProgram* separableProgram =
+            GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+        if (separableProgram)
+        {
+            //TODO: This does NOT belong here.
+            separableProgram->activate();
+        }
 
         const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( _vao );
 

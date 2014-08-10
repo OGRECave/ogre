@@ -54,6 +54,9 @@ namespace Ogre
         GLenum getTarget(void)                      { return mTarget; }
         GLuint getVboName(void) const               { return mVboName; }
 
+        /// Only use this function for the first upload
+        void _firstUpload( void *data, size_t elementStart, size_t elementCount );
+
         virtual void* map( size_t elementStart, size_t elementCount, MappingState prevMappingState );
         virtual void unmap( UnmapOptions unmapOption );
     };

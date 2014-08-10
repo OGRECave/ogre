@@ -65,6 +65,7 @@ namespace Ogre
             Fence fence( start, end );
             OCGLE( fence.fenceName = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
             mFences.push_back( fence );
+            fence.fenceName = 0; //Prevent the destructor from deleting the sync.
 
             mUnfencedHazards.clear();
         }
@@ -132,7 +133,7 @@ namespace Ogre
 
         if( lastWaitableFence != end )
         {
-            wait( itor->fenceName );
+            wait( lastWaitableFence->fenceName );
             mFences.erase( mFences.begin(), lastWaitableFence + 1 );
         }
 

@@ -38,7 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    GL3PlusVaoManager::GL3PlusVaoManager()
+    GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage ) :
+        mArbBufferStorage( supportsArbBufferStorage )
     {
         //Keep pools of 128MB each for static meshes
         mDefaultPoolSize[CPU_INACCESSIBLE]  = 128 * 1024 * 1024;
@@ -50,12 +51,17 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     GL3PlusVaoManager::~GL3PlusVaoManager()
     {
+        destroyAllVertexArrayObjects();
+        VaoManager::deleteAllBuffers( mVertexBuffers );
+        VaoManager::deleteAllBuffers( mIndexBuffers );
+
         vector<GLuint>::type bufferNames;
 
         bufferNames.reserve( mStagingBuffers[0].size() + mStagingBuffers[1].size() );
 
         for( size_t i=0; i<2; ++i )
         {
+            //Collect the buffer names from all staging buffers to use one API call
             StagingBufferVec::const_iterator itor = mStagingBuffers[i].begin();
             StagingBufferVec::const_iterator end  = mStagingBuffers[i].end();
 
@@ -68,6 +74,7 @@ namespace Ogre
 
         for( size_t i=0; i<MAX_VBO_FLAG; ++i )
         {
+            //Keep collecting the buffer names from all VBOs to use one API call
             VboVec::const_iterator itor = mVbos[i].begin();
             VboVec::const_iterator end  = mVbos[i].end();
 
@@ -298,7 +305,7 @@ namespace Ogre
                                                         this, bufferInterface, vElements, 0, 0, 0 );
 
         if( initialData )
-            bufferInterface->upload( initialData, 0, numElements );
+            bufferInterface->_firstUpload( initialData, 0, numElements );
 
         return retVal;
     }
@@ -361,7 +368,7 @@ namespace Ogre
                                                         this, bufferInterface );
 
         if( initialData )
-            bufferInterface->upload( initialData, 0, numElements );
+            bufferInterface->_firstUpload( initialData, 0, numElements );
 
         return retVal;
     }
@@ -476,6 +483,8 @@ namespace Ogre
                     vertexBinding.offset = multiSourcePool->getBytesOffsetToSource(
                                                             (*itor)->_getSourceIndex() );
                 }
+
+                vao.vertexBuffers.push_back( vertexBinding );
 
                 ++itor;
             }

@@ -44,6 +44,20 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
+    void GL3PlusBufferInterface::_firstUpload( void *data, size_t elementStart, size_t elementCount )
+    {
+        //In OpenGL; immutable buffers are a charade. They're mostly there to satisfy D3D11's needs.
+        //However we emulate the behavior and trying to upload to an immutable buffer will result
+        //in an exception or an assert, thus we temporarily change the type.
+        BufferType originalBufferType = mBuffer->mBufferType;
+        if( mBuffer->mBufferType == BT_IMMUTABLE )
+            mBuffer->mBufferType = BT_DEFAULT;
+
+        upload( data, elementStart, elementCount );
+
+        mBuffer->mBufferType = originalBufferType;
+    }
+    //-----------------------------------------------------------------------------------
     void* GL3PlusBufferInterface::map( size_t elementStart, size_t elementCount,
                                        MappingState prevMappingState )
     {
