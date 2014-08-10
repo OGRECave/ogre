@@ -84,6 +84,8 @@ namespace Ogre
                                                                 IndexBufferPacked *indexBuffer,
                                                                 RenderOperation::OperationType opType ) = 0;
 
+        virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao ) = 0;
+
     public:
         VaoManager();
         virtual ~VaoManager();
@@ -159,9 +161,16 @@ namespace Ogre
         @return
             VertexArrayObject that can be rendered.
         */
-        const VertexArrayObject* createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
-                                                          IndexBufferPacked *indexBuffer,
-                                                          RenderOperation::OperationType opType );
+        VertexArrayObject* createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
+                                                    IndexBufferPacked *indexBuffer,
+                                                    RenderOperation::OperationType opType );
+
+        /** Destroys the input pointer. After this call, it's no longer valid
+        @remarks
+            API memory may or may not be released since VertexArrayObjects
+            may internally share the same API constructs.
+        */
+        void destroyVertexArrayObject( VertexArrayObject *vao );
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks

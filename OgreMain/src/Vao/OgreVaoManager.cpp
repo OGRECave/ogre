@@ -130,8 +130,7 @@ namespace Ogre
         OGRE_DELETE indexBuffer;
     }
     //-----------------------------------------------------------------------------------
-    const VertexArrayObject *VaoManager::createVertexArrayObject(
-                                                            const VertexBufferPackedVec &vertexBuffers,
+    VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
                                                             RenderOperation::OperationType opType )
     {
@@ -169,6 +168,11 @@ namespace Ogre
         }
 
         return createVertexArrayObjectImpl( vertexBuffers, indexBuffer, opType );
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::destroyVertexArrayObject( VertexArrayObject *vao )
+    {
+        destroyVertexArrayObjectImpl( vao );
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* VaoManager::getStagingBuffer( size_t minSizeBytes, bool forUpload )

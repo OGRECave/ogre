@@ -439,7 +439,8 @@ namespace Ogre
             OCGLE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
         }
 
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vaoRef.indexBufferVbo );
+        if( vaoRef.indexBufferVbo )
+            glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vaoRef.indexBufferVbo );
 
         OCGLE( glBindVertexArray( 0 ) );
 
@@ -480,13 +481,23 @@ namespace Ogre
             }
         }
 
-        vao.indexBufferVbo  = static_cast<GL3PlusBufferInterface*>(
-                                indexBuffer->getBufferInterface() )->getVboName();
-        vao.indexType       = indexBuffer->getIndexType();
+        vao.refCount = 0;
+
+        if( indexBuffer )
+        {
+            vao.indexBufferVbo  = static_cast<GL3PlusBufferInterface*>(
+                                    indexBuffer->getBufferInterface() )->getVboName();
+            vao.indexType       = indexBuffer->getIndexType();
+        }
+        else
+        {
+            vao.indexBufferVbo  = 0;
+            vao.indexType       = IndexBufferPacked::IT_16BIT;
+        }
 
         bool bFound = false;
-        VaoVec::const_iterator itor = mVaos.begin();
-        VaoVec::const_iterator end  = mVaos.end();
+        VaoVec::iterator itor = mVaos.begin();
+        VaoVec::iterator end  = mVaos.end();
 
         while( itor != end && !bFound )
         {
@@ -514,7 +525,32 @@ namespace Ogre
                                                                               indexBuffer,
                                                                               opType );
 
+        ++itor->refCount;
+
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::destroyVertexArrayObjectImpl( VertexArrayObject *vao )
+    {
+        GL3PlusVertexArrayObject *glVao = static_cast<GL3PlusVertexArrayObject*>( vao );
+
+        VaoVec::iterator itor = mVaos.begin();
+        VaoVec::iterator end  = mVaos.end();
+
+        while( itor != end && itor->vaoName != glVao->mVaoName )
+            ++itor;
+
+        if( itor != end )
+        {
+            --itor->refCount;
+
+            if( !itor->refCount )
+            {
+                OCGLE( glDeleteVertexArrays( 1, &glVao->mVaoName ) );
+            }
+        }
+
+        OGRE_DELETE glVao;
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* GL3PlusVaoManager::createStagingBuffer( size_t sizeBytes, bool forUpload )

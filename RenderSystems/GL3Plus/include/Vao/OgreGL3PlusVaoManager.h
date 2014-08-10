@@ -114,6 +114,7 @@ namespace Ogre
             VertexBindingVec    vertexBuffers;
             GLuint              indexBufferVbo;
             IndexBufferPacked::IndexType indexType;
+            uint32              refCount;
         };
 
         typedef vector<Vbo>::type VboVec;
@@ -214,6 +215,9 @@ namespace Ogre
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
                                                         RenderOperation::OperationType opType );
+
+        virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
+
     public:
         GL3PlusVaoManager();
         virtual ~GL3PlusVaoManager();

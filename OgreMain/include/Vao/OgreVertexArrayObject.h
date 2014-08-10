@@ -39,6 +39,10 @@ namespace Ogre
 
     struct VertexArrayObject : public VertexArrayObjectAlloc
     {
+        friend class RenderSystem;
+        friend class GL3PlusRenderSystem;
+
+    protected:
         /// ID used for the RenderQueue to sort by VAOs. This ID
         /// may be shared by many VertexArrayObject instances
         uint32 mRenderQueueId;
@@ -50,6 +54,7 @@ namespace Ogre
         /// The type of operation to perform
         RenderOperation::OperationType mOperationType;
 
+    public:
         VertexArrayObject( uint32 renderQueueId, const VertexBufferPackedVec &vertexBuffers,
                            IndexBufferPacked *indexBuffer,
                            RenderOperation::OperationType operationType ) :
