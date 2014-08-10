@@ -254,6 +254,9 @@ namespace Ogre
         */
         void setDetailMapBlendMode( uint8 detailMap, PbsMobileBlendModes blendMode );
 
+        static UvAtlasParams textureLocationToAtlasParams(
+                                            const HlmsTextureManager::TextureLocation &texLocation );
+
         virtual void calculateHash();
     };
 

@@ -60,6 +60,7 @@ uniform @insertpiece( FresnelType ) F0;
 @property( detail_maps_diffuse )uniform lowp sampler2D	texDetailMap[@value( detail_maps_diffuse )];@end
 @property( detail_maps_normal )uniform lowp sampler2D	texDetailNormalMap[@value( detail_maps_normal )];@end
 
+@property( !diffuse_map && detail_maps_diffuse )lowp vec4 diffuseCol;@end
 @property( diffuse_map )lowp vec4 diffuseCol;
 @piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv@value(uv_diffuse).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
 @property( !hw_gamma_read )	//Gamma to linear space
@@ -115,15 +116,30 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 }
 @end
 
-@property( normal_map )mediump vec3 getTSNormal( lowp sampler2D normalMap, lowp vec2 uv0 )
+@property( normal_map_tex )mediump vec3 getTSNormal( lowp sampler2D normalMap, lowp vec2 uv )
 {
 	mediump vec3 tsNormal;
 @property( signed_int_textures )
 	//Normal texture must be in U8V8 or BC5 format!
-	tsNormal.xy = texture2D( normalMap, uv0 * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xy;
+	tsNormal.xy = texture2D( normalMap, uv * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = texture2D( normalMap, uv0  * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xw * 2.0 + 1.0;
+	tsNormal.xy = texture2D( normalMap, uv  * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xw * 2.0 + 1.0;
+@end
+	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
+
+	return tsNormal;
+}
+@end
+@property( detail_maps_normal )mediump vec3 getTSDetailNormal( lowp sampler2D normalMap, lowp vec2 uv )
+{
+	mediump vec3 tsNormal;
+@property( signed_int_textures )
+	//Normal texture must be in U8V8 or BC5 format!
+	tsNormal.xy = texture2D( normalMap, uv ).xy;
+@end @property( !signed_int_textures )
+	//Normal texture must be in LA format!
+	tsNormal.xy = texture2D( normalMap, uv ).xw * 2.0 + 1.0;
 @end
 	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
 
@@ -195,7 +211,7 @@ void main()
 	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
 @end
 @foreach( detail_maps_normal, n )
-	mediump vec3 vDetail@n	= getTSNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy ) * detailWeights.@insertpiece(detail_normal_swizzle@n);@end
+	mediump vec3 vDetail@n	= getTSDetailNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy ) * detailWeights.@insertpiece(detail_normal_swizzle@n);@end
 
 @property( !normal_map )
 	nNormal = normalize( psNormal );
@@ -221,6 +237,8 @@ void main()
 @insertpiece( SampleDiffuseMap )
 @insertpiece( SampleSpecularMap )
 @insertpiece( SampleRoughnessMap )
+
+	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = vec4( 0.0, 0.0, 0.0, 0.0 );@end
 
 @foreach( detail_maps_diffuse, n )
 	@insertpiece( blend_mode_idx@n ) @end

@@ -274,12 +274,8 @@ namespace Ogre
 
         outTexture = texLocation.texture;
 
-        if( outAtlasParams )
-        {
-            outAtlasParams->uOffset   = texLocation.xIdx / (float)texLocation.divisor;
-            outAtlasParams->vOffset   = texLocation.yIdx / (float)texLocation.divisor;
-            outAtlasParams->invDivisor= 1.0f / texLocation.divisor;
-        }
+		if( outAtlasParams )
+			*outAtlasParams = textureLocationToAtlasParams( texLocation );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setDiffuse( const Vector3 &diffuseColour )
@@ -326,7 +322,7 @@ namespace Ogre
     void HlmsPbsMobileDatablock::setTexture( PbsMobileTextureTypes texType, TexturePtr &newTexture,
                                              const UvAtlasParams &atlasParams )
     {
-        bool oldTexExisted = mTexture[texType].isNull();
+		bool oldWasNull = mTexture[texType].isNull();
         mTexture[texType] = newTexture;
 
         if( texType <= PBSM_ROUGHNESS )
@@ -334,15 +330,15 @@ namespace Ogre
             size_t uvAtlasIdx = 0;
 
             for( size_t i=0; i<texType; ++i )
-                uvAtlasIdx += mTexture[i].isNull();
+                uvAtlasIdx += !mTexture[i].isNull();
 
-            if( oldTexExisted != newTexture.isNull() )
+			if( oldWasNull != newTexture.isNull() )
             {
-                if( !oldTexExisted )
+				if( oldWasNull )
                 {
                     //We need to make room for our params
-                    memmove( mUvAtlasParams + uvAtlasIdx + 1, mUvAtlasParams + uvAtlasIdx,
-                             sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx - 1) );
+					memmove( mUvAtlasParams + uvAtlasIdx + 1, mUvAtlasParams + uvAtlasIdx,
+                             sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx) );
                     ++mNumUvAtlas;
                 }
                 else
@@ -360,7 +356,7 @@ namespace Ogre
             }
         }
 
-        if( oldTexExisted != newTexture.isNull() )
+		if( oldWasNull != newTexture.isNull() )
         {
             if( !mSamplerblocks[texType] )
             {
@@ -432,4 +428,15 @@ namespace Ogre
             flushRenderables();
         }
     }
+	//-----------------------------------------------------------------------------------
+	HlmsPbsMobileDatablock::UvAtlasParams HlmsPbsMobileDatablock::textureLocationToAtlasParams(
+												const HlmsTextureManager::TextureLocation &texLocation )
+	{
+		UvAtlasParams retVal;
+		retVal.uOffset   = texLocation.xIdx / (float)texLocation.divisor;
+		retVal.vOffset   = texLocation.yIdx / (float)texLocation.divisor;
+		retVal.invDivisor= 1.0f / texLocation.divisor;
+
+		return retVal;
+	}
 }

@@ -347,7 +347,7 @@ namespace Ogre
 
         bool usesNormalMap = !datablock->mTexture[PBSM_NORMAL].isNull();
         for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
-            usesNormalMap |= !datablock->mTexture[PBSM_NORMAL].isNull();
+			usesNormalMap |= !datablock->mTexture[i].isNull();
         setProperty( PbsMobileProperty::NormalMap, usesNormalMap );
 
         /*setProperty( HlmsBaseProp::, !datablock->mTexture[PBSM_DETAIL0].isNull() );
@@ -810,8 +810,8 @@ namespace Ogre
             if( datablock->mTextureHash != lastTextureHash )
             {
                 //Rebind textures
-                size_t texUnit = mPreparedPass.shadowMaps.size();
-                for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+				size_t texUnit = mPreparedPass.shadowMaps.size();
+				for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
                 {
                     if( !datablock->mTexture[i].isNull() )
                     {
