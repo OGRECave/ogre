@@ -210,8 +210,10 @@ namespace Ogre
 
         GLuint createVao( const Vao &vaoRef );
 
-        virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
-                                                                IndexBufferPacked *indexBuffer ) = 0;
+        virtual VertexArrayObject* createVertexArrayObjectImpl(
+                                                        const VertexBufferPackedVec &vertexBuffers,
+                                                        IndexBufferPacked *indexBuffer,
+                                                        RenderOperation::OperationType opType );
     public:
         GL3PlusVaoManager();
         virtual ~GL3PlusVaoManager();

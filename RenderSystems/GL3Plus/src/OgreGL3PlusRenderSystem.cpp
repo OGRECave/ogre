@@ -56,6 +56,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreHlmsDatablock.h"
+#include "Vao/OgreGL3PlusVaoManager.h"
 #include "Vao/OgreGL3PlusVertexArrayObject.h"
 #include "Vao/OgreIndexBufferPacked.h"
 #include "OgreRoot.h"
@@ -152,6 +153,7 @@ namespace Ogre {
         mCurrentContext = 0;
         mMainContext = 0;
         mGLInitialised = false;
+        mUseAdjacency = false;
         mTextureMipmapCount = 0;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
@@ -688,6 +690,9 @@ namespace Ogre {
         if (!mGLInitialised)
         {
             initialiseContext(win);
+
+            assert( !mVaoManager );
+            mVaoManager = OGRE_NEW GL3PlusVaoManager();
 
             StringVector tokens = StringUtil::split(mGLSupport->getGLVersion(), ".");
             if (!tokens.empty())
@@ -1330,6 +1335,14 @@ namespace Ogre {
         mActiveTessellationDomainGpuProgramParameters.setNull();
         mActiveFragmentGpuProgramParameters.setNull();
 
+        mVertexProgramBound             = false;
+        mGeometryProgramBound           = false;
+        mFragmentProgramBound           = false;
+        mTessellationHullProgramBound   = false;
+        mTessellationDomainProgramBound = false;
+        mComputeProgramBound            = false;
+        mUseAdjacency                   = false;
+
         if( mCurrentVertexShader )
         {
             mCurrentVertexShader->bind();
@@ -1341,6 +1354,8 @@ namespace Ogre {
             mCurrentGeometryShader->bind();
             mActiveGeometryGpuProgramParameters = mCurrentGeometryShader->getDefaultParameters();
             mGeometryProgramBound = true;
+
+            mUseAdjacency = mCurrentGeometryShader->isAdjacencyInfoRequired();
         }
         if( mCurrentHullShader )
         {
@@ -2132,7 +2147,7 @@ namespace Ogre {
         mRenderInstanceAttribsBound.clear();
     }
 
-    virtual void _setVertexArrayObject( const VertexArrayObject *_vao )
+    void GL3PlusRenderSystem::_setVertexArrayObject( const VertexArrayObject *_vao )
     {
         if( _vao )
         {
@@ -2145,8 +2160,10 @@ namespace Ogre {
         }
     }
 
-    virtual void _render( const VertexArrayObject *_vao )
+    void GL3PlusRenderSystem::_render( const VertexArrayObject *_vao )
     {
+        RenderSystem::_render( _vao );
+
         const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( _vao );
 
         GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
@@ -2154,8 +2171,10 @@ namespace Ogre {
 
         //glMultiDrawElementsBaseVertex
         //glMultiDrawElementsIndirect
-        glDrawElementsInstancedBaseVertex( primType, vao->mIndexBuffer->getNumElements(), indexType,
-                                           vao->mIndexBuffer->_getInternalBufferStart(), 1,
+        glDrawElementsInstancedBaseVertex( mCurrentDomainShader ? GL_PATCHES :
+                                                                  vao->mPrimType[mUseAdjacency],
+                                           vao->mIndexBuffer->getNumElements(), indexType,
+                                           (const void*)vao->mIndexBuffer->_getInternalBufferStart(), 1,
                                            vao->mVertexBuffers[0]->_getInternalBufferStart() );
     }
 
@@ -2626,6 +2645,7 @@ namespace Ogre {
             mActiveGeometryGpuProgramParameters.setNull();
             mCurrentGeometryShader->unbind();
             mCurrentGeometryShader = 0;
+            mUseAdjacency = false;
         }
         else if (gptype == GPT_FRAGMENT_PROGRAM && mCurrentFragmentShader)
         {

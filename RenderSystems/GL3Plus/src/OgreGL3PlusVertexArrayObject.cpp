@@ -31,7 +31,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    GL3PlusVertexArrayObject::GL3PlusVertexArrayObject() :
+    GL3PlusOldVertexArrayObject::GL3PlusOldVertexArrayObject() :
         mVAO(0),
         mInitialised(false)
     {
@@ -41,12 +41,12 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Cannot create GL Vertex Array Object",
-                        "GL3PlusVertexArrayObject::GL3PlusVertexArrayObject");
+                        "GL3PlusOldVertexArrayObject::GL3PlusOldVertexArrayObject");
         }
     }
 
     //-----------------------------------------------------------------------
-    GL3PlusVertexArrayObject::~GL3PlusVertexArrayObject()
+    GL3PlusOldVertexArrayObject::~GL3PlusOldVertexArrayObject()
     {
         if(mVAO)
         {
@@ -56,7 +56,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GL3PlusVertexArrayObject::bind(void)
+    void GL3PlusOldVertexArrayObject::bind(void)
     {
         if (mVAO)
         {

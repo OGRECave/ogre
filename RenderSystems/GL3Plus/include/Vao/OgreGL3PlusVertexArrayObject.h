@@ -37,13 +37,44 @@ namespace Ogre
 {
     struct _OgreGL3PlusExport GL3PlusVertexArrayObject : public VertexArrayObject
     {
-        GLuint mVaoName;
+        GLuint  mVaoName;
+        GLint   mPrimType[2];
 
         GL3PlusVertexArrayObject( GLuint vaoName, const VertexBufferPackedVec &vertexBuffers,
-                                  IndexBufferPacked *indexBuffer ) :
-            VertexArrayObject( static_cast<uint32>(vaoName), vertexBuffers, indexBuffer ),
+                                  IndexBufferPacked *indexBuffer,
+                                  RenderOperation::OperationType opType ) :
+            VertexArrayObject( (static_cast<uint32>(vaoName) & 0x3FFFFFF) | (opType << 26),
+                               vertexBuffers, indexBuffer, opType ),
             mVaoName( vaoName )
         {
+            switch( opType )
+            {
+            case RenderOperation::OT_POINT_LIST:
+                mPrimType[0] = GL_POINTS;
+                mPrimType[1] = GL_POINTS;
+                break;
+            case RenderOperation::OT_LINE_LIST:
+                mPrimType[0] = GL_LINES;
+                mPrimType[1] = GL_LINES_ADJACENCY;
+                break;
+            case RenderOperation::OT_LINE_STRIP:
+                mPrimType[0] = GL_LINE_STRIP_ADJACENCY;
+                mPrimType[1] = GL_LINE_STRIP;
+                break;
+            default:
+            case RenderOperation::OT_TRIANGLE_LIST:
+                mPrimType[0] = GL_TRIANGLES_ADJACENCY;
+                mPrimType[1] = GL_TRIANGLES;
+                break;
+            case RenderOperation::OT_TRIANGLE_STRIP:
+                mPrimType[0] = GL_TRIANGLE_STRIP_ADJACENCY;
+                mPrimType[1] = GL_TRIANGLE_STRIP;
+                break;
+            case RenderOperation::OT_TRIANGLE_FAN:
+                mPrimType[0] = GL_TRIANGLE_FAN;
+                mPrimType[1] = GL_TRIANGLE_FAN;
+                break;
+            }
         }
     };
 }

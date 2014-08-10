@@ -33,12 +33,13 @@ THE SOFTWARE.
 
 #include "Vao/OgreVertexBufferPacked.h"
 #include "Vao/OgreIndexBufferPacked.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre
 {
     typedef vector<StagingBuffer*>::type StagingBufferVec;
 
-    class _OgreExport VaoManager
+    class _OgreExport VaoManager : public RenderSysAlloc
     {
     protected:
         Timer *mTimer;
@@ -80,7 +81,8 @@ namespace Ogre
         virtual void destroyIndexBufferImpl( IndexBufferPacked *indexBuffer ) = 0;
 
         virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
-                                                                IndexBufferPacked *indexBuffer ) = 0;
+                                                                IndexBufferPacked *indexBuffer,
+                                                                RenderOperation::OperationType opType ) = 0;
 
     public:
         VaoManager();
@@ -152,11 +154,14 @@ namespace Ogre
             An array of vertex buffers to be bound to the vertex array object.
         @param indexBuffer
             The index buffer to be bound.
+        @param opType
+            Type of operation. Cannot be changed later.
         @return
             VertexArrayObject that can be rendered.
         */
         const VertexArrayObject* createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
-                                                          IndexBufferPacked *indexBuffer );
+                                                          IndexBufferPacked *indexBuffer,
+                                                          RenderOperation::OperationType opType );
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks

@@ -132,7 +132,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     const VertexArrayObject *VaoManager::createVertexArrayObject(
                                                             const VertexBufferPackedVec &vertexBuffers,
-                                                            IndexBufferPacked *indexBuffer )
+                                                            IndexBufferPacked *indexBuffer,
+                                                            RenderOperation::OperationType opType )
     {
         if( vertexBuffers.size() > 1 )
         {
@@ -167,7 +168,7 @@ namespace Ogre
             }
         }
 
-        return createVertexArrayObjectImpl( vertexBuffers, indexBuffer );
+        return createVertexArrayObjectImpl( vertexBuffers, indexBuffer, opType );
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* VaoManager::getStagingBuffer( size_t minSizeBytes, bool forUpload )

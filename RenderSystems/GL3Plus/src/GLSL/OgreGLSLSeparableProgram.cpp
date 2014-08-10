@@ -49,7 +49,7 @@ namespace Ogre
                     fragmentShader,
                     computeShader)
     {
-        mVertexArrayObject = new GL3PlusVertexArrayObject();
+        mVertexArrayObject = new GL3PlusOldVertexArrayObject();
     }
 
     GLSLSeparableProgram::~GLSLSeparableProgram()

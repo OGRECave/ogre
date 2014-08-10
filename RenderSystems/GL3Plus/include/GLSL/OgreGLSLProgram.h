@@ -139,7 +139,7 @@ namespace Ogre {
         GLSLShader* getGeometryShader() const { return mGeometryShader; }
         GLSLShader* getFragmentShader() const { return mFragmentShader; }
         GLSLShader* getComputeShader() const { return mComputeShader; }
-        GL3PlusVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
+        GL3PlusOldVertexArrayObject* getVertexArrayObject() { return mVertexArrayObject; }
 
     protected:
         /// Container of uniform references that are active in the program object
@@ -166,7 +166,7 @@ namespace Ogre {
         /// Linked compute shader.
         GLSLShader* mComputeShader;
         /// GL handle for the vertex array object
-        GL3PlusVertexArrayObject* mVertexArrayObject;
+        GL3PlusOldVertexArrayObject* mVertexArrayObject;
 
         /// Flag to indicate that uniform references have already been built
         bool mUniformRefsBuilt;

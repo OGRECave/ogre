@@ -1486,6 +1486,8 @@ namespace Ogre
         // managed by the RenderSystem
         TextureManager* mTextureManager;
 
+        VaoManager   *mVaoManager;
+
         // Active viewport (dest for future rendering operations)
         Viewport* mActiveViewport;
 

@@ -45,6 +45,8 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
+#include "Vao/OgreVaoManager.h"
+#include "Vao/OgreVertexArrayObject.h"
 
 namespace Ogre {
 
@@ -54,6 +56,7 @@ namespace Ogre {
     RenderSystem::RenderSystem()
         : mActiveRenderTarget(0)
         , mTextureManager(0)
+        , mVaoManager(0)
         , mActiveViewport(0)
         // This means CULL clockwise vertices, i.e. front of poly is counter-clockwise
         // This makes it the same as OpenGL and other right-handed systems
@@ -671,6 +674,9 @@ namespace Ogre {
         }
         OGRE_DELETE primary;
         mRenderTargets.clear();
+
+        OGRE_DELETE mVaoManager;
+        mVaoManager = 0;
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_beginGeometryCount(void)
@@ -784,6 +790,14 @@ namespace Ogre {
             setClipPlanesImpl(mClipPlanes);
             mClipPlanesDirty = false;
         }
+    }
+    //-----------------------------------------------------------------------
+    void RenderSystem::_render( const VertexArrayObject *vao )
+    {
+        // Update stats
+        mFaceCount      += vao->mFaceCount;
+        mVertexCount    += vao->mVertexBuffers[0]->getNumElements();
+        ++mBatchCount;
     }
     void RenderSystem::_renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot)
     {

@@ -439,6 +439,8 @@ namespace Ogre
             OCGLE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
         }
 
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vaoRef.indexBufferVbo );
+
         OCGLE( glBindVertexArray( 0 ) );
 
         return vaoName;
@@ -446,7 +448,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     VertexArrayObject* GL3PlusVaoManager::createVertexArrayObjectImpl(
                                                             const VertexBufferPackedVec &vertexBuffers,
-                                                            IndexBufferPacked *indexBuffer )
+                                                            IndexBufferPacked *indexBuffer,
+                                                            RenderOperation::OperationType opType )
     {
         Vao vao;
 
@@ -508,7 +511,8 @@ namespace Ogre
 
         GL3PlusVertexArrayObject *retVal = OGRE_NEW GL3PlusVertexArrayObject( itor->vaoName,
                                                                               vertexBuffers,
-                                                                              indexBuffer );
+                                                                              indexBuffer,
+                                                                              opType );
 
         return retVal;
     }

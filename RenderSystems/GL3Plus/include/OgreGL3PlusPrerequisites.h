@@ -45,6 +45,7 @@ namespace Ogre {
     class GL3PlusHardwarePixelBuffer;
     class GL3PlusRenderBuffer;
     class GL3PlusDepthBuffer;
+    class GL3PlusVaoManager;
     
     class GLSLShader;
 

@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreVertexBufferPacked.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre
 {
@@ -42,15 +43,41 @@ namespace Ogre
         /// may be shared by many VertexArrayObject instances
         uint32 mRenderQueueId;
 
+        uint32                  mFaceCount; /// For statistics
         VertexBufferPackedVec   mVertexBuffers;
         IndexBufferPacked       *mIndexBuffer;
 
+        /// The type of operation to perform
+        RenderOperation::OperationType mOperationType;
+
         VertexArrayObject( uint32 renderQueueId, const VertexBufferPackedVec &vertexBuffers,
-                           IndexBufferPacked *indexBuffer ) :
+                           IndexBufferPacked *indexBuffer,
+                           RenderOperation::OperationType operationType ) :
             mRenderQueueId( renderQueueId ),
+            mFaceCount( 0 ),
             mVertexBuffers( vertexBuffers ),
-            mIndexBuffer( indexBuffer )
+            mIndexBuffer( indexBuffer ),
+            mOperationType( operationType )
         {
+            size_t val;
+
+            if( mIndexBuffer )
+                val = mIndexBuffer->getNumElements();
+            else
+                val = mVertexBuffers[0]->getNumElements();
+
+            switch( mOperationType )
+            {
+            case RenderOperation::OT_TRIANGLE_LIST:
+                mFaceCount = (val / 3);
+                break;
+            case RenderOperation::OT_TRIANGLE_STRIP:
+            case RenderOperation::OT_TRIANGLE_FAN:
+                mFaceCount = (val - 2);
+                break;
+            default:
+                break;
+            }
         }
     };
 }

@@ -25,8 +25,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
-#ifndef __GL3PlusVERTEXARRAYOBJECT_H__
-#define __GL3PlusVERTEXARRAYOBJECT_H__
+#ifndef __GL3PlusOldVertexArrayObject_H__
+#define __GL3PlusOldVertexArrayObject_H__
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHardwareVertexBuffer.h"
@@ -34,7 +34,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
 
     /** Specialisation of VertexDeclaration for OpenGL Vertex Array Object usage */
-    class GL3PlusVertexArrayObject
+    class GL3PlusOldVertexArrayObject
     {
     protected:
         /// OpenGL id for the vertex array object
@@ -43,8 +43,8 @@ namespace Ogre {
         bool mInitialised;
 
     public:
-        GL3PlusVertexArrayObject();
-        ~GL3PlusVertexArrayObject();
+        GL3PlusOldVertexArrayObject();
+        ~GL3PlusOldVertexArrayObject();
         /// Bind a VAO
         void bind(void);
         bool isInitialised(void) { return mInitialised; }
