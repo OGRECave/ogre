@@ -66,7 +66,13 @@ namespace Ogre
         GL3PlusVaoManager *vaoManager = static_cast<GL3PlusVaoManager*>( mBuffer->mVaoManager );
         bool canPersistentMap = vaoManager->supportsArbBufferStorage();
 
-        uint8 dynamicCurrentFrame = vaoManager->getDynamicBufferCurrentFrame();
+        vaoManager->waitForTailFrameToFinish();
+
+        size_t dynamicCurrentFrame = mBuffer->mFinalBufferStart - mBuffer->mInternalBufferStart;
+        dynamicCurrentFrame /= mBuffer->mNumElements;
+        dynamicCurrentFrame = (dynamicCurrentFrame + 1) % vaoManager->getDynamicBufferMultiplier();
+        mBuffer->mFinalBufferStart = mBuffer->mInternalBufferStart +
+                                        dynamicCurrentFrame * mBuffer->mNumElements;
 
         if( prevMappingState == MS_UNMAPPED || !canPersistentMap )
         {

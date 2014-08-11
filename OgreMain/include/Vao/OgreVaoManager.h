@@ -62,6 +62,8 @@ namespace Ogre
         BufferPackedVec         mIndexBuffers;
         VertexArrayObjectVec    mVertexArrayObjects;
 
+        uint32          mFrameCount;
+
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
                                                             BufferType bufferType,
@@ -212,13 +214,17 @@ namespace Ogre
         */
         StagingBuffer* getStagingBuffer( size_t minSizeBytes, bool forUpload );
 
+        virtual void _update(void);
+
         void _notifyStagingBufferEnteredZeroRef( StagingBuffer *stagingBuffer );
         void _notifyStagingBufferLeftZeroRef( StagingBuffer *stagingBuffer );
 
-
         Timer* getTimer(void)               { return mTimer; }
 
-        uint8 getDynamicBufferMultiplier(void) const        { return mDynamicBufferMultiplier; }
+        uint32 getFrameCount(void)          { return mFrameCount; }
+
+        uint8 _getDynamicBufferCurrentFrameNoWait(void) const   { return mDynamicBufferCurrentFrame; }
+        uint8 getDynamicBufferMultiplier(void) const            { return mDynamicBufferMultiplier; }
     };
 }
 

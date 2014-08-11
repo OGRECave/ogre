@@ -231,10 +231,12 @@ namespace Ogre
         */
         virtual StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload );
 
-        virtual void update(void);
+        virtual void _update(void);
 
-        uint8 getDynamicBufferCurrentFrame(void) const;
-        uint8 getDynamicBufferMultiplier(void) const        { return mDynamicBufferMultiplier; }
+        /// Returns the current frame # (which wraps to 0 every mDynamicBufferMultiplier
+        /// times). But first stalls until that mDynamicBufferMultiplier-1 frame behind
+        /// is finished.
+        uint8 waitForTailFrameToFinish(void);
     };
 }
 

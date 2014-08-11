@@ -1014,6 +1014,11 @@ namespace Ogre {
         delete context;
     }
     //---------------------------------------------------------------------
+    void RenderSystem::_update(void)
+    {
+        mVaoManager->_update();
+    }
+    //---------------------------------------------------------------------
     const String& RenderSystem::_getDefaultViewportMaterialScheme( void ) const
     {
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS   

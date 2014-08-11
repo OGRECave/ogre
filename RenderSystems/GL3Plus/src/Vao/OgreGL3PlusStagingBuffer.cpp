@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const GLuint64 kOneSecondInNanoSeconds = 1000000000;
+    static const GLuint64 kOneSecondInNanoSeconds = 1000000000;
 
     GL3PlusStagingBuffer::GL3PlusStagingBuffer( size_t internalBufferStart, size_t sizeBytes,
                                                 VaoManager *vaoManager, bool uploadOnly,

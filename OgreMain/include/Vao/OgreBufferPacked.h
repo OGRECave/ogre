@@ -81,7 +81,8 @@ namespace Ogre
         friend class GL3PlusBufferInterface;
 
     protected:
-        size_t mInternalBufferStart;    /// In elements
+        size_t mInternalBufferStart;  /// In elements
+        size_t mFinalBufferStart;     /// In elements, includes dynamic buffer frame offset
         size_t mNumElements;
         uint32 mBytesPerElement;
 
@@ -107,6 +108,11 @@ namespace Ogre
         size_t          mLastMappingCount;
 
         void *mShadowCopy;
+
+#ifndef NDEBUG
+        /// Used by Dynamic buffers only
+        uint32 mLastFrameMapped;
+#endif
 
     public:
 
@@ -154,6 +160,12 @@ namespace Ogre
 
         virtual void disposeTicket( AsyncTicket *ticket ) = 0;
 
+        /**
+        @remarks
+            You can only map once per frame, regardless of parameters.
+            map( 0, 1 ) followed by map( 1, 1 ); is invalid.
+            If you plan modifying elements 0 and 1; you should call map( 0, 2 )
+        */
         void* map( size_t elementStart, size_t elementCount, MappingState persistentMethod );
         void unmap( UnmapOptions unmapOption );
 
@@ -162,6 +174,7 @@ namespace Ogre
         uint32 getTotalSizeBytes(void) const    { return mNumElements * mBytesPerElement; }
 
         size_t _getInternalBufferStart(void) const              { return mInternalBufferStart; }
+        size_t _getFinalBufferStart(void) const                 { return mFinalBufferStart; }
     };
 
     typedef vector<BufferPacked*>::type BufferPackedVec;

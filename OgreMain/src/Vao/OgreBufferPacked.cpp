@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "Vao/OgreBufferPacked.h"
 #include "Vao/OgreBufferInterface.h"
+#include "Vao/OgreVaoManager.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 
@@ -37,6 +38,7 @@ namespace Ogre
                                 BufferType bufferType, void *initialData, bool keepAsShadow,
                                 VaoManager *vaoManager, BufferInterface *bufferInterface ) :
         mInternalBufferStart( internalBufferStart ),
+        mFinalBufferStart( internalBufferStart ),
         mNumElements( numElements ),
         mBytesPerElement( bytesPerElement ),
         mBufferType( bufferType ),
@@ -45,7 +47,8 @@ namespace Ogre
         mMappingStart( 0 ),
         mMappingCount( 0 ),
         mBufferInterface( bufferInterface ),
-        mShadowCopy( 0 )
+        mShadowCopy( 0 ),
+        mLastFrameMapped( ~0 )
     {
         mBufferInterface->_notifyBuffer( this );
 
@@ -119,6 +122,17 @@ namespace Ogre
                          "persistentMethod cannot be MS_UNMAPPED",
                          "BufferPacked::map" );
         }
+
+#ifndef NDEBUG
+        if( mLastFrameMapped == mVaoManager->getFrameCount() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Mapping the buffer twice within the same frame detected! This is not allowed.",
+                         "BufferPacked::map" );
+        }
+
+        mLastFrameMapped = mVaoManager->getFrameCount();
+#endif
 
         //Can't map twice, unless this is a persistent mapping and we're
         //being called with the same persistency flag as before.

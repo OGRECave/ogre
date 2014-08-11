@@ -2178,7 +2178,7 @@ namespace Ogre {
         GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
                                                             GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
-        const void *indexOffset = (const void*)(vao->mIndexBuffer->_getInternalBufferStart() *
+        const void *indexOffset = (const void*)(vao->mIndexBuffer->_getFinalBufferStart() *
                                                 vao->mIndexBuffer->getBytesPerElement());
 
         //glMultiDrawElementsBaseVertex
@@ -2187,8 +2187,8 @@ namespace Ogre {
                                                                   vao->mPrimType[mUseAdjacency],
                                            vao->mIndexBuffer->getNumElements(),
                                            indexType, indexOffset, 1,
-                                           vao->mVertexBuffers[0]->_getInternalBufferStart() );
-        /*glDrawArrays( vao->mPrimType[mUseAdjacency], vao->mVertexBuffers[0]->_getInternalBufferStart(),
+                                           vao->mVertexBuffers[0]->_getFinalBufferStart() );
+        /*glDrawArrays( vao->mPrimType[mUseAdjacency], vao->mVertexBuffers[0]->_getFinalBufferStart(),
                       vao->mVertexBuffers[0]->getNumElements() );*/
     }
 

@@ -39,7 +39,8 @@ namespace Ogre
         mDefaultStagingBufferLifetime( 300000 ), //5 minutes
         mNextStagingBufferTimestampCheckpoint( ~0 ),
         mDynamicBufferMultiplier( 3 ),
-        mDynamicBufferCurrentFrame( 0 )
+        mDynamicBufferCurrentFrame( 0 ),
+        mFrameCount( 0 )
     {
         mTimer = OGRE_NEW Timer();
     }
@@ -268,6 +269,11 @@ namespace Ogre
         }
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::_update(void)
+    {
+        ++mFrameCount;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::_notifyStagingBufferEnteredZeroRef( StagingBuffer *stagingBuffer )

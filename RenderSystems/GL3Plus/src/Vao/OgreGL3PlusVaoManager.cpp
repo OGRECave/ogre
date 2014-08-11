@@ -38,6 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    static const GLuint64 kOneSecondInNanoSeconds = 1000000000;
+
     GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage ) :
         mArbBufferStorage( supportsArbBufferStorage )
     {
@@ -586,8 +588,10 @@ namespace Ogre
         return stagingBuffer;
     }
     //-----------------------------------------------------------------------------------
-    void GL3PlusVaoManager::update(void)
+    void GL3PlusVaoManager::_update(void)
     {
+        VaoManager::_update();
+
         unsigned long currentTimeMs = mTimer->getMilliseconds();
 
         FastArray<GLuint> bufferNames;
@@ -640,9 +644,47 @@ namespace Ogre
             bufferNames.clear();
         }
 
-        OCGLE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
+        if( mFrameSyncVec[mDynamicBufferCurrentFrame] )
+        {
+            OCGLE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
+        }
         OCGLE( mFrameSyncVec[mDynamicBufferCurrentFrame] = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
         mDynamicBufferCurrentFrame = (mDynamicBufferCurrentFrame + 1) % mDynamicBufferMultiplier;
+    }
+    //-----------------------------------------------------------------------------------
+    uint8 GL3PlusVaoManager::waitForTailFrameToFinish(void)
+    {
+        if( mFrameSyncVec[mDynamicBufferCurrentFrame] )
+        {
+            GLbitfield waitFlags    = 0;
+            GLuint64 waitDuration   = 0;
+            while( true )
+            {
+                GLenum waitRet = glClientWaitSync( mFrameSyncVec[mDynamicBufferCurrentFrame], waitFlags, waitDuration );
+                if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
+                {
+                    OCGLE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
+                    mFrameSyncVec[mDynamicBufferCurrentFrame] = 0;
+
+                    return mDynamicBufferCurrentFrame;
+                }
+
+                if( waitRet == GL_WAIT_FAILED )
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "Failure while waiting for a GL Fence. Could be out of GPU memory. "
+                                 "Update your video card drivers. If that doesn't help, "
+                                 "contact the developers.",
+                                 "GL3PlusVaoManager::getDynamicBufferCurrentFrame" );
+                }
+
+                // After the first time, need to start flushing, and wait for a looong time.
+                waitFlags = GL_SYNC_FLUSH_COMMANDS_BIT;
+                waitDuration = kOneSecondInNanoSeconds;
+            }
+        }
+
+        return mDynamicBufferCurrentFrame;
     }
     //-----------------------------------------------------------------------------------
     /*IndexBufferPacked* GL3PlusVaoManager::createIndexBufferImpl( IndexBufferPacked::IndexType indexType,
