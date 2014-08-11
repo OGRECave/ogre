@@ -38,8 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    extern const String c_blendModes[];
-    const String c_blendModes[] =
+    extern const String c_pbsBlendModes[];
+    const String c_pbsBlendModes[] =
     {
         "NormalNonPremul", "NormalPremul", "Add", "Subtract", "Multiply",
         "Multiply2x", "Screen", "Overlay", "Lighten", "Darken", "GrainExtract",
@@ -212,8 +212,8 @@ namespace Ogre
                 for( size_t j=0; j<NUM_PBSM_BLEND_MODES; ++j )
                 {
                     String blendModeLowerCase;
-                    blendModeLowerCase.resize( c_blendModes[j].size() );
-                    std::transform( c_blendModes[j].begin(), c_blendModes[j].end(),
+                    blendModeLowerCase.resize( c_pbsBlendModes[j].size() );
+                    std::transform( c_pbsBlendModes[j].begin(), c_pbsBlendModes[j].end(),
                                     blendModeLowerCase.begin(), ::tolower );
                     StringUtil::toLowerCase( paramVal );
 

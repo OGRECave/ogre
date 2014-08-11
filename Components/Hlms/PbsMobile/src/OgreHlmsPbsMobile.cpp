@@ -133,7 +133,7 @@ namespace Ogre
         &PbsMobileProperty::BlendModeIndex3
     };
 
-    extern const String c_blendModes[];
+    extern const String c_pbsBlendModes[];
 
     const String c_vsPerObjectUniforms[] =
     {
@@ -283,7 +283,7 @@ namespace Ogre
                 if( diffuseMaps )
                 {
                     inOutPieces[PixelShader][*PbsMobileProperty::BlendModes[validDetailMaps]] =
-                                                "@insertpiece( " + c_blendModes[blendMode] + ")";
+                                                "@insertpiece( " + c_pbsBlendModes[blendMode] + ")";
                 }
 
                 const char *swizzles[4] = { "x", "y", "z", "w" };

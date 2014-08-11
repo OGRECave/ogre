@@ -680,7 +680,11 @@ namespace Ogre {
 
         // Allocate new buffer
         uint32 heighestRes = std::max( std::max( mWidth, mHeight ), mDepth );
+#if ANDROID
+        mNumMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) / logf( 2.0f ) ) );
+#else
         mNumMipmaps = static_cast<uint8>( floorf( log2f( static_cast<float>(heighestRes) ) ) );
+#endif
         mBufSize    = calculateSize(mNumMipmaps, getNumFaces(), mWidth, mHeight, mDepth, mFormat);
         mBuffer     = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
 
