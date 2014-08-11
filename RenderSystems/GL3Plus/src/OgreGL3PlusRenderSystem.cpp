@@ -2178,13 +2178,18 @@ namespace Ogre {
         GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
                                                             GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
+        const void *indexOffset = (const void*)(vao->mIndexBuffer->_getInternalBufferStart() *
+                                                vao->mIndexBuffer->getBytesPerElement());
+
         //glMultiDrawElementsBaseVertex
         //glMultiDrawElementsIndirect
         glDrawElementsInstancedBaseVertex( mCurrentDomainShader ? GL_PATCHES :
                                                                   vao->mPrimType[mUseAdjacency],
-                                           vao->mIndexBuffer->getNumElements(), indexType,
-                                           (const void*)vao->mIndexBuffer->_getInternalBufferStart(), 1,
+                                           vao->mIndexBuffer->getNumElements(),
+                                           indexType, indexOffset, 1,
                                            vao->mVertexBuffers[0]->_getInternalBufferStart() );
+        /*glDrawArrays( vao->mPrimType[mUseAdjacency], vao->mVertexBuffers[0]->_getInternalBufferStart(),
+                      vao->mVertexBuffers[0]->getNumElements() );*/
     }
 
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,
