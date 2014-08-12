@@ -364,8 +364,7 @@ namespace Ogre
 #if OGRE_NO_GLES3_SUPPORT == 0
                         case GCT_SAMPLER2DARRAY:
 #endif
-                            // Samplers handled like 1-element ints
-                            OGRE_CHECK_GL_ERROR(glProgramUniform1ivEXT(progID, currentUniform->mLocation, 1,
+                            OGRE_CHECK_GL_ERROR(glProgramUniform1ivEXT(progID, currentUniform->mLocation, glArraySize,
                                                                        params->getIntPointer(def->physicalIndex)));
                             break;
 #if OGRE_NO_GLES3_SUPPORT == 0

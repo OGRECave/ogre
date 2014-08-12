@@ -124,7 +124,7 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 	tsNormal.xy = texture2D( normalMap, uv * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = texture2D( normalMap, uv  * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xw * 2.0 + 1.0;
+	tsNormal.xy = texture2D( normalMap, uv  * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xw * 2.0 - 1.0;
 @end
 	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
 
@@ -139,7 +139,7 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 	tsNormal.xy = texture2D( normalMap, uv ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = texture2D( normalMap, uv ).xw * 2.0 + 1.0;
+	tsNormal.xy = texture2D( normalMap, uv ).xw * 2.0 - 1.0;
 @end
 	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
 

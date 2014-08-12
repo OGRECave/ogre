@@ -383,8 +383,7 @@ namespace Ogre {
                     case GCT_SAMPLER2DSHADOW:
                     case GCT_SAMPLER3D:
                     case GCT_SAMPLERCUBE:
-                        // Samplers handled like 1-element ints
-                        OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, 1, 
+                        OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize, 
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
                         break;
                     case GCT_SAMPLER2DARRAY:

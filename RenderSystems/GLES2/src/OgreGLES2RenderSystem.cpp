@@ -262,6 +262,18 @@ namespace Ogre {
             rsc->setCapability(RSC_HWOCCLUSION);
         }
 
+        GLint maxRes2d, maxRes3d, maxResCube;
+        OGRE_CHECK_GL_ERROR( glGetIntegerv( GL_MAX_TEXTURE_SIZE,            &maxRes2d ) );
+#if OGRE_NO_GLES3_SUPPORT == 0
+        OGRE_CHECK_GL_ERROR( glGetIntegerv( GL_MAX_3D_TEXTURE_SIZE,         &maxRes3d ) );
+#else
+        maxRes3d = 0;
+#endif
+        OGRE_CHECK_GL_ERROR( glGetIntegerv( GL_MAX_CUBE_MAP_TEXTURE_SIZE,   &maxResCube ) );
+
+        rsc->setMaximumResolutions( static_cast<ushort>(maxRes2d), static_cast<ushort>(maxRes3d),
+                                    static_cast<ushort>(maxResCube) );
+
         // OpenGL ES - Check for these extensions too
         // For 2.0, http://www.khronos.org/registry/gles/api/2.0/gl2ext.h
 
@@ -1384,7 +1396,7 @@ namespace Ogre {
         // this is mostly to avoid holding bound programs that might get deleted
         // outside via the resource manager
         unbindGpuProgram(GPT_VERTEX_PROGRAM);
-		unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
+        unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         static_cast<EAGLES2Context*>(mMainContext)->bindSampleFramebuffer();
