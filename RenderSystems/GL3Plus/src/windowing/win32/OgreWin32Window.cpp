@@ -153,7 +153,8 @@ namespace Ogre {
             if ((opt = miscParams->find("externalWindowHandle")) != end)
             {
                 mHWnd = (HWND)StringConverter::parseSizeT(opt->second);
-                if (mHWnd)
+				
+				if (IsWindow(mHWnd) && mHWnd)
                 {
                     mIsExternal = true;
                     mIsFullScreen = false;
@@ -442,10 +443,8 @@ namespace Ogre {
             {
                 WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
                 WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-
-                WGL_CONTEXT_FLAGS_ARB,
             #if OGRE_DEBUG_MODE
-                    WGL_CONTEXT_DEBUG_BIT_ARB,
+				WGL_CONTEXT_FLAGS_ARB,  WGL_CONTEXT_DEBUG_BIT_ARB,
             #endif
                 WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
                 0, 0
