@@ -344,19 +344,19 @@ namespace Ogre
                         uint32 kernelVal = kernel[k_y+2][k_x+2];
 
     #ifdef OGRE_DOWNSAMPLE_R
-                        uint32 r = srcPtr[k_y * srcWidth + k_x + OGRE_DOWNSAMPLE_R];
+                        uint32 r = srcPtr[(k_y * srcWidth + k_x) * OGRE_TOTAL_SIZE + OGRE_DOWNSAMPLE_R];
                         accumR += r * r * kernelVal;
     #endif
     #ifdef OGRE_DOWNSAMPLE_G
-                        uint32 g = srcPtr[k_y * srcWidth + k_x + OGRE_DOWNSAMPLE_G];
+                        uint32 g = srcPtr[(k_y * srcWidth + k_x) * OGRE_TOTAL_SIZE + OGRE_DOWNSAMPLE_G];
                         accumG += g * g * kernelVal;
     #endif
     #ifdef OGRE_DOWNSAMPLE_B
-                        uint32 b = srcPtr[k_y * srcWidth + k_x + OGRE_DOWNSAMPLE_B];
+                        uint32 b = srcPtr[(k_y * srcWidth + k_x) * OGRE_TOTAL_SIZE + OGRE_DOWNSAMPLE_B];
                         accumB += b * b * kernelVal;
     #endif
     #ifdef OGRE_DOWNSAMPLE_A
-                        uint32 a = srcPtr[k_y * srcWidth + k_x + OGRE_DOWNSAMPLE_A];
+                        uint32 a = srcPtr[(k_y * srcWidth + k_x) * OGRE_TOTAL_SIZE + OGRE_DOWNSAMPLE_A];
                         accumA += a * kernelVal;
     #endif
 
@@ -385,7 +385,8 @@ namespace Ogre
                 srcPtr += OGRE_TOTAL_SIZE * 2;
             }
 
-            srcPtr += (dstWidth - srcWidth * 2) * OGRE_TOTAL_SIZE;
+            srcPtr += (srcWidth - dstWidth * 2) * OGRE_TOTAL_SIZE;
+            srcPtr += srcWidth * OGRE_TOTAL_SIZE;
         }
     }
     //-----------------------------------------------------------------------------------

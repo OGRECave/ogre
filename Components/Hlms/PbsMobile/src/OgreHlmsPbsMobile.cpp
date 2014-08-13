@@ -219,6 +219,11 @@ namespace Ogre
             assert( !datablock->mTexture[PBSM_SPECULAR].isNull() );
             psParams->setNamedConstant( "texSpecularMap", texUnit++ );
         }
+        if( getProperty( PbsMobileProperty::RoughnessMap ) )
+        {
+            assert( !datablock->mTexture[PBSM_ROUGHNESS].isNull() );
+            psParams->setNamedConstant( "texRoughnessMap", texUnit++ );
+        }
         if( getProperty( PbsMobileProperty::EnvProbeMap ) )
         {
             assert( !datablock->mTexture[PBSM_REFLECTION].isNull() );

@@ -154,14 +154,19 @@ namespace Ogre
         // The last problem is a subset of the 3rd problem
         //
         //  See Texture::_loadImages
-        HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
-        const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, entryIdx,
-                                                               pixelBufferBuf->getWidth(),
-                                                               pixelBufferBuf->getHeight(),
-                                                               entryIdx + 1 ),
-                                                          HardwareBuffer::HBL_DISCARD );
-        PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, srcBaseMip), currImage );
-        pixelBufferBuf->unlock();
+        uint8 minMipmaps = std::min<uint8>( srcImage.getNumMipmaps() - srcBaseMip,
+                                            dst->getNumMipmaps() ) + 1;
+        for( uint8 j=0; j<minMipmaps; ++j )
+        {
+            HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0, j);
+            const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, entryIdx,
+                                                                   pixelBufferBuf->getWidth(),
+                                                                   pixelBufferBuf->getHeight(),
+                                                                   entryIdx + 1 ),
+                                                              HardwareBuffer::HBL_DISCARD );
+            PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
+            pixelBufferBuf->unlock();
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsTextureManager::copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
@@ -194,19 +199,22 @@ namespace Ogre
             pixelBufferBuf->unlock();
         }
         else*/
+        uint8 minMipmaps = std::min<uint8>( srcImage.getNumMipmaps() - srcBaseMip,
+                                            dst->getNumMipmaps() ) + 1;
+        for( uint8 j=0; j<minMipmaps; ++j )
         {
-            HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
-            const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * srcImage.getWidth(),
-                                                                   yBlock * srcImage.getHeight(),
+            HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0, j);
+            const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * pixelBufferBuf->getWidth(),
+                                                                   yBlock * pixelBufferBuf->getHeight(),
                                                                    0,
-                                                                   nextX * srcImage.getWidth(),
-                                                                   nextY * srcImage.getHeight(),
+                                                                   nextX * pixelBufferBuf->getWidth(),
+                                                                   nextY * pixelBufferBuf->getHeight(),
                                                                    dst->getDepth() ),
                                                               HardwareBuffer::HBL_DISCARD );
             if( isNormalMap )
-                PixelUtil::convertForNormalMapping( srcImage.getPixelBox(0, srcBaseMip), currImage );
+                PixelUtil::convertForNormalMapping( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
             else
-                PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, srcBaseMip), currImage );
+                PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
             pixelBufferBuf->unlock();
         }
     }
@@ -284,6 +292,12 @@ namespace Ogre
                     textureArray.texture->getDepth()  == image.getDepth()  &&
                     textureArray.texture->getFormat() == imageFormat )
                 {
+                    if( image.getNumFaces() != textureArray.texture->getNumMipmaps() )
+                    {
+                        image.generateMipmaps( mDefaultTextureParameters[mapType].
+                                               hwGammaCorrection );
+                    }
+
                     //Bingo! Add this.
                     if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                     {
@@ -490,6 +504,12 @@ namespace Ogre
 
                     if( texType != TEX_TYPE_3D && texType != TEX_TYPE_CUBE_MAP )
                     {
+                        if( image.getNumFaces() != textureArray.texture->getNumMipmaps() )
+                        {
+                            image.generateMipmaps( mDefaultTextureParameters[mapType].
+                                                   hwGammaCorrection );
+                        }
+
                         if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                         {
                             copyTextureToArray( image, textureArray.texture,

@@ -681,14 +681,16 @@ namespace Ogre {
         // Allocate new buffer
         uint32 heighestRes = std::max( std::max( mWidth, mHeight ), mDepth );
 #if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1700))
-        mNumMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) / logf( 2.0f ) ) );
+        mNumMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) /
+                                                  logf( 2.0f ) ) );
 #else
         mNumMipmaps = static_cast<uint8>( floorf( log2f( static_cast<float>(heighestRes) ) ) );
 #endif
         mBufSize    = calculateSize(mNumMipmaps, getNumFaces(), mWidth, mHeight, mDepth, mFormat);
         mBuffer     = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
 
-        for( size_t i=0; i<6; ++i )
+        size_t numFaces = std::max<size_t>( mDepth, getNumFaces() );
+        for( size_t i=0; i<numFaces; ++i )
         {
             PixelBox tempBox = temp.getPixelBox( i );
             memcpy( this->getPixelBox( i ).data, tempBox.data, tempBox.getConsecutiveSize() );
