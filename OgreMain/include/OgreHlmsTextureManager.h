@@ -152,11 +152,12 @@ namespace Ogre
 
         TexturePtr mBlankTexture;
 
-        static void copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx );
+        static void copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx, uint8 srcBaseMip );
         static void copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
                                         uint16 entryIdx, uint16 sqrtMaxTextures,
-                                        bool isNormalMap );
-        static void copy3DTexture( const Image &srcImage, TexturePtr dst, uint16 sliceStart, uint16 sliceEnd );
+                                        uint8 srcBaseMip, bool isNormalMap );
+        static void copy3DTexture( const Image &srcImage, TexturePtr dst,
+                                   uint16 sliceStart, uint16 sliceEnd, uint8 srcBaseMip );
 
         /// Looks for the first image it can successfully load from the pack, and extracts its parameters.
         /// Returns false if failed to retrieve parameters.

@@ -143,7 +143,8 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsTextureManager::copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx )
+    void HlmsTextureManager::copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx,
+                                                 uint8 srcBaseMip )
     {
         //TODO: Deal with mipmaps (& cubemaps & 3D? does it work?). We could have:
         //  * Original image has mipmaps, we use them all
@@ -159,13 +160,13 @@ namespace Ogre
                                                                pixelBufferBuf->getHeight(),
                                                                entryIdx + 1 ),
                                                           HardwareBuffer::HBL_DISCARD );
-        PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
+        PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, srcBaseMip), currImage );
         pixelBufferBuf->unlock();
     }
     //-----------------------------------------------------------------------------------
     void HlmsTextureManager::copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
                                                  uint16 entryIdx, uint16 sqrtMaxTextures,
-                                                 bool isNormalMap )
+                                                 uint8 srcBaseMip, bool isNormalMap )
     {
         //TODO: Deal with mipmaps (& cubemaps & 3D? does it work?).
         size_t xBlock = entryIdx % sqrtMaxTextures;
@@ -183,7 +184,7 @@ namespace Ogre
                                                                    dst->getDepth() ),
                                                               HardwareBuffer::HBL_DISCARD );
                                                               //HardwareBuffer::HBL_NORMAL );
-            PixelUtil::bulkCompressedSubregion( srcImage.getPixelBox(), currImage,
+            PixelUtil::bulkCompressedSubregion( srcImage.getPixelBox(0, srcBaseMip), currImage,
                                                 Box( xBlock * srcImage.getWidth(),
                                                      yBlock * srcImage.getHeight(),
                                                      0,
@@ -203,19 +204,20 @@ namespace Ogre
                                                                    dst->getDepth() ),
                                                               HardwareBuffer::HBL_DISCARD );
             if( isNormalMap )
-                PixelUtil::convertForNormalMapping( srcImage.getPixelBox(), currImage );
+                PixelUtil::convertForNormalMapping( srcImage.getPixelBox(0, srcBaseMip), currImage );
             else
-                PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
+                PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, srcBaseMip), currImage );
             pixelBufferBuf->unlock();
         }
     }
     //-----------------------------------------------------------------------------------
     void HlmsTextureManager::copy3DTexture( const Image &srcImage, TexturePtr dst,
-                                            uint16 sliceStart, uint16 sliceEnd )
+                                            uint16 sliceStart, uint16 sliceEnd, uint8 srcBaseMip )
     {
         for( uint16 i=sliceStart; i<sliceEnd; ++i )
         {
-            uint8 minMipmaps = std::min( srcImage.getNumMipmaps(), dst->getNumMipmaps() ) + 1;
+            uint8 minMipmaps = std::min<uint8>( srcImage.getNumMipmaps() - srcBaseMip,
+                                                dst->getNumMipmaps() ) + 1;
             for( uint8 j=0; j<minMipmaps; ++j )
             {
                 HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer( i, j );
@@ -225,7 +227,9 @@ namespace Ogre
                                                                        1 ),
                                                                   HardwareBuffer::HBL_DISCARD );
 
-                PixelUtil::bulkPixelConversion( srcImage.getPixelBox( i - sliceStart, j ), currImage );
+                PixelUtil::bulkPixelConversion( srcImage.getPixelBox( i - sliceStart,
+                                                                      srcBaseMip + j ),
+                                                currImage );
                 pixelBufferBuf->unlock();
             }
         }
@@ -253,7 +257,7 @@ namespace Ogre
         if( it == mEntries.end() || it->name != searchName.name )
         {
             Image image;
-			image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+            image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
             PixelFormat imageFormat = image.getFormat();
             if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 )
@@ -283,13 +287,14 @@ namespace Ogre
                     //Bingo! Add this.
                     if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                     {
-                        copyTextureToArray( image, textureArray.texture, textureArray.entries.size() );
+                        copyTextureToArray( image, textureArray.texture,
+                                            textureArray.entries.size(), 0 );
                     }
                     else
                     {
                         copyTextureToAtlas( image, textureArray.texture,
                                             textureArray.entries.size(), textureArray.sqrtMaxTextures,
-                                            textureArray.isNormalMap );
+                                            textureArray.isNormalMap, 0 );
                     }
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
@@ -341,7 +346,7 @@ namespace Ogre
 
                     if( mDefaultTextureParameters[mapType].packingMethod == Atlas )
                     {
-                        limit        = static_cast<uint>( ceilf( sqrtf( limitSquared ) ) );
+                        limit        = static_cast<uint>( ceilf( sqrtf( (Real)limitSquared ) ) );
                         limitSquared = limit * limit;
                     }
 
@@ -351,6 +356,7 @@ namespace Ogre
                     TextureType texType = TEX_TYPE_2D;
 
                     uint width, height, depth;
+                    uint8 mipLevel = 0;
 
                     depth = image.getDepth();
 
@@ -403,15 +409,69 @@ namespace Ogre
                         width  = image.getWidth() * limit;
                         height = image.getHeight() * limit;
 
-                        if( width  > maxResolution || height > maxResolution )
+                        if( !maxResolution )
                         {
-                            limit = maxResolution / image.getWidth();
-                            limit = std::min<uint>( limit, maxResolution / image.getHeight() );
+                            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                         "Maximum resolution for this type of texture is 0.\n"
+                                         "Either a driver bug, or this GPU cannot support 2D/"
+                                         "Cubemap/3D texture: " + texName,
+                                         "HlmsTextureManager::createOrRetrieveTexture" );
+                        }
+
+                        if( width > maxResolution || height > maxResolution )
+                        {
+                            uint imageWidth  = image.getWidth();
+                            uint imageHeight = image.getHeight();
+
+                            if( imageWidth > maxResolution || height > maxResolution )
+                            {
+                                //Ok, not even a single texture can fit the Atlas.
+                                //Take a smaller mip. If the texture doesn't have
+                                //mipmaps, resize it.
+                                bool resize = true;
+                                if( image.getNumMipmaps() )
+                                {
+                                    resize = false;
+                                    while( (imageWidth > maxResolution || height > maxResolution)
+                                           && (mipLevel <= image.getNumMipmaps()) )
+                                    {
+                                        imageWidth  >>= 1;
+                                        imageHeight >>= 1;
+                                        ++mipLevel;
+                                    }
+
+                                    if( (imageWidth > maxResolution || height > maxResolution) )
+                                        resize = true;
+                                }
+
+                                if( resize )
+                                {
+                                    mipLevel = 0;
+                                    Real aspectRatio = (Real)image.getWidth() / (Real)image.getHeight();
+                                    if( image.getWidth() >= image.getHeight() )
+                                    {
+                                        imageWidth  = maxResolution;
+                                        imageHeight = static_cast<uint>( floorf( maxResolution /
+                                                                                 aspectRatio ) );
+                                    }
+                                    else
+                                    {
+                                        imageWidth  = static_cast<uint>( floorf( maxResolution *
+                                                                                 aspectRatio ) );
+                                        imageHeight = maxResolution;
+                                    }
+
+                                    image.resize( maxResolution, maxResolution );
+                                }
+                            }
+
+                            limit = maxResolution / imageWidth;
+                            limit = std::min<uint>( limit, maxResolution / imageHeight );
 
                             textureArray.maxTextures     = limit * limit;
                             textureArray.sqrtMaxTextures = limit;
-                            width  = image.getWidth() * limit;
-                            height = image.getHeight() * limit;
+                            width  = imageWidth  * limit;
+                            height = imageHeight * limit;
                         }
                     }
 
@@ -432,18 +492,21 @@ namespace Ogre
                     {
                         if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                         {
-                            copyTextureToArray( image, textureArray.texture, textureArray.entries.size() );
+                            copyTextureToArray( image, textureArray.texture,
+                                                textureArray.entries.size(), mipLevel );
                         }
                         else
                         {
                             copyTextureToAtlas( image, textureArray.texture, textureArray.entries.size(),
-                                                textureArray.sqrtMaxTextures, textureArray.isNormalMap );
+                                                textureArray.sqrtMaxTextures, mipLevel,
+                                                textureArray.isNormalMap );
                         }
                     }
                     else
                     {
                         copy3DTexture( image, textureArray.texture, 0,
-                                       std::max<uint32>( image.getNumFaces(), image.getDepth() ) );
+                                       std::max<uint32>( image.getNumFaces(), image.getDepth() ),
+                                       mipLevel );
                     }
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
@@ -623,7 +686,7 @@ namespace Ogre
                         }
                     }
 
-                    copy3DTexture( cubeMap, textureArray.texture, 0, 6 );
+                    copy3DTexture( cubeMap, textureArray.texture, 0, 6, 0 );
 
                     it = mEntries.insert( it, TextureEntry( searchName.name, TEXTURE_TYPE_ENV_MAP,
                                                             mTextureArrays[TEXTURE_TYPE_ENV_MAP].size(), 0 ) );
