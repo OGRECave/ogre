@@ -1944,29 +1944,27 @@ bail:
         StencilOperation depthFailOp, StencilOperation passOp, 
         bool twoSidedOperation)
     {
-		bool flip = false; // TODO: determine from mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping()
-
-		mDepthStencilDesc.FrontFace.StencilFunc = D3D11Mappings::get(func);
-		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
+		// We honor user intent in case of one sided operation, and carefully tweak it in case of two sided operations.
+		bool flipFront = twoSidedOperation &&
+						(mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping() ||
+						!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
+		bool flipBack = twoSidedOperation && !flipFront;
 
 		mStencilRef = refValue;
 		mDepthStencilDesc.StencilReadMask = compareMask;
 		mDepthStencilDesc.StencilWriteMask = writeMask;
 
-		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flip);
-		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, !flip);
+		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flipFront);
+		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flipBack);
 		
-		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flip);
-		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, !flip);
+		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flipFront);
+		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flipBack);
 		
-		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(passOp, flip);
-		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(passOp, !flip);
+		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(passOp, flipFront);
+		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(passOp, flipBack);
 
-		if (!twoSidedOperation)
-		{
-			mDepthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_NEVER;
-		}
-
+		mDepthStencilDesc.FrontFace.StencilFunc = D3D11Mappings::get(func);
+		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
 	}
 	//---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, 
@@ -3661,12 +3659,11 @@ bail:
 		{
 			deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 		}
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 		if (!OGRE_THREAD_SUPPORT)
 		{
 			deviceFlags |= D3D11_CREATE_DEVICE_SINGLETHREADED;
 		}
-#endif
+
 		ID3D11DeviceN * device;
 
 		hr = D3D11CreateDeviceN(NULL, D3D_DRIVER_TYPE_HARDWARE ,0,deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0 , 0);
