@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsPbsMobilePrerequisites.h"
 #include "OgrePrerequisites.h"
+#include "OgreVector4.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -51,14 +52,15 @@ namespace Ogre
 
     struct PbsMobileShaderCreationData
     {
-        uint8 uvSource[NUM_PBSM_SOURCES];
-        uint8 blendModes[4];
-        uint8 mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
-        float mFresnelR, mFresnelG, mFresnelB;    //F0
-        float mNormalMapWeight;
-        float mDetailNormalWeight[4];
-
+        uint8   uvSource[NUM_PBSM_SOURCES];
+        uint8   blendModes[4];
+        uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
+        float   mFresnelR, mFresnelG, mFresnelB;    //F0
         PbsUvAtlasParams mUvAtlasParams[4];
+        float   mNormalMapWeight;
+        float   mDetailNormalWeight[4];
+        float   mDetailWeight[4];
+        Vector4 mDetailsOffsetScale[4];
 
         PbsMobileShaderCreationData() :
             mFresnelTypeSizeBytes( 4 ),
@@ -67,6 +69,9 @@ namespace Ogre
         {
             mDetailNormalWeight[0] = mDetailNormalWeight[1] = 1.0f;
             mDetailNormalWeight[2] = mDetailNormalWeight[3] = 1.0f;
+            mDetailWeight[0] = mDetailWeight[1] = mDetailWeight[2] = mDetailWeight[3] = 1.0f;
+            for( size_t i=0; i<4; ++i )
+                mDetailsOffsetScale[i] = Vector4( 0, 0, 1, 1 );
             memset( uvSource, 0, sizeof( uvSource ) );
             memset( blendModes, 0, sizeof( blendModes ) );
         }

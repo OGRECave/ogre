@@ -45,8 +45,13 @@ uniform lowp vec3 kS;
 @property( !fresnel_scalar ) @piece( FresnelType )lowp float@end @end
 //Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 uniform @insertpiece( FresnelType ) F0;
-@property( normal_weight )uniform lowp float normalWeights[@value( normal_weight )];@end
 @property( uv_atlas )uniform mediump vec3 atlasOffsets[@value( uv_atlas )];@end
+@property( normal_weight )uniform lowp float normalWeights[@value( normal_weight )];@end
+@property( detail_weights )uniform lowp vec4 cDetailWeights;@end
+@property( detail_offsets )uniform mediump vec4 detailOffsetScale[@value( detail_offsets )];
+	@foreach( detail_offsets, n )
+		@property( detail_offsets@n )@piece( offsetDetail@n ) * detailOffsetScale[@value(currOffsetDetail)].zw + detailOffsetScale[@counter(currOffsetDetail)].xy@end @end @end
+@end
 // END UNIFORM DECLARATION
 
 @property( !roughness_map )#define ROUGHNESS roughness@end
@@ -208,22 +213,24 @@ void main()
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
 		lowp vec4 detailWeights = texture2D( texDetailWeightMap, psUv@value(uv_detail_weight).xy );
+		@property( detail_weights )detailWeights *= cDetailWeights;@end
 	@end @property( !detail_weight_map )
-		lowp vec4 detailWeights = vec4( 1.0 );
+		@property( detail_weights )lowp vec4 detailWeights = cDetailWeights;@end
+		@property( !detail_weights )lowp vec4 detailWeights = vec4( 1.0 );@end
 	@end
 	//Group all texture loads together to help the GPU hide the
 	//latency (bad GL ES2 drivers won't optimize this automatically)
 @end
 
 @foreach( detail_maps_diffuse, n )
-	lowp vec4 detailCol@n	= texture2D( texDetailMap[@n], psUv@value(uv_detail@n).xy );
+	lowp vec4 detailCol@n	= texture2D( texDetailMap[@n], psUv@value(uv_detail@n).xy@insertpiece( offsetDetail@n ) );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol.xyz = detailCol.xyz * detailCol.xyz;@end
 	detailWeights.@insertpiece(detail_diffuse_swizzle@n) *= detailCol@n.w;
 	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
 @end
 @foreach( detail_maps_normal, n )
-	mediump vec3 vDetail@n	= getTSDetailNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy ) * detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulA );@end
+	mediump vec3 vDetail@n	= getTSDetailNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy@insertpiece( offsetDetail@n ) ) * detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulA );@end
 
 @property( !normal_map )
 	nNormal = normalize( psNormal );

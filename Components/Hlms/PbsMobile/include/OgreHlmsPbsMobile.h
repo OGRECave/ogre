@@ -116,6 +116,13 @@ namespace Ogre
         static const IdString NormalWeightDetail2;
         static const IdString NormalWeightDetail3;
 
+        static const IdString DetailWeights;
+        static const IdString DetailOffsets;
+        static const IdString DetailOffsets0;
+        static const IdString DetailOffsets1;
+        static const IdString DetailOffsets2;
+        static const IdString DetailOffsets3;
+
         static const IdString UvDiffuse;
         static const IdString UvNormal;
         static const IdString UvSpecular;
@@ -155,6 +162,7 @@ namespace Ogre
         static const IdString *DetailDiffuseSwizzles[4];
         static const IdString *DetailNormalSwizzles[4];
         static const IdString *DetailNormalWeights[4];
+        static const IdString *DetailOffsetsPtrs[4];
 	};
 
     /** @} */

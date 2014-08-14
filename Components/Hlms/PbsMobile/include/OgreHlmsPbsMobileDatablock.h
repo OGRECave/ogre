@@ -64,7 +64,7 @@ namespace Ogre
         /// Baked parameters from PbsMobileShaderCreationData.
         /// mNumVariableParameters says how many parameters were
         /// actually baked.
-        float   mVariableParameters[20];
+        float   mVariableParameters[40];
 
         TexturePtr              mTexture[NUM_PBSM_TEXTURE_TYPES];
         HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
@@ -273,6 +273,38 @@ namespace Ogre
 
         /// Returns the detail normal maps' weight
         Real getNormalMapWeight(void) const;
+
+        /** Sets the weight of detail map. Affects both diffuse and
+            normal at the same time.
+        @remarks
+            A value of 1 will cause a flushRenderables as we remove the code from the
+            shader.
+            The weight from @see setNormalMapWeight is multiplied against this value
+            when it comes to the detail normal map.
+        @param detailMap
+            Value in the range [0; 4)
+        @param weight
+            The weight for the detail map. Usual values are in range [0; 1] but any
+            value is accepted and valid.
+            Default value is 1
+        */
+        void setDetailMapWeight( uint8 detailMap, Real weight );
+        Real getDetailMapWeight( uint8 detailMap ) const;
+
+        /** Sets the scale and offset of the detail map. Affects both diffuse and
+            normal at the same time.
+        @remarks
+            A value of Vector4( 0, 0, 1, 1 ) will cause a flushRenderables as we
+            remove the code from the shader.
+        @param detailNormalMap
+            Value in the range [0; 4)
+        @param offsetScale
+            XY = Contains the UV offset.
+            ZW = Constains the UV scale.
+            Default value is Vector4( 0, 0, 1, 1 )
+        */
+        void setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale );
+        const Vector4& getDetailMapOffsetScale( uint8 detailMap ) const;
 
         static PbsUvAtlasParams textureLocationToAtlasParams(
                                             const HlmsTextureManager::TextureLocation &texLocation );

@@ -256,9 +256,25 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::bakeVariableParameters(void)
     {
+        //float roughness
+        //vec3 kD;
+        //vec3 kS;
+        //vec3 F0; or float F0;
         size_t param = mShaderCreationData->mFresnelTypeSizeBytes >> 2;
         memcpy( mVariableParameters, &mShaderCreationData->mFresnelR, param << 2 );
 
+        //vec3 atlasOffsets[4]; (up to four, can be zero)
+        for( size_t i=0; i<=PBSM_ROUGHNESS; ++i )
+        {
+            if( !mTexture[i].isNull() )
+            {
+                memcpy( &mVariableParameters[param], &mShaderCreationData->mUvAtlasParams[i],
+                        sizeof( PbsUvAtlasParams ) );
+                param += sizeof( PbsUvAtlasParams ) >> 2;
+            }
+        }
+
+        //float normalWeights[5]; (up to five, can be zero)
         if( mShaderCreationData->mNormalMapWeight != 1.0f && !mTexture[PBSM_NORMAL].isNull() )
             mVariableParameters[param++] = mShaderCreationData->mNormalMapWeight;
 
@@ -271,13 +287,33 @@ namespace Ogre
             }
         }
 
-        for( size_t i=0; i<=PBSM_ROUGHNESS; ++i )
+        bool anyDetailWeight = false;
+        for( size_t i=0; i<4 && !anyDetailWeight; ++i )
         {
-            if( !mTexture[i].isNull() )
+            if( mShaderCreationData->mDetailWeight[i] != 1.0f &&
+                (!mTexture[PBSM_DETAIL0 + i].isNull() || !mTexture[PBSM_DETAIL0_NM + i].isNull()) )
             {
-                memcpy( &mVariableParameters[param], &mShaderCreationData->mUvAtlasParams[i],
-                        sizeof( PbsUvAtlasParams ) );
-                param += sizeof( PbsUvAtlasParams ) >> 2;
+                anyDetailWeight = true;
+            }
+        }
+
+        //vec4 cDetailWeights;
+        if( anyDetailWeight )
+        {
+            memcpy( &mVariableParameters[param], &mShaderCreationData->mDetailWeight,
+                    4 * sizeof(float) );
+            param += 4;
+        }
+
+        //vec4 detailOffsetScale[4];  (up to four, can be zero)
+        for( size_t i=0; i<4; ++i )
+        {
+            if( mShaderCreationData->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
+            {
+                memcpy( &mVariableParameters[param],
+                        &mShaderCreationData->mDetailsOffsetScale[i],
+                        4 * sizeof(float) );
+                param += 4;
             }
         }
 
@@ -285,8 +321,10 @@ namespace Ogre
         //vec3 kD;
         //vec3 kS;
         //vec3 F0; or float F0;
-        //float normalWeights[5]; (up to five, can be zero)
         //vec3 atlasOffsets[4]; (up to four, can be zero)
+        //float normalWeights[5]; (up to five, can be zero)
+        //vec4 cDetailWeights;
+        //vec4 detailOffsetScale[4];  (up to four, can be zero)
         mFullParametersBytes[0] = 7 * sizeof(float) + (param << 2);
         mFullParametersBytes[1] = 7 * sizeof(float);
     }
@@ -430,11 +468,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setDetailMapBlendMode( uint8 detailMap, PbsMobileBlendModes blendMode )
     {
-        if( detailMap >= 4 )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Details maps are in range [0; 4)",
-                         "HlmsPbsMobileDatablock::setDetailMapBlendMode" );
-        }
+        assert( detailMap < 4 );
 
         if( mShaderCreationData->blendModes[detailMap] != blendMode )
         {
@@ -445,11 +479,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setDetailNormalWeight( uint8 detailNormalMap, Real weight )
     {
-        if( detailNormalMap >= 4 )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Details maps are in range [0; 4)",
-                         "HlmsPbsMobileDatablock::setDetailNormalWeight" );
-        }
+        assert( detailNormalMap < 4 );
 
         bool wasOne = mShaderCreationData->mDetailNormalWeight[detailNormalMap] == 1.0f;
         mShaderCreationData->mDetailNormalWeight[detailNormalMap] = weight;
@@ -463,21 +493,16 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Real HlmsPbsMobileDatablock::getDetailNormalWeight( uint8 detailNormalMap ) const
     {
-        if( detailNormalMap >= 4 )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Details maps are in range [0; 4)",
-                         "HlmsPbsMobileDatablock::setDetailNormalWeight" );
-        }
-
+        assert( detailNormalMap < 4 );
         return mShaderCreationData->mDetailNormalWeight[detailNormalMap];
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setNormalMapWeight( Real weight )
     {
-        bool wasOne = mShaderCreationData->mNormalMapWeight == 1.0f;
+        bool wasDisabled = mShaderCreationData->mNormalMapWeight == 1.0f;
         mShaderCreationData->mNormalMapWeight = weight;
 
-        if( wasOne != (mShaderCreationData->mNormalMapWeight == 1.0f) )
+        if( wasDisabled != (mShaderCreationData->mNormalMapWeight == 1.0f) )
         {
             flushRenderables();
             bakeVariableParameters();
@@ -500,6 +525,47 @@ namespace Ogre
     Real HlmsPbsMobileDatablock::getNormalMapWeight(void) const
     {
         return mShaderCreationData->mNormalMapWeight;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setDetailMapWeight( uint8 detailMap, Real weight )
+    {
+        assert( detailMap < 4 );
+        bool wasDisabled = mShaderCreationData->mDetailWeight[detailMap] == 1.0f;
+
+        mShaderCreationData->mDetailWeight[detailMap] = weight;
+
+        if( wasDisabled != (mShaderCreationData->mDetailWeight[detailMap] == 1.0f) )
+            flushRenderables();
+
+        bakeVariableParameters();
+    }
+    //-----------------------------------------------------------------------------------
+    Real HlmsPbsMobileDatablock::getDetailMapWeight( uint8 detailMap ) const
+    {
+        assert( detailMap < 4 );
+        return mShaderCreationData->mDetailWeight[detailMap];
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale )
+    {
+        assert( detailMap < 4 );
+        bool wasDisabled = mShaderCreationData->mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 );
+
+        mShaderCreationData->mDetailsOffsetScale[detailMap] = offsetScale;
+
+        if( wasDisabled !=
+                (mShaderCreationData->mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 )) )
+        {
+            flushRenderables();
+        }
+
+        bakeVariableParameters();
+    }
+    //-----------------------------------------------------------------------------------
+    const Vector4& HlmsPbsMobileDatablock::getDetailMapOffsetScale( uint8 detailMap ) const
+    {
+        assert( detailMap < 4 );
+        return mShaderCreationData->mDetailsOffsetScale[detailMap];
     }
     //-----------------------------------------------------------------------------------
     PbsUvAtlasParams HlmsPbsMobileDatablock::textureLocationToAtlasParams(

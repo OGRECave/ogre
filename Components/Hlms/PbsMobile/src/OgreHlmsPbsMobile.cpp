@@ -65,6 +65,13 @@ namespace Ogre
     const IdString PbsMobileProperty::NormalWeightDetail2   = IdString( "normal_weight_detail2" );
     const IdString PbsMobileProperty::NormalWeightDetail3   = IdString( "normal_weight_detail3" );
 
+    const IdString PbsMobileProperty::DetailWeights     = IdString( "detail_weights" );
+    const IdString PbsMobileProperty::DetailOffsets     = IdString( "detail_offsets" );
+    const IdString PbsMobileProperty::DetailOffsets0    = IdString( "detail_offsets0" );
+    const IdString PbsMobileProperty::DetailOffsets1    = IdString( "detail_offsets1" );
+    const IdString PbsMobileProperty::DetailOffsets2    = IdString( "detail_offsets2" );
+    const IdString PbsMobileProperty::DetailOffsets3    = IdString( "detail_offsets3" );
+
     const IdString PbsMobileProperty::UvDiffuse         = IdString( "uv_diffuse" );
     const IdString PbsMobileProperty::UvNormal          = IdString( "uv_normal" );
     const IdString PbsMobileProperty::UvSpecular        = IdString( "uv_specular" );
@@ -121,7 +128,7 @@ namespace Ogre
         &PbsMobileProperty::DetailDiffuseSwizzle0,
         &PbsMobileProperty::DetailDiffuseSwizzle1,
         &PbsMobileProperty::DetailDiffuseSwizzle2,
-        &PbsMobileProperty::DetailDiffuseSwizzle3,
+        &PbsMobileProperty::DetailDiffuseSwizzle3
     };
 
     const IdString *PbsMobileProperty::DetailNormalSwizzles[4] =
@@ -129,7 +136,7 @@ namespace Ogre
         &PbsMobileProperty::DetailNormalSwizzle0,
         &PbsMobileProperty::DetailNormalSwizzle1,
         &PbsMobileProperty::DetailNormalSwizzle2,
-        &PbsMobileProperty::DetailNormalSwizzle3,
+        &PbsMobileProperty::DetailNormalSwizzle3
     };
 
     const IdString *PbsMobileProperty::DetailNormalWeights[4] =
@@ -137,7 +144,15 @@ namespace Ogre
         &PbsMobileProperty::NormalWeightDetail0,
         &PbsMobileProperty::NormalWeightDetail1,
         &PbsMobileProperty::NormalWeightDetail2,
-        &PbsMobileProperty::NormalWeightDetail3,
+        &PbsMobileProperty::NormalWeightDetail3
+    };
+
+    const IdString *PbsMobileProperty::DetailOffsetsPtrs[4] =
+    {
+        &PbsMobileProperty::DetailOffsets0,
+        &PbsMobileProperty::DetailOffsets1,
+        &PbsMobileProperty::DetailOffsets2,
+        &PbsMobileProperty::DetailOffsets3
     };
 
     const IdString *PbsMobileProperty::BlendModes[4] =
@@ -162,7 +177,10 @@ namespace Ogre
         "kD",
         "kS",
         "F0",
-        "atlasOffsets"
+        "atlasOffsets",
+        "normalWeights",
+        "cDetailWeights",
+        "detailOffsetScale",
     };
 
     HlmsPbsMobile::HlmsPbsMobile( Archive *dataFolder ) : Hlms( HLMS_PBS, "pbs", dataFolder )
@@ -376,6 +394,34 @@ namespace Ogre
 
         setDetailMapProperties( true, datablock, inOutPieces );
         setDetailMapProperties( false, datablock, inOutPieces );
+
+        {
+            bool anyDetailWeight = false;
+            for( size_t i=0; i<4 && !anyDetailWeight; ++i )
+            {
+                if( datablock->mShaderCreationData->mDetailWeight[i] != 1.0f &&
+                    (!datablock->mTexture[PBSM_DETAIL0 + i].isNull() ||
+                     !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull()) )
+                {
+                    anyDetailWeight = true;
+                }
+            }
+
+            if( anyDetailWeight )
+                setProperty( PbsMobileProperty::DetailWeights, 1 );
+        }
+
+        for( size_t i=0; i<4; ++i )
+        {
+            int numOffsets = 0;
+            if( datablock->mShaderCreationData->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
+            {
+                setProperty( *PbsMobileProperty::DetailOffsetsPtrs[i], 1 );
+                ++numOffsets;
+            }
+
+            setProperty( PbsMobileProperty::DetailOffsets, numOffsets );
+        }
 
         setProperty( PbsMobileProperty::DiffuseMap,     !datablock->mTexture[PBSM_DIFFUSE].isNull() );
         setProperty( PbsMobileProperty::NormalMapTex,   !datablock->mTexture[PBSM_NORMAL].isNull() );
