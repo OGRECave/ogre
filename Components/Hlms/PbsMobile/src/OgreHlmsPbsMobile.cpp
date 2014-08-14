@@ -411,13 +411,15 @@ namespace Ogre
                 setProperty( PbsMobileProperty::DetailWeights, 1 );
         }
 
-        for( size_t i=0; i<4; ++i )
         {
             int numOffsets = 0;
-            if( datablock->mShaderCreationData->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
+            for( size_t i=0; i<4; ++i )
             {
-                setProperty( *PbsMobileProperty::DetailOffsetsPtrs[i], 1 );
-                ++numOffsets;
+                if( datablock->mShaderCreationData->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
+                {
+                    setProperty( *PbsMobileProperty::DetailOffsetsPtrs[i], 1 );
+                    ++numOffsets;
+                }
             }
 
             setProperty( PbsMobileProperty::DetailOffsets, numOffsets );

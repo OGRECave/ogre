@@ -50,7 +50,11 @@ uniform @insertpiece( FresnelType ) F0;
 @property( detail_weights )uniform lowp vec4 cDetailWeights;@end
 @property( detail_offsets )uniform mediump vec4 detailOffsetScale[@value( detail_offsets )];
 	@foreach( detail_offsets, n )
-		@property( detail_offsets@n )@piece( offsetDetail@n ) * detailOffsetScale[@value(currOffsetDetail)].zw + detailOffsetScale[@counter(currOffsetDetail)].xy@end @end @end
+		@property( detail_offsets@n )
+			@piece( offsetDetailD@n ) * detailOffsetScale[@value(currOffsetDetailD)].zw + detailOffsetScale[@counter(currOffsetDetailD)].xy@end
+			@piece( offsetDetailN@n ) * detailOffsetScale[@value(currOffsetDetailN)].zw + detailOffsetScale[@counter(currOffsetDetailN)].xy@end
+		@end
+	@end
 @end
 // END UNIFORM DECLARATION
 
@@ -223,14 +227,14 @@ void main()
 @end
 
 @foreach( detail_maps_diffuse, n )
-	lowp vec4 detailCol@n	= texture2D( texDetailMap[@n], psUv@value(uv_detail@n).xy@insertpiece( offsetDetail@n ) );
+	lowp vec4 detailCol@n	= texture2D( texDetailMap[@n], psUv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ) );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol.xyz = detailCol.xyz * detailCol.xyz;@end
 	detailWeights.@insertpiece(detail_diffuse_swizzle@n) *= detailCol@n.w;
 	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
 @end
 @foreach( detail_maps_normal, n )
-	mediump vec3 vDetail@n	= getTSDetailNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy@insertpiece( offsetDetail@n ) ) * detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulA );@end
+	mediump vec3 vDetail@n	= getTSDetailNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy@insertpiece( offsetDetailN@n ) ) * detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulA );@end
 
 @property( !normal_map )
 	nNormal = normalize( psNormal );
