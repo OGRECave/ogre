@@ -58,6 +58,13 @@ namespace Ogre
     const IdString PbsMobileProperty::UvAtlas           = IdString( "uv_atlas" );
     const IdString PbsMobileProperty::FresnelScalar     = IdString( "fresnel_scalar" );
 
+    const IdString PbsMobileProperty::NormalWeight          = IdString( "normal_weight" );
+    const IdString PbsMobileProperty::NormalWeightTex       = IdString( "normal_weight_tex" );
+    const IdString PbsMobileProperty::NormalWeightDetail0   = IdString( "normal_weight_detail0" );
+    const IdString PbsMobileProperty::NormalWeightDetail1   = IdString( "normal_weight_detail1" );
+    const IdString PbsMobileProperty::NormalWeightDetail2   = IdString( "normal_weight_detail2" );
+    const IdString PbsMobileProperty::NormalWeightDetail3   = IdString( "normal_weight_detail3" );
+
     const IdString PbsMobileProperty::UvDiffuse         = IdString( "uv_diffuse" );
     const IdString PbsMobileProperty::UvNormal          = IdString( "uv_normal" );
     const IdString PbsMobileProperty::UvSpecular        = IdString( "uv_specular" );
@@ -123,6 +130,14 @@ namespace Ogre
         &PbsMobileProperty::DetailNormalSwizzle1,
         &PbsMobileProperty::DetailNormalSwizzle2,
         &PbsMobileProperty::DetailNormalSwizzle3,
+    };
+
+    const IdString *PbsMobileProperty::DetailNormalWeights[4] =
+    {
+        &PbsMobileProperty::NormalWeightDetail0,
+        &PbsMobileProperty::NormalWeightDetail1,
+        &PbsMobileProperty::NormalWeightDetail2,
+        &PbsMobileProperty::NormalWeightDetail3,
     };
 
     const IdString *PbsMobileProperty::BlendModes[4] =
@@ -321,8 +336,8 @@ namespace Ogre
         assert( dynamic_cast<HlmsPbsMobileDatablock*>( renderable->getDatablock() ) );
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
                                                         renderable->getDatablock() );
-        setProperty( PbsMobileProperty::UvAtlas, datablock->mNumUvAtlas );
-        setProperty( PbsMobileProperty::FresnelScalar, datablock->mFresnelTypeSizeBytes != 4 );
+        setProperty( PbsMobileProperty::UvAtlas, datablock->_calculateNumUvAtlas( false ) );
+        setProperty( PbsMobileProperty::FresnelScalar, datablock->hasSeparateFresnel() );
 
         for( size_t i=0; i<PBSM_DETAIL0; ++i )
         {
@@ -340,6 +355,25 @@ namespace Ogre
             }
         }
 
+        int numNormalWeights = 0;
+        if( datablock->getNormalMapWeight() != 1.0f && !datablock->mTexture[PBSM_NORMAL].isNull() )
+        {
+            setProperty( PbsMobileProperty::NormalWeightTex, 1 );
+            ++numNormalWeights;
+        }
+
+        for( size_t i=0; i<4; ++i )
+        {
+            if( datablock->getDetailNormalWeight( i ) != 1.0f &&
+                !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
+            {
+                setProperty( *PbsMobileProperty::DetailNormalWeights[i], 1 );
+                ++numNormalWeights;
+            }
+        }
+
+        setProperty( PbsMobileProperty::NormalWeight, numNormalWeights );
+
         setDetailMapProperties( true, datablock, inOutPieces );
         setDetailMapProperties( false, datablock, inOutPieces );
 
@@ -352,7 +386,7 @@ namespace Ogre
 
         bool usesNormalMap = !datablock->mTexture[PBSM_NORMAL].isNull();
         for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
-			usesNormalMap |= !datablock->mTexture[i].isNull();
+            usesNormalMap |= !datablock->mTexture[i].isNull();
         setProperty( PbsMobileProperty::NormalMap, usesNormalMap );
 
         /*setProperty( HlmsBaseProp::, !datablock->mTexture[PBSM_DETAIL0].isNull() );
@@ -374,7 +408,7 @@ namespace Ogre
     {
         HlmsPbsMobileDatablock *datablock = static_cast<HlmsPbsMobileDatablock*>(
                                                         renderable->getDatablock() );
-        setProperty( PbsMobileProperty::UvAtlas, datablock->mNumUvAtlasCaster );
+        setProperty( PbsMobileProperty::UvAtlas, datablock->_calculateNumUvAtlas( true ) );
 
         HlmsPropertyVec::iterator itor = mSetProperties.begin();
         HlmsPropertyVec::iterator end  = mSetProperties.end();
@@ -796,27 +830,17 @@ namespace Ogre
         //---------------------------------------------------------------------------
         //                          ---- PIXEL SHADER ----
         //---------------------------------------------------------------------------
+        //See HlmsPbsMobileDatablock::bakeVariableParameters
+        memcpy( psUniformBuffer, &datablock->mRoughness, datablock->mFullParametersBytes[casterPass] );
+        psUniformBuffer += datablock->mFullParametersBytes[casterPass] >> 2;
+
         if( !casterPass )
         {
-            //float roughness
-            //vec3 kD;
-            //vec3 kS;
-            //vec3 F0; or float F0;
-            memcpy( psUniformBuffer, &datablock->mRoughness,
-                    7 * sizeof(float) + datablock->mFresnelTypeSizeBytes );
-            psUniformBuffer += 7 + (datablock->mFresnelTypeSizeBytes >> 2);
-
-            //vec3 atlasOffsets[4]; (up to four, can be zero)
-            memcpy( psUniformBuffer, &datablock->mUvAtlasParams,
-                    datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) );
-            psUniformBuffer += datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) /
-                                sizeof( float );
-
             if( datablock->mTextureHash != lastTextureHash )
             {
                 //Rebind textures
-				size_t texUnit = mPreparedPass.shadowMaps.size();
-				for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+                size_t texUnit = mPreparedPass.shadowMaps.size();
+                for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
                 {
                     if( !datablock->mTexture[i].isNull() )
                     {
@@ -836,12 +860,6 @@ namespace Ogre
             if( lastTextureHash )
                 mRenderSystem->_disableTextureUnitsFrom( 0 );
             retVal = 0;
-
-            //vec3 atlasOffsets[4]; (up to four, can be zero)
-            /*memcpy( psUniformBuffer, &datablock->mUvAtlasParams,
-                    datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) );
-            psUniformBuffer += datablock->mNumUvAtlas * sizeof( HlmsPbsMobileDatablock::UvAtlasParams ) /
-                                sizeof( float );*/
         }
 
         assert( vsUniformBuffer - vpParams->getFloatPointer( 0 ) == vpParams->getFloatConstantList().size() );

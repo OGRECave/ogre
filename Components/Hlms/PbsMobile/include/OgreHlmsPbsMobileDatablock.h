@@ -43,48 +43,42 @@ namespace Ogre
     */
 
     struct PbsMobileShaderCreationData;
+    struct PbsUvAtlasParams;
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
     */
     class _OgreHlmsPbsMobileExport HlmsPbsMobileDatablock : public HlmsDatablock
     {
         friend class HlmsPbsMobile;
-    public:
-        struct UvAtlasParams
-        {
-            float uOffset;
-            float vOffset;
-            float invDivisor;
-            UvAtlasParams() : uOffset( 0 ), vOffset( 0 ), invDivisor( 1.0f ) {}
-        };
-
     protected:
-        uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
-        uint8   mNumUvAtlas;
-        /// Used during shadow mapping and alpha testing
-        uint8   mNumUvAtlasCaster;
+        /// [0] = Regular one.
+        /// [1] = Used during shadow mapping
+        uint16  mFullParametersBytes[2];
+
     public:
         float   mRoughness;
         float   mkDr, mkDg, mkDb;                   //kD
         float   mkSr, mkSg, mkSb;                   //kS
 
     protected:
-        float   mFresnelR, mFresnelG, mFresnelB;    //F0
-
-    protected:
-        UvAtlasParams mUvAtlasParams[4];
+        /// Baked parameters from PbsMobileShaderCreationData.
+        /// mNumVariableParameters says how many parameters were
+        /// actually baked.
+        float   mVariableParameters[20];
 
         TexturePtr              mTexture[NUM_PBSM_TEXTURE_TYPES];
         HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
 
-        /// The data in this structure only affects shader generation (thus modifying it implies
-        /// generating a new shader; i.e. a call to flushRenderables()). Because this data
-        /// is not needed while iterating (updating constants), it's dynamically allocated
+        /// The data in this structure only affects shader generation (thus modifying it
+        /// may imply generating a new shader; i.e. a call to flushRenderables()). Because
+        /// this data is not needed while iterating (updating constants), it's dynamically
+        /// allocated. It also contains information that rarely changes and is then baked.
         PbsMobileShaderCreationData *mShaderCreationData;
 
 
+        void bakeVariableParameters(void);
         void setTexture( const String &name, HlmsTextureManager::TextureMapType textureMapType,
-                         TexturePtr &outTexture, UvAtlasParams *outAtlasParams );
+                         PbsMobileTextureTypes textureType );
 
     public:
         /** Valid parameters in params:
@@ -204,7 +198,7 @@ namespace Ogre
         Vector3 getFresnel(void) const;
 
         /// Whether the same fresnel term is used for RGB, or individual ones for each channel
-        bool hasSeparateFresnel(void) const         { return mFresnelTypeSizeBytes != 4; }
+        bool hasSeparateFresnel(void) const;
 
         /** Sets a new texture for rendering
         @param UvAtlasParams
@@ -217,7 +211,7 @@ namespace Ogre
             Doesn't apply to certain texture types (i.e. PBSM_REFLECTION)
         */
         void setTexture( PbsMobileTextureTypes texType, TexturePtr &newTexture,
-                         const UvAtlasParams &atlasParams );
+                         const PbsUvAtlasParams &atlasParams );
 
         /** Sets a new sampler block to be associated with the texture
             (i.e. filtering mode, addressing modes, etc).
@@ -254,8 +248,36 @@ namespace Ogre
         */
         void setDetailMapBlendMode( uint8 detailMap, PbsMobileBlendModes blendMode );
 
-        static UvAtlasParams textureLocationToAtlasParams(
+        /** Sets the normal mapping weight. The range doesn't necessarily have to be in [0; 1]
+        @remarks
+            An exact value of 1 will generate a shader without the weighting math, while any
+            other value will generate another shader that uses this weight (i.e. will
+            cause a flushRenderables)
+        @param detailNormalMap
+            Value in the range [0; 4)
+        @param weight
+            The weight for the normal map.
+            A value of 0 means no effect (tangent space normal is 0, 0, 1); and would be
+            the same as disabling the normal map texture.
+            A value of 1 means full normal map effect.
+            A value outside the [0; 1] range extrapolates.
+            Default value is 1.
+        */
+        void setDetailNormalWeight( uint8 detailNormalMap, Real weight );
+
+        /// Returns the detail normal maps' weight
+        Real getDetailNormalWeight( uint8 detailNormalMap ) const;
+
+        /// @See setDetailNormalWeight. This is the same, but for the main normal map.
+        void setNormalMapWeight( Real weight );
+
+        /// Returns the detail normal maps' weight
+        Real getNormalMapWeight(void) const;
+
+        static PbsUvAtlasParams textureLocationToAtlasParams(
                                             const HlmsTextureManager::TextureLocation &texLocation );
+
+        int _calculateNumUvAtlas( bool casterPass ) const;
 
         virtual void calculateHash();
     };

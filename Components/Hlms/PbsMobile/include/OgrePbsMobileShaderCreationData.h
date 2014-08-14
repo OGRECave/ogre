@@ -41,13 +41,32 @@ namespace Ogre
     *  @{
     */
 
+    struct PbsUvAtlasParams
+    {
+        float uOffset;
+        float vOffset;
+        float invDivisor;
+        PbsUvAtlasParams() : uOffset( 0 ), vOffset( 0 ), invDivisor( 1.0f ) {}
+    };
+
     struct PbsMobileShaderCreationData
     {
         uint8 uvSource[NUM_PBSM_SOURCES];
         uint8 blendModes[4];
+        uint8 mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
+        float mFresnelR, mFresnelG, mFresnelB;    //F0
+        float mNormalMapWeight;
+        float mDetailNormalWeight[4];
 
-        PbsMobileShaderCreationData()
+        PbsUvAtlasParams mUvAtlasParams[4];
+
+        PbsMobileShaderCreationData() :
+            mFresnelTypeSizeBytes( 4 ),
+            mNormalMapWeight( 1.0f ),
+            mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f )
         {
+            mDetailNormalWeight[0] = mDetailNormalWeight[1] = 1.0f;
+            mDetailNormalWeight[2] = mDetailNormalWeight[3] = 1.0f;
             memset( uvSource, 0, sizeof( uvSource ) );
             memset( blendModes, 0, sizeof( blendModes ) );
         }

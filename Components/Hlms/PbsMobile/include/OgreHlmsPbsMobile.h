@@ -109,6 +109,13 @@ namespace Ogre
         static const IdString UvAtlas;
         static const IdString FresnelScalar;
 
+        static const IdString NormalWeight;
+        static const IdString NormalWeightTex;
+        static const IdString NormalWeightDetail0;
+        static const IdString NormalWeightDetail1;
+        static const IdString NormalWeightDetail2;
+        static const IdString NormalWeightDetail3;
+
         static const IdString UvDiffuse;
         static const IdString UvNormal;
         static const IdString UvSpecular;
@@ -147,6 +154,7 @@ namespace Ogre
         static const IdString *BlendModes[4];
         static const IdString *DetailDiffuseSwizzles[4];
         static const IdString *DetailNormalSwizzles[4];
+        static const IdString *DetailNormalWeights[4];
 	};
 
     /** @} */

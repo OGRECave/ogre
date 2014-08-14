@@ -45,6 +45,7 @@ uniform lowp vec3 kS;
 @property( !fresnel_scalar ) @piece( FresnelType )lowp float@end @end
 //Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 uniform @insertpiece( FresnelType ) F0;
+@property( normal_weight )uniform lowp float normalWeights[@value( normal_weight )];@end
 @property( uv_atlas )uniform mediump vec3 atlasOffsets[@value( uv_atlas )];@end
 // END UNIFORM DECLARATION
 
@@ -145,6 +146,17 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 
 	return tsNormal;
 }
+
+	@property( normal_weight_tex )
+		@set( curr_normal_weightA, 1 )
+		@set( curr_normal_weightB, 1 )
+	@end
+	@foreach( 4, n )
+		@property( normal_weight_detail@n )
+			@piece( detail@n_nm_weight_mulA ) * normalWeights[@counter(curr_normal_weightA)]@end
+			@piece( detail@n_nm_weight_mulB ) * normalWeights[@counter(curr_normal_weightB)]@end
+		@end
+	@end
 @end
 
 mediump vec3 cookTorrance( mediump vec3 lightDir, mediump vec3 viewDir, lowp float NdotV, mediump vec3 lightDiffuse, mediump vec3 lightSpecular )
@@ -211,7 +223,7 @@ void main()
 	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
 @end
 @foreach( detail_maps_normal, n )
-	mediump vec3 vDetail@n	= getTSDetailNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy ) * detailWeights.@insertpiece(detail_normal_swizzle@n);@end
+	mediump vec3 vDetail@n	= getTSDetailNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy ) * detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulA );@end
 
 @property( !normal_map )
 	nNormal = normalize( psNormal );
@@ -224,6 +236,7 @@ void main()
 	mediump mat3 TBN		= mat3( vTangent, vBinormal, geomNormal );
 
 	@property( normal_map_tex )nNormal = getTSNormal( texNormalMap, psUv@value(uv_normal).xy );@end
+	@property( normal_weight_tex )nNormal = mix( vec3( 0.0, 0.0, 1.0 ), nNormal, normalWeights[0] );@end
 @end
 
 @property( hlms_pssm_splits )
@@ -250,12 +263,13 @@ void main()
 	@piece( detail0_nm_op_sum )=@end
 	@piece( detail0_nm_op_mul )=@end
 @end
+
 @property( detail_maps_normal )
 	nNormal.xy	@insertpiece( detail0_nm_op_sum ) vDetail0.xy;
-	nNormal.z	@insertpiece( detail0_nm_op_mul ) vDetail0.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle0);@end
+	nNormal.z	@insertpiece( detail0_nm_op_mul ) vDetail0.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle0) @insertpiece( detail0_nm_weight_mulB );@end
 @foreach( detail_maps_normal, n, 1 )
 	nNormal.xy	+= vDetail@n.xy;
-	nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle@n);@end
+	nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulB );@end
 
 @property( normal_map )
 	nNormal = normalize( TBN * nNormal );

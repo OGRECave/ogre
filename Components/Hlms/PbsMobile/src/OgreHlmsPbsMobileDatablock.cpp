@@ -52,16 +52,14 @@ namespace Ogre
                                               const HlmsBlendblock *blendblock,
                                               const HlmsParamVec &params ) :
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
-        mFresnelTypeSizeBytes( 4 ),
-        mNumUvAtlas( 0 ),
-        mNumUvAtlasCaster( 0 ),
         mRoughness( 0.1f ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
-        mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f ),
         mShaderCreationData( 0 )
     {
+        mFullParametersBytes[0] = mFullParametersBytes[1] = 0;
         mShaderCreationData = new PbsMobileShaderCreationData();
+        memset( mVariableParameters, 0, sizeof( mVariableParameters ) );
         memset( mSamplerblocks, 0, sizeof( mSamplerblocks ) );
 
         String paramVal;
@@ -117,13 +115,13 @@ namespace Ogre
 
             if( vec.size() > 0 )
             {
-                mFresnelR = StringConverter::parseReal( vec[0], 1.0f );
+                mShaderCreationData->mFresnelR = StringConverter::parseReal( vec[0], 1.0f );
 
                 if( vec.size() == 3 )
                 {
-                    mFresnelG = StringConverter::parseReal( vec[1], 1.0f );
-                    mFresnelB = StringConverter::parseReal( vec[2], 1.0f );
-                    mFresnelTypeSizeBytes = 12;
+                    mShaderCreationData->mFresnelG = StringConverter::parseReal( vec[1], 1.0f );
+                    mShaderCreationData->mFresnelB = StringConverter::parseReal( vec[2], 1.0f );
+                    mShaderCreationData->mFresnelTypeSizeBytes = 12;
                 }
             }
         }
@@ -132,39 +130,33 @@ namespace Ogre
 
         if( Hlms::findParamInVec( params, "diffuse_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
-                        mTexture[PBSM_DIFFUSE], &mUvAtlasParams[mNumUvAtlas++] );
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE, PBSM_DIFFUSE );
 
             mSamplerblocks[PBSM_DIFFUSE] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "normal_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_NORMALS,
-                        mTexture[PBSM_NORMAL], &mUvAtlasParams[mNumUvAtlas++] );
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_NORMALS, PBSM_NORMAL );
             mSamplerblocks[PBSM_NORMAL] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "specular_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
-                        mTexture[PBSM_SPECULAR], &mUvAtlasParams[mNumUvAtlas++] );
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE, PBSM_SPECULAR );
             mSamplerblocks[PBSM_SPECULAR] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "roughness_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
-                        mTexture[PBSM_ROUGHNESS], &mUvAtlasParams[mNumUvAtlas++] );
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_MONOCHROME, PBSM_ROUGHNESS );
             mSamplerblocks[PBSM_ROUGHNESS] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "detail_weight_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL,
-                        mTexture[PBSM_DETAIL_WEIGHT], 0 );
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL, PBSM_DETAIL_WEIGHT );
             mSamplerblocks[PBSM_DETAIL_WEIGHT] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "reflection_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_ENV_MAP,
-                        mTexture[PBSM_REFLECTION], 0 );
+            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_ENV_MAP, PBSM_REFLECTION );
             mSamplerblocks[PBSM_REFLECTION] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
 
@@ -194,7 +186,7 @@ namespace Ogre
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
                 setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL,
-                            mTexture[PBSM_DETAIL0 + i], 0 );
+                            static_cast<PbsMobileTextureTypes>( PBSM_DETAIL0 + i ) );
                 mSamplerblocks[PBSM_DETAIL0 + i] = hlmsManager->getSamplerblock( detailSamplerRef );
             }
 
@@ -202,7 +194,7 @@ namespace Ogre
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
                 setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
-                            mTexture[PBSM_DETAIL0_NM + i], 0 );
+                            static_cast<PbsMobileTextureTypes>( PBSM_DETAIL0_NM + i ) );
                 mSamplerblocks[PBSM_DETAIL0_NM + i] = hlmsManager->getSamplerblock( detailSamplerRef );
             }
 
@@ -238,6 +230,7 @@ namespace Ogre
         }
 
         calculateHash();
+        bakeVariableParameters();
     }
     //-----------------------------------------------------------------------------------
     HlmsPbsMobileDatablock::~HlmsPbsMobileDatablock()
@@ -261,9 +254,46 @@ namespace Ogre
         mTextureHash = hash.mHash;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::bakeVariableParameters(void)
+    {
+        size_t param = mShaderCreationData->mFresnelTypeSizeBytes >> 2;
+        memcpy( mVariableParameters, &mShaderCreationData->mFresnelR, param << 2 );
+
+        if( mShaderCreationData->mNormalMapWeight != 1.0f && !mTexture[PBSM_NORMAL].isNull() )
+            mVariableParameters[param++] = mShaderCreationData->mNormalMapWeight;
+
+        for( size_t i=0; i<4; ++i )
+        {
+            if( mShaderCreationData->mDetailNormalWeight[i] != 1.0f &&
+                !mTexture[PBSM_DETAIL0_NM + i].isNull() )
+            {
+                mVariableParameters[param++] = mShaderCreationData->mDetailNormalWeight[i];
+            }
+        }
+
+        for( size_t i=0; i<=PBSM_ROUGHNESS; ++i )
+        {
+            if( !mTexture[i].isNull() )
+            {
+                memcpy( &mVariableParameters[param], &mShaderCreationData->mUvAtlasParams[i],
+                        sizeof( PbsUvAtlasParams ) );
+                param += sizeof( PbsUvAtlasParams ) >> 2;
+            }
+        }
+
+        //float roughness
+        //vec3 kD;
+        //vec3 kS;
+        //vec3 F0; or float F0;
+        //float normalWeights[5]; (up to five, can be zero)
+        //vec3 atlasOffsets[4]; (up to four, can be zero)
+        mFullParametersBytes[0] = 7 * sizeof(float) + (param << 2);
+        mFullParametersBytes[1] = 7 * sizeof(float);
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setTexture( const String &name,
                                              HlmsTextureManager::TextureMapType textureMapType,
-                                             TexturePtr &outTexture, UvAtlasParams *outAtlasParams )
+                                             PbsMobileTextureTypes textureType )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
@@ -272,10 +302,13 @@ namespace Ogre
 
         assert( !texLocation.texture->isTextureTypeArray() );
 
-        outTexture = texLocation.texture;
+        mTexture[textureType] = texLocation.texture;
 
-		if( outAtlasParams )
-			*outAtlasParams = textureLocationToAtlasParams( texLocation );
+        if( textureType <= PBSM_ROUGHNESS )
+        {
+            mShaderCreationData->mUvAtlasParams[textureType] = textureLocationToAtlasParams(
+                                                                                        texLocation );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setDiffuse( const Vector3 &diffuseColour )
@@ -297,66 +330,46 @@ namespace Ogre
     void HlmsPbsMobileDatablock::setFresnel( const Vector3 &fresnel, bool separateFresnel )
     {
         uint8 fresnelBytes = 4;
-        mFresnelR = fresnel.x;
+        mShaderCreationData->mFresnelR = fresnel.x;
 
         if( separateFresnel )
         {
-            mFresnelG = fresnel.y;
-            mFresnelB = fresnel.z;
+            mShaderCreationData->mFresnelG = fresnel.y;
+            mShaderCreationData->mFresnelB = fresnel.z;
 
             fresnelBytes = 12;
         }
 
-        if( fresnelBytes != mFresnelTypeSizeBytes )
+        if( fresnelBytes != mShaderCreationData->mFresnelTypeSizeBytes )
         {
-            mFresnelTypeSizeBytes = fresnelBytes;
+            mShaderCreationData->mFresnelTypeSizeBytes = fresnelBytes;
             flushRenderables();
         }
+
+        bakeVariableParameters();
     }
     //-----------------------------------------------------------------------------------
     Vector3 HlmsPbsMobileDatablock::getFresnel(void) const
     {
-        return Vector3( mFresnelR, mFresnelG, mFresnelB );
+        return Vector3( mShaderCreationData->mFresnelR, mShaderCreationData->mFresnelG,
+                        mShaderCreationData->mFresnelB );
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsPbsMobileDatablock::hasSeparateFresnel(void) const
+    {
+        return mShaderCreationData->mFresnelTypeSizeBytes != 4;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setTexture( PbsMobileTextureTypes texType, TexturePtr &newTexture,
-                                             const UvAtlasParams &atlasParams )
+                                             const PbsUvAtlasParams &atlasParams )
     {
-		bool oldWasNull = mTexture[texType].isNull();
+        bool oldWasNull = mTexture[texType].isNull();
         mTexture[texType] = newTexture;
 
         if( texType <= PBSM_ROUGHNESS )
-        {
-            size_t uvAtlasIdx = 0;
+            mShaderCreationData->mUvAtlasParams[texType] = atlasParams;
 
-            for( size_t i=0; i<texType; ++i )
-                uvAtlasIdx += !mTexture[i].isNull();
-
-			if( oldWasNull != newTexture.isNull() )
-            {
-				if( oldWasNull )
-                {
-                    //We need to make room for our params
-					memmove( mUvAtlasParams + uvAtlasIdx + 1, mUvAtlasParams + uvAtlasIdx,
-                             sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx) );
-                    ++mNumUvAtlas;
-                }
-                else
-                {
-                    //We're out, we need to keep everything contiguous
-                    memmove( mUvAtlasParams + uvAtlasIdx, mUvAtlasParams + uvAtlasIdx + 1,
-                             sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx - 1) );
-                    --mNumUvAtlas;
-                }
-            }
-
-            if( !newTexture.isNull() )
-            {
-                mUvAtlasParams[uvAtlasIdx] = atlasParams;
-            }
-        }
-
-		if( oldWasNull != newTexture.isNull() )
+        if( oldWasNull != newTexture.isNull() )
         {
             if( !mSamplerblocks[texType] )
             {
@@ -377,6 +390,7 @@ namespace Ogre
         }
 
         calculateHash();
+        bakeVariableParameters();
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setSamplerblock( PbsMobileTextureTypes texType,
@@ -428,15 +442,74 @@ namespace Ogre
             flushRenderables();
         }
     }
-	//-----------------------------------------------------------------------------------
-	HlmsPbsMobileDatablock::UvAtlasParams HlmsPbsMobileDatablock::textureLocationToAtlasParams(
-												const HlmsTextureManager::TextureLocation &texLocation )
-	{
-		UvAtlasParams retVal;
-		retVal.uOffset   = texLocation.xIdx / (float)texLocation.divisor;
-		retVal.vOffset   = texLocation.yIdx / (float)texLocation.divisor;
-		retVal.invDivisor= 1.0f / texLocation.divisor;
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setDetailNormalWeight( uint8 detailNormalMap, Real weight )
+    {
+        if( detailNormalMap >= 4 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Details maps are in range [0; 4)",
+                         "HlmsPbsMobileDatablock::setDetailNormalWeight" );
+        }
 
-		return retVal;
-	}
+        bool wasOne = mShaderCreationData->mDetailNormalWeight[detailNormalMap] == 1.0f;
+        mShaderCreationData->mDetailNormalWeight[detailNormalMap] = weight;
+
+        if( wasOne != (mShaderCreationData->mDetailNormalWeight[detailNormalMap] == 1.0f) )
+        {
+            flushRenderables();
+            bakeVariableParameters();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    Real HlmsPbsMobileDatablock::getDetailNormalWeight( uint8 detailNormalMap ) const
+    {
+        if( detailNormalMap >= 4 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Details maps are in range [0; 4)",
+                         "HlmsPbsMobileDatablock::setDetailNormalWeight" );
+        }
+
+        return mShaderCreationData->mDetailNormalWeight[detailNormalMap];
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setNormalMapWeight( Real weight )
+    {
+        bool wasOne = mShaderCreationData->mNormalMapWeight == 1.0f;
+        mShaderCreationData->mNormalMapWeight = weight;
+
+        if( wasOne != (mShaderCreationData->mNormalMapWeight == 1.0f) )
+        {
+            flushRenderables();
+            bakeVariableParameters();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    int HlmsPbsMobileDatablock::_calculateNumUvAtlas( bool casterPass ) const
+    {
+        int retVal = 0;
+
+        if( !casterPass )
+        {
+            for( size_t i=0; i<=PBSM_ROUGHNESS; ++i )
+                retVal += !mTexture[i].isNull();
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    Real HlmsPbsMobileDatablock::getNormalMapWeight(void) const
+    {
+        return mShaderCreationData->mNormalMapWeight;
+    }
+    //-----------------------------------------------------------------------------------
+    PbsUvAtlasParams HlmsPbsMobileDatablock::textureLocationToAtlasParams(
+                                                const HlmsTextureManager::TextureLocation &texLocation )
+    {
+        PbsUvAtlasParams retVal;
+        retVal.uOffset   = texLocation.xIdx / (float)texLocation.divisor;
+        retVal.vOffset   = texLocation.yIdx / (float)texLocation.divisor;
+        retVal.invDivisor= 1.0f / texLocation.divisor;
+
+        return retVal;
+    }
 }
