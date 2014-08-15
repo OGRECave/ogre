@@ -1084,7 +1084,10 @@ bail:
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
 		rsc->setCapability(RSC_SCISSOR_TEST);
-		rsc->setCapability(RSC_TWO_SIDED_STENCIL);
+
+		if(mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+			rsc->setCapability(RSC_TWO_SIDED_STENCIL);
+
 		rsc->setCapability(RSC_STENCIL_WRAP);
 		rsc->setCapability(RSC_HWOCCLUSION);
 		rsc->setCapability(RSC_HWOCCLUSION_ASYNCHRONOUS);
