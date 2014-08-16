@@ -156,6 +156,9 @@ namespace Ogre
         /// Returns the radius of a sphere enclosing the aabb from origin as center
         inline Real getRadiusOrigin() const;
 
+        inline bool operator == ( const Aabb &_r ) const;
+        inline bool operator != ( const Aabb &_r ) const;
+
         static const Aabb BOX_INFINITE;
         static const Aabb BOX_NULL;
 

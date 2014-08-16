@@ -257,11 +257,6 @@ namespace Ogre
             assert( !datablock->mTexture[PBSM_ROUGHNESS].isNull() );
             psParams->setNamedConstant( "texRoughnessMap", texUnit++ );
         }
-        if( getProperty( PbsMobileProperty::EnvProbeMap ) )
-        {
-            assert( !datablock->mTexture[PBSM_REFLECTION].isNull() );
-            psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
-        }
         if( getProperty( PbsMobileProperty::DetailWeightMap ) )
         {
             assert( !datablock->mTexture[PBSM_DETAIL_WEIGHT].isNull() );
@@ -295,6 +290,12 @@ namespace Ogre
                                                 texUnit++ );
                 }
             }
+        }
+
+        if( getProperty( PbsMobileProperty::EnvProbeMap ) )
+        {
+            assert( !datablock->mTexture[PBSM_REFLECTION].isNull() );
+            psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
         }
 
         return retVal;

@@ -704,6 +704,9 @@ namespace Ogre
                             LogManager::getSingleton().logMessage( "Couldn't generate mipmaps for '" +
                                                                     texInfo.name + "'", LML_CRITICAL );
                         }
+
+                        if( !pack.exportLocation.empty() )
+                            cubeMap.save( pack.exportLocation + "/" + texInfo.name + ".dds" );
                     }
 
                     copy3DTexture( cubeMap, textureArray.texture, 0, 6, 0 );

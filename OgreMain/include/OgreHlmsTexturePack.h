@@ -62,6 +62,7 @@ namespace Ogre
         bool            hasMipmaps;
         bool            hwGammaCorrection;
         String          name;
+        String          exportLocation;
 
         HlmsTexturePack() :
             pixelFormat( PF_UNKNOWN ),

@@ -337,11 +337,12 @@ namespace Ogre {
             "Image::save" );
 
         ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
-        imgData->format = mFormat;
-        imgData->height = mHeight;
-        imgData->width = mWidth;
-        imgData->depth = mDepth;
-        imgData->size = mBufSize;
+        imgData->format         = mFormat;
+        imgData->height         = mHeight;
+        imgData->width          = mWidth;
+        imgData->depth          = mDepth;
+        imgData->num_mipmaps    = mNumMipmaps;
+        imgData->size           = mBufSize;
         // Wrap in CodecDataPtr, this will delete
         Codec::CodecDataPtr codeDataPtr(imgData);
         // Wrap memory, be sure not to delete when stream destroyed
