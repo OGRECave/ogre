@@ -161,7 +161,7 @@ namespace Ogre
         /// (it's a block.. of data). Prefer calling getDatablock directly.
         HlmsDatablock* getMaterial( IdString name ) const   { return getDatablock( name ); }
 
-        HlmsTextureManager* getTextureManger(void) const    { return mTextureManager; }
+        HlmsTextureManager* getTextureManager(void) const   { return mTextureManager; }
 
         void useDefaultDatablockFrom( HlmsTypes type )      { mDefaultHlmsType = type; }
 

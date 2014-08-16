@@ -30,7 +30,9 @@ THE SOFTWARE.
 
 #include "OgreHlmsDatablock.h"
 #include "OgreHlms.h"
+#include "OgreHlmsManager.h"
 #include "OgreTexture.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
@@ -147,10 +149,41 @@ namespace Ogre
 
         while( itor != end )
         {
-            uint32 hash, casterHash;
-            mCreator->calculateHashFor( *itor, hash, casterHash );
-            (*itor)->_setHlmsHashes( hash, casterHash );
-            ++itor;
+            try
+            {
+                uint32 hash, casterHash;
+                mCreator->calculateHashFor( *itor, hash, casterHash );
+                (*itor)->_setHlmsHashes( hash, casterHash );
+                ++itor;
+            }
+            catch( Exception &e )
+            {
+                size_t currentIdx = itor - mLinkedRenderables.begin();
+                LogManager::getSingleton().logMessage( e.getFullDescription() );
+                LogManager::getSingleton().logMessage( "Couldn't apply change to datablock '" +
+                                                       mName.getFriendlyText() + "' for "
+                                                       "this renderable. Using default one. Check "
+                                                       "previous log messages to see if there's more "
+                                                       "information.", LML_CRITICAL );
+
+
+                if( mType == HLMS_LOW_LEVEL )
+                {
+                    HlmsManager *hlmsManager = mCreator->getHlmsManager();
+                    (*itor)->setDatablock( hlmsManager->getDefaultDatablock() );
+                }
+                else
+                {
+                    //Try to use the default datablock from the same
+                    //HLMS as the one the user wanted us to apply
+                    (*itor)->setDatablock( mCreator->getDefaultDatablock() );
+                }
+
+                //The container was changed with setDatablock change,
+                //the iterators may have been invalidated.
+                itor = mLinkedRenderables.begin() + currentIdx;
+                end  = mLinkedRenderables.end();
+            }
         }
     }
     //-----------------------------------------------------------------------------------

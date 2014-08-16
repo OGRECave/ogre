@@ -442,7 +442,7 @@ namespace Ogre
         setProperty( HlmsBaseProp::DiffuseMap, !datablock->mTexture[PBSM_DETAIL1].isNull() );*/
         bool normalMapCanBeSupported = (getProperty( HlmsBaseProp::Normal ) &&
                                         getProperty( HlmsBaseProp::Tangent )) ||
-                                        getProperty( HlmsBaseProp::QTangent, 1 );
+                                        getProperty( HlmsBaseProp::QTangent );
 
         if( !normalMapCanBeSupported && usesNormalMap )
         {

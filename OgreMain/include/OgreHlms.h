@@ -59,7 +59,7 @@ namespace Ogre
         {
             HlmsDatablock   *datablock;
             bool            visibleToManager;
-            String			name;
+            String          name;
             DatablockEntry() : datablock( 0 ), visibleToManager( false ) {}
             DatablockEntry( HlmsDatablock *_datablock, bool _visibleToManager, const String &_name ) :
                 datablock( _datablock ), visibleToManager( _visibleToManager ), name( _name ) {}
@@ -258,6 +258,7 @@ namespace Ogre
                                                     const HlmsParamVec &paramVec );
 
         virtual HlmsDatablock* createDefaultDatablock(void);
+        void _destroyAllDatablocks(void);
 
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces ) {}
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces ) {}
@@ -335,13 +336,14 @@ namespace Ogre
 
         /// Destroys all datablocks created with @createDatablock. Caller is responsible
         /// for ensuring those pointers aren't still in use (i.e. dangling pointers)
+        /// The default datablock will be recreated.
         void destroyAllDatablocks(void);
 
         /// @copydoc HlmsManager::getDefaultDatablock
         HlmsDatablock* getDefaultDatablock(void) const;
 
         /// Returns all datablocks owned by this Hlms, including the default one.
-        const HlmsDatablockMap& getDatablockMap(void) const	{ return mDatablocks; }
+        const HlmsDatablockMap& getDatablockMap(void) const { return mDatablocks; }
 
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
             the value to 'inOut', otherwise leaves 'inOut' as is.

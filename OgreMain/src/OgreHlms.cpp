@@ -115,7 +115,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Hlms::~Hlms()
     {
-        destroyAllDatablocks();
+        _destroyAllDatablocks();
 
         if( mHlmsManager )
         {
@@ -1212,7 +1212,7 @@ namespace Ogre
         mDatablocks.erase( itor );
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::destroyAllDatablocks(void)
+    void Hlms::_destroyAllDatablocks(void)
     {
         HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
         HlmsDatablockMap::const_iterator end  = mDatablocks.end();
@@ -1224,6 +1224,12 @@ namespace Ogre
         }
 
         mDatablocks.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::destroyAllDatablocks(void)
+    {
+        _destroyAllDatablocks();
+        mDefaultDatablock = createDefaultDatablock();
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::getDefaultDatablock(void) const

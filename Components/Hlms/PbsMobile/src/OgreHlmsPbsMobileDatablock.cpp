@@ -334,7 +334,7 @@ namespace Ogre
                                              PbsMobileTextureTypes textureType )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
-        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
         HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
                                                     createOrRetrieveTexture( name, textureMapType );
 
