@@ -333,7 +333,8 @@ struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
 	
 };
 
+}
+
 #include "OgreHeaderSuffix.h"
 
-}
 #endif
