@@ -192,6 +192,8 @@ namespace Ogre
         void _linkRenderable( Renderable *renderable );
         void _unlinkRenderable( Renderable *renderable );
 
+        const vector<Renderable*>::type& getLinkedRenderables(void) const { return mLinkedRenderables; }
+
         /// Enables or disables alpha testing. Calling this function triggers
         /// a HlmsDatablock::flushRenderables
         void setAlphaTest( bool bEnabled );
