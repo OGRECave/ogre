@@ -704,8 +704,7 @@ namespace Ogre
 
                     if( pack.hasMipmaps )
                     {
-                        //if( !cubeMap.generateMipmaps( pack.hwGammaCorrection, Image::FILTER_GAUSSIAN ) )
-                        if( !cubeMap.generateMipmaps( pack.hwGammaCorrection, Image::FILTER_LINEAR ) )
+                        if( !cubeMap.generateMipmaps( pack.hwGammaCorrection, Image::FILTER_GAUSSIAN ) )
                         {
                             LogManager::getSingleton().logMessage( "Couldn't generate mipmaps for '" +
                                                                     texInfo.name + "'", LML_CRITICAL );
