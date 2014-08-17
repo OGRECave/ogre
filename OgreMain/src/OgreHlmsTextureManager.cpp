@@ -567,6 +567,7 @@ namespace Ogre
                     {
                         searchName.name = *itor;
                         it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
+                        assert( it != mEntries.end() && it->name == searchName.name );
                         it->arrayIdx = newArrayIdx;
                         ++itor;
                     }
@@ -654,7 +655,7 @@ namespace Ogre
                 TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(),
                                                                  searchName );
 
-                if( it != mEntries.end() )
+                if( it != mEntries.end() && it->name == searchName.name )
                 {
                     LogManager::getSingleton().logMessage( "ERROR: A texture by the name '" +
                                                            texInfo.name  + "' already exists!" );
@@ -703,7 +704,8 @@ namespace Ogre
 
                     if( pack.hasMipmaps )
                     {
-                        if( !cubeMap.generateMipmaps( pack.hwGammaCorrection, Image::FILTER_GAUSSIAN ) )
+                        //if( !cubeMap.generateMipmaps( pack.hwGammaCorrection, Image::FILTER_GAUSSIAN ) )
+                        if( !cubeMap.generateMipmaps( pack.hwGammaCorrection, Image::FILTER_LINEAR ) )
                         {
                             LogManager::getSingleton().logMessage( "Couldn't generate mipmaps for '" +
                                                                     texInfo.name + "'", LML_CRITICAL );

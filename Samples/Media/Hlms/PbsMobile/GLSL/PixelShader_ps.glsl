@@ -5,8 +5,18 @@ precision mediump float;
 #endif*/
 #define FRAG_COLOR		0
 @property( !hlms_shadowcaster )
-@property( GL3+ )layout(location = FRAG_COLOR, index = 0) out vec4 outColour;@end
-@property( !GL3+ )#define outColour gl_FragColor@end
+@property( GL3+ )
+layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
+	@piece( texture2D )texture@end
+	@piece( textureCube )texture@end
+	@piece( textureCubeLod )textureLod@end
+@end
+@property( !GL3+ )
+#define outColour gl_FragColor
+	@piece( texture2D )texture2D@end
+	@piece( textureCube )textureCube@end
+	@piece( textureCubeLod )textureCube@end
+@end
 
 @property( hlms_normal )
 in mediump vec3 psPos;
@@ -72,15 +82,15 @@ uniform @insertpiece( FresnelType ) F0;
 
 @property( !diffuse_map && detail_maps_diffuse )lowp vec4 diffuseCol;@end
 @property( diffuse_map )lowp vec4 diffuseCol;
-@piece( SampleDiffuseMap )	diffuseCol = texture2D( texDiffuseMap, psUv@value(uv_diffuse).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
+@piece( SampleDiffuseMap )	diffuseCol = @insertpiece(texture2D)( texDiffuseMap, psUv@value(uv_diffuse).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
 @property( !hw_gamma_read )	//Gamma to linear space
 	diffuseCol = diffuseCol * diffuseCol;@end @end
 @piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
 @property( specular_map )lowp vec3 specularCol;
-@piece( SampleSpecularMap )	specularCol = texture2D( texSpecularMap, psUv@value(uv_specular).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xyz;@end
+@piece( SampleSpecularMap )	specularCol = @insertpiece(texture2D)( texSpecularMap, psUv@value(uv_specular).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xyz;@end
 @piece( MulSpecularMapValue )* specularCol@end@end
 @property( roughness_map )lowp float ROUGHNESS;
-@piece( SampleRoughnessMap )ROUGHNESS = roughness * texture2D( texRoughnessMap, psUv@value(uv_roughness).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).x;@end
+@piece( SampleRoughnessMap )ROUGHNESS = roughness * @insertpiece(texture2D)( texRoughnessMap, psUv@value(uv_roughness).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).x;@end
 @end
 
 @property( hlms_num_shadow_maps )
@@ -96,14 +106,14 @@ lowp float getShadow( highp @insertpiece( SAMPLER2DSHADOW ) shadowMap, highp vec
 	highp vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
 
 	// 2x2 PCF
-	highp float c =	(fDepth <= texture2D(shadowMap, uv - o.xy).r) ? 1 : 0; // top left
-	c +=		(fDepth <= texture2D(shadowMap, uv - o.zy).r) ? 1 : 0; // top right
-	c +=		(fDepth <= texture2D(shadowMap, uv + o.zy).r) ? 1 : 0; // bottom left
-	c +=		(fDepth <= texture2D(shadowMap, uv + o.xy).r) ? 1 : 0; // bottom right
+	highp float c =	(fDepth <= @insertpiece(texture2D)(shadowMap, uv - o.xy).r) ? 1 : 0; // top left
+	c +=		(fDepth <= @insertpiece(texture2D)(shadowMap, uv - o.zy).r) ? 1 : 0; // top right
+	c +=		(fDepth <= @insertpiece(texture2D)(shadowMap, uv + o.zy).r) ? 1 : 0; // bottom left
+	c +=		(fDepth <= @insertpiece(texture2D)(shadowMap, uv + o.xy).r) ? 1 : 0; // bottom right
 
 	return c * 0.25;@end
 @property( hlms_shadow_usues_depth_texture )
-	return texture2D( shadowMap, psPosLN.xyz, 0 ).x;@end
+	return @insertpiece(texture2D)( shadowMap, psPosLN.xyz, 0 ).x;@end
 }
 @end
 
@@ -131,10 +141,10 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 	mediump vec3 tsNormal;
 @property( signed_int_textures )
 	//Normal texture must be in U8V8 or BC5 format!
-	tsNormal.xy = texture2D( normalMap, uv * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xy;
+	tsNormal.xy = @insertpiece(texture2D)( normalMap, uv * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = texture2D( normalMap, uv  * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xw * 2.0 - 1.0;
+	tsNormal.xy = @insertpiece(texture2D)( normalMap, uv  * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xw * 2.0 - 1.0;
 @end
 	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
 
@@ -146,10 +156,10 @@ mediump vec3 qmul( mediump vec4 q, mediump vec3 v )
 	mediump vec3 tsNormal;
 @property( signed_int_textures )
 	//Normal texture must be in U8V8 or BC5 format!
-	tsNormal.xy = texture2D( normalMap, uv ).xy;
+	tsNormal.xy = @insertpiece(texture2D)( normalMap, uv ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = texture2D( normalMap, uv ).xw * 2.0 - 1.0;
+	tsNormal.xy = @insertpiece(texture2D)( normalMap, uv ).xw * 2.0 - 1.0;
 @end
 	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
 
@@ -216,7 +226,7 @@ void main()
 {
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
-		lowp vec4 detailWeights = texture2D( texDetailWeightMap, psUv@value(uv_detail_weight).xy );
+		lowp vec4 detailWeights = @insertpiece(texture2D)( texDetailWeightMap, psUv@value(uv_detail_weight).xy );
 		@property( detail_weights )detailWeights *= cDetailWeights;@end
 	@end @property( !detail_weight_map )
 		@property( detail_weights )lowp vec4 detailWeights = cDetailWeights;@end
@@ -227,7 +237,7 @@ void main()
 @end
 
 @foreach( detail_maps_diffuse, n )
-	lowp vec4 detailCol@n	= texture2D( texDetailMap[@n], psUv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ) );
+	lowp vec4 detailCol@n	= @insertpiece(texture2D)( texDetailMap[@n], psUv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ) );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol.xyz = detailCol.xyz * detailCol.xyz;@end
 	detailWeights.@insertpiece(detail_diffuse_swizzle@n) *= detailCol@n.w;
@@ -330,7 +340,7 @@ void main()
 		lightDir *= 1.0 / fDistance;
 	@property( hlms_lights_spot_textured )
 		mediump vec3 posInLightSpace = qmul( spotQuaternion[@value(spot_params)], psPos );
-		lowp float spotAtten = texture2D( texSpotLight, normalize( posInLightSpace ).xy ).x;
+		lowp float spotAtten = @insertpiece(texture2D)( texSpotLight, normalize( posInLightSpace ).xy ).x;
 	@end
 	@property( !hlms_lights_spot_textured )
 		mediump float spotAtten = clamp( (spotCosAngle - spotParams[@value(spot_params)].y) * spotParams[@value(spot_params)].x, 0.0, 1.0 );
@@ -343,7 +353,7 @@ void main()
 
 @property( envprobe_map )
 	mediump vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	mediump vec3 envColour = textureCube( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0 ).xyz;
+	mediump vec3 envColour = @insertpiece(textureCubeLod)( texEnvProbeMap, invViewMat * reflDir, ROUGHNESS * 12.0 ).xyz;
 	@property( !hw_gamma_read )//Gamma to linear space
 	envColour = envColour * envColour;@end
 	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS) );@end
