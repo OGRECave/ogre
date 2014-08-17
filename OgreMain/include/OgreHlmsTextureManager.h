@@ -105,19 +105,25 @@ namespace Ogre
         struct TextureArray
         {
             TexturePtr  texture;
+            /// When using UV atlas maxTextures = sqrtMaxTextures * sqrtMaxTextures;
+            /// However when using texture arrays, sqrtMaxTextures' value is ignored
             uint16      sqrtMaxTextures;
             uint16      maxTextures;
             bool        automatic;
             bool        isNormalMap;
 
+            uint16      activeEntries;
             StringVector entries;
 
             TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic, bool _isNormalMap ) :
                 sqrtMaxTextures( _sqrtMaxTextures ), maxTextures( _maxTextures ),
-                automatic( _automatic ), isNormalMap( _isNormalMap )
+                automatic( _automatic ), isNormalMap( _isNormalMap ), activeEntries( 0 )
             {
-                entries.reserve( maxTextures );
+                entries.resize( maxTextures );
             }
+
+            uint16 createEntry(void);
+            void destroyEntry( uint16 entry );
         };
 
         struct TextureEntry
@@ -158,6 +164,10 @@ namespace Ogre
                                         uint8 srcBaseMip, bool isNormalMap );
         static void copy3DTexture( const Image &srcImage, TexturePtr dst,
                                    uint16 sliceStart, uint16 sliceEnd, uint8 srcBaseMip );
+
+        TextureArrayVec::iterator findSuitableArray( TextureMapType mapType, uint32 width, uint32 height,
+                                                     uint32 depth, uint32 faces, PixelFormat format,
+                                                     uint8 numMipmaps );
 
         /// Looks for the first image it can successfully load from the pack, and extracts its parameters.
         /// Returns false if failed to retrieve parameters.
@@ -211,6 +221,11 @@ namespace Ogre
         TextureLocation createOrRetrieveTexture( const String &aliasName,
                                                  const String &texName,
                                                  TextureMapType mapType );
+
+        /// Destroys a texture. If the array has multiple entries, the entry for this texture is
+        /// sent back to a waiting list for a future new entry. Trying to read from this texture
+        /// after this call may result in garbage.
+        void destroyTexture( IdString aliasName );
 
         void createFromTexturePack( const HlmsTexturePack &pack );
 
