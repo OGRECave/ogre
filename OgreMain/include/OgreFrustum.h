@@ -419,13 +419,16 @@ namespace Ogre
         @remarks
             The clipping planes are ordered as declared in enumerate constants FrustumPlane.
         */
-        virtual const Plane* getFrustumPlanes(void) const;
+        const Plane* getFrustumPlanes(void) const;
+
+        /// Returns the frustum planes, doesn't check if dirty.
+        const Plane* _getCachedFrustumPlanes(void) const                { return mFrustumPlanes; }
 
         /** Retrieves a specified plane of the frustum (world space).
         @remarks
             Gets a reference to one of the planes which make up the frustum frustum, e.g. for clipping purposes.
         */
-        virtual const Plane& getFrustumPlane( unsigned short plane ) const;
+        const Plane& getFrustumPlane( unsigned short plane ) const;
 
         /** Tests whether the given container is visible in the Frustum.
         @param bound

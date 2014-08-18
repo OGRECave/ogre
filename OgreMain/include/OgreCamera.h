@@ -397,6 +397,9 @@ namespace Ogre {
             rotation inherited from a node attachment and reflection matrix. */
         Vector3 getDerivedRight(void) const;
 
+        /// Same as getDerivedPosition, but doesn't check if dirty.
+        const Vector3& _getCachedDerivedPosition(void) const                { return mDerivedPosition; }
+
         /** Gets the real world orientation of the camera, including any
             rotation inherited from a node attachment */
         const Quaternion& getRealOrientation(void) const;

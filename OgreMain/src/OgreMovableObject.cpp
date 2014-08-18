@@ -427,8 +427,8 @@ namespace Ogre {
         };
 
         ArrayVector3 cameraPos, lodCameraPos;
-        cameraPos.setAll( frustum->getDerivedPosition() );
-        lodCameraPos.setAll( lodCamera->getDerivedPosition() );
+        cameraPos.setAll( frustum->_getCachedDerivedPosition() );
+        lodCameraPos.setAll( lodCamera->_getCachedDerivedPosition() );
 
         // Flip the bit from shadow caster, and leave only that in "includeNonCasters"
         ArrayInt includeNonCasters = Mathlib::SetAll( ((sceneVisibilityFlags & LAYER_SHADOW_CASTER) ^ -1)
@@ -437,7 +437,7 @@ namespace Ogre {
 
         ArrayInt sceneFlags = Mathlib::SetAll( sceneVisibilityFlags );
         ArrayPlane planes[6];
-        const Plane *frustumPlanes = frustum->getFrustumPlanes();
+        const Plane *frustumPlanes = frustum->_getCachedFrustumPlanes();
 
         for( size_t i=0; i<6; ++i )
         {
@@ -565,7 +565,7 @@ namespace Ogre {
 
         while( itor != end )
         {
-            const Plane *frustumPlanes = (*itor)->getFrustumPlanes();
+            const Plane *frustumPlanes = (*itor)->_getCachedFrustumPlanes();
 
             for( size_t i=0; i<6; ++i )
             {
