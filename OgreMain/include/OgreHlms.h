@@ -285,6 +285,8 @@ namespace Ogre
         */
         virtual void reloadFrom( Archive *newDataFolder );
 
+        Archive* getDataFolder(void)                        { return mDataFolder; }
+
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks
             The name of the datablock must be in paramVec["name"] and must be unique
