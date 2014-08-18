@@ -128,7 +128,7 @@ namespace Ogre {
         const Viewport *viewport = camera->getLastViewport();
         Real viewportArea = static_cast<Real>(viewport->getActualWidth() * viewport->getActualHeight());
         ArrayVector3 cameraPos;
-        cameraPos.setAll( camera->getDerivedPosition() );
+        cameraPos.setAll( camera->_getCachedDerivedPosition() );
 
         const Matrix4 &projMat = camera->getProjectionMatrix();
         OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
@@ -229,7 +229,7 @@ namespace Ogre {
                                                        const Camera *camera, Real bias ) const
     {
         ArrayVector3 cameraPos;
-        cameraPos.setAll( camera->getDerivedPosition() );
+        cameraPos.setAll( camera->_getCachedDerivedPosition() );
 
         const Matrix4 &projMat = camera->getProjectionMatrix();
         OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );
