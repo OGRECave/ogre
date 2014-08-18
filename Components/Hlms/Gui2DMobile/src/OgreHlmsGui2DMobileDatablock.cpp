@@ -171,7 +171,7 @@ namespace Ogre
         }
 
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
-        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
 
         for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String ); ++i )
         {
@@ -196,7 +196,7 @@ namespace Ogre
                 {
                     uint val = StringConverter::parseUnsignedInt( *itor, ~0 );
 
-                    if( val != ~0 )
+                    if( val != (uint)(~0) )
                     {
                         //It's a number, must be an UV Set
                         setTextureUvSetForTexture( i, val );
@@ -373,7 +373,7 @@ namespace Ogre
         assert( until > 0 && until <= 16 );
 
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
-        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
         HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->getBlankTexture();
         assert( !texLocation.texture->isTextureTypeArray() );
 

@@ -82,7 +82,8 @@ namespace Ogre
         {
             //Don't include the ID in the comparision
             return memcmp( &mDepthCheck, &_r.mDepthCheck,
-                           ((char*)&mPolygonMode - (char*)&mDepthCheck) + sizeof( PolygonMode ) ) != 0;
+                           ( (const char*)&mPolygonMode - (const char*)&mDepthCheck ) +
+                                                            sizeof( PolygonMode ) ) != 0;
         }
     };
 
@@ -117,8 +118,8 @@ namespace Ogre
         {
             //Don't include the ID in the comparision
             return memcmp( &mSeparateBlend, &_r.mSeparateBlend,
-                           ((char*)&mBlendOperationAlpha - (char*)&mSeparateBlend) +
-                                                    sizeof( SceneBlendOperation ) ) != 0;
+                           ( (const char*)&mBlendOperationAlpha - (const char*)&mSeparateBlend) +
+                                                                sizeof( SceneBlendOperation ) ) != 0;
         }
     };
 

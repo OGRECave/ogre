@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     Rectangle2D::Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager ) :
-            MovableObject( id, objectMemoryManager, 255 ),
+            MovableObject( id, objectMemoryManager, 0 ),
             mPosition( Vector3::ZERO ),
             mOrientation( Quaternion::IDENTITY ),
             mScale( Vector3::UNIT_SCALE ),
@@ -243,7 +243,40 @@ namespace Ogre
     //-----------------------------------------------------------------------
     const String& Rectangle2D::getMovableType(void) const
     {
-        static String movType = "Rectangle2D";
-        return movType;
+        return Rectangle2DFactory::FACTORY_TYPE_NAME;
+    }
+
+    //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    String Rectangle2DFactory::FACTORY_TYPE_NAME = "Rectangle2D";
+    //-----------------------------------------------------------------------
+    const String& Rectangle2DFactory::getType(void) const
+    {
+        return FACTORY_TYPE_NAME;
+    }
+    //-----------------------------------------------------------------------
+    MovableObject* Rectangle2DFactory::createInstanceImpl( IdType id,
+                                                           ObjectMemoryManager *objectMemoryManager,
+                                                           const NameValuePairList* params )
+    {
+        bool bQuad = true;
+        if (params != 0)
+        {
+            NameValuePairList::const_iterator ni;
+
+            ni = params->find("quad");
+            if (ni != params->end())
+            {
+                bQuad = StringConverter::parseBool( ni->second, true );
+            }
+
+        }
+
+        return OGRE_NEW Rectangle2D( bQuad, id, objectMemoryManager );
+    }
+    //-----------------------------------------------------------------------
+    void Rectangle2DFactory::destroyInstance( MovableObject* obj)
+    {
+        OGRE_DELETE obj;
     }
 }

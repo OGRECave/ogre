@@ -85,6 +85,9 @@ namespace Ogre {
             resetAabb();
             updateLightBounds();
             break;
+        default:
+            //Keep compiler happy
+            break;
         }
     }
     //-----------------------------------------------------------------------

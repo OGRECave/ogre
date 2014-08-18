@@ -127,7 +127,8 @@ namespace Ogre
         outData.mOwner[nextSlotIdx]     = 0; //Caller has to fill it. Otherwise a crash is a good warning
         outData.mLocalAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
         outData.mWorldAabb->setFromAabb( Aabb::BOX_INFINITE, nextSlotIdx );
-        outData.mWorldRadius[nextSlotIdx]           = 0;
+        outData.mLocalRadius[nextSlotIdx]           = std::numeric_limits<Real>::infinity();
+        outData.mWorldRadius[nextSlotIdx]           = std::numeric_limits<Real>::infinity();
         outData.mDistanceToCamera[nextSlotIdx]      = 0;
         outData.mUpperDistance[nextSlotIdx]         = std::numeric_limits<Real>::max();
         outData.mVisibilityFlags[nextSlotIdx]       = MovableObject::getDefaultVisibilityFlags();

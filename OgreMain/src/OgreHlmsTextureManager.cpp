@@ -315,7 +315,8 @@ namespace Ogre
             if( mDefaultTextureParameters[mapType].mipmaps )
             {
                 uint32 heighestRes = std::max( std::max( image.getWidth(), image.getHeight() ),
-                                               std::max( image.getDepth(), image.getNumFaces() ) );
+                                               std::max<uint32>( image.getDepth(),
+                                                                 image.getNumFaces() ) );
 #if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1700))
                 numMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) /
                                                          logf( 2.0f ) ) );
@@ -553,7 +554,8 @@ namespace Ogre
             if( texArrayIt->activeEntries == texArrayIt->maxTextures )
             {
                 //The whole array has no actual content. Destroy the texture.
-                TextureManager::getSingleton().remove( texArrayIt->texture.staticCast<Resource>() );
+                ResourcePtr texResource = texArrayIt->texture;
+                TextureManager::getSingleton().remove( texResource );
                 texArrayIt = efficientVectorRemove( mTextureArrays[it->mapType], texArrayIt );
 
                 if( texArrayIt != mTextureArrays[it->mapType].end() )

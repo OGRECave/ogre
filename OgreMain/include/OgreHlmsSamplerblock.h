@@ -87,7 +87,7 @@ namespace Ogre
         {
             //Don't include the ID in the comparision
             return memcmp( &mMinFilter, &_r.mMinFilter,
-                           ((char*)&mMaxLod - (char*)&mMinFilter) + sizeof( mMaxLod ) ) != 0;
+                           ((const char*)&mMaxLod - (const char*)&mMinFilter) + sizeof( mMaxLod ) ) != 0;
         }
     };
 

@@ -1282,6 +1282,52 @@ namespace Ogre {
         */
         virtual void destroyAllEntities(void);
 
+        /** Creates a 2D rectangle that can be displayed for screen space effects or
+            showing a basic GUI.
+            Notice that due to engine's requirements, you need to attach this object
+            to a scene node in order to be rendered correctly.
+        @par
+            You can use the Root scene node. However if you're planning on also using
+            setRelativeOrigin, beware that this would break the permanent setting and
+            you should then use a dummy scene node for your rectangles.
+        @remarks
+            The Rectangle2D will request to use identity view and projection matrices,
+            but only low level materials will honour that request. PBS shaders will
+            ignore it (thus the rectangle will be drawn in 3D space) and other Hlms
+            types may work differently and you'll have to check its documentation.
+        @param bQuad
+            When true, the rectangle is drawn with two triangles. When false, it is
+            drawn as a single oversized triangle. Full screen triangles are faster
+            than quads, but will only work correctly if they cover the entire screen,
+            or are aided by scissor tests to clip the borders.
+        @param sceneType
+            Whether you will be moving the Rectangle2D's scene node around. Unless you're
+            planning to use this Rectangle2D for 3D purposes, it is highly recomended that
+            you use SCENE_STATIC (you can safely use SCENE_STATIC and change
+            Rectangle2D::setCorners and Rectangle2D::setNormal every frame).
+        @return
+            The Rectangle2D.
+        */
+        virtual Rectangle2D* createRectangle2D( bool bQuad,
+                                                SceneMemoryMgrTypes sceneType = SCENE_STATIC );
+
+        /** Removes & destroys an Entity from the SceneManager.
+        @warning
+            It may be safer to wait to clear the whole scene if you are unsure use clearScene.
+            @see SceneManager::clearScene
+        */
+        virtual void destroyRectangle2D( Rectangle2D *rect );
+
+        /** Removes & destroys all Rectangle2D.
+            @warning
+                Again, use caution since no Rectangle2D must be referred to
+                elsewhere otherwise a crash is likely. Use clearScene if you
+                are unsure (it clears SceneNode entries too.)
+            @see
+                SceneManager::clearScene
+        */
+        virtual void destroyAllRectangle2D(void);
+
         /** Used by Compositor, tells of which compositor textures active,
             so Materials can access them. If MRT, there could be more than one
         @param name

@@ -94,6 +94,24 @@ namespace Ogre {
         virtual void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false) {}
 
     };
+
+    /** Factory object for creating Entity instances */
+    class _OgreExport Rectangle2DFactory : public MovableObjectFactory
+    {
+    protected:
+        virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                                   const NameValuePairList* params = 0 );
+    public:
+        Rectangle2DFactory() {}
+        ~Rectangle2DFactory() {}
+
+        static String FACTORY_TYPE_NAME;
+
+        const String& getType(void) const;
+        void destroyInstance( MovableObject* obj);
+
+    };
+
     /** @} */
     /** @} */
 

@@ -64,8 +64,8 @@ namespace Ogre
 
         PbsMobileShaderCreationData() :
             mFresnelTypeSizeBytes( 4 ),
-            mNormalMapWeight( 1.0f ),
-            mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f )
+            mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f ),
+            mNormalMapWeight( 1.0f )
         {
             mDetailNormalWeight[0] = mDetailNormalWeight[1] = 1.0f;
             mDetailNormalWeight[2] = mDetailNormalWeight[3] = 1.0f;

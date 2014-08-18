@@ -435,6 +435,25 @@ void SceneManager::destroyAllEntities(void)
     destroyAllMovableObjectsByType(EntityFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
+Rectangle2D* SceneManager::createRectangle2D( bool bQuad, SceneMemoryMgrTypes sceneType )
+{
+    // delegate to factory implementation
+    NameValuePairList params;
+    params["quad"] = StringConverter::toString( bQuad );
+    return static_cast<Rectangle2D*>( createMovableObject( Rectangle2DFactory::FACTORY_TYPE_NAME,
+                                                           &mEntityMemoryManager[sceneType], &params ) );
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroyRectangle2D( Rectangle2D *rect )
+{
+    destroyMovableObject( rect );
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroyAllRectangle2D(void)
+{
+    destroyAllMovableObjectsByType(Rectangle2DFactory::FACTORY_TYPE_NAME);
+}
+//-----------------------------------------------------------------------
 void SceneManager::_addCompositorTexture( IdString name, const TextureVec *texs )
 {
     mCompositorTextures.push_back( CompositorTexture( name, texs ) );
