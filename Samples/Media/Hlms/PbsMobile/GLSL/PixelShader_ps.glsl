@@ -58,15 +58,24 @@ uniform @insertpiece( FresnelType ) F0;
 @property( uv_atlas )uniform mediump vec3 atlasOffsets[@value( uv_atlas )];@end
 @property( normal_weight )uniform lowp float normalWeights[@value( normal_weight )];@end
 @property( detail_weights )uniform lowp vec4 cDetailWeights;@end
-@property( detail_offsets )uniform mediump vec4 detailOffsetScale[@value( detail_offsets )];
-	@foreach( detail_offsets, n )
-		@property( detail_offsets@n )
-			@piece( offsetDetailD@n ) * detailOffsetScale[@value(currOffsetDetailD)].zw + detailOffsetScale[@counter(currOffsetDetailD)].xy@end
-			@piece( offsetDetailN@n ) * detailOffsetScale[@value(currOffsetDetailN)].zw + detailOffsetScale[@counter(currOffsetDetailN)].xy@end
+@property( detail_offsetsD )uniform mediump vec4 detailOffsetScaleD[@value( detail_offsetsD )];@end
+@property( detail_offsetsN )uniform mediump vec4 detailOffsetScaleN[@value( detail_offsetsN )];@end
+// END UNIFORM DECLARATION
+
+@property( detail_offsetsD )
+	@foreach( detail_maps_diffuse, n )
+		@property( detail_offsetsD@n )
+			@piece( offsetDetailD@n ) * detailOffsetScaleD[@value(currOffsetDetailD)].zw + detailOffsetScaleD[@counter(currOffsetDetailD)].xy@end
 		@end
 	@end
 @end
-// END UNIFORM DECLARATION
+@property( detail_offsetsN )
+	@foreach( detail_maps_normal, n )
+		@property( detail_offsetsN@n )
+			@piece( offsetDetailN@n ) * detailOffsetScaleN[@value(currOffsetDetailN)].zw + detailOffsetScaleN[@counter(currOffsetDetailN)].xy@end
+		@end
+	@end
+@end
 
 @property( !roughness_map )#define ROUGHNESS roughness@end
 @property( diffuse_map )uniform lowp sampler2D	texDiffuseMap;@end

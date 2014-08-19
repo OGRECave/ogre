@@ -64,7 +64,7 @@ namespace Ogre
         /// Baked parameters from PbsMobileShaderCreationData.
         /// mNumVariableParameters says how many parameters were
         /// actually baked.
-        float   mVariableParameters[40];
+        float   mVariableParameters[56];
 
         TexturePtr              mTexture[NUM_PBSM_TEXTURE_TYPES];
         HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
@@ -291,13 +291,14 @@ namespace Ogre
         void setDetailMapWeight( uint8 detailMap, Real weight );
         Real getDetailMapWeight( uint8 detailMap ) const;
 
-        /** Sets the scale and offset of the detail map. Affects both diffuse and
-            normal at the same time.
+        /** Sets the scale and offset of the detail map.
         @remarks
             A value of Vector4( 0, 0, 1, 1 ) will cause a flushRenderables as we
             remove the code from the shader.
-        @param detailNormalMap
-            Value in the range [0; 4)
+        @param detailMap
+            Value in the range [0; 8)
+            Range [0; 4) affects diffuse maps.
+            Range [4; 8) affects normal maps.
         @param offsetScale
             XY = Contains the UV offset.
             ZW = Constains the UV scale.

@@ -305,8 +305,9 @@ namespace Ogre
             param += 4;
         }
 
-        //vec4 detailOffsetScale[4];  (up to four, can be zero)
-        for( size_t i=0; i<4; ++i )
+        //vec4 detailOffsetScaleD[4];  (up to four, can be zero)
+        //vec4 detailOffsetScaleN[4];  (up to four, can be zero)
+        for( size_t i=0; i<8; ++i )
         {
             if( mShaderCreationData->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
             {
@@ -324,9 +325,10 @@ namespace Ogre
         //vec3 atlasOffsets[4]; (up to four, can be zero)
         //float normalWeights[5]; (up to five, can be zero)
         //vec4 cDetailWeights;
-        //vec4 detailOffsetScale[4];  (up to four, can be zero)
+        //vec4 detailOffsetScaleD[4];  (up to four, can be zero)
+        //vec4 detailOffsetScaleN[4];  (up to four, can be zero)
         mFullParametersBytes[0] = 7 * sizeof(float) + (param << 2);
-        mFullParametersBytes[1] = 7 * sizeof(float);
+        mFullParametersBytes[1] = 0;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setTexture( const String &name,
@@ -548,7 +550,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale )
     {
-        assert( detailMap < 4 );
+        assert( detailMap < 8 );
         bool wasDisabled = mShaderCreationData->mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 );
 
         mShaderCreationData->mDetailsOffsetScale[detailMap] = offsetScale;
@@ -564,7 +566,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     const Vector4& HlmsPbsMobileDatablock::getDetailMapOffsetScale( uint8 detailMap ) const
     {
-        assert( detailMap < 4 );
+        assert( detailMap < 8 );
         return mShaderCreationData->mDetailsOffsetScale[detailMap];
     }
     //-----------------------------------------------------------------------------------

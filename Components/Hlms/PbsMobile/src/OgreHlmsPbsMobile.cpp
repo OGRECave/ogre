@@ -66,11 +66,16 @@ namespace Ogre
     const IdString PbsMobileProperty::NormalWeightDetail3   = IdString( "normal_weight_detail3" );
 
     const IdString PbsMobileProperty::DetailWeights     = IdString( "detail_weights" );
-    const IdString PbsMobileProperty::DetailOffsets     = IdString( "detail_offsets" );
-    const IdString PbsMobileProperty::DetailOffsets0    = IdString( "detail_offsets0" );
-    const IdString PbsMobileProperty::DetailOffsets1    = IdString( "detail_offsets1" );
-    const IdString PbsMobileProperty::DetailOffsets2    = IdString( "detail_offsets2" );
-    const IdString PbsMobileProperty::DetailOffsets3    = IdString( "detail_offsets3" );
+    const IdString PbsMobileProperty::DetailOffsetsD    = IdString( "detail_offsetsD" );
+    const IdString PbsMobileProperty::DetailOffsetsD0   = IdString( "detail_offsetsD0" );
+    const IdString PbsMobileProperty::DetailOffsetsD1   = IdString( "detail_offsetsD1" );
+    const IdString PbsMobileProperty::DetailOffsetsD2   = IdString( "detail_offsetsD2" );
+    const IdString PbsMobileProperty::DetailOffsetsD3   = IdString( "detail_offsetsD3" );
+    const IdString PbsMobileProperty::DetailOffsetsN    = IdString( "detail_offsetsN" );
+    const IdString PbsMobileProperty::DetailOffsetsN0   = IdString( "detail_offsetsN0" );
+    const IdString PbsMobileProperty::DetailOffsetsN1   = IdString( "detail_offsetsN1" );
+    const IdString PbsMobileProperty::DetailOffsetsN2   = IdString( "detail_offsetsN2" );
+    const IdString PbsMobileProperty::DetailOffsetsN3   = IdString( "detail_offsetsN3" );
 
     const IdString PbsMobileProperty::UvDiffuse         = IdString( "uv_diffuse" );
     const IdString PbsMobileProperty::UvNormal          = IdString( "uv_normal" );
@@ -147,12 +152,20 @@ namespace Ogre
         &PbsMobileProperty::NormalWeightDetail3
     };
 
-    const IdString *PbsMobileProperty::DetailOffsetsPtrs[4] =
+    const IdString *PbsMobileProperty::DetailOffsetsDPtrs[4] =
     {
-        &PbsMobileProperty::DetailOffsets0,
-        &PbsMobileProperty::DetailOffsets1,
-        &PbsMobileProperty::DetailOffsets2,
-        &PbsMobileProperty::DetailOffsets3
+        &PbsMobileProperty::DetailOffsetsD0,
+        &PbsMobileProperty::DetailOffsetsD1,
+        &PbsMobileProperty::DetailOffsetsD2,
+        &PbsMobileProperty::DetailOffsetsD3
+    };
+
+    const IdString *PbsMobileProperty::DetailOffsetsNPtrs[4] =
+    {
+        &PbsMobileProperty::DetailOffsetsN0,
+        &PbsMobileProperty::DetailOffsetsN1,
+        &PbsMobileProperty::DetailOffsetsN2,
+        &PbsMobileProperty::DetailOffsetsN3
     };
 
     const IdString *PbsMobileProperty::BlendModes[4] =
@@ -180,7 +193,8 @@ namespace Ogre
         "atlasOffsets",
         "normalWeights",
         "cDetailWeights",
-        "detailOffsetScale",
+        "detailOffsetScaleD",
+        "detailOffsetScaleN",
     };
 
     HlmsPbsMobile::HlmsPbsMobile( Archive *dataFolder ) : Hlms( HLMS_PBS, "pbs", dataFolder )
@@ -386,7 +400,7 @@ namespace Ogre
             if( datablock->getDetailNormalWeight( i ) != 1.0f &&
                 !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
             {
-                setProperty( *PbsMobileProperty::DetailNormalWeights[i], 1 );
+                setProperty( *PbsMobileProperty::DetailNormalWeights[numNormalWeights - 1], 1 );
                 ++numNormalWeights;
             }
         }
@@ -414,16 +428,36 @@ namespace Ogre
 
         {
             int numOffsets = 0;
+            size_t validDetailMaps = 0;
             for( size_t i=0; i<4; ++i )
             {
                 if( datablock->mShaderCreationData->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
                 {
-                    setProperty( *PbsMobileProperty::DetailOffsetsPtrs[i], 1 );
+                    setProperty( *PbsMobileProperty::DetailOffsetsDPtrs[validDetailMaps], 1 );
                     ++numOffsets;
                 }
+
+                if( !datablock->mTexture[PBSM_DETAIL0 + i].isNull() )
+                    ++validDetailMaps;
             }
 
-            setProperty( PbsMobileProperty::DetailOffsets, numOffsets );
+            setProperty( PbsMobileProperty::DetailOffsetsD, numOffsets );
+
+            numOffsets = 0;
+            validDetailMaps = 0;
+            for( size_t i=0; i<4; ++i )
+            {
+                if( datablock->mShaderCreationData->mDetailsOffsetScale[i+4] != Vector4( 0, 0, 1, 1 ) )
+                {
+                    setProperty( *PbsMobileProperty::DetailOffsetsNPtrs[validDetailMaps], 1 );
+                    ++numOffsets;
+                }
+
+                if( !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
+                    ++validDetailMaps;
+            }
+
+            setProperty( PbsMobileProperty::DetailOffsetsN, numOffsets );
         }
 
         setProperty( PbsMobileProperty::DiffuseMap,     !datablock->mTexture[PBSM_DIFFUSE].isNull() );
