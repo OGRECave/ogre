@@ -191,7 +191,7 @@ mediump vec3 cookTorrance( mediump vec3 lightDir, mediump vec3 viewDir, lowp flo
 {
 	mediump vec3 halfWay= normalize( lightDir + viewDir );
 	lowp float NdotL = clamp( dot( nNormal, lightDir ), 0.0, 1.0 );
-	lowp float NdotH = clamp( dot( nNormal, halfWay ), 0.0, 1.0 );
+	lowp float NdotH = clamp( dot( nNormal, halfWay ), 0.001, 1.0 );
 	lowp float VdotH = clamp( dot( viewDir, halfWay ), 0.001, 1.0 );
 
 	lowp float sqR = ROUGHNESS * ROUGHNESS;
