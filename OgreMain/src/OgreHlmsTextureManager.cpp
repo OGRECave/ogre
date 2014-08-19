@@ -305,10 +305,12 @@ namespace Ogre
             image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
             PixelFormat imageFormat = image.getFormat();
-            if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 )
-                imageFormat = PF_A8R8G8B8;
-            else if( imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 )
+            if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 ||
+                imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 ||
+                imageFormat == PF_A8R8G8B8 )
+            {
                 imageFormat = PF_A8B8G8R8;
+            }
 
             uint8 numMipmaps = 0;
 
@@ -632,7 +634,18 @@ namespace Ogre
         }
 
         if( pack.pixelFormat != PF_UNKNOWN )
+        {
             pixelFormat = pack.pixelFormat;
+        }
+        else
+        {
+            if( pixelFormat == PF_X8R8G8B8 || pixelFormat == PF_R8G8B8 ||
+                pixelFormat == PF_X8B8G8R8 || pixelFormat == PF_B8G8R8 ||
+                pixelFormat == PF_A8R8G8B8 )
+            {
+                pixelFormat = PF_A8B8G8R8;
+            }
+        }
 
         if( pack.hasMipmaps )
         {
