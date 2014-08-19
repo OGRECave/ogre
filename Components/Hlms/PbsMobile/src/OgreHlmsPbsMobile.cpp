@@ -395,13 +395,20 @@ namespace Ogre
             ++numNormalWeights;
         }
 
-        for( size_t i=0; i<4; ++i )
         {
-            if( datablock->getDetailNormalWeight( i ) != 1.0f &&
-                !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
+            size_t validDetailMaps = 0;
+            for( size_t i=0; i<4; ++i )
             {
-                setProperty( *PbsMobileProperty::DetailNormalWeights[numNormalWeights - 1], 1 );
-                ++numNormalWeights;
+                if( !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
+                {
+                    if( datablock->getDetailNormalWeight( i ) != 1.0f )
+                    {
+                        setProperty( *PbsMobileProperty::DetailNormalWeights[validDetailMaps], 1 );
+                        ++numNormalWeights;
+                    }
+
+                    ++validDetailMaps;
+                }
             }
         }
 
