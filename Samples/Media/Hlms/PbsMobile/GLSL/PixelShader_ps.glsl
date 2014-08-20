@@ -262,7 +262,7 @@ void main()
 @foreach( detail_maps_diffuse, n )
 	@insertpiece( lowp ) vec4 detailCol@n	= @insertpiece(texture2D)( texDetailMap[@n], psUv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ) );
 	@property( !hw_gamma_read )//Gamma to linear space
-		detailCol.xyz = detailCol.xyz * detailCol.xyz;@end
+		detailCol@n.xyz = detailCol@n.xyz * detailCol@n.xyz;@end
 	detailWeights.@insertpiece(detail_diffuse_swizzle@n) *= detailCol@n.w;
 	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
 @end
