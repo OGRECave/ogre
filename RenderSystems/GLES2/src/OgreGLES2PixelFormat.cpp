@@ -133,7 +133,7 @@ namespace Ogre {
 #if OGRE_NO_GLES3_SUPPORT == 0
                 return GL_RGB;
 #else
-                if (hwGamma && caps->hasCapability( RSC_HW_GAMMA ) ))
+                if( hwGamma && caps->hasCapability( RSC_HW_GAMMA ) )
                     return GL_SRGB_EXT;
                 else
                     return GL_RGB;
@@ -154,7 +154,7 @@ namespace Ogre {
     #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                     return GL_BGRA_EXT;
     #else
-                    if (hwGamma && caps->hasCapability( RSC_HW_GAMMA ) ))
+                    if( hwGamma && caps->hasCapability( RSC_HW_GAMMA ) )
                         return GL_SRGB_ALPHA_EXT;
                     else
                         return GL_RGBA;
