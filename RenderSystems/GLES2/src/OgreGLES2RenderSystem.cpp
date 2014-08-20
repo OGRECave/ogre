@@ -473,11 +473,13 @@ namespace Ogre {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
 
+#if OGRE_NO_GLES3_SUPPORT == 0
         //Extension support is disabled as it is a bit buggy and hard to support
-        if (/*mGLSupport->checkExtension("GL_EXT_sRGB") ||*/ gleswIsSupported(3, 0))
+        if (GLSupport->checkExtension("GL_EXT_sRGB") || gleswIsSupported(3, 0))
         {
             rsc->setCapability( RSC_HW_GAMMA );
         }
+#endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         rsc->setCapability( RSC_TEXTURE_SIGNED_INT );

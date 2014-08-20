@@ -172,7 +172,7 @@ namespace Ogre {
     #if OGRE_NO_GLES3_SUPPORT == 0
                 return GL_RGBA;
     #else
-                if (hwGamma)
+                if( hwGamma && caps->hasCapability( RSC_HW_GAMMA ) )
                     return GL_SRGB_ALPHA_EXT;
                 else
                     return GL_RGBA;
