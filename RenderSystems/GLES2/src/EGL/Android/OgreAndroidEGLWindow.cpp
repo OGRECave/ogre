@@ -50,7 +50,7 @@ namespace Ogre {
     AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
         : EGLWindow(glsupport),
           mMaxBufferSize(32),
-          mMinBufferSize(16),
+          mMinBufferSize(32),
           mMaxDepthSize(16),
           mMaxStencilSize(0),
           mMSAA(0),
