@@ -237,9 +237,9 @@ namespace Ogre {
 
     void AndroidEGLWindow::_destroyInternalResources()
     {
-		if(mClosed)
-			return;
-		
+        if(mClosed)
+            return;
+        
         mContext->setCurrent();
         
         GLES2RenderSystem::getResourceManager()->notifyOnContextLost();
