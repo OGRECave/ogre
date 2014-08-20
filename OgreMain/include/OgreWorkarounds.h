@@ -41,6 +41,13 @@ THE SOFTWARE.
 //	https://twitter.com/KeepItFoolish/status/472456232738234368
 #define OGRE_GLES2_WORKAROUND_1		1
 
+//For some reason cubemapping in ES, the vector needs to be rotated 90° around the X axis.
+//May be it's a difference in the ES vs GL spec, or an Ogre bug when uploading the faces.
+//
+//First seen: ???
+//Last seen:  2014-08-19 on All devices
+#define OGRE_GLES2_WORKAROUND_2		1
+
 #endif
 
 #endif

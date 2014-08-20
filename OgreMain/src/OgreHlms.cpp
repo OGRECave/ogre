@@ -81,6 +81,7 @@ namespace Ogre
     const IdString HlmsBaseProp::AlphaTest      = IdString( "alpha_test" );
 
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
+    const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
 
     const IdString *HlmsBaseProp::UvCountPtrs[8] =
     {
@@ -106,6 +107,7 @@ namespace Ogre
         mRenderSystem( 0 ),
         mShaderProfile( "unset!" ),
         mDebugOutput( true ),
+        mHighQuality( false ),
         mDefaultDatablock( 0 ),
         mType( type ),
         mTypeName( typeName )
@@ -1142,6 +1144,12 @@ namespace Ogre
                                 HlmsMacroblock(), HlmsBlendblock(), HlmsParamVec(), false );
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::setHighQuality( bool highQuality )
+    {
+        mShaderCache.clear();
+        mHighQuality = highQuality;
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::reloadFrom( Archive *newDataFolder )
     {
         mShaderCache.clear();
@@ -1320,6 +1328,8 @@ namespace Ogre
 
             if( mShaderProfile == "glsl" ) //TODO: String comparision
                 setProperty( HlmsBaseProp::GL3Plus, 330 );
+
+            setProperty( HlmsBaseProp::HighQuality, mHighQuality );
 
             StringVector::const_iterator itor = mPieceFiles[i].begin();
             StringVector::const_iterator end  = mPieceFiles[i].end();

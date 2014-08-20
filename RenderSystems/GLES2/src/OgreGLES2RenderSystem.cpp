@@ -473,7 +473,8 @@ namespace Ogre {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
 
-        if (mGLSupport->checkExtension("GL_EXT_sRGB") || gleswIsSupported(3, 0))
+        //Extension support is disabled as it is a bit buggy and hard to support
+        if (/*mGLSupport->checkExtension("GL_EXT_sRGB") ||*/ gleswIsSupported(3, 0))
         {
             rsc->setCapability( RSC_HW_GAMMA );
         }
@@ -1235,9 +1236,9 @@ namespace Ogre {
         OCGE( glSamplerParameteri( samplerName, GL_TEXTURE_WRAP_R,
                                    getTextureAddressingMode( newBlock->mW ) ) );
 
-        OCGE( glSamplerParameterfv( samplerName, GL_TEXTURE_BORDER_COLOR,
+        /*OCGE( glSamplerParameterfv( samplerName, GL_TEXTURE_BORDER_COLOR,
                                     newBlock->mBorderColour.ptr() ) );
-        OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_LOD_BIAS, newBlock->mMipLodBias ) );
+        OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_LOD_BIAS, newBlock->mMipLodBias ) );*/
         OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MIN_LOD, newBlock->mMinLod ) );
         OCGE( glSamplerParameterf( samplerName, GL_TEXTURE_MAX_LOD, newBlock->mMaxLod ) );
 

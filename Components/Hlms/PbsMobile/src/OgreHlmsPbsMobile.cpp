@@ -769,9 +769,19 @@ namespace Ogre
                 }
             }
 
-            //mat3 invViewMat
+            //mat3 invViewMatCubemap
             for( size_t i=0; i<9; ++i )
+            {
+#ifdef OGRE_GLES2_WORKAROUND_2
+                Matrix3 xRot( 1.0f, 0.0f, 0.0f,
+                              0.0f, 0.0f, -1.0f,
+                              0.0f, 1.0f, 0.0f );
+                xRot = xRot * invViewMatrix3;
+                mPreparedPass.pixelShaderSharedBuffer.push_back( (float)xRot[0][i] );
+#else
                 mPreparedPass.pixelShaderSharedBuffer.push_back( (float)invViewMatrix3[0][i] );
+#endif
+            }
 
             mPreparedPass.shadowMaps.clear();
             mPreparedPass.shadowMaps.reserve( numShadowMaps );

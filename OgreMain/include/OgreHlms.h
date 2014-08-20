@@ -128,6 +128,7 @@ namespace Ogre
         String          mShaderProfile; /// "glsl", "glsles", "hlsl"
         String          mOutputPath;
         bool            mDebugOutput;
+        bool            mHighQuality;
 
         /// The default datablock occupies the name IdString(); which is not the same as IdString("")
         HlmsDatablock   *mDefaultDatablock;
@@ -271,6 +272,23 @@ namespace Ogre
         IdString getTypeName(void) const                    { return mTypeName; }
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
         HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
+
+        /** Sets the quality of the Hlms. This function is most relevant for mobile and
+            almost or completely ignored by Desktop.
+            The default value is false.
+        @par
+            On mobile, high quality will use "highp" quality precision qualifier for
+            all its variables and functions.
+            When not in HQ, mobile users may see aliasing artifacts, gradients; but
+            the performance impact can be quite high. Some GPU drivers might even
+            refuse to execute the shader as they cannot handle it.
+        @par
+            Unless you absolutely require high quality rendering on Mobile devices
+            and/or to get it to look as closely as possible as it looks in a Desktop
+            device, the recommended option is to have this off.
+        */
+        void setHighQuality( bool highQuality );
+        bool getHighQuality(void) const                     { return mHighQuality; }
 
         /** Destroys all the cached shaders and in the next opportunity will recreate them
             from the new location. This is very useful for fast iteration and real-time
@@ -480,6 +498,7 @@ namespace Ogre
         static const IdString AlphaTest;
 
         static const IdString GL3Plus;
+        static const IdString HighQuality;
 
         static const IdString *UvCountPtrs[8];
     };

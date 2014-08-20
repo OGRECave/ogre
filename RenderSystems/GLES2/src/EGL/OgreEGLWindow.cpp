@@ -203,7 +203,7 @@ namespace Ogre {
             buffer = mIsFullScreen? FB_FRONT : FB_BACK;
         }
 
-        GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
+        GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format, false);
         GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
 
         if ((format == 0) || (type == 0))

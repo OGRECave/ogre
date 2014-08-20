@@ -187,7 +187,7 @@ namespace Ogre {
 
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
-        GLenum format = GLES2PixelUtil::getGLOriginFormat(mFormat);
+        GLenum format = GLES2PixelUtil::getGLOriginFormat(mFormat, mHwGamma);
         GLenum internalformat = GLES2PixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
         uint32 width = mWidth;
         uint32 height = mHeight;

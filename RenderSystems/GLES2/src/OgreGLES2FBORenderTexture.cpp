@@ -318,8 +318,8 @@ namespace Ogre {
             mProps[x].valid = false;
 
             // Fetch GL format token
-            GLint internalFormat = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
-            GLenum fmt = GLES2PixelUtil::getGLOriginFormat((PixelFormat)x);
+            GLint internalFormat = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x, false);
+            GLenum fmt = GLES2PixelUtil::getGLOriginFormat((PixelFormat)x, false);
             GLenum type = GLES2PixelUtil::getGLOriginDataType((PixelFormat)x);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
