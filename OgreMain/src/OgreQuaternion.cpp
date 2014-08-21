@@ -411,7 +411,7 @@ namespace Ogre {
     bool Quaternion::equals(const Quaternion& rhs, const Radian& tolerance) const
     {
         Real d = Dot(rhs);
-        Radian angle = Math::ACos(2 * d*d - 1.0);
+        Radian angle = Math::ACos(2.0f * d*d - 1.0f);
 
         return Math::Abs(angle.valueRadians()) <= tolerance.valueRadians();
     }
