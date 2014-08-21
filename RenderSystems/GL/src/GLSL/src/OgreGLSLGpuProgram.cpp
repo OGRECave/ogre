@@ -138,7 +138,7 @@ namespace Ogre {
 			// pass on parameters from params to program object uniforms
 			linkProgram->updateUniforms(params, mask, mType);
 		}
-		catch (Exception& e) {}
+		catch (Exception&) {}
 	
 	}
 
