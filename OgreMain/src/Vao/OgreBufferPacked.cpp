@@ -47,6 +47,8 @@ namespace Ogre
         mMappingStart( 0 ),
         mMappingCount( 0 ),
         mBufferInterface( bufferInterface ),
+        mLastMappingStart( 0 ),
+        mLastMappingCount( 0 ),
         mShadowCopy( 0 ),
         mLastFrameMapped( ~0 )
     {
@@ -78,6 +80,16 @@ namespace Ogre
         {
             OGRE_FREE_SIMD( mShadowCopy, MEMCATEGORY_GEOMETRY );
             mShadowCopy = 0;
+        }
+
+        if( mMappingState != MS_UNMAPPED )
+        {
+            LogManager::getSingleton().logMessage( "WARNING: Deleting mapped buffer without "
+                                                   "having it unmapped. This is often sign of"
+                                                   " a resource leak or a bad pattern. "
+                                                   "Umapping the buffer for you...",
+                                                   LML_CRITICAL );
+            unmap( UO_UNMAP_ALL );
         }
 
         delete mBufferInterface;
@@ -120,6 +132,20 @@ namespace Ogre
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                          "persistentMethod cannot be MS_UNMAPPED",
+                         "BufferPacked::map" );
+        }
+
+        if( !elementCount )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Mapping 0 bytes is forbidden!",
+                         "BufferPacked::map" );
+        }
+
+        if( isCurrentlyMapped() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Buffer already mapped!",
                          "BufferPacked::map" );
         }
 
@@ -171,8 +197,22 @@ namespace Ogre
 
         mBufferInterface->unmap( unmapOption );
 
-        if( unmapOption || mMappingState == MS_MAPPED )
+        if( unmapOption == UO_UNMAP_ALL || mMappingState == MS_MAPPED )
             mMappingState = MS_UNMAPPED;
+
+        mLastMappingStart = 0;
+        mLastMappingCount = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    bool BufferPacked::isCurrentlyMapped(void) const
+    {
+        if( mMappingState == MS_UNMAPPED )
+            return false;
+
+        if( mLastMappingCount == 0 )
+            return false;
+
+        return true;
     }
 }
 

@@ -108,14 +108,16 @@ namespace Ogre
                                                flags ) );
         }
 
-        mBuffer->mLastMappingStart = elementStart + mBuffer->mInternalBufferStart +
-                                        mBuffer->mNumElements * dynamicCurrentFrame;
+        mBuffer->mLastMappingStart = 0;
         mBuffer->mLastMappingCount = elementCount;
 
         char *retVal = (char*)mMappedPtr;
 
         if( mBuffer->mMappingState >= MS_PERSISTENT_INCOHERENT && canPersistentMap )
+        {
+            mBuffer->mLastMappingStart = elementStart + mBuffer->mNumElements * dynamicCurrentFrame;
             retVal += (elementStart + mBuffer->mNumElements * dynamicCurrentFrame) * bytesPerElement;
+        }
 
         return retVal;
     }
@@ -130,8 +132,7 @@ namespace Ogre
         {
             OCGLE( glBindBuffer( mTarget, mVboName ) );
             OCGLE( glFlushMappedBufferRange( mTarget,
-                                             (mBuffer->mLastMappingStart - mBuffer->mMappingStart) *
-                                                                            mBuffer->mBytesPerElement,
+                                             mBuffer->mLastMappingStart,
                                              mBuffer->mLastMappingCount * mBuffer->mBytesPerElement ) );
 
             if( unmapOption == UO_UNMAP_ALL || !canPersistentMap || mBuffer->mMappingState == MS_MAPPED )

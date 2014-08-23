@@ -41,7 +41,8 @@ namespace Ogre
     {
         if( mBuffer->mBufferType == BT_DYNAMIC )
         {
-            void *dstData = this->map( elementStart, elementCount, MS_MAPPED );
+            assert( mBuffer->mMappingState == MS_UNMAPPED );
+            void *dstData = this->map( elementStart, elementCount, mBuffer->mMappingState );
             memcpy( dstData, data, elementCount * mBuffer->mBytesPerElement );
             this->unmap( UO_UNMAP_ALL );
         }

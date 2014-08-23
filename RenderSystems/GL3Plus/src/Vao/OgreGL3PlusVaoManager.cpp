@@ -660,7 +660,8 @@ namespace Ogre
             GLuint64 waitDuration   = 0;
             while( true )
             {
-                GLenum waitRet = glClientWaitSync( mFrameSyncVec[mDynamicBufferCurrentFrame], waitFlags, waitDuration );
+                GLenum waitRet = glClientWaitSync( mFrameSyncVec[mDynamicBufferCurrentFrame],
+                                                   waitFlags, waitDuration );
                 if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
                 {
                     OCGLE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );

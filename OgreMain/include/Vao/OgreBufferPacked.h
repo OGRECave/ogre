@@ -169,6 +169,17 @@ namespace Ogre
         void* map( size_t elementStart, size_t elementCount, MappingState persistentMethod );
         void unmap( UnmapOptions unmapOption );
 
+        /// Returns the mapping state. Note that if you call map with MS_PERSISTENT_INCOHERENT or
+        /// MS_PERSISTENT_COHERENT, then call unmap( UO_KEEP_PERSISTENT ); the returned value will
+        /// still be MS_PERSISTENT_INCOHERENT/_COHERENT when persistent mapping is supported.
+        /// This differs from isCurrentlyMapped
+        MappingState getMappingState(void) const                { return mMappingState; }
+
+        /// Returns whether the buffer is currently mapped. If you've persistently mapped the buffer
+        /// and then called unmap( UO_KEEP_PERSISTENT ); this function will return false; which
+        /// differs from getMappingState's behavior.
+        bool isCurrentlyMapped(void) const;
+
         uint32 getNumElements(void) const       { return mNumElements; }
         uint32 getBytesPerElement(void) const   { return mBytesPerElement; }
         uint32 getTotalSizeBytes(void) const    { return mNumElements * mBytesPerElement; }

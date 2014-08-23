@@ -84,6 +84,9 @@ namespace Ogre
                 break;
             }
         }
+
+        const VertexBufferPackedVec& getVertexBuffers(void) const       { return mVertexBuffers; }
+        IndexBufferPacked* getIndexBuffer(void) const                   { return mIndexBuffer; }
     };
 }
 
