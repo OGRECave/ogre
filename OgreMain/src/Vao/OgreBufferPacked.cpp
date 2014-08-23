@@ -49,8 +49,10 @@ namespace Ogre
         mBufferInterface( bufferInterface ),
         mLastMappingStart( 0 ),
         mLastMappingCount( 0 ),
-        mShadowCopy( 0 ),
-        mLastFrameMapped( ~0 )
+        mShadowCopy( 0 )
+#ifndef NDEBUG
+    ,   mLastFrameMapped( ~0 )
+#endif
     {
         mBufferInterface->_notifyBuffer( this );
 

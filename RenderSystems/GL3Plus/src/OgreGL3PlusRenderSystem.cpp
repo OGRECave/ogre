@@ -2175,21 +2175,27 @@ namespace Ogre {
 
         const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( _vao );
 
-        GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
-                                                            GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+        GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
 
-        const void *indexOffset = (const void*)(vao->mIndexBuffer->_getFinalBufferStart() *
-                                                vao->mIndexBuffer->getBytesPerElement());
+        if( vao->mIndexBuffer )
+        {
+            GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
+                                                                GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+            const void *indexOffset = (const void*)(vao->mIndexBuffer->_getFinalBufferStart() *
+                                                    vao->mIndexBuffer->getBytesPerElement());
 
-        //glMultiDrawElementsBaseVertex
-        //glMultiDrawElementsIndirect
-        glDrawElementsInstancedBaseVertex( mCurrentDomainShader ? GL_PATCHES :
-                                                                  vao->mPrimType[mUseAdjacency],
-                                           vao->mIndexBuffer->getNumElements(),
-                                           indexType, indexOffset, 1,
-                                           vao->mVertexBuffers[0]->_getFinalBufferStart() );
-        /*glDrawArrays( vao->mPrimType[mUseAdjacency], vao->mVertexBuffers[0]->_getFinalBufferStart(),
-                      vao->mVertexBuffers[0]->getNumElements() );*/
+            //glMultiDrawElementsBaseVertex
+            //glMultiDrawElementsIndirect
+            glDrawElementsInstancedBaseVertex( mode,
+                                               vao->mIndexBuffer->getNumElements(),
+                                               indexType, indexOffset, 1000,
+                                               vao->mVertexBuffers[0]->_getFinalBufferStart() );
+        }
+        else
+        {
+            glDrawArrays( vao->mPrimType[mUseAdjacency], vao->mVertexBuffers[0]->_getFinalBufferStart(),
+                          vao->mVertexBuffers[0]->getNumElements() );
+        }
     }
 
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,
