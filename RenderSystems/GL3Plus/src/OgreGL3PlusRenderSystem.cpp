@@ -2188,7 +2188,7 @@ namespace Ogre {
             //glMultiDrawElementsIndirect
             glDrawElementsInstancedBaseVertex( mode,
                                                vao->mIndexBuffer->getNumElements(),
-                                               indexType, indexOffset, 1000,
+                                               indexType, indexOffset, 1,
                                                vao->mVertexBuffers[0]->_getFinalBufferStart() );
         }
         else
