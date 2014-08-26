@@ -105,7 +105,7 @@ namespace Ogre {
 /* define OGRE_NORETURN macro */
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #	define OGRE_NORETURN __declspec(noreturn)
-#elif OGRE_COMPILER == OGRE_COMPILER_GCC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
 #	define OGRE_NORETURN __attribute__((noreturn))
 #else
 #	define OGRE_NORETURN
