@@ -92,16 +92,6 @@ namespace Ogre {
 		return mBufferImpl->isLocked();
 	}
 	//---------------------------------------------------------------------
-	bool D3D11HardwareUniformBuffer::releaseIfDefaultPool(void)
-	{
-		return true;
-	}
-	//---------------------------------------------------------------------
-	bool D3D11HardwareUniformBuffer::recreateIfDefaultPool(D3D11Device & device)
-	{
-		return true;
-	}
-	//---------------------------------------------------------------------
 	ID3D11Buffer * D3D11HardwareUniformBuffer::getD3DConstantBuffer( void ) const
 	{
 		return mBufferImpl->getD3DBuffer();

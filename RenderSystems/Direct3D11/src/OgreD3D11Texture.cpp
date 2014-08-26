@@ -833,61 +833,6 @@ namespace Ogre
 		return mSurfaceList[idx];
 	}
 	//---------------------------------------------------------------------
-	bool D3D11Texture::releaseIfDefaultPool(void)
-	{
-		if(mIsDynamic)
-		{
-			LogManager::getSingleton().logMessage(
-				"Releasing D3D11 default pool texture: " + mName);
-			// Just free any internal resources, don't call unload() here
-			// because we want the un-touched resource to keep its unloaded status
-			// after device reset.
-			freeInternalResources();
-			LogManager::getSingleton().logMessage(
-				"Released D3D11 default pool texture: " + mName);
-			return true;
-		}
-		return false;
-	}
-	//---------------------------------------------------------------------
-	bool D3D11Texture::recreateIfDefaultPool(D3D11Device &  device)
-	{
-		bool ret = false;
-		if(mIsDynamic)
-		{
-			ret = true;
-			LogManager::getSingleton().logMessage(
-				"Recreating D3D11 default pool texture: " + mName);
-			// We just want to create the texture resources if:
-			// 1. This is a render texture, or
-			// 2. This is a manual texture with no loader, or
-			// 3. This was an unloaded regular texture (preserve unloaded state)
-			if ((mIsManual && !mLoader) || (mUsage & TU_RENDERTARGET) || !isLoaded())
-			{
-				// just recreate any internal resources
-				createInternalResources();
-			}
-			// Otherwise, this is a regular loaded texture, or a manual texture with a loader
-			else
-			{
-				// The internal resources already freed, need unload/load here:
-				// 1. Make sure resource memory usage statistic correction.
-				// 2. Don't call unload() in releaseIfDefaultPool() because we want
-				//    the un-touched resource keep unload status after device reset.
-				unload();
-				// if manual, we need to recreate internal resources since load() won't do that
-				if (mIsManual)
-					createInternalResources();
-				load();
-			}
-			LogManager::getSingleton().logMessage(
-				"Recreated D3D11 default pool texture: " + mName);
-		}
-
-		return ret;
-
-	}
-	//---------------------------------------------------------------------
 	void D3D11Texture::prepareImpl( void )
 	{
 		if (mUsage & TU_RENDERTARGET || isManuallyLoaded())

@@ -94,47 +94,6 @@ namespace Ogre {
 		return mBufferImpl->isLocked();
 	}
 	//---------------------------------------------------------------------
-	bool D3D11HardwareVertexBuffer::releaseIfDefaultPool(void)
-	{
-		/*		if (mD3DPool == D3DPOOL_DEFAULT)
-		{
-		SAFE_RELEASE(mlpD3DBuffer);
-		return true;
-		}
-		return false;
-		*/
-		return true;
-	}
-	//---------------------------------------------------------------------
-	bool D3D11HardwareVertexBuffer::recreateIfDefaultPool(D3D11Device & device)
-	{
-		/*	if (mD3DPool == D3DPOOL_DEFAULT)
-		{
-		// Create the Index buffer
-		HRESULT hr = device->CreateIndexBuffer(
-		static_cast<UINT>(mSizeInBytes),
-		D3D11Mappings::get(mUsage),
-		D3D11Mappings::get(mIndexType),
-		mD3DPool,
-		&mlpD3DBuffer,
-		NULL
-		);
-
-		if (FAILED(hr))
-		{
-		String msg = DXGetErrorDescription(hr);
-		OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-		"Cannot create D3D11 Index buffer: " + msg, 
-		"D3D11HardwareVertexBuffer::D3D11HardwareVertexBuffer");
-		}
-
-		return true;
-		}
-		return false;
-		*/
-		return true;
-	}
-	//---------------------------------------------------------------------
 	ID3D11Buffer * D3D11HardwareVertexBuffer::getD3DVertexBuffer( void ) const
 	{
 		return mBufferImpl->getD3DBuffer();

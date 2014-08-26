@@ -59,11 +59,6 @@ namespace Ogre {
 			size_t dstOffset, size_t length, bool discardWholeBuffer = false);
 		bool isLocked(void) const;
 
-		/// For dealing with lost devices - release the resource if in the default pool
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool
-		bool recreateIfDefaultPool(D3D11Device & device);
-
 		/// Get the D3D-specific vertex buffer
 		ID3D11Buffer * getD3DConstantBuffer(void) const;
 	};

@@ -63,11 +63,6 @@ namespace Ogre {
 		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView; }
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
 
-		/// For dealing with lost devices - release the resource if in the default pool (and return true)
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool (and return true)
-		bool recreateIfDefaultPool(D3D11Device & device);
-
 		ID3D11Texture1D * GetTex1D() { return mp1DTex; };
 		ID3D11Texture2D * GetTex2D() { return mp2DTex; };
 		ID3D11Texture3D	* GetTex3D() { return mp3DTex; };
@@ -82,18 +77,16 @@ namespace Ogre {
         typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
 
 		/// D3DDevice pointer
-		D3D11Device	&	mDevice;	
+		D3D11Device	&	mDevice;
 
-		/// D3D11 pointer
-		//LPDIRECT3D11				*mpD3D;
 		// 1D texture pointer
 		ID3D11Texture1D *mp1DTex;
 		// 2D texture pointer
 		ID3D11Texture2D *mp2DTex;
 		/// cubic texture pointer
-		ID3D11Texture3D	*mp3DTex;	
+		ID3D11Texture3D	*mp3DTex;
 		/// actual texture pointer
-		ID3D11Resource 	*mpTex;		
+		ID3D11Resource 	*mpTex;
 
 		ID3D11ShaderResourceView* mpShaderResourceView;
 
