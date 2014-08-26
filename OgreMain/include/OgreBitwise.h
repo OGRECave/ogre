@@ -76,8 +76,8 @@ namespace Ogre {
             return __builtin_bswap64(arg);
 #else
             union { 
-                uint64_t sv;
-                uint32_t ul[2];
+                uint64 sv;
+                uint32 ul[2];
             } tmp, result;
             tmp.sv = arg;
             result.ul[0] = bswap32(tmp.ul[1]);
