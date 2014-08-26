@@ -248,7 +248,7 @@ namespace Ogre {
 				_map(mParentTexture->getTextureResource(), flags, rval);
 
 			// calculate the offset in bytes
-			offset = D3D11Mappings::_getSizeInBytes(rval.format, rval.left, rval.front);
+			offset = PixelUtil::getMemorySize(rval.left, rval.front, 1, rval.format);
 			// add the offset, so the right memory will be changed
 			//rval.data = static_cast<int*>(rval.data) + offset;
 		}
@@ -263,7 +263,7 @@ namespace Ogre {
 		mCurrentLockOptions = options;
 
 		// add the offset, so the right memory will be changed
-		rval.data = static_cast<int*>(rval.data) + offset;
+		rval.data = static_cast<int*>(rval.data) + offset;	// TODO: why offsetInBytes is added to (int*) pointer ???
 
 		return rval;
 	}
@@ -309,7 +309,7 @@ namespace Ogre {
 		dstBoxDx11.front = 0;
 		dstBoxDx11.back = mLockBox.getDepth();
 
-		size_t rowWidth = D3D11Mappings::_getSizeInBytes(mCurrentLock.format, mCurrentLock.getWidth());
+		size_t rowWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mCurrentLock.format);
 
 		switch(mParentTexture->getTextureType()) {
 		case TEX_TYPE_1D:
@@ -361,7 +361,7 @@ namespace Ogre {
 			break;
 		case TEX_TYPE_3D:
 			{
-				size_t sliceWidth = D3D11Mappings::_getSizeInBytes(mCurrentLock.format, mCurrentLock.getWidth(), mCurrentLock.getHeight());
+				size_t sliceWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format);
 
 				mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex3D(), static_cast<UINT>(mSubresourceIndex), 
 					&dstBoxDx11, mDataForStaticUsageLock, rowWidth, sliceWidth);
@@ -407,7 +407,7 @@ namespace Ogre {
  		{
 			if(mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
 			{
-				size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
+				size_t sizeinbytes = PixelUtil::getMemorySize(mParentTexture->getWidth(), mParentTexture->getHeight(), 1, mParentTexture->getFormat());
                 PixelBox box;
                 _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
 				void *data = box.data; 

@@ -45,7 +45,7 @@ namespace Ogre
 		mDepthStencilView->GetDesc( &pDesc );
 		// Unknown PixelFormat at the moment
 		PixelFormat format = D3D11Mappings::_getPF(pDesc.Format);
-		mBitDepth = D3D11Mappings::_getSizeInBytes(format) * 8;
+		mBitDepth = PixelUtil::getNumElemBytes(format) * 8;
 	}
 
 	D3D11DepthBuffer::~D3D11DepthBuffer()

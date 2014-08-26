@@ -41,6 +41,42 @@ THE SOFTWARE.
 namespace Ogre {
 	class D3D11Texture : public Texture
 	{
+	public:
+		/// constructor 
+		D3D11Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
+			const String& group, bool isManual, ManualResourceLoader* loader,
+			D3D11Device & device);
+		/// destructor
+		~D3D11Texture();
+
+		/// overridden from Texture
+		void copyToTexture(TexturePtr& target);
+		/// overridden from Texture
+		void loadImage(const Image &img);
+
+
+		/// @copydoc Texture::getBuffer
+		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
+
+		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
+		/// retrieves a pointer to the actual texture
+		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView; }
+		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
+
+		/// For dealing with lost devices - release the resource if in the default pool (and return true)
+		bool releaseIfDefaultPool(void);
+		/// For dealing with lost devices - recreate the resource if in the default pool (and return true)
+		bool recreateIfDefaultPool(D3D11Device & device);
+
+		ID3D11Texture1D * GetTex1D() { return mp1DTex; };
+		ID3D11Texture2D * GetTex2D() { return mp2DTex; };
+		ID3D11Texture3D	* GetTex3D() { return mp3DTex; };
+
+		bool HasAutoMipMapGenerationEnabled() const { return mAutoMipMapGeneration; }
+
+	protected:
+		TextureUsage _getTextureUsage() { return static_cast<TextureUsage>(mUsage); }
+
 	protected:
         // needed to store data between prepareImpl and loadImpl
         typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
@@ -89,14 +125,8 @@ namespace Ogre {
 
 		/// cube texture individual face names
 		String							mCubeFaceNames[6];
-		/// device creation parameters
-		//D3DDEVICE_CREATION_PARAMETERS	mDevCreParams;
 		/// back buffer pixel format
 		DXGI_FORMAT						mBBPixelFormat;
-		/// The memory pool being used
-		//D3DPOOL							mD3DPool;
-		/// device capabilities pointer
-		//D3DCAPS9						mDevCaps;
 		// Dynamic textures?
 		bool                            mDynamicTextures;
 		/// Vector of pointers to subsurfaces
@@ -131,8 +161,7 @@ namespace Ogre {
 		void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format, UINT miscflags);
 
 		/// internal method, the cube map face name for the spec. face index
-		String _getCubeFaceName(unsigned char face) const
-		{ assert(face < 6); return mCubeFaceNames[face]; }
+		String _getCubeFaceName(unsigned char face) const { assert(face < 6); return mCubeFaceNames[face]; }
 
 		/// internal method, create D3D11HardwarePixelBuffers for every face and
 		/// mipmap level. This method must be called after the D3D texture object was created
@@ -156,50 +185,6 @@ namespace Ogre {
 		LoadedStreams _prepareNormTex();
 		LoadedStreams _prepareVolumeTex();
 		LoadedStreams _prepareCubeTex();
-	public:
-		/// constructor 
-		D3D11Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
-			const String& group, bool isManual, ManualResourceLoader* loader, 
-			D3D11Device & device);
-		/// destructor
-		~D3D11Texture();
-
-		/// overridden from Texture
-		void copyToTexture( TexturePtr& target );
-		/// overridden from Texture
-		void loadImage( const Image &img );
-
-
-		/// @copydoc Texture::getBuffer
-		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
-
-		ID3D11Resource *getTextureResource() 
-		{ assert(mpTex); return mpTex; }
-		/// retrieves a pointer to the actual texture
-		ID3D11ShaderResourceView *getTexture() 
-		{ assert(mpShaderResourceView); return mpShaderResourceView; }
-		/*/// retrieves a pointer to the normal 1D/2D texture
-		IDirect3DTexture9 *getNormTexture()
-		{ assert(mpNormTex); return mpNormTex; }
-		/// retrieves a pointer to the cube texture
-		IDirect3DCubeTexture9 *getCubeTexture()
-		{ assert(mpCubeTex); return mpCubeTex; }
-		*/
-
-
-		/// For dealing with lost devices - release the resource if in the default pool (and return true)
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool (and return true)
-		bool recreateIfDefaultPool(D3D11Device & device);
-
-		ID3D11Texture1D * GetTex1D() {return mp1DTex;};
-		ID3D11Texture2D * GetTex2D() {return mp2DTex;};
-		ID3D11Texture3D	* GetTex3D() {return mp3DTex;};
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const;
-
-		bool HasAutoMipMapGenerationEnabled() const { return mAutoMipMapGeneration; }
-
 	};
 
 	/// RenderTexture implementation for D3D11

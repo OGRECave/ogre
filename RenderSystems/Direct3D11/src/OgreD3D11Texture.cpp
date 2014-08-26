@@ -361,9 +361,9 @@ namespace Ogre
 		desc.MipLevels		= numMips;
 		desc.ArraySize		= 1;
 		desc.Format			= d3dPF;
-		desc.Usage			= D3D11Mappings::_getUsage(mUsage);
-		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
-		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+		desc.Usage			= D3D11Mappings::_getUsage(_getTextureUsage());
+		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, _getTextureUsage());
+		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
 		desc.MiscFlags		= D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
 
 		// create the texture
@@ -461,9 +461,9 @@ namespace Ogre
                 desc.SampleDesc.Quality = 0;
         }
 
-        desc.Usage          = D3D11Mappings::_getUsage(mUsage);
-        desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
-        desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+        desc.Usage          = D3D11Mappings::_getUsage(_getTextureUsage());
+        desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(d3dPF, _getTextureUsage());
+        desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
         desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
 
         if (mIsDynamic)
@@ -603,14 +603,14 @@ namespace Ogre
 		desc.Depth			= static_cast<UINT>(mDepth);
 		desc.MipLevels		= numMips;
 		desc.Format			= d3dPF;
-		desc.Usage			= D3D11Mappings::_getUsage(mUsage);
+		desc.Usage			= D3D11Mappings::_getUsage(_getTextureUsage());
 		desc.BindFlags		= D3D11_BIND_SHADER_RESOURCE;
 
 		D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 		if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
 		   desc.BindFlags		|= D3D11_BIND_RENDER_TARGET;
 
-		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
 		desc.MiscFlags		= 0;
 		if (mIsDynamic)
 		{
@@ -886,11 +886,6 @@ namespace Ogre
 
 		return ret;
 
-	}
-	//---------------------------------------------------------------------
-	D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture::getShaderResourceViewDesc() const
-	{
-		return mSRVDesc;
 	}
 	//---------------------------------------------------------------------
 	void D3D11Texture::prepareImpl( void )
