@@ -1871,8 +1871,10 @@ bail:
 	{
 		mCullingMode = mode;
 
-		// TODO: invert culling mode based on mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping()
-		mRasterizerDesc.CullMode = D3D11Mappings::get(mode);
+		bool flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping() ||
+					!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
+
+		mRasterizerDesc.CullMode = D3D11Mappings::get(mode, flip);
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setDepthBufferParams( bool depthTest, bool depthWrite, CompareFunction depthFunction )
