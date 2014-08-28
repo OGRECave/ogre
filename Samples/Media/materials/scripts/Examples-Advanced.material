@@ -610,6 +610,12 @@ vertex_program Examples/FresnelRefractReflectVPold cg
 	entry_point main_vp_old
 	profiles vs_1_1 arbvp1
 }
+vertex_program Examples/FresnelRefractReflectVPHLSL hlsl
+{
+	source Example_Fresnel.cg
+	entry_point main_vp
+	target vs_2_0
+}
 vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
 {
 	source Example_FresnelVp.glsles
@@ -626,6 +632,7 @@ vertex_program Examples/FresnelRefractReflectVP unified
 {
 	delegate Examples/FresnelRefractReflectVPGLSL
 	delegate Examples/FresnelRefractReflectVPGLSLES
+	delegate Examples/FresnelRefractReflectVPHLSL
 	delegate Examples/FresnelRefractReflectVPCg
 }
 
@@ -635,6 +642,13 @@ fragment_program Examples/FresnelRefractReflectFPCg cg
 	entry_point main_fp
 	// sorry, ps_1_1 and fp20 can't do this
 	profiles ps_4_0 ps_2_0 arbfp1
+}
+
+fragment_program Examples/FresnelRefractReflectFPHLSL hlsl
+{
+	source Example_Fresnel.cg
+	entry_point main_fp
+	target ps_2_0
 }
 
 fragment_program Examples/FresnelRefractReflectPS asm
@@ -675,6 +689,7 @@ fragment_program Examples/FresnelRefractReflectFP unified
 {
 	delegate Examples/FresnelRefractReflectFPGLSL
 	delegate Examples/FresnelRefractReflectFPGLSLES
+	delegate Examples/FresnelRefractReflectFPHLSL
 	delegate Examples/FresnelRefractReflectFPCg
 }
 
