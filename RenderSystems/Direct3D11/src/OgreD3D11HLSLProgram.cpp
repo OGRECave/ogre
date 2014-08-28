@@ -495,11 +495,11 @@ namespace Ogre {
         if (FAILED(hr))
         {
             mErrorsInCompile = true;
-            String message = "Cannot assemble D3D11 high-level shader " + mName + " Errors:\n" +
-                static_cast<const char*>(errors->GetBufferPointer());
-            errors->Release();
+            String message = "Cannot compile D3D11 high-level shader " + mName + " Errors:\n" +
+                static_cast<const char*>(errors ? errors->GetBufferPointer() : "<null>");
+            SAFE_RELEASE(errors);
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
-                "D3D11HLSLProgram::loadFromSource");
+                "D3D11HLSLProgram::compileMicrocode");
         }
         else
         {
@@ -516,10 +516,9 @@ namespace Ogre {
 
             if (FAILED(hr))
             {
-                String message = "Cannot reflect D3D11 high-level shader " + mName + " Errors:\n" +
-                    static_cast<const char*>(errors->GetBufferPointer());
+                String message = "Cannot reflect D3D11 high-level shader " + mName;
 				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
-                    "D3D11HLSLProgram::loadFromSource");
+                    "D3D11HLSLProgram::compileMicrocode");
             }
 
             D3D11_SHADER_DESC shaderDesc;
@@ -527,10 +526,9 @@ namespace Ogre {
 
             if (FAILED(hr))
             {
-                String message = "Cannot get reflect info for D3D11 high-level shader " + mName + " Errors:\n" +
-                    static_cast<const char*>(errors->GetBufferPointer());
+                String message = "Cannot get reflect info for D3D11 high-level shader " + mName;
 				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
-                    "D3D11HLSLProgram::loadFromSource");
+                    "D3D11HLSLProgram::compileMicrocode");
             }
 
             // get the input parameters
@@ -559,7 +557,7 @@ namespace Ogre {
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                     "Multi constant buffers are not supported for now.",
-                    "D3D11HLSLProgram::loadFromSource");
+                    "D3D11HLSLProgram::compileMicrocode");
             }*/
 			
 			mConstantBufferNr = shaderDesc.ConstantBuffers;
@@ -576,10 +574,9 @@ namespace Ogre {
 					hr = shaderReflectionConstantBuffer->GetDesc(&constantBufferDesc);
 					if (FAILED(hr))
 					{
-						String message = "Cannot reflect constant buffer of D3D11 high-level shader " + mName + " Errors:\n" +
-							static_cast<const char*>(errors->GetBufferPointer());
+						String message = "Cannot reflect constant buffer of D3D11 high-level shader " + mName;
 						OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
-							"D3D11HLSLProgram::loadFromSource");
+							"D3D11HLSLProgram::compileMicrocode");
 					}
 
                     String * name = new String(constantBufferDesc.Name);
@@ -601,10 +598,9 @@ namespace Ogre {
 						HRESULT hr = varRef->GetDesc(&curVar);
 						if (FAILED(hr))
 						{
-							String message = "Cannot reflect constant buffer variable of D3D11 high-level shader " + mName + " Errors:\n" +
-								static_cast<const char*>(errors->GetBufferPointer());
+							String message = "Cannot reflect constant buffer variable of D3D11 high-level shader " + mName;
 							OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
-								"D3D11HLSLProgram::loadFromSource");
+								"D3D11HLSLProgram::compileMicrocode");
 						}
 
 						String * name = new String(curVar.Name);
