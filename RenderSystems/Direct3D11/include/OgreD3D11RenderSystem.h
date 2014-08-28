@@ -35,7 +35,9 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-#define MAX_LIGHTS 8
+	// Enable recognizing SM2.0 HLSL shaders.
+	// (the same shader code could be used by many RenderSystems, directly or via Cg)
+	#define SUPPORT_SM2_0_HLSL_SHADERS
 
 	class D3D11DriverList;
 	class D3D11Driver;

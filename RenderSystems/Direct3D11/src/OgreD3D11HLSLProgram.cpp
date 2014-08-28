@@ -1435,9 +1435,11 @@ namespace Ogre {
         , mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device)
         , mVertexShader(NULL), mConstantBufferSize(0)
         , mPixelShader(NULL),mGeometryShader(NULL), mHullShader(NULL), mDomainShader(NULL), mComputeShader(NULL)
-        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), mInputVertexDeclaration(device)
+		, mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false), mInputVertexDeclaration(device)
     {
-        shaderMacroSet = false;
+#ifdef SUPPORT_SM2_0_HLSL_SHADERS
+		mEnableBackwardsCompatibility = true;
+#endif
 
         if (createParamDictionary("D3D11HLSLProgram"))
         {

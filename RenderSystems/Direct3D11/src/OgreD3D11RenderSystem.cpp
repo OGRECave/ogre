@@ -1222,14 +1222,24 @@ bail:
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_1)
         {
             rsc->addShaderProfile("vs_4_0_level_9_1");
+#ifdef SUPPORT_SM2_0_HLSL_SHADERS
+            rsc->addShaderProfile("vs_2_0");
+#endif
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_3)
         {
             rsc->addShaderProfile("vs_4_0_level_9_3");
+#ifdef SUPPORT_SM2_0_HLSL_SHADERS
+            rsc->addShaderProfile("vs_2_a");
+            rsc->addShaderProfile("vs_2_x");
+#endif
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
         {
-    		rsc->addShaderProfile("vs_4_0");
+            rsc->addShaderProfile("vs_4_0");
+#ifdef SUPPORT_SM2_0_HLSL_SHADERS
+            rsc->addShaderProfile("vs_3_0");
+#endif
         }
 		if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_1)
 		{
@@ -1257,14 +1267,26 @@ bail:
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_1)
         {
             rsc->addShaderProfile("ps_4_0_level_9_1");
+#ifdef SUPPORT_SM2_0_HLSL_SHADERS
+            rsc->addShaderProfile("ps_2_0");
+#endif
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_3)
         {
             rsc->addShaderProfile("ps_4_0_level_9_3");
+#ifdef SUPPORT_SM2_0_HLSL_SHADERS
+            rsc->addShaderProfile("ps_2_a");
+            rsc->addShaderProfile("ps_2_b");
+            rsc->addShaderProfile("ps_2_x");
+#endif
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
         {
             rsc->addShaderProfile("ps_4_0");
+#ifdef SUPPORT_SM2_0_HLSL_SHADERS
+            rsc->addShaderProfile("ps_3_0");
+            rsc->addShaderProfile("ps_3_x");
+#endif
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_1)
         {
