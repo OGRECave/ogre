@@ -71,9 +71,6 @@ namespace Ogre
 
 		IDXGIDeviceN* _queryDxgiDevice(); // release after use
 	
-		// just check if the multisampling requested is supported by the device
-		bool _checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format);
-
 		void _updateViewportsDimensions();
 
 	protected:

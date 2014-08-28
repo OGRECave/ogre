@@ -61,20 +61,6 @@ namespace Ogre
         destroy();
     }
 	//---------------------------------------------------------------------
-	bool D3D11RenderWindowBase::_checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format)
-	{
-		//TODO :CheckMultisampleQualityLevels
-		if (SUCCEEDED(mDevice->CheckMultisampleQualityLevels(//CheckDeviceMultiSampleType(
-			format,
-			SampleCount,
-			outQuality)))
-		{
-			return true;
-		}
-		else
-			return false;
-	}
-	//---------------------------------------------------------------------
 	void D3D11RenderWindowBase::create(const String& name, unsigned int width, unsigned int height,
 		bool fullScreen, const NameValuePairList *miscParams)
 	{

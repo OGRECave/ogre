@@ -149,8 +149,6 @@ bail:
             mHLSLProgramFactory = 0;
         }
 
-		//SAFE_RELEASE( mpD3D );
-
 		LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " destroyed." );
 	}
 	//---------------------------------------------------------------------
@@ -932,7 +930,6 @@ bail:
 		SAFE_RELEASE( mpDXGIFactory );
 		mActiveD3DDriver = NULL;
 		mDevice = NULL;
-		mBasicStatesInitialised = false;
 		LogManager::getSingleton().logMessage("D3D11 : Shutting down cleanly.");
 		SAFE_DELETE( mTextureManager );
 		SAFE_DELETE( mHardwareBufferManager );
@@ -3608,7 +3605,6 @@ bail:
 		mHardwareBufferManager = NULL;
 		mGpuProgramManager = NULL;
 		mPrimaryWindow = NULL;
-		mBasicStatesInitialised = false;
         mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
