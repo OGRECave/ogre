@@ -1714,9 +1714,18 @@ namespace Ogre
 		if (i == mNamedConstants->map.end())
 		{
 			if (throwExceptionIfNotFound)
+			{
+				String knownNames;
+#if OGRE_DEBUG_MODE
+				// make it easy to catch typo and/or unused shader parameter elimination made by some drivers
+				knownNames = "Known names are: ";
+				for (i = mNamedConstants->map.begin(); i != mNamedConstants->map.end(); ++i)
+					knownNames.append(i->first).append(" ");
+#endif
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-				"Parameter called " + name + " does not exist. ",
+				"Parameter called " + name + " does not exist. " + knownNames,
 				"GpuProgramParameters::_findNamedConstantDefinition");
+			}
 			return 0;
 		}
 		else
