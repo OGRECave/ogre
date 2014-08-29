@@ -234,6 +234,11 @@ namespace Ogre {
 	void D3D11HardwareBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
 		size_t dstOffset, size_t length, bool discardWholeBuffer)
 	{
+		if (mUseShadowBuffer)
+		{
+			mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+		}
+
 		// If we're copying same-size buffers in their entirety...
 		if (srcOffset == 0 && dstOffset == 0 &&
 			length == mSizeInBytes && mSizeInBytes == srcBuffer.getSizeInBytes())
