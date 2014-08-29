@@ -236,9 +236,14 @@ namespace Ogre {
 	{
 		if (mUseShadowBuffer)
 		{
-			mShadowBuffer->copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+			static_cast<D3D11HardwareBuffer*>(mShadowBuffer)->copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 		}
-
+		copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+	}
+	//---------------------------------------------------------------------
+	void D3D11HardwareBuffer::copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset, 
+		size_t dstOffset, size_t length, bool discardWholeBuffer)
+	{
 		// If we're copying same-size buffers in their entirety...
 		if (srcOffset == 0 && dstOffset == 0 &&
 			length == mSizeInBytes && mSizeInBytes == srcBuffer.getSizeInBytes())
@@ -273,6 +278,16 @@ namespace Ogre {
 					"Cannot copy D3D11 subresource region\nError Description:" + errorDescription,
 					"D3D11HardwareBuffer::copyData");
 			}
+		}
+	}
+	//---------------------------------------------------------------------
+	void D3D11HardwareBuffer::_updateFromShadow(void)
+	{
+		if(mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+		{
+			bool discardWholeBuffer = mLockStart == 0 && mLockSize == mSizeInBytes;
+			copyDataImpl(*static_cast<D3D11HardwareBuffer*>(mShadowBuffer), mLockStart, mLockStart, mLockSize, discardWholeBuffer);
+			mShadowUpdated = false;
 		}
 	}
 	//---------------------------------------------------------------------
