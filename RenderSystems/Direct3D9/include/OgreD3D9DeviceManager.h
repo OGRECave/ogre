@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,45 +32,45 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	class D3D9Device;
-	class D3D9RenderWindow;
+    class D3D9Device;
+    class D3D9RenderWindow;
 
-	/** Device manager interface.
-	*/
-	class _OgreD3D9Export D3D9DeviceManager : public ResourceAlloc
-	{	
+    /** Device manager interface.
+    */
+    class _OgreD3D9Export D3D9DeviceManager : public ResourceAlloc
+    {   
 
-	// Interface.
-	public:		
-		void				setActiveDevice					(D3D9Device* device);
-		D3D9Device*			getActiveDevice					();
-		void				setActiveRenderTargetDevice		(D3D9Device* device);
-		D3D9Device*			getActiveRenderTargetDevice		();		
-		UINT				getDeviceCount					();
-		D3D9Device*			getDevice						(UINT index);			
-		void				linkRenderWindow				(D3D9RenderWindow* renderWindow);
-		void				destroyInactiveRenderDevices	();
-		void				notifyOnDeviceDestroy			(D3D9Device* device);
-		D3D9Device*			getDeviceFromD3D9Device			(IDirect3DDevice9* d3d9Device);
-		
-	public:
-		D3D9DeviceManager	();
-		~D3D9DeviceManager	();
+    // Interface.
+    public:     
+        void                setActiveDevice                 (D3D9Device* device);
+        D3D9Device*         getActiveDevice                 ();
+        void                setActiveRenderTargetDevice     (D3D9Device* device);
+        D3D9Device*         getActiveRenderTargetDevice     ();     
+        UINT                getDeviceCount                  ();
+        D3D9Device*         getDevice                       (UINT index);           
+        void                linkRenderWindow                (D3D9RenderWindow* renderWindow);
+        void                destroyInactiveRenderDevices    ();
+        void                notifyOnDeviceDestroy           (D3D9Device* device);
+        D3D9Device*         getDeviceFromD3D9Device         (IDirect3DDevice9* d3d9Device);
+        
+    public:
+        D3D9DeviceManager   ();
+        ~D3D9DeviceManager  ();
 
-	protected:		
-		typedef vector<D3D9Device*>::type		 DeviceList;
-		typedef DeviceList::iterator			 DeviceIterator;
-		typedef DeviceList::const_iterator		 ConstDeviceIterator;
-		typedef vector<D3D9RenderWindow*>::type  D3D9RenderWindowList;
+    protected:      
+        typedef vector<D3D9Device*>::type        DeviceList;
+        typedef DeviceList::iterator             DeviceIterator;
+        typedef DeviceList::const_iterator       ConstDeviceIterator;
+        typedef vector<D3D9RenderWindow*>::type  D3D9RenderWindowList;
 
-	protected:
-		D3D9Device*			selectDevice		(D3D9RenderWindow* renderWindow, D3D9RenderWindowList& renderWindowsGroup);
-		D3D9Driver*			findDriver			(D3D9RenderWindow* renderWindow);
+    protected:
+        D3D9Device*         selectDevice        (D3D9RenderWindow* renderWindow, D3D9RenderWindowList& renderWindowsGroup);
+        D3D9Driver*         findDriver          (D3D9RenderWindow* renderWindow);
 
-		
-		DeviceList								mRenderDevices;		
-		D3D9Device*								mActiveDevice;
-		D3D9Device*								mActiveRenderWindowDevice;		
-	};
+        
+        DeviceList                              mRenderDevices;     
+        D3D9Device*                             mActiveDevice;
+        D3D9Device*                             mActiveRenderWindowDevice;      
+    };
 }
 #endif

@@ -17,9 +17,16 @@ if (MINGW)
   list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/OgreMinGWSupport.cpp)
 endif ()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${DirectX9_INCLUDE_DIR})
-link_directories(${DirectX9_LIBRARY_DIR})
+if (OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${DirectX9_INCLUDE_DIR} ${AMDQBS_INCLUDE_DIR} ${NVAPI_INCLUDE_DIR})
+  link_directories(${DirectX9_LIBRARY_DIR} ${NVAPI_LIBRARY_DIR})  
+else()
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${DirectX9_INCLUDE_DIR})
+  link_directories(${DirectX9_LIBRARY_DIR})
+endif()
+
 add_definitions(-D_USRDLL)
+
 
 ogre_add_library(RenderSystem_Direct3D9 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_Direct3D9
@@ -35,6 +42,9 @@ endif ()
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_Direct3D9 ${OGRE_THREAD_LIBRARIES})
 endif ()
+if(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
+  target_link_libraries(RenderSystem_Direct3D9 ${NVAPI_LIBRARIES})
+endif()
 
 ogre_config_plugin(RenderSystem_Direct3D9)
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/Direct3D9)

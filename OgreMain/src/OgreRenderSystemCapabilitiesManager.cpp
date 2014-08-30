@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,12 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreStringVector.h"
-#include "OgreLogManager.h"
 #include "OgreArchiveManager.h"
 #include "OgreArchive.h"
-#include "OgreStringConverter.h"
-
-#include "OgreException.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 
@@ -90,10 +86,10 @@ namespace Ogre {
         return mCapabilitiesMap[name];
     }
 
-	const map<String, RenderSystemCapabilities*>::type &RenderSystemCapabilitiesManager::getCapabilities() const
-	{
-		return mCapabilitiesMap;
-	}
+    const map<String, RenderSystemCapabilities*>::type &RenderSystemCapabilitiesManager::getCapabilities() const
+    {
+        return mCapabilitiesMap;
+    }
 
     /** Method used by RenderSystemCapabilitiesSerializer::parseScript */
     void RenderSystemCapabilitiesManager::_addRenderSystemCapabilities(const String& name, RenderSystemCapabilities* caps)

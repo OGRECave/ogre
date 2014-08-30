@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -70,9 +70,9 @@ namespace Ogre {
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER, 0);
 
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glBindRenderbufferEXT(GL_RENDERBUFFER, 0);
 
         glActiveTexture(GL_TEXTURE0);
 
@@ -110,9 +110,8 @@ namespace Ogre {
         
         mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
-        
-        mEnableVector.reserve(10);
-        mEnableVector.clear();
+
+        mBoolStateMap.clear();
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
@@ -160,43 +159,43 @@ namespace Ogre {
         mColourMask.clear();
         mClearColour.clear();
         mActiveBufferMap.clear();
-        mEnableVector.clear();
+        mBoolStateMap.clear();
         mTexUnitsMap.clear();
         mTextureCoordGen.clear();
     }
     
     void GLStateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
     {
-		bool update = false;
+        bool update = false;
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         if (i == mActiveBufferMap.end())
         {
             // Haven't cached this state yet.  Insert it into the map
             mActiveBufferMap.insert(BindBufferMap::value_type(target, buffer));
-			update = true;
+            update = true;
         }
         else if((*i).second != buffer || force) // Update the cached value if needed
         {
-			(*i).second = buffer;
-			update = true;
+            (*i).second = buffer;
+            update = true;
         }
 
-		// Update GL
-		if(update)
-		{
+        // Update GL
+        if(update)
+        {
             if(target == GL_FRAMEBUFFER)
             {
-                glBindFramebuffer(target, buffer);
+                glBindFramebufferEXT(target, buffer);
             }
             else if(target == GL_RENDERBUFFER)
             {
-                glBindRenderbuffer(target, buffer);
+                glBindRenderbufferEXT(target, buffer);
             }
             else
             {
                 glBindBuffer(target, buffer);
             }
-		}
+        }
 
     }
 
@@ -210,17 +209,17 @@ namespace Ogre {
         
         if (i != mActiveBufferMap.end() && ((*i).second == buffer || force))
         {
-			if(target == GL_FRAMEBUFFER)
+            if(target == GL_FRAMEBUFFER)
             {
-				glDeleteFramebuffers(1, &buffer);
+                glDeleteFramebuffers(1, &buffer);
             }
             else if(target == GL_RENDERBUFFER)
             {
-				glDeleteRenderbuffers(1, &buffer);
+                glDeleteRenderbuffers(1, &buffer);
             }
             else
             {
-				glDeleteBuffers(1, &buffer);
+                glDeleteBuffers(1, &buffer);
             }
 
             // Currently bound buffer is being deleted, update the cached value to 0,
@@ -283,30 +282,30 @@ namespace Ogre {
     }
     
     bool GLStateCacheManagerImp::activateGLTextureUnit(size_t unit)
-	{
-		if (mActiveTextureUnit != unit)
-		{
-			if (unit < dynamic_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
-			{
-				glActiveTexture(GL_TEXTURE0 + unit);
-				mActiveTextureUnit = unit;
-				return true;
-			}
-			else if (!unit)
-			{
-				// always ok to use the first unit
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return true;
-		}
-	}
+    {
+        if (mActiveTextureUnit != unit)
+        {
+            if (unit < dynamic_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
+            {
+                glActiveTexture(GL_TEXTURE0 + unit);
+                mActiveTextureUnit = unit;
+                return true;
+            }
+            else if (!unit)
+            {
+                // always ok to use the first unit
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
     
     // TODO: Store as high/low bits of a GLuint
     void GLStateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
@@ -392,28 +391,18 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setEnabled(GLenum flag)
+    void GLStateCacheManagerImp::setEnabled(GLenum flag, bool enabled)
     {
-        bool found = std::find(mEnableVector.begin(), mEnableVector.end(), flag) != mEnableVector.end();
-        if(!found)
+        if (mBoolStateMap[flag] == enabled)
         {
-            mEnableVector.push_back(flag);
-            
+            glDisable(flag);
+        }
+        else
+        {
             glEnable(flag);
         }
     }
-    
-    void GLStateCacheManagerImp::setDisabled(GLenum flag)
-    {
-        vector<GLenum>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
-        if(iter != mEnableVector.end())
-        {
-            mEnableVector.erase(iter);
-            
-            glDisable(flag);
-        }
-    }
-    
+
     void GLStateCacheManagerImp::setViewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
         if((mViewport[0] != x) ||
@@ -470,16 +459,16 @@ namespace Ogre {
             mBlendEquationRGB = eqRGB;
             mBlendEquationAlpha = eqAlpha;
 
-			if(GLEW_VERSION_2_0)
+            if(GLEW_VERSION_2_0)
             {
-				glBlendEquationSeparate(eqRGB, eqAlpha);
-			}
-			else if(GLEW_EXT_blend_equation_separate)
+                glBlendEquationSeparate(eqRGB, eqAlpha);
+            }
+            else if(GLEW_EXT_blend_equation_separate)
             {
-				glBlendEquationSeparateEXT(eqRGB, eqAlpha);
-			}
-		}
-	}
+                glBlendEquationSeparateEXT(eqRGB, eqAlpha);
+            }
+        }
+    }
 
     void GLStateCacheManagerImp::setMaterialDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     {

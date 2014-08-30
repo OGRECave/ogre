@@ -1,10 +1,10 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,18 @@ THE SOFTWARE.
 #ifndef __VisualTest_H__
 #define __VisualTest_H__
 
+#include "OgreBuildSettings.h"
+
+#if defined(OGRE_BUILD_RENDERSYSTEM_GLES2) || defined(OGRE_BUILD_RENDERSYSTEM_GL3PLUS) || defined(OGRE_BUILD_RENDERSYSTEM_D3D11)
+#  define INCLUDE_RTSHADER_SYSTEM
+#endif
+
+#ifdef INCLUDE_RTSHADER_SYSTEM
+// Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
+// If cache path is not set - all shaders are generated to system memory.
+//#define _RTSS_WRITE_SHADERS_TO_DISK
+#endif // INCLUDE_RTSHADER_SYSTEM   
+
 #include "SdkSample.h"
 
 // resource group that will be automatically unloaded after the close of the sample
@@ -37,7 +49,7 @@ THE SOFTWARE.
 /** The base class for a visual test scene */
 class VisualTest : public OgreBites::Sample
 {
-public:
+ public:
 
     VisualTest()
     {
@@ -122,7 +134,7 @@ public:
         return false;
     }
 
-	/** Default frame started callback, advances animations */
+    /** Default frame started callback, advances animations */
     virtual bool frameStarted(const Ogre::FrameEvent& evt)
     {
         for(unsigned int i = 0; i < mAnimStateList.size(); ++i)
@@ -130,7 +142,7 @@ public:
         return true;
     }
 
-protected:
+ protected:
 
     // a set of frame numbers at which to trigger screenshots
     std::set<unsigned int> mScreenshotFrames;

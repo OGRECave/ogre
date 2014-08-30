@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,17 +31,17 @@ THE SOFTWARE.
 #include "OgreImageCodec.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Image
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Image
+    *  @{
+    */
 
     /** Codec specialized in loading ETC (Ericsson Texture Compression) images.
-	@remarks
-		We implement our own codec here since we need to be able to keep ETC
-		data compressed if the card supports it.
+    @remarks
+        We implement our own codec here since we need to be able to keep ETC
+        data compressed if the card supports it.
     */
     class _OgreExport ETCCodec : public ImageCodec
     {
@@ -49,13 +49,13 @@ namespace Ogre {
         String mType;
         
         void flipEndian(void * pData, size_t size, size_t count) const;
-	    void flipEndian(void * pData, size_t size) const;
+        void flipEndian(void * pData, size_t size) const;
 
-		/// Single registered codec instance
+        /// Single registered codec instance
         static ETCCodec* msPKMInstance;
         static ETCCodec* msKTXInstance;
 
-	public:
+    public:
         ETCCodec(const String &type);
         virtual ~ETCCodec() { }
 
@@ -65,22 +65,22 @@ namespace Ogre {
         void encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
         DecodeResult decode(DataStreamPtr& input) const;
-		/// @copydoc Codec::magicNumberToFileExt
-		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
+        /// @copydoc Codec::magicNumberToFileExt
+        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
         
         virtual String getType() const;        
 
-		/// Static method to startup and register the ETC codec
-		static void startup(void);
-		/// Static method to shutdown and unregister the ETC codec
-		static void shutdown(void);
+        /// Static method to startup and register the ETC codec
+        static void startup(void);
+        /// Static method to shutdown and unregister the ETC codec
+        static void shutdown(void);
     private:
         bool decodePKM(DataStreamPtr& input, DecodeResult& result) const;
         bool decodeKTX(DataStreamPtr& input, DecodeResult& result) const;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

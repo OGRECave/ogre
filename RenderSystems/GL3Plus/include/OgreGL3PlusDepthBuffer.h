@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,39 +37,39 @@ namespace Ogre
     class GL3PlusContext;
     class GL3PlusRenderBuffer;
     class GL3PlusRenderSystem;
-	/**
-		@copydoc DepthBuffer
+    /**
+        @copydoc DepthBuffer
 
-		OpenGL supports 3 different methods: FBO, pbuffer & Copy.
-		Each one has it's own limitations. Non-FBO methods are solved using "dummy" DepthBuffers.
-		That is, a DepthBuffer pointer is attached to the RenderTarget (for the sake of consistency)
-		but it doesn't actually contain a Depth surface/renderbuffer (mDepthBuffer & mStencilBuffer are
-		null pointers all the time) Those dummy DepthBuffers are identified thanks to their GL context.
-		Note that FBOs don't allow sharing with the main window's depth buffer. Therefore even
-		when FBO is enabled, a dummy DepthBuffer is still used to manage the windows.
-	*/
-	class _OgreGL3PlusExport GL3PlusDepthBuffer : public DepthBuffer
-	{
-	public:
-		GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GL3PlusContext *creatorContext,
-						GL3PlusRenderBuffer *depth, GL3PlusRenderBuffer *stencil,
-						uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
-						bool manual );
-		~GL3PlusDepthBuffer();
+        OpenGL supports 3 different methods: FBO, pbuffer & Copy.
+        Each one has it's own limitations. Non-FBO methods are solved using "dummy" DepthBuffers.
+        That is, a DepthBuffer pointer is attached to the RenderTarget (for the sake of consistency)
+        but it doesn't actually contain a Depth surface/renderbuffer (mDepthBuffer & mStencilBuffer are
+        null pointers all the time) Those dummy DepthBuffers are identified thanks to their GL context.
+        Note that FBOs don't allow sharing with the main window's depth buffer. Therefore even
+        when FBO is enabled, a dummy DepthBuffer is still used to manage the windows.
+    */
+    class _OgreGL3PlusExport GL3PlusDepthBuffer : public DepthBuffer
+    {
+    public:
+        GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GL3PlusContext *creatorContext,
+                        GL3PlusRenderBuffer *depth, GL3PlusRenderBuffer *stencil,
+                        uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+                        bool manual );
+        ~GL3PlusDepthBuffer();
 
-		/// @copydoc DepthBuffer::isCompatible
-		virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        /// @copydoc DepthBuffer::isCompatible
+        virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
-		GL3PlusContext* getGLContext() const { return mCreatorContext; }
-		GL3PlusRenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
-		GL3PlusRenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
+        GL3PlusContext* getGLContext() const { return mCreatorContext; }
+        GL3PlusRenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
+        GL3PlusRenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
 
-	protected:
-		uint32					mMultiSampleQuality;
-		GL3PlusContext				*mCreatorContext;
-		GL3PlusRenderBuffer			*mDepthBuffer;
-		GL3PlusRenderBuffer			*mStencilBuffer;
-		GL3PlusRenderSystem			*mRenderSystem;
-	};
+    protected:
+        uint32                  mMultiSampleQuality;
+        GL3PlusContext              *mCreatorContext;
+        GL3PlusRenderBuffer         *mDepthBuffer;
+        GL3PlusRenderBuffer         *mStencilBuffer;
+        GL3PlusRenderSystem         *mRenderSystem;
+    };
 }
 #endif

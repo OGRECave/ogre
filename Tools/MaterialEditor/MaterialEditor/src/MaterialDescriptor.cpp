@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,29 +42,29 @@ MaterialDescriptor::MaterialDescriptor(const String& name)
 MaterialDescriptor::~MaterialDescriptor()
 {
 }
-	
+    
 const String& MaterialDescriptor::getName() const
 {
-	return mName;
+    return mName;
 }
 
 const String& MaterialDescriptor::getScript() const
 {
-	return mScript;
+    return mScript;
 }
 
 MaterialController* MaterialDescriptor::getMaterialController()
 {
-	return mMaterialController;
+    return mMaterialController;
 }
 
 void MaterialDescriptor::OnRootInitialized(EventArgs& args)
 {
-	if(mMaterialController != NULL)
-	{	
-		delete mMaterialController;
-		mMaterialController = NULL;
-	}
+    if(mMaterialController != NULL)
+    {   
+        delete mMaterialController;
+        mMaterialController = NULL;
+    }
 }
 
 void MaterialDescriptor::OnRootShutdown(EventArgs& args)

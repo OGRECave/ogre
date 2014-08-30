@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,54 +30,53 @@ THE SOFTWARE.
 
 /***************************************************************************
 OgreExternalTextureSourceManager.h  -  
-	Handles the registering / unregistering of texture modifier plugins
+    Handles the registering / unregistering of texture modifier plugins
 
 -------------------
 date                 : Jan 1 2004
 email                : pjcast@yahoo.com
 ***************************************************************************/
 #include "OgreSingleton.h"
-#include "OgreString.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreExternalTextureSource.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Materials
-	*  @{
-	*/
-	/** 
-	Singleton Class which handles the registering and control of texture plugins. The plugins
-	will be mostly controlled via a string interface. */
-	class _OgreExport ExternalTextureSourceManager : public Singleton<ExternalTextureSourceManager>, public ResourceAlloc
-	{
-	public:
-		/** Constructor */
-		ExternalTextureSourceManager();
-		/** Destructor */
-		~ExternalTextureSourceManager();
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Materials
+    *  @{
+    */
+    /** 
+    Singleton Class which handles the registering and control of texture plugins. The plugins
+    will be mostly controlled via a string interface. */
+    class _OgreExport ExternalTextureSourceManager : public Singleton<ExternalTextureSourceManager>, public ResourceAlloc
+    {
+    public:
+        /** Constructor */
+        ExternalTextureSourceManager();
+        /** Destructor */
+        ~ExternalTextureSourceManager();
 
-		/** Sets active plugin (ie. "video", "effect", "generic", etc..) */
-		void setCurrentPlugIn( const String& sTexturePlugInType );
+        /** Sets active plugin (ie. "video", "effect", "generic", etc..) */
+        void setCurrentPlugIn( const String& sTexturePlugInType );
 
-		/** Returns currently selected plugin, may be null if none selected */
-		ExternalTextureSource* getCurrentPlugIn( void ) const { return mCurrExternalTextureSource; }
-	
-		/** Calls the destroy method of all registered plugins... 
-		Only the owner plugin should perform the destroy action. */
-		void destroyAdvancedTexture( const String& sTextureName,
-			const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        /** Returns currently selected plugin, may be null if none selected */
+        ExternalTextureSource* getCurrentPlugIn( void ) const { return mCurrExternalTextureSource; }
+    
+        /** Calls the destroy method of all registered plugins... 
+        Only the owner plugin should perform the destroy action. */
+        void destroyAdvancedTexture( const String& sTextureName,
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-		/** Returns the plugin which registered itself with a specific name 
-		(eg. "video"), or null if specified plugin not found */
-		ExternalTextureSource* getExternalTextureSource( const String& sTexturePlugInType );
+        /** Returns the plugin which registered itself with a specific name 
+        (eg. "video"), or null if specified plugin not found */
+        ExternalTextureSource* getExternalTextureSource( const String& sTexturePlugInType );
 
-		/** Called from plugin to register itself */
-		void setExternalTextureSource( const String& sTexturePlugInType, ExternalTextureSource* pTextureSystem );
+        /** Called from plugin to register itself */
+        void setExternalTextureSource( const String& sTexturePlugInType, ExternalTextureSource* pTextureSystem );
 
         /** Override standard Singleton retrieval.
         @remarks
@@ -111,16 +110,16 @@ namespace Ogre
         preventing link errors.
         */
         static ExternalTextureSourceManager* getSingletonPtr(void);
-	protected:
-		/// The current texture controller selected
-		ExternalTextureSource* mCurrExternalTextureSource;
-		
+    protected:
+        /// The current texture controller selected
+        ExternalTextureSource* mCurrExternalTextureSource;
+        
         // Collection of loaded texture System PlugIns, keyed by registered type
         typedef map< String, ExternalTextureSource*>::type TextureSystemList;
         TextureSystemList mTextureSystems;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 } 
 
 #include "OgreHeaderSuffix.h"

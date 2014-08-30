@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre {
     
     // init statics
-	ColourImageAffector::CmdImageAdjust		ColourImageAffector::msImageCmd;
+    ColourImageAffector::CmdImageAdjust     ColourImageAffector::msImageCmd;
 
     //-----------------------------------------------------------------------
     ColourImageAffector::ColourImageAffector(ParticleSystem* psys)
@@ -48,102 +48,102 @@ namespace Ogre {
         {
             ParamDictionary* dict = getParamDictionary();
 
-			dict->addParameter(ParameterDef("image", "image where the colours come from", PT_STRING), &msImageCmd);
+            dict->addParameter(ParameterDef("image", "image where the colours come from", PT_STRING), &msImageCmd);
         }
     }
     //-----------------------------------------------------------------------
     void ColourImageAffector::_initParticle(Particle* pParticle)
-	{
+    {
         if (!mColourImageLoaded)
         {
             _loadImage();
         }
 
-        pParticle->colour = mColourImage.getColourAt(0, 0, 0);
+        pParticle->mColour = mColourImage.getColourAt(0, 0, 0);
     
-	}
+    }
     //-----------------------------------------------------------------------
     void ColourImageAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
-        Particle*			p;
-		ParticleIterator	pi				= pSystem->_getIterator();
+        Particle*           p;
+        ParticleIterator    pi              = pSystem->_getIterator();
 
         if (!mColourImageLoaded)
         {
             _loadImage();
         }
 
-		int				   width			= (int)mColourImage.getWidth()  - 1;
+        int                width            = (int)mColourImage.getWidth()  - 1;
         
-		while (!pi.end())
-		{
-			p = pi.getNext();
-			const Real		life_time		= p->totalTimeToLive;
-			Real			particle_time	= 1.0f - (p->timeToLive / life_time); 
+        while (!pi.end())
+        {
+            p = pi.getNext();
+            const Real      life_time       = p->mTotalTimeToLive;
+            Real            particle_time   = 1.0f - (p->mTimeToLive / life_time);
 
-			if (particle_time > 1.0f)
-				particle_time = 1.0f;
-			if (particle_time < 0.0f)
-				particle_time = 0.0f;
+            if (particle_time > 1.0f)
+                particle_time = 1.0f;
+            if (particle_time < 0.0f)
+                particle_time = 0.0f;
 
-			const Real		float_index		= particle_time * width;
-			const int		index			= (int)float_index;
+            const Real      float_index     = particle_time * width;
+            const int       index           = (int)float_index;
 
             if(index < 0)
             {
-				p->colour = mColourImage.getColourAt(0, 0, 0);
+                p->mColour = mColourImage.getColourAt(0, 0, 0);
             }
             else if(index >= width) 
             {
-                p->colour = mColourImage.getColourAt(width, 0, 0);
+                p->mColour = mColourImage.getColourAt(width, 0, 0);
             }
             else
             {
                 // Linear interpolation
-				const Real		fract		= float_index - (Real)index;
-				const Real		to_colour	= fract;
-				const Real		from_colour	= 1.0f - to_colour;
+                const Real      fract       = float_index - (Real)index;
+                const Real      to_colour   = fract;
+                const Real      from_colour = 1.0f - to_colour;
              
                 ColourValue from=mColourImage.getColourAt(index, 0, 0),
-							to=mColourImage.getColourAt(index+1, 0, 0);
+                            to=mColourImage.getColourAt(index+1, 0, 0);
 
-				p->colour.r = from.r*from_colour + to.r*to_colour;
-                p->colour.g = from.g*from_colour + to.g*to_colour;
-                p->colour.b = from.b*from_colour + to.b*to_colour;
-                p->colour.a = from.a*from_colour + to.a*to_colour;
-			}
-		}
+                p->mColour.r = from.r*from_colour + to.r*to_colour;
+                p->mColour.g = from.g*from_colour + to.g*to_colour;
+                p->mColour.b = from.b*from_colour + to.b*to_colour;
+                p->mColour.a = from.a*from_colour + to.a*to_colour;
+            }
+        }
     }
     
     //-----------------------------------------------------------------------
     void ColourImageAffector::setImageAdjust(String name)
     {
-		mColourImageName = name;
+        mColourImageName = name;
         mColourImageLoaded = false;
-	}
+    }
     //-----------------------------------------------------------------------
     void ColourImageAffector::_loadImage(void)
     {
         mColourImage.load(mColourImageName, mParent->getResourceGroupName());
 
-		PixelFormat	format = mColourImage.getFormat();
+        PixelFormat format = mColourImage.getFormat();
 
-		if ( !PixelUtil::isAccessible(format) )
-		{
-			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Error: Image is not accessible (rgba) image.",
-					"ColourImageAffector::_loadImage" );
-		}
+        if ( !PixelUtil::isAccessible(format) )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Error: Image is not accessible (rgba) image.",
+                    "ColourImageAffector::_loadImage" );
+        }
 
         mColourImageLoaded = true;
-	}
+    }
     //-----------------------------------------------------------------------
     String ColourImageAffector::getImageAdjust(void) const
     {
         return mColourImageName;
     }
     
-	
-	//-----------------------------------------------------------------------
+    
+    //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     // Command objects

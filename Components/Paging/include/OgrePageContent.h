@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,56 +35,56 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Optional Components
-	*  @{
-	*/
-	/** \addtogroup Paging
-	*  Some details on paging component
-	*  @{
-	*/
+    /** \addtogroup Optional Components
+    *  @{
+    */
+    /** \addtogroup Paging
+    *  Some details on paging component
+    *  @{
+    */
 
 
-	/** Interface definition for a unit of content within a page. 
-	*/
-	class _OgrePagingExport PageContent : public PageAlloc
-	{
-	protected:
-		PageContentFactory* mCreator;
-		PageContentCollection* mParent;
-	public:
-		PageContent(PageContentFactory* creator);
-		virtual ~PageContent();
+    /** Interface definition for a unit of content within a page. 
+    */
+    class _OgrePagingExport PageContent : public PageAlloc
+    {
+    protected:
+        PageContentFactory* mCreator;
+        PageContentCollection* mParent;
+    public:
+        PageContent(PageContentFactory* creator);
+        virtual ~PageContent();
 
-		PageManager* getManager() const;
-		SceneManager* getSceneManager() const;
+        PageManager* getManager() const;
+        SceneManager* getSceneManager() const;
 
-		/// Internal method to notify a page that it is attached
-		virtual void _notifyAttached(PageContentCollection* parent);
-		/// Get the type of the content, which will match it's factory
-		virtual const String& getType() const;
+        /// Internal method to notify a page that it is attached
+        virtual void _notifyAttached(PageContentCollection* parent);
+        /// Get the type of the content, which will match it's factory
+        virtual const String& getType() const;
 
-		/// Save the content to a stream
-		virtual void save(StreamSerialiser& stream) = 0;
-		/// Called when the frame starts
-		virtual void frameStart(Real timeSinceLastFrame) {}
-		/// Called when the frame ends
-		virtual void frameEnd(Real timeElapsed) {}
-		/// Notify a section of the current camera
-		virtual void notifyCamera(Camera* cam) {}
+        /// Save the content to a stream
+        virtual void save(StreamSerialiser& stream) = 0;
+        /// Called when the frame starts
+        virtual void frameStart(Real timeSinceLastFrame) {}
+        /// Called when the frame ends
+        virtual void frameEnd(Real timeElapsed) {}
+        /// Notify a section of the current camera
+        virtual void notifyCamera(Camera* cam) {}
 
-		/// Prepare data - may be called in the background
-		virtual bool prepare(StreamSerialiser& ser) = 0;
-		/// Load - will be called in main thread
-		virtual void load() = 0;
-		/// Unload - will be called in main thread
-		virtual void unload() = 0;
-		/// Unprepare data - may be called in the background
-		virtual void unprepare() = 0;
+        /// Prepare data - may be called in the background
+        virtual bool prepare(StreamSerialiser& ser) = 0;
+        /// Load - will be called in main thread
+        virtual void load() = 0;
+        /// Unload - will be called in main thread
+        virtual void unload() = 0;
+        /// Unprepare data - may be called in the background
+        virtual void unprepare() = 0;
 
-	};
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

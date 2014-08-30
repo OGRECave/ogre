@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -189,9 +189,9 @@ namespace Ogre {
             Real t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
-			size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
+            size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
             size_t numVertices,
-			bool morphNormals)
+            bool morphNormals)
         {
             static ProfileItems results;
             static size_t index;
@@ -204,9 +204,9 @@ namespace Ogre {
                 t,
                 srcPos1, srcPos2,
                 dstPos,
-				pos1VSize, pos2VSize, dstVSize,
+                pos1VSize, pos2VSize, dstVSize,
                 numVertices,
-				morphNormals);
+                morphNormals);
             profile.end();
 
             // You can put break point here while running test application, to
@@ -426,7 +426,7 @@ namespace Ogre {
 #else // __OGRE_HAVE_DIRECTXMATH
              return _getOptimisedUtilGeneral();
 #endif
-		}
+        }
 
 #endif  // __DO_PROFILE__
     }

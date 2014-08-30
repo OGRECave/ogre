@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -95,7 +95,7 @@ namespace Ogre
         
         /// See GLStateCacheManager.clearCache.
         void clearCache();
-		
+        
         /// See GLStateCacheManager.bindGLBuffer.
         void bindGLBuffer(GLenum target, GLuint buffer, bool force = false);
         
@@ -166,10 +166,7 @@ namespace Ogre
         void setStencilMask(GLuint mask);
         
         /// See GLStateCacheManager.setEnabled.
-        void setEnabled(GLenum flag);
-        
-        /// See GLStateCacheManager.setDisabled.
-        void setDisabled(GLenum flag);
+        void setEnabled(GLenum flag, bool enabled);
         
         /// See GLStateCacheManager.getDiscardBuffers.
         unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }

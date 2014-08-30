@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -27,81 +27,80 @@ THE SOFTWARE.
 
 #include "OgreShaderProgramSet.h"
 #include "OgreShaderProgramManager.h"
-#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
 namespace RTShader {
 
 //-----------------------------------------------------------------------------
 ProgramSet::ProgramSet() : mVSCpuProgram(0), mPSCpuProgram(0)
-{	
+{   
 }
 
 //-----------------------------------------------------------------------------
 ProgramSet::~ProgramSet()
 {
-	if (mVSCpuProgram != NULL)
-	{
-		ProgramManager::getSingleton().destroyCpuProgram(mVSCpuProgram);
-		mVSCpuProgram = NULL;
-	}
+    if (mVSCpuProgram != NULL)
+    {
+        ProgramManager::getSingleton().destroyCpuProgram(mVSCpuProgram);
+        mVSCpuProgram = NULL;
+    }
 
-	if (mPSCpuProgram != NULL)
-	{
-		ProgramManager::getSingleton().destroyCpuProgram(mPSCpuProgram);
-		mPSCpuProgram = NULL;
-	}
-				
-	mVSGpuProgram.setNull();					
-	mPSGpuProgram.setNull();	
+    if (mPSCpuProgram != NULL)
+    {
+        ProgramManager::getSingleton().destroyCpuProgram(mPSCpuProgram);
+        mPSCpuProgram = NULL;
+    }
+                
+    mVSGpuProgram.setNull();                    
+    mPSGpuProgram.setNull();    
 }
 
 //-----------------------------------------------------------------------------
 void ProgramSet::setCpuVertexProgram(Program* vsCpuProgram)
 {
-	mVSCpuProgram = vsCpuProgram;
+    mVSCpuProgram = vsCpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 Program* ProgramSet::getCpuVertexProgram()
 {
-	return mVSCpuProgram;
+    return mVSCpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 void ProgramSet::setCpuFragmentProgram(Program* psCpuProgram)
 {
-	mPSCpuProgram = psCpuProgram;
+    mPSCpuProgram = psCpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 Program* ProgramSet::getCpuFragmentProgram()
 {
-	return mPSCpuProgram;
+    return mPSCpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 void ProgramSet::setGpuVertexProgram(GpuProgramPtr vsGpuProgram)
 {
-	mVSGpuProgram = vsGpuProgram;
+    mVSGpuProgram = vsGpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 GpuProgramPtr ProgramSet::getGpuVertexProgram()
 {
-	return mVSGpuProgram;
+    return mVSGpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 void ProgramSet::setGpuFragmentProgram(GpuProgramPtr psGpuProgram)
 {
-	mPSGpuProgram = psGpuProgram;
+    mPSGpuProgram = psGpuProgram;
 }
 
 //-----------------------------------------------------------------------------
 GpuProgramPtr ProgramSet::getGpuFragmentProgram()
 {
-	return mPSGpuProgram;
+    return mPSGpuProgram;
 }
 
 }

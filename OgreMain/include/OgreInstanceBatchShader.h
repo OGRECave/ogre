@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,68 +32,68 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
 
-	/** This is the same technique the old "InstancedGeometry" implementation used (with improvements).
-		Basically it creates a large vertex buffer with many repeating entities, and sends per instance
-		data through shader constants. Because SM 2.0 & 3.0 have up to 256 shader constant registers,
-		this means there can be approx up to 84 instances per batch, assuming they're not skinned
-		But using shader constants for other stuff (i.e. lighting) also affects negatively this number
-		A mesh with skeletally animated 2 bones reduces the number 84 to 42 instances per batch.
-		@par
-		The main advantage of this technique is that it's supported on a high variety of hardware
-		(SM 2.0 cards are required) and the same shader can be used for both skeletally animated
-		normal entities and instanced entities without a single change required.
-		@par
-		Unlike the old InstancedGeometry implementation, the developer doesn't need to worry about
-		reaching the 84 instances limit, the InstanceManager automatically takes care of splitting
-		and creating new batches. But beware internally, this means less performance improvement.
-		Another improvement is that vertex buffers are shared between batches, which significantly
-		reduces GPU VRAM usage.
+    /** This is the same technique the old "InstancedGeometry" implementation used (with improvements).
+        Basically it creates a large vertex buffer with many repeating entities, and sends per instance
+        data through shader constants. Because SM 2.0 & 3.0 have up to 256 shader constant registers,
+        this means there can be approx up to 84 instances per batch, assuming they're not skinned
+        But using shader constants for other stuff (i.e. lighting) also affects negatively this number
+        A mesh with skeletally animated 2 bones reduces the number 84 to 42 instances per batch.
+        @par
+        The main advantage of this technique is that it's supported on a high variety of hardware
+        (SM 2.0 cards are required) and the same shader can be used for both skeletally animated
+        normal entities and instanced entities without a single change required.
+        @par
+        Unlike the old InstancedGeometry implementation, the developer doesn't need to worry about
+        reaching the 84 instances limit, the InstanceManager automatically takes care of splitting
+        and creating new batches. But beware internally, this means less performance improvement.
+        Another improvement is that vertex buffers are shared between batches, which significantly
+        reduces GPU VRAM usage.
 
         @remarks
-			Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
+            Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
         @author
             Matias N. Goldberg ("dark_sylinc")
         @version
             1.0
      */
-	class _OgreExport InstanceBatchShader : public InstanceBatch
-	{
-		unsigned short	mNumWorldMatrices;
+    class _OgreExport InstanceBatchShader : public InstanceBatch
+    {
+        unsigned short  mNumWorldMatrices;
 
-		void setupVertices( const SubMesh* baseSubMesh );
-		void setupIndices( const SubMesh* baseSubMesh );
+        void setupVertices( const SubMesh* baseSubMesh );
+        void setupIndices( const SubMesh* baseSubMesh );
 
-		/** When the mesh is (hardware) skinned, a different code path is called so that
-			we reuse the index buffers and modify them in place. For example Instance #2
-			with reference to bone #5 would have BlendIndex = 2 + 5 = 7
-			Everything is copied identically except the VES_BLEND_INDICES semantic
-		*/
-		void setupHardwareSkinned( const SubMesh* baseSubMesh, VertexData *thisVertexData,
-									VertexData *baseVertexData );
+        /** When the mesh is (hardware) skinned, a different code path is called so that
+            we reuse the index buffers and modify them in place. For example Instance #2
+            with reference to bone #5 would have BlendIndex = 2 + 5 = 7
+            Everything is copied identically except the VES_BLEND_INDICES semantic
+        */
+        void setupHardwareSkinned( const SubMesh* baseSubMesh, VertexData *thisVertexData,
+                                    VertexData *baseVertexData );
 
-	public:
-		InstanceBatchShader( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
-							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-							const String &batchName );
-		virtual ~InstanceBatchShader();
+    public:
+        InstanceBatchShader( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+                            size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
+                            const String &batchName );
+        virtual ~InstanceBatchShader();
 
-		/** @see InstanceBatch::calculateMaxNumInstances */
-		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
+        /** @see InstanceBatch::calculateMaxNumInstances */
+        size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 
-		/** @see InstanceBatch::buildFrom */
-		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
+        /** @see InstanceBatch::buildFrom */
+        void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
-		//Renderable overloads
-		void getWorldTransforms( Matrix4* xform ) const;
-		unsigned short getNumWorldTransforms(void) const;
-	};
+        //Renderable overloads
+        void getWorldTransforms( Matrix4* xform ) const;
+        unsigned short getNumWorldTransforms(void) const;
+    };
 }
 
 #endif

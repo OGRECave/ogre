@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,18 +33,17 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreController.h"
 #include "OgreFrameListener.h"
-#include "OgreGpuProgram.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
-	//-----------------------------------------------------------------------
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
+    //-----------------------------------------------------------------------
     // Controller Values
     //-----------------------------------------------------------------------
     /** Predefined controller value for getting the latest frame time.
@@ -53,9 +52,9 @@ namespace Ogre {
     {
     protected:
         Real mFrameTime;
-		Real mTimeFactor;
-		Real mElapsedTime;
-		Real mFrameDelay;
+        Real mTimeFactor;
+        Real mElapsedTime;
+        Real mFrameDelay;
 
     public:
         FrameTimeControllerValue();
@@ -63,12 +62,12 @@ namespace Ogre {
         bool frameStarted(const FrameEvent &evt);
         Real getValue(void) const;
         void setValue(Real value);
-		Real getTimeFactor(void) const;
-		void setTimeFactor(Real tf);
-		Real getFrameDelay(void) const;
-		void setFrameDelay(Real fd);
-		Real getElapsedTime(void) const;
-		void setElapsedTime(Real elapsedTime);
+        Real getTimeFactor(void) const;
+        void setTimeFactor(Real tf);
+        Real getFrameDelay(void) const;
+        void setFrameDelay(Real fd);
+        Real getElapsedTime(void) const;
+        void setElapsedTime(Real elapsedTime);
     };
 
     //-----------------------------------------------------------------------
@@ -130,33 +129,33 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     /** Predefined controller value for setting a single floating-
-	    point value in a constant parameter of a vertex or fragment program.
+        point value in a constant parameter of a vertex or fragment program.
     @remarks
-		Any value is accepted, it is propagated into the 'x'
-		component of the constant register identified by the index. If you
-		need to use named parameters, retrieve the index from the param
-		object before setting this controller up.
-	@note
-		Retrieving a value from the program parameters is not currently 
-		supported, therefore do not use this controller value as a source,
-		only as a target.
+        Any value is accepted, it is propagated into the 'x'
+        component of the constant register identified by the index. If you
+        need to use named parameters, retrieve the index from the param
+        object before setting this controller up.
+    @note
+        Retrieving a value from the program parameters is not currently 
+        supported, therefore do not use this controller value as a source,
+        only as a target.
     */
     class _OgreExport FloatGpuParameterControllerValue : public ControllerValue<Real>
     {
     protected:
-		/// The parameters to access
-		GpuProgramParametersSharedPtr mParams;
-		/// The index of the parameter to be read or set
-		size_t mParamIndex;
+        /// The parameters to access
+        GpuProgramParametersSharedPtr mParams;
+        /// The index of the parameter to be read or set
+        size_t mParamIndex;
     public:
         /** Constructor.
-		    @param
-				params The parameters object to access
+            @param
+                params The parameters object to access
             @param
                 index The index of the parameter to be set
         */
         FloatGpuParameterControllerValue(GpuProgramParametersSharedPtr params,
-				size_t index );
+                size_t index );
 
         ~FloatGpuParameterControllerValue() {}
 
@@ -168,25 +167,25 @@ namespace Ogre {
     // Controller functions
     //-----------------------------------------------------------------------
 
-	/** Predefined controller function which just passes through the original source
-	directly to dest.
-	*/
-	class _OgreExport PassthroughControllerFunction : public ControllerFunction<Real>
-	{
-	public:
-		/** Constructor.
+    /** Predefined controller function which just passes through the original source
+    directly to dest.
+    */
+    class _OgreExport PassthroughControllerFunction : public ControllerFunction<Real>
+    {
+    public:
+        /** Constructor.
          @param
              deltaInput If true, signifies that the input will be a delta value such that the function should
              add it to an internal counter before calculating the output.
-		*/
-		PassthroughControllerFunction(bool deltaInput = false);
+        */
+        PassthroughControllerFunction(bool deltaInput = false);
 
-		/** Overridden function.
-		*/
-		Real calculate(Real source);
-	};
+        /** Overridden function.
+        */
+        Real calculate(Real source);
+    };
 
-	/** Predefined controller function for dealing with animation.
+    /** Predefined controller function for dealing with animation.
     */
     class _OgreExport AnimationControllerFunction : public ControllerFunction<Real>
     {
@@ -206,13 +205,13 @@ namespace Ogre {
         */
         Real calculate(Real source);
 
-		/** Set the time value manually. */
-		void setTime(Real timeVal);
-		/** Set the sequence duration value manually. */
-		void setSequenceTime(Real seqVal);
+        /** Set the time value manually. */
+        void setTime(Real timeVal);
+        /** Set the sequence duration value manually. */
+        void setSequenceTime(Real seqVal);
     };
 
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     /** Predefined controller function which simply scales an input to an output value.
     */
     class _OgreExport ScaleControllerFunction : public ControllerFunction<Real>
@@ -245,7 +244,7 @@ namespace Ogre {
             - frequency - the speed of the wave in cycles per second
             - phase - the offset of the start of the wave, e.g. 0.5 to start half-way through the wave
             - amplitude - scales the output so that instead of lying within [0,1] it lies within [0,1] * amplitude
-			- duty cycle - the active width of a PWM signal
+            - duty cycle - the active width of a PWM signal
         @par
             Note that for simplicity of integration with the rest of the controller insfrastructure, the output of
             the wave is parametric i.e. 0..1, rather than the typical wave output of [-1,1]. To compensate for this, the
@@ -263,7 +262,7 @@ namespace Ogre {
         Real mFrequency;
         Real mPhase;
         Real mAmplitude;
-		Real mDutyCycle;
+        Real mDutyCycle;
 
         /** Overridden from ControllerFunction. */
         Real getAdjustedInput(Real input);
@@ -273,8 +272,8 @@ namespace Ogre {
             @param
                 deltaInput If true, signifies that the input will be a delta value such that the function should
                 add it to an internal counter before calculating the output.
-			@param
-				dutyCycle Used in PWM mode to specify the pulse width.
+            @param
+                dutyCycle Used in PWM mode to specify the pulse width.
         */
         WaveformControllerFunction(WaveformType wType, Real base = 0, Real frequency = 1, Real phase = 0, Real amplitude = 1, bool deltaInput = true, Real dutyCycle = 0.5);
 
@@ -283,9 +282,35 @@ namespace Ogre {
         Real calculate(Real source);
 
     };
+
     //-----------------------------------------------------------------------
-	/** @} */
-	/** @} */
+    /** Predefined controller function based on linear function interpolation.
+    */
+    class _OgreExport LinearControllerFunction : public ControllerFunction<Real> {
+        Real mFrequency;
+        std::vector<Real> mKeys;
+        std::vector<Real> mValues;
+    public:
+        /** Constructor, requires keys and values of the function to interpolate
+            @param
+                keys the x-values of the function sampling points. Value range is [0,1]. Must include at least the keys 0 and 1.
+            @remarks
+                for simplicity and compability with the predefined ControllerValue classes the function range is limited to [0,1].
+                However you can use the frequency parameter to rescale the input key values.
+            @param
+                values the function values f(x) of the function. order must match keys
+            @remarks
+                there must be the same amount of keys and values
+        */
+        LinearControllerFunction(const std::vector<Real>& keys, const std::vector<Real>& values, Real frequency = 1, bool deltaInput = true);
+
+        /** Overridden function.
+        */
+        Real calculate(Real source);
+    };
+    //-----------------------------------------------------------------------
+    /** @} */
+    /** @} */
 
 }
 

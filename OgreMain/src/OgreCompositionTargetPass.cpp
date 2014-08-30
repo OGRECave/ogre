@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,13 +39,13 @@ CompositionTargetPass::CompositionTargetPass(CompositionTechnique *parent):
     mOnlyInitial(false),
     mVisibilityMask(0xFFFFFFFF),
     mLodBias(1.0f),
-	mMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME), 
-	mShadowsEnabled(true)
+    mMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME), 
+    mShadowsEnabled(true)
 {
-	if (Root::getSingleton().getRenderSystem())
-	{
-		mMaterialScheme = Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme();
-	}
+    if (Root::getSingleton().getRenderSystem())
+    {
+        mMaterialScheme = Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme();
+    }
 }
 //-----------------------------------------------------------------------
 CompositionTargetPass::~CompositionTargetPass()
@@ -105,22 +105,22 @@ float CompositionTargetPass::getLodBias()
 //-----------------------------------------------------------------------
 void CompositionTargetPass::setMaterialScheme(const String& schemeName)
 {
-	mMaterialScheme = schemeName;
+    mMaterialScheme = schemeName;
 }
 //-----------------------------------------------------------------------
 const String& CompositionTargetPass::getMaterialScheme(void) const
 {
-	return mMaterialScheme;
+    return mMaterialScheme;
 }
 //-----------------------------------------------------------------------
 void CompositionTargetPass::setShadowsEnabled(bool enabled)
 {
-	mShadowsEnabled = enabled;
+    mShadowsEnabled = enabled;
 }
 //-----------------------------------------------------------------------
 bool CompositionTargetPass::getShadowsEnabled(void) const
 {
-	return mShadowsEnabled;
+    return mShadowsEnabled;
 }
 //-----------------------------------------------------------------------
 CompositionPass *CompositionTargetPass::createPass()

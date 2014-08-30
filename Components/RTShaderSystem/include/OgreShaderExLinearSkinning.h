@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -31,9 +31,6 @@ THE SOFTWARE.
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExHardwareSkinningTechnique.h"
-#include "OgreShaderParameter.h"
-#include "OgreRenderSystem.h"
-#include "OgreShaderFunctionAtom.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -53,41 +50,41 @@ class _OgreRTSSExport LinearSkinning : public HardwareSkinningTechnique
 {
 // Interface.
 public:
-	/** Class default constructor */
-	LinearSkinning();
+    /** Class default constructor */
+    LinearSkinning();
 
-	/**
-	@see SubRenderState::resolveParameters.
-	*/
-	virtual bool resolveParameters(ProgramSet* programSet);
+    /**
+    @see SubRenderState::resolveParameters.
+    */
+    virtual bool resolveParameters(ProgramSet* programSet);
 
-	/**
-	@see SubRenderState::resolveDependencies.
-	*/
-	virtual bool resolveDependencies(ProgramSet* programSet);
+    /**
+    @see SubRenderState::resolveDependencies.
+    */
+    virtual bool resolveDependencies(ProgramSet* programSet);
 
-	/**
-	@see SubRenderState::addFunctionInvocations.
-	*/
-	virtual bool addFunctionInvocations(ProgramSet* programSet);
+    /**
+    @see SubRenderState::addFunctionInvocations.
+    */
+    virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 protected:
-	/** Adds functions to calculate position data in world, object and projective space */
-	void addPositionCalculations(Function* vsMain, int& funcCounter);
+    /** Adds functions to calculate position data in world, object and projective space */
+    void addPositionCalculations(Function* vsMain, int& funcCounter);
 
-	/** Adds the weight of a given position for a given index */
-	void addIndexedPositionWeight(Function* vsMain, int index, int& funcCounter);
+    /** Adds the weight of a given position for a given index */
+    void addIndexedPositionWeight(Function* vsMain, int index, int& funcCounter);
 
-	/** Adds the calculations for calculating a normal related element */
-	void addNormalRelatedCalculations(Function* vsMain,
-						ParameterPtr& pNormalRelatedParam,
-						ParameterPtr& pNormalWorldRelatedParam,
-						int& funcCounter);
+    /** Adds the calculations for calculating a normal related element */
+    void addNormalRelatedCalculations(Function* vsMain,
+                        ParameterPtr& pNormalRelatedParam,
+                        ParameterPtr& pNormalWorldRelatedParam,
+                        int& funcCounter);
 
-	/** Adds the weight of a given normal related parameter for a given index */
-	void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalRelatedParam,
-						ParameterPtr& pNormalWorldRelatedParam,
-						int index, int& funcCounter);
+    /** Adds the weight of a given normal related parameter for a given index */
+    void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalRelatedParam,
+                        ParameterPtr& pNormalWorldRelatedParam,
+                        int index, int& funcCounter);
 };
 
 }

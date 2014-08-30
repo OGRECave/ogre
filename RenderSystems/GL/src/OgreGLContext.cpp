@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,17 +49,17 @@ namespace Ogre {
 // declared in OgreGLPrerequisites.h 
 GLEWContext * glewGetContext()
 {
-	using namespace Ogre;
-	static OGRE_THREAD_POINTER_VAR(GLEWContext, GLEWContextsPtr);
+    using namespace Ogre;
+    static OGRE_THREAD_POINTER_VAR(GLEWContext, GLEWContextsPtr);
 
-	GLEWContext * currentGLEWContextsPtr =  OGRE_THREAD_POINTER_GET(GLEWContextsPtr);
-	if (currentGLEWContextsPtr == NULL)
-	{
-		currentGLEWContextsPtr = new GLEWContext();
-		OGRE_THREAD_POINTER_SET(GLEWContextsPtr, currentGLEWContextsPtr);
-		memset(currentGLEWContextsPtr, 0, sizeof(GLEWContext));
-		glewInit();
-	}
-	return currentGLEWContextsPtr;
+    GLEWContext * currentGLEWContextsPtr =  OGRE_THREAD_POINTER_GET(GLEWContextsPtr);
+    if (currentGLEWContextsPtr == NULL)
+    {
+        currentGLEWContextsPtr = new GLEWContext();
+        OGRE_THREAD_POINTER_SET(GLEWContextsPtr, currentGLEWContextsPtr);
+        memset(currentGLEWContextsPtr, 0, sizeof(GLEWContext));
+        glewInit();
+    }
+    return currentGLEWContextsPtr;
 }
 #endif

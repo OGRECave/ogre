@@ -43,68 +43,68 @@
 
 namespace OgreMayaExporter
 {
-	class OgreExporter : public MPxCommand
-	{
-	public:
-		// Public methods
-		//constructor
-		OgreExporter();
-		//destructor
-		virtual ~OgreExporter();
-		//override of MPxCommand methods
-		static void* creator();
-		MStatus doIt(const MArgList& args);
-		bool isUndoable() const;
+    class OgreExporter : public MPxCommand
+    {
+    public:
+        // Public methods
+        //constructor
+        OgreExporter();
+        //destructor
+        virtual ~OgreExporter();
+        //override of MPxCommand methods
+        static void* creator();
+        MStatus doIt(const MArgList& args);
+        bool isUndoable() const;
 
-	protected:
-		// Internal methods
-		//analyses a dag node in Maya and translates it to the OGRE format, 
-		//it is recursively applied until the whole dag nodes tree has been visited
-		MStatus translateNode(MDagPath& dagPath);
-		//writes animation data to an extra .anim file
-		MStatus writeAnim(MFnAnimCurve& anim);
-		//writes camera data to an extra .camera file
-		MStatus writeCamera(MFnCamera& camera);
-		//writes all translated data to a group of OGRE files
-		MStatus writeOgreData();
-		//cleans up memory and exits
-		void exit();
+    protected:
+        // Internal methods
+        //analyses a dag node in Maya and translates it to the OGRE format, 
+        //it is recursively applied until the whole dag nodes tree has been visited
+        MStatus translateNode(MDagPath& dagPath);
+        //writes animation data to an extra .anim file
+        MStatus writeAnim(MFnAnimCurve& anim);
+        //writes camera data to an extra .camera file
+        MStatus writeCamera(MFnCamera& camera);
+        //writes all translated data to a group of OGRE files
+        MStatus writeOgreData();
+        //cleans up memory and exits
+        void exit();
 
-	private:
-		// private members
-		MStatus stat;
-		ParamList m_params;
-		Mesh* m_pMesh;
-		MaterialSet* m_pMaterialSet;
-		MSelectionList m_selList;
-		MTime m_curTime;
-	};
-
-
+    private:
+        // private members
+        MStatus stat;
+        ParamList m_params;
+        Mesh* m_pMesh;
+        MaterialSet* m_pMaterialSet;
+        MSelectionList m_selList;
+        MTime m_curTime;
+    };
 
 
-	/*********************************************************************************************
-	*                                  INLINE Functions                                         *
-	*********************************************************************************************/
-	// Standard constructor
-	inline OgreExporter::OgreExporter()
-		:m_pMesh(0), m_pMaterialSet(0)
-	{
-		MGlobal::displayInfo("Translating scene to OGRE format");
-	}
 
-	// Routine for creating the plug-in
-	inline void* OgreExporter::creator()
-	{
-		return new OgreExporter();
-	}
 
-	// It tells that this command is not undoable
-	inline bool OgreExporter::isUndoable() const
-	{
-		MGlobal::displayInfo("Command is not undoable");
-		return false;
-	}
+    /*********************************************************************************************
+    *                                  INLINE Functions                                         *
+    *********************************************************************************************/
+    // Standard constructor
+    inline OgreExporter::OgreExporter()
+        :m_pMesh(0), m_pMaterialSet(0)
+    {
+        MGlobal::displayInfo("Translating scene to OGRE format");
+    }
 
-}	//end namespace
+    // Routine for creating the plug-in
+    inline void* OgreExporter::creator()
+    {
+        return new OgreExporter();
+    }
+
+    // It tells that this command is not undoable
+    inline bool OgreExporter::isUndoable() const
+    {
+        MGlobal::displayInfo("Command is not undoable");
+        return false;
+    }
+
+}   //end namespace
 #endif

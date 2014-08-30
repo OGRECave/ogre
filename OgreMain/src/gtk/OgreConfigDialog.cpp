@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -88,7 +88,7 @@ void ConfigDialog::rendererChanged (GtkComboBox *widget, gpointer data)
         if (strcmp (renderer, (*r)->getName ().c_str ()) == 0)
         {
             This->mSelectedRenderSystem = *r;
-	    This->setupRendererParams ();
+        This->setupRendererParams ();
         }
 }
 
@@ -133,10 +133,10 @@ void ConfigDialog::setupRendererParams ()
     uint row = 0;
     for (ConfigOptionMap::iterator i = options.begin (); i != options.end (); i++, row++)
     {
-	if (i->second.possibleValues.empty())
-	{
-	    continue;
-	}
+    if (i->second.possibleValues.empty())
+    {
+        continue;
+    }
 
         GtkWidget *ro_label = gtk_label_new (i->second.name.c_str ());
         gtk_widget_show (ro_label);

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,20 +33,20 @@ THE SOFTWARE.
 class MaterialScriptEditor : public ScintillaEditor
 {
 public:
-	MaterialScriptEditor(wxWindow* parent, wxWindowID id = -1,
-		const wxPoint& pos = wxDefaultPosition,
-		const wxSize& size = wxDefaultSize,
-		long style = wxVSCROLL
-		);
+    MaterialScriptEditor(wxWindow* parent, wxWindowID id = -1,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxDefaultSize,
+        long style = wxVSCROLL
+        );
 
-	virtual ~MaterialScriptEditor();
+    virtual ~MaterialScriptEditor();
 
-	void OnCharAdded(wxScintillaEvent &event);
+    void OnCharAdded(wxScintillaEvent &event);
 
 protected:
-	void initialize();
+    void initialize();
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _MATERIALSCRIPTEDITOR_H_

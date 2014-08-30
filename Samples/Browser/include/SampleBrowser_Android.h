@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@
 #include "SampleBrowser.h"
 #include "Android/OgreAndroidEGLWindow.h"
 
-#ifdef USE_RTSHADER_SYSTEM
+#ifdef INCLUDE_RTSHADER_SYSTEM
 #   include "OgreRTShaderSystem.h"
 #endif
 
@@ -263,7 +263,7 @@ namespace OgreBites
             mInputInjector = NULL;
             
 #ifdef OGRE_STATIC_LIB
-			mStaticPluginLoader->unload();
+            mStaticPluginLoader->unload();
             delete mStaticPluginLoader;
             mStaticPluginLoader = NULL;
 #endif

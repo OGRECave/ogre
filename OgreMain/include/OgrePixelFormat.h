@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,33 +33,33 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Image
-	*  @{
-	*/
-	/** The pixel format used for images, textures, and render surfaces */
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Image
+    *  @{
+    */
+    /** The pixel format used for images, textures, and render surfaces */
     enum PixelFormat
     {
         /// Unknown pixel format.
         PF_UNKNOWN = 0,
         /// 8-bit pixel format, all bits luminance.
         PF_L8 = 1,
-		PF_BYTE_L = PF_L8,
+        PF_BYTE_L = PF_L8,
         /// 16-bit pixel format, all bits luminance.
         PF_L16 = 2,
-		PF_SHORT_L = PF_L16,
+        PF_SHORT_L = PF_L16,
         /// 8-bit pixel format, all bits alpha.
         PF_A8 = 3,
-		PF_BYTE_A = PF_A8,
+        PF_BYTE_A = PF_A8,
         /// 8-bit pixel format, 4 bits alpha, 4 bits luminance.
         PF_A4L4 = 4,
-		/// 2 byte pixel format, 1 byte luminance, 1 byte alpha
-		PF_BYTE_LA = 5,
+        /// 2 byte pixel format, 1 byte luminance, 1 byte alpha
+        PF_BYTE_LA = 5,
         /// 16-bit pixel format, 5 bits red, 6 bits green, 5 bits blue.
         PF_R5G6B5 = 6,
-		/// 16-bit pixel format, 5 bits red, 6 bits green, 5 bits blue.
+        /// 16-bit pixel format, 5 bits red, 6 bits green, 5 bits blue.
         PF_B5G6R5 = 7,
         /// 8-bit pixel format, 2 bits blue, 3 bits green, 3 bits red.
         PF_R3G3B2 = 31,
@@ -77,8 +77,8 @@ namespace Ogre {
         PF_A8B8G8R8 = 13,
         /// 32-bit pixel format, 8 bits for blue, green, red and alpha.
         PF_B8G8R8A8 = 14,
-		/// 32-bit pixel format, 8 bits for red, green, blue and alpha.
-		PF_R8G8B8A8 = 28,
+        /// 32-bit pixel format, 8 bits for red, green, blue and alpha.
+        PF_R8G8B8A8 = 28,
         /// 32-bit pixel format, 8 bits for red, 8 bits for green, 8 bits for blue
         /// like PF_A8R8G8B8, but alpha will get discarded
         PF_X8R8G8B8 = 26,
@@ -86,23 +86,23 @@ namespace Ogre {
         /// like PF_A8B8G8R8, but alpha will get discarded
         PF_X8B8G8R8 = 27,
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-		/// 3 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue
-		PF_BYTE_RGB = PF_R8G8B8,
-		/// 3 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red
-		PF_BYTE_BGR = PF_B8G8R8,
-		/// 4 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red and one byte for alpha
-		PF_BYTE_BGRA = PF_B8G8R8A8,
-		/// 4 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue, and one byte for alpha
-		PF_BYTE_RGBA = PF_R8G8B8A8,
+        /// 3 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue
+        PF_BYTE_RGB = PF_R8G8B8,
+        /// 3 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red
+        PF_BYTE_BGR = PF_B8G8R8,
+        /// 4 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red and one byte for alpha
+        PF_BYTE_BGRA = PF_B8G8R8A8,
+        /// 4 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue, and one byte for alpha
+        PF_BYTE_RGBA = PF_R8G8B8A8,
 #else
-		/// 3 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue
-		PF_BYTE_RGB = PF_B8G8R8,
-		/// 3 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red
-		PF_BYTE_BGR = PF_R8G8B8,
-		/// 4 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red and one byte for alpha
-		PF_BYTE_BGRA = PF_A8R8G8B8,
-		/// 4 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue, and one byte for alpha
-		PF_BYTE_RGBA = PF_A8B8G8R8,
+        /// 3 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue
+        PF_BYTE_RGB = PF_B8G8R8,
+        /// 3 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red
+        PF_BYTE_BGR = PF_R8G8B8,
+        /// 4 byte pixel format, 1 byte for blue, 1 byte for green, 1 byte for red and one byte for alpha
+        PF_BYTE_BGRA = PF_A8R8G8B8,
+        /// 4 byte pixel format, 1 byte for red, 1 byte for green, 1 byte for blue, and one byte for alpha
+        PF_BYTE_RGBA = PF_A8B8G8R8,
 #endif        
         /// 32-bit pixel format, 2 bits for alpha, 10 bits for red, green and blue.
         PF_A2R10G10B10 = 15,
@@ -118,30 +118,30 @@ namespace Ogre {
         PF_DXT4 = 20,
         /// DDS (DirectDraw Surface) DXT5 format
         PF_DXT5 = 21,
-		/// 16-bit pixel format, 16 bits (float) for red
+        /// 16-bit pixel format, 16 bits (float) for red
         PF_FLOAT16_R = 32,
         /// 48-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue
         PF_FLOAT16_RGB = 22,
         /// 64-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue, 16 bits (float) for alpha
         PF_FLOAT16_RGBA = 23,
-		// 32-bit pixel format, 32 bits (float) for red
+        // 32-bit pixel format, 32 bits (float) for red
         PF_FLOAT32_R = 33,
         /// 96-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue
         PF_FLOAT32_RGB = 24,
         /// 128-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue, 32 bits (float) for alpha
         PF_FLOAT32_RGBA = 25,
-		/// 32-bit, 2-channel s10e5 floating point pixel format, 16-bit green, 16-bit red
-		PF_FLOAT16_GR = 35,
-		/// 64-bit, 2-channel floating point pixel format, 32-bit green, 32-bit red
-		PF_FLOAT32_GR = 36,
-		/// Depth texture format
-		PF_DEPTH = 29,
-		/// 64-bit pixel format, 16 bits for red, green, blue and alpha
-		PF_SHORT_RGBA = 30,
-		/// 32-bit pixel format, 16-bit green, 16-bit red
-		PF_SHORT_GR = 34,
-		/// 48-bit pixel format, 16 bits for red, green and blue
-		PF_SHORT_RGB = 37,
+        /// 32-bit, 2-channel s10e5 floating point pixel format, 16-bit green, 16-bit red
+        PF_FLOAT16_GR = 35,
+        /// 64-bit, 2-channel floating point pixel format, 32-bit green, 32-bit red
+        PF_FLOAT32_GR = 36,
+        /// Depth texture format
+        PF_DEPTH = 29,
+        /// 64-bit pixel format, 16 bits for red, green, blue and alpha
+        PF_SHORT_RGBA = 30,
+        /// 32-bit pixel format, 16-bit green, 16-bit red
+        PF_SHORT_GR = 34,
+        /// 48-bit pixel format, 16 bits for red, green and blue
+        PF_SHORT_RGB = 37,
         /// PVRTC (PowerVR) RGB 2 bpp
         PF_PVRTC_RGB2 = 38,
         /// PVRTC (PowerVR) RGBA 2 bpp
@@ -154,7 +154,7 @@ namespace Ogre {
         PF_PVRTC2_2BPP = 42,
         /// PVRTC (PowerVR) Version 2, 4 bpp
         PF_PVRTC2_4BPP = 43,
-		/// 32-bit pixel format, 11 bits (float) for red, 11 bits (float) for green, 10 bits (float) for blue
+        /// 32-bit pixel format, 11 bits (float) for red, 11 bits (float) for green, 10 bits (float) for blue
         PF_R11G11B10_FLOAT = 44,
         /// 8-bit pixel format, 8 bits red (unsigned int).
         PF_R8_UINT = 45,
@@ -250,16 +250,16 @@ namespace Ogre {
         PF_ETC2_RGBA8 = 90,
         /// ETC2 (Ericsson Texture Compression)
         PF_ETC2_RGB8A1 = 91,
-		/// ATC (AMD_compressed_ATC_texture)
-		PF_ATC_RGB = 92,
-		/// ATC (AMD_compressed_ATC_texture)
-		PF_ATC_RGBA_EXPLICIT_ALPHA = 93,
-		/// ATC (AMD_compressed_ATC_texture)
-		PF_ATC_RGBA_INTERPOLATED_ALPHA = 94,
-		// Number of pixel formats currently defined
+        /// ATC (AMD_compressed_ATC_texture)
+        PF_ATC_RGB = 92,
+        /// ATC (AMD_compressed_ATC_texture)
+        PF_ATC_RGBA_EXPLICIT_ALPHA = 93,
+        /// ATC (AMD_compressed_ATC_texture)
+        PF_ATC_RGBA_INTERPOLATED_ALPHA = 94,
+        // Number of pixel formats currently defined
         PF_COUNT = 95
     };
-	typedef vector<PixelFormat>::type PixelFormatList;
+    typedef vector<PixelFormat>::type PixelFormatList;
 
     /**
      * Flags defining some on/off properties of pixel formats
@@ -296,101 +296,101 @@ namespace Ogre {
         PCT_COUNT = 6    /// Number of pixel types
     };
     
-	/** A primitive describing a volume (3D), image (2D) or line (1D) of pixels in memory.
-     	In case of a rectangle, depth must be 1. 
-     	Pixels are stored as a succession of "depth" slices, each containing "height" rows of 
-     	"width" pixels.
+    /** A primitive describing a volume (3D), image (2D) or line (1D) of pixels in memory.
+        In case of a rectangle, depth must be 1. 
+        Pixels are stored as a succession of "depth" slices, each containing "height" rows of 
+        "width" pixels.
     */
     class _OgreExport PixelBox: public Box, public ImageAlloc {
     public:
-    	/// Parameter constructor for setting the members manually
-    	PixelBox() {}
-		~PixelBox() {}
-		/** Constructor providing extents in the form of a Box object. This constructor
-    		assumes the pixel data is laid out consecutively in memory. (this
-    		means row after row, slice after slice, with no space in between)
-    		@param extents	    Extents of the region defined by data
-    		@param pixelFormat	Format of this buffer
-    		@param pixelData	Pointer to the actual data
-    	*/
-		PixelBox(const Box &extents, PixelFormat pixelFormat, void *pixelData=0):
-			Box(extents), data(pixelData), format(pixelFormat)
-		{
-			setConsecutive();
-		}
-    	/** Constructor providing width, height and depth. This constructor
-    		assumes the pixel data is laid out consecutively in memory. (this
-    		means row after row, slice after slice, with no space in between)
-    		@param width	    Width of the region
-    		@param height	    Height of the region
-    		@param depth	    Depth of the region
-    		@param pixelFormat	Format of this buffer
-    		@param pixelData    Pointer to the actual data
-    	*/
-    	PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat pixelFormat, void *pixelData=0):
-    		Box(0, 0, 0, width, height, depth),
-    		data(pixelData), format(pixelFormat)
-    	{
-    		setConsecutive();
-    	}
-    	
+        /// Parameter constructor for setting the members manually
+        PixelBox() {}
+        ~PixelBox() {}
+        /** Constructor providing extents in the form of a Box object. This constructor
+            assumes the pixel data is laid out consecutively in memory. (this
+            means row after row, slice after slice, with no space in between)
+            @param extents      Extents of the region defined by data
+            @param pixelFormat  Format of this buffer
+            @param pixelData    Pointer to the actual data
+        */
+        PixelBox(const Box &extents, PixelFormat pixelFormat, void *pixelData=0):
+            Box(extents), data(pixelData), format(pixelFormat)
+        {
+            setConsecutive();
+        }
+        /** Constructor providing width, height and depth. This constructor
+            assumes the pixel data is laid out consecutively in memory. (this
+            means row after row, slice after slice, with no space in between)
+            @param width        Width of the region
+            @param height       Height of the region
+            @param depth        Depth of the region
+            @param pixelFormat  Format of this buffer
+            @param pixelData    Pointer to the actual data
+        */
+        PixelBox(uint32 width, uint32 height, uint32 depth, PixelFormat pixelFormat, void *pixelData=0):
+            Box(0, 0, 0, width, height, depth),
+            data(pixelData), format(pixelFormat)
+        {
+            setConsecutive();
+        }
+        
         /// The data pointer 
         void *data;
         /// The pixel format 
         PixelFormat format;
         /** Number of elements between the leftmost pixel of one row and the left
-         	pixel of the next. This value must always be equal to getWidth() (consecutive) 
-			for compressed formats.
+            pixel of the next. This value must always be equal to getWidth() (consecutive) 
+            for compressed formats.
         */
         size_t rowPitch;
         /** Number of elements between the top left pixel of one (depth) slice and 
-         	the top left pixel of the next. This can be a negative value. Must be a multiple of
-         	rowPitch. This value must always be equal to getWidth()*getHeight() (consecutive) 
-			for compressed formats.
+            the top left pixel of the next. This can be a negative value. Must be a multiple of
+            rowPitch. This value must always be equal to getWidth()*getHeight() (consecutive) 
+            for compressed formats.
         */
         size_t slicePitch;
         
         /** Set the rowPitch and slicePitch so that the buffer is laid out consecutive 
-         	in memory.
+            in memory.
         */        
         void setConsecutive()
         {
             rowPitch = getWidth();
             slicePitch = getWidth()*getHeight();
         }
-        /**	Get the number of elements between one past the rightmost pixel of 
-         	one row and the leftmost pixel of the next row. (IE this is zero if rows
-         	are consecutive).
+        /** Get the number of elements between one past the rightmost pixel of 
+            one row and the leftmost pixel of the next row. (IE this is zero if rows
+            are consecutive).
         */
         size_t getRowSkip() const { return rowPitch - getWidth(); }
         /** Get the number of elements between one past the right bottom pixel of
-         	one slice and the left top pixel of the next slice. (IE this is zero if slices
-         	are consecutive).
+            one slice and the left top pixel of the next slice. (IE this is zero if slices
+            are consecutive).
         */
         size_t getSliceSkip() const { return slicePitch - (getHeight() * rowPitch); }
 
         /** Return whether this buffer is laid out consecutive in memory (ie the pitches
-         	are equal to the dimensions)
+            are equal to the dimensions)
         */        
         bool isConsecutive() const 
-		{ 
-			return rowPitch == getWidth() && slicePitch == getWidth()*getHeight(); 
-		}
+        { 
+            return rowPitch == getWidth() && slicePitch == getWidth()*getHeight(); 
+        }
         /** Return the size (in bytes) this image would take if it was
-        	laid out consecutive in memory
-      	*/
-      	size_t getConsecutiveSize() const;
-      	/** Return a subvolume of this PixelBox.
-      		@param def	Defines the bounds of the subregion to return
-      		@return	A pixel box describing the region and the data in it
-      		@remarks	This function does not copy any data, it just returns
-      			a PixelBox object with a data pointer pointing somewhere inside 
-      			the data of object.
-      		@throws	Exception(ERR_INVALIDPARAMS) if def is not fully contained
-      	*/
-      	PixelBox getSubVolume(const Box &def) const;
+            laid out consecutive in memory
+        */
+        size_t getConsecutiveSize() const;
+        /** Return a subvolume of this PixelBox.
+            @param def  Defines the bounds of the subregion to return
+            @return A pixel box describing the region and the data in it
+            @remarks    This function does not copy any data, it just returns
+                a PixelBox object with a data pointer pointing somewhere inside 
+                the data of object.
+            @throws Exception(ERR_INVALIDPARAMS) if def is not fully contained
+        */
+        PixelBox getSubVolume(const Box &def) const;
         
-      	/** Return a data pointer pointing to top left front pixel of the pixel box.
+        /** Return a data pointer pointing to top left front pixel of the pixel box.
             @remarks Non consecutive pixel boxes are supported.
          */
         void* getTopLeftFrontPixelPtr() const;
@@ -432,25 +432,25 @@ namespace Ogre {
         */
         static size_t getNumElemBits( PixelFormat format );
 
-		/** Returns the size in memory of a region with the given extents and pixel
-			format with consecutive memory layout.
-			@param width
-				The width of the area
-			@param height
-				The height of the area
-			@param depth
-				The depth of the area
-			@param format
-				The format of the area
-		  	@return
-		  		The size in bytes
-			@remarks
-				In case that the format is non-compressed, this simply returns
-				width*height*depth*PixelUtil::getNumElemBytes(format). In the compressed
-				case, this does serious magic.
-		*/
-		static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format);
-		
+        /** Returns the size in memory of a region with the given extents and pixel
+            format with consecutive memory layout.
+            @param width
+                The width of the area
+            @param height
+                The height of the area
+            @param depth
+                The depth of the area
+            @param format
+                The format of the area
+            @return
+                The size in bytes
+            @remarks
+                In case that the format is non-compressed, this simply returns
+                width*height*depth*PixelUtil::getNumElemBytes(format). In the compressed
+                case, this does serious magic.
+        */
+        static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format);
+        
         /** Returns the property flags for this pixel format
           @return
                A bitfield combination of PFF_HASALPHA, PFF_ISCOMPRESSED,
@@ -474,35 +474,35 @@ namespace Ogre {
         static bool isNativeEndian(PixelFormat format);
         /** Shortcut method to determine if the format is a luminance format. */
         static bool isLuminance(PixelFormat format);
-		
-		/** Return whether a certain image extent is valid for this image format.
-			@param width
-				The width of the area
-			@param height
-				The height of the area
-			@param depth
-				The depth of the area
-			@param format
-				The format of the area
-			@remarks For non-compressed formats, this is always true. For DXT formats,
-			only sizes with a width and height multiple of 4 and depth 1 are allowed.
-		*/
-		static bool isValidExtent(size_t width, size_t height, size_t depth, PixelFormat format);
+        
+        /** Return whether a certain image extent is valid for this image format.
+            @param width
+                The width of the area
+            @param height
+                The height of the area
+            @param depth
+                The depth of the area
+            @param format
+                The format of the area
+            @remarks For non-compressed formats, this is always true. For DXT formats,
+            only sizes with a width and height multiple of 4 and depth 1 are allowed.
+        */
+        static bool isValidExtent(size_t width, size_t height, size_t depth, PixelFormat format);
 
         /** Gives the number of bits (RGBA) for a format. See remarks.          
           @remarks      For non-colour formats (dxt, depth) this returns [0,0,0,0].
         */
         static void getBitDepths(PixelFormat format, int rgba[4]);
 
-		/** Gives the masks for the R, G, B and A component
-		  @note			Only valid for native endian formats
+        /** Gives the masks for the R, G, B and A component
+          @note         Only valid for native endian formats
         */
         static void getBitMasks(PixelFormat format, uint64 rgba[4]);
 
-		/** Gives the bit shifts for R, G, B and A component
-		@note			Only valid for native endian formats
-		*/
-		static void getBitShifts(PixelFormat format, unsigned char rgba[4]);
+        /** Gives the bit shifts for R, G, B and A component
+        @note           Only valid for native endian formats
+        */
+        static void getBitShifts(PixelFormat format, unsigned char rgba[4]);
 
         /** Gets the name of an image format
         */
@@ -558,44 +558,44 @@ namespace Ogre {
         static PixelFormat getFormatForBitDepths(PixelFormat fmt, ushort integerBits, ushort floatBits);
 
         /** Pack a colour value to memory
-        	@param colour	The colour
-        	@param pf		Pixelformat in which to write the colour
-        	@param dest		Destination memory location
+            @param colour   The colour
+            @param pf       Pixelformat in which to write the colour
+            @param dest     Destination memory location
         */
         static void packColour(const ColourValue &colour, const PixelFormat pf,  void* dest);
         /** Pack a colour value to memory
-            @param r,g,b,a	The four colour components, range 0.0f to 1.0f
+            @param r,g,b,a  The four colour components, range 0.0f to 1.0f
                             (an exception to this case exists for floating point pixel
                             formats, which don't clamp to 0.0f..1.0f)
-        	@param pf		Pixelformat in which to write the colour
-        	@param dest		Destination memory location
+            @param pf       Pixelformat in which to write the colour
+            @param dest     Destination memory location
         */
         static void packColour(const uint8 r, const uint8 g, const uint8 b, const uint8 a, const PixelFormat pf,  void* dest);
          /** Pack a colour value to memory
-        	@param r,g,b,a	The four colour components, range 0.0f to 1.0f
-        					(an exception to this case exists for floating point pixel
-        					formats, which don't clamp to 0.0f..1.0f)
-        	@param pf		Pixelformat in which to write the colour
-        	@param dest		Destination memory location
+            @param r,g,b,a  The four colour components, range 0.0f to 1.0f
+                            (an exception to this case exists for floating point pixel
+                            formats, which don't clamp to 0.0f..1.0f)
+            @param pf       Pixelformat in which to write the colour
+            @param dest     Destination memory location
         */
         static void packColour(const float r, const float g, const float b, const float a, const PixelFormat pf,  void* dest);
 
         /** Unpack a colour value from memory
-        	@param colour	The colour is returned here
-        	@param pf		Pixelformat in which to read the colour
-        	@param src		Source memory location
+            @param colour   The colour is returned here
+            @param pf       Pixelformat in which to read the colour
+            @param src      Source memory location
         */
         static void unpackColour(ColourValue *colour, PixelFormat pf,  const void* src);
         /** Unpack a colour value from memory
-        	@param r        The red channel is returned here (as byte)
+            @param r        The red channel is returned here (as byte)
             @param g        The blue channel is returned here (as byte)
             @param b        The green channel is returned here (as byte)
             @param a        The alpha channel is returned here (as byte)
-        	@param pf		Pixelformat in which to read the colour
-        	@param src		Source memory location
-        	@remarks 	This function returns the colour components in 8 bit precision,
-        		this will lose precision when coming from PF_A2R10G10B10 or floating
-        		point formats.  
+            @param pf       Pixelformat in which to read the colour
+            @param src      Source memory location
+            @remarks    This function returns the colour components in 8 bit precision,
+                this will lose precision when coming from PF_A2R10G10B10 or floating
+                point formats.  
         */
         static void unpackColour(uint8 *r, uint8 *g, uint8 *b, uint8 *a, PixelFormat pf,  const void* src);
         /** Unpack a colour value from memory
@@ -603,38 +603,38 @@ namespace Ogre {
             @param g        The blue channel is returned here (as float)
             @param b        The green channel is returned here (as float)
             @param a        The alpha channel is returned here (as float)
-        	@param pf		Pixelformat in which to read the colour
-        	@param src		Source memory location
+            @param pf       Pixelformat in which to read the colour
+            @param src      Source memory location
         */
         static void unpackColour(float *r, float *g, float *b, float *a, PixelFormat pf,  const void* src); 
         
         /** Convert consecutive pixels from one format to another. No dithering or filtering is being done. 
-         	Converting from RGB to luminance takes the R channel.  In case the source and destination format match,
-         	just a copy is done.
-         	@param	src			Pointer to source region
-         	@param	srcFormat	Pixel format of source region
-         	@param  dst			Pointer to destination region
-         	@param	dstFormat	Pixel format of destination region
+            Converting from RGB to luminance takes the R channel.  In case the source and destination format match,
+            just a copy is done.
+            @param  src         Pointer to source region
+            @param  srcFormat   Pixel format of source region
+            @param  dst         Pointer to destination region
+            @param  dstFormat   Pixel format of destination region
          */
         static void bulkPixelConversion(void *src, PixelFormat srcFormat, void *dst, PixelFormat dstFormat, unsigned int count);
 
-      	/** Convert pixels from one format to another. No dithering or filtering is being done. Converting
-          	from RGB to luminance takes the R channel. 
-		 	@param	src			PixelBox containing the source pixels, pitches and format
-		 	@param	dst			PixelBox containing the destination pixels, pitches and format
-		 	@remarks The source and destination boxes must have the same
-         	dimensions. In case the source and destination format match, a plain copy is done.
+        /** Convert pixels from one format to another. No dithering or filtering is being done. Converting
+            from RGB to luminance takes the R channel. 
+            @param  src         PixelBox containing the source pixels, pitches and format
+            @param  dst         PixelBox containing the destination pixels, pitches and format
+            @remarks The source and destination boxes must have the same
+            dimensions. In case the source and destination format match, a plain copy is done.
         */
         static void bulkPixelConversion(const PixelBox &src, const PixelBox &dst);
 
-      	/** Flips pixels inplace in vertical direction.
-            @param	box			PixelBox containing pixels, pitches and format
+        /** Flips pixels inplace in vertical direction.
+            @param  box         PixelBox containing pixels, pitches and format
             @remarks Non consecutive pixel boxes are supported.
          */
         static void bulkPixelVerticalFlip(const PixelBox &box);
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

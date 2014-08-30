@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,17 +46,17 @@ namespace Ogre {
         
         virtual void getCustomAttribute(const String& name, void* pData);
 
-		/// Override needed to deal with multisample buffers
-		virtual void swapBuffers();
+        /// Override needed to deal with multisample buffers
+        virtual void swapBuffers();
 
-		/// Override so we can attach the depth buffer to the FBO
-		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
-		virtual void detachDepthBuffer();
-		virtual void _detachDepthBuffer();
+        /// Override so we can attach the depth buffer to the FBO
+        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
+        virtual void detachDepthBuffer();
+        virtual void _detachDepthBuffer();
     protected:
         GLES2FrameBufferObject mFB;
         
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /** See AndroidResource. */
         virtual void notifyOnContextLost();
         
@@ -71,7 +71,7 @@ namespace Ogre {
     {
     public:
         GLES2FBOManager();
-		~GLES2FBOManager();
+        ~GLES2FBOManager();
         
         /** Bind a certain render target if it is a FBO. If it is not a FBO, bind the
             main frame buffer.
@@ -89,15 +89,15 @@ namespace Ogre {
         /** Create a texture rendertarget object
         */
         virtual GLES2FBORenderTexture *createRenderTexture(const String &name, 
-			const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa);
+            const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa);
 
-		/** Create a multi render target 
-		*/
-		virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
+        /** Create a multi render target 
+        */
+        virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
         
         /** Request a render buffer. If format is GL_NONE, return a zero buffer.
         */
-        GLES2SurfaceDesc requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa);
+        GLES2SurfaceDesc requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa);
         /** Request the specify render buffer in case shared somewhere. Ignore
             silently if surface.buffer is 0.
         */
@@ -150,7 +150,7 @@ namespace Ogre {
             GLenum format;
             size_t width;
             size_t height;
-			uint samples;
+            uint samples;
             // Overloaded comparison operator for usage in map
             bool operator < (const RBFormat &other) const
             {
@@ -168,11 +168,11 @@ namespace Ogre {
                     {
                         if(height < other.height)
                             return true;
-						else if (height == other.height)
-						{
-							if (samples < other.samples)
-								return true;
-						}
+                        else if (height == other.height)
+                        {
+                            if (samples < other.samples)
+                                return true;
+                        }
                     }
                 }
                 return false;

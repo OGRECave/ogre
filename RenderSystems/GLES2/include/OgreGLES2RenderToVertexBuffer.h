@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,12 +43,12 @@ namespace Ogre {
         that run on previous results of those shaders, creating stateful 
         shaders.
     */
-	class _OgreGLES2Export GLES2RenderToVertexBuffer : public RenderToVertexBuffer
+    class _OgreGLES2Export GLES2RenderToVertexBuffer : public RenderToVertexBuffer
     {    
     public:
-		/** C'tor */
-		GLES2RenderToVertexBuffer();
-		/** D'tor */
+        /** C'tor */
+        GLES2RenderToVertexBuffer();
+        /** D'tor */
         virtual ~GLES2RenderToVertexBuffer();
 
         /**
@@ -60,13 +60,13 @@ namespace Ogre {
             Update the contents of this vertex buffer by rendering
         */
         virtual void update(SceneManager* sceneMgr);
-	protected:
-		void reallocateBuffer(size_t index);
-		void bindVerticesOutput(Pass* pass);
-		String getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index);
-		HardwareVertexBufferSharedPtr mVertexBuffers[2];
-		size_t mFrontBufferIndex;
-		GLuint mPrimitivesDrawnQuery;
+    protected:
+        void reallocateBuffer(size_t index);
+        void bindVerticesOutput(Pass* pass);
+        String getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index);
+        HardwareVertexBufferSharedPtr mVertexBuffers[2];
+        size_t mFrontBufferIndex;
+        GLuint mPrimitivesDrawnQuery;
         bool mFeedbackActive;
     };
 }

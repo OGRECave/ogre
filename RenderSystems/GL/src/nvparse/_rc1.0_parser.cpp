@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ THE SOFTWARE.
    There are some unavoidable exceptions within include files to
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
-#include <OgreGLPrerequisites.h>
+#include "OgreGLPrerequisites.h"
 /* Identify Bison output.  */
 #define YYBISON 1
 
@@ -170,7 +170,7 @@ int yylex ( void );
 #ifdef _WIN32
 #  define WIN32_LEAN_AND_MEAN
 #  if !defined(NOMINMAX) && defined(_MSC_VER)
-#	define NOMINMAX // required to stop windows.h messing up std::min
+#   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #  include <windows.h>
 #endif
@@ -267,7 +267,7 @@ typedef union YYSTYPE {
 
 #if (! defined (yyoverflow) \
      && (! defined (__cplusplus) \
-	 || (YYSTYPE_IS_TRIVIAL)))
+     || (YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
@@ -282,7 +282,7 @@ union yyalloc
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 # define YYSTACK_BYTES(N) \
-     ((N) * (sizeof (short) + sizeof (YYSTYPE))				\
+     ((N) * (sizeof (short) + sizeof (YYSTYPE))             \
       + YYSTACK_GAP_MAXIMUM)
 
 /* Copy COUNT objects from FROM to TO.  The source and destination do
@@ -292,13 +292,13 @@ union yyalloc
 #   define YYCOPY(To, From, Count) \
       __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
 #  else
-#   define YYCOPY(To, From, Count)		\
-      do					\
-	{					\
-	  register YYSIZE_T yyi;		\
-	  for (yyi = 0; yyi < (Count); yyi++)	\
-	    (To)[yyi] = (From)[yyi];		\
-	}					\
+#   define YYCOPY(To, From, Count)      \
+      do                    \
+    {                   \
+      register YYSIZE_T yyi;        \
+      for (yyi = 0; yyi < (Count); yyi++)   \
+        (To)[yyi] = (From)[yyi];        \
+    }                   \
       while (0)
 #  endif
 # endif
@@ -308,15 +308,15 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack)					\
-    do									\
-      {									\
-	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack, Stack, yysize);				\
-	Stack = &yyptr->Stack;						\
-	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
-	yyptr += yynewbytes / sizeof (*yyptr);				\
-      }									\
+# define YYSTACK_RELOCATE(Stack)                    \
+    do                                  \
+      {                                 \
+    YYSIZE_T yynewbytes;                        \
+    YYCOPY (&yyptr->Stack, Stack, yysize);              \
+    Stack = &yyptr->Stack;                      \
+    yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
+    yyptr += yynewbytes / sizeof (*yyptr);              \
+      }                                 \
     while (0)
 
 #endif
@@ -345,7 +345,7 @@ union yyalloc
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   290
 
-#define YYTRANSLATE(YYX) 						\
+#define YYTRANSLATE(YYX)                        \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
@@ -705,43 +705,43 @@ static const unsigned char yystos[] =
 # define YYSIZE_T unsigned int
 #endif
 
-#define yyerrok		(yyerrstatus = 0)
-#define yyclearin	(yychar = YYEMPTY)
-#define YYEMPTY		(-2)
-#define YYEOF		0
+#define yyerrok     (yyerrstatus = 0)
+#define yyclearin   (yychar = YYEMPTY)
+#define YYEMPTY     (-2)
+#define YYEOF       0
 
-#define YYACCEPT	goto yyacceptlab
-#define YYABORT		goto yyabortlab
-#define YYERROR		goto yyerrlab1
+#define YYACCEPT    goto yyacceptlab
+#define YYABORT     goto yyabortlab
+#define YYERROR     goto yyerrlab1
 
 
 /* Like YYERROR except do call yyerror.  This remains here temporarily
    to ease the transition to the new meaning of YYERROR, for GCC.
    Once GCC version 2 has supplanted version 1, this can go.  */
 
-#define YYFAIL		goto yyerrlab
+#define YYFAIL      goto yyerrlab
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)					\
-do								\
-  if (yychar == YYEMPTY && yylen == 1)				\
-    {								\
-      yychar = (Token);						\
-      yylval = (Value);						\
-      yytoken = YYTRANSLATE (yychar);				\
-      YYPOPSTACK;						\
-      goto yybackup;						\
-    }								\
-  else								\
-    { 								\
+#define YYBACKUP(Token, Value)                  \
+do                              \
+  if (yychar == YYEMPTY && yylen == 1)              \
+    {                               \
+      yychar = (Token);                     \
+      yylval = (Value);                     \
+      yytoken = YYTRANSLATE (yychar);               \
+      YYPOPSTACK;                       \
+      goto yybackup;                        \
+    }                               \
+  else                              \
+    {                               \
       yyerror ("syntax error: cannot back up");\
-      YYERROR;							\
-    }								\
+      YYERROR;                          \
+    }                               \
 while (0)
 
-#define YYTERROR	1
-#define YYERRCODE	256
+#define YYTERROR    1
+#define YYERRCODE   256
 
 /* YYLLOC_DEFAULT -- Compute the default location (before the actions
    are run).  */
@@ -770,27 +770,27 @@ while (0)
 #  define YYFPRINTF fprintf
 # endif
 
-# define YYDPRINTF(Args)			\
-do {						\
-  if (yydebug)					\
-    YYFPRINTF Args;				\
+# define YYDPRINTF(Args)            \
+do {                        \
+  if (yydebug)                  \
+    YYFPRINTF Args;             \
 } while (0)
 
-# define YYDSYMPRINT(Args)			\
-do {						\
-  if (yydebug)					\
-    yysymprint Args;				\
+# define YYDSYMPRINT(Args)          \
+do {                        \
+  if (yydebug)                  \
+    yysymprint Args;                \
 } while (0)
 
-# define YYDSYMPRINTF(Title, Token, Value, Location)		\
-do {								\
-  if (yydebug)							\
-    {								\
-      YYFPRINTF (stderr, "%s ", Title);				\
-      yysymprint (stderr, 					\
-                  Token, Value);	\
-      YYFPRINTF (stderr, "\n");					\
-    }								\
+# define YYDSYMPRINTF(Title, Token, Value, Location)        \
+do {                                \
+  if (yydebug)                          \
+    {                               \
+      YYFPRINTF (stderr, "%s ", Title);             \
+      yysymprint (stderr,                   \
+                  Token, Value);    \
+      YYFPRINTF (stderr, "\n");                 \
+    }                               \
 } while (0)
 
 /*------------------------------------------------------------------.
@@ -814,10 +814,10 @@ yy_stack_print (bottom, top)
   YYFPRINTF (stderr, "\n");
 }
 
-# define YY_STACK_PRINT(Bottom, Top)				\
-do {								\
-  if (yydebug)							\
-    yy_stack_print ((Bottom), (Top));				\
+# define YY_STACK_PRINT(Bottom, Top)                \
+do {                                \
+  if (yydebug)                          \
+    yy_stack_print ((Bottom), (Top));               \
 } while (0)
 
 
@@ -844,10 +844,10 @@ yy_reduce_print (yyrule)
   YYFPRINTF (stderr, "-> %s\n", yytname [yyr1[yyrule]]);
 }
 
-# define YY_REDUCE_PRINT(Rule)		\
-do {					\
-  if (yydebug)				\
-    yy_reduce_print (Rule);		\
+# define YY_REDUCE_PRINT(Rule)      \
+do {                    \
+  if (yydebug)              \
+    yy_reduce_print (Rule);     \
 } while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -863,7 +863,7 @@ int yydebug;
 
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
-#ifndef	YYINITDEPTH
+#ifndef YYINITDEPTH
 # define YYINITDEPTH 200
 #endif
 
@@ -1072,7 +1072,7 @@ yyparse ()
      to reallocate them elsewhere.  */
 
   /* The state stack.  */
-  short	yyssa[YYINITDEPTH];
+  short yyssa[YYINITDEPTH];
   short *yyss = yyssa;
   register short *yyssp;
 
@@ -1101,7 +1101,7 @@ yyparse ()
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY;		/* Cause a token to be read.  */
+  yychar = YYEMPTY;     /* Cause a token to be read.  */
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
@@ -1132,25 +1132,25 @@ yyparse ()
 
 #ifdef yyoverflow
       {
-	/* Give user a chance to reallocate the stack. Use copies of
-	   these so that the &'s don't force the real ones into
-	   memory.  */
-	YYSTYPE *yyvs1 = yyvs;
-	short *yyss1 = yyss;
+    /* Give user a chance to reallocate the stack. Use copies of
+       these so that the &'s don't force the real ones into
+       memory.  */
+    YYSTYPE *yyvs1 = yyvs;
+    short *yyss1 = yyss;
 
 
-	/* Each stack pointer address is followed by the size of the
-	   data in use in that stack, in bytes.  This used to be a
-	   conditional around just the two extra args, but that might
-	   be undefined if yyoverflow is a macro.  */
-	yyoverflow ("parser stack overflow",
-		    &yyss1, yysize * sizeof (*yyssp),
-		    &yyvs1, yysize * sizeof (*yyvsp),
+    /* Each stack pointer address is followed by the size of the
+       data in use in that stack, in bytes.  This used to be a
+       conditional around just the two extra args, but that might
+       be undefined if yyoverflow is a macro.  */
+    yyoverflow ("parser stack overflow",
+            &yyss1, yysize * sizeof (*yyssp),
+            &yyvs1, yysize * sizeof (*yyvsp),
 
-		    &yystacksize);
+            &yystacksize);
 
-	yyss = yyss1;
-	yyvs = yyvs1;
+    yyss = yyss1;
+    yyvs = yyvs1;
       }
 #else /* no yyoverflow */
 # ifndef YYSTACK_RELOCATE
@@ -1158,23 +1158,23 @@ yyparse ()
 # else
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
-	goto yyoverflowlab;
+    goto yyoverflowlab;
       yystacksize *= 2;
       if (YYMAXDEPTH < yystacksize)
-	yystacksize = YYMAXDEPTH;
+    yystacksize = YYMAXDEPTH;
 
       {
-	short *yyss1 = yyss;
-	union yyalloc *yyptr =
-	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
-	if (! yyptr)
-	  goto yyoverflowlab;
-	YYSTACK_RELOCATE (yyss);
-	YYSTACK_RELOCATE (yyvs);
+    short *yyss1 = yyss;
+    union yyalloc *yyptr =
+      (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
+    if (! yyptr)
+      goto yyoverflowlab;
+    YYSTACK_RELOCATE (yyss);
+    YYSTACK_RELOCATE (yyvs);
 
 #  undef YYSTACK_RELOCATE
-	if (yyss1 != yyssa)
-	  YYSTACK_FREE (yyss1);
+    if (yyss1 != yyssa)
+      YYSTACK_FREE (yyss1);
       }
 # endif
 #endif /* no yyoverflow */
@@ -1184,10 +1184,10 @@ yyparse ()
 
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-		  (unsigned long int) yystacksize));
+          (unsigned long int) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
-	YYABORT;
+    YYABORT;
     }
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
@@ -1238,7 +1238,7 @@ yybackup:
   if (yyn <= 0)
     {
       if (yyn == 0 || yyn == YYTABLE_NINF)
-	goto yyerrlab;
+    goto yyerrlab;
       yyn = -yyn;
       goto yyreduce;
     }
@@ -1299,822 +1299,822 @@ yyreduce:
         case 2:
 #line 74 "rc1.0_grammar.y"
     {
-			yyvsp[0].combinersStruct.Validate();
-			yyvsp[0].combinersStruct.Invoke();
-		;}
+            yyvsp[0].combinersStruct.Validate();
+            yyvsp[0].combinersStruct.Invoke();
+        ;}
     break;
 
   case 3:
 #line 81 "rc1.0_grammar.y"
     {
-			CombinersStruct combinersStruct;
-			combinersStruct.Init(yyvsp[-1].generalCombinersStruct, yyvsp[0].finalCombinerStruct, yyvsp[-2].constColorStruct);
-			yyval.combinersStruct = combinersStruct;
-		;}
+            CombinersStruct combinersStruct;
+            combinersStruct.Init(yyvsp[-1].generalCombinersStruct, yyvsp[0].finalCombinerStruct, yyvsp[-2].constColorStruct);
+            yyval.combinersStruct = combinersStruct;
+        ;}
     break;
 
   case 4:
 #line 87 "rc1.0_grammar.y"
     {
-			CombinersStruct combinersStruct;
-			combinersStruct.Init(yyvsp[-1].generalCombinersStruct, yyvsp[0].finalCombinerStruct, yyvsp[-3].constColorStruct, yyvsp[-2].constColorStruct);
-			yyval.combinersStruct = combinersStruct;
-		;}
+            CombinersStruct combinersStruct;
+            combinersStruct.Init(yyvsp[-1].generalCombinersStruct, yyvsp[0].finalCombinerStruct, yyvsp[-3].constColorStruct, yyvsp[-2].constColorStruct);
+            yyval.combinersStruct = combinersStruct;
+        ;}
     break;
 
   case 5:
 #line 93 "rc1.0_grammar.y"
     {
-			CombinersStruct combinersStruct;
-			combinersStruct.Init(yyvsp[-1].generalCombinersStruct, yyvsp[0].finalCombinerStruct);
-			yyval.combinersStruct = combinersStruct;
-		;}
+            CombinersStruct combinersStruct;
+            combinersStruct.Init(yyvsp[-1].generalCombinersStruct, yyvsp[0].finalCombinerStruct);
+            yyval.combinersStruct = combinersStruct;
+        ;}
     break;
 
   case 6:
 #line 99 "rc1.0_grammar.y"
     {
-			GeneralCombinersStruct generalCombinersStruct;
-			generalCombinersStruct.Init();
-			CombinersStruct combinersStruct;
-			combinersStruct.Init(generalCombinersStruct, yyvsp[0].finalCombinerStruct, yyvsp[-1].constColorStruct);
-			yyval.combinersStruct = combinersStruct;
-		;}
+            GeneralCombinersStruct generalCombinersStruct;
+            generalCombinersStruct.Init();
+            CombinersStruct combinersStruct;
+            combinersStruct.Init(generalCombinersStruct, yyvsp[0].finalCombinerStruct, yyvsp[-1].constColorStruct);
+            yyval.combinersStruct = combinersStruct;
+        ;}
     break;
 
   case 7:
 #line 107 "rc1.0_grammar.y"
     {
-			GeneralCombinersStruct generalCombinersStruct;
-			generalCombinersStruct.Init();
-			CombinersStruct combinersStruct;
-			combinersStruct.Init(generalCombinersStruct, yyvsp[0].finalCombinerStruct, yyvsp[-2].constColorStruct, yyvsp[-1].constColorStruct);
-			yyval.combinersStruct = combinersStruct;
-		;}
+            GeneralCombinersStruct generalCombinersStruct;
+            generalCombinersStruct.Init();
+            CombinersStruct combinersStruct;
+            combinersStruct.Init(generalCombinersStruct, yyvsp[0].finalCombinerStruct, yyvsp[-2].constColorStruct, yyvsp[-1].constColorStruct);
+            yyval.combinersStruct = combinersStruct;
+        ;}
     break;
 
   case 8:
 #line 115 "rc1.0_grammar.y"
     {
-			GeneralCombinersStruct generalCombinersStruct;
-			generalCombinersStruct.Init();
-			CombinersStruct combinersStruct;
-			combinersStruct.Init(generalCombinersStruct, yyvsp[0].finalCombinerStruct);
-			yyval.combinersStruct = combinersStruct;
-		;}
+            GeneralCombinersStruct generalCombinersStruct;
+            generalCombinersStruct.Init();
+            CombinersStruct combinersStruct;
+            combinersStruct.Init(generalCombinersStruct, yyvsp[0].finalCombinerStruct);
+            yyval.combinersStruct = combinersStruct;
+        ;}
     break;
 
   case 9:
 #line 125 "rc1.0_grammar.y"
     {
-			ConstColorStruct constColorStruct;
-			constColorStruct.Init(yyvsp[-11].registerEnum, yyvsp[-8].fval, yyvsp[-6].fval, yyvsp[-4].fval, yyvsp[-2].fval);
-			yyval.constColorStruct = constColorStruct;
-		;}
+            ConstColorStruct constColorStruct;
+            constColorStruct.Init(yyvsp[-11].registerEnum, yyvsp[-8].fval, yyvsp[-6].fval, yyvsp[-4].fval, yyvsp[-2].fval);
+            yyval.constColorStruct = constColorStruct;
+        ;}
     break;
 
   case 10:
 #line 134 "rc1.0_grammar.y"
     {
-			yyvsp[-1].generalCombinersStruct += yyvsp[0].generalCombinerStruct;
-			yyval.generalCombinersStruct = yyvsp[-1].generalCombinersStruct;
-		;}
+            yyvsp[-1].generalCombinersStruct += yyvsp[0].generalCombinerStruct;
+            yyval.generalCombinersStruct = yyvsp[-1].generalCombinersStruct;
+        ;}
     break;
 
   case 11:
 #line 139 "rc1.0_grammar.y"
     {
-			GeneralCombinersStruct generalCombinersStruct;
-			generalCombinersStruct.Init(yyvsp[0].generalCombinerStruct);
-			yyval.generalCombinersStruct = generalCombinersStruct;
-		;}
+            GeneralCombinersStruct generalCombinersStruct;
+            generalCombinersStruct.Init(yyvsp[0].generalCombinerStruct);
+            yyval.generalCombinersStruct = generalCombinersStruct;
+        ;}
     break;
 
   case 12:
 #line 147 "rc1.0_grammar.y"
     {
-			GeneralCombinerStruct generalCombinerStruct;
-			generalCombinerStruct.Init(yyvsp[-2].generalPortionStruct, yyvsp[-1].generalPortionStruct);
-			yyval.generalCombinerStruct = generalCombinerStruct;
-		;}
+            GeneralCombinerStruct generalCombinerStruct;
+            generalCombinerStruct.Init(yyvsp[-2].generalPortionStruct, yyvsp[-1].generalPortionStruct);
+            yyval.generalCombinerStruct = generalCombinerStruct;
+        ;}
     break;
 
   case 13:
 #line 153 "rc1.0_grammar.y"
     {
-			GeneralCombinerStruct generalCombinerStruct;
-			generalCombinerStruct.Init(yyvsp[-2].generalPortionStruct, yyvsp[-1].generalPortionStruct, yyvsp[-3].constColorStruct);
-			yyval.generalCombinerStruct = generalCombinerStruct;
-		;}
+            GeneralCombinerStruct generalCombinerStruct;
+            generalCombinerStruct.Init(yyvsp[-2].generalPortionStruct, yyvsp[-1].generalPortionStruct, yyvsp[-3].constColorStruct);
+            yyval.generalCombinerStruct = generalCombinerStruct;
+        ;}
     break;
 
   case 14:
 #line 159 "rc1.0_grammar.y"
     {
-			GeneralCombinerStruct generalCombinerStruct;
-			generalCombinerStruct.Init(yyvsp[-2].generalPortionStruct, yyvsp[-1].generalPortionStruct, yyvsp[-4].constColorStruct, yyvsp[-3].constColorStruct);
-			yyval.generalCombinerStruct = generalCombinerStruct;
-		;}
+            GeneralCombinerStruct generalCombinerStruct;
+            generalCombinerStruct.Init(yyvsp[-2].generalPortionStruct, yyvsp[-1].generalPortionStruct, yyvsp[-4].constColorStruct, yyvsp[-3].constColorStruct);
+            yyval.generalCombinerStruct = generalCombinerStruct;
+        ;}
     break;
 
   case 15:
 #line 165 "rc1.0_grammar.y"
     {
-			GeneralCombinerStruct generalCombinerStruct;
-			generalCombinerStruct.Init(yyvsp[-1].generalPortionStruct);
-			yyval.generalCombinerStruct = generalCombinerStruct;
-		;}
+            GeneralCombinerStruct generalCombinerStruct;
+            generalCombinerStruct.Init(yyvsp[-1].generalPortionStruct);
+            yyval.generalCombinerStruct = generalCombinerStruct;
+        ;}
     break;
 
   case 16:
 #line 171 "rc1.0_grammar.y"
     {
-			GeneralCombinerStruct generalCombinerStruct;
-			generalCombinerStruct.Init(yyvsp[-1].generalPortionStruct, yyvsp[-2].constColorStruct);
-			yyval.generalCombinerStruct = generalCombinerStruct;
-		;}
+            GeneralCombinerStruct generalCombinerStruct;
+            generalCombinerStruct.Init(yyvsp[-1].generalPortionStruct, yyvsp[-2].constColorStruct);
+            yyval.generalCombinerStruct = generalCombinerStruct;
+        ;}
     break;
 
   case 17:
 #line 177 "rc1.0_grammar.y"
     {
-			GeneralCombinerStruct generalCombinerStruct;
-			generalCombinerStruct.Init(yyvsp[-1].generalPortionStruct, yyvsp[-3].constColorStruct, yyvsp[-2].constColorStruct);
-			yyval.generalCombinerStruct = generalCombinerStruct;
-		;}
+            GeneralCombinerStruct generalCombinerStruct;
+            generalCombinerStruct.Init(yyvsp[-1].generalPortionStruct, yyvsp[-3].constColorStruct, yyvsp[-2].constColorStruct);
+            yyval.generalCombinerStruct = generalCombinerStruct;
+        ;}
     break;
 
   case 18:
 #line 185 "rc1.0_grammar.y"
     {
-			GeneralPortionStruct generalPortionStruct;
-			generalPortionStruct.Init(yyvsp[-4].ival, yyvsp[-2].generalFunctionStruct, yyvsp[-1].biasScaleEnum);
-			yyval.generalPortionStruct = generalPortionStruct;
-		;}
+            GeneralPortionStruct generalPortionStruct;
+            generalPortionStruct.Init(yyvsp[-4].ival, yyvsp[-2].generalFunctionStruct, yyvsp[-1].biasScaleEnum);
+            yyval.generalPortionStruct = generalPortionStruct;
+        ;}
     break;
 
   case 19:
 #line 191 "rc1.0_grammar.y"
     {
-			BiasScaleEnum noScale;
-			noScale.word = RCP_SCALE_BY_ONE;
-			GeneralPortionStruct generalPortionStruct;
-			generalPortionStruct.Init(yyvsp[-3].ival, yyvsp[-1].generalFunctionStruct, noScale);
-			yyval.generalPortionStruct = generalPortionStruct;
-		;}
+            BiasScaleEnum noScale;
+            noScale.word = RCP_SCALE_BY_ONE;
+            GeneralPortionStruct generalPortionStruct;
+            generalPortionStruct.Init(yyvsp[-3].ival, yyvsp[-1].generalFunctionStruct, noScale);
+            yyval.generalPortionStruct = generalPortionStruct;
+        ;}
     break;
 
   case 20:
 #line 201 "rc1.0_grammar.y"
     {
-			yyval.ival = yyvsp[0].ival;
-		;}
+            yyval.ival = yyvsp[0].ival;
+        ;}
     break;
 
   case 21:
 #line 205 "rc1.0_grammar.y"
     {
-			yyval.ival = yyvsp[0].ival;
-		;}
+            yyval.ival = yyvsp[0].ival;
+        ;}
     break;
 
   case 22:
 #line 211 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[0].registerEnum, GL_SIGNED_IDENTITY_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[0].registerEnum, GL_SIGNED_IDENTITY_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 23:
 #line 217 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[0].registerEnum, GL_SIGNED_NEGATE_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[0].registerEnum, GL_SIGNED_NEGATE_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 24:
 #line 223 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_EXPAND_NORMAL_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_EXPAND_NORMAL_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 25:
 #line 229 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_EXPAND_NEGATE_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_EXPAND_NEGATE_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 26:
 #line 235 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_HALF_BIAS_NORMAL_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_HALF_BIAS_NORMAL_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 27:
 #line 241 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_HALF_BIAS_NEGATE_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_HALF_BIAS_NEGATE_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 28:
 #line 247 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_IDENTITY_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_IDENTITY_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 29:
 #line 253 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_INVERT_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_INVERT_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 30:
 #line 261 "rc1.0_grammar.y"
     {
-			GeneralFunctionStruct generalFunction;
-			generalFunction.Init(yyvsp[-1].opStruct, yyvsp[0].opStruct);
-			yyval.generalFunctionStruct = generalFunction;
-		;}
+            GeneralFunctionStruct generalFunction;
+            generalFunction.Init(yyvsp[-1].opStruct, yyvsp[0].opStruct);
+            yyval.generalFunctionStruct = generalFunction;
+        ;}
     break;
 
   case 31:
 #line 267 "rc1.0_grammar.y"
     {
-			GeneralFunctionStruct generalFunction;
-			generalFunction.Init(yyvsp[-1].opStruct, yyvsp[0].opStruct);
-			yyval.generalFunctionStruct = generalFunction;
-		;}
+            GeneralFunctionStruct generalFunction;
+            generalFunction.Init(yyvsp[-1].opStruct, yyvsp[0].opStruct);
+            yyval.generalFunctionStruct = generalFunction;
+        ;}
     break;
 
   case 32:
 #line 273 "rc1.0_grammar.y"
     {
-			GeneralFunctionStruct generalFunction;
-			generalFunction.Init(yyvsp[-1].opStruct, yyvsp[0].opStruct);
-			yyval.generalFunctionStruct = generalFunction;
-		;}
+            GeneralFunctionStruct generalFunction;
+            generalFunction.Init(yyvsp[-1].opStruct, yyvsp[0].opStruct);
+            yyval.generalFunctionStruct = generalFunction;
+        ;}
     break;
 
   case 33:
 #line 279 "rc1.0_grammar.y"
     {
-			GeneralFunctionStruct generalFunction;
-			generalFunction.Init(yyvsp[0].opStruct);
-			yyval.generalFunctionStruct = generalFunction;
-		;}
+            GeneralFunctionStruct generalFunction;
+            generalFunction.Init(yyvsp[0].opStruct);
+            yyval.generalFunctionStruct = generalFunction;
+        ;}
     break;
 
   case 34:
 #line 285 "rc1.0_grammar.y"
     {
-			GeneralFunctionStruct generalFunction;
-			generalFunction.Init(yyvsp[-1].opStruct, yyvsp[0].opStruct);
-			yyval.generalFunctionStruct = generalFunction;
-		;}
+            GeneralFunctionStruct generalFunction;
+            generalFunction.Init(yyvsp[-1].opStruct, yyvsp[0].opStruct);
+            yyval.generalFunctionStruct = generalFunction;
+        ;}
     break;
 
   case 35:
 #line 291 "rc1.0_grammar.y"
     {
-			GeneralFunctionStruct generalFunction;
-			generalFunction.Init(yyvsp[-2].opStruct, yyvsp[-1].opStruct, yyvsp[0].opStruct);
-			yyval.generalFunctionStruct = generalFunction;
-		;}
+            GeneralFunctionStruct generalFunction;
+            generalFunction.Init(yyvsp[-2].opStruct, yyvsp[-1].opStruct, yyvsp[0].opStruct);
+            yyval.generalFunctionStruct = generalFunction;
+        ;}
     break;
 
   case 36:
 #line 297 "rc1.0_grammar.y"
     {
-			GeneralFunctionStruct generalFunction;
-			generalFunction.Init(yyvsp[-2].opStruct, yyvsp[-1].opStruct, yyvsp[0].opStruct);
-			yyval.generalFunctionStruct = generalFunction;
-		;}
+            GeneralFunctionStruct generalFunction;
+            generalFunction.Init(yyvsp[-2].opStruct, yyvsp[-1].opStruct, yyvsp[0].opStruct);
+            yyval.generalFunctionStruct = generalFunction;
+        ;}
     break;
 
   case 37:
 #line 303 "rc1.0_grammar.y"
     {
-			GeneralFunctionStruct generalFunction;
-			generalFunction.Init(yyvsp[0].opStruct);
-			yyval.generalFunctionStruct = generalFunction;
-		;}
+            GeneralFunctionStruct generalFunction;
+            generalFunction.Init(yyvsp[0].opStruct);
+            yyval.generalFunctionStruct = generalFunction;
+        ;}
     break;
 
   case 38:
 #line 311 "rc1.0_grammar.y"
     {
-			OpStruct dotFunction;
-			dotFunction.Init(RCP_DOT, yyvsp[-5].registerEnum, yyvsp[-3].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct);
-			yyval.opStruct = dotFunction;
-		;}
+            OpStruct dotFunction;
+            dotFunction.Init(RCP_DOT, yyvsp[-5].registerEnum, yyvsp[-3].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct);
+            yyval.opStruct = dotFunction;
+        ;}
     break;
 
   case 39:
 #line 319 "rc1.0_grammar.y"
     {
-			OpStruct mulFunction;
-			mulFunction.Init(RCP_MUL, yyvsp[-5].registerEnum, yyvsp[-3].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct);
-			yyval.opStruct = mulFunction;
-		;}
+            OpStruct mulFunction;
+            mulFunction.Init(RCP_MUL, yyvsp[-5].registerEnum, yyvsp[-3].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct);
+            yyval.opStruct = mulFunction;
+        ;}
     break;
 
   case 40:
 #line 325 "rc1.0_grammar.y"
     {
-			RegisterEnum zero;
-			zero.word = RCP_ZERO;
-			MappedRegisterStruct one;
-			one.Init(zero, GL_UNSIGNED_INVERT_NV);
-			OpStruct mulFunction;
-			mulFunction.Init(RCP_MUL, yyvsp[-3].registerEnum, yyvsp[-1].mappedRegisterStruct, one);
-			yyval.opStruct = mulFunction;
-		;}
+            RegisterEnum zero;
+            zero.word = RCP_ZERO;
+            MappedRegisterStruct one;
+            one.Init(zero, GL_UNSIGNED_INVERT_NV);
+            OpStruct mulFunction;
+            mulFunction.Init(RCP_MUL, yyvsp[-3].registerEnum, yyvsp[-1].mappedRegisterStruct, one);
+            yyval.opStruct = mulFunction;
+        ;}
     break;
 
   case 41:
 #line 337 "rc1.0_grammar.y"
     {
-			OpStruct muxFunction;
-			muxFunction.Init(RCP_MUX, yyvsp[-5].registerEnum);
-			yyval.opStruct = muxFunction;
-		;}
+            OpStruct muxFunction;
+            muxFunction.Init(RCP_MUX, yyvsp[-5].registerEnum);
+            yyval.opStruct = muxFunction;
+        ;}
     break;
 
   case 42:
 #line 345 "rc1.0_grammar.y"
     {
-			OpStruct sumFunction;
-			sumFunction.Init(RCP_SUM, yyvsp[-5].registerEnum);
-			yyval.opStruct = sumFunction;
-		;}
+            OpStruct sumFunction;
+            sumFunction.Init(RCP_SUM, yyvsp[-5].registerEnum);
+            yyval.opStruct = sumFunction;
+        ;}
     break;
 
   case 43:
 #line 353 "rc1.0_grammar.y"
     {
-			yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
-		;}
+            yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
+        ;}
     break;
 
   case 44:
 #line 357 "rc1.0_grammar.y"
     {
-			yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
-		;}
+            yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
+        ;}
     break;
 
   case 45:
 #line 361 "rc1.0_grammar.y"
     {
-			yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
-		;}
+            yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
+        ;}
     break;
 
   case 46:
 #line 365 "rc1.0_grammar.y"
     {
-			yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
-		;}
+            yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
+        ;}
     break;
 
   case 47:
 #line 369 "rc1.0_grammar.y"
     {
-			yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
-		;}
+            yyval.biasScaleEnum = yyvsp[-3].biasScaleEnum;
+        ;}
     break;
 
   case 48:
 #line 375 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[0].registerEnum, GL_UNSIGNED_IDENTITY_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[0].registerEnum, GL_UNSIGNED_IDENTITY_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 49:
 #line 381 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_IDENTITY_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_IDENTITY_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 50:
 #line 387 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_INVERT_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_INVERT_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 51:
 #line 393 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[0].registerEnum);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[0].registerEnum);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 52:
 #line 399 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_IDENTITY_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_IDENTITY_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 53:
 #line 405 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_INVERT_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_INVERT_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 54:
 #line 411 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[0].registerEnum);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[0].registerEnum);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 55:
 #line 417 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_IDENTITY_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_IDENTITY_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 56:
 #line 423 "rc1.0_grammar.y"
     {
-			MappedRegisterStruct reg;
-			reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_INVERT_NV);
-			yyval.mappedRegisterStruct = reg;
-		;}
+            MappedRegisterStruct reg;
+            reg.Init(yyvsp[-1].registerEnum, GL_UNSIGNED_INVERT_NV);
+            yyval.mappedRegisterStruct = reg;
+        ;}
     break;
 
   case 57:
 #line 431 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, false);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, false);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 58:
 #line 437 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, true);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, true);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 59:
 #line 443 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, false, yyvsp[-2].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, false, yyvsp[-2].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 60:
 #line 449 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, true, yyvsp[-2].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, true, yyvsp[-2].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 61:
 #line 455 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, true, yyvsp[-3].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, yyvsp[-1].finalAlphaFunctionStruct, true, yyvsp[-3].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 62:
 #line 462 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, false);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, false);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 63:
 #line 468 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 64:
 #line 474 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, false, yyvsp[-2].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, false, yyvsp[-2].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 65:
 #line 480 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true, yyvsp[-2].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true, yyvsp[-2].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 66:
 #line 486 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true, yyvsp[-3].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            finalCombinerStruct.Init(yyvsp[-1].finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true, yyvsp[-3].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 67:
 #line 493 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalAlphaFunctionStruct finalAlphaFunctionStruct;
-			finalAlphaFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, false);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalAlphaFunctionStruct finalAlphaFunctionStruct;
+            finalAlphaFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, false);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 68:
 #line 501 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalAlphaFunctionStruct finalAlphaFunctionStruct;
-			finalAlphaFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, true);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalAlphaFunctionStruct finalAlphaFunctionStruct;
+            finalAlphaFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, true);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 69:
 #line 509 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalAlphaFunctionStruct finalAlphaFunctionStruct;
-			finalAlphaFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, false, yyvsp[-1].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalAlphaFunctionStruct finalAlphaFunctionStruct;
+            finalAlphaFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, false, yyvsp[-1].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 70:
 #line 517 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalAlphaFunctionStruct finalAlphaFunctionStruct;
-			finalAlphaFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, true, yyvsp[-1].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalAlphaFunctionStruct finalAlphaFunctionStruct;
+            finalAlphaFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, true, yyvsp[-1].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 71:
 #line 525 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalAlphaFunctionStruct finalAlphaFunctionStruct;
-			finalAlphaFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, true, yyvsp[-2].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalAlphaFunctionStruct finalAlphaFunctionStruct;
+            finalAlphaFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(yyvsp[0].finalRgbFunctionStruct, finalAlphaFunctionStruct, true, yyvsp[-2].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 72:
 #line 534 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, false);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, false);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 73:
 #line 542 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 74:
 #line 550 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, false, yyvsp[-1].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, false, yyvsp[-1].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 75:
 #line 558 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true, yyvsp[-1].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true, yyvsp[-1].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 76:
 #line 566 "rc1.0_grammar.y"
     {
-			FinalCombinerStruct finalCombinerStruct;
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.ZeroOut();
-			finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true, yyvsp[-2].finalProductStruct);
-			yyval.finalCombinerStruct = finalCombinerStruct;
-		;}
+            FinalCombinerStruct finalCombinerStruct;
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.ZeroOut();
+            finalCombinerStruct.Init(finalRgbFunctionStruct, yyvsp[0].finalAlphaFunctionStruct, true, yyvsp[-2].finalProductStruct);
+            yyval.finalCombinerStruct = finalCombinerStruct;
+        ;}
     break;
 
   case 77:
 #line 576 "rc1.0_grammar.y"
     {
-			yyval.ival = yyvsp[-3].ival;
-		;}
+            yyval.ival = yyvsp[-3].ival;
+        ;}
     break;
 
   case 78:
 #line 582 "rc1.0_grammar.y"
     {
-			FinalProductStruct finalProductStruct;
-			finalProductStruct.Init(yyvsp[-3].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct);
-			yyval.finalProductStruct = finalProductStruct;
-		;}
+            FinalProductStruct finalProductStruct;
+            finalProductStruct.Init(yyvsp[-3].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct);
+            yyval.finalProductStruct = finalProductStruct;
+        ;}
     break;
 
   case 79:
 #line 590 "rc1.0_grammar.y"
     {
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.Init(yyvsp[-8].mappedRegisterStruct, yyvsp[-6].mappedRegisterStruct, yyvsp[-4].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct);
-			yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
-		;}
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.Init(yyvsp[-8].mappedRegisterStruct, yyvsp[-6].mappedRegisterStruct, yyvsp[-4].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct);
+            yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
+        ;}
     break;
 
   case 80:
 #line 596 "rc1.0_grammar.y"
     {
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.Init(yyvsp[-6].mappedRegisterStruct, yyvsp[-4].mappedRegisterStruct, yyvsp[-2].mappedRegisterStruct, yyvsp[-10].mappedRegisterStruct);
-			yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
-		;}
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.Init(yyvsp[-6].mappedRegisterStruct, yyvsp[-4].mappedRegisterStruct, yyvsp[-2].mappedRegisterStruct, yyvsp[-10].mappedRegisterStruct);
+            yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
+        ;}
     break;
 
   case 81:
 #line 602 "rc1.0_grammar.y"
     {
-			RegisterEnum zero;
-			zero.word = RCP_ZERO;
-			MappedRegisterStruct reg;
-			reg.Init(zero, GL_UNSIGNED_IDENTITY_NV);
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.Init(yyvsp[-6].mappedRegisterStruct, yyvsp[-4].mappedRegisterStruct, yyvsp[-2].mappedRegisterStruct, reg);
-			yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
-		;}
+            RegisterEnum zero;
+            zero.word = RCP_ZERO;
+            MappedRegisterStruct reg;
+            reg.Init(zero, GL_UNSIGNED_IDENTITY_NV);
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.Init(yyvsp[-6].mappedRegisterStruct, yyvsp[-4].mappedRegisterStruct, yyvsp[-2].mappedRegisterStruct, reg);
+            yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
+        ;}
     break;
 
   case 82:
 #line 612 "rc1.0_grammar.y"
     {
-			RegisterEnum zero;
-			zero.word = RCP_ZERO;
-			MappedRegisterStruct reg1;
-			reg1.Init(zero, GL_UNSIGNED_IDENTITY_NV);
-			MappedRegisterStruct reg2;
-			reg2.Init(zero, GL_UNSIGNED_IDENTITY_NV);
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.Init(yyvsp[-3].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct, reg1, reg2);
-			yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
-		;}
+            RegisterEnum zero;
+            zero.word = RCP_ZERO;
+            MappedRegisterStruct reg1;
+            reg1.Init(zero, GL_UNSIGNED_IDENTITY_NV);
+            MappedRegisterStruct reg2;
+            reg2.Init(zero, GL_UNSIGNED_IDENTITY_NV);
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.Init(yyvsp[-3].mappedRegisterStruct, yyvsp[-1].mappedRegisterStruct, reg1, reg2);
+            yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
+        ;}
     break;
 
   case 83:
 #line 624 "rc1.0_grammar.y"
     {
-			RegisterEnum zero;
-			zero.word = RCP_ZERO;
-			MappedRegisterStruct reg1;
-			reg1.Init(zero, GL_UNSIGNED_IDENTITY_NV);
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.Init(yyvsp[-5].mappedRegisterStruct, yyvsp[-3].mappedRegisterStruct, reg1, yyvsp[-1].mappedRegisterStruct);
-			yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
-		;}
+            RegisterEnum zero;
+            zero.word = RCP_ZERO;
+            MappedRegisterStruct reg1;
+            reg1.Init(zero, GL_UNSIGNED_IDENTITY_NV);
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.Init(yyvsp[-5].mappedRegisterStruct, yyvsp[-3].mappedRegisterStruct, reg1, yyvsp[-1].mappedRegisterStruct);
+            yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
+        ;}
     break;
 
   case 84:
 #line 634 "rc1.0_grammar.y"
     {
-			RegisterEnum zero;
-			zero.word = RCP_ZERO;
-			MappedRegisterStruct reg1;
-			reg1.Init(zero, GL_UNSIGNED_IDENTITY_NV);
-			MappedRegisterStruct reg2;
-			reg2.Init(zero, GL_UNSIGNED_IDENTITY_NV);
-			MappedRegisterStruct reg3;
-			reg3.Init(zero, GL_UNSIGNED_IDENTITY_NV);
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.Init(reg1, reg2, reg3, yyvsp[-1].mappedRegisterStruct);
-			yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
-		;}
+            RegisterEnum zero;
+            zero.word = RCP_ZERO;
+            MappedRegisterStruct reg1;
+            reg1.Init(zero, GL_UNSIGNED_IDENTITY_NV);
+            MappedRegisterStruct reg2;
+            reg2.Init(zero, GL_UNSIGNED_IDENTITY_NV);
+            MappedRegisterStruct reg3;
+            reg3.Init(zero, GL_UNSIGNED_IDENTITY_NV);
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.Init(reg1, reg2, reg3, yyvsp[-1].mappedRegisterStruct);
+            yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
+        ;}
     break;
 
   case 85:
 #line 648 "rc1.0_grammar.y"
     {
-			RegisterEnum zero;
-			zero.word = RCP_ZERO;
-			MappedRegisterStruct reg2;
-			reg2.Init(zero, GL_UNSIGNED_INVERT_NV);
-			MappedRegisterStruct reg3;
-			reg3.Init(zero, GL_UNSIGNED_IDENTITY_NV);
-			FinalRgbFunctionStruct finalRgbFunctionStruct;
-			finalRgbFunctionStruct.Init(yyvsp[-3].mappedRegisterStruct, reg2, reg3, yyvsp[-1].mappedRegisterStruct);
-			yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
-		;}
+            RegisterEnum zero;
+            zero.word = RCP_ZERO;
+            MappedRegisterStruct reg2;
+            reg2.Init(zero, GL_UNSIGNED_INVERT_NV);
+            MappedRegisterStruct reg3;
+            reg3.Init(zero, GL_UNSIGNED_IDENTITY_NV);
+            FinalRgbFunctionStruct finalRgbFunctionStruct;
+            finalRgbFunctionStruct.Init(yyvsp[-3].mappedRegisterStruct, reg2, reg3, yyvsp[-1].mappedRegisterStruct);
+            yyval.finalRgbFunctionStruct = finalRgbFunctionStruct;
+        ;}
     break;
 
   case 86:
 #line 662 "rc1.0_grammar.y"
     {
-			FinalAlphaFunctionStruct finalAlphaFunctionStruct;
-			finalAlphaFunctionStruct.Init(yyvsp[-1].mappedRegisterStruct);
-			yyval.finalAlphaFunctionStruct = finalAlphaFunctionStruct;
-		;}
+            FinalAlphaFunctionStruct finalAlphaFunctionStruct;
+            finalAlphaFunctionStruct.Init(yyvsp[-1].mappedRegisterStruct);
+            yyval.finalAlphaFunctionStruct = finalAlphaFunctionStruct;
+        ;}
     break;
 
   case 87:
 #line 670 "rc1.0_grammar.y"
     {
-			yyval.registerEnum = yyvsp[0].registerEnum;
-		;}
+            yyval.registerEnum = yyvsp[0].registerEnum;
+        ;}
     break;
 
   case 88:
 #line 674 "rc1.0_grammar.y"
     {
-			yyval.registerEnum = yyvsp[0].registerEnum;
-		;}
+            yyval.registerEnum = yyvsp[0].registerEnum;
+        ;}
     break;
 
 
@@ -2159,50 +2159,50 @@ yyerrlab:
       yyn = yypact[yystate];
 
       if (YYPACT_NINF < yyn && yyn < YYLAST)
-	{
-	  YYSIZE_T yysize = 0;
-	  int yytype = YYTRANSLATE (yychar);
-	  char *yymsg;
-	  int yyx, yycount;
+    {
+      YYSIZE_T yysize = 0;
+      int yytype = YYTRANSLATE (yychar);
+      char *yymsg;
+      int yyx, yycount;
 
-	  yycount = 0;
-	  /* Start YYX at -YYN if negative to avoid negative indexes in
-	     YYCHECK.  */
-	  for (yyx = yyn < 0 ? -yyn : 0;
-	       yyx < (int) (sizeof (yytname) / sizeof (char *)); yyx++)
-	    if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
-	      yysize += yystrlen (yytname[yyx]) + 15, yycount++;
-	  yysize += yystrlen ("syntax error, unexpected ") + 1;
-	  yysize += yystrlen (yytname[yytype]);
-	  yymsg = (char *) YYSTACK_ALLOC (yysize);
-	  if (yymsg != 0)
-	    {
-	      char *yyp = yystpcpy (yymsg, "syntax error, unexpected ");
-	      yyp = yystpcpy (yyp, yytname[yytype]);
+      yycount = 0;
+      /* Start YYX at -YYN if negative to avoid negative indexes in
+         YYCHECK.  */
+      for (yyx = yyn < 0 ? -yyn : 0;
+           yyx < (int) (sizeof (yytname) / sizeof (char *)); yyx++)
+        if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
+          yysize += yystrlen (yytname[yyx]) + 15, yycount++;
+      yysize += yystrlen ("syntax error, unexpected ") + 1;
+      yysize += yystrlen (yytname[yytype]);
+      yymsg = (char *) YYSTACK_ALLOC (yysize);
+      if (yymsg != 0)
+        {
+          char *yyp = yystpcpy (yymsg, "syntax error, unexpected ");
+          yyp = yystpcpy (yyp, yytname[yytype]);
 
-	      if (yycount < 5)
-		{
-		  yycount = 0;
-		  for (yyx = yyn < 0 ? -yyn : 0;
-		       yyx < (int) (sizeof (yytname) / sizeof (char *));
-		       yyx++)
-		    if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
-		      {
-			const char *yyq = ! yycount ? ", expecting " : " or ";
-			yyp = yystpcpy (yyp, yyq);
-			yyp = yystpcpy (yyp, yytname[yyx]);
-			yycount++;
-		      }
-		}
-	      yyerror (yymsg);
-	      YYSTACK_FREE (yymsg);
-	    }
-	  else
-	    yyerror ("syntax error; also virtual memory exhausted");
-	}
+          if (yycount < 5)
+        {
+          yycount = 0;
+          for (yyx = yyn < 0 ? -yyn : 0;
+               yyx < (int) (sizeof (yytname) / sizeof (char *));
+               yyx++)
+            if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
+              {
+            const char *yyq = ! yycount ? ", expecting " : " or ";
+            yyp = yystpcpy (yyp, yyq);
+            yyp = yystpcpy (yyp, yytname[yyx]);
+            yycount++;
+              }
+        }
+          yyerror (yymsg);
+          YYSTACK_FREE (yymsg);
+        }
+      else
+        yyerror ("syntax error; also virtual memory exhausted");
+    }
       else
 #endif /* YYERROR_VERBOSE */
-	yyerror ("syntax error");
+    yyerror ("syntax error");
     }
 
 
@@ -2210,21 +2210,21 @@ yyerrlab:
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
-	 error, discard it.  */
+     error, discard it.  */
 
       /* Return failure if at end of input.  */
       if (yychar == YYEOF)
         {
-	  /* Pop the error token.  */
+      /* Pop the error token.  */
           YYPOPSTACK;
-	  /* Pop the rest of the stack.  */
-	  while (yyss < yyssp)
-	    {
-	      YYDSYMPRINTF ("Error: popping", yystos[*yyssp], yyvsp, yylsp);
-	      yydestruct (yystos[*yyssp], yyvsp);
-	      YYPOPSTACK;
-	    }
-	  YYABORT;
+      /* Pop the rest of the stack.  */
+      while (yyss < yyssp)
+        {
+          YYDSYMPRINTF ("Error: popping", yystos[*yyssp], yyvsp, yylsp);
+          yydestruct (yystos[*yyssp], yyvsp);
+          YYPOPSTACK;
+        }
+      YYABORT;
         }
 
       YYDSYMPRINTF ("Error: discarding", yytoken, &yylval, &yylloc);
@@ -2242,25 +2242,25 @@ yyerrlab:
 | yyerrlab1 -- error raised explicitly by an action.  |
 `----------------------------------------------------*/
 yyerrlab1:
-  yyerrstatus = 3;	/* Each real token shifted decrements this.  */
+  yyerrstatus = 3;  /* Each real token shifted decrements this.  */
 
   for (;;)
     {
       yyn = yypact[yystate];
       if (yyn != YYPACT_NINF)
-	{
-	  yyn += YYTERROR;
-	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
-	    {
-	      yyn = yytable[yyn];
-	      if (0 < yyn)
-		break;
-	    }
-	}
+    {
+      yyn += YYTERROR;
+      if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+        {
+          yyn = yytable[yyn];
+          if (0 < yyn)
+        break;
+        }
+    }
 
       /* Pop the current state because it cannot handle the error token.  */
       if (yyssp == yyss)
-	YYABORT;
+    YYABORT;
 
       YYDSYMPRINTF ("Error: popping", yystos[*yyssp], yyvsp, yylsp);
       yydestruct (yystos[yystate], yyvsp);

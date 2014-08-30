@@ -13,10 +13,10 @@ public:
      virtual void attach(Observer*); 
      virtual void detach(Observer*); 
      virtual void notify(); 
-	 
+     
 protected: 
      Subject(); 
-	 
+     
 private: 
      ObserverList mObservers;
 };
@@ -24,8 +24,8 @@ private:
 Subject::Subject() {}
 
 Subject::~Subject()
-{	
-	// TODO: Clear list!
+{   
+    // TODO: Clear list!
 }
 
 void Subject::attach(Observer* o) { 
@@ -38,10 +38,10 @@ void Subject::detach(Observer* o) {
 
 void Subject::notify () { 
      ObserverList::iterator it;
-	 for(it = mObservers.begin(); it != mObservers.end(); ++it)
-	 {
-		*it->update(this);
-	 }
+     for(it = mObservers.begin(); it != mObservers.end(); ++it)
+     {
+        *it->update(this);
+     }
 }
 
 #endif // _SUBJECT_H_

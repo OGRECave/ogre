@@ -234,8 +234,8 @@ struct bsp_header_t {
 // Brushes sides in BSP tree
 //
 struct bsp_brushside_t {
-	int planenum;
-	int content;			// ??shader??
+    int planenum;
+    int content;            // ??shader??
 };
 
 
@@ -243,8 +243,8 @@ struct bsp_brushside_t {
 // Brushes in BSP tree
 //
 struct bsp_brush_t {
-	int firstside;
-	int numsides;
-	int shaderIndex;
+    int firstside;
+    int numsides;
+    int shaderIndex;
 };
 #endif

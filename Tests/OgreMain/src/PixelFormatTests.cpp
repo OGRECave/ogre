@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "PixelFormatTests.h"
 #include <cstdlib>
+#include <iomanip>
 
 // Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( PixelFormatTests );
@@ -94,35 +95,35 @@ void naiveBulkPixelConversion(const PixelBox &src, const PixelBox &dst)
 {
     uint8 *srcptr = static_cast<uint8*>(src.data);
     uint8 *dstptr = static_cast<uint8*>(dst.data);
-    unsigned int srcPixelSize = PixelUtil::getNumElemBytes(src.format);
-    unsigned int dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
+    size_t srcPixelSize = PixelUtil::getNumElemBytes(src.format);
+    size_t dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
 
     // Calculate pitches+skips in bytes
-    int srcRowSkipBytes = src.getRowSkip()*srcPixelSize;
-    int srcSliceSkipBytes = src.getSliceSkip()*srcPixelSize;
+    unsigned long srcRowSkipBytes = src.getRowSkip()*srcPixelSize;
+    unsigned long srcSliceSkipBytes = src.getSliceSkip()*srcPixelSize;
 
-    int dstRowSkipBytes = dst.getRowSkip()*dstPixelSize;
-    int dstSliceSkipBytes = dst.getSliceSkip()*dstPixelSize;
+    unsigned long dstRowSkipBytes = dst.getRowSkip()*dstPixelSize;
+    unsigned long dstSliceSkipBytes = dst.getSliceSkip()*dstPixelSize;
 
-	// The brute force fallback
-	float r,g,b,a;
-	for(size_t z=src.front; z<src.back; z++)
-	{
-		for(size_t y=src.top; y<src.bottom; y++)
-		{
-			for(size_t x=src.left; x<src.right; x++)
-			{
-				PixelUtil::unpackColour(&r, &g, &b, &a, src.format, srcptr);
-				PixelUtil::packColour(r, g, b, a, dst.format, dstptr);
-				srcptr += srcPixelSize;
-				dstptr += dstPixelSize;
-			}
-			srcptr += srcRowSkipBytes;
-			dstptr += dstRowSkipBytes;
-		}
-		srcptr += srcSliceSkipBytes;
-		dstptr += dstSliceSkipBytes;
-	}
+    // The brute force fallback
+    float r,g,b,a;
+    for(size_t z=src.front; z<src.back; z++)
+    {
+        for(size_t y=src.top; y<src.bottom; y++)
+        {
+            for(size_t x=src.left; x<src.right; x++)
+            {
+                PixelUtil::unpackColour(&r, &g, &b, &a, src.format, srcptr);
+                PixelUtil::packColour(r, g, b, a, dst.format, dstptr);
+                srcptr += srcPixelSize;
+                dstptr += dstPixelSize;
+            }
+            srcptr += srcRowSkipBytes;
+            dstptr += dstRowSkipBytes;
+        }
+        srcptr += srcSliceSkipBytes;
+        dstptr += dstSliceSkipBytes;
+    }
 
 }
 
@@ -134,8 +135,8 @@ void PixelFormatTests::setupBoxes(PixelFormat srcFormat, PixelFormat dstFormat)
         width = width2;
 
     src = PixelBox(width, 1, 1, srcFormat, randomData);
-	dst1 = PixelBox(width, 1, 1, dstFormat, temp);
-	dst2 = PixelBox(width, 1, 1, dstFormat, temp2);
+    dst1 = PixelBox(width, 1, 1, dstFormat, temp);
+    dst2 = PixelBox(width, 1, 1, dstFormat, temp2);
 
 }
 
@@ -143,7 +144,7 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
 {
     setupBoxes(srcFormat, dstFormat);
     // Check end of buffer
-    unsigned int eob = dst1.getWidth()*PixelUtil::getNumElemBytes(dstFormat);
+    unsigned long eob = dst1.getWidth()*PixelUtil::getNumElemBytes(dstFormat);
     temp[eob] = (unsigned char)0x56;
     temp[eob+1] = (unsigned char)0x23;
 
@@ -170,11 +171,11 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
     s << " ";
 
     // Compare result
-	StringUtil::StrStreamType msg;
-	msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
-		"->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
+    StringStream msg;
+    msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
+        "->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
     CPPUNIT_ASSERT_MESSAGE(msg.str().c_str(),
-		memcmp(dst1.data, dst2.data, eob) == 0);
+        memcmp(dst1.data, dst2.data, eob) == 0);
 }
 
 void PixelFormatTests::testBulkConversion()
@@ -182,18 +183,18 @@ void PixelFormatTests::testBulkConversion()
     // Self match
     testCase(PF_A8R8G8B8, PF_A8R8G8B8);
     // Optimized
-	testCase(PF_A8R8G8B8,PF_A8B8G8R8);
-	testCase(PF_A8R8G8B8,PF_B8G8R8A8);
-	testCase(PF_A8R8G8B8,PF_R8G8B8A8);
-	testCase(PF_A8B8G8R8,PF_A8R8G8B8);
-	testCase(PF_A8B8G8R8,PF_B8G8R8A8);
-	testCase(PF_A8B8G8R8,PF_R8G8B8A8);
-	testCase(PF_B8G8R8A8,PF_A8R8G8B8);
-	testCase(PF_B8G8R8A8,PF_A8B8G8R8);
-	testCase(PF_B8G8R8A8,PF_R8G8B8A8);
-	testCase(PF_R8G8B8A8,PF_A8R8G8B8);
-	testCase(PF_R8G8B8A8,PF_A8B8G8R8);
-	testCase(PF_R8G8B8A8,PF_B8G8R8A8);
+    testCase(PF_A8R8G8B8,PF_A8B8G8R8);
+    testCase(PF_A8R8G8B8,PF_B8G8R8A8);
+    testCase(PF_A8R8G8B8,PF_R8G8B8A8);
+    testCase(PF_A8B8G8R8,PF_A8R8G8B8);
+    testCase(PF_A8B8G8R8,PF_B8G8R8A8);
+    testCase(PF_A8B8G8R8,PF_R8G8B8A8);
+    testCase(PF_B8G8R8A8,PF_A8R8G8B8);
+    testCase(PF_B8G8R8A8,PF_A8B8G8R8);
+    testCase(PF_B8G8R8A8,PF_R8G8B8A8);
+    testCase(PF_R8G8B8A8,PF_A8R8G8B8);
+    testCase(PF_R8G8B8A8,PF_A8B8G8R8);
+    testCase(PF_R8G8B8A8,PF_B8G8R8A8);
 
     testCase(PF_A8B8G8R8, PF_L8);
     testCase(PF_L8, PF_A8B8G8R8);
@@ -213,16 +214,16 @@ void PixelFormatTests::testBulkConversion()
     testCase(PF_B8G8R8, PF_A8B8G8R8);
     testCase(PF_R8G8B8, PF_B8G8R8A8);
     testCase(PF_B8G8R8, PF_B8G8R8A8);
-	testCase(PF_A8R8G8B8, PF_R8G8B8);
-	testCase(PF_A8R8G8B8, PF_B8G8R8);
-	testCase(PF_X8R8G8B8, PF_A8R8G8B8);
-	testCase(PF_X8R8G8B8, PF_A8B8G8R8);
-	testCase(PF_X8R8G8B8, PF_B8G8R8A8);
-	testCase(PF_X8R8G8B8, PF_R8G8B8A8);
-	testCase(PF_X8B8G8R8, PF_A8R8G8B8);
-	testCase(PF_X8B8G8R8, PF_A8B8G8R8);
-	testCase(PF_X8B8G8R8, PF_B8G8R8A8);
-	testCase(PF_X8B8G8R8, PF_R8G8B8A8);
+    testCase(PF_A8R8G8B8, PF_R8G8B8);
+    testCase(PF_A8R8G8B8, PF_B8G8R8);
+    testCase(PF_X8R8G8B8, PF_A8R8G8B8);
+    testCase(PF_X8R8G8B8, PF_A8B8G8R8);
+    testCase(PF_X8R8G8B8, PF_B8G8R8A8);
+    testCase(PF_X8R8G8B8, PF_R8G8B8A8);
+    testCase(PF_X8B8G8R8, PF_A8R8G8B8);
+    testCase(PF_X8B8G8R8, PF_A8B8G8R8);
+    testCase(PF_X8B8G8R8, PF_B8G8R8A8);
+    testCase(PF_X8B8G8R8, PF_R8G8B8A8);
 
     //CPPUNIT_ASSERT_MESSAGE("Conversion mismatch", false);
 }

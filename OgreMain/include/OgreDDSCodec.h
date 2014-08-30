@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,46 +30,46 @@ THE SOFTWARE.
 
 #include "OgreImageCodec.h"
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Image
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Image
+    *  @{
+    */
 
-	// Forward declarations
-	struct DXTColourBlock;
-	struct DXTExplicitAlphaBlock;
-	struct DXTInterpolatedAlphaBlock;
+    // Forward declarations
+    struct DXTColourBlock;
+    struct DXTExplicitAlphaBlock;
+    struct DXTInterpolatedAlphaBlock;
 
     /** Codec specialized in loading DDS (Direct Draw Surface) images.
-	@remarks
-		We implement our own codec here since we need to be able to keep DXT
-		data compressed if the card supports it.
+    @remarks
+        We implement our own codec here since we need to be able to keep DXT
+        data compressed if the card supports it.
     */
     class _OgreExport DDSCodec : public ImageCodec
     {
     private:
         String mType;
 
-    	void flipEndian(void * pData, size_t size, size_t count) const;
-	    void flipEndian(void * pData, size_t size) const;
+        void flipEndian(void * pData, size_t size, size_t count) const;
+        void flipEndian(void * pData, size_t size) const;
 
-		PixelFormat convertFourCCFormat(uint32 fourcc) const;
-		PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
-		PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask,
-			uint32 gMask, uint32 bMask, uint32 aMask) const;
+        PixelFormat convertFourCCFormat(uint32 fourcc) const;
+        PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
+        PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask,
+            uint32 gMask, uint32 bMask, uint32 aMask) const;
 
-		/// Unpack DXT colours into array of 16 colour values
-		void unpackDXTColour(PixelFormat pf, const DXTColourBlock& block, ColourValue* pCol) const;
-		/// Unpack DXT alphas into array of 16 colour values
-		void unpackDXTAlpha(const DXTExplicitAlphaBlock& block, ColourValue* pCol) const;
-		/// Unpack DXT alphas into array of 16 colour values
-		void unpackDXTAlpha(const DXTInterpolatedAlphaBlock& block, ColourValue* pCol) const;
+        /// Unpack DXT colours into array of 16 colour values
+        void unpackDXTColour(PixelFormat pf, const DXTColourBlock& block, ColourValue* pCol) const;
+        /// Unpack DXT alphas into array of 16 colour values
+        void unpackDXTAlpha(const DXTExplicitAlphaBlock& block, ColourValue* pCol) const;
+        /// Unpack DXT alphas into array of 16 colour values
+        void unpackDXTAlpha(const DXTInterpolatedAlphaBlock& block, ColourValue* pCol) const;
 
-		/// Single registered codec instance
-		static DDSCodec* msInstance;
-	public:
+        /// Single registered codec instance
+        static DDSCodec* msInstance;
+    public:
         DDSCodec();
         virtual ~DDSCodec() { }
 
@@ -79,19 +79,19 @@ namespace Ogre {
         void encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
         DecodeResult decode(DataStreamPtr& input) const;
-		/// @copydoc Codec::magicNumberToFileExt
-		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
+        /// @copydoc Codec::magicNumberToFileExt
+        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
         
         virtual String getType() const;        
 
-		/// Static method to startup and register the DDS codec
-		static void startup(void);
-		/// Static method to shutdown and unregister the DDS codec
-		static void shutdown(void);
+        /// Static method to startup and register the DDS codec
+        static void startup(void);
+        /// Static method to shutdown and unregister the DDS codec
+        static void shutdown(void);
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

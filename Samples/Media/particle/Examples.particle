@@ -1,17 +1,16 @@
 // Example particle systems
 
-// Exudes greeny particles which float upwards
+// Exudes greeny particles which float upwards.
 particle_system Examples/GreenyNimbus
 {
     material        Examples/FlarePointSprite
-    particle_width	35
+    particle_width  35
     particle_height 35
     cull_each       false
-	cull_each       false
     quota           5000
     billboard_type  point
     
-    // Area emitter
+    // Area emitter.
     emitter Box
     {
         angle           30
@@ -26,14 +25,14 @@ particle_system Examples/GreenyNimbus
         depth           60
     }
 
-    // Make em float upwards
+    // Make 'em float upwards.
     affector LinearForce
     {
         force_vector      0 100 0
         force_application add
     }
 
-    // Fader
+    // Fader.
     affector ColourFader
     {
         red -0.25
@@ -42,7 +41,7 @@ particle_system Examples/GreenyNimbus
     }
 }
 
-// A sparkly purple fountain
+// A sparkly purple fountain.
 particle_system Examples/PurpleFountain
 {
     material        Examples/Flare2
@@ -52,7 +51,7 @@ particle_system Examples/PurpleFountain
     quota           10000
     billboard_type  oriented_self
     
-    // Area emitter
+    // Area emitter.
     emitter Point
     {
         angle           15
@@ -65,14 +64,14 @@ particle_system Examples/PurpleFountain
         colour_range_end    1 1 1
     }
 
-    // Gravity
+    // Gravity.
     affector LinearForce
     {
         force_vector      0 -100 0
         force_application add
     }
 
-    // Fader
+    // Fader.
     affector ColourFader
     {
         red -0.25
@@ -82,7 +81,7 @@ particle_system Examples/PurpleFountain
 }
 
 
-// A downpour
+// A downpour.
 particle_system Examples/Rain
 {
     material        Examples/Droplet
@@ -94,7 +93,7 @@ particle_system Examples/Rain
     billboard_type  oriented_common
     common_direction 0 -1 0
     
-    // Area emitter
+    // Area emitter.
     emitter Box
     {
         angle           0
@@ -107,7 +106,7 @@ particle_system Examples/Rain
         depth           0
     }
 
-    // Gravity
+    // Gravity.
     affector LinearForce
     {
         force_vector      0 -200 0
@@ -116,7 +115,7 @@ particle_system Examples/Rain
 
 }
 
-// A jet engine (of sorts)
+// A jet engine (of sorts).
 particle_system Examples/JetEngine1
 {
 	material 		Examples/Flare
@@ -176,7 +175,7 @@ particle_system Examples/JetEngine2
 	
 }
 
-// Exudes aureola particles which around the model float upwards
+// Exudes aureola particles which float upwards around the model.
 particle_system Examples/Aureola
 {
     material        Examples/Aureola
@@ -188,7 +187,7 @@ particle_system Examples/Aureola
     common_direction 0 1 0
     common_up_vector 0 0 1
 
-    // Area emitter
+    // Area emitter.
     emitter Box
     {
         angle           30
@@ -205,14 +204,14 @@ particle_system Examples/Aureola
         depth           30
     }
 
-    // Make em float upwards
+    // Make 'em float upwards.
     affector LinearForce
     {
         force_vector      0 70 0
         force_application add
     }
 
-    // Fader
+    // Fader.
     affector ColourFader2
     {
         red1 +0.4
@@ -228,7 +227,7 @@ particle_system Examples/Aureola
         state_change 3.5
     }
 
-    // Rotater
+    // Rotater.
     affector Rotator
     {
         rotation_range_start 0

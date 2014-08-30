@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,8 @@ namespace Ogre {
 #endif
     class GLSLESGpuProgram;
     class HardwareBufferManager;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    class AndroidResourceManager;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    class GLES2ManagedResourceManager;
 #endif
     
     /**
@@ -82,9 +82,9 @@ namespace Ogre {
             /// GL support class, used for creating windows etc.
             GLES2Support *mGLSupport;
 
-			/// State cache manager which responsible to reduce redundant state changes
+            /// State cache manager which responsible to reduce redundant state changes
             GLES2StateCacheManager* mStateCacheManager;
-			
+            
             /* The main GL context - main thread only */
             GLES2Context *mMainContext;
 
@@ -130,8 +130,8 @@ namespace Ogre {
                                         vector<GLuint>::type &instanceAttribsBound,
                                         bool updateVAO);
 
-			// Mipmap count of the actual bounded texture
-			size_t mCurTexMipCount;
+            // Mipmap count of the actual bounded texture
+            size_t mCurTexMipCount;
             GLint mViewport[4];
             GLint mScissor[4];
 
@@ -390,20 +390,21 @@ namespace Ogre {
                     StencilOperation stencilFailOp = SOP_KEEP,
                     StencilOperation depthFailOp = SOP_KEEP,
                     StencilOperation passOp = SOP_KEEP,
-                    bool twoSidedOperation = false);
-		     /** See
+                    bool twoSidedOperation = false,
+                    bool readBackAsTexture = false);
+             /** See
               RenderSystem
              */
-		    void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
-		     /** See
+            void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
+             /** See
               RenderSystem
              */
-		    void _setTextureUnitCompareEnabled(size_t unit, bool compare);			
-			/** See
+            void _setTextureUnitCompareEnabled(size_t unit, bool compare);          
+            /** See
              RenderSystem
              */
-			virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-				FilterOptions magFilter, FilterOptions mipFilter);				
+            virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
+                FilterOptions magFilter, FilterOptions mipFilter);              
             /** See
              RenderSystem
              */
@@ -415,7 +416,7 @@ namespace Ogre {
             /** See
              RenderSystem
              */
-            virtual bool hasAnisotropicMipMapFilter() const { return false; }  	
+            virtual bool hasAnisotropicMipMapFilter() const { return false; }   
             /** See
              RenderSystem
              */
@@ -488,14 +489,14 @@ namespace Ogre {
             void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
             void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
-			/// @copydoc RenderSystem::_setSceneBlending
-			void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
-			/// @copydoc RenderSystem::_setSeparateSceneBlending
-			void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
-			/// @copydoc RenderSystem::_setAlphaRejectSettings
-			void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
-			/// @copydoc RenderSystem::getDisplayMonitorCount
-			unsigned int getDisplayMonitorCount() const;
+            /// @copydoc RenderSystem::_setSceneBlending
+            void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
+            /// @copydoc RenderSystem::_setSeparateSceneBlending
+            void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
+            /// @copydoc RenderSystem::_setAlphaRejectSettings
+            void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
+            /// @copydoc RenderSystem::getDisplayMonitorCount
+            unsigned int getDisplayMonitorCount() const;
 
             /// Internal method for anisotropy validation
             GLfloat _getCurrentAnisotropy(size_t unit);
@@ -516,12 +517,12 @@ namespace Ogre {
             /// @copydoc RenderSystem::markProfileEvent
             virtual void markProfileEvent( const String &eventName );
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             void resetRenderer(RenderWindow* pRenderWnd);
         
-            static AndroidResourceManager* getResourceManager();
+            static GLES2ManagedResourceManager* getResourceManager();
     private:
-            static AndroidResourceManager* mResourceManager;
+            static GLES2ManagedResourceManager* mResourceManager;
 #endif
     };
 }

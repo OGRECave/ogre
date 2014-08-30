@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,14 +35,14 @@ origin of a camera.
 begin                : Mon Feb 26 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
 #ifndef PC_PLANE_H
 #define PC_PLANE_H
 
-#include <OgrePlane.h>
+#include "OgrePlane.h"
 #include "OgrePCZPrerequisites.h"
 
 namespace Ogre
@@ -55,14 +55,14 @@ namespace Ogre
     public:
         /** Standard constructor */
         PCPlane();
-		/** Alternative constructor */
-		PCPlane (const Plane & plane);
+        /** Alternative constructor */
+        PCPlane (const Plane & plane);
         /** Alternative constructor */
         PCPlane (const Vector3& rkNormal, const Vector3& rkPoint);
         /** Alternative constructor */
         PCPlane (const Vector3& rkPoint0, const Vector3& rkPoint1, const Vector3& rkPoint2);
-		/** Copy from an Ogre Plane */
-		void setFromOgrePlane(Plane & ogrePlane);
+        /** Copy from an Ogre Plane */
+        void setFromOgrePlane(Plane & ogrePlane);
 
         /** Standard destructor */
         ~PCPlane();

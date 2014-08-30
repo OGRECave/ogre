@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
+#include "OgreViewport.h"
+#include <iomanip>
 
 #import <UIKit/UIWindow.h>
 #import <UIKit/UIGraphics.h>
@@ -163,12 +165,8 @@ namespace Ogre {
     {
         // Call the base class method first
         RenderTarget::_beginUpdate();
-        
-        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
-        {
-            // Bind the FSAA buffer if we're doing multisampling
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer));
-        }
+
+        mContext->bindSampleFramebuffer();
     }
 
     void EAGL2Window::initNativeCreatedWindow(const NameValuePairList *miscParams)
@@ -247,7 +245,6 @@ namespace Ogre {
         if(mViewController.view != mView)
             mViewController.view = mView;
 
-        CFDictionaryRef dict;   // TODO: Dummy dictionary for now
         if(eaglLayer)
         {
             EAGLSharegroup *group = nil;
@@ -258,7 +255,7 @@ namespace Ogre {
                 LogManager::getSingleton().logMessage("iOS: Using an external EAGLSharegroup");
             }
             
-            mContext = mGLSupport->createNewContext(dict, eaglLayer, group);
+            mContext = mGLSupport->createNewContext(eaglLayer, group);
 
             mContext->mIsMultiSampleSupported = true;
             mContext->mNumSamples = mFSAA;
@@ -427,27 +424,28 @@ namespace Ogre {
         }
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer));
+#if OGRE_NO_GLES3_SUPPORT == 1
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mSampleFramebuffer));
             OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
-#if OGRE_NO_GLES3_SUPPORT == 0
-            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
-#else
             OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
+#else
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, mContext->mSampleFramebuffer));
+			OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, mWidth, mHeight, 0, 0, mWidth, mHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_READ_FRAMEBUFFER, attachmentCount, attachments));
 #endif
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
         }
         else
         {
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
-#if OGRE_NO_GLES3_SUPPORT == 0
-            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_FRAMEBUFFER, attachmentCount, attachments));
-#else
+#if OGRE_NO_GLES3_SUPPORT == 1
             OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments));
+#else
+            OGRE_CHECK_GL_ERROR(glInvalidateFramebuffer(GL_FRAMEBUFFER, attachmentCount, attachments));
 #endif
         }
-        
+
         OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer));
         if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)
         {
@@ -521,11 +519,24 @@ namespace Ogre {
         GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
         GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
 
+        GLint currentFBO = 0;
+        GLuint sampleFramebuffer = 0;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO));
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &sampleFramebuffer));
+        
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer));
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, currentFBO));
+        OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
+        
         // Read pixel data from the framebuffer
         OGRE_CHECK_GL_ERROR(glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
                                          (GLsizei)width, (GLsizei)height,
                                          format, type, data));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
+        
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
+        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &sampleFramebuffer));
 
         // Create a CGImage with the pixel data
         // If your OpenGL ES content is opaque, use kCGImageAlphaNoneSkipLast to ignore the alpha channel

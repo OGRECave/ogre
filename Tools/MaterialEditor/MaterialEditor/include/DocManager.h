@@ -5,7 +5,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -40,18 +40,18 @@ typedef map<wxString, wxString> DocMap;
 class DocManager
 {
 public:
-	DocManager();
-	virtual ~DocManager();
+    DocManager();
+    virtual ~DocManager();
 
-	void load(wxString& path);
+    void load(wxString& path);
 
-	void addDoc(wxString& key, wxString& doc);
-	void removeDoc(wxString& key);
+    void addDoc(wxString& key, wxString& doc);
+    void removeDoc(wxString& key);
 
-	wxString* find(wxString& s);
+    wxString* find(wxString& s);
 
 protected:
-	DocMap mDocs;
+    DocMap mDocs;
 };
 
 #endif // _DOCMANAGER_H_

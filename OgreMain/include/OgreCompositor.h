@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,18 +30,17 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreResource.h"
-#include "OgreTexture.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
-	/** Class representing a Compositor object. Compositors provide the means 
+
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
+    /** Class representing a Compositor object. Compositors provide the means 
         to flexibly "composite" the final rendering result from multiple scene renders
         and intermediate operations like rendering fullscreen quads. This makes 
         it possible to apply postfilter effects, HDRI postprocessing, and shadow 
@@ -105,36 +104,36 @@ namespace Ogre {
         */
         TechniqueIterator getSupportedTechniqueIterator(void);
 
-		/** Get a pointer to a supported technique for a given scheme. 
-		@remarks
-			If there is no specific supported technique with this scheme name, 
-			then the first supported technique with no specific scheme will be returned.
-		@param schemeName The scheme name you are looking for. Blank means to 
-			look for techniques with no scheme associated
-		*/
-		CompositionTechnique *getSupportedTechnique(const String& schemeName = StringUtil::BLANK);
+        /** Get a pointer to a supported technique for a given scheme. 
+        @remarks
+            If there is no specific supported technique with this scheme name, 
+            then the first supported technique with no specific scheme will be returned.
+        @param schemeName The scheme name you are looking for. Blank means to 
+            look for techniques with no scheme associated
+        */
+        CompositionTechnique *getSupportedTechnique(const String& schemeName = BLANKSTRING);
 
-		/** Get the instance name for a global texture.
-		@param name The name of the texture in the original compositor definition
-		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
-		@return The instance name for the texture, corresponds to a real texture
-		*/
-		const String& getTextureInstanceName(const String& name, size_t mrtIndex);
+        /** Get the instance name for a global texture.
+        @param name The name of the texture in the original compositor definition
+        @param mrtIndex If name identifies a MRT, which texture attachment to retrieve
+        @return The instance name for the texture, corresponds to a real texture
+        */
+        const String& getTextureInstanceName(const String& name, size_t mrtIndex);
 
-		/** Get the instance of a global texture.
-		@param name The name of the texture in the original compositor definition
-		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
-		@return The texture pointer, corresponds to a real texture
-		*/
-		TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
+        /** Get the instance of a global texture.
+        @param name The name of the texture in the original compositor definition
+        @param mrtIndex If name identifies a MRT, which texture attachment to retrieve
+        @return The texture pointer, corresponds to a real texture
+        */
+        TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
 
-		/** Get the render target for a given render texture name. 
-		@remarks
-			You can use this to add listeners etc, but do not use it to update the
-			targets manually or any other modifications, the compositor instance 
-			is in charge of this.
-		*/
-		RenderTarget* getRenderTarget(const String& name);
+        /** Get the render target for a given render texture name. 
+        @remarks
+            You can use this to add listeners etc, but do not use it to update the
+            targets manually or any other modifications, the compositor instance 
+            is in charge of this.
+        */
+        RenderTarget* getRenderTarget(const String& name);
 
     protected:
         /// @copydoc Resource::loadImpl
@@ -157,7 +156,7 @@ namespace Ogre {
         /// re-evaluated.
         bool mCompilationRequired;
 
-		/** Create global rendertextures.
+        /** Create global rendertextures.
         */
         void createGlobalTextures();
         
@@ -165,16 +164,16 @@ namespace Ogre {
         */
         void freeGlobalTextures();
 
-		//TODO GSOC : These typedefs are duplicated from CompositorInstance. Solve?
-		/// Map from name->local texture
+        //TODO GSOC : These typedefs are duplicated from CompositorInstance. Solve?
+        /// Map from name->local texture
         typedef map<String,TexturePtr>::type GlobalTextureMap;
         GlobalTextureMap mGlobalTextures;
-		/// Store a list of MRTs we've created
-		typedef map<String,MultiRenderTarget*>::type GlobalMRTMap;
-		GlobalMRTMap mGlobalMRTs;
+        /// Store a list of MRTs we've created
+        typedef map<String,MultiRenderTarget*>::type GlobalMRTMap;
+        GlobalMRTMap mGlobalMRTs;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

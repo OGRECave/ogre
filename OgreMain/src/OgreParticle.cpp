@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,16 +32,17 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void Particle::setRotation(const Radian& rot)
     {
-        rotation = rot;
-        if (rotation != Radian(0))
+        mRotation = rot;
+        if (mRotation != Radian(0))
             mParentSystem->_notifyParticleRotated();
     }
     //-----------------------------------------------------------------------
     void Particle::setDimensions(Real width, Real height)
     {
+        assert(width >= 0 && height >= 0 && "Particle dimensions can not be negative");
         mOwnDimensions = true;
         mWidth = width;
         mHeight = height;

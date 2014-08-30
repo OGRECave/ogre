@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,20 +40,20 @@ typedef std::list<INode*> NodeList;
 
 namespace OgreMax {
 
-	class MeshExporter : public OgreMaxExporter
-	{
-	public:
+    class MeshExporter : public OgreMaxExporter
+    {
+    public:
 
-		MeshExporter(const Config& config);
-		virtual ~MeshExporter();
+        MeshExporter(const Config& config);
+        virtual ~MeshExporter();
 
-		// take in a list of INode* for assembly into Ogre::Mesh form; returns
-		// a MeshPtr pointing to the newly minted Ogre Mesh object.
-		Ogre::MeshPtr buildMesh(NodeList nodeList);
+        // take in a list of INode* for assembly into Ogre::Mesh form; returns
+        // a MeshPtr pointing to the newly minted Ogre Mesh object.
+        Ogre::MeshPtr buildMesh(NodeList nodeList);
 
-	private:
+    private:
 
-		// Pointer to Mesh object for export
-		Ogre::MeshPtr	m_pMesh;
-	};
+        // Pointer to Mesh object for export
+        Ogre::MeshPtr   m_pMesh;
+    };
 }

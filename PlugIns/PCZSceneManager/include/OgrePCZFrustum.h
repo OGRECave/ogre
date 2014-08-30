@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ legal view frustum).
 begin                : Mon May 29 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 
 ---------------------------------------------------------------------------
 */
@@ -53,13 +53,13 @@ Code Style Update	 :
 #ifndef PCZ_FRUSTUM_H
 #define PCZ_FRUSTUM_H
 
-#include "OgrePCPlane.h"
 #include "OgrePCZPrerequisites.h"
 #include "OgreFrustum.h"
 
 namespace Ogre
 {
     class PortalBase;
+    class PCPlane;
 
     typedef list< PCPlane * >::type PCPlaneList;
 
@@ -70,63 +70,63 @@ namespace Ogre
     {
     public:
         // visibility types
-		enum Visibility
-		{
-			NONE,
-			PARTIAL,
-			FULL
-		};
+        enum Visibility
+        {
+            NONE,
+            PARTIAL,
+            FULL
+        };
 
-		/** Standard constructor */
-		PCZFrustum();
-		/** Standard destructor */
-		~PCZFrustum();
+        /** Standard constructor */
+        PCZFrustum();
+        /** Standard destructor */
+        ~PCZFrustum();
 
-		/* isVisible function for aabb */
-		bool isVisible( const AxisAlignedBox &bound) const;
-		/* isVisible function for sphere */
-		bool isVisible( const Sphere &bound) const;
-		/* isVisible() function for portals */
-		bool isVisible(const PortalBase* portal) const;
-		/* special function that returns true only when aabb fully fits inside the frustum. */
-		bool isFullyVisible(const AxisAlignedBox& bound) const;
-		/* special function that returns true only when sphere fully fits inside the frustum. */
-		bool isFullyVisible(const Sphere& bound) const;
-		/* special function that returns true only when portal fully fits inside the frustum. */
-		bool isFullyVisible(const PortalBase* portal) const;
+        /* isVisible function for aabb */
+        bool isVisible( const AxisAlignedBox &bound) const;
+        /* isVisible function for sphere */
+        bool isVisible( const Sphere &bound) const;
+        /* isVisible() function for portals */
+        bool isVisible(const PortalBase* portal) const;
+        /* special function that returns true only when aabb fully fits inside the frustum. */
+        bool isFullyVisible(const AxisAlignedBox& bound) const;
+        /* special function that returns true only when sphere fully fits inside the frustum. */
+        bool isFullyVisible(const Sphere& bound) const;
+        /* special function that returns true only when portal fully fits inside the frustum. */
+        bool isFullyVisible(const PortalBase* portal) const;
         /* more detailed check for visibility of an AABB */
         PCZFrustum::Visibility getVisibility(const AxisAlignedBox & bound);
 
-		/** Calculate  culling planes from portal and Frustum
+        /** Calculate  culling planes from portal and Frustum
             origin and add to list of culling planes */
-		int addPortalCullingPlanes(PortalBase* portal);
-		/// Remove  culling planes created from the given portal
-		void removePortalCullingPlanes(PortalBase* portal);
-		/// Remove all  culling planes
-		void removeAllCullingPlanes(void);
+        int addPortalCullingPlanes(PortalBase* portal);
+        /// Remove  culling planes created from the given portal
+        void removePortalCullingPlanes(PortalBase* portal);
+        /// Remove all  culling planes
+        void removeAllCullingPlanes(void);
         /// Set the origin value
         void setOrigin(const Vector3 & newOrigin) {mOrigin = newOrigin;}
         /// Set the origin plane
         void setOriginPlane(const Vector3 &rkNormal, const Vector3 &rkPoint);
         /// Tell the frustum whether or not to use the originplane
         void setUseOriginPlane(bool yesno) {mUseOriginPlane = yesno;}
-		/// Get an unused PCPlane from the CullingPlane Reservoir
-		PCPlane * getUnusedCullingPlane(void);
+        /// Get an unused PCPlane from the CullingPlane Reservoir
+        PCPlane * getUnusedCullingPlane(void);
 
-		/// Set the projection type of this PCZFrustum.
-		inline void setProjectionType(ProjectionType projType)
-		{ mProjType = projType; }
-		/// Get the projection type of this PCZFrustum.
-		inline ProjectionType getProjectionType() const
-		{ return mProjType; }
+        /// Set the projection type of this PCZFrustum.
+        inline void setProjectionType(ProjectionType projType)
+        { mProjType = projType; }
+        /// Get the projection type of this PCZFrustum.
+        inline ProjectionType getProjectionType() const
+        { return mProjType; }
 
     protected:
         Vector3     mOrigin;
         Plane       mOriginPlane;
         bool        mUseOriginPlane;
         PCPlaneList mActiveCullingPlanes;
-		PCPlaneList mCullingPlaneReservoir;
-		ProjectionType mProjType;
+        PCPlaneList mCullingPlaneReservoir;
+        ProjectionType mProjType;
 
     };
 

@@ -98,6 +98,12 @@ elseif (ANDROID)
     link_directories(${OPENGLES2_LIBRARY_PATH})
   endif()
   set(PLATFORM_HEADER_INSTALL "ANDROID")
+elseif (EMSCRIPTEN)
+  file(GLOB PLATFORM_HEADERS include/EGL/Emscripten/*.h include/EGL/*.h)
+  file(GLOB PLATFORM_SOURCES src/EGL/Emscripten/*.cpp src/EGL/*.cpp)
+
+  include_directories(src/EGL/Emscripten include/EGL/Emscripten)
+  set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (APPLE)
   file(GLOB PLATFORM_HEADERS "include/EAGL/*.h")
   file(GLOB PLATFORM_SOURCES "src/EAGL/*.mm")
@@ -115,7 +121,7 @@ elseif (UNIX)
 endif ()
 
 # Add support for the RT Shader System
-add_definitions(-DUSE_RTSHADER_SYSTEM)
+add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include

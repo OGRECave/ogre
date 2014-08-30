@@ -75,7 +75,7 @@ void receiverFP(
 	
 	out float4 result		: COLOR)
 {
-	shadowUV.xy = shadowUV.xy / shadowUV.w;
+	shadowUV = shadowUV / shadowUV.w;
 	float centerdepth = tex2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation
@@ -157,7 +157,7 @@ void normalMapShadowReceiverVp(float4 position	: POSITION,
 	// calculate tangent space light vector
 	// Get object space light direction
 	// Non-normalised since we'll do that in the fragment program anyway
-	float3 lightDir = lightPosition.xyz -  (position * lightPosition.w);
+	float3 lightDir = lightPosition.xyz -  (position.xyz * lightPosition.w);
 
 	// Calculate the binormal (NB we assume both normal and tangent are
 	// already normalised)
@@ -186,7 +186,7 @@ void normalMapShadowReceiverFp(
 			  uniform float inverseShadowmapSize,
 			  uniform float fixedDepthBias,
 			  uniform float gradientClamp,
-			  uniform float gradientScaleBias
+			  uniform float gradientScaleBias,
 			  
 			  uniform sampler2D   shadowMap : register(s0),
 			  uniform sampler2D   normalMap : register(s1),
@@ -203,7 +203,7 @@ void normalMapShadowReceiverFp(
 	float4 vertexColour = lightColour * dot(bumpVec, lightVec);
 
 	// point on shadowmap
-	shadowUV.xy = shadowUV.xy / shadowUV.w;
+	shadowUV = shadowUV / shadowUV.w;
 	float centerdepth = tex2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation

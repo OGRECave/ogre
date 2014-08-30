@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
 
 namespace Ogre
 {
-	class GLES2StateCacheManagerImp;
+    class GLES2StateCacheManagerImp;
 
     /** An in memory cache of the OpenGL ES state.
      @remarks
@@ -53,13 +53,13 @@ namespace Ogre
     class _OgreGLES2Export GLES2StateCacheManager : public StateCacheAlloc
     {
     private:
-		GLES2StateCacheManagerImp* mImp;
+        GLES2StateCacheManagerImp* mImp;
 
     public:
         GLES2StateCacheManager(void);
         ~GLES2StateCacheManager(void);
 
-		/** Initialize our cache variables and sets the
+        /** Initialize our cache variables and sets the
             GL states on the current context.
         */
         void initializeCache();
@@ -67,22 +67,22 @@ namespace Ogre
         /** Clears all cached values
         */
         void clearCache();
-		
-		/** Bind an OpenGL buffer of any type.
+        
+        /** Bind an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
         void bindGLBuffer(GLenum target, GLuint buffer, bool force = false);
 
-		/** Delete an OpenGL buffer of any type.
+        /** Delete an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
         void deleteGLBuffer(GLenum target, GLuint buffer, bool force = false);
 
-		/** Bind an OpenGL texture of any type.
+        /** Bind an OpenGL texture of any type.
          @param target The texture target.
          @param texture The texture ID.
          */
@@ -156,7 +156,7 @@ namespace Ogre
          */
         void setDepthFunc(GLenum func);
 
-		/** Gets the clear depth in the range from [0..1].
+        /** Gets the clear depth in the range from [0..1].
          @return The current clearing depth.
          */
         GLclampf getClearDepth(void) const;

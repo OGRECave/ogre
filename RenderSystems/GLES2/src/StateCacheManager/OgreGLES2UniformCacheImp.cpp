@@ -56,7 +56,7 @@ namespace Ogre {
         {
             // Haven't cached this state yet or the value has changed
             mUniformValueMap[location] = hash;
-			return true;
+            return true;
         }
 
         return false;

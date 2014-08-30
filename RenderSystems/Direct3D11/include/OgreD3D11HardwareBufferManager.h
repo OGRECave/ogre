@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,67 +33,67 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** Implementation of HardwareBufferManager for D3D11. */
-	class D3D11HardwareBufferManagerBase : public HardwareBufferManagerBase
-	{
-	protected:
-		D3D11Device & mlpD3DDevice;
+    /** Implementation of HardwareBufferManager for D3D11. */
+    class D3D11HardwareBufferManagerBase : public HardwareBufferManagerBase
+    {
+    protected:
+        D3D11Device & mlpD3DDevice;
 
-		/// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
-		VertexDeclaration* createVertexDeclarationImpl(void);
-		/// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
-		void destroyVertexDeclarationImpl(VertexDeclaration* decl);
+        /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
+        VertexDeclaration* createVertexDeclarationImpl(void);
+        /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
+        void destroyVertexDeclarationImpl(VertexDeclaration* decl);
 
-	public:
-		D3D11HardwareBufferManagerBase(D3D11Device & device);
-		~D3D11HardwareBufferManagerBase();
-		/// Creates a vertex buffer
-		HardwareVertexBufferSharedPtr 
-			createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// Creates a stream output vertex buffer
-		HardwareVertexBufferSharedPtr 
-			createStreamOutputVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// Create a hardware vertex buffer
-		HardwareIndexBufferSharedPtr 
-			createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// @copydoc HardwareBufferManager::createRenderToVertexBuffer
-		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
-		/// @copydoc HardwareBufferManager::createUniformBuffer
-		HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
-									HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
-									bool useShadowBuffer = false, const String& name = "");
-		/// @copydoc HardwareBufferManager::createCounterBuffer
-		HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+    public:
+        D3D11HardwareBufferManagerBase(D3D11Device & device);
+        ~D3D11HardwareBufferManagerBase();
+        /// Creates a vertex buffer
+        HardwareVertexBufferSharedPtr 
+            createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+        /// Creates a stream output vertex buffer
+        HardwareVertexBufferSharedPtr 
+            createStreamOutputVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+        /// Create a hardware vertex buffer
+        HardwareIndexBufferSharedPtr 
+            createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+        /// @copydoc HardwareBufferManager::createRenderToVertexBuffer
+        RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+        /// @copydoc HardwareBufferManager::createUniformBuffer
+        HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
+                                    HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
+                                    bool useShadowBuffer = false, const String& name = "");
+        /// @copydoc HardwareBufferManager::createCounterBuffer
+        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                            HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                            bool useShadowBuffer = false, const String& name = "");
 
-		/** Release all buffers in the default memory pool. 
-		@remarks
-		Method for dealing with lost devices.
-		*/
-		void releaseDefaultPoolResources(void);
-		/** Recreate all buffers in the default memory pool. 
-		@remarks
-		Method for dealing with lost devices.
-		*/
-		void recreateDefaultPoolResources(void);
+        /** Release all buffers in the default memory pool. 
+        @remarks
+        Method for dealing with lost devices.
+        */
+        void releaseDefaultPoolResources(void);
+        /** Recreate all buffers in the default memory pool. 
+        @remarks
+        Method for dealing with lost devices.
+        */
+        void recreateDefaultPoolResources(void);
 
-	};
+    };
 
-	/// D3D11HardwareBufferManagerBase as a Singleton
-	class D3D11HardwareBufferManager : public HardwareBufferManager
-	{
-	public:
-		D3D11HardwareBufferManager(D3D11Device & device)
-			: HardwareBufferManager(OGRE_NEW D3D11HardwareBufferManagerBase(device)) 
-		{
+    /// D3D11HardwareBufferManagerBase as a Singleton
+    class D3D11HardwareBufferManager : public HardwareBufferManager
+    {
+    public:
+        D3D11HardwareBufferManager(D3D11Device & device)
+            : HardwareBufferManager(OGRE_NEW D3D11HardwareBufferManagerBase(device)) 
+        {
 
-		}
-		~D3D11HardwareBufferManager()
-		{
-			OGRE_DELETE mImpl;
-		}
-	};
+        }
+        ~D3D11HardwareBufferManager()
+        {
+            OGRE_DELETE mImpl;
+        }
+    };
 
 
 }

@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -64,7 +64,7 @@ THE SOFTWARE
 // the warnings with things we may not be able to do anything about (e.g.
 // generated code from nvparse etc). I doubt very much that these calls
 // will ever be actually removed from VC anyway, it would break too much code.
-#	pragma warning( disable: 4996)
+#   pragma warning( disable: 4996)
 
 // disable: "conditional expression constant", always occurs on 
 // OGRE_MUTEX_CONDITIONAL when no threading enabled

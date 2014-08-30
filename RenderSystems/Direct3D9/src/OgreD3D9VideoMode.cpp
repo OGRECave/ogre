@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,27 +29,27 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	String D3D9VideoMode::getDescription() const
-	{
-		char tmp[128];
-		unsigned int colourDepth = 16;
-		if( mDisplayMode.Format == D3DFMT_X8R8G8B8 ||
-			mDisplayMode.Format == D3DFMT_A8R8G8B8 ||
-			mDisplayMode.Format == D3DFMT_R8G8B8 )
-			colourDepth = 32;
+    String D3D9VideoMode::getDescription() const
+    {
+        char tmp[128];
+        unsigned int colourDepth = 16;
+        if( mDisplayMode.Format == D3DFMT_X8R8G8B8 ||
+            mDisplayMode.Format == D3DFMT_A8R8G8B8 ||
+            mDisplayMode.Format == D3DFMT_R8G8B8 )
+            colourDepth = 32;
 
-		sprintf( tmp, "%d x %d @ %d-bit colour", mDisplayMode.Width, mDisplayMode.Height, colourDepth );
-		return String(tmp);
-	}
+        sprintf( tmp, "%d x %d @ %d-bit colour", mDisplayMode.Width, mDisplayMode.Height, colourDepth );
+        return String(tmp);
+    }
 
-	unsigned int D3D9VideoMode::getColourDepth() const
-	{
-		unsigned int colourDepth = 16;
-		if( mDisplayMode.Format == D3DFMT_X8R8G8B8 ||
-			mDisplayMode.Format == D3DFMT_A8R8G8B8 ||
-			mDisplayMode.Format == D3DFMT_R8G8B8 )
-			colourDepth = 32;
+    unsigned int D3D9VideoMode::getColourDepth() const
+    {
+        unsigned int colourDepth = 16;
+        if( mDisplayMode.Format == D3DFMT_X8R8G8B8 ||
+            mDisplayMode.Format == D3DFMT_A8R8G8B8 ||
+            mDisplayMode.Format == D3DFMT_R8G8B8 )
+            colourDepth = 32;
 
-		return colourDepth;
-	}
+        return colourDepth;
+    }
 }

@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -91,7 +91,7 @@ namespace Ogre {
         mBlendFuncSource = GL_ONE;
         mBlendFuncDest = GL_ZERO;
 
-		mClearColour.resize(4);
+        mClearColour.resize(4);
         mClearColour[0] = mClearColour[1] = mClearColour[2] = mClearColour[3] = 0.0f;
         
         mColourMask.resize(4);
@@ -193,7 +193,7 @@ namespace Ogre {
     }
     
     bool GLStateCacheManagerImp::activateGLTextureUnit(size_t unit)
-	{
+    {
         // Always return true for the currently bound texture unit
         if (mActiveTextureUnit == unit)
             return true;
@@ -210,7 +210,7 @@ namespace Ogre {
         {
             return false;
         }
-	}
+    }
     
     void GLStateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
     {
@@ -295,16 +295,18 @@ namespace Ogre {
         }
     }
     
-    void GLStateCacheManagerImp::setEnabled(GLenum flag)
+    void GLStateCacheManagerImp::setEnabled(GLenum flag, bool enabled)
     {
-        glEnable(flag);
+        if(enabled)
+        {
+            glEnable(flag);
+        }
+        else
+        {
+            glDisable(flag);
+        }
     }
-    
-    void GLStateCacheManagerImp::setDisabled(GLenum flag)
-    {
-        glDisable(flag);
-    }
-    
+
     void GLStateCacheManagerImp::setCullFace(GLenum face)
     {
         if(mCullFace != face)
@@ -337,14 +339,14 @@ namespace Ogre {
             mBlendEquationRGB = eqRGB;
             mBlendEquationAlpha = eqAlpha;
 
-			if(GLEW_VERSION_2_0) {
-				glBlendEquationSeparate(eqRGB, eqAlpha);
-			}
-			else if(GLEW_EXT_blend_equation_separate) {
-				glBlendEquationSeparateEXT(eqRGB, eqAlpha);
-			}
-		}
-	}
+            if(GLEW_VERSION_2_0) {
+                glBlendEquationSeparate(eqRGB, eqAlpha);
+            }
+            else if(GLEW_EXT_blend_equation_separate) {
+                glBlendEquationSeparateEXT(eqRGB, eqAlpha);
+            }
+        }
+    }
 
     void GLStateCacheManagerImp::setMaterialDiffuse(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     {

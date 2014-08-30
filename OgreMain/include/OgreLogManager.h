@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,18 +33,17 @@ THE SOFTWARE.
 
 #include "OgreLog.h"
 #include "OgreSingleton.h"
-#include "OgreString.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
-	/** The log manager handles the creation and retrieval of logs for the
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
+    /** The log manager handles the creation and retrieval of logs for the
         application.
         @remarks
             This class will create new log files and will retrieve instances
@@ -52,20 +51,20 @@ namespace Ogre
             create a fresh log or retrieve an existing one to output to.
             One log is the default log, and is the one written to when the
             logging methods of this class are called.
-		@par
-			By default, Root will instantiate a LogManager (which becomes the 
-			Singleton instance) on construction, and will create a default log
-			based on the Root construction parameters. If you want more control,
-			for example redirecting log output right from the start or suppressing
-			debug output, you need to create a LogManager yourself before creating
-			a Root instance, then create a default log. Root will detect that 
-			you've created one yourself and won't create one of its own, thus
-			using all your logging preferences from the first instance.
+        @par
+            By default, Root will instantiate a LogManager (which becomes the 
+            Singleton instance) on construction, and will create a default log
+            based on the Root construction parameters. If you want more control,
+            for example redirecting log output right from the start or suppressing
+            debug output, you need to create a LogManager yourself before creating
+            a Root instance, then create a default log. Root will detect that 
+            you've created one yourself and won't create one of its own, thus
+            using all your logging preferences from the first instance.
     */
     class _OgreExport LogManager : public Singleton<LogManager>, public LogAlloc
     {
-	protected:
-		typedef map<String, Log*>::type	LogList;
+    protected:
+        typedef map<String, Log*>::type LogList;
 
         /// A list of all the logs the manager can access
         LogList mLogs;
@@ -92,11 +91,11 @@ namespace Ogre
                 routed to the debugger's output window.
             @param
                 suppressFileOutput If true, this is a logical rather than a physical
-				log and no file output will be written. If you do this you should
-				register a LogListener so log output is not lost.
+                log and no file output will be written. If you do this you should
+                register a LogListener so log output is not lost.
         */
         Log* createLog( const String& name, bool defaultLog = false, bool debuggerOutput = true, 
-			bool suppressFileOutput = false);
+            bool suppressFileOutput = false);
 
         /** Retrieves a log managed by this class.
         */
@@ -106,12 +105,12 @@ namespace Ogre
         */
         Log* getDefaultLog();
 
-		/** Closes and removes a named log. */
-		void destroyLog(const String& name);
-		/** Closes and removes a log. */
-		void destroyLog(Log* log);
+        /** Closes and removes a named log. */
+        void destroyLog(const String& name);
+        /** Closes and removes a log. */
+        void destroyLog(Log* log);
 
-		/** Sets the passed in log as the default log.
+        /** Sets the passed in log as the default log.
         @return The previous default log.
         */
         Log* setDefaultLog(Log* newLog);
@@ -124,13 +123,13 @@ namespace Ogre
         /** Log a message to the default log (signature for backward compatibility).
         */
         void logMessage( LogMessageLevel lml, const String& message,  
-			bool maskDebug = false) { logMessage(message, lml, maskDebug); }
+            bool maskDebug = false) { logMessage(message, lml, maskDebug); }
 
-		/** Get a stream on the default log. */
-		Log::Stream stream(LogMessageLevel lml = LML_NORMAL, 
-			bool maskDebug = false);
+        /** Get a stream on the default log. */
+        Log::Stream stream(LogMessageLevel lml = LML_NORMAL, 
+            bool maskDebug = false);
 
-		/** Sets the level of detail of the default log.
+        /** Sets the level of detail of the default log.
         */
         void setLogDetail(LoggingLevel ll);
         /** Override standard Singleton retrieval.
@@ -169,8 +168,8 @@ namespace Ogre
     };
 
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

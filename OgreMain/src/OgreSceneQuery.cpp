@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,11 +35,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneQuery::SceneQuery(SceneManager* mgr)
         : mParentSceneMgr(mgr), mQueryMask(0xFFFFFFFF), 
-		mWorldFragmentType(SceneQuery::WFT_NONE)
+        mWorldFragmentType(SceneQuery::WFT_NONE)
     {
-		// default type mask to everything except lights & fx (previous behaviour)
-		mQueryTypeMask = (0xFFFFFFFF & ~SceneManager::FX_TYPE_MASK) 
-			& ~SceneManager::LIGHT_TYPE_MASK;
+        // default type mask to everything except lights & fx (previous behaviour)
+        mQueryTypeMask = (0xFFFFFFFF & ~SceneManager::FX_TYPE_MASK) 
+            & ~SceneManager::LIGHT_TYPE_MASK;
 
     }
     //-----------------------------------------------------------------------
@@ -56,16 +56,16 @@ namespace Ogre {
     {
         return mQueryMask;
     }
-	//-----------------------------------------------------------------------
-	void SceneQuery::setQueryTypeMask(uint32 mask)
-	{
-		mQueryTypeMask = mask;
-	}
-	//-----------------------------------------------------------------------
-	uint32 SceneQuery::getQueryTypeMask(void) const
-	{
-		return mQueryTypeMask;
-	}
+    //-----------------------------------------------------------------------
+    void SceneQuery::setQueryTypeMask(uint32 mask)
+    {
+        mQueryTypeMask = mask;
+    }
+    //-----------------------------------------------------------------------
+    uint32 SceneQuery::getQueryTypeMask(void) const
+    {
+        return mQueryTypeMask;
+    }
     //-----------------------------------------------------------------------
     void SceneQuery::setWorldFragmentType(enum SceneQuery::WorldFragmentType wft)
     {
@@ -102,13 +102,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RegionSceneQuery::clearResults(void)
     {
-        if (mLastResult)
-        {
-            OGRE_DELETE mLastResult;
-        }
+        OGRE_DELETE mLastResult;
         mLastResult = NULL;
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     SceneQueryResult&
     RegionSceneQuery::execute(void)
     {
@@ -118,7 +115,7 @@ namespace Ogre {
         execute(this);
         return *mLastResult;
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     bool RegionSceneQuery::
         queryResult(MovableObject* obj)
     {
@@ -127,7 +124,7 @@ namespace Ogre {
         // Continue
         return true;
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     bool RegionSceneQuery::queryResult(SceneQuery::WorldFragment* fragment)
     {
         // Add to internal list
@@ -320,13 +317,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void IntersectionSceneQuery::clearResults(void)
     {
-        if (mLastResult)
-        {
-            OGRE_DELETE mLastResult;
-        }
+        OGRE_DELETE mLastResult;
         mLastResult = NULL;
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     IntersectionSceneQueryResult&
     IntersectionSceneQuery::execute(void)
     {
@@ -336,7 +330,7 @@ namespace Ogre {
         execute(this);
         return *mLastResult;
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     bool IntersectionSceneQuery::
         queryResult(MovableObject* first, MovableObject* second)
     {
@@ -347,7 +341,7 @@ namespace Ogre {
         // Continue
         return true;
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     bool IntersectionSceneQuery::
         queryResult(MovableObject* movable, SceneQuery::WorldFragment* fragment)
     {

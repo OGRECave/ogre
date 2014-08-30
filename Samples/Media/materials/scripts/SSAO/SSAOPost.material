@@ -123,37 +123,37 @@ fragment_program SSAO/HorizonBased/CrossBilateralFilter/Y_fp_glsl glsl
 
 fragment_program SSAO/Post/NoFilter_fp unified
 {
-	delegate SSAO/Post/NoFilter_fp_glsl
+	//delegate SSAO/Post/NoFilter_fp_glsl
 	delegate SSAO/Post/NoFilter_fp_hlsl
-	delegate SSAO/Post/NoFilter_fp_cg 
+	//delegate SSAO/Post/NoFilter_fp_cg 
 }
 
 fragment_program SSAO/Post/BoxFilter_fp unified
 {
-	delegate SSAO/Post/BoxFilter_fp_glsl
+	//delegate SSAO/Post/BoxFilter_fp_glsl
 	delegate SSAO/Post/BoxFilter_fp_hlsl
-	delegate SSAO/Post/BoxFilter_fp_cg 
+	//delegate SSAO/Post/BoxFilter_fp_cg 
 }
 
 fragment_program SSAO/Post/SmartBoxFilter_fp unified
 {
-	delegate SSAO/Post/SmartBoxFilter_fp_glsl
+	//delegate SSAO/Post/SmartBoxFilter_fp_glsl
 	delegate SSAO/Post/SmartBoxFilter_fp_hlsl
-	delegate SSAO/Post/SmartBoxFilter_fp_cg 
+	//delegate SSAO/Post/SmartBoxFilter_fp_cg 
 }
 
 fragment_program SSAO/HorizonBased/CrossBilateralFilter/X_fp unified
 {
-	delegate SSAO/HorizonBased/CrossBilateralFilter/X_fp_glsl
+	//delegate SSAO/HorizonBased/CrossBilateralFilter/X_fp_glsl
 	delegate SSAO/HorizonBased/CrossBilateralFilter/X_fp_hlsl
-	delegate SSAO/HorizonBased/CrossBilateralFilter/X_fp_cg
+	//delegate SSAO/HorizonBased/CrossBilateralFilter/X_fp_cg
 }
 
 fragment_program SSAO/HorizonBased/CrossBilateralFilter/Y_fp unified
 {
-	delegate SSAO/HorizonBased/CrossBilateralFilter/Y_fp_glsl
+	//delegate SSAO/HorizonBased/CrossBilateralFilter/Y_fp_glsl
 	delegate SSAO/HorizonBased/CrossBilateralFilter/Y_fp_hlsl
-	delegate SSAO/HorizonBased/CrossBilateralFilter/Y_fp_cg
+	//delegate SSAO/HorizonBased/CrossBilateralFilter/Y_fp_cg
 }
 
 material SSAO/Post/NoFilter

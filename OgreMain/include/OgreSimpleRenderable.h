@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,21 +33,21 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
 #include "OgreAxisAlignedBox.h"
-#include "OgreMaterial.h"
+#include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Simple implementation of MovableObject and Renderable for single-part custom objects. 
-	@see ManualObject for a simpler interface with more flexibility
-	*/
-	class _OgreExport SimpleRenderable : public MovableObject, public Renderable
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Simple implementation of MovableObject and Renderable for single-part custom objects. 
+    @see ManualObject for a simpler interface with more flexibility
+    */
+    class _OgreExport SimpleRenderable : public MovableObject, public Renderable
     {
     protected:
         RenderOperation mRenderOp;
@@ -90,9 +90,9 @@ namespace Ogre {
         virtual const AxisAlignedBox& getBoundingBox(void) const;
 
         virtual void _updateRenderQueue(RenderQueue* queue);
-		/// @copydoc MovableObject::visitRenderables
-		void visitRenderables(Renderable::Visitor* visitor, 
-			bool debugRenderables = false);
+        /// @copydoc MovableObject::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false);
 
         virtual ~SimpleRenderable();
 
@@ -104,8 +104,8 @@ namespace Ogre {
         const LightList& getLights(void) const;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

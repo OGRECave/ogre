@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,23 +40,23 @@ class Project;
 class MaterialPage : public wxWizardPageSimple
 {
 public:
-	MaterialPage(wxWizard* parent);
-	virtual ~MaterialPage();
+    MaterialPage(wxWizard* parent);
+    virtual ~MaterialPage();
 
-	void getName(wxString& name) const;
-	Project* getProject() const;
-	void setProject(Project* project);
+    void getName(wxString& name) const;
+    Project* getProject() const;
+    void setProject(Project* project);
 
 protected:
-	void createPage();
+    void createPage();
 
-	wxBoxSizer* mSizer;
-	wxStaticText* mProjectLabel;
-	wxComboBox* mProjectComboBox;
-	wxStaticText* mNameLabel;
-	wxTextCtrl* mNameText;
+    wxBoxSizer* mSizer;
+    wxStaticText* mProjectLabel;
+    wxComboBox* mProjectComboBox;
+    wxStaticText* mNameLabel;
+    wxTextCtrl* mNameText;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _MATERIALPAGE_H_

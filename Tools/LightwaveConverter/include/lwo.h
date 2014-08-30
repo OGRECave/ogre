@@ -210,55 +210,55 @@ Lightwave SDK.
 class lwPlugin
 {
 public:
-	lwPlugin()
-	{
-		ord = 0;
-		name = 0;
-		data = 0;
-	}
+    lwPlugin()
+    {
+        ord = 0;
+        name = 0;
+        data = 0;
+    }
 
-	~lwPlugin()
-	{
-		if (ord) free(ord);
-		if (name) free(name);
-		if (data) free(data);
-	}
+    ~lwPlugin()
+    {
+        if (ord) free(ord);
+        if (name) free(name);
+        if (data) free(data);
+    }
 
-	char          *ord;
-	char          *name;
-	int            flags;
-	void          *data;
+    char          *ord;
+    char          *name;
+    int            flags;
+    void          *data;
 };
 
 typedef vector<lwPlugin*> vplugins;
 
 inline bool operator < (const lwPlugin &p1, const lwPlugin &p2 )
 {
-	return strcmp( p1.ord, p2.ord ) < 0;
+    return strcmp( p1.ord, p2.ord ) < 0;
 }
 
 class lwEParam
 {
 public:
-	lwEParam()
-	{
-		val = 0.0f;
-		eindex = 0;
-	}
-	float val;
-	int   eindex;
+    lwEParam()
+    {
+        val = 0.0f;
+        eindex = 0;
+    }
+    float val;
+    int   eindex;
 };
 
 class lwVParam
 {
 public:
-	lwVParam()
-	{
-		val[0] = val[1] = val[2] = 0.0f;
-		eindex = 0;
-	}
-	float val[ 3 ];
-	int   eindex;
+    lwVParam()
+    {
+        val[0] = val[1] = val[2] = 0.0f;
+        eindex = 0;
+    }
+    float val[ 3 ];
+    int   eindex;
 };
 
 
@@ -268,49 +268,49 @@ public:
 
 class lwTMap {
 public:
-	lwTMap()
-	{
-		ref_object = 0;
-	}
+    lwTMap()
+    {
+        ref_object = 0;
+    }
 
-	~lwTMap()
-	{
-		if (ref_object) free(ref_object);
-	}
-	lwVParam       size;
-	lwVParam       center;
-	lwVParam       rotate;
-	lwVParam       falloff;
-	int            fall_type;
-	char          *ref_object;
-	int            coord_sys;
+    ~lwTMap()
+    {
+        if (ref_object) free(ref_object);
+    }
+    lwVParam       size;
+    lwVParam       center;
+    lwVParam       rotate;
+    lwVParam       falloff;
+    int            fall_type;
+    char          *ref_object;
+    int            coord_sys;
 };
 
 class lwImageMap {
 public:
-	lwImageMap()
-	{
-		vmap_name = 0;
-	}
+    lwImageMap()
+    {
+        vmap_name = 0;
+    }
 
-	~lwImageMap()
-	{
-		if (vmap_name) free(vmap_name);
-	}
+    ~lwImageMap()
+    {
+        if (vmap_name) free(vmap_name);
+    }
 
-	int            cindex;
-	int            projection;
-	char          *vmap_name;
-	int            axis;
-	int            wrapw_type;
-	int            wraph_type;
-	lwEParam       wrapw;
-	lwEParam       wraph;
-	float          aa_strength;
-	int            aas_flags;
-	int            pblend;
-	lwEParam       stck;
-	lwEParam       amplitude;
+    int            cindex;
+    int            projection;
+    char          *vmap_name;
+    int            axis;
+    int            wrapw_type;
+    int            wraph_type;
+    lwEParam       wrapw;
+    lwEParam       wraph;
+    float          aa_strength;
+    int            aas_flags;
+    int            pblend;
+    lwEParam       stck;
+    lwEParam       amplitude;
 };
 
 #define PROJ_PLANAR       0
@@ -326,108 +326,108 @@ public:
 
 class lwProcedural {
 public:
-	lwProcedural()
-	{
-		name = 0;
-		data = 0;
-	}
+    lwProcedural()
+    {
+        name = 0;
+        data = 0;
+    }
 
-	~lwProcedural()
-	{
-		if (name) free(name);
-		if (data) free(data);
-	}
+    ~lwProcedural()
+    {
+        if (name) free(name);
+        if (data) free(data);
+    }
 
-	int            axis;
-	float          value[ 3 ];
-	char          *name;
-	void          *data;
+    int            axis;
+    float          value[ 3 ];
+    char          *name;
+    void          *data;
 };
 
 class lwGradKey {
 public:
-	float          value;
-	float          rgba[ 4 ];
+    float          value;
+    float          rgba[ 4 ];
 };
 
 class lwGradient {
 public:
-	lwGradient()
-	{
-		paramname = 0;
-		itemname = 0;
-		key = 0;
-		ikey = 0;
-	}
+    lwGradient()
+    {
+        paramname = 0;
+        itemname = 0;
+        key = 0;
+        ikey = 0;
+    }
 
-	~lwGradient()
-	{
-		if (paramname) free(paramname);
-		if (itemname) free(itemname);
-		if (key) free(key);
-		if (ikey) free(ikey);
-	}
+    ~lwGradient()
+    {
+        if (paramname) free(paramname);
+        if (itemname) free(itemname);
+        if (key) free(key);
+        if (ikey) free(ikey);
+    }
 
-	char          *paramname;
-	char          *itemname;
-	float          start;
-	float          end;
-	int            repeat;
-	lwGradKey     *key;                 /* array of gradient keys */
-	short         *ikey;                /* array of interpolation codes */
+    char          *paramname;
+    char          *itemname;
+    float          start;
+    float          end;
+    int            repeat;
+    lwGradKey     *key;                 /* array of gradient keys */
+    short         *ikey;                /* array of interpolation codes */
 } ;
 
 class lwTexture
 {
 public:
-	lwTexture()
-	{
-		ord = 0;
-		param.imap = 0;
-		
-		tmap.size.val[ 0 ] =
-			tmap.size.val[ 1 ] =
-			tmap.size.val[ 2 ] = 1.0f;
-		opacity.val = 1.0f;
-		enabled = 1;		
-	}
+    lwTexture()
+    {
+        ord = 0;
+        param.imap = 0;
+        
+        tmap.size.val[ 0 ] =
+            tmap.size.val[ 1 ] =
+            tmap.size.val[ 2 ] = 1.0f;
+        opacity.val = 1.0f;
+        enabled = 1;        
+    }
 
-	~lwTexture()
-	{
-		if (ord) free(ord);
-		if(param.imap)
-		{
-			switch (type)
-			{
-			case ID_IMAP:
-				delete param.imap;
-				break;
-			case ID_PROC:
-				delete param.proc;
-				break;
-			case ID_GRAD:
-				delete param.grad;
-				break;
-			default:
-				;
-			}
-		}
-	}
-	char          *ord;
-	unsigned int   type;
-	unsigned int   chan;
-	lwEParam       opacity;
-	short          opac_type;
-	short          enabled;
-	short          negative;
-	short          axis;
-	union
-	{
-		lwImageMap     *imap;
-		lwProcedural   *proc;
-		lwGradient     *grad;
-	}              param;
-	lwTMap         tmap;
+    ~lwTexture()
+    {
+        if (ord) free(ord);
+        if(param.imap)
+        {
+            switch (type)
+            {
+            case ID_IMAP:
+                delete param.imap;
+                break;
+            case ID_PROC:
+                delete param.proc;
+                break;
+            case ID_GRAD:
+                delete param.grad;
+                break;
+            default:
+                ;
+            }
+        }
+    }
+    char          *ord;
+    unsigned int   type;
+    unsigned int   chan;
+    lwEParam       opacity;
+    short          opac_type;
+    short          enabled;
+    short          negative;
+    short          axis;
+    union
+    {
+        lwImageMap     *imap;
+        lwProcedural   *proc;
+        lwGradient     *grad;
+    }              param;
+    lwTMap         tmap;
 };
 
 typedef vector<lwTexture*> vtextures;
@@ -437,51 +437,51 @@ typedef vector<lwTexture*> vtextures;
 class lwTParam
 {
 public:
-	lwTParam()
-	{
-		val = 0;
-		eindex = 0;
-	}
+    lwTParam()
+    {
+        val = 0;
+        eindex = 0;
+    }
 
-	~lwTParam()
-	{
-		for (unsigned int i=0; i < textures.size(); delete textures[i++]);
-	}
+    ~lwTParam()
+    {
+        for (unsigned int i=0; i < textures.size(); delete textures[i++]);
+    }
 
-	void addTexture( lwTexture *tex )
-	{
-		textures.insert(lower_bound(textures.begin(), textures.end(), tex), tex);
-	}
-	
-	float     val;
-	int       eindex;
-	vtextures textures;    /* linked list of texture layers */
+    void addTexture( lwTexture *tex )
+    {
+        textures.insert(lower_bound(textures.begin(), textures.end(), tex), tex);
+    }
+    
+    float     val;
+    int       eindex;
+    vtextures textures;    /* linked list of texture layers */
 };
 
 class lwCParam
 {
 public:
-	lwCParam()
-	{
-		rgb[0] = 0.78431f;
-		rgb[1] = 0.78431f;
-		rgb[2] = 0.78431f;
-		eindex = 0;
-	}
+    lwCParam()
+    {
+        rgb[0] = 0.78431f;
+        rgb[1] = 0.78431f;
+        rgb[2] = 0.78431f;
+        eindex = 0;
+    }
 
-	~lwCParam()
-	{
-		for (unsigned int i=0; i < textures.size(); delete textures[i++]);
-	}
+    ~lwCParam()
+    {
+        for (unsigned int i=0; i < textures.size(); delete textures[i++]);
+    }
 
-	void addTexture( lwTexture *tex )
-	{
-		textures.insert(lower_bound(textures.begin(), textures.end(), tex), tex);
-	}
+    void addTexture( lwTexture *tex )
+    {
+        textures.insert(lower_bound(textures.begin(), textures.end(), tex), tex);
+    }
 
-	float     rgb[ 3 ];
-	int       eindex;
-	vtextures textures;    /* linked list of texture layers */
+    float     rgb[ 3 ];
+    int       eindex;
+    vtextures textures;    /* linked list of texture layers */
 };
 
 
@@ -490,138 +490,138 @@ public:
 class lwGlow
 {
 public:
-	short          enabled;
-	short          type;
-	lwEParam       intensity;
-	lwEParam       size;
+    short          enabled;
+    short          type;
+    lwEParam       intensity;
+    lwEParam       size;
 };
 
 class lwRMap
 {
 public:
-	lwRMap()
-	{
-		options = 0;
-		cindex = 0;
-		seam_angle = 0.0f;
-	}
-	lwTParam       val;
-	int            options;
-	int            cindex;
-	float          seam_angle;
+    lwRMap()
+    {
+        options = 0;
+        cindex = 0;
+        seam_angle = 0.0f;
+    }
+    lwTParam       val;
+    int            options;
+    int            cindex;
+    float          seam_angle;
 };
 
 class lwLine
 {
 public:
-	short          enabled;
-	unsigned short flags;
-	lwEParam       size;
+    short          enabled;
+    unsigned short flags;
+    lwEParam       size;
 };
 
 class lwSurface
 {
 public:
-	lwSurface()
-	{
-		name = 0;
-		srcname = 0;
-		diffuse.val	   = 1.0f;
-		glossiness.val = 0.4f;
-		bump.val       = 1.0f;
-		eta.val        = 1.0f;
-		sideflags      = 1;
-	}
-	
-	~lwSurface()
-	{
-		if (name) free(name);
-		if (srcname) free(srcname);
-		for (unsigned int i=0; i < shaders.size(); delete shaders[i++]);
-	}
-	
-	int addTexture( lwTexture *tex )
-	{
-		switch ( tex->chan )
-		{
-		case ID_COLR:
-			color.addTexture(tex);
-			break;
-		case ID_LUMI:
-			luminosity.addTexture(tex);
-			break;
-		case ID_DIFF:
-			diffuse.addTexture(tex);
-			break;
-		case ID_SPEC:
-			specularity.addTexture(tex);
-			break;
-		case ID_GLOS:
-			glossiness.addTexture(tex);
-			break;
-		case ID_REFL:
-			reflection.val.addTexture(tex);
-			break;
-		case ID_TRAN:
-			transparency.val.addTexture(tex);
-			break;
-		case ID_RIND:
-			eta.addTexture(tex);
-			break;
-		case ID_TRNL:
-			translucency.addTexture(tex);
-			break;
-		case ID_BUMP:
-			bump.addTexture(tex);
-			break;
-		default:
-			return 0;
-		}
-		return 1;
-	}
-	
-	static lwSurface *lwDefaultSurface( void )
-	{
-		return new lwSurface;
-	}
+    lwSurface()
+    {
+        name = 0;
+        srcname = 0;
+        diffuse.val    = 1.0f;
+        glossiness.val = 0.4f;
+        bump.val       = 1.0f;
+        eta.val        = 1.0f;
+        sideflags      = 1;
+    }
+    
+    ~lwSurface()
+    {
+        if (name) free(name);
+        if (srcname) free(srcname);
+        for (unsigned int i=0; i < shaders.size(); delete shaders[i++]);
+    }
+    
+    int addTexture( lwTexture *tex )
+    {
+        switch ( tex->chan )
+        {
+        case ID_COLR:
+            color.addTexture(tex);
+            break;
+        case ID_LUMI:
+            luminosity.addTexture(tex);
+            break;
+        case ID_DIFF:
+            diffuse.addTexture(tex);
+            break;
+        case ID_SPEC:
+            specularity.addTexture(tex);
+            break;
+        case ID_GLOS:
+            glossiness.addTexture(tex);
+            break;
+        case ID_REFL:
+            reflection.val.addTexture(tex);
+            break;
+        case ID_TRAN:
+            transparency.val.addTexture(tex);
+            break;
+        case ID_RIND:
+            eta.addTexture(tex);
+            break;
+        case ID_TRNL:
+            translucency.addTexture(tex);
+            break;
+        case ID_BUMP:
+            bump.addTexture(tex);
+            break;
+        default:
+            return 0;
+        }
+        return 1;
+    }
+    
+    static lwSurface *lwDefaultSurface( void )
+    {
+        return new lwSurface;
+    }
 
-	char *setname(const char *newname)
-	{
-		unsigned int slength = strlen(newname);
+    char *setname(const char *newname)
+    {
+        unsigned int slength = strlen(newname);
 
-		if (name && slength > strlen(name))
-		{
-			free(name);
-			name = 0;			
-		}
-		if (!name) name = (char *)malloc(slength+1);
+        if (name && slength > strlen(name))
+        {
+            free(name);
+            name = 0;           
+        }
+        if (!name) name = (char *)malloc(slength+1);
 
-		return strcpy(name, newname);
-	}
-	
-	char             *name;
-	char             *srcname;
-	lwCParam          color;
-	lwTParam          luminosity;
-	lwTParam          diffuse;
-	lwTParam          specularity;
-	lwTParam          glossiness;
-	lwRMap            reflection;
-	lwRMap            transparency;
-	lwTParam          eta;
-	lwTParam          translucency;
-	lwTParam          bump;
-	float             smooth;
-	int               sideflags;
-	float             alpha;
-	int               alpha_mode;
-	lwEParam          color_hilite;
-	lwEParam          color_filter;
-	lwEParam          add_trans;
-	lwEParam          dif_sharp;
-	lwEParam          glow;
-	lwLine            line;
-	vplugins shaders;              /* linked list of shaders */
+        return strcpy(name, newname);
+    }
+    
+    char             *name;
+    char             *srcname;
+    lwCParam          color;
+    lwTParam          luminosity;
+    lwTParam          diffuse;
+    lwTParam          specularity;
+    lwTParam          glossiness;
+    lwRMap            reflection;
+    lwRMap            transparency;
+    lwTParam          eta;
+    lwTParam          translucency;
+    lwTParam          bump;
+    float             smooth;
+    int               sideflags;
+    float             alpha;
+    int               alpha_mode;
+    lwEParam          color_hilite;
+    lwEParam          color_filter;
+    lwEParam          add_trans;
+    lwEParam          dif_sharp;
+    lwEParam          glow;
+    lwLine            line;
+    vplugins shaders;              /* linked list of shaders */
 };
 
 typedef vector<lwSurface*> vsurfaces;
@@ -631,47 +631,47 @@ typedef vector<lwSurface*> vsurfaces;
 class lwVMap
 {
 public:
-	lwVMap()
-	{
-		name = 0;
-		vindex = 0;
-		pindex = 0;
-		val = 0;
-	}
+    lwVMap()
+    {
+        name = 0;
+        vindex = 0;
+        pindex = 0;
+        val = 0;
+    }
 
-	~lwVMap()
-	{
-		if (name) free(name);
-		if (vindex) free(vindex);
-		if (pindex) free(pindex);
-		
-		if (val) 
-		{
-			for (unsigned int i = 0; i < nverts; free(val[i++]));
-			free (val);
-		}
-	}
-	
-	char          *name;
-	unsigned int   type;
-	unsigned int   dim;
-	unsigned int   nverts;
-	int            perpoly;
-	int           *vindex;              /* array of point indexes */
-	int           *pindex;              /* array of polygon indexes */
-	float        **val;
+    ~lwVMap()
+    {
+        if (name) free(name);
+        if (vindex) free(vindex);
+        if (pindex) free(pindex);
+        
+        if (val) 
+        {
+            for (unsigned int i = 0; i < nverts; free(val[i++]));
+            free (val);
+        }
+    }
+    
+    char          *name;
+    unsigned int   type;
+    unsigned int   dim;
+    unsigned int   nverts;
+    int            perpoly;
+    int           *vindex;              /* array of point indexes */
+    int           *pindex;              /* array of polygon indexes */
+    float        **val;
 };
 
 typedef vector<lwVMap*> vvmaps;
 
 class lwVMapPt
 {
-	lwVMapPt();
+    lwVMapPt();
 public:
-	lwVMapPt(lwVMap *nvmap, int nindex) : vmap(nvmap), index(nindex) {};
+    lwVMapPt(lwVMap *nvmap, int nindex) : vmap(nvmap), index(nindex) {};
 
-	lwVMap        *vmap;
-	int            index;               /* vindex or pindex element */
+    lwVMap        *vmap;
+    int            index;               /* vindex or pindex element */
 };
 
 typedef vector<lwVMapPt> vvmapptrs;
@@ -683,36 +683,36 @@ typedef vector<lwPolygon*> vpolygons;
 
 class lwPoint: public Point3
 {
-	lwPoint();
+    lwPoint();
 public:
-	lwPoint(float r, float s, float t) : Point3(r, s, t) {};
+    lwPoint(float r, float s, float t) : Point3(r, s, t) {};
 
-	vvmapptrs      vmaps;               /* array of vmap references */
-	vpolygons      polygons;            /* array of polygon indexes */
-	unsigned short index;
+    vvmapptrs      vmaps;               /* array of vmap references */
+    vpolygons      polygons;            /* array of polygon indexes */
+    unsigned short index;
 };
 
 typedef vector<lwPoint*> vpoints;
 
 class lwVertex
 {
-	lwVertex();
+    lwVertex();
 
 public:
-	lwVertex(int nindex) : index(nindex) {}
-	
-	lwVertex(const lwVertex &v)
-	{
-		index = v.index;
-		point = v.point;
-		normal = v.normal;
-		vmaps = v.vmaps;
-	}
-	
-	int        index;      /* index into the point array */
-	lwPoint   *point;
-	Vector3    normal;
-	vvmapptrs  vmaps;      /* array of vmap references */
+    lwVertex(int nindex) : index(nindex) {}
+    
+    lwVertex(const lwVertex &v)
+    {
+        index = v.index;
+        point = v.point;
+        normal = v.normal;
+        vmaps = v.vmaps;
+    }
+    
+    int        index;      /* index into the point array */
+    lwPoint   *point;
+    Vector3    normal;
+    vvmapptrs  vmaps;      /* array of vmap references */
 };
 
 typedef vector<lwVertex*> vvertices;
@@ -721,7 +721,7 @@ typedef vector<char *> vtags;
 
 inline bool operator < (const lwTexture &t1, const lwTexture &t2 )
 {
-	return strcmp( t1.ord, t2.ord ) < 0;
+    return strcmp( t1.ord, t2.ord ) < 0;
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_WIN32

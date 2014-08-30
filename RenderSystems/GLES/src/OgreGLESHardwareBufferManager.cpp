@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -58,10 +58,10 @@ namespace Ogre {
         ptrAlloc->free = 1;
 
         // non-Win32 machines are having issues glBufferSubData, looks like buffer corruption
-		// disable for now until we figure out where the problem lies			
-#	if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-		mMapBufferThreshold = 0;
-#	endif
+        // disable for now until we figure out where the problem lies           
+#   if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
+        mMapBufferThreshold = 0;
+#   endif
     }
 
     GLESHardwareBufferManagerBase::~GLESHardwareBufferManagerBase()
@@ -103,11 +103,11 @@ namespace Ogre {
         return HardwareIndexBufferSharedPtr(buf);
     }
 
-	RenderToVertexBufferSharedPtr GLESHardwareBufferManagerBase::createRenderToVertexBuffer()
-	{
-		// not supported
-		return RenderToVertexBufferSharedPtr();
-	}
+    RenderToVertexBufferSharedPtr GLESHardwareBufferManagerBase::createRenderToVertexBuffer()
+    {
+        // not supported
+        return RenderToVertexBufferSharedPtr();
+    }
 
 
     GLenum GLESHardwareBufferManagerBase::getGLUsage(unsigned int usage)
@@ -249,16 +249,16 @@ namespace Ogre {
         // Should never get here unless there's a corruption
         assert(false && "Memory deallocation error");
     }
-	//---------------------------------------------------------------------
-	size_t GLESHardwareBufferManagerBase::getGLMapBufferThreshold() const
-	{
-		return mMapBufferThreshold;
-	}
-	//---------------------------------------------------------------------
-	void GLESHardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
-	{
-		mMapBufferThreshold = value;
-	}
+    //---------------------------------------------------------------------
+    size_t GLESHardwareBufferManagerBase::getGLMapBufferThreshold() const
+    {
+        return mMapBufferThreshold;
+    }
+    //---------------------------------------------------------------------
+    void GLESHardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
+    {
+        mMapBufferThreshold = value;
+    }
     //---------------------------------------------------------------------
     HardwareUniformBufferSharedPtr GLESHardwareBufferManagerBase::
         createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,

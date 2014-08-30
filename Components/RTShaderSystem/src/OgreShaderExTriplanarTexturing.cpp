@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
+#include "OgrePass.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -54,8 +55,8 @@ namespace RTShader {
         // Resolve output vertex shader normal.
         mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
 
-	// Resolve pixel shader output diffuse color.
-	mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        // Resolve pixel shader output diffuse color.
+        mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 
         // Resolve input pixel shader normal.
         mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
@@ -66,7 +67,6 @@ namespace RTShader {
         // Resolve input vertex shader normal.
         mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
 
-        mVSInPosition  = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
         mVSOutPosition = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
         mPSInPosition = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
             mVSOutPosition->getIndex(), 
@@ -84,7 +84,7 @@ namespace RTShader {
             return false;
    
         mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-        if (mPSOutDiffuse.get() == NULL)	
+        if (mPSOutDiffuse.get() == NULL)    
             return false;
     
         mPSTPParams = psProgram->resolveParameter(GCT_FLOAT3, -1, (uint16)GPV_GLOBAL, "gTPParams");
@@ -115,12 +115,12 @@ namespace RTShader {
     
         FunctionInvocation *curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING, internalCounter++); 
         curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mVSOutNormal, Operand::OPS_OUT);	
+        curFuncInvocation->pushOperand(mVSOutNormal, Operand::OPS_OUT); 
         vsMain->addAtomInstance(curFuncInvocation);
     
         curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING, internalCounter++); 
         curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(mVSOutPosition, Operand::OPS_OUT);	
+        curFuncInvocation->pushOperand(mVSOutPosition, Operand::OPS_OUT);   
         vsMain->addAtomInstance(curFuncInvocation);
     
         curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRIPLANAR_TEXTURING, FFP_PS_TEXTURING, internalCounter++);
@@ -132,7 +132,7 @@ namespace RTShader {
         curFuncInvocation->pushOperand(mSamplerFromZ, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSTPParams, Operand::OPS_IN);
         curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);
-        psMain->addAtomInstance(curFuncInvocation);	
+        psMain->addAtomInstance(curFuncInvocation); 
 
         return true;
     }
@@ -144,7 +144,7 @@ namespace RTShader {
     }
 
     //-----------------------------------------------------------------------
-    int	TriplanarTexturing::getExecutionOrder() const
+    int TriplanarTexturing::getExecutionOrder() const
     {
         return FFP_TEXTURING;
     }
@@ -156,15 +156,15 @@ namespace RTShader {
     
         // Create the mapping textures
         textureUnit = dstPass->createTextureUnitState();
-        textureUnit->setTextureName(mTextureNameFromX);		
+        textureUnit->setTextureName(mTextureNameFromX);     
         mTextureSamplerIndexFromX = dstPass->getNumTextureUnitStates() - 1;
     
         textureUnit = dstPass->createTextureUnitState();
-        textureUnit->setTextureName(mTextureNameFromY);		
+        textureUnit->setTextureName(mTextureNameFromY);     
         mTextureSamplerIndexFromY = dstPass->getNumTextureUnitStates() - 1;
     
         textureUnit = dstPass->createTextureUnitState();
-        textureUnit->setTextureName(mTextureNameFromZ);		
+        textureUnit->setTextureName(mTextureNameFromZ);     
         mTextureSamplerIndexFromZ = dstPass->getNumTextureUnitStates() - 1;
         return true;
     }
@@ -227,7 +227,7 @@ namespace RTShader {
     }
 
     //-----------------------------------------------------------------------
-    SubRenderState*	TriplanarTexturingFactory::createInstance(ScriptCompiler* compiler, 
+    SubRenderState* TriplanarTexturingFactory::createInstance(ScriptCompiler* compiler, 
                                                        PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
     {
         if (prop->name == "triplanarTexturing")
@@ -237,20 +237,20 @@ namespace RTShader {
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
                 TriplanarTexturing* tpSubRenderState = static_cast<TriplanarTexturing*>(subRenderState);
                 
-	            AbstractNodeList::const_iterator it = prop->values.begin();
+                AbstractNodeList::const_iterator it = prop->values.begin();
                 float parameters[3];
                 if (false == SGScriptTranslator::getFloat(*it, parameters))
                 {
                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
-                it++;
+                ++it;
                 if (false == SGScriptTranslator::getFloat(*it, parameters + 1))
                 {
                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     return NULL;
                 }
-                it++;
+                ++it;
                 if (false == SGScriptTranslator::getFloat(*it, parameters + 2))
                 {
                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -291,7 +291,7 @@ namespace RTShader {
     }
 
     //-----------------------------------------------------------------------
-    SubRenderState*	TriplanarTexturingFactory::createInstanceImpl()
+    SubRenderState* TriplanarTexturingFactory::createInstanceImpl()
     {
         return OGRE_NEW TriplanarTexturing;
     }

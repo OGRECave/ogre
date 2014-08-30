@@ -1,7 +1,7 @@
 /*
-	ATI fragment shader Extension program file.
-	setup by NFZ
-	extracted from ATI 8500 SDK
+    ATI fragment shader Extension program file.
+    setup by NFZ
+    extracted from ATI 8500 SDK
 
 ** GL_ATI_fragment_shader
 **
@@ -39,66 +39,66 @@ bool InitATIFragmentShaderExtensions(Ogre::GLSupport& glSupport)
 
     if(init) return init;
 
-	
-	/* confirm that the version of OpenGL supports ATI fragment shader */
-	/* done in GLRenderSystem
+    
+    /* confirm that the version of OpenGL supports ATI fragment shader */
+    /* done in GLRenderSystem
     extList = (char *)glGetString(GL_EXTENSIONS);
 
     if (strstr(extList, "GL_ATI_fragment_shader") == NULL)  {
-		//MessageBox(NULL, "GL_ATI_fragment_shader extension not supported", "GL Extension error", MB_OK);
-		// ** should raise exception
-		init = false;
-		return false;
+        //MessageBox(NULL, "GL_ATI_fragment_shader extension not supported", "GL Extension error", MB_OK);
+        // ** should raise exception
+        init = false;
+        return false;
     }
 
-	*/
+    */
 
 
-	glGenFragmentShadersATI_ptr    = (PFNGLGENFRAGMENTSHADERSATIPROC) glSupport.getProcAddress("glGenFragmentShadersATI");
-	glBindFragmentShaderATI_ptr    = (PFNGLBINDFRAGMENTSHADERATIPROC) glSupport.getProcAddress("glBindFragmentShaderATI");
-	glDeleteFragmentShaderATI_ptr  = (PFNGLDELETEFRAGMENTSHADERATIPROC) glSupport.getProcAddress("glDeleteFragmentShaderATI");
-	glBeginFragmentShaderATI_ptr   = (PFNGLBEGINFRAGMENTSHADERATIPROC) glSupport.getProcAddress("glBeginFragmentShaderATI");
-	glEndFragmentShaderATI_ptr     = (PFNGLENDFRAGMENTSHADERATIPROC) glSupport.getProcAddress("glEndFragmentShaderATI");
-	glPassTexCoordATI_ptr          = (PFNGLPASSTEXCOORDATIPROC) glSupport.getProcAddress("glPassTexCoordATI");
-	glSampleMapATI_ptr             = (PFNGLSAMPLEMAPATIPROC) glSupport.getProcAddress("glSampleMapATI");
-	glColorFragmentOp1ATI_ptr      = (PFNGLCOLORFRAGMENTOP1ATIPROC) glSupport.getProcAddress("glColorFragmentOp1ATI");
-	glColorFragmentOp2ATI_ptr      = (PFNGLCOLORFRAGMENTOP2ATIPROC) glSupport.getProcAddress("glColorFragmentOp2ATI");
-	glColorFragmentOp3ATI_ptr      = (PFNGLCOLORFRAGMENTOP3ATIPROC) glSupport.getProcAddress("glColorFragmentOp3ATI");
-	glAlphaFragmentOp1ATI_ptr      = (PFNGLALPHAFRAGMENTOP1ATIPROC) glSupport.getProcAddress("glAlphaFragmentOp1ATI");
-	glAlphaFragmentOp2ATI_ptr      = (PFNGLALPHAFRAGMENTOP2ATIPROC) glSupport.getProcAddress("glAlphaFragmentOp2ATI");
-	glAlphaFragmentOp3ATI_ptr      = (PFNGLALPHAFRAGMENTOP3ATIPROC) glSupport.getProcAddress("glAlphaFragmentOp3ATI");
-	glSetFragmentShaderConstantATI_ptr = (PFNGLSETFRAGMENTSHADERCONSTANTATIPROC) glSupport.getProcAddress("glSetFragmentShaderConstantATI");
+    glGenFragmentShadersATI_ptr    = (PFNGLGENFRAGMENTSHADERSATIPROC) glSupport.getProcAddress("glGenFragmentShadersATI");
+    glBindFragmentShaderATI_ptr    = (PFNGLBINDFRAGMENTSHADERATIPROC) glSupport.getProcAddress("glBindFragmentShaderATI");
+    glDeleteFragmentShaderATI_ptr  = (PFNGLDELETEFRAGMENTSHADERATIPROC) glSupport.getProcAddress("glDeleteFragmentShaderATI");
+    glBeginFragmentShaderATI_ptr   = (PFNGLBEGINFRAGMENTSHADERATIPROC) glSupport.getProcAddress("glBeginFragmentShaderATI");
+    glEndFragmentShaderATI_ptr     = (PFNGLENDFRAGMENTSHADERATIPROC) glSupport.getProcAddress("glEndFragmentShaderATI");
+    glPassTexCoordATI_ptr          = (PFNGLPASSTEXCOORDATIPROC) glSupport.getProcAddress("glPassTexCoordATI");
+    glSampleMapATI_ptr             = (PFNGLSAMPLEMAPATIPROC) glSupport.getProcAddress("glSampleMapATI");
+    glColorFragmentOp1ATI_ptr      = (PFNGLCOLORFRAGMENTOP1ATIPROC) glSupport.getProcAddress("glColorFragmentOp1ATI");
+    glColorFragmentOp2ATI_ptr      = (PFNGLCOLORFRAGMENTOP2ATIPROC) glSupport.getProcAddress("glColorFragmentOp2ATI");
+    glColorFragmentOp3ATI_ptr      = (PFNGLCOLORFRAGMENTOP3ATIPROC) glSupport.getProcAddress("glColorFragmentOp3ATI");
+    glAlphaFragmentOp1ATI_ptr      = (PFNGLALPHAFRAGMENTOP1ATIPROC) glSupport.getProcAddress("glAlphaFragmentOp1ATI");
+    glAlphaFragmentOp2ATI_ptr      = (PFNGLALPHAFRAGMENTOP2ATIPROC) glSupport.getProcAddress("glAlphaFragmentOp2ATI");
+    glAlphaFragmentOp3ATI_ptr      = (PFNGLALPHAFRAGMENTOP3ATIPROC) glSupport.getProcAddress("glAlphaFragmentOp3ATI");
+    glSetFragmentShaderConstantATI_ptr = (PFNGLSETFRAGMENTSHADERCONSTANTATIPROC) glSupport.getProcAddress("glSetFragmentShaderConstantATI");
 
-	if (glGenFragmentShadersATI_ptr == NULL) return false;
+    if (glGenFragmentShadersATI_ptr == NULL) return false;
 
-	if (glBindFragmentShaderATI_ptr == NULL) return false;
+    if (glBindFragmentShaderATI_ptr == NULL) return false;
 
-	if (glDeleteFragmentShaderATI_ptr == NULL) return false;
+    if (glDeleteFragmentShaderATI_ptr == NULL) return false;
 
-	if (glBeginFragmentShaderATI_ptr == NULL) return false;
+    if (glBeginFragmentShaderATI_ptr == NULL) return false;
 
-	if (glEndFragmentShaderATI_ptr == NULL) return false;
+    if (glEndFragmentShaderATI_ptr == NULL) return false;
 
-	if (glPassTexCoordATI_ptr == NULL) return false;
+    if (glPassTexCoordATI_ptr == NULL) return false;
 
-	if (glColorFragmentOp1ATI_ptr == NULL) return false;
+    if (glColorFragmentOp1ATI_ptr == NULL) return false;
 
-	if (glColorFragmentOp2ATI_ptr == NULL) return false;
+    if (glColorFragmentOp2ATI_ptr == NULL) return false;
 
-	if (glColorFragmentOp3ATI_ptr == NULL) return false;
+    if (glColorFragmentOp3ATI_ptr == NULL) return false;
 
-	if (glAlphaFragmentOp1ATI_ptr == NULL) return false;
+    if (glAlphaFragmentOp1ATI_ptr == NULL) return false;
 
-	if (glAlphaFragmentOp2ATI_ptr == NULL) return false;
+    if (glAlphaFragmentOp2ATI_ptr == NULL) return false;
 
-	if (glAlphaFragmentOp2ATI_ptr == NULL) return false;
+    if (glAlphaFragmentOp2ATI_ptr == NULL) return false;
 
-	if (glAlphaFragmentOp3ATI_ptr == NULL) return false;
+    if (glAlphaFragmentOp3ATI_ptr == NULL) return false;
 
-	if (glSetFragmentShaderConstantATI_ptr == NULL) return false;
+    if (glSetFragmentShaderConstantATI_ptr == NULL) return false;
 
     init = true;
 
-	return true;
+    return true;
 }
 

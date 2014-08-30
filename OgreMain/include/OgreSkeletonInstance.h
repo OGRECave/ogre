@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** A SkeletonInstance is a single instance of a Skeleton used by a world object.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** A SkeletonInstance is a single instance of a Skeleton used by a world object.
     @remarks
         The difference between a Skeleton and a SkeletonInstance is that the
         Skeleton is the 'master' version much like Mesh is a 'master' version of
@@ -64,9 +64,9 @@ namespace Ogre {
 
         /** Gets a single animation by index. */
         Animation* getAnimation(unsigned short index) const;
-		/// Internal accessor for animations (returns null if animation does not exist)
-		Animation* _getAnimationImpl(const String& name, 
-			const LinkedSkeletonAnimationSource** linker = 0) const;
+        /// Internal accessor for animations (returns null if animation does not exist)
+        Animation* _getAnimationImpl(const String& name, 
+            const LinkedSkeletonAnimationSource** linker = 0) const;
 
         /** Creates a new Animation object for animating this skeleton. 
         @remarks
@@ -78,7 +78,7 @@ namespace Ogre {
 
         /** Returns the named Animation object. */
         Animation* getAnimation(const String& name, 
-			const LinkedSkeletonAnimationSource** linker = 0) const;
+            const LinkedSkeletonAnimationSource** linker = 0) const;
 
         /** Removes an Animation from this skeleton. 
         @remarks
@@ -95,27 +95,27 @@ namespace Ogre {
         /** Frees a TagPoint that already attached to a bone */
         void freeTagPoint(TagPoint* tagPoint);
 
-		/// @copydoc Skeleton::addLinkedSkeletonAnimationSource
-		void addLinkedSkeletonAnimationSource(const String& skelName, 
-			Real scale = 1.0f);
-		/// @copydoc Skeleton::removeAllLinkedSkeletonAnimationSources
-		void removeAllLinkedSkeletonAnimationSources(void);
-		/// @copydoc Skeleton::getLinkedSkeletonAnimationSourceIterator
-		LinkedSkeletonAnimSourceIterator 
-			getLinkedSkeletonAnimationSourceIterator(void) const;
+        /// @copydoc Skeleton::addLinkedSkeletonAnimationSource
+        void addLinkedSkeletonAnimationSource(const String& skelName, 
+            Real scale = 1.0f);
+        /// @copydoc Skeleton::removeAllLinkedSkeletonAnimationSources
+        void removeAllLinkedSkeletonAnimationSources(void);
+        /// @copydoc Skeleton::getLinkedSkeletonAnimationSourceIterator
+        LinkedSkeletonAnimSourceIterator 
+            getLinkedSkeletonAnimationSourceIterator(void) const;
 
-		/// @copydoc Skeleton::_initAnimationState
-		void _initAnimationState(AnimationStateSet* animSet);
+        /// @copydoc Skeleton::_initAnimationState
+        void _initAnimationState(AnimationStateSet* animSet);
 
-		/// @copydoc Skeleton::_refreshAnimationState
-		void _refreshAnimationState(AnimationStateSet* animSet);
+        /// @copydoc Skeleton::_refreshAnimationState
+        void _refreshAnimationState(AnimationStateSet* animSet);
 
-		/// @copydoc Resource::getName
-		const String& getName(void) const;
-		/// @copydoc Resource::getHandle
-		ResourceHandle getHandle(void) const;
-		/// @copydoc Resource::getGroup
-		const String& getGroup(void);
+        /// @copydoc Resource::getName
+        const String& getName(void) const;
+        /// @copydoc Resource::getHandle
+        ResourceHandle getHandle(void) const;
+        /// @copydoc Resource::getGroup
+        const String& getGroup(void);
 
     protected:
         /// Pointer back to master Skeleton
@@ -154,8 +154,8 @@ namespace Ogre {
         void unloadImpl(void);
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

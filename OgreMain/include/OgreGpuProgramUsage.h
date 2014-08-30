@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,15 +34,15 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class Pass;
+    class Pass;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Materials
-	*  @{
-	*/
-	/** This class makes the usage of a vertex and fragment programs (low-level or high-level), 
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Materials
+    *  @{
+    */
+    /** This class makes the usage of a vertex and fragment programs (low-level or high-level), 
         with a given set of parameters, explicit.
     @remarks
         Using a vertex or fragment program can get fairly complex; besides the fairly rudimentary
@@ -70,21 +70,21 @@ namespace Ogre
         Just incase it wasn't clear from the above, this class provides linkage to both 
         GpuProgram and HighLevelGpuProgram, despite its name.
     */
-	class _OgreExport GpuProgramUsage : public Resource::Listener, public PassAlloc
+    class _OgreExport GpuProgramUsage : public Resource::Listener, public PassAlloc
     {
     protected:
         GpuProgramType mType;
-		Pass* mParent;
+        Pass* mParent;
         /// The program link
         GpuProgramPtr mProgram;
 
         /// Program parameters
         GpuProgramParametersSharedPtr mParameters;
-		
-		/// Whether to recreate parameters next load
-		bool mRecreateParams;
+        
+        /// Whether to recreate parameters next load
+        bool mRecreateParams;
 
-		void recreateParameters();
+        void recreateParameters();
 
     public:
         /** Default constructor.
@@ -92,15 +92,15 @@ namespace Ogre
         */
         GpuProgramUsage(GpuProgramType gptype, Pass* parent);
 
-		/** Copy constructor */
-		GpuProgramUsage(const GpuProgramUsage& rhs, Pass* newparent);
+        /** Copy constructor */
+        GpuProgramUsage(const GpuProgramUsage& rhs, Pass* newparent);
 
-		~GpuProgramUsage();
+        ~GpuProgramUsage();
 
         /** Gets the type of program we're trying to link to. */
         GpuProgramType getType(void) const { return mType; }
 
-		/** Sets the name of the program to use. 
+        /** Sets the name of the program to use. 
         @param name The name of the program to use
         @param resetParams
             If true, this will create a fresh set of parameters from the
@@ -110,17 +110,17 @@ namespace Ogre
             case of named parameters refers to the indexes underlying them, 
             not just the names.
         */
-		void setProgramName(const String& name, bool resetParams = true);
-		/** Sets the program to use.
+        void setProgramName(const String& name, bool resetParams = true);
+        /** Sets the program to use.
         @remarks
             Note that this will create a fresh set of parameters from the
             new program being linked, so if you had previously set parameters
             you will have to set them again.
         */
         void setProgram(GpuProgramPtr& prog);
-		/** Gets the program being used. */
+        /** Gets the program being used. */
         const GpuProgramPtr& getProgram() const { return mProgram; }
-		/** Gets the program being used. */
+        /** Gets the program being used. */
         const String& getProgramName(void) const { return mProgram->getName(); }
 
         /** Sets the program parameters that should be used; because parameters can be
@@ -140,13 +140,13 @@ namespace Ogre
 
         size_t calculateSize(void) const;
 
-		// Resource Listener
-		void unloadingComplete(Resource* prog);
-		void loadingComplete(Resource* prog);
+        // Resource Listener
+        void unloadingComplete(Resource* prog);
+        void loadingComplete(Resource* prog);
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

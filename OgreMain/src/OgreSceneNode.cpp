@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,7 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 
 #include "OgreException.h"
-#include "OgreEntity.h"
 #include "OgreCamera.h"
-#include "OgreLight.h"
 #include "OgreMath.h"
 #include "OgreSceneManager.h"
 #include "OgreMovableObject.h"
@@ -69,17 +67,15 @@ namespace Ogre {
     {
         // Detach all objects, do this manually to avoid needUpdate() call 
         // which can fail because of deleted items
-		ObjectMap::iterator itr;
-		for ( itr = mObjectsByName.begin(); itr != mObjectsByName.end(); ++itr )
-		{
+        ObjectMap::iterator itr;
+        for ( itr = mObjectsByName.begin(); itr != mObjectsByName.end(); ++itr )
+        {
             MovableObject* ret = itr->second;
             ret->_notifyAttached((SceneNode*)0);
-		}
+        }
         mObjectsByName.clear();
 
-        if (mWireBoundingBox) {
-			OGRE_DELETE mWireBoundingBox;
-		}
+        OGRE_DELETE mWireBoundingBox;
     }
     //-----------------------------------------------------------------------
     void SceneNode::_update(bool updateChildren, bool parentHasChanged)
@@ -88,35 +84,35 @@ namespace Ogre {
         _updateBounds();
     }
     //-----------------------------------------------------------------------
-	void SceneNode::setParent(Node* parent)
-	{
-		Node::setParent(parent);
+    void SceneNode::setParent(Node* parent)
+    {
+        Node::setParent(parent);
 
-		if (parent)
-		{
-			SceneNode* sceneParent = static_cast<SceneNode*>(parent);
-			setInSceneGraph(sceneParent->isInSceneGraph());
-		}
-		else
-		{
-			setInSceneGraph(false);
-		}
-	}
+        if (parent)
+        {
+            SceneNode* sceneParent = static_cast<SceneNode*>(parent);
+            setInSceneGraph(sceneParent->isInSceneGraph());
+        }
+        else
+        {
+            setInSceneGraph(false);
+        }
+    }
     //-----------------------------------------------------------------------
-	void SceneNode::setInSceneGraph(bool inGraph)
-	{
-		if (inGraph != mIsInSceneGraph)
-		{
-			mIsInSceneGraph = inGraph;
-			// Tell children
-	        ChildNodeMap::iterator child;
-    	    for (child = mChildren.begin(); child != mChildren.end(); ++child)
-        	{
-            	SceneNode* sceneChild = static_cast<SceneNode*>(child->second);
-				sceneChild->setInSceneGraph(inGraph);
-			}
-		}
-	}
+    void SceneNode::setInSceneGraph(bool inGraph)
+    {
+        if (inGraph != mIsInSceneGraph)
+        {
+            mIsInSceneGraph = inGraph;
+            // Tell children
+            ChildNodeMap::iterator child;
+            for (child = mChildren.begin(); child != mChildren.end(); ++child)
+            {
+                SceneNode* sceneChild = static_cast<SceneNode*>(child->second);
+                sceneChild->setInSceneGraph(inGraph);
+            }
+        }
+    }
     //-----------------------------------------------------------------------
     void SceneNode::attachObject(MovableObject* obj)
     {
@@ -240,12 +236,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void SceneNode::detachAllObjects(void)
     {
-		ObjectMap::iterator itr;
-		for ( itr = mObjectsByName.begin(); itr != mObjectsByName.end(); ++itr )
-		{
+        ObjectMap::iterator itr;
+        for ( itr = mObjectsByName.begin(); itr != mObjectsByName.end(); ++itr )
+        {
             MovableObject* ret = itr->second;
             ret->_notifyAttached((SceneNode*)0);
-		}
+        }
         mObjectsByName.clear();
         // Make sure bounds get updated (must go right to the top)
         needUpdate();
@@ -275,8 +271,8 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void SceneNode::_findVisibleObjects(Camera* cam, RenderQueue* queue, 
-		VisibleObjectsBoundsInfo* visibleBounds, bool includeChildren, 
-		bool displayNodes, bool onlyShadowCasters)
+        VisibleObjectsBoundsInfo* visibleBounds, bool includeChildren, 
+        bool displayNodes, bool onlyShadowCasters)
     {
         // Check self visible
         if (!cam->isVisible(mWorldAABB))
@@ -287,9 +283,9 @@ namespace Ogre {
         ObjectMap::iterator iobjend = mObjectsByName.end();
         for (iobj = mObjectsByName.begin(); iobj != iobjend; ++iobj)
         {
-			MovableObject* mo = iobj->second;
+            MovableObject* mo = iobj->second;
 
-			queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
+            queue->processVisibleObject(mo, cam, onlyShadowCasters, visibleBounds);
         }
 
         if (includeChildren)
@@ -300,7 +296,7 @@ namespace Ogre {
             {
                 SceneNode* sceneChild = static_cast<SceneNode*>(child->second);
                 sceneChild->_findVisibleObjects(cam, queue, visibleBounds, includeChildren, 
-					displayNodes, onlyShadowCasters);
+                    displayNodes, onlyShadowCasters);
             }
         }
 
@@ -310,47 +306,47 @@ namespace Ogre {
             queue->addRenderable(getDebugRenderable());
         }
 
-		// Check if the bounding box should be shown.
-		// See if our flag is set or if the scene manager flag is set.
-		if ( !mHideBoundingBox &&
+        // Check if the bounding box should be shown.
+        // See if our flag is set or if the scene manager flag is set.
+        if ( !mHideBoundingBox &&
              (mShowBoundingBox || (mCreator && mCreator->getShowBoundingBoxes())) )
-		{ 
-			_addBoundingBoxToQueue(queue);
-		}
+        { 
+            _addBoundingBoxToQueue(queue);
+        }
 
 
     }
 
-	Node::DebugRenderable* SceneNode::getDebugRenderable()
-	{
-		Vector3 hs = mWorldAABB.getHalfSize();
-		Real sz = std::min(hs.x, hs.y);
-		sz = std::min(sz, hs.z);
-		sz = std::max(sz, (Real)1.0);
-		return Node::getDebugRenderable(sz);
-	}
+    Node::DebugRenderable* SceneNode::getDebugRenderable()
+    {
+        Vector3 hs = mWorldAABB.getHalfSize();
+        Real sz = std::min(hs.x, hs.y);
+        sz = std::min(sz, hs.z);
+        sz = std::max(sz, (Real)1.0);
+        return Node::getDebugRenderable(sz);
+    }
 
 
-	void SceneNode::_addBoundingBoxToQueue(RenderQueue* queue) {
-		// Create a WireBoundingBox if needed.
-		if (mWireBoundingBox == NULL) {
-			mWireBoundingBox = OGRE_NEW WireBoundingBox();
-		}
-		mWireBoundingBox->setupBoundingBox(mWorldAABB);
-		queue->addRenderable(mWireBoundingBox);
-	}
+    void SceneNode::_addBoundingBoxToQueue(RenderQueue* queue) {
+        // Create a WireBoundingBox if needed.
+        if (mWireBoundingBox == NULL) {
+            mWireBoundingBox = OGRE_NEW WireBoundingBox();
+        }
+        mWireBoundingBox->setupBoundingBox(mWorldAABB);
+        queue->addRenderable(mWireBoundingBox);
+    }
 
-	void SceneNode::showBoundingBox(bool bShow) {
-		mShowBoundingBox = bShow;
-	}
+    void SceneNode::showBoundingBox(bool bShow) {
+        mShowBoundingBox = bShow;
+    }
 
-	bool SceneNode::getShowBoundingBox() const {
-		return mShowBoundingBox;
-	}
+    bool SceneNode::getShowBoundingBox() const {
+        return mShowBoundingBox;
+    }
 
-	void SceneNode::hideBoundingBox(bool bHide) {
-		mHideBoundingBox = bHide;
-	}
+    void SceneNode::hideBoundingBox(bool bHide) {
+        mHideBoundingBox = bHide;
+    }
 
     //-----------------------------------------------------------------------
     void SceneNode::updateFromParentImpl(void) const
@@ -387,11 +383,11 @@ namespace Ogre {
     {
         return ObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
     }
-	//-----------------------------------------------------------------------
-	SceneNode::ConstObjectIterator SceneNode::getAttachedObjectIterator(void) const
-	{
-		return ConstObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
-	}
+    //-----------------------------------------------------------------------
+    SceneNode::ConstObjectIterator SceneNode::getAttachedObjectIterator(void) const
+    {
+        return ConstObjectIterator(mObjectsByName.begin(), mObjectsByName.end());
+    }
     //-----------------------------------------------------------------------
     void SceneNode::removeAndDestroyChild(const String& name)
     {
@@ -419,27 +415,27 @@ namespace Ogre {
         for (i = mChildren.begin(); i != iend;)
         {
             SceneNode* sn = static_cast<SceneNode*>(i->second);
-			// increment iterator before destroying (iterator invalidated by 
-			// SceneManager::destroySceneNode because it causes removal from parent)
-			++i;
+            // increment iterator before destroying (iterator invalidated by 
+            // SceneManager::destroySceneNode because it causes removal from parent)
+            ++i;
             sn->removeAndDestroyAllChildren();
             sn->getCreator()->destroySceneNode(sn->getName());
         }
-	    mChildren.clear();
+        mChildren.clear();
         needUpdate();
     }
     //-----------------------------------------------------------------------
-	SceneNode* SceneNode::createChildSceneNode(const Vector3& inTranslate, 
+    SceneNode* SceneNode::createChildSceneNode(const Vector3& inTranslate, 
         const Quaternion& inRotate)
-	{
-		return static_cast<SceneNode*>(this->createChild(inTranslate, inRotate));
-	}
+    {
+        return static_cast<SceneNode*>(this->createChild(inTranslate, inRotate));
+    }
     //-----------------------------------------------------------------------
     SceneNode* SceneNode::createChildSceneNode(const String& name, const Vector3& inTranslate, 
-		const Quaternion& inRotate)
-	{
-		return static_cast<SceneNode*>(this->createChild(name, inTranslate, inRotate));
-	}
+        const Quaternion& inRotate)
+    {
+        return static_cast<SceneNode*>(this->createChild(name, inTranslate, inRotate));
+    }
     //-----------------------------------------------------------------------
     void SceneNode::findLights(LightList& destList, Real radius, uint32 lightMask) const
     {
@@ -485,19 +481,19 @@ namespace Ogre {
         mYawFixedAxis = fixedAxis;
     }
 
-	//-----------------------------------------------------------------------
-	void SceneNode::yaw(const Radian& angle, TransformSpace relativeTo)
-	{
-		if (mYawFixed)
-		{
-			rotate(mYawFixedAxis, angle, relativeTo);
-		}
-		else
-		{
-			rotate(Vector3::UNIT_Y, angle, relativeTo);
-		}
+    //-----------------------------------------------------------------------
+    void SceneNode::yaw(const Radian& angle, TransformSpace relativeTo)
+    {
+        if (mYawFixed)
+        {
+            rotate(mYawFixedAxis, angle, relativeTo);
+        }
+        else
+        {
+            rotate(Vector3::UNIT_Y, angle, relativeTo);
+        }
 
-	}
+    }
     //-----------------------------------------------------------------------
     void SceneNode::setDirection(Real x, Real y, Real z, TransformSpace relativeTo, 
         const Vector3& localDirectionVector)
@@ -646,26 +642,26 @@ namespace Ogre {
             }
         }
     }
-	//-----------------------------------------------------------------------
-	void SceneNode::setDebugDisplayEnabled(bool enabled, bool cascade)
-	{
-		ObjectMap::iterator oi, oiend;
-		oiend = mObjectsByName.end();
-		for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
-		{
-			oi->second->setDebugDisplayEnabled(enabled);
-		}
+    //-----------------------------------------------------------------------
+    void SceneNode::setDebugDisplayEnabled(bool enabled, bool cascade)
+    {
+        ObjectMap::iterator oi, oiend;
+        oiend = mObjectsByName.end();
+        for (oi = mObjectsByName.begin(); oi != oiend; ++oi)
+        {
+            oi->second->setDebugDisplayEnabled(enabled);
+        }
 
-		if (cascade)
-		{
-			ChildNodeMap::iterator i, iend;
-			iend = mChildren.end();
-			for (i = mChildren.begin(); i != iend; ++i)
-			{
-				static_cast<SceneNode*>(i->second)->setDebugDisplayEnabled(enabled, cascade);
-			}
-		}
-	}
+        if (cascade)
+        {
+            ChildNodeMap::iterator i, iend;
+            iend = mChildren.end();
+            for (i = mChildren.begin(); i != iend; ++i)
+            {
+                static_cast<SceneNode*>(i->second)->setDebugDisplayEnabled(enabled, cascade);
+            }
+        }
+    }
     //-----------------------------------------------------------------------
     void SceneNode::flipVisibility(bool cascade)
     {

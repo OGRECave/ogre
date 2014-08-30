@@ -5,12 +5,12 @@
 
 typedef class InstList {
 public:
-	InstList();
-	~InstList();
-	int Size();
-	InstList& operator+=(InstPtr t);
-	void Validate();
-	void Invoke();
+    InstList();
+    ~InstList();
+    int Size();
+    InstList& operator+=(InstPtr t);
+    void Validate();
+    void Invoke();
 private:
     InstPtr list;
     int size;

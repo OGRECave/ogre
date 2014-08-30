@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __InstanceManager_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMesh.h"
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
 
@@ -119,7 +118,7 @@ namespace Ogre
         SceneManager*           mSceneManager;
 
         size_t                  mMaxLookupTableInstances;
-        unsigned char			mNumCustomParams;		//Number of custom params per instance.
+        unsigned char           mNumCustomParams;       //Number of custom params per instance.
 
         /** Finds a batch with at least one free instanced entity we can use.
             If none found, creates one.
@@ -140,18 +139,18 @@ namespace Ogre
         /** @see defragmentBatches overload, this takes care of an array of batches
             for a specific material */
         void defragmentBatches( bool optimizeCull, vector<InstancedEntity*>::type &entities,
-								vector<Ogre::Vector4>::type &usedParams,
-								InstanceBatchVec &fragmentedBatches );
+                                vector<Ogre::Vector4>::type &usedParams,
+                                InstanceBatchVec &fragmentedBatches );
 
         /** @see setSetting. This function helps it by setting the given parameter to all batches
             in container.
         */
         void applySettingToBatches( BatchSettingId id, bool value, const InstanceBatchVec &container );
 
-		/** Called when we you use a mesh which has shared vertices, the function creates separate
-			vertex/index buffers and also recreates the bone assignments.
-		*/
-		void unshareVertices(const Ogre::MeshPtr &mesh);
+        /** Called when we you use a mesh which has shared vertices, the function creates separate
+            vertex/index buffers and also recreates the bone assignments.
+        */
+        void unshareVertices(const Ogre::MeshPtr &mesh);
 
     public:
         InstanceManager( const String &customName, SceneManager *sceneManager,
@@ -181,28 +180,28 @@ namespace Ogre
         */
         void setMaxLookupTableInstances( size_t maxLookupTableInstances );
 
-		/** Sets the number of custom parameters per instance. Some techniques (i.e. HWInstancingBasic)
-			support this, but not all of them. They also may have limitations to the max number. All
-			instancing implementations assume each instance param is a Vector4 (4 floats).
-		@remarks
-			This function cannot be called after the first batch has been created. Otherwise
-			it will raise an exception. If the technique doesn't support custom params, it will
-			raise an exception at the time of building the first InstanceBatch.
+        /** Sets the number of custom parameters per instance. Some techniques (i.e. HWInstancingBasic)
+            support this, but not all of them. They also may have limitations to the max number. All
+            instancing implementations assume each instance param is a Vector4 (4 floats).
+        @remarks
+            This function cannot be called after the first batch has been created. Otherwise
+            it will raise an exception. If the technique doesn't support custom params, it will
+            raise an exception at the time of building the first InstanceBatch.
 
-			HWInstancingBasic:
-				* Each custom params adds an additional float4 TEXCOORD.
-			HWInstancingVTF:
-				* Not implemented. (Recommendation: Implement this as an additional float4 VTF fetch)
-			TextureVTF:
-				* Not implemented. (see HWInstancingVTF's recommendation)
-			ShaderBased:
-				* Not supported.
-		@param numCustomParams Number of custom parameters each instance will have. Default: 0
-		*/
-		void setNumCustomParams( unsigned char numCustomParams );
+            HWInstancingBasic:
+                * Each custom params adds an additional float4 TEXCOORD.
+            HWInstancingVTF:
+                * Not implemented. (Recommendation: Implement this as an additional float4 VTF fetch)
+            TextureVTF:
+                * Not implemented. (see HWInstancingVTF's recommendation)
+            ShaderBased:
+                * Not supported.
+        @param numCustomParams Number of custom parameters each instance will have. Default: 0
+        */
+        void setNumCustomParams( unsigned char numCustomParams );
 
-		unsigned char getNumCustomParams() const
-		{ return mNumCustomParams; }
+        unsigned char getNumCustomParams() const
+        { return mNumCustomParams; }
 
         /** @return Instancing technique this manager was created for. Can't be changed after creation */
         InstancingTechnique getInstancingTechnique() const
@@ -219,7 +218,7 @@ namespace Ogre
         @param flags Flags to pass to the InstanceManager. @see InstanceManagerFlags
         @return The max/best amount of instances per batch given the suggested size and flags
         */
-        size_t getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize, uint16 flags );
+        size_t getMaxOrBestNumInstancesPerBatch( const String &materialName, size_t suggestedSize, uint16 flags );
 
         /** @copydoc SceneManager::createInstancedEntity */
         InstancedEntity* createInstancedEntity( const String &materialName );
@@ -272,7 +271,7 @@ namespace Ogre
         @param enabled Boolean value. It's meaning depends on the id.
         @param materialName When Blank, the setting is applied to all existing materials
         */
-        void setSetting( BatchSettingId id, bool enabled, const String &materialName = StringUtil::BLANK );
+        void setSetting( BatchSettingId id, bool enabled, const String &materialName = BLANKSTRING );
 
         /// If settings for the given material didn't exist, default value is returned
         bool getSetting( BatchSettingId id, const String &materialName ) const;

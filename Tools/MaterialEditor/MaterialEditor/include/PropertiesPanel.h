@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,31 +56,31 @@ typedef std::map<PassController*, int> PassPageIndexMap;
 class PropertiesPanel : public wxPanel
 {
 public:
-	PropertiesPanel(wxWindow* parent,
-		wxWindowID id = wxID_ANY,
-		const wxPoint& pos = wxDefaultPosition,
-		const wxSize& size = wxDefaultSize,
-		long style = wxTAB_TRAVERSAL | wxNO_BORDER,
-		const wxString& name = wxT("Properties Panel"));
+    PropertiesPanel(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxDefaultSize,
+        long style = wxTAB_TRAVERSAL | wxNO_BORDER,
+        const wxString& name = wxT("Properties Panel"));
 
-	virtual ~PropertiesPanel();
+    virtual ~PropertiesPanel();
 
-	void selectionChanged(EventArgs& args);
+    void selectionChanged(EventArgs& args);
 
-	void projectRemoved(EventArgs& args);
-	void materialRemoved(EventArgs& args);
-	void techniqueRemoved(EventArgs& args);
-	void passRemoved(EventArgs& args);
+    void projectRemoved(EventArgs& args);
+    void materialRemoved(EventArgs& args);
+    void techniqueRemoved(EventArgs& args);
+    void passRemoved(EventArgs& args);
 
 protected:
-	wxGridSizer* mGridSizer;
-	wxPropertyGridManager* mPropertyGrid;
+    wxGridSizer* mGridSizer;
+    wxPropertyGridManager* mPropertyGrid;
 
-	MaterialPageIndexMap mMaterialPageIndexMap;
-	TechniquePageIndexMap mTechniquePageIndexMap;
-	PassPageIndexMap mPassPageIndexMap;
+    MaterialPageIndexMap mMaterialPageIndexMap;
+    TechniquePageIndexMap mTechniquePageIndexMap;
+    PassPageIndexMap mPassPageIndexMap;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _PROPERTIESPANEL_H_

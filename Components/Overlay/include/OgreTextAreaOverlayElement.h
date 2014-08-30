@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -28,17 +28,17 @@ THE SOFTWARE
 #define _TextAreaOverlayElement_H__
 
 #include "OgreOverlayElement.h"
-#include "OgreFont.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Overlays
-	*  @{
-	*/
-	/** This class implements an overlay element which contains simple unformatted text.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Overlays
+    *  @{
+    */
+    /** This class implements an overlay element which contains simple unformatted text.
     */
     class _OgreOverlayExport TextAreaOverlayElement : public OverlayElement
     {
@@ -56,7 +56,7 @@ namespace Ogre
         virtual ~TextAreaOverlayElement();
 
         virtual void initialise(void);
-		virtual void setCaption(const DisplayString& text);
+        virtual void setCaption(const DisplayString& text);
 
         void setCharHeight( Real height );
         Real getCharHeight() const;
@@ -70,7 +70,7 @@ namespace Ogre
         /** See OverlayElement. */
         virtual const String& getTypeName(void) const;
         /** See Renderable. */
-		const MaterialPtr& getMaterial(void) const;
+        const MaterialPtr& getMaterial(void) const;
         /** See Renderable. */
         void getRenderOperation(RenderOperation& op);
         /** Overridden from OverlayElement */
@@ -108,7 +108,7 @@ namespace Ogre
         inline void setAlignment( Alignment a )
         {
             mAlignment = a;
-			mGeomPositionsOutOfDate = true;
+            mGeomPositionsOutOfDate = true;
         }
         inline Alignment getAlignment() const
         {
@@ -230,10 +230,11 @@ namespace Ogre
         FontPtr mFont;
         Real mCharHeight;
         ushort mPixelCharHeight;
+        bool mSpaceWidthOverridden;
         Real mSpaceWidth;
         ushort mPixelSpaceWidth;
         size_t mAllocSize;
-		Real mViewportAspectCoef;
+        Real mViewportAspectCoef;
 
         /// Colours to use for the vertices
         ColourValue mColourBottom;
@@ -245,13 +246,13 @@ namespace Ogre
         void checkMemoryAllocation( size_t numChars );
         /// Inherited function
         virtual void updatePositionGeometry();
-		/// Inherited function
-		virtual void updateTextureGeometry();
+        /// Inherited function
+        virtual void updateTextureGeometry();
         /// Updates vertex colours
         virtual void updateColours(void);
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

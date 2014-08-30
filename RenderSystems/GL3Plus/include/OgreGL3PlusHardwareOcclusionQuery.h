@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -68,26 +68,26 @@ class _OgreGL3PlusExport GL3PlusHardwareOcclusionQuery : public HardwareOcclusio
 // Public methods
 //--
 public:
-	/**
-	  * Default object constructor
-	  * 
-	  */
-	GL3PlusHardwareOcclusionQuery();
-	/**
-	  * Object destructor
-	  */
-	~GL3PlusHardwareOcclusionQuery();
+    /**
+      * Default object constructor
+      * 
+      */
+    GL3PlusHardwareOcclusionQuery();
+    /**
+      * Object destructor
+      */
+    ~GL3PlusHardwareOcclusionQuery();
 
-	//------------------------------------------------------------------
-	// Occlusion query functions (see base class documentation for this)
-	//--
-	void beginOcclusionQuery();
-	void endOcclusionQuery();
-	bool pullOcclusionQuery(unsigned int* NumOfFragments);
-	bool isStillOutstanding(void);
+    //------------------------------------------------------------------
+    // Occlusion query functions (see base class documentation for this)
+    //--
+    void beginOcclusionQuery();
+    void endOcclusionQuery();
+    bool pullOcclusionQuery(unsigned int* NumOfFragments);
+    bool isStillOutstanding(void);
 
     private:
-	    GLuint mQueryID;
+        GLuint mQueryID;
 };
 
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,44 +56,44 @@ namespace Ogre {
         */
         void bind();
 
-		/** Swap buffers - only useful when using multisample buffers.
-		*/
-		void swapBuffers();
+        /** Swap buffers - only useful when using multisample buffers.
+        */
+        void swapBuffers();
 
         /** This function acts very similar to @see GL3PlusFBORenderTexture::attachDepthBuffer
-			The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
-			while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to
-			be attached for OGL.
-		*/
-		void attachDepthBuffer( DepthBuffer *depthBuffer );
-		void detachDepthBuffer();
+            The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
+            while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to
+            be attached for OGL.
+        */
+        void attachDepthBuffer( DepthBuffer *depthBuffer );
+        void detachDepthBuffer();
 
-		/// Get the GL id for the FBO
-		GLuint getGLFBOID() const { return mFB; }
-		/// Get the GL id for the multisample FBO
-		GLuint getGLMultisampleFBOID() const { return mMultisampleFB; }
+        /// Get the GL id for the FBO
+        GLuint getGLFBOID() const { return mFB; }
+        /// Get the GL id for the multisample FBO
+        GLuint getGLMultisampleFBOID() const { return mMultisampleFB; }
         
         /// Accessors
         uint32 getWidth();
         uint32 getHeight();
         PixelFormat getFormat();
-		GLsizei getFSAA();
+        GLsizei getFSAA();
         
         GL3PlusFBOManager *getManager() { return mManager; }
-		const GL3PlusSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
+        const GL3PlusSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
     private:
         GL3PlusFBOManager *mManager;
-		GLsizei mNumSamples;
+        GLsizei mNumSamples;
         GLuint mFB;
-		GLuint mMultisampleFB;
-		GL3PlusSurfaceDesc mMultisampleColourBuffer;
+        GLuint mMultisampleFB;
+        GL3PlusSurfaceDesc mMultisampleColourBuffer;
         GL3PlusSurfaceDesc mDepth;
         GL3PlusSurfaceDesc mStencil;
         // Arbitrary number of texture surfaces
         GL3PlusSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 
 
-		/** Initialise object (find suitable depth and stencil format).
+        /** Initialise object (find suitable depth and stencil format).
             Must be called every time the bindings change.
             It fails with an exception (ERR_INVALIDPARAMS) if:
             - Attachment point 0 has no binding

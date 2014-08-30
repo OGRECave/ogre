@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,45 +28,43 @@ THE SOFTWARE.
 
 #include "OgreGLPlugin.h"
 #include "OgreRoot.h"
+#include "OgreGLRenderSystem.h"
 
 namespace Ogre 
 {
-	const String sPluginName = "GL RenderSystem";
-	//---------------------------------------------------------------------
-	GLPlugin::GLPlugin()
-		: mRenderSystem(0)
-	{
+    const String sPluginName = "GL RenderSystem";
+    //---------------------------------------------------------------------
+    GLPlugin::GLPlugin()
+        : mRenderSystem(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	const String& GLPlugin::getName() const
-	{
-		return sPluginName;
-	}
-	//---------------------------------------------------------------------
-	void GLPlugin::install()
-	{
-		mRenderSystem = new GLRenderSystem();
+    }
+    //---------------------------------------------------------------------
+    const String& GLPlugin::getName() const
+    {
+        return sPluginName;
+    }
+    //---------------------------------------------------------------------
+    void GLPlugin::install()
+    {
+        mRenderSystem = OGRE_NEW GLRenderSystem();
 
-		Root::getSingleton().addRenderSystem(mRenderSystem);
-	}
-	//---------------------------------------------------------------------
-	void GLPlugin::initialise()
-	{
-		// nothing to do
-	}
-	//---------------------------------------------------------------------
-	void GLPlugin::shutdown()
-	{
-		// nothing to do
-	}
-	//---------------------------------------------------------------------
-	void GLPlugin::uninstall()
-	{
-		delete mRenderSystem;
-		mRenderSystem = 0;
-
-	}
-
-
+        Root::getSingleton().addRenderSystem(mRenderSystem);
+    }
+    //---------------------------------------------------------------------
+    void GLPlugin::initialise()
+    {
+        // nothing to do
+    }
+    //---------------------------------------------------------------------
+    void GLPlugin::shutdown()
+    {
+        // nothing to do
+    }
+    //---------------------------------------------------------------------
+    void GLPlugin::uninstall()
+    {
+        OGRE_DELETE mRenderSystem;
+        mRenderSystem = 0;
+    }
 }

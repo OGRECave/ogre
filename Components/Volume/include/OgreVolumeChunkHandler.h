@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,10 +31,6 @@ THE SOFTWARE.
 #include "OgreWorkQueue.h"
 
 #include "OgreVolumePrerequisites.h"
-#include "OgreVolumeChunk.h"
-#include "OgreVolumeMeshBuilder.h"
-#include "OgreVolumeDualGridGenerator.h"
-#include "OgreVolumeOctreeNode.h"
 
 namespace Ogre {
 namespace Volume {
@@ -42,6 +38,9 @@ namespace Volume {
     /** Forward declaration.
     */
     class Chunk;
+    class MeshBuilder;
+    class DualGridGenerator;
+    class OctreeNode;
 
     /** Data being passed around while loading.
     */

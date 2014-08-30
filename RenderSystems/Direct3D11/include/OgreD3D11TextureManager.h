@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,37 +33,37 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class D3D11TextureManager : public TextureManager
-	{
-	protected:
-		D3D11Device & mDevice;
-		/// @copydoc ResourceManager::createImpl
-		Resource* createImpl(const String& name, ResourceHandle handle, 
-			const String& group, bool isManual, ManualResourceLoader* loader, 
-			const NameValuePairList* createParams);
+    class D3D11TextureManager : public TextureManager
+    {
+    protected:
+        D3D11Device & mDevice;
+        /// @copydoc ResourceManager::createImpl
+        Resource* createImpl(const String& name, ResourceHandle handle, 
+            const String& group, bool isManual, ManualResourceLoader* loader, 
+            const NameValuePairList* createParams);
 
-	public:
-		D3D11TextureManager( D3D11Device & device );
-		~D3D11TextureManager();
+    public:
+        D3D11TextureManager( D3D11Device & device );
+        ~D3D11TextureManager();
 
-		/** Release all textures in the default memory pool. 
-		@remarks
-		Method for dealing with lost devices.
-		*/
-		void releaseDefaultPoolResources(void);
-		/** Recreate all textures in the default memory pool. 
-		@remarks
-		Method for dealing with lost devices.
-		*/
-		void recreateDefaultPoolResources(void);
+        /** Release all textures in the default memory pool. 
+        @remarks
+        Method for dealing with lost devices.
+        */
+        void releaseDefaultPoolResources(void);
+        /** Recreate all textures in the default memory pool. 
+        @remarks
+        Method for dealing with lost devices.
+        */
+        void recreateDefaultPoolResources(void);
 
-		/// @copydoc TextureManager::getNativeFormat
-		PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
+        /// @copydoc TextureManager::getNativeFormat
+        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
 
-		/// @copydoc TextureManager::isHardwareFilteringSupported
-		bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
-			bool preciseFormatOnly = false);
+        /// @copydoc TextureManager::isHardwareFilteringSupported
+        bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
+            bool preciseFormatOnly = false);
 
-	};
+    };
 }
 #endif

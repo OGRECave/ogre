@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,17 +33,17 @@ template<> SelectionService* Ogre::Singleton<SelectionService>::msSingleton = 0;
 
 SelectionService& SelectionService::getSingleton(void)
 {  
-	assert( msSingleton );  return ( *msSingleton );  
+    assert( msSingleton );  return ( *msSingleton );  
 }
 
 SelectionService* SelectionService::getSingletonPtr(void)
 {
-	return msSingleton;
+    return msSingleton;
 }
 
 SelectionService::SelectionService()
 {
-	registerEvents();
+    registerEvents();
 }
 
 SelectionService::~SelectionService()
@@ -52,27 +52,27 @@ SelectionService::~SelectionService()
 
 void SelectionService::registerEvents()
 {
-	registerEvent(SelectionChanged);
+    registerEvent(SelectionChanged);
 }
 
 const SelectionList& SelectionService::getSelection() const
 {
-	return mSelection;
+    return mSelection;
 }
 
 void SelectionService::setSelection(boost::any& sel)
 {
-	mSelection.clear();
-	
-	mSelection.push_back(sel);
-	
-	fireEvent(SelectionChanged, SelectionEventArgs(mSelection));
+    mSelection.clear();
+    
+    mSelection.push_back(sel);
+    
+    fireEvent(SelectionChanged, SelectionEventArgs(mSelection));
 }
 
 void SelectionService::setSelection(const SelectionList& sel)
 {
-	mSelection = sel;
+    mSelection = sel;
 
-	fireEvent(SelectionChanged, SelectionEventArgs(mSelection));
+    fireEvent(SelectionChanged, SelectionEventArgs(mSelection));
 }
 

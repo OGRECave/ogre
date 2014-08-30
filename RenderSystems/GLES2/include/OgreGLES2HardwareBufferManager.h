@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,13 +33,13 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
-	class GLES2StateCacheManager;
+    class GLES2StateCacheManager;
 
     /** Implementation of HardwareBufferManager for OpenGL ES. */
     class _OgreGLES2Export GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         protected:
-			GLES2StateCacheManager* mStateCacheManager;
+            GLES2StateCacheManager* mStateCacheManager;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
             VertexDeclaration* createVertexDeclarationImpl(void);
             /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
@@ -55,8 +55,8 @@ namespace Ogre {
             HardwareIndexBufferSharedPtr createIndexBuffer(
                 HardwareIndexBuffer::IndexType itype, size_t numIndexes,
                 HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-	        /// Create a render to vertex buffer
-    	    RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+            /// Create a render to vertex buffer
+            RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
             HardwareUniformBufferSharedPtr
             createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "");
             /// Create a uniform buffer
@@ -72,31 +72,31 @@ namespace Ogre {
             /// Utility function to get the correct GL type based on VET's
             static GLenum getGLType(unsigned int type);
 
-			GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
+            GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
     };
 
-	/// GLES2HardwareBufferManagerBase as a Singleton
-	class _OgreGLES2Export GLES2HardwareBufferManager : public HardwareBufferManager
-	{
-	public:
-		GLES2HardwareBufferManager()
-			: HardwareBufferManager(OGRE_NEW GLES2HardwareBufferManagerBase()) 
-		{
+    /// GLES2HardwareBufferManagerBase as a Singleton
+    class _OgreGLES2Export GLES2HardwareBufferManager : public HardwareBufferManager
+    {
+    public:
+        GLES2HardwareBufferManager()
+            : HardwareBufferManager(OGRE_NEW GLES2HardwareBufferManagerBase()) 
+        {
 
-		}
-		~GLES2HardwareBufferManager()
-		{
-			OGRE_DELETE mImpl;
-		}
+        }
+        ~GLES2HardwareBufferManager()
+        {
+            OGRE_DELETE mImpl;
+        }
 
-		/// Utility function to get the correct GL usage based on HBU's
-		static GLenum getGLUsage(unsigned int usage) 
+        /// Utility function to get the correct GL usage based on HBU's
+        static GLenum getGLUsage(unsigned int usage) 
             { return GLES2HardwareBufferManagerBase::getGLUsage(usage); }
 
-		/// Utility function to get the correct GL type based on VET's
-		static GLenum getGLType(unsigned int type)
+        /// Utility function to get the correct GL type based on VET's
+        static GLenum getGLType(unsigned int type)
             { return GLES2HardwareBufferManagerBase::getGLType(type); }
-	};
+    };
 
 }
 

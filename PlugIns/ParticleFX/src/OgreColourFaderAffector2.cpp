@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,35 +34,35 @@ THE SOFTWARE.
 namespace Ogre {
     
     // init statics
-	// Phase 1
+    // Phase 1
     ColourFaderAffector2::CmdRedAdjust1 ColourFaderAffector2::msRedCmd1;
     ColourFaderAffector2::CmdGreenAdjust1 ColourFaderAffector2::msGreenCmd1;
     ColourFaderAffector2::CmdBlueAdjust1 ColourFaderAffector2::msBlueCmd1;
     ColourFaderAffector2::CmdAlphaAdjust1 ColourFaderAffector2::msAlphaCmd1;
 
-	// Phase 2
-	ColourFaderAffector2::CmdRedAdjust2 ColourFaderAffector2::msRedCmd2;
+    // Phase 2
+    ColourFaderAffector2::CmdRedAdjust2 ColourFaderAffector2::msRedCmd2;
     ColourFaderAffector2::CmdGreenAdjust2 ColourFaderAffector2::msGreenCmd2;
     ColourFaderAffector2::CmdBlueAdjust2 ColourFaderAffector2::msBlueCmd2;
     ColourFaderAffector2::CmdAlphaAdjust2 ColourFaderAffector2::msAlphaCmd2;
 
-	ColourFaderAffector2::CmdStateChange ColourFaderAffector2::msStateCmd;
+    ColourFaderAffector2::CmdStateChange ColourFaderAffector2::msStateCmd;
 
 
     //-----------------------------------------------------------------------
     ColourFaderAffector2::ColourFaderAffector2(ParticleSystem* psys) : ParticleAffector(psys)
     {
         mRedAdj1 = mGreenAdj1 = mBlueAdj1 = mAlphaAdj1 = 0;
-		mRedAdj2 = mGreenAdj2 = mBlueAdj2 = mAlphaAdj2 = 0;
+        mRedAdj2 = mGreenAdj2 = mBlueAdj2 = mAlphaAdj2 = 0;
         mType = "ColourFader2";
-		StateChangeVal = 1;	// Switch when there is 1 second left on the TTL
+        StateChangeVal = 1; // Switch when there is 1 second left on the TTL
 
         // Init parameters
         if (createParamDictionary("ColourFaderAffector2"))
         {
             ParamDictionary* dict = getParamDictionary();
 
-			// Phase 1
+            // Phase 1
             dict->addParameter(ParameterDef("red1", 
                 "The amount by which to adjust the red component of particles per second.",
                 PT_REAL), &msRedCmd1);
@@ -76,7 +76,7 @@ namespace Ogre {
                 "The amount by which to adjust the alpha component of particles per second.",
                 PT_REAL), &msAlphaCmd1);
 
-			// Phase 2
+            // Phase 2
             dict->addParameter(ParameterDef("red2", 
                 "The amount by which to adjust the red component of particles per second.",
                 PT_REAL), &msRedCmd2);
@@ -90,7 +90,7 @@ namespace Ogre {
                 "The amount by which to adjust the alpha component of particles per second.",
                 PT_REAL), &msAlphaCmd2);
 
-			// State Change Value
+            // State Change Value
             dict->addParameter(ParameterDef("state_change", 
                 "When the particle has this much time to live left, it will switch to state 2.",
                 PT_REAL), &msStateCmd);
@@ -103,38 +103,38 @@ namespace Ogre {
         ParticleIterator pi = pSystem->_getIterator();
         Particle *p;
         float dr1, dg1, db1, da1;
-		float dr2, dg2, db2, da2;
+        float dr2, dg2, db2, da2;
 
-		// Scale adjustments by time
-		dr1 = mRedAdj1   * timeElapsed;
-		dg1 = mGreenAdj1 * timeElapsed;
-		db1 = mBlueAdj1  * timeElapsed;
-		da1 = mAlphaAdj1 * timeElapsed;
+        // Scale adjustments by time
+        dr1 = mRedAdj1   * timeElapsed;
+        dg1 = mGreenAdj1 * timeElapsed;
+        db1 = mBlueAdj1  * timeElapsed;
+        da1 = mAlphaAdj1 * timeElapsed;
 
-		// Scale adjustments by time
-		dr2 = mRedAdj2   * timeElapsed;
-		dg2 = mGreenAdj2 * timeElapsed;
-		db2 = mBlueAdj2  * timeElapsed;
-		da2 = mAlphaAdj2 * timeElapsed;
+        // Scale adjustments by time
+        dr2 = mRedAdj2   * timeElapsed;
+        dg2 = mGreenAdj2 * timeElapsed;
+        db2 = mBlueAdj2  * timeElapsed;
+        da2 = mAlphaAdj2 * timeElapsed;
 
         while (!pi.end())
         {
-			p = pi.getNext();
+            p = pi.getNext();
 
-			if( p->timeToLive > StateChangeVal )
-			{
-				applyAdjustWithClamp(&p->colour.r, dr1);
-				applyAdjustWithClamp(&p->colour.g, dg1);
-				applyAdjustWithClamp(&p->colour.b, db1);
-				applyAdjustWithClamp(&p->colour.a, da1);
-			}
-			else
-			{
-				applyAdjustWithClamp(&p->colour.r, dr2);
-				applyAdjustWithClamp(&p->colour.g, dg2);
-				applyAdjustWithClamp(&p->colour.b, db2);
-				applyAdjustWithClamp(&p->colour.a, da2);
-			}
+            if( p->mTimeToLive > StateChangeVal )
+            {
+                applyAdjustWithClamp(&p->mColour.r, dr1);
+                applyAdjustWithClamp(&p->mColour.g, dg1);
+                applyAdjustWithClamp(&p->mColour.b, db1);
+                applyAdjustWithClamp(&p->mColour.a, da1);
+            }
+            else
+            {
+                applyAdjustWithClamp(&p->mColour.r, dr2);
+                applyAdjustWithClamp(&p->mColour.g, dg2);
+                applyAdjustWithClamp(&p->mColour.b, db2);
+                applyAdjustWithClamp(&p->mColour.a, da2);
+            }
         }
 
     }
@@ -146,7 +146,7 @@ namespace Ogre {
         mBlueAdj1 = blue;
         mAlphaAdj1 = alpha;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     void ColourFaderAffector2::setAdjust2(float red, float green, float blue, float alpha)
     {
         mRedAdj2 = red;

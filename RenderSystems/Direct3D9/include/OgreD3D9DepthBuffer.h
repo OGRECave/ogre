@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,27 +33,27 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class D3D9DepthBuffer : public DepthBuffer
-	{
-	public:
-		D3D9DepthBuffer( uint16 poolId, D3D9RenderSystem *renderSystem, IDirect3DDevice9 *creator,
-						 IDirect3DSurface9 *depthBufferSurf,
-						 D3DFORMAT fmt, uint32 width, uint32 height,
-						 uint32 fsaa, uint32 multiSampleQuality, bool isManual );
-		~D3D9DepthBuffer();
+    class D3D9DepthBuffer : public DepthBuffer
+    {
+    public:
+        D3D9DepthBuffer( uint16 poolId, D3D9RenderSystem *renderSystem, IDirect3DDevice9 *creator,
+                         IDirect3DSurface9 *depthBufferSurf,
+                         D3DFORMAT fmt, uint32 width, uint32 height,
+                         uint32 fsaa, uint32 multiSampleQuality, bool isManual );
+        ~D3D9DepthBuffer();
 
-		/// @copydoc DepthBuffer::isCompatible
-		virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        /// @copydoc DepthBuffer::isCompatible
+        virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
-		IDirect3DDevice9* getDeviceCreator() const;
-		IDirect3DSurface9* getDepthBufferSurface() const;
+        IDirect3DDevice9* getDeviceCreator() const;
+        IDirect3DSurface9* getDepthBufferSurface() const;
 
-	protected:
-		IDirect3DSurface9			*mDepthBuffer;
-		IDirect3DDevice9			*mCreator;
-		uint32						mMultiSampleQuality;
-		D3DFORMAT					mD3DFormat;
-		D3D9RenderSystem			*mRenderSystem;
-	};
+    protected:
+        IDirect3DSurface9           *mDepthBuffer;
+        IDirect3DDevice9            *mCreator;
+        uint32                      mMultiSampleQuality;
+        D3DFORMAT                   mD3DFormat;
+        D3D9RenderSystem            *mRenderSystem;
+    };
 }
 #endif

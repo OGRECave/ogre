@@ -52,7 +52,7 @@ namespace Ogre
         
         /// Clear out the cache
         void clearCache();
-		
+        
         /** Update a uniform
          @return A boolean value indicating whether this uniform needs to be updated in the GL.
          */

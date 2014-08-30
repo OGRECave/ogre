@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,13 +36,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
-	/** Abstract class defining the interface to be implemented by creators of ParticleEmitter subclasses.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
+    /** Abstract class defining the interface to be implemented by creators of ParticleEmitter subclasses.
     @remarks
         Plugins or 3rd party applications can add new types of particle emitters to Ogre by creating
         subclasses of the ParticleEmitter class. Because multiple instances of these emitters may be
@@ -53,7 +53,7 @@ namespace Ogre {
         a name which identifies them, examples might be 'point', 'cone', or 'box', and these can be 
         also be used from particle system scripts.
     */
-	class _OgreExport ParticleEmitterFactory : public FXAlloc
+    class _OgreExport ParticleEmitterFactory : public FXAlloc
     {
     protected:
         vector<ParticleEmitter*>::type mEmitters;
@@ -75,8 +75,8 @@ namespace Ogre {
 
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

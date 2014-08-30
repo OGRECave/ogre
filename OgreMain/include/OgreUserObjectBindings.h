@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,108 +34,108 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
 
-	/** Class that provides convenient interface to establish a linkage between
-	custom user application objects and Ogre core classes.
-	Any instance of Ogre class that will derive from this class could be associated with custom 
-	application object using this class interface.
-	*/
-	class _OgreExport UserObjectBindings : public GeneralAllocatedObject
-	{
-	public:	
-		/** Class constructor. */
-		UserObjectBindings();
+    /** Class that provides convenient interface to establish a linkage between
+    custom user application objects and Ogre core classes.
+    Any instance of Ogre class that will derive from this class could be associated with custom 
+    application object using this class interface.
+    */
+    class _OgreExport UserObjectBindings : public GeneralAllocatedObject
+    {
+    public: 
+        /** Class constructor. */
+        UserObjectBindings();
 
-		/** Class destructor. */
-		virtual ~UserObjectBindings();
+        /** Class destructor. */
+        virtual ~UserObjectBindings();
 
-		/** Sets any kind of user object on this class instance.
-		@remarks
-		This method allows you to associate any user object you like with 
-		this class. This can be a pointer back to one of your own
-		classes for instance.
-		@note This method is key less meaning that each call for it will override
-		previous object that were set. If you need to associate multiple objects
-		with this class use the extended version that takes key.
-		*/
-		void setUserAny(const Any& anything);
+        /** Sets any kind of user object on this class instance.
+        @remarks
+        This method allows you to associate any user object you like with 
+        this class. This can be a pointer back to one of your own
+        classes for instance.
+        @note This method is key less meaning that each call for it will override
+        previous object that were set. If you need to associate multiple objects
+        with this class use the extended version that takes key.
+        */
+        void setUserAny(const Any& anything);
 
-		/** Retrieves the custom key less user object associated with this class.
-		*/
-		const Any& getUserAny(void) const;
+        /** Retrieves the custom key less user object associated with this class.
+        */
+        const Any& getUserAny(void) const;
 
-		/** Sets any kind of user object on this class instance.
-		@remarks
-		This method allows you to associate multiple object with this class. 
-		This can be a pointer back to one of your own classes for instance.
-		Use a unique key to distinguish between each of these objects. 
-		@param key The key that this data is associate with.
-		@param anything The data to associate with the given key.
-		*/
-		void setUserAny(const String& key, const Any& anything);
+        /** Sets any kind of user object on this class instance.
+        @remarks
+        This method allows you to associate multiple object with this class. 
+        This can be a pointer back to one of your own classes for instance.
+        Use a unique key to distinguish between each of these objects. 
+        @param key The key that this data is associate with.
+        @param anything The data to associate with the given key.
+        */
+        void setUserAny(const String& key, const Any& anything);
 
-		/** Retrieves the custom user object associated with this class and key.
-		@param key The key that the requested user object is associated with.
-		@remarks
-		In case no object associated with this key the returned Any object will be empty.
-		*/
-		const Any& getUserAny(const String& key) const;
+        /** Retrieves the custom user object associated with this class and key.
+        @param key The key that the requested user object is associated with.
+        @remarks
+        In case no object associated with this key the returned Any object will be empty.
+        */
+        const Any& getUserAny(const String& key) const;
 
-		/** Erase the custom user object associated with this class and key from this binding.
-		@param key The key that the requested user object is associated with.		
-		*/
-		void eraseUserAny(const String& key);
+        /** Erase the custom user object associated with this class and key from this binding.
+        @param key The key that the requested user object is associated with.       
+        */
+        void eraseUserAny(const String& key);
 
-		/** Clear all user objects from this binding.	*/
-		void clear() const;
+        /** Clear all user objects from this binding.   */
+        void clear() const;
 
-		/** Returns empty user any object.
-		*/
-		static const Any& getEmptyUserAny() { return msEmptyAny; }
+        /** Returns empty user any object.
+        */
+        static const Any& getEmptyUserAny() { return msEmptyAny; }
 
-	// Types.
-	protected:		
-		typedef map<String, Any>::type			UserObjectsMap;
-		typedef UserObjectsMap::iterator		UserObjectsMapIterator;
-		typedef UserObjectsMap::const_iterator	UserObjectsMapConstIterator;
+    // Types.
+    protected:      
+        typedef map<String, Any>::type          UserObjectsMap;
+        typedef UserObjectsMap::iterator        UserObjectsMapIterator;
+        typedef UserObjectsMap::const_iterator  UserObjectsMapConstIterator;
 
-		/** Internal class that uses as data storage container.
-		*/
-		class Attributes : public GeneralAllocatedObject
-		{
-		public:
-			/** Attribute storage ctor. */
-			Attributes() : mUserObjectsMap(NULL) {}
+        /** Internal class that uses as data storage container.
+        */
+        class Attributes : public GeneralAllocatedObject
+        {
+        public:
+            /** Attribute storage ctor. */
+            Attributes() : mUserObjectsMap(NULL) {}
 
-			/** Attribute storage dtor. */
-			~Attributes()
-			{
-				if (mUserObjectsMap != NULL)
-				{
-					OGRE_DELETE mUserObjectsMap;
-					mUserObjectsMap = NULL;
-				}				
-			}
+            /** Attribute storage dtor. */
+            ~Attributes()
+            {
+                if (mUserObjectsMap != NULL)
+                {
+                    OGRE_DELETE mUserObjectsMap;
+                    mUserObjectsMap = NULL;
+                }               
+            }
 
-			Any					mKeylessAny;		// Will hold key less associated user object for fast access. 	
-			UserObjectsMap*		mUserObjectsMap;	// Will hold a map between user keys to user objects.
-		};
+            Any                 mKeylessAny;        // Will hold key less associated user object for fast access.   
+            UserObjectsMap*     mUserObjectsMap;    // Will hold a map between user keys to user objects.
+        };
 
-	// Attributes.
-	private:
-		static Any				msEmptyAny;			// Shared empty any object.
-		mutable Attributes*		mAttributes;		// Class attributes - will be allocated on demand.
-		
-	};
+    // Attributes.
+    private:
+        static Any              msEmptyAny;         // Shared empty any object.
+        mutable Attributes*     mAttributes;        // Class attributes - will be allocated on demand.
+        
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

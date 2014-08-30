@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -28,87 +28,86 @@
 #ifndef __InputContext_H__
 #define __InputContext_H__
 
-#include "Ogre.h"
 #include "OIS.h"
 
-#if OIS_VERSION >= 0x010300		//  OIS_VERSION >= 1.3.0
-#define OIS_WITH_MULTITOUCH		1
-#else							//  OIS_VERSION == 1.2.0
-#define OIS_WITH_MULTITOUCH		0
+#if OIS_VERSION >= 0x010300     //  OIS_VERSION >= 1.3.0
+#define OIS_WITH_MULTITOUCH     1
+#else                           //  OIS_VERSION == 1.2.0
+#define OIS_WITH_MULTITOUCH     0
 #endif
 
 namespace OgreBites
 {
-	/*=============================================================================
-	| Utility structure for passing OIS devices. Does not own them.
-	=============================================================================*/
-	struct InputContext
-	{
-		InputContext()
-		{
-			mKeyboard = 0;
-			mMouse = 0;
+    /*=============================================================================
+    | Utility structure for passing OIS devices. Does not own them.
+    =============================================================================*/
+    struct InputContext
+    {
+        InputContext()
+        {
+            mKeyboard = 0;
+            mMouse = 0;
 #if OIS_WITH_MULTITOUCH
-			mMultiTouch = 0;
+            mMultiTouch = 0;
 #endif
-			mAccelerometer = 0;
-		}
+            mAccelerometer = 0;
+        }
 
-		void capture() const
-		{
-			if(mKeyboard)
-				mKeyboard->capture();
-			if(mMouse)
-				mMouse->capture();
+        void capture() const
+        {
+            if(mKeyboard)
+                mKeyboard->capture();
+            if(mMouse)
+                mMouse->capture();
 #if OIS_WITH_MULTITOUCH
-			if(mMultiTouch)
-				mMultiTouch->capture();
+            if(mMultiTouch)
+                mMultiTouch->capture();
 #endif
-			if(mAccelerometer)
-	            mAccelerometer->capture();
-		}
+            if(mAccelerometer)
+                mAccelerometer->capture();
+        }
 
-		bool isKeyDown(OIS::KeyCode key) const
-		{
-			return mKeyboard && mKeyboard->isKeyDown(key);
-		}
+        bool isKeyDown(OIS::KeyCode key) const
+        {
+            return mKeyboard && mKeyboard->isKeyDown(key);
+        }
 
-		bool getCursorPosition(Ogre::Real& x, Ogre::Real& y) const
-		{
-			// prefer mouse
-			if(mMouse)
-			{
-				x = (Ogre::Real)mMouse->getMouseState().X.abs;
-				y = (Ogre::Real)mMouse->getMouseState().Y.abs;
-				return true;
-			}
-			
+        bool getCursorPosition(Ogre::Real& x, Ogre::Real& y) const
+        {
+            // prefer mouse
+            if(mMouse)
+            {
+                x = (Ogre::Real)mMouse->getMouseState().X.abs;
+                y = (Ogre::Real)mMouse->getMouseState().Y.abs;
+                return true;
+            }
+            
 #if OIS_WITH_MULTITOUCH
-			// than touch device
-			if(mMultiTouch)
-			{
-	            std::vector<OIS::MultiTouchState> states = mMultiTouch->getMultiTouchStates();
-		        if(states.size() > 0)
-		        {
-		        	x = (Ogre::Real)states[0].X.abs;
-		        	y = (Ogre::Real)states[0].Y.abs;
-		        	return true;
-			    }
-			}
+            // than touch device
+            if(mMultiTouch)
+            {
+                std::vector<OIS::MultiTouchState> states = mMultiTouch->getMultiTouchStates();
+                if(states.size() > 0)
+                {
+                    x = (Ogre::Real)states[0].X.abs;
+                    y = (Ogre::Real)states[0].Y.abs;
+                    return true;
+                }
+            }
 #endif
 
-			// fallback
-			x = y = 0.0;
-			return false;
-		}
+            // fallback
+            x = y = 0.0;
+            return false;
+        }
 
-		OIS::Keyboard* mKeyboard;         // context keyboard device
-		OIS::Mouse* mMouse;               // context mouse device
+        OIS::Keyboard* mKeyboard;         // context keyboard device
+        OIS::Mouse* mMouse;               // context mouse device
 #if OIS_WITH_MULTITOUCH
-		OIS::MultiTouch* mMultiTouch;     // context multitouch device
+        OIS::MultiTouch* mMultiTouch;     // context multitouch device
 #endif
-		OIS::JoyStick* mAccelerometer;    // context accelerometer device
-	};
+        OIS::JoyStick* mAccelerometer;    // context accelerometer device
+    };
 }
 
 #endif

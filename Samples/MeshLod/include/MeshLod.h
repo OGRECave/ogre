@@ -1,206 +1,85 @@
 #ifndef __MeshLod_H__
 #define __MeshLod_H__
 
+#include "SamplePlugin.h"
 #include "SdkSample.h"
-
 #include "OgreLodConfig.h"
-#include "OgreDistanceLodStrategy.h"
-#include "OgrePixelCountLodStrategy.h"
+#include "OgreMeshLodGenerator.h"
+#include "OgreLodWorkQueueInjectorListener.h"
 
-#include "OgreQueuedProgressiveMeshGenerator.h"
-#include "OgreProgressiveMeshGenerator.h"
-
-using namespace Ogre;
-using namespace OgreBites;
+// To reduce checkboxes some developer features can be enabled with macros.
+#define SHOW_MESH_HULL 0
+#define ENABLE_THREADING 1
 
 class _OgreSampleClassExport Sample_MeshLod :
-	public SdkSample
+    public OgreBites::SdkSample,
+    public Ogre::LodWorkQueueInjectorListener
 {
 public:
-
-	Sample_MeshLod() :
-		mHeadEntity(0), mUserReductionValue(0.5)
-	{
-		mInfo["Title"] = "Mesh Lod";
-		mInfo["Description"] = "Shows how to add Lod levels to a mesh using the ProgressiveMesh class.";
-		mInfo["Thumbnail"] = "thumb_meshlod.png";
-		mInfo["Category"] = "Unsorted";
-	}
+    Sample_MeshLod();
 protected:
 
-	void setupContent()
-	{
+// Events:
+    void setupContent();
+    void cleanupContent();
+    void setupControls(int uimode = 0);
+    void cleanupControls();
+    bool frameStarted(const Ogre::FrameEvent& evt);
 
-		mCameraMan->setStyle(CS_ORBIT);
+// GUI input events:
+    void buttonHit(OgreBites::Button* button);
+    void sliderMoved(OgreBites::Slider* slider);
+    void itemSelected(OgreBites::SelectMenu* menu);
+    void checkBoxToggled(OgreBites::CheckBox * box);
 
-        mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));  // set ambient light
+// Queued Lod injector events:
+    bool shouldInject(Ogre::LodWorkQueueRequest* request);
+    void injectionCompleted(Ogre::LodWorkQueueRequest* request);
 
-        // make the scene's main light come from above
-        Light* l = mSceneMgr->createLight();
-        l->setType(Light::LT_DIRECTIONAL);
-        l->setDirection(Vector3::NEGATIVE_UNIT_Y);
+// Other functions:
+    void changeSelectedMesh(const Ogre::String& name); // Changes current mesh to a mesh with given mesh name.
+    bool loadConfig(); /// Loads the LodConfig with LodConfigSerializer for current mesh.
+    void saveConfig(); /// Saves the LodConfig with LodConfigSerializer for current mesh.
+    void loadUserLod(bool useWorkLod = true); /// Loads current Lod config. If useWorkLod is selected only current work Lod level will be shown.
+    void forceLodLevel(int lodLevelID, bool forceDelayed = true); /// Forces given Lod Level or -1 for disable forcing.
 
-		// create a node for the model
-		mHeadNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    void loadAutomaticLod(); /// Produces acceptable output on any kind of mesh.
 
-		// setup gui
-		setupControls();
+    size_t getUniqueVertexCount(Ogre::MeshPtr mesh); /// Returns the unique vertex count of mesh.
+    bool getResourceFullPath(Ogre::MeshPtr& mesh, Ogre::String& outPath); /// Sets outPath to full resource file path. Returns true if location is writable.
+    
+    void addLodLevel(); /// Adds current work Lod level to the mesh Lod levels.
+    void loadLodLevel(int id); /// Loads the Lod levels with id to the work Lod level.
+    void removeLodLevel(); /// Removes currently selected Lod level.
 
-		// load mesh
-		changeSelectedMesh("sinbad.mesh");
-	}
+    void addToProfile(Ogre::Real cost); /// Add the currently reduced last vertex to the profile with given cost.
 
-	void setupControls()
-	{
-		
-		SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "ObjectType", "Object:", 200, 4);
-		objectType->addItem("sinbad.mesh");
-		objectType->addItem("ogrehead.mesh");
-		objectType->addItem("knot.mesh");
-		objectType->addItem("fish.mesh");
-		objectType->addItem("penguin.mesh");
-		objectType->addItem("ninja.mesh");
-		objectType->addItem("dragon.mesh");
-		objectType->addItem("athene.mesh");
-		objectType->addItem("sibenik.mesh");
+    void moveCameraToPixelDistance(Ogre::Real pixels); /// Moves camera to the swapping distance of PixelCountLodStrategy with given pixels.
+    Ogre::Real getCameraDistance(); /// Returns the distance between camera and mesh in pixels.
+    void recreateEntity();
 
-		/*
-		// Add all meshes from popular:
-		Ogre::StringVectorPtr meshes = Ogre::ResourceGroupManager::getSingleton().findResourceNames("Popular", "*.mesh");
-		for(auto& meshName : *meshes){
-			objectType->addItem(meshName);
-		}
-		*/
 
-		mWireframe = mTrayMgr->createCheckBox(TL_TOPLEFT, "wireframe", "Show wireframe");
-		mAutoconfig = mTrayMgr->createCheckBox(TL_TOPLEFT, "autoconfig", "Autoconfigure");
-		mThreaded = mTrayMgr->createCheckBox(TL_TOPLEFT, "threaded", "Background thread");
-		mThreaded->setChecked(true, false);
-		OgreBites::Slider* slider = mTrayMgr->createThickSlider(TL_TOPLEFT, "ReductionSlider", "Percentage", 200, 50, 0, 100, 101);
-		slider->setValue(50, false); // 50%
-		mUserReductionValue = 0.5; // 50%
+// Variables:
+    int mForcedLodLevel; /// Currently forced Lod level or -1 for disabled.
+    Ogre::LodLevel mWorkLevel; /// Current Lod Level, which we are seeing.
+    Ogre::LodConfig mLodConfig; /// Current LodConfig, which we are editing.
+    Ogre::Entity* mMeshEntity; /// Entity of the mesh.
+    Ogre::SceneNode* mMeshNode; /// Node of the mesh.
+#if SHOW_MESH_HULL
+    Ogre::Entity* mHullEntity; /// Entity of the mesh hull.
+    Ogre::SceneNode* mHullNode; /// Node of the mesh hull.
+#endif
 
-		mTrayMgr->showCursor();
-	}
-
-	void changeSelectedMesh(const Ogre::String& name)
-	{	
-		if(mHeadEntity){
-			mSceneMgr->destroyEntity(mHeadEntity);
-			mHeadEntity = 0;
-		}
-		mHeadMesh = Ogre::MeshManager::getSingleton().load(name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		mHeadEntity = mSceneMgr->createEntity(name, mHeadMesh);
-		mHeadNode->attachObject(mHeadEntity);
-		mCamera->setPosition(Ogre::Vector3(0, 0, 0));
-		mCamera->moveRelative(Ogre::Vector3(0, 0, mHeadMesh->getBoundingSphereRadius() * 2));
-		mCamera->setNearClipDistance(mHeadMesh->getBoundingSphereRadius() / 16);
-		mCamera->setFarClipDistance(mHeadMesh->getBoundingSphereRadius() * 256);
-
-		updateLod();
-	}
-	void cleanupContent()
-	{
-		if(mHeadEntity){
-			mSceneMgr->destroyEntity(mHeadEntity);
-			mHeadEntity = 0;
-		}
-	}
-	
-	void sliderMoved(Slider* slider)
-	{
-		if (slider->getName() == "ReductionSlider") {
-			mUserReductionValue = slider->getValue() / 100.0f;
-			mAutoconfig->setChecked(false, false);
-			updateLod();
-		}
-	}
-
-	void itemSelected(SelectMenu* menu)
-	{
-		if (menu->getName() == "ObjectType") {
-			changeSelectedMesh(menu->getSelectedItem());
-		}
-	}
-	void checkBoxToggled(OgreBites::CheckBox * box)
-	{
-		updateLod();
-	}
-
-	void updateLod()
-	{
-		if (mAutoconfig->isChecked()) {
-			loadAutomaticLod(mHeadMesh);
-			forceLodLevel(-1); // disable
-		} else {
-			loadUserLod(mHeadMesh, mUserReductionValue);
-			if(mHeadMesh->getNumLodLevels() > 1){
-				forceLodLevel(1); // Force Lod1
-			} else { // We don't have any Lod levels.
-				forceLodLevel(-1); // disable
-			}
-		}
-		if (mWireframe->isChecked()) {
-			mCameraMan->getCamera()->setPolygonMode(PM_WIREFRAME);
-		} else {
-			mCameraMan->getCamera()->setPolygonMode(PM_SOLID);
-		}
-	}
-	void forceLodLevel(int index){
-		if(index == -1) {
-			// Clear forced Lod level
-			mHeadEntity->setMeshLodBias(1.0, 0, std::numeric_limits<unsigned short>::max());
-		} else {
-			mHeadEntity->setMeshLodBias(1.0, index, index);
-		}
-	}
-	
-	void loadUserLod(Ogre::MeshPtr& mesh, Real reductionValue)
-	{
-		Ogre::LodConfig lodConfig;
-		lodConfig.levels.clear();
-		lodConfig.mesh = mesh;
-		lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
-		LodLevel lodLevel;
-		lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
-		lodLevel.distance = 1;
-		lodLevel.reductionValue = reductionValue;
-		lodConfig.levels.push_back(lodLevel);
-		if(mThreaded->isChecked()){
-			clearLodQueue();
-			QueuedProgressiveMeshGenerator pm;
-			pm.generateLodLevels(lodConfig);
-		} else {
-			ProgressiveMeshGenerator pm;
-			pm.generateLodLevels(lodConfig);
-		}
-	}
-
-	// This produces acceptable output on any kind of mesh.
-	void loadAutomaticLod(Ogre::MeshPtr& mesh)
-	{
-		if(mThreaded->isChecked()){
-			clearLodQueue();
-			QueuedProgressiveMeshGenerator pm;
-			pm.generateAutoconfiguredLodLevels(mesh);
-		} else {
-			ProgressiveMeshGenerator pm;
-			pm.generateAutoconfiguredLodLevels(mesh);
-		}
-	}
-
-	void clearLodQueue(){
-		// Remove outdated Lod requests to reduce delay.
-		PMWorker::getSingleton().clearPendingLodRequests();
-	}
-
-	MeshPtr mHeadMesh;
-	Entity* mHeadEntity;
-	SceneNode* mHeadNode;
-	Real mUserReductionValue;
-	OgreBites::CheckBox* mWireframe;
-	OgreBites::CheckBox* mAutoconfig;
-	OgreBites::CheckBox* mThreaded;
+// GUI elements:
+    OgreBites::CheckBox* mUseVertexNormals;
+    OgreBites::CheckBox* mWireframe;
+    OgreBites::SelectMenu* mProfileList;
+    OgreBites::SelectMenu* mLodLevelList;
+    OgreBites::SelectMenu* mManualMeshes;
+    OgreBites::Slider* mReductionSlider;
+    OgreBites::Slider* mOutsideWeightSlider;
+    OgreBites::Slider* mOutsideWalkAngle;
+    OgreBites::Label* mDistanceLabel;
 };
 
 #endif

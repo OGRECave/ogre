@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Copyright (c) 2006 Matthias Fink, netAllied GmbH <matthias.fink@web.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,11 +34,9 @@ THE SOFTWARE.
 #include "OgrePolygon.h"
 #include "OgreConvexBody.h"
 #include "OgreHeaderPrefix.h"
-
+#include "OgreAxisAlignedBox.h"
 
 namespace Ogre {
-
-    class ConvexBody;
 
     /** \addtogroup Core
     *  @{
@@ -117,7 +115,7 @@ namespace Ogre {
 
             /** Returns the bounding box representation.
             */
-            const AxisAlignedBox& getAAB(void) const;	
+            const AxisAlignedBox& getAAB(void) const;   
 
             /** Adds a specific point to the body list.
             */

@@ -34,39 +34,39 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/// Specialisation of HardwareBuffer for D3D11
-	class D3D11HardwareUniformBuffer : public HardwareUniformBuffer 
-	{
-	protected:
-		D3D11HardwareBuffer* mBufferImpl;
-		// have to implement these, but do nothing as overridden lock/unlock
-		void* lockImpl(size_t offset, size_t length, LockOptions options) {return 0;}
-		void unlockImpl(void) {}
+    /// Specialisation of HardwareBuffer for D3D11
+    class D3D11HardwareUniformBuffer : public HardwareUniformBuffer 
+    {
+    protected:
+        D3D11HardwareBuffer* mBufferImpl;
+        // have to implement these, but do nothing as overridden lock/unlock
+        void* lockImpl(size_t offset, size_t length, LockOptions options) {return 0;}
+        void unlockImpl(void) {}
 
-	public:
-		D3D11HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, 
-									bool useShadowBuffer, const String& name, D3D11Device & device);
-		~D3D11HardwareUniformBuffer();
+    public:
+        D3D11HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, 
+                                    bool useShadowBuffer, const String& name, D3D11Device & device);
+        ~D3D11HardwareUniformBuffer();
 
-		// override all data-gathering methods
-		void* lock(size_t offset, size_t length, LockOptions options);
-		void unlock(void);
-		void readData(size_t offset, size_t length, void* pDest);
-		void writeData(size_t offset, size_t length, const void* pSource,
-			bool discardWholeBuffer = false);
+        // override all data-gathering methods
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
+        void unlock(void);
+        void readData(size_t offset, size_t length, void* pDest);
+        void writeData(size_t offset, size_t length, const void* pSource,
+            bool discardWholeBuffer = false);
 
-		void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
-			size_t dstOffset, size_t length, bool discardWholeBuffer = false);
-		bool isLocked(void) const;
+        void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
+            size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+        bool isLocked(void) const;
 
-		/// For dealing with lost devices - release the resource if in the default pool
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool
-		bool recreateIfDefaultPool(D3D11Device & device);
+        /// For dealing with lost devices - release the resource if in the default pool
+        bool releaseIfDefaultPool(void);
+        /// For dealing with lost devices - recreate the resource if in the default pool
+        bool recreateIfDefaultPool(D3D11Device & device);
 
-		/// Get the D3D-specific vertex buffer
-		ID3D11Buffer * getD3DConstantBuffer(void) const;
-	};
+        /// Get the D3D-specific vertex buffer
+        ID3D11Buffer * getD3DConstantBuffer(void) const;
+    };
 
 }
 #endif

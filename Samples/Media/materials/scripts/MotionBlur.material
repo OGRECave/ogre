@@ -36,7 +36,7 @@ fragment_program Ogre/Compositor/Combine_GLSL_fp glsl
 fragment_program Ogre/Compositor/Combine_HLSL_fp hlsl
 {
 	source Combine_fp_ps40.hlsl
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 	entry_point Combine_fp_ps40
 
 	default_params
@@ -47,7 +47,7 @@ fragment_program Ogre/Compositor/Combine_HLSL_fp hlsl
 
 fragment_program Ogre/Compositor/Combine_fp unified
 {
-	//delegate Ogre/Compositor/Combine_GLSL_fp
+	delegate Ogre/Compositor/Combine_GLSL_fp
 	//delegate Ogre/Compositor/Combine_GLSLES_fp
 	delegate Ogre/Compositor/Combine_HLSL_fp
 	//delegate Ogre/Compositor/Combine_Cg_fp

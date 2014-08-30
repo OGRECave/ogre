@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -78,8 +78,8 @@ namespace Ogre {
         */
         void _notifyObjectMoved(const MovableObject* mov, 
             const Vector3& pos);
-		/** Internal method, makes sure an object is removed from the leaves when detached from a node. */
-		void _notifyObjectDetached(const MovableObject* mov);
+        /** Internal method, makes sure an object is removed from the leaves when detached from a node. */
+        void _notifyObjectDetached(const MovableObject* mov);
         /** Gets a pointer to the start of the leaf nodes. */
         BspNode* getLeafStart(void) {return &mRootNode[mLeafStart]; }
         /** Gets the number of leaf nodes */
@@ -90,15 +90,15 @@ namespace Ogre {
         /** Calculate the number of loading stages required for a given level */
         static size_t calculateLoadingStages(DataStreamPtr& stream);
 
-		/** Load direct from stream */
-		void load(DataStreamPtr& stream);
+        /** Load direct from stream */
+        void load(DataStreamPtr& stream);
 
-		/** Is sky enabled? */
-		bool isSkyEnabled(void) const;
-		/** Get Sky material name */
-		const String& getSkyMaterialName(void) const;
-		/** Get sky curvature */
-		Real getSkyCurvature(void) const;
+        /** Is sky enabled? */
+        bool isSkyEnabled(void) const;
+        /** Get Sky material name */
+        const String& getSkyMaterialName(void) const;
+        /** Get sky curvature */
+        Real getSkyCurvature(void) const;
 
         /** Utility class just to enable queueing of patches */
     protected:
@@ -117,7 +117,7 @@ namespace Ogre {
         BspNode* mRootNode;
         int mNumNodes;
         int mNumLeaves;
-		int mNumBrushes;
+        int mNumBrushes;
         int mLeafStart; /// The index at which leaf nodes begin
 
         /** Vertex format for fixed geometry.
@@ -158,7 +158,7 @@ namespace Ogre {
         BspNode::Brush *mBrushes;
 
         /** Vector of player start points */
-		vector<ViewPoint>::type mPlayerStarts;
+        vector<ViewPoint>::type mPlayerStarts;
 
         /** Internal utility function for loading data from Quake3. */
         void loadQuake3Level(const Quake3Level& q3lvl);
@@ -190,25 +190,25 @@ namespace Ogre {
         /** Internal method for parsing chosen entities. */
         void loadEntities(const Quake3Level& q3lvl);
 
-		typedef map<const MovableObject*, list<BspNode*>::type >::type MovableToNodeMap;
+        typedef map<const MovableObject*, list<BspNode*>::type >::type MovableToNodeMap;
         /// Map for locating the nodes a movable is currently a member of
         MovableToNodeMap mMovableToNodeMap;
 
         void tagNodesWithMovable(BspNode* node, const MovableObject* mov, const Vector3& pos);
 
         /// Storage of patches
-		typedef map<int, PatchSurface*>::type PatchMap;
+        typedef map<int, PatchSurface*>::type PatchMap;
         PatchMap mPatches;
         /// Total number of vertices required for all patches
         size_t mPatchVertexCount;
         /// Total number of indexes required for all patches
         size_t mPatchIndexCount;
-		/// Sky enabled?
-		bool mSkyEnabled;
-		/// Sky material
-		String mSkyMaterial;
-		/// Sky details
-		Real mSkyCurvature;
+        /// Sky enabled?
+        bool mSkyEnabled;
+        /// Sky material
+        String mSkyMaterial;
+        /// Sky details
+        Real mSkyCurvature;
 
 
         void initQuake3Patches(const Quake3Level & q3lvl, VertexDeclaration* decl);

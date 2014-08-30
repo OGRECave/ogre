@@ -16,7 +16,7 @@ VS10Reg::VS10Reg()
 {
     type = 0;
     index = 0;
-	sign = 0;
+    sign = 0;
     mask = 0;
 }
 
@@ -24,7 +24,7 @@ VS10Reg::VS10Reg(const VS10Reg &r)
 {
     type = r.type;
     index = r.index;
-	sign = r.sign;
+    sign = r.sign;
     mask = r.mask;
 }
 
@@ -34,7 +34,7 @@ VS10Reg& VS10Reg::operator=(const VS10Reg &r)
     {
         type = r.type;
         index = r.index;
-		sign = r.sign;
+        sign = r.sign;
         mask = r.mask;
     }
     return *this;
@@ -97,7 +97,7 @@ int VS10Reg::ValidateIndex()
         errors.set( "VS10Reg::ValidateIndex() Internal Error: unknown register type\n" );
         return 1;
     }
-	return 1;
+    return 1;
 }
 
 void VS10Reg::Translate()
@@ -253,8 +253,8 @@ VS10Inst::VS10Inst(int currline, int inst, char *cmt)
 VS10Inst::VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0)
 {
     line = currline;
-	instid = inst;
-	dst = dreg;
+    instid = inst;
+    dst = dreg;
     src[0] = src0;
     src[1].Init();
     src[2].Init();
@@ -264,8 +264,8 @@ VS10Inst::VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0)
 VS10Inst::VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0, VS10Reg src1)
 {
     line = currline;
-	instid = inst;
-	dst = dreg;
+    instid = inst;
+    dst = dreg;
     src[0] = src0;
     src[1] = src1;
     src[2].Init();
@@ -275,8 +275,8 @@ VS10Inst::VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0, VS10Reg s
 VS10Inst::VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0, VS10Reg src1, VS10Reg src2)
 {
     line = currline;
-	instid = inst;
-	dst = dreg;
+    instid = inst;
+    dst = dreg;
     src[0] = src0;
     src[1] = src1;
     src[2] = src2;

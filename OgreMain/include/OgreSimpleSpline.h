@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,20 +30,19 @@ THE SOFTWARE.
 #define __SimpleSpline_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreVector3.h"
 #include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** A very simple spline class which implements the Catmull-Rom class of splines.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** A very simple spline class which implements the Catmull-Rom class of splines.
     @remarks
         Splines are bendy lines. You define a series of points, and the spline forms
         a smoother line between the points to eliminate the sharp angles.
@@ -54,7 +53,7 @@ namespace Ogre {
         this by just asking you to define a series of points, and the tangents are 
         created for you. 
     */
-	class _OgreExport SimpleSpline
+    class _OgreExport SimpleSpline
     {
     public:
         SimpleSpline();
@@ -128,8 +127,8 @@ namespace Ogre {
 
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

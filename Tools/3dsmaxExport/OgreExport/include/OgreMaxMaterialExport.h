@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,32 +44,32 @@ class IGameMaterial;
 
 namespace OgreMax {
 
-	//typedef std::map< std::string, Mtl* > MaterialMap;
-	typedef std::map< std::string, IGameMaterial* > MaterialMap;
+    //typedef std::map< std::string, Mtl* > MaterialMap;
+    typedef std::map< std::string, IGameMaterial* > MaterialMap;
 
-	class MaterialExporter  : public OgreMaxExporter
-	{
+    class MaterialExporter  : public OgreMaxExporter
+    {
 
-	public:
-		MaterialExporter(const Config& config, MaterialMap& map);
-		virtual ~MaterialExporter();
+    public:
+        MaterialExporter(const Config& config, MaterialMap& map);
+        virtual ~MaterialExporter();
 
-		// take in a list of INode* for assembly into Ogre::Mesh form; returns
-		// a map of filename --> XML stringstream.
-		bool buildMaterial(std::string& output);
-		bool buildMaterial(IGameMaterial *mtl, const std::string& matName, std::string &of);
+        // take in a list of INode* for assembly into Ogre::Mesh form; returns
+        // a map of filename --> XML stringstream.
+        bool buildMaterial(std::string& output);
+        bool buildMaterial(IGameMaterial *mtl, const std::string& matName, std::string &of);
 
-	protected:
-		// material file stream functions
-		bool streamPass(std::ostream &of, IGameMaterial *mtl);
-		bool streamMaterial(std::ostream &of);
+    protected:
+        // material file stream functions
+        bool streamPass(std::ostream &of, IGameMaterial *mtl);
+        bool streamMaterial(std::ostream &of);
 
-		std::string removeSpaces(const std::string &s);
+        std::string removeSpaces(const std::string &s);
 
-	private:
+    private:
 
-		MaterialMap& m_materialMap;
-	};
+        MaterialMap& m_materialMap;
+    };
 }
 
 #endif

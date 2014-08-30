@@ -29,9 +29,9 @@
 #include <fstream>
 
 #ifdef MAC_PLUGIN
-	#include <ext/hash_map>
+    #include <ext/hash_map>
 #else
-	#include <hash_map>
+    #include <hash_map>
 #endif
 
 // Maya API

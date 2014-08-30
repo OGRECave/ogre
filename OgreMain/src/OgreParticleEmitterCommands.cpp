@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -95,18 +95,18 @@ namespace Ogre {
         {
             static_cast<ParticleEmitter*>(target)->setUp(StringConverter::parseVector3(val));
         }
-		//-----------------------------------------------------------------------
+        //-----------------------------------------------------------------------
         String CmdDirPositionRef::doGet(const void* target) const
         {
-			Vector4 val( static_cast<const ParticleEmitter*>(target)->getDirPositionReference() );
-			val.w = static_cast<const ParticleEmitter*>(target)->getDirPositionReferenceEnabled();
+            Vector4 val( static_cast<const ParticleEmitter*>(target)->getDirPositionReference() );
+            val.w = static_cast<const ParticleEmitter*>(target)->getDirPositionReferenceEnabled();
             return StringConverter::toString( val );
         }
         void CmdDirPositionRef::doSet(void* target, const String& val)
         {
-			const Vector4 parsed = StringConverter::parseVector4(val);
-			const Vector3 vPos( parsed.x, parsed.y, parsed.z );
-			static_cast<ParticleEmitter*>(target)->setDirPositionReference( vPos, parsed.w != 0 );
+            const Vector4 parsed = StringConverter::parseVector4(val);
+            const Vector3 vPos( parsed.x, parsed.y, parsed.z );
+            static_cast<ParticleEmitter*>(target)->setDirPositionReference( vPos, parsed.w != 0 );
         }
         //-----------------------------------------------------------------------
         String CmdEmissionRate::doGet(const void* target) const

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,8 +101,8 @@ namespace Ogre
         }
         
         // Switch context if different from current one
-		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-		rsys->_setViewport(this->getViewport(0));
+        RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+        rsys->_setViewport(this->getViewport(0));
 
         if(dst.getWidth() != dst.rowPitch)
         {
@@ -261,6 +261,33 @@ namespace Ogre
         CG_CHECK_ERROR(cgErr)
         
         // Get a pixel format that best matches what we are looking for
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        int attribsSize = 17;
+        if (mStereoEnabled)
+            attribsSize++;
+
+        CGLPixelFormatAttribute* attribs = (CGLPixelFormatAttribute*) malloc(attribsSize * sizeof(CGLPixelFormatAttribute));
+        attribs[0] = kCGLPFADoubleBuffer;
+        attribs[1] = kCGLPFAAlphaSize;
+        attribs[2] = (CGLPixelFormatAttribute)8;
+        attribs[3] = kCGLPFADepthSize;
+        attribs[4] = (CGLPixelFormatAttribute)reqDepth;
+        attribs[5] = kCGLPFAStencilSize;
+        attribs[6] = (CGLPixelFormatAttribute)8;
+        attribs[7] = kCGLPFASampleBuffers;
+        attribs[8] = (CGLPixelFormatAttribute)0;
+        attribs[9] = kCGLPFASamples;
+        attribs[10] = (CGLPixelFormatAttribute)0;
+        attribs[11] = kCGLPFAFullScreen;
+        attribs[12] = kCGLPFASingleRenderer;
+        attribs[13] = kCGLPFAAccelerated;
+        attribs[14] = kCGLPFADisplayMask;
+        attribs[15] = (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay);
+        if (mStereoEnabled)
+            attribs[16] = kCGLPFAStereo;
+
+        attribs[attribsSize - 1] = (CGLPixelFormatAttribute)0;
+#else
         CGLPixelFormatAttribute attribs[] = { 
             kCGLPFADoubleBuffer,
             kCGLPFAAlphaSize,     (CGLPixelFormatAttribute)8,
@@ -274,7 +301,8 @@ namespace Ogre
             kCGLPFADisplayMask,   (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay),
             (CGLPixelFormatAttribute)0
         };
-        
+#endif
+
         // Set up FSAA if it was requested
         if(fsaa > 1)
         {

@@ -1,5 +1,5 @@
 //-------------------------------
-//BrightBloom_ps20.hlsl
+//BrightBloom_ps40.hlsl
 // High-pass filter for obtaining lumminance
 // We use an aproximation formula that is pretty fast:
 //   f(x) = ( -3 * ( x - 1 )^2 + 1 ) * 2

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #include "OgreSerializer.h"
 #include "OgreLogManager.h"
-#include "OgreDataStream.h"
 #include "OgreException.h"
 #include "OgreVector3.h"
 #include "OgreQuaternion.h"
@@ -37,35 +36,36 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    /// stream overhead = ID + size
-    const size_t STREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
     const uint16 HEADER_STREAM_ID = 0x1000;
     const uint16 OTHER_ENDIAN_HEADER_STREAM_ID = 0x0010;
     //---------------------------------------------------------------------
-    Serializer::Serializer()
+    Serializer::Serializer() :
+        mVersion("[Serializer_v1.00]"), // Version number
+        mFlipEndian(false)
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        , mReportChunkErrors(true)
+#endif
     {
-        // Version number
-        mVersion = "[Serializer_v1.00]";
-		mFlipEndian = false;
     }
+
     //---------------------------------------------------------------------
     Serializer::~Serializer()
     {
     }
     //---------------------------------------------------------------------
-	void Serializer::determineEndianness(DataStreamPtr& stream)
-	{
-		if (stream->tell() != 0)
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Can only determine the endianness of the input stream if it "
-				"is at the start", "Serializer::determineEndianness");
-		}
-				
-		uint16 dest;
-		// read header id manually (no conversion)
+    void Serializer::determineEndianness(DataStreamPtr& stream)
+    {
+        if (stream->tell() != 0)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Can only determine the endianness of the input stream if it "
+                "is at the start", "Serializer::determineEndianness");
+        }
+                
+        uint16 dest;
+        // read header id manually (no conversion)
         size_t actually_read = stream->read(&dest, sizeof(uint16));
-		// skip back
+        // skip back
         stream->skip(0 - (long)actually_read);
         if (actually_read != sizeof(uint16))
         {
@@ -74,45 +74,45 @@ namespace Ogre {
                         "Couldn't read 16 bit header value from input stream.",
                         "Serializer::determineEndianness");
         }
-		if (dest == HEADER_STREAM_ID)
-		{
-			mFlipEndian = false;
-		}
-		else if (dest == OTHER_ENDIAN_HEADER_STREAM_ID)
-		{
-			mFlipEndian = true;
-		}
-		else
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Header chunk didn't match either endian: Corrupted stream?",
-				"Serializer::determineEndianness");
-		}
-	}
+        if (dest == HEADER_STREAM_ID)
+        {
+            mFlipEndian = false;
+        }
+        else if (dest == OTHER_ENDIAN_HEADER_STREAM_ID)
+        {
+            mFlipEndian = true;
+        }
+        else
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Header chunk didn't match either endian: Corrupted stream?",
+                "Serializer::determineEndianness");
+        }
+    }
     //---------------------------------------------------------------------
-	void Serializer::determineEndianness(Endian requestedEndian)
-	{
-		switch(requestedEndian)
-		{
-		case ENDIAN_NATIVE:
-			mFlipEndian = false;
-			break;
-		case ENDIAN_BIG:
+    void Serializer::determineEndianness(Endian requestedEndian)
+    {
+        switch(requestedEndian)
+        {
+        case ENDIAN_NATIVE:
+            mFlipEndian = false;
+            break;
+        case ENDIAN_BIG:
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-			mFlipEndian = false;
+            mFlipEndian = false;
 #else
-			mFlipEndian = true;
+            mFlipEndian = true;
 #endif
-			break;
-		case ENDIAN_LITTLE:
+            break;
+        case ENDIAN_LITTLE:
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-			mFlipEndian = true;
+            mFlipEndian = true;
 #else
-			mFlipEndian = false;
+            mFlipEndian = false;
 #endif
-			break;
-		}
-	}
+            break;
+        }
+    }
     //---------------------------------------------------------------------
     void Serializer::writeFileHeader(void)
     {
@@ -126,15 +126,25 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Serializer::writeChunkHeader(uint16 id, size_t size)
     {
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        if (!mChunkSizeStack.empty()){
+            size_t pos = mStream->tell();
+            if (pos != static_cast<size_t>(mChunkSizeStack.back()) && mReportChunkErrors){
+                LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: '" + mStream->getName()
+                    + "' Chunk id: " + StringConverter::toString(id));
+            }
+            mChunkSizeStack.back() = pos + size;
+        }
+#endif
         writeShorts(&id, 1);
-		uint32 uint32size = static_cast<uint32>(size);
+        uint32 uint32size = static_cast<uint32>(size);
         writeInts(&uint32size, 1);
     }
     //---------------------------------------------------------------------
     void Serializer::writeFloats(const float* const pFloat, size_t count)
     {
-		if (mFlipEndian)
-		{
+        if (mFlipEndian)
+        {
             float * pFloatToWrite = (float *)malloc(sizeof(float) * count);
             memcpy(pFloatToWrite, pFloat, sizeof(float) * count);
             
@@ -142,37 +152,37 @@ namespace Ogre {
             writeData(pFloatToWrite, sizeof(float), count);
             
             free(pFloatToWrite);
-		}
-		else
-		{
+        }
+        else
+        {
             writeData(pFloat, sizeof(float), count);
-		}
+        }
     }
     //---------------------------------------------------------------------
     void Serializer::writeFloats(const double* const pDouble, size_t count)
     {
-		// Convert to float, then write
-		float* tmp = OGRE_ALLOC_T(float, count, MEMCATEGORY_GENERAL);
-		for (unsigned int i = 0; i < count; ++i)
-		{
-			tmp[i] = static_cast<float>(pDouble[i]);
-		}
-		if(mFlipEndian)
-		{
+        // Convert to float, then write
+        float* tmp = OGRE_ALLOC_T(float, count, MEMCATEGORY_GENERAL);
+        for (unsigned int i = 0; i < count; ++i)
+        {
+            tmp[i] = static_cast<float>(pDouble[i]);
+        }
+        if(mFlipEndian)
+        {
             flipToLittleEndian(tmp, sizeof(float), count);
             writeData(tmp, sizeof(float), count);
-		}
-		else
-		{
+        }
+        else
+        {
             writeData(tmp, sizeof(float), count);
-		}
-		OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
+        }
+        OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
     }
     //---------------------------------------------------------------------
     void Serializer::writeShorts(const uint16* const pShort, size_t count = 1)
     {
-		if(mFlipEndian)
-		{
+        if(mFlipEndian)
+        {
             unsigned short * pShortToWrite = (unsigned short *)malloc(sizeof(unsigned short) * count);
             memcpy(pShortToWrite, pShort, sizeof(unsigned short) * count);
             
@@ -180,29 +190,29 @@ namespace Ogre {
             writeData(pShortToWrite, sizeof(unsigned short), count);
             
             free(pShortToWrite);
-		}
-		else
-		{
+        }
+        else
+        {
             writeData(pShort, sizeof(unsigned short), count);
-		}
+        }
     }
     //---------------------------------------------------------------------
     void Serializer::writeInts(const uint32* const pInt, size_t count = 1)
     {
-		if(mFlipEndian)
-		{
-            unsigned int * pIntToWrite = (unsigned int *)malloc(sizeof(unsigned int) * count);
-            memcpy(pIntToWrite, pInt, sizeof(unsigned int) * count);
+        if(mFlipEndian)
+        {
+            uint32 * pIntToWrite = (uint32 *)malloc(sizeof(uint32) * count);
+            memcpy(pIntToWrite, pInt, sizeof(uint32) * count);
             
-            flipToLittleEndian(pIntToWrite, sizeof(unsigned int), count);
-            writeData(pIntToWrite, sizeof(unsigned int), count);
+            flipToLittleEndian(pIntToWrite, sizeof(uint32), count);
+            writeData(pIntToWrite, sizeof(uint32), count);
             
             free(pIntToWrite);
-		}
-		else
-		{
-            writeData(pInt, sizeof(unsigned int), count);
-		}
+        }
+        else
+        {
+            writeData(pInt, sizeof(uint32), count);
+        }
     }
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -210,7 +220,7 @@ namespace Ogre {
     {
     //no endian flipping for 1-byte bools
     //XXX Nasty Hack to convert to 1-byte bools
-#	if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#   if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         char * pCharToWrite = (char *)malloc(sizeof(char) * count);
         for(unsigned int i = 0; i < count; i++)
         {
@@ -220,25 +230,25 @@ namespace Ogre {
         writeData(pCharToWrite, sizeof(char), count);
         
         free(pCharToWrite);
-#	else
+#   else
         writeData(pBool, sizeof(bool), count);
-#	endif
+#   endif
 
     }
     
     //---------------------------------------------------------------------
     void Serializer::writeData(const void* const buf, size_t size, size_t count)
     {
-		mStream->write(buf, size * count);
+        mStream->write(buf, size * count);
     }
     //---------------------------------------------------------------------
     void Serializer::writeString(const String& string)
     {
-		// Old, backwards compatible way - \n terminated
-		mStream->write(string.c_str(), string.length());
-		// Write terminating newline char
-		char terminator = '\n';
-		mStream->write(&terminator, 1);
+        // Old, backwards compatible way - \n terminated
+        mStream->write(string.c_str(), string.length());
+        // Write terminating newline char
+        char terminator = '\n';
+        mStream->write(&terminator, 1);
     }
     //---------------------------------------------------------------------
     void Serializer::readFileHeader(DataStreamPtr& stream)
@@ -270,26 +280,37 @@ namespace Ogre {
     //---------------------------------------------------------------------
     unsigned short Serializer::readChunk(DataStreamPtr& stream)
     {
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        size_t pos = stream->tell();
+#endif
         unsigned short id;
         readShorts(stream, &id, 1);
         
         readInts(stream, &mCurrentstreamLen, 1);
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        if (!mChunkSizeStack.empty() && !stream->eof()){
+            if (pos != static_cast<size_t>(mChunkSizeStack.back()) && mReportChunkErrors){
+                LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: '" + stream->getName() + "' Chunk id: " + StringConverter::toString(id));
+            }
+            mChunkSizeStack.back() = pos + mCurrentstreamLen;
+        }
+#endif
         return id;
     }
     //---------------------------------------------------------------------
     void Serializer::readBools(DataStreamPtr& stream, bool* pDest, size_t count)
     {
         //XXX Nasty Hack to convert 1 byte bools to 4 byte bools
-#	if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#   if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         char * pTemp = (char *)malloc(1*count); // to hold 1-byte bools
         stream->read(pTemp, 1 * count);
         for(unsigned int i = 0; i < count; i++)
             *(bool *)(pDest + i) = *(char *)(pTemp + i);
             
         free (pTemp);
-#	else
+#   else
         stream->read(pDest, sizeof(bool) * count);
-#	endif
+#   endif
         //no flipping on 1-byte datatypes
     }
     //---------------------------------------------------------------------
@@ -301,17 +322,17 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Serializer::readFloats(DataStreamPtr& stream, double* pDest, size_t count)
     {
-		// Read from float, convert to double
-		float* tmp = OGRE_ALLOC_T(float, count, MEMCATEGORY_GENERAL);
-		float* ptmp = tmp;
+        // Read from float, convert to double
+        float* tmp = OGRE_ALLOC_T(float, count, MEMCATEGORY_GENERAL);
+        float* ptmp = tmp;
         stream->read(tmp, sizeof(float) * count);
         flipFromLittleEndian(tmp, sizeof(float), count);
-		// Convert to doubles (no cast required)
-		while(count--)
-		{
-			*pDest++ = *ptmp++;
-		}
-		OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
+        // Convert to doubles (no cast required)
+        while(count--)
+        {
+            *pDest++ = *ptmp++;
+        }
+        OGRE_FREE(tmp, MEMCATEGORY_GENERAL);
     }
     //---------------------------------------------------------------------
     void Serializer::readShorts(DataStreamPtr& stream, unsigned short* pDest, size_t count)
@@ -320,10 +341,10 @@ namespace Ogre {
         flipFromLittleEndian(pDest, sizeof(unsigned short), count);
     }
     //---------------------------------------------------------------------
-    void Serializer::readInts(DataStreamPtr& stream, unsigned int* pDest, size_t count)
+    void Serializer::readInts(DataStreamPtr& stream, uint32* pDest, size_t count)
     {
-        stream->read(pDest, sizeof(unsigned int) * count);
-        flipFromLittleEndian(pDest, sizeof(unsigned int), count);
+        stream->read(pDest, sizeof(uint32) * count);
+        flipFromLittleEndian(pDest, sizeof(uint32), count);
     }
     //---------------------------------------------------------------------
     String Serializer::readString(DataStreamPtr& stream, size_t numChars)
@@ -375,18 +396,18 @@ namespace Ogre {
 
     void Serializer::flipToLittleEndian(void* pData, size_t size, size_t count)
     {
-		if(mFlipEndian)
-		{
-	        flipEndian(pData, size, count);
-		}
+        if(mFlipEndian)
+        {
+            flipEndian(pData, size, count);
+        }
     }
     
     void Serializer::flipFromLittleEndian(void* pData, size_t size, size_t count)
     {
-		if(mFlipEndian)
-		{
-	        flipEndian(pData, size, count);
-		}
+        if(mFlipEndian)
+        {
+            flipEndian(pData, size, count);
+        }
     }
     
     void Serializer::flipEndian(void * pData, size_t size, size_t count)
@@ -406,6 +427,46 @@ namespace Ogre {
             *(char *)((size_t)pData + size - byteIndex - 1) = swapByte;
         }
     }
-    
+
+    size_t Serializer::calcChunkHeaderSize()
+    {
+        return sizeof(uint16) + sizeof(uint32);
+    }
+
+    size_t Serializer::calcStringSize( const String& string )
+    {
+        // string + terminating \n character
+        return string.length() + 1;
+    }
+
+    void Serializer::pushInnerChunk(const DataStreamPtr& stream)
+    {
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        mChunkSizeStack.push_back(stream->tell());
+#endif
+    }
+    void Serializer::backpedalChunkHeader(DataStreamPtr& stream)
+    {
+        if (!stream->eof()){
+            stream->skip(-(int)calcChunkHeaderSize());
+        }
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        mChunkSizeStack.back() = stream->tell();
+#endif
+    }
+    void Serializer::popInnerChunk(const DataStreamPtr& stream)
+    {
+#if OGRE_SERIALIZER_VALIDATE_CHUNKSIZE
+        if (!mChunkSizeStack.empty()){
+            size_t pos = stream->tell();
+            if (pos != static_cast<size_t>(mChunkSizeStack.back()) && !stream->eof() && mReportChunkErrors){
+                LogManager::getSingleton().logMessage("Corrupted chunk detected! Stream name: " + stream->getName());
+            }
+
+            mChunkSizeStack.pop_back();
+        }
+#endif
+    }
+
 }
 

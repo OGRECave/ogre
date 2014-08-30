@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 namespace Ogre {
     NaClGLContext::NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance, pp::CompletionCallback* swapCallback)
-		: pp::Graphics3DClient(instance)
+        : pp::Graphics3DClient(instance)
         , mWindow(window)
         , mGLSupport(glsupport)
         , mInstance(instance)
@@ -58,8 +58,8 @@ namespace Ogre {
     {
         glSetCurrentContextPPAPI(0);
     }
-	
-	void NaClGLContext::setCurrent()
+    
+    void NaClGLContext::setCurrent()
     {
         if (mInstance == NULL) {
             glSetCurrentContextPPAPI(0);

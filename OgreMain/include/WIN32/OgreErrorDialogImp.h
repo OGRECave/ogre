@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,33 +32,33 @@ THE SOFTWARE.
 
 #define WIN32_LEAN_AND_MEAN
 #if !defined(NOMINMAX) && defined(_MSC_VER)
-#	define NOMINMAX // required to stop windows.h messing up std::min
+#   define NOMINMAX // required to stop windows.h messing up std::min
 #endif
 #include <windows.h>
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
-	/** Class for displaying the error dialog if Ogre fails badly. */
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
+    /** Class for displaying the error dialog if Ogre fails badly. */
     class _OgreExport ErrorDialog
     {
     public:
         ErrorDialog();
-		~ErrorDialog() {}
+        ~ErrorDialog() {}
 
-		/**
-		@remarks
-			Displays the error dialog.
-		@param
-			errorMessage The error message which has caused the failure.
-		@param
-			logName Optional name of the log to display in the detail pane.
-		*/
+        /**
+        @remarks
+            Displays the error dialog.
+        @param
+            errorMessage The error message which has caused the failure.
+        @param
+            logName Optional name of the log to display in the detail pane.
+        */
         void display(const String& errorMessage, String logName = "");
 
     protected:
@@ -73,8 +73,8 @@ namespace Ogre
         HINSTANCE mHInstance; // HInstance of application, for dialog
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

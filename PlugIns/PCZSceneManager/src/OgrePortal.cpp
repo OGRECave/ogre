@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,18 +34,13 @@ current TODO's       : none known
 */
 
 #include "OgrePortal.h"
-#include "OgrePCZSceneNode.h"
-#include "OgreSphere.h"
-#include "OgreSegment.h"
-#include "OgreRay.h"
-#include "OgrePCZone.h"   // need access to real zone class 
 
 using namespace Ogre;
 
 Portal::Portal(const String& name, const PORTAL_TYPE type)
-	: PortalBase(name, type),
-	mTargetZone(0),
-	mTargetPortal(0)
+    : PortalBase(name, type),
+    mTargetZone(0),
+    mTargetPortal(0)
 {
 }
 
@@ -56,19 +51,19 @@ Portal::~Portal()
 // Set the 1st Zone the Portal connects to
 void Portal::setTargetZone(PCZone* zone)
 {
-	mTargetZone = zone;
+    mTargetZone = zone;
 }
 
 // Set the Portal the Portal connects to
 void Portal::setTargetPortal(Portal* portal)
 {
-	mTargetPortal = portal;
+    mTargetPortal = portal;
 }
 
 /** @copydoc MovableObject::getMovableType. */
 const String& Portal::getMovableType() const
 {
-	return PortalFactory::FACTORY_TYPE_NAME;
+    return PortalFactory::FACTORY_TYPE_NAME;
 }
 
 //-----------------------------------------------------------------------
@@ -78,10 +73,10 @@ unsigned long PortalFactory::FACTORY_TYPE_FLAG = 0xFFFFFFFF;
 
 MovableObject* PortalFactory::createInstanceImpl(const String& name, const NameValuePairList* params)
 {
-	return OGRE_NEW Portal(name, getPortalType(params));
+    return OGRE_NEW Portal(name, getPortalType(params));
 }
 
 void PortalFactory::destroyInstance(MovableObject* obj)
 {
-	OGRE_DELETE obj;
+    OGRE_DELETE obj;
 }

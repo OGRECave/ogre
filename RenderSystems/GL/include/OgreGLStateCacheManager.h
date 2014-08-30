@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ typedef Ogre::GeneralAllocatedObject StateCacheAlloc;
 
 namespace Ogre
 {
-	class GLStateCacheManagerImp;
+    class GLStateCacheManagerImp;
 
     /** An in memory cache of the OpenGL state.
      @remarks
@@ -55,11 +55,11 @@ namespace Ogre
     class _OgreGLExport GLStateCacheManager : public StateCacheAlloc
     {
     private:
-		GLStateCacheManagerImp* mImp;
+        GLStateCacheManagerImp* mImp;
         typedef map<intptr_t, GLStateCacheManagerImp*>::type CachesMap;
         typedef MapIterator<CachesMap> CachesMapIterator;
 
-		CachesMap mCaches;
+        CachesMap mCaches;
 
     public:
         GLStateCacheManager(void);
@@ -79,22 +79,22 @@ namespace Ogre
         /** Clears all cached values
         */
         void clearCache();
-		
-		/** Bind an OpenGL buffer of any type.
+        
+        /** Bind an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
         void bindGLBuffer(GLenum target, GLuint buffer, bool force = false);
 
-		/** Delete an OpenGL buffer of any type.
+        /** Delete an OpenGL buffer of any type.
          @param target The buffer target.
          @param buffer The buffer ID.
          @param force Optional parameter to force an update.
          */
         void deleteGLBuffer(GLenum target, GLuint buffer, bool force = false);
 
-		/** Bind an OpenGL texture of any type.
+        /** Bind an OpenGL texture of any type.
          @param target The texture target.
          @param texture The texture ID.
          */
@@ -161,7 +161,7 @@ namespace Ogre
          */
         void setDepthFunc(GLenum func);
 
-		/** Gets the clear depth in the range from [0..1].
+        /** Gets the clear depth in the range from [0..1].
          @return The current clearing depth.
          */
         GLclampf getClearDepth(void) const;
@@ -205,12 +205,7 @@ namespace Ogre
         /** Enables a piece of OpenGL functionality.
          @param flag The function to enable.
          */
-        void setEnabled(GLenum flag);
-
-        /** Disables a piece of OpenGL functionality.
-         @param flag The function to disable.
-         */
-        void setDisabled(GLenum flag);
+        void setEnabled(GLenum flag, bool enabled);
 
         /** Gets the mask of buffers to be discarded if GL_EXT_discard_framebuffer is supported
          @return The buffer mask.

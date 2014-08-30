@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgrePrivate EGLWindow : public RenderWindow
     {
-	private:
+    private:
         protected:
             bool mClosed;
             bool mVisible;
@@ -47,34 +47,34 @@ namespace Ogre {
 
             EGLSupport* mGLSupport;
             EGLContext* mContext;
-			NativeWindowType mWindow;
-			NativeDisplayType mNativeDisplay;
-			::EGLDisplay mEglDisplay;
+            NativeWindowType mWindow;
+            NativeDisplayType mNativeDisplay;
+            ::EGLDisplay mEglDisplay;
 
 
-			::EGLConfig mEglConfig;
-			::EGLSurface mEglSurface;
+            ::EGLConfig mEglConfig;
+            ::EGLSurface mEglSurface;
 
             ::EGLSurface createSurfaceFromWindow(::EGLDisplay display, NativeWindowType win);
 
-			virtual void switchFullScreen(bool fullscreen) = 0;
-			virtual EGLContext * createEGLContext() const = 0;
-			virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height) = 0;
-			virtual void initNativeCreatedWindow(const NameValuePairList *miscParams) = 0;
-			virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title ) = 0;
-			virtual void reposition(int left, int top) = 0;
-			virtual void resize(unsigned int width, unsigned int height) = 0;
-			virtual void windowMovedOrResized() = 0;
+            virtual void switchFullScreen(bool fullscreen) = 0;
+            virtual EGLContext * createEGLContext() const = 0;
+            virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height) = 0;
+            virtual void initNativeCreatedWindow(const NameValuePairList *miscParams) = 0;
+            virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title ) = 0;
+            virtual void reposition(int left, int top) = 0;
+            virtual void resize(unsigned int width, unsigned int height) = 0;
+            virtual void windowMovedOrResized() = 0;
 
-	public:
+    public:
             EGLWindow(EGLSupport* glsupport);
             virtual ~EGLWindow();
 
-//		Moved create to native source because it has native calls in it.
+//      Moved create to native source because it has native calls in it.
 //            void create(const String& name, unsigned int width, unsigned int height,
 //                        bool fullScreen, const NameValuePairList *miscParams);
 
-			virtual void setFullscreen (bool fullscreen, uint width, uint height);
+            virtual void setFullscreen (bool fullscreen, uint width, uint height);
             void destroy(void);
             bool isClosed(void) const;
             bool isVisible(void) const;

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
     template <class T> class AtomicObject {
 
         public:
@@ -98,19 +98,19 @@ namespace Ogre {
             return mField--;
         }
 
-		T operator+=(const T &add)
-		{
+        T operator+=(const T &add)
+        {
                     OGRE_LOCK_AUTO_MUTEX;
-			mField += add;
-			return mField;
-		}
+            mField += add;
+            return mField;
+        }
 
-		T operator-=(const T &sub)
-		{
+        T operator-=(const T &sub)
+        {
                     OGRE_LOCK_AUTO_MUTEX;
-			mField -= sub;
-			return mField;
-		}
+            mField -= sub;
+            return mField;
+        }
 
         protected:
 
@@ -119,8 +119,8 @@ namespace Ogre {
         volatile T mField;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

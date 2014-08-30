@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,93 +32,93 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	enum D3D9ResourceCreationPolicy
-	{
-		// Creates the rendering resource on the current active device that needs it.
-		// This policy should be used when video memory consumption should be minimized but
-		// it might cause some performance issues when using loader resource thread since
-		// a resource that was not created on specified device will be created on demand during
-		// the rendering process and might cause the FPS to drop down. 
-		RCP_CREATE_ON_ACTIVE_DEVICE,
+    enum D3D9ResourceCreationPolicy
+    {
+        // Creates the rendering resource on the current active device that needs it.
+        // This policy should be used when video memory consumption should be minimized but
+        // it might cause some performance issues when using loader resource thread since
+        // a resource that was not created on specified device will be created on demand during
+        // the rendering process and might cause the FPS to drop down. 
+        RCP_CREATE_ON_ACTIVE_DEVICE,
 
-		// Create the rendering resource on every existing device. 		
-		// This policy should be used when working intensively with a background loader thread.
-		// In that case when multiple devices exist, the resource will be created on each device
-		// and will be ready to use in the rendering thread. 
-		// The draw back can be some video memory waste in case that each device render different
-		// scene and doesn't really need all the resources.
-		RCP_CREATE_ON_ALL_DEVICES
-	};
-	
-	class _OgreD3D9Export D3D9ResourceManager : public ResourceAlloc
-	{
+        // Create the rendering resource on every existing device.      
+        // This policy should be used when working intensively with a background loader thread.
+        // In that case when multiple devices exist, the resource will be created on each device
+        // and will be ready to use in the rendering thread. 
+        // The draw back can be some video memory waste in case that each device render different
+        // scene and doesn't really need all the resources.
+        RCP_CREATE_ON_ALL_DEVICES
+    };
+    
+    class _OgreD3D9Export D3D9ResourceManager : public ResourceAlloc
+    {
 
-	// Interface.
-	public:
+    // Interface.
+    public:
 
-		// Called immediately after the Direct3D device has been created.
-		void notifyOnDeviceCreate	(IDirect3DDevice9* d3d9Device);
+        // Called immediately after the Direct3D device has been created.
+        void notifyOnDeviceCreate   (IDirect3DDevice9* d3d9Device);
 
-		// Called before the Direct3D device is going to be destroyed.
-		void notifyOnDeviceDestroy	(IDirect3DDevice9* d3d9Device);
+        // Called before the Direct3D device is going to be destroyed.
+        void notifyOnDeviceDestroy  (IDirect3DDevice9* d3d9Device);
 
-		// Called immediately after the Direct3D device has entered a lost state.
-		void notifyOnDeviceLost		(IDirect3DDevice9* d3d9Device);
+        // Called immediately after the Direct3D device has entered a lost state.
+        void notifyOnDeviceLost     (IDirect3DDevice9* d3d9Device);
 
-		// Called immediately after the Direct3D device has been reset.
-		void notifyOnDeviceReset	(IDirect3DDevice9* d3d9Device);
+        // Called immediately after the Direct3D device has been reset.
+        void notifyOnDeviceReset    (IDirect3DDevice9* d3d9Device);
 
-		// Called when device state is changing. Access to any device should be locked.
-		// Relevant for multi thread application.
-		void lockDeviceAccess		();
+        // Called when device state is changing. Access to any device should be locked.
+        // Relevant for multi thread application.
+        void lockDeviceAccess       ();
 
-		// Called when device state change completed. Access to any device is allowed.
-		// Relevant for multi thread application.
-		void unlockDeviceAccess		();
-		
-		D3D9ResourceManager			();
-		~D3D9ResourceManager		();		
+        // Called when device state change completed. Access to any device is allowed.
+        // Relevant for multi thread application.
+        void unlockDeviceAccess     ();
+        
+        D3D9ResourceManager         ();
+        ~D3D9ResourceManager        ();     
 
-		void						setCreationPolicy	(D3D9ResourceCreationPolicy creationPolicy);
-		D3D9ResourceCreationPolicy	getCreationPolicy	() const;
+        void                        setCreationPolicy   (D3D9ResourceCreationPolicy creationPolicy);
+        D3D9ResourceCreationPolicy  getCreationPolicy   () const;
 
-		/** 
-			Set/Get automatic hardware buffers management.
-			This has affect only when multiple devices involved during the runtime.
-			When enabled, an explicit system memory backup is created for buffers with no read caps - so in case of device swaps
-			the content of the buffers can be restored from this copy.
-			The default is false in order to reduce system memory consumption.
-		*/
-		void						setAutoHardwareBufferManagement(bool autoManagement) { mAutoHardwareBufferManagement = autoManagement; }
-		bool						getAutoHardwareBufferManagement() const { return mAutoHardwareBufferManagement; }
+        /** 
+            Set/Get automatic hardware buffers management.
+            This has affect only when multiple devices involved during the runtime.
+            When enabled, an explicit system memory backup is created for buffers with no read caps - so in case of device swaps
+            the content of the buffers can be restored from this copy.
+            The default is false in order to reduce system memory consumption.
+        */
+        void                        setAutoHardwareBufferManagement(bool autoManagement) { mAutoHardwareBufferManagement = autoManagement; }
+        bool                        getAutoHardwareBufferManagement() const { return mAutoHardwareBufferManagement; }
 
-	// Friends.
-	protected:
-		friend class D3D9Resource;
-	
-	// Types.
-	protected:
-		typedef set<D3D9Resource*>::type		ResourceContainer;
-		typedef ResourceContainer::iterator		ResourceContainerIterator;
+    // Friends.
+    protected:
+        friend class D3D9Resource;
+    
+    // Types.
+    protected:
+        typedef set<D3D9Resource*>::type        ResourceContainer;
+        typedef ResourceContainer::iterator     ResourceContainerIterator;
 
-	// Protected methods.
-	protected:
-		
-		// Called when new resource created.
-		void _notifyResourceCreated		(D3D9Resource* pResource);
+    // Protected methods.
+    protected:
+        
+        // Called when new resource created.
+        void _notifyResourceCreated     (D3D9Resource* pResource);
 
-		// Called when resource is about to be destroyed.
-		void _notifyResourceDestroyed	(D3D9Resource* pResource);
-				
+        // Called when resource is about to be destroyed.
+        void _notifyResourceDestroyed   (D3D9Resource* pResource);
+                
 
-	// Attributes.
-	protected:		
-		OGRE_MUTEX(mResourcesMutex);
-		ResourceContainer			mResources;
-		D3D9ResourceCreationPolicy	mResourceCreationPolicy;
-		long						mDeviceAccessLockCount;		
-		bool						mAutoHardwareBufferManagement;
-	};
+    // Attributes.
+    protected:      
+        OGRE_MUTEX(mResourcesMutex);
+        ResourceContainer           mResources;
+        D3D9ResourceCreationPolicy  mResourceCreationPolicy;
+        long                        mDeviceAccessLockCount;     
+        bool                        mAutoHardwareBufferManagement;
+    };
 }
 
 #endif

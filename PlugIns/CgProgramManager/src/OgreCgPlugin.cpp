@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,30 +28,33 @@ THE SOFTWARE.
 
 #include "OgreCgPlugin.h"
 #include "OgreRoot.h"
+#include "OgreHighLevelGpuProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreCgFxScriptLoader.h"
+#include "OgreCgProgramFactory.h"
+#include "OgreLogManager.h"
 
 namespace Ogre 
 {
-	const String sPluginName = "Cg Program Manager";
-	//---------------------------------------------------------------------
-	CgPlugin::CgPlugin()
-		:mCgProgramFactory(0)
-	{
+    const String sPluginName = "Cg Program Manager";
+    //---------------------------------------------------------------------
+    CgPlugin::CgPlugin()
+        :mCgProgramFactory(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	const String& CgPlugin::getName() const
-	{
-		return sPluginName;
-	}
-	//---------------------------------------------------------------------
-	void CgPlugin::install()
-	{
-	}
-	//---------------------------------------------------------------------
-	void CgPlugin::initialise()
-	{
+    }
+    //---------------------------------------------------------------------
+    const String& CgPlugin::getName() const
+    {
+        return sPluginName;
+    }
+    //---------------------------------------------------------------------
+    void CgPlugin::install()
+    {
+    }
+    //---------------------------------------------------------------------
+    void CgPlugin::initialise()
+    {
         // Cg is also not supported on OpenGL 3+
         if(Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
         {
@@ -71,24 +74,24 @@ namespace Ogre
 
             OGRE_NEW CgFxScriptLoader();
         }
-	}
-	//---------------------------------------------------------------------
-	void CgPlugin::shutdown()
-	{
-		// nothing to do
-	}
-	//---------------------------------------------------------------------
-	void CgPlugin::uninstall()
-	{
+    }
+    //---------------------------------------------------------------------
+    void CgPlugin::shutdown()
+    {
+        // nothing to do
+    }
+    //---------------------------------------------------------------------
+    void CgPlugin::uninstall()
+    {
         if (mCgProgramFactory)
         {
-			OGRE_DELETE CgFxScriptLoader::getSingletonPtr(); 
+            OGRE_DELETE CgFxScriptLoader::getSingletonPtr(); 
 
             // Remove from manager safely
             if (HighLevelGpuProgramManager::getSingletonPtr())
                 HighLevelGpuProgramManager::getSingleton().removeFactory(mCgProgramFactory);
-		    OGRE_DELETE mCgProgramFactory;
-		    mCgProgramFactory = 0;
+            OGRE_DELETE mCgProgramFactory;
+            mCgProgramFactory = 0;
         }
-	}
+    }
 }

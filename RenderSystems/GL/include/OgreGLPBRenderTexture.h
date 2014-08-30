@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ namespace Ogre {
         /** @copydoc GLRTTManager::createRenderTexture
         */
         virtual RenderTexture *createRenderTexture(const String &name, 
-			const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
+            const GLSurfaceDesc &target, bool writeGamma, uint fsaa);
         
          /** @copydoc GLRTTManager::checkFormat
         */
@@ -87,10 +87,10 @@ namespace Ogre {
     protected:
         /** GLSupport reference, used to create PBuffers */
         GLSupport *mSupport;
-		/** Primary window reference */
-		RenderTarget *mMainWindow;
-		/** Primary window context */
-		GLContext *mMainContext;
+        /** Primary window reference */
+        RenderTarget *mMainWindow;
+        /** Primary window context */
+        GLContext *mMainContext;
         /** Reference to a PBuffer, with refcount */
         struct PBRef
         {

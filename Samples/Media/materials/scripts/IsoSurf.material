@@ -1,11 +1,11 @@
 //////////
 // HLSL //
 //////////
-vertex_program Ogre/IsoSurf/SampleFieldVS_HLSL hlsl
+vertex_program Ogre/Isosurf/SampleFieldVS_HLSL hlsl
 {
 	source isosurf.hlsl
 	entry_point mainVS
-	target vs_4_0
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 
 	default_params
 	{
@@ -15,30 +15,30 @@ vertex_program Ogre/IsoSurf/SampleFieldVS_HLSL hlsl
 	}
 }
 
-geometry_program Ogre/IsoSurf/TessellateTetrahedraGS_HLSL hlsl
+geometry_program Ogre/Isosurf/TessellateTetrahedraGS_HLSL hlsl
 {
 	source isosurf.hlsl
 	entry_point mainGS
 	target gs_4_0
 	uses_adjacency_information true
-	
+
 	default_params
 	{
 		param_named IsoValue float 1
 	}
 }
 
-fragment_program Ogre/IsoSurf/MetaballPS_HLSL hlsl
+fragment_program Ogre/Isosurf/MetaballPS_HLSL hlsl
 {
 	source isosurf.hlsl
 	entry_point mainPS
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 //////////
 //  CG  //
 //////////
-vertex_program Ogre/IsoSurf/SampleFieldVS_CG cg
+vertex_program Ogre/Isosurf/SampleFieldVS_CG cg
 {
 	source isosurf.cg
 	entry_point mainVS
@@ -52,20 +52,20 @@ vertex_program Ogre/IsoSurf/SampleFieldVS_CG cg
 	}
 }
 
-geometry_program Ogre/IsoSurf/TessellateTetrahedraGS_CG cg
+geometry_program Ogre/Isosurf/TessellateTetrahedraGS_CG cg
 {
 	source isosurf.cg
 	entry_point mainGS
 	profiles gpu_gp gp4_gp
 	uses_adjacency_information true
-	
+
 	default_params
 	{
-		param_named IsoValue float 1
+		param_named IsoValue float 1.0
 	}
 }
 
-fragment_program Ogre/IsoSurf/MetaballPS_CG cg
+fragment_program Ogre/Isosurf/MetaballPS_CG cg
 {
 	source isosurf.cg
 	entry_point mainPS
@@ -75,9 +75,9 @@ fragment_program Ogre/IsoSurf/MetaballPS_CG cg
 //////////
 // GLSL //
 //////////
-vertex_program Ogre/IsoSurf/SampleFieldVS_GLSL glsl
+vertex_program Ogre/Isosurf/SampleFieldVS_GLSL glsl
 {
-	source SampleFieldVS.glsl
+	source IsosurfVS.glsl
 	syntax glsl150
 
 	default_params
@@ -88,76 +88,76 @@ vertex_program Ogre/IsoSurf/SampleFieldVS_GLSL glsl
 	}
 }
 
-geometry_program Ogre/IsoSurf/TessellateTetrahedraGS_GLSL glsl
+geometry_program Ogre/Isosurf/TessellateTetrahedraGS_GLSL glsl
 {
-	source TessellateTetrahedraGS.glsl
+	source IsosurfGS.glsl
 	syntax glsl150
 	uses_adjacency_information true
-	
+
 	default_params
 	{
-		param_named IsoValue float 1
+		param_named IsoValue float 1.0
 	}
 }
 
-fragment_program Ogre/IsoSurf/MetaballPS_GLSL glsl
+fragment_program Ogre/Isosurf/MetaballPS_GLSL glsl
 {
-	source MetaballFP.glsl
+	source IsosurfFS.glsl
 	syntax glsl150
 }
 
-vertex_program Ogre/IsoSurf/SampleFieldVS unified
+vertex_program Ogre/Isosurf/SampleFieldVS unified
 {
-	delegate Ogre/IsoSurf/SampleFieldVS_GLSL
-	delegate Ogre/IsoSurf/SampleFieldVS_HLSL
-	delegate Ogre/IsoSurf/SampleFieldVS_CG
+	delegate Ogre/Isosurf/SampleFieldVS_GLSL
+	delegate Ogre/Isosurf/SampleFieldVS_HLSL
+	delegate Ogre/Isosurf/SampleFieldVS_CG
 	default_params
 	{
 
 	}
 }
 
-geometry_program Ogre/IsoSurf/TessellateTetrahedraGS unified
+geometry_program Ogre/Isosurf/TessellateTetrahedraGS unified
 {
-	delegate Ogre/IsoSurf/TessellateTetrahedraGS_GLSL
-	delegate Ogre/IsoSurf/TessellateTetrahedraGS_HLSL
-	delegate Ogre/IsoSurf/TessellateTetrahedraGS_CG
+	delegate Ogre/Isosurf/TessellateTetrahedraGS_GLSL
+	delegate Ogre/Isosurf/TessellateTetrahedraGS_HLSL
+	delegate Ogre/Isosurf/TessellateTetrahedraGS_CG
 	default_params
 	{
 
 	}
 }
 
-fragment_program Ogre/IsoSurf/MetaballPS unified
+fragment_program Ogre/Isosurf/MetaballPS unified
 {
-	delegate Ogre/IsoSurf/MetaballPS_GLSL
-	delegate Ogre/IsoSurf/MetaballPS_HLSL
-	delegate Ogre/IsoSurf/MetaballPS_CG
+	delegate Ogre/Isosurf/MetaballPS_GLSL
+	delegate Ogre/Isosurf/MetaballPS_HLSL
+	delegate Ogre/Isosurf/MetaballPS_CG
 	default_params
 	{
 
 	}
 }
 
-material Ogre/IsoSurf/TessellateTetrahedra
+material Ogre/Isosurf/TessellateTetrahedra
 {
 	technique
 	{
 		pass
 		{
-			vertex_program_ref Ogre/IsoSurf/SampleFieldVS
+			vertex_program_ref Ogre/Isosurf/SampleFieldVS
 			{
-			
+
 			}
-			
-			geometry_program_ref Ogre/IsoSurf/TessellateTetrahedraGS
+
+			geometry_program_ref Ogre/Isosurf/TessellateTetrahedraGS
 			{
-			
+
 			}
-			
-			fragment_program_ref Ogre/IsoSurf/MetaballPS
+
+			fragment_program_ref Ogre/Isosurf/MetaballPS
 			{
-			
+
 			}
 		}
 	}

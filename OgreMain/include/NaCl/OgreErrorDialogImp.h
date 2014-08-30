@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,21 +32,21 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** Class for displaying the error dialog if Ogre fails badly. */
-	class _OgreExport ErrorDialog
-	{
-	public:
-		ErrorDialog();
+    /** Class for displaying the error dialog if Ogre fails badly. */
+    class _OgreExport ErrorDialog
+    {
+    public:
+        ErrorDialog();
 
-		/**
-		@remarks
-			Displays the error dialog.
-		@param
-			errorMessage The error message which has caused the failure.
-		@param
-			logName Optional name of the log to display in the detail pane.
-		*/
-		void display(const String& errorMessage, String logName = "");
-	};
+        /**
+        @remarks
+            Displays the error dialog.
+        @param
+            errorMessage The error message which has caused the failure.
+        @param
+            logName Optional name of the log to display in the detail pane.
+        */
+        void display(const String& errorMessage, String logName = "");
+    };
 }
 #endif

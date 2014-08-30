@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -82,10 +82,10 @@ namespace Ogre {
         while (!pi.end())
         {
             p = pi.getNext();
-            applyAdjustWithClamp(&p->colour.r, dr);
-            applyAdjustWithClamp(&p->colour.g, dg);
-            applyAdjustWithClamp(&p->colour.b, db);
-            applyAdjustWithClamp(&p->colour.a, da);
+            applyAdjustWithClamp(&p->mColour.r, dr);
+            applyAdjustWithClamp(&p->mColour.g, dg);
+            applyAdjustWithClamp(&p->mColour.b, db);
+            applyAdjustWithClamp(&p->mColour.a, da);
         }
 
     }

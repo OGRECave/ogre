@@ -1,7 +1,7 @@
 varying vec4 colour;
 
 /*
-  Basic ambient lighting fragment program for GLSL ES
+  Basic ambient lighting fragment program for GLSL.
 */
 void main()
 {

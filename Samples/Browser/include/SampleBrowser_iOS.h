@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,10 @@
 #import <UIKit/UIKit.h> 
 #import <QuartzCore/QuartzCore.h>
 #import "SampleBrowser.h"
+
+// Defaulting to 2 means that we run at 30 frames per second. For 60 frames, use a value of 1.
+// 30 FPS is usually sufficient and results in lower power consumption.
+#define DISPLAYLINK_FRAME_INTERVAL      2
 
 #ifdef __OBJC__
 
@@ -90,7 +94,7 @@
         Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
 
         // Clear event times
-		Ogre::Root::getSingleton().clearEventTimes();
+        Ogre::Root::getSingleton().clearEventTimes();
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
@@ -101,9 +105,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Defaulting to 2 means that we run at 30 frames per second. For 60 frames, use a value of 1.
-    // 30 FPS is usually sufficient and results in lower power consumption.
-    mLastFrameTime = 2;
+    mLastFrameTime = DISPLAYLINK_FRAME_INTERVAL;
     mDisplayLink = nil;
 
     [self go];
@@ -121,7 +123,7 @@
     // Reset event times and reallocate the date and displaylink objects
     Ogre::Root::getSingleton().clearEventTimes();
     mDate = [[NSDate alloc] init];
-    mLastFrameTime = 2; // Reset the timer
+    mLastFrameTime = DISPLAYLINK_FRAME_INTERVAL; // Reset the timer
 
     mDisplayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(renderOneFrame:)];
     [mDisplayLink setFrameInterval:mLastFrameTime];

@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  Also see acknowledgements in Readme.html
  
  You may use this sample code for anything you like, it is not covered by the
@@ -62,50 +62,50 @@ using namespace OgreBites;
 class _OgreSampleClassExport SSAOGBufferSchemeHandler : public Ogre::MaterialManager::Listener
 {
 public:
-	SSAOGBufferSchemeHandler()
-	{
-		mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
-	}
+    SSAOGBufferSchemeHandler()
+    {
+        mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
+    }
 
-	virtual ~SSAOGBufferSchemeHandler()
-	{
-		mGBufRefMat.setNull();
-	}
+    virtual ~SSAOGBufferSchemeHandler()
+    {
+        mGBufRefMat.setNull();
+    }
 
-	/** @copydoc MaterialManager::Listener::handleSchemeNotFound */
-	virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, 
-		const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex, 
-		const Ogre::Renderable* rend)
-	{
-			Technique* gBufferTech = originalMaterial->createTechnique();
-			gBufferTech->setSchemeName(schemeName);
-			Ogre::Pass* gbufPass = gBufferTech->createPass();
-			*gbufPass = *mGBufRefMat->getTechnique(0)->getPass(0);
-			return gBufferTech;
-	}
+    /** @copydoc MaterialManager::Listener::handleSchemeNotFound */
+    virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+        const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex, 
+        const Ogre::Renderable* rend)
+    {
+            Technique* gBufferTech = originalMaterial->createTechnique();
+            gBufferTech->setSchemeName(schemeName);
+            Ogre::Pass* gbufPass = gBufferTech->createPass();
+            *gbufPass = *mGBufRefMat->getTechnique(0)->getPass(0);
+            return gBufferTech;
+    }
 private:
-	Ogre::MaterialPtr mGBufRefMat;
+    Ogre::MaterialPtr mGBufRefMat;
 };
 
 class _OgreSampleClassExport Sample_SSAO : public SdkSample
 {
 private:
-	std::vector<String> mMeshNames;
-	std::vector<Entity*> mMeshes;
-	int mCurrentMeshIndex;
+    std::vector<String> mMeshNames;
+    std::vector<Entity*> mMeshes;
+    int mCurrentMeshIndex;
     
-	std::vector<String> mCompositorNames;
-	String mCurrentCompositor;
-	
-	std::vector<String> mPostNames;
-	String mCurrentPost;
-	String mCurrentModulateScheme;
+    std::vector<String> mCompositorNames;
+    String mCurrentCompositor;
+    
+    std::vector<String> mPostNames;
+    String mCurrentPost;
+    String mCurrentModulateScheme;
 
-	SSAOGBufferSchemeHandler* mGBufSchemeHandler;
+    SSAOGBufferSchemeHandler* mGBufSchemeHandler;
     Light* mLight;
 
 public:
-	Sample_SSAO()
+    Sample_SSAO()
     {
         mInfo["Title"] = "SSAO Techniques";
         mInfo["Description"] = "A demo of several Screen Space Ambient Occlusion (SSAO) shading techniques using compositors.";
@@ -129,19 +129,19 @@ public:
         mPostNames.push_back("SSAO/Post/CrossBilateralFilter");
         mPostNames.push_back("SSAO/Post/SmartBoxFilter");
         mPostNames.push_back("SSAO/Post/BoxFilter");
-		
+        
         mCurrentCompositor = mCompositorNames[0];
         mCurrentPost = mPostNames[0];
 
-		mGBufSchemeHandler = NULL;
-		mLight = NULL;
+        mGBufSchemeHandler = NULL;
+        mLight = NULL;
     }
     
     void cleanupContent()
     {
-		MaterialManager::getSingleton().removeListener(mGBufSchemeHandler, "GBuffer");
-		delete mGBufSchemeHandler;
-		mGBufSchemeHandler = NULL;
+        MaterialManager::getSingleton().removeListener(mGBufSchemeHandler, "GBuffer");
+        delete mGBufSchemeHandler;
+        mGBufSchemeHandler = NULL;
 
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, false);
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
@@ -179,18 +179,20 @@ public:
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
                         " programs, so you cannot run this sample. Sorry!", "Sample_SSAO::testCapabilities");
         }
-		if (!(caps->getRenderSystemName() == "OpenGL Rendering Subsystem" || caps->getRenderSystemName() == "Direct3D9 Rendering Subsystem" ||
-			caps->getRenderSystemName() == "Direct3D11 Rendering Subsystem"))
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "This demo currently only supports OpenGL and DirectX9. Sorry!",
-				"Sample_SSAO:testCapabilities");
-		}
+		if (!(caps->getRenderSystemName() == "OpenGL Rendering Subsystem" ||
+			caps->getRenderSystemName() == "OpenGL 3+ Rendering Subsystem (EXPERIMENTAL)" || 
+			caps->getRenderSystemName() == "Direct3D9 Rendering Subsystem" ||
+            caps->getRenderSystemName() == "Direct3D11 Rendering Subsystem"))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "This demo currently only supports OpenGL and DirectX9. Sorry!",
+                "Sample_SSAO:testCapabilities");
+        }
     }
     
 protected:
-	/**
-	 * Setup the compositors to be used.
-	 */
+    /**
+     * Setup the compositors to be used.
+     */
     void setupCompositors()
     {
         
@@ -220,9 +222,9 @@ protected:
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, true);
     }
     
-	/**
-	 * Setup the controls, ie. the gui elements.
-	 */
+    /**
+     * Setup the controls, ie. the gui elements.
+     */
     void setupControls(void)
     {
         // --- select mesh menu ---
@@ -310,9 +312,9 @@ protected:
                                     10,
                                     101); // snaps ???
         // --- sample length parameter ---
-		mTrayMgr->createSeparator(TL_TOPLEFT, "sep");
+        mTrayMgr->createSeparator(TL_TOPLEFT, "sep");
 
-		mTrayMgr->createCheckBox(TL_TOPLEFT, SSAO_MODUALTE, "Modulate with scene", SSAO_GUI_WIDTH);
+        mTrayMgr->createCheckBox(TL_TOPLEFT, SSAO_MODUALTE, "Modulate with scene", SSAO_GUI_WIDTH);
 
         // --- sample length parameter ---
         mTrayMgr->createSeparator(TL_TOPLEFT, "sep2");
@@ -419,16 +421,16 @@ protected:
         mTrayMgr->showCursor();
     }
     
-	/**
-	 * Create the scene and load the content.
-	 */
+    /**
+     * Create the scene and load the content.
+     */
     void setupContent()
     {
         mViewport->setBackgroundColour(ColourValue(0.5, 0.5, 0.5, 1));
         
         // set our camera to orbit around the origin and show cursor
         mCameraMan->setStyle(CS_FREELOOK);
-		mCameraMan->setTopSpeed(20.0);
+        mCameraMan->setTopSpeed(20.0);
         mCamera->move(Vector3(0, 10, 0));
         mCamera->setFOVy(Radian(Degree(45).valueRadians())); // i.e. 60deg * 1.3.. maya and ogre use fovX and fovY
         mCamera->setFarClipDistance(400);
@@ -457,14 +459,14 @@ protected:
         changeCompositor(mCompositorNames[0]);
         changePost(mPostNames[0]);
 
-		mGBufSchemeHandler = new SSAOGBufferSchemeHandler();
-		MaterialManager::getSingleton().addListener(mGBufSchemeHandler, "GBuffer");
+        mGBufSchemeHandler = new SSAOGBufferSchemeHandler();
+        MaterialManager::getSingleton().addListener(mGBufSchemeHandler, "GBuffer");
     }
     
-	/**
-	 * Change the current displayed mesh to the new mesh identified by its index.
-	 * @param index The index of the new mesh in the mesh vector.
-	 */
+    /**
+     * Change the current displayed mesh to the new mesh identified by its index.
+     * @param index The index of the new mesh in the mesh vector.
+     */
     void changeMesh(int index)
     {
         mMeshes[mCurrentMeshIndex]->setVisible(false);
@@ -472,10 +474,10 @@ protected:
         mCurrentMeshIndex = index;
     }
     
-	/**
-	 * Change the compositor to be used.
-	 * @param compositor The name of the compositor
-	 */
+    /**
+     * Change the compositor to be used.
+     * @param compositor The name of the compositor
+     */
     void changeCompositor(Ogre::String compositor)
     {
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, false);
@@ -583,17 +585,17 @@ protected:
         }
     }
     
-	/**
-	 * Change the post filter to be used.
-	 * @param post The name of the new post processing filter.
-	 */
+    /**
+     * Change the post filter to be used.
+     * @param post The name of the new post processing filter.
+     */
     void changePost(Ogre::String post)
     {
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
         mCurrentPost = post;
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, true);
-		
-		if (post == "SSAO/Post/CrossBilateralFilter")
+        
+        if (post == "SSAO/Post/CrossBilateralFilter")
         {
             mTrayMgr->getWidget(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT)->show();
             mTrayMgr->moveWidgetToTray(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT, TL_TOPLEFT);
@@ -605,7 +607,7 @@ protected:
         }
     }
     
-	// sdkTray listener callbacks
+    // sdkTray listener callbacks
     void itemSelected(SelectMenu* menu)
     {
         if (menu->getName() == SSAO_OBJECT_MENU_NAME)
@@ -615,7 +617,7 @@ protected:
             changeCompositor(menu->getSelectedItem());
         
         else if (menu->getName() == SSAO_POST_MENU_NAME)
-            changePost(menu->getSelectedItem());	
+            changePost(menu->getSelectedItem());    
         
         else if (menu->getName() == SSAO_CAMERA_MENU_NAME)
         {
@@ -700,24 +702,24 @@ protected:
     
     void checkBoxToggled(OgreBites::CheckBox *box) 
     {
-		if(box->getName() == SSAO_MODUALTE)
-		{
-			if (box->isChecked())
-			{
-				CompositorManager::getSingleton().addCompositor(mViewport, "SSAO/Post/Modulate");
-	            CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", true);
-				mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-				mLight = mSceneMgr->createLight();
-				mLight->setPosition(30, 80, 30);
-			}
-			else
-			{  
-				mSceneMgr->destroyLight(mLight);
-				mLight = NULL;
+        if(box->getName() == SSAO_MODUALTE)
+        {
+            if (box->isChecked())
+            {
+                CompositorManager::getSingleton().addCompositor(mViewport, "SSAO/Post/Modulate");
+                CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", true);
+                mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+                mLight = mSceneMgr->createLight();
+                mLight->setPosition(30, 80, 30);
+            }
+            else
+            {  
+                mSceneMgr->destroyLight(mLight);
+                mLight = NULL;
                 CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", false);
-				CompositorManager::getSingleton().removeCompositor(mViewport, "SSAO/Post/Modulate");
-			}
-		}
+                CompositorManager::getSingleton().removeCompositor(mViewport, "SSAO/Post/Modulate");
+            }
+        }
         else if (box->getName() == SSAO_SAMPLE_SPACE_NAME)
         {
             setUniform("SSAO/Crytek", "SSAO/Crytek", "cSampleInScreenspace", box->isChecked(), false, 1);
@@ -743,21 +745,21 @@ protected:
         }
     }
     
-	// The following three methods are for mouse input
-	/** @see Sample::mousePressed. */
+    // The following three methods are for mouse input
+    /** @see Sample::mousePressed. */
 #if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
     
     bool mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
     {
         if (mTrayMgr->injectMouseDown(evt, id)) 
             return true;
-        if (id == OIS::MB_Left) 	
-            mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene			
+        if (id == OIS::MB_Left)     
+            mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
         
         return true;
     }
     
-	/** @see Sample::mouseReleased. */
+    /** @see Sample::mouseReleased. */
     bool mouseReleased( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
     {
         if (mTrayMgr->injectMouseUp(evt, id)) 
@@ -768,7 +770,7 @@ protected:
         return true;
     }
     
-	/** @see Sample::mouseMoved. */
+    /** @see Sample::mouseMoved. */
     bool mouseMoved( const OIS::MouseEvent& evt )
     {
         // only rotate the camera if cursor is hidden
@@ -783,16 +785,16 @@ protected:
         return true;
     }
 #endif
-	/**
-	 * Set the uniform value in the compositor
-	 * @param compositor The name of the compositor
-	 * @param material The material that contains the uniform
-	 * @param uniform The name of the uniform parameter
-	 * @param value The value
-	 * @param setVisible Whether to set the compositor to visible or not.
-	 * @param position The position at which the compositor should be added again.
-	 * defaults to -1, which means that the compositor is readded at the end of the chain.
-	 */
+    /**
+     * Set the uniform value in the compositor
+     * @param compositor The name of the compositor
+     * @param material The material that contains the uniform
+     * @param uniform The name of the uniform parameter
+     * @param value The value
+     * @param setVisible Whether to set the compositor to visible or not.
+     * @param position The position at which the compositor should be added again.
+     * defaults to -1, which means that the compositor is readded at the end of the chain.
+     */
     void setUniform(Ogre::String compositor, Ogre::String material, Ogre::String uniform, float value, bool setVisible, int position = -1)
     {
         // remove compositor first???

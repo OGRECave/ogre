@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,33 +35,33 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Optional Components
-	*  @{
-	*/
+    /** \addtogroup Optional Components
+    *  @{
+    */
 
-	/** \addtogroup Paging
-	*  Some details on paging component
-	*  @{
-	*/
+    /** \addtogroup Paging
+    *  Some details on paging component
+    *  @{
+    */
 
-	/** Define the interface to a factory class that will create subclasses
-	of PageContent. 
-	*/
-	class PageContentFactory : public PageAlloc
-	{
-	public:
-		PageContentFactory() {}
-		virtual ~PageContentFactory() {}
+    /** Define the interface to a factory class that will create subclasses
+    of PageContent. 
+    */
+    class PageContentFactory : public PageAlloc
+    {
+    public:
+        PageContentFactory() {}
+        virtual ~PageContentFactory() {}
 
-		virtual const String& getName() const = 0;
-		virtual PageContent* createInstance() = 0;
-		virtual void destroyInstance(PageContent*) = 0;
+        virtual const String& getName() const = 0;
+        virtual PageContent* createInstance() = 0;
+        virtual void destroyInstance(PageContent*) = 0;
 
-	};
+    };
 
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

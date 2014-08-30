@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreGLESRenderSystem.h"
 #include "OgreGLESHardwarePixelBuffer.h"
 #include "OgreGLESStateCacheManager.h"
+#include "OgreTextureManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -104,10 +105,10 @@ namespace Ogre {
         mHeight = GLESPixelUtil::optionalPO2(mHeight);
         mDepth = GLESPixelUtil::optionalPO2(mDepth);
         
-		// Adjust format if required
+        // Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
         
-		// Check requested number of mipmaps
+        // Check requested number of mipmaps
         size_t maxMips = GLESPixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
         
         if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
@@ -117,11 +118,11 @@ namespace Ogre {
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
         
-		// Generate texture name
+        // Generate texture name
         glGenTextures(1, &mTextureID);
         GL_CHECK_ERROR;
         
-		// Set texture type
+        // Set texture type
         mGLSupport.getStateCacheManager()->bindGLTexture(getGLESTextureTarget(), mTextureID);
         
         // Set some misc default parameters, these can of course be changed later
@@ -137,7 +138,7 @@ namespace Ogre {
         mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
                                                              GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         
-		// If we can do automip generation and the user desires this, do so
+        // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
         Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
         
@@ -181,9 +182,9 @@ namespace Ogre {
                 size = PixelUtil::getMemorySize(width, height, depth, mFormat);
                 
                 switch(mTextureType)
-				{
-					case TEX_TYPE_1D:
-					case TEX_TYPE_2D:
+                {
+                    case TEX_TYPE_1D:
+                    case TEX_TYPE_2D:
                         glCompressedTexImage2D(GL_TEXTURE_2D,
                                                mip,
                                                internalformat,
@@ -195,13 +196,13 @@ namespace Ogre {
                         break;
 #ifdef GL_OES_texture_cube_map
                     case TEX_TYPE_CUBE_MAP:
-						for(int face = 0; face < 6; face++) {
-							glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_OES + face, mip, internalformat,
+                        for(int face = 0; face < 6; face++) {
+                            glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_OES + face, mip, internalformat,
                                                    width, height, 0,
                                                    size, tmpdata);
                             GL_CHECK_ERROR;
-						}
-						break;
+                        }
+                        break;
 #endif
                     default:
                         break;
@@ -234,9 +235,9 @@ namespace Ogre {
             for(size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
                 switch(mTextureType)
-				{
-					case TEX_TYPE_1D:
-					case TEX_TYPE_2D:
+                {
+                    case TEX_TYPE_1D:
+                    case TEX_TYPE_2D:
                         glTexImage2D(GL_TEXTURE_2D,
                                      mip,
                                      internalformat,
@@ -247,13 +248,13 @@ namespace Ogre {
                         GL_CHECK_ERROR;
                         break;
 #ifdef GL_OES_texture_cube_map
-					case TEX_TYPE_CUBE_MAP:
-						for(int face = 0; face < 6; face++) {
-							glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_OES + face, mip, internalformat,
+                    case TEX_TYPE_CUBE_MAP:
+                        for(int face = 0; face < 6; face++) {
+                            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X_OES + face, mip, internalformat,
                                          width, height, 0,
                                          format, datatype, 0);
-						}
-						break;
+                        }
+                        break;
 #endif
                     default:
                         break;
@@ -274,7 +275,7 @@ namespace Ogre {
     // Creation / loading methods
     void GLESTexture::createInternalResourcesImpl(void)
     {
-		_createGLTexResource();
+        _createGLTexResource();
         
         _createSurfaceList();
 
@@ -322,11 +323,11 @@ namespace Ogre {
             }
 #endif
             
-			// If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap creation
+            // If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap creation
             PixelFormat imageFormat = (*loadedImages)[0].getFormat();
-			if (imageFormat == PF_PVRTC_RGB2 || imageFormat == PF_PVRTC_RGBA2 ||
+            if (imageFormat == PF_PVRTC_RGB2 || imageFormat == PF_PVRTC_RGBA2 ||
                 imageFormat == PF_PVRTC_RGB4 || imageFormat == PF_PVRTC_RGBA4)
-			{
+            {
                 size_t imageMips = (*loadedImages)[0].getNumMipmaps();
                 if (imageMips == 0)
                 {
@@ -334,7 +335,7 @@ namespace Ogre {
                     // Disable flag for auto mip generation
                     mUsage &= ~TU_AUTOMIPMAP;
                 }
-			}
+            }
         }
 #ifdef GL_OES_texture_cube_map
         else if (mTextureType == TEX_TYPE_CUBE_MAP)
@@ -465,8 +466,8 @@ namespace Ogre {
 
         for (size_t face = 0; face < getNumFaces(); face++)
         {
-			size_t width = mWidth;
-			size_t height = mHeight;
+            size_t width = mWidth;
+            size_t height = mHeight;
             for (size_t mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GLESHardwarePixelBuffer *buf = OGRE_NEW GLESTextureBuffer(mName,
@@ -519,4 +520,10 @@ namespace Ogre {
         assert(idx < mSurfaceList.size());
         return mSurfaceList[idx];
     }
+    
+    void GLESTexture::getCustomAttribute(const String& name, void* pData)
+	{
+		if (name == "GLID")
+			*static_cast<GLuint*>(pData) = mTextureID;
+	}
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,13 @@ namespace Ogre {
             OGRE_EXCEPT (Exception::ERR_INTERNAL_ERROR, "Could not load config dialog",
                          "ConfigDialog::initialise");
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        NSArray *keys = [[NSArray alloc] initWithObjects:@"Stereo Mode", @"Full Screen", @"FSAA", @"Colour Depth", @"RTT Preferred Mode", @"Video Mode", @"sRGB Gamma Conversion", @"macAPI", @"Content Scaling Factor", nil];
+        NSArray *stereoModeOptions = [[NSArray alloc] initWithObjects:@"None", @"Frame Sequential", nil];
+#else
         NSArray *keys = [[NSArray alloc] initWithObjects:@"Full Screen", @"FSAA", @"Colour Depth", @"RTT Preferred Mode", @"Video Mode", @"sRGB Gamma Conversion", @"macAPI", @"Content Scaling Factor", nil];
+#endif
+        
         NSArray *fullScreenOptions = [[NSArray alloc] initWithObjects:@"Yes", @"No", nil];
         NSArray *colourDepthOptions = [[NSArray alloc] initWithObjects:@"32", @"16", nil];
         NSArray *rttOptions = [[NSArray alloc] initWithObjects:@"FBO", @"PBuffer", @"Copy", nil];
@@ -87,6 +93,10 @@ namespace Ogre {
 			rs->setConfigOption("macAPI", "carbon");
 #endif
             
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			rs->setConfigOption("Stereo Mode", "None");
+#endif
+
             // Add to the drop down
             NSString *renderSystemName = [[NSString alloc] initWithCString:rs->getName().c_str() encoding:NSASCIIStringEncoding];
             [[mWindowDelegate getRenderSystemsPopUp] addItemWithTitle:renderSystemName];
@@ -125,11 +135,19 @@ namespace Ogre {
             }
         }
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		NSArray *objects = [[NSArray alloc] initWithObjects:stereoModeOptions, fullScreenOptions, fsaaOptions,
+			 colourDepthOptions, rttOptions, videoModeOptions, sRGBOptions, macAPIOptions, contentScaleOptions, nil];
+#else
         NSArray *objects = [[NSArray alloc] initWithObjects:fullScreenOptions, fsaaOptions,
                             colourDepthOptions, rttOptions, videoModeOptions, sRGBOptions, macAPIOptions, contentScaleOptions, nil];
-        [mWindowDelegate setOptions:[NSDictionary dictionaryWithObjects:objects forKeys:keys]];
+#endif
+		[mWindowDelegate setOptions:[NSDictionary dictionaryWithObjects:objects forKeys:keys]];
 
         // Clean up all those arrays
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		[stereoModeOptions release];
+#endif
         [fullScreenOptions release];
         [fsaaOptions release];
         [colourDepthOptions release];

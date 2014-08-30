@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreException.h"
-
-#include "OgreRoot.h"
 #include "OgreLogManager.h"
 
 #ifdef __BORLANDC__
@@ -48,64 +46,66 @@ namespace Ogre {
     }
 
     Exception::Exception(int num, const String& desc, const String& src, 
-		const char* typ, const char* fil, long lin) :
+        const char* typ, const char* fil, long lin) :
         line( lin ),
         number( num ),
-		typeName(typ),
+        typeName(typ),
         description( desc ),
         source( src ),
         file( fil )
     {
         // Log this error, mask it from debug though since it may be caught and ignored
         if(LogManager::getSingletonPtr())
-		{
+        {
             LogManager::getSingleton().logMessage(
-				this->getFullDescription(), 
+                this->getFullDescription(), 
                 LML_CRITICAL, true);
-		}
+        }
 
     }
 
     Exception::Exception(const Exception& rhs)
         : line( rhs.line ), 
-		number( rhs.number ), 
-		typeName( rhs.typeName ), 
-		description( rhs.description ), 
-		source( rhs.source ), 
-		file( rhs.file )
+        number( rhs.number ), 
+        typeName( rhs.typeName ), 
+        description( rhs.description ), 
+        source( rhs.source ), 
+        file( rhs.file )
     {
     }
 
-    void Exception::operator = ( const Exception& rhs )
+    Exception & Exception::operator = ( const Exception& rhs )
     {
         description = rhs.description;
         number = rhs.number;
         source = rhs.source;
         file = rhs.file;
         line = rhs.line;
-		typeName = rhs.typeName;
+        typeName = rhs.typeName;
+
+        return *this;
     }
 
     const String& Exception::getFullDescription(void) const
     {
-		if (fullDesc.empty())
-		{
+        if (fullDesc.empty())
+        {
 
-			StringUtil::StrStreamType desc;
+            StringStream desc;
 
-			desc <<  "OGRE EXCEPTION(" << number << ":" << typeName << "): "
-				<< description 
-				<< " in " << source;
+            desc <<  "OGRE EXCEPTION(" << number << ":" << typeName << "): "
+                << description 
+                << " in " << source;
 
-			if( line > 0 )
-			{
-				desc << " at " << file << " (line " << line << ")";
-			}
+            if( line > 0 )
+            {
+                desc << " at " << file << " (line " << line << ")";
+            }
 
-			fullDesc = desc.str();
-		}
+            fullDesc = desc.str();
+        }
 
-		return fullDesc;
+        return fullDesc;
     }
 
     int Exception::getNumber(void) const throw()

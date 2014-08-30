@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -71,17 +71,17 @@ namespace Ogre {
         void writeBoneParent(TiXmlElement* boneHierarchyNode, String boneName , String parentName);
         void writeAnimation(TiXmlElement* animsNode, const Animation* anim);
         void writeAnimationTrack(TiXmlElement* tracksNode, 
-			const NodeAnimationTrack* track);
+            const NodeAnimationTrack* track);
         void writeKeyFrame(TiXmlElement* keysNode, const TransformKeyFrame* key);
-		void writeSkeletonAnimationLink(TiXmlElement* linksNode, 
-			const LinkedSkeletonAnimationSource& link);
-		
-		void readBones(Skeleton* skel, TiXmlElement* mBonesNode);
-		void readBones2(Skeleton* skel, TiXmlElement* mBonesNode);
-		void createHierarchy(Skeleton* skel, TiXmlElement* mHierNode);
-		void readKeyFrames(NodeAnimationTrack* track, TiXmlElement* mKeyfNode);
-		void readAnimations(Skeleton* skel, TiXmlElement* mAnimNode) ;
-		void readSkeletonAnimationLinks(Skeleton* skel, TiXmlElement* linksNode);
+        void writeSkeletonAnimationLink(TiXmlElement* linksNode, 
+            const LinkedSkeletonAnimationSource& link);
+        
+        void readBones(Skeleton* skel, TiXmlElement* mBonesNode);
+        void readBones2(Skeleton* skel, TiXmlElement* mBonesNode);
+        void createHierarchy(Skeleton* skel, TiXmlElement* mHierNode);
+        void readKeyFrames(NodeAnimationTrack* track, TiXmlElement* mKeyfNode);
+        void readAnimations(Skeleton* skel, TiXmlElement* mAnimNode) ;
+        void readSkeletonAnimationLinks(Skeleton* skel, TiXmlElement* linksNode);
 
     };
 

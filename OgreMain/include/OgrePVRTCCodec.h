@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,30 +31,30 @@ THE SOFTWARE.
 #include "OgreImageCodec.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Image
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Image
+    *  @{
+    */
 
     /** Codec specialized in loading PVRTC (PowerVR) images.
-	@remarks
-		We implement our own codec here since we need to be able to keep PVRTC
-		data compressed if the card supports it.
+    @remarks
+        We implement our own codec here since we need to be able to keep PVRTC
+        data compressed if the card supports it.
     */
     class _OgreExport PVRTCCodec : public ImageCodec
     {
     protected:
         String mType;
 
-    	void flipEndian(void * pData, size_t size, size_t count) const;
-	    void flipEndian(void * pData, size_t size) const;
+        void flipEndian(void * pData, size_t size, size_t count) const;
+        void flipEndian(void * pData, size_t size) const;
 
-		/// Single registered codec instance
-		static PVRTCCodec* msInstance;
+        /// Single registered codec instance
+        static PVRTCCodec* msInstance;
 
-	public:
+    public:
         PVRTCCodec();
         virtual ~PVRTCCodec() { }
 
@@ -64,25 +64,25 @@ namespace Ogre {
         void encodeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
         /// @copydoc Codec::decode
         DecodeResult decode(DataStreamPtr& input) const;
-		/// @copydoc Codec::magicNumberToFileExt
-		String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
+        /// @copydoc Codec::magicNumberToFileExt
+        String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
         
         virtual String getType() const;        
 
-		/// Static method to startup and register the PVRTC codec
-		static void startup(void);
-		/// Static method to shutdown and unregister the PVRTC codec
-		static void shutdown(void);
+        /// Static method to startup and register the PVRTC codec
+        static void startup(void);
+        /// Static method to shutdown and unregister the PVRTC codec
+        static void shutdown(void);
 
-	private:
-		/// Decode PVRTCV2 image format
-		DecodeResult decodeV2(DataStreamPtr& stream) const;
+    private:
+        /// Decode PVRTCV2 image format
+        DecodeResult decodeV2(DataStreamPtr& stream) const;
 
-		/// Decode PVRTCV3 image format
-		DecodeResult decodeV3(DataStreamPtr& stream) const;
+        /// Decode PVRTCV3 image format
+        DecodeResult decodeV3(DataStreamPtr& stream) const;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,8 @@ THE SOFTWARE.
 namespace Ogre 
 {
 
-	//---------------------------------------------------------------------
-	AnimationState::AnimationState(AnimationStateSet* parent, const AnimationState &rhs)
+    //---------------------------------------------------------------------
+    AnimationState::AnimationState(AnimationStateSet* parent, const AnimationState &rhs)
         : mBlendMask(0)
         , mAnimationName(rhs.mAnimationName)
         , mParent(parent)
@@ -44,16 +44,16 @@ namespace Ogre
         , mEnabled(rhs.mEnabled)
         , mLoop(rhs.mLoop)
   {
-		mParent->_notifyDirty();
-	}
-	//---------------------------------------------------------------------
-	AnimationState::~AnimationState()
-	{
-	}
+        mParent->_notifyDirty();
+    }
+    //---------------------------------------------------------------------
+    AnimationState::~AnimationState()
+    {
+    }
     //---------------------------------------------------------------------
     AnimationState::AnimationState(const String& animName, 
-		AnimationStateSet *parent, Real timePos, Real length, Real weight, 
-		bool enabled)
+        AnimationStateSet *parent, Real timePos, Real length, Real weight, 
+        bool enabled)
         : mBlendMask(0)
         , mAnimationName(animName)
         , mParent(parent)
@@ -63,7 +63,7 @@ namespace Ogre
         , mEnabled(enabled)
         , mLoop(true)
     {
-		mParent->_notifyDirty();
+        mParent->_notifyDirty();
     }
     //---------------------------------------------------------------------
     const String& AnimationState::getAnimationName() const
@@ -78,24 +78,24 @@ namespace Ogre
     //---------------------------------------------------------------------
     void AnimationState::setTimePosition(Real timePos)
     {
-		if (timePos != mTimePos)
-		{
-			mTimePos = timePos;
-			if (mLoop)
-			{
-				// Wrap
-				mTimePos = fmod(mTimePos, mLength);
-				if(mTimePos < 0)
-					mTimePos += mLength;     
-			}
-			else
-			{
-				// Clamp
-				if(mTimePos < 0)
-					mTimePos = 0;
-				else if (mTimePos > mLength)
-					mTimePos = mLength;
-			}
+        if (timePos != mTimePos)
+        {
+            mTimePos = timePos;
+            if (mLoop)
+            {
+                // Wrap
+                mTimePos = fmod(mTimePos, mLength);
+                if(mTimePos < 0)
+                    mTimePos += mLength;     
+            }
+            else
+            {
+                // Clamp
+                if(mTimePos < 0)
+                    mTimePos = 0;
+                else if (mTimePos > mLength)
+                    mTimePos = mLength;
+            }
 
             if (mEnabled)
                 mParent->_notifyDirty();
@@ -131,10 +131,10 @@ namespace Ogre
         setTimePosition(mTimePos + offset);
     }
     //---------------------------------------------------------------------
-	bool AnimationState::hasEnded(void) const
-	{
-		return (mTimePos >= mLength && !mLoop);
-	}
+    bool AnimationState::hasEnded(void) const
+    {
+        return (mTimePos >= mLength && !mLoop);
+    }
     //---------------------------------------------------------------------
     bool AnimationState::getEnabled(void) const
     {
@@ -176,10 +176,10 @@ namespace Ogre
         mWeight = animState.mWeight;
         mEnabled = animState.mEnabled;
         mLoop = animState.mLoop;
-		mParent->_notifyDirty();
+        mParent->_notifyDirty();
 
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void AnimationState::setBlendMaskEntry(size_t boneHandle, float weight)
     {
       assert(mBlendMask && mBlendMask->size() > boneHandle);
@@ -187,7 +187,7 @@ namespace Ogre
       if (mEnabled)
         mParent->_notifyDirty();
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void AnimationState::_setBlendMaskData(const float* blendMaskData) 
     {
       assert(mBlendMask && "No BlendMask set!");
@@ -202,7 +202,7 @@ namespace Ogre
       if (mEnabled)
         mParent->_notifyDirty();
     }
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     void AnimationState::_setBlendMask(const BoneBlendMask* blendMask) 
     {
       if(!mBlendMask)
@@ -211,48 +211,48 @@ namespace Ogre
       }
       _setBlendMaskData(&(*blendMask)[0]);
     }
-	//---------------------------------------------------------------------
-	void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
-	{
-		if(!mBlendMask)
-		{
-			if(initialWeight >= 0)
-			{
-				mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint, initialWeight);
-			}
-			else
-			{
-				mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint);
-			}
-		}
-	}
-	//---------------------------------------------------------------------
-	void AnimationState::destroyBlendMask()
-	{
-		OGRE_DELETE_T(mBlendMask, BoneBlendMask, MEMCATEGORY_ANIMATION);
-		mBlendMask = 0;
-	}
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    void AnimationState::createBlendMask(size_t blendMaskSizeHint, float initialWeight)
+    {
+        if(!mBlendMask)
+        {
+            if(initialWeight >= 0)
+            {
+                mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint, initialWeight);
+            }
+            else
+            {
+                mBlendMask = OGRE_NEW_T(BoneBlendMask, MEMCATEGORY_ANIMATION)(blendMaskSizeHint);
+            }
+        }
+    }
+    //---------------------------------------------------------------------
+    void AnimationState::destroyBlendMask()
+    {
+        OGRE_DELETE_T(mBlendMask, BoneBlendMask, MEMCATEGORY_ANIMATION);
+        mBlendMask = 0;
+    }
+    //---------------------------------------------------------------------
 
-	//---------------------------------------------------------------------
-	AnimationStateSet::AnimationStateSet()
-		: mDirtyFrameNumber(std::numeric_limits<unsigned long>::max())
-	{
-	}
-	//---------------------------------------------------------------------
-	AnimationStateSet::AnimationStateSet(const AnimationStateSet& rhs)
-		: mDirtyFrameNumber(std::numeric_limits<unsigned long>::max())
-	{
-		// lock rhs
+    //---------------------------------------------------------------------
+    AnimationStateSet::AnimationStateSet()
+        : mDirtyFrameNumber(std::numeric_limits<unsigned long>::max())
+    {
+    }
+    //---------------------------------------------------------------------
+    AnimationStateSet::AnimationStateSet(const AnimationStateSet& rhs)
+        : mDirtyFrameNumber(std::numeric_limits<unsigned long>::max())
+    {
+        // lock rhs
             OGRE_LOCK_MUTEX(rhs.OGRE_AUTO_MUTEX_NAME);
 
-		for (AnimationStateMap::const_iterator i = rhs.mAnimationStates.begin();
-			i != rhs.mAnimationStates.end(); ++i)
-		{
-			AnimationState* src = i->second;
-			mAnimationStates[src->getAnimationName()] = 
-				OGRE_NEW AnimationState(this, *src);
-		}
+        for (AnimationStateMap::const_iterator i = rhs.mAnimationStates.begin();
+            i != rhs.mAnimationStates.end(); ++i)
+        {
+            AnimationState* src = i->second;
+            mAnimationStates[src->getAnimationName()] = 
+                OGRE_NEW AnimationState(this, *src);
+        }
 
         // Clone enabled animation state list
         for (EnabledAnimationStateList::const_iterator it = rhs.mEnabledAnimationStates.begin();
@@ -261,108 +261,108 @@ namespace Ogre
             const AnimationState* src = *it;
             mEnabledAnimationStates.push_back(getAnimationState(src->getAnimationName()));
         }
-	}
-	//---------------------------------------------------------------------
-	AnimationStateSet::~AnimationStateSet()
-	{
-		// Destroy
-		removeAllAnimationStates();
-	}
-	//---------------------------------------------------------------------
-	void AnimationStateSet::removeAnimationState(const String& name)
-	{
+    }
+    //---------------------------------------------------------------------
+    AnimationStateSet::~AnimationStateSet()
+    {
+        // Destroy
+        removeAllAnimationStates();
+    }
+    //---------------------------------------------------------------------
+    void AnimationStateSet::removeAnimationState(const String& name)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		AnimationStateMap::iterator i = mAnimationStates.find(name);
-		if (i != mAnimationStates.end())
-		{
+        AnimationStateMap::iterator i = mAnimationStates.find(name);
+        if (i != mAnimationStates.end())
+        {
             mEnabledAnimationStates.remove(i->second);
 
-			OGRE_DELETE i->second;
-			mAnimationStates.erase(i);
-		}
-	}
-	//---------------------------------------------------------------------
-	void AnimationStateSet::removeAllAnimationStates(void)
-	{
+            OGRE_DELETE i->second;
+            mAnimationStates.erase(i);
+        }
+    }
+    //---------------------------------------------------------------------
+    void AnimationStateSet::removeAllAnimationStates(void)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		for (AnimationStateMap::iterator i = mAnimationStates.begin();
-			i != mAnimationStates.end(); ++i)
-		{
-			OGRE_DELETE i->second;
-		}
-		mAnimationStates.clear();
+        for (AnimationStateMap::iterator i = mAnimationStates.begin();
+            i != mAnimationStates.end(); ++i)
+        {
+            OGRE_DELETE i->second;
+        }
+        mAnimationStates.clear();
         mEnabledAnimationStates.clear();
 
-	}
-	//---------------------------------------------------------------------
-	AnimationState* AnimationStateSet::createAnimationState(const String& name,  
-		Real timePos, Real length, Real weight, bool enabled)
-	{
+    }
+    //---------------------------------------------------------------------
+    AnimationState* AnimationStateSet::createAnimationState(const String& name,  
+        Real timePos, Real length, Real weight, bool enabled)
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		AnimationStateMap::iterator i = mAnimationStates.find(name);
-		if (i != mAnimationStates.end())
-		{
-			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
-				"State for animation named '" + name + "' already exists.", 
-				"AnimationStateSet::createAnimationState");
-		}
+        AnimationStateMap::iterator i = mAnimationStates.find(name);
+        if (i != mAnimationStates.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
+                "State for animation named '" + name + "' already exists.", 
+                "AnimationStateSet::createAnimationState");
+        }
 
-		AnimationState* newState = OGRE_NEW AnimationState(name, this, timePos, 
-			length, weight, enabled);
-		mAnimationStates[name] = newState;
+        AnimationState* newState = OGRE_NEW AnimationState(name, this, timePos, 
+            length, weight, enabled);
+        mAnimationStates[name] = newState;
 
-		return newState;
+        return newState;
 
-	}
-	//---------------------------------------------------------------------
-	AnimationState* AnimationStateSet::getAnimationState(const String& name) const
-	{
+    }
+    //---------------------------------------------------------------------
+    AnimationState* AnimationStateSet::getAnimationState(const String& name) const
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		AnimationStateMap::const_iterator i = mAnimationStates.find(name);
-		if (i == mAnimationStates.end())
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-				"No state found for animation named '" + name + "'", 
-				"AnimationStateSet::getAnimationState");
-		}
-		return i->second;
-	}
-	//---------------------------------------------------------------------
-	bool AnimationStateSet::hasAnimationState(const String& name) const
-	{
+        AnimationStateMap::const_iterator i = mAnimationStates.find(name);
+        if (i == mAnimationStates.end())
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+                "No state found for animation named '" + name + "'", 
+                "AnimationStateSet::getAnimationState");
+        }
+        return i->second;
+    }
+    //---------------------------------------------------------------------
+    bool AnimationStateSet::hasAnimationState(const String& name) const
+    {
             OGRE_LOCK_AUTO_MUTEX;
 
-		return mAnimationStates.find(name) != mAnimationStates.end();
-	}
-	//---------------------------------------------------------------------
-	AnimationStateIterator AnimationStateSet::getAnimationStateIterator(void)
-	{
+        return mAnimationStates.find(name) != mAnimationStates.end();
+    }
+    //---------------------------------------------------------------------
+    AnimationStateIterator AnimationStateSet::getAnimationStateIterator(void)
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		// returned iterator not threadsafe, noted in header
-		return AnimationStateIterator(
-			mAnimationStates.begin(), mAnimationStates.end());
-	}
-	//---------------------------------------------------------------------
-	ConstAnimationStateIterator AnimationStateSet::getAnimationStateIterator(void) const
-	{
+        // returned iterator not threadsafe, noted in header
+        return AnimationStateIterator(
+            mAnimationStates.begin(), mAnimationStates.end());
+    }
+    //---------------------------------------------------------------------
+    ConstAnimationStateIterator AnimationStateSet::getAnimationStateIterator(void) const
+    {
             OGRE_LOCK_AUTO_MUTEX;
-		// returned iterator not threadsafe, noted in header
-		return ConstAnimationStateIterator(
-			mAnimationStates.begin(), mAnimationStates.end());
-	}
-	//---------------------------------------------------------------------
-	void AnimationStateSet::copyMatchingState(AnimationStateSet* target) const
-	{
-		// lock target
+        // returned iterator not threadsafe, noted in header
+        return ConstAnimationStateIterator(
+            mAnimationStates.begin(), mAnimationStates.end());
+    }
+    //---------------------------------------------------------------------
+    void AnimationStateSet::copyMatchingState(AnimationStateSet* target) const
+    {
+        // lock target
             OGRE_LOCK_MUTEX(target->OGRE_AUTO_MUTEX_NAME);
-		// lock source
+        // lock source
             OGRE_LOCK_AUTO_MUTEX;
 
-		AnimationStateMap::iterator i, iend;
+        AnimationStateMap::iterator i, iend;
         iend = target->mAnimationStates.end();
         for (i = target->mAnimationStates.begin(); i != iend; ++i) {
             AnimationStateMap::const_iterator iother = mAnimationStates.find(i->first);
@@ -401,7 +401,7 @@ namespace Ogre
     void AnimationStateSet::_notifyAnimationStateEnabled(AnimationState* target, bool enabled)
     {
         OGRE_LOCK_AUTO_MUTEX;
-		// Remove from enabled animation state list first
+        // Remove from enabled animation state list first
         mEnabledAnimationStates.remove(target);
 
         // Add to enabled animation state list if need
@@ -417,21 +417,21 @@ namespace Ogre
     ConstEnabledAnimationStateIterator AnimationStateSet::getEnabledAnimationStateIterator(void) const
     {
         OGRE_LOCK_AUTO_MUTEX;
-		// returned iterator not threadsafe, noted in header
+        // returned iterator not threadsafe, noted in header
         return ConstEnabledAnimationStateIterator(
             mEnabledAnimationStates.begin(), mEnabledAnimationStates.end());
     }
-	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	Real AnimationStateControllerValue::getValue(void) const
-	{
-		return mTargetAnimationState->getTimePosition() / mTargetAnimationState->getLength();
-	}
-	//---------------------------------------------------------------------
-	void AnimationStateControllerValue::setValue(Real value)
-	{
-		mTargetAnimationState->setTimePosition(value * mTargetAnimationState->getLength());
-	}
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    Real AnimationStateControllerValue::getValue(void) const
+    {
+        return mTargetAnimationState->getTimePosition() / mTargetAnimationState->getLength();
+    }
+    //---------------------------------------------------------------------
+    void AnimationStateControllerValue::setValue(Real value)
+    {
+        mTargetAnimationState->setTimePosition(value * mTargetAnimationState->getLength());
+    }
 
 
 }

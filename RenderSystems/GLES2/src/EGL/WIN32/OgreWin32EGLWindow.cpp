@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,269 +46,269 @@ THE SOFTWARE.
 
 namespace Ogre {
     Win32EGLWindow::Win32EGLWindow(Win32EGLSupport *glsupport)
-		: EGLWindow(glsupport)
+        : EGLWindow(glsupport)
     {
-		mGLSupport = glsupport;
-		mNativeDisplay = glsupport->getNativeDisplay();
+        mGLSupport = glsupport;
+        mNativeDisplay = glsupport->getNativeDisplay();
     }
 
     Win32EGLWindow::~Win32EGLWindow()
     {
     }
 
-	EGLContext * Win32EGLWindow::createEGLContext() const
-	{
-		return new Win32EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
-	}
+    EGLContext * Win32EGLWindow::createEGLContext() const
+    {
+        return new Win32EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
+    }
 
-	void Win32EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
-	{
+    void Win32EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
+    {
 
-	}
+    }
 
-	void Win32EGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
-	{
+    void Win32EGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
+    {
 
-	}
+    }
 
-	void Win32EGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
-	{
-		// destroy current window, if any
-		if (mWindow)
-			destroy();
+    void Win32EGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
+    {
+        // destroy current window, if any
+        if (mWindow)
+            destroy();
 
 #ifdef OGRE_STATIC_LIB
-		HINSTANCE hInst = GetModuleHandle( NULL );
+        HINSTANCE hInst = GetModuleHandle( NULL );
 #else
 #  if OGRE_DEBUG_MODE == 1
-		HINSTANCE hInst = GetModuleHandle("RenderSystem_GLES2_d.dll");
+        HINSTANCE hInst = GetModuleHandle("RenderSystem_GLES2_d.dll");
 #  else
-		HINSTANCE hInst = GetModuleHandle("RenderSystem_GLES2.dll");
+        HINSTANCE hInst = GetModuleHandle("RenderSystem_GLES2.dll");
 #  endif
 #endif
 
-		mWindow = 0;
-		mClosed = false;		
-		mColourDepth = mIsFullScreen? 32 : GetDeviceCaps(GetDC(0), BITSPIXEL);
-		HWND parent = 0;
-		bool vsync = false;
-		String border;
-		bool outerSize = false;
-		bool hwGamma = false;
-		int monitorIndex = -1;
-		HMONITOR hMonitor = NULL;
+        mWindow = 0;
+        mClosed = false;        
+        mColourDepth = mIsFullScreen? 32 : GetDeviceCaps(GetDC(0), BITSPIXEL);
+        HWND parent = 0;
+        bool vsync = false;
+        String border;
+        bool outerSize = false;
+        bool hwGamma = false;
+        int monitorIndex = -1;
+        HMONITOR hMonitor = NULL;
 
 
-		if (!mIsExternal)
-		{
-			DWORD		  dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
-			DWORD		  dwStyleEx = 0;					
-			MONITORINFOEX monitorInfoEx;
-			RECT		  rc;
+        if (!mIsExternal)
+        {
+            DWORD         dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
+            DWORD         dwStyleEx = 0;                    
+            MONITORINFOEX monitorInfoEx;
+            RECT          rc;
 
-			// If we didn't specified the adapter index, or if it didn't find it
-			if (hMonitor == NULL)
-			{
-				POINT windowAnchorPoint;
+            // If we didn't specified the adapter index, or if it didn't find it
+            if (hMonitor == NULL)
+            {
+                POINT windowAnchorPoint;
 
-				// Fill in anchor point.
-				windowAnchorPoint.x = left;
-				windowAnchorPoint.y = top;
-
-
-				// Get the nearest monitor to this window.
-				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
-			}
-
-			// Get the target monitor info		
-			memset(&monitorInfoEx, 0, sizeof(MONITORINFOEX));
-			monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
-			GetMonitorInfo(hMonitor, &monitorInfoEx);
-
-			//size_t devNameLen = strlen(monitorInfoEx.szDevice);
-			//mDeviceName = new char[devNameLen + 1];
-
-			//strcpy(mDeviceName, monitorInfoEx.szDevice);			
+                // Fill in anchor point.
+                windowAnchorPoint.x = left;
+                windowAnchorPoint.y = top;
 
 
-			// No specified top left -> Center the window in the middle of the monitor
-			if (left == -1 || top == -1)
-			{				
-				int screenw = monitorInfoEx.rcMonitor.right  - monitorInfoEx.rcMonitor.left;
-				int screenh = monitorInfoEx.rcMonitor.bottom - monitorInfoEx.rcMonitor.top;
+                // Get the nearest monitor to this window.
+                hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
+            }
 
-				SetRect(&rc, 0, 0, width, height);
-				AdjustWindowRect(&rc, dwStyle, false);
+            // Get the target monitor info      
+            memset(&monitorInfoEx, 0, sizeof(MONITORINFOEX));
+            monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
+            GetMonitorInfo(hMonitor, &monitorInfoEx);
 
-				// clamp window dimensions to screen size
-				int outerw = (rc.right-rc.left < screenw)? rc.right-rc.left : screenw;
-				int outerh = (rc.bottom-rc.top < screenh)? rc.bottom-rc.top : screenh;
+            //size_t devNameLen = strlen(monitorInfoEx.szDevice);
+            //mDeviceName = new char[devNameLen + 1];
 
-				if (left == -1)
-					left = monitorInfoEx.rcMonitor.left + (screenw - outerw) / 2;
-				else if (monitorIndex != -1)
-					left += monitorInfoEx.rcMonitor.left;
+            //strcpy(mDeviceName, monitorInfoEx.szDevice);          
 
-				if (top == -1)
-					top = monitorInfoEx.rcMonitor.top + (screenh - outerh) / 2;
-				else if (monitorIndex != -1)
-					top += monitorInfoEx.rcMonitor.top;
-			}
-			else if (monitorIndex != -1)
-			{
-				left += monitorInfoEx.rcMonitor.left;
-				top += monitorInfoEx.rcMonitor.top;
-			}
 
-			mWidth = width;
-			mHeight = height;
-			mTop = top;
-			mLeft = left;
+            // No specified top left -> Center the window in the middle of the monitor
+            if (left == -1 || top == -1)
+            {               
+                int screenw = monitorInfoEx.rcMonitor.right  - monitorInfoEx.rcMonitor.left;
+                int screenh = monitorInfoEx.rcMonitor.bottom - monitorInfoEx.rcMonitor.top;
 
-			if (mIsFullScreen)
-			{
-				dwStyle |= WS_POPUP;
-				dwStyleEx |= WS_EX_TOPMOST;
-				mTop = monitorInfoEx.rcMonitor.top;
-				mLeft = monitorInfoEx.rcMonitor.left;											
-			}
-			else
-			{				
-				if (parent)
-				{
-					dwStyle |= WS_CHILD;
-				}
-				else
-				{
-					if (border == "none")
-						dwStyle |= WS_POPUP;
-					else if (border == "fixed")
-						dwStyle |= WS_OVERLAPPED | WS_BORDER | WS_CAPTION |
-						WS_SYSMENU | WS_MINIMIZEBOX;
-					else
-						dwStyle |= WS_OVERLAPPEDWINDOW;
-				}
+                SetRect(&rc, 0, 0, width, height);
+                AdjustWindowRect(&rc, dwStyle, false);
 
-				int screenw = GetSystemMetrics(SM_CXSCREEN);
-				int screenh = GetSystemMetrics(SM_CYSCREEN);
+                // clamp window dimensions to screen size
+                int outerw = (rc.right-rc.left < screenw)? rc.right-rc.left : screenw;
+                int outerh = (rc.bottom-rc.top < screenh)? rc.bottom-rc.top : screenh;
 
-				if (!outerSize)
-				{
-					// Calculate window dimensions required
-					// to get the requested client area
-					SetRect(&rc, 0, 0, mWidth, mHeight);
-					AdjustWindowRect(&rc, dwStyle, false);
-					mWidth = rc.right - rc.left;
-					mHeight = rc.bottom - rc.top;
+                if (left == -1)
+                    left = monitorInfoEx.rcMonitor.left + (screenw - outerw) / 2;
+                else if (monitorIndex != -1)
+                    left += monitorInfoEx.rcMonitor.left;
 
-					// Clamp window rect to the nearest display monitor.
-					if (mLeft < monitorInfoEx.rcMonitor.left)
-						mLeft = monitorInfoEx.rcMonitor.left;		
+                if (top == -1)
+                    top = monitorInfoEx.rcMonitor.top + (screenh - outerh) / 2;
+                else if (monitorIndex != -1)
+                    top += monitorInfoEx.rcMonitor.top;
+            }
+            else if (monitorIndex != -1)
+            {
+                left += monitorInfoEx.rcMonitor.left;
+                top += monitorInfoEx.rcMonitor.top;
+            }
 
-					if (mTop < monitorInfoEx.rcMonitor.top)					
-						mTop = monitorInfoEx.rcMonitor.top;					
+            mWidth = width;
+            mHeight = height;
+            mTop = top;
+            mLeft = left;
 
-					if ((int)mWidth > monitorInfoEx.rcMonitor.right - mLeft)					
-						mWidth = monitorInfoEx.rcMonitor.right - mLeft;	
+            if (mIsFullScreen)
+            {
+                dwStyle |= WS_POPUP;
+                dwStyleEx |= WS_EX_TOPMOST;
+                mTop = monitorInfoEx.rcMonitor.top;
+                mLeft = monitorInfoEx.rcMonitor.left;                                           
+            }
+            else
+            {               
+                if (parent)
+                {
+                    dwStyle |= WS_CHILD;
+                }
+                else
+                {
+                    if (border == "none")
+                        dwStyle |= WS_POPUP;
+                    else if (border == "fixed")
+                        dwStyle |= WS_OVERLAPPED | WS_BORDER | WS_CAPTION |
+                        WS_SYSMENU | WS_MINIMIZEBOX;
+                    else
+                        dwStyle |= WS_OVERLAPPEDWINDOW;
+                }
 
-					if ((int)mHeight > monitorInfoEx.rcMonitor.bottom - mTop)					
-						mHeight = monitorInfoEx.rcMonitor.bottom - mTop;		
-				}			
-			}
+                int screenw = GetSystemMetrics(SM_CXSCREEN);
+                int screenh = GetSystemMetrics(SM_CYSCREEN);
 
-			// register class and create window
-			WNDCLASS wc = { CS_OWNDC, WindowEventUtilities::_WndProc, 0, 0, hInst,
-				LoadIcon(NULL, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
-				(HBRUSH)GetStockObject(BLACK_BRUSH), NULL, "OgreGLES2Window" };
-			RegisterClass(&wc);
+                if (!outerSize)
+                {
+                    // Calculate window dimensions required
+                    // to get the requested client area
+                    SetRect(&rc, 0, 0, mWidth, mHeight);
+                    AdjustWindowRect(&rc, dwStyle, false);
+                    mWidth = rc.right - rc.left;
+                    mHeight = rc.bottom - rc.top;
 
-			if (mIsFullScreen)
-			{
-				DEVMODE displayDeviceMode;
+                    // Clamp window rect to the nearest display monitor.
+                    if (mLeft < monitorInfoEx.rcMonitor.left)
+                        mLeft = monitorInfoEx.rcMonitor.left;       
 
-				memset(&displayDeviceMode, 0, sizeof(displayDeviceMode));
-				displayDeviceMode.dmSize = sizeof(DEVMODE);
-				displayDeviceMode.dmBitsPerPel = mColourDepth;
-				displayDeviceMode.dmPelsWidth = mWidth;
-				displayDeviceMode.dmPelsHeight = mHeight;
-				displayDeviceMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+                    if (mTop < monitorInfoEx.rcMonitor.top)                 
+                        mTop = monitorInfoEx.rcMonitor.top;                 
+
+                    if ((int)mWidth > monitorInfoEx.rcMonitor.right - mLeft)                    
+                        mWidth = monitorInfoEx.rcMonitor.right - mLeft; 
+
+                    if ((int)mHeight > monitorInfoEx.rcMonitor.bottom - mTop)                   
+                        mHeight = monitorInfoEx.rcMonitor.bottom - mTop;        
+                }           
+            }
+
+            // register class and create window
+            WNDCLASS wc = { CS_OWNDC, WindowEventUtilities::_WndProc, 0, 0, hInst,
+                LoadIcon(NULL, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
+                (HBRUSH)GetStockObject(BLACK_BRUSH), NULL, "OgreGLES2Window" };
+            RegisterClass(&wc);
+
+            if (mIsFullScreen)
+            {
+                DEVMODE displayDeviceMode;
+
+                memset(&displayDeviceMode, 0, sizeof(displayDeviceMode));
+                displayDeviceMode.dmSize = sizeof(DEVMODE);
+                displayDeviceMode.dmBitsPerPel = mColourDepth;
+                displayDeviceMode.dmPelsWidth = mWidth;
+                displayDeviceMode.dmPelsHeight = mHeight;
+                displayDeviceMode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 /*
-				if (mDisplayFrequency)
-				{
-					displayDeviceMode.dmDisplayFrequency = mDisplayFrequency;
-					displayDeviceMode.dmFields |= DM_DISPLAYFREQUENCY;
-					if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN | CDS_TEST, NULL) != DISP_CHANGE_SUCCESSFUL)
-					{
-						LogManager::getSingleton().logMessage(LML_NORMAL, "ChangeDisplaySettings with user display frequency failed");
-						displayDeviceMode.dmFields ^= DM_DISPLAYFREQUENCY;
-					}
-				}
-				if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)								
-					LogManager::getSingleton().logMessage(LML_CRITICAL, "ChangeDisplaySettings failed");
+                if (mDisplayFrequency)
+                {
+                    displayDeviceMode.dmDisplayFrequency = mDisplayFrequency;
+                    displayDeviceMode.dmFields |= DM_DISPLAYFREQUENCY;
+                    if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN | CDS_TEST, NULL) != DISP_CHANGE_SUCCESSFUL)
+                    {
+                        LogManager::getSingleton().logMessage(LML_NORMAL, "ChangeDisplaySettings with user display frequency failed");
+                        displayDeviceMode.dmFields ^= DM_DISPLAYFREQUENCY;
+                    }
+                }
+                if (ChangeDisplaySettingsEx(mDeviceName, &displayDeviceMode, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)                             
+                    LogManager::getSingleton().logMessage(LML_CRITICAL, "ChangeDisplaySettings failed");
 */
 
-			}
-			// Pass pointer to self as WM_CREATE parameter
-			mWindow = CreateWindowEx(dwStyleEx, "OgreGLES2Window", title.c_str(),
-				dwStyle, mLeft, mTop, mWidth, mHeight, parent, 0, hInst, this);
+            }
+            // Pass pointer to self as WM_CREATE parameter
+            mWindow = CreateWindowEx(dwStyleEx, "OgreGLES2Window", title.c_str(),
+                dwStyle, mLeft, mTop, mWidth, mHeight, parent, 0, hInst, this);
 
-			WindowEventUtilities::_addRenderWindow(this);
+            WindowEventUtilities::_addRenderWindow(this);
 
-			LogManager::getSingleton().stream()
-				<< "Created Win32Window '"
-				<< mName << "' : " << mWidth << "x" << mHeight
-				<< ", " << mColourDepth << "bpp";
+            LogManager::getSingleton().stream()
+                << "Created Win32Window '"
+                << mName << "' : " << mWidth << "x" << mHeight
+                << ", " << mColourDepth << "bpp";
 
-		}
+        }
 
-		RECT rc;
-		// top and left represent outer window position
-		GetWindowRect(mWindow, &rc);
-		mTop = rc.top;
-		mLeft = rc.left;
-		// width and height represent drawable area only
-		GetClientRect(mWindow, &rc);
-		mWidth = rc.right;
-		mHeight = rc.bottom;
+        RECT rc;
+        // top and left represent outer window position
+        GetWindowRect(mWindow, &rc);
+        mTop = rc.top;
+        mLeft = rc.left;
+        // width and height represent drawable area only
+        GetClientRect(mWindow, &rc);
+        mWidth = rc.right;
+        mHeight = rc.bottom;
 
-		mNativeDisplay = GetDC(mWindow);
-		mEglDisplay = eglGetDisplay(mNativeDisplay);
-		
-		// fallback for some emulations 
-		if (mEglDisplay == EGL_NO_DISPLAY)
-		{
-			mEglDisplay = eglGetDisplay( EGL_DEFAULT_DISPLAY );
-		}
-		
-		eglInitialize(mEglDisplay, NULL, NULL);
+        mNativeDisplay = GetDC(mWindow);
+        mEglDisplay = eglGetDisplay(mNativeDisplay);
+        
+        // fallback for some emulations 
+        if (mEglDisplay == EGL_NO_DISPLAY)
+        {
+            mEglDisplay = eglGetDisplay( EGL_DEFAULT_DISPLAY );
+        }
+        
+        eglInitialize(mEglDisplay, NULL, NULL);
 
         eglBindAPI(EGL_OPENGL_ES_API);
 
-		mGLSupport->setGLDisplay(mEglDisplay);
-		mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
+        mGLSupport->setGLDisplay(mEglDisplay);
+        mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
 
 
-	}
+    }
 
-	void Win32EGLWindow::reposition( int left, int top )
-	{
+    void Win32EGLWindow::reposition( int left, int top )
+    {
 
-	}
+    }
 
-	void Win32EGLWindow::resize( unsigned int width, unsigned int height )
-	{
+    void Win32EGLWindow::resize( unsigned int width, unsigned int height )
+    {
 
-	}
+    }
 
-	void Win32EGLWindow::windowMovedOrResized()
-	{
+    void Win32EGLWindow::windowMovedOrResized()
+    {
 
-	}
+    }
 
-	void Win32EGLWindow::switchFullScreen( bool fullscreen )
-	{
+    void Win32EGLWindow::switchFullScreen( bool fullscreen )
+    {
 
-	}
+    }
 
     void Win32EGLWindow::create(const String& name, uint width, uint height,
                                 bool fullScreen, const NameValuePairList *miscParams)
@@ -319,10 +319,10 @@ namespace Ogre {
         short frequency = 0;
         bool vsync = false;
         ::EGLContext eglContext = 0;
-		int left = 0;
-		int top  = 0;
+        int left = 0;
+        int top  = 0;
 
-		getLeftAndTopFromNativeWindow(left, top, width, height);
+        getLeftAndTopFromNativeWindow(left, top, width, height);
 
         mIsFullScreen = fullScreen;
 
@@ -386,9 +386,9 @@ namespace Ogre {
             {
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             }
-		}
+        }
 
-		initNativeCreatedWindow(miscParams);
+        initNativeCreatedWindow(miscParams);
 
         if (mEglSurface)
         {
@@ -418,9 +418,9 @@ namespace Ogre {
                 EGL_LEVEL, 0,
                 EGL_DEPTH_SIZE, 16,
                 EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-		        EGL_RENDERABLE_TYPE,	EGL_OPENGL_ES2_BIT,
-		        EGL_NATIVE_RENDERABLE,	EGL_FALSE,
-        		EGL_DEPTH_SIZE,			EGL_DONT_CARE,
+                EGL_RENDERABLE_TYPE,    EGL_OPENGL_ES2_BIT,
+                EGL_NATIVE_RENDERABLE,  EGL_FALSE,
+                EGL_DEPTH_SIZE,         EGL_DONT_CARE,
                 EGL_NONE
             };
 
@@ -445,13 +445,13 @@ namespace Ogre {
             mGLSupport->switchMode (width, height, frequency);
         }
 
-		if (!mIsExternal)
+        if (!mIsExternal)
         {
-			createNativeWindow(left, top, width, height, title);
-		}
+            createNativeWindow(left, top, width, height, title);
+        }
 
-		mContext = createEGLContext();
-		mContext->setCurrent();
+        mContext = createEGLContext();
+        mContext->setCurrent();
         ::EGLSurface oldDrawableDraw = eglGetCurrentSurface(EGL_DRAW);
         ::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);
         ::EGLContext oldContext  = eglGetCurrentContext();
@@ -467,9 +467,9 @@ namespace Ogre {
         mLeft = left;
         mTop = top;
         mActive = true;
-		mVisible = true;
+        mVisible = true;
 
         mClosed = false;
-	}
+    }
 
 }

@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -32,6 +32,7 @@ THE SOFTWARE
 #   pragma GCC diagnostic ignored "-Wpragmas"
 #elif OGRE_COMPILER == OGRE_COMPILER_CLANG
 #   pragma GCC diagnostic ignored "-Wdocumentation"
+#   pragma GCC diagnostic ignored "-Wconstexpr-not-const"
 #endif
 #   pragma GCC diagnostic ignored "-Wshadow"
 #   pragma GCC diagnostic ignored "-Wpadded"
@@ -40,6 +41,7 @@ THE SOFTWARE
 #   pragma GCC diagnostic ignored "-Wshorten-64-to-32"
 #   pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #   pragma GCC diagnostic ignored "-Wunused-variable"
+#   pragma GCC diagnostic ignored "-Wundef"
 #endif
 
 #include <boost/thread/tss.hpp>

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,6 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreBlendMode.h"
 #include "OgreMatrix4.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreString.h"
 #include "OgreTexture.h"
 #include "OgreHeaderPrefix.h"
 
@@ -472,15 +470,15 @@ namespace Ogre {
             /** Vertex processing unit - indicates this unit will be used for 
                 a vertex texture fetch.
             */
-            BT_VERTEX = 1,			
-			/// Geometry processing unit		
-			BT_GEOMETRY = 2,
-			/// Tessellation control processing unit
-			BT_TESSELLATION_HULL = 3,
-			/// Tessellation evaluation processing unit
-			BT_TESSELLATION_DOMAIN = 4,
-			/// Compute processing unit
-			BT_COMPUTE = 5
+            BT_VERTEX = 1,          
+            /// Geometry processing unit        
+            BT_GEOMETRY = 2,
+            /// Tessellation control processing unit
+            BT_TESSELLATION_HULL = 3,
+            /// Tessellation evaluation processing unit
+            BT_TESSELLATION_DOMAIN = 4,
+            /// Compute processing unit
+            BT_COMPUTE = 5
         };
         /** Enum identifying the type of content this texture unit contains.
         */
@@ -699,9 +697,9 @@ namespace Ogre {
         /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
         @note
             The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
-		@note This is a shortcut method which sets the addressing mode for all
-			coordinates at once; you can also call the more specific method
-			to set the addressing mode per coordinate.
+        @note This is a shortcut method which sets the addressing mode for all
+            coordinates at once; you can also call the more specific method
+            to set the addressing mode per coordinate.
         @note
             This is a shortcut method which sets the addressing mode for all
             coordinates at once; you can also call the more specific method
@@ -1083,11 +1081,11 @@ namespace Ogre {
         /// Get the texture filtering for the given type.
         FilterOptions getTextureFiltering(FilterType ftpye) const;
 
-		void setTextureCompareEnabled(bool enabled);
-		bool getTextureCompareEnabled() const;
-	
-		void setTextureCompareFunction(CompareFunction function);
-		CompareFunction getTextureCompareFunction() const;
+        void setTextureCompareEnabled(bool enabled);
+        bool getTextureCompareEnabled() const;
+    
+        void setTextureCompareFunction(CompareFunction function);
+        CompareFunction getTextureCompareFunction() const;
 
         /** Sets the anisotropy level to be used for this texture level.
         @param maxAniso
@@ -1204,7 +1202,7 @@ namespace Ogre {
         /** Set the texture pointer for a given frame (internal use only!). */
         void _setTexturePtr(const TexturePtr& texptr, size_t frame);
 
-		size_t calculateSize(void) const;
+        size_t calculateSize(void) const;
 
         /** Gets the animation controller (as created because of setAnimatedTexture)
             if it exists.
@@ -1250,8 +1248,8 @@ protected:
         /// Texture filtering - mipmapping.
         FilterOptions mMipFilter;
 
-		bool mCompareEnabled;
-		CompareFunction mCompareFunc;
+        bool mCompareEnabled;
+        CompareFunction mCompareFunc;
 
         /// Texture anisotropy.
         unsigned int mMaxAniso;
@@ -1260,7 +1258,7 @@ protected:
 
         bool mIsDefaultAniso;
         bool mIsDefaultFiltering;
-        /// Binding type (fragment or vertex pipeline).
+        /// Binding type (fragment, vertex, tesselation hull and domain pipeline).
         BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
         ContentType mContentType;

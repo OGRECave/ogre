@@ -5,7 +5,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -36,7 +36,7 @@ THE SOFTWARE
 #include "Workspace.h"
 
 BEGIN_EVENT_TABLE(TechniqueWizard, wxWizard)
-	EVT_WIZARD_FINISHED(wxID_ANY, TechniqueWizard::OnFinish)
+    EVT_WIZARD_FINISHED(wxID_ANY, TechniqueWizard::OnFinish)
 END_EVENT_TABLE()
 
 TechniqueWizard::TechniqueWizard()
@@ -49,27 +49,27 @@ TechniqueWizard::~TechniqueWizard()
 
 bool TechniqueWizard::Create(wxWindow* parent, int id /* = -1 */, const wxString& title /* = wxEmptyString */, const wxBitmap& bitmap /* = wxNullBitmap */, const wxPoint& pos /* = wxDefaultPosition */, long style /* = wxDEFAULT_DIALOG_STYLE */)
 {
-	bool result = wxWizard::Create(parent, id, title, bitmap, pos, style);
+    bool result = wxWizard::Create(parent, id, title, bitmap, pos, style);
 
-	mTechniquePage = new TechniquePage(this);
+    mTechniquePage = new TechniquePage(this);
 
-	GetPageAreaSizer()->Add(mTechniquePage);
+    GetPageAreaSizer()->Add(mTechniquePage);
 
-	return result;
+    return result;
 }
 
 TechniquePage* TechniqueWizard::getTechniquePage() const
 {
-	return mTechniquePage;
+    return mTechniquePage;
 }
 
 void TechniqueWizard::OnFinish(wxWizardEvent& event)
 {
-	Project* project = mTechniquePage->getProject();
-	MaterialController* mc = mTechniquePage->getMaterial();
+    Project* project = mTechniquePage->getProject();
+    MaterialController* mc = mTechniquePage->getMaterial();
 
-	wxString name;
-	mTechniquePage->getName(name);
+    wxString name;
+    mTechniquePage->getName(name);
 
-	mc->createTechnique(name.c_str());
+    mc->createTechnique(name.c_str());
 }

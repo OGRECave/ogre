@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,40 +33,40 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/// Specialisation of HardwareVertexBuffer for D3D11
-	class D3D11HardwareVertexBuffer : public HardwareVertexBuffer 
-	{
-	protected:
-		D3D11HardwareBuffer* mBufferImpl;
-		// have to implement these, but do nothing as overridden lock/unlock
-		void* lockImpl(size_t offset, size_t length, LockOptions options) {return 0;}
-		void unlockImpl(void) {}
+    /// Specialisation of HardwareVertexBuffer for D3D11
+    class D3D11HardwareVertexBuffer : public HardwareVertexBuffer 
+    {
+    protected:
+        D3D11HardwareBuffer* mBufferImpl;
+        // have to implement these, but do nothing as overridden lock/unlock
+        void* lockImpl(size_t offset, size_t length, LockOptions options) {return 0;}
+        void unlockImpl(void) {}
 
-	public:
-		D3D11HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
-			HardwareBuffer::Usage usage, D3D11Device & device, bool useSystemMem, bool useShadowBuffer, 
-			bool streamOut);
-		~D3D11HardwareVertexBuffer();
+    public:
+        D3D11HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
+            HardwareBuffer::Usage usage, D3D11Device & device, bool useSystemMem, bool useShadowBuffer, 
+            bool streamOut);
+        ~D3D11HardwareVertexBuffer();
 
-		// override all data-gathering methods
-		void* lock(size_t offset, size_t length, LockOptions options);
-		void unlock(void);
-		void readData(size_t offset, size_t length, void* pDest);
-		void writeData(size_t offset, size_t length, const void* pSource,
-			bool discardWholeBuffer = false);
+        // override all data-gathering methods
+        void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
+        void unlock(void);
+        void readData(size_t offset, size_t length, void* pDest);
+        void writeData(size_t offset, size_t length, const void* pSource,
+            bool discardWholeBuffer = false);
 
-		void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
-			size_t dstOffset, size_t length, bool discardWholeBuffer = false);
-		bool isLocked(void) const;
+        void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
+            size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+        bool isLocked(void) const;
 
-		/// For dealing with lost devices - release the resource if in the default pool
-		bool releaseIfDefaultPool(void);
-		/// For dealing with lost devices - recreate the resource if in the default pool
-		bool recreateIfDefaultPool(D3D11Device & device);
+        /// For dealing with lost devices - release the resource if in the default pool
+        bool releaseIfDefaultPool(void);
+        /// For dealing with lost devices - recreate the resource if in the default pool
+        bool recreateIfDefaultPool(D3D11Device & device);
 
-		/// Get the D3D-specific vertex buffer
-		ID3D11Buffer * getD3DVertexBuffer(void) const;
-	};
+        /// Get the D3D-specific vertex buffer
+        ID3D11Buffer * getD3DVertexBuffer(void) const;
+    };
 
 }
 #endif

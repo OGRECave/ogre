@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -27,14 +27,20 @@ THE SOFTWARE.
 #include "OgreVolumeChunk.h"
 
 #include "OgreCamera.h"
-#include "OgreRoot.h"
 #include "OgreLogManager.h"
-#include "OgreTimer.h"
 #include "OgreConfigFile.h"
-
 #include "OgreVolumeIsoSurfaceMC.h"
 #include "OgreVolumeOctreeNodeSplitPolicy.h"
 #include "OgreVolumeTextureSource.h"
+#include "OgreVolumeChunkHandler.h"
+#include "OgreVolumeMeshBuilder.h"
+#include "OgreVolumeDualGridGenerator.h"
+#include "OgreSceneNode.h"
+#include "OgreViewport.h"
+#include "OgreRoot.h"
+#include "OgreVolumeChunk.h"
+#include "OgreVolumeMeshBuilder.h"
+#include "OgreVolumeOctreeNode.h"
 
 namespace Ogre {
 namespace Volume {
@@ -252,7 +258,13 @@ namespace Volume {
     {
         OGRE_DELETE mRenderOp.indexData;
         OGRE_DELETE mRenderOp.vertexData;
-        Root::getSingleton().removeFrameListener(this);
+
+        // Root might already be shutdown.
+        if (Root::getSingletonPtr())
+        {
+            Root::getSingleton().removeFrameListener(this);
+        }
+
         if (mChildren)
         {
             OGRE_DELETE mChildren[0];
@@ -386,10 +398,10 @@ namespace Volume {
 
         for (size_t i = 0; i < level; ++i)
         {
-            StringUtil::StrStreamType stream;
+            StringStream stream;
             stream << "materialOfLevel" << i;
             String materialOfLevel = config.getSetting(stream.str());
-            if (materialOfLevel != StringUtil::BLANK)
+            if (materialOfLevel != BLANKSTRING)
             {
                 setMaterialOfLevel(i, materialOfLevel);
             }

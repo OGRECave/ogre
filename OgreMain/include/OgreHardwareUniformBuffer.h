@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,35 +32,33 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
-#include "OgreGpuProgramParams.h"
-#include "OgreAny.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	class HardwareBufferManagerBase;
+    class HardwareBufferManagerBase;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/** Specialisation of HardwareBuffer for a uniform buffer. */
-	class _OgreExport HardwareUniformBuffer : public HardwareBuffer
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /** Specialisation of HardwareBuffer for a uniform buffer. */
+    class _OgreExport HardwareUniformBuffer : public HardwareBuffer
     {
-	    protected:
-		    HardwareBufferManagerBase* mMgr;
-			String mName;
+        protected:
+            HardwareBufferManagerBase* mMgr;
+            String mName;
 
-	    public:
-		    /// Should be called by HardwareBufferManager
-		    HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
-							HardwareBuffer::Usage usage, bool useShadowBuffer = false, const String& name = "");
-		    ~HardwareUniformBuffer();
-		    /// Return the manager of this buffer, if any
-		    HardwareBufferManagerBase* getManager() const { return mMgr; }
+        public:
+            /// Should be called by HardwareBufferManager
+            HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
+                            HardwareBuffer::Usage usage, bool useShadowBuffer = false, const String& name = "");
+            ~HardwareUniformBuffer();
+            /// Return the manager of this buffer, if any
+            HardwareBufferManagerBase* getManager() const { return mMgr; }
 
-			const String& getName() const { return mName; }
+            const String& getName() const { return mName; }
 
     };
 

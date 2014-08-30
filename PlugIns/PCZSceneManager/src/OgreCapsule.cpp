@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,46 +41,46 @@ using namespace Ogre;
 
 Capsule::Capsule()
 {
-	// uninitialized
+    // uninitialized
 }
 //----------------------------------------------------------------------------
 Capsule::Capsule(const Segment& segment, Real radius)
-	: mSegment(segment),
-	mRadius(radius)
+    : mSegment(segment),
+    mRadius(radius)
 {
 }
 //----------------------------------------------------------------------------
 void Capsule::set(const Vector3& newOrigin, const Vector3& newEnd, Real newRadius)
 {
-	mSegment.set(newOrigin, newEnd);
-	mRadius = newRadius;
+    mSegment.set(newOrigin, newEnd);
+    mRadius = newRadius;
 }
 //----------------------------------------------------------------------------
 void Capsule::setOrigin(const Vector3& newOrigin)
 {
-	mSegment.mOrigin = newOrigin;
+    mSegment.mOrigin = newOrigin;
 }
 //----------------------------------------------------------------------------
 void Capsule::setEndPoint(const Vector3& newEndpoint)
 {
-	mSegment.setEndPoint(newEndpoint);
+    mSegment.setEndPoint(newEndpoint);
 }
 //----------------------------------------------------------------------------
 void Capsule::setRadius(Real newRadius)
 {
-	mRadius = newRadius;
+    mRadius = newRadius;
 }
 //----------------------------------------------------------------------------
 bool Capsule::intersects(const Capsule& otherCapsule) const
 {
-	Real fDistance = mSegment.distance(otherCapsule.mSegment);
-	Real fRSum = mRadius + otherCapsule.mRadius;
-	return fDistance <= fRSum;
+    Real fDistance = mSegment.distance(otherCapsule.mSegment);
+    Real fRSum = mRadius + otherCapsule.mRadius;
+    return fDistance <= fRSum;
 }
 //----------------------------------------------------------------------------
 bool Capsule::intersects(const Segment& segment) const
 {
-	Real fDist = segment.distance(mSegment);
-	return fDist <= mRadius;
+    Real fDist = segment.distance(mSegment);
+    return fDist <= mRadius;
 }
 //----------------------------------------------------------------------------

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,16 +29,14 @@ PCZCamera.h  -  description
 begin                : Wed Feb 21 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
 #ifndef PCZCAMERA_H
 #define PCZCAMERA_H
 
-#include <OgreCamera.h>
-#include "OgrePCPlane.h"
-#include "OgrePortalBase.h"
+#include "OgreCamera.h"
 #include "OgrePCZFrustum.h"
 #include "OgrePCZPrerequisites.h"
 
@@ -54,13 +52,13 @@ namespace Ogre
     class _OgrePCZPluginExport PCZCamera : public Camera
     {
     public:
-		/** Visibility types */
-		enum Visibility
-		{
-			NONE,
-			PARTIAL,
-			FULL
-		};
+        /** Visibility types */
+        enum Visibility
+        {
+            NONE,
+            PARTIAL,
+            FULL
+        };
 
         /* Standard constructor */
         PCZCamera( const String& name, SceneManager* sm );
@@ -73,36 +71,36 @@ namespace Ogre
         */
         virtual const AxisAlignedBox& getBoundingBox(void) const;
 
-		/* Overridden isVisible function for aabb */
-		virtual bool isVisible( const AxisAlignedBox &bound, FrustumPlane *culledBy=0) const;
+        /* Overridden isVisible function for aabb */
+        virtual bool isVisible( const AxisAlignedBox &bound, FrustumPlane *culledBy=0) const;
 
-		/* isVisible() function for portals */
-		bool isVisible(PortalBase* portal, FrustumPlane* culledBy = 0) const;
+        /* isVisible() function for portals */
+        bool isVisible(PortalBase* portal, FrustumPlane* culledBy = 0) const;
 
         /** Returns the visibility of the box
         */
         bool isVisibile( const AxisAlignedBox &bound );
 
         /** Returns the detailed visibility of the box
-		*/
-		PCZCamera::Visibility getVisibility( const AxisAlignedBox &bound );
+        */
+        PCZCamera::Visibility getVisibility( const AxisAlignedBox &bound );
 
-		/// Sets the type of projection to use (orthographic or perspective).
-		void setProjectionType(ProjectionType pt);
+        /// Sets the type of projection to use (orthographic or perspective).
+        void setProjectionType(ProjectionType pt);
 
         /* Update function (currently used for making sure the origin stuff for the
            extra culling frustum is up to date */
         void update(void);
 
-		/** Calculate extra culling planes from portal and camera
-		   origin and add to list of extra culling planes */
-		int addPortalCullingPlanes(PortalBase* portal);
-		/// Remove extra culling planes created from the given portal
-		void removePortalCullingPlanes(PortalBase* portal);
-		/// Remove all extra culling planes
+        /** Calculate extra culling planes from portal and camera
+           origin and add to list of extra culling planes */
+        int addPortalCullingPlanes(PortalBase* portal);
+        /// Remove extra culling planes created from the given portal
+        void removePortalCullingPlanes(PortalBase* portal);
+        /// Remove all extra culling planes
         void removeAllExtraCullingPlanes(void);
     protected:
-		AxisAlignedBox mBox;
+        AxisAlignedBox mBox;
         PCZFrustum mExtraCullingFrustum;
     };
 

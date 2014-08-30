@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,46 +30,47 @@ THE SOFTWARE.
 #include "OgrePixelCountLodStrategy.h"
 
 #include "OgreViewport.h"
+#include "OgreCamera.h"
 
 #include <limits>
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    PixelCountLodStrategy::PixelCountLodStrategy(const String& name)
+    PixelCountLodStrategyBase::PixelCountLodStrategyBase(const String& name)
         : LodStrategy(name)
     { }
     //---------------------------------------------------------------------
-    Real PixelCountLodStrategy::getBaseValue() const
+    Real PixelCountLodStrategyBase::getBaseValue() const
     {
         // Use the maximum possible value as base
         return std::numeric_limits<Real>::max();
     }
     //---------------------------------------------------------------------
-    Real PixelCountLodStrategy::transformBias(Real factor) const
+    Real PixelCountLodStrategyBase::transformBias(Real factor) const
     {
         // No transformation required for pixel count strategy
         return factor;
     }
     //---------------------------------------------------------------------
-    ushort PixelCountLodStrategy::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const
+    ushort PixelCountLodStrategyBase::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const
     {
         // Values are descending
         return getIndexDescending(value, meshLodUsageList);
     }
     //---------------------------------------------------------------------
-    ushort PixelCountLodStrategy::getIndex(Real value, const Material::LodValueList& materialLodValueList) const
+    ushort PixelCountLodStrategyBase::getIndex(Real value, const Material::LodValueList& materialLodValueList) const
     {
         // Values are descending
         return getIndexDescending(value, materialLodValueList);
     }
     //---------------------------------------------------------------------
-    void PixelCountLodStrategy::sort(Mesh::MeshLodUsageList& meshLodUsageList) const
+    void PixelCountLodStrategyBase::sort(Mesh::MeshLodUsageList& meshLodUsageList) const
     {
         // Sort descending
         sortDescending(meshLodUsageList);
     }
     //---------------------------------------------------------------------
-    bool PixelCountLodStrategy::isSorted(const Mesh::LodValueList& values) const
+    bool PixelCountLodStrategyBase::isSorted(const Mesh::LodValueList& values) const
     {
         // Check if values are sorted descending
         return isSortedDescending(values);
@@ -91,7 +92,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     AbsolutePixelCountLodStrategy::AbsolutePixelCountLodStrategy()
-        : PixelCountLodStrategy("pixel_count")
+        : PixelCountLodStrategyBase("pixel_count")
     { }
     //-----------------------------------------------------------------------
     Real AbsolutePixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
@@ -160,7 +161,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     ScreenRatioPixelCountLodStrategy::ScreenRatioPixelCountLodStrategy()
-        : PixelCountLodStrategy("screen_ratio_pixel_count")
+        : PixelCountLodStrategyBase("screen_ratio_pixel_count")
     { }
     //-----------------------------------------------------------------------
     Real ScreenRatioPixelCountLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,9 +37,7 @@ email                : janders@users.sf.net
 #ifndef OCTREECAMERA_H
 #define OCTREECAMERA_H
 
-#include <OgreCamera.h>
-#include <OgreHardwareBufferManager.h>
-#include <OgreSimpleRenderable.h>
+#include "OgreCamera.h"
 #include "OgreOctreePrerequisites.h"
 
 /**
@@ -48,9 +46,6 @@ email                : janders@users.sf.net
 
 namespace Ogre
 {
-
-class Octree;
-
 
 /** Specialized viewpoint from which an Octree can be rendered.
 @remarks

@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,20 +101,20 @@ namespace Ogre {
                                                 const String& syntaxCode)
     {
         // TODO not implemented
-		class DummyGpuProgram : public GpuProgram
-		{
-		public:
-			DummyGpuProgram(ResourceManager* creator, const String& inName, ResourceHandle inHandle,
-				const String& inGroup, bool inIsManual, ManualResourceLoader* inLoader)
-				: GpuProgram(creator, inName, inHandle, inGroup, inIsManual, inLoader )
-			{};
-			/** @copydoc Resource::unloadImpl */
-			void unloadImpl(void){};
-			/** Overridden from GpuProgram */
-			void loadFromSource(void){};
+        class DummyGpuProgram : public GpuProgram
+        {
+        public:
+            DummyGpuProgram(ResourceManager* creator, const String& inName, ResourceHandle inHandle,
+                const String& inGroup, bool inIsManual, ManualResourceLoader* inLoader)
+                : GpuProgram(creator, inName, inHandle, inGroup, inIsManual, inLoader )
+            {};
+            /** @copydoc Resource::unloadImpl */
+            void unloadImpl(void){};
+            /** Overridden from GpuProgram */
+            void loadFromSource(void){};
 
-		};
-		return OGRE_NEW DummyGpuProgram(this, name, handle, group, 
-			isManual, loader);
+        };
+        return OGRE_NEW DummyGpuProgram(this, name, handle, group, 
+            isManual, loader);
     }
 }

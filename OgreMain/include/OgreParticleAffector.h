@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,12 +36,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 /** Abstract class defining the interface to be implemented by particle affectors.
     @remarks
         Particle affectors modify particles in a particle system over their lifetime. They can be
@@ -92,7 +92,7 @@ namespace Ogre {
         @param
             pParticle Pointer to a Particle to initialize.
         */
-		virtual void _initParticle(Particle* pParticle)
+        virtual void _initParticle(Particle* pParticle)
                 {
                     /* by default do nothing */
                     (void)pParticle;
@@ -118,8 +118,8 @@ namespace Ogre {
         const String &getType(void) const { return mType; }
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

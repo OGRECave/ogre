@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ namespace Ogre {
     {
         protected:
             /// Lock a box
-            PixelBox lockImpl(const Image::Box lockBox,  LockOptions options);
+            PixelBox lockImpl(const Image::Box &lockBox,  LockOptions options);
 
             /// Unlock a box
             void unlockImpl(void);
@@ -118,7 +118,7 @@ namespace Ogre {
             // Blitting implementation
             void blitFromTexture(GLES2TextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
             
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // Friends.
         protected:
             friend class GLES2Texture;
@@ -147,7 +147,7 @@ namespace Ogre {
     class _OgreGLES2Export GLES2RenderBuffer: public GLES2HardwarePixelBuffer
     {
         public:
-            GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);
+            GLES2RenderBuffer(GLenum format, uint32 width, uint32 height, GLsizei numSamples);
             virtual ~GLES2RenderBuffer();
 
             /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer

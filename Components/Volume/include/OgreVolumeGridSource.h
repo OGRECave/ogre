@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,11 @@ THE SOFTWARE.
 
 #include "OgreVolumePrerequisites.h"
 #include "OgreVolumeSource.h"
-#include "OgreVolumeCSGSource.h"
 
 namespace Ogre {
 namespace Volume {
+
+    class CSGOperationSource;
 
     /** A volume source from a discrete 3d grid.
     */
@@ -48,11 +49,11 @@ namespace Volume {
 
         /// The texture height.
         size_t mHeight;
-		
+        
         /// The texture depth.
         size_t mDepth;
         
-		/// The scale of the position based on the world width.
+        /// The scale of the position based on the world width.
         Real mPosXScale;
         
         /// The scale of the position based on the world height.

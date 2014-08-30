@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/Tiling_Cg_FP cg
 {
 	source TilingFP.cg
 	entry_point Tiling_ps
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 fragment_program Ogre/Compositor/Tiling_GLSLES_FP glsles

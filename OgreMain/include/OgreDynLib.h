@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ typedef struct HINSTANCE__* hInstance;
 struct HINSTANCE__;
 typedef struct HINSTANCE__* hInstance;
 
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #    define DYNLIB_HANDLE void*
 #    define DYNLIB_LOAD( a ) dlopen( a, RTLD_LAZY | RTLD_GLOBAL)
 #    define DYNLIB_GETSYM( a, b ) dlsym( a, b )
@@ -65,12 +65,12 @@ typedef struct HINSTANCE__* hInstance;
 #endif
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
 
     /** Resource holding data about a dynamic library.
         @remarks
@@ -81,10 +81,10 @@ namespace Ogre {
         @since
             27 January 2002
     */
-	class _OgreExport DynLib : public DynLibAlloc
+    class _OgreExport DynLib : public DynLibAlloc
     {
-	protected:
-		String mName;
+    protected:
+        String mName;
         /// Gets the last loading error
         String dynlibError(void);
     public:
@@ -104,8 +104,8 @@ namespace Ogre {
         /** Unload the library
         */
         void unload();
-		/// Get the name of the library
-		const String& getName(void) const { return mName; }
+        /// Get the name of the library
+        const String& getName(void) const { return mName; }
 
         /**
             Returns the address of the given symbol from the loaded library.
@@ -125,8 +125,8 @@ namespace Ogre {
         /// Handle to the loaded library.
         DYNLIB_HANDLE mInst;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

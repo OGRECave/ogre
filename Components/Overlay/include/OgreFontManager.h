@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -34,29 +34,29 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
-	/** Manages Font resources, parsing .fontdef files and generally organising them.*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
+    /** Manages Font resources, parsing .fontdef files and generally organising them.*/
     class _OgreOverlayExport FontManager : public ResourceManager, public Singleton< FontManager >
     {
     public:
 
-		FontManager();
-		~FontManager();
+        FontManager();
+        ~FontManager();
 
-		/// Create a new font
-		/// @see ResourceManager::createResource
-		FontPtr create (const String& name, const String& group,
-							bool isManual = false, ManualResourceLoader* loader = 0,
-							const NameValuePairList* createParams = 0);
+        /// Create a new font
+        /// @see ResourceManager::createResource
+        FontPtr create (const String& name, const String& group,
+                            bool isManual = false, ManualResourceLoader* loader = 0,
+                            const NameValuePairList* createParams = 0);
 
-		/// Get a resource by name
-		/// @see ResourceManager::getResourceByName
-		FontPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+        /// Get a resource by name
+        /// @see ResourceManager::getResourceByName
+        FontPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
 
         /** @copydoc ScriptLoader::parseScript */
@@ -97,17 +97,17 @@ namespace Ogre
     protected:
 
         /// Internal methods
-		Resource* createImpl(const String& name, ResourceHandle handle, 
-			const String& group, bool isManual, ManualResourceLoader* loader, 
+        Resource* createImpl(const String& name, ResourceHandle handle, 
+            const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* params);
-		void parseAttribute(const String& line, FontPtr& pFont);
+        void parseAttribute(const String& line, FontPtr& pFont);
 
         void logBadAttrib(const String& line, FontPtr& pFont);
 
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,17 +33,17 @@ template<> RootEventPlugin* Ogre::Singleton<RootEventPlugin>::msSingleton = 0;
 
 RootEventPlugin& RootEventPlugin::getSingleton(void)
 {  
-	assert( msSingleton );  return ( *msSingleton );  
+    assert( msSingleton );  return ( *msSingleton );  
 }
 
 RootEventPlugin* RootEventPlugin::getSingletonPtr(void)
 {
-	return msSingleton;
+    return msSingleton;
 }
 
 RootEventPlugin::RootEventPlugin()
 {
-	registerEvents();
+    registerEvents();
 }
 
 RootEventPlugin::~RootEventPlugin()
@@ -52,7 +52,7 @@ RootEventPlugin::~RootEventPlugin()
 
 const String& RootEventPlugin::getName() const
 {
-	return "Root Event Plugin";
+    return "Root Event Plugin";
 }
 
 void RootEventPlugin::install()
@@ -61,12 +61,12 @@ void RootEventPlugin::install()
 
 void RootEventPlugin::initialise()
 {
-	fireEvent(Initialized, RootEventArgs());
+    fireEvent(Initialized, RootEventArgs());
 }
 
 void RootEventPlugin::shutdown()
 {
-	fireEvent(Shutdown, RootEventArgs());
+    fireEvent(Shutdown, RootEventArgs());
 }
 
 void RootEventPlugin::uninstall()
@@ -74,6 +74,6 @@ void RootEventPlugin::uninstall()
 }
 void RootEventPlugin::registerEvents()
 {
-	registerEvent(Initialized);
-	registerEvent(Shutdown);
+    registerEvent(Initialized);
+    registerEvent(Shutdown);
 }

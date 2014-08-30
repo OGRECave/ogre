@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -90,8 +90,8 @@ namespace Ogre
         static void rendererChanged (GtkComboBox *widget, gpointer data);
         /// Callback function to change a renderer option
         static void optionChanged (GtkComboBox *widget, gpointer data);
-	/// Idle function to refresh renderer parameters
-	static gboolean refreshParams (gpointer data);
+    /// Idle function to refresh renderer parameters
+    static gboolean refreshParams (gpointer data);
     };
 }
 #endif

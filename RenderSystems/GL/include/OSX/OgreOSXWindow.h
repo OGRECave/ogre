@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,15 +37,15 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class OSXWindow : public RenderWindow
-	{
-	public:
-		OSXWindow();
-		virtual ~OSXWindow();
-		
-		/** Overridden - see RenderWindow */
-		void create( const String& name, unsigned int width, unsigned int height,
-	            bool fullScreen, const NameValuePairList *miscParams ) = 0;
+    class OSXWindow : public RenderWindow
+    {
+    public:
+        OSXWindow();
+        virtual ~OSXWindow();
+        
+        /** Overridden - see RenderWindow */
+        void create( const String& name, unsigned int width, unsigned int height,
+                bool fullScreen, const NameValuePairList *miscParams ) = 0;
         /** Overridden - see RenderWindow */
         virtual void destroy( void ) = 0;
         /** Overridden - see RenderWindow */
@@ -62,28 +62,28 @@ namespace Ogre
         virtual void swapBuffers( ) = 0;
         /** Overridden - see RenderTarget */
         virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
-		/** Overridden - see RenderTarget */
-		virtual void windowMovedOrResized() {};
+        /** Overridden - see RenderTarget */
+        virtual void windowMovedOrResized() {};
 
-	protected:
-		OSXContext* mContext;
-		CGLContextObj mCGLContextObj;
+    protected:
+        OSXContext* mContext;
+        CGLContextObj mCGLContextObj;
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
         CGDisplayModeRef mOriginalDisplayMode;
 #else
         CFDictionaryRef mOriginalDisplayMode;
 #endif
 
-		/** Switch to full screen mode using CGL */
-		void createCGLFullscreen(unsigned int width, unsigned int height, unsigned int depth, unsigned int fsaa, CGLContextObj sharedContext);
-		/** Kill full screen mode, and return to default windowed mode */
-		void destroyCGLFullscreen(void);
-		/** Update the full screen context */
-		void swapCGLBuffers(void);
+        /** Switch to full screen mode using CGL */
+        void createCGLFullscreen(unsigned int width, unsigned int height, unsigned int depth, unsigned int fsaa, CGLContextObj sharedContext);
+        /** Kill full screen mode, and return to default windowed mode */
+        void destroyCGLFullscreen(void);
+        /** Update the full screen context */
+        void swapCGLBuffers(void);
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
         uint32 bitDepthFromDisplayMode(CGDisplayModeRef mode);
 #endif
-	};
+    };
     
     #define ENABLE_CG_CHECK 0
     #if ENABLE_CG_CHECK

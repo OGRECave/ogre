@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -34,23 +34,23 @@
 
 namespace Ogre
 {
-	class _OgreExport ConfigDialog : public UtilityAlloc
-	{
-	public:
-		ConfigDialog();
-		~ConfigDialog();
-	
-	public:
-		void initialise();
-		void run();
-		void cancel();
+    class _OgreExport ConfigDialog : public UtilityAlloc
+    {
+    public:
+        ConfigDialog();
+        ~ConfigDialog();
+    
+    public:
+        void initialise();
+        void run();
+        void cancel();
 
-		bool display();
+        bool display();
 
-	protected:
-		RenderSystem* iSelectedRenderSystem;
-		bool		iDisplayStatus;		
-	};
+    protected:
+        RenderSystem* iSelectedRenderSystem;
+        bool        iDisplayStatus;     
+    };
 }
 
 #endif // __iOS_CONFIG_DIALOG_H__

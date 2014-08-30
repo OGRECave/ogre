@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -148,7 +148,7 @@ namespace Ogre {
                     else
                     {
                         // Attribute
-						StringUtil::toLowerCase(line);
+                        StringUtil::toLowerCase(line);
                         parseShaderAttrib(line, pShader);
                     }
 
@@ -301,7 +301,7 @@ namespace Ogre {
         if (params[0] == "map")
         {
             pPass->textureName = params[1];
-			StringUtil::toLowerCase(params[1]);
+            StringUtil::toLowerCase(params[1]);
             if (params[1] == "$lightmap")
                 pPass->texGen = TEXGEN_LIGHTMAP;
         }
@@ -309,7 +309,7 @@ namespace Ogre {
         if (params[0] == "clampmap")
         {
             pPass->textureName = params[1];
-			StringUtil::toLowerCase(params[1]);
+            StringUtil::toLowerCase(params[1]);
             if (params[1] == "$lightmap")
                 pPass->texGen = TEXGEN_LIGHTMAP;
             pPass->addressMode = TextureUnitState::TAM_CLAMP;

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,12 +28,8 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreCompositionTargetPass.h"
-#include "OgreCompositorInstance.h"
-#include "OgreCompositorChain.h"
-#include "OgreCompositionPass.h"
 #include "OgreTextureManager.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
 
 namespace Ogre {
 
@@ -76,15 +72,15 @@ CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinit
 //---------------------------------------------------------------------
 CompositionTechnique::TextureDefinition *CompositionTechnique::getTextureDefinition(const String& name)
 {
-	TextureDefinitions::iterator i, iend;
-	iend = mTextureDefinitions.end();
-	for (i = mTextureDefinitions.begin(); i != iend; ++i)
-	{
-		if ((*i)->name == name)
-			return *i;
-	}
+    TextureDefinitions::iterator i, iend;
+    iend = mTextureDefinitions.end();
+    for (i = mTextureDefinitions.begin(); i != iend; ++i)
+    {
+        if ((*i)->name == name)
+            return *i;
+    }
 
-	return 0;
+    return 0;
 
 }
 //-----------------------------------------------------------------------
@@ -163,12 +159,12 @@ CompositionTargetPass *CompositionTechnique::getOutputTargetPass()
 //-----------------------------------------------------------------------
 bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
 {
-	// A technique is supported if all materials referenced have a supported
-	// technique, and the intermediate texture formats requested are supported
-	// Material support is a cast-iron requirement, but if no texture formats 
-	// are directly supported we can let the rendersystem create the closest 
-	// match for the least demanding technique
-	
+    // A technique is supported if all materials referenced have a supported
+    // technique, and the intermediate texture formats requested are supported
+    // Material support is a cast-iron requirement, but if no texture formats 
+    // are directly supported we can let the rendersystem create the closest 
+    // match for the least demanding technique
+    
 
     // Check output target pass is supported
     if (!mOutputTarget->_isSupported())
@@ -190,62 +186,62 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
 
     TextureDefinitions::iterator i, iend;
     iend = mTextureDefinitions.end();
-	TextureManager& texMgr = TextureManager::getSingleton();
+    TextureManager& texMgr = TextureManager::getSingleton();
     for (i = mTextureDefinitions.begin(); i != iend; ++i)
     {
-		TextureDefinition* td = *i;
+        TextureDefinition* td = *i;
 
-		// Firstly check MRTs
-		if (td->formatList.size() > 
-			Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets())
-		{
-			return false;
-		}
+        // Firstly check MRTs
+        if (td->formatList.size() > 
+            Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets())
+        {
+            return false;
+        }
 
 
-		for (PixelFormatList::iterator pfi = td->formatList.begin(); pfi != td->formatList.end(); ++pfi)
-		{
+        for (PixelFormatList::iterator pfi = td->formatList.begin(); pfi != td->formatList.end(); ++pfi)
+        {
 
-			// Check whether equivalent supported
-			if(acceptTextureDegradation)
-			{
-				// Don't care about exact format so long as something is supported
-				if(texMgr.getNativeFormat(TEX_TYPE_2D, *pfi, TU_RENDERTARGET) == PF_UNKNOWN)
-				{
-					return false;
-				}
-			}
-			else
-			{
-				// Need a format which is the same number of bits to pass
-				if (!texMgr.isEquivalentFormatSupported(TEX_TYPE_2D, *pfi, TU_RENDERTARGET))
-				{
-					return false;
-				}
-			}
-		}
+            // Check whether equivalent supported
+            if(acceptTextureDegradation)
+            {
+                // Don't care about exact format so long as something is supported
+                if(texMgr.getNativeFormat(TEX_TYPE_2D, *pfi, TU_RENDERTARGET) == PF_UNKNOWN)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // Need a format which is the same number of bits to pass
+                if (!texMgr.isEquivalentFormatSupported(TEX_TYPE_2D, *pfi, TU_RENDERTARGET))
+                {
+                    return false;
+                }
+            }
+        }
 
-		//Check all render targets have same number of bits
-		if( !Root::getSingleton().getRenderSystem()->getCapabilities()->
-			hasCapability( RSC_MRT_DIFFERENT_BIT_DEPTHS ) && !td->formatList.empty() )
-		{
-			PixelFormat nativeFormat = texMgr.getNativeFormat( TEX_TYPE_2D, td->formatList.front(),
-																TU_RENDERTARGET );
-			size_t nativeBits = PixelUtil::getNumElemBits( nativeFormat );
-			for( PixelFormatList::iterator pfi = td->formatList.begin()+1;
-					pfi != td->formatList.end(); ++pfi )
-			{
-				PixelFormat nativeTmp = texMgr.getNativeFormat( TEX_TYPE_2D, *pfi, TU_RENDERTARGET );
-				if( PixelUtil::getNumElemBits( nativeTmp ) != nativeBits )
-				{
-					return false;
-				}
-			}
-		}
-	}
-	
-	// Must be ok
-	return true;
+        //Check all render targets have same number of bits
+        if( !Root::getSingleton().getRenderSystem()->getCapabilities()->
+            hasCapability( RSC_MRT_DIFFERENT_BIT_DEPTHS ) && !td->formatList.empty() )
+        {
+            PixelFormat nativeFormat = texMgr.getNativeFormat( TEX_TYPE_2D, td->formatList.front(),
+                                                                TU_RENDERTARGET );
+            size_t nativeBits = PixelUtil::getNumElemBits( nativeFormat );
+            for( PixelFormatList::iterator pfi = td->formatList.begin()+1;
+                    pfi != td->formatList.end(); ++pfi )
+            {
+                PixelFormat nativeTmp = texMgr.getNativeFormat( TEX_TYPE_2D, *pfi, TU_RENDERTARGET );
+                if( PixelUtil::getNumElemBits( nativeTmp ) != nativeBits )
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    
+    // Must be ok
+    return true;
 }
 //-----------------------------------------------------------------------
 Compositor *CompositionTechnique::getParent()
@@ -255,7 +251,7 @@ Compositor *CompositionTechnique::getParent()
 //---------------------------------------------------------------------
 void CompositionTechnique::setSchemeName(const String& schemeName)
 {
-	mSchemeName = schemeName;
+    mSchemeName = schemeName;
 }
 
 }

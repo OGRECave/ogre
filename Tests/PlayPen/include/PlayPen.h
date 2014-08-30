@@ -11,8 +11,8 @@ using namespace OgreBites;
 class _OgreSampleClassExport PlayPenPlugin : public SamplePlugin
 {
 public:
-	PlayPenPlugin();
-	~PlayPenPlugin();
+    PlayPenPlugin();
+    ~PlayPenPlugin();
 
 };
 
@@ -23,16 +23,16 @@ class _OgreSampleClassExport PlayPenBase : public SdkSample
 {
 public:
 
-	/// Resources in this group get destroyed on sample shutdown
-	static String TRANSIENT_RESOURCE_GROUP;
+    /// Resources in this group get destroyed on sample shutdown
+    static String TRANSIENT_RESOURCE_GROUP;
 
-	PlayPenBase();
-	void unloadResources();
-	bool frameStarted(const Ogre::FrameEvent& evt);
+    PlayPenBase();
+    void unloadResources();
+    bool frameStarted(const Ogre::FrameEvent& evt);
 protected:
-	typedef list<AnimationState*>::type AnimationStateList;
-	AnimationStateList mAnimStateList;
-	void cleanupContent() { mAnimStateList.clear(); }
+    typedef list<AnimationState*>::type AnimationStateList;
+    AnimationStateList mAnimStateList;
+    void cleanupContent() { mAnimStateList.clear(); }
 
 };
 

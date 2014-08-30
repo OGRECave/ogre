@@ -38,13 +38,14 @@ if(NOT TINYXML_FOUND)
 endif(NOT TINYXML_FOUND)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${TINYXML_INCLUDE_DIR})
+ogre_add_component_include_dir(MeshLodGenerator)
 add_definitions(-DTIXML_USE_STL)
 ogre_add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES} ${TINYXML_LIBRARIES})
+target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES} ${TINYXML_LIBRARIES} ${OGRE_MeshLodGenerator_LIBRARIES})
 
 if (APPLE)
     set_target_properties(OgreXMLConverter PROPERTIES
-        LINK_FLAGS "-framework Cocoa")
+        LINK_FLAGS "-framework Carbon -framework Cocoa")
 endif ()
 
 ogre_config_tool(OgreXMLConverter)

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,14 +29,7 @@ THE SOFTWARE.
 #ifndef __OverlaySystem_H__
 #define __OverlaySystem_H__
 
-#include "OgreOverlay.h"
-#include "OgreOverlayContainer.h"
-#include "OgreOverlayElement.h"
-#include "OgreOverlayManager.h"
-#include "OgreFontManager.h"
-#include "OgreBorderPanelOverlayElement.h"
-#include "OgreTextAreaOverlayElement.h"
-#include "OgreOverlayElementFactory.h"
+#include "OgreOverlayPrerequisites.h"
 #include "OgreRenderQueueListener.h"
 
 #if OGRE_PROFILING
@@ -45,38 +38,38 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Overlays
-	*  @{
-	*/
-	/** This class simplify initialization / finalization of the overlay system. 
-		OGRE root did this steps before the overlay system transformed into a component.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Overlays
+    *  @{
+    */
+    /** This class simplify initialization / finalization of the overlay system. 
+        OGRE root did this steps before the overlay system transformed into a component.
     @remarks
         Before you create a concrete instance of the OverlaySystem the OGRE::Root must be created
-		but not initialized. In the ctor all relevant systems are created and registered. The dtor
-		must be called before you delete OGRE::Root.
-		To make the overlays visible (= render into your viewports) you have to register this
-		instance as a RenderQueueListener in your scenemanager(s).
+        but not initialized. In the ctor all relevant systems are created and registered. The dtor
+        must be called before you delete OGRE::Root.
+        To make the overlays visible (= render into your viewports) you have to register this
+        instance as a RenderQueueListener in your scenemanager(s).
     */
-	class _OgreOverlayExport OverlaySystem : public OverlayAlloc , public Ogre::RenderQueueListener
-	{
-	public:
-		OverlaySystem();
-		virtual ~OverlaySystem();
+    class _OgreOverlayExport OverlaySystem : public OverlayAlloc , public Ogre::RenderQueueListener
+    {
+    public:
+        OverlaySystem();
+        virtual ~OverlaySystem();
 
-		/// @see RenderQueueListener
-		virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, 
-			bool& skipThisInvocation);
-	private:
+        /// @see RenderQueueListener
+        virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, 
+            bool& skipThisInvocation);
+    private:
         OverlayManager* mOverlayManager;
         FontManager* mFontManager;
 
 #if OGRE_PROFILING
-		OverlayProfileSessionListener* mProfileListener;
+        OverlayProfileSessionListener* mProfileListener;
 #endif
-	};
+    };
 
 }
 #endif

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,45 +31,45 @@ THE SOFTWARE.
 #include "OgreGLESPrerequisites.h"
 
 namespace Ogre {
-	class AndroidEGLContext;
+    class AndroidEGLContext;
     class AndroidResource;
     
-	class _OgrePrivate AndroidResourceManager : public ResourceAlloc
-	{
-	// Interface.
-	public:
+    class _OgrePrivate AndroidResourceManager : public ResourceAlloc
+    {
+    // Interface.
+    public:
 
-		// Called immediately after the Android context has entered a lost state.
+        // Called immediately after the Android context has entered a lost state.
         void notifyOnContextLost();
         
-		// Called immediately after the Android context has been reset.
+        // Called immediately after the Android context has been reset.
         void notifyOnContextReset();
-		
-		AndroidResourceManager();
-		~AndroidResourceManager();		
+        
+        AndroidResourceManager();
+        ~AndroidResourceManager();      
 
-	// Friends.
-	protected:
-		friend class AndroidResource;
-	
-	// Types.
-	protected:
-		typedef vector<AndroidResource*>::type	ResourceContainer;
-		typedef ResourceContainer::iterator		ResourceContainerIterator;
+    // Friends.
+    protected:
+        friend class AndroidResource;
+    
+    // Types.
+    protected:
+        typedef vector<AndroidResource*>::type  ResourceContainer;
+        typedef ResourceContainer::iterator     ResourceContainerIterator;
 
-	// Protected methods.
-	protected:
-		
-		// Called when new resource created.
-		void _notifyResourceCreated		(AndroidResource* pResource);
+    // Protected methods.
+    protected:
+        
+        // Called when new resource created.
+        void _notifyResourceCreated     (AndroidResource* pResource);
 
-		// Called when resource is about to be destroyed.
-		void _notifyResourceDestroyed	(AndroidResource* pResource);
-				
-	// Attributes.
-	protected:		
-		ResourceContainer			mResources;
-	};
+        // Called when resource is about to be destroyed.
+        void _notifyResourceDestroyed   (AndroidResource* pResource);
+                
+    // Attributes.
+    protected:      
+        ResourceContainer           mResources;
+    };
 }
 
 #endif

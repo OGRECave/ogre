@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,68 +30,68 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	//-----------------------------------------------------------------------
-	void copyFile(const String& src, const String& dst)
-	{
-		std::ifstream in(src.c_str(), std::ios::in | std::ios::binary);
-		std::ofstream out(dst.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+    //-----------------------------------------------------------------------
+    void copyFile(const String& src, const String& dst)
+    {
+        std::ifstream in(src.c_str(), std::ios::in | std::ios::binary);
+        std::ofstream out(dst.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
 
-		if (!in || !out)
-		{
-			LogOgreAndXSI("Unable to copy texture '" + src + "' to '" + dst + "'");
-			return;
-		}
+        if (!in || !out)
+        {
+            LogOgreAndXSI("Unable to copy texture '" + src + "' to '" + dst + "'");
+            return;
+        }
 
-		char tmpBuf[2048];
+        char tmpBuf[2048];
 
-		while (!in.eof())
-		{
-			in.read(tmpBuf, 2048);
+        while (!in.eof())
+        {
+            in.read(tmpBuf, 2048);
 
-			std::streamsize c = in.gcount();
+            std::streamsize c = in.gcount();
 
-			out.write(tmpBuf, c);
+            out.write(tmpBuf, c);
 
-		}
+        }
 
-		in.close();
-		out.close();
+        in.close();
+        out.close();
 
 
 
-	}
-	//-----------------------------------------------------------------------
-	template<> ProgressManager* Singleton<ProgressManager>::msSingleton = 0;
-	ProgressManager* ProgressManager::getSingletonPtr(void)
-	{
-		return msSingleton;
-	}
-	ProgressManager& ProgressManager::getSingleton(void)
-	{  
-		assert( msSingleton );  return ( *msSingleton );  
-	}
-	//-----------------------------------------------------------------------------
-	ProgressManager::ProgressManager(size_t numberOfStages)
-		:mNumberOfStages(numberOfStages), mProgress(0)
-	{
-		XSI::Application app;
+    }
+    //-----------------------------------------------------------------------
+    template<> ProgressManager* Singleton<ProgressManager>::msSingleton = 0;
+    ProgressManager* ProgressManager::getSingletonPtr(void)
+    {
+        return msSingleton;
+    }
+    ProgressManager& ProgressManager::getSingleton(void)
+    {  
+        assert( msSingleton );  return ( *msSingleton );  
+    }
+    //-----------------------------------------------------------------------------
+    ProgressManager::ProgressManager(size_t numberOfStages)
+        :mNumberOfStages(numberOfStages), mProgress(0)
+    {
+        XSI::Application app;
 
-		mProgressBar = app.GetUIToolkit().GetProgressBar();
-		mProgressBar.PutMaximum(numberOfStages);
-		mProgressBar.PutStep(1);
-		mProgressBar.PutVisible(true);
-		mProgressBar.PutCaption(L"Exporting");
-	}
-	//-----------------------------------------------------------------------------
-	ProgressManager::~ProgressManager()
-	{
-	}
-	//-----------------------------------------------------------------------------
-	void ProgressManager::progress(void)
-	{
-		++mProgress;
-		mProgressBar.Increment();
-		
-	}
+        mProgressBar = app.GetUIToolkit().GetProgressBar();
+        mProgressBar.PutMaximum(numberOfStages);
+        mProgressBar.PutStep(1);
+        mProgressBar.PutVisible(true);
+        mProgressBar.PutCaption(L"Exporting");
+    }
+    //-----------------------------------------------------------------------------
+    ProgressManager::~ProgressManager()
+    {
+    }
+    //-----------------------------------------------------------------------------
+    void ProgressManager::progress(void)
+    {
+        ++mProgress;
+        mProgressBar.Increment();
+        
+    }
 
 }

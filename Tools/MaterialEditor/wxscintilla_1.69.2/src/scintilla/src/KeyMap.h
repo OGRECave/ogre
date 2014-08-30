@@ -19,25 +19,25 @@
  */
 class KeyToCommand {
 public:
-	int key;
-	int modifiers;
-	unsigned int msg;
+    int key;
+    int modifiers;
+    unsigned int msg;
 };
 
 /**
  */
 class KeyMap {
-	KeyToCommand *kmap;
-	int len;
-	int alloc;
-	static const KeyToCommand MapDefault[];
+    KeyToCommand *kmap;
+    int len;
+    int alloc;
+    static const KeyToCommand MapDefault[];
 
 public:
-	KeyMap();
-	~KeyMap();
-	void Clear();
-	void AssignCmdKey(int key, int modifiers, unsigned int msg);
-	unsigned int Find(int key, int modifiers);	// 0 returned on failure
+    KeyMap();
+    ~KeyMap();
+    void Clear();
+    void AssignCmdKey(int key, int modifiers, unsigned int msg);
+    unsigned int Find(int key, int modifiers);  // 0 returned on failure
 };
 
 #endif

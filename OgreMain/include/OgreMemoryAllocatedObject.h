@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,88 +43,88 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Memory
-	*  @{
-	*/
-	/** Superclass for all objects that wish to use custom memory allocators
-		when their new / delete operators are called.
-		Requires a template parameter identifying the memory allocator policy 
-		to use (e.g. see StdAllocPolicy). 
-	*/
-	template <class Alloc>
-	class _OgreExport AllocatedObject
-	{
-	public:
-		explicit AllocatedObject()
-		{ }
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Memory
+    *  @{
+    */
+    /** Superclass for all objects that wish to use custom memory allocators
+        when their new / delete operators are called.
+        Requires a template parameter identifying the memory allocator policy 
+        to use (e.g. see StdAllocPolicy). 
+    */
+    template <class Alloc>
+    class _OgreExport AllocatedObject
+    {
+    public:
+        explicit AllocatedObject()
+        { }
 
-		~AllocatedObject()
-		{ }
+        ~AllocatedObject()
+        { }
 
-		/// operator new, with debug line info
-		void* operator new(size_t sz, const char* file, int line, const char* func)
-		{
-			return Alloc::allocateBytes(sz, file, line, func);
-		}
+        /// operator new, with debug line info
+        void* operator new(size_t sz, const char* file, int line, const char* func)
+        {
+            return Alloc::allocateBytes(sz, file, line, func);
+        }
 
-		void* operator new(size_t sz)
-		{
-			return Alloc::allocateBytes(sz);
-		}
+        void* operator new(size_t sz)
+        {
+            return Alloc::allocateBytes(sz);
+        }
 
-		/// placement operator new
-		void* operator new(size_t sz, void* ptr)
-		{
-			(void) sz;
-			return ptr;
-		}
+        /// placement operator new
+        void* operator new(size_t sz, void* ptr)
+        {
+            (void) sz;
+            return ptr;
+        }
 
-		/// array operator new, with debug line info
-		void* operator new[] ( size_t sz, const char* file, int line, const char* func )
-		{
-			return Alloc::allocateBytes(sz, file, line, func);
-		}
+        /// array operator new, with debug line info
+        void* operator new[] ( size_t sz, const char* file, int line, const char* func )
+        {
+            return Alloc::allocateBytes(sz, file, line, func);
+        }
 
-		void* operator new[] ( size_t sz )
-		{
-			return Alloc::allocateBytes(sz);
-		}
+        void* operator new[] ( size_t sz )
+        {
+            return Alloc::allocateBytes(sz);
+        }
 
-		void operator delete( void* ptr )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
+        void operator delete( void* ptr )
+        {
+            Alloc::deallocateBytes(ptr);
+        }
 
-		// Corresponding operator for placement delete (second param same as the first)
-		void operator delete( void* ptr, void* )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
+        // Corresponding operator for placement delete (second param same as the first)
+        void operator delete( void* ptr, void* )
+        {
+            Alloc::deallocateBytes(ptr);
+        }
 
-		// only called if there is an exception in corresponding 'new'
-		void operator delete( void* ptr, const char* , int , const char*  )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
+        // only called if there is an exception in corresponding 'new'
+        void operator delete( void* ptr, const char* , int , const char*  )
+        {
+            Alloc::deallocateBytes(ptr);
+        }
 
-		void operator delete[] ( void* ptr )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
-
-
-		void operator delete[] ( void* ptr, const char* , int , const char*  )
-		{
-			Alloc::deallocateBytes(ptr);
-		}
-	};
+        void operator delete[] ( void* ptr )
+        {
+            Alloc::deallocateBytes(ptr);
+        }
 
 
-	/** @} */
-	/** @} */
+        void operator delete[] ( void* ptr, const char* , int , const char*  )
+        {
+            Alloc::deallocateBytes(ptr);
+        }
+    };
+
+
+    /** @} */
+    /** @} */
 
 }
 

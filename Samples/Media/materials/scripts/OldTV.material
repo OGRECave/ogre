@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/OldTV_FPCg cg
 {
 	source OldTV.cg
 	entry_point OldTV_ps
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 fragment_program Ogre/Compositor/OldTV_FPGLSL glsl
@@ -33,7 +33,7 @@ fragment_program Ogre/Compositor/OldTV_FPHLSL hlsl
 {
 	source OldTV.hlsl
 	entry_point OldTV_ps
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Ogre/Compositor/OldTV_FP unified
@@ -62,7 +62,7 @@ material Ogre/Compositor/OldTV
                 param_named distortionFreq float 2.7
                 param_named distortionScale float 2.5
                 param_named distortionRoll float 0.93
-                param_named inerference float 0.5
+                param_named interference float 0.5
                 param_named frameLimit float 0.40
                 param_named frameShape float 0.26
                 param_named frameSharpness float 6.0

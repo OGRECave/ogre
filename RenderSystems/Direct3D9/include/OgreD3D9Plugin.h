@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,30 +34,30 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** Plugin instance for D3D9 Manager */
-	class _OgreD3D9Export D3D9Plugin : public Plugin
-	{
-	public:
-		D3D9Plugin();
+    /** Plugin instance for D3D9 Manager */
+    class _OgreD3D9Export D3D9Plugin : public Plugin
+    {
+    public:
+        D3D9Plugin();
 
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		D3D9RenderSystem* mRenderSystem;
-	};
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        D3D9RenderSystem* mRenderSystem;
+    };
 }
 
 #endif

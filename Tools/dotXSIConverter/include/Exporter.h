@@ -25,7 +25,7 @@ class Exporter {
         void exportMesh(std::string fileName, std::string skelName);
         /* Function to perform an export to Ogre .skeleton. */
         void exportBones(std::string fileName);
-		
+        
     protected:
         /* Internal recursive method for exporting a node in the scene */
         void exportCSLModel(Ogre::Mesh* pMesh, CSLModel* XSIModel);
@@ -35,7 +35,7 @@ class Exporter {
         void recurseBones(Skeleton* pSkel, CSLModel* XSIModel);
         /* Exports animation tracks */
         void exportAnim(Skeleton* pSkel, CSLModel* XSIModel);
-		
+        
         /* XSI Scene */
         CSLModel* SceneRoot;
         int boneCount;

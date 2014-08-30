@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,38 +34,38 @@ namespace Ogre
 
     OSXCarbonContext::OSXCarbonContext(AGLContext aglContext, AGLPixelFormat pixelFormat) :
         mAGLContext(aglContext), mPixelFormat(pixelFormat) {}
-	
-	OSXCarbonContext::~OSXCarbonContext()
-	{
-		_unregisterContext();
-		
+    
+    OSXCarbonContext::~OSXCarbonContext()
+    {
+        _unregisterContext();
+        
         if(mPixelFormat != NULL)
             aglDestroyPixelFormat(mPixelFormat);
     }
 
     void OSXCarbonContext::setCurrent()
-	{
-		// Apple's docs claim that you may need to force the context to null
-		// before setting current, especially when using pBuffers.
-		aglSetCurrentContext(NULL);
-		aglSetCurrentContext(mAGLContext);
-    }
-		
-	void OSXCarbonContext::endCurrent()
-	{
-		aglSetCurrentContext(NULL);
-	}
-	
-	GLContext* OSXCarbonContext::clone() const
-	{
+    {
+        // Apple's docs claim that you may need to force the context to null
+        // before setting current, especially when using pBuffers.
         aglSetCurrentContext(NULL);
-		AGLContext aglCtxShare = aglCreateContext(mPixelFormat, mAGLContext);
-		return OGRE_NEW OSXCarbonContext(aglCtxShare, mPixelFormat);
-	}
-	
-	String OSXCarbonContext::getContextType()
-	{
-		return "AGL";
-	}
+        aglSetCurrentContext(mAGLContext);
+    }
+        
+    void OSXCarbonContext::endCurrent()
+    {
+        aglSetCurrentContext(NULL);
+    }
+    
+    GLContext* OSXCarbonContext::clone() const
+    {
+        aglSetCurrentContext(NULL);
+        AGLContext aglCtxShare = aglCreateContext(mPixelFormat, mAGLContext);
+        return OGRE_NEW OSXCarbonContext(aglCtxShare, mPixelFormat);
+    }
+    
+    String OSXCarbonContext::getContextType()
+    {
+        return "AGL";
+    }
 
 }

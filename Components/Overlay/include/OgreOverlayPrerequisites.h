@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,10 +33,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	// forward decls
-	class Font;
+    // forward decls
+    class Font;
     class FontManager;
-	class Overlay;
+    class Overlay;
     class OverlayContainer;
     class OverlayElement;
     class OverlayElementFactory;
@@ -46,23 +46,23 @@ namespace Ogre
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#	if defined( OGRE_STATIC_LIB )
-#   	define _OgreOverlayExport
+#   if defined( OGRE_STATIC_LIB )
+#       define _OgreOverlayExport
 #   else
-#   	if defined( OGRE_OVERLAY_EXPORTS )
-#       	define _OgreOverlayExport __declspec( dllexport )
-#   	else
+#       if defined( OGRE_OVERLAY_EXPORTS )
+#           define _OgreOverlayExport __declspec( dllexport )
+#       else
 #           if defined( __MINGW32__ )
 #               define _OgreOverlayExport
 #           else
-#       	    define _OgreOverlayExport __declspec( dllimport )
+#               define _OgreOverlayExport __declspec( dllimport )
 #           endif
-#   	endif
-#	endif
+#       endif
+#   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
 #   define _OgreOverlayExport __attribute__ ((visibility("default")))
 #else
-#	define _OgreOverlayExport
+#   define _OgreOverlayExport
 #endif 
 
 

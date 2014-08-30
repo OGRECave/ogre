@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,59 +27,64 @@ THE SOFTWARE.
 */
 
 #include "OgreOverlaySystem.h"
+#include "OgreCamera.h"
 #include "OgreRoot.h"
+#include "OgreViewport.h"
+#include "OgreOverlayManager.h"
+#include "OgreOverlayElementFactory.h"
+#include "OgreFontManager.h"
 
 namespace Ogre {
-	//---------------------------------------------------------------------
-	OverlaySystem::OverlaySystem()
-	{
-		mOverlayManager = OGRE_NEW Ogre::OverlayManager();
-		mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::PanelOverlayElementFactory());
+    //---------------------------------------------------------------------
+    OverlaySystem::OverlaySystem()
+    {
+        mOverlayManager = OGRE_NEW Ogre::OverlayManager();
+        mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::PanelOverlayElementFactory());
 
-		mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::BorderPanelOverlayElementFactory());
+        mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::BorderPanelOverlayElementFactory());
 
-		mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::TextAreaOverlayElementFactory());
+        mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::TextAreaOverlayElementFactory());
 
-		mFontManager = OGRE_NEW FontManager();
+        mFontManager = OGRE_NEW FontManager();
 #if OGRE_PROFILING
-		mProfileListener = new Ogre::OverlayProfileSessionListener();
-		Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
+        mProfileListener = new Ogre::OverlayProfileSessionListener();
+        Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
         if (prof)
-		{
-			prof->addListener(mProfileListener);
-		}
+        {
+            prof->addListener(mProfileListener);
+        }
 #endif
-	}
-	//---------------------------------------------------------------------
-	OverlaySystem::~OverlaySystem()
-	{
+    }
+    //---------------------------------------------------------------------
+    OverlaySystem::~OverlaySystem()
+    {
 #if OGRE_PROFILING
-		Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
+        Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
         if (prof)
-		{
-			prof->removeListener(mProfileListener);
-		}
-		delete mProfileListener;
+        {
+            prof->removeListener(mProfileListener);
+        }
+        delete mProfileListener;
 #endif
-		OGRE_DELETE mOverlayManager;
-		OGRE_DELETE mFontManager;
-	}
-	//---------------------------------------------------------------------
-	void OverlaySystem::renderQueueStarted(uint8 queueGroupId, const String& invocation, 
-			bool& skipThisInvocation)
-	{
-		if(queueGroupId == Ogre::RENDER_QUEUE_OVERLAY)
-		{
-			Ogre::Viewport* vp = Ogre::Root::getSingletonPtr()->getRenderSystem()->_getViewport();
-			if(vp != NULL)
-			{
-				Ogre::SceneManager* sceneMgr = vp->getCamera()->getSceneManager();
-				if (vp->getOverlaysEnabled() && sceneMgr->_getCurrentRenderStage() != Ogre::SceneManager::IRS_RENDER_TO_TEXTURE)
-				{
-					OverlayManager::getSingleton()._queueOverlaysForRendering(vp->getCamera(), sceneMgr->getRenderQueue(), vp);
-				}
-			}
-		}
-	}
-	//---------------------------------------------------------------------
+        OGRE_DELETE mOverlayManager;
+        OGRE_DELETE mFontManager;
+    }
+    //---------------------------------------------------------------------
+    void OverlaySystem::renderQueueStarted(uint8 queueGroupId, const String& invocation, 
+            bool& skipThisInvocation)
+    {
+        if(queueGroupId == Ogre::RENDER_QUEUE_OVERLAY)
+        {
+            Ogre::Viewport* vp = Ogre::Root::getSingletonPtr()->getRenderSystem()->_getViewport();
+            if(vp != NULL)
+            {
+                Ogre::SceneManager* sceneMgr = vp->getCamera()->getSceneManager();
+                if (vp->getOverlaysEnabled() && sceneMgr->_getCurrentRenderStage() != Ogre::SceneManager::IRS_RENDER_TO_TEXTURE)
+                {
+                    OverlayManager::getSingleton()._queueOverlaysForRendering(vp->getCamera(), sceneMgr->getRenderQueue(), vp);
+                }
+            }
+        }
+    }
+    //---------------------------------------------------------------------
 }

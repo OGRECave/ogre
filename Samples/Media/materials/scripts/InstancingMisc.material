@@ -33,9 +33,22 @@ vertex_program Ogre/Instancing/Misc_cg_vs cg
 {
 	source InstancingMisc.cg
 	entry_point main_vs
-	profiles  vs_3_0 vs_2_0 vp40
+	profiles vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3 vs_3_0 vs_2_0 vp40
 
 	compile_arguments -DDEPTH_SHADOWRECEIVER
+}
+
+vertex_program Ogre/Instancing/Misc_hlsl_vs hlsl
+{
+	source InstancingMisc.hlsl
+	entry_point main_vs
+	target vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+
+	preprocessor_defines DEPTH_SHADOWRECEIVER
+	//default_params
+	//{
+	//	param_named_auto lightAttenuation light_attenuation_color 0
+	//}
 }
 
 //--------------------------------------------------------------
@@ -45,6 +58,7 @@ vertex_program Ogre/Instancing/Misc_vs unified
 {
 	delegate Ogre/Instancing/Misc_glsl_vs
 	delegate Ogre/Instancing/Misc_glsles_vs
+	//delegate Ogre/Instancing/Misc_hlsl_vs
 	delegate Ogre/Instancing/Misc_cg_vs
 
 	default_params

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,15 +33,15 @@ THE SOFTWARE.
 #include <OgreArchiveFactory.h>
 #include <android/asset_manager.h>
 
-namespace Ogre{	
-	class APKFileSystemArchive : public Archive
-	{
-	private:
-		AAssetManager* mAssetMgr;
-		String mPathPreFix;
+namespace Ogre{ 
+    class APKFileSystemArchive : public Archive
+    {
+    private:
+        AAssetManager* mAssetMgr;
+        String mPathPreFix;
 
-	public:
-		APKFileSystemArchive(const String& name, const String& archType, AAssetManager* assetMgr);
+    public:
+        APKFileSystemArchive(const String& name, const String& archType, AAssetManager* assetMgr);
         ~APKFileSystemArchive();
 
         /// @copydoc Archive::isCaseSensitive
@@ -55,13 +55,13 @@ namespace Ogre{
         /// @copydoc Archive::open
         DataStreamPtr open(const String& filename, bool readOnly = true) const;
 
-		/// @copydoc Archive::create
-		DataStreamPtr create(const String& filename) const;
+        /// @copydoc Archive::create
+        DataStreamPtr create(const String& filename) const;
 
-		/// @copydoc Archive::delete
-		void remove(const String& filename) const;
+        /// @copydoc Archive::delete
+        void remove(const String& filename) const;
 
-		/// @copydoc Archive::list
+        /// @copydoc Archive::list
         StringVectorPtr list(bool recursive = true, bool dirs = false);
 
         /// @copydoc Archive::listFileInfo
@@ -76,14 +76,14 @@ namespace Ogre{
         /// @copydoc Archive::exists
         bool exists(const String& filename);
 
-		/// @copydoc Archive::getModifiedTime
-		time_t getModifiedTime(const String& filename);
-	};
-	
-	class APKFileSystemArchiveFactory : public ArchiveFactory
+        /// @copydoc Archive::getModifiedTime
+        time_t getModifiedTime(const String& filename);
+    };
+    
+    class APKFileSystemArchiveFactory : public ArchiveFactory
     {
     public:
-		APKFileSystemArchiveFactory(AAssetManager* assetMgr) : mAssetMgr(assetMgr) {}
+        APKFileSystemArchiveFactory(AAssetManager* assetMgr) : mAssetMgr(assetMgr) {}
         virtual ~APKFileSystemArchiveFactory() {}
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;

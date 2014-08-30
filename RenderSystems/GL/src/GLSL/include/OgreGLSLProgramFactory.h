@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,20 +41,20 @@ namespace Ogre
     class _OgreGLExport GLSLProgramFactory : public HighLevelGpuProgramFactory
     {
     protected:
-		static String sLanguageName;
+        static String sLanguageName;
     public:
         GLSLProgramFactory(void);
         ~GLSLProgramFactory(void);
-		/// Get the name of the language this factory creates programs for
-		const String& getLanguage(void) const;
-		/// Create an instance of GLSLProgram
+        /// Get the name of the language this factory creates programs for
+        const String& getLanguage(void) const;
+        /// Create an instance of GLSLProgram
         HighLevelGpuProgram* create(ResourceManager* creator, 
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
-		void destroy(HighLevelGpuProgram* prog);
+        void destroy(HighLevelGpuProgram* prog);
 
-	private:
-		GLSLLinkProgramManager* mLinkProgramManager;
+    private:
+        GLSLLinkProgramManager* mLinkProgramManager;
 
     };
     }

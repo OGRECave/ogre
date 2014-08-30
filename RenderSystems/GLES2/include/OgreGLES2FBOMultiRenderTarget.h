@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,27 +35,27 @@ namespace Ogre {
     
     class GLES2FBOManager;
 
-	/** MultiRenderTarget for GL ES 2.x.
-	*/
-	class _OgreGLES2Export GLES2FBOMultiRenderTarget : public MultiRenderTarget
-	{
-	public:
-		GLES2FBOMultiRenderTarget(GLES2FBOManager *manager, const String &name);
-		~GLES2FBOMultiRenderTarget();
+    /** MultiRenderTarget for GL ES 2.x.
+    */
+    class _OgreGLES2Export GLES2FBOMultiRenderTarget : public MultiRenderTarget
+    {
+    public:
+        GLES2FBOMultiRenderTarget(GLES2FBOManager *manager, const String &name);
+        ~GLES2FBOMultiRenderTarget();
 
-		virtual void getCustomAttribute( const String& name, void *pData );
+        virtual void getCustomAttribute( const String& name, void *pData );
 
-		bool requiresTextureFlipping() const { return true; }
+        bool requiresTextureFlipping() const { return true; }
 
-		/// Override so we can attach the depth buffer to the FBO
-		virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
-		virtual void detachDepthBuffer();
-		virtual void _detachDepthBuffer();
-	private:
-		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
-		virtual void unbindSurfaceImpl(size_t attachment); 
-		GLES2FrameBufferObject fbo;
-	};
+        /// Override so we can attach the depth buffer to the FBO
+        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
+        virtual void detachDepthBuffer();
+        virtual void _detachDepthBuffer();
+    private:
+        virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
+        virtual void unbindSurfaceImpl(size_t attachment); 
+        GLES2FrameBufferObject fbo;
+    };
 
 }
 

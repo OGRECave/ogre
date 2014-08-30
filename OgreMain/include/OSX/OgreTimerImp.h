@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,20 +33,20 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** Timer class */
-	class _OgreExport Timer : public TimerAlloc
-	{
-	private:
-		struct timeval start;
-		clock_t zeroClock;
-	public:
-		Timer();
-		~Timer();
+    /** Timer class */
+    class _OgreExport Timer : public TimerAlloc
+    {
+    private:
+        struct timeval start;
+        clock_t zeroClock;
+    public:
+        Timer();
+        ~Timer();
 
-		/** Method for setting a specific option of the Timer. These options are usually
+        /** Method for setting a specific option of the Timer. These options are usually
             specific for a certain implementation of the Timer class, and may (and probably
             will) not exist across different implementations.  reset() must be called after
-			all setOption() calls.
+            all setOption() calls.
             @param
                 strKey The name of the option to set
             @param
@@ -59,20 +59,20 @@ namespace Ogre
         */
         bool setOption( const String& strKey, const void* pValue ) { return false; }
 
-		/** Resets timer */
-		void reset();
+        /** Resets timer */
+        void reset();
 
-		/** Returns milliseconds since initialisation or last reset */
-		unsigned long getMilliseconds();
+        /** Returns milliseconds since initialisation or last reset */
+        unsigned long getMilliseconds();
 
-		/** Returns microseconds since initialisation or last reset */
-		unsigned long getMicroseconds();
+        /** Returns microseconds since initialisation or last reset */
+        unsigned long getMicroseconds();
 
-		/** Returns milliseconds since initialisation or last reset, only CPU time measured */	
-		unsigned long getMillisecondsCPU();
+        /** Returns milliseconds since initialisation or last reset, only CPU time measured */  
+        unsigned long getMillisecondsCPU();
 
-		/** Returns microseconds since initialisation or last reset, only CPU time measured */	
-		unsigned long getMicrosecondsCPU();
-	};
+        /** Returns microseconds since initialisation or last reset, only CPU time measured */  
+        unsigned long getMicrosecondsCPU();
+    };
 }
 #endif

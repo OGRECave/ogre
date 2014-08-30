@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,26 +30,26 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/* 
+    /* 
 
-	Ugh, I wish I didn't have to do this.
+    Ugh, I wish I didn't have to do this.
 
-	The problem is that operator new/delete are *implicitly* static. We have to 
-	instantiate them for each combination exactly once throughout all the compilation
-	units that are linked together, and this appears to be the only way to do it. 
+    The problem is that operator new/delete are *implicitly* static. We have to 
+    instantiate them for each combination exactly once throughout all the compilation
+    units that are linked together, and this appears to be the only way to do it. 
 
-	At least I can do it via templates.
+    At least I can do it via templates.
 
-	*/
+    */
 
-	template class AllocatedObject<GeneralAllocPolicy>;
-	template class AllocatedObject<GeometryAllocPolicy>;
-	template class AllocatedObject<AnimationAllocPolicy>;
-	template class AllocatedObject<SceneCtlAllocPolicy>;
-	template class AllocatedObject<SceneObjAllocPolicy>;
-	template class AllocatedObject<ResourceAllocPolicy>;
-	template class AllocatedObject<ScriptingAllocPolicy>;
-	template class AllocatedObject<RenderSysAllocPolicy>; 
+    template class AllocatedObject<GeneralAllocPolicy>;
+    template class AllocatedObject<GeometryAllocPolicy>;
+    template class AllocatedObject<AnimationAllocPolicy>;
+    template class AllocatedObject<SceneCtlAllocPolicy>;
+    template class AllocatedObject<SceneObjAllocPolicy>;
+    template class AllocatedObject<ResourceAllocPolicy>;
+    template class AllocatedObject<ScriptingAllocPolicy>;
+    template class AllocatedObject<RenderSysAllocPolicy>; 
 
 
 

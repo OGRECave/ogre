@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -34,132 +34,132 @@
 
 namespace Ogre
 {
-	namespace {
-		/** Get actual file pointed to by symlink */
-		const Ogre::String resolveSymlink(const Ogre::String& symlink)
-		{
-			ssize_t bufsize = 256;
-			char* resolved = 0;
-			do
-			{
-				char* buf = OGRE_ALLOC_T(char, bufsize, Ogre::MEMCATEGORY_GENERAL);
-				ssize_t retval = readlink(symlink.c_str(), buf, bufsize);
-				if (retval == -1)
-				{
-					OGRE_FREE(buf, Ogre::MEMCATEGORY_GENERAL);
-					break;
-				}
+    namespace {
+        /** Get actual file pointed to by symlink */
+        const Ogre::String resolveSymlink(const Ogre::String& symlink)
+        {
+            ssize_t bufsize = 256;
+            char* resolved = 0;
+            do
+            {
+                char* buf = OGRE_ALLOC_T(char, bufsize, Ogre::MEMCATEGORY_GENERAL);
+                ssize_t retval = readlink(symlink.c_str(), buf, bufsize);
+                if (retval == -1)
+                {
+                    OGRE_FREE(buf, Ogre::MEMCATEGORY_GENERAL);
+                    break;
+                }
 
-				if (retval < bufsize)
-				{
-					// operation was successful.
-					// readlink does not guarantee to 0-terminate, so do this manually
-					buf[retval] = '\0';
-					resolved = buf;
-				}
-				else
-				{
-					// buffer was too small, grow buffer and try again
-					OGRE_FREE(buf, Ogre::MEMCATEGORY_GENERAL);
-					bufsize <<= 1;
-				}
-			} while (!resolved);
+                if (retval < bufsize)
+                {
+                    // operation was successful.
+                    // readlink does not guarantee to 0-terminate, so do this manually
+                    buf[retval] = '\0';
+                    resolved = buf;
+                }
+                else
+                {
+                    // buffer was too small, grow buffer and try again
+                    OGRE_FREE(buf, Ogre::MEMCATEGORY_GENERAL);
+                    bufsize <<= 1;
+                }
+            } while (!resolved);
 
-			if (resolved)
-			{
-				Ogre::String result (resolved);
-				OGRE_FREE(resolved, Ogre::MEMCATEGORY_GENERAL);
-				return result;
-			}
-			else
-				return "";
-		}
-	}
+            if (resolved)
+            {
+                Ogre::String result (resolved);
+                OGRE_FREE(resolved, Ogre::MEMCATEGORY_GENERAL);
+                return result;
+            }
+            else
+                return "";
+        }
+    }
     //---------------------------------------------------------------------
-	void FileSystemLayer::getConfigPaths()
-	{
-		// try to determine the application's path:
-		// recent systems should provide the executable path via the /proc system
-		Ogre::String appPath = resolveSymlink("/proc/self/exe");
-		if (appPath.empty())
-		{
-			// if /proc/self/exe isn't available, try it via the program's pid
-			pid_t pid = getpid();
-			char proc[64];
-			int retval = snprintf(proc, sizeof(proc), "/proc/%llu/exe", (unsigned long long) pid);
-			if (retval > 0 && retval < (long)sizeof(proc))
-				appPath = resolveSymlink(proc);
-		}
+    void FileSystemLayer::getConfigPaths()
+    {
+        // try to determine the application's path:
+        // recent systems should provide the executable path via the /proc system
+        Ogre::String appPath = resolveSymlink("/proc/self/exe");
+        if (appPath.empty())
+        {
+            // if /proc/self/exe isn't available, try it via the program's pid
+            pid_t pid = getpid();
+            char proc[64];
+            int retval = snprintf(proc, sizeof(proc), "/proc/%llu/exe", (unsigned long long) pid);
+            if (retval > 0 && retval < (long)sizeof(proc))
+                appPath = resolveSymlink(proc);
+        }
 
-		if (!appPath.empty())
-		{
-			// we need to strip the executable name from the path
-			Ogre::String::size_type pos = appPath.rfind('/');
-			if (pos != Ogre::String::npos)
-				appPath.erase(pos);
-		}
-		else
-		{
-			// couldn't find actual executable path, assume current working dir
-			appPath = ".";
-		}
+        if (!appPath.empty())
+        {
+            // we need to strip the executable name from the path
+            Ogre::String::size_type pos = appPath.rfind('/');
+            if (pos != Ogre::String::npos)
+                appPath.erase(pos);
+        }
+        else
+        {
+            // couldn't find actual executable path, assume current working dir
+            appPath = ".";
+        }
 
-		// use application path as first config search path
-		mConfigPaths.push_back(appPath + '/');
-		// then search inside ../share/OGRE
-		mConfigPaths.push_back(appPath + "/../share/OGRE/");
-		// then try system wide /etc
-		mConfigPaths.push_back("/etc/OGRE/");
-	}
+        // use application path as first config search path
+        mConfigPaths.push_back(appPath + '/');
+        // then search inside ../share/OGRE
+        mConfigPaths.push_back(appPath + "/../share/OGRE/");
+        // then try system wide /etc
+        mConfigPaths.push_back("/etc/OGRE/");
+    }
     //---------------------------------------------------------------------
-	void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
-	{
-		struct passwd* pwd = getpwuid(getuid());
-		if (pwd)
-		{
-			mHomePath = pwd->pw_dir;
-		}
-		else
-		{
-			// try the $HOME environment variable
-			mHomePath = getenv("HOME");
-		}
+    void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
+    {
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd)
+        {
+            mHomePath = pwd->pw_dir;
+        }
+        else
+        {
+            // try the $HOME environment variable
+            mHomePath = getenv("HOME");
+        }
 
-		if (!mHomePath.empty())
-		{
-			// create an .ogre subdir
-			mHomePath.append("/.ogre/");
-			if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
-			{
-				// can't create dir
-				mHomePath.clear();
-			}
-			else
-			{
-				// now create the given subdir
-				mHomePath.append(subdir + '/');
-				if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
-				{
-					// can't create dir
-					mHomePath.clear();
-				}
-			}
-		}
+        if (!mHomePath.empty())
+        {
+            // create an .ogre subdir
+            mHomePath.append("/.ogre/");
+            if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
+            {
+                // can't create dir
+                mHomePath.clear();
+            }
+            else
+            {
+                // now create the given subdir
+                mHomePath.append(subdir + '/');
+                if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
+                {
+                    // can't create dir
+                    mHomePath.clear();
+                }
+            }
+        }
 
-		if (mHomePath.empty())
-		{
-			// couldn't create dir in home directory, fall back to cwd
-			mHomePath = "./";
-		}
-	}
+        if (mHomePath.empty())
+        {
+            // couldn't create dir in home directory, fall back to cwd
+            mHomePath = "./";
+        }
+    }
     //---------------------------------------------------------------------
-	bool FileSystemLayer::fileExists(const Ogre::String& path) const
-	{
-		return access(path.c_str(), R_OK) == 0;
-	}
+    bool FileSystemLayer::fileExists(const Ogre::String& path) const
+    {
+        return access(path.c_str(), R_OK) == 0;
+    }
     //---------------------------------------------------------------------
-	bool FileSystemLayer::createDirectory(const Ogre::String& path)
-	{
-		return !mkdir(path.c_str(), 0755) || errno == EEXIST;
-	}
+    bool FileSystemLayer::createDirectory(const Ogre::String& path)
+    {
+        return !mkdir(path.c_str(), 0755) || errno == EEXIST;
+    }
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,18 +30,18 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreResourceManager.h"
 #include "OgreSingleton.h"
+#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
     /** This class manages the available ArchiveFactory plugins. 
     */
     class _OgreExport ArchiveManager : public Singleton<ArchiveManager>, public ArchiveAlloc
@@ -78,19 +78,19 @@ namespace Ogre {
         */
         Archive* load( const String& filename, const String& archiveType, bool readOnly);
 
-		/** Unloads an archive.
-		@remarks
-			You must ensure that this archive is not being used before removing it.
-		*/
-		void unload(Archive* arch);
-		/** Unloads an archive by name.
-		@remarks
-			You must ensure that this archive is not being used before removing it.
-		*/
-		void unload(const String& filename);
-		typedef MapIterator<ArchiveMap> ArchiveMapIterator;
-		/** Get an iterator over the Archives in this Manager. */
-		ArchiveMapIterator getArchiveIterator(void);
+        /** Unloads an archive.
+        @remarks
+            You must ensure that this archive is not being used before removing it.
+        */
+        void unload(Archive* arch);
+        /** Unloads an archive by name.
+        @remarks
+            You must ensure that this archive is not being used before removing it.
+        */
+        void unload(const String& filename);
+        typedef MapIterator<ArchiveMap> ArchiveMapIterator;
+        /** Get an iterator over the Archives in this Manager. */
+        ArchiveMapIterator getArchiveIterator(void);
 
         /** Adds a new ArchiveFactory to the list of available factories.
             @remarks
@@ -132,8 +132,8 @@ namespace Ogre {
         */
         static ArchiveManager* getSingletonPtr(void);
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

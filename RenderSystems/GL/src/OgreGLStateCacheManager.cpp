@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -86,7 +86,7 @@ namespace Ogre {
         if (mImp == NULL)
         {
             // Therefore we add a "dummy" cache if none are left
-            if (!mCaches.size())
+            if (mCaches.empty())
                 mCaches[0] = OGRE_NEW GLStateCacheManagerImp();
             mImp = mCaches.begin()->second;
         }
@@ -123,9 +123,9 @@ namespace Ogre {
     }
     
     bool GLStateCacheManager::activateGLTextureUnit(size_t unit)
-	{
+    {
         return mImp->activateGLTextureUnit(unit);
-	}
+    }
     
     void GLStateCacheManager::setBlendFunc(GLenum source, GLenum dest)
     {
@@ -167,16 +167,11 @@ namespace Ogre {
         mImp->setStencilMask(mask);
     }
     
-    void GLStateCacheManager::setEnabled(GLenum flag)
+    void GLStateCacheManager::setEnabled(GLenum flag, bool enabled)
     {
-        mImp->setEnabled(flag);
+        mImp->setEnabled(flag, enabled);
     }
-    
-    void GLStateCacheManager::setDisabled(GLenum flag)
-    {
-        mImp->setDisabled(flag);
-    }
-    
+
     void GLStateCacheManager::setCullFace(GLenum face)
     {
         mImp->setCullFace(face);

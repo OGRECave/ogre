@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,19 +61,19 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-	void PatchMesh::update(void* controlPointBuffer, size_t width, size_t height,
+    void PatchMesh::update(void* controlPointBuffer, size_t width, size_t height,
                            size_t uMaxSubdivisionLevel, size_t vMaxSubdivisionLevel,
                            PatchSurface::VisibleSide visibleSide)
-	{
-		mSurface.defineSurface(controlPointBuffer, mDeclaration, width, height, PatchSurface::PST_BEZIER, uMaxSubdivisionLevel, vMaxSubdivisionLevel, visibleSide);
-		Ogre::SubMesh* sm = this->getSubMesh(0);
-		Ogre::VertexData* vertex_data = sm->useSharedVertices ? this->sharedVertexData : sm->vertexData;
-		const Ogre::VertexElement* posElem = vertex_data->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
-		Ogre::HardwareVertexBufferSharedPtr vbuf = vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
+    {
+        mSurface.defineSurface(controlPointBuffer, mDeclaration, width, height, PatchSurface::PST_BEZIER, uMaxSubdivisionLevel, vMaxSubdivisionLevel, visibleSide);
+        Ogre::SubMesh* sm = this->getSubMesh(0);
+        Ogre::VertexData* vertex_data = sm->useSharedVertices ? this->sharedVertexData : sm->vertexData;
+        const Ogre::VertexElement* posElem = vertex_data->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
+        Ogre::HardwareVertexBufferSharedPtr vbuf = vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
 
         // Build patch with new control points
-		mSurface.build(vbuf, 0, sm->indexData->indexBuffer, 0);
-	}
+        mSurface.build(vbuf, 0, sm->indexData->indexBuffer, 0);
+    }
     //-----------------------------------------------------------------------
     void PatchMesh::setSubdivision(Real factor)
     {

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ namespace Ogre {
         }
         void CmdLeft::doSet(void* target, const String& val)
         {
-			Real r = StringConverter::parseReal(val);
+            Real r = StringConverter::parseReal(val);
             static_cast<OverlayElement*>(target)->setLeft(r);
         }
         //-----------------------------------------------------------------------
@@ -55,7 +55,7 @@ namespace Ogre {
         }
         void CmdTop::doSet(void* target, const String& val)
         {
-			Real r = StringConverter::parseReal(val);
+            Real r = StringConverter::parseReal(val);
             static_cast<OverlayElement*>(target)->setTop(r);
         }
         //-----------------------------------------------------------------------
@@ -66,7 +66,7 @@ namespace Ogre {
         }
         void CmdWidth::doSet(void* target, const String& val)
         {
-			Real r = StringConverter::parseReal(val);
+            Real r = StringConverter::parseReal(val);
             static_cast<OverlayElement*>(target)->setWidth(r);
         }
         //-----------------------------------------------------------------------
@@ -77,7 +77,7 @@ namespace Ogre {
         }
         void CmdHeight::doSet(void* target, const String& val)
         {
-			Real r = StringConverter::parseReal(val);
+            Real r = StringConverter::parseReal(val);
             static_cast<OverlayElement*>(target)->setHeight(r);
         }
         //-----------------------------------------------------------------------
@@ -87,10 +87,10 @@ namespace Ogre {
         }
         void CmdMaterial::doSet(void* target, const String& val)
         {
-			if (val != "")
-			{
-				static_cast<OverlayElement*>(target)->setMaterialName(val);
-			}
+            if (val != "")
+            {
+                static_cast<OverlayElement*>(target)->setMaterialName(val);
+            }
         }
         //-----------------------------------------------------------------------
         //-----------------------------------------------------------------------

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,25 +38,25 @@ class wxTextCtrl;
 class ProjectPage : public wxWizardPageSimple
 {
 public:
-	ProjectPage(wxWizard* parent);
-	virtual ~ProjectPage();
+    ProjectPage(wxWizard* parent);
+    virtual ~ProjectPage();
 
-	void getName(wxString& name) const;
-	void getLocation(wxString& location) const;
+    void getName(wxString& name) const;
+    void getLocation(wxString& location) const;
 
-	void OnBrowse(wxCommandEvent& event);
+    void OnBrowse(wxCommandEvent& event);
 
 protected:
-	void createPage();
+    void createPage();
 
-	wxBoxSizer* mSizer;
-	wxStaticText* mNameLabel;
-	wxTextCtrl* mNameText;
-	wxStaticText* mLocationLabel;
-	wxTextCtrl* mLocationText;
-	wxButton* mBrowseButton;
+    wxBoxSizer* mSizer;
+    wxStaticText* mNameLabel;
+    wxTextCtrl* mNameText;
+    wxStaticText* mLocationLabel;
+    wxTextCtrl* mLocationText;
+    wxButton* mBrowseButton;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _PROJECTPAGE_H_

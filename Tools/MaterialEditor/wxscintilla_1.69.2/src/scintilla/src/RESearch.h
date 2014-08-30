@@ -13,53 +13,53 @@
  * The following defines are not meant to be changeable.
  * They are for readability only.
  */
-#define MAXCHR	256
-#define CHRBIT	8
-#define BITBLK	MAXCHR/CHRBIT
+#define MAXCHR  256
+#define CHRBIT  8
+#define BITBLK  MAXCHR/CHRBIT
 
 class CharacterIndexer {
 public:
-	virtual char CharAt(int index)=0;
-	virtual ~CharacterIndexer() {
-	}
+    virtual char CharAt(int index)=0;
+    virtual ~CharacterIndexer() {
+    }
 };
 
 class RESearch {
 
 public:
-	RESearch(CharClassify *charClassTable);
-	~RESearch();
-	bool GrabMatches(CharacterIndexer &ci);
-	const char *Compile(const char *pat, int length, bool caseSensitive, bool posix);
-	int Execute(CharacterIndexer &ci, int lp, int endp);
-	int Substitute(CharacterIndexer &ci, char *src, char *dst);
+    RESearch(CharClassify *charClassTable);
+    ~RESearch();
+    bool GrabMatches(CharacterIndexer &ci);
+    const char *Compile(const char *pat, int length, bool caseSensitive, bool posix);
+    int Execute(CharacterIndexer &ci, int lp, int endp);
+    int Substitute(CharacterIndexer &ci, char *src, char *dst);
 
-	enum {MAXTAG=10};
-	enum {MAXNFA=2048};
-	enum {NOTFOUND=-1};
+    enum {MAXTAG=10};
+    enum {MAXNFA=2048};
+    enum {NOTFOUND=-1};
 
-	int bopat[MAXTAG];
-	int eopat[MAXTAG];
-	char *pat[MAXTAG];
+    int bopat[MAXTAG];
+    int eopat[MAXTAG];
+    char *pat[MAXTAG];
 
 private:
-	void Init();
-	void Clear();
-	void ChSet(char c);
-	void ChSetWithCase(char c, bool caseSensitive);
+    void Init();
+    void Clear();
+    void ChSet(char c);
+    void ChSetWithCase(char c, bool caseSensitive);
 
-	int PMatch(CharacterIndexer &ci, int lp, int endp, char *ap);
+    int PMatch(CharacterIndexer &ci, int lp, int endp, char *ap);
 
-	int bol;
-	int  tagstk[MAXTAG]; /* subpat tag stack */
-	char nfa[MAXNFA];    /* automaton */
-	int sta;
-	char bittab[BITBLK]; /* bit table for CCL pre-set bits */
-	int failure;
-	CharClassify *charClass;
-	bool iswordc(unsigned char x) {
-		return charClass->IsWord(x);
-	}
+    int bol;
+    int  tagstk[MAXTAG]; /* subpat tag stack */
+    char nfa[MAXNFA];    /* automaton */
+    int sta;
+    char bittab[BITBLK]; /* bit table for CCL pre-set bits */
+    int failure;
+    CharClassify *charClass;
+    bool iswordc(unsigned char x) {
+        return charClass->IsWord(x);
+    }
 };
 
 #endif

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -27,7 +27,6 @@ THE SOFTWARE.
 
 #include "OgreShaderSubRenderState.h"
 #include "OgreException.h"
-#include "OgreShaderGenerator.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -37,158 +36,158 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 SubRenderState::SubRenderState()
 {
-	
+    
 }
 
 //-----------------------------------------------------------------------
 SubRenderState::~SubRenderState()
 {
-	if (mOtherAccessor.isNull() == false)
-	{
-		mOtherAccessor->removeSubRenderStateInstance(this);
-	}
+    if (mOtherAccessor.isNull() == false)
+    {
+        mOtherAccessor->removeSubRenderStateInstance(this);
+    }
 }
 
 //-----------------------------------------------------------------------
 SubRenderStateFactory::~SubRenderStateFactory()
 {
-	assert(mSubRenderStateList.empty() &&
-		"SubRenderStateFactory::~SubRenderStateFactory -> Sub render states still exists !!!");
+    assert(mSubRenderStateList.empty() &&
+        "SubRenderStateFactory::~SubRenderStateFactory -> Sub render states still exists !!!");
 }
 
 //-----------------------------------------------------------------------
-SubRenderState*	SubRenderStateFactory::createInstance()
+SubRenderState* SubRenderStateFactory::createInstance()
 {
-	SubRenderState*	subRenderState = createInstanceImpl();
+    SubRenderState* subRenderState = createInstanceImpl();
 
-	mSubRenderStateList.insert(subRenderState);
+    mSubRenderStateList.insert(subRenderState);
 
-	return subRenderState;
+    return subRenderState;
 }
 
 //-----------------------------------------------------------------------
-SubRenderState*	SubRenderStateFactory::createOrRetrieveInstance(SGScriptTranslator* translator)
+SubRenderState* SubRenderStateFactory::createOrRetrieveInstance(SGScriptTranslator* translator)
 {
-	//check if we already create a SRS 
-	SubRenderState*	subRenderState = translator->getGeneratedSubRenderState(getType());
-	if (subRenderState == NULL)
-	{
-		//create a new sub render state
-		subRenderState = SubRenderStateFactory::createInstance();
-	}
-	return subRenderState;
+    //check if we already create a SRS 
+    SubRenderState* subRenderState = translator->getGeneratedSubRenderState(getType());
+    if (subRenderState == NULL)
+    {
+        //create a new sub render state
+        subRenderState = SubRenderStateFactory::createInstance();
+    }
+    return subRenderState;
 }
 
 //-----------------------------------------------------------------------
 void SubRenderStateFactory::destroyInstance(SubRenderState* subRenderState)
 {
-	SubRenderStateSetIterator it = mSubRenderStateList.find(subRenderState);
+    SubRenderStateSetIterator it = mSubRenderStateList.find(subRenderState);
 
-	if (it != mSubRenderStateList.end())
-	{
-		OGRE_DELETE *it;
-		mSubRenderStateList.erase(it);
-	}	
+    if (it != mSubRenderStateList.end())
+    {
+        OGRE_DELETE *it;
+        mSubRenderStateList.erase(it);
+    }   
 }
 
 //-----------------------------------------------------------------------
 void SubRenderStateFactory::destroyAllInstances()
 {
-	SubRenderStateSetIterator it;
+    SubRenderStateSetIterator it;
 
-	for (it = mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
-	{		
-		OGRE_DELETE *it;			
-	}
-	mSubRenderStateList.clear();
+    for (it = mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+    {       
+        OGRE_DELETE *it;            
+    }
+    mSubRenderStateList.clear();
 
 }
 
 //-----------------------------------------------------------------------
 SubRenderState& SubRenderState::operator=(const SubRenderState& rhs)
 {
-	if (getType() != rhs.getType())
-	{
-		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-			"Can not copy sub render states of different types !!",
-			"SubRenderState::operator=");
-	}
+    if (getType() != rhs.getType())
+    {
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            "Can not copy sub render states of different types !!",
+            "SubRenderState::operator=");
+    }
 
-	copyFrom(rhs);
+    copyFrom(rhs);
 
-	SubRenderStateAccessorPtr rhsAccessor = rhs.getAccessor();
+    SubRenderStateAccessorPtr rhsAccessor = rhs.getAccessor();
 
-	rhsAccessor->addSubRenderStateInstance(this);
-	mOtherAccessor = rhsAccessor;
+    rhsAccessor->addSubRenderStateInstance(this);
+    mOtherAccessor = rhsAccessor;
 
-	return *this;
+    return *this;
 }
 
 //-----------------------------------------------------------------------
 bool SubRenderState::createCpuSubPrograms(ProgramSet* programSet)
 {
-	bool result;
+    bool result;
 
-	// Resolve parameters.
-	result = resolveParameters(programSet);
-	if (false == result)
-		return false;
+    // Resolve parameters.
+    result = resolveParameters(programSet);
+    if (false == result)
+        return false;
 
-	// Resolve dependencies.
-	result = resolveDependencies(programSet);
-	if (false == result)
-		return false;
+    // Resolve dependencies.
+    result = resolveDependencies(programSet);
+    if (false == result)
+        return false;
 
-	// Add function invocations.
-	result = addFunctionInvocations(programSet);
-	if (false == result)
-		return false;
+    // Add function invocations.
+    result = addFunctionInvocations(programSet);
+    if (false == result)
+        return false;
 
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------
 bool SubRenderState::resolveParameters(ProgramSet* programSet)
 {
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------
 bool SubRenderState::resolveDependencies(ProgramSet* programSet)
 {
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------
 bool SubRenderState::addFunctionInvocations( ProgramSet* programSet )
 {
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------
 SubRenderStateAccessorPtr SubRenderState::getAccessor()
 {
-	if (mThisAccessor.isNull())
-	{
-		SubRenderStateAccessor* accessor = OGRE_NEW_T(SubRenderStateAccessor, MEMCATEGORY_GENERAL)(this);
-		
-		mThisAccessor.bind(accessor, SPFM_DELETE_T);
-	}
+    if (mThisAccessor.isNull())
+    {
+        SubRenderStateAccessor* accessor = OGRE_NEW_T(SubRenderStateAccessor, MEMCATEGORY_GENERAL)(this);
+        
+        mThisAccessor.bind(accessor, SPFM_DELETE_T);
+    }
 
-	return mThisAccessor;
+    return mThisAccessor;
 }
 
 //-----------------------------------------------------------------------
 SubRenderStateAccessorPtr SubRenderState::getAccessor() const
 {
-	if (mThisAccessor.isNull())
-	{
-		SubRenderStateAccessor* accessor = OGRE_NEW_T(SubRenderStateAccessor, MEMCATEGORY_GENERAL)(this);
+    if (mThisAccessor.isNull())
+    {
+        SubRenderStateAccessor* accessor = OGRE_NEW_T(SubRenderStateAccessor, MEMCATEGORY_GENERAL)(this);
 
-		mThisAccessor.bind(accessor, SPFM_DELETE_T);
-	}
+        mThisAccessor.bind(accessor, SPFM_DELETE_T);
+    }
 
-	return mThisAccessor;
+    return mThisAccessor;
 }
 
 

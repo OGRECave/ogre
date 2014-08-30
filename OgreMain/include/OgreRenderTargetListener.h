@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,13 +33,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/** Struct containing information about a RenderTarget event.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /** Struct containing information about a RenderTarget event.
     */
     struct RenderTargetEvent
     {
@@ -85,7 +85,7 @@ namespace Ogre {
         the 'Adapter' classes in Java rather than pure interfaces.
         */
     public:
-		virtual ~RenderTargetListener() {}
+        virtual ~RenderTargetListener() {}
         /** Called just before a RenderTarget is about to be rendered into.
         @remarks
             This event is raised just before any of the viewports on the target
@@ -128,19 +128,19 @@ namespace Ogre {
         virtual void postViewportUpdate(const RenderTargetViewportEvent& evt)
         { (void)evt; }
 
-		/** Called to notify listener that a Viewport has been added to the 
-			target in question.
-		*/
-		virtual void viewportAdded(const RenderTargetViewportEvent& evt)
+        /** Called to notify listener that a Viewport has been added to the 
+            target in question.
+        */
+        virtual void viewportAdded(const RenderTargetViewportEvent& evt)
                 { (void)evt; }
-		/** Called to notify listener that a Viewport has been removed from the 
-			target in question.
-		*/
-		virtual void viewportRemoved(const RenderTargetViewportEvent& evt)
+        /** Called to notify listener that a Viewport has been removed from the 
+            target in question.
+        */
+        virtual void viewportRemoved(const RenderTargetViewportEvent& evt)
                 { (void)evt; }
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #endif

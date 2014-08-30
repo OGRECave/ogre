@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,23 +38,23 @@ namespace Ogre {
     
     class GLSLESGpuProgram;
 
-	/** C++ encapsulation of GLSL ES Program Object
+    /** C++ encapsulation of GLSL ES Program Object
 
-	*/
+    */
 
-	class _OgreGLES2Export GLSLESLinkProgram : public GLSLESProgramCommon MANAGED_RESOURCE
-	{
-	protected:
+    class _OgreGLES2Export GLSLESLinkProgram : public GLSLESProgramCommon MANAGED_RESOURCE
+    {
+    protected:
         virtual void extractLayoutQualifiers(void) {}
 
-		/// Compiles and links the vertex and fragment programs
-		virtual void compileAndLink(void);
+        /// Compiles and links the vertex and fragment programs
+        virtual void compileAndLink(void);
         /// Put a program in use
         virtual void _useProgram(void);
 
-		void buildGLUniformReferences(void);
+        void buildGLUniformReferences(void);
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /** See AndroidResource. */
         virtual void notifyOnContextLost();
         
@@ -62,28 +62,28 @@ namespace Ogre {
         virtual void notifyOnContextReset();
 #endif
         
-	public:
-		/// Constructor should only be used by GLSLESLinkProgramManager
-		GLSLESLinkProgram(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram);
-		virtual ~GLSLESLinkProgram(void);
+    public:
+        /// Constructor should only be used by GLSLESLinkProgramManager
+        GLSLESLinkProgram(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram);
+        virtual ~GLSLESLinkProgram(void);
 
-		/** Makes a program object active by making sure it is linked and then putting it in use.
-		*/
-		void activate(void);
+        /** Makes a program object active by making sure it is linked and then putting it in use.
+        */
+        void activate(void);
 
-		/** Updates program object uniforms using data from GpuProgramParameters.
-		normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
-		*/
-		virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-		/** Updates program object uniform blocks using data from GpuProgramParameters.
+        /** Updates program object uniforms using data from GpuProgramParameters.
+        normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
+        */
+        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        /** Updates program object uniform blocks using data from GpuProgramParameters.
          normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
          */
-		virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-		/** Updates program object uniforms using data from pass iteration GpuProgramParameters.
-		normally called by GLSLESGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
-		*/
-		virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
-	};
+        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        /** Updates program object uniforms using data from pass iteration GpuProgramParameters.
+        normally called by GLSLESGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
+        */
+        virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
+    };
 
 }
 

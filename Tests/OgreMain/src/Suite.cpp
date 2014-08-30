@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,23 +45,23 @@ void setUpSuite()
 void tearDownSuite()
 {
     // shutdown and release managers that might have been created
-	if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
-		delete Ogre::HighLevelGpuProgramManager::getSingletonPtr();
-	if(Ogre::GpuProgramManager::getSingletonPtr())
-		delete Ogre::GpuProgramManager::getSingletonPtr();
-	if(Ogre::CompositorManager::getSingletonPtr())
-		delete Ogre::CompositorManager::getSingletonPtr();
-	if(Ogre::MaterialManager::getSingletonPtr())
-		delete Ogre::MaterialManager::getSingletonPtr();
-	if(Ogre::ResourceGroupManager::getSingletonPtr())
-		delete Ogre::ResourceGroupManager::getSingletonPtr();
+    if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
+        delete Ogre::HighLevelGpuProgramManager::getSingletonPtr();
+    if(Ogre::GpuProgramManager::getSingletonPtr())
+        delete Ogre::GpuProgramManager::getSingletonPtr();
+    if(Ogre::CompositorManager::getSingletonPtr())
+        delete Ogre::CompositorManager::getSingletonPtr();
+    if(Ogre::MaterialManager::getSingletonPtr())
+        delete Ogre::MaterialManager::getSingletonPtr();
+    if(Ogre::ResourceGroupManager::getSingletonPtr())
+        delete Ogre::ResourceGroupManager::getSingletonPtr();
 
-	if(Ogre::LogManager::getSingletonPtr())
-		delete Ogre::LogManager::getSingletonPtr();
-	if(Ogre::ResourceGroupManager::getSingletonPtr())
-		delete Ogre::ResourceGroupManager::getSingletonPtr();
-	if(Ogre::LodStrategyManager::getSingletonPtr())
-		delete Ogre::LodStrategyManager::getSingletonPtr();
+    if(Ogre::LogManager::getSingletonPtr())
+        delete Ogre::LogManager::getSingletonPtr();
+    if(Ogre::ResourceGroupManager::getSingletonPtr())
+        delete Ogre::ResourceGroupManager::getSingletonPtr();
+    if(Ogre::LodStrategyManager::getSingletonPtr())
+        delete Ogre::LodStrategyManager::getSingletonPtr();
 
 }
 

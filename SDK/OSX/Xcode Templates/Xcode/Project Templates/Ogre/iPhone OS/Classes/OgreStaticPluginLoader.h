@@ -57,134 +57,134 @@ Description: Utility class to load plugins statically
 
 namespace Ogre
 {
-	/** Utility class for loading some plugins statically.
-	@remarks
-		When loading plugins statically, you are limited to loading plugins 
-		that are known about at compile time. You should define preprocessor
-		symbols depending on which plugins you want to load - the symbol being
-		OGRE_STATIC_<pluginname>, with pluginname being the usual name of the
-		plugin DLL (no file extension, no debug suffix, and without the Plugin_ 
-		or RenderSystem_ prefix.)
-	*/
-	class StaticPluginLoader
-	{
-	protected:
+    /** Utility class for loading some plugins statically.
+    @remarks
+        When loading plugins statically, you are limited to loading plugins 
+        that are known about at compile time. You should define preprocessor
+        symbols depending on which plugins you want to load - the symbol being
+        OGRE_STATIC_<pluginname>, with pluginname being the usual name of the
+        plugin DLL (no file extension, no debug suffix, and without the Plugin_ 
+        or RenderSystem_ prefix.)
+    */
+    class StaticPluginLoader
+    {
+    protected:
 #ifdef OGRE_STATIC_CgProgramManager
-		CgPlugin* mCgPlugin;
+        CgPlugin* mCgPlugin;
 #endif
 #ifdef OGRE_STATIC_OctreeSceneManager
-		OctreePlugin* mOctreePlugin;
+        OctreePlugin* mOctreePlugin;
 #endif
 #ifdef OGRE_STATIC_ParticleFX
-		ParticleFXPlugin* mParticleFXPlugin;
+        ParticleFXPlugin* mParticleFXPlugin;
 #endif
 #ifdef OGRE_STATIC_BSPSceneManager
-		BspSceneManagerPlugin* mBSPPlugin;
+        BspSceneManagerPlugin* mBSPPlugin;
 #endif
 #ifdef OGRE_STATIC_PCZSceneManager
-		PCZPlugin* mPCZPlugin;
+        PCZPlugin* mPCZPlugin;
 #endif
 #ifdef OGRE_STATIC_OctreeZone
-		OctreeZonePlugin* mOctreeZonePlugin;
+        OctreeZonePlugin* mOctreeZonePlugin;
 #endif
 #ifdef OGRE_STATIC_GL
-		GLPlugin* mGLPlugin;
+        GLPlugin* mGLPlugin;
 #endif
 #ifdef OGRE_STATIC_GLES
-		GLESPlugin* mGLESPlugin;
+        GLESPlugin* mGLESPlugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D9
-		D3D9Plugin* mD3D9Plugin;
+        D3D9Plugin* mD3D9Plugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D11
-		D3D11Plugin* mD3D11Plugin;
+        D3D11Plugin* mD3D11Plugin;
 #endif
-	public:
-		StaticPluginLoader() {}
+    public:
+        StaticPluginLoader() {}
 
-		/** Load all the enabled plugins against the passed in root object. */
-		void load()
-		{
-			Root& root  = Root::getSingleton();
+        /** Load all the enabled plugins against the passed in root object. */
+        void load()
+        {
+            Root& root  = Root::getSingleton();
 #ifdef OGRE_STATIC_GL
-			mGLPlugin = OGRE_NEW GLPlugin();
-			root.installPlugin(mGLPlugin);
+            mGLPlugin = OGRE_NEW GLPlugin();
+            root.installPlugin(mGLPlugin);
 #endif
 #ifdef OGRE_STATIC_GLES
-			mGLESPlugin = OGRE_NEW GLESPlugin();
-			root.installPlugin(mGLESPlugin);
+            mGLESPlugin = OGRE_NEW GLESPlugin();
+            root.installPlugin(mGLESPlugin);
 #endif
 #ifdef OGRE_STATIC_Direct3D9
-			mD3D9Plugin = OGRE_NEW D3D9Plugin();
-			root.installPlugin(mD3D9Plugin);
+            mD3D9Plugin = OGRE_NEW D3D9Plugin();
+            root.installPlugin(mD3D9Plugin);
 #endif
 #ifdef OGRE_STATIC_Direct3D11
-			mD3D11Plugin = OGRE_NEW D3D11Plugin();
-			root.installPlugin(mD3D11Plugin);
+            mD3D11Plugin = OGRE_NEW D3D11Plugin();
+            root.installPlugin(mD3D11Plugin);
 #endif
 #ifdef OGRE_STATIC_CgProgramManager
-			mCgPlugin = OGRE_NEW CgPlugin();
-			root.installPlugin(mCgPlugin);
+            mCgPlugin = OGRE_NEW CgPlugin();
+            root.installPlugin(mCgPlugin);
 #endif
 #ifdef OGRE_STATIC_OctreeSceneManager
-			mOctreePlugin = OGRE_NEW OctreePlugin();
-			root.installPlugin(mOctreePlugin);
+            mOctreePlugin = OGRE_NEW OctreePlugin();
+            root.installPlugin(mOctreePlugin);
 #endif
 #ifdef OGRE_STATIC_ParticleFX
-			mParticleFXPlugin = OGRE_NEW ParticleFXPlugin();
-			root.installPlugin(mParticleFXPlugin);
+            mParticleFXPlugin = OGRE_NEW ParticleFXPlugin();
+            root.installPlugin(mParticleFXPlugin);
 #endif
 #ifdef OGRE_STATIC_BSPSceneManager
-			mBSPPlugin = OGRE_NEW BspSceneManagerPlugin();
-			root.installPlugin(mBSPPlugin);
+            mBSPPlugin = OGRE_NEW BspSceneManagerPlugin();
+            root.installPlugin(mBSPPlugin);
 #endif
 #ifdef OGRE_STATIC_PCZSceneManager
-			mPCZPlugin = OGRE_NEW PCZPlugin();
-			root.installPlugin(mPCZPlugin);
+            mPCZPlugin = OGRE_NEW PCZPlugin();
+            root.installPlugin(mPCZPlugin);
 #endif
 #ifdef OGRE_STATIC_OctreeZone
-			mOctreeZonePlugin = OGRE_NEW OctreeZonePlugin();
-			root.installPlugin(mOctreeZonePlugin);
+            mOctreeZonePlugin = OGRE_NEW OctreeZonePlugin();
+            root.installPlugin(mOctreeZonePlugin);
 #endif
-		}
+        }
 
-		void unload()
-		{
-			// don't unload plugins, since Root will have done that. Destroy here.
+        void unload()
+        {
+            // don't unload plugins, since Root will have done that. Destroy here.
 #ifdef OGRE_STATIC_OctreeZone
-			OGRE_DELETE mOctreeZonePlugin;
+            OGRE_DELETE mOctreeZonePlugin;
 #endif
 #ifdef OGRE_STATIC_PCZSceneManager
-			OGRE_DELETE mPCZPlugin;
+            OGRE_DELETE mPCZPlugin;
 #endif
 #ifdef OGRE_STATIC_BSPSceneManager
-			OGRE_DELETE mBSPPlugin;
+            OGRE_DELETE mBSPPlugin;
 #endif
 #ifdef OGRE_STATIC_ParticleFX
-			OGRE_DELETE mParticleFXPlugin;
+            OGRE_DELETE mParticleFXPlugin;
 #endif
 #ifdef OGRE_STATIC_OctreeSceneManager
-			OGRE_DELETE mOctreePlugin;
+            OGRE_DELETE mOctreePlugin;
 #endif
 #ifdef OGRE_STATIC_CgProgramManager
-			OGRE_DELETE mCgPlugin;
+            OGRE_DELETE mCgPlugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D9
-			OGRE_DELETE mD3D9Plugin;
+            OGRE_DELETE mD3D9Plugin;
 #endif
 #ifdef OGRE_STATIC_Direct3D11
-			OGRE_DELETE mD3D11Plugin;
+            OGRE_DELETE mD3D11Plugin;
 #endif
 #ifdef OGRE_STATIC_GL
-			OGRE_DELETE mGLPlugin;
+            OGRE_DELETE mGLPlugin;
 #endif
 #ifdef OGRE_STATIC_GLES
-			OGRE_DELETE mGLESPlugin;
+            OGRE_DELETE mGLESPlugin;
 #endif
 
-		}
+        }
 
-	};
+    };
 
 }
 

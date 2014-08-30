@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,12 +59,12 @@ namespace Ogre {
         }
     }
 
-	void GLES2FBORenderTexture::swapBuffers()
-	{
-		mFB.swapBuffers();
-	}
+    void GLES2FBORenderTexture::swapBuffers()
+    {
+        mFB.swapBuffers();
+    }
     
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2FBORenderTexture::notifyOnContextLost()
     {
         mFB.notifyOnContextLost();
@@ -82,27 +82,27 @@ namespace Ogre {
     }
 #endif
     
-	//-----------------------------------------------------------------------------
-	bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
-	{
-		bool result;
-		if( (result = GLES2RenderTexture::attachDepthBuffer( depthBuffer )) )
-			mFB.attachDepthBuffer( depthBuffer );
+    //-----------------------------------------------------------------------------
+    bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        bool result;
+        if( (result = GLES2RenderTexture::attachDepthBuffer( depthBuffer )) )
+            mFB.attachDepthBuffer( depthBuffer );
 
-		return result;
-	}
-	//-----------------------------------------------------------------------------
-	void GLES2FBORenderTexture::detachDepthBuffer()
-	{
-		mFB.detachDepthBuffer();
-		GLES2RenderTexture::detachDepthBuffer();
-	}
-	//-----------------------------------------------------------------------------
-	void GLES2FBORenderTexture::_detachDepthBuffer()
-	{
-		mFB.detachDepthBuffer();
-		GLES2RenderTexture::_detachDepthBuffer();
-	}
+        return result;
+    }
+    //-----------------------------------------------------------------------------
+    void GLES2FBORenderTexture::detachDepthBuffer()
+    {
+        mFB.detachDepthBuffer();
+        GLES2RenderTexture::detachDepthBuffer();
+    }
+    //-----------------------------------------------------------------------------
+    void GLES2FBORenderTexture::_detachDepthBuffer()
+    {
+        mFB.detachDepthBuffer();
+        GLES2RenderTexture::_detachDepthBuffer();
+    }
    
     // Size of probe texture
     #define PROBE_SIZE 16
@@ -111,7 +111,8 @@ namespace Ogre {
     static const GLenum stencilFormats[] =
     {
         GL_NONE,                    // No stencil
-#ifdef GL_OES_stencil4
+#if OGRE_NO_GLES3_SUPPORT == 1
+        GL_STENCIL_INDEX1_OES,
         GL_STENCIL_INDEX4_OES,
 #endif
         GL_STENCIL_INDEX8
@@ -119,7 +120,8 @@ namespace Ogre {
     static const size_t stencilBits[] =
     {
         0,
-#ifdef GL_OES_stencil4
+#if OGRE_NO_GLES3_SUPPORT == 1
+        1,
         4,
 #endif
         8
@@ -150,22 +152,22 @@ namespace Ogre {
     };
     #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
-	GLES2FBOManager::GLES2FBOManager()
+    GLES2FBOManager::GLES2FBOManager()
     {
         detectFBOFormats();
         
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
     }
 
-	GLES2FBOManager::~GLES2FBOManager()
-	{
-		if(!mRenderBufferMap.empty())
-		{
-			LogManager::getSingleton().logMessage("GL ES 2: Warning! GLES2FBOManager destructor called, but not all renderbuffers were released.");
-		}
+    GLES2FBOManager::~GLES2FBOManager()
+    {
+        if(!mRenderBufferMap.empty())
+        {
+            LogManager::getSingleton().logMessage("GL ES 2: Warning! GLES2FBOManager destructor called, but not all renderbuffers were released.");
+        }
         
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
-	}
+    }
     
     void GLES2FBOManager::_reload()
     {
@@ -191,21 +193,11 @@ namespace Ogre {
             glBindTexture(GL_TEXTURE_2D, tid);
 
             // Set some default parameters
-            if(getGLES2SupportRef()->checkExtension("GL_APPLE_texture_max_level") || gleswIsSupported(3, 0))
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
-
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-#if OGRE_NO_GLES3_SUPPORT == 0
-            unsigned char data[PROBE_SIZE * PROBE_SIZE * PixelUtil::getNumElemBytes(pixFmt)];
-
-            glTexStorage2D(GL_TEXTURE_2D, 1, internalFormat, PROBE_SIZE, PROBE_SIZE);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, PROBE_SIZE, PROBE_SIZE, fmt, GL_UNSIGNED_BYTE, data);
-#else
             glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, type, 0);
-#endif
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                    GL_TEXTURE_2D, tid, 0);
         }
@@ -310,6 +302,14 @@ namespace Ogre {
     */
     void GLES2FBOManager::detectFBOFormats()
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        // TODO: Fix that probing all formats slows down startup not just on the web also on Android / iOS
+        for(size_t x = 0; x < PF_COUNT; ++x)
+        {
+            mProps[x].valid = true;
+        }
+        LogManager::getSingleton().logMessage("[GLES2] : Valid FBO targets: detectFBOFormats is disabled on this platform (due performance reasons)");
+#else
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
 
@@ -317,37 +317,34 @@ namespace Ogre {
         {
             mProps[x].valid = false;
 
-			// Fetch GL format token
-			GLint internalFormat = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
+            // Fetch GL format token
+            GLint internalFormat = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
             GLenum fmt = GLES2PixelUtil::getGLOriginFormat((PixelFormat)x);
             GLenum type = GLES2PixelUtil::getGLOriginDataType((PixelFormat)x);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            if(internalFormat == GL_NONE)
+            if(internalFormat == GL_NONE || fmt == GL_NONE || type == GL_NONE)
                 continue;
 #else
-            if((internalFormat == GL_NONE) && (x != 0))
+            if((internalFormat == GL_NONE || fmt == GL_NONE || type == GL_NONE) && (x != 0))
                 continue;
 #endif
-			// No test for compressed formats
+            // No test for compressed formats
             if(PixelUtil::isCompressed((PixelFormat)x))
                 continue;
 
             // Create and attach framebuffer
             _createTempFramebuffer((PixelFormat)x, internalFormat, fmt, type, fb, tid);
 
-            // Check status
-            GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-			// Ignore status in case of fmt==GL_NONE, because no implementation will accept
-			// a buffer without *any* attachment. Buffers with only stencil and depth attachment
-			// might still be supported, so we must continue probing.
-            if(internalFormat == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE)
+            // Ignore status in case of fmt==GL_NONE, because no implementation will accept
+            // a buffer without *any* attachment. Buffers with only stencil and depth attachment
+            // might still be supported, so we must continue probing.
+            if(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
             {
                 mProps[x].valid = true;
-				StringUtil::StrStreamType str;
-				str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
-					<< " depth/stencil support: ";
+                StringStream str;
+                str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
+                    << " depth/stencil support: ";
 
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
@@ -363,10 +360,10 @@ namespace Ogre {
 
                         for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
-//                            StringUtil::StrStreamType l;
+//                            StringStream l;
 //                            l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 
-//                            	<< " D" << depthBits[depth] 
-//                            	<< "S" << stencilBits[stencil];
+//                              << " D" << depthBits[depth] 
+//                              << "S" << stencilBits[stencil];
 //                            LogManager::getSingleton().logMessage(l.str());
 
                             if (_tryFormat(depthFormats[depth], stencilFormats[stencil]))
@@ -418,7 +415,7 @@ namespace Ogre {
             // Delete texture and framebuffer
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glDeleteFramebuffers(1, &fb);
-			
+            
             if (internalFormat != GL_NONE)
             {
                 glDeleteTextures(1, &tid);
@@ -429,13 +426,14 @@ namespace Ogre {
         // Clear any errors
         glGetError();
 
-		String fmtstring;
+        String fmtstring;
         for(size_t x = 0; x < PF_COUNT; ++x)
         {
             if(mProps[x].valid)
                 fmtstring += PixelUtil::getFormatName((PixelFormat)x)+" ";
         }
         LogManager::getSingleton().logMessage("[GLES2] : Valid FBO targets " + fmtstring);
+#endif
     }
 
     void GLES2FBOManager::getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
@@ -445,6 +443,7 @@ namespace Ogre {
         // [best supported for internal format]
         size_t bestmode = 0;
         int bestscore = -1;
+        bool requestDepthOnly = internalFormat == PF_DEPTH;
         for(size_t mode = 0; mode < props.modes.size(); mode++)
         {
             int desirability = 0;
@@ -453,8 +452,8 @@ namespace Ogre {
             // desirability == 1000...2000  if no depth, stencil
             // desirability == 2000...3000  if depth, no stencil
             // desirability == 3000+        if depth and stencil
-            // beyond this, the total numer of bits (stencil+depth) is maximised
-            if(props.modes[mode].stencil)
+            // beyond this, the total number of bits (stencil+depth) is maximised
+            if(props.modes[mode].stencil && !requestDepthOnly)
                 desirability += 1000;
             if(props.modes[mode].depth)
                 desirability += 2000;
@@ -464,8 +463,8 @@ namespace Ogre {
                 if(depthFormats[props.modes[mode].depth] == GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed
                     desirability += 5000;
 #if OGRE_NO_GLES3_SUPPORT == 0
-			if(depthFormats[props.modes[mode].depth] == GL_DEPTH32F_STENCIL8) // Prefer 32F/8 packed
-				desirability += 5000;
+            if(depthFormats[props.modes[mode].depth] == GL_DEPTH32F_STENCIL8) // Prefer 32F/8 packed
+                desirability += 5000;
 #endif
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
             
@@ -476,19 +475,22 @@ namespace Ogre {
             }
         }
         *depthFormat = depthFormats[props.modes[bestmode].depth];
-        *stencilFormat = stencilFormats[props.modes[bestmode].stencil];
+        if(requestDepthOnly)
+            *stencilFormat = 0;
+        else
+            *stencilFormat = stencilFormats[props.modes[bestmode].stencil];
     }
 
     GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 
-		const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa)
+        const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa)
     {
         GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
-	MultiRenderTarget *GLES2FBOManager::createMultiRenderTarget(const String & name)
-	{
-		return new GLES2FBOMultiRenderTarget(this, name);
-	}
+    MultiRenderTarget *GLES2FBOManager::createMultiRenderTarget(const String & name)
+    {
+        return new GLES2FBOMultiRenderTarget(this, name);
+    }
 
     void GLES2FBOManager::bind(RenderTarget *target)
     {
@@ -497,17 +499,21 @@ namespace Ogre {
         target->getCustomAttribute("FBO", &fbo);
         if(fbo)
             fbo->bind();
-        else
             // Old style context (window/pbuffer) or copying render texture
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        // If we are using FSAA the correct buffer will be bound at another time.
+        else if(target->getFSAA() == 0)
+        {
             // The screen buffer is 1 on iOS
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 1));
+        }
 #else
+        else
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 #endif
     }
     
-    GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
+    GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, uint32 width, uint32 height, uint fsaa)
     {
         GLES2SurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
@@ -515,22 +521,22 @@ namespace Ogre {
         {
             RBFormat key(format, width, height, fsaa);
             RenderBufferMap::iterator it = mRenderBufferMap.find(key);
-            if(it != mRenderBufferMap.end())
+            if(it != mRenderBufferMap.end() && (it->second.refcount == 0))
             {
                 retval.buffer = it->second.buffer;
                 retval.zoffset = 0;
-				retval.numSamples = fsaa;
+                retval.numSamples = fsaa;
                 // Increase refcount
                 ++it->second.refcount;
             }
             else
             {
                 // New one
-                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, (GLint)fsaa);
+                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, fsaa);
                 mRenderBufferMap[key] = RBRef(rb);
                 retval.buffer = rb;
                 retval.zoffset = 0;
-				retval.numSamples = fsaa;
+                retval.numSamples = fsaa;
             }
         }
 //        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
@@ -559,17 +565,17 @@ namespace Ogre {
         RBFormat key(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
         RenderBufferMap::iterator it = mRenderBufferMap.find(key);
         if(it != mRenderBufferMap.end())
-		{
-			// Decrease refcount
-			--it->second.refcount;
-			if(it->second.refcount==0)
-			{
-				// If refcount reaches zero, delete buffer and remove from map
-				OGRE_DELETE it->second.buffer;
-				mRenderBufferMap.erase(it);
-				//std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
-				//        << " of " << key.width << "x" << key.height << std::endl;
-			}
-		}
+        {
+            // Decrease refcount
+            --it->second.refcount;
+            if(it->second.refcount==0)
+            {
+                // If refcount reaches zero, delete buffer and remove from map
+                OGRE_DELETE it->second.buffer;
+                mRenderBufferMap.erase(it);
+                //std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
+                //        << " of " << key.width << "x" << key.height << std::endl;
+            }
+        }
     }
 }
