@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-    
+namespace v1 {
     class MeshSerializerListener;
     
     /// Mesh compatibility versions
@@ -204,6 +204,7 @@ namespace Ogre {
     };
     /** @} */
     /** @} */
+}
 }
 
 #include "OgreHeaderSuffix.h"

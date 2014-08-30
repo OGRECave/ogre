@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     /** \addtogroup Core
     *  @{
     */
@@ -95,6 +97,7 @@ namespace Ogre
         void getWorldTransforms( Matrix4* xform ) const;
         unsigned short getNumWorldTransforms(void) const;
     };
+}
 }
 
 #endif

@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -235,6 +236,7 @@ namespace Ogre {
         ushort allocateHardwareAnimationElements(ushort count, bool animateNormals);
 
 
+        HardwareBufferManagerBase* _getHardwareBufferManager(void) const    { return mMgr; }
 
     };
 
@@ -318,6 +320,7 @@ namespace Ogre {
     };
     /** @} */
     /** @} */
+}
 }
 
 #include "OgreHeaderSuffix.h"

@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+namespace v1 {
 
     /** Class for serializing a Mesh to/from XML.
     @remarks
@@ -106,6 +107,7 @@ namespace Ogre {
         void readPoseKeyFrames(TiXmlElement* keyframesNode, VertexAnimationTrack* track);
         void readExtremes(TiXmlElement* extremesNode, Mesh *m);
     };
+}
 }
 
 #endif

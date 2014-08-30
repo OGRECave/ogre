@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
+namespace v1 {
     //---------------------------------------------------------------------
     Pose::Pose(ushort target, const String& name)
         : mTarget(target), mName(name)
@@ -199,6 +200,6 @@ namespace Ogre {
         // Allow buffer to recreate itself, contents may change anyway
         return newPose;
     }
-
+}
 }
 

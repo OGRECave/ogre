@@ -38,6 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     static const uint16 c_maxTexWidthHW = 4096;
     static const uint16 c_maxTexHeightHW    = 4096;
 
@@ -591,4 +593,5 @@ namespace Ogre
         instancedEntity->writeDualQuatTransform( pDest, boneIdxStart, boneIdxEnd );
         ++mInstancesWritten;
     }
+}
 }

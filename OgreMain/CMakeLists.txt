@@ -419,6 +419,12 @@ if (MINGW)
   target_link_libraries(OgreMain ws2_32)
 endif ()
 
+#set_source_files_properties( ${SOURCE_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
+#set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/OgreItem.cpp" PROPERTIES HEADER_FILE_ONLY FALSE)
+#set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/OgreMesh.cpp" PROPERTIES HEADER_FILE_ONLY FALSE)
+#set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/OgreMesh2.cpp" PROPERTIES HEADER_FILE_ONLY FALSE)
+#set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSubMesh2.cpp" PROPERTIES HEADER_FILE_ONLY FALSE)
+
 # specify a precompiled header to use
 use_precompiled_header(OgreMain 
   "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreStableHeaders.h"

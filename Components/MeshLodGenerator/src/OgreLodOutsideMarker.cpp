@@ -437,20 +437,20 @@ void LodOutsideMarker::cleanHull()
     mHull.resize(end);
 }
 
-Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, const String& resourceGroupName)
+Ogre::v1::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, const String& resourceGroupName)
 {
     // Based on the wiki sample: http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Generating+A+Mesh
 
     // Resource with given name should not exist!
-    assert(MeshManager::getSingleton().getByName(meshName).isNull());
+    assert(v1::MeshManager::getSingleton().getByName(meshName).isNull());
 
     generateHull(); // calculate mHull triangles.
 
     // Convex hull can't be empty!
     assert(!mHull.empty());
 
-    MeshPtr mesh = MeshManager::getSingleton().createManual(meshName, resourceGroupName, NULL);
-    SubMesh* subMesh = mesh->createSubMesh();
+    v1::MeshPtr mesh = v1::MeshManager::getSingleton().createManual(meshName, resourceGroupName, NULL);
+    v1::SubMesh* subMesh = mesh->createSubMesh();
 
     vector<Real>::type vertexBuffer;
     vector<unsigned short>::type indexBuffer;
@@ -480,34 +480,34 @@ Ogre::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName, con
     }
 
     /// Create vertex data structure for 8 vertices shared between submeshes
-    mesh->sharedVertexData = new VertexData();
+    mesh->sharedVertexData = new v1::VertexData();
     mesh->sharedVertexData->vertexCount = mHull.size() * 3;
 
     /// Create declaration (memory format) of vertex data
-    VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
+    v1::VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
     size_t offset = 0;
     // 1st buffer
     decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
-    offset += VertexElement::getTypeSize(VET_FLOAT3);
+    offset += v1::VertexElement::getTypeSize(VET_FLOAT3);
 
     /// Allocate vertex buffer of the requested number of vertices (vertexCount) 
     /// and bytes per vertex (offset)
-    HardwareVertexBufferSharedPtr vbuf = 
-        HardwareBufferManager::getSingleton().createVertexBuffer(
-        offset, mesh->sharedVertexData->vertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+    v1::HardwareVertexBufferSharedPtr vbuf =
+        v1::HardwareBufferManager::getSingleton().createVertexBuffer(
+        offset, mesh->sharedVertexData->vertexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
     /// Upload the vertex data to the card
     vbuf->writeData(0, vbuf->getSizeInBytes(), &vertexBuffer[0], true);
 
     /// Set vertex buffer binding so buffer 0 is bound to our vertex buffer
-    VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding; 
+    v1::VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
     bind->setBinding(0, vbuf);
 
     /// Allocate index buffer of the requested number of vertices (ibufCount) 
-    HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
+    v1::HardwareIndexBufferSharedPtr ibuf = v1::HardwareBufferManager::getSingleton().
         createIndexBuffer(
-        HardwareIndexBuffer::IT_16BIT, 
+        v1::HardwareIndexBuffer::IT_16BIT,
         indexBuffer.size(), 
-        HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 
     /// Upload the index data to the card
     ibuf->writeData(0, ibuf->getSizeInBytes(), &indexBuffer[0], true);

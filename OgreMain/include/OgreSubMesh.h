@@ -34,9 +34,11 @@ THE SOFTWARE.
 #include "OgreVertexBoneAssignment.h"
 #include "OgreAnimationTrack.h"
 #include "OgreResourceGroupManager.h"
+#include "Vao/OgreVertexArrayObject.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -66,7 +68,6 @@ namespace Ogre {
     public:
         SubMesh();
         ~SubMesh();
-
 
         /// Indicates if this submesh shares vertex data with other meshes or whether it has it's own vertices.
         bool useSharedVertices;
@@ -263,6 +264,9 @@ namespace Ogre {
          */
         SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
+        /// @See arrangeEfficient
+        void arrangeEfficientForOldInterface( bool halfPos, bool halfTexCoords );
+
     protected:
 
         /// Name of the material this SubMesh uses.
@@ -291,11 +295,29 @@ namespace Ogre {
         /// Internal method for removing LOD data
         void removeLodLevels(void);
 
-
+        /** Rearranges the buffers to be efficiently rendered in Ogre 2.0 with Hlms
+        @remarks
+            vertexData->vertexDeclaration is modified and vertexData->vertexBufferBinding
+            is destroyed. Caller must reallocate the vertex buffer filled with the returned
+            pointer
+        @param halfPos
+            @See Mesh::arrangeEfficientFor
+        @param halfTexCoords
+            @See Mesh::arrangeEfficientFor
+        @param outVertexElements [out]
+            Description of the buffer in the new Vao system. Matches the same as
+            vertexData->vertexDeclaration, provided as out param as convenience.
+            Can be null.
+        @return
+            Buffer pointer with reorganized data.
+            Caller MUST free the pointer with OGRE_FREE_SIMD( MEMCATEGORY_GEOMETRY ).
+        */
+        char* arrangeEfficient( bool halfPos, bool halfTexCoords, VertexElement2Vec *outVertexElements );
     };
     /** @} */
     /** @} */
 
+}
 } // namespace
 
 #include "OgreHeaderSuffix.h"

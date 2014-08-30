@@ -34,7 +34,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
     class GL3PlusFBOManager;
-    class GL3PlusRenderBuffer;
 
     /** RenderTexture for GL FBO
      */
@@ -169,10 +168,10 @@ namespace Ogre {
         struct RBRef
         {
             RBRef(){}
-        RBRef(GL3PlusRenderBuffer *inBuffer):
+        RBRef(v1::GL3PlusRenderBuffer *inBuffer):
             buffer(inBuffer), refcount(1)
             { }
-            GL3PlusRenderBuffer *buffer;
+            v1::GL3PlusRenderBuffer *buffer;
             size_t refcount;
         };
         typedef map<RBFormat, RBRef>::type RenderBufferMap;

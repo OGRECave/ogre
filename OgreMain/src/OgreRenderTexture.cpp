@@ -35,7 +35,7 @@ namespace Ogre
 {
 
     //-----------------------------------------------------------------------------
-    RenderTexture::RenderTexture(HardwarePixelBuffer *buffer, uint32 zoffset):
+    RenderTexture::RenderTexture(v1::HardwarePixelBuffer *buffer, uint32 zoffset):
         mBuffer(buffer), mZOffset(zoffset)
     {
         mPriority = OGRE_REND_TO_TEX_RT_GROUP;

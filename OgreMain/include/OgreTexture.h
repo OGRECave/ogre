@@ -47,12 +47,12 @@ namespace Ogre {
     enum TextureUsage
     {
         /// @copydoc HardwareBuffer::Usage
-        TU_STATIC = HardwareBuffer::HBU_STATIC,
-        TU_DYNAMIC = HardwareBuffer::HBU_DYNAMIC,
-        TU_WRITE_ONLY = HardwareBuffer::HBU_WRITE_ONLY,
-        TU_STATIC_WRITE_ONLY = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
-        TU_DYNAMIC_WRITE_ONLY = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
-        TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+        TU_STATIC = v1::HardwareBuffer::HBU_STATIC,
+        TU_DYNAMIC = v1::HardwareBuffer::HBU_DYNAMIC,
+        TU_WRITE_ONLY = v1::HardwareBuffer::HBU_WRITE_ONLY,
+        TU_STATIC_WRITE_ONLY = v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+        TU_DYNAMIC_WRITE_ONLY = v1::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY,
+        TU_DYNAMIC_WRITE_ONLY_DISCARDABLE = v1::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
         /// Mipmaps will be automatically generated for this texture
         TU_AUTOMIPMAP = 0x10,
         /** This texture will be a render target, i.e. used as a target for render to texture
@@ -383,7 +383,7 @@ namespace Ogre {
             @remarks    The buffer is invalidated when the resource is unloaded or destroyed.
                         Do not use it after the lifetime of the containing texture.
         */
-        virtual HardwarePixelBufferSharedPtr getBuffer(size_t face=0, size_t mipmap=0) = 0;
+        virtual v1::HardwarePixelBufferSharedPtr getBuffer(size_t face=0, size_t mipmap=0) = 0;
 
 
         /** Populate an Image with the contents of this texture. 

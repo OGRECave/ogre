@@ -40,7 +40,7 @@ class _OgreLodExport LodOutputProviderCompressedBuffer :
     public LodOutputProviderCompressedMesh
 {
 public:
-    LodOutputProviderCompressedBuffer(MeshPtr mesh);
+    LodOutputProviderCompressedBuffer(v1::MeshPtr mesh);
 
 protected:
     virtual void bakeFirstPass(LodData* data, int lodIndex);

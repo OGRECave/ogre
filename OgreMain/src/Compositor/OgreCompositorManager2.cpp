@@ -79,8 +79,8 @@ namespace Ogre
         mDummyObjectMemoryManager( 0 )
     {
         mDummyObjectMemoryManager = new ObjectMemoryManager();
-        mSharedTriangleFS   = OGRE_NEW Rectangle2D( false, 0, mDummyObjectMemoryManager );
-        mSharedQuadFS       = OGRE_NEW Rectangle2D( true, 0, mDummyObjectMemoryManager );
+        mSharedTriangleFS   = OGRE_NEW v1::Rectangle2D( false, 0, mDummyObjectMemoryManager );
+        mSharedQuadFS       = OGRE_NEW v1::Rectangle2D( true, 0, mDummyObjectMemoryManager );
 
         //----------------------------------------------------------------
         // Create a default Node & Workspace for basic rendering:
@@ -444,7 +444,7 @@ namespace Ogre
         mNullTextureList.push_back( shadowTex );
 
         // lock & populate the texture based on format
-        shadowTex->getBuffer()->lock(HardwareBuffer::HBL_DISCARD);
+        shadowTex->getBuffer()->lock(v1::HardwareBuffer::HBL_DISCARD);
         const PixelBox& box = shadowTex->getBuffer()->getCurrentLock();
 
         // set high-values across all bytes of the format 

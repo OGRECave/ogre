@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     //---------------------------------------------------------------------
     KeyFrame::KeyFrame(const AnimationTrack* parent, Real time) 
         : mTime(time), mParentTrack(parent)
@@ -233,6 +235,6 @@ namespace Ogre
         
     }
 
-
+}
 }
 

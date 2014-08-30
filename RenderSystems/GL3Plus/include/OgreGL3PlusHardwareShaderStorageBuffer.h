@@ -33,6 +33,7 @@
 //#include "OgreHardwareShaderStorageBuffer.h"
 
 namespace Ogre {
+namespace v1 {
 
     /// Specialisation of HardwareUniformBuffer for the OpenGL Shader Storage Buffer
     class _OgreGL3PlusExport GL3PlusHardwareShaderStorageBuffer : public HardwareUniformBuffer
@@ -67,5 +68,6 @@ namespace Ogre {
         void setGLBufferBinding(GLint binding);
         inline GLint getGLBufferBinding(void) const { return mBinding; }
     };
+}
 }
 #endif // __GL3PlusHARDWARESHADERSTORAGEBUFFER_H__

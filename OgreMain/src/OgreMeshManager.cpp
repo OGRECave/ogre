@@ -40,8 +40,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    template<> v1::MeshManager* Singleton<v1::MeshManager>::msSingleton = 0;
+namespace v1
+{
     //-----------------------------------------------------------------------
-    template<> MeshManager* Singleton<MeshManager>::msSingleton = 0;
     MeshManager* MeshManager::getSingletonPtr(void)
     {
         return msSingleton;
@@ -380,7 +382,7 @@ namespace Ogre
         msh->load();
     }
     //-------------------------------------------------------------------------
-    void MeshManager::setListener(Ogre::MeshSerializerListener *listener)
+    void MeshManager::setListener(MeshSerializerListener *listener)
     {
         mListener = listener;
     }
@@ -980,5 +982,5 @@ namespace Ogre
         return OGRE_NEW Mesh(this, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-
+}
 }

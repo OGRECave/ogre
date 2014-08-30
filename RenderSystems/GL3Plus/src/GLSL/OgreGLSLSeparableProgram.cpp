@@ -604,7 +604,7 @@ namespace Ogre
 
                     // Get the buffer this atomic counter belongs to.
                     //TODO exception handling
-                    HardwareCounterBufferSharedPtr atomic_buffer = mGLCounterBufferReferences[glBinding];
+                    v1::HardwareCounterBufferSharedPtr atomic_buffer = mGLCounterBufferReferences[glBinding];
 
                     // Update the value.
                     atomic_buffer->writeData(glOffset, sizeof(GLuint) * glArraySize, params->getUnsignedIntPointer(def->physicalIndex));
@@ -682,7 +682,7 @@ namespace Ogre
             GpuSharedParametersPtr paramsPtr = currentPair->first;
 
             //FIXME Possible buffer does not exist if no associated uniform block.
-            GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(currentPair->second.get());
+            v1::GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<v1::GL3PlusHardwareUniformBuffer*>(currentPair->second.get());
 
             if (!paramsPtr->isDirty()) continue;
 

@@ -114,7 +114,7 @@ namespace Ogre {
         /// @copydoc OptimisedUtil::calculateFaceNormals
         virtual void _OGRE_SIMD_ALIGN_ATTRIBUTE calculateFaceNormals(
             const float *positions,
-            const EdgeData::Triangle *triangles,
+            const v1::EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
             size_t numTriangles);
 
@@ -1585,7 +1585,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OptimisedUtilSSE::calculateFaceNormals(
         const float *positions,
-        const EdgeData::Triangle *triangles,
+        const v1::EdgeData::Triangle *triangles,
         Vector4 *faceNormals,
         size_t numTriangles)
     {

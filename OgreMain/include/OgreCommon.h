@@ -49,7 +49,6 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-
     typedef _StringBase String;
 
     /** \addtogroup Core

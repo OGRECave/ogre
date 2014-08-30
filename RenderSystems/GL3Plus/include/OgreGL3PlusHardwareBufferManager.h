@@ -33,6 +33,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
+namespace v1 {
     // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
     //TODO Double check that this still holds.
 #       define OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD (1024 * 32)
@@ -166,7 +167,7 @@ namespace Ogre {
         }
 
     };
-
+}
 }
 
 #endif

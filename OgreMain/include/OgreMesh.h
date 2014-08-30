@@ -40,6 +40,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    class LodStrategy;
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -49,7 +51,6 @@ namespace Ogre {
     */
 
     struct MeshLodUsage;
-    class LodStrategy;
 
     /** Resource holding data about 3D mesh.
     @remarks
@@ -279,6 +280,33 @@ namespace Ogre {
         /// Gets an iterator over the available submeshes
         SubMeshIterator getSubMeshIterator(void)
         { return SubMeshIterator(mSubMeshList.begin(), mSubMeshList.end()); }
+
+        /** Rearranges the buffers in this Mesh so that they are more efficient, an
+            prepared for 2.0 rendering methods.
+            You can't use the same Mesh for both Items and Entity
+        @param oldInterface
+            When true, the Mesh can be used with Entity and InstancedEntity, which
+            is the old 1.x interface; and the buffers are rearranged in a similar way
+            to 2.0's interface; which is useful i.e. for saving file to disk.
+            When false, the Mesh can be used with Items, which are the 2.0 interface.
+        @param halfPos
+            When true, converts the position buffer from FLOAT3 or FLOAT4 (32-bit
+            floating point) to HALF4 (16-bit half precision floating point).
+            May reduce precision which is often not needed or noticeable.
+            Recommended value is true unless the mesh is too big.
+
+            Do NOT use this flag if you intend to run the mesh in GLES2 devices which
+            don't have the GL_OES_VERTEX_HALF_FLOAT extension (many iOS, some Android).
+        @param halfTexCoords
+            The same as halfPos, but converts the texture coordinates to 16-bit half
+            precision floating point instead of the position. If there are 3 coordinates,
+            they will be paddded to 4 tex. coords. for alignment reasons.
+            Recommended value is true.
+
+            Do NOT use this flag if you intend to run the mesh in GLES2 devices which
+            don't have the GL_OES_VERTEX_HALF_FLOAT extension (many iOS, some Android).
+        */
+        void arrangeEfficientFor( bool oldInterface, bool halfPos, bool halfTexCoords );
       
         /** Shared vertex data.
         @remarks
@@ -955,6 +983,8 @@ namespace Ogre {
 
         const LodValueArray* _getLodValueArray(void) const                      { return &mLodValues; }
 
+        void createAzdoBuffers(void);
+
     };
 
     /** A way of recording the way each LODs is recorded this Mesh. */
@@ -987,7 +1017,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 
-
+}
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

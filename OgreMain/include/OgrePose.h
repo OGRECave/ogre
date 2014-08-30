@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -137,7 +138,7 @@ namespace Ogre {
     /** @} */
 
 }
-
+}
 #include "OgreHeaderSuffix.h"
 
 #endif

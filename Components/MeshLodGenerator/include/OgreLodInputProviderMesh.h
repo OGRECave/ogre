@@ -43,7 +43,7 @@ class _OgreLodExport LodInputProviderMesh :
     public LodInputProvider
 {
 public:
-    LodInputProviderMesh(MeshPtr mesh);
+    LodInputProviderMesh(v1::MeshPtr mesh);
     /// Called when the data should be filled with the input.
     virtual void initData(LodData* data);
     
@@ -52,12 +52,12 @@ protected:
     // This helps to find the vertex* in LodData for index buffer indices
     VertexLookupList mSharedVertexLookup;
     VertexLookupList mVertexLookup;
-    MeshPtr mMesh;
+    v1::MeshPtr mMesh;
 
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
-    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID);
-    void addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup);
+    void addIndexData(LodData* data, v1::IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID);
+    void addVertexData(LodData* data, v1::VertexData* vertexData, bool useSharedVertexLookup);
     template<typename IndexType>
     void addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd,
                                                 VertexLookupList& lookup,

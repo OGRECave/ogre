@@ -67,7 +67,7 @@ public:
      *
      * @param mesh Generate the Lod for this mesh.
      */
-    void generateAutoconfiguredLodLevels(MeshPtr& mesh);
+    void generateAutoconfiguredLodLevels(v1::MeshPtr& mesh);
 
     /**
      * @brief Fills Lod Config with a config, which works on any mesh.
@@ -75,7 +75,7 @@ public:
      * @param inMesh Optimize for this mesh.
      * @param outLodConfig Lod configuration storing the output.
      */
-    void getAutoconfig(MeshPtr& inMesh, LodConfig& outLodConfig);
+    void getAutoconfig(v1::MeshPtr& inMesh, LodConfig& outLodConfig);
 
     static void _configureMeshLodUsage(const LodConfig& lodConfig);
     void _resolveComponents(LodConfig& lodConfig, LodCollapseCostPtr& cost, LodDataPtr& data, LodInputProviderPtr& input, LodOutputProviderPtr& output, LodCollapserPtr& collapser);

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreCamera.h"
 
 namespace Ogre {
+namespace v1 {
     #define POSITION_BINDING 0
 
     WireBoundingBox::WireBoundingBox( IdType id, ObjectMemoryManager *objectMemoryManager )
@@ -222,7 +223,6 @@ namespace Ogre {
         return dist.squaredLength();
     }
 
-
-
+}
 }
 

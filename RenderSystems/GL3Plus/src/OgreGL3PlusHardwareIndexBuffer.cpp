@@ -32,7 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 
 namespace Ogre {
-
+namespace v1 {
     GL3PlusHardwareIndexBuffer::GL3PlusHardwareIndexBuffer(
         HardwareBufferManagerBase* mgr,
         IndexType idxType,
@@ -262,5 +262,5 @@ namespace Ogre {
         }
     }
 
-
+}
 }

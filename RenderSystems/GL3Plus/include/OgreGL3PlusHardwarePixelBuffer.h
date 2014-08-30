@@ -33,6 +33,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
+namespace v1 {
     class _OgreGL3PlusExport GL3PlusHardwarePixelBuffer: public HardwarePixelBuffer
     {
     protected:
@@ -95,5 +96,5 @@ namespace Ogre {
         GLuint mRenderbufferID;
     };
 }
-
+}
 #endif

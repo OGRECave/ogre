@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre {
+namespace v1 {
     class _OgreGL3PlusExport GL3PlusHardwareIndexBuffer : public HardwareIndexBuffer
     {
         private:
@@ -69,5 +70,5 @@ namespace Ogre {
             GLuint getGLBufferId(void) const { return mBufferId; }
     };
 }
-
+}
 #endif // __GL3PlusHARDWAREINDEXBUFFER_H__

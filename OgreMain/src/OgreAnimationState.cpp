@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
+namespace v1
+{
 
     //---------------------------------------------------------------------
     AnimationState::AnimationState(AnimationStateSet* parent, const AnimationState &rhs)
@@ -433,6 +435,6 @@ namespace Ogre
         mTargetAnimationState->setTimePosition(value * mTargetAnimationState->getLength());
     }
 
-
+}
 }
 

@@ -37,7 +37,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class Rectangle2D;
+    namespace v1
+    {
+        class Rectangle2D;
+    }
+
     typedef vector<TexturePtr>::type TextureVec;
 
     /** \addtogroup Core
@@ -115,8 +119,8 @@ namespace Ogre
         RenderSystem            *mRenderSystem;
 
         TextureVec              mNullTextureList;
-        Rectangle2D             *mSharedTriangleFS;
-        Rectangle2D             *mSharedQuadFS;
+        v1::Rectangle2D         *mSharedTriangleFS;
+        v1::Rectangle2D         *mSharedQuadFS;
         ObjectMemoryManager     *mDummyObjectMemoryManager;
 
         void validateNodes(void);
@@ -179,9 +183,9 @@ namespace Ogre
         @remarks
             Pointer is valid throughout the lifetime of this CompositorManager2
         */
-        Rectangle2D* getSharedFullscreenTriangle(void) const        { return mSharedTriangleFS; }
+        v1::Rectangle2D* getSharedFullscreenTriangle(void) const    { return mSharedTriangleFS; }
         /// @copydoc getSharedFullscreenTriangle
-        Rectangle2D* getSharedFullscreenQuad(void) const            { return mSharedQuadFS; }
+        v1::Rectangle2D* getSharedFullscreenQuad(void) const        { return mSharedQuadFS; }
 
         /** Main function to start rendering. Creates a workspace instance based on a
             workspace definition.

@@ -33,8 +33,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-
-
+namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -153,6 +152,7 @@ namespace Ogre {
     };
     /** @} */
     /** @} */
+}
 }
 
 #include "OgreHeaderSuffix.h"

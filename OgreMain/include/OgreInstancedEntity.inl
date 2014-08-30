@@ -28,6 +28,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     //-----------------------------------------------------------------------
     FORCEINLINE void InstancedEntity::writeSingleTransform3x4( float * RESTRICT_ALIAS xform ) const
     {
@@ -195,4 +197,5 @@ namespace Ogre
         }
     }
 #endif
+}
 }

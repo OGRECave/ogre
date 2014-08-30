@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "OgreOverlayContainer.h"
 
 namespace Ogre {
-
+namespace v1 {
 
     //---------------------------------------------------------------------
     // Define static members
@@ -843,4 +843,4 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 
 }
-
+}

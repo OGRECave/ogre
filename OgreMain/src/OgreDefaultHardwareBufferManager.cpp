@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {
-
+namespace v1 {
     DefaultHardwareVertexBuffer::DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
                                                              HardwareBuffer::Usage usage)
     : HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
@@ -301,4 +301,5 @@ namespace Ogre {
         DefaultHardwareCounterBuffer* ub = OGRE_NEW DefaultHardwareCounterBuffer(this, sizeBytes, usage, useShadowBuffer);
         return HardwareCounterBufferSharedPtr(ub);
     }
+}
 }

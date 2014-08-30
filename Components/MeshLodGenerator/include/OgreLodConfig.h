@@ -120,13 +120,13 @@ struct _OgreLodExport LodLevel {
 };
 
 struct _OgreLodExport LodConfig {
-    MeshPtr mesh; /// The mesh which we want to reduce.
+    v1::MeshPtr mesh; /// The mesh which we want to reduce.
     LodStrategy* strategy; /// Lod strategy to use.
 
     typedef vector<LodLevel>::type LodLevelList;
     LodLevelList levels; /// Info about Lod levels
 
-    LodConfig(MeshPtr & _mesh, LodStrategy * _strategy = DistanceLodStrategy::getSingletonPtr());
+    LodConfig(v1::MeshPtr & _mesh, LodStrategy * _strategy = DistanceLodStrategy::getSingletonPtr());
     LodConfig();
 
     // Helper functions:

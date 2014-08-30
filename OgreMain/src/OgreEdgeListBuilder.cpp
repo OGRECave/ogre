@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 
 namespace Ogre {
+namespace v1 {
 
     EdgeData::EdgeData() : isClosed(false){}
     
@@ -607,7 +608,6 @@ namespace Ogre {
 
     }
 
-
-
+}
 }
 

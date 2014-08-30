@@ -33,7 +33,7 @@
 namespace Ogre
 {
 
-    LodInputProviderBuffer::LodInputProviderBuffer( MeshPtr mesh )
+    LodInputProviderBuffer::LodInputProviderBuffer( v1::MeshPtr mesh )
     {
         mBuffer.fillBuffer(mesh);
     }

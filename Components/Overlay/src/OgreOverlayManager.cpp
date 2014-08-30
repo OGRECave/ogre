@@ -38,10 +38,12 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
 
-namespace Ogre {
-
+namespace Ogre
+{
+    template<> v1::OverlayManager *Singleton<v1::OverlayManager>::msSingleton = 0;
+namespace v1
+{
     //---------------------------------------------------------------------
-    template<> OverlayManager *Singleton<OverlayManager>::msSingleton = 0;
     OverlayManager* OverlayManager::getSingletonPtr(void)
     {
         return msSingleton;
@@ -716,4 +718,4 @@ namespace Ogre {
             + " registered.");
     }
 }
-
+}

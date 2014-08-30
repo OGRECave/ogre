@@ -121,7 +121,7 @@ namespace Ogre
     {
         String group = readString(mStream);
         String name = readString(mStream);
-        mLodConfig->mesh = MeshManager::getSingleton().load(name, group);
+        mLodConfig->mesh = v1::MeshManager::getSingleton().load(name, group);
 
         String strategyName = readString(mStream);
         mLodConfig->strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);

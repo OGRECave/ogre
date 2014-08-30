@@ -52,14 +52,14 @@ namespace Ogre {
         return getValueImpl(movableObject, camera->getLodCamera());
     }
     //-----------------------------------------------------------------------
-    void LodStrategy::assertSorted(const Mesh::LodValueArray &values)
+    void LodStrategy::assertSorted(const v1::Mesh::LodValueArray &values)
     {
         assert(isSorted(values) && "The LOD values must be sorted");
     }
     //---------------------------------------------------------------------
-    bool LodStrategy::isSorted(const Mesh::LodValueArray& values)
+    bool LodStrategy::isSorted(const v1::Mesh::LodValueArray& values)
     {
-        Mesh::LodValueArray::const_iterator it = values.begin();
+        v1::Mesh::LodValueArray::const_iterator it = values.begin();
         Real prev = (*it);
         for (++it; it != values.end(); ++it)
         {
@@ -73,23 +73,23 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     struct LodUsageSortLess :
-    public std::binary_function<const MeshLodUsage&, const MeshLodUsage&, bool>
+    public std::binary_function<const v1::MeshLodUsage&, const v1::MeshLodUsage&, bool>
     {
-        bool operator() (const MeshLodUsage& mesh1, const MeshLodUsage& mesh2)
+        bool operator() (const v1::MeshLodUsage& mesh1, const v1::MeshLodUsage& mesh2)
         {
             // Sort ascending
             return mesh1.value < mesh2.value;
         }
     };
-    void LodStrategy::sort(Mesh::MeshLodUsageList& meshLodUsageList)
+    void LodStrategy::sort(v1::Mesh::MeshLodUsageList& meshLodUsageList)
     {
         // Perform standard sort
         std::sort(meshLodUsageList.begin(), meshLodUsageList.end(), LodUsageSortLess());
     }
     //---------------------------------------------------------------------
-    ushort LodStrategy::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList)
+    ushort LodStrategy::getIndex(Real value, const v1::Mesh::MeshLodUsageList& meshLodUsageList)
     {
-        Mesh::MeshLodUsageList::const_iterator i, iend;
+        v1::Mesh::MeshLodUsageList::const_iterator i, iend;
         iend = meshLodUsageList.end();
         ushort index = 0;
         for (i = meshLodUsageList.begin(); i != iend; ++i, ++index)

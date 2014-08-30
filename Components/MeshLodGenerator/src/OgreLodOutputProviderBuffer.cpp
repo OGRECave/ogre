@@ -116,7 +116,7 @@ void LodOutputProviderBuffer::inject()
     OgreAssert(mMesh->getNumSubMeshes() == submeshCount, "");
     mMesh->removeLodLevels();
     for (unsigned short i = 0; i < submeshCount; i++) {
-        SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+        v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
         typedef vector<LodIndexBuffer>::type GenBuffers;
         GenBuffers& buffers = mBuffer.submesh[i].genIndexBuffers;
 
@@ -125,19 +125,19 @@ void LodOutputProviderBuffer::inject()
             LodIndexBuffer& buff = buffers[n];
             size_t indexCount = (buff.indexBufferSize ? buff.indexBufferSize : buff.indexCount);
             OgreAssert((int)buff.indexCount >= 0, "");
-            lods.push_back(OGRE_NEW IndexData());
+            lods.push_back(OGRE_NEW v1::IndexData());
             lods.back()->indexStart = buff.indexStart;
             lods.back()->indexCount = buff.indexCount;
             if(indexCount != 0) {
                 if(n > 0 && buffers[n-1].indexBuffer == buff.indexBuffer){
                     lods.back()->indexBuffer = (*(++lods.rbegin()))->indexBuffer;
                 } else {
-                    lods.back()->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+                    lods.back()->indexBuffer = v1::HardwareBufferManager::getSingleton().createIndexBuffer(
                         buff.indexSize == 2 ?
-                        HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
-                        indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+                        v1::HardwareIndexBuffer::IT_16BIT : v1::HardwareIndexBuffer::IT_32BIT,
+                        indexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
                     size_t sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
-                    void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
+                    void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, v1::HardwareBuffer::HBL_DISCARD);
                     memcpy(pOutBuff, buff.indexBuffer.get(), sizeInBytes);
                     lods.back()->indexBuffer->unlock();
                 }

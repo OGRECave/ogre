@@ -405,7 +405,7 @@ namespace Ogre
 
             while( it != en )
             {
-                GLint typeCount = VertexElement::getTypeCount( it->mType );
+                GLint typeCount = v1::VertexElement::getTypeCount( it->mType );
                 GLboolean normalised = GL_FALSE;
 
                 switch( it->mType )
@@ -423,17 +423,17 @@ namespace Ogre
                     break;
                 };
 
-                switch( VertexElement::getBaseType( it->mType ) )
+                switch( v1::VertexElement::getBaseType( it->mType ) )
                 {
                 default:
                 case VET_FLOAT1:
                     OCGLE( glVertexAttribPointer( attributeIndex, typeCount,
-                                                  GL3PlusHardwareBufferManager::getGLType( it->mType ),
+                                                  v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
                                                   normalised, binding.stride, (void*)binding.offset ) );
                     break;
                 case VET_DOUBLE1:
                     OCGLE( glVertexAttribLPointer( attributeIndex, typeCount,
-                                                   GL3PlusHardwareBufferManager::getGLType( it->mType ),
+                                                   v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
                                                    binding.stride, (void*)binding.offset ) );
                     break;
                 }
@@ -459,7 +459,7 @@ namespace Ogre
     VertexArrayObject* GL3PlusVaoManager::createVertexArrayObjectImpl(
                                                             const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
-                                                            RenderOperation::OperationType opType )
+                                                            v1::RenderOperation::OperationType opType )
     {
         Vao vao;
 

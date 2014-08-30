@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -81,7 +82,7 @@ namespace Ogre {
             Called by RenderTexture when destroyed.
         */
         virtual void _clearSliceRTT(size_t zoffset);
-        friend class RenderTexture;
+        friend class Ogre::RenderTexture;
     public:
         /// Should be called by HardwareBufferManager
         HardwarePixelBuffer(uint32 mWidth, uint32 mHeight, uint32 mDepth,
@@ -206,6 +207,7 @@ namespace Ogre {
 
     /** @} */
     /** @} */
+}
 }
 
 #include "OgreHeaderSuffix.h"

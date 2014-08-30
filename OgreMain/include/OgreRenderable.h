@@ -90,7 +90,7 @@ namespace Ogre {
 
         /** Gets the render operation required to send this object to the frame buffer.
         */
-        virtual void getRenderOperation(RenderOperation& op) = 0;
+        virtual void getRenderOperation(v1::RenderOperation& op) = 0;
 
         /** Called just prior to the Renderable being rendered. 
         @remarks

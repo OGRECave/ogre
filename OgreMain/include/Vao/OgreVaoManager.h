@@ -87,7 +87,7 @@ namespace Ogre
 
         virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
                                                                 IndexBufferPacked *indexBuffer,
-                                                                RenderOperation::OperationType opType ) = 0;
+                                                                v1::RenderOperation::OperationType opType ) = 0;
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao ) = 0;
 
@@ -178,12 +178,15 @@ namespace Ogre
         */
         VertexArrayObject* createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
                                                     IndexBufferPacked *indexBuffer,
-                                                    RenderOperation::OperationType opType );
+                                                    v1::RenderOperation::OperationType opType );
 
         /** Destroys the input pointer. After this call, it's no longer valid
         @remarks
             API memory may or may not be released since VertexArrayObjects
             may internally share the same API constructs.
+        @par
+            The vertex & index buffers associated with this vao are not destroyed by
+            this function.
         */
         void destroyVertexArrayObject( VertexArrayObject *vao );
 

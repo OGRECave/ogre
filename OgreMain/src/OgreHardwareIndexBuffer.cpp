@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+namespace v1 {
     //-----------------------------------------------------------------------------
     HardwareIndexBuffer::HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, 
         size_t numIndexes, HardwareBuffer::Usage usage, 
@@ -79,6 +79,6 @@ namespace Ogre {
     {
 
     }
-
+}
 }
 

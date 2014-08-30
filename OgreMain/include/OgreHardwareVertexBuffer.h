@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+namespace v1 {
     class HardwareBufferManagerBase;
 
     /** \addtogroup Core
@@ -94,6 +95,7 @@ namespace Ogre {
 
     /** Locking helper. */    
     typedef HardwareBufferLockGuard<HardwareVertexBufferSharedPtr> HardwareVertexBufferLockGuard;
+}
 
     /// Vertex element semantics, used to identify the meaning of vertex buffer contents
     enum VertexElementSemantic {
@@ -130,7 +132,6 @@ namespace Ogre {
         VET_COLOUR = 4,
         VET_SHORT1 = 5,
         VET_SHORT2 = 6,
-        VET_SHORT3 = 7,
         VET_SHORT4 = 8,
         VET_UBYTE4 = 9,
         /// D3D style compact colour
@@ -143,18 +144,21 @@ namespace Ogre {
         VET_DOUBLE4 = 15,
         VET_USHORT1 = 16,
         VET_USHORT2 = 17,
-        VET_USHORT3 = 18,
-        VET_USHORT4 = 19,      
-        VET_INT1 = 20,
-        VET_INT2 = 21,
-        VET_INT3 = 22,
-        VET_INT4 = 23,
-        VET_UINT1 = 24,
-        VET_UINT2 = 25,
-        VET_UINT3 = 26,
-        VET_UINT4 = 27
+        VET_USHORT4 = 18,
+        VET_INT1 = 19,
+        VET_INT2 = 20,
+        VET_INT3 = 21,
+        VET_INT4 = 22,
+        VET_UINT1 = 23,
+        VET_UINT2 = 24,
+        VET_UINT3 = 25,
+        VET_UINT4 = 26,
+        VET_HALF1 = 27,
+        VET_HALF2 = 28,
+        VET_HALF4 = 29,
     };
 
+namespace v1 {
     /** This class declares the usage of a single vertex buffer as a component
         of a complete VertexDeclaration.
         @remarks
@@ -595,7 +599,7 @@ namespace Ogre {
     /** @} */
 
 
-
+}
 }
 
 #include "OgreHeaderSuffix.h"

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreQuaternion.h"
 
 namespace Ogre {
+namespace v1 {
 
     //-----------------------------------------------------------------------------
     TagPoint::TagPoint(unsigned short handle, Skeleton* creator)
@@ -167,5 +168,5 @@ namespace Ogre {
     {
         return mParentEntity->queryLights();
     }
-
+}
 }

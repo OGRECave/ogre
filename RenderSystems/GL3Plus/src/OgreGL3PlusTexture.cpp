@@ -486,15 +486,15 @@ namespace Ogre {
         {
             for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
             {
-                GL3PlusHardwarePixelBuffer *buf = new GL3PlusTextureBuffer(mName,
+                v1::GL3PlusHardwarePixelBuffer *buf = new v1::GL3PlusTextureBuffer(mName,
                                                                            getGL3PlusTextureTarget(),
                                                                            mTextureID,
                                                                            face,
                                                                            mip,
-                                                                           static_cast<HardwareBuffer::Usage>(mUsage),
+                                                                           static_cast<v1::HardwareBuffer::Usage>(mUsage),
                                                                            mHwGamma, mFSAA);
 
-                mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
+                mSurfaceList.push_back(v1::HardwarePixelBufferSharedPtr(buf));
 
                 // Check for error
                 if (buf->getWidth() == 0 ||
@@ -513,7 +513,7 @@ namespace Ogre {
         }
     }
 
-    HardwarePixelBufferSharedPtr GL3PlusTexture::getBuffer(size_t face, size_t mipmap)
+    v1::HardwarePixelBufferSharedPtr GL3PlusTexture::getBuffer(size_t face, size_t mipmap)
     {
         if (face >= getNumFaces())
         {

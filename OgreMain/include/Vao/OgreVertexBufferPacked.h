@@ -48,6 +48,11 @@ namespace Ogre
         {
             return mType == _r.mType && mSemantic == _r.mSemantic;
         }
+
+        bool operator == ( VertexElementSemantic semantic ) const
+        {
+            return mSemantic == semantic;
+        }
     };
 
     typedef vector<VertexElement2>::type VertexElement2Vec;

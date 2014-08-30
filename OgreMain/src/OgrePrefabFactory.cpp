@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreSubMesh.h"
 
 namespace Ogre {
+namespace v1 {
     //---------------------------------------------------------------------
     bool PrefabFactory::createPrefab(Mesh* mesh)
     {
@@ -367,4 +368,5 @@ namespace Ogre {
         mesh->_setBoundingSphereRadius(SPHERE_RADIUS);
     }
     //---------------------------------------------------------------------
+}
 }

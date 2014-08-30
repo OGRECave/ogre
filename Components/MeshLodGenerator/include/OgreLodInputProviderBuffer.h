@@ -43,7 +43,7 @@ class _OgreLodExport LodInputProviderBuffer :
     public LodInputProvider
 {
 public:
-    LodInputProviderBuffer(MeshPtr mesh);
+    LodInputProviderBuffer(v1::MeshPtr mesh);
     /// Called when the data should be filled with the input.
     virtual void initData(LodData* data);
     

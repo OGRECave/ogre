@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
+namespace v1 {
 
     /// Specialisation of HardwareVertexBuffer for OpenGL
     class _OgreGL3PlusExport GL3PlusHardwareVertexBuffer : public HardwareVertexBuffer
@@ -72,5 +73,6 @@ namespace Ogre {
 
         inline GLuint getGLBufferId(void) const { return mBufferId; }
     };
+}
 }
 #endif // __GL3PlusHARDWAREVERTEXBUFFER_H__

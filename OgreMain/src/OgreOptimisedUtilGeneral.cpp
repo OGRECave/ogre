@@ -76,7 +76,7 @@ namespace Ogre {
         /// @copydoc OptimisedUtil::calculateFaceNormals
         virtual void calculateFaceNormals(
             const float *positions,
-            const EdgeData::Triangle *triangles,
+            const v1::EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
             size_t numTriangles);
 
@@ -312,13 +312,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void OptimisedUtilGeneral::calculateFaceNormals(
         const float *positions,
-        const EdgeData::Triangle *triangles,
+        const v1::EdgeData::Triangle *triangles,
         Vector4 *faceNormals,
         size_t numTriangles)
     {
         for ( ; numTriangles; --numTriangles)
         {
-            const EdgeData::Triangle& t = *triangles++;
+            const v1::EdgeData::Triangle& t = *triangles++;
             size_t offset;
 
             offset = t.vertIndex[0] * 3;

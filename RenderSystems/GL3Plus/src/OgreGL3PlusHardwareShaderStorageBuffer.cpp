@@ -32,6 +32,7 @@
 #include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre {
+namespace v1 {
     GL3PlusHardwareShaderStorageBuffer::GL3PlusHardwareShaderStorageBuffer(
         HardwareBufferManagerBase* mgr,
         size_t bufferSize,
@@ -203,4 +204,5 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
         }
     }
+}
 }

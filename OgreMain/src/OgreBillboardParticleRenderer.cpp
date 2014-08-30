@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "Math/Array/OgreObjectMemoryManager.h"
 
 namespace Ogre {
+namespace v1 {
     String rendererTypeName = "billboard";
 
     //-----------------------------------------------------------------------
@@ -262,7 +263,7 @@ namespace Ogre {
         mBillboardSet->setRenderQueueGroup(queueID);
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+    void BillboardParticleRenderer::setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority)
     {
         mBillboardSet->setRenderQueueGroupAndPriority(queueID, priority);
     }
@@ -504,7 +505,7 @@ namespace Ogre {
         static_cast<BillboardParticleRenderer*>(target)->setUseAccurateFacing(
             StringConverter::parseBool(val));
     }
-
+}
 }
 
 

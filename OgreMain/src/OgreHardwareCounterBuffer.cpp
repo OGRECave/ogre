@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreDefaultHardwareBufferManager.h"
 
 namespace Ogre {
+namespace v1 {
 
     HardwareCounterBuffer::HardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
                                     HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
@@ -63,4 +64,5 @@ namespace Ogre {
     {
 
     }
+}
 }

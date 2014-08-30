@@ -32,14 +32,18 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusTexture.h"
 
 namespace Ogre {
-    class GL3PlusHardwarePixelBuffer;
+
+    namespace v1
+    {
+        class GL3PlusHardwarePixelBuffer;
+    }
 
     /** GL surface descriptor. Points to a 2D surface that can be rendered to.
      */
     struct _OgrePrivate GL3PlusSurfaceDesc
     {
     public:
-        GL3PlusHardwarePixelBuffer *buffer;
+        v1::GL3PlusHardwarePixelBuffer *buffer;
         uint32 zoffset;
         uint numSamples;
 

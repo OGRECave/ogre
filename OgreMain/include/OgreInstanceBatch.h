@@ -38,6 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     /** \addtogroup Core
     *  @{
     */
@@ -255,7 +257,7 @@ namespace Ogre
         */
         virtual void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
-        const Ogre::MeshPtr& _getMeshReference(void) const { return mMeshReference; }
+        const Ogre::v1::MeshPtr& _getMeshReference(void) const { return mMeshReference; }
 
         /** @return true if it can not create more InstancedEntities
             (Num InstancedEntities == mInstancesPerBatch)
@@ -376,6 +378,7 @@ namespace Ogre
         using Renderable::getUserAny;
         using Renderable::setUserAny;
     };
+}
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

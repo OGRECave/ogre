@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include <algorithm>
 
 namespace Ogre {
+namespace v1 {
     // Init statics
     RadixSort<BillboardSet::ActiveBillboardList, Billboard*, float> BillboardSet::mRadixSorter;
 
@@ -1431,5 +1432,5 @@ namespace Ogre {
         OGRE_DELETE obj;
     }
 
-
+}
 }

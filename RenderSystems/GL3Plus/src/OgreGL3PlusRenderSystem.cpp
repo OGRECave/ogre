@@ -545,7 +545,7 @@ namespace Ogre {
         mFixedFunctionTextureUnits = caps->getNumTextureUnits();
 
         // Use VBO's by default
-        mHardwareBufferManager = new GL3PlusHardwareBufferManager();
+        mHardwareBufferManager = new v1::GL3PlusHardwareBufferManager();
 
         // Use FBO's for RTT, PBuffers and Copy are no longer supported
         // Create FBO manager
@@ -772,14 +772,15 @@ namespace Ogre {
             static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
                                                                         &depthFormat, &stencilFormat );
 
-            GL3PlusRenderBuffer *depthBuffer = new GL3PlusRenderBuffer( depthFormat, fbo->getWidth(),
-                                                                        fbo->getHeight(), fbo->getFSAA() );
+            v1::GL3PlusRenderBuffer *depthBuffer = new v1::GL3PlusRenderBuffer(
+                                                        depthFormat, fbo->getWidth(),
+                                                        fbo->getHeight(), fbo->getFSAA() );
 
-            GL3PlusRenderBuffer *stencilBuffer = fbo->getFormat() != PF_DEPTH ? depthBuffer : 0;
+            v1::GL3PlusRenderBuffer *stencilBuffer = fbo->getFormat() != PF_DEPTH ? depthBuffer : 0;
             if( depthFormat != GL_DEPTH24_STENCIL8 && depthFormat != GL_DEPTH32F_STENCIL8 && stencilFormat != GL_NONE )
             {
-                stencilBuffer = new GL3PlusRenderBuffer( stencilFormat, fbo->getWidth(),
-                                                         fbo->getHeight(), fbo->getFSAA() );
+                stencilBuffer = new v1::GL3PlusRenderBuffer( stencilFormat, fbo->getWidth(),
+                                                             fbo->getHeight(), fbo->getFSAA() );
             }
 
             // No "custom-quality" multisample for now in GL
@@ -1853,14 +1854,14 @@ namespace Ogre {
         activateGLTextureUnit(0);
     }
 
-    void GL3PlusRenderSystem::_render(const RenderOperation& op)
+    void GL3PlusRenderSystem::_render(const v1::RenderOperation& op)
     {
         // Call super class.
         RenderSystem::_render(op);
 
         // Create variables related to instancing.
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
-        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
+        v1::HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
+        v1::VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
                                 !globalInstanceVertexBuffer.isNull() && (globalVertexDeclaration != NULL))
             || op.vertexData->vertexBufferBinding->getHasInstanceData();
@@ -1873,9 +1874,9 @@ namespace Ogre {
         }
 
         // Get vertex array organization.
-        const VertexDeclaration::VertexElementList& decl =
+        const v1::VertexDeclaration::VertexElementList& decl =
             op.vertexData->vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
+        v1::VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
 
         // Bind VAO (set of per-vertex attributes: position, normal, etc.).
@@ -1920,13 +1921,13 @@ namespace Ogre {
         // Bind the appropriate VBOs to the active attributes of the VAO.
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
-            const VertexElement & elem = *elemIter;
+            const v1::VertexElement & elem = *elemIter;
             size_t source = elem.getSource();
 
             if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
                 continue; // Skip unbound elements.
 
-            HardwareVertexBufferSharedPtr vertexBuffer =
+            v1::HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(source);
 
             bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
@@ -1938,7 +1939,7 @@ namespace Ogre {
             elemEnd = globalVertexDeclaration->getElements().end();
             for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
             {
-                const VertexElement & elem = *elemIter;
+                const v1::VertexElement & elem = *elemIter;
                 bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
                                        mRenderAttribsBound, mRenderInstanceAttribsBound, updateVAO);
             }
@@ -1969,23 +1970,23 @@ namespace Ogre {
         bool useAdjacency = (mGeometryProgramBound && mCurrentGeometryShader && mCurrentGeometryShader->isAdjacencyInfoRequired());
         switch (op.operationType)
         {
-        case RenderOperation::OT_POINT_LIST:
+        case v1::RenderOperation::OT_POINT_LIST:
             primType = GL_POINTS;
             break;
-        case RenderOperation::OT_LINE_LIST:
+        case v1::RenderOperation::OT_LINE_LIST:
             primType = useAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
             break;
-        case RenderOperation::OT_LINE_STRIP:
+        case v1::RenderOperation::OT_LINE_STRIP:
             primType = useAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
             break;
         default:
-        case RenderOperation::OT_TRIANGLE_LIST:
+        case v1::RenderOperation::OT_TRIANGLE_LIST:
             primType = useAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
             break;
-        case RenderOperation::OT_TRIANGLE_STRIP:
+        case v1::RenderOperation::OT_TRIANGLE_STRIP:
             primType = useAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
             break;
-        case RenderOperation::OT_TRIANGLE_FAN:
+        case v1::RenderOperation::OT_TRIANGLE_FAN:
             primType = GL_TRIANGLE_FAN;
             break;
         }
@@ -2046,11 +2047,11 @@ namespace Ogre {
             if (op.useIndexes)
             {
                 OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                                                 static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
+                                                 static_cast<v1::GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
                 void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                      op.indexData->indexBuffer->getIndexSize());
                 GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
-                GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
+                GLenum indexType = (op.indexData->indexBuffer->getType() == v1::HardwareIndexBuffer::IT_32BIT) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
                 OGRE_CHECK_GL_ERROR(glDrawRangeElements(GL_PATCHES, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
                 //OGRE_CHECK_GL_ERROR(glDrawElements(GL_PATCHES, op.indexData->indexCount, indexType, pBufferData));
                 //                OGRE_CHECK_GL_ERROR(glDrawArraysInstanced(GL_PATCHES, 0, primCount, 1));
@@ -2065,13 +2066,14 @@ namespace Ogre {
         else if (op.useIndexes)
         {
             OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                                             static_cast<GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
+                                             static_cast<v1::GL3PlusHardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId()));
 
             void *pBufferData = GL_BUFFER_OFFSET(op.indexData->indexStart *
                                                  op.indexData->indexBuffer->getIndexSize());
 
             //TODO : GL_UNSIGNED_INT or GL_UNSIGNED_BYTE?  Latter breaks samples.
-            GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+            GLenum indexType = (op.indexData->indexBuffer->getType() == v1::HardwareIndexBuffer::IT_16BIT) ?
+                                GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
             do
             {
@@ -2919,13 +2921,15 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::bindVertexElementToGpu( const VertexElement &elem,
-                                                      HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
+    void GL3PlusRenderSystem::bindVertexElementToGpu( const v1::VertexElement &elem,
+                                                      v1::HardwareVertexBufferSharedPtr vertexBuffer,
+                                                      const size_t vertexStart,
                                                       vector<GLuint>::type &attribsBound,
                                                       vector<GLuint>::type &instanceAttribsBound,
                                                       bool updateVAO)
     {
-        const GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const GL3PlusHardwareVertexBuffer*>(vertexBuffer.get());
+        const v1::GL3PlusHardwareVertexBuffer* hwGlBuffer = static_cast<const v1::GL3PlusHardwareVertexBuffer*>(
+                                                                                            vertexBuffer.get());
 
         // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
         // if (updateVAO)
@@ -2940,7 +2944,7 @@ namespace Ogre {
             }
 
             VertexElementSemantic sem = elem.getSemantic();
-            unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
+            unsigned short typeCount = v1::VertexElement::getTypeCount(elem.getType());
             GLboolean normalised = GL_FALSE;
             GLuint attrib = 0;
             unsigned short elemIndex = elem.getIndex();
@@ -2997,7 +3001,7 @@ namespace Ogre {
             case VET_FLOAT1:
                 OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
                                                           typeCount,
-                                                          GL3PlusHardwareBufferManager::getGLType(elem.getType()),
+                                                          v1::GL3PlusHardwareBufferManager::getGLType(elem.getType()),
                                                           normalised,
                                                           static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                                           pBufferData));
@@ -3005,7 +3009,7 @@ namespace Ogre {
             case VET_DOUBLE1:
                 OGRE_CHECK_GL_ERROR(glVertexAttribLPointer(attrib,
                                                            typeCount,
-                                                           GL3PlusHardwareBufferManager::getGLType(elem.getType()),
+                                                           v1::GL3PlusHardwareBufferManager::getGLType(elem.getType()),
                                                            static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                                            pBufferData));
                 break;

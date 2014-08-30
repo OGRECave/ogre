@@ -36,6 +36,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     InstanceBatchShader::InstanceBatchShader( IdType id, ObjectMemoryManager *objectMemoryManager,
                                         InstanceManager *creator, MeshPtr &meshReference,
                                         const MaterialPtr &material, size_t instancesPerBatch,
@@ -346,4 +348,5 @@ namespace Ogre
     {
         return mNumWorldMatrices;
     }
+}
 }

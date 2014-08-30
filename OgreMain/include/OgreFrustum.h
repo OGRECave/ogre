@@ -166,7 +166,7 @@ namespace Ogre
         static String msMovableType;
 
         mutable AxisAlignedBox mBoundingBox;
-        mutable VertexData mVertexData;
+        mutable v1::VertexData mVertexData; //TODO: Remove this
         mutable Vector3 mWorldSpaceCorners[8];
 
         /// Is this frustum to act as a reflection of itself?
@@ -476,7 +476,7 @@ namespace Ogre
         void _notifyCurrentCamera(Camera* cam);
 
         /** Overridden from Renderable */
-        void getRenderOperation(RenderOperation& op);
+        void getRenderOperation(v1::RenderOperation& op);
 
         /** Overridden from Renderable */
         void getWorldTransforms(Matrix4* xform) const;

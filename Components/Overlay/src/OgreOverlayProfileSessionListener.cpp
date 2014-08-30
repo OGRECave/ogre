@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     //-----------------------------------------------------------------------
     OverlayProfileSessionListener::OverlayProfileSessionListener() 
         : mOverlay(0)
@@ -368,4 +370,5 @@ namespace Ogre
         mProfileGui->setDimensions(width, height);
     }
     //-----------------------------------------------------------------------
+}
 }

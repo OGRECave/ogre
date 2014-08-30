@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include <limits>
 
 namespace Ogre {
+namespace v1 {
     const size_t BillboardChain::SEGMENT_EMPTY = std::numeric_limits<size_t>::max();
     //-----------------------------------------------------------------------
     BillboardChain::Element::Element()
@@ -815,7 +816,5 @@ namespace Ogre {
     {
         OGRE_DELETE  obj;
     }
-
 }
-
-
+}

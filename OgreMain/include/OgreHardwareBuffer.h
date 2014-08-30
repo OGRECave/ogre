@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -393,6 +394,7 @@ namespace Ogre {
         const T& pBuf;
         void* pData;
     };
+}
 }
 #endif
 

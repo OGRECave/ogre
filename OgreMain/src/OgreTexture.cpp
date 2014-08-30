@@ -275,7 +275,7 @@ namespace Ogre {
             // Scoped
             {
                 // Print data about first destination surface
-                HardwarePixelBufferSharedPtr buf = getBuffer(0, 0); 
+                v1::HardwarePixelBufferSharedPtr buf = getBuffer(0, 0);
                 str << " Internal format is " << PixelUtil::getFormatName(buf->getFormat()) << 
                 "," << buf->getWidth() << "x" << buf->getHeight() << "x" << buf->getDepth() << ".";
             }

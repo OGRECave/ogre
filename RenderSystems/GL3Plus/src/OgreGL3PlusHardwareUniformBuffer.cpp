@@ -32,6 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre {
+namespace v1 {
     GL3PlusHardwareUniformBuffer::GL3PlusHardwareUniformBuffer(
         HardwareBufferManagerBase* mgr,
         size_t bufferSize,
@@ -206,4 +207,5 @@ namespace Ogre {
     // {
         
     // }
+}
 }

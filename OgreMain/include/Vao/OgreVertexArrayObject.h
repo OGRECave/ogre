@@ -52,38 +52,12 @@ namespace Ogre
         IndexBufferPacked       *mIndexBuffer;
 
         /// The type of operation to perform
-        RenderOperation::OperationType mOperationType;
+        v1::RenderOperation::OperationType mOperationType;
 
     public:
         VertexArrayObject( uint32 renderQueueId, const VertexBufferPackedVec &vertexBuffers,
                            IndexBufferPacked *indexBuffer,
-                           RenderOperation::OperationType operationType ) :
-            mRenderQueueId( renderQueueId ),
-            mFaceCount( 0 ),
-            mVertexBuffers( vertexBuffers ),
-            mIndexBuffer( indexBuffer ),
-            mOperationType( operationType )
-        {
-            size_t val;
-
-            if( mIndexBuffer )
-                val = mIndexBuffer->getNumElements();
-            else
-                val = mVertexBuffers[0]->getNumElements();
-
-            switch( mOperationType )
-            {
-            case RenderOperation::OT_TRIANGLE_LIST:
-                mFaceCount = (val / 3);
-                break;
-            case RenderOperation::OT_TRIANGLE_STRIP:
-            case RenderOperation::OT_TRIANGLE_FAN:
-                mFaceCount = (val - 2);
-                break;
-            default:
-                break;
-            }
-        }
+                           v1::RenderOperation::OperationType operationType );
 
         const VertexBufferPackedVec& getVertexBuffers(void) const       { return mVertexBuffers; }
         IndexBufferPacked* getIndexBuffer(void) const                   { return mIndexBuffer; }

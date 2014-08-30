@@ -39,6 +39,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     Skeleton::Skeleton()
@@ -1044,5 +1045,6 @@ namespace Ogre {
 
         return memSize;
     }
+}
 }
 

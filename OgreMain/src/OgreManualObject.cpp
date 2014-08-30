@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 
 namespace Ogre {
+namespace v1 {
 
 #define TEMP_INITIAL_SIZE 50
 #define TEMP_VERTEXSIZE_GUESS sizeof(float) * 12
@@ -1038,7 +1039,5 @@ namespace Ogre {
     {
         OGRE_DELETE obj;
     }
-
-
-
+}
 }

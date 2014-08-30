@@ -41,7 +41,7 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     // Shortcut to set up billboard particle renderer
-    BillboardParticleRendererFactory* mBillboardRendererFactory = 0;
+    v1::BillboardParticleRendererFactory* mBillboardRendererFactory = 0;
     //-----------------------------------------------------------------------
     template<> ParticleSystemManager* Singleton<ParticleSystemManager>::msSingleton = 0;
     ParticleSystemManager* ParticleSystemManager::getSingletonPtr(void)
@@ -367,7 +367,7 @@ namespace Ogre {
     {
         OGRE_LOCK_AUTO_MUTEX;
         // Create Billboard renderer factory
-        mBillboardRendererFactory = OGRE_NEW BillboardParticleRendererFactory();
+        mBillboardRendererFactory = OGRE_NEW v1::BillboardParticleRendererFactory();
         addRendererFactory(mBillboardRendererFactory);
 
     }

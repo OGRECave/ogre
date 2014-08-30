@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 
 namespace Ogre {
-
+namespace v1 {
     SimpleRenderable::SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager )
         : MovableObject( id, objectMemoryManager, 0 )
     , mWorldTransform(Matrix4::IDENTITY)
@@ -110,5 +110,5 @@ namespace Ogre {
         // Use movable query lights
         return queryLights();
     }
-
+}
 }

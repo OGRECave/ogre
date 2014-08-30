@@ -33,7 +33,9 @@ THE SOFTWARE.
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-    template<> OldSkeletonManager* Singleton<OldSkeletonManager>::msSingleton = 0;
+    template<> v1::OldSkeletonManager* Singleton<v1::OldSkeletonManager>::msSingleton = 0;
+namespace v1
+{
     OldSkeletonManager* OldSkeletonManager::getSingletonPtr(void)
     {
         return msSingleton;
@@ -76,5 +78,5 @@ namespace Ogre
     }
 
 
-
+}
 }

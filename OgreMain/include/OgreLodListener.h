@@ -54,7 +54,7 @@ namespace Ogre {
     struct EntityMeshLodChangedEvent
     {
         /// The entity whose level of detail has changed.
-        Entity *entity;
+        v1::Entity *entity;
 
         /// The camera with respect to which the level of detail has changed.
         Camera *camera;
@@ -73,7 +73,7 @@ namespace Ogre {
     struct EntityMaterialLodChangedEvent
     {
         /// The sub-entity whose material's level of detail has changed.
-        SubEntity *subEntity;
+        v1::SubEntity *subEntity;
 
         /// The camera with respect to which the level of detail has changed.
         Camera *camera;

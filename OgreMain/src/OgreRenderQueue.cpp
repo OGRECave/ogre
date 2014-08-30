@@ -43,7 +43,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    AtomicScalar<uint32> RenderOperation::MeshIndexId( 0 );
+    AtomicScalar<uint32> v1::RenderOperation::MeshIndexId( 0 );
 
     const HlmsCache c_dummyCache( 0, HLMS_MAX );
 
@@ -135,7 +135,7 @@ namespace Ogre
 #endif
         uint32 quantizedDepth = static_cast<uint32>( depth );
 
-        RenderOperation op;
+        v1::RenderOperation op;
         pRend->getRenderOperation( op ); //TODO
         uint32 meshHash = op.meshIndex;
         //TODO: Account for skeletal animation in any of the hashes (preferently on the material side)
@@ -250,8 +250,8 @@ namespace Ogre
 
         HlmsMacroblock const *lastMacroblock = mLastMacroblock;
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
-        VertexData const *lastVertexData = mLastVertexData;
-        IndexData const *lastIndexData = mLastIndexData;
+        v1::VertexData const *lastVertexData = mLastVertexData;
+        v1::IndexData const *lastIndexData = mLastIndexData;
         HlmsCache const *lastHlmsCache = mLastHlmsCache;
         uint32 lastTextureHash = mLastTextureHash;
         //uint32 lastVertexDataId = ~0;
@@ -272,7 +272,7 @@ namespace Ogre
             while( itor != end )
             {
                 const QueuedRenderable &queuedRenderable = *itor;
-                RenderOperation op;
+                v1::RenderOperation op;
                 queuedRenderable.renderable->getRenderOperation( op );
                 /*uint32 hlmsHash = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                                queuedRenderable.renderable->getHlmsHash();*/
@@ -338,7 +338,7 @@ namespace Ogre
                                                      dualParaboloid, mSceneManager );
 
         const QueuedRenderable queuedRenderable( 0, pRend, pMovableObject );
-        RenderOperation op;
+        v1::RenderOperation op;
         queuedRenderable.renderable->getRenderOperation( op );
         /*uint32 hlmsHash = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                        queuedRenderable.renderable->getHlmsHash();*/

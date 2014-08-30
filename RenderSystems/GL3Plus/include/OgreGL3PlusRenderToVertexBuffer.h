@@ -32,6 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusPrerequisites.h"
 
 namespace Ogre {
+namespace v1 {
     /**  An object which renders geometry to a vertex.
          @remarks
          This is especially useful together with geometry shaders, as you can
@@ -68,6 +69,7 @@ namespace Ogre {
         void reallocateBuffer(size_t index);
         String getSemanticVaryingName(VertexElementSemantic semantic, unsigned short index);
     };
+}
 }
 
 #endif

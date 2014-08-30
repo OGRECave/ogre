@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -103,7 +104,7 @@ namespace Ogre {
                 visibleSide Determines which side of the patch (or both) triangles are generated for.
         */
         void defineSurface(void* controlPointBuffer, 
-            VertexDeclaration *declaration, size_t width, size_t height,
+            v1::VertexDeclaration *declaration, size_t width, size_t height,
             PatchSurfaceType pType = PST_BEZIER, 
             size_t uMaxSubdivisionLevel = AUTO_LEVEL, size_t vMaxSubdivisionLevel = AUTO_LEVEL,
             VisibleSide visibleSide = VS_FRONT);
@@ -149,8 +150,8 @@ namespace Ogre {
             @param indexStart The offset at which to start writing indexes for this patch
 
         */
-        void build(HardwareVertexBufferSharedPtr destVertexBuffer, size_t vertexStart,
-            HardwareIndexBufferSharedPtr destIndexBuffer, size_t indexStart);
+        void build(v1::HardwareVertexBufferSharedPtr destVertexBuffer, size_t vertexStart,
+            v1::HardwareIndexBufferSharedPtr destIndexBuffer, size_t indexStart);
 
         /** Alters the level of subdivision for this surface.
             @remarks
@@ -176,7 +177,7 @@ namespace Ogre {
         }
     protected:
         /// Vertex declaration describing the control point buffer
-        VertexDeclaration* mDeclaration;
+        v1::VertexDeclaration* mDeclaration;
         /// Buffer containing the system-memory control points
         void* mControlPointBuffer;
         /// Type of surface
@@ -217,8 +218,8 @@ namespace Ogre {
         size_t getAutoULevel(bool forMax = false);
         size_t getAutoVLevel(bool forMax = false);
 
-        HardwareVertexBufferSharedPtr mVertexBuffer;
-        HardwareIndexBufferSharedPtr mIndexBuffer;
+        v1::HardwareVertexBufferSharedPtr mVertexBuffer;
+        v1::HardwareIndexBufferSharedPtr mIndexBuffer;
         size_t mVertexOffset;
         size_t mIndexOffset;
         size_t mRequiredVertexCount;
@@ -234,7 +235,7 @@ namespace Ogre {
 
     /** @} */
     /** @} */
-
+}
 } // namespace
 
 #include "OgreHeaderSuffix.h"

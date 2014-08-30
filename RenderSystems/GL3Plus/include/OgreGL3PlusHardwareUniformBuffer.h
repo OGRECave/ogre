@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreHardwareUniformBuffer.h"
 
 namespace Ogre {
-
+namespace v1 {
     /// Specialisation of HardwareUniformBuffer for OpenGL
     class _OgreGL3PlusExport GL3PlusHardwareUniformBuffer : public HardwareUniformBuffer
     {
@@ -77,5 +77,6 @@ namespace Ogre {
         void setGLBufferBinding(GLint binding);
         inline GLint getGLBufferBinding(void) const { return mBinding; }
     };
+}
 }
 #endif // __GL3PlusHARDWAREUNIFORMBUFFER_H__

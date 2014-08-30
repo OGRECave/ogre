@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreOverlay.h"
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     OverlayContainer::OverlayContainer(const String& name)
@@ -343,4 +344,4 @@ namespace Ogre {
     }
 
 }
-
+}

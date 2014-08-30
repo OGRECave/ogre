@@ -40,6 +40,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     static const uint16 c_maxTexWidth   = 4096;
     static const uint16 c_maxTexHeight  = 4096;
 
@@ -771,4 +773,5 @@ namespace Ogre
         return retVal;
 
     }
+}
 }

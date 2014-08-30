@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-
+namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -223,7 +223,7 @@ namespace Ogre {
         /// @copydoc ParticleSystemRenderer::setRenderQueueGroup
         void setRenderQueueGroup(uint8 queueID);
         /// @copydoc MovableObject::setRenderQueueGroupAndPriority
-        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+        void setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority);
         /// @copydoc ParticleSystemRenderer::setKeepParticlesInLocalSpace
         void setKeepParticlesInLocalSpace(bool keepLocal);
         /// @copydoc ParticleSystemRenderer::_getSortMode
@@ -263,6 +263,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 
+}
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

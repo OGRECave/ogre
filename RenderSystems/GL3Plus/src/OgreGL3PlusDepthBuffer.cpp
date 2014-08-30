@@ -33,7 +33,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre
 {
     GL3PlusDepthBuffer::GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GL3PlusContext *creatorContext,
-                                    GL3PlusRenderBuffer *depth, GL3PlusRenderBuffer *stencil,
+                                    v1::GL3PlusRenderBuffer *depth, v1::GL3PlusRenderBuffer *stencil,
                                     uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
                                     bool isManual ) :
                 DepthBuffer( poolId, 0, width, height, fsaa, "", isManual ),

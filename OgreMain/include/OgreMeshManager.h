@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+namespace v1 {
 
     class MeshSerializerListener;
 
@@ -503,6 +504,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 
+}
 } //namespace
 
 #include "OgreHeaderSuffix.h"

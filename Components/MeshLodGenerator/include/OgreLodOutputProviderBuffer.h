@@ -41,7 +41,7 @@ class _OgreLodExport LodOutputProviderBuffer :
     public LodOutputProvider
 {
 public:
-    LodOutputProviderBuffer(MeshPtr mesh) : mMesh(mesh) {}
+    LodOutputProviderBuffer(v1::MeshPtr mesh) : mMesh(mesh) {}
     virtual void prepare(LodData* data);
     virtual void finalize(LodData* data) {}
     virtual void bakeManualLodLevel(LodData* data, String& manualMeshName, int lodIndex);
@@ -49,7 +49,7 @@ public:
     virtual void inject();
     LodOutputBuffer& getBuffer();
 protected:
-    MeshPtr mMesh;
+    v1::MeshPtr mMesh;
     LodOutputBuffer mBuffer;
 };
 

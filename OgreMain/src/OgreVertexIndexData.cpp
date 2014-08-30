@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 
 namespace Ogre {
+namespace v1 {
 
     //-----------------------------------------------------------------------
     VertexData::VertexData(HardwareBufferManagerBase* mgr)
@@ -972,5 +973,5 @@ namespace Ogre {
         return false;
     }
     
-
+}
 }

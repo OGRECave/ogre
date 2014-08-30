@@ -34,6 +34,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     namespace
     {
         /** Controller value for pass frame time to RibbonTrail
@@ -548,9 +550,6 @@ namespace Ogre
     {
         OGRE_DELETE obj;
     }
-
-
-
-
+}
 }
 

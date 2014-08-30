@@ -33,7 +33,7 @@
 
 namespace Ogre
 {
-    LodInputProviderMesh::LodInputProviderMesh( MeshPtr mesh ) : mMesh(mesh)
+    LodInputProviderMesh::LodInputProviderMesh( v1::MeshPtr mesh ) : mMesh(mesh)
     {
 
     }
@@ -52,7 +52,7 @@ namespace Ogre
         size_t sharedVertexLookupSize = 0;
         unsigned short submeshCount = mMesh->getNumSubMeshes();
         for (unsigned short i = 0; i < submeshCount; i++) {
-            const SubMesh* submesh = mMesh->getSubMesh(i);
+            const v1::SubMesh* submesh = mMesh->getSubMesh(i);
             if (!submesh->useSharedVertices) {
                 size_t count = submesh->vertexData->vertexCount;
                 vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
@@ -85,8 +85,9 @@ namespace Ogre
         data->mMeshBoundingSphereRadius = mMesh->getBoundingSphereRadius();
         unsigned short submeshCount = mMesh->getNumSubMeshes();
         for (unsigned short i = 0; i < submeshCount; ++i) {
-            const SubMesh* submesh = mMesh->getSubMesh(i);
-            VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData : submesh->vertexData);
+            const v1::SubMesh* submesh = mMesh->getSubMesh(i);
+            v1::VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData :
+                                                                       submesh->vertexData);
             addVertexData(data, vertexData, submesh->useSharedVertices);
             if(submesh->indexData->indexCount > 0)
                 addIndexData(data, submesh->indexData, submesh->useSharedVertices, i);
@@ -96,7 +97,7 @@ namespace Ogre
         mSharedVertexLookup.clear();
         mVertexLookup.clear();
     }
-    void LodInputProviderMesh::addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup)
+    void LodInputProviderMesh::addVertexData(LodData* data, v1::VertexData* vertexData, bool useSharedVertexLookup)
     {
         if ((useSharedVertexLookup && !mSharedVertexLookup.empty())) { // We already loaded the shared vertex buffer.
             return;
@@ -104,15 +105,17 @@ namespace Ogre
         OgreAssert(vertexData->vertexCount != 0, "");
 
         // Locate position element and the buffer to go with it.
-        const VertexElement* elemPos = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+        const v1::VertexElement* elemPos = vertexData->vertexDeclaration->
+                                                findElementBySemantic(VES_POSITION);
 
         // Only float supported.
         OgreAssert(elemPos->getSize() == 12, "");
 
-        HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(elemPos->getSource());
+        v1::HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(
+                                                                        elemPos->getSource() );
 
         // Lock the buffer for reading.
-        unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(v1::HardwareBuffer::HBL_READ_ONLY));
         unsigned char* vertex = vStart;
         size_t vSize = vbuf->getVertexSize();
         unsigned char* vEnd = vertex + vertexData->vertexCount * vSize;
@@ -120,10 +123,11 @@ namespace Ogre
         VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
         lookup.clear();
 
-        HardwareVertexBufferSharedPtr vNormalBuf;
+        v1::HardwareVertexBufferSharedPtr vNormalBuf;
         unsigned char* vNormal;
         size_t vNormSize;
-        const VertexElement* elemNormal = vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
+        const v1::VertexElement* elemNormal = vertexData->vertexDeclaration->
+                                                findElementBySemantic(VES_NORMAL);
 
         data->mUseVertexNormals &= (elemNormal != NULL);
         if(data->mUseVertexNormals){
@@ -133,7 +137,8 @@ namespace Ogre
                 vNormal = vStart;
             }  else {
                 vNormalBuf = vertexData->vertexBufferBinding->getBuffer(elemNormal->getSource());
-                vNormal = static_cast<unsigned char*>(vNormalBuf->lock(HardwareBuffer::HBL_READ_ONLY));
+                vNormal = static_cast<unsigned char*>(
+                                vNormalBuf->lock(v1::HardwareBuffer::HBL_READ_ONLY) );
             }
             vNormSize = vNormalBuf->getVertexSize();
         }
@@ -190,9 +195,10 @@ namespace Ogre
             vNormalBuf->unlock();
         }
     }
-    void LodInputProviderMesh::addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID)
+    void LodInputProviderMesh::addIndexData( LodData* data, v1::IndexData* indexData,
+                                             bool useSharedVertexLookup, unsigned short submeshID )
     {
-        const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
+        const v1::HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
         size_t isize = ibuf->getIndexSize();
         data->mIndexBufferInfoList[submeshID].indexSize = isize;
         data->mIndexBufferInfoList[submeshID].indexCount = indexData->indexCount;
@@ -203,7 +209,7 @@ namespace Ogre
         VertexLookupList& lookup = useSharedVertexLookup ? mSharedVertexLookup : mVertexLookup;
 
         // Lock the buffer for reading.
-        char* iStart = static_cast<char*>(ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        char* iStart = static_cast<char*>(ibuf->lock(v1::HardwareBuffer::HBL_READ_ONLY));
         char* iEnd = iStart + ibuf->getSizeInBytes();
         if (isize == sizeof(unsigned short)) {
             addIndexDataImpl<unsigned short>(data, (unsigned short*) iStart, (unsigned short*) iEnd, lookup, submeshID);

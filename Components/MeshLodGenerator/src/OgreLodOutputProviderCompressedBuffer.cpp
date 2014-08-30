@@ -31,7 +31,7 @@
 
 namespace Ogre
 {
-    LodOutputProviderCompressedBuffer::LodOutputProviderCompressedBuffer( MeshPtr mesh ) : 
+    LodOutputProviderCompressedBuffer::LodOutputProviderCompressedBuffer( v1::MeshPtr mesh ) :
         LodOutputProviderCompressedMesh()
     {
         mMesh = mesh;

@@ -91,19 +91,19 @@ namespace Ogre {
         Real getValue(const MovableObject *movableObject, const Camera *camera) const;
 
         /** Get the index of the LOD usage which applies to a given value. */
-		static ushort getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList);
+        static ushort getIndex(Real value, const v1::Mesh::MeshLodUsageList& meshLodUsageList);
 
         /** Get the index of the LOD usage which applies to a given value. */
         static ushort getIndex(Real value, const Material::LodValueArray& materialLodValueArray);
 
         /** Sort mesh LOD usage list from greatest to least detail */
-		static void sort(Mesh::MeshLodUsageList& meshLodUsageList);
+        static void sort(v1::Mesh::MeshLodUsageList& meshLodUsageList);
 
         /** Determine if the LOD values are sorted from greatest detail to least detail. */
-		static bool isSorted(const Mesh::LodValueArray& values);
+        static bool isSorted(const v1::Mesh::LodValueArray& values);
 
         /** Assert that the LOD values are sorted from greatest detail to least detail. */
-        static void assertSorted(const Mesh::LodValueArray& values);
+        static void assertSorted(const v1::Mesh::LodValueArray& values);
 
         /** Get the name of this strategy. */
         const String& getName() const { return mName; }

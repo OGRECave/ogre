@@ -60,7 +60,7 @@ namespace Ogre {
         /** Creates a skeletondef based on an existing one from the legacy skeleton system.
             If a skeleton def with the same name already exists, returns that one instead.
         */
-        SkeletonDefPtr getSkeletonDef( Skeleton *oldSkeletonBase );
+        SkeletonDefPtr getSkeletonDef( v1::Skeleton *oldSkeletonBase );
 
         /// Create a new skeleton or retrieves an existing one. Will throw if can't find the skeleton.
         SkeletonDefPtr getSkeletonDef( const String &name,

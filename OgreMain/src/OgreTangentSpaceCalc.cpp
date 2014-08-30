@@ -33,6 +33,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     //---------------------------------------------------------------------
     TangentSpaceCalc::TangentSpaceCalc()
         : mVData(0)
@@ -774,5 +776,5 @@ namespace Ogre
             origBuffer->unlock();
         }
     }
-
+}
 }

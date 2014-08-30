@@ -36,6 +36,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     /** \addtogroup Core
     *  @{
     */
@@ -296,6 +298,7 @@ namespace Ogre
         void setCustomParam( unsigned char idx, const Vector4 &newParam );
         const Vector4& getCustomParam( unsigned char idx );
     };
+}
 }
 
 #include "OgreInstancedEntity.inl"

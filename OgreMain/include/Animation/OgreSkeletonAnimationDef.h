@@ -77,7 +77,7 @@ namespace Ogre
 
         void setName( const String &name )                              { mName = name; }
 
-        void build( const Skeleton *skeleton, const Animation *animation, Real frameRate );
+        void build( const v1::Skeleton *skeleton, const v1::Animation *animation, Real frameRate );
     };
 
     typedef vector<SkeletonAnimationDef>::type SkeletonAnimationDefVec;

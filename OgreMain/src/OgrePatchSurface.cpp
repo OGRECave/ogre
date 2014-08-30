@@ -33,6 +33,7 @@ THE SOFTWARE.
 #define LEVEL_WIDTH(lvl) ((1 << (lvl+1)) + 1)
 
 namespace Ogre {
+namespace v1 {
 
     // TODO: make this deal with specular colours and more than 2 texture coords
 
@@ -699,6 +700,6 @@ namespace Ogre {
                 *pDestReal++ = ((*pLeftReal++) + (*pRightReal++)) * 0.5f;
         }
     }
-
+}
 }
 

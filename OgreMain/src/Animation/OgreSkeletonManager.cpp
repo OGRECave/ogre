@@ -52,7 +52,7 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------
-    SkeletonDefPtr SkeletonManager::getSkeletonDef( Skeleton *oldSkeletonBase )
+    SkeletonDefPtr SkeletonManager::getSkeletonDef( v1::Skeleton *oldSkeletonBase )
     {
         IdString idName( oldSkeletonBase->getName() );
         SkeletonDefPtr retVal;
@@ -78,7 +78,7 @@ namespace Ogre
         SkeletonDefMap::iterator itor = mSkeletonDefs.find( name );
         if( itor == mSkeletonDefs.end() )
         {
-            Skeleton *oldSkeleton = OGRE_NEW Skeleton( 0, name, 0, groupName, false, 0 );
+            v1::Skeleton *oldSkeleton = OGRE_NEW v1::Skeleton( 0, name, 0, groupName, false, 0 );
             oldSkeleton->load();
             if( oldSkeleton->isLoaded() )
                 retVal = SkeletonDefPtr( new SkeletonDef( oldSkeleton, 1.0f ) );

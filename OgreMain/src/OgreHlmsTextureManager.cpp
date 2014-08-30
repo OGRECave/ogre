@@ -111,9 +111,9 @@ namespace Ogre
                                                 textureType, 4, 4, 1, 0, PF_R8G8B8A8, TU_DEFAULT, 0,
                                                 true, 0, BLANKSTRING, false );
 
-                HardwarePixelBufferSharedPtr pixelBufferBuf = mBlankTexture->getBuffer(0);
+                v1::HardwarePixelBufferSharedPtr pixelBufferBuf = mBlankTexture->getBuffer(0);
                 const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0, 4, 4, 1 ),
-                                                                  HardwareBuffer::HBL_DISCARD );
+                                                                  v1::HardwareBuffer::HBL_DISCARD );
                 uint8 *data = reinterpret_cast<uint8*>( currImage.data );
                 for( size_t y=0; y<currImage.getHeight(); ++y )
                 {
@@ -142,12 +142,12 @@ namespace Ogre
         // The last problem is a subset of the 3rd problem
         //
         //  See Texture::_loadImages
-        HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
+        v1::HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
         const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, entryIdx,
                                                                dst->getWidth(),
                                                                dst->getHeight(),
                                                                entryIdx + 1 ),
-                                                          HardwareBuffer::HBL_DISCARD );
+                                                          v1::HardwareBuffer::HBL_DISCARD );
         PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
         pixelBufferBuf->unlock();
     }
@@ -182,14 +182,14 @@ namespace Ogre
         }
         else*/
         {
-            HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
+            v1::HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
             const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * srcImage.getWidth(),
                                                                    yBlock * srcImage.getHeight(),
                                                                    0,
                                                                    nextX * srcImage.getWidth(),
                                                                    nextY * srcImage.getHeight(),
                                                                    dst->getDepth() ),
-                                                              HardwareBuffer::HBL_DISCARD );
+                                                              v1::HardwareBuffer::HBL_DISCARD );
             PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
             pixelBufferBuf->unlock();
         }

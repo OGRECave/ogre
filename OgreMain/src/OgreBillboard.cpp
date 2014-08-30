@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreBillboardSet.h"
 
 namespace Ogre {
-
+namespace v1 {
     //-----------------------------------------------------------------------
     Billboard::Billboard():
         mOwnDimensions(false),
@@ -141,6 +141,6 @@ namespace Ogre {
         setTexcoordRect(FloatRect(u0, v0, u1, v1));
     }
 
-
+}
 }
 

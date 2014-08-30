@@ -41,6 +41,7 @@
 #include "OgreGLSLSeparableProgramManager.h"
 
 namespace Ogre {
+namespace v1 {
 
     GL3PlusTextureBuffer::GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id,
                                                GLint face, GLint level, Usage usage,
@@ -832,5 +833,5 @@ namespace Ogre {
         assert(zoffset < mDepth);
         return mSliceTRT[zoffset];
     }
-
+}
 }

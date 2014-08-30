@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreHlmsManager.h"
 
 namespace Ogre {
+namespace v1 {
     //---------------------------------------------------------------------
     String BorderPanelOverlayElement::msTypeName = "BorderPanel";
     BorderPanelOverlayElement::CmdBorderSize BorderPanelOverlayElement::msCmdBorderSize;
@@ -835,8 +836,5 @@ namespace Ogre {
     {
         return msTypeName;
     }
-
-
-
 }
-
+}

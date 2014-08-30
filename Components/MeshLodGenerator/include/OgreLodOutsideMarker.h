@@ -46,7 +46,7 @@ public:
      */
     LodOutsideMarker(LodData::VertexList & vertexList, Real boundingSphereRadius, Real walkAngle);
     void markOutside(); /// Mark vertices, which are visible from outside.
-    MeshPtr createConvexHullMesh(const String& meshName,
+    v1::MeshPtr createConvexHullMesh(const String& meshName,
         const String& resourceGroupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME); /// Returns a mesh containing the Convex Hull shape.
 
     bool isVertexOutside(LodData::Vertex* v) {

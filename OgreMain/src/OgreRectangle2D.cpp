@@ -33,6 +33,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     Rectangle2D::Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager ) :
             MovableObject( id, objectMemoryManager, 255 ),
             mPosition( Vector3::ZERO ),
@@ -250,4 +252,5 @@ namespace Ogre
         static String movType = "Rectangle2D";
         return movType;
     }
+}
 }

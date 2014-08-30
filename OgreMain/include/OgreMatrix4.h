@@ -700,6 +700,5 @@ namespace Ogre
     }
     /** @} */
     /** @} */
-
 }
 #endif

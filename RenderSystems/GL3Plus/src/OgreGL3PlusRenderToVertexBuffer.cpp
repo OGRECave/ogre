@@ -42,7 +42,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include <iostream>
 
 namespace Ogre {
-
+namespace v1 {
     GL3PlusRenderToVertexBuffer::GL3PlusRenderToVertexBuffer()
         : mTargetBufferIndex(0)
         , mFirstUpdate(true)
@@ -385,4 +385,5 @@ namespace Ogre {
                         "OgreGL3PlusRenderToVertexBuffer::getSemanticVaryingName");
         }
     }
+}
 }

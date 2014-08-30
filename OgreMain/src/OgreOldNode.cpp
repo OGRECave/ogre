@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreMath.h"
 
 namespace Ogre {
+namespace v1 {
+
     OldNode::QueuedUpdates OldNode::msQueuedUpdates;
     //-----------------------------------------------------------------------
     OldNode::OldNode()
@@ -823,5 +825,6 @@ namespace Ogre {
         msQueuedUpdates.clear();
     }
     //---------------------------------------------------------------------
+}
 }
 

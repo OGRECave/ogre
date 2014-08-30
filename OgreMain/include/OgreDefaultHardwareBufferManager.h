@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
+namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -197,6 +198,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 
+}
 }
 
 #endif

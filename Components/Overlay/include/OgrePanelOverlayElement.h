@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -97,7 +98,7 @@ namespace Ogre {
         /** See OverlayElement. */
         virtual const String& getTypeName(void) const;
         /** See Renderable. */
-        void getRenderOperation(RenderOperation& op);
+        void getRenderOperation(v1::RenderOperation& op);
         /** Overridden from OverlayElement */
         void setMaterialName(const String& matName);
         /** Overridden from OverlayContainer */
@@ -134,7 +135,7 @@ namespace Ogre {
         size_t mNumTexCoordsInBuffer;
         Real mU1, mV1, mU2, mV2;
 
-        RenderOperation mRenderOp;
+        v1::RenderOperation mRenderOp;
 
         /// Internal method for setting up geometry, called by OverlayElement::update
         virtual void updatePositionGeometry(void);
@@ -156,6 +157,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 
+}
 }
 
 #endif

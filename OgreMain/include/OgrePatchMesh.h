@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgrePatchSurface.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -82,7 +83,7 @@ namespace Ogre {
     };
     /** @} */
     /** @} */
-
+}
 }
 
 #endif

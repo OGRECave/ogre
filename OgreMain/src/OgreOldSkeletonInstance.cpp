@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+namespace v1 {
     //-------------------------------------------------------------------------
     OldSkeletonInstance::OldSkeletonInstance(const SkeletonPtr& masterCopy) 
         : Skeleton()
@@ -242,6 +243,6 @@ namespace Ogre {
         return mSkeleton->getGroup();
     }
 
-
+}
 }
 

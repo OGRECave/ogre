@@ -36,7 +36,8 @@ THE SOFTWARE.
 #include "OgreVertexBoneAssignment.h"
 
 namespace Ogre {
-    
+namespace v1 {
+
     class MeshSerializerListener;
     struct MeshLodUsage;
 
@@ -310,7 +311,7 @@ namespace Ogre {
 
     /** @} */
     /** @} */
-
+}
 }
 
 #endif

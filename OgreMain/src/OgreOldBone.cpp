@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreSkeleton.h"
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     OldBone::OldBone(unsigned short handle, Skeleton* creator) 
@@ -127,10 +128,6 @@ namespace Ogre {
         }
 
     }
-
-
-
-
-
+}
 }
 

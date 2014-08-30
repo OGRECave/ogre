@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreGL3PlusDefaultHardwareBufferManager.h"
 
 namespace Ogre {
+namespace v1 {
     GL3PlusDefaultHardwareVertexBuffer::GL3PlusDefaultHardwareVertexBuffer(size_t vertexSize,
                                                                            size_t numVertices,
                                                                            HardwareBuffer::Usage usage)
@@ -319,10 +320,11 @@ namespace Ogre {
             new GL3PlusDefaultHardwareCounterBuffer(this, name));
     }
 
-    Ogre::RenderToVertexBufferSharedPtr GL3PlusDefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
+    RenderToVertexBufferSharedPtr GL3PlusDefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                     "Cannot create RenderToVertexBuffer in GL3PlusDefaultHardwareBufferManagerBase",
                     "GL3PlusDefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
     }
+}
 }

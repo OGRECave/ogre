@@ -699,23 +699,24 @@ namespace Ogre {
             //TODO error handling for when buffer has no associated shared parameter?
             //if (bufferi == mSharedParamGLBufferMap.end()) continue;
 
-            GL3PlusHardwareUniformBuffer* hwGlBuffer;
+            v1::GL3PlusHardwareUniformBuffer* hwGlBuffer;
             SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
             if (bufferMapi != sharedParamsBufferMap.end())
             {
-                hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(bufferMapi->second.get());
+                hwGlBuffer = static_cast<v1::GL3PlusHardwareUniformBuffer*>(bufferMapi->second.get());
             }
             else
             {
                 // Create buffer and add entry to buffer map.
                 GLint blockSize;
                 OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
-                HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
+                v1::HardwareUniformBufferSharedPtr newUniformBuffer = v1::HardwareBufferManager::getSingleton().
+                        createUniformBuffer(blockSize, v1::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
                 // bufferMapi->second() = newUniformBuffer;
-                hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
+                hwGlBuffer = static_cast<v1::GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
                 GLint bufferBinding = sharedParamsBufferMap.size();
                 hwGlBuffer->setGLBufferBinding(bufferBinding);
-                std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newUniformBuffer);
+                std::pair<GpuSharedParametersPtr, v1::HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newUniformBuffer);
                 sharedParamsBufferMap.insert(newPair);
 
                 // Get active block parameter properties.
@@ -784,11 +785,11 @@ namespace Ogre {
 
                 // No more shader storage blocks.
                 // if (uniformName == 0) break;
-                GL3PlusHardwareShaderStorageBuffer* hwGlBuffer;
+                v1::GL3PlusHardwareShaderStorageBuffer* hwGlBuffer;
                 SharedParamsBufferMap::const_iterator bufferMapi = sharedParamsBufferMap.find(blockSharedParams);
                 if (bufferMapi != sharedParamsBufferMap.end())
                 {
-                    hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(bufferMapi->second.get());
+                    hwGlBuffer = static_cast<v1::GL3PlusHardwareShaderStorageBuffer*>(bufferMapi->second.get());
                 }
                 else
                 {
@@ -810,8 +811,8 @@ namespace Ogre {
                     //blockSize = properties[0];
                     //TODO Implement shared param access param in materials (R, W, R+W)
                     // HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                    HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
-                    hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(newShaderStorageBuffer.get());
+                    v1::HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<v1::GL3PlusHardwareBufferManager*>(v1::HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, v1::HardwareBuffer::HBU_DYNAMIC, false, uniformName);
+                    hwGlBuffer = static_cast<v1::GL3PlusHardwareShaderStorageBuffer*>(newShaderStorageBuffer.get());
 
                     // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
                     // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
@@ -820,7 +821,7 @@ namespace Ogre {
                     GLint bufferBinding = sharedParamsBufferMap.size();
                     hwGlBuffer->setGLBufferBinding(bufferBinding);
 
-                    std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newShaderStorageBuffer);
+                    std::pair<GpuSharedParametersPtr, v1::HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newShaderStorageBuffer);
                     //sharedParamsBufferMap.insert(newPair);
 
                     // Get active block parameter properties.
@@ -851,9 +852,9 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE, &bufferSize));
                 OGRE_CHECK_GL_ERROR(glGetActiveAtomicCounterBufferiv(programObject, index, GL_ATOMIC_COUNTER_BUFFER_BINDING, &bufferBinding));
                 //TODO check parameters of this GL call
-                HardwareCounterBufferSharedPtr newCounterBuffer = HardwareBufferManager::getSingleton().createCounterBuffer(bufferSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
+                v1::HardwareCounterBufferSharedPtr newCounterBuffer = v1::HardwareBufferManager::getSingleton().createCounterBuffer(bufferSize, v1::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
 
-                GL3PlusHardwareCounterBuffer* hwGlBuffer = static_cast<GL3PlusHardwareCounterBuffer*>(newCounterBuffer.get());
+                v1::GL3PlusHardwareCounterBuffer* hwGlBuffer = static_cast<v1::GL3PlusHardwareCounterBuffer*>(newCounterBuffer.get());
                 hwGlBuffer->setGLBufferBinding(bufferBinding);
                 counterBufferList.push_back(newCounterBuffer);
             }

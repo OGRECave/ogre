@@ -33,9 +33,8 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+namespace v1 {
     namespace OverlayElementCommands {
-
         //-----------------------------------------------------------------------
         String CmdLeft::doGet(const void* target) const
         {
@@ -226,5 +225,6 @@ namespace Ogre {
         }
         //-----------------------------------------------------------------------
     }
+}
 }
 

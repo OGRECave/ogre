@@ -157,7 +157,7 @@ namespace Ogre {
         */
         virtual void calculateFaceNormals(
             const float *positions,
-            const EdgeData::Triangle *triangles,
+            const v1::EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
             size_t numTriangles) = 0;
 

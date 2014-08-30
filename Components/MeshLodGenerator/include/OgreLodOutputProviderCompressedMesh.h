@@ -41,7 +41,7 @@ class _OgreLodExport LodOutputProviderCompressedMesh :
     public LodOutputProvider
 {
 public:
-    LodOutputProviderCompressedMesh(MeshPtr mesh);
+    LodOutputProviderCompressedMesh(v1::MeshPtr mesh);
     ~LodOutputProviderCompressedMesh();
     virtual void prepare(LodData* data);
     virtual void finalize(LodData* data);
@@ -72,7 +72,7 @@ protected:
 
     /// if uneven lod levels are created, we need to fall back for the last lod level.
     LodOutputProvider* fallback;
-    MeshPtr mMesh;
+    v1::MeshPtr mMesh;
 
     int mLastIndexBufferID;
 

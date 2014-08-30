@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "Math/Array/OgreObjectMemoryManager.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -256,7 +257,7 @@ namespace Ogre {
 
     /** @} */
     /** @} */
-
+}
 }
 
 

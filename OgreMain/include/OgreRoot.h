@@ -87,9 +87,9 @@ namespace Ogre
         DynLibManager* mDynLibManager;
         ArchiveManager* mArchiveManager;
         MaterialManager* mMaterialManager;
-        MeshManager* mMeshManager;
+        v1::MeshManager* mMeshManager;
         ParticleSystemManager* mParticleManager;
-        OldSkeletonManager* mOldSkeletonManager;
+        v1::OldSkeletonManager* mOldSkeletonManager;
         SkeletonManager* mSkeletonManager;
         
         ArchiveFactory *mZipArchiveFactory;
@@ -120,7 +120,7 @@ namespace Ogre
         Real mFrameSmoothingTime;
         bool mRemoveQueueStructuresOnClear;
         Real mDefaultMinPixelSize;
-        HardwareBuffer::UploadOptions mFreqUpdatedBuffersUploadOption;
+        v1::HardwareBuffer::UploadOptions mFreqUpdatedBuffersUploadOption;
 
     public:
         typedef vector<DynLib*>::type PluginLibList;
@@ -472,7 +472,7 @@ namespace Ogre
                 This performs the same function as MeshManager::getSingleton
                 and is provided for convenience to scripting engines.
         */
-        MeshManager* getMeshManager(void);
+        v1::MeshManager* getMeshManager(void);
 
         /** Utility function for getting a better description of an error
             code.
@@ -1082,12 +1082,12 @@ namespace Ogre
         as it will upload frequently changing buffers to devices that require them.
         However setting the HBU_ON_DEMAND may also introduce hiccups.
         */
-        void setFreqUpdatedBuffersUploadOption(HardwareBuffer::UploadOptions uploadOp) { mFreqUpdatedBuffersUploadOption = uploadOp; }
+        void setFreqUpdatedBuffersUploadOption(v1::HardwareBuffer::UploadOptions uploadOp) { mFreqUpdatedBuffersUploadOption = uploadOp; }
         /** Get the default upload option for buffers that frequently changed
         @note
             To use this feature see Camera::setFreqUpdatedBuffersUploadOption()
         */
-        HardwareBuffer::UploadOptions getFreqUpdatedBuffersUploadOption() const { return mFreqUpdatedBuffersUploadOption; }
+        v1::HardwareBuffer::UploadOptions getFreqUpdatedBuffersUploadOption() const { return mFreqUpdatedBuffersUploadOption; }
 
     };
     /** @} */

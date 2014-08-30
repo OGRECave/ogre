@@ -48,14 +48,14 @@ namespace Ogre
     class _OgreExport RenderTexture: public RenderTarget
     {
     public:
-        RenderTexture(HardwarePixelBuffer *buffer, uint32 zoffset);
+        RenderTexture(v1::HardwarePixelBuffer *buffer, uint32 zoffset);
         virtual ~RenderTexture();
 
         virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
         PixelFormat suggestPixelFormat() const;
 
     protected:
-        HardwarePixelBuffer *mBuffer;
+        v1::HardwarePixelBuffer *mBuffer;
         uint32 mZOffset;
     };
 

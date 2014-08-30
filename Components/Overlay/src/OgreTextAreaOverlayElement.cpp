@@ -38,6 +38,7 @@ THE SOFTWARE
 #include "OgreHlmsDatablock.h"
 
 namespace Ogre {
+namespace v1 {
 
 #define DEFAULT_INITIAL_CHARS 12
     //---------------------------------------------------------------------
@@ -754,4 +755,5 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------------------------------
+}
 }

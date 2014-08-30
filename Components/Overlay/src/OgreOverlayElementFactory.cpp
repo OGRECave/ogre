@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     //-----------------------------------------------------------------------
     const String& PanelOverlayElementFactory::getTypeName(void) const
     {
@@ -48,4 +50,5 @@ namespace Ogre
         static String name = "TextArea";
         return name;
     }
+}
 }

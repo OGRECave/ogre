@@ -36,11 +36,14 @@ namespace Ogre
     // forward decls
     class Font;
     class FontManager;
-    class Overlay;
-    class OverlayContainer;
-    class OverlayElement;
-    class OverlayElementFactory;
-    class OverlayManager;
+    namespace v1
+    {
+        class Overlay;
+        class OverlayContainer;
+        class OverlayElement;
+        class OverlayElementFactory;
+        class OverlayManager;
+    }
 
     typedef SharedPtr<Font> FontPtr;
 }

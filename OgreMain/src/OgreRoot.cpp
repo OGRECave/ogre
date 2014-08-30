@@ -124,7 +124,7 @@ namespace Ogre {
       , mFrameSmoothingTime(0.0f)
       , mRemoveQueueStructuresOnClear(false)
       , mDefaultMinPixelSize(0)
-      , mFreqUpdatedBuffersUploadOption(HardwareBuffer::HBU_DEFAULT)
+      , mFreqUpdatedBuffersUploadOption(v1::HardwareBuffer::HBU_DEFAULT)
       , mNextMovableObjectTypeFlag(1)
       , mIsInitialised(false)
       , mIsBlendIndicesGpuRedundant(true)
@@ -195,10 +195,10 @@ namespace Ogre {
         mMaterialManager = OGRE_NEW MaterialManager();
 
         // Mesh manager
-        mMeshManager = OGRE_NEW MeshManager();
+        mMeshManager = OGRE_NEW v1::MeshManager();
 
         // Skeleton manager
-        mOldSkeletonManager = OGRE_NEW OldSkeletonManager();
+        mOldSkeletonManager = OGRE_NEW v1::OldSkeletonManager();
         mSkeletonManager    = OGRE_NEW SkeletonManager();
 
         // ..particle system manager
@@ -257,17 +257,17 @@ namespace Ogre {
         mAutoWindow = 0;
 
         // instantiate and register base movable factories
-        mEntityFactory = OGRE_NEW EntityFactory();
+        mEntityFactory = OGRE_NEW v1::EntityFactory();
         addMovableObjectFactory(mEntityFactory);
         mLightFactory = OGRE_NEW LightFactory();
         addMovableObjectFactory(mLightFactory);
-        mBillboardSetFactory = OGRE_NEW BillboardSetFactory();
+        mBillboardSetFactory = OGRE_NEW v1::BillboardSetFactory();
         addMovableObjectFactory(mBillboardSetFactory);
-        mManualObjectFactory = OGRE_NEW ManualObjectFactory();
+        mManualObjectFactory = OGRE_NEW v1::ManualObjectFactory();
         addMovableObjectFactory(mManualObjectFactory);
-        mBillboardChainFactory = OGRE_NEW BillboardChainFactory();
+        mBillboardChainFactory = OGRE_NEW v1::BillboardChainFactory();
         addMovableObjectFactory(mBillboardChainFactory);
-        mRibbonTrailFactory = OGRE_NEW RibbonTrailFactory();
+        mRibbonTrailFactory = OGRE_NEW v1::RibbonTrailFactory();
         addMovableObjectFactory(mRibbonTrailFactory);
 
         // Load plugins
@@ -813,9 +813,9 @@ namespace Ogre {
         return &TextureManager::getSingleton();
     }
     //-----------------------------------------------------------------------
-    MeshManager* Root::getMeshManager(void)
+    v1::MeshManager* Root::getMeshManager(void)
     {
-        return &MeshManager::getSingleton();
+        return &v1::MeshManager::getSingleton();
     }
     //-----------------------------------------------------------------------
     void Root::addFrameListener(FrameListener* newListener)
@@ -888,8 +888,8 @@ namespace Ogre {
         }
 
         // Tell buffer manager to free temp buffers used this frame
-        if (HardwareBufferManager::getSingletonPtr())
-            HardwareBufferManager::getSingleton()._releaseBufferCopies();
+        if (v1::HardwareBufferManager::getSingletonPtr())
+            v1::HardwareBufferManager::getSingleton()._releaseBufferCopies();
 
         // Tell the queue to process responses
         mWorkQueue->processResponses();
@@ -1468,7 +1468,7 @@ namespace Ogre {
             // Init particle systems manager
             mParticleManager->_initialise();
             // Init mesh manager
-            MeshManager::getSingleton()._initialise();
+            v1::MeshManager::getSingleton()._initialise();
             // Init plugins - after window creation so rsys resources available
             initialisePlugins();
             mFirstTimePostWindowInit = true;

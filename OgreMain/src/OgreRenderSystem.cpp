@@ -702,8 +702,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::convertColourValue(const ColourValue& colour, uint32* pDest)
     {
-        *pDest = VertexElement::convertColourValue(colour, getColourVertexElementType());
-
+        *pDest = v1::VertexElement::convertColourValue(colour, getColourVertexElementType());
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_setWorldMatrices(const Matrix4* m, unsigned short count)
@@ -715,7 +714,7 @@ namespace Ogre {
         _setWorldMatrix(Matrix4::IDENTITY);
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::_render(const RenderOperation& op)
+    void RenderSystem::_render(const v1::RenderOperation& op)
     {
         // Update stats
         size_t val;
@@ -735,48 +734,48 @@ namespace Ogre {
 
         switch(op.operationType)
         {
-        case RenderOperation::OT_TRIANGLE_LIST:
+        case v1::RenderOperation::OT_TRIANGLE_LIST:
             mFaceCount += (val / 3);
             break;
-        case RenderOperation::OT_TRIANGLE_STRIP:
-        case RenderOperation::OT_TRIANGLE_FAN:
+        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+        case v1::RenderOperation::OT_TRIANGLE_FAN:
             mFaceCount += (val - 2);
             break;
-        case RenderOperation::OT_POINT_LIST:
-        case RenderOperation::OT_LINE_LIST:
-        case RenderOperation::OT_LINE_STRIP:
-        case RenderOperation::OT_PATCH_1_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_2_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_3_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_4_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_5_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_6_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_7_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_8_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_9_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_10_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_11_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_12_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_13_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_14_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_15_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_16_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_17_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_18_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_19_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_20_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_21_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_22_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_23_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_24_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_25_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_26_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_27_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_28_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_29_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_30_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_31_CONTROL_POINT:
-        case RenderOperation::OT_PATCH_32_CONTROL_POINT:
+        case v1::RenderOperation::OT_POINT_LIST:
+        case v1::RenderOperation::OT_LINE_LIST:
+        case v1::RenderOperation::OT_LINE_STRIP:
+        case v1::RenderOperation::OT_PATCH_1_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_2_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_3_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_4_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_5_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_6_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_7_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_8_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_9_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_10_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_11_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_12_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_13_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_14_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_15_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_16_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_17_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_18_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_19_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_20_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_21_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_22_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_23_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_24_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_25_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_26_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_27_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_28_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_29_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_30_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_31_CONTROL_POINT:
+        case v1::RenderOperation::OT_PATCH_32_CONTROL_POINT:
             break;
         }
 
@@ -799,6 +798,7 @@ namespace Ogre {
         mVertexCount    += vao->mVertexBuffers[0]->getNumElements();
         ++mBatchCount;
     }
+    //-----------------------------------------------------------------------
     void RenderSystem::_renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot)
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
@@ -1035,12 +1035,12 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    Ogre::HardwareVertexBufferSharedPtr RenderSystem::getGlobalInstanceVertexBuffer() const
+    Ogre::v1::HardwareVertexBufferSharedPtr RenderSystem::getGlobalInstanceVertexBuffer() const
     {
         return mGlobalInstanceVertexBuffer;
     }
     //---------------------------------------------------------------------
-    void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr &val )
+    void RenderSystem::setGlobalInstanceVertexBuffer( const v1::HardwareVertexBufferSharedPtr &val )
     {
         if ( !val.isNull() && !val->getIsInstanceData() )
         {
@@ -1061,12 +1061,12 @@ namespace Ogre {
         mGlobalNumberOfInstances = val;
     }
 
-    VertexDeclaration* RenderSystem::getGlobalInstanceVertexBufferVertexDeclaration() const
+    v1::VertexDeclaration* RenderSystem::getGlobalInstanceVertexBufferVertexDeclaration() const
     {
         return mGlobalInstanceVertexBufferVertexDeclaration;
     }
     //---------------------------------------------------------------------
-    void RenderSystem::setGlobalInstanceVertexBufferVertexDeclaration( VertexDeclaration* val )
+    void RenderSystem::setGlobalInstanceVertexBufferVertexDeclaration( v1::VertexDeclaration* val )
     {
         mGlobalInstanceVertexBufferVertexDeclaration = val;
     }

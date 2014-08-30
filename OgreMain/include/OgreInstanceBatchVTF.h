@@ -33,6 +33,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     /** \addtogroup Core
     *  @{
     */
@@ -220,6 +222,7 @@ namespace Ogre
         /** @see InstanceBatch::calculateMaxNumInstances */
         size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
     };
+}
 }
 
 #endif

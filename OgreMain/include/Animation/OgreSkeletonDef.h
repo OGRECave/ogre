@@ -104,7 +104,7 @@ namespace Ogre
         @remarks
             If the framerate information has been lost, set it to 1.
         */
-        SkeletonDef( const Skeleton *originalSkeleton, Real frameRate );
+        SkeletonDef( const v1::Skeleton *originalSkeleton, Real frameRate );
 
         const String& getName(void) const                               { return mName; }
 

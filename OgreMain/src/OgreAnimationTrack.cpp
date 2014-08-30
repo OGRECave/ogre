@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 
 namespace Ogre {
+namespace v1 {
 
     namespace {
         // Locally key frame search helper
@@ -1424,6 +1425,6 @@ namespace Ogre {
         
     }
     
-
+}
 }
 

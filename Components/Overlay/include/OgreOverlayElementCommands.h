@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreStringInterface.h"
 
 namespace Ogre  {
-
+namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -115,6 +115,7 @@ namespace Ogre  {
     }
     /** @} */
     /** @} */
+}
 }
 
 #endif

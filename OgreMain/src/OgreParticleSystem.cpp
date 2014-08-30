@@ -1110,7 +1110,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void ParticleSystem::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+    void ParticleSystem::setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority)
     {
         MovableObject::setRenderQueueGroupAndPriority(queueID, priority);
         if (mRenderer)

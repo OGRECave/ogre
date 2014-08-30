@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHardwareCounterBuffer.h"
 
 namespace Ogre {
+namespace v1 {
 
     /// Specialisation of HardwareCounterBuffer for OpenGL
     class _OgreGL3PlusExport GL3PlusHardwareCounterBuffer : public HardwareCounterBuffer
@@ -65,5 +66,6 @@ namespace Ogre {
             void setGLBufferBinding(GLint binding);
             inline GLint getGLBufferBinding(void) const { return mBinding; }
     };
+}
 }
 #endif // __GL3PlusHARDWARECounterBUFFER_H__

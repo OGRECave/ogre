@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include <map>
 
 namespace Ogre {
-
+namespace v1 {
     
     //---------------------------------------------------------------------
     XMLSkeletonSerializer::XMLSkeletonSerializer()
@@ -672,5 +672,5 @@ namespace Ogre {
         }
     }
 }
-
+}
 

@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreSharedPtr.h"
 
 namespace Ogre {
+namespace v1 {
+
     class HardwareBufferManagerBase;
 
     /** \addtogroup Core
@@ -88,6 +90,7 @@ namespace Ogre {
 
     /** @} */
     /** @} */
+}
 }
 #endif
 

@@ -49,7 +49,7 @@ namespace Ogre {
 
         void createRenderTexture();
         /// @copydoc Texture::getBuffer
-        HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
+        v1::HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
         // Takes the OGRE texture type (1d/2d/3d/cube) and returns the appropriate GL one
         GLenum getGL3PlusTextureTarget(void) const;
@@ -137,7 +137,7 @@ namespace Ogre {
         GL3PlusSupport& mGLSupport;
 
         /// Vector of pointers to subsurfaces
-        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
+        typedef vector<v1::HardwarePixelBufferSharedPtr>::type SurfaceList;
         SurfaceList mSurfaceList;
     };
 }

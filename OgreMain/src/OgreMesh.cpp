@@ -51,6 +51,7 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonManager.h"
 
 namespace Ogre {
+namespace v1 {
     //-----------------------------------------------------------------------
     Mesh::Mesh(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
@@ -306,7 +307,27 @@ namespace Ogre {
         // Removes reference to skeleton
         setSkeletonName(BLANKSTRING);
     }
+    //-----------------------------------------------------------------------
+    void Mesh::arrangeEfficientFor( bool oldInterface, bool halfPos, bool halfTexCoords )
+    {
+        /*if( sharedVertexData )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Meshes with shared verex data are not supported in the interface." );
+        }
+        SubMeshList::const_iterator itor = mSubMeshList.begin();
+        SubMeshList::const_iterator end  = mSubMeshList.end();
 
+        while( itor != end )
+        {
+            if( oldInterface )
+                (*itor)->arrangeEfficientForOldInterface( halfPos, halfTexCoords );
+            else
+                (*itor)->arrangeEfficientForItems( halfPos, halfTexCoords );
+
+            ++itor;
+        }*/
+    }
     //-----------------------------------------------------------------------
     MeshPtr Mesh::clone(const String& newName, const String& newGroup)
     {
@@ -2470,5 +2491,12 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
+    void Mesh::createAzdoBuffers(void)
+    {
+        //mSubMeshList.begin();
+    }
+
+    //---------------------------------------------------------------------
+}
 }
 

@@ -72,10 +72,10 @@ namespace Ogre {
     typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
     typedef vector<GLAtomicCounterReference>::type GLAtomicCounterReferenceList;
     typedef GLAtomicCounterReferenceList::iterator GLAtomicCounterReferenceIterator;
-    typedef vector<HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
+    typedef vector<v1::HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
     typedef GLUniformBufferList::iterator GLUniformBufferIterator;
-    typedef map<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr>::type SharedParamsBufferMap;
-    typedef vector<HardwareCounterBufferSharedPtr>::type GLCounterBufferList;
+    typedef map<GpuSharedParametersPtr, v1::HardwareUniformBufferSharedPtr>::type SharedParamsBufferMap;
+    typedef vector<v1::HardwareCounterBufferSharedPtr>::type GLCounterBufferList;
     typedef GLCounterBufferList::iterator GLCounterBufferIterator;
 
     /** C++ encapsulation of GLSL program object.

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
+namespace v1 {
 
     //-----------------------------------------------------------------------
     PatchMesh::PatchMesh(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -66,10 +67,10 @@ namespace Ogre {
                            PatchSurface::VisibleSide visibleSide)
     {
         mSurface.defineSurface(controlPointBuffer, mDeclaration, width, height, PatchSurface::PST_BEZIER, uMaxSubdivisionLevel, vMaxSubdivisionLevel, visibleSide);
-        Ogre::SubMesh* sm = this->getSubMesh(0);
-        Ogre::VertexData* vertex_data = sm->useSharedVertices ? this->sharedVertexData : sm->vertexData;
-        const Ogre::VertexElement* posElem = vertex_data->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
-        Ogre::HardwareVertexBufferSharedPtr vbuf = vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
+        SubMesh* sm = this->getSubMesh(0);
+        VertexData* vertex_data = sm->useSharedVertices ? this->sharedVertexData : sm->vertexData;
+        const VertexElement* posElem = vertex_data->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
+        HardwareVertexBufferSharedPtr vbuf = vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
 
         // Build patch with new control points
         mSurface.build(vbuf, 0, sm->indexData->indexBuffer, 0);
@@ -119,6 +120,6 @@ namespace Ogre {
         this->_setBoundingSphereRadius(mSurface.getBoundingSphereRadius());
 
     }
-
+}
 }
 

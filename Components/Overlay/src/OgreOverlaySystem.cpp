@@ -35,15 +35,16 @@ THE SOFTWARE.
 #include "OgreFontManager.h"
 
 namespace Ogre {
+namespace v1 {
     //---------------------------------------------------------------------
     OverlaySystem::OverlaySystem()
     {
-        mOverlayManager = OGRE_NEW Ogre::OverlayManager();
-        mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::PanelOverlayElementFactory());
+        mOverlayManager = OGRE_NEW OverlayManager();
+        mOverlayManager->addOverlayElementFactory(OGRE_NEW PanelOverlayElementFactory());
 
-        mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::BorderPanelOverlayElementFactory());
+        mOverlayManager->addOverlayElementFactory(OGRE_NEW BorderPanelOverlayElementFactory());
 
-        mOverlayManager->addOverlayElementFactory(OGRE_NEW Ogre::TextAreaOverlayElementFactory());
+        mOverlayManager->addOverlayElementFactory(OGRE_NEW TextAreaOverlayElementFactory());
 
         mFontManager = OGRE_NEW FontManager();
 #if OGRE_PROFILING
@@ -86,4 +87,5 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
+}
 }

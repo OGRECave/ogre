@@ -32,7 +32,7 @@
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 
 namespace Ogre {
-
+namespace v1 {
     /** Texture surface.
      */
     class _OgreGL3PlusExport GL3PlusTextureBuffer: public GL3PlusHardwarePixelBuffer
@@ -89,6 +89,7 @@ namespace Ogre {
         SliceTRT mSliceTRT;
     };
 
+}
 }
 
 #endif

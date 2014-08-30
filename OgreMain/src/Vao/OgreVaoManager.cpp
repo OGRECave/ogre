@@ -72,7 +72,7 @@ namespace Ogre
 
         while( itor != end )
         {
-            bytesPerVertex += VertexElement::getTypeSize( itor->mType );
+            bytesPerVertex += v1::VertexElement::getTypeSize( itor->mType );
             ++itor;
         }
 
@@ -149,7 +149,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
-                                                            RenderOperation::OperationType opType )
+                                                            v1::RenderOperation::OperationType opType )
     {
         if( vertexBuffers.size() > 1 )
         {

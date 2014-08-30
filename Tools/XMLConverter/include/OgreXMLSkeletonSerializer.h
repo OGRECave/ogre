@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+namespace v1 {
     /** Class for serializing a Skeleton to/from XML.
     @remarks
         This class behaves the same way as SkeletonSerializer in the main project,
@@ -87,6 +87,6 @@ namespace Ogre {
 
 
 }
-
+}
 #endif
 

@@ -328,13 +328,13 @@ LogManager* logMgr = 0;
 Math* mth = 0;
 LodStrategyManager *lodMgr = 0;
 MaterialManager* matMgr = 0;
-OldSkeletonManager* skelMgr = 0;
-MeshSerializer* meshSerializer = 0;
-XMLMeshSerializer* xmlMeshSerializer = 0;
-SkeletonSerializer* skeletonSerializer = 0;
-XMLSkeletonSerializer* xmlSkeletonSerializer = 0;
-DefaultHardwareBufferManager *bufferManager = 0;
-MeshManager* meshMgr = 0;
+v1::OldSkeletonManager* skelMgr = 0;
+v1::MeshSerializer* meshSerializer = 0;
+v1::XMLMeshSerializer* xmlMeshSerializer = 0;
+v1::SkeletonSerializer* skeletonSerializer = 0;
+v1::XMLSkeletonSerializer* xmlSkeletonSerializer = 0;
+v1::DefaultHardwareBufferManager *bufferManager = 0;
+v1::MeshManager* meshMgr = 0;
 ResourceGroupManager* rgm = 0;
 
 
@@ -352,7 +352,7 @@ void meshToXML(XmlOptions opts)
     // pass false for freeOnClose to FileStreamDataStream since ifs is created on stack
     DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));
 
-    MeshPtr mesh = MeshManager::getSingleton().create("conversion", 
+    v1::MeshPtr mesh = v1::MeshManager::getSingleton().create("conversion",
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
     
 
@@ -361,7 +361,7 @@ void meshToXML(XmlOptions opts)
     xmlMeshSerializer->exportMesh(mesh.getPointer(), opts.dest);
 
     // Clean up the conversion mesh
-    MeshManager::getSingleton().remove("conversion");
+    v1::MeshManager::getSingleton().remove("conversion");
 }
 
 void XMLToBinary(XmlOptions opts)
@@ -380,7 +380,7 @@ void XMLToBinary(XmlOptions opts)
     if (!stricmp(root->Value(), "mesh"))
     {
         delete doc;
-        MeshPtr newMesh = MeshManager::getSingleton().createManual("conversion", 
+        v1::MeshPtr newMesh = v1::MeshManager::getSingleton().createManual("conversion",
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         VertexElementType colourElementType;
         if (opts.d3d)
@@ -400,37 +400,37 @@ void XMLToBinary(XmlOptions opts)
             if (newMesh->sharedVertexData)
             {
                 // Automatic
-                VertexDeclaration* newDcl = 
+                v1::VertexDeclaration* newDcl =
                     newMesh->sharedVertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                         newMesh->hasSkeleton(), newMesh->hasVertexAnimation(), newMesh->getSharedVertexDataAnimationIncludesNormals());
                 if (*newDcl != *(newMesh->sharedVertexData->vertexDeclaration))
                 {
                     // Usages don't matter here since we're onlly exporting
-                    BufferUsageList bufferUsages;
+                    v1::BufferUsageList bufferUsages;
                     for (size_t u = 0; u <= newDcl->getMaxSource(); ++u)
-                        bufferUsages.push_back(HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                        bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                     newMesh->sharedVertexData->reorganiseBuffers(newDcl, bufferUsages);
                 }
             }
             // Dedicated geometry
-            Mesh::SubMeshIterator smIt = newMesh->getSubMeshIterator();
+            v1::Mesh::SubMeshIterator smIt = newMesh->getSubMeshIterator();
             while (smIt.hasMoreElements())
             {
-                SubMesh* sm = smIt.getNext();
+                v1::SubMesh* sm = smIt.getNext();
                 if (!sm->useSharedVertices)
                 {
-                    const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
+                    const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::v1::VAT_NONE;
 
                     // Automatic
-                    VertexDeclaration* newDcl = 
+                    v1::VertexDeclaration* newDcl =
                         sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                             newMesh->hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals());
                     if (*newDcl != *(sm->vertexData->vertexDeclaration))
                     {
                         // Usages don't matter here since we're onlly exporting
-                        BufferUsageList bufferUsages;
+                        v1::BufferUsageList bufferUsages;
                         for (size_t u = 0; u <= newDcl->getMaxSource(); ++u)
-                            bufferUsages.push_back(HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                            bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                         sm->vertexData->reorganiseBuffers(newDcl, bufferUsages);
                     }
                 }
@@ -445,10 +445,10 @@ void XMLToBinary(XmlOptions opts)
 
         if (opts.nuextremityPoints)
         {
-            Mesh::SubMeshIterator smIt = newMesh->getSubMeshIterator();
+            v1::Mesh::SubMeshIterator smIt = newMesh->getSubMeshIterator();
             while (smIt.hasMoreElements())
             {
-                SubMesh* sm = smIt.getNext();
+                v1::SubMesh* sm = smIt.getNext();
                 sm->generateExtremes (opts.nuextremityPoints);
             }
         }
@@ -456,22 +456,22 @@ void XMLToBinary(XmlOptions opts)
         meshSerializer->exportMesh(newMesh.getPointer(), opts.dest, opts.endian);
 
         // Clean up the conversion mesh
-        MeshManager::getSingleton().remove("conversion");
+        v1::MeshManager::getSingleton().remove("conversion");
     }
     else if (!stricmp(root->Value(), "skeleton"))
     {
         delete doc;
-        SkeletonPtr newSkel = OldSkeletonManager::getSingleton().create("conversion", 
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        v1::SkeletonPtr newSkel = v1::OldSkeletonManager::getSingleton().create("conversion",
+                                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         xmlSkeletonSerializer->importSkeleton(opts.source, newSkel.getPointer());
         if (opts.optimiseAnimations)
         {
             newSkel->optimiseAllAnimations();
         }
-        skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
+        skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, v1::SKELETON_VERSION_LATEST, opts.endian);
 
         // Clean up the conversion skeleton
-        OldSkeletonManager::getSingleton().remove("conversion");
+        v1::OldSkeletonManager::getSingleton().remove("conversion");
     }
     else
     {
@@ -491,8 +491,8 @@ void skeletonToXML(XmlOptions opts)
         exit(1);
     }
 
-    SkeletonPtr skel = OldSkeletonManager::getSingleton().create("conversion", 
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    v1::SkeletonPtr skel = v1::OldSkeletonManager::getSingleton().create("conversion",
+                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
     // pass false for freeOnClose to FileStreamDataStream since ifs is created locally on stack
     DataStreamPtr stream(new FileStreamDataStream(opts.source, &ifs, false));
@@ -501,7 +501,7 @@ void skeletonToXML(XmlOptions opts)
     xmlSkeletonSerializer->exportSkeleton(skel.getPointer(), opts.dest);
 
     // Clean up the conversion skeleton
-    OldSkeletonManager::getSingleton().remove("conversion");
+    v1::OldSkeletonManager::getSingleton().remove("conversion");
 }
 
 int main(int numargs, char** args)
@@ -531,15 +531,15 @@ int main(int numargs, char** args)
         rgm = new ResourceGroupManager();
         mth = new Math();
         lodMgr = new LodStrategyManager();
-        meshMgr = new MeshManager();
+        meshMgr = new v1::MeshManager();
         matMgr = new MaterialManager();
         matMgr->initialise();
-        skelMgr = new OldSkeletonManager();
-        meshSerializer = new MeshSerializer();
-        xmlMeshSerializer = new XMLMeshSerializer();
-        skeletonSerializer = new SkeletonSerializer();
-        xmlSkeletonSerializer = new XMLSkeletonSerializer();
-        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
+        skelMgr = new v1::OldSkeletonManager();
+        meshSerializer = new v1::MeshSerializer();
+        xmlMeshSerializer = new v1::XMLMeshSerializer();
+        skeletonSerializer = new v1::SkeletonSerializer();
+        xmlSkeletonSerializer = new v1::XMLSkeletonSerializer();
+        bufferManager = new v1::DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
 
 
 

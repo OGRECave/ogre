@@ -32,7 +32,8 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-  
+namespace v1
+{
     //-----------------------------------------------------------------------------    
     HardwarePixelBuffer::HardwarePixelBuffer(uint32 width, uint32 height, uint32 depth,
             PixelFormat format, bool hwGamma,
@@ -193,4 +194,5 @@ namespace Ogre
     {
     }
 
+}
 }

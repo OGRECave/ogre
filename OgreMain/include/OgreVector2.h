@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-
     /** \addtogroup Core
     *  @{
     */
@@ -600,6 +599,5 @@ namespace Ogre
     };
     /** @} */
     /** @} */
-
 }
 #endif

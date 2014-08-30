@@ -100,7 +100,7 @@ struct UpgradeOptions {
     bool usePercent;
     Serializer::Endian endian;
     bool recalcBounds;
-    MeshVersion targetVersion;
+    v1::MeshVersion targetVersion;
 
 };
 
@@ -112,12 +112,12 @@ LogManager* logMgr = 0;
 Math* mth = 0;
 LodStrategyManager* lodMgr = 0;
 MaterialManager* matMgr = 0;
-OldSkeletonManager* skelMgr = 0;
-MeshSerializer* meshSerializer = 0;
-SkeletonSerializer* skeletonSerializer = 0;
-DefaultHardwareBufferManager *bufferManager = 0;
+v1::OldSkeletonManager* skelMgr = 0;
+v1::MeshSerializer* meshSerializer = 0;
+v1::SkeletonSerializer* skeletonSerializer = 0;
+v1::DefaultHardwareBufferManager *bufferManager = 0;
 ResourceGroupManager* rgm = 0;
-MeshManager* meshMgr = 0;
+v1::MeshManager* meshMgr = 0;
 UpgradeOptions opts;
 
 void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
@@ -141,7 +141,7 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.numLods = 0;
     opts.usePercent = true;
     opts.recalcBounds = false;
-    opts.targetVersion = MESH_VERSION_LATEST;
+    opts.targetVersion = v1::MESH_VERSION_LATEST;
 
 
     UnaryOptionList::iterator ui = unOpts.find("-e");
@@ -237,15 +237,15 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     bi = binOpts.find("-V");
     if (!bi->second.empty()) {
         if (bi->second == "1.10") {
-            opts.targetVersion = MESH_VERSION_1_10;
+            opts.targetVersion = v1::MESH_VERSION_1_10;
         } else if (bi->second == "1.8") {
-            opts.targetVersion = MESH_VERSION_1_8;
+            opts.targetVersion = v1::MESH_VERSION_1_8;
         } else if (bi->second == "1.7") {
-            opts.targetVersion = MESH_VERSION_1_7;
+            opts.targetVersion = v1::MESH_VERSION_1_7;
         } else if (bi->second == "1.4") {
-            opts.targetVersion = MESH_VERSION_1_4;
+            opts.targetVersion = v1::MESH_VERSION_1_4;
         } else if (bi->second == "1.0") {
-            opts.targetVersion = MESH_VERSION_1_0;
+            opts.targetVersion = v1::MESH_VERSION_1_0;
         } else {
             logMgr->stream() << "Unrecognised target mesh version '" << bi->second << "'";          
     }
@@ -285,12 +285,12 @@ String describeSemantic(VertexElementSemantic sem)
     }
     return "";
 }
-void displayVertexBuffers(VertexDeclaration::VertexElementList& elemList)
+void displayVertexBuffers(v1::VertexDeclaration::VertexElementList& elemList)
 {
     // Iterate per buffer
     unsigned short currentBuffer = 999;
     unsigned short elemNum = 0;
-    VertexDeclaration::VertexElementList::iterator i, iend;
+    v1::VertexDeclaration::VertexElementList::iterator i, iend;
     iend = elemList.end();
     for (i = elemList.begin(); i != iend; ++i) {
         if (i->getSource() != currentBuffer) {
@@ -306,7 +306,7 @@ void displayVertexBuffers(VertexDeclaration::VertexElementList& elemList)
     }
 }
 // Sort routine for VertexElement
-bool vertexElementLess(const VertexElement& e1, const VertexElement& e2)
+bool vertexElementLess(const v1::VertexElement& e1, const v1::VertexElement& e2)
 {
     // Sort by source first
     if (e1.getSource() < e2.getSource()) {
@@ -324,24 +324,24 @@ bool vertexElementLess(const VertexElement& e1, const VertexElement& e2)
     }
     return false;
 }
-void copyElems(VertexDeclaration* decl, VertexDeclaration::VertexElementList* elemList)
+void copyElems(v1::VertexDeclaration* decl, v1::VertexDeclaration::VertexElementList* elemList)
 {
     
     elemList->clear();
-    const VertexDeclaration::VertexElementList& origElems = decl->getElements();
-    VertexDeclaration::VertexElementList::const_iterator i, iend;
+    const v1::VertexDeclaration::VertexElementList& origElems = decl->getElements();
+    v1::VertexDeclaration::VertexElementList::const_iterator i, iend;
     iend = origElems.end();
     for (i = origElems.begin(); i != iend; ++i) {
         elemList->push_back(*i);
     }
-    elemList->sort(VertexDeclaration::vertexElementLess);
+    elemList->sort(v1::VertexDeclaration::vertexElementLess);
 }
 // Utility function to allow the user to modify the layout of vertex buffers.
-void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, VertexData* vertexData)
+void reorganiseVertexBuffers(const String& desc, v1::Mesh& mesh, v1::SubMesh* sm, v1::VertexData* vertexData)
 {
     cout << endl << desc << ":- " << endl;
     // Copy elements into a list
-    VertexDeclaration::VertexElementList elemList;
+    v1::VertexDeclaration::VertexElementList elemList;
     copyElems(vertexData->vertexDeclaration, &elemList);
 
     bool finish = false;
@@ -366,7 +366,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                 cin >> moveResp;
                 if (!moveResp.empty()) {
                     int eindex = StringConverter::parseInt(moveResp);
-                    VertexDeclaration::VertexElementList::iterator movei = elemList.begin();
+                    v1::VertexDeclaration::VertexElementList::iterator movei = elemList.begin();
                     std::advance(movei, eindex);
                     cout << endl << "Move element " << eindex << "(" + describeSemantic(movei->getSemantic()) <<
                     ") to which buffer: ";
@@ -374,8 +374,8 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                     if (!moveResp.empty()) {
                         int bindex = StringConverter::parseInt(moveResp);
                         // Move (note offset will be wrong)
-                        *movei = VertexElement(bindex, 0, movei->getType(),
-                            movei->getSemantic(), movei->getIndex());
+                        *movei = v1::VertexElement(bindex, 0, movei->getType(),
+                                                   movei->getSemantic(), movei->getIndex());
                         elemList.sort(vertexElementLess);
                         anyChanges = true;
                                 
@@ -383,12 +383,12 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                 }
             } else if (response == "a") {
                 // Automatic
-                VertexDeclaration* newDcl = 
+                v1::VertexDeclaration* newDcl =
                     vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                         mesh.hasSkeleton(), mesh.hasVertexAnimation(), 
                         sm ? sm->getVertexAnimationIncludesNormals() : mesh.getSharedVertexDataAnimationIncludesNormals());
                 copyElems(newDcl, &elemList);
-                HardwareBufferManager::getSingleton().destroyVertexDeclaration(newDcl);
+                v1::HardwareBufferManager::getSingleton().destroyVertexDeclaration(newDcl);
                 anyChanges = true;
 
             } else if (response == "d") {
@@ -397,7 +397,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                 cin >> moveResp;
                 if (!moveResp.empty()) {
                     int eindex = StringConverter::parseInt(moveResp);
-                    VertexDeclaration::VertexElementList::iterator movei = elemList.begin();
+                    v1::VertexDeclaration::VertexElementList::iterator movei = elemList.begin();
                     std::advance(movei, eindex);
                     cout << std::endl << "Delete element " << eindex << "(" + describeSemantic(movei->getSemantic()) << ")?: ";
                     cin >> moveResp;
@@ -430,8 +430,8 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
             cin >> response;
             StringUtil::toLowerCase(response);
             if (response == "y") {
-                VertexDeclaration* newDecl = HardwareBufferManager::getSingleton().createVertexDeclaration();
-                VertexDeclaration::VertexElementList::iterator i, iend;
+                v1::VertexDeclaration* newDecl = v1::HardwareBufferManager::getSingleton().createVertexDeclaration();
+                v1::VertexDeclaration::VertexElementList::iterator i, iend;
                 iend = elemList.end();
                 unsigned short currentBuffer = 999;
                 size_t offset = 0;
@@ -448,13 +448,13 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
                         i->getSemantic(),
                         i->getIndex());
 
-                    offset += VertexElement::getTypeSize(i->getType());
+                    offset += v1::VertexElement::getTypeSize(i->getType());
                     
                 }
                 // Usages don't matter here since we're onlly exporting
-                BufferUsageList bufferUsages;
+                v1::BufferUsageList bufferUsages;
                 for (size_t u = 0; u <= newDecl->getMaxSource(); ++u) {
-                    bufferUsages.push_back(HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                    bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                 }
                 vertexData->reorganiseBuffers(newDecl, bufferUsages);
             } else if (response == "n") {
@@ -470,7 +470,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
 
 }
 // Utility function to allow the user to modify the layout of vertex buffers.
-void reorganiseVertexBuffers(Mesh& mesh)
+void reorganiseVertexBuffers(v1::Mesh& mesh)
 {
     // Make sure animation types up to date
     mesh._determineAnimationTypes();
@@ -480,14 +480,14 @@ void reorganiseVertexBuffers(Mesh& mesh)
             reorganiseVertexBuffers("Shared Geometry", mesh, 0, mesh.sharedVertexData);
         } else {
             // Automatic
-            VertexDeclaration* newDcl = 
+            v1::VertexDeclaration* newDcl =
                 mesh.sharedVertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                 mesh.hasSkeleton(), mesh.hasVertexAnimation(), mesh.getSharedVertexDataAnimationIncludesNormals());
             if (*newDcl != *(mesh.sharedVertexData->vertexDeclaration)) {
                 // Usages don't matter here since we're onlly exporting
-                BufferUsageList bufferUsages;
+                v1::BufferUsageList bufferUsages;
                 for (size_t u = 0; u <= newDcl->getMaxSource(); ++u) {
-                    bufferUsages.push_back(HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                    bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                 }
                 mesh.sharedVertexData->reorganiseBuffers(newDcl, bufferUsages);
             }
@@ -495,27 +495,27 @@ void reorganiseVertexBuffers(Mesh& mesh)
         }
     }
 
-    Mesh::SubMeshIterator smIt = mesh.getSubMeshIterator();
+    v1::Mesh::SubMeshIterator smIt = mesh.getSubMeshIterator();
     unsigned short idx = 0;
     while (smIt.hasMoreElements()) {
-        SubMesh* sm = smIt.getNext();
+        v1::SubMesh* sm = smIt.getNext();
         if (!sm->useSharedVertices) {
             if (opts.interactive) {
                 StringStream str;
                 str << "SubMesh " << idx++; 
                 reorganiseVertexBuffers(str.str(), mesh, sm, sm->vertexData);
             } else {
-                const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
+                const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::v1::VAT_NONE;
 
                 // Automatic
-                VertexDeclaration* newDcl = 
+                v1::VertexDeclaration* newDcl =
                     sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
                     mesh.hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals() );
                 if (*newDcl != *(sm->vertexData->vertexDeclaration)) {
                     // Usages don't matter here since we're onlly exporting
-                    BufferUsageList bufferUsages;
+                    v1::BufferUsageList bufferUsages;
                     for (size_t u = 0; u <= newDcl->getMaxSource(); ++u) {
-                        bufferUsages.push_back(HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                        bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                     }
                     sm->vertexData->reorganiseBuffers(newDcl, bufferUsages);
                 }
@@ -526,7 +526,7 @@ void reorganiseVertexBuffers(Mesh& mesh)
 }
 
 
-void vertexBufferReorg(Mesh& mesh)
+void vertexBufferReorg(v1::Mesh& mesh)
 {
     String response;
 
@@ -552,14 +552,14 @@ void vertexBufferReorg(Mesh& mesh)
 
 }
 
-void recalcBounds(const VertexData* vdata, AxisAlignedBox& aabb, Real& radius)
+void recalcBounds(const v1::VertexData* vdata, AxisAlignedBox& aabb, Real& radius)
 {
-    const VertexElement* posElem = 
+    const v1::VertexElement* posElem =
         vdata->vertexDeclaration->findElementBySemantic(VES_POSITION);
     
-    const HardwareVertexBufferSharedPtr buf = vdata->vertexBufferBinding->getBuffer(
+    const v1::HardwareVertexBufferSharedPtr buf = vdata->vertexBufferBinding->getBuffer(
         posElem->getSource());
-    void* pBase = buf->lock(HardwareBuffer::HBL_READ_ONLY);
+    void* pBase = buf->lock(v1::HardwareBuffer::HBL_READ_ONLY);
 
     for (size_t v = 0; v < vdata->vertexCount; ++v) {
         float* pFloat;
@@ -577,7 +577,7 @@ void recalcBounds(const VertexData* vdata, AxisAlignedBox& aabb, Real& radius)
 
 }
 
-void recalcBounds(Mesh* mesh)
+void recalcBounds(v1::Mesh* mesh)
 {
     AxisAlignedBox aabb;
     Real radius = 0.0f;
@@ -586,7 +586,7 @@ void recalcBounds(Mesh* mesh)
         recalcBounds(mesh->sharedVertexData, aabb, radius);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i) {
-        SubMesh* sm = mesh->getSubMesh(i);
+        v1::SubMesh* sm = mesh->getSubMesh(i);
         if (!sm->useSharedVertices) {
             recalcBounds(sm->vertexData, aabb, radius);
     }
@@ -623,7 +623,7 @@ void printLodConfig(const LodConfig& lodConfig)
         (lodLevel.manualMeshName.empty() ? "N/A" : lodLevel.manualMeshName);
     }
 }
-size_t getUniqueVertexCount(MeshPtr mesh)
+size_t getUniqueVertexCount(v1::MeshPtr mesh)
 {
 
     // The vertex buffer contains the same vertex position multiple times.
@@ -635,7 +635,7 @@ size_t getUniqueVertexCount(MeshPtr mesh)
     MeshLodGenerator().generateLodLevels(lodConfig);
     return lodConfig.levels[0].outUniqueVertexCount;
 }
-void buildLod(MeshPtr& mesh)
+void buildLod(v1::MeshPtr& mesh)
 {
     String response;
 
@@ -870,13 +870,13 @@ void buildLod(MeshPtr& mesh)
     cout << "success\n";
 }
 
-void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
+void checkColour(v1::VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
                  VertexElementType& originalType)
 {
-    const VertexDeclaration::VertexElementList& elemList = vdata->vertexDeclaration->getElements();
-    for (VertexDeclaration::VertexElementList::const_iterator i = elemList.begin();
+    const v1::VertexDeclaration::VertexElementList& elemList = vdata->vertexDeclaration->getElements();
+    for (v1::VertexDeclaration::VertexElementList::const_iterator i = elemList.begin();
          i != elemList.end(); ++i) {
-        const VertexElement& elem = *i;
+        const v1::VertexElement& elem = *i;
         switch (elem.getType()) {
         case VET_COLOUR:
             hasAmbiguousColour = true;
@@ -894,7 +894,7 @@ void checkColour(VertexData* vdata, bool& hasColour, bool& hasAmbiguousColour,
 
 }
 
-void resolveColourAmbiguities(Mesh* mesh)
+void resolveColourAmbiguities(v1::Mesh* mesh)
 {
     // Check what we're dealing with
     bool hasColour = false;
@@ -904,7 +904,7 @@ void resolveColourAmbiguities(Mesh* mesh)
         checkColour(mesh->sharedVertexData, hasColour, hasAmbiguousColour, originalType);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i) {
-        SubMesh* sm = mesh->getSubMesh(i);
+        v1::SubMesh* sm = mesh->getSubMesh(i);
         if (sm->useSharedVertices == false) {
             checkColour(sm->vertexData, hasColour, hasAmbiguousColour, originalType);
         }
@@ -970,7 +970,7 @@ void resolveColourAmbiguities(Mesh* mesh)
         mesh->sharedVertexData->convertPackedColour(originalType, desiredType);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i) {
-        SubMesh* sm = mesh->getSubMesh(i);
+        v1::SubMesh* sm = mesh->getSubMesh(i);
         if (sm->useSharedVertices == false && hasColour) {
             sm->vertexData->convertPackedColour(originalType, desiredType);
         }
@@ -996,11 +996,11 @@ int main(int numargs, char** args)
         lodMgr = new LodStrategyManager();
         matMgr = new MaterialManager();
         matMgr->initialise();
-        skelMgr = new OldSkeletonManager();
-        meshSerializer = new MeshSerializer();
-        skeletonSerializer = new SkeletonSerializer();
-        bufferManager = new DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
-        meshMgr = new MeshManager();
+        skelMgr = new v1::OldSkeletonManager();
+        meshSerializer = new v1::MeshSerializer();
+        skeletonSerializer = new v1::SkeletonSerializer();
+        bufferManager = new v1::DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
+        meshMgr = new v1::MeshManager();
         // don't pad during upgrade
         meshMgr->setBoundsPaddingFactor(0.0f);
 
@@ -1051,9 +1051,9 @@ int main(int numargs, char** args)
                 "Unexpected error while reading file " + source, "OgreMeshUpgrade");
         fclose( pFile );
 
-        MeshPtr meshPtr = MeshManager::getSingleton().createManual("conversion",
+        v1::MeshPtr meshPtr = v1::MeshManager::getSingleton().createManual("conversion",
                                                                    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        Mesh* mesh = meshPtr.get();
+        v1::Mesh* mesh = meshPtr.get();
 
         DataStreamPtr stream(memstream);
         meshSerializer->importMesh(stream, mesh);

@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+namespace v1 {
 
     const unsigned short HEADER_CHUNK_ID = 0x1000;
     //---------------------------------------------------------------------
@@ -199,7 +200,7 @@ namespace Ogre {
             mListener->processMeshCompleted(pDest);
     }
     //---------------------------------------------------------------------
-    void MeshSerializer::setListener(Ogre::MeshSerializerListener *listener)
+    void MeshSerializer::setListener( MeshSerializerListener *listener )
     {
         mListener = listener;
     }
@@ -208,5 +209,6 @@ namespace Ogre {
     {
         return mListener;
     }
+}
 }
 

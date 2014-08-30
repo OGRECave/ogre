@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 
 namespace Ogre {
+namespace v1 {
     //---------------------------------------------------------------------
     String PanelOverlayElement::msTypeName = "Panel";
     PanelOverlayElement::CmdTiling PanelOverlayElement::msCmdTiling;
@@ -427,7 +428,7 @@ namespace Ogre {
             StringConverter::parseReal(vec[3])
             );
     }
-
+}
 }
 
 

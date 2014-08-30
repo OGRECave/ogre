@@ -70,7 +70,8 @@ namespace Ogre
         return (blockIdx & 0xFF000000) | ((blockIdx & 0x00FFFFFF) * ARRAY_PACKED_REALS);
     }
     //-----------------------------------------------------------------------------------
-    void SkeletonAnimationDef::build( const Skeleton *skeleton, const Animation *animation, Real frameRate )
+    void SkeletonAnimationDef::build( const v1::Skeleton *skeleton, const v1::Animation *animation,
+                                      Real frameRate )
     {
         mOriginalFrameRate = frameRate;
         mNumFrames = animation->getLength() * frameRate;
@@ -99,10 +100,10 @@ namespace Ogre
 
         for( size_t i=0; i<skeleton->getNumBones(); ++i )
         {
-            const OldBone *bone = skeleton->getBone( i );
+            const v1::OldBone *bone = skeleton->getBone( i );
 
             size_t depthLevel = 0;
-            OldNode const *parentBone = bone;
+            v1::OldNode const *parentBone = bone;
             while( (parentBone = parentBone->getParent()) )
                 ++depthLevel;
 
@@ -126,7 +127,7 @@ namespace Ogre
         //much memory to allocate, as we don't listen for resizes.
         //We also build a list of unique keyframe timestamps per block
         //(i.e. merge the keyframes from two bones that the same block)
-		Animation::OldNodeTrackIterator itor = animation->getOldNodeTrackIterator();
+        v1::Animation::OldNodeTrackIterator itor = animation->getOldNodeTrackIterator();
         {
             //Count the number of blocks needed by counting the number of unique keyframes per block.
             //i.e. When ARRAY_PACKED_REALS = 4; if 2 bones are in the same block and have the same
@@ -138,7 +139,7 @@ namespace Ogre
             while( itor.hasMoreElements() )
             {
                 size_t boneIdx              = itor.peekNextKey();
-                OldNodeAnimationTrack *track   = itor.getNext();
+                v1::OldNodeAnimationTrack *track   = itor.getNext();
 
                 if( track->getNumKeyFrames() > 0 )
                 {
@@ -203,11 +204,11 @@ namespace Ogre
 
 					if( animation->hasOldNodeTrack( boneIdx ) )
                     {
-						OldNodeAnimationTrack *oldTrack = animation->getOldNodeTrack( boneIdx );
+                        v1::OldNodeAnimationTrack *oldTrack = animation->getOldNodeTrack( boneIdx );
 
-                        TransformKeyFrame originalKF( 0, fTime );
+                        v1::TransformKeyFrame originalKF( 0, fTime );
                         oldTrack->getInterpolatedKeyFrame( animation->_getTimeIndex( fTime ),
-                                                            &originalKF );
+                                                           &originalKF );
 
                         itKeys->mBoneTransform->mPosition.setFromVector3( originalKF.getTranslate(), i );
                         itKeys->mBoneTransform->mOrientation.setFromQuaternion( originalKF.getRotation(),

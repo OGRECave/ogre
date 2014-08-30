@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreProfiler.h"
 
 namespace Ogre  {
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -130,5 +131,6 @@ namespace Ogre  {
         /// The max number of profiles we can display
         uint mMaxDisplayProfiles;
     };
+}
 }
 #endif

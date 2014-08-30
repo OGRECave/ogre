@@ -59,7 +59,7 @@ MeshLodGenerator& MeshLodGenerator::getSingleton()
     assert(msSingleton);
     return (*msSingleton);
 }
-void MeshLodGenerator::getAutoconfig(MeshPtr& inMesh, LodConfig& outLodConfig)
+void MeshLodGenerator::getAutoconfig(v1::MeshPtr& inMesh, LodConfig& outLodConfig)
 {
     outLodConfig.mesh = inMesh;
     outLodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
@@ -91,7 +91,7 @@ void MeshLodGenerator::getAutoconfig(MeshPtr& inMesh, LodConfig& outLodConfig)
     }
 }
 
-void MeshLodGenerator::generateAutoconfiguredLodLevels(MeshPtr& mesh)
+void MeshLodGenerator::generateAutoconfiguredLodLevels(v1::MeshPtr& mesh)
 {
     LodConfig lodConfig;
     getAutoconfig(mesh, lodConfig);
@@ -102,7 +102,7 @@ void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
 {
     lodConfig.mesh->freeEdgeList();
 	lodConfig.mesh->setLodStrategyName(lodConfig.strategy->getName());
-    MeshLodUsage usage;
+    v1::MeshLodUsage usage;
     size_t n = 0;
     lodConfig.mesh->_setLodInfo(lodConfig.levels.size() + 1); // add Lod levels
     for(size_t i = 0; i < lodConfig.levels.size(); i++) {

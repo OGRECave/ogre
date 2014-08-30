@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreSubEntity.h"
 
 namespace Ogre {
+namespace v1 {
 
     Animation::InterpolationMode Animation::msDefaultInterpolationMode = Animation::IM_LINEAR;
     Animation::RotationInterpolationMode 
@@ -848,7 +849,7 @@ namespace Ogre {
         return mContainer;
     }
     
-
+}
 }
 
 

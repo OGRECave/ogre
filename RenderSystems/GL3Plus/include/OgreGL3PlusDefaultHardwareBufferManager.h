@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
+namespace v1 {
     /// Specialisation of HardwareVertexBuffer for emulation
     class _OgreGL3PlusExport GL3PlusDefaultHardwareVertexBuffer : public HardwareVertexBuffer
     {
@@ -191,5 +192,5 @@ namespace Ogre {
         }
     };
 }
-
+}
 #endif

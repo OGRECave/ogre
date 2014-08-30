@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 namespace Ogre {
+namespace v1 {
     /// stream overhead = ID + size
     const long SSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
     const uint16 HEADER_STREAM_ID_EXT = 0x1000;
@@ -682,9 +683,5 @@ namespace Ogre {
         pSkel->addLinkedSkeletonAnimationSource(skelName, scale);
 
     }
-
-
-
 }
-
-
+}

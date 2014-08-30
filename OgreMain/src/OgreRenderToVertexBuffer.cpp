@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 
 namespace Ogre {
+namespace v1 {
     //-----------------------------------------------------------------------
     RenderToVertexBuffer::RenderToVertexBuffer() :
         mOperationType(RenderOperation::OT_TRIANGLE_LIST),
@@ -66,4 +67,5 @@ namespace Ogre {
         */
         mMaterial->load();
     }
+}
 }

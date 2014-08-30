@@ -110,7 +110,7 @@ namespace Ogre {
             /// Custom geometry block, only applicable for WFT_CUSTOM_GEOMETRY
             void* geometry;
             /// General render operation structure, fallback if nothing else is available
-            RenderOperation* renderOp;
+            v1::RenderOperation* renderOp; //TODO: VertexArrayObject pointer?
             
         };
     protected:

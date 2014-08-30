@@ -40,7 +40,7 @@ namespace Ogre
 
         // Create buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
             lods.resize(1);
         }
     }
@@ -50,8 +50,8 @@ namespace Ogre
         // placeholder dummy
         unsigned short submeshCount = mMesh->getNumSubMeshes();
         for (unsigned short i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-            lods.insert(lods.begin() + lodIndex, OGRE_NEW IndexData());
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            lods.insert(lods.begin() + lodIndex, OGRE_NEW v1::IndexData());
         }
     }
 
@@ -61,9 +61,9 @@ namespace Ogre
 
         // Create buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount;
-            IndexData* curLod = OGRE_NEW IndexData();
+            v1::IndexData* curLod = OGRE_NEW v1::IndexData();
             curLod->indexStart = 0;
             lods.insert(lods.begin() + lodIndex, curLod);
             if (indexCount == 0) {
@@ -76,14 +76,14 @@ namespace Ogre
                 curLod->indexCount = indexCount;
             }
 
-            curLod->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+            curLod->indexBuffer = v1::HardwareBufferManager::getSingleton().createIndexBuffer(
                 data->mIndexBufferInfoList[i].indexSize == 2 ?
-                HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
-                curLod->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+                v1::HardwareIndexBuffer::IT_16BIT : v1::HardwareIndexBuffer::IT_32BIT,
+                curLod->indexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
 
             data->mIndexBufferInfoList[i].buf.pshort =
                 static_cast<unsigned short*>(curLod->indexBuffer->lock(0, curLod->indexBuffer->getSizeInBytes(),
-                HardwareBuffer::HBL_DISCARD));
+                v1::HardwareBuffer::HBL_DISCARD));
 
             //Check if we should fill it with a "dummy" triangle.
             if (indexCount == 0) {
@@ -112,7 +112,7 @@ namespace Ogre
 
         // Close buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
             lods[lodIndex]->indexBuffer->unlock();
         }
     }

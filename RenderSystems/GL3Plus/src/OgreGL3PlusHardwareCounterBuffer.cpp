@@ -38,7 +38,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #endif
 
 namespace Ogre {
-
+namespace v1 {
     GL3PlusHardwareCounterBuffer::GL3PlusHardwareCounterBuffer(
         HardwareBufferManagerBase* mgr, const String& name = "")
         : HardwareCounterBuffer(mgr, sizeof(GLuint), 
@@ -205,5 +205,5 @@ namespace Ogre {
         }
     }
 
-
+}
 }

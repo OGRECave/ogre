@@ -42,6 +42,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     InstanceManager::InstanceManager( IdString customName, SceneManager *sceneManager,
                                         const String &meshName, const String &groupName,
                                         InstancingTechnique instancingTechnique, uint16 instancingFlags,
@@ -653,7 +655,7 @@ namespace Ogre
         idxData->indexBuffer->unlock();
     }
     //-----------------------------------------------------------------------
-    void InstanceManager::unshareVertices(const Ogre::MeshPtr &mesh)
+    void InstanceManager::unshareVertices(const MeshPtr &mesh)
     {
         // Retrieve data to copy bone assignments
         const Mesh::VertexBoneAssignmentList& boneAssignments = mesh->getBoneAssignments();
@@ -736,4 +738,5 @@ namespace Ogre
         mesh->clearBoneAssignments();
     }
     //-----------------------------------------------------------------------
+}
 }

@@ -32,6 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRenderOperation.h"
 
 namespace Ogre {
+namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -145,6 +146,7 @@ namespace Ogre {
 
     /** @} */
     /** @} */
+}
 }
 
 #endif

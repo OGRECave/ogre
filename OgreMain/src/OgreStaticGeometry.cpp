@@ -43,7 +43,7 @@ THE SOFTWARE.
 #include "OgreEdgeListBuilder.h"
 
 namespace Ogre {
-
+namespace v1 {
     #define REGION_RANGE 1024
     #define REGION_HALF_RANGE 512
     #define REGION_MAX_INDEX 511
@@ -1466,6 +1466,6 @@ namespace Ogre {
 
     }
     //--------------------------------------------------------------------------
-
+}
 }
 

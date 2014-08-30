@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreMatrix4.h"
 
 namespace Ogre  {
-
+namespace v1 {
 
     
     /** \addtogroup Core
@@ -116,7 +116,7 @@ namespace Ogre  {
 
     /** @} */
     /** @} */
-
+}
 } //namespace
 
 

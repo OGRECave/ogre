@@ -146,7 +146,7 @@ namespace Ogre
         mNullTextureList.push_back(shadowTex);
 
         // lock & populate the texture based on format
-        shadowTex->getBuffer()->lock(HardwareBuffer::HBL_DISCARD);
+        shadowTex->getBuffer()->lock(v1::HardwareBuffer::HBL_DISCARD);
         const PixelBox& box = shadowTex->getBuffer()->getCurrentLock();
 
         // set high-values across all bytes of the format 

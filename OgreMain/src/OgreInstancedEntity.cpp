@@ -39,6 +39,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+namespace v1
+{
     InstancedEntity::InstancedEntity(IdType id, ObjectMemoryManager *objectMemoryManager,
                                         InstanceBatch *batchOwner, uint32 instanceID,
                                  #ifndef OGRE_LEGACY_ANIMATIONS
@@ -522,4 +524,5 @@ namespace Ogre
     {
         return mBatchOwner->_getCustomParam( this, idx );
     }
+}
 }

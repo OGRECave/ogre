@@ -32,6 +32,8 @@ THE SOFTWARE
 
 namespace Ogre
 {
+namespace v1
+{
     /** \addtogroup Core
     *  @{
     */
@@ -72,7 +74,7 @@ namespace Ogre
         /** See Renderable. */
         const MaterialPtr& getMaterial(void) const;
         /** See Renderable. */
-        void getRenderOperation(RenderOperation& op);
+        void getRenderOperation(v1::RenderOperation& op);
         /** Overridden from OverlayElement */
         void setMaterialName(const String& matName);
 
@@ -210,7 +212,7 @@ namespace Ogre
         bool mTransparent;
 
         /// Render operation
-        RenderOperation mRenderOp;
+        v1::RenderOperation mRenderOp;
 
         /// Method for setting up base parameters for this class
         void addBaseParameters(void);
@@ -253,6 +255,7 @@ namespace Ogre
     };
     /** @} */
     /** @} */
+}
 }
 
 #endif

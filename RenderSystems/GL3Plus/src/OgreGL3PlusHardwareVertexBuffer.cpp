@@ -32,7 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre {
-
+namespace v1 {
     GL3PlusHardwareVertexBuffer::GL3PlusHardwareVertexBuffer(
         HardwareBufferManagerBase* mgr,
         size_t vertexSize,
@@ -263,6 +263,5 @@ namespace Ogre {
             mShadowUpdated = false;
         }
     }
-
-
+}
 }

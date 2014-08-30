@@ -214,7 +214,7 @@ namespace Ogre
         virtual VertexArrayObject* createVertexArrayObjectImpl(
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
-                                                        RenderOperation::OperationType opType );
+                                                        v1::RenderOperation::OperationType opType );
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 

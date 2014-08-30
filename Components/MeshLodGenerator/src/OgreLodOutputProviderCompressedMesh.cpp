@@ -35,7 +35,7 @@
 
 namespace Ogre
 {
-    LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh( MeshPtr mesh ) :
+    LodOutputProviderCompressedMesh::LodOutputProviderCompressedMesh( v1::MeshPtr mesh ) :
         mFirstBufferPass(0), mMesh(mesh), mLastIndexBufferID(0)
     {
         fallback = new LodOutputProviderMesh(mesh);
@@ -116,13 +116,13 @@ namespace Ogre
         assert(lodIndex > mLastIndexBufferID); // Implementation limitation
         // Create buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
             lods.reserve(lods.size() + 2);
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount;
             assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].indexCount);
             assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].prevOnlyIndexCount);
             
-            IndexData* prevLod = *lods.insert(lods.begin() + mLastIndexBufferID, OGRE_NEW IndexData());
+            v1::IndexData* prevLod = *lods.insert(lods.begin() + mLastIndexBufferID, OGRE_NEW v1::IndexData());
             prevLod->indexStart = 0;
 
             //If the index is empty we need to create a "dummy" triangle, just to keep the index buffer from being empty.
@@ -132,14 +132,14 @@ namespace Ogre
             indexCount = std::max<size_t>(indexCount, 3);
             prevLod->indexCount = std::max<size_t>(data->mIndexBufferInfoList[i].prevIndexCount, 3u);
 
-            prevLod->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
+            prevLod->indexBuffer = v1::HardwareBufferManager::getSingleton().createIndexBuffer(
                 data->mIndexBufferInfoList[i].indexSize == 2 ?
-                HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
-                indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+                v1::HardwareIndexBuffer::IT_16BIT : v1::HardwareIndexBuffer::IT_32BIT,
+                indexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
 
             data->mIndexBufferInfoList[i].buf.pshort =
                 static_cast<unsigned short*>(prevLod->indexBuffer->lock(0, prevLod->indexBuffer->getSizeInBytes(),
-                HardwareBuffer::HBL_DISCARD));
+                v1::HardwareBuffer::HBL_DISCARD));
 
             //Check if we should fill it with a "dummy" triangle.
             if (indexCount == 3) {
@@ -147,7 +147,7 @@ namespace Ogre
             }
 
             // Set up the other Lod
-            IndexData* curLod = *lods.insert(lods.begin() + lodIndex, OGRE_NEW IndexData());
+            v1::IndexData* curLod = *lods.insert(lods.begin() + lodIndex, OGRE_NEW v1::IndexData());
             curLod->indexStart = indexCount - data->mIndexBufferInfoList[i].indexCount;
             curLod->indexCount = data->mIndexBufferInfoList[i].indexCount;
             if(curLod->indexCount == 0){
@@ -224,9 +224,9 @@ namespace Ogre
 
         // Close buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
-            IndexData* prevLod = lods[mLastIndexBufferID];
-            IndexData* curLod = lods[lodIndex];
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::IndexData* prevLod = lods[mLastIndexBufferID];
+            v1::IndexData* curLod = lods[lodIndex];
             prevLod->indexBuffer->unlock();
             curLod->indexBuffer = prevLod->indexBuffer;
         }

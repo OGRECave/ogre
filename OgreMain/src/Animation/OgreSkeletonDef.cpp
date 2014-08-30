@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    SkeletonDef::SkeletonDef( const Skeleton *originalSkeleton, Real frameRate ) :
+    SkeletonDef::SkeletonDef( const v1::Skeleton *originalSkeleton, Real frameRate ) :
         mNumUnusedSlots( 0 ),
         mName( originalSkeleton->getName() )
     {
@@ -49,19 +49,19 @@ namespace Ogre
 
         //Clone the bone data
         size_t numDepthLevels = 1;
-        Skeleton::ConstBoneIterator itor = originalSkeleton->getBoneIteratorConst();
+        v1::Skeleton::ConstBoneIterator itor = originalSkeleton->getBoneIteratorConst();
         while( itor.hasMoreElements() )
         {
-            OldBone *bone = itor.getNext();
+            v1::OldBone *bone = itor.getNext();
             size_t parentIndex = -1;
             if( bone->getParent() )
             {
-                assert( !bone->getParent() || dynamic_cast<OldBone*>( bone->getParent() ) );
-                OldBone *parent = static_cast<OldBone*>( bone->getParent() );
+                assert( !bone->getParent() || dynamic_cast<v1::OldBone*>( bone->getParent() ) );
+                v1::OldBone *parent = static_cast<v1::OldBone*>( bone->getParent() );
                 parentIndex = parent->getHandle();
 
                 size_t tmpDepthLevels = 2;
-                OldNode *tmpParent = parent;
+                v1::OldNode *tmpParent = parent;
                 while( (tmpParent = tmpParent->getParent()) )
                     ++tmpDepthLevels;
                 numDepthLevels = std::max( numDepthLevels, tmpDepthLevels );

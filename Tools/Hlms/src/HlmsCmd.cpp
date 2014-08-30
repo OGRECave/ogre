@@ -200,7 +200,7 @@ void HlmsCmd::createScene(void)
         light->setType( Light::LT_SPOTLIGHT );
     }
 
-    Entity *entity = mSceneMgr->createEntity( "penguin.mesh" );
+    v1::Entity *entity = mSceneMgr->createEntity( "penguin.mesh" );
 
     HlmsParamVec params;
     /*params.insert( *//*std::lower_bound( params.begin(), params.end(), )*//*params.begin(),

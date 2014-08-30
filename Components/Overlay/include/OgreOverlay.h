@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 
 namespace Ogre {
-
+namespace v1 {
 
     /** \addtogroup Core
     *  @{
@@ -268,7 +268,7 @@ namespace Ogre {
     /** @} */
 
 }
-
+}
 
 #endif
 

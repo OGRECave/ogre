@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+namespace v1 {
     /** \addtogroup Core
     *  @{
     */
@@ -345,7 +346,7 @@ namespace Ogre {
         void setRenderQueueGroup(uint8 queueID);
 
         /// @copydoc MovableObject::setRenderQueueGroupAndPriority.
-        void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
+        void setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority);
 
         /** @copydoc MovableObject::_updateRenderQueue.
         */
@@ -737,6 +738,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 
+}
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"

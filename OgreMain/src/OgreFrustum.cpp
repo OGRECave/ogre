@@ -603,8 +603,8 @@ namespace Ogre {
                 mVertexData.vertexCount = 32;
                 mVertexData.vertexStart = 0;
                 mVertexData.vertexBufferBinding->setBinding( 0,
-                    HardwareBufferManager::getSingleton().createVertexBuffer(
-                        sizeof(float)*3, 32, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY) );
+                    v1::HardwareBufferManager::getSingleton().createVertexBuffer(
+                        sizeof(float)*3, 32, v1::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY) );
             }
 
             // Note: Even though we can dealing with general projection matrix here,
@@ -629,8 +629,8 @@ namespace Ogre {
             // 0 is the origin
             // 1, 2, 3, 4 are the points on the near plane, top left first, clockwise
             // 5, 6, 7, 8 are the points on the far plane, top left first, clockwise
-            HardwareVertexBufferSharedPtr vbuf = mVertexData.vertexBufferBinding->getBuffer(0);
-            float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+            v1::HardwareVertexBufferSharedPtr vbuf = mVertexData.vertexBufferBinding->getBuffer(0);
+            float* pFloat = static_cast<float*>(vbuf->lock(v1::HardwareBuffer::HBL_DISCARD));
 
             // near plane (remember frustum is going in -Z direction)
             *pFloat++ = vpLeft;  *pFloat++ = vpTop;    *pFloat++ = -mNearDist;
@@ -990,10 +990,10 @@ namespace Ogre {
     }
 #endif
     //-----------------------------------------------------------------------
-    void Frustum::getRenderOperation(RenderOperation& op) 
+    void Frustum::getRenderOperation(v1::RenderOperation& op)
     {
         updateVertexData();
-        op.operationType = RenderOperation::OT_LINE_LIST;
+        op.operationType = v1::RenderOperation::OT_LINE_LIST;
         op.useIndexes = false;
         op.useGlobalInstancingVertexBufferIsAvailable = false;
         op.vertexData = &mVertexData;
