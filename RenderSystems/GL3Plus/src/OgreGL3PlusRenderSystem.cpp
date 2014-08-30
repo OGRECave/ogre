@@ -1355,7 +1355,7 @@ namespace Ogre {
                                        newBlock->mMaxAnisotropy ) );
         }
 
-        newBlock->mRsData = (void*)samplerName;
+        newBlock->mRsData = reinterpret_cast<void*>( samplerName );
 
         /*GL3PlusHlmsSamplerblock *glSamplerblock = new GL3PlusHlmsSamplerblock();
 
@@ -1413,7 +1413,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_hlmsSamplerblockDestroyed( HlmsSamplerblock *block )
     {
-        GLuint samplerName = reinterpret_cast<GLuint>( block->mRsData );
+        GLuint samplerName = static_cast<GLuint>( reinterpret_cast<intptr_t>( block->mRsData ) );
         glDeleteSamplers( 1, &samplerName );
     }
 
@@ -1474,9 +1474,14 @@ namespace Ogre {
     void GL3PlusRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
         if( !samplerblock )
+        {
             glBindSampler( texUnit, 0 );
+        }
         else
-            glBindSampler( texUnit, reinterpret_cast<GLuint>( samplerblock->mRsData ) );
+        {
+            glBindSampler( texUnit, static_cast<GLuint>(
+                                    reinterpret_cast<intptr_t>( samplerblock->mRsData ) ) );
+        }
         /*if (!activateGLTextureUnit(texUnit))
             return;
 
