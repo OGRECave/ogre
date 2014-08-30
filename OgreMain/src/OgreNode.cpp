@@ -104,13 +104,21 @@ namespace Ogre {
             mListener->nodeDestroyed(this);
         }
 
-        removeAllChildren();
-        if( mParent )
-            mParent->removeChild( this );
-
+        //Calling removeAllChildren or mParent->removeChild before nodeDestroyed may
+        //result in an enlargement of the array memory buffer or in a cleanup.
+        //Either way, the memory manager could end up calling a virtual function;
+        //but our vtable is wrong by now. So we destroy our slot first.
         if( mNodeMemoryManager )
             mNodeMemoryManager->nodeDestroyed( mTransform, mDepthLevel );
         mDepthLevel = 0;
+
+        removeAllChildren();
+        if( mParent )
+        {
+            Node *parent = mParent;
+            mParent = 0; //We've already called mNodeMemoryManager->nodeDestroyed.
+            parent->removeChild( this );
+        }
     }
     //-----------------------------------------------------------------------
     Node* Node::getParent(void) const
