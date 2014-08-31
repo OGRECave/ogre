@@ -113,6 +113,7 @@ namespace Ogre
         }
 
         destroyVertexBufferImpl( vertexBuffer );
+        OGRE_DELETE vertexBuffer;
 
         efficientVectorRemove( mVertexBuffers, itor );
     }

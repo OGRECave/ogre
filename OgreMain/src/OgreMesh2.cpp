@@ -50,11 +50,12 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     Mesh::Mesh( ResourceManager* creator, const String& name, ResourceHandle handle,
-                const String& group, bool isManual, ManualResourceLoader* loader )
+                const String& group, VaoManager *vaoManager, bool isManual, ManualResourceLoader* loader )
         : Resource(creator, name, handle, group, isManual, loader),
         mBoundRadius( 0.0f ),
         mLodStrategyName( LodStrategyManager::getSingleton().getDefaultStrategy()->getName() ),
         mNumLods( 1 ),
+        mVaoManager( vaoManager ),
         mVertexBufferDefaultType( BT_IMMUTABLE ),
         mIndexBufferDefaultType( BT_IMMUTABLE ),
         mVertexBufferShadowBuffer( true ),
@@ -528,6 +529,9 @@ namespace Ogre {
             SubMesh *subMesh = createSubMesh();
             subMesh->importFromV1( mesh->getSubMesh( i ), halfPos, halfTexCoords );
         }
+
+        mIsManual = true;
+        setToLoaded();
     }
     //---------------------------------------------------------------------
 }

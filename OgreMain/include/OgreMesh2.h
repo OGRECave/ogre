@@ -111,6 +111,8 @@ namespace Ogre {
         uint16          mNumLods;
         LodValueArray   mLodValues;
 
+        VaoManager      *mVaoManager;
+
         BufferType mVertexBufferDefaultType;
         BufferType mIndexBufferDefaultType;
         bool mVertexBufferShadowBuffer;
@@ -140,7 +142,8 @@ namespace Ogre {
             Do not call this method directly.
         */
         Mesh( ResourceManager* creator, const String& name, ResourceHandle handle,
-              const String& group, bool isManual = false, ManualResourceLoader* loader = 0 );
+              const String& group, VaoManager *vaoManager,
+              bool isManual = false, ManualResourceLoader* loader = 0 );
         ~Mesh();
 
         // NB All methods below are non-virtual since they will be

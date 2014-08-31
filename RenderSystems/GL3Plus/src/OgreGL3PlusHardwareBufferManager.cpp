@@ -191,11 +191,9 @@ namespace v1 {
         case VET_UINT3:
         case VET_UINT4:
             return GL_UNSIGNED_INT;
-        case VET_SHORT1:
         case VET_SHORT2:
         case VET_SHORT4:
             return GL_SHORT;
-        case VET_USHORT1:
         case VET_USHORT2:
         case VET_USHORT4:
             return GL_UNSIGNED_SHORT;
@@ -204,7 +202,6 @@ namespace v1 {
         case VET_COLOUR_ARGB:
         case VET_UBYTE4:
             return GL_UNSIGNED_BYTE;
-        case VET_HALF1:
         case VET_HALF2:
         case VET_HALF4:
             return GL_HALF_FLOAT;

@@ -1652,11 +1652,11 @@ namespace v1 {
                     case VET_DOUBLE1:
                         typeSize = sizeof(double);
                         break;
-                    case VET_SHORT1:
-                        typeSize = sizeof(short);
+                    case VET_SHORT2:
+                        typeSize = sizeof(short) * 2;
                         break;
-                    case VET_USHORT1:
-                        typeSize = sizeof(unsigned short);
+                    case VET_USHORT2:
+                        typeSize = sizeof(unsigned short) * 2;
                         break;
                     case VET_INT1:
                         typeSize = sizeof(int);

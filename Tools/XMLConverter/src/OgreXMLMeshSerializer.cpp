@@ -459,9 +459,6 @@ namespace v1 {
                         case VET_COLOUR_ABGR: 
                             type = "colour"; 
                             break;
-                        case VET_SHORT1: 
-                            type = "short1"; 
-                            break;
                         case VET_SHORT2: 
                             type = "short2"; 
                             break;
@@ -590,10 +587,6 @@ namespace v1 {
                             dataNode->SetAttribute("v", StringConverter::toString(*pFloat++));
                             dataNode->SetAttribute("w", StringConverter::toString(*pFloat++));
                             dataNode->SetAttribute("x", StringConverter::toString(*pFloat++));
-                            break;
-                        case VET_SHORT1:
-                            elem.baseVertexPointerToElement(pVert, &pShort);
-                            dataNode->SetAttribute("u", StringConverter::toString(*pShort++ / 65535.0f));
                             break;
                         case VET_SHORT2:
                             elem.baseVertexPointerToElement(pVert, &pShort);
@@ -990,8 +983,6 @@ namespace v1 {
                             vtype = VET_FLOAT3;
                         else if (!::strcmp(attrib,"float4"))
                             vtype = VET_FLOAT4;
-                        else if (!::strcmp(attrib,"short1"))
-                            vtype = VET_SHORT1;
                         else if (!::strcmp(attrib,"short2"))
                             vtype = VET_SHORT2;
                         else if (!::strcmp(attrib,"short4"))
@@ -1238,11 +1229,6 @@ namespace v1 {
                             *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("v"));
                             *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("w"));
                             *pFloat++ = StringConverter::parseReal(xmlElem->Attribute("x"));
-                            break;
-
-                        case VET_SHORT1:
-                            elem.baseVertexPointerToElement(pVert, &pShort);
-                            *pShort++ = static_cast<uint16>(65535.0f * StringConverter::parseReal(xmlElem->Attribute("u")));
                             break;
 
                         case VET_SHORT2:

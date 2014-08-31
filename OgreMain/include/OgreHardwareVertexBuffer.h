@@ -122,6 +122,8 @@ namespace v1 {
     };
 
     /// Vertex element type, used to identify the base types of the vertex contents
+    /// Note that all attributes must be aligned to 4 bytes, that's why VET_SHORT1
+    /// (among others) doesn't exist.
     enum VertexElementType
     {
         VET_FLOAT1 = 0,
@@ -130,32 +132,29 @@ namespace v1 {
         VET_FLOAT4 = 3,
         /// alias to more specific colour type - use the current rendersystem's colour packing
         VET_COLOUR = 4,
-        VET_SHORT1 = 5,
-        VET_SHORT2 = 6,
-        VET_SHORT4 = 8,
-        VET_UBYTE4 = 9,
+        VET_SHORT2 = 5,
+        VET_SHORT4 = 6,
+        VET_UBYTE4 = 7,
         /// D3D style compact colour
-        VET_COLOUR_ARGB = 10,
+        VET_COLOUR_ARGB = 8,
         /// GL style compact colour
-        VET_COLOUR_ABGR = 11,
-        VET_DOUBLE1 = 12,
-        VET_DOUBLE2 = 13,
-        VET_DOUBLE3 = 14,
-        VET_DOUBLE4 = 15,
-        VET_USHORT1 = 16,
-        VET_USHORT2 = 17,
-        VET_USHORT4 = 18,
-        VET_INT1 = 19,
-        VET_INT2 = 20,
-        VET_INT3 = 21,
-        VET_INT4 = 22,
-        VET_UINT1 = 23,
-        VET_UINT2 = 24,
-        VET_UINT3 = 25,
-        VET_UINT4 = 26,
-        VET_HALF1 = 27,
-        VET_HALF2 = 28,
-        VET_HALF4 = 29,
+        VET_COLOUR_ABGR = 9,
+        VET_DOUBLE1 = 10,
+        VET_DOUBLE2 = 11,
+        VET_DOUBLE3 = 12,
+        VET_DOUBLE4 = 13,
+        VET_USHORT2 = 14,
+        VET_USHORT4 = 15,
+        VET_INT1 = 16,
+        VET_INT2 = 17,
+        VET_INT3 = 18,
+        VET_INT4 = 19,
+        VET_UINT1 = 20,
+        VET_UINT2 = 21,
+        VET_UINT3 = 22,
+        VET_UINT4 = 23,
+        VET_HALF2 = 24,
+        VET_HALF4 = 25,
     };
 
 namespace v1 {

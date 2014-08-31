@@ -57,7 +57,7 @@ namespace Ogre {
         {
             VertexArrayObject *vao = *itor;
 
-            VaoManager *vaoManager = 0;
+            VaoManager *vaoManager = mParent->mVaoManager;
             const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
             VertexBufferPackedVec::const_iterator itBuffers = vertexBuffers.begin();
             VertexBufferPackedVec::const_iterator enBuffers = vertexBuffers.end();
@@ -267,7 +267,7 @@ namespace Ogre {
         //can throw thus causing a leak if we don't free them.
         SafeDelete dataPtrContainer( data );
 
-        VaoManager *vaoManager = 0;
+        VaoManager *vaoManager = mParent->mVaoManager;
         VertexBufferPackedVec vertexBuffers;
         IndexBufferPacked *indexBuffer = 0;
 
@@ -300,9 +300,9 @@ namespace Ogre {
 
             indexBuffer = vaoManager->createIndexBuffer( indexType, indexData->indexCount,
                                                          mParent->mIndexBufferDefaultType,
-                                                         &indexDataPtr, keepAsShadow );
+                                                         indexDataPtr, keepAsShadow );
 
-            if( !keepAsShadow ) //Don't free the pointer ourselves
+            if( keepAsShadow ) //Don't free the pointer ourselves
                 indexDataPtrContainer.ptr = 0;
         }
 
@@ -361,19 +361,21 @@ namespace Ogre {
                     srcElements.push_back( *itor );
                 }
 
-                if( origElement.getBaseType( origElement.getType() ) != VET_FLOAT1 )
+                //We can't convert to half if it wasn't in floating point
+                //Also avoid converting 1 Float ==> 2 Half.
+                if( origElement.getBaseType( origElement.getType() ) == VET_FLOAT1 &&
+                    origElement.getTypeCount( origElement.getType() ) != 1 )
                 {
-                    //We can't convert to half if it wasn't in floating point
-                    if( origElement.getSemantic() == VES_POSITION )
-                        halfPos = false;
-                    else if( origElement.getSemantic() == VES_TEXTURE_COORDINATES )
-                        halfTexCoords = false;
-                }
-                else if( origElement.getSemantic() == VES_POSITION )
-                {
-                    //All attributes must be aligned at least to 4 bytes.
-                    VertexElement2 &lastInserted = vertexElements.back();
-                    lastInserted.mType = VET_HALF4;
+                    if( (origElement.getSemantic() == VES_POSITION && halfPos) ||
+                        (origElement.getSemantic() == VES_TEXTURE_COORDINATES && halfTexCoords) )
+                    {
+                        VertexElementType type = origElement.multiplyTypeCount(
+                                                            VET_HALF2, origElement.getTypeCount(
+                                                                            origElement.getType() ) );
+
+                        VertexElement2 &lastInserted = vertexElements.back();
+                        lastInserted.mType = type;
+                    }
                 }
 
                 ++itor;
@@ -410,6 +412,8 @@ namespace Ogre {
             vertexBuffSizes.push_back( vBuffer->getVertexSize() );
         }
 
+        char *dstData = data;
+
         //Perform the transfer. Note that vertexElements & srcElements do not match.
         //As vertexElements is modified for smaller types and may include padding
         //for alignment reasons.
@@ -423,36 +427,40 @@ namespace Ogre {
             while( itor != end )
             {
                 const VertexElement2 &vElement = *itor;
-                size_t veSize = v1::VertexElement::getTypeSize( itSrc->getType() );
+                size_t writeSize = v1::VertexElement::getTypeSize( vElement.mType );
 
-                if( (halfPos && vElement.mSemantic == VES_POSITION) ||
-                    (halfTexCoords && vElement.mSemantic == VES_TEXTURE_COORDINATES) )
+                if( v1::VertexElement::getBaseType( vElement.mType ) == VET_HALF2 &&
+                    v1::VertexElement::getBaseType( itSrc->getType() ) == VET_FLOAT1 )
                 {
+                    size_t readSize = v1::VertexElement::getTypeSize( itSrc->getType() );
+
                     //Convert float to half.
                     float fpData[4];
                     fpData[0] = fpData[1] = fpData[2] = 0.0f;
                     fpData[3] = 1.0f;
-                    memcpy( fpData, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), veSize );
+                    memcpy( fpData, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), readSize );
 
                     for( size_t j=0; j<v1::VertexElement::getTypeCount( vElement.mType ); ++j )
                     {
-                        *reinterpret_cast<uint16*>(data + acumOffset + j) =
+                        *reinterpret_cast<uint16*>(dstData + acumOffset + j) =
                                                             Bitwise::floatToHalf( fpData[j] );
                     }
                 }
                 else if( vElement.mSemantic == VES_NORMAL && hasTangents &&
-                         vElement.mType == VET_FLOAT3 )
+                         vElement.mType != VET_FLOAT3 )
                 {
+                    size_t readSize = v1::VertexElement::getTypeSize( itSrc->getType() );
+
                     //Convert TBN matrix (between 6 to 9 floats, 24-36 bytes)
                     //to a QTangent (4 shorts, 8 bytes)
-                    assert( veSize == sizeof(float) * 3 );
-                    assert( tangentElement->getSize() < sizeof(float) * 4 &&
+                    assert( readSize == sizeof(float) * 3 );
+                    assert( tangentElement->getSize() <= sizeof(float) * 4 &&
                             tangentElement->getSize() >= sizeof(float) * 3 );
 
                     float normal[3];
                     float tangent[4];
                     tangent[3] = 1.0f;
-                    memcpy( normal, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), veSize );
+                    memcpy( normal, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), readSize );
                     memcpy( tangent,
                             srcPtrs[tangentElement->getSource()] + tangentElement->getOffset(),
                             tangentElement->getSize() );
@@ -510,7 +518,7 @@ namespace Ogre {
                     if( tangent[3] < 0 )
                         qTangent = -qTangent;
 
-                    uint16 *dstData16 = reinterpret_cast<uint16*>(data + acumOffset);
+                    uint16 *dstData16 = reinterpret_cast<uint16*>(dstData + acumOffset);
 
                     dstData16[0] = Math::Clamp( qTangent.w * 32767.0f, -32768.0f, 32767.0f );
                     dstData16[1] = Math::Clamp( qTangent.x * 32767.0f, -32768.0f, 32767.0f );
@@ -520,19 +528,21 @@ namespace Ogre {
                 else
                 {
                     //Raw. Transfer as is.
-                    memcpy( data + acumOffset,
+                    memcpy( dstData + acumOffset,
                             srcPtrs[itSrc->getSource()] + itSrc->getOffset(),
-                            veSize );
+                            writeSize ); //writeSize = readSize
                 }
 
-                acumOffset += veSize;
+                acumOffset += writeSize;
                 ++itor;
             }
 
-            data += vertexSize;
+            dstData += vertexSize;
             for( size_t j=0; j<srcPtrs.size(); ++j )
                 srcPtrs[j] += vertexBuffSizes[j];
         }
+
+        assert( dstData == data + vertexSize * vertexData->vertexCount );
 
         //Cleanup
         for( size_t i=0; i<vertexData->vertexBufferBinding->getBufferCount(); ++i )
