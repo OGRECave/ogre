@@ -25,7 +25,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
-#if 0
+
 #include "OgreStableHeaders.h"
 #include "OgreItem.h"
 
@@ -33,6 +33,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreMesh2.h"
 #include "OgreSubMesh2.h"
 #include "OgreSubItem.h"
+#include "OgreHlmsManager.h"
 #include "OgreException.h"
 #include "OgreSceneManager.h"
 #include "OgreLogManager.h"
@@ -43,7 +44,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 #include "OgreTechnique.h"
 #include "OgrePass.h"
-#include "OgreOldSkeletonInstance.h"
 #include "OgreOptimisedUtil.h"
 #include "OgreSceneNode.h"
 #include "OgreLodStrategy.h"
@@ -104,14 +104,14 @@ namespace Ogre {
         mLodMesh = mMesh->_getLodValueArray();
 
         // Build main subItem list
-        buildSubItemList( mMesh, &mSubItemList );
+        buildSubItems();
 
         {
             //Without filling the renderables list, the RenderQueue won't
             //catch our sub entities and thus we won't be rendered
-            mRenderables.reserve( mSubItemList.size() );
-            SubItemList::iterator itor = mSubItemList.begin();
-            SubItemList::iterator end  = mSubItemList.end();
+            mRenderables.reserve( mSubItems.size() );
+            SubItemVec::iterator itor = mSubItems.begin();
+            SubItemVec::iterator end  = mSubItems.end();
             while( itor != end )
             {
                 mRenderables.push_back( &(*itor) );
@@ -119,7 +119,7 @@ namespace Ogre {
             }
         }
 
-        Aabb aabb( mMesh->getBounds().getCenter(), mMesh->getBounds().getHalfSize() );
+        Aabb aabb( mMesh->getAabb() );
         mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
         mObjectData.mWorldAabb->setFromAabb( aabb, mObjectData.mIndex );
         mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
@@ -134,7 +134,7 @@ namespace Ogre {
             return;
 
         // Delete submeshes
-        mSubItemList.clear();
+        mSubItems.clear();
         mRenderables.clear();
 
         OGRE_DELETE mSkeletonInstance;
@@ -157,43 +157,31 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubItem* Item::getSubItem(size_t index)
     {
-        if (index >= mSubItemList.size())
+        if (index >= mSubItems.size())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Index out of bounds.",
                         "Item::getSubItem");
-        return &mSubItemList[index];
+        return &mSubItems[index];
     }
     //-----------------------------------------------------------------------
     const SubItem* Item::getSubItem(size_t index) const
     {
-        if (index >= mSubItemList.size())
+        if (index >= mSubItems.size())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
             "Index out of bounds.",
             "Item::getSubItem");
-        return &mSubItemList[index];
-    }
-    //-----------------------------------------------------------------------
-    SubItem* Item::getSubItem(const String& name)
-    {
-        size_t index = mMesh->_getSubMeshIndex(name);
-        return getSubItem(index);
-    }
-    //-----------------------------------------------------------------------
-    const SubItem* Item::getSubItem(const String& name) const
-    {
-        size_t index = mMesh->_getSubMeshIndex(name);
-        return getSubItem(index);
+        return &mSubItems[index];
     }
     //-----------------------------------------------------------------------
     size_t Item::getNumSubItems(void) const
     {
-        return mSubItemList.size();
+        return mSubItems.size();
     }
     //-----------------------------------------------------------------------
     void Item::setDatablock( HlmsDatablock *datablock )
     {
-        SubItemList::iterator itor = mSubItemList.begin();
-        SubItemList::iterator end  = mSubItemList.end();
+        SubItemVec::iterator itor = mSubItems.begin();
+        SubItemVec::iterator end  = mSubItems.end();
 
         while( itor != end )
         {
@@ -201,6 +189,7 @@ namespace Ogre {
             ++itor;
         }
     }
+#if 0
     //-----------------------------------------------------------------------
     Item* Item::clone( const String& newName ) const
     {
@@ -215,85 +204,63 @@ namespace Ogre {
         if( mInitialised )
         {
             // Copy material settings
-            SubItemList::const_iterator i;
+            SubItemVec::const_iterator i;
             unsigned int n = 0;
-            for (i = mSubItemList.begin(); i != mSubItemList.end(); ++i, ++n)
+            for (i = mSubItems.begin(); i != mSubItems.end(); ++i, ++n)
                 newEnt->getSubItem(n)->setDatablock( i->getDatablock() );
         }
 
         return newEnt;
     }
+#endif
     //-----------------------------------------------------------------------
     void Item::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
         // Set for all subentities
-        SubItemList::iterator i;
-        for (i = mSubItemList.begin(); i != mSubItemList.end(); ++i)
+        SubItemVec::iterator i;
+        for (i = mSubItems.begin(); i != mSubItems.end(); ++i)
         {
             i->setMaterialName(name, groupName);
         }
-
     }
-
-
+    //-----------------------------------------------------------------------
     void Item::setMaterial( const MaterialPtr& material )
     {
         // Set for all subentities
-        SubItemList::iterator i;
-        for (i = mSubItemList.begin(); i != mSubItemList.end(); ++i)
+        SubItemVec::iterator i;
+        for (i = mSubItems.begin(); i != mSubItems.end(); ++i)
         {
             i->setMaterial(material);
         }
     }
-	//-----------------------------------------------------------------------
-    void Item::setUpdateBoundingBoxFromSkeleton(bool update)
-	{
-		mUpdateBoundingBoxFromSkeleton = update;
-		if (mMesh->isLoaded() && mMesh->getBoneBoundingRadius() == Real(0))
-		{
-			mMesh->_computeBoneBoundingRadius();
-		}
-	}
     //-----------------------------------------------------------------------
     const String& Item::getMovableType(void) const
     {
         return ItemFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
-    void Item::buildSubItemList( MeshPtr& mesh, SubItemList* sublist )
+    void Item::buildSubItems(void)
     {
         // Create SubEntities
-        unsigned short i, numSubMeshes;
-        SubMesh* subMesh;
-
-        numSubMeshes = mesh->getNumSubMeshes();
-        sublist->reserve( numSubMeshes );
-        for (i = 0; i < numSubMeshes; ++i)
+        size_t numSubMeshes = mMesh->getNumSubMeshes();
+        mSubItems.reserve( numSubMeshes );
+        for( size_t i=0; i<numSubMeshes; ++i )
         {
-            subMesh = mesh->getSubMesh(i);
-            sublist->push_back( SubItem( this, subMesh ) );
-            if (subMesh->isMatInitialised())
-                sublist->back().setMaterialName(subMesh->getMaterialName(), mesh->getGroup());
+            SubMesh *subMesh = mMesh->getSubMesh(i);
+            mSubItems.push_back( SubItem( this, subMesh ) );
+
+            if( !subMesh->mMaterialName.empty() )
+            {
+                //Try first Hlms materials, then the low level ones.
+                HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+                HlmsDatablock *datablock = hlmsManager->getDatablockNoThrow( subMesh->mMaterialName );
+
+                if( !datablock )
+                    mSubItems.back().setDatablock( datablock );
+                else
+                    mSubItems.back().setMaterialName( subMesh->mMaterialName, mMesh->getGroup() );
+            }
         }
-    }
-    //-----------------------------------------------------------------------
-    EdgeData* Item::getEdgeList(void)
-    {
-#if OGRE_NO_MESHLOD
-        unsigned short mMeshLodIndex = 0;
-#endif
-        // Get from Mesh
-        return mMesh->getEdgeList(mCurrentMeshLod);
-    }
-    //-----------------------------------------------------------------------
-    bool Item::hasEdgeList(void)
-    {
-#if OGRE_NO_MESHLOD
-        unsigned short mMeshLodIndex = 0;
-#endif
-        // check if mesh has an edge list attached
-        // give mesh a chance to built it if scheduled
-        return (mMesh->getEdgeList(mCurrentMeshLod) != NULL);
     }
     //-----------------------------------------------------------------------
     void Item::_notifyAttached( Node* parent )
@@ -304,9 +271,9 @@ namespace Ogre {
             mSkeletonInstance->setParentNode( parent );
     }
     //-----------------------------------------------------------------------
-    void Item::shareSkeletonInstanceWith(Item* Item)
+    /*void Item::shareSkeletonInstanceWith(Item* item)
     {
-        if (Item->getMesh()->getOldSkeleton() != getMesh()->getOldSkeleton())
+        if (item->getMesh()->getSkeleton() != getMesh()->getSkeleton())
         {
             OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
                 "The supplied Item has a different skeleton.",
@@ -318,7 +285,7 @@ namespace Ogre {
                 "This Item has no skeleton.",
                 "Item::shareSkeletonWith");
         }
-        if (mSharedSkeletonEntities != NULL && Item->mSharedSkeletonEntities != NULL)
+        if (mSharedSkeletonEntities != NULL && item->mSharedSkeletonEntities != NULL)
         {
             OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
                 "Both entities already shares their SkeletonInstances! At least "
@@ -334,21 +301,14 @@ namespace Ogre {
         else
         {
             OGRE_DELETE mSkeletonInstance;
-            OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
-            OGRE_DELETE mAnimationState;
-            // using OGRE_FREE since unsigned long is not a destructor
-            OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
-            mSkeletonInstance = Item->mSkeletonInstance;
-            mNumBoneMatrices = Item->mNumBoneMatrices;
-            mBoneMatrices = Item->mBoneMatrices;
-            mAnimationState = Item->mAnimationState;
-            mFrameBonesLastUpdated = Item->mFrameBonesLastUpdated;
-            if (Item->mSharedSkeletonEntities == NULL)
+            mSkeletonInstance = item->mSkeletonInstance;
+
+            if (item->mSharedSkeletonEntities == NULL)
             {
-                Item->mSharedSkeletonEntities = OGRE_NEW_T(ItemSet, MEMCATEGORY_ANIMATION)();
-                Item->mSharedSkeletonEntities->insert(Item);
+                item->mSharedSkeletonEntities = OGRE_NEW_T(ItemSet, MEMCATEGORY_ANIMATION)();
+                item->mSharedSkeletonEntities->insert(Item);
             }
-            mSharedSkeletonEntities = Item->mSharedSkeletonEntities;
+            mSharedSkeletonEntities = item->mSharedSkeletonEntities;
             mSharedSkeletonEntities->insert(this);
         }
     }
@@ -370,14 +330,8 @@ namespace Ogre {
         }
         else
         {
-            mSkeletonInstance = OGRE_NEW OldSkeletonInstance(mMesh->getOldSkeleton());
+            mSkeletonInstance = OGRE_NEW SkeletonInstance( mMesh->getSkeleton() );
             mSkeletonInstance->load();
-            mAnimationState = OGRE_NEW AnimationStateSet();
-            mMesh->_initAnimationState(mAnimationState);
-            mFrameBonesLastUpdated = OGRE_NEW_T(unsigned long, MEMCATEGORY_ANIMATION)(std::numeric_limits<unsigned long>::max());
-            mNumBoneMatrices = mSkeletonInstance->getNumBones();
-            mBoneMatrices = static_cast<Matrix4*>(OGRE_MALLOC_SIMD(sizeof(Matrix4) * mNumBoneMatrices, MEMCATEGORY_ANIMATION));
-
             mSharedSkeletonEntities->erase(this);
             if (mSharedSkeletonEntities->size() == 1)
             {
@@ -385,95 +339,8 @@ namespace Ogre {
             }
             mSharedSkeletonEntities = 0;
         }
-    }
-    //-----------------------------------------------------------------------
-    void Item::refreshAvailableAnimationState(void)
-    {
-        mMesh->_refreshAnimationState(mAnimationState);
-    }
-    //-----------------------------------------------------------------------
-    VertexData* Item::getVertexDataForBinding(void)
-    {
-        Item::VertexDataBindChoice c =
-            chooseVertexDataForBinding(mMesh->getSharedVertexDataAnimationType() != VAT_NONE);
-        switch(c)
-        {
-        case BIND_ORIGINAL:
-            return mMesh->sharedVertexData;
-        case BIND_HARDWARE_MORPH:
-            return mHardwareVertexAnimVertexData;
-        case BIND_SOFTWARE_MORPH:
-            return mSoftwareVertexAnimVertexData;
-        case BIND_SOFTWARE_SKELETAL:
-            return mSkelAnimVertexData;
-        };
-        // keep compiler happy
-        return mMesh->sharedVertexData;
-    }
-    //-----------------------------------------------------------------------
-    Item::VertexDataBindChoice Item::chooseVertexDataForBinding(bool vertexAnim)
-    {
-        if (hasSkeleton())
-        {
-            if (!isHardwareAnimationEnabled())
-            {
-                // all software skeletal binds same vertex data
-                // may be a 2-stage s/w transform including morph earlier though
-                return BIND_SOFTWARE_SKELETAL;
-            }
-            else if (vertexAnim)
-            {
-                // hardware morph animation
-                return BIND_HARDWARE_MORPH;
-            }
-            else
-            {
-                // hardware skeletal, no morphing
-                return BIND_ORIGINAL;
-            }
-        }
-        else if (vertexAnim)
-        {
-            // morph only, no skeletal
-            if (isHardwareAnimationEnabled())
-            {
-                return BIND_HARDWARE_MORPH;
-            }
-            else
-            {
-                return BIND_SOFTWARE_MORPH;
-            }
+    }*/
 
-        }
-        else
-        {
-            return BIND_ORIGINAL;
-        }
-
-    }
-    //---------------------------------------------------------------------
-    void Item::visitRenderables(Renderable::Visitor* visitor,
-        bool debugRenderables)
-    {
-        // Visit each SubItem
-        for (SubItemList::iterator i = mSubItemList.begin(); i != mSubItemList.end(); ++i)
-        {
-            visitor->visit( &(*i), 0, false);
-        }
-        // if manual LOD is in use, visit those too
-        ushort lodi = 1;
-        for (LODItemList::iterator e = mLodItemList.begin();
-            e != mLodItemList.end(); ++e, ++lodi)
-        {
-            
-            size_t nsub = (*e)->getNumSubEntities();
-            for (size_t s = 0; s < nsub; ++s)
-            {
-                visitor->visit((*e)->getSubItem(s), lodi, false);
-            }
-        }
-
-    }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     String ItemFactory::FACTORY_TYPE_NAME = "Item";
@@ -504,11 +371,10 @@ namespace Ogre {
             ni = params->find("mesh");
             if (ni != params->end())
             {
+#if 0
                 // Get mesh (load if required)
-                pMesh = MeshManager::getSingleton().load(
-                    ni->second,
-                    // autodetect group location
-                    groupName );
+                pMesh = MeshManager::getSingleton().load( ni->second, groupName );
+#endif
             }
 
         }
@@ -529,4 +395,3 @@ namespace Ogre {
 
 
 }
-#endif

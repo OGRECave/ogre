@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonManager.h"
 
 #include "Vao/OgreIndexBufferPacked.h"
+#include "Vao/OgreVertexArrayObject.h"
 
 #include "OgreOldSkeletonManager.h"
 
@@ -481,8 +482,8 @@ namespace Ogre {
         while( itor != end )
         {
             SubMesh *s = *itor;
-            SubMesh::VertexArrayObjectArray::const_iterator itVao = s->mVao.begin();
-            SubMesh::VertexArrayObjectArray::const_iterator enVao = s->mVao.end();
+            VertexArrayObjectArray::const_iterator itVao = s->mVao.begin();
+            VertexArrayObjectArray::const_iterator enVao = s->mVao.end();
 
             while( itVao != enVao )
             {

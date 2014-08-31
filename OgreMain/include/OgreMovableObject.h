@@ -553,20 +553,6 @@ namespace Ogre {
         /** Returns whether shadow casting is enabled for this object. */
         inline bool getCastShadows(void) const;
 
-        /** Method to allow a caller to abstractly iterate over the Renderable
-            instances that this MovableObject will add to the render queue when
-            asked, if any. 
-        @param visitor Pointer to a class implementing the Renderable::Visitor 
-            interface which will be called back for each Renderable which will
-            be queued. Bear in mind that the state of the Renderable instances
-            may not be finalised depending on when you call this.
-        @param debugRenderables If false, only regular renderables will be visited
-            (those for normal display). If true, debug renderables will be
-            included too.
-        */
-        virtual void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false) = 0;
-
         /** Sets whether or not the debug display of this object is enabled.
         @remarks
             Some objects aren't visible themselves but it can be useful to display

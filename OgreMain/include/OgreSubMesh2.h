@@ -31,10 +31,12 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreVertexBoneAssignment.h"
-#include "Vao/OgreVertexArrayObject.h"
+#include "Vao/OgreVertexBufferPacked.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
+    typedef FastArray<VertexArrayObject*> VertexArrayObjectArray;
 
     /** \addtogroup Core
     *  @{
@@ -60,7 +62,6 @@ namespace Ogre {
         friend class Mesh;
         friend class MeshSerializerImpl;
     public:
-        typedef FastArray<VertexArrayObject*> VertexArrayObjectArray;
         typedef FastArray<unsigned short> IndexMap;
         typedef vector<VertexBoneAssignment>::type VertexBoneAssignmentVec;
 
@@ -89,7 +90,6 @@ namespace Ogre {
 
         /// Name of the material this SubMesh uses.
         String  mMaterialName;
-        bool    mMaterialIsHlms;
 
         /// Reference to parent Mesh (not a smart pointer so child does not keep parent alive).
         Mesh    *mParent;
@@ -106,10 +106,6 @@ namespace Ogre {
     public:
         SubMesh();
         ~SubMesh();
-
-        /// Sets the name of the Material which this SubMesh will use
-        void setMaterialName( const String& matName );
-        const String& getMaterialName(void) const;
 
         /** Assigns a vertex to a bone with a given weight, for skeletal animation. 
         @remarks    

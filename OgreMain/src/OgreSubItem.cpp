@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgreItem.h"
 #include "OgreMaterialManager.h"
-#include "OgreSubMesh.h"
+#include "OgreSubMesh2.h"
 #include "OgreLogManager.h"
 #include "OgreMesh.h"
 #include "OgreException.h"
@@ -44,6 +44,7 @@ namespace Ogre {
     {
         //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
+        mVaoPerLod = subMeshBasis->mVao;
     }
     //-----------------------------------------------------------------------
     SubItem::~SubItem()

@@ -45,6 +45,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    typedef FastArray<VertexArrayObject*> VertexArrayObjectArray;
+
     /** \addtogroup Core
     *  @{
     */
@@ -398,6 +400,8 @@ namespace Ogre {
             mRenderSystemData = val; 
         }
 
+        const VertexArrayObjectArray& getVaos(void) const   { return mVaoPerLod; }
+
         uint32 getHlmsHash(void) const          { return mHlmsHash; }
         uint32 getHlmsCasterHash(void) const    { return mHlmsCasterHash; }
         HlmsDatablock* getDatablock(void) const { return mHlmsDatablock; }
@@ -421,9 +425,10 @@ namespace Ogre {
     protected:
         typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
-        uint32              mHlmsHash;
-        uint32              mHlmsCasterHash;
-        HlmsDatablock       *mHlmsDatablock;
+        VertexArrayObjectArray  mVaoPerLod;
+        uint32                  mHlmsHash;
+        uint32                  mHlmsCasterHash;
+        HlmsDatablock           *mHlmsDatablock;
         uint8                   mCurrentMaterialLod;
         FastArray<Real> const   *mLodMaterial;
 

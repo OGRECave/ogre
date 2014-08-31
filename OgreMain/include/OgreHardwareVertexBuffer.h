@@ -132,29 +132,33 @@ namespace v1 {
         VET_FLOAT4 = 3,
         /// alias to more specific colour type - use the current rendersystem's colour packing
         VET_COLOUR = 4,
-        VET_SHORT2 = 5,
-        VET_SHORT4 = 6,
-        VET_UBYTE4 = 7,
+        //VET_SHORT1 = 5,   Deprecated for being invalid
+        VET_SHORT2 = 6,
+        //VET_SHORT3 = 7,   Deprecated for being invalid
+        VET_SHORT4 = 8,
+        VET_UBYTE4 = 9,
         /// D3D style compact colour
-        VET_COLOUR_ARGB = 8,
+        VET_COLOUR_ARGB = 10,
         /// GL style compact colour
-        VET_COLOUR_ABGR = 9,
-        VET_DOUBLE1 = 10,
-        VET_DOUBLE2 = 11,
-        VET_DOUBLE3 = 12,
-        VET_DOUBLE4 = 13,
-        VET_USHORT2 = 14,
-        VET_USHORT4 = 15,
-        VET_INT1 = 16,
-        VET_INT2 = 17,
-        VET_INT3 = 18,
-        VET_INT4 = 19,
-        VET_UINT1 = 20,
-        VET_UINT2 = 21,
-        VET_UINT3 = 22,
-        VET_UINT4 = 23,
-        VET_HALF2 = 24,
-        VET_HALF4 = 25,
+        VET_COLOUR_ABGR = 11,
+        VET_DOUBLE1 = 12,
+        VET_DOUBLE2 = 13,
+        VET_DOUBLE3 = 14,
+        VET_DOUBLE4 = 15,
+        //VET_USHORT1 = 16, Deprecated for being invalid
+        VET_USHORT2 = 17,
+        //VET_USHORT3 = 18, Deprecated for being invalid
+        VET_USHORT4 = 19,
+        VET_INT1 = 20,
+        VET_INT2 = 21,
+        VET_INT3 = 22,
+        VET_INT4 = 23,
+        VET_UINT1 = 24,
+        VET_UINT2 = 25,
+        VET_UINT3 = 26,
+        VET_UINT4 = 27,
+        VET_HALF2 = 28,
+        VET_HALF4 = 29
     };
 
 namespace v1 {

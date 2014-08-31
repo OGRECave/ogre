@@ -81,7 +81,7 @@ namespace Ogre {
     class _OgreExport Item : public MovableObject, public Resource::Listener
     {
         // Allow ItemFItemy full access
-        friend class ItemFItemy;
+        friend class ItemFactory;
         friend class SubItem;
     public:
         
@@ -103,8 +103,8 @@ namespace Ogre {
 
         /** List of SubEntities (point to SubMeshes).
         */
-        typedef vector<SubItem>::type SubItemList;
-        SubItemList mSubItemList;
+        typedef vector<SubItem>::type SubItemVec;
+        SubItemVec mSubItems;
 
         SkeletonInstance    *mSkeletonInstance;
 
@@ -114,14 +114,11 @@ namespace Ogre {
         */
         //ItemSet* mSharedSkeletonEntities;
 
-		/// Flag indicating whether to update the bounding box from the bones of the skeleton.
-        bool mUpdateBoundingBoxFromSkeleton;
-
         /// Has this Item been initialised yet?
         bool mInitialised;
 
         /** Builds a list of SubItems based on the SubMeshes contained in the Mesh. */
-        void buildSubItemList( MeshPtr& mesh, SubItemList* sublist);
+        void buildSubItems(void);
 
     public:
         /** Default destructor.
@@ -136,13 +133,6 @@ namespace Ogre {
         */
         SubItem* getSubItem(size_t index);
         const SubItem* getSubItem(size_t index) const;
-
-        /** Gets a pointer to a SubItem by name
-        @remarks 
-            Names should be initialized during a Mesh creation.
-        */
-        SubItem* getSubItem( const String& name );
-        const SubItem* getSubItem( const String& name ) const;
 
         /** Retrieves the number of SubItem objects making up this Item.
         */
@@ -240,24 +230,6 @@ namespace Ogre {
         void _initialise(bool forceReinitialise = false);
         /** Tear down the internal structures of this Item, rendering it uninitialised. */
         void _deinitialise(void);
-
-        /** If true, the skeleton of the Item will be used to update the bounding box for culling.
-            Useful if you have skeletal animations that move the bones away from the root.  Otherwise, the
-            bounding box of the mesh in the binding pose will be used.
-        @remarks
-            When true, the bounding box will be generated to only enclose the bones that are used for skinning.
-            Also the resulting bounding box will be expanded by the amount of GetMesh()->getBoneBoundingRadius().
-            The expansion amount can be changed on the mesh to achieve a better fitting bounding box.
-        */
-        void setUpdateBoundingBoxFromSkeleton(bool update);
-
-        /** If true, the skeleton of the Item will be used to update the bounding box for culling.
-            Useful if you have skeletal animations that move the bones away from the root.  Otherwise, the
-            bounding box of the mesh in the binding pose will be used.
-        */
-        bool getUpdateBoundingBoxFromSkeleton() const   { return mUpdateBoundingBoxFromSkeleton; }
-
-        
     };
 
     /** FItemy object for creating Item instances */

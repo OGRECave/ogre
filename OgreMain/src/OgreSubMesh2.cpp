@@ -40,7 +40,6 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     SubMesh::SubMesh() :
-        mMaterialIsHlms( true ),
         mParent( 0 ),
         mBoneAssignmentsOutOfDate( false )
     {
