@@ -23,12 +23,12 @@ cbuffer cbPerFrame : register( b0 )
 // Vertex shader
 struct VS_CONTROL_POINT_INPUT
 {
-    float3 vPosition        : POSITION;
+    float4 vPosition        : POSITION;
 };
 
 struct VS_CONTROL_POINT_OUTPUT
 {
-    float3 vPosition        : POSITION;
+    float4 vPosition        : POSITION;
 };
 
 //Just a pass-through shader
@@ -50,7 +50,7 @@ struct HS_CONSTANT_DATA_OUTPUT
 
 struct HS_OUTPUT
 {
-    float3 vPosition           : POSITION;
+    float4 vPosition           : SV_POSITION;
 };
 
 HS_CONSTANT_DATA_OUTPUT ConstantHS( InputPatch<VS_CONTROL_POINT_OUTPUT, 3> ip,
