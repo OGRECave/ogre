@@ -45,7 +45,7 @@ struct v2h
 // hull to domain
 struct h2d
 {
-    float4 position 		: POSITION;
+    float4 position 		: SV_POSITION;
     float2 texCoord 		: TEXCOORD0;
 };
 
@@ -139,7 +139,7 @@ d2p simple_tessellation_ds(ConstantOutputType input, float3 barycentricCoordinat
 float4 simple_tessellation_ps(d2p In) : SV_TARGET
 {
 	float4 outColor;
-	outColor.rgb = g_DiffuseTxt.Sample( g_samLinear, In.texCoord );
+	outColor.rgb = g_DiffuseTxt.Sample( g_samLinear, In.texCoord ).rgb;
 	outColor.a = 1.0f;
 	
 	return outColor;
