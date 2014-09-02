@@ -23,14 +23,14 @@ cbuffer MatrixBuffer
 //////////////
 struct VertexInputType
 {
-    float3 position 		: POSITION;
+    float4 position 		: POSITION;
     float3 normal 			: NORMAL;
     float2 texCoord     	: TEXCOORD0;
 };
 
 struct HullInputType
 {
-    float3 position 		: POSITION;
+    float4 position 		: POSITION;
     float2 texCoord     	: TEXCOORD0;
     float3 normal 			: TEXCOORD1;
 };
@@ -59,7 +59,7 @@ struct ConstantOutputType
 //The HullOutputType structure is what will be the output from the hull shader.
 struct HullOutputType
 {
-    float3 position : POSITION;
+    float4 position : SV_POSITION;
     float2 texCoord : TEXCOORD0;
     float3 normal 	: TEXCOORD1;
 };
