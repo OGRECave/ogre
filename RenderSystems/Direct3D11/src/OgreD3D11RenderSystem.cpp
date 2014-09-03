@@ -2298,12 +2298,6 @@ bail:
 					"Failed to create blend state\nError Description:" + errorDescription, 
 					"D3D11RenderSystem::_render" );
 			}
-            
-            if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
-            {
-                // should we enable it all the time and not only for lower the level 10?
-                mRasterizerDesc.DepthClipEnable = true;
-            }
 
 			hr = mDevice->CreateRasterizerState(&mRasterizerDesc, &opState->mRasterizer) ;
 			if (FAILED(hr))
@@ -3652,7 +3646,7 @@ bail:
 
 		ZeroMemory( &mRasterizerDesc, sizeof(mRasterizerDesc));
 		mRasterizerDesc.FrontCounterClockwise = true;
-		mRasterizerDesc.DepthClipEnable = false;
+		mRasterizerDesc.DepthClipEnable = true;
 		mRasterizerDesc.MultisampleEnable = true;
 
 
