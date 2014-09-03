@@ -957,6 +957,132 @@ fragment_program Examples/GrassWaverReceiverFpCg cg
     }
 }
 
+
+vertex_program Examples/GrassWaverVpHLSL hlsl
+{
+	source Grass.cg
+	entry_point grass_vp
+	target vs_2_0
+
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+
+       // param_named_auto camObjPos camera_position_object_space
+
+        param_named_auto ambient ambient_light_colour
+        param_named_auto objSpaceLight light_position_object_space 0
+        param_named_auto lightColour light_diffuse_colour 0
+
+        param_named_auto offset custom 999
+    }
+}
+
+vertex_program Examples/GrassWaverTexVpHLSL hlsl
+  {
+	source Grass.cg
+	entry_point grassTex_vp
+	target vs_2_0
+
+    default_params
+      {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto offset custom 999
+    }
+}
+vertex_program Examples/GrassWaverAmbientVpHLSL hlsl
+{
+	source Grass.cg
+	entry_point grassAmbient_vp
+	target vs_2_0
+
+    default_params
+  	{
+  				param_named_auto worldViewProj worldviewproj_matrix
+  				param_named_auto ambient ambient_light_colour
+        param_named_auto offset custom 999
+    }
+}
+fragment_program Examples/GrassWaverAmbientFpHLSL hlsl
+{
+	source Grass.cg
+	entry_point grassAmbient_fp
+	target ps_2_0
+    default_params
+    {
+    }
+}
+fragment_program Examples/GrassWaverFpHLSL hlsl
+{
+	source Grass.cg
+	entry_point grass_fp
+	target ps_2_0
+    default_params
+    {
+    }
+}
+
+vertex_program Examples/GrassWaverCasterVpHLSL hlsl
+{
+	source Grass.cg
+	entry_point grasscaster_vp
+	target vs_2_0
+
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto offset custom 999
+		param_named_auto texelOffsets texel_offsets
+    }
+}
+fragment_program Examples/GrassWaverCasterFpHLSL hlsl
+{
+	source Grass.cg
+	entry_point grasscaster_fp
+	target ps_2_0
+    default_params
+    {
+    }
+}
+
+vertex_program Examples/GrassWaverReceiverVpHLSL hlsl
+{
+	source Grass.cg
+	entry_point grassreceiver_vp
+	target vs_2_0
+
+    default_params
+    {
+        param_named_auto world world_matrix
+		    param_named_auto worldViewProj worldviewproj_matrix
+		    param_named_auto texViewProj texture_viewproj_matrix
+
+        param_named_auto camObjPos camera_position_object_space
+
+  			param_named_auto objSpaceLight light_position_object_space 0
+  			param_named_auto lightColour light_diffuse_colour 0
+
+  			param_named_auto offset custom 999
+  	}
+}
+
+
+fragment_program Examples/GrassWaverReceiverFpHLSL hlsl
+{
+	source Grass.cg
+	entry_point grassreceiver_fp
+	target ps_2_0
+
+	default_params
+    {
+        //param_named inverseShadowmapSize float 0.0009765625
+		param_named fixedDepthBias float 0.0005
+		param_named gradientClamp float 0.0098
+		param_named gradientScaleBias float 0
+    }
+}
+
+
 vertex_program Examples/GrassWaverVpGLSLES glsles
 {
 	source GrassVp.glsles
@@ -1197,6 +1323,7 @@ vertex_program Examples/GrassWaverReceiverVp unified
 {
 	delegate Examples/GrassWaverReceiverVpGLSL
 	delegate Examples/GrassWaverReceiverVpGLSLES
+	delegate Examples/GrassWaverReceiverVpHLSL
 	delegate Examples/GrassWaverReceiverVpCg
 }
 
@@ -1204,6 +1331,7 @@ fragment_program Examples/GrassWaverReceiverFp unified
 {
 	delegate Examples/GrassWaverReceiverFpGLSL
 	delegate Examples/GrassWaverReceiverFpGLSLES
+	delegate Examples/GrassWaverReceiverFpHLSL
 	delegate Examples/GrassWaverReceiverFpCg
 }
 
@@ -1211,6 +1339,7 @@ vertex_program Examples/GrassWaverCasterVp unified
 {
 	delegate Examples/GrassWaverCasterVpGLSL
 	delegate Examples/GrassWaverCasterVpGLSLES
+	delegate Examples/GrassWaverCasterVpHLSL
 	delegate Examples/GrassWaverCasterVpCg
 }
 
@@ -1218,6 +1347,7 @@ fragment_program Examples/GrassWaverCasterFp unified
 {
 	delegate Examples/GrassWaverCasterFpGLSL
 	delegate Examples/GrassWaverCasterFpGLSLES
+	delegate Examples/GrassWaverCasterFpHLSL
 	delegate Examples/GrassWaverCasterFpCg
 }
 
@@ -1225,6 +1355,7 @@ vertex_program Examples/GrassWaverAmbientVp unified
 {
 	delegate Examples/GrassWaverAmbientVpGLSL
 	delegate Examples/GrassWaverAmbientVpGLSLES
+	delegate Examples/GrassWaverAmbientVpHLSL
 	delegate Examples/GrassWaverAmbientVpCg
 }
 
@@ -1232,6 +1363,7 @@ fragment_program Examples/GrassWaverAmbientFp unified
 {
 	delegate Examples/GrassWaverAmbientFpGLSL
 	delegate Examples/GrassWaverAmbientFpGLSLES
+	delegate Examples/GrassWaverAmbientFpHLSL
 	delegate Examples/GrassWaverAmbientFpCg
 }
 
@@ -1239,6 +1371,7 @@ vertex_program Examples/GrassWaverTexVp unified
 {
 	delegate Examples/GrassWaverTexVpGLSL
 	delegate Examples/GrassWaverTexVpGLSLES
+	delegate Examples/GrassWaverTexVpHLSL
 	delegate Examples/GrassWaverTexVpCg
 }
 
@@ -1246,6 +1379,7 @@ fragment_program Examples/GrassWaverFp unified
 {
 	delegate Examples/GrassWaverFpGLSL
 	delegate Examples/GrassWaverFpGLSLES
+	delegate Examples/GrassWaverFpHLSL
 	delegate Examples/GrassWaverFpCg
 }
 
@@ -1253,6 +1387,7 @@ vertex_program Examples/GrassWaverVp unified
 {
 	delegate Examples/GrassWaverVpGLSL
 	delegate Examples/GrassWaverVpGLSLES
+	delegate Examples/GrassWaverVpHLSL
 	delegate Examples/GrassWaverVpCg
 }
 
