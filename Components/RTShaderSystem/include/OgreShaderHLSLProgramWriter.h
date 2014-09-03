@@ -98,6 +98,7 @@ protected:
 
 	// Attributes.
 protected:
+	bool mIsShaderModel4;
 	// Map between GPU constant type to string value.
 	GpuConstTypeToStringMap mGpuConstTypeMap;
 	// Map between parameter semantic to string value.

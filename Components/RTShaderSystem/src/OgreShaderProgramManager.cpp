@@ -272,8 +272,8 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	//  shader models 4 and 5.
 	// This change may incrase the number of register used in older shader
 	//  models - this is why the check is present here.
-	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-	if (isVs4)
+	bool isShaderModel4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+	if (isShaderModel4)
 	{
 		synchronizePixelnToBeVertexOut(programSet);
 	}

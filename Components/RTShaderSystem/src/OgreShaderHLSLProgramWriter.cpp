@@ -50,14 +50,27 @@ HLSLProgramWriter::~HLSLProgramWriter()
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::initializeStringMaps()
 {
+	mIsShaderModel4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+
 	mGpuConstTypeMap[GCT_FLOAT1] = "float";
 	mGpuConstTypeMap[GCT_FLOAT2] = "float2";
 	mGpuConstTypeMap[GCT_FLOAT3] = "float3";
 	mGpuConstTypeMap[GCT_FLOAT4] = "float4";
-	mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
-	mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
-	mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
-	mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCUBE";
+	if(mIsShaderModel4)
+	{
+		mGpuConstTypeMap[GCT_SAMPLER1D] = "Texture1D";
+		mGpuConstTypeMap[GCT_SAMPLER2D] = "Texture2D";
+		mGpuConstTypeMap[GCT_SAMPLER3D] = "Texture3D";
+		mGpuConstTypeMap[GCT_SAMPLERCUBE] = "TextureCube";
+		mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "Texture2DArray";
+	}
+	else
+	{
+		mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler1D";
+		mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
+		mGpuConstTypeMap[GCT_SAMPLER3D] = "sampler3D";
+		mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCUBE";
+	}
 	mGpuConstTypeMap[GCT_MATRIX_2X2] = "float2x2";
 	mGpuConstTypeMap[GCT_MATRIX_2X3] = "float2x3";
 	mGpuConstTypeMap[GCT_MATRIX_2X4] = "float2x4";
@@ -160,6 +173,8 @@ void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
 	os << "//                         PROGRAM DEPENDENCIES" << std::endl;
 	os << "//-----------------------------------------------------------------------------" << std::endl;
 
+	if (mIsShaderModel4)
+		os << "#include \"ShaderModel4_Prerequisites." << getTargetLanguage() << '\"' << std::endl;
 
 	for (unsigned int i=0; i < program->getDependencyCount(); ++i)
 	{
@@ -172,18 +187,29 @@ void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
 {
-	os << mGpuConstTypeMap[parameter->getType()];
-	os << "\t";	
-	os << parameter->getName();	
-	if (parameter->isArray() == true)
+	if(mIsShaderModel4 && parameter->isSampler())
 	{
-		os << "[" << parameter->getSize() << "]";	
-	}
-	if (parameter->isSampler())
-	{
-		os << " : register(s" << parameter->getIndex() << ")";		
-	}
+		// SM4 separates sampler into texture and lightweight SamplerState
+		os << "#define " << parameter->getName() << " \\\n";
+		os << "\tMakeSamplerStruct(" << parameter->getName() << "Texture, " << parameter->getName() << "State)\n";
 
+		os << mGpuConstTypeMap[parameter->getType()] << "\t" << parameter->getName() << "Texture : register(t" << parameter->getIndex() << ");\n";
+		
+		os << "SamplerState\t" << parameter->getName() << "State : register(s" << parameter->getIndex() << ")";
+	}
+	else
+	{
+		os << mGpuConstTypeMap[parameter->getType()] << "\t" << parameter->getName();
+
+		if(parameter->isArray() == true)
+		{
+			os << "[" << parameter->getSize() << "]";
+		}
+		if(parameter->isSampler())
+		{
+			os << " : register(s" << parameter->getIndex() << ")";
+		}
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -250,15 +276,13 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 	size_t paramsCount = inParams.size() + outParams.size();
 	size_t curParamIndex = 0;
 
-	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-
 	// Write input parameters.
 	for (it=inParams.begin(); it != inParams.end(); ++it)
 	{					
 		os << "\t in ";
 
 		const char* forcedSemantic = 
-			(isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+			(mIsShaderModel4 && function->getFunctionType() == Function::FFT_PS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
 
 		writeFunctionParameter(os, *it, forcedSemantic);
 
@@ -274,8 +298,8 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 		os << "\t out ";
 
 		const char* forcedSemantic = 
-			(isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN) ? "SV_Target" :
-			(isVs4 && function->getFunctionType() == Function::FFT_VS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+			(mIsShaderModel4 && function->getFunctionType() == Function::FFT_PS_MAIN) ? "SV_Target" :
+			(mIsShaderModel4 && function->getFunctionType() == Function::FFT_VS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
 
 		writeFunctionParameter(os, *it, forcedSemantic);
 

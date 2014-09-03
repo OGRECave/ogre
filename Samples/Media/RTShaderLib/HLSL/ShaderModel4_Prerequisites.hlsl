@@ -1,0 +1,113 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org
+
+Copyright (c) 2000-2014 Torus Knot Software Ltd
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+
+#define SHADER_MODEL_4
+
+
+#define sampler1D	SamplerStruct1D
+#define sampler2D	SamplerStruct2D
+#define sampler3D	SamplerStruct3D
+#define samplerCUBE	SamplerStructCube
+
+
+struct SamplerStruct1D
+{
+	Texture1D tex;
+	SamplerState state;
+};
+
+struct SamplerStruct2D
+{
+	Texture2D tex;
+	SamplerState state;
+};
+
+struct SamplerStruct3D
+{
+	Texture3D tex;
+	SamplerState state;
+};
+
+struct SamplerStructCube
+{
+	TextureCube tex;
+	SamplerState state;
+};
+
+
+SamplerStruct1D MakeSamplerStruct(uniform Texture1D tex, uniform SamplerState state)
+{
+	SamplerStruct1D	res;
+	res.tex = tex;
+	res.state = state;
+	return res;
+}
+
+SamplerStruct2D MakeSamplerStruct(uniform Texture2D tex, uniform SamplerState state)
+{
+	SamplerStruct2D	res;
+	res.tex = tex;
+	res.state = state;
+	return res;
+}
+
+SamplerStruct3D MakeSamplerStruct(uniform Texture3D tex, uniform SamplerState state)
+{
+	SamplerStruct3D	res;
+	res.tex = tex;
+	res.state = state;
+	return res;
+}
+
+SamplerStructCube MakeSamplerStruct(uniform TextureCube tex, uniform SamplerState state)
+{
+	SamplerStructCube	res;
+	res.tex = tex;
+	res.state = state;
+	return res;
+}
+
+
+float4 tex1D(SamplerStruct1D ss, float t)
+{
+	return ss.tex.Sample(ss.state, t);
+}
+
+float4 tex2D(SamplerStruct2D ss, float2 t)
+{
+	return ss.tex.Sample(ss.state, t);
+}
+
+float4 tex3D(SamplerStruct3D ss, float3 t)
+{
+	return ss.tex.Sample(ss.state, t);
+}
+
+float4 texCUBE(SamplerStructCube ss, float3 t)
+{
+	return ss.tex.Sample(ss.state, t);
+}
