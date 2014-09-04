@@ -39,7 +39,7 @@ void main_vp(float4 position	: POSITION,
 }
 
 void main_fp( float4 position	: POSITION,
-       float diffuseIn 	: TEXCOORD0,
+			 float diffuseIn 	: TEXCOORD0,
 			 float specularIn	: TEXCOORD1,
 			 float edge		: TEXCOORD2,
 			 
@@ -48,14 +48,32 @@ void main_fp( float4 position	: POSITION,
 			 uniform float4 diffuse,
 			 uniform float4 specular,
 			 
+// It`s not enough to compile this shader for HLSL SM4 using compatibility mode as sampler1D declares Texture2D reference.
+// Explicit declaration of Texture1D is required to avoid mismatching between declared and actual texture type.
+#if HLSL_SM4
+			 uniform Texture1D diffuseRamp,
+			 uniform SamplerState diffuseRampSS,
+			 uniform Texture1D specularRamp,
+			 uniform SamplerState specularRampSS,
+			 uniform Texture1D edgeRamp,
+			 uniform SamplerState edgeRampSS
+#else
 			 uniform sampler1D diffuseRamp,
 			 uniform sampler1D specularRamp,
-			 uniform sampler1D edgeRamp)
+			 uniform sampler1D edgeRamp
+#endif
+)
 {
 	// Step functions from textures
+#if HLSL_SM4
+	diffuseIn = diffuseRamp.Sample(diffuseRampSS, diffuseIn).x;
+	specularIn = specularRamp.Sample(specularRampSS, specularIn).x;
+	edge = edgeRamp.Sample(edgeRampSS, edge).x;
+#else
 	diffuseIn = tex1D(diffuseRamp, diffuseIn).x;
 	specularIn = tex1D(specularRamp, specularIn).x;
 	edge = tex1D(edgeRamp, edge).x;
+#endif
 
 	colour = edge * ((diffuse * diffuseIn) + 
 					(specular * specularIn));

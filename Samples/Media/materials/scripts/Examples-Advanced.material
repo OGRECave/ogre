@@ -24,6 +24,36 @@ fragment_program Ogre/CelShadingFPCg cg
 
 }
 
+vertex_program Ogre/CelShadingVPHLSL hlsl
+{
+	source Example_CelShading.cg
+	entry_point main_vp
+	target vs_2_0
+
+	default_params
+	{
+		param_named_auto lightPosition light_position_object_space 0
+		param_named_auto eyePosition camera_position_object_space
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named shininess float 10 
+	}
+}
+
+fragment_program Ogre/CelShadingFPHLSL hlsl
+{
+	source Example_CelShading.cg
+	entry_point main_fp
+	target ps_2_0
+}
+
+fragment_program Ogre/CelShadingFPHLSL_sm4 hlsl
+{
+	source Example_CelShading.cg
+	entry_point main_fp
+	target ps_4_0
+	preprocessor_defines HLSL_SM4=1
+}
+
 vertex_program Ogre/CelShadingVPGLSLES glsles
 {
 	source Example_CelShadingVp.glsles
@@ -68,6 +98,8 @@ fragment_program Ogre/CelShadingFP unified
 {
 	delegate Ogre/CelShadingFPGLSL
 	delegate Ogre/CelShadingFPGLSLES
+	delegate Ogre/CelShadingFPHLSL_sm4
+	delegate Ogre/CelShadingFPHLSL
 	delegate Ogre/CelShadingFPCg
 }
 
@@ -75,6 +107,7 @@ vertex_program Ogre/CelShadingVP unified
 {
 	delegate Ogre/CelShadingVPGLSL
 	delegate Ogre/CelShadingVPGLSLES
+	delegate Ogre/CelShadingVPHLSL
 	delegate Ogre/CelShadingVPCg
 }
 
