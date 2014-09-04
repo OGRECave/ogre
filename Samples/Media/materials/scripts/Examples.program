@@ -36,7 +36,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4 cg
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 {
-    source Example_Basic.hlsl
+    source Example_Basic.cg
     entry_point ambientOneTexture_vp
     target vs_4_0
 
@@ -222,7 +222,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterCg cg
 // Same as below, but for use when rendering texture shadows
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL hlsl
 {
-    source Example_Basic.hlsl
+    source Example_Basic.cg
     entry_point hardwareSkinningTwoWeightsCaster_vp
     target vs_4_0
     includes_skeletal_animation true
@@ -253,7 +253,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
 // Basic hardware skinning using two indexed weights per vertex
 vertex_program Ogre/HardwareSkinningTwoWeightsHLSL hlsl
 {
-    source Example_Basic.hlsl
+    source Example_Basic.cg
     entry_point hardwareSkinningTwoWeights_vp
     target vs_4_0
     includes_skeletal_animation true
