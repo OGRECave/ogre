@@ -87,7 +87,8 @@ namespace Ogre
         DynLibManager* mDynLibManager;
         ArchiveManager* mArchiveManager;
         MaterialManager* mMaterialManager;
-        v1::MeshManager* mMeshManager;
+        v1::MeshManager* mMeshManagerV1;
+        MeshManager* mMeshManager;
         ParticleSystemManager* mParticleManager;
         v1::OldSkeletonManager* mOldSkeletonManager;
         SkeletonManager* mSkeletonManager;
@@ -136,6 +137,7 @@ namespace Ogre
         uint32 mNextMovableObjectTypeFlag;
         // stock movable factories
         MovableObjectFactory* mEntityFactory;
+        MovableObjectFactory* mItemFactory;
         MovableObjectFactory* mLightFactory;
         MovableObjectFactory* mBillboardSetFactory;
         MovableObjectFactory* mManualObjectFactory;
@@ -472,7 +474,7 @@ namespace Ogre
                 This performs the same function as MeshManager::getSingleton
                 and is provided for convenience to scripting engines.
         */
-        v1::MeshManager* getMeshManager(void);
+        v1::MeshManager* getMeshManagerV1(void);
 
         /** Utility function for getting a better description of an error
             code.

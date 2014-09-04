@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreEntity.h"
 #include "OgreSubEntity.h"
+#include "OgreItem.h"
+#include "OgreMesh2.h"
 #include "OgreLight.h"
 #include "OgreControllerManager.h"
 #include "OgreMaterialManager.h"
@@ -383,6 +385,34 @@ void SceneManager::destroyLight(Light *l)
 void SceneManager::destroyAllLights(void)
 {
     destroyAllMovableObjectsByType(LightFactory::FACTORY_TYPE_NAME);
+}
+//-----------------------------------------------------------------------
+Item* SceneManager::createItem( const String& meshName,
+                                const String& groupName, /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */
+                                SceneMemoryMgrTypes sceneType /*= SCENE_DYNAMIC */ )
+{
+    // delegate to factory implementation
+    NameValuePairList params;
+    params["mesh"] = meshName;
+    params["resourceGroup"] = groupName;
+    return static_cast<Item*>( createMovableObject( ItemFactory::FACTORY_TYPE_NAME,
+                                                    &mEntityMemoryManager[sceneType], &params) );
+
+}
+//---------------------------------------------------------------------
+Item* SceneManager::createItem( const MeshPtr& pMesh, SceneMemoryMgrTypes sceneType )
+{
+    return createItem(pMesh->getName(), pMesh->getGroup(), sceneType);
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroyItem( Item *i )
+{
+    destroyMovableObject( i );
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroyAllItems(void)
+{
+    destroyAllMovableObjectsByType(ItemFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 v1::Entity* SceneManager::createEntity( PrefabType ptype, SceneMemoryMgrTypes sceneType )

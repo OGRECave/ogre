@@ -1231,6 +1231,28 @@ namespace Ogre {
         ObjectMemoryManager& _getEntityMemoryManager(SceneMemoryMgrTypes sceneType)
                                                             { return mEntityMemoryManager[sceneType]; }
 
+        /** Create an Item (instance of a discrete mesh).
+            @param
+                meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
+                mesh will be loaded if it is not already.
+        */
+        virtual Item* createItem( const String& meshName,
+                                  const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                                  SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
+
+        /** Create an Item (instance of a discrete mesh).
+            @param
+                pMesh The pointer to the Mesh it is to be based on.
+        */
+        virtual Item* createItem( const MeshPtr& pMesh,
+                                  SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
+
+        /// Removes & destroys an Item from the SceneManager.
+        virtual void destroyItem( Item *item );
+
+        /// Removes & destroys all Items.
+        virtual void destroyAllItems(void);
+
         /** Create an Entity (instance of a discrete mesh).
             @param
                 meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
