@@ -140,6 +140,13 @@ vertex_program Examples/BumpMapVPCg cg
 	profiles vs_4_0 vs_1_1 arbvp1
 }
 
+vertex_program Examples/BumpMapVPHLSL hlsl
+{
+	source Example_BumpMapping.cg
+	entry_point main_vp
+	target vs_2_0
+}
+
 vertex_program Examples/BumpMapVPGLSLES glsles
 {
 	source Example_BumpMappingVp.glsles
@@ -156,6 +163,7 @@ vertex_program Examples/BumpMapVP unified
 {
 	delegate Examples/BumpMapVPGLSL
 	delegate Examples/BumpMapVPGLSLES
+	delegate Examples/BumpMapVPHLSL
 	delegate Examples/BumpMapVPCg
 }
 
@@ -166,6 +174,14 @@ vertex_program Examples/BumpMapVPTangentParityCg cg
 	entry_point main_vp
 	profiles vs_1_1 arbvp1
 	compile_arguments -DTANGENTS_HAVE_PARITY=1
+}
+
+vertex_program Examples/BumpMapVPTangentParityHLSL hlsl
+{
+	source Example_BumpMapping.cg
+	entry_point main_vp
+	target vs_2_0
+	preprocessor_defines TANGENTS_HAVE_PARITY=1
 }
 
 // Bump map vertex program, with tangent parity support for this is required
@@ -188,6 +204,7 @@ vertex_program Examples/BumpMapVPTangentParity unified
 {
 	delegate Examples/BumpMapVPTangentParityGLSL
 	delegate Examples/BumpMapVPTangentParityGLSLES
+	delegate Examples/BumpMapVPTangentParityHLSL
 	delegate Examples/BumpMapVPTangentParityCg
 }
 
@@ -197,6 +214,13 @@ fragment_program Examples/BumpMapFPCg cg
 	source Example_BumpMapping.cg
 	entry_point main_fp
 	profiles ps_4_0 ps_2_0 arbfp1 fp20
+}
+
+fragment_program Examples/BumpMapFPHLSL hlsl
+{
+	source Example_BumpMapping.cg
+	entry_point main_fp
+	target ps_2_0
 }
 
 fragment_program Examples/BumpMapFPGLSLES glsles
@@ -225,6 +249,7 @@ fragment_program Examples/BumpMapFP unified
 {
 	delegate Examples/BumpMapFPGLSL
 	delegate Examples/BumpMapFPGLSLES
+	delegate Examples/BumpMapFPHLSL
 	delegate Examples/BumpMapFPCg
 }
 
@@ -304,6 +329,13 @@ vertex_program Examples/BumpMapVPSpecularCg cg
 	profiles vs_4_0 vs_1_1 arbvp1
 }
 
+vertex_program Examples/BumpMapVPSpecularHLSL hlsl
+{
+	source Example_BumpMapping.cg
+	entry_point specular_vp
+	target vs_2_0
+}
+
 // Bump map with specular vertex program, support for this is required
 vertex_program Examples/BumpMapVPSpecularGLSLES glsles
 {
@@ -321,6 +353,7 @@ vertex_program Examples/BumpMapVPSpecular unified
 {
 	delegate Examples/BumpMapVPSpecularGLSL
 	delegate Examples/BumpMapVPSpecularGLSLES
+	delegate Examples/BumpMapVPSpecularHLSL
 	delegate Examples/BumpMapVPSpecularCg
 }
 
@@ -330,6 +363,13 @@ fragment_program Examples/BumpMapFPSpecularCg cg
 	source Example_BumpMapping.cg
 	entry_point specular_fp
 	profiles ps_4_0 ps_2_0 arbfp1 fp20
+}
+
+fragment_program Examples/BumpMapFPSpecularHLSL hlsl
+{
+	source Example_BumpMapping.cg
+	entry_point specular_fp
+	target ps_2_0
 }
 
 // Bump map fragment program, support for this is optional
@@ -359,6 +399,7 @@ fragment_program Examples/BumpMapFPSpecular unified
 {
 	delegate Examples/BumpMapFPSpecularGLSL
 	delegate Examples/BumpMapFPSpecularGLSLES
+	delegate Examples/BumpMapFPSpecularHLSL
 	delegate Examples/BumpMapFPSpecularCg
 }
 

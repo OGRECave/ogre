@@ -1,0 +1,18 @@
+// Version with signature strictly compatible with AmbientOneTextureUnified, HardwareMorphAnimation,
+// HardwarePoseAnimation, HardwareMorphAnimationWithNormals, HardwarePoseAnimationWithNormals
+// as required by D3D11.
+float4 main (float4 pos			: SV_POSITION, 
+			 float2 oUv			: TEXCOORD0,
+			 float4 colour		: COLOR) : COLOR
+{
+	return colour;
+}
+
+// BUGBUG: very strange version, seems that 'uniform colour' is never initialized
+float4 mainForAmbientOneTexture (float4 pos : SV_POSITION,
+								 float2 oUv : TEXCOORD0,
+								 float4 colour0 : COLOR,
+								 uniform float4 colour) : COLOR
+{
+	return colour;
+}

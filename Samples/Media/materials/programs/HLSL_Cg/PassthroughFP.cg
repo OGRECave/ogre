@@ -1,0 +1,16 @@
+// Version with signature strictly compatible with AmbientOneTextureUnified, HardwareMorphAnimation,
+// HardwarePoseAnimation, HardwareMorphAnimationWithNormals, HardwarePoseAnimationWithNormals
+// as required by D3D11.
+float4 main (	float4 pos : POSITION,
+				float2 oUv : TEXCOORD0,
+				float4 colour : COLOR) : COLOR
+{
+	return colour;
+}
+
+// Version with only used subset of signature.
+// TODO: Check, is there any performance gains and remove this version if not.
+float4 mainCg (float4 colour : COLOR) : COLOR
+{
+    return colour;
+}

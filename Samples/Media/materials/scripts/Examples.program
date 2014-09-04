@@ -155,6 +155,7 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 {
     delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSL
     delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSLES
+    delegate Ogre/BasicFragmentPrograms/PassthroughFpHLSL
     delegate Ogre/BasicFragmentPrograms/PassthroughFpCgSm4
     delegate Ogre/BasicFragmentPrograms/PassthroughFpCg
 }
@@ -172,6 +173,13 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCg cg
     entry_point mainCg
     source PassthroughFP.cg
     profiles ps_2_0 arbfp1
+}
+
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFpHLSL hlsl
+{
+    entry_point main
+    source PassthroughFP.cg
+    target ps_2_0
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
