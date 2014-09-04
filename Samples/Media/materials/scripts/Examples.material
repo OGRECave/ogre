@@ -2165,6 +2165,13 @@ fragment_program Examples/ShowUV_pCg_sm4 cg
 	profiles ps_4_0
 }
 
+fragment_program Examples/ShowUV_pHLSL hlsl
+{
+	source Example_Basic.cg
+	entry_point showuv_p
+	target ps_2_0
+}
+
 fragment_program Examples/ShowUV_pGLSLES glsles
 {
 	source ShowUV.glsles
@@ -2181,6 +2188,7 @@ fragment_program Examples/ShowUV_p unified
 {
 	delegate Examples/ShowUV_pGLSL
 	delegate Examples/ShowUV_pGLSLES
+	delegate Examples/ShowUV_pHLSL
 	delegate Examples/ShowUV_pCg
 	delegate Examples/ShowUV_pCg_sm4
 }
@@ -2191,6 +2199,7 @@ fragment_program Examples/ShowUVdir3D_pCg cg
 	entry_point showuvdir3d_p
 	profiles ps_2_0 arbfp1
 }
+
 fragment_program Examples/ShowUVdir3D_pCg_sm4 cg
 {
 	source Example_Basic_sm4.cg
@@ -2198,6 +2207,12 @@ fragment_program Examples/ShowUVdir3D_pCg_sm4 cg
 	profiles ps_4_0
 }
 
+fragment_program Examples/ShowUVdir3D_pHLSL hlsl
+{
+	source Example_Basic.cg
+	entry_point showuvdir3d_p
+	target ps_2_0
+}
 
 fragment_program Examples/ShowUVdir3D_pGLSLES glsles
 {
@@ -2215,6 +2230,7 @@ fragment_program Examples/ShowUVdir3D_p unified
 {
 	delegate Examples/ShowUVdir3D_pGLSL
 	delegate Examples/ShowUVdir3D_pGLSLES
+	delegate Examples/ShowUVdir3D_pHLSL
 	delegate Examples/ShowUVdir3D_pCg
 	delegate Examples/ShowUVdir3D_pCg_sm4
 }
@@ -2235,6 +2251,17 @@ vertex_program Examples/ShowTangents_vCg_sm4 cg
 	source Example_Basic_sm4.cg
 	entry_point basicPassthroughTangent_v
 	profiles vs_4_0
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Examples/ShowTangents_vHLSL hlsl
+{
+	source Example_Basic.cg
+	entry_point basicPassthroughTangent_v
+	target vs_2_0
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -2265,6 +2292,7 @@ vertex_program Examples/ShowTangents_v unified
 {
 	delegate Examples/ShowTangents_vGLSL
 	delegate Examples/ShowTangents_vGLSLES
+	delegate Examples/ShowTangents_vHLSL
 	delegate Examples/ShowTangents_vCg
 	delegate Examples/ShowTangents_vCg_sm4
 }
@@ -2285,6 +2313,17 @@ vertex_program Examples/ShowNormals_vCg_sm4 cg
 	source Example_Basic_sm4.cg
 	entry_point basicPassthroughNormal_v
 	profiles vs_4_0
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Examples/ShowNormals_vHLSL hlsl
+{
+	source Example_Basic.cg
+	entry_point basicPassthroughNormal_v
+	target vs_2_0
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -2315,6 +2354,7 @@ vertex_program Examples/ShowNormals_v unified
 {
 	delegate Examples/ShowNormals_vGLSL
 	delegate Examples/ShowNormals_vGLSLES
+	delegate Examples/ShowNormals_vHLSL
 	delegate Examples/ShowNormals_vCg
 	delegate Examples/ShowNormals_vCg_sm4
 }
