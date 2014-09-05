@@ -148,12 +148,18 @@ namespace Ogre {
 
         defines.clear();
 
-        if (stringBuffer.empty())
-            return;
+        // Add predefined macro so that the same shader can adapt itself to both D3D9 and D3D11.
+        // It can be used to declare sampler in D3D9 but separate texture and SamplerState for D3D11,
+        // using different texture sampling instructions, tex2D for D3D9 and SampleXxx for D3D11,
+        // declaring type of BLENDINDICES as float4 for D3D9 but as uint4 for D3D11 -  all those
+        // small but annoying differences that otherwise would require declaring separate programs.
+        D3D_SHADER_MACRO macro;
+        macro.Name = "SHADER_MODEL_4";
+        macro.Definition = "1";
+        defines.push_back(macro);
 
         // Split preprocessor defines and build up macro array
-        D3D_SHADER_MACRO macro;
-        String::size_type pos = 0;
+        String::size_type pos = stringBuffer.empty() ? String::npos : 0;
         while (pos != String::npos)
         {
             macro.Name = &stringBuffer[pos];

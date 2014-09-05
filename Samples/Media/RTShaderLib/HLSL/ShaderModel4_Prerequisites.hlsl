@@ -25,9 +25,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#define SHADER_MODEL_4
-
-
 #define sampler1D	SamplerStruct1D
 #define sampler2D	SamplerStruct2D
 #define sampler3D	SamplerStruct3D
