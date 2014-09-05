@@ -215,11 +215,23 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic)
 {
+	const char* type = mGpuConstTypeMap[parameter->getType()];
 
-	os << mGpuConstTypeMap[parameter->getType()];
-	
-	os << "\t";	
-	os << parameter->getName();	
+	if(mIsShaderModel4 && parameter->getSemantic() == Parameter::SPS_BLEND_INDICES)
+	{
+		// D3D9 converts shader parameter but D3D11 just reinterpret bits,
+		// therefore we should use uint4 type for VET_UBYTE4 aka DXGI_FORMAT_R8G8B8A8_UINT
+		switch(parameter->getType())
+		{
+		case GCT_FLOAT1: type = "uint"; break;
+		case GCT_FLOAT2: type = "uint2"; break;
+		case GCT_FLOAT3: type = "uint3"; break;
+		case GCT_FLOAT4: type = "uint4"; break;
+		}
+	}
+
+	os << type << '\t' << parameter->getName();
+
 	if (parameter->isArray() == true)
 	{
 		os << "[" << parameter->getSize() << "]";	
