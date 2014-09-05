@@ -37,8 +37,11 @@ void hardwareSkinningOneWeight_vp(
 	float4 position : POSITION,
 	float3 normal   : NORMAL,
 	float2 uv       : TEXCOORD0,
+#ifdef SHADER_MODEL_4
+	uint   blendIdx	: BLENDINDICES,
+#else
 	float  blendIdx : BLENDINDICES,
-	
+#endif
 
 	out float4 oPosition : POSITION,
 	out float2 oUv       : TEXCOORD0,
@@ -76,8 +79,11 @@ void hardwareSkinningOneWeight_vp(
 void hardwareSkinningOneWeightCaster_vp(
 	float4 position : POSITION,
 	float3 normal   : NORMAL,
+#ifdef SHADER_MODEL_4
+	uint   blendIdx	: BLENDINDICES,
+#else
 	float  blendIdx : BLENDINDICES,
-	
+#endif
 
 	out float4 oPosition : POSITION,
 	out float4 colour    : COLOR,
@@ -105,9 +111,12 @@ void hardwareSkinningTwoWeights_vp(
 	float4 position : POSITION,
 	float3 normal   : NORMAL,
 	float2 uv       : TEXCOORD0,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
 	float4 blendIdx : BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
-	
 
 	out float4 oPosition : POSITION,
 	out float2 oUv       : TEXCOORD0,
@@ -159,9 +168,12 @@ void hardwareSkinningTwoWeightsCaster_vp(
 	float4 position : POSITION,
 	float3 normal   : NORMAL,
 	float2 uv       : TEXCOORD0,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
 	float4 blendIdx : BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
-	
 
 	out float4 oPosition : POSITION,
 	out float4 colour           : COLOR,
@@ -195,9 +207,12 @@ void hardwareSkinningFourWeights_vp(
 	float4 position : POSITION,
 	float3 normal   : NORMAL,
 	float2 uv       : TEXCOORD0,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
 	float4 blendIdx : BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
-	
 
 	out float4 oPosition : POSITION,
 	out float2 oUv       : TEXCOORD0,

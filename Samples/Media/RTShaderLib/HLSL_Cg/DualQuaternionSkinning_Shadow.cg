@@ -108,6 +108,7 @@ void shadow_caster_dq_vs(
 }
 
 void shadow_caster_dq_ps(
+	in float4 position : POSITION,
 	in float4 colour : COLOR,
 	out float4 oColour : COLOR)
 {	
@@ -117,7 +118,11 @@ void shadow_caster_dq_ps(
 //Shadow caster pass
 void shadow_caster_dq_skinning_1weight_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -143,7 +148,11 @@ void shadow_caster_dq_skinning_1weight_vs(
 
 void shadow_caster_dq_skinning_2weight_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -169,7 +178,11 @@ void shadow_caster_dq_skinning_2weight_vs(
 
 void shadow_caster_dq_skinning_3weight_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -195,7 +208,11 @@ void shadow_caster_dq_skinning_3weight_vs(
 
 void shadow_caster_dq_skinning_4weight_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -223,7 +240,11 @@ void shadow_caster_dq_skinning_4weight_vs(
 //Two-phase skinning shadow caster pass
 void shadow_caster_dq_skinning_1weight_twophase_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -257,7 +278,11 @@ void shadow_caster_dq_skinning_1weight_twophase_vs(
 //Two-phase skinning shadow caster pass
 void shadow_caster_dq_skinning_2weight_twophase_vs(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4  blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,

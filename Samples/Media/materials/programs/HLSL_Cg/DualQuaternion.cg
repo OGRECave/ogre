@@ -5,7 +5,11 @@ void dualQuaternionHardwareSkinningTwoWeights_vp(
 	float4 position : POSITION,
 	float3 normal   : NORMAL,
 	float2 uv       : TEXCOORD0,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4 blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -46,7 +50,11 @@ void dualQuaternionHardwareSkinningTwoWeights_vp(
 //Shadow caster pass
 void dualQuaternionHardwareSkinningTwoWeightsCaster_vp(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4 blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,
@@ -75,9 +83,12 @@ void dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp(
 	float4 position : POSITION,
 	float3 normal   : NORMAL,
 	float2 uv       : TEXCOORD0,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4 blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
-	
 
 	out float4 oPosition : POSITION,
 	out float2 oUv       : TEXCOORD0,
@@ -97,7 +108,7 @@ void dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp(
 	blendS += blendWgt.y*scaleM[blendIdx.y];	
 		
 	float3 pass1_position = mul(blendS, position);
-	float3x3 blendSrotAT = adjointTransposeMatrix(float3x3(blendS));
+	float3x3 blendSrotAT = adjointTransposeMatrix((float3x3)blendS);
 	float3 pass1_normal = normalize(mul(blendSrotAT, normal.xyz));
 
 	//Second phase
@@ -125,7 +136,11 @@ void dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp(
 //Two-phase skinning shadow caster pass
 void dualQuaternionHardwareSkinningTwoWeightsTwoPhaseCaster_vp(
 	float4 position : POSITION,
-	float4 blendIdx : BLENDINDICES,
+#ifdef SHADER_MODEL_4
+	uint4 blendIdx	: BLENDINDICES,
+#else
+	float4 blendIdx	: BLENDINDICES,
+#endif
 	float4 blendWgt : BLENDWEIGHT,
 	
 	out float4 oPosition : POSITION,

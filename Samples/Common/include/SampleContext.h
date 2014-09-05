@@ -830,6 +830,10 @@ namespace OgreBites
 #			ifdef OGRE_BUILD_PLUGIN_CG
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/Cg", type, sec);
 #			endif
+            if (use_HLSL_Cg_shared)
+            {
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/HLSL_Cg", type, sec);
+            }
 #		endif /* INCLUDE_RTSHADER_SYSTEM */
 #	endif /* OGRE_PLATFORM != OGRE_PLATFORM_ANDROID */
 #endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
