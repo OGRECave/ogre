@@ -464,23 +464,24 @@ void SceneManager::destroyAllEntities(void)
     destroyAllMovableObjectsByType(v1::EntityFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-Rectangle2D* SceneManager::createRectangle2D( bool bQuad, SceneMemoryMgrTypes sceneType )
+v1::Rectangle2D* SceneManager::createRectangle2D( bool bQuad, SceneMemoryMgrTypes sceneType )
 {
     // delegate to factory implementation
     NameValuePairList params;
     params["quad"] = StringConverter::toString( bQuad );
-    return static_cast<Rectangle2D*>( createMovableObject( Rectangle2DFactory::FACTORY_TYPE_NAME,
-                                                           &mEntityMemoryManager[sceneType], &params ) );
+    return static_cast<v1::Rectangle2D*>( createMovableObject( v1::Rectangle2DFactory::FACTORY_TYPE_NAME,
+                                                               &mEntityMemoryManager[sceneType],
+                                                               &params ) );
 }
 //-----------------------------------------------------------------------
-void SceneManager::destroyRectangle2D( Rectangle2D *rect )
+void SceneManager::destroyRectangle2D( v1::Rectangle2D *rect )
 {
     destroyMovableObject( rect );
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllRectangle2D(void)
 {
-    destroyAllMovableObjectsByType(Rectangle2DFactory::FACTORY_TYPE_NAME);
+    destroyAllMovableObjectsByType(v1::Rectangle2DFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_addCompositorTexture( IdString name, const TextureVec *texs )

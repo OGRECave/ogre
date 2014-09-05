@@ -63,7 +63,7 @@ namespace Ogre
         if( end - start >= mFenceThreshold || forceFence )
         {
             Fence fence( start, end );
-            OCGLE( fence.fenceName = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
+            OCGE( fence.fenceName = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
             mFences.push_back( fence );
             fence.fenceName = 0; //Prevent the destructor from deleting the sync.
 
@@ -162,7 +162,7 @@ namespace Ogre
         waitIfNeeded();
 
         glBindBuffer( target, mVboName );
-        OCGLE( mMappedPtr = glMapBufferRange( target, mInternalBufferStart + mMappingStart,
+        OCGE( mMappedPtr = glMapBufferRange( target, mInternalBufferStart + mMappingStart,
                                               mMappingCount, flags ) );
 
         return mMappedPtr;
@@ -173,11 +173,11 @@ namespace Ogre
         GLenum target = mUploadOnly ? GL_COPY_WRITE_BUFFER : GL_COPY_READ_BUFFER;
         GLenum oppositeTarget = mUploadOnly ? GL_COPY_READ_BUFFER : GL_COPY_WRITE_BUFFER;
 
-        OCGLE( glBindBuffer( target, mVboName ) );
-        OCGLE( glFlushMappedBufferRange( target,
+        OCGE( glBindBuffer( target, mVboName ) );
+        OCGE( glFlushMappedBufferRange( target,
                                          mInternalBufferStart + mMappingStart,
                                          mMappingCount ) );
-        OCGLE( glUnmapBuffer( target ) );
+        OCGE( glUnmapBuffer( target ) );
         mMappedPtr = 0;
 
         for( size_t i=0; i<numDestinations; ++i )
@@ -192,8 +192,8 @@ namespace Ogre
             GLintptr dstOffset = dst.dstOffset + dst.destination->_getInternalBufferStart() *
                                                         dst.destination->getBytesPerElement();
 
-            OCGLE( glBindBuffer( oppositeTarget, bufferInterface->getVboName() ) );
-            OCGLE( glCopyBufferSubData( target, oppositeTarget,
+            OCGE( glBindBuffer( oppositeTarget, bufferInterface->getVboName() ) );
+            OCGE( glCopyBufferSubData( target, oppositeTarget,
                                         mInternalBufferStart + mMappingStart + dst.srcOffset,
                                         dstOffset, dst.length ) );
         }

@@ -89,7 +89,7 @@ namespace Ogre
 
         if( !bufferNames.empty() )
         {
-            OCGLE( glDeleteBuffers( bufferNames.size(), &bufferNames[0] ) );
+            OCGE( glDeleteBuffers( bufferNames.size(), &bufferNames[0] ) );
             bufferNames.clear();
         }
 
@@ -98,7 +98,7 @@ namespace Ogre
 
         while( itor != end )
         {
-            OCGLE( glDeleteSync( *itor ) );
+            OCGE( glDeleteSync( *itor ) );
             ++itor;
         }
     }
@@ -166,28 +166,28 @@ namespace Ogre
 
             //TODO: Deal with Out of memory errors
             //No luck, allocate a new buffer.
-            OCGLE( glGenBuffers( 1, &newVbo.vboName ) );
-            OCGLE( glBindBuffer( GL_ARRAY_BUFFER, newVbo.vboName ) );
+            OCGE( glGenBuffers( 1, &newVbo.vboName ) );
+            OCGE( glBindBuffer( GL_ARRAY_BUFFER, newVbo.vboName ) );
 
             if( mArbBufferStorage )
             {
                 if( vboFlag == CPU_ACCESSIBLE )
                 {
-                    OCGLE( glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0,
+                    OCGE( glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0,
                                             GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
                                             GL_MAP_COHERENT_BIT ) );
                 }
                 else
                 {
-                    OCGLE( glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0, 0 ) );
+                    OCGE( glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0, 0 ) );
                 }
             }
             else
             {
-                OCGLE( glBufferData( GL_ARRAY_BUFFER, mDefaultPoolSize[vboFlag], 0,
+                OCGE( glBufferData( GL_ARRAY_BUFFER, mDefaultPoolSize[vboFlag], 0,
                                      vboFlag == CPU_INACCESSIBLE ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW ) );
             }
-            OCGLE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
+            OCGE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
 
             newVbo.sizeBytes = poolSize;
             newVbo.freeBlocks.push_back( Block( 0, poolSize ) );
@@ -389,8 +389,8 @@ namespace Ogre
     GLuint GL3PlusVaoManager::createVao( const Vao &vaoRef )
     {
         GLuint vaoName;
-        OCGLE( glGenVertexArrays( 1, &vaoName ) );
-        OCGLE( glBindVertexArray( vaoName ) );
+        OCGE( glGenVertexArrays( 1, &vaoName ) );
+        OCGE( glBindVertexArray( vaoName ) );
 
         size_t attributeIndex = 0;
 
@@ -427,31 +427,31 @@ namespace Ogre
                 {
                 default:
                 case VET_FLOAT1:
-                    OCGLE( glVertexAttribPointer( attributeIndex, typeCount,
+                    OCGE( glVertexAttribPointer( attributeIndex, typeCount,
                                                   v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
                                                   normalised, binding.stride, (void*)binding.offset ) );
                     break;
                 case VET_DOUBLE1:
-                    OCGLE( glVertexAttribLPointer( attributeIndex, typeCount,
+                    OCGE( glVertexAttribLPointer( attributeIndex, typeCount,
                                                    v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
                                                    binding.stride, (void*)binding.offset ) );
                     break;
                 }
 
-                OCGLE( glVertexAttribDivisor( attributeIndex, binding.instancingDivisor ) );
-                OCGLE( glEnableVertexAttribArray( attributeIndex ) );
+                OCGE( glVertexAttribDivisor( attributeIndex, binding.instancingDivisor ) );
+                OCGE( glEnableVertexAttribArray( attributeIndex ) );
 
                 ++attributeIndex;
                 ++it;
             }
 
-            OCGLE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
+            OCGE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
         }
 
         if( vaoRef.indexBufferVbo )
             glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vaoRef.indexBufferVbo );
 
-        OCGLE( glBindVertexArray( 0 ) );
+        OCGE( glBindVertexArray( 0 ) );
 
         return vaoName;
     }
@@ -557,7 +557,7 @@ namespace Ogre
 
             if( !itor->refCount )
             {
-                OCGLE( glDeleteVertexArrays( 1, &glVao->mVaoName ) );
+                OCGE( glDeleteVertexArrays( 1, &glVao->mVaoName ) );
             }
         }
 
@@ -568,17 +568,17 @@ namespace Ogre
     {
         GLuint bufferName;
         GLenum target = forUpload ? GL_COPY_READ_BUFFER : GL_COPY_WRITE_BUFFER;
-        OCGLE( glGenBuffers( 1, &bufferName ) );
-        OCGLE( glBindBuffer( target, bufferName ) );
+        OCGE( glGenBuffers( 1, &bufferName ) );
+        OCGE( glBindBuffer( target, bufferName ) );
 
         if( mArbBufferStorage )
         {
-            OCGLE( glBufferStorage( target, sizeBytes, 0,
+            OCGE( glBufferStorage( target, sizeBytes, 0,
                                     forUpload ? GL_MAP_WRITE_BIT : GL_MAP_READ_BIT ) );
         }
         else
         {
-            OCGLE( glBufferData( target, sizeBytes, 0, forUpload ? GL_STREAM_DRAW : GL_STREAM_READ ) );
+            OCGE( glBufferData( target, sizeBytes, 0, forUpload ? GL_STREAM_DRAW : GL_STREAM_READ ) );
         }
 
         GL3PlusStagingBuffer *stagingBuffer = OGRE_NEW GL3PlusStagingBuffer( 0, sizeBytes, this,
@@ -640,15 +640,15 @@ namespace Ogre
 
         if( !bufferNames.empty() )
         {
-            OCGLE( glDeleteBuffers( bufferNames.size(), &bufferNames[0] ) );
+            OCGE( glDeleteBuffers( bufferNames.size(), &bufferNames[0] ) );
             bufferNames.clear();
         }
 
         if( mFrameSyncVec[mDynamicBufferCurrentFrame] )
         {
-            OCGLE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
+            OCGE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
         }
-        OCGLE( mFrameSyncVec[mDynamicBufferCurrentFrame] = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
+        OCGE( mFrameSyncVec[mDynamicBufferCurrentFrame] = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
         mDynamicBufferCurrentFrame = (mDynamicBufferCurrentFrame + 1) % mDynamicBufferMultiplier;
     }
     //-----------------------------------------------------------------------------------
@@ -664,7 +664,7 @@ namespace Ogre
                                                    waitFlags, waitDuration );
                 if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
                 {
-                    OCGLE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
+                    OCGE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
                     mFrameSyncVec[mDynamicBufferCurrentFrame] = 0;
 
                     return mDynamicBufferCurrentFrame;

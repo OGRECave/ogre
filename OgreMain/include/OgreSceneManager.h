@@ -1334,15 +1334,15 @@ namespace Ogre {
         @return
             The Rectangle2D.
         */
-        virtual Rectangle2D* createRectangle2D( bool bQuad,
-                                                SceneMemoryMgrTypes sceneType = SCENE_STATIC );
+        virtual v1::Rectangle2D* createRectangle2D( bool bQuad,
+                                                    SceneMemoryMgrTypes sceneType = SCENE_STATIC );
 
         /** Removes & destroys an Entity from the SceneManager.
         @warning
             It may be safer to wait to clear the whole scene if you are unsure use clearScene.
             @see SceneManager::clearScene
         */
-        virtual void destroyRectangle2D( Rectangle2D *rect );
+        virtual void destroyRectangle2D( v1::Rectangle2D *rect );
 
         /** Removes & destroys all Rectangle2D.
             @warning

@@ -228,12 +228,12 @@ namespace Ogre
                                                 dst->getNumMipmaps() ) + 1;
             for( uint8 j=0; j<minMipmaps; ++j )
             {
-                HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer( i, j );
+                v1::HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer( i, j );
                 const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0,
                                                                        pixelBufferBuf->getWidth(),
                                                                        pixelBufferBuf->getHeight(),
                                                                        1 ),
-                                                                  HardwareBuffer::HBL_DISCARD );
+                                                                  v1::HardwareBuffer::HBL_DISCARD );
 
                 PixelUtil::bulkPixelConversion( srcImage.getPixelBox( i - sliceStart,
                                                                       srcBaseMip + j ),

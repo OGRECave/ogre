@@ -253,7 +253,7 @@ namespace Ogre {
             {
                 //Try first Hlms materials, then the low level ones.
                 HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-                HlmsDatablock *datablock = hlmsManager->getDatablockNoThrow( subMesh->mMaterialName );
+                HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault( subMesh->mMaterialName );
 
                 if( !datablock )
                     mSubItems.back().setDatablock( datablock );
