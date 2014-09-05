@@ -51,17 +51,17 @@ namespace Ogre
         Its other main job is to provide UV atlas on the fly and/or texture arrays
         on the fly. To do that, we group textures into categories:
             * @TEXTURE_TYPE_DIFFUSE
-            * @TEXTURE_TYPE_SPECULAR
+            * @TEXTURE_TYPE_MONOCHROME
             * @TEXTURE_TYPE_NORMALS
             * @TEXTURE_TYPE_ENV_MAP
             * @TEXTURE_TYPE_DETAIL
-            * TEXTURE_TYPE_DETAIL_NORMAL_MAP
+            * @TEXTURE_TYPE_DETAIL_NORMAL_MAP
         Different categories have different default parameters. By default
         all types try to use array textures unless the RenderSystem API doesn't
         support it (in which case fallbacks to UV atlas).
     @par
         For example, Diffuse & detail textures enable hardware gamma correction.
-        Normal maps attempt to use BC5 compression, DXT5, or uncompress UV8,
+        Normal maps attempt to use BC5 compression, or uncompress UV8,
         in that order (depends on HW support).
         Detail maps default to not using UV atlas when texture arrays aren't
         supported (because detail maps are often meant to be tileable), etc
@@ -82,17 +82,18 @@ namespace Ogre
             bool        mipmaps;
             bool        hwGammaCorrection;
             PackingMethod packingMethod;
+            bool        isNormalMap;
 
             DefaultTextureParameters() :
                 pixelFormat( PF_UNKNOWN ), maxTexturesPerArray( 16 ),
                 mipmaps( true ), hwGammaCorrection( false ),
-                packingMethod( TextureArrays ) {}
+                packingMethod( TextureArrays ), isNormalMap( false ) {}
         };
 
         enum TextureMapType
         {
             TEXTURE_TYPE_DIFFUSE,
-            TEXTURE_TYPE_SPECULAR,
+            TEXTURE_TYPE_MONOCHROME,
             TEXTURE_TYPE_NORMALS,
             TEXTURE_TYPE_ENV_MAP,
             TEXTURE_TYPE_DETAIL,
@@ -104,17 +105,25 @@ namespace Ogre
         struct TextureArray
         {
             TexturePtr  texture;
+            /// When using UV atlas maxTextures = sqrtMaxTextures * sqrtMaxTextures;
+            /// However when using texture arrays, sqrtMaxTextures' value is ignored
             uint16      sqrtMaxTextures;
             uint16      maxTextures;
             bool        automatic;
+            bool        isNormalMap;
 
+            uint16      activeEntries;
             StringVector entries;
 
-            TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic ) :
-                sqrtMaxTextures( _sqrtMaxTextures ), maxTextures( _maxTextures ), automatic( _automatic )
+            TextureArray( uint16 _sqrtMaxTextures, uint16 _maxTextures, bool _automatic, bool _isNormalMap ) :
+                sqrtMaxTextures( _sqrtMaxTextures ), maxTextures( _maxTextures ),
+                automatic( _automatic ), isNormalMap( _isNormalMap ), activeEntries( 0 )
             {
-                entries.reserve( maxTextures );
+                entries.resize( maxTextures );
             }
+
+            uint16 createEntry(void);
+            void destroyEntry( uint16 entry );
         };
 
         struct TextureEntry
@@ -127,8 +136,8 @@ namespace Ogre
             TextureEntry( IdString _name ) :
                 name( _name ), mapType( NUM_TEXTURE_TYPES ), arrayIdx( ~0 ), entryIdx( ~0 ) {}
 
-            TextureEntry( IdString _name, TextureMapType _mapType, uint16 arrayIdx, uint16 entryIdx ) :
-                name( _name ), mapType( _mapType ), arrayIdx( arrayIdx), entryIdx( entryIdx ) {}
+            TextureEntry( IdString _name, TextureMapType _mapType, uint16 _arrayIdx, uint16 _entryIdx ) :
+                name( _name ), mapType( _mapType ), arrayIdx( _arrayIdx ), entryIdx( _entryIdx ) {}
 
             inline bool operator < ( const TextureEntry &_right ) const
             {
@@ -149,9 +158,21 @@ namespace Ogre
 
         TexturePtr mBlankTexture;
 
-        static void copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx );
+        static void copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx, uint8 srcBaseMip );
         static void copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
-                                        uint16 entryIdx, uint16 sqrtMaxTextures );
+                                        uint16 entryIdx, uint16 sqrtMaxTextures,
+                                        uint8 srcBaseMip, bool isNormalMap );
+        static void copy3DTexture( const Image &srcImage, TexturePtr dst,
+                                   uint16 sliceStart, uint16 sliceEnd, uint8 srcBaseMip );
+
+        TextureArrayVec::iterator findSuitableArray( TextureMapType mapType, uint32 width, uint32 height,
+                                                     uint32 depth, uint32 faces, PixelFormat format,
+                                                     uint8 numMipmaps );
+
+        /// Looks for the first image it can successfully load from the pack, and extracts its parameters.
+        /// Returns false if failed to retrieve parameters.
+        bool getTexturePackParameters( const HlmsTexturePack &pack, uint32 &outWidth, uint32 &outHeight,
+                                       uint32 &outDepth, PixelFormat &outPixelFormat ) const;
 
     public:
         HlmsTextureManager();
@@ -193,8 +214,25 @@ namespace Ogre
         */
         TextureLocation createOrRetrieveTexture( const String &texName, TextureMapType mapType );
 
+        /// See other overload. This one allows aliasing a texture. If you have
+        /// "VERY_TECHNICAL_NAME_HASH_1234.png" as texName, you can make your first
+        /// call with aliasName as "Tree Wood", and the next calls to
+        /// createOrRetrieveTexture( "Tree Wood", mapType ) will refer to this texture
+        TextureLocation createOrRetrieveTexture( const String &aliasName,
+                                                 const String &texName,
+                                                 TextureMapType mapType );
+
+        /// Destroys a texture. If the array has multiple entries, the entry for this texture is
+        /// sent back to a waiting list for a future new entry. Trying to read from this texture
+        /// after this call may result in garbage.
+        void destroyTexture( IdString aliasName );
+
+        void createFromTexturePack( const HlmsTexturePack &pack );
+
         /// Returns the precreated blank texture
         TextureLocation getBlankTexture(void) const;
+
+        DefaultTextureParameters* getDefaultTextureParameters(void) { return mDefaultTextureParameters; }
     };
     /** @} */
     /** @} */

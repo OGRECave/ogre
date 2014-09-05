@@ -28,6 +28,7 @@ THE SOFTWARE
 
 // Platform-specific stuff
 #include "OgrePlatform.h"
+#include "OgreWorkarounds.h"
 
 #include <string>
 
@@ -199,8 +200,18 @@ namespace Ogre {
     class HlmsLowLevelDatablock;
     struct HlmsMacroblock;
     class HlmsManager;
+    struct HlmsSamplerblock;
     class HlmsTextureManager;
+    struct HlmsTexturePack;
     class IndexBufferPacked;
+    class IndexData;
+    class InstanceBatch;
+    class InstanceBatchHW;
+    class InstanceBatchHW_VTF;
+    class InstanceBatchShader;
+    class InstanceBatchVTF;
+    class InstanceManager;
+    class InstancedEntity;
     class IntersectionSceneQuery;
     class IntersectionSceneQueryListener;
     class Image;

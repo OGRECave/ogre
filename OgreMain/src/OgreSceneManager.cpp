@@ -354,6 +354,7 @@ void SceneManager::destroyAllCameras(void)
 void SceneManager::clearFrameData(void)
 {
     mGlobalLightList.lights.clear();
+    mRenderQueue->clearState();
 }
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight()
@@ -461,6 +462,25 @@ void SceneManager::destroyEntity(v1::Entity *e)
 void SceneManager::destroyAllEntities(void)
 {
     destroyAllMovableObjectsByType(v1::EntityFactory::FACTORY_TYPE_NAME);
+}
+//-----------------------------------------------------------------------
+Rectangle2D* SceneManager::createRectangle2D( bool bQuad, SceneMemoryMgrTypes sceneType )
+{
+    // delegate to factory implementation
+    NameValuePairList params;
+    params["quad"] = StringConverter::toString( bQuad );
+    return static_cast<Rectangle2D*>( createMovableObject( Rectangle2DFactory::FACTORY_TYPE_NAME,
+                                                           &mEntityMemoryManager[sceneType], &params ) );
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroyRectangle2D( Rectangle2D *rect )
+{
+    destroyMovableObject( rect );
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroyAllRectangle2D(void)
+{
+    destroyAllMovableObjectsByType(Rectangle2DFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_addCompositorTexture( IdString name, const TextureVec *texs )
@@ -1166,7 +1186,9 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
             if( mInstancingThreadedCullingMethod == INSTANCING_CULLING_THREADED )
             {
                 fireCullFrustumInstanceBatchThreads( InstanceBatchCullRequest( camera, lodCamera,
-                                                     vp->getVisibilityMask()&getVisibilityMask() ) );
+                                                     (vp->getVisibilityMask() & getVisibilityMask()) |
+                                                     (vp->getVisibilityMask() &
+                                                       ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS) ) );
             }
 
             //mVisibleObjects should be filled in phase 01
@@ -1969,8 +1991,7 @@ void SceneManager::updateAnimationTransforms( BySkeletonDef &bySkeletonDef, size
 void SceneManager::updateAllAnimations()
 {
     mRequestType = UPDATE_ALL_ANIMATIONS;
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //-----------------------------------------------------------------------
 void SceneManager::updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx )
@@ -2015,8 +2036,7 @@ void SceneManager::updateAllTransforms()
             //Send them to worker threads (dark_sylinc). We need to go depth by depth because
             //we may depend on parents which could be processed by different threads.
             mUpdateTransformRequest = UpdateTransformRequest( t, nodesPerThread, numNodes );
-            mWorkerThreadsBarrier->sync(); //Fire threads
-            mWorkerThreadsBarrier->sync(); //Wait them to complete
+            fireWorkerThreadsAndWait();
             //Node::updateAllTransforms( numNodes, t );
         }
 
@@ -2073,8 +2093,7 @@ void SceneManager::updateAllBounds( const ObjectMemoryManagerVec &objectMemManag
 {
     mUpdateBoundsRequest    = &objectMemManager;
     mRequestType            = UPDATE_ALL_BOUNDS;
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //-----------------------------------------------------------------------
 void SceneManager::updateAllLodsThread( const UpdateLodRequest &request, size_t threadIdx )
@@ -2127,8 +2146,7 @@ void SceneManager::updateAllLods( const Camera *lodCamera, Real lodBias, uint8 f
     mUpdateLodRequest.camera->getFrustumPlanes();
     mUpdateLodRequest.lodCamera->getFrustumPlanes();
 
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //-----------------------------------------------------------------------
 void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request,
@@ -2182,7 +2200,9 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
             objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
             MovableObject::cullFrustum( numObjs, objData, camera,
-                    camera->getLastViewport()->getVisibilityMask()&getVisibilityMask(),
+                    (camera->getLastViewport()->getVisibilityMask() & getVisibilityMask()) |
+                    (camera->getLastViewport()->getVisibilityMask() &
+                                        ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
                     outVisibleObjects, lodCamera );
         }
 
@@ -3656,7 +3676,9 @@ AxisAlignedBox SceneManager::_calculateCurrentCastersBox( uint32 viewportVisibil
             const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
 
             MovableObject::calculateCastersBox( numObjs, objData,
-                                                viewportVisibilityMask&getVisibilityMask(),
+                                                (viewportVisibilityMask&getVisibilityMask()) |
+                                                (viewportVisibilityMask &
+                                                 ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
                                                 &tmpBox );
             retVal.merge( tmpBox );
         }
@@ -4232,8 +4254,7 @@ void SceneManager::updateInstanceManagers(void)
 {
     // First update the individual instances from multiple threads
     mRequestType = UPDATE_INSTANCE_MANAGERS;
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 
     // Now perform the final pass from a single thread
     InstanceManagerVec::const_iterator itor = mInstanceManagers.begin();
@@ -4563,7 +4584,9 @@ RenderSystem *SceneManager::getDestinationRenderSystem()
 uint32 SceneManager::_getCombinedVisibilityMask(void) const
 {
     return mCurrentViewport ?
-        mCurrentViewport->getVisibilityMask() & mVisibilityMask : mVisibilityMask;
+        (mCurrentViewport->getVisibilityMask() & mVisibilityMask) |
+        (mCurrentViewport->getVisibilityMask() & ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS) :
+                mVisibilityMask;
 
 }
 //-----------------------------------------------------------------------------------
@@ -4811,6 +4834,15 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
     }
 
 }
+void SceneManager::fireWorkerThreadsAndWait(void)
+{
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    _updateWorkerThread( NULL );
+#else
+    mWorkerThreadsBarrier->sync(); //Fire threads
+    mWorkerThreadsBarrier->sync(); //Wait them to complete
+#endif
+}
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 void SceneManager::fireCullFrustumThreads( const CullFrustumRequest &request )
@@ -4822,8 +4854,7 @@ void SceneManager::fireCullFrustumThreads( const CullFrustumRequest &request )
     //in case they weren't up to date.
     mCurrentCullFrustumRequest.camera->getFrustumPlanes();
     mCurrentCullFrustumRequest.lodCamera->getFrustumPlanes();
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //---------------------------------------------------------------------
 void SceneManager::fireCullFrustumInstanceBatchThreads( const InstanceBatchCullRequest &request )
@@ -4832,23 +4863,29 @@ void SceneManager::fireCullFrustumInstanceBatchThreads( const InstanceBatchCullR
     mRequestType = CULL_FRUSTUM_INSTANCEDENTS;
     mInstanceBatchCullRequest.frustum->getFrustumPlanes(); // Ensure they're up to date.
     mInstanceBatchCullRequest.lodCamera->getFrustumPlanes(); // Ensure they're up to date.
-    mWorkerThreadsBarrier->sync(); //Fire threads
-    mWorkerThreadsBarrier->sync(); //Wait them to complete
+    fireWorkerThreadsAndWait();
 }
 //---------------------------------------------------------------------
 void SceneManager::executeUserScalableTask( UniformScalableTask *task, bool bBlock )
 {
     mRequestType = USER_UNIFORM_SCALABLE_TASK;
     mUserTask = task;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    _updateWorkerThread( NULL );
+#else
     mWorkerThreadsBarrier->sync(); //Fire threads
     if( bBlock )
         mWorkerThreadsBarrier->sync(); //Wait them to complete
+#endif
 }
 //---------------------------------------------------------------------
 void SceneManager::waitForPendingUserScalableTask()
 {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     assert( mRequestType == USER_UNIFORM_SCALABLE_TASK );
     mWorkerThreadsBarrier->sync(); //Wait them to complete
+#endif
 }
 //---------------------------------------------------------------------
 unsigned long updateWorkerThread( ThreadHandle *threadHandle )
@@ -4860,6 +4897,7 @@ THREAD_DECLARE( updateWorkerThread );
 //---------------------------------------------------------------------
 void SceneManager::startWorkerThreads()
 {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     mWorkerThreadsBarrier = new Barrier( mNumWorkerThreads+1 );
     mWorkerThreads.reserve( mNumWorkerThreads );
     for( size_t i=0; i<mNumWorkerThreads; ++i )
@@ -4867,26 +4905,33 @@ void SceneManager::startWorkerThreads()
         ThreadHandlePtr th = Threads::CreateThread( THREAD_GET( updateWorkerThread ), i, this );
         mWorkerThreads.push_back( th );
     }
+#endif
 }
 //---------------------------------------------------------------------
 void SceneManager::stopWorkerThreads()
 {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     mExitWorkerThreads = true;
     mWorkerThreadsBarrier->sync(); // Wake up worker threads so they stop
     Threads::WaitForThreads( mWorkerThreads );
 
     delete mWorkerThreadsBarrier;
     mWorkerThreadsBarrier = 0;
+#endif
 }
 //---------------------------------------------------------------------
 unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
     size_t threadIdx = threadHandle->getThreadIdx();
     while( !mExitWorkerThreads )
     {
         mWorkerThreadsBarrier->sync();
         if( !mExitWorkerThreads )
         {
+#else
+    size_t threadIdx = 0;
+#endif
             switch( mRequestType )
             {
             case CULL_FRUSTUM:
@@ -4916,9 +4961,11 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
             default:
                 break;
             }
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
             mWorkerThreadsBarrier->sync();
         }
     }
+#endif
 
     return 0;
 }

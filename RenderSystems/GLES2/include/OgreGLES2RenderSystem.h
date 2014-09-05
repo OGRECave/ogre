@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreGLES2GpuProgram.h"
+#include "OgreHlmsSamplerblock.h"
 
 namespace Ogre {
     class GLES2Context;
@@ -47,8 +48,8 @@ namespace Ogre {
 #endif
     class GLSLESGpuProgram;
     class HardwareBufferManager;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    class AndroidResourceManager;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    class GLES2ManagedResourceManager;
 #endif
     
     /**
@@ -71,6 +72,8 @@ namespace Ogre {
 
             /// Holds texture type settings for every stage
             GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
+            GLES2TexturePtr mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
+            uint32          mSamplerblocksInternalIdCount;
 
             /// Number of fixed-function texture units
             unsigned short mFixedFunctionTextureUnits;
@@ -113,6 +116,7 @@ namespace Ogre {
 
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
+            GLfloat mLargestSupportedAnisotropy;
 
             // local data member of _render that were moved here to improve performance
             // (save allocations)
@@ -124,6 +128,7 @@ namespace Ogre {
             GLES2GpuProgram* mCurrentVertexProgram;
             GLES2GpuProgram* mCurrentFragmentProgram;
 
+            GLint getTextureAddressingMode(TextureAddressingMode tam) const;
             GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
             void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
@@ -294,8 +299,11 @@ namespace Ogre {
              */
             void _setViewport(Viewport *vp);
 
+            virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
+            virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
 			virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
 			virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
+            virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
 			virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
 
             /** See
@@ -506,12 +514,12 @@ namespace Ogre {
             /// @copydoc RenderSystem::markProfileEvent
             virtual void markProfileEvent( const String &eventName );
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             void resetRenderer(RenderWindow* pRenderWnd);
         
-            static AndroidResourceManager* getResourceManager();
+            static GLES2ManagedResourceManager* getResourceManager();
     private:
-            static AndroidResourceManager* mResourceManager;
+            static GLES2ManagedResourceManager* mResourceManager;
 #endif
     };
 }

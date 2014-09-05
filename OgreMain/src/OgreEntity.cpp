@@ -50,6 +50,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreLodStrategy.h"
 #include "OgreLodListener.h"
 #include "OgreMaterialManager.h"
+#include "OgreHlmsManager.h"
 
 namespace Ogre {
 namespace v1 {
@@ -197,6 +198,27 @@ namespace v1 {
 
         reevaluateVertexProcessing();
 
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        size_t numSubMeshes = mMesh->getNumSubMeshes();
+        for( size_t i=0; i<numSubMeshes; ++i )
+        {
+            SubMesh *subMesh = mMesh->getSubMesh(i);
+            if( subMesh->isMatInitialised() )
+            {
+                //Give preference to HLMS materials of the same name
+                HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault(
+                                                    subMesh->getMaterialName() );
+                if( datablock )
+                {
+                    mSubEntityList[i].setDatablock( datablock );
+                }
+                else
+                {
+                    mSubEntityList[i].setMaterialName( subMesh->getMaterialName(), mMesh->getGroup() );
+                }
+            }
+        }
+
         Aabb aabb( mMesh->getBounds().getCenter(), mMesh->getBounds().getHalfSize() );
         mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
         mObjectData.mWorldAabb->setFromAabb( aabb, mObjectData.mIndex );
@@ -338,6 +360,14 @@ namespace v1 {
         }
     }
     //-----------------------------------------------------------------------
+    void Entity::setDatablock( IdString datablockName )
+    {
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        HlmsDatablock *datablock = hlmsManager->getDatablock( datablockName );
+
+        setDatablock( datablock );
+    }
+    //-----------------------------------------------------------------------
     Entity* Entity::clone( const String& newName) const
     {
         if (!mManager)
@@ -388,15 +418,36 @@ namespace v1 {
             i->setMaterial(material);
         }
     }
-	//-----------------------------------------------------------------------
-	void Entity::setUpdateBoundingBoxFromSkeleton(bool update)
-	{
-		mUpdateBoundingBoxFromSkeleton = update;
-		if (mMesh->isLoaded() && mMesh->getBoneBoundingRadius() == Real(0))
-		{
-			mMesh->_computeBoneBoundingRadius();
-		}
-	}
+    //-----------------------------------------------------------------------
+    void Entity::setRenderQueueSubGroup( uint8 subGroup )
+    {
+        // Set for all subentities
+        SubEntityList::iterator i;
+        for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i)
+            i->setRenderQueueSubGroup( subGroup );
+#if !OGRE_NO_MESHLOD
+        // Set render queue for all manual LOD entities
+        if (mMesh->hasManualLodLevel())
+        {
+            LODEntityList::iterator li, liend;
+            liend = mLodEntityList.end();
+            for (li = mLodEntityList.begin(); li != liend; ++li)
+            {
+                if(*li != this)
+                    (*li)->setRenderQueueSubGroup( subGroup );
+            }
+        }
+#endif
+    }
+    //-----------------------------------------------------------------------
+    void Entity::setUpdateBoundingBoxFromSkeleton(bool update)
+    {
+        mUpdateBoundingBoxFromSkeleton = update;
+        if (mMesh->isLoaded() && mMesh->getBoneBoundingRadius() == Real(0))
+        {
+            mMesh->_computeBoneBoundingRadius();
+        }
+    }
     //-----------------------------------------------------------------------
     void Entity::_notifyCurrentCamera(Camera* cam)
     {
@@ -1243,7 +1294,7 @@ namespace v1 {
     {
         return mDisplaySkeleton;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     Entity* Entity::getManualLodLevel(size_t index) const
     {
 #if !OGRE_NO_MESHLOD
@@ -1255,7 +1306,7 @@ namespace v1 {
         return NULL;
 #endif
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     size_t Entity::getNumManualLodLevels(void) const
     {
         return mLodEntityList.size();
@@ -1273,8 +1324,6 @@ namespace v1 {
         {
             subMesh = mesh->getSubMesh(i);
             sublist->push_back( SubEntity( this, subMesh ) );
-            if (subMesh->isMatInitialised())
-                sublist->back().setMaterialName(subMesh->getMaterialName(), mesh->getGroup());
         }
     }
     //-----------------------------------------------------------------------
@@ -1584,7 +1633,32 @@ namespace v1 {
         for (i = mSubEntityList.begin(); i != iend; ++i)
         {
             SubEntity &sub = *i;
+
             const MaterialPtr& m = sub.getMaterial();
+
+            if( m.isNull() )
+            {
+                mVertexProgramInUse = true;
+                if (hasSkeleton())
+                {
+                    VertexAnimationType animType = VAT_NONE;
+                    if (sub.getSubMesh()->useSharedVertices)
+                    {
+                        animType = mMesh->getSharedVertexDataAnimationType();
+                    }
+                    else
+                    {
+                        animType = sub.getSubMesh()->getVertexAnimationType();
+                    }
+
+                    //Disable hw animation if there are morph and pose animations, at least for now.
+                    //Enable if there's only skeleton animation
+                    return animType == VAT_NONE;
+                }
+
+                return false;
+            }
+
             // Make sure it's loaded
             m->load();
             Technique* t = m->getBestTechnique(0, &sub);
@@ -1784,22 +1858,6 @@ namespace v1 {
             }
         }
 #endif
-    }
-    //-----------------------------------------------------------------------
-    void Entity::setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority)
-    {
-        MovableObject::setRenderQueueGroupAndPriority(queueID, priority);
-
-        // Set render queue for all manual LOD entities
-        if (mMesh->hasManualLodLevel())
-        {
-            LODEntityList::iterator li, liend;
-            liend = mLodEntityList.end();
-            for (li = mLodEntityList.begin(); li != liend; ++li)
-            {
-                (*li)->setRenderQueueGroupAndPriority(queueID, priority);
-            }
-        }
     }
     //-----------------------------------------------------------------------
     void Entity::shareSkeletonInstanceWith(Entity* entity)

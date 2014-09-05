@@ -82,7 +82,8 @@ namespace Ogre
         {
             //Don't include the ID in the comparision
             return memcmp( &mDepthCheck, &_r.mDepthCheck,
-                           ((char*)&mPolygonMode - (char*)&mDepthCheck) + sizeof( PolygonMode ) ) != 0;
+                           ( (const char*)&mPolygonMode - (const char*)&mDepthCheck ) +
+                                                            sizeof( PolygonMode ) ) != 0;
         }
     };
 
@@ -117,8 +118,8 @@ namespace Ogre
         {
             //Don't include the ID in the comparision
             return memcmp( &mSeparateBlend, &_r.mSeparateBlend,
-                           ((char*)&mBlendOperationAlpha - (char*)&mSeparateBlend) +
-                                                    sizeof( SceneBlendOperation ) ) != 0;
+                           ( (const char*)&mBlendOperationAlpha - (const char*)&mSeparateBlend) +
+                                                                sizeof( SceneBlendOperation ) ) != 0;
         }
     };
 
@@ -148,7 +149,6 @@ namespace Ogre
         //it's better if mShadowConstantBias is together with the derived type's variables
         /// List of renderables currently using this datablock
         vector<Renderable*>::type mLinkedRenderables;
-        HlmsParamVec mOriginalParams;
         Hlms    *mCreator;
         IdString mName;
 
@@ -164,11 +164,14 @@ namespace Ogre
     public:
         uint32  mTextureHash;       //TextureHash comes before macroblock for alignment reasons
         uint16  mMacroblockHash;    //Not all bits are used
-        uint8   mType;      /// @See HlmsTypes
-        bool    mIsOpaque;  /// Cached based on mBlendblock data
+        uint8   mType;              /// @See HlmsTypes
+        bool    mIsTransparent;     /// Cached based on mBlendblock data
         HlmsMacroblock const *mMacroblock;
         HlmsBlendblock const *mBlendblock;  ///Don't set this directly, use @setBlendblock
-
+    protected:
+        bool    mAlphaTest;
+    public:
+        float   mAlphaTestThreshold;
         float   mShadowConstantBias;
 
     public:
@@ -176,44 +179,26 @@ namespace Ogre
                        const HlmsMacroblock *macroblock,
                        const HlmsBlendblock *blendblock,
                        const HlmsParamVec &params );
-        virtual ~HlmsDatablock() {}
+        virtual ~HlmsDatablock();
+
+        /// Calculates the hashes needed for sorting by the RenderQueue (i.e. mTextureHash)
         virtual void calculateHash() {}
 
         IdString getName(void) const                { return mName; }
         Hlms* getCreator(void) const                { return mCreator; }
-        const HlmsParamVec& getOriginalParams(void) const   { return mOriginalParams; }
 
-        /// Call this function to set mBlendblock & mIsOpaque automatically based on input
+        /// Call this function to set mBlendblock & mIsTransparent automatically based on input
         void setBlendblock( HlmsBlendblock const *blendblock );
 
         void _linkRenderable( Renderable *renderable );
         void _unlinkRenderable( Renderable *renderable );
-    };
 
-    /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
-    */
-    class _OgreExport HlmsPbsMobileDatablock : public HlmsDatablock
-    {
-    public:
-        uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
-        float   mRoughness;
-        float   mkDr, mkDg, mkDb;                   //kD
-        float   mkSr, mkSg, mkSb;                   //kS
-        float   mFresnelR, mFresnelG, mFresnelB;    //F0
+        const vector<Renderable*>::type& getLinkedRenderables(void) const { return mLinkedRenderables; }
 
-        TexturePtr  mDiffuseTex;
-        TexturePtr  mNormalmapTex;
-        TexturePtr  mSpecularTex;
-        TexturePtr  mReflectionTex;
-        /*TexturePtr  mDetailMask;
-        TexturePtr  mDetailMap[4];*/
-
-        HlmsPbsMobileDatablock( IdString name, Hlms *creator,
-                             const HlmsMacroblock *macroblock,
-                             const HlmsBlendblock *blendblock,
-                             const HlmsParamVec &params );
-
-        virtual void calculateHash();
+        /// Enables or disables alpha testing. Calling this function triggers
+        /// a HlmsDatablock::flushRenderables
+        void setAlphaTest( bool bEnabled );
+        bool getAlphaTest(void) const               { return mAlphaTest; }
     };
 
     /** @} */

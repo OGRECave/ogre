@@ -157,10 +157,10 @@ namespace Ogre {
         */
         int getActualHeight(void) const;
 
-        int getScissorLeft(void) const                  { return mScissorRelLeft; }
-        int getScissorTop(void) const                   { return mScissorRelTop; }
-        int getScissorWidth(void) const                 { return mScissorRelWidth; }
-        int getScissorHeight(void) const                { return mScissorRelHeight; }
+        Real getScissorLeft(void) const                 { return mScissorRelLeft; }
+        Real getScissorTop(void) const                  { return mScissorRelTop; }
+        Real getScissorWidth(void) const                { return mScissorRelWidth; }
+        Real getScissorHeight(void) const               { return mScissorRelHeight; }
 
         int getScissorActualLeft(void) const            { return mScissorActLeft; }
         int getScissorActualTop(void) const             { return mScissorActTop; }

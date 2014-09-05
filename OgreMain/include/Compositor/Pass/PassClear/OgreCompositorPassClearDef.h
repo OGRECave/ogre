@@ -83,6 +83,10 @@ namespace Ogre
             mStencilValue( 0 ),
             mDiscardOnly( false )
         {
+            //Override so that it only gets executed on the first execution on the
+            //whole screen (i.e. clear the whole viewport during the left eye pass)
+            mExecutionMask          = 0x01;
+            mViewportModifierMask   = 0x00;
         }
     };
 

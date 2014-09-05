@@ -93,6 +93,7 @@ namespace Ogre
 
         void initInputDevices(void);
         void processInputDevices(void);
+        void validateShaderSignatures( const D3D11HLSLProgram* progA, const D3D11HLSLProgram* progB ) const;
         
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
@@ -180,12 +181,6 @@ namespace Ogre
             TextureType type;
             /// which texCoordIndex to use
             size_t coordIndex;
-            /// type of auto tex. calc. used
-            TexCoordCalcMethod autoTexCoordType;
-            /// Frustum, used if the above is projection
-            const Frustum *frustum; 
-
-            LayerBlendModeEx layerBlendMode;
 
             /// texture 
             ID3D11ShaderResourceView  *pTex;

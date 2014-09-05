@@ -81,7 +81,7 @@ namespace Ogre {
                                              const Camera *camera, Real bias ) const
     {
         ArrayVector3 cameraPos;
-        cameraPos.setAll( camera->getDerivedPosition() );
+        cameraPos.setAll( camera->_getCachedDerivedPosition() );
 
         ArrayReal lodInvBias( Mathlib::SetAll( camera->_getLodBiasInverse() * bias ) );
         OGRE_ALIGNED_DECL( Real, lodValues[ARRAY_PACKED_REALS], OGRE_SIMD_ALIGNMENT );

@@ -111,6 +111,7 @@ namespace Ogre
             LPRECT lprcMonitor, LPARAM dwData);
     };
 
+    extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 }
 
 #endif

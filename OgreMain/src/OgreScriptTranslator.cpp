@@ -1046,7 +1046,7 @@ namespace Ogre{
                             Pass::_getBlendFlags( sbt0,
                                                   blendblock.mSourceBlendFactor,
                                                   blendblock.mDestBlendFactor );
-                            Pass::_getBlendFlags( sbt0,
+                            Pass::_getBlendFlags( sbt1,
                                                   blendblock.mSourceBlendFactorAlpha,
                                                   blendblock.mDestBlendFactorAlpha );
                         }
@@ -1219,14 +1219,13 @@ namespace Ogre{
         }
 
         std::sort( paramVec.begin(), paramVec.end(), OrderParamVecByKey );
-        hlms->createDatablock( obj->name, macroblock, blendblock, paramVec );
+        hlms->createDatablock( obj->name, obj->name, macroblock, blendblock, paramVec );
 
         }
         catch( Exception &e )
         {
             if( i != obj->children.end() )
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, (*i)->file, (*i)->line);
-            throw e;
         }
     }
 
@@ -1906,7 +1905,7 @@ namespace Ogre{
                             Pass::_getBlendFlags( sbt0,
                                                   blendblock.mSourceBlendFactor,
                                                   blendblock.mDestBlendFactor );
-                            Pass::_getBlendFlags( sbt0,
+                            Pass::_getBlendFlags( sbt1,
                                                   blendblock.mSourceBlendFactorAlpha,
                                                   blendblock.mDestBlendFactorAlpha );
                         }
@@ -2885,6 +2884,10 @@ namespace Ogre{
                 }
             }
         }
+
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        mPass->setMacroblock( hlmsManager->getMacroblock( macroblock ) );
+        mPass->setBlendblock( hlmsManager->getBlendblock( blendblock ) );
     }
     //-------------------------------------------------------------------------
     void PassTranslator::translateFragmentProgramRef(Ogre::ScriptCompiler *compiler, Ogre::ObjectAbstractNode *node)

@@ -69,6 +69,15 @@ namespace Ogre {
         virtual Archive* createInstance(const String& name, bool readOnly) = 0;
 
         virtual Archive* createInstance(const String& name) { return createInstance(name, true); }
+
+        /** Some implementations (i.e. APKFileSystemArchive) usually modify the filename. For example
+            in APKFileSystemArchive, "/path/to/localfile.mesh" gets internally stored as
+            "path/to/localfile.mesh" (no leading slash), but across the platform the leading slash
+            is required. The ArchiveManager needs to be aware of this.
+        @param inOutPath
+            Given the input path, converts it to the final path.
+        */
+        virtual void convertPath( String& inOutPath ) const {}
     };
     /** @} */
     /** @} */

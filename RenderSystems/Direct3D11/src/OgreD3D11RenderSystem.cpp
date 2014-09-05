@@ -128,7 +128,8 @@ bail:
     }
 
     //---------------------------------------------------------------------
-    D3D11RenderSystem::D3D11RenderSystem() : mDevice(NULL)
+    D3D11RenderSystem::D3D11RenderSystem()
+		: mDevice(NULL)
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
@@ -1109,6 +1110,8 @@ bail:
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_HWOCCLUSION);
         rsc->setCapability(RSC_HWOCCLUSION_ASYNCHRONOUS);
+        rsc->setCapability(RSC_HW_GAMMA);
+        rsc->setCapability(RSC_TEXTURE_SIGNED_INT);
 
         convertVertexShaderCaps(rsc);
         convertPixelShaderCaps(rsc);
@@ -1850,9 +1853,6 @@ bail:
     void D3D11RenderSystem::_setTextureCoordCalculation( size_t stage, TexCoordCalcMethod m,
         const Frustum* frustum)
     {
-        // record the stage state
-        mTexStageDesc[stage].autoTexCoordType = m;
-        mTexStageDesc[stage].frustum = frustum;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
@@ -1881,10 +1881,6 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureBlendMode( size_t stage, const LayerBlendModeEx& bm )
     {
-        if (bm.blendType == LBT_COLOUR)
-        {
-            mTexStageDesc[stage].layerBlendMode = bm;
-        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op /*= SBO_ADD*/ )
@@ -2269,6 +2265,38 @@ bail:
         }
 
         mLastVertexSourceCount = binds.size();      
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::validateShaderSignatures( const D3D11HLSLProgram* progA, const D3D11HLSLProgram* progB ) const
+    {
+        // compare inputs of progB with outputs of progA to see if they are compatible
+        assert( progA );
+        assert( progB );
+        unsigned int inputCount = progB->getNumInputs();
+        if ( inputCount > progA->getNumOutputs() )
+        {
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                "Shader " + progA->getName() + " produces not enough output parameters for shader " + progB->getName(),
+                "D3D11RenderSystem::validateShaderSignatures" );
+        }
+        else
+        {
+            for ( unsigned int i = 0; i < inputCount; ++i )
+            {
+                const D3D11_SIGNATURE_PARAMETER_DESC& out = progA->getOutputParamDesc( i );
+                const D3D11_SIGNATURE_PARAMETER_DESC& in  = progB->getInputParamDesc( i );
+                if ( strcmp( in.SemanticName, out.SemanticName ) != 0 ||
+                    in.SemanticIndex != out.SemanticIndex ||
+                    in.ComponentType != out.ComponentType ||
+                    in.Mask != out.Mask
+                    )
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                        "Shader " + progA->getName() + " does not produce output parameters that are compatible with the inputs of shader " + progB->getName(),
+                        "D3D11RenderSystem::validateShaderSignatures" );
+                }
+            }
+        }
     }
 
     //---------------------------------------------------------------------
@@ -2854,7 +2882,33 @@ bail:
                 break;
             }
         }
-        
+#if OGRE_DEBUG_MODE
+        {
+            if ( mBoundTessellationHullProgram )
+            {
+                validateShaderSignatures( mBoundVertexProgram, mBoundTessellationHullProgram );
+                validateShaderSignatures( mBoundTessellationHullProgram, mBoundTessellationDomainProgram ); // if hull exists, so does domain
+                if ( mBoundGeometryProgram )
+                {
+                    validateShaderSignatures( mBoundTessellationDomainProgram, mBoundGeometryProgram );
+                    validateShaderSignatures( mBoundGeometryProgram, mBoundFragmentProgram );
+                }
+                else
+                {
+                    validateShaderSignatures( mBoundTessellationDomainProgram, mBoundFragmentProgram );
+                }
+            }
+            else if ( mBoundGeometryProgram )
+            {
+                validateShaderSignatures( mBoundVertexProgram, mBoundGeometryProgram );
+                validateShaderSignatures( mBoundGeometryProgram, mBoundFragmentProgram );
+            }
+            else
+            {
+                validateShaderSignatures( mBoundVertexProgram, mBoundFragmentProgram );
+            }
+        }
+#endif
         if (primCount)
         {
             // Issue the op
@@ -3239,21 +3293,21 @@ bail:
             break;
         case GPT_HULL_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveTessellationHullGpuProgramParameters.setNull();
                 mBoundTessellationHullProgram = NULL;
                 mDevice.GetImmediateContext()->HSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_DOMAIN_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveTessellationDomainGpuProgramParameters.setNull();
                 mBoundTessellationDomainProgram = NULL;
                 mDevice.GetImmediateContext()->DSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_COMPUTE_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveComputeGpuProgramParameters.setNull();
                 mBoundComputeProgram = NULL;
                 mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
             }
@@ -3975,7 +4029,6 @@ bail:
         // set stages desc. to defaults
         for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
         {
-            mTexStageDesc[n].autoTexCoordType = TEXCALC_NONE;
             mTexStageDesc[n].coordIndex = 0;
             mTexStageDesc[n].pTex = 0;
         }

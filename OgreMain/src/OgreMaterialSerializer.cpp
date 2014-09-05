@@ -370,6 +370,8 @@ namespace Ogre
                     case Light::LT_SPOTLIGHT:
                         writeValue("spot");
                         break;
+                    case Light::NUM_LIGHT_TYPES: //Keep compiler happy
+                        break;
                     };
                 }
             }
@@ -1309,6 +1311,8 @@ namespace Ogre
             break;
         case CMPF_NOT_EQUAL:
             writeValue("not_equal");
+            break;
+        case NUM_COMPARE_FUNCTIONS: //keep compiler happy
             break;
         }
     }

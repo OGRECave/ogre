@@ -41,10 +41,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    CompositorWorkspace::CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
+    CompositorWorkspace::CompositorWorkspace(IdType id, const CompositorWorkspaceDef *definition,
                                                 const CompositorChannel &finalRenderTarget,
                                                 SceneManager *sceneManager, Camera *defaultCam,
-                                                RenderSystem *renderSys, bool bEnabled ) :
+                                                RenderSystem *renderSys, bool bEnabled,
+                                                uint8 executionMask, uint8 viewportModifierMask,
+                                                const Vector4 &vpOffsetScale ) :
             IdObject( id ),
             mDefinition( definition ),
             mValid( false ),
@@ -53,8 +55,14 @@ namespace Ogre
             mDefaultCamera( defaultCam ),
             mSceneManager( sceneManager ),
             mRenderSys( renderSys ),
-            mRenderWindow( finalRenderTarget )
+            mRenderWindow( finalRenderTarget ),
+            mExecutionMask( executionMask ),
+            mViewportModifierMask( viewportModifierMask ),
+            mViewportModifier( vpOffsetScale )
     {
+        assert( (!defaultCam || (defaultCam->getSceneManager() == sceneManager)) &&
+                "Camera was created with a different SceneManager than supplied" );
+
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
                                                 id, true, mRenderWindow.target, mRenderSys );

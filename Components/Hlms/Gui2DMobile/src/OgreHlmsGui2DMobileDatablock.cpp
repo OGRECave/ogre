@@ -122,7 +122,7 @@ namespace Ogre
             }
         }
 
-        if( Hlms::findParamInVec( params, Hlms::PropertyAlphaTest, paramVal ) )
+        if( Hlms::findParamInVec( params, HlmsBaseProp::AlphaTest, paramVal ) )
         {
             mIsAlphaTested = true;
             mShaderCreationData->alphaTestCmp = CMPF_LESS;
@@ -171,7 +171,7 @@ namespace Ogre
         }
 
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
-        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
 
         for( size_t i=0; i<sizeof( c_diffuseMap ) / sizeof( String ); ++i )
         {
@@ -196,7 +196,7 @@ namespace Ogre
                 {
                     uint val = StringConverter::parseUnsignedInt( *itor, ~0 );
 
-                    if( val != ~0 )
+                    if( val != (uint)(~0) )
                     {
                         //It's a number, must be an UV Set
                         setTextureUvSetForTexture( i, val );
@@ -346,7 +346,7 @@ namespace Ogre
             {
                 //The previous texture wasn't an atlas, we need to make room for the params
                 memmove( mUvAtlasParams + uvAtlasIdx + 1, mUvAtlasParams + uvAtlasIdx,
-                         sizeof(UvAtlasParams) * (mNumTextureUnits - uvAtlasIdx - 1) );
+                         sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx - 1) );
                 mShaderCreationData->mTextureIsAtlas[texUnit] = true;
                 ++mNumUvAtlas;
             }
@@ -359,7 +359,7 @@ namespace Ogre
             {
                 //The new texture isn't an atlas, we need to keep everything contiguous
                 memmove( mUvAtlasParams + uvAtlasIdx, mUvAtlasParams + uvAtlasIdx + 1,
-                         sizeof(UvAtlasParams) * (mNumTextureUnits - uvAtlasIdx - 1) );
+                         sizeof(UvAtlasParams) * (mNumUvAtlas - uvAtlasIdx - 1) );
                 mShaderCreationData->mTextureIsAtlas[texUnit] = false;
                 --mNumUvAtlas;
             }
@@ -373,7 +373,7 @@ namespace Ogre
         assert( until > 0 && until <= 16 );
 
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
-        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManger();
+        HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
         HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->getBlankTexture();
         assert( !texLocation.texture->isTextureTypeArray() );
 

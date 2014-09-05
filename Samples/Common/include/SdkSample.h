@@ -321,6 +321,7 @@ namespace OgreBites
                 mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
             }   
 #endif // INCLUDE_RTSHADER_SYSTEM
+
 #if OGRE_PROFILING
             // Toggle visibility of profiler window
             else if (evt.key == OIS::KC_P)

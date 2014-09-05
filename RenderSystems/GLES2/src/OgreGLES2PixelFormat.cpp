@@ -33,8 +33,12 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------------
-    GLenum GLES2PixelUtil::getGLOriginFormat(PixelFormat mFormat)
+    GLenum GLES2PixelUtil::getGLOriginFormat(PixelFormat mFormat, bool hwGamma)
     {
+#if OGRE_NO_GLES3_SUPPORT != 0
+		const RenderSystemCapabilities *caps =
+            Root::getSingleton().getRenderSystem()->getCapabilities();
+#endif
         switch (mFormat)
         {
             case PF_A8:
@@ -126,17 +130,35 @@ namespace Ogre {
             case PF_B8G8R8:
             case PF_X8B8G8R8:
             case PF_SHORT_RGB:
+#if OGRE_NO_GLES3_SUPPORT == 0
                 return GL_RGB;
+#else
+                if( hwGamma && caps->hasCapability( RSC_HW_GAMMA ) )
+                    return GL_SRGB_EXT;
+                else
+                    return GL_RGB;
+#endif
 
             case PF_X8R8G8B8:
             case PF_A8R8G8B8:
             case PF_A4R4G4B4:
             case PF_A1R5G5B5:
             case PF_B8G8R8A8:
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                return GL_BGRA_EXT;
+#if OGRE_NO_GLES3_SUPPORT == 0
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                    return GL_BGRA_EXT;
+    #else
+                    return GL_RGBA;
+    #endif
 #else
-                return GL_RGBA;
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                    return GL_BGRA_EXT;
+    #else
+                    if( hwGamma && caps->hasCapability( RSC_HW_GAMMA ) )
+                        return GL_SRGB_ALPHA_EXT;
+                    else
+                        return GL_RGBA;
+    #endif
 #endif
 
             case PF_A8B8G8R8:
@@ -147,7 +169,14 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && OGRE_NO_GLES3_SUPPORT == 1
                 return GL_BGRA_EXT;
 #else
+    #if OGRE_NO_GLES3_SUPPORT == 0
                 return GL_RGBA;
+    #else
+                if( hwGamma && caps->hasCapability( RSC_HW_GAMMA ) )
+                    return GL_SRGB_ALPHA_EXT;
+                else
+                    return GL_RGBA;
+    #endif
 #endif
 
             case PF_DXT1:
@@ -334,6 +363,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLInternalFormat(PixelFormat fmt, bool hwGamma)
     {
+#if OGRE_NO_GLES3_SUPPORT != 0
+		const RenderSystemCapabilities *caps =
+            Root::getSingleton().getRenderSystem()->getCapabilities();
+#endif
+
         switch (fmt)
         {
             case PF_DEPTH:
@@ -500,7 +534,10 @@ namespace Ogre {
             case PF_X8B8G8R8:
             case PF_X8R8G8B8:
             case PF_SHORT_RGBA:
-                return GL_RGBA;
+                if( hwGamma && caps->hasCapability( RSC_HW_GAMMA ) )
+                    return GL_SRGB_ALPHA_EXT;
+                else
+                    return GL_RGBA;
             case PF_FLOAT16_RGB:
             case PF_FLOAT32_RGB:
             case PF_R5G6B5:
@@ -508,7 +545,10 @@ namespace Ogre {
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_SHORT_RGB:
-                return GL_RGB;
+                if( hwGamma && caps->hasCapability( RSC_HW_GAMMA ) )
+                    return GL_SRGB_EXT;
+                else
+                    return GL_RGB;
             case PF_FLOAT32_RGBA:
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
@@ -568,10 +608,18 @@ namespace Ogre {
                 return GL_RGBA8;
 #endif
 #else
+            const RenderSystemCapabilities *caps =
+                Root::getSingleton().getRenderSystem()->getCapabilities();
+
             if (hwGamma)
             {
-                // TODO not supported
-                return 0;
+                if( caps->hasCapability( RSC_HW_GAMMA ) )
+                    return GL_SRGB_EXT;
+                else
+                {
+                    // TODO not supported
+                    return 0;
+                }
             }
             else
             {
@@ -696,6 +744,12 @@ namespace Ogre {
                 return PF_R8;
             case GL_RG8_EXT:
                 return PF_RG8;
+#endif
+#if OGRE_NO_GLES3_SUPPORT != 0
+        case GL_SRGB_EXT:
+            return PF_X8R8G8B8;
+        case GL_SRGB_ALPHA_EXT:
+            return PF_A8R8G8B8;
 #endif
 #if OGRE_NO_GLES3_SUPPORT == 0
             case GL_RGB10_A2:

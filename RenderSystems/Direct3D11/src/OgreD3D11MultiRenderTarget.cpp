@@ -67,13 +67,11 @@ namespace Ogre
         {
             /// If there is another target bound, compare sizes
             if(targets[y]->getWidth() != buffer->getWidth() ||
-                targets[y]->getHeight() != buffer->getHeight() ||
-                PixelUtil::getNumElemBits(targets[y]->getFormat()) != 
-                PixelUtil::getNumElemBits(buffer->getFormat()))
+                targets[y]->getHeight() != buffer->getHeight())
             {
                 OGRE_EXCEPT(
                     Exception::ERR_INVALIDPARAMS, 
-                    "MultiRenderTarget surfaces are not of same size or bit depth", 
+                    "MultiRenderTarget surfaces are not of same size", 
                     "D3D11MultiRenderTarget::bindSurface"
                     );
             }
@@ -86,7 +84,7 @@ namespace Ogre
         target->getCustomAttribute( "ID3D11RenderTargetView", &v );
         mRenderTargetViews[attachment] = *v;
 
-        if(mNumberOfViews >= OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+        if(mNumberOfViews < OGRE_MAX_MULTIPLE_RENDER_TARGETS)
             mNumberOfViews++;
 
         checkAndUpdate();
@@ -98,7 +96,7 @@ namespace Ogre
         targets[attachment] = 0;
         mRenderTargetViews[attachment] = 0;
 
-        if(mNumberOfViews <= 0)
+        if(mNumberOfViews > 0)
             mNumberOfViews--;
 
         checkAndUpdate();

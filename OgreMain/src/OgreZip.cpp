@@ -52,17 +52,25 @@ namespace Ogre {
             errorMsg = "Out of memory.";
             break;            
         case ZZIP_DIR_OPEN:
+            errorMsg = "Unable to open zip file.";
+            break;
         case ZZIP_DIR_STAT: 
         case ZZIP_DIR_SEEK:
         case ZZIP_DIR_READ:
             errorMsg = "Unable to read zip file.";
-            break;            
+            break;
         case ZZIP_UNSUPP_COMPR:
             errorMsg = "Unsupported compression format.";
             break;            
         case ZZIP_CORRUPTED:
             errorMsg = "Corrupted archive.";
-            break;            
+            break;
+        case ZZIP_DIR_TOO_SHORT:
+            errorMsg = "Zip file is too short.";
+            break;
+        case ZZIP_DIR_EDH_MISSING:
+            errorMsg = "Zip-file's central directory record missing. Is this a 7z file?";
+            break;
         default:
             errorMsg = "Unknown error.";
             break;            

@@ -25,22 +25,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreAndroidResource.h"
-#include "OgreAndroidResourceManager.h"
+#include "OgreGLES2ManagedResource.h"
+#include "OgreGLES2ManagedResourceManager.h"
 
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-    AndroidResourceManager::AndroidResourceManager()
+    GLES2ManagedResourceManager::GLES2ManagedResourceManager()
     {
     }
     //-----------------------------------------------------------------------
-    AndroidResourceManager::~AndroidResourceManager()
+    GLES2ManagedResourceManager::~GLES2ManagedResourceManager()
     {
     
     }
     //-----------------------------------------------------------------------
-    void AndroidResourceManager::notifyOnContextLost()
+    void GLES2ManagedResourceManager::notifyOnContextLost()
     {               
         ResourceContainerIterator it = mResources.begin();
         while (it != mResources.end())
@@ -50,7 +50,7 @@ namespace Ogre
         }               
     }
     //-----------------------------------------------------------------------
-    void AndroidResourceManager::notifyOnContextReset()
+    void GLES2ManagedResourceManager::notifyOnContextReset()
     {
         ResourceContainerIterator it = mResources.begin();
         while (it != mResources.end())
@@ -60,12 +60,12 @@ namespace Ogre
         }   
     }
     //-----------------------------------------------------------------------
-    void AndroidResourceManager::_notifyResourceCreated(AndroidResource* pResource)
+    void GLES2ManagedResourceManager::_notifyResourceCreated(GLES2ManagedResource* pResource)
     {           
         mResources.push_back(pResource);
     }
     //-----------------------------------------------------------------------
-    void AndroidResourceManager::_notifyResourceDestroyed(AndroidResource* pResource)
+    void GLES2ManagedResourceManager::_notifyResourceDestroyed(GLES2ManagedResource* pResource)
     {       
         ResourceContainerIterator it = std::find( mResources.begin(), mResources.end(), pResource );
         if(it != mResources.end())

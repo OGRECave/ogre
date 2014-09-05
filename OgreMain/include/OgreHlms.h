@@ -47,6 +47,26 @@ namespace Ogre
     /** HLMS stands for "High Level Material System". */
     class _OgreExport Hlms : public PassAlloc
     {
+    public:
+        enum LightGatheringMode
+        {
+            LightGatherForward,
+            LightGatherForwardPlus,
+            LightGatherDeferred
+        };
+
+        struct DatablockEntry
+        {
+            HlmsDatablock   *datablock;
+            bool            visibleToManager;
+            String          name;
+            DatablockEntry() : datablock( 0 ), visibleToManager( false ) {}
+            DatablockEntry( HlmsDatablock *_datablock, bool _visibleToManager, const String &_name ) :
+                datablock( _datablock ), visibleToManager( _visibleToManager ), name( _name ) {}
+        };
+
+        typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
+
     protected:
         enum ShaderType
         {
@@ -98,23 +118,20 @@ namespace Ogre
         StringVector    mPieceFiles[5];
         HlmsManager     *mHlmsManager;
 
+        LightGatheringMode  mLightGatheringMode;
+        uint16              mNumLightsLimit;
+
         RenderSystem    *mRenderSystem;
 
-        struct DatablockEntry
-        {
-            HlmsDatablock   *datablock;
-            bool            visibleToManager;
-            DatablockEntry() : datablock( 0 ), visibleToManager( false ) {}
-            DatablockEntry( HlmsDatablock *_datablock, bool _visibleToManager ) :
-                datablock( _datablock ), visibleToManager( _visibleToManager ) {}
-        };
-
-        typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
         HlmsDatablockMap mDatablocks;
 
         String          mShaderProfile; /// "glsl", "glsles", "hlsl"
         String          mOutputPath;
         bool            mDebugOutput;
+        bool            mHighQuality;
+
+        /// The default datablock occupies the name IdString(); which is not the same as IdString("")
+        HlmsDatablock   *mDefaultDatablock;
 
         HlmsTypes       mType;
         IdString        mTypeName;
@@ -153,7 +170,7 @@ namespace Ogre
             std::vector<Expression> children;
             String                  value;
 
-            Expression() : type( EXPR_VAR ), result( false ), negated( false ) {}
+            Expression() : result( false ), negated( false ), type( EXPR_VAR ) {}
         };
 
         typedef std::vector<Expression> ExpressionVec;
@@ -161,6 +178,7 @@ namespace Ogre
         static void copy( String &outBuffer, const SubStringRef &inSubString, size_t length );
         static void repeat( String &outBuffer, const SubStringRef &inSubString, size_t length,
                             size_t passNum, const String &counterVar );
+        bool parseMath( const String &inBuffer, String &outBuffer );
         bool parseForEach( const String &inBuffer, String &outBuffer ) const;
         bool parseProperties( String &inBuffer, String &outBuffer ) const;
         bool collectPieces( const String &inBuffer, String &outBuffer );
@@ -240,6 +258,12 @@ namespace Ogre
                                                     const HlmsBlendblock *blendblock,
                                                     const HlmsParamVec &paramVec );
 
+        virtual HlmsDatablock* createDefaultDatablock(void);
+        void _destroyAllDatablocks(void);
+
+        virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces ) {}
+        virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces ) {}
+
     public:
         Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder );
         virtual ~Hlms();
@@ -249,12 +273,49 @@ namespace Ogre
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
         HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
 
+        /** Sets the quality of the Hlms. This function is most relevant for mobile and
+            almost or completely ignored by Desktop.
+            The default value is false.
+        @par
+            On mobile, high quality will use "highp" quality precision qualifier for
+            all its variables and functions.
+            When not in HQ, mobile users may see aliasing artifacts, gradients; but
+            the performance impact can be quite high. Some GPU drivers might even
+            refuse to execute the shader as they cannot handle it.
+        @par
+            Unless you absolutely require high quality rendering on Mobile devices
+            and/or to get it to look as closely as possible as it looks in a Desktop
+            device, the recommended option is to have this off.
+        */
+        void setHighQuality( bool highQuality );
+        bool getHighQuality(void) const                     { return mHighQuality; }
+
+        /** Destroys all the cached shaders and in the next opportunity will recreate them
+            from the new location. This is very useful for fast iteration and real-time
+            editing of Hlms shader templates.
+        @remarks
+            Calling with null pointer is possible and will only invalidate existing shaders
+            but you should provide a valid pointer before we start generating the first
+            shader (or else crash).
+        @par
+            Existing datablock materials won't be reloaded from files, so their properties
+            won't change (i.e. changed from blue to red), but the shaders will.
+        */
+        virtual void reloadFrom( Archive *newDataFolder );
+
+        Archive* getDataFolder(void)                        { return mDataFolder; }
+
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks
             The name of the datablock must be in paramVec["name"] and must be unique
             Throws if a datablock with the same name paramVec["name"] already exists
         @param name
             Name of the Datablock, must be unique within all Hlms types, not just this one.
+            99% you want this to be IdString( refName ); however this is not enforced.
+        @param refName
+            Name of the Datablock. The engine doesn't use this value at all. It is only
+            useful for UI editors which want to enumerate all existing datablocks and
+            display its name to the user.
         @param macroblockRef
             @See HlmsManager::getMacroblock
         @param blendblockRef
@@ -266,7 +327,8 @@ namespace Ogre
         @return
             Pointer to created Datablock
         */
-        HlmsDatablock* createDatablock( IdString name, const HlmsMacroblock &macroblockRef,
+        HlmsDatablock* createDatablock( IdString name, const String &refName,
+                                        const HlmsMacroblock &macroblockRef,
                                         const HlmsBlendblock &blendblockRef,
                                         const HlmsParamVec &paramVec,
                                         bool visibleToManager=true );
@@ -277,6 +339,14 @@ namespace Ogre
         */
         HlmsDatablock* getDatablock( IdString name ) const;
 
+        /// Returns the string name associated with its hashed name (this was
+        /// passed as refName in @createDatablock). Returns null ptr if
+        /// not found.
+        /// The reason this String doesn't live in HlmsDatablock is to prevent
+        /// cache trashing (datablocks are hot iterated every frame, and the
+        /// full name is rarely ever used)
+        const String* getFullNameString( IdString name ) const;
+
         /** Destroys a datablocks given its name. Caller is responsible for ensuring
             those pointers aren't still in use (i.e. dangling pointers)
         @remarks
@@ -286,7 +356,14 @@ namespace Ogre
 
         /// Destroys all datablocks created with @createDatablock. Caller is responsible
         /// for ensuring those pointers aren't still in use (i.e. dangling pointers)
+        /// The default datablock will be recreated.
         void destroyAllDatablocks(void);
+
+        /// @copydoc HlmsManager::getDefaultDatablock
+        HlmsDatablock* getDefaultDatablock(void) const;
+
+        /// Returns all datablocks owned by this Hlms, including the default one.
+        const HlmsDatablockMap& getDatablockMap(void) const { return mDatablocks; }
 
         /** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
             the value to 'inOut', otherwise leaves 'inOut' as is.
@@ -306,8 +383,7 @@ namespace Ogre
         @return
             A hash. This hash references property parameters that are already cached.
         */
-        virtual void calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
-                                       uint32 &outHash, uint32 &outCasterHash );
+        virtual void calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash );
 
         /** Called every frame by the Render Queue to cache the properties needed by this
             pass. i.e. Number of PSSM splits, number of shadow casting lights, etc
@@ -342,9 +418,36 @@ namespace Ogre
         const HlmsCache* getMaterial( HlmsCache const *lastReturnedValue, const HlmsCache &passCache,
                                       const QueuedRenderable &queuedRenderable, bool casterPass );
 
-        virtual void fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass, const HlmsCache *lastCache,
-                                     uint32 lastTextureHash ) = 0;
+        /** Fills the constant buffers. Gets executed right before drawing the mesh.
+        @param cache
+            Current cache of Shaders to be used.
+        @param queuedRenderable
+            The Renderable-MovableObject pair about to be rendered.
+        @param casterPass
+            Whether this is a shadow mapping caster pass.
+        @param lastCache
+            The cache of shaders that was the used by the previous renderable.
+        @param lastTextureHash
+            Last Texture Hash, used to let the Hlms know whether the textures should be changed again
+        @return
+            New Texture hash (may be equal or different to lastTextureHash).
+        */
+        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                       bool casterPass, const HlmsCache *lastCache,
+                                       uint32 lastTextureHash ) = 0;
+
+        /** Call to output the automatically generated shaders (which are usually made from templates)
+            on the given folder for inspection, analyzing, debugging, etc.
+        @remarks
+            The shader will be dumped when it is generated, not when this function gets called.
+            You should call this function at start up
+        @param enableDebugOutput
+            Whether to enable or disable dumping the shaders into a folder
+        @param path
+            Path location on where to dump it. Should end with slash for proper concatenation
+            (i.e. C:/path/ instead of C:/path; or /home/user/ instead of /home/user)
+        */
+        void setDebugOutputPath( bool enableDebugOutput, const String &path = BLANKSTRING );
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
@@ -352,48 +455,54 @@ namespace Ogre
         void _changeRenderSystem( RenderSystem *newRs );
 
         RenderSystem* getRenderSystem(void) const           { return mRenderSystem; }
+    };
 
-        static const IdString HlmsPropertySkeleton;
-        static const IdString HlmsPropertyBonesPerVertex;
-        static const IdString HlmsPropertyPose;
+    /// These are "default" or "Base" properties common to many implementations and thus defined here.
+    /// Most of them start with the suffix hlms_
+    struct _OgreExport HlmsBaseProp
+    {
+        static const IdString Skeleton;
+        static const IdString BonesPerVertex;
+        static const IdString Pose;
 
-        static const IdString HlmsPropertyNormal;
-        static const IdString HlmsPropertyQTangent;
+        static const IdString Normal;
+        static const IdString QTangent;
+        static const IdString Tangent;
 
-        static const IdString HlmsPropertyColour;
+        static const IdString Colour;
 
-        static const IdString HlmsPropertyUvCount;
-        static const IdString HlmsPropertyUvCount0;
-        static const IdString HlmsPropertyUvCount1;
-        static const IdString HlmsPropertyUvCount2;
-        static const IdString HlmsPropertyUvCount3;
-        static const IdString HlmsPropertyUvCount4;
-        static const IdString HlmsPropertyUvCount5;
-        static const IdString HlmsPropertyUvCount6;
-        static const IdString HlmsPropertyUvCount7;
+        static const IdString UvCount;
+        static const IdString UvCount0;
+        static const IdString UvCount1;
+        static const IdString UvCount2;
+        static const IdString UvCount3;
+        static const IdString UvCount4;
+        static const IdString UvCount5;
+        static const IdString UvCount6;
+        static const IdString UvCount7;
 
         //Change per frame (grouped together with scene pass)
-        static const IdString HlmsPropertyLightsDirectional;
-        static const IdString HlmsPropertyLightsPoint;
-        static const IdString HlmsPropertyLightsSpot;
-        static const IdString HlmsPropertyLightsAttenuation;
-        static const IdString HlmsPropertyLightsSpotParams;
+        static const IdString LightsDirectional;
+        static const IdString LightsPoint;
+        static const IdString LightsSpot;
+        static const IdString LightsAttenuation;
+        static const IdString LightsSpotParams;
 
         //Change per scene pass
-        static const IdString HlmsPropertyDualParaboloidMapping;
-        static const IdString HlmsPropertyNumShadowMaps;
-        static const IdString HlmsPropertyPssmSplits;
-        static const IdString HlmsPropertyShadowCaster;
+        static const IdString DualParaboloidMapping;
+        static const IdString NumShadowMaps;
+        static const IdString PssmSplits;
+        static const IdString ShadowCaster;
 
         //Change per material (hash can be cached on the renderable)
-        static const IdString PropertyDiffuseMap;
-        static const IdString PropertyNormalMap;
-        static const IdString PropertySpecularMap;
-        static const IdString PropertyEnvProbeMap;
-        static const IdString PropertyAlphaTest;
+        static const IdString AlphaTest;
+
+        static const IdString GL3Plus;
+        static const IdString HighQuality;
 
         static const IdString *UvCountPtrs[8];
     };
+
     /** @} */
     /** @} */
 

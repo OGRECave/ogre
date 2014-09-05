@@ -150,6 +150,8 @@ namespace Ogre {
         */
         virtual unsigned short getNumWorldTransforms(void) const { return 1; }
 
+        bool hasSkeletonAnimation(void) const               { return mHasSkeletonAnimation; }
+
         /** Sets whether or not to use an 'identity' projection.
         @remarks
             Usually Renderable objects will use a projection matrix as determined
@@ -413,7 +415,7 @@ namespace Ogre {
         void setDatablock( IdString datablockName );
 
         /// Assigns a datablock (i.e. HLMS Material) to this renderable
-        void setDatablock( HlmsDatablock *datablock );
+        virtual void setDatablock( HlmsDatablock *datablock );
 
         /// Manually sets the hlms hashes. Don't call this directly
         void _setHlmsHashes( uint32 hash, uint32 casterHash );
@@ -422,13 +424,33 @@ namespace Ogre {
 
         friend void LodStrategy::lodSet( ObjectData &t, Real lodValues[ARRAY_PACKED_REALS] );
 
+        /** Sets the render queue sub group.
+        @remarks
+            Within the same RenderQueue ID, you may want to have the renderables to have a
+            specific order (i.e. have a mesh, but the hair submesh with alpha blending
+            needs to be rendered last).
+        @par
+            RenderQueue Subgroups are useful for manually sorting objects, just like
+            RenderQueue IDs. However, RenderQueue IDs can also be useful for skipping
+            large number of objects through clever compositing and thus a performance
+            optimization. Subgroups cannot be used for such optimizations.
+        @param subGroup
+            The sub group. This value can't exceed OGRE_MAKE_MASK( SubRqIdBits )
+            @See RenderQueue
+        */
+        void setRenderQueueSubGroup( uint8 subGroup )   { mRenderQueueSubGroup = subGroup; }
+        uint8 getRenderQueueSubGroup(void) const        { return mRenderQueueSubGroup; }
+
     protected:
         typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
         VertexArrayObjectArray  mVaoPerLod;
-        uint32                  mHlmsHash;
-        uint32                  mHlmsCasterHash;
-        HlmsDatablock           *mHlmsDatablock;
+        uint32              mHlmsHash;
+        uint32              mHlmsCasterHash;
+        HlmsDatablock       *mHlmsDatablock;
+        uint8               mRenderQueueSubGroup;
+        //TODO: (refactor) Change this bool for the skeleton pointer.
+        bool                    mHasSkeletonAnimation;
         uint8                   mCurrentMaterialLod;
         FastArray<Real> const   *mLodMaterial;
 

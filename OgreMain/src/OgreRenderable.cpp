@@ -43,8 +43,10 @@ namespace Ogre
         mHlmsHash( 0 ),
         mHlmsCasterHash( 0 ),
         mHlmsDatablock( 0 ),
-        mLodMaterial( &MovableObject::c_DefaultLodMesh ),
+        mRenderQueueSubGroup( 0 ),
+        mHasSkeletonAnimation( false ),
         mCurrentMaterialLod( 0 ),
+        mLodMaterial( &MovableObject::c_DefaultLodMesh ),
         mHlmsGlobalIndex( ~0 ),
         mPolygonModeOverrideable( true ),
         mUseIdentityProjection( false ),
@@ -82,9 +84,35 @@ namespace Ogre
                 mHlmsDatablock->_unlinkRenderable( this );
 
             mHlmsDatablock = datablock;
+            try
+            {
+                mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsHash, mHlmsCasterHash );
+            }
+            catch( Exception &e )
+            {
+                LogManager::getSingleton().logMessage( e.getFullDescription() );
+                LogManager::getSingleton().logMessage( "Couldn't apply datablock '" +
+                                                       datablock->getName().getFriendlyText() + "' to "
+                                                       "this renderable. Using default one. Check "
+                                                       "previous log messages to see if there's more "
+                                                       "information.", LML_CRITICAL );
+
+                
+                if( mHlmsDatablock->mType == HLMS_LOW_LEVEL )
+                {
+                    HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+                    mHlmsDatablock = hlmsManager->getDefaultDatablock();
+                }
+                else
+                {
+                    //Try to use the default datablock from the same
+                    //HLMS as the one the user wanted us to apply
+                    mHlmsDatablock = mHlmsDatablock->getCreator()->getDefaultDatablock();
+                }
+                mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsHash, mHlmsCasterHash );
+            }
+
             mHlmsDatablock->_linkRenderable( this );
-            mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsDatablock->getOriginalParams(),
-                                                            mHlmsHash, mHlmsCasterHash );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -104,7 +132,8 @@ namespace Ogre
                 " because this Material does not exist. Have you forgotten to define it in a "
                 ".material script?", LML_CRITICAL );
 
-            setDatablock( IdString() );
+            HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+            setDatablock( hlmsManager->getDefaultDatablock() );
         }
         else
         {

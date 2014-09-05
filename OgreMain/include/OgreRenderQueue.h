@@ -122,6 +122,7 @@ namespace Ogre {
         HlmsManager *mHlmsManager;
         SceneManager *mSceneManager;
 
+        bool                    mLastWasCasterPass;
         HlmsMacroblock const    *mLastMacroblock;
         HlmsBlendblock const    *mLastBlendblock;
         v1::VertexData const    *mLastVertexData;
@@ -142,7 +143,7 @@ namespace Ogre {
         @remarks
             Calling this function inside render or renderES2 won't have any effect.
         */
-        void flushState(void);
+        void clearState(void);
 
         /** Add a renderable object to the queue.
         @remarks

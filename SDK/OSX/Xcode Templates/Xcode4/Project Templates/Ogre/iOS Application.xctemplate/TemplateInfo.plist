@@ -97,11 +97,11 @@
 								<key>SharedSettings</key>
 								<dict>
 									<key>HEADER_SEARCH_PATHS</key>
-									<string>"$(OGRE_SDK_ROOT)/include/OGRE" "$(OGRE_SDK_ROOT)/include/OGRE/RenderSystems/GLES2" "$(OGRE_SDK_ROOT)/include/OGRE/RTShaderSystem" "$(OGRE_SDK_ROOT)/include/OGRE/iOS" "$(OGRE_SDK_ROOT)/include" "$(OGRE_SDK_ROOT)/include/OIS" "$(OGRE_SDK_ROOT)/iOSDependencies/include"</string>
+									<string>"$(OGRE_SDK_ROOT)/include/OGRE" "$(OGRE_SDK_ROOT)/include/OGRE/Overlay" "$(OGRE_SDK_ROOT)/include/OGRE/RenderSystems/GLES2" "$(OGRE_SDK_ROOT)/include/OGRE/RTShaderSystem" "$(OGRE_SDK_ROOT)/include/OGRE/iOS" "$(OGRE_SDK_ROOT)/include" "$(OGRE_SDK_ROOT)/include/OIS" "$(OGRE_SDK_ROOT)/iOSDependencies/include"</string>
 									<key>OTHER_CFLAGS</key>
 									<string>-DOGRE_USE_GLES2=1</string>
 									<key>OTHER_LDFLAGS</key>
-									<string>-lOIS -lOgreMainStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lglsl_optimizer -lboost_system -lboost_chrono -lboost_date_time -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
+									<string>-lOIS -lOgreMainStatic -lOgreOverlayStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lglsl_optimizer -lboost_system -lboost_chrono -lboost_date_time -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
 								</dict>
 							</dict>
 						</array>

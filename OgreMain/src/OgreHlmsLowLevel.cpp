@@ -96,6 +96,28 @@ namespace Ogre
     void HlmsLowLevel::calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
                                          uint32 &outHash, uint32 &outCasterHash )
     {
+        const MaterialPtr &mat = renderable->getMaterial();
+
+        Material::TechniqueIterator techniqueIt = mat->getTechniqueIterator();
+        while( techniqueIt.hasMoreElements() )
+        {
+            Technique *technique = techniqueIt.getNext();
+            Technique::PassIterator passIt = technique->getPassIterator();
+
+            while( passIt.hasMoreElements() )
+            {
+                Pass *pass = passIt.getNext();
+
+                if( !pass->isProgrammable() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "Fixed Function pipeline is no longer allowed nor supported. "
+                                 "The material " + mat->getName() + " must use shaders",
+                                 "HlmsLowLevel::calculateHashFor" );
+                }
+            }
+        }
+
         outHash         = 0;
         outCasterHash   = 0;
     }
@@ -118,10 +140,10 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsLowLevel::fillBuffersFor( const HlmsCache *cache,
-                                       const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, const HlmsCache *lastCache,
-                                       uint32 lastTextureHash )
+    uint32 HlmsLowLevel::fillBuffersFor( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, const HlmsCache *lastCache,
+                                         uint32 lastTextureHash )
     {
         Renderable *renderable = queuedRenderable.renderable;
         unsigned short numMatrices = renderable->getNumWorldTransforms();
@@ -224,6 +246,8 @@ namespace Ogre
             mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM,
                                                      pass->getFragmentProgramParameters(), GPV_ALL );
         }
+
+        return 0;
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsLowLevel::createDatablockImpl( IdString datablockName,

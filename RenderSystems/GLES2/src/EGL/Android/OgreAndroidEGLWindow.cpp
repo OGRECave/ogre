@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
 #include "OgreAndroidEGLContext.h"
-#include "OgreAndroidResourceManager.h"
+#include "OgreGLES2ManagedResourceManager.h"
 #include "OgreViewport.h"
 
 #include <iostream>
@@ -50,7 +50,7 @@ namespace Ogre {
     AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
         : EGLWindow(glsupport),
           mMaxBufferSize(32),
-          mMinBufferSize(16),
+          mMinBufferSize(32),
           mMaxDepthSize(16),
           mMaxStencilSize(0),
           mMSAA(0),
@@ -92,7 +92,13 @@ namespace Ogre {
     void AndroidEGLWindow::windowMovedOrResized()
     {
         if(mActive)
-        {
+        {		
+			// When using GPU rendering for Android UI the os creates a context in the main thread
+			// Now we have 2 choices create OGRE in its own thread or set our context current before doing
+			// anything else. I put this code here because this function called before any rendering is done.
+			// Because the events for screen rotation / resizing did not worked on all devices it is the best way
+			// to query the correct dimensions.
+	        mContext->setCurrent(); 
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
             
@@ -232,6 +238,8 @@ namespace Ogre {
 
     void AndroidEGLWindow::_destroyInternalResources()
     {
+        mContext->setCurrent();
+        
         GLES2RenderSystem::getResourceManager()->notifyOnContextLost();
         mContext->_destroyInternalResources();
         
@@ -353,9 +361,7 @@ namespace Ogre {
             mClosed = false;
             
             mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
-            mContext->setCurrent();
-            
-            windowMovedOrResized();
+
             static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
         }
     }

@@ -73,16 +73,15 @@ namespace Ogre
         HlmsGui2DMobile( Archive *dataFolder );
         ~HlmsGui2DMobile();
 
-        virtual void calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
-                                       uint32 &outHash, uint32 &outCasterHash );
+        virtual void calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash );
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
                                            bool casterPass, bool dualParaboloid,
                                            SceneManager *sceneManager );
 
-        virtual void fillBuffersFor(const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass, const HlmsCache *lastCache,
-                                     uint32 lastTextureHash );
+        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                       bool casterPass, const HlmsCache *lastCache,
+                                       uint32 lastTextureHash );
 
         static const IdString PropertyTexMatrixCount;
         static const IdString PropertyTexMatrixCount0;
@@ -146,6 +145,11 @@ namespace Ogre
         static const IdString PropertyUvAtlas13;
         static const IdString PropertyUvAtlas14;
         static const IdString PropertyUvAtlas15;
+    };
+
+    struct _OgreHlmsGui2DMobileExport Gui2DMobileProp
+    {
+        static const IdString DiffuseMap;
     };
 
     /** @} */

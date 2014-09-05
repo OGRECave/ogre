@@ -203,7 +203,7 @@ namespace Ogre {
             buffer = mIsFullScreen? FB_FRONT : FB_BACK;
         }
 
-        GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
+        GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format, false);
         GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
 
         if ((format == 0) || (type == 0))
@@ -217,6 +217,8 @@ namespace Ogre {
         // Switch context if different from current one
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
         rsys->_setViewport(this->getViewport(0));
+
+		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         if(dst.getWidth() != dst.rowPitch)

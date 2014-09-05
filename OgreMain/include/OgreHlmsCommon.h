@@ -58,25 +58,25 @@ namespace Ogre
             assert( start <= original->size() );
         }
 
-        SubStringRef( const String *original, size_t start, size_t end ) :
+        SubStringRef( const String *original, size_t _start, size_t _end ) :
             mOriginal( original ),
-            mStart( start ),
-            mEnd( end )
+            mStart( _start ),
+            mEnd( _end )
         {
-            assert( start <= end );
-            assert( end <= original->size() );
+            assert( _start <= _end );
+            assert( _end <= original->size() );
         }
 
-        SubStringRef( const String *original, String::const_iterator start ) :
+        SubStringRef( const String *original, String::const_iterator _start ) :
             mOriginal( original ),
-            mStart( start - original->begin() ),
+            mStart( _start - original->begin() ),
             mEnd( original->size() )
         {
         }
 
-        size_t find( const char *value ) const
+        size_t find( const char *value, size_t pos=0 ) const
         {
-            size_t retVal = mOriginal->find( value, mStart );
+            size_t retVal = mOriginal->find( value, mStart + pos );
             if( retVal >= mEnd )
                 retVal = String::npos;
             else if( retVal != String::npos )
@@ -96,6 +96,27 @@ namespace Ogre
             return retVal;
         }
 
+        size_t findFirstOf( const char *c, size_t pos ) const
+        {
+            size_t retVal = mOriginal->find_first_of( c, mStart + pos );
+            if( retVal >= mEnd )
+                retVal = String::npos;
+            else if( retVal != String::npos )
+                retVal -= mStart;
+
+            return retVal;
+        }
+
+        bool matchEqual( const char *stringCompare ) const
+        {
+            const char *origStr = mOriginal->c_str() + mStart;
+            ptrdiff_t length = mEnd - mStart;
+            while( *origStr == *stringCompare && *origStr && --length )
+                ++origStr, ++stringCompare;
+
+            return length == 0 && *origStr == *stringCompare;
+        }
+
         void setStart( size_t newStart )            { mStart = std::min( newStart, mOriginal->size() ); }
         void setEnd( size_t newEnd )                { mEnd = std::min( newEnd, mOriginal->size() ); }
         size_t getStart(void) const                 { return mStart; }
@@ -106,7 +127,7 @@ namespace Ogre
         const String& getOriginalBuffer() const     { return *mOriginal; }
     };
 
-    struct HlmsProperty
+    struct _OgreExport HlmsProperty
     {
         IdString    keyName;
         int32       value;

@@ -92,16 +92,22 @@ namespace Ogre
     
     Barrier::Barrier( size_t threadCount )
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         pthread_barrier_init( &mBarrier, 0, static_cast<int>(threadCount) );
+#endif
     }
     //-----------------------------------------------------------------------------------
     Barrier::~Barrier()
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         pthread_barrier_destroy( &mBarrier );
+#endif
     }
     //-----------------------------------------------------------------------------------
     void Barrier::sync(void)
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         pthread_barrier_wait( &mBarrier );
+#endif
     }
 }

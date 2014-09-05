@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsCommon.h"
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsSamplerblock.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -43,6 +44,7 @@ namespace Ogre
 
 #define OGRE_HLMS_NUM_MACROBLOCKS 32
 #define OGRE_HLMS_NUM_BLENDBLOCKS 32
+#define OGRE_HLMS_NUM_SAMPLERBLOCKS 64
 
     /** HLMS stands for "High Level Material System". */
     class _OgreExport HlmsManager : public PassAlloc
@@ -53,10 +55,13 @@ namespace Ogre
         typedef vector<uint8>::type BlockIdxVec;
         HlmsMacroblock      mMacroblocks[OGRE_HLMS_NUM_MACROBLOCKS];
         HlmsBlendblock      mBlendblocks[OGRE_HLMS_NUM_BLENDBLOCKS];
+        HlmsSamplerblock    mSamplerblocks[OGRE_HLMS_NUM_SAMPLERBLOCKS];
         BlockIdxVec         mActiveMacroblocks;
         BlockIdxVec         mActiveBlendblocks;
+        BlockIdxVec         mActiveSamplerblocks;
         BlockIdxVec         mFreeMacroblockIds;
         BlockIdxVec         mFreeBlendblockIds;
+        BlockIdxVec         mFreeSamplerblockIds;
 
         RenderSystem        *mRenderSystem;
 
@@ -64,6 +69,8 @@ namespace Ogre
 
         typedef std::map<IdString, HlmsDatablock*> HlmsDatablockMap;
         HlmsDatablockMap mRegisteredDatablocks;
+
+        HlmsTypes           mDefaultHlmsType;
 
         void renderSystemDestroyAllBlocks(void);
 
@@ -104,6 +111,18 @@ namespace Ogre
         /// an O(N) search, but N <= OGRE_HLMS_NUM_BLENDBLOCKS
         void destroyBlendblock( const HlmsBlendblock *Blendblock );
 
+        /** @See getMacroblock. This is the same for Sampler states
+        @remarks
+            The input is a hard copy because it may be modified if invalid parameters are detected
+            (i.e. specifying anisotropic level higher than 1, but no anisotropic filter)
+            A warning on the log will be generated in such cases.
+        */
+        const HlmsSamplerblock* getSamplerblock( HlmsSamplerblock baseParams );
+
+        /// Destroys a macroblock created by @getSamplerblock. Note it performs
+        /// an O(N) search, but N <= OGRE_HLMS_NUM_SamplerBLOCKS
+        void destroySamplerblock( const HlmsSamplerblock *Samplerblock );
+
         /** Internal function used by Hlms types to tell us a datablock has been created
             so that we can return it when the user calls @getDatablock.
         @remarks
@@ -122,8 +141,8 @@ namespace Ogre
             retrieve it using this function. If that's the case, get the appropiate Hlms
             using @getHlms and then call @Hlms::getDatablock on it
         @par
-            Throws if the material/datablock with that name wasn't found
-            (note that Hlms::getDatablock doesn't throw!!!)
+            If the material/datablock with that name wasn't found, returns a default one
+            (note that Hlms::getDatablock doesn't do this!!!)
         @param name
             Unique name of the datablock. Datablock names are unique within the same Hlms
             type. If two types create a datablock with the same name and both attempt to
@@ -134,15 +153,20 @@ namespace Ogre
         HlmsDatablock* getDatablock( IdString name ) const;
 
         /// @See getDatablock. Exactly the same, but returns null pointer if it wasn't found,
-        /// instead of throwing.
-        HlmsDatablock* getDatablockNoThrow( IdString name ) const;
+        /// instead of going fallback to default.
+        HlmsDatablock* getDatablockNoDefault( IdString name ) const;
 
         /// Alias function. @See getDatablock, as many beginners will probably think of the word
         /// "Material" first. Datablock is a more technical (and accurate) name of what it does
         /// (it's a block.. of data). Prefer calling getDatablock directly.
         HlmsDatablock* getMaterial( IdString name ) const   { return getDatablock( name ); }
 
-        HlmsTextureManager* getTextureManger(void) const    { return mTextureManager; }
+        HlmsTextureManager* getTextureManager(void) const   { return mTextureManager; }
+
+        void useDefaultDatablockFrom( HlmsTypes type )      { mDefaultHlmsType = type; }
+
+        /// Datablock to use when another datablock failed or none was specified.
+        HlmsDatablock* getDefaultDatablock(void) const;
 
         /** Registers an HLMS provider. The type is retrieved from the provider. Two providers of
             the same type cannot be registered at the same time (@see HlmsTypes) and will throw

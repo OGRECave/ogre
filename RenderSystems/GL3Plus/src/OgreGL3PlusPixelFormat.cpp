@@ -49,19 +49,48 @@ namespace Ogre  {
         case PF_DEPTH:
             return GL_DEPTH_COMPONENT;
         case PF_A8:
-            return GL_ALPHA;
         case PF_L8:
-            return GL_RED;
         case PF_L16:
+        case PF_R8_UINT:
+        case PF_R8_SINT:
+        case PF_R16_SINT:
+        case PF_R32_SINT:
+        case PF_R16_UINT:
+        case PF_R32_UINT:
+        case PF_R8_SNORM:
+        case PF_R16_SNORM:
             return GL_RED;
         case PF_BYTE_LA:
+        case PF_FLOAT16_GR:
+        case PF_FLOAT32_GR:
+        case PF_SHORT_GR:
+        case PF_R8G8_UINT:
+        case PF_R16G16_UINT:
+        case PF_R32G32_UINT:
+        case PF_R8G8_SINT:
+        case PF_R8G8_SNORM:
+        case PF_R16G16_SNORM:
+        case PF_R16G16_SINT:
+        case PF_R32G32_SINT:
             return GL_RG;
         case PF_R3G3B2:
+        case PF_R5G6B5:
+        case PF_FLOAT16_RGB:
+        case PF_FLOAT32_RGB:
+        case PF_SHORT_RGB:
+        case PF_R11G11B10_FLOAT:
+        case PF_R9G9B9E5_SHAREDEXP:
+        case PF_R8G8B8_SNORM:
+        case PF_R16G16B16_SNORM:
+        case PF_R8G8B8_UINT:
+        case PF_R16G16B16_UINT:
+        case PF_R32G32B32_UINT:
+        case PF_R8G8B8_SINT:
+        case PF_R16G16B16_SINT:
+        case PF_R32G32B32_SINT:
             return GL_RGB;
         case PF_A1R5G5B5:
             return GL_BGRA;
-        case PF_R5G6B5:
-            return GL_RGB;
         case PF_B5G6R5:
             return GL_BGR;
         case PF_A4R4G4B4:
@@ -88,80 +117,30 @@ namespace Ogre  {
         case PF_B8G8R8A8:
             return GL_BGRA;
         case PF_R8G8B8A8:
+        case PF_A2B10G10R10:
+        case PF_FLOAT16_RGBA:
+        case PF_FLOAT32_RGBA:
+        case PF_SHORT_RGBA:
+        case PF_R8G8B8A8_SNORM:
+        case PF_R16G16B16A16_SNORM:
+        case PF_R8G8B8A8_SINT:
+        case PF_R16G16B16A16_SINT:
+        case PF_R32G32B32A32_SINT:
+        case PF_R8G8B8A8_UINT:
+        case PF_R16G16B16A16_UINT:
+        case PF_R32G32B32A32_UINT:
             return GL_RGBA;
         case PF_A2R10G10B10:
-            return GL_BGRA_INTEGER;
-        case PF_A2B10G10R10:
-            return GL_RGBA_INTEGER;
+            return GL_BGRA;
         case PF_FLOAT16_R:
         case PF_FLOAT32_R:
             return GL_RED;
-        case PF_FLOAT16_GR:
-        case PF_FLOAT32_GR:
-            return GL_RG;
-        case PF_FLOAT16_RGB:
-        case PF_FLOAT32_RGB:
-            return GL_RGB;
-        case PF_FLOAT16_RGBA:
-        case PF_FLOAT32_RGBA:
-            return GL_RGBA;
-        case PF_SHORT_RGBA:
-            return GL_RGBA;
-        case PF_SHORT_RGB:
-            return GL_RGB;
-        case PF_SHORT_GR:
-            return GL_RG;
         case PF_DXT1:
             return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
         case PF_DXT3:
             return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
         case PF_DXT5:
             return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-        case PF_R8_UINT:
-        case PF_R8G8_UINT:
-        case PF_R8G8B8_UINT:
-        case PF_R8G8B8A8_UINT:
-        case PF_R16_UINT:
-        case PF_R16G16_UINT:
-        case PF_R16G16B16_UINT:
-        case PF_R16G16B16A16_UINT:
-        case PF_R32_UINT:
-        case PF_R32G32_UINT:
-        case PF_R32G32B32_UINT:
-        case PF_R32G32B32A32_UINT:
-        case PF_R8_SINT:
-        case PF_R8G8_SINT:
-        case PF_R8G8B8_SINT:
-        case PF_R8G8B8A8_SINT:
-        case PF_R16_SINT:
-        case PF_R16G16_SINT:
-        case PF_R16G16B16_SINT:
-        case PF_R16G16B16A16_SINT:
-        case PF_R32_SINT:
-        case PF_R32G32_SINT:
-        case PF_R32G32B32_SINT:
-        case PF_R32G32B32A32_SINT:
-            return GL_RG_INTEGER;
-        case PF_R11G11B10_FLOAT:
-            return GL_RGB;
-        case PF_R9G9B9E5_SHAREDEXP:
-            return GL_RGB;
-        case PF_R8_SNORM:
-            return GL_R8_SNORM;
-        case PF_R8G8_SNORM:
-            return GL_RG8_SNORM;
-        case PF_R8G8B8_SNORM:
-            return GL_RGB8_SNORM;
-        case PF_R8G8B8A8_SNORM:
-            return GL_RGBA8_SNORM;
-        case PF_R16_SNORM:
-            return GL_R16_SNORM;
-        case PF_R16G16_SNORM:
-            return GL_RG16_SNORM;
-        case PF_R16G16B16_SNORM:
-            return GL_RGB16_SNORM;
-        case PF_R16G16B16A16_SNORM:
-            return GL_RGBA16_SNORM;
         case PF_BC4_UNORM:
             return GL_COMPRESSED_RED_RGTC1;
         case PF_BC4_SNORM:
@@ -201,6 +180,7 @@ namespace Ogre  {
         case PF_L8:
         case PF_R8G8B8:
         case PF_B8G8R8:
+            return GL_UNSIGNED_BYTE;
         case PF_R8_SNORM:
         case PF_R8G8_SNORM:
         case PF_R8G8B8_SNORM:
@@ -209,7 +189,7 @@ namespace Ogre  {
         case PF_R16G16_SNORM:
         case PF_R16G16B16_SNORM:
         case PF_R16G16B16A16_SNORM:
-            return GL_UNSIGNED_BYTE;
+            return GL_BYTE;
         case PF_R3G3B2:
             return GL_UNSIGNED_BYTE_3_3_2;
         case PF_A1R5G5B5:

@@ -165,6 +165,7 @@ THE SOFTWARE.
         #define OGRE_PREFETCH_T2( x ) ((void)0)
         #define OGRE_PREFETCH_NTA( x ) ((void)0)
 
+        #define ARRAY_REAL_ZERO 0
         #define ARRAY_INT_ZERO 0
 
         /// Input must be 16-byte aligned

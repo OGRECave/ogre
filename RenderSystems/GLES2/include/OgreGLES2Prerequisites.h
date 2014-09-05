@@ -37,7 +37,7 @@ THE SOFTWARE.
 #  define  GL_GLEXT_PROTOTYPES
 #endif
 
-#if OGRE_NO_GLES3_SUPPORT == 0
+#if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #   include <GLES3/gles3w.h>
 #else
 #   include <GLES2/gles2w.h>
@@ -54,17 +54,20 @@ THE SOFTWARE.
 #           endif
 #       endif
 #   endif
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL) || (OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
 #   ifndef GL_GLEXT_PROTOTYPES
 #       define GL_GLEXT_PROTOTYPES
 #   endif
-#   if OGRE_NO_GLES3_SUPPORT == 0
+#   if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #       include <GLES3/gl3platform.h>
 #       include <GLES3/gl3.h>
 #   else
 #       include <GLES2/gl2platform.h>
 #       include <GLES2/gl2.h>
 #       include <GLES2/gl2ext.h>
+#   endif
+#   if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#       define gleswIsSupported(x,y) (false)
 #   endif
 #   if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #       include "ppapi/cpp/completion_callback.h"
@@ -128,6 +131,7 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
+    struct GLES2HlmsSamplerblock;
     class GLES2GpuProgram;
     class GLES2Texture;
     typedef SharedPtr<GLES2GpuProgram> GLES2GpuProgramPtr;
@@ -298,6 +302,8 @@ namespace Ogre {
 #else
 #   define OGRE_CHECK_GL_ERROR(glFunc) { glFunc; }
 #endif
+
+#define OCGE OGRE_CHECK_GL_ERROR
 
 #if ENABLE_GL_CHECK
     #define EGL_CHECK_ERROR \

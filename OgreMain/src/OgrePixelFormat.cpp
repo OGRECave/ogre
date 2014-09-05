@@ -943,6 +943,76 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    void PixelUtil::convertForNormalMapping(const PixelBox &src, const PixelBox &dst)
+    {
+        assert(src.getWidth() == dst.getWidth() &&
+               src.getHeight() == dst.getHeight() &&
+               src.getDepth() == dst.getDepth() &&
+               (dst.format == PF_R8G8_SNORM || dst.format == PF_BYTE_LA)  );
+
+        const PixelFormatDescription &srcDesc = getDescriptionFor( src.format );
+
+        const size_t srcPixelSize = PixelUtil::getNumElemBytes(src.format);
+        const size_t dstPixelSize = PixelUtil::getNumElemBytes(dst.format);
+        uint8 *srcPtr = static_cast<uint8*>(src.data)
+            + (src.left + src.top * src.rowPitch + src.front * src.slicePitch) * srcPixelSize;
+        int8 *dstPtr = static_cast<int8*>(dst.data)
+            + (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch) * dstPixelSize;
+
+        // Calculate pitches+skips in bytes
+        const size_t srcRowSkipBytes    = src.getRowSkip() * srcPixelSize;
+        const size_t srcSliceSkipBytes  = src.getSliceSkip() * srcPixelSize;
+        const size_t dstRowSkipBytes    = dst.getRowSkip() * dstPixelSize;
+        const size_t dstSliceSkipBytes  = dst.getSliceSkip() * dstPixelSize;
+
+        uint8 notLuminanceMask  = srcDesc.flags & PFF_LUMINANCE ? 0x00 : 0xFF;
+        uint8 luminanceMask     = srcDesc.flags & PFF_LUMINANCE ? 0xFF : 0x00;
+
+        if( srcDesc.flags & PFF_FLOAT )
+        {
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                         "Floating point formats for normal maps is not implemented yet",
+                         "PixelUtil::convertForNormalMapping" );
+        }
+
+        if( srcDesc.componentType & PCT_SINT )
+        {
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                         "Signed formats formats for normal maps is not tested",
+                         "PixelUtil::convertForNormalMapping" );
+        }
+
+        uint8 shiftOffset = 0x7F;
+
+        if( dst.format == PF_BYTE_LA )
+            shiftOffset = 0x00;
+
+        uint8 r, g, b, a;
+        for(size_t z=src.front; z<src.back; z++)
+        {
+            for(size_t y=src.top; y<src.bottom; y++)
+            {
+                for(size_t x=src.left; x<src.right; x++)
+                {
+                    unpackColour( &r, &g, &b, &a, src.format, srcPtr );
+
+                    g = (g & notLuminanceMask) | (a & luminanceMask);
+
+                    *dstPtr++ = r - shiftOffset;
+                    *dstPtr++ = g - shiftOffset;
+
+                    srcPtr += srcPixelSize;
+                }
+
+                srcPtr += srcRowSkipBytes;
+                dstPtr += dstRowSkipBytes;
+            }
+
+            srcPtr += srcSliceSkipBytes;
+            dstPtr += dstSliceSkipBytes;
+        }
+    }
+    //-----------------------------------------------------------------------
     void PixelUtil::bulkPixelVerticalFlip(const PixelBox &box)
     {
         // Check for compressed formats, we don't support decompression, compression or recoding

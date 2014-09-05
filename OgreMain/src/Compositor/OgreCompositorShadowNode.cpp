@@ -266,22 +266,22 @@ namespace Ogre
             uint32 visibilityMaskR = mLightList->visibilityMask[_r];
 
             if( (visibilityMaskL & mCombinedVisibilityFlags) &&
-                !(visibilityMaskL & mCombinedVisibilityFlags) )
+                !(visibilityMaskR & mCombinedVisibilityFlags) )
             {
                 return true;
             }
             else if( !(visibilityMaskL & mCombinedVisibilityFlags) &&
-                     (visibilityMaskL & mCombinedVisibilityFlags) )
+                     (visibilityMaskR & mCombinedVisibilityFlags) )
             {
                 return false;
             }
             else if( (visibilityMaskL & VisibilityFlags::LAYER_SHADOW_CASTER) &&
-                    !(visibilityMaskL & VisibilityFlags::LAYER_SHADOW_CASTER) )
+                    !(visibilityMaskR & VisibilityFlags::LAYER_SHADOW_CASTER) )
             {
                 return true;
             }
             else if( !(visibilityMaskL & VisibilityFlags::LAYER_SHADOW_CASTER) &&
-                     (visibilityMaskL & VisibilityFlags::LAYER_SHADOW_CASTER) )
+                     (visibilityMaskR & VisibilityFlags::LAYER_SHADOW_CASTER) )
             {
                 return false;
             }
@@ -303,8 +303,6 @@ namespace Ogre
 
         mLastFrame = currentFrameCount;
 
-        const Real EPSILON = 1e-6f;
-
         mLastCamera = newCamera;
 
         const Viewport *viewport = newCamera->getLastViewport();
@@ -321,9 +319,6 @@ namespace Ogre
         mAffectedLights.resize( globalLightList.lights.size(), false );
 
         const Vector3 &camPos( newCamera->getDerivedPosition() );
-
-        int minIdx = -1;
-        Real minMaxDistance = -std::numeric_limits<Real>::infinity();
 
         //mShadowMapCastingLights.resize( numLights, 0 );
         vector<size_t>::type sortedIndexes;

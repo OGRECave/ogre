@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define _OgreHlmsPbsMobilePrerequisites_H_
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#   if defined( OGRE_STATIC_LIB )
+#   if defined( OGRE_STATIC_LIB ) || defined( OGRE_PBS_MOBILE_STATIC_LIB )
 #       define _OgreHlmsPbsMobileExport
 #   else
 #       if defined( OgreHlmsPbsMobile_EXPORTS )
@@ -47,5 +47,48 @@ THE SOFTWARE.
 #else
 #   define _OgreHlmsPbsMobileExport
 #endif 
+
+namespace Ogre
+{
+    enum PbsMobileTextureTypes
+    {
+        PBSM_DIFFUSE,
+        PBSM_NORMAL,
+        PBSM_SPECULAR,
+        PBSM_ROUGHNESS,
+        PBSM_DETAIL_WEIGHT,
+        PBSM_DETAIL0,
+        PBSM_DETAIL1,
+        PBSM_DETAIL2,
+        PBSM_DETAIL3,
+        PBSM_DETAIL0_NM,
+        PBSM_DETAIL1_NM,
+        PBSM_DETAIL2_NM,
+        PBSM_DETAIL3_NM,
+        PBSM_REFLECTION,
+        NUM_PBSM_SOURCES = PBSM_REFLECTION,
+        NUM_PBSM_TEXTURE_TYPES
+    };
+
+    enum PbsMobileBlendModes
+    {
+        /// Regular alpha blending
+        PBSM_BLEND_NORMAL_NON_PREMUL,
+        /// Premultiplied alpha blending
+        PBSM_BLEND_NORMAL_PREMUL,
+        PBSM_BLEND_ADD,
+        PBSM_BLEND_SUBTRACT,
+        PBSM_BLEND_MULTIPLY,
+        PBSM_BLEND_MULTIPLY2X,
+        PBSM_BLEND_SCREEN,
+        PBSM_BLEND_OVERLAY,
+        PBSM_BLEND_LIGHTEN,
+        PBSM_BLEND_DARKEN,
+        PBSM_BLEND_GRAIN_EXTRACT,
+        PBSM_BLEND_GRAIN_MERGE,
+        PBSM_BLEND_DIFFERENCE,
+        NUM_PBSM_BLEND_MODES
+    };
+}
 
 #endif

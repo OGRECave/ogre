@@ -30,7 +30,9 @@ THE SOFTWARE.
 
 #include "OgreHlmsDatablock.h"
 #include "OgreHlms.h"
+#include "OgreHlmsManager.h"
 #include "OgreTexture.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
@@ -67,36 +69,43 @@ namespace Ogre
     HlmsDatablock::HlmsDatablock( IdString name, Hlms *creator, const HlmsMacroblock *macroblock,
                                   const HlmsBlendblock *blendblock,
                                   const HlmsParamVec &params ) :
-        mOriginalParams( params ),
         mCreator( creator ),
         mName( name ),
-        mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
         mTextureHash( 0 ),
+        mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
         mType( creator->getType() ),
-        mIsOpaque( blendblock->mDestBlendFactor == SBF_ZERO &&
-                   blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
-                   blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
-                   blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
-                   blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA ),
+        mIsTransparent( !( blendblock->mDestBlendFactor == SBF_ZERO &&
+                           blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
+                           blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
+                           blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
+                           blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA ) ),
         mMacroblock( macroblock ),
         mBlendblock( blendblock ),
+        mAlphaTest( false ),
+        mAlphaTestThreshold( 0.5f ),
         mShadowConstantBias( 0.01f )
     {
+    }
+    HlmsDatablock::~HlmsDatablock()
+    {
+        assert( mLinkedRenderables.empty() &&
+                "This Datablock is still being used by some Renderables."
+                " Change their Datablocks before destroying this." );
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setBlendblock( HlmsBlendblock const *blendblock )
     {
         mBlendblock = blendblock;
-        mIsOpaque = blendblock->mDestBlendFactor == SBF_ZERO &&
-                    blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
-                    blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
-                    blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
-                    blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA;
+        mIsTransparent = !( blendblock->mDestBlendFactor == SBF_ZERO &&
+                            blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
+                            blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
+                            blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
+                            blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA );
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::_linkRenderable( Renderable *renderable )
     {
-        assert( renderable->mHlmsGlobalIndex == ~0 &&
+        assert( renderable->mHlmsGlobalIndex == (uint32)~0 &&
                 "Renderable must be unlinked before being linked again!" );
 
         renderable->mHlmsGlobalIndex = mLinkedRenderables.size();
@@ -124,6 +133,15 @@ namespace Ogre
         renderable->mHlmsGlobalIndex = ~0;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsDatablock::setAlphaTest( bool bEnabled )
+    {
+        if( bEnabled != mAlphaTest )
+        {
+            mAlphaTest = bEnabled;
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsDatablock::flushRenderables(void)
     {
         vector<Renderable*>::type::const_iterator itor = mLinkedRenderables.begin();
@@ -131,39 +149,42 @@ namespace Ogre
 
         while( itor != end )
         {
-            uint32 hash, casterHash;
-            mCreator->calculateHashFor( *itor, mOriginalParams, hash, casterHash );
-            (*itor)->_setHlmsHashes( hash, casterHash );
-            ++itor;
+            try
+            {
+                uint32 hash, casterHash;
+                mCreator->calculateHashFor( *itor, hash, casterHash );
+                (*itor)->_setHlmsHashes( hash, casterHash );
+                ++itor;
+            }
+            catch( Exception &e )
+            {
+                size_t currentIdx = itor - mLinkedRenderables.begin();
+                LogManager::getSingleton().logMessage( e.getFullDescription() );
+                LogManager::getSingleton().logMessage( "Couldn't apply change to datablock '" +
+                                                       mName.getFriendlyText() + "' for "
+                                                       "this renderable. Using default one. Check "
+                                                       "previous log messages to see if there's more "
+                                                       "information.", LML_CRITICAL );
+
+
+                if( mType == HLMS_LOW_LEVEL )
+                {
+                    HlmsManager *hlmsManager = mCreator->getHlmsManager();
+                    (*itor)->setDatablock( hlmsManager->getDefaultDatablock() );
+                }
+                else
+                {
+                    //Try to use the default datablock from the same
+                    //HLMS as the one the user wanted us to apply
+                    (*itor)->setDatablock( mCreator->getDefaultDatablock() );
+                }
+
+                //The container was changed with setDatablock change,
+                //the iterators may have been invalidated.
+                itor = mLinkedRenderables.begin() + currentIdx;
+                end  = mLinkedRenderables.end();
+            }
         }
     }
     //-----------------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------------
-    HlmsPbsMobileDatablock::HlmsPbsMobileDatablock( IdString name, Hlms *creator,
-                                              const HlmsMacroblock *macroblock,
-                                              const HlmsBlendblock *blendblock,
-                                              const HlmsParamVec &params ) :
-        HlmsDatablock( name, creator, macroblock, blendblock, params ),
-        mFresnelTypeSizeBytes( 4 ),
-        mRoughness( 0.1f ),
-        mkDr( 0.318309886 ), mkDg( 0.318309886 ), mkDb( 0.318309886 ), //Max Diffuse = 1 / PI
-        mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
-        mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f )
-    {
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsPbsMobileDatablock::calculateHash()
-    {
-        IdString hash;
-        if( !mDiffuseTex.isNull() )
-            hash += IdString( mDiffuseTex->getName() );
-        if( !mNormalmapTex.isNull() )
-            hash += IdString( mNormalmapTex->getName() );
-        if( !mSpecularTex.isNull() )
-            hash += IdString( mSpecularTex->getName() );
-        if( !mReflectionTex.isNull() )
-            hash += IdString( mReflectionTex->getName() );
-
-        mTextureHash = hash.mHash;
-    }
 }

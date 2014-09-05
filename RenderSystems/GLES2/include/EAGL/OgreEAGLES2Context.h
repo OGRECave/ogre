@@ -59,6 +59,7 @@ namespace Ogre {
 
             bool createFramebuffer();
             void destroyFramebuffer();
+            void bindSampleFramebuffer();
 
             /* The pixel dimensions of the backbuffer */
             GLint mBackingWidth;
@@ -73,8 +74,8 @@ namespace Ogre {
 
             bool mIsMultiSampleSupported;
             GLsizei mNumSamples;
-            GLuint mFSAAFramebuffer;
-            GLuint mFSAARenderbuffer;
+            GLuint mSampleFramebuffer;
+            GLuint mSampleRenderbuffer;
     };
 }
 

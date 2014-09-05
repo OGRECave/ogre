@@ -53,7 +53,7 @@ namespace Ogre
         GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GL3PlusContext *creatorContext,
                         v1::GL3PlusRenderBuffer *depth, v1::GL3PlusRenderBuffer *stencil,
                         uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
-                        bool isManual );
+                        bool _isManual );
         ~GL3PlusDepthBuffer();
 
         /// @copydoc DepthBuffer::isCompatible

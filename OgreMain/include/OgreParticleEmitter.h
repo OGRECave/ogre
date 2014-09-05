@@ -346,14 +346,14 @@ namespace Ogre {
         @par
             Also see the alternate version of this method which takes a single TTL in order to 
             set a constant TTL for all particles.
-        @param minTtl The minimum number of seconds each particle will live for.
-        @param maxTtl The maximum number of seconds each particle will live for.
+        @param minTtl The minimum number of seconds each particle will live for. Must be non-negative!
+        @param maxTtl The maximum number of seconds each particle will live for. Must be non-negative!
         */
         virtual void setTimeToLive(Real minTtl, Real maxTtl);
 
-        /** Sets the minimum time each particle will live for. */
+        /** Sets the minimum time each particle will live for. Must be non-negative! */
         virtual void setMinTimeToLive(Real min);
-        /** Sets the maximum time each particle will live for. */
+        /** Sets the maximum time each particle will live for. Must be non-negative! */
         virtual void setMaxTimeToLive(Real max);
         
         /** Gets the time each particle will live for. */

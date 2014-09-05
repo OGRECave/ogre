@@ -29,6 +29,7 @@
 #define __SdkTrays_H__
 
 #include "OgreOverlay.h"
+#include "OgreOverlaySystem.h"
 #include "OgreOverlayManager.h"
 #include "OgreBorderPanelOverlayElement.h"
 #include "OgreTextAreaOverlayElement.h"
@@ -39,6 +40,7 @@
 #include "OgreRoot.h"
 #include "OgreCamera.h"
 #include "OgreRenderWindow.h"
+#include "InputContext.h"
 #include <iomanip>
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC

@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsTextureManager.h"
+#include "OgreHlmsTexturePack.h"
 #include "OgreTextureManager.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
@@ -39,9 +40,13 @@ namespace Ogre
     HlmsTextureManager::HlmsTextureManager() : mRenderSystem( 0 ), mTextureId( 0 )
     {
         mDefaultTextureParameters[TEXTURE_TYPE_DIFFUSE].hwGammaCorrection   = true;
+        mDefaultTextureParameters[TEXTURE_TYPE_MONOCHROME].pixelFormat      = PF_L8;
         mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat         = PF_BC5_SNORM;
+        mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].isNormalMap         = true;
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].hwGammaCorrection    = true;
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat=PF_BC5_SNORM;
+        mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].isNormalMap = true;
+        mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].hwGammaCorrection   = true;
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::~HlmsTextureManager()
@@ -79,18 +84,22 @@ namespace Ogre
                     for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
                     {
                         mDefaultTextureParameters[i].packingMethod = Atlas;
-                        mDefaultTextureParameters[i].maxTexturesPerArray = 16;
+                        mDefaultTextureParameters[i].maxTexturesPerArray = 1;
                     }
                     mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].maxTexturesPerArray = 1;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].maxTexturesPerArray  = 1;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].maxTexturesPerArray = 1;
                 }
 
+                bool hwGammaCorrection = caps->hasCapability( RSC_HW_GAMMA );
+                mDefaultTextureParameters[TEXTURE_TYPE_DIFFUSE].hwGammaCorrection   = hwGammaCorrection;
+                mDefaultTextureParameters[TEXTURE_TYPE_DETAIL].hwGammaCorrection    = hwGammaCorrection;
+
                 // BC5 is the best, native (lossy) compressor for normal maps.
                 // DXT5 is like BC5, using the "store only in green and alpha channels" method.
                 // The last one is lossless, using UV8 to store uncompressed,
                 // and retrieve z = sqrt(x²+y²)
-                if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
+                /*if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
                 {
                     mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat = PF_BC5_SNORM;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_BC5_SNORM;
@@ -100,16 +109,18 @@ namespace Ogre
                     mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = PF_DXT5;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_DXT5;
                 }
-                else
+                else*/
                 {
-                    mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = PF_R8G8_SNORM;
-                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_R8G8_SNORM;
+                    PixelFormat pf = caps->hasCapability( RSC_TEXTURE_SIGNED_INT ) ? PF_R8G8_SNORM :
+                                                                                     PF_BYTE_LA;
+                    mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = pf;
+                    mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = pf;
                 }
 
                 mBlankTexture = TextureManager::getSingleton().createManual( "Hlms_Blanktexture",
                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                                 textureType, 4, 4, 1, 0, PF_R8G8B8A8, TU_DEFAULT, 0,
-                                                true, 0, BLANKSTRING, false );
+                                                false, 0, BLANKSTRING, false );
 
                 v1::HardwarePixelBufferSharedPtr pixelBufferBuf = mBlankTexture->getBuffer(0);
                 const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0, 4, 4, 1 ),
@@ -132,7 +143,8 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsTextureManager::copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx )
+    void HlmsTextureManager::copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx,
+                                                 uint8 srcBaseMip )
     {
         //TODO: Deal with mipmaps (& cubemaps & 3D? does it work?). We could have:
         //  * Original image has mipmaps, we use them all
@@ -142,18 +154,24 @@ namespace Ogre
         // The last problem is a subset of the 3rd problem
         //
         //  See Texture::_loadImages
-        v1::HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
-        const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, entryIdx,
-                                                               dst->getWidth(),
-                                                               dst->getHeight(),
-                                                               entryIdx + 1 ),
-                                                          v1::HardwareBuffer::HBL_DISCARD );
-        PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
-        pixelBufferBuf->unlock();
+        uint8 minMipmaps = std::min<uint8>( srcImage.getNumMipmaps() - srcBaseMip,
+                                            dst->getNumMipmaps() ) + 1;
+        for( uint8 j=0; j<minMipmaps; ++j )
+        {
+            v1::HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0, j);
+            const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, entryIdx,
+                                                                   pixelBufferBuf->getWidth(),
+                                                                   pixelBufferBuf->getHeight(),
+                                                                   entryIdx + 1 ),
+                                                              v1::HardwareBuffer::HBL_DISCARD );
+            PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
+            pixelBufferBuf->unlock();
+        }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsTextureManager::copyTextureToAtlas(const Image &srcImage, TexturePtr dst,
-                                          uint16 entryIdx, uint16 sqrtMaxTextures )
+    void HlmsTextureManager::copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
+                                                 uint16 entryIdx, uint16 sqrtMaxTextures,
+                                                 uint8 srcBaseMip, bool isNormalMap )
     {
         //TODO: Deal with mipmaps (& cubemaps & 3D? does it work?).
         size_t xBlock = entryIdx % sqrtMaxTextures;
@@ -171,7 +189,7 @@ namespace Ogre
                                                                    dst->getDepth() ),
                                                               HardwareBuffer::HBL_DISCARD );
                                                               //HardwareBuffer::HBL_NORMAL );
-            PixelUtil::bulkCompressedSubregion( srcImage.getPixelBox(), currImage,
+            PixelUtil::bulkCompressedSubregion( srcImage.getPixelBox(0, srcBaseMip), currImage,
                                                 Box( xBlock * srcImage.getWidth(),
                                                      yBlock * srcImage.getHeight(),
                                                      0,
@@ -181,25 +199,100 @@ namespace Ogre
             pixelBufferBuf->unlock();
         }
         else*/
+        uint8 minMipmaps = std::min<uint8>( srcImage.getNumMipmaps() - srcBaseMip,
+                                            dst->getNumMipmaps() ) + 1;
+        for( uint8 j=0; j<minMipmaps; ++j )
         {
-            v1::HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0);
-            const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * srcImage.getWidth(),
-                                                                   yBlock * srcImage.getHeight(),
+            v1::HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer(0, j);
+            const PixelBox &currImage = pixelBufferBuf->lock( Box( xBlock * pixelBufferBuf->getWidth(),
+                                                                   yBlock * pixelBufferBuf->getHeight(),
                                                                    0,
-                                                                   nextX * srcImage.getWidth(),
-                                                                   nextY * srcImage.getHeight(),
+                                                                   nextX * pixelBufferBuf->getWidth(),
+                                                                   nextY * pixelBufferBuf->getHeight(),
                                                                    dst->getDepth() ),
                                                               v1::HardwareBuffer::HBL_DISCARD );
-            PixelUtil::bulkPixelConversion( srcImage.getPixelBox(), currImage );
+            if( isNormalMap )
+                PixelUtil::convertForNormalMapping( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
+            else
+                PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
             pixelBufferBuf->unlock();
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::copy3DTexture( const Image &srcImage, TexturePtr dst,
+                                            uint16 sliceStart, uint16 sliceEnd, uint8 srcBaseMip )
+    {
+        for( uint16 i=sliceStart; i<sliceEnd; ++i )
+        {
+            uint8 minMipmaps = std::min<uint8>( srcImage.getNumMipmaps() - srcBaseMip,
+                                                dst->getNumMipmaps() ) + 1;
+            for( uint8 j=0; j<minMipmaps; ++j )
+            {
+                HardwarePixelBufferSharedPtr pixelBufferBuf = dst->getBuffer( i, j );
+                const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0,
+                                                                       pixelBufferBuf->getWidth(),
+                                                                       pixelBufferBuf->getHeight(),
+                                                                       1 ),
+                                                                  HardwareBuffer::HBL_DISCARD );
+
+                PixelUtil::bulkPixelConversion( srcImage.getPixelBox( i - sliceStart,
+                                                                      srcBaseMip + j ),
+                                                currImage );
+                pixelBufferBuf->unlock();
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsTextureManager::TextureArrayVec::iterator HlmsTextureManager::findSuitableArray(
+                                                                            TextureMapType mapType,
+                                                                            uint32 width, uint32 height,
+                                                                            uint32 depth, uint32 faces,
+                                                                            PixelFormat format,
+                                                                            uint8 numMipmaps )
+    {
+        TextureArrayVec::iterator retVal = mTextureArrays[mapType].end();
+
+        //Find an array where we can put it. If there is none, we'll have have to create a new one
+        TextureArrayVec::iterator itor = mTextureArrays[mapType].begin();
+        TextureArrayVec::iterator end  = mTextureArrays[mapType].end();
+
+        while( itor != end && retVal == end )
+        {
+            TextureArray &textureArray = *itor;
+
+            uint32 arrayTexWidth = textureArray.texture->getWidth() / textureArray.sqrtMaxTextures;
+            uint32 arrayTexHeight= textureArray.texture->getHeight() / textureArray.sqrtMaxTextures;
+            if( textureArray.automatic &&
+                textureArray.activeEntries < textureArray.maxTextures &&
+                arrayTexWidth  == width  &&
+                arrayTexHeight == height &&
+                textureArray.texture->getDepth()  == depth  &&
+                textureArray.texture->getNumFaces() == faces &&
+                textureArray.texture->getFormat() == format &&
+                textureArray.texture->getNumMipmaps() == numMipmaps )
+            {
+                retVal = itor;
+            }
+
+            ++itor;
+        }
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture(
                                                                         const String &texName,
                                                                         TextureMapType mapType )
     {
-        TextureEntry searchName( texName );
+        return createOrRetrieveTexture( texName, texName, mapType );
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture(
+                                                                        const String &aliasName,
+                                                                        const String &texName,
+                                                                        TextureMapType mapType )
+    {
+        TextureEntry searchName( aliasName );
         TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
 
         TextureLocation retVal;
@@ -209,194 +302,210 @@ namespace Ogre
         if( it == mEntries.end() || it->name != searchName.name )
         {
             Image image;
-            image.load( texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+            image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
             PixelFormat imageFormat = image.getFormat();
-            if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 )
-                imageFormat = PF_A8R8G8B8;
-            else if( imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 )
-                imageFormat = PF_A8B8G8R8;
-
-            //Find an array where we can put it. If there is none, we'll have have to create a new one
-            TextureArrayVec::iterator itor = mTextureArrays[mapType].begin();
-            TextureArrayVec::iterator end  = mTextureArrays[mapType].end();
-
-            bool bFound = false;
-
-            while( itor != end && !bFound )
+            if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 ||
+                imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 ||
+                imageFormat == PF_A8R8G8B8 )
             {
-                TextureArray &textureArray = *itor;
+                imageFormat = PF_A8B8G8R8;
+            }
 
-                size_t arrayTexWidth = textureArray.texture->getWidth() / textureArray.sqrtMaxTextures;
-                size_t arrayTexHeight= textureArray.texture->getHeight() / textureArray.sqrtMaxTextures;
-                if( textureArray.automatic &&
-                    textureArray.entries.size() < textureArray.maxTextures &&
-                    arrayTexWidth  == image.getWidth()  &&
-                    arrayTexHeight == image.getHeight() &&
-                    textureArray.texture->getDepth()  == image.getDepth()  &&
-                    textureArray.texture->getFormat() == imageFormat )
+            uint8 numMipmaps = 0;
+
+            if( mDefaultTextureParameters[mapType].mipmaps )
+            {
+                uint32 heighestRes = std::max( std::max( image.getWidth(), image.getHeight() ),
+                                               std::max<uint32>( image.getDepth(),
+                                                                 image.getNumFaces() ) );
+#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1700))
+                numMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) /
+                                                         logf( 2.0f ) ) );
+#else
+                numMipmaps = static_cast<uint8>( floorf( log2f( static_cast<float>(heighestRes) ) ) );
+#endif
+            }
+
+            TextureType texType = TEX_TYPE_2D;
+            uint width, height, depth, faces;
+            uint8 baseMipLevel = 0;
+
+            width   = image.getWidth();
+            height  = image.getHeight();
+            depth   = image.getDepth();
+            faces   = image.getNumFaces();
+
+            const RenderSystemCapabilities *caps = mRenderSystem->getCapabilities();
+            ushort maxResolution = caps->getMaximumResolution2D();
+
+            if( image.hasFlag( IF_3D_TEXTURE ) )
+            {
+                maxResolution = caps->getMaximumResolution3D();
+                texType = TEX_TYPE_3D;
+            }
+            else
+            {
+                if( image.hasFlag( IF_CUBEMAP ) )
                 {
-                    //Bingo! Add this.
-                    if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
+                    maxResolution = caps->getMaximumResolutionCubemap();
+                    //TODO: Cubemap arrays supported since D3D10.1
+                    texType = TEX_TYPE_CUBE_MAP;
+                }
+                else if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
+                {
+                    //2D Texture Arrays
+                    texType = TEX_TYPE_2D_ARRAY;
+                }
+            }
+
+            if( !maxResolution )
+            {
+                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                             "Maximum resolution for this type of texture is 0.\n"
+                             "Either a driver bug, or this GPU cannot support 2D/"
+                             "Cubemap/3D texture: " + texName,
+                             "HlmsTextureManager::createOrRetrieveTexture" );
+            }
+
+            //The texture is too big. Take a smaller mip.
+            //If the texture doesn't have mipmaps, resize it.
+            if( width > maxResolution || height > maxResolution )
+            {
+                bool resize = true;
+                if( image.getNumMipmaps() )
+                {
+                    resize = false;
+                    while( (width > maxResolution || height > maxResolution)
+                           && (baseMipLevel <= image.getNumMipmaps()) )
                     {
-                        copyTextureToArray( image, textureArray.texture, textureArray.entries.size() );
+                        width  >>= 1;
+                        height >>= 1;
+                        ++baseMipLevel;
+                    }
+
+                    if( (width > maxResolution || height > maxResolution) )
+                        resize = true;
+                }
+
+                if( resize )
+                {
+                    baseMipLevel = 0;
+                    Real aspectRatio = (Real)image.getWidth() / (Real)image.getHeight();
+                    if( image.getWidth() >= image.getHeight() )
+                    {
+                        width  = maxResolution;
+                        height = static_cast<uint>( floorf( maxResolution / aspectRatio ) );
                     }
                     else
                     {
-                        copyTextureToAtlas( image, textureArray.texture,
-                                            textureArray.entries.size(), textureArray.sqrtMaxTextures );
+                        width  = static_cast<uint>( floorf( maxResolution * aspectRatio ) );
+                        height = maxResolution;
                     }
 
-                    it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
-                                                            itor - mTextureArrays[mapType].begin(),
-                                                            textureArray.entries.size() ) );
-
-                    textureArray.entries.push_back( texName );
-
-                    bFound = true;
+                    image.resize( width, height );
                 }
-
-                ++itor;
             }
 
-            if( !bFound )
+            //Find an array where we can put it. If there is none, we'll have have to create a new one
+            TextureArrayVec::iterator dstArrayIt = findSuitableArray( mapType, width, height, depth,
+                                                                      faces, imageFormat,
+                                                                      numMipmaps - baseMipLevel );
+
+            if( dstArrayIt == mTextureArrays[mapType].end() )
             {
-                PixelFormat defaultPixelFormat = mDefaultTextureParameters[mapType].pixelFormat;
                 //Create a new array
-                if( mDefaultTextureParameters[mapType].maxTexturesPerArray == 1 )
+                PixelFormat defaultPixelFormat = mDefaultTextureParameters[mapType].pixelFormat;
+                uint limit          = mDefaultTextureParameters[mapType].maxTexturesPerArray;
+                uint limitSquared   = mDefaultTextureParameters[mapType].maxTexturesPerArray;
+
+                if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                 {
-                    TextureType texType = TEX_TYPE_2D;
-                    if( image.hasFlag( IF_3D_TEXTURE ) )
-                        texType = TEX_TYPE_3D;
-                    else if( image.hasFlag( IF_CUBEMAP ) )
-                        texType = TEX_TYPE_CUBE_MAP;
-
-                    TextureArray textureArray( 1, 1, true );
-                    textureArray.texture = TextureManager::getSingleton().load( texName,
-                                                ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-                                                texType, mDefaultTextureParameters[mapType].mipmaps ?
-                                                                                        MIP_DEFAULT : 0,
-                                                1.0f, false,
-                                                defaultPixelFormat == PF_UNKNOWN ? image.getFormat() :
-                                                                                   defaultPixelFormat,
-                                                mDefaultTextureParameters[mapType].hwGammaCorrection );
-                    textureArray.entries.push_back( texName );
-
-                    it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
-                                                            mTextureArrays[mapType].size(), 0 ) );
-
-                    mTextureArrays[mapType].push_back( textureArray );
+                    //Texture Arrays
+                    if( texType == TEX_TYPE_3D || texType == TEX_TYPE_CUBE_MAP )
+                    {
+                        //APIs don't support arrays + 3D textures
+                        //TODO: Cubemap arrays supported since D3D10.1
+                        limit = 1;
+                    }
+                    else if( texType == TEX_TYPE_2D_ARRAY )
+                    {
+                        depth = limit;
+                    }
                 }
                 else
                 {
-                    uint limit = mDefaultTextureParameters[mapType].maxTexturesPerArray;
-                    uint limitSquared = mDefaultTextureParameters[mapType].maxTexturesPerArray;
+                    //UV Atlas
+                    limit        = static_cast<uint>( ceilf( sqrtf( (Real)limitSquared ) ) );
+                    limitSquared = limit * limit;
 
-                    if( mDefaultTextureParameters[mapType].packingMethod == Atlas )
+                    if( texType == TEX_TYPE_3D || texType == TEX_TYPE_CUBE_MAP )
+                        limit = 1; //No UV atlas for 3D and Cubemaps
+
+                    uint texWidth  = width  * limit;
+                    uint texHeight = height * limit;
+
+                    if( texWidth > maxResolution || texHeight > maxResolution )
                     {
-                        limit        = static_cast<uint>( ceilf( sqrtf( limitSquared ) ) );
-                        limitSquared = limit * limit;
+                        limit = maxResolution / width;
+                        limit = std::min<uint>( limit, maxResolution / height );
+
+                        width  = width  * limit;
+                        height = height * limit;
                     }
 
-                    TextureArray textureArray( limit, limitSquared, true );
+                    limitSquared = limit * limit;
+                }
 
-                    TextureType texType = TEX_TYPE_2D;
+                TextureArray textureArray( limit, limitSquared, true,
+                                           mDefaultTextureParameters[mapType].isNormalMap );
 
-                    uint width, height, depth;
+                textureArray.texture = TextureManager::getSingleton().createManual(
+                                            "HlmsTextureManager/" +
+                                            StringConverter::toString( mTextureId++ ),
+                                            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                            texType, width, height, depth, numMipmaps - baseMipLevel,
+                                            defaultPixelFormat == PF_UNKNOWN ? imageFormat :
+                                                                               defaultPixelFormat,
+                                            TU_DEFAULT & ~TU_AUTOMIPMAP, 0,
+                                            mDefaultTextureParameters[mapType].hwGammaCorrection,
+                                            0, BLANKSTRING, false );
 
-                    depth = image.getDepth();
+                mTextureArrays[mapType].push_back( textureArray );
+                dstArrayIt = mTextureArrays[mapType].end() - 1;
+            }
 
-                    if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
-                    {
-                        //Texture Arrays
-                        width  = image.getWidth();
-                        height = image.getHeight();
+            uint16 entryIdx = dstArrayIt->createEntry();
+            uint16 arrayIdx = dstArrayIt - mTextureArrays[mapType].begin();
 
-                        if( image.hasFlag( IF_3D_TEXTURE ) )
-                        {
-                            texType = TEX_TYPE_3D;
-                            //APIs don't support arrays + 3D textures
-                            textureArray.maxTextures = 1;
-                        }
-                        else
-                        {
-                            if( image.hasFlag( IF_CUBEMAP ) )
-                            {
-                                //TODO: Cubemap arrays supported since D3D10.1
-                                texType = TEX_TYPE_CUBE_MAP;
-                                depth = image.getNumFaces();
-                            }
-                            else
-                            {
-                                texType = TEX_TYPE_2D_ARRAY;
-                                depth = textureArray.maxTextures;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //UV Atlas
-                        const RenderSystemCapabilities *caps = mRenderSystem->getCapabilities();
-                        ushort maxResolution = caps->getMaximumResolution2D();
-                        if( image.hasFlag( IF_3D_TEXTURE ) )
-                        {
-                            maxResolution = caps->getMaximumResolution3D();
-                            texType = TEX_TYPE_3D;
-                            textureArray.maxTextures = 1; //No UV atlas for 3D
-                        }
-                        else if( image.hasFlag( IF_CUBEMAP ) )
-                        {
-                            maxResolution = caps->getMaximumResolutionCubemap();
-                            texType = TEX_TYPE_CUBE_MAP;
-                            textureArray.maxTextures = 1; //No UV atlas for Cubemaps
-                            depth = image.getNumFaces();
-                        }
+            if( image.getNumMipmaps() - baseMipLevel != dstArrayIt->texture->getNumMipmaps() )
+            {
+                image.generateMipmaps( mDefaultTextureParameters[mapType].
+                                       hwGammaCorrection );
+            }
 
-                        width  = image.getWidth() * limit;
-                        height = image.getHeight() * limit;
-
-                        if( width  > maxResolution || height > maxResolution )
-                        {
-                            limit = maxResolution / width;
-                            limit = std::min<uint>( limit, maxResolution / height );
-
-                            textureArray.maxTextures     = limit * limit;
-                            textureArray.sqrtMaxTextures = limit;
-                            width  = image.getWidth() * limit;
-                            height = image.getHeight() * limit;
-                        }
-                    }
-
-                    textureArray.texture = TextureManager::getSingleton().createManual(
-                                                "HlmsTextureManager/" +
-                                                StringConverter::toString( mTextureId++ ),
-                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                texType, width, height, depth,
-                                                mDefaultTextureParameters[mapType].mipmaps ?
-                                                                                        MIP_DEFAULT : 0,
-                                                defaultPixelFormat == PF_UNKNOWN ? imageFormat :
-                                                                                   defaultPixelFormat,
-                                                TU_DEFAULT & ~TU_AUTOMIPMAP, 0,
-                                                mDefaultTextureParameters[mapType].hwGammaCorrection,
-                                                0, BLANKSTRING, false );
-
-                    if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
-                    {
-                        copyTextureToArray( image, textureArray.texture, textureArray.entries.size() );
-                    }
-                    else
-                    {
-                        copyTextureToAtlas( image, textureArray.texture, textureArray.entries.size(),
-                                            textureArray.sqrtMaxTextures );
-                    }
-
-                    it = mEntries.insert( it, TextureEntry( searchName.name, mapType,
-                                                            mTextureArrays[mapType].size(), 0 ) );
-
-                    textureArray.entries.push_back( texName );
-                    mTextureArrays[mapType].push_back( textureArray );
+            if( texType != TEX_TYPE_3D && texType != TEX_TYPE_CUBE_MAP )
+            {
+                if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
+                {
+                    copyTextureToArray( image, dstArrayIt->texture, entryIdx, baseMipLevel );
+                }
+                else
+                {
+                    copyTextureToAtlas( image, dstArrayIt->texture, entryIdx,
+                                        dstArrayIt->sqrtMaxTextures, baseMipLevel,
+                                        dstArrayIt->isNormalMap );
                 }
             }
+            else
+            {
+                copy3DTexture( image, dstArrayIt->texture, 0,
+                               std::max<uint32>( image.getNumFaces(), image.getDepth() ),
+                               baseMipLevel );
+            }
+
+            dstArrayIt->entries[entryIdx] = aliasName;
+            it = mEntries.insert( it, TextureEntry( searchName.name, mapType, arrayIdx, entryIdx ) );
         }
 
         const TextureArray &texArray = mTextureArrays[it->mapType][it->arrayIdx];
@@ -432,6 +541,225 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::destroyTexture( IdString aliasName )
+    {
+        TextureEntry searchName( aliasName );
+        TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
+
+        if( it != mEntries.end() && it->name == searchName.name )
+        {
+            mEntries.erase( it );
+
+            TextureArrayVec::iterator texArrayIt = mTextureArrays[it->mapType].begin() + it->arrayIdx;
+            texArrayIt->destroyEntry( it->entryIdx );
+
+            if( texArrayIt->activeEntries == texArrayIt->maxTextures )
+            {
+                //The whole array has no actual content. Destroy the texture.
+                ResourcePtr texResource = texArrayIt->texture;
+                TextureManager::getSingleton().remove( texResource );
+                texArrayIt = efficientVectorRemove( mTextureArrays[it->mapType], texArrayIt );
+
+                if( texArrayIt != mTextureArrays[it->mapType].end() )
+                {
+                    //The last element has now a new index. Update the references in mEntries
+                    size_t newArrayIdx = it->arrayIdx;
+                    StringVector::const_iterator itor = texArrayIt->entries.begin();
+                    StringVector::const_iterator end  = texArrayIt->entries.end();
+
+                    while( itor != end )
+                    {
+                        searchName.name = *itor;
+                        it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
+                        assert( it != mEntries.end() && it->name == searchName.name );
+                        it->arrayIdx = newArrayIdx;
+                        ++itor;
+                    }
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsTextureManager::getTexturePackParameters( const HlmsTexturePack &pack, uint32 &outWidth,
+                                                       uint32 &outHeight, uint32 &outDepth,
+                                                       PixelFormat &outPixelFormat ) const
+    {
+        HlmsTexturePack::TextureEntryVec::const_iterator itor = pack.textureEntry.begin();
+        HlmsTexturePack::TextureEntryVec::const_iterator end  = pack.textureEntry.end();
+
+        while( itor != end )
+        {
+            const HlmsTexturePack::TextureEntry &texInfo = *itor;
+
+            StringVector::const_iterator itPath = texInfo.paths.begin();
+            StringVector::const_iterator enPath = texInfo.paths.end();
+
+            while( itPath != enPath )
+            {
+                try
+                {
+                    Image image;
+                    image.load( *itPath, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+                    outWidth    = image.getWidth();
+                    outHeight   = image.getHeight();
+                    outDepth    = std::max<uint32>( image.getDepth(), image.getNumFaces() );
+                    outPixelFormat = image.getFormat();
+
+                    return true;
+                }
+                catch( ... )
+                {
+                }
+
+                ++itPath;
+            }
+
+            ++itor;
+        }
+
+        return false;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::createFromTexturePack( const HlmsTexturePack &pack )
+    {
+        uint32 width = 0, height = 0, depth = 0;
+        PixelFormat pixelFormat;
+        uint8 numMipmaps = 0;
+
+        if( !getTexturePackParameters( pack, width, height, depth, pixelFormat ) )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Could not derive the texture properties "
+                         "for texture pack '" + pack.name + "'",
+                         "HlmsTextureManager::createFromTexturePack" );
+        }
+
+        if( pack.pixelFormat != PF_UNKNOWN )
+        {
+            pixelFormat = pack.pixelFormat;
+        }
+        else
+        {
+            if( pixelFormat == PF_X8R8G8B8 || pixelFormat == PF_R8G8B8 ||
+                pixelFormat == PF_X8B8G8R8 || pixelFormat == PF_B8G8R8 ||
+                pixelFormat == PF_A8R8G8B8 )
+            {
+                pixelFormat = PF_A8B8G8R8;
+            }
+        }
+
+        if( pack.hasMipmaps )
+        {
+            uint32 heighestRes = std::max( std::max( width, height ), depth );
+#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1700))
+            numMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) / logf( 2.0f ) ) );
+#else
+            numMipmaps = static_cast<uint8>( floorf( log2f( static_cast<float>(heighestRes) ) ) );
+#endif
+        }
+
+        if( pack.textureType == TEX_TYPE_CUBE_MAP )
+        {
+            HlmsTexturePack::TextureEntryVec::const_iterator itor = pack.textureEntry.begin();
+            HlmsTexturePack::TextureEntryVec::const_iterator end  = pack.textureEntry.end();
+
+            while( itor != end )
+            {
+                const HlmsTexturePack::TextureEntry &texInfo = *itor;
+
+                TextureEntry searchName( texInfo.name );
+                TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(),
+                                                                 searchName );
+
+                if( it != mEntries.end() && it->name == searchName.name )
+                {
+                    LogManager::getSingleton().logMessage( "ERROR: A texture by the name '" +
+                                                           texInfo.name  + "' already exists!" );
+                    ++itor;
+                    continue;
+                }
+
+                assert( !texInfo.paths.empty() ) ;
+
+                if( texInfo.paths.size() != 1 )
+                {
+                    //Multiple files
+                    assert( !(texInfo.paths.size() % 6) &&
+                            "For cubemaps, the number of files must be multiple of 6!" );
+
+                    Image cubeMap;
+                    size_t cubeMapSize = PixelUtil::getMemorySize( width, height, 6, pixelFormat );
+                    cubeMap.loadDynamicImage( OGRE_ALLOC_T( uchar, cubeMapSize, MEMCATEGORY_GENERAL ),
+                                              width, height, 1, pixelFormat, true, 6 );
+                    for( size_t i=0; i<6; ++i )
+                    {
+                        Image image;
+                        image.load( texInfo.paths[i],
+                                    ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
+                        if( image.getWidth() != width && image.getHeight() != height )
+                        {
+                            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, texInfo.paths[i] +
+                                         ": All textures in the same pack must have the "
+                                         "same resolution!",
+                                         "HlmsTextureManager::createFromTexturePack" );
+                        }
+
+                        PixelUtil::bulkPixelConversion( image.getPixelBox( 0 ), cubeMap.getPixelBox( i ) );
+                    }
+
+                    TextureArray textureArray( 1, 1, false, false );
+
+                    textureArray.texture = TextureManager::getSingleton().createManual(
+                                                "HlmsTextureManager/" +
+                                                StringConverter::toString( mTextureId++ ),
+                                                ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                pack.textureType, width, height, depth, numMipmaps,
+                                                pixelFormat, TU_DEFAULT & ~TU_AUTOMIPMAP, 0,
+                                                pack.hwGammaCorrection, 0, BLANKSTRING, false );
+
+                    if( pack.hasMipmaps )
+                    {
+                        if( !cubeMap.generateMipmaps( pack.hwGammaCorrection, Image::FILTER_GAUSSIAN ) )
+                        {
+                            LogManager::getSingleton().logMessage( "Couldn't generate mipmaps for '" +
+                                                                    texInfo.name + "'", LML_CRITICAL );
+                        }
+
+                        if( !pack.exportLocation.empty() )
+                            cubeMap.save( pack.exportLocation + "/" + texInfo.name + ".dds" );
+                    }
+
+                    copy3DTexture( cubeMap, textureArray.texture, 0, 6, 0 );
+
+                    it = mEntries.insert( it, TextureEntry( searchName.name, TEXTURE_TYPE_ENV_MAP,
+                                                            mTextureArrays[TEXTURE_TYPE_ENV_MAP].size(), 0 ) );
+
+                    textureArray.entries.push_back( texInfo.name );
+                    mTextureArrays[TEXTURE_TYPE_ENV_MAP].push_back( textureArray );
+                }
+                else
+                {
+                    OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                                 "Oops! Work in Progress, sorry!",
+                                 "HlmsTextureManager::createFromTexturePack" );
+                    //TODO
+                    /*if( image.getNumMipmaps() != numMipmaps )
+                    {
+                        image.generateMipmaps();
+                    }*/
+                }
+
+                ++itor;
+            }
+        }
+        else
+        {
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                         "Oops! Work in Progress, sorry!",
+                         "HlmsTextureManager::createFromTexturePack" );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureLocation HlmsTextureManager::getBlankTexture(void) const
     {
         TextureLocation retVal;
@@ -442,4 +770,30 @@ namespace Ogre
 
         return retVal;
     }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    uint16 HlmsTextureManager::TextureArray::createEntry(void)
+    {
+        assert( activeEntries < maxTextures );
+        ++activeEntries;
+
+        StringVector::const_iterator itor = entries.begin();
+        StringVector::const_iterator end  = entries.end();
+
+        while( itor != end && !itor->empty() )
+            ++itor;
+
+        return static_cast<uint16>( itor - entries.begin() );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::TextureArray::destroyEntry( uint16 entry )
+    {
+        assert( activeEntries != 0 );
+        --activeEntries;
+
+        entries[entry].clear();
+    }
+
+    //-----------------------------------------------------------------------------------
 }

@@ -526,15 +526,17 @@ namespace Ogre
         if (rayorig.x <= min.x && raydir.x > 0)
         {
             t = (min.x - rayorig.x) / raydir.x;
-
-            // Substitute t back into ray and check bounds and dist
-            hitpoint = rayorig + raydir * t;
-            if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
-                hitpoint.z >= min.z && hitpoint.z <= max.z &&
-                (!hit || t < lowt))
+            if (t >= 0)
             {
-                hit = true;
-                lowt = t;
+                // Substitute t back into ray and check bounds and dist
+                hitpoint = rayorig + raydir * t;
+                if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
+					(!hit || t < lowt))
+                {
+                    hit = true;
+                    lowt = t;
+                }
             }
         }
         // Max x

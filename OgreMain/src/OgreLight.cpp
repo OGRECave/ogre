@@ -43,12 +43,13 @@ namespace Ogre {
           mSpotInner(Degree(30.0f)),
           mSpotFalloff(1.0f),
           mSpotNearClip(0.0f),
-          mRange(100000),
-          mAttenuationConst(1.0f),
+          mRange(23.0f),
+          mAttenuationConst(0.5f),
           mAttenuationLinear(0.0f),
-          mAttenuationQuad(0.0f),
+          mAttenuationQuad(0.5f),
           mPowerScale(1.0f),
           mOwnShadowFarDist(false),
+          mAffectParentNode(false),
           mShadowFarDist(0),
           mShadowFarDistSquared(0),
           mShadowNearClipDist(-1),
@@ -73,32 +74,21 @@ namespace Ogre {
 
         switch( mLightType )
         {
-        case LT_POINT:
-            mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
-            mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
-                                                 mObjectData.mIndex );
-            break;
         case LT_DIRECTIONAL:
             mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_INFINITE, mObjectData.mIndex );
             mObjectData.mLocalRadius[mObjectData.mIndex] = std::numeric_limits<Real>::infinity();
+            if( mAffectParentNode )
+                mParentNode->setScale( Vector3::UNIT_SCALE );
             break;
+        case LT_POINT:
         case LT_SPOTLIGHT:
-            setSpotAabb();
+            resetAabb();
+            updateLightBounds();
+            break;
+        default:
+            //Keep compiler happy
             break;
         }
-    }
-    //-----------------------------------------------------------------------
-    void Light::setSpotAabb(void)
-    {
-        assert( mLightType == LT_SPOTLIGHT );
-
-        //In local space, lights are centered at origin, facing towards +Z
-        Aabb aabb;
-        Real lenOpposite = Math::Tan( mSpotOuter ) * mRange;
-        aabb.mCenter    = Vector3::ZERO;
-        aabb.mHalfSize  = Vector3( lenOpposite, mRange, lenOpposite );
-        mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
-        mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ), mObjectData.mIndex );
     }
     //-----------------------------------------------------------------------
     void Light::setDirection(const Vector3& vec)
@@ -114,6 +104,14 @@ namespace Ogre {
         return mParentNode->getOrientation().zAxis();
     }
     //-----------------------------------------------------------------------
+    void Light::setAffectParentNode( bool bAffect )
+    {
+        mAffectParentNode = bAffect;
+
+        resetAabb();
+        updateLightBounds();
+    }
+    //-----------------------------------------------------------------------
     void Light::setSpotlightRange(const Radian& innerAngle, const Radian& outerAngle, Real falloff)
     {
         bool boundsChanged = mSpotOuter != outerAngle;
@@ -123,7 +121,7 @@ namespace Ogre {
         mSpotFalloff = falloff;
 
         if( boundsChanged && mLightType == LT_SPOTLIGHT )
-            setSpotAabb();
+            updateLightBounds();
     }
     //-----------------------------------------------------------------------
     void Light::setSpotlightInnerAngle(const Radian& val)
@@ -136,7 +134,7 @@ namespace Ogre {
         bool boundsChanged = mSpotOuter != val;
         mSpotOuter = val;
         if( boundsChanged && mLightType == LT_SPOTLIGHT )
-            setSpotAabb();
+            updateLightBounds();
     }
     //-----------------------------------------------------------------------
     void Light::setAttenuationBasedOnRadius( Real radius, Real lumThreshold )
@@ -144,12 +142,12 @@ namespace Ogre {
         assert( radius > 0.0f );
         assert( lumThreshold >= 0.0f && lumThreshold < 1.0f );
 
-        mAttenuationConst   = 1.0f;
-        mAttenuationLinear  = 2.0f / radius;
-        mAttenuationQuad    = 1.0f / (radius * radius);
+		mAttenuationConst   = 0.5f;
+		mAttenuationLinear  = 0.0f;
+		mAttenuationQuad    = 0.5f / (radius * radius);
 
         /*
-        lumThreshold = 1 / (c + l*r + q*d²)
+		lumThreshold = 1 / (c + l*d + q*d²)
         c + l*d + q*d² = 1 / lumThreshold
 
         if h = c - 1 / lumThreshold then
@@ -159,10 +157,11 @@ namespace Ogre {
         Real h = mAttenuationConst - 1.0f / lumThreshold;
         Real rootPart = sqrt( mAttenuationLinear * mAttenuationLinear - 4.0f * mAttenuationQuad * h );
         mRange = (-mAttenuationLinear + rootPart) / (2.0f * mAttenuationQuad);
+
+        updateLightBounds();
     }
     //-----------------------------------------------------------------------
-    void Light::setAttenuation(Real range, Real constant,
-                        Real linear, Real quadratic)
+    void Light::setAttenuation( Real range, Real constant, Real linear, Real quadratic )
     {
         bool boundsChanged = mRange != range;
 
@@ -172,16 +171,56 @@ namespace Ogre {
         mAttenuationQuad = quadratic;
 
         if( boundsChanged )
+            updateLightBounds();
+    }
+    //-----------------------------------------------------------------------
+    void Light::resetAabb()
+    {
+        mObjectData.mLocalRadius[mObjectData.mIndex] = 1.0f;
+        if( mLightType == LT_POINT )
         {
-            if( mLightType == LT_POINT )
+            mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
+                                                 mObjectData.mIndex );
+        }
+        else if( mLightType == LT_SPOTLIGHT )
+        {
+            mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3( 0.0f, 0.0f, 0.5f ),
+                                                       Vector3( 1.0f, 1.0f, 0.5f ) ),
+                                                 mObjectData.mIndex );
+        }
+    }
+    //-----------------------------------------------------------------------
+    void Light::updateLightBounds(void)
+    {
+        if( mLightType == LT_POINT )
+        {
+            if( !mAffectParentNode )
             {
                 mObjectData.mLocalRadius[mObjectData.mIndex] = mRange;
                 mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
                                                      mObjectData.mIndex );
             }
-            else if( mLightType == LT_SPOTLIGHT )
+            else
             {
-                setSpotAabb();
+                mParentNode->setScale( Vector3( mRange ) );
+            }
+        }
+        else if( mLightType == LT_SPOTLIGHT )
+        {
+            if( !mAffectParentNode )
+            {
+                //In local space, lights are centered at origin, facing towards +Z
+                Aabb aabb;
+                Real lenOpposite = Math::Tan( mSpotOuter * 0.5f ) * mRange;
+                aabb.mCenter    = Vector3( 0, 0, mRange * 0.5f );
+                aabb.mHalfSize  = Vector3( lenOpposite, lenOpposite, mRange * 0.5f );
+                mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
+                mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
+            }
+            else
+            {
+                Real tanHalfAngle = Math::Tan( mSpotOuter * 0.5f ) * mRange;
+                mParentNode->setScale( tanHalfAngle, tanHalfAngle, mRange );
             }
         }
     }

@@ -888,6 +888,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultDimensions( Real width, Real height )
     {
+        assert(width >= 0 && height >= 0 && "Particle dimensions can not be negative");
         mDefaultWidth = width;
         mDefaultHeight = height;
         if (mRenderer)
@@ -898,6 +899,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultWidth(Real width)
     {
+        assert(width >= 0 && "Particle dimensions can not be negative");
         mDefaultWidth = width;
         if (mRenderer)
         {
@@ -912,6 +914,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultHeight(Real height)
     {
+        assert(height >= 0 && "Particle dimensions can not be negative");
         mDefaultHeight = height;
         if (mRenderer)
         {
@@ -1110,12 +1113,11 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void ParticleSystem::setRenderQueueGroupAndPriority(uint8 queueID, uint8 priority)
+    void ParticleSystem::setRenderQueueSubGroup( uint8 subGroup )
     {
-        MovableObject::setRenderQueueGroupAndPriority(queueID, priority);
         if (mRenderer)
         {
-            mRenderer->setRenderQueueGroupAndPriority(queueID, priority);
+            mRenderer->setRenderQueueSubGroup( subGroup );
         }
     }
     //-----------------------------------------------------------------------

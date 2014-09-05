@@ -51,6 +51,8 @@ namespace v1 {
         mHardwarePoseCount = 0;
         mIndexStart = 0;
         mIndexEnd = 0;
+
+        mHasSkeletonAnimation = !subMeshBasis->parent->getSkeleton().isNull();
     }
     //-----------------------------------------------------------------------
     SubEntity::~SubEntity()
@@ -68,6 +70,14 @@ namespace v1 {
     void SubEntity::setMaterial( const MaterialPtr& material )
     {
         Renderable::setMaterial( material );
+
+        // tell parent to reconsider material vertex processing options
+        mParentEntity->reevaluateVertexProcessing();
+    }
+    //-----------------------------------------------------------------------
+    void SubEntity::setDatablock( HlmsDatablock *datablock )
+    {
+        Renderable::setDatablock( datablock );
 
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();

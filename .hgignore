@@ -25,3 +25,4 @@ Samples/Browser/WinRT.Xaml/Media
 AndroidBuild/
 AndroidDependencies/
 Build/
+EmscriptenDependencies

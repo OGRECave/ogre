@@ -290,6 +290,12 @@ namespace Ogre
             return Ogre::max( a, b );
         }
 
+        /// Returns the minimum value between a and b
+        static inline ArrayReal Min( ArrayReal a, ArrayReal b )
+        {
+            return Ogre::min( a, b );
+        }
+        
         /** Returns the minimum value of all elements in a
         @return
             r[0] = min( a[0], a[1], a[2], a[3] )

@@ -149,11 +149,6 @@ namespace Ogre
         return mRenderQueueID;
     }
     //-----------------------------------------------------------------------------------
-    inline uint8 MovableObject::getRenderQueueSubGroup(void) const
-    {
-        return mRenderQueuePriority;
-    }
-    //-----------------------------------------------------------------------------------
     inline SceneNode* MovableObject::getParentSceneNode(void) const
     {
         assert( !mParentNode || dynamic_cast<SceneNode*>( mParentNode ) );

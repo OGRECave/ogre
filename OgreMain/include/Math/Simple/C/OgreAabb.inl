@@ -182,4 +182,14 @@ namespace Ogre
         v += mHalfSize;         
         return v.length();
     }
+    //-----------------------------------------------------------------------------------
+    inline bool Aabb::operator == ( const Aabb &_r ) const
+    {
+        return mCenter == _r.mCenter && mHalfSize == _r.mHalfSize;
+    }
+    //-----------------------------------------------------------------------------------
+    inline bool Aabb::operator != ( const Aabb &_r ) const
+    {
+        return mCenter != _r.mCenter && mHalfSize != _r.mHalfSize;
+    }
 }

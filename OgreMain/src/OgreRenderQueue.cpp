@@ -74,6 +74,7 @@ namespace Ogre
     RenderQueue::RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager ) :
         mHlmsManager( hlmsManager ),
         mSceneManager( sceneManager ),
+        mLastWasCasterPass( false ),
         mLastMacroblock( 0 ),
         mLastBlendblock( 0 ),
         mLastVertexData( 0 ),
@@ -96,8 +97,9 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::flushState(void)
+    void RenderQueue::clearState(void)
     {
+        mLastWasCasterPass = false;
         mLastMacroblock = 0;
         mLastBlendblock = 0;
         mLastVertexData = 0;
@@ -110,7 +112,7 @@ namespace Ogre
                                      bool casterPass )
     {
         uint8 rqId  = pMovableObject->getRenderQueueGroup();
-        uint8 subId = pMovableObject->getRenderQueueSubGroup();
+        uint8 subId = pRend->getRenderQueueSubGroup();
         RealAsUint depth = pMovableObject->getCachedDistanceToCamera();
 
         assert( !mRenderQueues[rqId].mSorted &&
@@ -120,7 +122,7 @@ namespace Ogre
         uint32 hlmsHash = casterPass ? pRend->getHlmsCasterHash() : pRend->getHlmsHash();
         const HlmsDatablock *datablock = pRend->getDatablock();
 
-        bool opaque = datablock->mIsOpaque;
+        bool transparent = datablock->mIsTransparent;
 
         uint16 macroblock = datablock->mMacroblockHash;
         uint16 texturehash= datablock->mTextureHash;
@@ -142,12 +144,12 @@ namespace Ogre
         //TODO: Account for auto instancing animation in any of the hashes
 
         uint64 hash;
-        if( opaque )
+        if( transparent )
         {
             //Opaque objects are first sorted by material, then by mesh, then by depth front to back.
             hash =
                 ( uint64(subId          & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
-                ( uint64(opaque         & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
+                ( uint64(transparent    & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
                 ( uint64(macroblock     & OGRE_MAKE_MASK( MacroblockBits ))     << MacroblockShift )    |
                 ( uint64(hlmsHash       & OGRE_MAKE_MASK( ShaderBits ))         << ShaderShift )        |
                 ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShift )          |
@@ -160,7 +162,7 @@ namespace Ogre
             quantizedDepth = quantizedDepth ^ 0xffffffff;
             hash =
                 ( uint64(subId          & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
-                ( uint64(opaque         & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
+                ( uint64(transparent    & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
                 ( uint64(quantizedDepth & OGRE_MAKE_MASK( DepthBits ))          << DepthShiftTransp )   |
                 ( uint64(macroblock     & OGRE_MAKE_MASK( MacroblockBits ))    << MacroblockShiftTransp)|
                 ( uint64(hlmsHash       & OGRE_MAKE_MASK( ShaderBits ))         << ShaderShiftTransp )  |
@@ -236,6 +238,12 @@ namespace Ogre
     void RenderQueue::renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
                                  bool casterPass, bool dualParaboloid )
     {
+        if( mLastWasCasterPass != casterPass )
+        {
+            clearState();
+            mLastWasCasterPass = casterPass;
+        }
+
         HlmsCache passCache[HLMS_MAX];
 
         for( size_t i=0; i<HLMS_MAX; ++i )
@@ -308,13 +316,12 @@ namespace Ogre
                 if( lastHlmsCache != hlmsCache )
                     rs->_setProgramsFromHlms( hlmsCache );
 
-                hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                      lastHlmsCache, lastTextureHash );
+                lastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                                        lastHlmsCache, lastTextureHash );
 
                 rs->_render( op );
 
                 lastHlmsCache   = hlmsCache;
-                lastTextureHash = datablock->mTextureHash;
 
                 ++itor;
             }
@@ -331,6 +338,12 @@ namespace Ogre
     void RenderQueue::renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                           RenderSystem *rs, bool casterPass, bool dualParaboloid )
     {
+        if( mLastWasCasterPass != casterPass )
+        {
+            clearState();
+            mLastWasCasterPass = casterPass;
+        }
+
         const HlmsDatablock *datablock = pRend->getDatablock();
 
         Hlms *hlms = datablock->getCreator();
@@ -369,13 +382,12 @@ namespace Ogre
         if( mLastHlmsCache != hlmsCache )
             rs->_setProgramsFromHlms( hlmsCache );
 
-        hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                              mLastHlmsCache, mLastTextureHash );
+        mLastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                                 mLastHlmsCache, mLastTextureHash );
 
         rs->_render( op );
 
         mLastHlmsCache   = hlmsCache;
-        mLastTextureHash = datablock->mTextureHash;
     }
 }
 
