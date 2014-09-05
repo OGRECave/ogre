@@ -129,8 +129,8 @@ protected:
 	
 	ParameterPtr mParamInPosition;
 	ParameterPtr mParamInNormal;
-	ParameterPtr mParamInBiNormal;
-	ParameterPtr mParamInTangent;
+	//ParameterPtr mParamInBiNormal;
+	//ParameterPtr mParamInTangent;
 	ParameterPtr mParamInIndices;
 	ParameterPtr mParamInWeights;
 	UniformParameterPtr mParamInWorldMatrices;
@@ -143,8 +143,8 @@ protected:
 	ParameterPtr mParamTempFloat3;
 	ParameterPtr mParamLocalPositionWorld;
 	ParameterPtr mParamLocalNormalWorld;
-	ParameterPtr mParamLocalTangentWorld;
-	ParameterPtr mParamLocalBinormalWorld;
+	//ParameterPtr mParamLocalTangentWorld;
+	//ParameterPtr mParamLocalBinormalWorld;
 	ParameterPtr mParamOutPositionProj;
 };
 
