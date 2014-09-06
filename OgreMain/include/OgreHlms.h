@@ -261,6 +261,11 @@ namespace Ogre
         virtual HlmsDatablock* createDefaultDatablock(void);
         void _destroyAllDatablocks(void);
 
+        inline void calculateHashForSemantic( VertexElementSemantic semantic, VertexElementType type,
+                                              uint16 index, uint &inOutNumTexCoords );
+        uint16 calculateHashForV1( Renderable *renderable );
+        uint16 calculateHashForV2( Renderable *renderable );
+
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces ) {}
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces ) {}
 
@@ -452,7 +457,7 @@ namespace Ogre
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
 
-        void _changeRenderSystem( RenderSystem *newRs );
+        virtual void _changeRenderSystem( RenderSystem *newRs );
 
         RenderSystem* getRenderSystem(void) const           { return mRenderSystem; }
     };

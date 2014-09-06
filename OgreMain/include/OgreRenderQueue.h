@@ -125,6 +125,7 @@ namespace Ogre {
         bool                    mLastWasCasterPass;
         HlmsMacroblock const    *mLastMacroblock;
         HlmsBlendblock const    *mLastBlendblock;
+        uint32                  mLastVaoId;
         v1::VertexData const    *mLastVertexData;
         v1::IndexData const     *mLastIndexData;
         HlmsCache const         *mLastHlmsCache;
@@ -164,8 +165,12 @@ namespace Ogre {
         void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
                             bool casterPass );
 
-        void render( uint8 firstRq, uint8 lastRq );
         void renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
+                        bool casterPass, bool dualParaboloid );
+
+        /// Renders in a compatible way with GL 3.3 and D3D11. Can only render V2 objects
+        /// (i.e. Items, VertexArrayObject)
+        void renderGL3( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
                         bool casterPass, bool dualParaboloid );
 
         /// Don't call this too often.

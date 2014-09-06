@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
 
+#include "Vao/OgreVertexArrayObject.h"
+
 #include "Compositor/OgreCompositorShadowNode.h"
 
 #include "OgreLight.h"
@@ -1407,12 +1409,8 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash )
+    uint16 Hlms::calculateHashForV1( Renderable *renderable )
     {
-        mSetProperties.clear();
-
-        setProperty( HlmsBaseProp::Skeleton, renderable->hasSkeletonAnimation() );
-
         v1::RenderOperation op;
         renderable->getRenderOperation( op );
         v1::VertexDeclaration *vertexDecl = op.vertexData->vertexDeclaration;
@@ -1424,40 +1422,91 @@ namespace Ogre
         while( itor != end )
         {
             const v1::VertexElement &vertexElem = *itor;
-            switch( vertexElem.getSemantic() )
-            {
-            case VES_NORMAL:
-                if( v1::VertexElement::getTypeCount( vertexElem.getType() ) < 4 )
-                {
-                    setProperty( HlmsBaseProp::Normal, 1 );
-                }
-                else
-                {
-                    setProperty( HlmsBaseProp::QTangent, 1 );
-                }
-                break;
-            case VES_TANGENT:
-                setProperty( HlmsBaseProp::Tangent, 1 );
-                break;
-            case VES_DIFFUSE:
-                setProperty( HlmsBaseProp::Colour, 1 );
-                break;
-            case VES_TEXTURE_COORDINATES:
-                numTexCoords = std::max<uint>( numTexCoords, vertexElem.getIndex() + 1 );
-                setProperty( *HlmsBaseProp::UvCountPtrs[vertexElem.getIndex()],
-                              v1::VertexElement::getTypeCount( vertexElem.getType() ) );
-                break;
-            case VES_BLEND_WEIGHTS:
-                setProperty( HlmsBaseProp::BonesPerVertex,
-                             v1::VertexElement::getTypeCount( vertexElem.getType() ) );
-                break;
-            default:
-                break;
-            }
-
-            vertexElem.getType();
+            calculateHashForSemantic( vertexElem.getSemantic(), vertexElem.getType(),
+                                      vertexElem.getIndex(), numTexCoords );
             ++itor;
         }
+
+        return numTexCoords;
+    }
+    //-----------------------------------------------------------------------------------
+    uint16 Hlms::calculateHashForV2( Renderable *renderable )
+    {
+        //TODO: Account LOD
+        VertexArrayObject *vao = renderable->getVaos()[0];
+        const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
+
+        uint numTexCoords = 0;
+        uint16 semIndex[VES_COUNT];
+        memset( semIndex, 0, sizeof( semIndex ) );
+        VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator end  = vertexBuffers.end();
+
+        while( itor != end )
+        {
+            const VertexElement2Vec &vertexElements = (*itor)->getVertexElements();
+            VertexElement2Vec::const_iterator itElements = vertexElements.begin();
+            VertexElement2Vec::const_iterator enElements = vertexElements.end();
+
+            while( itElements != enElements )
+            {
+                calculateHashForSemantic( itElements->mSemantic, itElements->mType,
+                                          semIndex[itElements->mSemantic-1]++, numTexCoords );
+                ++itElements;
+            }
+
+            ++itor;
+        }
+
+        return numTexCoords;
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::calculateHashForSemantic( VertexElementSemantic semantic, VertexElementType type,
+                                         uint16 index, uint &inOutNumTexCoords )
+    {
+        switch( semantic )
+        {
+        case VES_NORMAL:
+            if( v1::VertexElement::getTypeCount( type ) < 4 )
+            {
+                setProperty( HlmsBaseProp::Normal, 1 );
+            }
+            else
+            {
+                setProperty( HlmsBaseProp::QTangent, 1 );
+            }
+            break;
+        case VES_TANGENT:
+            setProperty( HlmsBaseProp::Tangent, 1 );
+            break;
+        case VES_DIFFUSE:
+            setProperty( HlmsBaseProp::Colour, 1 );
+            break;
+        case VES_TEXTURE_COORDINATES:
+            inOutNumTexCoords = std::max<uint>( inOutNumTexCoords, index + 1 );
+            setProperty( *HlmsBaseProp::UvCountPtrs[index],
+                          v1::VertexElement::getTypeCount( type ) );
+            break;
+        case VES_BLEND_WEIGHTS:
+            setProperty( HlmsBaseProp::BonesPerVertex,
+                         v1::VertexElement::getTypeCount( type ) );
+            break;
+        default:
+            break;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash )
+    {
+        mSetProperties.clear();
+
+        setProperty( HlmsBaseProp::Skeleton, renderable->hasSkeletonAnimation() );
+
+        uint16 numTexCoords = 0;
+        if( renderable->getVaos().empty() )
+            numTexCoords = calculateHashForV1( renderable );
+        else
+            numTexCoords = calculateHashForV2( renderable );
 
         setProperty( HlmsBaseProp::UvCount, numTexCoords );
 

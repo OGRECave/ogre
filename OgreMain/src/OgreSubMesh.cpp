@@ -768,7 +768,7 @@ namespace v1 {
             while( itor != end )
             {
                 vertexData->vertexDeclaration->addElement( 0, acumOffset, itor->mType, itor->mSemantic,
-                                                           repeatCounts[itor->mSemantic]++ );
+                                                           repeatCounts[itor->mSemantic-1]++ );
                 acumOffset += VertexElement::getTypeSize( itor->mType );
                 ++itor;
             }

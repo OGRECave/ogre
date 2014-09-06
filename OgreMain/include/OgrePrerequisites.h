@@ -165,6 +165,7 @@ namespace Ogre {
     class Codec;
     class ColourValue;
     class ConfigDialog;
+    class ConstBufferPacked;
     template <typename T> class Controller;
     template <typename T> class ControllerFunction;
     class ControllerManager;

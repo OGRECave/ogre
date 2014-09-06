@@ -20,6 +20,10 @@ if (OGRE_BUILD_COMPONENT_HLMS_GUI2D_MOBILE)
 	add_subdirectory(Hlms/Gui2DMobile)
 endif ()
 
+if (OGRE_BUILD_COMPONENT_HLMS_PBS)
+	add_subdirectory(Hlms/Pbs)
+endif ()
+
 if (OGRE_BUILD_COMPONENT_PAGING)
   add_subdirectory(Paging)
 endif ()

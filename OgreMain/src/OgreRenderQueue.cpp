@@ -40,6 +40,8 @@ THE SOFTWARE.
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
 
+#include "Vao/OgreVertexArrayObject.h"
+
 
 namespace Ogre
 {
@@ -77,6 +79,7 @@ namespace Ogre
         mLastWasCasterPass( false ),
         mLastMacroblock( 0 ),
         mLastBlendblock( 0 ),
+        mLastVaoId( 0 ),
         mLastVertexData( 0 ),
         mLastIndexData( 0 ),
         mLastHlmsCache( &c_dummyCache ),
@@ -102,6 +105,7 @@ namespace Ogre
         mLastWasCasterPass = false;
         mLastMacroblock = 0;
         mLastBlendblock = 0;
+        mLastVaoId      = 0;
         mLastVertexData = 0;
         mLastIndexData  = 0;
         mLastHlmsCache  = &c_dummyCache;
@@ -173,68 +177,6 @@ namespace Ogre
                                                                             pMovableObject ) );
     }
     //-----------------------------------------------------------------------
-    /*void RenderQueue::render( uint8 firstRq, uint8 lastRq )
-    {
-        //mBatchesToRender.push_back( 0 ); TODO First batch is always dummy
-        float *texBufferPtr; //TODO
-
-        for( size_t i=firstRq; i<lastRq; ++i )
-        {
-            QueuedRenderableArray &queuedRenderables = mRenderQueues[i].mQueuedRenderables;
-
-            if( !mRenderQueues[i].mSorted )
-            {
-                std::sort( queuedRenderables.begin(), queuedRenderables.end() );
-                mRenderQueues[i].mSorted = true;
-            }
-
-            QueuedRenderableArray::const_iterator itor = queuedRenderables.begin();
-            QueuedRenderableArray::const_iterator end  = queuedRenderables.end();
-
-            while( itor != end )
-            {
-                const QueuedRenderable &queuedRenderable = *itor;
-                RenderOperation op;
-                queuedRenderable.renderable->getRenderOperation( op );
-
-                //TODO
-                uint32 renderOpHash;
-                size_t elementsPerInstance;
-
-                //const Hlms *hlms = queuedRenderable.renderable->getHlms();
-                //size_t hlmsElements = hlms->getNumElements( queuedRenderable.renderable );
-                //size_t elementsPerInstance = numWorldTransforms + hlmsElements;
-
-                Batch *batch = &mBatchesToRender.back();
-                if( batch->renderOpHash != renderOpHash ||
-                    batch->start + elementsPerInstance < batch->bufferBucket->numElements )
-                {
-                    mBatchesToRender.push_back( Batch() ); //TODO
-                    batch = &mBatchesToRender.back();
-                }
-
-                unsigned short numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
-                if( numWorldTransforms <= 1 )
-                {
-                    queuedRenderable.renderable->writeSingleTransform3x4( texBufferPtr );
-                    texBufferPtr += 12;
-                }
-                else
-                {
-                    queuedRenderable.renderable->writeAnimatedTransform3x4( texBufferPtr );
-                    texBufferPtr += 12 * numWorldTransforms;
-                }
-
-                hlms->writeElements( queuedRenderable.renderable, texBufferPtr );
-                texBufferPtr += hlmsElements;
-
-                ++batch->count;
-
-                //itor->
-                ++itor;
-            }
-        }
-    }*/
     void RenderQueue::renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
                                  bool casterPass, bool dualParaboloid )
     {
@@ -335,6 +277,102 @@ namespace Ogre
         mLastTextureHash    = lastTextureHash;
     }
     //-----------------------------------------------------------------------
+    void RenderQueue::renderGL3( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
+                                 bool casterPass, bool dualParaboloid )
+    {
+        if( mLastWasCasterPass != casterPass )
+        {
+            clearState();
+            mLastWasCasterPass = casterPass;
+        }
+
+        HlmsCache passCache[HLMS_MAX];
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+            if( hlms )
+            {
+                passCache[i] = hlms->preparePassHash( mSceneManager->getCurrentShadowNode(), casterPass,
+                                                      dualParaboloid, mSceneManager );
+            }
+        }
+
+        HlmsMacroblock const *lastMacroblock = mLastMacroblock;
+        HlmsBlendblock const *lastBlendblock = mLastBlendblock;
+        uint32 lastVaoId = mLastVaoId;
+        HlmsCache const *lastHlmsCache = mLastHlmsCache;
+        uint32 lastTextureHash = mLastTextureHash;
+
+        for( size_t i=firstRq; i<lastRq; ++i )
+        {
+            QueuedRenderableArray &queuedRenderables = mRenderQueues[i].mQueuedRenderables;
+
+            if( !mRenderQueues[i].mSorted )
+            {
+                std::sort( queuedRenderables.begin(), queuedRenderables.end() );
+                mRenderQueues[i].mSorted = true;
+            }
+
+            QueuedRenderableArray::const_iterator itor = queuedRenderables.begin();
+            QueuedRenderableArray::const_iterator end  = queuedRenderables.end();
+
+            while( itor != end )
+            {
+                const QueuedRenderable &queuedRenderable = *itor;
+                uint8 meshLod = 0; //TODO
+                const VertexArrayObjectArray &vaos = queuedRenderable.renderable->getVaos();
+
+                VertexArrayObject *vao = vaos[meshLod];
+                const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
+
+                if( lastMacroblock != datablock->mMacroblock )
+                {
+                    rs->_setHlmsMacroblock( datablock->mMacroblock );
+                    lastMacroblock = datablock->mMacroblock;
+                }
+
+                if( lastBlendblock != datablock->mBlendblock )
+                {
+                    rs->_setHlmsBlendblock( datablock->mBlendblock );
+                    lastBlendblock = datablock->mBlendblock;
+                }
+
+                if( lastVaoId != vao->getRenderQueueId() )
+                {
+                    rs->_setVertexArrayObject( vao );
+                    lastVaoId = vao->getRenderQueueId();
+                }
+
+                Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
+
+                const HlmsCache *hlmsCache = hlms->getMaterial( lastHlmsCache,
+                                                                passCache[datablock->mType],
+                                                                queuedRenderable,
+                                                                casterPass );
+                if( lastHlmsCache != hlmsCache )
+                    rs->_setProgramsFromHlms( hlmsCache );
+
+                lastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                                        lastHlmsCache, lastTextureHash );
+
+                rs->_render( vao );
+
+                lastHlmsCache   = hlmsCache;
+
+                ++itor;
+            }
+        }
+
+        mLastMacroblock     = lastMacroblock;
+        mLastBlendblock     = lastBlendblock;
+        mLastVaoId          = lastVaoId;
+        mLastVertexData     = 0;
+        mLastIndexData      = 0;
+        mLastHlmsCache      = lastHlmsCache;
+        mLastTextureHash    = lastTextureHash;
+    }
+    //-----------------------------------------------------------------------
     void RenderQueue::renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                           RenderSystem *rs, bool casterPass, bool dualParaboloid )
     {
@@ -388,6 +426,7 @@ namespace Ogre
         rs->_render( op );
 
         mLastHlmsCache   = hlmsCache;
+        mLastVaoId = 0;
     }
 }
 

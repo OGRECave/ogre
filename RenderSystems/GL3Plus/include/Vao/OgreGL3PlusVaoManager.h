@@ -153,7 +153,7 @@ namespace Ogre
         @param outBufferOffset [out]
             The offset in bytes at which the buffer data should be placed.
         */
-        void allocateVbo( size_t sizeBytes, size_t bytesPerElement, BufferType bufferType,
+        void allocateVbo( size_t sizeBytes, size_t alignment, BufferType bufferType,
                           size_t &outVboIdx, size_t &outBufferOffset );
 
         /** Deallocates a buffer allocated with @allocateVbo.
@@ -208,6 +208,10 @@ namespace Ogre
                                                           void *initialData, bool keepAsShadow );
 
         virtual void destroyIndexBufferImpl( IndexBufferPacked *indexBuffer );
+
+        virtual ConstBufferPacked* createConstBufferImpl( size_t sizeBytes, BufferType bufferType,
+                                                          void *initialData, bool keepAsShadow );
+        virtual void destroyConstBufferImpl( ConstBufferPacked *constBuffer );
 
         GLuint createVao( const Vao &vaoRef );
 

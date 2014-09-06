@@ -25,37 +25,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-/*
-#ifndef _Ogre_GL3PlusVertexBufferPacked_H_
-#define _Ogre_GL3PlusVertexBufferPacked_H_
 
-#include "OgreGL3PlusPrerequisites.h"
+#include "Vao/OgreGL3PlusConstBufferPacked.h"
 #include "Vao/OgreGL3PlusBufferInterface.h"
-#include "Vao/OgreVertexBufferPacked.h"
 
 namespace Ogre
 {
-    class GL3PlusVertexBufferPacked : public VertexBufferPacked
+    GL3PlusConstBufferPacked::GL3PlusConstBufferPacked(
+                size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+                BufferType bufferType, void *initialData, bool keepAsShadow,
+                VaoManager *vaoManager, BufferInterface *bufferInterface ) :
+        ConstBufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+                           initialData, keepAsShadow, vaoManager, bufferInterface )
     {
-    protected:
-        GL3PlusBufferInterface mBufferInterface;
+    }
+    //-----------------------------------------------------------------------------------
+    GL3PlusConstBufferPacked::~GL3PlusConstBufferPacked()
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusConstBufferPacked::bindConstantBuffer( uint16 slot )
+    {
+        assert( dynamic_cast<GL3PlusBufferInterface*>( mBufferInterface ) );
 
-        void uploadInternal( void *data, size_t elementStart, size_t elementCount );
+        GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                                                                      mBufferInterface );
 
-        virtual void* mapImpl( size_t elementStart, size_t elementCount, MappingState prevMappingState );
-        virtual void unmapImpl( UnmapOptions unmapOption );
-
-    public:
-        GL3PlusVertexBufferPacked( size_t internalBufferStart, size_t numElements,
-                                   uint32 bytesPerElement, BufferType bufferType,
-                                   void *initialData, bool keepAsShadow,
-                                   VaoManager *vaoManager, const VertexElement2Vec &vertexElements,
-                                   GLuint vboName );
-        ~GL3PlusVertexBufferPacked();
-
-        virtual void upload( void *data, size_t elementStart, size_t elementCount );
-    };
+        OCGE(
+          glBindBufferRange( bufferInterface->getTarget(), slot, bufferInterface->getVboName(),
+                             mFinalBufferStart * mBytesPerElement, mNumElements * mBytesPerElement ) );
+    }
+    //-----------------------------------------------------------------------------------
 }
-
-#endif
-*/

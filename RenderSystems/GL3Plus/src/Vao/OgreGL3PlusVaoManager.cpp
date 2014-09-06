@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusStagingBuffer.h"
 #include "Vao/OgreGL3PlusVertexArrayObject.h"
 #include "Vao/OgreGL3PlusBufferInterface.h"
+#include "Vao/OgreGL3PlusConstBufferPacked.h"
 #include "Vao/OgreGL3PlusMultiSourceVertexBufferPool.h"
 
 #include "OgreGL3PlusHardwareBufferManager.h" //GL3PlusHardwareBufferManager::getGLType
@@ -103,10 +104,10 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void GL3PlusVaoManager::allocateVbo( size_t sizeBytes, size_t bytesPerElement, BufferType bufferType,
+    void GL3PlusVaoManager::allocateVbo(size_t sizeBytes, size_t alignment, BufferType bufferType,
                                          size_t &outVboIdx, size_t &outBufferOffset )
     {
-        assert( bytesPerElement > 0 );
+        assert( alignment > 0 );
 
         VboFlag vboFlag = CPU_INACCESSIBLE;
 
@@ -135,9 +136,8 @@ namespace Ogre
             {
                 const Block &block = *blockIt;
 
-                //Round to next multiple of bytesPerElement
-                size_t newOffset = ( (block.offset + bytesPerElement - 1) /
-                                     bytesPerElement ) * bytesPerElement;
+                //Round to next multiple of alignment
+                size_t newOffset = ( (block.offset + alignment - 1) / alignment ) * alignment;
 
                 if( sizeBytes <= block.size - (newOffset - block.offset) )
                 {
@@ -198,8 +198,7 @@ namespace Ogre
         Vbo &bestVbo        = mVbos[vboFlag][bestVboIdx];
         Block &bestBlock    = bestVbo.freeBlocks[bestBlockIdx];
 
-        size_t newOffset = ( (bestBlock.offset + bytesPerElement - 1) /
-                             bytesPerElement ) * bytesPerElement;
+        size_t newOffset = ( (bestBlock.offset + alignment - 1) / alignment ) * alignment;
         size_t padding = newOffset - bestBlock.offset;
         //Shrink our records about available data.
         bestBlock.size   -= sizeBytes + padding;
@@ -384,6 +383,44 @@ namespace Ogre
         deallocateVbo( bufferInterface->getVboPoolIndex(), indexBuffer->_getInternalBufferStart(),
                        indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
                        indexBuffer->getBufferType() );
+    }
+    //-----------------------------------------------------------------------------------
+    ConstBufferPacked* GL3PlusVaoManager::createConstBufferImpl( size_t sizeBytes, BufferType bufferType,
+                                                                 void *initialData, bool keepAsShadow )
+    {
+        size_t vboIdx;
+        size_t bufferOffset;
+
+        allocateVbo( sizeBytes, 16, bufferType, vboIdx, bufferOffset );
+
+        VboFlag vboFlag = CPU_INACCESSIBLE;
+
+        if( bufferType == BT_DYNAMIC )
+            vboFlag = CPU_ACCESSIBLE;
+
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
+                                                                    GL_UNIFORM_BUFFER,
+                                                                    mVbos[vboFlag][vboIdx].vboName );
+        ConstBufferPacked *retVal = OGRE_NEW GL3PlusConstBufferPacked(
+                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferType, initialData, keepAsShadow,
+                                                        this, bufferInterface );
+
+        if( initialData )
+            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::destroyConstBufferImpl( ConstBufferPacked *constBuffer )
+    {
+        GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                                                        constBuffer->getBufferInterface() );
+
+
+        deallocateVbo( bufferInterface->getVboPoolIndex(), constBuffer->_getInternalBufferStart(),
+                       constBuffer->getNumElements() * constBuffer->getBytesPerElement(),
+                       constBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
     GLuint GL3PlusVaoManager::createVao( const Vao &vaoRef )

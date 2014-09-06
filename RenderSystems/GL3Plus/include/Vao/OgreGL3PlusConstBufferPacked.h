@@ -26,43 +26,24 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_VertexArrayObject_H_
-#define _Ogre_VertexArrayObject_H_
+#ifndef _Ogre_GL3PlusVertexBufferPacked_H_
+#define _Ogre_GL3PlusVertexBufferPacked_H_
 
-#include "OgrePrerequisites.h"
-#include "OgreVertexBufferPacked.h"
-#include "OgreRenderOperation.h"
+#include "OgreGL3PlusPrerequisites.h"
+#include "Vao/OgreGL3PlusBufferInterface.h"
+#include "Vao/OgreConstBufferPacked.h"
 
 namespace Ogre
 {
-    typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
-
-    struct VertexArrayObject : public VertexArrayObjectAlloc
+    class GL3PlusConstBufferPacked : public ConstBufferPacked
     {
-        friend class RenderSystem;
-        friend class GL3PlusRenderSystem;
-
-    protected:
-        /// ID used for the RenderQueue to sort by VAOs. This ID
-        /// may be shared by many VertexArrayObject instances
-        uint32 mRenderQueueId;
-
-        uint32                  mFaceCount; /// For statistics
-        VertexBufferPackedVec   mVertexBuffers;
-        IndexBufferPacked       *mIndexBuffer;
-
-        /// The type of operation to perform
-        v1::RenderOperation::OperationType mOperationType;
-
     public:
-        VertexArrayObject( uint32 renderQueueId, const VertexBufferPackedVec &vertexBuffers,
-                           IndexBufferPacked *indexBuffer,
-                           v1::RenderOperation::OperationType operationType );
+        GL3PlusConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+                                  BufferType bufferType, void *initialData, bool keepAsShadow,
+                                  VaoManager *vaoManager, BufferInterface *bufferInterface );
+        ~GL3PlusConstBufferPacked();
 
-        uint32 getRenderQueueId(void) const                             { return mRenderQueueId; }
-
-        const VertexBufferPackedVec& getVertexBuffers(void) const       { return mVertexBuffers; }
-        IndexBufferPacked* getIndexBuffer(void) const                   { return mIndexBuffer; }
+        virtual void bindConstantBuffer( uint16 slot );
     };
 }
 

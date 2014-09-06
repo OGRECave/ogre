@@ -60,6 +60,7 @@ namespace Ogre
 
         BufferPackedVec         mVertexBuffers;
         BufferPackedVec         mIndexBuffers;
+        BufferPackedVec         mConstBuffers;
         VertexArrayObjectVec    mVertexArrayObjects;
 
         uint32          mFrameCount;
@@ -84,6 +85,11 @@ namespace Ogre
                                                           void *initialData, bool keepAsShadow ) = 0;
 
         virtual void destroyIndexBufferImpl( IndexBufferPacked *indexBuffer ) = 0;
+
+        virtual ConstBufferPacked* createConstBufferImpl( size_t sizeBytes, BufferType bufferType,
+                                                          void *initialData, bool keepAsShadow ) = 0;
+
+        virtual void destroyConstBufferImpl( ConstBufferPacked *constBuffer ) = 0;
 
         virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
                                                                 IndexBufferPacked *indexBuffer,
@@ -158,11 +164,31 @@ namespace Ogre
                                               size_t numIndices, BufferType bufferType,
                                               void *initialData, bool keepAsShadow );
 
-        /** Destroys the given vertex buffer created with createVertexBuffer.
+        /** Destroys the given index buffer created with createIndexBuffer.
         @param indexBuffer
             Index Buffer created with createIndexBuffer
         */
         void destroyIndexBuffer( IndexBufferPacked *indexBuffer );
+
+        /** Creates an constant buffer based on the given parameters. Behind the scenes, the buffer
+            is actually part of much larger buffer, in order to reduce bindings at runtime.
+            (depends on the RenderSystem, on D3D11 we're forced to give its own buffer)
+        @remarks
+            @See createVertexBuffer for the remaining parameters not documented here.
+        @param sizeBytes
+            The size in bytes of the given constant buffer. API restrictions may apply.
+            To stay safe keep it multiple of 16, don't request more than 64kb per buffer.
+        @return
+            The desired const buffer pointer
+        */
+        ConstBufferPacked* createConstBuffer( size_t sizeBytes, BufferType bufferType,
+                                              void *initialData, bool keepAsShadow );
+
+        /** Destroys the given constant buffer created with createConstBuffer.
+        @param constBuffer
+            Constant Buffer created with createConstBuffer
+        */
+        void destroyConstBuffer( ConstBufferPacked *constBuffer );
 
         /** Creates a VertexArrayObject that binds all the vertex buffers with their respective
             declarations, and the index buffers. The returned value is immutable and thus cannot

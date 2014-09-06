@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreStagingBuffer.h"
 #include "Vao/OgreVertexArrayObject.h"
+#include "Vao/OgreConstBufferPacked.h"
 #include "OgreTimer.h"
 #include "OgreCommon.h"
 
@@ -146,6 +147,34 @@ namespace Ogre
         OGRE_DELETE *itor;
 
         efficientVectorRemove( mIndexBuffers, itor );
+    }
+    //-----------------------------------------------------------------------------------
+    ConstBufferPacked* VaoManager::createConstBuffer( size_t sizeBytes, BufferType bufferType,
+                                                      void *initialData, bool keepAsShadow )
+    {
+        ConstBufferPacked *retVal;
+        retVal = createConstBufferImpl( sizeBytes, bufferType, initialData, keepAsShadow );
+        mConstBuffers.push_back( retVal );
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::destroyConstBuffer( ConstBufferPacked *constBuffer )
+    {
+        BufferPackedVec::iterator itor = std::find( mConstBuffers.begin(),
+                                                    mConstBuffers.end(), constBuffer );
+
+        if( itor == mConstBuffers.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Constant Buffer has already been destroyed or "
+                         "doesn't belong to this VaoManager.",
+                         "VaoManager::destroyConstBuffer" );
+        }
+
+        destroyConstBufferImpl( constBuffer );
+        OGRE_DELETE *itor;
+
+        efficientVectorRemove( mConstBuffers, itor );
     }
     //-----------------------------------------------------------------------------------
     VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,

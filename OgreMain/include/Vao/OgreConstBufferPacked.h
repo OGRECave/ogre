@@ -26,43 +26,41 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_VertexArrayObject_H_
-#define _Ogre_VertexArrayObject_H_
+#ifndef _Ogre_ConstBufferPacked_H_
+#define _Ogre_ConstBufferPacked_H_
 
-#include "OgrePrerequisites.h"
-#include "OgreVertexBufferPacked.h"
-#include "OgreRenderOperation.h"
+#include "Vao/OgreBufferPacked.h"
 
 namespace Ogre
 {
-    typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
-
-    struct VertexArrayObject : public VertexArrayObjectAlloc
+    /** Represents constant buffers (also known as Uniform Buffers in GL)
+     */
+    class ConstBufferPacked : public BufferPacked
     {
-        friend class RenderSystem;
-        friend class GL3PlusRenderSystem;
-
-    protected:
-        /// ID used for the RenderQueue to sort by VAOs. This ID
-        /// may be shared by many VertexArrayObject instances
-        uint32 mRenderQueueId;
-
-        uint32                  mFaceCount; /// For statistics
-        VertexBufferPackedVec   mVertexBuffers;
-        IndexBufferPacked       *mIndexBuffer;
-
-        /// The type of operation to perform
-        v1::RenderOperation::OperationType mOperationType;
-
     public:
-        VertexArrayObject( uint32 renderQueueId, const VertexBufferPackedVec &vertexBuffers,
-                           IndexBufferPacked *indexBuffer,
-                           v1::RenderOperation::OperationType operationType );
 
-        uint32 getRenderQueueId(void) const                             { return mRenderQueueId; }
+        uint16  mConstantSlot;
 
-        const VertexBufferPackedVec& getVertexBuffers(void) const       { return mVertexBuffers; }
-        IndexBufferPacked* getIndexBuffer(void) const                   { return mIndexBuffer; }
+        ConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+                           BufferType bufferType, void *initialData, bool keepAsShadow,
+                           VaoManager *vaoManager, BufferInterface *bufferInterface ) :
+            BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+                          initialData, keepAsShadow, vaoManager, bufferInterface ),
+            mConstantSlot( 0 )
+        {
+        }
+
+        /** Binds the constant buffer to the given slot
+        @param slot
+            The slot to asign this constant buffer. In D3D11 it's called 'slot'.
+            In GLSL it's called it's called 'binding'
+        */
+        virtual void bindConstantBuffer( uint16 slot ) = 0;
+
+        //TODO
+        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
+        //TODO
+        virtual void disposeTicket( AsyncTicket *ticket ) {}
     };
 }
 
