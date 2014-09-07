@@ -69,6 +69,9 @@ namespace Ogre {
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
             }
         }
+		
+		mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+		
     }
     D3D11HardwarePixelBuffer::~D3D11HardwarePixelBuffer()
     {
@@ -407,16 +410,12 @@ namespace Ogre {
         {
             if(mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
             {
-                size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
                 PixelBox box;
                 _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
                 void *data = box.data; 
-
-                memcpy(data, mCurrentLock.data, sizeinbytes);
-
+				memcpy(data, mCurrentLock.data, mSizeInBytes);
                 // unmap the texture and the staging buffer
                 _unmap(mParentTexture->getTextureResource());
-
                 _unmapstagingbuffer(false);
             }
             else
