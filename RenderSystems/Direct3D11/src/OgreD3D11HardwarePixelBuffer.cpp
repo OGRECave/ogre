@@ -565,17 +565,23 @@ namespace Ogre {
             break;
         }
 
-        if (isDds && (dstBox.getWidth() % 4 != 0 || dstBox.getHeight() % 4 != 0 ))
-        {
-            return;
-        }
-
-
         // for scoped deletion of conversion buffer
         MemoryDataStreamPtr buf;
         PixelBox converted = src;
 
         D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(dstBox);
+		if (isDds)
+		{
+			if(dstBox.getWidth() % 4 > 0)
+			{
+				dstBoxDx11.right += 4 - dstBox.getWidth() % 4 ;
+			}
+			if(dstBox.getHeight() % 4 > 0)
+			{
+				dstBoxDx11.bottom += 4 - dstBox.getHeight() % 4 ;
+			}
+		}
+
         dstBoxDx11.front = 0;
         dstBoxDx11.back = converted.getDepth();
 
@@ -594,6 +600,11 @@ namespace Ogre {
             size_t sizeinbytes;
             if (PixelUtil::isCompressed(converted.format))
             {
+				if(converted.rowPitch  % 4 > 0)
+				{
+					converted.rowPitch  += 4 - converted.rowPitch  % 4;
+				}
+				
                 // D3D wants the width of one row of cells in bytes
                 if (converted.format == PF_DXT1)
                 {
@@ -632,6 +643,11 @@ namespace Ogre {
             size_t rowWidth;
             if (PixelUtil::isCompressed(converted.format))
             {
+				if(converted.rowPitch  % 4 > 0)
+				{
+					converted.rowPitch  += 4 - converted.rowPitch  % 4;
+				}
+				
                 // D3D wants the width of one row of cells in bytes
                 if (converted.format == PF_DXT1)
                 {
