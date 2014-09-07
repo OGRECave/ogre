@@ -809,8 +809,9 @@ namespace Ogre {
         lrect.pBits = data;
         lrect.Pitch = rPitch;
 
-
-        PixelBox locked(dst.getWidth(), dst.getHeight(), dst.getDepth(), tmpFormat);
+		
+		PixelBox locked(dst.getWidth(), dst.getHeight(), dst.getDepth(),  D3D11Mappings::_getPF(desc.Format));
+		
         fromD3DLock(locked, lrect);
         PixelUtil::bulkPixelConversion(locked, dst);
 
