@@ -221,6 +221,7 @@ bail:
         ConfigOption optFullScreen;
         ConfigOption optVSync;
         ConfigOption optVSyncInterval;
+		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
         ConfigOption optNVPerfHUD;
@@ -272,6 +273,14 @@ bail:
         optVSyncInterval.possibleValues.push_back( "3" );
         optVSyncInterval.possibleValues.push_back( "4" );
         optVSyncInterval.currentValue = "1";
+
+		optBackBufferCount.name = "Backbuffer Count";
+		optBackBufferCount.immutable = false;
+		optBackBufferCount.possibleValues.push_back( "Auto" );
+		optBackBufferCount.possibleValues.push_back( "1" );
+		optBackBufferCount.possibleValues.push_back( "2" );
+		optBackBufferCount.currentValue = "Auto";
+
 
         optAA.name = "FSAA";
         optAA.immutable = false;
@@ -382,6 +391,9 @@ bail:
         mOptions[optMaxFeatureLevels.name] = optMaxFeatureLevels;
         mOptions[optExceptionsErrorLevel.name] = optExceptionsErrorLevel;
         mOptions[optDriverType.name] = optDriverType;
+
+		mOptions[optBackBufferCount.name] = optBackBufferCount;
+
         
         refreshD3DSettings();
 
