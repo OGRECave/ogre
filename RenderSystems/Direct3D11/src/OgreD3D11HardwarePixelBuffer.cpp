@@ -764,10 +764,16 @@ namespace Ogre {
     {
         // Decide on pixel format of temp surface
         PixelFormat tmpFormat = mFormat; 
-        if(D3D11Mappings::_getPF(dst.format) != DXGI_FORMAT_UNKNOWN)
-        {
-            tmpFormat = dst.format;
-        }
+		
+		if(D3D11Mappings::_getPF(dst.format) == DXGI_FORMAT_UNKNOWN)
+		{
+			tmpFormat = dst.format;
+		}
+		if(tmpFormat == PF_A8B8G8R8)
+		{
+			tmpFormat = PF_A8R8G8B8;
+		}
+	
         assert(srcBox.getDepth() == 1 && dst.getDepth() == 1);
 
         //This is a pointer to the texture we're trying to copy
