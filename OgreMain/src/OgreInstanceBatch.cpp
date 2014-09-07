@@ -74,9 +74,12 @@ namespace Ogre
         mFullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
 
         mName = batchName;
-
-        mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
-    }
+		if (mCreator != NULL)
+		{
+		    mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
+	    }
+		
+	}
 
     InstanceBatch::~InstanceBatch()
     {
