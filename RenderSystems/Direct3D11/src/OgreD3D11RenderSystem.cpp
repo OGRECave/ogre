@@ -2031,14 +2031,6 @@ bail:
         mSceneAlphaRejectValue  = value;
         mSceneAlphaToCoverage   = alphaToCoverage;
         mBlendDesc.AlphaToCoverageEnable = alphaToCoverage;
-
-        // Do nothing, alpha rejection unavailable in Direct3D11
-        // hacky, but it works
-        if(func != CMPF_ALWAYS_PASS && !alphaToCoverage && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-        { mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
-            // Actually we should do it in pixel shader in dx11.
-            mBlendDesc.AlphaToCoverageEnable = true;
-        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setCullingMode( CullingMode mode )
