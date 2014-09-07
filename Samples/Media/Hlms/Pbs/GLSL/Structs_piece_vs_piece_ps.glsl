@@ -45,24 +45,24 @@ struct Material
 	  (formula is finalDiffuse = NdotL * surfaceDiffuse / PI)
 	*/
 	vec3 kD;
-	float shadowConstantBias;
 	vec3 kS;
 	float roughness;
 	@property( fresnel_scalar )@piece( FresnelType )vec3@end@end
 	@property( !fresnel_scalar ) @piece( FresnelType )float@end @end
 	//Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 	@insertpiece( FresnelType ) F0;
-	@property( normal_weight )float normalWeights[@value( normal_weight )];@end
-	@property( detail_weights )vec4 cDetailWeights;@end
-	@property( detail_offsetsD )vec4 detailOffsetScaleD[@value( detail_offsetsD )];@end
-	@property( detail_offsetsN )vec4 detailOffsetScaleN[@value( detail_offsetsN )];@end
+	@property( !fresnel_scalar )vec2 padding;@end
+	float normalWeights[5];
+	vec4 cDetailWeights;
+	vec4 detailOffsetScaleD[4];
+	vec4 detailOffsetScaleN[4];
 
-	uint indices[6];
+	uint indices[7];
 };
 
 layout(binding = 1) uniform MaterialBuf
 {
-	Material m[64];
+	Material m[273];
 } material;
 @end
 

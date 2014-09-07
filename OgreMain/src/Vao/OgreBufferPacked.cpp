@@ -119,6 +119,8 @@ namespace Ogre
             memcpy( (char*)mShadowCopy + elementStart * mBytesPerElement,
                     data, elementCount * mBytesPerElement );
         }
+
+        mBufferInterface->upload( data, elementStart, elementCount );
     }
     //-----------------------------------------------------------------------------------
     void* BufferPacked::map(size_t elementStart, size_t elementCount, MappingState persistentMethod )

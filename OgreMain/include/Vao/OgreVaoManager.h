@@ -178,6 +178,7 @@ namespace Ogre
         @param sizeBytes
             The size in bytes of the given constant buffer. API restrictions may apply.
             To stay safe keep it multiple of 16, don't request more than 64kb per buffer.
+            The actual buffer's size may not
         @return
             The desired const buffer pointer
         */

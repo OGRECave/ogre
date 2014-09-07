@@ -47,6 +47,7 @@ namespace Ogre
     const IdString PbsProperty::HwGammaWrite      = IdString( "hw_gamma_write" );
     const IdString PbsProperty::SignedIntTex      = IdString( "signed_int_textures" );
 
+    const IdString PbsProperty::NumTextures       = IdString( "num_textures" );
     const IdString PbsProperty::DiffuseMap        = IdString( "diffuse_map" );
     const IdString PbsProperty::NormalMapTex      = IdString( "normal_map_tex" );
     const IdString PbsProperty::SpecularMap       = IdString( "specular_map" );
@@ -179,25 +180,6 @@ namespace Ogre
 
     extern const String c_pbsBlendModes[];
 
-    const String c_vsPerObjectUniforms[] =
-    {
-        "worldView",
-        "worldViewProj",
-        "worldMat"
-    };
-    const String c_psPerObjectUniforms[] =
-    {
-        "roughness",
-        "kD",
-        "kS",
-        "F0",
-        "atlasOffsets",
-        "normalWeights",
-        "cDetailWeights",
-        "detailOffsetScaleD",
-        "detailOffsetScaleN",
-    };
-
     HlmsPbs::HlmsPbs( Archive *dataFolder ) :
         Hlms( HLMS_PBS, "pbs", dataFolder ),
         mPassBuffer( 0 ),
@@ -256,30 +238,10 @@ namespace Ogre
         const HlmsCache *retVal = Hlms::createShaderCacheEntry( renderableHash, passCache, finalHash,
                                                                 queuedRenderable );
 
-        GpuNamedConstants *constantsDef;
-        //Nasty const_cast, but the refactor required to remove this is 100x nastier.
-        constantsDef = const_cast<GpuNamedConstants*>( &retVal->vertexShader->getConstantDefinitions() );
-        bool hasSkeleton = getProperty( HlmsBaseProp::Skeleton ) != 0;
-        for( size_t i=hasSkeleton ? 2 : 0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
-        {
-            GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_vsPerObjectUniforms[i] );
-            if( it != constantsDef->map.end() )
-                it->second.variability = GPV_PER_OBJECT;
-        }
-
-        //Nasty const_cast, but the refactor required to remove this is 100x nastier.
-        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pixelShader->getConstantDefinitions() );
-        for( size_t i=0; i<sizeof( c_psPerObjectUniforms ) / sizeof( String ); ++i )
-        {
-            GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_psPerObjectUniforms[i] );
-            if( it != constantsDef->map.end() )
-                it->second.variability = GPV_PER_OBJECT;
-        }
-
         //Set samplers.
         GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
 
-        int texUnit = 0;
+        int texUnit = 1; //Vertex shader consumes 1 slot with its tbuffer.
         if( !mPreparedPass.shadowMaps.empty() )
         {
             vector<int>::type shadowMaps;
@@ -294,59 +256,11 @@ namespace Ogre
         const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
                                                     queuedRenderable.renderable->getDatablock() );
 
-        if( getProperty( PbsProperty::DiffuseMap ) )
+        int numTextures = getProperty( PbsProperty::NumTextures );
+        for( int i=0; i<numTextures; ++i )
         {
-            assert( !datablock->mTexture[PBSM_DIFFUSE].isNull() );
-            psParams->setNamedConstant( "texDiffuseMap", texUnit++ );
-        }
-        if( getProperty( PbsProperty::NormalMapTex ) )
-        {
-            assert( !datablock->mTexture[PBSM_NORMAL].isNull() );
-            psParams->setNamedConstant( "texNormalMap", texUnit++ );
-        }
-        if( getProperty( PbsProperty::SpecularMap ) )
-        {
-            assert( !datablock->mTexture[PBSM_SPECULAR].isNull() );
-            psParams->setNamedConstant( "texSpecularMap", texUnit++ );
-        }
-        if( getProperty( PbsProperty::RoughnessMap ) )
-        {
-            assert( !datablock->mTexture[PBSM_ROUGHNESS].isNull() );
-            psParams->setNamedConstant( "texRoughnessMap", texUnit++ );
-        }
-        if( getProperty( PbsProperty::DetailWeightMap ) )
-        {
-            assert( !datablock->mTexture[PBSM_DETAIL_WEIGHT].isNull() );
-            psParams->setNamedConstant( "texDetailWeightMap", texUnit++ );
-        }
-
-        if( getProperty( PbsProperty::DetailMapsDiffuse ) )
-        {
-            size_t validDetailMaps = 0;
-            for( size_t i=PBSM_DETAIL0; i<=PBSM_DETAIL3; ++i )
-            {
-                if( !datablock->mTexture[i].isNull() )
-                {
-                    assert( !datablock->mTexture[i].isNull() );
-                    psParams->setNamedConstant( "texDetailMap[" +
-                                                StringConverter::toString( validDetailMaps++ ) + "]",
-                                                texUnit++ );
-                }
-            }
-        }
-
-        if( getProperty( PbsProperty::DetailMapsNormal ) )
-        {
-            size_t validDetailMaps = 0;
-            for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
-            {
-                if( !datablock->mTexture[i].isNull() )
-                {
-                    psParams->setNamedConstant( "texDetailNormalMap[" +
-                                                StringConverter::toString( validDetailMaps++ ) + "]",
-                                                texUnit++ );
-                }
-            }
+            psParams->setNamedConstant( "textureMaps[" + StringConverter::toString( i ) + "]",
+                                        texUnit++ );
         }
 
         if( getProperty( PbsProperty::EnvProbeMap ) )

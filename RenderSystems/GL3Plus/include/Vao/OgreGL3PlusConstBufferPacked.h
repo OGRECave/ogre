@@ -40,7 +40,8 @@ namespace Ogre
     public:
         GL3PlusConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
                                   BufferType bufferType, void *initialData, bool keepAsShadow,
-                                  VaoManager *vaoManager, BufferInterface *bufferInterface );
+                                  VaoManager *vaoManager, BufferInterface *bufferInterface,
+                                  size_t bindableSize );
         ~GL3PlusConstBufferPacked();
 
         virtual void bindConstantBuffer( uint16 slot );

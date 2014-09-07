@@ -37,16 +37,17 @@ namespace Ogre
      */
     class ConstBufferPacked : public BufferPacked
     {
+    protected:
+        size_t mBindableSizeBytes;
+
     public:
-
-        uint16  mConstantSlot;
-
         ConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
                            BufferType bufferType, void *initialData, bool keepAsShadow,
-                           VaoManager *vaoManager, BufferInterface *bufferInterface ) :
+                           VaoManager *vaoManager, BufferInterface *bufferInterface,
+                           size_t bindableSize ) :
             BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
                           initialData, keepAsShadow, vaoManager, bufferInterface ),
-            mConstantSlot( 0 )
+            mBindableSizeBytes( bindableSize )
         {
         }
 
@@ -56,6 +57,10 @@ namespace Ogre
             In GLSL it's called it's called 'binding'
         */
         virtual void bindConstantBuffer( uint16 slot ) = 0;
+
+        /// Gets the size of the buffer that will get bound. May not be
+        /// the same as the size of the entire buffer (i.e. due to padding)
+        size_t getBindableSize(void) const                  { return mBindableSizeBytes; }
 
         //TODO
         virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }

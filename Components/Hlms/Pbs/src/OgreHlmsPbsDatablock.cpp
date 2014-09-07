@@ -52,15 +52,30 @@ namespace Ogre
                                               const HlmsBlendblock *blendblock,
                                               const HlmsParamVec &params ) :
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
-        mRoughness( 0.1f ),
+        mConstBuffer( 0 ),
+        mBufferOffset( 0 ),
+        mFresnelTypeSizeBytes( 4 ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
+        _padding0( 0 ),
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
-        mShaderCreationData( 0 )
+        mRoughness( 0.1f ),
+        mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f ),
+        mNormalMapWeight( 1.0f )
     {
-        mFullParametersBytes[0] = mFullParametersBytes[1] = 0;
-        mShaderCreationData = new PbsShaderCreationData();
-        memset( mVariableParameters, 0, sizeof( mVariableParameters ) );
+        memset( mUvSource, 0, sizeof( mUvSource ) );
+        memset( mBlendModes, 0, sizeof( mBlendModes ) );
+
+        mDetailNormalWeight[0] = mDetailNormalWeight[1] = 1.0f;
+        mDetailNormalWeight[2] = mDetailNormalWeight[3] = 1.0f;
+        mDetailWeight[0] = mDetailWeight[1] = mDetailWeight[2] = mDetailWeight[3] = 1.0f;
+        for( size_t i=0; i<8; ++i )
+            mDetailsOffsetScale[i] = Vector4( 0, 0, 1, 1 );
+
+        memset( mTexIndices, 0, sizeof( mTexIndices ) );
         memset( mSamplerblocks, 0, sizeof( mSamplerblocks ) );
+
+        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+            mTexToBakedTextureIdx[i] = NUM_PBSM_TEXTURE_TYPES;
 
         String paramVal;
 
@@ -230,7 +245,7 @@ namespace Ogre
         }
 
         calculateHash();
-        bakeVariableParameters();
+        scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     HlmsPbsDatablock::~HlmsPbsDatablock()
@@ -242,98 +257,95 @@ namespace Ogre
     void HlmsPbsDatablock::calculateHash()
     {
         IdString hash;
-        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+
+        PbsBakedTextureArray::const_iterator itor = mBakedTextures.begin();
+        PbsBakedTextureArray::const_iterator end  = mBakedTextures.end();
+
+        while( itor != end )
         {
-            if( !mTexture[i].isNull() )
-            {
-                hash += IdString( mTexture[i]->getName() );
-                hash += IdString( mSamplerblocks[i]->mId );
-            }
+            hash += IdString( itor->texture->getName() );
+            hash += IdString( itor->samplerBlock->mId );
+
+            ++itor;
         }
 
         mTextureHash = hash.mHash;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::bakeVariableParameters(void)
+    char* HlmsPbsDatablock::uploadToConstBuffer( char *dstPtr )
     {
-        //float roughness
-        //vec3 kD;
-        //vec3 kS;
-        //vec3 F0; or float F0;
-        size_t param = mShaderCreationData->mFresnelTypeSizeBytes >> 2;
-        memcpy( mVariableParameters, &mShaderCreationData->mFresnelR, param << 2 );
+        mBakedTextures.clear();
 
-        //vec3 atlasOffsets[4]; (up to four, can be zero)
-        for( size_t i=0; i<=PBSM_ROUGHNESS; ++i )
+        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
         {
-            if( !mTexture[i].isNull() )
+            PbsBakedTexture bakedTexture( mTexture[i], mSamplerblocks[i] );
+
+            PbsBakedTextureArray::const_iterator itor = std::find( mBakedTextures.begin(),
+                                                                   mBakedTextures.end(), bakedTexture );
+
+            if( itor == end )
+                mBakedTextures.push_back( bakedTexture );
+        }
+
+        const size_t dataSize = 58 * 4;
+        memcpy( dstPtr, &mkDr, dataSize );
+        return dstPtr + dataSize;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::decompileBakedTextures( PbsBakedTexture outTextures[NUM_PBSM_TEXTURE_TYPES] )
+    {
+        //Decompile the baked textures to know which texture is assigned to each type.
+        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+        {
+            uint8 idx = mTexToBakedTextureIdx[i];
+
+            if( idx < NUM_PBSM_TEXTURE_TYPES )
             {
-                memcpy( &mVariableParameters[param], &mShaderCreationData->mUvAtlasParams[i],
-                        sizeof( PbsUvAtlasParams ) );
-                param += sizeof( PbsUvAtlasParams ) >> 2;
+                outTextures[i] = PbsBakedTexture( mBakedTextures[idx].texture, mSamplerblocks[texType] );
+            }
+            else
+            {
+                //The texture may be null, but the samplerblock information may still be there.
+                outTextures[i] = PbsBakedTexture( TexturePtr(), mSamplerblocks[texType] );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::bakeTextures( const PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES] )
+    {
+        //The shader might need to be recompiled (mTexToBakedTextureIdx changed).
+        //We'll need to flush.
+        //Most likely mTexIndices also changed, so we need to update the const buffers as well
+        mBakedTextures.clear();
+
+        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+        {
+            if( !textures[i].texture.isNull() )
+            {
+                PbsBakedTextureArray::const_iterator itor = std::find( mBakedTextures.begin(),
+                                                                       mBakedTextures.end(),
+                                                                       textures[i] );
+
+                if( itor == mBakedTextures.end() )
+                {
+                    mTexToBakedTextureIdx[i] = mBakedTextures.size();
+                    mBakedTextures.push_back( bakedTexture );
+                }
+                else
+                {
+                    mTexToBakedTextureIdx[i] = itor - mBakedTextures.begin();
+                }
             }
         }
 
-        //float normalWeights[5]; (up to five, can be zero)
-        if( mShaderCreationData->mNormalMapWeight != 1.0f && !mTexture[PBSM_NORMAL].isNull() )
-            mVariableParameters[param++] = mShaderCreationData->mNormalMapWeight;
-
-        for( size_t i=0; i<4; ++i )
-        {
-            if( mShaderCreationData->mDetailNormalWeight[i] != 1.0f &&
-                !mTexture[PBSM_DETAIL0_NM + i].isNull() )
-            {
-                mVariableParameters[param++] = mShaderCreationData->mDetailNormalWeight[i];
-            }
-        }
-
-        bool anyDetailWeight = false;
-        for( size_t i=0; i<4 && !anyDetailWeight; ++i )
-        {
-            if( mShaderCreationData->mDetailWeight[i] != 1.0f &&
-                (!mTexture[PBSM_DETAIL0 + i].isNull() || !mTexture[PBSM_DETAIL0_NM + i].isNull()) )
-            {
-                anyDetailWeight = true;
-            }
-        }
-
-        //vec4 cDetailWeights;
-        if( anyDetailWeight )
-        {
-            memcpy( &mVariableParameters[param], &mShaderCreationData->mDetailWeight,
-                    4 * sizeof(float) );
-            param += 4;
-        }
-
-        //vec4 detailOffsetScaleD[4];  (up to four, can be zero)
-        //vec4 detailOffsetScaleN[4];  (up to four, can be zero)
-        for( size_t i=0; i<8; ++i )
-        {
-            if( mShaderCreationData->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
-            {
-                memcpy( &mVariableParameters[param],
-                        &mShaderCreationData->mDetailsOffsetScale[i],
-                        4 * sizeof(float) );
-                param += 4;
-            }
-        }
-
-        //float roughness
-        //vec3 kD;
-        //vec3 kS;
-        //vec3 F0; or float F0;
-        //vec3 atlasOffsets[4]; (up to four, can be zero)
-        //float normalWeights[5]; (up to five, can be zero)
-        //vec4 cDetailWeights;
-        //vec4 detailOffsetScaleD[4];  (up to four, can be zero)
-        //vec4 detailOffsetScaleN[4];  (up to four, can be zero)
-        mFullParametersBytes[0] = 7 * sizeof(float) + (param << 2);
-        mFullParametersBytes[1] = 0;
+        calculateHash();
+        flushRenderables();
+        scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setTexture( const String &name,
-                                             HlmsTextureManager::TextureMapType textureMapType,
-                                             PbsTextureTypes textureType )
+                                       HlmsTextureManager::TextureMapType textureMapType,
+                                       PbsTextureTypes textureType )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
@@ -386,7 +398,7 @@ namespace Ogre
             flushRenderables();
         }
 
-        bakeVariableParameters();
+        scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     Vector3 HlmsPbsDatablock::getFresnel(void) const
@@ -400,49 +412,78 @@ namespace Ogre
         return mShaderCreationData->mFresnelTypeSizeBytes != 4;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::setTexture( PbsTextureTypes texType, TexturePtr &newTexture,
-                                             const PbsUvAtlasParams &atlasParams )
+    void HlmsPbsDatablock::setTexture( PbsTextureTypes texType, uint16 arrayIndex,
+                                       const TexturePtr &newTexture, const HlmsSamplerblock *params )
     {
-        bool oldWasNull = mTexture[texType].isNull();
-        mTexture[texType] = newTexture;
+        PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
 
-        if( texType <= PBSM_ROUGHNESS )
-            mShaderCreationData->mUvAtlasParams[texType] = atlasParams;
+        //Decompile the baked textures to know which texture is assigned to each type.
+        decompileBakedTextures( textures );
 
-        if( oldWasNull != newTexture.isNull() )
+        //Set the new samplerblock
+        if( params )
         {
-            if( !mSamplerblocks[texType] )
+            HlmsManager *hlmsManager = mCreator->getHlmsManager();
+            mSamplerblocks[texType] = hlmsManager->getSamplerblock( *params );
+        }
+        else if( !newTexture.isNull() && !mSamplerblocks[texType] )
+        {
+            //Adding a texture, but the samplerblock doesn't exist. Create a default one.
+            HlmsSamplerblock samplerBlockRef;
+            if( texType >= PBSM_DETAIL0 && texType <= PBSM_DETAIL3_NM )
             {
-                HlmsSamplerblock samplerBlockRef;
-                if( texType >= PBSM_DETAIL0 && texType <= PBSM_DETAIL3_NM )
-                {
-                    //Detail maps default to wrap mode.
-                    samplerBlockRef.mU = TAM_WRAP;
-                    samplerBlockRef.mV = TAM_WRAP;
-                    samplerBlockRef.mW = TAM_WRAP;
-                }
-
-                HlmsManager *hlmsManager = mCreator->getHlmsManager();
-                mSamplerblocks[texType] = hlmsManager->getSamplerblock( samplerBlockRef );
+                //Detail maps default to wrap mode.
+                samplerBlockRef.mU = TAM_WRAP;
+                samplerBlockRef.mV = TAM_WRAP;
+                samplerBlockRef.mW = TAM_WRAP;
             }
-
-            flushRenderables();
+            mSamplerblocks[texType] = hlmsManager->getSamplerblock( *params );
         }
 
-        calculateHash();
-        bakeVariableParameters();
+        PbsBakedTexture oldTex = textures[texType];
+
+        //Set the texture and make the samplerblock changes to take effect
+        textures[texType].texture = newTexture;
+        textures[texType].samplerBlock = mSamplerblocks[texType];
+        mTexIndices[texType] = arrayIndex;
+
+        if( oldTex == textures[texType] )
+        {
+            //Only the array index changed. Just update our constant buffer.
+            scheduleConstBufferUpdate();
+        }
+        else
+        {
+            bakeTextures( textures );
+        }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::setSamplerblock( PbsTextureTypes texType,
-                                                  const HlmsSamplerblock &params )
+    TexturePtr HlmsPbsDatablock::getTexture( PbsTextureTypes texType )
+    {
+        TexturePtr retVal;
+
+        if( mTexToBakedTextureIdx[texType] < NUM_PBSM_TEXTURE_TYPES )
+            retVal = mBakedTextures[mTexToBakedTextureIdx[texType]].texture;
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setSamplerblock( PbsTextureTypes texType, const HlmsSamplerblock &params )
     {
         //TODO: Remove old sampler block (ref count, probably).
+        const HlmsSamplerblock *oldSamplerblock = mSamplerblocks[texType];
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         mSamplerblocks[texType] = hlmsManager->getSamplerblock( params );
+
+        if( oldSamplerblock != mSamplerblocks[texType] )
+        {
+            PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
+            decompileBakedTextures( textures );
+            bakeTextures( textures );
+        }
     }
     //-----------------------------------------------------------------------------------
-    const HlmsSamplerblock* HlmsPbsDatablock::getSamplerblock(
-                                                                PbsTextureTypes texType ) const
+    const HlmsSamplerblock* HlmsPbsDatablock::getSamplerblock( PbsTextureTypes texType ) const
     {
         return mSamplerblocks[texType];
     }
@@ -489,7 +530,7 @@ namespace Ogre
         if( wasOne != (mShaderCreationData->mDetailNormalWeight[detailNormalMap] == 1.0f) )
         {
             flushRenderables();
-            bakeVariableParameters();
+            scheduleConstBufferUpdate();
         }
     }
     //-----------------------------------------------------------------------------------
@@ -507,7 +548,7 @@ namespace Ogre
         if( wasDisabled != (mShaderCreationData->mNormalMapWeight == 1.0f) )
         {
             flushRenderables();
-            bakeVariableParameters();
+            scheduleConstBufferUpdate();
         }
     }
     //-----------------------------------------------------------------------------------
@@ -539,7 +580,7 @@ namespace Ogre
         if( wasDisabled != (mShaderCreationData->mDetailWeight[detailMap] == 1.0f) )
             flushRenderables();
 
-        bakeVariableParameters();
+        scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     Real HlmsPbsDatablock::getDetailMapWeight( uint8 detailMap ) const
@@ -561,7 +602,7 @@ namespace Ogre
             flushRenderables();
         }
 
-        bakeVariableParameters();
+        scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     const Vector4& HlmsPbsDatablock::getDetailMapOffsetScale( uint8 detailMap ) const

@@ -104,7 +104,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void GL3PlusVaoManager::allocateVbo(size_t sizeBytes, size_t alignment, BufferType bufferType,
+    void GL3PlusVaoManager::allocateVbo( size_t sizeBytes, size_t alignment, BufferType bufferType,
                                          size_t &outVboIdx, size_t &outBufferOffset )
     {
         assert( alignment > 0 );
@@ -391,12 +391,25 @@ namespace Ogre
         size_t vboIdx;
         size_t bufferOffset;
 
-        allocateVbo( sizeBytes, 16, bufferType, vboIdx, bufferOffset );
+        GLint alignment = 16;
+        glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment );
+
+        size_t bindableSize = sizeBytes;
 
         VboFlag vboFlag = CPU_INACCESSIBLE;
 
         if( bufferType == BT_DYNAMIC )
+        {
             vboFlag = CPU_ACCESSIBLE;
+
+            //For dynamic buffers, the size will be 3x times larger
+            //(depending on mDynamicBufferMultiplier); we need the
+            //offset after each map to be aligned; and for that, we
+            //sizeBytes to be multiple of alignment.
+            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+        }
+
+        allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
                                                                     GL_UNIFORM_BUFFER,
@@ -404,7 +417,7 @@ namespace Ogre
         ConstBufferPacked *retVal = OGRE_NEW GL3PlusConstBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
                                                         bufferType, initialData, keepAsShadow,
-                                                        this, bufferInterface );
+                                                        this, bufferInterface, bindableSize );
 
         if( initialData )
             bufferInterface->_firstUpload( initialData, 0, sizeBytes );

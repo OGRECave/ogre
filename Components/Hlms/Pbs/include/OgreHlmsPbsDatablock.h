@@ -45,40 +45,61 @@ namespace Ogre
     struct PbsShaderCreationData;
     struct PbsUvAtlasParams;
 
+    struct PbsBakedTexture
+    {
+        TexturePtr              texture;
+        HlmsSamplerblock const *samplerBlock;
+
+        PbsBakedTexture() : samplerBlock( 0 ) {}
+        PbsBakedTexture( const TexturePtr tex, const HlmsSamplerblock *_samplerBlock ) :
+            texture( tex ), samplerBlock( _samplerBlock ) {}
+    };
+
+    typedef FastArray<PbsBakedTexture> PbsBakedTextureArray;
+
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
     */
     class _OgreHlmsPbsExport HlmsPbsDatablock : public HlmsDatablock
     {
         friend class HlmsPbs;
     protected:
+        ConstBufferPacked   *mConstBuffer;
+        size_t              mBufferOffset;
+
         /// [0] = Regular one.
         /// [1] = Used during shadow mapping
-        uint16  mFullParametersBytes[2];
+        //uint16  mFullParametersBytes[2];
+        uint8   mUvSource[NUM_PBSM_SOURCES];
+        uint8   mBlendModes[4];
+        uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
 
-    public:
-        float   mRoughness;
         float   mkDr, mkDg, mkDb;                   //kD
+        float   _padding0;
         float   mkSr, mkSg, mkSb;                   //kS
+        float   mRoughness;
+        float   mFresnelR, mFresnelG, mFresnelB;    //F0
+        float   mNormalMapWeight;
+        float   mDetailNormalWeight[4];
+        float   mDetailWeight[4];
+        Vector4 mDetailsOffsetScale[8];
+        uint16  mTexIndices[NUM_PBSM_TEXTURE_TYPES];
 
-    protected:
-        /// Baked parameters from PbsShaderCreationData.
-        /// mNumVariableParameters says how many parameters were
-        /// actually baked.
-        float   mVariableParameters[56];
+        PbsBakedTextureArray mBakedTextures;
+        /// The way to read this variable is i.e. get diffuse texture,
+        /// mBakedTextures[mTexToBakedTextureIdx[PBSM_DIFFUSE]]
+        /// Then read mTexIndices[PBSM_DIFFUSE] to know which slice of the texture array.
+        uint8   mTexToBakedTextureIdx[NUM_PBSM_TEXTURE_TYPES];
 
-        TexturePtr              mTexture[NUM_PBSM_TEXTURE_TYPES];
         HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
 
-        /// The data in this structure only affects shader generation (thus modifying it
-        /// may imply generating a new shader; i.e. a call to flushRenderables()). Because
-        /// this data is not needed while iterating (updating constants), it's dynamically
-        /// allocated. It also contains information that rarely changes and is then baked.
-        PbsShaderCreationData *mShaderCreationData;
-
-
+        void scheduleConstBufferUpdate(void);
+        char* uploadToConstBuffer( char *dstPtr );
         void bakeVariableParameters(void);
         void setTexture( const String &name, HlmsTextureManager::TextureMapType textureMapType,
                          PbsTextureTypes textureType );
+
+        void decompileBakedTextures( PbsBakedTexture outTextures[NUM_PBSM_TEXTURE_TYPES] );
+        void bakeTextures( const PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES] );
 
     public:
         /** Valid parameters in params:
@@ -200,21 +221,29 @@ namespace Ogre
         /// Whether the same fresnel term is used for RGB, or individual ones for each channel
         bool hasSeparateFresnel(void) const;
 
-        /** Sets a new texture for rendering
-        @param UvAtlasParams
+        /** Sets a new texture for rendering. Calling this function may trigger an
+            HlmsDatablock::flushRenderables if the texture or the samplerblock changes.
+            Won't be called if only the arrayIndex changes
+        @param texType
             Type of the texture.
+        @param arrayIndex
+            The index in the array texture.
         @param newTexture
             Texture to change to. If it is null and previously wasn't (or viceversa), will
             trigger HlmsDatablock::flushRenderables.
-        @param atlasParams
-            The atlas offsets in case this texture is an atlas or an array texture
-            Doesn't apply to certain texture types (i.e. PBSM_REFLECTION)
+        @param params
+            Optional. We'll create (or retrieve an existing) samplerblock based on the input parameters.
+            When null, we leave the previously set samplerblock (if a texture is being set, and no
+            samplerblock was set, we'll create a default one)
         */
-        void setTexture( PbsTextureTypes texType, TexturePtr &newTexture,
-                         const PbsUvAtlasParams &atlasParams );
+        void setTexture( PbsTextureTypes texType, uint16 arrayIndex, const TexturePtr &newTexture,
+                         const HlmsSamplerblock *params=0 );
+
+        TexturePtr getTexture( PbsTextureTypes texType );
 
         /** Sets a new sampler block to be associated with the texture
-            (i.e. filtering mode, addressing modes, etc).
+            (i.e. filtering mode, addressing modes, etc). If the samplerblock changes,
+            this function will always trigger a HlmsDatablock::flushRenderables
         @param texType
             Type of texture.
         @param params
