@@ -1678,7 +1678,7 @@ bail:
     void D3D11RenderSystem::detachRenderTargetImpl(const String& name)
     {
         // Check in specialized lists
-        if (mPrimaryWindow->getName() == name)
+		if (mPrimaryWindow != NULL && mPrimaryWindow->getName() == name)
         {
             // We're destroying the primary window, so reset device and window
             mPrimaryWindow = 0;
