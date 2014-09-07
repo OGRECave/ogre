@@ -149,6 +149,9 @@ bail:
 		mIsWorkingUnderNsight = false;
 		
         mRenderSystemWasInited = false;
+		mSwitchingFullscreenCounter = 0;
+		
+		
         initRenderSystem();
 
         // set config options defaults
@@ -1025,8 +1028,7 @@ bail:
 
         // call superclass method
         RenderSystem::_initialise( autoCreateWindow );
-
-
+		this->fireDeviceEvent(&mDevice, "DeviceCreated");
         return autoWindow;
     }
     //---------------------------------------------------------------------
@@ -1057,79 +1059,73 @@ bail:
 
     }
     //---------------------------------------------------------------------
-    RenderWindow* D3D11RenderSystem::_createRenderWindow(const String &name, 
-        unsigned int width, unsigned int height, bool fullScreen,
-        const NameValuePairList *miscParams)
-    {
+	RenderWindow* D3D11RenderSystem::_createRenderWindow(const String &name,
+		unsigned int width, unsigned int height, bool fullScreen,
+		const NameValuePairList *miscParams)
+	{
 
-        // Check we're not creating a secondary window when the primary
-        // was fullscreen
-        if (mPrimaryWindow && mPrimaryWindow->isFullScreen())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Cannot create secondary windows when the primary is full screen",
-                "D3D11RenderSystem::_createRenderWindow");
-        }
-        if (mPrimaryWindow && fullScreen)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                "Cannot create full screen secondary windows",
-                "D3D11RenderSystem::_createRenderWindow");
-        }
-        
-        // Log a message
-        StringStream ss;
-        ss << "D3D11RenderSystem::_createRenderWindow \"" << name << "\", " <<
-            width << "x" << height << " ";
-        if(fullScreen)
-            ss << "fullscreen ";
-        else
-            ss << "windowed ";
-        if(miscParams)
-        {
-            ss << " miscParams: ";
-            NameValuePairList::const_iterator it;
-            for(it=miscParams->begin(); it!=miscParams->end(); ++it)
-            {
-                ss << it->first << "=" << it->second << " ";
-            }
-            LogManager::getSingleton().logMessage(ss.str());
-        }
-        
-        String msg;
+		// Check we're not creating a secondary window when the primary
+		// was fullscreen
+		if (mPrimaryWindow && mPrimaryWindow->isFullScreen() && fullScreen == false)
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+				"Cannot create secondary windows not in full screen when the primary is full screen",
+				"D3D11RenderSystem::_createRenderWindow");
+		}
 
-        // Make sure we don't already have a render target of the 
-        // sam name as the one supplied
-        if( mRenderTargets.find( name ) != mRenderTargets.end() )
-        {
-            msg = "A render target of the same name '" + name + "' already "
-                "exists.  You cannot create a new window with this name.";
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "D3D11RenderSystem::_createRenderWindow" );
-        }
+		// Log a message
+		StringStream ss;
+		ss << "D3D11RenderSystem::_createRenderWindow \"" << name << "\", " <<
+			width << "x" << height << " ";
+		if (fullScreen)
+			ss << "fullscreen ";
+		else
+			ss << "windowed ";
+		if (miscParams)
+		{
+			ss << " miscParams: ";
+			NameValuePairList::const_iterator it;
+			for (it = miscParams->begin(); it != miscParams->end(); ++it)
+			{
+				ss << it->first << "=" << it->second << " ";
+			}
+			LogManager::getSingleton().logMessage(ss.str());
+		}
+
+		String msg;
+
+		// Make sure we don't already have a render target of the 
+		// sam name as the one supplied
+		if (mRenderTargets.find(name) != mRenderTargets.end())
+		{
+			msg = "A render target of the same name '" + name + "' already "
+				"exists.  You cannot create a new window with this name.";
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msg, "D3D11RenderSystem::_createRenderWindow");
+		}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        D3D11RenderWindowBase* win = new D3D11RenderWindowHwnd(mDevice, mpDXGIFactory);
+		D3D11RenderWindowBase* win = new D3D11RenderWindowHwnd(mDevice, mpDXGIFactory);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        String windowType;
-        if(miscParams)
-        {
-            // Get variable-length params
-            NameValuePairList::const_iterator opt = miscParams->find("windowType");
-            if(opt != miscParams->end())
-                windowType = opt->second;
-        }
+		String windowType;
+		if(miscParams)
+		{
+			// Get variable-length params
+			NameValuePairList::const_iterator opt = miscParams->find("windowType");
+			if(opt != miscParams->end())
+				windowType = opt->second;
+		}
 
-        D3D11RenderWindowBase* win = NULL;
+		D3D11RenderWindowBase* win = NULL;
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-        if(win == NULL && windowType == "SurfaceImageSource")
-            win = new D3D11RenderWindowImageSource(mDevice, mpDXGIFactory);
+		if(win == NULL && windowType == "SurfaceImageSource")
+			win = new D3D11RenderWindowImageSource(mDevice, mpDXGIFactory);
 #endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-        if(win == NULL)
-            win = new D3D11RenderWindowCoreWindow(mDevice, mpDXGIFactory);
+		if(win == NULL)
+			win = new D3D11RenderWindowCoreWindow(mDevice, mpDXGIFactory);
 #endif
-        win->create( name, width, height, fullScreen, miscParams);
+		win->create(name, width, height, fullScreen, miscParams);
 
-        attachRenderTarget( *win );
+		attachRenderTarget(*win);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		// Must be called after device has been linked to window
@@ -1137,42 +1133,49 @@ bail:
 		win->_validateStereo();
 #endif
 
-        // If this is the first window, get the D3D device and create the texture manager
-        if( !mPrimaryWindow )
-        {
-            mPrimaryWindow = win;
-            win->getCustomAttribute( "D3DDEVICE", &mDevice );
-            
-            // Create the texture manager for use by others
-            mTextureManager = new D3D11TextureManager( mDevice );
-            // Also create hardware buffer manager
-            mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
+		// If this is the first window, get the D3D device and create the texture manager
+		if (!mPrimaryWindow)
+		{
+			mPrimaryWindow = win;
+			win->getCustomAttribute("D3DDEVICE", &mDevice);
 
-            // Create the GPU program manager
-            mGpuProgramManager = new D3D11GpuProgramManager(mDevice);
-            // create & register HLSL factory
-            if (mHLSLProgramFactory == NULL)
-                mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
-            mRealCapabilities = createRenderSystemCapabilities();                           
-            mRealCapabilities->addShaderProfile("hlsl");
+			// Create the texture manager for use by others
+			mTextureManager = new D3D11TextureManager(mDevice);
+			// Also create hardware buffer manager
+			mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
 
-            // if we are using custom capabilities, then 
-            // mCurrentCapabilities has already been loaded
-            if(!mUseCustomCapabilities)
-                mCurrentCapabilities = mRealCapabilities;
+			// Create the GPU program manager
+			mGpuProgramManager = new D3D11GpuProgramManager(mDevice);
+			// create & register HLSL factory
+			if (mHLSLProgramFactory == NULL)
+				mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
+			mRealCapabilities = createRenderSystemCapabilities();
+			mRealCapabilities->addShaderProfile("hlsl");
 
-            fireEvent("RenderSystemCapabilitiesCreated");
+			// if we are using custom capabilities, then 
+			// mCurrentCapabilities has already been loaded
+			if (!mUseCustomCapabilities)
+				mCurrentCapabilities = mRealCapabilities;
 
-            initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
+			fireEvent("RenderSystemCapabilitiesCreated");
 
-        }
-        else
-        {
-            mSecondaryWindows.push_back(win);
-        }
+			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
 
-        return win;
+		}
+		else
+		{
+			mSecondaryWindows.push_back(win);
+		}
 
+		return win;
+
+	}
+
+	void D3D11RenderSystem::fireDeviceEvent( D3D11Device* device, const String & name,NameValuePairList *i_params)
+	{
+		NameValuePairList &params = i_params != NULL ? *i_params : NameValuePairList();
+		params["D3DDEVICE"] =  StringConverter::toString((size_t)device->get());
+		fireEvent(name, &params);
     }
     //---------------------------------------------------------------------
     RenderSystemCapabilities* D3D11RenderSystem::createRenderSystemCapabilities() const
@@ -1685,7 +1688,7 @@ bail:
 		if (mPrimaryWindow != NULL && mPrimaryWindow->getName() == name)
         {
             // We're destroying the primary window, so reset device and window
-            mPrimaryWindow = 0;
+			mPrimaryWindow = NULL;
         }
         else
         {

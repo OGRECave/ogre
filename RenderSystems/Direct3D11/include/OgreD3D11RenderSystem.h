@@ -81,6 +81,8 @@ namespace Ogre
         bool mUseNVPerfHUD;
         /// Per-stage constant support? (not in main caps since D3D specific & minor)
         bool mPerStageConstantSupport;
+		
+		int mSwitchingFullscreenCounter;	// Are we switching from windowed to fullscreen 
 
 		bool mIsWorkingUnderNsight;
         /// structure holding texture unit settings for every stage
@@ -226,8 +228,11 @@ namespace Ogre
 
         // destructor
         ~D3D11RenderSystem();
-
-
+		
+		
+		int getSwitchingFullscreenCounter() const					{ return mSwitchingFullscreenCounter; }
+		void addToSwitchingFullscreenCounter()					{ mSwitchingFullscreenCounter++; }
+		
         void initRenderSystem();
 		
 		MonitorInfo & getMonitorInfo() { return mMonitorInfo; }
@@ -241,7 +246,10 @@ namespace Ogre
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0);
-
+		
+		/// @copydoc RenderSystem::fireDeviceEvent
+		void fireDeviceEvent( D3D11Device* device, const String & name,NameValuePairList *i_params = NULL);
+		
         /// @copydoc RenderSystem::createRenderTexture
         RenderTexture * createRenderTexture( const String & name, unsigned int width, unsigned int height,
             TextureType texType = TEX_TYPE_2D, PixelFormat internalFormat = PF_X8R8G8B8, 
