@@ -1180,6 +1180,8 @@ bail:
         rsc->setDeviceName(mActiveD3DDriver->DriverDescription());
         rsc->setRenderSystemName(getName());
 
+		rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
+		
         // Does NOT support fixed-function!
         //rsc->setCapability(RSC_FIXED_FUNCTION);
 
