@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Mappings.h"
+#include "OgreMonitorInfo.h"
 
 namespace Ogre 
 {
@@ -61,8 +62,8 @@ namespace Ogre
         D3D_FEATURE_LEVEL mFeatureLevel;
         D3D_FEATURE_LEVEL mMinRequestedFeatureLevel;
         D3D_FEATURE_LEVEL mMaxRequestedFeatureLevel;
-        /// Direct3D
-        //int           mpD3D;
+		MonitorInfo mMonitorInfo;
+		
         /// Direct3D rendering device
         D3D11Device     mDevice;
         
@@ -230,6 +231,8 @@ namespace Ogre
 
 
         void initRenderSystem();
+		
+		MonitorInfo & getMonitorInfo() { return mMonitorInfo; }
 
         virtual void initConfigOptions(void);
 
