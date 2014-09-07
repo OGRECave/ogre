@@ -72,7 +72,7 @@ THE SOFTWARE.
 //#endif
 
 //---------------------------------------------------------------------
-#define FLOAT2DWORD(f) *((DWORD*)&f)
+
 
 #ifndef D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT
 #   define D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT 4
