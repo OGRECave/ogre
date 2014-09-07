@@ -67,32 +67,32 @@ void SGX_TransformPosition(in float4x4 m,
 }
 
 //-----------------------------------------------------------------------------
-void SGX_FetchNormal(in sampler2D s, 
+void SGX_FetchNormal(in SamplerData2D s, 
 				   in float2 uv, 
 				   out float3 vOut)
 {
-	vOut = 2 * tex2D(s, uv).xyz - 1;
+	vOut = 2 * FFP_SampleTexture(s,uv).xyz - 1;
 }
 
 //-----------------------------------------------------------------------------
-void SGX_FetchNormal(in sampler2D s, 
+void SGX_FetchNormal(in SamplerData2D s, 
 				   in float2 uv, 
 				   out float4 vOut)
 
 {
-	float4 color = tex2D(s, uv);
+	float4 color = FFP_SampleTexture(s, uv);
 	vOut = float4(2 * color.xyz - 1,color.w);
 }
 
 //-----------------------------------------------------------------------------
-void SGX_Generate_Parallax_Texcoord(in sampler2D normalHeightMap,
+void SGX_Generate_Parallax_Texcoord(in SamplerData2D normalHeightMap,
 						in float2 texCoord,
 						in float3 eyeVec,
 						in float2 scaleBias,
 						out float2 newTexCoord)
 {
 	eyeVec = normalize(eyeVec);
-	float height = tex2D(normalHeightMap, texCoord).a;
+	float height = FFP_SampleTexture(normalHeightMap, texCoord).a;
 	float displacement = (height * scaleBias.x) + scaleBias.y;
 	float3 scaledEyeDir = eyeVec * displacement;
 	newTexCoord = (scaledEyeDir  + float3(texCoord, 1.0)).xy;

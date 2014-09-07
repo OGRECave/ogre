@@ -67,7 +67,8 @@ public:
         /// Binormal (Y axis if normal is Z)
         SPS_BINORMAL = 8,
         /// Tangent (X axis if normal is Z)
-        SPS_TANGENT = 9     
+        SPS_TANGENT = 9,
+		SPS_TEXTURE_ARRAY = 10
     };
 
     // Shader parameter content.
@@ -292,7 +293,8 @@ public:
         SPC_TEXTURE_COORDINATE5,
         SPC_TEXTURE_COORDINATE6,
         SPC_TEXTURE_COORDINATE7,
-
+		SPC_TEXTURE_ARRAY,
+		
         /// Reserved custom content range to be used by user custom shader extensions.
         SPC_CUSTOM_CONTENT_BEGIN    = 1000,
         SPC_CUSTOM_CONTENT_END      = 2000

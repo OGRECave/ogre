@@ -357,6 +357,8 @@ protected:
     ParameterPtr mVSLocalDir;
     // Normal map texture sampler parameter.
     UniformParameterPtr mNormalMapSampler;
+	// Normal map texture sampler state parameter.
+	UniformParameterPtr mNormalMapSamplerState;
     // Pixel shader normal parameter.
     ParameterPtr mPSNormal;
     // Vertex shader input texture coordinates.
