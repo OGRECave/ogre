@@ -39,6 +39,12 @@ THE SOFTWARE.
 #include "OgreD3D11RenderSystem.h"
 #include "OgreStringConverter.h"
 
+#define  HLSL_PROGRAM_DEFINE_VS "HLSL_VS"
+#define  HLSL_PROGRAM_DEFINE_PS "HLSL_PS"
+#define  HLSL_PROGRAM_DEFINE_GS "HLSL_GS"
+#define  HLSL_PROGRAM_DEFINE_HS "HLSL_HS"
+#define  HLSL_PROGRAM_DEFINE_CS "HLSL_CS"
+#define  HLSL_PROGRAM_DEFINE_DS "HLSL_DS"
 namespace Ogre {
     //-----------------------------------------------------------------------
     D3D11HLSLProgram::CmdEntryPoint D3D11HLSLProgram::msCmdEntryPoint;
@@ -142,7 +148,7 @@ namespace Ogre {
         Resource* mProgram;
     };
 
-    static void getDefines(String& stringBuffer, vector<D3D_SHADER_MACRO>::type& defines, const String& definesString)
+    void D3D11HLSLProgram::getDefines(String& stringBuffer, vector<D3D_SHADER_MACRO>::type& defines, const String& definesString)
     {
         // Populate preprocessor defines
         stringBuffer = definesString;
@@ -214,7 +220,34 @@ namespace Ogre {
         //Add D3D11 define to all program, compiled with D3D11 RenderSystem
         D3D_SHADER_MACRO macro = {"D3D11","1"};
         defines.push_back(macro);       
+		
         
+		switch (this->mType)
+		{
+			case GpuProgramType::GPT_VERTEX_PROGRAM:
+				macro.Name = HLSL_PROGRAM_DEFINE_VS;
+			break;
+			case GpuProgramType::GPT_FRAGMENT_PROGRAM:
+				macro.Name = HLSL_PROGRAM_DEFINE_PS;
+			break;
+			case GpuProgramType::GPT_GEOMETRY_PROGRAM:
+				macro.Name = HLSL_PROGRAM_DEFINE_GS;
+			break;
+			case GpuProgramType::GPT_DOMAIN_PROGRAM:
+				macro.Name = HLSL_PROGRAM_DEFINE_DS;
+			break;
+			case GpuProgramType::GPT_HULL_PROGRAM:
+				macro.Name = HLSL_PROGRAM_DEFINE_HS;
+			break;
+			case GpuProgramType::GPT_COMPUTE_PROGRAM:
+				macro.Name = HLSL_PROGRAM_DEFINE_CS;
+			break;
+			default:
+				OGRE_EXCEPT(Exception::ERR_INVALID_STATE,"Could not find a compatible HLSL program type",
+					"D3D11HLSLProgram::getDefines");
+		}
+		defines.push_back(macro);
+		
         // Add NULL terminator
         macro.Name = 0;
         macro.Definition = 0;
