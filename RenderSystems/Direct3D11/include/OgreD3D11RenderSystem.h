@@ -264,6 +264,9 @@ namespace Ogre
         virtual RenderTarget * detachRenderTarget(const String &name);
 
         const String& getName(void) const;
+		
+		const String& getFriendlyName(void) const;
+		
         void getCustomAttribute(const String& name, void* pData);
         // Low-level overridden members
         void setConfigOption( const String &name, const String &value );

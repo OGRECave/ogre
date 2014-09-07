@@ -177,6 +177,9 @@ namespace Ogre {
           RenderSystem
          */
         const String& getName(void) const;
+
+		const String& getFriendlyName(void) const;
+
         /** See
           RenderSystem
          */

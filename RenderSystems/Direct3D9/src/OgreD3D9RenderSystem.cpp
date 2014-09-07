@@ -169,6 +169,12 @@ namespace Ogre
         return strName;
     }
     //---------------------------------------------------------------------
+	const String& D3D9RenderSystem::getFriendlyName(void) const
+	{
+		static String strName = mIsDirectX9Ex ? "Direct3D 9Ex" : "Direct3D 9";
+		return strName;
+	}
+	
     D3D9DriverList* D3D9RenderSystem::getDirect3DDrivers()
     {
         if( !mDriverList )

@@ -242,6 +242,9 @@ namespace Ogre
 
         String getErrorDescription( long errorNumber ) const;
         const String& getName() const;
+
+		const String& getFriendlyName() const;
+
         // Low-level overridden members
         void setConfigOption( const String &name, const String &value );
         void reinitialise();

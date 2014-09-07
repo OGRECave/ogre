@@ -181,6 +181,13 @@ namespace Ogre {
         return strName;
     }
 
+
+	const String& GLRenderSystem::getFriendlyName(void) const
+	{
+		static String strName("OpenGL");
+		return strName;
+	}
+
     void GLRenderSystem::initConfigOptions(void)
     {
         mGLSupport->addConfig();
