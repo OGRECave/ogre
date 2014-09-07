@@ -187,8 +187,6 @@ namespace Ogre
             /// texture 
             ID3D11ShaderResourceView  *pTex;
             D3D11_SAMPLER_DESC  samplerDesc;
-            D3D11_SAMPLER_DESC currentSamplerDesc;
-            //ID3D11SamplerState * pSampler;
             bool used;
         } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];
 
