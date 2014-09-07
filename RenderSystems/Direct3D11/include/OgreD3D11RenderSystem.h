@@ -81,8 +81,9 @@ namespace Ogre
         /// Per-stage constant support? (not in main caps since D3D specific & minor)
         bool mPerStageConstantSupport;
 
+		bool mIsWorkingUnderNsight;
         /// structure holding texture unit settings for every stage
-
+		std::string getCreationErrorMessage(HRESULT hr, bool isDebug);
 
         D3D11DriverList* getDirect3DDrivers(void);
         void refreshD3DSettings(void);
@@ -91,7 +92,7 @@ namespace Ogre
 
 //      inline bool compareDecls( D3DVERTEXELEMENT9* pDecl1, D3DVERTEXELEMENT9* pDecl2, size_t size );
 
-
+		void getIsWorkingUnderNsight();
         void initInputDevices(void);
         void processInputDevices(void);
         

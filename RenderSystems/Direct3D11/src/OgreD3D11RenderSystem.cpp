@@ -83,6 +83,8 @@ THE SOFTWARE.
 #endif
 //---------------------------------------------------------------------
 #include <d3d10.h>
+#include <OgreNsightChecker.h>
+
 
 namespace Ogre 
 {
@@ -141,7 +143,9 @@ bail:
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
         mEnableFixedPipeline = false;
-
+		
+		mIsWorkingUnderNsight = false;
+		
         mRenderSystemWasInited = false;
         initRenderSystem();
 
@@ -608,11 +612,34 @@ bail:
         return mOptions;
     }
     //---------------------------------------------------------------------
+	
+	std::string D3D11RenderSystem::getCreationErrorMessage(HRESULT hr, bool isDebug)
+	{
+		std::stringstream error;
+		error<<"Failed to create";
+		if (isDebug)
+		{
+			error<<" debug layer";
+		}
+		error<<" Direct3D11 object."<<std::endl;
+#ifdef USE_DXERR_LIBRARY
+		error<<DXGetErrorDescription(hr);
+#else
+		error<<(hr);
+#endif
+		error<<std::endl;
+		return error.str();
+	}
+
     RenderWindow* D3D11RenderSystem::_initialise( bool autoCreateWindow, const String& windowTitle )
     {
         RenderWindow* autoWindow = NULL;
         LogManager::getSingleton().logMessage( "D3D11 : Subsystem Initialising" );
-
+		
+		mIsWorkingUnderNsight = NsightChecker::IsWorkingUnderNsight();
+		if (mIsWorkingUnderNsight)
+			LogManager::getSingleton().logMessage( "D3D11 : Nvidia Nsight found");
+		
         // Init using current settings
         mActiveD3DDriver = NULL;
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
@@ -696,7 +723,9 @@ bail:
 #endif
             if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() && OGRE_DEBUG_MODE)
             {
-                deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+				deviceFlags |= 
+				mIsWorkingUnderNsight ? 0 : D3D11_CREATE_DEVICE_DEBUG;
+				
             }
             if (!OGRE_THREAD_SUPPORT)
             {
@@ -794,31 +823,53 @@ bail:
 
             ID3D11DeviceN * device;
             // But, if creating WARP or software, don't use a selected adapter, it will be selected automatically
+			HRESULT hr = D3D11CreateDeviceN(pSelectedAdapter,
+				driverType,
+				NULL,
+				deviceFlags, 
+				requestedLevels + maxRequestedFeatureLevelIndex, 
+				minRequestedFeatureLevelIndex - maxRequestedFeatureLevelIndex + 1,
+				D3D11_SDK_VERSION, 
+				&device, 
+				&mFeatureLevel, 
+				0);
             
-            HRESULT hr = D3D11CreateDeviceN(pSelectedAdapter,
-                driverType,
-                NULL,
-                deviceFlags, 
-                requestedLevels + maxRequestedFeatureLevelIndex, 
-                minRequestedFeatureLevelIndex - maxRequestedFeatureLevelIndex + 1,
-                D3D11_SDK_VERSION, 
-                &device, 
-                &mFeatureLevel, 
-                0);
+			bool isDebug = (deviceFlags & D3D11_CREATE_DEVICE_DEBUG) == D3D11_CREATE_DEVICE_DEBUG;
+			if (FAILED(hr))
+			{
+				std::string errorMsg = getCreationErrorMessage(hr, isDebug);
+				if (!isDebug)
+				{
+					OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+						errorMsg,
+						"D3D11RenderSystem::D3D11RenderSystem");
+				}
+				else
+				{
+					//If failed to create D3D11 device with debug layer try without debug layer.
+					Ogre::LogManager::getSingleton().logMessage(errorMsg);
+					Ogre::LogManager::getSingleton().logMessage("Trying to create a standard layer Direct3D11 object");
+					deviceFlags &= ~D3D11_CREATE_DEVICE_DEBUG;
+					HRESULT hr = D3D11CreateDeviceN(pSelectedAdapter,
+						driverType,
+						NULL,
+						deviceFlags,
+						requestedLevels + maxRequestedFeatureLevelIndex,
+						minRequestedFeatureLevelIndex - maxRequestedFeatureLevelIndex + 1,
+						D3D11_SDK_VERSION,
+						&device,
+						&mFeatureLevel,
+						0);
 
-            if(FAILED(hr))         
-            {
-                StringStream error;
-#ifdef USE_DXERR_LIBRARY
-                error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
-#else
-                error<<"Failed to create Direct3D11 object. D3D11CreateDeviceN returned this error code: "<<std::endl<<(hr)<<std::endl;
-#endif
-
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                    error.str(), 
-                    "D3D11RenderSystem::D3D11RenderSystem" );
-            }
+					if (FAILED(hr))
+					{
+						std::string errorMsg = getCreationErrorMessage(hr, isDebug);
+						OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+							errorMsg,
+							"D3D11RenderSystem::D3D11RenderSystem");
+					}
+				}
+			}
 
             SAFE_RELEASE(pSelectedAdapter);
 
@@ -4006,7 +4057,7 @@ bail:
 #endif
         if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() && OGRE_DEBUG_MODE)
         {
-            deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+				deviceFlags |= mIsWorkingUnderNsight ? 0 : D3D11_CREATE_DEVICE_DEBUG;
         }
 #if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
         if (!OGRE_THREAD_SUPPORT)
@@ -4017,20 +4068,33 @@ bail:
         ID3D11DeviceN * device;
 
         hr = D3D11CreateDeviceN(NULL, D3D_DRIVER_TYPE_HARDWARE ,0,deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0 , 0);
+	
+		bool isDebug = (deviceFlags & D3D11_CREATE_DEVICE_DEBUG) == D3D11_CREATE_DEVICE_DEBUG;
+		if (FAILED(hr))
+		{
+			std::string errorMsg = getCreationErrorMessage(hr,isDebug);
+			if (!isDebug)
+			{
+				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+					errorMsg, 
+					"D3D11RenderSystem::D3D11RenderSystem" );
+			}
+			else
+			{
+				Ogre::LogManager::getSingleton().logMessage(errorMsg);
+				Ogre::LogManager::getSingleton().logMessage("Trying to create a standard layer Direct3D11 object");
 
+				deviceFlags &= ~D3D11_CREATE_DEVICE_DEBUG;
+				hr = D3D11CreateDeviceN(NULL, D3D_DRIVER_TYPE_HARDWARE ,0,deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0 , 0);
         if(FAILED(hr))
         {
-            StringStream error;
-#ifdef USE_DXERR_LIBRARY
-            error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
-#else
-            error<<"Failed to create Direct3D11 object."<<std::endl<<std::hex<<hr<<std::endl;
-#endif
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                "Failed to create Direct3D11 object", 
-                "D3D11RenderSystem::D3D11RenderSystem" );
-        }
-
+					std::string errorMsg = getCreationErrorMessage(hr,isDebug);
+					OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+						errorMsg, 
+						"D3D11RenderSystem::D3D11RenderSystem" );
+				}
+			}
+		}
         mDevice = D3D11Device(device) ;
 
 
