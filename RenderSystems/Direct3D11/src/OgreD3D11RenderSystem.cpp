@@ -2516,9 +2516,9 @@ bail:
                         FilterMips[n],false );
                     stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
                     stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-                    stage.samplerDesc.MinLOD = 0;
-                    stage.samplerDesc.MipLODBias = 0.f;
-                    stage.currentSamplerDesc = stage.samplerDesc;
+					stage.samplerDesc.MipLODBias = Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99);
+					stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
+					
 
                     HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState) ;
                     if (FAILED(hr))
