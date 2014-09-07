@@ -2084,9 +2084,9 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
-        mRasterizerDesc.DepthBiasClamp = constantBias;
-        mRasterizerDesc.SlopeScaledDepthBias = slopeScaleBias;
-
+		const float nearFarFactor = 10.0; 
+		mRasterizerDesc.DepthBias = -constantBias * nearFarFactor;
+		mRasterizerDesc.SlopeScaledDepthBias = -slopeScaleBias;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, 
