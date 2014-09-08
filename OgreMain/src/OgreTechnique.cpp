@@ -1252,6 +1252,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Technique::clearIlluminationPasses(void)
     {
+        MaterialManager::getSingleton()._notifyBeforeIlluminationPassesCleared(this);
         IlluminationPassList::iterator i, iend;
         iend = mIlluminationPasses.end();
         for (i = mIlluminationPasses.begin(); i != iend; ++i)
@@ -1269,12 +1270,15 @@ namespace Ogre {
     Technique::getIlluminationPassIterator(void)
     {
         IlluminationPassesState targetState = IPS_COMPILED;
-        if (mIlluminationPassesCompilationPhase != targetState)
+        if(mIlluminationPassesCompilationPhase != targetState
+        && mIlluminationPassesCompilationPhase != IPS_COMPILE_DISABLED)
         {
             // prevents parent->_notifyNeedsRecompile() call during compile
             mIlluminationPassesCompilationPhase = IPS_COMPILE_DISABLED;
             // Splitting the passes into illumination passes
             _compileIlluminationPasses();
+            // Post notification, so that technique owner can post-process created passes
+            MaterialManager::getSingleton()._notifyAfterIlluminationPassesCreated(this);
             // Mark that illumination passes compilation finished
             mIlluminationPassesCompilationPhase = targetState;
         }

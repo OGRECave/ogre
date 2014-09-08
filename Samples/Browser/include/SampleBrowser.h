@@ -198,6 +198,28 @@ public:
 		return generatedTech;
 	}
 
+	virtual bool afterIlluminationPassesCreated(Ogre::Technique* tech)
+	{
+		if(tech->getSchemeName() == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+		{
+			Ogre::Material* mat = tech->getParent();
+			mShaderGenerator->validateMaterialIlluminationPasses(tech->getSchemeName(), mat->getName(), mat->getGroup());
+			return true;
+		}
+		return false;
+	}
+
+	virtual bool beforeIlluminationPassesCleared(Ogre::Technique* tech)
+	{
+		if(tech->getSchemeName() == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+		{
+			Ogre::Material* mat = tech->getParent();
+			mShaderGenerator->invalidateMaterialIlluminationPasses(tech->getSchemeName(), mat->getName(), mat->getGroup());
+			return true;
+		}
+		return false;
+	}
+
 protected:	
 	Ogre::RTShader::ShaderGenerator*	mShaderGenerator;			// The shader generator instance.		
 };

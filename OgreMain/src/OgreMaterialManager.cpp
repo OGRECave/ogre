@@ -307,4 +307,62 @@ namespace Ogre {
 
 	}
 
+	void MaterialManager::_notifyAfterIlluminationPassesCreated(Technique* tech)
+	{
+		// First, check the scheme specific listeners
+		ListenerMap::iterator it = mListenerMap.find(mActiveSchemeName);
+		if(it != mListenerMap.end())
+		{
+			ListenerList& listenerList = it->second;
+			for(ListenerList::iterator i = listenerList.begin(); i != listenerList.end(); ++i)
+			{
+				bool handled = (*i)->afterIlluminationPassesCreated(tech);
+				if(handled)
+					return;
+			}
+		}
+
+		//If no success, check generic listeners
+		it = mListenerMap.find(StringUtil::BLANK);
+		if(it != mListenerMap.end())
+		{
+			ListenerList& listenerList = it->second;
+			for(ListenerList::iterator i = listenerList.begin(); i != listenerList.end(); ++i)
+			{
+				bool handled = (*i)->afterIlluminationPassesCreated(tech);
+				if(handled)
+					return;
+			}
+		}
+	}
+
+	void MaterialManager::_notifyBeforeIlluminationPassesCleared(Technique* tech)
+	{
+		// First, check the scheme specific listeners
+		ListenerMap::iterator it = mListenerMap.find(mActiveSchemeName);
+		if(it != mListenerMap.end())
+		{
+			ListenerList& listenerList = it->second;
+			for(ListenerList::iterator i = listenerList.begin(); i != listenerList.end(); ++i)
+			{
+				bool handled = (*i)->beforeIlluminationPassesCleared(tech);
+				if(handled)
+					return;
+			}
+		}
+
+		//If no success, check generic listeners
+		it = mListenerMap.find(StringUtil::BLANK);
+		if(it != mListenerMap.end())
+		{
+			ListenerList& listenerList = it->second;
+			for(ListenerList::iterator i = listenerList.begin(); i != listenerList.end(); ++i)
+			{
+				bool handled = (*i)->beforeIlluminationPassesCleared(tech);
+				if(handled)
+					return;
+			}
+		}
+	}
+
 }
