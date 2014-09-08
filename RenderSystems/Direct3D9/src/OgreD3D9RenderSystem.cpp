@@ -221,6 +221,7 @@ namespace Ogre
         ConfigOption optMultihead;
         ConfigOption optVSync;
         ConfigOption optVSyncInterval;
+		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
         ConfigOption optNVPerfHUD;
@@ -297,6 +298,13 @@ namespace Ogre
         optVSyncInterval.possibleValues.push_back( "4" );
         optVSyncInterval.currentValue = "1";
 
+		optBackBufferCount.name = "Backbuffer Count";
+		optBackBufferCount.immutable = false;
+		optBackBufferCount.possibleValues.push_back( "Auto" );
+		optBackBufferCount.possibleValues.push_back( "1" );
+		optBackBufferCount.possibleValues.push_back( "2" );
+		optBackBufferCount.currentValue = "Auto";
+
         optAA.name = "FSAA";
         optAA.immutable = false;
         optAA.possibleValues.push_back( "None" );
@@ -357,6 +365,7 @@ namespace Ogre
         mOptions[optMultihead.name] = optMultihead;
         mOptions[optVSync.name] = optVSync;
         mOptions[optVSyncInterval.name] = optVSyncInterval;
+		mOptions[optBackBufferCount.name] = optBackBufferCount;
         mOptions[optAA.name] = optAA;
         mOptions[optFPUMode.name] = optFPUMode;
         mOptions[optNVPerfHUD.name] = optNVPerfHUD;
@@ -502,6 +511,18 @@ namespace Ogre
                 mFSAAHint = values[1];
 
         }
+		
+		if (name == "Backbuffer Count")
+		{
+			if (value == "Auto")
+			{
+				mBackBufferCount = -1;
+			}
+			else
+			{
+				mBackBufferCount = StringConverter::parseUnsignedInt(value);
+			}
+		}
 
         if( name == "Allow NVPerfHUD" )
         {
@@ -733,7 +754,8 @@ namespace Ogre
             miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
             miscParams["gamma"] = StringConverter::toString(hwGamma);
             miscParams["monitorIndex"] = StringConverter::toString(static_cast<int>(mActiveD3DDriver->getAdapterNumber()));
-
+			miscParams["Backbuffer Count"] = StringConverter::toString(mBackBufferCount);
+			
             opt = mOptions.find("VSync");
             if (opt == mOptions.end())
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "D3D9RenderSystem::initialise");
