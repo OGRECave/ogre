@@ -421,6 +421,9 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
             }
             break;
         case CompositionPass::PT_RENDERCUSTOM:
+		
+			finalState.currentQueueGroupID = pass->getFirstRenderQueue();
+		
             RenderSystemOperation* customOperation = CompositorManager::getSingleton().
                 getCustomCompositionPass(pass->getCustomType())->createOperation(this, pass);
             queueRenderSystemOp(finalState, customOperation);
