@@ -1145,7 +1145,7 @@ namespace Ogre
             *static_cast<HardwarePixelBuffer**>(pData) = mBuffer;
             return;
         }
-        else if(name == "HWND")
+		else if(name == "HWND" || name == "WINDOW")
         {
             HWND *pHwnd = (HWND*)pData;
             *pHwnd = NULL;
