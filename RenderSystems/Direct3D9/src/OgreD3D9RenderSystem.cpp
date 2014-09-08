@@ -4288,6 +4288,11 @@ namespace Ogre
     }
 
     //---------------------------------------------------------------------
+	bool D3D9RenderSystem::IsActiveDeviceLost() 
+	{
+		return D3D9RenderSystem::getDeviceManager()->getActiveDevice()->isDeviceLost();
+	}
+
     unsigned int D3D9RenderSystem::getDisplayMonitorCount() const
     {
         return mD3D->GetAdapterCount();

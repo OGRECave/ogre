@@ -355,7 +355,9 @@ namespace Ogre
         Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
         */
         virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
-        
+
+		bool IsActiveDeviceLost();
+
         /// Tells whether the system is initialized with DirectX 9Ex driver
         /// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
         static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
