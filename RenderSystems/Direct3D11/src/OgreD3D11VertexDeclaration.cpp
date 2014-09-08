@@ -142,19 +142,6 @@ namespace Ogre {
 
                 if(!found)
                 {
-                    // find by pos
-                    i = mElementList.begin();
-                    for (unsigned int count = 0; count < idx && i != iend; count++, ++i)
-                    {
-                    }
-                    if (i != iend)
-                    {
-                        found = true;
-                    }
-                }
-
-                if(!found)
-                {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D11 vertex declaration" , 
                                                 "D3D11VertexDeclaration::getILayoutByShader");
                 }
