@@ -280,4 +280,18 @@ namespace Ogre
     }
 
     //---------------------------------------------------------------------
+
+	D3D11Device::ThreadInfo::ThreadInfo(ID3D11DeviceContextN* context)
+		: mContext(context)
+		, mEventHandle(0)
+	{
+		mEventHandle = CreateEventEx(0, TEXT("ThreadContextEvent"), 0, EVENT_ALL_ACCESS);
+	}
+    //---------------------------------------------------------------------
+	D3D11Device::ThreadInfo::~ThreadInfo()
+	{
+		SAFE_RELEASE(mContext);
+
+		CloseHandle(mEventHandle);
+	}
 }

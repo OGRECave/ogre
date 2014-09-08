@@ -48,19 +48,9 @@ namespace Ogre
             ID3D11DeviceContextN* mContext;
             void* mEventHandle;
 
-            ThreadInfo(ID3D11DeviceContextN* context)
-                : mContext(context)
-                , mEventHandle(0)
-            {
-                mEventHandle = CreateEventEx(0, TEXT("ThreadContextEvent"), 0, EVENT_ALL_ACCESS);
-            }
-
-            ~ThreadInfo()
-            {
-                SAFE_RELEASE(mContext);
-
-                CloseHandle(mEventHandle);
-            }
+			ThreadInfo(ID3D11DeviceContextN* context);
+			~ThreadInfo();
+            
         };
 
         D3D11Device();
