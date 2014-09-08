@@ -43,6 +43,8 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreShaderExTextureAtlasSampler.h"
 #include "OgreShaderExTriplanarTexturing.h"
+#include "OgreRoot.h"
+#include "OgreException.h"
 
 namespace Ogre {
 
@@ -170,6 +172,12 @@ bool ShaderGenerator::_initialize()
 
     // Create the default scheme.
     createScheme(DEFAULT_SCHEME_NAME);
+	
+	if (Ogre::Root::getSingleton().getRenderSystem()->getName().find("Direct3D11") != String::npos)
+	{
+		this->setTargetLanguage("hlsl",4.0);
+	}
+	
 
     return true;
 }
@@ -1337,6 +1345,15 @@ size_t ShaderGenerator::getFragmentShaderCount() const
 //-----------------------------------------------------------------------------
 void ShaderGenerator::setTargetLanguage(const String& shaderLanguage,const float version)
 {
+	
+	if (Ogre::Root::getSingleton().getRenderSystem()->getName().find("Direct3D11") != String::npos)
+	{
+		if (shaderLanguage != "hlsl" || version < 4.0)
+			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+			"Direct3D11 supports hlsl 4.0 and above'",
+			"ShaderGenerator::setTargetLanguage");
+	}
+	
     // Make sure that the shader language is supported.
     if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(shaderLanguage) == false)
     {
