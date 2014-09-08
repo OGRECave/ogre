@@ -503,6 +503,19 @@ namespace Ogre
             else mMultiheadUse = mutAuto;
         }
 
+		if (name == "VSync Interval")
+		{
+			mVSyncInterval = StringConverter::parseUnsignedInt(value);
+		}
+
+		if( name == "VSync" )
+		{
+			if (value == "Yes")
+				mVSync = true;
+			else
+				mVSync = false;
+		}
+		
         if( name == "FSAA" )
         {
             StringVector values = StringUtil::split(value, " ", 1);
@@ -645,6 +658,12 @@ namespace Ogre
                 "the 'Rendering Device' has been changed.";
         }
 
+		it = mOptions.find( "VSync" );
+		if( it->second.currentValue == "Yes" )
+			mVSync = true;
+		else
+			mVSync = false;
+
         return BLANKSTRING;
     }
     //---------------------------------------------------------------------
@@ -751,6 +770,9 @@ namespace Ogre
             miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
             miscParams["FSAA"] = StringConverter::toString(mFSAASamples);
             miscParams["FSAAHint"] = mFSAAHint;
+			miscParams["vsync"] = StringConverter::toString(mVSync);
+			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
+
             miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
             miscParams["gamma"] = StringConverter::toString(hwGamma);
             miscParams["monitorIndex"] = StringConverter::toString(static_cast<int>(mActiveD3DDriver->getAdapterNumber()));
