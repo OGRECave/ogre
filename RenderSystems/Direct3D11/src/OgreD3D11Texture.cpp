@@ -307,7 +307,10 @@ namespace Ogre
                     mTextureType = TEX_TYPE_2D_ARRAY;
                 else
                     mTextureType = TEX_TYPE_2D;
-
+				
+				//TODO: move this line to a proper place.
+				_setSrcAttributes(desc.Width, desc.Height, 1, mFormat);
+				
                 _create2DResourceView();
             }
             break;
