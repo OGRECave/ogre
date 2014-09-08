@@ -63,6 +63,7 @@ THE SOFTWARE.
 #include "OgreRectangle2D.h"
 #include "OgreLodListener.h"
 #include "OgreInstancedGeometry.h"
+#include "OgreUnifiedHighLevelGpuProgram.h"
 
 // This class implements the most basic scene manager
 
@@ -1589,6 +1590,10 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
+	if (sys->getName().find("Direct3D11") != String::npos)
+	{
+		UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
+	}
 
 }
 
