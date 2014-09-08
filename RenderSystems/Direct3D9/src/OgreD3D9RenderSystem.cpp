@@ -93,6 +93,15 @@ namespace Ogre
         mDeviceManager = NULL;  
         mPerStageConstantSupport = false;
 
+		for(int i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
+		{
+			for(int j = 0 ; j < 2 ; j++)
+			{
+				mManualBlendColours[i][j] = ColourValue::ZERO;
+			}
+
+		}
+
         // Create the resource manager.
         mResourceManager = OGRE_NEW D3D9ResourceManager();
 
