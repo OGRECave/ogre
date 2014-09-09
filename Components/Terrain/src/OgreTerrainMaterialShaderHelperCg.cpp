@@ -94,8 +94,9 @@ namespace Ogre
 		bool compression = terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP;
 		if (compression)
 		{
+			const char* idx2 = prof->_isSM4Available() ? "int2" : "float2";
 			outStream << 
-				"float2 posIndex : POSITION,\n"
+				idx2 << " posIndex : POSITION,\n"
 				"float height  : TEXCOORD0,\n";
 		}
 		else

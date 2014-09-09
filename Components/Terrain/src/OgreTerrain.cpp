@@ -77,7 +77,7 @@ namespace Ogre
 	// since 129^2 is the greatest power we can address in 16-bit index
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
 	const uint16 Terrain::WORKQUEUE_DERIVED_DATA_REQUEST = 1;
-	const uint64 Terrain::TERRAIN_GENERATE_MATERIAL_INTERVAL_MS = 400;
+	const uint64 Terrain::TERRAIN_GENERATE_MATERIAL_INTERVAL_MS = 100;
 	const uint16 Terrain::WORKQUEUE_GENERATE_MATERIAL_REQUEST = 2;
 	const size_t Terrain::LOD_MORPH_CUSTOM_PARAM = 1001;
 	const uint8 Terrain::DERIVED_DATA_DELTAS = 1;
