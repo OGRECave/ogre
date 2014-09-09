@@ -1187,7 +1187,7 @@ namespace Ogre {
     void D3D11HLSLProgram::createLowLevelImpl(void)
     {
         // Create a low-level program, give it the same name as us
-        mAssemblerProgram =GpuProgramPtr(dynamic_cast<GpuProgram*>(this));
+        mAssemblerProgram = GpuProgramPtr(dynamic_cast<GpuProgram*>(this), SPFM_NONE);
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::unloadHighLevelImpl(void)
@@ -1475,12 +1475,6 @@ namespace Ogre {
     {
         //SAFE_RELEASE(mConstantBuffer);
 		mBufferInfoMap.clear();
-        // this is a hack - to solve that problem that we are the mAssemblerProgram of ourselves
-        if ( !mAssemblerProgram.isNull() )
-        {
-            mAssemblerProgram.setUseCount(0);
-            mAssemblerProgram.setNull();
-        }
 
         // have to call this here reather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
