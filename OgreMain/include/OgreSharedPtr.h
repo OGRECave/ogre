@@ -47,7 +47,9 @@ namespace Ogre {
 		/// Use OGRE_DELETE_T to free (only MEMCATEGORY_GENERAL supported)
 		SPFM_DELETE_T,
 		/// Use OGRE_FREE to free (only MEMCATEGORY_GENERAL supported)
-		SPFM_FREE
+		SPFM_FREE,
+		/// Don`t free resource at all, lifetime controlled externally.
+		SPFM_NONE
 	};
 
     struct SharedPtrInfo {
@@ -59,6 +61,10 @@ namespace Ogre {
 
         AtomicScalar<unsigned>  useCount;
     };
+
+	struct SharedPtrInfoNone : public SharedPtrInfo
+	{
+	};
 
 	template <class T>
 	class SharedPtrInfoDelete : public SharedPtrInfo
@@ -146,6 +152,7 @@ namespace Ogre {
                 case SPFM_DELETE:   return OGRE_NEW_T(SharedPtrInfoDelete<T>,  MEMCATEGORY_GENERAL) (rep);
                 case SPFM_DELETE_T: return OGRE_NEW_T(SharedPtrInfoDeleteT<T>, MEMCATEGORY_GENERAL) (rep);
                 case SPFM_FREE:     return OGRE_NEW_T(SharedPtrInfoFree<T>,    MEMCATEGORY_GENERAL) (rep);
+                case SPFM_NONE:     return OGRE_NEW_T(SharedPtrInfoNone,       MEMCATEGORY_GENERAL) ();
             }
             assert(!"Bad method");
             return 0;
@@ -174,11 +181,11 @@ namespace Ogre {
 		}
 
 		SharedPtr& operator=(const SharedPtr& r) {
-			if (pRep == r.pRep)
-            {
-                assert(pInfo == r.pInfo);
+			// One resource could have several non-controlling control blocks but only one controlling.
+			assert(pRep != r.pRep || pInfo == r.pInfo || dynamic_cast<SharedPtrInfoNone*>(pInfo) || dynamic_cast<SharedPtrInfoNone*>(r.pInfo));
+			if(pInfo == r.pInfo)
 				return *this;
-            }
+
 			// Swap current data into a local copy
 			// this ensures we deal with rhs and this being dependent
 			SharedPtr<T> tmp(r);
@@ -216,8 +223,11 @@ namespace Ogre {
 #endif
         SharedPtr& operator=(const SharedPtr<Y>& r)
         {
-			if (pRep == r.pRep)
+			// One resource could have several non-controlling control blocks but only one controlling.
+			assert(pRep != r.pRep || pInfo == r.pInfo|| dynamic_cast<SharedPtrInfoNone*>(pInfo) || dynamic_cast<SharedPtrInfoNone*>(r.pInfo));
+			if(pInfo == r.pInfo)
 				return *this;
+
 			// Swap current data into a local copy
 			// this ensures we deal with rhs and this being dependent
 			SharedPtr<T> tmp(r);
@@ -242,8 +252,8 @@ namespace Ogre {
         template<typename Y>
         inline SharedPtr<Y> dynamicCast() const
         {
-            if(pRep) {
-                Y* rep = dynamic_cast<Y*>(pRep);
+            Y* rep = dynamic_cast<Y*>(pRep);
+            if(rep) {
                 ++pInfo->useCount;
 				return SharedPtr<Y>(rep, pInfo);
             } else return SharedPtr<Y>();
