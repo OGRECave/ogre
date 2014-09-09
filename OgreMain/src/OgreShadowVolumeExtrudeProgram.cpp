@@ -662,6 +662,28 @@ namespace Ogre {
 	String ShadowVolumeExtrudeProgram::frgProgramName = "";
 
 	bool ShadowVolumeExtrudeProgram::mInitialised = false;
+
+	//---------------------------------------------------------------------
+	// programs for Ogre/StencilShadowModulationPass material
+	//---------------------------------------------------------------------
+	const String gShadowModulativePassVs_Name = "Ogre/StencilShadowModulationPassVs";
+	const String gShadowModulativePassPs_Name = "Ogre/StencilShadowModulationPassPs";
+
+	const String gShadowModulativePassVs_4_0 =
+		"float4x4	worldviewproj_matrix;\n"
+		"void vs_main(in float4 iPos : POSITION, out float4 oPos : SV_Position)\n"
+		"{\n"
+		"    oPos = mul(worldviewproj_matrix, iPos);\n"
+		"}\n";
+
+	const String gShadowModulativePassPs_4_0 =
+		"float4 ambient_light_colour;\n"
+		"void fs_main(in float4 oPos : SV_Position, out float4 oColor : SV_Target)\n"
+		"{\n"
+		"    oColor = ambient_light_colour;\n"
+//		"    oColor = float4(0.75, 0.75, 0.75, 1);\n"
+		"}\n";
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     void ShadowVolumeExtrudeProgram::initialise(void)
@@ -813,6 +835,33 @@ namespace Ogre {
 					}
 				}
 			}
+			// Create programs for Ogre/StencilShadowModulationPass material
+			if(GpuProgramManager::getSingleton().getByName(gShadowModulativePassVs_Name).isNull())
+			{
+				if(syntax == "vs_4_0")
+				{
+					HighLevelGpuProgramPtr vp = HighLevelGpuProgramManager::getSingleton().createProgram(
+						gShadowModulativePassVs_Name, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+						"hlsl", GPT_VERTEX_PROGRAM);
+					vp->setSource(gShadowModulativePassVs_4_0);
+					vp->setParameter("target", "vs_4_0_level_9_1");	// shared subset, to be usable from microcode cache on all devices
+					vp->setParameter("entry_point", "vs_main");
+					vp->load();
+
+					HighLevelGpuProgramPtr fp = HighLevelGpuProgramManager::getSingleton().createProgram(
+						gShadowModulativePassPs_Name, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+						"hlsl", GPT_FRAGMENT_PROGRAM);
+					fp->setSource(gShadowModulativePassPs_4_0);
+					fp->setParameter("target", "ps_4_0_level_9_1"); // shared subset, to be usable from microcode cache on all devices
+					fp->setParameter("entry_point", "fs_main");
+					fp->load();
+				}
+				else if(syntax == "glsles")
+				{
+					// TODO: create programs for GLES2
+				}
+			}
+
 			mInitialised = true;
 		}
     }

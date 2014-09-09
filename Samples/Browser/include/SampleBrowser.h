@@ -1361,7 +1361,7 @@ protected:
 			    mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, 
 					"BaseWhiteNoLighting");
 				Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-                if(baseWhite->getNumTechniques() > 1)
+                if(baseWhiteNoLighting->getNumTechniques() > 1)
                 {
 				    baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
 				    baseWhiteNoLighting->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
