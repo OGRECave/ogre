@@ -4798,7 +4798,7 @@ void SceneManager::initShadowVolumeMaterials(void)
 
                     matModStencil->compile();
                 }
-                catch(Exception& ex)
+                catch(Exception&)
                 {
                     // TODO: implement programs for GLES2 and remove this try/catch block
                 }

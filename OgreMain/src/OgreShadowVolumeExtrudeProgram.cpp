@@ -681,7 +681,6 @@ namespace Ogre {
 		"void fs_main(in float4 oPos : SV_Position, out float4 oColor : SV_Target)\n"
 		"{\n"
 		"    oColor = ambient_light_colour;\n"
-//		"    oColor = float4(0.75, 0.75, 0.75, 1);\n"
 		"}\n";
 
     //---------------------------------------------------------------------
