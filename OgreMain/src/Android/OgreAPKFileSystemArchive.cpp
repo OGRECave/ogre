@@ -137,7 +137,7 @@ namespace Ogre{
 		return files;
 	}
 
-	FileInfoListPtr APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs) const
+	FileInfoListPtr APKFileSystemArchive::findFileInfo(const String& pattern, bool recursive, bool dirs)
 	{
 		FileInfoListPtr files(new FileInfoList);
 		std::map<String, std::vector< String > >::iterator iter = mFiles.find( mName );
