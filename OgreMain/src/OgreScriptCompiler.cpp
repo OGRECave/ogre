@@ -1283,6 +1283,23 @@ namespace Ogre
 #endif
 
         mIds["subroutine"] = ID_SUBROUTINE;
+
+		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
+	}
+
+	uint32 ScriptCompiler::registerCustomWordId(const String &word)
+	{
+		// if the word is already registered, just return the right id
+		IdMap::iterator iter = mIds.find(word);
+		if(iter != mIds.end())
+			return iter->second;
+
+		// As there are no other function changing mIds than registerCustomWordId and initWordMap,
+		// we know that mLargestRegisteredWordId is the largest word id and therefore mLargestRegisteredWordId+1
+		// wasn't used yet.
+		mLargestRegisteredWordId++;
+		mIds[word] = mLargestRegisteredWordId;
+		return mLargestRegisteredWordId;
     }
 
     // AbstractTreeeBuilder
@@ -1642,6 +1659,11 @@ namespace Ogre
             }
         }
         return translator;
+	}
+	//-----------------------------------------------------------------------
+	uint32 ScriptCompilerManager::registerCustomWordId(const String &word)
+	{
+		return OGRE_THREAD_POINTER_GET(mScriptCompiler)->registerCustomWordId(word);
     }
     //-----------------------------------------------------------------------
     void ScriptCompilerManager::addScriptPattern(const String &pattern)

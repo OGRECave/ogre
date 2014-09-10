@@ -806,7 +806,19 @@ namespace Ogre
         }
 
         // Choose closest supported D3D format as a D3D format
-        return D3D11Mappings::_getPF(D3D11Mappings::_getClosestSupportedPF(mFormat));
+        DXGI_FORMAT dxFmt = D3D11Mappings::_getPF( D3D11Mappings::_getClosestSupportedPF( mFormat ) );
+        if ( isHardwareGammaEnabled() )
+        {
+            switch ( dxFmt )
+            {
+                case DXGI_FORMAT_R8G8B8A8_UNORM:  dxFmt = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; break;
+                case DXGI_FORMAT_BC1_UNORM:       dxFmt = DXGI_FORMAT_BC1_UNORM_SRGB; break;
+                case DXGI_FORMAT_BC2_UNORM:       dxFmt = DXGI_FORMAT_BC2_UNORM_SRGB; break;
+                case DXGI_FORMAT_BC3_UNORM:       dxFmt = DXGI_FORMAT_BC3_UNORM_SRGB; break;
+                case DXGI_FORMAT_BC7_UNORM:       dxFmt = DXGI_FORMAT_BC7_UNORM_SRGB; break;
+            }
+        }
+        return dxFmt;
 
     }
     //---------------------------------------------------------------------

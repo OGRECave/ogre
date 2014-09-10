@@ -103,6 +103,14 @@ static void *get_proc(const char *proc)
     CFRelease(procname);
     return res;
 }
+#elif defined(__EMSCRIPTEN__)
+#include <EGL/egl.h>
+static void open_libgl() {}
+static void close_libgl() {}
+static void *get_proc(const char *proc)
+{
+    return (void*)eglGetProcAddress(proc);
+}
 #else
 #include <dlfcn.h>
 #include <EGL/egl.h>

@@ -25,34 +25,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __AndroidResource_H__
-#define __AndroidResource_H__
+#include "OgreTimer.h"
+#include <emscripten/emscripten.h>
+#include <ctime>
 
-#include "OgreGLES2Prerequisites.h"
+using namespace Ogre;
 
-namespace Ogre {
-
-    class AndroidEGLContext;
-    
-    /** Represents a Android rendering resource.
-    Provide unified interface to
-    handle various device states.
-    */
-    class _OgrePrivate AndroidResource
-    {
-
-    // Interface.
-    public:
-
-        // Called immediately after the Android context has entered a lost state.
-        virtual void notifyOnContextLost() {}
-
-        // Called immediately after the Android context has been reset.
-        virtual void notifyOnContextReset() {}
-
-    public:
-        AndroidResource();
-        virtual ~AndroidResource();
-    };
+//--------------------------------------------------------------------------------//
+Timer::Timer()
+{
+    reset();
 }
-#endif
+
+//--------------------------------------------------------------------------------//
+Timer::~Timer()
+{
+}
+
+//--------------------------------------------------------------------------------//
+void Timer::reset()
+{
+    zeroClock = clock();
+    start = emscripten_get_now();
+}
+
+//--------------------------------------------------------------------------------//
+unsigned long Timer::getMilliseconds()
+{
+    return emscripten_get_now() - start;
+}
+
+//--------------------------------------------------------------------------------//
+unsigned long Timer::getMicroseconds()
+{
+    return (emscripten_get_now() - start) * 1000.0;
+}
+
+//-- Common Across All Timers ----------------------------------------------------//
+unsigned long Timer::getMillisecondsCPU()
+{
+    clock_t newClock = clock();
+    return (unsigned long)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000.0)) ;
+}
+
+//-- Common Across All Timers ----------------------------------------------------//
+unsigned long Timer::getMicrosecondsCPU()
+{
+    clock_t newClock = clock();
+    return (unsigned long)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000000.0)) ;
+}

@@ -258,11 +258,13 @@ namespace Ogre
 		mDevice->SetRenderTarget(0, mStereoBuffer);
 
 		// Update the quad buffer with the right render target
+		D3DSURFACE_DESC rightBufferDesc;
+		mRightBuffer->GetDesc(&rightBufferDesc);
 		D3DVIEWPORT9 viewPort;
 		viewPort.X = 0;
 		viewPort.Y = mLineOffset;
-		viewPort.Width = mRightBuffer->Width;
-		viewPort.Height = mRightBuffer->Height;
+		viewPort.Width = rightBufferDesc.Width;
+		viewPort.Height = rightBufferDesc.Height;
 		viewPort.MinZ = 0;
 		viewPort.MaxZ = 1;
 		mDevice->SetViewport(&viewPort);

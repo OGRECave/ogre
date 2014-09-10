@@ -59,6 +59,8 @@ namespace Ogre {
             {
                 return mTextureID;
             }
+            
+            void getCustomAttribute(const String& name, void* pData);
 
         protected:
             /// @copydoc Texture::createInternalResourcesImpl
@@ -91,7 +93,7 @@ namespace Ogre {
             /// Create gl texture
             void _createGLTexResource();
         
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             /** See AndroidResource. */
             virtual void notifyOnContextLost();
         

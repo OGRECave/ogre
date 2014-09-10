@@ -706,6 +706,10 @@ namespace Ogre
     {
         ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
         DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        if ( isHardwareGammaEnabled() )
+        {
+            format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        }
         mSwapChainDesc.BufferDesc.Width     = mWidth;
         mSwapChainDesc.BufferDesc.Height    = mHeight;
         mSwapChainDesc.BufferDesc.Format    = format;

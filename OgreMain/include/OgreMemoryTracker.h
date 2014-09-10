@@ -183,6 +183,9 @@ namespace Ogre
         ~MemoryTracker()
         {
             reportLeaks();
+
+            // Disable recording so we don't try to record our own deallocation.
+            mRecordEnable = false;
         }
 
         /// Static utility method to get the memory tracker instance

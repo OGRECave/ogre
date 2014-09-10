@@ -173,7 +173,7 @@ namespace Ogre
         MultiheadUseType mMultiheadUse;
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		D3D9StereoDriverBridge* mStereoDriver;
+        D3D9StereoDriverBridge* mStereoDriver;
 #endif
 
     protected:
@@ -398,10 +398,13 @@ namespace Ogre
 
         /// Returns how multihead should be activated
         MultiheadUseType getMultiheadUse() const { return mMultiheadUse; }
-		
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		/// @copydoc RenderSystem::setDrawBuffer
-		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+        /// @copydoc RenderSystem::setDrawBuffer
+        virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+
+        /// Creates a bridge to the Direct3D stereo driver implementation
+        void createStereoDriver(const NameValuePairList* miscParams);
 #endif
 
     protected:  

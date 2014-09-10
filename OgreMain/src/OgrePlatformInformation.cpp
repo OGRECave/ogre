@@ -121,7 +121,7 @@ namespace Ogre {
             // Return values in eax, no return statement requirement here for VC.
         }
     #endif
-#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
            return true;
        #else
@@ -175,7 +175,7 @@ namespace Ogre {
             // Return values in eax, no return statement requirement here for VC.
         }
     #endif
-#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
         __asm__
         (
@@ -249,7 +249,7 @@ namespace Ogre {
             return false;
         }
     #endif
-#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 
             return true;
         #else
@@ -421,10 +421,11 @@ namespace Ogre {
                 memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
                 //*((int*)CPUString) = result._ebx;
-                                memcpy(CPUString, &result._ebx, sizeof(int));
                 //*((int*)(CPUString+4)) = result._edx;
-                                //*((int*)(CPUString+8)) = result._ecx;
-                                memcpy(CPUString+8, &result._ecx, sizeof(int));
+                //*((int*)(CPUString+8)) = result._ecx;
+                memcpy(CPUString, &result._ebx, sizeof(int));
+                memcpy(CPUString+4, &result._edx, sizeof(int));
+                memcpy(CPUString+8, &result._ecx, sizeof(int));
 
                 detailedIdentStr << CPUString;
 

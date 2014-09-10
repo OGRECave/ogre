@@ -1334,7 +1334,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const
     {
-        def.arraySize = d3dDesc.Elements + 1;
+        def.arraySize = std::max<unsigned int>(d3dDesc.Elements, 1);
         switch(d3dDesc.Type)
         {
         case D3D10_SVT_INT:

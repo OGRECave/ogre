@@ -46,7 +46,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
 #endif
 {
-    new Ogre::LogManager();
+    Ogre::LogManager* logMgr = new Ogre::LogManager();
 
     m_pLog = Ogre::LogManager::getSingleton().createLog("OgreLogfile.log", true, true, false);
     m_pLog->setDebugOutputEnabled(true);
@@ -69,7 +69,10 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     
     m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
     m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
-    
+
+    m_pOverlaySystem = new Ogre::OverlaySystem();
+    m_pSceneMgr->addRenderQueueListener(m_pOverlaySystem);
+
     m_pCamera = m_pSceneMgr->createCamera("Camera");
     m_pCamera->setPosition(Vector3(0, 60, 60));
     m_pCamera->lookAt(Vector3(0, 0, 0));
@@ -141,8 +144,11 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     
     m_pTimer = OGRE_NEW Ogre::Timer();
     m_pTimer->reset();
-    
-    m_pTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", m_pRenderWnd, m_pMouse, this);
+	
+    OgreBites::InputContext inputContext;
+    inputContext.mMouse = m_pMouse;
+    inputContext.mKeyboard = m_pKeyboard;
+    m_pTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", m_pRenderWnd, inputContext, this);
     m_pTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     m_pTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
     m_pTrayMgr->hideCursor();

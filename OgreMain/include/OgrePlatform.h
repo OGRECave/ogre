@@ -40,8 +40,8 @@ namespace Ogre {
 #define OGRE_PLATFORM_ANDROID 5
 #define OGRE_PLATFORM_NACL 6
 #define OGRE_PLATFORM_WINRT 7
-#define OGRE_PLATFORM_FLASHCC 8
-
+#define OGRE_PLATFORM_EMSCRIPTEN 8
+    
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
 #define OGRE_COMPILER_BORL 3
@@ -129,8 +129,8 @@ namespace Ogre {
 #   else
 #       define OGRE_PLATFORM OGRE_PLATFORM_WIN32
 #   endif
-#elif defined(__FLASHCC__)
-#   define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
+#elif defined(__EMSCRIPTEN__)
+#   define OGRE_PLATFORM OGRE_PLATFORM_EMSCRIPTEN
 #elif defined( __APPLE_CC__)
     // Device                                                     Simulator
     // Both requiring OS version 6.0 or greater
@@ -239,9 +239,9 @@ namespace Ogre {
 #endif // OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
 //----------------------------------------------------------------------------
-// Linux/Apple/iOS/Android/NaCl Settings
+// Linux/Apple/iOS/Android/NaCl/Emscripten Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
+    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
@@ -285,20 +285,6 @@ namespace Ogre {
 #       define CLOCKS_PER_SEC  1000
 #   endif
 #endif
-    
-//----------------------------------------------------------------------------
-// FlashCC Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
-#   ifdef OGRE_UNICODE_SUPPORT
-#       undef OGRE_UNICODE_SUPPORT
-#   endif
-#   define OGRE_UNICODE_SUPPORT 0
-#   ifdef DEBUG
-#       define OGRE_DEBUG_MODE 1
-#   else
-#       define OGRE_DEBUG_MODE 0
-#   endif
-#endif
 
 #ifndef __OGRE_HAVE_DIRECTXMATH
 #   define __OGRE_HAVE_DIRECTXMATH 0
@@ -318,24 +304,8 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 //  Locales are not supported by the C lib you have to go through JNI.
 #   define OGRE_DEFAULT_LOCALE ""
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   define OGRE_DEFAULT_LOCALE "C"
-#elif defined(__MINGW32__)
-#   define OGRE_DEFAULT_LOCALE "C"
 #else
-#   if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#       if _MSC_VER >= 1700
-#           define OGRE_DEFAULT_LOCALE "en-GB"
-#       else
-//          http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
-#           define OGRE_DEFAULT_LOCALE "uk"
-#       endif
-#   elif OGRE_COMPILER == OGRE_COMPILER_GCCE
-//      http://gcc.gnu.org/onlinedocs/libstdc++/manual/localization.html
-#       define OGRE_DEFAULT_LOCALE "en_GB.UTF8"
-#   else
-#       define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
-#   endif
+#   define OGRE_DEFAULT_LOCALE "C"
 #endif
 
 //----------------------------------------------------------------------------

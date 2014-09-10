@@ -637,7 +637,12 @@ bail:
 
             if ("No information queue exceptions" == infoQType)
             {
+#if OGRE_DEBUG_MODE
+                // a debug build should always enable the debug layer and report errors
+                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
+#else
                 D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_NO_EXCEPTION);
+#endif
             }
             else if ("Corruption" == infoQType)
             {
@@ -1887,9 +1892,6 @@ bail:
     void D3D11RenderSystem::_setTextureCoordCalculation( size_t stage, TexCoordCalcMethod m,
         const Frustum* frustum)
     {
-        // record the stage state
-        mTexStageDesc[stage].autoTexCoordType = m;
-        mTexStageDesc[stage].frustum = frustum;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
@@ -1918,10 +1920,6 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureBlendMode( size_t stage, const LayerBlendModeEx& bm )
     {
-        if (bm.blendType == LBT_COLOUR)
-        {
-            mTexStageDesc[stage].layerBlendMode = bm;
-        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op /*= SBO_ADD*/ )
@@ -3292,21 +3290,21 @@ bail:
             break;
         case GPT_HULL_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveTessellationHullGpuProgramParameters.setNull();
                 mBoundTessellationHullProgram = NULL;
                 mDevice.GetImmediateContext()->HSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_DOMAIN_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveTessellationDomainGpuProgramParameters.setNull();
                 mBoundTessellationDomainProgram = NULL;
                 mDevice.GetImmediateContext()->DSSetShader( NULL, NULL, 0 );
             }
             break;
         case GPT_COMPUTE_PROGRAM:
             {
-                mActiveGeometryGpuProgramParameters.setNull();
+                mActiveComputeGpuProgramParameters.setNull();
                 mBoundComputeProgram = NULL;
                 mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
             }
@@ -4033,7 +4031,6 @@ bail:
         // set stages desc. to defaults
         for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
         {
-            mTexStageDesc[n].autoTexCoordType = TEXCALC_NONE;
             mTexStageDesc[n].coordIndex = 0;
             mTexStageDesc[n].pTex = 0;
         }

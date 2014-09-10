@@ -120,6 +120,9 @@ namespace OgreBites
     public:
 
         SampleContext()
+#if (OGRE_THREAD_PROVIDER == 3) and (OGRE_NO_TBB_SCHEDULER == 1)
+            : mTaskScheduler(tbb::task_scheduler_init::deferred)
+#endif
         {
             mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
             mRoot = 0;
@@ -292,6 +295,10 @@ namespace OgreBites
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader.unload();
 #endif
+#endif
+#if (OGRE_THREAD_PROVIDER == 3) and (OGRE_NO_TBB_SCHEDULER == 1)
+            if (mTaskScheduler.is_active())
+                mTaskScheduler.terminate();
 #endif
         }
 
@@ -602,6 +609,9 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void createRoot()
         {
+#if (OGRE_THREAD_PROVIDER == 3) and (OGRE_NO_TBB_SCHEDULER == 1)
+            mTaskScheduler.initialize(OGRE_THREAD_HARDWARE_CONCURRENCY);
+#endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             mRoot = Ogre::Root::getSingletonPtr();
 #else
@@ -967,6 +977,10 @@ namespace OgreBites
             return stream;
         }
         AAssetManager* mAssetMgr;       // Android asset manager to access files inside apk
+#endif
+
+#if (OGRE_THREAD_PROVIDER == 3) and (OGRE_NO_TBB_SCHEDULER == 1)
+        tbb::task_scheduler_init mTaskScheduler;
 #endif
 
         Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
