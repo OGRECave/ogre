@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -287,6 +287,7 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported
         rsc->setCapability(RSC_VBO);
+        rsc->setCapability(RSC_32BIT_INDEX);
 
         // Vertex Array Objects are supported in 3.0
         rsc->setCapability(RSC_VAO);
@@ -374,6 +375,7 @@ namespace Ogre {
         rsc->setMaxPointSize(psRange[1]);
 
         // GLSL is always supported in GL
+        // TODO: Deprecate this profile name in favor of versioned names
         rsc->addShaderProfile("glsl");
 
         // Support for specific shader profiles
@@ -1933,20 +1935,6 @@ namespace Ogre {
 
             // Unbind the vertex array object.  Marks the end of what state will be included.
             OGRE_CHECK_GL_ERROR(glBindVertexArray(0));
-        }
-
-        // Set fences
-        for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
-        {
-            const VertexElement & elem = *elemIter;
-            size_t source = elem.getSource();
-
-            if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
-                continue; // skip unbound elements
-
-            HardwareVertexBufferSharedPtr vertexBuffer =
-                op.vertexData->vertexBufferBinding->getBuffer(source);
-            static_cast<GL3PlusHardwareVertexBuffer*>(vertexBuffer.get())->setFence();
         }
 
         mRenderAttribsBound.clear();

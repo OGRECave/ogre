@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -83,8 +83,8 @@ THE SOFTWARE.
 #include "OgreScriptCompiler.h"
 #include "OgreWindowEventUtilities.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#  include "macUtils.h"
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#include "macUtils.h"
 #endif
 #if OGRE_NO_PVRTC_CODEC == 0
 #  include "OgrePVRTCCodec.h"
@@ -666,7 +666,18 @@ namespace Ogre {
             while(iter.hasMoreElements())
             {
                 String archType = iter.peekNextKey();
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 String filename = iter.getNext();
+
+                // Only adjust relative directories
+                if (!StringUtil::startsWith(filename, "/", false))
+                {
+                    filename = StringUtil::replaceAll(filename, "../", "");
+                    filename = String(macBundlePath() + "/Contents/Resources/" + filename);
+                }
+#else
+                String filename = iter.getNext();
+#endif
 
                 rscManager.parseCapabilitiesFromArchive(filename, archType, true);
             }

@@ -11,6 +11,7 @@ set(HEADER_FILES
     include/TestContext.h
 	../Common/include/ImageValidator.h
 	../Common/include/TestBatch.h
+	../Common/include/CppUnitResultWriter.h
 	../Common/include/TestResultWriter.h
 	../Common/include/SimpleResultWriter.h
 	../Common/include/HTMLWriter.h
@@ -33,6 +34,12 @@ include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/Common/include)
 if (OGRE_STATIC)
   include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/VTests/include)
   include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
+  
+  # Fix for static build with MinGW
+  if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
+	include_directories(${DirectX9_INCLUDE_DIR})
+  endif() 
+  
   list(APPEND SAMPLE_LIBRARIES VTests)
   list(APPEND SAMPLE_LIBRARIES PlayPenTests)
 endif()

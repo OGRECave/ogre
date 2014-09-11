@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -254,6 +254,20 @@ namespace Ogre
 		void removeNameExclusion(const String &type);
 		/// Internal method for firing the handleEvent method
 		bool _fireEvent(ScriptCompilerEvent *evt, void *retval);
+
+		/// Adds a custom word id which can be used for custom script translators
+		/** 
+		@param
+		word The word to be registered.
+
+		@return
+		The word id for the registered word.
+		
+		@note
+		If the word is already registered, the already registered id is returned.
+		*/
+		uint32 registerCustomWordId(const String &word);
+
 	private: // Tree processing
 		AbstractNodeListPtr convertToAST(const ConcreteNodeListPtr &nodes);
 		/// This built-in function processes import nodes
@@ -277,6 +291,10 @@ namespace Ogre
 		String mGroup;
 		// The word -> id conversion table
 		IdMap mIds;
+
+		// The largest registered id
+		uint32 mLargestRegisteredWordId;
+
 		// This is an environment map
 		typedef map<String,String>::type Environment;
 		Environment mEnv;
@@ -417,6 +435,19 @@ namespace Ogre
 		void clearTranslatorManagers();
 		/// Retrieves a ScriptTranslator from the supported managers
 		ScriptTranslator *getTranslator(const AbstractNodePtr &node);
+
+		/// Adds a custom word id which can be used for custom script translators
+		/** 
+		@param
+		word The word to be registered.
+
+		@return
+		The word id for the registered word.
+		
+		@note
+		If the word is already registered, the already registered id is returned.
+		*/
+		uint32 registerCustomWordId(const String &word);
 
 		/// Adds a script extension that can be handled (e.g. *.material, *.pu, etc.)
 		void addScriptPattern(const String &pattern);

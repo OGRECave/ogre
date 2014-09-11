@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ void help(void)
 {
     // Print help message
     cout << endl << "OgreMeshUpgrader: Upgrades or downgrades .mesh file versions." << endl;
-    cout << "Provided for OGRE by Steve Streeting 2004-2013" << endl << endl;
+    cout << "Provided for OGRE by Steve Streeting 2004-2014" << endl << endl;
     cout << "Usage: OgreMeshUpgrader [opts] sourcefile [destfile] " << endl;
 	cout << "-i             = Interactive mode, prompt for options" << endl;
 	cout << "-l lodlevels   = number of LOD levels" << endl;
@@ -987,7 +987,7 @@ int main(int numargs, char** args)
 		}
 		stat( source.c_str(), &tagStat );
 		MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
-		size_t result = fread( (void*)memstream->getPtr(), tagStat.st_size, 1, pFile );
+		size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
 		if (result != tagStat.st_size)
 			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 				"Unexpected error while reading file " + source, "OgreMeshUpgrade");

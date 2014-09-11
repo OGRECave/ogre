@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,7 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGL2Window.h"
+#   include "OgreEAGLES2Context.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #	include "OgreAndroidEGLWindow.h"
 #	include "OgreAndroidEGLContext.h"
@@ -232,6 +233,8 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported by OpenGL ES
         rsc->setCapability(RSC_VBO);
+        if(mGLSupport->checkExtension("GL_OES_element_index_uint"))
+            rsc->setCapability(RSC_32BIT_INDEX);
 
 		// Check for hardware occlusion support
 		if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
@@ -379,6 +382,19 @@ namespace Ogre {
 #if OGRE_NO_GLES3_SUPPORT == 0
         rsc->setCapability(RSC_TEXTURE_3D);
 #endif
+
+        // ES 3 always supports NPOT textures
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+        if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || gleswIsSupported(3, 0))
+        {
+            rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
+            rsc->setNonPOW2TexturesLimited(false);
+        }
+        else
+#endif
+        {
+            rsc->setNonPOW2TexturesLimited(true);
+        }
 
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
@@ -1086,6 +1102,10 @@ namespace Ogre {
 		// outside via the resource manager
 		unbindGpuProgram(GPT_VERTEX_PROGRAM);
 		unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        static_cast<EAGLES2Context*>(mMainContext)->bindSampleFramebuffer();
+#endif
     }
 
     void GLES2RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
@@ -1694,15 +1714,15 @@ namespace Ogre {
 
                 if(hasInstanceData && (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0)))
                 {
-                    OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
+                    OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
                 }
                 else
                 {
 #if OGRE_NO_GLES3_SUPPORT == 0
                     GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
-                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexStart, indexEnd, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData));
 #else
-                    OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
+                    OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData));
 #endif
                 }
 
@@ -1722,11 +1742,11 @@ namespace Ogre {
 
                 if((mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0)) && hasInstanceData)
 				{
-					OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount, numberOfInstances));
+					OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
 				}
 				else
 				{
-                    OGRE_CHECK_GL_ERROR(glDrawArrays((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount));
+                    OGRE_CHECK_GL_ERROR(glDrawArrays((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount)));
 				}
             } while (updatePassIterationRenderState());
         }
@@ -1741,20 +1761,6 @@ namespace Ogre {
             // Unbind the vertex array object.  Marks the end of what state will be included.
             OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
 #endif
-
-        // Set fences
-        for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
-        {
-            const VertexElement & elem = *elemIter;
-            size_t source = elem.getSource();
-
-            if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
-                continue; // skip unbound elements
-
-            HardwareVertexBufferSharedPtr vertexBuffer =
-            op.vertexData->vertexBufferBinding->getBuffer(source);
-            static_cast<GLES2HardwareVertexBuffer*>(vertexBuffer.get())->setFence();
-        }
 
         // Unbind all attributes
 		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
@@ -1782,7 +1788,7 @@ namespace Ogre {
         //  GL measures from the bottom, not the top
         size_t targetHeight = mActiveRenderTarget->getHeight();
         // Calculate the "lower-left" corner of the viewport
-        GLsizei w, h, x, y;
+        size_t w, h, x, y;
 
         if (enabled)
         {
@@ -1795,7 +1801,10 @@ namespace Ogre {
                 y = targetHeight - bottom;
             w = right - left;
             h = bottom - top;
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
         }
         else
         {
@@ -1808,7 +1817,10 @@ namespace Ogre {
                 y = mActiveViewport->getActualTop();
             else
                 y = targetHeight - mActiveViewport->getActualTop() - h;
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            OGRE_CHECK_GL_ERROR(glScissor(static_cast<GLsizei>(x),
+                                          static_cast<GLsizei>(y),
+                                          static_cast<GLsizei>(w),
+                                          static_cast<GLsizei>(h)));
         }
     }
 
@@ -2279,8 +2291,6 @@ namespace Ogre {
                 
         initialiseContext(win);
         
-        mGLSupport->initialiseExtensions();
-        
         static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
         
         _destroyDepthBuffer(win);
@@ -2376,7 +2386,7 @@ namespace Ogre {
                 {
                     if (hwGlBuffer->isInstanceData())
                     {
-                        OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, hwGlBuffer->getInstanceDataStepRate()));
+                        OGRE_CHECK_GL_ERROR(glVertexAttribDivisorEXT(attrib, static_cast<GLuint>(hwGlBuffer->getInstanceDataStepRate())));
                         instanceAttribsBound.push_back(attrib);
                     }
                 }

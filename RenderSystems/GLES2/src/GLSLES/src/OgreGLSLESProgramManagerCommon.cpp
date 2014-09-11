@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -245,7 +245,7 @@ namespace Ogre {
             String shaderSource = gpuProgram->getGLSLProgram()->getSource();
             glslopt_shader* shader = glslopt_optimize(mGLSLOptimiserContext, shaderType, shaderSource.c_str(), 0);
 
-            std::stringstream os;
+            StringStream os;
             if(glslopt_get_status(shader))
             {
                 // Write the current version (this forces the driver to fulfill the glsl es standard)

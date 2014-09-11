@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@ namespace Ogre
     private:
         typedef HashMap<GLenum, GLuint> BindBufferMap;
         typedef HashMap<GLenum, GLint> TexParameteriMap;
+        typedef HashMap<GLenum, bool> GLbooleanStateMap;
 
         struct TextureUnitParams
         {
@@ -76,7 +77,7 @@ namespace Ogre
         /// A map of texture parameters for each texture unit
         TexUnitsMap mTexUnitsMap;
         /// Array of each OpenGL feature that is enabled i.e. blending, depth test, etc.
-        vector<GLenum>::type mEnableVector;
+        GLbooleanStateMap mBoolStateMap;
         /// Stores the current clear colour
         vector<GLclampf>::type mClearColour;
         /// Stores the current colour write mask
@@ -204,11 +205,8 @@ namespace Ogre
         void setStencilMask(GLuint mask);
         
         /// See GLStateCacheManager.setEnabled.
-        void setEnabled(GLenum flag);
-        
-        /// See GLStateCacheManager.setDisabled.
-        void setDisabled(GLenum flag);
-        
+        void setEnabled(GLenum flag, bool enabled);
+
         /// See GLStateCacheManager.getDiscardBuffers.
         unsigned int getDiscardBuffers(void) const { return mDiscardBuffers; }
         

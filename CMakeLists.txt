@@ -38,10 +38,8 @@ if (APPLE)
   CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
   SET(CMAKE_SIZEOF_VOID_P 4)
   set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
-  if(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT)
-    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
-    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-  endif()
+  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
 endif ()
 
 
@@ -152,6 +150,8 @@ if (MINGW)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
   # disable this optimisation because it breaks release builds (reason unknown)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-tree-slp-vectorize")
+  # Ignore some really annoying warnings which also happen in dependencies
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=cast-qual -Wno-unused-local-typedefs")
 endif ()
 
 if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
@@ -255,7 +255,6 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iOS" FORCE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
-  set(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT TRUE CACHE BOOL "Forcing libc++ support for iOS" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
   add_definitions(-mno-thumb)
@@ -301,7 +300,6 @@ elseif (FLASHCC)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for FlashCC" FORCE)
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
-  # Set 10.6 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx)
   if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
     execute_process(COMMAND xcodebuild -version -sdk "${XCODE_ATTRIBUTE_SDKROOT}" Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
@@ -312,16 +310,14 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   if (NOT CMAKE_OSX_ARCHITECTURES)
     if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-      set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
       if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
-        set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)")
+        set(CMAKE_OSX_ARCHITECTURES "${ARCHS_STANDARD_64_BIT}")
       else()
         set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_64_BIT)")
       endif()
     else()
-      set(CMAKE_OSX_DEPLOYMENT_TARGET 10.6)
       if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
-        set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_64_BIT)")
+        set(CMAKE_OSX_ARCHITECTURES "${ARCHS_STANDARD_32_64_BIT}")
       else()
         set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_64_BIT)")
       endif()
@@ -329,9 +325,7 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   endif()
 
   # 10.7 is the minimum for libc++ support
-  if(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
-  endif()
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
 
   # Make sure that the OpenGL render system is selected for non-iOS Apple builds
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
@@ -422,12 +416,10 @@ cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER "Enable GLSL opti
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_VAO_SUPPORT "Use VertexArrayObjects if possible." FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT "Enable OpenGL state cache management" FALSE "OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2 OR OGRE_BUILD_RENDERSYSTEM_GL3PLUS" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES3_SUPPORT "Enable OpenGL ES 3.x Features" FALSE "OPENGLES3_FOUND;OGRE_BUILD_RENDERSYSTEM_GLES2;NOT OGRE_BUILD_PLATFORM_WINRT;NOT OGRE_BUILD_PLATFORM_WINDOWS_PHONE" FALSE)
-cmake_dependent_option(OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT "Enable libc++ support for OS X" FALSE "APPLE" FALSE)
 cmake_dependent_option(OGRE_USE_BOOST "Use Boost extensions" TRUE "Boost_FOUND" FALSE)
 # Customise what to install
 option(OGRE_INSTALL_SAMPLES "Install Ogre demos." TRUE)
 option(OGRE_INSTALL_TOOLS "Install Ogre tools." TRUE)
-option(OGRE_BUILD_DOCS "Generate documentation target for build if Doxygen is installed." TRUE)
 option(OGRE_INSTALL_DOCS "Install documentation." TRUE)
 option(OGRE_INSTALL_SAMPLES_SOURCE "Install samples source files." FALSE)
 cmake_dependent_option(OGRE_INSTALL_PDB "Install debug pdb files" TRUE "MSVC" FALSE)
@@ -470,7 +462,6 @@ mark_as_advanced(
   OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER
   OGRE_CONFIG_ENABLE_GLES2_VAO_SUPPORT
   OGRE_CONFIG_ENABLE_GLES3_SUPPORT
-  OGRE_CONFIG_ENABLE_LIBCPP_SUPPORT
   OGRE_USE_BOOST
   OGRE_INSTALL_SAMPLES_SOURCE
   OGRE_FULL_RPATH
@@ -537,9 +528,7 @@ if (OGRE_BUILD_XSIEXPORTER)
 endif ()
 
 # Install documentation
-if (OGRE_BUILD_DOCS)
-  add_subdirectory(Docs)
-endif ()
+add_subdirectory(Docs)
 
 # Install media files
 if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)

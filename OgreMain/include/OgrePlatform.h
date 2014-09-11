@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -132,12 +132,6 @@ namespace Ogre {
 #elif defined(__FLASHCC__)
 #	define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
 #elif defined( __APPLE_CC__)
-#   ifndef __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__
-#       define __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ 0
-#   endif
-#   ifndef __IPHONE_OS_VERSION_MIN_REQUIRED
-#       define __IPHONE_OS_VERSION_MIN_REQUIRED 0
-#   endif
     // Device                                                     Simulator
     // Both requiring OS version 6.0 or greater
 #   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 60000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
@@ -324,26 +318,8 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 //	Locales are not supported by the C lib you have to go through JNI.
 #	define OGRE_DEFAULT_LOCALE ""
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#	define OGRE_DEFAULT_LOCALE "C"
 #else
-#	if OGRE_COMPILER == OGRE_COMPILER_MSVC
-#		if _MSC_VER >= 1700
-#			define OGRE_DEFAULT_LOCALE "en-GB"
-#		else
-// 			http://msdn.microsoft.com/en-us/library/39cwe7zf%28v=vs.90%29.aspx
-#			define OGRE_DEFAULT_LOCALE "uk"
-#		endif
-#	elif OGRE_COMPILER == OGRE_COMPILER_GCCE
-//		http://gcc.gnu.org/onlinedocs/libstdc++/manual/localization.html
-#   	define OGRE_DEFAULT_LOCALE "en_GB.UTF8"
-#	else
-#       if OGRE_NO_LIBCPP_SUPPORT == 0
-#           define OGRE_DEFAULT_LOCALE "en_GB.UTF-8"
-#       else
-#   	    define OGRE_DEFAULT_LOCALE "C"
-#       endif
-#	endif
+#   define OGRE_DEFAULT_LOCALE "C"
 #endif
 
 //----------------------------------------------------------------------------

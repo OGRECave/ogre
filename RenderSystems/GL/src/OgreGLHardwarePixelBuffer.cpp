@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -603,13 +603,13 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
     /// Disable alpha, depth and scissor testing, disable blending, 
     /// disable culling, disble lighting, disable fog and reset foreground
     /// colour.
-    mGLSupport.getStateCacheManager()->setDisabled(GL_ALPHA_TEST);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_DEPTH_TEST);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_SCISSOR_TEST);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_BLEND);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_CULL_FACE);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_LIGHTING);
-    mGLSupport.getStateCacheManager()->setDisabled(GL_FOG);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_ALPHA_TEST, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_DEPTH_TEST, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_SCISSOR_TEST, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_BLEND, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_CULL_FACE, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_LIGHTING, false);
+    mGLSupport.getStateCacheManager()->setEnabled(GL_FOG, false);
     
     /// Save and reset matrices
     glMatrixMode(GL_MODELVIEW);
@@ -715,7 +715,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         
         /// Finally we're ready to rumble	
         mGLSupport.getStateCacheManager()->bindGLTexture(src->mTarget, src->mTextureID);
-        mGLSupport.getStateCacheManager()->setEnabled(src->mTarget);
+        mGLSupport.getStateCacheManager()->setEnabled(src->mTarget, true);
         glBegin(GL_QUADS);
         glTexCoord3f(u1, v1, w);
         glVertex2f(-1.0f, -1.0f);
@@ -726,7 +726,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         glTexCoord3f(u1, v2, w);
         glVertex2f(-1.0f, 1.0f);
         glEnd();
-        mGLSupport.getStateCacheManager()->setDisabled(src->mTarget);
+        mGLSupport.getStateCacheManager()->setEnabled(src->mTarget, false);
         
         if(tempTex)
         {

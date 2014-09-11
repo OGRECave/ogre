@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -234,8 +234,8 @@ namespace Ogre {
 
 		// Map to store interface slot position. 
 		// Number of interface slots is size of this map.
-		typedef std::map<std::string, unsigned int> SlotMap;
-		typedef std::map<std::string, unsigned int>::const_iterator SlotIterator;
+		typedef std::map<String, unsigned int> SlotMap;
+		typedef std::map<String, unsigned int>::const_iterator SlotIterator;
 		SlotMap mSlotMap;
 
         typedef vector<D3D11_SIGNATURE_PARAMETER_DESC>::type D3d11ShaderParameters;

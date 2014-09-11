@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +74,7 @@ namespace Ogre {
 
         destroy();
 
-        if(mWindow)
+        if(mWindow && !mIsExternal)
         {
             [mWindow release];
             mWindow = nil;
@@ -126,11 +126,7 @@ namespace Ogre {
         NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winx = 0, winy = 0;
 		int depth = 32;
-#if OGRE_NO_LIBCPP_SUPPORT == 0
-        NameValuePairList::const_iterator opt{};
-#else
         NameValuePairList::const_iterator opt;
-#endif
         mIsFullScreen = fullScreen;
 		
 		if(miscParams)
@@ -261,11 +257,7 @@ namespace Ogre {
         }
         else
         {
-#if OGRE_NO_LIBCPP_SUPPORT == 0
-            NameValuePairList::const_iterator param_useNSView_pair{};
-#else
             NameValuePairList::const_iterator param_useNSView_pair;
-#endif
             param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
 
             if(param_useNSView_pair != miscParams->end())
@@ -290,6 +282,7 @@ namespace Ogre {
             }
 
             mWindow = [mView window];
+            mIsExternal = true;
 
             // Add our window to the window event listener class
             WindowEventUtilities::_addRenderWindow(this);
@@ -322,9 +315,12 @@ namespace Ogre {
         // Enable GL multithreading
         CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCEMPEngine);
 
+        // Fix garbage screen
+        glViewport(0, 0, mWidth, mHeight);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+        
         [mGLContext update];
-
-//        rs->clearFrameBuffer(FBT_COLOUR);
 
         [mGLContext flushBuffer];
         CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
@@ -379,7 +375,8 @@ namespace Ogre {
 
             if(mWindow)
             {
-                [mWindow performClose:nil];
+                if(!mIsExternal)
+                    [mWindow performClose:nil];
 
                 if(mGLPixelFormat)
                 {

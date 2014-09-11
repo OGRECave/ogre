@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -80,17 +80,10 @@ namespace Ogre
 #else
                 if (mDebugOut && !maskDebug)
                 {
-
-#	if OGRE_DEBUG_MODE && (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-					String logMessageString(message);
-					logMessageString.append( "\n" );
-                    Ogre_OutputCString( logMessageString.c_str());
-#	else
 					if (lml == LML_CRITICAL)
 						std::cerr << message << std::endl;
 					else
 						std::cout << message << std::endl;
-#	endif
 				}
 #endif
 

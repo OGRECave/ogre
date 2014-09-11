@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,19 +48,34 @@ void TerrainTests::setUp()
 		logManager->createLog("testTerrain.log", true, false);
 	}
     LogManager::getSingleton().setLogDetail(LL_LOW);
+    mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
-	mRoot = OGRE_NEW Root();
+#ifdef OGRE_STATIC_LIB
+	mRoot = OGRE_NEW Root(StringUtil::BLANK);
+        
+	mStaticPluginLoader.load();
+#else
+    String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+	mRoot = OGRE_NEW Root(pluginsPath);
+#endif
 	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
 	// Load resource paths from config file
 	ConfigFile cf;
+    String resourcesPath;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
+	resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	cf.load("bin/release/resources.cfg");
+#if OGRE_DEBUG_MODE
+    resourcesPath = mFSLayer->getConfigFilePath("resources_d.cfg");
 #else
-	cf.load("bin/resources.cfg");
+    resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #endif
+#else
+	resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
+#endif
+
+    cf.load(resourcesPath);
 
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();
@@ -89,6 +104,7 @@ void TerrainTests::tearDown()
 {
 	OGRE_DELETE mTerrainOpts;
 	OGRE_DELETE mRoot;
+    OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
 
 void TerrainTests::testCreate()

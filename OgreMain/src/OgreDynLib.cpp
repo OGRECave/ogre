@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -85,12 +85,12 @@ namespace Ogre {
         }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         // dlopen() does not add .dylib to the filename, like windows does for .dll
-        if (name.substr(name.length() - 6, 6) != ".dylib")
+        if(name.substr(name.find_last_of(".") + 1) != "dylib")
 			name += ".dylib";
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 		// Although LoadLibraryEx will add .dll itself when you only specify the library name,
 		// if you include a relative path then it does not. So, add it to be sure.
-		if (name.substr(name.length() - 4, 4) != ".dll")
+        if(name.substr(name.find_last_of(".") + 1) != "dll")
 			name += ".dll";
 #endif
         mInst = (DYNLIB_HANDLE)DYNLIB_LOAD( name.c_str() );

@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -260,6 +260,8 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported by OpenGL ES
         rsc->setCapability(RSC_VBO);
+        if(mGLSupport->checkExtension("GL_OES_element_index_uint"))
+            rsc->setCapability(RSC_32BIT_INDEX);
 
         // OpenGL ES - Check for these extensions too
         // For 1.1, http://www.khronos.org/registry/gles/api/1.1/glext.h

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,18 +49,15 @@ namespace Ogre {
         destroyBuffer();
     }
 
-    void GLES2HardwareVertexBuffer::setFence(void)
-    {
-        if(!mFence && (getGLES2SupportRef()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
-        {
-            OGRE_CHECK_GL_ERROR(mFence = glFenceSyncAPPLE(GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE, 0));
-        }
-    }
-
     void GLES2HardwareVertexBuffer::createBuffer()
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-        
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Vertex Buffer #" + StringConverter::toString(mBufferId)).c_str()));
+        }
+
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -71,7 +68,6 @@ namespace Ogre {
 		static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
         OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
                                          GLES2HardwareBufferManager::getGLUsage(mUsage)));
-        mFence = 0;
     }
 
     void GLES2HardwareVertexBuffer::destroyBuffer()
@@ -146,18 +142,6 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Vertex Buffer: Out of memory", "GLES2HardwareVertexBuffer::lock");
-        }
-
-        if(mFence && (getGLES2SupportRef()->checkExtension("GL_APPLE_sync") || gleswIsSupported(3, 0)))
-        {
-            GLenum result;
-            OGRE_CHECK_GL_ERROR(result = glClientWaitSyncAPPLE(mFence, GL_SYNC_FLUSH_COMMANDS_BIT_APPLE, GL_TIMEOUT_IGNORED_APPLE));
-            if(result == GL_WAIT_FAILED_APPLE)
-            {
-                // Some error
-            }
-            OGRE_CHECK_GL_ERROR(glDeleteSyncAPPLE(mFence));
-            mFence = 0;
         }
 
         // return offsetted

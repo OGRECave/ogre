@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -68,16 +68,12 @@ namespace Ogre {
 
 #if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL)
             case PF_FLOAT16_R:
-                return GL_R16F_EXT;
             case PF_FLOAT32_R:
-                return GL_R32F_EXT;
             case PF_R8:
                 return GL_RED_EXT;
 
             case PF_FLOAT16_GR:
-                return GL_RG16F_EXT;
             case PF_FLOAT32_GR:
-                return GL_RG32F_EXT;
             case PF_RG8:
                 return GL_RG_EXT;
 #endif

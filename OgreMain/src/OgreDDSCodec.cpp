@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -136,10 +136,7 @@ namespace Ogre {
 	const uint32 DDSD_CAPS = 0x00000001;
 	const uint32 DDSD_HEIGHT = 0x00000002;
 	const uint32 DDSD_WIDTH = 0x00000004;
-	const uint32 DDSD_PITCH = 0x00000008;
 	const uint32 DDSD_PIXELFORMAT = 0x00001000;
-	const uint32 DDSD_MIPMAPCOUNT = 0x00020000;
-	const uint32 DDSD_LINEARSIZE = 0x00080000;
 	const uint32 DDSD_DEPTH = 0x00800000;
 	const uint32 DDPF_ALPHAPIXELS = 0x00000001;
 	const uint32 DDPF_FOURCC = 0x00000004;
@@ -155,6 +152,11 @@ namespace Ogre {
 	const uint32 DDSCAPS2_CUBEMAP_POSITIVEZ = 0x00004000;
 	const uint32 DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x00008000;
 	const uint32 DDSCAPS2_VOLUME = 0x00200000;
+
+    // Currently unused
+//    const uint32 DDSD_PITCH = 0x00000008;
+//    const uint32 DDSD_MIPMAPCOUNT = 0x00020000;
+//    const uint32 DDSD_LINEARSIZE = 0x00080000;
 
 	// Special FourCC codes
 	const uint32 D3DFMT_R16F			= 111;

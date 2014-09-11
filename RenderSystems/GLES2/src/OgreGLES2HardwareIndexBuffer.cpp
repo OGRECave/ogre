@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,8 @@ namespace Ogre {
         : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
     {
 #if OGRE_NO_GLES3_SUPPORT == 1
-		GLES2Support* glSupport = dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support();
-		if (!glSupport->checkExtension("GL_OES_element_index_uint") && idxType == HardwareIndexBuffer::IT_32BIT)
+		if (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_32BIT_INDEX) &&
+            idxType == HardwareIndexBuffer::IT_32BIT)
 		{
 			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 				"32 bit hardware buffers are not allowed in OpenGL ES.",
@@ -61,7 +61,13 @@ namespace Ogre {
     void GLES2HardwareIndexBuffer::createBuffer()
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
-        
+
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Index Buffer #" + StringConverter::toString(mBufferId)).c_str()));
+        }
+
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,

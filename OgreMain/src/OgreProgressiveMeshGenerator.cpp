@@ -4,7 +4,7 @@
  * (Object-oriented Graphics Rendering Engine)
  * For the latest info, see http://www.ogre3d.org/
  *
- * Copyright (c) 2000-2013 Torus Knot Software Ltd
+ * Copyright (c) 2000-2014 Torus Knot Software Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,6 @@
 #include "OgreSubMesh.h"
 #include "OgreMesh.h"
 #include "OgreLodStrategy.h"
-#include "OgreLogManager.h"
 #include "OgrePixelCountLodStrategy.h"
 
 namespace Ogre
@@ -218,43 +217,6 @@ void ProgressiveMeshGenerator::addVertexData(VertexData* vertexData, bool useSha
 		lookup.push_back(v);
 	}
 	vbuf->unlock();
-}
-template<typename IndexType>
-void ProgressiveMeshGenerator::addIndexDataImpl(IndexType* iPos, const IndexType* iEnd,
-                                                VertexLookupList& lookup,
-                                                unsigned short submeshID)
-{
-
-	// Loop through all triangles and connect them to the vertices.
-	for (; iPos < iEnd; iPos += 3) {
-		// It should never reallocate or every pointer will be invalid.
-		OgreAssert(mTriangleList.capacity() > mTriangleList.size(), "");
-		mTriangleList.push_back(PMTriangle());
-		PMTriangle* tri = &mTriangleList.back();
-		tri->isRemoved = false;
-		tri->submeshID = submeshID;
-		for (int i = 0; i < 3; i++) {
-			// Invalid index: Index is bigger then vertex buffer size.
-			OgreAssert(iPos[i] < lookup.size(), "");
-			tri->vertexID[i] = iPos[i];
-			tri->vertex[i] = lookup[iPos[i]];
-		}
-		if (tri->isMalformed()) {
-#if OGRE_DEBUG_MODE
-			stringstream str;
-			str << "In " << mMeshName << " malformed triangle found with ID: " << getTriangleID(tri) << ". " <<
-			std::endl;
-			printTriangle(tri, str);
-			str << "It will be excluded from LOD level calculations.";
-			LogManager::getSingleton().stream() << str.str();
-#endif
-			tri->isRemoved = true;
-			mIndexBufferInfoList[tri->submeshID].indexCount -= 3;
-			continue;
-		}
-		tri->computeNormal();
-		addTriangleToEdges(tri);
-	}
 }
 
 void ProgressiveMeshGenerator::addIndexData(IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID)

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -772,7 +772,7 @@ bail:
 
 			if(FAILED(hr))         
  			{
-				std::stringstream error;
+				StringStream error;
 #ifdef USE_DXERR_LIBRARY
 				error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
 #else
@@ -1081,6 +1081,12 @@ bail:
 		rsc->setCapability(RSC_HWSTENCIL);
 		rsc->setStencilBufferBitDepth(8);
 
+		rsc->setCapability(RSC_VBO);
+		UINT formatSupport;
+		if(mFeatureLevel >= D3D_FEATURE_LEVEL_9_2
+		|| SUCCEEDED(mDevice->CheckFormatSupport(DXGI_FORMAT_R32_UINT, &formatSupport)) && 0 != (formatSupport & D3D11_FORMAT_SUPPORT_IA_INDEX_BUFFER))
+			rsc->setCapability(RSC_32BIT_INDEX);
+
 		// Set number of texture units, always 16
 		rsc->setNumTextureUnits(16);
 		rsc->setCapability(RSC_ANISOTROPY);
@@ -1093,7 +1099,6 @@ bail:
 		// We always support compression, D3DX will decompress if device does not support
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 		rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
-		rsc->setCapability(RSC_VBO);
 		rsc->setCapability(RSC_SCISSOR_TEST);
 		rsc->setCapability(RSC_TWO_SIDED_STENCIL);
 		rsc->setCapability(RSC_STENCIL_WRAP);
@@ -3579,10 +3584,9 @@ bail:
 					// drop samples
 					--fsaa;
 
-					if (fsaa == 1)
+					if (fsaa == 0)
 					{
 						// ran out of options, no FSAA
-						fsaa = 0;
 						ok = true;
 					}
 				}
@@ -3685,7 +3689,7 @@ bail:
 
 		if(FAILED(hr))
 		{
-			std::stringstream error;
+			StringStream error;
 #ifdef USE_DXERR_LIBRARY
 			error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
 #else

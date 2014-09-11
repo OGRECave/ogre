@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -670,7 +670,7 @@ protected:
 				mSampleMenu->setItems(sampleTitles);
 				if (mSampleMenu->getNumItems() != 0) itemSelected(mSampleMenu);
 
-				mSampleSlider->setRange(1, sampleTitles.size(), sampleTitles.size());
+				mSampleSlider->setRange(1, sampleTitles.size(), static_cast<Ogre::uint>(sampleTitles.size()));
 			}
 			else if (menu == mSampleMenu)    // sample changed, so update slider, label and description
 			{
@@ -777,7 +777,7 @@ protected:
 			{
 				// if we're in the main screen, use the up and down arrow keys to cycle through samples
 				int newIndex = mSampleMenu->getSelectionIndex() + (evt.key == OIS::KC_UP ? -1 : 1);
-				mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
+				mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, static_cast<int>(mSampleMenu->getNumItems() - 1)));
 			}
 			else if (evt.key == OIS::KC_RETURN)   // start or stop sample
 			{
@@ -994,7 +994,7 @@ protected:
 				orientedEvt.state.Z.rel != 0 && mSampleMenu->getNumItems() != 0)
 			{
 				int newIndex = mSampleMenu->getSelectionIndex() - orientedEvt.state.Z.rel / Ogre::Math::Abs(orientedEvt.state.Z.rel);
-				mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
+				mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, static_cast<int>(mSampleMenu->getNumItems() - 1)));
 			}
             
 			try
