@@ -181,12 +181,6 @@ namespace Ogre
             TextureType type;
             /// which texCoordIndex to use
             size_t coordIndex;
-            /// type of auto tex. calc. used
-            TexCoordCalcMethod autoTexCoordType;
-            /// Frustum, used if the above is projection
-            const Frustum *frustum; 
-
-            LayerBlendModeEx layerBlendMode;
 
             /// texture 
             ID3D11ShaderResourceView  *pTex;

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
 #include "OgreHeaderPrefix.h"
+#include "Threading/OgreThreadHeaders.h"
 
 // Forward declaration for zziplib to avoid header file dependency.
 typedef struct zzip_dir     ZZIP_DIR;

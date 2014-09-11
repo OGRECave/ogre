@@ -70,9 +70,9 @@ namespace Ogre {
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER, 0);
 
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glBindRenderbufferEXT(GL_RENDERBUFFER, 0);
 
         glActiveTexture(GL_TEXTURE0);
 
@@ -185,11 +185,11 @@ namespace Ogre {
         {
             if(target == GL_FRAMEBUFFER)
             {
-                glBindFramebuffer(target, buffer);
+                glBindFramebufferEXT(target, buffer);
             }
             else if(target == GL_RENDERBUFFER)
             {
-                glBindRenderbuffer(target, buffer);
+                glBindRenderbufferEXT(target, buffer);
             }
             else
             {

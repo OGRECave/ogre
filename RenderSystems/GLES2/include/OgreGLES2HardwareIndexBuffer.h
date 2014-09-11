@@ -49,7 +49,7 @@ namespace Ogre {
         
             void destroyBuffer();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             /** See AndroidResource. */
             virtual void notifyOnContextLost();
         

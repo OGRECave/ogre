@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
@@ -26,32 +26,28 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __FlashCCConfigDialog_H__
-#define __FlashCCConfigDialog_H__
+#ifndef __EmscriptenEGLSupport_H__
+#define __EmscriptenEGLSupport_H__
 
-#include "OgrePrerequisites.h"
-#include "OgreRoot.h"
-#include "OgreRenderSystem.h"
+#include "OgreEGLSupport.h"
 
-namespace Ogre
-{
-    class _OgreExport ConfigDialog : public UtilityAlloc
+namespace Ogre {
+    class _OgrePrivate EmscriptenEGLSupport : public EGLSupport
     {
     public:
-        ConfigDialog();
-        ~ConfigDialog();
-    
-    public:
-        void initialise();
-        void run();
-        void cancel();
+        EmscriptenEGLSupport();
+        virtual ~EmscriptenEGLSupport();
 
-        bool display();
+        virtual void switchMode(uint& width, uint& height, short& frequency);
+        
+        virtual RenderWindow* newWindow(const String& name,
+                                        unsigned int width, unsigned int height,
+                                        bool fullScreen,
+                                        const NameValuePairList *miscParams = 0);
 
-    protected:
-        RenderSystem* iSelectedRenderSystem;
-        bool        iDisplayStatus;     
+	virtual EGLConfig* chooseGLConfig(const GLint* attribList,
+					  GLint *nElements);
     };
 }
 
-#endif // __AndroidConfigDialog_H__
+#endif

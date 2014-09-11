@@ -78,7 +78,7 @@ private:
     
     void destroyQuery();
     
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 protected:
     
     /** See AndroidResource. */

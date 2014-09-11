@@ -62,7 +62,13 @@ namespace Ogre {
             break;            
         case ZZIP_CORRUPTED:
             errorMsg = "Corrupted archive.";
-            break;            
+            break;
+        case ZZIP_DIR_TOO_SHORT:
+            errorMsg = "Zip file is too short.";
+            break;
+        case ZZIP_DIR_EDH_MISSING:
+            errorMsg = "Zip-file's central directory record missing. Is this a 7z file?";
+            break;
         default:
             errorMsg = "Unknown error.";
             break;            

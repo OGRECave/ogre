@@ -38,7 +38,7 @@ THE SOFTWARE.
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
 #include "OgreAndroidEGLContext.h"
-#include "OgreAndroidResourceManager.h"
+#include "OgreGLES2ManagedResourceManager.h"
 #include "OgreViewport.h"
 
 #include <iostream>
@@ -237,6 +237,11 @@ namespace Ogre {
 
     void AndroidEGLWindow::_destroyInternalResources()
     {
+        if(mClosed)
+            return;
+        
+        mContext->setCurrent();
+        
         GLES2RenderSystem::getResourceManager()->notifyOnContextLost();
         mContext->_destroyInternalResources();
         
@@ -358,9 +363,7 @@ namespace Ogre {
             mClosed = false;
             
             mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
-            mContext->setCurrent();
-            
-            windowMovedOrResized();
+
             static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
         }
     }

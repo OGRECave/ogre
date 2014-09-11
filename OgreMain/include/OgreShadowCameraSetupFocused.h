@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgrePolygon.h"
 #include "OgreConvexBody.h"
 #include "OgreHeaderPrefix.h"
-
+#include "OgreAxisAlignedBox.h"
 
 namespace Ogre {
 

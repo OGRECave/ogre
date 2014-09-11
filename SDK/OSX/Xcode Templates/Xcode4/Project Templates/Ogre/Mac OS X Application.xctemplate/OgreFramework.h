@@ -111,6 +111,7 @@ public:
     Ogre::Viewport*             m_pViewport;
     Ogre::Log*                  m_pLog;
     Ogre::Timer*                m_pTimer;
+    Ogre::OverlaySystem*        m_pOverlaySystem;
     
     OIS::InputManager*          m_pInputMgr;
     OIS::Keyboard*              m_pKeyboard;
