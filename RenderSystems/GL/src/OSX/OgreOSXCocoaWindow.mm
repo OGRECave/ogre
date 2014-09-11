@@ -130,9 +130,14 @@ namespace Ogre {
 		int depth = 32;
         NameValuePairList::const_iterator opt;
         mIsFullScreen = fullScreen;
+        bool enableMultithreading = false;
 		
 		if(miscParams)
 		{
+            opt = miscParams->find("enableMultithreadedGL");
+            if(opt != miscParams->end())
+                enableMultithreading = StringConverter::parseBool(opt->second);
+            
 			opt = miscParams->find("title");
 			if(opt != miscParams->end())
 				windowTitle = [NSString stringWithCString:opt->second.c_str() encoding:NSUTF8StringEncoding];
@@ -328,9 +333,10 @@ namespace Ogre {
         // Crash on functions that have been removed from the API
         CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCECrashOnRemovedFunctions);
 #endif
-
+           
         // Enable GL multithreading
-        CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCEMPEngine);
+        if(enableMultithreading)
+           CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCEMPEngine);
 
         // Fix garbage screen
         glViewport(0, 0, mWidth, mHeight);

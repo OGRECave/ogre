@@ -244,7 +244,17 @@ namespace Ogre {
             // Get the target monitor info      
             memset(&monitorInfoEx, 0, sizeof(MONITORINFOEX));
             monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
-            GetMonitorInfo(hMonitor, &monitorInfoEx);
+
+            if (!GetMonitorInfo(hMonitor, &monitorInfoEx))
+            {
+                DWORD le = GetLastError();
+                LogManager::getSingleton().logMessage(LML_CRITICAL, 
+                    ::Ogre::String("Win32Window::create(): Call to GetMonitorInfo() failed.")
+                    + ::Ogre::String(" GetLastError() returns: ")
+                    + ::Ogre::StringConverter::toString(le)
+                    );
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Call to GetMonitorInfo() failed", "Win32Window::create()");
+            }
 
             size_t devNameLen = strlen(monitorInfoEx.szDevice);
             mDeviceName = new char[devNameLen + 1];

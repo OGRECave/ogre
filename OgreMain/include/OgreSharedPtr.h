@@ -191,7 +191,7 @@ namespace Ogre {
          * MSVC 2012 and earlier only claim conformance to C++98. This is fortunate,
          * because they don't support default template parameters
          */
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L && !defined( __APPLE__ )
         template<class Y,
             class = typename std::enable_if<std::is_convertible<Y*, T*>::value>::type>
 #else
@@ -208,7 +208,7 @@ namespace Ogre {
         }
 
         
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L && !defined( __APPLE__ )
         template<class Y,
                  class = typename std::enable_if<std::is_assignable<T*, Y*>::value>::type>
 #else

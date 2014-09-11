@@ -51,7 +51,7 @@ namespace Ogre {
     struct FileInfo {
         /// The archive in which the file has been found (for info when performing
         /// multi-Archive searches, note you should still open through ResourceGroupManager)
-        const Archive* archive;
+        Archive* archive;
         /// The file's fully qualified name
         String filename;
         /// Path name; separated by '/' and ending with '/'
@@ -142,7 +142,7 @@ namespace Ogre {
             read / write the file. If the file is not present, returns a null
             shared pointer.
         */
-        virtual DataStreamPtr open(const String& filename, bool readOnly = true) const = 0;
+        virtual DataStreamPtr open(const String& filename, bool readOnly = true) = 0;
 
         /** Create a new file (or overwrite one already there). 
         @note If the archive is read-only then this method will fail.
@@ -150,7 +150,7 @@ namespace Ogre {
         @return A shared pointer to a DataStream which can be used to 
         read / write the file. 
         */
-        virtual DataStreamPtr create(const String& filename) const
+        virtual DataStreamPtr create(const String& filename)
         {
                         (void)filename;
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
@@ -162,7 +162,7 @@ namespace Ogre {
         @remarks Not possible on read-only archives
         @param filename The fully qualified name of the file
         */
-        virtual void remove(const String& filename) const
+        virtual void remove(const String& filename)
         {
                         (void)filename;
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
@@ -225,7 +225,7 @@ namespace Ogre {
             the criteria.
         */
         virtual FileInfoListPtr findFileInfo(const String& pattern, 
-            bool recursive = true, bool dirs = false) const = 0;
+            bool recursive = true, bool dirs = false) = 0;
 
         /// Return the type code of this Archive
         const String& getType(void) const { return mType; }
