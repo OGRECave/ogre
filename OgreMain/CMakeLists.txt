@@ -240,7 +240,7 @@ endif()
 
 if (OGRE_CONFIG_ENABLE_STBI)
   list(APPEND HEADER_FILES include/OgreSTBICodec.h)
-  list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp  src/stbi/stb_image.c)
+  list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
