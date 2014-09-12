@@ -47,8 +47,12 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
         add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@"  "glsl_optimizer" "glcpp-library" "mesa")
 	endif()
-	
-	add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@" "OIS" "freetype" "FreeImage" "zzip")
+
+	if(OGRE_CONFIG_ENABLE_FREEIMAGE)
+        add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@" "FreeImage")
+    endif()
+
+	add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@" "OIS" "freetype" "zzip")
 	
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
