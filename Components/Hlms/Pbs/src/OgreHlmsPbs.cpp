@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreHlmsPbs.h"
 #include "OgreHlmsPbsDatablock.h"
-#include "OgrePbsShaderCreationData.h"
 
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
@@ -40,6 +39,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Vao/OgreVaoManager.h"
+#include "Vao/OgreConstBufferPacked.h"
 
 namespace Ogre
 {
@@ -57,7 +57,6 @@ namespace Ogre
 
     const IdString PbsProperty::NormalMap         = IdString( "normal_map" );
 
-    const IdString PbsProperty::UvAtlas           = IdString( "uv_atlas" );
     const IdString PbsProperty::FresnelScalar     = IdString( "fresnel_scalar" );
 
     const IdString PbsProperty::NormalWeight          = IdString( "normal_weight" );
@@ -265,7 +264,7 @@ namespace Ogre
 
         if( getProperty( PbsProperty::EnvProbeMap ) )
         {
-            assert( !datablock->mTexture[PBSM_REFLECTION].isNull() );
+            assert( !datablock->getTexture( PBSM_REFLECTION ).isNull() );
             psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
         }
 
@@ -275,20 +274,20 @@ namespace Ogre
     void HlmsPbs::setDetailMapProperties( bool diffuseMaps, HlmsPbsDatablock *datablock,
                                                 PiecesMap *inOutPieces )
     {
-        PbsTextureTypes detailTextureStart    = diffuseMaps ? PBSM_DETAIL0 : PBSM_DETAIL0_NM;
+        PbsTextureTypes detailTextureStart = diffuseMaps ? PBSM_DETAIL0 : PBSM_DETAIL0_NM;
         const IdString **detailSwizzles = diffuseMaps ? PbsProperty::DetailDiffuseSwizzles :
                                                         PbsProperty::DetailNormalSwizzles;
 
         size_t validDetailMaps = 0;
         for( size_t i=0; i<4; ++i )
         {
-            uint8 blendMode = datablock->mShaderCreationData->blendModes[i];
+            uint8 blendMode = datablock->mBlendModes[i];
 
             //If Detail map 0 doesn't exists but Detail map 1 does;
             //then DetailDiffuseSwizzle0 must reference the swizzle 'y'
             //Same happens with the UV sources (the UV sources[1] end up
             //actually as sources[0], etc).
-            if( !datablock->mTexture[detailTextureStart + i].isNull() )
+            if( !datablock->getTexture( detailTextureStart + i ).isNull() )
             {
                 if( diffuseMaps )
                 {
@@ -300,7 +299,7 @@ namespace Ogre
                 IdString swizzleN = *detailSwizzles[validDetailMaps];
                 inOutPieces[PixelShader][swizzleN] = swizzles[i];
 
-                uint8 uvSource = datablock->mShaderCreationData->uvSource[detailTextureStart + i];
+                uint8 uvSource = datablock->mUvSource[detailTextureStart + i];
                 setProperty( *PbsProperty::UvSourcePtrs[detailTextureStart + validDetailMaps],
                              uvSource );
 
@@ -326,15 +325,14 @@ namespace Ogre
         assert( dynamic_cast<HlmsPbsDatablock*>( renderable->getDatablock() ) );
         HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>(
                                                         renderable->getDatablock() );
-        setProperty( PbsProperty::UvAtlas, datablock->_calculateNumUvAtlas( false ) );
         setProperty( PbsProperty::FresnelScalar, datablock->hasSeparateFresnel() );
 
         for( size_t i=0; i<PBSM_DETAIL0; ++i )
         {
-            uint8 uvSource = datablock->mShaderCreationData->uvSource[i];
+            uint8 uvSource = datablock->mUvSource[i];
             setProperty( *PbsProperty::UvSourcePtrs[i], uvSource );
 
-            if( !datablock->mTexture[i].isNull() &&
+            if( !datablock->getTexture( i ).isNull() &&
                 getProperty( *HlmsBaseProp::UvCountPtrs[uvSource] ) < 2 )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
@@ -346,7 +344,7 @@ namespace Ogre
         }
 
         int numNormalWeights = 0;
-        if( datablock->getNormalMapWeight() != 1.0f && !datablock->mTexture[PBSM_NORMAL].isNull() )
+        if( datablock->getNormalMapWeight() != 1.0f && !datablock->getTexture( PBSM_NORMAL ).isNull() )
         {
             setProperty( PbsProperty::NormalWeightTex, 1 );
             ++numNormalWeights;
@@ -356,7 +354,7 @@ namespace Ogre
             size_t validDetailMaps = 0;
             for( size_t i=0; i<4; ++i )
             {
-                if( !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
+                if( !datablock->getTexture( PBSM_DETAIL0_NM + i ).isNull() )
                 {
                     if( datablock->getDetailNormalWeight( i ) != 1.0f )
                     {
@@ -378,9 +376,9 @@ namespace Ogre
             bool anyDetailWeight = false;
             for( size_t i=0; i<4 && !anyDetailWeight; ++i )
             {
-                if( datablock->mShaderCreationData->mDetailWeight[i] != 1.0f &&
-                    (!datablock->mTexture[PBSM_DETAIL0 + i].isNull() ||
-                     !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull()) )
+                if( datablock->mDetailWeight[i] != 1.0f &&
+                    (!datablock->getTexture( PBSM_DETAIL0 + i ).isNull() ||
+                     !datablock->getTexture( PBSM_DETAIL0_NM + i ).isNull()) )
                 {
                     anyDetailWeight = true;
                 }
@@ -395,13 +393,13 @@ namespace Ogre
             size_t validDetailMaps = 0;
             for( size_t i=0; i<4; ++i )
             {
-                if( datablock->mShaderCreationData->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
+                if( datablock->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
                 {
                     setProperty( *PbsProperty::DetailOffsetsDPtrs[validDetailMaps], 1 );
                     ++numOffsets;
                 }
 
-                if( !datablock->mTexture[PBSM_DETAIL0 + i].isNull() )
+                if( !datablock->getTexture( PBSM_DETAIL0 + i ).isNull() )
                     ++validDetailMaps;
             }
 
@@ -411,33 +409,33 @@ namespace Ogre
             validDetailMaps = 0;
             for( size_t i=0; i<4; ++i )
             {
-                if( datablock->mShaderCreationData->mDetailsOffsetScale[i+4] != Vector4( 0, 0, 1, 1 ) )
+                if( datablock->mDetailsOffsetScale[i+4] != Vector4( 0, 0, 1, 1 ) )
                 {
                     setProperty( *PbsProperty::DetailOffsetsNPtrs[validDetailMaps], 1 );
                     ++numOffsets;
                 }
 
-                if( !datablock->mTexture[PBSM_DETAIL0_NM + i].isNull() )
+                if( !datablock->getTexture( PBSM_DETAIL0_NM + i ).isNull() )
                     ++validDetailMaps;
             }
 
             setProperty( PbsProperty::DetailOffsetsN, numOffsets );
         }
 
-        setProperty( PbsProperty::DiffuseMap,     !datablock->mTexture[PBSM_DIFFUSE].isNull() );
-        setProperty( PbsProperty::NormalMapTex,   !datablock->mTexture[PBSM_NORMAL].isNull() );
-        setProperty( PbsProperty::SpecularMap,    !datablock->mTexture[PBSM_SPECULAR].isNull() );
-        setProperty( PbsProperty::RoughnessMap,   !datablock->mTexture[PBSM_ROUGHNESS].isNull() );
-        setProperty( PbsProperty::EnvProbeMap,    !datablock->mTexture[PBSM_REFLECTION].isNull() );
-        setProperty( PbsProperty::DetailWeightMap,!datablock->mTexture[PBSM_DETAIL_WEIGHT].isNull() );
+        setProperty( PbsProperty::DiffuseMap,     !datablock->getTexture( PBSM_DIFFUSE ).isNull() );
+        setProperty( PbsProperty::NormalMapTex,   !datablock->getTexture( PBSM_NORMAL ).isNull() );
+        setProperty( PbsProperty::SpecularMap,    !datablock->getTexture( PBSM_SPECULAR ).isNull() );
+        setProperty( PbsProperty::RoughnessMap,   !datablock->getTexture( PBSM_ROUGHNESS ).isNull() );
+        setProperty( PbsProperty::EnvProbeMap,    !datablock->getTexture( PBSM_REFLECTION ).isNull() );
+        setProperty( PbsProperty::DetailWeightMap,!datablock->getTexture( PBSM_DETAIL_WEIGHT ).isNull() );
 
-        bool usesNormalMap = !datablock->mTexture[PBSM_NORMAL].isNull();
+        bool usesNormalMap = !datablock->getTexture( PBSM_NORMAL ).isNull();
         for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
-            usesNormalMap |= !datablock->mTexture[i].isNull();
+            usesNormalMap |= !datablock->getTexture( i ).isNull();
         setProperty( PbsProperty::NormalMap, usesNormalMap );
 
-        /*setProperty( HlmsBaseProp::, !datablock->mTexture[PBSM_DETAIL0].isNull() );
-        setProperty( HlmsBaseProp::DiffuseMap, !datablock->mTexture[PBSM_DETAIL1].isNull() );*/
+        /*setProperty( HlmsBaseProp::, !datablock->getTexture( PBSM_DETAIL0 ).isNull() );
+        setProperty( HlmsBaseProp::DiffuseMap, !datablock->getTexture( PBSM_DETAIL1 ).isNull() );*/
         bool normalMapCanBeSupported = (getProperty( HlmsBaseProp::Normal ) &&
                                         getProperty( HlmsBaseProp::Tangent )) ||
                                         getProperty( HlmsBaseProp::QTangent );
@@ -453,17 +451,15 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbs::calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces )
     {
-        HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>(
-                                                        renderable->getDatablock() );
-        setProperty( PbsProperty::UvAtlas, datablock->_calculateNumUvAtlas( true ) );
+        //HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>(
+        //                                              renderable->getDatablock() );
 
         HlmsPropertyVec::iterator itor = mSetProperties.begin();
         HlmsPropertyVec::iterator end  = mSetProperties.end();
 
         while( itor != end )
         {
-            if( itor->keyName != PbsProperty::UvAtlas &&
-                itor->keyName != PbsProperty::HwGammaRead &&
+            if( itor->keyName != PbsProperty::HwGammaRead &&
                 itor->keyName != PbsProperty::UvDiffuse &&
                 itor->keyName != HlmsBaseProp::Skeleton &&
                 itor->keyName != HlmsBaseProp::BonesPerVertex &&
@@ -506,225 +502,74 @@ namespace Ogre
             projectionMatrix[1][3] = -projectionMatrix[1][3];
         }
 
-        mPreparedPass.viewProjMatrix    = projectionMatrix * viewMatrix;
-        mPreparedPass.viewMatrix        = viewMatrix;
+        int32 numLights             = getProperty( HlmsBaseProp::LightsSpot );
+        int32 numDirectionalLights  = getProperty( HlmsBaseProp::LightsDirectional );
+        int32 numShadowMaps         = getProperty( HlmsBaseProp::NumShadowMaps );
+        int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
+
+        size_t mapSize = 16 * 4;
 
         if( !casterPass )
         {
-            int32 numShadowMaps = getProperty( HlmsBaseProp::NumShadowMaps );
-            mPreparedPass.vertexShaderSharedBuffer.clear();
-            mPreparedPass.vertexShaderSharedBuffer.reserve( (16 + 2) * numShadowMaps + 16 * 2 );
+            mapSize += ( 16 + (16 + 2 + 2) * numShadowMaps + 9 ) * 4;
+            mapSize += numPssmSplits * 4;
+            mapSize = alignToNextMultiple( mapSize, 16 );
 
-            //---------------------------------------------------------------------------
-            //                          ---- VERTEX SHADER ----
-            //---------------------------------------------------------------------------
+            if( shadowNode )
+                mapSize += ( 7 * 4 * 4 ) * numLights;
+            else
+                mapSize += ( 3 * 4 * 4 ) * numDirectionalLights;
+        }
+        else
+        {
+            mapSize += (2 + 2) * 4;
+        }
 
-            //mat4 texWorldViewProj[numShadowMaps]
+        float *passBuffer = reinterpret_cast<float*>( mPassBuffer->map( 0, mapSize, MS_PERSISTENT_INCOHERENT ) );
+
+#ifndef NDEBUG
+        const float *startupPtr = passBuffer;
+#endif
+
+        //---------------------------------------------------------------------------
+        //                          ---- VERTEX SHADER ----
+        //---------------------------------------------------------------------------
+
+        //mat4 viewProj;
+        Matrix4 viewProjMatrix = projectionMatrix * viewMatrix;
+        for( size_t i=0; i<16; ++i )
+            *passBuffer++ = (float)viewProjMatrix[0][i];
+
+        if( !casterPass )
+        {
+            //mat4 view;
+            for( size_t i=0; i<16; ++i )
+                *passBuffer++ = (float)viewMatrix[0][i];
+
             for( int32 i=0; i<numShadowMaps; ++i )
             {
+                //mat4 shadowRcv[numShadowMaps].texWorldViewProj
                 Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( i );
                 for( size_t j=0; j<16; ++j )
-                    mPreparedPass.vertexShaderSharedBuffer.push_back( (float)viewProjTex[0][j] );
-            }
-            //vec2 shadowDepthRange[numShadowMaps]
-            for( int32 i=0; i<numShadowMaps; ++i )
-            {
+                    *passBuffer++ = (float)viewProjTex[0][j];
+
+                //vec2 shadowRcv[numShadowMaps].shadowDepthRange
                 Real fNear, fFar;
                 shadowNode->getMinMaxDepthRange( i, fNear, fFar );
                 const Real depthRange = fFar - fNear;
-                mPreparedPass.vertexShaderSharedBuffer.push_back( fNear );
-                mPreparedPass.vertexShaderSharedBuffer.push_back( 1.0f / depthRange );
-            }
+                *passBuffer++ = fNear;
+                *passBuffer++ = 1.0f / depthRange;
 
-#ifdef OGRE_GLES2_WORKAROUND_1
-            Matrix4 tmp = mPreparedPass.viewProjMatrix.transpose();
-#endif
-            //mat4 worldView (it's actually view)
-            for( size_t i=0; i<16; ++i )
-            {
-#ifdef OGRE_GLES2_WORKAROUND_1
-                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)tmp[0][i] );
-#else
-                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)mPreparedPass.
-                                                                    viewProjMatrix[0][i] );
-#endif
+                passBuffer += 2; //Padding
             }
-#ifdef OGRE_GLES2_WORKAROUND_1
-            tmp = viewMatrix.transpose();
-            //mat4 worldViewProj (it's actually viewProj)
-            for( size_t i=0; i<16; ++i )
-                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)tmp[0][i] );
-#else
-            //mat4 worldViewProj (it's actually viewProj)
-            for( size_t i=0; i<16; ++i )
-                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)viewMatrix[0][i] );
-#endif
 
             //---------------------------------------------------------------------------
             //                          ---- PIXEL SHADER ----
             //---------------------------------------------------------------------------
-            int32 numPssmSplits     = getProperty( HlmsBaseProp::PssmSplits );
-            int32 numLights         = getProperty( HlmsBaseProp::LightsSpot );
-            int32 numAttenLights    = getProperty( HlmsBaseProp::LightsAttenuation );
-            int32 numSpotlights     = getProperty( HlmsBaseProp::LightsSpotParams );
-            mPreparedPass.pixelShaderSharedBuffer.clear();
-            mPreparedPass.pixelShaderSharedBuffer.reserve( 2 * numShadowMaps + numPssmSplits +
-                                                           9 * numLights + 3 * numAttenLights +
-                                                           6 * numSpotlights + 9 );
 
             Matrix3 viewMatrix3, invViewMatrix3;
             viewMatrix.extract3x3Matrix( viewMatrix3 );
             invViewMatrix3 = viewMatrix3.Inverse();
-
-            //vec2 invShadowMapSize
-            for( int32 i=0; i<numShadowMaps; ++i )
-            {
-                //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
-                //changes need to be done so that UV calculations land on the right place
-                uint32 texWidth  = shadowNode->getLocalTextures()[i].textures[0]->getWidth();
-                uint32 texHeight = shadowNode->getLocalTextures()[i].textures[0]->getHeight();
-                mPreparedPass.pixelShaderSharedBuffer.push_back( 1.0f / texWidth );
-                mPreparedPass.pixelShaderSharedBuffer.push_back( 1.0f / texHeight );
-            }
-            //float pssmSplitPoints
-            for( int32 i=0; i<numPssmSplits; ++i )
-                mPreparedPass.pixelShaderSharedBuffer.push_back( (*shadowNode->getPssmSplits(0))[i] );
-
-            if( shadowNode )
-            {
-                const LightClosestArray &lights = shadowNode->getShadowCastingLights();
-                //vec3 lightPosition[numLights]
-                for( int32 i=0; i<numLights; ++i )
-                {
-                    Vector4 lightPos4 = lights[i].light->getAs4DVector();
-                    Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.x );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.y );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.z );
-                }
-                //vec3 lightDiffuse[numLights]
-                for( int32 i=0; i<numLights; ++i )
-                {
-                    ColourValue colour = lights[i].light->getDiffuseColour() *
-                                         lights[i].light->getPowerScale();
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.r );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.g );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.b );
-                }
-                //vec3 lightSpecular[numLights]
-                for( int32 i=0; i<numLights; ++i )
-                {
-                    ColourValue colour = lights[i].light->getSpecularColour() *
-                                         lights[i].light->getPowerScale();
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.r );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.g );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.b );
-                }
-                //vec3 attenuation[numAttenLights]
-                for( int32 i=numLights - numAttenLights; i<numLights; ++i )
-                {
-                    Real attenRange     = lights[i].light->getAttenuationRange();
-                    Real attenLinear    = lights[i].light->getAttenuationLinear();
-                    Real attenQuadratic = lights[i].light->getAttenuationQuadric();
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenRange );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenLinear );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenQuadratic );
-                }
-                //vec3 spotDirection[numSpotlights]
-                for( int32 i=numLights - numSpotlights; i<numLights; ++i )
-                {
-                    Vector3 spotDir = viewMatrix3 * lights[i].light->getDerivedDirection();
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.x );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.y );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.z );
-                }
-                //vec3 spotParams[numSpotlights]
-                for( int32 i=numLights - numSpotlights; i<numLights; ++i )
-                {
-                    Radian innerAngle = lights[i].light->getSpotlightInnerAngle();
-                    Radian outerAngle = lights[i].light->getSpotlightOuterAngle();
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( 1.0f /
-                                        ( cosf( innerAngle.valueRadians() * 0.5f ) -
-                                          cosf( outerAngle.valueRadians() * 0.5f ) ) );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back(
-                                        cosf( outerAngle.valueRadians() * 0.5f ) );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back(
-                                        lights[i].light->getSpotlightFalloff() );
-                }
-            }
-            else
-            {
-                int32 numDirectionalLights = getProperty( HlmsBaseProp::LightsDirectional );
-
-                //No shadow maps, only pass directional lights
-                const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
-
-                //vec3 lightPosition[numLights]
-                for( int32 i=0; i<numLights; ++i )
-                {
-                    Vector4 lightPos4 = globalLightList.lights[i]->getAs4DVector();
-                    Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.x );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.y );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.z );
-                }
-                //vec3 lightDiffuse[numLights]
-                for( int32 i=0; i<numLights; ++i )
-                {
-                    ColourValue colour = globalLightList.lights[i]->getDiffuseColour() *
-                                         globalLightList.lights[i]->getPowerScale();
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.r );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.g );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.b );
-                }
-                //vec3 lightSpecular[numLights]
-                for( int32 i=0; i<numLights; ++i )
-                {
-                    ColourValue colour = globalLightList.lights[i]->getSpecularColour() *
-                                         globalLightList.lights[i]->getPowerScale();
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.r );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.g );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( colour.b );
-                }
-                //vec3 attenuation[numAttenLights]
-                for( int32 i=numLights - numAttenLights; i<numLights; ++i )
-                {
-                    assert( globalLightList.lights[i]->getType() != Light::LT_DIRECTIONAL );
-                    Real attenRange     = globalLightList.lights[i]->getAttenuationRange();
-                    Real attenLinear    = globalLightList.lights[i]->getAttenuationLinear();
-                    Real attenQuadratic = globalLightList.lights[i]->getAttenuationQuadric();
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenRange );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenLinear );
-                    mPreparedPass.pixelShaderSharedBuffer.push_back( attenQuadratic );
-                }
-                //vec3 spotDirection[numSpotlights]
-                for( int32 i=numDirectionalLights; i<numLights; ++i )
-                {
-                    if( globalLightList.lights[i]->getType() == Light::LT_SPOTLIGHT )
-                    {
-                        Vector3 spotDir = viewMatrix3 * globalLightList.lights[i]->getDerivedDirection();
-                        mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.x );
-                        mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.y );
-                        mPreparedPass.pixelShaderSharedBuffer.push_back( spotDir.z );
-                    }
-                }
-                //vec3 spotParams[numSpotlights]
-                for( int32 i=numDirectionalLights; i<numLights; ++i )
-                {
-                    if( globalLightList.lights[i]->getType() == Light::LT_SPOTLIGHT )
-                    {
-                        Radian innerAngle = globalLightList.lights[i]->getSpotlightInnerAngle();
-                        Radian outerAngle = globalLightList.lights[i]->getSpotlightOuterAngle();
-                        mPreparedPass.pixelShaderSharedBuffer.push_back( 1.0f /
-                                            ( cosf( innerAngle.valueRadians() * 0.5f ) -
-                                              cosf( outerAngle.valueRadians() * 0.5f ) ) );
-                        mPreparedPass.pixelShaderSharedBuffer.push_back(
-                                            cosf( outerAngle.valueRadians() * 0.5f ) );
-                        mPreparedPass.pixelShaderSharedBuffer.push_back(
-                                            globalLightList.lights[i]->getSpotlightFalloff() );
-                    }
-                }
-            }
 
             //mat3 invViewMatCubemap
             for( size_t i=0; i<9; ++i )
@@ -734,37 +579,142 @@ namespace Ogre
                               0.0f, 0.0f, -1.0f,
                               0.0f, 1.0f, 0.0f );
                 xRot = xRot * invViewMatrix3;
-                mPreparedPass.pixelShaderSharedBuffer.push_back( (float)xRot[0][i] );
+                *passBuffer++ = (float)xRot[0][i];
 #else
-                mPreparedPass.pixelShaderSharedBuffer.push_back( (float)invViewMatrix3[0][i] );
+                *passBuffer++ = (float)invViewMatrix3[0][i];
 #endif
+
+                //Alignment: each row/column is one vec4, despite being 3x3
+                if( !( (i+1) % 3 ) )
+                    ++passBuffer;
             }
 
-            mPreparedPass.shadowMaps.clear();
-            mPreparedPass.shadowMaps.reserve( numShadowMaps );
-            for( int32 i=0; i<numShadowMaps; ++i )
-                mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
+            //float pssmSplitPoints
+            for( int32 i=0; i<numPssmSplits; ++i )
+                *passBuffer++ = (*shadowNode->getPssmSplits(0))[i];
+
+            passBuffer += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
+
+            if( shadowNode )
+            {
+                const LightClosestArray &lights = shadowNode->getShadowCastingLights();
+
+                for( int32 i=0; i<numLights; ++i )
+                {
+                    Vector4 lightPos4 = lights[i].light->getAs4DVector();
+                    Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+
+                    //vec3 lights[numLights].position
+                    *passBuffer++ = lightPos.x;
+                    *passBuffer++ = lightPos.y;
+                    *passBuffer++ = lightPos.z;
+                    ++passBuffer;
+
+                    //vec3 lights[numLights].diffuse
+                    ColourValue colour = lights[i].light->getDiffuseColour() *
+                                         lights[i].light->getPowerScale();
+                    *passBuffer++ = colour.r;
+                    *passBuffer++ = colour.g;
+                    *passBuffer++ = colour.b;
+                    ++passBuffer;
+
+                    //vec3 lights[numLights].specular
+                    colour = lights[i].light->getSpecularColour() * lights[i].light->getPowerScale();
+                    *passBuffer++ = colour.r;
+                    *passBuffer++ = colour.g;
+                    *passBuffer++ = colour.b;
+                    ++passBuffer;
+
+                    //vec3 lights[numLights].attenuation;
+                    Real attenRange     = lights[i].light->getAttenuationRange();
+                    Real attenLinear    = lights[i].light->getAttenuationLinear();
+                    Real attenQuadratic = lights[i].light->getAttenuationQuadric();
+                    *passBuffer++ = attenRange;
+                    *passBuffer++ = attenLinear;
+                    *passBuffer++ = attenQuadratic;
+                    ++passBuffer;
+
+                    //vec3 lights[numLights].spotDirection;
+                    Vector3 spotDir = viewMatrix3 * lights[i].light->getDerivedDirection();
+                    *passBuffer++ = spotDir.x;
+                    *passBuffer++ = spotDir.y;
+                    *passBuffer++ = spotDir.z;
+                    ++passBuffer;
+
+                    //vec3 lights[numLights].spotParams;
+                    Radian innerAngle = lights[i].light->getSpotlightInnerAngle();
+                    Radian outerAngle = lights[i].light->getSpotlightOuterAngle();
+                    *passBuffer++ = 1.0f / ( cosf( innerAngle.valueRadians() * 0.5f ) -
+                                             cosf( outerAngle.valueRadians() * 0.5f ) );
+                    *passBuffer++ = cosf( outerAngle.valueRadians() * 0.5f );
+                    *passBuffer++ = lights[i].light->getSpotlightFalloff();
+                    ++passBuffer;
+
+                    if( (size_t)i < shadowNode->getLocalTextures().size() )
+                    {
+                        //vec2 lights[numLights].invShadowMapSize
+                        //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
+                        //changes need to be done so that UV calculations land on the right place
+                        uint32 texWidth  = shadowNode->getLocalTextures()[i].textures[0]->getWidth();
+                        uint32 texHeight = shadowNode->getLocalTextures()[i].textures[0]->getHeight();
+                        *passBuffer++ = 1.0f / texWidth;
+                        *passBuffer++ = 1.0f / texHeight;
+                        passBuffer += 2;
+                    }
+                    else
+                    {
+                        //If we have 3 directional lights and two shadow mapped lights, this is possible.
+                        passBuffer += 4;
+                    }
+                }
+            }
+            else
+            {
+                //No shadow maps, only pass directional lights
+                const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
+
+                for( int32 i=0; i<numDirectionalLights; ++i )
+                {
+                    Vector4 lightPos4 = globalLightList.lights[i]->getAs4DVector();
+                    Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+
+                    //vec3 lights[numLights].position
+                    *passBuffer++ = lightPos.x;
+                    *passBuffer++ = lightPos.y;
+                    *passBuffer++ = lightPos.z;
+                    ++passBuffer;
+
+                    //vec3 lights[numLights].diffuse
+                    ColourValue colour = globalLightList.lights[i]->getDiffuseColour() *
+                                         globalLightList.lights[i]->getPowerScale();
+                    *passBuffer++ = colour.r;
+                    *passBuffer++ = colour.g;
+                    *passBuffer++ = colour.b;
+                    ++passBuffer;
+
+                    //vec3 lights[numLights].specular
+                    colour = globalLightList.lights[i]->getSpecularColour() * globalLightList.lights[i]->getPowerScale();
+                    *passBuffer++ = colour.r;
+                    *passBuffer++ = colour.g;
+                    *passBuffer++ = colour.b;
+                    ++passBuffer;
+                }
+            }
         }
         else
         {
-            mPreparedPass.vertexShaderSharedBuffer.clear();
-            mPreparedPass.vertexShaderSharedBuffer.reserve( 2 + 16 );
-            mPreparedPass.pixelShaderSharedBuffer.clear();
-
             //vec2 depthRange;
             Real fNear, fFar;
             shadowNode->getMinMaxDepthRange( camera, fNear, fFar );
             const Real depthRange = fFar - fNear;
-            mPreparedPass.vertexShaderSharedBuffer.push_back( fNear );
-            mPreparedPass.vertexShaderSharedBuffer.push_back( 1.0f / depthRange );
-
-            //mat4 worldViewProj (it's actually viewProj)
-            for( size_t i=0; i<16; ++i )
-            {
-                mPreparedPass.vertexShaderSharedBuffer.push_back( (float)mPreparedPass.
-                                                                    viewProjMatrix[0][i] );
-            }
+            *passBuffer++ = fNear;
+            *passBuffer++ = 1.0f / depthRange;
+            passBuffer += 2;
         }
+
+        assert( (size_t)(passBuffer - startupPtr) == mapSize );
+
+        mPassBuffer->unmap( UO_KEEP_PERSISTENT );
 
         return retVal;
     }
@@ -809,7 +759,7 @@ namespace Ogre
 
         uint16 variabilityMask = GPV_PER_OBJECT;
         size_t psBufferElements = mPreparedPass.pixelShaderSharedBuffer.size() -
-                                    ((!casterPass && datablock->mTexture[PBSM_REFLECTION].isNull()) ?
+                                    ((!casterPass && datablock->getTexture( PBSM_REFLECTION ).isNull()) ?
                                                                                             9 : 0);
 
         bool hasSkeletonAnimation = queuedRenderable.renderable->hasSkeletonAnimation();
@@ -819,7 +769,7 @@ namespace Ogre
         assert( mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem <
                 vpParams->getFloatConstantList().size() );
         assert( ( mPreparedPass.pixelShaderSharedBuffer.size() -
-                  ((!casterPass && datablock->mTexture[PBSM_REFLECTION].isNull()) ? 9 : 0) ) <=
+                  ((!casterPass && datablock->getTexture( PBSM_REFLECTION ).isNull()) ? 9 : 0) ) <=
                 psParams->getFloatConstantList().size() );
 
         if( cache != lastCache )
@@ -899,9 +849,9 @@ namespace Ogre
                 size_t texUnit = mPreparedPass.shadowMaps.size();
                 for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
                 {
-                    if( !datablock->mTexture[i].isNull() )
+                    if( !datablock->getTexture( i ).isNull() )
                     {
-                        mRenderSystem->_setTexture( texUnit, true, datablock->mTexture[i] );
+                        mRenderSystem->_setTexture( texUnit, true, datablock->getTexture( i ) );
                         mRenderSystem->_setHlmsSamplerblock( texUnit, datablock->mSamplerblocks[i] );
                         ++texUnit;
                     }

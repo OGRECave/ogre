@@ -116,7 +116,6 @@ namespace Ogre
 
         static const IdString NormalMap;
 
-        static const IdString UvAtlas;
         static const IdString FresnelScalar;
 
         static const IdString NormalWeight;

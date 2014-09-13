@@ -42,9 +42,6 @@ namespace Ogre
     *  @{
     */
 
-    struct PbsShaderCreationData;
-    struct PbsUvAtlasParams;
-
     struct PbsBakedTexture
     {
         TexturePtr              texture;
@@ -53,6 +50,11 @@ namespace Ogre
         PbsBakedTexture() : samplerBlock( 0 ) {}
         PbsBakedTexture( const TexturePtr tex, const HlmsSamplerblock *_samplerBlock ) :
             texture( tex ), samplerBlock( _samplerBlock ) {}
+
+        bool operator == ( const PbsBakedTexture &_r ) const
+        {
+            return texture == _r.texture && samplerBlock == _r.samplerBlock;
+        }
     };
 
     typedef FastArray<PbsBakedTexture> PbsBakedTextureArray;
@@ -95,8 +97,9 @@ namespace Ogre
         void scheduleConstBufferUpdate(void);
         char* uploadToConstBuffer( char *dstPtr );
         void bakeVariableParameters(void);
-        void setTexture( const String &name, HlmsTextureManager::TextureMapType textureMapType,
-                         PbsTextureTypes textureType );
+
+        /// Sets the appropiate mTexIndices[textureMapType], and returns the texture pointer
+        TexturePtr setTexture( const String &name, HlmsTextureManager::TextureMapType textureMapType );
 
         void decompileBakedTextures( PbsBakedTexture outTextures[NUM_PBSM_TEXTURE_TYPES] );
         void bakeTextures( const PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES] );
@@ -239,7 +242,8 @@ namespace Ogre
         void setTexture( PbsTextureTypes texType, uint16 arrayIndex, const TexturePtr &newTexture,
                          const HlmsSamplerblock *params=0 );
 
-        TexturePtr getTexture( PbsTextureTypes texType );
+        TexturePtr getTexture( PbsTextureTypes texType ) const;
+        TexturePtr getTexture( size_t texType ) const;
 
         /** Sets a new sampler block to be associated with the texture
             (i.e. filtering mode, addressing modes, etc). If the samplerblock changes,
@@ -335,11 +339,6 @@ namespace Ogre
         */
         void setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale );
         const Vector4& getDetailMapOffsetScale( uint8 detailMap ) const;
-
-        static PbsUvAtlasParams textureLocationToAtlasParams(
-                                            const HlmsTextureManager::TextureLocation &texLocation );
-
-        int _calculateNumUvAtlas( bool casterPass ) const;
 
         void _recreateConstBuffers(void);
 

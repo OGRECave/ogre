@@ -200,21 +200,20 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 void main()
 {
 	uint materialId	= instance.worldMaterialIdx[drawId] & 0x1FF;
-	uint indices[6]	= material.m[materialId].indices;
-@property( diffuse_map )	diffuseIdx			=  indices[0] & 0x0000FFFF;@end
-@property( normal_map_tex )	normalIdx			= (indices[0] & 0xFFFF0000) >> 16;@end
-@property( specular_map )	specularIdx			=  indices[1] & 0x0000FFFF;@end
-@property( roughness_map )	roughnessIdx		= (indices[1] & 0xFFFF0000) >> 16;@end
-@property( detail_weight_map )	weightMapIdx		=  indices[2] & 0x0000FFFF;@end
-@property( detail_map0 )	detailMapIdx0		= (indices[2] & 0xFFFF0000) >> 16;@end
-@property( detail_map1 )	detailMapIdx1		=  indices[3] & 0x0000FFFF;@end
-@property( detail_map2 )	detailMapIdx2		= (indices[3] & 0xFFFF0000) >> 16;@end
-@property( detail_map3 )	detailMapIdx3		=  indices[4] & 0x0000FFFF;@end
-@property( detail_map_nm0 )	detailNormMapIdx0	= (indices[4] & 0xFFFF0000) >> 16;@end
-@property( detail_map_nm1 )	detailNormMapIdx1	=  indices[5] & 0x0000FFFF;@end
-@property( detail_map_nm2 )	detailNormMapIdx2	= (indices[5] & 0xFFFF0000) >> 16;@end
-@property( detail_map_nm3 )	detailNormMapIdx3	=  indices[6] & 0x0000FFFF;@end
-@property( envprobe_map )	envMapIdx			= (indices[6] & 0xFFFF0000) >> 16;@end
+@property( diffuse_map )	diffuseIdx			=  material.m[materialId].indices0 & 0x0000FFFF;@end
+@property( normal_map_tex )	normalIdx			= (material.m[materialId].indices0 & 0xFFFF0000) >> 16;@end
+@property( specular_map )	specularIdx			=  material.m[materialId].indices1 & 0x0000FFFF;@end
+@property( roughness_map )	roughnessIdx		= (material.m[materialId].indices1 & 0xFFFF0000) >> 16;@end
+@property( detail_weight_map )	weightMapIdx		=  material.m[materialId].indices2 & 0x0000FFFF;@end
+@property( detail_map0 )	detailMapIdx0		= (material.m[materialId].indices2 & 0xFFFF0000) >> 16;@end
+@property( detail_map1 )	detailMapIdx1		=  material.m[materialId].indices3 & 0x0000FFFF;@end
+@property( detail_map2 )	detailMapIdx2		= (material.m[materialId].indices3 & 0xFFFF0000) >> 16;@end
+@property( detail_map3 )	detailMapIdx3		=  material.m[materialId].indices4 & 0x0000FFFF;@end
+@property( detail_map_nm0 )	detailNormMapIdx0	= (material.m[materialId].indices4 & 0xFFFF0000) >> 16;@end
+@property( detail_map_nm1 )	detailNormMapIdx1	=  material.m[materialId].indices5 & 0x0000FFFF;@end
+@property( detail_map_nm2 )	detailNormMapIdx2	= (material.m[materialId].indices5 & 0xFFFF0000) >> 16;@end
+@property( detail_map_nm3 )	detailNormMapIdx3	=  material.m[materialId].indices6 & 0x0000FFFF;@end
+@property( envprobe_map )	envMapIdx			= (material.m[materialId].indices6 & 0xFFFF0000) >> 16;@end
 
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
@@ -254,9 +253,9 @@ void main()
 
 @property( hlms_pssm_splits )
 	float fShadow = 1.0;
-	if( inPs.depth <= pssmSplitPoints[@value(CurrentShadowMap)] )
+	if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
 		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, invShadowMapSize[@counter(CurrentShadowMap)] );@end
-@foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pssmSplitPoints[@value(CurrentShadowMap)] )
+@foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
 		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, invShadowMapSize[@counter(CurrentShadowMap)] );
 @end
 

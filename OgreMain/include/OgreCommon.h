@@ -810,6 +810,23 @@ namespace Ogre {
         return container.begin() + idx;
     }
 
+    /// Aligns the input 'offset' to the next multiple of 'alignment'.
+    /// Alignment can be any value except 0. Some examples:
+    ///
+    /// alignToNextMultiple( 0, 4 ) = 0;
+    /// alignToNextMultiple( 1, 4 ) = 4;
+    /// alignToNextMultiple( 2, 4 ) = 4;
+    /// alignToNextMultiple( 3, 4 ) = 4;
+    /// alignToNextMultiple( 4, 4 ) = 4;
+    /// alignToNextMultiple( 5, 4 ) = 8;
+    ///
+    /// alignToNextMultiple( 0, 3 ) = 0;
+    /// alignToNextMultiple( 1, 3 ) = 3;
+    inline size_t alignToNextMultiple( size_t offset, size_t alignment )
+    {
+        return ( (offset + alignment - 1) / alignment ) * alignment;
+    }
+
 #if OGRE_CPU == OGRE_CPU_X86
     //VS 2012 translates this to a single maxss/maxpd instruction! :)
     //(plus some memory loading if arguments weren't loaded)

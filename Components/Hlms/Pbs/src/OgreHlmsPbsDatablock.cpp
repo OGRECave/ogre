@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsTextureManager.h"
-#include "OgrePbsShaderCreationData.h"
 #include "OgreTexture.h"
 #include "OgreLogManager.h"
 
@@ -130,48 +129,55 @@ namespace Ogre
 
             if( vec.size() > 0 )
             {
-                mShaderCreationData->mFresnelR = StringConverter::parseReal( vec[0], 1.0f );
+                mFresnelR = StringConverter::parseReal( vec[0], 1.0f );
 
                 if( vec.size() == 3 )
                 {
-                    mShaderCreationData->mFresnelG = StringConverter::parseReal( vec[1], 1.0f );
-                    mShaderCreationData->mFresnelB = StringConverter::parseReal( vec[2], 1.0f );
-                    mShaderCreationData->mFresnelTypeSizeBytes = 12;
+                    mFresnelG = StringConverter::parseReal( vec[1], 1.0f );
+                    mFresnelB = StringConverter::parseReal( vec[2], 1.0f );
+                    mFresnelTypeSizeBytes = 12;
                 }
             }
         }
 
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
+        PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
+
         if( Hlms::findParamInVec( params, "diffuse_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE, PBSM_DIFFUSE );
-
+            textures[PBSM_DIFFUSE].texture = setTexture( paramVal,
+                                                         HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
             mSamplerblocks[PBSM_DIFFUSE] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "normal_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_NORMALS, PBSM_NORMAL );
+            textures[PBSM_NORMAL].texture = setTexture( paramVal,
+                                                        HlmsTextureManager::TEXTURE_TYPE_NORMALS );
             mSamplerblocks[PBSM_NORMAL] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "specular_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DIFFUSE, PBSM_SPECULAR );
+            textures[PBSM_SPECULAR].texture = setTexture( paramVal,
+                                                          HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
             mSamplerblocks[PBSM_SPECULAR] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "roughness_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_MONOCHROME, PBSM_ROUGHNESS );
+            textures[PBSM_ROUGHNESS].texture = setTexture( paramVal,
+                                                           HlmsTextureManager::TEXTURE_TYPE_MONOCHROME );
             mSamplerblocks[PBSM_ROUGHNESS] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "detail_weight_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL, PBSM_DETAIL_WEIGHT );
+            textures[PBSM_DETAIL_WEIGHT].texture = setTexture( paramVal,
+                                                               HlmsTextureManager::TEXTURE_TYPE_DETAIL );
             mSamplerblocks[PBSM_DETAIL_WEIGHT] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "reflection_map", paramVal ) )
         {
-            setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_ENV_MAP, PBSM_REFLECTION );
+            textures[PBSM_REFLECTION].texture = setTexture( paramVal,
+                                                            HlmsTextureManager::TEXTURE_TYPE_ENV_MAP );
             mSamplerblocks[PBSM_REFLECTION] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
 
@@ -200,18 +206,19 @@ namespace Ogre
             String key = "detail_map" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
-                setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL,
-                            static_cast<PbsTextureTypes>( PBSM_DETAIL0 + i ) );
+                textures[PBSM_DETAIL0 + i].texture = setTexture(
+                            paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL );
                 mSamplerblocks[PBSM_DETAIL0 + i] = hlmsManager->getSamplerblock( detailSamplerRef );
             }
 
             key = "detail_normal_map" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
-                setTexture( paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
-                            static_cast<PbsTextureTypes>( PBSM_DETAIL0_NM + i ) );
+                textures[PBSM_DETAIL0_NM + i].texture = setTexture(
+                            paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP );
                 mSamplerblocks[PBSM_DETAIL0_NM + i] = hlmsManager->getSamplerblock( detailSamplerRef );
             }
+
 
             key = "detail_blend_mode" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
@@ -223,7 +230,6 @@ namespace Ogre
                     std::transform( c_pbsBlendModes[j].begin(), c_pbsBlendModes[j].end(),
                                     blendModeLowerCase.begin(), ::tolower );
                     StringUtil::toLowerCase( paramVal );
-
                     if( blendModeLowerCase == paramVal )
                         setDetailMapBlendMode( i, static_cast<PbsBlendModes>( j ) );
                 }
@@ -244,14 +250,17 @@ namespace Ogre
             }
         }
 
+        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+            textures[i].samplerBlock = mSamplerblocks[i];
+
+        bakeTextures( textures );
+
         calculateHash();
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     HlmsPbsDatablock::~HlmsPbsDatablock()
     {
-        delete mShaderCreationData;
-        mShaderCreationData = 0;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::calculateHash()
@@ -271,25 +280,15 @@ namespace Ogre
 
         mTextureHash = hash.mHash;
     }
+
+
     //-----------------------------------------------------------------------------------
     char* HlmsPbsDatablock::uploadToConstBuffer( char *dstPtr )
     {
-        mBakedTextures.clear();
-
-        for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
-        {
-            PbsBakedTexture bakedTexture( mTexture[i], mSamplerblocks[i] );
-
-            PbsBakedTextureArray::const_iterator itor = std::find( mBakedTextures.begin(),
-                                                                   mBakedTextures.end(), bakedTexture );
-
-            if( itor == end )
-                mBakedTextures.push_back( bakedTexture );
-        }
-
-        const size_t dataSize = 58 * 4;
+        size_t dataSize = 52 * 4 + NUM_PBSM_TEXTURE_TYPES * 2;
         memcpy( dstPtr, &mkDr, dataSize );
-        return dstPtr + dataSize;
+
+        return dstPtr + alignToNextMultiple( dataSize, 4 * 4 );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::decompileBakedTextures( PbsBakedTexture outTextures[NUM_PBSM_TEXTURE_TYPES] )
@@ -301,12 +300,12 @@ namespace Ogre
 
             if( idx < NUM_PBSM_TEXTURE_TYPES )
             {
-                outTextures[i] = PbsBakedTexture( mBakedTextures[idx].texture, mSamplerblocks[texType] );
+                outTextures[i] = PbsBakedTexture( mBakedTextures[idx].texture, mSamplerblocks[i] );
             }
             else
             {
                 //The texture may be null, but the samplerblock information may still be there.
-                outTextures[i] = PbsBakedTexture( TexturePtr(), mSamplerblocks[texType] );
+                outTextures[i] = PbsBakedTexture( TexturePtr(), mSamplerblocks[i] );
             }
         }
     }
@@ -329,7 +328,7 @@ namespace Ogre
                 if( itor == mBakedTextures.end() )
                 {
                     mTexToBakedTextureIdx[i] = mBakedTextures.size();
-                    mBakedTextures.push_back( bakedTexture );
+                    mBakedTextures.push_back( textures[i] );
                 }
                 else
                 {
@@ -343,24 +342,19 @@ namespace Ogre
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::setTexture( const String &name,
-                                       HlmsTextureManager::TextureMapType textureMapType,
-                                       PbsTextureTypes textureType )
+    TexturePtr HlmsPbsDatablock::setTexture( const String &name,
+                                             HlmsTextureManager::TextureMapType textureMapType )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
         HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
                                                     createOrRetrieveTexture( name, textureMapType );
 
-        assert( !texLocation.texture->isTextureTypeArray() );
+        assert( texLocation.texture->isTextureTypeArray() );
 
-        mTexture[textureType] = texLocation.texture;
+        mTexIndices[textureMapType] = texLocation.xIdx;
 
-        if( textureType <= PBSM_ROUGHNESS )
-        {
-            mShaderCreationData->mUvAtlasParams[textureType] = textureLocationToAtlasParams(
-                                                                                        texLocation );
-        }
+        return texLocation.texture;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDiffuse( const Vector3 &diffuseColour )
@@ -382,19 +376,19 @@ namespace Ogre
     void HlmsPbsDatablock::setFresnel( const Vector3 &fresnel, bool separateFresnel )
     {
         uint8 fresnelBytes = 4;
-        mShaderCreationData->mFresnelR = fresnel.x;
+        mFresnelR = fresnel.x;
 
         if( separateFresnel )
         {
-            mShaderCreationData->mFresnelG = fresnel.y;
-            mShaderCreationData->mFresnelB = fresnel.z;
+            mFresnelG = fresnel.y;
+            mFresnelB = fresnel.z;
 
             fresnelBytes = 12;
         }
 
-        if( fresnelBytes != mShaderCreationData->mFresnelTypeSizeBytes )
+        if( fresnelBytes != mFresnelTypeSizeBytes )
         {
-            mShaderCreationData->mFresnelTypeSizeBytes = fresnelBytes;
+            mFresnelTypeSizeBytes = fresnelBytes;
             flushRenderables();
         }
 
@@ -403,13 +397,12 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Vector3 HlmsPbsDatablock::getFresnel(void) const
     {
-        return Vector3( mShaderCreationData->mFresnelR, mShaderCreationData->mFresnelG,
-                        mShaderCreationData->mFresnelB );
+        return Vector3( mFresnelR, mFresnelG, mFresnelB );
     }
     //-----------------------------------------------------------------------------------
     bool HlmsPbsDatablock::hasSeparateFresnel(void) const
     {
-        return mShaderCreationData->mFresnelTypeSizeBytes != 4;
+        return mFresnelTypeSizeBytes != 4;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setTexture( PbsTextureTypes texType, uint16 arrayIndex,
@@ -437,6 +430,8 @@ namespace Ogre
                 samplerBlockRef.mV = TAM_WRAP;
                 samplerBlockRef.mW = TAM_WRAP;
             }
+
+            HlmsManager *hlmsManager = mCreator->getHlmsManager();
             mSamplerblocks[texType] = hlmsManager->getSamplerblock( *params );
         }
 
@@ -458,7 +453,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    TexturePtr HlmsPbsDatablock::getTexture( PbsTextureTypes texType )
+    TexturePtr HlmsPbsDatablock::getTexture( PbsTextureTypes texType ) const
     {
         TexturePtr retVal;
 
@@ -466,6 +461,11 @@ namespace Ogre
             retVal = mBakedTextures[mTexToBakedTextureIdx[texType]].texture;
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    TexturePtr HlmsPbsDatablock::getTexture( size_t texType ) const
+    {
+        return getTexture( static_cast<PbsTextureTypes>( texType ) );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setSamplerblock( PbsTextureTypes texType, const HlmsSamplerblock &params )
@@ -502,9 +502,9 @@ namespace Ogre
                          "HlmsPbsDatablock::setTextureUvSource" );
         }
 
-        if( mShaderCreationData->uvSource[sourceType] != uvSet )
+        if( mUvSource[sourceType] != uvSet )
         {
-            mShaderCreationData->uvSource[sourceType] = uvSet;
+            mUvSource[sourceType] = uvSet;
             flushRenderables();
         }
     }
@@ -513,9 +513,9 @@ namespace Ogre
     {
         assert( detailMap < 4 );
 
-        if( mShaderCreationData->blendModes[detailMap] != blendMode )
+        if( mBlendModes[detailMap] != blendMode )
         {
-            mShaderCreationData->blendModes[detailMap] = blendMode;
+            mBlendModes[detailMap] = blendMode;
             flushRenderables();
         }
     }
@@ -524,10 +524,10 @@ namespace Ogre
     {
         assert( detailNormalMap < 4 );
 
-        bool wasOne = mShaderCreationData->mDetailNormalWeight[detailNormalMap] == 1.0f;
-        mShaderCreationData->mDetailNormalWeight[detailNormalMap] = weight;
+        bool wasOne = mDetailNormalWeight[detailNormalMap] == 1.0f;
+        mDetailNormalWeight[detailNormalMap] = weight;
 
-        if( wasOne != (mShaderCreationData->mDetailNormalWeight[detailNormalMap] == 1.0f) )
+        if( wasOne != (mDetailNormalWeight[detailNormalMap] == 1.0f) )
         {
             flushRenderables();
             scheduleConstBufferUpdate();
@@ -537,47 +537,34 @@ namespace Ogre
     Real HlmsPbsDatablock::getDetailNormalWeight( uint8 detailNormalMap ) const
     {
         assert( detailNormalMap < 4 );
-        return mShaderCreationData->mDetailNormalWeight[detailNormalMap];
+        return mDetailNormalWeight[detailNormalMap];
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setNormalMapWeight( Real weight )
     {
-        bool wasDisabled = mShaderCreationData->mNormalMapWeight == 1.0f;
-        mShaderCreationData->mNormalMapWeight = weight;
+        bool wasDisabled = mNormalMapWeight == 1.0f;
+        mNormalMapWeight = weight;
 
-        if( wasDisabled != (mShaderCreationData->mNormalMapWeight == 1.0f) )
+        if( wasDisabled != (mNormalMapWeight == 1.0f) )
         {
             flushRenderables();
             scheduleConstBufferUpdate();
         }
     }
     //-----------------------------------------------------------------------------------
-    int HlmsPbsDatablock::_calculateNumUvAtlas( bool casterPass ) const
-    {
-        int retVal = 0;
-
-        if( !casterPass )
-        {
-            for( size_t i=0; i<=PBSM_ROUGHNESS; ++i )
-                retVal += !mTexture[i].isNull();
-        }
-
-        return retVal;
-    }
-    //-----------------------------------------------------------------------------------
     Real HlmsPbsDatablock::getNormalMapWeight(void) const
     {
-        return mShaderCreationData->mNormalMapWeight;
+        return mNormalMapWeight;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDetailMapWeight( uint8 detailMap, Real weight )
     {
         assert( detailMap < 4 );
-        bool wasDisabled = mShaderCreationData->mDetailWeight[detailMap] == 1.0f;
+        bool wasDisabled = mDetailWeight[detailMap] == 1.0f;
 
-        mShaderCreationData->mDetailWeight[detailMap] = weight;
+        mDetailWeight[detailMap] = weight;
 
-        if( wasDisabled != (mShaderCreationData->mDetailWeight[detailMap] == 1.0f) )
+        if( wasDisabled != (mDetailWeight[detailMap] == 1.0f) )
             flushRenderables();
 
         scheduleConstBufferUpdate();
@@ -586,18 +573,17 @@ namespace Ogre
     Real HlmsPbsDatablock::getDetailMapWeight( uint8 detailMap ) const
     {
         assert( detailMap < 4 );
-        return mShaderCreationData->mDetailWeight[detailMap];
+        return mDetailWeight[detailMap];
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale )
     {
         assert( detailMap < 8 );
-        bool wasDisabled = mShaderCreationData->mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 );
+        bool wasDisabled = mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 );
 
-        mShaderCreationData->mDetailsOffsetScale[detailMap] = offsetScale;
+        mDetailsOffsetScale[detailMap] = offsetScale;
 
-        if( wasDisabled !=
-                (mShaderCreationData->mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 )) )
+        if( wasDisabled != (mDetailsOffsetScale[detailMap] == Vector4( 0, 0, 1, 1 )) )
         {
             flushRenderables();
         }
@@ -608,17 +594,6 @@ namespace Ogre
     const Vector4& HlmsPbsDatablock::getDetailMapOffsetScale( uint8 detailMap ) const
     {
         assert( detailMap < 8 );
-        return mShaderCreationData->mDetailsOffsetScale[detailMap];
-    }
-    //-----------------------------------------------------------------------------------
-    PbsUvAtlasParams HlmsPbsDatablock::textureLocationToAtlasParams(
-                                                const HlmsTextureManager::TextureLocation &texLocation )
-    {
-        PbsUvAtlasParams retVal;
-        retVal.uOffset   = texLocation.xIdx / (float)texLocation.divisor;
-        retVal.vOffset   = texLocation.yIdx / (float)texLocation.divisor;
-        retVal.invDivisor= 1.0f / texLocation.divisor;
-
-        return retVal;
+        return mDetailsOffsetScale[detailMap];
     }
 }
