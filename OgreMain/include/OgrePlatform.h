@@ -102,6 +102,15 @@ namespace Ogre {
 #   define FORCEINLINE __inline
 #endif
 
+/* define OGRE_NORETURN macro */
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#	define OGRE_NORETURN __declspec(noreturn)
+#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#	define OGRE_NORETURN __attribute__((noreturn))
+#else
+#	define OGRE_NORETURN
+#endif
+
 /* Finds the current platform */
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && !defined(__ANDROID__)
 #   if defined(WINAPI_FAMILY)

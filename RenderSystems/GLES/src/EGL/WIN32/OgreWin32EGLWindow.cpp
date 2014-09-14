@@ -80,11 +80,9 @@ namespace Ogre {
 #ifdef OGRE_STATIC_LIB
         HINSTANCE hInst = GetModuleHandle( NULL );
 #else
-#  if OGRE_DEBUG_MODE == 1
-        HINSTANCE hInst = GetModuleHandle("RenderSystem_GLES_d.dll");
-#  else
-        HINSTANCE hInst = GetModuleHandle("RenderSystem_GLES.dll");
-#  endif
+		static const TCHAR staticVar;
+		HINSTANCE hInst = NULL;
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
 #endif
 
         mWindow = 0;

@@ -81,8 +81,6 @@ namespace Ogre {
         return mBufferImpl->isLocked();
     }
     //---------------------------------------------------------------------
-    bool D3D11HardwareIndexBuffer::releaseIfDefaultPool(void)
-    {
         /*      if (mD3DPool == D3DPOOL_DEFAULT)
         {
         SAFE_RELEASE(mlpD3DBuffer);
@@ -90,11 +88,7 @@ namespace Ogre {
         }
         return false;
         */
-        return true;
-    }
     //---------------------------------------------------------------------
-    bool D3D11HardwareIndexBuffer::recreateIfDefaultPool(D3D11Device & device)
-    {
         /*  if (mD3DPool == D3DPOOL_DEFAULT)
         {
         // Create the Index buffer
@@ -106,7 +100,6 @@ namespace Ogre {
         &mlpD3DBuffer,
         NULL
         );
-
         if (FAILED(hr))
         {
         String msg = DXGetErrorDescription(hr);
@@ -114,13 +107,10 @@ namespace Ogre {
         "Cannot create D3D11 Index buffer: " + msg, 
         "D3D11HardwareIndexBuffer::D3D11HardwareIndexBuffer");
         }
-
         return true;
         }
         return false;
         */
-        return true;
-    }
     //---------------------------------------------------------------------
     ID3D11Buffer * D3D11HardwareIndexBuffer::getD3DIndexBuffer( void ) const
     {

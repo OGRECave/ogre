@@ -301,14 +301,14 @@ namespace Ogre {
         "ATTRIB v24 = vertex.texcoord[0];\n"
         "ATTRIB v16 = vertex.position;\n"
         "PARAM c0[4] = { program.local[0..3] };\n"
-        "PARAM c5 = program.local[5];\n"
-        "PARAM c4 = program.local[4];\n"
+        "PARAM c4 = program.local[4];\n"    // c4.xyz = lightPos
+        "PARAM c5 = program.local[5];\n"    // c5.x = extrudeDist
         "ADD R0.x, c6.x, -v24.x;\n"
-        "MUL R0.w, R0.x, c5.x;\n"
-        "ADD R0.xyz, v16.xyzx, -c4.xyzx;\n"
-        "DP3 R1.w, R0.xyzx, R0.xyzx;\n"     // R1.w = Vector3(vertex - lightpos).sqrLength()
-        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / Vector3(vertex - lightpos).length()
-        "MUL R0.xyz, R1.w, R0.xyzx;\n"      // R0.xyz = Vector3(vertex - lightpos).normalisedCopy()
+        "MUL R0.w, R0.x, c5.x;\n"           // R0.w = (1 - wcoord) * extrudeDist
+        "ADD R0.xyz, v16.xyzx, -c4.xyzx;\n" // R0.xyz = extrusionDir = Vector3(vertex - lightPos)
+        "DP3 R1.w, R0.xyzx, R0.xyzx;\n"     // R1.w = extrusionDir.sqrLength()
+        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / extrusionDir.length()
+        "MUL R0.xyz, R1.w, R0.xyzx;\n"      // R0.xyz = extrusionDir.normalisedCopy()
         "MAD R0.xyz, R0.w, R0.xyzx, v16.xyzx;\n"
         "DPH result.position.x, R0.xyzz, c0[0];\n"
         "DPH result.position.y, R0.xyzz, c0[1];\n"
@@ -322,11 +322,11 @@ namespace Ogre {
         "dcl_texcoord0 v7\n"
         "dcl_position v0\n"
         "add r0.x, c6.x, -v7.x\n"
-        "mul r1.x, r0.x, c5.x\n"
+        "mul r1.x, r0.x, c5.x\n"            // r1.x = (1 - wcoord) * extrudeDist
         "add r0.yzw, v0.xxyz, -c4.xxyz\n"
-        "dp3 r0.x, r0.yzw, r0.yzw\n"
-        "rsq r0.x, r0.x\n"
-        "mul r0.xyz, r0.x, r0.yzw\n"
+        "dp3 r0.x, r0.yzw, r0.yzw\n"        // r0.x = extrusionDir.sqrLength()
+        "rsq r0.x, r0.x\n"                  // r0.x = 1 / extrusionDir.length()
+        "mul r0.xyz, r0.x, r0.yzw\n"        // r0.xyz = extrusionDir.normalisedCopy()
         "mad r0.xyz, r1.x, r0.xyz, v0.xyz\n"
         "mov r0.w, c6.x\n"
         "dp4 oPos.x, c0, r0\n"
@@ -351,16 +351,15 @@ namespace Ogre {
         "{\n"
         "    // extrusion in object space\n"
         "    // vertex unmodified if w==1, extruded if w==0\n"
-        "   float3 extrusionDir = position.xyz - light_position_object_space.xyz;\n"
-        "   extrusionDir = normalize(extrusionDir);\n"
-        "   \n"
+		"    float3 extrusionDir = position.xyz - light_position_object_space.xyz;\n"
+		"    extrusionDir = normalize(extrusionDir);\n"
+		"\n"
         "    float4 newpos = float4(position.xyz +  \n"
         "        ((1 - wcoord.x) * shadow_extrusion_distance * extrusionDir), 1);\n"
         "\n"
         "    VS_OUTPUT output = (VS_OUTPUT)0;\n"
         "    output.Pos = mul(worldviewproj_matrix, newpos);\n"
         "    return output;\n"
-
         "\n"
         "}\n";
 
@@ -413,15 +412,18 @@ namespace Ogre {
     String ShadowVolumeExtrudeProgram::mDirArbvp1Finite = 
         "!!ARBvp1.0\n"
         "PARAM c6 = { 1, 0, 0, 0 };\n"
-        "TEMP R0;\n"
+        "TEMP R0, R1;\n"
         "ATTRIB v24 = vertex.texcoord[0];\n"
         "ATTRIB v16 = vertex.position;\n"
         "PARAM c0[4] = { program.local[0..3] };\n"
-        "PARAM c4 = program.local[4];\n"
-        "PARAM c5 = program.local[5];\n"
+        "PARAM c4 = program.local[4];\n"    // c4.xyz = lightDir = -extrusionDir
+        "PARAM c5 = program.local[5];\n"    // c5.x = extrudeDist
         "ADD R0.x, c6.x, -v24.x;\n"
-        "MUL R0.x, R0.x, c5.x;\n"
-        "MAD R0.xyz, -R0.x, c4.xyzx, v16.xyzx;\n"
+        "MUL R0.w, R0.x, c5.x;\n"           // R0.w = (1 - wcoord) * extrudeDist
+        "DP3 R1.w, c4.xyzx, c4.xyzx;\n"     // R1.w = extrusionDir.sqrLength()
+        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / extrusionDir.length()
+        "MUL R0.xyz, R1.w, -c4.xyzx;\n"     // R0.xyz = extrusionDir.normalisedCopy()
+        "MAD R0.xyz, R0.w, R0.xyzx, v16.xyzx;\n"
         "DPH result.position.x, R0.xyzz, c0[0];\n"
         "DPH result.position.y, R0.xyzz, c0[1];\n"
         "DPH result.position.z, R0.xyzz, c0[2];\n"
@@ -434,8 +436,11 @@ namespace Ogre {
         "dcl_texcoord0 v7\n"
         "dcl_position v0\n"
         "add r0.x, c6.x, -v7.x\n"
-        "mul r0.x, r0.x, c5.x\n"
-        "mad r0.xyz, -r0.x, c4.xyz, v0.xyz\n"
+        "mul r0.w, r0.x, c5.x\n"            // r0.w = (1 - wcoord) * extrudeDist
+        "dp3 r1.w, c4.xyz, c4.xyz\n"        // r1.w = extrusionDir.sqrLength()
+        "rsq r1.w, r1.w\n"                  // r1.w = 1 / extrusionDir.length()
+        "mul r0.xyz, r1.w, -c4.xyz\n"       // r0.xyz = extrusionDir.normalisedCopy()
+        "mad r0.xyz, r0.w, r0.xyz, v0.xyz;\n"
         "mov r0.w, c6.x\n"
         "dp4 oPos.x, c0, r0\n"
         "dp4 oPos.y, c1, r0\n"
@@ -459,9 +464,11 @@ namespace Ogre {
         "{\n"
         "    // extrusion in object space\n"
         "    // vertex unmodified if w==1, extruded if w==0\n"
-        "   // -ve light_position_object_space is direction\n"
-        "    float4 newpos = float4(position.xyz - \n"
-        "        (wcoord.x * shadow_extrusion_distance * light_position_object_space.xyz), 1);\n"
+		"    float3 extrusionDir = - light_position_object_space.xyz;\n"
+		"    extrusionDir = normalize(extrusionDir);\n"
+		"\n"
+		"    float4 newpos = float4(position.xyz + \n"
+		"        ((1 - wcoord.x) * shadow_extrusion_distance * extrusionDir), 1);\n"
         "\n"
         "    VS_OUTPUT output = (VS_OUTPUT)0;\n"
         "    output.Pos = mul(worldviewproj_matrix, newpos);\n"
@@ -481,9 +488,11 @@ namespace Ogre {
         "{\n"
         "    // Extrusion in object space\n"
         "    // Vertex unmodified if w==1, extruded if w==0\n"
-        "    // -ve light_position_object_space is direction\n"
-        "    vec4 newpos = vec4(vertex.xyz - \n"
-        "        (uv0.x * shadow_extrusion_distance * light_position_object_space.xyz), 1.0);\n"
+        "	vec3 extrusionDir = - light_position_object_space.xyz;\n"
+        "	extrusionDir = normalize(extrusionDir);\n"
+        "	\n"
+        "    vec4 newpos = vec4(vertex.xyz +  \n"
+        "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
         "\n"
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "\n"
@@ -505,9 +514,11 @@ namespace Ogre {
         "{\n"
         "    // Extrusion in object space\n"
         "    // Vertex unmodified if w==1, extruded if w==0\n"
-        "    // -ve light_position_object_space is direction\n"
-        "    vec4 newpos = vec4(position.xyz - \n"
-        "        (uv0.x * shadow_extrusion_distance * light_position_object_space.xyz), 1.0);\n"
+		"	vec3 extrusionDir = - light_position_object_space.xyz;\n"
+		"	extrusionDir = normalize(extrusionDir);\n"
+		"	\n"
+		"    vec4 newpos = vec4(position.xyz +  \n"
+		"        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
         "\n"
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "\n"
@@ -566,8 +577,8 @@ namespace Ogre {
         "ATTRIB v24 = vertex.texcoord[0];\n"
         "ATTRIB v16 = vertex.position;\n"
         "PARAM c0[4] = { program.local[0..3] };\n"
-        "PARAM c4 = program.local[4];\n"
-        "PARAM c5 = program.local[5];\n"
+        "PARAM c4 = program.local[4];\n"    // c4.xyz = lightDir = -extrusionDir
+        "PARAM c5 = program.local[5];\n"    // c5.x = extrudeDist
         "MOV result.color.front.primary, c6.x;\n"
         "ADD R0.x, c6.x, -v24.x;\n"
         "MUL R0.x, R0.x, c5.x;\n"
@@ -585,8 +596,11 @@ namespace Ogre {
         "dcl_position v0\n"
         "mov oD0, c6.x\n"
         "add r0.x, c6.x, -v7.x\n"
-        "mul r0.x, r0.x, c5.x\n"
-        "mad r0.xyz, -r0.x, c4.xyz, v0.xyz\n"
+        "mul r0.w, r0.x, c5.x\n"            // r0.w = (1 - wcoord) * extrudeDist
+        "dp3 r1.w, c4.xyz, c4.xyz\n"        // r1.w = extrusionDir.sqrLength()
+        "rsq r1.w, r1.w\n"                  // r1.w = 1 / extrusionDir.length()
+        "mul r0.xyz, r1.w, -c4.xyz\n"       // r0.xyz = extrusionDir.normalisedCopy()
+        "mad r0.xyz, r0.w, r0.xyz, v0.xyz;\n"
         "mov r0.w, c6.x\n"
         "dp4 oPos.x, c0, r0\n"
         "dp4 oPos.y, c1, r0\n"
@@ -707,13 +721,13 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
     const String ShadowVolumeExtrudeProgram::programNames[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
     {
 		"Ogre/ShadowExtrudePointLight",
-		"Ogre/ShadowExtrudePointLightDebug",
-		"Ogre/ShadowExtrudeDirLight",
-		"Ogre/ShadowExtrudeDirLightDebug",
-		"Ogre/ShadowExtrudePointLightFinite",
-		"Ogre/ShadowExtrudePointLightFiniteDebug",
-		"Ogre/ShadowExtrudeDirLightFinite",
-		"Ogre/ShadowExtrudeDirLightFiniteDebug"
+        "Ogre/ShadowExtrudePointLightDebug",
+        "Ogre/ShadowExtrudeDirLight",
+        "Ogre/ShadowExtrudeDirLightDebug",
+        "Ogre/ShadowExtrudePointLightFinite",
+        "Ogre/ShadowExtrudePointLightFiniteDebug",
+        "Ogre/ShadowExtrudeDirLightFinite",
+        "Ogre/ShadowExtrudeDirLightFiniteDebug"
     };
 
     String ShadowVolumeExtrudeProgram::frgProgramName = "";
@@ -815,9 +829,9 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
 			Light::LightTypes vertexProgramLightTypes[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] =
 			{
 				Light::LT_POINT, Light::LT_POINT,
-				Light::LT_DIRECTIONAL, Light::LT_DIRECTIONAL,
-				Light::LT_POINT, Light::LT_POINT,
-				Light::LT_DIRECTIONAL, Light::LT_DIRECTIONAL
+				Light::LT_DIRECTIONAL, Light::LT_DIRECTIONAL, 
+				Light::LT_POINT, Light::LT_POINT, 
+				Light::LT_DIRECTIONAL, Light::LT_DIRECTIONAL 
 			};
 
 			// load hardware extrusion programs for point & dir lights
@@ -830,11 +844,9 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
 			{
 				syntax = "vs_1_1";
 			}
-			else if (
-				(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0"))
-				|| (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1"))
-				|| (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
-				)
+			else if (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0")
+                  || GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1")
+                  || GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
 			{
 				syntax = "vs_4_0";
 			}
@@ -977,125 +989,55 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderArbvp1FiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderArbvp1Finite();
-                    }
+                    return debug ? getDirectionalLightExtruderArbvp1FiniteDebug() : getDirectionalLightExtruderArbvp1Finite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderArbvp1Debug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderArbvp1();
-                    }
+                    return debug ? getDirectionalLightExtruderArbvp1Debug() : getDirectionalLightExtruderArbvp1();
                 }
             } 
             else if (syntax == "vs_1_1")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_1_1FiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_1_1Finite();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_1_1FiniteDebug() : getDirectionalLightExtruderVs_1_1Finite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_1_1Debug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_1_1();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_1_1Debug() : getDirectionalLightExtruderVs_1_1();
                 }
             }
             else if (syntax == "vs_4_0")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_4_0FiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_4_0Finite();
-                    }
-                }
-                else
-                {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_4_0Debug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_4_0();
-                    }
-                }
-            }
+					return debug ? getDirectionalLightExtruderVs_4_0FiniteDebug() : getDirectionalLightExtruderVs_4_0Finite();
+				}
+				else
+				{
+					return debug ? getDirectionalLightExtruderVs_4_0Debug() : getDirectionalLightExtruderVs_4_0();
+				}
+			}
             else if (syntax == "glsl")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_glslFiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_glslFinite();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_glslFiniteDebug() : getDirectionalLightExtruderVs_glslFinite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_glslDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_glsl();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_glslDebug() : getDirectionalLightExtruderVs_glsl();
                 }
             }
             else if (syntax == "glsles")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_glslesFiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_glslesFinite();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_glslesFiniteDebug() : getDirectionalLightExtruderVs_glslesFinite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_glslesDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_glsles();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_glslesDebug() : getDirectionalLightExtruderVs_glsles();
                 }
             }
             else
@@ -1105,7 +1047,6 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
                     "arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
                     "SceneManager::getProgramSource");
             }
-
         }
         else
         {
@@ -1113,127 +1054,57 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderArbvp1FiniteDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderArbvp1Finite();
-                    }
+                    return debug ? getPointLightExtruderArbvp1FiniteDebug() : getPointLightExtruderArbvp1Finite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderArbvp1Debug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderArbvp1();
-                    }
+                    return debug ? getPointLightExtruderArbvp1Debug() : getPointLightExtruderArbvp1();
                 }
             }
             else if (syntax == "vs_1_1")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_1_1FiniteDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_1_1Finite();
-                    }
+                    return debug ? getPointLightExtruderVs_1_1FiniteDebug() : getPointLightExtruderVs_1_1Finite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_1_1Debug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_1_1();
-                    }
+                    return debug ? getPointLightExtruderVs_1_1Debug() : getPointLightExtruderVs_1_1();
                 }
             }
             else if (syntax == "vs_4_0")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_4_0FiniteDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_4_0Finite();
-                    }
-                }
-                else
-                {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_4_0Debug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_4_0();
-                    }
-                }
-            }
+					return debug ? getPointLightExtruderVs_4_0FiniteDebug() : getPointLightExtruderVs_4_0Finite();
+				}
+				else
+				{
+					return debug ? getPointLightExtruderVs_4_0Debug() : getPointLightExtruderVs_4_0();
+				}
+			}
             else if (syntax == "glsl")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_glslFiniteDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_glslFinite();
-                    }
-                }
-                else
-                {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_glslDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_glsl();
-                    }
-                }
-            }
+					return debug ? getPointLightExtruderVs_glslFiniteDebug() : getPointLightExtruderVs_glslFinite();
+				}
+				else
+				{
+					return debug ? getPointLightExtruderVs_glslDebug() : getPointLightExtruderVs_glsl();
+				}
+			}
             else if (syntax == "glsles")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_glslesFiniteDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_glslesFinite();
-                    }
-                }
-                else
-                {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_glslesDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_glsles();
-                    }
-                }
-            }
+					return debug ? getPointLightExtruderVs_glslesFiniteDebug() : getPointLightExtruderVs_glslesFinite();
+				}
+				else
+				{
+					return debug ? getPointLightExtruderVs_glslesDebug() : getPointLightExtruderVs_glsles();
+				}
+			}
             else
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
@@ -1241,7 +1112,6 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
                     "arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
                     "SceneManager::getProgramSource");
             }
-
         }
     }
     //---------------------------------------------------------------------
@@ -1252,54 +1122,24 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
         {
             if (finite)
             {
-                if (debug)
-                {
-                    return programNames[DIRECTIONAL_LIGHT_FINITE_DEBUG];
-                }
-                else
-                {
-                    return programNames[DIRECTIONAL_LIGHT_FINITE];
-                }
+                return programNames[debug ? DIRECTIONAL_LIGHT_FINITE_DEBUG : DIRECTIONAL_LIGHT_FINITE];
             }
             else
             {
-                if (debug)
-                {
-                    return programNames[DIRECTIONAL_LIGHT_DEBUG];
-                }
-                else
-                {
-                    return programNames[DIRECTIONAL_LIGHT];
-                }
+                return programNames[debug ? DIRECTIONAL_LIGHT_DEBUG : DIRECTIONAL_LIGHT];
             }
         }
         else
         {
             if (finite)
             {
-                if (debug)
-                {
-                    return programNames[POINT_LIGHT_FINITE_DEBUG];
-                }
-                else
-                {
-                    return programNames[POINT_LIGHT_FINITE];
-                }
+                return programNames[debug ? POINT_LIGHT_FINITE_DEBUG : POINT_LIGHT_FINITE];
             }
             else
             {
-                if (debug)
-                {
-                    return programNames[POINT_LIGHT_DEBUG];
-                }
-                else
-                {
-                    return programNames[POINT_LIGHT];
-                }
+                return programNames[debug ? POINT_LIGHT_DEBUG : POINT_LIGHT];
             }
         }
     }
-
-
 
 }

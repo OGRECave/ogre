@@ -45,11 +45,8 @@ namespace Ogre
 #ifdef OGRE_STATIC_LIB
         mHInstance = GetModuleHandle( NULL );
 #else
-#  if OGRE_DEBUG_MODE == 1
-        mHInstance = GetModuleHandle("OgreMain_d.dll");
-#  else
-        mHInstance = GetModuleHandle("OgreMain.dll");
-#  endif
+        static const TCHAR staticVar;
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &mHInstance);
 #endif
         mSelectedRenderSystem = 0;
     }

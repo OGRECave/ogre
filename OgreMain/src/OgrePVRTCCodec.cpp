@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreImage.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
+#include "OgreBitwise.h"
 
 #define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define PVR_TEXTURE_FLAG_TYPE_MASK  0xff
@@ -197,11 +198,11 @@ namespace Ogre {
 
         // Get format flags
         flags = header.flags;
-        flipEndian(reinterpret_cast<void*>(flags), sizeof(uint32));
+        flipEndian(&flags, sizeof(uint32));
         formatFlags = flags & PVR_TEXTURE_FLAG_TYPE_MASK;
 
         uint32 bitmaskAlpha = header.bitmaskAlpha;
-        flipEndian(reinterpret_cast<void*>(bitmaskAlpha), sizeof(uint32));
+        flipEndian(&bitmaskAlpha, sizeof(uint32));
 
         if (formatFlags == kPVRTextureFlagTypePVRTC_4 || formatFlags == kPVRTextureFlagTypePVRTC_2)
         {
@@ -286,7 +287,7 @@ namespace Ogre {
 
         // Get format flags
         flags = header.flags;
-        flipEndian(reinterpret_cast<void*>(flags), sizeof(uint32));
+        flipEndian(&flags, sizeof(uint32));
 
         imgData->depth = header.depth;
         imgData->width = header.width;
@@ -348,25 +349,17 @@ namespace Ogre {
         return mType;
     }
     //---------------------------------------------------------------------    
-    void PVRTCCodec::flipEndian(void * pData, size_t size, size_t count) const
+    void PVRTCCodec::flipEndian(void * pData, size_t size, size_t count)
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        for(unsigned int index = 0; index < count; index++)
-        {
-            flipEndian((void *)((long)pData + (index * size)), size);
-        }
+		Bitwise::bswapChunks(pData, size, count);
 #endif
     }
     //---------------------------------------------------------------------    
-    void PVRTCCodec::flipEndian(void * pData, size_t size) const
+    void PVRTCCodec::flipEndian(void * pData, size_t size)
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
-        {
-            char swapByte = *(char *)((long)pData + byteIndex);
-            *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
-            *(char *)((long)pData + size - byteIndex - 1) = swapByte;
-        }
+        Bitwise::bswapBuffer(pData, size);
 #endif
     }
     //---------------------------------------------------------------------
@@ -376,7 +369,7 @@ namespace Ogre {
         {
             uint32 fileType;
             memcpy(&fileType, magicNumberPtr, sizeof(uint32));
-            flipEndian(&fileType, sizeof(uint32), 1);
+			flipEndian(&fileType, sizeof(uint32));
 
             if (PVR3_MAGIC == fileType || PVR2_MAGIC == fileType)
             {
