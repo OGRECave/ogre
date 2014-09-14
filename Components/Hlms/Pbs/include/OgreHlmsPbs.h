@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsPbsPrerequisites.h"
 #include "OgreHlms.h"
+#include "OgreConstBufferPool.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -49,9 +50,10 @@ namespace Ogre
     /** Physically based shading implementation specfically designed for OpenGL ES 2.0 and other
         RenderSystems which do not support uniform buffers.
     */
-    class _OgreHlmsPbsExport HlmsPbs : public Hlms
+    class _OgreHlmsPbsExport HlmsPbs : public Hlms, public ConstBufferPool
     {
-        typedef std::vector<ConstBufferPacked*> ConstBufferPackedVec;
+        typedef vector<ConstBufferPacked*>::type ConstBufferPackedVec;
+        typedef vector<HlmsDatablock*>::type HlmsDatablockVec;
 
         struct PassData
         {
@@ -63,12 +65,19 @@ namespace Ogre
             Matrix4 viewMatrix;
         };
 
+        PassData                mPreparedPass;
         ConstBufferPacked       *mPassBuffer;
-        ConstBufferPackedVec    mDatablockBuffers;
 
-        PassData    mPreparedPass;
+        ConstBufferPackedVec    mInstanceBuffer;
 
-        VaoManager  *mVaoManager;
+        uint32  *mStartMappedConstBuffer;
+        uint32  *mCurrentMappedConstBuffer;
+
+        float   *mStartMappedTexBuffer;
+        float   *mCurrentMappedTexBuffer;
+
+        size_t  mMappedConstBufferSize;
+        size_t  mMappedTexBufferSize;
 
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
@@ -81,6 +90,8 @@ namespace Ogre
                                                     const HlmsParamVec &paramVec );
 
         void setDetailMapProperties( bool diffuseMaps, HlmsPbsDatablock *datablock, PiecesMap *inOutPieces );
+
+        void uploadDirtyDatablocks(void);
 
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );

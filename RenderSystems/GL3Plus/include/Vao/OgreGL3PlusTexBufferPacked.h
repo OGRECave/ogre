@@ -30,20 +30,23 @@ THE SOFTWARE.
 #define _Ogre_GL3PlusVertexBufferPacked_H_
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "Vao/OgreConstBufferPacked.h"
+#include "Vao/OgreTexBufferPacked.h"
 
 namespace Ogre
 {
-    class GL3PlusConstBufferPacked : public ConstBufferPacked
+    class GL3PlusTexBufferPacked : public TexBufferPacked
     {
-    public:
-        GL3PlusConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
-                                  BufferType bufferType, void *initialData, bool keepAsShadow,
-                                  VaoManager *vaoManager, BufferInterface *bufferInterface,
-                                  size_t bindableSize );
-        ~GL3PlusConstBufferPacked();
+        GLuint mTexName;
+        GLenum mInternalFormat;
 
-        virtual void bindBuffer( uint16 slot );
+    public:
+        GL3PlusTexBufferPacked(size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+                                BufferType bufferType, void *initialData, bool keepAsShadow,
+                                VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface,
+                                Ogre::PixelFormat pf );
+        ~GL3PlusTexBufferPacked();
+
+        virtual void bindBuffer( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
     };
 }
 

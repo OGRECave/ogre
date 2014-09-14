@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreHlmsPbsPrerequisites.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsTextureManager.h"
+#include "OgreConstBufferPool.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -61,7 +62,7 @@ namespace Ogre
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
     */
-    class _OgreHlmsPbsExport HlmsPbsDatablock : public HlmsDatablock
+    class _OgreHlmsPbsExport HlmsPbsDatablock : public HlmsDatablock, public ConstBufferPoolUser
     {
         friend class HlmsPbs;
     protected:
@@ -179,10 +180,10 @@ namespace Ogre
                 UV set to use for the particular texture map.
                 The UV value must be in range [0; 8)
         */
-        HlmsPbsDatablock( IdString name, Hlms *creator,
-                                const HlmsMacroblock *macroblock,
-                                const HlmsBlendblock *blendblock,
-                                const HlmsParamVec &params );
+        HlmsPbsDatablock( IdString name, HlmsPbs *creator,
+                          const HlmsMacroblock *macroblock,
+                          const HlmsBlendblock *blendblock,
+                          const HlmsParamVec &params );
         virtual ~HlmsPbsDatablock();
 
         /// Sets the diffuse colour. The colour will be divided by PI for energy conservation.
@@ -343,6 +344,9 @@ namespace Ogre
         void _recreateConstBuffers(void);
 
         virtual void calculateHash();
+
+        static const size_t MaterialSizeInGpu;
+        static const size_t MaterialSizeInGpuAligned;
     };
 
     /** @} */

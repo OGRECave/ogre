@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreConstBufferPacked.h"
+#include "Vao/OgreStagingBuffer.h"
 
 namespace Ogre
 {
@@ -181,8 +182,8 @@ namespace Ogre
 
     HlmsPbs::HlmsPbs( Archive *dataFolder ) :
         Hlms( HLMS_PBS, "pbs", dataFolder ),
-        mPassBuffer( 0 ),
-        mVaoManager( 0 )
+        ConstBufferPool( 68, 16 * 1024 * 1024, 0 ),
+        mPassBuffer( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -195,21 +196,10 @@ namespace Ogre
         if( mVaoManager )
         {
             mVaoManager->destroyConstBuffer( mPassBuffer );
-
-            ConstBufferPackedVec::const_iterator itor = mDatablockBuffers.begin();
-            ConstBufferPackedVec::const_iterator end  = mDatablockBuffers.end();
-
-            while( itor != end )
-                mVaoManager->destroyConstBuffer( *itor++ );
-
-            mDatablockBuffers.clear();
-            mVaoManager = 0;
         }
 
-        if( newRs )
-            mVaoManager = newRs->getVaoManager();
-
         Hlms::_changeRenderSystem( newRs );
+        ConstBufferPool::_changeRenderSystem( newRs );
 
         if( newRs )
         {
@@ -223,7 +213,7 @@ namespace Ogre
                 assert( dynamic_cast<HlmsPbsDatablock*>( itor->second.datablock ) );
                 HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>( itor->second.datablock );
 
-                datablock->_recreateConstBuffers();
+                scheduleForUpdate( datablock );
                 ++itor;
             }
         }
@@ -473,6 +463,62 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbs::uploadDirtyDatablocks(void)
+    {
+        if( mDirtyUsers.empty() )
+            return;
+
+        std::sort( mDirtyUsers.begin(), mDirtyUsers.end(), OrderConstBufferPoolUserByPoolThenSlot );
+
+        size_t uploadSize = HlmsPbsDatablock::MaterialSizeInGpuAligned * mDirtyUsers.size();
+        StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( uploadSize, true );
+
+        StagingBuffer::DestinationVec destinations;
+
+        ConstBufferPoolUserVec::const_iterator itor = mDirtyUsers.begin();
+        ConstBufferPoolUserVec::const_iterator end  = mDirtyUsers.end();
+
+        char *bufferStart = reinterpret_cast<char*>( stagingBuffer->map( uploadSize ) );
+        char *data = bufferStart;
+
+        while( itor != end )
+        {
+            HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>(*itor);
+
+            size_t srcOffset = static_cast<size_t>( data - bufferStart );
+            size_t dstOffset = datablock->getAssignedSlot() * HlmsPbsDatablock::MaterialSizeInGpuAligned;
+
+            data = datablock->uploadToConstBuffer( data );
+
+            StagingBuffer::Destination dst( datablock->getAssignedPool()->materialBuffer, dstOffset,
+                                            srcOffset, HlmsPbsDatablock::MaterialSizeInGpuAligned );
+
+            if( !destinations.empty() )
+            {
+                StagingBuffer::Destination &lastElement = destinations.back();
+
+                if( lastElement.destination == dst.destination &&
+                    (lastElement.dstOffset + lastElement.length == dst.dstOffset) )
+                {
+                    lastElement.length += dst.length;
+                }
+                else
+                {
+                    destinations.push_back( dst );
+                }
+            }
+            else
+            {
+                destinations.push_back( dst );
+            }
+
+            ++itor;
+        }
+
+        stagingBuffer->unmap( destinations );
+        stagingBuffer->removeReferenceCount();
+    }
+    //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbs::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                               bool dualParaboloid, SceneManager *sceneManager )
     {
@@ -720,27 +766,22 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     uint32 HlmsPbs::fillBuffersFor( const HlmsCache *cache,
-                                          const QueuedRenderable &queuedRenderable,
-                                          bool casterPass, const HlmsCache *lastCache,
-                                          uint32 lastTextureHash )
+                                    const QueuedRenderable &queuedRenderable,
+                                    bool casterPass, const HlmsCache *lastCache,
+                                    uint32 lastTextureHash )
     {
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
-        float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
-#if _SECURE_SCL
-        float *psUniformBuffer = 0;
-        if( !psParams->getFloatConstantList().empty() )
-            psUniformBuffer = psParams->getFloatPointer( 0 );
-#else
-        float *psUniformBuffer = psParams->getFloatPointer( 0 );
-#endif
 
         assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
+        uint16 variabilityMask = GPV_PER_OBJECT;
         if( !lastCache || lastCache->type != HLMS_PBS )
         {
+            variabilityMask = GPV_ALL;
+
             //We changed HlmsType, rebind the shared textures.
             FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
             FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
@@ -757,33 +798,12 @@ namespace Ogre
             }
         }
 
-        uint16 variabilityMask = GPV_PER_OBJECT;
-        size_t psBufferElements = mPreparedPass.pixelShaderSharedBuffer.size() -
-                                    ((!casterPass && datablock->getTexture( PBSM_REFLECTION ).isNull()) ?
-                                                                                            9 : 0);
+        ConstBufferPacked *instanceConstBuffer = 0;
+
+        uint32 * RESTRICT_ALIAS currentMappedConstBuffer    = mCurrentMappedConstBuffer;
+        float * RESTRICT_ALIAS currentMappedTexBuffer       = mCurrentMappedTexBuffer;
 
         bool hasSkeletonAnimation = queuedRenderable.renderable->hasSkeletonAnimation();
-        size_t sharedViewTransfElem = hasSkeletonAnimation ? 0 : (16 * (2 - casterPass));
-
-        //Sizes can't be equal (we also add more data)
-        assert( mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem <
-                vpParams->getFloatConstantList().size() );
-        assert( ( mPreparedPass.pixelShaderSharedBuffer.size() -
-                  ((!casterPass && datablock->getTexture( PBSM_REFLECTION ).isNull()) ? 9 : 0) ) <=
-                psParams->getFloatConstantList().size() );
-
-        if( cache != lastCache )
-        {
-            variabilityMask = GPV_ALL;
-            memcpy( vsUniformBuffer, mPreparedPass.vertexShaderSharedBuffer.begin(),
-                    sizeof(float) * (mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem) );
-
-            memcpy( psUniformBuffer, mPreparedPass.pixelShaderSharedBuffer.begin(),
-                    sizeof(float) * psBufferElements );
-        }
-
-        vsUniformBuffer += mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem;
-        psUniformBuffer += psBufferElements;
 
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
 
@@ -793,24 +813,31 @@ namespace Ogre
 #if !OGRE_DOUBLE_PRECISION
         if( !hasSkeletonAnimation )
         {
+            //uint worldMaterialIdx[]
+            *currentMappedConstBuffer++ = datablock->getAssignedSlot() & 0x1FF;
+
             //mat4 worldViewProj
             Matrix4 tmp = mPreparedPass.viewProjMatrix * worldMat;
     #ifdef OGRE_GLES2_WORKAROUND_1
             tmp = tmp.transpose();
     #endif
-            memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
-            vsUniformBuffer += 16;
+            memcpy( currentMappedTexBuffer, &tmp, sizeof(Matrix4) );
+            currentMappedTexBuffer += 16;
+
             //mat4 worldView
             tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
     #ifdef OGRE_GLES2_WORKAROUND_1
-            //On GLES2, there is a bug in PowerVR SGX 540 where glProgramUniformMatrix4fvEXT doesn't
             tmp = tmp.transpose();
     #endif
-            memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) * !casterPass );
-            vsUniformBuffer += 16 * !casterPass;
+            memcpy( currentMappedTexBuffer, &tmp, sizeof(Matrix4) * !casterPass );
+            currentMappedTexBuffer += 16 * !casterPass;
         }
         else
         {
+            //uint worldMaterialIdx[]
+            *currentMappedConstBuffer++ = (((mCurrentMappedTexBuffer - mStartMappedTexBuffer) / 3) << 9) |
+                                            (datablock->getAssignedSlot() & 0x1FF);
+
             uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
             assert( numWorldTransforms <= 60 );
 
@@ -829,17 +856,11 @@ namespace Ogre
     #error Not Coded Yet! (cannot use memcpy on Matrix4)
 #endif
 
-        if( casterPass )
-            *vsUniformBuffer++ = datablock->mShadowConstantBias;
-
         uint32 retVal;
 
         //---------------------------------------------------------------------------
         //                          ---- PIXEL SHADER ----
         //---------------------------------------------------------------------------
-        //See HlmsPbsDatablock::bakeVariableParameters
-        memcpy( psUniformBuffer, &datablock->mRoughness, datablock->mFullParametersBytes[casterPass] );
-        psUniformBuffer += datablock->mFullParametersBytes[casterPass] >> 2;
 
         if( !casterPass )
         {
@@ -869,9 +890,9 @@ namespace Ogre
             retVal = 0;
         }
 
-        assert( vsUniformBuffer - vpParams->getFloatPointer( 0 ) == vpParams->getFloatConstantList().size() );
-        assert( (!psParams->getFloatConstantList().size() && !psUniformBuffer) ||
-                (psUniformBuffer - psParams->getFloatPointer( 0 ) == psParams->getFloatConstantList().size()) );
+        mCurrentMappedConstBuffer   = currentMappedConstBuffer;
+        mCurrentMappedTexBuffer     = currentMappedTexBuffer;
+
 
         mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, variabilityMask );
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );

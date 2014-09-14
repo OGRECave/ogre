@@ -30,37 +30,42 @@ THE SOFTWARE.
 #define _Ogre_ConstBufferPacked_H_
 
 #include "Vao/OgreBufferPacked.h"
+#include "OgrePixelFormat.h"
 
 namespace Ogre
 {
-    /** Represents constant buffers (also known as Uniform Buffers in GL)
+    /** Represents Texture buffers (also known as tbuffers in D3D11)
      */
-    class ConstBufferPacked : public BufferPacked
+    class TexBufferPacked : public BufferPacked
     {
-    protected:
-        size_t mBindableSizeBytes;
+        PixelFormat mPixelFormat;
 
     public:
-        ConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
-                           BufferType bufferType, void *initialData, bool keepAsShadow,
-                           VaoManager *vaoManager, BufferInterface *bufferInterface,
-                           size_t bindableSize ) :
+        TexBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+                         BufferType bufferType, void *initialData, bool keepAsShadow,
+                         VaoManager *vaoManager, BufferInterface *bufferInterface, PixelFormat pf ) :
             BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
                           initialData, keepAsShadow, vaoManager, bufferInterface ),
-            mBindableSizeBytes( bindableSize )
+            mPixelFormat( pf )
         {
         }
 
-        /** Binds the constant buffer to the given slot
+        /** Binds the texture buffer to the given slot
         @param slot
             The slot to asign this constant buffer. In D3D11 it's called 'slot'.
             In GLSL it's called it's called 'binding'
+        @param offset
+            0-based offset. It is possible to bind a region of the buffer.
+            Offset needs to be aligned. You can query the RS capabilities for
+            the alignment, however 256 bytes is the maximum allowed alignment
+            per the OpenGL specification, making it a safe bet to hardcode.
+        @param sizeBytes
+            Size in bytes to bind the tex buffer. When zero,
+            binds from offset until the end of the buffer.
         */
-        virtual void bindBuffer( uint16 slot ) = 0;
+        virtual void bindBuffer( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
 
-        /// Gets the size of the buffer that will get bound. May not be
-        /// the same as the size of the entire buffer (i.e. due to padding)
-        size_t getBindableSize(void) const                  { return mBindableSizeBytes; }
+        PixelFormat getPixelFormat(void) const           { return mPixelFormat; }
 
         //TODO
         virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }

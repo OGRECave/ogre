@@ -53,7 +53,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
 	int _idx = int(blendIndices[0] * 3.0);
-	uint matStart = (instance.worldMaterialIdx[drawId] & 0xFFFFFE00) >> 23;
+	uint matStart = (instance.worldMaterialIdx[drawId] & 0xFFFFFE00) >> 9;
 	vec4 worldMat[3];
 	worldMat[0] = texelFetch( worldMatBuf, matStart + _idx + 0 );
 	worldMat[1] = texelFetch( worldMatBuf, matStart + _idx + 1 );
@@ -135,18 +135,18 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 void main()
 {
 @property( !hlms_skeleton )
+	mat4 worldViewProj;
+	worldViewProj[0] = texelFetch( worldMatBuf, drawId * 2 );
+	worldViewProj[1] = texelFetch( worldMatBuf, drawId * 2 + 1 );
+	worldViewProj[2] = texelFetch( worldMatBuf, drawId * 2 + 2 );
+	worldViewProj[3] = texelFetch( worldMatBuf, drawId * 2 + 3 );
 	@property( hlms_normal )
 	mat4 worldView;
-	worldView[0] = texelFetch( worldMatBuf, drawId * 2 );
-	worldView[1] = texelFetch( worldMatBuf, drawId * 2 + 1 );
-	worldView[2] = texelFetch( worldMatBuf, drawId * 2 + 2 );
-	worldView[3] = texelFetch( worldMatBuf, drawId * 2 + 3 );
+	worldView[0] = texelFetch( worldMatBuf, drawId * 2 + 4 );
+	worldView[1] = texelFetch( worldMatBuf, drawId * 2 + 5 );
+	worldView[2] = texelFetch( worldMatBuf, drawId * 2 + 6 );
+	worldView[3] = texelFetch( worldMatBuf, drawId * 2 + 7 );
 	@end
-	mat4 worldViewProj;
-	worldViewProj[0] = texelFetch( worldMatBuf, drawId * 2 + 4 );
-	worldViewProj[1] = texelFetch( worldMatBuf, drawId * 2 + 5 );
-	worldViewProj[2] = texelFetch( worldMatBuf, drawId * 2 + 6 );
-	worldViewProj[3] = texelFetch( worldMatBuf, drawId * 2 + 7 );
 @end
 
 @property( hlms_qtangent )

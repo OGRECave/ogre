@@ -61,6 +61,7 @@ namespace Ogre
         BufferPackedVec         mVertexBuffers;
         BufferPackedVec         mIndexBuffers;
         BufferPackedVec         mConstBuffers;
+        BufferPackedVec         mTexBuffers;
         VertexArrayObjectVec    mVertexArrayObjects;
 
         uint32          mFrameCount;
@@ -88,8 +89,11 @@ namespace Ogre
 
         virtual ConstBufferPacked* createConstBufferImpl( size_t sizeBytes, BufferType bufferType,
                                                           void *initialData, bool keepAsShadow ) = 0;
-
         virtual void destroyConstBufferImpl( ConstBufferPacked *constBuffer ) = 0;
+
+        virtual TexBufferPacked* createTexBufferImpl( size_t sizeBytes, BufferType bufferType,
+                                                          void *initialData, bool keepAsShadow ) = 0;
+        virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer ) = 0;
 
         virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
                                                                 IndexBufferPacked *indexBuffer,
@@ -178,7 +182,6 @@ namespace Ogre
         @param sizeBytes
             The size in bytes of the given constant buffer. API restrictions may apply.
             To stay safe keep it multiple of 16, don't request more than 64kb per buffer.
-            The actual buffer's size may not
         @return
             The desired const buffer pointer
         */
@@ -190,6 +193,25 @@ namespace Ogre
             Constant Buffer created with createConstBuffer
         */
         void destroyConstBuffer( ConstBufferPacked *constBuffer );
+
+        /** Creates an constant buffer based on the given parameters. Behind the scenes, the buffer
+            is actually part of much larger buffer, in order to reduce bindings at runtime.
+            (depends on the RenderSystem, on D3D11 we're forced to give its own buffer)
+        @remarks
+            @See createVertexBuffer for the remaining parameters not documented here.
+        @param sizeBytes
+            The size in bytes of the given constant buffer. API restrictions may apply.
+        @return
+            The desired texture buffer pointer
+        */
+        TexBufferPacked* createTexBuffer( size_t sizeBytes, BufferType bufferType,
+                                          void *initialData, bool keepAsShadow );
+
+        /** Destroys the given texture buffer created with createTexBuffer.
+        @param constBuffer
+            Texture Buffer created with createTexBuffer
+        */
+        void destroyTexBuffer( TexBufferPacked *texBuffer );
 
         /** Creates a VertexArrayObject that binds all the vertex buffers with their respective
             declarations, and the index buffers. The returned value is immutable and thus cannot

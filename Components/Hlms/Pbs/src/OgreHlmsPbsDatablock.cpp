@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreHlmsPbsDatablock.h"
-#include "OgreHlms.h"
+#include "OgreHlmsPbs.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsTextureManager.h"
 #include "OgreTexture.h"
@@ -45,11 +45,16 @@ namespace Ogre
         "GrainMerge", "Difference"
     };
 
+    const size_t HlmsPbsDatablock::MaterialSizeInGpu          = 52 * 4 + NUM_PBSM_TEXTURE_TYPES * 2;
+    const size_t HlmsPbsDatablock::MaterialSizeInGpuAligned   = alignToNextMultiple(
+                                                                    HlmsPbsDatablock::MaterialSizeInGpu,
+                                                                    4 * 4 );
+
     //-----------------------------------------------------------------------------------
-    HlmsPbsDatablock::HlmsPbsDatablock( IdString name, Hlms *creator,
-                                              const HlmsMacroblock *macroblock,
-                                              const HlmsBlendblock *blendblock,
-                                              const HlmsParamVec &params ) :
+    HlmsPbsDatablock::HlmsPbsDatablock( IdString name, HlmsPbs *creator,
+                                        const HlmsMacroblock *macroblock,
+                                        const HlmsBlendblock *blendblock,
+                                        const HlmsParamVec &params ) :
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
         mConstBuffer( 0 ),
         mBufferOffset( 0 ),
@@ -256,11 +261,13 @@ namespace Ogre
         bakeTextures( textures );
 
         calculateHash();
-        scheduleConstBufferUpdate();
+
+        creator->requestSlot( mTextureHash, this );
     }
     //-----------------------------------------------------------------------------------
     HlmsPbsDatablock::~HlmsPbsDatablock()
     {
+        static_cast<HlmsPbs*>(mCreator)->releaseSlot( this );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::calculateHash()
@@ -278,17 +285,22 @@ namespace Ogre
             ++itor;
         }
 
-        mTextureHash = hash.mHash;
+        if( mTextureHash != hash.mHash )
+        {
+            mTextureHash = hash.mHash;
+            static_cast<HlmsPbs*>(mCreator)->requestSlot( mTextureHash, this );
+        }
     }
-
-
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::scheduleConstBufferUpdate(void)
+    {
+        static_cast<HlmsPbs*>(mCreator)->scheduleForUpdate( this );
+    }
     //-----------------------------------------------------------------------------------
     char* HlmsPbsDatablock::uploadToConstBuffer( char *dstPtr )
     {
-        size_t dataSize = 52 * 4 + NUM_PBSM_TEXTURE_TYPES * 2;
-        memcpy( dstPtr, &mkDr, dataSize );
-
-        return dstPtr + alignToNextMultiple( dataSize, 4 * 4 );
+        memcpy( dstPtr, &mkDr, MaterialSizeInGpu );
+        return dstPtr + MaterialSizeInGpuAligned;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::decompileBakedTextures( PbsBakedTexture outTextures[NUM_PBSM_TEXTURE_TYPES] )

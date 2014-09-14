@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusVertexArrayObject.h"
 #include "Vao/OgreGL3PlusBufferInterface.h"
 #include "Vao/OgreGL3PlusConstBufferPacked.h"
+#include "Vao/OgreGL3PlusTexBufferPacked.h"
 #include "Vao/OgreGL3PlusMultiSourceVertexBufferPool.h"
 
 #include "OgreGL3PlusHardwareBufferManager.h" //GL3PlusHardwareBufferManager::getGLType
@@ -434,6 +435,57 @@ namespace Ogre
         deallocateVbo( bufferInterface->getVboPoolIndex(), constBuffer->_getInternalBufferStart(),
                        constBuffer->getNumElements() * constBuffer->getBytesPerElement(),
                        constBuffer->getBufferType() );
+    }
+    //-----------------------------------------------------------------------------------
+    TexBufferPacked* GL3PlusVaoManager::createTexBufferImpl( size_t sizeBytes, BufferType bufferType,
+                                                             void *initialData, bool keepAsShadow )
+    {
+        size_t vboIdx;
+        size_t bufferOffset;
+
+        GLint alignment = 256;
+        glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
+
+        size_t bindableSize = sizeBytes;
+
+        VboFlag vboFlag = CPU_INACCESSIBLE;
+
+        if( bufferType == BT_DYNAMIC )
+        {
+            vboFlag = CPU_ACCESSIBLE;
+
+            //For dynamic buffers, the size will be 3x times larger
+            //(depending on mDynamicBufferMultiplier); we need the
+            //offset after each map to be aligned; and for that, we
+            //sizeBytes to be multiple of alignment.
+            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+        }
+
+        allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
+
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
+                                                                    GL_TEXTURE_BUFFER,
+                                                                    mVbos[vboFlag][vboIdx].vboName );
+        TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
+                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferType, initialData, keepAsShadow,
+                                                        this, bufferInterface, bindableSize );
+
+        if( initialData )
+            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::destroyTexBufferImpl( TexBufferPacked *texBuffer )
+    {
+        GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                                                        texBuffer->getBufferInterface() );
+
+
+        deallocateVbo( bufferInterface->getVboPoolIndex(), texBuffer->_getInternalBufferStart(),
+                       texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
+                       texBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
     GLuint GL3PlusVaoManager::createVao( const Vao &vaoRef )

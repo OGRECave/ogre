@@ -89,6 +89,8 @@ namespace Ogre
         PBSM_BLEND_DIFFERENCE,
         NUM_PBSM_BLEND_MODES
     };
+
+    class HlmsPbs;
 }
 
 #endif

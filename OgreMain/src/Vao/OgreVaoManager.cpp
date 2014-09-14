@@ -177,6 +177,34 @@ namespace Ogre
         efficientVectorRemove( mConstBuffers, itor );
     }
     //-----------------------------------------------------------------------------------
+    TexBufferPacked* VaoManager::createTexBuffer( size_t sizeBytes, BufferType bufferType,
+                                                  void *initialData, bool keepAsShadow )
+    {
+        TexBufferPacked *retVal;
+        retVal = createTexBufferImpl( sizeBytes, bufferType, initialData, keepAsShadow );
+        mTexBuffers.push_back( retVal );
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::destroyTexBuffer( TexBufferPacked *texBuffer )
+    {
+        BufferPackedVec::iterator itor = std::find( mTexBuffers.begin(),
+                                                    mTexBuffers.end(), texBuffer );
+
+        if( itor == mTexBuffers.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Texture Buffer has already been destroyed or "
+                         "doesn't belong to this VaoManager.",
+                         "VaoManager::destroyTexBuffer" );
+        }
+
+        destroyTexBufferImpl( texBuffer );
+        OGRE_DELETE *itor;
+
+        efficientVectorRemove( mTexBuffers, itor );
+    }
+    //-----------------------------------------------------------------------------------
     VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
                                                             v1::RenderOperation::OperationType opType )
