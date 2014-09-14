@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_ConstBufferPacked_H_
-#define _Ogre_ConstBufferPacked_H_
+#ifndef _Ogre_TexBufferPacked_H_
+#define _Ogre_TexBufferPacked_H_
 
 #include "Vao/OgreBufferPacked.h"
 #include "OgrePixelFormat.h"

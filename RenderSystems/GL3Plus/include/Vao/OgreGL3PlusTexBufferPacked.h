@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_GL3PlusVertexBufferPacked_H_
-#define _Ogre_GL3PlusVertexBufferPacked_H_
+#ifndef _Ogre_GL3PlusTexBufferPacked_H_
+#define _Ogre_GL3PlusTexBufferPacked_H_
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "Vao/OgreTexBufferPacked.h"

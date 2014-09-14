@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "Vao/OgreStagingBuffer.h"
 #include "Vao/OgreVertexArrayObject.h"
 #include "Vao/OgreConstBufferPacked.h"
+#include "Vao/OgreTexBufferPacked.h"
 #include "OgreTimer.h"
 #include "OgreCommon.h"
 
