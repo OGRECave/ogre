@@ -224,6 +224,8 @@ namespace Ogre {
 		// Establish texture attributes
 		bool isVolume = (imgData->depth > 1);		
 		bool isFloat32r = (imgData->format == PF_FLOAT32_R);
+		bool isFloat16 = (imgData->format == PF_FLOAT16_RGBA);
+		bool isFloat32 = (imgData->format == PF_FLOAT32_RGBA);
 		bool notImplemented = false;
 		String notImplementedString = "";
 
@@ -260,6 +262,8 @@ namespace Ogre {
 		case PF_X8R8G8B8:
 		case PF_R8G8B8:
 		case PF_FLOAT32_R:
+		case PF_FLOAT16_RGBA:
+		case PF_FLOAT32_RGBA:
 			break;
 		default:
 			// No crazy FOURCC or 565 et al. file formats at this stage
@@ -310,6 +314,14 @@ namespace Ogre {
 			case PF_FLOAT32_R:
 				ddsHeaderRgbBits = 32;
 				break;
+			case PF_FLOAT16_RGBA:
+				ddsHeaderRgbBits = 16 * 4;
+				hasAlpha = true;
+				break;
+			case PF_FLOAT32_RGBA:
+				ddsHeaderRgbBits = 32 * 4;
+				hasAlpha = true;
+				break;
 			default:
 				ddsHeaderRgbBits = 0;
 				break;
@@ -350,8 +362,19 @@ namespace Ogre {
 
 			ddsHeader.pixelFormat.size = DDS_PIXELFORMAT_SIZE;
 			ddsHeader.pixelFormat.flags = (hasAlpha) ? DDPF_RGB|DDPF_ALPHAPIXELS : DDPF_RGB;
-			ddsHeader.pixelFormat.flags = (isFloat32r) ? DDPF_FOURCC : ddsHeader.pixelFormat.flags;
-			ddsHeader.pixelFormat.fourCC = (isFloat32r) ? D3DFMT_R32F : 0;
+			ddsHeader.pixelFormat.flags = (isFloat32r || isFloat16 || isFloat32) ? DDPF_FOURCC : ddsHeader.pixelFormat.flags;
+			if (isFloat32r) {
+				ddsHeader.pixelFormat.fourCC = D3DFMT_R32F;
+			}
+			else if (isFloat16) {
+				ddsHeader.pixelFormat.fourCC = D3DFMT_A16B16G16R16F;
+			}
+			else if (isFloat32) {
+				ddsHeader.pixelFormat.fourCC = D3DFMT_A32B32G32R32F;
+			}
+			else {
+				ddsHeader.pixelFormat.fourCC = 0;
+			}
 			ddsHeader.pixelFormat.rgbBits = ddsHeaderRgbBits;
 
 			ddsHeader.pixelFormat.alphaMask = (hasAlpha)   ? 0xFF000000 : 0x00000000;
