@@ -118,22 +118,24 @@ namespace Ogre {
         VET_FLOAT4 = 3,
         /// alias to more specific colour type - use the current rendersystem's colour packing
         VET_COLOUR = 4,
-        VET_SHORT1 = 5,
+        VET_SHORT1 = 5,  /// AVOID (see note below)
         VET_SHORT2 = 6,
-        VET_SHORT3 = 7,
+        VET_SHORT3 = 7,  /// AVOID (see note below)
         VET_SHORT4 = 8,
         VET_UBYTE4 = 9,
         /// D3D style compact colour
         VET_COLOUR_ARGB = 10,
         /// GL style compact colour
         VET_COLOUR_ABGR = 11,
+
+        // the following are not universally supported on all hardware:
         VET_DOUBLE1 = 12,
         VET_DOUBLE2 = 13,
         VET_DOUBLE3 = 14,
         VET_DOUBLE4 = 15,
-        VET_USHORT1 = 16,
+        VET_USHORT1 = 16,  /// AVOID (see note below)
         VET_USHORT2 = 17,
-        VET_USHORT3 = 18,
+        VET_USHORT3 = 18,  /// AVOID (see note below)
         VET_USHORT4 = 19,      
         VET_INT1 = 20,
         VET_INT2 = 21,
@@ -142,7 +144,21 @@ namespace Ogre {
         VET_UINT1 = 24,
         VET_UINT2 = 25,
         VET_UINT3 = 26,
-        VET_UINT4 = 27
+        VET_UINT4 = 27,
+        VET_BYTE4 = 28,  // signed bytes
+        // normalized types (range is either 0 to 1 or -1 to 1)
+        VET_BYTE4_NORM = 29,   // signed normalized bytes
+        VET_UBYTE4_NORM = 30,  // unsigned normalized bytes
+        VET_SHORT2_NORM = 31,  // signed normalized shorts
+        VET_SHORT4_NORM = 32,
+        VET_USHORT2_NORM = 33, // unsigned normalized shorts
+        VET_USHORT4_NORM = 34
+
+        // Note that SHORT1, SHORT3, USHORT1 and USHORT3 should never be used
+        // because they aren't supported on any known hardware -- their size
+        // is not a multiple of 4 bytes.
+        // These values should be removed when possible.  Try to avoid breaking the mesh
+        // serializer though.
     };
 
     /** This class declares the usage of a single vertex buffer as a component
@@ -187,14 +203,17 @@ namespace Ogre {
         size_t getSize(void) const;
         /// Utility method for helping to calculate offsets
         static size_t getTypeSize(VertexElementType etype);
-        /// Utility method which returns the count of values in a given type
+        /// Utility method which returns the count of values in a given type (result for colors may be counter-intuitive)
         static unsigned short getTypeCount(VertexElementType etype);
-        /** Simple converter function which will turn a single-value type into a
-            multi-value type based on a parameter.
+        /** Simple converter function which will return a type large enough to hold 'count' values
+            of the same type as the values in 'baseType'.  The 'baseType' parameter should have the
+            smallest count available.  The return type may have the count rounded up to the next multiple
+            of 4 bytes.  Byte types will always return a 4-count type, while short types will return either
+            a 2-count or 4-count type.
         */
         static VertexElementType multiplyTypeCount(VertexElementType baseType, unsigned short count);
-        /** Simple converter function which will a type into it's single-value
-            equivalent - makes switches on type easier.
+        /** Simple converter function which will turn a type into it's single-value (or lowest multiple-value)
+            equivalent - makes switches on type easier.  May give counter-intuitive results with bytes or shorts.
         */
         static VertexElementType getBaseType(VertexElementType multiType);
 

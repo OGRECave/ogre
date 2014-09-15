@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreVector3.h"
 #include "OgreHardwareBuffer.h"
+#include "OgreHardwareVertexBuffer.h"
 #include "OgrePatchSurface.h"
 #include "OgreHeaderPrefix.h"
 
@@ -392,6 +393,26 @@ namespace Ogre {
         /// @copydoc Singleton::getSingleton()
         static MeshManager* getSingletonPtr(void);
 
+        /** Gets the base element type used for blend weights in vertex buffers.
+        @remarks
+        See the remarks below for SetBlendWeightsBaseElementType().
+        */
+        VertexElementType getBlendWeightsBaseElementType() const;
+
+        /** sets the base element type used for blend weights in vertex buffers.
+        @remarks
+        This takes effect when meshes are loaded.  Default is VET_FLOAT1.
+        Valid values are:
+        VET_UBYTE4:        8-bit blend weights.  Lowest memory cost but may have precision issues.  Shader must multiply incoming blend weights with 1/255.  No software skinning.
+        VET_UBYTE4_NORM:   8-bit blend weights.  Lowest memory cost but may have precision issues.  Requires SM2.0+ vertex shader.  No software skinning.
+        VET_USHORT2:       16-bit blend weights.  Shader must multiply incoming blend weights with 1/65535.  No software skinning.
+        VET_USHORT2_NORM:  16-bit blend weights.  Requires SM2.0+ vertex shader.  No software skinning.
+        VET_SHORT2:        15-bit blend weights.  Shader must multiply incoming blend weights with 1/32767.  No software skinning.
+        VET_SHORT2_NORM:   15-bit blend weights.  May work on platforms that do not support VET_USHORT2_NORM.  No software skinning.
+        VET_FLOAT1:        23-bit blend weights.  Highest memory cost.  Supports hardware and software skinning.
+        */
+        void setBlendWeightsBaseElementType( VertexElementType vet );
+
         /** Gets the factor by which the bounding box of an entity is padded.
             Default is 0.01
         */
@@ -468,6 +489,9 @@ namespace Ogre {
         void loadManualCurvedPlane(Mesh* pMesh, MeshBuildParams& params);
         /** Utility method for manual loading a curved illusion plane */
         void loadManualCurvedIllusionPlane(Mesh* pMesh, MeshBuildParams& params);
+
+        // element type for blend weights in vertex buffer (VET_UBYTE4, VET_USHORT1, or VET_FLOAT1)
+        VertexElementType mBlendWeightsBaseElementType;
 
         bool mPrepAllMeshesForShadowVolumes;
     

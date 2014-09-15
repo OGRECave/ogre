@@ -149,39 +149,38 @@ namespace Ogre {
         case VET_DOUBLE4:
             return sizeof(double)*4;
         case VET_SHORT1:
-            return sizeof(short);
-        case VET_SHORT2:
-            return sizeof(short)*2;
-        case VET_SHORT3:
-            return sizeof(short)*3;
-        case VET_SHORT4:
-            return sizeof(short)*4;
         case VET_USHORT1:
-            return sizeof(unsigned short);
+            return sizeof( short );
+        case VET_SHORT2:
+        case VET_SHORT2_NORM:
         case VET_USHORT2:
-            return sizeof(unsigned short)*2;
+        case VET_USHORT2_NORM:
+            return sizeof( short ) * 2;
+        case VET_SHORT3:
         case VET_USHORT3:
-            return sizeof(unsigned short)*3;
+            return sizeof( short ) * 3;
+        case VET_SHORT4:
+        case VET_SHORT4_NORM:
         case VET_USHORT4:
-            return sizeof(unsigned short)*4;
+        case VET_USHORT4_NORM:
+            return sizeof( short ) * 4;
         case VET_INT1:
-            return sizeof(int);
-        case VET_INT2:
-            return sizeof(int)*2;
-        case VET_INT3:
-            return sizeof(int)*3;
-        case VET_INT4:
-            return sizeof(int)*4;
         case VET_UINT1:
-            return sizeof(unsigned int);
+            return sizeof( int );
+        case VET_INT2:
         case VET_UINT2:
-            return sizeof(unsigned int)*2;
+            return sizeof( int ) * 2;
+        case VET_INT3:
         case VET_UINT3:
-            return sizeof(unsigned int)*3;
+            return sizeof( int ) * 3;
+        case VET_INT4:
         case VET_UINT4:
-            return sizeof(unsigned int)*4;
+            return sizeof( int ) * 4;
+        case VET_BYTE4:
+        case VET_BYTE4_NORM:
         case VET_UBYTE4:
-            return sizeof(unsigned char)*4;
+        case VET_UBYTE4_NORM:
+            return sizeof(char)*4;
         }
         return 0;
     }
@@ -202,7 +201,9 @@ namespace Ogre {
             return 1;
         case VET_FLOAT2:
         case VET_SHORT2:
+        case VET_SHORT2_NORM:
         case VET_USHORT2:
+        case VET_USHORT2_NORM:
         case VET_UINT2:
         case VET_INT2:
         case VET_DOUBLE2:
@@ -216,11 +217,16 @@ namespace Ogre {
             return 3;
         case VET_FLOAT4:
         case VET_SHORT4:
+        case VET_SHORT4_NORM:
         case VET_USHORT4:
+        case VET_USHORT4_NORM:
         case VET_UINT4:
         case VET_INT4:
         case VET_DOUBLE4:
+        case VET_BYTE4:
         case VET_UBYTE4:
+        case VET_BYTE4_NORM:
+        case VET_UBYTE4_NORM:
             return 4;
         }
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid type", 
@@ -230,38 +236,56 @@ namespace Ogre {
     VertexElementType VertexElement::multiplyTypeCount(VertexElementType baseType, 
         unsigned short count)
     {
+        if ( count < 1 || count > 4 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Count out of range",
+                "VertexElement::multiplyTypeCount" );
+        }
         switch (baseType)
         {
         case VET_FLOAT1:
-            switch(count)
-            {
-            case 1:
-                return VET_FLOAT1;
-            case 2:
-                return VET_FLOAT2;
-            case 3:
-                return VET_FLOAT3;
-            case 4:
-                return VET_FLOAT4;
-            default:
-                break;
-            }
-            break;
+        case VET_DOUBLE1:
+        case VET_INT1:
+        case VET_UINT1:
+            // evil enumeration arithmetic
+            return static_cast<VertexElementType>( baseType + count - 1 );
+
         case VET_SHORT1:
-            switch(count)
+        case VET_SHORT2:
+            if ( count <= 2 )
             {
-            case 1:
-                return VET_SHORT1;
-            case 2:
                 return VET_SHORT2;
-            case 3:
-                return VET_SHORT3;
-            case 4:
-                return VET_SHORT4;
-            default:
-                break;
             }
-            break;
+            return VET_SHORT4;
+
+        case VET_USHORT1:
+        case VET_USHORT2:
+            if ( count <= 2 )
+            {
+                return VET_USHORT2;
+            }
+            return VET_USHORT4;
+
+        case VET_SHORT2_NORM:
+            if ( count <= 2 )
+            {
+                return VET_SHORT2_NORM;
+            }
+            return VET_SHORT4_NORM;
+
+        case VET_USHORT2_NORM:
+            if ( count <= 2 )
+            {
+                return VET_USHORT2_NORM;
+            }
+            return VET_USHORT4_NORM;
+
+        case VET_BYTE4:
+        case VET_BYTE4_NORM:
+        case VET_UBYTE4:
+        case VET_UBYTE4_NORM:
+            return baseType;
+
         default:
             break;
         }
@@ -359,8 +383,20 @@ namespace Ogre {
             case VET_USHORT3:
             case VET_USHORT4:
                 return VET_USHORT1;
+            case VET_SHORT2_NORM:
+            case VET_SHORT4_NORM:
+                return VET_SHORT2_NORM;
+            case VET_USHORT2_NORM:
+            case VET_USHORT4_NORM:
+                return VET_USHORT2_NORM;
+            case VET_BYTE4:
+                return VET_BYTE4;
+            case VET_BYTE4_NORM:
+                return VET_BYTE4_NORM;
             case VET_UBYTE4:
                 return VET_UBYTE4;
+            case VET_UBYTE4_NORM:
+                return VET_UBYTE4_NORM;
         };
         // To keep compiler happy
         return VET_FLOAT1;

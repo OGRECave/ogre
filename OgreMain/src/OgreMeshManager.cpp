@@ -54,6 +54,7 @@ namespace Ogre
     MeshManager::MeshManager():
     mBoundsPaddingFactor(0.01), mListener(0)
     {
+        mBlendWeightsBaseElementType = VET_FLOAT1;
         mPrepAllMeshesForShadowVolumes = false;
 
         mLoadOrder = 350.0f;
@@ -965,7 +966,34 @@ namespace Ogre
         return mPrepAllMeshesForShadowVolumes;
     }
     //-----------------------------------------------------------------------
-    Real MeshManager::getBoundsPaddingFactor(void)
+    VertexElementType MeshManager::getBlendWeightsBaseElementType() const
+    {
+        return mBlendWeightsBaseElementType;
+    }
+    //-----------------------------------------------------------------------
+    void MeshManager::setBlendWeightsBaseElementType( VertexElementType vet )
+    {
+        switch ( vet )
+        {
+            case VET_UBYTE4:
+            case VET_UBYTE4_NORM:
+            case VET_USHORT2:
+            case VET_USHORT2_NORM:
+            case VET_SHORT2:
+            case VET_SHORT2_NORM:
+            case VET_FLOAT1:
+                mBlendWeightsBaseElementType = vet;
+                break;
+            default:
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                    "Unsupported setting for setBlendWeightsBaseElementType",
+                    "MeshManager::setBlendWeightsBaseElementType"
+                    );
+                break;
+        }
+    }
+    //-----------------------------------------------------------------------
+    Real MeshManager::getBoundsPaddingFactor( void )
     {
         return mBoundsPaddingFactor;
     }

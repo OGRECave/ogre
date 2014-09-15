@@ -787,7 +787,6 @@ namespace Ogre {
     {
         // Create or reuse blend weight / indexes buffer
         // Indices are always a UBYTE4 no matter how many weights per vertex
-        // Weights are more specific though since they are Reals
         VertexDeclaration* decl = targetVertexData->vertexDeclaration;
         VertexBufferBinding* bind = targetVertexData->vertexBufferBinding;
         unsigned short bindIndex;
@@ -813,10 +812,12 @@ namespace Ogre {
             // Get new binding
             bindIndex = bind->getNextIndex();
         }
-
+        // type of Weights is settable on the MeshManager.
+        VertexElementType weightsBaseType = MeshManager::getSingleton().getBlendWeightsBaseElementType();
+        VertexElementType weightsVertexElemType = VertexElement::multiplyTypeCount( weightsBaseType, numBlendWeightsPerVertex );
         HardwareVertexBufferSharedPtr vbuf =
             HardwareBufferManager::getSingleton().createVertexBuffer(
-                sizeof(unsigned char)*4 + sizeof(float)*numBlendWeightsPerVertex,
+            sizeof( unsigned char ) * 4 + VertexElement::getTypeSize( weightsVertexElemType ),
                 targetVertexData->vertexCount,
                 HardwareBuffer::HBU_STATIC_WRITE_ONLY,
                 true // use shadow buffer
@@ -840,9 +841,7 @@ namespace Ogre {
             const VertexElement& idxElem =
                 decl->insertElement(insertPoint, bindIndex, 0, VET_UBYTE4, VES_BLEND_INDICES);
             const VertexElement& wtElem =
-                decl->insertElement(insertPoint+1, bindIndex, sizeof(unsigned char)*4,
-                VertexElement::multiplyTypeCount(VET_FLOAT1, numBlendWeightsPerVertex),
-                VES_BLEND_WEIGHTS);
+                decl->insertElement(insertPoint+1, bindIndex, sizeof(unsigned char)*4, weightsVertexElemType, VES_BLEND_WEIGHTS);
             pIdxElem = &idxElem;
             pWeightElem = &wtElem;
         }
@@ -853,13 +852,30 @@ namespace Ogre {
             const VertexElement& idxElem =
                 decl->addElement(bindIndex, 0, VET_UBYTE4, VES_BLEND_INDICES);
             const VertexElement& wtElem =
-                decl->addElement(bindIndex, sizeof(unsigned char)*4,
-                VertexElement::multiplyTypeCount(VET_FLOAT1, numBlendWeightsPerVertex),
-                VES_BLEND_WEIGHTS);
+                decl->addElement(bindIndex, sizeof(unsigned char)*4, weightsVertexElemType, VES_BLEND_WEIGHTS );
             pIdxElem = &idxElem;
             pWeightElem = &wtElem;
         }
 
+        unsigned int maxIntWt = 0;
+        // keeping a switch out of the loop
+        switch ( weightsBaseType )
+        {
+            case VET_FLOAT1:
+                break;
+            case VET_UBYTE4:
+            case VET_UBYTE4_NORM:
+                maxIntWt = 0xff;
+                break;
+            case VET_USHORT2:
+            case VET_USHORT2_NORM:
+                maxIntWt = 0xffff;
+                break;
+            case VET_SHORT2:
+            case VET_SHORT2_NORM:
+                maxIntWt = 0x7fff;
+                break;
+        }
         // Assign data
         size_t v;
         VertexBoneAssignmentList::const_iterator i, iend;
@@ -868,30 +884,97 @@ namespace Ogre {
         unsigned char *pBase = static_cast<unsigned char*>(
             vbuf->lock(HardwareBuffer::HBL_DISCARD));
         // Iterate by vertex
-        float *pWeight;
-        unsigned char *pIndex;
         for (v = 0; v < targetVertexData->vertexCount; ++v)
         {
-            /// Convert to specific pointers
-            pWeightElem->baseVertexPointerToElement(pBase, &pWeight);
-            pIdxElem->baseVertexPointerToElement(pBase, &pIndex);
+            // collect the indices/weights in these arrays
+            unsigned char indices[ 4 ] = { 0, 0, 0, 0 };
+            float weights[ 4 ] = { 1.0f, 0.0f, 0.0f, 0.0f };
             for (unsigned short bone = 0; bone < numBlendWeightsPerVertex; ++bone)
             {
                 // Do we still have data for this vertex?
                 if (i != iend && i->second.vertexIndex == v)
                 {
-                    // If so, write weight
-                    *pWeight++ = i->second.weight;
-                    *pIndex++ = static_cast<unsigned char>(boneIndexToBlendIndexMap[i->second.boneIndex]);
+                    // If so, grab weight and index
+                    weights[ bone ] = i->second.weight;
+                    indices[ bone ] = static_cast<unsigned char>( boneIndexToBlendIndexMap[ i->second.boneIndex ] );
                     ++i;
+                }
+            }
+            // if weights are integers,
+            if ( weightsBaseType != VET_FLOAT1 )
+            {
+                // pack the float weights into shorts/bytes
+                unsigned int intWeights[ 4 ];
+                unsigned int sum = 0;
+                const unsigned int wtScale = maxIntWt;  // this value corresponds to a weight of 1.0
+                for ( int ii = 0; ii < 4; ++ii )
+                {
+                    unsigned int bw = static_cast<unsigned int>( weights[ ii ] * wtScale );
+                    intWeights[ ii ] = bw;
+                    sum += bw;
+                }
+                // if the sum doesn't add up due to roundoff error, we need to adjust the intWeights so that the sum is wtScale
+                if ( sum != maxIntWt )
+                {
+                    // find the largest weight (it isn't necessarily the first one...)
+                    int iMaxWeight = 0;
+                    unsigned int maxWeight = 0;
+                    for ( int ii = 0; ii < 4; ++ii )
+                    {
+                        unsigned int bw = intWeights[ ii ];
+                        if ( bw > maxWeight )
+                        {
+                            iMaxWeight = ii;
+                            maxWeight = bw;
+                        }
+                    }
+                    // Adjust the largest weight to make sure the sum is correct.
+                    // The idea is that changing the largest weight will have the smallest effect
+                    // on the ratio of weights.  This works best when there is one dominant weight,
+                    // and worst when 2 or more weights are similar in magnitude.
+                    // A better method could be used to reduce the quantization error, but this is
+                    // being done at run-time so it needs to be quick.
+                    intWeights[ iMaxWeight ] += maxIntWt - sum;
+                }
+
+                // now write the weights
+                if ( weightsBaseType == VET_UBYTE4 || weightsBaseType == VET_UBYTE4_NORM )
+                {
+                    // write out the weights as bytes
+                    unsigned char* pWeight;
+                    pWeightElem->baseVertexPointerToElement( pBase, &pWeight );
+                    // NOTE: always writes out 4 regardless of numBlendWeightsPerVertex
+                    for ( int ii = 0; ii < 4; ++ii )
+                    {
+                        *pWeight++ = static_cast<unsigned char>( intWeights[ ii ] );
+                    }
                 }
                 else
                 {
-                    // Ran out of assignments for this vertex, use weight 0 to indicate empty.
-                    // If no bones are defined (an error in itself) set bone 0 as the assigned bone. 
-                    *pWeight++ = (bone == 0) ? 1.0f : 0.0f;
-                    *pIndex++ = 0;
+                    // write out the weights as shorts
+                    unsigned short* pWeight;
+                    pWeightElem->baseVertexPointerToElement( pBase, &pWeight );
+                    for ( int ii = 0; ii < numBlendWeightsPerVertex; ++ii )
+                    {
+                        *pWeight++ = static_cast<unsigned short>( intWeights[ ii ] );
+                    }
                 }
+            }
+            else
+            {
+                // write out the weights as floats
+                float* pWeight;
+                pWeightElem->baseVertexPointerToElement( pBase, &pWeight );
+                for ( int ii = 0; ii < numBlendWeightsPerVertex; ++ii )
+                {
+                    *pWeight++ = weights[ ii ];
+                }
+            }
+            unsigned char* pIndex;
+            pIdxElem->baseVertexPointerToElement( pBase, &pIndex );
+            for ( int ii = 0; ii < 4; ++ii )
+            {
+                *pIndex++ = indices[ ii ];
             }
             pBase += vbuf->getVertexSize();
         }
