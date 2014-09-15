@@ -1997,7 +1997,7 @@ namespace Ogre {
                 }
                 return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableIterator(
                     shadowTechnique, light, indexBuffer, indexBufferUsedSize,
-                    extrusionDistance, flags);
+                    extrude, extrusionDistance, flags);
             }
         }
 #endif
