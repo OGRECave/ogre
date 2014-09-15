@@ -78,7 +78,6 @@ namespace Ogre
     
         // just check if the multisampling requested is supported by the device
         bool _checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format);
-
         void _updateViewportsDimensions();
 
     protected:
@@ -115,18 +114,32 @@ namespace Ogre
         /// Get the presentation parameters used with this window
         DXGI_SWAP_CHAIN_DESC_N* getPresentationParameters(void) { return &mSwapChainDesc; }
 
-        void swapBuffers( );
+		int getContainingMonitorNumber();
 
+		IDXGISwapChainN * _getSwapChain() { return mpSwapChain; }
+        void swapBuffers( );
+		void updateStats(void);
+
+		bool IsWindows8OrGreater();
+		
     protected:
         void _createSizeDependedD3DResources(); // obtains mpBackBuffer from mpSwapChain
         void _createSwapChain();
         virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice) = 0;
         void _resizeSwapChainBuffers(unsigned width, unsigned height);
 
+		int getVBlankMissCount( );
+
     protected:
         // Pointer to swap chain
         IDXGISwapChainN * mpSwapChain;
         DXGI_SWAP_CHAIN_DESC_N mSwapChainDesc;
+
+		DXGI_FRAME_STATISTICS		mPreviousPresentStats;			// We save the previous present stats - so we can detect a "vblank miss"
+		bool						mPreviousPresentStatsIsValid;	// Does mLastPresentStats data is valid (it isn't if when you start or resize the window)
+		uint						mVBlankMissCount;				// Number of times we missed the v sync blank
+		bool						mUseFlipMode;					// Flag to determine if the swapchain flip model is enabled.
+
     };
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -151,10 +164,20 @@ namespace Ogre
     
         HWND getWindowHandle() const                            { return mHWnd; }
         void getCustomAttribute( const String& name, void* pData );
+		void adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
+			unsigned int* winWidth, unsigned int* winHeight);
+
+		DWORD getWindowStyle(bool fullScreen) const { if (fullScreen) return mFullscreenWinStyle; return mWindowedWinStyle; }
+		void updateWindowRect();
+		void _beginUpdate();
+
+		void				setVSyncEnabled		(bool vsync);
+		bool				isVSyncEnabled		() const;
+		void				setVSyncInterval	(unsigned int interval);
+		unsigned int		getVSyncInterval	() const;
 
     protected:
-        /// Are we in the middle of switching between fullscreen and windowed
-        bool _getSwitchingFullscreen() const                    { return mSwitchingFullscreen; }
+
         /// Indicate that fullscreen / windowed switching has finished
         void _finishSwitchingFullscreen();
 
@@ -162,7 +185,11 @@ namespace Ogre
         void setActive(bool state);
     protected:
         HWND    mHWnd;                  // Win32 window handle
-        bool    mSwitchingFullscreen;   // Are we switching from fullscreen to windowed or vice versa
+		DWORD						mWindowedWinStyle;		// Windowed mode window style flags.
+		DWORD						mFullscreenWinStyle;	// Fullscreen mode window style flags.		 
+		unsigned int				mDesiredWidth;			// Desired width after resizing
+		unsigned int				mDesiredHeight;			// Desired height after resizing
+		int							mLastSwitchingFullscreenCounter;	// the last value of the switching fullscreen counter when we switched
     };
 
 #endif

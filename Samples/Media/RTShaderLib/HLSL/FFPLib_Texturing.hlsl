@@ -229,10 +229,11 @@ struct SamplerDataCube
 //-----------------------------------------------------------------------------
 
 #ifdef D3D11
-	float4 FFP_SampleTexture(in SamplerData1D	s,	in float f)		{ return s.samplerObject.Sample(s.samplerState,f);}
-	float4 FFP_SampleTexture(in SamplerData2D	s,	in float2 f)	{ return s.samplerObject.Sample(s.samplerState,f);}
-	float4 FFP_SampleTexture(in SamplerData3D	s,	in float3 f)	{ return s.samplerObject.Sample(s.samplerState,f);}
-	float4 FFP_SampleTexture(in SamplerDataCube	s,	in float3 f)	{ return s.samplerObject.Sample(s.samplerState,f);}
+
+float4 FFP_SampleTextureLOD(in SamplerData1D s,in float f,in float lod) 
+	{ 
+		return s.samplerObject.SampleLevel(s.samplerState,f,lod);
+	}
 	
 	float4 FFP_SampleTextureLOD(in SamplerData2D s,in float2 f,in float lod) 
 	{ 
@@ -243,6 +244,29 @@ struct SamplerDataCube
 	{ 
 		return s.samplerObject.SampleLevel(s.samplerState,f,lod);
 	}
+	float4 FFP_SampleTextureLOD(in SamplerDataCube s,in float3 f,in float lod) 
+	{ 
+		return s.samplerObject.SampleLevel(s.samplerState,f,lod);
+	}
+	float4 FFP_SampleTextureLOD(in Texture2DArray s,in SamplerState state, in float3 f,float lod) 
+	{ 
+		return s.SampleLevel(state,f,lod);
+	}
+#ifdef HLSL_VS
+	float4 FFP_SampleTexture(in SamplerData1D	s,	in float f)		{ return FFP_SampleTextureLOD(s,f,0);}
+	float4 FFP_SampleTexture(in SamplerData2D	s,	in float2 f)	{ return FFP_SampleTextureLOD(s,f,0);}
+	float4 FFP_SampleTexture(in SamplerData3D	s,	in float3 f)	{ return FFP_SampleTextureLOD(s,f,0);}
+	float4 FFP_SampleTexture(in SamplerDataCube	s,	in float3 f)	{ return FFP_SampleTextureLOD(s,f,0);}
+	//Special case for TetxtureArray in D3D11
+	float4 FFP_SampleTexture(in Texture2DArray s,in SamplerState state, in float3 f)	{ return FFP_SampleTextureLOD(s,state,f,0);}
+#else
+	float4 FFP_SampleTexture(in SamplerData1D	s,	in float f)		{ return s.samplerObject.Sample(s.samplerState,f);}	
+	float4 FFP_SampleTexture(in SamplerData2D	s,	in float2 f)	{ return s.samplerObject.Sample(s.samplerState,f);}
+	float4 FFP_SampleTexture(in SamplerData3D	s,	in float3 f)	{ return s.samplerObject.Sample(s.samplerState,f);}
+	float4 FFP_SampleTexture(in SamplerDataCube	s,	in float3 f)	{ return s.samplerObject.Sample(s.samplerState,f);}
+	//Special case for TetxtureArray in D3D11
+	float4 FFP_SampleTexture(in Texture2DArray s,in SamplerState state, in float3 f)	{ return s.Sample(state,f);}
+#endif	
 	
 	void FFP_Construct_Sampler_Wrapper(in Texture1D samplerObject,in SamplerState samplerState,out SamplerData1D samplerData)
 	{
@@ -303,6 +327,17 @@ struct SamplerDataCube
 			samplerData.samplerObject = samplerObject;
 	}
 	
+#endif
+//-----------------------------------------------------------------------------
+//Special case for TetxtureArray in D3D11
+#ifdef D3D11
+void FFP_SampleTexture( in Texture2DArray s,
+						in SamplerState state,
+						in float3 f,
+						out float4 t)
+{
+	t = FFP_SampleTexture(s,state, f);
+}
 #endif
 //-----------------------------------------------------------------------------
 void FFP_SampleTextureProj(in SamplerData2D s, 

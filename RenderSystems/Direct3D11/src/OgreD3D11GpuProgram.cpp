@@ -97,7 +97,7 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Cannot create D3D11 vertex shader " + mName + " from microcode\nError Description:" + errorDescription,
                     "D3D11GpuVertexProgram::loadFromMicrocode");
 
@@ -150,7 +150,7 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Cannot create D3D11 pixel shader " + mName + " from microcode.\nError Description:" + errorDescription,
                     "D3D11GpuFragmentProgram::loadFromMicrocode");
             }
@@ -202,7 +202,7 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Cannot create D3D11 geometry shader " + mName + " from microcode.\nError Description:" + errorDescription,
                     "D3D11GpuGeometryProgram::loadFromMicrocode");
             }
@@ -254,7 +254,7 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Cannot create D3D11 domain shader " + mName + " from microcode.\nError Description:" + errorDescription,
                     "D3D11GpuFragmentProgram::loadFromMicrocode");
             }
@@ -306,7 +306,7 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Cannot create D3D11 hull shader " + mName + " from microcode.\nError Description:" + errorDescription,
                     "D3D11GpuFragmentProgram::loadFromMicrocode");
             }

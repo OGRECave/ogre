@@ -86,7 +86,7 @@ namespace Ogre {
                     p->mPosition = (p->mPosition + ( directionPart )) + (((directionPart) - direction) * mBounce);
 
                     // reflect direction vector
-                    p->mDirection = (p->mDirection - (2.0 * p->mDirection.dotProduct( mPlaneNormal ) * mPlaneNormal)) * mBounce;
+                    p->mDirection = (p->mDirection - (2.0f * p->mDirection.dotProduct( mPlaneNormal ) * mPlaneNormal)) * mBounce;
                 }
             }
         }

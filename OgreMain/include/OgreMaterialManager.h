@@ -104,6 +104,17 @@ namespace Ogre {
                 const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
                 const Renderable* rend) = 0;
 
+			/** Called right after illuminated passes were created,
+				so that owner of runtime generated technique can handle this.
+			@return True if notification is handled and should not be propagated further.
+			*/
+			virtual bool afterIlluminationPassesCreated(Technique* technique) { return false; }
+
+			/** Called right before illuminated passes would be removed,
+				so that owner of runtime generated technique can handle this.
+			@return True if notification is handled and should not be propagated further.
+			*/
+			virtual bool beforeIlluminationPassesCleared(Technique* technique) { return false; }
         };
 
     protected:
@@ -278,6 +289,13 @@ namespace Ogre {
         /// Internal method for sorting out missing technique for a scheme
         virtual Technique* _arbitrateMissingTechniqueForActiveScheme(
             Material* mat, unsigned short lodIndex, const Renderable* rend);
+
+		/// Internal method for sorting out illumination passes for a scheme
+		virtual void _notifyAfterIlluminationPassesCreated(Technique* mat);
+
+		/// Internal method for sorting out illumination passes for a scheme
+		virtual void _notifyBeforeIlluminationPassesCleared(Technique* mat);
+
 
         /** Override standard Singleton retrieval.
         @remarks

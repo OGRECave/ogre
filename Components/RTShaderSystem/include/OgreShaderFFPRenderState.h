@@ -60,7 +60,8 @@ enum FFPFragmentShaderStage
     FFP_PS_TEXTURING                    = 200,  
     FFP_PS_COLOUR_END                   = 300,
     FFP_PS_FOG                          = 400,
-    FFP_PS_POST_PROCESS                 = 500
+    FFP_PS_POST_PROCESS                 = 500,
+	FFP_PS_ALPHA_TEST					= 1000
 };
 
 // Fixed Function generic stages.
@@ -72,7 +73,8 @@ enum FFPShaderStage
     FFP_LIGHTING                        = 300,
     FFP_TEXTURING                       = 400,
     FFP_FOG                             = 500,
-    FFP_POST_PROCESS                    = 600
+    FFP_POST_PROCESS                    = 600,
+	FFP_ALPHA_TEST						= 1000
 };
 
 // Fixed Function Library: Common functions
@@ -124,7 +126,8 @@ enum FFPShaderStage
 #define FFP_FUNC_PIXELFOG_LINEAR                    "FFP_PixelFog_Linear"
 #define FFP_FUNC_PIXELFOG_EXP                       "FFP_PixelFog_Exp"
 #define FFP_FUNC_PIXELFOG_EXP2                      "FFP_PixelFog_Exp2"
-    
+#define FFP_LIB_ALPHA_TEST							"FFPLIB_AlphaTest"
+#define FFP_FUNC_ALPHA_TEST							"FFP_Alpha_Test"
 
 /** @} */
 /** @} */

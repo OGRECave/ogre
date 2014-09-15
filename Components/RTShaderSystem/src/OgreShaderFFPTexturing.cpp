@@ -96,7 +96,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
     if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4()) 
     {
         //Resolve texture sampler state parameter for  hlsl 4.0
-        textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
+		textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GpuConstantType::GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
         hasError |= !(textureUnitParams->mTextureSamplerState.get());
     }
     
@@ -490,19 +490,24 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 }
 
 
-ParameterPtr FFPTexturing::GetSamplerWrapperParam(GpuConstantType samplerType,Function* function)
+ParameterPtr FFPTexturing::GetSamplerWrapperParam(UniformParameterPtr sampler, Function* function)
 {
-    Ogre::String paramName = "lLocalSamplerWrapper_";
-    int samplerParamDim = samplerType - GCT_SAMPLER1D + 1;
+	
+	Ogre::String paramName = sampler->getName(); // "lLocalSamplerWrapper_";
+	int samplerType = sampler->getType();
+	int samplerParamDim = samplerType - GpuConstantType::GCT_SAMPLER1D + 1;
     if (samplerParamDim <= 3 )
         paramName +=  StringConverter::toString(samplerParamDim) + "D";
     else if (samplerParamDim == 4 )
         paramName +=  "Cube";
-
-    GpuConstantType margin =  (GpuConstantType)(GCT_SAMPLER_WRAPPER1D - GCT_SAMPLER1D);
+	else 
+		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+		"Sampler wrappers are only for GCT_SAMPLER1D, GCT_SAMPLER2D, GCT_SAMPLER3D and GCT_SAMPLERCUBE",
+		"FFPTexturing::GetSamplerWrapperParam");
+	GpuConstantType margin =  (GpuConstantType)(GpuConstantType::GCT_SAMPLER_WRAPPER1D -  GpuConstantType::GCT_SAMPLER1D);
     GpuConstantType samplerWrapperType = (GpuConstantType)(samplerType + margin);
 
-    ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
+	ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::Semantic::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
     return samplerWrapperParam;
 }
 
@@ -512,7 +517,7 @@ void FFPTexturing::AddTextureSampleWrapperInvocation(UniformParameterPtr texture
 
     FunctionInvocation* curFuncInvocation = NULL;
     
-    ParameterPtr samplerWrapperParam = GetSamplerWrapperParam(samplerType,function);
+	ParameterPtr samplerWrapperParam = GetSamplerWrapperParam(textureSampler, function);
     curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT_SAMPLER_WRAPPER, groupOrder, internalCounter++);
     curFuncInvocation->pushOperand(textureSampler, Operand::OPS_IN);
 
@@ -530,10 +535,13 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
 
     Ogre::String targetLanguage =  RTShader::ShaderGenerator::getSingleton().getTargetLanguage();
 
-    if (targetLanguage == "hlsl")
+	if (targetLanguage == "hlsl" 
+		&& textureUnitParams->mTextureSamplerType >= GpuConstantType::GCT_SAMPLER1D 
+		&& textureUnitParams->mTextureSamplerType <= GpuConstantType::GCT_SAMPLERCUBE
+		)
     {
         FunctionInvocation* curFuncInvocation = NULL;
-        ParameterPtr samplerWrapperParam =  GetSamplerWrapperParam(textureUnitParams->mTextureSamplerType,psMain);
+        ParameterPtr samplerWrapperParam =  GetSamplerWrapperParam(textureUnitParams->mTextureSampler,psMain);
         AddTextureSampleWrapperInvocation(textureUnitParams->mTextureSampler,textureUnitParams->mTextureSamplerState,textureUnitParams->mTextureSamplerType,psMain,groupOrder,internalCounter);
 
             if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
@@ -558,9 +566,23 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
         else    
             curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
 
-        curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
-        curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
+		
+		if (textureUnitParams->mTextureSamplerType == GpuConstantType::GCT_SAMPLER2DARRAY)
+		{
+			curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
+		
+				curFuncInvocation->pushOperand(textureUnitParams->mTextureSamplerState, Operand::OPS_IN);
+		
+			curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
+		}
+		else
+		{
+			curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
+		}
+		
         psMain->addAtomInstance(curFuncInvocation);
     }
 

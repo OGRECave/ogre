@@ -123,7 +123,7 @@ ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
         break;
             
     case Parameter::SPS_BLEND_INDICES:
-        assert(type == GCT_FLOAT4);
+		assert(type == GCT_UINT4);
         param = ParameterFactory::createInIndices(index);
         break;
             

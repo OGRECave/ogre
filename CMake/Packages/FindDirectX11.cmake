@@ -11,13 +11,40 @@
 # Find DirectX11 SDK
 # Define:
 # DirectX11_FOUND
-# DirectX11_INCLUDE_DIR
-# DirectX11_LIBRARY
-# DirectX11_ROOT_DIR
+# DirectX11_INCLUDE_DIRS
+# DirectX11_LIBRARIES
 
 if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	include(FindPkgMacros)
 	findpkg_begin(DirectX11)
+
+	# assume that toolchain could not be changed on the fly, so only changes to OGRE_BUILD_PLATFORM_WINDOWS_PHONE should reset the cache
+	clear_if_changed(OGRE_BUILD_PLATFORM_WINDOWS_PHONE
+		DirectX11_INCLUDE_DIR
+	)
+
+	# Windows Phone 8.1 SDK
+	if(OGRE_BUILD_PLATFORM_WINDOWS_PHONE AND MSVC12)
+		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Phone Kits/8.1/include" "C:/Program Files/Windows Phone Kits/8.1/include")
+		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Phone Kits/8.1/lib/${MSVC_CXX_ARCHITECTURE_ID}/"
+
+	# Windows Phone 8.0 SDK
+	elseif(OGRE_BUILD_PLATFORM_WINDOWS_PHONE AND MSVC11)
+		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Phone Kits/8.0/include" "C:/Program Files/Windows Phone Kits/8.0/include")
+		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Phone Kits/8.0/lib/${MSVC_CXX_ARCHITECTURE_ID}/"
+
+	# Windows 8.1 SDK
+	elseif(MSVC12)
+	    find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/8.1/include/um" "C:/Program Files/Windows Kits/8.1/include/um")
+		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/8.1/lib/winv6.3/um/${MSVC_CXX_ARCHITECTURE_ID}/"
+		
+	# Windows 8.0 SDK
+	elseif(MSVC11)
+	    find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/8.0/include/um" "C:/Program Files/Windows Kits/8.0/include/um")
+		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/8.0/lib/win8/um/${MSVC_CXX_ARCHITECTURE_ID}/"
+
+	# Legacy Direct X SDK
+	else() 
 
 	# Get path, convert backslashes as ${ENV_DXSDK_DIR}
 	getenv_path(DXSDK_DIR)
@@ -38,17 +65,6 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	"$ENV{ProgramFiles}/Microsoft DirectX SDK*"
 	)
 
-	if(OGRE_BUILD_PLATFORM_WINRT)
-		# Windows 8 SDK has custom layout
-		set(DirectX11_INC_SEARCH_PATH 
-		"C:/Program Files (x86)/Windows Kits/8.0/Include/shared"
-		"C:/Program Files (x86)/Windows Kits/8.0/Include/um"
-		)
-		set(DirectX11_LIB_SEARCH_PATH 
-		"C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um"
-		)
-	endif()
-
 	create_search_paths(DirectX11)
 	# redo search if prefix path changed
 	clear_if_changed(DirectX11_PREFIX_PATH
@@ -65,19 +81,17 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	endif(CMAKE_CL_64)
 
 	# look for D3D11 components
-    find_path(DirectX11_INCLUDE_DIR NAMES D3D11Shader.h HINTS ${DirectX11_INC_SEARCH_PATH})
+    find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS ${DirectX11_INC_SEARCH_PATH})
     find_library(DirectX11_DXERR_LIBRARY NAMES DxErr HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
 	find_library(DirectX11_DXGUID_LIBRARY NAMES dxguid HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
 	find_library(DirectX11_DXGI_LIBRARY NAMES dxgi HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
 	find_library(DirectX11_D3DCOMPILER_LIBRARY NAMES d3dcompiler HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
+	find_library(DirectX11_D3D11_LIBRARY NAMES d3d11 HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
+	find_library(DirectX11_D3DX11_LIBRARY NAMES d3dx11 HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})	
 
-	find_library(DirectX11_LIBRARY NAMES d3d11 HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})
-    find_library(DirectX11_D3DX11_LIBRARY NAMES d3dx11 HINTS ${DirectX11_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX11_LIBPATH_SUFFIX})	
-	if (DirectX11_INCLUDE_DIR AND DirectX11_LIBRARY)
-	  set(DirectX11_D3D11_FOUND TRUE)
-	  set(DirectX11_INCLUDE_DIR ${DirectX11_INCLUDE_DIR})
+	if (DirectX11_INCLUDE_DIR AND DirectX11_D3D11_LIBRARY)
 	  set(DirectX11_D3D11_LIBRARIES ${DirectX11_D3D11_LIBRARIES}
-	    ${DirectX11_LIBRARY}
+	    ${DirectX11_D3D11_LIBRARY}
 	    ${DirectX11_DXGI_LIBRARY}
         ${DirectX11_DXGUID_LIBRARY}
         ${DirectX11_D3DCOMPILER_LIBRARY}        	  
@@ -90,25 +104,19 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
         set(DirectX11_D3D11_LIBRARIES ${DirectX11_D3D11_LIBRARIES} ${DirectX11_DXERR_LIBRARY})
     endif ()
 
-	findpkg_finish(DirectX11)
-	
-	set(DirectX11_LIBRARIES 
+	set(DirectX11_LIBRARY 
 		${DirectX11_D3D11_LIBRARIES} 
 	)
 	
-	if (OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
-		set(DirectX11_FOUND TRUE) 
-        set(DirectX11_INCLUDE_DIR "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/WPSDK/WP80/include" CACHE STRING "" FORCE)
-        set(DirectX11_LIBRARY "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/WPSDK/WP80/lib" CACHE STRING "" FORCE)
-        set(DirectX11_LIBRARIES ${DirectX11_LIBRARY})
-		set(CMAKE_CXX_FLAGS "/EHsc"  CACHE STRING "" FORCE)
-	endif ()
-  
-	mark_as_advanced(DirectX11_INCLUDE_DIR 
-					 DirectX11_D3D11_LIBRARIES 
+	mark_as_advanced(DirectX11_D3D11_LIBRARY 
 					 DirectX11_D3DX11_LIBRARY
 					 DirectX11_DXERR_LIBRARY 
 					 DirectX11_DXGUID_LIBRARY
 					 DirectX11_DXGI_LIBRARY 
 					 DirectX11_D3DCOMPILER_LIBRARY)	
+
+	endif () # Legacy Direct X SDK
+
+	findpkg_finish(DirectX11)
+	
 endif(WIN32)

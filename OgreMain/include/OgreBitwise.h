@@ -42,6 +42,78 @@ namespace Ogre {
     */
     class Bitwise {
     public:
+        /** Returns value with reversed bytes order.
+        */
+        static FORCEINLINE uint16 bswap16(uint16 arg)
+        {
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
+            return _byteswap_ushort(arg);
+#elif OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap16) || OGRE_COMPILER == OGRE_COMPILER_GCC && OGRE_COMP_VER >= 480
+            return __builtin_bswap16(arg);
+#else
+            return ((arg << 8) & 0xFF00) | ((arg >> 8) & 0x00FF);
+#endif
+        }
+        /** Returns value with reversed bytes order.
+        */
+        static FORCEINLINE uint32 bswap32(uint32 arg)
+        {
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
+            return _byteswap_ulong(arg);
+#elif OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap32) || OGRE_COMPILER == OGRE_COMPILER_GCC && OGRE_COMP_VER >= 430
+            return __builtin_bswap32(arg);
+#else
+            return ((arg & 0x000000FF) << 24) | ((arg & 0x0000FF00) << 8) | ((arg >> 8) & 0x0000FF00) | ((arg >> 24) & 0x000000FF);
+#endif
+        }
+        /** Returns value with reversed bytes order.
+        */
+        static FORCEINLINE uint64 bswap64(uint64 arg)
+        {
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
+            return _byteswap_uint64(arg);
+#elif OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap64) || OGRE_COMPILER == OGRE_COMPILER_GCC && OGRE_COMP_VER >= 430
+            return __builtin_bswap64(arg);
+#else
+            union { 
+                uint64 sv;
+                uint32 ul[2];
+            } tmp, result;
+            tmp.sv = arg;
+            result.ul[0] = bswap32(tmp.ul[1]);
+            result.ul[1] = bswap32(tmp.ul[0]);
+            return result.sv; 
+#endif
+        }
+
+        /** Reverses byte order of buffer. Use bswap16/32/64 instead if possible.
+        */
+        static inline void bswapBuffer(void * pData, size_t size)
+        {
+            char swapByte;
+            for(char *p0 = (char*)pData, *p1 = p0 + size - 1; p0 < p1; ++p0, --p1)
+            {
+                swapByte = *p0;
+                *p0 = *p1;
+                *p1 = swapByte;
+            }
+        }
+        /** Reverses byte order of chunks in buffer, where 'size' is size of one chunk.
+        */
+        static inline void bswapChunks(void * pData, size_t size, size_t count)
+        {
+            for(size_t c = 0; c < count; ++c)
+            {
+                char swapByte;
+                for(char *p0 = (char*)pData + c * size, *p1 = p0 + size - 1; p0 < p1; ++p0, --p1)
+                {
+                    swapByte = *p0;
+                    *p0 = *p1;
+                    *p1 = swapByte;
+                }
+            }
+        }
+
         /** Returns the most significant bit set in a value.
         */
         static FORCEINLINE unsigned int mostSignificantBitSet(unsigned int value)

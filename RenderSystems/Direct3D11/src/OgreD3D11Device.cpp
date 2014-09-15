@@ -146,10 +146,14 @@ namespace Ogre
         case NO_ERROR:
             break;
         case E_INVALIDARG:
-            res = res + "invalid parameters were passed.\n";
+			res.append("invalid parameters were passed.\n");
             break;
         default:
-            ;//assert(false); // unknown HRESULT
+			{
+			char tmp[64];
+			sprintf(tmp, "hr = 0x%08X\n", lastResult);
+			res.append(tmp);
+			}
         }
 
         if (mInfoQueue != NULL)
@@ -280,4 +284,18 @@ namespace Ogre
     }
 
     //---------------------------------------------------------------------
+
+	D3D11Device::ThreadInfo::ThreadInfo(ID3D11DeviceContextN* context)
+		: mContext(context)
+		, mEventHandle(0)
+	{
+		mEventHandle = CreateEventEx(0, TEXT("ThreadContextEvent"), 0, EVENT_ALL_ACCESS);
+	}
+    //---------------------------------------------------------------------
+	D3D11Device::ThreadInfo::~ThreadInfo()
+	{
+		SAFE_RELEASE(mContext);
+
+		CloseHandle(mEventHandle);
+	}
 }

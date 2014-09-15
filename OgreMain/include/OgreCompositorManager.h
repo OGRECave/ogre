@@ -166,14 +166,26 @@ namespace Ogre {
         */
         CompositorLogic* getCompositorLogic(const String& name);
 
+		/** Check if a compositor logic exists
+		*/
+
+		bool CompositorManager::getHasCompositorLogic(const String& name);
+		
         /** Register a custom composition pass.
         */
         void registerCustomCompositionPass(const String& name, CustomCompositionPass* customPass);
-        
+
         /** Get a custom composition pass by its name 
         */
+		void unRegisterCustomCompositionPass(const String& name);
+		
         CustomCompositionPass* getCustomCompositionPass(const String& name);
 
+		/** Check if a compositor pass exists
+		*/
+		
+		bool CompositorManager::getHasCompositionPass(const String& name);
+		
         /**
         Relocates a compositor chain from one viewport to another
         @param sourceVP The viewport to take the chain from

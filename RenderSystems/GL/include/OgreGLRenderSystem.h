@@ -79,8 +79,6 @@ namespace Ogre {
         unsigned short mFixedFunctionTextureUnits;
 
         void initConfigOptions(void);
-        void initInputDevices(void);
-        void processInputDevices(void);
 
         void setGLLight(size_t index, Light* lt);
         void makeGLMatrix(GLfloat gl_matrix[16], const Matrix4& m);
@@ -177,6 +175,9 @@ namespace Ogre {
           RenderSystem
          */
         const String& getName(void) const;
+
+		const String& getFriendlyName(void) const;
+
         /** See
           RenderSystem
          */

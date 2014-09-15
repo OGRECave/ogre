@@ -77,12 +77,21 @@ protected:
 
     /// Texture sampler for the x-direction planar mapping part.
     UniformParameterPtr mSamplerFromX;
+	
+	/// Texture sampler state for the x-direction planar mapping part.
+	UniformParameterPtr mSamplerFromXState;
 
     /// Texture sampler for the y-direction planar mapping part.
     UniformParameterPtr mSamplerFromY;
+	
+	/// Texture sampler state for the y-direction planar mapping part.
+	UniformParameterPtr mSamplerFromYState;
 
     /// Texture sampler for the z-direction planar mapping part.
     UniformParameterPtr mSamplerFromZ;
+	
+	/// Texture sampler stae for the z-direction planar mapping part.
+	UniformParameterPtr mSamplerFromZState;
     
     /// Pixel shader input diffuse colour.
     ParameterPtr mPSInDiffuse;

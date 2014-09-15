@@ -69,6 +69,9 @@ namespace Ogre {
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
             }
         }
+		
+		mSizeInBytes = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
+		
     }
     D3D11HardwarePixelBuffer::~D3D11HardwarePixelBuffer()
     {
@@ -109,11 +112,11 @@ namespace Ogre {
         {
         case TEX_TYPE_1D:
             {  
-                mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
                 if (mDevice.isError())
                 {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                         "D3D11 device cannot map 1D texture\nError Description:" + errorDescription,
                         "D3D11HardwarePixelBuffer::_map");
                 }
@@ -122,12 +125,12 @@ namespace Ogre {
         case TEX_TYPE_CUBE_MAP:
         case TEX_TYPE_2D:
             {
-                mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1), 
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1), 
                     flags, 0, &pMappedResource);
                 if (mDevice.isError())
                 {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                         "D3D11 device cannot map 2D texture\nError Description:" + errorDescription,
                         "D3D11HardwarePixelBuffer::_map");
                 }
@@ -135,12 +138,12 @@ namespace Ogre {
             break;
         case TEX_TYPE_2D_ARRAY:
             {
-                mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1), 
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1), 
                     flags, 0, &pMappedResource);
                 if (mDevice.isError())
                 {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                         "D3D11 device cannot map 2D texture array\nError Description:" + errorDescription,
                         "D3D11HardwarePixelBuffer::_map");
                 }
@@ -148,12 +151,12 @@ namespace Ogre {
             break;
         case TEX_TYPE_3D:
             {
-                mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
 
                 if (mDevice.isError())
                 {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					String errorDescription = mDevice.getErrorDescription(hr);
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                         "D3D11 device cannot map 3D texture\nError Description:" + errorDescription,
                         "D3D11HardwarePixelBuffer::lockImpl");
                 }
@@ -248,7 +251,7 @@ namespace Ogre {
                 _map(mParentTexture->getTextureResource(), flags, rval);
 
             // calculate the offset in bytes
-            offset = D3D11Mappings::_getSizeInBytes(rval.format, rval.left, rval.front);
+			offset = PixelUtil::getMemorySize(rval.left, rval.front, 1, rval.format);
             // add the offset, so the right memory will be changed
             //rval.data = static_cast<int*>(rval.data) + offset;
         }
@@ -263,7 +266,7 @@ namespace Ogre {
         mCurrentLockOptions = options;
 
         // add the offset, so the right memory will be changed
-        rval.data = static_cast<int*>(rval.data) + offset;
+		rval.data = static_cast<int*>(rval.data) + offset;	// TODO: why offsetInBytes is added to (int*) pointer ???
 
         return rval;
     }
@@ -309,7 +312,7 @@ namespace Ogre {
         dstBoxDx11.front = 0;
         dstBoxDx11.back = mLockBox.getDepth();
 
-        size_t rowWidth = D3D11Mappings::_getSizeInBytes(mCurrentLock.format, mCurrentLock.getWidth());
+		size_t rowWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mCurrentLock.format);
 
         switch(mParentTexture->getTextureType()) {
         case TEX_TYPE_1D:
@@ -361,7 +364,7 @@ namespace Ogre {
             break;
         case TEX_TYPE_3D:
             {
-                size_t sliceWidth = D3D11Mappings::_getSizeInBytes(mCurrentLock.format, mCurrentLock.getWidth(), mCurrentLock.getHeight());
+				size_t sliceWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format);
 
                 mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex3D(), static_cast<UINT>(mSubresourceIndex), 
                     &dstBoxDx11, mDataForStaticUsageLock, rowWidth, sliceWidth);
@@ -407,16 +410,12 @@ namespace Ogre {
         {
             if(mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
             {
-                size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
                 PixelBox box;
                 _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD, box);
                 void *data = box.data; 
-
-                memcpy(data, mCurrentLock.data, sizeinbytes);
-
+				memcpy(data, mCurrentLock.data, mSizeInBytes);
                 // unmap the texture and the staging buffer
                 _unmap(mParentTexture->getTextureResource());
-
                 _unmapstagingbuffer(false);
             }
             else
@@ -566,17 +565,23 @@ namespace Ogre {
             break;
         }
 
-        if (isDds && (dstBox.getWidth() % 4 != 0 || dstBox.getHeight() % 4 != 0 ))
-        {
-            return;
-        }
-
-
         // for scoped deletion of conversion buffer
         MemoryDataStreamPtr buf;
         PixelBox converted = src;
 
         D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(dstBox);
+		if (isDds)
+		{
+			if(dstBox.getWidth() % 4 > 0)
+			{
+				dstBoxDx11.right += 4 - dstBox.getWidth() % 4 ;
+			}
+			if(dstBox.getHeight() % 4 > 0)
+			{
+				dstBoxDx11.bottom += 4 - dstBox.getHeight() % 4 ;
+			}
+		}
+
         dstBoxDx11.front = 0;
         dstBoxDx11.back = converted.getDepth();
 
@@ -595,6 +600,11 @@ namespace Ogre {
             size_t sizeinbytes;
             if (PixelUtil::isCompressed(converted.format))
             {
+				if(converted.rowPitch  % 4 > 0)
+				{
+					converted.rowPitch  += 4 - converted.rowPitch  % 4;
+				}
+				
                 // D3D wants the width of one row of cells in bytes
                 if (converted.format == PF_DXT1)
                 {
@@ -633,6 +643,11 @@ namespace Ogre {
             size_t rowWidth;
             if (PixelUtil::isCompressed(converted.format))
             {
+				if(converted.rowPitch  % 4 > 0)
+				{
+					converted.rowPitch  += 4 - converted.rowPitch  % 4;
+				}
+				
                 // D3D wants the width of one row of cells in bytes
                 if (converted.format == PF_DXT1)
                 {
@@ -765,10 +780,16 @@ namespace Ogre {
     {
         // Decide on pixel format of temp surface
         PixelFormat tmpFormat = mFormat; 
-        if(D3D11Mappings::_getPF(dst.format) != DXGI_FORMAT_UNKNOWN)
-        {
-            tmpFormat = dst.format;
-        }
+		
+		if(D3D11Mappings::_getPF(dst.format) == DXGI_FORMAT_UNKNOWN)
+		{
+			tmpFormat = dst.format;
+		}
+		if(tmpFormat == PF_A8B8G8R8)
+		{
+			tmpFormat = PF_A8R8G8B8;
+		}
+	
         assert(srcBox.getDepth() == 1 && dst.getDepth() == 1);
 
         //This is a pointer to the texture we're trying to copy
@@ -804,8 +825,9 @@ namespace Ogre {
         lrect.pBits = data;
         lrect.Pitch = rPitch;
 
-
-        PixelBox locked(dst.getWidth(), dst.getHeight(), dst.getDepth(), tmpFormat);
+		
+		PixelBox locked(dst.getWidth(), dst.getHeight(), dst.getDepth(),  D3D11Mappings::_getPF(desc.Format));
+		
         fromD3DLock(locked, lrect);
         PixelUtil::bulkPixelConversion(locked, dst);
 

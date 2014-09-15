@@ -57,40 +57,6 @@ namespace Ogre
         return new D3D11Texture(this, name, handle, group, isManual, loader, mDevice); 
     }
     //---------------------------------------------------------------------
-    void D3D11TextureManager::releaseDefaultPoolResources(void)
-    {
-        size_t count = 0;
-
-        ResourceMap::iterator r, rend;
-        rend = mResources.end();
-        for (r = mResources.begin(); r != rend; ++r)
-        {
-            D3D11TexturePtr t = r->second.staticCast<D3D11Texture>();
-            if (t->releaseIfDefaultPool())
-                count++;
-        }
-        LogManager::getSingleton().logMessage("D3D11TextureManager released:");
-        LogManager::getSingleton().logMessage(
-            StringConverter::toString(count) + " unmanaged textures");
-    }
-    //---------------------------------------------------------------------
-    void D3D11TextureManager::recreateDefaultPoolResources(void)
-    {
-        size_t count = 0;
-
-        ResourceMap::iterator r, rend;
-        rend = mResources.end();
-        for (r = mResources.begin(); r != rend; ++r)
-        {
-            D3D11TexturePtr t = r->second.staticCast<D3D11Texture>();
-            if(t->recreateIfDefaultPool(mDevice))
-                count++;
-        }
-        LogManager::getSingleton().logMessage("D3D11TextureManager recreated:");
-        LogManager::getSingleton().logMessage(
-            StringConverter::toString(count) + " unmanaged textures");
-    }
-    //---------------------------------------------------------------------
     PixelFormat D3D11TextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)
     {
         // Basic filtering
