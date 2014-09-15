@@ -132,7 +132,7 @@ namespace Ogre
 		
 		/** Returns the friendly name of the render system
 		*/
-		virtual const String& getFriendlyName(void) const { return "N/A"; }
+		virtual const String& getFriendlyName(void) const = 0;
 		
         /** Returns the details of this API's configuration options
         @remarks
