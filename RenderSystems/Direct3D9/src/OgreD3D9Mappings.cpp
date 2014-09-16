@@ -546,28 +546,35 @@ namespace Ogre
         case VET_COLOUR_ABGR:
         case VET_COLOUR_ARGB:
             return D3DDECLTYPE_D3DCOLOR;
-            break;
         case VET_FLOAT1:
             return D3DDECLTYPE_FLOAT1;
-            break;
         case VET_FLOAT2:
             return D3DDECLTYPE_FLOAT2;
-            break;
         case VET_FLOAT3:
             return D3DDECLTYPE_FLOAT3;
-            break;
         case VET_FLOAT4:
             return D3DDECLTYPE_FLOAT4;
-            break;
         case VET_SHORT2:
             return D3DDECLTYPE_SHORT2;
-            break;
         case VET_SHORT4:
             return D3DDECLTYPE_SHORT4;
-            break;
         case VET_UBYTE4:
             return D3DDECLTYPE_UBYTE4;
-            break;
+        case VET_UBYTE4_NORM:
+            // valid only with vertex shaders >= 2.0
+            return D3DDECLTYPE_UBYTE4N;
+        case VET_SHORT2_NORM:
+            // valid only with vertex shaders >= 2.0
+            return D3DDECLTYPE_SHORT2N;
+        case VET_SHORT4_NORM:
+            // valid only with vertex shaders >= 2.0
+            return D3DDECLTYPE_SHORT4N;
+        case VET_USHORT2_NORM:
+            // valid only with vertex shaders >= 2.0
+            return D3DDECLTYPE_USHORT2N;
+        case VET_USHORT4_NORM:
+            // valid only with vertex shaders >= 2.0
+            return D3DDECLTYPE_USHORT4N;
         }
         // to keep compiler happy
         return D3DDECLTYPE_FLOAT3;
