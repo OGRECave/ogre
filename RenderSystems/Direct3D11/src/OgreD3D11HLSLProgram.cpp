@@ -157,15 +157,9 @@ namespace Ogre {
 
         if (!stringBuffer.empty())
         {
-        // using different texture sampling instructions, tex2D for D3D9 and SampleXxx for D3D11,
-        // declaring type of BLENDINDICES as float4 for D3D9 but as uint4 for D3D11 -  all those
-        // small but annoying differences that otherwise would require declaring separate programs.
-        D3D_SHADER_MACRO macro;
-        macro.Name = "SHADER_MODEL_4";
-        macro.Definition = "1";
-        defines.push_back(macro);
             // Split preprocessor defines and build up macro array
-        String::size_type pos = stringBuffer.empty() ? String::npos : 0;
+            D3D_SHADER_MACRO macro;
+            String::size_type pos = stringBuffer.empty() ? String::npos : 0;
             while (pos != String::npos)
             {
                 macro.Name = &stringBuffer[pos];
@@ -227,6 +221,12 @@ namespace Ogre {
         D3D_SHADER_MACRO macro = {"D3D11","1"};
         defines.push_back(macro);       
 		
+        // Using different texture sampling instructions, tex2D for D3D9 and SampleXxx for D3D11,
+        // declaring type of BLENDINDICES as float4 for D3D9 but as uint4 for D3D11 -  all those
+        // small but annoying differences that otherwise would require declaring separate programs.
+        macro.Name = "SHADER_MODEL_4";
+        defines.push_back(macro);
+
         
 		switch (this->mType)
 		{
@@ -447,7 +447,7 @@ namespace Ogre {
     {
         // If we are running from the cache, we should not be trying to compile/reflect on shaders.
 #if defined(ENABLE_SHADERS_CACHE_LOAD) && (ENABLE_SHADERS_CACHE_LOAD == 1)
-        String message = "Cannot assemble/reflect D3D11 shader: " + mName + " in shipping code\n";
+        String message = "Cannot compile/reflect D3D11 shader: " + mName + " in shipping code\n";
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, message,
             "D3D11HLSLProgram::compileMicrocode");
 #else
@@ -501,16 +501,10 @@ namespace Ogre {
 
         ID3DBlob * pMicroCode;
 
-#ifdef OGRE_DEBUG_MODE
-		const char* filename = mFilename.c_str();
-#else
-		const char* filename = NULL;
-#endif
-
         HRESULT hr = D3DCompile(
             mSource.c_str(),      // [in] Pointer to the shader in memory. 
             mSource.size(),       // [in] Size of the shader in memory.  
-            filename,             // [in] The name of the file that contains the shader code. 
+            mFilename.c_str(),    // [in] Optional. You can use this parameter for strings that specify error messages.
             pDefines,             // [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D_SHADER_MACRO. If not used, set this to NULL. 
             &includeHandler,      // [in] Optional. Pointer to an ID3DInclude Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include. 
             mEntryPoint.c_str(),  // [in] Name of the shader-entrypoint function where shader execution begins. 
@@ -547,6 +541,17 @@ namespace Ogre {
         }
         else
         {
+#if OGRE_DEBUG_MODE
+            // Log warnings if any
+            const char* warnings = static_cast<const char*>(errors ? errors->GetBufferPointer() : 0);
+            if(warnings && LogManager::getSingletonPtr())
+            {
+                String message = "Warnings while compiling D3D11 high-level shader " + mName + ":\n" + warnings;
+                LogManager::getSingleton().logMessage(message, LML_NORMAL);
+            }
+#endif
+            SAFE_RELEASE(errors);
+
             mMicroCode.resize(pMicroCode->GetBufferSize());
             memcpy(&mMicroCode[0], pMicroCode->GetBufferPointer(), pMicroCode->GetBufferSize());
             SAFE_RELEASE(pMicroCode);
