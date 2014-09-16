@@ -347,8 +347,7 @@ bail:
         optExceptionsErrorLevel.possibleValues.push_back("Warning");
         optExceptionsErrorLevel.possibleValues.push_back("Info (exception on any message)");
 #if OGRE_DEBUG_MODE
-        //optExceptionsErrorLevel.currentValue = "Info (exception on any message)";
-		optExceptionsErrorLevel.currentValue = "Error (exception on any message)";
+        optExceptionsErrorLevel.currentValue = "Info (exception on any message)";
 #else
         optExceptionsErrorLevel.currentValue = "No information queue exceptions";
 #endif
