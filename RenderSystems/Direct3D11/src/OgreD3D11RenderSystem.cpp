@@ -2484,8 +2484,6 @@ bail:
                     "D3D11RenderSystem::_render" );
             }
 
-			//Default DepthClip to true
-			mRasterizerDesc.DepthClipEnable = true;
             hr = mDevice->CreateRasterizerState(&mRasterizerDesc, &opState->mRasterizer) ;
             if (FAILED(hr))
             {
