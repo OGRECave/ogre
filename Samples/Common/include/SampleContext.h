@@ -120,7 +120,7 @@ namespace OgreBites
     public:
 
         SampleContext()
-#if (OGRE_THREAD_PROVIDER == 3) and (OGRE_NO_TBB_SCHEDULER == 1)
+#if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
             : mTaskScheduler(tbb::task_scheduler_init::deferred)
 #endif
         {
@@ -296,7 +296,7 @@ namespace OgreBites
             mStaticPluginLoader.unload();
 #endif
 #endif
-#if (OGRE_THREAD_PROVIDER == 3) and (OGRE_NO_TBB_SCHEDULER == 1)
+#if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
             if (mTaskScheduler.is_active())
                 mTaskScheduler.terminate();
 #endif
@@ -609,7 +609,7 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void createRoot()
         {
-#if (OGRE_THREAD_PROVIDER == 3) and (OGRE_NO_TBB_SCHEDULER == 1)
+#if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
             mTaskScheduler.initialize(OGRE_THREAD_HARDWARE_CONCURRENCY);
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -993,7 +993,7 @@ namespace OgreBites
         AAssetManager* mAssetMgr;       // Android asset manager to access files inside apk
 #endif
 
-#if (OGRE_THREAD_PROVIDER == 3) and (OGRE_NO_TBB_SCHEDULER == 1)
+#if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
         tbb::task_scheduler_init mTaskScheduler;
 #endif
 
