@@ -847,7 +847,7 @@ bail:
 				std::string errorMsg = getCreationErrorMessage(hr, isDebug);
 				if (!isDebug)
 				{
-					OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 						errorMsg,
 						"D3D11RenderSystem::D3D11RenderSystem");
 				}
@@ -870,7 +870,7 @@ bail:
 					if (FAILED(hr))
 					{
 						std::string errorMsg = getCreationErrorMessage(hr, isDebug);
-						OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+						OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 							errorMsg,
 							"D3D11RenderSystem::D3D11RenderSystem");
 					}
@@ -1614,7 +1614,7 @@ bail:
             if( FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Unable to create the view of the depth texture \nError Description:" + errorDescription,
                     "D3D11RenderSystem::_createDepthBufferFor");
             }
@@ -4093,7 +4093,7 @@ bail:
 			std::string errorMsg = getCreationErrorMessage(hr,isDebug);
 			if (!isDebug)
 			{
-				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+				OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr,
 					errorMsg, 
 					"D3D11RenderSystem::D3D11RenderSystem" );
 			}
@@ -4107,7 +4107,7 @@ bail:
         if(FAILED(hr))
         {
 					std::string errorMsg = getCreationErrorMessage(hr,isDebug);
-					OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+					OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr,
 						errorMsg, 
 						"D3D11RenderSystem::D3D11RenderSystem" );
 				}
