@@ -621,19 +621,13 @@ bail:
 	
 	std::string D3D11RenderSystem::getCreationErrorMessage(HRESULT hr, bool isDebug)
 	{
-		std::stringstream error;
+		StringStream error;
 		error<<"Failed to create";
 		if (isDebug)
 		{
 			error<<" debug layer";
 		}
-		error<<" Direct3D11 object."<<std::endl;
-#ifdef USE_DXERR_LIBRARY
-		error<<DXGetErrorDescription(hr);
-#else
-		error<<(hr);
-#endif
-		error<<std::endl;
+		error << " Direct3D11 object.\n" << (hr) << "\n";
 		return error.str();
 	}
 
