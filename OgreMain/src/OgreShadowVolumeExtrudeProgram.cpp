@@ -581,8 +581,11 @@ namespace Ogre {
         "PARAM c5 = program.local[5];\n"    // c5.x = extrudeDist
         "MOV result.color.front.primary, c6.x;\n"
         "ADD R0.x, c6.x, -v24.x;\n"
-        "MUL R0.x, R0.x, c5.x;\n"
-        "MAD R0.xyz, -R0.x, c4.xyzx, v16.xyzx;\n"
+        "MUL R0.w, R0.x, c5.x;\n"           // R0.w = (1 - wcoord) * extrudeDist
+        "DP3 R1.w, c4.xyzx, c4.xyzx;\n"     // R1.w = extrusionDir.sqrLength()
+        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / extrusionDir.length()
+        "MUL R0.xyz, R1.w, -c4.xyzx;\n"     // R0.xyz = extrusionDir.normalisedCopy()
+        "MAD R0.xyz, R0.w, R0.xyzx, v16.xyzx;\n"
         "DPH result.position.x, R0.xyzz, c0[0];\n"
         "DPH result.position.y, R0.xyzz, c0[1];\n"
         "DPH result.position.z, R0.xyzz, c0[2];\n"
