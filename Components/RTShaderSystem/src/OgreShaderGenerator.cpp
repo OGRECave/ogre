@@ -25,7 +25,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderGenerator.h"
-#include "OgreShaderProgram.h"
 #include "OgreShaderProgramManager.h"
 #include "OgreShaderFFPRenderStateBuilder.h"
 #include "OgreShaderRenderState.h"
@@ -382,7 +381,7 @@ size_t ShaderGenerator::getNumSubRenderStateFactories() const
 SubRenderStateFactory*  ShaderGenerator::getSubRenderStateFactory(size_t index)
 {
 	{
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
 
 		SubRenderStateFactoryIterator itFind = mSubRenderStateFactories.begin();
 		for(; index != 0 && itFind != mSubRenderStateFactories.end(); --index , ++itFind);
@@ -1685,6 +1684,7 @@ void ShaderGenerator::SGTechnique::createIlluminationSGPasses()
 		if(!origPassUserData.isEmpty())
 		{
 			OGRE_LOCK_AUTO_MUTEX;
+
 			SGPass* origPassEntry = any_cast<SGPass*>(origPassUserData);
 			passEntry->setCustomRenderState(origPassEntry->getCustomRenderState());
 		}
