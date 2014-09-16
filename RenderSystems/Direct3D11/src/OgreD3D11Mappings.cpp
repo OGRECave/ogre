@@ -302,6 +302,10 @@ namespace Ogre
             return DXGI_FORMAT_R16G16_SINT;
         case VET_SHORT4:
             return DXGI_FORMAT_R16G16B16A16_SINT;
+        case VET_SHORT2_NORM:
+            return DXGI_FORMAT_R16G16_SNORM;
+        case VET_SHORT4_NORM:
+            return DXGI_FORMAT_R16G16B16A16_SNORM;
 
         // Unsigned short
         case VET_USHORT1:
@@ -310,6 +314,10 @@ namespace Ogre
             return DXGI_FORMAT_R16G16_UINT;
         case VET_USHORT4:
             return DXGI_FORMAT_R16G16B16A16_UINT;
+        case VET_USHORT2_NORM:
+            return DXGI_FORMAT_R16G16_UNORM;
+        case VET_USHORT4_NORM:
+            return DXGI_FORMAT_R16G16B16A16_UNORM;
 
         // Signed int
         case VET_INT1:
@@ -330,9 +338,15 @@ namespace Ogre
             return DXGI_FORMAT_R32G32B32_UINT;
         case VET_UINT4:
             return DXGI_FORMAT_R32G32B32A32_UINT;
-
+            
+        case VET_BYTE4:
+            return DXGI_FORMAT_R8G8B8A8_SINT;
+        case VET_BYTE4_NORM:
+            return DXGI_FORMAT_R8G8B8A8_SNORM;
         case VET_UBYTE4:
             return DXGI_FORMAT_R8G8B8A8_UINT;
+        case VET_UBYTE4_NORM:
+            return DXGI_FORMAT_R8G8B8A8_UNORM;
         }
         // to keep compiler happy
         return DXGI_FORMAT_R32G32B32_FLOAT;
