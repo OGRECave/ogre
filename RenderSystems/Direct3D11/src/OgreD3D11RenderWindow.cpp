@@ -433,8 +433,8 @@ namespace Ogre
 		mStereoEnabled = D3D11StereoDriverBridge::getSingleton().isStereoEnabled(this->getName());
 	}
 #endif
-	//---------------------------------------------------------------------
 #pragma endregion
+
     //---------------------------------------------------------------------
     // class D3D11RenderWindowSwapChainBased
     //---------------------------------------------------------------------
@@ -628,14 +628,13 @@ namespace Ogre
 		return mVBlankMissCount;
 	}
 	
-    //---------------------------------------------------------------------
 #pragma endregion
 
-#pragma region D3D11RenderWindowHwnd
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     //---------------------------------------------------------------------
     // class D3D11RenderWindowHwnd
     //---------------------------------------------------------------------
+#pragma region D3D11RenderWindowHwnd
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     D3D11RenderWindowHwnd::D3D11RenderWindowHwnd(D3D11Device & device, IDXGIFactoryN*   pDXGIFactory)
         : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
     {
@@ -1045,7 +1044,6 @@ namespace Ogre
             return;
 
         _resizeSwapChainBuffers(width, height);
-		#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::getCustomAttribute( const String& name, void* pData )
@@ -1277,14 +1275,14 @@ namespace Ogre
 		}
 		RenderWindow::setActive(state);
 	}
-
-
+#endif
 #pragma endregion
-#pragma region D3D11RenderWindowCoreWindow
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+
     //---------------------------------------------------------------------
     // class D3D11RenderWindowCoreWindow
     //---------------------------------------------------------------------
+#pragma region D3D11RenderWindowCoreWindow
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
     D3D11RenderWindowCoreWindow::D3D11RenderWindowCoreWindow(D3D11Device & device, IDXGIFactoryN*   pDXGIFactory)
         : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
     {
@@ -1410,7 +1408,7 @@ namespace Ogre
 
         _resizeSwapChainBuffers(0, 0);      // pass zero to autodetect size
     }
-    //---------------------------------------------------------------------
+
 #endif
 #pragma endregion
 
@@ -1419,7 +1417,7 @@ namespace Ogre
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowImageSource
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-    //---------------------------------------------------------------------
+
     D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
         : D3D11RenderWindowBase(device, pDXGIFactory)
         , mImageSourceNative(NULL)
