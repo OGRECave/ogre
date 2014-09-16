@@ -70,10 +70,10 @@ elseif (WIN32)
       include/WIN32/OgreTimerImp.h
     )
     set(PLATFORM_SOURCE_FILES
+      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialogWinRT.cpp
       src/WIN32/OgreErrorDialogWinRT.cpp
       src/WIN32/OgreTimer.cpp
-	  src/WIN32/OgreOptimisedUtilDirectXMath.cpp
     )  
 
     set(PLATFORM_HEADER_INSTALL "WIN32")
@@ -86,6 +86,7 @@ elseif (WIN32)
       include/WIN32/OgreMinGWSupport.h
     )
     set(PLATFORM_SOURCE_FILES
+      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialog.cpp
       src/WIN32/OgreErrorDialog.cpp
       src/WIN32/OgreFileSystemLayer.cpp

@@ -113,8 +113,11 @@ namespace Ogre {
 
 /* Finds the current platform */
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && !defined(__ANDROID__)
-#   if defined(WINAPI_FAMILY)
+#    include <sdkddkver.h>
+#    if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8 // i.e. this is modern SDK and we compile for OS with guaranteed support for DirectXMath
 #       define __OGRE_HAVE_DIRECTXMATH 1
+#    endif
+#   if defined(WINAPI_FAMILY)
 #       include <winapifamily.h>
 #       if WINAPI_FAMILY == WINAPI_FAMILY_APP|| WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
 #           define DESKTOP_APP 1
