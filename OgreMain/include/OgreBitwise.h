@@ -30,6 +30,11 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#ifndef __has_builtin
+    // Compatibility with non-clang compilers
+    #define __has_builtin(x) 0
+#endif
+
 namespace Ogre {
     /** \addtogroup Core
     *  @{
@@ -48,7 +53,7 @@ namespace Ogre {
         {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
             return _byteswap_ushort(arg);
-#elif OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap16) || OGRE_COMPILER == OGRE_COMPILER_GCC && OGRE_COMP_VER >= 480
+#elif (OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap16)) || (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 480)
             return __builtin_bswap16(arg);
 #else
             return ((arg << 8) & 0xFF00) | ((arg >> 8) & 0x00FF);
@@ -60,7 +65,7 @@ namespace Ogre {
         {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
             return _byteswap_ulong(arg);
-#elif OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap32) || OGRE_COMPILER == OGRE_COMPILER_GCC && OGRE_COMP_VER >= 430
+#elif (OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap32)) || (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 430)
             return __builtin_bswap32(arg);
 #else
             return ((arg & 0x000000FF) << 24) | ((arg & 0x0000FF00) << 8) | ((arg >> 8) & 0x0000FF00) | ((arg >> 24) & 0x000000FF);
@@ -72,7 +77,7 @@ namespace Ogre {
         {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
             return _byteswap_uint64(arg);
-#elif OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap64) || OGRE_COMPILER == OGRE_COMPILER_GCC && OGRE_COMP_VER >= 430
+#elif (OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap64)) || (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 430)
             return __builtin_bswap64(arg);
 #else
             union { 
