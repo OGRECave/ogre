@@ -4787,7 +4787,7 @@ void SceneManager::initShadowVolumeMaterials(void)
 			mShadowModulativePass->setLightingEnabled(false);
 			mShadowModulativePass->setDepthWriteEnabled(false);
 			mShadowModulativePass->setDepthCheckEnabled(false);
-			TextureUnitState* t = mShadowModulativePass->createTextureUnitState();
+			mShadowModulativePass->createTextureUnitState();
 
 
 			mShadowModulativePass->setCullingMode(CULL_NONE);

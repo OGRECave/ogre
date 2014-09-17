@@ -808,10 +808,10 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
 		}
 
 		//Add vertex program
-		AddInternalProgram(vsProgramName, vsProgram, language, vsEntryPoint, vsTarget, GpuProgramType::GPT_VERTEX_PROGRAM);
+		AddInternalProgram(vsProgramName, vsProgram, language, vsEntryPoint, vsTarget, GPT_VERTEX_PROGRAM);
 
 		//Add fragment program
-		AddInternalProgram(fsProgramName, fsProgram, language, fsEntryPoint, fsTarget, GpuProgramType::GPT_FRAGMENT_PROGRAM);
+		AddInternalProgram(fsProgramName, fsProgram, language, fsEntryPoint, fsTarget, GPT_FRAGMENT_PROGRAM);
 	}
 
     void ShadowVolumeExtrudeProgram::initialise(void)
