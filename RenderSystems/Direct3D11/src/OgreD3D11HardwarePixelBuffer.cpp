@@ -92,15 +92,6 @@ namespace Ogre {
         SAFE_RELEASE(mStagingBuffer);
     }
     //-----------------------------------------------------------------------------  
-    // Util functions to convert a D3D locked box to a pixel box
-    void D3D11HardwarePixelBuffer::fromD3DLock(PixelBox &rval, const DXGI_MAPPED_RECT &lrect)
-    {
-        rval.rowPitch = lrect.Pitch / PixelUtil::getNumElemBytes(rval.format);
-        rval.slicePitch = rval.rowPitch * rval.getHeight();
-        assert((lrect.Pitch % PixelUtil::getNumElemBytes(rval.format))==0);
-        rval.data = lrect.pBits;
-    }
-//-----------------------------------------------------------------------------
     void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
     {
         mDevice.clearStoredErrorMessages();
@@ -817,18 +808,7 @@ namespace Ogre {
         mDevice.GetImmediateContext()->Map( pStagingTexture, 0, D3D11_MAP_READ , 0, &mapped );
         
         // read the data out of the texture.
-        unsigned int rPitch = mapped.RowPitch;
-        BYTE *data = ((BYTE *)mapped.pData);
-
-        //Using existing OGRE functions
-        DXGI_MAPPED_RECT lrect; 
-        lrect.pBits = data;
-        lrect.Pitch = rPitch;
-
-		
-		PixelBox locked(dst.getWidth(), dst.getHeight(), dst.getDepth(),  D3D11Mappings::_getPF(desc.Format));
-		
-        fromD3DLock(locked, lrect);
+        PixelBox locked = D3D11Mappings::getPixelBoxWithMapping(dst.getWidth(), dst.getHeight(), dst.getDepth(), D3D11Mappings::_getPF(desc.Format), mapped);
         PixelUtil::bulkPixelConversion(locked, dst);
 
         //Release the staging texture
