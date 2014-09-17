@@ -21,7 +21,9 @@ public:
     StringVector getRequiredPlugins()
     {
         StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
             names.push_back("Cg Program Manager");
         return names;
     }

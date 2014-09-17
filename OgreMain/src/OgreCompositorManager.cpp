@@ -508,6 +508,12 @@ CompositorLogic* CompositorManager::getCompositorLogic(const String& name)
     return it->second;
 }
 //---------------------------------------------------------------------
+bool CompositorManager::getHasCompositorLogic(const String& name)
+{
+	CompositorLogicMap::iterator it = mCompositorLogics.find(name);
+	return it == mCompositorLogics.end() ? false : true;
+}
+//---------------------------------------------------------------------
 void CompositorManager::registerCustomCompositionPass(const String& name, CustomCompositionPass* logic)
 {   
     if (name.empty()) 
@@ -523,6 +529,24 @@ void CompositorManager::registerCustomCompositionPass(const String& name, Custom
             "CompositorManager::registerCustomCompositionPass");
     }
     mCustomCompositionPasses[name] = logic;
+}
+//---------------------------------------------------------------------
+void CompositorManager::unRegisterCustomCompositionPass(const String& name)
+{	
+	CustomCompositionPassMap::iterator itor = mCustomCompositionPasses.find(name);
+	if( itor == mCustomCompositionPasses.end() )
+	{
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+			"Custom composition pass '" + name + "' not registered.",
+			"CompositorManager::unRegisterCustomCompositionPass");
+	}
+	mCustomCompositionPasses.erase( itor );
+}
+//---------------------------------------------------------------------
+bool CompositorManager::getHasCompositionPass(const String& name)
+{
+	CustomCompositionPassMap::iterator it = mCustomCompositionPasses.find(name);
+	return it == mCustomCompositionPasses.end() ? false : true;
 }
 //---------------------------------------------------------------------
 CustomCompositionPass* CompositorManager::getCustomCompositionPass(const String& name)

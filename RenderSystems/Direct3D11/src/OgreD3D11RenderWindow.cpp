@@ -40,6 +40,15 @@ THE SOFTWARE.
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
 
+#define OGRE_D3D11_WIN_CLASS_NAME "OgreD3D11Wnd"
+
+//Find out if the DXGI header files are referenced to windows 8.0 or windows 8.1 SDK
+#if (__REQUIRED_RPCNDR_H_VERSION__ >= 500)
+#define WIN8SDK
+#endif
+
+
+
 namespace Ogre
 {
     //---------------------------------------------------------------------
@@ -64,6 +73,12 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11RenderWindowBase::~D3D11RenderWindowBase()
     {
+		
+		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		NameValuePairList params;
+		params["RenderWindow"] = StringConverter::toString((size_t)this);
+		rsys->fireDeviceEvent(&mDevice,"RenderWindowDestroyed",&params);
+		
         destroy();
     }
     //---------------------------------------------------------------------
@@ -139,6 +154,13 @@ namespace Ogre
         mName = name;
         mDepthBufferPoolId = depthBuffer ? DepthBuffer::POOL_DEFAULT : DepthBuffer::POOL_NO_DEPTH;
         mIsFullScreen = fullScreen;
+
+		if(mIsFullScreen)
+		{
+			D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+			rsys->addToSwitchingFullscreenCounter();
+		}
+
         mColourDepth = colourDepth;
 
         mWidth = mHeight = mLeft = mTop = 0;
@@ -157,19 +179,21 @@ namespace Ogre
         D3D11_TEXTURE2D_DESC BBDesc;
         mpBackBuffer->GetDesc( &BBDesc );
 
+        // mFSAA is an external request that may be even not supported by hardware, but mFSAAType should be always in sync with reality
+        assert(BBDesc.SampleDesc.Count == mFSAAType.Count && BBDesc.SampleDesc.Quality == mFSAAType.Quality);
+
         // create the render target view
         D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
         ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
 
         RTVDesc.Format = BBDesc.Format;
-        RTVDesc.ViewDimension = mFSAA ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
-        RTVDesc.Texture2D.MipSlice = 0;
+        RTVDesc.ViewDimension = mFSAAType.Count > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
         hr = mDevice->CreateRenderTargetView( mpBackBuffer, &RTVDesc, &mRenderTargetView );
 
         if( FAILED(hr) )
         {
-            String errorDescription = mDevice.getErrorDescription();
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to create rendertagert view\nError Description:" + errorDescription,
                 "D3D11RenderWindow::_createSizeDependedD3DResources");
         }
@@ -197,7 +221,7 @@ namespace Ogre
             if( FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Unable to create depth texture\nError Description:" + errorDescription,
                     "D3D11RenderWindow::_createSizeDependedD3DResources");
             }
@@ -207,16 +231,15 @@ namespace Ogre
             ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
 
             descDSV.Format =  descDepth.Format;
-            descDSV.ViewDimension = mFSAA ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
-            descDSV.Texture2D.MipSlice = 0;
+            descDSV.ViewDimension = mFSAAType.Count > 1 ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
             hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
 
             SAFE_RELEASE(pDepthStencil);
                 
             if( FAILED(hr) )
             {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Unable to create depth stencil view\nError Description:" + errorDescription,
                     "D3D11RenderWindow::_createSizeDependedD3DResources");
             }
@@ -274,7 +297,7 @@ namespace Ogre
         HRESULT hr = mDevice->QueryInterface( __uuidof(IDXGIDeviceN), (void**)&pDXGIDevice );
         if( FAILED(hr) )
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to query a DXGIDevice",
                 "D3D11RenderWindowBase::_queryDxgiDevice");
         }
@@ -338,14 +361,14 @@ namespace Ogre
 
         ID3D11Texture2D *backbuffer = NULL;
 
-        if(BBDesc.SampleDesc.Quality > 0)
+        if(BBDesc.SampleDesc.Count > 1)
         {
                 D3D11_TEXTURE2D_DESC desc = BBDesc;
-                desc.Usage = D3D11_USAGE_DEFAULT;
-                desc.CPUAccessFlags = 0;
-                desc.BindFlags = 0;
-                desc.SampleDesc.Quality = 0;
                 desc.SampleDesc.Count = 1;
+                desc.SampleDesc.Quality = 0;
+                desc.Usage = D3D11_USAGE_DEFAULT;
+                desc.BindFlags = 0;
+                desc.CPUAccessFlags = 0;
 
                 HRESULT hr = mDevice->CreateTexture2D(
                         &desc,
@@ -355,21 +378,21 @@ namespace Ogre
                 if (FAILED(hr) || mDevice.isError())
                 {
                         String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                                 "Error creating texture\nError Description:" + errorDescription, 
                                 "D3D11RenderWindow::copyContentsToMemory" );
                 }
 
-                mDevice.GetImmediateContext()->ResolveSubresource(backbuffer, D3D11CalcSubresource(0, 0, 1), mpBackBuffer, D3D11CalcSubresource(0, 0, 1), desc.Format);
+                mDevice.GetImmediateContext()->ResolveSubresource(backbuffer, D3D11CalcSubresource(0, 0, 1), mpBackBuffer, D3D11CalcSubresource(0, 0, 1), BBDesc.Format);
         }
 
 
         // change the parameters of the texture so we can read it
-        BBDesc.Usage = D3D11_USAGE_STAGING;
-        BBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        BBDesc.BindFlags = 0;
-        BBDesc.SampleDesc.Quality = 0;
         BBDesc.SampleDesc.Count = 1;
+        BBDesc.SampleDesc.Quality = 0;
+        BBDesc.Usage = D3D11_USAGE_STAGING;
+        BBDesc.BindFlags = 0;
+        BBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
         // create a temp buffer to copy to
         ID3D11Texture2D * pTempTexture2D;
@@ -381,7 +404,7 @@ namespace Ogre
         if (FAILED(hr) || mDevice.isError())
         {
                 String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                         "Error creating texture\nError Description:" + errorDescription, 
                         "D3D11RenderWindow::copyContentsToMemory" );
         }
@@ -392,10 +415,9 @@ namespace Ogre
         D3D11_MAPPED_SUBRESOURCE mappedTex2D;
         mDevice.GetImmediateContext()->Map(pTempTexture2D, 0,D3D11_MAP_READ, 0, &mappedTex2D);
 
-        // copy the the texture to the dest
-        PixelUtil::bulkPixelConversion(
-            PixelBox(mWidth, mHeight, 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D.pData), 
-            dst);
+        // copy the texture to the dest
+        PixelBox src = D3D11Mappings::getPixelBoxWithMapping(mWidth, mHeight, 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D);
+        PixelUtil::bulkPixelConversion(src, dst);
 
         // unmap the temp buffer
         mDevice.GetImmediateContext()->Unmap(pTempTexture2D, 0);
@@ -411,8 +433,8 @@ namespace Ogre
 		mStereoEnabled = D3D11StereoDriverBridge::getSingleton().isStereoEnabled(this->getName());
 	}
 #endif
-	//---------------------------------------------------------------------
 #pragma endregion
+
     //---------------------------------------------------------------------
     // class D3D11RenderWindowSwapChainBased
     //---------------------------------------------------------------------
@@ -422,6 +444,10 @@ namespace Ogre
         , mpSwapChain(NULL)
     {
         ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
+		memset(&mPreviousPresentStats, 0, sizeof(mPreviousPresentStats));
+		mPreviousPresentStatsIsValid = false; 
+		mVBlankMissCount = 0; 
+		mUseFlipMode = false;
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::destroy()
@@ -450,7 +476,7 @@ namespace Ogre
 
         if (FAILED(hr))
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to create swap chain",
                 "D3D11RenderWindowSwapChainBased::_createSwapChain");
         }
@@ -464,7 +490,7 @@ namespace Ogre
         HRESULT hr = mpSwapChain->GetBuffer( 0,  __uuidof( ID3D11Texture2D ), (LPVOID*)&mpBackBuffer  );
         if( FAILED(hr) )
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to Get Back Buffer for swap chain",
                 "D3D11RenderWindow::_createSizeDependedD3DResources");
         }
@@ -476,10 +502,18 @@ namespace Ogre
     void D3D11RenderWindowSwapChainBased::_resizeSwapChainBuffers(unsigned width, unsigned height)
     {
         _destroySizeDependedD3DResources();
-
+		
+		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		NameValuePairList params;
+		params["RenderWindow"] = StringConverter::toString((size_t)this);
+		rsys->fireDeviceEvent(&mDevice,"RenderWindowBeforeResize",&params);
+		
         // width and height can be zero to autodetect size, therefore do not rely on them
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        UINT Flags = mIsFullScreen ? DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH : 0;
+
+		UINT Flags = 0;
+
+		
         mpSwapChain->ResizeBuffers(mSwapChainDesc.BufferCount, width, height, mSwapChainDesc.BufferDesc.Format, Flags);
         mpSwapChain->GetDesc(&mSwapChainDesc);
         mWidth = mSwapChainDesc.BufferDesc.Width;
@@ -497,34 +531,119 @@ namespace Ogre
 
         // Notify viewports of resize
         _updateViewportsDimensions();
+		rsys->fireDeviceEvent(&mDevice,"RenderWindowResized",&params);
+		
     }
+
+	//---------------------------------------------------------------------
+	int D3D11RenderWindowSwapChainBased::getContainingMonitorNumber()
+	{
+		IDXGISwapChain* swapChain = _getSwapChain();
+		IDXGIOutput* output;
+		int monitorSequencialNumber = -1;
+		if (swapChain != NULL)
+		{
+			HRESULT hr = swapChain->GetContainingOutput(&output);
+			if (hr == S_OK)
+			{
+				DXGI_OUTPUT_DESC desc;
+				output->GetDesc(&desc);
+				D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+				monitorSequencialNumber = rsys->getMonitorInfo().getMonitorSequentialNumberFromHMonitor(desc.Monitor);
+			}
+		}
+		return monitorSequencialNumber;
+	}
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::swapBuffers( )
     {
+		NameValuePairList params;
+		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		params["RenderWindow"] = StringConverter::toString((size_t)this);
+		rsys->fireDeviceEvent(&mDevice,"BeforeDevicePresent",&params);
+
         if( !mDevice.isNull() )
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            HRESULT hr = mpSwapChain->Present(mVSync ? mVSyncInterval : 0, 0);
+
+			UINT syncInterval = 0;
+			if(mVSync)
+			{
+				syncInterval = mVSyncInterval;
+			}
+			HRESULT hr = mpSwapChain->Present(syncInterval, 0);			
+
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
             HRESULT hr = mpSwapChain->Present(1, 0); // flip presentation model swap chains have another semantic for first parameter
 #endif
             if( FAILED(hr) )
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers" );
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers");
         }
+	}
+	
+	//---------------------------------------------------------------------
+	void D3D11RenderWindowSwapChainBased::updateStats( void )
+	{
+		RenderTarget::updateStats();
+		mStats.vBlankMissCount = getVBlankMissCount();
+	}
+	//---------------------------------------------------------------------
+	bool D3D11RenderWindowSwapChainBased::IsWindows8OrGreater()
+	{
+		DWORD version = GetVersion();
+		DWORD major = (DWORD)(LOBYTE(LOWORD(version)));
+		DWORD minor = (DWORD)(HIBYTE(LOWORD(version)));
+		return (major > 6) || ((major == 6) && (minor >= 2));
+	}
+	//---------------------------------------------------------------------
+	int D3D11RenderWindowSwapChainBased::getVBlankMissCount()
+	{
+		if (!(mIsFullScreen || (!mIsFullScreen && isVSyncEnabled() && mUseFlipMode == true && mFSAA == 0)))
+		{
+			return -1;
+		}
+
+		DXGI_FRAME_STATISTICS currentPresentStats;
+		ZeroMemory(&currentPresentStats, sizeof(currentPresentStats));
+		HRESULT hr = mpSwapChain->GetFrameStatistics(&currentPresentStats);
+		if(FAILED(hr) || currentPresentStats.PresentRefreshCount == 0)
+		{
+			mPreviousPresentStatsIsValid = false;
+			return -1;
+		}
+		else
+		{
+			if(mPreviousPresentStatsIsValid == true)
+			{
+				int currentVBlankMissCount = (currentPresentStats.PresentRefreshCount - mPreviousPresentStats.PresentRefreshCount) 
+					- (currentPresentStats.PresentCount - mPreviousPresentStats.PresentCount);
+				if(currentVBlankMissCount > 0)
+				{
+					mVBlankMissCount +=  currentVBlankMissCount;
     }
-    //---------------------------------------------------------------------
+			}
+			mPreviousPresentStats			= currentPresentStats;
+			mPreviousPresentStatsIsValid	= true;
+		}			
+		return mVBlankMissCount;
+	}
+	
 #pragma endregion
 
-#pragma region D3D11RenderWindowHwnd
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     //---------------------------------------------------------------------
     // class D3D11RenderWindowHwnd
     //---------------------------------------------------------------------
+#pragma region D3D11RenderWindowHwnd
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     D3D11RenderWindowHwnd::D3D11RenderWindowHwnd(D3D11Device & device, IDXGIFactoryN*   pDXGIFactory)
         : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
     {
         mHWnd = 0;
-        mSwitchingFullscreen = false;
+		mWindowedWinStyle = 0;
+		mFullscreenWinStyle = 0;
+		mDesiredWidth = 0;
+		mDesiredHeight = 0;
+		mLastSwitchingFullscreenCounter = 0;
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::create(const String& name, unsigned int width, unsigned int height,
@@ -535,8 +654,15 @@ namespace Ogre
         HWND parentHWnd = 0;
         HWND externalHandle = 0;
         String title = name;
-        int left = -1; // Defaults to screen center
-        int top = -1; // Defaults to screen center
+
+		unsigned int colourDepth = 32;
+		int left = INT_MAX; // Defaults to screen center
+		int top = INT_MAX;  // Defaults to screen center
+		bool depthBuffer = true;
+		int monitorIndex = -1;	//Default by detecting the adapter from left / top position	
+		size_t fsaaSamples = 0;
+		String fsaaHint;
+
         String border = "";
         bool outerSize = false;
         bool enableDoubleClick = false;
@@ -565,6 +691,36 @@ namespace Ogre
             opt = miscParams->find("externalWindowHandle");
             if(opt != miscParams->end())
                 externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
+			
+				opt = miscParams->find("vsync");
+				if(opt != miscParams->end())
+					mVSync = StringConverter::parseBool(opt->second);
+				opt = miscParams->find("hidden");
+				if(opt != miscParams->end())
+					mHidden = StringConverter::parseBool(opt->second);
+				opt = miscParams->find("vsyncInterval");
+				if(opt != miscParams->end())
+					mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
+				opt = miscParams->find("displayFrequency");
+				if(opt != miscParams->end())
+					mDisplayFrequency = StringConverter::parseUnsignedInt(opt->second);
+				opt = miscParams->find("colourDepth");
+				if(opt != miscParams->end())
+					colourDepth = StringConverter::parseUnsignedInt(opt->second);
+				opt = miscParams->find("depthBuffer");
+				if(opt != miscParams->end())
+					depthBuffer = StringConverter::parseBool(opt->second);
+				opt = miscParams->find("FSAA");
+				if(opt != miscParams->end())
+				{
+					mFSAA = StringConverter::parseUnsignedInt(opt->second);
+				}
+				opt = miscParams->find("FSAAHint");
+				if(opt != miscParams->end())
+				{
+					mFSAAHint = opt->second;
+				}
+			
             // window border style
             opt = miscParams->find("border");
             if(opt != miscParams->end())
@@ -573,100 +729,147 @@ namespace Ogre
             opt = miscParams->find("outerDimensions");
             if(opt != miscParams->end())
                 outerSize = StringConverter::parseBool(opt->second);
+			
+				opt = miscParams->find("gamma");
+				if(opt != miscParams->end())
+					mHwGamma = StringConverter::parseBool(opt->second);
+				opt = miscParams->find("monitorIndex");
+				if(opt != miscParams->end())
+					monitorIndex = StringConverter::parseInt(opt->second);
+				opt = miscParams->find("show");
+				if(opt != miscParams->end())
+					mHidden = !StringConverter::parseBool(opt->second);
+			
             // enable double click messages
             opt = miscParams->find("enableDoubleClick");
             if(opt != miscParams->end())
                 enableDoubleClick = StringConverter::parseBool(opt->second);
 
         }
+		
+		mIsFullScreen = fullScreen;
+		
 
         // Destroy current window if any
         if( mHWnd )
             destroy();
 
-        if (!externalHandle)
-        {
-            DWORD dwStyle = (mHidden ? 0 : WS_VISIBLE) | WS_CLIPCHILDREN;
-            RECT rc;
-
-            mWidth = width;
-            mHeight = height;
-            mTop = top;
-            mLeft = left;
-
-            if (!fullScreen)
-            {
-                if (parentHWnd)
-                {
-                    dwStyle |= WS_CHILD;
-                }
-                else
-                {
-                    if (border == "none")
-                        dwStyle |= WS_POPUP;
-                    else if (border == "fixed")
-                        dwStyle |= WS_OVERLAPPED | WS_BORDER | WS_CAPTION |
-                        WS_SYSMENU | WS_MINIMIZEBOX;
-                    else
-                        dwStyle |= WS_OVERLAPPEDWINDOW;
-                }
-
-                if (!outerSize)
-                {
-                    // Calculate window dimensions required
-                    // to get the requested client area
-                    SetRect(&rc, 0, 0, mWidth, mHeight);
-                    AdjustWindowRect(&rc, dwStyle, false);
-                    mWidth = rc.right - rc.left;
-                    mHeight = rc.bottom - rc.top;
-
-                    // Clamp width and height to the desktop dimensions
-                    int screenw = GetSystemMetrics(SM_CXSCREEN);
-                    int screenh = GetSystemMetrics(SM_CYSCREEN);
-                    if ((int)mWidth > screenw)
-                        mWidth = screenw;
-                    if ((int)mHeight > screenh)
-                        mHeight = screenh;
-                    if (mLeft < 0)
-                        mLeft = (screenw - mWidth) / 2;
-                    if (mTop < 0)
-                        mTop = (screenh - mHeight) / 2;
-                }
-            }
-            else
-            {
-                dwStyle |= WS_POPUP;
-                mTop = mLeft = 0;
-            }
-
-            UINT classStyle = 0;
-            if (enableDoubleClick)
-                classStyle |= CS_DBLCLKS;
-
-            HINSTANCE hInst = NULL;
-
-            // Register the window class
-            // NB allow 4 bytes of window data for D3D11RenderWindow pointer
-            WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
-                LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
-                (HBRUSH)GetStockObject(BLACK_BRUSH), 0, "OgreD3D11Wnd" };   
-
- 
-            RegisterClass(&wc);
-
-            // Create our main window
-            // Pass pointer to self
-            mIsExternal = false;
-            mHWnd = CreateWindow("OgreD3D11Wnd", title.c_str(), dwStyle,
-                mLeft, mTop, mWidth, mHeight, parentHWnd, 0, hInst, this);
-
-            WindowEventUtilities::_addRenderWindow(this);
-        }
-        else
-        {
-            mHWnd = externalHandle;
-            mIsExternal = true;
-        }
+		if (!externalHandle)
+		{
+			DWORD		dwStyleEx = 0;
+			HMONITOR    hMonitor = NULL;		
+			MONITORINFO monitorInfo;
+			RECT		rc;
+			if (hMonitor == NULL)
+			{
+				POINT windowAnchorPoint;
+				windowAnchorPoint.x = left;
+				windowAnchorPoint.y = top;
+				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
+			}
+			memset(&monitorInfo, 0, sizeof(MONITORINFO));
+			monitorInfo.cbSize = sizeof(MONITORINFO);
+			GetMonitorInfo(hMonitor, &monitorInfo);
+			mFullscreenWinStyle = WS_CLIPCHILDREN | WS_POPUP;
+			mWindowedWinStyle   = WS_CLIPCHILDREN;
+			if (!mHidden)
+			{
+				mFullscreenWinStyle |= WS_VISIBLE;
+				mWindowedWinStyle |= WS_VISIBLE;
+			}
+			if (parentHWnd)
+			{
+				mWindowedWinStyle |= WS_CHILD;
+			}
+			else
+			{
+				if (border == "none")
+					mWindowedWinStyle |= WS_POPUP;
+				else if (border == "fixed")
+					mWindowedWinStyle |= WS_OVERLAPPED | WS_BORDER | WS_CAPTION |
+					WS_SYSMENU | WS_MINIMIZEBOX;
+				else
+					mWindowedWinStyle |= WS_OVERLAPPEDWINDOW;
+			}
+			unsigned int winWidth, winHeight;
+			winWidth = width;
+			winHeight = height;
+			if (left == INT_MAX || top == INT_MAX)
+			{				
+				uint32 screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+				uint32 screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+				uint32 outerw = (winWidth < screenw)? winWidth : screenw;
+				uint32 outerh = (winHeight < screenh)? winHeight : screenh;
+				if (left == INT_MAX)
+					left = monitorInfo.rcWork.left + (screenw - outerw) / 2;
+				else if (monitorIndex != -1)
+					left += monitorInfo.rcWork.left;
+				if (top == INT_MAX)
+					top = monitorInfo.rcWork.top + (screenh - outerh) / 2;
+				else if (monitorIndex != -1)
+					top += monitorInfo.rcWork.top;
+			}
+			else if (monitorIndex != -1)
+			{
+				left += monitorInfo.rcWork.left;
+				top += monitorInfo.rcWork.top;
+			}
+			mWidth = mDesiredWidth = width;
+			mHeight = mDesiredHeight = height;
+			mTop = top;
+			mLeft = left;
+			if (fullScreen)
+			{
+				dwStyleEx |= WS_EX_TOPMOST;				
+				mTop = monitorInfo.rcMonitor.top;
+				mLeft = monitorInfo.rcMonitor.left;		
+			}
+			else
+			{				
+				adjustWindow(width, height, &winWidth, &winHeight);
+				if (!outerSize)
+				{
+					SetRect(&rc, 0, 0, mWidth, mHeight);
+					AdjustWindowRect(&rc, getWindowStyle(fullScreen), false);
+					mWidth = rc.right - rc.left;
+					mHeight = rc.bottom - rc.top;
+					if (mLeft < monitorInfo.rcWork.left)
+						mLeft = monitorInfo.rcWork.left;		
+					if (mTop < monitorInfo.rcWork.top)					
+						mTop = monitorInfo.rcWork.top;					
+					if (static_cast<int>(winWidth) > monitorInfo.rcWork.right - mLeft)					
+						winWidth = monitorInfo.rcWork.right - mLeft;	
+					if (static_cast<int>(winHeight) > monitorInfo.rcWork.bottom - mTop)					
+						winHeight = monitorInfo.rcWork.bottom - mTop;										
+				}
+			}
+			UINT classStyle = 0;
+			if (enableDoubleClick)
+				classStyle |= CS_DBLCLKS;
+#ifdef OGRE_STATIC_LIB
+			HINSTANCE hInst = GetModuleHandle( NULL );
+#else
+#  if OGRE_DEBUG_MODE == 1
+			HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11_d.dll" );
+#  else
+			HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11.dll" );
+#  endif
+#endif
+			WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
+				LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
+				(HBRUSH)GetStockObject(BLACK_BRUSH), 0, OGRE_D3D11_WIN_CLASS_NAME };
+			RegisterClass(&wc);
+			mIsExternal = false;
+			mHWnd = CreateWindowEx(dwStyleEx, OGRE_D3D11_WIN_CLASS_NAME, title.c_str(), getWindowStyle(fullScreen),
+				mLeft, mTop, winWidth, winHeight, parentHWnd, 0, hInst, this);
+			WindowEventUtilities::_addRenderWindow(this);
+		}
+		else
+		{
+			mHWnd = externalHandle;
+			mIsExternal = true;
+		}
+	
 
         RECT rc;
         // top and left represent outer window coordinates
@@ -687,6 +890,12 @@ namespace Ogre
         _createSizeDependedD3DResources();
         mpDXGIFactory->MakeWindowAssociation(mHWnd, NULL);
         setHidden(mHidden);
+		
+		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		NameValuePairList params;
+		params["RenderWindow"] = StringConverter::toString((size_t)this);
+		rsys->fireDeviceEvent(&mDevice,"RenderWindowCreated",&params);
+		
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::destroy()
@@ -702,30 +911,36 @@ namespace Ogre
         mHWnd = NULL;
     }
     //---------------------------------------------------------------------
-    HRESULT D3D11RenderWindowHwnd::_createSwapChainImpl(IDXGIDeviceN* pDXGIDevice)
-    {
-        ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
-        DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        if ( isHardwareGammaEnabled() )
-        {
-            format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-        }
-        mSwapChainDesc.BufferDesc.Width     = mWidth;
-        mSwapChainDesc.BufferDesc.Height    = mHeight;
-        mSwapChainDesc.BufferDesc.Format    = format;
+	HRESULT D3D11RenderWindowHwnd::_createSwapChainImpl(IDXGIDeviceN* pDXGIDevice)
+	{
+		ZeroMemory(&mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N));
+		DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		if (isHardwareGammaEnabled())
+		{
+			format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		}
+		mSwapChainDesc.BufferDesc.Width = mWidth;
+		mSwapChainDesc.BufferDesc.Height = mHeight;
+		mSwapChainDesc.BufferDesc.Format = format;
 
-        mSwapChainDesc.BufferDesc.RefreshRate.Numerator=0;
-        mSwapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
-        
-        mSwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-        mSwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-        mSwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH ;
-        
+		mSwapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
+		mSwapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
+
+		mSwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		mSwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		mSwapChainDesc.Flags = 0;
+
+#ifdef WIN8SDK
+		mUseFlipMode = IsWindows8OrGreater();
+		mSwapChainDesc.BufferCount = mUseFlipMode ? 2 : 1;
+		mSwapChainDesc.SwapEffect = mUseFlipMode ? DXGI_SWAP_EFFECT_DISCARD : DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+#else
+		mSwapChainDesc.BufferCount = 1;
+		mSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+#endif	
+
         // triple buffer if VSync is on
-        mSwapChainDesc.BufferUsage          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        mSwapChainDesc.BufferCount          = mVSync ? 2 : 1;
-        mSwapChainDesc.SwapEffect           = DXGI_SWAP_EFFECT_DISCARD ;
-
+        mSwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         mSwapChainDesc.OutputWindow         = mHWnd;
         mSwapChainDesc.Windowed             = !mIsFullScreen;
 
@@ -786,29 +1001,30 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderWindowHwnd::resize(unsigned int width, unsigned int height)
-    {
-        if (!mIsExternal)
-        {
-            if (mHWnd && !mIsFullScreen)
-            {
-                RECT rc = { 0, 0, width, height };
-                AdjustWindowRect(&rc, GetWindowLong(mHWnd, GWL_STYLE), false);
-                width = rc.right - rc.left;
-                height = rc.bottom - rc.top;
-                SetWindowPos(mHWnd, 0, 0, 0, width, height,
-                    SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
-            }
-        }
-        else
-            windowMovedOrResized();
-    }
+	void D3D11RenderWindowHwnd::resize(unsigned int width, unsigned int height)
+	{
+
+		if (!mIsExternal)
+		{
+			if (mHWnd && !mIsFullScreen)
+			{
+				unsigned int winWidth, winHeight;
+				adjustWindow(width, height, &winWidth, &winHeight);
+				SetWindowPos(mHWnd, 0, 0, 0, winWidth, winHeight,
+					SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+			}
+		}
+		else
+			updateWindowRect();
+	}
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::windowMovedOrResized()
     {
         if (!mHWnd || IsIconic(mHWnd))
             return;
 
+		updateWindowRect();		
+		
         RECT rc;
         // top and left represent outer window position
         GetWindowRect(mHWnd, &rc);
@@ -852,7 +1068,11 @@ namespace Ogre
         {
 
             if (fullScreen != mIsFullScreen)
-                mSwitchingFullscreen = true;
+
+			{
+				D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+				rsys->addToSwitchingFullscreenCounter();
+			}
 
             DWORD dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
 
@@ -861,10 +1081,14 @@ namespace Ogre
 
             if (fullScreen)
             {
-                dwStyle |= WS_POPUP;
-                mTop = mLeft = 0;
-                mWidth = width;
-                mHeight = height;
+				HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
+				MONITORINFO monitorInfo;
+				memset(&monitorInfo, 0, sizeof(MONITORINFO));
+				monitorInfo.cbSize = sizeof(MONITORINFO);
+				GetMonitorInfo(hMonitor, &monitorInfo);
+				mTop = monitorInfo.rcMonitor.top;
+				mLeft = monitorInfo.rcMonitor.left;				
+				
                 // need different ordering here
 
                 if (oldFullscreen)
@@ -875,27 +1099,20 @@ namespace Ogre
                 else
                 {
                     SetWindowPos(mHWnd, HWND_TOPMOST, 0, 0, width, height, SWP_NOACTIVATE);
-                    //MoveWindow(mHWnd, mLeft, mTop, mWidth, mHeight, FALSE);
                     SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
                     SetWindowPos(mHWnd, 0, 0,0, 0,0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
                 }
             }
             else
             {
-                dwStyle |= WS_OVERLAPPEDWINDOW;
-                // Calculate window dimensions required
-                // to get the requested client area
-                RECT rc;
-                SetRect(&rc, 0, 0, width, height);
-                AdjustWindowRect(&rc, dwStyle, false);
-                unsigned int winWidth = rc.right - rc.left;
-                unsigned int winHeight = rc.bottom - rc.top;
-
-                SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
-                SetWindowPos(mHWnd, HWND_NOTOPMOST, 0, 0, winWidth, winHeight,
-                    SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOACTIVATE);
-                // Note that we also set the position in the restoreLostDevice method
-                // via _finishSwitchingFullScreen
+				unsigned int winWidth, winHeight;
+				winWidth = mWidth;
+				winHeight = mHeight;
+				adjustWindow(mWidth, mHeight, &winWidth, &winHeight);
+				SetWindowLong(mHWnd, GWL_STYLE, getWindowStyle(mIsFullScreen));
+				SetWindowPos(mHWnd, HWND_NOTOPMOST, 0, 0, winWidth, winHeight,
+					SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOACTIVATE);
+				updateWindowRect();
             }
 
             mSwapChainDesc.Windowed = !fullScreen;
@@ -912,61 +1129,160 @@ namespace Ogre
         }
     } 
     //---------------------------------------------------------------------
+	void D3D11RenderWindowHwnd::adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
+		unsigned int* winWidth, unsigned int* winHeight)
+	{
+		RECT rc;
+		SetRect(&rc, 0, 0, clientWidth, clientHeight);
+		AdjustWindowRect(&rc, getWindowStyle(mIsFullScreen), false);
+		*winWidth = rc.right - rc.left;
+		*winHeight = rc.bottom - rc.top;
+	}
+
     void D3D11RenderWindowHwnd::_finishSwitchingFullscreen()
     {
         if(mIsFullScreen)
         {
             // Need to reset the region on the window sometimes, when the 
             // windowed mode was constrained by desktop 
-            HRGN hRgn = CreateRectRgn(0,0,mSwapChainDesc.BufferDesc.Width, mSwapChainDesc.BufferDesc.Height);
-            SetWindowRgn(mHWnd, hRgn, FALSE);
+			HRGN hRgn = CreateRectRgn(0,0,mSwapChainDesc.BufferDesc.Width, mSwapChainDesc.BufferDesc.Height);
+			SetWindowRgn(mHWnd, hRgn, FALSE);
         }
         else
         {
             // When switching back to windowed mode, need to reset window size 
             // after device has been restored
-            RECT rc;
-            SetRect(&rc, 0, 0, mSwapChainDesc.BufferDesc.Width, mSwapChainDesc.BufferDesc.Height);
-            AdjustWindowRect(&rc, GetWindowLong(mHWnd, GWL_STYLE), false);
-            unsigned int winWidth = rc.right - rc.left;
-            unsigned int winHeight = rc.bottom - rc.top;
-            int screenw = GetSystemMetrics(SM_CXSCREEN);
-            int screenh = GetSystemMetrics(SM_CYSCREEN);
-            int left = (screenw - winWidth) / 2;
-            int top = (screenh - winHeight) / 2;
-            SetWindowPos(mHWnd, HWND_NOTOPMOST, left, top, winWidth, winHeight,
-                SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE);
+			if (mWidth != mDesiredWidth ||
+				mHeight != mDesiredHeight)
+			{
+				mWidth = mDesiredWidth;
+				mHeight = mDesiredHeight;				
+			}
+			unsigned int winWidth, winHeight;
+			adjustWindow(mWidth, mHeight, &winWidth, &winHeight);
+			HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
+			MONITORINFO monitorInfo;
+			memset(&monitorInfo, 0, sizeof(MONITORINFO));
+			monitorInfo.cbSize = sizeof(MONITORINFO);
+			GetMonitorInfo(hMonitor, &monitorInfo);
+			ULONG screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+			ULONG screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+			int left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
+			int top = screenh > winHeight ? ((screenh - winHeight) / 2) : 0;
+			SetWindowPos(mHWnd, HWND_NOTOPMOST, left, top, winWidth, winHeight,
+				SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE);
+			updateWindowRect();
+			
 
         }
-        mpSwapChain->SetFullscreenState(mIsFullScreen, NULL);
-        mSwitchingFullscreen = false;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderWindowHwnd::setActive(bool state)
-    {
-            if (mHWnd && mpSwapChain && mIsFullScreen)
-            {
-                    if (state)
-                    {
-                            ShowWindow(mHWnd, SW_RESTORE);
-                            mpSwapChain->SetFullscreenState(mIsFullScreen, NULL);
-                    }
-                    else
-                    {
-                            ShowWindow(mHWnd, SW_SHOWMINIMIZED);
-                            mpSwapChain->SetFullscreenState(FALSE, NULL);
-                    }
-            }
 
-            RenderWindow::setActive(state);
+		DXGI_SWAP_CHAIN_DESC dsc;
+		ZeroMemory(&dsc, sizeof(dsc));
+		mpSwapChain->GetDesc(&dsc);
+		if(dsc.Windowed == mIsFullScreen)
+		{
+        mpSwapChain->SetFullscreenState(mIsFullScreen, NULL);
+		}
+		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		mLastSwitchingFullscreenCounter = rsys->getSwitchingFullscreenCounter();
+
     }
+	
+	void D3D11RenderWindowHwnd::updateWindowRect()
+	{
+		RECT rc;
+		BOOL result;
+		result = GetWindowRect(mHWnd, &rc);
+		if (result == FALSE)
+		{
+			mTop = 0;
+			mLeft = 0;
+			mWidth = 0;
+			mHeight = 0;
+			return;
+		}
+		mTop = rc.top;
+		mLeft = rc.left;
+		result = GetClientRect(mHWnd, &rc);
+		if (result == FALSE)
+		{
+			mTop = 0;
+			mLeft = 0;
+			mWidth = 0;
+			mHeight = 0;
+			return;
+		}
+		unsigned int width = rc.right - rc.left;
+		unsigned int height = rc.bottom - rc.top;
+		if (width != mWidth || height != mHeight)
+		{
+			mWidth  = rc.right - rc.left;
+			mHeight = rc.bottom - rc.top;
+			_resizeSwapChainBuffers(mWidth, mHeight);
+			_updateViewportsDimensions();		
+		}	
+	}
+	void D3D11RenderWindowHwnd::_beginUpdate()
+	{		
+		if (mIsExternal)
+		{		
+			updateWindowRect();
+		}
+		if (mWidth == 0 || mHeight == 0)
+		{
+			return;
+		}
+		DXGI_SWAP_CHAIN_DESC dsc;
+		ZeroMemory(&dsc, sizeof(dsc));
+		mpSwapChain->GetDesc(&dsc);
+		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		if(rsys->getSwitchingFullscreenCounter() > mLastSwitchingFullscreenCounter 
+			|| GetFocus() == mHWnd && dsc.Windowed == mIsFullScreen)
+		{
+			_finishSwitchingFullscreen();		
+		}
+		RenderWindow::_beginUpdate();
+	}
+	void D3D11RenderWindowHwnd::setVSyncEnabled( bool vsync )
+	{
+		mVSync = vsync;
+	}
+	bool D3D11RenderWindowHwnd::isVSyncEnabled() const
+	{
+		return mVSync;
+	}
+	void D3D11RenderWindowHwnd::setVSyncInterval( unsigned int interval )
+	{
+		mVSyncInterval = interval;
+	}
+	unsigned int D3D11RenderWindowHwnd::getVSyncInterval() const
+	{
+		return mVSyncInterval;
+	}
+	void D3D11RenderWindowHwnd::setActive(bool state)
+	{
+		if (mHWnd && mpSwapChain && mIsFullScreen && state)
+		{
+			DXGI_SWAP_CHAIN_DESC dsc;
+			ZeroMemory(&dsc, sizeof(dsc));
+			mpSwapChain->GetDesc(&dsc);
+			if(dsc.Windowed)
+			{
+				D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+				rsys->addToSwitchingFullscreenCounter();
+			}
+
+		}
+		RenderWindow::setActive(state);
+	}
 #endif
 #pragma endregion
-#pragma region D3D11RenderWindowCoreWindow
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+
     //---------------------------------------------------------------------
     // class D3D11RenderWindowCoreWindow
     //---------------------------------------------------------------------
+#pragma region D3D11RenderWindowCoreWindow
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
     D3D11RenderWindowCoreWindow::D3D11RenderWindowCoreWindow(D3D11Device & device, IDXGIFactoryN*   pDXGIFactory)
         : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
     {
@@ -1092,7 +1408,7 @@ namespace Ogre
 
         _resizeSwapChainBuffers(0, 0);      // pass zero to autodetect size
     }
-    //---------------------------------------------------------------------
+
 #endif
 #pragma endregion
 
@@ -1101,7 +1417,7 @@ namespace Ogre
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowImageSource
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-    //---------------------------------------------------------------------
+
     D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
         : D3D11RenderWindowBase(device, pDXGIFactory)
         , mImageSourceNative(NULL)
@@ -1171,7 +1487,7 @@ namespace Ogre
         HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
         if( FAILED(hr) )
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to Create Back Buffer",
                 "D3D11RenderWindowImageSource::_createSizeDependedD3DResources");
         }
@@ -1214,7 +1530,7 @@ namespace Ogre
 
         if(FAILED(hr))
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to Get DXGI surface for SurfaceImageSource",
                 "D3D11RenderWindowImageSource::swapBuffers");
         }
@@ -1224,7 +1540,7 @@ namespace Ogre
         SAFE_RELEASE(dxgiSurface);
         if(FAILED(hr))
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to convert DXGI surface to D3D11 texture",
                 "D3D11RenderWindowImageSource::swapBuffers");
         }
@@ -1237,7 +1553,7 @@ namespace Ogre
 
         if( FAILED(hr) )
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Drawing into SurfaceImageSource failed",
                 "D3D11RenderWindowImageSource::swapBuffers");
         }

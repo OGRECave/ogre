@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreImage.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
+#include "OgreBitwise.h"
 
 namespace Ogre {
     // Internal DDS structure definitions
@@ -362,7 +363,7 @@ namespace Ogre {
 //          ddsHeader.caps.reserved[1] = 0;
 
             // Swap endian
-            flipEndian(&ddsMagic, sizeof(uint32), 1);
+			flipEndian(&ddsMagic, sizeof(uint32));
             flipEndian(&ddsHeader, 4, sizeof(DDSHeader) / 4);
 
             // Write the file           
@@ -602,7 +603,7 @@ namespace Ogre {
         // Read 4 character code
         uint32 fileType;
         stream->read(&fileType, sizeof(uint32));
-        flipEndian(&fileType, sizeof(uint32), 1);
+		flipEndian(&fileType, sizeof(uint32));
         
         if (FOURCC('D', 'D', 'S', ' ') != fileType)
         {
@@ -710,8 +711,8 @@ namespace Ogre {
                     // 32-bit so can benefit from this.
                     DXTColourBlock block;
                     stream->read(&block, sizeof(DXTColourBlock));
-                    flipEndian(&(block.colour_0), sizeof(uint16), 1);
-                    flipEndian(&(block.colour_1), sizeof(uint16), 1);
+					flipEndian(&(block.colour_0), sizeof(uint16));
+					flipEndian(&(block.colour_1), sizeof(uint16));
                     // skip back since we'll need to read this again
                     stream->skip(0 - (long)sizeof(DXTColourBlock));
                     // colour_0 <= colour_1 means transparency in DXT1
@@ -808,14 +809,14 @@ namespace Ogre {
                                     {
                                         // interpolated alpha
                                         stream->read(&iAlpha, sizeof(DXTInterpolatedAlphaBlock));
-                                        flipEndian(&(iAlpha.alpha_0), sizeof(uint16), 1);
-                                        flipEndian(&(iAlpha.alpha_1), sizeof(uint16), 1);
+										flipEndian(&(iAlpha.alpha_0), sizeof(uint16));
+										flipEndian(&(iAlpha.alpha_1), sizeof(uint16));
                                         unpackDXTAlpha(iAlpha, tempColours) ;
                                     }
                                     // always read colour
                                     stream->read(&col, sizeof(DXTColourBlock));
-                                    flipEndian(&(col.colour_0), sizeof(uint16), 1);
-                                    flipEndian(&(col.colour_1), sizeof(uint16), 1);
+									flipEndian(&(col.colour_0), sizeof(uint16));
+									flipEndian(&(col.colour_1), sizeof(uint16));
                                     unpackDXTColour(sourceFormat, col, tempColours);
 
                                     // write 4x4 block to uncompressed version
@@ -900,25 +901,17 @@ namespace Ogre {
         return mType;
     }
     //---------------------------------------------------------------------    
-    void DDSCodec::flipEndian(void * pData, size_t size, size_t count) const
+    void DDSCodec::flipEndian(void * pData, size_t size, size_t count)
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        for(unsigned int index = 0; index < count; index++)
-        {
-            flipEndian((void *)((long)pData + (index * size)), size);
-        }
+		Bitwise::bswapChunks(pData, size, count);
 #endif
     }
     //---------------------------------------------------------------------    
-    void DDSCodec::flipEndian(void * pData, size_t size) const
+    void DDSCodec::flipEndian(void * pData, size_t size)
     {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
-        {
-            char swapByte = *(char *)((long)pData + byteIndex);
-            *(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
-            *(char *)((long)pData + size - byteIndex - 1) = swapByte;
-        }
+        Bitwise::bswapBuffer(pData, size);
 #endif
     }
     //---------------------------------------------------------------------
@@ -928,7 +921,7 @@ namespace Ogre {
         {
             uint32 fileType;
             memcpy(&fileType, magicNumberPtr, sizeof(uint32));
-            flipEndian(&fileType, sizeof(uint32), 1);
+			flipEndian(&fileType, sizeof(uint32));
 
             if (DDS_MAGIC == fileType)
             {

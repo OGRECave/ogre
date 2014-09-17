@@ -4629,10 +4629,7 @@ namespace Ogre
             }
 
             //filtering
-            if (mDefaults ||
-                pTex->getTextureFiltering(FT_MIN) != FO_LINEAR ||
-                pTex->getTextureFiltering(FT_MAG) != FO_LINEAR ||
-                pTex->getTextureFiltering(FT_MIP) != FO_POINT)
+            if (mDefaults || !pTex->isDefaultFiltering())
             {
                 writeAttribute(4, "filtering");
                 writeValue(

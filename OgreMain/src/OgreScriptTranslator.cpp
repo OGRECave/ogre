@@ -112,34 +112,13 @@ namespace Ogre{
         if (node->type != ANT_ATOM)
             return false;
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        // if (atom->id != 1 && atom->id != 2)
+		 if (atom->id == 1 || atom->id == 2)
+		{
+			*result = atom->id == 1 ? true : false;
+			return true;
+		}
         //     return false;
-
-        // *result = atom->id == 1 ? true : false;
-
-        // if
-
-        // AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-        // int n = sscanf(atom->value.c_str(), "%d", result);
-
-        // if (n == 0 || n == EOF)
-        //     return false; // Conversion failed
-        //TODO Make more efficient parser
-        //TODO Figure out how to lowercase via Ogre
-        
-        //const char * c_str = atom->value.c_str();
-
-        if (atom->id == 1 || atom->id == 2)
-        {
-            *result = atom->id == 1 ? true : false;
-        }
-        else 
-        {
-            String string(atom->value.c_str());
-            *result = StringConverter::parseBool(string);
-        }
-                
-        return true;
+		return false;
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getString(const AbstractNodePtr &node, String *result)

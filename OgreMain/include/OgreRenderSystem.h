@@ -129,7 +129,11 @@ namespace Ogre
         /** Returns the name of the rendering system.
         */
         virtual const String& getName(void) const = 0;
-
+		
+		/** Returns the friendly name of the render system
+		*/
+		virtual const String& getFriendlyName(void) const = 0;
+		
         /** Returns the details of this API's configuration options
         @remarks
         Each render system must be able to inform the world
@@ -1561,6 +1565,11 @@ namespace Ogre
         Viewport* mActiveViewport;
 
         CullingMode mCullingMode;
+
+
+		bool mVSync;
+		unsigned int mVSyncInterval;
+		unsigned int mBackBufferCount; // -1 means 2 for vsync and 1 for no vsync
 
         bool mWBuffer;
 

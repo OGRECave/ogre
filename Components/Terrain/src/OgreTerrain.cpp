@@ -383,25 +383,27 @@ namespace Ogre
 
         // other data
         // normals
-        stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
-        String normalDataType("normalmap");
-        stream.write(&normalDataType);
-        stream.write(&mSize);
-        if (mCpuTerrainNormalMap)
-        {
-            // save from CPU data if it's there, it means GPU data was never created
-            stream.write((uint8*)mCpuTerrainNormalMap->data, mSize * mSize * 3);
-        }
-        else
-        {
-            uint8* tmpData = (uint8*)OGRE_MALLOC(mSize * mSize * 3, MEMCATEGORY_GENERAL);
-            PixelBox dst(mSize, mSize, 1, PF_BYTE_RGB, tmpData);
-            mTerrainNormalMap->getBuffer()->blitToMemory(dst);
-            stream.write(tmpData, mSize * mSize * 3);
-            OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
-        }
-        stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
-
+		if (mNormalMapRequired)
+		{
+			stream.writeChunkBegin(TERRAINDERIVEDDATA_CHUNK_ID, TERRAINDERIVEDDATA_CHUNK_VERSION);
+			String normalDataType("normalmap");
+			stream.write(&normalDataType);
+			stream.write(&mSize);
+			if (mCpuTerrainNormalMap)
+			{
+				// save from CPU data if it's there, it means GPU data was never created
+				stream.write((uint8*)mCpuTerrainNormalMap->data, mSize * mSize * 3);
+			}
+			else
+			{
+				uint8* tmpData = (uint8*)OGRE_MALLOC(mSize * mSize * 3, MEMCATEGORY_GENERAL);
+				PixelBox dst(mSize, mSize, 1, PF_BYTE_RGB, tmpData);
+				mTerrainNormalMap->getBuffer()->blitToMemory(dst);
+				stream.write(tmpData, mSize * mSize * 3);
+				OGRE_FREE(tmpData, MEMCATEGORY_GENERAL);
+			}
+			stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
+		}
 
         // colourmap
         if (mGlobalColourMapEnabled)

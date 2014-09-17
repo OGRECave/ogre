@@ -27,8 +27,10 @@ public:
     StringVector getRequiredPlugins()
     {
         StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
-            names.push_back("Cg Program Manager");
+        if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
+			names.push_back("Cg Program Manager");
         return names;
     }
 

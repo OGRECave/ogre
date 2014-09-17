@@ -56,7 +56,6 @@ namespace Ogre
         Method for dealing with lost devices.
         */
         void recreateDefaultPoolResources(void);
-
         /// @copydoc TextureManager::getNativeFormat
         PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
 

@@ -7,7 +7,7 @@
 
 struct vertex_in
 {
-	float4 position	: SV_POSITION;
+	float4 position	: POSITION;
 	float3 normal		: NORMAL;
 };
 
