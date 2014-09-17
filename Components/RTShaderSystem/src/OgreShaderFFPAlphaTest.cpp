@@ -87,6 +87,9 @@ namespace Ogre {
 
 		bool FFPAlphaTest::addFunctionInvocations( ProgramSet* programSet )
 		{
+			Program* psProgram = programSet->getCpuFragmentProgram();
+			Function* psMain = psProgram->getEntryPointFunction();
+
 			FunctionInvocation *curFuncInvocation;
 			int internalCounter = 0;
 
