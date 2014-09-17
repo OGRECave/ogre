@@ -89,13 +89,9 @@ namespace Ogre
         void freeDevice(void);
 
 		void getIsWorkingUnderNsight();
-        void initInputDevices(void);
-        void processInputDevices(void);
         
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
-        /// check if a FSAA is supported
-        bool _checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format);
         
         D3D11HardwareBufferManager* mHardwareBufferManager;
         D3D11GpuProgramManager* mGpuProgramManager;

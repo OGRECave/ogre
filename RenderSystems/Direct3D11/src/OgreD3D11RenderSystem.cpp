@@ -190,21 +190,6 @@ bail:
         return mDriverList;
     }
     //---------------------------------------------------------------------
-    bool D3D11RenderSystem::_checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format)
-    {
-        // TODO: check if we need this function
-        HRESULT hr;
-        hr = mDevice->CheckMultisampleQualityLevels( 
-                format,
-            SampleCount,
-            outQuality);
-
-        if (SUCCEEDED(hr) && *outQuality > 0)
-            return true;
-        else
-            return false;
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::initConfigOptions()
     {
         D3D11DriverList* driverList;
@@ -547,16 +532,11 @@ bail:
             if (videoMode)
             {
                 UINT numLevels = 0;
-                 bool bOK=false;
                 // set maskable levels supported
                 for (unsigned int n = 1; n < D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)
                 {
-                    bOK = this->_checkMultiSampleQuality(
-                        n, 
-                        &numLevels, 
-                        videoMode->getFormat()
-                        );
-                    if (bOK)
+                    HRESULT hr = mDevice->CheckMultisampleQualityLevels(videoMode->getFormat(), n, &numLevels);
+                    if (SUCCEEDED(hr) && numLevels > 0)
                     {
                         optFSAA->possibleValues.push_back(StringConverter::toString(n));
                         if (n >=8)
@@ -721,11 +701,9 @@ bail:
             // This flag is required in order to enable compatibility with Direct2D.
             deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif
-            if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() && OGRE_DEBUG_MODE)
+            if (OGRE_DEBUG_MODE && !mIsWorkingUnderNsight && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
             {
-				deviceFlags |= 
-				mIsWorkingUnderNsight ? 0 : D3D11_CREATE_DEVICE_DEBUG;
-				
+                deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
             }
             if (!OGRE_THREAD_SUPPORT)
             {
@@ -2531,8 +2509,8 @@ bail:
                     HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState) ;
                     if (FAILED(hr))
                     {
-					String errorDescription = mDevice.getErrorDescription(hr);
-					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                        String errorDescription = mDevice.getErrorDescription(hr);
+                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                             "Failed to create sampler state\nError Description:" + errorDescription,
                             "D3D11RenderSystem::_render" );
                     }
@@ -3174,7 +3152,6 @@ bail:
                     numberOfViews,
                     pRTView,
                     NULL);
-                //mTextureManager->mEffect->GetVariableByName(variableName.c_str())->AsShaderResource()->SetResource(mDSTResView);  
 
                 mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), &mDSTResView);
                 if (mDevice.isError())
@@ -4066,9 +4043,9 @@ bail:
         // This flag is required in order to enable compatibility with Direct2D.
         deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif
-        if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() && OGRE_DEBUG_MODE)
+        if (OGRE_DEBUG_MODE && !mIsWorkingUnderNsight && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
         {
-				deviceFlags |= mIsWorkingUnderNsight ? 0 : D3D11_CREATE_DEVICE_DEBUG;
+            deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
         }
         if (!OGRE_THREAD_SUPPORT)
         {
