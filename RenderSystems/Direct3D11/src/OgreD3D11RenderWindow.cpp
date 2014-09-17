@@ -1179,9 +1179,9 @@ namespace Ogre
 		DXGI_SWAP_CHAIN_DESC dsc;
 		ZeroMemory(&dsc, sizeof(dsc));
 		mpSwapChain->GetDesc(&dsc);
-		if(dsc.Windowed == mIsFullScreen)
+		if((dsc.Windowed != 0) == mIsFullScreen)
 		{
-        mpSwapChain->SetFullscreenState(mIsFullScreen, NULL);
+            mpSwapChain->SetFullscreenState(mIsFullScreen, NULL);
 		}
 		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 		mLastSwitchingFullscreenCounter = rsys->getSwitchingFullscreenCounter();
@@ -1237,7 +1237,7 @@ namespace Ogre
 		mpSwapChain->GetDesc(&dsc);
 		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 		if(rsys->getSwitchingFullscreenCounter() > mLastSwitchingFullscreenCounter 
-			|| GetFocus() == mHWnd && dsc.Windowed == mIsFullScreen)
+			|| GetFocus() == mHWnd && ((dsc.Windowed != 0) == mIsFullScreen))
 		{
 			_finishSwitchingFullscreen();		
 		}

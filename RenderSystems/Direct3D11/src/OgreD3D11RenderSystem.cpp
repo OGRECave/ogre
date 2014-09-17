@@ -2100,7 +2100,7 @@ bail:
     void D3D11RenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
 		const float nearFarFactor = 10.0; 
-		mRasterizerDesc.DepthBias = -constantBias * nearFarFactor;
+		mRasterizerDesc.DepthBias = static_cast<int>(-constantBias * nearFarFactor);
 		mRasterizerDesc.SlopeScaledDepthBias = -slopeScaleBias;
     }
     //---------------------------------------------------------------------
@@ -2524,7 +2524,7 @@ bail:
                         FilterMips[n],false );
                     stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
                     stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-					stage.samplerDesc.MipLODBias = Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99);
+					stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
 					stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
 					
 
