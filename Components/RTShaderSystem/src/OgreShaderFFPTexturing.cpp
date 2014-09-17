@@ -96,7 +96,7 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
     if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4()) 
     {
         //Resolve texture sampler state parameter for  hlsl 4.0
-		textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GpuConstantType::GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
+		textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
         hasError |= !(textureUnitParams->mTextureSamplerState.get());
     }
     
@@ -495,7 +495,7 @@ ParameterPtr FFPTexturing::GetSamplerWrapperParam(UniformParameterPtr sampler, F
 	
 	Ogre::String paramName = sampler->getName(); // "lLocalSamplerWrapper_";
 	int samplerType = sampler->getType();
-	int samplerParamDim = samplerType - GpuConstantType::GCT_SAMPLER1D + 1;
+	int samplerParamDim = samplerType - GCT_SAMPLER1D + 1;
     if (samplerParamDim <= 3 )
         paramName +=  StringConverter::toString(samplerParamDim) + "D";
     else if (samplerParamDim == 4 )
@@ -504,7 +504,7 @@ ParameterPtr FFPTexturing::GetSamplerWrapperParam(UniformParameterPtr sampler, F
 		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 		"Sampler wrappers are only for GCT_SAMPLER1D, GCT_SAMPLER2D, GCT_SAMPLER3D and GCT_SAMPLERCUBE",
 		"FFPTexturing::GetSamplerWrapperParam");
-	GpuConstantType margin =  (GpuConstantType)(GpuConstantType::GCT_SAMPLER_WRAPPER1D -  GpuConstantType::GCT_SAMPLER1D);
+	GpuConstantType margin =  (GpuConstantType)(GCT_SAMPLER_WRAPPER1D -  GCT_SAMPLER1D);
     GpuConstantType samplerWrapperType = (GpuConstantType)(samplerType + margin);
 
 	ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::Semantic::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
@@ -536,8 +536,8 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
     Ogre::String targetLanguage =  RTShader::ShaderGenerator::getSingleton().getTargetLanguage();
 
 	if (targetLanguage == "hlsl" 
-		&& textureUnitParams->mTextureSamplerType >= GpuConstantType::GCT_SAMPLER1D 
-		&& textureUnitParams->mTextureSamplerType <= GpuConstantType::GCT_SAMPLERCUBE
+		&& textureUnitParams->mTextureSamplerType >= GCT_SAMPLER1D 
+		&& textureUnitParams->mTextureSamplerType <= GCT_SAMPLERCUBE
 		)
     {
         FunctionInvocation* curFuncInvocation = NULL;
@@ -567,7 +567,7 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
             curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
 
 		
-		if (textureUnitParams->mTextureSamplerType == GpuConstantType::GCT_SAMPLER2DARRAY)
+		if (textureUnitParams->mTextureSamplerType == GCT_SAMPLER2DARRAY)
 		{
 			curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
 		
