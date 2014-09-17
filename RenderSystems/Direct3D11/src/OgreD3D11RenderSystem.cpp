@@ -840,7 +840,7 @@ bail:
 				std::string errorMsg = getCreationErrorMessage(hr, isDebug);
 				if (!isDebug)
 				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 						errorMsg,
 						"D3D11RenderSystem::D3D11RenderSystem");
 				}

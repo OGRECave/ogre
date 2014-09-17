@@ -67,6 +67,10 @@ namespace Ogre
 		/// Get dx11 color
 		static void get(const ColourValue& inColour, float * outColour );
 
+		/// utility method, generates Ogre PixelBox using usual parameters and dataPtr/rowPitch/slicePitch from D3D11_MAPPED_SUBRESOURCE
+		static PixelBox getPixelBoxWithMapping(size_t width, size_t height, size_t depth, PixelFormat pixelFormat, const D3D11_MAPPED_SUBRESOURCE& mapping);
+		/// utility method, applies dataPtr/rowPitch/slicePitch from D3D11_MAPPED_SUBRESOURCE to Ogre PixelBox
+		static void setPixelBoxMapping(PixelBox& box, const D3D11_MAPPED_SUBRESOURCE& mapping);
 
 		/// utility method, convert D3D11 pixel format to Ogre pixel format
 		static PixelFormat _getPF(DXGI_FORMAT d3dPF);
