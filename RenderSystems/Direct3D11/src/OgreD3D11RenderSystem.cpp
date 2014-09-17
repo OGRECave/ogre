@@ -988,7 +988,7 @@ bail:
 
         // call superclass method
         RenderSystem::_initialise( autoCreateWindow );
-		this->fireDeviceEvent(&mDevice, "DeviceCreated");
+        this->fireDeviceEvent(&mDevice, "DeviceCreated");
         return autoWindow;
     }
     //---------------------------------------------------------------------
@@ -1127,14 +1127,16 @@ bail:
 		}
 
 		return win;
-
 	}
 
-	void D3D11RenderSystem::fireDeviceEvent( D3D11Device* device, const String & name,NameValuePairList *i_params)
-	{
-		NameValuePairList &params = i_params != NULL ? *i_params : NameValuePairList();
-		params["D3DDEVICE"] =  StringConverter::toString((size_t)device->get());
-		fireEvent(name, &params);
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::fireDeviceEvent(D3D11Device* device, const String & name, D3D11RenderWindowBase* sendingWindow /* = NULL */)
+    {
+        NameValuePairList params;
+        params["D3DDEVICE"] =  StringConverter::toString((size_t)device->get());
+        if(sendingWindow)
+            params["RenderWindow"] = StringConverter::toString((size_t)sendingWindow);
+        fireEvent(name, &params);
     }
     //---------------------------------------------------------------------
     RenderSystemCapabilities* D3D11RenderSystem::createRenderSystemCapabilities() const

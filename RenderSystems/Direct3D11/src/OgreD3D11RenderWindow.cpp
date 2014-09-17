@@ -73,12 +73,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11RenderWindowBase::~D3D11RenderWindowBase()
     {
-		
-		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-		NameValuePairList params;
-		params["RenderWindow"] = StringConverter::toString((size_t)this);
-		rsys->fireDeviceEvent(&mDevice,"RenderWindowDestroyed",&params);
-		
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->fireDeviceEvent(&mDevice,"RenderWindowDestroyed",this);
+
         destroy();
     }
     //---------------------------------------------------------------------
@@ -487,20 +484,14 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_resizeSwapChainBuffers(unsigned width, unsigned height)
     {
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->fireDeviceEvent(&mDevice,"RenderWindowBeforeResize",this);
+
         _destroySizeDependedD3DResources();
-		
-		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-		NameValuePairList params;
-		params["RenderWindow"] = StringConverter::toString((size_t)this);
-		rsys->fireDeviceEvent(&mDevice,"RenderWindowBeforeResize",&params);
-		
+
         // width and height can be zero to autodetect size, therefore do not rely on them
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-
-		UINT Flags = 0;
-
-		
-        mpSwapChain->ResizeBuffers(mSwapChainDesc.BufferCount, width, height, mSwapChainDesc.BufferDesc.Format, Flags);
+        mpSwapChain->ResizeBuffers(mSwapChainDesc.BufferCount, width, height, mSwapChainDesc.BufferDesc.Format, 0);
         mpSwapChain->GetDesc(&mSwapChainDesc);
         mWidth = mSwapChainDesc.BufferDesc.Width;
         mHeight = mSwapChainDesc.BufferDesc.Height;
@@ -517,8 +508,7 @@ namespace Ogre
 
         // Notify viewports of resize
         _updateViewportsDimensions();
-		rsys->fireDeviceEvent(&mDevice,"RenderWindowResized",&params);
-		
+        rsys->fireDeviceEvent(&mDevice,"RenderWindowResized",this);
     }
 
 	//---------------------------------------------------------------------
@@ -543,21 +533,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::swapBuffers( )
     {
-		NameValuePairList params;
-		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-		params["RenderWindow"] = StringConverter::toString((size_t)this);
-		rsys->fireDeviceEvent(&mDevice,"BeforeDevicePresent",&params);
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->fireDeviceEvent(&mDevice,"BeforeDevicePresent",this);
 
         if( !mDevice.isNull() )
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-
-			UINT syncInterval = 0;
-			if(mVSync)
-			{
-				syncInterval = mVSyncInterval;
-			}
-			HRESULT hr = mpSwapChain->Present(syncInterval, 0);			
+            HRESULT hr = mpSwapChain->Present(mVSync ? mVSyncInterval : 0, 0);
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
             HRESULT hr = mpSwapChain->Present(1, 0); // flip presentation model swap chains have another semantic for first parameter
@@ -876,12 +858,9 @@ namespace Ogre
         _createSizeDependedD3DResources();
         mpDXGIFactory->MakeWindowAssociation(mHWnd, NULL);
         setHidden(mHidden);
-		
-		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-		NameValuePairList params;
-		params["RenderWindow"] = StringConverter::toString((size_t)this);
-		rsys->fireDeviceEvent(&mDevice,"RenderWindowCreated",&params);
-		
+
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->fireDeviceEvent(&mDevice,"RenderWindowCreated",this);
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::destroy()
