@@ -183,6 +183,12 @@ namespace Ogre {
         return strName;
     }
 
+    const String& GL3PlusRenderSystem::getFriendlyName(void) const
+    {
+        static String strName("OpenGL 3+");
+        return strName;
+    }
+
     void GL3PlusRenderSystem::initConfigOptions(void)
     {
         mGLSupport->addConfig();

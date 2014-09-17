@@ -156,6 +156,12 @@ namespace Ogre {
         return strName;
     }
 
+    const String& GLES2RenderSystem::getFriendlyName(void) const
+    {
+        static String strName("OpenGL ES 2.x");
+        return strName;
+    }
+
     ConfigOptionMap& GLES2RenderSystem::getConfigOptions(void)
     {
         return mGLSupport->getConfigOptions();
