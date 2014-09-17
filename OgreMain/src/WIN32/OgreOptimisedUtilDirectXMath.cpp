@@ -54,7 +54,7 @@ namespace DirectX
 		XMCHAR4& operator= (const XMCHAR4& Char4) { c[0] = Char4.c[0]; c[1] = Char4.c[1]; c[2] = Char4.c[2]; c[3] = Char4.c[3]; return *this; }
 	};
 
-	inline XMCHAR4 XM_CALLCONV XMVector4GreaterByteMask
+	inline XMCHAR4 __fastcall XMVector4GreaterByteMask
 	(
 		FXMVECTOR V1,
 		FXMVECTOR V2
