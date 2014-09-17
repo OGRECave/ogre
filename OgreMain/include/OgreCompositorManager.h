@@ -84,7 +84,6 @@ namespace Ogre {
         /// @see ResourceManager::getResourceByName
         CompositorPtr getByName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
-
         /** @see ScriptLoader::parseScript
         */
         void parseScript(DataStreamPtr& stream, const String& groupName);
@@ -168,8 +167,7 @@ namespace Ogre {
 
 		/** Check if a compositor logic exists
 		*/
-
-		bool CompositorManager::getHasCompositorLogic(const String& name);
+		bool getHasCompositorLogic(const String& name);
 		
         /** Register a custom composition pass.
         */
@@ -182,9 +180,8 @@ namespace Ogre {
         CustomCompositionPass* getCustomCompositionPass(const String& name);
 
 		/** Check if a compositor pass exists
-		*/
-		
-		bool CompositorManager::getHasCompositionPass(const String& name);
+		*/		
+		bool getHasCompositionPass(const String& name);
 		
         /**
         Relocates a compositor chain from one viewport to another
@@ -209,6 +206,7 @@ namespace Ogre {
         preventing link errors.
         */
         static CompositorManager& getSingleton(void);
+
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton
@@ -225,7 +223,6 @@ namespace Ogre {
         preventing link errors.
         */
         static CompositorManager* getSingletonPtr(void);
-
     
     private:
         typedef map<Viewport*, CompositorChain*>::type Chains;
