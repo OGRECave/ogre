@@ -179,13 +179,15 @@ namespace Ogre
         D3D11_TEXTURE2D_DESC BBDesc;
         mpBackBuffer->GetDesc( &BBDesc );
 
+        // mFSAA is an external request that may be even not supported by hardware, but mFSAAType should be always in sync with reality
+        assert(BBDesc.SampleDesc.Count == mFSAAType.Count && BBDesc.SampleDesc.Quality == mFSAAType.Quality);
+
         // create the render target view
         D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
         ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
 
         RTVDesc.Format = BBDesc.Format;
-        RTVDesc.ViewDimension = mFSAA ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
-        RTVDesc.Texture2D.MipSlice = 0;
+        RTVDesc.ViewDimension = mFSAAType.Count > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
         hr = mDevice->CreateRenderTargetView( mpBackBuffer, &RTVDesc, &mRenderTargetView );
 
         if( FAILED(hr) )
@@ -229,8 +231,7 @@ namespace Ogre
             ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
 
             descDSV.Format =  descDepth.Format;
-            descDSV.ViewDimension = mFSAA ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
-            descDSV.Texture2D.MipSlice = 0;
+            descDSV.ViewDimension = mFSAAType.Count > 1 ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
             hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
 
             SAFE_RELEASE(pDepthStencil);
@@ -360,14 +361,14 @@ namespace Ogre
 
         ID3D11Texture2D *backbuffer = NULL;
 
-        if(BBDesc.SampleDesc.Quality > 0)
+        if(BBDesc.SampleDesc.Count > 1)
         {
                 D3D11_TEXTURE2D_DESC desc = BBDesc;
-                desc.Usage = D3D11_USAGE_DEFAULT;
-                desc.CPUAccessFlags = 0;
-                desc.BindFlags = 0;
-                desc.SampleDesc.Quality = 0;
                 desc.SampleDesc.Count = 1;
+                desc.SampleDesc.Quality = 0;
+                desc.Usage = D3D11_USAGE_DEFAULT;
+                desc.BindFlags = 0;
+                desc.CPUAccessFlags = 0;
 
                 HRESULT hr = mDevice->CreateTexture2D(
                         &desc,
@@ -382,16 +383,16 @@ namespace Ogre
                                 "D3D11RenderWindow::copyContentsToMemory" );
                 }
 
-                mDevice.GetImmediateContext()->ResolveSubresource(backbuffer, D3D11CalcSubresource(0, 0, 1), mpBackBuffer, D3D11CalcSubresource(0, 0, 1), desc.Format);
+                mDevice.GetImmediateContext()->ResolveSubresource(backbuffer, D3D11CalcSubresource(0, 0, 1), mpBackBuffer, D3D11CalcSubresource(0, 0, 1), BBDesc.Format);
         }
 
 
         // change the parameters of the texture so we can read it
-        BBDesc.Usage = D3D11_USAGE_STAGING;
-        BBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        BBDesc.BindFlags = 0;
-        BBDesc.SampleDesc.Quality = 0;
         BBDesc.SampleDesc.Count = 1;
+        BBDesc.SampleDesc.Quality = 0;
+        BBDesc.Usage = D3D11_USAGE_STAGING;
+        BBDesc.BindFlags = 0;
+        BBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
         // create a temp buffer to copy to
         ID3D11Texture2D * pTempTexture2D;
@@ -414,10 +415,9 @@ namespace Ogre
         D3D11_MAPPED_SUBRESOURCE mappedTex2D;
         mDevice.GetImmediateContext()->Map(pTempTexture2D, 0,D3D11_MAP_READ, 0, &mappedTex2D);
 
-        // copy the the texture to the dest
-        PixelUtil::bulkPixelConversion(
-            PixelBox(mWidth, mHeight, 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D.pData), 
-            dst);
+        // copy the texture to the dest
+        PixelBox src = D3D11Mappings::getPixelBoxWithMapping(mWidth, mHeight, 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D);
+        PixelUtil::bulkPixelConversion(src, dst);
 
         // unmap the temp buffer
         mDevice.GetImmediateContext()->Unmap(pTempTexture2D, 0);
