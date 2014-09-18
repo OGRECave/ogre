@@ -933,14 +933,14 @@ namespace Ogre
 #ifdef WIN8SDK
 		mUseFlipMode = IsWindows8OrGreater();
 		mSwapChainDesc.BufferCount = mUseFlipMode ? 2 : 1;
-		mSwapChainDesc.SwapEffect = mUseFlipMode ? DXGI_SWAP_EFFECT_DISCARD : DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+		mSwapChainDesc.SwapEffect = mUseFlipMode ? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL : DXGI_SWAP_EFFECT_DISCARD;
 #else
 		mSwapChainDesc.BufferCount = 1;
 		mSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 #endif	
 
         // triple buffer if VSync is on
-        mSwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        mSwapChainDesc.BufferUsage          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         mSwapChainDesc.OutputWindow         = mHWnd;
         mSwapChainDesc.Windowed             = !mIsFullScreen;
 
