@@ -915,7 +915,7 @@ namespace Ogre
 #ifdef WIN8SDK
 		mUseFlipMode = IsWindows8OrGreater();
 		mSwapChainDesc.BufferCount = mUseFlipMode ? 2 : 1;
-		mSwapChainDesc.SwapEffect = mUseFlipMode ? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL : DXGI_SWAP_EFFECT_DISCARD;
+		mSwapChainDesc.SwapEffect = /* mUseFlipMode ? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL :*/ DXGI_SWAP_EFFECT_DISCARD;
 #else
 		mSwapChainDesc.BufferCount = 1;
 		mSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
