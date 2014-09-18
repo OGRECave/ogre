@@ -435,15 +435,16 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::destroy()
     {
+        _destroySwapChain();
+        D3D11RenderWindowBase::destroy();
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainBased::_destroySwapChain()
+    {
         if(mIsFullScreen && mpSwapChain != NULL)
-        {
             mpSwapChain->SetFullscreenState(false, NULL); // get back from fullscreen
-            mIsFullScreen = false;
-        }
 
         SAFE_RELEASE(mpSwapChain);
-
-        D3D11RenderWindowBase::destroy();
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_createSwapChain(void)
@@ -464,7 +465,7 @@ namespace Ogre
                 "D3D11RenderWindowSwapChainBased::_createSwapChain");
         }
     }
-
+    //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_createSizeDependedD3DResources()
     {
         // obtain back buffer
@@ -480,6 +481,22 @@ namespace Ogre
 
         // create all other size depended resources
         D3D11RenderWindowBase::_createSizeDependedD3DResources();
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainBased::_recreateSwapChain()
+    {
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->fireDeviceEvent(&mDevice,"RenderWindowBeforeResize",this);
+
+        _destroySizeDependedD3DResources();
+        _destroySwapChain();
+        
+        _createSwapChain();
+        _createSizeDependedD3DResources();
+
+        // Notify viewports of resize
+        _updateViewportsDimensions();
+        rsys->fireDeviceEvent(&mDevice,"RenderWindowResized",this);
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_resizeSwapChainBuffers(unsigned width, unsigned height)
@@ -1033,7 +1050,6 @@ namespace Ogre
         {
 
             if (fullScreen != mIsFullScreen)
-
 			{
 				D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 				rsys->addToSwitchingFullscreenCounter();
@@ -1449,12 +1465,34 @@ namespace Ogre
         desc.CPUAccessFlags = 0;
         desc.MiscFlags = 0;
 
+        // Create back buffer, maybe with FSAA
         HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
+        if(FAILED(hr) && mFSAAType.Count > 1)
+        {
+            // Second chance - try without FSAA, keep mFSAAType synchronized.
+            desc.SampleDesc.Count = mFSAAType.Count = 1;
+            desc.SampleDesc.Quality = mFSAAType.Quality = 0;
+            hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
+        }
         if( FAILED(hr) )
         {
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to Create Back Buffer",
                 "D3D11RenderWindowImageSource::_createSizeDependedD3DResources");
+        }
+
+        // Create optional back buffer without FSAA if needed
+        if(mFSAAType.Count > 1)
+        {
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBufferNoMSAA);
+            if( FAILED(hr) )
+            {
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Unable to Create Back Buffer without MSAA",
+                    "D3D11RenderWindowImageSource::_createSizeDependedD3DResources");
+            }
         }
 
         // create front buffer - SurfaceImageSource
@@ -1510,7 +1548,14 @@ namespace Ogre
                 "D3D11RenderWindowImageSource::swapBuffers");
         }
 
-        mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBuffer, 0, NULL, 0);
+        // resolve multi-sample texture into single-sample texture if needed
+        if(mpBackBufferNoMSAA)
+        {
+            mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA, 0, mpBackBuffer, 0, DXGI_FORMAT_B8G8R8A8_UNORM);
+            mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBufferNoMSAA, 0, NULL, 0);
+        }
+        else
+            mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBuffer, 0, NULL, 0);
 
         hr = mImageSourceNative->EndDraw();
 

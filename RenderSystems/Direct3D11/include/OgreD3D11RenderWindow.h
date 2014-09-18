@@ -55,6 +55,8 @@ namespace Ogre
 
         void reposition(int left, int top)                      {}
         void resize(unsigned int width, unsigned int height)    {}
+        /// @copydoc RenderTarget::setFSAA
+        virtual void setFSAA(uint fsaa, const String& fsaaHint) { mFSAA = fsaa; mFSAAHint = fsaaHint; resize(mWidth, mHeight); }
 
         bool isClosed() const                                   { return mClosed; }
         bool isHidden() const                                   { return mHidden; }
@@ -115,16 +117,22 @@ namespace Ogre
 		int getContainingMonitorNumber();
 
 		IDXGISwapChainN * _getSwapChain() { return mpSwapChain; }
+
+        /// @copydoc RenderTarget::setFSAA
+        virtual void setFSAA(uint fsaa, const String& fsaaHint) { mFSAA = fsaa; mFSAAHint = fsaaHint; _recreateSwapChain(); }
+
         void swapBuffers( );
 		void updateStats(void);
 
 		bool IsWindows8OrGreater();
 		
     protected:
-        void _createSizeDependedD3DResources(); // obtains mpBackBuffer from mpSwapChain
         void _createSwapChain();
         virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice) = 0;
+        void _destroySwapChain();
+        void _recreateSwapChain(); // required to change FSAA
         void _resizeSwapChainBuffers(unsigned width, unsigned height);
+        void _createSizeDependedD3DResources(); // obtains mpBackBuffer from mpSwapChain
 
 		int getVBlankMissCount( );
 
@@ -238,12 +246,13 @@ namespace Ogre
         virtual void getCustomAttribute( const String& name, void* pData ); // "ImageBrush" -> Windows::UI::Xaml::Media::ImageBrush^
 
     protected:
-        void _createSizeDependedD3DResources(); // creates mpBackBuffer
+        void _createSizeDependedD3DResources(); // creates mpBackBuffer and optionally mpBackBufferNoMSAA
 
     protected:
         Windows::UI::Xaml::Media::ImageBrush^                   mBrush;             // size independed
         Windows::UI::Xaml::Media::Imaging::SurfaceImageSource^  mImageSource;       // size depended, can be NULL
         ISurfaceImageSourceNative*                              mImageSourceNative; // size depended, can be NULL
+        ID3D11Texture2D*                                        mpBackBufferNoMSAA; // size depended, optional
     };
 #endif //  (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 
