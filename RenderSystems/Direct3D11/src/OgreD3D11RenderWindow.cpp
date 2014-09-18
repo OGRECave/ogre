@@ -42,13 +42,6 @@ THE SOFTWARE.
 
 #define OGRE_D3D11_WIN_CLASS_NAME "OgreD3D11Wnd"
 
-//Find out if the DXGI header files are referenced to windows 8.0 or windows 8.1 SDK
-#if (__REQUIRED_RPCNDR_H_VERSION__ >= 500)
-#define WIN8SDK
-#endif
-
-
-
 namespace Ogre
 {
     //---------------------------------------------------------------------
@@ -575,10 +568,14 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D11RenderWindowSwapChainBased::IsWindows8OrGreater()
 	{
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 		DWORD version = GetVersion();
 		DWORD major = (DWORD)(LOBYTE(LOWORD(version)));
 		DWORD minor = (DWORD)(HIBYTE(LOWORD(version)));
 		return (major > 6) || ((major == 6) && (minor >= 2));
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		return true; // GetVersion() is not available in WinRT
+#endif
 	}
 	//---------------------------------------------------------------------
 	int D3D11RenderWindowSwapChainBased::getVBlankMissCount()
@@ -912,7 +909,7 @@ namespace Ogre
 		mSwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		mSwapChainDesc.Flags = 0;
 
-#ifdef WIN8SDK
+#if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
 		mUseFlipMode = IsWindows8OrGreater();
 		mSwapChainDesc.BufferCount = mUseFlipMode ? 2 : 1;
 		mSwapChainDesc.SwapEffect = /* mUseFlipMode ? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL :*/ DXGI_SWAP_EFFECT_DISCARD;
