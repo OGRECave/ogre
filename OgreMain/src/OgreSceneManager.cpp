@@ -1582,22 +1582,20 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     camera->_notifyRenderedBatches(mDestRenderSystem->_getBatchCount());
 
     Root::getSingleton()._popCurrentSceneManager(this);
-
 }
-
-
 //-----------------------------------------------------------------------
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
-	if (sys->getName().find("Direct3D11") != String::npos)
-	{
-		UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
-	}
 
+    if(sys)
+    {
+        if (sys->getName().find("Direct3D11") != String::npos)
+        {
+            UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
+        }
+    }
 }
-
-
 //-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)
 {
