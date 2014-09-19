@@ -1398,7 +1398,7 @@ namespace Ogre
 
     D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
         : D3D11RenderWindowBase(device, pDXGIFactory)
-        , mImageSourceNative(NULL)
+        , mImageSourceNative(NULL), mpBackBufferNoMSAA(NULL)
     {
     }
     //---------------------------------------------------------------------
@@ -1431,6 +1431,7 @@ namespace Ogre
     {
         D3D11RenderWindowBase::destroy();
 
+        SAFE_RELEASE(mpBackBufferNoMSAA);
         SAFE_RELEASE(mImageSourceNative);
         mImageSource = nullptr;
         mBrush = nullptr;
@@ -1439,6 +1440,7 @@ namespace Ogre
     void D3D11RenderWindowImageSource::_createSizeDependedD3DResources()
     {
         SAFE_RELEASE(mpBackBuffer);
+        SAFE_RELEASE(mpBackBufferNoMSAA);
         SAFE_RELEASE(mImageSourceNative);
 
         if(mWidth <= 0 || mHeight <= 0)
@@ -1448,6 +1450,9 @@ namespace Ogre
             return;
         }
 
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->determineFSAASettings(mFSAA, mFSAAHint, DXGI_FORMAT_B8G8R8A8_UNORM, &mFSAAType);
+
         // create back buffer - ID3D11Texture2D
         D3D11_TEXTURE2D_DESC desc = {0};
         desc.Width = mWidth;
@@ -1455,8 +1460,8 @@ namespace Ogre
         desc.MipLevels = 1;
         desc.ArraySize = 1;
         desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.SampleDesc.Quality = 0;
+        desc.SampleDesc.Count = mFSAAType.Count;
+        desc.SampleDesc.Quality = mFSAAType.Quality;
         desc.Usage = D3D11_USAGE_DEFAULT;
         desc.BindFlags = D3D11_BIND_RENDER_TARGET;
         desc.CPUAccessFlags = 0;
