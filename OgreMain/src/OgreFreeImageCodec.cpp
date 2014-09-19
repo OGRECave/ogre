@@ -71,7 +71,7 @@ namespace Ogre {
     {
         // Callback method as required by FreeImage to report problems
         OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, 
-                    message, "FreeImageCodec::save")
+                    message, "FreeImageCodec::save");
     }
     //---------------------------------------------------------------------
     void FreeImageCodec::startup(void)

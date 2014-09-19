@@ -507,4 +507,19 @@ namespace Ogre {
 		return mColourBuffer;
 	}
 	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    void Viewport::Listener::viewportCameraChanged(Viewport*)
+    {
+    }
+
+    //-----------------------------------------------------------------------
+    void Viewport::Listener::viewportDimensionsChanged(Viewport*)
+    {
+    }
+
+    //-----------------------------------------------------------------------
+    void Viewport::Listener::viewportDestroyed(Viewport*)
+    {
+    }
+
 }

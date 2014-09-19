@@ -669,6 +669,8 @@ protected:
         void destroySGPasses();
         
     protected:
+        // Auto mutex.
+        OGRE_AUTO_MUTEX;
         // Parent material.     
         SGMaterial* mParent;
         // Source technique.

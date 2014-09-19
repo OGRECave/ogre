@@ -379,7 +379,7 @@ size_t ShaderGenerator::getNumSubRenderStateFactories() const
 SubRenderStateFactory*  ShaderGenerator::getSubRenderStateFactory(size_t index)
 {
     {
-            OGRE_LOCK_AUTO_MUTEX;
+        OGRE_LOCK_AUTO_MUTEX;
 
         SubRenderStateFactoryIterator itFind = mSubRenderStateFactories.begin();
         for(; index != 0 && itFind != mSubRenderStateFactories.end(); --index , ++itFind);
@@ -1693,6 +1693,7 @@ void ShaderGenerator::SGTechnique::createIlluminationSGPasses()
 		const Any& origPassUserData = p->originalPass->getUserObjectBindings().getUserAny(SGPass::UserKey);
 		if(!origPassUserData.isEmpty())
 		{
+
 			SGPass* origPassEntry = any_cast<SGPass*>(origPassUserData);
 			passEntry->setCustomRenderState(origPassEntry->getCustomRenderState());
 		}

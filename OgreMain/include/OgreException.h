@@ -277,10 +277,10 @@ namespace Ogre {
 
     
 #ifndef OGRE_EXCEPT
-#define OGRE_EXCEPT(code, desc, src)			Ogre::ExceptionFactory::throwException(code, code, desc, src, __FILE__, __LINE__);
-#define OGRE_EXCEPT_EX(code, num, desc, src) 	Ogre::ExceptionFactory::throwException(code, num, desc, src, __FILE__, __LINE__);
+#define OGRE_EXCEPT(code, desc, src)         Ogre::ExceptionFactory::throwException(code, code, desc, src, __FILE__, __LINE__)
+#define OGRE_EXCEPT_EX(code, num, desc, src) Ogre::ExceptionFactory::throwException(code, num, desc, src, __FILE__, __LINE__)
 #else
-#define OGRE_EXCEPT_EX(code, num, desc, src) 	OGRE_EXCEPT(code, desc, src);
+#define OGRE_EXCEPT_EX(code, num, desc, src) OGRE_EXCEPT(code, desc, src)
 #endif
     /** @} */
     /** @} */

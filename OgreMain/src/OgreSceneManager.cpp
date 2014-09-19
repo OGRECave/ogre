@@ -2503,6 +2503,8 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
         renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
     }
 
+    // Override auto param ambient to force vertex programs to use shadow colour
+    mAutoParamDataSource->setAmbientLightColour(mShadowColour);
 
     // Iterate over lights, render all volumes to stencil
     LightList::const_iterator li, liend;
@@ -2530,6 +2532,9 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
         }
 
     }// for each light
+
+    // Restore ambient light
+    mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
 
     // Iterate again - variable name changed to appease gcc.
     RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
@@ -4772,36 +4777,36 @@ void SceneManager::initShadowVolumeMaterials(void)
 
     if (!mShadowModulativePass)
     {
-		MaterialPtr matModStencil = MaterialManager::getSingleton().getByName(
-			"Ogre/StencilShadowModulationPass");
-		if (matModStencil.isNull())
-		{
-			// Init
-			matModStencil = MaterialManager::getSingleton().create(
-				"Ogre/StencilShadowModulationPass",
-				ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-			mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
-			mShadowModulativePass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO);
-			mShadowModulativePass->setLightingEnabled(false);
-			mShadowModulativePass->setDepthWriteEnabled(false);
-			mShadowModulativePass->setDepthCheckEnabled(false);
-			mShadowModulativePass->createTextureUnitState();
+    MaterialPtr matModStencil = MaterialManager::getSingleton().getByName(
+        "Ogre/StencilShadowModulationPass");
+    if (matModStencil.isNull())
+    {
+        // Init
+        matModStencil = MaterialManager::getSingleton().create(
+            "Ogre/StencilShadowModulationPass",
+            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+        mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
+        mShadowModulativePass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO);
+        mShadowModulativePass->setLightingEnabled(false);
+        mShadowModulativePass->setDepthWriteEnabled(false);
+        mShadowModulativePass->setDepthCheckEnabled(false);
+        mShadowModulativePass->createTextureUnitState();
 
 
-			mShadowModulativePass->setCullingMode(CULL_NONE);
+        mShadowModulativePass->setCullingMode(CULL_NONE);
 
-			mShadowModulativePass->setVertexProgram("Ogre/ShadowBlendVP");
-			mShadowModulativePass->setFragmentProgram("Ogre/ShadowBlendFP");
-	
-			mShadowModulativePass->getFragmentProgramParameters()->setNamedConstant("shadowColor", mShadowColour);
-			mShadowModulativePass->getVertexProgramParameters()->setAutoConstant(0, Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+        mShadowModulativePass->setVertexProgram("Ogre/ShadowBlendVP");
+        mShadowModulativePass->setFragmentProgram("Ogre/ShadowBlendFP");
 
-			
-		}
-		else
-		{
-			mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
-		}
+        mShadowModulativePass->getFragmentProgramParameters()->setNamedConstant("shadowColor", mShadowColour);
+        mShadowModulativePass->getVertexProgramParameters()->setAutoConstant(0, Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+
+
+    }
+    else
+    {
+        mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
+    }
 
     }
 
