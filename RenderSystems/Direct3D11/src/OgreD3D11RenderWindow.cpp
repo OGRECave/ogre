@@ -779,15 +779,11 @@ namespace Ogre
 			UINT classStyle = 0;
 			if (enableDoubleClick)
 				classStyle |= CS_DBLCLKS;
-#ifdef OGRE_STATIC_LIB
-			HINSTANCE hInst = GetModuleHandle( NULL );
-#else
-#  if OGRE_DEBUG_MODE == 1
-			HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11_d.dll" );
-#  else
-			HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11.dll" );
-#  endif
-#endif
+
+			HINSTANCE hInst = NULL;
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+
 			WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
 				LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
 				(HBRUSH)GetStockObject(BLACK_BRUSH), 0, OGRE_D3D11_WIN_CLASS_NAME };

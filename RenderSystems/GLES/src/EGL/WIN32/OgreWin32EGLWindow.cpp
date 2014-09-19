@@ -77,13 +77,9 @@ namespace Ogre {
         if (mWindow)
             destroy();
 
-#ifdef OGRE_STATIC_LIB
-        HINSTANCE hInst = GetModuleHandle( NULL );
-#else
-		static const TCHAR staticVar;
 		HINSTANCE hInst = NULL;
+		static const TCHAR staticVar;
 		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
-#endif
 
         mWindow = 0;
         mClosed = false;        

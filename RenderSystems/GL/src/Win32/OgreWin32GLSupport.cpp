@@ -505,14 +505,11 @@ namespace Ogre {
         // take this opportunity to enumerate the valid FSAA modes.
         
         LPCSTR dummyText = "OgreWglDummy";
-#ifdef OGRE_STATIC_LIB
-        HINSTANCE hinst = GetModuleHandle( NULL );
-#else
-		static const TCHAR staticVar;
+
 		HINSTANCE hinst = NULL;
+		static const TCHAR staticVar;
 		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hinst);
-#endif
-        
+
         WNDCLASS dummyClass;
         memset(&dummyClass, 0, sizeof(WNDCLASS));
         dummyClass.style = CS_OWNDC;
