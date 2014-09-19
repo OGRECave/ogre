@@ -1,23 +1,19 @@
 // GetParentProcID.cpp : Defines the entry point for the console application.
 //
 
-#include <stdio.h>
+#include "OgrePrerequisites.h"
+#include "OgreNsightChecker.h"
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+
 #include <windows.h>
-#include <SetupAPI.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <Psapi.h>
 #include <tlhelp32.h>
-#include <vdmdbg.h>
-#include <conio.h>
-#include <string>
-#include "OgreNsightChecker.h"
 
 #pragma comment(lib,"Psapi.lib")
 
-namespace Ogre
-{
-BOOL WINAPI NsightChecker::GetParentPID(PROCESSENTRY32& procentry)
+
+static BOOL WINAPI GetParentPID(PROCESSENTRY32& procentry)
 {
 	OSVERSIONINFO  osver;
 	HINSTANCE      hInstLib;
@@ -114,7 +110,7 @@ const DWORD TIMEOUT = 5000;
 const DWORD TIMEOUT = 30000;
 #endif
 
-std::string NsightChecker::GetProcessFileName(DWORD processID)
+static std::string GetProcessFileName(DWORD processID)
 {
 		std::string result = "";
 
@@ -145,14 +141,28 @@ std::string NsightChecker::GetProcessFileName(DWORD processID)
 		return result;
 }
 
-	bool NsightChecker::IsWorkingUnderNsight()
+static bool IsWorkingUnderNsightImpl()
+{
+	PROCESSENTRY32 selfprocentry;
+	if(GetParentPID(selfprocentry))
 	{
-		PROCESSENTRY32 selfprocentry;
-		if (GetParentPID(selfprocentry))
-		{
-			std::string parentFileName =  GetProcessFileName(selfprocentry.th32ParentProcessID);
-			return parentFileName.find("Nsight.Monitor") != std::string::npos;
-		}
+		std::string parentFileName = GetProcessFileName(selfprocentry.th32ParentProcessID);
+		return parentFileName.find("Nsight.Monitor") != std::string::npos;
+	}
+	return false;
+}
+
+#endif
+
+namespace Ogre
+{
+	bool IsWorkingUnderNsight()
+	{
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+		static bool isWorkingUnderNsight = IsWorkingUnderNsightImpl();
+		return isWorkingUnderNsight;
+#else
 		return false;
+#endif
 	}
 }

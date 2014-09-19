@@ -136,9 +136,6 @@ bail:
 		mMonitorInfo.Refresh();
 
         mEnableFixedPipeline = false;
-		
-		mIsWorkingUnderNsight = false;
-		
         mRenderSystemWasInited = false;
 		mSwitchingFullscreenCounter = 0;
 		
@@ -615,11 +612,10 @@ bail:
     {
         RenderWindow* autoWindow = NULL;
         LogManager::getSingleton().logMessage( "D3D11 : Subsystem Initialising" );
-		
-		mIsWorkingUnderNsight = NsightChecker::IsWorkingUnderNsight();
-		if (mIsWorkingUnderNsight)
+
+		if(IsWorkingUnderNsight())
 			LogManager::getSingleton().logMessage( "D3D11 : Nvidia Nsight found");
-		
+
         // Init using current settings
         mActiveD3DDriver = NULL;
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
@@ -701,7 +697,7 @@ bail:
             // This flag is required in order to enable compatibility with Direct2D.
             deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif
-            if (OGRE_DEBUG_MODE && !mIsWorkingUnderNsight && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
+            if (OGRE_DEBUG_MODE && !IsWorkingUnderNsight() && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
             {
                 deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
             }
@@ -4045,7 +4041,7 @@ bail:
         // This flag is required in order to enable compatibility with Direct2D.
         deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif
-        if (OGRE_DEBUG_MODE && !mIsWorkingUnderNsight && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
+        if (OGRE_DEBUG_MODE && !IsWorkingUnderNsight() && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
         {
             deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
         }

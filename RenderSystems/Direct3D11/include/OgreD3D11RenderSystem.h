@@ -79,7 +79,6 @@ namespace Ogre
         bool mUseNVPerfHUD;
 		int mSwitchingFullscreenCounter;	// Are we switching from windowed to fullscreen 
 
-		bool mIsWorkingUnderNsight;
         /// structure holding texture unit settings for every stage
 		std::string getCreationErrorMessage(HRESULT hr, bool isDebug);
 
@@ -88,8 +87,6 @@ namespace Ogre
         void refreshFSAAOptions(void);
         void freeDevice(void);
 
-		void getIsWorkingUnderNsight();
-        
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
         
