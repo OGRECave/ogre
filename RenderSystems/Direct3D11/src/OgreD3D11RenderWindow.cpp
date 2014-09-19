@@ -521,25 +521,6 @@ namespace Ogre
         rsys->fireDeviceEvent(&mDevice,"RenderWindowResized",this);
     }
 
-	//---------------------------------------------------------------------
-	int D3D11RenderWindowSwapChainBased::getContainingMonitorNumber()
-	{
-		IDXGISwapChain* swapChain = _getSwapChain();
-		IDXGIOutput* output;
-		int monitorSequencialNumber = -1;
-		if (swapChain != NULL)
-		{
-			HRESULT hr = swapChain->GetContainingOutput(&output);
-			if (hr == S_OK)
-			{
-				DXGI_OUTPUT_DESC desc;
-				output->GetDesc(&desc);
-				D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-				monitorSequencialNumber = rsys->getMonitorInfo().getMonitorSequentialNumberFromHMonitor(desc.Monitor);
-			}
-		}
-		return monitorSequencialNumber;
-	}
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::swapBuffers( )
     {

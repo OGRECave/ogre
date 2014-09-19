@@ -133,8 +133,6 @@ bail:
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
-		mMonitorInfo.Refresh();
-
         mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
 		mSwitchingFullscreenCounter = 0;
