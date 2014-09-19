@@ -673,36 +673,6 @@ namespace Ogre
             opt = miscParams->find("externalWindowHandle");
             if(opt != miscParams->end())
                 externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
-			
-				opt = miscParams->find("vsync");
-				if(opt != miscParams->end())
-					mVSync = StringConverter::parseBool(opt->second);
-				opt = miscParams->find("hidden");
-				if(opt != miscParams->end())
-					mHidden = StringConverter::parseBool(opt->second);
-				opt = miscParams->find("vsyncInterval");
-				if(opt != miscParams->end())
-					mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
-				opt = miscParams->find("displayFrequency");
-				if(opt != miscParams->end())
-					mDisplayFrequency = StringConverter::parseUnsignedInt(opt->second);
-				opt = miscParams->find("colourDepth");
-				if(opt != miscParams->end())
-					colourDepth = StringConverter::parseUnsignedInt(opt->second);
-				opt = miscParams->find("depthBuffer");
-				if(opt != miscParams->end())
-					depthBuffer = StringConverter::parseBool(opt->second);
-				opt = miscParams->find("FSAA");
-				if(opt != miscParams->end())
-				{
-					mFSAA = StringConverter::parseUnsignedInt(opt->second);
-				}
-				opt = miscParams->find("FSAAHint");
-				if(opt != miscParams->end())
-				{
-					mFSAAHint = opt->second;
-				}
-			
             // window border style
             opt = miscParams->find("border");
             if(opt != miscParams->end())
@@ -711,17 +681,10 @@ namespace Ogre
             opt = miscParams->find("outerDimensions");
             if(opt != miscParams->end())
                 outerSize = StringConverter::parseBool(opt->second);
-			
-				opt = miscParams->find("gamma");
-				if(opt != miscParams->end())
-					mHwGamma = StringConverter::parseBool(opt->second);
-				opt = miscParams->find("monitorIndex");
-				if(opt != miscParams->end())
-					monitorIndex = StringConverter::parseInt(opt->second);
-				opt = miscParams->find("show");
-				if(opt != miscParams->end())
-					mHidden = !StringConverter::parseBool(opt->second);
-			
+            opt = miscParams->find("monitorIndex");
+            if(opt != miscParams->end())
+                monitorIndex = StringConverter::parseInt(opt->second);
+
             // enable double click messages
             opt = miscParams->find("enableDoubleClick");
             if(opt != miscParams->end())
