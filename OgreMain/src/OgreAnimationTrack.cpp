@@ -235,6 +235,9 @@ namespace Ogre {
             ++j;
         }
     }
+    //--------------------------------------------------------------------------
+    void AnimationTrack::_applyBaseKeyFrame(const KeyFrame*)
+    {}
 	//---------------------------------------------------------------------
 	void AnimationTrack::populateClone(AnimationTrack* clone) const
 	{

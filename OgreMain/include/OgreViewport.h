@@ -64,13 +64,13 @@ namespace Ogre {
 			virtual ~Listener() {}
 
 			/** Notification of when a new camera is set to target listening Viewport. */
-			virtual void viewportCameraChanged(Viewport* viewport) {}
+			virtual void viewportCameraChanged(Viewport* viewport);
 
 			/** Notification of when target listening Viewport's dimensions changed. */
-			virtual void viewportDimensionsChanged(Viewport* viewport) {}
+			virtual void viewportDimensionsChanged(Viewport* viewport);
 
 			/** Notification of when target listening Viewport's is destroyed. */
-			virtual void viewportDestroyed(Viewport* viewport) {}
+			virtual void viewportDestroyed(Viewport* viewport);
 		};
 
         /** The usual constructor.

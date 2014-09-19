@@ -106,8 +106,8 @@ namespace Ogre {
             ERR_ITEM_NOT_FOUND,
             ERR_FILE_NOT_FOUND,
             ERR_INTERNAL_ERROR,
-            ERR_RT_ASSERTION_FAILED, 
-			ERR_NOT_IMPLEMENTED
+            ERR_RT_ASSERTION_FAILED,
+            ERR_NOT_IMPLEMENTED
         };
 
         /** Default constructor.
@@ -127,7 +127,7 @@ namespace Ogre {
 
         /** Assignment operator.
         */
-        void operator = (const Exception& rhs);
+        Exception & operator = (const Exception& rhs);
 
         /** Returns a string with the full description of this error.
             @remarks
@@ -262,10 +262,10 @@ namespace Ogre {
 
 	
 #ifndef OGRE_EXCEPT
-#define OGRE_EXCEPT(code, desc, src)			Ogre::ExceptionFactory::throwException(code, code, desc, src, __FILE__, __LINE__);
-#define OGRE_EXCEPT_EX(code, num, desc, src) 	Ogre::ExceptionFactory::throwException(code, num, desc, src, __FILE__, __LINE__);
+#define OGRE_EXCEPT(code, desc, src)         Ogre::ExceptionFactory::throwException(code, code, desc, src, __FILE__, __LINE__)
+#define OGRE_EXCEPT_EX(code, num, desc, src) Ogre::ExceptionFactory::throwException(code, num, desc, src, __FILE__, __LINE__)
 #else
-#define OGRE_EXCEPT_EX(code, num, desc, src) 	OGRE_EXCEPT(code, desc, src);
+#define OGRE_EXCEPT_EX(code, num, desc, src) OGRE_EXCEPT(code, desc, src)
 #endif
 	/** @} */
 	/** @} */

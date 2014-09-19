@@ -467,5 +467,9 @@ namespace Ogre {
 
 	}
 
+    //--------------------------------------------------------------------------
+    void Texture::getCustomAttribute(const String&, void*)
+    {
+    } 
 
 }
