@@ -382,6 +382,14 @@ namespace Ogre {
         */
         virtual const String& getFSAAHint() const { return mFSAAHint; }
 
+        /** Set the level of multisample AA to be used if hardware support it.
+            This option will be ignored if the hardware does not support it 
+            or setting can not be changed on the fly on per-target level. 
+            @param fsaa The number of samples
+            @param fsaaHint Any hinting text (@see Root::createRenderWindow)
+        */
+        virtual void setFSAA(uint fsaa, const String& fsaaHint) { }
+
         /** RenderSystem specific interface for a RenderTarget;
             this should be subclassed by RenderSystems.
         */

@@ -836,6 +836,16 @@ namespace OgreBites
                 unsigned int h = Ogre::StringConverter::parseUnsignedInt(vmopts[1]);
                 mWindow->setFullscreen(!mWindow->isFullScreen(), w, h);
             }
+            else if(evt.key == OIS::KC_F11 || evt.key == OIS::KC_F12) // Decrease and increase FSAA level on the fly
+            {
+                // current FSAA                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
+                unsigned decreasedFSAA[17] = { 0, 0, 1, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8 };
+                unsigned increasedFSAA[17] = { 2, 2, 4, 4, 8, 8, 8, 8,16,16,16,16,16,16,16,16, 0, };
+                unsigned FSAA = std::min(mWindow->getFSAA(), 16U);
+                unsigned newFSAA = (evt.key == OIS::KC_F12) ? increasedFSAA[FSAA] : decreasedFSAA[FSAA];
+                if(newFSAA != 0)
+                    mWindow->setFSAA(newFSAA, mWindow->getFSAAHint());
+            }
 
             try
             {

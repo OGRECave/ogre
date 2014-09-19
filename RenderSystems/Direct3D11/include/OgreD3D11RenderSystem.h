@@ -89,13 +89,9 @@ namespace Ogre
         void freeDevice(void);
 
 		void getIsWorkingUnderNsight();
-        void initInputDevices(void);
-        void processInputDevices(void);
         
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
-        /// check if a FSAA is supported
-        bool _checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format);
         
         D3D11HardwareBufferManager* mHardwareBufferManager;
         D3D11GpuProgramManager* mGpuProgramManager;
@@ -234,10 +230,10 @@ namespace Ogre
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0);
-		
-		/// @copydoc RenderSystem::fireDeviceEvent
-		void fireDeviceEvent( D3D11Device* device, const String & name,NameValuePairList *i_params = NULL);
-		
+
+        /// @copydoc RenderSystem::fireDeviceEvent
+        void fireDeviceEvent( D3D11Device* device, const String & name, D3D11RenderWindowBase* sendingWindow = NULL);
+
         /// @copydoc RenderSystem::createRenderTexture
         RenderTexture * createRenderTexture( const String & name, unsigned int width, unsigned int height,
             TextureType texType = TEX_TYPE_2D, PixelFormat internalFormat = PF_X8R8G8B8, 
