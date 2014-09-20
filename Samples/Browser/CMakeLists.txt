@@ -342,7 +342,6 @@ if (OGRE_INSTALL_SAMPLES)
 			DESTINATION bin${OGRE_RELWDBG_PATH} CONFIGURATIONS RelWithDebInfo
 			)
 	endif ()
-endif ()	
+endif ()
 endif(ANDROID)
-
 
