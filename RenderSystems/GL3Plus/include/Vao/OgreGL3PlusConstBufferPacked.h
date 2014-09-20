@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class GL3PlusConstBufferPacked : public ConstBufferPacked
+    class _OgreGL3PlusExport GL3PlusConstBufferPacked : public ConstBufferPacked
     {
     public:
         GL3PlusConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,

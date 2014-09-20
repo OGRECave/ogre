@@ -58,7 +58,7 @@ namespace Ogre
     typedef vector<VertexElement2>::type VertexElement2Vec;
     typedef vector<VertexElement2Vec>::type VertexElement2VecVec;
 
-    class VertexBufferPacked : public BufferPacked
+    class _OgreExport VertexBufferPacked : public BufferPacked
     {
     protected:
         VertexElement2Vec mVertexElements;

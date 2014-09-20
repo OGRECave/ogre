@@ -112,7 +112,7 @@ namespace Ogre
     public:
         GL3PlusStagingBuffer( size_t internalBufferStart, size_t sizeBytes,
                               VaoManager *vaoManager, bool uploadOnly, GLuint vboName );
-        ~GL3PlusStagingBuffer();
+        virtual ~GL3PlusStagingBuffer();
 
         virtual StagingStallType willStall( size_t sizeBytes ) const;
 

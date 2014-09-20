@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "Vao/OgreVertexBufferPacked.h"
 #include "Vao/OgreIndexBufferPacked.h"
 #include "OgreRenderOperation.h"
+#include "OgrePixelFormat.h"
 
 namespace Ogre
 {
@@ -91,8 +92,9 @@ namespace Ogre
                                                           void *initialData, bool keepAsShadow ) = 0;
         virtual void destroyConstBufferImpl( ConstBufferPacked *constBuffer ) = 0;
 
-        virtual TexBufferPacked* createTexBufferImpl( size_t sizeBytes, BufferType bufferType,
-                                                          void *initialData, bool keepAsShadow ) = 0;
+        virtual TexBufferPacked* createTexBufferImpl( PixelFormat pixelFormat, size_t sizeBytes,
+                                                      BufferType bufferType,
+                                                      void *initialData, bool keepAsShadow ) = 0;
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer ) = 0;
 
         virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
@@ -199,12 +201,15 @@ namespace Ogre
             (depends on the RenderSystem, on D3D11 we're forced to give its own buffer)
         @remarks
             @See createVertexBuffer for the remaining parameters not documented here.
+        @param pixelFormat
+            The pixel format for the texture buffer.
         @param sizeBytes
             The size in bytes of the given constant buffer. API restrictions may apply.
         @return
             The desired texture buffer pointer
         */
-        TexBufferPacked* createTexBuffer( size_t sizeBytes, BufferType bufferType,
+        TexBufferPacked* createTexBuffer( PixelFormat pixelFormat, size_t sizeBytes,
+                                          BufferType bufferType,
                                           void *initialData, bool keepAsShadow );
 
         /** Destroys the given texture buffer created with createTexBuffer.

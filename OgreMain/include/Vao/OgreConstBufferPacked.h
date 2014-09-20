@@ -35,7 +35,7 @@ namespace Ogre
 {
     /** Represents constant buffers (also known as Uniform Buffers in GL)
      */
-    class ConstBufferPacked : public BufferPacked
+    class _OgreExport ConstBufferPacked : public BufferPacked
     {
     protected:
         size_t mBindableSizeBytes;

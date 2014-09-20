@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class IndexBufferPacked : public BufferPacked
+    class _OgreExport IndexBufferPacked : public BufferPacked
     {
     public:
         enum IndexType

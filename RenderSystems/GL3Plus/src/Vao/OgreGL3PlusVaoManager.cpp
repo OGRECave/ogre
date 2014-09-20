@@ -437,7 +437,8 @@ namespace Ogre
                        constBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
-    TexBufferPacked* GL3PlusVaoManager::createTexBufferImpl( size_t sizeBytes, BufferType bufferType,
+    TexBufferPacked* GL3PlusVaoManager::createTexBufferImpl( PixelFormat pixelFormat, size_t sizeBytes,
+                                                             BufferType bufferType,
                                                              void *initialData, bool keepAsShadow )
     {
         size_t vboIdx;
@@ -445,8 +446,6 @@ namespace Ogre
 
         GLint alignment = 256;
         glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
-
-        size_t bindableSize = sizeBytes;
 
         VboFlag vboFlag = CPU_INACCESSIBLE;
 
@@ -469,7 +468,7 @@ namespace Ogre
         TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
                                                         bufferType, initialData, keepAsShadow,
-                                                        this, bufferInterface, bindableSize );
+                                                        this, bufferInterface, pixelFormat );
 
         if( initialData )
             bufferInterface->_firstUpload( initialData, 0, sizeBytes );

@@ -37,7 +37,7 @@ namespace Ogre
 {
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
 
-    struct VertexArrayObject : public VertexArrayObjectAlloc
+    struct _OgreExport VertexArrayObject : public VertexArrayObjectAlloc
     {
         friend class RenderSystem;
         friend class GL3PlusRenderSystem;

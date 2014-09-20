@@ -44,7 +44,7 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void GL3PlusConstBufferPacked::bindConstantBuffer( uint16 slot )
+    void GL3PlusConstBufferPacked::bindBuffer( uint16 slot )
     {
         assert( dynamic_cast<GL3PlusBufferInterface*>( mBufferInterface ) );
 

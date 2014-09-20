@@ -36,7 +36,7 @@ namespace Ogre
 {
     /** Represents Texture buffers (also known as tbuffers in D3D11)
      */
-    class TexBufferPacked : public BufferPacked
+    class _OgreExport TexBufferPacked : public BufferPacked
     {
         PixelFormat mPixelFormat;
 

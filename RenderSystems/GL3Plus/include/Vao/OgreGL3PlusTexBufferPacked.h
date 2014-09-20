@@ -34,7 +34,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class GL3PlusTexBufferPacked : public TexBufferPacked
+    class GL3PlusBufferInterface;
+
+    class _OgreGL3PlusExport GL3PlusTexBufferPacked : public TexBufferPacked
     {
         GLuint mTexName;
         GLenum mInternalFormat;

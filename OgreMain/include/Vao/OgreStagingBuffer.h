@@ -72,7 +72,7 @@ namespace Ogre
     @par
         Staging buffers can't be persistently mapped, since it beats the point.
     */
-    class StagingBuffer : public StagingBufferAlloc
+    class _OgreExport StagingBuffer : public StagingBufferAlloc
     {
     public:
         struct Destination
@@ -146,7 +146,7 @@ namespace Ogre
         @remarks
             Will throw if sizeBytes > this->getMaxSize()
         */
-        virtual void* map( size_t sizeBytes );
+        void* map( size_t sizeBytes );
 
         void unmap( const Destination *destinations, size_t numDestinations );
 

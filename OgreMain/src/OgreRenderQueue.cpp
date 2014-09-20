@@ -212,6 +212,14 @@ namespace Ogre
 
             if( !mRenderQueues[i].mSorted )
             {
+                //TODO: Exploit temporal coherence across framesm then use insertion sorts.
+                //As explained by L. Spiro in
+                //http://www.gamedev.net/topic/661114-temporal-coherence-and-render-queue-sorting/?view=findpost&p=5181408
+                //Keep a list of sorted indices from the previous frame (one per camera).
+                //If we have the sorted list "5, 1, 4, 3, 2, 0":
+                //  * If it grew from last frame, append: 5, 1, 4, 3, 2, 0, 6, 7 and use insertion sort.
+                //  * If it's the same, leave it as is, and use insertion sort just in case.
+                //  * If it's shorter, reset the indices 0, 1, 2, 3, 4; probably use quicksort or other generic sort
                 std::sort( queuedRenderables.begin(), queuedRenderables.end() );
                 mRenderQueues[i].mSorted = true;
             }

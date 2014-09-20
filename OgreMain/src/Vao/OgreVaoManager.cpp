@@ -178,11 +178,12 @@ namespace Ogre
         efficientVectorRemove( mConstBuffers, itor );
     }
     //-----------------------------------------------------------------------------------
-    TexBufferPacked* VaoManager::createTexBuffer( size_t sizeBytes, BufferType bufferType,
+    TexBufferPacked* VaoManager::createTexBuffer( PixelFormat pixelFormat,  size_t sizeBytes,
+                                                  BufferType bufferType,
                                                   void *initialData, bool keepAsShadow )
     {
         TexBufferPacked *retVal;
-        retVal = createTexBufferImpl( sizeBytes, bufferType, initialData, keepAsShadow );
+        retVal = createTexBufferImpl( pixelFormat, sizeBytes, bufferType, initialData, keepAsShadow );
         mTexBuffers.push_back( retVal );
         return retVal;
     }

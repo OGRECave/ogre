@@ -38,7 +38,7 @@ namespace Ogre
     /** For GL3+, most (if not all) buffers, can be treated with the same code.
         Hence most equivalent functionality is encapsulated here.
     */
-    class GL3PlusBufferInterface : public BufferInterface
+    class _OgreGL3PlusExport GL3PlusBufferInterface : public BufferInterface
     {
     protected:
         size_t  mVboPoolIdx;
