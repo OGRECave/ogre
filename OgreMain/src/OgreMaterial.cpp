@@ -605,7 +605,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Material::setMacroblock( const HlmsMacroblock *macroblock )
+    void Material::setMacroblock( const HlmsMacroblock &macroblock )
     {
         Techniques::iterator i, iend;
         iend = mTechniques.end();
@@ -615,7 +615,7 @@ namespace Ogre {
         }
     }
     // --------------------------------------------------------------------
-    void Material::setBlendblock( const HlmsBlendblock *blendblock )
+    void Material::setBlendblock( const HlmsBlendblock &blendblock )
     {
         Techniques::iterator i, iend;
         iend = mTechniques.end();

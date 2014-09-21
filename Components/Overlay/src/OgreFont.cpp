@@ -205,7 +205,7 @@ namespace Ogre
         {
             //Alpha blending
             blendblock.mSourceBlendFactor       = SBF_SOURCE_ALPHA;
-            blendblock.mSourceBlendFactor       = SBF_SOURCE_ALPHA;
+            blendblock.mSourceBlendFactorAlpha  = SBF_SOURCE_ALPHA;
             blendblock.mDestBlendFactor         = SBF_ONE_MINUS_SOURCE_ALPHA;
             blendblock.mDestBlendFactorAlpha    = SBF_ONE_MINUS_SOURCE_ALPHA;
         }
@@ -213,7 +213,7 @@ namespace Ogre
         {
             //Add
             blendblock.mSourceBlendFactor       = SBF_ONE;
-            blendblock.mSourceBlendFactor       = SBF_ONE;
+            blendblock.mSourceBlendFactorAlpha  = SBF_ONE;
             blendblock.mDestBlendFactor         = SBF_ONE;
             blendblock.mDestBlendFactorAlpha    = SBF_ONE;
         }

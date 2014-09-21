@@ -378,7 +378,7 @@ namespace Ogre {
             property there.
         @see Pass::setBlendblock
         */
-        void setMacroblock( const HlmsMacroblock *macroblock );
+        void setMacroblock( const HlmsMacroblock &macroblock );
 
         /** Sets the blendblock every pass has with the existing contents of the scene.
         @note
@@ -388,7 +388,7 @@ namespace Ogre {
             property there.
         @see Pass::setBlendblock
         */
-        void setBlendblock( const HlmsBlendblock *blendblock );
+        void setBlendblock( const HlmsBlendblock &blendblock );
 
         /** Assigns a level-of-detail (LOD) index to this Technique.
         @remarks

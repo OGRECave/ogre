@@ -237,6 +237,16 @@ namespace Ogre
     {
         delete mShaderCreationData;
         mShaderCreationData = 0;
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        if( hlmsManager )
+        {
+            for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+            {
+                if( mSamplerblocks[i] )
+                    hlmsManager->destroySamplerblock( mSamplerblocks[i] );
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::calculateHash()
@@ -436,9 +446,13 @@ namespace Ogre
     void HlmsPbsMobileDatablock::setSamplerblock( PbsMobileTextureTypes texType,
                                                   const HlmsSamplerblock &params )
     {
-        //TODO: Remove old sampler block (ref count, probably).
+        const HlmsSamplerblock *oldBlock = mSamplerblocks[texType];
+
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         mSamplerblocks[texType] = hlmsManager->getSamplerblock( params );
+
+        if( oldBlock )
+            hlmsManager->destroySamplerblock( oldBlock );
     }
     //-----------------------------------------------------------------------------------
     const HlmsSamplerblock* HlmsPbsMobileDatablock::getSamplerblock(

@@ -268,6 +268,16 @@ namespace Ogre
     HlmsPbsDatablock::~HlmsPbsDatablock()
     {
         static_cast<HlmsPbs*>(mCreator)->releaseSlot( this );
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        if( hlmsManager )
+        {
+            for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+            {
+                if( mSamplerblocks[i] )
+                    hlmsManager->destroySamplerblock( mSamplerblocks[i] );
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::calculateHash()
@@ -418,7 +428,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setTexture( PbsTextureTypes texType, uint16 arrayIndex,
-                                       const TexturePtr &newTexture, const HlmsSamplerblock *params )
+                                       const TexturePtr &newTexture, const HlmsSamplerblock *refParams )
     {
         PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
 
@@ -426,10 +436,14 @@ namespace Ogre
         decompileBakedTextures( textures );
 
         //Set the new samplerblock
-        if( params )
+        if( refParams )
         {
             HlmsManager *hlmsManager = mCreator->getHlmsManager();
-            mSamplerblocks[texType] = hlmsManager->getSamplerblock( *params );
+            const HlmsSamplerblock *oldSamplerblock = mSamplerblocks[texType];
+            mSamplerblocks[texType] = hlmsManager->getSamplerblock( *refParams );
+
+            if( oldSamplerblock )
+                hlmsManager->destroySamplerblock( oldSamplerblock );
         }
         else if( !newTexture.isNull() && !mSamplerblocks[texType] )
         {
@@ -444,7 +458,7 @@ namespace Ogre
             }
 
             HlmsManager *hlmsManager = mCreator->getHlmsManager();
-            mSamplerblocks[texType] = hlmsManager->getSamplerblock( *params );
+            mSamplerblocks[texType] = hlmsManager->getSamplerblock( *refParams );
         }
 
         PbsBakedTexture oldTex = textures[texType];
@@ -482,10 +496,12 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setSamplerblock( PbsTextureTypes texType, const HlmsSamplerblock &params )
     {
-        //TODO: Remove old sampler block (ref count, probably).
         const HlmsSamplerblock *oldSamplerblock = mSamplerblocks[texType];
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         mSamplerblocks[texType] = hlmsManager->getSamplerblock( params );
+
+        if( oldSamplerblock )
+            hlmsManager->destroySamplerblock( oldSamplerblock );
 
         if( oldSamplerblock != mSamplerblocks[texType] )
         {

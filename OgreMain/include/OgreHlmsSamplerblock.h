@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreColourValue.h"
+#include "OgreHlmsDatablock.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -60,9 +61,8 @@ namespace Ogre
         This is very analogous to D3D11_SAMPLER_DESC. @See HlmsDatablock
         Up to 32 different blocks are allowed!
     */
-    struct _OgreExport HlmsSamplerblock
+    struct _OgreExport HlmsSamplerblock : public BasicBlock
     {
-        uint8               mId;
         FilterOptions       mMinFilter;
         FilterOptions       mMagFilter;
         FilterOptions       mMipFilter;
@@ -78,8 +78,6 @@ namespace Ogre
         ColourValue         mBorderColour;
         float               mMinLod;
         float               mMaxLod;
-
-        void                *mRsData;       ///Render-System specific data
 
         HlmsSamplerblock();
 

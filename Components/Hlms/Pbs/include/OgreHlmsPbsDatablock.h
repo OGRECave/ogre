@@ -237,11 +237,11 @@ namespace Ogre
             trigger HlmsDatablock::flushRenderables.
         @param params
             Optional. We'll create (or retrieve an existing) samplerblock based on the input parameters.
-            When null, we leave the previously set samplerblock (if a texture is being set, and no
+            When null, we leave the previously set samplerblock (if a texture is being set, and if no
             samplerblock was set, we'll create a default one)
         */
         void setTexture( PbsTextureTypes texType, uint16 arrayIndex, const TexturePtr &newTexture,
-                         const HlmsSamplerblock *params=0 );
+                         const HlmsSamplerblock *refParams=0 );
 
         TexturePtr getTexture( PbsTextureTypes texType ) const;
         TexturePtr getTexture( size_t texType ) const;

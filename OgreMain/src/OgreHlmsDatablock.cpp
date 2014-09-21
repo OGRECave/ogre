@@ -38,8 +38,16 @@ namespace Ogre
 {
     extern CompareFunction convertCompareFunction(const String& param);
 
-    HlmsMacroblock::HlmsMacroblock() :
+    BasicBlock::BasicBlock( uint8 blockType ) :
+        mRsData( 0 ),
+        mRefCount( 0 ),
         mId( 0 ),
+        mBlockType( blockType )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsMacroblock::HlmsMacroblock() :
+        BasicBlock( BLOCK_MACRO ),
         mDepthCheck( true ),
         mDepthWrite( true ),
         mDepthFunc( CMPF_LESS_EQUAL ),
@@ -48,20 +56,20 @@ namespace Ogre
         mAlphaToCoverageEnabled( false ),
         mScissorTestEnabled( false ),
         mCullMode( CULL_CLOCKWISE ),
-        mPolygonMode( PM_SOLID ),
-        mRsData( 0 )
+        mPolygonMode( PM_SOLID )
     {
     }
+    //-----------------------------------------------------------------------------------
     HlmsBlendblock::HlmsBlendblock() :
-        mId( 0 ),
+        BasicBlock( BLOCK_BLEND ),
+        mIsTransparent( false ),
         mSeparateBlend( false ),
         mSourceBlendFactor( SBF_ONE ),
         mDestBlendFactor( SBF_ZERO ),
         mSourceBlendFactorAlpha( SBF_ONE ),
         mDestBlendFactorAlpha( SBF_ZERO ),
         mBlendOperation( SBO_ADD ),
-        mBlendOperationAlpha( SBO_ADD ),
-        mRsData( 0 )
+        mBlendOperationAlpha( SBO_ADD )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -74,11 +82,6 @@ namespace Ogre
         mTextureHash( 0 ),
         mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
         mType( creator->getType() ),
-        mIsTransparent( !( blendblock->mDestBlendFactor == SBF_ZERO &&
-                           blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
-                           blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
-                           blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
-                           blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA ) ),
         mMacroblock( macroblock ),
         mBlendblock( blendblock ),
         mAlphaTest( false ),
@@ -91,16 +94,53 @@ namespace Ogre
         assert( mLinkedRenderables.empty() &&
                 "This Datablock is still being used by some Renderables."
                 " Change their Datablocks before destroying this." );
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        if( hlmsManager )
+        {
+            hlmsManager->destroyMacroblock( mMacroblock );
+            hlmsManager->destroyBlendblock( mBlendblock );
+        }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsDatablock::setBlendblock( HlmsBlendblock const *blendblock )
+    void HlmsDatablock::setMacroblock( const HlmsMacroblock &macroblock )
     {
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        const HlmsMacroblock *oldBlock = mMacroblock;
+        mMacroblock = hlmsManager->getMacroblock( macroblock );
+
+        hlmsManager->destroyMacroblock( oldBlock );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsDatablock::setMacroblock( const HlmsMacroblock *macroblock )
+    {
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        hlmsManager->addReference( macroblock );
+        if( mMacroblock )
+            hlmsManager->destroyMacroblock( mMacroblock );
+        mMacroblock = macroblock;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsDatablock::setBlendblock( const HlmsBlendblock &blendblock )
+    {
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        const HlmsBlendblock *oldBlock = mBlendblock;
+        mBlendblock = hlmsManager->getBlendblock( blendblock );
+
+        hlmsManager->destroyBlendblock( oldBlock );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsDatablock::setBlendblock( const HlmsBlendblock *blendblock )
+    {
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        hlmsManager->addReference( blendblock );
+        if( mBlendblock )
+            hlmsManager->destroyBlendblock( mBlendblock );
         mBlendblock = blendblock;
-        mIsTransparent = !( blendblock->mDestBlendFactor == SBF_ZERO &&
-                            blendblock->mSourceBlendFactor != SBF_DEST_COLOUR &&
-                            blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
-                            blendblock->mSourceBlendFactor != SBF_DEST_ALPHA &&
-                            blendblock->mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA );
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::_linkRenderable( Renderable *renderable )

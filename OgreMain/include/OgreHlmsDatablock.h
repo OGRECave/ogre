@@ -41,13 +41,30 @@ namespace Ogre
     *  @{
     */
 
+    enum HlmsBasicBlock
+    {
+        BLOCK_MACRO,
+        BLOCK_BLEND,
+        BLOCK_SAMPLER,
+        NUM_BASIC_BLOCKS,
+    };
+
+    struct _OgreExport BasicBlock
+    {
+        void        *mRsData;       ///Render-System specific data
+        uint16      mRefCount;
+        uint16      mId;
+        uint8       mBlockType;
+
+        BasicBlock( uint8 blockType );
+    };
+
     /** A macro block contains settings that will rarely change, and thus are common to many materials.
         This is very analogous to D3D11_RASTERIZER_DESC. @See HlmsDatablock
         Up to 32 different blocks are allowed!
     */
-    struct _OgreExport HlmsMacroblock
+    struct _OgreExport HlmsMacroblock : public BasicBlock
     {
-        uint8               mId;
         bool                mDepthCheck;
         bool                mDepthWrite;
         CompareFunction     mDepthFunc;
@@ -74,7 +91,6 @@ namespace Ogre
         bool                mScissorTestEnabled;
         CullingMode         mCullMode;
         PolygonMode         mPolygonMode;
-        void                *mRsData;       ///Render-System specific data
 
         HlmsMacroblock();
 
@@ -95,9 +111,10 @@ namespace Ogre
               Transparent materials are sorted differently than opaque ones.
         Up to 32 different blocks are allowed!
     */
-    struct _OgreExport HlmsBlendblock
+    struct _OgreExport HlmsBlendblock : public BasicBlock
     {
-        uint8               mId;
+        /// This value calculated by HlmsManager::getBlendblock
+        bool                mIsTransparent;
         /// Used to determine if separate alpha blending should be used for color and alpha channels
         bool                mSeparateBlend;
 
@@ -109,8 +126,6 @@ namespace Ogre
         // Blending operations
         SceneBlendOperation mBlendOperation;
         SceneBlendOperation mBlendOperationAlpha;
-
-        void                *mRsData;       ///Render-System specific data
 
         HlmsBlendblock();
 
@@ -144,6 +159,7 @@ namespace Ogre
     */
     class _OgreExport HlmsDatablock : public PassAlloc
     {
+        friend class RenderQueue;
     protected:
         //Non-hot variables first (can't put them last as HlmsDatablock may be derived and
         //it's better if mShadowConstantBias is together with the derived type's variables
@@ -165,10 +181,10 @@ namespace Ogre
         uint32  mTextureHash;       //TextureHash comes before macroblock for alignment reasons
         uint16  mMacroblockHash;    //Not all bits are used
         uint8   mType;              /// @See HlmsTypes
-        bool    mIsTransparent;     /// Cached based on mBlendblock data
-        HlmsMacroblock const *mMacroblock;
-        HlmsBlendblock const *mBlendblock;  ///Don't set this directly, use @setBlendblock
     protected:
+        HlmsMacroblock const *mMacroblock;
+        HlmsBlendblock const *mBlendblock;
+
         bool    mAlphaTest;
     public:
         float   mAlphaTestThreshold;
@@ -187,8 +203,40 @@ namespace Ogre
         IdString getName(void) const                { return mName; }
         Hlms* getCreator(void) const                { return mCreator; }
 
-        /// Call this function to set mBlendblock & mIsTransparent automatically based on input
-        void setBlendblock( HlmsBlendblock const *blendblock );
+        /** Sets a new macroblock that matches the same parameter as the input.
+            Decreases the reference count of the previously set one.
+            Runs an O(N) search to get the right block.
+        @param macroblock
+            @See HlmsManager::getMacroblock
+        */
+        void setMacroblock( const HlmsMacroblock &macroblock );
+
+        /** Sets the macroblock from the given pointer that was already
+            retrieved from the HlmsManager. Unlike the other overload,
+            this operation is O(1).
+        @param macroblock
+            A valid block. The reference count is increased inside this function.
+        */
+        void setMacroblock( const HlmsMacroblock *macroblock );
+
+        /** Sets a new blendblock that matches the same parameter as the input.
+            Decreases the reference count of the previous mBlendblock.
+            Runs an O(N) search to get the right block.
+        @param blendblock
+            @See HlmsManager::getBlendblock
+        */
+        void setBlendblock( const HlmsBlendblock &blendblock );
+
+        /** Sets the blendblock from the given pointer that was already
+            retrieved from the HlmsManager. Unlike the other overload,
+            this operation is O(1).
+        @param blendblock
+            A valid block. The reference count is increased inside this function.
+        */
+        void setBlendblock( const HlmsBlendblock *blendblock );
+
+        const HlmsMacroblock* getMacroblock(void) const                 { return mMacroblock; }
+        const HlmsBlendblock* getBlendblock(void) const                 { return mBlendblock; }
 
         void _linkRenderable( Renderable *renderable );
         void _unlinkRenderable( Renderable *renderable );

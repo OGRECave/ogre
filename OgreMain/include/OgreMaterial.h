@@ -423,7 +423,7 @@ namespace Ogre {
             property there.
         @see Pass::setMacroblock
         */
-        void setMacroblock( const HlmsMacroblock *macroblock );
+        void setMacroblock( const HlmsMacroblock &macroblock );
 
         /** Sets whether or not colour buffer writing is enabled for each Pass.
         @note
@@ -490,7 +490,7 @@ namespace Ogre {
             property there.
         @see Pass::setBlendblock
         */
-        void setBlendblock( const HlmsBlendblock *blendblock );
+        void setBlendblock( const HlmsBlendblock &blendblock );
 
         /** Tells the material that it needs recompilation. */
         void _notifyNeedsRecompile(void);

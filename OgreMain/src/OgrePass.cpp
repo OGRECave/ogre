@@ -182,8 +182,8 @@ namespace Ogre {
         mFogDensity = oth.mFogDensity;
 
         // The datablock belongs to us, so we don't copy everything (overwrites critical data)
-        mDatablock->mMacroblock = oth.mDatablock->mMacroblock;
-        mDatablock->setBlendblock( oth.mDatablock->mBlendblock );
+        mDatablock->setMacroblock( oth.mDatablock->getMacroblock() );
+        mDatablock->setBlendblock( oth.mDatablock->getBlendblock() );
 
         mAlphaRejectFunc = oth.mAlphaRejectFunc;
         mAlphaRejectVal = oth.mAlphaRejectVal;
@@ -770,29 +770,29 @@ namespace Ogre {
         return mDatablock;
     }
     //-----------------------------------------------------------------------
-    void Pass::setMacroblock( const HlmsMacroblock *macroblock )
+    void Pass::setMacroblock( const HlmsMacroblock &macroblock )
     {
-        mDatablock->mMacroblock = macroblock;
+        mDatablock->setMacroblock( macroblock );
     }
     //-----------------------------------------------------------------------
     const HlmsMacroblock* Pass::getMacroblock(void) const
     {
-        return mDatablock->mMacroblock;
+        return mDatablock->getMacroblock();
     }
     //-----------------------------------------------------------------------
-    void Pass::setBlendblock( const HlmsBlendblock *blendblock )
+    void Pass::setBlendblock( const HlmsBlendblock &blendblock )
     {
         mDatablock->setBlendblock( blendblock );
     }
     //-----------------------------------------------------------------------
     const HlmsBlendblock* Pass::getBlendblock(void) const
     {
-        return mDatablock->mBlendblock;
+        return mDatablock->getBlendblock();
     }
     //-----------------------------------------------------------------------
     bool Pass::isTransparent(void) const
     {
-        return mDatablock->mIsTransparent;
+        return mDatablock->getBlendblock()->mIsTransparent;
     }
     //-----------------------------------------------------------------------
     void Pass::setAlphaRejectFunction(CompareFunction func)

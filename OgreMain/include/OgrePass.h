@@ -685,7 +685,7 @@ namespace Ogre {
         HlmsDatablock* _getDatablock(void) const;
 
         /// Changes the current macroblock for a new one. Pointer can't be null
-        void setMacroblock( const HlmsMacroblock *macroblock );
+        void setMacroblock( const HlmsMacroblock &macroblock );
 
         /** Retrieves current macroblock. Don't const_cast the return value to modify it.
             @See HlmsDatablock remarks.
@@ -693,7 +693,7 @@ namespace Ogre {
         const HlmsMacroblock* getMacroblock(void) const;
 
         /// Changes the current blendblock for a new one. Pointer can't be null
-        void setBlendblock( const HlmsBlendblock *blendblock );
+        void setBlendblock( const HlmsBlendblock &blendblock );
 
         /** Retrieves current blendblock. Don't const_cast the return value to modify it.
             @See HlmsDatablock remarks.

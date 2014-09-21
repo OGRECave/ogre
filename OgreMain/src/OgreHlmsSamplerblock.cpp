@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     HlmsSamplerblock::HlmsSamplerblock() :
-        mId( 0 ),
+        BasicBlock( BLOCK_SAMPLER ),
         mMinFilter( FO_LINEAR ),
         mMagFilter( FO_LINEAR ),
         mMipFilter( FO_LINEAR ),

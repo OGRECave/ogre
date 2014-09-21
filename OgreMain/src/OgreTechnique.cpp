@@ -753,7 +753,7 @@ namespace Ogre {
         }
     }
     // --------------------------------------------------------------------
-    void Technique::setMacroblock( const HlmsMacroblock *macroblock )
+    void Technique::setMacroblock( const HlmsMacroblock &macroblock )
     {
         Passes::iterator i, iend;
         iend = mPasses.end();
@@ -763,7 +763,7 @@ namespace Ogre {
         }
     }
     // --------------------------------------------------------------------
-    void Technique::setBlendblock( const HlmsBlendblock *blendblock )
+    void Technique::setBlendblock( const HlmsBlendblock &blendblock )
     {
         Passes::iterator i, iend;
         iend = mPasses.end();

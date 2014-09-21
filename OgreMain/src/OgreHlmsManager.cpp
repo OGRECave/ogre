@@ -40,31 +40,35 @@ namespace Ogre
     {
         memset( mRegisteredHlms, 0, sizeof( mRegisteredHlms ) );
         memset( mDeleteRegisteredOnExit, 0, sizeof( mDeleteRegisteredOnExit ) );
+        memset( mBlocks, 0, sizeof( mBlocks ) );
 
         mTextureManager = OGRE_NEW HlmsTextureManager();
 
-        mActiveMacroblocks.reserve( OGRE_HLMS_NUM_MACROBLOCKS );
-        mFreeMacroblockIds.reserve( OGRE_HLMS_NUM_MACROBLOCKS );
+        mActiveBlocks[BLOCK_MACRO].reserve( OGRE_HLMS_NUM_MACROBLOCKS );
+        mFreeBlockIds[BLOCK_MACRO].reserve( OGRE_HLMS_NUM_MACROBLOCKS );
         for( uint8 i=0; i<OGRE_HLMS_NUM_MACROBLOCKS; ++i )
         {
             mMacroblocks[i].mId = i;
-            mFreeMacroblockIds.push_back( (OGRE_HLMS_NUM_MACROBLOCKS - 1) - i );
+            mBlocks[BLOCK_MACRO][i] = &mMacroblocks[i];
+            mFreeBlockIds[BLOCK_MACRO].push_back( (OGRE_HLMS_NUM_MACROBLOCKS - 1) - i );
         }
 
-        mActiveBlendblocks.reserve( OGRE_HLMS_NUM_BLENDBLOCKS );
-        mFreeBlendblockIds.reserve( OGRE_HLMS_NUM_BLENDBLOCKS );
+        mActiveBlocks[BLOCK_BLEND].reserve( OGRE_HLMS_NUM_BLENDBLOCKS );
+        mFreeBlockIds[BLOCK_BLEND].reserve( OGRE_HLMS_NUM_BLENDBLOCKS );
         for( uint8 i=0; i<OGRE_HLMS_NUM_BLENDBLOCKS; ++i )
         {
             mBlendblocks[i].mId = i;
-            mFreeBlendblockIds.push_back( (OGRE_HLMS_NUM_BLENDBLOCKS - 1) - i );
+            mBlocks[BLOCK_BLEND][i] = &mBlendblocks[i];
+            mFreeBlockIds[BLOCK_BLEND].push_back( (OGRE_HLMS_NUM_BLENDBLOCKS - 1) - i );
         }
 
-        mActiveSamplerblocks.reserve( OGRE_HLMS_NUM_SAMPLERBLOCKS );
-        mFreeSamplerblockIds.reserve( OGRE_HLMS_NUM_SAMPLERBLOCKS );
+        mActiveBlocks[BLOCK_SAMPLER].reserve( OGRE_HLMS_NUM_SAMPLERBLOCKS );
+        mFreeBlockIds[BLOCK_SAMPLER].reserve( OGRE_HLMS_NUM_SAMPLERBLOCKS );
         for( uint8 i=0; i<OGRE_HLMS_NUM_SAMPLERBLOCKS; ++i )
         {
             mSamplerblocks[i].mId = i;
-            mFreeSamplerblockIds.push_back( (OGRE_HLMS_NUM_SAMPLERBLOCKS - 1) - i );
+            mBlocks[BLOCK_SAMPLER][i] = &mSamplerblocks[i];
+            mFreeBlockIds[BLOCK_SAMPLER].push_back( (OGRE_HLMS_NUM_SAMPLERBLOCKS - 1) - i );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -89,17 +93,64 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsManager::addReference( const BasicBlock *block )
+    {
+        BasicBlock *realBlock = mBlocks[block->mBlockType][block->mId];
+        if( realBlock != block )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                         "The block wasn't created with this manager!",
+                         "HlmsManager::addReference" );
+        }
+
+        ++realBlock->mRefCount;
+    }
+    //-----------------------------------------------------------------------------------
+    uint16 HlmsManager::getFreeBasicBlock( uint8 type )
+    {
+        if( mFreeBlockIds[type].empty() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                         "Can't have more than " +
+                         StringConverter::toString( mActiveBlocks[type].size() ) +
+                         " active blocks! You have too "
+                         "many materials with different rasterizer state, "
+                         "blending state, or sampler state parameters.",
+                         "HlmsManager::getFreeBasicBlock" );
+        }
+
+        size_t idx = mFreeBlockIds[type].back();
+        mFreeBlockIds[type].pop_back();
+
+        mActiveBlocks[type].push_back( idx );
+
+        return idx;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::destroyBasicBlock( BasicBlock *block )
+    {
+        block->mRsData = 0;
+
+        BlockIdxVec::iterator itor = std::find( mActiveBlocks[block->mBlockType].begin(),
+                                                mActiveBlocks[block->mBlockType].end(),
+                                                block->mId );
+        assert( itor != mActiveBlocks[block->mBlockType].end() );
+        mActiveBlocks[block->mBlockType].erase( itor );
+
+        mFreeBlockIds[block->mBlockType].push_back( block->mId );
+    }
+    //-----------------------------------------------------------------------------------
     const HlmsMacroblock* HlmsManager::getMacroblock( const HlmsMacroblock &baseParams )
     {
         assert( mRenderSystem && "A render system must be selected first!" );
 
-        BlockIdxVec::iterator itor = mActiveMacroblocks.begin();
-        BlockIdxVec::iterator end  = mActiveMacroblocks.end();
+        BlockIdxVec::iterator itor = mActiveBlocks[BLOCK_MACRO].begin();
+        BlockIdxVec::iterator end  = mActiveBlocks[BLOCK_MACRO].end();
 
         while( itor != end && mMacroblocks[*itor] != baseParams )
             ++itor;
 
-        HlmsMacroblock const * retVal = 0;
+        HlmsMacroblock *retVal = 0;
         if( itor != end )
         {
             //Already exists
@@ -107,24 +158,17 @@ namespace Ogre
         }
         else
         {
-            if( mFreeMacroblockIds.empty() )
-            {
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-                             "Can't have more than 32 active macroblocks! You have too "
-                             "many materials with different rasterizer state parameters.",
-                             "HlmsManager::getMacroblock" );
-            }
-
-            size_t idx = mFreeMacroblockIds.back();
-            mFreeMacroblockIds.pop_back();
+            size_t idx = getFreeBasicBlock( BLOCK_MACRO );
 
             mMacroblocks[idx] = baseParams;
             mMacroblocks[idx].mId = idx; //Restore the ID which has just been overwritten.
             mRenderSystem->_hlmsMacroblockCreated( &mMacroblocks[idx] );
-            mActiveMacroblocks.push_back( idx );
 
             retVal = &mMacroblocks[idx];
         }
+
+        assert( retVal->mRefCount < 0xFFFF && "Reference count overflow!" );
+        ++retVal->mRefCount;
 
         return retVal;
     }
@@ -138,28 +182,26 @@ namespace Ogre
                          "HlmsManager::destroyMacroblock" );
         }
 
-        mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[macroblock->mId] );
-        mMacroblocks[macroblock->mId].mRsData = 0;
+        --mMacroblocks[macroblock->mId].mRefCount;
 
-        BlockIdxVec::iterator itor = std::find( mActiveMacroblocks.begin(), mActiveMacroblocks.end(),
-                                                macroblock->mId );
-        assert( itor != mActiveMacroblocks.end() );
-        mActiveMacroblocks.erase( itor );
-
-        mFreeMacroblockIds.push_back( macroblock->mId );
+        if( !mMacroblocks[macroblock->mId].mRefCount )
+        {
+            mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[macroblock->mId] );
+            destroyBasicBlock( &mMacroblocks[macroblock->mId] );
+        }
     }
     //-----------------------------------------------------------------------------------
     const HlmsBlendblock* HlmsManager::getBlendblock( const HlmsBlendblock &baseParams )
     {
         assert( mRenderSystem && "A render system must be selected first!" );
 
-        BlockIdxVec::iterator itor = mActiveBlendblocks.begin();
-        BlockIdxVec::iterator end  = mActiveBlendblocks.end();
+        BlockIdxVec::iterator itor = mActiveBlocks[BLOCK_BLEND].begin();
+        BlockIdxVec::iterator end  = mActiveBlocks[BLOCK_BLEND].end();
 
         while( itor != end && mBlendblocks[*itor] != baseParams )
             ++itor;
 
-        HlmsBlendblock const * retVal = 0;
+        HlmsBlendblock *retVal = 0;
         if( itor != end )
         {
             //Already exists
@@ -167,24 +209,23 @@ namespace Ogre
         }
         else
         {
-            if( mFreeBlendblockIds.empty() )
-            {
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-                             "Can't have more than 32 active Blendblocks! You have too "
-                             "many materials with different blend state parameters.",
-                             "HlmsManager::getBlendblock" );
-            }
-
-            size_t idx = mFreeBlendblockIds.back();
-            mFreeBlendblockIds.pop_back();
+            size_t idx = getFreeBasicBlock( BLOCK_BLEND );
 
             mBlendblocks[idx] = baseParams;
+            mBlendblocks[idx].mId = idx; //Restore the ID which has just been overwritten.
+            mBlendblocks[idx].mIsTransparent =
+                     !( baseParams.mDestBlendFactor == SBF_ZERO &&
+                        baseParams.mSourceBlendFactor != SBF_DEST_COLOUR &&
+                        baseParams.mSourceBlendFactor != SBF_ONE_MINUS_DEST_COLOUR &&
+                        baseParams.mSourceBlendFactor != SBF_DEST_ALPHA &&
+                        baseParams.mSourceBlendFactor != SBF_ONE_MINUS_DEST_ALPHA );
             mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[idx] );
-            mActiveBlendblocks.push_back( idx );
-
 
             retVal = &mBlendblocks[idx];
         }
+
+        assert( retVal->mRefCount < 0xFFFF && "Reference count overflow!" );
+        ++retVal->mRefCount;
 
         return retVal;
     }
@@ -198,15 +239,13 @@ namespace Ogre
                          "HlmsManager::destroyBlendblock" );
         }
 
-        mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[blendblock->mId] );
-        mBlendblocks[blendblock->mId].mRsData = 0;
+        --mBlendblocks[blendblock->mId].mRefCount;
 
-        BlockIdxVec::iterator itor = std::find( mActiveBlendblocks.begin(), mActiveBlendblocks.end(),
-                                                blendblock->mId );
-        assert( itor != mActiveBlendblocks.end() );
-        mActiveBlendblocks.erase( itor );
-
-        mFreeBlendblockIds.push_back( blendblock->mId );
+        if( !mBlendblocks[blendblock->mId].mRefCount )
+        {
+            mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[blendblock->mId] );
+            destroyBasicBlock( &mBlendblocks[blendblock->mId] );
+        }
     }
     //-----------------------------------------------------------------------------------
     const HlmsSamplerblock* HlmsManager::getSamplerblock( HlmsSamplerblock baseParams )
@@ -235,13 +274,13 @@ namespace Ogre
                                                    " They've been corrected." );
         }
 
-        BlockIdxVec::iterator itor = mActiveSamplerblocks.begin();
-        BlockIdxVec::iterator end  = mActiveSamplerblocks.end();
+        BlockIdxVec::iterator itor = mActiveBlocks[BLOCK_SAMPLER].begin();
+        BlockIdxVec::iterator end  = mActiveBlocks[BLOCK_SAMPLER].end();
 
         while( itor != end && mSamplerblocks[*itor] != baseParams )
             ++itor;
 
-        HlmsSamplerblock const * retVal = 0;
+        HlmsSamplerblock *retVal = 0;
         if( itor != end )
         {
             //Already exists
@@ -249,25 +288,17 @@ namespace Ogre
         }
         else
         {
-            if( mFreeSamplerblockIds.empty() )
-            {
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
-                             "Can't have more than " +
-                             StringConverter::toString( OGRE_HLMS_NUM_SAMPLERBLOCKS ) +
-                             " active Samplerblocks! You have too "
-                             "many materials with different Sampler state parameters.",
-                             "HlmsManager::getSamplerblock" );
-            }
-
-            size_t idx = mFreeSamplerblockIds.back();
-            mFreeSamplerblockIds.pop_back();
+            size_t idx = getFreeBasicBlock( BLOCK_SAMPLER );
 
             mSamplerblocks[idx] = baseParams;
+            mSamplerblocks[idx].mId = idx; //Restore the ID which has just been overwritten.
             mRenderSystem->_hlmsSamplerblockCreated( &mSamplerblocks[idx] );
-            mActiveSamplerblocks.push_back( idx );
 
             retVal = &mSamplerblocks[idx];
         }
+
+        assert( retVal->mRefCount < 0xFFFF && "Reference count overflow!" );
+        ++retVal->mRefCount;
 
         return retVal;
     }
@@ -281,15 +312,13 @@ namespace Ogre
                          "HlmsManager::destroySamplerblock" );
         }
 
-        mRenderSystem->_hlmsSamplerblockDestroyed( &mSamplerblocks[samplerblock->mId] );
-        mSamplerblocks[samplerblock->mId].mRsData = 0;
+        --mSamplerblocks[samplerblock->mId].mRefCount;
 
-        BlockIdxVec::iterator itor = std::find( mActiveSamplerblocks.begin(), mActiveSamplerblocks.end(),
-                                                samplerblock->mId );
-        assert( itor != mActiveSamplerblocks.end() );
-        mActiveSamplerblocks.erase( itor );
-
-        mFreeSamplerblockIds.push_back( samplerblock->mId );
+        if( !mSamplerblocks[samplerblock->mId].mRefCount )
+        {
+            mRenderSystem->_hlmsSamplerblockDestroyed( &mSamplerblocks[samplerblock->mId] );
+            destroyBasicBlock( &mSamplerblocks[samplerblock->mId] );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::_datablockAdded( HlmsDatablock *datablock )
@@ -384,13 +413,13 @@ namespace Ogre
     {
         if( mRenderSystem )
         {
-            BlockIdxVec::const_iterator itor = mActiveMacroblocks.begin();
-            BlockIdxVec::const_iterator end  = mActiveMacroblocks.end();
+            BlockIdxVec::const_iterator itor = mActiveBlocks[BLOCK_MACRO].begin();
+            BlockIdxVec::const_iterator end  = mActiveBlocks[BLOCK_MACRO].end();
             while( itor != end )
                 mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[*itor++] );
 
-            itor = mActiveBlendblocks.begin();
-            end  = mActiveBlendblocks.end();
+            itor = mActiveBlocks[BLOCK_BLEND].begin();
+            end  = mActiveBlocks[BLOCK_BLEND].end();
             while( itor != end )
                 mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[*itor++] );
         }
@@ -403,13 +432,13 @@ namespace Ogre
 
         if( mRenderSystem )
         {
-            BlockIdxVec::const_iterator itor = mActiveMacroblocks.begin();
-            BlockIdxVec::const_iterator end  = mActiveMacroblocks.end();
+            BlockIdxVec::const_iterator itor = mActiveBlocks[BLOCK_MACRO].begin();
+            BlockIdxVec::const_iterator end  = mActiveBlocks[BLOCK_MACRO].end();
             while( itor != end )
                 mRenderSystem->_hlmsMacroblockCreated( &mMacroblocks[*itor++] );
 
-            itor = mActiveBlendblocks.begin();
-            end  = mActiveBlendblocks.end();
+            itor = mActiveBlocks[BLOCK_BLEND].begin();
+            end  = mActiveBlocks[BLOCK_BLEND].end();
             while( itor != end )
                 mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[*itor++] );
         }

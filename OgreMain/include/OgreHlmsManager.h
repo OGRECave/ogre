@@ -46,22 +46,22 @@ namespace Ogre
 #define OGRE_HLMS_NUM_BLENDBLOCKS 32
 #define OGRE_HLMS_NUM_SAMPLERBLOCKS 64
 
+//Biggest value between all three
+#define OGRE_HLMS_MAX_BASIC_BLOCKS OGRE_HLMS_NUM_SAMPLERBLOCKS
+
     /** HLMS stands for "High Level Material System". */
     class _OgreExport HlmsManager : public PassAlloc
     {
         Hlms    *mRegisteredHlms[HLMS_MAX];
         bool    mDeleteRegisteredOnExit[HLMS_MAX];
 
-        typedef vector<uint8>::type BlockIdxVec;
+        typedef vector<uint16>::type BlockIdxVec;
         HlmsMacroblock      mMacroblocks[OGRE_HLMS_NUM_MACROBLOCKS];
         HlmsBlendblock      mBlendblocks[OGRE_HLMS_NUM_BLENDBLOCKS];
         HlmsSamplerblock    mSamplerblocks[OGRE_HLMS_NUM_SAMPLERBLOCKS];
-        BlockIdxVec         mActiveMacroblocks;
-        BlockIdxVec         mActiveBlendblocks;
-        BlockIdxVec         mActiveSamplerblocks;
-        BlockIdxVec         mFreeMacroblockIds;
-        BlockIdxVec         mFreeBlendblockIds;
-        BlockIdxVec         mFreeSamplerblockIds;
+        BlockIdxVec         mActiveBlocks[NUM_BASIC_BLOCKS];
+        BlockIdxVec         mFreeBlockIds[NUM_BASIC_BLOCKS];
+        BasicBlock          *mBlocks[NUM_BASIC_BLOCKS][OGRE_HLMS_MAX_BASIC_BLOCKS];
 
         RenderSystem        *mRenderSystem;
 
@@ -73,10 +73,15 @@ namespace Ogre
         HlmsTypes           mDefaultHlmsType;
 
         void renderSystemDestroyAllBlocks(void);
+        uint16 getFreeBasicBlock( uint8 type );
+        void destroyBasicBlock( BasicBlock *block );
 
     public:
         HlmsManager();
         virtual ~HlmsManager();
+
+        /// Increments the reference count for the block, despite being const.
+        void addReference( const BasicBlock *block );
 
         /// Returns a registered HLMS based on type. May be null.
         Hlms* getHlms( HlmsTypes type )                 { return mRegisteredHlms[type]; }
@@ -85,6 +90,9 @@ namespace Ogre
             returns the existing one.
         @par
             Macroblocks are destroyed by the HlmsManager. Don't try to delete them manually.
+        @par
+            Macroblocks are manually reference counted. They increment with each getMacroblock call.
+            Make sure to call destroyMacroblock after you're done using it.
         @par
             Up to 32 different macroblocks are supported at the same time.
         @param baseParams
@@ -100,15 +108,16 @@ namespace Ogre
         */
         const HlmsMacroblock* getMacroblock( const HlmsMacroblock &baseParams );
 
-        /// Destroys a macroblock created by @getMacroblock. Note it performs an O(N) search,
-        /// but N <= OGRE_HLMS_NUM_MACROBLOCKS
+        /// Destroys a macroblock created by @getMacroblock. Blocks are manually reference counted
+        /// and calling this function will decrease the count.
+        /// The object will actually be destroyed when the count reaches 0.
+        /// When count reaches 0, it will perform an O(N) search but N <= OGRE_HLMS_NUM_MACROBLOCKS
         void destroyMacroblock( const HlmsMacroblock *macroblock );
 
         /// @See getMacroblock. This is the same for blend states
         const HlmsBlendblock* getBlendblock( const HlmsBlendblock &baseParams );
 
-        /// Destroys a macroblock created by @getBlendblock. Note it performs
-        /// an O(N) search, but N <= OGRE_HLMS_NUM_BLENDBLOCKS
+        /// @See destroyMacroblock
         void destroyBlendblock( const HlmsBlendblock *Blendblock );
 
         /** @See getMacroblock. This is the same for Sampler states
@@ -119,8 +128,7 @@ namespace Ogre
         */
         const HlmsSamplerblock* getSamplerblock( HlmsSamplerblock baseParams );
 
-        /// Destroys a macroblock created by @getSamplerblock. Note it performs
-        /// an O(N) search, but N <= OGRE_HLMS_NUM_SamplerBLOCKS
+        /// @See destroyMacroblock
         void destroySamplerblock( const HlmsSamplerblock *Samplerblock );
 
         /** Internal function used by Hlms types to tell us a datablock has been created
