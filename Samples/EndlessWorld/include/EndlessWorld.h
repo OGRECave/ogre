@@ -36,6 +36,7 @@ same license as the rest of the engine.
 #define TERRAIN_WORLD_SIZE 12000.0f
 #define TERRAIN_SIZE 513
 #define HOLD_LOD_DISTANCE 3000.0
+#define USE_PERLIN_DEFINER 1
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -416,7 +417,7 @@ protected:
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(ENDLESS_TERRAIN_FILE_PREFIX, ENDLESS_TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
-		mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
+		mTerrainGroup->setAutoUpdateLod(TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE));
 
 		configureTerrainDefaults(l);
 
@@ -433,9 +434,12 @@ protected:
 			ENDLESS_PAGE_MIN_X, ENDLESS_PAGE_MIN_Y, 
 			ENDLESS_PAGE_MAX_X, ENDLESS_PAGE_MAX_Y);
 
+#if USE_PERLIN_DEFINER == 1
 		mPerlinNoiseTerrainGenerator = OGRE_NEW PerlinNoiseTerrainGenerator;
-		mTerrainPagedWorldSection->setDefiner( mPerlinNoiseTerrainGenerator );
-//		mTerrainPagedWorldSection->setDefiner( OGRE_NEW SimpleTerrainDefiner );
+		mTerrainPagedWorldSection->setDefiner(mPerlinNoiseTerrainGenerator);
+#else
+		mTerrainPagedWorldSection->setDefiner(OGRE_NEW SimpleTerrainDefiner);
+#endif
 
 		mTerrainGroup->freeTemporaryResources();
 
