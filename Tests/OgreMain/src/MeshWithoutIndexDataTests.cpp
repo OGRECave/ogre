@@ -27,47 +27,53 @@ THE SOFTWARE.
 */
 #include <stdio.h>
 #include "Ogre.h"
-#include "OgreProgressiveMeshGenerator.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreFileSystem.h"
 #include "OgreArchiveManager.h"
 #include "MeshWithoutIndexDataTests.h"
-#include "OgreLogManager.h"
+#include "OgreLodStrategyManager.h"
+#include "OgreLodConfig.h"
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
+#include "UnitTestSuite.h"
 
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
+#include "OgreMeshLodGenerator.h"
+#endif
+
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(MeshWithoutIndexDataTests);
+
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::setUp()
 {
-    if(LogManager::getSingletonPtr() == 0)
-        mLogManager = OGRE_NEW LogManager();
-
-	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
-    LogManager::getSingleton().setLogDetail(LL_LOW);
-	OGRE_NEW ResourceGroupManager();
-	OGRE_NEW LodStrategyManager();
+    OGRE_NEW ResourceGroupManager();
+    OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
     mMeshMgr = OGRE_NEW MeshManager();
-    archiveMgr = OGRE_NEW ArchiveManager();
-    archiveMgr->addArchiveFactory(OGRE_NEW FileSystemArchiveFactory());
+    mArchiveMgr = OGRE_NEW ArchiveManager();
+    mArchiveMgr->addArchiveFactory(OGRE_NEW FileSystemArchiveFactory());
 
-	MaterialManager* matMgr = OGRE_NEW MaterialManager();
-	matMgr->initialise();
+    MaterialManager* matMgr = OGRE_NEW MaterialManager();
+    matMgr->initialise();
 }
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::tearDown()
 {
+    OGRE_DELETE MaterialManager::getSingletonPtr();
+    OGRE_DELETE mArchiveMgr;
     OGRE_DELETE mMeshMgr;
     OGRE_DELETE mBufMgr;
-    OGRE_DELETE archiveMgr;
-	OGRE_DELETE MaterialManager::getSingletonPtr();
-	OGRE_DELETE LodStrategyManager::getSingletonPtr();
-	OGRE_DELETE ResourceGroupManager::getSingletonPtr();
-    OGRE_DELETE mLogManager;
+    OGRE_DELETE LodStrategyManager::getSingletonPtr();
+    OGRE_DELETE ResourceGroupManager::getSingletonPtr();
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testCreateSimpleLine()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     ManualObject* line = OGRE_NEW ManualObject("line");
     line->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
     line->position(0, 50, 0);
@@ -87,7 +93,7 @@ void MeshWithoutIndexDataTests::testCreateSimpleLine()
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineMesh.get(), fileName);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedLine = mMeshMgr->load(fileName, "General");
@@ -100,11 +106,15 @@ void MeshWithoutIndexDataTests::testCreateSimpleLine()
     CPPUNIT_ASSERT(rop.useIndexes == false);
     CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testCreateLineList()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     ManualObject* lineList = OGRE_NEW ManualObject("line");
     lineList->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
     lineList->position(0, 50, 0);
@@ -128,7 +138,7 @@ void MeshWithoutIndexDataTests::testCreateLineList()
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineListMesh.get(), fileName);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedLineList = mMeshMgr->load(fileName, "General");
@@ -141,11 +151,15 @@ void MeshWithoutIndexDataTests::testCreateLineList()
     CPPUNIT_ASSERT(rop.useIndexes == false);
     CPPUNIT_ASSERT(loadedLineList->getSubMesh(0)->vertexData->vertexCount == 6);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testCreateLineStrip()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     ManualObject* lineStrip = OGRE_NEW ManualObject("line");
     lineStrip->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_STRIP);
     lineStrip->position(50, 100, 0);
@@ -167,7 +181,7 @@ void MeshWithoutIndexDataTests::testCreateLineStrip()
     MeshSerializer meshWriter;
     meshWriter.exportMesh(lineStripMesh.get(), fileName);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedLineStrip = mMeshMgr->load(fileName, "General");
@@ -180,11 +194,15 @@ void MeshWithoutIndexDataTests::testCreateLineStrip()
     CPPUNIT_ASSERT(rop.useIndexes == false);
     CPPUNIT_ASSERT(loadedLineStrip->getSubMesh(0)->vertexData->vertexCount == 4);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testCreatePointList()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     ManualObject* pointList = OGRE_NEW ManualObject("line");
     pointList->begin("BaseWhiteNoLighting", RenderOperation::OT_POINT_LIST);
     pointList->position(50, 100, 0);
@@ -206,7 +224,7 @@ void MeshWithoutIndexDataTests::testCreatePointList()
     MeshSerializer meshWriter;
     meshWriter.exportMesh(pointListMesh.get(), fileName);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedPointList = mMeshMgr->load(fileName, "General");
@@ -219,11 +237,15 @@ void MeshWithoutIndexDataTests::testCreatePointList()
     CPPUNIT_ASSERT(rop.useIndexes == false);
     CPPUNIT_ASSERT(loadedPointList->getSubMesh(0)->vertexData->vertexCount == 4);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     String matName = "lineMat";
     MaterialPtr matPtr = MaterialManager::getSingleton().create(matName, "General").staticCast<Material>();
     Pass* pass = matPtr->getTechnique(0)->getPass(0);
@@ -252,7 +274,7 @@ void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
         MaterialManager::getSingleton().getByName(matName).staticCast<Material>(),
         matName + ".material");
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedLine = mMeshMgr->load(fileName, "General");
@@ -266,9 +288,9 @@ void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
     CPPUNIT_ASSERT(rop.useIndexes == false);
     CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->vertexData->vertexCount == 2);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void createMeshWithMaterial(String fileName)
 {
     String matFileNameSuffix = ".material";
@@ -327,11 +349,14 @@ void createMeshWithMaterial(String fileName)
     manObj->end();
     manObj->convertToMesh(fileName);
     OGRE_DELETE manObj;
-
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testCreateMesh()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     String fileName = "indexMix.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
@@ -341,14 +366,14 @@ void MeshWithoutIndexDataTests::testCreateMesh()
     for (int i=0; i<4; ++i)
     {
         mesh->getSubMesh(i)->_getRenderOperation(rop);
-        // first submesh has indexes; the others not
+        // First submesh has indexes, the others does not.
         CPPUNIT_ASSERT( rop.useIndexes == (i == 0) );
     }
 
     MeshSerializer meshWriter;
     meshWriter.exportMesh(mesh.get(), fileName);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedMesh = mMeshMgr->load(fileName, "General");
@@ -357,11 +382,15 @@ void MeshWithoutIndexDataTests::testCreateMesh()
 
     CPPUNIT_ASSERT(loadedMesh->getNumSubMeshes() == 4);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testCloneMesh()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     String originalName = "toClone.mesh";
     createMeshWithMaterial(originalName);
     MeshPtr mesh = mMeshMgr->getByName(originalName).staticCast<Mesh>();
@@ -373,7 +402,7 @@ void MeshWithoutIndexDataTests::testCloneMesh()
     MeshSerializer meshWriter;
     meshWriter.exportMesh(mesh.get(), fileName);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 
     ResourceGroupManager::getSingleton().addResourceLocation(".", "FileSystem");
     MeshPtr loadedMesh = mMeshMgr->load(fileName, "General");
@@ -382,11 +411,15 @@ void MeshWithoutIndexDataTests::testCloneMesh()
 
     CPPUNIT_ASSERT(loadedMesh->getNumSubMeshes() == 4);
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testEdgeList()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     String fileName = "testEdgeList.mesh";
     ManualObject* line = OGRE_NEW ManualObject("line");
     line->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
@@ -407,11 +440,15 @@ void MeshWithoutIndexDataTests::testEdgeList()
 
     remove(fileName.c_str());
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testGenerateExtremes()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     String fileName = "testGenerateExtremes.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
@@ -425,55 +462,54 @@ void MeshWithoutIndexDataTests::testGenerateExtremes()
     {
         SubMesh* subMesh = mesh->getSubMesh(i);
         // According to generateExtremes, extremes are built based upon the bounding box indices.
-        // But it also creates indices for all bbox's even if the mesh does not have any.
-        // So...there should always be some extremity points. The number of which may vary
+        // But it also creates indices for all bounding boxes even if the mesh does not have any.
+        // So...there should always be some extremity points. The number of which may vary.
         if (subMesh->indexData->indexCount > 0)
         {
             CPPUNIT_ASSERT(subMesh->extremityPoints.size() == NUM_EXTREMES);
         }
     }
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testBuildTangentVectors()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+//--------------------------------------------------------------------------
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     String fileName = "testBuildTangentVectors.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
     try
     {
-        // make sure correct exception is thrown
+        // Make sure correct exception is thrown
         mesh->buildTangentVectors();
         CPPUNIT_FAIL("Expected InvalidParametersException!");
     }
     catch (const InvalidParametersException&)
     {
-    	// ok
+        // Ok
     }
     
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
 }
-
+//--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::testGenerateLodLevels()
 {
+#ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     String fileName = "testGenerateLodLevels.mesh";
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName).staticCast<Mesh>();
 
-	LodConfig lodConfig;
-    lodConfig.levels.clear();
-    lodConfig.mesh = MeshPtr(mesh);
-    lodConfig.strategy = DistanceLodSphereStrategy::getSingletonPtr();
-    LodLevel lodLevel;
-    lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
-    lodLevel.distance = 600.0;
-    lodLevel.reductionValue = 2;
-    lodConfig.levels.push_back(lodLevel);
-    ProgressiveMeshGenerator pm;
-    pm.generateLodLevels(lodConfig);
-    // FAIL: Levels == 1
+    LodConfig lodConfig(mesh);
+    lodConfig.createGeneratedLodLevel(600, 2, LodLevel::VRM_CONSTANT);
+    MeshLodGenerator().generateLodLevels(lodConfig);
+    // It may be less then 2, when two levels have the same vertex count it will be optimized out and lodLevel.outSkipped=true
     CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
     {
@@ -482,6 +518,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
         {
             if (subMesh->indexData->indexCount > 0)
             {
+                // This may not be true for all meshes, but in this test we don't have reduced to 0.
                 CPPUNIT_ASSERT(subMesh->mLodFaceList[j]->indexCount > 0);
             }
             else
@@ -497,5 +534,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
 
     remove(fileName.c_str());
 
-    mMeshMgr->remove( fileName );
+    mMeshMgr->remove(fileName);
+#endif
 }
+//--------------------------------------------------------------------------//--------------------------------------------------------------------------
