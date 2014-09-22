@@ -863,7 +863,7 @@ bool NormalMapLighting::addPSNormalFetchInvocation(Function* psMain, const int g
 		curFuncInvocation->pushOperand(mNormalMapSampler, Operand::OPS_IN);
 
     curFuncInvocation->pushOperand(mPSInTexcoord, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_OUT, Operand::OPM_XYZ);	
+	curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_OUT);	
     psMain->addAtomInstance(curFuncInvocation);     
 
     return true;
