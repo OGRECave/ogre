@@ -328,6 +328,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "D3D11RenderWindowBase::copyContentsToMemory" );
+        }
+
         if(mpBackBuffer == NULL)
             return;
 
@@ -392,7 +399,7 @@ namespace Ogre
         mDevice.GetImmediateContext()->Map(pTempTexture2D, 0,D3D11_MAP_READ, 0, &mappedTex2D);
 
         // copy the texture to the dest
-        PixelBox src = D3D11Mappings::getPixelBoxWithMapping(mWidth, mHeight, 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D);
+        PixelBox src = D3D11Mappings::getPixelBoxWithMapping(dst.getWidth(), dst.getHeight(), 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D);
         PixelUtil::bulkPixelConversion(src, dst);
 
         // unmap the temp buffer
