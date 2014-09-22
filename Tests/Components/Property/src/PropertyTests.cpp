@@ -27,47 +27,51 @@ THE SOFTWARE.
 */
 #include "PropertyTests.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( PropertyTests );
+#include "UnitTestSuite.h"
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(PropertyTests);
+
+//--------------------------------------------------------------------------
 void PropertyTests::setUp()
 {
-
 }
-
+//--------------------------------------------------------------------------
 void PropertyTests::tearDown()
 {
 }
-
+//--------------------------------------------------------------------------
 class Foo
 {
 protected:
-	String mName;
+    String mName;
 public:
-	void setName(const String& name) { mName = name; }
-	const String& getName() const { return mName; }
+    void setName(const String& name) { mName = name; }
+    const String& getName() const { return mName; }
 };
-
+//--------------------------------------------------------------------------
 void PropertyTests::testStringProp()
 {
-	PropertyDefMap propertyDefs;
-	Foo foo;
-	PropertySet props;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
-	PropertyDefMap::iterator defi = propertyDefs.insert(PropertyDefMap::value_type("name", 
-			PropertyDef("name", 
-			"The name of the object.", PROP_STRING))).first;
+    PropertyDefMap propertyDefs;
+    Foo foo;
+    PropertySet props;
 
-	props.addProperty(
-		OGRE_NEW Property<String>(&(defi->second),
-		boost::bind(&Foo::getName, &foo), 
-		boost::bind(&Foo::setName, &foo, _1)));
+    PropertyDefMap::iterator defi = propertyDefs.insert(PropertyDefMap::value_type("name", 
+            PropertyDef("name", 
+            "The name of the object.", PROP_STRING))).first;
 
-	Ogre::String strName, strTest;
-	strTest = "A simple name";
-	props.setValue("name", strTest);
-	props.getValue("name", strName);
+    props.addProperty(
+        OGRE_NEW Property<String>(&(defi->second),
+        boost::bind(&Foo::getName, &foo), 
+        boost::bind(&Foo::setName, &foo, _1)));
 
-	CPPUNIT_ASSERT_EQUAL(strTest, strName);
+    Ogre::String strName, strTest;
+    strTest = "A simple name";
+    props.setValue("name", strTest);
+    props.getValue("name", strName);
 
+    CPPUNIT_ASSERT_EQUAL(strTest, strName);
 }
-
+//--------------------------------------------------------------------------

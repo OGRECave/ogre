@@ -25,22 +25,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __StreamSerialiserTests_H__
+#define __StreamSerialiserTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 class StreamSerialiserTests : public CppUnit::TestFixture
 {
 	// CppUnit macros for setting up the test suite
-	CPPUNIT_TEST_SUITE( StreamSerialiserTests );
+    CPPUNIT_TEST_SUITE(StreamSerialiserTests);
 	CPPUNIT_TEST(testWriteBasic);
-
 	CPPUNIT_TEST_SUITE_END();
-protected:
+
 public:
 	void setUp();
 	void tearDown();
 
 	void testWriteBasic();
-
-
 };
+
+#endif

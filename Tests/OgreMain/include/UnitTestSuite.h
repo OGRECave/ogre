@@ -26,7 +26,22 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#ifndef __UnitTestSuite_H__
+#define __UnitTestSuite_H__
 
-void setUpSuite();
+#include <cppunit/TestFixture.h>
 
-void tearDownSuite();
+#include "OgreSingleton.h"
+
+class UnitTestSuite : public Ogre::Singleton<UnitTestSuite>
+{
+public:
+    UnitTestSuite() {};
+
+    void setUpSuite();
+    void tearDownSuite();
+
+    void startTestMethod(const std::string testName);
+};
+
+#endif

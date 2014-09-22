@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __TerrainTests_H__
+#define __TerrainTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -33,6 +37,7 @@ THE SOFTWARE.
 #include "OgreFileSystemLayer.h"
 
 #include "OgreBuildSettings.h"
+
 #ifdef OGRE_STATIC_LIB
 #include "../../../../Samples/Common/include/OgreStaticPluginLoader.h"
 #endif
@@ -41,22 +46,25 @@ using namespace Ogre;
 
 class TerrainTests : public CppUnit::TestFixture
 {
-	// CppUnit macros for setting up the test suite
-	CPPUNIT_TEST_SUITE( TerrainTests );
-	CPPUNIT_TEST(testCreate);
-	CPPUNIT_TEST_SUITE_END();
+    // CppUnit macros for setting up the test suite
+    CPPUNIT_TEST_SUITE(TerrainTests);
+    CPPUNIT_TEST(testCreate);
+    CPPUNIT_TEST_SUITE_END();
 
 #ifdef OGRE_STATIC_LIB
-StaticPluginLoader mStaticPluginLoader;
+    StaticPluginLoader mStaticPluginLoader;
 #endif
 
-	Root* mRoot;
-	SceneManager* mSceneMgr;
-	TerrainGlobalOptions* mTerrainOpts;
+    Root* mRoot;
+    SceneManager* mSceneMgr;
+    TerrainGlobalOptions* mTerrainOpts;
     FileSystemLayer* mFSLayer;
 
 public:
-	void setUp();
-	void tearDown();
-	void testCreate();
+    void setUp();
+    void tearDown();
+
+    void testCreate();
 };
+
+#endif

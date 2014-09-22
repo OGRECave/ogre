@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __StringTests_H__
+#define __StringTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "OgreString.h"
@@ -32,7 +36,7 @@ THE SOFTWARE.
 class StringTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( StringTests );
+    CPPUNIT_TEST_SUITE(StringTests);
     CPPUNIT_TEST(testSplitFileNameNoPath);
     CPPUNIT_TEST(testSplitFileNameRelativePath);
     CPPUNIT_TEST(testSplitFileNameAbsolutePath);
@@ -53,21 +57,24 @@ class StringTests : public CppUnit::TestFixture
 	CPPUNIT_TEST(testParseQuaternion);
 	CPPUNIT_TEST(testParseBool);
 	CPPUNIT_TEST(testParseColourValue);
-
     CPPUNIT_TEST_SUITE_END();
+
 protected:
 	Ogre::String testFileNoPath;
 	Ogre::String testFileRelativePathWindows;
 	Ogre::String testFileRelativePathUnix;
 	Ogre::String testFileAbsolutePathWindows;
 	Ogre::String testFileAbsolutePathUnix;
+
 public:
     void setUp();
     void tearDown();
+
 	// StringUtil::splitFileName tests
     void testSplitFileNameNoPath();
     void testSplitFileNameRelativePath();
     void testSplitFileNameAbsolutePath();
+
 	// StringUtil::match tests
     void testMatchCaseSensitive();
     void testMatchCaseInSensitive();
@@ -77,6 +84,7 @@ public:
 	void testMatchGlobStartAndEnd();
 	void testMatchGlobMiddle();
 	void testMatchSuperGlobtastic();
+
 	// StringConverter tests
 	void testParseReal();
 	void testParseInt();
@@ -87,6 +95,6 @@ public:
 	void testParseQuaternion();
 	void testParseBool();
 	void testParseColourValue();
-
-
 };
+
+#endif

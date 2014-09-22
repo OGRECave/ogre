@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __FileSystemArchiveTests_H__
+#define __FileSystemArchiveTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "OgreString.h"
@@ -34,7 +38,7 @@ using namespace Ogre;
 class FileSystemArchiveTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( FileSystemArchiveTests );
+    CPPUNIT_TEST_SUITE(FileSystemArchiveTests);
     CPPUNIT_TEST(testListNonRecursive);
     CPPUNIT_TEST(testListRecursive);
     CPPUNIT_TEST(testListFileInfoNonRecursive);
@@ -47,8 +51,12 @@ class FileSystemArchiveTests : public CppUnit::TestFixture
     CPPUNIT_TEST(testReadInterleave);
 	CPPUNIT_TEST(testCreateAndRemoveFile);
     CPPUNIT_TEST_SUITE_END();
+
 protected:
-    String testPath;
+    String mTestPath;
+    size_t mFileSizeRoot1;
+    size_t mFileSizeRoot2;
+
 public:
     void setUp();
     void tearDown();
@@ -64,5 +72,6 @@ public:
     void testFileRead();
     void testReadInterleave();
 	void testCreateAndRemoveFile();
-
 };
+
+#endif

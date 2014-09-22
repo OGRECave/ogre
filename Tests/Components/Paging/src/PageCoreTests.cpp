@@ -28,82 +28,75 @@ THE SOFTWARE.
 #include "PageCoreTests.h"
 #include "OgrePaging.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
+#include "UnitTestSuite.h"
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(PageCoreTests);
+
+//--------------------------------------------------------------------------
 void PageCoreTests::setUp()
 {
-    // set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("testPageCore.log", true, false);
-	}
-    LogManager::getSingleton().setLogDetail(LL_LOW);
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
-#if OGRE_STATIC
-        mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
-#endif
-
 #ifdef OGRE_STATIC_LIB
-	mRoot = OGRE_NEW Root(StringUtil::BLANK);
-        
-	mStaticPluginLoader.load();
+    mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
+    mRoot = OGRE_NEW Root(StringUtil::BLANK);        
+    mStaticPluginLoader.load();
 #else
     String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
-	mRoot = OGRE_NEW Root(pluginsPath);
+    mRoot = OGRE_NEW Root(pluginsPath);
 #endif
 
-	mPageManager = OGRE_NEW PageManager();
+    mPageManager = OGRE_NEW PageManager();
 
-	// make certain the resource location is NOT read-only
-	ResourceGroupManager::getSingleton().addResourceLocation("./", "FileSystem",
-	    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, false, false);
+    // make certain the resource location is NOT read-only
+    ResourceGroupManager::getSingleton().addResourceLocation("./", "FileSystem",
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, false, false);
 
-	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
+    mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
 }
-
+//--------------------------------------------------------------------------
 void PageCoreTests::tearDown()
 {
-	OGRE_DELETE mPageManager;
-	OGRE_DELETE mRoot;
+    OGRE_DELETE mPageManager;
+    OGRE_DELETE mRoot;
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
-#if OGRE_STATIC
+
+#if OGRE_STATIC_LIB
     OGRE_DELETE mStaticPluginLoader;
 #endif
 }
-
-
+//--------------------------------------------------------------------------
 void PageCoreTests::testSimpleCreateSaveLoadWorld()
 {
-	String worldName = "MyWorld";
-	String filename = "myworld.world";
-	String sectionName1 = "Section1";
-	String sectionName2 = "Section2";
-	PagedWorld* world = mPageManager->createWorld(worldName);
-	PagedWorldSection* section = world->createSection("Grid2D", mSceneMgr, sectionName1);
-	section = world->createSection("Grid2D", mSceneMgr, sectionName2);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
-	// Create a page
-	Page* p = section->loadOrCreatePage(Vector3::ZERO);
+    String worldName = "MyWorld";
+    String filename = "myworld.world";
+    String sectionName1 = "Section1";
+    String sectionName2 = "Section2";
+    PagedWorld* world = mPageManager->createWorld(worldName);
+    PagedWorldSection* section = world->createSection("Grid2D", mSceneMgr, sectionName1);
+    section = world->createSection("Grid2D", mSceneMgr, sectionName2);
+
+    // Create a page
+    Page* p = section->loadOrCreatePage(Vector3::ZERO);
 
     p->createContentCollection("Simple");
 
-	world->save(filename);
+    world->save(filename);
 
-	mPageManager->destroyWorld(world);
-	world = 0;
-	world = mPageManager->loadWorld(filename);
+    mPageManager->destroyWorld(world);
+    world = 0;
+    world = mPageManager->loadWorld(filename);
 
-	CPPUNIT_ASSERT_EQUAL(worldName, world->getName());
-	CPPUNIT_ASSERT_EQUAL((size_t)2, world->getSectionCount());
+    CPPUNIT_ASSERT_EQUAL(worldName, world->getName());
+    CPPUNIT_ASSERT_EQUAL((size_t)2, world->getSectionCount());
 
-	section = world->getSection(sectionName1);
-	CPPUNIT_ASSERT(section != 0);
-	section = world->getSection(sectionName2);
-	CPPUNIT_ASSERT(section != 0);
+    section = world->getSection(sectionName1);
+    CPPUNIT_ASSERT(section != 0);
+    section = world->getSection(sectionName2);
+    CPPUNIT_ASSERT(section != 0);
 }
+//--------------------------------------------------------------------------
 

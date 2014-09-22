@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __PropertyTests_H__
+#define __PropertyTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -35,13 +39,16 @@ using namespace Ogre;
 
 class PropertyTests : public CppUnit::TestFixture
 {
-	// CppUnit macros for setting up the test suite
-	CPPUNIT_TEST_SUITE( PropertyTests );
-	CPPUNIT_TEST(testStringProp);
-	CPPUNIT_TEST_SUITE_END();
+    // CppUnit macros for setting up the test suite
+    CPPUNIT_TEST_SUITE(PropertyTests);
+    CPPUNIT_TEST(testStringProp);
+    CPPUNIT_TEST_SUITE_END();
 
 public:
-	void setUp();
-	void tearDown();
-	void testStringProp();
+    void setUp();
+    void tearDown();
+
+    void testStringProp();
 };
+
+#endif

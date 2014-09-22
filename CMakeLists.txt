@@ -512,7 +512,7 @@ endif ()
 # Setup samples
 add_subdirectory(Samples)
 
-#Add android JNI binding
+# Add android JNI binding
 if(ANDROID)
   include(toolchain/AndroidJNI)
 endif()

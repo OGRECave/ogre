@@ -30,98 +30,88 @@ THE SOFTWARE.
 #include "OgreConfigFile.h"
 #include "OgreResourceGroupManager.h"
 
+#include "UnitTestSuite.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
 #endif
 
-CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(TerrainTests);
 
+//--------------------------------------------------------------------------
 void TerrainTests::setUp()
 {
-    // set up silent logging to not pollute output
-	if(LogManager::getSingletonPtr())
-		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-
-	if(LogManager::getSingletonPtr() == 0)
-	{
-		LogManager* logManager = OGRE_NEW LogManager();
-		logManager->createLog("testTerrain.log", true, false);
-	}
-    LogManager::getSingleton().setLogDetail(LL_LOW);
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #ifdef OGRE_STATIC_LIB
-	mRoot = OGRE_NEW Root(StringUtil::BLANK);
-        
-	mStaticPluginLoader.load();
+    mRoot = OGRE_NEW Root(StringUtil::BLANK);        
+    mStaticPluginLoader.load();
 #else
     String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
-	mRoot = OGRE_NEW Root(pluginsPath);
+    mRoot = OGRE_NEW Root(pluginsPath);
 #endif
-	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
-	// Load resource paths from config file
-	ConfigFile cf;
+    mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
+
+    // Load resource paths from config file
+    ConfigFile cf;
     String resourcesPath;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-	resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#if OGRE_DEBUG_MODE
-    resourcesPath = mFSLayer->getConfigFilePath("resources_d.cfg");
-#else
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
-#endif
 #else
-	resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
+    resourcesPath = mFSLayer->getConfigFilePath("bin/resources.cfg");
 #endif
 
     cf.load(resourcesPath);
 
-	// Go through all sections & settings in the file
-	ConfigFile::SectionIterator seci = cf.getSectionIterator();
+    // Go through all sections & settings in the file
+    ConfigFile::SectionIterator seci = cf.getSectionIterator();
 
-	String secName, typeName, archName;
-	while (seci.hasMoreElements())
-	{
-		secName = seci.peekNextKey();
-		ConfigFile::SettingsMultiMap *settings = seci.getNext();
-		ConfigFile::SettingsMultiMap::iterator i;
-		for (i = settings->begin(); i != settings->end(); ++i)
-		{
-			typeName = i->first;
-			archName = i->second;
-			ResourceGroupManager::getSingleton().addResourceLocation(
-				archName, typeName, secName);
+    String secName, typeName, archName;
+    while (seci.hasMoreElements())
+    {
+        secName = seci.peekNextKey();
+        ConfigFile::SettingsMultiMap *settings = seci.getNext();
+        ConfigFile::SettingsMultiMap::iterator i;
+        for (i = settings->begin(); i != settings->end(); ++i)
+        {
+            typeName = i->first;
+            archName = i->second;
+            ResourceGroupManager::getSingleton().addResourceLocation(
+                archName, typeName, secName);
+        }
+    }
 
-		}
-	}
-
-	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
-
+    mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
 }
-
+//--------------------------------------------------------------------------
 void TerrainTests::tearDown()
 {
-	OGRE_DELETE mTerrainOpts;
-	OGRE_DELETE mRoot;
+    OGRE_DELETE mTerrainOpts;
+    OGRE_DELETE mRoot;
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
-
+//--------------------------------------------------------------------------
 void TerrainTests::testCreate()
 {
-	Terrain* t = OGRE_NEW Terrain(mSceneMgr);
-	Image img;
-	img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
-	Terrain::ImportData imp;
-	imp.inputImage = &img;
-	imp.terrainSize = 513;
-	imp.worldSize = 1000;
-	imp.minBatchSize = 33;
-	imp.maxBatchSize = 65;
-	t->prepare(imp);
-	// don't load, this requires GPU access
-	//t->load();
+    Terrain* t = OGRE_NEW Terrain(mSceneMgr);
+    Image img;
+    img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-	OGRE_DELETE t;
+    Terrain::ImportData imp;
+    imp.inputImage = &img;
+    imp.terrainSize = 513;
+    imp.worldSize = 1000;
+    imp.minBatchSize = 33;
+    imp.maxBatchSize = 65;
+    t->prepare(imp);
+    
+    // Note: Do not load as this would require GPU access!
+    //t->load();
+
+    OGRE_DELETE t;
 }
+//--------------------------------------------------------------------------
