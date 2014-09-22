@@ -69,6 +69,10 @@ namespace Ogre
             {
                 return left < right.offsetAfterPadding;
             }
+            bool operator () ( const StrideChanger &left, const StrideChanger &right ) const
+            {
+                return left.offsetAfterPadding < right.offsetAfterPadding;
+            }
         };
 
         typedef vector<Block>::type BlockVec;
