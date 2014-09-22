@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreStableHeaders.h"
 #include "Vao/OgreMultiSourceVertexBufferPool.h"
 #include "Vao/OgreVaoManager.h"
 
