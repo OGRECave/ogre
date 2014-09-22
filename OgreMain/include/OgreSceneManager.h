@@ -1096,6 +1096,14 @@ namespace Ogre {
         */
         virtual Camera* findCamera( IdString name ) const;
 
+        /** Finds the camera with the given name. Returns null if not found.
+        @param name
+            Hash of the name of the camera to find
+        @return
+            Camera pointer. Null if not found.
+        */
+        virtual Camera* findCameraNoThrow( IdString name ) const;
+
         /** Removes a camera from the scene.
             @remarks
                 This method removes a previously added camera from the scene.

@@ -282,15 +282,25 @@ Camera* SceneManager::createCamera( const String &name, bool isVisible, bool for
 //-----------------------------------------------------------------------
 Camera* SceneManager::findCamera( IdString name ) const
 {
-    CameraMap::const_iterator itor = mCamerasByName.find( name );
-    if( itor == mCamerasByName.end() )
+    Camera *retVal = findCameraNoThrow( name );
+    if( !retVal )
     {
-        OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, 
+        OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
                      "Camera with name '" + name.getFriendlyText() + "' not found",
                      "SceneManager::findCamera" );
     }
 
-    return itor->second;
+    return retVal;
+}
+//-----------------------------------------------------------------------
+Camera* SceneManager::findCameraNoThrow( IdString name ) const
+{
+    Camera *retVal = 0;
+    CameraMap::const_iterator itor = mCamerasByName.find( name );
+    if( itor != mCamerasByName.end() )
+        retVal = itor->second;
+
+    return retVal;
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyCamera(Camera *cam)
