@@ -118,6 +118,7 @@ if (OGRE_BUILD_TESTS)
     if (OGRE_CONFIG_ENABLE_ZIP)
       list(APPEND HEADER_FILES OgreMain/include/ZipArchiveTests.h)
       list(APPEND SOURCE_FILES OgreMain/src/ZipArchiveTests.cpp)
+	  file(COPY OgreMain/misc DESTINATION OgreMain/)
     endif ()
 
     if (OGRE_BUILD_COMPONENT_PAGING)
@@ -294,7 +295,7 @@ if (OGRE_BUILD_TESTS)
           )
       endif()
 	  
-	else() # not APPLE	
+	else(WIN32)
 		# Copy necessary unit test data
 				
 		if (OGRE_CONFIG_ENABLE_ZIP)

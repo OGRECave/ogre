@@ -46,8 +46,10 @@ void ZipArchiveTests::setUp()
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     mTestPath = macBundlePath() + "/Contents/Resources/Media/misc/ArchiveTest.zip";
-#else
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     mTestPath = "../../Tests/OgreMain/misc/ArchiveTest.zip";
+#else
+    mTestPath = "./Tests/OgreMain/misc/ArchiveTest.zip";
 #endif
 }
 //--------------------------------------------------------------------------
