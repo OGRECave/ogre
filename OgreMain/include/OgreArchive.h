@@ -150,13 +150,13 @@ namespace Ogre {
         @return A shared pointer to a DataStream which can be used to 
         read / write the file. 
         */
-        virtual DataStreamPtr create(const String& filename) const;
+        virtual DataStreamPtr create(const String& filename);
 
         /** Delete a named file.
         @remarks Not possible on read-only archives
         @param filename The fully qualified name of the file
         */
-        virtual void remove(const String& filename) const;
+        virtual void remove(const String& filename);
 
         /** List all file names in the archive.
         @note
