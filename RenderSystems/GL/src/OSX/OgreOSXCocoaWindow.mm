@@ -67,7 +67,7 @@ namespace Ogre {
         mUseNSView(false), mContentScalingFactor(1.0), mContentScalingSupported(false)
     {
         GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-        mContentScalingSupported = dynamic_cast<OSXGLSupport*>(rs->getGLSupportRef())->OSVersionIsAtLeast("10.7");
+        mContentScalingSupported = dynamic_cast<OSXGLSupport*>(rs->getGLSupportRef())->OSVersionIsAtLeast(NSAppKitVersionNumber10_7);
     }
 
     OSXCocoaWindow::~OSXCocoaWindow()
