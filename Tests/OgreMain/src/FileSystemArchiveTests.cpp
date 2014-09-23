@@ -45,7 +45,7 @@ void FileSystemArchiveTests::setUp()
     mFileSizeRoot1 = 125;
     mFileSizeRoot2 = 150;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mTestPath = "../../Tests/OgreMain/misc/ArchiveTest";
+    mTestPath = "./Tests/OgreMain/misc/ArchiveTest";
     mFileSizeRoot1 = 130;
     mFileSizeRoot2 = 156;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
