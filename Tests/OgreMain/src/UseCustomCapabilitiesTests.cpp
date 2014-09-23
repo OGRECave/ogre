@@ -45,6 +45,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(UseCustomCapabilitiesTests);
 //--------------------------------------------------------------------------
 void UseCustomCapabilitiesTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     using namespace Ogre;
 
     if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())

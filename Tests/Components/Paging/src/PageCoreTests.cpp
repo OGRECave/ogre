@@ -36,6 +36,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(PageCoreTests);
 //--------------------------------------------------------------------------
 void PageCoreTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #ifdef OGRE_STATIC_LIB

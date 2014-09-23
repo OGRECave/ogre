@@ -41,6 +41,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(StreamSerialiserTests);
 //--------------------------------------------------------------------------
 void StreamSerialiserTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
 }
 //--------------------------------------------------------------------------
 void StreamSerialiserTests::tearDown()

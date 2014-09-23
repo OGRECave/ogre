@@ -39,7 +39,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(RadixSortTests);
 //--------------------------------------------------------------------------
 void RadixSortTests::setUp()
 {
-	srand(time(0));
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
 }
 //--------------------------------------------------------------------------
 void RadixSortTests::tearDown()

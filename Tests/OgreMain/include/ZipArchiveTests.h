@@ -66,7 +66,6 @@ public:
     void testFindFileInfoRecursive();
     void testFileRead();
     void testReadInterleave();
-
 };
 
 #endif

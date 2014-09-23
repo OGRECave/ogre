@@ -40,6 +40,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(VectorTests);
 //--------------------------------------------------------------------------
 void VectorTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
 }
 //--------------------------------------------------------------------------
 void VectorTests::tearDown()

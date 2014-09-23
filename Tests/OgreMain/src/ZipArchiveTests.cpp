@@ -44,6 +44,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION( ZipArchiveTests );
 //--------------------------------------------------------------------------
 void ZipArchiveTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     mTestPath = macBundlePath() + "/Contents/Resources/Media/misc/ArchiveTest.zip";
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32

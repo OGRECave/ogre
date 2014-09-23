@@ -6,7 +6,6 @@
 #include <cppunit/XmlOutputter.h>
 #include <cppunit/TestRunner.h>
 
-#include "OgrePlatform.h"
 #include "OgreString.h"
 #include "OgreLogManager.h"
 

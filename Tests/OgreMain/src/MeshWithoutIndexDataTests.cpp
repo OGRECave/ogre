@@ -47,6 +47,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(MeshWithoutIndexDataTests);
 //--------------------------------------------------------------------------
 void MeshWithoutIndexDataTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     OGRE_NEW ResourceGroupManager();
     OGRE_NEW LodStrategyManager();
     mBufMgr = OGRE_NEW DefaultHardwareBufferManager();

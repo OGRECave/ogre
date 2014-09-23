@@ -36,6 +36,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(PixelFormatTests);
 //--------------------------------------------------------------------------
 void PixelFormatTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     mSize = 4096;
     mRandomData = new uint8[mSize];
     mTemp = new uint8[mSize];
@@ -56,6 +58,7 @@ void PixelFormatTests::tearDown()
 //--------------------------------------------------------------------------
 void PixelFormatTests::testIntegerPackUnpack()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 }
 //--------------------------------------------------------------------------
 void PixelFormatTests::testFloatPackUnpack()
@@ -143,8 +146,6 @@ void PixelFormatTests::setupBoxes(PixelFormat srcFormat, PixelFormat dstFormat)
 //--------------------------------------------------------------------------
 void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
 {
-    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
-
     setupBoxes(srcFormat, dstFormat);
     // Check end of buffer
     unsigned long eob = mDst1.getWidth()*PixelUtil::getNumElemBytes(dstFormat);
