@@ -35,6 +35,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(PropertyTests);
 //--------------------------------------------------------------------------
 void PropertyTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
 }
 //--------------------------------------------------------------------------
 void PropertyTests::tearDown()

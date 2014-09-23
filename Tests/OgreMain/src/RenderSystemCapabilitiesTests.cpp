@@ -49,6 +49,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(RenderSystemCapabilitiesTests);
 //--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     using namespace Ogre;
 
     // We need to be able to create FileSystem archives to load .rendercaps

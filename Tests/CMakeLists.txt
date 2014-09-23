@@ -295,7 +295,7 @@ if (OGRE_BUILD_TESTS)
           )
       endif()
 	  
-	else(WIN32)
+	else() # not APPLE
 		# Copy necessary unit test data
 				
 		if (OGRE_CONFIG_ENABLE_ZIP)

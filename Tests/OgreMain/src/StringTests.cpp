@@ -42,6 +42,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(StringTests);
 //--------------------------------------------------------------------------
 void StringTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     testFileNoPath = "testfile.txt";
     testFileRelativePathUnix = "this/is/relative/testfile.txt";
     testFileRelativePathWindows = "this\\is\\relative\\testfile.txt";

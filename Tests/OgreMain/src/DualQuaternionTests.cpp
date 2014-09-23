@@ -40,6 +40,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(DualQuaternionTests);
 //--------------------------------------------------------------------------
 void DualQuaternionTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
 }
 //--------------------------------------------------------------------------
 void DualQuaternionTests::tearDown()

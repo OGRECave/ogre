@@ -39,6 +39,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(BitwiseTests);
 //--------------------------------------------------------------------------
 void BitwiseTests::setUp()
 {    
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
 }
 //--------------------------------------------------------------------------
 void BitwiseTests::tearDown()

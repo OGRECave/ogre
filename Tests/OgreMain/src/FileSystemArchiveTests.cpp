@@ -38,6 +38,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(FileSystemArchiveTests);
 //--------------------------------------------------------------------------
 void FileSystemArchiveTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     mFileSizeRoot1 = 0;
     mFileSizeRoot2 = 0;
 

@@ -76,11 +76,15 @@ void UnitTestSuite::tearDownSuite()
         delete Ogre::LogManager::getSingletonPtr();
 }
 //--------------------------------------------------------------------------
-void UnitTestSuite::startTestMethod(const std::string testName)
+void UnitTestSuite::startTestSetup(const std::string testName)
 {
     Ogre::LogManager::getSingletonPtr()->logMessage("----------------------------------------------------------------------------------------------------");
-    Ogre::LogManager::getSingletonPtr()->logMessage("||> Starting Unit Test [" + testName + "]:");
-    Ogre::LogManager::getSingletonPtr()->logMessage("----------------------------------------------------------------------------------------------------");
+    Ogre::LogManager::getSingletonPtr()->logMessage("||--> Starting Setup of Unit Test [" + testName + "]:");
+}
+//--------------------------------------------------------------------------
+void UnitTestSuite::startTestMethod(const std::string testName)
+{
+    Ogre::LogManager::getSingletonPtr()->logMessage("||--> Starting Unit Test [" + testName + "]:");
 }
 //--------------------------------------------------------------------------
 

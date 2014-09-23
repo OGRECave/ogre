@@ -38,7 +38,9 @@ CPPUNIT_TEST_SUITE_REGISTRATION(EdgeBuilderTests);
 //--------------------------------------------------------------------------
 void EdgeBuilderTests::setUp()
 {
-    mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
+   UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+   
+   mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
 }
 //--------------------------------------------------------------------------
 void EdgeBuilderTests::tearDown()

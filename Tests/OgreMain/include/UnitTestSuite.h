@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 #include "OgreSingleton.h"
 
-class UnitTestSuite : public Ogre::Singleton<UnitTestSuite>
+class UnitTestSuite : public Ogre::Singleton<UnitTestSuite>, public Ogre::GeneralAllocatedObject
 {
 public:
     UnitTestSuite() {};
@@ -41,6 +41,7 @@ public:
     void setUpSuite();
     void tearDownSuite();
 
+    void startTestSetup(const std::string testName);
     void startTestMethod(const std::string testName);
 };
 
