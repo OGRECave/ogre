@@ -27,17 +27,20 @@ THE SOFTWARE.
 */
 #include "PropertyTests.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( PropertyTests );
+#include "UnitTestSuite.h"
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(PropertyTests);
+
+//--------------------------------------------------------------------------
 void PropertyTests::setUp()
 {
-
 }
-
+//--------------------------------------------------------------------------
 void PropertyTests::tearDown()
 {
 }
-
+//--------------------------------------------------------------------------
 class Foo
 {
 protected:
@@ -46,9 +49,11 @@ public:
     void setName(const String& name) { mName = name; }
     const String& getName() const { return mName; }
 };
-
+//--------------------------------------------------------------------------
 void PropertyTests::testStringProp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     PropertyDefMap propertyDefs;
     Foo foo;
     PropertySet props;
@@ -68,6 +73,5 @@ void PropertyTests::testStringProp()
     props.getValue("name", strName);
 
     CPPUNIT_ASSERT_EQUAL(strTest, strName);
-
 }
-
+//--------------------------------------------------------------------------

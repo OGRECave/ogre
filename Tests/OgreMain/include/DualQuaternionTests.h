@@ -25,13 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __DualQuaternionTests_H__
+#define __DualQuaternionTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 class DualQuaternionTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( DualQuaternionTests );
+    CPPUNIT_TEST_SUITE(DualQuaternionTests);
     CPPUNIT_TEST(testConversion);
     CPPUNIT_TEST(testDefaultValue);
     CPPUNIT_TEST(testMatrix);
@@ -40,6 +44,7 @@ class DualQuaternionTests : public CppUnit::TestFixture
 public:
     void setUp();
     void tearDown();
+
     //Converts back and forth between a dual quaternion and a quaternion and vector
     void testConversion();
     //Tests if the default values of a dual quaternion are the correct identity values
@@ -47,3 +52,5 @@ public:
     //Converts back and forth between a dual quaternion and a transformation matrix
     void testMatrix();
 };
+
+#endif

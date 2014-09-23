@@ -29,36 +29,40 @@ THE SOFTWARE.
 #include <cstdlib>
 #include <iomanip>
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( PixelFormatTests );
+#include "UnitTestSuite.h"
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(PixelFormatTests);
+
+//--------------------------------------------------------------------------
 void PixelFormatTests::setUp()
 {
-    size = 4096;
-    randomData = new uint8[size];
-    temp = new uint8[size];
-    temp2 = new uint8[size];
+    mSize = 4096;
+    mRandomData = new uint8[mSize];
+    mTemp = new uint8[mSize];
+    mTemp2 = new uint8[mSize];
+
     // Generate reproducible random data
     srand(0);
-    for(unsigned int x=0; x<(unsigned int)size; x++)
-        randomData[x] = (uint8)rand();
+    for(unsigned int x=0; x<(unsigned int)mSize; x++)
+        mRandomData[x] = (uint8)rand();
 }
-
+//--------------------------------------------------------------------------
 void PixelFormatTests::tearDown()
 {
-    delete [] randomData;
-    delete [] temp;
-    delete [] temp2;
+    delete [] mRandomData;
+    delete [] mTemp;
+    delete [] mTemp2;
 }
-
-
+//--------------------------------------------------------------------------
 void PixelFormatTests::testIntegerPackUnpack()
 {
-
 }
-
+//--------------------------------------------------------------------------
 void PixelFormatTests::testFloatPackUnpack()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     // Float32
     float data[4] = {1.0f, 2.0f, 3.0f, 4.0f};
     float r,g,b,a;
@@ -70,26 +74,26 @@ void PixelFormatTests::testFloatPackUnpack()
 
     // Float16
     setupBoxes(PF_A8B8G8R8, PF_FLOAT16_RGBA);
-    dst2.format = PF_A8B8G8R8;
-    unsigned int eob = src.getWidth()*4;
+    mDst2.format = PF_A8B8G8R8;
+    unsigned int eob = mSrc.getWidth()*4;
 
-    PixelUtil::bulkPixelConversion(src, dst1);
-    PixelUtil::bulkPixelConversion(dst1, dst2);
+    PixelUtil::bulkPixelConversion(mSrc, mDst1);
+    PixelUtil::bulkPixelConversion(mDst1, mDst2);
 
     // Locate errors
     std::stringstream s;
     unsigned int x;
     for(x=0; x<eob; x++) {
-        if(temp2[x] != randomData[x])
-            s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) randomData[x]
-              << "!= " << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) temp2[x] << " ";
+        if(mTemp2[x] != mRandomData[x])
+            s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) mRandomData[x]
+              << "!= " << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) mTemp2[x] << " ";
     }
 
     // src and dst2 should match
     CPPUNIT_ASSERT_MESSAGE("PF_FLOAT16_RGBA<->PF_A8B8G8R8 conversion was not lossless "+s.str(),
-        memcmp(src.data, dst2.data, eob) == 0);
+        memcmp(mSrc.data, mDst2.data, eob) == 0);
 }
-
+//--------------------------------------------------------------------------
 // Pure 32 bit float precision brute force pixel conversion; for comparison
 void naiveBulkPixelConversion(const PixelBox &src, const PixelBox &dst)
 {
@@ -124,50 +128,50 @@ void naiveBulkPixelConversion(const PixelBox &src, const PixelBox &dst)
         srcptr += srcSliceSkipBytes;
         dstptr += dstSliceSkipBytes;
     }
-
 }
-
+//--------------------------------------------------------------------------
 void PixelFormatTests::setupBoxes(PixelFormat srcFormat, PixelFormat dstFormat)
 {
-    unsigned int width = (size-4) / PixelUtil::getNumElemBytes(srcFormat);
-    unsigned int width2 = (size-4) / PixelUtil::getNumElemBytes(dstFormat);
+    unsigned int width = (mSize-4) / PixelUtil::getNumElemBytes(srcFormat);
+    unsigned int width2 = (mSize-4) / PixelUtil::getNumElemBytes(dstFormat);
     if(width > width2)
         width = width2;
 
-    src = PixelBox(width, 1, 1, srcFormat, randomData);
-    dst1 = PixelBox(width, 1, 1, dstFormat, temp);
-    dst2 = PixelBox(width, 1, 1, dstFormat, temp2);
-
+    mSrc = PixelBox(width, 1, 1, srcFormat, mRandomData);
+    mDst1 = PixelBox(width, 1, 1, dstFormat, mTemp);
+    mDst2 = PixelBox(width, 1, 1, dstFormat, mTemp2);
 }
-
+//--------------------------------------------------------------------------
 void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     setupBoxes(srcFormat, dstFormat);
     // Check end of buffer
-    unsigned long eob = dst1.getWidth()*PixelUtil::getNumElemBytes(dstFormat);
-    temp[eob] = (unsigned char)0x56;
-    temp[eob+1] = (unsigned char)0x23;
+    unsigned long eob = mDst1.getWidth()*PixelUtil::getNumElemBytes(dstFormat);
+    mTemp[eob] = (unsigned char)0x56;
+    mTemp[eob+1] = (unsigned char)0x23;
 
     //std::cerr << "["+PixelUtil::getFormatName(srcFormat)+"->"+PixelUtil::getFormatName(dstFormat)+"]" << " " << eob << std::endl;
 
     // Do pack/unpacking with both naive and optimized version
-    PixelUtil::bulkPixelConversion(src, dst1);
-    naiveBulkPixelConversion(src, dst2);
+    PixelUtil::bulkPixelConversion(mSrc, mDst1);
+    naiveBulkPixelConversion(mSrc, mDst2);
 
-    CPPUNIT_ASSERT_EQUAL(temp[eob], (unsigned char)0x56);
-    CPPUNIT_ASSERT_EQUAL(temp[eob+1], (unsigned char)0x23);
+    CPPUNIT_ASSERT_EQUAL(mTemp[eob], (unsigned char)0x56);
+    CPPUNIT_ASSERT_EQUAL(mTemp[eob+1], (unsigned char)0x23);
 
     std::stringstream s;
     int x;
     s << "src=";
     for(x=0; x<16; x++)
-        s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) randomData[x];
+        s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) mRandomData[x];
     s << " dst=";
     for(x=0; x<16; x++)
-        s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) temp[x];
+        s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) mTemp[x];
     s << " dstRef=";
     for(x=0; x<16; x++)
-        s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) temp2[x];
+        s << std::hex << std::setw(2) << std::setfill('0') << (unsigned int) mTemp2[x];
     s << " ";
 
     // Compare result
@@ -175,13 +179,16 @@ void PixelFormatTests::testCase(PixelFormat srcFormat, PixelFormat dstFormat)
     msg << "Conversion mismatch [" << PixelUtil::getFormatName(srcFormat) << 
         "->" << PixelUtil::getFormatName(dstFormat) << "] " << s.str();
     CPPUNIT_ASSERT_MESSAGE(msg.str().c_str(),
-        memcmp(dst1.data, dst2.data, eob) == 0);
+        memcmp(mDst1.data, mDst2.data, eob) == 0);
 }
-
+//--------------------------------------------------------------------------
 void PixelFormatTests::testBulkConversion()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     // Self match
     testCase(PF_A8R8G8B8, PF_A8R8G8B8);
+
     // Optimized
     testCase(PF_A8R8G8B8,PF_A8B8G8R8);
     testCase(PF_A8R8G8B8,PF_B8G8R8A8);
@@ -224,7 +231,6 @@ void PixelFormatTests::testBulkConversion()
     testCase(PF_X8B8G8R8, PF_A8B8G8R8);
     testCase(PF_X8B8G8R8, PF_B8G8R8A8);
     testCase(PF_X8B8G8R8, PF_R8G8B8A8);
-
-    //CPPUNIT_ASSERT_MESSAGE("Conversion mismatch", false);
 }
+//--------------------------------------------------------------------------
 

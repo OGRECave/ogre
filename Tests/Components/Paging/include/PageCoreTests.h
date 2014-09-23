@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __PageCoreTests_H__
+#define __PageCoreTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -32,8 +36,8 @@ THE SOFTWARE.
 #include "OgrePageManager.h"
 #include "OgreGrid2DPageStrategy.h"
 #include "OgreFileSystemLayer.h"
-
 #include "OgreBuildSettings.h"
+
 #ifdef OGRE_STATIC_LIB
 #include "../../../../Samples/Common/include/OgreStaticPluginLoader.h"
 #endif
@@ -43,7 +47,7 @@ using namespace Ogre;
 class PageCoreTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( PageCoreTests );
+    CPPUNIT_TEST_SUITE(PageCoreTests);
     CPPUNIT_TEST(testSimpleCreateSaveLoadWorld);
     CPPUNIT_TEST_SUITE_END();
 
@@ -51,6 +55,7 @@ class PageCoreTests : public CppUnit::TestFixture
     PageManager* mPageManager;
     SceneManager* mSceneMgr;
     FileSystemLayer* mFSLayer;
+
 #ifdef OGRE_STATIC_LIB
     StaticPluginLoader mStaticPluginLoader;
 #endif
@@ -58,6 +63,9 @@ class PageCoreTests : public CppUnit::TestFixture
 public:
     void setUp();
     void tearDown();
+
     void testSimpleCreateSaveLoadWorld();
     void testLoadWorld();
 };
+
+#endif

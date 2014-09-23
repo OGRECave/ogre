@@ -30,21 +30,26 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreMatrix4.h"
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( DualQuaternionTests );
+#include "UnitTestSuite.h"
 
 using namespace Ogre;
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(DualQuaternionTests);
+
+//--------------------------------------------------------------------------
 void DualQuaternionTests::setUp()
 {
 }
-
+//--------------------------------------------------------------------------
 void DualQuaternionTests::tearDown()
 {
 }
-
+//--------------------------------------------------------------------------
 void DualQuaternionTests::testConversion()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     DualQuaternion dQuat;
     Quaternion quat(Radian(Degree(60)), Vector3::UNIT_Y);
     Vector3 translation(0, 0, 10);
@@ -57,9 +62,11 @@ void DualQuaternionTests::testConversion()
     CPPUNIT_ASSERT_EQUAL(result, quat);
     CPPUNIT_ASSERT(resTrans.positionEquals(translation));
 }
-
+//--------------------------------------------------------------------------
 void DualQuaternionTests::testDefaultValue()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     DualQuaternion dQuatDefault;
     
     Quaternion quatDefault;
@@ -70,9 +77,11 @@ void DualQuaternionTests::testDefaultValue()
     CPPUNIT_ASSERT_EQUAL(quatDefault, Quaternion::IDENTITY); 
     CPPUNIT_ASSERT(transDefault.positionEquals(Vector3::ZERO));
 }
-
+//--------------------------------------------------------------------------
 void DualQuaternionTests::testMatrix()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     Matrix4 transform;
     Vector3 translation(10, 4, 0);
     Vector3 scale = Vector3::UNIT_SCALE;
@@ -94,3 +103,4 @@ void DualQuaternionTests::testMatrix()
     CPPUNIT_ASSERT(scaleResult.positionEquals(scale));
     CPPUNIT_ASSERT(rotationResult.equals(rotation, Radian(0.001)));
 }
+//--------------------------------------------------------------------------

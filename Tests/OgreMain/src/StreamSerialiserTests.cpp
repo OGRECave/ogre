@@ -31,20 +31,26 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreVector3.h"
 
+#include "UnitTestSuite.h"
+
 using namespace Ogre;
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( StreamSerialiserTests );
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(StreamSerialiserTests);
 
+//--------------------------------------------------------------------------
 void StreamSerialiserTests::setUp()
 {
 }
+//--------------------------------------------------------------------------
 void StreamSerialiserTests::tearDown()
 {
 }
-
+//--------------------------------------------------------------------------
 void StreamSerialiserTests::testWriteBasic()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     FileSystemArchive arch("./", "FileSystem", false);
     arch.load();
 
@@ -53,15 +59,14 @@ void StreamSerialiserTests::testWriteBasic()
     String aTestString = "Some text here";
     int aTestValue = 99;
     uint32 chunkID = StreamSerialiser::makeIdentifier("TEST");
+
     // write the data
     {
-
         DataStreamPtr stream = arch.create(fileName);
 
         StreamSerialiser serialiser(stream);
 
         serialiser.writeChunkBegin(chunkID);
-
 
         serialiser.write(&aTestVector);
         serialiser.write(&aTestString);
@@ -71,7 +76,6 @@ void StreamSerialiserTests::testWriteBasic()
 
     // read it back
     {
-
         DataStreamPtr stream = arch.open(fileName);
 
         StreamSerialiser serialiser(stream);
@@ -93,12 +97,10 @@ void StreamSerialiserTests::testWriteBasic()
         CPPUNIT_ASSERT_EQUAL(aTestVector, inVector);
         CPPUNIT_ASSERT_EQUAL(aTestString, inString);
         CPPUNIT_ASSERT_EQUAL(aTestValue, inValue);
-
     }
-
-
 
     arch.remove(fileName);
 
     CPPUNIT_ASSERT(!arch.exists(fileName));
 }
+//--------------------------------------------------------------------------

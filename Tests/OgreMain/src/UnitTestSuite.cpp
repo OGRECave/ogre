@@ -34,17 +34,24 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreLodStrategyManager.h"
 
-Ogre::LogManager* logMgr;
-void setUpSuite()
-{
-    logMgr = new Ogre::LogManager();
-    logMgr->createLog("OgreTest.log", true, true);
-    Ogre::LogManager::getSingleton().setLogDetail(Ogre::LL_LOW);
-}
+#include "UnitTestSuite.h"
 
-void tearDownSuite()
+template<> UnitTestSuite* Ogre::Singleton<UnitTestSuite>::msSingleton = 0;
+
+//--------------------------------------------------------------------------
+void UnitTestSuite::setUpSuite()
 {
-    // shutdown and release managers that might have been created
+    Ogre::LogManager* logMgr = new Ogre::LogManager();
+    logMgr->createLog("OgreTest.log", true, true);
+    logMgr->setLogDetail(Ogre::LL_BOREME);
+    Ogre::LogManager::getSingletonPtr()->logMessage("----------------------------------------------------------------------------------------------------");
+    logMgr->logMessage("##> Ogre3D Unit Test Suite successfully set up.");
+    Ogre::LogManager::getSingletonPtr()->logMessage("----------------------------------------------------------------------------------------------------");
+}
+//--------------------------------------------------------------------------
+void UnitTestSuite::tearDownSuite()
+{
+    // Shutdown and release managers that might have been created
     if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
         delete Ogre::HighLevelGpuProgramManager::getSingletonPtr();
     if(Ogre::GpuProgramManager::getSingletonPtr())
@@ -56,12 +63,24 @@ void tearDownSuite()
     if(Ogre::ResourceGroupManager::getSingletonPtr())
         delete Ogre::ResourceGroupManager::getSingletonPtr();
 
-    if(Ogre::LogManager::getSingletonPtr())
-        delete Ogre::LogManager::getSingletonPtr();
     if(Ogre::ResourceGroupManager::getSingletonPtr())
         delete Ogre::ResourceGroupManager::getSingletonPtr();
     if(Ogre::LodStrategyManager::getSingletonPtr())
         delete Ogre::LodStrategyManager::getSingletonPtr();
 
+    Ogre::LogManager::getSingletonPtr()->logMessage("----------------------------------------------------------------------------------------------------");
+    Ogre::LogManager::getSingletonPtr()->logMessage("##> Ogre3D Unit Test Suite successfully shut down.");
+    Ogre::LogManager::getSingletonPtr()->logMessage("----------------------------------------------------------------------------------------------------");
+
+    if(Ogre::LogManager::getSingletonPtr())
+        delete Ogre::LogManager::getSingletonPtr();
 }
+//--------------------------------------------------------------------------
+void UnitTestSuite::startTestMethod(const std::string testName)
+{
+    Ogre::LogManager::getSingletonPtr()->logMessage("----------------------------------------------------------------------------------------------------");
+    Ogre::LogManager::getSingletonPtr()->logMessage("||> Starting Unit Test [" + testName + "]:");
+    Ogre::LogManager::getSingletonPtr()->logMessage("----------------------------------------------------------------------------------------------------");
+}
+//--------------------------------------------------------------------------
 
