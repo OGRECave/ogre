@@ -51,6 +51,12 @@ namespace Ogre
         mDefaultPoolSize[CPU_ACCESSIBLE]    = 32 * 1024 * 1024;
 
         mFrameSyncVec.resize( mDynamicBufferMultiplier, 0 );
+
+        GLint alignment;
+        glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment );
+        mConstBufferAlignment = alignment;
+        glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
+        mTexBufferAlignment = alignment;
     }
     //-----------------------------------------------------------------------------------
     GL3PlusVaoManager::~GL3PlusVaoManager()
@@ -392,8 +398,7 @@ namespace Ogre
         size_t vboIdx;
         size_t bufferOffset;
 
-        GLint alignment = 16;
-        glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment );
+        GLint alignment = mConstBufferAlignment;
 
         size_t bindableSize = sizeBytes;
 
@@ -444,8 +449,7 @@ namespace Ogre
         size_t vboIdx;
         size_t bufferOffset;
 
-        GLint alignment = 256;
-        glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
+        GLint alignment = mTexBufferAlignment;
 
         VboFlag vboFlag = CPU_INACCESSIBLE;
 

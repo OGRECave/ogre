@@ -47,8 +47,11 @@ namespace Ogre
 
         void upload( void *data, size_t elementStart, size_t elementCount );
 
-        virtual void* map( size_t elementStart, size_t elementCount, MappingState prevMappingState ) = 0;
-        virtual void unmap( UnmapOptions unmapOption ) = 0;
+        virtual void* map( size_t elementStart, size_t elementCount,
+                           MappingState prevMappingState, bool advanceFrame = true ) = 0;
+        virtual void unmap( UnmapOptions unmapOption,
+                            size_t flushStartElem = 0, size_t flushSizeElem = 0 ) = 0;
+        virtual void advanceFrame(void) = 0;
 
         void _notifyBuffer( BufferPacked *buffer )          { mBuffer = buffer; }
     };

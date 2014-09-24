@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreConstBufferPacked.h"
+#include "Vao/OgreTexBufferPacked.h"
 #include "Vao/OgreStagingBuffer.h"
 
 namespace Ogre
@@ -762,6 +763,9 @@ namespace Ogre
 
         mPassBuffer->unmap( UO_KEEP_PERSISTENT );
 
+        mapNextConstBuffer();
+        mapNextTexBuffer();
+
         return retVal;
     }
     //-----------------------------------------------------------------------------------
@@ -788,7 +792,7 @@ namespace Ogre
 
             if( !casterPass )
             {
-                size_t texUnit = 0;
+                size_t texUnit = 1;
                 while( itor != end )
                 {
                     mRenderSystem->_setTexture( texUnit, true, *itor );
@@ -797,8 +801,6 @@ namespace Ogre
                 }
             }
         }
-
-        ConstBufferPacked *instanceConstBuffer = 0;
 
         uint32 * RESTRICT_ALIAS currentMappedConstBuffer    = mCurrentMappedConstBuffer;
         float * RESTRICT_ALIAS currentMappedTexBuffer       = mCurrentMappedTexBuffer;
@@ -839,18 +841,17 @@ namespace Ogre
                                             (datablock->getAssignedSlot() & 0x1FF);
 
             uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
-            assert( numWorldTransforms <= 60 );
+            assert( numWorldTransforms <= 256 );
 
+            //vec4 worldMat[][3]
             //TODO: Don't rely on a virtual function + make a direct 4x3 copy
-            Matrix4 tmp[60];
+            Matrix4 tmp[256];
             queuedRenderable.renderable->getWorldTransforms( tmp );
             for( size_t i=0; i<numWorldTransforms; ++i )
             {
-                memcpy( vsUniformBuffer, &tmp[i], 12 * sizeof(float) );
-                vsUniformBuffer += 12;
+                memcpy( currentMappedTexBuffer, &tmp[i], 12 * sizeof(float) );
+                currentMappedTexBuffer += 12;
             }
-
-            vsUniformBuffer += (60 - numWorldTransforms) * 12;
         }
 #else
     #error Not Coded Yet! (cannot use memcpy on Matrix4)
@@ -867,7 +868,7 @@ namespace Ogre
             if( datablock->mTextureHash != lastTextureHash )
             {
                 //Rebind textures
-                size_t texUnit = mPreparedPass.shadowMaps.size();
+                size_t texUnit = mPreparedPass.shadowMaps.size() + 1;
                 for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
                 {
                     if( !datablock->getTexture( i ).isNull() )
@@ -886,7 +887,7 @@ namespace Ogre
         else
         {
             if( lastTextureHash )
-                mRenderSystem->_disableTextureUnitsFrom( 0 );
+                mRenderSystem->_disableTextureUnitsFrom( 1 );
             retVal = 0;
         }
 
@@ -898,6 +899,101 @@ namespace Ogre
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::unmapConstBuffer(void)
+    {
+        if( mStartMappedConstBuffer )
+        {
+            //Unmap the current buffer
+            ConstBufferPacked *constBuffer = mConstBuffers[mCurrentConstBuffer];
+            constBuffer->unmap( UO_KEEP_PERSISTENT, 0,
+                                (mCurrentMappedConstBuffer - mStartMappedConstBuffer) * sizeof(uint32) );
+
+            ++mCurrentConstBuffer;
+
+            mStartMappedConstBuffer     = 0;
+            mCurrentMappedConstBuffer   = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::mapNextConstBuffer(void)
+    {
+        unmapConstBuffer();
+
+        if( mCurrentConstBuffer > mConstBuffers.size() )
+        {
+            //mConstBuffers.push_back(  ); TODO
+        }
+
+        ConstBufferPacked *constBuffer = mConstBuffers[mCurrentConstBuffer];
+
+        mStartMappedConstBuffer     = reinterpret_cast<uint32*>(
+                                            constBuffer->map( 0, constBuffer->getNumElements(),
+                                                              MS_PERSISTENT_INCOHERENT ) );
+        mCurrentMappedConstBuffer   = mStartMappedConstBuffer;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::unmapTexBuffer(void)
+    {
+        //Save our progress
+        mTexLastOffset = (mCurrentMappedTexBuffer - mStartMappedTexBuffer) * sizeof(float);
+
+        if( mStartMappedTexBuffer )
+        {
+            //Unmap the current buffer
+            TexBufferPacked *texBuffer = mTexBuffers[mCurrentTexBuffer];
+            texBuffer->unmap( UO_KEEP_PERSISTENT, 0, mTexLastOffset );
+        }
+
+        mStartMappedTexBuffer   = 0;
+        mCurrentMappedTexBuffer = 0;
+
+        //Ensure the proper alignment
+        mTexLastOffset = alignToNextMultiple( mTexLastOffset, mVaoManager->getTexBufferAlignment() );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::mapNextTexBuffer(void)
+    {
+        unmapTexBuffer();
+
+        TexBufferPacked *texBuffer = mTexBuffers[mCurrentTexBuffer];
+
+        //We'll go out of bounds. This buffer is full. Get a new one and remap from 0.
+        if( mTexLastOffset >= texBuffer->getTotalSizeBytes() )
+        {
+            mTexLastOffset = 0;
+            ++mCurrentTexBuffer;
+
+            if( mCurrentTexBuffer >= mTexBuffers.size() )
+            {
+                //mTexBuffers.push_back(  ); TODO
+            }
+
+            texBuffer = mTexBuffers[mCurrentTexBuffer];
+        }
+
+        mStartMappedTexBuffer   = reinterpret_cast<float*>(
+                                            texBuffer->map( mTexLastOffset,
+                                                            texBuffer->getNumElements() - mTexLastOffset,
+                                                            MS_PERSISTENT_INCOHERENT, false ) );
+        mCurrentMappedTexBuffer = mStartMappedTexBuffer;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::frameEnded(void)
+    {
+        mCurrentTexBuffer   = 0;
+        mCurrentConstBuffer = 0;
+        mTexLastOffset      = 0;
+
+        TexBufferPackedVec::const_iterator itor = mTexBuffers.begin();
+        TexBufferPackedVec::const_iterator end  = mTexBuffers.end();
+
+        while( itor != end )
+        {
+            (*itor)->advanceFrame();
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsPbs::createDatablockImpl( IdString datablockName,

@@ -53,6 +53,7 @@ namespace Ogre
     class _OgreHlmsPbsExport HlmsPbs : public Hlms, public ConstBufferPool
     {
         typedef vector<ConstBufferPacked*>::type ConstBufferPackedVec;
+        typedef vector<TexBufferPacked*>::type TexBufferPackedVec;
         typedef vector<HlmsDatablock*>::type HlmsDatablockVec;
 
         struct PassData
@@ -68,7 +69,10 @@ namespace Ogre
         PassData                mPreparedPass;
         ConstBufferPacked       *mPassBuffer;
 
-        ConstBufferPackedVec    mInstanceBuffer;
+        uint32                  mCurrentConstBuffer;    /// Resets every to zero every new frame.
+        uint32                  mCurrentTexBuffer;      /// Resets every to zero every new frame.
+        ConstBufferPackedVec    mConstBuffers;
+        TexBufferPackedVec      mTexBuffers;
 
         uint32  *mStartMappedConstBuffer;
         uint32  *mCurrentMappedConstBuffer;
@@ -76,8 +80,8 @@ namespace Ogre
         float   *mStartMappedTexBuffer;
         float   *mCurrentMappedTexBuffer;
 
-        size_t  mMappedConstBufferSize;
-        size_t  mMappedTexBufferSize;
+        /// Resets every to zero every new buffer (@see unmapTexBuffer and @see mapNextTexBuffer).
+        size_t  mTexLastOffset;
 
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
@@ -96,6 +100,31 @@ namespace Ogre
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );
 
+        /// For compatibility reasons with D3D11 and GLES3, Const buffers are mapped.
+        /// Once we're done with it (even if we didn't fully use it) we discard it
+        /// and get a new one. We will at least have to get a new one on every pass.
+        /// This is affordable since common Const buffer limits are of 64kb.
+        /// At the next frame we restart mCurrentConstBuffer to 0.
+        void unmapConstBuffer(void);
+        void mapNextConstBuffer(void);
+
+        /// Texture buffers are treated differently than Const buffers. We first map it.
+        /// Once we're done with it, we save our progress (in mTexLastOffset) and in the
+        /// next pass start where we left off (i.e. if we wrote to the first 2MB chunk,
+        /// start mapping from 2MB onwards). Only when the buffer is full, we get a new
+        /// Tex Buffer.
+        /// At the next frame we restart mCurrentTexBuffer to 0.
+        ///
+        /// Tex Buffers can be as big as 128MB, thus "restarting" with another 128MB
+        /// buffer on every pass is too expensive. This strategy benefits low level RS
+        /// like GL3+ and D3D11.1* (Windows 8) and D3D12; whereas on D3D11 and GLES3
+        /// drivers dynamic mapping may discover we're writing to a region not in use
+        /// or may internally use a new buffer (wasting memory space).
+        ///
+        /// (*) D3D11.1 allows using MAP_NO_OVERWRITE for texture buffers.
+        void unmapTexBuffer(void);
+        void mapNextTexBuffer(void);
+
     public:
         HlmsPbs( Archive *dataFolder );
         ~HlmsPbs();
@@ -109,6 +138,8 @@ namespace Ogre
         virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                        bool casterPass, const HlmsCache *lastCache,
                                        uint32 lastTextureHash );
+
+        virtual void frameEnded(void);
     };
 
     struct _OgreHlmsPbsExport PbsProperty

@@ -52,7 +52,8 @@ namespace Ogre
         mLastMappingCount( 0 ),
         mShadowCopy( 0 )
 #ifndef NDEBUG
-    ,   mLastFrameMapped( ~0 )
+    ,   mLastFrameMapped( ~0 ),
+        mLastFrameMappedAndAdvanced( ~0 )
 #endif
     {
         mBufferInterface->_notifyBuffer( this );
@@ -124,7 +125,8 @@ namespace Ogre
         mBufferInterface->upload( data, elementStart, elementCount );
     }
     //-----------------------------------------------------------------------------------
-    void* BufferPacked::map(size_t elementStart, size_t elementCount, MappingState persistentMethod )
+    void* BufferPacked::map( size_t elementStart, size_t elementCount,
+                             MappingState persistentMethod, bool advanceFrame )
     {
         if( mBufferType != BT_DYNAMIC )
         {
@@ -155,14 +157,30 @@ namespace Ogre
         }
 
 #ifndef NDEBUG
-        if( mLastFrameMapped == mVaoManager->getFrameCount() )
         {
-            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                         "Mapping the buffer twice within the same frame detected! This is not allowed.",
-                         "BufferPacked::map" );
-        }
+            uint32 currentFrame = mVaoManager->getFrameCount();
+            if( mLastFrameMappedAndAdvanced == currentFrame )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                             "Mapping the buffer twice within the same frame detected! "
+                             "This is not allowed.", "BufferPacked::map" );
+            }
 
-        mLastFrameMapped = mVaoManager->getFrameCount();
+            if( //This is a different frame from the last time we called map
+                    mLastFrameMapped != currentFrame &&
+                    //map was called, but advanceFrame was not.
+                    (int)(mLastFrameMapped - mLastFrameMappedAndAdvanced) > 0 )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                             "Last frame called map( advanceFrame = true ) but "
+                             "didn't call advanceFrame!!!.", "BufferPacked::map" );
+            }
+
+            mLastFrameMapped = currentFrame;
+
+            if( advanceFrame )
+                mLastFrameMappedAndAdvanced = currentFrame;
+        }
 #endif
 
         //Can't map twice, unless this is a persistent mapping and we're
@@ -188,10 +206,10 @@ namespace Ogre
         MappingState prevMappingState = mMappingState;
         mMappingState = persistentMethod;
 
-        return mBufferInterface->map( elementStart, elementCount, prevMappingState );
+        return mBufferInterface->map( elementStart, elementCount, prevMappingState, advanceFrame );
     }
     //-----------------------------------------------------------------------------------
-    void BufferPacked::unmap( UnmapOptions unmapOption )
+    void BufferPacked::unmap( UnmapOptions unmapOption, size_t flushStartElem, size_t flushSizeElem )
     {
         if( mMappingState == MS_UNMAPPED )
         {
@@ -200,13 +218,37 @@ namespace Ogre
                          "BufferPacked::unmap" );
         }
 
-        mBufferInterface->unmap( unmapOption );
+        mBufferInterface->unmap( unmapOption, flushStartElem, flushSizeElem );
 
         if( unmapOption == UO_UNMAP_ALL || mMappingState == MS_MAPPED )
             mMappingState = MS_UNMAPPED;
 
         mLastMappingStart = 0;
         mLastMappingCount = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void BufferPacked::advanceFrame(void)
+    {
+#ifndef NDEBUG
+        if( mLastFrameMappedAndAdvanced == mVaoManager->getFrameCount() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Calling advanceFrame twice in the same frame (or map was already "
+                         "called with advanceFrame = true). This is not allowed.",
+                         "BufferPacked::advanceFrame" );
+        }
+
+        mLastFrameMappedAndAdvanced = mVaoManager->getFrameCount();
+#endif
+
+        if( isCurrentlyMapped() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Don't advanceFrame while mapped!",
+                         "BufferPacked::map" );
+        }
+
+        return mBufferInterface->advanceFrame();
     }
     //-----------------------------------------------------------------------------------
     bool BufferPacked::isCurrentlyMapped(void) const

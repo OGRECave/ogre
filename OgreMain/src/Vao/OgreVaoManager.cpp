@@ -43,7 +43,9 @@ namespace Ogre
         mDynamicBufferMultiplier( 3 ),
         mDynamicBufferCurrentFrame( 0 ),
         mNextStagingBufferTimestampCheckpoint( ~0 ),
-        mFrameCount( 0 )
+        mFrameCount( 0 ),
+        mConstBufferAlignment( 256 ),
+        mTexBufferAlignment( 256 )
     {
         mTimer = OGRE_NEW Timer();
     }

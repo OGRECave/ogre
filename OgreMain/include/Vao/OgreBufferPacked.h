@@ -112,6 +112,7 @@ namespace Ogre
 #ifndef NDEBUG
         /// Used by Dynamic buffers only
         uint32 mLastFrameMapped;
+        uint32 mLastFrameMappedAndAdvanced;
 #endif
 
     public:
@@ -160,14 +161,54 @@ namespace Ogre
 
         virtual void disposeTicket( AsyncTicket *ticket ) = 0;
 
-        /**
+        /** Maps the specified region to a pointer the CPU can access. Only dynamic buffers
+            can use this function. The region [elementStart; elementStart + elementCount)
+            will be mapped.
         @remarks
-            You can only map once per frame, regardless of parameters.
+            You can only map once per frame, regardless of parameters (except for advanceFrame).
             map( 0, 1 ) followed by map( 1, 1 ); is invalid.
             If you plan modifying elements 0 and 1; you should call map( 0, 2 )
+        @par
+            Note that even if you use persistent mapping, you still need to call @see unmap.
+        @param elementStart
+            Start of the region to be mapped, in elements. Normally you want this to be 0.
+        @param elementCount
+            Length of the region to map, in elements. @see getNumElements to map the whole range.
+            Can't be 0.
+        @param persistentMethod
+            Method used to map. @see MappingState. Note that even if you use persistent mapping,
+            you still need to call @see unmap.
+        @param advanceFrame
+            When true, the Buffer will be usable after unmapping it (or earlier if persistent mapped).
+            However you won't be able to call map() again until the next frame.
+            Calling this with false allows to call map multiple times. However ater calling unmap,
+            you must call advanceFrame. THIS IS ONLY FOR VERY ADVANCED USERS.
         */
-        void* map( size_t elementStart, size_t elementCount, MappingState persistentMethod );
-        void unmap( UnmapOptions unmapOption );
+        void* map( size_t elementStart, size_t elementCount,
+                   MappingState persistentMethod, bool advanceFrame=true );
+
+        /** Unmaps or flushes the region mapped with @see map. Alternatively, you can flush a smaller region
+            (i.e. you didn't know which regions you were to update when mapping, but now that you're done,
+            you know).
+            The region being flushed is [flushStart; flushStart + flushSize)
+        @param unmapOption
+            When using persistent mapping, UO_KEEP_PERSISTENT will keep the map alive; but you will
+            have to call map again to use it. This requirement allows Ogre to:
+                1. Synchronize if needed (avoid mapping a region that is still in use)
+                2. Emulate persistent mapping on Hardware/Drivers that don't support it.
+        @param flushStartElem
+            In elements, 0-based index (based on the mapped region) on where to start flushing from.
+            Default is 0.
+        @param flushSizeElem
+            The length of the flushing region, which can't be bigger than 'elementCount' passed
+            to @see map. When this value is 0, we flush until the end of the buffer starting
+            from flushStartElem
+        */
+        void unmap( UnmapOptions unmapOption, size_t flushStartElem = 0, size_t flushSizeElem = 0 );
+
+        /// @see map. Do NOT call this function more than once per frame,
+        /// or if you've called map( advanceFrame = true )
+        void advanceFrame(void);
 
         /// Returns the mapping state. Note that if you call map with MS_PERSISTENT_INCOHERENT or
         /// MS_PERSISTENT_COHERENT, then call unmap( UO_KEEP_PERSISTENT ); the returned value will

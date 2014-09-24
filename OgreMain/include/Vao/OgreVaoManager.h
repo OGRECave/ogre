@@ -67,6 +67,9 @@ namespace Ogre
 
         uint32          mFrameCount;
 
+        uint32 mConstBufferAlignment;
+        uint32 mTexBufferAlignment;
+
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
                                                             BufferType bufferType,
@@ -275,6 +278,9 @@ namespace Ogre
 
         void _notifyStagingBufferEnteredZeroRef( StagingBuffer *stagingBuffer );
         void _notifyStagingBufferLeftZeroRef( StagingBuffer *stagingBuffer );
+
+        uint32 getConstBufferAlignment(void) const      { return mConstBufferAlignment; }
+        uint32 getTexBufferAlignment(void) const        { return mTexBufferAlignment; }
 
         Timer* getTimer(void)               { return mTimer; }
 

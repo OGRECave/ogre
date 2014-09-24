@@ -46,6 +46,8 @@ namespace Ogre
         GLuint  mVboName;
         void    *mMappedPtr;
 
+        size_t advanceFrame( bool bAdvanceFrame );
+
     public:
         GL3PlusBufferInterface( size_t vboPoolIdx, GLenum target, GLuint vboName );
         ~GL3PlusBufferInterface();
@@ -57,8 +59,11 @@ namespace Ogre
         /// Only use this function for the first upload
         void _firstUpload( void *data, size_t elementStart, size_t elementCount );
 
-        virtual void* map( size_t elementStart, size_t elementCount, MappingState prevMappingState );
-        virtual void unmap( UnmapOptions unmapOption );
+        virtual void* map( size_t elementStart, size_t elementCount,
+                           MappingState prevMappingState, bool advanceFrame = true );
+        virtual void unmap( UnmapOptions unmapOption,
+                            size_t flushStartElem = 0, size_t flushSizeElem = 0 );
+        virtual void advanceFrame(void);
     };
 }
 
