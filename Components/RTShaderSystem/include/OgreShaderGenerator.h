@@ -140,7 +140,7 @@ public:
     /** 
     Return if hlsl 4.0 shading language is currently in use.        
     */
-    const bool IsHlsl4() const { return mShaderLanguage == "hlsl" && mShaderLanguageVersion == 4.0f; }
+    bool IsHlsl4() const { return mShaderLanguage == "hlsl" && mShaderLanguageVersion == 4.0f; }
     /** 
     Return the target shader language currently in use.     
     */
