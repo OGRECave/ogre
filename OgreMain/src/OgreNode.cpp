@@ -421,6 +421,18 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    void Node::_notifyStaticDirty(void) const
+    {
+        NodeVec::const_iterator itor = mChildren.begin();
+        NodeVec::const_iterator end  = mChildren.end();
+
+        while( itor != end )
+        {
+            (*itor)->_notifyStaticDirty();
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
     Quaternion Node::getOrientation() const
     {
         return mTransform.mOrientation->getAsQuaternion( mTransform.mIndex );

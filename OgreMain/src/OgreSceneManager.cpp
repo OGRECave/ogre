@@ -1943,7 +1943,7 @@ MeshPtr SceneManager::createSkydomePlane(
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::notifyStaticDirty( MovableObject *movableObject )
+void SceneManager::notifyStaticAabbDirty( MovableObject *movableObject )
 {
     mStaticEntitiesDirty = true;
     movableObject->_notifyStaticDirty();
