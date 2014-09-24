@@ -441,6 +441,9 @@ namespace Ogre
                                        bool casterPass, const HlmsCache *lastCache,
                                        uint32 lastTextureHash ) = 0;
 
+        /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
+        virtual void frameEnded(void);
+
         /** Call to output the automatically generated shaders (which are usually made from templates)
             on the given folder for inspection, analyzing, debugging, etc.
         @remarks
