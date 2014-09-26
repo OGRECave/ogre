@@ -151,7 +151,7 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR OGRE_BUILD_PLATFORM_WINRT OR ANDROID OR EMSCRIPTEN))
+if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
 endif ()
@@ -238,7 +238,7 @@ endif()
 #######################################################################
 
 # Find OIS
-if (OGRE_BUILD_PLATFORM_WINRT)
+if (WINDOWS_STORE OR WINDOWS_PHONE)
 	# for WinRT we need only includes
 	set(OIS_FIND_QUIETLY TRUE)
         find_package(OIS)

@@ -188,3 +188,54 @@ This can be done from the Target Properties panel.  It must match the bundle
 identifier of a valid developer certificate if you are building for devices.
 See the following PDF for information under Generating an App ID:
 http://developer.apple.com/library/ios/documentation/Xcode/Conceptual/iphone_development/index.html
+
+
+9. Building Ogre as Windows Store or Windows Phone application
+-------------------------------------------------------------------
+
+You need Windows 8.0 or later, Windows 8.1 is recommended.
+
+You need Visual Studio 2012 or later, Visual Studio 2013 is recommended
+as it is bundled with WinStore 8.0/8.1 and WinPhone 8.0/8.1 SDKs.
+
+Download and install CMake 3.1 (scheduled for release 2014-11-01) 
+or CMakeMS from http://cmakems.codeplex.com/
+
+Patched dependencies must be used, compiled with appropriate WINAPI_FAMILY.
+Cg is not supported, and only headers from OIS are needed. 
+You can use https://bitbucket.org/eugene_gff/ogre-dependencies-winrt - 
+has VS2012 and VS2013 projects for Win32, WinRT (can be reused for WinPhone)
+Compile dependencies for all configurations that you plan to use before
+running CMake. Dependencies for Win32 and for WinRT must be located in
+separate folders, Win32 version can be built from OgreDependencies.VS201x.sln,
+ WinRT from OgreDependencies.VS201x.WinRT.sln
+
+Run CMake, specify source and binaries folders, than "Configure", select
+"Visual Studio 12 2013" generator and "Specify options for cross-compiling"
+option, specify Operating System = "WindowsStore" or "WindowsPhone",
+Version = "8.0" or "8.1", than "Finish", specify WinRT dependencies folder
+for OGRE_DEPENDENCIES_DIR, "Configure", should be no more errors, then press
+"Generate". If you want build time to be shorter - set OGRE_UNITY_BUILD to on.
+
+Select SampleBrowser as the start up project and run.
+
+Note 1: The code and generated cmake solution should be on local NTFS drive,
+and can't be on a network drive, including VMWare shared folders - or
+you will get a errors when you will try to compile/link/run resulting exe.
+
+Note 2: Ogre uses d3dcompiler_xx.dll to compile shaders, and WinStore and
+WinPhone 8.1 projects can use it without restriction as it is part of OS.
+But WinStore and WinPhone 8.0 applications should load already compiled
+shaders from cache, as d3dcompiler_xx.dll is available to them only during
+development. Therefore to avoid necessity to deploy d3dcompiler_xx.dll
+during development (additional configurations with d3dcompiler_xx.dll)
+and generation of such cache - use version 8.1 of these platforms.
+
+Note 3: Running WinPhone emulator in OS running under VMware:
+We were able to run the emulation and debug without an issue by using two
+steps: (a) Under the settings of the VM > CPU, make sure you have the
+option to pass-through the Intel VT-x/EPT feature, (b) Edit the config
+file .vmx and add the parameter: hypervisor.cpuid.v0 = "FALSE"
+All versions of Visual Studio 2012 have a window refresh issue when running
+in VMware and the window is maximized, the solution is just to change the
+size of the Visual Studio window to be less the the screen width and height.

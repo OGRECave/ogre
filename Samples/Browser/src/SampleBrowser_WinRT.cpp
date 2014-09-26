@@ -27,8 +27,7 @@ THE SOFTWARE.
 */
 #include <directxmath.h>
 
-#include "SampleBrowserWinRT.h"
-#include "BasicTimer.h"
+#include "SampleBrowser_WinRT.h"
 
 using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Core;
@@ -102,20 +101,25 @@ void SampleBrowserWinRT::Load(Platform::String^ entryPoint)
 
 void SampleBrowserWinRT::Run()
 {
-    BasicTimer^ timer = ref new BasicTimer();
-
     CoreWindow::GetForCurrentThread()->Activate();
 
     m_sampleBrowser.initAppForWinRT(CoreWindow::GetForCurrentThread(), m_inputManager.GetInputContext());
     m_sampleBrowser.initApp();
 
+    Ogre::Timer timer;
+    float timerTotal = 0.001f * timer.getMilliseconds();
+    float timerDelta = 1.0f / 60.0f;
+
     while (!m_windowClosed && !Ogre::Root::getSingleton().endRenderingQueued())
     {
-        timer->Update();
         CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
-		m_inputManager.Update(timer->Total, timer->Delta);
-        if(!Ogre::Root::getSingleton().renderOneFrame(timer->Delta))
-			break;
+        m_inputManager.Update(timerTotal, timerDelta);
+        if(!Ogre::Root::getSingleton().renderOneFrame(timerDelta))
+            break;
+
+        float timerTotalPrev = timerTotal;
+        timerTotal = 0.001f * timer.getMilliseconds();
+        timerDelta = std::max(1.0f / 60.0f, timerTotal - timerTotalPrev);
     }
 
     m_sampleBrowser.closeApp();

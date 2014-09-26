@@ -37,13 +37,18 @@
 #include "macUtils.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-// For WinRT we only support running from the cache file.
-#       define ENABLE_SHADERS_CACHE_LOAD 1
-#endif
-
 #define ENABLE_SHADERS_CACHE_SAVE 0
 #define ENABLE_SHADERS_CACHE_LOAD 0
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#    include <sdkddkver.h>
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT == _WIN32_WINNT_WIN8
+//      For WinRT 8.0 we only support running from the cache file.
+#       undef ENABLE_SHADERS_CACHE_LOAD
+#       define ENABLE_SHADERS_CACHE_LOAD 1
+#    endif
+#endif
+
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android_native_app_glue.h>
