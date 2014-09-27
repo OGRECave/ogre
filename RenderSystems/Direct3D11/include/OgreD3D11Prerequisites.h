@@ -66,7 +66,7 @@ THE SOFTWARE.
 #include <d3d11_1.h>
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE_80
 #   include <C:\Program Files (x86)\Windows Kits\8.0\Include\um\d3d11shader.h>
 #else
 #   include <d3d11shader.h>

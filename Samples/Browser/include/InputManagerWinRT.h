@@ -60,14 +60,14 @@ public:
 public:
     InputManagerWinRT()
     {
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
         m_tiltX = 0.0f;
         m_tiltY = 0.0f;
 #endif
     }
     void Initialize()
     {
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
         // Returns accelerometer ref if there is one; nullptr otherwise.
         m_accelerometer = Windows::Devices::Sensors::Accelerometer::GetDefault();
 #endif
@@ -75,7 +75,7 @@ public:
 
     void Update( Ogre::Real timeTotal, Ogre::Real timeDelta )
     {
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
         const float UserInactivityDuration = 60.0f; // in seconds
         const float UserInactivityThreshold = 0.01f;
          m_tiltX = 0.0f;
@@ -211,7 +211,7 @@ public:
 
     bool OnPointerAction(Windows::UI::Input::PointerPoint^ currentPoint, EPointerAction action)
     {
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
         //TODO: convert to use onpointerpressed/moved
         if (action == PointerPressed)
         {
@@ -297,7 +297,7 @@ private:
 
             // Convert from display independent pixels to resolution pixels.
             // convert from dips to screen pixels
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
             float scaleFactor = mState.width / 480.0f;
             int dx = (int)(scaleFactor * pt.X);
             int dy = (int)(scaleFactor * pt.Y);
@@ -432,7 +432,7 @@ private:
     WinRTMouse mOISMouse;
     WinRTKeyboard mOISKeyboard;
     
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
     typedef std::map<int, XMFLOAT2>                         TouchMap;
     TouchMap                                                m_touches;
     Windows::Devices::Sensors::Accelerometer^               m_accelerometer;

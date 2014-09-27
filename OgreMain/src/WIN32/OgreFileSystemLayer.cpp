@@ -29,8 +29,8 @@
 #include "OgreFileSystemLayer.h"
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#if !((OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE))
-#   include <shlobj.h>
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#  include <shlobj.h>
 #endif
 #include <io.h>
 #include <direct.h>

@@ -286,19 +286,15 @@ namespace OgreBites
         void initAppForWinRT( Windows::UI::Core::CoreWindow^ nativeWindow, InputContext inputContext)
         {
             mNativeWindow = nativeWindow;
-#   if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-            mNativeControl = nullptr;
-#       endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
             mInputContext = inputContext;
         }
-#       if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       if !__OGRE_WINRT_PHONE_80
         void initAppForWinRT( Windows::UI::Xaml::Shapes::Rectangle ^ nativeControl, InputContext inputContext)
         {
-            mNativeWindow = nullptr;
             mNativeControl = nativeControl;
             mInputContext = inputContext;
         }
-#       endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       endif
 #endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
         /*-----------------------------------------------------------------------------
           | init data members needed only by NaCl
@@ -775,7 +771,7 @@ namespace OgreBites
 
             if (evt.key == OIS::KC_ESCAPE)
             {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
                 // If there is a quit button, assume that we intended to press it via 'ESC'.
                 if (mTrayMgr->areTraysVisible())
                 {
@@ -786,7 +782,7 @@ namespace OgreBites
                         return false;  // now act as if we didn't handle the button to get AppModel to exit.
                     }
                 }
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
+#endif // __OGRE_WINRT_PHONE
                 if (mTitleLabel->getTrayLocation() != TL_NONE)
                 {
                     // if we're in the main screen and a sample's running, toggle sample pause state
@@ -1245,15 +1241,14 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void windowMovedOrResized()
         {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && !__OGRE_WINRT_PHONE_80
             if(mNativeControl)
             {
                 // in WinRT.Xaml case Ogre::RenderWindow is actually brush
                 // applied to native control and we need resize this brush manually
                 mWindow->resize(mNativeControl->ActualWidth, mNativeControl->ActualHeight);
             }
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#endif // !__OGRE_WINRT_PHONE_80
             mWindow->windowMovedOrResized();    // notify window
             windowResized(mWindow);                             // notify window event listeners
         }
@@ -1291,7 +1286,7 @@ namespace OgreBites
                 miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)reinterpret_cast<void*>(mNativeWindow.Get()));
                 res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Bounds.Width, mNativeWindow->Bounds.Height, false, &miscParams);
             }
-#       if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       if !__OGRE_WINRT_PHONE_80
             else if(mNativeControl)
             {
                 miscParams["windowType"] = "SurfaceImageSource";
@@ -1300,7 +1295,7 @@ namespace OgreBites
                 res->getCustomAttribute("ImageBrush", &pUnk);
                 mNativeControl->Fill = reinterpret_cast<Windows::UI::Xaml::Media::ImageBrush^>(pUnk);
             }
-#       endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       endif // !__OGRE_WINRT_PHONE_80
 
             return res;
 
@@ -2008,9 +2003,9 @@ namespace OgreBites
         int mStartSampleIndex;                         // directly starts the sample with the given index
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
         Platform::Agile<Windows::UI::Core::CoreWindow> mNativeWindow;
-#       if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       if !__OGRE_WINRT_PHONE_80
         Windows::UI::Xaml::Shapes::Rectangle^ mNativeControl;
-#       endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       endif // !__OGRE_WINRT_PHONE_80
 #endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;

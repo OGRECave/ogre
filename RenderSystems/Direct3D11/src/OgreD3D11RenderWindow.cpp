@@ -1244,10 +1244,10 @@ namespace Ogre
 
         Windows::Foundation::Rect rc = mCoreWindow->Bounds;
         float scale = Windows::Graphics::Display::DisplayProperties::LogicalDpi / 96;
-        mLeft = (int)(rc.X * scale);
-        mTop = (int)(rc.Y * scale);
-        mWidth = (int)(rc.Width * scale);
-        mHeight = (int)(rc.Height * scale);
+        mLeft = (int)(rc.X * scale + 0.5f);
+        mTop = (int)(rc.Y * scale + 0.5f);
+        mWidth = (int)(rc.Width * scale + 0.5f);
+        mHeight = (int)(rc.Height * scale + 0.5f);
 
         LogManager::getSingleton().stream()
             << "D3D11 : Created D3D11 Rendering Window '"
@@ -1282,7 +1282,7 @@ namespace Ogre
 
         // triple buffer if VSync is on
         mSwapChainDesc.BufferUsage          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE_80
         mSwapChainDesc.BufferCount          = 1;                                    // WP8: One buffer.
         mSwapChainDesc.Scaling              = DXGI_SCALING_STRETCH;                 // WP8: Must be stretch scaling mode.
         mSwapChainDesc.SwapEffect           = DXGI_SWAP_EFFECT_DISCARD;             // WP8: No swap effect.
@@ -1293,8 +1293,10 @@ namespace Ogre
 #endif
         mSwapChainDesc.AlphaMode            = DXGI_ALPHA_MODE_UNSPECIFIED;
 
+#if !__OGRE_WINRT_PHONE
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         rsys->determineFSAASettings(mFSAA, mFSAAHint, format, &mFSAAType);
+#endif
         mSwapChainDesc.SampleDesc.Count = mFSAAType.Count;
         mSwapChainDesc.SampleDesc.Quality = mFSAAType.Quality;
 
@@ -1341,7 +1343,7 @@ namespace Ogre
     // class D3D11RenderWindowImageSource
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowImageSource
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && !__OGRE_WINRT_PHONE_80
 
     D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
         : D3D11RenderWindowBase(device, pDXGIFactory)
@@ -1542,6 +1544,6 @@ namespace Ogre
 
         D3D11RenderWindowBase::getCustomAttribute(name, pData);
     }
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#endif // !__OGRE_WINRT_PHONE_80
 #pragma endregion
 }

@@ -36,7 +36,7 @@ THE SOFTWARE.
 #pragma warning( disable : 4451 ) // http://social.msdn.microsoft.com/Forums/en-US/winappswithnativecode/thread/314b5826-0a66-4307-abfe-87b8052c3c07/
 
 #    include <agile.h>
-#    if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+#    if !__OGRE_WINRT_PHONE_80
 #    include <windows.ui.xaml.media.dxinterop.h>
 #    endif
  
@@ -223,7 +223,7 @@ namespace Ogre
         Platform::Agile<Windows::UI::Core::CoreWindow> mCoreWindow;
     };
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#if !__OGRE_WINRT_PHONE_80
 
     class D3D11RenderWindowImageSource
         : public D3D11RenderWindowBase
@@ -252,7 +252,7 @@ namespace Ogre
         ISurfaceImageSourceNative*                              mImageSourceNative; // size depended, can be NULL
         ID3D11Texture2D*                                        mpBackBufferNoMSAA; // size depended, optional
     };
-#endif //  (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#endif // !__OGRE_WINRT_PHONE_80
 
 #endif
 

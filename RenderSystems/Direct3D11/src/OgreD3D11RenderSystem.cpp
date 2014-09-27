@@ -303,13 +303,18 @@ bail:
         optMaxFeatureLevels.name = "Max Requested Feature Levels";
         optMaxFeatureLevels.possibleValues.push_back("9.1");
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#    if  OGRE_WINRT_TARGET_TYPE == PHONE
+#if __OGRE_WINRT_PHONE_80
         optMaxFeatureLevels.possibleValues.push_back("9.2");
-#    endif
         optMaxFeatureLevels.possibleValues.push_back("9.3");
         optMaxFeatureLevels.currentValue = "9.3";
-#else     
+#elif __OGRE_WINRT_PHONE || __OGRE_WINRT_STORE
+        optMaxFeatureLevels.possibleValues.push_back("9.3");
+        optMaxFeatureLevels.possibleValues.push_back("10.0");
+        optMaxFeatureLevels.possibleValues.push_back("10.1");
+        optMaxFeatureLevels.possibleValues.push_back("11.0");
+        optMaxFeatureLevels.possibleValues.push_back("11.1");
+        optMaxFeatureLevels.currentValue = "11.1";
+#else
         optMaxFeatureLevels.possibleValues.push_back("9.3");
         optMaxFeatureLevels.possibleValues.push_back("10.0");
         optMaxFeatureLevels.possibleValues.push_back("10.1");
@@ -750,14 +755,14 @@ bail:
             }
 
             D3D_FEATURE_LEVEL requestedLevels[] = {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#if !__OGRE_WINRT_PHONE_80
+#if __OGRE_WINRT_STORE || __OGRE_WINRT_PHONE
                 D3D_FEATURE_LEVEL_11_1,
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-#if !( (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE) )
+#endif
                 D3D_FEATURE_LEVEL_11_0,
                 D3D_FEATURE_LEVEL_10_1,
                 D3D_FEATURE_LEVEL_10_0,
-#endif // !( (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE) )
+#endif // !__OGRE_WINRT_PHONE_80
                 D3D_FEATURE_LEVEL_9_3,
                 D3D_FEATURE_LEVEL_9_2,
                 D3D_FEATURE_LEVEL_9_1
@@ -1069,10 +1074,10 @@ bail:
 		}
 
 		D3D11RenderWindowBase* win = NULL;
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#if !__OGRE_WINRT_PHONE_80
 		if(win == NULL && windowType == "SurfaceImageSource")
 			win = new D3D11RenderWindowImageSource(mDevice, mpDXGIFactory);
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#endif // !__OGRE_WINRT_PHONE_80
 		if(win == NULL)
 			win = new D3D11RenderWindowCoreWindow(mDevice, mpDXGIFactory);
 #endif
@@ -3984,7 +3989,7 @@ bail:
         mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 
-#if  OGRE_WINRT_TARGET_TYPE == PHONE
+#    if __OGRE_WINRT_PHONE_80
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
 #    else
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
