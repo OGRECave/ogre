@@ -956,7 +956,7 @@ namespace Ogre
         mCurrentMappedConstBuffer   = currentMappedConstBuffer;
         mCurrentMappedTexBuffer     = currentMappedTexBuffer;
 
-        return (mCurrentConstBufferSize - mStartMappedConstBuffer) - 1;
+        return (mCurrentMappedConstBuffer - mStartMappedConstBuffer) - 1;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::unmapConstBuffer(void)

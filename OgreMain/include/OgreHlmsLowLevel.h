@@ -87,9 +87,9 @@ namespace Ogre
                                       bool casterPass, const HlmsCache *lastCache,
                                       uint32 lastTextureHash );
 
-        virtual void fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass, const HlmsCache *lastCache,
-                                     CommandBuffer *commandBuffer );
+        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                       bool casterPass, const HlmsCache *lastCache,
+                                       CommandBuffer *commandBuffer );
     };
 
     /** @} */

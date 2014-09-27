@@ -250,9 +250,10 @@ namespace Ogre
         return 0;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsLowLevel::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, const HlmsCache *lastCache,
-                                       CommandBuffer *commandBuffer )
+    uint32 HlmsLowLevel::fillBuffersFor( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, const HlmsCache *lastCache,
+                                         CommandBuffer *commandBuffer )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                      "Low Level materials not supported with Items and other V2 models",
