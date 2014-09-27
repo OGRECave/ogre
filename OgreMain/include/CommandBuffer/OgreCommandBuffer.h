@@ -33,6 +33,21 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    /** Command Buffer implementation.
+        This interface is very sensitive to performance. For this reason:
+    @par
+        1. Each command has a fixed size (@see COMMAND_FIXED_SIZE)
+           Whether a command uses all of the bytes is up to them.
+    @par
+        2. The command is stored as a flat contiguous array.
+    @par
+        3. Instead of implementing each command as a virtual function
+           to the base class 'CbBase', we use C-style function pointers
+           and manually maintain the table. This allows nifty optimizations
+           (i.e. a vtable in a 64-bit arch needs 8 bytes!) and storing
+           the commands as POD in the flat array (instead of having an
+           array of pointers, and having to call virtual destructors).
+    */
     class CommandBuffer
     {
         static const size_t COMMAND_FIXED_SIZE;
@@ -52,9 +67,11 @@ namespace Ogre
         void execute_disableTextureUnitsFrom( const CbBase * RESTRICT_ALIAS cmd );
         void execute_invalidCommand( const CbBase * RESTRICT_ALIAS cmd );
 
-        void execute( const CbBase * RESTRICT_ALIAS cmd );
+        /// Executes all the commands in the command buffer. Clears the cmd buffer afterwards
+        void execute(void);
 
-        /// Request a command.
+        /// Creates/Records a command already casted to the typename.
+        /// May invalidate returned pointers from previous calls.
         template <typename T>
         T* addCommand(void)
         {
@@ -67,11 +84,17 @@ namespace Ogre
             return retVal;
         }
 
+        /// Returns a pointer to the last created command
         CbBase* getLastCommand(void);
 
-        size_t getNumCommands(void) const           { return mCommandBuffer.size(); }
-
+        /// Returns the offset of the given command, in case you want to retrieve
+        /// the command later (addCommand may invalidate the pointer.
+        /// @see getCommandFromOffset.
         size_t getCommandOffset( CbBase *cmd ) const;
+
+        /// Retrieves the command from the given offset.
+        /// Returns null if no such command at that offset (out of bounds).
+        /// @see getCommandOffset.
         CbBase* getCommandFromOffset( size_t offset );
     };
 

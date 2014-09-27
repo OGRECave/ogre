@@ -59,12 +59,15 @@ namespace Ogre
                      "CommandBuffer::execute_setInvalidCommand" );
     }
     //-----------------------------------------------------------------------------------
-    void CommandBuffer::execute( const CbBase * RESTRICT_ALIAS cmd )
+    void CommandBuffer::execute(void)
     {
+        CbBase const * RESTRICT_ALIAS cmd = reinterpret_cast<CbBase*>( mCommandBuffer.begin() );
+
         size_t cmdBufferCount = mCommandBuffer.size() / CommandBuffer::COMMAND_FIXED_SIZE;
         for( size_t i=cmdBufferCount; i--; )
         {
             (*this.*CbExecutionTable[cmd->commandType])( cmd );
+            ++cmd;
         }
 
         mCommandBuffer.clear();
