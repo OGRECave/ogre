@@ -83,14 +83,11 @@ public:
     // Core Fondation Dictionary helper functions, also static for ease of use in above static
     static Boolean _getDictionaryBoolean(CFDictionaryRef dict, const void* key);
     static long _getDictionaryLong(CFDictionaryRef dict, const void* key);
-    bool OSVersionIsAtLeast(String newVersion);
+    bool OSVersionIsAtLeast(double minAppKitVersionNumber); // pass constants like NSAppKitVersionNumber10_7
 
 protected:
     String mAPI;
     String mContextType;
-
-    //Implement this in .mm and put all obj.c objects there
-    class OSXGLSupportImpl * mImpl;
     
 }; // class OSXGLSupport
 

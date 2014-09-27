@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Mappings.h"
-#include "OgreMonitorInfo.h"
 
 namespace Ogre 
 {
@@ -63,8 +62,7 @@ namespace Ogre
         D3D_FEATURE_LEVEL mFeatureLevel;
         D3D_FEATURE_LEVEL mMinRequestedFeatureLevel;
         D3D_FEATURE_LEVEL mMaxRequestedFeatureLevel;
-		MonitorInfo mMonitorInfo;
-		
+
         /// Direct3D rendering device
         D3D11Device     mDevice;
         
@@ -79,7 +77,6 @@ namespace Ogre
         bool mUseNVPerfHUD;
 		int mSwitchingFullscreenCounter;	// Are we switching from windowed to fullscreen 
 
-		bool mIsWorkingUnderNsight;
         /// structure holding texture unit settings for every stage
 		std::string getCreationErrorMessage(HRESULT hr, bool isDebug);
 
@@ -88,8 +85,6 @@ namespace Ogre
         void refreshFSAAOptions(void);
         void freeDevice(void);
 
-		void getIsWorkingUnderNsight();
-        
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
         
@@ -218,8 +213,6 @@ namespace Ogre
 		void addToSwitchingFullscreenCounter()					{ mSwitchingFullscreenCounter++; }
 		
         void initRenderSystem();
-		
-		MonitorInfo & getMonitorInfo() { return mMonitorInfo; }
 
         virtual void initConfigOptions(void);
 

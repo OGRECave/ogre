@@ -259,7 +259,7 @@ function(ogre_config_framework LIBNAME)
          PROPERTIES BUILD_WITH_INSTALL_RPATH 1
          INSTALL_NAME_DIR "@executable_path/../Frameworks"
       )
-      set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADERS}")
+      set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES};${PLATFORM_HEADERS};" )
       set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
       set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
       set_target_properties(${LIBNAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")

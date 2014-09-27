@@ -1280,11 +1280,9 @@ namespace Ogre
         RenderWindowResources* resources = it->second;
         bool swapChain = isSwapChainWindow(renderWindow);
 
-
-
-        if ((dst.left < 0) || (dst.right > renderWindow->getWidth()) ||
-            (dst.top < 0) || (dst.bottom > renderWindow->getHeight()) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > renderWindow->getWidth() ||
+            dst.getHeight() > renderWindow->getHeight() ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Invalid box.",

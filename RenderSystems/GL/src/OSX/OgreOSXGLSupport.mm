@@ -48,31 +48,17 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class OSXGLSupportImpl
-    {
-    public:
-        OSXGLSupportImpl(){}
-        NSString * mCurrentOSVersion;
-    };
-    
-bool OSXGLSupport::OSVersionIsAtLeast(String newVersion)
+bool OSXGLSupport::OSVersionIsAtLeast(double minAppKitVersionNumber)
 {
-    return [mImpl->mCurrentOSVersion compare:[NSString stringWithCString:newVersion.c_str() encoding:NSASCIIStringEncoding]
-                              options:NSNumericSearch] >= NSOrderedSame;
+    return NSAppKitVersionNumber >= minAppKitVersionNumber;
 }
-
 
 OSXGLSupport::OSXGLSupport() : mAPI(""), mContextType("")
 {
-    
-    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"];
-    mImpl = new OSXGLSupportImpl();
-    mImpl->mCurrentOSVersion = [dict objectForKey:@"ProductVersion"];
 }
 
 OSXGLSupport::~OSXGLSupport()
 {
-    delete mImpl;
 }
 
 void OSXGLSupport::addConfig( void )
@@ -138,7 +124,7 @@ void OSXGLSupport::addConfig( void )
     optContentScalingFactor.possibleValues.push_back( "1.33" );
     optContentScalingFactor.possibleValues.push_back( "1.5" );
     optContentScalingFactor.possibleValues.push_back( "2.0" );
-    if(OSVersionIsAtLeast("10.7"))
+    if(OSVersionIsAtLeast(NSAppKitVersionNumber10_7))
         optContentScalingFactor.currentValue = StringConverter::toString((float)[NSScreen mainScreen].backingScaleFactor);
     else
         optContentScalingFactor.currentValue = "1.0";

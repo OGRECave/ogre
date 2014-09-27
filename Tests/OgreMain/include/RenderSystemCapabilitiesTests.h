@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __RenderSystemCapabilitiesTests_H__
+#define __RenderSystemCapabilitiesTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -35,15 +39,12 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-
 class RenderSystemCapabilitiesTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( RenderSystemCapabilitiesTests );
-
+    CPPUNIT_TEST_SUITE(RenderSystemCapabilitiesTests);
     CPPUNIT_TEST(testIsShaderProfileSupported);
     CPPUNIT_TEST(testHasCapability);
-
     CPPUNIT_TEST(testSerializeBlank);
     CPPUNIT_TEST(testSerializeEnumCapability);
     CPPUNIT_TEST(testSerializeStringCapability);
@@ -51,13 +52,10 @@ class RenderSystemCapabilitiesTests : public CppUnit::TestFixture
     CPPUNIT_TEST(testSerializeIntCapability);
     CPPUNIT_TEST(testSerializeRealCapability);
     CPPUNIT_TEST(testSerializeShaderCapability);
-
     CPPUNIT_TEST(testWriteSimpleCapabilities);
     CPPUNIT_TEST(testWriteAllFalseCapabilities);
     CPPUNIT_TEST(testWriteAllTrueCapabilities);
-
     CPPUNIT_TEST(testWriteAndReadComplexCapabilities);
-
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -89,6 +87,6 @@ public:
     // Need these for loading .rendercaps from the file system
     ArchiveManager* mArchiveManager;
     FileSystemArchiveFactory* mFileSystemArchiveFactory;
-    LogManager *mLogManager;
-
 };
+
+#endif

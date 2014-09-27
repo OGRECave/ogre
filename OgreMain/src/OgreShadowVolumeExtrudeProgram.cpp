@@ -736,6 +736,27 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
     String ShadowVolumeExtrudeProgram::frgProgramName = "";
 
     bool ShadowVolumeExtrudeProgram::mInitialised = false;
+
+	//---------------------------------------------------------------------
+	// programs for Ogre/StencilShadowModulationPass material
+	//---------------------------------------------------------------------
+	const String gShadowModulativePassVs_Name = "Ogre/StencilShadowModulationPassVs";
+	const String gShadowModulativePassPs_Name = "Ogre/StencilShadowModulationPassPs";
+
+	const String gShadowModulativePassVs_4_0 =
+		"float4x4	worldviewproj_matrix;\n"
+		"void vs_main(in float4 iPos : POSITION, out float4 oPos : SV_Position)\n"
+		"{\n"
+		"    oPos = mul(worldviewproj_matrix, iPos);\n"
+		"}\n";
+
+	const String gShadowModulativePassPs_4_0 =
+		"float4 ambient_light_colour;\n"
+		"void fs_main(in float4 oPos : SV_Position, out float4 oColor : SV_Target)\n"
+		"{\n"
+		"    oColor = ambient_light_colour;\n"
+		"}\n";
+
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 

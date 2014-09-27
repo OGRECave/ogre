@@ -108,7 +108,8 @@ namespace Ogre {
             ERR_FILE_NOT_FOUND,
             ERR_INTERNAL_ERROR,
             ERR_RT_ASSERTION_FAILED,
-            ERR_NOT_IMPLEMENTED
+            ERR_NOT_IMPLEMENTED,
+            ERR_INVALID_CALL
         };
 
         /** Default constructor.
@@ -234,7 +235,12 @@ namespace Ogre {
         RuntimeAssertionException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
             : Exception(inNumber, inDescription, inSource, "RuntimeAssertionException", inFile, inLine) {}
     };
-
+    class _OgreExport InvalidCallException : public Exception
+    {
+    public:
+        InvalidCallException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+            : Exception(inNumber, inDescription, inSource, "InvalidCallException", inFile, inLine) {}
+    };
 
     /** Class implementing dispatch methods in order to construct by-value
         exceptions of a derived type based just on an exception code.
@@ -251,25 +257,26 @@ namespace Ogre {
         /// Private constructor, no construction
         ExceptionFactory() {}
     public:
-		static OGRE_NORETURN void throwException(
-			Exception::ExceptionCodes code, int number,
+        static OGRE_NORETURN void throwException(
+            Exception::ExceptionCodes code, int number,
             const String& desc, 
             const String& src, const char* file, long line)
         {
-			switch (code)
-        {
-			case Exception::ERR_CANNOT_WRITE_TO_FILE:	throw IOException(number, desc, src, file, line);
-			case Exception::ERR_INVALID_STATE:			throw InvalidStateException(number, desc, src, file, line);
-			case Exception::ERR_INVALIDPARAMS:			throw InvalidParametersException(number, desc, src, file, line);
-			case Exception::ERR_RENDERINGAPI_ERROR:		throw RenderingAPIException(number, desc, src, file, line);
-			case Exception::ERR_DUPLICATE_ITEM:			throw ItemIdentityException(number, desc, src, file, line);
-			case Exception::ERR_ITEM_NOT_FOUND:			throw ItemIdentityException(number, desc, src, file, line);
-			case Exception::ERR_FILE_NOT_FOUND:			throw FileNotFoundException(number, desc, src, file, line);
-			case Exception::ERR_INTERNAL_ERROR:			throw InternalErrorException(number, desc, src, file, line);
-			case Exception::ERR_RT_ASSERTION_FAILED:	throw RuntimeAssertionException(number, desc, src, file, line);
-			case Exception::ERR_NOT_IMPLEMENTED:		throw UnimplementedException(number, desc, src, file, line);
-			default:									throw Exception(number, desc, src, "Exception", file, line);
-        }
+            switch (code)
+            {
+            case Exception::ERR_CANNOT_WRITE_TO_FILE:   throw IOException(number, desc, src, file, line);
+            case Exception::ERR_INVALID_STATE:          throw InvalidStateException(number, desc, src, file, line);
+            case Exception::ERR_INVALIDPARAMS:          throw InvalidParametersException(number, desc, src, file, line);
+            case Exception::ERR_RENDERINGAPI_ERROR:     throw RenderingAPIException(number, desc, src, file, line);
+            case Exception::ERR_DUPLICATE_ITEM:         throw ItemIdentityException(number, desc, src, file, line);
+            case Exception::ERR_ITEM_NOT_FOUND:         throw ItemIdentityException(number, desc, src, file, line);
+            case Exception::ERR_FILE_NOT_FOUND:         throw FileNotFoundException(number, desc, src, file, line);
+            case Exception::ERR_INTERNAL_ERROR:         throw InternalErrorException(number, desc, src, file, line);
+            case Exception::ERR_RT_ASSERTION_FAILED:    throw RuntimeAssertionException(number, desc, src, file, line);
+            case Exception::ERR_NOT_IMPLEMENTED:        throw UnimplementedException(number, desc, src, file, line);
+            case Exception::ERR_INVALID_CALL:           throw InvalidCallException(number, desc, src, file, line);
+            default:                                    throw Exception(number, desc, src, "Exception", file, line);
+            }
         }
 
     };
@@ -277,10 +284,10 @@ namespace Ogre {
 
     
 #ifndef OGRE_EXCEPT
-#define OGRE_EXCEPT(code, desc, src)			Ogre::ExceptionFactory::throwException(code, code, desc, src, __FILE__, __LINE__);
-#define OGRE_EXCEPT_EX(code, num, desc, src) 	Ogre::ExceptionFactory::throwException(code, num, desc, src, __FILE__, __LINE__);
+#define OGRE_EXCEPT(code, desc, src)         Ogre::ExceptionFactory::throwException(code, code, desc, src, __FILE__, __LINE__)
+#define OGRE_EXCEPT_EX(code, num, desc, src) Ogre::ExceptionFactory::throwException(code, num, desc, src, __FILE__, __LINE__)
 #else
-#define OGRE_EXCEPT_EX(code, num, desc, src) 	OGRE_EXCEPT(code, desc, src);
+#define OGRE_EXCEPT_EX(code, num, desc, src) OGRE_EXCEPT(code, desc, src)
 #endif
     /** @} */
     /** @} */

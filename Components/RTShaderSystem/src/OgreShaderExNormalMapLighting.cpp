@@ -637,8 +637,8 @@ bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuVertexProgram();
     Program* psProgram = programSet->getCpuFragmentProgram();
 
-	vsProgram->addDependency(FFP_LIB_TEXTURING);
-	psProgram->addDependency(FFP_LIB_TEXTURING);
+    vsProgram->addDependency(FFP_LIB_TEXTURING);
+    psProgram->addDependency(FFP_LIB_TEXTURING);
 
     vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(SGX_LIB_NORMALMAPLIGHTING);
@@ -863,7 +863,7 @@ bool NormalMapLighting::addPSNormalFetchInvocation(Function* psMain, const int g
 		curFuncInvocation->pushOperand(mNormalMapSampler, Operand::OPS_IN);
 
     curFuncInvocation->pushOperand(mPSInTexcoord, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_OUT);    
+	curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_OUT);	
     psMain->addAtomInstance(curFuncInvocation);     
 
     return true;

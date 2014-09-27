@@ -150,25 +150,13 @@ namespace Ogre {
         @return A shared pointer to a DataStream which can be used to 
         read / write the file. 
         */
-        virtual DataStreamPtr create(const String& filename)
-        {
-                        (void)filename;
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-                "This archive does not support creation of files.", 
-                "Archive::create");
-        }
+        virtual DataStreamPtr create(const String& filename);
 
         /** Delete a named file.
         @remarks Not possible on read-only archives
         @param filename The fully qualified name of the file
         */
-        virtual void remove(const String& filename)
-        {
-                        (void)filename;
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-                "This archive does not support removal of files.", 
-                "Archive::remove");
-        }
+        virtual void remove(const String& filename);
 
         /** List all file names in the archive.
         @note

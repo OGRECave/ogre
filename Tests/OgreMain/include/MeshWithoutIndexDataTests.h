@@ -25,17 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __MeshWithoutIndexDataTests_H__
+#define __MeshWithoutIndexDataTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "OgreLogManager.h"
 
 using namespace Ogre;
-using Ogre::ushort;
 
 class MeshWithoutIndexDataTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( MeshWithoutIndexDataTests );
+    CPPUNIT_TEST_SUITE(MeshWithoutIndexDataTests);
     CPPUNIT_TEST(testCreateSimpleLine);
     CPPUNIT_TEST(testCreateLineList);
     CPPUNIT_TEST(testCreateLineStrip);
@@ -52,12 +54,12 @@ class MeshWithoutIndexDataTests : public CppUnit::TestFixture
 protected:
     HardwareBufferManager* mBufMgr;
     MeshManager* mMeshMgr;
-    ArchiveManager* archiveMgr;
-    LogManager *mLogManager;
+    ArchiveManager* mArchiveMgr;
 
 public:
     void setUp();
     void tearDown();
+
     void testCreateSimpleLine();
     void testCreateLineList();
     void testCreateLineStrip();
@@ -69,5 +71,5 @@ public:
     void testGenerateExtremes();
     void testBuildTangentVectors();
     void testGenerateLodLevels();
-
 };
+#endif

@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __PixelFormatTests_H__
+#define __PixelFormatTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "OgrePixelFormat.h"
@@ -34,11 +38,12 @@ using namespace Ogre;
 class PixelFormatTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( PixelFormatTests );
-    CPPUNIT_TEST( testIntegerPackUnpack );
-    CPPUNIT_TEST( testFloatPackUnpack );
-    CPPUNIT_TEST( testBulkConversion );
+    CPPUNIT_TEST_SUITE(PixelFormatTests);
+    CPPUNIT_TEST(testIntegerPackUnpack);
+    CPPUNIT_TEST(testFloatPackUnpack);
+    CPPUNIT_TEST(testBulkConversion);
     CPPUNIT_TEST_SUITE_END();
+
 public:
     void setUp();
     void tearDown();
@@ -50,9 +55,12 @@ public:
     // Utils
     void setupBoxes(PixelFormat srcFormat, PixelFormat dstFormat);
     void testCase(PixelFormat srcFormat, PixelFormat dstFormat);
+
 private:
-    int size;
-    uint8 *randomData;
-    uint8 *temp, *temp2;
-    PixelBox src, dst1, dst2;
+    int mSize;
+    uint8 *mRandomData;
+    uint8 *mTemp, *mTemp2;
+    PixelBox mSrc, mDst1, mDst2;
 };
+
+#endif

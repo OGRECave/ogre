@@ -328,6 +328,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "D3D11RenderWindowBase::copyContentsToMemory" );
+        }
+
         if(mpBackBuffer == NULL)
             return;
 
@@ -392,7 +399,7 @@ namespace Ogre
         mDevice.GetImmediateContext()->Map(pTempTexture2D, 0,D3D11_MAP_READ, 0, &mappedTex2D);
 
         // copy the texture to the dest
-        PixelBox src = D3D11Mappings::getPixelBoxWithMapping(mWidth, mHeight, 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D);
+        PixelBox src = D3D11Mappings::getPixelBoxWithMapping(dst.getWidth(), dst.getHeight(), 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D);
         PixelUtil::bulkPixelConversion(src, dst);
 
         // unmap the temp buffer
@@ -521,25 +528,6 @@ namespace Ogre
         rsys->fireDeviceEvent(&mDevice,"RenderWindowResized",this);
     }
 
-	//---------------------------------------------------------------------
-	int D3D11RenderWindowSwapChainBased::getContainingMonitorNumber()
-	{
-		IDXGISwapChain* swapChain = _getSwapChain();
-		IDXGIOutput* output;
-		int monitorSequencialNumber = -1;
-		if (swapChain != NULL)
-		{
-			HRESULT hr = swapChain->GetContainingOutput(&output);
-			if (hr == S_OK)
-			{
-				DXGI_OUTPUT_DESC desc;
-				output->GetDesc(&desc);
-				D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-				monitorSequencialNumber = rsys->getMonitorInfo().getMonitorSequentialNumberFromHMonitor(desc.Monitor);
-			}
-		}
-		return monitorSequencialNumber;
-	}
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::swapBuffers( )
     {
@@ -673,36 +661,6 @@ namespace Ogre
             opt = miscParams->find("externalWindowHandle");
             if(opt != miscParams->end())
                 externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
-			
-				opt = miscParams->find("vsync");
-				if(opt != miscParams->end())
-					mVSync = StringConverter::parseBool(opt->second);
-				opt = miscParams->find("hidden");
-				if(opt != miscParams->end())
-					mHidden = StringConverter::parseBool(opt->second);
-				opt = miscParams->find("vsyncInterval");
-				if(opt != miscParams->end())
-					mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
-				opt = miscParams->find("displayFrequency");
-				if(opt != miscParams->end())
-					mDisplayFrequency = StringConverter::parseUnsignedInt(opt->second);
-				opt = miscParams->find("colourDepth");
-				if(opt != miscParams->end())
-					colourDepth = StringConverter::parseUnsignedInt(opt->second);
-				opt = miscParams->find("depthBuffer");
-				if(opt != miscParams->end())
-					depthBuffer = StringConverter::parseBool(opt->second);
-				opt = miscParams->find("FSAA");
-				if(opt != miscParams->end())
-				{
-					mFSAA = StringConverter::parseUnsignedInt(opt->second);
-				}
-				opt = miscParams->find("FSAAHint");
-				if(opt != miscParams->end())
-				{
-					mFSAAHint = opt->second;
-				}
-			
             // window border style
             opt = miscParams->find("border");
             if(opt != miscParams->end())
@@ -711,17 +669,10 @@ namespace Ogre
             opt = miscParams->find("outerDimensions");
             if(opt != miscParams->end())
                 outerSize = StringConverter::parseBool(opt->second);
-			
-				opt = miscParams->find("gamma");
-				if(opt != miscParams->end())
-					mHwGamma = StringConverter::parseBool(opt->second);
-				opt = miscParams->find("monitorIndex");
-				if(opt != miscParams->end())
-					monitorIndex = StringConverter::parseInt(opt->second);
-				opt = miscParams->find("show");
-				if(opt != miscParams->end())
-					mHidden = !StringConverter::parseBool(opt->second);
-			
+            opt = miscParams->find("monitorIndex");
+            if(opt != miscParams->end())
+                monitorIndex = StringConverter::parseInt(opt->second);
+
             // enable double click messages
             opt = miscParams->find("enableDoubleClick");
             if(opt != miscParams->end())
@@ -828,15 +779,11 @@ namespace Ogre
 			UINT classStyle = 0;
 			if (enableDoubleClick)
 				classStyle |= CS_DBLCLKS;
-#ifdef OGRE_STATIC_LIB
-			HINSTANCE hInst = GetModuleHandle( NULL );
-#else
-#  if OGRE_DEBUG_MODE == 1
-			HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11_d.dll" );
-#  else
-			HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11.dll" );
-#  endif
-#endif
+
+			HINSTANCE hInst = NULL;
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+
 			WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
 				LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
 				(HBRUSH)GetStockObject(BLACK_BRUSH), 0, OGRE_D3D11_WIN_CLASS_NAME };
@@ -1398,7 +1345,7 @@ namespace Ogre
 
     D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
         : D3D11RenderWindowBase(device, pDXGIFactory)
-        , mImageSourceNative(NULL)
+        , mImageSourceNative(NULL), mpBackBufferNoMSAA(NULL)
     {
     }
     //---------------------------------------------------------------------
@@ -1431,6 +1378,7 @@ namespace Ogre
     {
         D3D11RenderWindowBase::destroy();
 
+        SAFE_RELEASE(mpBackBufferNoMSAA);
         SAFE_RELEASE(mImageSourceNative);
         mImageSource = nullptr;
         mBrush = nullptr;
@@ -1439,6 +1387,7 @@ namespace Ogre
     void D3D11RenderWindowImageSource::_createSizeDependedD3DResources()
     {
         SAFE_RELEASE(mpBackBuffer);
+        SAFE_RELEASE(mpBackBufferNoMSAA);
         SAFE_RELEASE(mImageSourceNative);
 
         if(mWidth <= 0 || mHeight <= 0)
@@ -1448,6 +1397,9 @@ namespace Ogre
             return;
         }
 
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->determineFSAASettings(mFSAA, mFSAAHint, DXGI_FORMAT_B8G8R8A8_UNORM, &mFSAAType);
+
         // create back buffer - ID3D11Texture2D
         D3D11_TEXTURE2D_DESC desc = {0};
         desc.Width = mWidth;
@@ -1455,8 +1407,8 @@ namespace Ogre
         desc.MipLevels = 1;
         desc.ArraySize = 1;
         desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-        desc.SampleDesc.Count = 1;
-        desc.SampleDesc.Quality = 0;
+        desc.SampleDesc.Count = mFSAAType.Count;
+        desc.SampleDesc.Quality = mFSAAType.Quality;
         desc.Usage = D3D11_USAGE_DEFAULT;
         desc.BindFlags = D3D11_BIND_RENDER_TARGET;
         desc.CPUAccessFlags = 0;

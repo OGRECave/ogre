@@ -41,6 +41,7 @@
 
 #import "OgreOSXCocoaWindow.h"
 #import <QuartzCore/CVDisplayLink.h>
+#include <iostream>
 
 #include "SampleBrowser.h"
 

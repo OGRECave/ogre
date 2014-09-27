@@ -9,6 +9,7 @@ syntax: glob
 *.obj
 *.rule
 *.sdf
+.DS_Store
 Dependencies/*
 iOSDependencies
 build/*

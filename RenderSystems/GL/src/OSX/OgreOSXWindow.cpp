@@ -76,9 +76,9 @@ namespace Ogre
     //-------------------------------------------------------------------------------------------------//
     void OSXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if ((dst.right > mWidth) ||
-            (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Invalid box.",

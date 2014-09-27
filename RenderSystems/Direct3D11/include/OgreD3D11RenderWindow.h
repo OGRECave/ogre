@@ -114,8 +114,6 @@ namespace Ogre
         /// Get the presentation parameters used with this window
         DXGI_SWAP_CHAIN_DESC_N* getPresentationParameters(void) { return &mSwapChainDesc; }
 
-		int getContainingMonitorNumber();
-
 		IDXGISwapChainN * _getSwapChain() { return mpSwapChain; }
 
         /// @copydoc RenderTarget::setFSAA

@@ -46,6 +46,8 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreSkeleton.h"
 
+#include "UnitTestSuite.h"
+
 //#define I_HAVE_LOT_OF_FREE_TIME
 
 // To run XML test, you need to symlink all files (except main.cpp) from XMLConverter tool to the Test_Ogre component!
@@ -66,17 +68,13 @@ THE SOFTWARE.
 #include "macUtils.h"
 #endif
 
-// Register the suite
+// Register the test suite
 CPPUNIT_TEST_SUITE_REGISTRATION(MeshSerializerTests);
 
+//--------------------------------------------------------------------------
 void MeshSerializerTests::setUp()
 {
-    errorFactor = 0.05;
-
-    OGRE_DELETE LogManager::getSingletonPtr();
-    mLogManager = OGRE_NEW LogManager();
-    mLogManager->createLog("MeshWithoutIndexDataTests.log", false);
-    mLogManager->setLogDetail(LL_LOW);
+    mErrorFactor = 0.05;
 
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
@@ -94,6 +92,7 @@ void MeshSerializerTests::setUp()
     // Load resource paths from config file
     ConfigFile cf;
     String resourcesPath;
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #else
@@ -116,7 +115,6 @@ void MeshSerializerTests::setUp()
                 ResourceGroupManager::getSingleton().addResourceLocation(
                     archName, typeName, secName);
             }
-
         }
     }
 
@@ -136,16 +134,18 @@ void MeshSerializerTests::setUp()
     }
 
     mMesh->reload();
+
 #ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR
     {
         MeshLodGenerator().generateAutoconfiguredLodLevels(mMesh);
     }
 #endif /* ifdef OGRE_BUILD_COMPONENT_MESHLODGENERATOR */
+
     mOrigMesh = mMesh->clone(mMesh->getName() + ".orig.mesh", mMesh->getGroup());
 }
+//--------------------------------------------------------------------------
 void MeshSerializerTests::tearDown()
 {
-
     // Copy back original file.
     if (!mMeshFullPath.empty()) {
         copyFile(mMeshFullPath + ".bak", mMeshFullPath);
@@ -164,83 +164,100 @@ void MeshSerializerTests::tearDown()
     if (!mSkeleton.isNull()) {
         mSkeleton->unload();
         mSkeleton.setNull();
-    }
+    }    
+    
     OGRE_DELETE MeshManager::getSingletonPtr();
     OGRE_DELETE SkeletonManager::getSingletonPtr();
     OGRE_DELETE DefaultHardwareBufferManager::getSingletonPtr();
-    OGRE_DELETE ArchiveManager::getSingletonPtr();
+    OGRE_DELETE ArchiveManager::getSingletonPtr();    
     OGRE_DELETE MaterialManager::getSingletonPtr();
     OGRE_DELETE LodStrategyManager::getSingletonPtr();
     OGRE_DELETE ResourceGroupManager::getSingletonPtr();
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
-    OGRE_DELETE mLogManager;
 }
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh_clone()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     MeshPtr cloneMesh = mMesh->clone(mMesh->getName() + ".clone.mesh", mMesh->getGroup());
     assertMeshClone(mMesh.get(), cloneMesh.get());
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh(MeshVersion version)
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     MeshSerializer serializer;
     serializer.exportMesh(mOrigMesh.get(), mMeshFullPath, version);
     mMesh->reload();
     assertMeshClone(mOrigMesh.get(), mMesh.get(), version);
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testSkeleton_Version_1_8()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     if (!mSkeleton.isNull()) {
         SkeletonSerializer skeletonSerializer;
         skeletonSerializer.exportSkeleton(mSkeleton.get(), mSkeletonFullPath, SKELETON_VERSION_1_8);
         mSkeleton->reload();
     }
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testSkeleton_Version_1_0()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     if (!mSkeleton.isNull()) {
         SkeletonSerializer skeletonSerializer;
         skeletonSerializer.exportSkeleton(mSkeleton.get(), mSkeletonFullPath, SKELETON_VERSION_1_0);
         mSkeleton->reload();
     }
 }
-
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh_Version_1_10()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     testMesh(MESH_VERSION_LATEST);
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh_Version_1_8()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     testMesh(MESH_VERSION_1_8);
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh_Version_1_41()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     testMesh(MESH_VERSION_1_7);
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh_Version_1_4()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     testMesh(MESH_VERSION_1_4);
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh_Version_1_3()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     testMesh(MESH_VERSION_1_0);
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh_Version_1_2()
 {
-    // Exporting legacy Mesh not supported!
-    // testMesh(MESH_VERSION_LEGACY);
-
 #ifdef I_HAVE_LOT_OF_FREE_TIME
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     // My sandboxing test. Takes a long time to complete!
-    // Runs on all meshes and exports all to every Lod version.
+    // Runs on all meshes and exports all to every LoD version.
     char* groups [] = { "Popular", "General", "Tests" };
     for (int i = 0; i < 3; i++) {
         StringVectorPtr meshes = ResourceGroupManager::getSingleton().findResourceNames(groups[i], "*.mesh");
@@ -287,10 +304,12 @@ void MeshSerializerTests::testMesh_Version_1_2()
     }
 #endif /* ifdef I_HAVE_LOT_OF_FREE_TIME */
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::testMesh_XML()
 {
 #ifdef OGRE_TEST_XMLSERIALIZER
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     XMLMeshSerializer serializerXML;
     serializerXML.exportMesh(mOrigMesh.get(), mMeshFullPath + ".xml");
     mMesh = MeshManager::getSingleton().create(mMesh->getName() + ".test.mesh", mMesh->getGroup());
@@ -298,7 +317,7 @@ void MeshSerializerTests::testMesh_XML()
     assertMeshClone(mOrigMesh.get(), mMesh.get());
 #endif
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version /*= MESH_VERSION_LATEST*/)
 {
     // TODO: Compare skeleton
@@ -353,6 +372,7 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
     CPPUNIT_ASSERT(a->getSharedVertexDataAnimationType() == b->getSharedVertexDataAnimationType());
     CPPUNIT_ASSERT(a->getVertexBufferUsage() == b->getVertexBufferUsage());
     CPPUNIT_ASSERT(a->hasVertexAnimation() == b->hasVertexAnimation());
+
 #ifndef OGRE_TEST_XMLSERIALIZER
     CPPUNIT_ASSERT(a->isEdgeListBuilt() == b->isEdgeListBuilt()); // <== OgreXMLSerializer is doing post processing to generate edgelists!
 #endif // !OGRE_TEST_XMLSERIALIZER
@@ -375,6 +395,7 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
             assertLodUsageClone(a->getLodLevel(i), b->getLodLevel(i));
         }
     }
+
     CPPUNIT_ASSERT(a->getNumSubMeshes() == b->getNumSubMeshes());
     int numLods = std::min(a->getNumLodLevels(), b->getNumLodLevels());
     int numSubmeshes = a->getNumSubMeshes();
@@ -404,7 +425,7 @@ void MeshSerializerTests::assertMeshClone(Mesh* a, Mesh* b, MeshVersion version 
         }
     }
 }
-
+//--------------------------------------------------------------------------
 bool MeshSerializerTests::isLodMixed(const Mesh* pMesh)
 {
     if (!pMesh->hasManualLodLevel()) {
@@ -420,6 +441,7 @@ bool MeshSerializerTests::isLodMixed(const Mesh* pMesh)
 
     return false;
 }
+//--------------------------------------------------------------------------
 void MeshSerializerTests::assertVertexDataClone(VertexData* a, VertexData* b, MeshVersion version /*= MESH_VERSION_LATEST*/)
 {
     CPPUNIT_ASSERT((a == NULL) == (b == NULL));
@@ -454,6 +476,7 @@ void MeshSerializerTests::assertVertexDataClone(VertexData* a, VertexData* b, Me
             for (; aIt != aEndIt; aIt++) {
                 bIt = std::find(bElements.begin(), bElements.end(), *aIt);
                 CPPUNIT_ASSERT(bIt != bElements.end());
+
 #ifndef OGRE_TEST_XMLSERIALIZER
                 const VertexElement& aElem = *aIt;
                 const VertexElement& bElem = *bIt;
@@ -477,7 +500,6 @@ void MeshSerializerTests::assertVertexDataClone(VertexData* a, VertexData* b, Me
                 CPPUNIT_ASSERT(!error && "Content of vertex buffer differs!");
 #endif /* ifndef OGRE_TEST_XMLSERIALIZER */
             }
-
         }
 
         CPPUNIT_ASSERT(a->vertexStart == b->vertexStart);
@@ -500,11 +522,13 @@ void MeshSerializerTests::assertVertexDataClone(VertexData* a, VertexData* b, Me
         }
     }
 }
+//--------------------------------------------------------------------------
 template<typename T>
 bool MeshSerializerTests::isContainerClone(T& a, T& b)
 {
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
 }
+//--------------------------------------------------------------------------
 template<typename K, typename V>
 bool MeshSerializerTests::isHashMapClone(const HashMap<K, V>& a, const HashMap<K, V>& b)
 {
@@ -524,6 +548,7 @@ bool MeshSerializerTests::isHashMapClone(const HashMap<K, V>& a, const HashMap<K
     }
     return true;
 }
+//--------------------------------------------------------------------------
 void MeshSerializerTests::assertIndexDataClone(IndexData* a, IndexData* b, MeshVersion version /*= MESH_VERSION_LATEST*/)
 {
     CPPUNIT_ASSERT((a == NULL) == (b == NULL));
@@ -548,7 +573,7 @@ void MeshSerializerTests::assertIndexDataClone(IndexData* a, IndexData* b, MeshV
         }
     }
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::assertEdgeDataClone(EdgeData* a, EdgeData* b, MeshVersion version /*= MESH_VERSION_LATEST*/)
 {
     CPPUNIT_ASSERT((a == NULL) == (b == NULL));
@@ -561,14 +586,14 @@ void MeshSerializerTests::assertEdgeDataClone(EdgeData* a, EdgeData* b, MeshVers
         CPPUNIT_ASSERT(a->edgeGroups.size() == b->edgeGroups.size());
     }
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::assertLodUsageClone(const MeshLodUsage& a, const MeshLodUsage& b, MeshVersion version /*= MESH_VERSION_LATEST*/)
 {
     CPPUNIT_ASSERT(a.manualName == b.manualName);
     CPPUNIT_ASSERT(isEqual(a.userValue, b.userValue));
     CPPUNIT_ASSERT(isEqual(a.value, b.value));
 }
-
+//--------------------------------------------------------------------------
 void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, String& outPath)
 {
     ResourceGroupManager& resourceGroupMgr = ResourceGroupManager::getSingleton();
@@ -601,7 +626,7 @@ void MeshSerializerTests::getResourceFullPath(const ResourcePtr& resource, Strin
 
     assert(info->archive->getType() == "FileSystem");
 }
-
+//--------------------------------------------------------------------------
 bool MeshSerializerTests::copyFile(const String& srcPath, const String& dstPath)
 {
     std::ifstream src(srcPath.c_str(), std::ios::binary);
@@ -616,14 +641,15 @@ bool MeshSerializerTests::copyFile(const String& srcPath, const String& dstPath)
     dst << src.rdbuf();
     return true;
 }
-
+//--------------------------------------------------------------------------
 bool MeshSerializerTests::isEqual(Real a, Real b)
 {
-    Real absoluteError = std::abs(a * errorFactor);
+    Real absoluteError = std::abs(a * mErrorFactor);
     return ((a - absoluteError) <= b) && ((a + absoluteError) >= b);
 }
-
+//--------------------------------------------------------------------------
 bool MeshSerializerTests::isEqual(const Vector3& a, const Vector3& b)
 {
     return isEqual(a.x, b.x) && isEqual(a.y, b.y) && isEqual(a.z, b.z);
 }
+//--------------------------------------------------------------------------
