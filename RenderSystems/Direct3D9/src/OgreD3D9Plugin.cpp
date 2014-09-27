@@ -65,8 +65,16 @@ namespace Ogre
     
         // Create the DirectX 9 rendering api
 		HINSTANCE hInst = NULL;
-		static const TCHAR staticVar;
-		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+		#ifdef __MINGW32__
+			#if OGRE_DEBUG_MODE == 1
+				hInst = GetModuleHandle("OgreMain_d.dll");
+			#else
+				hInst = GetModuleHandle("OgreMain.dll");
+			#endif
+		#else
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+		#endif
 
         mRenderSystem = OGRE_NEW D3D9RenderSystem( hInst );
         // Register the render system

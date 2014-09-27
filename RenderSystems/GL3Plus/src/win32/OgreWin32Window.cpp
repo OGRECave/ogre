@@ -81,8 +81,16 @@ namespace Ogre {
 			destroy();
 
 		HINSTANCE hInst = NULL;
-		static const TCHAR staticVar;
-		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+		#ifdef __MINGW32__
+			#if OGRE_DEBUG_MODE == 1
+				hInst = GetModuleHandle("OgreMain_d.dll");
+			#else
+				hInst = GetModuleHandle("OgreMain.dll");
+			#endif
+		#else
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+		#endif
 
 		mHWnd = 0;
 		mName = name;

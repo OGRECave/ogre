@@ -499,8 +499,16 @@ namespace Ogre {
         LPCSTR dummyText = "OgreWglDummy";
 
 		HINSTANCE hinst = NULL;
-		static const TCHAR staticVar;
-		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hinst);
+		#ifdef __MINGW32__
+			#if OGRE_DEBUG_MODE == 1
+				hinst = GetModuleHandle("OgreMain_d.dll");
+			#else
+				hinst = GetModuleHandle("OgreMain.dll");
+			#endif
+		#else
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hinst);
+		#endif
         
         WNDCLASS dummyClass;
         memset(&dummyClass, 0, sizeof(WNDCLASS));
