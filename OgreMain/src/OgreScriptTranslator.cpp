@@ -5578,21 +5578,20 @@ namespace Ogre{
                         switch (baseType)
                         {
                         case BCT_FLOAT:
-                            translateSharedParamNamed <float> (compiler, sharedParams, prop, pName, baseType, constType);
+                            translateSharedParamNamed <float, BCT_FLOAT> (compiler, sharedParams, prop, pName, constType);
                             break;
                         case BCT_INT:
-                            translateSharedParamNamed <int> (compiler, sharedParams, prop, pName, baseType, constType);
+                            translateSharedParamNamed <int, BCT_INT> (compiler, sharedParams, prop, pName, constType);
                             break;
                         case BCT_DOUBLE:
-                            translateSharedParamNamed <double> (compiler, sharedParams, prop, pName, baseType, constType);
+                            translateSharedParamNamed <double, BCT_DOUBLE> (compiler, sharedParams, prop, pName, constType);
                             break;
                         case BCT_UINT:
-                        case BCT_BOOL:
-                            translateSharedParamNamed <uint> (compiler, sharedParams, prop, pName, baseType, constType);
+                            translateSharedParamNamed <uint, BCT_UINT> (compiler, sharedParams, prop, pName, constType);
                             break;
-                        // case BCT_BOOL:
-                        //     translateSharedParamNamed <bool> (compiler, sharedParams, prop, pName, baseType, constType);
-                        //     break;
+                        case BCT_BOOL:
+                            translateSharedParamNamed <uint, BCT_BOOL> (compiler, sharedParams, prop, pName, constType);
+                            break;
                         default:
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                "invalid parameter type");
@@ -5605,8 +5604,14 @@ namespace Ogre{
         }
     }
     //-------------------------------------------------------------------------
-    template <class T>
-    void SharedParamsTranslator::translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters* sharedParams, PropertyAbstractNode *prop, String pName, BaseConstantType baseType, GpuConstantType constType)
+    template <> float  SharedParamsTranslator::parseParameter<float,  BCT_FLOAT>  (const String& param) { return StringConverter::parseReal(param); }
+    template <> int    SharedParamsTranslator::parseParameter<int,    BCT_INT>    (const String& param) { return StringConverter::parseInt(param); }
+    template <> double SharedParamsTranslator::parseParameter<double, BCT_DOUBLE> (const String& param) { return StringConverter::parseReal(param); }
+    template <> uint   SharedParamsTranslator::parseParameter<uint,   BCT_UINT>   (const String& param) { return StringConverter::parseUnsignedInt(param); }
+    template <> uint   SharedParamsTranslator::parseParameter<uint,   BCT_BOOL>   (const String& param) { return StringConverter::parseBool(param); }
+    //-------------------------------------------------------------------------
+    template <class T, BaseConstantType baseType>
+    void SharedParamsTranslator::translateSharedParamNamed(ScriptCompiler *compiler, GpuSharedParameters* sharedParams, PropertyAbstractNode *prop, String pName, GpuConstantType constType)
     {
         std::vector<T> values;
 
@@ -5643,38 +5648,7 @@ namespace Ogre{
                 //     continue;
                 // }
 
-                // if (isFloat)
-                //     mFloats.push_back((float)StringConverter::parseReal(atom->value));
-                // else if (isInt)
-                //     mInts.push_back(StringConverter::parseInt(atom->value));
-                // else if (isDouble)
-                //     mDoubles.push_back(StringConverter::parseDouble(atom->value));
-                // else if (isUInt)
-                //     mUInts.push_back(StringConverter::parseUInt(atom->value));
-                // else if (isBool)
-                //     mUInts.push_back(StringConverter::parseBoolean(atom->value));
-                
-                switch(baseType)
-                {
-                case BCT_FLOAT:
-                    values.push_back((float)StringConverter::parseReal(atom->value));
-                    break;
-                case BCT_INT:
-                    values.push_back(StringConverter::parseInt(atom->value));
-                    break;
-                case BCT_DOUBLE:
-                    values.push_back((double)StringConverter::parseReal(atom->value));
-                    break;
-                case BCT_UINT:
-                    values.push_back(StringConverter::parseUnsignedInt(atom->value));
-                    break;
-                case BCT_BOOL:
-                    values.push_back((uint)StringConverter::parseBool(atom->value));
-                    break;
-                default:
-                    // This should never be reached.
-                    break;
-                }
+                values.push_back(parseParameter<T, baseType>(atom->value));
             }
 
         } // each extra param
