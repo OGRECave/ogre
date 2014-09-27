@@ -222,6 +222,10 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
+        virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes, BufferType bufferType,
+                                                                void *initialData, bool keepAsShadow );
+        virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
+
         GLuint createVao( const Vao &vaoRef );
 
         virtual VertexArrayObject* createVertexArrayObjectImpl(

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Vao/OgreVertexArrayObject.h"
 #include "Vao/OgreConstBufferPacked.h"
 #include "Vao/OgreTexBufferPacked.h"
+#include "Vao/OgreIndirectBufferPacked.h"
 #include "OgreTimer.h"
 #include "OgreCommon.h"
 
@@ -208,6 +209,34 @@ namespace Ogre
         OGRE_DELETE *itor;
 
         efficientVectorRemove( mTexBuffers, itor );
+    }
+    //-----------------------------------------------------------------------------------
+    IndirectBufferPacked* VaoManager::createIndirectBuffer( size_t sizeBytes, BufferType bufferType,
+                                                            void *initialData, bool keepAsShadow )
+    {
+        IndirectBufferPacked *retVal;
+        retVal = createIndirectBufferImpl( sizeBytes, bufferType, initialData, keepAsShadow );
+        mIndirectBuffers.push_back( retVal );
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::destroyIndirectBuffer( IndirectBufferPacked *indirectBuffer )
+    {
+        BufferPackedVec::iterator itor = std::find( mIndirectBuffers.begin(),
+                                                    mIndirectBuffers.end(), indirectBuffer );
+
+        if( itor == mIndirectBuffers.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Indirect Buffer has already been destroyed or "
+                         "doesn't belong to this VaoManager.",
+                         "VaoManager::destroyIndirectBuffer" );
+        }
+
+        destroyIndirectBufferImpl( indirectBuffer );
+        OGRE_DELETE *itor;
+
+        efficientVectorRemove( mIndirectBuffers, itor );
     }
     //-----------------------------------------------------------------------------------
     VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,

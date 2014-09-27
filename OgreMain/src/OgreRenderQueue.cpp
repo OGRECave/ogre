@@ -42,6 +42,7 @@ THE SOFTWARE.
 
 #include "Vao/OgreVertexArrayObject.h"
 #include "Vao/OgreIndexBufferPacked.h"
+#include "Vao/OgreIndirectBufferPacked.h"
 
 #include "CommandBuffer/OgreCommandBuffer.h"
 #include "CommandBuffer/OgreCbBlocks.h"
@@ -89,7 +90,8 @@ namespace Ogre
         mLastIndexData( 0 ),
         mLastHlmsCache( &c_dummyCache ),
         mLastTextureHash( 0 ),
-        mCommandBuffer( 0 )
+        mCommandBuffer( 0 ),
+        mIndirectBuffer( 0 )
     {
     }
     //---------------------------------------------------------------------
@@ -323,6 +325,10 @@ namespace Ogre
         CbDrawStrip     *drawStripPtr = 0;
         CbSharedDraw    *drawCountPtr = 0;
 
+        uint32 baseInstance = 0;
+        unsigned char *indirectDraw = static_cast<unsigned char*>(
+                    mIndirectBuffer->map( 0, mIndirectBuffer->getNumElements(), MS_PERSISTENT_INCOHERENT ) );
+
         for( size_t i=firstRq; i<lastRq; ++i )
         {
             QueuedRenderableArray &queuedRenderables = mRenderQueues[i].mQueuedRenderables;
@@ -371,8 +377,8 @@ namespace Ogre
                     *hlmsCacheCmd = CbHlmsCache( hlmsCache );
                 }
 
-                hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                      lastHlmsCache, mCommandBuffer );
+                baseInstance = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                                     lastHlmsCache, mCommandBuffer );
 
                 if( drawCmd != mCommandBuffer->getLastCommand() ||
                     lastVaoId != vao->getRenderQueueId() )
@@ -406,24 +412,28 @@ namespace Ogre
                     {
                         drawStripPtr = 0;
                         CbDrawCallIndexed *drawCall = static_cast<CbDrawCallIndexed*>( drawCmd );
+                        drawCall->drawIndexedPtr = reinterpret_cast<CbDrawIndexed*>( indirectDraw );
+                        indirectDraw += sizeof( CbDrawIndexed );
                         drawIndexedPtr = drawCall->drawIndexedPtr;
                         drawCountPtr = drawIndexedPtr;
-                        drawIndexedPtr->count       = 1;
-                        drawIndexedPtr->primCount   = vao->mIndexBuffer->getNumElements();
-                        drawIndexedPtr->firstVertexIndex = vao->mIndexBuffer->_getFinalBufferStart();
-                        drawIndexedPtr->baseVertex  = vao->mVertexBuffers[0]->_getFinalBufferStart();
-                        drawIndexedPtr->baseInstance= 0;
+                        drawIndexedPtr->count           = 1;
+                        drawIndexedPtr->primCount       = vao->mIndexBuffer->getNumElements();
+                        drawIndexedPtr->firstVertexIndex= vao->mIndexBuffer->_getFinalBufferStart();
+                        drawIndexedPtr->baseVertex      = vao->mVertexBuffers[0]->_getFinalBufferStart();
+                        drawIndexedPtr->baseInstance    = baseInstance;
                     }
                     else
                     {
                         drawIndexedPtr = 0;
                         CbDrawCallStrip *drawCall = static_cast<CbDrawCallStrip*>( drawCmd );
+                        drawCall->drawStripPtr = reinterpret_cast<CbDrawStrip*>( indirectDraw );
+                        indirectDraw += sizeof( CbDrawStrip );
                         drawStripPtr = drawCall->drawStripPtr;
                         drawCountPtr = drawStripPtr;
                         drawStripPtr->count             = 1;
                         drawStripPtr->primCount         = vao->mVertexBuffers[0]->getNumElements();
-                        drawStripPtr->firstVertexIndex  = vao->mIndexBuffer->_getFinalBufferStart();
-                        drawStripPtr->baseInstance      = 0;
+                        drawStripPtr->firstVertexIndex  = vao->mVertexBuffers[0]->_getFinalBufferStart();
+                        drawStripPtr->baseInstance      = baseInstance;
                     }
 
                     lastVao = vao;
@@ -437,6 +447,8 @@ namespace Ogre
                 ++itor;
             }
         }
+
+        mIndirectBuffer->unmap( UO_KEEP_PERSISTENT );
 
         mLastMacroblock     = lastMacroblock;
         mLastBlendblock     = lastBlendblock;

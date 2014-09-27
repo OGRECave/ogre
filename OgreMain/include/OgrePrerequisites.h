@@ -207,6 +207,7 @@ namespace Ogre {
     class HlmsTextureManager;
     struct HlmsTexturePack;
     class IndexBufferPacked;
+    class IndirectBufferPacked;
     class InstanceBatch;
     class InstanceBatchHW;
     class InstanceBatchHW_VTF;

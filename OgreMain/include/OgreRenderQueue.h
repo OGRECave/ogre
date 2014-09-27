@@ -132,6 +132,7 @@ namespace Ogre {
         uint32                  mLastTextureHash;
 
         CommandBuffer           *mCommandBuffer;
+        IndirectBufferPacked    *mIndirectBuffer;
 
     public:
         RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager );

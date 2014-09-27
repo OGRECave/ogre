@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
@@ -25,51 +25,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreCbDrawCall_H_
-#define _OgreCbDrawCall_H_
 
-#include "CommandBuffer/OgreCbCommon.h"
+#ifndef _Ogre_IndirectBufferPacked_H_
+#define _Ogre_IndirectBufferPacked_H_
+
+#include "Vao/OgreBufferPacked.h"
 
 namespace Ogre
 {
-#pragma pack( push, 4 )
-    struct CbSharedDraw
+    /** Represents Indirect buffers for storing draw call commands
+    */
+    class _OgreExport IndirectBufferPacked : public BufferPacked
     {
-        uint32 count;
-        uint32 primCount;
-        uint32 firstVertexIndex;
-    };
+    public:
+        IndirectBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+                              BufferType bufferType, void *initialData, bool keepAsShadow,
+                              VaoManager *vaoManager, BufferInterface *bufferInterface ) :
+            BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+                          initialData, keepAsShadow, vaoManager, bufferInterface )
+        {
+        }
 
-    struct CbDrawStrip : CbSharedDraw
-    {
-        uint32 baseInstance;
-    };
-
-    struct CbDrawIndexed : CbSharedDraw
-    {
-        uint32 baseVertex;
-        uint32 baseInstance;
-    };
-#pragma pack( pop )
-
-    struct CbDrawCall : public CbBase
-    {
-        VertexArrayObject   *vao;
-        uint32              numDraws;
-        CbDrawCall( uint16 cmdType, VertexArrayObject *_vao );
-    };
-
-    struct CbDrawCallIndexed : public CbDrawCall
-    {
-        CbDrawIndexed   *drawIndexedPtr;
-        CbDrawCallIndexed( VertexArrayObject *_vao );
-    };
-
-    struct CbDrawCallStrip : public CbDrawCall
-    {
-        CbDrawStrip *drawStripPtr;
-
-        CbDrawCallStrip( VertexArrayObject *_vao );
+        //TODO
+        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
+        //TODO
+        virtual void disposeTicket( AsyncTicket *ticket ) {}
     };
 }
 

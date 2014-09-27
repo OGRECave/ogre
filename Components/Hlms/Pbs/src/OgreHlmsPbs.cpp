@@ -827,9 +827,9 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                  bool casterPass, const HlmsCache *lastCache,
-                                  CommandBuffer *commandBuffer )
+    uint32 HlmsPbs::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                    bool casterPass, const HlmsCache *lastCache,
+                                    CommandBuffer *commandBuffer )
     {
         assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
@@ -955,6 +955,8 @@ namespace Ogre
 
         mCurrentMappedConstBuffer   = currentMappedConstBuffer;
         mCurrentMappedTexBuffer     = currentMappedTexBuffer;
+
+        return (mCurrentConstBufferSize - mStartMappedConstBuffer) - 1;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::unmapConstBuffer(void)

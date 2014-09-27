@@ -143,9 +143,9 @@ namespace Ogre
                                            bool casterPass, bool dualParaboloid,
                                            SceneManager *sceneManager );
 
-        virtual void fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                     bool casterPass, const HlmsCache *lastCache,
-                                     CommandBuffer *commandBuffer );
+        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                       bool casterPass, const HlmsCache *lastCache,
+                                       CommandBuffer *commandBuffer );
 
         virtual void frameEnded(void);
     };

@@ -63,6 +63,7 @@ namespace Ogre
         BufferPackedVec         mIndexBuffers;
         BufferPackedVec         mConstBuffers;
         BufferPackedVec         mTexBuffers;
+        BufferPackedVec         mIndirectBuffers;
         VertexArrayObjectVec    mVertexArrayObjects;
 
         uint32          mFrameCount;
@@ -99,6 +100,12 @@ namespace Ogre
                                                       BufferType bufferType,
                                                       void *initialData, bool keepAsShadow ) = 0;
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer ) = 0;
+
+        virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes,
+                                                                BufferType bufferType,
+                                                                void *initialData,
+                                                                bool keepAsShadow ) = 0;
+        virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer ) = 0;
 
         virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
                                                                 IndexBufferPacked *indexBuffer,
@@ -220,6 +227,19 @@ namespace Ogre
             Texture Buffer created with createTexBuffer
         */
         void destroyTexBuffer( TexBufferPacked *texBuffer );
+
+        /** Creates an indirect buffer.
+        @remarks
+            @See createVertexBuffer for the remaining parameters not documented here.
+        */
+        IndirectBufferPacked* createIndirectBuffer( size_t sizeBytes, BufferType bufferType,
+                                                    void *initialData, bool keepAsShadow );
+
+        /** Destroys the given indirect buffer created with createIndirectBuffer.
+        @param indirectBuffer
+            Indirect Buffer created with createIndirectBuffer
+        */
+        void destroyIndirectBuffer( IndirectBufferPacked *indirectBuffer );
 
         /** Creates a VertexArrayObject that binds all the vertex buffers with their respective
             declarations, and the index buffers. The returned value is immutable and thus cannot

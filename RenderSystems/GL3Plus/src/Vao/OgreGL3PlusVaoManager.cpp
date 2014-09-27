@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusTexBufferPacked.h"
 #include "Vao/OgreGL3PlusMultiSourceVertexBufferPool.h"
 
+#include "Vao/OgreIndirectBufferPacked.h"
+
 #include "OgreGL3PlusHardwareBufferManager.h" //GL3PlusHardwareBufferManager::getGLType
 
 #include "OgreTimer.h"
@@ -489,6 +491,56 @@ namespace Ogre
         deallocateVbo( bufferInterface->getVboPoolIndex(), texBuffer->_getInternalBufferStart(),
                        texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
                        texBuffer->getBufferType() );
+    }
+    //-----------------------------------------------------------------------------------
+    IndirectBufferPacked* GL3PlusVaoManager::createIndirectBufferImpl( size_t sizeBytes,
+                                                                       BufferType bufferType,
+                                                                       void *initialData,
+                                                                       bool keepAsShadow )
+    {
+        size_t vboIdx;
+        size_t bufferOffset;
+
+        size_t alignment = 4;
+
+        VboFlag vboFlag = CPU_INACCESSIBLE;
+
+        if( bufferType == BT_DYNAMIC )
+        {
+            vboFlag = CPU_ACCESSIBLE;
+
+            //For dynamic buffers, the size will be 3x times larger
+            //(depending on mDynamicBufferMultiplier); we need the
+            //offset after each map to be aligned; and for that, we
+            //sizeBytes to be multiple of alignment.
+            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+        }
+
+        allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
+
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
+                                                                    GL_DRAW_INDIRECT_BUFFER,
+                                                                    mVbos[vboFlag][vboIdx].vboName );
+        IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
+                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferType, initialData, keepAsShadow,
+                                                        this, bufferInterface );
+
+        if( initialData )
+            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer )
+    {
+        GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                                                        indirectBuffer->getBufferInterface() );
+
+
+        deallocateVbo( bufferInterface->getVboPoolIndex(), indirectBuffer->_getInternalBufferStart(),
+                       indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
+                       indirectBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
     GLuint GL3PlusVaoManager::createVao( const Vao &vaoRef )
