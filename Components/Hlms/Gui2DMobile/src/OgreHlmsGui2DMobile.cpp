@@ -411,7 +411,7 @@ namespace Ogre
             //Rebind textures
             for( uint texUnit=0; texUnit<datablock->mNumTextureUnits; ++texUnit )
             {
-                mRenderSystem->_setTexture( texUnit, true, datablock->mDiffuseTextures[texUnit] );
+                mRenderSystem->_setTexture( texUnit, true, datablock->mDiffuseTextures[texUnit].get() );
                 ++texUnit;
             }
 

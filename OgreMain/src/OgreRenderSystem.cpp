@@ -297,13 +297,13 @@ namespace Ogre {
                 _setVertexTexture(texUnit, tex);
                 // bind nothing to fragment unit (hardware isn't shared but fragment
                 // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
+                _setTexture(texUnit, true, sNullTexPtr.get());
             }
             else
             {
                 // vice versa
                 _setVertexTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
+                _setTexture(texUnit, true, tex.get());
             }
         }
 
@@ -316,13 +316,13 @@ namespace Ogre {
                 _setGeometryTexture(texUnit, tex);
                 // bind nothing to fragment unit (hardware isn't shared but fragment
                 // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
+                _setTexture(texUnit, true, sNullTexPtr.get());
             }
             else
             {
                 // vice versa
                 _setGeometryTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
+                _setTexture(texUnit, true, tex.get());
             }
         }
 
@@ -335,13 +335,13 @@ namespace Ogre {
                 _setComputeTexture(texUnit, tex);
                 // bind nothing to fragment unit (hardware isn't shared but fragment
                 // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
+                _setTexture(texUnit, true, sNullTexPtr.get());
             }
             else
             {
                 // vice versa
                 _setComputeTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
+                _setTexture(texUnit, true, tex.get());
             }
         }
 
@@ -354,13 +354,13 @@ namespace Ogre {
                 _setTessellationDomainTexture(texUnit, tex);
                 // bind nothing to fragment unit (hardware isn't shared but fragment
                 // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
+                _setTexture(texUnit, true, sNullTexPtr.get());
             }
             else
             {
                 // vice versa
                 _setTessellationDomainTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
+                _setTexture(texUnit, true, tex.get());
             }
         }
 
@@ -373,13 +373,13 @@ namespace Ogre {
                 _setTessellationHullTexture(texUnit, tex);
                 // bind nothing to fragment unit (hardware isn't shared but fragment
                 // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
+                _setTexture(texUnit, true, sNullTexPtr.get());
             }
             else
             {
                 // vice versa
                 _setTessellationHullTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
+                _setTexture(texUnit, true, tex.get());
             }
         }
 
@@ -387,7 +387,7 @@ namespace Ogre {
         {
             // Shared vertex / fragment textures or no vertex texture support
             // Bind texture (may be blank)
-            _setTexture(texUnit, true, tex);
+            _setTexture(texUnit, true, tex.get());
         }
 
         // Set texture coordinate set
@@ -486,7 +486,7 @@ namespace Ogre {
         const String &texname)
     {
         TexturePtr t = TextureManager::getSingleton().getByName(texname);
-        _setTexture(unit, enabled, t);
+        _setTexture(unit, enabled, t.get());
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
@@ -543,7 +543,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::_disableTextureUnit(size_t texUnit)
     {
-        _setTexture(texUnit, false, sNullTexPtr);
+        _setTexture(texUnit, false, sNullTexPtr.get());
     }
     //---------------------------------------------------------------------
     void RenderSystem::_disableTextureUnitsFrom(size_t texUnit)

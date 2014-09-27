@@ -59,8 +59,8 @@ namespace Ogre
         /// Only use this function for the first upload
         void _firstUpload( void *data, size_t elementStart, size_t elementCount );
 
-        virtual void* map( size_t elementStart, size_t elementCount,
-                           MappingState prevMappingState, bool advanceFrame = true );
+        virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
+                                       MappingState prevMappingState, bool advanceFrame = true );
         virtual void unmap( UnmapOptions unmapOption,
                             size_t flushStartElem = 0, size_t flushSizeElem = 0 );
         virtual void advanceFrame(void);

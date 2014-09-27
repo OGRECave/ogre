@@ -39,6 +39,7 @@ namespace Ogre
 
     struct _OgreExport VertexArrayObject : public VertexArrayObjectAlloc
     {
+        friend class RenderQueue;
         friend class RenderSystem;
         friend class GL3PlusRenderSystem;
 

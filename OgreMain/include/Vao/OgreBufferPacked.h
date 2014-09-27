@@ -184,8 +184,8 @@ namespace Ogre
             Calling this with false allows to call map multiple times. However ater calling unmap,
             you must call advanceFrame. THIS IS ONLY FOR VERY ADVANCED USERS.
         */
-        void* map( size_t elementStart, size_t elementCount,
-                   MappingState persistentMethod, bool advanceFrame=true );
+        DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
+                               MappingState persistentMethod, bool advanceFrame=true );
 
         /** Unmaps or flushes the region mapped with @see map. Alternatively, you can flush a smaller region
             (i.e. you didn't know which regions you were to update when mapping, but now that you're done,

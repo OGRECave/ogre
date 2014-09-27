@@ -58,8 +58,8 @@ namespace Ogre
         mBuffer->mBufferType = originalBufferType;
     }
     //-----------------------------------------------------------------------------------
-    void* GL3PlusBufferInterface::map( size_t elementStart, size_t elementCount,
-                                       MappingState prevMappingState, bool bAdvanceFrame )
+    DECL_MALLOC void* GL3PlusBufferInterface::map( size_t elementStart, size_t elementCount,
+                                                   MappingState prevMappingState, bool bAdvanceFrame )
     {
         size_t bytesPerElement = mBuffer->mBytesPerElement;
 

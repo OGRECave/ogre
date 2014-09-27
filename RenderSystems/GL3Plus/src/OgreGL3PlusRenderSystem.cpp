@@ -943,16 +943,16 @@ namespace Ogre {
         // Point sprites are always on in OpenGL 3.2 and up.
     }
 
-    void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
+    void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, Texture *texPtr)
     {
-        GL3PlusTexturePtr tex = texPtr.staticCast<GL3PlusTexture>();
+        GL3PlusTexture *tex = static_cast<GL3PlusTexture*>( texPtr );
 
         if (!activateGLTextureUnit(stage))
             return;
 
         if (enabled)
         {
-            if (!tex.isNull())
+            if ( tex )
             {
                 // Note used
                 tex->touch();
@@ -965,7 +965,7 @@ namespace Ogre {
                 // Assume 2D.
                 mTextureTypes[stage] = GL_TEXTURE_2D;
 
-            if(!tex.isNull())
+            if( tex )
             {
                 bool isFsaa;
                 GLuint id = tex->getGLID( isFsaa );
@@ -988,27 +988,27 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setVertexTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex.get());
     }
 
     void GL3PlusRenderSystem::_setGeometryTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex.get());
     }
 
     void GL3PlusRenderSystem::_setComputeTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex.get());
     }
 
     void GL3PlusRenderSystem::_setTessellationHullTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex.get());
     }
 
     void GL3PlusRenderSystem::_setTessellationDomainTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex.get());
     }
 
     void GL3PlusRenderSystem::_setTextureCoordSet(size_t stage, size_t index)

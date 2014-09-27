@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
@@ -26,34 +26,25 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_BufferInterface_H_
-#define _Ogre_BufferInterface_H_
+#ifndef _OgreCbShaderBuffer_H_
+#define _OgreCbShaderBuffer_H_
 
-#include "Vao/OgreBufferPacked.h"
+#include "CommandBuffer/OgreCbCommon.h"
 
 namespace Ogre
 {
-    /** Most (if not all) buffers, can be treated with the same code.
-        Hence most equivalent functionality is encapsulated here.
-    */
-    class _OgreExport BufferInterface
+    struct CbShaderBuffer : CbBase
     {
-    protected:
-        BufferPacked *mBuffer;
+        uint16          slot;
+        BufferPacked   *bufferPacked;
+        uint32          bindOffset;
+        uint32          bindSizeBytes;
 
-    public:
-        BufferInterface();
-        virtual ~BufferInterface() {}
+        CbShaderBuffer( uint16 _slot, ConstBufferPacked *_bufferPacked,
+                        uint32 _bindOffset, uint32 _bindSizeBytes );
 
-        void upload( void *data, size_t elementStart, size_t elementCount );
-
-        virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
-                                       MappingState prevMappingState, bool advanceFrame = true ) = 0;
-        virtual void unmap( UnmapOptions unmapOption,
-                            size_t flushStartElem = 0, size_t flushSizeElem = 0 ) = 0;
-        virtual void advanceFrame(void) = 0;
-
-        void _notifyBuffer( BufferPacked *buffer )          { mBuffer = buffer; }
+        CbShaderBuffer( uint16 _slot, TexBufferPacked *_bufferPacked,
+                        uint32 _bindOffset, uint32 _bindSizeBytes );
     };
 }
 

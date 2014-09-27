@@ -43,6 +43,10 @@ THE SOFTWARE.
 #include "Vao/OgreTexBufferPacked.h"
 #include "Vao/OgreStagingBuffer.h"
 
+#include "CommandBuffer/OgreCommandBuffer.h"
+#include "CommandBuffer/OgreCbTexture.h"
+#include "CommandBuffer/OgreCbShaderBuffer.h"
+
 namespace Ogre
 {
     const IdString PbsProperty::HwGammaRead       = IdString( "hw_gamma_read" );
@@ -184,20 +188,56 @@ namespace Ogre
     HlmsPbs::HlmsPbs( Archive *dataFolder ) :
         Hlms( HLMS_PBS, "pbs", dataFolder ),
         ConstBufferPool( 68, 16 * 1024 * 1024, 0 ),
-        mPassBuffer( 0 )
+        mCurrentPassBuffer( 0 ),
+        mCurrentConstBuffer( 0 ),
+        mCurrentTexBuffer( 0 ),
+        mStartMappedConstBuffer( 0 ),
+        mCurrentMappedConstBuffer( 0 ),
+        mCurrentConstBufferSize( 0 ),
+        mStartMappedTexBuffer( 0 ),
+        mCurrentMappedTexBuffer( 0 ),
+        mCurrentTexBufferSize( 0 ),
+        mTexLastOffset( 0 ),
+        mLastTexBufferCmdOffset( (size_t)~0 ),
+        mLastTextureHash( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
     HlmsPbs::~HlmsPbs()
     {
+        {
+            TexBufferPackedVec::const_iterator itor = mTexBuffers.begin();
+            TexBufferPackedVec::const_iterator end  = mTexBuffers.end();
+
+            while( itor != end )
+                mVaoManager->destroyTexBuffer( *itor++ );
+
+            mTexBuffers.clear();
+        }
+
+        {
+            ConstBufferPackedVec::const_iterator itor = mConstBuffers.begin();
+            ConstBufferPackedVec::const_iterator end  = mConstBuffers.end();
+
+            while( itor != end )
+                mVaoManager->destroyConstBuffer( *itor++ );
+
+            mConstBuffers.clear();
+
+            itor = mPassBuffers.begin();
+            end  = mPassBuffers.end();
+
+            while( itor != end )
+                mVaoManager->destroyConstBuffer( *itor++ );
+
+            mPassBuffers.clear();
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::_changeRenderSystem( RenderSystem *newRs )
     {
         if( mVaoManager )
-        {
-            mVaoManager->destroyConstBuffer( mPassBuffer );
-        }
+            destroyAllBuffers();
 
         Hlms::_changeRenderSystem( newRs );
         ConstBufferPool::_changeRenderSystem( newRs );
@@ -258,6 +298,12 @@ namespace Ogre
             assert( !datablock->getTexture( PBSM_REFLECTION ).isNull() );
             psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
         }
+
+        mRenderSystem->_setProgramsFromHlms( retVal );
+
+        GpuProgramParametersSharedPtr vpParams = retVal->vertexShader->getDefaultParameters();
+        mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, GPV_ALL );
+        mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, GPV_ALL );
 
         return retVal;
     }
@@ -521,7 +567,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbs::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
-                                              bool dualParaboloid, SceneManager *sceneManager )
+                                        bool dualParaboloid, SceneManager *sceneManager )
     {
         HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
 
@@ -572,10 +618,23 @@ namespace Ogre
             mapSize += (2 + 2) * 4;
         }
 
-        float *passBuffer = reinterpret_cast<float*>( mPassBuffer->map( 0, mapSize, MS_PERSISTENT_INCOHERENT ) );
+        //Arbitrary 16kb (minimum supported by GL), should be enough.
+        const size_t maxBufferSize = 16 * 1024 * 1024;
+
+        assert( mapSize <= maxBufferSize );
+
+        if( mCurrentPassBuffer >= mPassBuffers.size() )
+        {
+            mPassBuffers.push_back( mVaoManager->createConstBuffer( maxBufferSize, BT_DYNAMIC,
+                                                                    0, false ) );
+        }
+
+        ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer++];
+        float *passBufferPtr = reinterpret_cast<float*>( passBuffer->map( 0, mapSize,
+                                                                          MS_PERSISTENT_INCOHERENT ) );
 
 #ifndef NDEBUG
-        const float *startupPtr = passBuffer;
+        const float *startupPtr = passBufferPtr;
 #endif
 
         //---------------------------------------------------------------------------
@@ -585,29 +644,29 @@ namespace Ogre
         //mat4 viewProj;
         Matrix4 viewProjMatrix = projectionMatrix * viewMatrix;
         for( size_t i=0; i<16; ++i )
-            *passBuffer++ = (float)viewProjMatrix[0][i];
+            *passBufferPtr++ = (float)viewProjMatrix[0][i];
 
         if( !casterPass )
         {
             //mat4 view;
             for( size_t i=0; i<16; ++i )
-                *passBuffer++ = (float)viewMatrix[0][i];
+                *passBufferPtr++ = (float)viewMatrix[0][i];
 
             for( int32 i=0; i<numShadowMaps; ++i )
             {
                 //mat4 shadowRcv[numShadowMaps].texWorldViewProj
                 Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( i );
                 for( size_t j=0; j<16; ++j )
-                    *passBuffer++ = (float)viewProjTex[0][j];
+                    *passBufferPtr++ = (float)viewProjTex[0][j];
 
                 //vec2 shadowRcv[numShadowMaps].shadowDepthRange
                 Real fNear, fFar;
                 shadowNode->getMinMaxDepthRange( i, fNear, fFar );
                 const Real depthRange = fFar - fNear;
-                *passBuffer++ = fNear;
-                *passBuffer++ = 1.0f / depthRange;
+                *passBufferPtr++ = fNear;
+                *passBufferPtr++ = 1.0f / depthRange;
 
-                passBuffer += 2; //Padding
+                passBufferPtr += 2; //Padding
             }
 
             //---------------------------------------------------------------------------
@@ -626,21 +685,21 @@ namespace Ogre
                               0.0f, 0.0f, -1.0f,
                               0.0f, 1.0f, 0.0f );
                 xRot = xRot * invViewMatrix3;
-                *passBuffer++ = (float)xRot[0][i];
+                *passBufferPtr++ = (float)xRot[0][i];
 #else
-                *passBuffer++ = (float)invViewMatrix3[0][i];
+                *passBufferPtr++ = (float)invViewMatrix3[0][i];
 #endif
 
                 //Alignment: each row/column is one vec4, despite being 3x3
                 if( !( (i+1) % 3 ) )
-                    ++passBuffer;
+                    ++passBufferPtr;
             }
 
             //float pssmSplitPoints
             for( int32 i=0; i<numPssmSplits; ++i )
-                *passBuffer++ = (*shadowNode->getPssmSplits(0))[i];
+                *passBufferPtr++ = (*shadowNode->getPssmSplits(0))[i];
 
-            passBuffer += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
+            passBufferPtr += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
 
             if( shadowNode )
             {
@@ -652,50 +711,50 @@ namespace Ogre
                     Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
 
                     //vec3 lights[numLights].position
-                    *passBuffer++ = lightPos.x;
-                    *passBuffer++ = lightPos.y;
-                    *passBuffer++ = lightPos.z;
-                    ++passBuffer;
+                    *passBufferPtr++ = lightPos.x;
+                    *passBufferPtr++ = lightPos.y;
+                    *passBufferPtr++ = lightPos.z;
+                    ++passBufferPtr;
 
                     //vec3 lights[numLights].diffuse
                     ColourValue colour = lights[i].light->getDiffuseColour() *
                                          lights[i].light->getPowerScale();
-                    *passBuffer++ = colour.r;
-                    *passBuffer++ = colour.g;
-                    *passBuffer++ = colour.b;
-                    ++passBuffer;
+                    *passBufferPtr++ = colour.r;
+                    *passBufferPtr++ = colour.g;
+                    *passBufferPtr++ = colour.b;
+                    ++passBufferPtr;
 
                     //vec3 lights[numLights].specular
                     colour = lights[i].light->getSpecularColour() * lights[i].light->getPowerScale();
-                    *passBuffer++ = colour.r;
-                    *passBuffer++ = colour.g;
-                    *passBuffer++ = colour.b;
-                    ++passBuffer;
+                    *passBufferPtr++ = colour.r;
+                    *passBufferPtr++ = colour.g;
+                    *passBufferPtr++ = colour.b;
+                    ++passBufferPtr;
 
                     //vec3 lights[numLights].attenuation;
                     Real attenRange     = lights[i].light->getAttenuationRange();
                     Real attenLinear    = lights[i].light->getAttenuationLinear();
                     Real attenQuadratic = lights[i].light->getAttenuationQuadric();
-                    *passBuffer++ = attenRange;
-                    *passBuffer++ = attenLinear;
-                    *passBuffer++ = attenQuadratic;
-                    ++passBuffer;
+                    *passBufferPtr++ = attenRange;
+                    *passBufferPtr++ = attenLinear;
+                    *passBufferPtr++ = attenQuadratic;
+                    ++passBufferPtr;
 
                     //vec3 lights[numLights].spotDirection;
                     Vector3 spotDir = viewMatrix3 * lights[i].light->getDerivedDirection();
-                    *passBuffer++ = spotDir.x;
-                    *passBuffer++ = spotDir.y;
-                    *passBuffer++ = spotDir.z;
-                    ++passBuffer;
+                    *passBufferPtr++ = spotDir.x;
+                    *passBufferPtr++ = spotDir.y;
+                    *passBufferPtr++ = spotDir.z;
+                    ++passBufferPtr;
 
                     //vec3 lights[numLights].spotParams;
                     Radian innerAngle = lights[i].light->getSpotlightInnerAngle();
                     Radian outerAngle = lights[i].light->getSpotlightOuterAngle();
-                    *passBuffer++ = 1.0f / ( cosf( innerAngle.valueRadians() * 0.5f ) -
+                    *passBufferPtr++ = 1.0f / ( cosf( innerAngle.valueRadians() * 0.5f ) -
                                              cosf( outerAngle.valueRadians() * 0.5f ) );
-                    *passBuffer++ = cosf( outerAngle.valueRadians() * 0.5f );
-                    *passBuffer++ = lights[i].light->getSpotlightFalloff();
-                    ++passBuffer;
+                    *passBufferPtr++ = cosf( outerAngle.valueRadians() * 0.5f );
+                    *passBufferPtr++ = lights[i].light->getSpotlightFalloff();
+                    ++passBufferPtr;
 
                     if( (size_t)i < shadowNode->getLocalTextures().size() )
                     {
@@ -704,14 +763,14 @@ namespace Ogre
                         //changes need to be done so that UV calculations land on the right place
                         uint32 texWidth  = shadowNode->getLocalTextures()[i].textures[0]->getWidth();
                         uint32 texHeight = shadowNode->getLocalTextures()[i].textures[0]->getHeight();
-                        *passBuffer++ = 1.0f / texWidth;
-                        *passBuffer++ = 1.0f / texHeight;
-                        passBuffer += 2;
+                        *passBufferPtr++ = 1.0f / texWidth;
+                        *passBufferPtr++ = 1.0f / texHeight;
+                        passBufferPtr += 2;
                     }
                     else
                     {
                         //If we have 3 directional lights and two shadow mapped lights, this is possible.
-                        passBuffer += 4;
+                        passBufferPtr += 4;
                     }
                 }
             }
@@ -726,25 +785,25 @@ namespace Ogre
                     Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
 
                     //vec3 lights[numLights].position
-                    *passBuffer++ = lightPos.x;
-                    *passBuffer++ = lightPos.y;
-                    *passBuffer++ = lightPos.z;
-                    ++passBuffer;
+                    *passBufferPtr++ = lightPos.x;
+                    *passBufferPtr++ = lightPos.y;
+                    *passBufferPtr++ = lightPos.z;
+                    ++passBufferPtr;
 
                     //vec3 lights[numLights].diffuse
                     ColourValue colour = globalLightList.lights[i]->getDiffuseColour() *
                                          globalLightList.lights[i]->getPowerScale();
-                    *passBuffer++ = colour.r;
-                    *passBuffer++ = colour.g;
-                    *passBuffer++ = colour.b;
-                    ++passBuffer;
+                    *passBufferPtr++ = colour.r;
+                    *passBufferPtr++ = colour.g;
+                    *passBufferPtr++ = colour.b;
+                    ++passBufferPtr;
 
                     //vec3 lights[numLights].specular
                     colour = globalLightList.lights[i]->getSpecularColour() * globalLightList.lights[i]->getPowerScale();
-                    *passBuffer++ = colour.r;
-                    *passBuffer++ = colour.g;
-                    *passBuffer++ = colour.b;
-                    ++passBuffer;
+                    *passBufferPtr++ = colour.r;
+                    *passBufferPtr++ = colour.g;
+                    *passBufferPtr++ = colour.b;
+                    ++passBufferPtr;
                 }
             }
         }
@@ -754,38 +813,30 @@ namespace Ogre
             Real fNear, fFar;
             shadowNode->getMinMaxDepthRange( camera, fNear, fFar );
             const Real depthRange = fFar - fNear;
-            *passBuffer++ = fNear;
-            *passBuffer++ = 1.0f / depthRange;
-            passBuffer += 2;
+            *passBufferPtr++ = fNear;
+            *passBufferPtr++ = 1.0f / depthRange;
+            passBufferPtr += 2;
         }
 
-        assert( (size_t)(passBuffer - startupPtr) == mapSize );
+        assert( (size_t)(passBufferPtr - startupPtr) == mapSize );
 
-        mPassBuffer->unmap( UO_KEEP_PERSISTENT );
+        passBuffer->unmap( UO_KEEP_PERSISTENT );
 
-        mapNextConstBuffer();
-        mapNextTexBuffer();
+        mLastTextureHash = 0;
 
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    uint32 HlmsPbs::fillBuffersFor( const HlmsCache *cache,
-                                    const QueuedRenderable &queuedRenderable,
-                                    bool casterPass, const HlmsCache *lastCache,
-                                    uint32 lastTextureHash )
+    void HlmsPbs::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                  bool casterPass, const HlmsCache *lastCache,
+                                  CommandBuffer *commandBuffer )
     {
-        GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
-        GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
-
         assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
-        uint16 variabilityMask = GPV_PER_OBJECT;
         if( !lastCache || lastCache->type != HLMS_PBS )
         {
-            variabilityMask = GPV_ALL;
-
             //We changed HlmsType, rebind the shared textures.
             FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
             FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
@@ -795,11 +846,17 @@ namespace Ogre
                 size_t texUnit = 1;
                 while( itor != end )
                 {
-                    mRenderSystem->_setTexture( texUnit, true, *itor );
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, itor->get() );
                     ++texUnit;
                     ++itor;
                 }
             }
+            else
+            {
+                *commandBuffer->addCommand<CbTextureDisableFrom>() = CbTextureDisableFrom( 1 );
+            }
+
+            mLastTextureHash = 0;
         }
 
         uint32 * RESTRICT_ALIAS currentMappedConstBuffer    = mCurrentMappedConstBuffer;
@@ -809,12 +866,21 @@ namespace Ogre
 
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
 
+        if( (currentMappedConstBuffer - mStartMappedConstBuffer) + 1 >= mCurrentConstBufferSize )
+            currentMappedConstBuffer = mapNextConstBuffer( commandBuffer );
+
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----
         //---------------------------------------------------------------------------
 #if !OGRE_DOUBLE_PRECISION
         if( !hasSkeletonAnimation )
         {
+            if( (currentMappedTexBuffer - mStartMappedTexBuffer) +
+                    16 * (1 + !casterPass) >= mCurrentTexBufferSize )
+            {
+                currentMappedTexBuffer = mapNextTexBuffer( commandBuffer );
+            }
+
             //uint worldMaterialIdx[]
             *currentMappedConstBuffer++ = datablock->getAssignedSlot() & 0x1FF;
 
@@ -843,6 +909,12 @@ namespace Ogre
             uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
             assert( numWorldTransforms <= 256 );
 
+            if( (currentMappedTexBuffer - mStartMappedTexBuffer) +
+                    12 * numWorldTransforms >= mCurrentTexBufferSize )
+            {
+                currentMappedTexBuffer = mapNextTexBuffer( commandBuffer );
+            }
+
             //vec4 worldMat[][3]
             //TODO: Don't rely on a virtual function + make a direct 4x3 copy
             Matrix4 tmp[256];
@@ -857,48 +929,32 @@ namespace Ogre
     #error Not Coded Yet! (cannot use memcpy on Matrix4)
 #endif
 
-        uint32 retVal;
-
         //---------------------------------------------------------------------------
         //                          ---- PIXEL SHADER ----
         //---------------------------------------------------------------------------
 
         if( !casterPass )
         {
-            if( datablock->mTextureHash != lastTextureHash )
+            if( datablock->mTextureHash != mLastTextureHash )
             {
                 //Rebind textures
                 size_t texUnit = mPreparedPass.shadowMaps.size() + 1;
                 for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
                 {
-                    if( !datablock->getTexture( i ).isNull() )
+                    const TexturePtr &texturePtr = datablock->getTexture( i );
+                    if( !texturePtr.isNull() )
                     {
-                        mRenderSystem->_setTexture( texUnit, true, datablock->getTexture( i ) );
-                        mRenderSystem->_setHlmsSamplerblock( texUnit, datablock->mSamplerblocks[i] );
-                        ++texUnit;
+                        *commandBuffer->addCommand<CbTexture>() =
+                                CbTexture( texUnit++, true, texturePtr.get(), datablock->mSamplerblocks[i] );
                     }
                 }
 
-                mRenderSystem->_disableTextureUnitsFrom( texUnit );
+                *commandBuffer->addCommand<CbTextureDisableFrom>() = CbTextureDisableFrom( texUnit );
             }
-
-            retVal = datablock->mTextureHash;
-        }
-        else
-        {
-            if( lastTextureHash )
-                mRenderSystem->_disableTextureUnitsFrom( 1 );
-            retVal = 0;
         }
 
         mCurrentMappedConstBuffer   = currentMappedConstBuffer;
         mCurrentMappedTexBuffer     = currentMappedTexBuffer;
-
-
-        mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, variabilityMask );
-        mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, variabilityMask );
-
-        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::unmapConstBuffer(void)
@@ -917,7 +973,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::mapNextConstBuffer(void)
+    DECL_MALLOC uint32* HlmsPbs::mapNextConstBuffer( CommandBuffer *commandBuffer )
     {
         unmapConstBuffer();
 
@@ -932,9 +988,13 @@ namespace Ogre
                                             constBuffer->map( 0, constBuffer->getNumElements(),
                                                               MS_PERSISTENT_INCOHERENT ) );
         mCurrentMappedConstBuffer   = mStartMappedConstBuffer;
+
+        *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 0, constBuffer, 0, 0 );
+
+        return mStartMappedConstBuffer;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::unmapTexBuffer(void)
+    void HlmsPbs::unmapTexBuffer( CommandBuffer *commandBuffer )
     {
         //Save our progress
         mTexLastOffset = (mCurrentMappedTexBuffer - mStartMappedTexBuffer) * sizeof(float);
@@ -944,6 +1004,14 @@ namespace Ogre
             //Unmap the current buffer
             TexBufferPacked *texBuffer = mTexBuffers[mCurrentTexBuffer];
             texBuffer->unmap( UO_KEEP_PERSISTENT, 0, mTexLastOffset );
+
+            CbShaderBuffer *shaderBufferCmd = reinterpret_cast<CbShaderBuffer*>(
+                        commandBuffer->getCommandFromOffset( mLastTexBufferCmdOffset ) );
+            if( shaderBufferCmd )
+            {
+                assert( shaderBufferCmd->bufferPacked == texBuffer );
+                shaderBufferCmd->bindSizeBytes = mTexLastOffset;
+            }
         }
 
         mStartMappedTexBuffer   = 0;
@@ -953,9 +1021,9 @@ namespace Ogre
         mTexLastOffset = alignToNextMultiple( mTexLastOffset, mVaoManager->getTexBufferAlignment() );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::mapNextTexBuffer(void)
+    DECL_MALLOC float* HlmsPbs::mapNextTexBuffer( CommandBuffer *commandBuffer )
     {
-        unmapTexBuffer();
+        unmapTexBuffer( commandBuffer );
 
         TexBufferPacked *texBuffer = mTexBuffers[mCurrentTexBuffer];
 
@@ -978,12 +1046,58 @@ namespace Ogre
                                                             texBuffer->getNumElements() - mTexLastOffset,
                                                             MS_PERSISTENT_INCOHERENT, false ) );
         mCurrentMappedTexBuffer = mStartMappedTexBuffer;
+
+        CbShaderBuffer *shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
+        *shaderBufferCmd = CbShaderBuffer( 0, texBuffer, 0, 0 );
+
+        mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
+
+        return mStartMappedTexBuffer;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::destroyAllBuffers(void)
+    {
+        mCurrentPassBuffer  = 0;
+        mCurrentConstBuffer = 0;
+        mCurrentTexBuffer   = 0;
+        mTexLastOffset      = 0;
+
+        {
+            TexBufferPackedVec::const_iterator itor = mTexBuffers.begin();
+            TexBufferPackedVec::const_iterator end  = mTexBuffers.end();
+
+            while( itor != end )
+                mVaoManager->destroyTexBuffer( *itor++ );
+
+            mTexBuffers.clear();
+        }
+
+        {
+            ConstBufferPackedVec::const_iterator itor = mConstBuffers.begin();
+            ConstBufferPackedVec::const_iterator end  = mConstBuffers.end();
+
+            while( itor != end )
+                mVaoManager->destroyConstBuffer( *itor++ );
+
+            mConstBuffers.clear();
+        }
+
+        {
+            ConstBufferPackedVec::const_iterator itor = mPassBuffers.begin();
+            ConstBufferPackedVec::const_iterator end  = mPassBuffers.end();
+
+            while( itor != end )
+                mVaoManager->destroyConstBuffer( *itor++ );
+
+            mPassBuffers.clear();
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::frameEnded(void)
     {
-        mCurrentTexBuffer   = 0;
+        mCurrentPassBuffer  = 0;
         mCurrentConstBuffer = 0;
+        mCurrentTexBuffer   = 0;
         mTexLastOffset      = 0;
 
         TexBufferPackedVec::const_iterator itor = mTexBuffers.begin();

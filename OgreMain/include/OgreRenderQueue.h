@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __RenderQueue_H__
-#define __RenderQueue_H__
+#ifndef _OgreRenderQueue_H_
+#define _OgreRenderQueue_H_
 
 #include "OgrePrerequisites.h"
 #include "OgreSharedPtr.h"
@@ -130,6 +130,8 @@ namespace Ogre {
         v1::IndexData const     *mLastIndexData;
         HlmsCache const         *mLastHlmsCache;
         uint32                  mLastTextureHash;
+
+        CommandBuffer           *mCommandBuffer;
 
     public:
         RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager );

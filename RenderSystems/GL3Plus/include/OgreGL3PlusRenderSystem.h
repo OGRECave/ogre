@@ -316,7 +316,7 @@ namespace Ogre {
         /** See
             RenderSystem
         */
-        void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
+        void _setTexture(size_t unit, bool enabled, Texture *tex);
         /** See
             RenderSystem
         */

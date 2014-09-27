@@ -161,7 +161,7 @@ namespace Ogre
             ++itor;
         }
 
-        if( bestBlockIdx == ~0 )
+        if( bestBlockIdx == (size_t)~0 )
         {
             bestVboIdx      = mVbos[vboFlag].size();
             bestBlockIdx    = 0;

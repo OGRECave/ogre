@@ -47,6 +47,7 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_filtered_std("Animation")
+add_filtered_std("CommandBuffer")
 add_filtered_std("Compositor")
 add_filtered_std("Compositor/Pass")
 add_filtered_std("Compositor/Pass/PassClear")

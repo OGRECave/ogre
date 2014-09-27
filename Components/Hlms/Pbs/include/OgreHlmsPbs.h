@@ -67,8 +67,9 @@ namespace Ogre
         };
 
         PassData                mPreparedPass;
-        ConstBufferPacked       *mPassBuffer;
+        ConstBufferPackedVec    mPassBuffers;
 
+        uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
         uint32                  mCurrentConstBuffer;    /// Resets every to zero every new frame.
         uint32                  mCurrentTexBuffer;      /// Resets every to zero every new frame.
         ConstBufferPackedVec    mConstBuffers;
@@ -76,12 +77,17 @@ namespace Ogre
 
         uint32  *mStartMappedConstBuffer;
         uint32  *mCurrentMappedConstBuffer;
+        size_t  mCurrentConstBufferSize;
 
         float   *mStartMappedTexBuffer;
         float   *mCurrentMappedTexBuffer;
+        size_t  mCurrentTexBufferSize;
 
         /// Resets every to zero every new buffer (@see unmapTexBuffer and @see mapNextTexBuffer).
         size_t  mTexLastOffset;
+        size_t  mLastTexBufferCmdOffset;
+
+        uint32 mLastTextureHash;
 
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
@@ -106,7 +112,7 @@ namespace Ogre
         /// This is affordable since common Const buffer limits are of 64kb.
         /// At the next frame we restart mCurrentConstBuffer to 0.
         void unmapConstBuffer(void);
-        void mapNextConstBuffer(void);
+        DECL_MALLOC uint32* mapNextConstBuffer( CommandBuffer *commandBuffer );
 
         /// Texture buffers are treated differently than Const buffers. We first map it.
         /// Once we're done with it, we save our progress (in mTexLastOffset) and in the
@@ -122,8 +128,10 @@ namespace Ogre
         /// or may internally use a new buffer (wasting memory space).
         ///
         /// (*) D3D11.1 allows using MAP_NO_OVERWRITE for texture buffers.
-        void unmapTexBuffer(void);
-        void mapNextTexBuffer(void);
+        void unmapTexBuffer( CommandBuffer *commandBuffer );
+        DECL_MALLOC float* mapNextTexBuffer( CommandBuffer *commandBuffer );
+
+        void destroyAllBuffers(void);
 
     public:
         HlmsPbs( Archive *dataFolder );
@@ -135,9 +143,9 @@ namespace Ogre
                                            bool casterPass, bool dualParaboloid,
                                            SceneManager *sceneManager );
 
-        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, const HlmsCache *lastCache,
-                                       uint32 lastTextureHash );
+        virtual void fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                     bool casterPass, const HlmsCache *lastCache,
+                                     CommandBuffer *commandBuffer );
 
         virtual void frameEnded(void);
     };

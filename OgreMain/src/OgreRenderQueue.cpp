@@ -41,6 +41,11 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 
 #include "Vao/OgreVertexArrayObject.h"
+#include "Vao/OgreIndexBufferPacked.h"
+
+#include "CommandBuffer/OgreCommandBuffer.h"
+#include "CommandBuffer/OgreCbBlocks.h"
+#include "CommandBuffer/OgreCbDrawCall.h"
 
 
 namespace Ogre
@@ -83,7 +88,8 @@ namespace Ogre
         mLastVertexData( 0 ),
         mLastIndexData( 0 ),
         mLastHlmsCache( &c_dummyCache ),
-        mLastTextureHash( 0 )
+        mLastTextureHash( 0 ),
+        mCommandBuffer( 0 )
     {
     }
     //---------------------------------------------------------------------
@@ -308,9 +314,14 @@ namespace Ogre
 
         HlmsMacroblock const *lastMacroblock = mLastMacroblock;
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
+        VertexArrayObject *lastVao = 0;
         uint32 lastVaoId = mLastVaoId;
         HlmsCache const *lastHlmsCache = mLastHlmsCache;
-        uint32 lastTextureHash = mLastTextureHash;
+
+        CbDrawCall *drawCmd = 0;
+        CbDrawIndexed   *drawIndexedPtr = 0;
+        CbDrawStrip     *drawStripPtr = 0;
+        CbSharedDraw    *drawCountPtr = 0;
 
         for( size_t i=firstRq; i<lastRq; ++i )
         {
@@ -336,20 +347,16 @@ namespace Ogre
 
                 if( lastMacroblock != datablock->mMacroblock )
                 {
-                    rs->_setHlmsMacroblock( datablock->mMacroblock );
+                    CbMacroblock *blockCmd = mCommandBuffer->addCommand<CbMacroblock>();
+                    *blockCmd = CbMacroblock( datablock->mMacroblock );
                     lastMacroblock = datablock->mMacroblock;
                 }
 
                 if( lastBlendblock != datablock->mBlendblock )
                 {
-                    rs->_setHlmsBlendblock( datablock->mBlendblock );
+                    CbBlendblock *blockCmd = mCommandBuffer->addCommand<CbBlendblock>();
+                    *blockCmd = CbBlendblock( datablock->mBlendblock );
                     lastBlendblock = datablock->mBlendblock;
-                }
-
-                if( lastVaoId != vao->getRenderQueueId() )
-                {
-                    rs->_setVertexArrayObject( vao );
-                    lastVaoId = vao->getRenderQueueId();
                 }
 
                 Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
@@ -359,14 +366,73 @@ namespace Ogre
                                                                 queuedRenderable,
                                                                 casterPass );
                 if( lastHlmsCache != hlmsCache )
-                    rs->_setProgramsFromHlms( hlmsCache );
+                {
+                    CbHlmsCache *hlmsCacheCmd = mCommandBuffer->addCommand<CbHlmsCache>();
+                    *hlmsCacheCmd = CbHlmsCache( hlmsCache );
+                }
 
-                lastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                                        lastHlmsCache, lastTextureHash );
+                hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                      lastHlmsCache, mCommandBuffer );
 
-                rs->_render( vao );
+                if( drawCmd != mCommandBuffer->getLastCommand() ||
+                    lastVaoId != vao->getRenderQueueId() )
+                {
+                    //Different mesh, vertex buffers or layout. Make a new draw call.
+                    //(or also the the Hlms made a batch-breaking command)
+                    if( vao->getIndexBuffer() )
+                    {
+                        CbDrawCallIndexed *drawCall = mCommandBuffer->addCommand<CbDrawCallIndexed>();
+                        *drawCall = CbDrawCallIndexed( vao );
+                        drawCmd = drawCall;
+                    }
+                    else
+                    {
+                        CbDrawCallStrip *drawCall = mCommandBuffer->addCommand<CbDrawCallStrip>();
+                        *drawCall = CbDrawCallStrip( vao );
+                        drawCmd = drawCall;
+                    }
 
-                lastHlmsCache   = hlmsCache;
+                    rs->_setVertexArrayObject( vao );
+                    lastVaoId = vao->getRenderQueueId();
+                    lastVao = 0;
+                }
+
+                if( lastVao != vao )
+                {
+                    //Different mesh, but same vertex buffers & layouts. Advance indirection buffer.
+                    ++drawCmd->numDraws;
+
+                    if( vao->getIndexBuffer() )
+                    {
+                        drawStripPtr = 0;
+                        CbDrawCallIndexed *drawCall = static_cast<CbDrawCallIndexed*>( drawCmd );
+                        drawIndexedPtr = drawCall->drawIndexedPtr;
+                        drawCountPtr = drawIndexedPtr;
+                        drawIndexedPtr->count       = 1;
+                        drawIndexedPtr->primCount   = vao->mIndexBuffer->getNumElements();
+                        drawIndexedPtr->firstVertexIndex = vao->mIndexBuffer->_getFinalBufferStart();
+                        drawIndexedPtr->baseVertex  = vao->mVertexBuffers[0]->_getFinalBufferStart();
+                        drawIndexedPtr->baseInstance= 0;
+                    }
+                    else
+                    {
+                        drawIndexedPtr = 0;
+                        CbDrawCallStrip *drawCall = static_cast<CbDrawCallStrip*>( drawCmd );
+                        drawStripPtr = drawCall->drawStripPtr;
+                        drawCountPtr = drawStripPtr;
+                        drawStripPtr->count             = 1;
+                        drawStripPtr->primCount         = vao->mVertexBuffers[0]->getNumElements();
+                        drawStripPtr->firstVertexIndex  = vao->mIndexBuffer->_getFinalBufferStart();
+                        drawStripPtr->baseInstance      = 0;
+                    }
+
+                    lastVao = vao;
+                }
+                else
+                {
+                    //Same mesh. Just go with instancing.
+                    ++drawCountPtr->count;
+                }
 
                 ++itor;
             }
@@ -378,7 +444,7 @@ namespace Ogre
         mLastVertexData     = 0;
         mLastIndexData      = 0;
         mLastHlmsCache      = lastHlmsCache;
-        mLastTextureHash    = lastTextureHash;
+        mLastTextureHash    = 0;
     }
     //-----------------------------------------------------------------------
     void RenderQueue::renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,

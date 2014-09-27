@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
@@ -25,35 +25,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef _OgreCbBlocks_H_
+#define _OgreCbBlocks_H_
 
-#ifndef _Ogre_BufferInterface_H_
-#define _Ogre_BufferInterface_H_
-
-#include "Vao/OgreBufferPacked.h"
+#include "CommandBuffer/OgreCbCommon.h"
 
 namespace Ogre
 {
-    /** Most (if not all) buffers, can be treated with the same code.
-        Hence most equivalent functionality is encapsulated here.
-    */
-    class _OgreExport BufferInterface
+    struct CbMacroblock : public CbBase
     {
-    protected:
-        BufferPacked *mBuffer;
+        HlmsMacroblock const    *block;
+        void                    *reserved; //For PipelineStateObjects?
 
-    public:
-        BufferInterface();
-        virtual ~BufferInterface() {}
+        CbMacroblock( const HlmsMacroblock *_block );
+    };
 
-        void upload( void *data, size_t elementStart, size_t elementCount );
+    struct CbBlendblock : public CbBase
+    {
+        HlmsBlendblock const    *block;
+        void                    *reserved; //For PipelineStateObjects?
 
-        virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
-                                       MappingState prevMappingState, bool advanceFrame = true ) = 0;
-        virtual void unmap( UnmapOptions unmapOption,
-                            size_t flushStartElem = 0, size_t flushSizeElem = 0 ) = 0;
-        virtual void advanceFrame(void) = 0;
+        CbBlendblock( const HlmsBlendblock *_block );
+    };
 
-        void _notifyBuffer( BufferPacked *buffer )          { mBuffer = buffer; }
+    struct CbHlmsCache : CbBase
+    {
+        HlmsCache const *hlmsCache;
+        CbHlmsCache( const HlmsCache *_hlmsCache );
     };
 }
 

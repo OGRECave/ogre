@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
@@ -25,35 +25,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef _OgreCbCommon_H_
+#define _OgreCbCommon_H_
 
-#ifndef _Ogre_BufferInterface_H_
-#define _Ogre_BufferInterface_H_
-
-#include "Vao/OgreBufferPacked.h"
+#include "OgrePrerequisites.h"
 
 namespace Ogre
 {
-    /** Most (if not all) buffers, can be treated with the same code.
-        Hence most equivalent functionality is encapsulated here.
-    */
-    class _OgreExport BufferInterface
+    enum CbType
     {
-    protected:
-        BufferPacked *mBuffer;
+        CB_DRAW_CALL_INDEXED,
+        CB_DRAW_CALL_STRIP,
+        CB_SET_CONSTANT_BUFFER,
+        CB_SET_TEXTURE_BUFFER,
+        CB_SET_MACROBLOCK,
+        CB_SET_BLENDBLOCK,
+        CB_SET_HLMS_BLOCK,
+        CB_SET_TEXTURE,
+        CB_TEXTURE_DISABLE_FROM,
+        MAX_COMMAND_BUFFER
+    };
 
-    public:
-        BufferInterface();
-        virtual ~BufferInterface() {}
+    struct CbBase
+    {
+        uint16  commandType;
 
-        void upload( void *data, size_t elementStart, size_t elementCount );
-
-        virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
-                                       MappingState prevMappingState, bool advanceFrame = true ) = 0;
-        virtual void unmap( UnmapOptions unmapOption,
-                            size_t flushStartElem = 0, size_t flushSizeElem = 0 ) = 0;
-        virtual void advanceFrame(void) = 0;
-
-        void _notifyBuffer( BufferPacked *buffer )          { mBuffer = buffer; }
+        CbBase( uint16 cmdType ) : commandType( cmdType ) {}
     };
 }
 

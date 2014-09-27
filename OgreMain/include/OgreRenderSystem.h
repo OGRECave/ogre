@@ -686,8 +686,7 @@ namespace Ogre
         @param enabled Boolean to turn the unit on/off
         @param texPtr Pointer to the texture to use.
         */
-        virtual void _setTexture(size_t unit, bool enabled, 
-            const TexturePtr &texPtr) = 0;
+        virtual void _setTexture(size_t unit, bool enabled,  Texture *texPtr) = 0;
         /**
         Sets the texture to bind to a given texture unit.
 

@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
@@ -25,35 +25,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef _OgreCbDrawCall_H_
+#define _OgreCbDrawCall_H_
 
-#ifndef _Ogre_BufferInterface_H_
-#define _Ogre_BufferInterface_H_
-
-#include "Vao/OgreBufferPacked.h"
+#include "CommandBuffer/OgreCbCommon.h"
 
 namespace Ogre
 {
-    /** Most (if not all) buffers, can be treated with the same code.
-        Hence most equivalent functionality is encapsulated here.
-    */
-    class _OgreExport BufferInterface
+    struct CbSharedDraw
     {
-    protected:
-        BufferPacked *mBuffer;
+        uint32 count;
+        uint32 primCount;
+        uint32 firstVertexIndex;
+    };
 
-    public:
-        BufferInterface();
-        virtual ~BufferInterface() {}
+    struct CbDrawStrip : CbSharedDraw
+    {
+        uint32 baseInstance;
+    };
 
-        void upload( void *data, size_t elementStart, size_t elementCount );
+    struct CbDrawIndexed : CbSharedDraw
+    {
+        uint32 baseVertex;
+        uint32 baseInstance;
+    };
 
-        virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
-                                       MappingState prevMappingState, bool advanceFrame = true ) = 0;
-        virtual void unmap( UnmapOptions unmapOption,
-                            size_t flushStartElem = 0, size_t flushSizeElem = 0 ) = 0;
-        virtual void advanceFrame(void) = 0;
+    struct CbDrawCall : public CbBase
+    {
+        VertexArrayObject   *vao;
+        uint32              numDraws;
+        CbDrawCall( uint16 cmdType, VertexArrayObject *_vao );
+    };
 
-        void _notifyBuffer( BufferPacked *buffer )          { mBuffer = buffer; }
+    struct CbDrawCallIndexed : public CbDrawCall
+    {
+        CbDrawIndexed   *drawIndexedPtr;
+        CbDrawCallIndexed( VertexArrayObject *_vao );
+    };
+
+    struct CbDrawCallStrip : public CbDrawCall
+    {
+        CbDrawStrip *drawStripPtr;
+
+        CbDrawCallStrip( VertexArrayObject *_vao );
     };
 }
 

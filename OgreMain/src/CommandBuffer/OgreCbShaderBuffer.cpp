@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
@@ -26,35 +26,30 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_BufferInterface_H_
-#define _Ogre_BufferInterface_H_
+#include "CommandBuffer/OgreCommandBuffer.h"
+#include "CommandBuffer/OgreCbShaderBuffer.h"
 
-#include "Vao/OgreBufferPacked.h"
+#include "Vao/OgreConstBufferPacked.h"
+#include "Vao/OgreTexBufferPacked.h"
 
 namespace Ogre
 {
-    /** Most (if not all) buffers, can be treated with the same code.
-        Hence most equivalent functionality is encapsulated here.
-    */
-    class _OgreExport BufferInterface
+    void CommandBuffer::execute_setConstantBuffer( const CbBase * RESTRICT_ALIAS _cmd )
     {
-    protected:
-        BufferPacked *mBuffer;
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
 
-    public:
-        BufferInterface();
-        virtual ~BufferInterface() {}
+        assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
 
-        void upload( void *data, size_t elementStart, size_t elementCount );
+        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBuffer( cmd->slot );
+    }
 
-        virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
-                                       MappingState prevMappingState, bool advanceFrame = true ) = 0;
-        virtual void unmap( UnmapOptions unmapOption,
-                            size_t flushStartElem = 0, size_t flushSizeElem = 0 ) = 0;
-        virtual void advanceFrame(void) = 0;
+    void CommandBuffer::execute_setTextureBuffer( const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
 
-        void _notifyBuffer( BufferPacked *buffer )          { mBuffer = buffer; }
-    };
+        assert( dynamic_cast<TexBufferPacked*>( cmd->bufferPacked ) );
+
+        TexBufferPacked *texBuffer = static_cast<TexBufferPacked*>( cmd->bufferPacked );
+        texBuffer->bindBuffer( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+    }
 }
-
-#endif

@@ -162,8 +162,10 @@ namespace Ogre {
     class BufferInterface;
     class BufferPacked;
     class Camera;
+    struct CbBase;
     class Codec;
     class ColourValue;
+    class CommandBuffer;
     class ConfigDialog;
     class ConstBufferPacked;
     template <typename T> class Controller;

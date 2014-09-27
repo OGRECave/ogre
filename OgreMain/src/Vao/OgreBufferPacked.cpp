@@ -125,8 +125,8 @@ namespace Ogre
         mBufferInterface->upload( data, elementStart, elementCount );
     }
     //-----------------------------------------------------------------------------------
-    void* BufferPacked::map( size_t elementStart, size_t elementCount,
-                             MappingState persistentMethod, bool advanceFrame )
+    DECL_MALLOC void* BufferPacked::map( size_t elementStart, size_t elementCount,
+                                         MappingState persistentMethod, bool advanceFrame )
     {
         if( mBufferType != BT_DYNAMIC )
         {

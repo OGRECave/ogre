@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2014 Torus Knot Software Ltd
 
@@ -25,35 +25,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef _OgreCbTexture_H_
+#define _OgreCbTexture_H_
 
-#ifndef _Ogre_BufferInterface_H_
-#define _Ogre_BufferInterface_H_
-
-#include "Vao/OgreBufferPacked.h"
+#include "CommandBuffer/OgreCbCommon.h"
 
 namespace Ogre
 {
-    /** Most (if not all) buffers, can be treated with the same code.
-        Hence most equivalent functionality is encapsulated here.
-    */
-    class _OgreExport BufferInterface
+    struct CbTexture : public CbBase
     {
-    protected:
-        BufferPacked *mBuffer;
+        uint16                  texUnit;
+        bool                    bEnabled;
+        Texture                 *texture;
+        HlmsSamplerblock const  *samplerBlock;
 
-    public:
-        BufferInterface();
-        virtual ~BufferInterface() {}
+        CbTexture( uint16 _texUnit, bool _bEnabled, Texture *_texture,
+                   const HlmsSamplerblock *_samplerBlock = 0 );
+    };
 
-        void upload( void *data, size_t elementStart, size_t elementCount );
+    struct CbTextureDisableFrom : public CbBase
+    {
+        uint16 fromTexUnit;
 
-        virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
-                                       MappingState prevMappingState, bool advanceFrame = true ) = 0;
-        virtual void unmap( UnmapOptions unmapOption,
-                            size_t flushStartElem = 0, size_t flushSizeElem = 0 ) = 0;
-        virtual void advanceFrame(void) = 0;
-
-        void _notifyBuffer( BufferPacked *buffer )          { mBuffer = buffer; }
+        CbTextureDisableFrom( uint16 _fromTexUnit );
     };
 }
 
