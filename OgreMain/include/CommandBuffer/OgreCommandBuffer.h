@@ -56,7 +56,10 @@ namespace Ogre
 
         FastArray<unsigned char>    mCommandBuffer;
     public:
+        void execute_setVao( const CbBase * RESTRICT_ALIAS cmd );
+        void execute_drawCallIndexedEmulated( const CbBase * RESTRICT_ALIAS cmd );
         void execute_drawCallIndexed( const CbBase * RESTRICT_ALIAS cmd );
+        void execute_drawCallStripEmulated( const CbBase * RESTRICT_ALIAS cmd );
         void execute_drawCallStrip( const CbBase * RESTRICT_ALIAS cmd );
         void execute_setConstantBuffer( const CbBase * RESTRICT_ALIAS cmd );
         void execute_setTextureBuffer( const CbBase * RESTRICT_ALIAS cmd );

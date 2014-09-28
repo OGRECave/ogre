@@ -356,6 +356,8 @@ namespace Ogre {
         virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
         virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
+
+        virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
         /** See
             RenderSystem
         */
@@ -478,6 +480,8 @@ namespace Ogre {
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
         virtual void _render( const VertexArrayObject *vao );
+        virtual void _render( const CbDrawCallIndexed *cmd );
+        virtual void _render( const CbDrawCallStrip *cmd );
 
         void clearFrameBuffer(unsigned int buffers,
                               const ColourValue& colour = ColourValue::Black,

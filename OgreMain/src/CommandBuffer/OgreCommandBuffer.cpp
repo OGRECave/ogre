@@ -38,7 +38,10 @@ namespace Ogre
 
     CommandBufferExecuteFunc CbExecutionTable[MAX_COMMAND_BUFFER+1] =
     {
+        &CommandBuffer::execute_setVao,
+        &CommandBuffer::execute_drawCallIndexedEmulated,
         &CommandBuffer::execute_drawCallIndexed,
+        &CommandBuffer::execute_drawCallStripEmulated,
         &CommandBuffer::execute_drawCallStrip,
         &CommandBuffer::execute_setConstantBuffer,
         &CommandBuffer::execute_setTextureBuffer,

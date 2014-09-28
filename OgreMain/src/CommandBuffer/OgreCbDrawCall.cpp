@@ -1,4 +1,4 @@
-/*
+﻿/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -30,53 +30,54 @@ THE SOFTWARE.
 #include "CommandBuffer/OgreCbDrawCall.h"
 
 #include "Vao/OgreVertexArrayObject.h"
+#include "Vao/OgreIndirectBufferPacked.h"
 
 #include "OgreRenderSystem.h"
 
 namespace Ogre
 {
-    CbDrawCall::CbDrawCall( uint16 cmdType, VertexArrayObject *_vao ) :
+    CbVao::CbVao( VertexArrayObject *_vao ) :
+        CbBase( CB_SET_VAO ),
+        vao( _vao )
+    {
+    }
+
+    void CommandBuffer::execute_setVao( const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbVao *cmd = static_cast<const CbVao*>( _cmd );
+        mRenderSystem->_setVertexArrayObject( cmd->vao );
+    }
+
+    CbDrawCall::CbDrawCall( uint16 cmdType, VertexArrayObject *_vao,
+                            void *_indirectBufferOffset ) :
         CbBase( cmdType ),
         vao( _vao ),
-        numDraws( 0 )
+        numDraws( 0 ),
+        indirectBufferOffset( _indirectBufferOffset )
     {
     }
 
-    CbDrawCallIndexed::CbDrawCallIndexed( VertexArrayObject *_vao ) :
-        CbDrawCall( CB_DRAW_CALL_INDEXED, _vao ),
-        drawIndexedPtr( 0 )
-    {
-    }
-
-    /*void CbDrawCallIndexed::addVao( VertexArrayObject *vao )
-    {
-        //TODO
-        if( vao == lastVao )
-            ++drawIndexedPtr->count;
-        else
-        {
-            //drawIndexedPtr->baseInstance = 0; ? TODO
-            drawIndexedPtr->count       = 1;
-            drawIndexedPtr->primCount   = vao->mIndexBuffer->getNumElements();
-            drawIndexedPtr->firstIndex  = vao->mIndexBuffer->_getFinalBufferStart();
-            drawIndexedPtr->baseVertex  = vao->getVertexBuffers()[0]->_getFinalBufferStart();
-        }
-    }*/
-
-
-    CbDrawCallStrip::CbDrawCallStrip( VertexArrayObject *_vao ) :
-        CbDrawCall( CB_DRAW_CALL_STRIP, _vao ),
-        drawStripPtr( 0 )
+    CbDrawCallIndexed::CbDrawCallIndexed( bool supportsIndirectBuffers, VertexArrayObject *_vao,
+                                          void *_indirectBufferOffset ) :
+        CbDrawCall( CB_DRAW_CALL_INDEXED + supportsIndirectBuffers, _vao, _indirectBufferOffset )
     {
     }
 
     void CommandBuffer::execute_drawCallIndexed( const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbDrawCallIndexed *cmd = static_cast<const CbDrawCallIndexed*>( _cmd );
+        mRenderSystem->_render( cmd );
+    }
+
+    CbDrawCallStrip::CbDrawCallStrip( bool supportsIndirectBuffers, VertexArrayObject *_vao,
+                                      void *_indirectBufferOffset ) :
+        CbDrawCall( CB_DRAW_CALL_STRIP + supportsIndirectBuffers, _vao, _indirectBufferOffset )
+    {
     }
 
     void CommandBuffer::execute_drawCallStrip( const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbDrawCallStrip *cmd = static_cast<const CbDrawCallStrip*>( _cmd );
+        mRenderSystem->_render( cmd );
     }
 }

@@ -59,7 +59,10 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreHlmsSamplerblock.h"
 #include "Vao/OgreGL3PlusVaoManager.h"
 #include "Vao/OgreGL3PlusVertexArrayObject.h"
+#include "Vao/OgreGL3PlusBufferInterface.h"
 #include "Vao/OgreIndexBufferPacked.h"
+#include "Vao/OgreIndirectBufferPacked.h"
+#include "CommandBuffer/OgreCbDrawCall.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
@@ -697,7 +700,8 @@ namespace Ogre {
 
             assert( !mVaoManager );
             mVaoManager = OGRE_NEW GL3PlusVaoManager(
-                                            mGLSupport->checkExtension("GL_ARB_buffer_storage") );
+                                            mGLSupport->checkExtension("GL_ARB_buffer_storage"),
+                                            mGLSupport->checkExtension("GL_ARB_multi_draw_indirect") );
 
             StringVector tokens = StringUtil::split(mGLSupport->getGLVersion(), ".");
             if (!tokens.empty())
@@ -1579,6 +1583,20 @@ namespace Ogre {
         }
     }
 
+    void GL3PlusRenderSystem::_setIndirectBuffer( IndirectBufferPacked *indirectBuffer )
+    {
+        if( indirectBuffer )
+        {
+            GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                                                            indirectBuffer->getBufferInterface() );
+            OCGE( glBindBuffer( GL_DRAW_INDIRECT_BUFFER, bufferInterface->getVboName() ) );
+        }
+        else
+        {
+            OCGE( glBindBuffer( GL_DRAW_INDIRECT_BUFFER, 0 ) );
+        }
+    }
+
     void GL3PlusRenderSystem::_beginFrame(void)
     {
     }
@@ -2398,6 +2416,26 @@ namespace Ogre {
             glDrawArrays( vao->mPrimType[mUseAdjacency], vao->mVertexBuffers[0]->_getFinalBufferStart(),
                           vao->mVertexBuffers[0]->getNumElements() );
         }
+    }
+
+    void GL3PlusRenderSystem::_render( const CbDrawCallIndexed *cmd )
+    {
+        const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( cmd->vao );
+        GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
+
+        GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
+                                                            GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+
+        glMultiDrawElementsIndirect( mode, indexType, cmd->indirectBufferOffset,
+                                     cmd->numDraws, sizeof(CbDrawIndexed) );
+    }
+
+    void GL3PlusRenderSystem::_render( const CbDrawCallStrip *cmd )
+    {
+        const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( cmd->vao );
+        GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
+
+        glMultiDrawArraysIndirect( mode, cmd->indirectBufferOffset, cmd->numDraws, sizeof(CbDrawStrip) );
     }
 
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,

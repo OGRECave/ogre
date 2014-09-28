@@ -163,6 +163,8 @@ namespace Ogre {
     class BufferPacked;
     class Camera;
     struct CbBase;
+    struct CbDrawCallIndexed;
+    struct CbDrawCallStrip;
     class Codec;
     class ColourValue;
     class CommandBuffer;

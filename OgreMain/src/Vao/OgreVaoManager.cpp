@@ -41,6 +41,7 @@ namespace Ogre
     VaoManager::VaoManager() :
         mTimer( 0 ),
         mDefaultStagingBufferLifetime( 300000 ), //5 minutes
+        mSupportsIndirectBuffers( false ),
         mDynamicBufferMultiplier( 3 ),
         mDynamicBufferCurrentFrame( 0 ),
         mNextStagingBufferTimestampCheckpoint( ~0 ),

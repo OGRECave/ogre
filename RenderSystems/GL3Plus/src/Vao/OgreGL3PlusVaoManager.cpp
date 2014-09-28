@@ -44,7 +44,7 @@ namespace Ogre
 {
     static const GLuint64 kOneSecondInNanoSeconds = 1000000000;
 
-    GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage ) :
+    GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers ) :
         mArbBufferStorage( supportsArbBufferStorage )
     {
         //Keep pools of 128MB each for static meshes
@@ -59,6 +59,8 @@ namespace Ogre
         mConstBufferAlignment = alignment;
         glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
         mTexBufferAlignment = alignment;
+
+        mSupportsIndirectBuffers = supportsIndirectBuffers;
     }
     //-----------------------------------------------------------------------------------
     GL3PlusVaoManager::~GL3PlusVaoManager()

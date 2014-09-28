@@ -92,33 +92,10 @@ namespace Ogre {
             RenderQueueGroup() : mSorted( false ) {}
         };
 
-        struct BufferBucket
-        {
-            TexturePtr  texBuffer;
-            size_t      usedElements;
-            size_t      maxElements;
-        };
-
-        struct Batch
-        {
-            uint32          renderOpHash;
-            uint32          start;
-            uint32          count;
-            BufferBucket    *bufferBucket;
-
-            //RenderOperation renderOperation;
-        };
-
-        static inline bool OrderSkeletonByHash( const Batch &_left, const Batch &_right )
-        {
-            return _left.renderOpHash < _right.renderOpHash;
-        }
-
-        typedef FastArray<Batch> BatchArray;
+        typedef vector<IndirectBufferPacked*>::type IndirectBufferPackedVec;
 
         RenderQueueGroup mRenderQueues[256];
 
-        BatchArray mBatchesToRender;
         HlmsManager *mHlmsManager;
         SceneManager *mSceneManager;
 
@@ -132,7 +109,17 @@ namespace Ogre {
         uint32                  mLastTextureHash;
 
         CommandBuffer           *mCommandBuffer;
-        IndirectBufferPacked    *mIndirectBuffer;
+        IndirectBufferPackedVec mFreeIndirectBuffers;
+        IndirectBufferPackedVec mUsedIndirectBuffers;
+
+        /** Returns a new (or an existing) indirect buffer that can hold the requested number of draws.
+        @param numDraws
+            Number of draws the indirect buffer is expected to hold. It must be an upper limit.
+            The caller may end up using less draws if he desires.
+        @return
+            Pointer to usable indirect buffer
+        */
+        IndirectBufferPacked* getIndirectBuffer( size_t numDraws );
 
     public:
         RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager );

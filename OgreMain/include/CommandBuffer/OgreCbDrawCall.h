@@ -32,6 +32,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    struct CbVao : public CbBase
+    {
+        VertexArrayObject *vao;
+        CbVao( VertexArrayObject *_vao );
+    };
+
 #pragma pack( push, 4 )
     struct CbSharedDraw
     {
@@ -56,20 +62,20 @@ namespace Ogre
     {
         VertexArrayObject   *vao;
         uint32              numDraws;
-        CbDrawCall( uint16 cmdType, VertexArrayObject *_vao );
+        void                *indirectBufferOffset;
+        CbDrawCall( uint16 cmdType, VertexArrayObject *_vao, void *_indirectBufferOffset );
     };
 
     struct CbDrawCallIndexed : public CbDrawCall
     {
-        CbDrawIndexed   *drawIndexedPtr;
-        CbDrawCallIndexed( VertexArrayObject *_vao );
+        CbDrawCallIndexed( bool supportsIndirectBuffers, VertexArrayObject *_vao,
+                           void *_indirectBufferOffset );
     };
 
     struct CbDrawCallStrip : public CbDrawCall
     {
-        CbDrawStrip *drawStripPtr;
-
-        CbDrawCallStrip( VertexArrayObject *_vao );
+        CbDrawCallStrip( bool supportsIndirectBuffers, VertexArrayObject *_vao,
+                         void *_indirectBufferOffset );
     };
 }
 

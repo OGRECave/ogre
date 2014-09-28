@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
 
+#include "Vao/OgreVaoManager.h"
 #include "Vao/OgreVertexArrayObject.h"
 #include "Vao/OgreIndexBufferPacked.h"
 #include "Vao/OgreIndirectBufferPacked.h"
@@ -90,13 +91,52 @@ namespace Ogre
         mLastIndexData( 0 ),
         mLastHlmsCache( &c_dummyCache ),
         mLastTextureHash( 0 ),
-        mCommandBuffer( 0 ),
-        mIndirectBuffer( 0 )
+        mCommandBuffer( 0 )
     {
     }
     //---------------------------------------------------------------------
     RenderQueue::~RenderQueue()
     {
+    }
+    //-----------------------------------------------------------------------
+    IndirectBufferPacked* RenderQueue::getIndirectBuffer( size_t numDraws )
+    {
+        size_t requiredBytes = numDraws * sizeof( CbDrawIndexed );
+
+        IndirectBufferPackedVec::iterator itor = mFreeIndirectBuffers.begin();
+        IndirectBufferPackedVec::iterator end  = mFreeIndirectBuffers.end();
+
+        size_t smallestBufferSize                           = std::numeric_limits<size_t>::max();
+        IndirectBufferPackedVec::iterator smallestBuffer    = end;
+
+        //Find the smallest buffer in the pool that can fit the request.
+        while( itor != end )
+        {
+            size_t bufferSize = (*itor)->getTotalSizeBytes();
+            if( requiredBytes < bufferSize && smallestBufferSize > bufferSize )
+            {
+                smallestBuffer      = itor;
+                smallestBufferSize  = bufferSize;
+            }
+
+            ++itor;
+        }
+
+        if( smallestBuffer == end )
+        {
+            //None found? Create a new one.
+            VaoManager *vaoManager = 0;
+            mFreeIndirectBuffers.push_back( vaoManager->createIndirectBuffer( requiredBytes, BT_DYNAMIC,
+                                                                              0, false ) );
+            smallestBuffer = mFreeIndirectBuffers.end() - 1;
+        }
+
+        IndirectBufferPacked *retVal = *smallestBuffer;
+
+        mUsedIndirectBuffers.push_back( *smallestBuffer );
+        efficientVectorRemove( mFreeIndirectBuffers, smallestBuffer );
+
+        return retVal;
     }
     //-----------------------------------------------------------------------
     void RenderQueue::clear(void)
@@ -320,14 +360,23 @@ namespace Ogre
         uint32 lastVaoId = mLastVaoId;
         HlmsCache const *lastHlmsCache = mLastHlmsCache;
 
+        VaoManager *vaoManager = 0;
+        bool supportsIndirectBuffers = vaoManager->supportsIndirectBuffers();
+
         CbDrawCall *drawCmd = 0;
         CbDrawIndexed   *drawIndexedPtr = 0;
         CbDrawStrip     *drawStripPtr = 0;
         CbSharedDraw    *drawCountPtr = 0;
 
+        size_t numNeededDraws = 0;
+        for( size_t i=firstRq; i<lastRq; ++i )
+            numNeededDraws += mRenderQueues[i].mQueuedRenderables.size();
+
+        IndirectBufferPacked *indirectBuffer = getIndirectBuffer( numNeededDraws );
         uint32 baseInstance = 0;
         unsigned char *indirectDraw = static_cast<unsigned char*>(
-                    mIndirectBuffer->map( 0, mIndirectBuffer->getNumElements(), MS_PERSISTENT_INCOHERENT ) );
+                    indirectBuffer->map( 0, indirectBuffer->getNumElements(), MS_PERSISTENT_INCOHERENT ) );
+        unsigned char *startIndirectDraw = indirectDraw;
 
         for( size_t i=firstRq; i<lastRq; ++i )
         {
@@ -385,20 +434,25 @@ namespace Ogre
                 {
                     //Different mesh, vertex buffers or layout. Make a new draw call.
                     //(or also the the Hlms made a batch-breaking command)
+
+                    if( lastVaoId != vao->getRenderQueueId() )
+                        *mCommandBuffer->addCommand<CbVao>() = CbVao( vao );
+
+                    void *offset = indirectBuffer->_getFinalBufferStart() + startIndirectDraw;
+
                     if( vao->getIndexBuffer() )
                     {
                         CbDrawCallIndexed *drawCall = mCommandBuffer->addCommand<CbDrawCallIndexed>();
-                        *drawCall = CbDrawCallIndexed( vao );
+                        *drawCall = CbDrawCallIndexed( supportsIndirectBuffers, vao, offset );
                         drawCmd = drawCall;
                     }
                     else
                     {
                         CbDrawCallStrip *drawCall = mCommandBuffer->addCommand<CbDrawCallStrip>();
-                        *drawCall = CbDrawCallStrip( vao );
+                        *drawCall = CbDrawCallStrip( supportsIndirectBuffers, vao, offset );
                         drawCmd = drawCall;
                     }
 
-                    rs->_setVertexArrayObject( vao );
                     lastVaoId = vao->getRenderQueueId();
                     lastVao = 0;
                 }
@@ -408,13 +462,12 @@ namespace Ogre
                     //Different mesh, but same vertex buffers & layouts. Advance indirection buffer.
                     ++drawCmd->numDraws;
 
-                    if( vao->getIndexBuffer() )
+                    if( vao->mIndexBuffer )
                     {
                         drawStripPtr = 0;
-                        CbDrawCallIndexed *drawCall = static_cast<CbDrawCallIndexed*>( drawCmd );
-                        drawCall->drawIndexedPtr = reinterpret_cast<CbDrawIndexed*>( indirectDraw );
+                        drawIndexedPtr = reinterpret_cast<CbDrawIndexed*>( indirectDraw );
                         indirectDraw += sizeof( CbDrawIndexed );
-                        drawIndexedPtr = drawCall->drawIndexedPtr;
+
                         drawCountPtr = drawIndexedPtr;
                         drawIndexedPtr->count           = 1;
                         drawIndexedPtr->primCount       = vao->mIndexBuffer->getNumElements();
@@ -425,10 +478,9 @@ namespace Ogre
                     else
                     {
                         drawIndexedPtr = 0;
-                        CbDrawCallStrip *drawCall = static_cast<CbDrawCallStrip*>( drawCmd );
-                        drawCall->drawStripPtr = reinterpret_cast<CbDrawStrip*>( indirectDraw );
+                        drawStripPtr = reinterpret_cast<CbDrawStrip*>( indirectDraw );
                         indirectDraw += sizeof( CbDrawStrip );
-                        drawStripPtr = drawCall->drawStripPtr;
+
                         drawCountPtr = drawStripPtr;
                         drawStripPtr->count             = 1;
                         drawStripPtr->primCount         = vao->mVertexBuffers[0]->getNumElements();
@@ -448,7 +500,9 @@ namespace Ogre
             }
         }
 
-        mIndirectBuffer->unmap( UO_KEEP_PERSISTENT );
+        indirectBuffer->unmap( UO_KEEP_PERSISTENT );
+
+        mCommandBuffer->execute();
 
         mLastMacroblock     = lastMacroblock;
         mLastBlendblock     = lastBlendblock;

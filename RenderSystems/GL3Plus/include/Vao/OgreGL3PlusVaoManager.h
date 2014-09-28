@@ -236,7 +236,7 @@ namespace Ogre
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 
     public:
-        GL3PlusVaoManager( bool supportsArbBufferStorage );
+        GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers );
         virtual ~GL3PlusVaoManager();
 
         bool supportsArbBufferStorage(void) const       { return mArbBufferStorage; }

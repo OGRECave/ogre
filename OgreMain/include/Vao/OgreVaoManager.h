@@ -55,6 +55,7 @@ namespace Ogre
         StagingBufferVec mStagingBuffers[2];
         StagingBufferVec mZeroRefStagingBuffers[2];
 
+        bool            mSupportsIndirectBuffers;
         uint8           mDynamicBufferMultiplier;
         uint8           mDynamicBufferCurrentFrame;
         unsigned long   mNextStagingBufferTimestampCheckpoint;
@@ -301,6 +302,10 @@ namespace Ogre
 
         uint32 getConstBufferAlignment(void) const      { return mConstBufferAlignment; }
         uint32 getTexBufferAlignment(void) const        { return mTexBufferAlignment; }
+
+        /// When false, IndirectBufferPacked will emulate the mapping behavior,
+        /// and we need to use the emulated calls in RenderSystem.
+        bool supportsIndirectBuffers(void) const        { return mSupportsIndirectBuffers; }
 
         Timer* getTimer(void)               { return mTimer; }
 

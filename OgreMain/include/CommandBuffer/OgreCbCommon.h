@@ -34,7 +34,10 @@ namespace Ogre
 {
     enum CbType
     {
+        CB_SET_VAO,
+        CB_DRAW_CALL_INDEXED_EMULATED,
         CB_DRAW_CALL_INDEXED,
+        CB_DRAW_CALL_STRIP_EMULATED,
         CB_DRAW_CALL_STRIP,
         CB_SET_CONSTANT_BUFFER,
         CB_SET_TEXTURE_BUFFER,

@@ -709,6 +709,8 @@ namespace Ogre
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock ) {}
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block ) {}
 
+        virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer ) = 0;
+
         /** Binds a texture to a vertex, geometry, compute, tessellation hull
         or tessellation domain sampler.
         @remarks
@@ -1193,6 +1195,8 @@ namespace Ogre
 
         /// Renders the VAO. Assumes _setVertexArrayObject has already been called.
         virtual void _render( const VertexArrayObject *vao );
+        virtual void _render( const CbDrawCallIndexed *cmd ) = 0;
+        virtual void _render( const CbDrawCallStrip *cmd ) = 0;
 
         virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot);
 
