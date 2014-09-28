@@ -45,7 +45,8 @@ namespace Ogre
     static const GLuint64 kOneSecondInNanoSeconds = 1000000000;
 
     GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers ) :
-        mArbBufferStorage( supportsArbBufferStorage )
+        mArbBufferStorage( supportsArbBufferStorage ),
+        mDrawId( 0 )
     {
         //Keep pools of 128MB each for static meshes
         mDefaultPoolSize[CPU_INACCESSIBLE]  = 128 * 1024 * 1024;
@@ -61,6 +62,31 @@ namespace Ogre
         mTexBufferAlignment = alignment;
 
         mSupportsIndirectBuffers = supportsIndirectBuffers;
+
+        mVertexAttributeIndex[VES_POSITION - 1]             = 0;
+        mVertexAttributeIndex[VES_NORMAL - 1]               = 1;
+        mVertexAttributeIndex[VES_TANGENT - 1]              = 2;
+        mVertexAttributeIndex[VES_BLEND_WEIGHTS - 1]        = 3;
+        mVertexAttributeIndex[VES_BLEND_INDICES - 1]        = 4;
+        mVertexAttributeIndex[VES_DIFFUSE - 1]              = 5;
+        mVertexAttributeIndex[VES_SPECULAR - 1]             = 6;
+        mVertexAttributeIndex[VES_TEXTURE_COORDINATES - 1]  = 7;
+        //There are up to 8 VES_TEXTURE_COORDINATES. Occupy range [7; 15)
+        //Index 15 is reserved for draw ID.
+
+        //VES_BINORMAL uses slot 16. Lots of GPUs don't support more than 16 attributes
+        //(even very modern ones like the GeForce 680). Since Binormal is rarely used, it
+        //is technical (not artist controlled, unlike UVs) and can be replaced by a
+        //4-component VES_TANGENT, we leave this one for the end.
+        mVertexAttributeIndex[VES_BINORMAL - 1]             = 16;
+
+        VertexElement2Vec vertexElements;
+        vertexElements.push_back( VertexElement2( VET_UINT1, VES_COUNT ) );
+        uint32 *drawIdPtr = static_cast<uint32*>( OGRE_MALLOC_SIMD( 4096 * sizeof(uint32),
+                                                                    MEMCATEGORY_GEOMETRY ) );
+        for( uint32 i=0; i<4096; ++i )
+            drawIdPtr[i] = i;
+        mDrawId = createVertexBuffer( vertexElements, 4096, BT_IMMUTABLE, drawIdPtr, true );
     }
     //-----------------------------------------------------------------------------------
     GL3PlusVaoManager::~GL3PlusVaoManager()
@@ -551,7 +577,7 @@ namespace Ogre
         OCGE( glGenVertexArrays( 1, &vaoName ) );
         OCGE( glBindVertexArray( vaoName ) );
 
-        size_t attributeIndex = 0;
+        GLuint uvCount = 0;
 
         for( size_t i=0; i<vaoRef.vertexBuffers.size(); ++i )
         {
@@ -582,18 +608,36 @@ namespace Ogre
                     break;
                 };
 
+                GLuint attributeIndex = mVertexAttributeIndex[it->mSemantic] + uvCount;
+
+                if( it->mSemantic == VES_TEXTURE_COORDINATES )
+                {
+                    assert( uvCount < 8 && "Up to 8 UVs are supported." );
+                    attributeIndex += uvCount;
+                    ++uvCount;
+                }
+
+                if( it->mSemantic == VES_BINORMAL )
+                {
+                    LogManager::getSingleton().logMessage(
+                                "WARNING: VES_BINORMAL will not render properly in "
+                                "many GPUs where GL_MAX_VERTEX_ATTRIBS = 16. Consider"
+                                " changing for VES_TANGENT with 4 components or use"
+                                " QTangents", LML_CRITICAL );
+                }
+
                 switch( v1::VertexElement::getBaseType( it->mType ) )
                 {
                 default:
                 case VET_FLOAT1:
                     OCGE( glVertexAttribPointer( attributeIndex, typeCount,
-                                                  v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
-                                                  normalised, binding.stride, (void*)binding.offset ) );
+                                                 v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
+                                                 normalised, binding.stride, (void*)binding.offset ) );
                     break;
                 case VET_DOUBLE1:
                     OCGE( glVertexAttribLPointer( attributeIndex, typeCount,
-                                                   v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
-                                                   binding.stride, (void*)binding.offset ) );
+                                                  v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
+                                                  binding.stride, (void*)binding.offset ) );
                     break;
                 }
 
@@ -604,6 +648,19 @@ namespace Ogre
                 ++it;
             }
 
+            OCGE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
+        }
+
+        {
+            //Now bind the Draw ID.
+            GL3PlusBufferInterface *drawIdBufferInterface = static_cast<GL3PlusBufferInterface*>(
+                        mDrawId->getBufferInterface() );
+            const GLuint drawIdIdx = 15;
+            OCGE( glBindBuffer( GL_ARRAY_BUFFER, drawIdBufferInterface->getVboName() ) );
+            OCGE( glVertexAttribPointer( drawIdIdx, 1, GL_UNSIGNED_INT, GL_FALSE,
+                                         sizeof(uint32), (void*)mDrawId->_getFinalBufferStart() ) );
+            OCGE( glVertexAttribDivisor( drawIdIdx, 1 ) );
+            OCGE( glEnableVertexAttribArray( drawIdIdx ) );
             OCGE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
         }
 

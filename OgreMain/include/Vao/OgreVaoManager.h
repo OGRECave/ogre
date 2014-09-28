@@ -143,6 +143,7 @@ namespace Ogre
         @param initialData
             Initial data the buffer will hold upon creation. Can be null (i.e. you plan to upload later).
             Cannot be null when bufferType is BT_IMMUTABLE. Must have enough room to prevent an overflow.
+            @see BufferPacked::BufferPacked
         @param keepAsShadow
             Whether to keep the pointer "initialData" as a shadow copy of the contents.
             @See BufferPacked::BufferPacked regarding on who is responsible for freeing this pointer

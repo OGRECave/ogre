@@ -140,6 +140,9 @@ namespace Ogre
         /// True if ARB_buffer_storage is supported (Persistent Mapping and immutable buffers)
         bool    mArbBufferStorage;
 
+        GLuint mVertexAttributeIndex[VES_COUNT];
+        VertexBufferPacked  *mDrawId;
+
         /** Asks for allocating buffer space in a VBO (Vertex Buffer Object).
             If the VBO doesn't exist, all VBOs are full or can't fit this request,
             then a new VBO will be created.
