@@ -90,7 +90,7 @@ namespace Ogre {
 				#else
 					hInst = GetModuleHandle("RenderSystem_GL3Plus.dll");
 				#endif
-			#end
+			#endif
 		#else
 			static const TCHAR staticVar;
 			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
