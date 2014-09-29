@@ -34,6 +34,16 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    CbShaderBuffer::CbShaderBuffer( uint16 _slot, ConstBufferPacked *_bufferPacked,
+                                    uint32 _bindOffset, uint32 _bindSizeBytes ) :
+        CbBase( CB_SET_CONSTANT_BUFFER ),
+        slot( _slot ),
+        bufferPacked( _bufferPacked ),
+        bindOffset( _bindOffset ),
+        bindSizeBytes( _bindSizeBytes )
+    {
+    }
+
     void CommandBuffer::execute_setConstantBuffer( const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
@@ -41,6 +51,16 @@ namespace Ogre
         assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
 
         static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBuffer( cmd->slot );
+    }
+
+    CbShaderBuffer::CbShaderBuffer( uint16 _slot, TexBufferPacked *_bufferPacked,
+                                    uint32 _bindOffset, uint32 _bindSizeBytes ) :
+        CbBase( CB_SET_TEXTURE_BUFFER ),
+        slot( _slot ),
+        bufferPacked( _bufferPacked ),
+        bindOffset( _bindOffset ),
+        bindSizeBytes( _bindSizeBytes )
+    {
     }
 
     void CommandBuffer::execute_setTextureBuffer( const CbBase * RESTRICT_ALIAS _cmd )

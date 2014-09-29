@@ -58,7 +58,7 @@ namespace Ogre
     };
 #pragma pack( pop )
 
-    struct CbDrawCall : public CbBase
+    struct _OgreExport CbDrawCall : public CbBase
     {
         VertexArrayObject   *vao;
         uint32              numDraws;
@@ -66,13 +66,13 @@ namespace Ogre
         CbDrawCall( uint16 cmdType, VertexArrayObject *_vao, void *_indirectBufferOffset );
     };
 
-    struct CbDrawCallIndexed : public CbDrawCall
+    struct _OgreExport CbDrawCallIndexed : public CbDrawCall
     {
         CbDrawCallIndexed( bool supportsIndirectBuffers, VertexArrayObject *_vao,
                            void *_indirectBufferOffset );
     };
 
-    struct CbDrawCallStrip : public CbDrawCall
+    struct _OgreExport CbDrawCallStrip : public CbDrawCall
     {
         CbDrawCallStrip( bool supportsIndirectBuffers, VertexArrayObject *_vao,
                          void *_indirectBufferOffset );

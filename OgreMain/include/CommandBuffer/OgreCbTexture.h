@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    struct CbTexture : public CbBase
+    struct _OgreExport CbTexture : public CbBase
     {
         uint16                  texUnit;
         bool                    bEnabled;
@@ -43,7 +43,7 @@ namespace Ogre
                    const HlmsSamplerblock *_samplerBlock = 0 );
     };
 
-    struct CbTextureDisableFrom : public CbBase
+    struct _OgreExport CbTextureDisableFrom : public CbBase
     {
         uint16 fromTexUnit;
 

@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    struct CbShaderBuffer : CbBase
+    struct _OgreExport CbShaderBuffer : CbBase
     {
         uint16          slot;
         BufferPacked   *bufferPacked;

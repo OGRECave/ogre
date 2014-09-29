@@ -972,6 +972,17 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    uint32 HlmsPbsMobile::fillBuffersFor( const HlmsCache *cache,
+                                          const QueuedRenderable &queuedRenderable,
+                                          bool casterPass, const HlmsCache *lastCache,
+                                          CommandBuffer *commandBuffer )
+    {
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                     "Trying to use fast-path on a mobile implementation. "
+                     "Change the RenderQueue settings.",
+                     "HlmsPbsMobile::fillBuffersFor" );
+    }
+    //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsPbsMobile::createDatablockImpl( IdString datablockName,
                                                        const HlmsMacroblock *macroblock,
                                                        const HlmsBlendblock *blendblock,

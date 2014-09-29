@@ -62,6 +62,13 @@ namespace Ogre
         CbDrawCall( CB_DRAW_CALL_INDEXED + supportsIndirectBuffers, _vao, _indirectBufferOffset )
     {
     }
+    void CommandBuffer::execute_drawCallIndexedEmulated( const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbDrawCallIndexed *cmd = static_cast<const CbDrawCallIndexed*>( _cmd );
+
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "",
+                     "CommandBuffer::execute_drawCallIndexedEmulated" );
+    }
 
     void CommandBuffer::execute_drawCallIndexed( const CbBase * RESTRICT_ALIAS _cmd )
     {
@@ -73,6 +80,14 @@ namespace Ogre
                                       void *_indirectBufferOffset ) :
         CbDrawCall( CB_DRAW_CALL_STRIP + supportsIndirectBuffers, _vao, _indirectBufferOffset )
     {
+    }
+
+    void CommandBuffer::execute_drawCallStripEmulated( const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbDrawCallStrip *cmd = static_cast<const CbDrawCallStrip*>( _cmd );
+
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "",
+                     "CommandBuffer::execute_drawCallStripEmulated" );
     }
 
     void CommandBuffer::execute_drawCallStrip( const CbBase * RESTRICT_ALIAS _cmd )

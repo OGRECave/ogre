@@ -433,6 +433,17 @@ namespace Ogre
         return datablock->mTextureHash;
     }
     //-----------------------------------------------------------------------------------
+    uint32 HlmsGui2DMobile::fillBuffersFor( const HlmsCache *cache,
+                                            const QueuedRenderable &queuedRenderable,
+                                            bool casterPass, const HlmsCache *lastCache,
+                                            CommandBuffer *commandBuffer )
+    {
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                     "Trying to use fast-path on a mobile implementation. "
+                     "Change the RenderQueue settings.",
+                     "HlmsGui2DMobile::fillBuffersFor" );
+    }
+    //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsGui2DMobile::createDatablockImpl( IdString datablockName,
                                                          const HlmsMacroblock *macroblock,
                                                          const HlmsBlendblock *blendblock,

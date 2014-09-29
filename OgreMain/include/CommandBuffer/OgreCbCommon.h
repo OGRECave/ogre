@@ -49,7 +49,7 @@ namespace Ogre
         MAX_COMMAND_BUFFER
     };
 
-    struct CbBase
+    struct _OgreExport CbBase
     {
         uint16  commandType;
 

@@ -48,7 +48,7 @@ namespace Ogre
            the commands as POD in the flat array (instead of having an
            array of pointers, and having to call virtual destructors).
     */
-    class CommandBuffer
+    class _OgreExport CommandBuffer
     {
         static const size_t COMMAND_FIXED_SIZE;
 
