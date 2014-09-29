@@ -886,17 +886,8 @@ namespace Ogre
                 "frame rates, turn VSync on if you observe this problem.");
         }
 
-        HRESULT hr;
-
         // Create swap chain            
-        hr = mpDXGIFactory->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, &mpSwapChain);
-    
-        if (FAILED(hr))
-        {
-            // Try a second time, may fail the first time due to back buffer count,
-            // which will be corrected by the runtime
-            hr = mpDXGIFactory->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, &mpSwapChain);
-        }
+        HRESULT hr = mpDXGIFactory->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, &mpSwapChain);
 
         return hr;
     }
@@ -1302,13 +1293,6 @@ namespace Ogre
 
         // Create swap chain
         HRESULT hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, &mpSwapChain);
-    
-        if (FAILED(hr))
-        {
-            // Try a second time, may fail the first time due to back buffer count,
-            // which will be corrected by the runtime
-            hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, &mpSwapChain);
-        }
         if (FAILED(hr))
             return hr;
 
