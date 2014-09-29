@@ -206,7 +206,9 @@ namespace Ogre
     public:
         D3D11RenderWindowCoreWindow(D3D11Device& device, IDXGIFactoryN* pDXGIFactory);
         ~D3D11RenderWindowCoreWindow()                          { destroy(); }
-        virtual void create(const String& name, unsigned width, unsigned height, bool fullScreen, const NameValuePairList *miscParams);
+
+        virtual float getViewPointToPixelScale();
+        virtual void create(const String& name, unsigned widthPt, unsigned heightPt, bool fullScreen, const NameValuePairList *miscParams);
         virtual void destroy(void);
 
         Windows::UI::Core::CoreWindow^ getCoreWindow() const    { return mCoreWindow.Get(); }

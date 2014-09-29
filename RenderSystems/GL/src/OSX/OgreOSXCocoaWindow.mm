@@ -351,7 +351,7 @@ namespace Ogre {
         StringStream ss;
         ss  << "Cocoa: Window created " << widthPt << " x " << heightPt
         << " with backing store size " << mWidth << " x " << mHeight
-        << " using content scaling factor " << std::fixed << std::setprecision(1) << mContentScalingFactor;
+        << " using content scaling factor " << std::fixed << std::setprecision(1) << getViewPointToPixelScale();
         LogManager::getSingleton().logMessage(ss.str());
     }
 
@@ -494,6 +494,11 @@ namespace Ogre {
         glPixelStorei(GL_PACK_ROW_LENGTH, 0);
         
         PixelUtil::bulkPixelVerticalFlip(dst);
+    }
+
+    float OSXCocoaWindow::getViewPointToPixelScale()
+    {
+        return (mContentScalingSupported && mContentScalingFactor > 1.0f) ? mContentScalingFactor : 1.0f;
     }
 
     int OSXCocoaWindow::_getPixelFromPoint(int viewPt) const

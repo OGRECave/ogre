@@ -35,10 +35,10 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11Texture.h"
-
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
+#include <iomanip>
 
 #define OGRE_D3D11_WIN_CLASS_NAME "OgreD3D11Wnd"
 
@@ -1203,10 +1203,20 @@ namespace Ogre
         : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
     {
     }
-    void D3D11RenderWindowCoreWindow::create(const String& name, unsigned int width, unsigned int height,
+
+	float D3D11RenderWindowCoreWindow::getViewPointToPixelScale()
+	{
+#if _WIN32_WINNT > _WIN32_WINNT_WIN8
+		return Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi / 96;
+#else
+		return Windows::Graphics::Display::DisplayProperties::LogicalDpi / 96;
+#endif
+	}
+
+    void D3D11RenderWindowCoreWindow::create(const String& name, unsigned int widthPt, unsigned int heightPt,
         bool fullScreen, const NameValuePairList *miscParams)
     {
-        D3D11RenderWindowSwapChainBased::create(name, width, height, fullScreen, miscParams);
+        D3D11RenderWindowSwapChainBased::create(name, widthPt, heightPt, fullScreen, miscParams);
 
         Windows::UI::Core::CoreWindow^ externalHandle = nullptr;
 
@@ -1233,17 +1243,17 @@ namespace Ogre
             mIsExternal = true;
         }
 
+        float scale = getViewPointToPixelScale();
         Windows::Foundation::Rect rc = mCoreWindow->Bounds;
-        float scale = Windows::Graphics::Display::DisplayProperties::LogicalDpi / 96;
         mLeft = (int)(rc.X * scale + 0.5f);
         mTop = (int)(rc.Y * scale + 0.5f);
         mWidth = (int)(rc.Width * scale + 0.5f);
         mHeight = (int)(rc.Height * scale + 0.5f);
 
-        LogManager::getSingleton().stream()
-            << "D3D11 : Created D3D11 Rendering Window '"
-            << mName << "' : " << mWidth << "x" << mHeight 
-            << ", " << mColourDepth << "bpp";
+        LogManager::getSingleton().stream() << std::fixed << std::setprecision(1) 
+            << "D3D11 : Created D3D11 Rendering Window \"" << mName << "\", " << rc.Width << " x " << rc.Height
+            << ", with backing store " << mWidth << "x" << mHeight << ", " << mColourDepth << "bpp, "
+            << "using content scaling factor " << scale;
 
         _createSwapChain();
         _createSizeDependedD3DResources();
@@ -1310,12 +1320,12 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowCoreWindow::windowMovedOrResized()
     {
+        float scale = getViewPointToPixelScale();
         Windows::Foundation::Rect rc = mCoreWindow->Bounds;
-        float scale = Windows::Graphics::Display::DisplayProperties::LogicalDpi / 96;
-        mLeft = (int)(rc.X * scale);
-        mTop = (int)(rc.Y * scale);
-        mWidth = (int)(rc.Width * scale);
-        mHeight = (int)(rc.Height * scale);
+        mLeft = (int)(rc.X * scale + 0.5f);
+        mTop = (int)(rc.Y * scale + 0.5f);
+        mWidth = (int)(rc.Width * scale + 0.5f);
+        mHeight = (int)(rc.Height * scale + 0.5f);
 
         _resizeSwapChainBuffers(0, 0);      // pass zero to autodetect size
     }
