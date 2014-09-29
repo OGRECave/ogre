@@ -76,6 +76,8 @@ namespace v1 {
     {
         setDefaultDimensions( 100, 100 );
 
+        mRenderables.push_back( this );
+
         setPoolSize( poolSize );
         setCastShadows( false );
         setTextureStacksAndSlices( 1, 1 );
@@ -559,6 +561,11 @@ namespace v1 {
                 injectBillboard(*(*it), camera);
             }
             endBillboards();
+
+            mRenderables.clear();
+            if( !mActiveBillboards.empty() )
+                mRenderables.push_back( this );
+
             mBillboardDataChanged = false;
         }
     }

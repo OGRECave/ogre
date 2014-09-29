@@ -1219,7 +1219,9 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
                 while( itor != end )
                 {
-                    //(*itor)->_updateRenderQueue( getRenderQueue(), camera, lodCamera );
+                    //TODO: v1 RenderQueues get this called. v2 don't (use different loops for perf!)
+                    (*itor)->_updateRenderQueue( mRenderQueue, camera, lodCamera );
+
                     RenderableArray::const_iterator itRend = (*itor)->mRenderables.begin();
                     RenderableArray::const_iterator enRend = (*itor)->mRenderables.end();
 

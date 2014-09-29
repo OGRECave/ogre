@@ -201,6 +201,7 @@ uniform highp @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shado
 	@end
 @end
 
+@property( hlms_normal )
 @insertpiece( mediump ) vec3 cookTorrance( @insertpiece( mediump ) vec3 lightDir, @insertpiece( mediump ) vec3 viewDir, @insertpiece( lowp ) float NdotV, @insertpiece( mediump ) vec3 lightDiffuse, @insertpiece( mediump ) vec3 lightSpecular )
 {
 	@insertpiece( mediump ) vec3 halfWay= normalize( lightDir + viewDir );
@@ -242,11 +243,13 @@ uniform highp @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shado
 	return NdotL * (kS * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
 					kD * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
 }
+@end
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], psPosL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
 
 void main()
 {
+@property( hlms_normal )
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
 		@insertpiece( lowp ) vec4 detailWeights = @insertpiece(texture2D)( texDetailWeightMap, psUv@value(uv_detail_weight).xy );
@@ -388,6 +391,9 @@ void main()
 	outColour.xyz	= finalColour;
 @end
 	outColour.w		= 1.0;
+@end @property( !hlms_normal )
+	outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
+@end
 }
 @end
 @property( hlms_shadowcaster )
