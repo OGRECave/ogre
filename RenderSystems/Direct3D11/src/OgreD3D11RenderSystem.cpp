@@ -493,7 +493,7 @@ bail:
             else if (value == "11.0")
                 mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
             else
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
                 mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
 #else
                 mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -755,14 +755,14 @@ bail:
             }
 
             D3D_FEATURE_LEVEL requestedLevels[] = {
-#if !__OGRE_WINRT_PHONE_80
-#if __OGRE_WINRT_STORE || __OGRE_WINRT_PHONE
+#if !__OGRE_WINRT_PHONE // Windows Phone support only FL 9.3, but simulator can create much more capable device, so restrict it artificially here
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
                 D3D_FEATURE_LEVEL_11_1,
 #endif
                 D3D_FEATURE_LEVEL_11_0,
                 D3D_FEATURE_LEVEL_10_1,
                 D3D_FEATURE_LEVEL_10_0,
-#endif // !__OGRE_WINRT_PHONE_80
+#endif // !__OGRE_WINRT_PHONE
                 D3D_FEATURE_LEVEL_9_3,
                 D3D_FEATURE_LEVEL_9_2,
                 D3D_FEATURE_LEVEL_9_1
@@ -3987,13 +3987,10 @@ bail:
         mGpuProgramManager = NULL;
         mPrimaryWindow = NULL;
         mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-
-#    if __OGRE_WINRT_PHONE_80
+#if __OGRE_WINRT_PHONE // Windows Phone support only FL 9.3, but simulator can create much more capable device, so restrict it artificially here
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
-#    else
+#elif _WIN32_WINNT >= _WIN32_WINNT_WIN8
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
-#    endif
 #else
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 #endif
