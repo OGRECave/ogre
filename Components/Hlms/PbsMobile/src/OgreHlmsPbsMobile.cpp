@@ -843,7 +843,7 @@ namespace Ogre
                 size_t texUnit = 0;
                 while( itor != end )
                 {
-                    mRenderSystem->_setTexture( texUnit, true, *itor );
+                    mRenderSystem->_setTexture( texUnit, true, (*itor).get() );
                     ++texUnit;
                     ++itor;
                 }
@@ -944,7 +944,7 @@ namespace Ogre
                 {
                     if( !datablock->mTexture[i].isNull() )
                     {
-                        mRenderSystem->_setTexture( texUnit, true, datablock->mTexture[i] );
+                        mRenderSystem->_setTexture( texUnit, true, datablock->mTexture[i].get() );
                         mRenderSystem->_setHlmsSamplerblock( texUnit, datablock->mSamplerblocks[i] );
                         ++texUnit;
                     }

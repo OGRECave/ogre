@@ -644,7 +644,6 @@ namespace Ogre
                 OCGE( glVertexAttribDivisor( attributeIndex, binding.instancingDivisor ) );
                 OCGE( glEnableVertexAttribArray( attributeIndex ) );
 
-                ++attributeIndex;
                 ++it;
             }
 

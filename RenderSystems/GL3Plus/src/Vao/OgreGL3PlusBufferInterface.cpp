@@ -125,7 +125,7 @@ namespace Ogre
     void GL3PlusBufferInterface::unmap( UnmapOptions unmapOption,
                                         size_t flushStartElem, size_t flushSizeElem )
     {
-        assert( flushStartElem < mBuffer->mLastMappingCount &&
+        assert( flushStartElem <= mBuffer->mLastMappingCount &&
                 "Flush starts after the end of the mapped region!" );
         assert( flushStartElem + flushSizeElem <= mBuffer->mLastMappingCount &&
                 "Flush region out of bounds!" );
