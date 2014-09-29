@@ -1265,7 +1265,7 @@ ScriptTranslator* ShaderGenerator::getTranslator(const AbstractNodePtr& node)
     
     if(node->type == Ogre::ANT_OBJECT)
     {
-        ObjectAbstractNode *obj           = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj           = static_cast<ObjectAbstractNode*>(node.get());
         SGScriptTranslatorIterator itFind = mScriptTranslatorsMap.find(obj->cls);
         
         if(itFind != mScriptTranslatorsMap.end())

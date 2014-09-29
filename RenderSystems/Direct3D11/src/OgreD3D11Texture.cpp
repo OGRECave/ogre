@@ -90,7 +90,7 @@ namespace Ogre
 
         D3D11Texture *other;
         // get the target
-        other = reinterpret_cast< D3D11Texture * >( target.get() );
+        other = static_cast< D3D11Texture * >( target.get() );
 
         mDevice.GetImmediateContext()->CopyResource(other->getTextureResource(), mpTex);
         if (mDevice.isError())
@@ -638,7 +638,7 @@ namespace Ogre
 		desc.Usage			= D3D11Mappings::_getUsage(_getTextureUsage());
         desc.BindFlags      = D3D11_BIND_SHADER_RESOURCE;
 
-        D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
            desc.BindFlags       |= D3D11_BIND_RENDER_TARGET;
 
@@ -776,7 +776,7 @@ namespace Ogre
         if(mFormat == PF_UNKNOWN)
             return mBBPixelFormat;
 
-        D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         if (rsys->_getFeatureLevel() < D3D_FEATURE_LEVEL_10_0 && mFormat == PF_L8)
         {
             // For 3D textures, PF_L8, which maps to DXGI_FORMAT_R8_UNORM, is not supported but PF_A8, which maps to DXGI_FORMAT_R8_UNORM is supported.
@@ -1073,7 +1073,7 @@ namespace Ogre
         }
         else if(name == "isTexture")
         {
-            bool *b = reinterpret_cast< bool * >( pData );
+            bool *b = static_cast< bool * >( pData );
             *b = true;
             return;
         }
@@ -1096,7 +1096,7 @@ namespace Ogre
         }
         else if( name == "numberOfViews" )
         {
-            unsigned int* n = reinterpret_cast<unsigned int*>(pData);
+            unsigned int* n = static_cast<unsigned int*>(pData);
             *n = 1;
             return;
         }

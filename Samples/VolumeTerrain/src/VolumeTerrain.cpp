@@ -145,7 +145,7 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
     {
         Real radius = (Real)2.5;
         CSGSphereSource sphere(radius, intersection);
-        CSGOperationSource *operation = doUnion ? reinterpret_cast<CSGOperationSource*>(new CSGUnionSource()) : new CSGDifferenceSource();
+        CSGOperationSource *operation = doUnion ? static_cast<CSGOperationSource*>(new CSGUnionSource()) : new CSGDifferenceSource();
         static_cast<TextureSource*>(mVolumeRoot->getChunkParameters()->src)->combineWithSource(operation, &sphere, intersection, radius * (Real)1.5);
         
         mVolumeRoot->getChunkParameters()->updateFrom = intersection - radius * (Real)1.5;

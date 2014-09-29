@@ -32,7 +32,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11_TEXTURE_ADDRESS_MODE D3D11Mappings::get(TextureUnitState::TextureAddressingMode tam)
     {
-        D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
             return D3D11_TEXTURE_ADDRESS_WRAP;
 

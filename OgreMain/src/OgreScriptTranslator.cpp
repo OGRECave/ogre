@@ -79,7 +79,7 @@ namespace Ogre{
             return;
 
         // Abstract objects are completely skipped
-        if((reinterpret_cast<ObjectAbstractNode*>(node.get()))->abstract)
+        if((static_cast<ObjectAbstractNode*>(node.get()))->abstract)
             return;
 
         // Retrieve the translator to use
@@ -90,7 +90,7 @@ namespace Ogre{
             translator->translate(compiler, node);
         else
             compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, node->file, node->line,
-                               "token \"" + reinterpret_cast<ObjectAbstractNode*>(node.get())->cls + "\" is not recognized");
+                               "token \"" + static_cast<ObjectAbstractNode*>(node.get())->cls + "\" is not recognized");
     }
     //-------------------------------------------------------------------------
     AbstractNodeList::const_iterator ScriptTranslator::getNodeAt(const AbstractNodeList &nodes, int index)
@@ -619,7 +619,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void MaterialTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
         if(obj->name.empty())
             compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
 
@@ -629,7 +629,7 @@ namespace Ogre{
 
         if(!processed)
         {
-            mMaterial = reinterpret_cast<Ogre::Material*>(MaterialManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get());
+            mMaterial = MaterialManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get();
         }
         else
         {
@@ -646,7 +646,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_LOD_VALUES:
@@ -810,7 +810,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void TechniqueTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         // Create the technique from the material
         Ogre::Material *material = Ogre::any_cast<Ogre::Material*>(obj->parent->context);
@@ -826,7 +826,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_SCHEME:
@@ -1053,7 +1053,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void PassTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         Technique *technique = any_cast<Technique*>(obj->parent->context);
         mPass = technique->createPass();
@@ -1068,7 +1068,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_AMBIENT:
@@ -1401,7 +1401,7 @@ namespace Ogre{
                     {
                         if(prop->values.front()->type == ANT_ATOM)
                         {
-                            AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(prop->values.front().get());
+                            AtomAbstractNode *atom = static_cast<AtomAbstractNode*>(prop->values.front().get());
                             switch(atom->id)
                             {
                             case ID_ADD:
@@ -1446,8 +1446,8 @@ namespace Ogre{
                         AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1);
                         if((*i0)->type == ANT_ATOM && (*i1)->type == ANT_ATOM)
                         {
-                            AtomAbstractNode *atom0 = reinterpret_cast<AtomAbstractNode*>((*i0).get()),
-                                *atom1 = reinterpret_cast<AtomAbstractNode*>((*i1).get());
+                            AtomAbstractNode *atom0 = static_cast<AtomAbstractNode*>((*i0).get()),
+                                             *atom1 = static_cast<AtomAbstractNode*>((*i1).get());
                             SceneBlendOperation op = SBO_ADD, alphaOp = SBO_ADD;
                             switch(atom0->id)
                             {
@@ -2476,7 +2476,7 @@ namespace Ogre{
             }
             else if((*i)->type == ANT_OBJECT)
             {
-                ObjectAbstractNode *child = reinterpret_cast<ObjectAbstractNode*>((*i).get());
+                ObjectAbstractNode *child = static_cast<ObjectAbstractNode*>((*i).get());
                 switch(child->id)
                 {
                 case ID_FRAGMENT_PROGRAM_REF:
@@ -2786,7 +2786,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void TextureUnitTranslator::translate(ScriptCompiler *compiler, const Ogre::AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         Pass *pass = any_cast<Pass*>(obj->parent->context);
         mUnit = pass->createTextureUnitState();
@@ -2801,7 +2801,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_TEXTURE_ALIAS:
@@ -4248,7 +4248,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void TextureSourceTranslator::translate(Ogre::ScriptCompiler *compiler, const Ogre::AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         // It has to have one value identifying the texture source name
         if(obj->values.empty())
@@ -4336,7 +4336,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void GpuProgramTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         // Must have a name
         if(obj->name.empty())
@@ -4455,8 +4455,7 @@ namespace Ogre{
         bool processed = compiler->_fireEvent(&evt, (void*)&prog);
         if(!processed)
         {
-            prog = reinterpret_cast<GpuProgram*>(GpuProgramManager::getSingleton().createProgram(obj->name,
-                                                                                                 compiler->getResourceGroup(), source, translateIDToGpuProgramType(obj->id), syntax).get());
+            prog = GpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), source, translateIDToGpuProgramType(obj->id), syntax).get();
         }
 
         // Check that allocation worked
@@ -4483,7 +4482,7 @@ namespace Ogre{
         if(prog->isSupported() && !params.isNull())
         {
             GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
+            GpuProgramTranslator::translateProgramParameters(compiler, ptr, static_cast<ObjectAbstractNode*>(params.get()));
         }
     }
     //-------------------------------------------------------------------------
@@ -4540,9 +4539,7 @@ namespace Ogre{
 
         if(!processed)
         {
-            prog = reinterpret_cast<HighLevelGpuProgram*>(
-                HighLevelGpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(),
-                                                                         "unified", translateIDToGpuProgramType(obj->id)).get());
+            prog = HighLevelGpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), "unified", translateIDToGpuProgramType(obj->id)).get();
         }
 
         // Check that allocation worked
@@ -4569,7 +4566,7 @@ namespace Ogre{
         if(prog->isSupported() && !params.isNull())
         {
             GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
+            GpuProgramTranslator::translateProgramParameters(compiler, ptr, static_cast<ObjectAbstractNode*>(params.get()));
         }
 
     }
@@ -4656,9 +4653,7 @@ namespace Ogre{
         bool processed = compiler->_fireEvent(&evt, (void*)&prog);
         if(!processed)
         {
-            prog = reinterpret_cast<HighLevelGpuProgram*>(
-                HighLevelGpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(),
-                                                                         language, translateIDToGpuProgramType(obj->id)).get());
+            prog = HighLevelGpuProgramManager::getSingleton().createProgram(obj->name, compiler->getResourceGroup(), language, translateIDToGpuProgramType(obj->id)).get();
             prog->setSourceFile(source);
         }
 
@@ -4686,7 +4681,7 @@ namespace Ogre{
         if(prog->isSupported() && !params.isNull())
         {
             GpuProgramParametersSharedPtr ptr = prog->getDefaultParameters();
-            GpuProgramTranslator::translateProgramParameters(compiler, ptr, reinterpret_cast<ObjectAbstractNode*>(params.get()));
+            GpuProgramTranslator::translateProgramParameters(compiler, ptr, static_cast<ObjectAbstractNode*>(params.get()));
         }
 
     }
@@ -4731,7 +4726,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_SHARED_PARAMS_REF:
@@ -5498,7 +5493,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void SharedParamsTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         // Must have a name
         if (obj->name.empty())
@@ -5528,7 +5523,7 @@ namespace Ogre{
         {
             if ((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch (prop->id)
                 {
                 case ID_SHARED_PARAM_NAMED:
@@ -5699,7 +5694,7 @@ namespace Ogre{
 
     void ParticleSystemTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
         // Find the name
         if(obj->name.empty())
         {
@@ -5733,7 +5728,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_MATERIAL:
@@ -5818,7 +5813,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void ParticleEmitterTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         // Must have a type as the first value
         if(obj->values.empty())
@@ -5841,7 +5836,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 String value;
 
                 // Glob the values together
@@ -5883,7 +5878,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void ParticleAffectorTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         // Must have a type as the first value
         if(obj->values.empty())
@@ -5906,7 +5901,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 String value;
 
                 // Glob the values together
@@ -5948,7 +5943,7 @@ namespace Ogre{
 
     void CompositorTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
         if(obj->name.empty())
         {
             compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, obj->file, obj->line);
@@ -5961,8 +5956,7 @@ namespace Ogre{
 
         if(!processed)
         {
-            mCompositor = reinterpret_cast<Compositor*>(CompositorManager::getSingleton().create(obj->name,
-                                                                                                 compiler->getResourceGroup()).get());
+            mCompositor = CompositorManager::getSingleton().create(obj->name, compiler->getResourceGroup()).get();
         }
 
         if(mCompositor == 0)
@@ -6000,7 +5994,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void CompositionTechniqueTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         Compositor *compositor = any_cast<Compositor*>(obj->parent->context);
         mTechnique = compositor->createTechnique();
@@ -6014,7 +6008,7 @@ namespace Ogre{
             }
             else if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_TEXTURE:
@@ -6287,7 +6281,7 @@ namespace Ogre{
     //-------------------------------------------------------------------------
     void CompositionTargetPassTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         CompositionTechnique *technique = any_cast<CompositionTechnique*>(obj->parent->context);
         if(obj->id == ID_TARGET)
@@ -6314,7 +6308,7 @@ namespace Ogre{
             }
             else if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_INPUT:
@@ -6489,7 +6483,7 @@ namespace Ogre{
 
     void CompositionPassTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
     {
-        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 
         CompositionTargetPass *target = any_cast<CompositionTargetPass*>(obj->parent->context);
         mPass = target->createPass();
@@ -6542,7 +6536,7 @@ namespace Ogre{
             }
             else if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 switch(prop->id)
                 {
                 case ID_CHECK:
@@ -6914,7 +6908,7 @@ namespace Ogre{
                     {
                         if(prop->values.front()->type == ANT_ATOM)
                         {
-                            AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(prop->values.front().get());
+                            AtomAbstractNode *atom = static_cast<AtomAbstractNode*>(prop->values.front().get());
                             if(atom->id == ID_CAMERA_FAR_CORNERS_VIEW_SPACE)
                                 mPass->setQuadFarCorners(true, true);
                             else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)
@@ -6954,8 +6948,8 @@ namespace Ogre{
 
         if(node->type == ANT_OBJECT)
         {
-            ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
-            ObjectAbstractNode *parent = obj->parent ? reinterpret_cast<ObjectAbstractNode*>(obj->parent) : 0;
+            ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
+            ObjectAbstractNode *parent = obj->parent ? static_cast<ObjectAbstractNode*>(obj->parent) : 0;
             if(obj->id == ID_MATERIAL)
                 translator = &mMaterialTranslator;
             else if(obj->id == ID_TECHNIQUE && parent && parent->id == ID_MATERIAL)
