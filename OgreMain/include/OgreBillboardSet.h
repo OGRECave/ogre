@@ -117,6 +117,9 @@ namespace v1 {
         /// Rotation type of each billboard
         BillboardRotationType mRotationType;
 
+        String  mMaterialName;
+        String  mMaterialGroup;
+
         /// Default width of each billboard
         Real mDefaultWidth;
         /// Default height of each billboard
@@ -805,6 +808,9 @@ namespace v1 {
             Calling this method will cause GPU buffers update in the next render queue update.
         */
         void notifyBillboardDataChanged(void) { mBillboardDataChanged = true; }
+
+        virtual void setMaterial( const MaterialPtr& material );
+        virtual void setDatablock( HlmsDatablock *datablock );
 
     };
 

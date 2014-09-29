@@ -97,7 +97,7 @@ namespace v1 {
         // index data set up later
 
         Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
-        setDatablock( hlms->getDatablock( IdString() ) );
+        setDatablock( hlms->getDefaultDatablock() );
 
     }
     //-----------------------------------------------------------------------
@@ -157,6 +157,9 @@ namespace v1 {
                     "visible on some rendering APIs so you should change this "
                     "so you use one or the other.");
             }
+
+            mHlmsDatablock->getCreator()->calculateHashFor( this, mHlmsHash, mHlmsCasterHash );
+
             mVertexDeclDirty = false;
         }
     }

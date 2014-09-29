@@ -238,6 +238,10 @@ namespace Ogre
         const HlmsMacroblock* getMacroblock(void) const                 { return mMacroblock; }
         const HlmsBlendblock* getBlendblock(void) const                 { return mBlendblock; }
 
+        /// @see Hlms::getFullNameString. This operations is NOT fast. Might return null
+        /// (if the datablock was removed from the Hlms but somehow is still alive)
+        const String* getFullName(void) const;
+
         void _linkRenderable( Renderable *renderable );
         void _unlinkRenderable( Renderable *renderable );
 

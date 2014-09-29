@@ -166,6 +166,9 @@ namespace Ogre {
         /// Don't call this too often.
         void renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                  RenderSystem *rs, bool casterPass, bool dualParaboloid );
+
+        /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
+        void frameEnded(void);
     };
 
     /** @} */

@@ -76,9 +76,6 @@ namespace v1 {
     {
         setDefaultDimensions( 100, 100 );
 
-        Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
-        setDatablock( hlms->getDatablock( IdString() ) );
-
         setPoolSize( poolSize );
         setCastShadows( false );
         setTextureStacksAndSlices( 1, 1 );
@@ -760,6 +757,38 @@ namespace v1 {
 
             mIndexData->indexBuffer->unlock();
         }
+
+        if( mHlmsDatablock && getMaterial().isNull() )
+        {
+            //Needed to force Hlms to recalculate the hash (vertex attributes may have changed)
+            mHlmsDatablock->_unlinkRenderable( this );
+            mHlmsDatablock = 0;
+        }
+
+        if( mMaterialName.empty() )
+        {
+            Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
+            setDatablock( hlms->getDefaultDatablock() );
+        }
+        else
+        {
+            if( mMaterialGroup.empty() )
+            {
+                Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
+                HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+                HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault( mMaterialName );
+
+                if( datablock )
+                    setDatablock( datablock );
+                else
+                    setDatablock( hlms->getDefaultDatablock() );
+            }
+            else
+            {
+                setMaterialName( mMaterialName, mMaterialGroup );
+            }
+        }
+
         mBuffersCreated = true;
     }
     //-----------------------------------------------------------------------
@@ -780,6 +809,25 @@ namespace v1 {
 
         mBuffersCreated = false;
 
+    }
+    //-----------------------------------------------------------------------
+    void BillboardSet::setMaterial( const MaterialPtr& material )
+    {
+        mMaterialName   = material->getName();
+        mMaterialGroup  = material->getGroup();
+        Renderable::setMaterial( material );
+    }
+    //-----------------------------------------------------------------------
+    void BillboardSet::setDatablock( HlmsDatablock *datablock )
+    {
+        mMaterialName.clear();
+        mMaterialGroup.clear();
+
+        const String *fullDatablockName = datablock->getFullName();
+        if( fullDatablockName )
+            mMaterialName = *fullDatablockName;
+
+        Renderable::setDatablock( datablock );
     }
     //-----------------------------------------------------------------------
     unsigned int BillboardSet::getPoolSize(void) const

@@ -143,6 +143,11 @@ namespace Ogre
         mBlendblock = blendblock;
     }
     //-----------------------------------------------------------------------------------
+    const String* HlmsDatablock::getFullName(void) const
+    {
+        return mCreator->getFullNameString( mName );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsDatablock::_linkRenderable( Renderable *renderable )
     {
         assert( renderable->mHlmsGlobalIndex == (uint32)~0 &&
