@@ -3857,108 +3857,58 @@ bail:
     void D3D11RenderSystem::determineFSAASettings(uint fsaa, const String& fsaaHint, 
         DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings)
     {
-        bool ok = false;
-        bool qualityHint = fsaaHint.find("Quality") != String::npos;
-        size_t origFSAA = fsaa;
-        bool tryCSAA = false;
-        // NVIDIA, prefer CSAA if available for 8+
-        // it would be tempting to use getCapabilities()->getVendor() == GPU_NVIDIA but
-        // if this is the first window, caps will not be initialised yet
+        bool qualityHint = fsaa >= 8 && fsaaHint.find("Quality") != String::npos;
         
-        if (mActiveD3DDriver->getAdapterIdentifier().VendorId == 0x10DE && 
-            fsaa >= 8)
+        // NVIDIA, AMD - prefer CSAA aka EQAA if available.
+        // see http://developer.nvidia.com/object/coverage-sampled-aa.html
+        // see http://developer.amd.com/wordpress/media/2012/10/EQAA%20Modes%20for%20AMD%20HD%206900%20Series%20Cards.pdf
+
+        // Modes are sorted from high quality to low quality, CSAA aka EQAA are listed first
+        // Note, that max(Count, Quality) == FSAA level and (Count >= 8 && Quality != 0) == quality hint
+        DXGI_SAMPLE_DESC presets[] = {
+                { 8, 16 }, // CSAA 16xQ, EQAA 8f16x
+                { 4, 16 }, // CSAA 16x,  EQAA 4f16x
+                { 16, 0 }, // MSAA 16x
+
+                { 12, 0 }, // MSAA 12x
+
+                { 8, 8 },  // CSAA 8xQ
+                { 4, 8 },  // CSAA 8x,  EQAA 4f8x
+                { 8, 0 },  // MSAA 8x
+
+                { 6, 0 },  // MSAA 6x
+                { 4, 0 },  // MSAA 4x
+                { 2, 0 },  // MSAA 2x
+                { 1, 0 },  // MSAA 1x
+                { NULL },
+        };
+
+        // Skip too HQ modes
+        DXGI_SAMPLE_DESC* mode = presets;
+        for(; mode->Count != 0; ++mode)
         {
-            tryCSAA  = true;
+            unsigned modeFSAA = std::max(mode->Count, mode->Quality);
+            bool modeQuality = mode->Count >= 8 && mode->Quality != 0;
+            bool tooHQ = (modeFSAA > fsaa || modeFSAA == fsaa && modeQuality && !qualityHint);
+            if(!tooHQ)
+                break;
         }
 
-        while (!ok)
+        // Use first supported mode
+        for(; mode->Count != 0; ++mode)
         {
-            // Deal with special cases
-            if (tryCSAA)
-            {
-                // see http://developer.nvidia.com/object/coverage-sampled-aa.html
-                switch(fsaa)
-                {
-                case 8:
-                    if (qualityHint)
-                    {
-                        outFSAASettings->Count = 8;
-                        outFSAASettings->Quality = 8;
-                    }
-                    else
-                    {
-                        outFSAASettings->Count = 4;
-                        outFSAASettings->Quality = 8;
-                    }
-                    break;
-                case 16:
-                    if (qualityHint)
-                    {
-                        outFSAASettings->Count = 8;
-                        outFSAASettings->Quality = 16;
-                    }
-                    else
-                    {
-                        outFSAASettings->Count = 4;
-                        outFSAASettings->Quality = 16;
-                    }
-                    break;
-                }
-            }
-            else // !CSAA
-            {
-                outFSAASettings->Count = fsaa == 0 ? 1 : fsaa;
-                outFSAASettings->Quality = 0;
-            }
-
-
-            HRESULT hr;
             UINT outQuality;
-            hr = mDevice->CheckMultisampleQualityLevels( 
-                format, 
-                outFSAASettings->Count, 
-                &outQuality);
+            HRESULT hr = mDevice->CheckMultisampleQualityLevels(format, mode->Count, &outQuality);
 
-            if (SUCCEEDED(hr) && 
-                (!tryCSAA || outQuality > outFSAASettings->Quality))
+            if(SUCCEEDED(hr) && outQuality > mode->Quality)
             {
-                ok = true;
+                *outFSAASettings = *mode;
+                return;
             }
-            else
-            {
-                // downgrade
-                if (tryCSAA && fsaa == 8)
-                {
-                    // for CSAA, we'll try downgrading with quality mode at all samples.
-                    // then try without quality, then drop CSAA
-                    if (qualityHint)
-                    {
-                        // drop quality first
-                        qualityHint = false;
-                    }
-                    else
-                    {
-                        // drop CSAA entirely 
-                        tryCSAA = false;
-                    }
-                    // return to original requested samples
-                    fsaa = static_cast<uint>(origFSAA);
-                }
-                else
-                {
-                    // drop samples
-                    --fsaa;
+        }
 
-                    if (fsaa == 0)
-                    {
-                        // ran out of options, no FSAA
-                        ok = true;
-                    }
-                }
-            }
-
-        } // while !ok
-
+        outFSAASettings->Count = 1;
+        outFSAASettings->Quality = 0;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::initRenderSystem()
