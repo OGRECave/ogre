@@ -573,7 +573,7 @@ namespace Ogre {
     String ShadowVolumeExtrudeProgram::mDirArbvp1FiniteDebug = 
         "!!ARBvp1.0\n"
         "PARAM c6 = { 1, 0, 0, 0 };\n"
-        "TEMP R0;\n"
+        "TEMP R0, R1;\n"
         "ATTRIB v24 = vertex.texcoord[0];\n"
         "ATTRIB v16 = vertex.position;\n"
         "PARAM c0[4] = { program.local[0..3] };\n"
