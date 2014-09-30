@@ -93,8 +93,7 @@ namespace Ogre
         return &mShaderCache.back();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsLowLevel::calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
-                                         uint32 &outHash, uint32 &outCasterHash )
+    void HlmsLowLevel::calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash )
     {
         const MaterialPtr &mat = renderable->getMaterial();
 
