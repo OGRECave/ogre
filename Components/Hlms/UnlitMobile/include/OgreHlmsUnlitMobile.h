@@ -86,7 +86,10 @@ namespace Ogre
         virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                        bool casterPass, const HlmsCache *lastCache,
                                        CommandBuffer *commandBuffer );
+    };
 
+    struct _OgreHlmsUnlitMobileExport UnlitMobileProp
+    {
         static const IdString PropertyTexMatrixCount;
         static const IdString PropertyTexMatrixCount0;
         static const IdString PropertyTexMatrixCount1;
@@ -96,6 +99,8 @@ namespace Ogre
         static const IdString PropertyTexMatrixCount5;
         static const IdString PropertyTexMatrixCount6;
         static const IdString PropertyTexMatrixCount7;
+
+        static const IdString DiffuseMap;
 
         static const IdString PropertyDiffuse;
         static const IdString PropertyDiffuseMapCount0;
@@ -149,11 +154,6 @@ namespace Ogre
         static const IdString PropertyUvAtlas13;
         static const IdString PropertyUvAtlas14;
         static const IdString PropertyUvAtlas15;
-    };
-
-    struct _OgreHlmsUnlitMobileExport UnlitMobileProp
-    {
-        static const IdString DiffuseMap;
     };
 
     /** @} */
