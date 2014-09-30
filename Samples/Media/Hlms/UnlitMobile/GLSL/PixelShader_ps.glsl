@@ -6,9 +6,8 @@
 in @insertpiece( mediump ) vec@value( hlms_uv_count@n ) psUv@n;@end
 
 // START UNIFORM DECLARATION
-//Uniforms that change per pass
+//Uniforms that change per material
 @property( alpha_test )uniform @insertpiece( lowp ) float alpha_test_threshold;@end
-//Uniforms that change per entity
 @property( uv_atlas )uniform @insertpiece( mediump ) vec3 atlasOffsets[@value( uv_atlas )];@end
 // END UNIFORM DECLARATION
 

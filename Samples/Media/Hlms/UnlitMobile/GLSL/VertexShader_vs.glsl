@@ -10,7 +10,7 @@ in vec@value( hlms_uv_count@n ) uv@n;@end
 out vec@value( hlms_uv_count@n ) psUv@n;@end
 
 // START UNIFORM DECLARATION
-//Uniforms that change per pass
+//Uniforms that change per material
 @property( hlms_texture_matrix_count )uniform mat4 texture_matrix[@value( hlms_texture_matrix_count )];@end
 //Uniforms that change per entity
 uniform mat4 worldViewProj;

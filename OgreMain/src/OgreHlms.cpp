@@ -40,6 +40,7 @@ THE SOFTWARE.
 
 #include "OgreLight.h"
 #include "OgreSceneManager.h"
+#include "OgreLogManager.h"
 //#include "OgreMovableObject.h"
 //#include "OgreRenderable.h"
 
@@ -1365,14 +1366,27 @@ namespace Ogre
                 inString.resize( inFile->size() );
                 inFile->read( &inString[0], inFile->size() );
 
-                this->parseMath( inString, outString );
-                this->parseForEach( outString, inString );
-                this->parseProperties( inString, outString );
-                this->collectPieces( outString, inString );
-                this->insertPieces( inString, outString );
-                this->parseCounter( outString, inString );
+                bool syntaxError = false;
+
+                syntaxError |= this->parseMath( inString, outString );
+                syntaxError |= this->parseForEach( outString, inString );
+                syntaxError |= this->parseProperties( inString, outString );
+                while( !syntaxError  && (outString.find( "@piece" ) != String::npos ||
+                                         outString.find( "@insertpiece" ) != String::npos) )
+                {
+                    syntaxError |= this->collectPieces( outString, inString );
+                    syntaxError |= this->insertPieces( inString, outString );
+                }
+                syntaxError |= this->parseCounter( outString, inString );
 
                 outString.swap( inString );
+
+                if( syntaxError )
+                {
+                    LogManager::getSingleton().logMessage( "There were HLMS syntax errors while parsing "
+                                                           + StringConverter::toString( finalHash ) +
+                                                           ShaderFiles[i] );
+                }
 
                 if( mDebugOutput )
                 {

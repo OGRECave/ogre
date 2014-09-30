@@ -345,8 +345,8 @@ namespace Ogre
         }
 
         //mPreparedPass.viewProjMatrix[0]   = camera->getProjectionMatrix() * viewMatrix; //TODO
-        mPreparedPass.viewProjMatrix[0]     = Matrix4::IDENTITY;
-        mPreparedPass.viewProjMatrix[1]     = projectionMatrix * viewMatrix;
+        mPreparedPass.viewProjMatrix[0]     = projectionMatrix * viewMatrix;
+        mPreparedPass.viewProjMatrix[1]     = Matrix4::IDENTITY;
 
         return retVal;
     }
