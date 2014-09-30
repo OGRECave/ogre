@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
-#include "OgreHlmsGui2DMobileDatablock.h"
+#include "OgreHlmsUnlitMobileDatablock.h"
 #include "OgreHlms.h"
 #include "OgreHlmsManager.h"
 #include "OgreRenderSystem.h"
@@ -256,11 +256,11 @@ namespace v1 {
         if (!mMaterialName.empty() && mInitialised)
         {
             HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-            Hlms *hlms = hlmsManager->getHlms( HLMS_GUI );
+            Hlms *hlms = hlmsManager->getHlms( HLMS_UNLIT );
             HlmsDatablock *datablock = hlms->getDatablock( mMaterialName );
-            assert( dynamic_cast<HlmsGui2DMobileDatablock*>( datablock ) );
+            assert( dynamic_cast<HlmsUnlitMobileDatablock*>( datablock ) );
 
-            HlmsGui2DMobileDatablock *guiDatablock = static_cast<HlmsGui2DMobileDatablock*>(datablock);
+            HlmsUnlitMobileDatablock *guiDatablock = static_cast<HlmsUnlitMobileDatablock*>(datablock);
             uint8 numLayers = guiDatablock->getNumUvSets();
 
             VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;

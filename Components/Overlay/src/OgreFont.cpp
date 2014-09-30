@@ -38,7 +38,7 @@ THE SOFTWARE
 #include "OgreRoot.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
-#include "OgreHlmsGui2DMobileDatablock.h"
+#include "OgreHlmsUnlitMobileDatablock.h"
 
 #define generic _generic    // keyword for C++/CX
 #include <ft2build.h>
@@ -194,7 +194,7 @@ namespace Ogre
             texLayer = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(mSource);
         }
 
-        Hlms *hlmsGui = Root::getSingleton().getHlmsManager()->getHlms( HLMS_GUI );
+        Hlms *hlmsGui = Root::getSingleton().getHlmsManager()->getHlms( HLMS_UNLIT );
 
         HlmsMacroblock macroblock;
         HlmsBlendblock blendblock;
@@ -226,10 +226,10 @@ namespace Ogre
         mHlmsDatablock = hlmsGui->createDatablock( datablockName, datablockName,
                                                    macroblock, blendblock, paramsVec );
 
-        assert( dynamic_cast<HlmsGui2DMobileDatablock*>( mHlmsDatablock ) );
+        assert( dynamic_cast<HlmsUnlitMobileDatablock*>( mHlmsDatablock ) );
 
-        HlmsGui2DMobileDatablock *guiDatablock = static_cast<HlmsGui2DMobileDatablock*>(mHlmsDatablock);
-        guiDatablock->setTexture( 0, mTexture, HlmsGui2DMobileDatablock::UvAtlasParams() );
+        HlmsUnlitMobileDatablock *guiDatablock = static_cast<HlmsUnlitMobileDatablock*>(mHlmsDatablock);
+        guiDatablock->setTexture( 0, mTexture, HlmsUnlitMobileDatablock::UvAtlasParams() );
         guiDatablock->calculateHash();
 
         // Make sure material is aware of colour per vertex.

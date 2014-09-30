@@ -774,14 +774,14 @@ namespace v1 {
 
         if( mMaterialName.empty() )
         {
-            Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
+            Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_PBS );
             setDatablock( hlms->getDefaultDatablock() );
         }
         else
         {
             if( mMaterialGroup.empty() )
             {
-                Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
+                Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_PBS );
                 HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
                 HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault( mMaterialName );
 

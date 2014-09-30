@@ -25,10 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreHlmsGui2DMobileDatablock_H_
-#define _OgreHlmsGui2DMobileDatablock_H_
+#ifndef _OgreHlmsUnlitMobileDatablock_H_
+#define _OgreHlmsUnlitMobileDatablock_H_
 
-#include "OgreHlmsGui2DMobilePrerequisites.h"
+#include "OgreHlmsUnlitMobilePrerequisites.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
@@ -43,9 +43,9 @@ namespace Ogre
     */
 
     /// Contains information needed by the UI (2D) for OpenGL ES 2.0
-    class _OgreHlmsGui2DMobileExport HlmsGui2DMobileDatablock : public HlmsDatablock
+    class _OgreHlmsUnlitMobileExport HlmsUnlitMobileDatablock : public HlmsDatablock
     {
-        friend class HlmsGui2DMobile;
+        friend class HlmsUnlitMobile;
 
         struct ShaderCreationData
         {
@@ -150,11 +150,11 @@ namespace Ogre
                 Default: alpha_test less 0.5
                 Example: alpha_test equal 0.1
         */
-        HlmsGui2DMobileDatablock( IdString name, Hlms *creator,
+        HlmsUnlitMobileDatablock( IdString name, Hlms *creator,
                                   const HlmsMacroblock *macroblock,
                                   const HlmsBlendblock *blendblock,
                                   const HlmsParamVec &params );
-        virtual ~HlmsGui2DMobileDatablock();
+        virtual ~HlmsUnlitMobileDatablock();
 
         virtual void calculateHash();
 

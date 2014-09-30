@@ -649,7 +649,7 @@ namespace v1 {
             if( !borderDatablock || borderDatablock->getName() != mBorderMaterialName )
             {
                 HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-                Hlms *hlms = hlmsManager->getHlms( HLMS_GUI );
+                Hlms *hlms = hlmsManager->getHlms( HLMS_UNLIT );
                 HlmsDatablock *datablock = hlms->getDatablock( mBorderMaterialName );
                 mBorderRenderable->setDatablock( datablock );
             }

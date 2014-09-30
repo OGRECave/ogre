@@ -96,7 +96,7 @@ namespace v1 {
         mVertexData->vertexStart = 0;
         // index data set up later
 
-        Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_FX );
+        Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_UNLIT );
         setDatablock( hlms->getDefaultDatablock() );
 
     }

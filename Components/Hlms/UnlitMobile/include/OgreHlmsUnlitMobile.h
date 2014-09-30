@@ -25,10 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreHlmsGui2DMobile_H_
-#define _OgreHlmsGui2DMobile_H_
+#ifndef _OgreHlmsUnlitMobile_H_
+#define _OgreHlmsUnlitMobile_H_
 
-#include "OgreHlmsGui2DMobilePrerequisites.h"
+#include "OgreHlmsUnlitMobilePrerequisites.h"
 #include "OgreHlms.h"
 #include "OgreHeaderPrefix.h"
 
@@ -47,14 +47,14 @@ namespace Ogre
     /** User Interface (2D) implementation specfically designed for OpenGL ES 2.0 and other
         RenderSystems which do not support uniform buffers.
     */
-    class _OgreHlmsGui2DMobileExport HlmsGui2DMobile : public Hlms
+    class _OgreHlmsUnlitMobileExport HlmsUnlitMobile : public Hlms
     {
         struct PassData
         {
             /*FastArray<float>    vertexShaderSharedBuffer;
             FastArray<float>    pixelShaderSharedBuffer;*/
 
-            Matrix4 viewProjMatrix;
+            Matrix4 viewProjMatrix[2];
         };
 
         PassData    mPreparedPass;
@@ -70,8 +70,8 @@ namespace Ogre
                                                     const HlmsParamVec &paramVec );
 
     public:
-        HlmsGui2DMobile( Archive *dataFolder );
-        ~HlmsGui2DMobile();
+        HlmsUnlitMobile( Archive *dataFolder );
+        ~HlmsUnlitMobile();
 
         virtual void calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash );
 
@@ -151,7 +151,7 @@ namespace Ogre
         static const IdString PropertyUvAtlas15;
     };
 
-    struct _OgreHlmsGui2DMobileExport Gui2DMobileProp
+    struct _OgreHlmsUnlitMobileExport UnlitMobileProp
     {
         static const IdString DiffuseMap;
     };

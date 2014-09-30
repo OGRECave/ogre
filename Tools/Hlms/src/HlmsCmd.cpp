@@ -48,8 +48,8 @@ THE SOFTWARE.
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsPbsMobile.h"
-#include "OgreHlmsGui2DMobile.h"
-#include "OgreHlmsGui2DMobileDatablock.h"
+#include "OgreHlmsUnlitMobile.h"
+#include "OgreHlmsUnlitMobileDatablock.h"
 #include "OgreArchiveManager.h"
 #include "OgreEntity.h"
 
@@ -212,7 +212,7 @@ void HlmsCmd::createScene(void)
     HlmsBlendblock blendblockRef;
 
     HlmsManager *hlmsManager = mRoot->getHlmsManager();
-    Hlms *usedGenerator = hlmsManager->getHlms( HLMS_GUI );
+    Hlms *usedGenerator = hlmsManager->getHlms( HLMS_UNLIT );
     HlmsDatablock *datablock = usedGenerator->createDatablock( "TEST MATERIAL", "TEST MATERIAL",
                                                                macroblockRef, blendblockRef, params );
     entity->setDatablock( datablock );
@@ -341,10 +341,10 @@ void HlmsCmd::setupResources(void)
                     "/home/matias/Ogre2-Hlms/Samples/Media/Hlms/GuiMobile/GLSL",
                     "FileSystem", true );
     HlmsPbsMobile   *pbs    = OGRE_NEW HlmsPbsMobile( archivePbs );
-    HlmsGui2DMobile *gui2d  = OGRE_NEW HlmsGui2DMobile( archiveGui );
+    HlmsUnlitMobile *Unlit  = OGRE_NEW HlmsUnlitMobile( archiveGui );
     HlmsManager *hlmsManager = mRoot->getHlmsManager();
     hlmsManager->registerHlms( pbs );
-    hlmsManager->registerHlms( gui2d );
+    hlmsManager->registerHlms( Unlit );
 
     // Load resource paths from config file
     Ogre::ConfigFile cf;

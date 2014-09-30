@@ -25,27 +25,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreHlmsGui2DMobilePrerequisites_H_
-#define _OgreHlmsGui2DMobilePrerequisites_H_
+#ifndef _OgreHlmsUnlitMobilePrerequisites_H_
+#define _OgreHlmsUnlitMobilePrerequisites_H_
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #   if defined( OGRE_STATIC_LIB )
-#       define _OgreHlmsGui2DMobileExport
+#       define _OgreHlmsUnlitMobileExport
 #   else
-#       if defined( OgreHlmsGui2DMobile_EXPORTS )
-#           define _OgreHlmsGui2DMobileExport __declspec( dllexport )
+#       if defined( OgreHlmsUnlitMobile_EXPORTS )
+#           define _OgreHlmsUnlitMobileExport __declspec( dllexport )
 #       else
 #           if defined( __MINGW32__ )
-#               define _OgreHlmsGui2DMobileExport
+#               define _OgreHlmsUnlitMobileExport
 #           else
-#               define _OgreHlmsGui2DMobileExport __declspec( dllimport )
+#               define _OgreHlmsUnlitMobileExport __declspec( dllimport )
 #           endif
 #       endif
 #   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
-#   define _OgreHlmsGui2DMobileExport __attribute__ ((visibility("default")))
+#   define _OgreHlmsUnlitMobileExport __attribute__ ((visibility("default")))
 #else
-#   define _OgreHlmsGui2DMobileExport
+#   define _OgreHlmsUnlitMobileExport
 #endif 
 
 #endif

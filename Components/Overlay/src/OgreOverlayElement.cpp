@@ -427,7 +427,7 @@ namespace v1 {
         if( mInitialised && (!mHlmsDatablock || mHlmsDatablock->getName() != mMaterialName) )
         {
             HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-            Hlms *hlms = hlmsManager->getHlms( HLMS_GUI );
+            Hlms *hlms = hlmsManager->getHlms( HLMS_UNLIT );
             HlmsDatablock *datablock = hlms->getDatablock( mMaterialName );
 			this->setDatablock( datablock );
         }

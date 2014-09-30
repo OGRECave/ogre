@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "OgreHlmsGui2DMobileDatablock.h"
+#include "OgreHlmsUnlitMobileDatablock.h"
 #include "OgreHlms.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsTextureManager.h"
@@ -67,7 +67,7 @@ namespace Ogre
         "diffuse_map15"
     };
 
-    HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock( IdString name, Hlms *creator,
+    HlmsUnlitMobileDatablock::HlmsUnlitMobileDatablock( IdString name, Hlms *creator,
                                                         const HlmsMacroblock *macroblock,
                                                         const HlmsBlendblock *blendblock,
                                                         const HlmsParamVec &params ) :
@@ -161,7 +161,7 @@ namespace Ogre
                             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                                          mName.getFriendlyText() + ": unknown alpha_test cmp function "
                                          "'" + *itor + "'",
-                                         "HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock" );
+                                         "HlmsUnlitMobileDatablock::HlmsUnlitMobileDatablock" );
                         }
                     }
 
@@ -182,7 +182,7 @@ namespace Ogre
                     OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                                  mName.getFriendlyText() + ": Can't leave gaps between texture units! '"
                                  + c_diffuseMap[i] + "' was specified but the previous diffuse_map "
-                                 "is missing.", "HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock" );
+                                 "is missing.", "HlmsUnlitMobileDatablock::HlmsUnlitMobileDatablock" );
                 }
 
                 mDiffuseTextures[i] = hlmsTextureManager->getBlankTexture().texture;
@@ -264,7 +264,7 @@ namespace Ogre
                     OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                                  mName.getFriendlyText() +
                                  ": animate parameters must be in range [0; 8)",
-                                 "HlmsGui2DMobileDatablock::HlmsGui2DMobileDatablock" );
+                                 "HlmsUnlitMobileDatablock::HlmsUnlitMobileDatablock" );
                 }
 
                 if( mShaderCreationData->mTextureMatrixMap[val] == 1 )
@@ -287,13 +287,13 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    HlmsGui2DMobileDatablock::~HlmsGui2DMobileDatablock()
+    HlmsUnlitMobileDatablock::~HlmsUnlitMobileDatablock()
     {
         delete mShaderCreationData;
         mShaderCreationData = 0;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobileDatablock::calculateHash()
+    void HlmsUnlitMobileDatablock::calculateHash()
     {
         IdString hash;
         for( uint i=0; i<mNumTextureUnits; ++i )
@@ -302,7 +302,7 @@ namespace Ogre
         mTextureHash = hash.mHash;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobileDatablock::setColour( const ColourValue &diffuse )
+    void HlmsUnlitMobileDatablock::setColour( const ColourValue &diffuse )
     {
         assert( mHasColour && "Setting colour to a Datablock created w/out diffuse flag will be ignored" );
         mR = diffuse.r;
@@ -311,7 +311,7 @@ namespace Ogre
         mA = diffuse.a;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobileDatablock::setAlphaTestThreshold( float alphaThreshold )
+    void HlmsUnlitMobileDatablock::setAlphaTestThreshold( float alphaThreshold )
     {
         assert( mIsAlphaTested && "Setting alpha threshold to a Datablock created w/out alpha test "
                 "will be ignored" );
@@ -319,19 +319,19 @@ namespace Ogre
         mAlphaTestThreshold = alphaThreshold;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobileDatablock::setTexture( uint8 texUnit, TexturePtr &newTexture,
+    void HlmsUnlitMobileDatablock::setTexture( uint8 texUnit, TexturePtr &newTexture,
                                                const UvAtlasParams &atlasParams )
     {
         if( texUnit >= mNumTextureUnits )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture unit out of range in datablock '" +
-                         mName.getFriendlyText() + "'", "HlmsGui2DMobileDatablock::setTexture" );
+                         mName.getFriendlyText() + "'", "HlmsUnlitMobileDatablock::setTexture" );
         }
 
         if( newTexture.isNull() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "New texture can't be null in datablock '" +
-                         mName.getFriendlyText() + "'", "HlmsGui2DMobileDatablock::setTexture" );
+                         mName.getFriendlyText() + "'", "HlmsUnlitMobileDatablock::setTexture" );
         }
 
         mDiffuseTextures[texUnit]   = newTexture;
@@ -368,7 +368,7 @@ namespace Ogre
         calculateHash();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobileDatablock::enableTextureUnits( uint8 until )
+    void HlmsUnlitMobileDatablock::enableTextureUnits( uint8 until )
     {
         assert( until > 0 && until <= 16 );
 
@@ -391,7 +391,7 @@ namespace Ogre
         flushRenderables();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobileDatablock::disableTextureUnits( uint8 from )
+    void HlmsUnlitMobileDatablock::disableTextureUnits( uint8 from )
     {
         assert( from < 16 );
 
@@ -407,14 +407,14 @@ namespace Ogre
         flushRenderables();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsGui2DMobileDatablock::setTextureUvSetForTexture( uint8 texUnit, uint8 uvSet )
+    void HlmsUnlitMobileDatablock::setTextureUvSetForTexture( uint8 texUnit, uint8 uvSet )
     {
         if( texUnit >= mNumTextureUnits )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture unit out of range in datablock '" +
                          mName.getFriendlyText() + "' attempted value: " +
                          StringConverter::toString( texUnit ),
-                         "HlmsGui2DMobileDatablock::setTextureUvSetForTexture" );
+                         "HlmsUnlitMobileDatablock::setTextureUvSetForTexture" );
         }
 
         if( uvSet >= 8 )
@@ -422,7 +422,7 @@ namespace Ogre
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "UV Set must be in range [0; 8) in datablock '" +
                          mName.getFriendlyText() + "'; attempted value: " +
                          StringConverter::toString( uvSet ),
-                         "HlmsGui2DMobileDatablock::setTextureUvSetForTexture" );
+                         "HlmsUnlitMobileDatablock::setTextureUvSetForTexture" );
         }
 
         mShaderCreationData->mUvSetForTexture[texUnit] = uvSet;
@@ -430,7 +430,7 @@ namespace Ogre
         flushRenderables();
     }
     //-----------------------------------------------------------------------------------
-    uint8 HlmsGui2DMobileDatablock::getNumUvSets(void) const
+    uint8 HlmsUnlitMobileDatablock::getNumUvSets(void) const
     {
         uint8 retVal = 0;
 

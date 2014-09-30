@@ -9,19 +9,19 @@
 
 # Configure Ogre HLMS User Interface (2D) for OpenGL ES 2.0 build
 
-PROJECT(OgreHlmsGui2DMobile)
+PROJECT(OgreHlmsUnlitMobile)
 
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-ogre_add_library(OgreHlmsGui2DMobile ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-set_target_properties(OgreHlmsGui2DMobile PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreHlmsGui2DMobile OgreMain)
+ogre_add_library(OgreHlmsUnlitMobile ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+set_target_properties(OgreHlmsUnlitMobile PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
+target_link_libraries(OgreHlmsUnlitMobile OgreMain)
 
-ogre_config_framework(OgreHlmsGui2DMobile)
-ogre_config_component(OgreHlmsGui2DMobile)
+ogre_config_framework(OgreHlmsUnlitMobile)
+ogre_config_component(OgreHlmsUnlitMobile)
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Hlms/UI2D_ES2

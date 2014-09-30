@@ -16,8 +16,8 @@ if (OGRE_BUILD_COMPONENT_HLMS_PBS_MOBILE)
 	add_subdirectory(Hlms/PbsMobile)
 endif ()
 
-if (OGRE_BUILD_COMPONENT_HLMS_GUI2D_MOBILE)
-	add_subdirectory(Hlms/Gui2DMobile)
+if (OGRE_BUILD_COMPONENT_HLMS_UNLIT_MOBILE)
+	add_subdirectory(Hlms/UnlitMobile)
 endif ()
 
 if (OGRE_BUILD_COMPONENT_HLMS_PBS)
