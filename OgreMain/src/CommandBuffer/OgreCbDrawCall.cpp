@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreStableHeaders.h"
+
 #include "CommandBuffer/OgreCommandBuffer.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
 
