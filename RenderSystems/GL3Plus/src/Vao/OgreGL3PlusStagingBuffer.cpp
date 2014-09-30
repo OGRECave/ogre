@@ -175,7 +175,7 @@ namespace Ogre
 
         OCGE( glBindBuffer( target, mVboName ) );
         OCGE( glFlushMappedBufferRange( target,
-                                         mInternalBufferStart + mMappingStart,
+                                         0 /*mInternalBufferStart + mMappingStart*/,
                                          mMappingCount ) );
         OCGE( glUnmapBuffer( target ) );
         mMappedPtr = 0;
