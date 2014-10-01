@@ -44,6 +44,10 @@ using namespace DirectX;
 #define OIS_130_CONST       
 #endif
 
+#if OIS_VERSION >= 0x010300     //  OIS_VERSION >= 1.3.0
+namespace OIS { void Keyboard::setTextTranslation(TextTranslationMode mode) { mTextMode = mode; } }
+#endif
+
 namespace OgreBites {
 
 class InputManagerWinRT
@@ -212,36 +216,26 @@ public:
     bool OnPointerAction(Windows::UI::Input::PointerPoint^ currentPoint, EPointerAction action)
     {
 #if __OGRE_WINRT_PHONE
-        //TODO: convert to use onpointerpressed/moved
+        // Handle touch events in the top of the screen as special cases to emulate Key presses.
         if (action == PointerPressed)
         {
+            // Note, that both WinRT and OIS work in display independent pixels here.
             Windows::Foundation::Point pt = currentPoint->Position;
-            Windows::UI::Input::PointerPointProperties^ properties = currentPoint->Properties;
-            bool handled = false;
-
-            // Convert from display independent pixels to resolution pixels.
-            // convert from dips to screen pixels
             const OIS::MouseState& ms = mOISMouse.getMouseState();
             float deviceHeight = ms.height;
             float deviceWidth = ms.width;
-            float scaleFactor = deviceWidth / 480.0f;
-            float dx = (scaleFactor * pt.X);
-            float dy = (scaleFactor * pt.Y);
 
-            // fake some key presses for touch events at the top of the screen
-            // Handle touch events in the bottom of the screen as special special cases to emulate Key presses.
-            if (dy/deviceHeight < 0.1f)
+            if (pt.Y < 0.1f * deviceHeight)
             {
                 Windows::System::VirtualKey vkey = Windows::System::VirtualKey::None;
                 Windows::UI::Core::CorePhysicalKeyStatus keystatus;
                 keystatus.IsKeyReleased = false;
                 keystatus.WasKeyDown = true;
-                if (dx/deviceWidth < 0.3f)
+                if (pt.X < 0.3f * deviceWidth)
                 {
                     keystatus.ScanCode = OIS::KC_F; // Imitate the 'F' frame rate key being pressed.
-                    return OnKeyAction( vkey, keystatus, true);
                 }
-                else if (dx/deviceWidth > 0.7f)
+                else if (pt.X > 0.7f * deviceWidth)
                 {
                     keystatus.ScanCode = OIS::KC_R; // Imitate the 'R' being pressed.
                 }
@@ -252,15 +246,14 @@ public:
                 return OnKeyAction( vkey, keystatus, true);
             }
         }
-        return  mOISMouse.OnPointerAction(currentPoint, action);
-#else
+#endif
+
         switch(currentPoint->PointerDevice->PointerDeviceType)
         {
         case Windows::Devices::Input::PointerDeviceType::Touch: if(currentPoint->Properties->IsPrimary) return mOISMouse.OnPointerAction(currentPoint, action); break;
         case Windows::Devices::Input::PointerDeviceType::Pen:   if(currentPoint->Properties->IsPrimary) return mOISMouse.OnPointerAction(currentPoint, action); break;
         case Windows::Devices::Input::PointerDeviceType::Mouse: if(currentPoint->Properties->IsPrimary) return mOISMouse.OnPointerAction(currentPoint, action); break;
         }
-#endif
         return false;
     }
 
@@ -295,22 +288,6 @@ private:
             // clear relative states
             mState.X.rel = mState.Y.rel = mState.Z.rel = 0;
 
-            // Convert from display independent pixels to resolution pixels.
-            // convert from dips to screen pixels
-#if __OGRE_WINRT_PHONE
-            float scaleFactor = mState.width / 480.0f;
-            int dx = (int)(scaleFactor * pt.X);
-            int dy = (int)(scaleFactor * pt.Y);
-#else
-            int dx = (int)(pt.X);
-            int dy = (int)(pt.Y);
-#endif
-            bool bMoved = mState.X.abs != dx && mState.Y.abs != dy;
-            mState.X.rel = dx - mState.X.abs;
-            mState.Y.rel = dy - mState.Y.abs;
-            mState.X.abs = dx;
-            mState.Y.abs = dy;
-
             // process wheel actions
             switch(action)
             {
@@ -327,6 +304,21 @@ private:
             case PointerReleased:
             case PointerMoved:
                 {
+                    // process pointer moved part first, so that pressed/released events would use already updated coordinates
+                    // Note, that both WinRT and OIS work in display independent pixels here.
+                    int ptx = (int)(pt.X);
+                    int pty = (int)(pt.Y);
+                    if(mState.X.abs != ptx || mState.Y.abs != pty)
+                    {
+                        mState.X.rel = ptx - mState.X.abs;
+                        mState.Y.rel = pty - mState.Y.abs;
+                        mState.X.abs = ptx;
+                        mState.Y.abs = pty;
+                        if(mListener && mListener->mouseMoved(OIS::MouseEvent(this, mState)))
+                            handled = true;
+                    }
+
+                    // process pressed/released events
                     int buttons = 
                         (properties->IsLeftButtonPressed ? 1 << OIS::MB_Left : 0) |
                         (properties->IsRightButtonPressed ? 1 << OIS::MB_Right : 0) |
@@ -352,13 +344,6 @@ private:
                             if(mListener && mListener->mouseReleased(OIS::MouseEvent(this, mState), (OIS::MouseButtonID)buttonID))
                                 handled = true;
                         }
-                    }
-
-                    // process pointer moved part
-                    if(bMoved)
-                    {
-                        if(mListener && mListener->mouseMoved(OIS::MouseEvent(this, mState)))
-                        handled = true;
                     }
                 }
                 break;

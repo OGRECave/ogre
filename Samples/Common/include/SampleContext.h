@@ -415,9 +415,11 @@ namespace OgreBites
 
             if(mInputContext.mMouse)
             {
+                // as OIS work in windowing system units we need to convert pixels to them
                 const OIS::MouseState& ms = mInputContext.mMouse->getMouseState();
-                ms.width = rw->getWidth();
-                ms.height = rw->getHeight();
+                float scale = rw->getViewPointToPixelScale();
+                ms.width = (int)(rw->getWidth() / scale);
+                ms.height = (int)(rw->getHeight() / scale);
             }
         }
 
@@ -460,13 +462,22 @@ namespace OgreBites
 
         void transformInputState(OIS::PointerState &state)
         {
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
             int w = mWindow->getViewport(0)->getActualWidth();
             int h = mWindow->getViewport(0)->getActualHeight();
             int absX = state.X.abs;
             int absY = state.Y.abs;
             int relX = state.X.rel;
             int relY = state.Y.rel;
+
+            // as OIS work in windowing system units we need to convert them to pixels
+            float scale = mWindow->getViewPointToPixelScale();
+            if(scale != 1.0f)
+            {
+                absX = (int)(absX * scale);
+                absY = (int)(absY * scale);
+                relX = (int)(relX * scale);
+                relY = (int)(relY * scale);
+            }
 
             // determine required orientation
             Ogre::OrientationMode orientation = Ogre::OR_DEGREE_0;
@@ -487,27 +498,38 @@ namespace OgreBites
             switch (orientation)
             {
             case Ogre::OR_DEGREE_0:
+                state.X.abs = absX;
+                state.Y.abs = absY;
+                state.X.rel = relX;
+                state.Y.rel = relY;
+                state.width = w;
+                state.height = h;
                 break;
             case Ogre::OR_DEGREE_90:
                 state.X.abs = w - absY;
                 state.Y.abs = absX;
                 state.X.rel = -relY;
                 state.Y.rel = relX;
+                state.width = h;
+                state.height = w;
                 break;
             case Ogre::OR_DEGREE_180:
                 state.X.abs = w - absX;
                 state.Y.abs = h - absY;
                 state.X.rel = -relX;
                 state.Y.rel = -relY;
+                state.width = w;
+                state.height = h;
                 break;
             case Ogre::OR_DEGREE_270:
                 state.X.abs = absY;
                 state.Y.abs = h - absX;
                 state.X.rel = relY;
                 state.Y.rel = -relX;
+                state.width = h;
+                state.height = w;
                 break;
             }
-#endif
         }
 
         // don`t override this functions, override pointerXxx analogs below

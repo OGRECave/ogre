@@ -58,7 +58,7 @@ void SampleBrowserWinRT::Initialize(CoreApplicationView^ applicationView)
 
 void SampleBrowserWinRT::SetWindow(CoreWindow^ window)
 {
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_PC_APP)
+#if !__OGRE_WINRT_PHONE
 	window->PointerCursor = nullptr;
 #endif
 
