@@ -772,6 +772,8 @@ namespace v1 {
             mHlmsDatablock = 0;
         }
 
+        mBuffersCreated = true;
+
         if( mMaterialName.empty() )
         {
             Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_PBS );
@@ -795,8 +797,6 @@ namespace v1 {
                 setMaterialName( mMaterialName, mMaterialGroup );
             }
         }
-
-        mBuffersCreated = true;
     }
     //-----------------------------------------------------------------------
     void BillboardSet::_destroyBuffers(void)
@@ -815,14 +815,15 @@ namespace v1 {
         mMainBuf.setNull();
 
         mBuffersCreated = false;
-
     }
     //-----------------------------------------------------------------------
     void BillboardSet::setMaterial( const MaterialPtr& material )
     {
         mMaterialName   = material->getName();
         mMaterialGroup  = material->getGroup();
-        Renderable::setMaterial( material );
+
+        if( mBuffersCreated )
+            Renderable::setMaterial( material );
     }
     //-----------------------------------------------------------------------
     void BillboardSet::setDatablock( HlmsDatablock *datablock )
