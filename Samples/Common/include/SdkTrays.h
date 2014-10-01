@@ -2913,19 +2913,11 @@ namespace OgreBites
         | Processes mouse button down events. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        bool injectMouseDown(const OIS::MultiTouchEvent& evt)
-#else
-        bool injectMouseDown(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-#endif
+        bool injectPointerDown(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             // only process left button when stuff is visible
             if (!mCursorLayer->isVisible() || id != OIS::MB_Left) return false;
-#else
-            // only process touches when stuff is visible
-            if (!mCursorLayer->isVisible()) return false;
-#endif
+
             Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
 
             mTrayDrag = false;
@@ -2996,19 +2988,11 @@ namespace OgreBites
         | Processes mouse button up events. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        bool injectMouseUp(const OIS::MultiTouchEvent& evt)
-#else
-        bool injectMouseUp(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-#endif
+        bool injectPointerUp(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             // only process left button when stuff is visible
             if (!mCursorLayer->isVisible() || id != OIS::MB_Left) return false;
-#else
-            // only process touches when stuff is visible
-            if (!mCursorLayer->isVisible()) return false;
-#endif
+
             Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
 
             if (mExpandedMenu)   // only check top priority widget until it passes on
@@ -3054,11 +3038,7 @@ namespace OgreBites
         | Updates cursor position. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        bool injectMouseMove(const OIS::MultiTouchEvent& evt)
-#else
-        bool injectMouseMove(const OIS::MouseEvent& evt)
-#endif
+        bool injectPointerMove(const OIS::PointerEvent& evt)
         {
             if (!mCursorLayer->isVisible()) return false;   // don't process if cursor layer is invisible
 

@@ -110,11 +110,10 @@ namespace OgreBites
     class SampleContext :
         public Ogre::FrameListener,
         public Ogre::WindowEventListener,
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
         public OIS::KeyListener,
         public OIS::MouseListener
-#else
-        public OIS::MultiTouchListener
+#if OIS_WITH_MULTITOUCH
+        ,public OIS::MultiTouchListener  // note: we will send events either to MouseListener or to MultiTouchListener, depending on platform
 #endif
     {
     public:
@@ -414,14 +413,12 @@ namespace OgreBites
             // manually call sample callback to ensure correct order
             if (mCurrentSample && !mSamplePaused) mCurrentSample->windowResized(rw);
 
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             if(mInputContext.mMouse)
             {
                 const OIS::MouseState& ms = mInputContext.mMouse->getMouseState();
                 ms.width = rw->getWidth();
                 ms.height = rw->getHeight();
             }
-#endif
         }
 
         // window event callbacks which manually call their respective sample callbacks to ensure correct order
@@ -461,13 +458,9 @@ namespace OgreBites
             return true;
         }
 
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0)
-    #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        void transformInputState(OIS::MultiTouchState &state)
-    #else
-        void transformInputState(OIS::MouseState &state)
-    #endif
+        void transformInputState(OIS::PointerState &state)
         {
+#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
             int w = mWindow->getViewport(0)->getActualWidth();
             int h = mWindow->getViewport(0)->getActualHeight();
             int absX = state.X.abs;
@@ -475,7 +468,23 @@ namespace OgreBites
             int relX = state.X.rel;
             int relY = state.Y.rel;
 
-            switch (mWindow->getViewport(0)->getOrientationMode())
+            // determine required orientation
+            Ogre::OrientationMode orientation = Ogre::OR_DEGREE_0;
+#    if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0)
+            orientation = mWindow->getViewport(0)->getOrientationMode();
+#    elif (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 1) && (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+            UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+            switch (interfaceOrientation)
+            {
+            case UIInterfaceOrientationPortrait:           break;
+            case UIInterfaceOrientationLandscapeLeft:      orientation = Ogre::OR_DEGREE_90;  break;
+            case UIInterfaceOrientationPortraitUpsideDown: orientation = Ogre::OR_DEGREE_180; break;
+            case UIInterfaceOrientationLandscapeRight:     orientation = Ogre::OR_DEGREE_270; break;
+            }
+#    endif
+
+            // apply changes
+            switch (orientation)
             {
             case Ogre::OR_DEGREE_0:
                 break;
@@ -498,86 +507,42 @@ namespace OgreBites
                 state.Y.rel = -relX;
                 break;
             }
+#endif
         }
-#elif (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 1) && (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
-    // Variation based upon device orientation for use with a view controller
-    void transformInputState(OIS::MultiTouchState &state)
-    {
-        int w = mWindow->getViewport(0)->getActualWidth();
-        int h = mWindow->getViewport(0)->getActualHeight();
-        int absX = state.X.abs;
-        int absY = state.Y.abs;
-        int relX = state.X.rel;
-        int relY = state.Y.rel;
 
-        UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
-        switch (interfaceOrientation)
-        {
-            case UIInterfaceOrientationPortrait:
-                break;
-            case UIInterfaceOrientationLandscapeLeft:
-                state.X.abs = w - absY;
-                state.Y.abs = absX;
-                state.X.rel = -relY;
-                state.Y.rel = relX;
-                break;
-            case UIInterfaceOrientationPortraitUpsideDown:
-                state.X.abs = w - absX;
-                state.Y.abs = h - absY;
-                state.X.rel = -relX;
-                state.Y.rel = -relY;
-                break;
-            case UIInterfaceOrientationLandscapeRight:
-                state.X.abs = absY;
-                state.Y.abs = h - absX;
-                state.X.rel = relY;
-                state.Y.rel = -relX;
-                break;
-        }
-    }
+        // don`t override this functions, override pointerXxx analogs below
+        virtual bool mouseMoved(const OIS::MouseEvent& evt)                           { return pointerMoved(evt); }
+        virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)  { return pointerPressed(evt, id); }
+        virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id) { return pointerReleased(evt, id); }
+#if OIS_WITH_MULTITOUCH
+        virtual bool touchMoved(const OIS::MultiTouchEvent& evt)                      { return pointerMoved(evt); }
+        virtual bool touchPressed(const OIS::MultiTouchEvent& evt)                    { return pointerPressed(evt, OIS::MB_Left); }
+        virtual bool touchReleased(const OIS::MultiTouchEvent& evt)                   { return pointerReleased(evt, OIS::MB_Left); }
+        virtual bool touchCancelled(const OIS::MultiTouchEvent &evt)                  { return pointerCancelled(evt); }
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
+        virtual bool pointerMoved(const OIS::PointerEvent& evt)
         {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->touchMoved(evt);
+            if (mCurrentSample && !mSamplePaused) return mCurrentSample->pointerMoved(evt);
             return true;
         }
-#else
-        virtual bool mouseMoved(const OIS::MouseEvent& evt)
-        {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->mouseMoved(evt);
-            return true;
-        }
-#endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
+        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->touchPressed(evt);
+            if (mCurrentSample && !mSamplePaused) return mCurrentSample->pointerPressed(evt, id);
             return true;
         }
-#else
-        virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-        {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->mousePressed(evt, id);
-            return true;
-        }
-#endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
+        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->touchReleased(evt);
+            if (mCurrentSample && !mSamplePaused) return mCurrentSample->pointerReleased(evt, id);
             return true;
         }
-#else
-        virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+
+        virtual bool pointerCancelled(const OIS::PointerEvent& evt)
         {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->mouseReleased(evt, id);
             return true;
         }
-#endif
 
         bool isFirstRun() { return mFirstRun; }
         void setFirstRun(bool flag) { mFirstRun = flag; }

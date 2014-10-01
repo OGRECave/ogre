@@ -45,35 +45,19 @@ public:
         return SdkSample::keyReleased(evt);
     }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    bool touchPressed(const OIS::MultiTouchEvent& evt)
+    bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
     {
         // relay input events to character controller
-        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseDown(evt);
-        return SdkSample::touchPressed(evt);
+        if (!mTrayMgr->isDialogVisible()) mChara->injectPointerDown(evt, id);
+        return SdkSample::pointerPressed(evt, id);
     }
 
-    bool touchMoved(const OIS::MultiTouchEvent& evt)
+    bool pointerMoved(const OIS::PointerEvent& evt)
     {
         // relay input events to character controller
-        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseMove(evt);
-        return SdkSample::touchMoved(evt);
+        if (!mTrayMgr->isDialogVisible()) mChara->injectPointerMove(evt);
+        return SdkSample::pointerMoved(evt);
     }
-#else
-    bool mouseMoved(const OIS::MouseEvent& evt)
-    {
-        // relay input events to character controller
-        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseMove(evt);
-        return SdkSample::mouseMoved(evt);
-    }
-
-    bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-    {
-        // relay input events to character controller
-        if (!mTrayMgr->isDialogVisible()) mChara->injectMouseDown(evt, id);
-        return SdkSample::mousePressed(evt, id);
-    }
-#endif
 
 protected:
 

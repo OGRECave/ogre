@@ -174,12 +174,10 @@ protected:
         }
     }
 
-    #if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-
     //-----------------------------------------------------------------------
-    bool mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
+    bool pointerPressed( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
     {
-        if (mTrayMgr->injectMouseDown(evt, id)) 
+        if (mTrayMgr->injectPointerDown(evt, id)) 
             return true;
         if (id == OIS::MB_Left)     
             mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
@@ -188,9 +186,9 @@ protected:
     }
 
     //-----------------------------------------------------------------------
-    bool mouseReleased( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
+    bool pointerReleased( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
     {
-        if (mTrayMgr->injectMouseUp(evt, id)) 
+        if (mTrayMgr->injectPointerUp(evt, id)) 
             return true;
         if (id == OIS::MB_Left) 
             mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
@@ -199,20 +197,17 @@ protected:
     }
 
     //-----------------------------------------------------------------------
-    bool mouseMoved( const OIS::MouseEvent& evt )
+    bool pointerMoved( const OIS::PointerEvent& evt )
     {
         // only rotate the camera if cursor is hidden
         if (mTrayMgr->isCursorVisible()) 
-            mTrayMgr->injectMouseMove(evt);
+            mTrayMgr->injectPointerMove(evt);
         else 
-            mCameraMan->injectMouseMove(evt);
+            mCameraMan->injectPointerMove(evt);
 
 
         return true;
     }
-    #endif
-
-    
 
 private:
     RTShaderSRSTexturedFogFactory* mSRSTextureFogFactory;

@@ -897,34 +897,16 @@ namespace OgreBites
 #endif
 
         /*-----------------------------------------------------------------------------
-          | Extends mousePressed to inject mouse press into tray manager, and to check
+          | Extends pointerPressed to inject mouse press into tray manager, and to check
           | for thumbnail clicks, just because we can.
           -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
-#else
-            virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-#endif
+        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            OIS::MultiTouchState state = evt.state;
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+            OIS::PointerState state = evt.state;
             transformInputState(state);
-#endif
-            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
-#else
-            OIS::MouseState state = evt.state;
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            transformInputState(state);
-#endif
-            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
-#endif
+            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            if (mTrayMgr->injectMouseDown(orientedEvt)) return true;
-#else
-            if (mTrayMgr->injectMouseDown(orientedEvt, id)) return true;
-#endif
+            if (mTrayMgr->injectPointerDown(orientedEvt, id)) return true;
 
             if (mTitleLabel->getTrayLocation() != TL_NONE)
             {
@@ -942,11 +924,7 @@ namespace OgreBites
 
             try
             {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-                return SampleContext::touchPressed(orientedEvt);
-#else
-                return SampleContext::mousePressed(orientedEvt, id);
-#endif
+                return SampleContext::pointerPressed(orientedEvt, id);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -958,41 +936,19 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-          | Extends mouseReleased to inject mouse release into tray manager.
+          | Extends pointerReleased to inject mouse release into tray manager.
           -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
-#else
-            virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-#endif
+        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            OIS::MultiTouchState state = evt.state;
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+            OIS::PointerState state = evt.state;
             transformInputState(state);
-#endif
-            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
-#else
-            OIS::MouseState state = evt.state;
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            transformInputState(state);
-#endif
-            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
-#endif
+            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            if (mTrayMgr->injectMouseUp(orientedEvt)) return true;
-#else
-            if (mTrayMgr->injectMouseUp(orientedEvt, id)) return true;
-#endif
+            if (mTrayMgr->injectPointerUp(orientedEvt, id)) return true;
 
             try
             {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-                return SampleContext::touchReleased(orientedEvt);
-#else
-                return SampleContext::mouseReleased(orientedEvt, id);
-#endif
+                return SampleContext::pointerReleased(orientedEvt, id);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -1004,30 +960,16 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-          | Extends mouseMoved to inject mouse position into tray manager, and checks
+          | Extends pointerMoved to inject mouse position into tray manager, and checks
           | for mouse wheel movements to slide the carousel, because we can.
           -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-#else
-            virtual bool mouseMoved(const OIS::MouseEvent& evt)
-#endif
+        virtual bool pointerMoved(const OIS::PointerEvent& evt)
         {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            OIS::MultiTouchState state = evt.state;
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+            OIS::PointerState state = evt.state;
             transformInputState(state);
-#endif
-            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
-#else
-            OIS::MouseState state = evt.state;
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            transformInputState(state);
-#endif
-            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
-#endif
+            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-            if (mTrayMgr->injectMouseMove(orientedEvt)) return true;
+            if (mTrayMgr->injectPointerMove(orientedEvt)) return true;
 
             if (!(mCurrentSample && !mSamplePaused) && mTitleLabel->getTrayLocation() != TL_NONE &&
                 orientedEvt.state.Z.rel != 0 && mSampleMenu->getNumItems() != 0)
@@ -1038,11 +980,7 @@ namespace OgreBites
 
             try
             {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-                return SampleContext::touchMoved(orientedEvt);
-#else
-                return SampleContext::mouseMoved(orientedEvt);
-#endif
+                return SampleContext::pointerMoved(orientedEvt);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -1053,15 +991,14 @@ namespace OgreBites
             return true;
         }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
         /*-----------------------------------------------------------------------------
-          | Extends touchCancelled to inject an event that a touch was cancelled.
+          | Extends pointerCancelled to inject an event that a touch was cancelled.
           -----------------------------------------------------------------------------*/
-        virtual bool touchCancelled(const OIS::MultiTouchEvent& evt)
+        virtual bool pointerCancelled(const OIS::PointerEvent& evt)
         {
             return true;
         }
-#endif
+
         /*-----------------------------------------------------------------------------
           | Extends windowResized to best fit menus on screen. We basically move the
           | menu tray to the left for higher resolutions and move it to the center
