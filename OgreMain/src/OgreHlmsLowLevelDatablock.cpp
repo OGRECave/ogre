@@ -37,7 +37,8 @@ namespace Ogre
                                                   const HlmsMacroblock *macroblock,
                                                   const HlmsBlendblock *blendblock,
                                                   const HlmsParamVec &params ) :
-        HlmsDatablock( name, creator, macroblock, blendblock, params )
+        HlmsDatablock( name, creator, macroblock, blendblock, params ),
+        mProxyMaterial( 0 )
     {
     }
     //-----------------------------------------------------------------------------------

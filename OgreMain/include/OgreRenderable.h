@@ -448,6 +448,7 @@ namespace Ogre {
         uint32              mHlmsHash;
         uint32              mHlmsCasterHash;
         HlmsDatablock       *mHlmsDatablock;
+        MaterialPtr         mMaterial; /// Only valid when using low level materials
         uint8               mRenderQueueSubGroup;
         //TODO: (refactor) Change this bool for the skeleton pointer.
         bool                    mHasSkeletonAnimation;

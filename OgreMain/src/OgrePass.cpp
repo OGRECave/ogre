@@ -103,14 +103,7 @@ namespace Ogre {
 
         assert( dynamic_cast<HlmsLowLevelDatablock*>( datablock ) );
         mDatablock = static_cast<HlmsLowLevelDatablock*>( datablock );
-        mDatablock->mProxyMaterial = MaterialManager::getSingleton().getByName(
-                                                        parentMaterial->getName(),
-                                                        parentMaterial->getGroup() );
-        //The Pass owns the datablock. If we don't decrement the ref count, the
-        //datablock will own the pass. However we still need SharedPtrs so that
-        //if other the Ptr is retrieved from the datablock, the ref. counted is
-        //incremented
-        mDatablock->mProxyMaterial._manualRelease();
+        mDatablock->mProxyMaterial = parentMaterial;
    }
 
     //-----------------------------------------------------------------------------
@@ -129,14 +122,7 @@ namespace Ogre {
 
         assert( dynamic_cast<HlmsLowLevelDatablock*>( datablock ) );
         mDatablock = static_cast<HlmsLowLevelDatablock*>( datablock );
-        mDatablock->mProxyMaterial = MaterialManager::getSingleton().getByName(
-                                                        parentMaterial->getName(),
-                                                        parentMaterial->getGroup() );
-        //The Pass owns the datablock. If we don't decrement the ref count, the
-        //datablock will own the pass. However we still need SharedPtrs so that
-        //if other the Ptr is retrieved from the datablock, the ref. counted is
-        //incremented
-        mDatablock->mProxyMaterial._manualRelease();
+        mDatablock->mProxyMaterial = parentMaterial;
 
         *this = oth;
         mParent = parent;
@@ -153,9 +139,6 @@ namespace Ogre {
         OGRE_DELETE mComputeProgramUsage;
         OGRE_DELETE mShadowCasterVertexProgramUsage;
         OGRE_DELETE mShadowCasterFragmentProgramUsage;
-
-        //The proxy should not destroy the material.
-        mDatablock->mProxyMaterial._manualSetNull();
 
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
