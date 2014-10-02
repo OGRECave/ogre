@@ -906,21 +906,20 @@ namespace OgreBites
             transformInputState(state);
             OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-            if (mTrayMgr->injectPointerDown(orientedEvt, id)) return true;
-
             if (mTitleLabel->getTrayLocation() != TL_NONE)
             {
                 for (unsigned int i = 0; i < mThumbs.size(); i++)
                 {
                     if (mThumbs[i]->isVisible() && Widget::isCursorOver(mThumbs[i],
-                                                                        Ogre::Vector2(mTrayMgr->getCursorContainer()->getLeft(),
-                                                                                      mTrayMgr->getCursorContainer()->getTop()), 0))
+                        Ogre::Vector2(mTrayMgr->getCursorContainer()->getLeft(), mTrayMgr->getCursorContainer()->getTop()), 0))
                     {
                         mSampleMenu->selectItem(i);
-                        break;
+                        return true;
                     }
                 }
             }
+
+            if (mTrayMgr->injectPointerDown(orientedEvt, id)) return true;
 
             try
             {

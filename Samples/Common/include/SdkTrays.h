@@ -2941,7 +2941,8 @@ namespace OgreBites
                 return true;
             }
 
-            for (unsigned int i = 0; i < 9; i++)   // check if mouse is over a non-null tray
+            // process widgets in reverse ZOrder
+            for (int i = 8; i >= 0; --i)   // check if mouse is over a non-null tray
             {
                 if (mTrays[i]->isVisible() && Widget::isCursorOver(mTrays[i], cursorPos, 2))
                 {
@@ -2950,10 +2951,10 @@ namespace OgreBites
                 }
             }
 
-            for (unsigned int i = 0; i < mWidgets[9].size(); i++)  // check if mouse is over a non-null tray's widgets
+            for (WidgetList::reverse_iterator it = mWidgets[9].rbegin(), it_end = mWidgets[9].rend(); it != it_end; ++it)  // check if mouse is over a non-null tray's widgets
             {
-                if (mWidgets[9][i]->getOverlayElement()->isVisible() &&
-                    Widget::isCursorOver(mWidgets[9][i]->getOverlayElement(), cursorPos))
+                Widget* w = *it;
+                if (w->getOverlayElement()->isVisible() && Widget::isCursorOver(w->getOverlayElement(), cursorPos))
                 {
                     mTrayDrag = true;   // initiate a drag that originates in a tray
                     break;
@@ -2962,13 +2963,13 @@ namespace OgreBites
 
             if (!mTrayDrag) return false;   // don't process if mouse press is not in tray
 
-            for (unsigned int i = 0; i < 10; i++)
+            for (int i = 9; i >= 0; --i)
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (unsigned int j = 0; j < mWidgets[i].size(); j++)
+                for (WidgetList::reverse_iterator it = mWidgets[i].rbegin(), it_end = mWidgets[i].rend(); it != it_end; ++it)
                 {
-                    Widget* w = mWidgets[i][j];
+                    Widget* w = *it;
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorPressed(cursorPos);    // send event to widget
 
@@ -3016,15 +3017,14 @@ namespace OgreBites
 
             if (!mTrayDrag) return false;    // this click did not originate in a tray, so don't process
 
-            Widget* w;
-
-            for (unsigned int i = 0; i < 10; i++)
+            // process trays and widgets in reverse ZOrder
+            for (int i = 9; i >= 0; --i)
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (unsigned int j = 0; j < mWidgets[i].size(); j++)
+                for (WidgetList::reverse_iterator it = mWidgets[i].rbegin(), it_end = mWidgets[i].rend(); it != it_end; ++it)
                 {
-                    w = mWidgets[i][j];
+                    Widget* w = *it;
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorReleased(cursorPos);    // send event to widget
                 }
@@ -3063,15 +3063,14 @@ namespace OgreBites
                 return true;
             }
 
-            Widget* w;
-
-            for (unsigned int i = 0; i < 10; i++)
+            // process trays and widgets in reverse ZOrder
+            for (int i = 9; i >= 0; --i)
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (unsigned int j = 0; j < mWidgets[i].size(); j++)
+                for (WidgetList::reverse_iterator it = mWidgets[i].rbegin(), it_end = mWidgets[i].rend(); it != it_end; ++it)
                 {
-                    w = mWidgets[i][j];
+                    Widget* w = *it;
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorMoved(cursorPos);    // send event to widget
                 }
