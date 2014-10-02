@@ -76,8 +76,7 @@ namespace Ogre
         HlmsLowLevel();
         ~HlmsLowLevel();
 
-        virtual void calculateHashFor( Renderable *renderable, const HlmsParamVec &params,
-                                       uint32 &outHash, uint32 &outCasterHash );
+        virtual void calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash );
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
                                            bool casterPass, bool dualParaboloid,
