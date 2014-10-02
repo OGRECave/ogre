@@ -145,18 +145,13 @@ namespace Ogre
     {
         // Ensure new material loaded (will not load again if already loaded)
         material->load();
+        mMaterial = material;
         setDatablock( material->getTechnique(0)->getPass(0)->_getDatablock() );
         mLodMaterial = material->_getLodValues();
     }
     //-----------------------------------------------------------------------------------
     MaterialPtr Renderable::getMaterial(void) const
     {
-        if( mHlmsDatablock->mType == HLMS_LOW_LEVEL )
-        {
-            assert( dynamic_cast<HlmsLowLevelDatablock*>( mHlmsDatablock ) );
-            return static_cast<HlmsLowLevelDatablock*>( mHlmsDatablock )->mProxyMaterial;
-        }
-
-        return MaterialPtr();
+        return mMaterial;
     }
 }
