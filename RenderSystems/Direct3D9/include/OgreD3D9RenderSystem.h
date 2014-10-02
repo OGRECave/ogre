@@ -64,8 +64,12 @@ namespace Ogre
         IDirect3D9*  mD3D;      
         // Stored options
         ConfigOptionMap mOptions;
+        // TODO: remove following fields, use values directly from mOptions map as other render systems does
         size_t mFSAASamples;
         String mFSAAHint;
+        bool mVSync; 
+        unsigned int mVSyncInterval;
+        unsigned int mBackBufferCount; // -1 means 2 for vsync and 1 for no vsync
 
         /// instance
         HINSTANCE mhInstance;

@@ -1566,11 +1566,6 @@ namespace Ogre
 
         CullingMode mCullingMode;
 
-
-		bool mVSync;
-		unsigned int mVSyncInterval;
-		unsigned int mBackBufferCount; // -1 means 2 for vsync and 1 for no vsync
-
         bool mWBuffer;
 
         size_t mBatchCount;
