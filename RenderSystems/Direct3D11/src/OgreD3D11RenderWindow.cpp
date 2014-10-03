@@ -58,7 +58,6 @@ namespace Ogre
         mSizing = false;
         mClosed = false;
         mHidden = false;
-        mDisplayFrequency = 0;
         mRenderTargetView = 0;
         mDepthStencilView = 0;
         mpBackBuffer = 0;
@@ -75,12 +74,10 @@ namespace Ogre
     void D3D11RenderWindowBase::create(const String& name, unsigned int width, unsigned int height,
         bool fullScreen, const NameValuePairList *miscParams)
     {
-        mFSAAType.Count = 1;
-        mFSAAType.Quality = 0;
         mFSAA = 0;
         mFSAAHint = "";
-        mVSync = false;
-        mVSyncInterval = 1;
+        mFSAAType.Count = 1;
+        mFSAAType.Quality = 0;
         
         unsigned int colourDepth = 32;
         bool depthBuffer = true;
@@ -89,22 +86,10 @@ namespace Ogre
         {
             // Get variable-length params
             NameValuePairList::const_iterator opt;
-            // vsync    [parseBool]
-            opt = miscParams->find("vsync");
-            if(opt != miscParams->end())
-                mVSync = StringConverter::parseBool(opt->second);
-            // vsyncInterval    [parseUnsignedInt]
-            opt = miscParams->find("vsyncInterval");
-            if(opt != miscParams->end())
-                mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
             // hidden   [parseBool]
             opt = miscParams->find("hidden");
             if(opt != miscParams->end())
                 mHidden = StringConverter::parseBool(opt->second);
-            // displayFrequency
-            opt = miscParams->find("displayFrequency");
-            if(opt != miscParams->end())
-                mDisplayFrequency = StringConverter::parseUnsignedInt(opt->second);
             // colourDepth
             opt = miscParams->find("colourDepth");
             if(opt != miscParams->end())
@@ -427,10 +412,13 @@ namespace Ogre
         , mpSwapChain(NULL)
     {
         ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
-		memset(&mPreviousPresentStats, 0, sizeof(mPreviousPresentStats));
-		mPreviousPresentStatsIsValid = false; 
-		mVBlankMissCount = 0; 
-		mUseFlipMode = false;
+        mUseFlipSequentialMode = false;
+        mVSync = false;
+        mVSyncInterval = 1;
+
+        memset(&mPreviousPresentStats, 0, sizeof(mPreviousPresentStats));
+        mPreviousPresentStatsIsValid = false; 
+        mVBlankMissCount = 0; 
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::destroy()
@@ -536,39 +524,23 @@ namespace Ogre
 
         if( !mDevice.isNull() )
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            HRESULT hr = mpSwapChain->Present(mVSync ? mVSyncInterval : 0, 0);
-
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            HRESULT hr = mpSwapChain->Present(1, 0); // flip presentation model swap chains have another semantic for first parameter
-#endif
+            // flip presentation model swap chains have another semantic for first parameter
+            UINT syncInterval = mUseFlipSequentialMode ? std::max(1U, mVSyncInterval) : (mVSync ? mVSyncInterval : 0);
+            HRESULT hr = mpSwapChain->Present(syncInterval, 0);
             if( FAILED(hr) )
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers");
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers");
         }
-	}
-	
-	//---------------------------------------------------------------------
-	void D3D11RenderWindowSwapChainBased::updateStats( void )
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainBased::updateStats( void )
 	{
 		RenderTarget::updateStats();
 		mStats.vBlankMissCount = getVBlankMissCount();
 	}
 	//---------------------------------------------------------------------
-	bool D3D11RenderWindowSwapChainBased::IsWindows8OrGreater()
-	{
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		DWORD version = GetVersion();
-		DWORD major = (DWORD)(LOBYTE(LOWORD(version)));
-		DWORD minor = (DWORD)(HIBYTE(LOWORD(version)));
-		return (major > 6) || ((major == 6) && (minor >= 2));
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-		return true; // GetVersion() is not available in WinRT
-#endif
-	}
-	//---------------------------------------------------------------------
 	int D3D11RenderWindowSwapChainBased::getVBlankMissCount()
 	{
-		if (!(mIsFullScreen || (!mIsFullScreen && isVSyncEnabled() && mUseFlipMode == true && mFSAA == 0)))
+		if (!(mIsFullScreen || (!mIsFullScreen && isVSyncEnabled() && mUseFlipSequentialMode == true && mFSAA == 0)))
 		{
 			return -1;
 		}
@@ -587,10 +559,7 @@ namespace Ogre
 			{
 				int currentVBlankMissCount = (currentPresentStats.PresentRefreshCount - mPreviousPresentStats.PresentRefreshCount) 
 					- (currentPresentStats.PresentCount - mPreviousPresentStats.PresentCount);
-				if(currentVBlankMissCount > 0)
-				{
-					mVBlankMissCount +=  currentVBlankMissCount;
-    }
+				mVBlankMissCount +=  std::max(0, currentVBlankMissCount);
 			}
 			mPreviousPresentStats			= currentPresentStats;
 			mPreviousPresentStatsIsValid	= true;
@@ -614,6 +583,14 @@ namespace Ogre
 		mDesiredWidth = 0;
 		mDesiredHeight = 0;
 		mLastSwitchingFullscreenCounter = 0;
+    }
+    //---------------------------------------------------------------------
+    bool D3D11RenderWindowHwnd::IsWindows8OrGreater()
+    {
+        DWORD version = GetVersion();
+        DWORD major = (DWORD)(LOBYTE(LOWORD(version)));
+        DWORD minor = (DWORD)(HIBYTE(LOWORD(version)));
+        return (major > 6) || ((major == 6) && (minor >= 2));
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::create(const String& name, unsigned int width, unsigned int height,
@@ -672,6 +649,21 @@ namespace Ogre
             opt = miscParams->find("monitorIndex");
             if(opt != miscParams->end())
                 monitorIndex = StringConverter::parseInt(opt->second);
+
+#if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
+            // useFlipSequentialMode    [parseBool]
+            opt = miscParams->find("useFlipSequentialMode");
+            if(opt != miscParams->end())
+                mUseFlipSequentialMode = IsWindows8OrGreater() && StringConverter::parseBool(opt->second);
+#endif
+            // vsync    [parseBool]
+            opt = miscParams->find("vsync");
+            if(opt != miscParams->end())
+                mVSync = StringConverter::parseBool(opt->second);
+            // vsyncInterval    [parseUnsignedInt]
+            opt = miscParams->find("vsyncInterval");
+            if(opt != miscParams->end())
+                mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
 
             // enable double click messages
             opt = miscParams->find("enableDoubleClick");
@@ -857,9 +849,8 @@ namespace Ogre
 		mSwapChainDesc.Flags = 0;
 
 #if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
-		mUseFlipMode = IsWindows8OrGreater();
-		mSwapChainDesc.BufferCount = mUseFlipMode ? 2 : 1;
-		mSwapChainDesc.SwapEffect = /* mUseFlipMode ? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL :*/ DXGI_SWAP_EFFECT_DISCARD;
+		mSwapChainDesc.BufferCount = mUseFlipSequentialMode ? 2 : 1;
+		mSwapChainDesc.SwapEffect = mUseFlipSequentialMode ? DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL : DXGI_SWAP_EFFECT_DISCARD;
 #else
 		mSwapChainDesc.BufferCount = 1;
 		mSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -1159,22 +1150,6 @@ namespace Ogre
 		}
 		RenderWindow::_beginUpdate();
 	}
-	void D3D11RenderWindowHwnd::setVSyncEnabled( bool vsync )
-	{
-		mVSync = vsync;
-	}
-	bool D3D11RenderWindowHwnd::isVSyncEnabled() const
-	{
-		return mVSync;
-	}
-	void D3D11RenderWindowHwnd::setVSyncInterval( unsigned int interval )
-	{
-		mVSyncInterval = interval;
-	}
-	unsigned int D3D11RenderWindowHwnd::getVSyncInterval() const
-	{
-		return mVSyncInterval;
-	}
 	void D3D11RenderWindowHwnd::setActive(bool state)
 	{
 		if (mHWnd && mpSwapChain && mIsFullScreen && state)
@@ -1202,16 +1177,17 @@ namespace Ogre
     D3D11RenderWindowCoreWindow::D3D11RenderWindowCoreWindow(D3D11Device & device, IDXGIFactoryN*   pDXGIFactory)
         : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
     {
+        mUseFlipSequentialMode = true;
     }
 
-	float D3D11RenderWindowCoreWindow::getViewPointToPixelScale()
-	{
+    float D3D11RenderWindowCoreWindow::getViewPointToPixelScale()
+    {
 #if _WIN32_WINNT > _WIN32_WINNT_WIN8
-		return Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi / 96;
+        return Windows::Graphics::Display::DisplayInformation::GetForCurrentView()->LogicalDpi / 96;
 #else
-		return Windows::Graphics::Display::DisplayProperties::LogicalDpi / 96;
+        return Windows::Graphics::Display::DisplayProperties::LogicalDpi / 96;
 #endif
-	}
+    }
 
     void D3D11RenderWindowCoreWindow::create(const String& name, unsigned int widthPt, unsigned int heightPt,
         bool fullScreen, const NameValuePairList *miscParams)

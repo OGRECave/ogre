@@ -2287,13 +2287,12 @@ bail:
 
             vp->_clearUpdatedFlag();
         }
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        // as swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL we need to reestablish render target views
         else
         {
-            _setRenderTargetViews();
+            // if swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL we need to reestablish render target views
+            if(static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer())
+                _setRenderTargetViews();
         }
-#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()
