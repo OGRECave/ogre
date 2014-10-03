@@ -130,6 +130,24 @@ namespace Ogre
         mClosed = false;
     }
     //---------------------------------------------------------------------
+    DXGI_FORMAT D3D11RenderWindowBase::_getGammaFormat(DXGI_FORMAT format, bool appendSRGB)
+    {
+        if(appendSRGB)
+        {
+            switch(format)
+            {
+            case DXGI_FORMAT_R8G8B8A8_UNORM:       return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+            case DXGI_FORMAT_B8G8R8A8_UNORM:       return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+            case DXGI_FORMAT_B8G8R8X8_UNORM:       return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+            case DXGI_FORMAT_BC1_UNORM:            return DXGI_FORMAT_BC1_UNORM_SRGB;
+            case DXGI_FORMAT_BC2_UNORM:            return DXGI_FORMAT_BC2_UNORM_SRGB;
+            case DXGI_FORMAT_BC3_UNORM:            return DXGI_FORMAT_BC3_UNORM_SRGB;
+            case DXGI_FORMAT_BC7_UNORM:            return DXGI_FORMAT_BC7_UNORM_SRGB;
+            }
+        }
+        return format;
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderWindowBase::_createSizeDependedD3DResources(void)
     {
         assert(mpBackBuffer && !mRenderTargetView && !mDepthStencilView);
@@ -331,27 +349,24 @@ namespace Ogre
 
         if(BBDesc.SampleDesc.Count > 1)
         {
-                D3D11_TEXTURE2D_DESC desc = BBDesc;
-                desc.SampleDesc.Count = 1;
-                desc.SampleDesc.Quality = 0;
-                desc.Usage = D3D11_USAGE_DEFAULT;
-                desc.BindFlags = 0;
-                desc.CPUAccessFlags = 0;
+            D3D11_TEXTURE2D_DESC desc = BBDesc;
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+            desc.BindFlags = 0;
+            desc.CPUAccessFlags = 0;
 
-                HRESULT hr = mDevice->CreateTexture2D(
-                        &desc,
-                        NULL,
-                        &backbuffer);
+            HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, &backbuffer);
 
-                if (FAILED(hr) || mDevice.isError())
-                {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                                "Error creating texture\nError Description:" + errorDescription, 
-                                "D3D11RenderWindow::copyContentsToMemory" );
-                }
+            if (FAILED(hr) || mDevice.isError())
+            {
+                String errorDescription = mDevice.getErrorDescription(hr);
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Error creating texture\nError Description:" + errorDescription, 
+                    "D3D11RenderWindow::copyContentsToMemory" );
+            }
 
-                mDevice.GetImmediateContext()->ResolveSubresource(backbuffer, D3D11CalcSubresource(0, 0, 1), mpBackBuffer, D3D11CalcSubresource(0, 0, 1), BBDesc.Format);
+            mDevice.GetImmediateContext()->ResolveSubresource(backbuffer, 0, mpBackBuffer, 0, BBDesc.Format);
         }
 
 
@@ -456,13 +471,36 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_createSizeDependedD3DResources()
     {
-        // obtain back buffer
         SAFE_RELEASE(mpBackBuffer);
 
-        HRESULT hr = mpSwapChain->GetBuffer( 0,  __uuidof( ID3D11Texture2D ), (LPVOID*)&mpBackBuffer  );
-        if( FAILED(hr) )
+        HRESULT hr = S_OK;
+        if(mUseFlipSequentialMode && mFSAAType.Count > 1)
         {
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+            // Swapchain does not support FSAA in FlipSequentialMode, therefore create separate back buffer with FSAA
+            D3D11_TEXTURE2D_DESC desc = { 0 };
+            desc.Width               = mWidth;
+            desc.Height              = mHeight;
+            desc.MipLevels           = 1;
+            desc.ArraySize           = 1;
+            desc.Format              = _getSwapChainFormat();
+            desc.SampleDesc.Count    = mFSAAType.Count;
+            desc.SampleDesc.Quality  = mFSAAType.Quality;
+            desc.Usage               = D3D11_USAGE_DEFAULT;
+            desc.BindFlags           = D3D11_BIND_RENDER_TARGET;
+            desc.CPUAccessFlags      = 0;
+            desc.MiscFlags           = 0;
+
+            hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
+        }
+        else
+        {
+            // Obtain back buffer from swapchain
+            hr = mpSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mpBackBuffer);
+        }
+
+        if(FAILED(hr))
+        {
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to Get Back Buffer for swap chain",
                 "D3D11RenderWindow::_createSizeDependedD3DResources");
         }
@@ -471,15 +509,25 @@ namespace Ogre
         D3D11RenderWindowBase::_createSizeDependedD3DResources();
     }
     //---------------------------------------------------------------------
-    void D3D11RenderWindowSwapChainBased::_recreateSwapChain()
+    void D3D11RenderWindowSwapChainBased::_changeBuffersFSAA()
     {
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         rsys->fireDeviceEvent(&mDevice,"RenderWindowBeforeResize",this);
 
         _destroySizeDependedD3DResources();
-        _destroySwapChain();
-        
-        _createSwapChain();
+
+        if(mUseFlipSequentialMode)
+        {
+            // swapchain is not multisampled in flip sequential mode, so we reuse it
+            D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+            rsys->determineFSAASettings(mFSAA, mFSAAHint, _getSwapChainFormat(), &mFSAAType);
+        }
+        else
+        {
+            _destroySwapChain();
+            _createSwapChain();
+        }
+
         _createSizeDependedD3DResources();
 
         // Notify viewports of resize
@@ -524,6 +572,17 @@ namespace Ogre
 
         if( !mDevice.isNull() )
         {
+            // Step of resolving MSAA resource for swap chains in FlipSequentialMode should be done by application rather than by OS.
+            if(mUseFlipSequentialMode && mFSAAType.Count > 1)
+            {
+                ID3D11Texture2D* swapChainBackBuffer = NULL;
+                HRESULT hr = mpSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&swapChainBackBuffer);
+                if(FAILED(hr))
+                    OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error obtaining backbuffer", "D3D11RenderWindowSwapChainBased::swapBuffers");
+                mDevice.GetImmediateContext()->ResolveSubresource(swapChainBackBuffer, 0, mpBackBuffer, 0, _getSwapChainFormat());
+                SAFE_RELEASE(swapChainBackBuffer);
+            }
+
             // flip presentation model swap chains have another semantic for first parameter
             UINT syncInterval = mUseFlipSequentialMode ? std::max(1U, mVSyncInterval) : (mVSync ? mVSyncInterval : 0);
             HRESULT hr = mpSwapChain->Present(syncInterval, 0);
@@ -831,12 +890,12 @@ namespace Ogre
     //---------------------------------------------------------------------
 	HRESULT D3D11RenderWindowHwnd::_createSwapChainImpl(IDXGIDeviceN* pDXGIDevice)
 	{
+		DXGI_FORMAT format = _getGammaFormat(DXGI_FORMAT_R8G8B8A8_UNORM, isHardwareGammaEnabled());
+
+		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		rsys->determineFSAASettings(mFSAA, mFSAAHint, format, &mFSAAType);
+
 		ZeroMemory(&mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N));
-		DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		if (isHardwareGammaEnabled())
-		{
-			format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-		}
 		mSwapChainDesc.BufferDesc.Width = mWidth;
 		mSwapChainDesc.BufferDesc.Height = mHeight;
 		mSwapChainDesc.BufferDesc.Format = format;
@@ -846,7 +905,17 @@ namespace Ogre
 
 		mSwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		mSwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		mSwapChainDesc.Flags = 0;
+
+		if(mUseFlipSequentialMode)
+		{
+			mSwapChainDesc.SampleDesc.Count = 1;
+			mSwapChainDesc.SampleDesc.Quality = 0;
+		}
+		else
+		{
+			mSwapChainDesc.SampleDesc.Count = mFSAAType.Count;
+			mSwapChainDesc.SampleDesc.Quality = mFSAAType.Quality;
+		}
 
 #if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
 		mSwapChainDesc.BufferCount = mUseFlipSequentialMode ? 2 : 1;
@@ -856,15 +925,9 @@ namespace Ogre
 		mSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 #endif	
 
-        // triple buffer if VSync is on
         mSwapChainDesc.BufferUsage          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         mSwapChainDesc.OutputWindow         = mHWnd;
         mSwapChainDesc.Windowed             = !mIsFullScreen;
-
-        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-        rsys->determineFSAASettings(mFSAA, mFSAAHint, format, &mFSAAType);
-        mSwapChainDesc.SampleDesc.Count = mFSAAType.Count;
-        mSwapChainDesc.SampleDesc.Quality = mFSAAType.Quality;
 
         if (!mVSync && !mIsFullScreen)
         {
@@ -1251,13 +1314,22 @@ namespace Ogre
     //---------------------------------------------------------------------
     HRESULT D3D11RenderWindowCoreWindow::_createSwapChainImpl(IDXGIDeviceN* pDXGIDevice)
     {
-        DXGI_FORMAT format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        DXGI_FORMAT format = _getGammaFormat(DXGI_FORMAT_B8G8R8A8_UNORM, isHardwareGammaEnabled());
+
+#if !__OGRE_WINRT_PHONE
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->determineFSAASettings(mFSAA, mFSAAHint, format, &mFSAAType);
+#endif
+
         mSwapChainDesc.Width                = 0;                                    // Use automatic sizing.
         mSwapChainDesc.Height               = 0;
         mSwapChainDesc.Format               = format;
         mSwapChainDesc.Stereo               = false;
 
-        // triple buffer if VSync is on
+        assert(mUseFlipSequentialMode);                                             // i.e. no FSAA for swapchain, but can be enabled in separate backbuffer
+        mSwapChainDesc.SampleDesc.Count     = 1;
+        mSwapChainDesc.SampleDesc.Quality   = 0;
+
         mSwapChainDesc.BufferUsage          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 #if __OGRE_WINRT_PHONE_80
         mSwapChainDesc.BufferCount          = 1;                                    // WP8: One buffer.
@@ -1269,13 +1341,6 @@ namespace Ogre
         mSwapChainDesc.SwapEffect           = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;     // MS recommends using this swap effect for all applications.
 #endif
         mSwapChainDesc.AlphaMode            = DXGI_ALPHA_MODE_UNSPECIFIED;
-
-#if !__OGRE_WINRT_PHONE
-        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-        rsys->determineFSAASettings(mFSAA, mFSAAHint, format, &mFSAAType);
-#endif
-        mSwapChainDesc.SampleDesc.Count = mFSAAType.Count;
-        mSwapChainDesc.SampleDesc.Quality = mFSAAType.Quality;
 
         // Create swap chain
         HRESULT hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, &mpSwapChain);
@@ -1369,8 +1434,10 @@ namespace Ogre
             return;
         }
 
+        DXGI_FORMAT format = _getGammaFormat(DXGI_FORMAT_B8G8R8A8_UNORM, isHardwareGammaEnabled());
+
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-        rsys->determineFSAASettings(mFSAA, mFSAAHint, DXGI_FORMAT_B8G8R8A8_UNORM, &mFSAAType);
+        rsys->determineFSAASettings(mFSAA, mFSAAHint, format, &mFSAAType);
 
         // create back buffer - ID3D11Texture2D
         D3D11_TEXTURE2D_DESC desc = {0};
@@ -1378,7 +1445,7 @@ namespace Ogre
         desc.Height = mHeight;
         desc.MipLevels = 1;
         desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        desc.Format = format;
         desc.SampleDesc.Count = mFSAAType.Count;
         desc.SampleDesc.Quality = mFSAAType.Quality;
         desc.Usage = D3D11_USAGE_DEFAULT;
@@ -1465,7 +1532,7 @@ namespace Ogre
         // resolve multi-sample texture into single-sample texture if needed
         if(mpBackBufferNoMSAA)
         {
-            mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA, 0, mpBackBuffer, 0, DXGI_FORMAT_B8G8R8A8_UNORM);
+            mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA, 0, mpBackBuffer, 0, _getGammaFormat(DXGI_FORMAT_B8G8R8A8_UNORM, isHardwareGammaEnabled()));
             mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBufferNoMSAA, 0, NULL, 0);
         }
         else

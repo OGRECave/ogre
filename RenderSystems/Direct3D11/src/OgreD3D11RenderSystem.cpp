@@ -944,6 +944,7 @@ bail:
             miscParams["FSAAHint"] = fsaaHint;
             miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
             miscParams["gamma"] = StringConverter::toString(hwGamma);
+            //miscParams["useFlipSequentialMode"] = StringConverter::toString(true);
 
             opt = mOptions.find("VSync");
             if (opt == mOptions.end())
@@ -2276,10 +2277,6 @@ bail:
                     "D3D11RenderSystem::_setViewport");
             }
 
-            // Set sRGB write mode
-            //__SetRenderState(D3DRS_SRGBWRITEENABLE, target->isHardwareGammaEnabled());
-            // TODO where has sRGB state gone?
-            
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			D3D11RenderWindowBase* d3d11Window = static_cast<D3D11RenderWindowBase*>(target);
 			d3d11Window->_validateStereo();

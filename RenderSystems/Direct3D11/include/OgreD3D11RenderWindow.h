@@ -77,8 +77,9 @@ namespace Ogre
         void _destroySizeDependedD3DResources();
 
         IDXGIDeviceN* _queryDxgiDevice(); // release after use
-
         void _updateViewportsDimensions();
+
+        static DXGI_FORMAT _getGammaFormat(DXGI_FORMAT format, bool appendSRGB);
 
     protected:
         D3D11Device & mDevice;          // D3D11 driver
@@ -105,13 +106,18 @@ namespace Ogre
         ~D3D11RenderWindowSwapChainBased()                      { destroy(); }
         virtual void destroy(void);
 
-        /// Get the presentation parameters used with this window
-        DXGI_SWAP_CHAIN_DESC_N* _getSwapChainDescription(void)  { return &mSwapChainDesc; }
+        /// Get the swapchain details.
         IDXGISwapChainN* _getSwapChain()                        { return mpSwapChain; }
+        DXGI_SWAP_CHAIN_DESC_N* _getSwapChainDescription(void)  { return &mSwapChainDesc; }
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        DXGI_FORMAT _getSwapChainFormat()                       { return mSwapChainDesc.BufferDesc.Format; }
+#else
+        DXGI_FORMAT _getSwapChainFormat()                       { return mSwapChainDesc.Format; }
+#endif
         virtual bool _shouldRebindBackBuffer()                  { return mUseFlipSequentialMode; }
 
         /// @copydoc RenderTarget::setFSAA
-        virtual void setFSAA(uint fsaa, const String& fsaaHint) { mFSAA = fsaa; mFSAAHint = fsaaHint; _recreateSwapChain(); }
+        virtual void setFSAA(uint fsaa, const String& fsaaHint) { mFSAA = fsaa; mFSAAHint = fsaaHint; _changeBuffersFSAA(); }
 
         void setVSyncEnabled(bool vsync)                        { mVSync = vsync; }
         bool isVSyncEnabled() const                             { return mVSync || mUseFlipSequentialMode; }
@@ -125,9 +131,9 @@ namespace Ogre
         void _createSwapChain();
         virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice) = 0;
         void _destroySwapChain();
-        void _recreateSwapChain(); // required to change FSAA
+        void _changeBuffersFSAA();
         void _resizeSwapChainBuffers(unsigned width, unsigned height);
-        void _createSizeDependedD3DResources(); // obtains mpBackBuffer from mpSwapChain
+        void _createSizeDependedD3DResources(); // obtains mpBackBuffer directly from mpSwapChain or create separate if FSAA requested while mUseFlipSequentialMode
 
         int getVBlankMissCount();
 
