@@ -66,8 +66,10 @@ namespace Ogre {
             const Camera *lodCamera, list<Particle*>::type& currentParticles,
             bool cullIndividually) = 0;
 
+        /** Sets the HLMS material this renderer must use; called by ParticleSystem. */
+        virtual void _setDatablock( HlmsDatablock *datablock ) = 0;
         /** Sets the material this renderer must use; called by ParticleSystem. */
-        virtual void _setMaterial(MaterialPtr& mat) = 0;
+        virtual void _setMaterialName( const String &matName, const String &resourceGroup ) = 0;
         /** Delegated to by ParticleSystem::_notifyCurrentCamera */
         virtual void _notifyCurrentCamera(Camera* cam) = 0;
         /** Delegated to by ParticleSystem::_notifyAttached */

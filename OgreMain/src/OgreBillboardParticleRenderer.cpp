@@ -173,9 +173,15 @@ namespace v1 {
         mBillboardSet->visitRenderables(visitor, debugRenderables);
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_setMaterial(MaterialPtr& mat)
+    void BillboardParticleRenderer::_setDatablock( HlmsDatablock *datablock )
     {
-        mBillboardSet->setMaterial( mat );
+        mBillboardSet->setDatablock( datablock );
+    }
+    //-----------------------------------------------------------------------
+    void BillboardParticleRenderer::_setMaterialName( const String &matName,
+                                                      const String &resourceGroup )
+    {
+        mBillboardSet->setMaterialName( matName, resourceGroup );
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRenderer::setBillboardType(BillboardType bbt)

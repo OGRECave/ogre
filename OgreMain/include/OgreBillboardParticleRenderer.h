@@ -206,8 +206,10 @@ namespace v1 {
         /// @copydoc ParticleSystemRenderer::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);
-        /// @copydoc ParticleSystemRenderer::_setMaterial
-        void _setMaterial(MaterialPtr& mat);
+        /// @copydoc ParticleSystemRenderer::_setDatablock
+        virtual void _setDatablock( HlmsDatablock *datablock );
+        /// @copydoc ParticleSystemRenderer::_setMaterialName
+        virtual void _setMaterialName( const String &matName, const String &resourceGroup );
         /// @copydoc ParticleSystemRenderer::_notifyCurrentCamera
         void _notifyCurrentCamera(Camera* cam);
         /// @copydoc ParticleSystemRenderer::_notifyParticleRotated

@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreSceneManager.h"
 #include "OgreControllerManager.h"
+#include "OgreHlmsManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -959,9 +960,17 @@ namespace Ogre {
         mMaterialName = name;
         if (mIsRendererConfigured)
         {
-            MaterialPtr mat = MaterialManager::getSingleton().load(
-                mMaterialName, mResourceGroupName).staticCast<Material>();
-            mRenderer->_setMaterial(mat);
+            HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+            //Give preference to HLMS materials of the same name
+            HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault( mMaterialName );
+            if( datablock )
+            {
+                mRenderer->_setDatablock( datablock );
+            }
+            else
+            {
+                mRenderer->_setMaterialName( mMaterialName, mResourceGroupName );
+            }
         }
     }
     //-----------------------------------------------------------------------
@@ -1036,11 +1045,21 @@ namespace Ogre {
             mRenderer->_notifyAttached(mParentNode);
             mRenderer->_notifyDefaultDimensions(mDefaultWidth, mDefaultHeight);
             createVisualParticles(0, mParticlePool.size());
-            MaterialPtr mat = MaterialManager::getSingleton().load(
-                mMaterialName, mResourceGroupName).staticCast<Material>();
-            mRenderer->_setMaterial(mat);
             mRenderer->setRenderQueueGroup(mRenderQueueID);
             mRenderer->setKeepParticlesInLocalSpace(mLocalSpace);
+
+            HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+            //Give preference to HLMS materials of the same name
+            HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault( mMaterialName );
+            if( datablock )
+            {
+                mRenderer->_setDatablock( datablock );
+            }
+            else
+            {
+                mRenderer->_setMaterialName( mMaterialName, mResourceGroupName );
+            }
+
             mIsRendererConfigured = true;
         }
     }
