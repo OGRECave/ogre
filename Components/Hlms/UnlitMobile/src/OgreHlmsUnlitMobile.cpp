@@ -428,6 +428,7 @@ namespace Ogre
             for( uint texUnit=0; texUnit<datablock->mNumTextureUnits; ++texUnit )
             {
                 mRenderSystem->_setTexture( texUnit, true, datablock->mDiffuseTextures[texUnit].get() );
+                mRenderSystem->_setHlmsSamplerblock( texUnit, datablock->mSamplerblocks[texUnit] );
                 ++texUnit;
             }
 

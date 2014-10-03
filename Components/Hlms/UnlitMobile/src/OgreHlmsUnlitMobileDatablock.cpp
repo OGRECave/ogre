@@ -81,6 +81,8 @@ namespace Ogre
         mAlphaTestThreshold( 0.5f ),
         mShaderCreationData( 0 )
     {
+        memset( mSamplerblocks, 0, sizeof(mSamplerblocks) );
+
         for( size_t i=0; i<sizeof(mTextureMatrices) / sizeof(Matrix4); ++i )
         {
             mTextureMatrices[i*16 +  0] = 1.0f;
@@ -186,6 +188,7 @@ namespace Ogre
                 }
 
                 mDiffuseTextures[i] = hlmsTextureManager->getBlankTexture().texture;
+                mSamplerblocks[i] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
 
                 StringVector vec = StringUtil::split( paramVal );
 
@@ -297,7 +300,10 @@ namespace Ogre
     {
         IdString hash;
         for( uint i=0; i<mNumTextureUnits; ++i )
+        {
             hash += IdString( mDiffuseTextures[i]->getName() );
+            hash += IdString( mSamplerblocks[i]->mId );
+        }
 
         mTextureHash = hash.mHash;
     }
@@ -336,6 +342,12 @@ namespace Ogre
 
         mDiffuseTextures[texUnit]   = newTexture;
 
+        if( !mSamplerblocks[texUnit] )
+        {
+            HlmsManager *hlmsManager = mCreator->getHlmsManager();
+            mSamplerblocks[texUnit] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
+        }
+
         size_t uvAtlasIdx = 0;
         for( size_t i=0; i<texUnit; ++i )
             uvAtlasIdx += mShaderCreationData->mTextureIsAtlas[i];
@@ -368,6 +380,28 @@ namespace Ogre
         calculateHash();
     }
     //-----------------------------------------------------------------------------------
+    void HlmsUnlitMobileDatablock::setSamplerblock( uint8 texUnit, const HlmsSamplerblock &params )
+    {
+        if( texUnit >= mNumTextureUnits )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture unit out of range in datablock '" +
+                         mName.getFriendlyText() + "'", "HlmsUnlitMobileDatablock::setSamplerblock" );
+        }
+
+        const HlmsSamplerblock *oldBlock = mSamplerblocks[texUnit];
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        mSamplerblocks[texUnit] = hlmsManager->getSamplerblock( params );
+
+        if( oldBlock )
+            hlmsManager->destroySamplerblock( oldBlock );
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsSamplerblock* HlmsUnlitMobileDatablock::getSamplerblock( uint8 texUnit ) const
+    {
+        return mSamplerblocks[texUnit];
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsUnlitMobileDatablock::enableTextureUnits( uint8 until )
     {
         assert( until > 0 && until <= 16 );
@@ -384,6 +418,8 @@ namespace Ogre
             mUvAtlasParams[i].vOffset   = texLocation.yIdx;
             mUvAtlasParams[i].invDivisor= 1.0f / texLocation.divisor;
             mShaderCreationData->mTextureIsAtlas[i] = false;
+
+            mSamplerblocks[i]           = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
 
         mNumTextureUnits = std::max( mNumTextureUnits, until );
@@ -395,11 +431,19 @@ namespace Ogre
     {
         assert( from < 16 );
 
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
         for( size_t i=from; i<mNumTextureUnits; ++i )
         {
             mDiffuseTextures[i].setNull();
             mNumUvAtlas -= mShaderCreationData->mTextureIsAtlas[i];
             mShaderCreationData->mTextureIsAtlas[i] = false;
+
+            if( mSamplerblocks[i] )
+            {
+                hlmsManager->destroySamplerblock( mSamplerblocks[i] );
+                mSamplerblocks[i] = 0;
+            }
         }
 
         mNumTextureUnits = std::min( mNumTextureUnits, from );

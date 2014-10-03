@@ -94,6 +94,7 @@ namespace Ogre
         /// Up to 16 diffuse textures (they can re use UVs); which is the limit for a lot of HW
         /// Must be contiguous (i.e. if mDiffuseTextures[1] isn't used, mDiffuseTextures[2] can't be)
         TexturePtr mDiffuseTextures[16];
+        HlmsSamplerblock const  *mSamplerblocks[16];
 
         /// The data in this structure only affects shader generation (thus modifying it implies
         /// generating a new shader; i.e. a call to flushRenderables()). Because this data
@@ -180,12 +181,25 @@ namespace Ogre
         /** Sets a new texture for rendering
         @param texUnit
             ID of the texture unit. Must be in range [0; mNumTextureUnits) otherwise throws.
+            @see enableTextureUnits in order to increase mNumTextureUnits.
         @param newTexture
             Texture to change to. Can't be null, otherwise throws (use a blank texture).
         @param atlasParams
             The atlas offsets in case this texture is an atlas or an array texture
         */
         void setTexture( uint8 texUnit, TexturePtr &newTexture, const UvAtlasParams &atlasParams );
+
+        /** Sets a new sampler block to be associated with the texture
+            (i.e. filtering mode, addressing modes, etc).
+        @param texUnit
+            ID of the texture unit. Must be in range [0; mNumTextureUnits) otherwise throws.
+            @see enableTextureUnits in order to increase mNumTextureUnits.
+        @param params
+            The sampler block to use as reference.
+        */
+        void setSamplerblock( uint8 texUnit, const HlmsSamplerblock &params );
+
+        const HlmsSamplerblock* getSamplerblock( uint8 texUnit ) const;
 
         /** Enables all texture units until the 'until' parameter. All the tex units in the
             range [0; until) will be enabled.

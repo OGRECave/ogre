@@ -917,7 +917,8 @@ namespace Ogre
         /// @See HlmsBlendblock
         virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock ) = 0;
 
-        /// @See HlmsSamplerblock
+        /// @See HlmsSamplerblock. This function MUST be called after _setTexture, not before.
+        /// Otherwise not all APIs may see the change.
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock ) = 0;
 
         /// @See HlmsCache
