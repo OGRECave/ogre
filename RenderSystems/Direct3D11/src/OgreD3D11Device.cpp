@@ -32,21 +32,63 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11Device::eExceptionsErrorLevel D3D11Device::mExceptionsErrorLevel = D3D11Device::D3D_NO_EXCEPTION;
     //---------------------------------------------------------------------
-    D3D11Device::D3D11Device( ID3D11DeviceN * D3D11device )
-        : mD3D11Device(D3D11device)
-        , mImmediateContext(0)
+    D3D11Device::D3D11Device()
+        : mD3D11Device(NULL)
+        , mImmediateContext(NULL)
+        , mClassLinkage(NULL)
         , mInfoQueue(NULL)
-        , mClassLinkage(0)
-    {
-        if (D3D11device)
-        {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            D3D11device->GetImmediateContext(&mImmediateContext);
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            D3D11device->GetImmediateContext1(&mImmediateContext);
+#if OGRE_D3D11_PROFILING
+        , mPerf(NULL)
 #endif
-            HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&mInfoQueue);
+    {
+    }
+    //---------------------------------------------------------------------
+    D3D11Device::~D3D11Device()
+    {
+        ReleaseAll();
+    }
+    //---------------------------------------------------------------------
+    void D3D11Device::ReleaseAll()
+    {
+        // Clear state
+        if (mImmediateContext)
+        {
+            mImmediateContext->Flush();
+            mImmediateContext->ClearState();
+        }
+#if OGRE_D3D11_PROFILING
+        SAFE_RELEASE(mPerf);
+#endif
+        SAFE_RELEASE(mInfoQueue);
+        SAFE_RELEASE(mClassLinkage);
+        SAFE_RELEASE(mImmediateContext);
+        SAFE_RELEASE(mD3D11Device);
+    }
+    //---------------------------------------------------------------------
+    void D3D11Device::TransferOwnership(ID3D11DeviceN* d3d11device)
+    {
+        assert(mD3D11Device != d3d11device);
+        ReleaseAll();
 
+        if (d3d11device)
+        {
+            HRESULT hr = S_OK;
+
+            mD3D11Device = d3d11device;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+            mD3D11Device->GetImmediateContext(&mImmediateContext);
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+            mD3D11Device->GetImmediateContext1(&mImmediateContext);
+#endif
+
+#if OGRE_D3D11_PROFILING
+            hr = mImmediateContext->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), (LPVOID*)&mPerf);
+            if(!mPerf->GetStatus())
+                SAFE_RELEASE(mPerf);
+#endif
+
+            hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&mInfoQueue);
             if (SUCCEEDED(hr))
             {
                 mInfoQueue->ClearStoredMessages();
@@ -84,50 +126,14 @@ namespace Ogre
             }
 
             // If feature level is 11, create class linkage
-            SAFE_RELEASE(mClassLinkage)
             if (mD3D11Device->GetFeatureLevel() == D3D_FEATURE_LEVEL_11_0)
             {
-                HRESULT hr = mD3D11Device->CreateClassLinkage(&mClassLinkage);
+                hr = mD3D11Device->CreateClassLinkage(&mClassLinkage);
             }
-        }   
-    }
-    //---------------------------------------------------------------------
-    D3D11Device::D3D11Device() : mD3D11Device(0), mImmediateContext(0), mClassLinkage(0)
-    {
-    }
-    //---------------------------------------------------------------------
-    D3D11Device::~D3D11Device()
-    {
-    }
-    //---------------------------------------------------------------------
-    ID3D11DeviceN * D3D11Device::operator=( ID3D11DeviceN * D3D11device )
-    {
-        mD3D11Device = D3D11device; 
-        if (D3D11device)
-        {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            D3D11device->GetImmediateContext(&mImmediateContext);
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            D3D11device->GetImmediateContext1(&mImmediateContext);
-#endif          
-            
-            // If feature level is 11, create class linkage
-            SAFE_RELEASE(mClassLinkage);
-            if (mD3D11Device->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
-            {
-                HRESULT hr = mD3D11Device->CreateClassLinkage(&mClassLinkage);
-            }
-            
         }
-        return mD3D11Device;
     }
     //---------------------------------------------------------------------
-    const bool D3D11Device::isNull()
-    {
-        return mD3D11Device == 0;
-    }
-    //---------------------------------------------------------------------
-    const String D3D11Device::getErrorDescription(const HRESULT lastResult /* = NO_ERROR */) const
+    String D3D11Device::getErrorDescription(const HRESULT lastResult /* = NO_ERROR */) const
     {
         if (!mD3D11Device)
         {
@@ -146,14 +152,14 @@ namespace Ogre
         case NO_ERROR:
             break;
         case E_INVALIDARG:
-			res.append("invalid parameters were passed.\n");
+            res.append("invalid parameters were passed.\n");
             break;
         default:
-			{
-			char tmp[64];
-			sprintf(tmp, "hr = 0x%08X\n", lastResult);
-			res.append(tmp);
-			}
+            {
+            char tmp[64];
+            sprintf(tmp, "hr = 0x%08X\n", lastResult);
+            res.append(tmp);
+            }
         }
 
         if (mInfoQueue != NULL)
@@ -175,25 +181,6 @@ namespace Ogre
         return res;
     }
     //---------------------------------------------------------------------
-    void D3D11Device::release()
-    {
-        // Clear state
-        if (mImmediateContext)
-        {
-            mImmediateContext->Flush();
-            mImmediateContext->ClearState();
-        }
-        SAFE_RELEASE(mInfoQueue);
-        SAFE_RELEASE(mD3D11Device);
-        SAFE_RELEASE(mImmediateContext);
-        SAFE_RELEASE(mClassLinkage);
-    }
-    //---------------------------------------------------------------------
-    ID3D11DeviceN * D3D11Device::get()
-    {
-        return mD3D11Device;
-    }
-    //---------------------------------------------------------------------
     void D3D11Device::setExceptionsErrorLevel( const eExceptionsErrorLevel exceptionsErrorLevel )
     {
         mExceptionsErrorLevel = exceptionsErrorLevel;
@@ -204,7 +191,7 @@ namespace Ogre
         return mExceptionsErrorLevel;
     }
     //---------------------------------------------------------------------
-    const bool D3D11Device::_getErrorsFromQueue() const
+    bool D3D11Device::_getErrorsFromQueue() const
     {
         if (mInfoQueue != NULL)
         {
@@ -272,7 +259,7 @@ namespace Ogre
         }
     }
 
-    const void D3D11Device::clearStoredErrorMessages() const
+    void D3D11Device::clearStoredErrorMessages() const
     {
         if (mD3D11Device && D3D_NO_EXCEPTION != mExceptionsErrorLevel)
         {
@@ -283,19 +270,4 @@ namespace Ogre
         }
     }
 
-    //---------------------------------------------------------------------
-
-	D3D11Device::ThreadInfo::ThreadInfo(ID3D11DeviceContextN* context)
-		: mContext(context)
-		, mEventHandle(0)
-	{
-		mEventHandle = CreateEventEx(0, TEXT("ThreadContextEvent"), 0, EVENT_ALL_ACCESS);
-	}
-    //---------------------------------------------------------------------
-	D3D11Device::ThreadInfo::~ThreadInfo()
-	{
-		SAFE_RELEASE(mContext);
-
-		CloseHandle(mEventHandle);
-	}
 }

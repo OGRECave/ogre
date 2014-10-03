@@ -58,12 +58,6 @@ THE SOFTWARE.
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
 
-//#ifdef OGRE_PROFILING == 1 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-//#include "d3d9.h"
-//#endif
-
-//---------------------------------------------------------------------
-
 
 #ifndef D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT
 #   define D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT 4
@@ -126,7 +120,7 @@ bail:
 
     //---------------------------------------------------------------------
     D3D11RenderSystem::D3D11RenderSystem()
-		: mDevice(NULL)
+		: mDevice()
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
 #endif	
@@ -636,12 +630,8 @@ bail:
 
         //AIZ:recreate the device for the selected adapter
         {
-            if (!mDevice.isNull())
-            {
-                mDevice.release();
-            }
+            mDevice.ReleaseAll();
 
-        
             opt = mOptions.find( "Information Queue Exceptions Bottom Level" );
             if( opt == mOptions.end() )
                 OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find Information Queue Exceptions Bottom Level option!", "D3D11RenderSystem::initialise" );
@@ -884,7 +874,7 @@ bail:
             SAFE_RELEASE(pDXGIAdapter);
             SAFE_RELEASE(pDXGIDevice);
 
-            mDevice = D3D11Device(device) ;
+            mDevice.TransferOwnership(device) ;
         }
 
         if( autoCreateWindow )
@@ -1009,7 +999,7 @@ bail:
         SAFE_DELETE( mDriverList );
         SAFE_RELEASE( mpDXGIFactory );
         mActiveD3DDriver = NULL;
-        mDevice = NULL;
+        mDevice.ReleaseAll();
         LogManager::getSingleton().logMessage("D3D11 : Shutting down cleanly.");
         SAFE_DELETE( mTextureManager );
         SAFE_DELETE( mHardwareBufferManager );
@@ -1723,13 +1713,9 @@ bail:
             }
             */
             // Clean up depth stencil surfaces
-            mDevice.release();
+            mDevice.ReleaseAll();
             //mActiveD3DDriver->setDevice(D3D11Device(NULL));
-            mDevice = 0;
-
         }
-
-
     }
     //---------------------------------------------------------------------
     VertexElementType D3D11RenderSystem::getColourVertexElementType(void) const
@@ -4030,7 +4016,7 @@ bail:
 				}
 			}
 		}
-        mDevice = D3D11Device(device) ;
+        mDevice.TransferOwnership(device);
 
 
         // set stages desc. to defaults
@@ -4102,32 +4088,33 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::beginProfileEvent( const String &eventName )
     {
-//#ifdef OGRE_PROFILING == 1
-//      if( eventName.empty() )
-//          return;
-// 
-//      vector<wchar_t>::type result(eventName.length() + 1, '\0');
-//      (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
-//      (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
-//#endif
+#if OGRE_D3D11_PROFILING
+        if(mDevice.GetProfiler())
+        {			
+            wchar_t wideName[256]; // Let avoid heap memory allocation if we are in profiling code.
+            bool wideNameOk = !eventName.empty() && 0 != MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length() + 1, wideName, ARRAYSIZE(wideName));
+            mDevice.GetProfiler()->BeginEvent(wideNameOk ? wideName : L"<too long or empty event name>");
+        }
+#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::endProfileEvent( void )
     {
-//#ifdef OGRE_PROFILING == 1
-//      (void)D3DPERF_EndEvent();
-//#endif
+#if OGRE_D3D11_PROFILING
+        if(mDevice.GetProfiler())
+            mDevice.GetProfiler()->EndEvent();
+#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::markProfileEvent( const String &eventName )
     {
-//#ifdef OGRE_PROFILING == 1
-//      if( eventName.empty() )
-//          return;
-//
-//      vector<wchar_t>::type result(eventName.length() + 1, '\0');
-//      (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
-//      (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
-//#endif
-    }    
+#if OGRE_D3D11_PROFILING
+        if(mDevice.GetProfiler())
+        {
+            wchar_t wideName[256]; // Let avoid heap memory allocation if we are in profiling code.
+            bool wideNameOk = !eventName.empty() && 0 != MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length() + 1, wideName, ARRAYSIZE(wideName));
+            mDevice.GetProfiler()->SetMarker(wideNameOk ? wideName : L"<too long or empty event name>");
+        }
+#endif
+    }
 }
