@@ -2951,9 +2951,10 @@ namespace OgreBites
                 }
             }
 
-            for (WidgetList::reverse_iterator it = mWidgets[9].rbegin(), it_end = mWidgets[9].rend(); it != it_end; ++it)  // check if mouse is over a non-null tray's widgets
+            for (int j = (int)mWidgets[9].size() - 1; j >= 0 ; --j)  // check if mouse is over a non-null tray's widgets
             {
-                Widget* w = *it;
+                if(j >= (int)mWidgets[9].size()) continue;
+                Widget* w = mWidgets[9][j];
                 if (w->getOverlayElement()->isVisible() && Widget::isCursorOver(w->getOverlayElement(), cursorPos))
                 {
                     mTrayDrag = true;   // initiate a drag that originates in a tray
@@ -2967,9 +2968,10 @@ namespace OgreBites
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (WidgetList::reverse_iterator it = mWidgets[i].rbegin(), it_end = mWidgets[i].rend(); it != it_end; ++it)
+                for (int j = (int)mWidgets[i].size() - 1; j >= 0; --j)
                 {
-                    Widget* w = *it;
+                    if(j >= (int)mWidgets[i].size()) continue;
+                    Widget* w = mWidgets[i][j];
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorPressed(cursorPos);    // send event to widget
 
@@ -3022,9 +3024,10 @@ namespace OgreBites
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (WidgetList::reverse_iterator it = mWidgets[i].rbegin(), it_end = mWidgets[i].rend(); it != it_end; ++it)
+                for (int j = (int)mWidgets[i].size() - 1; j >= 0; --j)
                 {
-                    Widget* w = *it;
+                    if(j >= (int)mWidgets[i].size()) continue;
+                    Widget* w = mWidgets[i][j];
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorReleased(cursorPos);    // send event to widget
                 }
@@ -3068,9 +3071,10 @@ namespace OgreBites
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (WidgetList::reverse_iterator it = mWidgets[i].rbegin(), it_end = mWidgets[i].rend(); it != it_end; ++it)
+                for (int j = (int)mWidgets[i].size() - 1; j >= 0; --j)
                 {
-                    Widget* w = *it;
+                    if(j >= (int)mWidgets[i].size()) continue;
+                    Widget* w = mWidgets[i][j];
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorMoved(cursorPos);    // send event to widget
                 }
