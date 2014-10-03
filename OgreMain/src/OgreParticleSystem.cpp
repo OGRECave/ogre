@@ -712,7 +712,8 @@ namespace Ogre {
             if (!mIsRendererConfigured)
                 configureRenderer();
 
-            mRenderer->_updateRenderQueue(queue, camera, lodCamera, mActiveParticles, mCullIndividual);
+            mRenderer->_updateRenderQueue(queue, camera, lodCamera, mActiveParticles, mCullIndividual,
+                                          mRenderables);
         }
     }
     //---------------------------------------------------------------------

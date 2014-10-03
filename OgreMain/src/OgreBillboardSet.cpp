@@ -833,9 +833,20 @@ namespace v1 {
 
         const String *fullDatablockName = datablock->getFullName();
         if( fullDatablockName )
+        {
             mMaterialName = *fullDatablockName;
+        }
+        else
+        {
+            LogManager::getSingleton().logMessage(
+                        "Couldn't retrieve full material name of datablock '" +
+                        datablock->getName().getFriendlyText() +
+                        "' Billboard may not render as expected. "
+                        "May be the datablock is scheduled for deletion?" );
+        }
 
-        Renderable::setDatablock( datablock );
+        if( mBuffersCreated )
+            Renderable::setDatablock( datablock );
     }
     //-----------------------------------------------------------------------
     unsigned int BillboardSet::getPoolSize(void) const

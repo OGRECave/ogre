@@ -202,7 +202,8 @@ namespace v1 {
         const String& getType(void) const;
         /// @copydoc ParticleSystemRenderer::_updateRenderQueue
         void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera,
-            list<Particle*>::type& currentParticles, bool cullIndividually);
+            list<Particle*>::type& currentParticles, bool cullIndividually,
+            RenderableArray &outRenderables );
         /// @copydoc ParticleSystemRenderer::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);

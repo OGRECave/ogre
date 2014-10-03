@@ -37,6 +37,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    typedef FastArray<Renderable*> RenderableArray;
+
     /** \addtogroup Core
     *  @{
     */
@@ -64,7 +66,7 @@ namespace Ogre {
         */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera,
             const Camera *lodCamera, list<Particle*>::type& currentParticles,
-            bool cullIndividually) = 0;
+            bool cullIndividually, RenderableArray &outRenderables ) = 0;
 
         /** Sets the HLMS material this renderer must use; called by ParticleSystem. */
         virtual void _setDatablock( HlmsDatablock *datablock ) = 0;

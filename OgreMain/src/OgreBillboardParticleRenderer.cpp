@@ -130,7 +130,8 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRenderer::_updateRenderQueue(RenderQueue* queue, Camera *camera,
-        const Camera *lodCamera, list<Particle*>::type& currentParticles, bool cullIndividually)
+        const Camera *lodCamera, list<Particle*>::type& currentParticles, bool cullIndividually,
+        RenderableArray &outRenderables )
     {
         mBillboardSet->setCullIndividually(cullIndividually);
 
@@ -165,6 +166,9 @@ namespace v1 {
 
         // Update the queue
         mBillboardSet->_updateRenderQueue(queue, camera, lodCamera);
+
+        outRenderables.clear();
+        outRenderables.push_back( mBillboardSet );
     }
     //---------------------------------------------------------------------
     void BillboardParticleRenderer::visitRenderables(Renderable::Visitor* visitor, 
