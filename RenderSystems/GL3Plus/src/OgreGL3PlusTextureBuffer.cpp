@@ -252,6 +252,25 @@ namespace Ogre {
                 // Standard alignment of 4 is not right.
                 OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
             }
+
+            GLenum type = GL3PlusPixelUtil::getGLOriginDataType(data.format);
+
+            if (data.format == PF_DEPTH)
+            {
+                switch (GL3PlusPixelUtil::getGLInternalFormat(data.format))
+                {
+                    case GL_DEPTH_COMPONENT16:
+                        type = GL_UNSIGNED_SHORT;
+                        break;
+
+                    default:
+                    case GL_DEPTH_COMPONENT24:
+                    case GL_DEPTH_COMPONENT32:
+                        type = GL_UNSIGNED_INT;
+                        break;
+                }
+            }
+
             switch(mTarget)
             {
             case GL_TEXTURE_1D:
@@ -260,7 +279,7 @@ namespace Ogre {
                     dest.left,
                     dest.getWidth(),
                     GL3PlusPixelUtil::getGLOriginFormat(data.format),
-                    GL3PlusPixelUtil::getGLOriginDataType(data.format),
+                    type,
                     NULL));
                 break;
             case GL_TEXTURE_2D:
@@ -271,7 +290,7 @@ namespace Ogre {
                     dest.left, dest.top,
                     dest.getWidth(), dest.getHeight(),
                     GL3PlusPixelUtil::getGLOriginFormat(data.format),
-                    GL3PlusPixelUtil::getGLOriginDataType(data.format),
+                    type,
                     NULL));
                 break;
             case GL_TEXTURE_3D:
@@ -281,7 +300,7 @@ namespace Ogre {
                     dest.left, dest.top, dest.front,
                     dest.getWidth(), dest.getHeight(), dest.getDepth(),
                     GL3PlusPixelUtil::getGLOriginFormat(data.format),
-                    GL3PlusPixelUtil::getGLOriginDataType(data.format),
+                    type,
                     NULL));
                 break;
             }
@@ -491,7 +510,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldfb));
 
         // Set up temporary FBO
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, fboMan->getTemporaryFBO(0)));
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboMan->getTemporaryFBO(0)));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, fboMan->getTemporaryFBO(1)));
 
         GLuint tempTex = 0;
@@ -534,6 +553,8 @@ namespace Ogre {
                     bindToFramebuffer(GL_COLOR_ATTACHMENT0, slice);
             }
 
+            OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
+
             GLbitfield mask = GL_ZERO;
 
             // Bind the appropriate source texture to the read framebuffer
@@ -541,7 +562,7 @@ namespace Ogre {
             {
                 src->_bindToFramebuffer(GL_DEPTH_ATTACHMENT, slice, GL_READ_FRAMEBUFFER);
 
-                OGRE_CHECK_GL_ERROR(glReadBuffer(GL_DEPTH_ATTACHMENT));
+                OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
 
                 mask |= GL_DEPTH_BUFFER_BIT;
 
@@ -556,6 +577,8 @@ namespace Ogre {
 
                 mask |= GL_COLOR_BUFFER_BIT;
             }
+
+            OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_READ_FRAMEBUFFER));
 
             assert(mask != GL_ZERO);
 
@@ -583,23 +606,21 @@ namespace Ogre {
 
         if (mFormat == PF_DEPTH)
         {
-            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                                                          GL_RENDERBUFFER, 0));
             OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                                                           GL_RENDERBUFFER, 0));
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                                          GL_RENDERBUFFER, 0));
             OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                                           GL_RENDERBUFFER, 0));
         }
 
+        // Reset read buffer/framebuffer
+        OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
 
         // Restore old framebuffer
-        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, oldfb));
         OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tempTex));
     }
 
@@ -682,16 +703,31 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000));
 
-        GLenum internalFormat = GL3PlusPixelUtil::getGLOriginFormat(src.format);
+        GLenum internalFormat = GL3PlusPixelUtil::getGLInternalFormat(src.format);
+
+        GLenum format = GL_RGBA;
+
+        switch (internalFormat)
+        {
+            case GL_DEPTH_COMPONENT:
+            case GL_DEPTH_COMPONENT16:
+            case GL_DEPTH_COMPONENT24:
+            case GL_DEPTH_COMPONENT32:
+                format = GL_DEPTH_COMPONENT;
+                break;
+
+            default:
+                break;
+        }
 
         // Allocate texture memory
         if (target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY)
         {
-            OGRE_CHECK_GL_ERROR(glTexImage3D(target, 0, internalFormat, src.getWidth(), src.getHeight(), src.getDepth(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
+            OGRE_CHECK_GL_ERROR(glTexImage3D(target, 0, internalFormat, src.getWidth(), src.getHeight(), src.getDepth(), 0, format, GL_UNSIGNED_BYTE, 0));
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glTexImage2D(target, 0, internalFormat, src.getWidth(), src.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
+            OGRE_CHECK_GL_ERROR(glTexImage2D(target, 0, internalFormat, src.getWidth(), src.getHeight(), 0, format, GL_UNSIGNED_BYTE, 0));
         }
 
         // GL texture buffer

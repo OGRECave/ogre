@@ -130,8 +130,6 @@ namespace Ogre {
     {
         detectFBOFormats();
 
-        GLsizei numBuffers = 1;
-
         mTempFBO.resize(Ogre::TEMP_FBOS, 0);
 
         for (size_t i = 0; i < Ogre::TEMP_FBOS; i++)
