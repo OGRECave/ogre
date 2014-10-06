@@ -73,10 +73,12 @@ namespace Ogre
 #endif
 
     protected:
-        void _createSizeDependedD3DResources(); // assumes mpBackBuffer is already initialized
+        virtual DXGI_FORMAT _getBasicFormat()                   { return DXGI_FORMAT_B8G8R8A8_UNORM; } // preferred since Win8
+        DXGI_FORMAT _getRenderFormat()                          { return _getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled()); }
+        void _createSizeDependedD3DResources();                 // assumes mpBackBuffer is already initialized
         void _destroySizeDependedD3DResources();
 
-        IDXGIDeviceN* _queryDxgiDevice(); // release after use
+        IDXGIDeviceN* _queryDxgiDevice();                       // release after use
         void _updateViewportsDimensions();
 
         static DXGI_FORMAT _getGammaFormat(DXGI_FORMAT format, bool appendSRGB);
@@ -93,6 +95,7 @@ namespace Ogre
 
         // Window size depended resources - must be released before swapchain resize and recreated later
         ID3D11Texture2D*        mpBackBuffer;
+        ID3D11Texture2D*        mpBackBufferNoMSAA;             // optional, always holds up-to-date copy data from mpBackBuffer if not NULL
         ID3D11RenderTargetView* mRenderTargetView;
         ID3D11DepthStencilView* mDepthStencilView;
     };
@@ -109,11 +112,6 @@ namespace Ogre
         /// Get the swapchain details.
         IDXGISwapChainN* _getSwapChain()                        { return mpSwapChain; }
         DXGI_SWAP_CHAIN_DESC_N* _getSwapChainDescription(void)  { return &mSwapChainDesc; }
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        DXGI_FORMAT _getSwapChainFormat()                       { return mSwapChainDesc.BufferDesc.Format; }
-#else
-        DXGI_FORMAT _getSwapChainFormat()                       { return mSwapChainDesc.Format; }
-#endif
         virtual bool _shouldRebindBackBuffer()                  { return mUseFlipSequentialMode; }
 
         /// @copydoc RenderTarget::setFSAA
@@ -128,12 +126,13 @@ namespace Ogre
         void updateStats(void);
 
     protected:
+        DXGI_FORMAT _getSwapChainFormat()                       { return _getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled() && !mUseFlipSequentialMode); }
         void _createSwapChain();
         virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice) = 0;
         void _destroySwapChain();
         void _changeBuffersFSAA();
         void _resizeSwapChainBuffers(unsigned width, unsigned height);
-        void _createSizeDependedD3DResources(); // obtains mpBackBuffer directly from mpSwapChain or create separate if FSAA requested while mUseFlipSequentialMode
+        void _createSizeDependedD3DResources();                 // obtains mpBackBuffer and optionally mpBackBufferNoMSAA, former can be from mpSwapChain or standalone
 
         int getVBlankMissCount();
 
@@ -142,13 +141,13 @@ namespace Ogre
         IDXGISwapChainN*        mpSwapChain;
         DXGI_SWAP_CHAIN_DESC_N  mSwapChainDesc;
 
-        bool                    mUseFlipSequentialMode;       // Flag to determine if the swapchain flip sequential model is enabled. Not supported before Win8.0, required for WinRT.
-        bool                    mVSync;                       // mVSync assumed to be true if mUseFlipSequentialMode
-        unsigned                mVSyncInterval;               // Used at least 1 if mUseFlipSequentialMode
+        bool                    mUseFlipSequentialMode;         // Flag to determine if the swapchain flip sequential model is enabled. Not supported before Win8.0, required for WinRT.
+        bool                    mVSync;                         // mVSync assumed to be true if mUseFlipSequentialMode
+        unsigned                mVSyncInterval;                 // Used at least 1 if mUseFlipSequentialMode
 
-        DXGI_FRAME_STATISTICS   mPreviousPresentStats;        // We save the previous present stats - so we can detect a "vblank miss"
-        bool                    mPreviousPresentStatsIsValid; // Does mLastPresentStats data is valid (it isn't if when you start or resize the window)
-        uint                    mVBlankMissCount;             // Number of times we missed the v sync blank
+        DXGI_FRAME_STATISTICS   mPreviousPresentStats;          // We save the previous present stats - so we can detect a "vblank miss"
+        bool                    mPreviousPresentStatsIsValid;   // Does mLastPresentStats data is valid (it isn't if when you start or resize the window)
+        uint                    mVBlankMissCount;               // Number of times we missed the v sync blank
     };
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -157,7 +156,7 @@ namespace Ogre
         : public D3D11RenderWindowSwapChainBased
     {
     public:
-        D3D11RenderWindowHwnd(D3D11Device& device, IDXGIFactoryN*   pDXGIFactory);
+        D3D11RenderWindowHwnd(D3D11Device& device, IDXGIFactoryN* pDXGIFactory);
         ~D3D11RenderWindowHwnd()                                { destroy(); }
         virtual void create(const String& name, unsigned width, unsigned height, bool fullScreen, const NameValuePairList *miscParams);
         virtual void destroy(void);
@@ -180,22 +179,22 @@ namespace Ogre
         void _beginUpdate();
 
     protected:
+        DXGI_FORMAT _getBasicFormat()                           { return DXGI_FORMAT_R8G8B8A8_UNORM; } // be compatible with pre-Win8 D3D11
+        virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice);
 
         /// Indicate that fullscreen / windowed switching has finished
         void _finishSwitchingFullscreen();
-
-        virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice);
         void setActive(bool state);
 
         static bool IsWindows8OrGreater();
 
     protected:
-        HWND    mHWnd;                  // Win32 window handle
-		DWORD						mWindowedWinStyle;		// Windowed mode window style flags.
-		DWORD						mFullscreenWinStyle;	// Fullscreen mode window style flags.		 
-		unsigned int				mDesiredWidth;			// Desired width after resizing
-		unsigned int				mDesiredHeight;			// Desired height after resizing
-		int							mLastSwitchingFullscreenCounter;	// the last value of the switching fullscreen counter when we switched
+        HWND                    mHWnd;                          // Win32 window handle
+        DWORD                   mWindowedWinStyle;              // Windowed mode window style flags.
+        DWORD                   mFullscreenWinStyle;            // Fullscreen mode window style flags.
+        unsigned int            mDesiredWidth;                  // Desired width after resizing
+        unsigned int            mDesiredHeight;                 // Desired height after resizing
+        int                     mLastSwitchingFullscreenCounter;// the last value of the switching fullscreen counter when we switched
     };
 
 #endif
@@ -248,13 +247,12 @@ namespace Ogre
         virtual void getCustomAttribute( const String& name, void* pData ); // "ImageBrush" -> Windows::UI::Xaml::Media::ImageBrush^
 
     protected:
-        void _createSizeDependedD3DResources(); // creates mpBackBuffer and optionally mpBackBufferNoMSAA
+        void _createSizeDependedD3DResources();                 // creates mpBackBuffer and optionally mpBackBufferNoMSAA
 
     protected:
         Windows::UI::Xaml::Media::ImageBrush^                   mBrush;             // size independed
         Windows::UI::Xaml::Media::Imaging::SurfaceImageSource^  mImageSource;       // size depended, can be NULL
         ISurfaceImageSourceNative*                              mImageSourceNative; // size depended, can be NULL
-        ID3D11Texture2D*                                        mpBackBufferNoMSAA; // size depended, optional
     };
 #endif // !__OGRE_WINRT_PHONE_80
 
