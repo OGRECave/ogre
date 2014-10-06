@@ -310,6 +310,17 @@ namespace Ogre
         static PbsUvAtlasParams textureLocationToAtlasParams(
                                             const HlmsTextureManager::TextureLocation &texLocation );
 
+        /** Suggests the TextureMapType (aka texture category) for each type of texture
+            (i.e. normals should load from TEXTURE_TYPE_NORMALS).
+        @remarks
+            Remember that if "myTexture" was loaded as TEXTURE_TYPE_DIFFUSE and then you try
+            to load it as TEXTURE_TYPE_NORMALS, the first one will prevail until it's removed.
+            You could create an alias however, and thus have two copies of the same texture with
+            different loading parameters.
+        */
+        static HlmsTextureManager::TextureMapType suggestMapTypeBasedOnTextureType(
+                                                        PbsMobileTextureTypes type );
+
         int _calculateNumUvAtlas( bool casterPass ) const;
 
         virtual void calculateHash();
