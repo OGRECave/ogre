@@ -52,8 +52,21 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@" "FreeImage")
     endif()
 
-	add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@" "OIS" "freetype" "zzip")
-	
+    if(OGRE_USE_BOOST)
+       set(OGRE_BOOST_INCLUDES ${Boost_INCLUDE_DIRS})
+       set(OGRE_BOOST_LIBS)
+       
+       foreach(LIB ${Boost_LIBRARIES})
+           get_filename_component(LIB_NAME ${LIB} NAME_WE)
+           string(SUBSTRING ${LIB_NAME} 3 -1 LIB_NAME)
+           set(OGRE_BOOST_LIBS ${OGRE_BOOST_LIBS} ${LIB_NAME})
+       endforeach()
+       
+	   add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@" ${OGRE_BOOST_LIBS})
+    endif()
+
+    add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@" "OIS" "freetype" "zzip")
+
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
       SET(NDK_BUILD_EXECUTABLE "ndk-build")
