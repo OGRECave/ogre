@@ -309,20 +309,20 @@ namespace Ogre
     //---------------------------------------------------------------------
     void TerrainPagedWorldSection::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
     {
-        PageID pageID = mPagesInLoading.front();
-
-        // trigger terrain load
-        long x, y;
-        // pageID is the same as a packed index
-        mTerrainGroup->unpackIndex(pageID, &x, &y);
-        mTerrainGroup->loadTerrain(x, y, false);
-        mPagesInLoading.pop_front();
-
-        unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
-        mNextLoadingTime = currentTime + mLoadingIntervalMs;
-
-        if(!mPagesInLoading.empty())
+		if(!mPagesInLoading.empty())
         {
+			PageID pageID = mPagesInLoading.front();
+
+			// trigger terrain load
+			long x, y;
+			// pageID is the same as a packed index
+			mTerrainGroup->unpackIndex(pageID, &x, &y);
+			mTerrainGroup->loadTerrain(x, y, false);
+			mPagesInLoading.pop_front();
+
+			unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
+			mNextLoadingTime = currentTime + mLoadingIntervalMs;
+
             // Continue loading other pages
             Root::getSingleton().getWorkQueue()->addRequest(
                     mWorkQueueChannel, WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST, 
