@@ -6,7 +6,7 @@ LOCAL_PATH := $(call my-dir)
     include $(CLEAR_VARS)
     LOCAL_MODULE    := @ANDROID_MOD_NAME@
     LOCAL_LDLIBS	:= -landroid -lc -lm -ldl -lz -llog -lEGL -lGLESv2
-    LOCAL_LDLIBS	+= -L@OGRE_BINARY_DIR@/lib -L@OGRE_DEPENDENCIES_DIR@/lib/@ANDROID_ABI@
+    LOCAL_LDLIBS	+= -L@OGRE_BINARY_DIR@/lib -L@OGRE_DEPENDENCIES_DIR@/lib/@ANDROID_NDK_ABI_NAME@
     
     LOCAL_STATIC_LIBRARIES := @SAMPLE_LDLIBS@ android_native_app_glue cpufeatures
     LOCAL_CFLAGS := -DGL_GLEXT_PROTOTYPES=1

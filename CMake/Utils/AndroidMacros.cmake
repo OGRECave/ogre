@@ -45,14 +45,14 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	endforeach(DEPENDENCY ${DEPENDENCIES})
 	add_static_libs("${OGRE_BINARY_DIR}/lib" ${DEPEND_STATIC_LIBS})
 	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
-        add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@"  "glsl_optimizer" "glcpp-library" "mesa")
+        add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@"  "glsl_optimizer" "glcpp-library" "mesa")
 	endif()
 
 	if(OGRE_CONFIG_ENABLE_FREEIMAGE)
-        add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@" "FreeImage")
+        add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@" "FreeImage")
     endif()
 
-	add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@" "OIS" "freetype" "zzip")
+	add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@" "OIS" "freetype" "zzip")
 	
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
@@ -88,7 +88,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	file(MAKE_DIRECTORY "${NDKOUT}/src")
 
     file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
-    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static\nNDK_TOOLCHAIN_VERSION := ${ANDROID_COMPILER_VERSION}")
+    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_NDK_ABI_NAME}\nLOCAL_ARM_NEON := ${NEON}\nAPP_STL := gnustl_static\nNDK_TOOLCHAIN_VERSION := ${ANDROID_COMPILER_VERSION}")
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
 	configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
     
