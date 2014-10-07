@@ -94,7 +94,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Resource* MaterialManager::createImpl(const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader,
-        const NameValuePairList* params)
+    const NameValuePairList* params)
     {
         return OGRE_NEW Material(this, name, handle, group, isManual, loader);
     }
@@ -113,7 +113,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MaterialManager::initialise(void)
     {
-        // Set up default material - don't use name contructor as we want to avoid applying defaults
+        // Set up default material - don't use name constructor as we want to avoid applying defaults
         mDefaultSettings = create("DefaultSettings", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         // Add a single technique and pass, non-programmable
         mDefaultSettings->createTechnique()->createPass();
@@ -125,7 +125,7 @@ namespace Ogre {
         create("BaseWhite", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         // Set up an unlit base white material
         MaterialPtr baseWhiteNoLighting = create("BaseWhiteNoLighting",
-            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+        ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
         baseWhiteNoLighting->setLightingEnabled(false);
 
     }
@@ -297,5 +297,63 @@ namespace Ogre {
         return 0;
 
     }
+
+	void MaterialManager::_notifyAfterIlluminationPassesCreated(Technique* tech)
+	{
+		// First, check the scheme specific listeners
+		ListenerMap::iterator it = mListenerMap.find(mActiveSchemeName);
+		if(it != mListenerMap.end())
+		{
+			ListenerList& listenerList = it->second;
+			for(ListenerList::iterator i = listenerList.begin(); i != listenerList.end(); ++i)
+			{
+				bool handled = (*i)->afterIlluminationPassesCreated(tech);
+				if(handled)
+					return;
+			}
+		}
+
+		//If no success, check generic listeners
+		it = mListenerMap.find(BLANKSTRING);
+		if(it != mListenerMap.end())
+		{
+			ListenerList& listenerList = it->second;
+			for(ListenerList::iterator i = listenerList.begin(); i != listenerList.end(); ++i)
+			{
+				bool handled = (*i)->afterIlluminationPassesCreated(tech);
+				if(handled)
+					return;
+			}
+		}
+	}
+
+	void MaterialManager::_notifyBeforeIlluminationPassesCleared(Technique* tech)
+	{
+		// First, check the scheme specific listeners
+		ListenerMap::iterator it = mListenerMap.find(mActiveSchemeName);
+		if(it != mListenerMap.end())
+		{
+			ListenerList& listenerList = it->second;
+			for(ListenerList::iterator i = listenerList.begin(); i != listenerList.end(); ++i)
+			{
+				bool handled = (*i)->beforeIlluminationPassesCleared(tech);
+				if(handled)
+					return;
+			}
+		}
+
+		//If no success, check generic listeners
+		it = mListenerMap.find(BLANKSTRING);
+		if(it != mListenerMap.end())
+		{
+			ListenerList& listenerList = it->second;
+			for(ListenerList::iterator i = listenerList.begin(); i != listenerList.end(); ++i)
+			{
+				bool handled = (*i)->beforeIlluminationPassesCleared(tech);
+				if(handled)
+					return;
+			}
+		}
+	}
 
 }

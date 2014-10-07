@@ -93,6 +93,15 @@ namespace Ogre
         mDeviceManager = NULL;  
         mPerStageConstantSupport = false;
 
+		for(int i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
+		{
+			for(int j = 0 ; j < 2 ; j++)
+			{
+				mManualBlendColours[i][j] = ColourValue::ZERO;
+			}
+
+		}
+
         // Create the resource manager.
         mResourceManager = OGRE_NEW D3D9ResourceManager();
 
@@ -169,6 +178,12 @@ namespace Ogre
         return strName;
     }
     //---------------------------------------------------------------------
+	const String& D3D9RenderSystem::getFriendlyName(void) const
+	{
+		static String strName = mIsDirectX9Ex ? "Direct3D 9Ex" : "Direct3D 9";
+		return strName;
+	}
+	
     D3D9DriverList* D3D9RenderSystem::getDirect3DDrivers()
     {
         if( !mDriverList )
@@ -206,6 +221,7 @@ namespace Ogre
         ConfigOption optMultihead;
         ConfigOption optVSync;
         ConfigOption optVSyncInterval;
+		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
         ConfigOption optNVPerfHUD;
@@ -282,6 +298,13 @@ namespace Ogre
         optVSyncInterval.possibleValues.push_back( "4" );
         optVSyncInterval.currentValue = "1";
 
+		optBackBufferCount.name = "Backbuffer Count";
+		optBackBufferCount.immutable = false;
+		optBackBufferCount.possibleValues.push_back( "Auto" );
+		optBackBufferCount.possibleValues.push_back( "1" );
+		optBackBufferCount.possibleValues.push_back( "2" );
+		optBackBufferCount.currentValue = "Auto";
+
         optAA.name = "FSAA";
         optAA.immutable = false;
         optAA.possibleValues.push_back( "None" );
@@ -342,6 +365,7 @@ namespace Ogre
         mOptions[optMultihead.name] = optMultihead;
         mOptions[optVSync.name] = optVSync;
         mOptions[optVSyncInterval.name] = optVSyncInterval;
+		mOptions[optBackBufferCount.name] = optBackBufferCount;
         mOptions[optAA.name] = optAA;
         mOptions[optFPUMode.name] = optFPUMode;
         mOptions[optNVPerfHUD.name] = optNVPerfHUD;
@@ -479,6 +503,19 @@ namespace Ogre
             else mMultiheadUse = mutAuto;
         }
 
+		if (name == "VSync Interval")
+		{
+			mVSyncInterval = StringConverter::parseUnsignedInt(value);
+		}
+
+		if( name == "VSync" )
+		{
+			if (value == "Yes")
+				mVSync = true;
+			else
+				mVSync = false;
+		}
+		
         if( name == "FSAA" )
         {
             StringVector values = StringUtil::split(value, " ", 1);
@@ -487,6 +524,18 @@ namespace Ogre
                 mFSAAHint = values[1];
 
         }
+		
+		if (name == "Backbuffer Count")
+		{
+			if (value == "Auto")
+			{
+				mBackBufferCount = -1;
+			}
+			else
+			{
+				mBackBufferCount = StringConverter::parseUnsignedInt(value);
+			}
+		}
 
         if( name == "Allow NVPerfHUD" )
         {
@@ -609,6 +658,12 @@ namespace Ogre
                 "the 'Rendering Device' has been changed.";
         }
 
+		it = mOptions.find( "VSync" );
+		if( it->second.currentValue == "Yes" )
+			mVSync = true;
+		else
+			mVSync = false;
+
         return BLANKSTRING;
     }
     //---------------------------------------------------------------------
@@ -715,10 +770,14 @@ namespace Ogre
             miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
             miscParams["FSAA"] = StringConverter::toString(mFSAASamples);
             miscParams["FSAAHint"] = mFSAAHint;
+			miscParams["vsync"] = StringConverter::toString(mVSync);
+			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
+
             miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
             miscParams["gamma"] = StringConverter::toString(hwGamma);
             miscParams["monitorIndex"] = StringConverter::toString(static_cast<int>(mActiveD3DDriver->getAdapterNumber()));
-
+			miscParams["Backbuffer Count"] = StringConverter::toString(mBackBufferCount);
+			
             opt = mOptions.find("VSync");
             if (opt == mOptions.end())
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "D3D9RenderSystem::initialise");
@@ -4282,6 +4341,11 @@ namespace Ogre
     }
 
     //---------------------------------------------------------------------
+	bool D3D9RenderSystem::IsActiveDeviceLost() 
+	{
+		return D3D9RenderSystem::getDeviceManager()->getActiveDevice()->isDeviceLost();
+	}
+
     unsigned int D3D9RenderSystem::getDisplayMonitorCount() const
     {
         return mD3D->GetAdapterCount();

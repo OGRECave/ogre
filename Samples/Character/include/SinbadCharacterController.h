@@ -121,30 +121,13 @@ public:
         }
     }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    void injectMouseMove(const OIS::MultiTouchEvent& evt)
+    void injectPointerMove(const OIS::PointerEvent& evt)
     {
         // update camera goal based on mouse movement
         updateCameraGoal(-0.05f * evt.state.X.rel, -0.05f * evt.state.Y.rel, -0.0005f * evt.state.Z.rel);
     }
 
-    void injectMouseDown(const OIS::MultiTouchEvent& evt)
-    {
-        if (mSwordsDrawn && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
-        {
-            // if swords are out, and character's not doing something weird, then SLICE!
-            setTopAnimation(ANIM_SLICE_VERTICAL, true);
-            mTimer = 0;
-        }
-    }
-#else
-    void injectMouseMove(const OIS::MouseEvent& evt)
-    {
-        // update camera goal based on mouse movement
-        updateCameraGoal(-0.05f * evt.state.X.rel, -0.05f * evt.state.Y.rel, -0.0005f * evt.state.Z.rel);
-    }
-
-    void injectMouseDown(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+    void injectPointerDown(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
     {
         if (mSwordsDrawn && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
         {
@@ -154,7 +137,6 @@ public:
             mTimer = 0;
         }
     }
-#endif
 
 private:
 

@@ -129,7 +129,11 @@ namespace Ogre
         /** Returns the name of the rendering system.
         */
         virtual const String& getName(void) const = 0;
-
+		
+		/** Returns the friendly name of the render system
+		*/
+		virtual const String& getFriendlyName(void) const = 0;
+		
         /** Returns the details of this API's configuration options
         @remarks
         Each render system must be able to inform the world

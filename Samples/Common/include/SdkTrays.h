@@ -2913,19 +2913,11 @@ namespace OgreBites
         | Processes mouse button down events. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        bool injectMouseDown(const OIS::MultiTouchEvent& evt)
-#else
-        bool injectMouseDown(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-#endif
+        bool injectPointerDown(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             // only process left button when stuff is visible
             if (!mCursorLayer->isVisible() || id != OIS::MB_Left) return false;
-#else
-            // only process touches when stuff is visible
-            if (!mCursorLayer->isVisible()) return false;
-#endif
+
             Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
 
             mTrayDrag = false;
@@ -2949,7 +2941,8 @@ namespace OgreBites
                 return true;
             }
 
-            for (unsigned int i = 0; i < 9; i++)   // check if mouse is over a non-null tray
+            // process widgets in reverse ZOrder
+            for (int i = 8; i >= 0; --i)   // check if mouse is over a non-null tray
             {
                 if (mTrays[i]->isVisible() && Widget::isCursorOver(mTrays[i], cursorPos, 2))
                 {
@@ -2958,10 +2951,11 @@ namespace OgreBites
                 }
             }
 
-            for (unsigned int i = 0; i < mWidgets[9].size(); i++)  // check if mouse is over a non-null tray's widgets
+            for (int j = (int)mWidgets[9].size() - 1; j >= 0 ; --j)  // check if mouse is over a non-null tray's widgets
             {
-                if (mWidgets[9][i]->getOverlayElement()->isVisible() &&
-                    Widget::isCursorOver(mWidgets[9][i]->getOverlayElement(), cursorPos))
+                if(j >= (int)mWidgets[9].size()) continue;
+                Widget* w = mWidgets[9][j];
+                if (w->getOverlayElement()->isVisible() && Widget::isCursorOver(w->getOverlayElement(), cursorPos))
                 {
                     mTrayDrag = true;   // initiate a drag that originates in a tray
                     break;
@@ -2970,12 +2964,13 @@ namespace OgreBites
 
             if (!mTrayDrag) return false;   // don't process if mouse press is not in tray
 
-            for (unsigned int i = 0; i < 10; i++)
+            for (int i = 9; i >= 0; --i)
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (unsigned int j = 0; j < mWidgets[i].size(); j++)
+                for (int j = (int)mWidgets[i].size() - 1; j >= 0; --j)
                 {
+                    if(j >= (int)mWidgets[i].size()) continue;
                     Widget* w = mWidgets[i][j];
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorPressed(cursorPos);    // send event to widget
@@ -2996,19 +2991,11 @@ namespace OgreBites
         | Processes mouse button up events. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        bool injectMouseUp(const OIS::MultiTouchEvent& evt)
-#else
-        bool injectMouseUp(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-#endif
+        bool injectPointerUp(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
             // only process left button when stuff is visible
             if (!mCursorLayer->isVisible() || id != OIS::MB_Left) return false;
-#else
-            // only process touches when stuff is visible
-            if (!mCursorLayer->isVisible()) return false;
-#endif
+
             Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
 
             if (mExpandedMenu)   // only check top priority widget until it passes on
@@ -3032,15 +3019,15 @@ namespace OgreBites
 
             if (!mTrayDrag) return false;    // this click did not originate in a tray, so don't process
 
-            Widget* w;
-
-            for (unsigned int i = 0; i < 10; i++)
+            // process trays and widgets in reverse ZOrder
+            for (int i = 9; i >= 0; --i)
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (unsigned int j = 0; j < mWidgets[i].size(); j++)
+                for (int j = (int)mWidgets[i].size() - 1; j >= 0; --j)
                 {
-                    w = mWidgets[i][j];
+                    if(j >= (int)mWidgets[i].size()) continue;
+                    Widget* w = mWidgets[i][j];
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorReleased(cursorPos);    // send event to widget
                 }
@@ -3054,11 +3041,7 @@ namespace OgreBites
         | Updates cursor position. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        bool injectMouseMove(const OIS::MultiTouchEvent& evt)
-#else
-        bool injectMouseMove(const OIS::MouseEvent& evt)
-#endif
+        bool injectPointerMove(const OIS::PointerEvent& evt)
         {
             if (!mCursorLayer->isVisible()) return false;   // don't process if cursor layer is invisible
 
@@ -3083,15 +3066,15 @@ namespace OgreBites
                 return true;
             }
 
-            Widget* w;
-
-            for (unsigned int i = 0; i < 10; i++)
+            // process trays and widgets in reverse ZOrder
+            for (int i = 9; i >= 0; --i)
             {
                 if (!mTrays[i]->isVisible()) continue;
 
-                for (unsigned int j = 0; j < mWidgets[i].size(); j++)
+                for (int j = (int)mWidgets[i].size() - 1; j >= 0; --j)
                 {
-                    w = mWidgets[i][j];
+                    if(j >= (int)mWidgets[i].size()) continue;
+                    Widget* w = mWidgets[i][j];
                     if (!w->getOverlayElement()->isVisible()) continue;
                     w->_cursorMoved(cursorPos);    // send event to widget
                 }

@@ -63,6 +63,7 @@ THE SOFTWARE.
 #include "OgreRectangle2D.h"
 #include "OgreLodListener.h"
 #include "OgreInstancedGeometry.h"
+#include "OgreUnifiedHighLevelGpuProgram.h"
 
 // This class implements the most basic scene manager
 
@@ -1581,18 +1582,20 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     camera->_notifyRenderedBatches(mDestRenderSystem->_getBatchCount());
 
     Root::getSingleton()._popCurrentSceneManager(this);
-
 }
-
-
 //-----------------------------------------------------------------------
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
 
+    if(sys)
+    {
+        if (sys->getName().find("Direct3D11") != String::npos)
+        {
+            UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
+        }
+    }
 }
-
-
 //-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)
 {
@@ -2500,6 +2503,8 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
         renderObjects(pPriorityGrp->getSolidsBasic(), om, true, true);
     }
 
+    // Override auto param ambient to force vertex programs to use shadow colour
+    mAutoParamDataSource->setAmbientLightColour(mShadowColour);
 
     // Iterate over lights, render all volumes to stencil
     LightList::const_iterator li, liend;
@@ -2527,6 +2532,9 @@ void SceneManager::renderModulativeStencilShadowedQueueGroupObjects(
         }
 
     }// for each light
+
+    // Restore ambient light
+    mAutoParamDataSource->setAmbientLightColour(mAmbientLight);
 
     // Iterate again - variable name changed to appease gcc.
     RenderQueueGroup::PriorityMapIterator groupIt2 = pGroup->getIterator();
@@ -4769,29 +4777,37 @@ void SceneManager::initShadowVolumeMaterials(void)
 
     if (!mShadowModulativePass)
     {
+    MaterialPtr matModStencil = MaterialManager::getSingleton().getByName(
+        "Ogre/StencilShadowModulationPass");
+    if (matModStencil.isNull())
+    {
+        // Init
+        matModStencil = MaterialManager::getSingleton().create(
+            "Ogre/StencilShadowModulationPass",
+            ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+        mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
+        mShadowModulativePass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO);
+        mShadowModulativePass->setLightingEnabled(false);
+        mShadowModulativePass->setDepthWriteEnabled(false);
+        mShadowModulativePass->setDepthCheckEnabled(false);
+        mShadowModulativePass->createTextureUnitState();
 
-        MaterialPtr matModStencil = MaterialManager::getSingleton().getByName(
-            "Ogre/StencilShadowModulationPass");
-        if (matModStencil.isNull())
-        {
-            // Init
-            matModStencil = MaterialManager::getSingleton().create(
-                "Ogre/StencilShadowModulationPass",
-                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-            mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
-            mShadowModulativePass->setSceneBlending(SBF_DEST_COLOUR, SBF_ZERO); 
-            mShadowModulativePass->setLightingEnabled(false);
-            mShadowModulativePass->setDepthWriteEnabled(false);
-            mShadowModulativePass->setDepthCheckEnabled(false);
-            TextureUnitState* t = mShadowModulativePass->createTextureUnitState();
-            t->setColourOperationEx(LBX_MODULATE, LBS_MANUAL, LBS_CURRENT, 
-                mShadowColour);
-            mShadowModulativePass->setCullingMode(CULL_NONE);
-        }
-        else
-        {
-            mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
-        }
+
+        mShadowModulativePass->setCullingMode(CULL_NONE);
+
+        mShadowModulativePass->setVertexProgram("Ogre/ShadowBlendVP");
+        mShadowModulativePass->setFragmentProgram("Ogre/ShadowBlendFP");
+
+        mShadowModulativePass->getFragmentProgramParameters()->setNamedConstant("shadowColor", mShadowColour);
+        mShadowModulativePass->getVertexProgramParameters()->setAutoConstant(0, Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+
+
+    }
+    else
+    {
+        mShadowModulativePass = matModStencil->getTechnique(0)->getPass(0);
+    }
+
     }
 
     // Also init full screen quad while we're at it
@@ -5854,8 +5870,7 @@ void SceneManager::setShadowColour(const ColourValue& colour)
     // otherwise, it'll set up while preparing shadow materials.
     if (mShadowModulativePass)
     {
-        mShadowModulativePass->getTextureUnitState(0)->setColourOperationEx(
-            LBX_MODULATE, LBS_MANUAL, LBS_CURRENT, colour);
+		mShadowModulativePass->getFragmentProgramParameters()->setNamedConstant("shadowColor",colour);
     }
 }
 //---------------------------------------------------------------------

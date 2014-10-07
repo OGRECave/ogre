@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreSingleton.h"
+#include "OgreFileSystemLayer.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreSceneManager.h"
 #include "OgreShaderRenderState.h"
@@ -38,7 +39,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class FileSystemLayer;
 
 namespace RTShader {
 
@@ -421,6 +421,23 @@ public:
     */
     bool validateMaterial(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);    
 
+	/**
+	Invalidate specific material scheme. This action will lead to shader regeneration of the technique belongs to the
+	given scheme name.
+	@param schemeName The scheme to invalidate.
+	@param materialName The material to invalidate.
+	@param groupName The source group name.
+	*/
+	void invalidateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
+	/**
+	Validate specific material scheme. This action will generate shader programs illumination passes of the technique of the
+	given scheme name.
+	@param schemeName The scheme to validate.
+	@param materialName The material to validate.
+	@param groupName The source group name.
+	*/
+	bool validateMaterialIlluminationPasses(const String& schemeName, const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
     /** 
     Return custom material Serializer of the shader generator.
@@ -528,7 +545,7 @@ protected:
     class _OgreRTSSExport SGPass : public RTShaderSystemAlloc
     {
     public:
-        SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass);
+		SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass, IlluminationStage stage);
         ~SGPass();
     
         /** Build the render state. */
@@ -549,6 +566,12 @@ protected:
 
         /** Get destination pass. */
         Pass* getDstPass() { return mDstPass; }
+
+		/** Get illumination stage. */
+		IlluminationStage getIlluminationStage() { return mStage; }
+
+		/** Get illumination state. */
+		bool isIlluminationPass() { return mStage != IS_UNKNOWN; }
 
         /** Get custom FPP sub state of this pass. */
         SubRenderState* getCustomFFPSubState(int subStateOrder);
@@ -572,6 +595,8 @@ protected:
         Pass* mSrcPass;
         // Destination pass.
         Pass* mDstPass;
+		// Illumination stage
+		IlluminationStage mStage;
         // Custom render state.
         RenderState* mCustomRenderState;
         // The compiled render state.
@@ -604,6 +629,15 @@ protected:
         /** Acquire the CPU/GPU programs for this technique. */
         void acquirePrograms();
 
+		/** Build the render state for illumination passes. */
+		void buildIlluminationTargetRenderState();
+
+		/** Acquire the CPU/GPU programs for illumination passes of this technique. */
+		void acquireIlluminationPrograms();
+
+		/** Destroy the illumination passes entries. */
+		void destroyIlluminationSGPasses();
+
         /** Release the CPU/GPU programs of this technique. */
         void releasePrograms();
 
@@ -628,17 +662,22 @@ protected:
         /** Create the passes entries. */
         void createSGPasses();
 
+		/** Create the illumination passes entries. */
+		void createIlluminationSGPasses();
+
         /** Destroy the passes entries. */
         void destroySGPasses();
         
     protected:
+        // Auto mutex.
+        OGRE_AUTO_MUTEX;
         // Parent material.     
         SGMaterial* mParent;
         // Source technique.
         Technique* mSrcTechnique;
         // Destination technique.
         Technique* mDstTechnique;
-        // All passes entries.
+		// All passes entries, both normal and illumination.
         SGPassList mPassEntries;
         // The custom render states of all passes.
         RenderStateList mCustomRenderStates;
@@ -713,7 +752,17 @@ protected:
         @see ShaderGenerator::validateMaterial.
         */
         bool validate(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-                
+
+		/** Validate illumination passes of the specific material.
+		@see ShaderGenerator::invalidateMaterialIlluminationPasses.
+		*/
+		void invalidateIlluminationPasses(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
+		/** Validate illumination passes of the specific material.
+		@see ShaderGenerator::validateMaterialIlluminationPasses.
+		*/
+		bool validateIlluminationPasses(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+
         /** Add a technique to current techniques list. */
         void addTechniqueEntry(SGTechnique* techEntry);
 

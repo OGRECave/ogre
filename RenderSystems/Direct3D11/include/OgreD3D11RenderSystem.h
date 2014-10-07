@@ -35,7 +35,9 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-#define MAX_LIGHTS 8
+	// Enable recognizing SM2.0 HLSL shaders.
+	// (the same shader code could be used by many RenderSystems, directly or via Cg)
+	#define SUPPORT_SM2_0_HLSL_SHADERS  0
 
     class D3D11DriverList;
     class D3D11Driver;
@@ -54,23 +56,18 @@ namespace Ogre
             DT_HARDWARE, // GPU based
             DT_SOFTWARE, // microsoft original (slow) software driver
             DT_WARP // microsoft new (faster) software driver - (Windows Advanced Rasterization Platform) - http://msdn.microsoft.com/en-us/library/dd285359.aspx
-
         };
 
         OGRE_D3D11_DRIVER_TYPE mDriverType; // d3d11 driver type
         D3D_FEATURE_LEVEL mFeatureLevel;
         D3D_FEATURE_LEVEL mMinRequestedFeatureLevel;
         D3D_FEATURE_LEVEL mMaxRequestedFeatureLevel;
-        /// Direct3D
-        //int           mpD3D;
+
         /// Direct3D rendering device
         D3D11Device     mDevice;
         
         // Stored options
         ConfigOptionMap mOptions;
-
-        /// instance
-        HINSTANCE mhInstance;
 
         /// List of D3D drivers installed (video cards)
         D3D11DriverList* mDriverList;
@@ -78,27 +75,18 @@ namespace Ogre
         D3D11Driver* mActiveD3DDriver;
         /// NVPerfHUD allowed?
         bool mUseNVPerfHUD;
-        /// Per-stage constant support? (not in main caps since D3D specific & minor)
-        bool mPerStageConstantSupport;
+		int mSwitchingFullscreenCounter;	// Are we switching from windowed to fullscreen 
 
         /// structure holding texture unit settings for every stage
-
+		std::string getCreationErrorMessage(HRESULT hr, bool isDebug);
 
         D3D11DriverList* getDirect3DDrivers(void);
         void refreshD3DSettings(void);
         void refreshFSAAOptions(void);
         void freeDevice(void);
 
-//      inline bool compareDecls( D3DVERTEXELEMENT9* pDecl1, D3DVERTEXELEMENT9* pDecl2, size_t size );
-
-
-        void initInputDevices(void);
-        void processInputDevices(void);
-        
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
-        /// check if a FSAA is supported
-        bool _checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format);
         
         D3D11HardwareBufferManager* mHardwareBufferManager;
         D3D11GpuProgramManager* mGpuProgramManager;
@@ -177,7 +165,6 @@ namespace Ogre
         struct sD3DTextureStageDesc
         {
             /// the type of the texture
-            //D3D11Mappings::eD3DTexType texType;
             TextureType type;
             /// which texCoordIndex to use
             size_t coordIndex;
@@ -185,15 +172,11 @@ namespace Ogre
             /// texture 
             ID3D11ShaderResourceView  *pTex;
             D3D11_SAMPLER_DESC  samplerDesc;
-            D3D11_SAMPLER_DESC currentSamplerDesc;
-            //ID3D11SamplerState * pSampler;
             bool used;
         } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];
 
 
-        // What follows is a set of duplicated lists just to make it
-        // easier to deal with lost devices
-        
+
         /// Primary window, the one used to create the device
         D3D11RenderWindowBase* mPrimaryWindow;
 
@@ -201,8 +184,6 @@ namespace Ogre
         // List of additional windows after the first (swap chains)
         SecondaryWindowList mSecondaryWindows;
 
-        bool mBasicStatesInitialised;
-        
         bool mRenderSystemWasInited;
 
         IDXGIFactoryN*  mpDXGIFactory;
@@ -226,8 +207,11 @@ namespace Ogre
 
         // destructor
         ~D3D11RenderSystem();
-
-
+		
+		
+		int getSwitchingFullscreenCounter() const					{ return mSwitchingFullscreenCounter; }
+		void addToSwitchingFullscreenCounter()					{ mSwitchingFullscreenCounter++; }
+		
         void initRenderSystem();
 
         virtual void initConfigOptions(void);
@@ -239,6 +223,9 @@ namespace Ogre
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0);
+
+        /// @copydoc RenderSystem::fireDeviceEvent
+        void fireDeviceEvent( D3D11Device* device, const String & name, D3D11RenderWindowBase* sendingWindow = NULL);
 
         /// @copydoc RenderSystem::createRenderTexture
         RenderTexture * createRenderTexture( const String & name, unsigned int width, unsigned int height,
@@ -264,6 +251,9 @@ namespace Ogre
         virtual RenderTarget * detachRenderTarget(const String &name);
 
         const String& getName(void) const;
+		
+		const String& getFriendlyName(void) const;
+		
         void getCustomAttribute(const String& name, void* pData);
         // Low-level overridden members
         void setConfigOption( const String &name, const String &value );
@@ -310,8 +300,7 @@ namespace Ogre
         void _setTesselationDomainTexture(size_t unit, const TexturePtr& tex);
         void _disableTextureUnit(size_t texUnit);
         void _setTextureCoordSet( size_t unit, size_t index );
-        void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m, 
-            const Frustum* frustum = 0);
+        void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m, const Frustum* frustum = 0);
         void _setTextureBlendMode( size_t unit, const LayerBlendModeEx& bm );
         void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
         void _setTextureBorderColour(size_t stage, const ColourValue& colour);
@@ -333,16 +322,14 @@ namespace Ogre
         void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
         void _setDepthBias(float constantBias, float slopeScaleBias);
         void _setFog( FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0 );
-        void _convertProjectionMatrix(const Matrix4& matrix,
-            Matrix4& dest, bool forGpuProgram = false);
+		void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool forGpuProgram = false);
         void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
             Matrix4& dest, bool forGpuProgram = false);
         void _makeProjectionMatrix(Real left, Real right, Real bottom, Real top, Real nearPlane, 
             Real farPlane, Matrix4& dest, bool forGpuProgram = false);
         void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
             Matrix4& dest, bool forGpuProgram = false);
-        void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, 
-            bool forGpuProgram);
+        void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, bool forGpuProgram);
         void _setPolygonMode(PolygonMode level);
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
         void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);

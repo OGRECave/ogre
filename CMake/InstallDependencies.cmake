@@ -133,7 +133,7 @@ endif () # OGRE_INSTALL_DEPENDENCIES
     
   if(WIN32)
     # copy the dependency DLLs to the right places
-    if(NOT OGRE_BUILD_PLATFORM_WINRT)
+    if(NOT (WINDOWS_STORE OR WINDOWS_PHONE))
       install_debug(OIS_d.dll)
       install_release(OIS.dll)
     endif ()
@@ -251,7 +251,7 @@ if (OGRE_COPY_DEPENDENCIES)
 
   if (WIN32)
     # copy the required DLLs to the build directory (configure_file is the only copy-like op I found in CMake)
-	if( (OGRE_BUILD_SAMPLES OR OGRE_BUILD_TESTS) AND (NOT OGRE_BUILD_PLATFORM_WINRT) )
+	if( (OGRE_BUILD_SAMPLES OR OGRE_BUILD_TESTS) AND NOT (WINDOWS_STORE OR WINDOWS_PHONE) )
 		if(EXISTS ${OIS_BINARY_DBG} AND EXISTS ${OIS_BINARY_REL})
 		  file(COPY ${OIS_BINARY_DBG} DESTINATION ${OGRE_BINARY_DIR}/bin/debug)
 		  file(COPY ${OIS_BINARY_REL} DESTINATION ${OGRE_BINARY_DIR}/bin/release)

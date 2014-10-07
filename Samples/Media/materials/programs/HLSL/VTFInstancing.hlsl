@@ -37,7 +37,7 @@ struct VS_OUTPUT
 #define SHADOW_BIAS 0
 
 #ifdef ST_DUAL_QUATERNION
-#include "DualQuaternion_Common.cg"
+#include "DualQuaternion_Common.hlsl"
 #endif
 
 #define LOD 0

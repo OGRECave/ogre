@@ -35,8 +35,8 @@ THE SOFTWARE.
 // http://www.geometrictools.com/License/Boost/LICENSE_1_0.txt
 
 #include "OgreQuaternion.h"
-
 #include "OgreMatrix3.h"
+
 
 namespace Ogre {
 
@@ -396,25 +396,25 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Vector3 Quaternion::operator* (const Vector3& v) const
     {
-        // nVidia SDK implementation
-        Vector3 uv, uuv;
-        Vector3 qvec(x, y, z);
-        uv = qvec.crossProduct(v);
-        uuv = qvec.crossProduct(uv);
-        uv *= (2.0f * w);
-        uuv *= 2.0f;
+		// nVidia SDK implementation
+		Vector3 uv, uuv;
+		Vector3 qvec(x, y, z);
+		uv = qvec.crossProduct(v);
+		uuv = qvec.crossProduct(uv);
+		uv *= (2.0f * w);
+		uuv *= 2.0f;
 
-        return v + uv + uuv;
+		return v + uv + uuv;
 
     }
     //-----------------------------------------------------------------------
-    bool Quaternion::equals(const Quaternion& rhs, const Radian& tolerance) const
-    {
+	bool Quaternion::equals(const Quaternion& rhs, const Radian& tolerance) const
+	{
         Real d = Dot(rhs);
-        Radian angle = Math::ACos(2 * d*d - 1.0);
+        Radian angle = Math::ACos(2.0f * d*d - 1.0f);
 
-        return Math::Abs(angle.valueRadians()) <= tolerance.valueRadians();
-    }
+		return Math::Abs(angle.valueRadians()) <= tolerance.valueRadians();
+	}
     //-----------------------------------------------------------------------
     Quaternion Quaternion::Slerp (Real fT, const Quaternion& rkP,
         const Quaternion& rkQ, bool shortestPath)
@@ -510,94 +510,94 @@ namespace Ogre {
         return len;
     }
     //-----------------------------------------------------------------------
-    Radian Quaternion::getRoll(bool reprojectAxis) const
-    {
-        if (reprojectAxis)
-        {
-            // roll = atan2(localx.y, localx.x)
-            // pick parts of xAxis() implementation that we need
-//          Real fTx  = 2.0*x;
-            Real fTy  = 2.0f*y;
-            Real fTz  = 2.0f*z;
-            Real fTwz = fTz*w;
-            Real fTxy = fTy*x;
-            Real fTyy = fTy*y;
-            Real fTzz = fTz*z;
+	Radian Quaternion::getRoll(bool reprojectAxis) const
+	{
+		if (reprojectAxis)
+		{
+			// roll = atan2(localx.y, localx.x)
+			// pick parts of xAxis() implementation that we need
+//			Real fTx  = 2.0*x;
+			Real fTy  = 2.0f*y;
+			Real fTz  = 2.0f*z;
+			Real fTwz = fTz*w;
+			Real fTxy = fTy*x;
+			Real fTyy = fTy*y;
+			Real fTzz = fTz*z;
 
-            // Vector3(1.0-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
+			// Vector3(1.0-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
 
-            return Radian(Math::ATan2(fTxy+fTwz, 1.0f-(fTyy+fTzz)));
+			return Radian(Math::ATan2(fTxy+fTwz, 1.0f-(fTyy+fTzz)));
 
-        }
-        else
-        {
-            return Radian(Math::ATan2(2*(x*y + w*z), w*w + x*x - y*y - z*z));
-        }
-    }
+		}
+		else
+		{
+			return Radian(Math::ATan2(2*(x*y + w*z), w*w + x*x - y*y - z*z));
+		}
+	}
     //-----------------------------------------------------------------------
-    Radian Quaternion::getPitch(bool reprojectAxis) const
-    {
-        if (reprojectAxis)
-        {
-            // pitch = atan2(localy.z, localy.y)
-            // pick parts of yAxis() implementation that we need
-            Real fTx  = 2.0f*x;
-//          Real fTy  = 2.0f*y;
-            Real fTz  = 2.0f*z;
-            Real fTwx = fTx*w;
-            Real fTxx = fTx*x;
-            Real fTyz = fTz*y;
-            Real fTzz = fTz*z;
+	Radian Quaternion::getPitch(bool reprojectAxis) const
+	{
+		if (reprojectAxis)
+		{
+			// pitch = atan2(localy.z, localy.y)
+			// pick parts of yAxis() implementation that we need
+			Real fTx  = 2.0f*x;
+//			Real fTy  = 2.0f*y;
+			Real fTz  = 2.0f*z;
+			Real fTwx = fTx*w;
+			Real fTxx = fTx*x;
+			Real fTyz = fTz*y;
+			Real fTzz = fTz*z;
 
-            // Vector3(fTxy-fTwz, 1.0-(fTxx+fTzz), fTyz+fTwx);
-            return Radian(Math::ATan2(fTyz+fTwx, 1.0f-(fTxx+fTzz)));
-        }
-        else
-        {
-            // internal version
-            return Radian(Math::ATan2(2*(y*z + w*x), w*w - x*x - y*y + z*z));
-        }
-    }
+			// Vector3(fTxy-fTwz, 1.0-(fTxx+fTzz), fTyz+fTwx);
+			return Radian(Math::ATan2(fTyz+fTwx, 1.0f-(fTxx+fTzz)));
+		}
+		else
+		{
+			// internal version
+			return Radian(Math::ATan2(2*(y*z + w*x), w*w - x*x - y*y + z*z));
+		}
+	}
     //-----------------------------------------------------------------------
-    Radian Quaternion::getYaw(bool reprojectAxis) const
-    {
-        if (reprojectAxis)
-        {
-            // yaw = atan2(localz.x, localz.z)
-            // pick parts of zAxis() implementation that we need
-            Real fTx  = 2.0f*x;
-            Real fTy  = 2.0f*y;
-            Real fTz  = 2.0f*z;
-            Real fTwy = fTy*w;
-            Real fTxx = fTx*x;
-            Real fTxz = fTz*x;
-            Real fTyy = fTy*y;
+	Radian Quaternion::getYaw(bool reprojectAxis) const
+	{
+		if (reprojectAxis)
+		{
+			// yaw = atan2(localz.x, localz.z)
+			// pick parts of zAxis() implementation that we need
+			Real fTx  = 2.0f*x;
+			Real fTy  = 2.0f*y;
+			Real fTz  = 2.0f*z;
+			Real fTwy = fTy*w;
+			Real fTxx = fTx*x;
+			Real fTxz = fTz*x;
+			Real fTyy = fTy*y;
 
-            // Vector3(fTxz+fTwy, fTyz-fTwx, 1.0-(fTxx+fTyy));
+			// Vector3(fTxz+fTwy, fTyz-fTwx, 1.0-(fTxx+fTyy));
 
-            return Radian(Math::ATan2(fTxz+fTwy, 1.0f-(fTxx+fTyy)));
+			return Radian(Math::ATan2(fTxz+fTwy, 1.0f-(fTxx+fTyy)));
 
-        }
-        else
-        {
-            // internal version
-            return Radian(Math::ASin(-2*(x*z - w*y)));
-        }
-    }
+		}
+		else
+		{
+			// internal version
+			return Radian(Math::ASin(-2*(x*z - w*y)));
+		}
+	}
     //-----------------------------------------------------------------------
     Quaternion Quaternion::nlerp(Real fT, const Quaternion& rkP,
         const Quaternion& rkQ, bool shortestPath)
     {
-        Quaternion result;
+		Quaternion result;
         Real fCos = rkP.Dot(rkQ);
-        if (fCos < 0.0f && shortestPath)
-        {
-            result = rkP + fT * ((-rkQ) - rkP);
-        }
-        else
-        {
-            result = rkP + fT * (rkQ - rkP);
-        }
+		if (fCos < 0.0f && shortestPath)
+		{
+			result = rkP + fT * ((-rkQ) - rkP);
+		}
+		else
+		{
+			result = rkP + fT * (rkQ - rkP);
+		}
         result.normalise();
         return result;
     }

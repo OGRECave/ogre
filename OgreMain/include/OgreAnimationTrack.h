@@ -233,7 +233,7 @@ namespace Ogre
         virtual void _buildKeyFrameIndexMap(const vector<Real>::type& keyFrameTimes);
         
         /** Internal method to re-base the keyframes relative to a given keyframe. */
-        virtual void _applyBaseKeyFrame(const KeyFrame* base) {}
+        virtual void _applyBaseKeyFrame(const KeyFrame* base);
 
         /** Set a listener for this track. */
         virtual void setListener(Listener* l) { mListener = l; }

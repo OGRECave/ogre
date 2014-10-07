@@ -64,8 +64,12 @@ namespace Ogre
         IDirect3D9*  mD3D;      
         // Stored options
         ConfigOptionMap mOptions;
+        // TODO: remove following fields, use values directly from mOptions map as other render systems does
         size_t mFSAASamples;
         String mFSAAHint;
+        bool mVSync; 
+        unsigned int mVSyncInterval;
+        unsigned int mBackBufferCount; // -1 means 2 for vsync and 1 for no vsync
 
         /// instance
         HINSTANCE mhInstance;
@@ -242,6 +246,9 @@ namespace Ogre
 
         String getErrorDescription( long errorNumber ) const;
         const String& getName() const;
+
+		const String& getFriendlyName() const;
+
         // Low-level overridden members
         void setConfigOption( const String &name, const String &value );
         void reinitialise();
@@ -352,7 +359,9 @@ namespace Ogre
         Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
         */
         virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
-        
+
+		bool IsActiveDeviceLost();
+
         /// Tells whether the system is initialized with DirectX 9Ex driver
         /// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
         static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }

@@ -113,14 +113,14 @@ namespace Ogre {
                     return ((width+3)/4)*((height+3)/4)*16 * depth;
                 case PF_BC4_SNORM:
                 case PF_BC4_UNORM:
-                    return ceilf(width/4.0f)*ceilf(height/4.0f)*8.0f;
+                    return ((width+3)/4)*((height+3)/4)*8;
                 case PF_BC5_SNORM:
                 case PF_BC5_UNORM:
                 case PF_BC6H_SF16:
                 case PF_BC6H_UF16:
                 case PF_BC7_UNORM:
                 case PF_BC7_UNORM_SRGB:
-                    return ceilf(width/4.0f)*ceilf(height/4.0f)*16.0f;
+                    return ((width+3)/4)*((height+3)/4)*16;
 
                 // Size calculations from the PVRTC OpenGL extension spec
                 // http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt

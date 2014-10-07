@@ -27,8 +27,7 @@ THE SOFTWARE.
 */
 #include <directxmath.h>
 
-#include "SampleBrowserWinRT.h"
-#include "BasicTimer.h"
+#include "SampleBrowser_WinRT.h"
 
 using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Core;
@@ -59,7 +58,7 @@ void SampleBrowserWinRT::Initialize(CoreApplicationView^ applicationView)
 
 void SampleBrowserWinRT::SetWindow(CoreWindow^ window)
 {
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_PC_APP)
+#if !__OGRE_WINRT_PHONE
 	window->PointerCursor = nullptr;
 #endif
 
@@ -90,7 +89,7 @@ void SampleBrowserWinRT::SetWindow(CoreWindow^ window)
     window->PointerWheelChanged +=
         ref new TypedEventHandler<CoreWindow^, PointerEventArgs^>(this, &SampleBrowserWinRT::OnPointerWheelChanged);
 
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
 	Windows::Phone::UI::Input::HardwareButtons::BackPressed +=
 		ref new EventHandler<Windows::Phone::UI::Input::BackPressedEventArgs^>(this, &SampleBrowserWinRT::OnBackPressed);
 #endif
@@ -102,20 +101,26 @@ void SampleBrowserWinRT::Load(Platform::String^ entryPoint)
 
 void SampleBrowserWinRT::Run()
 {
-    BasicTimer^ timer = ref new BasicTimer();
-
     CoreWindow::GetForCurrentThread()->Activate();
+    CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent); // required by WinPhone to move window to foreground
 
     m_sampleBrowser.initAppForWinRT(CoreWindow::GetForCurrentThread(), m_inputManager.GetInputContext());
-    m_sampleBrowser.initApp();
+    m_sampleBrowser.initApp(); // here resources are loaded and progressbar shown
+
+    Ogre::Timer timer;
+    float timerTotal = 0.001f * timer.getMilliseconds();
+    float timerDelta = 1.0f / 60.0f;
 
     while (!m_windowClosed && !Ogre::Root::getSingleton().endRenderingQueued())
     {
-        timer->Update();
         CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
-		m_inputManager.Update(timer->Total, timer->Delta);
-        if(!Ogre::Root::getSingleton().renderOneFrame(timer->Delta))
-			break;
+        m_inputManager.Update(timerTotal, timerDelta);
+        if(!Ogre::Root::getSingleton().renderOneFrame(timerDelta))
+            break;
+
+        float timerTotalPrev = timerTotal;
+        timerTotal = 0.001f * timer.getMilliseconds();
+        timerDelta = std::max(1.0f / 60.0f, timerTotal - timerTotalPrev);
     }
 
     m_sampleBrowser.closeApp();
@@ -193,7 +198,7 @@ void SampleBrowserWinRT::OnPointerWheelChanged(Windows::UI::Core::CoreWindow^ se
     if(m_inputManager.OnPointerAction(args->CurrentPoint, OgreBites::InputManagerWinRT::PointerWheelChanged)) args->Handled = true;
 }
 
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
 void SampleBrowserWinRT::OnBackPressed( Platform::Object ^sender, Windows::Phone::UI::Input::BackPressedEventArgs^ args)
 {
     // Send the back to main menu event unless we are already there in which case we exit all the way.

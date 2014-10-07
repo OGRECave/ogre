@@ -29,29 +29,20 @@ THE SOFTWARE.
 #include "OgrePaging.h"
 #include "OgreLogManager.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( PageCoreTests );
+#include "UnitTestSuite.h"
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(PageCoreTests);
+
+//--------------------------------------------------------------------------
 void PageCoreTests::setUp()
 {
-    // set up silent logging to not pollute output
-    if(LogManager::getSingletonPtr())
-        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-
-    if(LogManager::getSingletonPtr() == 0)
-    {
-        LogManager* logManager = OGRE_NEW LogManager();
-        logManager->createLog("testPageCore.log", true, false);
-    }
-    LogManager::getSingleton().setLogDetail(LL_LOW);
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
-
-#if OGRE_STATIC
-        mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
-#endif
 
 #ifdef OGRE_STATIC_LIB
     mRoot = OGRE_NEW Root(BLANKSTRING);
-        
     mStaticPluginLoader.load();
 #else
     String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
@@ -66,20 +57,22 @@ void PageCoreTests::setUp()
 
     mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
 }
-
+//--------------------------------------------------------------------------
 void PageCoreTests::tearDown()
 {
     OGRE_DELETE mPageManager;
     OGRE_DELETE mRoot;
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
-#if OGRE_STATIC
+
+#if OGRE_STATIC_LIB
     OGRE_DELETE mStaticPluginLoader;
 #endif
 }
-
-
+//--------------------------------------------------------------------------
 void PageCoreTests::testSimpleCreateSaveLoadWorld()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     String worldName = "MyWorld";
     String filename = "myworld.world";
     String sectionName1 = "Section1";
@@ -107,4 +100,5 @@ void PageCoreTests::testSimpleCreateSaveLoadWorld()
     section = world->getSection(sectionName2);
     CPPUNIT_ASSERT(section != 0);
 }
+//--------------------------------------------------------------------------
 

@@ -102,32 +102,39 @@ namespace Ogre {
 #   define FORCEINLINE __inline
 #endif
 
+/* define OGRE_NORETURN macro */
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#	define OGRE_NORETURN __declspec(noreturn)
+#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#	define OGRE_NORETURN __attribute__((noreturn))
+#else
+#	define OGRE_NORETURN
+#endif
+
 /* Finds the current platform */
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && !defined(__ANDROID__)
+#   include <sdkddkver.h>
 #   if defined(WINAPI_FAMILY)
-#       define __OGRE_HAVE_DIRECTXMATH 1
 #       include <winapifamily.h>
 #       if WINAPI_FAMILY == WINAPI_FAMILY_APP|| WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-#           define DESKTOP_APP 1
-#           define PHONE 2
 #           define OGRE_PLATFORM OGRE_PLATFORM_WINRT
-#           ifndef _CRT_SECURE_NO_WARNINGS
-#               define _CRT_SECURE_NO_WARNINGS
-#           endif
-#           ifndef _SCL_SECURE_NO_WARNINGS
-#               define _SCL_SECURE_NO_WARNINGS
-#           endif
-#           if WINAPI_FAMILY == WINAPI_FAMILY_APP
-#               define OGRE_WINRT_TARGET_TYPE DESKTOP_APP
-#           endif
-#           if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-#               define OGRE_WINRT_TARGET_TYPE PHONE
-#           endif
 #       else
 #           define OGRE_PLATFORM OGRE_PLATFORM_WIN32
 #       endif
 #   else
 #       define OGRE_PLATFORM OGRE_PLATFORM_WIN32
+#   endif
+#   define __OGRE_WINRT_STORE     (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_APP)        // WindowsStore 8.0 and 8.1
+#   define __OGRE_WINRT_PHONE     (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)  // WindowsPhone 8.0 and 8.1
+#   define __OGRE_WINRT_PHONE_80  (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP && _WIN32_WINNT <= _WIN32_WINNT_WIN8) // Windows Phone 8.0 often need special handling, while 8.1 is OK
+#   if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8 // i.e. this is modern SDK and we compile for OS with guaranteed support for DirectXMath
+#       define __OGRE_HAVE_DIRECTXMATH 1
+#   endif
+#   ifndef _CRT_SECURE_NO_WARNINGS
+#       define _CRT_SECURE_NO_WARNINGS
+#   endif
+#   ifndef _SCL_SECURE_NO_WARNINGS
+#       define _SCL_SECURE_NO_WARNINGS
 #   endif
 #elif defined(__EMSCRIPTEN__)
 #   define OGRE_PLATFORM OGRE_PLATFORM_EMSCRIPTEN
@@ -160,7 +167,7 @@ namespace Ogre {
 #endif
 
     /* Find the arch type */
-#if defined(__x86_64__) || defined(_M_X64) || defined(__powerpc64__) || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__arm64__) || defined(_aarch64_) || defined(__mips64) || defined(__mips64_)
+#if defined(__x86_64__) || defined(_M_X64) || defined(__powerpc64__) || defined(__alpha__) || defined(__ia64__) || defined(__s390__) || defined(__s390x__) || defined(__arm64__) || defined(__aarch64__) || defined(__mips64) || defined(__mips64_)
 #   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_64
 #else
 #   define OGRE_ARCH_TYPE OGRE_ARCHITECTURE_32

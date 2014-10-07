@@ -25,12 +25,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
 #include "OgreGLES2ManagedResource.h"
 #include "OgreGLES2ManagedResourceManager.h"
 #include "OgreGLES2RenderSystem.h"
 
 namespace Ogre
 {
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    
     GLES2ManagedResource::GLES2ManagedResource()
     {               
         GLES2RenderSystem::getResourceManager()->_notifyResourceCreated(static_cast<GLES2ManagedResource*>(this));
@@ -40,4 +44,7 @@ namespace Ogre
     {   
         GLES2RenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<GLES2ManagedResource*>(this));
     }
+
+ #endif
+
 }

@@ -63,10 +63,6 @@ namespace Ogre {
         /** Grab the NSOpenGLPixelFormat if it exists */
         NSOpenGLPixelFormat* getPixelFormat();
         
-        /* The pixel dimensions of the backbuffer */
-        GLint mBackingWidth;
-        GLint mBackingHeight;
-
     private:
         NSOpenGLContext* mNSGLContext;
         NSOpenGLPixelFormat *mNSGLPixelFormat;

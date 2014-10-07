@@ -62,7 +62,7 @@ elseif (EMSCRIPTEN)
 
   set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (WIN32)
-  if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
+  if (WINDOWS_STORE OR WINDOWS_PHONE)
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
       include/WIN32/OgreConfigDialogImpWinRT.h
@@ -70,10 +70,11 @@ elseif (WIN32)
       include/WIN32/OgreTimerImp.h
     )
     set(PLATFORM_SOURCE_FILES
+      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialogWinRT.cpp
       src/WIN32/OgreErrorDialogWinRT.cpp
+      src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
-	  src/WIN32/OgreOptimisedUtilDirectXMath.cpp
     )  
 
     set(PLATFORM_HEADER_INSTALL "WIN32")
@@ -86,6 +87,7 @@ elseif (WIN32)
       include/WIN32/OgreMinGWSupport.h
     )
     set(PLATFORM_SOURCE_FILES
+      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialog.cpp
       src/WIN32/OgreErrorDialog.cpp
       src/WIN32/OgreFileSystemLayer.cpp
@@ -281,9 +283,10 @@ endif ()
 set (TARGET_LINK_FLAGS "")
 
 # setup OgreMain target
-if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
+if (WINDOWS_STORE OR WINDOWS_PHONE)
 	# exclude OgreTimer.cpp from unity builds; causes problem
 	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
+	set_target_properties(OgreMain PROPERTIES VS_WINRT_COMPONENT "true")
 else ()
 	# exclude OgreAlignedAllocator.cpp from unity builds; causes problems on Linux
 	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")

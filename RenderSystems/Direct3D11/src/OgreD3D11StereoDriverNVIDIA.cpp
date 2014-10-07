@@ -87,10 +87,10 @@ namespace Ogre
 		stereoHandle.isStereoOn = 0;
 
 		// Create a new NVAPI stereo handle and verify it is activated
-		void* d3dDevice;
+		void* d3dDevice = NULL;
 		renderWindow->getCustomAttribute("D3DDEVICE", &d3dDevice);
 
-		NvAPI_Status nvStatus = NvAPI_Stereo_CreateHandleFromIUnknown(reinterpret_cast<ID3D11DeviceN*>(d3dDevice), &stereoHandle.nvapiStereoHandle);
+		NvAPI_Status nvStatus = NvAPI_Stereo_CreateHandleFromIUnknown(static_cast<ID3D11DeviceN*>(d3dDevice), &stereoHandle.nvapiStereoHandle);
 		if (logErrorMessage(nvStatus))
 			nvStatus = NvAPI_Stereo_IsActivated(stereoHandle.nvapiStereoHandle, &stereoHandle.isStereoOn);
 
@@ -132,11 +132,11 @@ namespace Ogre
 				logErrorMessage(nvStatus);
 			}
 
-			void* d3dDevice;
+			void* d3dDevice = NULL;
 			stereoHandle.renderWindow->getCustomAttribute("D3DDEVICE", &d3dDevice);
 
 			nvStatus = NvAPI_Stereo_DestroyHandle(stereoHandle.nvapiStereoHandle);
-			nvStatus = NvAPI_Stereo_CreateHandleFromIUnknown(reinterpret_cast<ID3D11DeviceN*>(d3dDevice), &stereoHandle.nvapiStereoHandle);
+			nvStatus = NvAPI_Stereo_CreateHandleFromIUnknown(static_cast<ID3D11DeviceN*>(d3dDevice), &stereoHandle.nvapiStereoHandle);
 			if (NVAPI_OK != nvStatus)
 				return false;
 		}

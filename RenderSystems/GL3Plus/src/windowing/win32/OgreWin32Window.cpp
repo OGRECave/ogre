@@ -81,15 +81,21 @@ namespace Ogre {
         if (mHWnd)
             destroy();
 
-#ifdef OGRE_STATIC_LIB
-        HINSTANCE hInst = GetModuleHandle( NULL );
-#else
-#  if OGRE_DEBUG_MODE == 1
-        HINSTANCE hInst = GetModuleHandle("RenderSystem_GL_d.dll");
-#  else
-        HINSTANCE hInst = GetModuleHandle("RenderSystem_GL.dll");
-#  endif
-#endif
+		HINSTANCE hInst = NULL;
+		#ifdef __MINGW32__
+			#ifdef OGRE_STATIC_LIB
+        		hInst = GetModuleHandle( NULL );
+			#else
+				#if OGRE_DEBUG_MODE == 1
+					hInst = GetModuleHandle("RenderSystem_GL3Plus_d.dll");
+				#else
+					hInst = GetModuleHandle("RenderSystem_GL3Plus.dll");
+				#endif
+			#endif
+		#else
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+		#endif
 
         mHWnd = 0;
         mName = name;
@@ -824,9 +830,9 @@ namespace Ogre {
 
     void Win32Window::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if ((dst.left < 0) || (dst.right > mWidth) ||
-            (dst.top < 0) || (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Invalid box.",

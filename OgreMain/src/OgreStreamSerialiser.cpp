@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "OgreCommon.h"
 #include "OgreStreamSerialiser.h"
+#include "OgreBitwise.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreVector2.h"
@@ -438,7 +439,7 @@ namespace Ogre
             void* pToWrite = OGRE_MALLOC(totSize, MEMCATEGORY_GENERAL);
             memcpy(pToWrite, buf, totSize);
 
-            flipEndian(pToWrite, size, count);
+			Bitwise::bswapChunks(pToWrite, size, count);
             mStream->write(pToWrite, totSize);
 
             OGRE_FREE(pToWrite, MEMCATEGORY_GENERAL);
@@ -585,7 +586,7 @@ namespace Ogre
         mStream->read(buf, totSize);
 
         if (mFlipEndian)
-            flipEndian(buf, size, count);
+			Bitwise::bswapChunks(buf, size, count);
 
     }
     //---------------------------------------------------------------------
@@ -772,28 +773,6 @@ namespace Ogre
         double t = 0;
         readConverted(val, t, count);
     }
-
-    //---------------------------------------------------------------------
-    void StreamSerialiser::flipEndian(void * pBase, size_t size, size_t count)
-    {
-        for (size_t c = 0; c < count; ++c)
-        {
-            void *pData = (void *)((intptr_t)pBase + (c * size));
-            for(size_t byteIndex = 0; byteIndex < size/2; byteIndex++)
-            {
-                char swapByte = *(char *)((intptr_t)pData + byteIndex);
-                *(char *)((intptr_t)pData + byteIndex) = 
-                    *(char *)((intptr_t)pData + size - byteIndex - 1);
-                *(char *)((intptr_t)pData + size - byteIndex - 1) = swapByte;
-            }
-        }
-
-    }
-    //---------------------------------------------------------------------
-    void StreamSerialiser::flipEndian(void * pData, size_t size)
-    {
-        flipEndian(pData, size, 1);
-    }
     //---------------------------------------------------------------------
     uint32 StreamSerialiser::calculateChecksum(Chunk* c)
     {
@@ -803,9 +782,9 @@ namespace Ogre
         uint16 version = c->version;
         uint32 length = c->length;
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-        flipEndian(&id, sizeof(uint32));
-        flipEndian(&version, sizeof(uint16));
-        flipEndian(&length, sizeof(uint32));
+		Bitwise::bswapBuffer(&id, sizeof(uint32));
+		Bitwise::bswapBuffer(&version, sizeof(uint16));
+		Bitwise::bswapBuffer(&length, sizeof(uint32));
 #endif
         uint32 hashVal = FastHash((const char*)&id, sizeof(uint32));
         hashVal = FastHash((const char*)&version, sizeof(uint16), hashVal);

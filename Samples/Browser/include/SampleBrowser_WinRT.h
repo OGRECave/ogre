@@ -60,7 +60,7 @@ protected:
     void OnPointerMoved(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args);
     void OnPointerWheelChanged(Windows::UI::Core::CoreWindow^ sender, Windows::UI::Core::PointerEventArgs^ args);
 
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
 	// Should we subclass a phone browser?
 	void OnBackPressed( Platform::Object ^sender, Windows::Phone::UI::Input::BackPressedEventArgs^ args);
 #endif

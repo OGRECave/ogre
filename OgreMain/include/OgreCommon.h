@@ -29,14 +29,6 @@ THE SOFTWARE.
 #define __Common_H__
 // Common stuff
 
-#if defined ( OGRE_GCC_VISIBILITY )
-#   pragma GCC visibility push(default)
-#endif
-
-#if defined ( OGRE_GCC_VISIBILITY )
-#   pragma GCC visibility pop
-#endif
-
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {

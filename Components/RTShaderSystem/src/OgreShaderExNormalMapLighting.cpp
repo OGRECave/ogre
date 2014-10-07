@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreShaderRenderState.h"
 #include "OgrePass.h"
 #include "OgreMaterialSerializer.h"
+#include "OgreShaderGenerator.h"
+#include "OgreShaderFFPTexturing.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -262,6 +264,9 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     
     // Resolve normal map texture sampler parameter.        
     mNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
+
+	if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+		mNormalMapSamplerState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSamplerState");
     
     // Get surface ambient colour if need to.
     if ((mTrackVertexColourType & TVC_AMBIENT) == 0)
@@ -632,6 +637,9 @@ bool NormalMapLighting::resolveDependencies(ProgramSet* programSet)
     Program* vsProgram = programSet->getCpuVertexProgram();
     Program* psProgram = programSet->getCpuFragmentProgram();
 
+    vsProgram->addDependency(FFP_LIB_TEXTURING);
+    psProgram->addDependency(FFP_LIB_TEXTURING);
+
     vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(SGX_LIB_NORMALMAPLIGHTING);
 
@@ -842,10 +850,20 @@ bool NormalMapLighting::addPSNormalFetchInvocation(Function* psMain, const int g
 {
     FunctionInvocation* curFuncInvocation = NULL;   
 
+	bool isHLSL = Ogre::RTShader::ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
+
+	if (isHLSL)
+		FFPTexturing::AddTextureSampleWrapperInvocation(mNormalMapSampler, mNormalMapSamplerState, GCT_SAMPLER2D, psMain, groupOrder, internalCounter);
+
     curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_FETCHNORMAL, groupOrder, internalCounter++); 
-    curFuncInvocation->pushOperand(mNormalMapSampler, Operand::OPS_IN);
+
+	if (isHLSL)
+		curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(mNormalMapSampler, psMain), Operand::OPS_IN);
+	else
+		curFuncInvocation->pushOperand(mNormalMapSampler, Operand::OPS_IN);
+
     curFuncInvocation->pushOperand(mPSInTexcoord, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_OUT);    
+	curFuncInvocation->pushOperand(mPSNormal, Operand::OPS_OUT);	
     psMain->addAtomInstance(curFuncInvocation);     
 
     return true;

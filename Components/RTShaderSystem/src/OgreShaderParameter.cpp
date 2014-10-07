@@ -551,7 +551,9 @@ ParameterPtr ParameterFactory::createInWeights(int index)
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createInIndices(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iBlendIndices_" + StringConverter::toString(index), 
+	return ParameterPtr(OGRE_NEW Parameter(
+		GCT_UINT4 
+	, "iBlendIndices_" + StringConverter::toString(index), 
         Parameter::SPS_BLEND_INDICES, index, 
         Parameter::SPC_BLEND_INDICES));
 }

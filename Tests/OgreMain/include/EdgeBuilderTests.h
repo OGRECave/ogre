@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __EdgeBuilderTests_H__
+#define __EdgeBuilderTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "OgreLogManager.h"
@@ -35,19 +39,22 @@ using namespace Ogre;
 class EdgeBuilderTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( EdgeBuilderTests );
+    CPPUNIT_TEST_SUITE(EdgeBuilderTests);
     CPPUNIT_TEST(testSingleIndexBufSingleVertexBuf);
     CPPUNIT_TEST(testMultiIndexBufSingleVertexBuf);
     CPPUNIT_TEST(testMultiIndexBufMultiVertexBuf);
     CPPUNIT_TEST_SUITE_END();
+
 protected:
     HardwareBufferManager* mBufMgr;
-    LogManager* mLogManager;
+
 public:
     void setUp();
     void tearDown();
+
     void testSingleIndexBufSingleVertexBuf();
     void testMultiIndexBufSingleVertexBuf();
     void testMultiIndexBufMultiVertexBuf();
-
 };
+
+#endif

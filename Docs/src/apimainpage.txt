@@ -5,13 +5,13 @@
   
   @subsection s1 What is this?
   This is the complete API reference for <a href="www.ogre3d.org"><b>OGRE</b></a> (<b>O</b>bject-Oriented <b>G</b>raphics <b>R</b>endering <b>E</b>ngine) version <b>1.9.0</b> ("Ghadamon"). Contained within are the 
-  specifications for each class and the methods from those classes which you can refer to when writing code which uses OGRE. 
+  specifications for each namespace/module/class and the methods from those which you can refer to when writing code which uses OGRE. 
   
-  The API references for previous OGRE versions can be found under the following link: <a href="http://www.ogre3d.org/docs/api/X.Y">www.ogre3d.org/docs/api/X.Y</a> (replace X.Y with the version number, for example 1.7 or 1.8).
+  The API references for some of the previous OGRE versions can be found under the following link: <a href="http://www.ogre3d.org/docs/api/X.Y">www.ogre3d.org/docs/api/X.Y</a> (replace X.Y with the version number, for example 1.7 or 1.8).
   
   @subsection s2 It's so BIG!
   
-  Yes, yes it is (and thank you for noticing). OGRE is a large and complex 
+  Yes it is (and thank you for noticing). OGRE is a large and complex 
   system so the API documentation, whilst fully inclusive and the most 
   complete reference to OGRE that you'll find, is not the recommended way to 
   start learning. You will certainly want
@@ -32,6 +32,13 @@
   you need here. However, if you can't find it, or you're not sure where to 
   start looking, visit the <a href="http://www.ogre3d.org">main OGRE website</a> and dip into the <a href="http://www.ogre3d.org/support">community areas</a>
   like the <a href="http://www.ogre3d.org/wiki">wiki</a> and the <a href="http://www.ogre3d.org/forums/">forums</a> to get some assistance. 
+  
+  @subsection s3 License
+  
+	<div>The OGRE rendering engine itself is licensed under the <a href="http://opensource.org/licenses/MIT/">MIT License</a>. More details can be found <a href="http://www.ogre3d.org/licensing/">here</a>.<br />
+	This documentation work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.<br />	
+	<i>Copyright &copy; 2014 Torus Knot Software Ltd</i>
+	<img alt="Creative Commons License" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></div>
   
 */
 
