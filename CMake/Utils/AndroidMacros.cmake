@@ -25,7 +25,7 @@ macro(add_static_libs_from_paths)
         set(SAMPLE_LDLIBS "${SAMPLE_LDLIBS} ${LIB_NAME}")
     endforeach()
     set(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\n    LOCAL_STATIC_LIBRARIES\t+= ")
-endmacro(add_static_libs)
+endmacro(add_static_libs_from_paths)
 
 macro(create_android_proj ANDROID_PROJECT_TARGET)
     ##################################################################
