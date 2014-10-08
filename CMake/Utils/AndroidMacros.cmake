@@ -16,6 +16,16 @@ macro(add_static_libs LIB_DIR)
     SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\n    LOCAL_STATIC_LIBRARIES\t+= ")
 endmacro(add_static_libs)
 
+macro(add_static_libs_from_paths)
+    foreach(LIB ${ARGN})
+        get_filename_component(LIB_NAME ${LIB} NAME_WE)
+        string(SUBSTRING ${LIB_NAME} 3 -1 LIB_NAME) # strip lib prefix
+        
+        set(HEADERS "${HEADERS}# ${LIB_NAME}\n\tinclude $(CLEAR_VARS)\n\tLOCAL_MODULE    := ${LIB_NAME}\n\tLOCAL_SRC_FILES := ${LIB}\n\tinclude $(PREBUILT_STATIC_LIBRARY)\n\n")
+        set(SAMPLE_LDLIBS "${SAMPLE_LDLIBS} ${LIB_NAME}")
+    endforeach()
+    set(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\n    LOCAL_STATIC_LIBRARIES\t+= ")
+endmacro(add_static_libs)
 
 macro(create_android_proj ANDROID_PROJECT_TARGET)
     ##################################################################
@@ -53,16 +63,8 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     endif()
 
     if(OGRE_USE_BOOST)
-       set(OGRE_BOOST_INCLUDES ${Boost_INCLUDE_DIRS})
-       set(OGRE_BOOST_LIBS)
-       
-       foreach(LIB ${Boost_LIBRARIES})
-           get_filename_component(LIB_NAME ${LIB} NAME_WE)
-           string(SUBSTRING ${LIB_NAME} 3 -1 LIB_NAME)
-           set(OGRE_BOOST_LIBS ${OGRE_BOOST_LIBS} ${LIB_NAME})
-       endforeach()
-       
-	   add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@" ${OGRE_BOOST_LIBS})
+       set(OGRE_BOOST_INCLUDES ${Boost_INCLUDE_DIRS})       
+	   add_static_libs_from_paths(${Boost_LIBRARIES})
     endif()
 
     add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@" "OIS" "freetype" "zzip")
