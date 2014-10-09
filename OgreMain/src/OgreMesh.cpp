@@ -2239,13 +2239,9 @@ namespace Ogre {
             }
         }
 
-        // TODO: Fix this in PixelCountLodStrategy::getIndex()
-        // Fix bug in Ogre with pixel count LOD strategy.
-        // Changes [0, 20, 15, 10, 5] to [max, 20, 15, 10, 5].
-        // Fixes PixelCountLodStrategy::getIndex() function, which returned always 0 index.
-        // Fixes ScreenRatioPixelCountLodStrategy loading from mesh
-		mMeshLodUsageList[0].userValue = lodConfig.strategy->getBaseValue();
-		mMeshLodUsageList[0].value = lodConfig.strategy->getBaseValue();
+	// Set LOD strategy base values
+	mMeshLodUsageList[0].userValue = lodConfig.strategy->getBaseValue();
+	mMeshLodUsageList[0].value = lodConfig.strategy->getBaseValue();
 
     }
     //---------------------------------------------------------------------
