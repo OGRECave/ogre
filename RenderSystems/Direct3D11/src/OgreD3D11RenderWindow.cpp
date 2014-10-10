@@ -358,7 +358,8 @@ namespace Ogre
         {
             backbufferNoMSAA = mpBackBufferNoMSAA;
             backbufferNoMSAA->AddRef();
-            // Assume mpBackBufferNoMSAA already holds data from mpBackBuffer, so no ResolveSubresource required here
+
+            mDevice.GetImmediateContext()->ResolveSubresource(backbufferNoMSAA, 0, mpBackBuffer, 0, BBDesc.Format);
         }
         else
         {
