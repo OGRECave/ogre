@@ -449,7 +449,7 @@
 mkdir -p &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks&quot;
 mkdir -p &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Plugins&quot;
 ditto &quot;$OGRE_SDK_ROOT/lib/macosx/Release/Ogre.framework&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks/Ogre.framework&quot;
-ditto &quot;$OGRE_SDK_ROOT/lib/macosx/Release/OgreOverlay.framework&quot; &quot;$BUILT_PRODUCTS_DIR/Test.app/Contents/Frameworks/OgreOverlay.framework&quot;
+ditto &quot;$OGRE_SDK_ROOT/lib/macosx/Release/OgreOverlay.framework&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks/OgreOverlay.framework&quot;
 ditto &quot;$OGRE_SDK_ROOT/lib/macosx/Release/RenderSystem_GL.framework&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks/RenderSystem_GL.framework&quot;
 ditto &quot;$PROJECT_DIR/$PROJECT_NAME/media/&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Resources/media/&quot;
 ditto $PROJECT_DIR/$PROJECT_NAME/*.cfg &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Resources/&quot;
