@@ -75,7 +75,7 @@ namespace Ogre
             if (out_proj != NULL)
             {
                 *out_proj = Matrix4::getScale(1, 1, -1);
-                //*out_proj = Matrix4::IDENTITY;
+                // *out_proj = Matrix4::IDENTITY;
             }
 
             // set up camera if requested
