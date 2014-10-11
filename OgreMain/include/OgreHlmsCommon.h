@@ -58,13 +58,13 @@ namespace Ogre
             assert( start <= original->size() );
         }
 
-        SubStringRef( const String *original, size_t start, size_t end ) :
+        SubStringRef( const String *original, size_t start, size_t end_ ) :
             mOriginal( original ),
             mStart( start ),
-            mEnd( end )
+            mEnd( end_ )
         {
-            assert( start <= end );
-            assert( end <= original->size() );
+            assert( start <= end_ );
+            assert( end_ <= original->size() );
         }
 
         SubStringRef( const String *original, String::const_iterator start ) :
