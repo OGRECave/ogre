@@ -97,8 +97,11 @@ namespace Ogre {
         // of getTechnique is based on it for backwards compatibility
         if(pRend->getMaterial().isNull() || !pRend->getTechnique())
         {
-            // Use default base white
-            MaterialPtr baseWhite = MaterialManager::getSingleton().getByName("BaseWhite");
+            // Use default base white, with lighting only if vertices has normals
+            RenderOperation op;
+            pRend->getRenderOperation(op);
+            bool useLighting = (NULL != op.vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL));
+            MaterialPtr baseWhite = MaterialManager::getSingleton().getByName(useLighting ? "BaseWhite" : "BaseWhiteNoLighting");
             pTech = baseWhite->getTechnique(0);
         }
         else

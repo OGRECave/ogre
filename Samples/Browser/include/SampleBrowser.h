@@ -1289,11 +1289,8 @@ namespace OgreBites
             }
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
-                //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
                 // creates shaders for base material BaseWhite using the RTSS
                 Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-                baseWhite->setLightingEnabled(false);
                 mShaderGenerator->createShaderBasedTechnique(
                     "BaseWhite",
                     Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
