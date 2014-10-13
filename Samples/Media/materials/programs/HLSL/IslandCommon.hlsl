@@ -7,7 +7,7 @@ http://developer.nvidia.com/nvidia-graphics-sdk-11-direct3d
 
 cbuffer QuadObject
 {
-    const float2 QuadVertices[4] =
+    static const float2 QuadVertices[4] =
     {
         {-1.0, -1.0},
         { 1.0, -1.0},
@@ -15,7 +15,7 @@ cbuffer QuadObject
         { 1.0,  1.0}
     };
 
-    const float2 QuadTexCoordinates[4] =
+    static const float2 QuadTexCoordinates[4] =
     {
         {0.0, 1.0},
         {1.0, 1.0},

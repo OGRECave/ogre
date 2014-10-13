@@ -33,6 +33,7 @@ v2p main_triplanar_reference_vp(a2v input)
 	output.oEyePos = eyePosition;
 		
 	// Fog like in the terrain component, but exp2 added
+	output.oNormAndFogVal.w = 0;
 	#if FOGLINEAR
 	output.oNormAndFogVal.w = saturate((output.oClipPos.z - input.fogParams.y) * input.fogParams.w);
 	#endif
