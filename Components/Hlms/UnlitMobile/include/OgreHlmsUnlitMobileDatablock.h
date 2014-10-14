@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsUnlitMobilePrerequisites.h"
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsTextureManager.h"
 #include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
 
@@ -87,7 +88,6 @@ namespace Ogre
         uint8   mNumTextureUnits;
         uint8   mNumUvAtlas;
         float   mR, mG, mB, mA;
-        float   mAlphaTestThreshold;
 
         UvAtlasParams mUvAtlasParams[16];
 
@@ -171,13 +171,6 @@ namespace Ogre
         /// Gets the current colour. The returned value is meaningless if mHasColour is false
         ColourValue getColour(void) const               { return ColourValue( mR, mG, mB, mA ); }
 
-        /// Sets a new colour value. Asserts if mIsAlphaTested is false.
-        void setAlphaTestThreshold( float alphaThreshold );
-
-        /// Gets the current alpha test threshold. The returned
-        /// value is meaningless if mIsAlphaTested is false
-        float getAlphaTestThreshold(void) const         { return mAlphaTestThreshold; }
-
         /** Sets a new texture for rendering
         @param texUnit
             ID of the texture unit. Must be in range [0; mNumTextureUnits) otherwise throws.
@@ -239,13 +232,16 @@ namespace Ogre
             The uv set. Must be in range [0; 8) otherwise throws. If the datablock is assigned
             to a mesh that has less UV sets than required, it will throw during the assignment.
         */
-        void setTextureUvSetForTexture( uint8 texUnit, uint8 uvSet );
+        void setTextureUvSource( uint8 texUnit, uint8 uvSet );
 
         /// Returns the number of texture units.
         uint8 getNumTextureUnits(void) const            { return mNumTextureUnits; }
 
         /// Calculates the amount of UV sets used by the datablock
         uint8 getNumUvSets(void) const;
+
+        static UvAtlasParams textureLocationToAtlasParams(
+                                            const HlmsTextureManager::TextureLocation &texLocation );
     };
 
     /** @} */

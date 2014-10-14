@@ -78,7 +78,6 @@ namespace Ogre
         mNumTextureUnits( 0 ),
         mNumUvAtlas( 0 ),
         mR( 1.0f ), mG( 1.0f ), mB( 1.0f ), mA( 1.0f ),
-        mAlphaTestThreshold( 0.5f ),
         mShaderCreationData( 0 )
     {
         memset( mSamplerblocks, 0, sizeof(mSamplerblocks) );
@@ -202,7 +201,7 @@ namespace Ogre
                     if( val != (uint)(~0) )
                     {
                         //It's a number, must be an UV Set
-                        setTextureUvSetForTexture( i, val );
+                        setTextureUvSource( i, val );
                     }
                     else if( !itor->empty() )
                     {
@@ -315,14 +314,6 @@ namespace Ogre
         mG = diffuse.g;
         mB = diffuse.b;
         mA = diffuse.a;
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsUnlitMobileDatablock::setAlphaTestThreshold( float alphaThreshold )
-    {
-        assert( mIsAlphaTested && "Setting alpha threshold to a Datablock created w/out alpha test "
-                "will be ignored" );
-
-        mAlphaTestThreshold = alphaThreshold;
     }
     //-----------------------------------------------------------------------------------
     void HlmsUnlitMobileDatablock::setTexture( uint8 texUnit, TexturePtr &newTexture,
@@ -451,14 +442,14 @@ namespace Ogre
         flushRenderables();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsUnlitMobileDatablock::setTextureUvSetForTexture( uint8 texUnit, uint8 uvSet )
+    void HlmsUnlitMobileDatablock::setTextureUvSource( uint8 texUnit, uint8 uvSet )
     {
         if( texUnit >= mNumTextureUnits )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture unit out of range in datablock '" +
                          mName.getFriendlyText() + "' attempted value: " +
                          StringConverter::toString( texUnit ),
-                         "HlmsUnlitMobileDatablock::setTextureUvSetForTexture" );
+                         "HlmsUnlitMobileDatablock::setTextureUvSource" );
         }
 
         if( uvSet >= 8 )
@@ -466,7 +457,7 @@ namespace Ogre
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "UV Set must be in range [0; 8) in datablock '" +
                          mName.getFriendlyText() + "'; attempted value: " +
                          StringConverter::toString( uvSet ),
-                         "HlmsUnlitMobileDatablock::setTextureUvSetForTexture" );
+                         "HlmsUnlitMobileDatablock::setTextureUvSource" );
         }
 
         mShaderCreationData->mUvSetForTexture[texUnit] = uvSet;
@@ -480,6 +471,17 @@ namespace Ogre
 
         for( size_t i=0; i<mNumTextureUnits; ++i )
             retVal = std::max<uint8>( mShaderCreationData->mUvSetForTexture[i] + 1, retVal );
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsUnlitMobileDatablock::UvAtlasParams HlmsUnlitMobileDatablock::textureLocationToAtlasParams(
+                                                const HlmsTextureManager::TextureLocation &texLocation )
+    {
+        UvAtlasParams retVal;
+        retVal.uOffset   = texLocation.xIdx / (float)texLocation.divisor;
+        retVal.vOffset   = texLocation.yIdx / (float)texLocation.divisor;
+        retVal.invDivisor= 1.0f / texLocation.divisor;
 
         return retVal;
     }
