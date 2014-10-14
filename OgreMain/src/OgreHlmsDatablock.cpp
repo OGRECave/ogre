@@ -84,11 +84,59 @@ namespace Ogre
         mType( creator->getType() ),
         mMacroblock( macroblock ),
         mBlendblock( blendblock ),
-        mAlphaTest( false ),
+        mAlphaTestCmp( CMPF_ALWAYS_PASS ),
         mAlphaTestThreshold( 0.5f ),
         mShadowConstantBias( 0.01f )
     {
+        String paramVal;
+        if( Hlms::findParamInVec( params, HlmsBaseProp::AlphaTest, paramVal ) )
+        {
+            mAlphaTestCmp = CMPF_LESS;
+
+            if( !paramVal.empty() )
+            {
+                StringVector vec = StringUtil::split( paramVal );
+
+                StringVector::const_iterator itor = vec.begin();
+                StringVector::const_iterator end  = vec.end();
+
+                while( itor != end )
+                {
+                    if( *itor == "less" )
+                        mAlphaTestCmp = CMPF_LESS;
+                    else if( *itor == "less_equal" )
+                        mAlphaTestCmp = CMPF_LESS_EQUAL;
+                    else if( *itor == "equal" )
+                        mAlphaTestCmp = CMPF_EQUAL;
+                    else if( *itor == "greater" )
+                        mAlphaTestCmp = CMPF_GREATER;
+                    else if( *itor == "greater_equal" )
+                        mAlphaTestCmp = CMPF_GREATER_EQUAL;
+                    else if( *itor == "not_equal" )
+                        mAlphaTestCmp = CMPF_NOT_EQUAL;
+                    else
+                    {
+                        Real val = -1.0f;
+                        val = StringConverter::parseReal( *itor, -1.0f );
+                        if( val >= 0 )
+                        {
+                            mAlphaTestThreshold = val;
+                        }
+                        else
+                        {
+                            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                         mName.getFriendlyText() + ": unknown alpha_test cmp function "
+                                         "'" + *itor + "'",
+                                         "HlmsDatablock::HlmsDatablock" );
+                        }
+                    }
+
+                    ++itor;
+                }
+            }
+        }
     }
+    //-----------------------------------------------------------------------------------
     HlmsDatablock::~HlmsDatablock()
     {
         assert( mLinkedRenderables.empty() &&
@@ -143,6 +191,20 @@ namespace Ogre
         mBlendblock = blendblock;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsDatablock::setAlphaTest( CompareFunction compareFunction )
+    {
+        if( mAlphaTestCmp != compareFunction )
+        {
+            mAlphaTestCmp = static_cast<CompareFunction>( compareFunction );
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    CompareFunction HlmsDatablock::getAlphaTest(void) const
+    {
+        return static_cast<CompareFunction>( mAlphaTestCmp );
+    }
+    //-----------------------------------------------------------------------------------
     const String* HlmsDatablock::getFullName(void) const
     {
         return mCreator->getFullNameString( mName );
@@ -176,15 +238,6 @@ namespace Ogre
             (*itor)->mHlmsGlobalIndex = itor - mLinkedRenderables.begin();
 
         renderable->mHlmsGlobalIndex = ~0;
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsDatablock::setAlphaTest( bool bEnabled )
-    {
-        if( bEnabled != mAlphaTest )
-        {
-            mAlphaTest = bEnabled;
-            flushRenderables();
-        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::flushRenderables(void)
@@ -230,6 +283,22 @@ namespace Ogre
                 end  = mLinkedRenderables.end();
             }
         }
+    }
+    //-----------------------------------------------------------------------------------
+    static const char *c_cmpStrings[NUM_COMPARE_FUNCTIONS] =
+    {
+        "==",   //CMPF_ALWAYS_FAIL (dummy)
+        "==",   //CMPF_ALWAYS_PASS (dummy)
+        "<",    //CMPF_LESS
+        "<=",   //CMPF_LESS_EQUAL
+        "==",   //CMPF_EQUAL
+        ">",    //CMPF_NOT_EQUAL
+        ">=",   //CMPF_GREATER_EQUAL
+        "!=",   //CMPF_GREATER
+    };
+    const char* HlmsDatablock::getCmpString( CompareFunction compareFunction )
+    {
+        return c_cmpStrings[compareFunction];
     }
     //-----------------------------------------------------------------------------------
 }

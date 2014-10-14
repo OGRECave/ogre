@@ -276,21 +276,12 @@ namespace Ogre
         setProperty( UnlitMobileProp::PropertyDiffuse, datablock->mHasColour );
         setProperty( UnlitMobileProp::DiffuseMap, datablock->mNumTextureUnits );
 
-        if( datablock->mIsAlphaTested )
+        if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
         {
             setProperty( HlmsBaseProp::AlphaTest, 1 );
 
-            switch( datablock->mShaderCreationData->alphaTestCmp )
-            {
-            case CMPF_LESS:             pieces[PixelShader]["alpha_test_cmp_func"] = "<"; break;
-            case CMPF_LESS_EQUAL:       pieces[PixelShader]["alpha_test_cmp_func"] = "<="; break;
-            case CMPF_EQUAL:            pieces[PixelShader]["alpha_test_cmp_func"] = "=="; break;
-            case CMPF_GREATER:          pieces[PixelShader]["alpha_test_cmp_func"] = ">"; break;
-            case CMPF_GREATER_EQUAL:    pieces[PixelShader]["alpha_test_cmp_func"] = ">="; break;
-            case CMPF_NOT_EQUAL:        pieces[PixelShader]["alpha_test_cmp_func"] = "!="; break;
-            default:
-                break;
-            }
+            pieces[PixelShader][HlmsBasePieces::AlphaTestCmpFunc] =
+                    HlmsDatablock::getCmpString( datablock->getAlphaTest() );
         }
 
         setProperty( UnlitMobileProp::PropertyUvAtlas, datablock->mNumUvAtlas );
@@ -405,7 +396,7 @@ namespace Ogre
             psUniformBuffer += 4;
         }
 
-        if( datablock->mIsAlphaTested )
+        if( datablock->mAlphaTestCmp != CMPF_ALWAYS_PASS )
             *psUniformBuffer++ = datablock->mAlphaTestThreshold;
 
         memcpy( psUniformBuffer, datablock->mUvAtlasParams,

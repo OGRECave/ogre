@@ -515,6 +515,11 @@ namespace Ogre
         static const IdString *UvCountPtrs[8];
     };
 
+    struct _OgreExport HlmsBasePieces
+    {
+        static const IdString AlphaTestCmpFunc;
+    };
+
     /** @} */
     /** @} */
 

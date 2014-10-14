@@ -185,7 +185,7 @@ namespace Ogre
         HlmsMacroblock const *mMacroblock;
         HlmsBlendblock const *mBlendblock;
 
-        bool    mAlphaTest;
+        uint8   mAlphaTestCmp;  /// @see CompareFunction
     public:
         float   mAlphaTestThreshold;
         float   mShadowConstantBias;
@@ -238,6 +238,17 @@ namespace Ogre
         const HlmsMacroblock* getMacroblock(void) const                 { return mMacroblock; }
         const HlmsBlendblock* getBlendblock(void) const                 { return mBlendblock; }
 
+        /** Sets the alpha test to the given compare function. CMPF_ALWAYS_PASS means disabled.
+            @see mAlphaTestThreshold.
+            Calling this function triggers a HlmsDatablock::flushRenderables
+        @remarks
+            It is to the derived implementation to actually implement the alpha test.
+        @param compareFunction
+            Compare function to use. Default is CMPF_ALWAYS_PASS , which means disabled.
+        */
+        void setAlphaTest( CompareFunction compareFunction );
+        CompareFunction getAlphaTest(void) const;
+
         /// @see Hlms::getFullNameString. This operations is NOT fast. Might return null
         /// (if the datablock was removed from the Hlms but somehow is still alive)
         const String* getFullName(void) const;
@@ -247,10 +258,7 @@ namespace Ogre
 
         const vector<Renderable*>::type& getLinkedRenderables(void) const { return mLinkedRenderables; }
 
-        /// Enables or disables alpha testing. Calling this function triggers
-        /// a HlmsDatablock::flushRenderables
-        void setAlphaTest( bool bEnabled );
-        bool getAlphaTest(void) const               { return mAlphaTest; }
+        static const char* getCmpString( CompareFunction compareFunction );
     };
 
     /** @} */

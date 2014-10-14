@@ -74,7 +74,6 @@ namespace Ogre
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
         mNumTextureMatrices( 0 ),
         mHasColour( false ),
-        mIsAlphaTested( false ),
         mNumTextureUnits( 0 ),
         mNumUvAtlas( 0 ),
         mR( 1.0f ), mG( 1.0f ), mB( 1.0f ), mA( 1.0f ),
@@ -120,54 +119,6 @@ namespace Ogre
                 mG = val.g;
                 mB = val.b;
                 mA = val.a;
-            }
-        }
-
-        if( Hlms::findParamInVec( params, HlmsBaseProp::AlphaTest, paramVal ) )
-        {
-            mIsAlphaTested = true;
-            mShaderCreationData->alphaTestCmp = CMPF_LESS;
-
-            if( !paramVal.empty() )
-            {
-                StringVector vec = StringUtil::split( paramVal );
-
-                StringVector::const_iterator itor = vec.begin();
-                StringVector::const_iterator end  = vec.end();
-
-                while( itor != end )
-                {
-                    if( *itor == "less" )
-                        mShaderCreationData->alphaTestCmp = CMPF_LESS;
-                    else if( *itor == "less_equal" )
-                        mShaderCreationData->alphaTestCmp = CMPF_LESS_EQUAL;
-                    else if( *itor == "equal" )
-                        mShaderCreationData->alphaTestCmp = CMPF_EQUAL;
-                    else if( *itor == "greater" )
-                        mShaderCreationData->alphaTestCmp = CMPF_GREATER;
-                    else if( *itor == "greater_equal" )
-                        mShaderCreationData->alphaTestCmp = CMPF_GREATER_EQUAL;
-                    else if( *itor == "not_equal" )
-                        mShaderCreationData->alphaTestCmp = CMPF_NOT_EQUAL;
-                    else
-                    {
-                        Real val = -1.0f;
-                        val = StringConverter::parseReal( *itor, -1.0f );
-                        if( val >= 0 )
-                        {
-                            mAlphaTestThreshold = val;
-                        }
-                        else
-                        {
-                            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                                         mName.getFriendlyText() + ": unknown alpha_test cmp function "
-                                         "'" + *itor + "'",
-                                         "HlmsUnlitMobileDatablock::HlmsUnlitMobileDatablock" );
-                        }
-                    }
-
-                    ++itor;
-                }
             }
         }
 

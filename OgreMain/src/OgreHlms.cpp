@@ -86,6 +86,8 @@ namespace Ogre
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
 
+    const IdString HlmsBasePieces::AlphaTestCmpFunc = IdString( "alpha_test_cmp_func" );
+
     const IdString *HlmsBaseProp::UvCountPtrs[8] =
     {
         &HlmsBaseProp::UvCount0,
@@ -1526,9 +1528,14 @@ namespace Ogre
 
         HlmsDatablock *datablock = renderable->getDatablock();
 
-        setProperty( HlmsBaseProp::AlphaTest, datablock->getAlphaTest() );
+        setProperty( HlmsBaseProp::AlphaTest, datablock->getAlphaTest() != CMPF_ALWAYS_PASS );
 
         PiecesMap pieces[NumShaderTypes];
+        if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
+        {
+            pieces[PixelShader][HlmsBasePieces::AlphaTestCmpFunc] =
+                    HlmsDatablock::getCmpString( datablock->getAlphaTest() );
+        }
         calculateHashForPreCreate( renderable, pieces );
 
         uint32 renderableHash = this->addRenderableCache( mSetProperties, pieces );
@@ -1536,7 +1543,7 @@ namespace Ogre
         //For shadow casters, turn normals off. UVs & diffuse also off unless there's alpha testing.
         setProperty( HlmsBaseProp::Normal, 0 );
         setProperty( HlmsBaseProp::QTangent, 0 );
-        if( !datablock->getAlphaTest() )
+        if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
         {
             setProperty( HlmsBaseProp::UvCount, 0 );
         }

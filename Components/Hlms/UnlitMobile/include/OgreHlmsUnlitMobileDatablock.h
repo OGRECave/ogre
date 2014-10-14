@@ -52,14 +52,13 @@ namespace Ogre
         {
             /// Maps UV coordinate sets to mTextureMatrices starting index.
             uint8           mTextureMatrixMap[8];
-            CompareFunction alphaTestCmp;
 
             /// One per texture unit. Specifies which UV set we will use.
             uint8           mUvSetForTexture[16];
             uint8           mBlendModes[16];
             bool            mTextureIsAtlas[16];
 
-            ShaderCreationData() : alphaTestCmp( CMPF_ALWAYS_PASS )
+            ShaderCreationData()
             {
                 memset( mTextureMatrixMap, 0xffffffff, sizeof(mTextureMatrixMap) );
                 memset( mUvSetForTexture, 0, sizeof(mUvSetForTexture) );
@@ -84,7 +83,6 @@ namespace Ogre
         float   mTextureMatrices[16*8];
 
         bool    mHasColour;         /// When false; mR, mG, mB & mA aren't passed to the pixel shader
-        bool    mIsAlphaTested;
         uint8   mNumTextureUnits;
         uint8   mNumUvAtlas;
         float   mR, mG, mB, mA;
@@ -161,9 +159,6 @@ namespace Ogre
 
         /// If this returns false, the values of mR, mG, mB & mA will be ignored.
         bool hasColour(void) const                      { return mHasColour; }
-
-        /// If this returns false, the value of mIsAlphaTested will be ignored.
-        bool isAlphaTested(void) const                  { return mIsAlphaTested; }
 
         /// Sets a new colour value. Asserts if mHasColour is false.
         void setColour( const ColourValue &diffuse );
