@@ -218,7 +218,7 @@ namespace Ogre
             diffuseTex.reserve( datablock->mNumTextureUnits );
             for( texUnit=0; texUnit<datablock->mNumTextureUnits; ++texUnit )
             {
-                assert( !datablock->mDiffuseTextures[texUnit].isNull() );
+                assert( !datablock->mBakedDiffuseTextures[texUnit].isNull() );
                 diffuseTex.push_back( texUnit );
                 ++texUnit;
             }
@@ -418,8 +418,9 @@ namespace Ogre
             //Rebind textures
             for( uint texUnit=0; texUnit<datablock->mNumTextureUnits; ++texUnit )
             {
-                mRenderSystem->_setTexture( texUnit, true, datablock->mDiffuseTextures[texUnit].get() );
-                mRenderSystem->_setHlmsSamplerblock( texUnit, datablock->mSamplerblocks[texUnit] );
+                mRenderSystem->_setTexture( texUnit, true,
+                                            datablock->mBakedDiffuseTextures[texUnit].get() );
+                mRenderSystem->_setHlmsSamplerblock( texUnit, datablock->mBakedSamplerblocks[texUnit] );
                 ++texUnit;
             }
 

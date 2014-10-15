@@ -53,6 +53,9 @@ namespace Ogre
             /// Maps UV coordinate sets to mTextureMatrices starting index.
             uint8           mTextureMatrixMap[8];
 
+            TexturePtr      mDiffuseTextures[16];
+            HlmsSamplerblock const  *mSamplerblocks[16];
+
             /// One per texture unit. Specifies which UV set we will use.
             uint8           mUvSetForTexture[16];
             uint8           mBlendModes[16];
@@ -61,6 +64,7 @@ namespace Ogre
             ShaderCreationData()
             {
                 memset( mTextureMatrixMap, 0xffffffff, sizeof(mTextureMatrixMap) );
+                memset( mSamplerblocks, 0, sizeof(mSamplerblocks) );
                 memset( mUvSetForTexture, 0, sizeof(mUvSetForTexture) );
                 memset( mBlendModes, 0, sizeof(mBlendModes) );
                 memset( mTextureIsAtlas, 0, sizeof(mTextureIsAtlas) );
@@ -91,8 +95,8 @@ namespace Ogre
 
         /// Up to 16 diffuse textures (they can re use UVs); which is the limit for a lot of HW
         /// Must be contiguous (i.e. if mDiffuseTextures[1] isn't used, mDiffuseTextures[2] can't be)
-        TexturePtr mDiffuseTextures[16];
-        HlmsSamplerblock const  *mSamplerblocks[16];
+        TexturePtr mBakedDiffuseTextures[16];
+        HlmsSamplerblock const  *mBakedSamplerblocks[16];
 
         /// The data in this structure only affects shader generation (thus modifying it implies
         /// generating a new shader; i.e. a call to flushRenderables()). Because this data
@@ -168,8 +172,7 @@ namespace Ogre
 
         /** Sets a new texture for rendering
         @param texUnit
-            ID of the texture unit. Must be in range [0; mNumTextureUnits) otherwise throws.
-            @see enableTextureUnits in order to increase mNumTextureUnits.
+            ID of the texture unit. Must be in range [0; 16) otherwise throws.
         @param newTexture
             Texture to change to. Can't be null, otherwise throws (use a blank texture).
         @param atlasParams
@@ -180,8 +183,7 @@ namespace Ogre
         /** Sets a new sampler block to be associated with the texture
             (i.e. filtering mode, addressing modes, etc).
         @param texUnit
-            ID of the texture unit. Must be in range [0; mNumTextureUnits) otherwise throws.
-            @see enableTextureUnits in order to increase mNumTextureUnits.
+            ID of the texture unit. Must be in range [0; 16) otherwise throws.
         @param params
             The sampler block to use as reference.
         */
@@ -189,48 +191,20 @@ namespace Ogre
 
         const HlmsSamplerblock* getSamplerblock( uint8 texUnit ) const;
 
-        /** Enables all texture units until the 'until' parameter. All the tex units in the
-            range [0; until) will be enabled.
-        @remarks
-            When enabling a texture unit that was disabled, a blank dummy texture will be
-            assigned to that unit.
-        @par
-            If the datablock had 6 texture units enabled and 'until' is 5; nothing will happen
-        @par
-            Calling this function implies calling @see HlmsDatablock::flushRenderables. If
-            the another shader must be created, it could cause a stall.
-        @param until
-            A value in the range (0; 16].
-        */
-        void enableTextureUnits( uint8 until );
-
-        /** Disables all texture units starting from the 'from' parameter, inclusive. All the
-            tex. units in the range [from; 16) will be removed.
-        @remarks
-            If the datablock had 6 texture units enabled and 'from' is 7; nothing will happen.
-            Disabling a texture unit will release the TexturePtr.
-        @par
-            Calling this function implies calling @see HlmsDatablock::flushRenderables. If
-            the another shader must be created, it could cause a stall.
-        @param from
-            A value in the range [0; 16)
-        */
-        void disableTextureUnits( uint8 from );
-
         /** Sets the set of UVs that will be used to sample from the texture unit.
         @remarks
             Calling this function implies calling @see HlmsDatablock::flushRenderables. If
             the another shader must be created, it could cause a stall.
         @param texUnit
-            ID of the texture unit. Must be in range [0; mNumTextureUnits) otherwise throws.
+            ID of the texture unit. Must be in range [0; 16) otherwise throws.
         @param uvSet
             The uv set. Must be in range [0; 8) otherwise throws. If the datablock is assigned
             to a mesh that has less UV sets than required, it will throw during the assignment.
         */
         void setTextureUvSource( uint8 texUnit, uint8 uvSet );
 
-        /// Returns the number of texture units.
-        uint8 getNumTextureUnits(void) const            { return mNumTextureUnits; }
+        /// Returns the number of texture units that are actually used.
+        uint8 getNumTextureUnitsInUse(void) const           { return mNumTextureUnits; }
 
         /// Calculates the amount of UV sets used by the datablock
         uint8 getNumUvSets(void) const;
