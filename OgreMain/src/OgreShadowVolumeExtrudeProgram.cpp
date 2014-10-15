@@ -714,10 +714,9 @@ static const String glsles_prefix = "precision highp float;\
         "uniform mat4 worldViewProj; \
         attribute vec4 inPos; \
         varying vec4 uv0; \
-        varying vec4 pos; \
         \
         void main() {\
-            pos = worldViewProj*inPos; \
+            gl_Position = worldViewProj*inPos; \
             inPos.xy = sign(inPos.xy); \
             uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f; \
         }";
