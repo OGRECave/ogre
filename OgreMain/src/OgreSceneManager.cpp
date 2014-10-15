@@ -4799,6 +4799,7 @@ void SceneManager::initShadowVolumeMaterials(void)
         mShadowModulativePass->setFragmentProgram("Ogre/ShadowBlendFP");
 
         mShadowModulativePass->getFragmentProgramParameters()->setNamedConstant("shadowColor", mShadowColour);
+        mShadowModulativePass->getVertexProgramParameters()->setNamedAutoConstant("worldViewProj", Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
         mShadowModulativePass->getVertexProgramParameters()->setAutoConstant(0, Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
 
 

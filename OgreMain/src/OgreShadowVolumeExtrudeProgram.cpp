@@ -696,27 +696,31 @@ namespace Ogre {
 
 
 
-	 /*String ShadowVolumeExtrudeProgram::mModulate_Fs_glsles =
-"sampler2D RT : register(s0);\
-uniform vec4 shadowColor;\
-void ShadowBlend_ps(vec2 iTexCoord : TEXCOORD0) : COLOR\
-{\
-gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, iTexCoord).w);\
-}";
+static const String glsles_prefix = "precision highp float;\
+                                    precision highp int; \
+                                    precision lowp sampler2D; \
+                                    precision lowp samplerCube;";
 
-	 String ShadowVolumeExtrudeProgram::mModulate_Vs_glsles =
-"void ShadowBlend_vs\
-(\
-in vec4 inPos : POSITION,\
-out vec4 pos : POSITION,\
-out vec2 uv0 : TEXCOORD0,\
-uniform mat4x4 worldViewProj\
-)\
-{\
-pos = mul(worldViewProj, inPos);\
-inPos.xy = sign(inPos.xy);\
-uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
-}";*/
+    String ShadowVolumeExtrudeProgram::mModulate_Fs_glsl =
+        "uniform sampler2D RT; \
+        uniform vec4 shadowColor; \
+        varying vec2 uv0; \
+        \
+        void main() {\
+            gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, uv0).w);\
+        }";
+
+    String ShadowVolumeExtrudeProgram::mModulate_Vs_glsl =
+        "uniform mat4 worldViewProj; \
+        attribute vec4 inPos; \
+        varying vec4 uv0; \
+        varying vec4 pos; \
+        \
+        void main() {\
+            pos = worldViewProj*inPos; \
+            inPos.xy = sign(inPos.xy); \
+            uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f; \
+        }";
 
 
 
@@ -740,17 +744,17 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
 	//---------------------------------------------------------------------
 	// programs for Ogre/StencilShadowModulationPass material
 	//---------------------------------------------------------------------
-	const String gShadowModulativePassVs_Name = "Ogre/StencilShadowModulationPassVs";
-	const String gShadowModulativePassPs_Name = "Ogre/StencilShadowModulationPassPs";
+	const String gShadowModulativePassVs_Name = "Ogre/StencilShadowModulationPassVs"; // FIXME: unused?!
+	const String gShadowModulativePassPs_Name = "Ogre/StencilShadowModulationPassPs"; // FIXME: unused?!
 
-	const String gShadowModulativePassVs_4_0 =
+	const String gShadowModulativePassVs_4_0 = // FIXME: unused?!
 		"float4x4	worldviewproj_matrix;\n"
 		"void vs_main(in float4 iPos : POSITION, out float4 oPos : SV_Position)\n"
 		"{\n"
 		"    oPos = mul(worldviewproj_matrix, iPos);\n"
 		"}\n";
 
-	const String gShadowModulativePassPs_4_0 =
+	const String gShadowModulativePassPs_4_0 = // FIXME: unused?!
 		"float4 ambient_light_colour;\n"
 		"void fs_main(in float4 oPos : SV_Position, out float4 oColor : SV_Target)\n"
 		"{\n"
@@ -796,17 +800,19 @@ uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
 
 		if (glsl)
 		{
-			vsTarget = "vp40";
-			fsTarget = "fp40";
-			language = "cg";
-			vsProgram = mModulate_Vs_cg;
-			fsProgram = mModulate_Fs_cg;
+			vsTarget = "glsl";
+			fsTarget = "glsl";
+			language = "glsl";
+			vsProgram = mModulate_Vs_glsl;
+			fsProgram = mModulate_Fs_glsl;
 		}
 		else if (glsles)
 		{
-			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
-				"Modulation pass gpu programs for glsles are not implemented",
-				"ShadowVolumeExtrudeProgram::initialiseModulationPassPrograms");
+            vsTarget = "glsles";
+            fsTarget = "glsles";
+            language = "glsles";
+            vsProgram = glsles_prefix+mModulate_Vs_glsl;
+            fsProgram = glsles_prefix+mModulate_Fs_glsl;
 		}
 		else
 		{
