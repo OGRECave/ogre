@@ -329,8 +329,8 @@ namespace Ogre
         for( size_t i=0; i<texUnit; ++i )
             uvAtlasIdx += mShaderCreationData->mTextureIsAtlas[i];
 
-        if( atlasParams.uOffset != 0 || atlasParams.vOffset != 0 || atlasParams.invDivisor != 1.0f ||
-            newTexture.isNull() )
+        if( (atlasParams.uOffset != 0 || atlasParams.vOffset != 0 || atlasParams.invDivisor != 1.0f) &&
+            !newTexture.isNull() )
         {
             if( mShaderCreationData->mTextureIsAtlas[texUnit] == false )
             {

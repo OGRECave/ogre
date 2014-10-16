@@ -285,26 +285,31 @@ namespace Ogre
         }
 
         setProperty( UnlitMobileProp::PropertyUvAtlas, datablock->mNumUvAtlas );
-        for( size_t i=0; i<datablock->mNumTextureUnits; ++i )
+        size_t texUnit = 0;
+        for( size_t i=0; i<16; ++i )
         {
-            const uint8 uvSet = datablock->mShaderCreationData->mUvSetForTexture[i];
-            const uint8 blendModeIdx = datablock->mShaderCreationData->mBlendModes[i];
-
-            if( uvSet >= numTexCoords )
+            if( !datablock->mShaderCreationData->mDiffuseTextures[i].isNull() )
             {
-                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             datablock->getName().getFriendlyText() +
-                             ": diffuse_map's is trying to use more UV sets than the mesh "
-                             "has ( " + StringConverter::toString(uvSet) + " vs " +
-                             StringConverter::toString(numTexCoords) + " )",
-                             "HlmsUnlitMobile::calculateHashFor" );
-            }
+                const uint8 uvSet = datablock->mShaderCreationData->mUvSetForTexture[i];
+                const uint8 blendModeIdx = datablock->mShaderCreationData->mBlendModes[i];
 
-            setProperty( *DiffuseMapCountPtrs[i][0], uvSet );
-            pieces[PixelShader][*DiffuseMapCountPtrs[i][1]] = "@insertpiece( " +
-                                                                c_blendModes[blendModeIdx] + ")";
-            setProperty( *DiffuseMapCountPtrs[i][2],
-                         datablock->mShaderCreationData->mTextureIsAtlas[i] );
+                if( uvSet >= numTexCoords )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 datablock->getName().getFriendlyText() +
+                                 ": diffuse_map's is trying to use more UV sets than the mesh "
+                                 "has ( " + StringConverter::toString(uvSet) + " vs " +
+                                 StringConverter::toString(numTexCoords) + " )",
+                                 "HlmsUnlitMobile::calculateHashFor" );
+                }
+
+                setProperty( *DiffuseMapCountPtrs[texUnit][0], uvSet );
+                pieces[PixelShader][*DiffuseMapCountPtrs[texUnit][1]] = "@insertpiece( " +
+                                                                        c_blendModes[blendModeIdx] + ")";
+                setProperty( *DiffuseMapCountPtrs[texUnit][2],
+                             datablock->mShaderCreationData->mTextureIsAtlas[i] );
+                ++texUnit;
+            }
         }
 
         setProperty( UnlitMobileProp::PropertyTexMatrixCount, datablock->mNumTextureMatrices );
