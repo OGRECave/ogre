@@ -37,7 +37,7 @@ void main()
 	@insertpiece( blend_mode_idx@n )@end
 
 	@property( hlms_colour )outColour *= psColour @insertpiece( MultiplyDiffuseConst );@end
-	@property( !hlms_colour )outColour *= diffuseColour;@end
+	@property( !hlms_colour && diffuse )outColour *= diffuseColour;@end
 @end
 
 @property( alpha_test )
