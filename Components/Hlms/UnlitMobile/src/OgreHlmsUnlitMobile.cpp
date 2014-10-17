@@ -395,15 +395,18 @@ namespace Ogre
         //---------------------------------------------------------------------------
         //                          ---- PIXEL SHADER ----
         //---------------------------------------------------------------------------
+        //vec4 diffuseColour
         if( datablock->mHasColour )
         {
             memcpy( psUniformBuffer, &datablock->mR, 4 * sizeof(float) );
             psUniformBuffer += 4;
         }
 
+        //float alpha_test_threshold
         if( datablock->mAlphaTestCmp != CMPF_ALWAYS_PASS )
             *psUniformBuffer++ = datablock->mAlphaTestThreshold;
 
+        //vec3 atlasOffsets[]
         memcpy( psUniformBuffer, datablock->mUvAtlasParams,
                 datablock->mNumUvAtlas * sizeof( HlmsUnlitMobileDatablock::UvAtlasParams ) );
         psUniformBuffer += datablock->mNumUvAtlas * (sizeof( HlmsUnlitMobileDatablock::UvAtlasParams ) /

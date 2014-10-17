@@ -161,7 +161,12 @@ namespace Ogre
 
         virtual void calculateHash();
 
+        /// Controls whether the value in @see setColour is used.
+        /// Calling this function implies calling @see HlmsDatablock::flushRenderables.
+        void setUseColour( bool useColour );
+
         /// If this returns false, the values of mR, mG, mB & mA will be ignored.
+        /// @see setUseColour.
         bool hasColour(void) const                      { return mHasColour; }
 
         /// Sets a new colour value. Asserts if mHasColour is false.

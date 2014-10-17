@@ -298,9 +298,20 @@ namespace Ogre
         mTextureHash = hash.mHash;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsUnlitMobileDatablock::setUseColour( bool useColour )
+    {
+        if( mHasColour != useColour )
+        {
+            mHasColour = useColour;
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsUnlitMobileDatablock::setColour( const ColourValue &diffuse )
     {
-        assert( mHasColour && "Setting colour to a Datablock created w/out diffuse flag will be ignored" );
+        assert( diffuse == ColourValue::White ||
+                (mHasColour &&
+                 "Setting colour to a Datablock created w/out diffuse flag will be ignored") );
         mR = diffuse.r;
         mG = diffuse.g;
         mB = diffuse.b;
