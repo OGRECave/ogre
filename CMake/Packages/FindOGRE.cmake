@@ -407,6 +407,7 @@ macro(ogre_find_component COMPONENT HEADER)
 	  mark_as_advanced(OGRE_${COMPONENT}_BINARY_REL OGRE_${COMPONENT}_BINARY_DBG)
     endif()
   endif()
+  unset(OGRE_${COMPONENT}_FIND_QUIETLY)
 endmacro()
 
 # look for Paging component
