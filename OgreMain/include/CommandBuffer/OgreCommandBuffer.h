@@ -56,6 +56,10 @@ namespace Ogre
 
         FastArray<unsigned char>    mCommandBuffer;
     public:
+        CommandBuffer();
+
+        void setCurrentRenderSystem( RenderSystem *renderSystem );
+
         void execute_setVao( const CbBase * RESTRICT_ALIAS cmd );
         void execute_drawCallIndexedEmulated( const CbBase * RESTRICT_ALIAS cmd );
         void execute_drawCallIndexed( const CbBase * RESTRICT_ALIAS cmd );
@@ -79,7 +83,7 @@ namespace Ogre
         T* addCommand(void)
         {
             assert( sizeof(T) <= COMMAND_FIXED_SIZE );
-            mCommandBuffer.insert( mCommandBuffer.end(), COMMAND_FIXED_SIZE );
+            mCommandBuffer.resize( mCommandBuffer.size() + COMMAND_FIXED_SIZE );
 
             T *retVal = reinterpret_cast<T*>( mCommandBuffer.end() - COMMAND_FIXED_SIZE );
             retVal->commandType = MAX_COMMAND_BUFFER;

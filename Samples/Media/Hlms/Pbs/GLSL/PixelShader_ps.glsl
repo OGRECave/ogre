@@ -199,7 +199,7 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 
 void main()
 {
-	uint materialId	= instance.worldMaterialIdx[drawId] & 0x1FF;
+	uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FF;
 @property( diffuse_map )	diffuseIdx			=  material.m[materialId].indices0 & 0x0000FFFF;@end
 @property( normal_map_tex )	normalIdx			= (material.m[materialId].indices0 & 0xFFFF0000) >> 16;@end
 @property( specular_map )	specularIdx			=  material.m[materialId].indices1 & 0x0000FFFF;@end

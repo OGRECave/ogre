@@ -168,7 +168,8 @@ mGpuParamsDirty((uint16)GPV_ALL)
     if (root)
         _setDestinationRenderSystem(root->getRenderSystem());
 
-    mRenderQueue = OGRE_NEW RenderQueue( root->getHlmsManager(), this );
+    mRenderQueue = OGRE_NEW RenderQueue( root->getHlmsManager(), this,
+                                         mDestRenderSystem->getVaoManager() );
 
     // create the auto param data source instance
     mAutoParamDataSource = createAutoParamDataSource();
@@ -1227,7 +1228,7 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
                     while( itRend != enRend )
                     {
-                        mRenderQueue->addRenderable( *itRend, *itor, casterPass );
+                        mRenderQueue->addRenderableV1( *itRend, *itor, casterPass );
                         ++itRend;
                     }
 

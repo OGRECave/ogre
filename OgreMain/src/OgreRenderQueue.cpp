@@ -80,9 +80,11 @@ namespace Ogre
     const int MeshShiftTransp       = ShaderShiftTransp - MeshBits;         //11
     const int TextureShiftTransp    = MeshShiftTransp   - TextureBits;      //0
     //---------------------------------------------------------------------
-    RenderQueue::RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager ) :
+    RenderQueue::RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager,
+                              VaoManager *vaoManager ) :
         mHlmsManager( hlmsManager ),
         mSceneManager( sceneManager ),
+        mVaoManager( vaoManager ),
         mLastWasCasterPass( false ),
         mLastMacroblock( 0 ),
         mLastBlendblock( 0 ),
@@ -93,10 +95,12 @@ namespace Ogre
         mLastTextureHash( 0 ),
         mCommandBuffer( 0 )
     {
+        mCommandBuffer = new CommandBuffer();
     }
     //---------------------------------------------------------------------
     RenderQueue::~RenderQueue()
     {
+        delete mCommandBuffer;
     }
     //-----------------------------------------------------------------------
     IndirectBufferPacked* RenderQueue::getIndirectBuffer( size_t numDraws )
@@ -125,9 +129,8 @@ namespace Ogre
         if( smallestBuffer == end )
         {
             //None found? Create a new one.
-            VaoManager *vaoManager = 0;
-            mFreeIndirectBuffers.push_back( vaoManager->createIndirectBuffer( requiredBytes, BT_DYNAMIC,
-                                                                              0, false ) );
+            mFreeIndirectBuffers.push_back( mVaoManager->createIndirectBuffer( requiredBytes, BT_DYNAMIC,
+                                                                               0, false ) );
             smallestBuffer = mFreeIndirectBuffers.end() - 1;
         }
 
@@ -160,8 +163,20 @@ namespace Ogre
         mLastTextureHash= 0;
     }
     //-----------------------------------------------------------------------
+    void RenderQueue::addRenderableV1( Renderable* pRend, const MovableObject *pMovableObject,
+                                       bool casterPass )
+    {
+        addRenderable( pRend, pMovableObject, casterPass, true );
+    }
+    //-----------------------------------------------------------------------
     void RenderQueue::addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
                                      bool casterPass )
+    {
+        addRenderable( pRend, pMovableObject, casterPass, false );
+    }
+    //-----------------------------------------------------------------------
+    void RenderQueue::addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
+                                     bool casterPass, bool isV1 )
     {
         uint8 rqId  = pMovableObject->getRenderQueueGroup();
         uint8 subId = pRend->getRenderQueueSubGroup();
@@ -189,9 +204,22 @@ namespace Ogre
 #endif
         uint32 quantizedDepth = static_cast<uint32>( depth );
 
-        v1::RenderOperation op;
-        pRend->getRenderOperation( op ); //TODO
-        uint32 meshHash = op.meshIndex;
+        uint32 meshHash;
+
+        if( isV1 )
+        {
+            v1::RenderOperation op;
+            pRend->getRenderOperation( op ); //TODO
+            meshHash = op.meshIndex;
+        }
+        else
+        {
+            uint8 meshLod = 0; //TODO
+            const VertexArrayObjectArray &vaos = pRend->getVaos();
+
+            VertexArrayObject *vao = vaos[meshLod];
+            meshHash = vao->getRenderQueueId();
+        }
         //TODO: Account for skeletal animation in any of the hashes (preferently on the material side)
         //TODO: Account for auto instancing animation in any of the hashes
 
@@ -342,6 +370,13 @@ namespace Ogre
             mLastWasCasterPass = casterPass;
         }
 
+        size_t numNeededDraws = 0;
+        for( size_t i=firstRq; i<lastRq; ++i )
+            numNeededDraws += mRenderQueues[i].mQueuedRenderables.size();
+
+        if( !numNeededDraws )
+            return;
+
         HlmsCache passCache[HLMS_MAX];
 
         for( size_t i=0; i<HLMS_MAX; ++i )
@@ -354,23 +389,20 @@ namespace Ogre
             }
         }
 
+        mCommandBuffer->setCurrentRenderSystem( rs );
+
         HlmsMacroblock const *lastMacroblock = mLastMacroblock;
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
         VertexArrayObject *lastVao = 0;
         uint32 lastVaoId = mLastVaoId;
         HlmsCache const *lastHlmsCache = mLastHlmsCache;
 
-        VaoManager *vaoManager = 0;
-        bool supportsIndirectBuffers = vaoManager->supportsIndirectBuffers();
+        bool supportsIndirectBuffers = mVaoManager->supportsIndirectBuffers();
 
         CbDrawCall *drawCmd = 0;
         CbDrawIndexed   *drawIndexedPtr = 0;
         CbDrawStrip     *drawStripPtr = 0;
         CbSharedDraw    *drawCountPtr = 0;
-
-        size_t numNeededDraws = 0;
-        for( size_t i=firstRq; i<lastRq; ++i )
-            numNeededDraws += mRenderQueues[i].mQueuedRenderables.size();
 
         IndirectBufferPacked *indirectBuffer = getIndirectBuffer( numNeededDraws );
         uint32 baseInstance = 0;

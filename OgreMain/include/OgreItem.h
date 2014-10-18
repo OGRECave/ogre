@@ -141,6 +141,9 @@ namespace Ogre {
         /// Sets the given HLMS databloock to all SubEntities
         void setDatablock( HlmsDatablock *datablock );
 
+        /// Sets the given HLMS datablock to all SubEntities
+        void setDatablock( IdString datablockName );
+
         /** Clones this Item and returns a pointer to the clone.
         @remarks
             Useful method for duplicating an Item. The new Item must be

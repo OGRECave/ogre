@@ -49,6 +49,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreLodStrategy.h"
 #include "OgreLodListener.h"
 #include "OgreMaterialManager.h"
+#include "OgreMeshManager2.h"
 
 namespace Ogre {
     extern const FastArray<Real> c_DefaultLodMesh;
@@ -188,6 +189,14 @@ namespace Ogre {
             itor->setDatablock( datablock );
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------
+    void Item::setDatablock( IdString datablockName )
+    {
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        HlmsDatablock *datablock = hlmsManager->getDatablock( datablockName );
+
+        setDatablock( datablock );
     }
 #if 0
     //-----------------------------------------------------------------------
@@ -371,10 +380,8 @@ namespace Ogre {
             ni = params->find("mesh");
             if (ni != params->end())
             {
-#if 0
                 // Get mesh (load if required)
                 pMesh = MeshManager::getSingleton().load( ni->second, groupName );
-#endif
             }
 
         }

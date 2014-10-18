@@ -101,6 +101,7 @@ layout(binding = 2) uniform InstanceBuffer
 @end
 
 @piece( VStoPS_block )
+	flat uint drawId;
 	@property( !hlms_shadowcaster )
 		@property( hlms_normal )
 			vec3 pos;

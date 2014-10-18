@@ -52,7 +52,15 @@ namespace Ogre
         &CommandBuffer::execute_disableTextureUnitsFrom,
         &CommandBuffer::execute_invalidCommand
     };
-
+    //-----------------------------------------------------------------------------------
+    CommandBuffer::CommandBuffer() : mRenderSystem( 0 )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    void CommandBuffer::setCurrentRenderSystem( RenderSystem *renderSystem )
+    {
+        mRenderSystem = renderSystem;
+    }
     //-----------------------------------------------------------------------------------
     void CommandBuffer::execute_invalidCommand( const CbBase *cmd )
     {

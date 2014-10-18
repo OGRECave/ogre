@@ -23,6 +23,8 @@ in vec4 blendWeights;@end
 @foreach( hlms_uv_count, n )
 in vec@value( hlms_uv_count@n ) uv@n;@end
 
+in uint drawId;
+
 out block
 {
 @insertpiece( VStoPS_block )
@@ -176,4 +178,6 @@ void main()
 	//see http://yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	gl_Position.z = gl_Position.z * (gl_Position.w * pass.depthRange.y);
 @end
+
+	outVs.drawId = drawId;
 }

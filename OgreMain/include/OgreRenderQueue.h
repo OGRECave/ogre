@@ -97,7 +97,8 @@ namespace Ogre {
         RenderQueueGroup mRenderQueues[256];
 
         HlmsManager *mHlmsManager;
-        SceneManager *mSceneManager;
+        SceneManager*mSceneManager;
+        VaoManager  *mVaoManager;
 
         bool                    mLastWasCasterPass;
         HlmsMacroblock const    *mLastMacroblock;
@@ -121,8 +122,11 @@ namespace Ogre {
         */
         IndirectBufferPacked* getIndirectBuffer( size_t numDraws );
 
+        FORCEINLINE void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
+                                        bool casterPass, bool isV1 );
+
     public:
-        RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager );
+        RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager, VaoManager *vaoManager );
         ~RenderQueue();
 
         /// Empty the queue - should only be called by SceneManagers.
@@ -136,9 +140,13 @@ namespace Ogre {
         */
         void clearState(void);
 
-        /** Add a renderable object to the queue.
+        /// Add a renderable (Ogre v1.x) object to the queue. @see addRenderable
+        void addRenderableV1( Renderable* pRend, const MovableObject *pMovableObject,
+                              bool casterPass );
+
+        /** Add a renderable (Ogre v2.0, i.e. Items; they use VAOs) object to the queue.
         @remarks
-            This methods adds a Renderable to the queue, which will be rendered later by 
+            This methods adds a Renderable to the queue, which will be rendered later by
             the SceneManager. This is the advanced version of the call which allows the renderable
             to be added to any queue.
         @note
@@ -149,7 +157,7 @@ namespace Ogre {
             The group the renderable is to be added to. This
             can be used to schedule renderable objects in separate groups such that the SceneManager
             respects the divisions between the groupings and does not reorder them outside these
-            boundaries. This can be handy for overlays where no matter what you want the overlay to 
+            boundaries. This can be handy for overlays where no matter what you want the overlay to
             be rendered last.
         */
         void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,

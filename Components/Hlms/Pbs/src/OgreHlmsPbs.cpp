@@ -239,8 +239,8 @@ namespace Ogre
         if( mVaoManager )
             destroyAllBuffers();
 
-        Hlms::_changeRenderSystem( newRs );
         ConstBufferPool::_changeRenderSystem( newRs );
+        Hlms::_changeRenderSystem( newRs );
 
         if( newRs )
         {
@@ -818,13 +818,23 @@ namespace Ogre
             passBufferPtr += 2;
         }
 
-        assert( (size_t)(passBufferPtr - startupPtr) == mapSize );
+        assert( (size_t)(passBufferPtr - startupPtr) * 4 == mapSize );
 
         passBuffer->unmap( UO_KEEP_PERSISTENT );
 
         mLastTextureHash = 0;
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsPbs::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                    bool casterPass, const HlmsCache *lastCache,
+                                    uint32 lastTextureHash )
+    {
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                     "Trying to use slow-path on a desktop implementation. "
+                     "Change the RenderQueue settings.",
+                     "HlmsPbs::fillBuffersFor" );
     }
     //-----------------------------------------------------------------------------------
     uint32 HlmsPbs::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
