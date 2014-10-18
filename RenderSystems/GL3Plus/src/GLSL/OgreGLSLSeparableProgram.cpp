@@ -186,6 +186,9 @@ namespace Ogre
                     return;
                 }
 
+                if( program->getType() == GPT_VERTEX_PROGRAM )
+                    bindFixedAttributes( programHandle );
+
                 program->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));

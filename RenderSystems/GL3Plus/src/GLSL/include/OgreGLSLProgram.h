@@ -190,6 +190,9 @@ namespace Ogre {
         void populateParameterNames(GpuProgramParametersSharedPtr params);
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
+
+        void bindFixedAttributes( const GL3PlusVaoManager *vaoManager );
+
         /** Check the compile result for an error with default precision - and recompile if needed.
             some glsl compilers return an error default precision is set to types other then
             int or float, this function test a failed compile result for the error,

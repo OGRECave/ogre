@@ -203,6 +203,8 @@ namespace Ogre {
 
         VertexElementSemantic getAttributeSemanticEnum(String type);
         const char * getAttributeSemanticString(VertexElementSemantic semantic);
+
+        void bindFixedAttributes( GLuint programName );
     };
 
 

@@ -205,6 +205,8 @@ namespace Ogre {
             mComputeShader->attachToProgramObject(mGLProgramHandle);
         }
 
+        bindFixedAttributes( mGLProgramHandle );
+
         // the link
         OGRE_CHECK_GL_ERROR(glLinkProgram( mGLProgramHandle ));
         OGRE_CHECK_GL_ERROR(glGetProgramiv( mGLProgramHandle, GL_LINK_STATUS, &mLinked ));

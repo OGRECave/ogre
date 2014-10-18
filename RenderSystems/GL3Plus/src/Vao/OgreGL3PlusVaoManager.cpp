@@ -44,6 +44,26 @@ namespace Ogre
 {
     static const GLuint64 kOneSecondInNanoSeconds = 1000000000;
 
+    const GLuint GL3PlusVaoManager::VERTEX_ATTRIBUTE_INDEX[VES_COUNT] =
+    {
+        0,  // VES_POSITION - 1
+        1,  // VES_NORMAL - 1
+        2,  // VES_TANGENT - 1
+        3,  // VES_BLEND_WEIGHTS - 1
+        4,  // VES_BLEND_INDICES - 1
+        5,  // VES_DIFFUSE - 1
+        6,  // VES_SPECULAR - 1
+        7,  // VES_TEXTURE_COORDINATES - 1
+        //There are up to 8 VES_TEXTURE_COORDINATES. Occupy range [7; 15)
+        //Index 15 is reserved for draw ID.
+
+        //VES_BINORMAL uses slot 16. Lots of GPUs don't support more than 16 attributes
+        //(even very modern ones like the GeForce 680). Since Binormal is rarely used, it
+        //is technical (not artist controlled, unlike UVs) and can be replaced by a
+        //4-component VES_TANGENT, we leave this one for the end.
+        16, // VES_BINORMAL - 1
+    };
+
     GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers ) :
         mArbBufferStorage( supportsArbBufferStorage ),
         mDrawId( 0 )
@@ -62,23 +82,6 @@ namespace Ogre
         mTexBufferAlignment = alignment;
 
         mSupportsIndirectBuffers = supportsIndirectBuffers;
-
-        mVertexAttributeIndex[VES_POSITION - 1]             = 0;
-        mVertexAttributeIndex[VES_NORMAL - 1]               = 1;
-        mVertexAttributeIndex[VES_TANGENT - 1]              = 2;
-        mVertexAttributeIndex[VES_BLEND_WEIGHTS - 1]        = 3;
-        mVertexAttributeIndex[VES_BLEND_INDICES - 1]        = 4;
-        mVertexAttributeIndex[VES_DIFFUSE - 1]              = 5;
-        mVertexAttributeIndex[VES_SPECULAR - 1]             = 6;
-        mVertexAttributeIndex[VES_TEXTURE_COORDINATES - 1]  = 7;
-        //There are up to 8 VES_TEXTURE_COORDINATES. Occupy range [7; 15)
-        //Index 15 is reserved for draw ID.
-
-        //VES_BINORMAL uses slot 16. Lots of GPUs don't support more than 16 attributes
-        //(even very modern ones like the GeForce 680). Since Binormal is rarely used, it
-        //is technical (not artist controlled, unlike UVs) and can be replaced by a
-        //4-component VES_TANGENT, we leave this one for the end.
-        mVertexAttributeIndex[VES_BINORMAL - 1]             = 16;
 
         VertexElement2Vec vertexElements;
         vertexElements.push_back( VertexElement2( VET_UINT1, VES_COUNT ) );
@@ -608,7 +611,7 @@ namespace Ogre
                     break;
                 };
 
-                GLuint attributeIndex = mVertexAttributeIndex[it->mSemantic] + uvCount;
+                GLuint attributeIndex = VERTEX_ATTRIBUTE_INDEX[it->mSemantic - 1] + uvCount;
 
                 if( it->mSemantic == VES_TEXTURE_COORDINATES )
                 {
@@ -903,12 +906,9 @@ namespace Ogre
         return mDynamicBufferCurrentFrame;
     }
     //-----------------------------------------------------------------------------------
-    /*IndexBufferPacked* GL3PlusVaoManager::createIndexBufferImpl( IndexBufferPacked::IndexType indexType,
-                                                      size_t numIndices, BufferType bufferType,
-                                                      void *initialData, bool keepAsShadow )
+    GLuint GL3PlusVaoManager::getAttributeIndexFor( VertexElementSemantic semantic )
     {
-        return createIndexBufferImpl( 0, numIndices, indexType == IndexBufferPacked::IT_16BIT ? 2 : 4,
-                                      bufferType, 0, initialData, keepAsShadow );
-    }*/
+        return VERTEX_ATTRIBUTE_INDEX[semantic - 1];
+    }
 }
 

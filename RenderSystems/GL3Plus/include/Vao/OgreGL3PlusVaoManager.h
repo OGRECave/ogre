@@ -140,7 +140,7 @@ namespace Ogre
         /// True if ARB_buffer_storage is supported (Persistent Mapping and immutable buffers)
         bool    mArbBufferStorage;
 
-        GLuint mVertexAttributeIndex[VES_COUNT];
+        static const GLuint VERTEX_ATTRIBUTE_INDEX[VES_COUNT];
         VertexBufferPacked  *mDrawId;
 
         /** Asks for allocating buffer space in a VBO (Vertex Buffer Object).
@@ -257,6 +257,8 @@ namespace Ogre
         /// times). But first stalls until that mDynamicBufferMultiplier-1 frame behind
         /// is finished.
         uint8 waitForTailFrameToFinish(void);
+
+        static GLuint getAttributeIndexFor( VertexElementSemantic semantic );
     };
 }
 
