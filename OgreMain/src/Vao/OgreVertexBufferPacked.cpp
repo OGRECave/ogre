@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    VertexBufferPacked::VertexBufferPacked( size_t internalBufferStart, size_t numElements,
+    VertexBufferPacked::VertexBufferPacked( size_t internalBufferStartBytes, size_t numElements,
                                             uint32 bytesPerElement, BufferType bufferType,
                                             void *initialData, bool keepAsShadow,
                                             VaoManager *vaoManager, BufferInterface *bufferInterface,
@@ -39,7 +39,7 @@ namespace Ogre
                                             size_t multiSourceId,
                                             MultiSourceVertexBufferPool *multiSourcePool,
                                             uint8 sourceIdx ) :
-        BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+        BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
                       initialData, keepAsShadow, vaoManager, bufferInterface ),
         mVertexElements( vertexElements ),
         mMultiSourceId( multiSourceId ),

@@ -38,10 +38,10 @@ namespace Ogre
     class _OgreExport IndirectBufferPacked : public BufferPacked
     {
     public:
-        IndirectBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+        IndirectBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
                               BufferType bufferType, void *initialData, bool keepAsShadow,
                               VaoManager *vaoManager, BufferInterface *bufferInterface ) :
-            BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+            BufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
                           initialData, keepAsShadow, vaoManager, bufferInterface )
         {
         }

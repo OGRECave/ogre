@@ -42,7 +42,7 @@ namespace Ogre
         GLenum mInternalFormat;
 
     public:
-        GL3PlusTexBufferPacked(size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+        GL3PlusTexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
                                 BufferType bufferType, void *initialData, bool keepAsShadow,
                                 VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface,
                                 Ogre::PixelFormat pf );

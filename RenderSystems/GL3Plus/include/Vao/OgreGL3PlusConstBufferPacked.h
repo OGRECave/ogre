@@ -37,7 +37,8 @@ namespace Ogre
     class _OgreGL3PlusExport GL3PlusConstBufferPacked : public ConstBufferPacked
     {
     public:
-        GL3PlusConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+        GL3PlusConstBufferPacked( size_t internalBufferStartBytes, size_t numElements,
+                                  uint32 bytesPerElement,
                                   BufferType bufferType, void *initialData, bool keepAsShadow,
                                   VaoManager *vaoManager, BufferInterface *bufferInterface,
                                   size_t bindableSize );

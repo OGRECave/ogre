@@ -34,10 +34,10 @@ THE SOFTWARE.
 namespace Ogre
 {
     GL3PlusTexBufferPacked::GL3PlusTexBufferPacked(
-                size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+                size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
                 BufferType bufferType, void *initialData, bool keepAsShadow,
                 VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface, PixelFormat pf ) :
-        TexBufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+        TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
                          initialData, keepAsShadow, vaoManager, bufferInterface, pf ),
         mTexName( 0 )
     {

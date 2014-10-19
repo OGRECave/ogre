@@ -71,6 +71,8 @@ namespace Ogre
 
         uint32 mConstBufferAlignment;
         uint32 mTexBufferAlignment;
+        size_t mConstBufferMaxSize;
+        size_t mTexBufferMaxSize;
 
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
@@ -303,6 +305,8 @@ namespace Ogre
 
         uint32 getConstBufferAlignment(void) const      { return mConstBufferAlignment; }
         uint32 getTexBufferAlignment(void) const        { return mTexBufferAlignment; }
+        size_t getConstBufferMaxSize(void) const        { return mConstBufferMaxSize; }
+        size_t getTexBufferMaxSize(void) const          { return mTexBufferMaxSize; }
 
         /// When false, IndirectBufferPacked will emulate the mapping behavior,
         /// and we need to use the emulated calls in RenderSystem.

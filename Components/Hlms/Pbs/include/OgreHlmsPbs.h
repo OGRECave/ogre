@@ -89,6 +89,8 @@ namespace Ogre
 
         uint32 mLastTextureHash;
 
+        size_t mTextureBufferDefaultSize;
+
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
                                                          uint32 finalHash,
@@ -152,6 +154,10 @@ namespace Ogre
                                        CommandBuffer *commandBuffer );
 
         virtual void frameEnded(void);
+
+        /// Changes the default suggested size for the texture buffer.
+        /// Actual size may be lower if the GPU can't honour the request.
+        void setTextureBufferDefaultSize( size_t defaultSize );
     };
 
     struct _OgreHlmsPbsExport PbsProperty

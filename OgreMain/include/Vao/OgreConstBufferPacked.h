@@ -41,11 +41,11 @@ namespace Ogre
         size_t mBindableSizeBytes;
 
     public:
-        ConstBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+        ConstBufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
                            BufferType bufferType, void *initialData, bool keepAsShadow,
                            VaoManager *vaoManager, BufferInterface *bufferInterface,
                            size_t bindableSize ) :
-            BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+            BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
                           initialData, keepAsShadow, vaoManager, bufferInterface ),
             mBindableSizeBytes( bindableSize )
         {

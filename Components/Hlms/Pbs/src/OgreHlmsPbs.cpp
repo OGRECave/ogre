@@ -199,7 +199,8 @@ namespace Ogre
         mCurrentTexBufferSize( 0 ),
         mTexLastOffset( 0 ),
         mLastTexBufferCmdOffset( (size_t)~0 ),
-        mLastTextureHash( 0 )
+        mLastTextureHash( 0 ),
+        mTextureBufferDefaultSize( 32 * 1024 * 1024 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -822,6 +823,16 @@ namespace Ogre
 
         passBuffer->unmap( UO_KEEP_PERSISTENT );
 
+        //mTexBuffers must hold at least one buffer to prevent out of bound exceptions.
+        if( mTexBuffers.empty() )
+        {
+            size_t bufferSize = std::min<size_t>( mTextureBufferDefaultSize,
+                                                  mVaoManager->getTexBufferMaxSize() );
+            TexBufferPacked *newBuffer = mVaoManager->createTexBuffer( PF_R8G8B8A8, bufferSize,
+                                                                       BT_DYNAMIC, 0, false );
+            mTexBuffers.push_back( newBuffer );
+        }
+
         mLastTextureHash = 0;
 
         return retVal;
@@ -989,9 +1000,11 @@ namespace Ogre
     {
         unmapConstBuffer();
 
-        if( mCurrentConstBuffer > mConstBuffers.size() )
+        if( mCurrentConstBuffer >= mConstBuffers.size() )
         {
-            //mConstBuffers.push_back(  ); TODO
+            size_t bufferSize = std::min<size_t>( 65535, mVaoManager->getConstBufferMaxSize() );
+            ConstBufferPacked *newBuffer = mVaoManager->createConstBuffer( bufferSize, BT_DYNAMIC, 0, false );
+            mConstBuffers.push_back( newBuffer );
         }
 
         ConstBufferPacked *constBuffer = mConstBuffers[mCurrentConstBuffer];
@@ -1047,7 +1060,11 @@ namespace Ogre
 
             if( mCurrentTexBuffer >= mTexBuffers.size() )
             {
-                //mTexBuffers.push_back(  ); TODO
+                size_t bufferSize = std::min<size_t>( mTextureBufferDefaultSize,
+                                                      mVaoManager->getTexBufferMaxSize() );
+                TexBufferPacked *newBuffer = mVaoManager->createTexBuffer( PF_R8G8B8A8, bufferSize,
+                                                                           BT_DYNAMIC, 0, false );
+                mTexBuffers.push_back( newBuffer );
             }
 
             texBuffer = mTexBuffers[mCurrentTexBuffer];
@@ -1120,6 +1137,11 @@ namespace Ogre
             (*itor)->advanceFrame();
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setTextureBufferDefaultSize( size_t defaultSize )
+    {
+        mTextureBufferDefaultSize = defaultSize;
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsPbs::createDatablockImpl( IdString datablockName,

@@ -35,11 +35,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    BufferPacked::BufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
-                                BufferType bufferType, void *initialData, bool keepAsShadow,
-                                VaoManager *vaoManager, BufferInterface *bufferInterface ) :
-        mInternalBufferStart( internalBufferStart ),
-        mFinalBufferStart( internalBufferStart ),
+    BufferPacked::BufferPacked( size_t internalBufferStartBytes, size_t numElements,
+                                uint32 bytesPerElement, BufferType bufferType, void *initialData,
+                                bool keepAsShadow, VaoManager *vaoManager,
+                                BufferInterface *bufferInterface ) :
+        mInternalBufferStart( internalBufferStartBytes / bytesPerElement ),
+        mFinalBufferStart( internalBufferStartBytes / bytesPerElement ),
         mNumElements( numElements ),
         mBytesPerElement( bytesPerElement ),
         mBufferType( bufferType ),
@@ -56,6 +57,8 @@ namespace Ogre
         mLastFrameMappedAndAdvanced( ~0 )
 #endif
     {
+        assert( !(internalBufferStartBytes % bytesPerElement) );
+
         mBufferInterface->_notifyBuffer( this );
 
         if( !initialData && mBufferType == BT_IMMUTABLE )
@@ -167,9 +170,9 @@ namespace Ogre
             }
 
             if( //This is a different frame from the last time we called map
-                    mLastFrameMapped != currentFrame &&
-                    //map was called, but advanceFrame was not.
-                    (int)(mLastFrameMapped - mLastFrameMappedAndAdvanced) > 0 )
+                mLastFrameMapped != currentFrame &&
+                //map was called, but advanceFrame was not.
+                (int)(mLastFrameMapped - mLastFrameMappedAndAdvanced) > 0 )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                              "Last frame called map( advanceFrame = true ) but "

@@ -42,10 +42,10 @@ namespace Ogre
             IT_32BIT
         };
 
-        IndexBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+        IndexBufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
                            BufferType bufferType, void *initialData, bool keepAsShadow,
                            VaoManager *vaoManager, BufferInterface *bufferInterface ) :
-            BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+            BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
                           initialData, keepAsShadow, vaoManager, bufferInterface )
         {
         }

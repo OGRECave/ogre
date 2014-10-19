@@ -32,10 +32,10 @@ THE SOFTWARE.
 namespace Ogre
 {
     GL3PlusConstBufferPacked::GL3PlusConstBufferPacked(
-                size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+                size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
                 BufferType bufferType, void *initialData, bool keepAsShadow,
                 VaoManager *vaoManager, BufferInterface *bufferInterface , size_t bindableSize ) :
-        ConstBufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+        ConstBufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
                            initialData, keepAsShadow, vaoManager, bufferInterface, bindableSize )
     {
     }

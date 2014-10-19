@@ -81,6 +81,12 @@ namespace Ogre
         glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
         mTexBufferAlignment = alignment;
 
+        GLint maxBufferSize;
+        glGetIntegerv( GL_MAX_UNIFORM_BLOCK_SIZE, &maxBufferSize );
+        mConstBufferMaxSize = static_cast<size_t>( maxBufferSize );
+        glGetIntegerv( GL_MAX_TEXTURE_BUFFER_SIZE, &maxBufferSize );
+        mTexBufferMaxSize = static_cast<size_t>( maxBufferSize );
+
         mSupportsIndirectBuffers = supportsIndirectBuffers;
 
         VertexElement2Vec vertexElements;
@@ -357,7 +363,8 @@ namespace Ogre
                                                         vertexBuffer->getBufferInterface() );
 
 
-        deallocateVbo( bufferInterface->getVboPoolIndex(), vertexBuffer->_getInternalBufferStart(),
+        deallocateVbo( bufferInterface->getVboPoolIndex(),
+                       vertexBuffer->_getInternalBufferStart() * vertexBuffer->getBytesPerElement(),
                        vertexBuffer->getNumElements() * vertexBuffer->getBytesPerElement(),
                        vertexBuffer->getBufferType() );
     }
@@ -420,7 +427,8 @@ namespace Ogre
                                                         indexBuffer->getBufferInterface() );
 
 
-        deallocateVbo( bufferInterface->getVboPoolIndex(), indexBuffer->_getInternalBufferStart(),
+        deallocateVbo( bufferInterface->getVboPoolIndex(),
+                       indexBuffer->_getInternalBufferStart() * indexBuffer->getBytesPerElement(),
                        indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
                        indexBuffer->getBufferType() );
     }
@@ -470,7 +478,8 @@ namespace Ogre
                                                         constBuffer->getBufferInterface() );
 
 
-        deallocateVbo( bufferInterface->getVboPoolIndex(), constBuffer->_getInternalBufferStart(),
+        deallocateVbo( bufferInterface->getVboPoolIndex(),
+                       constBuffer->_getInternalBufferStart() * constBuffer->getBytesPerElement(),
                        constBuffer->getNumElements() * constBuffer->getBytesPerElement(),
                        constBuffer->getBufferType() );
     }
@@ -519,7 +528,8 @@ namespace Ogre
                                                         texBuffer->getBufferInterface() );
 
 
-        deallocateVbo( bufferInterface->getVboPoolIndex(), texBuffer->_getInternalBufferStart(),
+        deallocateVbo( bufferInterface->getVboPoolIndex(),
+                       texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
                        texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
                        texBuffer->getBufferType() );
     }
@@ -569,7 +579,8 @@ namespace Ogre
                                                         indirectBuffer->getBufferInterface() );
 
 
-        deallocateVbo( bufferInterface->getVboPoolIndex(), indirectBuffer->_getInternalBufferStart(),
+        deallocateVbo( bufferInterface->getVboPoolIndex(),
+                       indirectBuffer->_getInternalBufferStart() * indirectBuffer->getBytesPerElement(),
                        indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
                        indirectBuffer->getBufferType() );
     }

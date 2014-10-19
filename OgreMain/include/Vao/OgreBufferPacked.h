@@ -135,7 +135,7 @@ namespace Ogre
 
             Must be false if bufferType == BT_DYNAMIC
         */
-        BufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+        BufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
                       BufferType bufferType, void *initialData, bool keepAsShadow,
                       VaoManager *vaoManager, BufferInterface *bufferInterface );
         virtual ~BufferPacked();

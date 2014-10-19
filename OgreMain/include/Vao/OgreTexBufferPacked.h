@@ -41,10 +41,10 @@ namespace Ogre
         PixelFormat mPixelFormat;
 
     public:
-        TexBufferPacked( size_t internalBufferStart, size_t numElements, uint32 bytesPerElement,
+        TexBufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
                          BufferType bufferType, void *initialData, bool keepAsShadow,
                          VaoManager *vaoManager, BufferInterface *bufferInterface, PixelFormat pf ) :
-            BufferPacked( internalBufferStart, numElements, bytesPerElement, bufferType,
+            BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
                           initialData, keepAsShadow, vaoManager, bufferInterface ),
             mPixelFormat( pf )
         {

@@ -47,7 +47,9 @@ namespace Ogre
         mNextStagingBufferTimestampCheckpoint( ~0 ),
         mFrameCount( 0 ),
         mConstBufferAlignment( 256 ),
-        mTexBufferAlignment( 256 )
+        mTexBufferAlignment( 256 ),
+        mConstBufferMaxSize( 16 * 1024 * 1024 ), //Minimum guaranteed by GL.
+        mTexBufferMaxSize( 128 * 1024 * 1024 )   //Minimum guaranteed by GL.
     {
         mTimer = OGRE_NEW Timer();
     }
