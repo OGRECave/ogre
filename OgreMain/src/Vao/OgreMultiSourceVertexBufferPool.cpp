@@ -48,7 +48,7 @@ namespace Ogre
         mSourceOffset.reserve( mVertexElementsBySource.size() );
 
         uint8 dynamicBufferMultiplier = 1;
-        if( mBufferType == BT_DYNAMIC )
+        if( mBufferType >= BT_DYNAMIC_DEFAULT )
             dynamicBufferMultiplier = mVaoManager->getDynamicBufferMultiplier();
 
         size_t accumulatedOffset = 0;

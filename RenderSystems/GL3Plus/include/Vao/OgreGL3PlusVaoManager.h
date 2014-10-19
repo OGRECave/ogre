@@ -40,7 +40,9 @@ namespace Ogre
         enum VboFlag
         {
             CPU_INACCESSIBLE,
-            CPU_ACCESSIBLE,
+            CPU_ACCESSIBLE_DEFAULT,
+            CPU_ACCESSIBLE_PERSISTENT,
+            CPU_ACCESSIBLE_PERSISTENT_COHERENT,
             MAX_VBO_FLAG
         };
 
@@ -83,6 +85,7 @@ namespace Ogre
         {
             GLuint vboName;
             size_t sizeBytes;
+            GL3PlusDynamicBuffer *dynamicBuffer; //Null for CPU_INACCESSIBLE BOs.
 
             BlockVec            freeBlocks;
             StrideChangerVec    strideChangers;
@@ -237,6 +240,8 @@ namespace Ogre
                                                         v1::RenderOperation::OperationType opType );
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
+
+        static VboFlag bufferTypeToVboFlag( BufferType bufferType );
 
     public:
         GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers );

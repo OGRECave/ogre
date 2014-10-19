@@ -29,14 +29,17 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusBufferInterface.h"
 #include "Vao/OgreGL3PlusVaoManager.h"
 #include "Vao/OgreGL3PlusStagingBuffer.h"
+#include "Vao/OgreGL3PlusDynamicBuffer.h"
 
 namespace Ogre
 {
-    GL3PlusBufferInterface::GL3PlusBufferInterface( size_t vboPoolIdx, GLenum target, GLuint vboName ) :
+    GL3PlusBufferInterface::GL3PlusBufferInterface( size_t vboPoolIdx, GLuint vboName,
+                                                    GL3PlusDynamicBuffer *dynamicBuffer ) :
         mVboPoolIdx( vboPoolIdx ),
-        mTarget( target ),
         mVboName( vboName ),
-        mMappedPtr( 0 )
+        mMappedPtr( 0 ),
+        mUnmapTicket( (size_t)~0 ),
+        mDynamicBuffer( dynamicBuffer )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -72,36 +75,23 @@ namespace Ogre
 
         if( prevMappingState == MS_UNMAPPED || !canPersistentMap )
         {
-            GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT |
-                                GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT;
-
             //Non-persistent buffers just map the small region they'll need.
             size_t offset = mBuffer->mInternalBufferStart + elementStart +
                             mBuffer->mNumElements * dynamicCurrentFrame;
             size_t length = elementCount;
 
-            if( mBuffer->mMappingState >= MS_PERSISTENT_INCOHERENT && canPersistentMap )
+            if( mBuffer->mBufferType >= BT_DYNAMIC_PERSISTENT && canPersistentMap )
             {
                 //Persistent buffers map the *whole* assigned buffer,
                 //we later care for the offsets and lengths
                 offset = mBuffer->mInternalBufferStart;
                 length = mBuffer->mNumElements * vaoManager->getDynamicBufferMultiplier();
-
-                flags |= GL_MAP_PERSISTENT_BIT;
-
-                if( mBuffer->mMappingState == MS_PERSISTENT_COHERENT )
-                    flags |= GL_MAP_COHERENT_BIT;
             }
 
-            mBuffer->mMappingStart = offset;
-            mBuffer->mMappingCount = length;
-
-            glBindBuffer( mTarget, mVboName );
-            OCGE(
-                mMappedPtr = glMapBufferRange( mTarget,
-                                               offset * bytesPerElement,
-                                               length * bytesPerElement,
-                                               flags ) );
+            OCGE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
+            mMappedPtr = mDynamicBuffer->map( offset * bytesPerElement,
+                                              length * bytesPerElement,
+                                              mUnmapTicket );
         }
 
         //For regular maps, mLastMappingStart is 0. So that we can later flush correctly.
@@ -110,7 +100,7 @@ namespace Ogre
 
         char *retVal = (char*)mMappedPtr;
 
-        if( mBuffer->mMappingState >= MS_PERSISTENT_INCOHERENT && canPersistentMap )
+        if( mBuffer->mBufferType >= BT_DYNAMIC_PERSISTENT && canPersistentMap )
         {
             //For persistent maps, we've mapped the whole 3x size of the buffer. mLastMappingStart
             //points to the right offset so that we can later flush correctly.
@@ -133,20 +123,21 @@ namespace Ogre
         bool canPersistentMap = static_cast<GL3PlusVaoManager*>( mBuffer->mVaoManager )->
                                                                 supportsArbBufferStorage();
 
-        if( mBuffer->mMappingState <= MS_PERSISTENT_INCOHERENT ||
+        if( mBuffer->mBufferType < BT_DYNAMIC_PERSISTENT ||
             unmapOption == UO_UNMAP_ALL || !canPersistentMap )
         {
             if( !flushSizeElem )
                 flushSizeElem = mBuffer->mLastMappingCount - flushStartElem;
 
-            OCGE( glBindBuffer( mTarget, mVboName ) );
-            OCGE( glFlushMappedBufferRange( mTarget,
+            OCGE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
+            OCGE( glFlushMappedBufferRange( GL_COPY_WRITE_BUFFER,
                                              mBuffer->mLastMappingStart + flushStartElem,
                                              flushSizeElem * mBuffer->mBytesPerElement ) );
 
-            if( unmapOption == UO_UNMAP_ALL || !canPersistentMap || mBuffer->mMappingState == MS_MAPPED )
+            if( unmapOption == UO_UNMAP_ALL || !canPersistentMap ||
+                mBuffer->mBufferType < BT_DYNAMIC_PERSISTENT )
             {
-                OCGE( glUnmapBuffer( mTarget ) );
+                mDynamicBuffer->unmap( mUnmapTicket );
                 mMappedPtr = 0;
             }
         }

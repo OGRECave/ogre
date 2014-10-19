@@ -35,6 +35,10 @@ namespace Ogre
 {
     enum BufferType
     {
+        /// Read access from GPU.
+        /// i.e. Textures, most meshes.
+        BT_IMMUTABLE,
+
         /** Read and write access from GPU. No access for CPU at all.
             i.e. RenderTextures, vertex buffers that will be used for R2VB
         @remarks
@@ -49,19 +53,19 @@ namespace Ogre
         /// hidden buffer behind the scenes. You get what you ask, therefore it's
         /// your responsability to ensure you don't lock a region that is currently
         /// in use by the GPU (or else stall).
-        BT_DYNAMIC,
+        BT_DYNAMIC_DEFAULT,
 
-        /// Read access from GPU.
-        /// i.e. Textures, most meshes.
-        BT_IMMUTABLE,
+        /// Same as BT_DYNAMIC, but mapping will be persistent.
+        BT_DYNAMIC_PERSISTENT,
+
+        /// Same as BT_DYNAMIC_PERSISTENT, but mapping will be persistent and cache coherent.
+        BT_DYNAMIC_PERSISTENT_COHERENT,
     };
 
     enum MappingState
     {
         MS_UNMAPPED,
         MS_MAPPED,
-        MS_PERSISTENT_INCOHERENT,
-        MS_PERSISTENT_COHERENT,
         NUM_MAPPING_STATE
     };
 
@@ -90,20 +94,11 @@ namespace Ogre
         VaoManager      *mVaoManager;
 
         MappingState    mMappingState;
-        size_t          mMappingStart;
-        size_t          mMappingCount;
 
         BufferInterface *mBufferInterface;
 
-        /// For non-persistent mapping, mLastMapping* will match its mMapping* counterparts.
-        /// However for persistent mapping, the first call to map() will map a given range,
-        /// and subsequent calls to map() can map a subregion of that first region, and thus
-        /// their values won't match. The following assertions should always be true:
-        ///     mLastMappingStart >= mMappingStart
-        ///     mLastMappingCount <= mMappingStart - mLastMappingStart + mMappingCount
-        /// This way we can efficiently emulate the behavior on OpenGL implementations that
-        /// don't have persistent mapping while also efficiently flushing buffers mapped
-        /// with PERSISTENT_INCOHERENT
+        /// Stores the range of the last map() call so that
+        /// we can flush it correctly when calling unmap
         size_t          mLastMappingStart;
         size_t          mLastMappingCount;
 
@@ -133,7 +128,7 @@ namespace Ogre
 
             If the constructor throws, then data will NOT be freed, and caller will have to do it.
 
-            Must be false if bufferType == BT_DYNAMIC
+            Must be false if bufferType >= BT_DYNAMIC
         */
         BufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
                       BufferType bufferType, void *initialData, bool keepAsShadow,
@@ -175,17 +170,13 @@ namespace Ogre
         @param elementCount
             Length of the region to map, in elements. @see getNumElements to map the whole range.
             Can't be 0.
-        @param persistentMethod
-            Method used to map. @see MappingState. Note that even if you use persistent mapping,
-            you still need to call @see unmap.
         @param advanceFrame
             When true, the Buffer will be usable after unmapping it (or earlier if persistent mapped).
             However you won't be able to call map() again until the next frame.
             Calling this with false allows to call map multiple times. However ater calling unmap,
             you must call advanceFrame. THIS IS ONLY FOR VERY ADVANCED USERS.
         */
-        DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
-                               MappingState persistentMethod, bool advanceFrame=true );
+        DECL_MALLOC void* map( size_t elementStart, size_t elementCount, bool advanceFrame=true );
 
         /** Unmaps or flushes the region mapped with @see map. Alternatively, you can flush a smaller region
             (i.e. you didn't know which regions you were to update when mapping, but now that you're done,

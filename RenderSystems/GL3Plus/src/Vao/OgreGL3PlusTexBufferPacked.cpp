@@ -65,7 +65,7 @@ namespace Ogre
         OCGE( glActiveTexture( GL_TEXTURE0 + slot ) );
         OCGE( glBindTexture( GL_TEXTURE_BUFFER, mTexName ) );
         OCGE(
-          glTexBufferRange( bufferInterface->getTarget(), mInternalFormat, bufferInterface->getVboName(),
+          glTexBufferRange( GL_TEXTURE_BUFFER, mInternalFormat, bufferInterface->getVboName(),
                             mFinalBufferStart * mBytesPerElement + offset, sizeBytes ) );
 
         //TODO: Get rid of this nonsense of restoring the active texture.

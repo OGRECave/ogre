@@ -42,18 +42,20 @@ namespace Ogre
     {
     protected:
         size_t  mVboPoolIdx;
-        GLenum  mTarget;
         GLuint  mVboName;
         void    *mMappedPtr;
+
+        size_t  mUnmapTicket;
+        GL3PlusDynamicBuffer *mDynamicBuffer;
 
         size_t advanceFrame( bool bAdvanceFrame );
 
     public:
-        GL3PlusBufferInterface( size_t vboPoolIdx, GLenum target, GLuint vboName );
+        GL3PlusBufferInterface( size_t vboPoolIdx, GLuint vboName,
+                                GL3PlusDynamicBuffer *dynamicBuffer );
         ~GL3PlusBufferInterface();
 
         size_t getVboPoolIndex(void)                { return mVboPoolIdx; }
-        GLenum getTarget(void)                      { return mTarget; }
         GLuint getVboName(void) const               { return mVboName; }
 
         /// Only use this function for the first upload

@@ -52,7 +52,7 @@ namespace Ogre
                                                                       mBufferInterface );
 
         OCGE(
-          glBindBufferRange( bufferInterface->getTarget(), slot, bufferInterface->getVboName(),
+          glBindBufferRange( GL_UNIFORM_BUFFER, slot, bufferInterface->getVboName(),
                              mFinalBufferStart * mBytesPerElement, mBindableSizeBytes ) );
     }
     //-----------------------------------------------------------------------------------

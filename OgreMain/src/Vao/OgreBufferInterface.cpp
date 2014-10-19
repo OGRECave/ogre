@@ -40,7 +40,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void BufferInterface::upload( void *data, size_t elementStart, size_t elementCount )
     {
-        if( mBuffer->mBufferType == BT_DYNAMIC )
+        if( mBuffer->mBufferType >= BT_DYNAMIC_DEFAULT )
         {
             assert( mBuffer->mMappingState == MS_UNMAPPED );
             void *dstData = this->map( elementStart, elementCount, mBuffer->mMappingState );

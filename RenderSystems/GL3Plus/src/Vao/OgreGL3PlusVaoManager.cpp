@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusConstBufferPacked.h"
 #include "Vao/OgreGL3PlusTexBufferPacked.h"
 #include "Vao/OgreGL3PlusMultiSourceVertexBufferPool.h"
+#include "Vao/OgreGL3PlusDynamicBuffer.h"
 
 #include "Vao/OgreIndirectBufferPacked.h"
 
@@ -70,8 +71,10 @@ namespace Ogre
     {
         //Keep pools of 128MB each for static meshes
         mDefaultPoolSize[CPU_INACCESSIBLE]  = 128 * 1024 * 1024;
+
         //Keep pools of 32MB each for dynamic vertex buffers
-        mDefaultPoolSize[CPU_ACCESSIBLE]    = 32 * 1024 * 1024;
+        for( size_t i=CPU_ACCESSIBLE_DEFAULT; i<=CPU_ACCESSIBLE_PERSISTENT_COHERENT; ++i )
+            mDefaultPoolSize[i] = 32 * 1024 * 1024;
 
         mFrameSyncVec.resize( mDynamicBufferMultiplier, 0 );
 
@@ -123,13 +126,15 @@ namespace Ogre
 
         for( size_t i=0; i<MAX_VBO_FLAG; ++i )
         {
-            //Keep collecting the buffer names from all VBOs to use one API call
-            VboVec::const_iterator itor = mVbos[i].begin();
-            VboVec::const_iterator end  = mVbos[i].end();
+            //Free pointers and collect the buffer names from all VBOs to use one API call
+            VboVec::iterator itor = mVbos[i].begin();
+            VboVec::iterator end  = mVbos[i].end();
 
             while( itor != end )
             {
                 bufferNames.push_back( itor->vboName );
+                delete itor->dynamicBuffer;
+                itor->dynamicBuffer = 0;
                 ++itor;
             }
         }
@@ -155,13 +160,10 @@ namespace Ogre
     {
         assert( alignment > 0 );
 
-        VboFlag vboFlag = CPU_INACCESSIBLE;
+        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-        if( bufferType == BT_DYNAMIC )
-        {
+        if( bufferType >= BT_DYNAMIC_DEFAULT )
             sizeBytes   *= mDynamicBufferMultiplier;
-            vboFlag     = CPU_ACCESSIBLE;
-        }
 
         VboVec::const_iterator itor = mVbos[vboFlag].begin();
         VboVec::const_iterator end  = mVbos[vboFlag].end();
@@ -217,16 +219,22 @@ namespace Ogre
 
             if( mArbBufferStorage )
             {
-                if( vboFlag == CPU_ACCESSIBLE )
+                GLbitfield flags = 0;
+
+                if( vboFlag >= CPU_ACCESSIBLE_DEFAULT )
                 {
-                    OCGE( glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0,
-                                            GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT |
-                                            GL_MAP_COHERENT_BIT ) );
+                    flags |= GL_MAP_WRITE_BIT;
+
+                    if( vboFlag >= CPU_ACCESSIBLE_PERSISTENT )
+                    {
+                        flags |= GL_MAP_PERSISTENT_BIT;
+
+                        if( vboFlag >= CPU_ACCESSIBLE_PERSISTENT_COHERENT )
+                            flags |= GL_MAP_COHERENT_BIT;
+                    }
                 }
-                else
-                {
-                    OCGE( glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0, 0 ) );
-                }
+
+                OCGE( glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0, flags ) );
             }
             else
             {
@@ -237,6 +245,13 @@ namespace Ogre
 
             newVbo.sizeBytes = poolSize;
             newVbo.freeBlocks.push_back( Block( 0, poolSize ) );
+            newVbo.dynamicBuffer = 0;
+
+            if( vboFlag != CPU_INACCESSIBLE )
+            {
+                newVbo.dynamicBuffer = new GL3PlusDynamicBuffer( newVbo.vboName, newVbo.sizeBytes,
+                                                                 this, bufferType );
+            }
 
             mVbos[vboFlag].push_back( newVbo );
         }
@@ -260,7 +275,7 @@ namespace Ogre
         }
 
         if( bestBlock.size == 0 )
-            mVbos[vboFlag].erase( mVbos[vboFlag].begin() + bestVboIdx );
+            bestVbo.freeBlocks.erase( bestVbo.freeBlocks.begin() + bestBlockIdx );
 
         outVboIdx       = bestVboIdx;
         outBufferOffset = newOffset;
@@ -269,9 +284,9 @@ namespace Ogre
     void GL3PlusVaoManager::deallocateVbo( size_t vboIdx, size_t bufferOffset, size_t sizeBytes,
                                            BufferType bufferType )
     {
-        VboFlag vboFlag = bufferType == BT_DYNAMIC ? CPU_ACCESSIBLE: CPU_INACCESSIBLE;
+        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-        if( bufferType == BT_DYNAMIC )
+        if( bufferType >= BT_DYNAMIC_DEFAULT )
             sizeBytes *= mDynamicBufferMultiplier;
 
         Vbo &vbo = mVbos[vboFlag][vboIdx];
@@ -338,14 +353,10 @@ namespace Ogre
 
         allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, vboIdx, bufferOffset );
 
-        VboFlag vboFlag = CPU_INACCESSIBLE;
-
-        if( bufferType == BT_DYNAMIC )
-            vboFlag = CPU_ACCESSIBLE;
-
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
-                                                                    GL_ARRAY_BUFFER,
-                                                                    mVbos[vboFlag][vboIdx].vboName );
+        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
+        Vbo &vbo = mVbos[vboFlag][vboIdx];
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+                                                                              vbo.dynamicBuffer );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
@@ -380,10 +391,7 @@ namespace Ogre
         allocateVbo( maxNumVertices * totalBytesPerVertex, totalBytesPerVertex,
                      bufferType, vboIdx, bufferOffset );
 
-        VboFlag vboFlag = CPU_INACCESSIBLE;
-
-        if( bufferType == BT_DYNAMIC )
-            vboFlag = CPU_ACCESSIBLE;
+        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
         const Vbo &vbo = mVbos[vboFlag][vboIdx];
 
@@ -402,14 +410,11 @@ namespace Ogre
 
         allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, vboIdx, bufferOffset );
 
-        VboFlag vboFlag = CPU_INACCESSIBLE;
+        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-        if( bufferType == BT_DYNAMIC )
-            vboFlag = CPU_ACCESSIBLE;
-
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
-                                                                    GL_ARRAY_BUFFER,
-                                                                    mVbos[vboFlag][vboIdx].vboName );
+        Vbo &vbo = mVbos[vboFlag][vboIdx];
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+                                                                              vbo.dynamicBuffer );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
@@ -443,12 +448,10 @@ namespace Ogre
 
         size_t bindableSize = sizeBytes;
 
-        VboFlag vboFlag = CPU_INACCESSIBLE;
+        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-        if( bufferType == BT_DYNAMIC )
+        if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
-            vboFlag = CPU_ACCESSIBLE;
-
             //For dynamic buffers, the size will be 3x times larger
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
@@ -458,9 +461,9 @@ namespace Ogre
 
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
-                                                                    GL_UNIFORM_BUFFER,
-                                                                    mVbos[vboFlag][vboIdx].vboName );
+        Vbo &vbo = mVbos[vboFlag][vboIdx];
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+                                                                              vbo.dynamicBuffer );
         ConstBufferPacked *retVal = OGRE_NEW GL3PlusConstBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
                                                         bufferType, initialData, keepAsShadow,
@@ -493,12 +496,10 @@ namespace Ogre
 
         GLint alignment = mTexBufferAlignment;
 
-        VboFlag vboFlag = CPU_INACCESSIBLE;
+        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-        if( bufferType == BT_DYNAMIC )
+        if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
-            vboFlag = CPU_ACCESSIBLE;
-
             //For dynamic buffers, the size will be 3x times larger
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
@@ -508,9 +509,9 @@ namespace Ogre
 
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
-                                                                    GL_TEXTURE_BUFFER,
-                                                                    mVbos[vboFlag][vboIdx].vboName );
+        Vbo &vbo = mVbos[vboFlag][vboIdx];
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+                                                                              vbo.dynamicBuffer );
         TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
                                                         bufferType, initialData, keepAsShadow,
@@ -544,12 +545,10 @@ namespace Ogre
 
         size_t alignment = 4;
 
-        VboFlag vboFlag = CPU_INACCESSIBLE;
+        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-        if( bufferType == BT_DYNAMIC )
+        if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
-            vboFlag = CPU_ACCESSIBLE;
-
             //For dynamic buffers, the size will be 3x times larger
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
@@ -559,9 +558,9 @@ namespace Ogre
 
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0,
-                                                                    GL_DRAW_INDIRECT_BUFFER,
-                                                                    mVbos[vboFlag][vboIdx].vboName );
+        Vbo &vbo = mVbos[vboFlag][vboIdx];
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+                                                                              vbo.dynamicBuffer );
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
                                                         bufferType, initialData, keepAsShadow,
@@ -920,6 +919,12 @@ namespace Ogre
     GLuint GL3PlusVaoManager::getAttributeIndexFor( VertexElementSemantic semantic )
     {
         return VERTEX_ATTRIBUTE_INDEX[semantic - 1];
+    }
+    //-----------------------------------------------------------------------------------
+    GL3PlusVaoManager::VboFlag GL3PlusVaoManager::bufferTypeToVboFlag( BufferType bufferType )
+    {
+        return static_cast<VboFlag>( std::max( 0, (bufferType - BT_DYNAMIC_DEFAULT) +
+                                                    CPU_ACCESSIBLE_DEFAULT ) );
     }
 }
 

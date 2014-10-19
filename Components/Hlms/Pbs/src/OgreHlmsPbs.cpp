@@ -187,7 +187,7 @@ namespace Ogre
 
     HlmsPbs::HlmsPbs( Archive *dataFolder ) :
         Hlms( HLMS_PBS, "pbs", dataFolder ),
-        ConstBufferPool( 68, 16 * 1024 * 1024, 0 ),
+        ConstBufferPool( 68, 16 * 1024, 0 ), //TODO
         mCurrentPassBuffer( 0 ),
         mCurrentConstBuffer( 0 ),
         mCurrentTexBuffer( 0 ),
@@ -245,8 +245,6 @@ namespace Ogre
 
         if( newRs )
         {
-            //mPassBuffer = mVaoManager->createConstBuffer( , BT_DYNAMIC, 0, false );
-
             HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
             HlmsDatablockMap::const_iterator end  = mDatablocks.end();
 
@@ -620,19 +618,18 @@ namespace Ogre
         }
 
         //Arbitrary 16kb (minimum supported by GL), should be enough.
-        const size_t maxBufferSize = 16 * 1024 * 1024;
+        const size_t maxBufferSize = 16 * 1024;
 
         assert( mapSize <= maxBufferSize );
 
         if( mCurrentPassBuffer >= mPassBuffers.size() )
         {
-            mPassBuffers.push_back( mVaoManager->createConstBuffer( maxBufferSize, BT_DYNAMIC,
+            mPassBuffers.push_back( mVaoManager->createConstBuffer( maxBufferSize, BT_DYNAMIC_PERSISTENT,
                                                                     0, false ) );
         }
 
         ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer++];
-        float *passBufferPtr = reinterpret_cast<float*>( passBuffer->map( 0, mapSize,
-                                                                          MS_PERSISTENT_INCOHERENT ) );
+        float *passBufferPtr = reinterpret_cast<float*>( passBuffer->map( 0, mapSize ) );
 
 #ifndef NDEBUG
         const float *startupPtr = passBufferPtr;
@@ -646,6 +643,9 @@ namespace Ogre
         Matrix4 viewProjMatrix = projectionMatrix * viewMatrix;
         for( size_t i=0; i<16; ++i )
             *passBufferPtr++ = (float)viewProjMatrix[0][i];
+
+        mPreparedPass.viewProjMatrix    = viewProjMatrix;
+        mPreparedPass.viewMatrix        = viewMatrix;
 
         if( !casterPass )
         {
@@ -829,7 +829,7 @@ namespace Ogre
             size_t bufferSize = std::min<size_t>( mTextureBufferDefaultSize,
                                                   mVaoManager->getTexBufferMaxSize() );
             TexBufferPacked *newBuffer = mVaoManager->createTexBuffer( PF_R8G8B8A8, bufferSize,
-                                                                       BT_DYNAMIC, 0, false );
+                                                                       BT_DYNAMIC_PERSISTENT, 0, false );
             mTexBuffers.push_back( newBuffer );
         }
 
@@ -1003,15 +1003,16 @@ namespace Ogre
         if( mCurrentConstBuffer >= mConstBuffers.size() )
         {
             size_t bufferSize = std::min<size_t>( 65535, mVaoManager->getConstBufferMaxSize() );
-            ConstBufferPacked *newBuffer = mVaoManager->createConstBuffer( bufferSize, BT_DYNAMIC, 0, false );
+            ConstBufferPacked *newBuffer = mVaoManager->createConstBuffer( bufferSize,
+                                                                           BT_DYNAMIC_PERSISTENT,
+                                                                           0, false );
             mConstBuffers.push_back( newBuffer );
         }
 
         ConstBufferPacked *constBuffer = mConstBuffers[mCurrentConstBuffer];
 
         mStartMappedConstBuffer     = reinterpret_cast<uint32*>(
-                                            constBuffer->map( 0, constBuffer->getNumElements(),
-                                                              MS_PERSISTENT_INCOHERENT ) );
+                                            constBuffer->map( 0, constBuffer->getNumElements() ) );
         mCurrentMappedConstBuffer   = mStartMappedConstBuffer;
 
         *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 0, constBuffer, 0, 0 );
@@ -1063,7 +1064,8 @@ namespace Ogre
                 size_t bufferSize = std::min<size_t>( mTextureBufferDefaultSize,
                                                       mVaoManager->getTexBufferMaxSize() );
                 TexBufferPacked *newBuffer = mVaoManager->createTexBuffer( PF_R8G8B8A8, bufferSize,
-                                                                           BT_DYNAMIC, 0, false );
+                                                                           BT_DYNAMIC_PERSISTENT,
+                                                                           0, false );
                 mTexBuffers.push_back( newBuffer );
             }
 
@@ -1073,7 +1075,7 @@ namespace Ogre
         mStartMappedTexBuffer   = reinterpret_cast<float*>(
                                             texBuffer->map( mTexLastOffset,
                                                             texBuffer->getNumElements() - mTexLastOffset,
-                                                            MS_PERSISTENT_INCOHERENT, false ) );
+                                                            false ) );
         mCurrentMappedTexBuffer = mStartMappedTexBuffer;
 
         CbShaderBuffer *shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();

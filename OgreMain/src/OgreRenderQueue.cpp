@@ -129,7 +129,8 @@ namespace Ogre
         if( smallestBuffer == end )
         {
             //None found? Create a new one.
-            mFreeIndirectBuffers.push_back( mVaoManager->createIndirectBuffer( requiredBytes, BT_DYNAMIC,
+            mFreeIndirectBuffers.push_back( mVaoManager->createIndirectBuffer( requiredBytes,
+                                                                               BT_DYNAMIC_PERSISTENT,
                                                                                0, false ) );
             smallestBuffer = mFreeIndirectBuffers.end() - 1;
         }
@@ -407,7 +408,7 @@ namespace Ogre
         IndirectBufferPacked *indirectBuffer = getIndirectBuffer( numNeededDraws );
         uint32 baseInstance = 0;
         unsigned char *indirectDraw = static_cast<unsigned char*>(
-                    indirectBuffer->map( 0, indirectBuffer->getNumElements(), MS_PERSISTENT_INCOHERENT ) );
+                    indirectBuffer->map( 0, indirectBuffer->getNumElements() ) );
         unsigned char *startIndirectDraw = indirectDraw;
 
         for( size_t i=firstRq; i<lastRq; ++i )

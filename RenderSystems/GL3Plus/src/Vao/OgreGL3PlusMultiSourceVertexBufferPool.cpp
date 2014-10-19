@@ -52,7 +52,7 @@ namespace Ogre
     void GL3PlusMultiSourceVertexBufferPool::allocateVbo( size_t numVertices,
                                                           size_t &outBufferOffset )
     {
-        if( mBufferType == BT_DYNAMIC )
+        if( mBufferType >= BT_DYNAMIC_DEFAULT )
             numVertices *= mVaoManager->getDynamicBufferMultiplier();
 
         GL3PlusVaoManager::BlockVec::iterator blockIt = mFreeBlocks.begin();
@@ -83,7 +83,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void GL3PlusMultiSourceVertexBufferPool::deallocateVbo( size_t bufferOffset, size_t numVertices )
     {
-        if( mBufferType == BT_DYNAMIC )
+        if( mBufferType >= BT_DYNAMIC_DEFAULT )
             numVertices *= mVaoManager->getDynamicBufferMultiplier();
 
         //See if we're contiguous to a free block and make that block grow.
@@ -103,8 +103,7 @@ namespace Ogre
         {
             for( size_t i=0; i<mVertexElementsBySource.size(); ++i )
             {
-                GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, GL_ARRAY_BUFFER,
-                                                                                      mVboName );
+                GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, mVboName, 0 /*TODO*/ );
                 void *_initialData = 0;
                 if( initialData )
                     _initialData = initialData[i];

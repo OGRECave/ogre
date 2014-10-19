@@ -46,8 +46,6 @@ namespace Ogre
         mBufferType( bufferType ),
         mVaoManager( vaoManager ),
         mMappingState( MS_UNMAPPED ),
-        mMappingStart( 0 ),
-        mMappingCount( 0 ),
         mBufferInterface( bufferInterface ),
         mLastMappingStart( 0 ),
         mLastMappingCount( 0 ),
@@ -70,7 +68,7 @@ namespace Ogre
 
         if( keepAsShadow )
         {
-            if( mBufferType == BT_DYNAMIC )
+            if( mBufferType >= BT_DYNAMIC_DEFAULT )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                              "Dynamic buffers can't have a shadow copy!",
@@ -128,20 +126,12 @@ namespace Ogre
         mBufferInterface->upload( data, elementStart, elementCount );
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC void* BufferPacked::map( size_t elementStart, size_t elementCount,
-                                         MappingState persistentMethod, bool advanceFrame )
+    DECL_MALLOC void* BufferPacked::map( size_t elementStart, size_t elementCount, bool advanceFrame )
     {
-        if( mBufferType != BT_DYNAMIC )
+        if( mBufferType < BT_DYNAMIC_DEFAULT )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "Only dynamic buffers can be mapped! Use upload instead.",
-                         "BufferPacked::map" );
-        }
-
-        if( persistentMethod == MS_UNMAPPED )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "persistentMethod cannot be MS_UNMAPPED",
                          "BufferPacked::map" );
         }
 
@@ -155,7 +145,9 @@ namespace Ogre
         if( isCurrentlyMapped() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                         "Buffer already mapped!",
+                         "Buffer already mapped! Only persistent buffers can call"
+                         "map more than once without unmapping, but you still need "
+                         "to call unmap( UO_KEEP_PERSISTENT ) between maps",
                          "BufferPacked::map" );
         }
 
@@ -186,28 +178,8 @@ namespace Ogre
         }
 #endif
 
-        //Can't map twice, unless this is a persistent mapping and we're
-        //being called with the same persistency flag as before.
-        if( mMappingState != MS_UNMAPPED &&
-            (mMappingState != persistentMethod || persistentMethod < MS_PERSISTENT_INCOHERENT) )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                         "Buffer already mapped! (or missmatching persistency flag between calls)",
-                         "BufferPacked::map" );
-        }
-
-        if( mMappingState == persistentMethod && persistentMethod >= MS_PERSISTENT_INCOHERENT &&
-            (elementStart < mMappingStart  ||
-             elementCount > (mMappingStart - elementStart) + mMappingCount) )
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "The buffer is already persistently mapped, but the requested subregion lies "
-                         " outside this buffer. The first map should've been bigger (or unmap "
-                         "the buffer and remap)", "BufferPacked::map" );
-        }
-
         MappingState prevMappingState = mMappingState;
-        mMappingState = persistentMethod;
+        mMappingState = MS_MAPPED;
 
         return mBufferInterface->map( elementStart, elementCount, prevMappingState, advanceFrame );
     }
@@ -223,7 +195,7 @@ namespace Ogre
 
         mBufferInterface->unmap( unmapOption, flushStartElem, flushSizeElem );
 
-        if( unmapOption == UO_UNMAP_ALL || mMappingState == MS_MAPPED )
+        if( unmapOption == UO_UNMAP_ALL || mBufferType == BT_DYNAMIC_DEFAULT )
             mMappingState = MS_UNMAPPED;
 
         mLastMappingStart = 0;
