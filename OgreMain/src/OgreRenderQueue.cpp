@@ -535,6 +535,13 @@ namespace Ogre
 
         indirectBuffer->unmap( UO_KEEP_PERSISTENT );
 
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+            if( hlms )
+                hlms->prepareForCommandBufferExecution( mCommandBuffer );
+        }
+
         mCommandBuffer->execute();
 
         mLastMacroblock     = lastMacroblock;

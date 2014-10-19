@@ -1124,6 +1124,12 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbs::prepareForCommandBufferExecution( CommandBuffer *commandBuffer )
+    {
+        unmapConstBuffer();
+        unmapTexBuffer( commandBuffer );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbs::frameEnded(void)
     {
         mCurrentPassBuffer  = 0;

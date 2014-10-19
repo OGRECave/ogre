@@ -445,6 +445,9 @@ namespace Ogre
                                        bool casterPass, const HlmsCache *lastCache,
                                        CommandBuffer *commandBuffer ) = 0;
 
+        /// This gets called right before executing the command buffer.
+        virtual void prepareForCommandBufferExecution( CommandBuffer *commandBuffer ) {}
+
         /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
         virtual void frameEnded(void) {}
 

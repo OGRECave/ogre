@@ -1762,6 +1762,9 @@ namespace Ogre {
         virtual void _renderPhase02( Camera* camera, const Camera* lodCamera, Viewport* vp,
                                      uint8 firstRq, uint8 lastRq, bool includeOverlays );
 
+        /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
+        void _frameEnded(void);
+
         /** Internal method for queueing the sky objects with the params as 
             previously set through setSkyBox, setSkyPlane and setSkyDome.
         */
@@ -2986,7 +2989,6 @@ namespace Ogre {
         virtual void performCleanup( ArrayMemoryManager::ManagerType managerType, uint16 level,
                                      const MemoryPoolVec &basePtrs, size_t const *elementsMemSizes,
                                      size_t startInstance, size_t diffInstances );*/
-
 
         /** Add a level of detail listener. */
         void addLodListener(LodListener *listener);

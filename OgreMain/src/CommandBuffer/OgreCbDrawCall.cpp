@@ -61,7 +61,8 @@ namespace Ogre
 
     CbDrawCallIndexed::CbDrawCallIndexed( bool supportsIndirectBuffers, VertexArrayObject *_vao,
                                           void *_indirectBufferOffset ) :
-        CbDrawCall( CB_DRAW_CALL_INDEXED + supportsIndirectBuffers, _vao, _indirectBufferOffset )
+        CbDrawCall( CB_DRAW_CALL_INDEXED_EMULATED + supportsIndirectBuffers,
+                    _vao, _indirectBufferOffset )
     {
     }
     void CommandBuffer::execute_drawCallIndexedEmulated( const CbBase * RESTRICT_ALIAS _cmd )
@@ -80,7 +81,7 @@ namespace Ogre
 
     CbDrawCallStrip::CbDrawCallStrip( bool supportsIndirectBuffers, VertexArrayObject *_vao,
                                       void *_indirectBufferOffset ) :
-        CbDrawCall( CB_DRAW_CALL_STRIP + supportsIndirectBuffers, _vao, _indirectBufferOffset )
+        CbDrawCall( CB_DRAW_CALL_STRIP_EMULATED + supportsIndirectBuffers, _vao, _indirectBufferOffset )
     {
     }
 

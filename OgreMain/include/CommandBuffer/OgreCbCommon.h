@@ -34,6 +34,7 @@ namespace Ogre
 {
     enum CbType
     {
+        CB_INVALID,
         CB_SET_VAO,
         CB_DRAW_CALL_INDEXED_EMULATED,
         CB_DRAW_CALL_INDEXED,

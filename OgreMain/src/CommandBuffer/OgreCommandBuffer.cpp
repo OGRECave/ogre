@@ -38,6 +38,7 @@ namespace Ogre
 
     CommandBufferExecuteFunc CbExecutionTable[MAX_COMMAND_BUFFER+1] =
     {
+        &CommandBuffer::execute_invalidCommand,
         &CommandBuffer::execute_setVao,
         &CommandBuffer::execute_drawCallIndexedEmulated,
         &CommandBuffer::execute_drawCallIndexed,
@@ -72,13 +73,14 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CommandBuffer::execute(void)
     {
-        CbBase const * RESTRICT_ALIAS cmd = reinterpret_cast<CbBase*>( mCommandBuffer.begin() );
+        unsigned char const * RESTRICT_ALIAS cmdBase = mCommandBuffer.begin();
 
         size_t cmdBufferCount = mCommandBuffer.size() / CommandBuffer::COMMAND_FIXED_SIZE;
         for( size_t i=cmdBufferCount; i--; )
         {
+            CbBase const * RESTRICT_ALIAS cmd = reinterpret_cast<const CbBase*RESTRICT_ALIAS>( cmdBase );
             (*this.*CbExecutionTable[cmd->commandType])( cmd );
-            ++cmd;
+            cmdBase += CommandBuffer::COMMAND_FIXED_SIZE;
         }
 
         mCommandBuffer.clear();

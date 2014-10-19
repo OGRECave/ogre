@@ -1279,7 +1279,11 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
     Root::getSingleton()._popCurrentSceneManager(this);
 }
-
+//-----------------------------------------------------------------------
+void SceneManager::_frameEnded(void)
+{
+    mRenderQueue->frameEnded();
+}
 
 //-----------------------------------------------------------------------
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)

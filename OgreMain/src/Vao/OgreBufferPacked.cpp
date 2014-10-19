@@ -167,7 +167,7 @@ namespace Ogre
                 (int)(mLastFrameMapped - mLastFrameMappedAndAdvanced) > 0 )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                             "Last frame called map( advanceFrame = true ) but "
+                             "Last frame called map( advanceFrame = false ) but "
                              "didn't call advanceFrame!!!.", "BufferPacked::map" );
             }
 
