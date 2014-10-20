@@ -463,6 +463,13 @@ namespace Ogre {
 		applyToNode(mTargetNode, timeIndex, weight, scale);
 
 	}
+    //---------------------------------------------------------------------
+    void NodeAnimationTrack::setInitialState(const Vector3& position, const Quaternion orientation, const Vector3& scale)
+    {
+        mInitialPosition = position;
+        mInitialOrientation = orientation;
+        mInitialScale = scale;
+    }
 	//---------------------------------------------------------------------
 	void NodeAnimationTrack::resetNodeToInitialState(void)
 	{
