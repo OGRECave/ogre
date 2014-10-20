@@ -13,6 +13,7 @@ layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
 @insertpiece( MaterialDecl )
+@insertpiece( InstanceDecl )
 in block
 {
 @insertpiece( VStoPS_block )
