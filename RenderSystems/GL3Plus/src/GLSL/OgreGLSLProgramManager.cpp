@@ -684,6 +684,7 @@ namespace Ogre {
 
         GLint blockCount = 0;
 
+#if 0
         // Now deal with uniform blocks
 
         OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
@@ -758,6 +759,7 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(glUniformBlockBinding(programObject, index, bufferBinding));
         }
+#endif
 
         // Now deal with shader storage blocks
 

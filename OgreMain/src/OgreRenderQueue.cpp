@@ -48,6 +48,7 @@ THE SOFTWARE.
 #include "CommandBuffer/OgreCommandBuffer.h"
 #include "CommandBuffer/OgreCbBlocks.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
+#include "CommandBuffer/OgreCbShaderBuffer.h"
 
 
 namespace Ogre
@@ -469,7 +470,10 @@ namespace Ogre
                     //(or also the the Hlms made a batch-breaking command)
 
                     if( lastVaoId != vao->getRenderQueueId() )
+                    {
                         *mCommandBuffer->addCommand<CbVao>() = CbVao( vao );
+                        *mCommandBuffer->addCommand<CbIndirectBuffer>() = CbIndirectBuffer( indirectBuffer );
+                    }
 
                     void *offset = reinterpret_cast<void*>( indirectBuffer->_getFinalBufferStart() +
                                                             (indirectDraw - startIndirectDraw) );
@@ -542,8 +546,6 @@ namespace Ogre
             if( hlms )
                 hlms->prepareForCommandBufferExecution( mCommandBuffer );
         }
-
-        rs->_setIndirectBuffer( indirectBuffer );
 
         mCommandBuffer->execute();
 

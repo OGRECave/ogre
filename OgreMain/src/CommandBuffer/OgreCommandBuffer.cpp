@@ -46,6 +46,7 @@ namespace Ogre
         &CommandBuffer::execute_drawCallStrip,
         &CommandBuffer::execute_setConstantBuffer,
         &CommandBuffer::execute_setTextureBuffer,
+        &CommandBuffer::execute_setIndirectBuffer,
         &CommandBuffer::execute_setMacroblock,
         &CommandBuffer::execute_setBlendblock,
         &CommandBuffer::execute_setHlmsCache,

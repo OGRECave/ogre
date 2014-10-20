@@ -46,6 +46,13 @@ namespace Ogre
         CbShaderBuffer( uint16 _slot, TexBufferPacked *_bufferPacked,
                         uint32 _bindOffset, uint32 _bindSizeBytes );
     };
+
+    struct _OgreExport CbIndirectBuffer : CbBase
+    {
+        IndirectBufferPacked *indirectBuffer;
+
+        CbIndirectBuffer( IndirectBufferPacked *_indirectBuffer );
+    };
 }
 
 #endif

@@ -42,6 +42,7 @@ namespace Ogre
         CB_DRAW_CALL_STRIP,
         CB_SET_CONSTANT_BUFFER,
         CB_SET_TEXTURE_BUFFER,
+        CB_SET_INDIRECT_BUFFER,
         CB_SET_MACROBLOCK,
         CB_SET_BLENDBLOCK,
         CB_SET_HLMS_BLOCK,

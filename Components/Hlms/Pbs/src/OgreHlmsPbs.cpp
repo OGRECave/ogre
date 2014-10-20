@@ -187,10 +187,11 @@ namespace Ogre
 
     HlmsPbs::HlmsPbs( Archive *dataFolder ) :
         Hlms( HLMS_PBS, "pbs", dataFolder ),
-        ConstBufferPool( 68, 16 * 1024, 0 ), //TODO
+        ConstBufferPool( 256, 64 * 1024, 0 ), //TODO
         mCurrentPassBuffer( 0 ),
         mCurrentConstBuffer( 0 ),
         mCurrentTexBuffer( 0 ),
+        mLastBoundPool( 0 ),
         mStartMappedConstBuffer( 0 ),
         mCurrentMappedConstBuffer( 0 ),
         mCurrentConstBufferSize( 0 ),
@@ -835,6 +836,8 @@ namespace Ogre
 
         mLastTextureHash = 0;
 
+        mLastBoundPool = 0;
+
         return retVal;
     }
     //-----------------------------------------------------------------------------------
@@ -862,6 +865,12 @@ namespace Ogre
             FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
             FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
 
+            //layout(binding = 0) uniform PassBuffer {} pass
+            ConstBufferPacked *passBuffer = mPassBuffers.back();
+            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 0, passBuffer, 0,
+                                                                           passBuffer->
+                                                                           getTotalSizeBytes() );
+
             if( !casterPass )
             {
                 size_t texUnit = 1;
@@ -878,6 +887,16 @@ namespace Ogre
             }
 
             mLastTextureHash = 0;
+        }
+
+        if( mLastBoundPool != datablock->getAssignedPool() )
+        {
+            //layout(binding = 1) uniform MaterialBuf {} materialArray
+            const ConstBufferPool::BufferPool *newPool = datablock->getAssignedPool();
+            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 1, newPool->materialBuffer, 0,
+                                                                           newPool->materialBuffer->
+                                                                           getTotalSizeBytes() );
+            mLastBoundPool = newPool;
         }
 
         uint32 * RESTRICT_ALIAS currentMappedConstBuffer    = mCurrentMappedConstBuffer;
@@ -1015,7 +1034,7 @@ namespace Ogre
                                             constBuffer->map( 0, constBuffer->getNumElements() ) );
         mCurrentMappedConstBuffer   = mStartMappedConstBuffer;
 
-        *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 0, constBuffer, 0, 0 );
+        *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 2, constBuffer, 0, 0 );
 
         return mStartMappedConstBuffer;
     }

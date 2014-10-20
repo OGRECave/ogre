@@ -67,6 +67,7 @@ namespace Ogre
         void execute_drawCallStrip( const CbBase * RESTRICT_ALIAS cmd );
         void execute_setConstantBuffer( const CbBase * RESTRICT_ALIAS cmd );
         void execute_setTextureBuffer( const CbBase * RESTRICT_ALIAS cmd );
+        void execute_setIndirectBuffer( const CbBase * RESTRICT_ALIAS cmd );
         void execute_setMacroblock( const CbBase * RESTRICT_ALIAS cmd );
         void execute_setBlendblock( const CbBase * RESTRICT_ALIAS cmd );
         void execute_setHlmsCache( const CbBase * RESTRICT_ALIAS cmd );

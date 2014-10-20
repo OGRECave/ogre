@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "Vao/OgreConstBufferPacked.h"
 #include "Vao/OgreTexBufferPacked.h"
 
+#include "OgreRenderSystem.h"
+
 namespace Ogre
 {
     CbShaderBuffer::CbShaderBuffer( uint16 _slot, ConstBufferPacked *_bufferPacked,
@@ -73,5 +75,17 @@ namespace Ogre
 
         TexBufferPacked *texBuffer = static_cast<TexBufferPacked*>( cmd->bufferPacked );
         texBuffer->bindBuffer( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+    }
+
+    CbIndirectBuffer::CbIndirectBuffer( IndirectBufferPacked *_indirectBuffer ) :
+        CbBase( CB_SET_INDIRECT_BUFFER ),
+        indirectBuffer( _indirectBuffer )
+    {
+    }
+
+    void CommandBuffer::execute_setIndirectBuffer( const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbIndirectBuffer *cmd = static_cast<const CbIndirectBuffer*>( _cmd );
+        mRenderSystem->_setIndirectBuffer( cmd->indirectBuffer );
     }
 }

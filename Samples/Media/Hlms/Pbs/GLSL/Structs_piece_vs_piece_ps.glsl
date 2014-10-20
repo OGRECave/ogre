@@ -80,7 +80,8 @@ struct Material
 
 layout(binding = 1) uniform MaterialBuf
 {
-	Material m[273];
+	//Material m[273];
+	Material m[256];
 } materialArray;
 @end
 

@@ -75,6 +75,8 @@ namespace Ogre
         ConstBufferPackedVec    mConstBuffers;
         TexBufferPackedVec      mTexBuffers;
 
+        ConstBufferPool::BufferPool const *mLastBoundPool;
+
         uint32  *mStartMappedConstBuffer;
         uint32  *mCurrentMappedConstBuffer;
         size_t  mCurrentConstBufferSize;

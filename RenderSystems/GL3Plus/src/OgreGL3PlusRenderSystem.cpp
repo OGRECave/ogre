@@ -1581,6 +1581,13 @@ namespace Ogre {
             mActiveFragmentGpuProgramParameters = mCurrentFragmentShader->getDefaultParameters();
             mFragmentProgramBound = true;
         }
+
+        GLSLSeparableProgram* separableProgram =
+            GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
+        if (separableProgram)
+        {
+            separableProgram->activate();
+        }
     }
 
     void GL3PlusRenderSystem::_setIndirectBuffer( IndirectBufferPacked *indirectBuffer )
@@ -2426,8 +2433,8 @@ namespace Ogre {
         GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
                                                             GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
-        glMultiDrawElementsIndirect( mode, indexType, cmd->indirectBufferOffset,
-                                     cmd->numDraws, sizeof(CbDrawIndexed) );
+        OCGE( glMultiDrawElementsIndirect( mode, indexType, cmd->indirectBufferOffset,
+                                           cmd->numDraws, sizeof(CbDrawIndexed) ) );
     }
 
     void GL3PlusRenderSystem::_render( const CbDrawCallStrip *cmd )
@@ -2435,7 +2442,8 @@ namespace Ogre {
         const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( cmd->vao );
         GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
 
-        glMultiDrawArraysIndirect( mode, cmd->indirectBufferOffset, cmd->numDraws, sizeof(CbDrawStrip) );
+        OCGE( glMultiDrawArraysIndirect( mode, cmd->indirectBufferOffset,
+                                         cmd->numDraws, sizeof(CbDrawStrip) ) );
     }
 
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,
