@@ -208,6 +208,7 @@ namespace Ogre {
         bool setStatic( bool bStatic );
 
         /// Called by SceneManager when it is telling we're a static MovableObject being dirty
+        /// Don't call this directly. @see SceneManager::notifyStaticDirty
         virtual void _notifyStaticDirty(void) const {}
 
         /** Internal method by which the movable object must add Renderable subclass instances to the rendering queue.

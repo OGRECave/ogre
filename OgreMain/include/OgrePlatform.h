@@ -439,11 +439,14 @@ typedef signed char int8;
 #if OGRE_RESTRICT_ALIASING != 0
     #if OGRE_COMPILER == OGRE_COMPILER_MSVC
         #define RESTRICT_ALIAS __restrict   //MSVC
+        #define RESTRICT_ALIAS_RETURN __restrict
     #else
         #define RESTRICT_ALIAS __restrict__ //GCC... and others?
+        #define RESTRICT_ALIAS_RETURN
     #endif
 #else
     #define RESTRICT_ALIAS
+    #define RESTRICT_ALIAS_RETURN
 #endif
 
 // Disable these warnings (too much noise)
