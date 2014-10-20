@@ -7530,6 +7530,21 @@ namespace Ogre{
                         }
                     }
                     break;
+                    case ID_MATERIAL_SCHEME:
+                        {
+                            if (prop->values.empty())
+                            {
+                                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                                return;
+                            }
+
+                            AbstractNodeList::const_iterator it0 = prop->values.begin();
+                            if (!getString(*it0, &passScene->mMaterialScheme))
+                            {
+                                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            }
+                        }
+                        break;
                 case ID_VIEWPORT:
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:

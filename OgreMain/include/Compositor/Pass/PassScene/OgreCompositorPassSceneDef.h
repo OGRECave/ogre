@@ -92,6 +92,11 @@ namespace Ogre
         */
         Real            mLodBias;
 
+        /** The material scheme used for this pass. If no material scheme is set then
+            it will use the default scheme
+        */
+        String          mMaterialScheme;
+
         CompositorPassSceneDef( uint32 rtIndex ) :
             CompositorPassDef( PASS_SCENE, rtIndex ),
             mVisibilityMask( VisibilityFlags::RESERVED_VISIBILITY_FLAGS ),
@@ -100,7 +105,8 @@ namespace Ogre
             mLastRQ( -1 ),
             mCameraCubemapReorient( false ),
             mUpdateLodLists( true ),
-            mLodBias( 1.0f )
+            mLodBias( 1.0f ),
+            mMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME)
         {
             //Change base defaults
             mIncludeOverlays = true;

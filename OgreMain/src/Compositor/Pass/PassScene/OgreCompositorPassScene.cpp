@@ -101,9 +101,13 @@ namespace Ogre
         if( lodCamera && mCamera == mLodCamera )
             usedLodCamera = lodCamera;
 
-		//Let the code receive valid camera->getLastViewport() return values.
-		mCamera->_notifyViewport( mViewport );
-		const_cast<Camera*>(usedLodCamera)->_notifyViewport( mViewport ); //TODO: Ugly const_cast
+        //store the viewports current material scheme and use the one set in the scene pass def
+        String oldViewportMatScheme = mViewport->getMaterialScheme();
+        mViewport->setMaterialScheme(mDefinition->mMaterialScheme);
+
+        //Let the code receive valid camera->getLastViewport() return values.
+        mCamera->_notifyViewport( mViewport );
+        const_cast<Camera*>(usedLodCamera)->_notifyViewport( mViewport ); //TODO: Ugly const_cast
 
         //Call beginUpdate if we're the first to use this RT
         if( mDefinition->mBeginRtUpdate )
@@ -165,6 +169,9 @@ namespace Ogre
             //Restore orientation
             mCamera->setOrientation( oldCameraOrientation );
         }
+
+        //restore viewport material scheme
+        mViewport->setMaterialScheme(oldViewportMatScheme);
 
         //Call endUpdate if we're the last pass in a row to use this RT
         if( mDefinition->mEndRtUpdate )
