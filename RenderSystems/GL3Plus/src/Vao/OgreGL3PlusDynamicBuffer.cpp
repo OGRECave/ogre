@@ -96,6 +96,15 @@ namespace Ogre
         return static_cast<char*>(mMappedPtr) + start;
     }
     //-----------------------------------------------------------------------------------
+    void GL3PlusDynamicBuffer::flush( size_t ticket, size_t start, size_t count )
+    {
+        assert( start <= mMappedRanges[ticket].count && start + count <= mMappedRanges[ticket].count );
+
+        OCGE( glFlushMappedBufferRange( GL_COPY_WRITE_BUFFER,
+                                        mMappedRanges[ticket].start + start,
+                                        count ) );
+    }
+    //-----------------------------------------------------------------------------------
     void GL3PlusDynamicBuffer::unmap( size_t ticket )
     {
         assert( ticket < mMappedRanges.size() && "Invalid unmap ticket!" );

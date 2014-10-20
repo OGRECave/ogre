@@ -83,8 +83,12 @@ namespace Ogre
         /// Assumes mVboName is already bound to GL_COPY_WRITE_BUFFER!!!
         DECL_MALLOC void* map( size_t start, size_t count, size_t &outTicket );
 
+        /// Flushes the region of the given ticket. start is 0-based.
+        void flush( size_t ticket, size_t start, size_t count );
+
         /// Unmaps given ticket (got from @see map).
         /// Assumes mVboName is already bound to GL_COPY_WRITE_BUFFER!!!
+        /// The ticket becomes invalid after this.
         void unmap( size_t ticket );
     };
 }

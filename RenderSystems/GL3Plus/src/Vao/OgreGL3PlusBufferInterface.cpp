@@ -123,19 +123,19 @@ namespace Ogre
         bool canPersistentMap = static_cast<GL3PlusVaoManager*>( mBuffer->mVaoManager )->
                                                                 supportsArbBufferStorage();
 
-        if( mBuffer->mBufferType < BT_DYNAMIC_PERSISTENT ||
+        if( mBuffer->mBufferType <= BT_DYNAMIC_PERSISTENT ||
             unmapOption == UO_UNMAP_ALL || !canPersistentMap )
         {
             if( !flushSizeElem )
                 flushSizeElem = mBuffer->mLastMappingCount - flushStartElem;
 
             OCGE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
-            OCGE( glFlushMappedBufferRange( GL_COPY_WRITE_BUFFER,
-                                             mBuffer->mLastMappingStart + flushStartElem,
-                                             flushSizeElem * mBuffer->mBytesPerElement ) );
+            mDynamicBuffer->flush( mUnmapTicket,
+                                   mBuffer->mLastMappingStart + flushStartElem,
+                                   flushSizeElem * mBuffer->mBytesPerElement );
 
             if( unmapOption == UO_UNMAP_ALL || !canPersistentMap ||
-                mBuffer->mBufferType < BT_DYNAMIC_PERSISTENT )
+                mBuffer->mBufferType == BT_DYNAMIC_DEFAULT )
             {
                 mDynamicBuffer->unmap( mUnmapTicket );
                 mMappedPtr = 0;
@@ -154,11 +154,13 @@ namespace Ogre
         size_t dynamicCurrentFrame = mBuffer->mFinalBufferStart - mBuffer->mInternalBufferStart;
         dynamicCurrentFrame /= mBuffer->mNumElements;
 
-        if( bAdvanceFrame )
-            dynamicCurrentFrame = (dynamicCurrentFrame + 1) % vaoManager->getDynamicBufferMultiplier();
+        dynamicCurrentFrame = (dynamicCurrentFrame + 1) % vaoManager->getDynamicBufferMultiplier();
 
-        mBuffer->mFinalBufferStart = mBuffer->mInternalBufferStart +
-                                        dynamicCurrentFrame * mBuffer->mNumElements;
+        if( bAdvanceFrame )
+        {
+            mBuffer->mFinalBufferStart = mBuffer->mInternalBufferStart +
+                                            dynamicCurrentFrame * mBuffer->mNumElements;
+        }
 
         return dynamicCurrentFrame;
     }
