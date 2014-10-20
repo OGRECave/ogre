@@ -471,7 +471,8 @@ namespace Ogre
                     if( lastVaoId != vao->getRenderQueueId() )
                         *mCommandBuffer->addCommand<CbVao>() = CbVao( vao );
 
-                    void *offset = indirectBuffer->_getFinalBufferStart() + startIndirectDraw;
+                    void *offset = reinterpret_cast<void*>( indirectBuffer->_getFinalBufferStart() +
+                                                            (indirectDraw - startIndirectDraw) );
 
                     if( vao->getIndexBuffer() )
                     {
@@ -541,6 +542,8 @@ namespace Ogre
             if( hlms )
                 hlms->prepareForCommandBufferExecution( mCommandBuffer );
         }
+
+        rs->_setIndirectBuffer( indirectBuffer );
 
         mCommandBuffer->execute();
 

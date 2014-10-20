@@ -10,6 +10,9 @@ layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 
 @property( !hlms_shadowcaster )
 
+@property( fresnel_scalar )@piece( gFresnelType )vec3@end @end
+@property( !fresnel_scalar ) @piece( gFresnelType )float@end @end
+
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
 @insertpiece( MaterialDecl )
@@ -35,7 +38,7 @@ in block
 	@end
 @end
 
-@property( !roughness_map )#define ROUGHNESS roughness@end
+@property( !roughness_map )#define ROUGHNESS material.roughness@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 @property( envprobe_map )uniform samplerCube	texEnvProbeMap;@end
 
@@ -63,6 +66,7 @@ in block
 @piece( SampleRoughnessMap )ROUGHNESS = roughness * texture( textureMaps[@value( roughness_map )], vec3(psIn.uv@value(uv_roughness).xy, roughnessIdx) ).x;@end
 @end
 
+Material material;
 @property( hlms_normal || hlms_qtangent )vec3 nNormal;@end
 
 @property( normal_map )
@@ -188,14 +192,14 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 	//Formula:
 	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
 	//	fresnelD = lerp( (1 - N*L)^5, 1, 1 - F0 )
-	@insertpiece( FresnelType ) fresnelS = F0 + pow( 1.0 - VdotH, 5.0 ) * (1.0 - F0);
-	@insertpiece( FresnelType ) fresnelD = 1.0 - F0 + pow( 1.0 - NdotL, 5.0 ) * F0;
+	@insertpiece( gFresnelType ) fresnelS = material.F0 + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0);
+	@insertpiece( gFresnelType ) fresnelD = 1.0 - material.F0 + pow( 1.0 - NdotL, 5.0 ) * material.F0;
 
 	//Avoid very small denominators, they go to NaN or cause aliasing artifacts
-	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
+	@insertpiece( gFresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
 
-	return NdotL * (kS * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
-					kD * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
+	return NdotL * (material.kS * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
+					material.kD * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
 }
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
@@ -203,20 +207,21 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 void main()
 {
 	uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FF;
-@property( diffuse_map )	diffuseIdx			=  material.m[materialId].indices0 & 0x0000FFFF;@end
-@property( normal_map_tex )	normalIdx			= (material.m[materialId].indices0 & 0xFFFF0000) >> 16;@end
-@property( specular_map )	specularIdx			=  material.m[materialId].indices1 & 0x0000FFFF;@end
-@property( roughness_map )	roughnessIdx		= (material.m[materialId].indices1 & 0xFFFF0000) >> 16;@end
-@property( detail_weight_map )	weightMapIdx		=  material.m[materialId].indices2 & 0x0000FFFF;@end
-@property( detail_map0 )	detailMapIdx0		= (material.m[materialId].indices2 & 0xFFFF0000) >> 16;@end
-@property( detail_map1 )	detailMapIdx1		=  material.m[materialId].indices3 & 0x0000FFFF;@end
-@property( detail_map2 )	detailMapIdx2		= (material.m[materialId].indices3 & 0xFFFF0000) >> 16;@end
-@property( detail_map3 )	detailMapIdx3		=  material.m[materialId].indices4 & 0x0000FFFF;@end
-@property( detail_map_nm0 )	detailNormMapIdx0	= (material.m[materialId].indices4 & 0xFFFF0000) >> 16;@end
-@property( detail_map_nm1 )	detailNormMapIdx1	=  material.m[materialId].indices5 & 0x0000FFFF;@end
-@property( detail_map_nm2 )	detailNormMapIdx2	= (material.m[materialId].indices5 & 0xFFFF0000) >> 16;@end
-@property( detail_map_nm3 )	detailNormMapIdx3	=  material.m[materialId].indices6 & 0x0000FFFF;@end
-@property( envprobe_map )	envMapIdx			= (material.m[materialId].indices6 & 0xFFFF0000) >> 16;@end
+	material = materialArray.m[materialId];
+@property( diffuse_map )	diffuseIdx			=  material.indices0 & 0x0000FFFF;@end
+@property( normal_map_tex )	normalIdx			= (material.indices0 & 0xFFFF0000) >> 16;@end
+@property( specular_map )	specularIdx			=  material.indices1 & 0x0000FFFF;@end
+@property( roughness_map )	roughnessIdx		= (material.indices1 & 0xFFFF0000) >> 16;@end
+@property( detail_weight_map )	weightMapIdx		=  material.indices2 & 0x0000FFFF;@end
+@property( detail_map0 )	detailMapIdx0		= (material.indices2 & 0xFFFF0000) >> 16;@end
+@property( detail_map1 )	detailMapIdx1		=  material.indices3 & 0x0000FFFF;@end
+@property( detail_map2 )	detailMapIdx2		= (material.indices3 & 0xFFFF0000) >> 16;@end
+@property( detail_map3 )	detailMapIdx3		=  material.indices4 & 0x0000FFFF;@end
+@property( detail_map_nm0 )	detailNormMapIdx0	= (material.indices4 & 0xFFFF0000) >> 16;@end
+@property( detail_map_nm1 )	detailNormMapIdx1	=  material.indices5 & 0x0000FFFF;@end
+@property( detail_map_nm2 )	detailNormMapIdx2	= (material.indices5 & 0xFFFF0000) >> 16;@end
+@property( detail_map_nm3 )	detailNormMapIdx3	=  material.indices6 & 0x0000FFFF;@end
+@property( envprobe_map )	envMapIdx			= (material.indices6 & 0xFFFF0000) >> 16;@end
 
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
@@ -297,11 +302,11 @@ void main()
 
 	vec3 finalColour = vec3(0);
 @property( hlms_lights_directional )
-	finalColour += cookTorrance( lightPosition[0], viewDir, NdotV, lightDiffuse[0], lightSpecular[0] );
+	finalColour += cookTorrance( pass.lights[0].position, viewDir, NdotV, pass.lights[0].diffuse, pass.lights[0].specular );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
 @end
 @foreach( hlms_lights_directional, n, 1 )
-	finalColour += cookTorrance( lightPosition[@n], viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );@end
+	finalColour += cookTorrance( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );@end
 
 @property( hlms_lights_point || hlms_lights_spot )	vec3 lightDir;
 	float fDistance;
@@ -310,13 +315,13 @@ void main()
 
 	//Point lights
 @foreach( hlms_lights_point, n, hlms_lights_directional )
-	lightDir = lightPosition[@n] - inPs.pos;
+	lightDir = pass.lights[@n].position - inPs.pos;
 	fDistance= length( lightDir );
-	if( fDistance <= attenuation[@value(atten)].x )
+	if( fDistance <= pass.lights[@n].attenuation.x )
 	{
 		lightDir *= 1.0 / fDistance;
-		tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
+		tmpColour = cookTorrance( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
+		float atten = 1.0 / (1.0 + pass.lights[@n].attenuation.y * fDistance + pass.lights[@n].attenuation.z * fDistance * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
@@ -325,11 +330,11 @@ void main()
 	//spotParams[@value(spot_params)].y = cos( OuterAngle / 2 )
 	//spotParams[@value(spot_params)].z = falloff
 @foreach( hlms_lights_spot, n, hlms_lights_point )
-	lightDir = lightPosition[@n] - inPs.pos;
+	lightDir = pass.lights[@n].position - inPs.pos;
 	fDistance= length( lightDir );
-@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - lightPosition[@n] ), spotDirection[@value(spot_params)] );@end
-@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - lightPosition[@n] ), zAxis( spotQuaternion[@value(spot_params)] ) );@end
-	if( fDistance <= attenuation[@value(atten)].x && spotCosAngle >= spotParams[@value(spot_params)].y )
+@property( !hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - pass.lights[@n].position ), pass.lights[@n].spotDirection );@end
+@property( hlms_lights_spot_textured )	spotCosAngle = dot( normalize( inPs.pos - pass.lights[@n].position ), zAxis( pass.lights[@n].spotQuaternion ) );@end
+	if( fDistance <= pass.lights[@n].attenuation.x && spotCosAngle >= pass.lights[@n].spotParams.y )
 	{
 		lightDir *= 1.0 / fDistance;
 	@property( hlms_lights_spot_textured )
@@ -337,11 +342,11 @@ void main()
 		float spotAtten = texture( texSpotLight, normalize( posInLightSpace ).xy ).x;
 	@end
 	@property( !hlms_lights_spot_textured )
-		float spotAtten = clamp( (spotCosAngle - spotParams[@value(spot_params)].y) * spotParams[@value(spot_params)].x, 0.0, 1.0 );
-		spotAtten = pow( spotAtten, spotParams[@counter(spot_params)].z );
+		float spotAtten = clamp( (spotCosAngle - pass.lights[@n].spotParams.y) * pass.lights[@n].spotParams.x, 0.0, 1.0 );
+		spotAtten = pow( spotAtten, pass.lights[@n].spotParams.z );
 	@end
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
+		float atten = 1.0 / (1.0 + pass.lights[@n].attenuation.y * fDistance + pass.lights[@n].attenuation.z * fDistance * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
 

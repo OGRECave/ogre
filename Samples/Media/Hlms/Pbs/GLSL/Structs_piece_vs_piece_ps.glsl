@@ -56,7 +56,7 @@ struct Material
 	vec3 kS;
 	float roughness;
 	@property( fresnel_scalar )@piece( FresnelType )vec3@end @end
-	@property( !fresnel_scalar ) @piece( FresnelType )float@end @end
+	@property( !fresnel_scalar )@piece( FresnelType )float@end @end
 	//Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 	@insertpiece( FresnelType ) F0;
 	@property( !fresnel_scalar )vec2 padding;@end
@@ -81,7 +81,7 @@ struct Material
 layout(binding = 1) uniform MaterialBuf
 {
 	Material m[273];
-} material;
+} materialArray;
 @end
 
 
