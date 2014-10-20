@@ -305,7 +305,8 @@ namespace Ogre {
             VertexElementSemantic semantic;
         };
 
-        static const SemanticNameTable attributesTable[VES_COUNT] =
+#define OGRE_NUM_SEMANTICS 10
+        static const SemanticNameTable attributesTable[OGRE_NUM_SEMANTICS] =
         {
             { "vertex",         VES_POSITION },
             { "blendWeights",   VES_BLEND_WEIGHTS },
@@ -315,10 +316,11 @@ namespace Ogre {
             { "secondary_colour",VES_SPECULAR },
             { "tangent",        VES_TANGENT },
             { "binormal",       VES_BINORMAL },
+            { "qtangent",       VES_NORMAL },
             { "uv",             VES_TEXTURE_COORDINATES },
         };
 
-        for( size_t i=0; i<VES_COUNT - 1; ++i )
+        for( size_t i=0; i<OGRE_NUM_SEMANTICS - 1; ++i )
         {
             const SemanticNameTable &entry = attributesTable[i];
             OCGE( glBindAttribLocation( programName,

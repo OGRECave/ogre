@@ -36,11 +36,12 @@ layout(binding = 0) uniform PassBuffer
 	mat3 invViewMatCubemap;
 @property( hlms_pssm_splits )@foreach( hlms_pssm_splits, n )
 	float pssmSplitPoints@n;@end @end
-	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)]@end
+	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end
 @end @property( hlms_shadowcaster )
 	//Vertex shader
 	vec2 depthRange;
 @end
+
 } pass;
 @end
 
@@ -54,8 +55,8 @@ struct Material
 	vec3 kD;
 	vec3 kS;
 	float roughness;
-	@property( fresnel_scalar )@piece( FresnelType )vec3@end@end
-	@property( !fresnel_scalar ) @piece( FresnelType )float@end @end
+	@property( !fresnel_scalar )@piece( FresnelType )vec3@end @end
+	@property( fresnel_scalar ) @piece( FresnelType )float@end @end
 	//Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 	@insertpiece( FresnelType ) F0;
 	@property( !fresnel_scalar )vec2 padding;@end
