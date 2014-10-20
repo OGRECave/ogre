@@ -953,12 +953,6 @@ namespace Ogre
 
         copy( outBuffer, subString, subString.getSize() );
 
-        while( !syntaxError && outBuffer.find( "@insertpiece" ) != String::npos )
-        {
-            inBuffer.swap( outBuffer );
-            syntaxError = insertPieces( inBuffer, outBuffer );
-        }
-
         return syntaxError;
     }
     //-----------------------------------------------------------------------------------

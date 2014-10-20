@@ -62,6 +62,8 @@ in block
 @piece( SampleRoughnessMap )ROUGHNESS = roughness * texture( textureMaps[@value( roughness_map )], vec3(psIn.uv@value(uv_roughness).xy, roughnessIdx) ).x;@end
 @end
 
+@property( hlms_normal || hlms_qtangent )vec3 nNormal;@end
+
 @property( normal_map )
 @property( hlms_qtangent )
 @piece( tbnApplyReflection ) * inPs.biNormalReflection@end

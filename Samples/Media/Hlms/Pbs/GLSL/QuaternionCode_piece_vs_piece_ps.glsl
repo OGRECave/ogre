@@ -1,14 +1,14 @@
 @piece( DeclQuat_xAxis )
 vec3 xAxis( vec4 qQuat )
 {
-	Real fTy  = 2.0 * qQuat.qQuat.y;
-	Real fTz  = 2.0 * qQuat.qQuat.z;
-	Real fTwy = fTy * qQuat.qQuat.w;
-	Real fTwz = fTz * qQuat.qQuat.w;
-	Real fTxy = fTy * qQuat.qQuat.x;
-	Real fTxz = fTz * qQuat.qQuat.x;
-	Real fTyy = fTy * qQuat.qQuat.y;
-	Real fTzz = fTz * qQuat.qQuat.z;
+	float fTy  = 2.0 * qQuat.y;
+	float fTz  = 2.0 * qQuat.z;
+	float fTwy = fTy * qQuat.w;
+	float fTwz = fTz * qQuat.w;
+	float fTxy = fTy * qQuat.x;
+	float fTxz = fTz * qQuat.x;
+	float fTyy = fTy * qQuat.y;
+	float fTzz = fTz * qQuat.z;
 
 	return vec3( 1.0-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy );
 }

@@ -55,8 +55,8 @@ struct Material
 	vec3 kD;
 	vec3 kS;
 	float roughness;
-	@property( !fresnel_scalar )@piece( FresnelType )vec3@end @end
-	@property( fresnel_scalar ) @piece( FresnelType )float@end @end
+	@property( fresnel_scalar )@piece( FresnelType )vec3@end @end
+	@property( !fresnel_scalar ) @piece( FresnelType )float@end @end
 	//Fresnel coefficient, may be per colour component (vec3) or scalar (float)
 	@insertpiece( FresnelType ) F0;
 	@property( !fresnel_scalar )vec2 padding;@end
@@ -104,11 +104,12 @@ layout(binding = 2) uniform InstanceBuffer
 @piece( VStoPS_block )
 	flat uint drawId;
 	@property( !hlms_shadowcaster )
-		@property( hlms_normal )
+		@property( hlms_normal || hlms_qtangent )
 			vec3 pos;
 			vec3 normal;
 			@property( normal_map )vec3 tangent;
-			@property( hlms_qtangent )flat float biNormalReflection;@end @end
+				@property( hlms_qtangent )flat float biNormalReflection;@end
+			@end
 		@end
 		@foreach( hlms_uv_count, n )
 			vec@value( hlms_uv_count@n ) uv@n;@end

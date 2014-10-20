@@ -57,9 +57,9 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	int _idx = int(blendIndices[0] * 3.0);
 	uint matStart = (instance.worldMaterialIdx[drawId] & 0xFFFFFE00) >> 9;
 	vec4 worldMat[3];
-	worldMat[0] = texelFetch( worldMatBuf, matStart + _idx + 0 );
-	worldMat[1] = texelFetch( worldMatBuf, matStart + _idx + 1 );
-	worldMat[2] = texelFetch( worldMatBuf, matStart + _idx + 2 );
+	worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0) );
+	worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1) );
+	worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2) );
 	vec4 _localPos;
 	_localPos.x = dot( worldMat[0], vertex );
 	_localPos.y = dot( worldMat[1], vertex );
@@ -80,9 +80,9 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;@end
 	@foreach( hlms_bones_per_vertex, n, 1 )
 	_idx = int(blendIndices[@n] * 3.0);
-	worldMat[0] = texelFetch( worldMatBuf, matStart + _idx + 0 );
-	worldMat[1] = texelFetch( worldMatBuf, matStart + _idx + 1 );
-	worldMat[2] = texelFetch( worldMatBuf, matStart + _idx + 2 );
+	worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0) );
+	worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1) );
+	worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2) );
 	tmp.x = dot( worldMat[0], vertex );
 	tmp.y = dot( worldMat[1], vertex );
 	tmp.z = dot( worldMat[2], vertex );
@@ -114,16 +114,16 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 @piece( VertexTransform )
 	//Lighting is in view space
-	@property( hlms_normal )outVs.pos		= @insertpiece( CalculatePsPos );@end
-	@property( hlms_normal )outVs.normal	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_normal);@end
+	@property( hlms_normal || hlms_qtangent )outVs.pos		= @insertpiece( CalculatePsPos );@end
+	@property( hlms_normal || hlms_qtangent )outVs.normal	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_normal);@end
 	@property( normal_map )outVs.tangent	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_tangent);@end
 @property( !hlms_dual_paraboloid_mapping )
 	gl_Position = @insertpiece( worldViewProjMat ) * @insertpiece(local_vertex);@end
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	gl_Position.w	= 1.0f;
-	@property( hlms_normal )gl_Position.xyz	= outVs.pos;@end
-	@property( !hlms_normal )gl_Position.xyz	= @insertpiece( CalculatePsPos );@end
+	@property( hlms_normal || hlms_qtangent )gl_Position.xyz	= outVs.pos;@end
+	@property( !hlms_normal && !hlms_qtangent )gl_Position.xyz	= @insertpiece( CalculatePsPos );@end
 	float L = length( gl_Position.xyz );
 	gl_Position.z	+= 1.0f;
 	gl_Position.xy	/= gl_Position.z;
@@ -138,30 +138,32 @@ void main()
 {
 @property( !hlms_skeleton )
 	mat4 worldViewProj;
-	worldViewProj[0] = texelFetch( worldMatBuf, drawId * 2 );
-	worldViewProj[1] = texelFetch( worldMatBuf, drawId * 2 + 1 );
-	worldViewProj[2] = texelFetch( worldMatBuf, drawId * 2 + 2 );
-	worldViewProj[3] = texelFetch( worldMatBuf, drawId * 2 + 3 );
-	@property( hlms_normal )
+	worldViewProj[0] = texelFetch( worldMatBuf, int(drawId * 2) );
+	worldViewProj[1] = texelFetch( worldMatBuf, int(drawId * 2 + 1) );
+	worldViewProj[2] = texelFetch( worldMatBuf, int(drawId * 2 + 2) );
+	worldViewProj[3] = texelFetch( worldMatBuf, int(drawId * 2 + 3) );
+	@property( hlms_normal || hlms_qtangent )
 	mat4 worldView;
-	worldView[0] = texelFetch( worldMatBuf, drawId * 2 + 4 );
-	worldView[1] = texelFetch( worldMatBuf, drawId * 2 + 5 );
-	worldView[2] = texelFetch( worldMatBuf, drawId * 2 + 6 );
-	worldView[3] = texelFetch( worldMatBuf, drawId * 2 + 7 );
+	worldView[0] = texelFetch( worldMatBuf, int(drawId * 2 + 4) );
+	worldView[1] = texelFetch( worldMatBuf, int(drawId * 2 + 5) );
+	worldView[2] = texelFetch( worldMatBuf, int(drawId * 2 + 6) );
+	worldView[3] = texelFetch( worldMatBuf, int(drawId * 2 + 7) );
 	@end
 @end
 
 @property( hlms_qtangent )
 	//Decode qTangent to TBN with reflection
 	vec3 normal		= xAxis( qtangent );
+	@property( normal_map )
 	vec3 tangent	= yAxis( qtangent );
 	outVs.biNormalReflection = sign( qtangent.w ); //We ensure in C++ qtangent.w is never 0
+	@end
 @end
 
 	@insertpiece( SkeletonTransform )
 	@insertpiece( VertexTransform )
 @foreach( hlms_uv_count, n )
-	psUv@n = uv@n;@end
+	outVs.uv@n = uv@n;@end
 
 @property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
