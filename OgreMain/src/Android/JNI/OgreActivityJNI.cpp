@@ -66,27 +66,29 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-static bool gInit = false;
-static Ogre::Root* gRoot = NULL;
-static Ogre::RenderWindow* gRenderWnd = NULL;
+namespace {
+bool gInit = false;
+Ogre::Root* gRoot = NULL;
+Ogre::RenderWindow* gRenderWnd = NULL;
 
 #ifdef OGRE_BUILD_PLUGIN_OCTREE
-static Ogre::OctreePlugin* gOctreePlugin = NULL;
+Ogre::OctreePlugin* gOctreePlugin = NULL;
 #endif
 
 #ifdef OGRE_BUILD_PLUGIN_PFX
-static Ogre::ParticleFXPlugin* gParticleFXPlugin = NULL;
+Ogre::ParticleFXPlugin* gParticleFXPlugin = NULL;
 #endif
 
 #ifdef OGRE_BUILD_COMPONENT_OVERLAY
-static Ogre::OverlaySystem* gOverlaySystem = NULL; 
+Ogre::OverlaySystem* gOverlaySystem = NULL;
 #endif
 
-static Ogre::GLESRS* gGLESPlugin = NULL;
+Ogre::GLESRS* gGLESPlugin = NULL;
 
-static Ogre::SceneManager* pSceneMgr = NULL;
-static Ogre::Camera* pCamera = NULL;
-static JavaVM* gVM = NULL;
+Ogre::SceneManager* pSceneMgr = NULL;
+Ogre::Camera* pCamera = NULL;
+JavaVM* gVM = NULL;
+}
 
 // enable JNI calling conventions for functions defined here
 extern "C" 
