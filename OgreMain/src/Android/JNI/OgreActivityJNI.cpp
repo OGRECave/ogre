@@ -176,32 +176,30 @@ void Java_org_ogre3d_android_OgreActivityJNI_destroy(JNIEnv * env, jobject obj)
 
 void Java_org_ogre3d_android_OgreActivityJNI_initWindow(JNIEnv * env, jobject obj,  jobject surface)
 {
-    if(surface)
-    {
-        ANativeWindow* nativeWnd = ANativeWindow_fromSurface(env, surface);
-        if (nativeWnd && gRoot)
-        {
-            if (!gRenderWnd)
-            {
-                Ogre::NameValuePairList opt;
-                opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)nativeWnd);
-                gRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
+    if (!surface) {
+        return;
+    }
 
+    ANativeWindow* nativeWnd = ANativeWindow_fromSurface(env, surface);
 
-                if(!pSceneMgr)
-                {
-                    pSceneMgr = gRoot->createSceneManager(Ogre::ST_GENERIC);
-                    pCamera = pSceneMgr->createCamera("MyCam");
+    if (!nativeWnd || !gRoot) {
+        return;
+    }
 
-                    Ogre::Viewport* vp = gRenderWnd->addViewport(pCamera);
-                    vp->setBackgroundColour(Ogre::ColourValue(1,0,0));
-                }
-            }
-            else
-            {
-                static_cast<Ogre::AndroidEGLWindow*>(gRenderWnd)->_createInternalResources(nativeWnd, NULL);
-            }
+    if (!gRenderWnd) {
+        Ogre::NameValuePairList opt;
+        opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)nativeWnd);
+        gRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
+
+        if (!pSceneMgr) {
+            pSceneMgr = gRoot->createSceneManager(Ogre::ST_GENERIC);
+            pCamera = pSceneMgr->createCamera("MyCam");
+
+            Ogre::Viewport* vp = gRenderWnd->addViewport(pCamera);
+            vp->setBackgroundColour(Ogre::ColourValue(1,0,0));
         }
+    } else {
+        static_cast<Ogre::AndroidEGLWindow*>(gRenderWnd)->_createInternalResources(nativeWnd, NULL);
     }
 }
 
