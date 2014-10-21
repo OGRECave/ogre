@@ -186,7 +186,7 @@ void Java_org_ogre3d_android_OgreActivityJNI_initWindow(JNIEnv * env, jobject ob
                 gRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
 
 
-                if(pSceneMgr == NULL)
+                if(!pSceneMgr)
                 {
                     pSceneMgr = gRoot->createSceneManager(Ogre::ST_GENERIC);
                     pCamera = pSceneMgr->createCamera("MyCam");
@@ -213,7 +213,7 @@ void Java_org_ogre3d_android_OgreActivityJNI_termWindow(JNIEnv * env, jobject ob
 
 void Java_org_ogre3d_android_OgreActivityJNI_renderOneFrame(JNIEnv * env, jobject obj)
 {
-    if(gRenderWnd != NULL && gRenderWnd->isActive())
+    if(gRenderWnd && gRenderWnd->isActive())
     {
         try
         {
