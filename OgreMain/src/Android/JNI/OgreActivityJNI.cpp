@@ -224,6 +224,6 @@ void Java_org_ogre3d_android_OgreActivityJNI_renderOneFrame(JNIEnv * env, jobjec
             gRoot->renderOneFrame();
 
             //gVM->DetachCurrentThread();
-        }catch(Ogre::RenderingAPIException ex) {}
+        }catch(Ogre::RenderingAPIException& ex) {}
     }
 }
