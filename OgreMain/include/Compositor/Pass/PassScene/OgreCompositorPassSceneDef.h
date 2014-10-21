@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "../OgreCompositorPassDef.h"
 
 #include "OgreVisibilityFlags.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre
 {
