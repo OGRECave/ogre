@@ -1181,7 +1181,10 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
                     realLastRq  = std::max<uint8>( realLastRq, (*itor)->_getTotalRenderQueues() );
                     ++itor;
                 }
-                realLastRq = std::min( realLastRq, lastRq );
+
+                //clamp RQ values to the real RQ range
+                realFirstRq = std::min(realLastRq, std::max(realFirstRq, firstRq));
+                realLastRq = std::min(realLastRq, std::max(realFirstRq, lastRq));
             }
 
             camera->_setRenderedRqs( realFirstRq, realLastRq );
