@@ -659,7 +659,7 @@ namespace Ogre {
             switch(mParentTexture->getTextureType()) {
             case TEX_TYPE_1D:
                 {
-                    D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+                    D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
                     if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
                     {
                         mDevice.GetImmediateContext()->UpdateSubresource( 

@@ -37,13 +37,18 @@
 #include "macUtils.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-// For WinRT we only support running from the cache file.
-#       define ENABLE_SHADERS_CACHE_LOAD 1
-#endif
-
 #define ENABLE_SHADERS_CACHE_SAVE 0
 #define ENABLE_SHADERS_CACHE_LOAD 0
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#    include <sdkddkver.h>
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT == _WIN32_WINNT_WIN8
+//      For WinRT 8.0 we only support running from the cache file.
+#       undef ENABLE_SHADERS_CACHE_LOAD
+#       define ENABLE_SHADERS_CACHE_LOAD 1
+#    endif
+#endif
+
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android_native_app_glue.h>
@@ -167,42 +172,41 @@ namespace OgreBites
                                                       const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex,
                                                       const Ogre::Renderable* rend)
         {
-            Ogre::Technique* generatedTech = NULL;
-
-            // Case this is the default shader generator scheme.
-            if (schemeName == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+            if (schemeName != Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
             {
-                bool techniqueCreated;
+                return NULL;
+            }
+            // Case this is the default shader generator scheme.
 
-                // Create shader generated technique for this material.
-                techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-                    originalMaterial->getName(),
-                    Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-                    schemeName);
+            // Create shader generated technique for this material.
+            bool techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
+                originalMaterial->getName(),
+                Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+                schemeName);
 
-                // Case technique registration succeeded.
-                if (techniqueCreated)
+            if (!techniqueCreated)
+            {
+                return NULL;
+            }
+            // Case technique registration succeeded.
+
+            // Force creating the shaders for the generated technique.
+            mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
+
+            // Grab the generated technique.
+            Ogre::Material::TechniqueIterator itTech = originalMaterial->getTechniqueIterator();
+
+            while (itTech.hasMoreElements())
+            {
+                Ogre::Technique* curTech = itTech.getNext();
+
+                if (curTech->getSchemeName() == schemeName)
                 {
-                    // Force creating the shaders for the generated technique.
-                    mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
-
-                    // Grab the generated technique.
-                    Ogre::Material::TechniqueIterator itTech = originalMaterial->getTechniqueIterator();
-
-                    while (itTech.hasMoreElements())
-                    {
-                        Ogre::Technique* curTech = itTech.getNext();
-
-                        if (curTech->getSchemeName() == schemeName)
-                        {
-                            generatedTech = curTech;
-                            break;
-                        }
-                    }
+                    return curTech;
                 }
             }
 
-            return generatedTech;
+            return NULL;
         }
 
 	virtual bool afterIlluminationPassesCreated(Ogre::Technique* tech)
@@ -281,19 +285,15 @@ namespace OgreBites
         void initAppForWinRT( Windows::UI::Core::CoreWindow^ nativeWindow, InputContext inputContext)
         {
             mNativeWindow = nativeWindow;
-#   if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-            mNativeControl = nullptr;
-#       endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
             mInputContext = inputContext;
         }
-#       if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       if !__OGRE_WINRT_PHONE_80
         void initAppForWinRT( Windows::UI::Xaml::Shapes::Rectangle ^ nativeControl, InputContext inputContext)
         {
-            mNativeWindow = nullptr;
             mNativeControl = nativeControl;
             mInputContext = inputContext;
         }
-#       endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       endif
 #endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
         /*-----------------------------------------------------------------------------
           | init data members needed only by NaCl
@@ -770,7 +770,7 @@ namespace OgreBites
 
             if (evt.key == OIS::KC_ESCAPE)
             {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE
                 // If there is a quit button, assume that we intended to press it via 'ESC'.
                 if (mTrayMgr->areTraysVisible())
                 {
@@ -781,7 +781,7 @@ namespace OgreBites
                         return false;  // now act as if we didn't handle the button to get AppModel to exit.
                     }
                 }
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
+#endif // __OGRE_WINRT_PHONE
                 if (mTitleLabel->getTrayLocation() != TL_NONE)
                 {
                     // if we're in the main screen and a sample's running, toggle sample pause state
@@ -896,56 +896,33 @@ namespace OgreBites
 #endif
 
         /*-----------------------------------------------------------------------------
-          | Extends mousePressed to inject mouse press into tray manager, and to check
+          | Extends pointerPressed to inject mouse press into tray manager, and to check
           | for thumbnail clicks, just because we can.
           -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
-#else
-            virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-#endif
+        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            OIS::MultiTouchState state = evt.state;
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+            OIS::PointerState state = evt.state;
             transformInputState(state);
-#endif
-            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
-#else
-            OIS::MouseState state = evt.state;
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            transformInputState(state);
-#endif
-            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
-#endif
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            if (mTrayMgr->injectMouseDown(orientedEvt)) return true;
-#else
-            if (mTrayMgr->injectMouseDown(orientedEvt, id)) return true;
-#endif
+            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
             if (mTitleLabel->getTrayLocation() != TL_NONE)
             {
                 for (unsigned int i = 0; i < mThumbs.size(); i++)
                 {
                     if (mThumbs[i]->isVisible() && Widget::isCursorOver(mThumbs[i],
-                                                                        Ogre::Vector2(mTrayMgr->getCursorContainer()->getLeft(),
-                                                                                      mTrayMgr->getCursorContainer()->getTop()), 0))
+                        Ogre::Vector2(mTrayMgr->getCursorContainer()->getLeft(), mTrayMgr->getCursorContainer()->getTop()), 0))
                     {
                         mSampleMenu->selectItem(i);
-                        break;
+                        return true;
                     }
                 }
             }
 
+            if (mTrayMgr->injectPointerDown(orientedEvt, id)) return true;
+
             try
             {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-                return SampleContext::touchPressed(orientedEvt);
-#else
-                return SampleContext::mousePressed(orientedEvt, id);
-#endif
+                return SampleContext::pointerPressed(orientedEvt, id);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -957,41 +934,19 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-          | Extends mouseReleased to inject mouse release into tray manager.
+          | Extends pointerReleased to inject mouse release into tray manager.
           -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
-#else
-            virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-#endif
+        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            OIS::MultiTouchState state = evt.state;
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+            OIS::PointerState state = evt.state;
             transformInputState(state);
-#endif
-            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
-#else
-            OIS::MouseState state = evt.state;
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            transformInputState(state);
-#endif
-            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
-#endif
+            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            if (mTrayMgr->injectMouseUp(orientedEvt)) return true;
-#else
-            if (mTrayMgr->injectMouseUp(orientedEvt, id)) return true;
-#endif
+            if (mTrayMgr->injectPointerUp(orientedEvt, id)) return true;
 
             try
             {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-                return SampleContext::touchReleased(orientedEvt);
-#else
-                return SampleContext::mouseReleased(orientedEvt, id);
-#endif
+                return SampleContext::pointerReleased(orientedEvt, id);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -1003,30 +958,16 @@ namespace OgreBites
         }
 
         /*-----------------------------------------------------------------------------
-          | Extends mouseMoved to inject mouse position into tray manager, and checks
+          | Extends pointerMoved to inject mouse position into tray manager, and checks
           | for mouse wheel movements to slide the carousel, because we can.
           -----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-#else
-            virtual bool mouseMoved(const OIS::MouseEvent& evt)
-#endif
+        virtual bool pointerMoved(const OIS::PointerEvent& evt)
         {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            OIS::MultiTouchState state = evt.state;
-#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+            OIS::PointerState state = evt.state;
             transformInputState(state);
-#endif
-            OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
-#else
-            OIS::MouseState state = evt.state;
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            transformInputState(state);
-#endif
-            OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
-#endif
+            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-            if (mTrayMgr->injectMouseMove(orientedEvt)) return true;
+            if (mTrayMgr->injectPointerMove(orientedEvt)) return true;
 
             if (!(mCurrentSample && !mSamplePaused) && mTitleLabel->getTrayLocation() != TL_NONE &&
                 orientedEvt.state.Z.rel != 0 && mSampleMenu->getNumItems() != 0)
@@ -1037,11 +978,7 @@ namespace OgreBites
 
             try
             {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-                return SampleContext::touchMoved(orientedEvt);
-#else
-                return SampleContext::mouseMoved(orientedEvt);
-#endif
+                return SampleContext::pointerMoved(orientedEvt);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -1052,15 +989,14 @@ namespace OgreBites
             return true;
         }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
         /*-----------------------------------------------------------------------------
-          | Extends touchCancelled to inject an event that a touch was cancelled.
+          | Extends pointerCancelled to inject an event that a touch was cancelled.
           -----------------------------------------------------------------------------*/
-        virtual bool touchCancelled(const OIS::MultiTouchEvent& evt)
+        virtual bool pointerCancelled(const OIS::PointerEvent& evt)
         {
             return true;
         }
-#endif
+
         /*-----------------------------------------------------------------------------
           | Extends windowResized to best fit menus on screen. We basically move the
           | menu tray to the left for higher resolutions and move it to the center
@@ -1240,15 +1176,14 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void windowMovedOrResized()
         {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && !__OGRE_WINRT_PHONE_80
             if(mNativeControl)
             {
                 // in WinRT.Xaml case Ogre::RenderWindow is actually brush
                 // applied to native control and we need resize this brush manually
                 mWindow->resize(mNativeControl->ActualWidth, mNativeControl->ActualHeight);
             }
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#endif // !__OGRE_WINRT_PHONE_80
             mWindow->windowMovedOrResized();    // notify window
             windowResized(mWindow);                             // notify window event listeners
         }
@@ -1286,7 +1221,7 @@ namespace OgreBites
                 miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)reinterpret_cast<void*>(mNativeWindow.Get()));
                 res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Bounds.Width, mNativeWindow->Bounds.Height, false, &miscParams);
             }
-#       if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       if !__OGRE_WINRT_PHONE_80
             else if(mNativeControl)
             {
                 miscParams["windowType"] = "SurfaceImageSource";
@@ -1295,7 +1230,7 @@ namespace OgreBites
                 res->getCustomAttribute("ImageBrush", &pUnk);
                 mNativeControl->Fill = reinterpret_cast<Windows::UI::Xaml::Media::ImageBrush^>(pUnk);
             }
-#       endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       endif // !__OGRE_WINRT_PHONE_80
 
             return res;
 
@@ -1354,11 +1289,8 @@ namespace OgreBites
             }
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
-                //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
                 // creates shaders for base material BaseWhite using the RTSS
                 Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-                baseWhite->setLightingEnabled(false);
                 mShaderGenerator->createShaderBasedTechnique(
                     "BaseWhite",
                     Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
@@ -2003,9 +1935,9 @@ namespace OgreBites
         int mStartSampleIndex;                         // directly starts the sample with the given index
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
         Platform::Agile<Windows::UI::Core::CoreWindow> mNativeWindow;
-#       if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       if !__OGRE_WINRT_PHONE_80
         Windows::UI::Xaml::Shapes::Rectangle^ mNativeControl;
-#       endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#       endif // !__OGRE_WINRT_PHONE_80
 #endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;

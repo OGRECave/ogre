@@ -38,10 +38,14 @@ namespace Ogre
     ErrorDialog::ErrorDialog()
     {
 		#ifdef __MINGW32__
-			#if OGRE_DEBUG_MODE == 1
-				mHInstance = GetModuleHandle("OgreMain_d.dll");
+			#ifdef OGRE_STATIC_LIB
+        		mHInstance = GetModuleHandle( NULL );
 			#else
-				mHInstance = GetModuleHandle("OgreMain.dll");
+				#if OGRE_DEBUG_MODE == 1
+					mHInstance = GetModuleHandle("OgreMain_d.dll");
+				#else
+					mHInstance = GetModuleHandle("OgreMain.dll");
+				#endif
 			#endif
 		#else
 			static const TCHAR staticVar;

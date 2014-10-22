@@ -500,10 +500,14 @@ namespace Ogre {
 
 		HINSTANCE hinst = NULL;
 		#ifdef __MINGW32__
-			#if OGRE_DEBUG_MODE == 1
-				hinst = GetModuleHandle("OgreMain_d.dll");
+			#ifdef OGRE_STATIC_LIB
+        		hinst = GetModuleHandle( NULL );
 			#else
-				hinst = GetModuleHandle("OgreMain.dll");
+				#if OGRE_DEBUG_MODE == 1
+					hinst = GetModuleHandle("RenderSystem_GL3Plus_d.dll");
+				#else
+					hinst = GetModuleHandle("RenderSystem_GL3Plus.dll");
+				#endif
 			#endif
 		#else
 			static const TCHAR staticVar;

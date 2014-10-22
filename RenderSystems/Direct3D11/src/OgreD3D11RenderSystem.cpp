@@ -58,12 +58,6 @@ THE SOFTWARE.
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
 
-//#ifdef OGRE_PROFILING == 1 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-//#include "d3d9.h"
-//#endif
-
-//---------------------------------------------------------------------
-
 
 #ifndef D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT
 #   define D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT 4
@@ -126,7 +120,7 @@ bail:
 
     //---------------------------------------------------------------------
     D3D11RenderSystem::D3D11RenderSystem()
-		: mDevice(NULL)
+		: mDevice()
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
 #endif	
@@ -303,13 +297,18 @@ bail:
         optMaxFeatureLevels.name = "Max Requested Feature Levels";
         optMaxFeatureLevels.possibleValues.push_back("9.1");
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#    if  OGRE_WINRT_TARGET_TYPE == PHONE
+#if __OGRE_WINRT_PHONE_80
         optMaxFeatureLevels.possibleValues.push_back("9.2");
-#    endif
         optMaxFeatureLevels.possibleValues.push_back("9.3");
         optMaxFeatureLevels.currentValue = "9.3";
-#else     
+#elif __OGRE_WINRT_PHONE || __OGRE_WINRT_STORE
+        optMaxFeatureLevels.possibleValues.push_back("9.3");
+        optMaxFeatureLevels.possibleValues.push_back("10.0");
+        optMaxFeatureLevels.possibleValues.push_back("10.1");
+        optMaxFeatureLevels.possibleValues.push_back("11.0");
+        optMaxFeatureLevels.possibleValues.push_back("11.1");
+        optMaxFeatureLevels.currentValue = "11.1";
+#else
         optMaxFeatureLevels.possibleValues.push_back("9.3");
         optMaxFeatureLevels.possibleValues.push_back("10.0");
         optMaxFeatureLevels.possibleValues.push_back("10.1");
@@ -488,7 +487,7 @@ bail:
             else if (value == "11.0")
                 mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
             else
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
                 mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
 #else
                 mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -631,12 +630,8 @@ bail:
 
         //AIZ:recreate the device for the selected adapter
         {
-            if (!mDevice.isNull())
-            {
-                mDevice.release();
-            }
+            mDevice.ReleaseAll();
 
-        
             opt = mOptions.find( "Information Queue Exceptions Bottom Level" );
             if( opt == mOptions.end() )
                 OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find Information Queue Exceptions Bottom Level option!", "D3D11RenderSystem::initialise" );
@@ -750,14 +745,14 @@ bail:
             }
 
             D3D_FEATURE_LEVEL requestedLevels[] = {
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#if !__OGRE_WINRT_PHONE // Windows Phone support only FL 9.3, but simulator can create much more capable device, so restrict it artificially here
+#if _WIN32_WINNT >= _WIN32_WINNT_WIN8
                 D3D_FEATURE_LEVEL_11_1,
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
-#if !( (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE) )
+#endif
                 D3D_FEATURE_LEVEL_11_0,
                 D3D_FEATURE_LEVEL_10_1,
                 D3D_FEATURE_LEVEL_10_0,
-#endif // !( (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE) )
+#endif // !__OGRE_WINRT_PHONE
                 D3D_FEATURE_LEVEL_9_3,
                 D3D_FEATURE_LEVEL_9_2,
                 D3D_FEATURE_LEVEL_9_1
@@ -879,7 +874,7 @@ bail:
             SAFE_RELEASE(pDXGIAdapter);
             SAFE_RELEASE(pDXGIDevice);
 
-            mDevice = D3D11Device(device) ;
+            mDevice.TransferOwnership(device) ;
         }
 
         if( autoCreateWindow )
@@ -949,6 +944,7 @@ bail:
             miscParams["FSAAHint"] = fsaaHint;
             miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
             miscParams["gamma"] = StringConverter::toString(hwGamma);
+            //miscParams["useFlipSequentialMode"] = StringConverter::toString(true);
 
             opt = mOptions.find("VSync");
             if (opt == mOptions.end())
@@ -1004,7 +1000,7 @@ bail:
         SAFE_DELETE( mDriverList );
         SAFE_RELEASE( mpDXGIFactory );
         mActiveD3DDriver = NULL;
-        mDevice = NULL;
+        mDevice.ReleaseAll();
         LogManager::getSingleton().logMessage("D3D11 : Shutting down cleanly.");
         SAFE_DELETE( mTextureManager );
         SAFE_DELETE( mHardwareBufferManager );
@@ -1069,10 +1065,10 @@ bail:
 		}
 
 		D3D11RenderWindowBase* win = NULL;
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#if !__OGRE_WINRT_PHONE_80
 		if(win == NULL && windowType == "SurfaceImageSource")
 			win = new D3D11RenderWindowImageSource(mDevice, mpDXGIFactory);
-#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#endif // !__OGRE_WINRT_PHONE_80
 		if(win == NULL)
 			win = new D3D11RenderWindowCoreWindow(mDevice, mpDXGIFactory);
 #endif
@@ -1718,13 +1714,9 @@ bail:
             }
             */
             // Clean up depth stencil surfaces
-            mDevice.release();
+            mDevice.ReleaseAll();
             //mActiveD3DDriver->setDevice(D3D11Device(NULL));
-            mDevice = 0;
-
         }
-
-
     }
     //---------------------------------------------------------------------
     VertexElementType D3D11RenderSystem::getColourVertexElementType(void) const
@@ -2285,10 +2277,6 @@ bail:
                     "D3D11RenderSystem::_setViewport");
             }
 
-            // Set sRGB write mode
-            //__SetRenderState(D3DRS_SRGBWRITEENABLE, target->isHardwareGammaEnabled());
-            // TODO where has sRGB state gone?
-            
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			D3D11RenderWindowBase* d3d11Window = static_cast<D3D11RenderWindowBase*>(target);
 			d3d11Window->_validateStereo();
@@ -2296,13 +2284,12 @@ bail:
 
             vp->_clearUpdatedFlag();
         }
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        // as swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL we need to reestablish render target views
         else
         {
-            _setRenderTargetViews();
+            // if swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL we need to reestablish render target views
+            if(static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer())
+                _setRenderTargetViews();
         }
-#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()
@@ -3852,108 +3839,58 @@ bail:
     void D3D11RenderSystem::determineFSAASettings(uint fsaa, const String& fsaaHint, 
         DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings)
     {
-        bool ok = false;
-        bool qualityHint = fsaaHint.find("Quality") != String::npos;
-        size_t origFSAA = fsaa;
-        bool tryCSAA = false;
-        // NVIDIA, prefer CSAA if available for 8+
-        // it would be tempting to use getCapabilities()->getVendor() == GPU_NVIDIA but
-        // if this is the first window, caps will not be initialised yet
+        bool qualityHint = fsaa >= 8 && fsaaHint.find("Quality") != String::npos;
         
-        if (mActiveD3DDriver->getAdapterIdentifier().VendorId == 0x10DE && 
-            fsaa >= 8)
+        // NVIDIA, AMD - prefer CSAA aka EQAA if available.
+        // see http://developer.nvidia.com/object/coverage-sampled-aa.html
+        // see http://developer.amd.com/wordpress/media/2012/10/EQAA%20Modes%20for%20AMD%20HD%206900%20Series%20Cards.pdf
+
+        // Modes are sorted from high quality to low quality, CSAA aka EQAA are listed first
+        // Note, that max(Count, Quality) == FSAA level and (Count >= 8 && Quality != 0) == quality hint
+        DXGI_SAMPLE_DESC presets[] = {
+                { 8, 16 }, // CSAA 16xQ, EQAA 8f16x
+                { 4, 16 }, // CSAA 16x,  EQAA 4f16x
+                { 16, 0 }, // MSAA 16x
+
+                { 12, 0 }, // MSAA 12x
+
+                { 8, 8 },  // CSAA 8xQ
+                { 4, 8 },  // CSAA 8x,  EQAA 4f8x
+                { 8, 0 },  // MSAA 8x
+
+                { 6, 0 },  // MSAA 6x
+                { 4, 0 },  // MSAA 4x
+                { 2, 0 },  // MSAA 2x
+                { 1, 0 },  // MSAA 1x
+                { NULL },
+        };
+
+        // Skip too HQ modes
+        DXGI_SAMPLE_DESC* mode = presets;
+        for(; mode->Count != 0; ++mode)
         {
-            tryCSAA  = true;
+            unsigned modeFSAA = std::max(mode->Count, mode->Quality);
+            bool modeQuality = mode->Count >= 8 && mode->Quality != 0;
+            bool tooHQ = (modeFSAA > fsaa || modeFSAA == fsaa && modeQuality && !qualityHint);
+            if(!tooHQ)
+                break;
         }
 
-        while (!ok)
+        // Use first supported mode
+        for(; mode->Count != 0; ++mode)
         {
-            // Deal with special cases
-            if (tryCSAA)
-            {
-                // see http://developer.nvidia.com/object/coverage-sampled-aa.html
-                switch(fsaa)
-                {
-                case 8:
-                    if (qualityHint)
-                    {
-                        outFSAASettings->Count = 8;
-                        outFSAASettings->Quality = 8;
-                    }
-                    else
-                    {
-                        outFSAASettings->Count = 4;
-                        outFSAASettings->Quality = 8;
-                    }
-                    break;
-                case 16:
-                    if (qualityHint)
-                    {
-                        outFSAASettings->Count = 8;
-                        outFSAASettings->Quality = 16;
-                    }
-                    else
-                    {
-                        outFSAASettings->Count = 4;
-                        outFSAASettings->Quality = 16;
-                    }
-                    break;
-                }
-            }
-            else // !CSAA
-            {
-                outFSAASettings->Count = fsaa == 0 ? 1 : fsaa;
-                outFSAASettings->Quality = 0;
-            }
-
-
-            HRESULT hr;
             UINT outQuality;
-            hr = mDevice->CheckMultisampleQualityLevels( 
-                format, 
-                outFSAASettings->Count, 
-                &outQuality);
+            HRESULT hr = mDevice->CheckMultisampleQualityLevels(format, mode->Count, &outQuality);
 
-            if (SUCCEEDED(hr) && 
-                (!tryCSAA || outQuality > outFSAASettings->Quality))
+            if(SUCCEEDED(hr) && outQuality > mode->Quality)
             {
-                ok = true;
+                *outFSAASettings = *mode;
+                return;
             }
-            else
-            {
-                // downgrade
-                if (tryCSAA && fsaa == 8)
-                {
-                    // for CSAA, we'll try downgrading with quality mode at all samples.
-                    // then try without quality, then drop CSAA
-                    if (qualityHint)
-                    {
-                        // drop quality first
-                        qualityHint = false;
-                    }
-                    else
-                    {
-                        // drop CSAA entirely 
-                        tryCSAA = false;
-                    }
-                    // return to original requested samples
-                    fsaa = static_cast<uint>(origFSAA);
-                }
-                else
-                {
-                    // drop samples
-                    --fsaa;
+        }
 
-                    if (fsaa == 0)
-                    {
-                        // ran out of options, no FSAA
-                        ok = true;
-                    }
-                }
-            }
-
-        } // while !ok
-
+        outFSAASettings->Count = 1;
+        outFSAASettings->Quality = 0;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::initRenderSystem()
@@ -3982,13 +3919,10 @@ bail:
         mGpuProgramManager = NULL;
         mPrimaryWindow = NULL;
         mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-
-#if  OGRE_WINRT_TARGET_TYPE == PHONE
+#if __OGRE_WINRT_PHONE // Windows Phone support only FL 9.3, but simulator can create much more capable device, so restrict it artificially here
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
-#    else
+#elif _WIN32_WINNT >= _WIN32_WINNT_WIN8
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
-#    endif
 #else
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 #endif
@@ -4078,7 +4012,7 @@ bail:
 				}
 			}
 		}
-        mDevice = D3D11Device(device) ;
+        mDevice.TransferOwnership(device);
 
 
         // set stages desc. to defaults
@@ -4150,32 +4084,33 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::beginProfileEvent( const String &eventName )
     {
-//#ifdef OGRE_PROFILING == 1
-//      if( eventName.empty() )
-//          return;
-// 
-//      vector<wchar_t>::type result(eventName.length() + 1, '\0');
-//      (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
-//      (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
-//#endif
+#if OGRE_D3D11_PROFILING
+        if(mDevice.GetProfiler())
+        {			
+            wchar_t wideName[256]; // Let avoid heap memory allocation if we are in profiling code.
+            bool wideNameOk = !eventName.empty() && 0 != MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length() + 1, wideName, ARRAYSIZE(wideName));
+            mDevice.GetProfiler()->BeginEvent(wideNameOk ? wideName : L"<too long or empty event name>");
+        }
+#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::endProfileEvent( void )
     {
-//#ifdef OGRE_PROFILING == 1
-//      (void)D3DPERF_EndEvent();
-//#endif
+#if OGRE_D3D11_PROFILING
+        if(mDevice.GetProfiler())
+            mDevice.GetProfiler()->EndEvent();
+#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::markProfileEvent( const String &eventName )
     {
-//#ifdef OGRE_PROFILING == 1
-//      if( eventName.empty() )
-//          return;
-//
-//      vector<wchar_t>::type result(eventName.length() + 1, '\0');
-//      (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
-//      (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
-//#endif
-    }    
+#if OGRE_D3D11_PROFILING
+        if(mDevice.GetProfiler())
+        {
+            wchar_t wideName[256]; // Let avoid heap memory allocation if we are in profiling code.
+            bool wideNameOk = !eventName.empty() && 0 != MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length() + 1, wideName, ARRAYSIZE(wideName));
+            mDevice.GetProfiler()->SetMarker(wideNameOk ? wideName : L"<too long or empty event name>");
+        }
+#endif
+    }
 }

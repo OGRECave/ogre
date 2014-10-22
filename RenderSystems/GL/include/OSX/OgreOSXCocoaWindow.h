@@ -66,13 +66,7 @@ namespace Ogre {
         float mContentScalingFactor;
         bool mContentScalingSupported;
 
-        /// We always keep mWidth and mHeight as well as result of getWidth() and getHeight() in pixels, as
-        /// too much OpenGL code depends on it. But window/view management functions takes view points for
-        /// convenience, as does the rest of windowing system. Such parameters are named using xxxxPt pattern,
-        /// and should not be mixed with pixels without being converted by _getPixelFromPoint() function.
-        /// By default pixels are equal to points, but you can request smaller pixels on Retina displays.
         int _getPixelFromPoint(int viewPt) const;
-        
         void _setWindowParameters(unsigned int widthPt, unsigned int heightPt);
         
     public:
@@ -85,6 +79,9 @@ namespace Ogre {
         NSOpenGLPixelFormat* nsopenGLPixelFormat() const { return mGLPixelFormat; };
         void createWithView(OgreView *view);
 
+        /** @copydoc see RenderWindow::getViewPointToPixelScale */
+        float getViewPointToPixelScale();
+        /** Overridden - see RenderWindow */
         void create(const String& name, unsigned int widthPt, unsigned int heightPt,
                 bool fullScreen, const NameValuePairList *miscParams);
         /** Overridden - see RenderWindow */

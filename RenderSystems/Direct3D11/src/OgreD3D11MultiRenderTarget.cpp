@@ -138,13 +138,13 @@ namespace Ogre
         }
         else if( name == "numberOfViews" )
         {
-            uint* n = reinterpret_cast<unsigned int*>(pData);
+            uint* n = static_cast<unsigned int*>(pData);
             *n = mNumberOfViews;
             return;
         }
         else if(name == "isTexture")
         {
-            bool *b = reinterpret_cast< bool * >( pData );
+            bool *b = static_cast< bool * >( pData );
             *b = false;
             return;
         }

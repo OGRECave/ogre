@@ -78,7 +78,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    bool FileSystemLayer::fileExists(const Ogre::String& path) const
+    bool FileSystemLayer::fileExists(const Ogre::String& path)
     {
         return access(path.c_str(), R_OK) == 0;
     }
@@ -86,5 +86,20 @@ namespace Ogre
     bool FileSystemLayer::createDirectory(const Ogre::String& path)
     {
         return !mkdir(path.c_str(), 0755) || errno == EEXIST;
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::removeDirectory(const Ogre::String& path)
+    {
+        return !rmdir(path.c_str()) || errno == ENOENT;
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::removeFile(const Ogre::String& path)
+    {
+        return !unlink(path.c_str()) || errno == ENOENT;
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::renameFile(const Ogre::String& oldname, const Ogre::String& newname)
+    {
+        return !rename(oldname.c_str(), newname.c_str());
     }
 }

@@ -112,6 +112,7 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
     // Serializer options:
     mTrayMgr->createButton(TL_TOPRIGHT, "btnShowAll", "Show all levels", 200);
     mTrayMgr->createButton(TL_TOPRIGHT, "btnSaveMesh", "Save mesh", 200);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnRestoreMesh", "Restore original mesh", 200);
     mTrayMgr->createButton(TL_TOPRIGHT, "btnShowMesh", "Show Lod from mesh", 200);
     mTrayMgr->createButton(TL_TOPRIGHT, "btnAutoconfigure", "Show autoconfigured mesh", 200);
 
@@ -577,6 +578,8 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
         if(!getResourceFullPath(mLodConfig.mesh, filename) || filename == "") {
             mTrayMgr->showOkDialog("Error", "'" + filename + "' is not a writable path!");
         } else {
+            if(!FileSystemLayer::fileExists(filename + ".orig"))
+                FileSystemLayer::renameFile(filename, filename + ".orig");
             MeshSerializer ms;
             ms.exportMesh(mLodConfig.mesh.get(), filename);
             mTrayMgr->showOkDialog("Success", "Mesh saved to: " + filename);
@@ -584,6 +587,14 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
         if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible()){
             loadUserLod();
         }
+    }
+    else if(button->getName() == "btnRestoreMesh") {
+        String filename("");
+        if(getResourceFullPath(mLodConfig.mesh, filename) && filename != "") {
+            if(FileSystemLayer::fileExists(filename + ".orig"))
+                FileSystemLayer::renameFile(filename + ".orig", filename);
+        }
+        changeSelectedMesh(mLodConfig.mesh->getName());
     }
 }
 

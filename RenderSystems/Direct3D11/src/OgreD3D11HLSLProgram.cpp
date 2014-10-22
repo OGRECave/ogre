@@ -473,7 +473,7 @@ namespace Ogre {
 
 
         UINT compileFlags=0;
-        D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 #if OGRE_DEBUG_MODE
         compileFlags |= D3DCOMPILE_DEBUG;
         // Skip optimization only if we have enough instruction slots (>=256) and not feature level 9 hardware
