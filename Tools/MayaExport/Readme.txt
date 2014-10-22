@@ -7,30 +7,31 @@
  *                                                                             *
  *******************************************************************************
 
-
+--------------------------------------------------------------------------------
 Installation:
+--------------------------------------------------------------------------------
 
+1) Copy "ogreExporter.mll" to your Maya plug-ins directory (e.g.: C:\Program Files\Alias\Maya7.0\bin\plug-ins)
 
-1)Copy ogreExporter.mll to your maya plug-ins directory (I.E.: C:\Program Files\Alias\Maya7.0\bin\plug-ins)
+2) Copy Ogre DLLs (you can find them in the "dlls" directory of this zip) to your Maya bin directory
+   (e.g.: C:\Program Files\Alias\Maya7.0\bin)
 
-2)Copy Ogre dlls (you can find them in the "dlls" directory of this zip) to your maya bin directory
-(I.E.: C:\Program Files\Alias\Maya7.0\bin)
+3) Copy "ogreExporter.mel" (from the "mel" directory of this zip) to your Maya scripts directory 
+   (e.g.: C:\Documents and Settings\user\My Documents\maya\6.5\scripts)
 
-3)Copy ogreExporter.mel (from the "mel" directory of this zip) to your maya scripts directory 
-(I.E.: C:\Documents and Settings\user\My Documents\maya\6.5\scripts)
+4) If you already have a userSetup.mel in your scripts folder, then append the line 
+      source ogreExporter.mel;
+   to the existing "userSetup.mel".
+   If you don't have a "userSetup.mel" file in your scripts directory, then copy there the one you find in
+   the "scripts" directory of this zip.
 
-4)If you already have a userSetup.mel in your scripts folder, then append the line 
-	source ogreExporter.mel;
-to the existing userSetup.mel.
-If you don't have a userSetup.mel file in your scripts directory, then copy there the one you find in
-the "scripts" directory of this zip.
+5) Launch vcredist_x86.exe to install the latest Visual Studio DLLs
 
-5)Launch vcredist_x86.exe to install the latest visual studio 8 dlls
-
-
+--------------------------------------------------------------------------------
 Usage:
+--------------------------------------------------------------------------------
 
-1) Via gui from the menu Ogre->Export
+1) Via GUI from the menu Ogre->Export
 
 2) Via script:
 
@@ -104,3 +105,9 @@ vertexAnimOptions:
 clipOptions:
 	"startEnd" s e ("frames" | "seconds") | "timeSlider"	specify clip range with start/end time or use time slider range
 
+--------------------------------------------------------------------------------
+Trouble Shooting:
+--------------------------------------------------------------------------------
+
+- some users reported that they need to add an additional "-v" parameter after "-q" into the file "ogreExporter.mel",
+  in the lines 1924 to 1926 (details: http://www.ogre3d.org/forums/viewtopic.php?f=8&t=46563)
