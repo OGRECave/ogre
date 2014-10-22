@@ -1124,7 +1124,7 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
-    void Mesh::_setLodUsage(unsigned short level, MeshLodUsage& usage)
+    void Mesh::_setLodUsage(unsigned short level, const MeshLodUsage& usage)
     {
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 
@@ -1185,13 +1185,16 @@ namespace Ogre {
             (*isub)->removeLodLevels();
         }
 
+        bool edgeListWasBuilt = isEdgeListBuilt();
         freeEdgeList();
 
         // Reinitialise
         mNumLods = 1;
         mMeshLodUsageList.resize(1);
         mMeshLodUsageList[0].edgeData = NULL;
-        // TODO: Shouldn't we rebuild edge lists after freeing them?
+
+        if(edgeListWasBuilt)
+            buildEdgeList();
 #endif
     }
 
