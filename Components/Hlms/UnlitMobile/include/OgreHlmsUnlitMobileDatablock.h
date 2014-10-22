@@ -185,6 +185,8 @@ namespace Ogre
         */
         void setTexture( uint8 texUnit, TexturePtr &newTexture, const UvAtlasParams &atlasParams );
 
+        TexturePtr getTexture( uint8 texUnit ) const;
+
         /** Sets a new sampler block to be associated with the texture
             (i.e. filtering mode, addressing modes, etc).
         @param texUnit

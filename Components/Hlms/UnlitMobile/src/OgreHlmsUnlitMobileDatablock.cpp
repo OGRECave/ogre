@@ -369,6 +369,12 @@ namespace Ogre
         calculateHash();
     }
     //-----------------------------------------------------------------------------------
+    TexturePtr HlmsUnlitMobileDatablock::getTexture( uint8 texUnit ) const
+    {
+        assert( texUnit < 16 );
+        return mShaderCreationData->mDiffuseTextures[texUnit];
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsUnlitMobileDatablock::setSamplerblock( uint8 texUnit, const HlmsSamplerblock &params )
     {
         if( texUnit >= 16 )
