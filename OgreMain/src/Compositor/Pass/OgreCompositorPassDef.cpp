@@ -34,6 +34,10 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
 
+#include "Compositor/OgreCompositorNodeDef.h"
+#include "Compositor/OgreCompositorManager2.h"
+#include "Compositor/Pass/OgreCompositorPassProvider.h"
+
 namespace Ogre
 {
     CompositorTargetDef::~CompositorTargetDef()
@@ -66,6 +70,23 @@ namespace Ogre
             break;
         case PASS_STENCIL:
             retVal = OGRE_NEW CompositorPassStencilDef( mRtIndex );
+            break;
+        case PASS_CUSTOM0:
+        case PASS_CUSTOM1:
+        case PASS_CUSTOM2:
+        case PASS_CUSTOM3:
+            {
+                CompositorPassProvider *passProvider = mParentNodeDef->getCompositorManager()->
+                                                                    getCompositorPassProvider();
+                if( !passProvider )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                                 "Using custom compositor passes but no provider is set",
+                                 "CompositorTargetDef::addPass" );
+                }
+
+                retVal = passProvider->addPassDef( passType, mRtIndex, mParentNodeDef );
+            }
             break;
         default:
             break;
