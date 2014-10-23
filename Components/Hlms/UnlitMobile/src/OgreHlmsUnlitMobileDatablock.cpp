@@ -371,7 +371,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsUnlitMobileDatablock::setSamplerblock( uint8 texUnit, const HlmsSamplerblock &params )
     {
-        if( texUnit >= mNumTextureUnits )
+        if( texUnit >= 16 )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Texture unit out of range in datablock '" +
                          mName.getFriendlyText() + "'", "HlmsUnlitMobileDatablock::setSamplerblock" );
