@@ -93,12 +93,15 @@ namespace Ogre
         bool        mStartEnabled;
         String      mNameStr;
 
+        CompositorManager2 *mCompositorManager;
+
     public:
         IdString    mCustomIdentifier;
 
-        CompositorNodeDef( const String &name ) :
+        CompositorNodeDef( const String &name, CompositorManager2 *compositorManager ) :
                 TextureDefinitionBase( TEXTURE_LOCAL ),
-                mName( name ), mStartEnabled( true ), mNameStr( name ) {}
+                mName( name ), mStartEnabled( true ), mNameStr( name ),
+                mCompositorManager( compositorManager ) {}
         virtual ~CompositorNodeDef() {}
 
         IdString getName(void) const                        { return mName; }
@@ -177,6 +180,8 @@ namespace Ogre
             channel's name. Global textures aren't supported.
         */
         void mapOutputChannel( size_t outChannel, IdString textureName );
+
+        CompositorManager2* getCompositorManager(void) const { return mCompositorManager; }
     };
 
     /** @} */
