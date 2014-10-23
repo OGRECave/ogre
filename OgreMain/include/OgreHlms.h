@@ -101,7 +101,7 @@ namespace Ogre
             std::vector<Expression> children;
             String                  value;
 
-            Expression() : type( EXPR_VAR ), result( false ), negated( false ) {}
+            Expression() : result( false ), negated( false ), type( EXPR_VAR ) {}
         };
 
         typedef std::vector<Expression> ExpressionVec;
