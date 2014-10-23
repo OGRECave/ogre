@@ -120,8 +120,8 @@ namespace Ogre
         size_t              mMaxRq; //Maximum RQ included by one of our passes
 
     public:
-        CompositorShadowNodeDef( const String &name ) :
-                CompositorNodeDef( name ), mDefaultTechnique( SHADOWMAP_UNIFORM ),
+        CompositorShadowNodeDef( const String &name, CompositorManager2 *compositorManager ) :
+                CompositorNodeDef( name, compositorManager ), mDefaultTechnique( SHADOWMAP_UNIFORM ),
                 mNumLights( 0 ), mMinRq( ~0 ), mMaxRq( 0 ) {}
         virtual ~CompositorShadowNodeDef() {}
 
