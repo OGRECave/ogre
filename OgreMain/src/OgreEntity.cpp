@@ -542,9 +542,9 @@ namespace v1 {
 #endif
     }
     //-----------------------------------------------------------------------
-    /*void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
+    void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
-        // Do nothing if not initialised yet
+        /*// Do nothing if not initialised yet
         if (!mInitialised)
             return;
 
@@ -630,8 +630,15 @@ namespace v1 {
                 OldBone* bone = mSkeletonInstance->getBone(b);
                 queue->addRenderable(bone->getDebugRenderable(1), mRenderQueueID, mRenderQueuePriority);
             }
+        }*/
+
+        // Since we know we're going to be rendered, take this opportunity to
+        // update the animation
+        if (hasSkeleton() || hasVertexAnimation())
+        {
+            updateAnimation();
         }
-    }*/
+    }
     //-----------------------------------------------------------------------
     AnimationState* Entity::getAnimationState(const String& name) const
     {

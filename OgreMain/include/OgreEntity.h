@@ -360,7 +360,7 @@ namespace v1 {
 
         /** @copydoc MovableObject::_updateRenderQueue.
         */
-        //void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
+        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
         /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;
