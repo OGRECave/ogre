@@ -7690,7 +7690,7 @@ namespace Ogre{
         else
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
-                "pass types must be \"clear\", \"stencil\", \"render_quad\" or \"render_scene\".");
+                "pass types must be \"clear\", \"stencil\", \"render_quad\", \"render_scene\" or \"custom\".");
             return;
         }
 
