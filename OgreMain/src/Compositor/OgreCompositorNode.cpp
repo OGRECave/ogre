@@ -381,10 +381,7 @@ namespace Ogre
                                             static_cast<CompositorPassStencilDef*>(*itPass),
                                             *channel, this, mRenderSystem );
                     break;
-                case PASS_CUSTOM0:
-                case PASS_CUSTOM1:
-                case PASS_CUSTOM2:
-                case PASS_CUSTOM3:
+                case PASS_CUSTOM:
                     {
                         CompositorPassProvider *passProvider = mWorkspace->getCompositorManager()->
                                                                         getCompositorPassProvider();

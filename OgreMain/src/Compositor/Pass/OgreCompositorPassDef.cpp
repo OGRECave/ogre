@@ -54,7 +54,7 @@ namespace Ogre
         mCompositorPasses.clear();
     }
     //-----------------------------------------------------------------------------------
-    CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType )
+    CompositorPassDef* CompositorTargetDef::addPass( CompositorPassType passType, IdString customId )
     {
         CompositorPassDef *retVal = 0;
         switch( passType )
@@ -71,10 +71,7 @@ namespace Ogre
         case PASS_STENCIL:
             retVal = OGRE_NEW CompositorPassStencilDef( mRtIndex );
             break;
-        case PASS_CUSTOM0:
-        case PASS_CUSTOM1:
-        case PASS_CUSTOM2:
-        case PASS_CUSTOM3:
+        case PASS_CUSTOM:
             {
                 CompositorPassProvider *passProvider = mParentNodeDef->getCompositorManager()->
                                                                     getCompositorPassProvider();
@@ -85,7 +82,7 @@ namespace Ogre
                                  "CompositorTargetDef::addPass" );
                 }
 
-                retVal = passProvider->addPassDef( passType, mRtIndex, mParentNodeDef );
+                retVal = passProvider->addPassDef( passType, customId, mRtIndex, mParentNodeDef );
             }
             break;
         default:

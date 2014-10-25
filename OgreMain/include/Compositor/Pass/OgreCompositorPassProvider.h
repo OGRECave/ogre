@@ -72,7 +72,17 @@ namespace Ogre
     class _OgreExport CompositorPassProvider : public ResourceAlloc
     {
     public:
+        /**
+        @param passType
+        @param customId
+            Arbitrary ID in case there is more than one type of custom pass you want to implement.
+            Defaults to IdString()
+        @param rtIndex
+        @param parentNodeDef
+        @return
+        */
         virtual CompositorPassDef* addPassDef( CompositorPassType passType,
+                                               IdString customId,
                                                uint32 rtIndex,
                                                CompositorNodeDef *parentNodeDef ) = 0;
 
