@@ -240,6 +240,8 @@ namespace Ogre
                     mShaderCreationData->mTextureMatrixMap[i] = mNumTextureMatrices++;
             }
         }
+
+        calculateHash();
     }
     //-----------------------------------------------------------------------------------
     HlmsUnlitMobileDatablock::~HlmsUnlitMobileDatablock()
@@ -387,6 +389,9 @@ namespace Ogre
 
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         mShaderCreationData->mSamplerblocks[texUnit] = hlmsManager->getSamplerblock( params );
+
+        if( oldBlock != mShaderCreationData->mSamplerblocks[texUnit] )
+            calculateHash();
 
         if( oldBlock )
             hlmsManager->destroySamplerblock( oldBlock );

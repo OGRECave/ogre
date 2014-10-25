@@ -414,7 +414,7 @@ namespace Ogre
 
 #if OGRE_DEBUG_MODE
         {
-            IdString oldHash = datablock->mTextureHash;
+            uint32 oldHash = datablock->mTextureHash;
             const_cast<HlmsUnlitMobileDatablock*>(datablock)->calculateHash();
             assert( oldHash == datablock->mTextureHash &&
                     "Forgot to call calculateHash after modifying a texture to datablock" );
