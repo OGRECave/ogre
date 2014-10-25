@@ -204,7 +204,7 @@ namespace Ogre
         RealAsUint mask = -int64(depth >> 63) | 0x8000000000000000;
         depth = (depth ^ mask) >> 32;
 #endif
-        uint32 quantizedDepth = static_cast<uint32>( depth );
+        uint32 quantizedDepth = static_cast<uint32>( depth ) >> (32 - DepthBits);
 
         uint32 meshHash;
 
@@ -226,7 +226,7 @@ namespace Ogre
         //TODO: Account for auto instancing animation in any of the hashes
 
         uint64 hash;
-        if( transparent )
+        if( !transparent )
         {
             //Opaque objects are first sorted by material, then by mesh, then by depth front to back.
             hash =
