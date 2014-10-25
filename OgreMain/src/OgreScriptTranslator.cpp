@@ -8084,7 +8084,7 @@ namespace Ogre{
             translateQuad( compiler, node, target );
         else if(obj->name == "render_scene")
             translateScene( compiler, node, target );
-        else if(obj->name == "render_custom")
+        else if(obj->name == "custom")
         {
             IdString customId;
             if( !obj->values.empty() )
