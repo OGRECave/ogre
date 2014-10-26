@@ -439,11 +439,10 @@ namespace Ogre {
                     fpData[3] = 1.0f;
                     memcpy( fpData, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), readSize );
 
+                    uint16 *dstData16 = reinterpret_cast<uint16*>(dstData + acumOffset);
+
                     for( size_t j=0; j<v1::VertexElement::getTypeCount( vElement.mType ); ++j )
-                    {
-                        *reinterpret_cast<uint16*>(dstData + acumOffset + j) =
-                                                            Bitwise::floatToHalf( fpData[j] );
-                    }
+                        dstData16[j] = Bitwise::floatToHalf( fpData[j] );
                 }
                 else if( vElement.mSemantic == VES_NORMAL && hasTangents &&
                          vElement.mType != VET_FLOAT3 )
