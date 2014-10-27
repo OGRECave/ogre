@@ -267,7 +267,6 @@ namespace Ogre {
         };
         
         int maxAttribs[] = {
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 			EGL_BUFFER_SIZE, mMaxBufferSize,
             EGL_DEPTH_SIZE, mMaxDepthSize,
             EGL_STENCIL_SIZE, mMaxStencilSize,
@@ -288,7 +287,6 @@ namespace Ogre {
 					EGL_NONE
 				};
 				int CSAAmaxAttribs[] = {
-					EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 					EGL_BUFFER_SIZE, mMaxBufferSize,
 					EGL_DEPTH_SIZE, mMaxDepthSize,
 					EGL_STENCIL_SIZE, mMaxStencilSize,
@@ -318,7 +316,6 @@ namespace Ogre {
 					EGL_NONE
 				};
 				int MSAAmaxAttribs[] = {
-					EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 					EGL_BUFFER_SIZE, mMaxBufferSize,
 					EGL_DEPTH_SIZE, mMaxDepthSize,
 					EGL_STENCIL_SIZE, mMaxStencilSize,
