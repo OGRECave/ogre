@@ -1145,10 +1145,31 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::prepareForCommandBufferExecution( CommandBuffer *commandBuffer )
+    void HlmsPbs::preCommandBufferExecution( CommandBuffer *commandBuffer )
     {
         unmapConstBuffer();
         unmapTexBuffer( commandBuffer );
+
+        TexBufferPackedVec::const_iterator itor = mTexBuffers.begin();
+        TexBufferPackedVec::const_iterator end  = mTexBuffers.end();
+
+        while( itor != end )
+        {
+            (*itor)->advanceFrame();
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::postCommandBufferExecution( CommandBuffer *commandBuffer )
+    {
+        TexBufferPackedVec::const_iterator itor = mTexBuffers.begin();
+        TexBufferPackedVec::const_iterator end  = mTexBuffers.end();
+
+        while( itor != end )
+        {
+            (*itor)->regressFrame();
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::frameEnded(void)

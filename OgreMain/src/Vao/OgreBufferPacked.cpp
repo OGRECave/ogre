@@ -226,6 +226,29 @@ namespace Ogre
         return mBufferInterface->advanceFrame();
     }
     //-----------------------------------------------------------------------------------
+    void BufferPacked::regressFrame(void)
+    {
+#ifndef NDEBUG
+        if( mLastFrameMappedAndAdvanced != mVaoManager->getFrameCount() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "regressFrame can only be called after calling advanceFrame ",
+                         "BufferPacked::advanceFrame" );
+        }
+
+        --mLastFrameMappedAndAdvanced;
+#endif
+
+        if( isCurrentlyMapped() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Don't regressFrame while mapped!",
+                         "BufferPacked::map" );
+        }
+
+        return mBufferInterface->regressFrame();
+    }
+    //-----------------------------------------------------------------------------------
     bool BufferPacked::isCurrentlyMapped(void) const
     {
         if( mMappingState == MS_UNMAPPED )

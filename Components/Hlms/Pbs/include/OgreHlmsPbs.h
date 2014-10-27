@@ -155,7 +155,8 @@ namespace Ogre
                                        bool casterPass, const HlmsCache *lastCache,
                                        CommandBuffer *commandBuffer );
 
-        virtual void prepareForCommandBufferExecution( CommandBuffer *commandBuffer );
+        virtual void preCommandBufferExecution( CommandBuffer *commandBuffer );
+        virtual void postCommandBufferExecution( CommandBuffer *commandBuffer );
 
         virtual void frameEnded(void);
 

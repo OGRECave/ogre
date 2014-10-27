@@ -446,7 +446,9 @@ namespace Ogre
                                        CommandBuffer *commandBuffer ) = 0;
 
         /// This gets called right before executing the command buffer.
-        virtual void prepareForCommandBufferExecution( CommandBuffer *commandBuffer ) {}
+        virtual void preCommandBufferExecution( CommandBuffer *commandBuffer ) {}
+        /// This gets called after executing the command buffer.
+        virtual void postCommandBufferExecution( CommandBuffer *commandBuffer ) {}
 
         /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
         virtual void frameEnded(void) {}

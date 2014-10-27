@@ -164,4 +164,17 @@ namespace Ogre
 
         return dynamicCurrentFrame;
     }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusBufferInterface::regressFrame(void)
+    {
+        GL3PlusVaoManager *vaoManager = static_cast<GL3PlusVaoManager*>( mBuffer->mVaoManager );
+        size_t dynamicCurrentFrame = mBuffer->mFinalBufferStart - mBuffer->mInternalBufferStart;
+        dynamicCurrentFrame /= mBuffer->mNumElements;
+
+        dynamicCurrentFrame = (dynamicCurrentFrame + vaoManager->getDynamicBufferMultiplier() - 1) %
+                                vaoManager->getDynamicBufferMultiplier();
+
+        mBuffer->mFinalBufferStart = mBuffer->mInternalBufferStart +
+                                        dynamicCurrentFrame * mBuffer->mNumElements;
+    }
 }

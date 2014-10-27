@@ -544,10 +544,17 @@ namespace Ogre
         {
             Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
             if( hlms )
-                hlms->prepareForCommandBufferExecution( mCommandBuffer );
+                hlms->preCommandBufferExecution( mCommandBuffer );
         }
 
         mCommandBuffer->execute();
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+            if( hlms )
+                hlms->postCommandBufferExecution( mCommandBuffer );
+        }
 
         mLastMacroblock     = lastMacroblock;
         mLastBlendblock     = lastBlendblock;

@@ -201,6 +201,11 @@ namespace Ogre
         /// or if you've called map( advanceFrame = true )
         void advanceFrame(void);
 
+        /// Performs the opposite of @see advanceFrame. Only call this after having called
+        /// advanceFrame. i.e. restore the buffer to the state it was before calling
+        /// advanceFrame.
+        void regressFrame(void);
+
         /// Returns the mapping state. Note that if you call map with MS_PERSISTENT_INCOHERENT or
         /// MS_PERSISTENT_COHERENT, then call unmap( UO_KEEP_PERSISTENT ); the returned value will
         /// still be MS_PERSISTENT_INCOHERENT/_COHERENT when persistent mapping is supported.
