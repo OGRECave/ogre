@@ -49,6 +49,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     GL3PlusTexBufferPacked::~GL3PlusTexBufferPacked()
     {
+        OCGE( glDeleteTextures( 1, &mTexName ) );
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusTexBufferPacked::bindBuffer( uint16 slot, size_t offset, size_t sizeBytes )

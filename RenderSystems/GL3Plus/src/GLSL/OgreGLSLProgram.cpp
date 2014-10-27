@@ -139,7 +139,7 @@ namespace Ogre {
         else
         {
             assert(false && "Missing attribute!");
-            return (VertexElementSemantic)0;
+            return (VertexElementSemantic)1;
         }
     }
 

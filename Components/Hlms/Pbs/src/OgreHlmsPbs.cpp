@@ -269,6 +269,7 @@ namespace Ogre
                                                                 queuedRenderable );
 
         //Set samplers.
+        GpuProgramParametersSharedPtr vsParams = retVal->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
 
         int texUnit = 1; //Vertex shader consumes 1 slot with its tbuffer.
@@ -299,10 +300,11 @@ namespace Ogre
             psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
         }
 
+        vsParams->setNamedConstant( "worldMatBuf", 0 );
+
         mRenderSystem->_setProgramsFromHlms( retVal );
 
-        GpuProgramParametersSharedPtr vpParams = retVal->vertexShader->getDefaultParameters();
-        mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vpParams, GPV_ALL );
+        mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vsParams, GPV_ALL );
         mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, GPV_ALL );
 
         return retVal;
@@ -829,7 +831,7 @@ namespace Ogre
         {
             size_t bufferSize = std::min<size_t>( mTextureBufferDefaultSize,
                                                   mVaoManager->getTexBufferMaxSize() );
-            TexBufferPacked *newBuffer = mVaoManager->createTexBuffer( PF_R8G8B8A8, bufferSize,
+            TexBufferPacked *newBuffer = mVaoManager->createTexBuffer( PF_FLOAT32_RGBA, bufferSize,
                                                                        BT_DYNAMIC_PERSISTENT, 0, false );
             mTexBuffers.push_back( newBuffer );
         }
@@ -1082,7 +1084,7 @@ namespace Ogre
             {
                 size_t bufferSize = std::min<size_t>( mTextureBufferDefaultSize,
                                                       mVaoManager->getTexBufferMaxSize() );
-                TexBufferPacked *newBuffer = mVaoManager->createTexBuffer( PF_R8G8B8A8, bufferSize,
+                TexBufferPacked *newBuffer = mVaoManager->createTexBuffer( PF_FLOAT32_RGBA, bufferSize,
                                                                            BT_DYNAMIC_PERSISTENT,
                                                                            0, false );
                 mTexBuffers.push_back( newBuffer );
