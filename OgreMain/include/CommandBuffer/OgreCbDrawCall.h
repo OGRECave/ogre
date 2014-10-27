@@ -41,8 +41,8 @@ namespace Ogre
 #pragma pack( push, 4 )
     struct CbSharedDraw
     {
-        uint32 count;
         uint32 primCount;
+        uint32 instanceCount;
         uint32 firstVertexIndex;
     };
 

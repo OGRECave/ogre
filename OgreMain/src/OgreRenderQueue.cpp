@@ -507,8 +507,8 @@ namespace Ogre
                         indirectDraw += sizeof( CbDrawIndexed );
 
                         drawCountPtr = drawIndexedPtr;
-                        drawIndexedPtr->count           = 1;
                         drawIndexedPtr->primCount       = vao->mIndexBuffer->getNumElements();
+                        drawIndexedPtr->instanceCount   = 1;
                         drawIndexedPtr->firstVertexIndex= vao->mIndexBuffer->_getFinalBufferStart();
                         drawIndexedPtr->baseVertex      = vao->mVertexBuffers[0]->_getFinalBufferStart();
                         drawIndexedPtr->baseInstance    = baseInstance;
@@ -520,8 +520,8 @@ namespace Ogre
                         indirectDraw += sizeof( CbDrawStrip );
 
                         drawCountPtr = drawStripPtr;
-                        drawStripPtr->count             = 1;
                         drawStripPtr->primCount         = vao->mVertexBuffers[0]->getNumElements();
+                        drawStripPtr->instanceCount     = 1;
                         drawStripPtr->firstVertexIndex  = vao->mVertexBuffers[0]->_getFinalBufferStart();
                         drawStripPtr->baseInstance      = baseInstance;
                     }
@@ -531,7 +531,7 @@ namespace Ogre
                 else
                 {
                     //Same mesh. Just go with instancing.
-                    ++drawCountPtr->count;
+                    ++drawCountPtr->instanceCount;
                 }
 
                 ++itor;

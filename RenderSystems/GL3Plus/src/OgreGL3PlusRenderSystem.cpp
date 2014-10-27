@@ -1626,6 +1626,8 @@ namespace Ogre {
             if(mDriverVersion.minor >= 3)
                 unbindGpuProgram(GPT_COMPUTE_PROGRAM);
         }
+
+        glBindProgramPipeline( 0 );
     }
 
     void GL3PlusRenderSystem::_setCullingMode(CullingMode mode)
@@ -2392,14 +2394,6 @@ namespace Ogre {
     {
         RenderSystem::_render( _vao );
 
-        GLSLSeparableProgram* separableProgram =
-            GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-        if (separableProgram)
-        {
-            //TODO: This does NOT belong here.
-            separableProgram->activate();
-        }
-
         const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( _vao );
 
         GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
@@ -2412,16 +2406,24 @@ namespace Ogre {
                                                     vao->mIndexBuffer->getBytesPerElement());
 
             //glMultiDrawElementsBaseVertex
-            //glMultiDrawElementsIndirect
-            glDrawElementsInstancedBaseVertex( mode,
-                                               vao->mIndexBuffer->getNumElements(),
-                                               indexType, indexOffset, 1,
-                                               vao->mVertexBuffers[0]->_getFinalBufferStart() );
+            OCGE( glDrawElementsInstancedBaseVertex( mode,
+                                                     vao->mIndexBuffer->getNumElements(),
+                                                     indexType, indexOffset, 1,
+                                                     vao->mVertexBuffers[0]->_getFinalBufferStart() ) );
+            /*OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
+                      mode,
+                      vao->mIndexBuffer->getNumElements(),
+                      indexType,
+                      indexOffset,
+                      vao->mIndexBuffer->getNumElements(),
+                      vao->mVertexBuffers[0]->_getFinalBufferStart(),
+                      0 ) );*/
         }
         else
         {
-            glDrawArrays( vao->mPrimType[mUseAdjacency], vao->mVertexBuffers[0]->_getFinalBufferStart(),
-                          vao->mVertexBuffers[0]->getNumElements() );
+            OCGE( glDrawArrays( vao->mPrimType[mUseAdjacency],
+                                vao->mVertexBuffers[0]->_getFinalBufferStart(),
+                                vao->mVertexBuffers[0]->getNumElements() ) );
         }
     }
 
