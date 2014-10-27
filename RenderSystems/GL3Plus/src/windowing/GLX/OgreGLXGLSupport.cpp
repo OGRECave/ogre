@@ -837,10 +837,13 @@ namespace Ogre
         int (*oldHandler)(Display*, XErrorEvent*) =
             XSetErrorHandler(&ctxErrorHandler);
 
+        PFNGLXCREATECONTEXTATTRIBSARBPROC _glXCreateContextAttribsARB;
+        _glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)const_cast<GLXGLSupport*>(this)->getProcAddress("glXCreateContextAttribsARB");
+
         while(!glxContext && (context_attribs[1] >= 3))
         {
             ctxErrorOccurred = false;
-            glxContext = glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
+            glxContext = _glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
             // Sync to ensure any errors generated are processed.
             XSync( mGLDisplay, False );
             if ( !ctxErrorOccurred && glxContext )
