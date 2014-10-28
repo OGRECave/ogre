@@ -41,6 +41,7 @@ material Ogre/Copy/4xFP16
 
 			texture_unit
 			{
+				filtering none
 				tex_address_mode clamp
 			}
 		}
