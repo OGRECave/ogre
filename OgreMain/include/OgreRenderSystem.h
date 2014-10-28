@@ -924,21 +924,6 @@ namespace Ogre
         /// @See HlmsCache
         virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache ) = 0;
 
-        /** Sets the culling mode for the render system based on the 'vertex winding'.
-        A typical way for the rendering engine to cull triangles is based on the
-        'vertex winding' of triangles. Vertex winding refers to the direction in
-        which the vertices are passed or indexed to in the rendering operation as viewed
-        from the camera, and will wither be clockwise or anticlockwise (that's 'counterclockwise' for
-        you Americans out there ;) The default is CULL_CLOCKWISE i.e. that only triangles whose vertices
-        are passed/indexed in anticlockwise order are rendered - this is a common approach and is used in 3D studio models
-        for example. You can alter this culling mode if you wish but it is not advised unless you know what you are doing.
-        You may wish to use the CULL_NONE option for mesh data that you cull yourself where the vertex
-        winding is uncertain.
-        */
-        virtual void _setCullingMode(CullingMode mode) = 0;
-
-        virtual CullingMode _getCullingMode(void) const;
-
         /** Sets the mode of operation for depth buffer tests from this point onwards.
         Sometimes you may wish to alter the behaviour of the depth buffer to achieve
         special effects. Because it's unlikely that you'll set these options for an entire frame,
@@ -1080,9 +1065,6 @@ namespace Ogre
         */
         virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, 
             bool forGpuProgram) = 0;
-
-        /** Sets how to rasterise triangles, as points, wireframe or solid polys. */
-        virtual void _setPolygonMode(PolygonMode level) = 0;
 
         /** Turns depth-stencil buffer checking on or off. 
         @remarks
@@ -1505,8 +1487,6 @@ namespace Ogre
 
         // Active viewport (dest for future rendering operations)
         Viewport* mActiveViewport;
-
-        CullingMode mCullingMode;
 
         bool mWBuffer;
 

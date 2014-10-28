@@ -45,7 +45,6 @@ namespace Ogre {
         mSceneMgr(sm),
         mOrientation(Quaternion::IDENTITY),
         mPosition(Vector3::ZERO),
-        mSceneDetail(PM_SOLID),
         mAutoTrackTarget(0),
         mAutoTrackOffset(Vector3::ZERO),
         mSceneLodFactor(1.0f),
@@ -97,20 +96,6 @@ namespace Ogre {
     {
         return mSceneMgr;
     }
-
-
-    //-----------------------------------------------------------------------
-    void Camera::setPolygonMode(PolygonMode sd)
-    {
-        mSceneDetail = sd;
-    }
-
-    //-----------------------------------------------------------------------
-    PolygonMode Camera::getPolygonMode(void) const
-    {
-        return mSceneDetail;
-    }
-
     //-----------------------------------------------------------------------
     void Camera::setPosition(Real x, Real y, Real z)
     {
@@ -119,7 +104,6 @@ namespace Ogre {
         mPosition.z = z;
         invalidateView();
     }
-
     //-----------------------------------------------------------------------
     void Camera::setPosition(const Vector3& vec)
     {

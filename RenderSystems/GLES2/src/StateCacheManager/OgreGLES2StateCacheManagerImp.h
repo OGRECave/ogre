@@ -78,16 +78,12 @@ namespace Ogre
         vector<GLuint>::type mEnabledVertexAttribs;
         /// Stores the current depth write mask
         GLboolean mDepthMask;
-        /// Stores the current polygon rendering mode
-        GLenum mPolygonMode;
         /// Stores the current blend equation
         GLenum mBlendEquation;
         /// Stores the current blend source function
         GLenum mBlendFuncSource;
         /// Stores the current blend destination function
         GLenum mBlendFuncDest;
-        /// Stores the current face culling setting
-        GLenum mCullFace;
         /// Stores the current depth test function
         GLenum mDepthFunc;
         /// Stores the current stencil mask
@@ -194,18 +190,6 @@ namespace Ogre
         
         /// See GLES2StateCacheManager.setDiscardBuffers.
         void setDiscardBuffers(unsigned int flags) { mDiscardBuffers = flags; }
-        
-        /// See GLES2StateCacheManager.getPolygonMode.
-        GLenum getPolygonMode(void) const { return mPolygonMode; }
-        
-        /// See GLES2StateCacheManager.setPolygonMode.
-        void setPolygonMode(GLenum mode) { mPolygonMode = mode; }
-        
-        /// See GLES2StateCacheManager.getCullFace.
-        GLenum getCullFace(void) const { return mCullFace; }
-        
-        /// See GLES2StateCacheManager.setCullFace.
-        void setCullFace(GLenum face);
     };
 }
 

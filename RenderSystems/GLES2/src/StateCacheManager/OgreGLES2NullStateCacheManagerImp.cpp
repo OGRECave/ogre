@@ -49,8 +49,6 @@ namespace Ogre {
 
         OGRE_CHECK_GL_ERROR(glBlendFunc(GL_ONE, GL_ZERO));
 
-        OGRE_CHECK_GL_ERROR(glCullFace(mCullFace));
-
         OGRE_CHECK_GL_ERROR(glDepthFunc(mDepthFunc));
 
         OGRE_CHECK_GL_ERROR(glDepthMask(mDepthMask));
@@ -79,9 +77,7 @@ namespace Ogre {
     void GLES2StateCacheManagerImp::clearCache()
     {
         mDepthMask = GL_TRUE;
-        mPolygonMode = GL_FILL;
         mBlendEquation = GL_FUNC_ADD;
-        mCullFace = GL_BACK;
         mDepthFunc = GL_LESS;
         mStencilMask = 0xFFFFFFFF;
         mActiveTextureUnit = 0;
@@ -277,15 +273,5 @@ namespace Ogre {
     void GLES2StateCacheManagerImp::setVertexAttribDisabled(GLuint attrib)
     {
         OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(attrib));
-    }
-
-    void GLES2StateCacheManagerImp::setCullFace(GLenum face)
-    {
-        if(mCullFace != face)
-        {
-            mCullFace = face;
-            
-            OGRE_CHECK_GL_ERROR(glCullFace(face));
-        }
     }
 }

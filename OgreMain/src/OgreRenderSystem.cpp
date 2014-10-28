@@ -58,9 +58,6 @@ namespace Ogre {
         , mTextureManager(0)
         , mVaoManager(0)
         , mActiveViewport(0)
-        // This means CULL clockwise vertices, i.e. front of poly is counter-clockwise
-        // This makes it the same as OpenGL and other right-handed systems
-        , mCullingMode(CULL_CLOCKWISE)
         , mWBuffer(false)
         , mBatchCount(0)
         , mFaceCount(0)
@@ -589,11 +586,6 @@ namespace Ogre {
         }
 
         mDepthBufferPool.clear();
-    }
-    //-----------------------------------------------------------------------
-    CullingMode RenderSystem::_getCullingMode(void) const
-    {
-        return mCullingMode;
     }
     //-----------------------------------------------------------------------
     bool RenderSystem::getFixedPipelineEnabled(void) const

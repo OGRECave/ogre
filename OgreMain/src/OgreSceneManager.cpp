@@ -1251,9 +1251,6 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
     mDestRenderSystem->_beginGeometryCount();
 
-    // Set rasterisation mode
-    mDestRenderSystem->_setPolygonMode(camera->getPolygonMode());
-
     // Set initial camera state
     mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());
     
@@ -2484,10 +2481,12 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 };
             }
 
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
             // this also copes with returning from negative scale in previous render op
             // for same pass
             if (cullMode != mDestRenderSystem->_getCullingMode())
                 mDestRenderSystem->_setCullingMode(cullMode);
+#endif
         }
 
         if (doLightIteration)
@@ -4060,9 +4059,6 @@ void SceneManager::_resumeRendering(SceneManager::RenderContext* context)
     }
     mCameraInProgress = context->camera;
     mDestRenderSystem->_resumeFrame(context->rsContext);
-
-    // Set rasterisation mode
-    mDestRenderSystem->_setPolygonMode(mCameraInProgress->getPolygonMode());
 
     // Set initial camera state
     mDestRenderSystem->_setProjectionMatrix(mCameraInProgress->getProjectionMatrixRS());

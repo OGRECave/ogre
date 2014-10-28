@@ -226,26 +226,6 @@ namespace Ogre
          @param flags The bit mask of buffers to be discarded. Stored as Ogre::FrameBufferType.
          */
         void setDiscardBuffers(unsigned int flags);
-
-        /** Gets the current polygon rendering mode, fill, wireframe, points, etc.
-         @return The current polygon rendering mode.
-         */
-        GLenum getPolygonMode(void) const;
-
-        /** Sets the current polygon rendering mode.
-         @param mode The polygon mode to use.
-         */
-        void setPolygonMode(GLenum mode);
-
-        /** Sets the face culling mode.
-         @return The current face culling mode
-         */
-        GLenum getCullFace(void) const;
-
-        /** Sets the face culling setting.
-         @param face The face culling mode to use.
-         */
-        void setCullFace(GLenum face);
     };
 }
 

@@ -144,11 +144,6 @@ namespace Ogre {
         vector<GLuint>::type mRenderAttribsBound;
         vector<GLuint>::type mRenderInstanceAttribsBound;
 
-        /**
-            Cache the polygon mode value
-        */
-        GLenum mPolygonMode;
-
         GLint getCombinedMinMipFilter(void) const;
 
         GLSLShader* mCurrentVertexShader;
@@ -350,6 +345,8 @@ namespace Ogre {
             RenderSystem
         */
         void _setViewport(Viewport *vp);
+        virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
+        virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
         virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
@@ -366,10 +363,6 @@ namespace Ogre {
             RenderSystem
         */
         void _endFrame(void);
-        /** See
-            RenderSystem
-        */
-        void _setCullingMode(CullingMode mode);
         /** See
             RenderSystem
         */
@@ -427,10 +420,6 @@ namespace Ogre {
             RenderSystem
         */
         void enableClipPlane (ushort index, bool enable);
-        /** See
-            RenderSystem
-        */
-        void _setPolygonMode(PolygonMode level);
         /** See
             RenderSystem
         */
@@ -540,8 +529,6 @@ namespace Ogre {
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         /// @copydoc RenderSystem::getDisplayMonitorCount
         unsigned int getDisplayMonitorCount() const;
-
-        GLenum _getPolygonMode(void) { return mPolygonMode; }
 
         void _setSceneBlendingOperation(SceneBlendOperation op);
         void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);

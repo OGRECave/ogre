@@ -50,6 +50,7 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreGLES2StateCacheManager.h"
+#include "OgreGLES2HlmsMacroblock.h"
 #if OGRE_NO_GLES3_SUPPORT != 0
     #include "OgreGLES2HlmsSamplerblock.h"
 #endif
@@ -1175,6 +1176,56 @@ namespace Ogre {
         }
     }
 
+    void GLES2RenderSystem::_hlmsMacroblockCreated( HlmsMacroblock *newBlock )
+    {
+        GLES2HlmsMacroblock *glMacroblock = new GLES2HlmsMacroblock();
+
+        glMacroblock->mDepthWrite   = newBlock->mDepthWrite ? GL_TRUE : GL_FALSE;
+        glMacroblock->mDepthFunc    = convertCompareFunction( newBlock->mDepthFunc );
+
+        switch( newBlock->mCullMode )
+        {
+        case CULL_NONE:
+            glMacroblock->mCullMode[0] = 0;
+            glMacroblock->mCullMode[1] = 0;
+            break;
+        default:
+        case CULL_CLOCKWISE:
+            glMacroblock->mCullMode[0] = GL_FRONT;
+            glMacroblock->mCullMode[1] = GL_BACK;
+            break;
+        case CULL_ANTICLOCKWISE:
+            glMacroblock->mCullMode[0] = GL_BACK;
+            glMacroblock->mCullMode[1] = GL_FRONT;
+            break;
+        }
+
+        switch( newBlock->mPolygonMode )
+        {
+        case PM_POINTS:
+            //glMacroblock->mPolygonMode = GL_POINTS;
+            glMacroblock->mPolygonMode = GL_POINT;
+            break;
+        case PM_WIREFRAME:
+            //glMacroblock->mPolygonMode = GL_LINE_STRIP;
+            glMacroblock->mPolygonMode = GL_LINE;
+            break;
+        default:
+        case PM_SOLID:
+            glMacroblock->mPolygonMode = GL_FILL;
+            break;
+        }
+
+        newBlock->mRsData = glMacroblock;
+    }
+
+    void GLES2RenderSystem::_hlmsMacroblockDestroyed( HlmsMacroblock *block )
+    {
+        GLES2HlmsMacroblock *glMacroblock = reinterpret_cast<GLES2HlmsMacroblock*>(block->mRsData);
+        delete glMacroblock;
+        block->mRsData = 0;
+    }
+
     void GLES2RenderSystem::_hlmsSamplerblockCreated( HlmsSamplerblock *newBlock )
     {
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -1288,36 +1339,61 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
     {
+        GLES2HlmsMacroblock *glMacroblock = reinterpret_cast<GLES2HlmsMacroblock*>(
+                                                                macroblock->mRsData );
+
         if( macroblock->mDepthCheck )
         {
-            OGRE_CHECK_GL_ERROR(glEnable( GL_DEPTH_TEST ));
+            OCGE( glEnable( GL_DEPTH_TEST ) );
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glDisable( GL_DEPTH_TEST ));
+            OCGE( glDisable( GL_DEPTH_TEST ) );
         }
-        OGRE_CHECK_GL_ERROR(glDepthMask( macroblock->mDepthWrite ? GL_TRUE : GL_FALSE ));
-        OGRE_CHECK_GL_ERROR(glDepthFunc( convertCompareFunction(macroblock->mDepthFunc )));
+        OCGE( glDepthMask( glMacroblock->mDepthWrite ) );
+        OCGE( glDepthFunc( glMacroblock->mDepthFunc ) );
 
         _setDepthBias( macroblock->mDepthBiasConstant, macroblock->mDepthBiasSlopeScale );
-        _setCullingMode( macroblock->mCullMode );
 
-        if( macroblock->mScissorTestEnabled )
+        //Cull mode
+        if( glMacroblock->mCullMode[0] == 0 )
         {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
+            OCGE( glDisable( GL_CULL_FACE ) );
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
+            // NB: Because two-sided stencil API dependence of the front face, we must
+            // use the same 'winding' for the front face everywhere. As the OGRE default
+            // culling mode is clockwise, we also treat anticlockwise winding as front
+            // face for consistently. On the assumption that, we can't change the front
+            // face by glFrontFace anywhere.
+            size_t cullIdx = !(mActiveRenderTarget &&
+                    ((mActiveRenderTarget->requiresTextureFlipping() && !mInvertVertexWinding) ||
+                     (!mActiveRenderTarget->requiresTextureFlipping() && mInvertVertexWinding)));
+
+            OCGE( glEnable( GL_CULL_FACE ) );
+            OCGE( glCullFace( glMacroblock->mCullMode[cullIdx] ) );
         }
+
+        //Polygon mode
+        OCGE( glPolygonMode( GL_FRONT_AND_BACK, glMacroblock->mPolygonMode ) );
 
         if( macroblock->mAlphaToCoverageEnabled )
         {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+            OCGE( glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
+            OCGE( glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
+        }
+
+        if( macroblock->mScissorTestEnabled )
+        {
+            OCGE( glEnable(GL_SCISSOR_TEST) );
+        }
+        else
+        {
+            OCGE( glDisable(GL_SCISSOR_TEST) );
         }
 
         mScissorsEnabled = macroblock->mScissorTestEnabled;
@@ -1420,54 +1496,6 @@ namespace Ogre {
 
         if(gles2decl)
             gles2decl->bind();
-    }
-
-    void GLES2RenderSystem::_setCullingMode(CullingMode mode)
-    {
-        mCullingMode = mode;
-        // NB: Because two-sided stencil API dependence of the front face, we must
-        // use the same 'winding' for the front face everywhere. As the OGRE default
-        // culling mode is clockwise, we also treat anticlockwise winding as front
-        // face for consistently. On the assumption that, we can't change the front
-        // face by glFrontFace anywhere.
-
-        GLenum cullMode;
-
-        switch( mode )
-        {
-            case CULL_NONE:
-                mStateCacheManager->setDisabled(GL_CULL_FACE);
-                return;
-
-            default:
-            case CULL_CLOCKWISE:
-                if (mActiveRenderTarget &&
-                    ((mActiveRenderTarget->requiresTextureFlipping() && !mInvertVertexWinding) ||
-                     (!mActiveRenderTarget->requiresTextureFlipping() && mInvertVertexWinding)))
-                {
-                    cullMode = GL_FRONT;
-                }
-                else
-                {
-                    cullMode = GL_BACK;
-                }
-                break;
-            case CULL_ANTICLOCKWISE:
-                if (mActiveRenderTarget && 
-                    ((mActiveRenderTarget->requiresTextureFlipping() && !mInvertVertexWinding) ||
-                    (!mActiveRenderTarget->requiresTextureFlipping() && mInvertVertexWinding)))
-                {
-                    cullMode = GL_BACK;
-                }
-                else
-                {
-                    cullMode = GL_FRONT;
-                }
-                break;
-        }
-
-        mStateCacheManager->setEnabled(GL_CULL_FACE);
-        mStateCacheManager->setCullFace(cullMode);
     }
 
     void GLES2RenderSystem::_setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction)
@@ -1666,23 +1694,6 @@ namespace Ogre {
         matrix[2][1] = c.y;
         matrix[2][2] = c.z + 1.0F;
         matrix[2][3] = c.w; 
-    }
-
-    void GLES2RenderSystem::_setPolygonMode(PolygonMode level)
-    {
-        switch(level)
-        {
-        case PM_POINTS:
-            mStateCacheManager->setPolygonMode(GL_POINTS);
-            break;
-        case PM_WIREFRAME:
-            mStateCacheManager->setPolygonMode(GL_LINE_STRIP);
-            break;
-        default:
-        case PM_SOLID:
-            mStateCacheManager->setPolygonMode(GL_FILL);
-            break;
-        }
     }
 
     void GLES2RenderSystem::setStencilCheckEnabled(bool enabled)

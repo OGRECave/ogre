@@ -317,10 +317,6 @@ namespace Ogre {
             /** See
              RenderSystem
              */
-            void _setCullingMode(CullingMode mode);
-            /** See
-             RenderSystem
-             */
             void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
             /** See
              RenderSystem
@@ -375,10 +371,6 @@ namespace Ogre {
              RenderSystem
              */
             void enableClipPlane (ushort index, bool enable);
-            /** See
-             RenderSystem
-             */
-            void _setPolygonMode(PolygonMode level);
             /** See
              RenderSystem
              */

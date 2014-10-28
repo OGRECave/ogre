@@ -126,9 +126,6 @@ namespace Ogre {
         /// Fixed axis to yaw around
         Vector3 mYawFixedAxis;
 
-        /// Rendering type
-        PolygonMode mSceneDetail;
-
         /// Stored number of visible faces in the last render
         unsigned int mVisFacesLastRender;
 
@@ -218,19 +215,6 @@ namespace Ogre {
         /** Returns a pointer to the SceneManager this camera is rendering through.
         */
         SceneManager* getSceneManager(void) const;
-
-        /** Sets the level of rendering detail required from this camera.
-        @remarks
-            Each camera is set to render at full detail by default, that is
-            with full texturing, lighting etc. This method lets you change
-            that behaviour, allowing you to make the camera just render a
-            wireframe view, for example.
-        */
-        void setPolygonMode(PolygonMode sd);
-
-        /** Retrieves the level of detail that the camera will render.
-        */
-        PolygonMode getPolygonMode(void) const;
 
         /** Sets the camera's position.
         */

@@ -160,11 +160,6 @@ namespace Ogre {
     {
         mImp->setVertexAttribDisabled(attrib);
     }
-
-    void GLES2StateCacheManager::setCullFace(GLenum face)
-    {
-        mImp->setCullFace(face);
-    }
     
     GLenum GLES2StateCacheManager::getBlendEquation() const
     {
@@ -204,20 +199,5 @@ namespace Ogre {
     void GLES2StateCacheManager::setDiscardBuffers(unsigned int flags)
     {
         mImp->setDiscardBuffers(flags);
-    }
-    
-    GLenum GLES2StateCacheManager::getPolygonMode() const
-    {
-        return mImp->getPolygonMode();
-    }
-    
-    void GLES2StateCacheManager::setPolygonMode(GLenum mode)
-    {
-        mImp->setPolygonMode(mode);
-    }
-    
-    GLenum GLES2StateCacheManager::getCullFace() const
-    {
-        return mImp->getCullFace();
     }
 }
