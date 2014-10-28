@@ -878,14 +878,14 @@ namespace Ogre
         vsUniformBuffer += mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem;
         psUniformBuffer += psBufferElements;
 
-        const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
-
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----
         //---------------------------------------------------------------------------
 #if !OGRE_DOUBLE_PRECISION
         if( !hasSkeletonAnimation )
         {
+            const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
+
             //mat4 worldViewProj
             Matrix4 tmp = mPreparedPass.viewProjMatrix * worldMat;
     #ifdef OGRE_GLES2_WORKAROUND_1
