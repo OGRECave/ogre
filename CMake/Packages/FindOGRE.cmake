@@ -388,6 +388,7 @@ set(OGRE_COMPONENT_SEARCH_PATH_DBG
 )
 
 macro(ogre_find_component COMPONENT HEADER)
+  set(OGRE_${COMPONENT}_FIND_QUIETLY ${OGRE_FIND_QUIETLY})
   findpkg_begin(OGRE_${COMPONENT})
   find_path(OGRE_${COMPONENT}_INCLUDE_DIR NAMES ${HEADER} HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} PATH_SUFFIXES ${COMPONENT} OGRE/${COMPONENT} Components/${COMPONENT}/include)
   set(OGRE_${COMPONENT}_LIBRARY_NAMES "Ogre${COMPONENT}${OGRE_LIB_SUFFIX}")
@@ -406,6 +407,7 @@ macro(ogre_find_component COMPONENT HEADER)
 	  mark_as_advanced(OGRE_${COMPONENT}_BINARY_REL OGRE_${COMPONENT}_BINARY_DBG)
     endif()
   endif()
+  unset(OGRE_${COMPONENT}_FIND_QUIETLY)
 endmacro()
 
 # look for Paging component
