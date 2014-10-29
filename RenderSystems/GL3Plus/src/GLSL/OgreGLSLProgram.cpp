@@ -333,7 +333,7 @@ namespace Ogre {
             //UVs are a special case.
             OCGE( glBindAttribLocation( programName,
                                         GL3PlusVaoManager::getAttributeIndexFor(
-                                                    VES_TEXTURE_COORDINATES ) + 1,
+                                                    VES_TEXTURE_COORDINATES ) + i,
                                         ("uv" + StringConverter::toString( i )).c_str() ) );
         }
 
