@@ -84,8 +84,18 @@ namespace Ogre
         bool operator != ( const HlmsSamplerblock &_r ) const
         {
             //Don't include the ID in the comparision
-            return memcmp( &mMinFilter, &_r.mMinFilter,
-                           ((const char*)&mMaxLod - (const char*)&mMinFilter) + sizeof( mMaxLod ) ) != 0;
+            return  mMinFilter          != _r.mMinFilter ||
+                    mMagFilter          != _r.mMagFilter ||
+                    mMipFilter          != _r.mMipFilter ||
+                    mU                  != _r.mU ||
+                    mV                  != _r.mV ||
+                    mW                  != _r.mW ||
+                    mMipLodBias         != _r.mMipLodBias ||
+                    mMaxAnisotropy      != _r.mMaxAnisotropy ||
+                    mCompareFunction    != _r.mCompareFunction ||
+                    mBorderColour       != _r.mBorderColour ||
+                    mMinLod             != _r.mMinLod ||
+                    mMaxLod             != _r.mMaxLod;
         }
     };
 

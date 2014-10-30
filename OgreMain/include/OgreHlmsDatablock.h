@@ -65,6 +65,8 @@ namespace Ogre
     */
     struct _OgreExport HlmsMacroblock : public BasicBlock
     {
+        bool                mAlphaToCoverageEnabled;
+        bool                mScissorTestEnabled;
         bool                mDepthCheck;
         bool                mDepthWrite;
         CompareFunction     mDepthFunc;
@@ -87,8 +89,6 @@ namespace Ogre
         /// The slope-relative bias value, expressed as a factor of the depth slope
         float               mDepthBiasSlopeScale;
 
-        bool                mAlphaToCoverageEnabled;
-        bool                mScissorTestEnabled;
         /// Culling mode based on the 'vertex winding'.
         /// A typical way for the rendering engine to cull triangles is based on the
         /// 'vertex winding' of triangles. Vertex winding refers to the direction in
@@ -108,9 +108,15 @@ namespace Ogre
         bool operator != ( const HlmsMacroblock &_r ) const
         {
             //Don't include the ID in the comparision
-            return memcmp( &mDepthCheck, &_r.mDepthCheck,
-                           ( (const char*)&mPolygonMode - (const char*)&mDepthCheck ) +
-                                                            sizeof( PolygonMode ) ) != 0;
+            return  mAlphaToCoverageEnabled != _r.mAlphaToCoverageEnabled ||
+                    mScissorTestEnabled     != _r.mScissorTestEnabled ||
+                    mDepthCheck             != _r.mDepthCheck ||
+                    mDepthWrite             != _r.mDepthWrite ||
+                    mDepthFunc              != _r.mDepthFunc ||
+                    mDepthBiasConstant      != _r.mDepthBiasConstant ||
+                    mDepthBiasSlopeScale    != _r.mDepthBiasSlopeScale ||
+                    mCullMode               != _r.mCullMode ||
+                    mPolygonMode            != _r.mPolygonMode;
         }
     };
 
@@ -143,9 +149,15 @@ namespace Ogre
         bool operator != ( const HlmsBlendblock &_r ) const
         {
             //Don't include the ID in the comparision
-            return memcmp( &mSeparateBlend, &_r.mSeparateBlend,
-                           ( (const char*)&mBlendOperationAlpha - (const char*)&mSeparateBlend) +
-                                                                sizeof( SceneBlendOperation ) ) != 0;
+            //AND don't include mIsTransparent, which is filled
+            //automatically only for some managed objects.
+            return  mSeparateBlend          != _r.mSeparateBlend ||
+                    mSourceBlendFactor      != _r.mSourceBlendFactor ||
+                    mDestBlendFactor        != _r.mDestBlendFactor ||
+                    mSourceBlendFactorAlpha != _r.mSourceBlendFactorAlpha ||
+                    mDestBlendFactorAlpha   != _r.mDestBlendFactorAlpha ||
+                    mBlendOperation         != _r.mBlendOperation ||
+                    mBlendOperationAlpha    != _r.mBlendOperationAlpha;
         }
     };
 
