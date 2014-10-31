@@ -129,9 +129,9 @@ bail:
 
         mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
-		mSwitchingFullscreenCounter = 0;
-		
-		
+        mSwitchingFullscreenCounter = 0;
+        mDriverType = DT_HARDWARE;
+
         initRenderSystem();
 
         // set config options defaults
@@ -868,9 +868,6 @@ bail:
                 }
             }
 
-            if( !videoMode )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find requested video mode.", "D3D11RenderSystem::initialise" );
-            
             // sRGB window option
             bool hwGamma = false;
             opt = mOptions.find( "sRGB Gamma Conversion" );
@@ -888,7 +885,7 @@ bail:
             }                       
 
             NameValuePairList miscParams;
-            miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
+            miscParams["colourDepth"] = StringConverter::toString(videoMode ? videoMode->getColourDepth() : 32);
             miscParams["FSAA"] = StringConverter::toString(fsaa);
             miscParams["FSAAHint"] = fsaaHint;
             miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
