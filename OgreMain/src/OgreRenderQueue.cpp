@@ -281,6 +281,7 @@ namespace Ogre
         v1::VertexData const *lastVertexData = mLastVertexData;
         v1::IndexData const *lastIndexData = mLastIndexData;
         HlmsCache const *lastHlmsCache = mLastHlmsCache;
+        uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
         uint32 lastTextureHash = mLastTextureHash;
         //uint32 lastVertexDataId = ~0;
 
@@ -337,19 +338,21 @@ namespace Ogre
 
                 Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
 
+                lastHlmsCacheHash = lastHlmsCache->hash;
                 const HlmsCache *hlmsCache = hlms->getMaterial( lastHlmsCache,
                                                                 passCache[datablock->mType],
                                                                 queuedRenderable,
                                                                 casterPass );
-                if( lastHlmsCache != hlmsCache )
+                if( lastHlmsCacheHash != hlmsCache->hash )
+                {
                     rs->_setProgramsFromHlms( hlmsCache );
+                    lastHlmsCache = hlmsCache;
+                }
 
                 lastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                                        lastHlmsCache, lastTextureHash );
+                                                        lastHlmsCacheHash, lastTextureHash );
 
                 rs->_render( op );
-
-                lastHlmsCache   = hlmsCache;
 
                 ++itor;
             }
@@ -398,6 +401,7 @@ namespace Ogre
         VertexArrayObject *lastVao = 0;
         uint32 lastVaoId = mLastVaoId;
         HlmsCache const *lastHlmsCache = mLastHlmsCache;
+        uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
 
         bool supportsIndirectBuffers = mVaoManager->supportsIndirectBuffers();
 
@@ -450,18 +454,20 @@ namespace Ogre
 
                 Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
 
+                lastHlmsCacheHash = lastHlmsCache->hash;
                 const HlmsCache *hlmsCache = hlms->getMaterial( lastHlmsCache,
                                                                 passCache[datablock->mType],
                                                                 queuedRenderable,
                                                                 casterPass );
-                if( lastHlmsCache != hlmsCache )
+                if( lastHlmsCacheHash != hlmsCache->hash )
                 {
                     CbHlmsCache *hlmsCacheCmd = mCommandBuffer->addCommand<CbHlmsCache>();
                     *hlmsCacheCmd = CbHlmsCache( hlmsCache );
+                    lastHlmsCache = hlmsCache;
                 }
 
                 baseInstance = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                                     lastHlmsCache, mCommandBuffer );
+                                                     lastHlmsCacheHash, mCommandBuffer );
 
                 if( drawCmd != mCommandBuffer->getLastCommand() ||
                     lastVaoId != vao->getRenderQueueId() )
@@ -607,17 +613,20 @@ namespace Ogre
             mLastIndexData = op.indexData;
         }
 
+        uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
         const HlmsCache *hlmsCache = hlms->getMaterial( mLastHlmsCache, passCache,
                                                         queuedRenderable, casterPass );
-        if( mLastHlmsCache != hlmsCache )
+        if( lastHlmsCacheHash != hlmsCache->hash )
+        {
             rs->_setProgramsFromHlms( hlmsCache );
+            mLastHlmsCache = hlmsCache;
+        }
 
         mLastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                                 mLastHlmsCache, mLastTextureHash );
+                                                 lastHlmsCacheHash, mLastTextureHash );
 
         rs->_render( op );
 
-        mLastHlmsCache   = hlmsCache;
         mLastVaoId = 0;
     }
     //-----------------------------------------------------------------------

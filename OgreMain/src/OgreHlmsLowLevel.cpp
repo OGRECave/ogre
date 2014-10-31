@@ -141,7 +141,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     uint32 HlmsLowLevel::fillBuffersFor( const HlmsCache *cache,
                                          const QueuedRenderable &queuedRenderable,
-                                         bool casterPass, const HlmsCache *lastCache,
+                                         bool casterPass, uint32 lastCacheHash,
                                          uint32 lastTextureHash )
     {
         Renderable *renderable = queuedRenderable.renderable;
@@ -251,7 +251,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     uint32 HlmsLowLevel::fillBuffersFor( const HlmsCache *cache,
                                          const QueuedRenderable &queuedRenderable,
-                                         bool casterPass, const HlmsCache *lastCache,
+                                         bool casterPass, uint32 lastCacheHash,
                                          CommandBuffer *commandBuffer )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,

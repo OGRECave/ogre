@@ -349,7 +349,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     uint32 HlmsUnlitMobile::fillBuffersFor( const HlmsCache *cache,
                                             const QueuedRenderable &queuedRenderable,
-                                            bool casterPass, const HlmsCache *lastCache,
+                                            bool casterPass, uint32 lastCacheHash,
                                             uint32 lastTextureHash )
     {
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
@@ -367,7 +367,7 @@ namespace Ogre
         const HlmsUnlitMobileDatablock *datablock = static_cast<const HlmsUnlitMobileDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
-        uint16 variabilityMask = cache != lastCache ? GPV_ALL : GPV_PER_OBJECT;
+        uint16 variabilityMask = cache->hash != lastCacheHash ? GPV_ALL : GPV_PER_OBJECT;
 
         //const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
         Matrix4 worldMat;
@@ -452,7 +452,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     uint32 HlmsUnlitMobile::fillBuffersFor( const HlmsCache *cache,
                                             const QueuedRenderable &queuedRenderable,
-                                            bool casterPass, const HlmsCache *lastCache,
+                                            bool casterPass, uint32 lastCacheHash,
                                             CommandBuffer *commandBuffer )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,

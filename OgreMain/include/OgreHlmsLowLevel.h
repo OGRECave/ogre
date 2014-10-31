@@ -83,11 +83,11 @@ namespace Ogre
                                            SceneManager *sceneManager );
 
         virtual uint32 fillBuffersFor(const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                      bool casterPass, const HlmsCache *lastCache,
+                                      bool casterPass, uint32 lastCacheHash,
                                       uint32 lastTextureHash );
 
         virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, const HlmsCache *lastCache,
+                                       bool casterPass, uint32 lastCacheHash,
                                        CommandBuffer *commandBuffer );
     };
 

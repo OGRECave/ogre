@@ -814,7 +814,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     uint32 HlmsPbsMobile::fillBuffersFor( const HlmsCache *cache,
                                           const QueuedRenderable &queuedRenderable,
-                                          bool casterPass, const HlmsCache *lastCache,
+                                          bool casterPass, uint32 lastCacheHash,
                                           uint32 lastTextureHash )
     {
         GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
@@ -832,7 +832,7 @@ namespace Ogre
         const HlmsPbsMobileDatablock *datablock = static_cast<const HlmsPbsMobileDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
-        if( !lastCache || lastCache->type != HLMS_PBS )
+        if( OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( lastCacheHash ) != HLMS_PBS )
         {
             //We changed HlmsType, rebind the shared textures.
             FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
@@ -865,7 +865,7 @@ namespace Ogre
                   ((!casterPass && datablock->mTexture[PBSM_REFLECTION].isNull()) ? 9 : 0) ) <=
                 psParams->getFloatConstantList().size() );
 
-        if( cache != lastCache )
+        if( cache->hash != lastCacheHash )
         {
             variabilityMask = GPV_ALL;
             memcpy( vsUniformBuffer, mPreparedPass.vertexShaderSharedBuffer.begin(),
@@ -974,7 +974,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     uint32 HlmsPbsMobile::fillBuffersFor( const HlmsCache *cache,
                                           const QueuedRenderable &queuedRenderable,
-                                          bool casterPass, const HlmsCache *lastCache,
+                                          bool casterPass, uint32 lastCacheHash,
                                           CommandBuffer *commandBuffer )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,

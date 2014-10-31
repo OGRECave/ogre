@@ -408,6 +408,12 @@ namespace Ogre
             renderable. If the shaders have already been created (i.e. whether for this
             renderable, or another one) it gets them from a cache. Otherwise we create it.
             It assumes that renderable->setHlms( this, parameters ) has already called.
+        @param lastReturnedValue
+            The last value returned by getMaterial.
+            VERY IMPORTANT: lastReturnedValue pointer may be invalidated after this call.
+            The only time it's safe to assume it hasn't changed, if the value of
+            lastReturnedValue->hash *before* calling this function is the same as the
+            hash value of the returned pointer.
         @param passCache
             The cache returned by @preparePassHash.
         @param renderable
@@ -430,19 +436,19 @@ namespace Ogre
             The Renderable-MovableObject pair about to be rendered.
         @param casterPass
             Whether this is a shadow mapping caster pass.
-        @param lastCache
-            The cache of shaders that was the used by the previous renderable.
+        @param lastCacheHash
+            The hash of the cache of shaders that was the used by the previous renderable.
         @param lastTextureHash
             Last Texture Hash, used to let the Hlms know whether the textures should be changed again
         @return
             New Texture hash (may be equal or different to lastTextureHash).
         */
         virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, const HlmsCache *lastCache,
+                                       bool casterPass, uint32 lastCacheHash,
                                        uint32 lastTextureHash ) = 0;
 
         virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, const HlmsCache *lastCache,
+                                       bool casterPass, uint32 lastCacheHash,
                                        CommandBuffer *commandBuffer ) = 0;
 
         /// This gets called right before executing the command buffer.

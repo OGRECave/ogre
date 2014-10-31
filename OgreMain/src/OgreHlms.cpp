@@ -1109,7 +1109,7 @@ namespace Ogre
     size_t Hlms::addRenderableCache( const HlmsPropertyVec &renderableSetProperties,
                                      const PiecesMap *pieces )
     {
-        assert( mRenderableCache.size() < 64 );
+        assert( mRenderableCache.size() < 256 );
 
         RenderableCache cacheEntry( renderableSetProperties, pieces );
 
@@ -1121,7 +1121,7 @@ namespace Ogre
             it = mRenderableCache.end() - 1;
         }
 
-        return (mType << 7) | (it - mRenderableCache.begin());
+        return (mType << 8) | (it - mRenderableCache.begin());
     }
     //-----------------------------------------------------------------------------------
     const Hlms::RenderableCache &Hlms::getRenderableCache( uint32 hash ) const
@@ -1672,7 +1672,12 @@ namespace Ogre
         hash[1] = passCache.hash &
                         (queuedRenderable.movableObject->getCastShadows() ? 0xffffffff : 0xffffffe1 );
 
-        MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
+        //MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
+
+        assert( !(hash[0] & ((1 << 9) - 1)) );
+        assert( !(hash[1] & ((1 << 22) - 1)) );
+
+        finalHash = (hash[0] << 22) | hash[1];
 
         if( lastReturnedValue->hash != finalHash )
         {

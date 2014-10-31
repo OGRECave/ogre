@@ -844,7 +844,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     uint32 HlmsPbs::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                    bool casterPass, const HlmsCache *lastCache,
+                                    bool casterPass, uint32 lastCacheHash,
                                     uint32 lastTextureHash )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
@@ -854,14 +854,14 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     uint32 HlmsPbs::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                    bool casterPass, const HlmsCache *lastCache,
+                                    bool casterPass, uint32 lastCacheHash,
                                     CommandBuffer *commandBuffer )
     {
         assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
                                                 queuedRenderable.renderable->getDatablock() );
 
-        if( !lastCache || lastCache->type != HLMS_PBS )
+        if( OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( lastCacheHash ) != HLMS_PBS )
         {
             //We changed HlmsType, rebind the shared textures.
             FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();

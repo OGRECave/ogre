@@ -190,6 +190,8 @@ namespace Ogre
         HlmsCache( uint32 _hash, HlmsTypes _type ) : hash( _hash ), type( _type ) {}
     };
 
+    #define OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( x ) (x >> 29)
+
     typedef vector<HlmsCache>::type HlmsCacheVec;
 
     inline bool OrderCacheByHash( const HlmsCache &_left, const HlmsCache &_right )
