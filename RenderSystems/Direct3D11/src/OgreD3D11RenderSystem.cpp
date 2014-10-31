@@ -614,16 +614,29 @@ bail:
             DXGI_FORMAT format = videoMode ? videoMode->getFormat() : DXGI_FORMAT_R8G8B8A8_UNORM;
             UINT numLevels = 0;
             // set maskable levels supported
-            for (unsigned int n = 1; n < D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)
+            for (unsigned int n = 1; n <= D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)
             {
                 HRESULT hr = device->CheckMultisampleQualityLevels(format, n, &numLevels);
                 if (SUCCEEDED(hr) && numLevels > 0)
                 {
                     optFSAA->possibleValues.push_back(StringConverter::toString(n));
-                    if (n >=8)
+
+                    // 8x could mean 8xCSAA, and we need other designation for 8xMSAA
+                    if(n == 8 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 8    // 8x CSAA
+                    || n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 16  // 16x CSAA
+                    || n == 16 && SUCCEEDED(device->CheckMultisampleQualityLevels(format, 8, &numLevels)) && numLevels > 16) // 16xQ CSAA
                     {
                         optFSAA->possibleValues.push_back(StringConverter::toString(n) + " [Quality]");
                     }
+                }
+                else if(n == 16) // there could be case when 16xMSAA is not supported but 16xCSAA and may be 16xQ CSAA are supported
+                {
+                    bool csaa16x = SUCCEEDED(device->CheckMultisampleQualityLevels(format, 4, &numLevels)) && numLevels > 16;
+                    bool csaa16xQ = SUCCEEDED(device->CheckMultisampleQualityLevels(format, 8, &numLevels)) && numLevels > 16;
+                    if(csaa16x || csaa16xQ)
+                        optFSAA->possibleValues.push_back("16");
+                    if(csaa16x && csaa16xQ)
+                        optFSAA->possibleValues.push_back("16 [Quality]");
                 }
             }
             SAFE_RELEASE(device);
