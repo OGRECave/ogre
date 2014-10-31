@@ -51,7 +51,7 @@ elseif(ANDROID)
 
   include_directories(src/EGL/Android include/EGL/Android)
   link_directories(${OPENGLES_LIBRARY_PATH})
-  set(PLATFORM_HEADER_INSTALL "ANDROID")
+  set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
   file(GLOB PLATFORM_HEADERS "include/EGL/X11/*.h" "include/EGL/*.h")
   file(GLOB PLATFORM_SOURCES "src/EGL/X11/*.cpp" "src/EGL/*.cpp")
