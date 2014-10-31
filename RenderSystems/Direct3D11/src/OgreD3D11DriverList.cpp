@@ -33,8 +33,9 @@ THE SOFTWARE.
 namespace Ogre 
 {
     //-----------------------------------------------------------------------
-    D3D11DriverList::D3D11DriverList( IDXGIFactoryN*    pDXGIFactory ) 
+    D3D11DriverList::D3D11DriverList( IDXGIFactoryN* pDXGIFactory ) 
     {
+        mHiddenDriversCount = 0;
         enumerate(pDXGIFactory);
     }
     //-----------------------------------------------------------------------
@@ -50,8 +51,9 @@ namespace Ogre
     //-----------------------------------------------------------------------
     BOOL D3D11DriverList::enumerate(IDXGIFactoryN*  pDXGIFactory)
     {
+        assert(mDriverList.empty() && mHiddenDriversCount == 0);
+
         LogManager::getSingleton().logMessage( "D3D11: Driver Detection Starts" );
-        // Create the DXGI Factory
 
         for( UINT iAdapter=0; ; iAdapter++ )
         {
@@ -68,19 +70,19 @@ namespace Ogre
                 return false;
             }
 
-            // we don't want NVIDIA PerfHUD in the list - so - here we filter it out
-            DXGI_ADAPTER_DESC1 adaptDesc;
-            if ( SUCCEEDED( pDXGIAdapter->GetDesc1( &adaptDesc ) ) )
+            // we don't want NVIDIA PerfHUD in the list, so place it to the hidden part of drivers list
+            D3D11Driver* driver = new D3D11Driver(iAdapter, pDXGIAdapter);
+
+            const bool isHidden = wcscmp(driver->getAdapterIdentifier().Description, L"NVIDIA PerfHUD") == 0;
+            if(isHidden)
             {
-                const bool isPerfHUD = wcscmp( adaptDesc.Description, L"NVIDIA PerfHUD" ) == 0;
-
-                if (isPerfHUD)
-                {
-                    continue;
-                }
+                mDriverList.push_back(driver);
+                ++mHiddenDriversCount;
             }
-
-            mDriverList.push_back(new D3D11Driver(iAdapter,pDXGIAdapter) );
+            else
+            {
+                mDriverList.insert(mDriverList.end() - mHiddenDriversCount, driver);
+            }
 
             SAFE_RELEASE(pDXGIAdapter);
         }
@@ -92,7 +94,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     size_t D3D11DriverList::count() const 
     {
-        return mDriverList.size();
+        return mDriverList.size() - mHiddenDriversCount;
     }
     //-----------------------------------------------------------------------
     D3D11Driver* D3D11DriverList::item( size_t index )
