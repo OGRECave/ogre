@@ -522,21 +522,19 @@ bail:
         if (driver)
         {
             it = mOptions.find("Video Mode");
-            D3D11VideoMode *videoMode = driver->getVideoModeList()->item(it->second.currentValue);
-            if (videoMode)
+            D3D11VideoMode *videoMode = driver->getVideoModeList()->item(it->second.currentValue); // Could be NULL if working over RDP/Simulator
+            DXGI_FORMAT format = videoMode ? videoMode->getFormat() : DXGI_FORMAT_R8G8B8A8_UNORM;
+            UINT numLevels = 0;
+            // set maskable levels supported
+            for (unsigned int n = 1; n < D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)
             {
-                UINT numLevels = 0;
-                // set maskable levels supported
-                for (unsigned int n = 1; n < D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)
+                HRESULT hr = mDevice->CheckMultisampleQualityLevels(format, n, &numLevels);
+                if (SUCCEEDED(hr) && numLevels > 0)
                 {
-                    HRESULT hr = mDevice->CheckMultisampleQualityLevels(videoMode->getFormat(), n, &numLevels);
-                    if (SUCCEEDED(hr) && numLevels > 0)
+                    optFSAA->possibleValues.push_back(StringConverter::toString(n));
+                    if (n >=8)
                     {
-                        optFSAA->possibleValues.push_back(StringConverter::toString(n));
-                        if (n >=8)
-                        {
-                            optFSAA->possibleValues.push_back(StringConverter::toString(n) + " [Quality]");
-                        }
+                        optFSAA->possibleValues.push_back(StringConverter::toString(n) + " [Quality]");
                     }
                 }
             }
