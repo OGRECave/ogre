@@ -187,7 +187,7 @@ namespace Ogre
 
     HlmsPbs::HlmsPbs( Archive *dataFolder ) :
         Hlms( HLMS_PBS, "pbs", dataFolder ),
-        ConstBufferPool( 256, 64 * 1024, 0 ), //TODO
+        ConstBufferPool( 273, 64 * 1024, 0 ), //TODO
         mCurrentPassBuffer( 0 ),
         mCurrentConstBuffer( 0 ),
         mCurrentTexBuffer( 0 ),
@@ -566,6 +566,8 @@ namespace Ogre
 
         stagingBuffer->unmap( destinations );
         stagingBuffer->removeReferenceCount();
+
+        mDirtyUsers.clear();
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbs::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
@@ -602,18 +604,28 @@ namespace Ogre
         int32 numShadowMaps         = getProperty( HlmsBaseProp::NumShadowMaps );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
+        //mat4 viewProj;
         size_t mapSize = 16 * 4;
 
         if( !casterPass )
         {
-            mapSize += ( 16 + (16 + 2 + 2) * numShadowMaps + 9 ) * 4;
+            //mat4 view + mat4 shadowRcv[numShadowMaps].texWorldViewProj +
+            //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
+            //mat3 invViewMatCubemap (upgraded to three vec4)
+            mapSize += ( 16 + (16 + 2 + 2) * numShadowMaps + 4 * 3 ) * 4;
             mapSize += numPssmSplits * 4;
             mapSize = alignToNextMultiple( mapSize, 16 );
 
             if( shadowNode )
+            {
+                //Seven variables * 4 (padded vec3) * 4 (bytes) * numLights
                 mapSize += ( 7 * 4 * 4 ) * numLights;
+            }
             else
+            {
+                //Three variables * 4 (padded vec3) * 4 (bytes) * numDirectionalLights
                 mapSize += ( 3 * 4 * 4 ) * numDirectionalLights;
+            }
         }
         else
         {
@@ -839,6 +851,8 @@ namespace Ogre
         mLastTextureHash = 0;
 
         mLastBoundPool = 0;
+
+        uploadDirtyDatablocks();
 
         return retVal;
     }

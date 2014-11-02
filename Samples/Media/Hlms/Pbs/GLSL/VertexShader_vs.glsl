@@ -1,8 +1,21 @@
+@property( !false )
 @property( GL430 )#version 430 core
 @end @property( !GL430 )
 #version 330 core
 #extension GL_ARB_shading_language_420pack: require
 @end
+
+#define UNPACK_MAT4( dst, matrixBuf, pixelIdx ) \
+	{ \
+		vec4 row0 = texelFetch( matrixBuf, int(pixelIdx) ); \
+		vec4 row1 = texelFetch( matrixBuf, int(pixelIdx + 1) ); \
+		vec4 row2 = texelFetch( matrixBuf, int(pixelIdx + 2) ); \
+		vec4 row3 = texelFetch( matrixBuf, int(pixelIdx + 3) ); \
+		dst = mat4( row0.x, row1.x, row2.x, row3.x, \
+					row0.y, row1.y, row2.y, row3.y, \
+					row0.z, row1.z, row2.z, row3.z, \
+					row0.w, row1.w, row2.w, row3.w ); \
+	}
 
 layout(std140) uniform;
 
@@ -40,7 +53,10 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @property( hlms_qtangent )
 @insertpiece( DeclQuat_xAxis )
 @insertpiece( DeclQuat_yAxis )
-@end
+@insertpiece( DeclQuat_zAxis )
+@property( normal_map )
+@insertpiece( DeclQuat_yAxis )
+@end @end
 
 @property( !hlms_skeleton )
 @piece( local_vertex )vertex@end
@@ -138,22 +154,16 @@ void main()
 {
 @property( !hlms_skeleton )
 	mat4 worldViewProj;
-	worldViewProj[0] = texelFetch( worldMatBuf, int(drawId * 2) );
-	worldViewProj[1] = texelFetch( worldMatBuf, int(drawId * 2 + 1) );
-	worldViewProj[2] = texelFetch( worldMatBuf, int(drawId * 2 + 2) );
-	worldViewProj[3] = texelFetch( worldMatBuf, int(drawId * 2 + 3) );
+	UNPACK_MAT4( worldViewProj, worldMatBuf, drawId * 2 );
 	@property( hlms_normal || hlms_qtangent )
 	mat4 worldView;
-	worldView[0] = texelFetch( worldMatBuf, int(drawId * 2 + 4) );
-	worldView[1] = texelFetch( worldMatBuf, int(drawId * 2 + 5) );
-	worldView[2] = texelFetch( worldMatBuf, int(drawId * 2 + 6) );
-	worldView[3] = texelFetch( worldMatBuf, int(drawId * 2 + 7) );
+	UNPACK_MAT4( worldView, worldMatBuf, drawId * 2 + 4 );
 	@end
 @end
 
 @property( hlms_qtangent )
 	//Decode qTangent to TBN with reflection
-	vec3 normal		= xAxis( qtangent );
+	vec3 normal		= xAxis( normalize( qtangent ) );
 	@property( normal_map )
 	vec3 tangent	= yAxis( qtangent );
 	outVs.biNormalReflection = sign( qtangent.w ); //We ensure in C++ qtangent.w is never 0
@@ -183,3 +193,34 @@ void main()
 
 	outVs.drawId = drawId;
 }
+@end
+@property( false )
+#version 430 core
+#extension GL_ARB_shading_language_420pack: require
+
+//layout(std140) uniform;
+
+in vec4 vertex;
+in uint drawId;
+uniform samplerBuffer worldMatBuf;
+
+void main()
+{
+	mat4 worldViewProj;
+	/*{
+		vec4 row0 = texelFetch( worldMatBuf, int(drawId * 2) );
+		vec4 row1 = texelFetch( worldMatBuf, int(drawId * 2 + 1) );
+		vec4 row2 = texelFetch( worldMatBuf, int(drawId * 2 + 2) );
+		vec4 row3 = texelFetch( worldMatBuf, int(drawId * 2 + 3) );
+
+		worldViewProj = mat4(
+					row0.x, row1.x, row2.x, row3.x,
+					row0.y, row1.y, row2.y, row3.y,
+					row0.z, row1.z, row2.z, row3.z,
+					row0.w, row1.w, row2.w, row3.w );
+	}*/
+	UNPACK_MAT4( worldViewProj, worldMatBuf, drawId * 2 );
+
+	gl_Position = worldViewProj * vertex;
+}
+@end

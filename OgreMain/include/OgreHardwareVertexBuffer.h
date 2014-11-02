@@ -145,9 +145,9 @@ namespace v1 {
         VET_DOUBLE2 = 13,
         VET_DOUBLE3 = 14,
         VET_DOUBLE4 = 15,
-        //VET_USHORT1 = 16, Deprecated for being invalid
+        VET_USHORT1_DEPRECATED = 16, // Deprecated for being invalid
         VET_USHORT2 = 17,
-        //VET_USHORT3 = 18, Deprecated for being invalid
+        VET_USHORT3_DEPRECATED = 18, // Deprecated for being invalid
         VET_USHORT4 = 19,
         VET_INT1 = 20,
         VET_INT2 = 21,
@@ -157,8 +157,15 @@ namespace v1 {
         VET_UINT2 = 25,
         VET_UINT3 = 26,
         VET_UINT4 = 27,
-        VET_HALF2 = 28,
-        VET_HALF4 = 29
+        VET_BYTE4 = 28, // signed bytes
+        VET_BYTE4_SNORM = 29,  // signed normalized bytes
+        VET_UBYTE4_NORM = 30,  // unsigned normalized bytes
+        VET_SHORT2_SNORM = 31, // signed normalized shorts
+        VET_SHORT4_SNORM = 32,
+        VET_USHORT2_NORM = 33, // unsigned normalized shorts
+        VET_USHORT4_NORM = 34,
+        VET_HALF2 = 35,
+        VET_HALF4 = 36
     };
 
 namespace v1 {
@@ -206,6 +213,8 @@ namespace v1 {
         static size_t getTypeSize(VertexElementType etype);
         /// Utility method which returns the count of values in a given type
         static unsigned short getTypeCount(VertexElementType etype);
+        /// Utility method which returns true if the type is SNORM or NORM
+        static bool isTypeNormalized(VertexElementType etype);
         /** Simple converter function which will turn a single-value type into a
             multi-value type based on a parameter.
         */

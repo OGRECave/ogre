@@ -150,12 +150,16 @@ namespace v1 {
         case VET_DOUBLE4:
             return sizeof(double)*4;
         case VET_SHORT2:
+        case VET_SHORT2_SNORM:
             return sizeof(short)*2;
         case VET_SHORT4:
+        case VET_SHORT4_SNORM:
             return sizeof(short)*4;
         case VET_USHORT2:
+        case VET_USHORT2_NORM:
             return sizeof(unsigned short)*2;
         case VET_USHORT4:
+        case VET_USHORT4_NORM:
             return sizeof(unsigned short)*4;
         case VET_INT1:
             return sizeof(int);
@@ -174,11 +178,20 @@ namespace v1 {
         case VET_UINT4:
             return sizeof(unsigned int)*4;
         case VET_UBYTE4:
+        case VET_UBYTE4_NORM:
             return sizeof(unsigned char)*4;
+        case VET_BYTE4:
+        case VET_BYTE4_SNORM:
+            return sizeof(char) * 4;
         case VET_HALF2:
             return sizeof(float);
         case VET_HALF4:
             return sizeof(float) * 2;
+
+        case VET_USHORT1_DEPRECATED:
+            return sizeof(unsigned short);
+        case VET_USHORT3_DEPRECATED:
+            return sizeof(unsigned short) * 3;
         }
         return 0;
     }
@@ -194,6 +207,7 @@ namespace v1 {
         case VET_UINT1:
         case VET_INT1:
         case VET_DOUBLE1:
+        case VET_USHORT1_DEPRECATED:
             return 1;
         case VET_FLOAT2:
         case VET_SHORT2:
@@ -202,11 +216,14 @@ namespace v1 {
         case VET_INT2:
         case VET_DOUBLE2:
         case VET_HALF2:
+        case VET_SHORT2_SNORM:
+        case VET_USHORT2_NORM:
             return 2;
         case VET_FLOAT3:
         case VET_UINT3:
         case VET_INT3:
         case VET_DOUBLE3:
+        case VET_USHORT3_DEPRECATED:
             return 3;
         case VET_FLOAT4:
         case VET_SHORT4:
@@ -216,10 +233,32 @@ namespace v1 {
         case VET_DOUBLE4:
         case VET_UBYTE4:
         case VET_HALF4:
+        case VET_BYTE4:
+        case VET_BYTE4_SNORM:
+        case VET_UBYTE4_NORM:
+        case VET_SHORT4_SNORM:
+        case VET_USHORT4_NORM:
             return 4;
         }
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid type", 
             "VertexElement::getTypeCount");
+    }
+    //-----------------------------------------------------------------------------
+    bool VertexElement::isTypeNormalized( VertexElementType etype )
+    {
+        VertexElementType baseType = getBaseType( etype );
+        switch( baseType )
+        {
+            case VET_SHORT2_SNORM:
+            case VET_USHORT2_NORM:
+            case VET_BYTE4_SNORM:
+            case VET_UBYTE4_NORM:
+                return true;
+            default:
+                return false;
+        }
+
+        return false;
     }
     //-----------------------------------------------------------------------------
     VertexElementType VertexElement::multiplyTypeCount(VertexElementType baseType, 
@@ -358,6 +397,9 @@ namespace v1 {
             case VET_SHORT2:
             case VET_SHORT4:
                 return VET_SHORT2;
+            case VET_USHORT1_DEPRECATED:
+            case VET_USHORT3_DEPRECATED:
+                return VET_USHORT1_DEPRECATED;
             case VET_USHORT2:
             case VET_USHORT4:
                 return VET_USHORT2;
@@ -366,6 +408,18 @@ namespace v1 {
                 return VET_HALF2;
             case VET_UBYTE4:
                 return VET_UBYTE4;
+            case VET_BYTE4:
+                return VET_BYTE4;
+            case VET_BYTE4_SNORM:
+                return VET_BYTE4_SNORM;
+            case VET_UBYTE4_NORM:
+                return VET_UBYTE4_NORM;
+            case VET_SHORT2_SNORM:
+            case VET_SHORT4_SNORM:
+                return VET_SHORT2_SNORM;
+            case VET_USHORT2_NORM:
+            case VET_USHORT4_NORM:
+                return VET_USHORT2_NORM;
         };
         // To keep compiler happy
         return VET_FLOAT1;

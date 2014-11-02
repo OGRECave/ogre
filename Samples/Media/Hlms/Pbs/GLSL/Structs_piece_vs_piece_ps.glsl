@@ -52,36 +52,23 @@ struct Material
 	/* kD is already divided by PI to make it energy conserving.
 	  (formula is finalDiffuse = NdotL * surfaceDiffuse / PI)
 	*/
-	vec3 kD;
-	vec3 kS;
-	float roughness;
-	@property( fresnel_scalar )@piece( FresnelType )vec3@end @end
-	@property( !fresnel_scalar )@piece( FresnelType )float@end @end
+	vec4 kD;
+	vec4 kS; //kS.w is roughness
 	//Fresnel coefficient, may be per colour component (vec3) or scalar (float)
-	@insertpiece( FresnelType ) F0;
-	@property( !fresnel_scalar )vec2 padding;@end
-	float normalWeights0;
-	float normalWeights1;
-	float normalWeights2;
-	float normalWeights3;
-	float normalWeights4;
+	//F0.w is mNormalMapWeight
+	vec4 F0;
+	vec4 normalWeights;
 	vec4 cDetailWeights;
 	vec4 detailOffsetScaleD[4];
 	vec4 detailOffsetScaleN[4];
 
-	uint indices0;
-	uint indices1;
-	uint indices2;
-	uint indices3;
-	uint indices4;
-	uint indices5;
-	uint indices6;
+	uvec4 indices0_3;
+	uvec4 indices4_7;
 };
 
 layout(binding = 1) uniform MaterialBuf
 {
-	//Material m[273];
-	Material m[256];
+	Material m[273];
 } materialArray;
 @end
 

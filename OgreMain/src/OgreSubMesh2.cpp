@@ -388,7 +388,7 @@ namespace Ogre {
                                                             VertexElement2( VET_FLOAT3,
                                                                             VES_NORMAL ) );
                 if( it != vertexElements.end() )
-                    it->mType = VET_SHORT4;
+                    it->mType = VET_SHORT4_SNORM;
             }
         }
 
@@ -428,24 +428,7 @@ namespace Ogre {
                 const VertexElement2 &vElement = *itor;
                 size_t writeSize = v1::VertexElement::getTypeSize( vElement.mType );
 
-                if( v1::VertexElement::getBaseType( vElement.mType ) == VET_HALF2 &&
-                    v1::VertexElement::getBaseType( itSrc->getType() ) == VET_FLOAT1 )
-                {
-                    size_t readSize = v1::VertexElement::getTypeSize( itSrc->getType() );
-
-                    //Convert float to half.
-                    float fpData[4];
-                    fpData[0] = fpData[1] = fpData[2] = 0.0f;
-                    fpData[3] = 1.0f;
-                    memcpy( fpData, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), readSize );
-
-                    uint16 *dstData16 = reinterpret_cast<uint16*>(dstData + acumOffset);
-
-                    for( size_t j=0; j<v1::VertexElement::getTypeCount( vElement.mType ); ++j )
-                        dstData16[j] = Bitwise::floatToHalf( fpData[j] );
-                }
-                else if( vElement.mSemantic == VES_NORMAL && hasTangents &&
-                         vElement.mType != VET_FLOAT3 )
+                if( vElement.mSemantic == VES_NORMAL && hasTangents && vElement.mType != VET_FLOAT3 )
                 {
                     size_t readSize = v1::VertexElement::getTypeSize( itSrc->getType() );
 
@@ -485,7 +468,7 @@ namespace Ogre {
                     Matrix3 tbn;
                     tbn.SetColumn( 0, vNormal );
                     tbn.SetColumn( 1, vTangent );
-                    tbn.SetColumn( 2, vTangent.crossProduct( vNormal ) );
+                    tbn.SetColumn( 2, vNormal.crossProduct( vTangent ) );
 
                     //See Spherical Skinning with Dual-Quaternions and QTangents,
                     //Ivo Zoltan Frey, SIGRAPH 2011 Vancounver.
@@ -503,7 +486,8 @@ namespace Ogre {
                     //stays normalized.
                     //if( qTangent.w < 0 )
                     //  qTangent = -qTangent;
-                    if( qTangent.w < bias )
+                    //Also our shaders assume qTangent.w is never 0.
+                    if( fabsf( qTangent.w ) < bias )
                     {
                         Real normFactor = Math::Sqrt( 1 - bias * bias );
                         qTangent.w = bias;
@@ -523,6 +507,22 @@ namespace Ogre {
                     dstData16[2] = Math::Clamp( qTangent.z * 32767.0f, -32768.0f, 32767.0f );
                     dstData16[3] = Math::Clamp( qTangent.w * 32767.0f, -32768.0f, 32767.0f );
                 }
+                else if( v1::VertexElement::getBaseType( vElement.mType ) == VET_HALF2 &&
+                         v1::VertexElement::getBaseType( itSrc->getType() ) == VET_FLOAT1 )
+                {
+                    size_t readSize = v1::VertexElement::getTypeSize( itSrc->getType() );
+
+                    //Convert float to half.
+                    float fpData[4];
+                    fpData[0] = fpData[1] = fpData[2] = 0.0f;
+                    fpData[3] = 1.0f;
+                    memcpy( fpData, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), readSize );
+
+                    uint16 *dstData16 = reinterpret_cast<uint16*>(dstData + acumOffset);
+
+                    for( size_t j=0; j<v1::VertexElement::getTypeCount( vElement.mType ); ++j )
+                        dstData16[j] = Bitwise::floatToHalf( fpData[j] );
+                }
                 else
                 {
                     //Raw. Transfer as is.
@@ -532,6 +532,7 @@ namespace Ogre {
                 }
 
                 acumOffset += writeSize;
+                ++itSrc;
                 ++itor;
             }
 

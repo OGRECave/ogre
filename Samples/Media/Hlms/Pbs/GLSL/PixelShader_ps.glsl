@@ -1,3 +1,4 @@
+@property( !false )
 @property( GL430 )#version 430 core
 @end @property( !GL430 )
 #version 330 core
@@ -10,8 +11,8 @@ layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 
 @property( !hlms_shadowcaster )
 
-@property( fresnel_scalar )@piece( gFresnelType )vec3@end @end
-@property( !fresnel_scalar ) @piece( gFresnelType )float@end @end
+@property( fresnel_scalar )@piece( FresnelType )vec3@end @piece( FresnelSwizzle )xyz@end @end
+@property( !fresnel_scalar ) @piece( FresnelType )float@end @piece( FresnelSwizzle )x@end @end
 
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
@@ -38,7 +39,7 @@ in block
 	@end
 @end
 
-@property( !roughness_map )#define ROUGHNESS material.roughness@end
+@property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 @property( envprobe_map )uniform samplerCube	texEnvProbeMap;@end
 
@@ -63,7 +64,7 @@ in block
 @piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map )], vec3(psIn.uv@value(uv_specular).xy, specularIdx) ).xyz;@end
 @piece( MulSpecularMapValue )* specularCol@end@end
 @property( roughness_map )float ROUGHNESS;
-@piece( SampleRoughnessMap )ROUGHNESS = roughness * texture( textureMaps[@value( roughness_map )], vec3(psIn.uv@value(uv_roughness).xy, roughnessIdx) ).x;@end
+@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w * texture( textureMaps[@value( roughness_map )], vec3(psIn.uv@value(uv_roughness).xy, roughnessIdx) ).x;@end
 @end
 
 Material material;
@@ -192,14 +193,14 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 	//Formula:
 	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
 	//	fresnelD = lerp( (1 - N*L)^5, 1, 1 - F0 )
-	@insertpiece( gFresnelType ) fresnelS = material.F0 + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0);
-	@insertpiece( gFresnelType ) fresnelD = 1.0 - material.F0 + pow( 1.0 - NdotL, 5.0 ) * material.F0;
+	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
+	@insertpiece( FresnelType ) fresnelD = 1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle );
 
 	//Avoid very small denominators, they go to NaN or cause aliasing artifacts
-	@insertpiece( gFresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
+	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
 
-	return NdotL * (material.kS * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
-					material.kD * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
+	return NdotL * (material.kS.xyz * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
+					material.kD.xyz * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
 }
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
@@ -208,20 +209,20 @@ void main()
 {
 	uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FF;
 	material = materialArray.m[materialId];
-@property( diffuse_map )	diffuseIdx			=  material.indices0 & 0x0000FFFF;@end
-@property( normal_map_tex )	normalIdx			= (material.indices0 & 0xFFFF0000) >> 16;@end
-@property( specular_map )	specularIdx			=  material.indices1 & 0x0000FFFF;@end
-@property( roughness_map )	roughnessIdx		= (material.indices1 & 0xFFFF0000) >> 16;@end
-@property( detail_weight_map )	weightMapIdx		=  material.indices2 & 0x0000FFFF;@end
-@property( detail_map0 )	detailMapIdx0		= (material.indices2 & 0xFFFF0000) >> 16;@end
-@property( detail_map1 )	detailMapIdx1		=  material.indices3 & 0x0000FFFF;@end
-@property( detail_map2 )	detailMapIdx2		= (material.indices3 & 0xFFFF0000) >> 16;@end
-@property( detail_map3 )	detailMapIdx3		=  material.indices4 & 0x0000FFFF;@end
-@property( detail_map_nm0 )	detailNormMapIdx0	= (material.indices4 & 0xFFFF0000) >> 16;@end
-@property( detail_map_nm1 )	detailNormMapIdx1	=  material.indices5 & 0x0000FFFF;@end
-@property( detail_map_nm2 )	detailNormMapIdx2	= (material.indices5 & 0xFFFF0000) >> 16;@end
-@property( detail_map_nm3 )	detailNormMapIdx3	=  material.indices6 & 0x0000FFFF;@end
-@property( envprobe_map )	envMapIdx			= (material.indices6 & 0xFFFF0000) >> 16;@end
+@property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFF;@end
+@property( normal_map_tex )	normalIdx			= material.indices0_3.x >> 16;@end
+@property( specular_map )	specularIdx			= material.indices0_3.y & 0x0000FFFF;@end
+@property( roughness_map )	roughnessIdx		= material.indices0_3.y >> 16;@end
+@property( detail_weight_map )	weightMapIdx		= material.indices0_3.z & 0x0000FFFF;@end
+@property( detail_map0 )	detailMapIdx0		= material.indices0_3.z >> 16;@end
+@property( detail_map1 )	detailMapIdx1		= material.indices0_3.w & 0x0000FFFF;@end
+@property( detail_map2 )	detailMapIdx2		= material.indices0_3.w >> 16;@end
+@property( detail_map3 )	detailMapIdx3		= material.indices4_7.x & 0x0000FFFF;@end
+@property( detail_map_nm0 )	detailNormMapIdx0	= material.indices4_7.x >> 16;@end
+@property( detail_map_nm1 )	detailNormMapIdx1	= material.indices4_7.y & 0x0000FFFF;@end
+@property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16;@end
+@property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFF;@end
+@property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16;@end
 
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
@@ -373,5 +374,36 @@ void main()
 	outColour = inPs.depth;@end
 @property( !GL3+ )
 	gl_FragColor.x = inPs.depth;@end
+}
+@end
+@end
+
+@property( false )
+#version 330
+
+// START UNIFORM DECLARATION
+@insertpiece( PassDecl )
+@insertpiece( MaterialDecl )
+@insertpiece( InstanceDecl )
+in block
+{
+@insertpiece( VStoPS_block )
+} inPs;
+// END UNIFORM DECLARATION
+
+Material material;
+
+void main()
+{
+	//uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FF;
+	//material = materialArray.m[materialId];
+	material = materialArray.m[0];
+	//gl_FragColor = texture2D( tex, psUv0 );
+	//gl_FragColor = vec4( 0, 1, 0, 1 );
+	//float v = float(material.indices0_3.y & 0x0000FFFF) * 0.25f;
+	//float v = float(material.indices0_3.y >> 16) * 0.25f;
+	//gl_FragColor = vec4( v, v, v, 1 );
+	//gl_FragColor = vec4( materialArray.m[1].kD.x, materialArray.m[1].kD.y, materialArray.m[1].kD.z, 1 );
+	gl_FragColor = vec4( inPs.normal, 1.0f );
 }
 @end

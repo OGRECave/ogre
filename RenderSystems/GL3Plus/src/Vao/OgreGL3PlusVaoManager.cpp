@@ -48,10 +48,9 @@ namespace Ogre
     const GLuint GL3PlusVaoManager::VERTEX_ATTRIBUTE_INDEX[VES_COUNT] =
     {
         0,  // VES_POSITION - 1
-        1,  // VES_NORMAL - 1
-        2,  // VES_TANGENT - 1
         3,  // VES_BLEND_WEIGHTS - 1
         4,  // VES_BLEND_INDICES - 1
+        1,  // VES_NORMAL - 1
         5,  // VES_DIFFUSE - 1
         6,  // VES_SPECULAR - 1
         7,  // VES_TEXTURE_COORDINATES - 1
@@ -63,6 +62,7 @@ namespace Ogre
         //is technical (not artist controlled, unlike UVs) and can be replaced by a
         //4-component VES_TANGENT, we leave this one for the end.
         16, // VES_BINORMAL - 1
+        2,  // VES_TANGENT - 1
     };
 
     GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers ) :
@@ -601,10 +601,13 @@ namespace Ogre
             VertexElement2Vec::const_iterator it = binding.vertexElements.begin();
             VertexElement2Vec::const_iterator en = binding.vertexElements.end();
 
+            size_t bindAccumOffset = 0;
+
             while( it != en )
             {
                 GLint typeCount = v1::VertexElement::getTypeCount( it->mType );
-                GLboolean normalised = GL_FALSE;
+                GLboolean normalised = v1::VertexElement::isTypeNormalized( it->mType ) ? GL_TRUE :
+                                                                                          GL_FALSE;
 
                 switch( it->mType )
                 {
@@ -645,17 +648,30 @@ namespace Ogre
                 case VET_FLOAT1:
                     OCGE( glVertexAttribPointer( attributeIndex, typeCount,
                                                  v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
-                                                 normalised, binding.stride, (void*)binding.offset ) );
+                                                 normalised, binding.stride,
+                                                 (void*)(binding.offset + bindAccumOffset) ) );
+                    break;
+                case VET_SHORT2:
+                case VET_USHORT2:
+                case VET_UINT1:
+                case VET_INT1:
+                    OCGE( glVertexAttribIPointer( attributeIndex, typeCount,
+                                                  v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
+                                                  binding.stride,
+                                                  (void*)(binding.offset + bindAccumOffset) ) );
                     break;
                 case VET_DOUBLE1:
                     OCGE( glVertexAttribLPointer( attributeIndex, typeCount,
                                                   v1::GL3PlusHardwareBufferManager::getGLType( it->mType ),
-                                                  binding.stride, (void*)binding.offset ) );
+                                                  binding.stride,
+                                                  (void*)(binding.offset + bindAccumOffset) ) );
                     break;
                 }
 
                 OCGE( glVertexAttribDivisor( attributeIndex, binding.instancingDivisor ) );
                 OCGE( glEnableVertexAttribArray( attributeIndex ) );
+
+                bindAccumOffset += v1::VertexElement::getTypeSize( it->mType );
 
                 ++it;
             }

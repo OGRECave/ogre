@@ -45,6 +45,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     GL3PlusStagingBuffer::~GL3PlusStagingBuffer()
     {
+        deleteFences( mFences.begin(), mFences.end() );
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusStagingBuffer::addFence( size_t from, size_t to, bool forceFence )
@@ -65,7 +66,6 @@ namespace Ogre
             Fence fence( start, end );
             OCGE( fence.fenceName = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
             mFences.push_back( fence );
-            fence.fenceName = 0; //Prevent the destructor from deleting the sync.
 
             mUnfencedHazards.clear();
         }
@@ -95,6 +95,17 @@ namespace Ogre
             // After the first time, need to start flushing, and wait for a looong time.
             waitFlags = GL_SYNC_FLUSH_COMMANDS_BIT;
             waitDuration = kOneSecondInNanoSeconds;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusStagingBuffer::deleteFences( FenceVec::iterator itor, FenceVec::iterator end )
+    {
+        while( itor != end )
+        {
+            if( itor->fenceName )
+                glDeleteSync( itor->fenceName );
+            itor->fenceName = 0;
+            ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -134,6 +145,7 @@ namespace Ogre
         if( lastWaitableFence != end )
         {
             wait( lastWaitableFence->fenceName );
+            deleteFences( mFences.begin(), lastWaitableFence + 1 );
             mFences.erase( mFences.begin(), lastWaitableFence + 1 );
         }
 

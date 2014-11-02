@@ -69,12 +69,6 @@ namespace Ogre
             {
                 assert( _start <= _end );
             }
-            ~Fence()
-            {
-                if( fenceName )
-                    glDeleteSync( fenceName );
-                fenceName = 0;
-            }
 
             bool overlaps( const Fence &fence ) const
             {
@@ -96,6 +90,8 @@ namespace Ogre
             put behind a fence
         */
         void addFence( size_t from, size_t to, bool forceFence );
+
+        void deleteFences( FenceVec::iterator itor, FenceVec::iterator end );
 
         /// Waits undefinitely on the given GLSync object. Can throw if failed to wait.
         void wait( GLsync syncObj );
