@@ -52,6 +52,7 @@ namespace Ogre
     const IdString PbsProperty::HwGammaRead       = IdString( "hw_gamma_read" );
     const IdString PbsProperty::HwGammaWrite      = IdString( "hw_gamma_write" );
     const IdString PbsProperty::SignedIntTex      = IdString( "signed_int_textures" );
+    const IdString PbsProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
 
     const IdString PbsProperty::NumTextures       = IdString( "num_textures" );
     const IdString PbsProperty::DiffuseMap        = IdString( "diffuse_map" );
@@ -187,7 +188,7 @@ namespace Ogre
 
     HlmsPbs::HlmsPbs( Archive *dataFolder ) :
         Hlms( HLMS_PBS, "pbs", dataFolder ),
-        ConstBufferPool( 273, 64 * 1024, 0 ), //TODO
+        ConstBufferPool( HlmsPbsDatablock::MaterialSizeInGpuAligned ),
         mCurrentPassBuffer( 0 ),
         mCurrentConstBuffer( 0 ),
         mCurrentTexBuffer( 0 ),
@@ -228,7 +229,7 @@ namespace Ogre
                 assert( dynamic_cast<HlmsPbsDatablock*>( itor->second.datablock ) );
                 HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>( itor->second.datablock );
 
-                scheduleForUpdate( datablock );
+                requestSlot( datablock->mTextureHash, datablock );
                 ++itor;
             }
         }
@@ -460,6 +461,10 @@ namespace Ogre
                          "Generate Tangents for this mesh to fix the problem or use a "
                          "datablock without normal maps.", "HlmsPbs::calculateHashForPreCreate" );
         }
+
+        String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
+        inOutPieces[VertexShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
+        inOutPieces[PixelShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces )
@@ -484,6 +489,10 @@ namespace Ogre
 
             ++itor;
         }
+
+        String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
+        inOutPieces[VertexShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
+        inOutPieces[PixelShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::uploadDirtyDatablocks(void)

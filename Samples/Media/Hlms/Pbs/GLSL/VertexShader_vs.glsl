@@ -52,8 +52,6 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 @property( hlms_qtangent )
 @insertpiece( DeclQuat_xAxis )
-@insertpiece( DeclQuat_yAxis )
-@insertpiece( DeclQuat_zAxis )
 @property( normal_map )
 @insertpiece( DeclQuat_yAxis )
 @end @end

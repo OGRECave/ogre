@@ -35,14 +35,20 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    ConstBufferPool::ConstBufferPool( uint32 slotsPerPool, size_t bufferSize, VaoManager *vaoManager ) :
-        mSlotsPerPool( slotsPerPool ),
-        mBufferSize( bufferSize ),
-        mVaoManager( vaoManager )
+    ConstBufferPool::ConstBufferPool( uint32 bytesPerSlot ) :
+        mBytesPerSlot( bytesPerSlot ),
+        mSlotsPerPool( 0 ),
+        mBufferSize( 0 ),
+        mVaoManager( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
     ConstBufferPool::~ConstBufferPool()
+    {
+        destroyAllPools();
+    }
+    //-----------------------------------------------------------------------------------
+    void ConstBufferPool::destroyAllPools(void)
     {
         BufferPoolVecMap::const_iterator itor = mPools.begin();
         BufferPoolVecMap::const_iterator end  = mPools.end();
@@ -147,24 +153,8 @@ namespace Ogre
     {
         if( mVaoManager )
         {
-            BufferPoolVecMap::iterator itor = mPools.begin();
-            BufferPoolVecMap::iterator end  = mPools.end();
-
-            while( itor != end )
-            {
-                BufferPoolVec::iterator it = itor->second.begin();
-                BufferPoolVec::iterator en = itor->second.end();
-
-                while( it != en )
-                {
-                    mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
-                    (*it)->materialBuffer = 0;
-                    ++it;
-                }
-
-                ++itor;
-            }
-
+            destroyAllPools();
+            mDirtyUsers.clear();
             mVaoManager = 0;
         }
 
@@ -172,23 +162,8 @@ namespace Ogre
         {
             mVaoManager = newRs->getVaoManager();
 
-            BufferPoolVecMap::iterator itor = mPools.begin();
-            BufferPoolVecMap::iterator end  = mPools.end();
-
-            while( itor != end )
-            {
-                BufferPoolVec::iterator it = itor->second.begin();
-                BufferPoolVec::iterator en = itor->second.end();
-
-                while( it != en )
-                {
-                    (*it)->materialBuffer = mVaoManager->createConstBuffer( mBufferSize, BT_DEFAULT,
-                                                                            0, false );
-                    ++it;
-                }
-
-                ++itor;
-            }
+            mBufferSize = std::min<size_t>( mVaoManager->getConstBufferMaxSize(), 64 * 1024 );
+            mSlotsPerPool = mBufferSize / mBytesPerSlot;
         }
     }
     //-----------------------------------------------------------------------------------

@@ -68,7 +68,7 @@ struct Material
 
 layout(binding = 1) uniform MaterialBuf
 {
-	Material m[273];
+	Material m[@insertpiece( materials_per_buffer )];
 } materialArray;
 @end
 

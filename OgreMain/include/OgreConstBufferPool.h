@@ -68,14 +68,17 @@ namespace Ogre
         typedef vector<ConstBufferPoolUser*>::type  ConstBufferPoolUserVec;
 
         BufferPoolVecMap    mPools;
+        uint32              mBytesPerSlot;
         uint32              mSlotsPerPool;
         size_t              mBufferSize;
         VaoManager          *mVaoManager;
 
         ConstBufferPoolUserVec mDirtyUsers;
 
+        void destroyAllPools(void);
+
     public:
-        ConstBufferPool( uint32 slotsPerPool, size_t bufferSize, VaoManager *vaoManager );
+        ConstBufferPool( uint32 bytesPerSlot );
         virtual ~ConstBufferPool();
 
         /// Requests a slot and fills 'user'. Automatically schedules for update

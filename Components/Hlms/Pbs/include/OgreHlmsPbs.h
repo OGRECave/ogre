@@ -170,6 +170,7 @@ namespace Ogre
         static const IdString HwGammaRead;
         static const IdString HwGammaWrite;
         static const IdString SignedIntTex;
+        static const IdString MaterialsPerBuffer;
 
         static const IdString NumTextures;
         static const IdString DiffuseMap;
