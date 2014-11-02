@@ -26,32 +26,34 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_IndirectBufferPacked_H_
-#define _Ogre_IndirectBufferPacked_H_
-
-#include "Vao/OgreBufferPacked.h"
+#include "OgreStableHeaders.h"
+#include "Vao/OgreIndirectBufferPacked.h"
+#include "Vao/OgreVaoManager.h"
 
 namespace Ogre
 {
-    /** Represents Indirect buffers for storing draw call commands
-    */
-    class _OgreExport IndirectBufferPacked : public BufferPacked
+    IndirectBufferPacked::IndirectBufferPacked( size_t internalBufStartBytes, size_t numElements,
+                                                uint32 bytesPerElement, BufferType bufferType,
+                                                void *initialData, bool keepAsShadow,
+                                                VaoManager *vaoManager,
+                                                BufferInterface *bufferInterface ) :
+        BufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
+                      initialData, keepAsShadow, vaoManager, bufferInterface ),
+        mSwBuffer( 0 )
     {
-        unsigned char *mSwBuffer;
-
-    public:
-        IndirectBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                              BufferType bufferType, void *initialData, bool keepAsShadow,
-                              VaoManager *vaoManager, BufferInterface *bufferInterface );
-        ~IndirectBufferPacked();
-
-        unsigned char* getSwBufferPtr(void)     { return mSwBuffer; }
-
-        //TODO
-        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
-        //TODO
-        virtual void disposeTicket( AsyncTicket *ticket ) {}
-    };
+        if( !vaoManager->supportsIndirectBuffers() )
+        {
+            mSwBuffer = reinterpret_cast<unsigned char*>(
+                            OGRE_MALLOC_SIMD( numElements * bytesPerElement, MEMCATEGORY_RENDERSYS ) );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    IndirectBufferPacked::~IndirectBufferPacked()
+    {
+        if( mSwBuffer )
+        {
+            OGRE_FREE_SIMD( mSwBuffer, MEMCATEGORY_RENDERSYS );
+            mSwBuffer = 0;
+        }
+    }
 }
-
-#endif

@@ -68,9 +68,7 @@ namespace Ogre
     void CommandBuffer::execute_drawCallIndexedEmulated( const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbDrawCallIndexed *cmd = static_cast<const CbDrawCallIndexed*>( _cmd );
-
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "",
-                     "CommandBuffer::execute_drawCallIndexedEmulated" );
+        mRenderSystem->_renderEmulated( cmd );
     }
 
     void CommandBuffer::execute_drawCallIndexed( const CbBase * RESTRICT_ALIAS _cmd )
@@ -88,9 +86,7 @@ namespace Ogre
     void CommandBuffer::execute_drawCallStripEmulated( const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbDrawCallStrip *cmd = static_cast<const CbDrawCallStrip*>( _cmd );
-
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "",
-                     "CommandBuffer::execute_drawCallStripEmulated" );
+        mRenderSystem->_renderEmulated( cmd );
     }
 
     void CommandBuffer::execute_drawCallStrip( const CbBase * RESTRICT_ALIAS _cmd )

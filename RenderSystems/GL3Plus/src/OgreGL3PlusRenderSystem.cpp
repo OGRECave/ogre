@@ -162,6 +162,7 @@ namespace Ogre {
         mTextureMipmapCount = 0;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
+        mSwIndirectBufferPtr = 0;
         mCurrentVertexShader = 0;
         mCurrentGeometryShader = 0;
         mCurrentFragmentShader = 0;
@@ -1668,15 +1669,25 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setIndirectBuffer( IndirectBufferPacked *indirectBuffer )
     {
-        if( indirectBuffer )
+        if( mVaoManager->supportsIndirectBuffers() )
         {
-            GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+            if( indirectBuffer )
+            {
+                GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
                                                             indirectBuffer->getBufferInterface() );
-            OCGE( glBindBuffer( GL_DRAW_INDIRECT_BUFFER, bufferInterface->getVboName() ) );
+                OCGE( glBindBuffer( GL_DRAW_INDIRECT_BUFFER, bufferInterface->getVboName() ) );
+            }
+            else
+            {
+                OCGE( glBindBuffer( GL_DRAW_INDIRECT_BUFFER, 0 ) );
+            }
         }
         else
         {
-            OCGE( glBindBuffer( GL_DRAW_INDIRECT_BUFFER, 0 ) );
+            if( indirectBuffer )
+                mSwIndirectBufferPtr = indirectBuffer->getSwBufferPtr();
+            else
+                mSwIndirectBufferPtr = 0;
         }
     }
 
@@ -2418,14 +2429,6 @@ namespace Ogre {
                                                      vao->mIndexBuffer->getNumElements(),
                                                      indexType, indexOffset, 1,
                                                      vao->mVertexBuffers[0]->_getFinalBufferStart() ) );
-            /*OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
-                      mode,
-                      vao->mIndexBuffer->getNumElements(),
-                      indexType,
-                      indexOffset,
-                      vao->mIndexBuffer->getNumElements(),
-                      vao->mVertexBuffers[0]->_getFinalBufferStart(),
-                      0 ) );*/
         }
         else
         {
@@ -2454,6 +2457,53 @@ namespace Ogre {
 
         OCGE( glMultiDrawArraysIndirect( mode, cmd->indirectBufferOffset,
                                          cmd->numDraws, sizeof(CbDrawStrip) ) );
+    }
+
+    void GL3PlusRenderSystem::_renderEmulated( const CbDrawCallIndexed *cmd )
+    {
+        const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( cmd->vao );
+        GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
+
+        GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
+                                                            GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+
+        CbDrawIndexed *drawCmd = reinterpret_cast<CbDrawIndexed*>(
+                                    mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
+
+        const size_t bytesPerIndexElement = vao->mIndexBuffer->getBytesPerElement();
+
+        for( uint32 i=cmd->numDraws; i--; )
+        {
+            OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
+                      mode,
+                      drawCmd->primCount,
+                      indexType,
+                      reinterpret_cast<void*>( drawCmd->firstVertexIndex * bytesPerIndexElement ),
+                      drawCmd->instanceCount,
+                      drawCmd->baseVertex,
+                      drawCmd->baseInstance ) );
+            ++drawCmd;
+        }
+    }
+
+    void GL3PlusRenderSystem::_renderEmulated( const CbDrawCallStrip *cmd )
+    {
+        const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( cmd->vao );
+        GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
+
+        CbDrawStrip *drawCmd = reinterpret_cast<CbDrawStrip*>(
+                                    mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
+
+        for( uint32 i=cmd->numDraws; i--; )
+        {
+            OCGE( glDrawArraysInstancedBaseInstance(
+                      mode,
+                      drawCmd->firstVertexIndex,
+                      drawCmd->primCount,
+                      drawCmd->instanceCount,
+                      drawCmd->baseInstance ) );
+            ++drawCmd;
+        }
     }
 
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,

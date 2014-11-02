@@ -540,12 +540,8 @@ namespace Ogre
                                                                        void *initialData,
                                                                        bool keepAsShadow )
     {
-        size_t vboIdx;
-        size_t bufferOffset;
-
-        size_t alignment = 4;
-
-        VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
+        const size_t alignment = 4;
+        size_t bufferOffset = 0;
 
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
@@ -556,32 +552,52 @@ namespace Ogre
             sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
         }
 
-        allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
+        GL3PlusBufferInterface *bufferInterface = 0;
+        if( mSupportsIndirectBuffers )
+        {
+            size_t vboIdx;
+            VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-        Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
-                                                                              vbo.dynamicBuffer );
+            allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
+
+            Vbo &vbo = mVbos[vboFlag][vboIdx];
+            bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName, vbo.dynamicBuffer );
+        }
+
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
         if( initialData )
-            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+        {
+            if( mSupportsIndirectBuffers )
+            {
+                bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+            }
+            else
+            {
+                memcpy( retVal->getSwBufferPtr(), initialData, sizeBytes );
+            }
+        }
 
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusVaoManager::destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer )
     {
-        GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
-                                                        indirectBuffer->getBufferInterface() );
+        if( mSupportsIndirectBuffers )
+        {
+            GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                        indirectBuffer->getBufferInterface() );
 
 
-        deallocateVbo( bufferInterface->getVboPoolIndex(),
-                       indirectBuffer->_getInternalBufferStart() * indirectBuffer->getBytesPerElement(),
-                       indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
-                       indirectBuffer->getBufferType() );
+            deallocateVbo( bufferInterface->getVboPoolIndex(),
+                           indirectBuffer->_getInternalBufferStart() *
+                                indirectBuffer->getBytesPerElement(),
+                           indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
+                           indirectBuffer->getBufferType() );
+        }
     }
     //-----------------------------------------------------------------------------------
     GLuint GL3PlusVaoManager::createVao( const Vao &vaoRef )

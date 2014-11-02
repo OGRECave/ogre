@@ -1180,6 +1180,8 @@ namespace Ogre
         virtual void _render( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd ) = 0;
         virtual void _render( const CbDrawCallStrip *cmd ) = 0;
+        virtual void _renderEmulated( const CbDrawCallIndexed *cmd ) = 0;
+        virtual void _renderEmulated( const CbDrawCallStrip *cmd ) = 0;
 
         virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot);
 

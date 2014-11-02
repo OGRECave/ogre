@@ -57,7 +57,8 @@ namespace Ogre
     {
         assert( !(internalBufferStartBytes % bytesPerElement) );
 
-        mBufferInterface->_notifyBuffer( this );
+        if( mBufferInterface )
+            mBufferInterface->_notifyBuffer( this );
 
         if( !initialData && mBufferType == BT_IMMUTABLE )
         {

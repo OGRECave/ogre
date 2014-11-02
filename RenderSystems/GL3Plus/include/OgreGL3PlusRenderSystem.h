@@ -146,6 +146,8 @@ namespace Ogre {
 
         GLint getCombinedMinMipFilter(void) const;
 
+        unsigned char *mSwIndirectBufferPtr;
+
         GLSLShader* mCurrentVertexShader;
         GLSLShader* mCurrentFragmentShader;
         GLSLShader* mCurrentGeometryShader;
@@ -471,6 +473,8 @@ namespace Ogre {
         virtual void _render( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd );
         virtual void _render( const CbDrawCallStrip *cmd );
+        virtual void _renderEmulated( const CbDrawCallIndexed *cmd );
+        virtual void _renderEmulated( const CbDrawCallStrip *cmd );
 
         void clearFrameBuffer(unsigned int buffers,
                               const ColourValue& colour = ColourValue::Black,

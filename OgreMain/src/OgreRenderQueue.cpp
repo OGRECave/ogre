@@ -412,8 +412,18 @@ namespace Ogre
 
         IndirectBufferPacked *indirectBuffer = getIndirectBuffer( numNeededDraws );
         uint32 baseInstance = 0;
-        unsigned char *indirectDraw = static_cast<unsigned char*>(
-                    indirectBuffer->map( 0, indirectBuffer->getNumElements() ) );
+        unsigned char *indirectDraw;
+
+        if( supportsIndirectBuffers )
+        {
+            indirectDraw = static_cast<unsigned char*>(
+                                indirectBuffer->map( 0, indirectBuffer->getNumElements() ) );
+        }
+        else
+        {
+            indirectDraw = indirectBuffer->getSwBufferPtr();
+        }
+
         unsigned char *startIndirectDraw = indirectDraw;
 
         for( size_t i=firstRq; i<lastRq; ++i )
@@ -478,7 +488,8 @@ namespace Ogre
                     if( lastVaoId != vao->getRenderQueueId() )
                     {
                         *mCommandBuffer->addCommand<CbVao>() = CbVao( vao );
-                        *mCommandBuffer->addCommand<CbIndirectBuffer>() = CbIndirectBuffer( indirectBuffer );
+                        *mCommandBuffer->addCommand<CbIndirectBuffer>() =
+                                                                CbIndirectBuffer( indirectBuffer );
                     }
 
                     void *offset = reinterpret_cast<void*>( indirectBuffer->_getFinalBufferStart() +
@@ -544,7 +555,8 @@ namespace Ogre
             }
         }
 
-        indirectBuffer->unmap( UO_KEEP_PERSISTENT );
+        if( supportsIndirectBuffers )
+            indirectBuffer->unmap( UO_KEEP_PERSISTENT );
 
         for( size_t i=0; i<HLMS_MAX; ++i )
         {
