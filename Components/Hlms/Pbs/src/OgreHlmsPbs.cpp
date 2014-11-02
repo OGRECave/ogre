@@ -1,4 +1,4 @@
-/*
+﻿/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -207,33 +207,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsPbs::~HlmsPbs()
     {
-        {
-            TexBufferPackedVec::const_iterator itor = mTexBuffers.begin();
-            TexBufferPackedVec::const_iterator end  = mTexBuffers.end();
-
-            while( itor != end )
-                mVaoManager->destroyTexBuffer( *itor++ );
-
-            mTexBuffers.clear();
-        }
-
-        {
-            ConstBufferPackedVec::const_iterator itor = mConstBuffers.begin();
-            ConstBufferPackedVec::const_iterator end  = mConstBuffers.end();
-
-            while( itor != end )
-                mVaoManager->destroyConstBuffer( *itor++ );
-
-            mConstBuffers.clear();
-
-            itor = mPassBuffers.begin();
-            end  = mPassBuffers.end();
-
-            while( itor != end )
-                mVaoManager->destroyConstBuffer( *itor++ );
-
-            mPassBuffers.clear();
-        }
+        destroyAllBuffers();
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::_changeRenderSystem( RenderSystem *newRs )
@@ -1133,7 +1107,12 @@ namespace Ogre
             TexBufferPackedVec::const_iterator end  = mTexBuffers.end();
 
             while( itor != end )
-                mVaoManager->destroyTexBuffer( *itor++ );
+            {
+                if( (*itor)->getMappingState() != MS_UNMAPPED )
+                    (*itor)->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyTexBuffer( *itor );
+                ++itor;
+            }
 
             mTexBuffers.clear();
         }
@@ -1143,7 +1122,12 @@ namespace Ogre
             ConstBufferPackedVec::const_iterator end  = mConstBuffers.end();
 
             while( itor != end )
-                mVaoManager->destroyConstBuffer( *itor++ );
+            {
+                if( (*itor)->getMappingState() != MS_UNMAPPED )
+                    (*itor)->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyConstBuffer( *itor );
+                ++itor;
+            }
 
             mConstBuffers.clear();
         }
@@ -1153,7 +1137,12 @@ namespace Ogre
             ConstBufferPackedVec::const_iterator end  = mPassBuffers.end();
 
             while( itor != end )
-                mVaoManager->destroyConstBuffer( *itor++ );
+            {
+                if( (*itor)->getMappingState() != MS_UNMAPPED )
+                    (*itor)->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyConstBuffer( *itor );
+                ++itor;
+            }
 
             mPassBuffers.clear();
         }

@@ -54,8 +54,11 @@ namespace Ogre
 
             while( it != en )
             {
-                mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
-                delete *it;
+                if( (*it)->materialBuffer )
+                {
+                    mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
+                    delete *it;
+                }
                 ++it;
             }
 
