@@ -52,7 +52,7 @@ namespace Ogre {
         /// Rendering loop control
         bool mStopRendering;
 
-        typedef HashMap<GLenum, GLuint>  BindBufferMap;
+        typedef OGRE_HashMap<GLenum, GLuint>  BindBufferMap;
 
         /// View matrix to set world against
         Matrix4 mViewMatrix;
