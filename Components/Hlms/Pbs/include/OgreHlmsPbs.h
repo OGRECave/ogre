@@ -103,7 +103,9 @@ namespace Ogre
                                                     const HlmsBlendblock *blendblock,
                                                     const HlmsParamVec &paramVec );
 
-        void setDetailMapProperties( bool diffuseMaps, HlmsPbsDatablock *datablock, PiecesMap *inOutPieces );
+        void setDetailMapProperties( HlmsPbsDatablock *datablock, PiecesMap *inOutPieces );
+        void setTextureProperty( IdString propertyName, HlmsPbsDatablock *datablock,
+                                 PbsTextureTypes texType );
 
         void uploadDirtyDatablocks(void);
 
@@ -179,6 +181,14 @@ namespace Ogre
         static const IdString RoughnessMap;
         static const IdString EnvProbeMap;
         static const IdString DetailWeightMap;
+        static const IdString DetailMap0;
+        static const IdString DetailMap1;
+        static const IdString DetailMap2;
+        static const IdString DetailMap3;
+        static const IdString DetailMapNm0;
+        static const IdString DetailMapNm1;
+        static const IdString DetailMapNm2;
+        static const IdString DetailMapNm3;
 
         static const IdString NormalMap;
 
@@ -192,12 +202,10 @@ namespace Ogre
         static const IdString NormalWeightDetail3;
 
         static const IdString DetailWeights;
-        static const IdString DetailOffsetsD;
         static const IdString DetailOffsetsD0;
         static const IdString DetailOffsetsD1;
         static const IdString DetailOffsetsD2;
         static const IdString DetailOffsetsD3;
-        static const IdString DetailOffsetsN;
         static const IdString DetailOffsetsN0;
         static const IdString DetailOffsetsN1;
         static const IdString DetailOffsetsN2;
@@ -221,29 +229,20 @@ namespace Ogre
 
         static const IdString DetailMapsDiffuse;
         static const IdString DetailMapsNormal;
+        static const IdString FirstValidDetailMapNm;
 
         static const IdString BlendModeIndex0;
         static const IdString BlendModeIndex1;
         static const IdString BlendModeIndex2;
         static const IdString BlendModeIndex3;
 
-        static const IdString DetailDiffuseSwizzle0;
-        static const IdString DetailDiffuseSwizzle1;
-        static const IdString DetailDiffuseSwizzle2;
-        static const IdString DetailDiffuseSwizzle3;
-
-        static const IdString DetailNormalSwizzle0;
-        static const IdString DetailNormalSwizzle1;
-        static const IdString DetailNormalSwizzle2;
-        static const IdString DetailNormalSwizzle3;
-
         static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
         static const IdString *BlendModes[4];
-        static const IdString *DetailDiffuseSwizzles[4];
-        static const IdString *DetailNormalSwizzles[4];
         static const IdString *DetailNormalWeights[4];
         static const IdString *DetailOffsetsDPtrs[4];
         static const IdString *DetailOffsetsNPtrs[4];
+        static const IdString *DetailMaps[4];
+        static const IdString *DetailMapsNm[4];
     };
 
     /** @} */

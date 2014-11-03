@@ -1347,6 +1347,7 @@ namespace Ogre
                 this->parseForEach( outString, inString );
                 this->parseProperties( inString, outString );
                 this->collectPieces( outString, inString );
+                this->parseCounter( inString, outString );
                 ++itor;
             }
 

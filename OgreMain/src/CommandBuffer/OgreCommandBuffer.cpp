@@ -36,7 +36,7 @@ namespace Ogre
 {
     const size_t CommandBuffer::COMMAND_FIXED_SIZE = 32;
 
-    CommandBufferExecuteFunc CbExecutionTable[MAX_COMMAND_BUFFER+1] =
+    CommandBuffer::CommandBufferExecuteFunc* CbExecutionTable[MAX_COMMAND_BUFFER+1] =
     {
         &CommandBuffer::execute_invalidCommand,
         &CommandBuffer::execute_setVao,
@@ -64,7 +64,7 @@ namespace Ogre
         mRenderSystem = renderSystem;
     }
     //-----------------------------------------------------------------------------------
-    void CommandBuffer::execute_invalidCommand( const CbBase *cmd )
+    void CommandBuffer::execute_invalidCommand( CommandBuffer *_this, const CbBase *cmd )
     {
         OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
                      "Invalid CommandBuffer command. "
@@ -80,7 +80,7 @@ namespace Ogre
         for( size_t i=cmdBufferCount; i--; )
         {
             CbBase const * RESTRICT_ALIAS cmd = reinterpret_cast<const CbBase*RESTRICT_ALIAS>( cmdBase );
-            (*this.*CbExecutionTable[cmd->commandType])( cmd );
+            (*CbExecutionTable[cmd->commandType])( this, cmd );
             cmdBase += CommandBuffer::COMMAND_FIXED_SIZE;
         }
 

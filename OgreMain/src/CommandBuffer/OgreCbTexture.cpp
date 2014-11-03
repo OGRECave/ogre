@@ -45,13 +45,13 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_setTexture( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setTexture( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbTexture *cmd = static_cast<const CbTexture*>( _cmd );
-        mRenderSystem->_setTexture( cmd->texUnit, cmd->bEnabled, cmd->texture );
+        _this->mRenderSystem->_setTexture( cmd->texUnit, cmd->bEnabled, cmd->texture );
 
         if( cmd->samplerBlock )
-            mRenderSystem->_setHlmsSamplerblock( cmd->texUnit, cmd->samplerBlock );
+            _this->mRenderSystem->_setHlmsSamplerblock( cmd->texUnit, cmd->samplerBlock );
     }
 
     CbTextureDisableFrom::CbTextureDisableFrom( uint16 _fromTexUnit ) :
@@ -60,9 +60,10 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_disableTextureUnitsFrom( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_disableTextureUnitsFrom( CommandBuffer *_this,
+                                                         const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbTextureDisableFrom *cmd = static_cast<const CbTextureDisableFrom*>( _cmd );
-        mRenderSystem->_disableTextureUnitsFrom( cmd->fromTexUnit );
+        _this->mRenderSystem->_disableTextureUnitsFrom( cmd->fromTexUnit );
     }
 }

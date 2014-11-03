@@ -74,6 +74,7 @@ namespace Ogre
         VaoManager          *mVaoManager;
 
         ConstBufferPoolUserVec mDirtyUsers;
+        ConstBufferPoolUserVec mUsers;
 
         void destroyAllPools(void);
 
@@ -94,13 +95,15 @@ namespace Ogre
     class _OgreExport ConstBufferPoolUser
     {
         friend class ConstBufferPool;
+    protected:
 
         friend bool OrderConstBufferPoolUserByPoolThenSlot( const ConstBufferPoolUser *_l,
                                                             const ConstBufferPoolUser *_r );
 
         uint32                      mAssignedSlot;
         ConstBufferPool::BufferPool *mAssignedPool;
-        ConstBufferPool             *mPoolOwner;
+        size_t                      mGlobalIndex;
+        //ConstBufferPool             *mPoolOwner;
         bool                        mDirty;
 
     public:

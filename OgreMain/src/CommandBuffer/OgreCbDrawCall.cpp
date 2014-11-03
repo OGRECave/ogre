@@ -44,10 +44,10 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_setVao( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setVao( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbVao *cmd = static_cast<const CbVao*>( _cmd );
-        mRenderSystem->_setVertexArrayObject( cmd->vao );
+        _this->mRenderSystem->_setVertexArrayObject( cmd->vao );
     }
 
     CbDrawCall::CbDrawCall( uint16 cmdType, VertexArrayObject *_vao,
@@ -65,16 +65,18 @@ namespace Ogre
                     _vao, _indirectBufferOffset )
     {
     }
-    void CommandBuffer::execute_drawCallIndexedEmulated( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_drawCallIndexedEmulated( CommandBuffer *_this,
+                                                         const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbDrawCallIndexed *cmd = static_cast<const CbDrawCallIndexed*>( _cmd );
-        mRenderSystem->_renderEmulated( cmd );
+        _this->mRenderSystem->_renderEmulated( cmd );
     }
 
-    void CommandBuffer::execute_drawCallIndexed( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_drawCallIndexed( CommandBuffer *_this,
+                                                 const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbDrawCallIndexed *cmd = static_cast<const CbDrawCallIndexed*>( _cmd );
-        mRenderSystem->_render( cmd );
+        _this->mRenderSystem->_render( cmd );
     }
 
     CbDrawCallStrip::CbDrawCallStrip( bool supportsIndirectBuffers, VertexArrayObject *_vao,
@@ -83,15 +85,17 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_drawCallStripEmulated( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_drawCallStripEmulated( CommandBuffer *_this,
+                                                       const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbDrawCallStrip *cmd = static_cast<const CbDrawCallStrip*>( _cmd );
-        mRenderSystem->_renderEmulated( cmd );
+        _this->mRenderSystem->_renderEmulated( cmd );
     }
 
-    void CommandBuffer::execute_drawCallStrip( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_drawCallStrip( CommandBuffer *_this,
+                                               const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbDrawCallStrip *cmd = static_cast<const CbDrawCallStrip*>( _cmd );
-        mRenderSystem->_render( cmd );
+        _this->mRenderSystem->_render( cmd );
     }
 }

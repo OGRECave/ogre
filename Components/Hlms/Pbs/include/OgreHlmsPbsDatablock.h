@@ -341,7 +341,9 @@ namespace Ogre
         void setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale );
         const Vector4& getDetailMapOffsetScale( uint8 detailMap ) const;
 
-        void _recreateConstBuffers(void);
+        /// Returns the index to mBakedTextures. Returns NUM_PBSM_TEXTURE_TYPES if
+        /// there is no texture assigned to texType
+        uint8 getBakedTextureIdx( PbsTextureTypes texType ) const;
 
         virtual void calculateHash();
 

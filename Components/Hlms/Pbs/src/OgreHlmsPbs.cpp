@@ -61,6 +61,14 @@ namespace Ogre
     const IdString PbsProperty::RoughnessMap      = IdString( "roughness_map" );
     const IdString PbsProperty::EnvProbeMap       = IdString( "envprobe_map" );
     const IdString PbsProperty::DetailWeightMap   = IdString( "detail_weight_map" );
+    const IdString PbsProperty::DetailMap0        = IdString( "detail_map0" );
+    const IdString PbsProperty::DetailMap1        = IdString( "detail_map1" );
+    const IdString PbsProperty::DetailMap2        = IdString( "detail_map2" );
+    const IdString PbsProperty::DetailMap3        = IdString( "detail_map3" );
+    const IdString PbsProperty::DetailMapNm0     = IdString( "detail_map_nm0" );
+    const IdString PbsProperty::DetailMapNm1     = IdString( "detail_map_nm1" );
+    const IdString PbsProperty::DetailMapNm2     = IdString( "detail_map_nm2" );
+    const IdString PbsProperty::DetailMapNm3     = IdString( "detail_map_nm3" );
 
     const IdString PbsProperty::NormalMap         = IdString( "normal_map" );
 
@@ -74,12 +82,10 @@ namespace Ogre
     const IdString PbsProperty::NormalWeightDetail3   = IdString( "normal_weight_detail3" );
 
     const IdString PbsProperty::DetailWeights     = IdString( "detail_weights" );
-    const IdString PbsProperty::DetailOffsetsD    = IdString( "detail_offsetsD" );
     const IdString PbsProperty::DetailOffsetsD0   = IdString( "detail_offsetsD0" );
     const IdString PbsProperty::DetailOffsetsD1   = IdString( "detail_offsetsD1" );
     const IdString PbsProperty::DetailOffsetsD2   = IdString( "detail_offsetsD2" );
     const IdString PbsProperty::DetailOffsetsD3   = IdString( "detail_offsetsD3" );
-    const IdString PbsProperty::DetailOffsetsN    = IdString( "detail_offsetsN" );
     const IdString PbsProperty::DetailOffsetsN0   = IdString( "detail_offsetsN0" );
     const IdString PbsProperty::DetailOffsetsN1   = IdString( "detail_offsetsN1" );
     const IdString PbsProperty::DetailOffsetsN2   = IdString( "detail_offsetsN2" );
@@ -90,12 +96,10 @@ namespace Ogre
     const IdString PbsProperty::UvSpecular        = IdString( "uv_specular" );
     const IdString PbsProperty::UvRoughness       = IdString( "uv_roughness" );
     const IdString PbsProperty::UvDetailWeight    = IdString( "uv_detail_weight" );
-
     const IdString PbsProperty::UvDetail0         = IdString( "uv_detail0" );
     const IdString PbsProperty::UvDetail1         = IdString( "uv_detail1" );
     const IdString PbsProperty::UvDetail2         = IdString( "uv_detail2" );
     const IdString PbsProperty::UvDetail3         = IdString( "uv_detail3" );
-
     const IdString PbsProperty::UvDetailNm0       = IdString( "uv_detail_nm0" );
     const IdString PbsProperty::UvDetailNm1       = IdString( "uv_detail_nm1" );
     const IdString PbsProperty::UvDetailNm2       = IdString( "uv_detail_nm2" );
@@ -108,16 +112,7 @@ namespace Ogre
 
     const IdString PbsProperty::DetailMapsDiffuse = IdString( "detail_maps_diffuse" );
     const IdString PbsProperty::DetailMapsNormal  = IdString( "detail_maps_normal" );
-
-    const IdString PbsProperty::DetailDiffuseSwizzle0 = IdString( "detail_diffuse_swizzle0" );
-    const IdString PbsProperty::DetailDiffuseSwizzle1 = IdString( "detail_diffuse_swizzle1" );
-    const IdString PbsProperty::DetailDiffuseSwizzle2 = IdString( "detail_diffuse_swizzle2" );
-    const IdString PbsProperty::DetailDiffuseSwizzle3 = IdString( "detail_diffuse_swizzle3" );
-
-    const IdString PbsProperty::DetailNormalSwizzle0  = IdString( "detail_normal_swizzle0" );
-    const IdString PbsProperty::DetailNormalSwizzle1  = IdString( "detail_normal_swizzle1" );
-    const IdString PbsProperty::DetailNormalSwizzle2  = IdString( "detail_normal_swizzle2" );
-    const IdString PbsProperty::DetailNormalSwizzle3  = IdString( "detail_normal_swizzle3" );
+    const IdString PbsProperty::FirstValidDetailMapNm= IdString( "first_valid_detail_map_nm" );
 
     const IdString *PbsProperty::UvSourcePtrs[NUM_PBSM_SOURCES] =
     {
@@ -134,22 +129,6 @@ namespace Ogre
         &PbsProperty::UvDetailNm1,
         &PbsProperty::UvDetailNm2,
         &PbsProperty::UvDetailNm3
-    };
-
-    const IdString *PbsProperty::DetailDiffuseSwizzles[4] =
-    {
-        &PbsProperty::DetailDiffuseSwizzle0,
-        &PbsProperty::DetailDiffuseSwizzle1,
-        &PbsProperty::DetailDiffuseSwizzle2,
-        &PbsProperty::DetailDiffuseSwizzle3
-    };
-
-    const IdString *PbsProperty::DetailNormalSwizzles[4] =
-    {
-        &PbsProperty::DetailNormalSwizzle0,
-        &PbsProperty::DetailNormalSwizzle1,
-        &PbsProperty::DetailNormalSwizzle2,
-        &PbsProperty::DetailNormalSwizzle3
     };
 
     const IdString *PbsProperty::DetailNormalWeights[4] =
@@ -182,6 +161,22 @@ namespace Ogre
         &PbsProperty::BlendModeIndex1,
         &PbsProperty::BlendModeIndex2,
         &PbsProperty::BlendModeIndex3
+    };
+
+    const IdString *PbsProperty::DetailMaps[4] =
+    {
+        &PbsProperty::DetailMap0,
+        &PbsProperty::DetailMap1,
+        &PbsProperty::DetailMap2,
+        &PbsProperty::DetailMap3,
+    };
+
+    const IdString *PbsProperty::DetailMapsNm[4] =
+    {
+        &PbsProperty::DetailMapNm0,
+        &PbsProperty::DetailMapNm1,
+        &PbsProperty::DetailMapNm2,
+        &PbsProperty::DetailMapNm3,
     };
 
     extern const String c_pbsBlendModes[];
@@ -285,53 +280,71 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::setDetailMapProperties( bool diffuseMaps, HlmsPbsDatablock *datablock,
-                                                PiecesMap *inOutPieces )
+    void HlmsPbs::setDetailMapProperties( HlmsPbsDatablock *datablock, PiecesMap *inOutPieces )
     {
-        PbsTextureTypes detailTextureStart = diffuseMaps ? PBSM_DETAIL0 : PBSM_DETAIL0_NM;
-        const IdString **detailSwizzles = diffuseMaps ? PbsProperty::DetailDiffuseSwizzles :
-                                                        PbsProperty::DetailNormalSwizzles;
-
-        size_t validDetailMaps = 0;
+        uint32 minNormalMap = 4;
+        bool hasDiffuseMaps = false;
+        bool hasNormalMaps = false;
+        bool anyDetailWeight = false;
         for( size_t i=0; i<4; ++i )
         {
             uint8 blendMode = datablock->mBlendModes[i];
 
-            //If Detail map 0 doesn't exists but Detail map 1 does;
-            //then DetailDiffuseSwizzle0 must reference the swizzle 'y'
-            //Same happens with the UV sources (the UV sources[1] end up
-            //actually as sources[0], etc).
-            if( !datablock->getTexture( detailTextureStart + i ).isNull() )
+            setTextureProperty( *PbsProperty::DetailMaps[i], datablock,
+                                static_cast<PbsTextureTypes>( PBSM_DETAIL0 + i ) );
+            setTextureProperty( *PbsProperty::DetailMapsNm[i], datablock,
+                                static_cast<PbsTextureTypes>( PBSM_DETAIL0_NM + i ) );
+
+            if( !datablock->getTexture( PBSM_DETAIL0 + i ).isNull() )
             {
-                if( diffuseMaps )
-                {
-                    inOutPieces[PixelShader][*PbsProperty::BlendModes[validDetailMaps]] =
+                inOutPieces[PixelShader][*PbsProperty::BlendModes[i]] =
                                                 "@insertpiece( " + c_pbsBlendModes[blendMode] + ")";
-                }
+                hasDiffuseMaps = true;
+            }
 
-                const char *swizzles[4] = { "x", "y", "z", "w" };
-                IdString swizzleN = *detailSwizzles[validDetailMaps];
-                inOutPieces[PixelShader][swizzleN] = swizzles[i];
+            if( !datablock->getTexture( PBSM_DETAIL0_NM + i ).isNull() )
+            {
+                minNormalMap = std::min<uint32>( minNormalMap, i );
+                hasNormalMaps = true;
+            }
 
-                uint8 uvSource = datablock->mUvSource[detailTextureStart + i];
-                setProperty( *PbsProperty::UvSourcePtrs[detailTextureStart + validDetailMaps],
-                             uvSource );
+            if( datablock->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
+                setProperty( *PbsProperty::DetailOffsetsDPtrs[i], 1 );
 
-                if( getProperty( *HlmsBaseProp::UvCountPtrs[uvSource] ) < 2 )
-                {
-                    OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                                 "Renderable needs at least 2 coordinates in UV set #" +
-                                 StringConverter::toString( uvSource ) +
-                                 ". Either change the mesh, or change the UV source settings",
-                                 "HlmsPbs::setDetailMapProperties" );
-                }
+            if( datablock->mDetailsOffsetScale[i+4] != Vector4( 0, 0, 1, 1 ) )
+                setProperty( *PbsProperty::DetailOffsetsNPtrs[i], 1 );
 
-                ++validDetailMaps;
+            if( datablock->mDetailWeight[i] != 1.0f &&
+                (!datablock->getTexture( PBSM_DETAIL0 + i ).isNull() ||
+                 !datablock->getTexture( PBSM_DETAIL0_NM + i ).isNull()) )
+            {
+                anyDetailWeight = true;
             }
         }
 
-        setProperty( diffuseMaps ? PbsProperty::DetailMapsDiffuse :
-                                   PbsProperty::DetailMapsNormal, validDetailMaps );
+        if( hasDiffuseMaps )
+            setProperty( PbsProperty::DetailMapsDiffuse, 4 );
+
+        if( hasNormalMaps )
+            setProperty( PbsProperty::DetailMapsNormal, 4 );
+
+        setProperty( PbsProperty::FirstValidDetailMapNm, minNormalMap );
+
+        if( anyDetailWeight )
+            setProperty( PbsProperty::DetailWeights, 1 );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setTextureProperty( IdString propertyName, HlmsPbsDatablock *datablock,
+                                      PbsTextureTypes texType )
+    {
+        uint8 idx = datablock->getBakedTextureIdx( texType );
+        if( idx != NUM_PBSM_TEXTURE_TYPES )
+        {
+            //In the template the we subtract the "+1" for the index.
+            //We need to increment it now otherwise @property( diffuse_map )
+            //can translate to @property( 0 ) which is not what we want.
+            setProperty( propertyName, idx + 1 );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces )
@@ -341,7 +354,7 @@ namespace Ogre
                                                         renderable->getDatablock() );
         setProperty( PbsProperty::FresnelScalar, datablock->hasSeparateFresnel() );
 
-        for( size_t i=0; i<PBSM_DETAIL0; ++i )
+        for( size_t i=0; i<PBSM_REFLECTION; ++i )
         {
             uint8 uvSource = datablock->mUvSource[i];
             setProperty( *PbsProperty::UvSourcePtrs[i], uvSource );
@@ -383,65 +396,16 @@ namespace Ogre
 
         setProperty( PbsProperty::NormalWeight, numNormalWeights );
 
-        setDetailMapProperties( true, datablock, inOutPieces );
-        setDetailMapProperties( false, datablock, inOutPieces );
+        setDetailMapProperties( datablock, inOutPieces );
 
-        {
-            bool anyDetailWeight = false;
-            for( size_t i=0; i<4 && !anyDetailWeight; ++i )
-            {
-                if( datablock->mDetailWeight[i] != 1.0f &&
-                    (!datablock->getTexture( PBSM_DETAIL0 + i ).isNull() ||
-                     !datablock->getTexture( PBSM_DETAIL0_NM + i ).isNull()) )
-                {
-                    anyDetailWeight = true;
-                }
-            }
+        setProperty( PbsProperty::NumTextures, datablock->mBakedTextures.size() );
 
-            if( anyDetailWeight )
-                setProperty( PbsProperty::DetailWeights, 1 );
-        }
-
-        {
-            int numOffsets = 0;
-            size_t validDetailMaps = 0;
-            for( size_t i=0; i<4; ++i )
-            {
-                if( datablock->mDetailsOffsetScale[i] != Vector4( 0, 0, 1, 1 ) )
-                {
-                    setProperty( *PbsProperty::DetailOffsetsDPtrs[validDetailMaps], 1 );
-                    ++numOffsets;
-                }
-
-                if( !datablock->getTexture( PBSM_DETAIL0 + i ).isNull() )
-                    ++validDetailMaps;
-            }
-
-            setProperty( PbsProperty::DetailOffsetsD, numOffsets );
-
-            numOffsets = 0;
-            validDetailMaps = 0;
-            for( size_t i=0; i<4; ++i )
-            {
-                if( datablock->mDetailsOffsetScale[i+4] != Vector4( 0, 0, 1, 1 ) )
-                {
-                    setProperty( *PbsProperty::DetailOffsetsNPtrs[validDetailMaps], 1 );
-                    ++numOffsets;
-                }
-
-                if( !datablock->getTexture( PBSM_DETAIL0_NM + i ).isNull() )
-                    ++validDetailMaps;
-            }
-
-            setProperty( PbsProperty::DetailOffsetsN, numOffsets );
-        }
-
-        setProperty( PbsProperty::DiffuseMap,     !datablock->getTexture( PBSM_DIFFUSE ).isNull() );
-        setProperty( PbsProperty::NormalMapTex,   !datablock->getTexture( PBSM_NORMAL ).isNull() );
-        setProperty( PbsProperty::SpecularMap,    !datablock->getTexture( PBSM_SPECULAR ).isNull() );
-        setProperty( PbsProperty::RoughnessMap,   !datablock->getTexture( PBSM_ROUGHNESS ).isNull() );
-        setProperty( PbsProperty::EnvProbeMap,    !datablock->getTexture( PBSM_REFLECTION ).isNull() );
-        setProperty( PbsProperty::DetailWeightMap,!datablock->getTexture( PBSM_DETAIL_WEIGHT ).isNull() );
+        setTextureProperty( PbsProperty::DiffuseMap,    datablock,  PBSM_DIFFUSE );
+        setTextureProperty( PbsProperty::NormalMapTex,  datablock,  PBSM_NORMAL );
+        setTextureProperty( PbsProperty::SpecularMap,   datablock,  PBSM_SPECULAR );
+        setTextureProperty( PbsProperty::RoughnessMap,  datablock,  PBSM_ROUGHNESS );
+        setTextureProperty( PbsProperty::EnvProbeMap,   datablock,  PBSM_REFLECTION );
+        setTextureProperty( PbsProperty::DetailWeightMap,datablock, PBSM_DETAIL_WEIGHT );
 
         bool usesNormalMap = !datablock->getTexture( PBSM_NORMAL ).isNull();
         for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )

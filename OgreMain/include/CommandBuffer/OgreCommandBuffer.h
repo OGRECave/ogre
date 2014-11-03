@@ -60,20 +60,23 @@ namespace Ogre
 
         void setCurrentRenderSystem( RenderSystem *renderSystem );
 
-        void execute_setVao( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_drawCallIndexedEmulated( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_drawCallIndexed( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_drawCallStripEmulated( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_drawCallStrip( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_setConstantBuffer( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_setTextureBuffer( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_setIndirectBuffer( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_setMacroblock( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_setBlendblock( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_setHlmsCache( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_setTexture( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_disableTextureUnitsFrom( const CbBase * RESTRICT_ALIAS cmd );
-        void execute_invalidCommand( const CbBase * RESTRICT_ALIAS cmd );
+        typedef void (CommandBufferExecuteFunc)( CommandBuffer *_this,
+                                                 const CbBase * RESTRICT_ALIAS cmd );
+
+        static CommandBufferExecuteFunc execute_setVao;
+        static CommandBufferExecuteFunc execute_drawCallIndexedEmulated;
+        static CommandBufferExecuteFunc execute_drawCallIndexed;
+        static CommandBufferExecuteFunc execute_drawCallStripEmulated;
+        static CommandBufferExecuteFunc execute_drawCallStrip;
+        static CommandBufferExecuteFunc execute_setConstantBuffer;
+        static CommandBufferExecuteFunc execute_setTextureBuffer;
+        static CommandBufferExecuteFunc execute_setIndirectBuffer;
+        static CommandBufferExecuteFunc execute_setMacroblock;
+        static CommandBufferExecuteFunc execute_setBlendblock;
+        static CommandBufferExecuteFunc execute_setHlmsCache;
+        static CommandBufferExecuteFunc execute_setTexture;
+        static CommandBufferExecuteFunc execute_disableTextureUnitsFrom;
+        static CommandBufferExecuteFunc execute_invalidCommand;
 
         /// Executes all the commands in the command buffer. Clears the cmd buffer afterwards
         void execute(void);
@@ -105,8 +108,6 @@ namespace Ogre
         /// @see getCommandOffset.
         CbBase* getCommandFromOffset( size_t offset );
     };
-
-    typedef void (CommandBuffer::*CommandBufferExecuteFunc)( const CbBase * RESTRICT_ALIAS cmd );
 }
 
 #endif

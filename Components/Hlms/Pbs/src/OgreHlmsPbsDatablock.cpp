@@ -267,7 +267,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsPbsDatablock::~HlmsPbsDatablock()
     {
-        static_cast<HlmsPbs*>(mCreator)->releaseSlot( this );
+        if( mAssignedPool )
+            static_cast<HlmsPbs*>(mCreator)->releaseSlot( this );
 
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         if( hlmsManager )
@@ -356,6 +357,10 @@ namespace Ogre
                 {
                     mTexToBakedTextureIdx[i] = itor - mBakedTextures.begin();
                 }
+            }
+            else
+            {
+                mTexToBakedTextureIdx[i] = NUM_PBSM_TEXTURE_TYPES;
             }
         }
 
@@ -483,7 +488,7 @@ namespace Ogre
     {
         TexturePtr retVal;
 
-        if( mTexToBakedTextureIdx[texType] < NUM_PBSM_TEXTURE_TYPES )
+        if( mTexToBakedTextureIdx[texType] < mBakedTextures.size() )
             retVal = mBakedTextures[mTexToBakedTextureIdx[texType]].texture;
 
         return retVal;
@@ -623,5 +628,10 @@ namespace Ogre
     {
         assert( detailMap < 8 );
         return mDetailsOffsetScale[detailMap];
+    }
+    //-----------------------------------------------------------------------------------
+    uint8 HlmsPbsDatablock::getBakedTextureIdx( PbsTextureTypes texType ) const
+    {
+        return mTexToBakedTextureIdx[texType];
     }
 }

@@ -61,10 +61,11 @@ namespace Ogre
     {
         CAPS_CATEGORY_COMMON = 0,
         CAPS_CATEGORY_COMMON_2 = 1,
-        CAPS_CATEGORY_D3D9 = 2,
-        CAPS_CATEGORY_GL = 3,
+        CAPS_CATEGORY_COMMON_3 = 2,
+        CAPS_CATEGORY_D3D9 = 3,
+        CAPS_CATEGORY_GL = 4,
         /// Placeholder for max value
-        CAPS_CATEGORY_COUNT = 4
+        CAPS_CATEGORY_COUNT = 5
     };
 
     /// Enum describing the different hardware capabilities we want to check for
@@ -129,8 +130,6 @@ namespace Ogre
         RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
         /// Supports rendering to vertex buffers
         RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
-        /// Supports different texture bindings
-        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 28),
 
         /// Supports compressed textures
         RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),
@@ -194,10 +193,13 @@ namespace Ogre
         RSC_READ_BACK_AS_TEXTURE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 26),
         /// Explicit FSAA resolves (i.e. sample MSAA textures directly in the shader without resolving)
         RSC_EXPLICIT_FSAA_RESOLVE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 27),
+
+        /// Supports different texture bindings
+        RSC_COMPLETE_TEXTURE_BINDING = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 0),
         /// TEX_TYPE_2D_ARRAY is supported
-        RSC_TEXTURE_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 28),
+        RSC_TEXTURE_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 1),
         /// TEX_TYPE_CUBE_MAP_ARRAY is supported
-        RSC_TEXTURE_CUBE_MAP_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 29),
+        RSC_TEXTURE_CUBE_MAP_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 2),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

@@ -48,7 +48,8 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_setConstantBuffer( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setConstantBuffer( CommandBuffer *_this,
+                                                   const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
 
@@ -67,7 +68,8 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_setTextureBuffer( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setTextureBuffer( CommandBuffer *_this,
+                                                  const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
 
@@ -83,9 +85,10 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_setIndirectBuffer( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setIndirectBuffer( CommandBuffer *_this,
+                                                   const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbIndirectBuffer *cmd = static_cast<const CbIndirectBuffer*>( _cmd );
-        mRenderSystem->_setIndirectBuffer( cmd->indirectBuffer );
+        _this->mRenderSystem->_setIndirectBuffer( cmd->indirectBuffer );
     }
 }

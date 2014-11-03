@@ -42,10 +42,10 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_setMacroblock( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setMacroblock( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbMacroblock *cmd = static_cast<const CbMacroblock*>( _cmd );
-        mRenderSystem->_setHlmsMacroblock( cmd->block );
+        _this->mRenderSystem->_setHlmsMacroblock( cmd->block );
     }
 
     CbBlendblock::CbBlendblock( const HlmsBlendblock *_block ) :
@@ -55,10 +55,10 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_setBlendblock( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setBlendblock( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbBlendblock *cmd = static_cast<const CbBlendblock*>( _cmd );
-        mRenderSystem->_setHlmsBlendblock( cmd->block );
+        _this->mRenderSystem->_setHlmsBlendblock( cmd->block );
     }
 
     CbHlmsCache::CbHlmsCache( const HlmsCache *_hlmsCache ) :
@@ -67,9 +67,9 @@ namespace Ogre
     {
     }
 
-    void CommandBuffer::execute_setHlmsCache( const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setHlmsCache( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbHlmsCache *cmd = static_cast<const CbHlmsCache*>( _cmd );
-        mRenderSystem->_setProgramsFromHlms( cmd->hlmsCache );
+        _this->mRenderSystem->_setProgramsFromHlms( cmd->hlmsCache );
     }
 }

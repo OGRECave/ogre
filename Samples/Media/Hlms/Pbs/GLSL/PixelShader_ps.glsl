@@ -24,47 +24,32 @@ in block
 } inPs;
 // END UNIFORM DECLARATION
 
-@property( detail_offsetsD )
-	@foreach( detail_maps_diffuse, n )
-		@property( detail_offsetsD@n )
-			@piece( offsetDetailD@n ) * detailOffsetScaleD[@value(currOffsetDetailD)].zw + detailOffsetScaleD[@counter(currOffsetDetailD)].xy@end
-		@end
-	@end
-@end
-@property( detail_offsetsN )
-	@foreach( detail_maps_normal, n )
-		@property( detail_offsetsN@n )
-			@piece( offsetDetailN@n ) * detailOffsetScaleN[@value(currOffsetDetailN)].zw + detailOffsetScaleN[@counter(currOffsetDetailN)].xy@end
-		@end
-	@end
-@end
-
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 @property( envprobe_map )uniform samplerCube	texEnvProbeMap;@end
 
-@property( diffuse_map )	uint diffuseIdx;@end
-@property( normal_map_tex )	uint normalIdx;@end
-@property( specular_map )	uint specularIdx;@end
-@property( roughness_map )	uint roughnessIdx;@end
-@property( detail_weight_map )	uint weightMapIdx;@end
+@property( diffuse_map )	uint diffuseIdx;@sub( diffuse_map_idx, diffuse_map, 1 )@end
+@property( normal_map_tex )	uint normalIdx;@sub( normal_map_tex_idx, normal_map_tex, 1 )@end
+@property( specular_map )	uint specularIdx;@sub( specular_map_idx, specular_map, 1 )@end
+@property( roughness_map )	uint roughnessIdx;@sub( roughness_map_idx, roughness_map, 1 )@end
+@property( detail_weight_map )	uint weightMapIdx;@sub( detail_weight_map_idx, detail_weight_map, 1 )@end
 @foreach( 4, n )
-	@property( detail_map@n )uint detailMapIdx@n;@end @end
+	@property( detail_map@n )uint detailMapIdx@n;@sub( detail_map@n_idx, detail_map@n, 1 )@end @end
 @foreach( 4, n )
-	@property( detail_map_nm@n )uint detailNormMapIdx@n;@end @end
-@property( envprobe_map )	uint envMapIdx;@end
+	@property( detail_map_nm@n )uint detailNormMapIdx@n;@sub( detail_map_nm@n_idx, detail_map_nm@n, 1 )@end @end
+@property( envprobe_map )	uint envMapIdx;@sub( envprobe_map_idx, envprobe_map, 1 )@end
 
 @property( !diffuse_map && detail_maps_diffuse )vec4 diffuseCol;@end
 @property( diffuse_map )vec4 diffuseCol;
-@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map )], vec3( psIn.uv@value(uv_diffuse).xy, diffuseIdx ) );
+@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map_idx )], vec3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) );
 @property( !hw_gamma_read )	//Gamma to linear space
 	diffuseCol = diffuseCol * diffuseCol;@end @end
 @piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
 @property( specular_map )vec3 specularCol;
-@piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map )], vec3(psIn.uv@value(uv_specular).xy, specularIdx) ).xyz;@end
+@piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).xyz;@end
 @piece( MulSpecularMapValue )* specularCol@end@end
 @property( roughness_map )float ROUGHNESS;
-@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w * texture( textureMaps[@value( roughness_map )], vec3(psIn.uv@value(uv_roughness).xy, roughnessIdx) ).x;@end
+@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w * texture( textureMaps[@value( roughness_map_idx )], vec3(inPs.uv@value(uv_roughness).xy, roughnessIdx) ).x;@end
 @end
 
 Material material;
@@ -124,10 +109,10 @@ vec3 qmul( vec4 q, vec3 v )
 	vec3 tsNormal;
 @property( signed_int_textures )
 	//Normal texture must be in U8V8 or BC5 format!
-	tsNormal.xy = texture( textureMaps[@value( normal_map_tex )], vec3(uv, normalIdx) ).xy;
+	tsNormal.xy = texture( textureMaps[@value( normal_map_tex_idx )], vec3(uv, normalIdx) ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = texture( textureMaps[@value( normal_map_tex )], vec3(uv, normalIdx) ).xw * 2.0 - 1.0;
+	tsNormal.xy = texture( textureMaps[@value( normal_map_tex_idx )], vec3(uv, normalIdx) ).xw * 2.0 - 1.0;
 @end
 	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
 
@@ -149,14 +134,10 @@ vec3 qmul( vec4 q, vec3 v )
 	return tsNormal;
 }
 
-	@property( normal_weight_tex )
-		@set( curr_normal_weightA, 1 )
-		@set( curr_normal_weightB, 1 )
-	@end
+	@property( normal_weight_tex )#define normalMapWeight material.F0.w@end
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
-			@piece( detail@n_nm_weight_mulA ) * normalWeights[@counter(curr_normal_weightA)]@end
-			@piece( detail@n_nm_weight_mulB ) * normalWeights[@counter(curr_normal_weightB)]@end
+			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )]@end
 		@end
 	@end
 @end
@@ -226,25 +207,25 @@ void main()
 
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
-		vec4 detailWeights = texture( textureMaps[@value(detail_weight_map)], vec3(psIn.uv@value(uv_detail_weight).xy, weightMapIdx) );
-		@property( detail_weights )detailWeights *= cDetailWeights;@end
+		vec4 detailWeights = texture( textureMaps[@value(detail_weight_map_idx)], vec3(inPs.uv@value(uv_detail_weight).xy, weightMapIdx) );
+		@property( detail_weights )detailWeights *= material.cDetailWeights;@end
 	@end @property( !detail_weight_map )
-		@property( detail_weights )vec4 detailWeights = cDetailWeights;@end
+		@property( detail_weights )vec4 detailWeights = material.cDetailWeights;@end
 		@property( !detail_weights )vec4 detailWeights = vec4( 1.0 );@end
 	@end
 	//Group all texture loads together to help the GPU hide the
 	//latency (bad GL ES2 drivers won't optimize this automatically)
 @end
 
-@foreach( detail_maps_diffuse, n )
-	vec4 detailCol@n	= texture( textureMaps[@value(detail_map@n)], vec3( psIn.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ) );
+@foreach( detail_maps_diffuse, n )@property( detail_map@n )
+	vec4 detailCol@n	= texture( textureMaps[@value(detail_map@n_idx], vec3( inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ) );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol@n.xyz = detailCol@n.xyz * detailCol@n.xyz;@end
-	detailWeights.@insertpiece(detail_diffuse_swizzle@n) *= detailCol@n.w;
-	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
+	detailWeights.@insertpiece(detail_swizzle@n) *= detailCol@n.w;
+	detailCol@n.w = detailWeights.@insertpiece(detail_swizzle@n);@end
 @end
-@foreach( detail_maps_normal, n )
-	vec3 vDetail@n	= getTSDetailNormal( textureMaps[@value(detail_map_nm@n)], vec3( psIn.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetailN@n ), detailNormMapIdx@n ) ) * detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulA );@end
+@foreach( detail_maps_normal, n )@property( detail_map_nm@n )
+	vec3 vDetail@n	= getTSDetailNormal( textureMaps[@value(detail_map_nm@n_idx)], vec3( inPs.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetailN@n ), detailNormMapIdx@n ) ) * detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
 @property( !normal_map )
 	nNormal = normalize( inPs.normal );
@@ -256,8 +237,8 @@ void main()
 	vec3 vBinormal	= cross( vTangent, geomNormal )@insertpiece( tbnApplyReflection );
 	mat3 TBN		= mat3( vTangent, vBinormal, geomNormal );
 
-	@property( normal_map_tex )nNormal = getTSNormal( texNormalMap, psIn.uv@value(uv_normal).xy );@end
-	@property( normal_weight_tex )nNormal = mix( vec3( 0.0, 0.0, 1.0 ), nNormal, normalWeights[0] );@end
+	@property( normal_map_tex )nNormal = getTSNormal( texNormalMap, inPs.uv@value(uv_normal).xy );@end
+	@property( normal_weight_tex )nNormal = mix( vec3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );@end
 @end
 
 @property( hlms_pssm_splits )
@@ -278,19 +259,19 @@ void main()
 	@insertpiece( blend_mode_idx@n ) @end
 
 @property( normal_map_tex )
-	@piece( detail0_nm_op_sum )+=@end
-	@piece( detail0_nm_op_mul )*=@end
+	@piece( detail_nm_op_sum )+=@end
+	@piece( detail_nm_op_mul )*=@end
 @end @property( !normal_map_tex )
-	@piece( detail0_nm_op_sum )=@end
-	@piece( detail0_nm_op_mul )=@end
+	@piece( detail_nm_op_sum )=@end
+	@piece( detail_nm_op_mul )=@end
 @end
 
-@property( detail_maps_normal )
-	nNormal.xy	@insertpiece( detail0_nm_op_sum ) vDetail0.xy;
-	nNormal.z	@insertpiece( detail0_nm_op_mul ) vDetail0.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle0) @insertpiece( detail0_nm_weight_mulB );@end
-@foreach( detail_maps_normal, n, 1 )
+@foreach( second_valid_detail_map_nm, n, first_valid_detail_map_nm )
+	nNormal.xy	@insertpiece( detail_nm_op_sum ) vDetail@n.xy;
+	nNormal.z	@insertpiece( detail_nm_op_mul ) vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end
+@foreach( detail_maps_normal, n, second_valid_detail_map_nm )@property( detail_map_nm@n )
 	nNormal.xy	+= vDetail@n.xy;
-	nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulB );@end
+	nNormal.z	*= vDetail@n.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
 @property( normal_map )
 	nNormal = normalize( TBN * nNormal );
@@ -393,17 +374,22 @@ in block
 
 Material material;
 
+layout(binding=1) uniform sampler2DArray textureMaps[1];
+
 void main()
 {
-	//uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FF;
-	//material = materialArray.m[materialId];
-	material = materialArray.m[0];
+	uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FF;
+	material = materialArray.m[materialId];
+	//material = materialArray.m[0];
 	//gl_FragColor = texture2D( tex, psUv0 );
 	//gl_FragColor = vec4( 0, 1, 0, 1 );
-	//float v = float(material.indices0_3.y & 0x0000FFFF) * 0.25f;
-	//float v = float(material.indices0_3.y >> 16) * 0.25f;
+	//float v = float(material.indices0_3.x & 0x0000FFFF) * 0.000125f;
+	//float v = material.kD.x;
+	//float v = float(material.indices0_3.x >> 16) * 0.25f;
 	//gl_FragColor = vec4( v, v, v, 1 );
 	//gl_FragColor = vec4( materialArray.m[1].kD.x, materialArray.m[1].kD.y, materialArray.m[1].kD.z, 1 );
-	gl_FragColor = vec4( inPs.normal, 1.0f );
+	//gl_FragColor = vec4( inPs.normal, 1.0f );
+
+	gl_FragColor = texture( textureMaps[0], vec3( inPs.uv0.xy, material.indices0_3.x & 0x0000FFFF ) );
 }
 @end

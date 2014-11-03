@@ -50,28 +50,46 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ConstBufferPool::destroyAllPools(void)
     {
-        BufferPoolVecMap::const_iterator itor = mPools.begin();
-        BufferPoolVecMap::const_iterator end  = mPools.end();
-
-        while( itor != end )
         {
-            BufferPoolVec::const_iterator it = itor->second.begin();
-            BufferPoolVec::const_iterator en = itor->second.end();
+            BufferPoolVecMap::const_iterator itor = mPools.begin();
+            BufferPoolVecMap::const_iterator end  = mPools.end();
 
-            while( it != en )
+            while( itor != end )
             {
-                if( (*it)->materialBuffer )
+                BufferPoolVec::const_iterator it = itor->second.begin();
+                BufferPoolVec::const_iterator en = itor->second.end();
+
+                while( it != en )
                 {
-                    mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
-                    delete *it;
+                    if( (*it)->materialBuffer )
+                    {
+                        mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
+                        delete *it;
+                    }
+                    ++it;
                 }
-                ++it;
+
+                ++itor;
             }
 
-            ++itor;
+            mPools.clear();
         }
 
-        mPools.clear();
+        {
+            ConstBufferPoolUserVec::const_iterator itor = mUsers.begin();
+            ConstBufferPoolUserVec::const_iterator end  = mUsers.end();
+
+            while( itor != end )
+            {
+                (*itor)->mAssignedSlot  = 0;
+                (*itor)->mAssignedPool  = 0;
+                (*itor)->mGlobalIndex   = -1;
+                (*itor)->mDirty         = false;
+                ++itor;
+            }
+
+            mUsers.clear();
+        }
     }
     //-----------------------------------------------------------------------------------
     void ConstBufferPool::requestSlot( uint32 hash, ConstBufferPoolUser *user )
@@ -108,7 +126,10 @@ namespace Ogre
         BufferPool *pool = *itor;
         user->mAssignedSlot = pool->freeSlots.back();
         user->mAssignedPool = pool;
-        user->mPoolOwner    = this;
+        user->mGlobalIndex  = mUsers.size();
+        //user->mPoolOwner    = this;
+
+        mUsers.push_back( user );
 
         pool->freeSlots.pop_back();
 
@@ -136,8 +157,17 @@ namespace Ogre
         pool->freeSlots.push_back( user->mAssignedSlot );
         user->mAssignedSlot = 0;
         user->mAssignedPool = 0;
-        user->mPoolOwner    = 0;
-        user->mDirty        = true;
+        //user->mPoolOwner    = 0;
+        user->mDirty        = false;
+
+        assert( user->mGlobalIndex < mUsers.size() && user == *(mUsers.begin() + user->mGlobalIndex) &&
+                "mGlobalIndex out of date or argument doesn't belong to this pool manager" );
+        ConstBufferPoolUserVec::iterator itor = mUsers.begin() + user->mGlobalIndex;
+        itor = efficientVectorRemove( mUsers, itor );
+
+        //The node that was at the end got swapped and has now a different index
+        if( itor != mUsers.end() )
+            (*itor)->mGlobalIndex = itor - mUsers.begin();
     }
     //-----------------------------------------------------------------------------------
     void ConstBufferPool::scheduleForUpdate( ConstBufferPoolUser *dirtyUser )
@@ -184,7 +214,8 @@ namespace Ogre
     ConstBufferPoolUser::ConstBufferPoolUser() :
         mAssignedSlot( 0 ),
         mAssignedPool( 0 ),
-        mPoolOwner( 0 ),
+        //mPoolOwner( 0 ),
+        mGlobalIndex( -1 ),
         mDirty( false )
     {
     }
