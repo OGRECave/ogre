@@ -158,7 +158,8 @@ namespace Ogre
 
         TexturePtr mBlankTexture;
 
-        static void copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx, uint8 srcBaseMip );
+        static void copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx,
+                                        uint8 srcBaseMip, bool isNormalMap );
         static void copyTextureToAtlas( const Image &srcImage, TexturePtr dst,
                                         uint16 entryIdx, uint16 sqrtMaxTextures,
                                         uint8 srcBaseMip, bool isNormalMap );

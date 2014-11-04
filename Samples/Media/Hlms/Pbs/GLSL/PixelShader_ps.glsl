@@ -203,7 +203,7 @@ void main()
 	nNormal = normalize( inPs.normal );
 @end @property( normal_map )
 	vec3 geomNormal = normalize( inPs.normal );
-	vTangent = normalize( inPs.tangent );
+	vec3 vTangent = normalize( inPs.tangent );
 
 	//Get the TBN matrix
 	vec3 vBinormal	= cross( vTangent, geomNormal )@insertpiece( tbnApplyReflection );

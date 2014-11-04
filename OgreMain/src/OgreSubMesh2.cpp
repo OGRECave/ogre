@@ -481,13 +481,14 @@ namespace Ogre {
                     const Real bias = 1.0f / 32767.0f;
 
                     //Make sure QTangent is always positive
+                    if( qTangent.w < 0 )
+                        qTangent = -qTangent;
+
                     //Because '-0' sign information is lost when using integers,
                     //we need to apply a "bias"; while making sure the Quatenion
                     //stays normalized.
-                    //if( qTangent.w < 0 )
-                    //  qTangent = -qTangent;
-                    //Also our shaders assume qTangent.w is never 0.
-                    if( fabsf( qTangent.w ) < bias )
+                    // ** Also our shaders assume qTangent.w is never 0. **
+                    if( qTangent.w < bias )
                     {
                         Real normFactor = Math::Sqrt( 1 - bias * bias );
                         qTangent.w = bias;

@@ -144,7 +144,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void HlmsTextureManager::copyTextureToArray( const Image &srcImage, TexturePtr dst, uint16 entryIdx,
-                                                 uint8 srcBaseMip )
+                                                 uint8 srcBaseMip, bool isNormalMap )
     {
         //TODO: Deal with mipmaps (& cubemaps & 3D? does it work?). We could have:
         //  * Original image has mipmaps, we use them all
@@ -164,7 +164,10 @@ namespace Ogre
                                                                    pixelBufferBuf->getHeight(),
                                                                    entryIdx + 1 ),
                                                               v1::HardwareBuffer::HBL_DISCARD );
-            PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
+            if( isNormalMap )
+                PixelUtil::convertForNormalMapping( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
+            else
+                PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
             pixelBufferBuf->unlock();
         }
     }
@@ -488,7 +491,8 @@ namespace Ogre
             {
                 if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                 {
-                    copyTextureToArray( image, dstArrayIt->texture, entryIdx, baseMipLevel );
+                    copyTextureToArray( image, dstArrayIt->texture, entryIdx,
+                                        baseMipLevel, dstArrayIt->isNormalMap );
                 }
                 else
                 {
