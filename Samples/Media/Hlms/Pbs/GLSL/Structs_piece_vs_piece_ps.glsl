@@ -45,6 +45,9 @@ layout(binding = 0) uniform PassBuffer
 } pass;
 @end
 
+@property( fresnel_scalar )@piece( FresnelType )vec3@end @piece( FresnelSwizzle )xyz@end @end
+@property( !fresnel_scalar )@piece( FresnelType )float@end @piece( FresnelSwizzle )x@end @end
+
 @piece( MaterialDecl )
 //Uniforms that change per Item/Entity, but change very infrequently
 struct Material

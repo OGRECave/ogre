@@ -1,8 +1,4 @@
-@property( false )
-	/*
-	detail_maps_diffuse & detail_maps_normal are either 0 or 4
-	*/
-@end
+// detail_maps_diffuse & detail_maps_normal are either 0 or 4
 
 @foreach( detail_maps_diffuse, n )
 	@property( detail_offsetsD@n )
@@ -20,16 +16,14 @@
 @piece( detail_swizzle2 )z@end;
 @piece( detail_swizzle3 )w@end;
 
+/*
+Down below we perform:
+	if( detail_maps_normal )
+		second_valid_detail_map_nm = first_valid_detail_map_nm + 1;
+	else
+		second_valid_detail_map_nm = 0;
+*/
 @property( detail_maps_normal )
-	@property( false )
-		/*
-		Down below we perform:
-			if( detail_maps_normal )
-				second_valid_detail_map_nm = first_valid_detail_map_nm + 1;
-			else
-				second_valid_detail_map_nm = 0;
-		*/
-	@end
 	@add( second_valid_detail_map_nm, first_valid_detail_map_nm, 1 )
 @end @property( !detail_maps_normal )
 	@set( second_valid_detail_map_nm, 0 )
