@@ -238,7 +238,7 @@ namespace Ogre
             }
             else
             {
-                OCGE( glBufferData( GL_ARRAY_BUFFER, mDefaultPoolSize[vboFlag], 0,
+                OCGE( glBufferData( GL_ARRAY_BUFFER, poolSize, 0,
                                      vboFlag == CPU_INACCESSIBLE ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW ) );
             }
             OCGE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
