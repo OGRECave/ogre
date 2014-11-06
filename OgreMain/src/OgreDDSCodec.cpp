@@ -899,9 +899,9 @@ namespace Ogre {
                 else
                 {
                     // Note: We assume the source and destination have the same pitch
-                    for (size_t z = 0; z < imgData->depth; ++z)
+                    for (size_t z = 0; z < depth; ++z)
                     {
-                        for (size_t y = 0; y < imgData->height; ++y)
+                        for (size_t y = 0; y < height; ++y)
                         {
                             stream->read(destPtr, dstPitch);
                             destPtr = static_cast<void*>(static_cast<uchar*>(destPtr) + dstPitch);
