@@ -188,7 +188,7 @@ void Java_org_ogre3d_android_OgreActivityJNI_initWindow(JNIEnv * env, jobject ob
 
     if (!gRenderWnd) {
         Ogre::NameValuePairList opt;
-        opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)nativeWnd);
+        opt["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(nativeWnd));
         gRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
 
         if (!pSceneMgr) {
