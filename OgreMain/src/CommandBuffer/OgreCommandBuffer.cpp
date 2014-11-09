@@ -99,12 +99,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CbBase* CommandBuffer::getCommandFromOffset( size_t offset )
     {
-        assert( !(offset % COMMAND_FIXED_SIZE) );
-
         CbBase *retVal = 0;
 
         if( offset < mCommandBuffer.size() )
+        {
+            assert( !(offset % COMMAND_FIXED_SIZE) );
             retVal = reinterpret_cast<CbBase*>( mCommandBuffer.begin() + offset );
+        }
 
         return retVal;
     }
