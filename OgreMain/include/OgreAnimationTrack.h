@@ -342,6 +342,21 @@ namespace Ogre
 		*/
 		virtual TransformKeyFrame* createNodeKeyFrame(Real timePos);
 
+        /** Set the initial state of the node for this animation track
+        @remarks
+            Node tracks are based from an initial state, which the node is set to every frame before the node animation is applied
+            Most 3D model exporters base each animation frame from a 0 transform, which is the defaults. 
+            However in some situations you may want to change this.
+        @param position     The initial position to set
+        @param orientation  The initial orientation to set
+        @param scale        The initial scale to set
+        */
+        void setInitialState(const Vector3& position, const Quaternion orientation, const Vector3& scale);
+
+		/** Resets the the target node to the initial state
+		@remarks 
+			This is called everyframe before the animation is applied. @See setInitialState
+		*/
 		void resetNodeToInitialState(void);
 
 		/** Returns a pointer to the associated OldNode object (if any). */
