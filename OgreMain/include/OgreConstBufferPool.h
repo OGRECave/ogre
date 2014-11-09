@@ -78,6 +78,8 @@ namespace Ogre
 
         void destroyAllPools(void);
 
+        void uploadDirtyDatablocks( size_t materialSizeInGpu );
+
     public:
         ConstBufferPool( uint32 bytesPerSlot );
         virtual ~ConstBufferPool();
@@ -105,6 +107,10 @@ namespace Ogre
         size_t                      mGlobalIndex;
         //ConstBufferPool             *mPoolOwner;
         bool                        mDirty;
+
+        /// Derived class must fill dstPtr. Amount of bytes written can't
+        /// exceed the value passed to ConstBufferPool::uploadDirtyDatablocks
+        virtual void uploadToConstBuffer( char *dstPtr ) = 0;
 
     public:
         ConstBufferPoolUser();

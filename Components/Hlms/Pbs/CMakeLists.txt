@@ -24,5 +24,5 @@ ogre_config_framework(OgreHlmsPbs)
 ogre_config_component(OgreHlmsPbs)
 
 install(FILES ${HEADER_FILES}
-  DESTINATION include/OGRE/Hlms/PbsMobile
+  DESTINATION include/OGRE/Hlms/Pbs
 )

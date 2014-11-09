@@ -56,8 +56,6 @@ namespace Ogre
                                         const HlmsBlendblock *blendblock,
                                         const HlmsParamVec &params ) :
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
-        mConstBuffer( 0 ),
-        mBufferOffset( 0 ),
         mFresnelTypeSizeBytes( 4 ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         _padding0( 0 ),
@@ -308,10 +306,9 @@ namespace Ogre
         static_cast<HlmsPbs*>(mCreator)->scheduleForUpdate( this );
     }
     //-----------------------------------------------------------------------------------
-    char* HlmsPbsDatablock::uploadToConstBuffer( char *dstPtr )
+    void HlmsPbsDatablock::uploadToConstBuffer( char *dstPtr )
     {
         memcpy( dstPtr, &mkDr, MaterialSizeInGpu );
-        return dstPtr + MaterialSizeInGpuAligned;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::decompileBakedTextures( PbsBakedTexture outTextures[NUM_PBSM_TEXTURE_TYPES] )
@@ -390,6 +387,7 @@ namespace Ogre
         mkDr = diffuseColour.x * invPI;
         mkDg = diffuseColour.y * invPI;
         mkDb = diffuseColour.z * invPI;
+        scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setIndexOfRefraction( const Vector3 &refractionIdx,
@@ -463,7 +461,7 @@ namespace Ogre
             }
 
             HlmsManager *hlmsManager = mCreator->getHlmsManager();
-            mSamplerblocks[texType] = hlmsManager->getSamplerblock( *refParams );
+            mSamplerblocks[texType] = hlmsManager->getSamplerblock( samplerBlockRef );
         }
 
         PbsBakedTexture oldTex = textures[texType];

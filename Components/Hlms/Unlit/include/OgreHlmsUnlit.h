@@ -25,10 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreHlmsPbs_H_
-#define _OgreHlmsPbs_H_
+#ifndef _OgreHlmsUnlit_H_
+#define _OgreHlmsUnlit_H_
 
-#include "OgreHlmsPbsPrerequisites.h"
+#include "OgreHlmsUnlitPrerequisites.h"
 #include "OgreHlms.h"
 #include "OgreConstBufferPool.h"
 #include "OgreHeaderPrefix.h"
@@ -45,12 +45,12 @@ namespace Ogre
     *  @{
     */
 
-    class HlmsPbsDatablock;
+    class HlmsUnlitDatablock;
 
     /** Physically based shading implementation specfically designed for OpenGL ES 2.0 and other
         RenderSystems which do not support uniform buffers.
     */
-    class _OgreHlmsPbsExport HlmsPbs : public Hlms, public ConstBufferPool
+    class _OgreHlmsUnlitExport HlmsUnlit : public Hlms, public ConstBufferPool
     {
         typedef vector<ConstBufferPacked*>::type ConstBufferPackedVec;
         typedef vector<TexBufferPacked*>::type TexBufferPackedVec;
@@ -58,18 +58,11 @@ namespace Ogre
 
         struct PassData
         {
-            FastArray<TexturePtr>   shadowMaps;
-            FastArray<float>    vertexShaderSharedBuffer;
-            FastArray<float>    pixelShaderSharedBuffer;
-
             Matrix4 viewProjMatrix;
-            Matrix4 viewMatrix;
         };
 
         PassData                mPreparedPass;
-        ConstBufferPackedVec    mPassBuffers;
 
-        uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
         uint32                  mCurrentConstBuffer;    /// Resets every to zero every new frame.
         uint32                  mCurrentTexBuffer;      /// Resets every to zero every new frame.
         ConstBufferPackedVec    mConstBuffers;
@@ -103,12 +96,10 @@ namespace Ogre
                                                     const HlmsBlendblock *blendblock,
                                                     const HlmsParamVec &paramVec );
 
-        void setDetailMapProperties( HlmsPbsDatablock *datablock, PiecesMap *inOutPieces );
-        void setTextureProperty( IdString propertyName, HlmsPbsDatablock *datablock,
-                                 PbsTextureTypes texType );
+        void setTextureProperty( IdString propertyName, HlmsUnlitDatablock *datablock,
+                                 uint8 texType );
 
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
-        virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );
 
         /// For compatibility reasons with D3D11 and GLES3, Const buffers are mapped.
         /// Once we're done with it (even if we didn't fully use it) we discard it
@@ -139,8 +130,8 @@ namespace Ogre
         void destroyAllBuffers(void);
 
     public:
-        HlmsPbs( Archive *dataFolder );
-        ~HlmsPbs();
+        HlmsUnlit( Archive *dataFolder );
+        ~HlmsUnlit();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
 
@@ -166,82 +157,97 @@ namespace Ogre
         void setTextureBufferDefaultSize( size_t defaultSize );
     };
 
-    struct _OgreHlmsPbsExport PbsProperty
+    struct _OgreHlmsUnlitExport UnlitProperty
     {
         static const IdString HwGammaRead;
         static const IdString HwGammaWrite;
         static const IdString SignedIntTex;
         static const IdString MaterialsPerBuffer;
+        static const IdString AnimationMatricesPerBuffer;
 
+        static const IdString TexMatrixCount;
+        static const IdString TexMatrixCount0;
+        static const IdString TexMatrixCount1;
+        static const IdString TexMatrixCount2;
+        static const IdString TexMatrixCount3;
+        static const IdString TexMatrixCount4;
+        static const IdString TexMatrixCount5;
+        static const IdString TexMatrixCount6;
+        static const IdString TexMatrixCount7;
+
+        /// Whether uses material's colour.
+        static const IdString Diffuse;
+
+        /// Number of texture arrays actually baked.
         static const IdString NumTextures;
+
+        /// Number of diffuse maps.
         static const IdString DiffuseMap;
-        static const IdString NormalMapTex;
-        static const IdString SpecularMap;
-        static const IdString RoughnessMap;
-        static const IdString EnvProbeMap;
-        static const IdString DetailWeightMap;
-        static const IdString DetailMap0;
-        static const IdString DetailMap1;
-        static const IdString DetailMap2;
-        static const IdString DetailMap3;
-        static const IdString DetailMapNm0;
-        static const IdString DetailMapNm1;
-        static const IdString DetailMapNm2;
-        static const IdString DetailMapNm3;
 
-        static const IdString NormalMap;
+        //static const IdString DiffuseMap0;
 
-        static const IdString FresnelScalar;
+        /// UV source # assigned to each texture.
+        static const IdString UvDiffuse0;
+        static const IdString UvDiffuse1;
+        static const IdString UvDiffuse2;
+        static const IdString UvDiffuse3;
+        static const IdString UvDiffuse4;
+        static const IdString UvDiffuse5;
+        static const IdString UvDiffuse6;
+        static const IdString UvDiffuse7;
+        static const IdString UvDiffuse8;
+        static const IdString UvDiffuse9;
+        static const IdString UvDiffuse10;
+        static const IdString UvDiffuse11;
+        static const IdString UvDiffuse12;
+        static const IdString UvDiffuse13;
+        static const IdString UvDiffuse14;
+        static const IdString UvDiffuse15;
 
-        static const IdString NormalWeight;
-        static const IdString NormalWeightTex;
-        static const IdString NormalWeightDetail0;
-        static const IdString NormalWeightDetail1;
-        static const IdString NormalWeightDetail2;
-        static const IdString NormalWeightDetail3;
-
-        static const IdString DetailWeights;
-        static const IdString DetailOffsetsD0;
-        static const IdString DetailOffsetsD1;
-        static const IdString DetailOffsetsD2;
-        static const IdString DetailOffsetsD3;
-        static const IdString DetailOffsetsN0;
-        static const IdString DetailOffsetsN1;
-        static const IdString DetailOffsetsN2;
-        static const IdString DetailOffsetsN3;
-
-        static const IdString UvDiffuse;
-        static const IdString UvNormal;
-        static const IdString UvSpecular;
-        static const IdString UvRoughness;
-        static const IdString UvDetailWeight;
-
-        static const IdString UvDetail0;
-        static const IdString UvDetail1;
-        static const IdString UvDetail2;
-        static const IdString UvDetail3;
-
-        static const IdString UvDetailNm0;
-        static const IdString UvDetailNm1;
-        static const IdString UvDetailNm2;
-        static const IdString UvDetailNm3;
-
-        static const IdString DetailMapsDiffuse;
-        static const IdString DetailMapsNormal;
-        static const IdString FirstValidDetailMapNm;
+        static const IdString UvDiffuseSwizzle0;
+        static const IdString UvDiffuseSwizzle1;
+        static const IdString UvDiffuseSwizzle2;
+        static const IdString UvDiffuseSwizzle3;
+        static const IdString UvDiffuseSwizzle4;
+        static const IdString UvDiffuseSwizzle5;
+        static const IdString UvDiffuseSwizzle6;
+        static const IdString UvDiffuseSwizzle7;
+        static const IdString UvDiffuseSwizzle8;
+        static const IdString UvDiffuseSwizzle9;
+        static const IdString UvDiffuseSwizzle10;
+        static const IdString UvDiffuseSwizzle11;
+        static const IdString UvDiffuseSwizzle12;
+        static const IdString UvDiffuseSwizzle13;
+        static const IdString UvDiffuseSwizzle14;
+        static const IdString UvDiffuseSwizzle15;
 
         static const IdString BlendModeIndex0;
         static const IdString BlendModeIndex1;
         static const IdString BlendModeIndex2;
         static const IdString BlendModeIndex3;
+        static const IdString BlendModeIndex4;
+        static const IdString BlendModeIndex5;
+        static const IdString BlendModeIndex6;
+        static const IdString BlendModeIndex7;
+        static const IdString BlendModeIndex8;
+        static const IdString BlendModeIndex9;
+        static const IdString BlendModeIndex10;
+        static const IdString BlendModeIndex11;
+        static const IdString BlendModeIndex12;
+        static const IdString BlendModeIndex13;
+        static const IdString BlendModeIndex14;
+        static const IdString BlendModeIndex15;
 
-        static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
-        static const IdString *BlendModes[4];
-        static const IdString *DetailNormalWeights[4];
-        static const IdString *DetailOffsetsDPtrs[4];
-        static const IdString *DetailOffsetsNPtrs[4];
-        static const IdString *DetailMaps[4];
-        static const IdString *DetailMapsNm[4];
+        static const IdString OutUvCount;
+
+        struct DiffuseMapPtr
+        {
+            IdString const *uvSource;
+            IdString const *uvSourceSwizzle;
+            IdString const *blendModeIndex;
+        };
+
+        static const DiffuseMapPtr DiffuseMapPtrs[NUM_UNLIT_TEXTURE_TYPES];
     };
 
     /** @} */

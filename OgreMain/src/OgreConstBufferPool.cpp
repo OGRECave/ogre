@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreConstBufferPool.h"
 
 #include "Vao/OgreVaoManager.h"
+#include "Vao/OgreStagingBuffer.h"
+#include "Vao/OgreConstBufferPacked.h"
 #include "OgreRenderSystem.h"
 
 namespace Ogre
@@ -90,6 +92,63 @@ namespace Ogre
 
             mUsers.clear();
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void ConstBufferPool::uploadDirtyDatablocks( size_t materialSizeInGpu )
+    {
+        if( mDirtyUsers.empty() )
+            return;
+
+        std::sort( mDirtyUsers.begin(), mDirtyUsers.end(), OrderConstBufferPoolUserByPoolThenSlot );
+
+        size_t uploadSize = materialSizeInGpu * mDirtyUsers.size();
+        StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( uploadSize, true );
+
+        StagingBuffer::DestinationVec destinations;
+
+        ConstBufferPoolUserVec::const_iterator itor = mDirtyUsers.begin();
+        ConstBufferPoolUserVec::const_iterator end  = mDirtyUsers.end();
+
+        char *bufferStart = reinterpret_cast<char*>( stagingBuffer->map( uploadSize ) );
+        char *data = bufferStart;
+
+        while( itor != end )
+        {
+            size_t srcOffset = static_cast<size_t>( data - bufferStart );
+            size_t dstOffset = (*itor)->getAssignedSlot() * materialSizeInGpu;
+
+            (*itor)->uploadToConstBuffer( data );
+            data += materialSizeInGpu;
+
+            StagingBuffer::Destination dst( (*itor)->getAssignedPool()->materialBuffer, dstOffset,
+                                            srcOffset, materialSizeInGpu );
+
+            if( !destinations.empty() )
+            {
+                StagingBuffer::Destination &lastElement = destinations.back();
+
+                if( lastElement.destination == dst.destination &&
+                    (lastElement.dstOffset + lastElement.length == dst.dstOffset) )
+                {
+                    lastElement.length += dst.length;
+                }
+                else
+                {
+                    destinations.push_back( dst );
+                }
+            }
+            else
+            {
+                destinations.push_back( dst );
+            }
+
+            ++itor;
+        }
+
+        stagingBuffer->unmap( destinations );
+        stagingBuffer->removeReferenceCount();
+
+        mDirtyUsers.clear();
     }
     //-----------------------------------------------------------------------------------
     void ConstBufferPool::requestSlot( uint32 hash, ConstBufferPoolUser *user )

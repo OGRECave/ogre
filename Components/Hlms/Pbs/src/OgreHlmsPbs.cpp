@@ -41,7 +41,6 @@ THE SOFTWARE.
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreConstBufferPacked.h"
 #include "Vao/OgreTexBufferPacked.h"
-#include "Vao/OgreStagingBuffer.h"
 
 #include "CommandBuffer/OgreCommandBuffer.h"
 #include "CommandBuffer/OgreCbTexture.h"
@@ -459,64 +458,6 @@ namespace Ogre
         inOutPieces[PixelShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::uploadDirtyDatablocks(void)
-    {
-        if( mDirtyUsers.empty() )
-            return;
-
-        std::sort( mDirtyUsers.begin(), mDirtyUsers.end(), OrderConstBufferPoolUserByPoolThenSlot );
-
-        size_t uploadSize = HlmsPbsDatablock::MaterialSizeInGpuAligned * mDirtyUsers.size();
-        StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( uploadSize, true );
-
-        StagingBuffer::DestinationVec destinations;
-
-        ConstBufferPoolUserVec::const_iterator itor = mDirtyUsers.begin();
-        ConstBufferPoolUserVec::const_iterator end  = mDirtyUsers.end();
-
-        char *bufferStart = reinterpret_cast<char*>( stagingBuffer->map( uploadSize ) );
-        char *data = bufferStart;
-
-        while( itor != end )
-        {
-            HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>(*itor);
-
-            size_t srcOffset = static_cast<size_t>( data - bufferStart );
-            size_t dstOffset = datablock->getAssignedSlot() * HlmsPbsDatablock::MaterialSizeInGpuAligned;
-
-            data = datablock->uploadToConstBuffer( data );
-
-            StagingBuffer::Destination dst( datablock->getAssignedPool()->materialBuffer, dstOffset,
-                                            srcOffset, HlmsPbsDatablock::MaterialSizeInGpuAligned );
-
-            if( !destinations.empty() )
-            {
-                StagingBuffer::Destination &lastElement = destinations.back();
-
-                if( lastElement.destination == dst.destination &&
-                    (lastElement.dstOffset + lastElement.length == dst.dstOffset) )
-                {
-                    lastElement.length += dst.length;
-                }
-                else
-                {
-                    destinations.push_back( dst );
-                }
-            }
-            else
-            {
-                destinations.push_back( dst );
-            }
-
-            ++itor;
-        }
-
-        stagingBuffer->unmap( destinations );
-        stagingBuffer->removeReferenceCount();
-
-        mDirtyUsers.clear();
-    }
-    //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbs::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                         bool dualParaboloid, SceneManager *sceneManager )
     {
@@ -799,7 +740,7 @@ namespace Ogre
 
         mLastBoundPool = 0;
 
-        uploadDirtyDatablocks();
+        uploadDirtyDatablocks( HlmsPbsDatablock::MaterialSizeInGpuAligned );
 
         return retVal;
     }
@@ -850,6 +791,8 @@ namespace Ogre
             }
 
             mLastTextureHash = 0;
+            mLastBoundPool = 0;
+            rebindTexBuffer( commandBuffer );
         }
 
         if( mLastBoundPool != datablock->getAssignedPool() )
@@ -942,14 +885,15 @@ namespace Ogre
             {
                 //Rebind textures
                 size_t texUnit = mPreparedPass.shadowMaps.size() + 1;
-                for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+
+                PbsBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
+                PbsBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();
+
+                while( itor != end )
                 {
-                    const TexturePtr &texturePtr = datablock->getTexture( i );
-                    if( !texturePtr.isNull() )
-                    {
-                        *commandBuffer->addCommand<CbTexture>() =
-                                CbTexture( texUnit++, true, texturePtr.get(), datablock->mSamplerblocks[i] );
-                    }
+                    *commandBuffer->addCommand<CbTexture>() =
+                            CbTexture( texUnit++, true, itor->texture.get(), itor->samplerBlock );
+                    ++itor;
                 }
 
                 *commandBuffer->addCommand<CbTextureDisableFrom>() = CbTextureDisableFrom( texUnit );
@@ -1066,6 +1010,24 @@ namespace Ogre
         mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
 
         return mStartMappedTexBuffer;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::rebindTexBuffer( CommandBuffer *commandBuffer )
+    {
+        //Set the binding size of the old binding command (if exists)
+        CbShaderBuffer *shaderBufferCmd = reinterpret_cast<CbShaderBuffer*>(
+                    commandBuffer->getCommandFromOffset( mLastTexBufferCmdOffset ) );
+        if( shaderBufferCmd )
+        {
+            assert( shaderBufferCmd->bufferPacked == mTexBuffers[mCurrentTexBuffer] );
+            shaderBufferCmd->bindSizeBytes = (mCurrentMappedTexBuffer - mStartMappedTexBuffer) *
+                                                sizeof(float);
+        }
+
+        //Add a new binding command.
+        shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
+        *shaderBufferCmd = CbShaderBuffer( 0, mTexBuffers[mCurrentTexBuffer], 0, 0 );
+        mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbs::destroyAllBuffers(void)

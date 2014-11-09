@@ -66,9 +66,6 @@ namespace Ogre
     {
         friend class HlmsPbs;
     protected:
-        ConstBufferPacked   *mConstBuffer;
-        size_t              mBufferOffset;
-
         /// [0] = Regular one.
         /// [1] = Used during shadow mapping
         //uint16  mFullParametersBytes[2];
@@ -96,7 +93,7 @@ namespace Ogre
         HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
 
         void scheduleConstBufferUpdate(void);
-        char* uploadToConstBuffer( char *dstPtr );
+        virtual void uploadToConstBuffer( char *dstPtr );
         void bakeVariableParameters(void);
 
         /// Sets the appropiate mTexIndices[textureMapType], and returns the texture pointer

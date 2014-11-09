@@ -41,120 +41,120 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const IdString UnlitMobileProp::PropertyTexMatrixCount      = IdString( "hlms_texture_matrix_count" );
-    const IdString UnlitMobileProp::PropertyTexMatrixCount0     = IdString( "hlms_texture_matrix_count0" );
-    const IdString UnlitMobileProp::PropertyTexMatrixCount1     = IdString( "hlms_texture_matrix_count1" );
-    const IdString UnlitMobileProp::PropertyTexMatrixCount2     = IdString( "hlms_texture_matrix_count2" );
-    const IdString UnlitMobileProp::PropertyTexMatrixCount3     = IdString( "hlms_texture_matrix_count3" );
-    const IdString UnlitMobileProp::PropertyTexMatrixCount4     = IdString( "hlms_texture_matrix_count4" );
-    const IdString UnlitMobileProp::PropertyTexMatrixCount5     = IdString( "hlms_texture_matrix_count5" );
-    const IdString UnlitMobileProp::PropertyTexMatrixCount6     = IdString( "hlms_texture_matrix_count6" );
-    const IdString UnlitMobileProp::PropertyTexMatrixCount7     = IdString( "hlms_texture_matrix_count7" );
+    const IdString UnlitMobileProp::TexMatrixCount      = IdString( "hlms_texture_matrix_count" );
+    const IdString UnlitMobileProp::TexMatrixCount0     = IdString( "hlms_texture_matrix_count0" );
+    const IdString UnlitMobileProp::TexMatrixCount1     = IdString( "hlms_texture_matrix_count1" );
+    const IdString UnlitMobileProp::TexMatrixCount2     = IdString( "hlms_texture_matrix_count2" );
+    const IdString UnlitMobileProp::TexMatrixCount3     = IdString( "hlms_texture_matrix_count3" );
+    const IdString UnlitMobileProp::TexMatrixCount4     = IdString( "hlms_texture_matrix_count4" );
+    const IdString UnlitMobileProp::TexMatrixCount5     = IdString( "hlms_texture_matrix_count5" );
+    const IdString UnlitMobileProp::TexMatrixCount6     = IdString( "hlms_texture_matrix_count6" );
+    const IdString UnlitMobileProp::TexMatrixCount7     = IdString( "hlms_texture_matrix_count7" );
 
-    const IdString UnlitMobileProp::DiffuseMap                  = IdString( "diffuse_map" );
+    const IdString UnlitMobileProp::DiffuseMap          = IdString( "diffuse_map" );
 
-    const IdString UnlitMobileProp::PropertyDiffuse             = IdString( "diffuse" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount0    = IdString( "diffuse_map_count0" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount1    = IdString( "diffuse_map_count1" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount2    = IdString( "diffuse_map_count2" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount3    = IdString( "diffuse_map_count3" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount4    = IdString( "diffuse_map_count4" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount5    = IdString( "diffuse_map_count5" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount6    = IdString( "diffuse_map_count6" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount7    = IdString( "diffuse_map_count7" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount8    = IdString( "diffuse_map_count8" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount9    = IdString( "diffuse_map_count9" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount10   = IdString( "diffuse_map_count10" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount11   = IdString( "diffuse_map_count11" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount12   = IdString( "diffuse_map_count12" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount13   = IdString( "diffuse_map_count13" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount14   = IdString( "diffuse_map_count14" );
-    const IdString UnlitMobileProp::PropertyDiffuseMapCount15   = IdString( "diffuse_map_count15" );
+    const IdString UnlitMobileProp::Diffuse             = IdString( "diffuse" );
+    const IdString UnlitMobileProp::DiffuseMapCount0    = IdString( "diffuse_map_count0" );
+    const IdString UnlitMobileProp::DiffuseMapCount1    = IdString( "diffuse_map_count1" );
+    const IdString UnlitMobileProp::DiffuseMapCount2    = IdString( "diffuse_map_count2" );
+    const IdString UnlitMobileProp::DiffuseMapCount3    = IdString( "diffuse_map_count3" );
+    const IdString UnlitMobileProp::DiffuseMapCount4    = IdString( "diffuse_map_count4" );
+    const IdString UnlitMobileProp::DiffuseMapCount5    = IdString( "diffuse_map_count5" );
+    const IdString UnlitMobileProp::DiffuseMapCount6    = IdString( "diffuse_map_count6" );
+    const IdString UnlitMobileProp::DiffuseMapCount7    = IdString( "diffuse_map_count7" );
+    const IdString UnlitMobileProp::DiffuseMapCount8    = IdString( "diffuse_map_count8" );
+    const IdString UnlitMobileProp::DiffuseMapCount9    = IdString( "diffuse_map_count9" );
+    const IdString UnlitMobileProp::DiffuseMapCount10   = IdString( "diffuse_map_count10" );
+    const IdString UnlitMobileProp::DiffuseMapCount11   = IdString( "diffuse_map_count11" );
+    const IdString UnlitMobileProp::DiffuseMapCount12   = IdString( "diffuse_map_count12" );
+    const IdString UnlitMobileProp::DiffuseMapCount13   = IdString( "diffuse_map_count13" );
+    const IdString UnlitMobileProp::DiffuseMapCount14   = IdString( "diffuse_map_count14" );
+    const IdString UnlitMobileProp::DiffuseMapCount15   = IdString( "diffuse_map_count15" );
 
-    const IdString UnlitMobileProp::PropertyBlendModeIdx0       = IdString( "blend_mode_idx0" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx1       = IdString( "blend_mode_idx1" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx2       = IdString( "blend_mode_idx2" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx3       = IdString( "blend_mode_idx3" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx4       = IdString( "blend_mode_idx4" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx5       = IdString( "blend_mode_idx5" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx6       = IdString( "blend_mode_idx6" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx7       = IdString( "blend_mode_idx7" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx8       = IdString( "blend_mode_idx8" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx9       = IdString( "blend_mode_idx9" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx10      = IdString( "blend_mode_idx10" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx11      = IdString( "blend_mode_idx11" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx12      = IdString( "blend_mode_idx12" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx13      = IdString( "blend_mode_idx13" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx14      = IdString( "blend_mode_idx14" );
-    const IdString UnlitMobileProp::PropertyBlendModeIdx15      = IdString( "blend_mode_idx15" );
+    const IdString UnlitMobileProp::BlendModeIdx0       = IdString( "blend_mode_idx0" );
+    const IdString UnlitMobileProp::BlendModeIdx1       = IdString( "blend_mode_idx1" );
+    const IdString UnlitMobileProp::BlendModeIdx2       = IdString( "blend_mode_idx2" );
+    const IdString UnlitMobileProp::BlendModeIdx3       = IdString( "blend_mode_idx3" );
+    const IdString UnlitMobileProp::BlendModeIdx4       = IdString( "blend_mode_idx4" );
+    const IdString UnlitMobileProp::BlendModeIdx5       = IdString( "blend_mode_idx5" );
+    const IdString UnlitMobileProp::BlendModeIdx6       = IdString( "blend_mode_idx6" );
+    const IdString UnlitMobileProp::BlendModeIdx7       = IdString( "blend_mode_idx7" );
+    const IdString UnlitMobileProp::BlendModeIdx8       = IdString( "blend_mode_idx8" );
+    const IdString UnlitMobileProp::BlendModeIdx9       = IdString( "blend_mode_idx9" );
+    const IdString UnlitMobileProp::BlendModeIdx10      = IdString( "blend_mode_idx10" );
+    const IdString UnlitMobileProp::BlendModeIdx11      = IdString( "blend_mode_idx11" );
+    const IdString UnlitMobileProp::BlendModeIdx12      = IdString( "blend_mode_idx12" );
+    const IdString UnlitMobileProp::BlendModeIdx13      = IdString( "blend_mode_idx13" );
+    const IdString UnlitMobileProp::BlendModeIdx14      = IdString( "blend_mode_idx14" );
+    const IdString UnlitMobileProp::BlendModeIdx15      = IdString( "blend_mode_idx15" );
 
-    const IdString UnlitMobileProp::PropertyUvAtlas             = IdString( "uv_atlas" );
-    const IdString UnlitMobileProp::PropertyUvAtlas0            = IdString( "uv_atlas0" );
-    const IdString UnlitMobileProp::PropertyUvAtlas1            = IdString( "uv_atlas1" );
-    const IdString UnlitMobileProp::PropertyUvAtlas2            = IdString( "uv_atlas2" );
-    const IdString UnlitMobileProp::PropertyUvAtlas3            = IdString( "uv_atlas3" );
-    const IdString UnlitMobileProp::PropertyUvAtlas4            = IdString( "uv_atlas4" );
-    const IdString UnlitMobileProp::PropertyUvAtlas5            = IdString( "uv_atlas5" );
-    const IdString UnlitMobileProp::PropertyUvAtlas6            = IdString( "uv_atlas6" );
-    const IdString UnlitMobileProp::PropertyUvAtlas7            = IdString( "uv_atlas7" );
-    const IdString UnlitMobileProp::PropertyUvAtlas8            = IdString( "uv_atlas8" );
-    const IdString UnlitMobileProp::PropertyUvAtlas9            = IdString( "uv_atlas9" );
-    const IdString UnlitMobileProp::PropertyUvAtlas10           = IdString( "uv_atlas10" );
-    const IdString UnlitMobileProp::PropertyUvAtlas11           = IdString( "uv_atlas11" );
-    const IdString UnlitMobileProp::PropertyUvAtlas12           = IdString( "uv_atlas12" );
-    const IdString UnlitMobileProp::PropertyUvAtlas13           = IdString( "uv_atlas13" );
-    const IdString UnlitMobileProp::PropertyUvAtlas14           = IdString( "uv_atlas14" );
-    const IdString UnlitMobileProp::PropertyUvAtlas15           = IdString( "uv_atlas15" );
+    const IdString UnlitMobileProp::UvAtlas             = IdString( "uv_atlas" );
+    const IdString UnlitMobileProp::UvAtlas0            = IdString( "uv_atlas0" );
+    const IdString UnlitMobileProp::UvAtlas1            = IdString( "uv_atlas1" );
+    const IdString UnlitMobileProp::UvAtlas2            = IdString( "uv_atlas2" );
+    const IdString UnlitMobileProp::UvAtlas3            = IdString( "uv_atlas3" );
+    const IdString UnlitMobileProp::UvAtlas4            = IdString( "uv_atlas4" );
+    const IdString UnlitMobileProp::UvAtlas5            = IdString( "uv_atlas5" );
+    const IdString UnlitMobileProp::UvAtlas6            = IdString( "uv_atlas6" );
+    const IdString UnlitMobileProp::UvAtlas7            = IdString( "uv_atlas7" );
+    const IdString UnlitMobileProp::UvAtlas8            = IdString( "uv_atlas8" );
+    const IdString UnlitMobileProp::UvAtlas9            = IdString( "uv_atlas9" );
+    const IdString UnlitMobileProp::UvAtlas10           = IdString( "uv_atlas10" );
+    const IdString UnlitMobileProp::UvAtlas11           = IdString( "uv_atlas11" );
+    const IdString UnlitMobileProp::UvAtlas12           = IdString( "uv_atlas12" );
+    const IdString UnlitMobileProp::UvAtlas13           = IdString( "uv_atlas13" );
+    const IdString UnlitMobileProp::UvAtlas14           = IdString( "uv_atlas14" );
+    const IdString UnlitMobileProp::UvAtlas15           = IdString( "uv_atlas15" );
 
     extern const String c_blendModes[];
 
     const IdString *DiffuseMapCountPtrs[16][3] =
     {
-        { &UnlitMobileProp::PropertyDiffuseMapCount0, &UnlitMobileProp::PropertyBlendModeIdx0,
-          &UnlitMobileProp::PropertyUvAtlas0 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount1, &UnlitMobileProp::PropertyBlendModeIdx1,
-          &UnlitMobileProp::PropertyUvAtlas1 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount2, &UnlitMobileProp::PropertyBlendModeIdx2,
-          &UnlitMobileProp::PropertyUvAtlas2 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount3, &UnlitMobileProp::PropertyBlendModeIdx3,
-          &UnlitMobileProp::PropertyUvAtlas3 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount4, &UnlitMobileProp::PropertyBlendModeIdx4,
-          &UnlitMobileProp::PropertyUvAtlas4 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount5, &UnlitMobileProp::PropertyBlendModeIdx5,
-          &UnlitMobileProp::PropertyUvAtlas5 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount6, &UnlitMobileProp::PropertyBlendModeIdx6,
-          &UnlitMobileProp::PropertyUvAtlas6 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount7, &UnlitMobileProp::PropertyBlendModeIdx7,
-          &UnlitMobileProp::PropertyUvAtlas7 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount8, &UnlitMobileProp::PropertyBlendModeIdx8,
-          &UnlitMobileProp::PropertyUvAtlas8 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount9, &UnlitMobileProp::PropertyBlendModeIdx9,
-          &UnlitMobileProp::PropertyUvAtlas9 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount10, &UnlitMobileProp::PropertyBlendModeIdx10,
-          &UnlitMobileProp::PropertyUvAtlas10 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount11, &UnlitMobileProp::PropertyBlendModeIdx11,
-          &UnlitMobileProp::PropertyUvAtlas11 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount12, &UnlitMobileProp::PropertyBlendModeIdx12,
-          &UnlitMobileProp::PropertyUvAtlas12 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount13, &UnlitMobileProp::PropertyBlendModeIdx13,
-          &UnlitMobileProp::PropertyUvAtlas13 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount14, &UnlitMobileProp::PropertyBlendModeIdx14,
-          &UnlitMobileProp::PropertyUvAtlas14 },
-        { &UnlitMobileProp::PropertyDiffuseMapCount15, &UnlitMobileProp::PropertyBlendModeIdx15,
-          &UnlitMobileProp::PropertyUvAtlas15 },
+        { &UnlitMobileProp::DiffuseMapCount0, &UnlitMobileProp::BlendModeIdx0,
+          &UnlitMobileProp::UvAtlas0 },
+        { &UnlitMobileProp::DiffuseMapCount1, &UnlitMobileProp::BlendModeIdx1,
+          &UnlitMobileProp::UvAtlas1 },
+        { &UnlitMobileProp::DiffuseMapCount2, &UnlitMobileProp::BlendModeIdx2,
+          &UnlitMobileProp::UvAtlas2 },
+        { &UnlitMobileProp::DiffuseMapCount3, &UnlitMobileProp::BlendModeIdx3,
+          &UnlitMobileProp::UvAtlas3 },
+        { &UnlitMobileProp::DiffuseMapCount4, &UnlitMobileProp::BlendModeIdx4,
+          &UnlitMobileProp::UvAtlas4 },
+        { &UnlitMobileProp::DiffuseMapCount5, &UnlitMobileProp::BlendModeIdx5,
+          &UnlitMobileProp::UvAtlas5 },
+        { &UnlitMobileProp::DiffuseMapCount6, &UnlitMobileProp::BlendModeIdx6,
+          &UnlitMobileProp::UvAtlas6 },
+        { &UnlitMobileProp::DiffuseMapCount7, &UnlitMobileProp::BlendModeIdx7,
+          &UnlitMobileProp::UvAtlas7 },
+        { &UnlitMobileProp::DiffuseMapCount8, &UnlitMobileProp::BlendModeIdx8,
+          &UnlitMobileProp::UvAtlas8 },
+        { &UnlitMobileProp::DiffuseMapCount9, &UnlitMobileProp::BlendModeIdx9,
+          &UnlitMobileProp::UvAtlas9 },
+        { &UnlitMobileProp::DiffuseMapCount10, &UnlitMobileProp::BlendModeIdx10,
+          &UnlitMobileProp::UvAtlas10 },
+        { &UnlitMobileProp::DiffuseMapCount11, &UnlitMobileProp::BlendModeIdx11,
+          &UnlitMobileProp::UvAtlas11 },
+        { &UnlitMobileProp::DiffuseMapCount12, &UnlitMobileProp::BlendModeIdx12,
+          &UnlitMobileProp::UvAtlas12 },
+        { &UnlitMobileProp::DiffuseMapCount13, &UnlitMobileProp::BlendModeIdx13,
+          &UnlitMobileProp::UvAtlas13 },
+        { &UnlitMobileProp::DiffuseMapCount14, &UnlitMobileProp::BlendModeIdx14,
+          &UnlitMobileProp::UvAtlas14 },
+        { &UnlitMobileProp::DiffuseMapCount15, &UnlitMobileProp::BlendModeIdx15,
+          &UnlitMobileProp::UvAtlas15 },
     };
 
 
     const IdString *TexCoordAnimationMatrix[8] =
     {
-        &UnlitMobileProp::PropertyTexMatrixCount0,
-        &UnlitMobileProp::PropertyTexMatrixCount1,
-        &UnlitMobileProp::PropertyTexMatrixCount2,
-        &UnlitMobileProp::PropertyTexMatrixCount3,
-        &UnlitMobileProp::PropertyTexMatrixCount4,
-        &UnlitMobileProp::PropertyTexMatrixCount5,
-        &UnlitMobileProp::PropertyTexMatrixCount6,
-        &UnlitMobileProp::PropertyTexMatrixCount7
+        &UnlitMobileProp::TexMatrixCount0,
+        &UnlitMobileProp::TexMatrixCount1,
+        &UnlitMobileProp::TexMatrixCount2,
+        &UnlitMobileProp::TexMatrixCount3,
+        &UnlitMobileProp::TexMatrixCount4,
+        &UnlitMobileProp::TexMatrixCount5,
+        &UnlitMobileProp::TexMatrixCount6,
+        &UnlitMobileProp::TexMatrixCount7
     };
 
     const String c_vsPerObjectUniforms[] =
@@ -273,7 +273,7 @@ namespace Ogre
         const HlmsUnlitMobileDatablock *datablock = static_cast<const HlmsUnlitMobileDatablock*>(
                                                                     renderable->getDatablock() );
 
-        setProperty( UnlitMobileProp::PropertyDiffuse, datablock->mHasColour );
+        setProperty( UnlitMobileProp::Diffuse, datablock->mHasColour );
         setProperty( UnlitMobileProp::DiffuseMap, datablock->mNumTextureUnits );
 
         if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
@@ -284,7 +284,7 @@ namespace Ogre
                     HlmsDatablock::getCmpString( datablock->getAlphaTest() );
         }
 
-        setProperty( UnlitMobileProp::PropertyUvAtlas, datablock->mNumUvAtlas );
+        setProperty( UnlitMobileProp::UvAtlas, datablock->mNumUvAtlas );
         size_t texUnit = 0;
         for( size_t i=0; i<16; ++i )
         {
@@ -312,7 +312,7 @@ namespace Ogre
             }
         }
 
-        setProperty( UnlitMobileProp::PropertyTexMatrixCount, datablock->mNumTextureMatrices );
+        setProperty( UnlitMobileProp::TexMatrixCount, datablock->mNumTextureMatrices );
         for( size_t i=0; i<datablock->mNumTextureMatrices; ++i )
             setProperty( *TexCoordAnimationMatrix[i], 1 );
 
