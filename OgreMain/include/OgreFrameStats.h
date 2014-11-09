@@ -45,7 +45,7 @@ namespace Ogre
     */
     class _OgreExport FrameStats : public ProfilerAlloc
     {
-        unsigned long mCurrentFrame;
+        int mNextFrame;
         unsigned long mBestFrameTime;
         unsigned long mWorstFrameTime;
         unsigned long mLastTime;
@@ -58,14 +58,14 @@ namespace Ogre
             reset( 0 );
         }
 
-        float getFps(void) const                { return 1000000.0f / mFrameTimes[mCurrentFrame]; }
-        float getAvgFps(void) const             { return 1000000.0f / getAvgTime(); }
+        float getFps(void) const                { return 1000.0f / getLastTime(); }
+        float getAvgFps(void) const             { return 1000.0f / getAvgTime(); }
 
         float getBestTime(void) const   { return mBestFrameTime * 0.001f; }
         float getWorstTime(void) const  { return mWorstFrameTime * 0.001f; }
         float getLastTime(void) const
         {
-            return mFrameTimes[(mCurrentFrame + OGRE_FRAME_STATS_SAMPLES - 1) %
+            return mFrameTimes[(mNextFrame + OGRE_FRAME_STATS_SAMPLES - 1) %
                                 OGRE_FRAME_STATS_SAMPLES] * 0.001f;
         }
 
@@ -78,9 +78,9 @@ namespace Ogre
 
             for( size_t i=0; i<mFramesSampled; ++i )
             {
-                //idx is first in the range [(mCurrentFrame - mFramesSampled); mCurrentFrame),
-                //but then warped around mCurrentFrame
-                size_t idx = (i + mCurrentFrame + (mFramesSampled * 2 - 1)) % mFramesSampled;
+                //idx is first in the range [(mNextFrame - mFramesSampled); mNextFrame),
+                //but then warped around mNextFrame
+                size_t idx = (i + mNextFrame + (mFramesSampled * 2 - 1)) % mFramesSampled;
                 avg += mFrameTimes[idx];
             }
 
@@ -91,19 +91,19 @@ namespace Ogre
         void addSample( unsigned long timeMs )
         {
             unsigned long frameTimeMs = timeMs - mLastTime;
-            mFrameTimes[mCurrentFrame]  = frameTimeMs;
+            mFrameTimes[mNextFrame]  = frameTimeMs;
             mBestFrameTime              = std::min( frameTimeMs, mBestFrameTime );
             mWorstFrameTime             = std::max( frameTimeMs, mWorstFrameTime );
 
             mFramesSampled = std::min<size_t>( (mFramesSampled + 1), OGRE_FRAME_STATS_SAMPLES );
-            mCurrentFrame = (mCurrentFrame + 1) % OGRE_FRAME_STATS_SAMPLES;
+            mNextFrame = (mNextFrame + 1) % OGRE_FRAME_STATS_SAMPLES;
 
             mLastTime = timeMs;
         }
 
         void reset( unsigned long timeMs )
         {
-            mCurrentFrame   = 0;
+            mNextFrame   = 0;
             mBestFrameTime  = std::numeric_limits<unsigned long>::max();
             mWorstFrameTime = 0;
             mLastTime       = timeMs;

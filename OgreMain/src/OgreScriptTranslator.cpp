@@ -7684,10 +7684,28 @@ namespace Ogre{
             translateQuad( compiler, node, target );
         else if(obj->name == "render_scene")
             translateScene( compiler, node, target );
+        else if(obj->name == "custom")
+        {
+            IdString customId;
+            if( !obj->values.empty() )
+            {
+                // Get the custom name
+                String type;
+                if( !getString(obj->values.front(), &type) )
+                {
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line);
+                    return;
+                }
+
+                customId = type;
+            }
+
+            mPassDef = target->addPass( PASS_CUSTOM, customId );
+        }
         else
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
-                "pass types must be \"clear\", \"stencil\", \"render_quad\" or \"render_scene\".");
+                "pass types must be \"clear\", \"stencil\", \"render_quad\", \"render_scene\" or \"custom\".");
             return;
         }
 

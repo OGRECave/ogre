@@ -51,7 +51,8 @@ namespace Ogre
         PASS_QUAD,
         PASS_CLEAR,
         PASS_STENCIL,
-        PASS_RESOLVE
+        PASS_RESOLVE,
+        PASS_CUSTOM
     };
 
     /** Interface to abstract all types of pass definitions (@see CompositorPassType):
@@ -148,7 +149,7 @@ namespace Ogre
         */
         void setNumPasses( size_t numPasses )           { mCompositorPasses.reserve( numPasses ); }
 
-        CompositorPassDef* addPass( CompositorPassType passType );
+        CompositorPassDef* addPass( CompositorPassType passType, IdString customId = IdString() );
 
         const CompositorPassDefVec& getCompositorPasses() const { return mCompositorPasses; }
 

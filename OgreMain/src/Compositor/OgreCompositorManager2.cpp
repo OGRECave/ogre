@@ -240,7 +240,7 @@ namespace Ogre
 
         if( mNodeDefinitions.find( name ) == mNodeDefinitions.end() )
         {
-            retVal = OGRE_NEW CompositorNodeDef( name );
+            retVal = OGRE_NEW CompositorNodeDef( name, this );
             mNodeDefinitions[name] = retVal;
         }
         else
@@ -286,7 +286,7 @@ namespace Ogre
 
         if( mShadowNodeDefs.find( name ) == mShadowNodeDefs.end() )
         {
-            retVal = OGRE_NEW CompositorShadowNodeDef( name );
+            retVal = OGRE_NEW CompositorShadowNodeDef( name, this );
             mShadowNodeDefs[name] = 0; //Fill with a null ptr, it will later be validated
             mUnfinishedShadowNodes.push_back( retVal );
         }
@@ -570,5 +570,15 @@ namespace Ogre
 
         CompositorWorkspaceDef *workDef = this->addWorkspaceDefinition( workspaceDefName );
         workDef->connectOutput( nodeDef->getName(), 0 );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::setCompositorPassProvider( CompositorPassProvider *passProvider )
+    {
+        mCompositorPassProvider = passProvider;
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorPassProvider* CompositorManager2::getCompositorPassProvider(void) const
+    {
+        return mCompositorPassProvider;
     }
 }

@@ -723,12 +723,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void Root::initialiseCompositor(void)
-    {
-        if( !mCompositorManager2 )
-            mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );
-    }
-    //-----------------------------------------------------------------------
     void Root::useCustomRenderSystemCapabilities(RenderSystemCapabilities* capabilities)
     {
         mActiveRenderer->useCustomRenderSystemCapabilities(capabilities);
@@ -1450,6 +1444,7 @@ namespace Ogre {
             mWorkQueue->startup();
             // Initialise material manager
             mMaterialManager->initialise();
+            mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );
             // Init particle systems manager
             mParticleManager->_initialise();
             // Init mesh manager

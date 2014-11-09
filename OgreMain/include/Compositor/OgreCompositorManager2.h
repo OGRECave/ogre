@@ -38,6 +38,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     class Rectangle2D;
+    class CompositorPassProvider;
     typedef vector<TexturePtr>::type TextureVec;
 
     /** \addtogroup Core
@@ -117,6 +118,9 @@ namespace Ogre
         TextureVec              mNullTextureList;
         Rectangle2D             *mSharedTriangleFS;
         Rectangle2D             *mSharedQuadFS;
+
+        /// For custom passes.
+        CompositorPassProvider  *mCompositorPassProvider;
 
         void validateNodes(void);
 
@@ -265,6 +269,11 @@ namespace Ogre
         void createBasicWorkspaceDef( const IdString &workspaceDefName,
                                         const ColourValue &backgroundColour,
                                         IdString shadowNodeName=IdString() );
+
+        /// Sets a custom pass provider in order to implement custom passes in
+        /// your nodes. @see CompositorPassProvider
+        void setCompositorPassProvider( CompositorPassProvider *passProvider );
+        CompositorPassProvider* getCompositorPassProvider(void) const;
     };
 
     /** @} */
