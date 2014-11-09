@@ -58,7 +58,7 @@ namespace Ogre
 
         struct PassData
         {
-            Matrix4 viewProjMatrix;
+            Matrix4 viewProjMatrix[2];
         };
 
         PassData                mPreparedPass;

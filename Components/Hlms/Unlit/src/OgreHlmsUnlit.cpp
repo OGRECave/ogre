@@ -371,6 +371,23 @@ namespace Ogre
     HlmsCache HlmsUnlit::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                           bool dualParaboloid, SceneManager *sceneManager )
     {
+        Camera *camera = sceneManager->getCameraInProgress();
+        Matrix4 viewMatrix = camera->getViewMatrix(true);
+
+        Matrix4 projectionMatrix = camera->getProjectionMatrixWithRSDepth();
+
+        RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+        if( renderTarget->requiresTextureFlipping() )
+        {
+            projectionMatrix[1][0] = -projectionMatrix[1][0];
+            projectionMatrix[1][1] = -projectionMatrix[1][1];
+            projectionMatrix[1][2] = -projectionMatrix[1][2];
+            projectionMatrix[1][3] = -projectionMatrix[1][3];
+        }
+
+        mPreparedPass.viewProjMatrix[0]     = projectionMatrix * viewMatrix;
+        mPreparedPass.viewProjMatrix[1]     = Matrix4::IDENTITY;
+
         mSetProperties.clear();
 
         //mTexBuffers must hold at least one buffer to prevent out of bound exceptions.
@@ -438,6 +455,8 @@ namespace Ogre
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----
         //---------------------------------------------------------------------------
+        bool useIdentityProjection = queuedRenderable.renderable->getUseIdentityProjection();
+
 #if !OGRE_DOUBLE_PRECISION
         if( (currentMappedTexBuffer - mStartMappedTexBuffer) + 16 >= mCurrentTexBufferSize )
         {
@@ -448,7 +467,7 @@ namespace Ogre
         *currentMappedConstBuffer++ = datablock->getAssignedSlot();
 
         //mat4 worldViewProj
-        Matrix4 tmp = mPreparedPass.viewProjMatrix * worldMat;
+        Matrix4 tmp = mPreparedPass.viewProjMatrix[useIdentityProjection] * worldMat;
         memcpy( currentMappedTexBuffer, &tmp, sizeof(Matrix4) );
         currentMappedTexBuffer += 16;
 #else

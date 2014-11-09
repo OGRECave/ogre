@@ -59,7 +59,7 @@ void main()
 
 @foreach( out_uv_count, n )
 	@property( out_uv@_texture_matrix )UNPACK_MAT4( textureMatrix, animationMatrixBuf, (drawId * 16) + @value( out_uv@n_tex_unit ) );@end
-	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@insertpiece( out_uv@n_source_uv ).xy @property( out_uv@_texture_matrix ) * textureMatrix@end ;@end
+	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@value( out_uv@n_source_uv ).xy @property( out_uv@_texture_matrix ) * textureMatrix@end ;@end
 
 	outVs.drawId = drawId;
 }
