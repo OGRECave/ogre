@@ -882,7 +882,16 @@ bail:
                 fsaa = StringConverter::parseUnsignedInt(values[0]);
                 if (values.size() > 1)
                     fsaaHint = values[1];
-            }                       
+            }
+
+            if( !videoMode )
+            {
+                LogManager::getSingleton().logMessage(
+                            "WARNING D3D11: Couldn't find requested video mode. Forcing 32bpp. "
+                            "If you have two GPUs and you're rendering to the GPU that is not "
+                            "plugged to the monitor you can then ignore this message.",
+                            LML_CRITICAL );
+            }
 
             NameValuePairList miscParams;
             miscParams["colourDepth"] = StringConverter::toString(videoMode ? videoMode->getColourDepth() : 32);
@@ -2466,7 +2475,7 @@ bail:
                     "D3D11 device cannot set blend state\nError Description:" + errorDescription,
                     "D3D11RenderSystem::_render");
             }
-            if (mBoundGeometryProgram && mBindingType == TextureUnitState::BindingType::BT_GEOMETRY)
+            if (mBoundGeometryProgram && mBindingType == TextureUnitState::BT_GEOMETRY)
             {
                 {
                     mDevice.GetImmediateContext()->GSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
@@ -2580,7 +2589,7 @@ bail:
             }
 
             /// Compute Shader binding
-            if (mBoundComputeProgram && mBindingType == TextureUnitState::BindingType::BT_COMPUTE)
+            if (mBoundComputeProgram && mBindingType == TextureUnitState::BT_COMPUTE)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
@@ -2610,7 +2619,7 @@ bail:
             }
 
             /// Hull Shader binding
-            if (mBoundTessellationHullProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELLATION_HULL)
+            if (mBoundTessellationHullProgram && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
@@ -2640,7 +2649,7 @@ bail:
             }
             
             /// Domain Shader binding
-            if (mBoundTessellationDomainProgram && mBindingType == TextureUnitState::BindingType::BT_TESSELLATION_DOMAIN)
+            if (mBoundTessellationDomainProgram && mBindingType == TextureUnitState::BT_TESSELLATION_DOMAIN)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
