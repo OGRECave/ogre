@@ -726,8 +726,7 @@ SceneNode* SceneManager::getSceneNode( IdType id )
     SceneNodeList::reverse_iterator ritor = mSceneNodes.rbegin();
     SceneNodeList::reverse_iterator rend  = mSceneNodes.rend();
 
-    IdCmp idCmp;
-    while( ritor != rend && !idCmp( *ritor, id ) )
+    while( ritor != rend && (*ritor)->getId() != id )
         ++ritor;
 
     if( ritor != mSceneNodes.rend() )
@@ -743,8 +742,7 @@ const SceneNode* SceneManager::getSceneNode( IdType id ) const
     SceneNodeList::const_reverse_iterator ritor = mSceneNodes.rbegin();
     SceneNodeList::const_reverse_iterator rend  = mSceneNodes.rend();
 
-    IdCmp idCmp;
-    while( ritor != rend && !idCmp( *ritor, id ) )
+    while( ritor != rend && (*ritor)->getId() != id )
         ++ritor;
 
     if( ritor != mSceneNodes.rend() )
