@@ -119,6 +119,11 @@ namespace v1 {
         */
         virtual void setMaterial( const MaterialPtr& material );
 
+        /** Make every setDatablock method from Renderable available.
+            See http://www.research.att.com/~bs/bs_faq2.html#overloadderived
+        */
+        using Renderable::setDatablock;
+
         virtual void setDatablock( HlmsDatablock *datablock );
 
         /** Accessor method to read mesh data.
