@@ -356,7 +356,7 @@ namespace Ogre {
         return was_avail + (size_t)r;
     }
     //---------------------------------------------------------------------
-    size_t ZipDataStream::write(void* buf, size_t count)
+    size_t ZipDataStream::write(const void* buf, size_t count)
     {
         // not supported
         return 0;
