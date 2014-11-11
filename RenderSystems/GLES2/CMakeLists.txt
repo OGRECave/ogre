@@ -40,28 +40,28 @@ file(GLOB KHR_HEADERS "include/KHR/*.h")
 include_directories(src/StateCacheManager)
 if(OGRE_CONFIG_ENABLE_GL_STATE_CACHE_SUPPORT)
   list(APPEND STATECACHE_HEADERS
-      src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
-      src/StateCacheManager/OgreGLES2UniformCacheImp.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2UniformCacheImp.h
   )
   list(APPEND SOURCE_FILES
-      src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp
-      src/StateCacheManager/OgreGLES2UniformCacheImp.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2UniformCacheImp.cpp
   )
 else()
   list(APPEND STATECACHE_HEADERS
-      src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.h
-      src/StateCacheManager/OgreGLES2NullUniformCacheImp.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullUniformCacheImp.h
   )
   list(APPEND SOURCE_FILES
-      src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp
-      src/StateCacheManager/OgreGLES2NullUniformCacheImp.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/StateCacheManager/OgreGLES2NullUniformCacheImp.cpp
   )
 endif()
 
 if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
   list(APPEND GLSLES_FILES
-    src/GLSLES/src/OgreGLSLESCgProgram.cpp
-    src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/src/OgreGLSLESCgProgram.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp
   )
 endif (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
 
@@ -99,8 +99,8 @@ elseif (ANDROID)
   endif()
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif (EMSCRIPTEN)
-  file(GLOB PLATFORM_HEADERS include/EGL/Emscripten/*.h include/EGL/*.h)
-  file(GLOB PLATFORM_SOURCES src/EGL/Emscripten/*.cpp src/EGL/*.cpp)
+  file(GLOB PLATFORM_HEADERS "include/EGL/Emscripten/*.h" "include/EGL/*.h")
+  file(GLOB PLATFORM_SOURCES "src/EGL/Emscripten/*.cpp" "src/EGL/*.cpp")
 
   include_directories(src/EGL/Emscripten include/EGL/Emscripten)
   set(PLATFORM_HEADER_INSTALL "Emscripten")
@@ -132,7 +132,7 @@ include_directories(
   ${OPENGLES3_INCLUDE_DIR} ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
 )
 
-ogre_add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${STATECACHE_HEADERS} ${GLESW_HEADERS} ${KHR_HEADERS} ${GLSLES_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
+ogre_add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${STATECACHE_HEADERS} ${GLESW_HEADERS} ${KHR_HEADERS} ${PLATFORM_HEADERS} ${SOURCE_FILES} ${PLATFORM_SOURCES} SEPARATE ${GLSLES_FILES})
 target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES3_LIBRARIES} ${OPENGLES2_LIBRARIES} ${EGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
