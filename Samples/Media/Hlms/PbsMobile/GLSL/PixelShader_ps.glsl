@@ -65,6 +65,7 @@ uniform @insertpiece( lowp ) float roughness;
 */
 uniform @insertpiece( lowp ) vec3 kD;
 uniform @insertpiece( lowp ) vec3 kS;
+@property( alpha_test )uniform @insertpiece( lowp ) float alpha_test_threshold;@end
 @property( fresnel_scalar )@piece( FresnelType )@insertpiece( lowp ) vec3@end@end
 @property( !fresnel_scalar ) @piece( FresnelType )@insertpiece( lowp ) float@end @end
 //Fresnel coefficient, may be per colour component (vec3) or scalar (float)
@@ -107,7 +108,7 @@ uniform @insertpiece( FresnelType ) F0;
 @property( diffuse_map )@insertpiece( lowp ) vec4 diffuseCol;
 @piece( SampleDiffuseMap )	diffuseCol = @insertpiece(texture2D)( texDiffuseMap, psUv@value(uv_diffuse).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy );
 @property( !hw_gamma_read )	//Gamma to linear space
-	diffuseCol = diffuseCol * diffuseCol;@end @end
+	diffuseCol.xyz = diffuseCol.xyz * diffuseCol.xyz;@end @end
 @piece( MulDiffuseMapValue )* diffuseCol.xyz@end@end
 @property( specular_map )@insertpiece( lowp ) vec3 specularCol;
 @piece( SampleSpecularMap )	specularCol = @insertpiece(texture2D)( texSpecularMap, psUv@value(uv_specular).xy * atlasOffsets[@value(atlas)].z + atlasOffsets[@counter(atlas)].xy ).xyz;@end
@@ -249,6 +250,17 @@ uniform highp @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shado
 
 void main()
 {
+@insertpiece( SampleDiffuseMap )
+@property( alpha_test )
+	@property( diffuse_map )
+	if( alpha_test_threshold @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
+		discard;
+	@end @property( !diffuse_map && !detail_maps_diffuse )
+	if( alpha_test_threshold @insertpiece( alpha_test_cmp_func ) 1.0 )
+		discard;
+	@end
+@end
+
 @property( hlms_normal )
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
@@ -269,6 +281,11 @@ void main()
 	detailWeights.@insertpiece(detail_diffuse_swizzle@n) *= detailCol@n.w;
 	detailCol@n.w = detailWeights.@insertpiece(detail_diffuse_swizzle@n);
 @end
+
+@property( alpha_test && !diffuse_map && detail_maps_diffuse )
+	if( alpha_test_threshold @insertpiece( alpha_test_cmp_func ) detailCol0.a )
+		discard;@end
+
 @foreach( detail_maps_normal, n )
 	@insertpiece( mediump ) vec3 vDetail@n	= getTSDetailNormal( texDetailNormalMap[@n], psUv@value(uv_detail_nm@n).xy@insertpiece( offsetDetailN@n ) ) * detailWeights.@insertpiece(detail_normal_swizzle@n) @insertpiece( detail@n_nm_weight_mulA );@end
 
@@ -294,7 +311,6 @@ void main()
 		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], psPosL@n, invShadowMapSize[@counter(CurrentShadowMap)] );
 @end
 
-@insertpiece( SampleDiffuseMap )
 @insertpiece( SampleSpecularMap )
 @insertpiece( SampleRoughnessMap )
 

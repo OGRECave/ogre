@@ -205,6 +205,11 @@ namespace Ogre
         return static_cast<CompareFunction>( mAlphaTestCmp );
     }
     //-----------------------------------------------------------------------------------
+    void HlmsDatablock::setAlphaTestThreshold( float threshold )
+    {
+        mAlphaTestThreshold = threshold;
+    }
+    //-----------------------------------------------------------------------------------
     const String* HlmsDatablock::getFullName(void) const
     {
         return mCreator->getFullNameString( mName );
@@ -285,16 +290,17 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    static const char *c_cmpStrings[NUM_COMPARE_FUNCTIONS] =
+    static const char *c_cmpStrings[NUM_COMPARE_FUNCTIONS+1] =
     {
         "==",   //CMPF_ALWAYS_FAIL (dummy)
         "==",   //CMPF_ALWAYS_PASS (dummy)
         "<",    //CMPF_LESS
         "<=",   //CMPF_LESS_EQUAL
         "==",   //CMPF_EQUAL
-        ">",    //CMPF_NOT_EQUAL
+        "!=",   //CMPF_NOT_EQUAL
         ">=",   //CMPF_GREATER_EQUAL
-        "!=",   //CMPF_GREATER
+        ">",    //CMPF_GREATER
+        "==",   //NUM_COMPARE_FUNCTIONS (dummy)
     };
     const char* HlmsDatablock::getCmpString( CompareFunction compareFunction )
     {

@@ -64,7 +64,7 @@ namespace Ogre
         /// Baked parameters from PbsMobileShaderCreationData.
         /// mNumVariableParameters says how many parameters were
         /// actually baked.
-        float   mVariableParameters[56];
+        float   mVariableParameters[60];
 
         TexturePtr              mTexture[NUM_PBSM_TEXTURE_TYPES];
         HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
@@ -306,6 +306,17 @@ namespace Ogre
         */
         void setDetailMapOffsetScale( uint8 detailMap, const Vector4 &offsetScale );
         const Vector4& getDetailMapOffsetScale( uint8 detailMap ) const;
+
+        /** @see HlmsDatablock::setAlphaTest
+        @remarks
+            Alpha testing works on the alpha channel of the diffuse texture.
+            If there is no diffuse texture, the first diffuse detail map after
+            applying the blend weights (texture + params) is used.
+            If there are no diffuse nor detail-diffuse maps, the alpha test is
+            compared against the value 1.0
+        */
+        virtual void setAlphaTest( CompareFunction compareFunction );
+        virtual void setAlphaTestThreshold( float threshold );
 
         static PbsUvAtlasParams textureLocationToAtlasParams(
                                             const HlmsTextureManager::TextureLocation &texLocation );

@@ -209,8 +209,8 @@ namespace Ogre
         HlmsBlendblock const *mBlendblock;
 
         uint8   mAlphaTestCmp;  /// @see CompareFunction
-    public:
         float   mAlphaTestThreshold;
+    public:
         float   mShadowConstantBias;
 
     public:
@@ -267,10 +267,19 @@ namespace Ogre
         @remarks
             It is to the derived implementation to actually implement the alpha test.
         @param compareFunction
-            Compare function to use. Default is CMPF_ALWAYS_PASS , which means disabled.
+            Compare function to use. Default is CMPF_ALWAYS_PASS, which means disabled.
+            Note: CMPF_ALWAYS_FAIL is not supported. Set a negative threshold to
+            workaround this issue.
         */
-        void setAlphaTest( CompareFunction compareFunction );
+        virtual void setAlphaTest( CompareFunction compareFunction );
         CompareFunction getAlphaTest(void) const;
+
+        /** Alpha test's threshold. @see setAlphaTest
+        @param threshold
+            Value typically in the range [0; 1)
+        */
+        virtual void setAlphaTestThreshold( float threshold );
+        float getAlphaTestThreshold(void) const                         { return mAlphaTestThreshold; }
 
         /// @see Hlms::getFullNameString. This operations is NOT fast. Might return null
         /// (if the datablock was removed from the Hlms but somehow is still alive)

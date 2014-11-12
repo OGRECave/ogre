@@ -56,6 +56,6 @@ void main()
 @end
 
 @property( alpha_test )
-	if( outColour.a @insertpiece( alpha_test_cmp_func ) material.alpha_test_threshold.x )
+	if( material.alpha_test_threshold.x @insertpiece( alpha_test_cmp_func ) outColour.a )
 		discard;@end
 }

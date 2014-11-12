@@ -189,6 +189,7 @@ namespace Ogre
         "roughness",
         "kD",
         "kS",
+        "alpha_test_threshold",
         "F0",
         "atlasOffsets",
         "normalWeights",

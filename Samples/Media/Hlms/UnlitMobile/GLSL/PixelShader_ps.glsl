@@ -41,6 +41,6 @@ void main()
 @end
 
 @property( alpha_test )
-	if( outColour.a @insertpiece( alpha_test_cmp_func ) alpha_test_threshold )
+	if( alpha_test_threshold @insertpiece( alpha_test_cmp_func ) outColour.a )
 		discard;@end
 }

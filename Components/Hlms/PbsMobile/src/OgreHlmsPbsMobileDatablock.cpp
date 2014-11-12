@@ -266,12 +266,18 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::bakeVariableParameters(void)
     {
+        size_t param = 0;
+        //float alpha_test_threshold
+        if( mAlphaTestCmp != CMPF_ALWAYS_PASS )
+            mVariableParameters[param++] = mAlphaTestThreshold;
+
         //float roughness
         //vec3 kD;
         //vec3 kS;
         //vec3 F0; or float F0;
-        size_t param = mShaderCreationData->mFresnelTypeSizeBytes >> 2;
-        memcpy( mVariableParameters, &mShaderCreationData->mFresnelR, param << 2 );
+        memcpy( &mVariableParameters[param], &mShaderCreationData->mFresnelR,
+                mShaderCreationData->mFresnelTypeSizeBytes );
+        param += mShaderCreationData->mFresnelTypeSizeBytes >> 2;
 
         //vec3 atlasOffsets[4]; (up to four, can be zero)
         for( size_t i=0; i<=PBSM_ROUGHNESS; ++i )
@@ -331,6 +337,7 @@ namespace Ogre
         //float roughness
         //vec3 kD;
         //vec3 kS;
+        //float alpha_test_threshold;
         //vec3 F0; or float F0;
         //vec3 atlasOffsets[4]; (up to four, can be zero)
         //float normalWeights[5]; (up to five, can be zero)
@@ -338,7 +345,8 @@ namespace Ogre
         //vec4 detailOffsetScaleD[4];  (up to four, can be zero)
         //vec4 detailOffsetScaleN[4];  (up to four, can be zero)
         mFullParametersBytes[0] = 7 * sizeof(float) + (param << 2);
-        mFullParametersBytes[1] = 0;
+        //float alpha_test_threshold
+        mFullParametersBytes[1] = (mAlphaTestCmp != CMPF_ALWAYS_PASS) * sizeof(float);
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setTexture( const String &name,
@@ -582,6 +590,18 @@ namespace Ogre
     {
         assert( detailMap < 8 );
         return mShaderCreationData->mDetailsOffsetScale[detailMap];
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setAlphaTest( CompareFunction compareFunction )
+    {
+        HlmsDatablock::setAlphaTest( compareFunction );
+        bakeVariableParameters();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setAlphaTestThreshold( float threshold )
+    {
+        HlmsDatablock::setAlphaTestThreshold( threshold );
+        bakeVariableParameters();
     }
     //-----------------------------------------------------------------------------------
     PbsUvAtlasParams HlmsPbsMobileDatablock::textureLocationToAtlasParams(
