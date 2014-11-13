@@ -154,7 +154,8 @@ namespace Ogre
 
     HlmsUnlit::HlmsUnlit( Archive *dataFolder ) :
         Hlms( HLMS_UNLIT, "unlit", dataFolder ),
-        ConstBufferPool( HlmsUnlitDatablock::MaterialSizeInGpuAligned ),
+        ConstBufferPool( HlmsUnlitDatablock::MaterialSizeInGpuAligned,
+                         ExtraBufferParams( 64 * NUM_UNLIT_TEXTURE_TYPES ) ),
         mCurrentConstBuffer( 0 ),
         mCurrentTexBuffer( 0 ),
         mLastBoundPool( 0 ),
@@ -194,7 +195,8 @@ namespace Ogre
                 assert( dynamic_cast<HlmsUnlitDatablock*>( itor->second.datablock ) );
                 HlmsUnlitDatablock *datablock = static_cast<HlmsUnlitDatablock*>( itor->second.datablock );
 
-                requestSlot( datablock->mTextureHash, datablock );
+                requestSlot( datablock->mNumEnabledAnimationMatrices != 0, datablock,
+                             datablock->mNumEnabledAnimationMatrices != 0 );
                 ++itor;
             }
         }
@@ -403,7 +405,7 @@ namespace Ogre
         mLastTextureHash = 0;
         mLastBoundPool = 0;
 
-        uploadDirtyDatablocks( HlmsUnlitDatablock::MaterialSizeInGpuAligned );
+        uploadDirtyDatablocks();
 
         return HlmsCache( 0, HLMS_UNLIT );
     }
@@ -441,6 +443,14 @@ namespace Ogre
             *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 1, newPool->materialBuffer, 0,
                                                                            newPool->materialBuffer->
                                                                            getTotalSizeBytes() );
+            if( newPool->extraBuffer )
+            {
+                TexBufferPacked *extraBuffer = static_cast<TexBufferPacked*>( newPool->extraBuffer );
+                *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 1, extraBuffer, 0,
+                                                                               extraBuffer->
+                                                                               getTotalSizeBytes() );
+            }
+
             mLastBoundPool = newPool;
         }
 

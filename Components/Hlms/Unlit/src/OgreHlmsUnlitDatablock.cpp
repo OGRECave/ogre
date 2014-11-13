@@ -72,9 +72,9 @@ namespace Ogre
 
     //-----------------------------------------------------------------------------------
     HlmsUnlitDatablock::HlmsUnlitDatablock( IdString name, HlmsUnlit *creator,
-                                        const HlmsMacroblock *macroblock,
-                                        const HlmsBlendblock *blendblock,
-                                        const HlmsParamVec &params ) :
+                                            const HlmsMacroblock *macroblock,
+                                            const HlmsBlendblock *blendblock,
+                                            const HlmsParamVec &params ) :
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
         mNumEnabledAnimationMatrices( 0 ),
         mHasColour( false ),
@@ -88,6 +88,8 @@ namespace Ogre
 
         memset( mTexIndices, 0, sizeof( mTexIndices ) );
         memset( mSamplerblocks, 0, sizeof( mSamplerblocks ) );
+
+        memset( mEnabledAnimationMatrices, 0, sizeof( mEnabledAnimationMatrices ) );
 
         for( size_t i=0; i<NUM_UNLIT_TEXTURE_TYPES; ++i )
             mTexToBakedTextureIdx[i] = NUM_UNLIT_TEXTURE_TYPES;
@@ -187,14 +189,15 @@ namespace Ogre
                             "in material '" + mName.getFriendlyText() +
                             "'; parameter 'animate'. Are you sure this is correct?", LML_CRITICAL );
                 }
+                else
+                {
+                    ++mNumEnabledAnimationMatrices;
+                }
 
-                mEnabledAnimationMatrices[val] = 1;
+                mEnabledAnimationMatrices[val] = true;
 
                 pos = paramVal.find_first_of( ' ' );
             }
-
-            for( size_t i=0; i<8; ++i )
-                mEnabledAnimationMatrices[i] = true;
         }
 
         bakeTextures( textures );
@@ -202,7 +205,8 @@ namespace Ogre
         calculateHash();
 
         //Use the same hash for everything (the number of materials per buffer is high)
-        creator->requestSlot( 0, this );
+        creator->requestSlot( mNumEnabledAnimationMatrices != 0, this,
+                              mNumEnabledAnimationMatrices != 0 );
     }
     //-----------------------------------------------------------------------------------
     HlmsUnlitDatablock::~HlmsUnlitDatablock()
@@ -251,6 +255,18 @@ namespace Ogre
     void HlmsUnlitDatablock::uploadToConstBuffer( char *dstPtr )
     {
         memcpy( dstPtr, &mR, MaterialSizeInGpu );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsUnlitDatablock::uploadToExtraBuffer( char *dstPtr )
+    {
+#if !OGRE_DOUBLE_PRECISION
+        memcpy( dstPtr, mTextureMatrices, sizeof( mTextureMatrices ) );
+#else
+        float * RESTRICT_ALIAS dstFloat = reinterpret_cast<float * RESTRICT_ALIAS>( dstPtr );
+
+        for( size_t i=0; i<NUM_UNLIT_TEXTURE_TYPES * 4; ++i )
+            *dstFloat++ = (float)mTextureMatrices[0][0][i];
+#endif
     }
     //-----------------------------------------------------------------------------------
     void HlmsUnlitDatablock::decompileBakedTextures( UnlitBakedTexture outTextures[NUM_UNLIT_TEXTURE_TYPES] )
@@ -456,7 +472,13 @@ namespace Ogre
             mEnabledAnimationMatrices[textureUnit] = bEnable;
             mNumEnabledAnimationMatrices += (bEnable * 2) - 1; //bEnable ? +1 : -1
 
-            scheduleTODO();
+            if( !mNumEnabledAnimationMatrices || (mNumEnabledAnimationMatrices == 1 && bEnable) )
+            {
+                static_cast<HlmsUnlit*>(mCreator)->requestSlot( mNumEnabledAnimationMatrices != 0, this,
+                                                                mNumEnabledAnimationMatrices != 0 );
+            }
+
+            scheduleConstBufferUpdate();
 
             flushRenderables();
         }
@@ -465,6 +487,20 @@ namespace Ogre
     bool HlmsUnlitDatablock::getEnableAnimationMatrix( uint8 textureUnit ) const
     {
         return mEnabledAnimationMatrices[textureUnit];
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsUnlitDatablock::setAnimationMatrix( uint8 textureUnit, const Matrix4 &matrix )
+    {
+        assert( textureUnit < NUM_UNLIT_TEXTURE_TYPES );
+
+        mTextureMatrices[textureUnit] = matrix;
+        if( mEnabledAnimationMatrices[textureUnit] )
+            scheduleConstBufferUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    const Matrix4& HlmsUnlitDatablock::getAnimationMatrix( uint8 textureUnit ) const
+    {
+        return mTextureMatrices[textureUnit];
     }
     //-----------------------------------------------------------------------------------
     uint8 HlmsUnlitDatablock::getBakedTextureIdx( uint8 texType ) const

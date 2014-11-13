@@ -88,6 +88,7 @@ namespace Ogre
 
         void scheduleConstBufferUpdate(void);
         virtual void uploadToConstBuffer( char *dstPtr );
+        virtual void uploadToExtraBuffer( char *dstPtr );
         void bakeVariableParameters(void);
 
         /// Sets the appropiate mTexIndices[textureMapType], and returns the texture pointer
@@ -224,7 +225,8 @@ namespace Ogre
         void setEnableAnimationMatrix( uint8 textureUnit, bool bEnable );
         bool getEnableAnimationMatrix( uint8 textureUnit ) const;
 
-        void scheduleTODO();
+        void setAnimationMatrix( uint8 textureUnit, const Matrix4 &matrix );
+        const Matrix4 & getAnimationMatrix( uint8 textureUnit ) const;
 
         /// Returns the index to mBakedTextures. Returns NUM_PBSM_TEXTURE_TYPES if
         /// there is no texture assigned to texType

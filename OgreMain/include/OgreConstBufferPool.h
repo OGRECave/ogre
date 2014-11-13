@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _OgreConstBufferPool_H_
 
 #include "OgrePrerequisites.h"
+#include "Vao/OgreBufferPacked.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -57,8 +58,20 @@ namespace Ogre
             uint32                  hash;
             vector<uint32>::type    freeSlots;
             ConstBufferPacked       *materialBuffer;
+            BufferPacked            *extraBuffer;
 
-            BufferPool( uint32 _hash, uint32 slotsPerPool, ConstBufferPacked *_materialBuffer );
+            BufferPool( uint32 _hash, uint32 slotsPerPool, ConstBufferPacked *_materialBuffer,
+                        BufferPacked *_extraBuffer );
+        };
+
+        struct ExtraBufferParams
+        {
+            size_t      bytesPerSlot;
+            BufferType  bufferType;
+            bool        useTextureBuffers;
+
+            ExtraBufferParams( size_t _bytesPerSlot = 0, BufferType _bufferType = BT_DEFAULT,
+                               bool _useTextureBuffers = true );
         };
 
     protected:
@@ -71,6 +84,7 @@ namespace Ogre
         uint32              mBytesPerSlot;
         uint32              mSlotsPerPool;
         size_t              mBufferSize;
+        ExtraBufferParams   mExtraBufferParams;
         VaoManager          *mVaoManager;
 
         ConstBufferPoolUserVec mDirtyUsers;
@@ -78,14 +92,14 @@ namespace Ogre
 
         void destroyAllPools(void);
 
-        void uploadDirtyDatablocks( size_t materialSizeInGpu );
+        void uploadDirtyDatablocks(void);
 
     public:
-        ConstBufferPool( uint32 bytesPerSlot );
+        ConstBufferPool( uint32 bytesPerSlot, const ExtraBufferParams &extraBufferParams );
         virtual ~ConstBufferPool();
 
         /// Requests a slot and fills 'user'. Automatically schedules for update
-        void requestSlot( uint32 hash, ConstBufferPoolUser *user );
+        void requestSlot( uint32 hash, ConstBufferPoolUser *user, bool wantsExtraBuffer );
         /// Releases a slot requested with requestSlot.
         void releaseSlot( ConstBufferPoolUser *user );
 
@@ -111,6 +125,7 @@ namespace Ogre
         /// Derived class must fill dstPtr. Amount of bytes written can't
         /// exceed the value passed to ConstBufferPool::uploadDirtyDatablocks
         virtual void uploadToConstBuffer( char *dstPtr ) = 0;
+        virtual void uploadToExtraBuffer( char *dstPtr ) {}
 
     public:
         ConstBufferPoolUser();

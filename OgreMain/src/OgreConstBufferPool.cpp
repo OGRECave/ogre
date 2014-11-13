@@ -33,14 +33,16 @@ THE SOFTWARE.
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreStagingBuffer.h"
 #include "Vao/OgreConstBufferPacked.h"
+#include "Vao/OgreTexBufferPacked.h"
 #include "OgreRenderSystem.h"
 
 namespace Ogre
 {
-    ConstBufferPool::ConstBufferPool( uint32 bytesPerSlot ) :
+    ConstBufferPool::ConstBufferPool( uint32 bytesPerSlot, const ExtraBufferParams &extraBufferParams ) :
         mBytesPerSlot( bytesPerSlot ),
         mSlotsPerPool( 0 ),
         mBufferSize( 0 ),
+        mExtraBufferParams( extraBufferParams ),
         mVaoManager( 0 )
     {
     }
@@ -63,11 +65,26 @@ namespace Ogre
 
                 while( it != en )
                 {
-                    if( (*it)->materialBuffer )
+                    mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
+
+                    if( (*it)->extraBuffer )
                     {
-                        mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
-                        delete *it;
+                        if( mExtraBufferParams.useTextureBuffers )
+                        {
+                            assert( dynamic_cast<TexBufferPacked*>( (*it)->extraBuffer ) );
+                            mVaoManager->destroyTexBuffer( static_cast<TexBufferPacked*>(
+                                                               (*it)->extraBuffer ) );
+                        }
+                        else
+                        {
+                            assert( dynamic_cast<ConstBufferPacked*>( (*it)->extraBuffer ) );
+                            mVaoManager->destroyConstBuffer( static_cast<ConstBufferPacked*>(
+                                                                 (*it)->extraBuffer ) );
+                        }
                     }
+
+                    delete *it;
+
                     ++it;
                 }
 
@@ -94,33 +111,43 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void ConstBufferPool::uploadDirtyDatablocks( size_t materialSizeInGpu )
+    void ConstBufferPool::uploadDirtyDatablocks(void)
     {
         if( mDirtyUsers.empty() )
             return;
 
+        const size_t materialSizeInGpu = mBytesPerSlot;
+        const size_t extraBufferSizeInGpu = mExtraBufferParams.bytesPerSlot;
+
         std::sort( mDirtyUsers.begin(), mDirtyUsers.end(), OrderConstBufferPoolUserByPoolThenSlot );
 
-        size_t uploadSize = materialSizeInGpu * mDirtyUsers.size();
+        const size_t uploadSize = (materialSizeInGpu + extraBufferSizeInGpu) * mDirtyUsers.size();
         StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( uploadSize, true );
 
         StagingBuffer::DestinationVec destinations;
+        StagingBuffer::DestinationVec extraDestinations;
+
+        destinations.reserve( mDirtyUsers.size() );
+        extraDestinations.reserve( mDirtyUsers.size() );
 
         ConstBufferPoolUserVec::const_iterator itor = mDirtyUsers.begin();
         ConstBufferPoolUserVec::const_iterator end  = mDirtyUsers.end();
 
         char *bufferStart = reinterpret_cast<char*>( stagingBuffer->map( uploadSize ) );
-        char *data = bufferStart;
+        char *data      = bufferStart;
+        char *extraData = bufferStart + materialSizeInGpu * mDirtyUsers.size();
 
         while( itor != end )
         {
-            size_t srcOffset = static_cast<size_t>( data - bufferStart );
-            size_t dstOffset = (*itor)->getAssignedSlot() * materialSizeInGpu;
+            const size_t srcOffset = static_cast<size_t>( data - bufferStart );
+            const size_t dstOffset = (*itor)->getAssignedSlot() * materialSizeInGpu;
 
             (*itor)->uploadToConstBuffer( data );
             data += materialSizeInGpu;
 
-            StagingBuffer::Destination dst( (*itor)->getAssignedPool()->materialBuffer, dstOffset,
+            const BufferPool *usersPool = (*itor)->getAssignedPool();
+
+            StagingBuffer::Destination dst( usersPool->materialBuffer, dstOffset,
                                             srcOffset, materialSizeInGpu );
 
             if( !destinations.empty() )
@@ -142,8 +169,41 @@ namespace Ogre
                 destinations.push_back( dst );
             }
 
+            if( usersPool->extraBuffer )
+            {
+                (*itor)->uploadToExtraBuffer( extraData );
+                extraData += extraBufferSizeInGpu;
+
+                const size_t extraSrcOffset = static_cast<size_t>( extraData - bufferStart );
+                const size_t extraDstOffset = (*itor)->getAssignedSlot() * extraBufferSizeInGpu;
+
+                StagingBuffer::Destination extraDst( usersPool->extraBuffer, extraDstOffset,
+                                                     extraSrcOffset, extraBufferSizeInGpu );
+
+                if( !extraDestinations.empty() )
+                {
+                    StagingBuffer::Destination &lastElement = extraDestinations.back();
+
+                    if( lastElement.destination == dst.destination &&
+                        (lastElement.dstOffset + lastElement.length == dst.dstOffset) )
+                    {
+                        lastElement.length += dst.length;
+                    }
+                    else
+                    {
+                        extraDestinations.push_back( extraDst );
+                    }
+                }
+                else
+                {
+                    extraDestinations.push_back( extraDst );
+                }
+            }
+
             ++itor;
         }
+
+        destinations.insert( destinations.end(), extraDestinations.begin(), extraDestinations.end() );
 
         stagingBuffer->unmap( destinations );
         stagingBuffer->removeReferenceCount();
@@ -151,7 +211,7 @@ namespace Ogre
         mDirtyUsers.clear();
     }
     //-----------------------------------------------------------------------------------
-    void ConstBufferPool::requestSlot( uint32 hash, ConstBufferPoolUser *user )
+    void ConstBufferPool::requestSlot( uint32 hash, ConstBufferPoolUser *user, bool wantsExtraBuffer )
     {
         if( user->mAssignedPool )
             releaseSlot( user );
@@ -176,8 +236,28 @@ namespace Ogre
         {
             ConstBufferPacked *materialBuffer = mVaoManager->createConstBuffer( mBufferSize, BT_DEFAULT,
                                                                                 0, false );
+            BufferPacked *extraBuffer = 0;
 
-            BufferPool *newPool = new BufferPool( hash, mSlotsPerPool, materialBuffer );
+            if( mExtraBufferParams.bytesPerSlot && wantsExtraBuffer )
+            {
+                if( mExtraBufferParams.useTextureBuffers )
+                {
+                    extraBuffer = mVaoManager->createTexBuffer( PF_FLOAT32_RGBA,
+                                                                mExtraBufferParams.bytesPerSlot *
+                                                                                    mSlotsPerPool,
+                                                                mExtraBufferParams.bufferType,
+                                                                0, false );
+                }
+                else
+                {
+                    extraBuffer = mVaoManager->createConstBuffer( mExtraBufferParams.bytesPerSlot *
+                                                                                    mSlotsPerPool,
+                                                                  mExtraBufferParams.bufferType,
+                                                                  0, false );
+                }
+            }
+
+            BufferPool *newPool = new BufferPool( hash, mSlotsPerPool, materialBuffer, extraBuffer );
             bufferPool.push_back( newPool );
             itor = bufferPool.end() - 1;
         }
@@ -187,6 +267,12 @@ namespace Ogre
         user->mAssignedPool = pool;
         user->mGlobalIndex  = mUsers.size();
         //user->mPoolOwner    = this;
+
+        //If this assert triggers, you need to be consistent between your hashes
+        //and the wantsExtraBuffer flag so that you land in the right pool.
+        assert( (pool->extraBuffer != 0) == wantsExtraBuffer &&
+                "The pool was first requested with/without an extra buffer "
+                "but now the opposite is being requested" );
 
         mUsers.push_back( user );
 
@@ -259,13 +345,24 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     ConstBufferPool::BufferPool::BufferPool( uint32 _hash, uint32 slotsPerPool,
-                                             ConstBufferPacked *_materialBuffer ) :
+                                             ConstBufferPacked *_materialBuffer,
+                                             BufferPacked *_extraBuffer ) :
         hash( _hash ),
-        materialBuffer( _materialBuffer )
+        materialBuffer( _materialBuffer ),
+        extraBuffer( _extraBuffer )
     {
         freeSlots.reserve( slotsPerPool );
         for( uint32 i=0; i<slotsPerPool; ++i )
             freeSlots.push_back( (slotsPerPool - i) - 1 );
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    ConstBufferPool::ExtraBufferParams::ExtraBufferParams( size_t _bytesPerSlot, BufferType _bufferType,
+                                                           bool _useTextureBuffers ) :
+        bytesPerSlot( _bytesPerSlot ),
+        bufferType( _bufferType ),
+        useTextureBuffers( _useTextureBuffers )
+    {
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------

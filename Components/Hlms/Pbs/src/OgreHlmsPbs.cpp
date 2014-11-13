@@ -182,7 +182,8 @@ namespace Ogre
 
     HlmsPbs::HlmsPbs( Archive *dataFolder ) :
         Hlms( HLMS_PBS, "pbs", dataFolder ),
-        ConstBufferPool( HlmsPbsDatablock::MaterialSizeInGpuAligned ),
+        ConstBufferPool( HlmsPbsDatablock::MaterialSizeInGpuAligned,
+                         ConstBufferPool::ExtraBufferParams() ),
         mCurrentPassBuffer( 0 ),
         mCurrentConstBuffer( 0 ),
         mCurrentTexBuffer( 0 ),
@@ -223,7 +224,7 @@ namespace Ogre
                 assert( dynamic_cast<HlmsPbsDatablock*>( itor->second.datablock ) );
                 HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>( itor->second.datablock );
 
-                requestSlot( datablock->mTextureHash, datablock );
+                requestSlot( datablock->mTextureHash, datablock, false );
                 ++itor;
             }
         }
@@ -740,7 +741,7 @@ namespace Ogre
 
         mLastBoundPool = 0;
 
-        uploadDirtyDatablocks( HlmsPbsDatablock::MaterialSizeInGpuAligned );
+        uploadDirtyDatablocks();
 
         return retVal;
     }
