@@ -108,7 +108,7 @@ namespace Ogre {
 		mGLSLProgramFactory(0),
 		mRTTManager(0),
 		mActiveTextureUnit(0),
-                mMaxBuiltInTextureAttribIndex(-1)
+		mMaxBuiltInTextureAttribIndex(-1)
 	{
 		size_t i;
 
