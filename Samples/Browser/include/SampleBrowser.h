@@ -172,42 +172,41 @@ namespace OgreBites
                                                       const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex,
                                                       const Ogre::Renderable* rend)
         {
-            Ogre::Technique* generatedTech = NULL;
-
-            // Case this is the default shader generator scheme.
-            if (schemeName == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+            if (schemeName != Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
             {
-                bool techniqueCreated;
+                return NULL;
+            }
+            // Case this is the default shader generator scheme.
 
-                // Create shader generated technique for this material.
-                techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-                    originalMaterial->getName(),
-                    Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-                    schemeName);
+            // Create shader generated technique for this material.
+            bool techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
+                originalMaterial->getName(),
+                Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+                schemeName);
 
-                // Case technique registration succeeded.
-                if (techniqueCreated)
+            if (!techniqueCreated)
+            {
+                return NULL;
+            }
+            // Case technique registration succeeded.
+
+            // Force creating the shaders for the generated technique.
+            mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
+
+            // Grab the generated technique.
+            Ogre::Material::TechniqueIterator itTech = originalMaterial->getTechniqueIterator();
+
+            while (itTech.hasMoreElements())
+            {
+                Ogre::Technique* curTech = itTech.getNext();
+
+                if (curTech->getSchemeName() == schemeName)
                 {
-                    // Force creating the shaders for the generated technique.
-                    mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
-
-                    // Grab the generated technique.
-                    Ogre::Material::TechniqueIterator itTech = originalMaterial->getTechniqueIterator();
-
-                    while (itTech.hasMoreElements())
-                    {
-                        Ogre::Technique* curTech = itTech.getNext();
-
-                        if (curTech->getSchemeName() == schemeName)
-                        {
-                            generatedTech = curTech;
-                            break;
-                        }
-                    }
+                    return curTech;
                 }
             }
 
-            return generatedTech;
+            return NULL;
         }
 
 	virtual bool afterIlluminationPassesCreated(Ogre::Technique* tech)
@@ -1290,11 +1289,8 @@ namespace OgreBites
             }
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
-                //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
                 // creates shaders for base material BaseWhite using the RTSS
                 Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-                baseWhite->setLightingEnabled(false);
                 mShaderGenerator->createShaderBasedTechnique(
                     "BaseWhite",
                     Ogre::MaterialManager::DEFAULT_SCHEME_NAME,

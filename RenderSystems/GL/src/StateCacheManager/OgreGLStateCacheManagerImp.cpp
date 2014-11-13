@@ -625,7 +625,7 @@ namespace Ogre {
 
     void GLStateCacheManagerImp::enableTextureCoordGen(GLenum type)
     {
-        HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
+        OGRE_HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
         if (it == mTextureCoordGen.end())
         {
             glEnable(type);
@@ -643,7 +643,7 @@ namespace Ogre {
 
     void GLStateCacheManagerImp::disableTextureCoordGen(GLenum type)
     {
-        HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
+        OGRE_HashMap<GLenum, TexGenParams>::iterator it = mTextureCoordGen.find(mActiveTextureUnit);
         if (it != mTextureCoordGen.end())
         {
             std::set<GLenum>::iterator found = it->second.mEnabled.find(type);

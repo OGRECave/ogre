@@ -1588,7 +1588,8 @@ namespace Ogre {
             readInts(stream, &bufferIndex, 1);
             if(bufferIndex != (unsigned int)-1) {
                 // copy buffer pointer
-                indexData->indexBuffer = sm->mLodFaceList[bufferIndex]->indexBuffer;
+                indexData->indexBuffer = sm->mLodFaceList[bufferIndex-1]->indexBuffer;
+                assert(!indexData->indexBuffer.isNull());
             } else {
                 // generate buffers
 

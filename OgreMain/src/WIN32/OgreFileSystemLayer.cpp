@@ -154,7 +154,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    bool FileSystemLayer::fileExists(const Ogre::String& path) const
+    bool FileSystemLayer::fileExists(const Ogre::String& path)
     {
         return _access(path.c_str(), 04) == 0; // Use CRT API rather than GetFileAttributesExA to pass Windows Store validation
     }
@@ -162,5 +162,22 @@ namespace Ogre
     bool FileSystemLayer::createDirectory(const Ogre::String& path)
     {
         return !_mkdir(path.c_str()) || errno == EEXIST; // Use CRT API rather than CreateDirectoryA to pass Windows Store validation
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::removeDirectory(const Ogre::String& path)
+    {
+        return !_rmdir(path.c_str()) || errno == ENOENT; // Use CRT API to pass Windows Store validation
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::removeFile(const Ogre::String& path)
+    {
+        return !_unlink(path.c_str()) || errno == ENOENT; // Use CRT API to pass Windows Store validation
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::renameFile(const Ogre::String& oldname, const Ogre::String& newname)
+    {
+        if(fileExists(oldname) && fileExists(newname))
+            removeFile(newname);
+        return !rename(oldname.c_str(), newname.c_str()); // Use CRT API to pass Windows Store validation
     }
 }

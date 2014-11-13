@@ -267,7 +267,7 @@ namespace OgreBites
 
         virtual void _cursorPressed(const Ogre::Vector2& cursorPos) {}
         virtual void _cursorReleased(const Ogre::Vector2& cursorPos) {}
-        virtual void _cursorMoved(const Ogre::Vector2& cursorPos) {}
+        virtual void _cursorMoved(const Ogre::Vector2& cursorPos, float wheelDelta) {}
         virtual void _focusLost() {}
 
         // internal methods used by SdkTrayManager. do not call directly.
@@ -343,7 +343,7 @@ namespace OgreBites
             }
         }
 
-        void _cursorMoved(const Ogre::Vector2& cursorPos)
+        void _cursorMoved(const Ogre::Vector2& cursorPos, float wheelDelta)
         {
             if (isCursorOver(mElement, cursorPos, 4))
             {
@@ -611,7 +611,7 @@ namespace OgreBites
             mDragging = false;
         }
 
-        void _cursorMoved(const Ogre::Vector2& cursorPos)
+        void _cursorMoved(const Ogre::Vector2& cursorPos, float wheelDelta)
         {
             if (mDragging)
             {
@@ -1003,7 +1003,7 @@ namespace OgreBites
             mDragging = false;
         }
 
-        void _cursorMoved(const Ogre::Vector2& cursorPos)
+        void _cursorMoved(const Ogre::Vector2& cursorPos, float wheelDelta)
         {
             Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
 
@@ -1020,6 +1020,13 @@ namespace OgreBites
                     int newIndex = (int) (scrollPercentage * (mItems.size() - mItemElements.size()) + 0.5);
                     if (newIndex != mDisplayIndex) setDisplayIndex(newIndex);
                     return;
+                }
+                else if(fabsf(wheelDelta) > 0.5f * 120.0f) // seems that OIS uses click == WHEEL_DELTA == 120 for all platforms
+                {
+                    int newIndex = Ogre::Math::Clamp<int>(mDisplayIndex + (wheelDelta > 0 ? -1 : 1), 0, (int)(mItems.size() - mItemElements.size()));
+                    Ogre::Real lowerBoundary = mScrollTrack->getHeight() - mScrollHandle->getHeight();
+                    mScrollHandle->setTop((int)(newIndex * lowerBoundary / (mItems.size() - mItemElements.size())));
+                    setDisplayIndex(newIndex);
                 }
 
                 Ogre::Real l = mItemElements.front()->_getDerivedLeft() * om.getViewportWidth() + 5;
@@ -1360,7 +1367,7 @@ namespace OgreBites
             }
         }
 
-        void _cursorMoved(const Ogre::Vector2& cursorPos)
+        void _cursorMoved(const Ogre::Vector2& cursorPos, float wheelDelta)
         {
             if (mDragging)
             {
@@ -1591,7 +1598,7 @@ namespace OgreBites
             if (mCursorOver && mListener) toggle();
         }
 
-        void _cursorMoved(const Ogre::Vector2& cursorPos)
+        void _cursorMoved(const Ogre::Vector2& cursorPos, float wheelDelta)
         {
             if (isCursorOver(mSquare, cursorPos, 5))
             {
@@ -3046,22 +3053,23 @@ namespace OgreBites
             if (!mCursorLayer->isVisible()) return false;   // don't process if cursor layer is invisible
 
             Ogre::Vector2 cursorPos(evt.state.X.abs, evt.state.Y.abs);
+            float wheelDelta = evt.state.Z.rel;
             mCursor->setPosition(cursorPos.x, cursorPos.y);
 
             if (mExpandedMenu)   // only check top priority widget until it passes on
             {
-                mExpandedMenu->_cursorMoved(cursorPos);
+                mExpandedMenu->_cursorMoved(cursorPos, wheelDelta);
                 return true;
             }
 
             if (mDialog)   // only check top priority widget until it passes on
             {
-                mDialog->_cursorMoved(cursorPos);
-                if (mOk) mOk->_cursorMoved(cursorPos);
+                mDialog->_cursorMoved(cursorPos, wheelDelta);
+                if(mOk) mOk->_cursorMoved(cursorPos, wheelDelta);
                 else
                 {
-                    mYes->_cursorMoved(cursorPos);
-                    mNo->_cursorMoved(cursorPos);
+                    mYes->_cursorMoved(cursorPos, wheelDelta);
+                    mNo->_cursorMoved(cursorPos, wheelDelta);
                 }
                 return true;
             }
@@ -3076,7 +3084,7 @@ namespace OgreBites
                     if(j >= (int)mWidgets[i].size()) continue;
                     Widget* w = mWidgets[i][j];
                     if (!w->getOverlayElement()->isVisible()) continue;
-                    w->_cursorMoved(cursorPos);    // send event to widget
+                    w->_cursorMoved(cursorPos, wheelDelta);    // send event to widget
                 }
             }
 

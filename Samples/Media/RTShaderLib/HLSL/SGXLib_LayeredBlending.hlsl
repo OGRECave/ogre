@@ -56,7 +56,7 @@ float3 RGBToHSL(float3 color)
 			hsl.x = deltaB - deltaG; // Hue
 		else if (color.g == fmax)
 			hsl.x = (1.0 / 3.0) + deltaR - deltaB; // Hue
-		else if (color.b == fmax)
+		else // (color.b == fmax)
 			hsl.x = (2.0 / 3.0) + deltaG - deltaR; // Hue
 
 		if (hsl.x < 0.0)

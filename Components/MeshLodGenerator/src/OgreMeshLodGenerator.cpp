@@ -100,6 +100,7 @@ void MeshLodGenerator::generateAutoconfiguredLodLevels(MeshPtr& mesh)
 
 void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
 {
+    bool edgeListWasBuilt = lodConfig.mesh->isEdgeListBuilt();
     lodConfig.mesh->freeEdgeList();
     lodConfig.mesh->setLodStrategy(lodConfig.strategy);
     MeshLodUsage usage;
@@ -121,6 +122,8 @@ void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
     }
     // Remove skipped Lod levels
     lodConfig.mesh->_setLodInfo(n + 1);
+    if(edgeListWasBuilt)
+        lodConfig.mesh->buildEdgeList();
 }
 
 MeshLodGenerator::MeshLodGenerator() :

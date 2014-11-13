@@ -1416,7 +1416,10 @@ namespace Ogre
             case POINT_SPACE:
                 // always go via terrain space
                 if (translation)
-                    outVec.x /= (mSize - 1); outVec.y /= (mSize - 1); 
+                {
+                    outVec.x /= (mSize - 1); 
+                    outVec.y /= (mSize - 1); 
+                }
                 currSpace = TERRAIN_SPACE;
                 break;
 
