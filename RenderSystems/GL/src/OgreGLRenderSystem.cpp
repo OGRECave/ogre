@@ -108,7 +108,7 @@ namespace Ogre {
 		mGLSLProgramFactory(0),
 		mRTTManager(0),
 		mActiveTextureUnit(0),
-		mMaxBuiltInTextureAttribIndex(-1)
+		mMaxBuiltInTextureAttribIndex(0)
 	{
 		size_t i;
 
@@ -2831,7 +2831,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Call super class
 		RenderSystem::_render(op);
 
-	 	mMaxBuiltInTextureAttribIndex = -1;
+	 	mMaxBuiltInTextureAttribIndex = 0;
 	 	if ( ! mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
 			 && 
 			 (
