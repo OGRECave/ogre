@@ -2995,7 +2995,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// only valid up to GL_MAX_TEXTURE_UNITS, which is recorded in mFixedFunctionTextureUnits
 		if (multitexturing)
         {
-            unsigned short mNumEnabledTextures = std::max(std::min((unsigned short)mDisabledTexUnitsFrom, mFixedFunctionTextureUnits), mMaxBuiltInTextureAttribIndex + 1);		
+            unsigned short mNumEnabledTextures = std::max(std::min((unsigned short)mDisabledTexUnitsFrom, mFixedFunctionTextureUnits), (unsigned short)(mMaxBuiltInTextureAttribIndex + 1));		
             for (unsigned short i = 0; i < mNumEnabledTextures; i++)
             {
                 // No need to disable for texture units that weren't used
