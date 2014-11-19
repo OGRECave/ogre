@@ -1061,7 +1061,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getSceneDepthRange() const
     {
-        static Vector4 dummy(0, 100000, 100000, 1/100000);
+        static Vector4 dummy(0, 100000, 100000, 1.f/100000);
 
         if (mSceneDepthRangeDirty)
         {
