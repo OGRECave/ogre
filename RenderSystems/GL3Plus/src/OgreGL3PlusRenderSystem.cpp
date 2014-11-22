@@ -127,6 +127,9 @@ namespace Ogre {
           mShaderManager(0),
           mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
+          mGlobalVao( 0 ),
+          mCurrentVertexBuffer( 0 ),
+          mCurrentIndexBuffer( 0 ),
           mRTTManager(0),
           mActiveTextureUnit(0)
     {
@@ -703,6 +706,12 @@ namespace Ogre {
             mVaoManager = OGRE_NEW GL3PlusVaoManager(
                                             mGLSupport->checkExtension("GL_ARB_buffer_storage"),
                                             mGLSupport->checkExtension("GL_ARB_multi_draw_indirect") );
+
+            //Bind the Draw ID
+            OCGE( glGenVertexArrays( 1, &mGlobalVao ) );
+            OCGE( glBindVertexArray( mGlobalVao ) );
+            static_cast<GL3PlusVaoManager*>( mVaoManager )->bindDrawId();
+            OCGE( glBindVertexArray( 0 ) );
 
             StringVector tokens = StringUtil::split(mGLSupport->getGLVersion(), ".");
             if (!tokens.empty())
@@ -2504,6 +2513,193 @@ namespace Ogre {
                       drawCmd->baseInstance ) );
             ++drawCmd;
         }
+    }
+
+    void GL3PlusRenderSystem::_setRenderOperation( const v1::CbRenderOp *cmd )
+    {
+        v1::VertexBufferBinding *vertexBufferBinding = cmd->vertexData->vertexBufferBinding;
+        v1::VertexDeclaration *vertexDeclaration     = cmd->vertexData->vertexDeclaration;
+
+        const v1::VertexDeclaration::VertexElementList& elements = vertexDeclaration->getElements();
+        v1::VertexDeclaration::VertexElementList::const_iterator itor;
+        v1::VertexDeclaration::VertexElementList::const_iterator end;
+
+        itor = elements.begin();
+        end  = elements.end();
+
+        while( itor != end )
+        {
+            const v1::VertexElement &elem = *itor;
+
+            unsigned short source = elem.getSource();
+
+            VertexElementSemantic semantic = elem.getSemantic();
+            GLuint attributeIndex = GL3PlusVaoManager::getAttributeIndexFor( semantic ) +
+                                    elem.getIndex();
+
+            if( !vertexBufferBinding->isBufferBound( source ) )
+            {
+                OCGE( glDisableVertexAttribArray( attributeIndex ) );
+                ++itor;
+                continue; // Skip unbound elements.
+            }
+
+            v1::HardwareVertexBufferSharedPtr vertexBuffer = vertexBufferBinding->getBuffer( source );
+            const v1::GL3PlusHardwareVertexBuffer* hwGlBuffer =
+                            static_cast<v1::GL3PlusHardwareVertexBuffer*>( vertexBuffer.get() );
+
+            OCGE( glBindBuffer( GL_ARRAY_BUFFER, hwGlBuffer->getGLBufferId() ) );
+            void *bindOffset = GL_BUFFER_OFFSET( elem.getOffset() );
+
+            VertexElementType vertexElementType = elem.getType();
+
+            GLint typeCount = v1::VertexElement::getTypeCount( vertexElementType );
+            GLboolean normalised = v1::VertexElement::isTypeNormalized( vertexElementType ) ? GL_TRUE :
+                                                                                              GL_FALSE;
+            switch( vertexElementType )
+            {
+            case VET_COLOUR:
+            case VET_COLOUR_ABGR:
+            case VET_COLOUR_ARGB:
+                // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+                // VertexElement::getTypeCount treats them as 1 (RGBA)
+                // Also need to normalise the fixed-point data
+                typeCount = 4;
+                normalised = GL_TRUE;
+                break;
+            default:
+                break;
+            };
+
+            assert( semantic != VES_TEXTURE_COORDINATES || elem.getIndex() < 8 &&
+                    "Up to 8 UVs are supported." );
+
+            if( semantic == VES_BINORMAL )
+            {
+                LogManager::getSingleton().logMessage(
+                            "WARNING: VES_BINORMAL will not render properly in "
+                            "many GPUs where GL_MAX_VERTEX_ATTRIBS = 16. Consider"
+                            " changing for VES_TANGENT with 4 components or use"
+                            " QTangents", LML_CRITICAL );
+            }
+
+            GLenum type = v1::GL3PlusHardwareBufferManager::getGLType( elem.getType() );
+
+            switch( v1::VertexElement::getBaseType( vertexElementType ) )
+            {
+            default:
+            case VET_FLOAT1:
+                OCGE( glVertexAttribPointer( attributeIndex, typeCount,
+                                             type,
+                                             normalised,
+                                             static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                             bindOffset ) );
+                break;
+            case VET_SHORT2:
+            case VET_USHORT2:
+            case VET_UINT1:
+            case VET_INT1:
+                OCGE( glVertexAttribIPointer( attributeIndex, typeCount,
+                                              type,
+                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                              bindOffset ) );
+                break;
+            case VET_DOUBLE1:
+                OCGE( glVertexAttribLPointer( attributeIndex, typeCount,
+                                              type,
+                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                              bindOffset ) );
+                break;
+            }
+
+            OCGE( glVertexAttribDivisor( attributeIndex, hwGlBuffer->getInstanceDataStepRate() *
+                                         hwGlBuffer->getIsInstanceData() ) );
+            OCGE( glEnableVertexAttribArray( attributeIndex ) );
+
+            ++itor;
+        }
+
+        if( cmd->indexData )
+        {
+            v1::GL3PlusHardwareIndexBuffer *indexBuffer = static_cast<v1::GL3PlusHardwareIndexBuffer*>(
+                                                                    cmd->indexData->indexBuffer.get() );
+            OCGE( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, indexBuffer->getGLBufferId() ) );
+        }
+    }
+
+    void GL3PlusRenderSystem::_render( const v1::CbDrawCallIndexed *cmd )
+    {
+        GLenum mode = GL_TRIANGLES;
+        switch( cmd->operationType )
+        {
+        case v1::RenderOperation::OT_POINT_LIST:
+            mode = GL_POINTS;
+            break;
+        case v1::RenderOperation::OT_LINE_LIST:
+            mode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
+            break;
+        case v1::RenderOperation::OT_LINE_STRIP:
+            mode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
+            break;
+        default:
+        case v1::RenderOperation::OT_TRIANGLE_LIST:
+            mode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
+            break;
+        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+            mode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
+            break;
+        case v1::RenderOperation::OT_TRIANGLE_FAN:
+            mode = GL_TRIANGLE_FAN;
+            break;
+        }
+
+        GLenum indexType = mCurrentIndexBuffer->indexBuffer->getType() ==
+                            v1::HardwareIndexBuffer::IT_16BIT ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+
+        const size_t bytesPerIndexElement = mCurrentIndexBuffer->indexBuffer->getIndexSize();
+
+        OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
+                    mode,
+                    cmd->primCount,
+                    indexType,
+                    reinterpret_cast<void*>( cmd->firstVertexIndex * bytesPerIndexElement ),
+                    cmd->instanceCount,
+                    mCurrentVertexBuffer->vertexStart,
+                    cmd->baseInstance ) );
+    }
+
+    void GL3PlusRenderSystem::_render( const v1::CbDrawCallStrip *cmd )
+    {
+        GLenum mode = GL_TRIANGLES;
+        switch( cmd->operationType )
+        {
+        case v1::RenderOperation::OT_POINT_LIST:
+            mode = GL_POINTS;
+            break;
+        case v1::RenderOperation::OT_LINE_LIST:
+            mode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
+            break;
+        case v1::RenderOperation::OT_LINE_STRIP:
+            mode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
+            break;
+        default:
+        case v1::RenderOperation::OT_TRIANGLE_LIST:
+            mode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
+            break;
+        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+            mode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
+            break;
+        case v1::RenderOperation::OT_TRIANGLE_FAN:
+            mode = GL_TRIANGLE_FAN;
+            break;
+        }
+
+        OCGE( glDrawArraysInstancedBaseInstance(
+                    mode,
+                    cmd->firstVertexIndex,
+                    cmd->primCount,
+                    cmd->instanceCount,
+                    cmd->baseInstance ) );
     }
 
     void GL3PlusRenderSystem::clearFrameBuffer(unsigned int buffers,

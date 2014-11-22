@@ -697,15 +697,7 @@ namespace Ogre
 
         {
             //Now bind the Draw ID.
-            GL3PlusBufferInterface *drawIdBufferInterface = static_cast<GL3PlusBufferInterface*>(
-                        mDrawId->getBufferInterface() );
-            const GLuint drawIdIdx = 15;
-            OCGE( glBindBuffer( GL_ARRAY_BUFFER, drawIdBufferInterface->getVboName() ) );
-            OCGE( glVertexAttribPointer( drawIdIdx, 1, GL_UNSIGNED_INT, GL_FALSE,
-                                         sizeof(uint32), (void*)mDrawId->_getFinalBufferStart() ) );
-            OCGE( glVertexAttribDivisor( drawIdIdx, 1 ) );
-            OCGE( glEnableVertexAttribArray( drawIdIdx ) );
-            OCGE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
+            bindDrawId();
         }
 
         if( vaoRef.indexBufferVbo )
@@ -714,6 +706,19 @@ namespace Ogre
         OCGE( glBindVertexArray( 0 ) );
 
         return vaoName;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusVaoManager::bindDrawId(void)
+    {
+        GL3PlusBufferInterface *drawIdBufferInterface = static_cast<GL3PlusBufferInterface*>(
+                    mDrawId->getBufferInterface() );
+        const GLuint drawIdIdx = 15;
+        OCGE( glBindBuffer( GL_ARRAY_BUFFER, drawIdBufferInterface->getVboName() ) );
+        OCGE( glVertexAttribPointer( drawIdIdx, 1, GL_UNSIGNED_INT, GL_FALSE,
+                                     sizeof(uint32), (void*)mDrawId->_getFinalBufferStart() ) );
+        OCGE( glVertexAttribDivisor( drawIdIdx, 1 ) );
+        OCGE( glEnableVertexAttribArray( drawIdIdx ) );
+        OCGE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
     }
     //-----------------------------------------------------------------------------------
     VertexArrayObject* GL3PlusVaoManager::createVertexArrayObjectImpl(

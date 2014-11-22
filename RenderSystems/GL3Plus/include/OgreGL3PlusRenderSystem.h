@@ -117,6 +117,11 @@ namespace Ogre {
         /// List of background thread contexts
         GL3PlusContextList mBackgroundContextList;
 
+        /// For rendering legacy objects.
+        GLuint  mGlobalVao;
+        v1::VertexData  *mCurrentVertexBuffer;
+        v1::IndexData   *mCurrentIndexBuffer;
+
         GLSLShaderManager *mShaderManager;
         GLSLShaderFactory* mGLSLShaderFactory;
         v1::HardwareBufferManager* mHardwareBufferManager;
@@ -475,6 +480,10 @@ namespace Ogre {
         virtual void _render( const CbDrawCallStrip *cmd );
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd );
         virtual void _renderEmulated( const CbDrawCallStrip *cmd );
+
+        virtual void _setRenderOperation( const v1::CbRenderOp *cmd );
+        virtual void _render( const v1::CbDrawCallIndexed *cmd );
+        virtual void _render( const v1::CbDrawCallStrip *cmd );
 
         void clearFrameBuffer(unsigned int buffers,
                               const ColourValue& colour = ColourValue::Black,

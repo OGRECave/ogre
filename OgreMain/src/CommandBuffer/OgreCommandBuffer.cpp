@@ -52,6 +52,9 @@ namespace Ogre
         &CommandBuffer::execute_setHlmsCache,
         &CommandBuffer::execute_setTexture,
         &CommandBuffer::execute_disableTextureUnitsFrom,
+        &CommandBuffer::execute_setV1RenderOp,
+        &CommandBuffer::execute_drawV1Indexed,
+        &CommandBuffer::execute_drawV1Strip,
         &CommandBuffer::execute_invalidCommand
     };
     //-----------------------------------------------------------------------------------

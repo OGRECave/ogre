@@ -358,6 +358,9 @@ namespace Ogre {
         class Billboard;
         class BillboardChain;
         class BillboardSet;
+        struct CbRenderOp;
+        struct CbDrawCallIndexed;
+        struct CbDrawCallStrip;
         class EdgeData;
         class EdgeListBuilder;
         class Entity;

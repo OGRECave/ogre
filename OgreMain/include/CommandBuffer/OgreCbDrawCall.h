@@ -77,6 +77,44 @@ namespace Ogre
         CbDrawCallStrip( bool supportsIndirectBuffers, VertexArrayObject *_vao,
                          void *_indirectBufferOffset );
     };
+
+namespace v1
+{
+    struct CbRenderOp : public CbBase
+    {
+        v1::VertexData  *vertexData;
+        v1::IndexData   *indexData;
+        //uint32          numberOfInstances;
+        //uint8           operationType;
+        //uint8           renderToVertexBuffer; //Is this used???
+        //uint8           useGlobalInstancingVertexBufferIsAvailable;
+
+        CbRenderOp( const v1::RenderOperation &_renderOp );
+    };
+
+    struct _OgreExport CbDrawCall : public CbBase
+    {
+        uint8           operationType;
+        //uint8           renderToVertexBuffer; //Is this used???
+        uint8           useGlobalInstancingVertexBufferIsAvailable;
+        //void            *indirectBufferOffset;
+        uint32          baseInstance;
+        uint32          primCount;
+        uint32          instanceCount;
+        uint32          firstVertexIndex;
+        CbDrawCall( uint16 cmdType );
+    };
+
+    struct _OgreExport CbDrawCallIndexed : public CbDrawCall
+    {
+        CbDrawCallIndexed();
+    };
+
+    struct _OgreExport CbDrawCallStrip : public CbDrawCall
+    {
+        CbDrawCallStrip();
+    };
+}
 }
 
 #endif

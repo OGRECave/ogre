@@ -291,7 +291,7 @@ namespace Ogre
 
             if( !mRenderQueues[i].mSorted )
             {
-                //TODO: Exploit temporal coherence across framesm then use insertion sorts.
+                //TODO: Exploit temporal coherence across frames then use insertion sorts.
                 //As explained by L. Spiro in
                 //http://www.gamedev.net/topic/661114-temporal-coherence-and-render-queue-sorting/?view=findpost&p=5181408
                 //Keep a list of sorted indices from the previous frame (one per camera).
@@ -577,6 +577,183 @@ namespace Ogre
         mLastMacroblock     = lastMacroblock;
         mLastBlendblock     = lastBlendblock;
         mLastVaoId          = lastVaoId;
+        mLastVertexData     = 0;
+        mLastIndexData      = 0;
+        mLastHlmsCache      = lastHlmsCache;
+        mLastTextureHash    = 0;
+    }
+    //-----------------------------------------------------------------------
+    void RenderQueue::renderGL3V1( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
+                                   bool casterPass, bool dualParaboloid )
+    {
+        if( mLastWasCasterPass != casterPass )
+        {
+            clearState();
+            mLastWasCasterPass = casterPass;
+        }
+
+        size_t numNeededDraws = 0;
+        for( size_t i=firstRq; i<lastRq; ++i )
+            numNeededDraws += mRenderQueues[i].mQueuedRenderables.size();
+
+        if( !numNeededDraws )
+            return;
+
+        HlmsCache passCache[HLMS_MAX];
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+            if( hlms )
+            {
+                passCache[i] = hlms->preparePassHash( mSceneManager->getCurrentShadowNode(), casterPass,
+                                                      dualParaboloid, mSceneManager );
+            }
+        }
+
+        mCommandBuffer->setCurrentRenderSystem( rs );
+
+        HlmsMacroblock const *lastMacroblock = mLastMacroblock;
+        HlmsBlendblock const *lastBlendblock = mLastBlendblock;
+        v1::RenderOperation lastRenderOp;
+        HlmsCache const *lastHlmsCache = mLastHlmsCache;
+        uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
+
+        v1::CbDrawCall *drawCmd = 0;
+        uint32 baseInstance = 0;
+
+        for( size_t i=firstRq; i<lastRq; ++i )
+        {
+            QueuedRenderableArray &queuedRenderables = mRenderQueues[i].mQueuedRenderables;
+
+            if( !mRenderQueues[i].mSorted )
+            {
+                std::sort( queuedRenderables.begin(), queuedRenderables.end() );
+                mRenderQueues[i].mSorted = true;
+            }
+
+            QueuedRenderableArray::const_iterator itor = queuedRenderables.begin();
+            QueuedRenderableArray::const_iterator end  = queuedRenderables.end();
+
+            while( itor != end )
+            {
+                const QueuedRenderable &queuedRenderable = *itor;
+
+                v1::RenderOperation renderOp;
+                queuedRenderable.renderable->getRenderOperation( renderOp );
+
+                const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
+
+                if( lastMacroblock != datablock->mMacroblock )
+                {
+                    CbMacroblock *blockCmd = mCommandBuffer->addCommand<CbMacroblock>();
+                    *blockCmd = CbMacroblock( datablock->mMacroblock );
+                    lastMacroblock = datablock->mMacroblock;
+                }
+
+                if( lastBlendblock != datablock->mBlendblock )
+                {
+                    CbBlendblock *blockCmd = mCommandBuffer->addCommand<CbBlendblock>();
+                    *blockCmd = CbBlendblock( datablock->mBlendblock );
+                    lastBlendblock = datablock->mBlendblock;
+                }
+
+                Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
+
+                lastHlmsCacheHash = lastHlmsCache->hash;
+                const HlmsCache *hlmsCache = hlms->getMaterial( lastHlmsCache,
+                                                                passCache[datablock->mType],
+                                                                queuedRenderable,
+                                                                casterPass );
+                if( lastHlmsCacheHash != hlmsCache->hash )
+                {
+                    CbHlmsCache *hlmsCacheCmd = mCommandBuffer->addCommand<CbHlmsCache>();
+                    *hlmsCacheCmd = CbHlmsCache( hlmsCache );
+                    lastHlmsCache = hlmsCache;
+                }
+
+                baseInstance = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
+                                                     lastHlmsCacheHash, mCommandBuffer );
+
+                bool differentRenderOp = lastRenderOp.vertexData != renderOp.vertexData ||
+                        lastRenderOp.indexData != renderOp.indexData ||
+                        lastRenderOp.operationType != renderOp.operationType ||
+                        lastRenderOp.useGlobalInstancingVertexBufferIsAvailable !=
+                            renderOp.useGlobalInstancingVertexBufferIsAvailable;
+
+                if( drawCmd != mCommandBuffer->getLastCommand() || differentRenderOp )
+                {
+                    //Different mesh, vertex buffers or layout. Make a new draw call.
+                    //(or also the the Hlms made a batch-breaking command)
+
+                    if( differentRenderOp )
+                    {
+                        *mCommandBuffer->addCommand<v1::CbRenderOp>() = v1::CbRenderOp( renderOp );
+                        lastRenderOp = renderOp;
+                    }
+
+                    if( renderOp.indexData )
+                    {
+                        v1::CbDrawCallIndexed *drawCall =
+                                mCommandBuffer->addCommand<v1::CbDrawCallIndexed>();
+                        *drawCall = v1::CbDrawCallIndexed();
+
+                        drawCall->operationType     = renderOp.operationType;
+                        drawCall->useGlobalInstancingVertexBufferIsAvailable =
+                                renderOp.useGlobalInstancingVertexBufferIsAvailable;
+                        drawCall->primCount         = renderOp.indexData->indexCount;
+                        drawCall->instanceCount     = renderOp.numberOfInstances;
+                        drawCall->firstVertexIndex  = renderOp.indexData->indexStart;
+                        drawCall->baseInstance      = baseInstance;
+
+                        drawCmd = drawCall;
+                    }
+                    else
+                    {
+                        v1::CbDrawCallStrip *drawCall =
+                                mCommandBuffer->addCommand<v1::CbDrawCallStrip>();
+                        *drawCall = v1::CbDrawCallStrip();
+
+                        drawCall->operationType     = renderOp.operationType;
+                        drawCall->useGlobalInstancingVertexBufferIsAvailable =
+                                renderOp.useGlobalInstancingVertexBufferIsAvailable;
+                        drawCall->primCount         = renderOp.vertexData->vertexCount;
+                        drawCall->instanceCount     = renderOp.numberOfInstances;
+                        drawCall->firstVertexIndex  = renderOp.vertexData->vertexStart;
+                        drawCall->baseInstance      = baseInstance;
+
+                        drawCmd = drawCall;
+                    }
+                }
+                else
+                {
+                    //Same mesh. Just go with instancing.
+                    drawCmd->instanceCount += renderOp.numberOfInstances;
+                }
+
+                ++itor;
+            }
+        }
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+            if( hlms )
+                hlms->preCommandBufferExecution( mCommandBuffer );
+        }
+
+        mCommandBuffer->execute();
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+            if( hlms )
+                hlms->postCommandBufferExecution( mCommandBuffer );
+        }
+
+        mLastMacroblock     = lastMacroblock;
+        mLastBlendblock     = lastBlendblock;
+        mLastVaoId          = 0;
         mLastVertexData     = 0;
         mLastIndexData      = 0;
         mLastHlmsCache      = lastHlmsCache;

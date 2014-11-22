@@ -98,4 +98,48 @@ namespace Ogre
         const CbDrawCallStrip *cmd = static_cast<const CbDrawCallStrip*>( _cmd );
         _this->mRenderSystem->_render( cmd );
     }
+
+    //-----------------------------------------------------------------------------------
+
+    v1::CbRenderOp::CbRenderOp( const v1::RenderOperation &renderOp ) :
+        CbBase( CB_SET_V1_RENDER_OP )
+    {
+        vertexData  = renderOp.vertexData;
+        indexData   = renderOp.indexData;
+    }
+
+    void CommandBuffer::execute_setV1RenderOp( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const v1::CbRenderOp *cmd = static_cast<const v1::CbRenderOp*>( _cmd );
+        _this->mRenderSystem->_setRenderOperation( cmd );
+    }
+
+    v1::CbDrawCall::CbDrawCall( uint16 cmdType ) :
+        CbBase( cmdType )
+    {
+    }
+
+    v1::CbDrawCallIndexed::CbDrawCallIndexed() :
+        v1::CbDrawCall( CB_DRAW_V1_INDEXED )
+    {
+    }
+
+    void CommandBuffer::execute_drawV1Indexed( CommandBuffer *_this,
+                                               const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const v1::CbDrawCallIndexed *cmd = static_cast<const v1::CbDrawCallIndexed*>( _cmd );
+        _this->mRenderSystem->_render( cmd );
+    }
+
+    v1::CbDrawCallStrip::CbDrawCallStrip() :
+        v1::CbDrawCall( CB_DRAW_V1_STRIP )
+    {
+    }
+
+    void CommandBuffer::execute_drawV1Strip( CommandBuffer *_this,
+                                             const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const v1::CbDrawCallStrip *cmd = static_cast<const v1::CbDrawCallStrip*>( _cmd );
+        _this->mRenderSystem->_render( cmd );
+    }
 }

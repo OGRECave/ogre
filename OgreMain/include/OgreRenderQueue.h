@@ -170,6 +170,8 @@ namespace Ogre {
         /// (i.e. Items, VertexArrayObject)
         void renderGL3( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
                         bool casterPass, bool dualParaboloid );
+        void renderGL3V1( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
+                          bool casterPass, bool dualParaboloid );
 
         /// Don't call this too often.
         void renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,

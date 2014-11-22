@@ -247,6 +247,9 @@ namespace Ogre
         GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers );
         virtual ~GL3PlusVaoManager();
 
+        /// Binds the Draw ID to the currently bound vertex array object.
+        void bindDrawId(void);
+
         bool supportsArbBufferStorage(void) const       { return mArbBufferStorage; }
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.

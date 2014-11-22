@@ -1183,6 +1183,11 @@ namespace Ogre
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd ) = 0;
         virtual void _renderEmulated( const CbDrawCallStrip *cmd ) = 0;
 
+        virtual void _setRenderOperation( const v1::CbRenderOp *cmd ) = 0;
+        /// Renders a V1 RenderOperation. Assumes _setRenderOperation has already been called.
+        virtual void _render( const v1::CbDrawCallIndexed *cmd ) = 0;
+        virtual void _render( const v1::CbDrawCallStrip *cmd ) = 0;
+
         virtual void _renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot);
 
         /** Gets the capabilities of the render system. */
