@@ -311,7 +311,7 @@ namespace Ogre {
         @param newName
             Name for the new entity.
         */
-        Entity* clone( const String& newName ) const;
+        Entity* clone(void) const;
 
         /** Sets the material to use for the whole of this entity.
         @remarks
