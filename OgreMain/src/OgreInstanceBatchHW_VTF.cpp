@@ -429,7 +429,7 @@ namespace v1
             ObjectData objData;
             const size_t numObjs = mLocalObjectMemoryManager.getFirstObjectData( objData, 0 );
 
-            visibleObjects = &mManager->_getTmpVisibleObjectsList()[0];
+            visibleObjects = &mManager->_getTmpVisibleObjectsList()[0][mRenderQueueID];
             visibleObjects->clear();
 
             //TODO: Static batches aren't yet supported (camera ptr will be null and crash)

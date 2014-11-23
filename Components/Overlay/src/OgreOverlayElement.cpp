@@ -620,7 +620,7 @@ namespace v1 {
     {
         if (mVisible)
         {
-            queue->addRenderable( this, mOverlay, false );
+            queue->addRenderableV1( mOverlay->getRenderQueueGroup(), false, this, mOverlay );
         }
     }
     //---------------------------------------------------------------------

@@ -48,13 +48,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsMacroblock::HlmsMacroblock() :
         BasicBlock( BLOCK_MACRO ),
+        mAlphaToCoverageEnabled( false ),
+        mScissorTestEnabled( false ),
         mDepthCheck( true ),
         mDepthWrite( true ),
         mDepthFunc( CMPF_LESS_EQUAL ),
         mDepthBiasConstant( 0 ),
         mDepthBiasSlopeScale( 0 ),
-        mAlphaToCoverageEnabled( false ),
-        mScissorTestEnabled( false ),
         mCullMode( CULL_CLOCKWISE ),
         mPolygonMode( PM_SOLID )
     {

@@ -1083,6 +1083,7 @@ void SceneManager::prepareRenderQueue(void)
 void SceneManager::_swapVisibleObjectsForShadowMapping()
 {
     mVisibleObjects.swap( mVisibleObjectsBackup );
+    mRenderQueue->_swapQueuesForShadowMapping();
 }
 //-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
@@ -1099,13 +1100,15 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
 
     {
         // Lock scene graph mutex, no more changes until we're ready to render
-            OGRE_LOCK_MUTEX(sceneGraphMutex);
+        OGRE_LOCK_MUTEX(sceneGraphMutex);
 
         // Prepare render queue for receiving new objects
         /*{
             OgreProfileGroup("prepareRenderQueue", OGREPROF_GENERAL);
             prepareRenderQueue();
         }*/
+
+        mRenderQueue->clear();
 
         if (mFindVisibleObjects)
         {
@@ -1132,6 +1135,7 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
             camera->_setRenderedRqs( realFirstRq, realLastRq );
 
             CullFrustumRequest cullRequest( realFirstRq, realLastRq,
+                                            mIlluminationStage == IRS_RENDER_TO_TEXTURE,
                                             &mEntitiesMemoryManagerCulledList, camera, lodCamera );
             fireCullFrustumThreads( cullRequest );
         }
@@ -1209,33 +1213,42 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
             bool casterPass = mIlluminationStage == IRS_RENDER_TO_TEXTURE;
 
-            mRenderQueue->clear();
-
-            //TODO: _updateRenderQueue MIGHT be called in parallel
             firePreFindVisibleObjects(vp);
+
             while( it != en )
             {
-                MovableObject::MovableObjectArray::const_iterator itor = it->begin();
-                MovableObject::MovableObjectArray::const_iterator end  = it->end();
+                VisibleObjectsPerRq::const_iterator itPerRq = it->begin();
+                VisibleObjectsPerRq::const_iterator enPerRq = it->end();
 
-                while( itor != end )
+                while( itPerRq != enPerRq )
                 {
-                    //TODO: v1 RenderQueues get this called. v2 don't (use different loops for perf!)
-                    (*itor)->_updateRenderQueue( mRenderQueue, camera, lodCamera );
+                    MovableObject::MovableObjectArray::const_iterator itor = itPerRq->begin();
+                    MovableObject::MovableObjectArray::const_iterator end  = itPerRq->end();
 
-                    RenderableArray::const_iterator itRend = (*itor)->mRenderables.begin();
-                    RenderableArray::const_iterator enRend = (*itor)->mRenderables.end();
-
-                    while( itRend != enRend )
+                    while( itor != end )
                     {
-                        mRenderQueue->addRenderableV1( *itRend, *itor, casterPass );
-                        ++itRend;
+                        //Only v1 are added here. v2 objects have already
+                        //been added in parallel in phase 01.
+                        (*itor)->_updateRenderQueue( mRenderQueue, camera, lodCamera );
+
+                        RenderableArray::const_iterator itRend = (*itor)->mRenderables.begin();
+                        RenderableArray::const_iterator enRend = (*itor)->mRenderables.end();
+
+                        while( itRend != enRend )
+                        {
+                            mRenderQueue->addRenderableV1( 0, casterPass, *itRend, *itor );
+                            ++itRend;
+                        }
+
+                        ++itor;
                     }
 
-                    ++itor;
+                    ++itPerRq;
                 }
+
                 ++it;
             }
+
             firePostFindVisibleObjects(vp);
         }
         // Queue skies, if viewport seems it
@@ -1281,7 +1294,6 @@ void SceneManager::_frameEnded(void)
 {
     mRenderQueue->frameEnded();
 }
-
 //-----------------------------------------------------------------------
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
@@ -2165,23 +2177,32 @@ void SceneManager::updateAllLods( const Camera *lodCamera, Real lodBias, uint8 f
 }
 //-----------------------------------------------------------------------
 void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullRequest &request,
-                                                    size_t threadIdx )
+                                                   size_t threadIdx )
 {
-    MovableObject::MovableObjectArray::const_iterator itor = mVisibleObjects[threadIdx].begin();
-    MovableObject::MovableObjectArray::const_iterator end  = mVisibleObjects[threadIdx].end();
+    VisibleObjectsPerRq::const_iterator it = mVisibleObjects[threadIdx].begin();
+    VisibleObjectsPerRq::const_iterator en = mVisibleObjects[threadIdx].begin();
 
-    while( itor != end )
+    while( it != en )
     {
-        (*itor)->instanceBatchCullFrustumThreaded( request.frustum, request.lodCamera,
-                                                   request.combinedVisibilityFlags );
-        ++itor;
+        MovableObject::MovableObjectArray::const_iterator itor = it->begin();
+        MovableObject::MovableObjectArray::const_iterator end  = it->end();
+
+        while( itor != end )
+        {
+            (*itor)->instanceBatchCullFrustumThreaded( request.frustum, request.lodCamera,
+                                                       request.combinedVisibilityFlags );
+            ++itor;
+        }
+
+        ++it;
     }
 }
 //-----------------------------------------------------------------------
 void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t threadIdx )
 {
-    MovableObject::MovableObjectArray &outVisibleObjects = *(mVisibleObjects.begin() + threadIdx);
-    outVisibleObjects.clear();
+    VisibleObjectsPerRq &visibleObjectsPerRq = *(mVisibleObjects.begin() + threadIdx);
+    visibleObjectsPerRq.clear();
+    visibleObjectsPerRq.resize( 255 );
 
     const Camera *camera    = request.camera;
     const Camera *lodCamera = request.lodCamera;
@@ -2198,6 +2219,8 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
 
         for( size_t i=firstRq; i<lastRq; ++i )
         {
+            MovableObject::MovableObjectArray &outVisibleObjects = *(visibleObjectsPerRq.begin() + i);
+
             ObjectData objData;
             const size_t totalObjs = memoryManager->getFirstObjectData( objData, i );
 
@@ -2219,6 +2242,29 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
                     (camera->getLastViewport()->getVisibilityMask() &
                                         ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
                     outVisibleObjects, lodCamera );
+
+            if( mRenderQueue->getRenderQueueMode(i) == RenderQueue::FAST )
+            {
+                //V2 meshes can be added to the render queue in parallel
+                bool casterPass = request.casterPass;
+                MovableObject::MovableObjectArray::const_iterator itor = outVisibleObjects.begin();
+                MovableObject::MovableObjectArray::const_iterator end  = outVisibleObjects.end();
+
+                while( itor != end )
+                {
+                    RenderableArray::const_iterator itRend = (*itor)->mRenderables.begin();
+                    RenderableArray::const_iterator enRend = (*itor)->mRenderables.end();
+
+                    while( itRend != enRend )
+                    {
+                        mRenderQueue->addRenderableV2( threadIdx, i, casterPass, *itRend, *itor );
+                        ++itRend;
+                    }
+                    ++itor;
+                }
+
+                outVisibleObjects.clear();
+            }
         }
 
         ++it;

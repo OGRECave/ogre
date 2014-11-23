@@ -604,7 +604,8 @@ namespace v1 {
         if (mVisible)
         {
             // Add outer
-            queue->addRenderable( mBorderRenderable, mOverlay, false );
+            queue->addRenderableV1( mOverlay->getRenderQueueGroup(), false,
+                                    mBorderRenderable, mOverlay );
 
             // do inner last so the border artifacts don't overwrite the children
             // Add inner

@@ -2517,6 +2517,9 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setRenderOperation( const v1::CbRenderOp *cmd )
     {
+        mCurrentVertexBuffer    = cmd->vertexData;
+        mCurrentIndexBuffer     = cmd->indexData;
+
         v1::VertexBufferBinding *vertexBufferBinding = cmd->vertexData->vertexBufferBinding;
         v1::VertexDeclaration *vertexDeclaration     = cmd->vertexData->vertexDeclaration;
 

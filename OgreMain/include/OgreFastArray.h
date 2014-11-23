@@ -200,6 +200,14 @@ namespace Ogre
             return mData + idx;
         }
 
+        void appendPOD( const_iterator otherBegin, const_iterator otherEnd )
+        {
+            growToFit( otherEnd - otherBegin );
+
+            memcpy( mData + mSize, otherBegin, (otherEnd - otherBegin) *  sizeof(T) );
+            mSize += otherEnd - otherBegin;
+        }
+
         iterator erase( iterator toErase )
         {
             size_t idx = (toErase - mData);

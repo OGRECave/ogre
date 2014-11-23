@@ -97,6 +97,9 @@ namespace Ogre
         mCommandBuffer( 0 )
     {
         mCommandBuffer = new CommandBuffer();
+
+        for( size_t i=0; i<256; ++i )
+            mRenderQueues[i].mQueuedRenderablesPerThread.resize( sceneManager->getNumWorkerThreads() );
     }
     //---------------------------------------------------------------------
     RenderQueue::~RenderQueue()
@@ -148,6 +151,17 @@ namespace Ogre
     {
         for( size_t i=0; i<256; ++i )
         {
+            QueuedRenderableArrayPerThread::iterator itor =
+                    mRenderQueues[i].mQueuedRenderablesPerThread.begin();
+            QueuedRenderableArrayPerThread::iterator end  =
+                    mRenderQueues[i].mQueuedRenderablesPerThread.end();
+
+            while( itor != end )
+            {
+                itor->clear();
+                ++itor;
+            }
+
             mRenderQueues[i].mQueuedRenderables.clear();
             mRenderQueues[i].mSorted = false;
         }
@@ -165,22 +179,24 @@ namespace Ogre
         mLastTextureHash= 0;
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::addRenderableV1( Renderable* pRend, const MovableObject *pMovableObject,
-                                       bool casterPass )
+    void RenderQueue::addRenderableV1( uint8 renderQueueId, bool casterPass, Renderable* pRend,
+                                       const MovableObject *pMovableObject )
     {
-        addRenderable( pRend, pMovableObject, casterPass, true );
+        addRenderable( 0, renderQueueId, casterPass, pRend, pMovableObject, true );
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
-                                     bool casterPass )
+    void RenderQueue::addRenderableV2( size_t threadIdx, uint8 renderQueueId, bool casterPass,
+                                       Renderable* pRend, const MovableObject *pMovableObject )
     {
-        addRenderable( pRend, pMovableObject, casterPass, false );
+        addRenderable( threadIdx, renderQueueId, casterPass, pRend, pMovableObject, false );
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
-                                     bool casterPass, bool isV1 )
+    void RenderQueue::addRenderable( size_t threadIdx, uint8 rqId, bool casterPass,
+                                     Renderable* pRend, const MovableObject *pMovableObject,
+                                     bool isV1 )
     {
-        uint8 rqId  = pMovableObject->getRenderQueueGroup();
+        assert( rqId == pMovableObject->getRenderQueueGroup() );
+
         uint8 subId = pRend->getRenderQueueSubGroup();
         RealAsUint depth = pMovableObject->getCachedDistanceToCamera();
 
@@ -251,8 +267,8 @@ namespace Ogre
                 ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShiftTransp );
         }
 
-        mRenderQueues[rqId].mQueuedRenderables.push_back( QueuedRenderable( hash, pRend,
-                                                                            pMovableObject ) );
+        mRenderQueues[rqId].mQueuedRenderablesPerThread[threadIdx].push_back(
+                    QueuedRenderable( hash, pRend, pMovableObject ) );
     }
     //-----------------------------------------------------------------------
     void RenderQueue::render( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
@@ -267,7 +283,7 @@ namespace Ogre
         size_t numNeededDraws = 0;
         for( size_t i=firstRq; i<lastRq; ++i )
         {
-            if( mRenderQueues[i].mMode != V1_LEGACY )
+            if( mRenderQueues[i].mMode == FAST )
                 numNeededDraws += mRenderQueues[i].mQueuedRenderables.size();
         }
 
@@ -311,9 +327,29 @@ namespace Ogre
         for( size_t i=firstRq; i<lastRq; ++i )
         {
             QueuedRenderableArray &queuedRenderables = mRenderQueues[i].mQueuedRenderables;
+            QueuedRenderableArrayPerThread &perThreadQueue = mRenderQueues[i].mQueuedRenderablesPerThread;
 
             if( !mRenderQueues[i].mSorted )
             {
+                size_t numRenderables = 0;
+                QueuedRenderableArrayPerThread::const_iterator itor = perThreadQueue.begin();
+                QueuedRenderableArrayPerThread::const_iterator end  = perThreadQueue.end();
+
+                while( itor != end )
+                {
+                    numRenderables += itor->size();
+                    ++itor;
+                }
+
+                queuedRenderables.reserve( numRenderables );
+
+                itor = perThreadQueue.begin();
+                while( itor != end )
+                {
+                    queuedRenderables.appendPOD( itor->begin(), itor->end() );
+                    ++itor;
+                }
+
                 //TODO: Exploit temporal coherence across frames then use insertion sorts.
                 //As explained by L. Spiro in
                 //http://www.gamedev.net/topic/661114-temporal-coherence-and-render-queue-sorting/?view=findpost&p=5181408
@@ -322,6 +358,8 @@ namespace Ogre
                 //  * If it grew from last frame, append: 5, 1, 4, 3, 2, 0, 6, 7 and use insertion sort.
                 //  * If it's the same, leave it as is, and use insertion sort just in case.
                 //  * If it's shorter, reset the indices 0, 1, 2, 3, 4; probably use quicksort or other generic sort
+                //
+                //TODO2: Explore sorting first on multiple threads, then merge sort into one.
                 std::sort( queuedRenderables.begin(), queuedRenderables.end() );
                 mRenderQueues[i].mSorted = true;
             }
@@ -330,22 +368,18 @@ namespace Ogre
             {
                 renderES2( rs, casterPass, dualParaboloid, passCache, mRenderQueues[i] );
             }
-            else if( numNeededDraws > 0 )
+            else if( mRenderQueues[i].mMode == V1_FAST )
             {
-                if( mRenderQueues[i].mMode == V1_FAST )
-                {
-                    renderGL3V1( casterPass, dualParaboloid, passCache, mRenderQueues[i],
-                                 indirectBuffer, indirectDraw, startIndirectDraw );
-                }
-                else //if( mRenderQueues[i].mMode == FAST )
-                {
-                    renderGL3( casterPass, dualParaboloid, passCache, mRenderQueues[i],
-                               indirectBuffer, indirectDraw, startIndirectDraw );
-                }
+                renderGL3V1( casterPass, dualParaboloid, passCache, mRenderQueues[i] );
+            }
+            else if( numNeededDraws > 0 /*&& mRenderQueues[i].mMode == FAST*/ )
+            {
+                renderGL3( casterPass, dualParaboloid, passCache, mRenderQueues[i],
+                           indirectBuffer, indirectDraw, startIndirectDraw );
             }
         }
 
-        if( supportsIndirectBuffers )
+        if( supportsIndirectBuffers && indirectBuffer )
             indirectBuffer->unmap( UO_KEEP_PERSISTENT );
 
         for( size_t i=0; i<HLMS_MAX; ++i )
@@ -593,10 +627,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void RenderQueue::renderGL3V1( bool casterPass, bool dualParaboloid,
                                    HlmsCache passCache[],
-                                   const RenderQueueGroup &renderQueueGroup,
-                                   IndirectBufferPacked *indirectBuffer,
-                                   unsigned char *indirectDraw,
-                                   unsigned char *startIndirectDraw )
+                                   const RenderQueueGroup &renderQueueGroup )
     {
         HlmsMacroblock const *lastMacroblock = mLastMacroblock;
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
@@ -793,6 +824,22 @@ namespace Ogre
             if( hlms )
                 hlms->frameEnded();
         }
+    }
+    //-----------------------------------------------------------------------
+    void RenderQueue::_swapQueuesForShadowMapping(void)
+    {
+        for( size_t i=0; i<256; ++i )
+            mRenderQueues[i].swap( mRenderQueuesBackup[i] );
+    }
+    //-----------------------------------------------------------------------
+    void RenderQueue::setRenderQueueMode( uint8 rqId, Modes newMode )
+    {
+        mRenderQueues[rqId].mMode = newMode;
+    }
+    //-----------------------------------------------------------------------
+    RenderQueue::Modes RenderQueue::getRenderQueueMode( uint8 rqId ) const
+    {
+        return mRenderQueues[rqId].mMode;
     }
 }
 

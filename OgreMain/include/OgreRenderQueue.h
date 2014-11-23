@@ -110,19 +110,30 @@ namespace Ogre {
 
     private:
         typedef FastArray<QueuedRenderable> QueuedRenderableArray;
+        typedef FastArray<QueuedRenderableArray> QueuedRenderableArrayPerThread;
 
         struct RenderQueueGroup
         {
+            QueuedRenderableArrayPerThread mQueuedRenderablesPerThread;
             QueuedRenderableArray   mQueuedRenderables;
             bool                    mSorted;
             Modes                   mMode;
 
             RenderQueueGroup() : mSorted( false ), mMode( V1_FAST ) {}
+
+            void swap( RenderQueueGroup &other )
+            {
+                this->mQueuedRenderablesPerThread.swap( other.mQueuedRenderablesPerThread );
+                this->mQueuedRenderables.swap( other.mQueuedRenderables );
+                std::swap( this->mSorted, other.mSorted );
+                std::swap( this->mMode, other.mMode );
+            }
         };
 
         typedef vector<IndirectBufferPacked*>::type IndirectBufferPackedVec;
 
         RenderQueueGroup mRenderQueues[256];
+        RenderQueueGroup mRenderQueuesBackup[256];
 
         HlmsManager *mHlmsManager;
         SceneManager*mSceneManager;
@@ -150,8 +161,9 @@ namespace Ogre {
         */
         IndirectBufferPacked* getIndirectBuffer( size_t numDraws );
 
-        FORCEINLINE void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
-                                        bool casterPass, bool isV1 );
+        FORCEINLINE void addRenderable( size_t threadIdx, uint8 renderQueueId, bool casterPass,
+                                        Renderable* pRend, const MovableObject *pMovableObject,
+                                        bool isV1 );
 
         void renderES2( RenderSystem *rs, bool casterPass, bool dualParaboloid,
                         HlmsCache passCache[], const RenderQueueGroup &renderQueueGroup );
@@ -165,9 +177,7 @@ namespace Ogre {
                         unsigned char *indirectDraw, unsigned char *startIndirectDraw );
         void renderGL3V1( bool casterPass, bool dualParaboloid,
                           HlmsCache passCache[],
-                          const RenderQueueGroup &renderQueueGroup,
-                          IndirectBufferPacked *indirectBuffer,
-                          unsigned char *indirectDraw, unsigned char *startIndirectDraw );
+                          const RenderQueueGroup &renderQueueGroup );
 
     public:
         RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager, VaoManager *vaoManager );
@@ -185,27 +195,25 @@ namespace Ogre {
         void clearState(void);
 
         /// Add a renderable (Ogre v1.x) object to the queue. @see addRenderable
-        void addRenderableV1( Renderable* pRend, const MovableObject *pMovableObject,
-                              bool casterPass );
+        void addRenderableV1( uint8 renderQueueId, bool casterPass, Renderable* pRend,
+                              const MovableObject *pMovableObject );
 
         /** Add a renderable (Ogre v2.0, i.e. Items; they use VAOs) object to the queue.
-        @remarks
-            This methods adds a Renderable to the queue, which will be rendered later by
-            the SceneManager. This is the advanced version of the call which allows the renderable
-            to be added to any queue.
-        @note
-            Called by implementation of MovableObject::_updateRenderQueue.
-        @param
-            pRend Pointer to the Renderable to be added to the queue
-        @param groupID
-            The group the renderable is to be added to. This
-            can be used to schedule renderable objects in separate groups such that the SceneManager
-            respects the divisions between the groupings and does not reorder them outside these
-            boundaries. This can be handy for overlays where no matter what you want the overlay to
-            be rendered last.
+        @param threadIdx
+            The unique index of the thread from which this function is called from.
+            Valid range is [0; SceneManager::mNumWorkerThreads)
+        @param renderQueueId
+            The ID of the render queue. Must be the same as the ID in
+            pMovableObject->getRenderQueueGroup()
+        @param casterPass
+            Whether we're performing the shadow mapping pass.
+        @param pRend
+            Pointer to the Renderable to be added to the queue.
+        @param pMovableObject
+            Pointer to the MovableObject linked to the Renderable.
         */
-        void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
-                            bool casterPass );
+        void addRenderableV2( size_t threadIdx, uint8 renderQueueId, bool casterPass,
+                              Renderable* pRend, const MovableObject *pMovableObject );
 
         void render( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
                      bool casterPass, bool dualParaboloid );
@@ -216,6 +224,11 @@ namespace Ogre {
 
         /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
         void frameEnded(void);
+
+        void _swapQueuesForShadowMapping(void);
+
+        void setRenderQueueMode( uint8 rqId, RenderQueue::Modes newMode );
+        RenderQueue::Modes getRenderQueueMode( uint8 rqId ) const;
     };
 
     /** @} */
