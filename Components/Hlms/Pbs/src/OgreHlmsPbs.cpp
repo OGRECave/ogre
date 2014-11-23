@@ -814,7 +814,10 @@ namespace Ogre
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
 
         if( (currentMappedConstBuffer - mStartMappedConstBuffer) + 1 >= mCurrentConstBufferSize )
+        {
             currentMappedConstBuffer = mapNextConstBuffer( commandBuffer );
+            currentMappedTexBuffer = mCurrentMappedTexBuffer;
+        }
 
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----
@@ -949,6 +952,8 @@ namespace Ogre
 
         *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 2, constBuffer, 0, 0 );
 
+        rebindTexBuffer( commandBuffer, true );
+
         return mStartMappedConstBuffer;
     }
     //-----------------------------------------------------------------------------------
@@ -1020,7 +1025,7 @@ namespace Ogre
         return mStartMappedTexBuffer;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::rebindTexBuffer( CommandBuffer *commandBuffer )
+    void HlmsPbs::rebindTexBuffer( CommandBuffer *commandBuffer, bool resetOffset )
     {
         //Set the binding size of the old binding command (if exists)
         CbShaderBuffer *shaderBufferCmd = reinterpret_cast<CbShaderBuffer*>(
@@ -1032,9 +1037,19 @@ namespace Ogre
                                                 sizeof(float);
         }
 
+        size_t oldOffset = 0;
+        if( resetOffset )
+        {
+            oldOffset = (mCurrentMappedTexBuffer - mStartMappedTexBuffer) * sizeof(float);
+            oldOffset = alignToNextMultiple( oldOffset, mVaoManager->getTexBufferAlignment() );
+
+            mCurrentMappedTexBuffer = reinterpret_cast<float*>(
+                            reinterpret_cast<unsigned char*>(mStartMappedTexBuffer) + oldOffset );
+        }
+
         //Add a new binding command.
         shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
-        *shaderBufferCmd = CbShaderBuffer( 0, mTexBuffers[mCurrentTexBuffer], 0, 0 );
+        *shaderBufferCmd = CbShaderBuffer( 0, mTexBuffers[mCurrentTexBuffer], oldOffset, 0 );
         mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
     }
     //-----------------------------------------------------------------------------------
