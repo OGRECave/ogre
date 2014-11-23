@@ -82,14 +82,42 @@ namespace Ogre {
     */
     class _OgreExport RenderQueue : public RenderQueueAlloc
     {
+    public:
+        enum Modes
+        {
+            /// This is the slowest mode. Renders the same or similar way to how Ogre 1.x
+            /// rendered meshes. Only v1 entities can be put in this type of queue.
+            /// Ideal for low level materials, InstancedEntity via InstanceManager,
+            /// and any other weird custom object.
+            V1_LEGACY,
+
+            /// Renders v1 entities using HLMS materials with some of the new benefits,
+            /// but some deprecated features from Ogre 1.x might not be available
+            /// or work properly (like global instancing buffer).
+            /// Ideal for most v1 entities, particle effects and billboards using HLMS
+            /// materials.
+            /// Cannot be used by RenderSystems that don't support constant buffers
+            /// (i.e. OpenGL ES 2)
+            V1_FAST,
+
+            /// Renders v2 items using HLMS materials with minimum driver overhead
+            /// Recommended method for rendering extremely large amounts of objects
+            /// of homogeneous and heterogenous meshes, with many different kinds
+            /// of materials and textures.
+            /// Only v2 Items can be put in this queue.
+            FAST
+        };
+
+    private:
         typedef FastArray<QueuedRenderable> QueuedRenderableArray;
 
         struct RenderQueueGroup
         {
             QueuedRenderableArray   mQueuedRenderables;
             bool                    mSorted;
+            Modes                   mMode;
 
-            RenderQueueGroup() : mSorted( false ) {}
+            RenderQueueGroup() : mSorted( false ), mMode( V1_FAST ) {}
         };
 
         typedef vector<IndirectBufferPacked*>::type IndirectBufferPackedVec;
@@ -124,6 +152,22 @@ namespace Ogre {
 
         FORCEINLINE void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
                                         bool casterPass, bool isV1 );
+
+        void renderES2( RenderSystem *rs, bool casterPass, bool dualParaboloid,
+                        HlmsCache passCache[], const RenderQueueGroup &renderQueueGroup );
+
+        /// Renders in a compatible way with GL 3.3 and D3D11. Can only render V2 objects
+        /// (i.e. Items, VertexArrayObject)
+        void renderGL3( bool casterPass, bool dualParaboloid,
+                        HlmsCache passCache[],
+                        const RenderQueueGroup &renderQueueGroup,
+                        IndirectBufferPacked *indirectBuffer,
+                        unsigned char *indirectDraw, unsigned char *startIndirectDraw );
+        void renderGL3V1( bool casterPass, bool dualParaboloid,
+                          HlmsCache passCache[],
+                          const RenderQueueGroup &renderQueueGroup,
+                          IndirectBufferPacked *indirectBuffer,
+                          unsigned char *indirectDraw, unsigned char *startIndirectDraw );
 
     public:
         RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager, VaoManager *vaoManager );
@@ -163,15 +207,8 @@ namespace Ogre {
         void addRenderable( Renderable* pRend, const MovableObject *pMovableObject,
                             bool casterPass );
 
-        void renderES2( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
-                        bool casterPass, bool dualParaboloid );
-
-        /// Renders in a compatible way with GL 3.3 and D3D11. Can only render V2 objects
-        /// (i.e. Items, VertexArrayObject)
-        void renderGL3( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
-                        bool casterPass, bool dualParaboloid );
-        void renderGL3V1( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
-                          bool casterPass, bool dualParaboloid );
+        void render( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
+                     bool casterPass, bool dualParaboloid );
 
         /// Don't call this too often.
         void renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,

@@ -1264,8 +1264,8 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
         //_renderVisibleObjects();
         OgreProfileGroup("RenderQueue::render", OGREPROF_RENDERING);
         //TODO: RENDER QUEUE Add Dual Paraboloid mapping
-        mRenderQueue->renderES2( mDestRenderSystem, firstRq, lastRq,
-                                 mIlluminationStage == IRS_RENDER_TO_TEXTURE, false );
+        mRenderQueue->render( mDestRenderSystem, firstRq, lastRq,
+                              mIlluminationStage == IRS_RENDER_TO_TEXTURE, false );
     }
 
     // Notify camera of vis faces
