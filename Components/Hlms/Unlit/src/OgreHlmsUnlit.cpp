@@ -474,7 +474,8 @@ namespace Ogre
         }
 
         //uint materialIdx[]
-        *currentMappedConstBuffer++ = datablock->getAssignedSlot();
+        *currentMappedConstBuffer = datablock->getAssignedSlot();
+        currentMappedConstBuffer += 4;
 
         //mat4 worldViewProj
         Matrix4 tmp = mPreparedPass.viewProjMatrix[useIdentityProjection] * worldMat;
@@ -506,13 +507,15 @@ namespace Ogre
                 }
 
                 *commandBuffer->addCommand<CbTextureDisableFrom>() = CbTextureDisableFrom( texUnit );
+
+                mLastTextureHash = datablock->mTextureHash;
             }
         }
 
         mCurrentMappedConstBuffer   = currentMappedConstBuffer;
         mCurrentMappedTexBuffer     = currentMappedTexBuffer;
 
-        return (mCurrentMappedConstBuffer - mStartMappedConstBuffer) - 1;
+        return ((mCurrentMappedConstBuffer - mStartMappedConstBuffer) >> 2) - 1;
     }
     //-----------------------------------------------------------------------------------
     void HlmsUnlit::unmapConstBuffer(void)
@@ -528,6 +531,7 @@ namespace Ogre
 
             mStartMappedConstBuffer     = 0;
             mCurrentMappedConstBuffer   = 0;
+            mCurrentConstBufferSize     = 0;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -549,6 +553,7 @@ namespace Ogre
         mStartMappedConstBuffer     = reinterpret_cast<uint32*>(
                                             constBuffer->map( 0, constBuffer->getNumElements() ) );
         mCurrentMappedConstBuffer   = mStartMappedConstBuffer;
+        mCurrentConstBufferSize     = constBuffer->getNumElements() >> 2;
 
         *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 2, constBuffer, 0, 0 );
 
@@ -577,6 +582,7 @@ namespace Ogre
 
         mStartMappedTexBuffer   = 0;
         mCurrentMappedTexBuffer = 0;
+        mCurrentTexBufferSize   = 0;
 
         //Ensure the proper alignment
         mTexLastOffset = alignToNextMultiple( mTexLastOffset, mVaoManager->getTexBufferAlignment() );
@@ -612,6 +618,7 @@ namespace Ogre
                                                             texBuffer->getNumElements() - mTexLastOffset,
                                                             false ) );
         mCurrentMappedTexBuffer = mStartMappedTexBuffer;
+        mCurrentTexBufferSize   = (texBuffer->getNumElements() - mTexLastOffset) >> 2;
 
         CbShaderBuffer *shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
         *shaderBufferCmd = CbShaderBuffer( 0, texBuffer, 0, 0 );

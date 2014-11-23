@@ -185,7 +185,7 @@ namespace Ogre
         efficientVectorRemove( mConstBuffers, itor );
     }
     //-----------------------------------------------------------------------------------
-    TexBufferPacked* VaoManager::createTexBuffer( PixelFormat pixelFormat,  size_t sizeBytes,
+    TexBufferPacked* VaoManager::createTexBuffer( PixelFormat pixelFormat, size_t sizeBytes,
                                                   BufferType bufferType,
                                                   void *initialData, bool keepAsShadow )
     {

@@ -284,7 +284,18 @@ namespace Ogre
         for( size_t i=firstRq; i<lastRq; ++i )
         {
             if( mRenderQueues[i].mMode == FAST )
-                numNeededDraws += mRenderQueues[i].mQueuedRenderables.size();
+            {
+                QueuedRenderableArrayPerThread::const_iterator itor =
+                        mRenderQueues[i].mQueuedRenderablesPerThread.begin();
+                QueuedRenderableArrayPerThread::const_iterator end  =
+                        mRenderQueues[i].mQueuedRenderablesPerThread.end();
+
+                while( itor != end )
+                {
+                    numNeededDraws += itor->size();
+                    ++itor;
+                }
+            }
         }
 
         HlmsCache passCache[HLMS_MAX];
