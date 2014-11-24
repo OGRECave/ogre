@@ -93,12 +93,10 @@ elseif (WIN32)
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
       src/WIN32/resource.h
-      src/WIN32/winres.h
     )  
     set(RESOURCE_FILES
       src/WIN32/resource.h
       src/WIN32/OgreWin32Resources.rc
-      src/WIN32/winres.h
     )
     source_group(Resources FILES ${RESOURCE_FILES})
     set(PLATFORM_HEADER_INSTALL "WIN32")
