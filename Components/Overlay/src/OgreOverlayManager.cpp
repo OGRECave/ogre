@@ -68,6 +68,7 @@ namespace v1
 
         mNodeMemoryManager = new NodeMemoryManager();
         mDummyNode = OGRE_NEW SceneNode( 0, 0, mNodeMemoryManager, 0 );
+        mDummyNode->_getFullTransformUpdated();
     }
     //---------------------------------------------------------------------
     OverlayManager::~OverlayManager()

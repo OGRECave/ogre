@@ -24,12 +24,13 @@ add_definitions(-DOGRE_OVERLAY_EXPORTS -D_MT -D_USRDLL)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 
-ogre_add_component_include_dir(Hlms/UnlitMobile)
+ogre_add_component_include_dir(Hlms/Unlit)
+#ogre_add_component_include_dir(Hlms/UnlitMobile)
 
 # setup target
 ogre_add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreOverlay PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES} OgreHlmsUnlitMobile )
+target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES} OgreHlmsUnlit )
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgreOverlay ${OGRE_THREAD_LIBRARIES})
 endif ()

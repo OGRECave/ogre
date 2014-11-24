@@ -121,7 +121,7 @@ namespace Ogre
         while( itor != end )
         {
             size_t bufferSize = (*itor)->getTotalSizeBytes();
-            if( requiredBytes < bufferSize && smallestBufferSize > bufferSize )
+            if( requiredBytes <= bufferSize && smallestBufferSize > bufferSize )
             {
                 smallestBuffer      = itor;
                 smallestBufferSize  = bufferSize;
@@ -377,10 +377,20 @@ namespace Ogre
 
             if( mRenderQueues[i].mMode == V1_LEGACY )
             {
+                if( mLastVaoId )
+                {
+                    rs->_startLegacyV1Rendering();
+                    mLastVaoId = 0;
+                }
                 renderES2( rs, casterPass, dualParaboloid, passCache, mRenderQueues[i] );
             }
             else if( mRenderQueues[i].mMode == V1_FAST )
             {
+                if( mLastVaoId )
+                {
+                    rs->_startLegacyV1Rendering();
+                    mLastVaoId = 0;
+                }
                 renderGL3V1( casterPass, dualParaboloid, passCache, mRenderQueues[i] );
             }
             else if( numNeededDraws > 0 /*&& mRenderQueues[i].mMode == FAST*/ )

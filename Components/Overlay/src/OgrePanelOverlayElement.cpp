@@ -31,10 +31,15 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreRoot.h"
-#include "OgreHlmsUnlitMobileDatablock.h"
 #include "OgreHlms.h"
 #include "OgreHlmsManager.h"
 #include "OgreRenderSystem.h"
+
+#ifdef OGRE_BUILD_COMPONENT_HLMS_UNLIT
+    #include "OgreHlmsUnlitDatablock.h"
+#else
+    #include "OgreHlmsUnlitMobileDatablock.h"
+#endif
 
 namespace Ogre {
 namespace v1 {
@@ -258,10 +263,15 @@ namespace v1 {
             HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
             Hlms *hlms = hlmsManager->getHlms( HLMS_UNLIT );
             HlmsDatablock *datablock = hlms->getDatablock( mMaterialName );
-            assert( dynamic_cast<HlmsUnlitMobileDatablock*>( datablock ) );
+            assert( dynamic_cast<OverlayUnlitDatablock*>( datablock ) );
 
-            HlmsUnlitMobileDatablock *guiDatablock = static_cast<HlmsUnlitMobileDatablock*>(datablock);
+            OverlayUnlitDatablock *guiDatablock = static_cast<OverlayUnlitDatablock*>(datablock);
+
+#ifdef OGRE_BUILD_COMPONENT_HLMS_UNLIT
+            uint8 numLayers = 1; //TODO?
+#else
             uint8 numLayers = guiDatablock->getNumUvSets();
+#endif
 
             VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
             // Check the number of texcoords we have in our buffer now

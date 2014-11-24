@@ -65,7 +65,7 @@ namespace Ogre
             {
                 TextureType textureType = TEX_TYPE_2D;
 
-                if( caps->hasCapability(RSC_TEXTURE_2D_ARRAY) && false ) //TODO
+                if( caps->hasCapability(RSC_TEXTURE_2D_ARRAY) ) //TODO
                 {
                     textureType = TEX_TYPE_2D_ARRAY;
 

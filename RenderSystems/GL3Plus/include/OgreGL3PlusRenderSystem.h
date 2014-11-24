@@ -481,6 +481,7 @@ namespace Ogre {
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd );
         virtual void _renderEmulated( const CbDrawCallStrip *cmd );
 
+        virtual void _startLegacyV1Rendering(void);
         virtual void _setRenderOperation( const v1::CbRenderOp *cmd );
         virtual void _render( const v1::CbDrawCallIndexed *cmd );
         virtual void _render( const v1::CbDrawCallStrip *cmd );

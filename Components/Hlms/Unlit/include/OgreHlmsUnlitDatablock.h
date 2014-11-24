@@ -97,13 +97,6 @@ namespace Ogre
         void decompileBakedTextures( UnlitBakedTexture outTextures[NUM_UNLIT_TEXTURE_TYPES] );
         void bakeTextures( const UnlitBakedTexture textures[NUM_UNLIT_TEXTURE_TYPES] );
 
-        struct Foo
-        {
-            uint8 sourceUv;
-            uint8 texUnit;
-            bool needsMatrix;
-        };
-
     public:
         /** Valid parameters in params:
         @param params

@@ -68,6 +68,18 @@ namespace Ogre
 #   define _OgreOverlayExport
 #endif 
 
-
+#ifdef OGRE_BUILD_COMPONENT_HLMS_UNLIT
+    namespace Ogre
+    {
+        class HlmsUnlitDatablock;
+        typedef HlmsUnlitDatablock OverlayUnlitDatablock;
+    }
+#else
+    namespace Ogre
+    {
+        class HlmsUnlitMobileDatablock;
+        typedef HlmsUnlitMobileDatablock OverlayUnlitDatablock;
+    }
+#endif
 
 #endif 

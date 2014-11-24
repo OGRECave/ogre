@@ -1183,6 +1183,8 @@ namespace Ogre
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd ) = 0;
         virtual void _renderEmulated( const CbDrawCallStrip *cmd ) = 0;
 
+        /// May override the current VertexArrayObject!
+        virtual void _startLegacyV1Rendering(void) {}
         virtual void _setRenderOperation( const v1::CbRenderOp *cmd ) = 0;
         /// Renders a V1 RenderOperation. Assumes _setRenderOperation has already been called.
         virtual void _render( const v1::CbDrawCallIndexed *cmd ) = 0;

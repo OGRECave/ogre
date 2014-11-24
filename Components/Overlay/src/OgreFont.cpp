@@ -38,7 +38,14 @@ THE SOFTWARE
 #include "OgreRoot.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
-#include "OgreHlmsUnlitMobileDatablock.h"
+
+#ifdef OGRE_BUILD_COMPONENT_HLMS_UNLIT
+    #include "OgreHlmsUnlitDatablock.h"
+    #define OGRE_FONT_TEX_TYPE_2D TEX_TYPE_2D_ARRAY
+#else
+    #include "OgreHlmsUnlitMobileDatablock.h"
+    #define OGRE_FONT_TEX_TYPE_2D TEX_TYPE_2D
+#endif
 
 #define generic _generic    // keyword for C++/CX
 #include <ft2build.h>
@@ -189,7 +196,7 @@ namespace Ogre
         else
         {
             // Manually load since we need to load to get alpha
-            mTexture = TextureManager::getSingleton().load(mSource, mGroup, TEX_TYPE_2D, 0);
+            mTexture = TextureManager::getSingleton().load(mSource, mGroup, OGRE_FONT_TEX_TYPE_2D, 0);
             blendByAlpha = mTexture->hasAlpha();
             texLayer = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(mSource);
         }
@@ -219,17 +226,21 @@ namespace Ogre
         }
 
         HlmsParamVec paramsVec;
-        paramsVec.push_back( std::pair<IdString, String>( "diffuse_map", "" ) );
+        //paramsVec.push_back( std::pair<IdString, String>( "diffuse_map", "" ) );
         std::sort( paramsVec.begin(), paramsVec.end() );
 
         String datablockName = "Fonts/" + mName;
         mHlmsDatablock = hlmsGui->createDatablock( datablockName, datablockName,
                                                    macroblock, blendblock, paramsVec );
 
-        assert( dynamic_cast<HlmsUnlitMobileDatablock*>( mHlmsDatablock ) );
+        assert( dynamic_cast<OverlayUnlitDatablock*>( mHlmsDatablock ) );
 
-        HlmsUnlitMobileDatablock *guiDatablock = static_cast<HlmsUnlitMobileDatablock*>(mHlmsDatablock);
-        guiDatablock->setTexture( 0, mTexture, HlmsUnlitMobileDatablock::UvAtlasParams() );
+        OverlayUnlitDatablock *guiDatablock = static_cast<OverlayUnlitDatablock*>(mHlmsDatablock);
+#ifdef OGRE_BUILD_COMPONENT_HLMS_UNLIT
+        guiDatablock->setTexture( 0, 0, mTexture );
+#else
+        guiDatablock->setTexture( 0, mTexture, OverlayUnlitDatablock::UvAtlasParams() );
+#endif
         guiDatablock->calculateHash();
 
         // Make sure material is aware of colour per vertex.
@@ -267,7 +278,7 @@ namespace Ogre
         // Create, setting isManual to true and passing self as loader
         mTexture = TextureManager::getSingleton().create(
             texName, mGroup, true, this);
-        mTexture->setTextureType(TEX_TYPE_2D);
+        mTexture->setTextureType(OGRE_FONT_TEX_TYPE_2D);
         mTexture->setNumMipmaps(0);
         mTexture->load();
 
