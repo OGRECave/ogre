@@ -319,6 +319,12 @@ namespace Ogre
             {
                 itor->size += blockToMerge->size;
                 size_t idx = itor - blocks.begin();
+
+                //When blockToMerge is the last one, its index won't be the same
+                //after removing the other iterator, they will swap.
+                if( idx == blocks.size() - 1 )
+                    idx = itor - blocks.begin();
+
                 efficientVectorRemove( blocks, blockToMerge );
 
                 blockToMerge = blocks.begin() + idx;
@@ -329,6 +335,12 @@ namespace Ogre
             {
                 blockToMerge->size += itor->size;
                 size_t idx = blockToMerge - blocks.begin();
+
+                //When blockToMerge is the last one, its index won't be the same
+                //after removing the other iterator, they will swap.
+                if( idx == blocks.size() - 1 )
+                    idx = itor - blocks.begin();
+
                 efficientVectorRemove( blocks, itor );
 
                 blockToMerge = blocks.begin() + idx;

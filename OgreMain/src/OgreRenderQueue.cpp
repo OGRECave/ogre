@@ -280,6 +280,8 @@ namespace Ogre
             mLastWasCasterPass = casterPass;
         }
 
+        rs->setCurrentPassIterationCount( 1 );
+
         size_t numNeededDraws = 0;
         for( size_t i=firstRq; i<lastRq; ++i )
         {

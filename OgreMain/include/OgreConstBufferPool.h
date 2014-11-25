@@ -64,7 +64,7 @@ namespace Ogre
                         BufferPacked *_extraBuffer );
         };
 
-        struct ExtraBufferParams
+        struct _OgreExport ExtraBufferParams
         {
             size_t      bytesPerSlot;
             BufferType  bufferType;
