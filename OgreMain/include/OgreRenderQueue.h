@@ -124,10 +124,15 @@ namespace Ogre {
         {
             QueuedRenderableArrayPerThread mQueuedRenderablesPerThread;
             QueuedRenderableArray   mQueuedRenderables;
+            /// When false, this render queue group won't be sorted.
+            /// Useful when the RQ needs to be drawn exactly in the
+            /// order that Renderables were added, or when you have
+            /// a deep CPU bottleneck.
+            bool                    mDoSort;
             bool                    mSorted;
             Modes                   mMode;
 
-            RenderQueueGroup() : mSorted( false ), mMode( V1_FAST ) {}
+            RenderQueueGroup() : mDoSort( true ), mSorted( false ), mMode( V1_FAST ) {}
 
             void swap( RenderQueueGroup &other )
             {
