@@ -323,7 +323,7 @@ namespace Ogre
                 //When blockToMerge is the last one, its index won't be the same
                 //after removing the other iterator, they will swap.
                 if( idx == blocks.size() - 1 )
-                    idx = itor - blocks.begin();
+                    idx = blockToMerge - blocks.begin();
 
                 efficientVectorRemove( blocks, blockToMerge );
 
