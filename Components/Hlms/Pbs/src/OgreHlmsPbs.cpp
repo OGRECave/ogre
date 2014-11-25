@@ -974,6 +974,7 @@ namespace Ogre
             {
                 assert( shaderBufferCmd->bufferPacked == texBuffer );
                 shaderBufferCmd->bindSizeBytes = mTexLastOffset;
+                mLastTexBufferCmdOffset = (size_t)~0;
             }
         }
 
