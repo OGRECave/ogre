@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreGL3PlusHardwareBufferManager.h" //GL3PlusHardwareBufferManager::getGLType
 
 #include "OgreTimer.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {
@@ -217,6 +218,12 @@ namespace Ogre
             OCGE( glGenBuffers( 1, &newVbo.vboName ) );
             OCGE( glBindBuffer( GL_ARRAY_BUFFER, newVbo.vboName ) );
 
+            GLenum error = 0;
+            int trustCounter = 1000;
+            //Reset the error code. Trust counter prevents an infinite loop
+            //just in case we encounter a moronic GL implementation.
+            while( glGetError() && trustCounter-- );
+
             if( mArbBufferStorage )
             {
                 GLbitfield flags = 0;
@@ -234,13 +241,29 @@ namespace Ogre
                     }
                 }
 
-                OCGE( glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0, flags ) );
+                glBufferStorage( GL_ARRAY_BUFFER, poolSize, 0, flags );
+
+                error = glGetError();
             }
             else
             {
-                OCGE( glBufferData( GL_ARRAY_BUFFER, poolSize, 0,
-                                     vboFlag == CPU_INACCESSIBLE ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW ) );
+                glBufferData( GL_ARRAY_BUFFER, poolSize, 0,
+                              vboFlag == CPU_INACCESSIBLE ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW );
+
+                error = glGetError();
             }
+
+            //OpenGL can't continue after any GL_OUT_OF_MEMORY has been raised,
+            //thus ignore the trustCounter in that case.
+            if( (error != 0 && trustCounter != 0) || error == GL_OUT_OF_MEMORY )
+            {
+                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                             "Out of GPU memory or driver refused.\n"
+                             "glGetError code: " + StringConverter::toString( error ) + ".\n"
+                             "Requested: " + StringConverter::toString( poolSize ) + " bytes.",
+                             "GL3PlusVaoManager::allocateVbo" );
+            }
+
             OCGE( glBindBuffer( GL_ARRAY_BUFFER, 0 ) );
 
             newVbo.sizeBytes = poolSize;

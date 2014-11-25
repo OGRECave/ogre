@@ -695,7 +695,7 @@ namespace Ogre
                                                             passCache[datablock->mType],
                                                             queuedRenderable,
                                                             casterPass );
-            if( lastHlmsCacheHash != hlmsCache->hash )
+            if( lastHlmsCache != hlmsCache )
             {
                 CbHlmsCache *hlmsCacheCmd = mCommandBuffer->addCommand<CbHlmsCache>();
                 *hlmsCacheCmd = CbHlmsCache( hlmsCache );

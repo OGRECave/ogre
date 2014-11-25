@@ -230,6 +230,7 @@ namespace Ogre
                                          GpuProgramPtr &tesselationDomainShader,
                                          GpuProgramPtr &pixelShader );
         const HlmsCache* getShaderCache( uint32 hash ) const;
+        void clearShaderCache(void);
 
         /** Creates a shader based on input parameters. Caller is responsible for ensuring
             this shader hasn't already been created.
@@ -410,10 +411,6 @@ namespace Ogre
             It assumes that renderable->setHlms( this, parameters ) has already called.
         @param lastReturnedValue
             The last value returned by getMaterial.
-            VERY IMPORTANT: lastReturnedValue pointer may be invalidated after this call.
-            The only time it's safe to assume it hasn't changed, if the value of
-            lastReturnedValue->hash *before* calling this function is the same as the
-            hash value of the returned pointer.
         @param passCache
             The cache returned by @preparePassHash.
         @param renderable

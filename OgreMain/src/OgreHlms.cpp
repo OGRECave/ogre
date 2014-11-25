@@ -122,6 +122,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Hlms::~Hlms()
     {
+        clearShaderCache();
+
         _destroyAllDatablocks();
 
         if( mHlmsManager )
@@ -1145,13 +1147,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::setHighQuality( bool highQuality )
     {
-        mShaderCache.clear();
+        clearShaderCache();
         mHighQuality = highQuality;
     }
     //-----------------------------------------------------------------------------------
     void Hlms::reloadFrom( Archive *newDataFolder )
     {
-        mShaderCache.clear();
+        clearShaderCache();
         mDataFolder = newDataFolder;
         enumeratePieceFiles();
     }
@@ -1267,7 +1269,7 @@ namespace Ogre
     {
         HlmsCache cache( hash, mType );
         HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
-                                                      cache, OrderCacheByHash );
+                                                      &cache, OrderCacheByHash );
 
         assert( (it == mShaderCache.end() || it->hash != hash) &&
                 "Can't add the same shader to the cache twice! (or a hash collision happened)" );
@@ -1278,19 +1280,36 @@ namespace Ogre
         cache.tesselationDomainShader   = tesselationDomainShader;
         cache.pixelShader               = pixelShader;
 
-        return &(*mShaderCache.insert( it, cache ));
+        HlmsCache *retVal = new HlmsCache( cache );
+        mShaderCache.insert( it, retVal );
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::getShaderCache( uint32 hash ) const
     {
         HlmsCache cache( hash, mType );
         HlmsCacheVec::const_iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
-                                                            cache, OrderCacheByHash );
+                                                            &cache, OrderCacheByHash );
 
-        if( it != mShaderCache.end() && it->hash == hash )
-            return &(*it);
+        if( it != mShaderCache.end() && (*it)->hash == hash )
+            return *it;
 
         return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::clearShaderCache(void)
+    {
+        HlmsCacheVec::const_iterator itor = mShaderCache.begin();
+        HlmsCacheVec::const_iterator end  = mShaderCache.end();
+
+        while( itor != end )
+        {
+            delete *itor;
+            ++itor;
+        }
+
+        mShaderCache.clear();
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::createShaderCacheEntry( uint32 renderableHash, const HlmsCache &passCache,
@@ -1702,7 +1721,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::_changeRenderSystem( RenderSystem *newRs )
     {
-        mShaderCache.clear();
+        clearShaderCache();
         mRenderSystem = newRs;
 
         mShaderProfile = "unset!";

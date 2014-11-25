@@ -192,11 +192,11 @@ namespace Ogre
 
     #define OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( x ) (x >> 29)
 
-    typedef vector<HlmsCache>::type HlmsCacheVec;
+    typedef vector<HlmsCache*>::type HlmsCacheVec;
 
-    inline bool OrderCacheByHash( const HlmsCache &_left, const HlmsCache &_right )
+    inline bool OrderCacheByHash( const HlmsCache *_left, const HlmsCache *_right )
     {
-        return _left.hash < _right.hash;
+        return _left->hash < _right->hash;
     }
 
     /** @} */
