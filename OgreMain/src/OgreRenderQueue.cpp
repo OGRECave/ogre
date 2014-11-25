@@ -158,7 +158,7 @@ namespace Ogre
 
             while( itor != end )
             {
-                itor->clear();
+                itor->q.clear();
                 ++itor;
             }
 
@@ -267,7 +267,7 @@ namespace Ogre
                 ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShiftTransp );
         }
 
-        mRenderQueues[rqId].mQueuedRenderablesPerThread[threadIdx].push_back(
+        mRenderQueues[rqId].mQueuedRenderablesPerThread[threadIdx].q.push_back(
                     QueuedRenderable( hash, pRend, pMovableObject ) );
     }
     //-----------------------------------------------------------------------
@@ -294,7 +294,7 @@ namespace Ogre
 
                 while( itor != end )
                 {
-                    numNeededDraws += itor->size();
+                    numNeededDraws += itor->q.size();
                     ++itor;
                 }
             }
@@ -350,7 +350,7 @@ namespace Ogre
 
                 while( itor != end )
                 {
-                    numRenderables += itor->size();
+                    numRenderables += itor->q.size();
                     ++itor;
                 }
 
@@ -359,7 +359,7 @@ namespace Ogre
                 itor = perThreadQueue.begin();
                 while( itor != end )
                 {
-                    queuedRenderables.appendPOD( itor->begin(), itor->end() );
+                    queuedRenderables.appendPOD( itor->q.begin(), itor->q.end() );
                     ++itor;
                 }
 

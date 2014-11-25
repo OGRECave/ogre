@@ -2201,8 +2201,17 @@ void SceneManager::instanceBatchCullFrustumThread( const InstanceBatchCullReques
 void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t threadIdx )
 {
     VisibleObjectsPerRq &visibleObjectsPerRq = *(mVisibleObjects.begin() + threadIdx);
-    visibleObjectsPerRq.clear();
-    visibleObjectsPerRq.resize( 255 );
+    {
+        visibleObjectsPerRq.resize( 255 );
+        VisibleObjectsPerRq::iterator itor = visibleObjectsPerRq.begin();
+        VisibleObjectsPerRq::iterator end  = visibleObjectsPerRq.end();
+
+        while( itor != end )
+        {
+            itor->clear();
+            ++itor;
+        }
+    }
 
     const Camera *camera    = request.camera;
     const Camera *lodCamera = request.lodCamera;

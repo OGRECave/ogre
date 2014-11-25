@@ -362,9 +362,6 @@ namespace Ogre
             inOutPieces[VertexShader][outPrefix + "_swizzle"] = i % 2 ? "zw" : "xy";
         }
 
-        /*TODO
-        * Schedule and Update texture matrices (and set them).*/
-
         String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
         inOutPieces[VertexShader][UnlitProperty::MaterialsPerBuffer] = slotsPerPoolStr;
         inOutPieces[PixelShader][UnlitProperty::MaterialsPerBuffer]  = slotsPerPoolStr;

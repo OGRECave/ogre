@@ -110,7 +110,15 @@ namespace Ogre {
 
     private:
         typedef FastArray<QueuedRenderable> QueuedRenderableArray;
-        typedef FastArray<QueuedRenderableArray> QueuedRenderableArrayPerThread;
+
+        struct ThreadRenderQueue
+        {
+            QueuedRenderableArray   q;
+            /// The padding prevents false cache sharing when multithreading.
+            uint8                   padding[128];
+        };
+
+        typedef FastArray<ThreadRenderQueue> QueuedRenderableArrayPerThread;
 
         struct RenderQueueGroup
         {
