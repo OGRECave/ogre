@@ -373,7 +373,7 @@ namespace Ogre
                 //  * If it's shorter, reset the indices 0, 1, 2, 3, 4; probably use quicksort or other generic sort
                 //
                 //TODO2: Explore sorting first on multiple threads, then merge sort into one.
-                if( mDoSort )
+                if( mRenderQueues[i].mDoSort )
                 {
                     std::sort( queuedRenderables.begin(), queuedRenderables.end() );
                     mRenderQueues[i].mSorted = true;
