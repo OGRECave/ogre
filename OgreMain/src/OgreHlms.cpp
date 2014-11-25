@@ -1271,7 +1271,7 @@ namespace Ogre
         HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
                                                       &cache, OrderCacheByHash );
 
-        assert( (it == mShaderCache.end() || it->hash != hash) &&
+        assert( (it == mShaderCache.end() || (*it)->hash != hash) &&
                 "Can't add the same shader to the cache twice! (or a hash collision happened)" );
 
         cache.vertexShader              = vertexShader;
