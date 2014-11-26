@@ -855,10 +855,6 @@ namespace Ogre
         }
         else
         {
-            //uint worldMaterialIdx[]
-            *currentMappedConstBuffer++ = (((mCurrentMappedTexBuffer - mStartMappedTexBuffer) / 3) << 9) |
-                                            (datablock->getAssignedSlot() & 0x1FF);
-
             uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
             assert( numWorldTransforms <= 256 );
 
@@ -867,6 +863,13 @@ namespace Ogre
             {
                 currentMappedTexBuffer = mapNextTexBuffer( commandBuffer );
             }
+
+            //uint worldMaterialIdx[]
+            size_t distToWorldMatStart = mCurrentMappedTexBuffer - mStartMappedTexBuffer;
+            distToWorldMatStart >>= 2;
+            *currentMappedConstBuffer = (distToWorldMatStart << 9 ) |
+                                            (datablock->getAssignedSlot() & 0x1FF);
+            currentMappedConstBuffer += 4;
 
             //vec4 worldMat[][3]
             //TODO: Don't rely on a virtual function + make a direct 4x3 copy

@@ -68,8 +68,8 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @end
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
-	int _idx = int(blendIndices[0] * 3.0);
-	uint matStart = (instance.worldMaterialIdx[drawId] & 0xFFFFFE00) >> 9;
+	int _idx = int(blendIndices[0] * 3);
+	uint matStart = instance.worldMaterialIdx[drawId] >> 9;
 	vec4 worldMat[3];
 	worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0) );
 	worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1) );
@@ -93,7 +93,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
 	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;@end
 	@foreach( hlms_bones_per_vertex, n, 1 )
-	_idx = int(blendIndices[@n] * 3.0);
+	_idx = int(blendIndices[@n] * 3);
 	worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0) );
 	worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1) );
 	worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2) );
