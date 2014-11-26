@@ -85,7 +85,6 @@ namespace Ogre
         float   *mStartMappedTexBuffer;
         float   *mCurrentMappedTexBuffer;
         size_t  mCurrentTexBufferSize;
-        size_t  mTexBufferAlignment; //Not in bytes, already divided by 4.
 
         /// Resets every to zero every new buffer (@see unmapTexBuffer and @see mapNextTexBuffer).
         size_t  mTexLastOffset;

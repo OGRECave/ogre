@@ -195,7 +195,6 @@ namespace Ogre
         mStartMappedTexBuffer( 0 ),
         mCurrentMappedTexBuffer( 0 ),
         mCurrentTexBufferSize( 0 ),
-        mTexBufferAlignment( 256 ),
         mTexLastOffset( 0 ),
         mLastTexBufferCmdOffset( (size_t)~0 ),
         mLastTextureHash( 0 ),
@@ -218,8 +217,6 @@ namespace Ogre
 
         if( newRs )
         {
-            mTexBufferAlignment = mVaoManager->getTexBufferAlignment() >> 2;
-
             HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
             HlmsDatablockMap::const_iterator end  = mDatablocks.end();
 

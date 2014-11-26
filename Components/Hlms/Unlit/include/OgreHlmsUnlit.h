@@ -74,6 +74,7 @@ namespace Ogre
         uint32  *mCurrentMappedConstBuffer;
         size_t  mCurrentConstBufferSize;
 
+        float   *mRealStartMappedTexBuffer;
         float   *mStartMappedTexBuffer;
         float   *mCurrentMappedTexBuffer;
         size_t  mCurrentTexBufferSize;
@@ -126,15 +127,19 @@ namespace Ogre
         ///
         /// (*) D3D11.1 allows using MAP_NO_OVERWRITE for texture buffers.
         void unmapTexBuffer( CommandBuffer *commandBuffer );
-        DECL_MALLOC float* mapNextTexBuffer( CommandBuffer *commandBuffer );
+        DECL_MALLOC float* mapNextTexBuffer( CommandBuffer *commandBuffer, size_t minimumSizeBytes );
 
         /** Rebinds the texture buffer. Finishes the last bind command to the tbuffer.
         @param resetOffset
             When true, the tbuffer will be offsetted so that the shader samples
             from 0 at the current offset in mCurrentMappedTexBuffer
             WARNING: mCurrentMappedTexBuffer may be modified due to alignment.
+            mStartMappedTexBuffer & mCurrentTexBufferSize will always be modified
+        @param minimumTexBufferSize
+            If resetOffset is true and the remaining space in the currently mapped
+            tbuffer is less than minimumSizeBytes, we will call mapNextTexBuffer
         */
-        void rebindTexBuffer( CommandBuffer *commandBuffer, bool resetOffset = false );
+        void rebindTexBuffer( CommandBuffer *commandBuffer, bool resetOffset = false, size_t minimumSizeBytes = 1 );
 
         void destroyAllBuffers(void);
 

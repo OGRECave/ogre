@@ -162,6 +162,7 @@ namespace Ogre
         mStartMappedConstBuffer( 0 ),
         mCurrentMappedConstBuffer( 0 ),
         mCurrentConstBufferSize( 0 ),
+        mRealStartMappedTexBuffer( 0 ),
         mStartMappedTexBuffer( 0 ),
         mCurrentMappedTexBuffer( 0 ),
         mCurrentTexBufferSize( 0 ),
@@ -456,9 +457,22 @@ namespace Ogre
 
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
 
-        if( (currentMappedConstBuffer - mStartMappedConstBuffer) + 1 >= mCurrentConstBufferSize )
+        bool exceedsConstBuffer = (size_t)((currentMappedConstBuffer - mStartMappedConstBuffer) + 4) >
+                                                                                mCurrentConstBufferSize;
+
+        const size_t minimumTexBufferSize = 16;
+        bool exceedsTexBuffer = (currentMappedTexBuffer - mStartMappedTexBuffer) +
+                                     minimumTexBufferSize >= mCurrentTexBufferSize;
+
+        if( exceedsConstBuffer || exceedsTexBuffer )
         {
             currentMappedConstBuffer = mapNextConstBuffer( commandBuffer );
+
+            if( exceedsTexBuffer )
+                mapNextTexBuffer( commandBuffer, minimumTexBufferSize * sizeof(float) );
+            else
+                rebindTexBuffer( commandBuffer, true, minimumTexBufferSize * sizeof(float) );
+
             currentMappedTexBuffer = mCurrentMappedTexBuffer;
         }
 
@@ -468,11 +482,6 @@ namespace Ogre
         bool useIdentityProjection = queuedRenderable.renderable->getUseIdentityProjection();
 
 #if !OGRE_DOUBLE_PRECISION
-        if( (currentMappedTexBuffer - mStartMappedTexBuffer) + 16 >= mCurrentTexBufferSize )
-        {
-            currentMappedTexBuffer = mapNextTexBuffer( commandBuffer );
-        }
-
         //uint materialIdx[]
         *currentMappedConstBuffer = datablock->getAssignedSlot();
         currentMappedConstBuffer += 4;
@@ -557,8 +566,6 @@ namespace Ogre
 
         *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 2, constBuffer, 0, 0 );
 
-        rebindTexBuffer( commandBuffer, true );
-
         return mStartMappedConstBuffer;
     }
     //-----------------------------------------------------------------------------------
@@ -583,6 +590,7 @@ namespace Ogre
             }
         }
 
+        mRealStartMappedTexBuffer = 0;
         mStartMappedTexBuffer   = 0;
         mCurrentMappedTexBuffer = 0;
         mCurrentTexBufferSize   = 0;
@@ -591,14 +599,16 @@ namespace Ogre
         mTexLastOffset = alignToNextMultiple( mTexLastOffset, mVaoManager->getTexBufferAlignment() );
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC float* HlmsUnlit::mapNextTexBuffer( CommandBuffer *commandBuffer )
+    DECL_MALLOC float* HlmsUnlit::mapNextTexBuffer( CommandBuffer *commandBuffer, size_t minimumSizeBytes )
     {
         unmapTexBuffer( commandBuffer );
 
         TexBufferPacked *texBuffer = mTexBuffers[mCurrentTexBuffer];
 
+        mTexLastOffset = alignToNextMultiple( mTexLastOffset, mVaoManager->getTexBufferAlignment() );
+
         //We'll go out of bounds. This buffer is full. Get a new one and remap from 0.
-        if( mTexLastOffset >= texBuffer->getTotalSizeBytes() )
+        if( mTexLastOffset + minimumSizeBytes >= texBuffer->getTotalSizeBytes() )
         {
             mTexLastOffset = 0;
             ++mCurrentTexBuffer;
@@ -616,11 +626,12 @@ namespace Ogre
             texBuffer = mTexBuffers[mCurrentTexBuffer];
         }
 
-        mStartMappedTexBuffer   = reinterpret_cast<float*>(
+        mRealStartMappedTexBuffer   = reinterpret_cast<float*>(
                                             texBuffer->map( mTexLastOffset,
                                                             texBuffer->getNumElements() - mTexLastOffset,
                                                             false ) );
-        mCurrentMappedTexBuffer = mStartMappedTexBuffer;
+        mStartMappedTexBuffer   = mRealStartMappedTexBuffer;
+        mCurrentMappedTexBuffer = mRealStartMappedTexBuffer;
         mCurrentTexBufferSize   = (texBuffer->getNumElements() - mTexLastOffset) >> 2;
 
         CbShaderBuffer *shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
@@ -631,8 +642,11 @@ namespace Ogre
         return mStartMappedTexBuffer;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsUnlit::rebindTexBuffer( CommandBuffer *commandBuffer, bool resetOffset )
+    void HlmsUnlit::rebindTexBuffer( CommandBuffer *commandBuffer, bool resetOffset,
+                                     size_t minimumSizeBytes )
     {
+        assert( minimumSizeBytes > 0 );
+
         //Set the binding size of the old binding command (if exists)
         CbShaderBuffer *shaderBufferCmd = reinterpret_cast<CbShaderBuffer*>(
                     commandBuffer->getCommandFromOffset( mLastTexBufferCmdOffset ) );
@@ -643,20 +657,34 @@ namespace Ogre
                                                 sizeof(float);
         }
 
-        size_t oldOffset = 0;
-        if( resetOffset )
+        const size_t bufferSizeBytes = mCurrentTexBufferSize * sizeof(float);
+        size_t currentOffset = (mCurrentMappedTexBuffer - mStartMappedTexBuffer) * sizeof(float);
+        currentOffset = alignToNextMultiple( currentOffset, mVaoManager->getTexBufferAlignment() );
+        currentOffset = std::min( bufferSizeBytes, currentOffset );
+        const size_t remainingSize = bufferSizeBytes - currentOffset;
+
+        if( resetOffset && remainingSize < minimumSizeBytes )
         {
-            oldOffset = (mCurrentMappedTexBuffer - mStartMappedTexBuffer) * sizeof(float);
-            oldOffset = alignToNextMultiple( oldOffset, mVaoManager->getTexBufferAlignment() );
-
-            mCurrentMappedTexBuffer = reinterpret_cast<float*>(
-                            reinterpret_cast<unsigned char*>(mStartMappedTexBuffer) + oldOffset );
+            mapNextTexBuffer( commandBuffer, minimumSizeBytes );
         }
+        else
+        {
+            size_t bindOffset = (mStartMappedTexBuffer - mRealStartMappedTexBuffer) * sizeof(float);
+            if( resetOffset )
+            {
+                mStartMappedTexBuffer = reinterpret_cast<float*>(
+                            reinterpret_cast<unsigned char*>(mStartMappedTexBuffer) + currentOffset );
+                mCurrentMappedTexBuffer = mStartMappedTexBuffer;
+                mCurrentTexBufferSize -= currentOffset / sizeof(float);
 
-        //Add a new binding command.
-        shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
-        *shaderBufferCmd = CbShaderBuffer( 0, mTexBuffers[mCurrentTexBuffer], oldOffset, 0 );
-        mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
+                bindOffset = (mCurrentMappedTexBuffer - mRealStartMappedTexBuffer) * sizeof(float);
+            }
+
+            //Add a new binding command.
+            shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
+            *shaderBufferCmd = CbShaderBuffer( 0, mTexBuffers[mCurrentTexBuffer], bindOffset, 0 );
+            mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsUnlit::destroyAllBuffers(void)
