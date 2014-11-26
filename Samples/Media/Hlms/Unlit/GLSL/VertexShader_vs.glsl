@@ -1,16 +1,16 @@
 @insertpiece( SetCrossPlatformSettings )
 
-#define UNPACK_MAT4( dst, matrixBuf, pixelIdx ) \
-	{ \
-		vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) * 4) ); \
-		vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) * 4) + 1) ); \
-		vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) * 4) + 2) ); \
-		vec4 row3 = texelFetch( matrixBuf, int(((pixelIdx) * 4) + 3) ); \
-		dst = mat4( row0.x, row1.x, row2.x, row3.x, \
-					row0.y, row1.y, row2.y, row3.y, \
-					row0.z, row1.z, row2.z, row3.z, \
-					row0.w, row1.w, row2.w, row3.w ); \
-	}
+mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
+{
+	vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2) );
+	vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2) + 1) );
+	vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2) + 2) );
+	vec4 row3 = texelFetch( matrixBuf, int(((pixelIdx) << 2) + 3) );
+	return mat4( row0.x, row1.x, row2.x, row3.x,
+				 row0.y, row1.y, row2.y, row3.y,
+				 row0.z, row1.z, row2.z, row3.z,
+				 row0.w, row1.w, row2.w, row3.w );
+}
 
 layout(std140) uniform;
 
@@ -38,7 +38,7 @@ void main()
 {
 	//uint drawId = 1;
 	mat4 worldViewProj;
-	UNPACK_MAT4( worldViewProj, worldMatBuf, drawId );
+	worldViewProj = UNPACK_MAT4( worldMatBuf, drawId );
 
 @property( !hlms_dual_paraboloid_mapping )
 	gl_Position = worldViewProj * vertex;
@@ -59,7 +59,7 @@ void main()
 @property( texture_matrix )	mat4 textureMatrix;@end
 
 @foreach( out_uv_count, n )
-	@property( out_uv@_texture_matrix )UNPACK_MAT4( textureMatrix, animationMatrixBuf, (instance.materialIdx[drawId] * 16) + @value( out_uv@n_tex_unit ) );@end
+	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.materialIdx[drawId] << 4) + @value( out_uv@n_tex_unit ) );@end
 	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@value( out_uv@n_source_uv ).xy @property( out_uv@_texture_matrix ) * textureMatrix@end ;@end
 
 	outVs.drawId = drawId;

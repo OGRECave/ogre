@@ -545,8 +545,9 @@ namespace Ogre
 
         //mat4 viewProj;
         Matrix4 viewProjMatrix = projectionMatrix * viewMatrix;
+        Matrix4 tmp = viewProjMatrix.transpose();
         for( size_t i=0; i<16; ++i )
-            *passBufferPtr++ = (float)viewProjMatrix[0][i];
+            *passBufferPtr++ = (float)tmp[0][i];
 
         mPreparedPass.viewProjMatrix    = viewProjMatrix;
         mPreparedPass.viewMatrix        = viewMatrix;
@@ -554,8 +555,9 @@ namespace Ogre
         if( !casterPass )
         {
             //mat4 view;
+            Matrix4 tmp = viewMatrix.transpose();
             for( size_t i=0; i<16; ++i )
-                *passBufferPtr++ = (float)viewMatrix[0][i];
+                *passBufferPtr++ = (float)tmp[0][i];
 
             for( int32 i=0; i<numShadowMaps; ++i )
             {
