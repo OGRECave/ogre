@@ -100,6 +100,10 @@ namespace Ogre
 
         for( size_t i=0; i<256; ++i )
             mRenderQueues[i].mQueuedRenderablesPerThread.resize( sceneManager->getNumWorkerThreads() );
+
+        // Set some defaults.
+        setRenderQueueMode( 0, FAST );
+        setRenderQueueMode( 1, V1_FAST );
     }
     //---------------------------------------------------------------------
     RenderQueue::~RenderQueue()
@@ -866,6 +870,16 @@ namespace Ogre
     RenderQueue::Modes RenderQueue::getRenderQueueMode( uint8 rqId ) const
     {
         return mRenderQueues[rqId].mMode;
+    }
+    //-----------------------------------------------------------------------
+    void RenderQueue::setSortRenderQueue( uint8 rqId, bool bSort )
+    {
+        mRenderQueues[rqId].mDoSort = bSort;
+    }
+    //-----------------------------------------------------------------------
+    bool RenderQueue::getSortRenderQueue( uint8 rqId ) const
+    {
+        return mRenderQueues[rqId].mDoSort;
     }
 }
 

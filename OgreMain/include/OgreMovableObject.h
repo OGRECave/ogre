@@ -143,7 +143,7 @@ namespace Ogre {
 
         /// Constructor
         MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
-                        uint8 renderQueueId );
+                       uint8 renderQueueId );
 
         /** Don't use this constructor unless you know what you're doing.
             @See ObjectMemoryManager::mDummyNode

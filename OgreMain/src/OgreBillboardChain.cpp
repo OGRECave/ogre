@@ -68,7 +68,7 @@ namespace v1 {
     BillboardChain::BillboardChain( IdType id, ObjectMemoryManager *objectMemoryManager,
             size_t maxElements, size_t numberOfChains, bool useTextureCoords,
             bool useColours, bool dynamic )
-        :MovableObject( id, objectMemoryManager, 0 ),
+        :MovableObject( id, objectMemoryManager, 1 ),
         mMaxElementsPerChain(maxElements),
         mChainCount(numberOfChains),
         mUseTexCoords(useTextureCoords),

@@ -1233,8 +1233,8 @@ namespace Ogre {
         */
         virtual void unregisterSceneNodeListener( SceneNode *sceneNode );
 
-        /// Returns the RenderQueue. For advanced users.
-        RenderQueue* _getRenderQueue(void) const            { return mRenderQueue; }
+        /// Returns the RenderQueue.
+        RenderQueue* getRenderQueue(void) const             { return mRenderQueue; }
 
         /** Retrieves the main entity memory manager.
         @remarks

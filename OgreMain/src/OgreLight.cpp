@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     Light::Light( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager, 0 ),
+        : MovableObject( id, objectMemoryManager, 1 ),
           mLightType(LT_POINT),
           mDiffuse(ColourValue::White),
           mSpecular(ColourValue::Black),

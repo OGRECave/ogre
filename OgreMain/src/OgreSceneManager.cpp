@@ -1217,13 +1217,10 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
             while( it != en )
             {
-                VisibleObjectsPerRq::const_iterator itPerRq = it->begin();
-                VisibleObjectsPerRq::const_iterator enPerRq = it->end();
-
-                while( itPerRq != enPerRq )
+                for( uint8 i=firstRq; i<lastRq; ++i )
                 {
-                    MovableObject::MovableObjectArray::const_iterator itor = itPerRq->begin();
-                    MovableObject::MovableObjectArray::const_iterator end  = itPerRq->end();
+                    MovableObject::MovableObjectArray::const_iterator itor = (*it)[i].begin();
+                    MovableObject::MovableObjectArray::const_iterator end  = (*it)[i].end();
 
                     while( itor != end )
                     {
@@ -1236,14 +1233,12 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
 
                         while( itRend != enRend )
                         {
-                            mRenderQueue->addRenderableV1( 0, casterPass, *itRend, *itor );
+                            mRenderQueue->addRenderableV1( i, casterPass, *itRend, *itor );
                             ++itRend;
                         }
 
                         ++itor;
                     }
-
-                    ++itPerRq;
                 }
 
                 ++it;

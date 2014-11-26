@@ -124,10 +124,6 @@ namespace Ogre {
         {
             QueuedRenderableArrayPerThread mQueuedRenderablesPerThread;
             QueuedRenderableArray   mQueuedRenderables;
-            /// When false, this render queue group won't be sorted.
-            /// Useful when the RQ needs to be drawn exactly in the
-            /// order that Renderables were added, or when you have
-            /// a deep CPU bottleneck.
             bool                    mDoSort;
             bool                    mSorted;
             Modes                   mMode;
@@ -240,8 +236,26 @@ namespace Ogre {
 
         void _swapQueuesForShadowMapping(void);
 
+        /** Sets the mode for the RenderQueue ID. @see RenderQueue::Modes
+        @param rqId
+            ID of the render queue
+        @param newMode
+            The new mode to use.
+        */
         void setRenderQueueMode( uint8 rqId, RenderQueue::Modes newMode );
         RenderQueue::Modes getRenderQueueMode( uint8 rqId ) const;
+
+        /** Sets whether we should sort the render queue ID every frame.
+        @param rqId
+            ID of the render queue
+        @param bSort
+            When false, the render queue group won't be sorted. Useful when the RQ
+            needs to be drawn exactly in the order that Renderables were added,
+            or when you have a deep CPU bottleneck where the time taken to
+            sort hurts more than it is supposed to help.
+        */
+        void setSortRenderQueue( uint8 rqId, bool bSort );
+        bool getSortRenderQueue( uint8 rqId ) const;
     };
 
     /** @} */

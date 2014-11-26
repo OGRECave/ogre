@@ -36,7 +36,7 @@ namespace Ogre
 namespace v1
 {
     Rectangle2D::Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager ) :
-            MovableObject( id, objectMemoryManager, 0 ),
+            MovableObject( id, objectMemoryManager, 1 ),
             mPosition( Vector3::ZERO ),
             mOrientation( Quaternion::IDENTITY ),
             mScale( Vector3::UNIT_SCALE ),

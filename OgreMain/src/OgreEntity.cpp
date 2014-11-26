@@ -57,7 +57,7 @@ namespace v1 {
     extern const FastArray<Real> c_DefaultLodMesh;
     //-----------------------------------------------------------------------
     Entity::Entity ( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager, 0 ),
+        : MovableObject( id, objectMemoryManager, 1 ),
           mAnimationState(NULL),
           mSkelAnimVertexData(0),
           mTempVertexAnimInfo(),
@@ -88,7 +88,7 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------
     Entity::Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh) :
-        MovableObject(id, objectMemoryManager, 0),
+        MovableObject(id, objectMemoryManager, 1),
         mMesh(mesh),
         mAnimationState(NULL),
         mSkelAnimVertexData(0),

@@ -47,7 +47,7 @@ namespace v1
                                         BoneMemoryManager *boneMemoryManager,
                                  #endif
                                         InstancedEntity* sharedTransformEntity ) :
-                MovableObject( id, objectMemoryManager, 0 ),
+                MovableObject( id, objectMemoryManager, 1 ),
                 mInstanceId( instanceID ),
                 mInUse( false ),
                 mBatchOwner( batchOwner ),

@@ -54,7 +54,7 @@ namespace Ogre {
     uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF & (~LAYER_VISIBILITY);
     //-----------------------------------------------------------------------
     MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                    uint8 renderQueueId )
+                                  uint8 renderQueueId )
         : IdObject( id )
         , mParentNode(0)
         , mRenderQueueID(renderQueueId)

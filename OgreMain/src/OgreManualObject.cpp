@@ -48,7 +48,7 @@ namespace v1 {
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
     //-----------------------------------------------------------------------------
     ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager, 0 ),
+        : MovableObject( id, objectMemoryManager, 1 ),
           mDynamic(false), mCurrentSection(0), mFirstVertex(true),
           mTempVertexPending(false),
           mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
