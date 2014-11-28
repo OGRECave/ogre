@@ -423,6 +423,9 @@ namespace Ogre
         */
         virtual const Plane* getFrustumPlanes(void) const;
 
+        /// Returns the frustum planes, doesn't check if dirty.
+        const Plane* _getCachedFrustumPlanes(void) const                { return mFrustumPlanes; }
+
         /** Retrieves a specified plane of the frustum (world space).
         @remarks
             Gets a reference to one of the planes which make up the frustum frustum, e.g. for clipping purposes.
