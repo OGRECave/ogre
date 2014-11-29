@@ -26,52 +26,29 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "VTestPlugin.h"
-#include "StencilShadowTest.h"
-#include "ParticleTest.h"
-#include "TransparencyTest.h"
-#include "TextureEffectsTest.h"
-#include "CubeMappingTest.h"
-#include "TextureBlitTest.h"
-#include "OgreResourceGroupManager.h"
+#ifndef __TextureBlitTest_H__
+#define __TextureBlitTest_H__
 
-VTestPlugin::VTestPlugin()
-    :SamplePlugin("VTestPlugin")
+#include "VisualTest.h"
+#include "SamplePlugin.h"
+
+using namespace Ogre;
+
+/** Tests basic stencil shadow behavior */
+class _OgreSampleClassExport TextureBlitTest : public VisualTest
 {
-    // add the playpen tests
-    addSample(new TextureBlitTest());
-//    addSample(new CubeMappingTest()); // no bg on Win
-//    addSample(new ParticleTest());
-    // addSample(new StencilShadowTest()); // crashes on Windows; should show ogre head, barrel, taurus
-//    addSample(new TextureEffectsTest());
-//    addSample(new TransparencyTest());
-}
-//---------------------------------------------------------------------
+public:
 
-VTestPlugin::~VTestPlugin()
-{
-    for (OgreBites::SampleSet::iterator i = mSamples.begin(); i != mSamples.end(); ++i)
-    {
-        delete *i;
-    }
-    mSamples.clear();
-}
-//---------------------------------------------------------------------
+    TextureBlitTest();
 
-#ifndef OGRE_STATIC_LIB
+protected:
 
-VTestPlugin* testPlugin = 0;
+    void setupContent();
 
-extern "C" _OgreSampleExport void dllStartPlugin()
-{
-    testPlugin = OGRE_NEW VTestPlugin();
-    Ogre::Root::getSingleton().installPlugin(testPlugin);
-}
+private:
+    TexturePtr m_colorTexture;
+    TexturePtr m_depthTexture;
 
-extern "C" _OgreSampleExport void dllStopPlugin()
-{
-    Ogre::Root::getSingleton().uninstallPlugin(testPlugin); 
-    OGRE_DELETE testPlugin;
-}
+};
 
 #endif

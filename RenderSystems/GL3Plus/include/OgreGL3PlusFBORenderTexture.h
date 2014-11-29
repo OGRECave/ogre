@@ -103,7 +103,7 @@ namespace Ogre {
 
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
          */
-        GLuint getTemporaryFBO() { return mTempFBO; }
+        GLuint getTemporaryFBO(size_t i);
     private:
         /** Frame Buffer Object properties for a certain texture format.
          */
@@ -180,7 +180,7 @@ namespace Ogre {
 
         /** Temporary FBO identifier
          */
-        GLuint mTempFBO;
+        std::vector<GLuint> mTempFBO;
 
         /** Detect allowed FBO formats */
         void detectFBOFormats();

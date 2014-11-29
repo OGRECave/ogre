@@ -74,6 +74,7 @@ namespace Ogre {
         // Blitting implementation
         void blitFromTexture(GL3PlusTextureBuffer *src,
                              const Image::Box &srcBox, const Image::Box &dstBox);
+
     protected:
         // In case this is a texture level.
         GLenum mTarget;
@@ -87,6 +88,8 @@ namespace Ogre {
 
         typedef vector<RenderTexture*>::type SliceTRT;
         SliceTRT mSliceTRT;
+
+        void _bindToFramebuffer(GLenum attachment, uint32 zoffset, GLenum which);
     };
 
 }
