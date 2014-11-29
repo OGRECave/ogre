@@ -109,7 +109,7 @@ namespace v1
     class _OgreExport ManualObject : public MovableObject
     {
     public:
-        ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager );
+        ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
         virtual ~ManualObject();
 
         //pre-declare ManualObjectSection
@@ -506,7 +506,8 @@ namespace v1
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                    const NameValuePairList* params = 0 );
+                                                   SceneManager *manager,
+                                                   const NameValuePairList* params = 0 );
     public:
         ManualObjectFactory() {}
         ~ManualObjectFactory() {}

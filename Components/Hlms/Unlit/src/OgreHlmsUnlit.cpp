@@ -418,9 +418,27 @@ namespace Ogre
                      "HlmsUnlit::fillBuffersFor" );
     }
     //-----------------------------------------------------------------------------------
+    uint32 HlmsUnlit::fillBuffersForV1( const HlmsCache *cache,
+                                        const QueuedRenderable &queuedRenderable,
+                                        bool casterPass, uint32 lastCacheHash,
+                                        CommandBuffer *commandBuffer )
+    {
+        return fillBuffersFor( cache, queuedRenderable, casterPass,
+                               lastCacheHash, commandBuffer, true );
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsUnlit::fillBuffersForV2( const HlmsCache *cache,
+                                        const QueuedRenderable &queuedRenderable,
+                                        bool casterPass, uint32 lastCacheHash,
+                                        CommandBuffer *commandBuffer )
+    {
+        return fillBuffersFor( cache, queuedRenderable, casterPass,
+                               lastCacheHash, commandBuffer, false );
+    }
+    //-----------------------------------------------------------------------------------
     uint32 HlmsUnlit::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                       bool casterPass, uint32 lastCacheHash,
-                                      CommandBuffer *commandBuffer )
+                                      CommandBuffer *commandBuffer, bool isV1 )
     {
         assert( dynamic_cast<const HlmsUnlitDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsUnlitDatablock *datablock = static_cast<const HlmsUnlitDatablock*>(

@@ -93,10 +93,11 @@ namespace v1 {
 
         /** Private constructor (instances cannot be created directly).
         */
-        Entity( IdType id, ObjectMemoryManager *objectMemoryManager );
+        Entity( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
         /** Private constructor.
         */
-        Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh );
+        Entity( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
+                const MeshPtr& mesh );
 
         /** The Mesh that this Entity is based on.
         */
@@ -734,7 +735,8 @@ namespace v1 {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                    const NameValuePairList* params = 0 );
+                                                   SceneManager *manager,
+                                                   const NameValuePairList* params = 0 );
     public:
         EntityFactory() {}
         ~EntityFactory() {}

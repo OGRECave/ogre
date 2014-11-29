@@ -80,8 +80,8 @@ namespace Ogre
         mDummyObjectMemoryManager( 0 )
     {
         mDummyObjectMemoryManager = new ObjectMemoryManager();
-        mSharedTriangleFS   = OGRE_NEW v1::Rectangle2D( false, 0, mDummyObjectMemoryManager );
-        mSharedQuadFS       = OGRE_NEW v1::Rectangle2D( true, 0, mDummyObjectMemoryManager );
+        mSharedTriangleFS   = OGRE_NEW v1::Rectangle2D( false, 0, mDummyObjectMemoryManager, 0 );
+        mSharedQuadFS       = OGRE_NEW v1::Rectangle2D( true, 0, mDummyObjectMemoryManager, 0 );
 
         //----------------------------------------------------------------
         // Create a default Node & Workspace for basic rendering:

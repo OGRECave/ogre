@@ -56,8 +56,8 @@ namespace Ogre {
 namespace v1 {
     extern const FastArray<Real> c_DefaultLodMesh;
     //-----------------------------------------------------------------------
-    Entity::Entity ( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager, 1 ),
+    Entity::Entity ( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager )
+        : MovableObject( id, objectMemoryManager, manager, 1 ),
           mAnimationState(NULL),
           mSkelAnimVertexData(0),
           mTempVertexAnimInfo(),
@@ -87,8 +87,9 @@ namespace v1 {
         mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_ENTITY_DEFAULT_MASK;
     }
     //-----------------------------------------------------------------------
-    Entity::Entity( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh) :
-        MovableObject(id, objectMemoryManager, 1),
+    Entity::Entity( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
+                    const MeshPtr& mesh ) :
+        MovableObject(id, objectMemoryManager, manager, 1),
         mMesh(mesh),
         mAnimationState(NULL),
         mSkelAnimVertexData(0),
@@ -176,7 +177,8 @@ namespace v1 {
                 const MeshLodUsage& usage = mMesh->getLodLevel(i);
                 // Manually create entity
                 Entity* lodEnt = OGRE_NEW Entity( Id::generateNewId<MovableObject>(),
-                                                    mObjectMemoryManager, usage.manualMesh );
+                                                  mObjectMemoryManager, mManager,
+                                                  usage.manualMesh );
                 lodEnt->setName( mName + "Lod" + StringConverter::toString(i) );
                 mLodEntityList.push_back(lodEnt);
             }
@@ -2047,8 +2049,9 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------
     MovableObject* EntityFactory::createInstanceImpl( IdType id,
-                                            ObjectMemoryManager *objectMemoryManager,
-                                            const NameValuePairList* params )
+                                                      ObjectMemoryManager *objectMemoryManager,
+                                                      SceneManager* manager,
+                                                      const NameValuePairList* params )
     {
         // must have mesh parameter
         MeshPtr pMesh;
@@ -2082,7 +2085,7 @@ namespace v1 {
                 "EntityFactory::createInstance");
         }
 
-        return OGRE_NEW Entity( id, objectMemoryManager, pMesh );
+        return OGRE_NEW Entity( id, objectMemoryManager, manager, pMesh );
     }
     //-----------------------------------------------------------------------
     void EntityFactory::destroyInstance( MovableObject* obj)

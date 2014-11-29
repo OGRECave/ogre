@@ -293,17 +293,6 @@ namespace Ogre {
         */
         virtual void flipVisibility(bool cascade = true);
 
-        /** Tells all objects attached to this node whether to display their
-            debug information or not.
-        @remarks    
-            This is a shortcut to calling setDebugDisplayEnabled() on the objects attached
-            to this node, and optionally to all objects attached to child
-            nodes. 
-        @param enabled Whether the objects are to display debug info or not
-        @param cascade If true, this setting cascades into child nodes too.
-        */
-        virtual void setDebugDisplayEnabled(bool enabled, bool cascade = true);
-
         /// As Node::getDebugRenderable, except scaling is automatically determined
         //virtual DebugRenderable* getDebugRenderable();
 

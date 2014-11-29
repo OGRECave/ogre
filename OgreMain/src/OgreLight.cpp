@@ -34,8 +34,8 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    Light::Light( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager, 1 ),
+    Light::Light( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager )
+        : MovableObject( id, objectMemoryManager, manager, 1 ),
           mLightType(LT_POINT),
           mDiffuse(ColourValue::White),
           mSpecular(ColourValue::Black),
@@ -534,11 +534,12 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     MovableObject* LightFactory::createInstanceImpl( IdType id,
-                                            ObjectMemoryManager *objectMemoryManager,
-                                            const NameValuePairList* params )
+                                                     ObjectMemoryManager *objectMemoryManager,
+                                                     SceneManager *manager,
+                                                     const NameValuePairList* params )
     {
 
-        Light* light = OGRE_NEW Light( id, objectMemoryManager );
+        Light* light = OGRE_NEW Light( id, objectMemoryManager, manager );
  
         if(params)
         {

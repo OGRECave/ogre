@@ -84,18 +84,17 @@ namespace Ogre {
         friend class ItemFactory;
         friend class SubItem;
     public:
-        
-        typedef set<Item*>::type ItemSet;
-        typedef map<unsigned short, bool>::type SchemeHardwareAnimMap;
+        //typedef set<Item*>::type ItemSet;
 
     protected:
 
         /** Private constructor (instances cannot be created directly).
         */
-        Item( IdType id, ObjectMemoryManager *objectMemoryManager );
+        Item( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
         /** Private constructor.
         */
-        Item( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh );
+        Item( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
+              const MeshPtr& mesh );
 
         /** The Mesh that this Item is based on.
         */
@@ -105,8 +104,6 @@ namespace Ogre {
         */
         typedef vector<SubItem>::type SubItemVec;
         SubItemVec mSubItems;
-
-        SkeletonInstance    *mSkeletonInstance;
 
         /** A set of all the entities which shares a single OldSkeletonInstance.
             This is only created if the Item is in fact sharing it's OldSkeletonInstance with
@@ -180,11 +177,6 @@ namespace Ogre {
 
         /** Returns whether or not this Item is skeletally animated. */
         bool hasSkeleton(void) const                    { return mSkeletonInstance != 0; }
-        /** Get this Item's personal skeleton instance. */
-        SkeletonInstance* getSkeleton(void) const       { return mSkeletonInstance; }
-
-        /** @copydoc MovableObject::_notifyAttached */
-        void _notifyAttached( Node* parent );
 
         /** Shares the SkeletonInstance with the supplied Item.
             Note that in order for this to work, both entities must have the same
@@ -233,6 +225,8 @@ namespace Ogre {
         void _initialise(bool forceReinitialise = false);
         /** Tear down the internal structures of this Item, rendering it uninitialised. */
         void _deinitialise(void);
+
+        virtual void _notifyParentNodeMemoryChanged(void);
     };
 
     /** FItemy object for creating Item instances */
@@ -240,6 +234,7 @@ namespace Ogre {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                                   SceneManager *manager,
                                                    const NameValuePairList* params = 0 );
     public:
         ItemFactory() {}

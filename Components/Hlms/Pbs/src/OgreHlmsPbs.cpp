@@ -46,6 +46,8 @@ THE SOFTWARE.
 #include "CommandBuffer/OgreCbTexture.h"
 #include "CommandBuffer/OgreCbShaderBuffer.h"
 
+#include "Animation/OgreSkeletonInstance.h"
+
 namespace Ogre
 {
     const IdString PbsProperty::HwGammaRead       = IdString( "hw_gamma_read" );
@@ -759,9 +761,27 @@ namespace Ogre
                      "HlmsPbs::fillBuffersFor" );
     }
     //-----------------------------------------------------------------------------------
+    uint32 HlmsPbs::fillBuffersForV1( const HlmsCache *cache,
+                                      const QueuedRenderable &queuedRenderable,
+                                      bool casterPass, uint32 lastCacheHash,
+                                      CommandBuffer *commandBuffer )
+    {
+        return fillBuffersFor( cache, queuedRenderable, casterPass,
+                               lastCacheHash, commandBuffer, true );
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsPbs::fillBuffersForV2( const HlmsCache *cache,
+                                      const QueuedRenderable &queuedRenderable,
+                                      bool casterPass, uint32 lastCacheHash,
+                                      CommandBuffer *commandBuffer )
+    {
+        return fillBuffersFor( cache, queuedRenderable, casterPass,
+                               lastCacheHash, commandBuffer, false );
+    }
+    //-----------------------------------------------------------------------------------
     uint32 HlmsPbs::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                     bool casterPass, uint32 lastCacheHash,
-                                    CommandBuffer *commandBuffer )
+                                    CommandBuffer *commandBuffer, bool isV1 )
     {
         assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
@@ -863,40 +883,94 @@ namespace Ogre
         }
         else
         {
-            uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
-            assert( numWorldTransforms <= 256 );
-
-            const size_t minimumTexBufferSize = 12 * numWorldTransforms;
-            bool exceedsTexBuffer = (currentMappedTexBuffer - mStartMappedTexBuffer) +
-                                      minimumTexBufferSize >= mCurrentTexBufferSize;
-
-            if( exceedsConstBuffer || exceedsTexBuffer )
+            if( isV1 )
             {
-                currentMappedConstBuffer = mapNextConstBuffer( commandBuffer );
+                uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
+                assert( numWorldTransforms <= 256 );
 
-                if( exceedsTexBuffer )
-                    mapNextTexBuffer( commandBuffer, minimumTexBufferSize * sizeof(float) );
-                else
-                    rebindTexBuffer( commandBuffer, true, minimumTexBufferSize * sizeof(float) );
+                const size_t minimumTexBufferSize = 12 * numWorldTransforms;
+                bool exceedsTexBuffer = (currentMappedTexBuffer - mStartMappedTexBuffer) +
+                        minimumTexBufferSize >= mCurrentTexBufferSize;
 
-                currentMappedTexBuffer = mCurrentMappedTexBuffer;
+                if( exceedsConstBuffer || exceedsTexBuffer )
+                {
+                    currentMappedConstBuffer = mapNextConstBuffer( commandBuffer );
+
+                    if( exceedsTexBuffer )
+                        mapNextTexBuffer( commandBuffer, minimumTexBufferSize * sizeof(float) );
+                    else
+                        rebindTexBuffer( commandBuffer, true, minimumTexBufferSize * sizeof(float) );
+
+                    currentMappedTexBuffer = mCurrentMappedTexBuffer;
+                }
+
+                //uint worldMaterialIdx[]
+                size_t distToWorldMatStart = mCurrentMappedTexBuffer - mStartMappedTexBuffer;
+                distToWorldMatStart >>= 2;
+                *currentMappedConstBuffer = (distToWorldMatStart << 9 ) |
+                        (datablock->getAssignedSlot() & 0x1FF);
+                currentMappedConstBuffer += 4;
+
+                //vec4 worldMat[][3]
+                //TODO: Don't rely on a virtual function + make a direct 4x3 copy
+                Matrix4 tmp[256];
+                queuedRenderable.renderable->getWorldTransforms( tmp );
+                for( size_t i=0; i<numWorldTransforms; ++i )
+                {
+                    memcpy( currentMappedTexBuffer, &tmp[i], 12 * sizeof(float) );
+                    currentMappedTexBuffer += 12;
+                }
             }
-
-            //uint worldMaterialIdx[]
-            size_t distToWorldMatStart = mCurrentMappedTexBuffer - mStartMappedTexBuffer;
-            distToWorldMatStart >>= 2;
-            *currentMappedConstBuffer = (distToWorldMatStart << 9 ) |
-                                            (datablock->getAssignedSlot() & 0x1FF);
-            currentMappedConstBuffer += 4;
-
-            //vec4 worldMat[][3]
-            //TODO: Don't rely on a virtual function + make a direct 4x3 copy
-            Matrix4 tmp[256];
-            queuedRenderable.renderable->getWorldTransforms( tmp );
-            for( size_t i=0; i<numWorldTransforms; ++i )
+            else
             {
-                memcpy( currentMappedTexBuffer, &tmp[i], 12 * sizeof(float) );
-                currentMappedTexBuffer += 12;
+                SkeletonInstance *skeleton = queuedRenderable.movableObject->getSkeletonInstance();
+
+#if OGRE_DEBUG_MODE
+                assert( dynamic_cast<const RenderableAnimated*>( queuedRenderable.renderable ) );
+#endif
+
+                const RenderableAnimated *renderableAnimated = static_cast<const RenderableAnimated*>(
+                                                                        queuedRenderable.renderable );
+
+                const RenderableAnimated::IndexMap *indexMap = renderableAnimated->getBlendIndexToBoneIndexMap();
+
+                const size_t minimumTexBufferSize = 12 * indexMap->size();
+                bool exceedsTexBuffer = (currentMappedTexBuffer - mStartMappedTexBuffer) +
+                                            minimumTexBufferSize >= mCurrentTexBufferSize;
+
+                if( exceedsConstBuffer || exceedsTexBuffer )
+                {
+                    currentMappedConstBuffer = mapNextConstBuffer( commandBuffer );
+
+                    if( exceedsTexBuffer )
+                        mapNextTexBuffer( commandBuffer, minimumTexBufferSize * sizeof(float) );
+                    else
+                        rebindTexBuffer( commandBuffer, true, minimumTexBufferSize * sizeof(float) );
+
+                    currentMappedTexBuffer = mCurrentMappedTexBuffer;
+                }
+
+                //uint worldMaterialIdx[]
+                size_t distToWorldMatStart = mCurrentMappedTexBuffer - mStartMappedTexBuffer;
+                distToWorldMatStart >>= 2;
+                *currentMappedConstBuffer = (distToWorldMatStart << 9 ) |
+                        (datablock->getAssignedSlot() & 0x1FF);
+                currentMappedConstBuffer += 4;
+
+                RenderableAnimated::IndexMap::const_iterator itBone = indexMap->begin();
+                RenderableAnimated::IndexMap::const_iterator enBone = indexMap->end();
+
+                while( itBone != enBone )
+                {
+                    const SimpleMatrixAf4x3 &mat4x3 = skeleton->_getBoneFullTransform( *itBone );
+                    Matrix4 tmp2;
+                    mat4x3.store( &tmp2 );
+                    memcpy( currentMappedTexBuffer, tmp2[0], 12 * sizeof(float) );
+                    //mat4x3.streamTo4x3( currentMappedTexBuffer );
+                    currentMappedTexBuffer += 12;
+
+                    ++itBone;
+                }
             }
         }
 #else

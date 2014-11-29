@@ -35,46 +35,51 @@ namespace Ogre {
     String MovablePlane::msMovableType = "MovablePlane";
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    MovablePlane::MovablePlane( IdType id, ObjectMemoryManager *objectMemoryManager ) :
+    MovablePlane::MovablePlane( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                SceneManager *manager ) :
         Plane(),
-        MovableObject(id, objectMemoryManager, 1),
+        MovableObject(id, objectMemoryManager, manager, 1),
         mLastTranslate(Vector3::ZERO), 
         mLastRotate(Quaternion::IDENTITY),
         mDirty(true)
     {
     }
     //-----------------------------------------------------------------------
-    MovablePlane::MovablePlane (IdType id, ObjectMemoryManager *objectMemoryManager, const Plane& rhs) :
+    MovablePlane::MovablePlane( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                SceneManager *manager, const Plane& rhs ) :
         Plane(rhs), 
-        MovableObject( id, objectMemoryManager, 1 ),
+        MovableObject( id, objectMemoryManager, manager, 1 ),
         mLastTranslate(Vector3::ZERO), mLastRotate(Quaternion::IDENTITY), 
         mDirty(true)
     {
     }
     //-----------------------------------------------------------------------
-    MovablePlane::MovablePlane (IdType id, ObjectMemoryManager *objectMemoryManager,
-                                const Vector3& rkNormal, Real fConstant)
+    MovablePlane::MovablePlane( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                SceneManager *manager,
+                                const Vector3& rkNormal, Real fConstant )
         : Plane (rkNormal, fConstant),
-        MovableObject( id, objectMemoryManager, 1 ),
+        MovableObject( id, objectMemoryManager, manager, 1 ),
         mLastTranslate(Vector3::ZERO),
         mLastRotate(Quaternion::IDENTITY), mDirty(true)
     {
     }
     //-----------------------------------------------------------------------
-    MovablePlane::MovablePlane (IdType id, ObjectMemoryManager *objectMemoryManager,
-                                const Vector3& rkNormal, const Vector3& rkPoint)
+    MovablePlane::MovablePlane( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                SceneManager *manager,
+                                const Vector3& rkNormal, const Vector3& rkPoint )
         : Plane(rkNormal, rkPoint),
-        MovableObject( id, objectMemoryManager, 1 ),
+        MovableObject( id, objectMemoryManager, manager, 1 ),
         mLastTranslate(Vector3::ZERO), 
         mLastRotate(Quaternion::IDENTITY), mDirty(true)
     {
     }
     //-----------------------------------------------------------------------
-    MovablePlane::MovablePlane (IdType id, ObjectMemoryManager *objectMemoryManager,
+    MovablePlane::MovablePlane( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                SceneManager *manager,
                                 const Vector3& rkPoint0, const Vector3& rkPoint1,
-                                const Vector3& rkPoint2)
+                                const Vector3& rkPoint2 )
         : Plane(rkPoint0, rkPoint1, rkPoint2),
-        MovableObject( id, objectMemoryManager, 1 ),
+        MovableObject( id, objectMemoryManager, manager, 1 ),
         mLastTranslate(Vector3::ZERO), 
         mLastRotate(Quaternion::IDENTITY), mDirty(true)
     {

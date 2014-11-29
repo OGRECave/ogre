@@ -59,7 +59,7 @@ namespace Ogre {
             the same time as their parent Item by the SceneManager method
             createItem.
     */
-    class _OgreExport SubItem : public Renderable, public SubEntityAlloc
+    class _OgreExport SubItem : public RenderableAnimated, public SubEntityAlloc
     {
         // Note no virtual functions for efficiency
         friend class Item;

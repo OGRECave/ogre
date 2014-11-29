@@ -38,13 +38,19 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     SubItem::SubItem( Item* parent, SubMesh* subMeshBasis ) :
-        Renderable(),
+        RenderableAnimated(),
         mParentItem( parent ),
         mSubMesh( subMeshBasis )
     {
         //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
         mVaoPerLod = subMeshBasis->mVao;
+
+        if( !subMeshBasis->mBlendIndexToBoneIndexMap.empty() )
+        {
+            mHasSkeletonAnimation = true;
+            mBlendIndexToBoneIndexMap = &subMeshBasis->mBlendIndexToBoneIndexMap;
+        }
     }
     //-----------------------------------------------------------------------
     SubItem::~SubItem()

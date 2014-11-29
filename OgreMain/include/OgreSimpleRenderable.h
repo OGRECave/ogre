@@ -64,7 +64,7 @@ namespace v1 {
 
     public:
         /// Constructor
-        SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager );
+        SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
 
         virtual void setMaterial( const String& matName );
         virtual const MaterialPtr& getMaterial(void) const;

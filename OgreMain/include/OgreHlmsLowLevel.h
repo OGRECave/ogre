@@ -82,13 +82,19 @@ namespace Ogre
                                            bool casterPass, bool dualParaboloid,
                                            SceneManager *sceneManager );
 
-        virtual uint32 fillBuffersFor(const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                      bool casterPass, uint32 lastCacheHash,
-                                      uint32 lastTextureHash );
-
         virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
                                        bool casterPass, uint32 lastCacheHash,
-                                       CommandBuffer *commandBuffer );
+                                       uint32 lastTextureHash );
+
+        virtual uint32 fillBuffersForV1( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer );
+
+        virtual uint32 fillBuffersForV2( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer );
     };
 
     /** @} */

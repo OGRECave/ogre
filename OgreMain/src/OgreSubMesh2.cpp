@@ -242,6 +242,7 @@ namespace Ogre {
             }
         };
 
+        subMesh->_compileBoneAssignments();
         const v1::SubMesh::VertexBoneAssignmentList& v1BoneAssignments = subMesh->getBoneAssignments();
         mBoneAssignments.reserve( v1BoneAssignments.size() );
 
@@ -315,7 +316,10 @@ namespace Ogre {
     }
     bool sortVertexElementsBySemantic( const v1::VertexElement &l, const v1::VertexElement &r )
     {
-        return l.getSemantic() < r.getSemantic() && l.getIndex() < l.getIndex();
+        if( l.getSemantic() == r.getSemantic() )
+            return l.getIndex() < l.getIndex();
+
+        return l.getSemantic() < r.getSemantic();
     }
 
     char* SubMesh::arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,

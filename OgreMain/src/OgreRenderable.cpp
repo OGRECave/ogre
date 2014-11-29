@@ -154,4 +154,10 @@ namespace Ogre
     {
         return mMaterial;
     }
+    //-----------------------------------------------------------------------------------
+    RenderableAnimated::RenderableAnimated() :
+        Renderable(),
+        mBlendIndexToBoneIndexMap( 0 )
+    {
+    }
 }

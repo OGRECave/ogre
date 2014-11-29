@@ -708,7 +708,7 @@ namespace v1 {
     StaticGeometry::Region::Region( IdType id, ObjectMemoryManager *objectMemoryManager,
                                     StaticGeometry* parent, SceneManager* mgr, uint32 regionID,
                                     const Vector3& centre ) :
-        MovableObject( id, objectMemoryManager, 1 ),
+        MovableObject( id, objectMemoryManager, 0, 1 ),
         mParent(parent), mSceneMgr(mgr), mNode(0),
         mRegionID(regionID), mCentre(centre)
     {

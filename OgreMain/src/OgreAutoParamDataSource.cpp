@@ -81,7 +81,7 @@ namespace Ogre {
          mCurrentSceneManager(0),
          mCurrentPass(0),
          mCurrentShadowNode(0),
-         mBlankLight( 0, &mObjectMemoryManager )
+         mBlankLight( 0, &mObjectMemoryManager, 0 )
     {
         mBlankLight.setDiffuseColour(ColourValue::Black);
         mBlankLight.setSpecularColour(ColourValue::Black);

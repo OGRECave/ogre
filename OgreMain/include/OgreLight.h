@@ -92,7 +92,7 @@ namespace Ogre {
 
         /** Normal constructor. Should not be called directly, but rather the SceneManager::createLight method should be used.
         */
-        Light( IdType id, ObjectMemoryManager *objectMemoryManager );
+        Light( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
 
         /** Standard destructor.
         */
@@ -545,7 +545,8 @@ namespace Ogre {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                    const NameValuePairList* params = 0 );
+                                                   SceneManager *manager,
+                                                   const NameValuePairList* params = 0 );
     public:
         LightFactory() {}
         ~LightFactory() {}

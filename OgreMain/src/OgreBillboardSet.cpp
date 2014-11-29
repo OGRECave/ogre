@@ -51,8 +51,9 @@ namespace v1 {
 
     //-----------------------------------------------------------------------
     BillboardSet::BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                unsigned int poolSize, bool externalData, uint8 renderQueueId ) :
-        MovableObject( id, objectMemoryManager, renderQueueId ),
+                                SceneManager *manager, unsigned int poolSize,
+                                bool externalData, uint8 renderQueueId ) :
+        MovableObject( id, objectMemoryManager, manager, renderQueueId ),
         mOriginType( BBO_CENTER ),
         mRotationType( BBR_TEXCOORD ),
         mAllDefaultSize( true ),
@@ -1461,8 +1462,9 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------
     MovableObject* BillboardSetFactory::createInstanceImpl( IdType id,
-                                            ObjectMemoryManager *objectMemoryManager,
-                                            const NameValuePairList* params )
+                                                            ObjectMemoryManager *objectMemoryManager,
+                                                            SceneManager *manager,
+                                                            const NameValuePairList* params )
     {
         // may have parameters
         bool externalData = false;
@@ -1485,11 +1487,11 @@ namespace v1 {
 
         if (poolSize > 0)
         {
-            return OGRE_NEW BillboardSet(id, objectMemoryManager, poolSize, externalData);
+            return OGRE_NEW BillboardSet(id, objectMemoryManager, manager, poolSize, externalData);
         }
         else
         {
-            return OGRE_NEW BillboardSet(id, objectMemoryManager);
+            return OGRE_NEW BillboardSet(id, objectMemoryManager, manager);
         }
 
     }

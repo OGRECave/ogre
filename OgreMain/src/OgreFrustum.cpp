@@ -48,7 +48,7 @@ namespace Ogre {
     const Real Frustum::INFINITE_FAR_PLANE_ADJUST = 0.00001;
     //-----------------------------------------------------------------------
     Frustum::Frustum( IdType id, ObjectMemoryManager *objectMemoryManager ) : 
-        MovableObject( id, objectMemoryManager, 1 ),
+        MovableObject( id, objectMemoryManager, (SceneManager*)0, 1 ),
         mProjType(PT_PERSPECTIVE), 
         mFOVy(Radian(Math::PI/4.0f)), 
         mFarDist(100000.0f), 

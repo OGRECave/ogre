@@ -35,8 +35,9 @@ namespace Ogre
 {
 namespace v1
 {
-    Rectangle2D::Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager ) :
-            MovableObject( id, objectMemoryManager, 1 ),
+    Rectangle2D::Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager,
+                              SceneManager *manager ) :
+            MovableObject( id, objectMemoryManager, manager, 1 ),
             mPosition( Vector3::ZERO ),
             mOrientation( Quaternion::IDENTITY ),
             mScale( Vector3::UNIT_SCALE ),
@@ -259,6 +260,7 @@ namespace v1
     //-----------------------------------------------------------------------
     MovableObject* Rectangle2DFactory::createInstanceImpl( IdType id,
                                                            ObjectMemoryManager *objectMemoryManager,
+                                                           SceneManager *manager,
                                                            const NameValuePairList* params )
     {
         bool bQuad = true;
@@ -274,7 +276,7 @@ namespace v1
 
         }
 
-        return OGRE_NEW Rectangle2D( bQuad, id, objectMemoryManager );
+        return OGRE_NEW Rectangle2D( bQuad, id, objectMemoryManager, manager );
     }
     //-----------------------------------------------------------------------
     void Rectangle2DFactory::destroyInstance( MovableObject* obj)

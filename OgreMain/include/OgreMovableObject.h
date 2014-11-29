@@ -107,8 +107,11 @@ namespace Ogre {
         /// List of lights for this object
         LightList mLightList;
 
-        /// Is debug display enabled?
-        bool mDebugDisplay;
+        /// Only valid for V2 objects. Derived classes are in charge of
+        /// creating and/or destroying it. Placed here since it's the
+        /// most efficient method of retrieval during rendering, iterating
+        /// over each Item.
+        SkeletonInstance    *mSkeletonInstance;
 
         /// The memory manager used to allocate the ObjectData.
         ObjectMemoryManager *mObjectMemoryManager;
@@ -143,7 +146,7 @@ namespace Ogre {
 
         /// Constructor
         MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
-                       uint8 renderQueueId );
+                       SceneManager* manager, uint8 renderQueueId );
 
         /** Don't use this constructor unless you know what you're doing.
             @See ObjectMemoryManager::mDummyNode
@@ -533,18 +536,7 @@ namespace Ogre {
         /** Returns whether shadow casting is enabled for this object. */
         inline bool getCastShadows(void) const;
 
-        /** Sets whether or not the debug display of this object is enabled.
-        @remarks
-            Some objects aren't visible themselves but it can be useful to display
-            a debug representation of them. Or, objects may have an additional 
-            debug display on top of their regular display. This option enables / 
-            disables that debug display. Objects that are not visible never display
-            debug geometry regardless of this setting.
-        */
-        virtual void setDebugDisplayEnabled(bool enabled) { mDebugDisplay = enabled; }
-        /// Gets whether debug display of this object is enabled. 
-        virtual bool isDebugDisplayEnabled(void) const { return mDebugDisplay; }
-
+        SkeletonInstance* getSkeletonInstance(void) const   { return mSkeletonInstance; }
 
 #ifndef NDEBUG
         void _setCachedAabbOutOfDate(void)                  { mCachedAabbOutOfDate = true; }
@@ -563,7 +555,8 @@ namespace Ogre {
     protected:
         /// Internal implementation of create method - must be overridden
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                    const NameValuePairList* params = 0) = 0;
+                                                   SceneManager* manager,
+                                                   const NameValuePairList* params = 0) = 0;
     public:
         MovableObjectFactory() {}
         virtual ~MovableObjectFactory() {}

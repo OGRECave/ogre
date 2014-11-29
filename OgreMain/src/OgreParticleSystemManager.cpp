@@ -206,7 +206,8 @@ namespace Ogre {
         }
 
         ParticleSystem* tpl = OGRE_NEW ParticleSystem( Id::generateNewId<ParticleSystem>(),
-                                                        &mTemplatesObjectMemMgr, resourceGroup );
+                                                       &mTemplatesObjectMemMgr, (SceneManager*)0,
+                                                       resourceGroup );
         tpl->setName( name );
         addTemplate(name, tpl);
         return tpl;
@@ -227,18 +228,20 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    ParticleSystem* ParticleSystemManager::createSystemImpl(IdType id,
-                                                ObjectMemoryManager *objectMemoryManager,
-                                                size_t quota, const String& resourceGroup)
+    ParticleSystem* ParticleSystemManager::createSystemImpl( IdType id,
+                                                             ObjectMemoryManager *objectMemoryManager,
+                                                             SceneManager *manager,
+                                                             size_t quota, const String& resourceGroup )
     {
-        ParticleSystem* sys = OGRE_NEW ParticleSystem( id, objectMemoryManager, resourceGroup );
+        ParticleSystem* sys = OGRE_NEW ParticleSystem( id, objectMemoryManager, manager, resourceGroup );
         sys->setParticleQuota(quota);
         return sys;
     }
     //-----------------------------------------------------------------------
-    ParticleSystem* ParticleSystemManager::createSystemImpl(IdType id,
-                                                ObjectMemoryManager *objectMemoryManager,
-                                                const String& templateName)
+    ParticleSystem* ParticleSystemManager::createSystemImpl( IdType id,
+                                                             ObjectMemoryManager *objectMemoryManager,
+                                                             SceneManager *manager,
+                                                             const String& templateName )
     {
         // Look up template
         ParticleSystem* pTemplate = getTemplate(templateName);
@@ -248,7 +251,8 @@ namespace Ogre {
                         "ParticleSystemManager::createSystem");
         }
 
-        ParticleSystem* sys = createSystemImpl( id, objectMemoryManager, pTemplate->getParticleQuota(), 
+        ParticleSystem* sys = createSystemImpl( id, objectMemoryManager, manager,
+                                                pTemplate->getParticleQuota(),
                                                 pTemplate->getResourceGroupName() );
         // Copy template settings
         *sys = *pTemplate;
@@ -532,8 +536,9 @@ namespace Ogre {
     String ParticleSystemFactory::FACTORY_TYPE_NAME = "ParticleSystem";
     //-----------------------------------------------------------------------
     MovableObject* ParticleSystemFactory::createInstanceImpl( IdType id,
-                                            ObjectMemoryManager *objectMemoryManager,
-                                            const NameValuePairList* params )
+                                                              ObjectMemoryManager *objectMemoryManager,
+                                                              SceneManager *manager,
+                                                              const NameValuePairList* params )
     {
         if (params != 0)
         {
@@ -543,7 +548,7 @@ namespace Ogre {
                 String templateName = ni->second;
                 // create using manager
                 return ParticleSystemManager::getSingleton().createSystemImpl(
-                        id, objectMemoryManager, templateName);
+                        id, objectMemoryManager, manager, templateName);
             }
         }
         // Not template based, look for quota & resource name
@@ -564,7 +569,7 @@ namespace Ogre {
         }
         // create using manager
         return ParticleSystemManager::getSingleton().createSystemImpl(
-                                id, objectMemoryManager, quota, resourceGroup);
+                                id, objectMemoryManager, manager, quota, resourceGroup);
                 
 
     }

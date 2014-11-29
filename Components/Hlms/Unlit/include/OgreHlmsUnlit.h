@@ -143,6 +143,11 @@ namespace Ogre
 
         void destroyAllBuffers(void);
 
+        FORCEINLINE uint32 fillBuffersFor( const HlmsCache *cache,
+                                           const QueuedRenderable &queuedRenderable,
+                                           bool casterPass, uint32 lastCacheHash,
+                                           CommandBuffer *commandBuffer, bool isV1 );
+
     public:
         HlmsUnlit( Archive *dataFolder );
         ~HlmsUnlit();
@@ -157,9 +162,15 @@ namespace Ogre
                                        bool casterPass, uint32 lastCacheHash,
                                        uint32 lastTextureHash );
 
-        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, uint32 lastCacheHash,
-                                       CommandBuffer *commandBuffer );
+        virtual uint32 fillBuffersForV1( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer );
+
+        virtual uint32 fillBuffersForV2( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer );
 
         virtual void preCommandBufferExecution( CommandBuffer *commandBuffer );
         virtual void postCommandBufferExecution( CommandBuffer *commandBuffer );

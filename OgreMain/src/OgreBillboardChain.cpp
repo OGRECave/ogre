@@ -66,9 +66,10 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------
     BillboardChain::BillboardChain( IdType id, ObjectMemoryManager *objectMemoryManager,
-            size_t maxElements, size_t numberOfChains, bool useTextureCoords,
-            bool useColours, bool dynamic )
-        :MovableObject( id, objectMemoryManager, 1 ),
+                                    SceneManager *manager, size_t maxElements,
+                                    size_t numberOfChains, bool useTextureCoords,
+                                    bool useColours, bool dynamic )
+        :MovableObject( id, objectMemoryManager, manager, 1 ),
         mMaxElementsPerChain(maxElements),
         mChainCount(numberOfChains),
         mUseTexCoords(useTextureCoords),
@@ -771,8 +772,9 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------
     MovableObject* BillboardChainFactory::createInstanceImpl( IdType id,
-                                            ObjectMemoryManager *objectMemoryManager,
-                                            const NameValuePairList* params )
+                                                              ObjectMemoryManager *objectMemoryManager,
+                                                              SceneManager *manager,
+                                                              const NameValuePairList* params )
     {
         size_t maxElements = 20;
         size_t numberOfChains = 1;
@@ -810,7 +812,7 @@ namespace v1 {
 
         }
 
-        return OGRE_NEW BillboardChain( id, objectMemoryManager, maxElements,
+        return OGRE_NEW BillboardChain( id, objectMemoryManager, manager, maxElements,
                                         numberOfChains, useTex, useCol, dynamic);
 
     }

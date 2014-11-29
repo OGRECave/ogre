@@ -79,7 +79,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	_localPos.y = dot( worldMat[1], vertex );
 	_localPos.z = dot( worldMat[2], vertex );
 	_localPos *= blendWeights[0];
-	@property( hlms_normal )vec3 _localNorm;
+	@property( hlms_normal || hlms_qtangent )vec3 _localNorm;
 	_localNorm.x = dot( worldMat[0].xyz, normal );
 	_localNorm.y = dot( worldMat[1].xyz, normal );
 	_localNorm.z = dot( worldMat[2].xyz, normal );
@@ -101,7 +101,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	tmp.y = dot( worldMat[1], vertex );
 	tmp.z = dot( worldMat[2], vertex );
 	_localPos += tmp * blendWeights[@n];
-	@property( hlms_normal )
+	@property( hlms_normal || hlms_qtangent )
 	tmp.x = dot( worldMat[0].xyz, normal );
 	tmp.y = dot( worldMat[1].xyz, normal );
 	tmp.z = dot( worldMat[2].xyz, normal );

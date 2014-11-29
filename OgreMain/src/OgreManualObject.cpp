@@ -47,8 +47,9 @@ namespace v1 {
 #define TEMP_INITIAL_VERTEX_SIZE TEMP_VERTEXSIZE_GUESS * TEMP_INITIAL_SIZE
 #define TEMP_INITIAL_INDEX_SIZE sizeof(uint32) * TEMP_INITIAL_SIZE
     //-----------------------------------------------------------------------------
-    ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager, 1 ),
+    ManualObject::ManualObject( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                SceneManager *manager )
+        : MovableObject( id, objectMemoryManager, manager, 1 ),
           mDynamic(false), mCurrentSection(0), mFirstVertex(true),
           mTempVertexPending(false),
           mTempVertexBuffer(0), mTempVertexSize(TEMP_INITIAL_VERTEX_SIZE),
@@ -1029,10 +1030,11 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------------
     MovableObject* ManualObjectFactory::createInstanceImpl( IdType id,
-                                            ObjectMemoryManager *objectMemoryManager,
-                                            const NameValuePairList* params )
+                                                            ObjectMemoryManager *objectMemoryManager,
+                                                            SceneManager *manager,
+                                                            const NameValuePairList* params )
     {
-        return OGRE_NEW ManualObject( id, objectMemoryManager );
+        return OGRE_NEW ManualObject( id, objectMemoryManager, manager );
     }
     //-----------------------------------------------------------------------------
     void ManualObjectFactory::destroyInstance( MovableObject* obj)

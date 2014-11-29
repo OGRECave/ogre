@@ -149,7 +149,7 @@ namespace Ogre {
             You should use the ParticleSystemManager to create particle systems rather than creating
             them directly.
         */
-        ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager,
+        ParticleSystem( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
                         const String& resourceGroupName );
 
         virtual ~ParticleSystem();

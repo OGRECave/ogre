@@ -568,8 +568,8 @@ namespace Ogre
                 lastHlmsCache = hlmsCache;
             }
 
-            uint32 baseInstance = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                                        lastHlmsCacheHash, mCommandBuffer );
+            uint32 baseInstance = hlms->fillBuffersForV2( hlmsCache, queuedRenderable, casterPass,
+                                                          lastHlmsCacheHash, mCommandBuffer );
 
             if( drawCmd != mCommandBuffer->getLastCommand() ||
                 lastVaoId != vao->getRenderQueueId() )
@@ -709,8 +709,8 @@ namespace Ogre
                 lastHlmsCache = hlmsCache;
             }
 
-            uint32 baseInstance = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                                        lastHlmsCacheHash, mCommandBuffer );
+            uint32 baseInstance = hlms->fillBuffersForV1( hlmsCache, queuedRenderable, casterPass,
+                                                          lastHlmsCacheHash, mCommandBuffer );
 
             bool differentRenderOp = lastRenderOp.vertexData != renderOp.vertexData ||
                     lastRenderOp.indexData != renderOp.indexData ||

@@ -53,9 +53,11 @@ namespace v1
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    RibbonTrail::RibbonTrail( IdType id, ObjectMemoryManager *objectMemoryManager, size_t maxElements, 
-        size_t numberOfChains, bool useTextureCoords, bool useColours)
-        :BillboardChain( id, objectMemoryManager, maxElements, 0, useTextureCoords, useColours, true),
+    RibbonTrail::RibbonTrail( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
+                              size_t maxElements,  size_t numberOfChains,
+                              bool useTextureCoords, bool useColours )
+        :BillboardChain( id, objectMemoryManager, manager, maxElements,
+                         0, useTextureCoords, useColours, true),
         mFadeController(0)
     {
         setTrailLength(100);
@@ -507,9 +509,10 @@ namespace v1
         return FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------
-    MovableObject* RibbonTrailFactory::createInstanceImpl(  IdType id,
-                                            ObjectMemoryManager *objectMemoryManager,
-                                            const NameValuePairList* params )
+    MovableObject* RibbonTrailFactory::createInstanceImpl( IdType id,
+                                                           ObjectMemoryManager *objectMemoryManager,
+                                                           SceneManager *manager,
+                                                           const NameValuePairList* params )
     {
         size_t maxElements = 20;
         size_t numberOfChains = 1;
@@ -541,7 +544,7 @@ namespace v1
 
         }
 
-        return OGRE_NEW RibbonTrail( id, objectMemoryManager, maxElements,
+        return OGRE_NEW RibbonTrail( id, objectMemoryManager, manager, maxElements,
                                      numberOfChains, useTex, useCol);
 
     }

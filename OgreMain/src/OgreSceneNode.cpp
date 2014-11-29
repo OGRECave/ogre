@@ -472,29 +472,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void SceneNode::setDebugDisplayEnabled(bool enabled, bool cascade)
-    {
-        ObjectVec::iterator itor = mAttachments.begin();
-        ObjectVec::iterator end  = mAttachments.end();
-
-        while( itor != end )
-        {
-            (*itor)->setDebugDisplayEnabled( enabled );
-            ++itor;
-        }
-
-        if (cascade)
-        {
-            NodeVec::iterator childItor = mChildren.begin();
-            NodeVec::iterator childItorEnd  = mChildren.end();
-            while( childItor != childItorEnd )
-            {
-                static_cast<SceneNode*>( *childItor )->setDebugDisplayEnabled( enabled, cascade );
-                ++childItor;
-            }
-        }
-    }
-    //-----------------------------------------------------------------------
     void SceneNode::flipVisibility(bool cascade)
     {
         ObjectVec::iterator itor = mAttachments.begin();

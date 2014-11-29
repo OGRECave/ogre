@@ -531,6 +531,13 @@ namespace Ogre {
             subMesh->importFromV1( mesh->getSubMesh( i ), halfPos, halfTexCoords );
         }
 
+        v1::SkeletonPtr v1Skeleton = mesh->getOldSkeleton();
+        if( !v1Skeleton.isNull() )
+        {
+            mSkeleton = SkeletonManager::getSingleton().getSkeletonDef( v1Skeleton.get() );
+            mSkeletonName = mSkeleton->getName();
+        }
+
         mIsManual = true;
         setToLoaded();
     }

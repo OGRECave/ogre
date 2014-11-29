@@ -249,13 +249,27 @@ namespace Ogre
         return 0;
     }
     //-----------------------------------------------------------------------------------
-    uint32 HlmsLowLevel::fillBuffersFor( const HlmsCache *cache,
-                                         const QueuedRenderable &queuedRenderable,
-                                         bool casterPass, uint32 lastCacheHash,
-                                         CommandBuffer *commandBuffer )
+    uint32 HlmsLowLevel::fillBuffersForV1( const HlmsCache *cache,
+                                           const QueuedRenderable &queuedRenderable,
+                                           bool casterPass, uint32 lastCacheHash,
+                                           CommandBuffer *commandBuffer )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-                     "Low Level materials not supported with Items and other V2 models",
+                     "Low Level materials can only be used in RenderQueue mode V1_LEGACY. "
+                     "Change the mode with RenderQueue::setSortRenderQueue, or place the "
+                     "object in a different RenderQueue",
+                     "HlmsLowLevel::fillBuffersFor" );
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsLowLevel::fillBuffersForV2( const HlmsCache *cache,
+                                           const QueuedRenderable &queuedRenderable,
+                                           bool casterPass, uint32 lastCacheHash,
+                                           CommandBuffer *commandBuffer )
+    {
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                     "Low Level materials can only be used in RenderQueue mode V1_LEGACY. "
+                     "Change the mode with RenderQueue::setSortRenderQueue, or place the "
+                     "object in a different RenderQueue",
                      "HlmsLowLevel::fillBuffersFor" );
     }
     //-----------------------------------------------------------------------------------

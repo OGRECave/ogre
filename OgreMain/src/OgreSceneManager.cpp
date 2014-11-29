@@ -1489,7 +1489,8 @@ void SceneManager::_setSkyBox(bool enable,
         if (!mSkyBoxObj)
         {
             mSkyBoxObj = OGRE_NEW v1::ManualObject( Id::generateNewId<MovableObject>(),
-                                                    &mEntityMemoryManager[SCENE_DYNAMIC] );
+                                                    &mEntityMemoryManager[SCENE_DYNAMIC],
+                                                    this );
             mSkyBoxObj->setCastShadows(false);
             mSkyBoxObj->setRenderQueueGroup( renderQueue );
             mSkyBoxObj->setQueryFlags( 0 );

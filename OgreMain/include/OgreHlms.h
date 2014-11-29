@@ -444,9 +444,15 @@ namespace Ogre
                                        bool casterPass, uint32 lastCacheHash,
                                        uint32 lastTextureHash ) = 0;
 
-        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
-                                       bool casterPass, uint32 lastCacheHash,
-                                       CommandBuffer *commandBuffer ) = 0;
+        virtual uint32 fillBuffersForV1( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer ) = 0;
+
+        virtual uint32 fillBuffersForV2( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer ) = 0;
 
         /// This gets called right before executing the command buffer.
         virtual void preCommandBufferExecution( CommandBuffer *commandBuffer ) {}

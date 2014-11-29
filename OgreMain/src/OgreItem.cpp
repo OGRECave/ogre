@@ -54,18 +54,17 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 namespace Ogre {
     extern const FastArray<Real> c_DefaultLodMesh;
     //-----------------------------------------------------------------------
-    Item::Item( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager, 0 ),
-          mSkeletonInstance( 0 ),
+    Item::Item( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager )
+        : MovableObject( id, objectMemoryManager, manager, 0 ),
           mInitialised( false )
     {
         mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_ENTITY_DEFAULT_MASK;
     }
     //-----------------------------------------------------------------------
-    Item::Item( IdType id, ObjectMemoryManager *objectMemoryManager, const MeshPtr& mesh ) :
-        MovableObject( id, objectMemoryManager, 0 ),
+    Item::Item( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
+                const MeshPtr& mesh ) :
+        MovableObject( id, objectMemoryManager, manager, 0 ),
         mMesh( mesh ),
-        mSkeletonInstance( 0 ),
         mInitialised( false )
     {
         _initialise();
@@ -272,14 +271,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Item::_notifyAttached( Node* parent )
-    {
-        MovableObject::_notifyAttached(parent);
-
-        if( mSkeletonInstance )
-            mSkeletonInstance->setParentNode( parent );
-    }
-    //-----------------------------------------------------------------------
     /*void Item::shareSkeletonInstanceWith(Item* item)
     {
         if (item->getMesh()->getSkeleton() != getMesh()->getSkeleton())
@@ -349,6 +340,14 @@ namespace Ogre {
             mSharedSkeletonEntities = 0;
         }
     }*/
+    //-----------------------------------------------------------------------
+    void Item::_notifyParentNodeMemoryChanged(void)
+    {
+        if( mSkeletonInstance /*&& !mSharedTransformEntity*/ )
+        {
+            mSkeletonInstance->setParentNode( mSkeletonInstance->getParentNode() );
+        }
+    }
 
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
@@ -360,8 +359,9 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     MovableObject* ItemFactory::createInstanceImpl( IdType id,
-                                            ObjectMemoryManager *objectMemoryManager,
-                                            const NameValuePairList* params )
+                                                    ObjectMemoryManager *objectMemoryManager,
+                                                    SceneManager *manager,
+                                                    const NameValuePairList* params )
     {
         // must have mesh parameter
         MeshPtr pMesh;
@@ -392,7 +392,7 @@ namespace Ogre {
                 "ItemFactory::createInstance");
         }
 
-        return OGRE_NEW Item( id, objectMemoryManager, pMesh );
+        return OGRE_NEW Item( id, objectMemoryManager, manager, pMesh );
     }
     //-----------------------------------------------------------------------
     void ItemFactory::destroyInstance( MovableObject* obj)

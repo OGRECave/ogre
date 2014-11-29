@@ -63,7 +63,8 @@ namespace v1 {
         void initRectangle2D(void);
 
     public:
-        Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager );
+        Rectangle2D( bool bQuad, IdType id, ObjectMemoryManager *objectMemoryManager,
+                     SceneManager *manager );
         ~Rectangle2D();
 
         /** Sets the corners of the rectangle, in relative coordinates.
@@ -101,6 +102,7 @@ namespace v1 {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                                   SceneManager *manager,
                                                    const NameValuePairList* params = 0 );
     public:
         Rectangle2DFactory() {}

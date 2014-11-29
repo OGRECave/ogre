@@ -46,7 +46,7 @@ namespace v1
                                     const MaterialPtr &material, size_t instancesPerBatch,
                                     const Mesh::IndexMap *indexToBoneMap ) :
                 Renderable(),
-                MovableObject( id, objectMemoryManager, 1 ),
+                MovableObject( id, objectMemoryManager, (SceneManager*)0, 1 ),
                 mInstancesPerBatch( instancesPerBatch ),
                 mCreator( creator ),
                 mMeshReference( meshReference ),

@@ -318,9 +318,9 @@ namespace v1 {
         @see
             BillboardSet::setAutoextend
         */
-        BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager,
-                        unsigned int poolSize = 20, bool externalDataSource = false,
-                        uint8 renderQueueId=0 );
+        BillboardSet( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager,
+                      unsigned int poolSize = 20, bool externalDataSource = false,
+                      uint8 renderQueueId=0 );
 
         virtual ~BillboardSet();
 
@@ -819,7 +819,8 @@ namespace v1 {
     {
     protected:
         virtual MovableObject* createInstanceImpl( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                                    const NameValuePairList* params = 0 );
+                                                   SceneManager* manager,
+                                                   const NameValuePairList* params = 0 );
     public:
         BillboardSetFactory() {}
         ~BillboardSetFactory() {}

@@ -33,8 +33,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace v1 {
-    SimpleRenderable::SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager )
-        : MovableObject( id, objectMemoryManager, 1 )
+    SimpleRenderable::SimpleRenderable( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                        SceneManager *manager )
+        : MovableObject( id, objectMemoryManager, manager, 1 )
     , mWorldTransform(Matrix4::IDENTITY)
     , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))

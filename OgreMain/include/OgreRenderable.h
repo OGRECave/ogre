@@ -450,7 +450,6 @@ namespace Ogre {
         HlmsDatablock       *mHlmsDatablock;
         MaterialPtr         mMaterial; /// Only valid when using low level materials
         uint8               mRenderQueueSubGroup;
-        //TODO: (refactor) Change this bool for the skeleton pointer.
         bool                    mHasSkeletonAnimation;
         uint8                   mCurrentMaterialLod;
         FastArray<Real> const   *mLodMaterial;
@@ -467,6 +466,18 @@ namespace Ogre {
         bool mUseIdentityView;
         UserObjectBindings mUserObjectBindings;      /// User objects binding.
         mutable RenderSystemData * mRenderSystemData;/// This should be used only by a render system for internal use
+    };
+
+    class _OgreExport RenderableAnimated : public Renderable
+    {
+    public:
+        typedef FastArray<unsigned short> IndexMap;
+    protected:
+        IndexMap    *mBlendIndexToBoneIndexMap;
+    public:
+        RenderableAnimated();
+
+        const IndexMap* getBlendIndexToBoneIndexMap(void) const { return mBlendIndexToBoneIndexMap; }
     };
 
     /** @} */

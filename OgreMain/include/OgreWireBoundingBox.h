@@ -63,7 +63,7 @@ namespace v1 {
 
     public:
             
-        WireBoundingBox( IdType id, ObjectMemoryManager *objectMemoryManager );
+        WireBoundingBox( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager );
         ~WireBoundingBox();
 
         /** Builds the wireframe line list.

@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreLodListener.h"
 #include "OgreLight.h"
 #include "OgreTechnique.h"
+#include "Animation/OgreSkeletonInstance.h"
 #include "Math/Array/OgreArraySphere.h"
 #include "Math/Array/OgreBooleanMask.h"
 #include "OgreRawPtr.h"
@@ -54,16 +55,16 @@ namespace Ogre {
     uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF & (~LAYER_VISIBILITY);
     //-----------------------------------------------------------------------
     MovableObject::MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
-                                  uint8 renderQueueId )
+                                  SceneManager *manager, uint8 renderQueueId )
         : IdObject( id )
         , mParentNode(0)
         , mRenderQueueID(renderQueueId)
-        , mManager(0)
+        , mManager( manager )
         , mLodMesh( &c_DefaultLodMesh )
         , mCurrentMeshLod( 0 )
         , mMinPixelSize(0)
         , mListener(0)
-        , mDebugDisplay(false)
+        , mSkeletonInstance( 0 )
         , mObjectMemoryManager( objectMemoryManager )
         , mGlobalIndex( -1 )
         , mParentIndex( -1 )
@@ -85,7 +86,7 @@ namespace Ogre {
         , mCurrentMeshLod( 0 )
         , mMinPixelSize(0)
         , mListener(0)
-        , mDebugDisplay(false)
+        , mSkeletonInstance( 0 )
         , mObjectMemoryManager( 0 )
         , mGlobalIndex( -1 )
         , mParentIndex( -1 )
@@ -111,6 +112,9 @@ namespace Ogre {
 
         if( mObjectMemoryManager )
             mObjectMemoryManager->objectDestroyed( mObjectData, mRenderQueueID );
+
+        //If derived class may have created it, it should've destroyed it by now.
+        assert( !mSkeletonInstance );
     }
     //-----------------------------------------------------------------------
     void MovableObject::_notifyAttached( Node* parent )
@@ -141,6 +145,9 @@ namespace Ogre {
             if( mManager && isStatic() )
                 mManager->notifyStaticDirty( this );
         }
+
+        if( mSkeletonInstance )
+            mSkeletonInstance->setParentNode( parent );
     }
     //---------------------------------------------------------------------
     void MovableObject::detachFromParent(void)
@@ -832,8 +839,7 @@ namespace Ogre {
                                 ObjectMemoryManager *objectMemoryManager, SceneManager* manager,
                                 const NameValuePairList* params )
     {
-        MovableObject* m = createInstanceImpl( id, objectMemoryManager, params );
-        m->_notifyManager(manager);
+        MovableObject* m = createInstanceImpl( id, objectMemoryManager, manager, params );
         return m;
     }
 

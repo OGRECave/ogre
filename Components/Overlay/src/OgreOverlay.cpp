@@ -41,7 +41,7 @@ namespace v1 {
     //---------------------------------------------------------------------
     Overlay::Overlay( const String& name, IdType id,
                       ObjectMemoryManager *objectMemoryManager, uint8 renderQueueId ) :
-        MovableObject( id, objectMemoryManager, renderQueueId ),
+        MovableObject( id, objectMemoryManager, (SceneManager*)0, renderQueueId ),
         mRotate(0.0f), 
         mScrollX(0.0f), mScrollY(0.0f),
         mScaleX(1.0f), mScaleY(1.0f), 
