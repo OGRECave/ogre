@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusFBOMultiRenderTarget.h"
 
+#define TEMP_FBOS 2
+
 namespace Ogre {
 
 //-----------------------------------------------------------------------------    
@@ -129,7 +131,12 @@ namespace Ogre {
     {
         detectFBOFormats();
         
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
+        mTempFBO.resize(TEMP_FBOS, 0);
+
+        for (int i = 0; i < TEMP_FBOS; i++)
+        {
+            OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO[i]));
+        }
     }
 
 	GL3PlusFBOManager::~GL3PlusFBOManager()
@@ -139,7 +146,10 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.", LML_CRITICAL);
 		}
         
-        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
+        for (int i = 0; i < TEMP_FBOS; i++)
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO[i]));
+        }
 	}
 
     void GL3PlusFBOManager::_createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
@@ -523,6 +533,13 @@ namespace Ogre {
 //				std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
 //				        << " of " << key.width << "x" << key.height << std::endl;
 			}
-		}
+        }
+    }
+
+    GLuint GL3PlusFBOManager::getTemporaryFBO(size_t id)
+    {
+        assert(id < mTempFBO.size());
+
+        return mTempFBO[id];
     }
 }
