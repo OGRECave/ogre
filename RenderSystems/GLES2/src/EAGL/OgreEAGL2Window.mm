@@ -113,19 +113,8 @@ namespace Ogre {
 	{
         if(!mWindow) return;
 
-        Real w = mContentScalingFactor, h = mContentScalingFactor;
-
-        // Check the orientation of the view controller and adjust dimensions
-        if (UIInterfaceOrientationIsPortrait(mViewController.interfaceOrientation))
-        {
-            h *= std::max(width, height);
-            w *= std::min(width, height);
-        }
-        else
-        {
-            w *= std::max(width, height);
-            h *= std::min(width, height);
-        }
+        Real w = width * mContentScalingFactor;
+        Real h = height * mContentScalingFactor;
 
         // Check if the window size really changed
         if(mWidth == w && mHeight == h)
@@ -148,10 +137,10 @@ namespace Ogre {
 	void EAGL2Window::windowMovedOrResized()
 	{
 		CGRect frame = [mView frame];
-		mWidth = (unsigned int)frame.size.width;
-		mHeight = (unsigned int)frame.size.height;
-        mLeft = (int)frame.origin.x;
-        mTop = (int)frame.origin.y+(int)frame.size.height;
+        mWidth = (unsigned int)frame.size.width * mContentScalingFactor;
+        mHeight = (unsigned int)frame.size.height * mContentScalingFactor;
+        mLeft = (int)frame.origin.x * mContentScalingFactor;
+        mTop = ((int)frame.origin.y + (int)frame.size.height) * mContentScalingFactor;
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
@@ -522,9 +511,15 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentFBO));
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &sampleFramebuffer));
         
+#if OGRE_NO_GLES3_SUPPORT == 1
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, sampleFramebuffer));
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, currentFBO));
         OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
+#else
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER, sampleFramebuffer));
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, currentFBO));
+        OGRE_CHECK_GL_ERROR(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+#endif
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, currentFBO));
         
         // Read pixel data from the framebuffer

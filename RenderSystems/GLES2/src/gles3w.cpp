@@ -61,7 +61,7 @@ static void open_libgl(void)
     if(isSimulator)
     {
         // Ask where Xcode is installed
-        std::string xcodePath = exec("/usr/bin/xcode-select -print-path");
+        std::string xcodePath = "/Applications/Xcode.app/Contents/Developer\n";
 
         // The result contains an end line character. Remove it.
         size_t pos = xcodePath.find("\n");

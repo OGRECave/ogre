@@ -40,7 +40,7 @@ if (WIN32)
 # Add system specific settings
 elseif (APPLE)
   file(GLOB PLATFORM_HEADERS "include/EAGL/*.h")
-  file(GLOB PLATFORM_SOURCES "include/EAGL/*.mm")
+  file(GLOB PLATFORM_SOURCES "src/EAGL/*.mm")
 
   include_directories(src/EAGL include/EAGL)
   link_directories(${OPENGLES_LIBRARY_PATH})
