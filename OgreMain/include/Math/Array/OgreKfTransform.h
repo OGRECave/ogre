@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __KfTransform_H__
-#define __KfTransform_H__
+#ifndef _OgreKfTransform_H_
+#define _OgreKfTransform_H_
 
 #include "Math/Array/OgreArrayQuaternion.h"
 

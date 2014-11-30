@@ -50,10 +50,9 @@ namespace Ogre
         map<IdString, size_t>::type mBoneToWeights;
         String              mName;
 
-        KfTransformArrayMemoryManager *mKfTransformMemoryManager;
+        SkeletonDef const   *mSkeletonDef;
 
-        inline uint32 slotToBlockIdx( uint32 slotIdx ) const;
-		inline uint32 blockIdxToSlotStart( uint32 blockIdx ) const;
+        KfTransformArrayMemoryManager *mKfTransformMemoryManager;
 
         typedef vector<Real>::type TimestampVec;
         typedef map<size_t, TimestampVec>::type TimestampsPerBlock;
@@ -76,8 +75,14 @@ namespace Ogre
         ~SkeletonAnimationDef();
 
         void setName( const String &name )                              { mName = name; }
+        void _setSkeletonDef( const SkeletonDef *skeletonDef )          { mSkeletonDef = skeletonDef; }
 
         void build( const v1::Skeleton *skeleton, const v1::Animation *animation, Real frameRate );
+
+        /// Dumps all the tracks in CSV format to the output string argument.
+        /// Mostly for debugging purposes. (also easy example to show how to
+        /// enumerate all the tracks and get the bones back from its block index)
+        void _dumpCsvTracks( String &outText ) const;
     };
 
     typedef vector<SkeletonAnimationDef>::type SkeletonAnimationDefVec;

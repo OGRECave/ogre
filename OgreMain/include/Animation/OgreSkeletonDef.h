@@ -78,12 +78,44 @@ namespace Ogre
 
         typedef vector<DepthLevelInfo>::type DepthLevelInfoVec;
 
+        typedef map<uint32, uint32>::type IndexToIndexMap;
+        typedef vector<uint32>::type BoneToSlotVec;
+
     protected:
         typedef map<IdString, size_t>::type BoneNameMap;
 
         BoneDataVec             mBones;
         BoneNameMap             mBoneIndexByName;
         SkeletonAnimationDefVec mAnimationDefs;
+
+        /// This maps the slot index to a bone index for mBones[]. @see slotToBlockIdx
+        /// Terminology:
+        /// Bone Index:
+        ///  It's the bone index given by skeleton. i.e. mBones[boneIdx]
+        /// Slot Index
+        ///  It's the place in SoA slots the bone will end up with, with an index containing
+        ///  the parent level in the high 8 bits.
+        ///     For example the given bone hierarchy:
+        ///         A
+        ///         |\ \
+        ///         | \ \
+        ///         B  C D
+        ///         |
+        ///         E
+        ///     A is the first root at depth level 0; the index is 0
+        ///     B is (1 << 24) | (0 & 0x00FFFFF); because it's the first bone in depth level 1
+        ///     C is (1 << 24) | (1 & 0x00FFFFF); because it's the second bone in depth lv 1
+        ///     D is (1 << 24) | (2 & 0x00FFFFF); because it's the third bone in depth lv 1
+        ///     E is (2 << 24) | (0 & 0x00FFFFF); because it's the first bone in depth lv 2 (child of B)
+        ///
+        /// Block Index.
+        ///  It's the same as slot index, but the slot part (low 24 bits) is divided by ARRAY_PACKED_REALS
+        ///  For example, ARRAY_PACKED_REALS = 4, slots 0 1 2 & 3 are in block 0
+        ///
+        /// Converts Slot Index -> Bone Index
+        IndexToIndexMap mSlotToBone;
+        /// Converts Bone Index -> Slot Index
+        BoneToSlotVec   mBoneToSlot;
 
         RawSimdUniquePtr<KfTransform, MEMCATEGORY_ANIMATION>        mBindPose;
         RawSimdUniquePtr<ArrayMatrixAf4x3, MEMCATEGORY_ANIMATION>   mReverseBindPose;
@@ -123,6 +155,47 @@ namespace Ogre
             Level depth to reach. Must be in range [0; mDepthLevelInfoVec.size]
         */
         size_t getNumberOfBoneBlocks( size_t numLevels ) const;
+
+        /** Converts a "Slot index" to a block index. @see mSlotToBone
+            Slot indices contain the information about the bone's depth level in the
+            hierarchy, and an index to the exact bone.
+            Block indices also contain the depth level, but an index to the start of
+            the SIMD block.
+        @remarks
+            Converting to a "block index" is a lossy process. Information pointing
+            to the individual bone is lost; and only the start of the block is
+            preserved.
+            e.g. if ARRAY_PACKED_REALS = 4, and the slot index is pointing to the
+            slot 3; the block index will reset the slot to 0.
+            If the slot index is pointing to slot 6, the index will reset to slot 4,
+            which is the first in the SIMD block
+        @param slotIdx
+            The slot index.
+        @return
+            The block index.
+        */
+        inline static uint32 slotToBlockIdx( uint32 slotIdx )
+        {
+            return (slotIdx & 0xFF000000) | ((slotIdx & 0x00FFFFFF) / ARRAY_PACKED_REALS);
+        }
+
+        /** Convertes a block index back to a slot index. However the slot points at the
+            start of the SIMD block. @see slotToBlockIdx and @see mSlotToBone
+        @param blockIdx
+            The block index
+        @return
+            The slot index.
+        */
+        inline static uint32 blockIdxToSlotStart( uint32 blockIdx )
+        {
+            return (blockIdx & 0xFF000000) | ((blockIdx & 0x00FFFFFF) * ARRAY_PACKED_REALS);
+        }
+
+        /// @see mSlotToBone
+        const IndexToIndexMap& getSlotToBone(void) const    { return mSlotToBone; }
+
+        /// @see mBoneToSlot
+        const BoneToSlotVec& getBoneToSlot(void) const      { return mBoneToSlot; }
     };
 }
 

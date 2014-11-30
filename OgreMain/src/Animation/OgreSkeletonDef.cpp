@@ -94,10 +94,38 @@ namespace Ogre
             mBonesPerDepth[currentDepthLevel].push_back( i );
         }
 
+        // Populate both mBoneToSlot and mSlotToBone
+        mBoneToSlot.reserve( originalSkeleton->getNumBones() );
+        for( size_t i=0; i<originalSkeleton->getNumBones(); ++i )
+        {
+            const v1::OldBone *bone = originalSkeleton->getBone( i );
+
+            size_t depthLevel = 0;
+            v1::OldNode const *parentBone = bone;
+            while( (parentBone = parentBone->getParent()) )
+                ++depthLevel;
+
+            size_t offset = 0;
+            BoneToSlotVec::const_iterator itBoneToSlot = mBoneToSlot.begin();
+            BoneToSlotVec::const_iterator enBoneToSlot  = mBoneToSlot.end();
+            while( itBoneToSlot != enBoneToSlot )
+            {
+                if( (*itBoneToSlot >> 24) == depthLevel )
+                    ++offset;
+                ++itBoneToSlot;
+            }
+
+            //Build the map that lets us know the final slot bone index that will be
+            //assigned to this bone (to get the block we still need to divide by ARRAY_PACKED_REALS)
+            mBoneToSlot.push_back( static_cast<uint>((depthLevel << 24) | (offset & 0x00FFFFFF)) );
+            mSlotToBone[mBoneToSlot.back()] = static_cast<uint>(i);
+        }
+
         //Clone the animations
         mAnimationDefs.resize( originalSkeleton->getNumAnimations() );
         for( size_t i=0; i<originalSkeleton->getNumAnimations(); ++i )
         {
+            mAnimationDefs[i]._setSkeletonDef( this );
             mAnimationDefs[i].setName( originalSkeleton->getAnimation( i )->getName() );
             mAnimationDefs[i].build( originalSkeleton, originalSkeleton->getAnimation( i ), frameRate );
         }

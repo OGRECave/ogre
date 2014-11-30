@@ -309,6 +309,16 @@ namespace Ogre
         return &mBones[itor->second];
     }
     //-----------------------------------------------------------------------------------
+    Bone* SkeletonInstance::getBone( size_t index )
+    {
+        return &mBones[index];
+    }
+    //-----------------------------------------------------------------------------------
+    size_t SkeletonInstance::getNumBones(void) const
+    {
+        return mBones.size();
+    }
+    //-----------------------------------------------------------------------------------
     bool SkeletonInstance::hasAnimation( IdString name ) const
     {
         SkeletonAnimationVec::const_iterator itor = mAnimations.begin();
