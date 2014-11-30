@@ -34,6 +34,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    namespace v1
+    {
+        class TimeIndex;
+    }
+
     class _OgreExport SkeletonAnimationDef : public AnimationAlloc
     {
         friend class SkeletonAnimation;
@@ -56,6 +61,15 @@ namespace Ogre
 
         typedef vector<Real>::type TimestampVec;
         typedef map<size_t, TimestampVec>::type TimestampsPerBlock;
+
+        /** Same as @see OldNodeAnimationTrack::getInterpolatedKeyFrame, but doesn't normalize
+            the interpolated quaternion, otherwise the rotation speed would be completely
+            changed after we create additional keyframes to maintain compatibility within
+            the SIMD block.
+        */
+        static void getInterpolatedUnnormalizedKeyFrame( v1::OldNodeAnimationTrack *oldTrack,
+                                                         const v1::TimeIndex& timeIndex,
+                                                         v1::TransformKeyFrame* kf );
 
         /** Allocates enough memory in mKfTransformMemoryManager, creates all the mTracks
             (one per each entry in timestampsByBlock), and allocates all the keyframes
