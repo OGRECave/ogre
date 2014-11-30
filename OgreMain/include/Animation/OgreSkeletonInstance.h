@@ -136,6 +136,12 @@ namespace Ogre
         /// Gets the bone with given name. Throws if not found.
         Bone* getBone( IdString boneName );
 
+        /// Gets the bone from its index. Don't overflow!. @see getNumBones
+        Bone* getBone( size_t index );
+
+        /// Gets the number of bones.
+        size_t getNumBones(void) const;
+
         bool hasAnimation( IdString name ) const;
         /// Returns the requested animations. Throws if not found. O(N) Linear search
         SkeletonAnimation* getAnimation( IdString name );

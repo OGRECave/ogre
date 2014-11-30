@@ -150,6 +150,8 @@ namespace Ogre
         bool getEnabled(void) const                                 { return mEnabled; }
 
         void _applyAnimation( const TransformArray &boneTransforms );
+
+        const SkeletonAnimationDef* getDefinition(void) const       { return mDefinition; }
     };
 
     /** @} */

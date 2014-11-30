@@ -29,10 +29,12 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Animation/OgreSkeletonAnimationDef.h"
+#include "Animation/OgreSkeletonDef.h"
 
 #include "Math/Array/OgreMathlib.h"
 #include "Math/Array/OgreTransform.h"
 #include "Math/Array/OgreKfTransformArrayMemoryManager.h"
+#include "Math/Array/OgreKfTransform.h"
 
 #include "OgreAnimation.h"
 #include "OgreOldBone.h"
@@ -44,6 +46,7 @@ namespace Ogre
     SkeletonAnimationDef::SkeletonAnimationDef() :
         mNumFrames( 0 ),
         mOriginalFrameRate( 25.0f ),
+        mSkeletonDef( 0 ),
         mKfTransformMemoryManager( 0 )
     {
     }
@@ -60,67 +63,15 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    inline uint32 SkeletonAnimationDef::slotToBlockIdx( uint32 slotIdx ) const
-    {
-        return (slotIdx & 0xFF000000) | ((slotIdx & 0x00FFFFFF) / ARRAY_PACKED_REALS);
-    }
-	//-----------------------------------------------------------------------------------
-    inline uint32 SkeletonAnimationDef::blockIdxToSlotStart( uint32 blockIdx ) const
-    {
-        return (blockIdx & 0xFF000000) | ((blockIdx & 0x00FFFFFF) * ARRAY_PACKED_REALS);
-    }
-    //-----------------------------------------------------------------------------------
-    void SkeletonAnimationDef::build( const Skeleton *skeleton, const Animation *animation, Real frameRate )
+    void SkeletonAnimationDef::build( const Skeleton *skeleton, const Animation *animation,
+                                      Real frameRate )
     {
         mOriginalFrameRate = frameRate;
         mNumFrames = animation->getLength() * frameRate;
 
-        //Terminology:
-        // Bone Index:
-        //  It's the bone index given by skeleton. i.e. getBone( boneIdx )
-        // Slot Index
-        //  It's the place in SoA slots the bone will end up with, with an index containing
-        //  the parent level in the high 8 bits.
-        //          For example the first root bone is 0
-        //          The first bone child of root is (1 << 24) | (0 & 0x00FFFFF)
-        //          The second bone child of root is (1 << 24) | (1 & 0x00FFFFF)
-        //          The first bone child of child of root is (2 << 24) | (0 & 0x00FFFFF)
-        //
-        // Block Index.
-        //  It's the same as slot index, but the slot part (low 24 bits) is divided by ARRAY_PACKED_REALS
-        //  For example, ARRAY_PACKED_REALS = 4, slots 0 1 2 & 3 are in block 0
-
         //Converts Bone Index -> Slot Index
-        vector<uint32>::type boneToSlot;
-        boneToSlot.reserve( skeleton->getNumBones() );
-
-        //Converts Slot Index -> Bone Index
-        map<uint32, uint32>::type slotToBone;
-
-        for( size_t i=0; i<skeleton->getNumBones(); ++i )
-        {
-            const OldBone *bone = skeleton->getBone( i );
-
-            size_t depthLevel = 0;
-            OldNode const *parentBone = bone;
-            while( (parentBone = parentBone->getParent()) )
-                ++depthLevel;
-
-            size_t offset = 0;
-            vector<uint32>::type::const_iterator itor = boneToSlot.begin();
-            vector<uint32>::type::const_iterator end  = boneToSlot.end();
-            while( itor != end )
-            {
-                if( (*itor >> 24) == depthLevel )
-                    ++offset;
-                ++itor;
-            }
-
-            //Build the map that lets us know the final slot bone index that will be
-            //assigned to this bone (to get the block we still need to divide by ARRAY_PACKED_REALS)
-            boneToSlot.push_back( static_cast<uint>((depthLevel << 24) | (offset & 0x00FFFFFF)) );
-            slotToBone[boneToSlot.back()] = static_cast<uint>(i);
-        }
+        const SkeletonDef::BoneToSlotVec &boneToSlot    = mSkeletonDef->getBoneToSlot();
+        const SkeletonDef::IndexToIndexMap &slotToBone  = mSkeletonDef->getSlotToBone();
 
         //1st Pass: Count the number of keyframes, so we know how
         //much memory to allocate, as we don't listen for resizes.
@@ -143,7 +94,7 @@ namespace Ogre
                 if( track->getNumKeyFrames() > 0 )
                 {
                     uint32 slotIdx = boneToSlot[boneIdx];
-                    uint32 blockIdx = slotToBlockIdx( slotIdx );
+                    uint32 blockIdx = SkeletonDef::slotToBlockIdx( slotIdx );
 
                     TimestampsPerBlock::iterator itKeyframes = timestampsByBlock.find( blockIdx );
                     if( itKeyframes == timestampsByBlock.end() )
@@ -186,7 +137,7 @@ namespace Ogre
             KeyFrameRigVec::iterator enKeys = keyFrames.end();
 
             uint32 blockIdx = itTrack->getBoneBlockIdx();
-			uint32 slotStart= blockIdxToSlotStart( blockIdx );
+            uint32 slotStart= SkeletonDef::blockIdxToSlotStart( blockIdx );
 
             while( itKeys != enKeys )
             {
@@ -205,9 +156,40 @@ namespace Ogre
                     {
 						OldNodeAnimationTrack *oldTrack = animation->getOldNodeTrack( boneIdx );
 
-                        TransformKeyFrame originalKF( 0, fTime );
-                        oldTrack->getInterpolatedKeyFrame( animation->_getTimeIndex( fTime ),
-                                                            &originalKF );
+                        v1::TransformKeyFrame originalKF( 0, fTime );
+                        /*oldTrack->getInterpolatedKeyFrame( animation->_getTimeIndex( fTime ),
+                                                           &originalKF );*/
+                        {
+                            v1::KeyFrame *kBase1, *kBase2;
+                            v1::TransformKeyFrame *k1, *k2;
+                            unsigned short firstKeyIndex;
+
+                            Real t = oldTrack->getKeyFramesAtTime( animation->_getTimeIndex( fTime ),
+                                                                   &kBase1, &kBase2, &firstKeyIndex);
+                            k1 = static_cast<v1::TransformKeyFrame*>(kBase1);
+                            k2 = static_cast<v1::TransformKeyFrame*>(kBase2);
+
+                            if (t == 0.0)
+                            {
+                                // Just use k1
+                                originalKF = *k1;
+                            }
+                            else
+                            {
+                                // Interpolate by t
+                                Vector3 base;
+                                // Translation
+                                base = k1->getTranslate();
+                                originalKF.setTranslate( base + ((k2->getTranslate() - base) * t) );
+
+                                // Scale
+                                base = k1->getScale();
+                                originalKF.setScale( base + ((k2->getScale() - base) * t) );
+
+                                Quaternion qBase = k1->getRotation();
+                                originalKF.setRotation( qBase + ((k2->getRotation() - qBase) * t) );
+                            }
+                        }
 
                         itKeys->mBoneTransform->mPosition.setFromVector3( originalKF.getTranslate(), i );
                         itKeys->mBoneTransform->mOrientation.setFromQuaternion( originalKF.getRotation(),
@@ -356,6 +338,73 @@ namespace Ogre
                 ++keyframesDone[i];
             }
             ++i;
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void SkeletonAnimationDef::_dumpCsvTracks( String &outText ) const
+    {
+        const SkeletonDef::BoneDataVec &mBones = mSkeletonDef->getBones();
+        const SkeletonDef::IndexToIndexMap &slotToBone = mSkeletonDef->getSlotToBone();
+
+        SkeletonTrackVec::const_iterator itor = mTracks.begin();
+        SkeletonTrackVec::const_iterator end  = mTracks.end();
+
+        while( itor != end )
+        {
+            const SkeletonTrack &track = *itor;
+            uint32 blockIdx = track.getBoneBlockIdx();
+
+            const KeyFrameRigVec &keyFrames = track.getKeyFrames();
+
+            for( size_t i=0; i<ARRAY_PACKED_REALS; ++i )
+            {
+                uint32 slotIdx = SkeletonDef::blockIdxToSlotStart( blockIdx ) + i;
+
+                SkeletonDef::IndexToIndexMap::const_iterator itSlotToBone = slotToBone.find( slotIdx );
+
+                if( itSlotToBone != slotToBone.end() )
+                {
+                    uint32 boneIdx = itSlotToBone->second;
+
+                    const SkeletonDef::BoneData &boneDef = mBones[boneIdx];
+                    outText += boneDef.name;
+                    outText += ",";
+
+                    KeyFrameRigVec::const_iterator itKeyFrames = keyFrames.begin();
+                    KeyFrameRigVec::const_iterator enKeyFrames = keyFrames.end();
+
+                    while( itKeyFrames != enKeyFrames )
+                    {
+                        outText += StringConverter::toString( itKeyFrames->mFrame );
+                        outText += ",";
+
+                        const KfTransform * RESTRICT_ALIAS boneTransform = itKeyFrames->mBoneTransform;
+
+                        Vector3 vPos, vScale;
+                        Quaternion qRot;
+
+                        boneTransform->mPosition.getAsVector3( vPos, i );
+                        boneTransform->mOrientation.getAsQuaternion( qRot, i );
+                        boneTransform->mScale.getAsVector3( vScale, i );
+
+                        outText += StringConverter::toString( vPos.x ) + ",";
+                        outText += StringConverter::toString( vPos.y ) + ",";
+                        outText += StringConverter::toString( vPos.z ) + ",";
+                        outText += StringConverter::toString( qRot.x ) + ",";
+                        outText += StringConverter::toString( qRot.y ) + ",";
+                        outText += StringConverter::toString( qRot.z ) + ",";
+                        outText += StringConverter::toString( qRot.w ) + ",";
+                        outText += StringConverter::toString( vScale.x ) + ",";
+                        outText += StringConverter::toString( vScale.y ) + ",";
+                        outText += StringConverter::toString( vScale.z ) + ",";
+                        ++itKeyFrames;
+                    }
+
+                    outText += "\n";
+                }
+            }
+
             ++itor;
         }
     }
