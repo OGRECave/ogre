@@ -216,6 +216,9 @@ namespace Ogre {
         // Transform user LOD values (starting at index 1, no need to transform base value)
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
+
+        // Rewrite first value
+        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
 	}
 	//-----------------------------------------------------------------------
     void Mesh::prepareImpl()
@@ -2203,12 +2206,13 @@ namespace Ogre {
         mLodStrategy = lodStrategy;
 
         assert(mMeshLodUsageList.size());
-        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
-
+        
         // Re-transform user LOD values (starting at index 1, no need to transform base value)
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
 
+        // Rewrite first value
+        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
     }
     //--------------------------------------------------------------------
     void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
@@ -2235,17 +2239,10 @@ namespace Ogre {
             }
         }
 
-        // TODO: Fix this in PixelCountLodStrategy::getIndex()
-        // Fix bug in Ogre with pixel count LOD strategy.
-        // Changes [0, 20, 15, 10, 5] to [max, 20, 15, 10, 5].
-        // Fixes PixelCountLodStrategy::getIndex() function, which returned always 0 index.
-        if (lodConfig.strategy == AbsolutePixelCountLodStrategy::getSingletonPtr()) {
-            mMeshLodUsageList[0].userValue = std::numeric_limits<Real>::max();
-            mMeshLodUsageList[0].value = std::numeric_limits<Real>::max();
-        } else {
-            mMeshLodUsageList[0].userValue = 0;
-            mMeshLodUsageList[0].value = 0;
-        }
+        // Set LOD strategy base values
+        mMeshLodUsageList[0].userValue = lodConfig.strategy->getBaseValue();
+        mMeshLodUsageList[0].value = lodConfig.strategy->getBaseValue();
+
     }
     //---------------------------------------------------------------------
 }
