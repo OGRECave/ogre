@@ -217,8 +217,8 @@ namespace Ogre {
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
 
-		// Rewrite first value
-		mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
+        // Rewrite first value
+        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
 	}
 	//-----------------------------------------------------------------------
     void Mesh::prepareImpl()
@@ -2211,8 +2211,8 @@ namespace Ogre {
 		for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin(); i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
 
-		// Rewrite first value
-		mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
+        // Rewrite first value
+        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
     }
     //--------------------------------------------------------------------
     void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
@@ -2239,9 +2239,9 @@ namespace Ogre {
             }
         }
 
-	// Set LOD strategy base values
-	mMeshLodUsageList[0].userValue = lodConfig.strategy->getBaseValue();
-	mMeshLodUsageList[0].value = lodConfig.strategy->getBaseValue();
+        // Set LOD strategy base values
+        mMeshLodUsageList[0].userValue = lodConfig.strategy->getBaseValue();
+        mMeshLodUsageList[0].value = lodConfig.strategy->getBaseValue();
 
     }
     //---------------------------------------------------------------------
