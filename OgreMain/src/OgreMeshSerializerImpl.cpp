@@ -111,9 +111,10 @@ namespace Ogre {
         // Check header
         readFileHeader(stream);
 
+        unsigned short streamID = readChunk(stream);
+
         while(!stream->eof())
         {
-            unsigned short streamID = readChunk(stream);
             switch (streamID)
             {
             case M_MESH:
@@ -121,6 +122,7 @@ namespace Ogre {
                 break;
 			}
 
+            streamID = readChunk(stream);
         }
     }
     //---------------------------------------------------------------------

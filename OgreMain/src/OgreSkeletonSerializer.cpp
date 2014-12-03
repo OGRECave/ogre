@@ -127,9 +127,10 @@ namespace Ogre {
 		// Check header
         readFileHeader(stream);
 
+        unsigned short streamID = readChunk(stream);
+
         while(!stream->eof())
         {
-            unsigned short streamID = readChunk(stream);
             switch (streamID)
             {
 			case SKELETON_BLENDMODE:
@@ -153,6 +154,8 @@ namespace Ogre {
 				readSkeletonAnimationLink(stream, pSkel);
 				break;
             }
+
+            streamID = readChunk(stream);
         }
 
 		// Assume bones are stored in the binding pose
