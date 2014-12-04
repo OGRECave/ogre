@@ -292,8 +292,8 @@ namespace Ogre
             {
                 FT_Load_Char( face, cp, FT_LOAD_RENDER );
 
-                if( ( 2 * ( face->glyph->bitmap.rows << 6 ) - face->glyph->metrics.horiBearingY ) > max_height )
-                    max_height = ( 2 * ( face->glyph->bitmap.rows << 6 ) - face->glyph->metrics.horiBearingY );
+                if( ( 2 * ( ((int)face->glyph->bitmap.rows) << 6 ) - face->glyph->metrics.horiBearingY ) > max_height )
+                    max_height = ( 2 * ( ((int)face->glyph->bitmap.rows) << 6 ) - face->glyph->metrics.horiBearingY );
                 if( face->glyph->metrics.horiBearingY > mTtfMaxBearingY )
                     mTtfMaxBearingY = static_cast<int>(face->glyph->metrics.horiBearingY);
 
