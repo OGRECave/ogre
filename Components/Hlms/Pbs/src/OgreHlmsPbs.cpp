@@ -1055,9 +1055,9 @@ namespace Ogre
     void HlmsPbs::unmapTexBuffer( CommandBuffer *commandBuffer )
     {
         //Save our progress
-        mTexLastOffset = (mCurrentMappedTexBuffer - mStartMappedTexBuffer) * sizeof(float);
+        mTexLastOffset += (mCurrentMappedTexBuffer - mRealStartMappedTexBuffer) * sizeof(float);
 
-        if( mStartMappedTexBuffer )
+        if( mRealStartMappedTexBuffer )
         {
             //Unmap the current buffer
             TexBufferPacked *texBuffer = mTexBuffers[mCurrentTexBuffer];
