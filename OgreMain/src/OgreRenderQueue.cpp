@@ -57,29 +57,27 @@ namespace Ogre
 
     const HlmsCache c_dummyCache( 0, HLMS_MAX );
 
-    const int SubRqIdBits           = 3;
-    const int TransparencyBits      = 1;
-    const int MacroblockBits        = 10;
-    const int ShaderBits            = 10;    //The higher 3 bits contain HlmsTypes
-    const int MeshBits              = 14;
-    const int TextureBits           = 11;
-    const int DepthBits             = 15;
+    const int RqBits::SubRqIdBits           = 3;
+    const int RqBits::TransparencyBits      = 1;
+    const int RqBits::MacroblockBits        = 10;
+    const int RqBits::ShaderBits            = 10;    //The higher 3 bits contain HlmsTypes
+    const int RqBits::MeshBits              = 14;
+    const int RqBits::TextureBits           = 11;
+    const int RqBits::DepthBits             = 15;
 
-    #define OGRE_MAKE_MASK( x ) ( (1 << x) - 1 )
+    const int RqBits::SubRqIdShift          = 64                - SubRqIdBits;      //60
+    const int RqBits::TransparencyShift     = SubRqIdShift      - TransparencyBits; //59
+    const int RqBits::MacroblockShift       = TransparencyShift - MacroblockBits;   //49
+    const int RqBits::ShaderShift           = MacroblockShift   - ShaderBits;       //40
+    const int RqBits::MeshShift             = ShaderShift       - MeshBits;         //26
+    const int RqBits::TextureShift          = MeshShift         - TextureBits;      //15
+    const int RqBits::DepthShift            = TextureShift      - DepthBits;        //0
 
-    const int SubRqIdShift          = 64                - SubRqIdBits;      //60
-    const int TransparencyShift     = SubRqIdShift      - TransparencyBits; //59
-    const int MacroblockShift       = TransparencyShift - MacroblockBits;   //49
-    const int ShaderShift           = MacroblockShift   - ShaderBits;       //40
-    const int MeshShift             = ShaderShift       - MeshBits;         //26
-    const int TextureShift          = MeshShift         - TextureBits;      //15
-    const int DepthShift            = TextureShift      - DepthBits;        //0
-
-    const int DepthShiftTransp      = TransparencyShift - DepthBits;        //44
-    const int MacroblockShiftTransp = DepthShiftTransp  - MacroblockBits;   //34
-    const int ShaderShiftTransp     = MacroblockShiftTransp - ShaderBits;   //25
-    const int MeshShiftTransp       = ShaderShiftTransp - MeshBits;         //11
-    const int TextureShiftTransp    = MeshShiftTransp   - TextureBits;      //0
+    const int RqBits::DepthShiftTransp      = TransparencyShift - DepthBits;        //44
+    const int RqBits::MacroblockShiftTransp = DepthShiftTransp  - MacroblockBits;   //34
+    const int RqBits::ShaderShiftTransp     = MacroblockShiftTransp - ShaderBits;   //25
+    const int RqBits::MeshShiftTransp       = ShaderShiftTransp - MeshBits;         //11
+    const int RqBits::TextureShiftTransp    = MeshShiftTransp   - TextureBits;      //0
     //---------------------------------------------------------------------
     RenderQueue::RenderQueue( HlmsManager *hlmsManager, SceneManager *sceneManager,
                               VaoManager *vaoManager ) :
@@ -206,7 +204,7 @@ namespace Ogre
 
         assert( !mRenderQueues[rqId].mSorted &&
                 "Called addRenderable after render and before clear" );
-        assert( subId < OGRE_MAKE_MASK( SubRqIdBits ) );
+        assert( subId < OGRE_RQ_MAKE_MASK( RqBits::SubRqIdBits ) );
 
         uint32 hlmsHash = casterPass ? pRend->getHlmsCasterHash() : pRend->getHlmsHash();
         const HlmsDatablock *datablock = pRend->getDatablock();
@@ -224,7 +222,7 @@ namespace Ogre
         RealAsUint mask = -int64(depth >> 63) | 0x8000000000000000;
         depth = (depth ^ mask) >> 32;
 #endif
-        uint32 quantizedDepth = static_cast<uint32>( depth ) >> (32 - DepthBits);
+        uint32 quantizedDepth = static_cast<uint32>( depth ) >> (32 - RqBits::DepthBits);
 
         uint32 meshHash;
 
@@ -245,31 +243,35 @@ namespace Ogre
         //TODO: Account for skeletal animation in any of the hashes (preferently on the material side)
         //TODO: Account for auto instancing animation in any of the hashes
 
+        #define OGRE_RQ_HASH( x, bits, shift ) ( uint64( (x) & OGRE_RQ_MAKE_MASK( (bits) ) ) << (shift) )
+
         uint64 hash;
         if( !transparent )
         {
             //Opaque objects are first sorted by material, then by mesh, then by depth front to back.
             hash =
-                ( uint64(subId          & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
-                ( uint64(transparent    & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
-                ( uint64(macroblock     & OGRE_MAKE_MASK( MacroblockBits ))     << MacroblockShift )    |
-                ( uint64(hlmsHash       & OGRE_MAKE_MASK( ShaderBits ))         << ShaderShift )        |
-                ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShift )          |
-                ( uint64(texturehash    & OGRE_MAKE_MASK( TextureBits ))        << TextureShift )       |
-                ( uint64(quantizedDepth & OGRE_MAKE_MASK( DepthBits ))          << DepthShift );
+            OGRE_RQ_HASH( subId,            RqBits::SubRqIdBits,        RqBits::SubRqIdShift )      |
+            OGRE_RQ_HASH( transparent,      RqBits::TransparencyBits,   RqBits::TransparencyShift ) |
+            OGRE_RQ_HASH( macroblock,       RqBits::MacroblockBits,     RqBits::MacroblockShift )   |
+            OGRE_RQ_HASH( hlmsHash,         RqBits::ShaderBits,         RqBits::ShaderShift )       |
+            OGRE_RQ_HASH( meshHash,         RqBits::MeshBits,           RqBits::MeshShift )         |
+            OGRE_RQ_HASH( texturehash,      RqBits::TextureBits,        RqBits::TextureShift )      |
+            OGRE_RQ_HASH( quantizedDepth,   RqBits::DepthBits,          RqBits::DepthShift );
         }
         else
         {
             //Transparent objects are sorted by depth back to front, then by material, then by mesh.
             quantizedDepth = quantizedDepth ^ 0xffffffff;
             hash =
-                ( uint64(subId          & OGRE_MAKE_MASK( SubRqIdBits ))        << SubRqIdShift )       |
-                ( uint64(transparent    & OGRE_MAKE_MASK( TransparencyBits ))   << TransparencyShift )  |
-                ( uint64(quantizedDepth & OGRE_MAKE_MASK( DepthBits ))          << DepthShiftTransp )   |
-                ( uint64(macroblock     & OGRE_MAKE_MASK( MacroblockBits ))    << MacroblockShiftTransp)|
-                ( uint64(hlmsHash       & OGRE_MAKE_MASK( ShaderBits ))         << ShaderShiftTransp )  |
-                ( uint64(meshHash       & OGRE_MAKE_MASK( MeshBits ))           << MeshShiftTransp );
+            OGRE_RQ_HASH( subId,            RqBits::SubRqIdBits,        RqBits::SubRqIdShift )          |
+            OGRE_RQ_HASH( transparent,      RqBits::TransparencyBits,   RqBits::TransparencyShift )     |
+            OGRE_RQ_HASH( quantizedDepth,   RqBits::DepthBits,          RqBits::DepthShiftTransp )      |
+            OGRE_RQ_HASH( macroblock,       RqBits::MacroblockBits,     RqBits::MacroblockShiftTransp ) |
+            OGRE_RQ_HASH( hlmsHash,         RqBits::ShaderBits,         RqBits::ShaderShiftTransp )     |
+            OGRE_RQ_HASH( meshHash,         RqBits::MeshBits,           RqBits::MeshShiftTransp );
         }
+
+        #undef OGRE_RQ_HASH
 
         mRenderQueues[rqId].mQueuedRenderablesPerThread[threadIdx].q.push_back(
                     QueuedRenderable( hash, pRend, pMovableObject ) );

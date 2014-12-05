@@ -40,11 +40,11 @@ namespace Ogre
         GLuint  mVaoName;
         GLint   mPrimType[2];
 
-        GL3PlusVertexArrayObject( GLuint vaoName, const VertexBufferPackedVec &vertexBuffers,
+        GL3PlusVertexArrayObject( GLuint vaoName, uint32 renderQueueId,
+                                  const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer,
                                   v1::RenderOperation::OperationType opType ) :
-            VertexArrayObject( (static_cast<uint32>(vaoName) & 0x3FFFFFF) | (opType << 26),
-                               vertexBuffers, indexBuffer, opType ),
+            VertexArrayObject( renderQueueId, vertexBuffers, indexBuffer, opType ),
             mVaoName( vaoName )
         {
             switch( opType )

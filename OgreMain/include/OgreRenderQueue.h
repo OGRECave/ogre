@@ -258,6 +258,34 @@ namespace Ogre {
         bool getSortRenderQueue( uint8 rqId ) const;
     };
 
+    #define OGRE_RQ_MAKE_MASK( x ) ( (1 << x) - 1 )
+
+    class _OgreExport RqBits
+    {
+    public:
+        static const int SubRqIdBits;
+        static const int TransparencyBits;
+        static const int MacroblockBits;
+        static const int ShaderBits;
+        static const int MeshBits;
+        static const int TextureBits;
+        static const int DepthBits;
+
+        static const int SubRqIdShift;
+        static const int TransparencyShift;
+        static const int MacroblockShift;
+        static const int ShaderShift;
+        static const int MeshShift;
+        static const int TextureShift;
+        static const int DepthShift;
+
+        static const int DepthShiftTransp;
+        static const int MacroblockShiftTransp;
+        static const int ShaderShiftTransp;
+        static const int MeshShiftTransp;
+        static const int TextureShiftTransp;
+    };
+
     /** @} */
     /** @} */
 
