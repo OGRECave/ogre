@@ -39,12 +39,16 @@ namespace Ogre
                                                 GLuint vboName ) :
         StagingBuffer( internalBufferStart, sizeBytes, vaoManager, uploadOnly ),
         mVboName( vboName ),
-        mMappedPtr( 0 )
+        mMappedPtr( 0 ),
+        mFenceThreshold( sizeBytes / 4 )
     {
     }
     //-----------------------------------------------------------------------------------
     GL3PlusStagingBuffer::~GL3PlusStagingBuffer()
     {
+        if( !mFences.empty() )
+            wait( mFences.back().fenceName );
+
         deleteFences( mFences.begin(), mFences.end() );
     }
     //-----------------------------------------------------------------------------------
@@ -261,5 +265,11 @@ namespace Ogre
         }
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusStagingBuffer::cleanUnfencedHazards(void)
+    {
+        if( !mUnfencedHazards.empty() )
+            addFence( mUnfencedHazards.front().start, mUnfencedHazards.back().end, true );
     }
 }

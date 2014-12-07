@@ -46,11 +46,10 @@ namespace Ogre
     protected:
         Timer *mTimer;
 
-    public:
         /// In millseconds. Note: Changing this value won't affect existing staging buffers.
+        uint32 mDefaultStagingBufferUnfencedTime;
         uint32 mDefaultStagingBufferLifetime;
 
-    protected:
         /// [0] = for uploads, [1] = for downloads
         StagingBufferVec mStagingBuffers[2];
         StagingBufferVec mZeroRefStagingBuffers[2];
@@ -301,7 +300,8 @@ namespace Ogre
             If we can't find any existing buffer that can hold the requested number bytes,
             we'll create a new one.
         @remarks
-            The reference count is increasesd before returning the staging buffer.
+            Calling this function causes the reference count of the returned pointer to
+            be increased.
             You should decrease the reference count after you're done with the returned
             pointer. @See StagingBuffer::removeReferenceCount regarding ref. counting.
         @param sizeBytes
@@ -331,6 +331,34 @@ namespace Ogre
         Timer* getTimer(void)               { return mTimer; }
 
         uint32 getFrameCount(void)          { return mFrameCount; }
+
+        /** Sets the default time for staging buffers. Staging buffers are recycled/reused.
+            When their reference count reaches 0, this VaoManager will begin to track how
+            long since the last time they've reached ref count 0.
+            When the time threshold is met, the staging buffer gets removed.
+        @remarks
+            @see getStagingBuffer
+        @param lifetime
+            Time in milliseconds. The default is 5 minutes.
+            A staging buffer that remained at zero ref. count for lifetime milliseconds
+            will be destroyed.
+        @param unfencedTime
+            For efficiency reasons (API overhead), some staging buffers implementations
+            will not track all hazards on fences. A staging buffer that remained at
+            zero ref. count for unfencedTime milliseconds will be told to clean
+            their hazards, creating the missing appropiate fences.
+            unfencedTime can't be higher than lifetime.
+            unfencedTime should not be too far away from lifetime, and not too soon
+            either, to maximize the chances of no stalls when we finally destroy it
+            and avoid excessive API overhead in keeping fences alive.
+            The default is 4 minutes 59 seconds.
+        */
+        void setDefaultStagingBufferlifetime( uint32 lifetime, uint32 unfencedTime );
+
+        uint32 getDefaultStagingBufferUnfencedTime(void) const
+                                            { return mDefaultStagingBufferUnfencedTime; }
+        uint32 getDefaultStagingBufferLifetime(void) const
+                                            { return mDefaultStagingBufferLifetime; }
 
         uint8 _getDynamicBufferCurrentFrameNoWait(void) const   { return mDynamicBufferCurrentFrame; }
         uint8 getDynamicBufferMultiplier(void) const            { return mDynamicBufferMultiplier; }

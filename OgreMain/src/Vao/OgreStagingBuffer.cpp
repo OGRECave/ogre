@@ -45,7 +45,8 @@ namespace Ogre
         mMappingStart( 0 ),
         mMappingCount( 0 ),
         mRefCount( 1 ),
-        mLifetimeThreshold( vaoManager->mDefaultStagingBufferLifetime ),
+        mUnfenceTimeThreshold( vaoManager->getDefaultStagingBufferUnfencedTime() ),
+        mLifetimeThreshold( vaoManager->getDefaultStagingBufferLifetime() ),
         mLastUsedTimestamp( vaoManager->getTimer()->getMilliseconds() )
     {
     }

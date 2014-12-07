@@ -35,11 +35,13 @@ THE SOFTWARE.
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "OgreTimer.h"
 #include "OgreCommon.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
     VaoManager::VaoManager() :
         mTimer( 0 ),
+        mDefaultStagingBufferUnfencedTime( 300000 - 1000 ), //4 minutes, 59 seconds
         mDefaultStagingBufferLifetime( 300000 ), //5 minutes
         mSupportsIndirectBuffers( false ),
         mDynamicBufferMultiplier( 3 ),
@@ -495,6 +497,29 @@ namespace Ogre
 
         assert( itor != zeroRefStagingBuffers.end() );
         efficientVectorRemove( zeroRefStagingBuffers, itor );
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::setDefaultStagingBufferlifetime( uint32 lifetime, uint32 unfencedTime )
+    {
+        if( unfencedTime > lifetime )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "unfencedTime must be equal or lower than lifetime",
+                         "VaoManager::setDefaultStagingBufferlifetime" );
+        }
+
+        if( unfencedTime == lifetime )
+        {
+            LogManager::getSingleton().logMessage(
+                        "WARNING: lifetime is equal to unfencedTime in "
+                        "VaoManager::setDefaultStagingBufferlifetime. This could give you random "
+                        "stalls or framerate hiccups. You should set unfencedTime to some time "
+                        "earlier to lifetime. Like 1 second earlier. But not too distant either "
+                        "to prevent API overhead.", LML_CRITICAL );
+        }
+
+        mDefaultStagingBufferLifetime       = lifetime;
+        mDefaultStagingBufferUnfencedTime   = unfencedTime;
     }
 }
 

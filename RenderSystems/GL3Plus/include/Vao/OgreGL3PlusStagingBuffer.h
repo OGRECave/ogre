@@ -112,6 +112,8 @@ namespace Ogre
 
         virtual StagingStallType willStall( size_t sizeBytes ) const;
 
+        void cleanUnfencedHazards(void);
+
         GLuint getBufferName(void) const            { return mVboName; }
     };
 }

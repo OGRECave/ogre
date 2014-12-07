@@ -654,6 +654,9 @@ namespace Ogre {
 
         _cleanupDepthBuffers();
 
+        OGRE_DELETE mVaoManager;
+        mVaoManager = 0;
+
         // Remove all the render targets.
         // (destroy primary target last since others may depend on it)
         RenderTarget* primary = 0;
@@ -666,9 +669,6 @@ namespace Ogre {
         }
         OGRE_DELETE primary;
         mRenderTargets.clear();
-
-        OGRE_DELETE mVaoManager;
-        mVaoManager = 0;
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_beginGeometryCount(void)

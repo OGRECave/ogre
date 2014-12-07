@@ -114,6 +114,7 @@ namespace Ogre
 
         /// Manual reference count. Note on creation it starts already at 1.
         int16           mRefCount;
+        uint32          mUnfenceTimeThreshold;
         uint32          mLifetimeThreshold;
         unsigned long   mLastUsedTimestamp;
 
@@ -187,8 +188,12 @@ namespace Ogre
         uint16 getReferenceCount(void) const        { return mRefCount; }
 
         /// Returns the time in milliseconds in which a StagingBuffer should
+        /// hazards unfenced while with a reference count of 0. @see getLifetimeThreshold
+        uint32 getUnfencedTimeThreshold(void) const { return mUnfenceTimeThreshold; }
+
+        /// Returns the time in milliseconds in which a StagingBuffer should
         /// live with a reference count of 0 before being deleted.
-        uint32 getLifetimeThreshold(void)           { return mLifetimeThreshold; }
+        uint32 getLifetimeThreshold(void) const     { return mLifetimeThreshold; }
 
         /// Returns the time in millisecond when the ref. count became 0.
         unsigned long getLastUsedTimestamp(void)    { return mLastUsedTimestamp; }
