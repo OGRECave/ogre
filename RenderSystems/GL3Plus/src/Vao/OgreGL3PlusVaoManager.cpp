@@ -883,6 +883,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     StagingBuffer* GL3PlusVaoManager::createStagingBuffer( size_t sizeBytes, bool forUpload )
     {
+        sizeBytes = std::max<size_t>( sizeBytes, 4 * 1024 * 1024 );
+
         GLuint bufferName;
         GLenum target = forUpload ? GL_COPY_READ_BUFFER : GL_COPY_WRITE_BUFFER;
         OCGE( glGenBuffers( 1, &bufferName ) );
