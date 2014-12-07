@@ -51,6 +51,8 @@ namespace Ogre
         {
         }
 
+        virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_CONST; }
+
         /** Binds the constant buffer to the given slot
         @param slot
             The slot to asign this constant buffer. In D3D11 it's called 'slot'.

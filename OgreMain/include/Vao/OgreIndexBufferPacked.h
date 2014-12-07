@@ -50,6 +50,8 @@ namespace Ogre
         {
         }
 
+        virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_INDEX; }
+
         IndexType getIndexType(void) const  { return mBytesPerElement == 2 ? IT_16BIT : IT_32BIT; }
 
         //TODO

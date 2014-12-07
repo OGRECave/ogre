@@ -105,8 +105,7 @@ namespace Ogre
     GL3PlusVaoManager::~GL3PlusVaoManager()
     {
         destroyAllVertexArrayObjects();
-        VaoManager::deleteAllBuffers( mVertexBuffers );
-        VaoManager::deleteAllBuffers( mIndexBuffers );
+        deleteAllBuffers();
 
         vector<GLuint>::type bufferNames;
 
@@ -960,6 +959,13 @@ namespace Ogre
         {
             OCGE( glDeleteBuffers( bufferNames.size(), &bufferNames[0] ) );
             bufferNames.clear();
+        }
+
+        if( !mDelayedDestroyBuffers.empty() &&
+            mDelayedDestroyBuffers.front().frameNumDynamic == mDynamicBufferCurrentFrame )
+        {
+            waitForTailFrameToFinish();
+            destroyDelayedBuffers( mDynamicBufferCurrentFrame );
         }
 
         if( mFrameSyncVec[mDynamicBufferCurrentFrame] )

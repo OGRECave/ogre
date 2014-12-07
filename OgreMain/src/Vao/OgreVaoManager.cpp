@@ -97,7 +97,7 @@ namespace Ogre
         VertexBufferPacked *retVal = createVertexBufferImpl( numVertices, bytesPerVertex, bufferType,
                                                              initialData, keepAsShadow, vertexElements );
 
-        mVertexBuffers.push_back( retVal );
+        mBuffers[BP_TYPE_VERTEX].push_back( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
@@ -110,10 +110,10 @@ namespace Ogre
                          "VaoManager::destroyVertexBuffer" );
         }
 
-        BufferPackedVec::iterator itor = std::find( mVertexBuffers.begin(),
-                                                    mVertexBuffers.end(), vertexBuffer );
+        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_VERTEX].begin(),
+                                                    mBuffers[BP_TYPE_VERTEX].end(), vertexBuffer );
 
-        if( itor == mVertexBuffers.end() )
+        if( itor == mBuffers[BP_TYPE_VERTEX].end() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "Vertex Buffer has already been destroyed or "
@@ -121,10 +121,20 @@ namespace Ogre
                          "VaoManager::destroyVertexBuffer" );
         }
 
-        destroyVertexBufferImpl( vertexBuffer );
-        OGRE_DELETE vertexBuffer;
+        if( vertexBuffer->getBufferType() >= BT_DYNAMIC_DEFAULT )
+        {
+            //We need to delay the removal of this buffer until
+            //we're sure it's not in use by the GPU anymore
+            DelayedBuffer delayedBuffer( vertexBuffer, mFrameCount, mDynamicBufferCurrentFrame );
+            mDelayedDestroyBuffers.push_back( delayedBuffer );
+        }
+        else
+        {
+            destroyVertexBufferImpl( vertexBuffer );
+            OGRE_DELETE vertexBuffer;
+        }
 
-        efficientVectorRemove( mVertexBuffers, itor );
+        efficientVectorRemove( mBuffers[BP_TYPE_VERTEX], itor );
     }
     //-----------------------------------------------------------------------------------
     IndexBufferPacked* VaoManager::createIndexBuffer( IndexBufferPacked::IndexType indexType,
@@ -134,16 +144,16 @@ namespace Ogre
         IndexBufferPacked *retVal;
         retVal = createIndexBufferImpl( numIndices, indexType == IndexBufferPacked::IT_16BIT ? 2 : 4,
                                         bufferType, initialData, keepAsShadow );
-        mIndexBuffers.push_back( retVal );
+        mBuffers[BP_TYPE_INDEX].push_back( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyIndexBuffer( IndexBufferPacked *indexBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mIndexBuffers.begin(),
-                                                    mIndexBuffers.end(), indexBuffer );
+        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_INDEX].begin(),
+                                                    mBuffers[BP_TYPE_INDEX].end(), indexBuffer );
 
-        if( itor == mIndexBuffers.end() )
+        if( itor == mBuffers[BP_TYPE_INDEX].end() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "Index Buffer has already been destroyed or "
@@ -151,10 +161,20 @@ namespace Ogre
                          "VaoManager::destroyIndexBuffer" );
         }
 
-        destroyIndexBufferImpl( indexBuffer );
-        OGRE_DELETE *itor;
+        if( indexBuffer->getBufferType() >= BT_DYNAMIC_DEFAULT )
+        {
+            //We need to delay the removal of this buffer until
+            //we're sure it's not in use by the GPU anymore
+            DelayedBuffer delayedBuffer( indexBuffer, mFrameCount, mDynamicBufferCurrentFrame );
+            mDelayedDestroyBuffers.push_back( delayedBuffer );
+        }
+        else
+        {
+            destroyIndexBufferImpl( indexBuffer );
+            OGRE_DELETE *itor;
+        }
 
-        efficientVectorRemove( mIndexBuffers, itor );
+        efficientVectorRemove( mBuffers[BP_TYPE_INDEX], itor );
     }
     //-----------------------------------------------------------------------------------
     ConstBufferPacked* VaoManager::createConstBuffer( size_t sizeBytes, BufferType bufferType,
@@ -162,16 +182,16 @@ namespace Ogre
     {
         ConstBufferPacked *retVal;
         retVal = createConstBufferImpl( sizeBytes, bufferType, initialData, keepAsShadow );
-        mConstBuffers.push_back( retVal );
+        mBuffers[BP_TYPE_CONST].push_back( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyConstBuffer( ConstBufferPacked *constBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mConstBuffers.begin(),
-                                                    mConstBuffers.end(), constBuffer );
+        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_CONST].begin(),
+                                                    mBuffers[BP_TYPE_CONST].end(), constBuffer );
 
-        if( itor == mConstBuffers.end() )
+        if( itor == mBuffers[BP_TYPE_CONST].end() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "Constant Buffer has already been destroyed or "
@@ -179,10 +199,20 @@ namespace Ogre
                          "VaoManager::destroyConstBuffer" );
         }
 
-        destroyConstBufferImpl( constBuffer );
-        OGRE_DELETE *itor;
+        if( constBuffer->getBufferType() >= BT_DYNAMIC_DEFAULT )
+        {
+            //We need to delay the removal of this buffer until
+            //we're sure it's not in use by the GPU anymore
+            DelayedBuffer delayedBuffer( constBuffer, mFrameCount, mDynamicBufferCurrentFrame );
+            mDelayedDestroyBuffers.push_back( delayedBuffer );
+        }
+        else
+        {
+            destroyConstBufferImpl( constBuffer );
+            OGRE_DELETE *itor;
+        }
 
-        efficientVectorRemove( mConstBuffers, itor );
+        efficientVectorRemove( mBuffers[BP_TYPE_CONST], itor );
     }
     //-----------------------------------------------------------------------------------
     TexBufferPacked* VaoManager::createTexBuffer( PixelFormat pixelFormat, size_t sizeBytes,
@@ -191,16 +221,16 @@ namespace Ogre
     {
         TexBufferPacked *retVal;
         retVal = createTexBufferImpl( pixelFormat, sizeBytes, bufferType, initialData, keepAsShadow );
-        mTexBuffers.push_back( retVal );
+        mBuffers[BP_TYPE_TEX].push_back( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyTexBuffer( TexBufferPacked *texBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mTexBuffers.begin(),
-                                                    mTexBuffers.end(), texBuffer );
+        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_TEX].begin(),
+                                                    mBuffers[BP_TYPE_TEX].end(), texBuffer );
 
-        if( itor == mTexBuffers.end() )
+        if( itor == mBuffers[BP_TYPE_TEX].end() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "Texture Buffer has already been destroyed or "
@@ -208,10 +238,20 @@ namespace Ogre
                          "VaoManager::destroyTexBuffer" );
         }
 
-        destroyTexBufferImpl( texBuffer );
-        OGRE_DELETE *itor;
+        if( texBuffer->getBufferType() >= BT_DYNAMIC_DEFAULT )
+        {
+            //We need to delay the removal of this buffer until
+            //we're sure it's not in use by the GPU anymore
+            DelayedBuffer delayedBuffer( texBuffer, mFrameCount, mDynamicBufferCurrentFrame );
+            mDelayedDestroyBuffers.push_back( delayedBuffer );
+        }
+        else
+        {
+            destroyTexBufferImpl( texBuffer );
+            OGRE_DELETE *itor;
+        }
 
-        efficientVectorRemove( mTexBuffers, itor );
+        efficientVectorRemove( mBuffers[BP_TYPE_TEX], itor );
     }
     //-----------------------------------------------------------------------------------
     IndirectBufferPacked* VaoManager::createIndirectBuffer( size_t sizeBytes, BufferType bufferType,
@@ -219,16 +259,16 @@ namespace Ogre
     {
         IndirectBufferPacked *retVal;
         retVal = createIndirectBufferImpl( sizeBytes, bufferType, initialData, keepAsShadow );
-        mIndirectBuffers.push_back( retVal );
+        mBuffers[BP_TYPE_INDIRECT].push_back( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyIndirectBuffer( IndirectBufferPacked *indirectBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mIndirectBuffers.begin(),
-                                                    mIndirectBuffers.end(), indirectBuffer );
+        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_INDIRECT].begin(),
+                                                    mBuffers[BP_TYPE_INDIRECT].end(), indirectBuffer );
 
-        if( itor == mIndirectBuffers.end() )
+        if( itor == mBuffers[BP_TYPE_INDIRECT].end() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "Indirect Buffer has already been destroyed or "
@@ -236,10 +276,20 @@ namespace Ogre
                          "VaoManager::destroyIndirectBuffer" );
         }
 
-        destroyIndirectBufferImpl( indirectBuffer );
-        OGRE_DELETE *itor;
+        if( indirectBuffer->getBufferType() >= BT_DYNAMIC_DEFAULT )
+        {
+            //We need to delay the removal of this buffer until
+            //we're sure it's not in use by the GPU anymore
+            DelayedBuffer delayedBuffer( indirectBuffer, mFrameCount, mDynamicBufferCurrentFrame );
+            mDelayedDestroyBuffers.push_back( delayedBuffer );
+        }
+        else
+        {
+            destroyIndirectBufferImpl( indirectBuffer );
+            OGRE_DELETE *itor;
+        }
 
-        efficientVectorRemove( mIndirectBuffers, itor );
+        efficientVectorRemove( mBuffers[BP_TYPE_INDIRECT], itor );
     }
     //-----------------------------------------------------------------------------------
     VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
@@ -317,15 +367,31 @@ namespace Ogre
         mVertexArrayObjects.clear();
     }
     //-----------------------------------------------------------------------------------
-    void VaoManager::deleteAllBuffers( BufferPackedVec &buffersContainer )
+    void VaoManager::deleteAllBuffers(void)
     {
-        BufferPackedVec::const_iterator itor = buffersContainer.begin();
-        BufferPackedVec::const_iterator end  = buffersContainer.end();
+        for( int i=0; i<NUM_BUFFER_PACKED_TYPES; ++i )
+        {
+            BufferPackedVec::const_iterator itor = mBuffers[i].begin();
+            BufferPackedVec::const_iterator end  = mBuffers[i].end();
 
-        while( itor != end )
-            OGRE_DELETE *itor++;
+            while( itor != end )
+                OGRE_DELETE *itor++;
 
-        buffersContainer.clear();
+            mBuffers[i].clear();
+        }
+
+        {
+            DelayedBufferVec::const_iterator itor = mDelayedDestroyBuffers.begin();
+            DelayedBufferVec::const_iterator end  = mDelayedDestroyBuffers.end();
+
+            while( itor != end )
+            {
+                OGRE_DELETE itor->bufferPacked;
+                ++itor;
+            }
+
+            mDelayedDestroyBuffers.clear();
+        }
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* VaoManager::getStagingBuffer( size_t minSizeBytes, bool forUpload )
@@ -364,6 +430,51 @@ namespace Ogre
         }
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::destroyDelayedBuffers( uint8 fromDynamicFrame )
+    {
+        DelayedBufferVec::iterator itor = mDelayedDestroyBuffers.begin();
+        DelayedBufferVec::iterator end  = mDelayedDestroyBuffers.end();
+
+        while( itor != end )
+        {
+            assert( mFrameCount - itor->frame <= mDynamicBufferCurrentFrame &&
+                    "Delayed buffer has been in queue for more than it should be!" );
+
+            if( itor->frameNumDynamic != fromDynamicFrame || itor->frame == mFrameCount )
+                break;
+
+            switch( itor->bufferPacked->getBufferPackedType() )
+            {
+            case BP_TYPE_VERTEX:
+                assert( dynamic_cast<VertexBufferPacked*>( itor->bufferPacked ) );
+                destroyVertexBufferImpl( static_cast<VertexBufferPacked*>( itor->bufferPacked ) );
+                break;
+            case BP_TYPE_INDEX:
+                assert( dynamic_cast<IndexBufferPacked*>( itor->bufferPacked ) );
+                destroyIndexBufferImpl( static_cast<IndexBufferPacked*>( itor->bufferPacked ) );
+                break;
+            case BP_TYPE_CONST:
+                assert( dynamic_cast<ConstBufferPacked*>( itor->bufferPacked ) );
+                destroyConstBufferImpl( static_cast<ConstBufferPacked*>( itor->bufferPacked ) );
+                break;
+            case BP_TYPE_TEX:
+                assert( dynamic_cast<TexBufferPacked*>( itor->bufferPacked ) );
+                destroyTexBufferImpl( static_cast<TexBufferPacked*>( itor->bufferPacked ) );
+                break;
+            case BP_TYPE_INDIRECT:
+                assert( dynamic_cast<IndirectBufferPacked*>( itor->bufferPacked ) );
+                destroyIndirectBufferImpl( static_cast<IndirectBufferPacked*>( itor->bufferPacked ) );
+                break;
+            }
+
+            OGRE_DELETE itor->bufferPacked;
+
+            ++itor;
+        }
+
+        mDelayedDestroyBuffers.erase( mDelayedDestroyBuffers.begin(), itor );
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::_update(void)

@@ -79,6 +79,16 @@ namespace Ogre
         UO_KEEP_PERSISTENT
     };
 
+    enum BufferPackedTypes
+    {
+        BP_TYPE_VERTEX,
+        BP_TYPE_INDEX,
+        BP_TYPE_CONST,
+        BP_TYPE_TEX,
+        BP_TYPE_INDIRECT,
+        NUM_BUFFER_PACKED_TYPES
+    };
+
     class _OgreExport BufferPacked : public BufferPackedAlloc
     {
         friend class BufferInterface;
@@ -134,6 +144,9 @@ namespace Ogre
                       BufferType bufferType, void *initialData, bool keepAsShadow,
                       VaoManager *vaoManager, BufferInterface *bufferInterface );
         virtual ~BufferPacked();
+
+        /// Useful to query which one is the derived class.
+        virtual BufferPackedTypes getBufferPackedType(void) const = 0;
 
         BufferType getBufferType(void) const                    { return mBufferType; }
         BufferInterface* getBufferInterface(void) const         { return mBufferInterface; }

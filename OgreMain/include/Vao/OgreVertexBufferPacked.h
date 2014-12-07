@@ -87,6 +87,8 @@ namespace Ogre
                             MultiSourceVertexBufferPool *multiSourcePool, uint8 sourceIdx );
         ~VertexBufferPacked();
 
+        virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_VERTEX; }
+
         const VertexElement2Vec& getVertexElements(void) const  { return mVertexElements; }
 
         size_t getMultiSourceId(void)                           { return mMultiSourceId; }

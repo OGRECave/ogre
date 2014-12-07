@@ -45,6 +45,8 @@ namespace Ogre
                               VaoManager *vaoManager, BufferInterface *bufferInterface );
         ~IndirectBufferPacked();
 
+        virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_INDIRECT; }
+
         unsigned char* getSwBufferPtr(void)     { return mSwBuffer; }
 
         //TODO

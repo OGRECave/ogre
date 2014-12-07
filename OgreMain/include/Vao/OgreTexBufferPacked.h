@@ -50,6 +50,8 @@ namespace Ogre
         {
         }
 
+        virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_TEX; }
+
         /** Binds the texture buffer to the given slot
         @param slot
             The slot to asign this constant buffer. In D3D11 it's called 'slot'.

@@ -107,6 +107,19 @@ namespace Ogre
     RenderQueue::~RenderQueue()
     {
         delete mCommandBuffer;
+
+        assert( mUsedIndirectBuffers.empty() );
+
+        IndirectBufferPackedVec::const_iterator itor = mFreeIndirectBuffers.begin();
+        IndirectBufferPackedVec::const_iterator end  = mFreeIndirectBuffers.end();
+
+        while( itor != end )
+        {
+            if( (*itor)->getMappingState() != MS_UNMAPPED )
+                (*itor)->unmap( UO_UNMAP_ALL );
+            mVaoManager->destroyIndirectBuffer( *itor );
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------
     IndirectBufferPacked* RenderQueue::getIndirectBuffer( size_t numDraws )

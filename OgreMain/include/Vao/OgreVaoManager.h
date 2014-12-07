@@ -60,12 +60,21 @@ namespace Ogre
         uint8           mDynamicBufferCurrentFrame;
         unsigned long   mNextStagingBufferTimestampCheckpoint;
 
-        BufferPackedVec         mVertexBuffers;
-        BufferPackedVec         mIndexBuffers;
-        BufferPackedVec         mConstBuffers;
-        BufferPackedVec         mTexBuffers;
-        BufferPackedVec         mIndirectBuffers;
+        BufferPackedVec         mBuffers[NUM_BUFFER_PACKED_TYPES];
         VertexArrayObjectVec    mVertexArrayObjects;
+
+        struct DelayedBuffer
+        {
+            BufferPacked    *bufferPacked;
+            uint32          frame;
+            uint8           frameNumDynamic;
+
+            DelayedBuffer( BufferPacked *_bufferPacked, uint32 _frame, uint8 _frameNumDynamic ) :
+                bufferPacked( _bufferPacked ), frame( _frame ), frameNumDynamic( _frameNumDynamic ) {}
+        };
+
+        typedef vector<DelayedBuffer>::type DelayedBufferVec;
+        DelayedBufferVec    mDelayedDestroyBuffers;
 
         uint32          mFrameCount;
 
@@ -123,8 +132,15 @@ namespace Ogre
         void destroyAllVertexArrayObjects(void);
 
         /// Just deletes the pointers, but may not destroy/free the API constructs.
-        /// Utility helper for derived classes. Also clears the container.
-        static void deleteAllBuffers( BufferPackedVec &buffersContainer );
+        /// Utility helper for derived classes. Also clears the containers.
+        void deleteAllBuffers(void);
+
+        /** Removes all the buffers whose destruction was delayed until now.
+        @remarks
+            Reads mDynamicBufferCurrentFrame and mFrameCount.
+            Caller is responsible for hazard checking.
+        */
+        void destroyDelayedBuffers( uint8 fromDynamicFrame );
 
     public:
         VaoManager();
