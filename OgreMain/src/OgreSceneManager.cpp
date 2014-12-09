@@ -3913,9 +3913,14 @@ void SceneManager::manualRender(Renderable* rend, const Pass* pass, Viewport* vp
             mAutoParamDataSource->setCurrentViewport(vp);
             mAutoParamDataSource->setCurrentRenderTarget(vp->getTarget());
         }
-        mAutoParamDataSource->setCurrentSceneManager(this);
+        
+		const Camera* oldCam = mAutoParamDataSource->getCurrentCamera();
+
+		mAutoParamDataSource->setCurrentSceneManager(this);
         mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
         updateGpuProgramParameters(pass);
+
+		mAutoParamDataSource->setCurrentCamera(oldCam, false);
     }
     if (vp)
         mCurrentViewport = vp;
