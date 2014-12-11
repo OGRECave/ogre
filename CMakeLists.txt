@@ -155,9 +155,11 @@ if (MSVC)
 endif ()
 if (MINGW)
   add_definitions(-D_WIN32_WINNT=0x0500)
-  # set architecture to i686, since otherwise some versions of MinGW can't link
-  # the atomic primitives
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=i686")
+  if( CMAKE_SIZEOF_VOID_P EQUAL 4 )
+    # set architecture to i686, since otherwise some versions of MinGW can't link
+    # the atomic primitives
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=i686")
+  endif ()
   # Fpermissive required to let some "non-standard" casting operations in the plugins pass
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
   # disable this optimisation because it breaks release builds (reason unknown)
