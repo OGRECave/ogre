@@ -37,6 +37,8 @@ THE SOFTWARE.
 
 #include "Vao/OgreIndirectBufferPacked.h"
 
+#include "OgreRenderQueue.h"
+
 #include "OgreGL3PlusHardwareBufferManager.h" //GL3PlusHardwareBufferManager::getGLType
 
 #include "OgreTimer.h"
