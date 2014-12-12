@@ -7,10 +7,10 @@
 
 mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
 {
-	vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2) );
-	vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2) + 1) );
-	vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2) + 2) );
-	vec4 row3 = texelFetch( matrixBuf, int(((pixelIdx) << 2) + 3) );
+        vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
+        vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 1u) );
+        vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 2u) );
+        vec4 row3 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 3u) );
 	return mat4( row0.x, row1.x, row2.x, row3.x,
 				 row0.y, row1.y, row2.y, row3.y,
 				 row0.z, row1.z, row2.z, row3.z,
@@ -69,11 +69,11 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
 	int _idx = int(blendIndices[0] * 3);
-	uint matStart = instance.worldMaterialIdx[drawId] >> 9;
+        uint matStart = instance.worldMaterialIdx[drawId] >> 9u;
 	vec4 worldMat[3];
-	worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0) );
-	worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1) );
-	worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2) );
+        worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0u) );
+        worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1u) );
+        worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2u) );
 	vec4 _localPos;
 	_localPos.x = dot( worldMat[0], vertex );
 	_localPos.y = dot( worldMat[1], vertex );
@@ -94,9 +94,9 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;@end
 	@foreach( hlms_bones_per_vertex, n, 1 )
 	_idx = int(blendIndices[@n] * 3);
-	worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0) );
-	worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1) );
-	worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2) );
+        worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0u) );
+        worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1u) );
+        worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2u) );
 	tmp.x = dot( worldMat[0], vertex );
 	tmp.y = dot( worldMat[1], vertex );
 	tmp.z = dot( worldMat[2], vertex );
@@ -152,10 +152,10 @@ void main()
 {
 @property( !hlms_skeleton )
 	mat4 worldViewProj;
-	worldViewProj = UNPACK_MAT4( worldMatBuf, drawId << 1 );
+        worldViewProj = UNPACK_MAT4( worldMatBuf, drawId << 1u );
 	@property( hlms_normal || hlms_qtangent )
 	mat4 worldView;
-	worldView = UNPACK_MAT4( worldMatBuf, (drawId << 1) + 1 );
+        worldView = UNPACK_MAT4( worldMatBuf, (drawId << 1u) + 1u );
 	@end
 @end
 
@@ -206,10 +206,10 @@ void main()
 {
 	mat4 worldViewProj;
 	/*{
-		vec4 row0 = texelFetch( worldMatBuf, int(drawId * 2) );
-		vec4 row1 = texelFetch( worldMatBuf, int(drawId * 2 + 1) );
-		vec4 row2 = texelFetch( worldMatBuf, int(drawId * 2 + 2) );
-		vec4 row3 = texelFetch( worldMatBuf, int(drawId * 2 + 3) );
+                vec4 row0 = texelFetch( worldMatBuf, int(drawId * 2u) );
+                vec4 row1 = texelFetch( worldMatBuf, int(drawId * 2u + 1u) );
+                vec4 row2 = texelFetch( worldMatBuf, int(drawId * 2u + 2u) );
+                vec4 row3 = texelFetch( worldMatBuf, int(drawId * 2u + 3u) );
 
 		worldViewProj = mat4(
 					row0.x, row1.x, row2.x, row3.x,
@@ -217,7 +217,7 @@ void main()
 					row0.z, row1.z, row2.z, row3.z,
 					row0.w, row1.w, row2.w, row3.w );
 	}*/
-	worldViewProj = UNPACK_MAT4( worldMatBuf, drawId * 2 );
+        worldViewProj = UNPACK_MAT4( worldMatBuf, drawId * 2u );
 
 	gl_Position = worldViewProj * vertex;
 }
