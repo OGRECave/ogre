@@ -963,10 +963,7 @@ namespace Ogre
                 while( itBone != enBone )
                 {
                     const SimpleMatrixAf4x3 &mat4x3 = skeleton->_getBoneFullTransform( *itBone );
-                    Matrix4 tmp2;
-                    mat4x3.store( &tmp2 );
-                    memcpy( currentMappedTexBuffer, tmp2[0], 12 * sizeof(float) );
-                    //mat4x3.streamTo4x3( currentMappedTexBuffer );
+                    mat4x3.streamTo4x3( currentMappedTexBuffer );
                     currentMappedTexBuffer += 12;
 
                     ++itBone;
