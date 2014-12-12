@@ -1677,6 +1677,10 @@ namespace Ogre {
             if (separableProgram)
                 separableProgram->activate();
         }
+        else
+        {
+            GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+        }
     }
 
     void GL3PlusRenderSystem::_setIndirectBuffer( IndirectBufferPacked *indirectBuffer )

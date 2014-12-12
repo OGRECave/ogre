@@ -20,13 +20,13 @@ in block
 @property( diffuse_map || alpha_test )Material material;@end
 
 @piece( diffuseIdx0 )material.indices0_3.x & 0x0000FFFF@end
-@piece( diffuseIdx1 )material.indices0_3.y & >> 16@end
-@piece( diffuseIdx2 )material.indices0_3.z & 0x0000FFFF@end
-@piece( diffuseIdx3 )material.indices0_3.w & >> 16@end
-@piece( diffuseIdx4 )material.indices4_7.x & 0x0000FFFF@end
-@piece( diffuseIdx5 )material.indices4_7.y & >> 16@end
-@piece( diffuseIdx6 )material.indices4_7.z & 0x0000FFFF@end
-@piece( diffuseIdx7 )material.indices4_7.w & >> 16@end
+@piece( diffuseIdx1 )material.indices0_3.y & >> 16u@end
+@piece( diffuseIdx2 )material.indices0_3.z & 0x0000FFFFu@end
+@piece( diffuseIdx3 )material.indices0_3.w & >> 16u@end
+@piece( diffuseIdx4 )material.indices4_7.x & 0x0000FFFFu@end
+@piece( diffuseIdx5 )material.indices4_7.y & >> 16u@end
+@piece( diffuseIdx6 )material.indices4_7.z & 0x0000FFFFu@end
+@piece( diffuseIdx7 )material.indices4_7.w & >> 16u@end
 
 void main()
 {

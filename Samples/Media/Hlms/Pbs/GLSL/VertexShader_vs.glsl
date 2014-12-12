@@ -196,7 +196,19 @@ void main()
 #version 430 core
 #extension GL_ARB_shading_language_420pack: require
 
-//layout(std140) uniform;
+layout(std140) uniform;
+
+mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
+{
+        vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
+        vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 1u) );
+        vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 2u) );
+        vec4 row3 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 3u) );
+        return mat4( row0.x, row1.x, row2.x, row3.x,
+                                 row0.y, row1.y, row2.y, row3.y,
+                                 row0.z, row1.z, row2.z, row3.z,
+                                 row0.w, row1.w, row2.w, row3.w );
+}
 
 in vec4 vertex;
 in uint drawId;
@@ -217,7 +229,7 @@ void main()
 					row0.z, row1.z, row2.z, row3.z,
 					row0.w, row1.w, row2.w, row3.w );
 	}*/
-        worldViewProj = UNPACK_MAT4( worldMatBuf, drawId * 2u );
+        worldViewProj = UNPACK_MAT4( worldMatBuf, drawId << 1u );
 
 	gl_Position = worldViewProj * vertex;
 }

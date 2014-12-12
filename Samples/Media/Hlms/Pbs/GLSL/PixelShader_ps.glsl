@@ -164,22 +164,22 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 
 void main()
 {
-	uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FF;
+        uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FFu;
 	material = materialArray.m[materialId];
-@property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFF;@end
-@property( normal_map_tex )	normalIdx			= material.indices0_3.x >> 16;@end
-@property( specular_map )	specularIdx			= material.indices0_3.y & 0x0000FFFF;@end
-@property( roughness_map )	roughnessIdx		= material.indices0_3.y >> 16;@end
-@property( detail_weight_map )	weightMapIdx		= material.indices0_3.z & 0x0000FFFF;@end
-@property( detail_map0 )	detailMapIdx0		= material.indices0_3.z >> 16;@end
-@property( detail_map1 )	detailMapIdx1		= material.indices0_3.w & 0x0000FFFF;@end
-@property( detail_map2 )	detailMapIdx2		= material.indices0_3.w >> 16;@end
-@property( detail_map3 )	detailMapIdx3		= material.indices4_7.x & 0x0000FFFF;@end
-@property( detail_map_nm0 )	detailNormMapIdx0	= material.indices4_7.x >> 16;@end
-@property( detail_map_nm1 )	detailNormMapIdx1	= material.indices4_7.y & 0x0000FFFF;@end
-@property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16;@end
-@property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFF;@end
-@property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16;@end
+@property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
+@property( normal_map_tex )	normalIdx			= material.indices0_3.x >> 16u;@end
+@property( specular_map )	specularIdx			= material.indices0_3.y & 0x0000FFFFu;@end
+@property( roughness_map )	roughnessIdx		= material.indices0_3.y >> 16u;@end
+@property( detail_weight_map )	weightMapIdx		= material.indices0_3.z & 0x0000FFFFu;@end
+@property( detail_map0 )	detailMapIdx0		= material.indices0_3.z >> 16u;@end
+@property( detail_map1 )	detailMapIdx1		= material.indices0_3.w & 0x0000FFFFu;@end
+@property( detail_map2 )	detailMapIdx2		= material.indices0_3.w >> 16u;@end
+@property( detail_map3 )	detailMapIdx3		= material.indices4_7.x & 0x0000FFFFu;@end
+@property( detail_map_nm0 )	detailNormMapIdx0	= material.indices4_7.x >> 16u;@end
+@property( detail_map_nm1 )	detailNormMapIdx1	= material.indices4_7.y & 0x0000FFFFu;@end
+@property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16u;@end
+@property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFFu;@end
+@property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
 
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
@@ -335,6 +335,10 @@ void main()
 
 @property( false )
 #version 330
+#extension GL_ARB_shading_language_420pack: require
+layout(std140) uniform;
+#define FRAG_COLOR		0
+layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
@@ -352,18 +356,19 @@ layout(binding=1) uniform sampler2DArray textureMaps[1];
 
 void main()
 {
-	uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FF;
-	material = materialArray.m[materialId];
+        //uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FFu;
+        //material = materialArray.m[materialId];
 	//material = materialArray.m[0];
 	//gl_FragColor = texture2D( tex, psUv0 );
 	//gl_FragColor = vec4( 0, 1, 0, 1 );
-	//float v = float(material.indices0_3.x & 0x0000FFFF) * 0.000125f;
+        //float v = float(material.indices0_3.x & 0x0000FFFFu) * 0.000125f;
 	//float v = material.kD.x;
-	//float v = float(material.indices0_3.x >> 16) * 0.25f;
+        //float v = float(material.indices0_3.x >> 16u) * 0.25f;
 	//gl_FragColor = vec4( v, v, v, 1 );
 	//gl_FragColor = vec4( materialArray.m[1].kD.x, materialArray.m[1].kD.y, materialArray.m[1].kD.z, 1 );
 	//gl_FragColor = vec4( inPs.normal, 1.0f );
 
-	gl_FragColor = texture( textureMaps[0], vec3( inPs.uv0.xy, material.indices0_3.x & 0x0000FFFF ) );
+        //outColour = texture( textureMaps[0], vec3( inPs.uv0.xy, material.indices0_3.x & 0x0000FFFFu ) );
+        outColour = vec4( 1.0f, 1.0f, 1.0f, 1.0f );
 }
 @end
