@@ -93,7 +93,8 @@ namespace Ogre
         glGetIntegerv( GL_MAX_TEXTURE_BUFFER_SIZE, &maxBufferSize );
         mTexBufferMaxSize = static_cast<size_t>( maxBufferSize );
 
-        mSupportsIndirectBuffers = supportsIndirectBuffers;
+        mSupportsPersistentMapping  = mArbBufferStorage;
+        mSupportsIndirectBuffers    = supportsIndirectBuffers;
 
         VertexElement2Vec vertexElements;
         vertexElements.push_back( VertexElement2( VET_UINT1, VES_COUNT ) );

@@ -1668,11 +1668,14 @@ namespace Ogre {
             mFragmentProgramBound = true;
         }
 
-        GLSLSeparableProgram* separableProgram =
-            GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
-        if (separableProgram)
+        GLSLSeparableProgramManager* separableProgramMgr =
+                GLSLSeparableProgramManager::getSingletonPtr();
+
+        if( separableProgramMgr )
         {
-            separableProgram->activate();
+            GLSLSeparableProgram* separableProgram = separableProgramMgr->getCurrentSeparableProgram();
+            if (separableProgram)
+                separableProgram->activate();
         }
     }
 

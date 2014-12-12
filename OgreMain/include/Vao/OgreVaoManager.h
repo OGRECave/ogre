@@ -54,6 +54,7 @@ namespace Ogre
         StagingBufferVec mStagingBuffers[2];
         StagingBufferVec mZeroRefStagingBuffers[2];
 
+        bool            mSupportsPersistentMapping;
         bool            mSupportsIndirectBuffers;
         uint8           mDynamicBufferMultiplier;
         uint8           mDynamicBufferCurrentFrame;
@@ -323,6 +324,8 @@ namespace Ogre
         uint32 getTexBufferAlignment(void) const        { return mTexBufferAlignment; }
         size_t getConstBufferMaxSize(void) const        { return mConstBufferMaxSize; }
         size_t getTexBufferMaxSize(void) const          { return mTexBufferMaxSize; }
+
+        bool supportsPersistentMapping(void) const      { return mSupportsPersistentMapping; }
 
         /// When false, IndirectBufferPacked will emulate the mapping behavior,
         /// and we need to use the emulated calls in RenderSystem.

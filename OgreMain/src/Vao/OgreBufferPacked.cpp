@@ -196,8 +196,11 @@ namespace Ogre
 
         mBufferInterface->unmap( unmapOption, flushStartElem, flushSizeElem );
 
-        if( unmapOption == UO_UNMAP_ALL || mBufferType == BT_DYNAMIC_DEFAULT )
+        if( unmapOption == UO_UNMAP_ALL || mBufferType == BT_DYNAMIC_DEFAULT ||
+            !mVaoManager->supportsPersistentMapping() )
+        {
             mMappingState = MS_UNMAPPED;
+        }
 
         mLastMappingStart = 0;
         mLastMappingCount = 0;
