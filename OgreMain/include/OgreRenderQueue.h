@@ -258,7 +258,7 @@ namespace Ogre {
         bool getSortRenderQueue( uint8 rqId ) const;
     };
 
-    #define OGRE_RQ_MAKE_MASK( x ) ( (1 << x) - 1 )
+    #define OGRE_RQ_MAKE_MASK( x ) ( (1 << (x)) - 1 )
 
     class _OgreExport RqBits
     {
