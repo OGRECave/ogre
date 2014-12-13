@@ -993,36 +993,43 @@ namespace Ogre
     {
         if( mFrameSyncVec[mDynamicBufferCurrentFrame] )
         {
-            GLbitfield waitFlags    = 0;
-            GLuint64 waitDuration   = 0;
-            while( true )
-            {
-                GLenum waitRet = glClientWaitSync( mFrameSyncVec[mDynamicBufferCurrentFrame],
-                                                   waitFlags, waitDuration );
-                if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
-                {
-                    OCGE( glDeleteSync( mFrameSyncVec[mDynamicBufferCurrentFrame] ) );
-                    mFrameSyncVec[mDynamicBufferCurrentFrame] = 0;
-
-                    return mDynamicBufferCurrentFrame;
-                }
-
-                if( waitRet == GL_WAIT_FAILED )
-                {
-                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                                 "Failure while waiting for a GL Fence. Could be out of GPU memory. "
-                                 "Update your video card drivers. If that doesn't help, "
-                                 "contact the developers.",
-                                 "GL3PlusVaoManager::getDynamicBufferCurrentFrame" );
-                }
-
-                // After the first time, need to start flushing, and wait for a looong time.
-                waitFlags = GL_SYNC_FLUSH_COMMANDS_BIT;
-                waitDuration = kOneSecondInNanoSeconds;
-            }
+            waitFor( mFrameSyncVec[mDynamicBufferCurrentFrame] );
+            mFrameSyncVec[mDynamicBufferCurrentFrame] = 0;
         }
 
         return mDynamicBufferCurrentFrame;
+    }
+    //-----------------------------------------------------------------------------------
+    GLsync GL3PlusVaoManager::waitFor( GLsync fenceName )
+    {
+        GLbitfield waitFlags    = 0;
+        GLuint64 waitDuration   = 0;
+        while( true )
+        {
+            GLenum waitRet = glClientWaitSync( fenceName, waitFlags, waitDuration );
+            if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
+            {
+                OCGE( glDeleteSync( fenceName ) );
+                return 0;
+            }
+
+            if( waitRet == GL_WAIT_FAILED )
+            {
+                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                             "Failure while waiting for a GL Fence. Could be out of GPU memory. "
+                             "Update your video card drivers. If that doesn't help, "
+                             "contact the developers.",
+                             "GL3PlusVaoManager::getDynamicBufferCurrentFrame" );
+
+                return fenceName;
+            }
+
+            // After the first time, need to start flushing, and wait for a looong time.
+            waitFlags = GL_SYNC_FLUSH_COMMANDS_BIT;
+            waitDuration = kOneSecondInNanoSeconds;
+        }
+
+        return fenceName;
     }
     //-----------------------------------------------------------------------------------
     GLuint GL3PlusVaoManager::getAttributeIndexFor( VertexElementSemantic semantic )

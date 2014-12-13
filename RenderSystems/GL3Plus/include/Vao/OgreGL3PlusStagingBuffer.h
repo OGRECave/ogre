@@ -140,6 +140,7 @@ namespace Ogre
         void cleanUnfencedHazards(void);
 
         virtual bool canDownload( size_t length ) const;
+        virtual void _cancelDownload( size_t offset, size_t sizeBytes );
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
 
         GLuint getBufferName(void) const            { return mVboName; }

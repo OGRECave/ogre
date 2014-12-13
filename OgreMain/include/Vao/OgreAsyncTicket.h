@@ -47,8 +47,9 @@ namespace Ogre
     @par
         Call @BufferPacked::disposeTicket when you're done with this ticket.
     */
-    class AsyncTicket
+    class _OgreExport AsyncTicket
     {
+    protected:
         bool mHasBeenMapped;
         BufferPacked    *mCreator;
         StagingBuffer   *mStagingBuffer;
@@ -58,17 +59,26 @@ namespace Ogre
         size_t mElementCount;
 
         virtual const void* mapImpl(void) = 0;
-        virtual void unmapImpl(void) = 0;
 
     public:
         AsyncTicket( BufferPacked *creator, StagingBuffer *stagingBuffer,
                      size_t elementStart, size_t elementCount );
         ~AsyncTicket();
 
+        /** Maps the buffer for CPU access. Will stall if transfer from GPU memory to
+            staging area hasn't finished yet. @see queryIsTransferDone.
+        @remarks
+            Attempting to const cast the returned pointer and write to it is undefined behavior.
+            Only call this function *once*. Once mapped, cannot be remapped again.
+        @return
+            The pointer with the data read from the GPU. Read only.
+        */
         const void* map(void);
+
+        /// Unmaps the pointer mapped with map().
         void unmap(void);
 
-        virtual bool queryIsTransferDone(void) const        { return true; }
+        virtual bool queryIsTransferDone(void)              { return true; }
     };
 }
 

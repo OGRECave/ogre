@@ -266,6 +266,16 @@ namespace Ogre
         /// is finished.
         uint8 waitForTailFrameToFinish(void);
 
+        /** Will stall undefinitely until GPU finishes (signals the sync object).
+        @param fenceName
+            Sync object to wait for. Will be deleted on success. On failure,
+            throws an exception and fenceName will not be deleted.
+        @returns
+            Null ptr on success. Should throw on failure, but if this function for some
+            strange reason doesn't throw, it is programmed to return 'fenceName'
+        */
+        static GLsync waitFor( GLsync fenceName );
+
         static GLuint getAttributeIndexFor( VertexElementSemantic semantic );
     };
 }

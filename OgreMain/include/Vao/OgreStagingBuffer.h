@@ -177,6 +177,11 @@ namespace Ogre
         */
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength ) = 0;
 
+        /// Releases memory assigned to a download that hasn't been mapped yet,
+        /// to make space for another _asyncDownload call. Useful when you
+        /// suddenly don't intend to call _mapForRead.
+        virtual void _cancelDownload( size_t offset, size_t sizeBytes ) = 0;
+
         /** Maps the buffer for read acces for the CPU.
         @remarks
             For internal use.

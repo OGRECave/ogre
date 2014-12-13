@@ -50,8 +50,29 @@ namespace Ogre
     AsyncTicket::~AsyncTicket()
     {
         if( mStagingBuffer->getMappingState() != MS_UNMAPPED )
-            mStagingBuffer->unmap( 0, 0 );
+        {
+            unmap();
+        }
+        else if( !mHasBeenMapped )
+        {
+            mStagingBuffer->_cancelDownload( mStagingBufferMapOffset,
+                                             mElementCount * mCreator->getBytesPerElement() );
+        }
+
         mStagingBuffer->removeReferenceCount();
         mStagingBuffer = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    const void* AsyncTicket::map(void)
+    {
+        assert( !mHasBeenMapped );
+
+        mHasBeenMapped = true;
+        return mapImpl();
+    }
+    //-----------------------------------------------------------------------------------
+    void AsyncTicket::unmap(void)
+    {
+        mStagingBuffer->unmap( 0, 0 );
     }
 }

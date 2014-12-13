@@ -359,21 +359,8 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    const void* GL3PlusStagingBuffer::_mapForReadImpl( size_t offset, size_t sizeBytes )
+    void GL3PlusStagingBuffer::_cancelDownload( size_t offset, size_t sizeBytes )
     {
-        assert( !mUploadOnly );
-        GLbitfield flags;
-
-        //TODO: Reading + Persistency is supported, unsynchronized is not.
-        flags = GL_MAP_READ_BIT;
-
-        mMappingStart = offset;
-        mMappingCount = sizeBytes;
-
-        OCGE( glBindBuffer( GL_COPY_READ_BUFFER, mVboName ) );
-        OCGE( mMappedPtr = glMapBufferRange( GL_COPY_READ_BUFFER, mInternalBufferStart + mMappingStart,
-                                             mMappingCount, flags ) );
-
         //Put the mapped region back to our records as "available" for subsequent _asyncDownload
         Fence mappedArea( offset, offset + sizeBytes );
 #if OGRE_DEBUG_MODE
@@ -391,6 +378,25 @@ namespace Ogre
         mAvailableDownloadRegions.push_back( mappedArea );
 
         mergeContiguousBlocks( mAvailableDownloadRegions.end() - 1, mAvailableDownloadRegions );
+    }
+    //-----------------------------------------------------------------------------------
+    const void* GL3PlusStagingBuffer::_mapForReadImpl( size_t offset, size_t sizeBytes )
+    {
+        assert( !mUploadOnly );
+        GLbitfield flags;
+
+        //TODO: Reading + Persistency is supported, unsynchronized is not.
+        flags = GL_MAP_READ_BIT;
+
+        mMappingStart = offset;
+        mMappingCount = sizeBytes;
+
+        OCGE( glBindBuffer( GL_COPY_READ_BUFFER, mVboName ) );
+        OCGE( mMappedPtr = glMapBufferRange( GL_COPY_READ_BUFFER, mInternalBufferStart + mMappingStart,
+                                             mMappingCount, flags ) );
+
+        //Put the mapped region back to our records as "available" for subsequent _asyncDownload
+        _cancelDownload( offset, sizeBytes );
 
         return mMappedPtr;
     }
