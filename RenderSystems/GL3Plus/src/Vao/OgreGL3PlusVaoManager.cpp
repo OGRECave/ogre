@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusTexBufferPacked.h"
 #include "Vao/OgreGL3PlusMultiSourceVertexBufferPool.h"
 #include "Vao/OgreGL3PlusDynamicBuffer.h"
+#include "Vao/OgreGL3PlusAsyncTicket.h"
 
 #include "Vao/OgreIndirectBufferPacked.h"
 
@@ -909,6 +910,14 @@ namespace Ogre
         mStagingBuffers[forUpload].push_back( stagingBuffer );
 
         return stagingBuffer;
+    }
+    //-----------------------------------------------------------------------------------
+    AsyncTicketPtr GL3PlusVaoManager::createAsyncTicket( BufferPacked *creator,
+                                                         StagingBuffer *stagingBuffer,
+                                                         size_t elementStart, size_t elementCount )
+    {
+        return AsyncTicketPtr( OGRE_NEW GL3PlusAsyncTicket( creator, stagingBuffer,
+                                                            elementStart, elementCount ) );
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusVaoManager::_update(void)

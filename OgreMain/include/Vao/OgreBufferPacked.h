@@ -151,6 +151,10 @@ namespace Ogre
         BufferType getBufferType(void) const                    { return mBufferType; }
         BufferInterface* getBufferInterface(void) const         { return mBufferInterface; }
 
+        /// Async data read request. A ticket will be returned. Once the async transfer finishes,
+        /// you can use the ticket to read the data from CPU. @See AsyncTicket
+        AsyncTicketPtr readRequest( size_t elementStart, size_t elementCount );
+
         /** Sends the provided data to the GPU
         @param data
             The data to transfer to the GPU. Caller is responsible for freeing the pointer.
@@ -162,12 +166,6 @@ namespace Ogre
             Size, in number of elements, of data. Must be less than @getNumElements - elementStart
         */
         virtual void upload( void *data, size_t elementStart, size_t elementCount );
-
-        /// Async data read request. A ticket will be returned. Once the async transfer finishes,
-        /// you can use the ticket to read the data from CPU. @See AsyncTicket
-        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) = 0;
-
-        virtual void disposeTicket( AsyncTicket *ticket ) = 0;
 
         /** Maps the specified region to a pointer the CPU can access. Only dynamic buffers
             can use this function. The region [elementStart; elementStart + elementCount)

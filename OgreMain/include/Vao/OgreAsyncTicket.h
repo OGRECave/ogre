@@ -47,7 +47,7 @@ namespace Ogre
     @par
         Call @BufferPacked::disposeTicket when you're done with this ticket.
     */
-    class _OgreExport AsyncTicket
+    class _OgreExport AsyncTicket : public RenderSysAlloc
     {
     protected:
         bool mHasBeenMapped;
@@ -63,7 +63,7 @@ namespace Ogre
     public:
         AsyncTicket( BufferPacked *creator, StagingBuffer *stagingBuffer,
                      size_t elementStart, size_t elementCount );
-        ~AsyncTicket();
+        virtual ~AsyncTicket();
 
         /** Maps the buffer for CPU access. Will stall if transfer from GPU memory to
             staging area hasn't finished yet. @see queryIsTransferDone.

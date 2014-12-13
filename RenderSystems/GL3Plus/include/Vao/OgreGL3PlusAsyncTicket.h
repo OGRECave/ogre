@@ -40,7 +40,7 @@ namespace Ogre
     protected:
         GLsync  mFenceName;
 
-        virtual const void* mapImpl(void) = 0;
+        virtual const void* mapImpl(void);
 
     public:
         GL3PlusAsyncTicket( BufferPacked *creator, StagingBuffer *stagingBuffer,

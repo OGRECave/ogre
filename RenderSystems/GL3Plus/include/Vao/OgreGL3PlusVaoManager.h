@@ -259,6 +259,9 @@ namespace Ogre
         */
         virtual StagingBuffer* createStagingBuffer( size_t sizeBytes, bool forUpload );
 
+        virtual AsyncTicketPtr createAsyncTicket( BufferPacked *creator, StagingBuffer *stagingBuffer,
+                                                  size_t elementStart, size_t elementCount );
+
         virtual void _update(void);
 
         /// Returns the current frame # (which wraps to 0 every mDynamicBufferMultiplier

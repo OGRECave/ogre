@@ -315,6 +315,9 @@ namespace Ogre
         */
         StagingBuffer* getStagingBuffer( size_t minSizeBytes, bool forUpload );
 
+        virtual AsyncTicketPtr createAsyncTicket( BufferPacked *creator, StagingBuffer *stagingBuffer,
+                                                  size_t elementStart, size_t elementCount ) = 0;
+
         virtual void _update(void);
 
         void _notifyStagingBufferEnteredZeroRef( StagingBuffer *stagingBuffer );

@@ -63,11 +63,6 @@ namespace Ogre
         /// Gets the size of the buffer that will get bound. May not be
         /// the same as the size of the entire buffer (i.e. due to padding)
         size_t getBindableSize(void) const                  { return mBindableSizeBytes; }
-
-        //TODO
-        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
-        //TODO
-        virtual void disposeTicket( AsyncTicket *ticket ) {}
     };
 }
 

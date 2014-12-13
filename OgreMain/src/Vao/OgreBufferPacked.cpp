@@ -102,6 +102,13 @@ namespace Ogre
         mBufferInterface = 0;
     }
     //-----------------------------------------------------------------------------------
+    AsyncTicketPtr BufferPacked::readRequest( size_t elementStart, size_t elementCount )
+    {
+        StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( elementCount, false );
+
+        return mVaoManager->createAsyncTicket( this, stagingBuffer, elementStart, elementCount );
+    }
+    //-----------------------------------------------------------------------------------
     void BufferPacked::upload( void *data, size_t elementStart, size_t elementCount )
     {
         if( mBufferType == BT_IMMUTABLE )

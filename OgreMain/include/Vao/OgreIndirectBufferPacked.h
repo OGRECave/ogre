@@ -48,11 +48,6 @@ namespace Ogre
         virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_INDIRECT; }
 
         unsigned char* getSwBufferPtr(void)     { return mSwBuffer; }
-
-        //TODO
-        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
-        //TODO
-        virtual void disposeTicket( AsyncTicket *ticket ) {}
     };
 }
 

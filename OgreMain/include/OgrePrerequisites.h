@@ -334,6 +334,7 @@ namespace Ogre {
 
     template<typename T> class SharedPtr;
     typedef SharedPtr<AnimableValue> AnimableValuePtr;
+    typedef SharedPtr<AsyncTicket> AsyncTicketPtr;
     typedef SharedPtr<DataStream> DataStreamPtr;
     typedef SharedPtr<GpuProgram> GpuProgramPtr;
     typedef SharedPtr<GpuNamedConstants> GpuNamedConstantsPtr;

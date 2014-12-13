@@ -53,11 +53,6 @@ namespace Ogre
         virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_INDEX; }
 
         IndexType getIndexType(void) const  { return mBytesPerElement == 2 ? IT_16BIT : IT_32BIT; }
-
-        //TODO
-        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
-        //TODO
-        virtual void disposeTicket( AsyncTicket *ticket ) {}
     };
 }
 

@@ -68,11 +68,6 @@ namespace Ogre
         virtual void bindBuffer( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
 
         PixelFormat getPixelFormat(void) const           { return mPixelFormat; }
-
-        //TODO
-        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
-        //TODO
-        virtual void disposeTicket( AsyncTicket *ticket ) {}
     };
 }
 

@@ -102,11 +102,6 @@ namespace Ogre
         /// and pool). This value is for internal use.
         /// Always 0 for non-multisource vertex buffers.
         uint8 _getSourceIndex(void) const                       { return mSourceIdx; }
-
-        //TODO
-        virtual AsyncTicket* readRequest( size_t elementStart, size_t elementCount ) { return 0; }
-        //TODO
-        virtual void disposeTicket( AsyncTicket *ticket ) {}
     };
 
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
