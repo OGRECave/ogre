@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include "Vao/OgreGL3PlusVaoManager.h"
 #include "Vao/OgreGL3PlusBufferInterface.h"
 
+#include "OgreStringConverter.h"
+
 namespace Ogre
 {
     extern const GLuint64 kOneSecondInNanoSeconds;
@@ -115,6 +117,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void GL3PlusStagingBuffer::waitIfNeeded(void)
     {
+        assert( mUploadOnly );
+
         size_t mappingStart = mMappingStart;
         size_t sizeBytes    = mMappingCount;
 
@@ -158,27 +162,17 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void* GL3PlusStagingBuffer::mapImpl( size_t sizeBytes )
     {
-        GLenum target = mUploadOnly ? GL_COPY_WRITE_BUFFER : GL_COPY_READ_BUFFER;
-        GLbitfield flags;
+        assert( mUploadOnly );
 
-        if( mUploadOnly )
-        {
-            target = GL_COPY_WRITE_BUFFER;
-            flags = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT |
-                    GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT;
-        }
-        else
-        {
-            target = GL_COPY_READ_BUFFER;
-            flags = GL_MAP_READ_BIT;
-        }
+        GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT |
+                           GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT;
 
         mMappingCount = sizeBytes;
 
-        waitIfNeeded();
+        waitIfNeeded(); //Will fill mMappingStart
 
-        glBindBuffer( target, mVboName );
-        OCGE( mMappedPtr = glMapBufferRange( target, mInternalBufferStart + mMappingStart,
+        OCGE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
+        OCGE( mMappedPtr = glMapBufferRange( GL_COPY_WRITE_BUFFER, mInternalBufferStart + mMappingStart,
                                               mMappingCount, flags ) );
 
         return mMappedPtr;
@@ -214,12 +208,17 @@ namespace Ogre
                                         dstOffset, dst.length ) );
         }
 
-        //Add fence to this region (or at least, track the hazard).
-        addFence( mMappingStart, mMappingStart + mMappingCount - 1, false );
+        if( !mUploadOnly )
+        {
+            //Add fence to this region (or at least, track the hazard).
+            addFence( mMappingStart, mMappingStart + mMappingCount - 1, false );
+        }
     }
     //-----------------------------------------------------------------------------------
-    StagingStallType GL3PlusStagingBuffer::willStall( size_t sizeBytes ) const
+    StagingStallType GL3PlusStagingBuffer::uploadWillStall( size_t sizeBytes ) const
     {
+        assert( mUploadOnly );
+
         size_t mappingStart = mMappingStart;
 
         StagingStallType retVal = STALL_NONE;
@@ -271,5 +270,175 @@ namespace Ogre
     {
         if( !mUnfencedHazards.empty() )
             addFence( mUnfencedHazards.front().start, mUnfencedHazards.back().end, true );
+    }
+    //-----------------------------------------------------------------------------------
+    //
+    //  DOWNLOADS
+    //
+    //-----------------------------------------------------------------------------------
+    bool GL3PlusStagingBuffer::canDownload( size_t length ) const
+    {
+        assert( !mUploadOnly );
+
+        FenceVec::const_iterator itor = mAvailableDownloadRegions.begin();
+        FenceVec::const_iterator end  = mAvailableDownloadRegions.end();
+
+        while( itor != end && length > itor->length() )
+            ++itor;
+
+        return itor != end;
+    }
+    //-----------------------------------------------------------------------------------
+    size_t GL3PlusStagingBuffer::_asyncDownload( BufferPacked *source, size_t srcOffset,
+                                                 size_t srcLength )
+    {
+        size_t freeRegionOffset = getFreeDownloadRegion( srcLength );
+
+        if( freeRegionOffset == -1 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Cannot download the request amount of " +
+                         StringConverter::toString( srcLength ) + " bytes to this staging buffer. "
+                         "Try another one (we're full of requests that haven't been read by CPU yet)",
+                         "GL3PlusStagingBuffer::_asyncDownload" );
+        }
+
+        assert( !mUploadOnly );
+        assert( dynamic_cast<GL3PlusBufferInterface*>( source->getBufferInterface() ) );
+        assert( (srcOffset + srcLength) <= source->getTotalSizeBytes() );
+
+        GL3PlusBufferInterface *bufferInterface = static_cast<GL3PlusBufferInterface*>(
+                                                            source->getBufferInterface() );
+
+        OCGE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
+        OCGE( glBindBuffer( GL_COPY_READ_BUFFER, bufferInterface->getVboName() ) );
+
+        OCGE( glCopyBufferSubData( GL_COPY_WRITE_BUFFER, GL_COPY_READ_BUFFER,
+                                   source->_getFinalBufferStart() *
+                                    source->getBytesPerElement() + srcOffset,
+                                   mInternalBufferStart + freeRegionOffset,
+                                   srcLength ) );
+
+        return freeRegionOffset;
+    }
+    //-----------------------------------------------------------------------------------
+    size_t GL3PlusStagingBuffer::getFreeDownloadRegion( size_t length )
+    {
+        //Grab the smallest region that fits the request.
+        size_t lowestLength = std::numeric_limits<size_t>::max();
+        FenceVec::iterator itor = mAvailableDownloadRegions.begin();
+        FenceVec::iterator end  = mAvailableDownloadRegions.end();
+
+        FenceVec::iterator itLowest = end;
+
+        while( itor != end )
+        {
+            size_t freeRegionLength = itor->length();
+            if( length <= freeRegionLength && freeRegionLength < lowestLength )
+            {
+                itLowest = itor;
+                lowestLength = freeRegionLength;
+            }
+
+            ++itor;
+        }
+
+        size_t retVal = -1;
+
+        if( itLowest != end )
+        {
+            //Got a region! Shrink our records
+            retVal = itLowest->start;
+            itLowest->start += length;
+
+            //This region is empty. Remove it.
+            if( itLowest->start == itLowest->end )
+                efficientVectorRemove( mAvailableDownloadRegions, itLowest );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    const void* GL3PlusStagingBuffer::_mapForReadImpl( size_t offset, size_t sizeBytes )
+    {
+        assert( !mUploadOnly );
+        GLbitfield flags;
+
+        //TODO: Reading + Persistency is supported, unsynchronized is not.
+        flags = GL_MAP_READ_BIT;
+
+        mMappingStart = offset;
+        mMappingCount = sizeBytes;
+
+        OCGE( glBindBuffer( GL_COPY_READ_BUFFER, mVboName ) );
+        OCGE( mMappedPtr = glMapBufferRange( GL_COPY_READ_BUFFER, mInternalBufferStart + mMappingStart,
+                                             mMappingCount, flags ) );
+
+        //Put the mapped region back to our records as "available" for subsequent _asyncDownload
+        Fence mappedArea( offset, offset + sizeBytes );
+#if OGRE_DEBUG_MODE
+        FenceVec::const_iterator itor = mAvailableDownloadRegions.begin();
+        FenceVec::const_iterator end  = mAvailableDownloadRegions.end();
+
+        while( itor != end )
+        {
+            assert( !itor->overlaps( mappedArea ) &&
+                    "Already called _mapForReadImpl on this area (or part of it!) before!" );
+            ++itor;
+        }
+#endif
+
+        mAvailableDownloadRegions.push_back( mappedArea );
+
+        mergeContiguousBlocks( mAvailableDownloadRegions.end() - 1, mAvailableDownloadRegions );
+
+        return mMappedPtr;
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusStagingBuffer::mergeContiguousBlocks( FenceVec::iterator blockToMerge,
+                                                      FenceVec &blocks )
+    {
+        FenceVec::iterator itor = blocks.begin();
+        FenceVec::iterator end  = blocks.end();
+
+        while( itor != end )
+        {
+            if( itor->end == blockToMerge->start )
+            {
+                itor->end = blockToMerge->end;
+                size_t idx = itor - blocks.begin();
+
+                //When blockToMerge is the last one, its index won't be the same
+                //after removing the other iterator, they will swap.
+                if( idx == blocks.size() - 1 )
+                    idx = blockToMerge - blocks.begin();
+
+                efficientVectorRemove( blocks, blockToMerge );
+
+                blockToMerge = blocks.begin() + idx;
+                itor = blocks.begin();
+                end  = blocks.end();
+            }
+            else if( blockToMerge->end == itor->start )
+            {
+                blockToMerge->end += itor->start;
+                size_t idx = blockToMerge - blocks.begin();
+
+                //When blockToMerge is the last one, its index won't be the same
+                //after removing the other iterator, they will swap.
+                if( idx == blocks.size() - 1 )
+                    idx = itor - blocks.begin();
+
+                efficientVectorRemove( blocks, itor );
+
+                blockToMerge = blocks.begin() + idx;
+                itor = blocks.begin();
+                end  = blocks.end();
+            }
+            else
+            {
+                ++itor;
+            }
+        }
     }
 }

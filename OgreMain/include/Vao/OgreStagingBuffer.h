@@ -120,6 +120,8 @@ namespace Ogre
 
         void mapChecks( size_t sizeBytes );
 
+        virtual const void* _mapForReadImpl( size_t offset, size_t sizeBytes ) = 0;
+
         virtual void* mapImpl( size_t sizeBytes ) = 0;
         virtual void unmapImpl( const Destination *destinations, size_t numDestinations ) = 0;
 
@@ -132,6 +134,8 @@ namespace Ogre
         /// When false, can only be used for downloading from GPU
         bool getUploadOnly(void) const                  { return mUploadOnly; }
 
+        MappingState getMappingState(void) const        { return mMappingState; }
+
         /** Returns true if our next call to @map() with the same parameters will stall.
             @See StagingStallType
         @remarks
@@ -139,11 +143,59 @@ namespace Ogre
             return STALL_PARTIAL (i.e. GLES2)
             The chances of getting a STALL_FULL get higher as sizeBytes gets closer
             to this->getMaxSize()
+            mUploadOnly must be false.
+            It is the counter side of @see canDownload
         */
-        virtual StagingStallType willStall( size_t sizeBytes ) const;
+        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
+
+        /** Checks if this staging buffer has enough free space to use _asyncDownload.
+            Otherwise such function would raise an exception.
+        @remarks
+            mUploadOnly must be true.
+            It is the counter side of @see uploadWillStall
+        @param length
+            The size in bytes that need to be downloaded.
+        */
+        virtual bool canDownload( size_t length ) const = 0;
+
+        /** Copies the GPU data in BufferPacked to the StagingBuffer so that it can be
+            later read by the CPU using an AsyncTicket. @see AsyncTicket.
+        @remarks
+            For internal use.
+            May throw if it can't handle the request (i.e. requested size is too big,
+            or too many _asyncDownload operations are pending until calling _mapForRead)
+            @see canDownload
+            mUploadOnly must be true.
+        @param source
+            The buffer to copy from.
+        @param srcOffset
+            The offset, in bytes, of the buffer to copy from.
+        @param srcLength
+            The size in bytes, of the data to transfer to this staging buffer.
+        @return
+            The offset in bytes that will be used by @see _mapForRead
+        */
+        virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength ) = 0;
+
+        /** Maps the buffer for read acces for the CPU.
+        @remarks
+            For internal use.
+            mUploadOnly must be true.
+            Attempting to const cast the returned pointer and write to it is undefined behavior.
+            Call unmap( 0, 0 ) to unmap.
+            Once mapped and unmapped, the same region shouldn't be remapped.
+        @param offset
+            The returned value from _asyncDownload.
+        @param sizeBytes
+            The size in bytes of the data to map. Should be parameter 'srcLength' passed
+            to _asyncDownload.
+        @return
+            The pointer with the data read from the GPU. Read only.
+        */
+        const void* _mapForRead( size_t offset, size_t sizeBytes );
 
         /** Maps the given amount of bytes. May block if not ready.
-            @See willStall if you wish to know.
+            @See uploadWillStall if you wish to know.
         @remarks
             Will throw if sizeBytes > this->getMaxSize()
         */

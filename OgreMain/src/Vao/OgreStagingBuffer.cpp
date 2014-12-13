@@ -82,13 +82,37 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    StagingStallType StagingBuffer::willStall( size_t sizeBytes ) const
+    StagingStallType StagingBuffer::uploadWillStall( size_t sizeBytes ) const
     {
+        assert( mUploadOnly );
         return STALL_PARTIAL;
+    }
+    //-----------------------------------------------------------------------------------
+    const void* StagingBuffer::_mapForRead( size_t offset, size_t sizeBytes )
+    {
+        assert( !mUploadOnly );
+
+        if( mMappingState != MS_UNMAPPED )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Buffer already mapped!",
+                         "StagingBuffer::_mapForRead" );
+        }
+
+        mMappingState = MS_MAPPED;
+
+        return _mapForReadImpl( offset, sizeBytes );
     }
     //-----------------------------------------------------------------------------------
     void* StagingBuffer::map( size_t sizeBytes )
     {
+        assert( mUploadOnly );
+
+        if( mMappingState != MS_UNMAPPED )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Buffer already mapped!",
+                         "StagingBuffer::map" );
+        }
+
         mapChecks( sizeBytes );
         mMappingState = MS_MAPPED;
         return mapImpl( sizeBytes );

@@ -72,15 +72,32 @@ namespace Ogre
 
             bool overlaps( const Fence &fence ) const
             {
-                return !( fence.end < this->start || fence.start > this->end );
+                return !( fence.end <= this->start || fence.start >= this->end );
             }
+
+            size_t length(void) const { return end - start; }
         };
 
+        //------------------------------------
+        // Begin used for uploads
+        //------------------------------------
         typedef vector<Fence>::type FenceVec;
         FenceVec mFences;
+
         /// Regions of memory that were unmapped but haven't
         /// been fenced due to not passing the threshold yet.
         FenceVec mUnfencedHazards;
+        //------------------------------------
+        // End used for uploads
+        //------------------------------------
+
+        //------------------------------------
+        // Begin used for downloads
+        //------------------------------------
+        FenceVec mAvailableDownloadRegions;
+        //------------------------------------
+        // End used for downloads
+        //------------------------------------
 
         /** Adds a fence to the region [from; to]. The region may actually be kept in
             mUnfencedHazards until the threshold is achieved or we're forced to fence
@@ -105,14 +122,25 @@ namespace Ogre
         virtual void* mapImpl( size_t sizeBytes );
         virtual void unmapImpl( const Destination *destinations, size_t numDestinations );
 
+        /// Returns the offset that can hold length bytes
+        size_t getFreeDownloadRegion( size_t length );
+        virtual const void* _mapForReadImpl( size_t offset, size_t sizeBytes );
+
+        /// @see GL3PlusVaoManager::mergeContiguousBlocks
+        static void mergeContiguousBlocks( FenceVec::iterator blockToMerge,
+                                           FenceVec &blocks );
+
     public:
         GL3PlusStagingBuffer( size_t internalBufferStart, size_t sizeBytes,
                               VaoManager *vaoManager, bool uploadOnly, GLuint vboName );
         virtual ~GL3PlusStagingBuffer();
 
-        virtual StagingStallType willStall( size_t sizeBytes ) const;
+        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
 
         void cleanUnfencedHazards(void);
+
+        virtual bool canDownload( size_t length ) const;
+        virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
 
         GLuint getBufferName(void) const            { return mVboName; }
     };

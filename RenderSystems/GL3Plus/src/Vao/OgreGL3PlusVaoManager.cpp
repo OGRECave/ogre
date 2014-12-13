@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    extern const GLuint64 kOneSecondInNanoSeconds;
     const GLuint64 kOneSecondInNanoSeconds = 1000000000;
 
     const GLuint GL3PlusVaoManager::VERTEX_ATTRIBUTE_INDEX[VES_COUNT] =
