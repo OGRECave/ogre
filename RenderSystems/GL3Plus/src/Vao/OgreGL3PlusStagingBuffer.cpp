@@ -44,6 +44,8 @@ namespace Ogre
         mMappedPtr( 0 ),
         mFenceThreshold( sizeBytes / 4 )
     {
+        if( !mUploadOnly )
+            mAvailableDownloadRegions.push_back( Fence( 0, mSizeBytes ) );
     }
     //-----------------------------------------------------------------------------------
     GL3PlusStagingBuffer::~GL3PlusStagingBuffer()
@@ -313,7 +315,7 @@ namespace Ogre
         OCGE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
         OCGE( glBindBuffer( GL_COPY_READ_BUFFER, bufferInterface->getVboName() ) );
 
-        OCGE( glCopyBufferSubData( GL_COPY_WRITE_BUFFER, GL_COPY_READ_BUFFER,
+        OCGE( glCopyBufferSubData( GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
                                    source->_getFinalBufferStart() *
                                     source->getBytesPerElement() + srcOffset,
                                    mInternalBufferStart + freeRegionOffset,

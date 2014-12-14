@@ -104,7 +104,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     AsyncTicketPtr BufferPacked::readRequest( size_t elementStart, size_t elementCount )
     {
-        StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( elementCount, false );
+        StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( elementCount * mBytesPerElement,
+                                                                      false );
 
         return mVaoManager->createAsyncTicket( this, stagingBuffer, elementStart, elementCount );
     }
