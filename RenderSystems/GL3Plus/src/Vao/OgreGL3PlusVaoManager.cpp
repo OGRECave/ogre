@@ -870,7 +870,7 @@ namespace Ogre
         VaoVec::iterator itor = mVaos.begin();
         VaoVec::iterator end  = mVaos.end();
 
-        while( itor != end && itor->vaoName != glVao->mVaoName )
+        while( itor != end && itor->vaoName != glVao->getVaoName() )
             ++itor;
 
         if( itor != end )
@@ -879,7 +879,8 @@ namespace Ogre
 
             if( !itor->refCount )
             {
-                OCGE( glDeleteVertexArrays( 1, &glVao->mVaoName ) );
+				GLuint vaoName = glVao->getVaoName();
+                OCGE( glDeleteVertexArrays( 1, &vaoName ) );
             }
         }
 

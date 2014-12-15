@@ -87,7 +87,7 @@ namespace Ogre
         mLastWasCasterPass( false ),
         mLastMacroblock( 0 ),
         mLastBlendblock( 0 ),
-        mLastVaoId( 0 ),
+        mLastVaoName( 0 ),
         mLastVertexData( 0 ),
         mLastIndexData( 0 ),
         mLastHlmsCache( &c_dummyCache ),
@@ -187,7 +187,7 @@ namespace Ogre
         mLastWasCasterPass = false;
         mLastMacroblock = 0;
         mLastBlendblock = 0;
-        mLastVaoId      = 0;
+        mLastVaoName    = 0;
         mLastVertexData = 0;
         mLastIndexData  = 0;
         mLastHlmsCache  = &c_dummyCache;
@@ -401,19 +401,19 @@ namespace Ogre
 
             if( mRenderQueues[i].mMode == V1_LEGACY )
             {
-                if( mLastVaoId )
+                if( mLastVaoName )
                 {
                     rs->_startLegacyV1Rendering();
-                    mLastVaoId = 0;
+                    mLastVaoName = 0;
                 }
                 renderES2( rs, casterPass, dualParaboloid, passCache, mRenderQueues[i] );
             }
             else if( mRenderQueues[i].mMode == V1_FAST )
             {
-                if( mLastVaoId )
+                if( mLastVaoName )
                 {
                     rs->_startLegacyV1Rendering();
-                    mLastVaoId = 0;
+                    mLastVaoName = 0;
                 }
                 renderGL3V1( casterPass, dualParaboloid, passCache, mRenderQueues[i] );
             }
@@ -530,7 +530,7 @@ namespace Ogre
         HlmsMacroblock const *lastMacroblock = mLastMacroblock;
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
         VertexArrayObject *lastVao = 0;
-        uint32 lastVaoId = mLastVaoId;
+        uint32 lastVaoName = mLastVaoName;
         HlmsCache const *lastHlmsCache = mLastHlmsCache;
         uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
 
@@ -587,16 +587,17 @@ namespace Ogre
                                                           lastHlmsCacheHash, mCommandBuffer );
 
             if( drawCmd != mCommandBuffer->getLastCommand() ||
-                lastVaoId != vao->getRenderQueueId() )
+                lastVaoName != vao->getVaoName() )
             {
                 //Different mesh, vertex buffers or layout. Make a new draw call.
                 //(or also the the Hlms made a batch-breaking command)
 
-                if( lastVaoId != vao->getRenderQueueId() )
+                if( lastVaoName != vao->getVaoName() )
                 {
                     *mCommandBuffer->addCommand<CbVao>() = CbVao( vao );
                     *mCommandBuffer->addCommand<CbIndirectBuffer>() =
                                                             CbIndirectBuffer( indirectBuffer );
+                    lastVaoName = vao->getVaoName();
                 }
 
                 void *offset = reinterpret_cast<void*>( indirectBuffer->_getFinalBufferStart() +
@@ -615,7 +616,6 @@ namespace Ogre
                     drawCmd = drawCall;
                 }
 
-                lastVaoId = vao->getRenderQueueId();
                 lastVao = 0;
             }
 
@@ -663,7 +663,7 @@ namespace Ogre
 
         mLastMacroblock     = lastMacroblock;
         mLastBlendblock     = lastBlendblock;
-        mLastVaoId          = lastVaoId;
+        mLastVaoName        = lastVaoName;
         mLastVertexData     = 0;
         mLastIndexData      = 0;
         mLastHlmsCache      = lastHlmsCache;
@@ -790,7 +790,7 @@ namespace Ogre
 
         mLastMacroblock     = lastMacroblock;
         mLastBlendblock     = lastBlendblock;
-        mLastVaoId          = 0;
+        mLastVaoName        = 0;
         mLastVertexData     = 0;
         mLastIndexData      = 0;
         mLastHlmsCache      = lastHlmsCache;
@@ -853,7 +853,7 @@ namespace Ogre
 
         rs->_render( op );
 
-        mLastVaoId = 0;
+        mLastVaoName        = 0;
     }
     //-----------------------------------------------------------------------
     void RenderQueue::frameEnded(void)

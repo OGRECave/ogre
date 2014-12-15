@@ -151,7 +151,7 @@ namespace Ogre {
         bool                    mLastWasCasterPass;
         HlmsMacroblock const    *mLastMacroblock;
         HlmsBlendblock const    *mLastBlendblock;
-        uint32                  mLastVaoId;
+        uint32                  mLastVaoName;
         v1::VertexData const    *mLastVertexData;
         v1::IndexData const     *mLastIndexData;
         HlmsCache const         *mLastHlmsCache;

@@ -44,8 +44,15 @@ namespace Ogre
         friend class GL3PlusRenderSystem;
 
     protected:
-        /// ID used for the RenderQueue to sort by VAOs. This ID
-        /// may be shared by many VertexArrayObject instances
+        /// ID of the internal vertex and index buffer layouts. If this ID
+        /// doesn't change between two draw calls, then there is no need
+        /// to reset the VAO (i.e. same vertex and index buffers are used)
+        /// This ID may be shared by many VertexArrayObject instances.
+        uint32 mVaoName;
+
+        /// ID used for the RenderQueue to sort by VAOs. It's similar to
+        /// mVaoName, but contains more information for sorting purposes.
+        /// This ID may be shared by many VertexArrayObject instances.
         uint32 mRenderQueueId;
 
         uint32                  mFaceCount; /// For statistics
@@ -56,11 +63,13 @@ namespace Ogre
         v1::RenderOperation::OperationType mOperationType;
 
     public:
-        VertexArrayObject( uint32 renderQueueId, const VertexBufferPackedVec &vertexBuffers,
+        VertexArrayObject( uint32 vaoName, uint32 renderQueueId,
+                           const VertexBufferPackedVec &vertexBuffers,
                            IndexBufferPacked *indexBuffer,
                            v1::RenderOperation::OperationType operationType );
 
         uint32 getRenderQueueId(void) const                             { return mRenderQueueId; }
+        uint32 getVaoName(void) const                                   { return mVaoName; }
 
         const VertexBufferPackedVec& getVertexBuffers(void) const       { return mVertexBuffers; }
         IndexBufferPacked* getIndexBuffer(void) const                   { return mIndexBuffer; }
