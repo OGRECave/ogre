@@ -36,20 +36,20 @@ namespace Ogre
 {
     class D3D11DriverList
     {
-    private:
-        vector<D3D11Driver*>::type mDriverList;
-
     public:
         D3D11DriverList( IDXGIFactoryN* pDXGIFactory );
         ~D3D11DriverList();
 
-        BOOL enumerate(IDXGIFactoryN*   pDXGIFactory);
-        size_t count() const;
+        size_t count() const; /// does not include hidden drivers like NVPerfHUD
         D3D11Driver* item( size_t index );
-
         D3D11Driver* item( const String &name );
 
+    private:
+        BOOL enumerate(IDXGIFactoryN* pDXGIFactory);
 
+    private:
+        vector<D3D11Driver*>::type mDriverList;
+        unsigned                   mHiddenDriversCount;
     };
 }
 #endif

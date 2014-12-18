@@ -178,7 +178,7 @@ namespace Ogre {
         /// @copydoc DataStream::read
         size_t read(void* buf, size_t count);
         /// @copydoc DataStream::write
-        size_t write(void* buf, size_t count);
+        size_t write(const void* buf, size_t count);
         /// @copydoc DataStream::skip
         void skip(long count);
         /// @copydoc DataStream::seek

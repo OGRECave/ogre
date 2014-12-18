@@ -579,9 +579,12 @@ namespace Ogre
 
         mContext->setCurrent();
 
+        PFNGLXSWAPINTERVALSGIPROC _glXSwapIntervalSGI;
+        _glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC)mGLSupport->getProcAddress("glXSwapIntervalSGI");
+
         if (! mIsExternalGLControl )
         {
-            glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
+            _glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
         }
 
         mContext->endCurrent();

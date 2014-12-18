@@ -149,7 +149,8 @@ namespace Ogre {
         /** Sets the current pass */
         virtual void setCurrentPass(const Pass* pass);
 
-
+		/** Returns the current bounded camera */
+		const Camera* getCurrentCamera() const;
 
         virtual const Matrix4& getWorldMatrix(void) const;
         virtual const Matrix4* getWorldMatrixArray(void) const;

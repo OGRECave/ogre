@@ -66,155 +66,164 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-static bool gInit = false;
-static Ogre::Root* gRoot = NULL;
-static Ogre::RenderWindow* gRenderWnd = NULL;
+namespace {
+bool gInit = false;
+Ogre::Root* gRoot = NULL;
+Ogre::RenderWindow* gRenderWnd = NULL;
 
 #ifdef OGRE_BUILD_PLUGIN_OCTREE
-static Ogre::OctreePlugin* gOctreePlugin = NULL;
+Ogre::OctreePlugin* gOctreePlugin = NULL;
 #endif
 
 #ifdef OGRE_BUILD_PLUGIN_PFX
-static Ogre::ParticleFXPlugin* gParticleFXPlugin = NULL;
+Ogre::ParticleFXPlugin* gParticleFXPlugin = NULL;
 #endif
 
 #ifdef OGRE_BUILD_COMPONENT_OVERLAY
-static Ogre::OverlaySystem* gOverlaySystem = NULL; 
+Ogre::OverlaySystem* gOverlaySystem = NULL;
 #endif
 
-static Ogre::GLESRS* gGLESPlugin = NULL;
+Ogre::GLESRS* gGLESPlugin = NULL;
 
-static Ogre::SceneManager* pSceneMgr = NULL;
-static Ogre::Camera* pCamera = NULL;
-static JavaVM* gVM = NULL;
+Ogre::SceneManager* pSceneMgr = NULL;
+Ogre::Camera* pCamera = NULL;
+JavaVM* gVM = NULL;
+}
+
+// enable JNI calling conventions for functions defined here
 extern "C" 
 {
-    JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) 
-    {
-        gVM = vm;
-        return JNI_VERSION_1_4;
-    }
+    JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved);
+    JNIEXPORT void JNICALL  Java_org_ogre3d_android_OgreActivityJNI_create(JNIEnv * env, jobject obj, jobject assetManager);
+    JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_destroy(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_initWindow(JNIEnv * env, jobject obj,  jobject surface);
+    JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_termWindow(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_renderOneFrame(JNIEnv * env, jobject obj);
+}
 
-    JNIEXPORT void JNICALL  Java_org_ogre3d_android_OgreActivityJNI_create(JNIEnv * env, jobject obj, jobject assetManager)
-    {
-        if(gInit)
-            return;
-         
-        gRoot = new Ogre::Root();
+jint JNI_OnLoad(JavaVM *vm, void *reserved)
+{
+    gVM = vm;
+    return JNI_VERSION_1_4;
+}
 
-        gGLESPlugin = OGRE_NEW GLESRS();
-        gRoot->installPlugin(gGLESPlugin);
-            
+void Java_org_ogre3d_android_OgreActivityJNI_create(JNIEnv * env, jobject obj, jobject assetManager)
+{
+    if(gInit)
+        return;
+
+    gRoot = new Ogre::Root();
+
+    gGLESPlugin = OGRE_NEW GLESRS();
+    gRoot->installPlugin(gGLESPlugin);
+
 #ifdef OGRE_BUILD_PLUGIN_OCTREE
-        gOctreePlugin = OGRE_NEW OctreePlugin();
-        gRoot->installPlugin(gOctreePlugin);
+    gOctreePlugin = OGRE_NEW OctreePlugin();
+    gRoot->installPlugin(gOctreePlugin);
 #endif
-            
+
 #ifdef OGRE_BUILD_PLUGIN_PFX
-        gParticleFXPlugin = OGRE_NEW ParticleFXPlugin();
-        gRoot->installPlugin(gParticleFXPlugin);
+    gParticleFXPlugin = OGRE_NEW ParticleFXPlugin();
+    gRoot->installPlugin(gParticleFXPlugin);
 #endif
 
 #ifdef OGRE_BUILD_COMPONENT_OVERLAY
-        gOverlaySystem = OGRE_NEW OverlaySystem(); 
+    gOverlaySystem = OGRE_NEW OverlaySystem();
 #endif
-        
-        gRoot->setRenderSystem(gRoot->getAvailableRenderers().at(0));
-        gRoot->initialise(false);
-        gInit = true;
-        
-        AAssetManager* assetMgr = AAssetManager_fromJava(env, assetManager);
-        if (assetMgr) 
-        {
-            ArchiveManager::getSingleton().addArchiveFactory( new APKFileSystemArchiveFactory(assetMgr) );
-            ArchiveManager::getSingleton().addArchiveFactory( new APKZipArchiveFactory(assetMgr) );
-        }
-    }
     
-    JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_destroy(JNIEnv * env, jobject obj)
+    gRoot->setRenderSystem(gRoot->getAvailableRenderers().at(0));
+    gRoot->initialise(false);
+    gInit = true;
+
+    AAssetManager* assetMgr = AAssetManager_fromJava(env, assetManager);
+    if (assetMgr)
     {
-        if(!gInit)
-            return;
-                
-        gInit = false;
-                
+        ArchiveManager::getSingleton().addArchiveFactory( new APKFileSystemArchiveFactory(assetMgr) );
+        ArchiveManager::getSingleton().addArchiveFactory( new APKZipArchiveFactory(assetMgr) );
+    }
+}
+
+void Java_org_ogre3d_android_OgreActivityJNI_destroy(JNIEnv * env, jobject obj)
+{
+    if(!gInit)
+        return;
+
+    gInit = false;
+
 #ifdef OGRE_BUILD_COMPONENT_OVERLAY
-        OGRE_DELETE gOverlaySystem; 
-        gOverlaySystem = NULL;
+    OGRE_DELETE gOverlaySystem;
+    gOverlaySystem = NULL;
 #endif
 
-        OGRE_DELETE gRoot;
-        gRoot = NULL;
-        gRenderWnd = NULL;
+    OGRE_DELETE gRoot;
+    gRoot = NULL;
+    gRenderWnd = NULL;
 
 #ifdef OGRE_BUILD_PLUGIN_PFX
-        OGRE_DELETE gParticleFXPlugin;
-        gParticleFXPlugin = NULL;
+    OGRE_DELETE gParticleFXPlugin;
+    gParticleFXPlugin = NULL;
 #endif
 
 #ifdef OGRE_BUILD_PLUGIN_OCTREE
-        OGRE_DELETE gOctreePlugin;
-        gOctreePlugin = NULL;
+    OGRE_DELETE gOctreePlugin;
+    gOctreePlugin = NULL;
 #endif
 
-        OGRE_DELETE gGLESPlugin;
-        gGLESPlugin = NULL;
-    }
-    
+    OGRE_DELETE gGLESPlugin;
+    gGLESPlugin = NULL;
+}
 
-    JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_initWindow(JNIEnv * env, jobject obj,  jobject surface)
-    {
-        if(surface)
-        {
-            ANativeWindow* nativeWnd = ANativeWindow_fromSurface(env, surface);
-            if (nativeWnd && gRoot)
-            {
-                if (!gRenderWnd) 
-                {
-                    Ogre::NameValuePairList opt;
-                    opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)nativeWnd);
-                    gRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
-                    
-                    
-                    if(pSceneMgr == NULL)
-                    {
-                        pSceneMgr = gRoot->createSceneManager(Ogre::ST_GENERIC);
-                        pCamera = pSceneMgr->createCamera("MyCam");
-        
-                        Ogre::Viewport* vp = gRenderWnd->addViewport(pCamera);
-                        vp->setBackgroundColour(Ogre::ColourValue(1,0,0));
-                    }                       
-                }
-                else
-                {
-                    static_cast<Ogre::AndroidEGLWindow*>(gRenderWnd)->_createInternalResources(nativeWnd, NULL);
-                }                        
-            }
-        }
+
+void Java_org_ogre3d_android_OgreActivityJNI_initWindow(JNIEnv * env, jobject obj,  jobject surface)
+{
+    if (!surface) {
+        return;
     }
-    
-    JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_termWindow(JNIEnv * env, jobject obj)
-    {
-        if(gRoot && gRenderWnd)
-        {
-            static_cast<Ogre::AndroidEGLWindow*>(gRenderWnd)->_destroyInternalResources();
-        }
+
+    ANativeWindow* nativeWnd = ANativeWindow_fromSurface(env, surface);
+
+    if (!nativeWnd || !gRoot) {
+        return;
     }
-    
-    JNIEXPORT void JNICALL Java_org_ogre3d_android_OgreActivityJNI_renderOneFrame(JNIEnv * env, jobject obj)
-    {
-        if(gRenderWnd != NULL && gRenderWnd->isActive())
-        {
-            try
-            {
-                if(gVM->AttachCurrentThread(&env, NULL) < 0)                    
-                    return;
-                
-                gRenderWnd->windowMovedOrResized();
-                gRoot->renderOneFrame();
-                
-                //gVM->DetachCurrentThread();               
-            }catch(Ogre::RenderingAPIException ex) {}
+
+    if (!gRenderWnd) {
+        Ogre::NameValuePairList opt;
+        opt["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(nativeWnd));
+        gRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
+
+        if (!pSceneMgr) {
+            pSceneMgr = gRoot->createSceneManager(Ogre::ST_GENERIC);
+            pCamera = pSceneMgr->createCamera("MyCam");
+
+            Ogre::Viewport* vp = gRenderWnd->addViewport(pCamera);
+            vp->setBackgroundColour(Ogre::ColourValue(1,0,0));
         }
+    } else {
+        static_cast<Ogre::AndroidEGLWindow*>(gRenderWnd)->_createInternalResources(nativeWnd, NULL);
     }
-};
+}
+
+void Java_org_ogre3d_android_OgreActivityJNI_termWindow(JNIEnv * env, jobject obj)
+{
+    if(gRoot && gRenderWnd)
+    {
+        static_cast<Ogre::AndroidEGLWindow*>(gRenderWnd)->_destroyInternalResources();
+    }
+}
+
+void Java_org_ogre3d_android_OgreActivityJNI_renderOneFrame(JNIEnv * env, jobject obj)
+{
+    if(gRenderWnd && gRenderWnd->isActive())
+    {
+        try
+        {
+            if(gVM->AttachCurrentThread(&env, NULL) < 0)
+                return;
+
+            gRenderWnd->windowMovedOrResized();
+            gRoot->renderOneFrame();
+
+            //gVM->DetachCurrentThread();
+        }catch(Ogre::RenderingAPIException& ex) {}
+    }
+}

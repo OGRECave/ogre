@@ -98,6 +98,11 @@ namespace Ogre {
     {
     }
     //-----------------------------------------------------------------------------
+	const Camera* AutoParamDataSource::getCurrentCamera() const
+	{
+		return mCurrentCamera;
+	}
+	//-----------------------------------------------------------------------------
     const Light& AutoParamDataSource::getLight(size_t index) const
     {
         // If outside light range, return a blank light to ensure zeroised for program
@@ -1061,7 +1066,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getSceneDepthRange() const
     {
-        static Vector4 dummy(0, 100000, 100000, 1/100000);
+        static Vector4 dummy(0, 100000, 100000, 1.f/100000);
 
         if (mSceneDepthRangeDirty)
         {

@@ -230,22 +230,22 @@ namespace Ogre {
         
 		switch (this->mType)
 		{
-			case GpuProgramType::GPT_VERTEX_PROGRAM:
+			case GPT_VERTEX_PROGRAM:
 				macro.Name = HLSL_PROGRAM_DEFINE_VS;
 			break;
-			case GpuProgramType::GPT_FRAGMENT_PROGRAM:
+			case GPT_FRAGMENT_PROGRAM:
 				macro.Name = HLSL_PROGRAM_DEFINE_PS;
 			break;
-			case GpuProgramType::GPT_GEOMETRY_PROGRAM:
+			case GPT_GEOMETRY_PROGRAM:
 				macro.Name = HLSL_PROGRAM_DEFINE_GS;
 			break;
-			case GpuProgramType::GPT_DOMAIN_PROGRAM:
+			case GPT_DOMAIN_PROGRAM:
 				macro.Name = HLSL_PROGRAM_DEFINE_DS;
 			break;
-			case GpuProgramType::GPT_HULL_PROGRAM:
+			case GPT_HULL_PROGRAM:
 				macro.Name = HLSL_PROGRAM_DEFINE_HS;
 			break;
-			case GpuProgramType::GPT_COMPUTE_PROGRAM:
+			case GPT_COMPUTE_PROGRAM:
 				macro.Name = HLSL_PROGRAM_DEFINE_CS;
 			break;
 			default:

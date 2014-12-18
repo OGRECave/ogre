@@ -159,7 +159,7 @@ namespace Ogre
         bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
         void detachRenderTargetImpl(const String& name);
         
-        HashMap<IDirect3DDevice9*, unsigned short> mCurrentLights;
+        OGRE_HashMap<IDirect3DDevice9*, unsigned short> mCurrentLights;
         /// Saved last view matrix
         Matrix4 mViewMatrix;
 
@@ -171,7 +171,7 @@ namespace Ogre
         
         /** Mapping of texture format -> DepthStencil. Used as cache by _getDepthStencilFormatFor
         */
-        typedef HashMap<unsigned int, D3DFORMAT> DepthStencilHash;
+        typedef OGRE_HashMap<unsigned int, D3DFORMAT> DepthStencilHash;
         DepthStencilHash mDepthStencilHash;
 
         MultiheadUseType mMultiheadUse;

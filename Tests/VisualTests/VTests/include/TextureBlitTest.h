@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,38 +26,29 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLES2UniformCacheImp_H__
-#define __GLES2UniformCacheImp_H__
+#ifndef __TextureBlitTest_H__
+#define __TextureBlitTest_H__
 
-#include "OgreGLES2Prerequisites.h"
+#include "VisualTest.h"
+#include "SamplePlugin.h"
 
-typedef Ogre::GeneralAllocatedObject UniformCacheAlloc;
+using namespace Ogre;
 
-namespace Ogre
+/** Tests basic stencil shadow behavior */
+class _OgreSampleClassExport TextureBlitTest : public VisualTest
 {
-    /** An in memory cache of the OpenGL ES2 uniforms.
-     @see GLES2UniformCache
-     */
-    class _OgreGLES2Export GLES2UniformCacheImp : public UniformCacheAlloc
-    {
-    private:
-        typedef OGRE_HashMap<GLint, uint32> UniformMap;
+public:
 
-        /// A map of uniform names and a hash of their values
-        UniformMap mUniformValueMap;
-        
-    public:
-        GLES2UniformCacheImp(void);
-        ~GLES2UniformCacheImp(void);
-        
-        /// Clear out the cache
-        void clearCache();
-        
-        /** Update a uniform
-         @return A boolean value indicating whether this uniform needs to be updated in the GL.
-         */
-        bool updateUniform(GLint location, const void *value, GLsizei length);
-    };
-}
+    TextureBlitTest();
+
+protected:
+
+    void setupContent();
+
+private:
+    TexturePtr m_colorTexture;
+    TexturePtr m_depthTexture;
+
+};
 
 #endif
