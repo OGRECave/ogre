@@ -32,7 +32,7 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
-if (APPLE)
+if (APPLE AND NOT ANDROID)
   if(CMAKE_VERSION VERSION_LESS 3.0.0)
     include(CMakeForceCompiler)
     CMAKE_FORCE_C_COMPILER(clang GNU)
