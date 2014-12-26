@@ -73,6 +73,8 @@ namespace Ogre
 
         const VertexBufferPackedVec& getVertexBuffers(void) const       { return mVertexBuffers; }
         IndexBufferPacked* getIndexBuffer(void) const                   { return mIndexBuffer; }
+
+        v1::RenderOperation::OperationType getOperationType(void) const { return mOperationType; }
     };
 }
 
