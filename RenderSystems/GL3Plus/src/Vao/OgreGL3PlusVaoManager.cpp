@@ -679,7 +679,7 @@ namespace Ogre
                     break;
                 };
 
-                GLuint attributeIndex = VERTEX_ATTRIBUTE_INDEX[it->mSemantic - 1] + uvCount;
+                GLuint attributeIndex = VERTEX_ATTRIBUTE_INDEX[it->mSemantic - 1];
 
                 if( it->mSemantic == VES_TEXTURE_COORDINATES )
                 {
