@@ -94,6 +94,7 @@ namespace Ogre {
         virtual void readFileHeader(DataStreamPtr& stream);
         virtual unsigned short readChunk(DataStreamPtr& stream);
         
+        void readChar(DataStreamPtr& stream, uint8* pDest);
         void readBools(DataStreamPtr& stream, bool* pDest, size_t count);
         void readFloats(DataStreamPtr& stream, float* pDest, size_t count);
         void readFloats(DataStreamPtr& stream, double* pDest, size_t count);

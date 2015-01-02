@@ -471,6 +471,18 @@ namespace Ogre {
         mIndexBufferShadowBuffer    = shadowBuffer;
     }
     //---------------------------------------------------------------------
+    void Mesh::nameSubMesh(const String& name, ushort index)
+    {
+        mSubMeshNameMap[name] = index;
+    }
+    //---------------------------------------------------------------------
+    void Mesh::unnameSubMesh(const String& name)
+    {
+        SubMeshNameMap::iterator i = mSubMeshNameMap.find( name );
+        if( i != mSubMeshNameMap.end() )
+            mSubMeshNameMap.erase(i);
+    }
+    //---------------------------------------------------------------------
     size_t Mesh::calculateSize(void) const
     {
         // calculate GPU size

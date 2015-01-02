@@ -111,14 +111,19 @@ namespace v1 {
         VES_DIFFUSE = 5,
         /// Specular colours
         VES_SPECULAR = 6,
-        /// Texture coordinates
+        /// Texture coordinates. You can have up to 8 of these. 6 if
+        /// VES_BLEND_WEIGHTS2 or VES_BLEND_INDICES2 if present.
         VES_TEXTURE_COORDINATES = 7,
         /// Binormal (Y axis if normal is Z)
         VES_BINORMAL = 8,
         /// Tangent (X axis if normal is Z)
         VES_TANGENT = 9,
+        /// Second pair of blending weights (i.e. more than 4, less or equal than 8)
+        VES_BLEND_WEIGHTS2 = 10,
+        /// Second pair of blending indices (i.e. more than 4, less or equal than 8)
+        VES_BLEND_INDICES2 = 11,
         /// The  number of VertexElementSemantic elements (note - the first value VES_POSITION is 1) 
-        VES_COUNT = 9
+        VES_COUNT = 11,
     };
 
     /// Vertex element type, used to identify the base types of the vertex contents

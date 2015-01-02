@@ -94,7 +94,7 @@ namespace Ogre
     void GL3PlusMultiSourceVertexBufferPool::createVertexBuffers(
                                                     VertexBufferPackedVec &outVertexBuffers,
                                                     size_t numVertices,
-                                                    void **initialData, bool keepAsShadow )
+                                                    void * const *initialData, bool keepAsShadow )
     {
         size_t vertexOffset;
         allocateVbo( numVertices, vertexOffset );

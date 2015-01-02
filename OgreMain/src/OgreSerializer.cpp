@@ -298,6 +298,12 @@ namespace Ogre {
         return id;
     }
     //---------------------------------------------------------------------
+    void Serializer::readChar(DataStreamPtr& stream, uint8* pDest)
+    {
+        stream->read( pDest, sizeof(uint8) );
+        //no flipping on 1-byte datatypes
+    }
+    //---------------------------------------------------------------------
     void Serializer::readBools(DataStreamPtr& stream, bool* pDest, size_t count)
     {
         //XXX Nasty Hack to convert 1 byte bools to 4 byte bools

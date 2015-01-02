@@ -111,7 +111,7 @@ namespace Ogre
             The desired vertex buffer pointer
         */
         virtual void createVertexBuffers( VertexBufferPackedVec &outVertexBuffers, size_t numVertices,
-                                          void **initialData, bool keepAsShadow ) = 0;
+                                          void * const *initialData, bool keepAsShadow ) = 0;
 
         /** Destroys all the buffers returned from a call to createVertexBuffers.
             All the returned buffers from that call must be supplied. Not one more, not one less.

@@ -145,6 +145,9 @@ namespace Ogre {
          */
         //SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
+        void setMaterialName( const String &name )          { mMaterialName = name; }
+        String getMaterialName(void) const                  { return mMaterialName; }
+
         /// @See arrangeEfficient
         void importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords );
 

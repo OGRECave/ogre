@@ -82,6 +82,7 @@ namespace Ogre {
     class _OgreExport Mesh: public Resource
     {
         friend class SubMesh;
+        friend class MeshSerializerImpl;
 
     public:
         typedef FastArray<Real> LodValueArray;
@@ -117,6 +118,12 @@ namespace Ogre {
         BufferType mIndexBufferDefaultType;
         bool mVertexBufferShadowBuffer;
         bool mIndexBufferShadowBuffer;
+
+        /** A hashmap used to store optional SubMesh names.
+            Translates a name into SubMesh index.
+        */
+        typedef HashMap<String, ushort> SubMeshNameMap;
+        SubMeshNameMap mSubMeshNameMap;
 
         /** Loads the mesh from disk.  This call only performs IO, it
             does not parse the bytestream or check for any errors therein.
@@ -175,6 +182,12 @@ namespace Ogre {
 
         /// Gets an iterator over the available submeshes
         const SubMeshVec& getSubMeshes(void) const      { return mSubMeshes; }
+
+        /// Gives a name to a SubMesh
+        void nameSubMesh(const String& name, ushort index);
+
+        /// Removes a name from a SubMesh
+        void unnameSubMesh(const String& name);
 
         /** Makes a copy of this mesh object and gives it a new name.
         @remarks

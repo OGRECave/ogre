@@ -69,7 +69,7 @@ namespace Ogre
         virtual ~GL3PlusMultiSourceVertexBufferPool();
 
         void createVertexBuffers( VertexBufferPackedVec &outVertexBuffers, size_t numVertices,
-                                  void **initialData, bool keepAsShadow );
+                                  void * const *initialData, bool keepAsShadow );
     };
 }
 

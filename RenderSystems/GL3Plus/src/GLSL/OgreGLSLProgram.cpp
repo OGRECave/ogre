@@ -305,7 +305,7 @@ namespace Ogre {
             VertexElementSemantic semantic;
         };
 
-#define OGRE_NUM_SEMANTICS 10
+#define OGRE_NUM_SEMANTICS 12
         static const SemanticNameTable attributesTable[OGRE_NUM_SEMANTICS] =
         {
             { "vertex",         VES_POSITION },
@@ -317,6 +317,8 @@ namespace Ogre {
             { "tangent",        VES_TANGENT },
             { "binormal",       VES_BINORMAL },
             { "qtangent",       VES_NORMAL },
+            { "blendWeights2",  VES_BLEND_WEIGHTS2 },
+            { "blendIndices2",  VES_BLEND_INDICES2 },
             { "uv",             VES_TEXTURE_COORDINATES },
         };
 

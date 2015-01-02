@@ -60,6 +60,7 @@ namespace Ogre
         6,  // VES_SPECULAR - 1
         7,  // VES_TEXTURE_COORDINATES - 1
         //There are up to 8 VES_TEXTURE_COORDINATES. Occupy range [7; 15)
+        //Range [13; 15) overlaps with VES_BLEND_WEIGHTS2 & VES_BLEND_INDICES2
         //Index 15 is reserved for draw ID.
 
         //VES_BINORMAL uses slot 16. Lots of GPUs don't support more than 16 attributes
@@ -68,6 +69,8 @@ namespace Ogre
         //4-component VES_TANGENT, we leave this one for the end.
         16, // VES_BINORMAL - 1
         2,  // VES_TANGENT - 1
+        13, // VES_BLEND_WEIGHTS2 - 1
+        14, // VES_BLEND_INDICES2 - 1
     };
 
     GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers ) :
@@ -687,6 +690,11 @@ namespace Ogre
                     attributeIndex += uvCount;
                     ++uvCount;
                 }
+
+                assert( ( uvCount < 6 || (it->mSemantic != VES_BLEND_WEIGHTS2 &&
+                                          it->mSemantic != VES_BLEND_INDICES2) ) &&
+                        "Available UVs get reduced from 8 to 6 when"
+                        " VES_BLEND_WEIGHTS2/INDICES2 is present" );
 
                 if( it->mSemantic == VES_BINORMAL )
                 {
