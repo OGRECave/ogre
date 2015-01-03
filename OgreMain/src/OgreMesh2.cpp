@@ -30,11 +30,11 @@ THE SOFTWARE.
 
 #include "OgreSubMesh2.h"
 #include "OgreLogManager.h"
-#include "OgreMeshSerializer.h"
+#include "OgreMesh2Serializer.h"
+#include "OgreMeshManager2.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreException.h"
-#include "OgreMeshManager.h"
 #include "OgreOptimisedUtil.h"
 #include "OgreSkeleton.h"
 #include "OgreLodStrategyManager.h"
@@ -157,10 +157,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Mesh::loadImpl()
     {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "", "Mesh::loadImpl()");
-
-        /*MeshSerializer serializer;
-        serializer.setListener(MeshManager::getSingleton().getListener());
+        MeshSerializer serializer( mVaoManager );
+        //serializer.setListener(MeshManager::getSingleton().getListener());
 
         // If the only copy is local on the stack, it will be cleaned
         // up reliably in case of exceptions, etc
@@ -173,7 +171,7 @@ namespace Ogre {
                         "Mesh::loadImpl()");
         }
 
-        serializer.importMesh(data, this);*/
+        serializer.importMesh(data, this);
     }
     //-----------------------------------------------------------------------
     void Mesh::unloadImpl()
@@ -308,9 +306,9 @@ namespace Ogre {
         {
             // Pad out the AABB a little, helps with most bounds tests
             mAabb.mHalfSize += 2.0f * mAabb.mHalfSize *
-                                v1::MeshManager::getSingleton().getBoundsPaddingFactor();
+                                MeshManager::getSingleton().getBoundsPaddingFactor();
             // Pad out the sphere a little too
-            mBoundRadius = mBoundRadius + (mBoundRadius * v1::MeshManager::getSingleton().getBoundsPaddingFactor());
+            mBoundRadius = mBoundRadius + (mBoundRadius * MeshManager::getSingleton().getBoundsPaddingFactor());
         }
     }
     //-----------------------------------------------------------------------

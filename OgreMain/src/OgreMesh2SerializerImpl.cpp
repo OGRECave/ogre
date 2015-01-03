@@ -57,7 +57,8 @@ namespace Ogre {
     /// stream overhead = ID + size
     const long MSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
     //---------------------------------------------------------------------
-    MeshSerializerImpl::MeshSerializerImpl()
+    MeshSerializerImpl::MeshSerializerImpl( VaoManager *vaoManager ) :
+        mVaoManager( vaoManager )
     {
         // Version number
         mVersion = "[MeshSerializer_v2.0]";
@@ -145,7 +146,7 @@ namespace Ogre {
         exportedLodCount = 1; // generate edge data for original mesh
 
         LodLevelVertexBufferTableVec lodVertexTable;
-        lodVertexTable.reserve( pMesh->getNumSubMeshes() );
+        lodVertexTable.resize( pMesh->getNumSubMeshes() );
 
         for( size_t i=0; i<pMesh->getNumSubMeshes(); ++i )
         {
@@ -257,7 +258,6 @@ namespace Ogre {
     {
         // Header
         writeChunkHeader(M_SUBMESH, calcSubMeshSize(s, lodVertexTable));
-        pushInnerChunk(mStream);
 
         // char* materialName
         writeString(s->getMaterialName());
@@ -267,17 +267,15 @@ namespace Ogre {
 
         for( uint8 lodLevel=0; lodLevel<numLodLevels; ++lodLevel )
             writeSubMeshLod( s->mVao[lodLevel], lodLevel, lodVertexTable[lodLevel] );
-
-        popInnerChunk(mStream);
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSubMeshLod( const VertexArrayObject *vao, uint8 lodLevel,
                                               uint8 lodSource )
     {
-        const bool skipVertexBuffer = (lodLevel == lodSource);
+        const bool skipVertexBuffer = (lodLevel != lodSource);
 
-        writeChunkHeader( M_SUBMESH_LOD, calcSubMeshLodSize( vao, skipVertexBuffer ) );
         pushInnerChunk(mStream);
+        writeChunkHeader( M_SUBMESH_LOD, calcSubMeshLodSize( vao, skipVertexBuffer ) );
 
         writeIndexes( vao->getIndexBuffer() );
 
@@ -287,9 +285,9 @@ namespace Ogre {
         }
         else
         {
+            pushInnerChunk(mStream);
             writeChunkHeader( M_SUBMESH_M_GEOMETRY_EXTERNAL_SOURCE,
                               MSTREAM_OVERHEAD_SIZE + sizeof(uint8) );
-            pushInnerChunk(mStream);
             writeData( &lodSource, 1, 1 );
             popInnerChunk(mStream);
         }
@@ -367,7 +365,8 @@ namespace Ogre {
     void MeshSerializerImpl::writeGeometry( const VertexBufferPackedVec &vertexData )
     {
         // Header
-        writeChunkHeader(M_GEOMETRY, calcGeometrySize(vertexData));
+        pushInnerChunk(mStream);
+        writeChunkHeader(M_SUBMESH_M_GEOMETRY, calcGeometrySize(vertexData));
 
         uint32 vertexCount = 0;
         uint8 numSources = static_cast<uint8>( vertexData.size() );
@@ -376,14 +375,13 @@ namespace Ogre {
 
         writeInts(&vertexCount, 1);
         writeData(&numSources, 1, 1);
-
-        pushInnerChunk(mStream);
         {
             // Vertex declaration
             size_t size = calcVertexDeclSize( vertexData );
-            writeChunkHeader(M_SUBMESH_M_GEOMETRY_VERTEX_DECLARATION, size);
 
             pushInnerChunk(mStream);
+            writeChunkHeader(M_SUBMESH_M_GEOMETRY_VERTEX_DECLARATION, size);
+
             {
                 //Go through all the sources
                 VertexBufferPackedVec::const_iterator itor = vertexData.begin();
@@ -417,7 +415,8 @@ namespace Ogre {
 
             for( uint8 i=0; i<numSources; ++i )
             {
-                size_t size = MSTREAM_OVERHEAD_SIZE + (sizeof(uint8)* 2);
+                size_t size = MSTREAM_OVERHEAD_SIZE + (sizeof(uint8)* 2) +
+                                vertexData[i]->getTotalSizeBytes();
 
                 pushInnerChunk(mStream);
                 writeChunkHeader(M_SUBMESH_M_GEOMETRY_VERTEX_BUFFER, size);
@@ -540,7 +539,7 @@ namespace Ogre {
         size += sizeof(uint8);
 
         for( uint8 lodLevel=0; lodLevel<pSub->mVao.size(); ++lodLevel )
-            size += calcSubMeshLodSize( pSub->mVao[lodLevel], lodVertexTable[lodLevel] == lodLevel );
+            size += calcSubMeshLodSize( pSub->mVao[lodLevel], lodVertexTable[lodLevel] != lodLevel );
 
         return size;
     }
@@ -563,7 +562,7 @@ namespace Ogre {
 
         if( !skipVertexBuffer )
         {
-            calcGeometrySize( vao->getVertexBuffers() );
+            size += calcGeometrySize( vao->getVertexBuffers() );
         }
         else
         {
@@ -821,10 +820,8 @@ namespace Ogre {
     {
         sm->mVao.reserve( submeshLods.size() );
 
-        VaoManager *vaoManager = 0;
-
         VertexBufferPackedVec vertexBuffers;
-        for( size_t i=0; submeshLods.size(); ++i )
+        for( size_t i=0; i<submeshLods.size(); ++i )
         {
             const SubMeshLod &subMeshLod = submeshLods[i];
 
@@ -837,7 +834,7 @@ namespace Ogre {
             {
                 if( subMeshLod.vertexDeclarations.size() == 1 )
                 {
-                    VertexBufferPacked *vertexBuffer = vaoManager->createVertexBuffer(
+                    VertexBufferPacked *vertexBuffer = mVaoManager->createVertexBuffer(
                                 subMeshLod.vertexDeclarations[0], subMeshLod.numVertices,
                                 BT_IMMUTABLE, subMeshLod.vertexBuffers[0], true );
 
@@ -851,7 +848,7 @@ namespace Ogre {
                                  "MeshSerializerImpl::createSubMeshVao" );
                     /*TODO: Support this, also grab an existing pool that can
                     handle our request before trying to create a new one.
-                    MultiSourceVertexBufferPool *multiSourcePool = vaoManager->
+                    MultiSourceVertexBufferPool *multiSourcePool = mVaoManager->
                             createMultiSourceVertexBufferPool(
                                 subMeshLod.vertexDeclarations[0],
                                 std::max( defaultMaxNumVertices, subMeshLod.numVertices ), BT_IMMUTABLE );
@@ -873,24 +870,24 @@ namespace Ogre {
             IndexBufferPacked *indexBuffer = 0;
             if( subMeshLod.indexData )
             {
-                indexBuffer = vaoManager->createIndexBuffer(
+                indexBuffer = mVaoManager->createIndexBuffer(
                                     subMeshLod.index32Bit ? IndexBufferPacked::IT_32BIT :
                                                             IndexBufferPacked::IT_16BIT,
                                     subMeshLod.numIndices, BT_IMMUTABLE,
                                     subMeshLod.indexData, true );
             }
 
-            sm->mVao.push_back( vaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
-                                                                     subMeshLod.operationType ) );
+            sm->mVao.push_back( mVaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
+                                                                      subMeshLod.operationType ) );
         }
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readSubMeshLod( DataStreamPtr& stream, Mesh *pMesh,
                                              SubMeshLod *subLod, uint8 currentLod )
     {
-        pushInnerChunk(stream);
-
         readIndexes( stream, subLod );
+
+        pushInnerChunk(stream);
 
         uint16 streamID = readChunk(stream);
         while( !stream->eof() &&
@@ -975,8 +972,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readGeometry(DataStreamPtr& stream, SubMeshLod *subLod)
     {
-        pushInnerChunk( stream );
-
         readInts( stream, &subLod->numVertices, 1 );
 
         uint8 numSources;
@@ -984,6 +979,8 @@ namespace Ogre {
 
         subLod->vertexDeclarations.resize( numSources );
         subLod->vertexBuffers.resize( numSources );
+
+        pushInnerChunk( stream );
 
         uint16 streamID = readChunk(stream);
         while( !stream->eof() &&
@@ -1013,8 +1010,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readVertexDeclaration(DataStreamPtr& stream, SubMeshLod *subLod)
     {
-        pushInnerChunk( stream );
-
         VertexElement2VecVec::iterator itor = subLod->vertexDeclarations.begin();
         VertexElement2VecVec::iterator end  = subLod->vertexDeclarations.end();
 
@@ -1038,44 +1033,45 @@ namespace Ogre {
 
             ++itor;
         }
-
-        popInnerChunk( stream );
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readVertexBuffer(DataStreamPtr& stream, SubMeshLod *subLod)
     {
-        pushInnerChunk( stream );
+        //Source
+        uint8 source;
+        readChar( stream, &source );
 
-        uint8 numSources = subLod->vertexBuffers.size();
+        // Per-vertex size, must agree with declaration at this source
+        uint8 bytesPerVertex;
+        readChar( stream, &bytesPerVertex );
 
-        for( uint8 source=0; source<numSources; ++source )
+        const VertexElement2Vec &vertexElements = subLod->vertexDeclarations[source];
+
+        if( bytesPerVertex != VaoManager::calculateVertexSize( vertexElements ) )
         {
-            // Per-vertex size, must agree with declaration at this source
-            uint8 bytesPerVertex;
-            readChar( stream, &bytesPerVertex );
-
-            const VertexElement2Vec &vertexElements = subLod->vertexDeclarations[source];
-
-            if( bytesPerVertex != VaoManager::calculateVertexSize( vertexElements ) )
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                            "Buffer vertex size does not agree with vertex declaration",
-                            "MeshSerializerImpl::readVertexBuffer");
-            }
-
-            uint8 *vertexData = reinterpret_cast<uint8*>( OGRE_MALLOC_SIMD(
-                                    sizeof(uint8) * bytesPerVertex * subLod->numVertices,
-                                    MEMCATEGORY_GEOMETRY ) );
-            subLod->vertexBuffers.push_back( vertexData );
-
-            stream->read( vertexData, bytesPerVertex * subLod->numVertices );
-
-            // Endian conversion
-            flipLittleEndian( vertexData, subLod->numVertices, bytesPerVertex,
-                              vertexElements );
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Buffer vertex size does not agree with vertex declaration",
+                        "MeshSerializerImpl::readVertexBuffer");
         }
 
-        popInnerChunk( stream );
+        if( subLod->vertexBuffers[source] )
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Two vertex buffer streams are assigned to the same source."
+                        " This mesh is invalid.",
+                        "MeshSerializerImpl::readVertexBuffer");
+        }
+
+        uint8 *vertexData = reinterpret_cast<uint8*>( OGRE_MALLOC_SIMD(
+                                sizeof(uint8) * bytesPerVertex * subLod->numVertices,
+                                MEMCATEGORY_GEOMETRY ) );
+        subLod->vertexBuffers[source] = vertexData;
+
+        stream->read( vertexData, bytesPerVertex * subLod->numVertices );
+
+        // Endian conversion
+        flipLittleEndian( vertexData, subLod->numVertices, bytesPerVertex,
+                          vertexElements );
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readSubMeshLodOperation( DataStreamPtr& stream,

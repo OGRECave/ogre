@@ -61,7 +61,7 @@ namespace Ogre {
     class _OgrePrivate MeshSerializerImpl : public Serializer
     {
     public:
-        MeshSerializerImpl();
+        MeshSerializerImpl( VaoManager *vaoManager );
         virtual ~MeshSerializerImpl();
         /** Exports a mesh to the file specified. 
         @remarks
@@ -194,6 +194,7 @@ namespace Ogre {
         virtual void enableValidation();
 
         ushort exportedLodCount; // Needed to limit exported Edge data, when exporting
+        VaoManager *mVaoManager;
     };
 
     /** @} */

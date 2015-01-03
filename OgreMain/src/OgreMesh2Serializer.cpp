@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
     const unsigned short HEADER_CHUNK_ID = 0x1000;
     //---------------------------------------------------------------------
-    MeshSerializer::MeshSerializer()
+    MeshSerializer::MeshSerializer( VaoManager *vaoManager )
         :mListener(0)
     {
         // Init implementations
@@ -46,7 +46,7 @@ namespace Ogre {
 
         mVersionData.push_back(OGRE_NEW MeshVersionData(
             MESH_VERSION_2_0, "[MeshSerializer_v2.0]",
-            OGRE_NEW MeshSerializerImpl()));
+            OGRE_NEW MeshSerializerImpl( vaoManager )));
     }
     //---------------------------------------------------------------------
     MeshSerializer::~MeshSerializer()

@@ -186,9 +186,14 @@ namespace Ogre
         GLenum oppositeTarget = mUploadOnly ? GL_COPY_READ_BUFFER : GL_COPY_WRITE_BUFFER;
 
         OCGE( glBindBuffer( target, mVboName ) );
-        OCGE( glFlushMappedBufferRange( target,
-                                         0 /*mInternalBufferStart + mMappingStart*/,
-                                         mMappingCount ) );
+
+        if( mUploadOnly )
+        {
+            OCGE( glFlushMappedBufferRange( target,
+                                            0 /*mInternalBufferStart + mMappingStart*/,
+                                            mMappingCount ) );
+        }
+
         OCGE( glUnmapBuffer( target ) );
         mMappedPtr = 0;
 
@@ -210,7 +215,7 @@ namespace Ogre
                                         dstOffset, dst.length ) );
         }
 
-        if( !mUploadOnly )
+        if( mUploadOnly )
         {
             //Add fence to this region (or at least, track the hazard).
             addFence( mMappingStart, mMappingStart + mMappingCount - 1, false );

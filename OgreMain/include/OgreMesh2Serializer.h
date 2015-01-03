@@ -79,7 +79,7 @@ namespace Ogre {
     class _OgreExport MeshSerializer : public Serializer
     {
     public:
-        MeshSerializer();
+        MeshSerializer( VaoManager *vaoManager );
         virtual ~MeshSerializer();
 
 
