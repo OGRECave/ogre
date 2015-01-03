@@ -27,3 +27,4 @@ AndroidBuild/
 AndroidDependencies/
 Build/
 EmscriptenDependencies
+EmscriptenBuild
