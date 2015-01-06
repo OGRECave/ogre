@@ -186,6 +186,12 @@ namespace Ogre
         /// Sets the diffuse colour. The colour will be divided by PI for energy conservation.
         void setDiffuse( const Vector3 &diffuseColour );
 
+        /// Sets the specular colour.
+        void setSpecular( const Vector3 &specularColour );
+
+        /// Sets the roughness
+        void setRoughness( float roughness );
+
         /** Calculates fresnel (F0 in most books) based on the IOR.
             The formula used is ( (1 - idx) / 1 + idx )²
         @remarks
@@ -341,6 +347,17 @@ namespace Ogre
         /// Returns the index to mBakedTextures. Returns NUM_PBSM_TEXTURE_TYPES if
         /// there is no texture assigned to texType
         uint8 getBakedTextureIdx( PbsTextureTypes texType ) const;
+
+        /** Suggests the TextureMapType (aka texture category) for each type of texture
+            (i.e. normals should load from TEXTURE_TYPE_NORMALS).
+        @remarks
+            Remember that if "myTexture" was loaded as TEXTURE_TYPE_DIFFUSE and then you try
+            to load it as TEXTURE_TYPE_NORMALS, the first one will prevail until it's removed.
+            You could create an alias however, and thus have two copies of the same texture with
+            different loading parameters.
+        */
+        static HlmsTextureManager::TextureMapType suggestMapTypeBasedOnTextureType(
+                                                                PbsTextureTypes type );
 
         virtual void calculateHash();
 

@@ -390,6 +390,20 @@ namespace Ogre
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setSpecular( const Vector3 &specularColour )
+    {
+        mkSr = specularColour.x;
+        mkSg = specularColour.y;
+        mkSb = specularColour.z;
+        scheduleConstBufferUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setRoughness( float roughness )
+    {
+        mRoughness = roughness;
+        scheduleConstBufferUpdate();
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setIndexOfRefraction( const Vector3 &refractionIdx,
                                                        bool separateFresnel )
     {
@@ -631,5 +645,42 @@ namespace Ogre
     uint8 HlmsPbsDatablock::getBakedTextureIdx( PbsTextureTypes texType ) const
     {
         return mTexToBakedTextureIdx[texType];
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsTextureManager::TextureMapType HlmsPbsDatablock::suggestMapTypeBasedOnTextureType(
+                                                                        PbsTextureTypes type )
+    {
+        HlmsTextureManager::TextureMapType retVal;
+        switch( type )
+        {
+        default:
+        case PBSM_DIFFUSE:
+        case PBSM_SPECULAR:
+        case PBSM_DETAIL_WEIGHT:
+        case PBSM_DETAIL0:
+        case PBSM_DETAIL1:
+        case PBSM_DETAIL2:
+        case PBSM_DETAIL3:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+            break;
+
+        case PBSM_NORMAL:
+        case PBSM_DETAIL0_NM:
+        case PBSM_DETAIL1_NM:
+        case PBSM_DETAIL2_NM:
+        case PBSM_DETAIL3_NM:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_NORMALS;
+            break;
+
+        case PBSM_ROUGHNESS:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_MONOCHROME;
+            break;
+
+        case PBSM_REFLECTION:
+            retVal = HlmsTextureManager::TEXTURE_TYPE_ENV_MAP;
+            break;
+        }
+
+        return retVal;
     }
 }
