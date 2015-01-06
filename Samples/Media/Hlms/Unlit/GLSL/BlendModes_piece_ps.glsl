@@ -87,3 +87,8 @@
 
 @foreach( 16, n )
 @property( uv_atlas@n ) @piece( atlasOffset@n )* atlasOffsets[@n].z + atlasOffsets[@n].xy @end @end @end
+
+// Get the indexes to the textureMaps[] array using template code. We had to add 1
+// to the actual value otherwise property( diffuse_map ) fails when the index is 0
+@foreach( diffuse_map, n )
+	@sub( diffuse_map@n_idx, diffuse_map@n, 1 ) @end

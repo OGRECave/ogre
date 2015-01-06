@@ -244,6 +244,7 @@ namespace Ogre
                 {
                     --nesting;
                     it += sizeof( "end" ) - 1;
+                    continue;
                 }
                 else
                 {
@@ -266,7 +267,7 @@ namespace Ogre
         assert( nesting >= -1 );
 
         if( it != en && nesting < 0 )
-            outSubString.setEnd( it - outSubString.getOriginalBuffer().begin() - sizeof( "end" ) );
+            outSubString.setEnd( it - outSubString.getOriginalBuffer().begin() - (sizeof( "end" ) - 1) );
         else
         {
             syntaxError = false;

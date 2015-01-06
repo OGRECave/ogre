@@ -23,7 +23,7 @@
 
 
 // Get the indexes to the textureMaps[] array using template code. We had to add 1
-// to the actual value otherwise @property( diffuse_map ) fails when the index is 0
+// to the actual value otherwise property( diffuse_map ) fails when the index is 0
 @sub( diffuse_map_idx, diffuse_map, 1 )
 @sub( normal_map_tex_idx, normal_map_tex, 1 )
 @sub( specular_map_idx, specular_map, 1 )
