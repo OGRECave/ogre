@@ -1052,20 +1052,22 @@ namespace Ogre
     void HlmsPbs::unmapTexBuffer( CommandBuffer *commandBuffer )
     {
         //Save our progress
-        mTexLastOffset += (mCurrentMappedTexBuffer - mRealStartMappedTexBuffer) * sizeof(float);
+        const size_t bytesWritten = (mCurrentMappedTexBuffer - mRealStartMappedTexBuffer) *
+                                                                            sizeof(float);
+        mTexLastOffset += bytesWritten;
 
         if( mRealStartMappedTexBuffer )
         {
             //Unmap the current buffer
             TexBufferPacked *texBuffer = mTexBuffers[mCurrentTexBuffer];
-            texBuffer->unmap( UO_KEEP_PERSISTENT, 0, mTexLastOffset );
+            texBuffer->unmap( UO_KEEP_PERSISTENT, 0, bytesWritten );
 
             CbShaderBuffer *shaderBufferCmd = reinterpret_cast<CbShaderBuffer*>(
                         commandBuffer->getCommandFromOffset( mLastTexBufferCmdOffset ) );
             if( shaderBufferCmd )
             {
                 assert( shaderBufferCmd->bufferPacked == texBuffer );
-                shaderBufferCmd->bindSizeBytes = mTexLastOffset;
+                shaderBufferCmd->bindSizeBytes = mTexLastOffset - shaderBufferCmd->bindOffset;
                 mLastTexBufferCmdOffset = (size_t)~0;
             }
         }
@@ -1115,7 +1117,7 @@ namespace Ogre
         mCurrentTexBufferSize   = (texBuffer->getNumElements() - mTexLastOffset) >> 2;
 
         CbShaderBuffer *shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
-        *shaderBufferCmd = CbShaderBuffer( 0, texBuffer, 0, 0 );
+        *shaderBufferCmd = CbShaderBuffer( 0, texBuffer, mTexLastOffset, 0 );
 
         mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
 
