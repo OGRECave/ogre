@@ -338,7 +338,7 @@ void main()
 	outColour.xyz	= finalColour;
 @end
 	outColour.w		= 1.0;
-@end @property( !hlms_normal && !hlms_qtangent ) )
+@end @property( !hlms_normal && !hlms_qtangent )
 	outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
 @end
 }
