@@ -118,6 +118,7 @@ vec3 qmul( vec4 q, vec3 v )
 	@end
 @end
 
+@property( hlms_normal || hlms_qtangent )
 vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lightSpecular )
 {
 	vec3 halfWay= normalize( lightDir + viewDir );
@@ -159,11 +160,13 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 	return NdotL * (material.kS.xyz * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
 					material.kD.xyz * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
 }
+@end
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
 
 void main()
 {
+@property( hlms_normal || hlms_qtangent )
         uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FFu;
 	material = materialArray.m[materialId];
 @property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
@@ -199,6 +202,10 @@ void main()
 	detailCol@n.w = detailWeights.@insertpiece(detail_swizzle@n);@end
 @end
 
+@property( alpha_test && !diffuse_map && detail_maps_diffuse )
+	if( material.kD.w @insertpiece( alpha_test_cmp_func ) detailCol0.a )
+		discard;@end
+
 @property( !normal_map )
 	nNormal = normalize( inPs.normal );
 @end @property( normal_map )
@@ -222,6 +229,17 @@ void main()
 @end
 
 @insertpiece( SampleDiffuseMap )
+
+@property( alpha_test )
+	@property( diffuse_map )
+	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
+		discard;
+	@end @property( !diffuse_map && !detail_maps_diffuse )
+	if( material.kD.w @insertpiece( alpha_test_cmp_func ) 1.0 )
+		discard;
+	@end
+@end
+
 @insertpiece( SampleSpecularMap )
 @insertpiece( SampleRoughnessMap )
 
@@ -320,6 +338,9 @@ void main()
 	outColour.xyz	= finalColour;
 @end
 	outColour.w		= 1.0;
+@end @property( !hlms_normal && !hlms_qtangent ) )
+	outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
+@end
 }
 @end
 @property( hlms_shadowcaster )

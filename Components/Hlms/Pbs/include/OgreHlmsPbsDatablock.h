@@ -348,6 +348,16 @@ namespace Ogre
         /// there is no texture assigned to texType
         uint8 getBakedTextureIdx( PbsTextureTypes texType ) const;
 
+        /** @see HlmsDatablock::setAlphaTest
+        @remarks
+            Alpha testing works on the alpha channel of the diffuse texture.
+            If there is no diffuse texture, the first diffuse detail map after
+            applying the blend weights (texture + params) is used.
+            If there are no diffuse nor detail-diffuse maps, the alpha test is
+            compared against the value 1.0
+        */
+        virtual void setAlphaTestThreshold( float threshold );
+
         /** Suggests the TextureMapType (aka texture category) for each type of texture
             (i.e. normals should load from TEXTURE_TYPE_NORMALS).
         @remarks

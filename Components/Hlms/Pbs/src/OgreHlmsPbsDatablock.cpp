@@ -308,6 +308,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::uploadToConstBuffer( char *dstPtr )
     {
+        _padding0 = mAlphaTestThreshold;
         memcpy( dstPtr, &mkDr, MaterialSizeInGpu );
     }
     //-----------------------------------------------------------------------------------
@@ -645,6 +646,12 @@ namespace Ogre
     uint8 HlmsPbsDatablock::getBakedTextureIdx( PbsTextureTypes texType ) const
     {
         return mTexToBakedTextureIdx[texType];
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setAlphaTestThreshold( float threshold )
+    {
+        HlmsDatablock::setAlphaTestThreshold( threshold );
+        scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureMapType HlmsPbsDatablock::suggestMapTypeBasedOnTextureType(
