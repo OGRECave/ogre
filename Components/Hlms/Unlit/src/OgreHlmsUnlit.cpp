@@ -67,10 +67,12 @@ namespace Ogre
 
     const IdString UnlitProperty::Diffuse               = IdString( "diffuse" );
 
+    const IdString UnlitProperty::NumArrayTextures      = IdString( "num_array_textures" );
     const IdString UnlitProperty::NumTextures           = IdString( "num_textures" );
 
     const IdString UnlitProperty::DiffuseMap            = IdString( "diffuse_map" );
     //const IdString UnlitProperty::DiffuseMap0           = IdString( "diffuse_map0" );
+    //const IdString UnlitProperty::DiffuseMap0Array      = IdString( "diffuse_map0_array" );
 
     const IdString UnlitProperty::UvDiffuse0            = IdString( "uv_diffuse0" );
     const IdString UnlitProperty::UvDiffuse1            = IdString( "uv_diffuse1" );
@@ -221,11 +223,27 @@ namespace Ogre
         const HlmsUnlitDatablock *datablock = static_cast<const HlmsUnlitDatablock*>(
                                                     queuedRenderable.renderable->getDatablock() );
 
-        int numTextures = getProperty( UnlitProperty::NumTextures );
-        for( int i=0; i<numTextures; ++i )
+        UnlitBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
+        UnlitBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();
+
+        int numTextures = 0;
+        int numArrayTextures = 0;
+        while( itor != end )
         {
-            psParams->setNamedConstant( "textureMaps[" + StringConverter::toString( i ) + "]",
-                                        texUnit++ );
+            if( itor->texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+            {
+                psParams->setNamedConstant( "textureMapsArray[" +
+                                            StringConverter::toString( numArrayTextures++ ) + "]",
+                                            texUnit++ );
+            }
+            else
+            {
+                psParams->setNamedConstant( "textureMaps[" +
+                                            StringConverter::toString( numTextures++ ) + "]",
+                                            texUnit++ );
+            }
+
+            ++itor;
         }
 
         vsParams->setNamedConstant( "worldMatBuf", 0 );
@@ -272,7 +290,26 @@ namespace Ogre
         setProperty( HlmsBaseProp::Tangent,     0 );
         setProperty( HlmsBaseProp::BonesPerVertex, 0 );
 
-        setProperty( UnlitProperty::NumTextures, datablock->mBakedTextures.size() );
+        int numTextures = 0;
+        int numArrayTextures = 0;
+
+        {
+            UnlitBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
+            UnlitBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();
+
+            while( itor != end )
+            {
+                if( itor->texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+                    ++numArrayTextures;
+                else
+                    ++numTextures;
+
+                ++itor;
+            }
+        }
+
+        setProperty( UnlitProperty::NumArrayTextures, numArrayTextures );
+        setProperty( UnlitProperty::NumTextures, numTextures );
 
         setProperty( UnlitProperty::DiffuseMap,
                      datablock->mBakedTextures.empty() ? 0 : NUM_UNLIT_TEXTURE_TYPES );
@@ -282,11 +319,14 @@ namespace Ogre
         for( uint8 i=0; i<NUM_UNLIT_TEXTURE_TYPES; ++i )
         {
             //Set whether the texture is used.
-            IdString diffuseMapN( "diffuse_map" + StringConverter::toString( i ) );
+            String diffuseMapNStr = "diffuse_map" + StringConverter::toString( i );
+            IdString diffuseMapN( diffuseMapNStr );
             setTextureProperty( diffuseMapN, datablock, i );
 
+            TexturePtr texture = datablock->getTexture( i );
+
             //Sanity check.
-            bool hasTexture = !datablock->getTexture( i ).isNull();
+            bool hasTexture = !texture.isNull();
             if( hasTexture && getProperty( *HlmsBaseProp::UvCountPtrs[datablock->mUvSource[i]] ) < 2 )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
@@ -294,6 +334,12 @@ namespace Ogre
                              StringConverter::toString( datablock->mUvSource[i] ) +
                              ". Either change the mesh, or change the UV source settings",
                              "HlmsUnlit::calculateHashForPreCreate" );
+            }
+
+            if( !texture.isNull() && texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+            {
+                IdString diffuseMapNArray( diffuseMapNStr + "_array" );
+                setProperty( diffuseMapNArray, 1 );
             }
 
             //Set the blend mode

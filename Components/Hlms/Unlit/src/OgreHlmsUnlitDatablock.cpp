@@ -300,8 +300,8 @@ namespace Ogre
             if( !textures[i].texture.isNull() )
             {
                 UnlitBakedTextureArray::const_iterator itor = std::find( mBakedTextures.begin(),
-                                                                       mBakedTextures.end(),
-                                                                       textures[i] );
+                                                                         mBakedTextures.end(),
+                                                                         textures[i] );
 
                 if( itor == mBakedTextures.end() )
                 {

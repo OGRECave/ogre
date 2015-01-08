@@ -13,20 +13,12 @@ in block
 } inPs;
 // END UNIFORM DECLARATION
 
-@property( diffuse_map )uniform sampler2DArray	textureMaps[@value( num_textures )];@end
+@property( num_array_textures )uniform sampler2DArray	textureMapsArray[@value( num_array_textures )];@end
+@property( num_textures )uniform sampler2D	textureMaps[@value( num_textures )];@end
 
 @property( diffuse )@piece( MultiplyDiffuseConst )* material.diffuse@end @end
 
 @property( diffuse_map || alpha_test )Material material;@end
-
-@piece( diffuseIdx0 )material.indices0_3.x & 0x0000FFFF@end
-@piece( diffuseIdx1 )material.indices0_3.y >> 16u@end
-@piece( diffuseIdx2 )material.indices0_3.z & 0x0000FFFFu@end
-@piece( diffuseIdx3 )material.indices0_3.w >> 16u@end
-@piece( diffuseIdx4 )material.indices4_7.x & 0x0000FFFFu@end
-@piece( diffuseIdx5 )material.indices4_7.y >> 16u@end
-@piece( diffuseIdx6 )material.indices4_7.z & 0x0000FFFFu@end
-@piece( diffuseIdx7 )material.indices4_7.w >> 16u@end
 
 void main()
 {
@@ -43,10 +35,10 @@ void main()
 
 @property( diffuse_map )@property( diffuse_map0 )
 	//Load base image
-	outColour = texture( textureMaps[@value(diffuse_map0_idx)], vec3( inPs.uv@value( uv_diffuse0 ).@insertpiece( uv_diffuse_swizzle0 ), @insertpiece( diffuseIdx0 ) ) );@end
+        outColour = texture( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) );@end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
-	vec4 topImage@n = texture( textureMaps[@value(diffuse_map@n_idx)], vec3( inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), @insertpiece( diffuseIdx@n ) ) );@end @end
+        vec4 topImage@n = texture( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) );@end @end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
 	@insertpiece( blend_mode_idx@n )@end @end

@@ -966,6 +966,8 @@ namespace Ogre {
 
         if (enabled)
         {
+            GLenum oldTexType = mTextureTypes[stage];
+
             if ( tex )
             {
                 // Note used
@@ -978,6 +980,9 @@ namespace Ogre {
             else
                 // Assume 2D.
                 mTextureTypes[stage] = GL_TEXTURE_2D;
+
+            if( oldTexType != mTextureTypes[stage] )
+                OCGE( glBindTexture( oldTexType, 0 ) );
 
             if( tex )
             {
@@ -994,7 +999,7 @@ namespace Ogre {
         else
         {
             // Bind zero texture.
-            OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
+            OGRE_CHECK_GL_ERROR(glBindTexture(mTextureTypes[stage], 0));
         }
 
         activateGLTextureUnit(0);
