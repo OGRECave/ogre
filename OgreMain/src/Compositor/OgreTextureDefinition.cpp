@@ -202,6 +202,7 @@ namespace Ogre
                                             textureDef.formatList[0], TU_RENDERTARGET, 0, hwGamma,
                                             fsaa, fsaaHint, textureDef.fsaaExplicitResolve );
             RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+            rt->setDepthBufferPool( textureDef.depthBufferId );
             newChannel.target = rt;
             newChannel.textures.push_back( tex );
         }
@@ -212,6 +213,7 @@ namespace Ogre
             PixelFormatList::const_iterator pixIt = textureDef.formatList.begin();
             PixelFormatList::const_iterator pixEn = textureDef.formatList.end();
 
+            mrt->setDepthBufferPool( textureDef.depthBufferId );
             newChannel.target = mrt;
 
             while( pixIt != pixEn )
