@@ -154,7 +154,7 @@ namespace Ogre {
         {
             // Dummy value
             mTextureCoordIndex[i] = 99;
-            mTextureTypes[i] = 0;
+            mTextureTypes[i] = GL_TEXTURE_2D;
         }
 
         mActiveRenderTarget = 0;
