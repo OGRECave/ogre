@@ -46,6 +46,20 @@ namespace Ogre
                             "OgreCompositorShadowNodeDef::addTextureSourceName" );
         }
 
+        return CompositorNodeDef::addTextureSourceName( name, mShadowMapTexDefinitions.size() + index,
+                                                        textureSource );
+    }
+    //-----------------------------------------------------------------------------------
+    IdString CompositorShadowNodeDef::addShadowTextureSourceName( const String &name, size_t index,
+                                                                  TextureSource textureSource )
+    {
+        if( textureSource == TEXTURE_INPUT )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Shadow Nodes don't support input channels!"
+                            " Shadow Node: '" + mName.getFriendlyText() + "'",
+                            "OgreCompositorShadowNodeDef::addTextureSourceName" );
+        }
+
         return CompositorNodeDef::addTextureSourceName( name, index, textureSource );
     }
     //-----------------------------------------------------------------------------------
@@ -89,7 +103,7 @@ namespace Ogre
         mNumLights += newLight;
 
         if( !isAtlas )
-            addTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
+            addShadowTextureSourceName( name, mShadowMapTexDefinitions.size(), TEXTURE_LOCAL );
         mShadowMapTexDefinitions.push_back( ShadowTextureDefinition( mDefaultTechnique, name,
                                                                      lightIdx, split ) );
         return &mShadowMapTexDefinitions.back();

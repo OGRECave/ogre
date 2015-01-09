@@ -119,6 +119,9 @@ namespace Ogre
         size_t              mMinRq; //Minimum RQ included by one of our passes
         size_t              mMaxRq; //Maximum RQ included by one of our passes
 
+        IdString addShadowTextureSourceName( const String &name, size_t index,
+                                             TextureSource textureSource );
+
     public:
         CompositorShadowNodeDef( const String &name, CompositorManager2 *compositorManager ) :
                 CompositorNodeDef( name, compositorManager ), mDefaultTechnique( SHADOWMAP_UNIFORM ),
