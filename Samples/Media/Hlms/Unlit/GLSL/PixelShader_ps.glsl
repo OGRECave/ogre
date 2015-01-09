@@ -18,11 +18,11 @@ in block
 
 @property( diffuse )@piece( MultiplyDiffuseConst )* material.diffuse@end @end
 
-@property( diffuse_map || alpha_test )Material material;@end
+@property( diffuse_map || alpha_test || diffuse )Material material;@end
 
 void main()
 {
-@property( diffuse_map || alpha_test )
+@property( diffuse_map || alpha_test || diffuse )
 	uint materialId	= instance.materialIdx[inPs.drawId];
 	material = materialArray.m[materialId];
 @end

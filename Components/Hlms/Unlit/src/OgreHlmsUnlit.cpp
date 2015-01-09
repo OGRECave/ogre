@@ -308,6 +308,8 @@ namespace Ogre
             }
         }
 
+        setProperty( UnlitProperty::Diffuse, datablock->mHasColour );
+
         setProperty( UnlitProperty::NumArrayTextures, numArrayTextures );
         setProperty( UnlitProperty::NumTextures, numTextures );
 
