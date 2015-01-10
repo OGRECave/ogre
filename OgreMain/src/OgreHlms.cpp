@@ -986,6 +986,7 @@ namespace Ogre
         if( pos != String::npos )
         {
             size_t maxSize = subString.findFirstOf( " \t(", pos + 1 );
+            maxSize = std::min( maxSize, subString.getSize() );
             SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                 subString.getStart() + maxSize );
 

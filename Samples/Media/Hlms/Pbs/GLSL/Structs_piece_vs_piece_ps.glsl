@@ -80,21 +80,21 @@ layout(binding = 1) uniform MaterialBuf
 //Uniforms that change per Item/Entity
 layout(binding = 2) uniform InstanceBuffer
 {
-@property( !hlms_shadowcaster )
+    //.x =
 	//The lower 9 bits contain the material's start index.
-	//The higher 23 bits contain the world matrix start index.
-	uint worldMaterialIdx[4096];
-@end @property( hlms_shadowcaster )
-	//It's cheaper to send the shadowConstantBias rather than
-	//sending the index to the material ID to read the bias.
-	float shadowConstantBias;
-@end
+    //The higher 23 bits contain the world matrix start index.
+    //
+    //.y =
+    //shadowConstantBias. Send the bias directly to avoid an
+    //unnecessary indirection during the shadow mapping pass.
+    //Must be loaded with uintBitsToFloat
+    uvec4 worldMaterialIdx[4096];
 } instance;
 @end
 
 @piece( VStoPS_block )
-	flat uint drawId;
-	@property( !hlms_shadowcaster )
+    @property( !hlms_shadowcaster )
+        flat uint drawId;
 		@property( hlms_normal || hlms_qtangent )
 			vec3 pos;
 			vec3 normal;

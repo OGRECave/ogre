@@ -7,19 +7,25 @@
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
+@property( !hlms_shadowcaster )
 layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
+@end @property( hlms_shadowcaster )
+layout(location = FRAG_COLOR, index = 0) out float outColour;
+@end
 
 @property( !hlms_shadowcaster )
-
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
+@end
 in block
 {
 @insertpiece( VStoPS_block )
 } inPs;
 // END UNIFORM DECLARATION
+
+@property( !hlms_shadowcaster )
 
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
@@ -162,12 +168,12 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 }
 @end
 
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), invShadowMapSize[@counter(CurrentShadowMap)] )@end @end
+@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@counter(CurrentShadowMap), pass.lights[@counter(CurrentShadowMapLight)].invShadowMapSize )@end @end
 
 void main()
 {
 @property( hlms_normal || hlms_qtangent )
-        uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FFu;
+        uint materialId	= instance.worldMaterialIdx[inPs.drawId].x & 0x1FFu;
 	material = materialArray.m[materialId];
 @property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
 @property( normal_map_tex )	normalIdx			= material.indices0_3.x >> 16u;@end
@@ -223,10 +229,11 @@ void main()
 @property( hlms_pssm_splits )
 	float fShadow = 1.0;
 	if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, invShadowMapSize[@counter(CurrentShadowMap)] );@end
+        fShadow = getShadow( texShadowMap[@counter(CurrentShadowMap)], inPs.posL0, pass.lights[0].invShadowMapSize );@end
 @foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, invShadowMapSize[@counter(CurrentShadowMap)] );
+        fShadow = getShadow( texShadowMap[@counter(CurrentShadowMap)], inPs.posL@n, pass.lights[0].invShadowMapSize );
 @end
+@set( CurrentShadowMapLight, 1 )
 
 @insertpiece( SampleDiffuseMap )
 
@@ -377,7 +384,7 @@ layout(binding=1) uniform sampler2DArray textureMaps[1];
 
 void main()
 {
-        //uint materialId	= instance.worldMaterialIdx[inPs.drawId] & 0x1FFu;
+        //uint materialId	= instance.worldMaterialIdx[inPs.drawId].x & 0x1FFu;
         //material = materialArray.m[materialId];
 	//material = materialArray.m[0];
 	//gl_FragColor = texture2D( tex, psUv0 );

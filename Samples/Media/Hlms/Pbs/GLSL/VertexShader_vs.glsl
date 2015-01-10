@@ -69,7 +69,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
 	int _idx = int(blendIndices[0] * 3);
-        uint matStart = instance.worldMaterialIdx[drawId] >> 9u;
+        uint matStart = instance.worldMaterialIdx[drawId].x >> 9u;
 	vec4 worldMat[3];
         worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0u) );
         worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1u) );
@@ -179,17 +179,18 @@ void main()
 	outVs.posL@n.z = (outVs.posL@n.z - pass.shadowRcv[@n].shadowDepthRange.x) * pass.shadowRcv[@n].shadowDepthRange.y;@end
 
 @property( hlms_pssm_splits )	outVs.depth = gl_Position.z;@end
+
+    outVs.drawId = drawId;
 @end @property( hlms_shadowcaster )
+    float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[drawId].y );
 	//Linear depth
-	outVs.depth	= (gl_Position.z - pass.depthRange.x + instance.shadowConstantBias) * pass.depthRange.y;
+    outVs.depth	= (gl_Position.z - pass.depthRange.x + shadowConstantBias) * pass.depthRange.y;
 
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	gl_Position.z = gl_Position.z * (gl_Position.w * pass.depthRange.y);
 @end
-
-	outVs.drawId = drawId;
 }
 @end
 @property( false )

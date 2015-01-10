@@ -863,7 +863,6 @@ namespace Ogre
 
             //uint worldMaterialIdx[]
             *currentMappedConstBuffer = datablock->getAssignedSlot() & 0x1FF;
-            currentMappedConstBuffer += 4;
 
             //mat4 worldViewProj
             Matrix4 tmp = mPreparedPass.viewProjMatrix * worldMat;
@@ -909,7 +908,6 @@ namespace Ogre
                 distToWorldMatStart >>= 2;
                 *currentMappedConstBuffer = (distToWorldMatStart << 9 ) |
                         (datablock->getAssignedSlot() & 0x1FF);
-                currentMappedConstBuffer += 4;
 
                 //vec4 worldMat[][3]
                 //TODO: Don't rely on a virtual function + make a direct 4x3 copy
@@ -955,7 +953,6 @@ namespace Ogre
                 distToWorldMatStart >>= 2;
                 *currentMappedConstBuffer = (distToWorldMatStart << 9 ) |
                         (datablock->getAssignedSlot() & 0x1FF);
-                currentMappedConstBuffer += 4;
 
                 RenderableAnimated::IndexMap::const_iterator itBone = indexMap->begin();
                 RenderableAnimated::IndexMap::const_iterator enBone = indexMap->end();
@@ -973,6 +970,10 @@ namespace Ogre
 #else
     #error Not Coded Yet! (cannot use memcpy on Matrix4)
 #endif
+
+        *reinterpret_cast<float * RESTRICT_ALIAS>( currentMappedConstBuffer+1 ) = datablock->
+                                                                                    mShadowConstantBias;
+        currentMappedConstBuffer += 4;
 
         //---------------------------------------------------------------------------
         //                          ---- PIXEL SHADER ----
