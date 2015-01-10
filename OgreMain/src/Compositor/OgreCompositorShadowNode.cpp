@@ -427,9 +427,9 @@ namespace Ogre
         sceneManager->_setCurrentRenderStage( previous );
     }
     //-----------------------------------------------------------------------------------
-    void CompositorShadowNode::postInitializePassScene( CompositorPassScene *pass )
+    void CompositorShadowNode::postInitializePass( CompositorPass *pass )
     {
-        const CompositorPassSceneDef *passDef = pass->getDefinition();
+        const CompositorPassDef *passDef = pass->getDefinition();
         const ShadowMapCamera &smCamera = mShadowMapCameras[passDef->mShadowMapIdx];
 
         assert( (!smCamera.camera->getLastViewport() ||
@@ -437,7 +437,12 @@ namespace Ogre
                 "Two scene passes to the same shadow map have different viewport!" );
 
         smCamera.camera->_notifyViewport( pass->getViewport() );
-        pass->_setCustomCamera( smCamera.camera );
+
+        if( passDef->getType() == PASS_SCENE )
+        {
+            assert( dynamic_cast<CompositorPassScene*>(pass) );
+            static_cast<CompositorPassScene*>(pass)->_setCustomCamera( smCamera.camera );
+        }
     }
     //-----------------------------------------------------------------------------------
     const LightList* CompositorShadowNode::setShadowMapsToPass( Renderable* rend, const Pass* pass,

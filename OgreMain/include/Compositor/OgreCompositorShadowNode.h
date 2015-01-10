@@ -168,7 +168,7 @@ namespace Ogre
         void _update(Camera* camera, const Camera *lodCamera, SceneManager *sceneManager);
 
         /// We derive so we can override the camera with ours
-        virtual void postInitializePassScene( CompositorPassScene *pass );
+        virtual void postInitializePass( CompositorPass *pass );
 
         const LightList* setShadowMapsToPass( Renderable* rend, const Pass* pass,
                                               AutoParamDataSource *autoParamDataSource,

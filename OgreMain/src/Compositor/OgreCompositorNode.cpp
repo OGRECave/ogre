@@ -374,7 +374,6 @@ namespace Ogre
                     newPass = OGRE_NEW CompositorPassScene(
                                             static_cast<CompositorPassSceneDef*>(*itPass),
                                             mWorkspace->getDefaultCamera(), *channel, this );
-                    postInitializePassScene( static_cast<CompositorPassScene*>( newPass ) );
                     break;
                 case PASS_STENCIL:
                     newPass = OGRE_NEW CompositorPassStencil(
@@ -395,6 +394,8 @@ namespace Ogre
                                 "CompositorNode::initializePasses" );
                     break;
                 }
+
+                postInitializePass( newPass );
 
                 mPasses.push_back( newPass );
                 ++itPass;

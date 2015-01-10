@@ -126,12 +126,12 @@ namespace Ogre
         */
         void disconnectOutput();
 
-        /** Called right after we create a PASS_SCENE pass. Derived
+        /** Called right after we create a pass. Derived
             classes may want to do something with it
         @param pass
             Newly created pass to toy with.
         */
-        virtual void postInitializePassScene( CompositorPassScene *pass ) {}
+        virtual void postInitializePass( CompositorPass *pass ) {}
 
     public:
         /** The Id must be unique across all engine so we can create unique named textures.

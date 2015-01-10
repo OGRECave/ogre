@@ -790,7 +790,7 @@ namespace Ogre
         if( OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( lastCacheHash ) != HLMS_PBS )
         {
             //layout(binding = 0) uniform PassBuffer {} pass
-            ConstBufferPacked *passBuffer = mPassBuffers.back();
+            ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer-1];
             *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 0, passBuffer, 0,
                                                                            passBuffer->
                                                                            getTotalSizeBytes() );
