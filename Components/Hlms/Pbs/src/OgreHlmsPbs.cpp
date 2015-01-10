@@ -789,10 +789,6 @@ namespace Ogre
 
         if( OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( lastCacheHash ) != HLMS_PBS )
         {
-            //We changed HlmsType, rebind the shared textures.
-            FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
-            FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
-
             //layout(binding = 0) uniform PassBuffer {} pass
             ConstBufferPacked *passBuffer = mPassBuffers.back();
             *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 0, passBuffer, 0,
@@ -802,6 +798,10 @@ namespace Ogre
             if( !casterPass )
             {
                 size_t texUnit = 1;
+
+                //We changed HlmsType, rebind the shared textures.
+                FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
+                FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
                 while( itor != end )
                 {
                     *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, itor->get() );

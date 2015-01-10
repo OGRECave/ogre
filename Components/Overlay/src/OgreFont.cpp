@@ -41,11 +41,9 @@ THE SOFTWARE
 
 #ifdef OGRE_BUILD_COMPONENT_HLMS_UNLIT
     #include "OgreHlmsUnlitDatablock.h"
-    #define OGRE_FONT_TEX_TYPE_2D TEX_TYPE_2D_ARRAY
     #include "OgreHardwarePixelBuffer.h"
 #else
     #include "OgreHlmsUnlitMobileDatablock.h"
-    #define OGRE_FONT_TEX_TYPE_2D TEX_TYPE_2D
 #endif
 
 #define generic _generic    // keyword for C++/CX
@@ -197,7 +195,7 @@ namespace Ogre
         else
         {
             // Manually load since we need to load to get alpha
-            mTexture = TextureManager::getSingleton().load(mSource, mGroup, OGRE_FONT_TEX_TYPE_2D, 0);
+            mTexture = TextureManager::getSingleton().load(mSource, mGroup, TEX_TYPE_2D, 0);
             blendByAlpha = mTexture->hasAlpha();
             texLayer = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(mSource);
         }
@@ -279,7 +277,7 @@ namespace Ogre
         // Create, setting isManual to true and passing self as loader
         mTexture = TextureManager::getSingleton().create(
             texName, mGroup, true, this);
-        mTexture->setTextureType(OGRE_FONT_TEX_TYPE_2D);
+        mTexture->setTextureType(TEX_TYPE_2D);
         mTexture->setNumMipmaps(0);
         mTexture->load();
 
@@ -473,33 +471,11 @@ namespace Ogre
 
         Texture* tex = static_cast<Texture*>(res);
 
-#ifdef OGRE_BUILD_COMPONENT_HLMS_UNLIT
-        tex->setWidth( img.getWidth() );
-        tex->setHeight( img.getHeight() );
-        tex->setDepth( 1 );
-        tex->setFormat( PF_BYTE_LA );
-        tex->createInternalResources();
-
-        img.generateMipmaps( false );
-        uint8 minMipmaps = std::min<uint8>( img.getNumMipmaps(), tex->getNumMipmaps() ) + 1;
-        for( uint8 j=0; j<minMipmaps; ++j )
-        {
-            v1::HardwarePixelBufferSharedPtr pixelBufferBuf = tex->getBuffer(0, j);
-            const PixelBox &currImage = pixelBufferBuf->lock( Box( 0, 0, 0,
-                                                                   pixelBufferBuf->getWidth(),
-                                                                   pixelBufferBuf->getHeight(),
-                                                                   1 ),
-                                                              v1::HardwareBuffer::HBL_DISCARD );
-            PixelUtil::bulkPixelConversion( img.getPixelBox(0, j), currImage );
-            pixelBufferBuf->unlock();
-        }
-#else
         // Call internal _loadImages, not loadImage since that's external and 
         // will determine load status etc again, and this is a manual loader inside load()
         ConstImagePtrList imagePtrs;
         imagePtrs.push_back(&img);
         tex->_loadImages( imagePtrs );
-#endif
 
         FT_Done_FreeType(ftLibrary);
     }
