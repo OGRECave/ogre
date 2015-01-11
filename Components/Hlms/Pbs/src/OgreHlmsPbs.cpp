@@ -503,6 +503,7 @@ namespace Ogre
         {
             //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
             //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
+            //              vec2 shadowRcv[numShadowMaps].invShadowMapSize +
             //mat3 invViewMatCubemap (upgraded to three vec4)
             mapSize += ( 16 + (16 + 2 + 2) * numShadowMaps + 4 * 3 ) * 4;
             mapSize += numPssmSplits * 4;
@@ -510,8 +511,8 @@ namespace Ogre
 
             if( shadowNode )
             {
-                //Seven variables * 4 (padded vec3) * 4 (bytes) * numLights
-                mapSize += ( 7 * 4 * 4 ) * numLights;
+                //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
+                mapSize += ( 6 * 4 * 4 ) * numLights;
             }
             else
             {
@@ -565,6 +566,7 @@ namespace Ogre
             {
                 //mat4 shadowRcv[numShadowMaps].texViewProj
                 Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( i );
+                viewProjTex = viewProjTex.transpose();
                 for( size_t j=0; j<16; ++j )
                     *passBufferPtr++ = (float)viewProjTex[0][j];
 
@@ -575,7 +577,14 @@ namespace Ogre
                 *passBufferPtr++ = fNear;
                 *passBufferPtr++ = 1.0f / depthRange;
 
-                passBufferPtr += 2; //Padding
+
+                //vec2 shadowRcv[numShadowMaps].invShadowMapSize
+                //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
+                //changes need to be done so that UV calculations land on the right place
+                uint32 texWidth  = shadowNode->getLocalTextures()[i].textures[0]->getWidth();
+                uint32 texHeight = shadowNode->getLocalTextures()[i].textures[0]->getHeight();
+                *passBufferPtr++ = 1.0f / texWidth;
+                *passBufferPtr++ = 1.0f / texHeight;
             }
 
             //---------------------------------------------------------------------------
@@ -664,23 +673,6 @@ namespace Ogre
                     *passBufferPtr++ = cosf( outerAngle.valueRadians() * 0.5f );
                     *passBufferPtr++ = lights[i].light->getSpotlightFalloff();
                     ++passBufferPtr;
-
-                    if( (size_t)i < shadowNode->getLocalTextures().size() )
-                    {
-                        //vec2 lights[numLights].invShadowMapSize
-                        //TODO: textures[0] is out of bounds when using shadow atlas. Also see how what
-                        //changes need to be done so that UV calculations land on the right place
-                        uint32 texWidth  = shadowNode->getLocalTextures()[i].textures[0]->getWidth();
-                        uint32 texHeight = shadowNode->getLocalTextures()[i].textures[0]->getHeight();
-                        *passBufferPtr++ = 1.0f / texWidth;
-                        *passBufferPtr++ = 1.0f / texHeight;
-                        passBufferPtr += 2;
-                    }
-                    else
-                    {
-                        //If we have 3 directional lights and two shadow mapped lights, this is possible.
-                        passBufferPtr += 4;
-                    }
                 }
 
                 mPreparedPass.shadowMaps.clear();

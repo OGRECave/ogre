@@ -168,7 +168,7 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 }
 @end
 
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@counter(CurrentShadowMap), pass.lights[@counter(CurrentShadowMapLight)].invShadowMapSize )@end @end
+@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
 void main()
 {
@@ -227,13 +227,14 @@ void main()
 @end
 
 @property( hlms_pssm_splits )
-	float fShadow = 1.0;
-	if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-        fShadow = getShadow( texShadowMap[@counter(CurrentShadowMap)], inPs.posL0, pass.lights[0].invShadowMapSize );@end
+    float fShadow = 1.0;
+    if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
+        fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-        fShadow = getShadow( texShadowMap[@counter(CurrentShadowMap)], inPs.posL@n, pass.lights[0].invShadowMapSize );
+        fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps )
+    float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end
-@set( CurrentShadowMapLight, 1 )
 
 @insertpiece( SampleDiffuseMap )
 

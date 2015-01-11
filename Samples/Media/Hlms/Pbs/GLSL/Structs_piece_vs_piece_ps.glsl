@@ -3,6 +3,7 @@ struct ShadowReceiverData
 {
     mat4 texViewProj;
 	vec2 shadowDepthRange;
+    vec2 invShadowMapSize;
 };
 
 struct Light
@@ -14,8 +15,6 @@ struct Light
 	vec3 attenuation;
 	vec3 spotDirection;
 	vec3 spotParams;
-
-	vec2 invShadowMapSize;
 @end
 };
 

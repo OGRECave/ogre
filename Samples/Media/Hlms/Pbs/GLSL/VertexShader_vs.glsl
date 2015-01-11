@@ -154,7 +154,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @end
 @piece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-    outVs.posL@n = pass.shadowRcv[@n].texViewProj * worldPos;@end
+    outVs.posL@n = pass.shadowRcv[@n].texViewProj * vec4(worldPos.xyz, 1.0f);@end
 @end
 
 void main()
