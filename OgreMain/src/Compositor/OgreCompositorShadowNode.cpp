@@ -580,7 +580,7 @@ namespace Ogre
     {
         return PROJECTIONCLIPSPACE2DTOIMAGESPACE_PERSPECTIVE *
                 mShadowMapCameras[shadowMapIdx].camera->getProjectionMatrixWithRSDepth() *
-                mShadowMapCameras[shadowMapIdx].camera->getViewMatrix();
+                mShadowMapCameras[shadowMapIdx].camera->getViewMatrix( true );
     }
     //-----------------------------------------------------------------------------------
     const vector<Real>::type* CompositorShadowNode::getPssmSplits( size_t shadowMapIdx ) const

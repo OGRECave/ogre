@@ -90,7 +90,6 @@ namespace Ogre
         mLastVaoName( 0 ),
         mLastVertexData( 0 ),
         mLastIndexData( 0 ),
-        mLastHlmsCache( &c_dummyCache ),
         mLastTextureHash( 0 ),
         mCommandBuffer( 0 )
     {
@@ -193,7 +192,6 @@ namespace Ogre
         mLastVaoName    = 0;
         mLastVertexData = 0;
         mLastIndexData  = 0;
-        mLastHlmsCache  = &c_dummyCache;
         mLastTextureHash= 0;
     }
     //-----------------------------------------------------------------------
@@ -455,8 +453,8 @@ namespace Ogre
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
         v1::VertexData const *lastVertexData = mLastVertexData;
         v1::IndexData const *lastIndexData = mLastIndexData;
-        HlmsCache const *lastHlmsCache = mLastHlmsCache;
-        uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
+        HlmsCache const *lastHlmsCache = &c_dummyCache;
+        uint32 lastHlmsCacheHash = 0;
         uint32 lastTextureHash = mLastTextureHash;
         //uint32 lastVertexDataId = ~0;
 
@@ -520,7 +518,6 @@ namespace Ogre
         mLastBlendblock     = lastBlendblock;
         mLastVertexData     = lastVertexData;
         mLastIndexData      = lastIndexData;
-        mLastHlmsCache      = lastHlmsCache;
         mLastTextureHash    = lastTextureHash;
     }
     //-----------------------------------------------------------------------
@@ -534,8 +531,8 @@ namespace Ogre
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
         VertexArrayObject *lastVao = 0;
         uint32 lastVaoName = mLastVaoName;
-        HlmsCache const *lastHlmsCache = mLastHlmsCache;
-        uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
+        HlmsCache const *lastHlmsCache = &c_dummyCache;
+        uint32 lastHlmsCacheHash = 0;
 
         bool supportsIndirectBuffers = mVaoManager->supportsIndirectBuffers();
 
@@ -669,7 +666,6 @@ namespace Ogre
         mLastVaoName        = lastVaoName;
         mLastVertexData     = 0;
         mLastIndexData      = 0;
-        mLastHlmsCache      = lastHlmsCache;
         mLastTextureHash    = 0;
     }
     //-----------------------------------------------------------------------
@@ -680,8 +676,8 @@ namespace Ogre
         HlmsMacroblock const *lastMacroblock = mLastMacroblock;
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
         v1::RenderOperation lastRenderOp;
-        HlmsCache const *lastHlmsCache = mLastHlmsCache;
-        uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
+        HlmsCache const *lastHlmsCache = &c_dummyCache;
+        uint32 lastHlmsCacheHash = 0;
 
         v1::CbDrawCall *drawCmd = 0;
 
@@ -796,7 +792,6 @@ namespace Ogre
         mLastVaoName        = 0;
         mLastVertexData     = 0;
         mLastIndexData      = 0;
-        mLastHlmsCache      = lastHlmsCache;
         mLastTextureHash    = 0;
     }
     //-----------------------------------------------------------------------
@@ -842,17 +837,12 @@ namespace Ogre
             mLastIndexData = op.indexData;
         }
 
-        uint32 lastHlmsCacheHash = mLastHlmsCache->hash;
-        const HlmsCache *hlmsCache = hlms->getMaterial( mLastHlmsCache, passCache,
+        const HlmsCache *hlmsCache = hlms->getMaterial( &c_dummyCache, passCache,
                                                         queuedRenderable, casterPass );
-        if( lastHlmsCacheHash != hlmsCache->hash )
-        {
-            rs->_setProgramsFromHlms( hlmsCache );
-            mLastHlmsCache = hlmsCache;
-        }
+        rs->_setProgramsFromHlms( hlmsCache );
 
         mLastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
-                                                 lastHlmsCacheHash, mLastTextureHash );
+                                                 0, mLastTextureHash );
 
         rs->_render( op );
 

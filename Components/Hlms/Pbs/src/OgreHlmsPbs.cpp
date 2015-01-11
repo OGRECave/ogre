@@ -250,8 +250,8 @@ namespace Ogre
         {
             vector<int>::type shadowMaps;
             shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
-            for( texUnit=0; texUnit<(int)mPreparedPass.shadowMaps.size(); ++texUnit )
-                shadowMaps.push_back( texUnit );
+            for( size_t i=0; i<(int)mPreparedPass.shadowMaps.size(); ++i )
+                shadowMaps.push_back( texUnit++ );
 
             psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
         }

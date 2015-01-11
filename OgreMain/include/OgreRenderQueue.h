@@ -154,7 +154,6 @@ namespace Ogre {
         uint32                  mLastVaoName;
         v1::VertexData const    *mLastVertexData;
         v1::IndexData const     *mLastIndexData;
-        HlmsCache const         *mLastHlmsCache;
         uint32                  mLastTextureHash;
 
         CommandBuffer           *mCommandBuffer;
