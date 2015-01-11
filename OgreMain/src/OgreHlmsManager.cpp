@@ -36,7 +36,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    HlmsManager::HlmsManager() : mRenderSystem( 0 ), mTextureManager( 0 ), mDefaultHlmsType( HLMS_PBS )
+    HlmsManager::HlmsManager() :
+        mRenderSystem( 0 ),
+        mShadowMappingUseBackFaces( true ),
+        mTextureManager( 0 ),
+        mDefaultHlmsType( HLMS_PBS )
     {
         memset( mRegisteredHlms, 0, sizeof( mRegisteredHlms ) );
         memset( mDeleteRegisteredOnExit, 0, sizeof( mDeleteRegisteredOnExit ) );
@@ -406,6 +410,20 @@ namespace Ogre
             if( mDeleteRegisteredOnExit[type] )
                 OGRE_DELETE mRegisteredHlms[type];
             mRegisteredHlms[type] = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::setShadowMappingUseBackFaces( bool useBackFaces )
+    {
+        if( mShadowMappingUseBackFaces != useBackFaces )
+        {
+            mShadowMappingUseBackFaces = useBackFaces;
+
+            for( int i=0; i<HLMS_MAX; ++i )
+            {
+                if( mRegisteredHlms[i] )
+                    mRegisteredHlms[i]->_notifyShadowMappingBackFaceSetting();
+            }
         }
     }
     //-----------------------------------------------------------------------------------

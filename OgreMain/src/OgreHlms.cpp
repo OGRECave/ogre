@@ -1722,6 +1722,20 @@ namespace Ogre
         mOutputPath		= path;
     }
     //-----------------------------------------------------------------------------------
+    void Hlms::_notifyShadowMappingBackFaceSetting(void)
+    {
+        HlmsDatablockMap::const_iterator itor = mDatablocks.begin();
+        HlmsDatablockMap::const_iterator end  = mDatablocks.end();
+
+        while( itor != end )
+        {
+            HlmsDatablock *datablock = itor->second.datablock;
+            datablock->setMacroblock( datablock->getMacroblock( false ), false );
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::_changeRenderSystem( RenderSystem *newRs )
     {
         clearShaderCache();

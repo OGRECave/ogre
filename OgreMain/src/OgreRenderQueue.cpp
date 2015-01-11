@@ -223,9 +223,9 @@ namespace Ogre
         uint32 hlmsHash = casterPass ? pRend->getHlmsCasterHash() : pRend->getHlmsHash();
         const HlmsDatablock *datablock = pRend->getDatablock();
 
-        bool transparent = datablock->mBlendblock->mIsTransparent;
+        bool transparent = datablock->mBlendblock[casterPass]->mIsTransparent;
 
-        uint16 macroblock = datablock->mMacroblockHash;
+        uint16 macroblock = datablock->mMacroblockHash[casterPass];
         uint16 texturehash= datablock->mTextureHash;
 
         //Flip the float to deal with negative & positive numbers
@@ -472,16 +472,16 @@ namespace Ogre
                                            queuedRenderable.renderable->getHlmsHash();*/
             const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
 
-            if( lastMacroblock != datablock->mMacroblock )
+            if( lastMacroblock != datablock->mMacroblock[casterPass] )
             {
-                rs->_setHlmsMacroblock( datablock->mMacroblock );
-                lastMacroblock = datablock->mMacroblock;
+                rs->_setHlmsMacroblock( datablock->mMacroblock[casterPass] );
+                lastMacroblock = datablock->mMacroblock[casterPass];
             }
 
-            if( lastBlendblock != datablock->mBlendblock )
+            if( lastBlendblock != datablock->mBlendblock[casterPass] )
             {
-                rs->_setHlmsBlendblock( datablock->mBlendblock );
-                lastBlendblock = datablock->mBlendblock;
+                rs->_setHlmsBlendblock( datablock->mBlendblock[casterPass] );
+                lastBlendblock = datablock->mBlendblock[casterPass];
             }
 
             if( lastVertexData != op.vertexData )
@@ -555,18 +555,18 @@ namespace Ogre
             VertexArrayObject *vao = vaos[meshLod];
             const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
 
-            if( lastMacroblock != datablock->mMacroblock )
+            if( lastMacroblock != datablock->mMacroblock[casterPass] )
             {
                 CbMacroblock *blockCmd = mCommandBuffer->addCommand<CbMacroblock>();
-                *blockCmd = CbMacroblock( datablock->mMacroblock );
-                lastMacroblock = datablock->mMacroblock;
+                *blockCmd = CbMacroblock( datablock->mMacroblock[casterPass] );
+                lastMacroblock = datablock->mMacroblock[casterPass];
             }
 
-            if( lastBlendblock != datablock->mBlendblock )
+            if( lastBlendblock != datablock->mBlendblock[casterPass] )
             {
                 CbBlendblock *blockCmd = mCommandBuffer->addCommand<CbBlendblock>();
-                *blockCmd = CbBlendblock( datablock->mBlendblock );
-                lastBlendblock = datablock->mBlendblock;
+                *blockCmd = CbBlendblock( datablock->mBlendblock[casterPass] );
+                lastBlendblock = datablock->mBlendblock[casterPass];
             }
 
             Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
@@ -695,18 +695,18 @@ namespace Ogre
 
             const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
 
-            if( lastMacroblock != datablock->mMacroblock )
+            if( lastMacroblock != datablock->mMacroblock[casterPass] )
             {
                 CbMacroblock *blockCmd = mCommandBuffer->addCommand<CbMacroblock>();
-                *blockCmd = CbMacroblock( datablock->mMacroblock );
-                lastMacroblock = datablock->mMacroblock;
+                *blockCmd = CbMacroblock( datablock->mMacroblock[casterPass] );
+                lastMacroblock = datablock->mMacroblock[casterPass];
             }
 
-            if( lastBlendblock != datablock->mBlendblock )
+            if( lastBlendblock != datablock->mBlendblock[casterPass] )
             {
                 CbBlendblock *blockCmd = mCommandBuffer->addCommand<CbBlendblock>();
-                *blockCmd = CbBlendblock( datablock->mBlendblock );
-                lastBlendblock = datablock->mBlendblock;
+                *blockCmd = CbBlendblock( datablock->mBlendblock[casterPass] );
+                lastBlendblock = datablock->mBlendblock[casterPass];
             }
 
             Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( datablock->mType ) );
@@ -816,16 +816,16 @@ namespace Ogre
         /*uint32 hlmsHash = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                        queuedRenderable.renderable->getHlmsHash();*/
 
-        if( mLastMacroblock != datablock->mMacroblock )
+        if( mLastMacroblock != datablock->mMacroblock[casterPass] )
         {
-            rs->_setHlmsMacroblock( datablock->mMacroblock );
-            mLastMacroblock = datablock->mMacroblock;
+            rs->_setHlmsMacroblock( datablock->mMacroblock[casterPass] );
+            mLastMacroblock = datablock->mMacroblock[casterPass];
         }
 
-        if( mLastBlendblock != datablock->mBlendblock )
+        if( mLastBlendblock != datablock->mBlendblock[casterPass] )
         {
-            rs->_setHlmsBlendblock( datablock->mBlendblock );
-            mLastBlendblock = datablock->mBlendblock;
+            rs->_setHlmsBlendblock( datablock->mBlendblock[casterPass] );
+            mLastBlendblock = datablock->mBlendblock[casterPass];
         }
 
         if( mLastVertexData != op.vertexData )

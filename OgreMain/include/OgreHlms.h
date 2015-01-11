@@ -478,6 +478,9 @@ namespace Ogre
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
 
+        /// Internal use. @see HlmsManager::setShadowMappingUseBackFaces
+        void _notifyShadowMappingBackFaceSetting(void);
+
         virtual void _changeRenderSystem( RenderSystem *newRs );
 
         RenderSystem* getRenderSystem(void) const           { return mRenderSystem; }

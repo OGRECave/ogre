@@ -746,7 +746,6 @@ namespace Ogre {
         v1::Rectangle2D* mFullScreenQuad;
         Real mShadowDirLightExtrudeDist;
         IlluminationRenderStage mIlluminationStage;
-        bool mShadowCasterRenderBackFaces;
         /// Struct for caching light clipping information for re-use in a frame
         struct LightClippingInfo
         {
@@ -2601,23 +2600,6 @@ namespace Ogre {
             techniques may be used for hardware fallback.
         */
         virtual void setShadowTextureCasterMaterial(const String& name);
-
-        /** Sets whether or not shadow casters should be rendered into shadow
-            textures using their back faces rather than their front faces. 
-        @remarks
-            Rendering back faces rather than front faces into a shadow texture
-            can help minimise depth comparison issues, if you're using depth
-            shadowmapping. You will probably still need some biasing but you
-            won't need as much. For solid objects the result is the same anyway,
-            if you have objects with holes you may want to turn this option off.
-            The default is to enable this option.
-        */
-        virtual void setShadowCasterRenderBackFaces(bool bf) { mShadowCasterRenderBackFaces = bf; }
-
-        /** Gets whether or not shadow casters should be rendered into shadow
-            textures using their back faces rather than their front faces. 
-        */
-        virtual bool getShadowCasterRenderBackFaces() const { return mShadowCasterRenderBackFaces; }
 
         void _setCurrentShadowNode( CompositorShadowNode *shadowNode );
         const CompositorShadowNode* getCurrentShadowNode(void) const    { return mCurrentShadowNode; }

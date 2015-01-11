@@ -80,14 +80,22 @@ namespace Ogre
         mCreator( creator ),
         mName( name ),
         mTextureHash( 0 ),
-        mMacroblockHash( (((macroblock->mId) & 0x1F) << 5) | (blendblock->mId & 0x1F) ),
         mType( creator->getType() ),
-        mMacroblock( macroblock ),
-        mBlendblock( blendblock ),
         mAlphaTestCmp( CMPF_ALWAYS_PASS ),
         mAlphaTestThreshold( 0.5f ),
         mShadowConstantBias( 0.01f )
     {
+        mMacroblockHash[0] = mMacroblockHash[1] = 0;
+        mMacroblock[0] = mMacroblock[1] = 0;
+        mBlendblock[0] = mBlendblock[1] = 0;
+        setMacroblock( macroblock, false );
+        setBlendblock( blendblock, false );
+
+        //The two previous calls increased the ref. counts by one more than what we need. Correct.
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        hlmsManager->destroyMacroblock( macroblock );
+        hlmsManager->destroyBlendblock( blendblock );
+
         String paramVal;
         if( Hlms::findParamInVec( params, HlmsBaseProp::AlphaTest, paramVal ) )
         {
@@ -146,49 +154,99 @@ namespace Ogre
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         if( hlmsManager )
         {
-            hlmsManager->destroyMacroblock( mMacroblock );
-            hlmsManager->destroyBlendblock( mBlendblock );
+            for( int i=0; i<2; ++i )
+            {
+                hlmsManager->destroyMacroblock( mMacroblock[i] );
+                hlmsManager->destroyBlendblock( mBlendblock[i] );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsDatablock::setMacroblock( const HlmsMacroblock &macroblock )
+    void HlmsDatablock::setMacroblock( const HlmsMacroblock &macroblock, bool casterBlock )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
-        const HlmsMacroblock *oldBlock = mMacroblock;
-        mMacroblock = hlmsManager->getMacroblock( macroblock );
+        const HlmsMacroblock *oldBlock = mMacroblock[casterBlock];
+        mMacroblock[casterBlock] = hlmsManager->getMacroblock( macroblock );
 
-        hlmsManager->destroyMacroblock( oldBlock );
+        if( oldBlock )
+            hlmsManager->destroyMacroblock( oldBlock );
+        updateMacroblockHash( casterBlock );
+
+        if( !casterBlock )
+        {
+            bool useBackFaces = mCreator->getHlmsManager()->getShadowMappingUseBackFaces();
+
+            if( useBackFaces && macroblock.mCullMode != CULL_NONE )
+            {
+                HlmsMacroblock casterblock = macroblock;
+                casterblock.mCullMode = macroblock.mCullMode == CULL_CLOCKWISE ? CULL_ANTICLOCKWISE :
+                                                                                 CULL_CLOCKWISE;
+                setMacroblock( casterblock, true );
+            }
+            else
+            {
+                setMacroblock( mMacroblock[0], true );
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsDatablock::setMacroblock( const HlmsMacroblock *macroblock )
+    void HlmsDatablock::setMacroblock( const HlmsMacroblock *macroblock, bool casterBlock )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
         hlmsManager->addReference( macroblock );
-        if( mMacroblock )
-            hlmsManager->destroyMacroblock( mMacroblock );
-        mMacroblock = macroblock;
+        if( mMacroblock[casterBlock] )
+            hlmsManager->destroyMacroblock( mMacroblock[casterBlock] );
+        mMacroblock[casterBlock] = macroblock;
+
+        updateMacroblockHash( casterBlock );
+
+        if( !casterBlock )
+        {
+            bool useBackFaces = mCreator->getHlmsManager()->getShadowMappingUseBackFaces();
+
+            if( useBackFaces && macroblock->mCullMode != CULL_NONE )
+            {
+                HlmsMacroblock casterblock = *macroblock;
+                casterblock.mCullMode = macroblock->mCullMode == CULL_CLOCKWISE ? CULL_ANTICLOCKWISE :
+                                                                                  CULL_CLOCKWISE;
+                setMacroblock( casterblock, true );
+            }
+            else
+            {
+                setMacroblock( mMacroblock[0], true );
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsDatablock::setBlendblock( const HlmsBlendblock &blendblock )
+    void HlmsDatablock::setBlendblock( const HlmsBlendblock &blendblock, bool casterBlock )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
-        const HlmsBlendblock *oldBlock = mBlendblock;
-        mBlendblock = hlmsManager->getBlendblock( blendblock );
+        const HlmsBlendblock *oldBlock = mBlendblock[casterBlock];
+        mBlendblock[casterBlock] = hlmsManager->getBlendblock( blendblock );
 
-        hlmsManager->destroyBlendblock( oldBlock );
+        if( oldBlock )
+            hlmsManager->destroyBlendblock( oldBlock );
+        updateMacroblockHash( casterBlock );
+
+        if( !casterBlock )
+            setBlendblock( mBlendblock[0], true );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsDatablock::setBlendblock( const HlmsBlendblock *blendblock )
+    void HlmsDatablock::setBlendblock( const HlmsBlendblock *blendblock, bool casterBlock )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
         hlmsManager->addReference( blendblock );
-        if( mBlendblock )
-            hlmsManager->destroyBlendblock( mBlendblock );
-        mBlendblock = blendblock;
+        if( mBlendblock[casterBlock] )
+            hlmsManager->destroyBlendblock( mBlendblock[casterBlock] );
+        mBlendblock[casterBlock] = blendblock;
+        updateMacroblockHash( casterBlock );
+
+        if( !casterBlock )
+            setBlendblock( mBlendblock[0], true );
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setAlphaTest( CompareFunction compareFunction )
@@ -243,6 +301,18 @@ namespace Ogre
             (*itor)->mHlmsGlobalIndex = itor - mLinkedRenderables.begin();
 
         renderable->mHlmsGlobalIndex = ~0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsDatablock::updateMacroblockHash( bool casterPass )
+    {
+        uint16 macroId = 0;
+        uint16 blendId = 0;
+
+        if( mMacroblock[casterPass] )
+            macroId = mMacroblock[casterPass]->mId;
+        if( mBlendblock[casterPass] )
+            blendId = mBlendblock[casterPass]->mId;
+        mMacroblockHash[casterPass] = ((macroId & 0x1F) << 5) | (blendId & 0x1F);
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::flushRenderables(void)

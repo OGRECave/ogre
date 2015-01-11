@@ -179,6 +179,12 @@ namespace Ogre
     @par
         If you need to change a macroblock, create a new one (HlmsManager keeps them cached
         if already created) and change the entire pointer.
+    @par
+        Each datablock has a pair of macroblocks and blendblocks. One of is for the regular passes,
+        the other is for shadow mapping passes, since often you don't want them to be the same.
+        Shadow mapping often wants to reverse culling (@see HlmsManager::setShadowMappingUseBackFaces)
+        or use some depth bias. As for blendblocks, with transparent objects you may want to
+        turn off alpha blending, but enable alpha testing instead.
     */
     class _OgreExport HlmsDatablock : public PassAlloc
     {
@@ -200,13 +206,15 @@ namespace Ogre
         */
         void flushRenderables(void);
 
+        void updateMacroblockHash( bool casterPass );
+
     public:
         uint32  mTextureHash;       //TextureHash comes before macroblock for alignment reasons
-        uint16  mMacroblockHash;    //Not all bits are used
+        uint16  mMacroblockHash[2]; //Not all bits are used
         uint8   mType;              /// @See HlmsTypes
     protected:
-        HlmsMacroblock const *mMacroblock;
-        HlmsBlendblock const *mBlendblock;
+        HlmsMacroblock const *mMacroblock[2];
+        HlmsBlendblock const *mBlendblock[2];
 
         uint8   mAlphaTestCmp;  /// @see CompareFunction
         float   mAlphaTestThreshold;
@@ -231,35 +239,51 @@ namespace Ogre
             Runs an O(N) search to get the right block.
         @param macroblock
             @See HlmsManager::getMacroblock
+        @param casterBlock
+            True to directly set the macroblock to be used during the shadow mapping's caster pass.
+            Note that when false, it will automatically reset the caster's block according to
+            HlmsManager::setShadowMappingUseBackFaces setting.
         */
-        void setMacroblock( const HlmsMacroblock &macroblock );
+        void setMacroblock( const HlmsMacroblock &macroblock, bool casterBlock = false );
 
         /** Sets the macroblock from the given pointer that was already
             retrieved from the HlmsManager. Unlike the other overload,
             this operation is O(1).
         @param macroblock
             A valid block. The reference count is increased inside this function.
+        @param casterBlock
+            True to directly set the macroblock to be used during the shadow mapping's caster pass.
+            Note that when false, it will automatically reset the caster's block according to
+            HlmsManager::setShadowMappingUseBackFaces setting.
         */
-        void setMacroblock( const HlmsMacroblock *macroblock );
+        void setMacroblock( const HlmsMacroblock *macroblock, bool casterBlock = false );
 
         /** Sets a new blendblock that matches the same parameter as the input.
             Decreases the reference count of the previous mBlendblock.
             Runs an O(N) search to get the right block.
         @param blendblock
             @See HlmsManager::getBlendblock
+        @param casterBlock
+            True to directly set the blendblock to be used during the shadow mapping's caster pass.
+            Note that when false, it will reset the caster block to the same as the regular one.
         */
-        void setBlendblock( const HlmsBlendblock &blendblock );
+        void setBlendblock( const HlmsBlendblock &blendblock, bool casterBlock = false );
 
         /** Sets the blendblock from the given pointer that was already
             retrieved from the HlmsManager. Unlike the other overload,
             this operation is O(1).
         @param blendblock
             A valid block. The reference count is increased inside this function.
+        @param casterBlock
+            True to directly set the blendblock to be used during the shadow mapping's caster pass.
+            Note that when false, it will reset the caster block to the same as the regular one.
         */
-        void setBlendblock( const HlmsBlendblock *blendblock );
+        void setBlendblock( const HlmsBlendblock *blendblock, bool casterBlock = false );
 
-        const HlmsMacroblock* getMacroblock(void) const                 { return mMacroblock; }
-        const HlmsBlendblock* getBlendblock(void) const                 { return mBlendblock; }
+        const HlmsMacroblock* getMacroblock( bool casterBlock=false ) const
+                                                                { return mMacroblock[casterBlock]; }
+        const HlmsBlendblock* getBlendblock( bool casterBlock=false ) const
+                                                                { return mBlendblock[casterBlock]; }
 
         /** Sets the alpha test to the given compare function. CMPF_ALWAYS_PASS means disabled.
             @see mAlphaTestThreshold.

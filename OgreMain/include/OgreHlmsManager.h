@@ -64,6 +64,7 @@ namespace Ogre
         BasicBlock          *mBlocks[NUM_BASIC_BLOCKS][OGRE_HLMS_MAX_BASIC_BLOCKS];
 
         RenderSystem        *mRenderSystem;
+        bool                mShadowMappingUseBackFaces;
 
         HlmsTextureManager  *mTextureManager;
 
@@ -191,6 +192,20 @@ namespace Ogre
         /// Unregisters an HLMS provider of the given type. Does nothing if no provider was registered.
         /// @See registerHlms for details.
         void unregisterHlms( HlmsTypes type );
+
+        /** Sets whether or not shadow casters should be rendered into shadow
+            textures using their back faces rather than their front faces.
+        @remarks
+            Rendering back faces rather than front faces into a shadow texture
+            can help minimise depth comparison issues, if you're using depth
+            shadowmapping. You will probably still need some biasing but you
+            won't need as much. For solid objects the result is the same anyway,
+            if you have objects with holes you may want to turn this option off.
+            The default is to enable this option.
+        */
+        void setShadowMappingUseBackFaces( bool useBackFaces );
+
+        bool getShadowMappingUseBackFaces(void)             { return mShadowMappingUseBackFaces; }
 
         void _changeRenderSystem( RenderSystem *newRs );
     };
