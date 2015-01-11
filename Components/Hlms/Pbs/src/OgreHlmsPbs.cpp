@@ -552,7 +552,6 @@ namespace Ogre
         for( size_t i=0; i<16; ++i )
             *passBufferPtr++ = (float)tmp[0][i];
 
-        mPreparedPass.viewProjMatrix    = viewProjMatrix;
         mPreparedPass.viewMatrix        = viewMatrix;
 
         if( !casterPass )
@@ -683,6 +682,11 @@ namespace Ogre
                         passBufferPtr += 4;
                     }
                 }
+
+                mPreparedPass.shadowMaps.clear();
+                mPreparedPass.shadowMaps.reserve( numShadowMaps );
+                for( int32 i=0; i<numShadowMaps; ++i )
+                    mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
             }
             else
             {

@@ -342,7 +342,7 @@ void main()
 	//Linear to Gamma space
 	outColour.xyz	= sqrt( finalColour );
 @end @property( hw_gamma_write )
-	outColour.xyz	= finalColour;
+    outColour.xyz	= finalColour;
 @end
 	outColour.w		= 1.0;
 @end @property( !hlms_normal && !hlms_qtangent )

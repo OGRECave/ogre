@@ -62,7 +62,6 @@ namespace Ogre
             FastArray<float>    vertexShaderSharedBuffer;
             FastArray<float>    pixelShaderSharedBuffer;
 
-            Matrix4 viewProjMatrix;
             Matrix4 viewMatrix;
         };
 
