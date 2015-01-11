@@ -17,6 +17,17 @@ mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
 				 row0.w, row1.w, row2.w, row3.w );
 }
 
+mat4x3 UNPACK_MAT4x3( samplerBuffer matrixBuf, uint pixelIdx )
+{
+        vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
+        vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 1u) );
+        vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 2u) );
+        return mat4x3( row0.x, row1.x, row2.x,
+                       row0.y, row1.y, row2.y,
+                       row0.z, row1.z, row2.z,
+                       row0.w, row1.w, row2.w );
+}
+
 layout(std140) uniform;
 
 in vec4 vertex;
@@ -62,9 +73,9 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @piece( local_tangent )tangent@end
 @end
 @property( hlms_skeleton )
-@piece( local_vertex )_localPos@end
-@piece( local_normal )_localNorm@end
-@piece( local_tangent )_localTang@end
+@piece( local_vertex )worldPos@end
+@piece( local_normal )worldNorm@end
+@piece( local_tangent )worldTang@end
 @end
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
@@ -74,21 +85,21 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
         worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0u) );
         worldMat[1] = texelFetch( worldMatBuf, int(matStart + _idx + 1u) );
         worldMat[2] = texelFetch( worldMatBuf, int(matStart + _idx + 2u) );
-	vec4 _localPos;
-	_localPos.x = dot( worldMat[0], vertex );
-	_localPos.y = dot( worldMat[1], vertex );
-	_localPos.z = dot( worldMat[2], vertex );
-	_localPos *= blendWeights[0];
-	@property( hlms_normal || hlms_qtangent )vec3 _localNorm;
-	_localNorm.x = dot( worldMat[0].xyz, normal );
-	_localNorm.y = dot( worldMat[1].xyz, normal );
-	_localNorm.z = dot( worldMat[2].xyz, normal );
-	_localNorm *= blendWeights[0];@end
-	@property( normal_map )vec3 _localTang;
-	_localTang.x = dot( worldMat[0].xyz, tangent );
-	_localTang.y = dot( worldMat[1].xyz, tangent );
-	_localTang.z = dot( worldMat[2].xyz, tangent );
-	_localTang *= blendWeights[0];@end
+    vec4 worldPos;
+    worldPos.x = dot( worldMat[0], vertex );
+    worldPos.y = dot( worldMat[1], vertex );
+    worldPos.z = dot( worldMat[2], vertex );
+    worldPos *= blendWeights[0];
+    @property( hlms_normal || hlms_qtangent )vec3 worldNorm;
+    worldNorm.x = dot( worldMat[0].xyz, normal );
+    worldNorm.y = dot( worldMat[1].xyz, normal );
+    worldNorm.z = dot( worldMat[2].xyz, normal );
+    worldNorm *= blendWeights[0];@end
+    @property( normal_map )vec3 worldTang;
+    worldTang.x = dot( worldMat[0].xyz, tangent );
+    worldTang.y = dot( worldMat[1].xyz, tangent );
+    worldTang.z = dot( worldMat[2].xyz, tangent );
+    worldTang *= blendWeights[0];@end
 
 	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
 	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;@end
@@ -100,28 +111,26 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	tmp.x = dot( worldMat[0], vertex );
 	tmp.y = dot( worldMat[1], vertex );
 	tmp.z = dot( worldMat[2], vertex );
-	_localPos += tmp * blendWeights[@n];
+    worldPos += tmp * blendWeights[@n];
 	@property( hlms_normal || hlms_qtangent )
 	tmp.x = dot( worldMat[0].xyz, normal );
 	tmp.y = dot( worldMat[1].xyz, normal );
 	tmp.z = dot( worldMat[2].xyz, normal );
-	_localNorm += tmp.xyz * blendWeights[@n];@end
+    worldNorm += tmp.xyz * blendWeights[@n];@end
 	@property( normal_map )
 	tmp.x = dot( worldMat[0].xyz, tangent );
 	tmp.y = dot( worldMat[1].xyz, tangent );
 	tmp.z = dot( worldMat[2].xyz, tangent );
-	_localTang += tmp.xyz * blendWeights[@n];@end
+    worldTang += tmp.xyz * blendWeights[@n];@end
 	@end
 
-	_localPos.w = 1.0;
+    worldPos.w = 1.0;
 @end @end
 
 @property( hlms_skeleton )
-	@piece( worldViewMat )pass.view@end
-	@piece( worldViewProjMat )pass.viewProj@end
+    @piece( worldViewMat )pass.view@end
 @end @property( !hlms_skeleton )
-	@piece( worldViewMat )worldView@end
-	@piece( worldViewProjMat )worldViewProj@end
+    @piece( worldViewMat )worldView@end
 @end
 
 @piece( CalculatePsPos )(@insertpiece( worldViewMat ) * @insertpiece(local_vertex)).xyz@end
@@ -129,10 +138,10 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @piece( VertexTransform )
 	//Lighting is in view space
 	@property( hlms_normal || hlms_qtangent )outVs.pos		= @insertpiece( CalculatePsPos );@end
-	@property( hlms_normal || hlms_qtangent )outVs.normal	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_normal);@end
-	@property( normal_map )outVs.tangent	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_tangent);@end
+    @property( hlms_normal || hlms_qtangent )outVs.normal	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_normal);@end
+    @property( normal_map )outVs.tangent	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_tangent);@end
 @property( !hlms_dual_paraboloid_mapping )
-	gl_Position = @insertpiece( worldViewProjMat ) * @insertpiece(local_vertex);@end
+    gl_Position = pass.viewProj * worldPos;@end
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	gl_Position.w	= 1.0f;
@@ -145,18 +154,18 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @end
 @piece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-	outVs.posL@n = pass.shadowRcv[@n].texWorldViewProj * @insertpiece(local_vertex);@end
+    outVs.posL@n = pass.shadowRcv[@n].texViewProj * worldPos;@end
 @end
 
 void main()
 {
 @property( !hlms_skeleton )
-	mat4 worldViewProj;
-        worldViewProj = UNPACK_MAT4( worldMatBuf, drawId << 1u );
+    mat4x3 worldMat = UNPACK_MAT4x3( worldMatBuf, drawId @property( !hlms_shadowcaster )<< 1u@end );
 	@property( hlms_normal || hlms_qtangent )
-	mat4 worldView;
-        worldView = UNPACK_MAT4( worldMatBuf, (drawId << 1u) + 1u );
+    mat4 worldView = UNPACK_MAT4( worldMatBuf, (drawId << 1u) + 1u );
 	@end
+
+    vec4 worldPos = vec4( (worldMat * vertex).xyz, 1.0f );
 @end
 
 @property( hlms_qtangent )
@@ -209,6 +218,17 @@ mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
                                  row0.y, row1.y, row2.y, row3.y,
                                  row0.z, row1.z, row2.z, row3.z,
                                  row0.w, row1.w, row2.w, row3.w );
+}
+
+mat4x3 UNPACK_MAT4x3( samplerBuffer matrixBuf, uint pixelIdx )
+{
+        vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
+        vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 1u) );
+        vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 2u) );
+        return mat4x3( row0.x, row1.x, row2.x,
+                       row0.y, row1.y, row2.y,
+                       row0.z, row1.z, row2.z,
+                       row0.w, row1.w, row2.w );
 }
 
 in vec4 vertex;

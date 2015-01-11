@@ -501,7 +501,7 @@ namespace Ogre
 
         if( !casterPass )
         {
-            //mat4 view + mat4 shadowRcv[numShadowMaps].texWorldViewProj +
+            //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
             //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
             //mat3 invViewMatCubemap (upgraded to three vec4)
             mapSize += ( 16 + (16 + 2 + 2) * numShadowMaps + 4 * 3 ) * 4;
@@ -564,7 +564,7 @@ namespace Ogre
 
             for( int32 i=0; i<numShadowMaps; ++i )
             {
-                //mat4 shadowRcv[numShadowMaps].texWorldViewProj
+                //mat4 shadowRcv[numShadowMaps].texViewProj
                 Matrix4 viewProjTex = shadowNode->getViewProjectionMatrix( i );
                 for( size_t j=0; j<16; ++j )
                     *passBufferPtr++ = (float)viewProjTex[0][j];
@@ -864,16 +864,12 @@ namespace Ogre
             //uint worldMaterialIdx[]
             *currentMappedConstBuffer = datablock->getAssignedSlot() & 0x1FF;
 
-            //mat4 worldViewProj
-            Matrix4 tmp = mPreparedPass.viewProjMatrix * worldMat;
-    #ifdef OGRE_GLES2_WORKAROUND_1
-            tmp = tmp.transpose();
-    #endif
-            memcpy( currentMappedTexBuffer, &tmp, sizeof(Matrix4) );
+            //mat4x3 world
+            memcpy( currentMappedTexBuffer, &worldMat, 4 * 3 * sizeof(float) );
             currentMappedTexBuffer += 16;
 
             //mat4 worldView
-            tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
+            Matrix4 tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
     #ifdef OGRE_GLES2_WORKAROUND_1
             tmp = tmp.transpose();
     #endif

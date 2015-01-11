@@ -1,7 +1,7 @@
 @piece( PassDecl )
 struct ShadowReceiverData
 {
-	mat4 texWorldViewProj;
+    mat4 texViewProj;
 	vec2 shadowDepthRange;
 };
 
