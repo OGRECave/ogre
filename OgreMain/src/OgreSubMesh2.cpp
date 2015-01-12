@@ -229,19 +229,18 @@ namespace Ogre {
         return 0;
     }*/
     //---------------------------------------------------------------------
+    struct SafeDelete
+    {
+        void *ptr;
+        SafeDelete( void *_ptr ) : ptr( _ptr ) {}
+        ~SafeDelete()
+        {
+            if( ptr )
+                OGRE_FREE_SIMD( ptr, MEMCATEGORY_GEOMETRY );
+        }
+    };
     void SubMesh::importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords )
     {
-        struct SafeDelete
-        {
-            void *ptr;
-            SafeDelete( void *_ptr ) : ptr( _ptr ) {}
-            ~SafeDelete()
-            {
-                if( ptr )
-                    OGRE_FREE_SIMD( ptr, MEMCATEGORY_GEOMETRY );
-            }
-        };
-
         subMesh->_compileBoneAssignments();
         const v1::SubMesh::VertexBoneAssignmentList& v1BoneAssignments = subMesh->getBoneAssignments();
         mBoneAssignments.reserve( v1BoneAssignments.size() );
@@ -269,7 +268,6 @@ namespace Ogre {
 
         VaoManager *vaoManager = mParent->mVaoManager;
         VertexBufferPackedVec vertexBuffers;
-        IndexBufferPacked *indexBuffer = 0;
 
         //Create the vertex buffer
         bool keepAsShadow = mParent->mVertexBufferShadowBuffer;
@@ -282,32 +280,52 @@ namespace Ogre {
         if( keepAsShadow ) //Don't free the pointer ourselves
             dataPtrContainer.ptr = 0;
 
-        v1::IndexData *indexData = subMesh->indexData;
-        if( indexData )
-        {
-            //Create & copy the index buffer
-            keepAsShadow = mParent->mIndexBufferShadowBuffer;
-            void *indexDataPtr = OGRE_MALLOC_SIMD( indexData->indexCount *
-                                                   indexData->indexBuffer->getIndexSize(),
-                                                   MEMCATEGORY_GEOMETRY );
-            SafeDelete indexDataPtrContainer( indexDataPtr );
-            IndexBufferPacked::IndexType indexType = static_cast<IndexBufferPacked::IndexType>(
-                                                            indexData->indexBuffer->getType() );
-
-            memcpy( indexDataPtr, indexData->indexBuffer->lock( v1::HardwareBuffer::HBL_READ_ONLY ),
-                    indexData->indexBuffer->getIndexSize() * indexData->indexCount );
-            indexData->indexBuffer->unlock();
-
-            indexBuffer = vaoManager->createIndexBuffer( indexType, indexData->indexCount,
-                                                         mParent->mIndexBufferDefaultType,
-                                                         indexDataPtr, keepAsShadow );
-
-            if( keepAsShadow ) //Don't free the pointer ourselves
-                indexDataPtrContainer.ptr = 0;
-        }
+        IndexBufferPacked *indexBuffer = importFromV1( subMesh->indexData );
 
         mVao.push_back( vaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
                                                              subMesh->operationType ) );
+
+        //Now deal with the automatic LODs
+        v1::SubMesh::LODFaceList::const_iterator itor = subMesh->mLodFaceList.begin();
+        v1::SubMesh::LODFaceList::const_iterator end  = subMesh->mLodFaceList.end();
+
+        while( itor != end )
+        {
+            IndexBufferPacked *lodIndexBuffer = importFromV1( *itor );
+
+            mVao.push_back( vaoManager->createVertexArrayObject( vertexBuffers, lodIndexBuffer,
+                                                                 subMesh->operationType ) );
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    IndexBufferPacked* SubMesh::importFromV1( v1::IndexData *indexData )
+    {
+        if( !indexData )
+            return 0;
+
+        //Create & copy the index buffer
+        bool keepAsShadow = mParent->mIndexBufferShadowBuffer;
+        VaoManager *vaoManager = mParent->mVaoManager;
+        void *indexDataPtr = OGRE_MALLOC_SIMD( indexData->indexCount *
+                                               indexData->indexBuffer->getIndexSize(),
+                                               MEMCATEGORY_GEOMETRY );
+        SafeDelete indexDataPtrContainer( indexDataPtr );
+        IndexBufferPacked::IndexType indexType = static_cast<IndexBufferPacked::IndexType>(
+                                                        indexData->indexBuffer->getType() );
+
+        memcpy( indexDataPtr, indexData->indexBuffer->lock( v1::HardwareBuffer::HBL_READ_ONLY ),
+                indexData->indexBuffer->getIndexSize() * indexData->indexCount );
+        indexData->indexBuffer->unlock();
+
+        IndexBufferPacked *indexBuffer = vaoManager->createIndexBuffer( indexType, indexData->indexCount,
+                                                                        mParent->mIndexBufferDefaultType,
+                                                                        indexDataPtr, keepAsShadow );
+
+        if( keepAsShadow ) //Don't free the pointer ourselves
+            indexDataPtrContainer.ptr = 0;
+
+        return indexBuffer;
     }
     //---------------------------------------------------------------------
     bool sortVertexElementsBySemantic2( const VertexElement2 &l, const VertexElement2 &r )

@@ -153,6 +153,9 @@ namespace Ogre {
 
     protected:
 
+        /// Converts a v1 IndexBuffer to a v2 format. Returns nullptr if indexData is also nullptr
+        IndexBufferPacked* importFromV1( v1::IndexData *indexData );
+
         /** Rearranges the buffers to be efficiently rendered in Ogre 2.0 with Hlms
         @remarks
             vertexData->vertexDeclaration is modified and vertexData->vertexBufferBinding

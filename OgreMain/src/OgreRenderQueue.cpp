@@ -248,7 +248,7 @@ namespace Ogre
         }
         else
         {
-            uint8 meshLod = 0; //TODO
+            uint8 meshLod = pMovableObject->getCurrentMeshLod();
             const VertexArrayObjectArray &vaos = pRend->getVaos();
 
             VertexArrayObject *vao = vaos[meshLod];
@@ -549,7 +549,7 @@ namespace Ogre
         while( itor != end )
         {
             const QueuedRenderable &queuedRenderable = *itor;
-            uint8 meshLod = 0; //TODO
+            uint8 meshLod = queuedRenderable.movableObject->getCurrentMeshLod();
             const VertexArrayObjectArray &vaos = queuedRenderable.renderable->getVaos();
 
             VertexArrayObject *vao = vaos[meshLod];

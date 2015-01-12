@@ -548,6 +548,16 @@ namespace Ogre {
             mSkeletonName = mSkeleton->getName();
         }
 
+        //So far we only import manual LOD levels. If the mesh had manual LOD levels,
+        //mLodValues will have more entries than Vaos, causing an out of bounds exception.
+        //Don't use LOD if the imported mesh had manual levels.
+        //Note: Mesh2 supports LOD levels that have their own vertex and index buffers,
+        //so it should be possible to import them as well.
+        if( !mesh->hasManualLodLevel() )
+            mLodValues = *mesh->_getLodValueArray();
+        else
+            mLodValues = MovableObject::c_DefaultLodMesh;
+
         mIsManual = true;
         setToLoaded();
     }
