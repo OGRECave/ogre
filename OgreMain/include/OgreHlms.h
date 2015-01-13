@@ -52,7 +52,8 @@ namespace Ogre
         {
             LightGatherForward,
             LightGatherForwardPlus,
-            LightGatherDeferred
+            LightGatherDeferred,
+            LightGatherNone,
         };
 
         struct DatablockEntry

@@ -173,6 +173,8 @@ namespace Ogre
         mLastTextureHash( 0 ),
         mTextureBufferDefaultSize( 4 * 1024 * 1024 )
     {
+        //Override defaults
+        mLightGatheringMode = LightGatherNone;
     }
     //-----------------------------------------------------------------------------------
     HlmsUnlit::~HlmsUnlit()

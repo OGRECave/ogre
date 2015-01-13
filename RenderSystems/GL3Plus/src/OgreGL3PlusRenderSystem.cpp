@@ -2605,7 +2605,7 @@ namespace Ogre {
                             " QTangents", LML_CRITICAL );
             }
 
-            GLenum type = v1::GL3PlusHardwareBufferManager::getGLType( elem.getType() );
+            GLenum type = v1::GL3PlusHardwareBufferManager::getGLType( vertexElementType );
 
             switch( v1::VertexElement::getBaseType( vertexElementType ) )
             {

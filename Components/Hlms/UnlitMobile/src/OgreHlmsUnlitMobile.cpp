@@ -171,6 +171,8 @@ namespace Ogre
 
     HlmsUnlitMobile::HlmsUnlitMobile( Archive *dataFolder ) : Hlms( HLMS_UNLIT, "unlit", dataFolder )
     {
+        //Override defaults
+        mLightGatheringMode = LightGatherNone;
     }
     //-----------------------------------------------------------------------------------
     HlmsUnlitMobile::~HlmsUnlitMobile()
