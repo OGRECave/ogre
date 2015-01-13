@@ -58,45 +58,27 @@ namespace Ogre
         */
         size_t  mFenceThreshold;
 
-        struct Fence
+        struct GLFence : Fence
         {
-            size_t  start;
-            size_t  end;
             GLsync  fenceName;
 
-            Fence( size_t _start, size_t _end ) :
-                start( _start ), end( _end ), fenceName( 0 )
+            GLFence( size_t _start, size_t _end ) :
+                Fence( _start , _end ), fenceName( 0 )
             {
-                assert( _start <= _end );
             }
-
-            bool overlaps( const Fence &fence ) const
-            {
-                return !( fence.end <= this->start || fence.start >= this->end );
-            }
-
-            size_t length(void) const { return end - start; }
         };
 
         //------------------------------------
         // Begin used for uploads
         //------------------------------------
-        typedef vector<Fence>::type FenceVec;
-        FenceVec mFences;
+        typedef vector<GLFence>::type GLFenceVec;
+        GLFenceVec mFences;
 
         /// Regions of memory that were unmapped but haven't
         /// been fenced due to not passing the threshold yet.
-        FenceVec mUnfencedHazards;
+        GLFenceVec mUnfencedHazards;
         //------------------------------------
         // End used for uploads
-        //------------------------------------
-
-        //------------------------------------
-        // Begin used for downloads
-        //------------------------------------
-        FenceVec mAvailableDownloadRegions;
-        //------------------------------------
-        // End used for downloads
         //------------------------------------
 
         /** Adds a fence to the region [from; to]. The region may actually be kept in
@@ -108,7 +90,7 @@ namespace Ogre
         */
         void addFence( size_t from, size_t to, bool forceFence );
 
-        void deleteFences( FenceVec::iterator itor, FenceVec::iterator end );
+        void deleteFences( GLFenceVec::iterator itor, GLFenceVec::iterator end );
 
         /// Waits undefinitely on the given GLSync object. Can throw if failed to wait.
         void wait( GLsync syncObj );
@@ -122,13 +104,7 @@ namespace Ogre
         virtual void* mapImpl( size_t sizeBytes );
         virtual void unmapImpl( const Destination *destinations, size_t numDestinations );
 
-        /// Returns the offset that can hold length bytes
-        size_t getFreeDownloadRegion( size_t length );
         virtual const void* _mapForReadImpl( size_t offset, size_t sizeBytes );
-
-        /// @see GL3PlusVaoManager::mergeContiguousBlocks
-        static void mergeContiguousBlocks( FenceVec::iterator blockToMerge,
-                                           FenceVec &blocks );
 
     public:
         GL3PlusStagingBuffer( size_t internalBufferStart, size_t sizeBytes,
@@ -139,8 +115,6 @@ namespace Ogre
 
         void cleanUnfencedHazards(void);
 
-        virtual bool canDownload( size_t length ) const;
-        virtual void _cancelDownload( size_t offset, size_t sizeBytes );
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
 
         GLuint getBufferName(void) const            { return mVboName; }

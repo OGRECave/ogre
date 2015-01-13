@@ -44,8 +44,6 @@ namespace Ogre
         mMappedPtr( 0 ),
         mFenceThreshold( sizeBytes / 4 )
     {
-        if( !mUploadOnly )
-            mAvailableDownloadRegions.push_back( Fence( 0, mSizeBytes ) );
     }
     //-----------------------------------------------------------------------------------
     GL3PlusStagingBuffer::~GL3PlusStagingBuffer()
@@ -60,7 +58,7 @@ namespace Ogre
     {
         assert( to <= mSizeBytes );
 
-        Fence unfencedHazard( from, to );
+        GLFence unfencedHazard( from, to );
 
         mUnfencedHazards.push_back( unfencedHazard );
 
@@ -71,7 +69,7 @@ namespace Ogre
 
         if( end - start >= mFenceThreshold || forceFence )
         {
-            Fence fence( start, end );
+            GLFence fence( start, end );
             OCGE( fence.fenceName = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
             mFences.push_back( fence );
 
@@ -94,7 +92,7 @@ namespace Ogre
             if( waitRet == GL_WAIT_FAILED )
             {
                 OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "Failure while waiting for a GL Fence. Could be out of GPU memory. "
+                             "Failure while waiting for a GL GLFence. Could be out of GPU memory. "
                              "Update your video card drivers. If that doesn't help, "
                              "contact the developers.", "GL3PlusStagingBuffer::wait" );
                 return;
@@ -106,7 +104,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void GL3PlusStagingBuffer::deleteFences( FenceVec::iterator itor, FenceVec::iterator end )
+    void GL3PlusStagingBuffer::deleteFences( GLFenceVec::iterator itor, GLFenceVec::iterator end )
     {
         while( itor != end )
         {
@@ -137,12 +135,12 @@ namespace Ogre
             mappingStart = 0;
         }
 
-        Fence regionToMap( mappingStart, mappingStart + sizeBytes );
+        GLFence regionToMap( mappingStart, mappingStart + sizeBytes );
 
-        FenceVec::iterator itor = mFences.begin();
-        FenceVec::iterator end  = mFences.end();
+        GLFenceVec::iterator itor = mFences.begin();
+        GLFenceVec::iterator end  = mFences.end();
 
-        FenceVec::iterator lastWaitableFence = end;
+        GLFenceVec::iterator lastWaitableFence = end;
 
         while( itor != end )
         {
@@ -234,8 +232,8 @@ namespace Ogre
         {
             if( !mUnfencedHazards.empty() )
             {
-                Fence regionToMap( 0, sizeBytes );
-                Fence hazardousRegion( mUnfencedHazards.front().start, mSizeBytes - 1 );
+                GLFence regionToMap( 0, sizeBytes );
+                GLFence hazardousRegion( mUnfencedHazards.front().start, mSizeBytes - 1 );
 
                 if( hazardousRegion.overlaps( regionToMap ) )
                 {
@@ -247,12 +245,12 @@ namespace Ogre
             mappingStart = 0;
         }
 
-        Fence regionToMap( mappingStart, mappingStart + sizeBytes );
+        GLFence regionToMap( mappingStart, mappingStart + sizeBytes );
 
-        FenceVec::const_iterator itor = mFences.begin();
-        FenceVec::const_iterator end  = mFences.end();
+        GLFenceVec::const_iterator itor = mFences.begin();
+        GLFenceVec::const_iterator end  = mFences.end();
 
-        FenceVec::const_iterator lastWaitableFence = end;
+        GLFenceVec::const_iterator lastWaitableFence = end;
 
         while( itor != end )
         {
@@ -282,19 +280,6 @@ namespace Ogre
     //
     //  DOWNLOADS
     //
-    //-----------------------------------------------------------------------------------
-    bool GL3PlusStagingBuffer::canDownload( size_t length ) const
-    {
-        assert( !mUploadOnly );
-
-        FenceVec::const_iterator itor = mAvailableDownloadRegions.begin();
-        FenceVec::const_iterator end  = mAvailableDownloadRegions.end();
-
-        while( itor != end && length > itor->length() )
-            ++itor;
-
-        return itor != end;
-    }
     //-----------------------------------------------------------------------------------
     size_t GL3PlusStagingBuffer::_asyncDownload( BufferPacked *source, size_t srcOffset,
                                                  size_t srcLength )
@@ -329,64 +314,6 @@ namespace Ogre
         return freeRegionOffset;
     }
     //-----------------------------------------------------------------------------------
-    size_t GL3PlusStagingBuffer::getFreeDownloadRegion( size_t length )
-    {
-        //Grab the smallest region that fits the request.
-        size_t lowestLength = std::numeric_limits<size_t>::max();
-        FenceVec::iterator itor = mAvailableDownloadRegions.begin();
-        FenceVec::iterator end  = mAvailableDownloadRegions.end();
-
-        FenceVec::iterator itLowest = end;
-
-        while( itor != end )
-        {
-            size_t freeRegionLength = itor->length();
-            if( length <= freeRegionLength && freeRegionLength < lowestLength )
-            {
-                itLowest = itor;
-                lowestLength = freeRegionLength;
-            }
-
-            ++itor;
-        }
-
-        size_t retVal = -1;
-
-        if( itLowest != end )
-        {
-            //Got a region! Shrink our records
-            retVal = itLowest->start;
-            itLowest->start += length;
-
-            //This region is empty. Remove it.
-            if( itLowest->start == itLowest->end )
-                efficientVectorRemove( mAvailableDownloadRegions, itLowest );
-        }
-
-        return retVal;
-    }
-    //-----------------------------------------------------------------------------------
-    void GL3PlusStagingBuffer::_cancelDownload( size_t offset, size_t sizeBytes )
-    {
-        //Put the mapped region back to our records as "available" for subsequent _asyncDownload
-        Fence mappedArea( offset, offset + sizeBytes );
-#if OGRE_DEBUG_MODE
-        FenceVec::const_iterator itor = mAvailableDownloadRegions.begin();
-        FenceVec::const_iterator end  = mAvailableDownloadRegions.end();
-
-        while( itor != end )
-        {
-            assert( !itor->overlaps( mappedArea ) &&
-                    "Already called _mapForReadImpl on this area (or part of it!) before!" );
-            ++itor;
-        }
-#endif
-
-        mAvailableDownloadRegions.push_back( mappedArea );
-
-        mergeContiguousBlocks( mAvailableDownloadRegions.end() - 1, mAvailableDownloadRegions );
-    }
-    //-----------------------------------------------------------------------------------
     const void* GL3PlusStagingBuffer::_mapForReadImpl( size_t offset, size_t sizeBytes )
     {
         assert( !mUploadOnly );
@@ -406,52 +333,5 @@ namespace Ogre
         _cancelDownload( offset, sizeBytes );
 
         return mMappedPtr;
-    }
-    //-----------------------------------------------------------------------------------
-    void GL3PlusStagingBuffer::mergeContiguousBlocks( FenceVec::iterator blockToMerge,
-                                                      FenceVec &blocks )
-    {
-        FenceVec::iterator itor = blocks.begin();
-        FenceVec::iterator end  = blocks.end();
-
-        while( itor != end )
-        {
-            if( itor->end == blockToMerge->start )
-            {
-                itor->end = blockToMerge->end;
-                size_t idx = itor - blocks.begin();
-
-                //When blockToMerge is the last one, its index won't be the same
-                //after removing the other iterator, they will swap.
-                if( idx == blocks.size() - 1 )
-                    idx = blockToMerge - blocks.begin();
-
-                efficientVectorRemove( blocks, blockToMerge );
-
-                blockToMerge = blocks.begin() + idx;
-                itor = blocks.begin();
-                end  = blocks.end();
-            }
-            else if( blockToMerge->end == itor->start )
-            {
-                blockToMerge->end += itor->start;
-                size_t idx = blockToMerge - blocks.begin();
-
-                //When blockToMerge is the last one, its index won't be the same
-                //after removing the other iterator, they will swap.
-                if( idx == blocks.size() - 1 )
-                    idx = itor - blocks.begin();
-
-                efficientVectorRemove( blocks, itor );
-
-                blockToMerge = blocks.begin() + idx;
-                itor = blocks.begin();
-                end  = blocks.end();
-            }
-            else
-            {
-                ++itor;
-            }
-        }
     }
 }

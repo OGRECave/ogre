@@ -102,6 +102,27 @@ namespace Ogre
         typedef vector<Destination>::type DestinationVec;
 
     protected:
+        struct Fence
+        {
+            size_t  start;
+            size_t  end;
+
+            Fence( size_t _start, size_t _end ) :
+                start( _start ), end( _end )
+            {
+                assert( _start <= _end );
+            }
+
+            bool overlaps( const Fence &fence ) const
+            {
+                return !( fence.end <= this->start || fence.start >= this->end );
+            }
+
+            size_t length(void) const { return end - start; }
+        };
+
+        typedef vector<Fence>::type FenceVec;
+
         size_t  mInternalBufferStart;
         size_t  mSizeBytes;
         bool    mUploadOnly;
@@ -118,12 +139,38 @@ namespace Ogre
         uint32          mLifetimeThreshold;
         unsigned long   mLastUsedTimestamp;
 
+        //------------------------------------
+        // Begin used for downloads
+        //------------------------------------
+        FenceVec mAvailableDownloadRegions;
+        //------------------------------------
+        // End used for downloads
+        //------------------------------------
+
         void mapChecks( size_t sizeBytes );
 
         virtual const void* _mapForReadImpl( size_t offset, size_t sizeBytes ) = 0;
 
         virtual void* mapImpl( size_t sizeBytes ) = 0;
         virtual void unmapImpl( const Destination *destinations, size_t numDestinations ) = 0;
+
+        /// Returns the offset that can hold length bytes
+        size_t getFreeDownloadRegion( size_t length );
+
+        /** Starts with "blockToMerge" and recursively merges all blocks which
+            end up being affected by "blockToMerge".
+        @remarks
+            Example: if "blocks" contains C, A, E, B and blockToMerge is B,
+            then A will be merged with B, then AB will be merged with C
+            So now "blocks" contains ABC and E.
+        @param blockToMerge
+            Iterator to a block to merge. Must belong to "blocks". Iterator may
+            be invalidated after calling this function.
+        @param blocks
+            Vector of blocks where blockToMerge belongs to.
+        */
+        static void mergeContiguousBlocks( FenceVec::iterator blockToMerge,
+                                           FenceVec &blocks );
 
     public:
         StagingBuffer( size_t internalBufferStart, size_t sizeBytes,
@@ -156,7 +203,7 @@ namespace Ogre
         @param length
             The size in bytes that need to be downloaded.
         */
-        virtual bool canDownload( size_t length ) const = 0;
+        bool canDownload( size_t length ) const;
 
         /** Copies the GPU data in BufferPacked to the StagingBuffer so that it can be
             later read by the CPU using an AsyncTicket. @see AsyncTicket.
@@ -180,7 +227,7 @@ namespace Ogre
         /// Releases memory assigned to a download that hasn't been mapped yet,
         /// to make space for another _asyncDownload call. Useful when you
         /// suddenly don't intend to call _mapForRead.
-        virtual void _cancelDownload( size_t offset, size_t sizeBytes ) = 0;
+        void _cancelDownload( size_t offset, size_t sizeBytes );
 
         /** Maps the buffer for read acces for the CPU.
         @remarks

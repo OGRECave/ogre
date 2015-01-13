@@ -54,7 +54,7 @@ namespace Ogre
         virtual void advanceFrame(void) = 0;
         virtual void regressFrame(void) = 0;
 
-        void _notifyBuffer( BufferPacked *buffer )          { mBuffer = buffer; }
+        virtual void _notifyBuffer( BufferPacked *buffer )  { mBuffer = buffer; }
     };
 }
 

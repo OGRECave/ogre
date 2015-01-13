@@ -183,18 +183,7 @@ namespace Ogre
                             BufferType bufferType );
 
     public:
-        /** Starts with "blockToMerge" and recursively merges all blocks which
-            end up being affected by "blockToMerge".
-        @remarks
-            Example: if "blocks" contains C, A, E, B and blockToMerge is B,
-            then A will be merged with B, then AB will be merged with C
-            So now "blocks" contains ABC and E.
-        @param blockToMerge
-            Iterator to a block to merge. Must belong to "blocks". Iterator may
-            be invalidated after calling this function.
-        @param blocks
-            Vector of blocks where blockToMerge belongs to.
-        */
+        /// @see StagingBuffer::mergeContiguousBlocks
         static void mergeContiguousBlocks( BlockVec::iterator blockToMerge,
                                            BlockVec &blocks );
 
