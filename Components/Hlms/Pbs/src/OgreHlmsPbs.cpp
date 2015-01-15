@@ -814,6 +814,16 @@ namespace Ogre
 
             mLastTextureHash = 0;
             mLastBoundPool = 0;
+
+            //layout(binding = 2) uniform InstanceBuffer {} instance
+            if( mCurrentConstBuffer < mConstBuffers.size() &&
+                (size_t)((mCurrentMappedConstBuffer - mStartMappedConstBuffer) + 4) <=
+                    mCurrentConstBufferSize )
+            {
+                *commandBuffer->addCommand<CbShaderBuffer>() =
+                        CbShaderBuffer( 2, mConstBuffers[mCurrentConstBuffer], 0, 0 );
+            }
+
             rebindTexBuffer( commandBuffer );
         }
 
