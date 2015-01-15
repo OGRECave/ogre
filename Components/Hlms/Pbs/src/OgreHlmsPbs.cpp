@@ -834,15 +834,20 @@ namespace Ogre
 
         const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
 
-        bool exceedsConstBuffer = (size_t)((currentMappedConstBuffer - mStartMappedConstBuffer) + 4) >
-                                                                                mCurrentConstBufferSize;
-
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----
         //---------------------------------------------------------------------------
 #if !OGRE_DOUBLE_PRECISION
         if( !hasSkeletonAnimation )
         {
+            //We need to correct currentMappedConstBuffer to point to the right texture buffer's
+            //offset, which may not be in sync if the previous draw had skeletal animation.
+            const size_t currentConstOffset = (currentMappedTexBuffer - mStartMappedTexBuffer) >>
+                                                (2 + !casterPass);
+            currentMappedConstBuffer =  currentConstOffset + mStartMappedConstBuffer;
+            bool exceedsConstBuffer = (size_t)((currentMappedConstBuffer - mStartMappedConstBuffer) + 4)
+                                        > mCurrentConstBufferSize;
+
             const size_t minimumTexBufferSize = 16 * (1 + !casterPass);
             bool exceedsTexBuffer = (currentMappedTexBuffer - mStartMappedTexBuffer) +
                                          minimumTexBufferSize >= mCurrentTexBufferSize;
@@ -876,6 +881,9 @@ namespace Ogre
         }
         else
         {
+            bool exceedsConstBuffer = (size_t)((currentMappedConstBuffer - mStartMappedConstBuffer) + 4)
+                                        > mCurrentConstBufferSize;
+
             if( isV1 )
             {
                 uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
@@ -960,6 +968,14 @@ namespace Ogre
                     ++itBone;
                 }
             }
+
+            //If the next entity is not skeletally animated, we'll need this piece of code.
+            //Non-skeletally animated objects are far more common than skeletal ones,
+            //so we do this here.
+            size_t currentConstOffset = (size_t)(currentMappedTexBuffer - mStartMappedTexBuffer);
+            currentConstOffset = alignToNextMultiple( currentConstOffset, 16 + 16 * !casterPass );
+            currentConstOffset = std::min( currentConstOffset, mCurrentTexBufferSize );
+            currentMappedTexBuffer = mStartMappedTexBuffer + currentConstOffset;
         }
 #else
     #error Not Coded Yet! (cannot use memcpy on Matrix4)
