@@ -969,9 +969,10 @@ namespace Ogre
                 }
             }
 
-            //If the next entity is not skeletally animated, we'll need this piece of code.
+            //If the next entity will not be skeletally animated, we'll need
+            //currentMappedTexBuffer to be 16/32-byte aligned.
             //Non-skeletally animated objects are far more common than skeletal ones,
-            //so we do this here.
+            //so we do this here instead of doing it before rendering the non-skeletal ones.
             size_t currentConstOffset = (size_t)(currentMappedTexBuffer - mStartMappedTexBuffer);
             currentConstOffset = alignToNextMultiple( currentConstOffset, 16 + 16 * !casterPass );
             currentConstOffset = std::min( currentConstOffset, mCurrentTexBufferSize );
