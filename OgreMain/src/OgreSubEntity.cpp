@@ -38,10 +38,9 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     SubEntity::SubEntity (Entity* parent, SubMesh* subMeshBasis)
-        : Renderable(), mParentEntity(parent), //mMaterialName("BaseWhite"),
+        : Renderable(), mParentEntity(parent),
         mSubMesh(subMeshBasis), mMaterialLodIndex(0), mCachedCamera(0)
     {
-        //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mVisible = true;
         mRenderQueueID = 0;
         mRenderQueueIDSet = false;
@@ -70,13 +69,10 @@ namespace Ogre {
     const String& SubEntity::getMaterialName(void) const
     {
         return !mMaterialPtr.isNull() ? mMaterialPtr->getName() : BLANKSTRING;
-        //return mMaterialName;
     }
     //-----------------------------------------------------------------------
     void SubEntity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
-
-
         MaterialPtr material = MaterialManager::getSingleton().getByName(name, groupName);
 
         if( material.isNull() )
@@ -99,7 +95,7 @@ namespace Ogre {
 
         setMaterial( material );
     }
-
+    //-----------------------------------------------------------------------
     void SubEntity::setMaterial( const MaterialPtr& material )
     {
         mMaterialPtr = material;
@@ -128,7 +124,6 @@ namespace Ogre {
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
     }
-
     //-----------------------------------------------------------------------
     const MaterialPtr& SubEntity::getMaterial(void) const
     {
@@ -312,7 +307,6 @@ namespace Ogre {
     bool SubEntity::isVisible(void) const
     {
         return mVisible;
-
     }
     //-----------------------------------------------------------------------
     void SubEntity::prepareTempBlendBuffers(void)
@@ -477,38 +471,38 @@ namespace Ogre {
         }
 
     }
-
+    //-----------------------------------------------------------------------
     void SubEntity::setRenderQueueGroup(uint8 queueID)
     {
         mRenderQueueIDSet = true;
         mRenderQueueID = queueID;
     }
-
+    //-----------------------------------------------------------------------
     void SubEntity::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
     {
         setRenderQueueGroup(queueID);
         mRenderQueuePrioritySet = true;
         mRenderQueuePriority = priority;
     }
-
+    //-----------------------------------------------------------------------
     uint8 SubEntity::getRenderQueueGroup(void) const
     {
         return mRenderQueueID;
     }
-
+    //-----------------------------------------------------------------------
     ushort SubEntity::getRenderQueuePriority(void) const
     {
         return mRenderQueuePriority;
     }
-
+    //-----------------------------------------------------------------------
     bool SubEntity::isRenderQueueGroupSet(void) const
     {
         return mRenderQueueIDSet;
     }
-
+    //-----------------------------------------------------------------------
     bool SubEntity::isRenderQueuePrioritySet(void) const
     {
         return mRenderQueuePrioritySet;
     }
-
+    //-----------------------------------------------------------------------
 }
