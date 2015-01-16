@@ -714,6 +714,8 @@ namespace Ogre
                                                  normalised, binding.stride,
                                                  (void*)(binding.offset + bindAccumOffset) ) );
                     break;
+                case VET_BYTE4:
+                case VET_UBYTE4:
                 case VET_SHORT2:
                 case VET_USHORT2:
                 case VET_UINT1:
