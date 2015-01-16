@@ -85,7 +85,7 @@ namespace Ogre
 #else
                 if (mDebugOut && !maskDebug)
                 {
-#    if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#    if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && OGRE_DEBUG_MODE
 #        if OGRE_WCHAR_T_STRINGS
                     OutputDebugStringW(message.c_str());
                     OutputDebugStringW(L"\n");
