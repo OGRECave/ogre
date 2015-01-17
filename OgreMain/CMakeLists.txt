@@ -101,22 +101,17 @@ elseif (WIN32)
     source_group(Resources FILES ${RESOURCE_FILES})
     set(PLATFORM_HEADER_INSTALL "WIN32")
 
-    if (MINGW) 
+    if (MINGW)
       # Older CMake versions do not know how to deal with resource files on MinGW.
       # Newer ones do, but pass along invalid command options to windres.
       # This is a manual fix for the moment.
-      get_filename_component(OGRE_MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
-      #set(OGRE_MINGW_RC ${OGRE_MINGW_PATH}/windres.exe)
-      file(GLOB OGRE_MINGW_RC_NAMES "${OGRE_MINGW_PATH}/*windres*")
-      find_program(OGRE_MINGW_RC NAMES ${OGRE_MINGW_RC_NAMES} HINTS ${OGRE_MINGW_PATH} DOC "Path to MinGW resource compiler")
-      if (NOT OGRE_MINGW_RC)
-        message(SEND_ERROR "Could not find MinGW resource compiler. Please specify path in OGRE_MINGW_RC.")
+      if (NOT CMAKE_RC_COMPILER)
+        message(SEND_ERROR "Could not find MinGW resource compiler. Please specify path in CMAKE_RC_COMPILER.")
       endif ()
-      mark_as_advanced(OGRE_MINGW_RC)
       add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
-        COMMAND ${OGRE_MINGW_RC} -I${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32 
-                                 -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
-                                 -o${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
+        COMMAND ${CMAKE_RC_COMPILER} -I${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32 
+                                     -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
+                                     -o${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
         DEPENDS ${RESOURCE_FILES})
       list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)
     else ()
