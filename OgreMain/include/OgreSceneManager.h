@@ -2866,6 +2866,10 @@ namespace Ogre {
         virtual MovableObject* createMovableObject(const String& typeName,
                                                     ObjectMemoryManager *objectMemMgr,
                                                     const NameValuePairList* params = 0);
+        /**
+        Returns if this SceneManager contains the specified MovableObject
+        */
+        virtual bool hasMovableObject( MovableObject *m );
         /** Destroys a MovableObject with the name specified, of the type specified.
         @remarks
             The MovableObject will automatically detach itself from any nodes
