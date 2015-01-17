@@ -85,7 +85,9 @@ namespace Ogre
         uint32              mSlotsPerPool;
         size_t              mBufferSize;
         ExtraBufferParams   mExtraBufferParams;
-        VaoManager          *mVaoManager;
+    private:
+        VaoManager          *_mVaoManager;
+    protected:
 
         ConstBufferPoolUserVec mDirtyUsers;
         ConstBufferPoolUserVec mUsers;

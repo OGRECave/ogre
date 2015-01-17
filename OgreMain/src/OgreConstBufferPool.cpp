@@ -43,7 +43,7 @@ namespace Ogre
         mSlotsPerPool( 0 ),
         mBufferSize( 0 ),
         mExtraBufferParams( extraBufferParams ),
-        mVaoManager( 0 )
+        _mVaoManager( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -65,21 +65,21 @@ namespace Ogre
 
                 while( it != en )
                 {
-                    mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
+                    _mVaoManager->destroyConstBuffer( (*it)->materialBuffer );
 
                     if( (*it)->extraBuffer )
                     {
                         if( mExtraBufferParams.useTextureBuffers )
                         {
                             assert( dynamic_cast<TexBufferPacked*>( (*it)->extraBuffer ) );
-                            mVaoManager->destroyTexBuffer( static_cast<TexBufferPacked*>(
-                                                               (*it)->extraBuffer ) );
+                            _mVaoManager->destroyTexBuffer( static_cast<TexBufferPacked*>(
+                                                                (*it)->extraBuffer ) );
                         }
                         else
                         {
                             assert( dynamic_cast<ConstBufferPacked*>( (*it)->extraBuffer ) );
-                            mVaoManager->destroyConstBuffer( static_cast<ConstBufferPacked*>(
-                                                                 (*it)->extraBuffer ) );
+                            _mVaoManager->destroyConstBuffer( static_cast<ConstBufferPacked*>(
+                                                                  (*it)->extraBuffer ) );
                         }
                     }
 
@@ -122,7 +122,7 @@ namespace Ogre
         std::sort( mDirtyUsers.begin(), mDirtyUsers.end(), OrderConstBufferPoolUserByPoolThenSlot );
 
         const size_t uploadSize = (materialSizeInGpu + extraBufferSizeInGpu) * mDirtyUsers.size();
-        StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( uploadSize, true );
+        StagingBuffer *stagingBuffer = _mVaoManager->getStagingBuffer( uploadSize, true );
 
         StagingBuffer::DestinationVec destinations;
         StagingBuffer::DestinationVec extraDestinations;
@@ -234,26 +234,26 @@ namespace Ogre
 
         if( itor == end )
         {
-            ConstBufferPacked *materialBuffer = mVaoManager->createConstBuffer( mBufferSize, BT_DEFAULT,
-                                                                                0, false );
+            ConstBufferPacked *materialBuffer = _mVaoManager->createConstBuffer( mBufferSize, BT_DEFAULT,
+                                                                                 0, false );
             BufferPacked *extraBuffer = 0;
 
             if( mExtraBufferParams.bytesPerSlot && wantsExtraBuffer )
             {
                 if( mExtraBufferParams.useTextureBuffers )
                 {
-                    extraBuffer = mVaoManager->createTexBuffer( PF_FLOAT32_RGBA,
-                                                                mExtraBufferParams.bytesPerSlot *
+                    extraBuffer = _mVaoManager->createTexBuffer( PF_FLOAT32_RGBA,
+                                                                 mExtraBufferParams.bytesPerSlot *
                                                                                     mSlotsPerPool,
-                                                                mExtraBufferParams.bufferType,
-                                                                0, false );
+                                                                 mExtraBufferParams.bufferType,
+                                                                 0, false );
                 }
                 else
                 {
-                    extraBuffer = mVaoManager->createConstBuffer( mExtraBufferParams.bytesPerSlot *
+                    extraBuffer = _mVaoManager->createConstBuffer( mExtraBufferParams.bytesPerSlot *
                                                                                     mSlotsPerPool,
-                                                                  mExtraBufferParams.bufferType,
-                                                                  0, false );
+                                                                   mExtraBufferParams.bufferType,
+                                                                   0, false );
                 }
             }
 
@@ -326,18 +326,18 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ConstBufferPool::_changeRenderSystem( RenderSystem *newRs )
     {
-        if( mVaoManager )
+        if( _mVaoManager )
         {
             destroyAllPools();
             mDirtyUsers.clear();
-            mVaoManager = 0;
+            _mVaoManager = 0;
         }
 
         if( newRs )
         {
-            mVaoManager = newRs->getVaoManager();
+            _mVaoManager = newRs->getVaoManager();
 
-            mBufferSize = std::min<size_t>( mVaoManager->getConstBufferMaxSize(), 64 * 1024 );
+            mBufferSize = std::min<size_t>( _mVaoManager->getConstBufferMaxSize(), 64 * 1024 );
             mSlotsPerPool = mBufferSize / mBytesPerSlot;
         }
     }

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define _OgreHlmsPbs_H_
 
 #include "OgreHlmsPbsPrerequisites.h"
-#include "OgreHlms.h"
+#include "OgreHlmsBufferManager.h"
 #include "OgreConstBufferPool.h"
 #include "OgreHeaderPrefix.h"
 
@@ -50,10 +50,9 @@ namespace Ogre
     /** Physically based shading implementation specfically designed for OpenGL ES 2.0 and other
         RenderSystems which do not support uniform buffers.
     */
-    class _OgreHlmsPbsExport HlmsPbs : public Hlms, public ConstBufferPool
+    class _OgreHlmsPbsExport HlmsPbs : public HlmsBufferManager, public ConstBufferPool
     {
         typedef vector<ConstBufferPacked*>::type ConstBufferPackedVec;
-        typedef vector<TexBufferPacked*>::type TexBufferPackedVec;
         typedef vector<HlmsDatablock*>::type HlmsDatablockVec;
 
         struct PassData
@@ -69,29 +68,10 @@ namespace Ogre
         ConstBufferPackedVec    mPassBuffers;
 
         uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
-        uint32                  mCurrentConstBuffer;    /// Resets every to zero every new frame.
-        uint32                  mCurrentTexBuffer;      /// Resets every to zero every new frame.
-        ConstBufferPackedVec    mConstBuffers;
-        TexBufferPackedVec      mTexBuffers;
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
-        uint32  *mStartMappedConstBuffer;
-        uint32  *mCurrentMappedConstBuffer;
-        size_t  mCurrentConstBufferSize;
-
-        float   *mRealStartMappedTexBuffer;
-        float   *mStartMappedTexBuffer;
-        float   *mCurrentMappedTexBuffer;
-        size_t  mCurrentTexBufferSize;
-
-        /// Resets every to zero every new buffer (@see unmapTexBuffer and @see mapNextTexBuffer).
-        size_t  mTexLastOffset;
-        size_t  mLastTexBufferCmdOffset;
-
         uint32 mLastTextureHash;
-
-        size_t mTextureBufferDefaultSize;
 
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
@@ -110,47 +90,7 @@ namespace Ogre
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );
 
-        /// For compatibility reasons with D3D11 and GLES3, Const buffers are mapped.
-        /// Once we're done with it (even if we didn't fully use it) we discard it
-        /// and get a new one. We will at least have to get a new one on every pass.
-        /// This is affordable since common Const buffer limits are of 64kb.
-        /// At the next frame we restart mCurrentConstBuffer to 0.
-        void unmapConstBuffer(void);
-
-        /// Warning: Calling this function affects BOTH mCurrentConstBuffer and mCurrentTexBuffer
-        DECL_MALLOC uint32* mapNextConstBuffer( CommandBuffer *commandBuffer );
-
-        /// Texture buffers are treated differently than Const buffers. We first map it.
-        /// Once we're done with it, we save our progress (in mTexLastOffset) and in the
-        /// next pass start where we left off (i.e. if we wrote to the first 2MB chunk,
-        /// start mapping from 2MB onwards). Only when the buffer is full, we get a new
-        /// Tex Buffer.
-        /// At the next frame we restart mCurrentTexBuffer to 0.
-        ///
-        /// Tex Buffers can be as big as 128MB, thus "restarting" with another 128MB
-        /// buffer on every pass is too expensive. This strategy benefits low level RS
-        /// like GL3+ and D3D11.1* (Windows 8) and D3D12; whereas on D3D11 and GLES3
-        /// drivers dynamic mapping may discover we're writing to a region not in use
-        /// or may internally use a new buffer (wasting memory space).
-        ///
-        /// (*) D3D11.1 allows using MAP_NO_OVERWRITE for texture buffers.
-        void unmapTexBuffer( CommandBuffer *commandBuffer );
-        DECL_MALLOC float* mapNextTexBuffer( CommandBuffer *commandBuffer, size_t minimumSizeBytes );
-
-        /** Rebinds the texture buffer. Finishes the last bind command to the tbuffer.
-        @param resetOffset
-            When true, the tbuffer will be offsetted so that the shader samples
-            from 0 at the current offset in mCurrentMappedTexBuffer
-            WARNING: mCurrentMappedTexBuffer may be modified due to alignment.
-            mStartMappedTexBuffer & mCurrentTexBufferSize will always be modified
-        @param minimumTexBufferSize
-            If resetOffset is true and the remaining space in the currently mapped
-            tbuffer is less than minimumSizeBytes, we will call mapNextTexBuffer
-        */
-        void rebindTexBuffer( CommandBuffer *commandBuffer, bool resetOffset = false,
-                              size_t minimumSizeBytes = 1 );
-
-        void destroyAllBuffers(void);
+        virtual void destroyAllBuffers(void);
 
         FORCEINLINE uint32 fillBuffersFor( const HlmsCache *cache,
                                            const QueuedRenderable &queuedRenderable,
@@ -180,14 +120,7 @@ namespace Ogre
                                          bool casterPass, uint32 lastCacheHash,
                                          CommandBuffer *commandBuffer );
 
-        virtual void preCommandBufferExecution( CommandBuffer *commandBuffer );
-        virtual void postCommandBufferExecution( CommandBuffer *commandBuffer );
-
         virtual void frameEnded(void);
-
-        /// Changes the default suggested size for the texture buffer.
-        /// Actual size may be lower if the GPU can't honour the request.
-        void setTextureBufferDefaultSize( size_t defaultSize );
     };
 
     struct _OgreHlmsPbsExport PbsProperty
