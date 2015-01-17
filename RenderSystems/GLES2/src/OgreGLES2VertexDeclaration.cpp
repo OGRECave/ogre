@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 
 namespace Ogre {
-
+namespace v1 {
     //-----------------------------------------------------------------------
     GLES2VertexDeclaration::GLES2VertexDeclaration()
         :
@@ -74,4 +74,5 @@ namespace Ogre {
 #   endif
 #endif
     }
+}
 }

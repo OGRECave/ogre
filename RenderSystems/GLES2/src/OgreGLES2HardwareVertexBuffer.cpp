@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreGLES2StateCacheManager.h"
 
 namespace Ogre {
+namespace v1 {
     GLES2HardwareVertexBuffer::GLES2HardwareVertexBuffer(HardwareBufferManagerBase* mgr, 
                                                        size_t vertexSize,
                                                        size_t numVertices,
@@ -291,4 +292,5 @@ namespace Ogre {
             mShadowUpdated = false;
         }
     }
+}
 }

@@ -35,7 +35,9 @@ THE SOFTWARE.
 namespace Ogre 
 {
     class GLES2Context;
+    namespace v1 {
     class GLES2RenderBuffer;
+    }
     class GLES2RenderSystem;
     /**
         @copydoc DepthBuffer
@@ -52,23 +54,23 @@ namespace Ogre
     {
     public:
         GLES2DepthBuffer( uint16 poolId, GLES2RenderSystem *renderSystem, GLES2Context *creatorContext,
-                        GLES2RenderBuffer *depth, GLES2RenderBuffer *stencil,
-                        uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
-                        bool isManual );
+                          v1::GLES2RenderBuffer *depth, v1::GLES2RenderBuffer *stencil,
+                          uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+                          bool isManual );
         ~GLES2DepthBuffer();
 
         /// @copydoc DepthBuffer::isCompatible
         virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
         GLES2Context* getGLContext() const { return mCreatorContext; }
-        GLES2RenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
-        GLES2RenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
+        v1::GLES2RenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
+        v1::GLES2RenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
 
     protected:
         uint32                      mMultiSampleQuality;
         GLES2Context                *mCreatorContext;
-        GLES2RenderBuffer           *mDepthBuffer;
-        GLES2RenderBuffer           *mStencilBuffer;
+        v1::GLES2RenderBuffer       *mDepthBuffer;
+        v1::GLES2RenderBuffer       *mStencilBuffer;
         GLES2RenderSystem           *mRenderSystem;
     };
 }

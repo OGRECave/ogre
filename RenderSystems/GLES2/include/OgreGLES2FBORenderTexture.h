@@ -35,7 +35,10 @@ THE SOFTWARE.
 
 namespace Ogre {
     class GLES2FBOManager;
+
+    namespace v1 {
     class GLES2RenderBuffer;
+    }
 
     /** RenderTexture for GL ES 2 FBO
     */
@@ -181,10 +184,10 @@ namespace Ogre {
         struct RBRef
         {
             RBRef(){}
-            RBRef(GLES2RenderBuffer *inBuffer):
+            RBRef(v1::GLES2RenderBuffer *inBuffer):
                 buffer(inBuffer), refcount(1)
             { }
-            GLES2RenderBuffer *buffer;
+            v1::GLES2RenderBuffer *buffer;
             size_t refcount;
         };
         typedef map<RBFormat, RBRef>::type RenderBufferMap;

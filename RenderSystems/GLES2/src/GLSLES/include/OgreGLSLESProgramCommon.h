@@ -51,7 +51,7 @@ namespace Ogre {
 
     typedef vector<GLUniformReference>::type GLUniformReferenceList;
     typedef GLUniformReferenceList::iterator GLUniformReferenceIterator;
-    typedef vector<HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
+    typedef vector<v1::HardwareUniformBufferSharedPtr>::type GLUniformBufferList;
 
     typedef GLUniformBufferList::iterator GLUniformBufferIterator;
 

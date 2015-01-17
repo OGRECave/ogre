@@ -108,7 +108,7 @@ namespace Ogre {
         if (name=="TARGET")
         {
             GLES2SurfaceDesc &target = *static_cast<GLES2SurfaceDesc*>(pData);
-            target.buffer = static_cast<GLES2HardwarePixelBuffer*>(mBuffer);
+            target.buffer = static_cast<v1::GLES2HardwarePixelBuffer*>(mBuffer);
             target.zoffset = mZOffset;
         }
     }
@@ -146,7 +146,7 @@ namespace Ogre {
         target->getCustomAttribute("TARGET", &surface);
         if (surface.buffer)
         {
-            static_cast<GLES2TextureBuffer*>(surface.buffer)->copyFromFramebuffer(surface.zoffset);
+            static_cast<v1::GLES2TextureBuffer*>(surface.buffer)->copyFromFramebuffer(surface.zoffset);
         }
     }
 }

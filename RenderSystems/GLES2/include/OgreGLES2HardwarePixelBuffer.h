@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
+namespace v1 {
     class _OgreGLES2Export GLES2HardwarePixelBuffer: public HardwarePixelBuffer
     {
         protected:
@@ -158,6 +159,7 @@ namespace Ogre {
             GLuint mRenderbufferID;
             GLsizei mNumSamples;
     };
+}
 }
 
 #endif

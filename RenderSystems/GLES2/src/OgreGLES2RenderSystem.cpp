@@ -101,6 +101,8 @@ namespace Ogre {
         mScissor[2] = 1;
         mScissor[3] = 1;
 
+        mGlPolyMode = GL_FILL;
+
         LogManager::getSingleton().logMessage(getName() + " created.");
 
         mRenderAttribsBound.reserve(100);
@@ -514,7 +516,7 @@ namespace Ogre {
         mFixedFunctionTextureUnits = caps->getNumTextureUnits();
 
         // Use VBO's by default
-        mHardwareBufferManager = OGRE_NEW GLES2HardwareBufferManager();
+        mHardwareBufferManager = OGRE_NEW v1::GLES2HardwareBufferManager();
 
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
@@ -714,10 +716,12 @@ namespace Ogre {
             static_cast<GLES2FBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
                                                                         &depthFormat, &stencilFormat );
 
-            GLES2RenderBuffer *depthBuffer = OGRE_NEW GLES2RenderBuffer( depthFormat, fbo->getWidth(),
-                                                                fbo->getHeight(), fbo->getFSAA() );
+            v1::GLES2RenderBuffer *depthBuffer = OGRE_NEW v1::GLES2RenderBuffer( depthFormat,
+                                                                                 fbo->getWidth(),
+                                                                                 fbo->getHeight(),
+                                                                                 fbo->getFSAA() );
 
-            GLES2RenderBuffer *stencilBuffer = depthBuffer;
+            v1::GLES2RenderBuffer *stencilBuffer = depthBuffer;
             if( 
 #if OGRE_NO_GLES3_SUPPORT == 0
                depthFormat != GL_DEPTH32F_STENCIL8 &&
@@ -725,8 +729,8 @@ namespace Ogre {
                depthFormat != GL_DEPTH24_STENCIL8_OES &&
                stencilFormat )
             {
-                stencilBuffer = OGRE_NEW GLES2RenderBuffer( stencilFormat, fbo->getWidth(),
-                                                           fbo->getHeight(), fbo->getFSAA() );
+                stencilBuffer = OGRE_NEW v1::GLES2RenderBuffer( stencilFormat, fbo->getWidth(),
+                                                                fbo->getHeight(), fbo->getFSAA() );
             }
 
             // No "custom-quality" multisample for now in GL
@@ -845,9 +849,9 @@ namespace Ogre {
             mClipPlanesDirty = true;
     }
 
-    void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
+    void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, Texture *texPtr)
     {
-        GLES2TexturePtr tex = texPtr.staticCast<GLES2Texture>();
+        GLES2Texture *tex = static_cast<GLES2Texture*>(texPtr);
 
         if (!mStateCacheManager->activateGLTextureUnit(stage))
             return;
@@ -858,7 +862,7 @@ namespace Ogre {
             mCurTexMipCount = 0;
 #endif
             GLuint texID =  0;
-            if (!tex.isNull())
+            if (tex)
             {
                 // Note used
                 tex->touch();
@@ -1203,12 +1207,10 @@ namespace Ogre {
         switch( newBlock->mPolygonMode )
         {
         case PM_POINTS:
-            //glMacroblock->mPolygonMode = GL_POINTS;
-            glMacroblock->mPolygonMode = GL_POINT;
+            glMacroblock->mPolygonMode = GL_POINTS;
             break;
         case PM_WIREFRAME:
-            //glMacroblock->mPolygonMode = GL_LINE_STRIP;
-            glMacroblock->mPolygonMode = GL_LINE;
+            glMacroblock->mPolygonMode = GL_LINE_STRIP;
             break;
         default:
         case PM_SOLID:
@@ -1376,7 +1378,8 @@ namespace Ogre {
         }
 
         //Polygon mode
-        OCGE( glPolygonMode( GL_FRONT_AND_BACK, glMacroblock->mPolygonMode ) );
+        //OCGE( glPolygonMode( GL_FRONT_AND_BACK, glMacroblock->mPolygonMode ) );
+        mGlPolyMode = glMacroblock->mPolygonMode;
 
         if( macroblock->mAlphaToCoverageEnabled )
         {
@@ -1482,17 +1485,17 @@ namespace Ogre {
 #endif
     }
 
-    void GLES2RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
+    void GLES2RenderSystem::setVertexDeclaration(v1::VertexDeclaration* decl)
     {
         OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                     "Cannot directly call setVertexDeclaration in the GLES2 render system - cast then use 'setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)' .", 
                     "GLES2RenderSystem::setVertexDeclaration" );
     }
 
-    void GLES2RenderSystem::setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)
+    void GLES2RenderSystem::setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding)
     {
-        GLES2VertexDeclaration* gles2decl = 
-            static_cast<GLES2VertexDeclaration*>(decl);
+        v1::GLES2VertexDeclaration* gles2decl =
+            static_cast<v1::GLES2VertexDeclaration*>(decl);
 
         if(gles2decl)
             gles2decl->bind();
@@ -1897,13 +1900,13 @@ namespace Ogre {
         mStateCacheManager->activateGLTextureUnit(0);
     }
 
-    void GLES2RenderSystem::_render(const RenderOperation& op)
+    void GLES2RenderSystem::_render(const v1::RenderOperation& op)
     {
         // Call super class
         RenderSystem::_render(op);
 
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer;
-        VertexDeclaration* globalVertexDeclaration = 0;
+        v1::HardwareVertexBufferSharedPtr globalInstanceVertexBuffer;
+        v1::VertexDeclaration* globalVertexDeclaration = 0;
         bool hasInstanceData = false;
         size_t numberOfInstances = 0;
         if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
@@ -1924,12 +1927,12 @@ namespace Ogre {
 
         void* pBufferData = 0;
 
-        const VertexDeclaration::VertexElementList& decl =
+        const v1::VertexDeclaration::VertexElementList& decl =
             op.vertexData->vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
+        v1::VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
-        GLES2VertexDeclaration* gles2decl = 
-            static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
+        v1::GLES2VertexDeclaration* gles2decl =
+            static_cast<v1::GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
         // Use a little shorthand
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0
@@ -1943,13 +1946,13 @@ namespace Ogre {
 
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
-            const VertexElement & elem = *elemIter;
+            const v1::VertexElement & elem = *elemIter;
             unsigned short elemSource = elem.getSource();
 
             if (!op.vertexData->vertexBufferBinding->isBufferBound(elemSource))
                 continue; // skip unbound elements
  
-            HardwareVertexBufferSharedPtr vertexBuffer =
+            v1::HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(elemSource);
             bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
                                    mRenderAttribsBound, mRenderInstanceAttribsBound, true);
@@ -1962,7 +1965,7 @@ namespace Ogre {
                 elemEnd = globalVertexDeclaration->getElements().end();
                 for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
                 {
-                    const VertexElement & elem = *elemIter;
+                    const v1::VertexElement & elem = *elemIter;
                     bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
                                            mRenderAttribsBound, mRenderInstanceAttribsBound, true);
                     continue;
@@ -1974,39 +1977,39 @@ namespace Ogre {
         GLint primType;
         switch (op.operationType)
         {
-            case RenderOperation::OT_POINT_LIST:
+            case v1::RenderOperation::OT_POINT_LIST:
                 primType = GL_POINTS;
                 break;
-            case RenderOperation::OT_LINE_LIST:
+            case v1::RenderOperation::OT_LINE_LIST:
                 primType = GL_LINES;
                 break;
-            case RenderOperation::OT_LINE_STRIP:
+            case v1::RenderOperation::OT_LINE_STRIP:
                 primType = GL_LINE_STRIP;
                 break;
             default:
-            case RenderOperation::OT_TRIANGLE_LIST:
+            case v1::RenderOperation::OT_TRIANGLE_LIST:
                 primType = GL_TRIANGLES;
                 break;
-            case RenderOperation::OT_TRIANGLE_STRIP:
+            case v1::RenderOperation::OT_TRIANGLE_STRIP:
                 primType = GL_TRIANGLE_STRIP;
                 break;
-            case RenderOperation::OT_TRIANGLE_FAN:
+            case v1::RenderOperation::OT_TRIANGLE_FAN:
                 primType = GL_TRIANGLE_FAN;
                 break;
         }
 
-        GLenum polyMode = mStateCacheManager->getPolygonMode();
+        GLenum polyMode = mGlPolyMode;
         if (op.useIndexes)
         {
             // If we are using VAO's then only bind the buffer the first time through. Otherwise, always bind.
             if (!useVAO || (useVAO && gles2decl && !gles2decl->isInitialised()))
                 mStateCacheManager->bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                         static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
+                         static_cast<v1::GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
             pBufferData = VBO_BUFFER_OFFSET(op.indexData->indexStart *
                                             op.indexData->indexBuffer->getIndexSize());
 
-            GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
+            GLenum indexType = (op.indexData->indexBuffer->getType() == v1::HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
             do
             {
@@ -2627,14 +2630,15 @@ namespace Ogre {
         return mStateCacheManager->getDiscardBuffers();
     }
 
-    void GLES2RenderSystem::bindVertexElementToGpu( const VertexElement &elem,
-                                                     HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
-                                                     vector<GLuint>::type &attribsBound,
-                                                     vector<GLuint>::type &instanceAttribsBound,
-                                                     bool updateVAO)
+    void GLES2RenderSystem::bindVertexElementToGpu( const v1::VertexElement &elem,
+                                                    v1::HardwareVertexBufferSharedPtr vertexBuffer,
+                                                    const size_t vertexStart,
+                                                    vector<GLuint>::type &attribsBound,
+                                                    vector<GLuint>::type &instanceAttribsBound,
+                                                    bool updateVAO)
     {
         void* pBufferData = 0;
-        const GLES2HardwareVertexBuffer* hwGlBuffer = static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get());
+        const v1::GLES2HardwareVertexBuffer* hwGlBuffer = static_cast<const v1::GLES2HardwareVertexBuffer*>(vertexBuffer.get());
 
         // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
         if (updateVAO)
@@ -2649,7 +2653,7 @@ namespace Ogre {
             }
 
             VertexElementSemantic sem = elem.getSemantic();
-            unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
+            unsigned short typeCount = v1::VertexElement::getTypeCount(elem.getType());
             GLboolean normalised = GL_FALSE;
             GLuint attrib = 0;
             unsigned short elemIndex = elem.getIndex();
@@ -2705,7 +2709,7 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
                                                       typeCount,
-                                                      GLES2HardwareBufferManager::getGLType(elem.getType()),
+                                                      v1::GLES2HardwareBufferManager::getGLType(elem.getType()),
                                                       normalised,
                                                       static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                                       pBufferData));

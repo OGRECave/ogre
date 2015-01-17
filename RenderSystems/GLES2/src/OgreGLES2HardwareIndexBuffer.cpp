@@ -34,7 +34,8 @@ THE SOFTWARE.
 #include "OgreGLES2StateCacheManager.h"
 
 namespace Ogre {
-    GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr, 
+namespace v1 {
+    GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr,
                                                      IndexType idxType,
                                                      size_t numIndexes,
                                                      HardwareBuffer::Usage usage,
@@ -299,4 +300,5 @@ namespace Ogre {
             mShadowUpdated = false;
         }
     }
+}
 }

@@ -532,7 +532,7 @@ namespace Ogre {
             else
             {
                 // New one
-                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, fsaa);
+                v1::GLES2RenderBuffer *rb = OGRE_NEW v1::GLES2RenderBuffer(format, width, height, fsaa);
                 mRenderBufferMap[key] = RBRef(rb);
                 retval.buffer = rb;
                 retval.zoffset = 0;

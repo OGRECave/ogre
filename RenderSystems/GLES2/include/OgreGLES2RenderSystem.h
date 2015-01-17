@@ -47,7 +47,9 @@ namespace Ogre {
     class GLSLESCgProgramFactory;
 #endif
     class GLSLESGpuProgram;
+    namespace v1 {
     class HardwareBufferManager;
+    }
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     class GLES2ManagedResourceManager;
 #endif
@@ -99,13 +101,14 @@ namespace Ogre {
             GLES2ContextList mBackgroundContextList;
 
             bool mScissorsEnabled;
+            GLenum mGlPolyMode;
 
             GLES2GpuProgramManager *mGpuProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
 #if !OGRE_NO_GLES2_CG_SUPPORT
             GLSLESCgProgramFactory* mGLSLESCgProgramFactory;
 #endif
-            HardwareBufferManager* mHardwareBufferManager;
+            v1::HardwareBufferManager* mHardwareBufferManager;
 
             /** Manager object for creating render textures.
                 Direct render to texture via GL_OES_framebuffer_object is preferable 
@@ -131,11 +134,12 @@ namespace Ogre {
             GLint getTextureAddressingMode(TextureAddressingMode tam) const;
             GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
-            void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
-                                        const size_t vertexStart,
-                                        vector<GLuint>::type &attribsBound,
-                                        vector<GLuint>::type &instanceAttribsBound,
-                                        bool updateVAO);
+            void bindVertexElementToGpu( const v1::VertexElement &elem,
+                                         v1::HardwareVertexBufferSharedPtr vertexBuffer,
+                                         const size_t vertexStart,
+                                         vector<GLuint>::type &attribsBound,
+                                         vector<GLuint>::type &instanceAttribsBound,
+                                         bool updateVAO);
 
             void correctViewport( GLint x, GLint &y, GLint &w, GLint &h, RenderTarget *renderTarget );
 
@@ -264,7 +268,7 @@ namespace Ogre {
             /** See
              RenderSystem
              */
-            void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
+            void _setTexture(size_t unit, bool enabled, Texture *tex);
             /** See
              RenderSystem
              */
@@ -299,6 +303,8 @@ namespace Ogre {
              */
             void _setViewport(Viewport *vp);
 
+            virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
+            virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
             virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
             virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
 			virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
@@ -413,19 +419,19 @@ namespace Ogre {
             /** See
              RenderSystem
              */
-            void setVertexDeclaration(VertexDeclaration* decl);
+            void setVertexDeclaration(v1::VertexDeclaration* decl);
             /** See
              RenderSystem
              */
-            void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
+            void setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding);
             /** See
              RenderSystem
              */
-            void setVertexBufferBinding(VertexBufferBinding* binding) {}
+            void setVertexBufferBinding(v1::VertexBufferBinding* binding) {}
             /** See
              RenderSystem
              */
-            void _render(const RenderOperation& op);
+            void _render(const v1::RenderOperation& op);
 
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,

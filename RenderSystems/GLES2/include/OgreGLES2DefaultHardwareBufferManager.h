@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre {
+namespace v1 {
     /// Specialisation of HardwareVertexBuffer for emulation
     class _OgreGLES2Export GLES2DefaultHardwareVertexBuffer : public HardwareVertexBuffer
     {
@@ -176,6 +177,7 @@ namespace Ogre {
                         "GLES2DefaultHardwareBufferManager::createUniformBuffer");
         }
     };
+}
 }
 
 #endif

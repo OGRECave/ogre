@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "OgreGLES2ManagedResourceManager.h"
 #include "OgreGLES2RenderSystem.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+
 namespace Ogre
 {
     GLES2ManagedResource::GLES2ManagedResource()
@@ -41,3 +43,5 @@ namespace Ogre
         GLES2RenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<GLES2ManagedResource*>(this));
     }
 }
+
+#endif

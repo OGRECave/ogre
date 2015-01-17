@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
+namespace v1 {
     class _OgreGLES2Export GLES2HardwareIndexBuffer : public HardwareIndexBuffer MANAGED_RESOURCE
     {
         private:
@@ -77,6 +78,7 @@ namespace Ogre {
 
             inline GLuint getGLBufferId(void) const { return mBufferId; }
     };
+}
 }
 
 #endif

@@ -35,6 +35,8 @@ THE SOFTWARE.
 namespace Ogre {
     class GLES2StateCacheManager;
 
+namespace v1 {
+
     /** Implementation of HardwareBufferManager for OpenGL ES. */
     class _OgreGLES2Export GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
@@ -98,6 +100,7 @@ namespace Ogre {
             { return GLES2HardwareBufferManagerBase::getGLType(type); }
     };
 
+}
 }
 
 #endif

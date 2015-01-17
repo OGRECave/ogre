@@ -32,14 +32,16 @@ THE SOFTWARE.
 #include "OgreGLES2Texture.h"
 
 namespace Ogre {
+namespace v1 {
     class GLES2HardwarePixelBuffer;
+}
 
     /** GL surface descriptor. Points to a 2D surface that can be rendered to.
     */
     struct _OgreGLES2Export GLES2SurfaceDesc
     {
         public:
-            GLES2HardwarePixelBuffer *buffer;
+            v1::GLES2HardwarePixelBuffer *buffer;
             uint32 zoffset;
             uint numSamples;
 

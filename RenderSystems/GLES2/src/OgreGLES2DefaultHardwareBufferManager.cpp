@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLES2Util.h"
 
 namespace Ogre {
+namespace v1 {
     GLES2DefaultHardwareVertexBuffer::GLES2DefaultHardwareVertexBuffer(size_t vertexSize,
                                                                  size_t numVertices,
                                                                  HardwareBuffer::Usage usage)
@@ -260,7 +261,7 @@ namespace Ogre {
         return HardwareUniformBufferSharedPtr(new GLES2DefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name));
     }
     
-    Ogre::RenderToVertexBufferSharedPtr GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
+    RenderToVertexBufferSharedPtr GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
     {
         if(!gleswIsSupported(3, 0))
         {
@@ -270,4 +271,5 @@ namespace Ogre {
         }
 //        return HardwareUniformBufferSharedPtr(new GLES2DefaultHardwareRenderToVertexBuffer(this, sizeBytes, usage, useShadowBuffer, name));
     }
+}
 }

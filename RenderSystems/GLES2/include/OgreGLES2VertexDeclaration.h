@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre { 
+namespace v1 {
 
     /** Specialisation of VertexDeclaration for OpenGL ES 2 Vertex Array Object usage */
     class GLES2VertexDeclaration : public VertexDeclaration
@@ -48,7 +49,7 @@ namespace Ogre {
         bool isInitialised(void) { return mIsInitialised; }
         void setInitialised(bool flag) { mIsInitialised = flag; }
     };
-
+}
 }
 
 #endif

@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreBitwise.h"
 
 namespace Ogre {
+namespace v1 {
     GLES2HardwarePixelBuffer::GLES2HardwarePixelBuffer(uint32 width, uint32 height,
                                                      uint32 depth, PixelFormat format, bool hwGamma,
                                                      HardwareBuffer::Usage usage)
@@ -1266,4 +1267,5 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment,
                                                       GL_RENDERBUFFER, mRenderbufferID));
     }
+}
 }

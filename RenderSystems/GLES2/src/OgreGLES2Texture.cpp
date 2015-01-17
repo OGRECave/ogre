@@ -550,7 +550,7 @@ namespace Ogre {
 
             for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
             {
-                GLES2HardwarePixelBuffer *buf = OGRE_NEW GLES2TextureBuffer(mName,
+                v1::GLES2HardwarePixelBuffer *buf = OGRE_NEW v1::GLES2TextureBuffer(mName,
                                                                             getGLES2TextureTarget(),
                                                                             mTextureID,
                                                                             width, height, depth,
@@ -558,10 +558,10 @@ namespace Ogre {
                                                                             GLES2PixelUtil::getGLOriginDataType(mFormat),
                                                                             static_cast<GLint>(face),
                                                                             mip,
-                                                                            static_cast<HardwareBuffer::Usage>(mUsage),
+                                                                            static_cast<v1::HardwareBuffer::Usage>(mUsage),
                                                                             doSoftware && mip == 0, mHwGamma, mFSAA);
 
-                mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
+                mSurfaceList.push_back(v1::HardwarePixelBufferSharedPtr(buf));
 
                 // Check for error
                 if (buf->getWidth() == 0 ||
@@ -580,7 +580,7 @@ namespace Ogre {
         }
     }
 
-    HardwarePixelBufferSharedPtr GLES2Texture::getBuffer(size_t face, size_t mipmap)
+    v1::HardwarePixelBufferSharedPtr GLES2Texture::getBuffer(size_t face, size_t mipmap)
     {
         if (face >= getNumFaces())
         {

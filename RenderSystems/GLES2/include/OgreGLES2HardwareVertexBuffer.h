@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
+
+namespace v1 {
     /// Specialisation of HardwareVertexBuffer for OpenGL ES
     class _OgreGLES2Export GLES2HardwareVertexBuffer : public HardwareVertexBuffer MANAGED_RESOURCE
     {
@@ -79,6 +81,7 @@ namespace Ogre {
 
             inline GLuint getGLBufferId(void) const { return mBufferId; }
     };
+}
 }
 
 #endif
