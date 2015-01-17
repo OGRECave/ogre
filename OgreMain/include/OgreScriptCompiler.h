@@ -838,6 +838,8 @@ namespace Ogre
                     ID_NUM_INITIAL,
                     ID_IDENTIFIER,
                     ID_OVERLAYS,
+                    ID_EXECUTION_MASK,
+                    ID_VIEWPORT_MODIFIER_MASK,
 
                     //Used by PASS_SCENE
                     ID_LOD_BIAS,

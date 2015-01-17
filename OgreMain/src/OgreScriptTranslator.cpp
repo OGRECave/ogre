@@ -7567,6 +7567,8 @@ namespace Ogre{
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:
                 case ID_OVERLAYS:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7712,6 +7714,8 @@ namespace Ogre{
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:
                 case ID_OVERLAYS:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7949,6 +7953,8 @@ namespace Ogre{
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:
                 case ID_OVERLAYS:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -8054,6 +8060,8 @@ namespace Ogre{
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:
                 case ID_OVERLAYS:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -8216,6 +8224,54 @@ namespace Ogre{
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                 "overlays argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
+                        }
+                    }
+                    break;
+                case ID_EXECUTION_MASK:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "execution_mask only supports 1 argument");
+                    }
+                    else
+                    {
+                        uint32 val;
+                        if( !getHex(prop->values.front(), &val) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "execution_mask argument must be an 8-bit hexadecimal value");
+                        }
+                        else
+                        {
+                            mPassDef->mExecutionMask = static_cast<uint8>( val & 0xFF );
+                        }
+                    }
+                    break;
+                case ID_VIEWPORT_MODIFIER_MASK:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "viewport_mask only supports 1 argument");
+                    }
+                    else
+                    {
+                        uint32 val;
+                        if( !getHex(prop->values.front(), &val) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "viewport_mask argument must be an 8-bit hexadecimal value");
+                        }
+                        else
+                        {
+                            mPassDef->mViewportModifierMask = static_cast<uint8>( val & 0xFF );
                         }
                     }
                     break;

@@ -1237,6 +1237,8 @@ namespace Ogre
         mIds["num_initial"]     = ID_NUM_INITIAL;
         mIds["identifier"]      = ID_IDENTIFIER;
         mIds["overlays"]        = ID_OVERLAYS;
+        mIds["execution_mask"]  = ID_EXECUTION_MASK;
+        mIds["viewport_modifier_mask"]   = ID_VIEWPORT_MODIFIER_MASK;
 
         mIds["lod_bias"]        = ID_LOD_BIAS;
         mIds["lod_update_list"] = ID_LOD_UPDATE_LIST;
