@@ -9,16 +9,6 @@
 
 # Configure RenderSystem build
 
-if (OGRE_BUILD_RENDERSYSTEM_D3D9)
-  if (NOT DirectX9_FOUND)
-    MESSAGE(STATUS "Could not find dependency: DirectX")
-  	MESSAGE(STATUS "Skipping Direct3D9 rendersystem build")
-    set(OGRE_BUILD_RENDERSYSTEM_D3D9 0)
-  else ()
-    add_subdirectory(Direct3D9)
-  endif ()
-endif ()
-
 if (OGRE_BUILD_RENDERSYSTEM_D3D11)
   if (NOT DirectX11_FOUND)
     MESSAGE(STATUS "Could not find dependency: DirectX")
