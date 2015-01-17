@@ -391,6 +391,11 @@ namespace Ogre
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
+    Vector3 HlmsPbsDatablock::getDiffuse(void) const
+    {
+        return Vector3( mkDr, mkDg, mkDb );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setSpecular( const Vector3 &specularColour )
     {
         mkSr = specularColour.x;
@@ -399,10 +404,20 @@ namespace Ogre
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
+    Vector3 HlmsPbsDatablock::getSpecular(void) const
+    {
+        return Vector3( mkSr, mkSg, mkSb );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setRoughness( float roughness )
     {
         mRoughness = roughness;
         scheduleConstBufferUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    float HlmsPbsDatablock::getRoughness(void) const
+    {
+        return mRoughness;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setIndexOfRefraction( const Vector3 &refractionIdx,

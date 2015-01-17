@@ -185,12 +185,15 @@ namespace Ogre
 
         /// Sets the diffuse colour. The colour will be divided by PI for energy conservation.
         void setDiffuse( const Vector3 &diffuseColour );
+        Vector3 getDiffuse(void) const;
 
         /// Sets the specular colour.
         void setSpecular( const Vector3 &specularColour );
+        Vector3 getSpecular(void) const;
 
         /// Sets the roughness
         void setRoughness( float roughness );
+        float getRoughness(void) const;
 
         /** Calculates fresnel (F0 in most books) based on the IOR.
             The formula used is ( (1 - idx) / 1 + idx )²

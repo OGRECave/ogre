@@ -377,6 +377,33 @@ namespace Ogre
         mkDb = diffuseColour.z * invPI;
     }
     //-----------------------------------------------------------------------------------
+    Vector3 HlmsPbsMobileDatablock::getDiffuse(void) const
+    {
+        return Vector3( mkDr, mkDg, mkDb );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setSpecular( const Vector3 &specularColour )
+    {
+        mkSr = specularColour.x;
+        mkSg = specularColour.y;
+        mkSb = specularColour.z;
+    }
+    //-----------------------------------------------------------------------------------
+    Vector3 HlmsPbsMobileDatablock::getSpecular(void) const
+    {
+        return Vector3( mkSr, mkSg, mkSb );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsMobileDatablock::setRoughness( float roughness )
+    {
+        mRoughness = roughness;
+    }
+    //-----------------------------------------------------------------------------------
+    float HlmsPbsMobileDatablock::getRoughness(void) const
+    {
+        return mRoughness;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setIndexOfRefraction( const Vector3 &refractionIdx,
                                                        bool separateFresnel )
     {
