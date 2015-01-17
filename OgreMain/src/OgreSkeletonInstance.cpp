@@ -236,12 +236,11 @@ namespace Ogre {
         return mSkeleton->getHandle();
     }
     //-------------------------------------------------------------------------
-    const String& SkeletonInstance::getGroup(void)
+    const String& SkeletonInstance::getGroup(void) const
     {
         // delegate
         return mSkeleton->getGroup();
     }
-
 
 }
 
