@@ -269,7 +269,8 @@ namespace Ogre
                 textureArray.activeEntries < textureArray.maxTextures &&
                 arrayTexWidth  == width  &&
                 arrayTexHeight == height &&
-                textureArray.texture->getDepth()  == depth  &&
+                    (textureArray.texture->getTextureType() != TEX_TYPE_3D ||
+                    textureArray.texture->getDepth()== depth)  &&
                 textureArray.texture->getNumFaces() == faces &&
                 textureArray.texture->getFormat() == format &&
                 textureArray.texture->getNumMipmaps() == numMipmaps )
@@ -312,7 +313,11 @@ namespace Ogre
                 imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 ||
                 imageFormat == PF_A8R8G8B8 )
             {
+#if OGRE_PLATFORM >= OGRE_PLATFORM_ANDROID
                 imageFormat = PF_A8B8G8R8;
+#else
+                imageFormat = PF_A8R8G8B8;
+#endif
             }
 
             uint8 numMipmaps = 0;
@@ -459,6 +464,9 @@ namespace Ogre
 
                     limitSquared = limit * limit;
                 }
+
+                if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
+                    limit = 1;
 
                 TextureArray textureArray( limit, limitSquared, true,
                                            mDefaultTextureParameters[mapType].isNormalMap );
@@ -773,6 +781,112 @@ namespace Ogre
         retVal.divisor  = 1;
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsTextureManager::dumpMemoryUsage(void) const
+    {
+        const char *typeNames[NUM_TEXTURE_TYPES] =
+        {
+            "DIFFUSE",
+            "MONOCHROME",
+            "NORMALS",
+            "ENV_MAP",
+            "DETAIL",
+            "DETAIL_NORMAL_MAP"
+        };
+
+        size_t bytesPerCategory[NUM_TEXTURE_TYPES];
+        memset( bytesPerCategory, 0, sizeof( bytesPerCategory ) );
+
+        LogManager &logManager = LogManager::getSingleton();
+
+        logManager.logMessage(
+                    "================================"
+                    "Start dump of HlmsTextureManager"
+                    "================================",
+                    LML_CRITICAL );
+
+        logManager.logMessage(
+                    "|#|Type|Width|Height|Depth|Format|HW Gamma|Mipmaps|Size in bytes|"
+                    "Num. active textures|Total texture capacity|Texture Names",
+                    LML_CRITICAL );
+
+        for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
+        {
+            TextureArrayVec::const_iterator itor = mTextureArrays[i].begin();
+            TextureArrayVec::const_iterator end  = mTextureArrays[i].end();
+
+            String row;
+
+            while( itor != end )
+            {
+                size_t textureSize = 0;
+
+                uint32 width    = itor->texture->getWidth();
+                uint32 height   = itor->texture->getHeight();
+                uint32 depth    = itor->texture->getDepth();
+
+                for( size_t j=0; j<(size_t)(itor->texture->getNumMipmaps() + 1); ++j )
+                {
+                    textureSize += PixelUtil::getMemorySize( width, height, depth,
+                                                             itor->texture->getFormat() ) *
+                                    itor->texture->getNumFaces();
+
+                    width   = std::max<uint32>( width >> 1, 1 );
+                    height  = std::max<uint32>( height >> 1, 1 );
+                    if( !itor->texture->isTextureTypeArray() )
+                        depth = std::max<uint32>( depth >> 1, 1 );
+                }
+
+                row += "|";
+                row += StringConverter::toString( itor - mTextureArrays[i].begin() ) + "|";
+                row += String( typeNames[i] ) + "|";
+                row += StringConverter::toString( itor->texture->getWidth() ) + "|";
+                row += StringConverter::toString( itor->texture->getHeight() ) + "|";
+                row += StringConverter::toString( itor->texture->getDepth() ) + "|";
+                row += PixelUtil::getFormatName( itor->texture->getFormat() ) + "|";
+                row += itor->texture->isHardwareGammaEnabled() ? "Yes|" : "No|";
+                row += StringConverter::toString( itor->texture->getNumMipmaps() ) + "|";
+                row += StringConverter::toString( textureSize ) + "|";
+                row += StringConverter::toString( itor->activeEntries ) + "|";
+                row += StringConverter::toString( itor->entries.size() );
+
+                StringVector::const_iterator itEntry = itor->entries.begin();
+                StringVector::const_iterator enEntry = itor->entries.begin() + itor->activeEntries;
+
+                while( itEntry != enEntry )
+                    row += "|" + *itEntry++;
+
+                logManager.logMessage( row, LML_CRITICAL );
+                row.clear();
+
+                bytesPerCategory[i] += textureSize;
+
+                ++itor;
+            }
+        }
+
+        logManager.logMessage( "|Size in MBs per category:", LML_CRITICAL );
+
+        size_t totalBytes = 0;
+        for( size_t i=0; i<NUM_TEXTURE_TYPES; ++i )
+        {
+            logManager.logMessage( "|" + String( typeNames[i] ) + "|" +
+                                   StringConverter::toString( bytesPerCategory[i] /
+                                                              (1024.0f * 1024.0f) ),
+                                   LML_CRITICAL );
+
+            totalBytes += bytesPerCategory[i];
+        }
+
+        logManager.logMessage( "|Total MBs used:|" + StringConverter::toString( totalBytes /
+                                                                                (1024.0f * 1024.0f) ),
+                               LML_CRITICAL );
+        logManager.logMessage(
+                    "================================"
+                    "End dump of HlmsTextureManager"
+                    "================================",
+                    LML_CRITICAL );
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
