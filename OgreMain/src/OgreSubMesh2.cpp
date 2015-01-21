@@ -241,6 +241,8 @@ namespace Ogre {
     };
     void SubMesh::importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords )
     {
+        mMaterialName = subMesh->getMaterialName();
+
         subMesh->_compileBoneAssignments();
         const v1::SubMesh::VertexBoneAssignmentList& v1BoneAssignments = subMesh->getBoneAssignments();
         mBoneAssignments.reserve( v1BoneAssignments.size() );

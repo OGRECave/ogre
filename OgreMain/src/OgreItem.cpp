@@ -263,7 +263,7 @@ namespace Ogre {
                 HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
                 HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault( subMesh->mMaterialName );
 
-                if( !datablock )
+                if( datablock )
                     mSubItems.back().setDatablock( datablock );
                 else
                     mSubItems.back().setMaterialName( subMesh->mMaterialName, mMesh->getGroup() );
