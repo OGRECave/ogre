@@ -288,7 +288,10 @@ namespace Ogre {
     */
     void GL3PlusFBOManager::detectFBOFormats()
     {
-        bool gl43plus = gl3wIsSupported(4,3);
+        // is glGetInternalformativ supported?
+        // core since GL 4.2: see https://www.opengl.org/wiki/GLAPI/glGetInternalformat
+        // TODO also look for GL_ARB_internalformat_query
+        bool hasInternalFormatQuery = gl3wIsSupported(4,2);
 
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
@@ -311,7 +314,10 @@ namespace Ogre {
             bool setupOk;
             GLint params;
 
-            if(!gl43plus) {
+            if(hasInternalFormatQuery) {
+                OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, fmt, GL_FRAMEBUFFER_RENDERABLE, 2, &params));
+                setupOk = params == GL_FULL_SUPPORT;
+            } else {
                 // Create and attach framebuffer
                 _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
 
@@ -319,9 +325,6 @@ namespace Ogre {
                 GLuint status;
                 OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
                 setupOk = status == GL_FRAMEBUFFER_COMPLETE;
-            } else {
-                OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, fmt, GL_FRAMEBUFFER_RENDERABLE, 2, &params));
-                setupOk = params == GL_FULL_SUPPORT;
             }
 
             // Ignore status in case of fmt==GL_NONE, because no implementation will accept
@@ -337,7 +340,7 @@ namespace Ogre {
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
-                    if(gl43plus) {
+                    if(hasInternalFormatQuery) {
                         OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, depthFormats[depth],
                                                                   GL_FRAMEBUFFER_RENDERABLE, 2, &params));
                         if (params == GL_FULL_SUPPORT)
