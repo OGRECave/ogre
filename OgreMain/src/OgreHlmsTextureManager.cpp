@@ -427,12 +427,16 @@ namespace Ogre
                 uint limit          = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                 uint limitSquared   = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                 bool packNonPow2    = mDefaultTextureParameters[mapType].packNonPow2;
+                float packMaxRatio  = mDefaultTextureParameters[mapType].packMaxRatio;
 
                 if( !packNonPow2 )
                 {
                     if( !Bitwise::isPO2( width ) || !Bitwise::isPO2( height ) )
                         limit = limitSquared = 1;
                 }
+
+                if( width / (float)height >= packMaxRatio || height / (float)width >= packMaxRatio )
+                    limit = limitSquared = 1;
 
                 if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                 {

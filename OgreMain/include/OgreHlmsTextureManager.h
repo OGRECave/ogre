@@ -103,6 +103,12 @@ namespace Ogre
             /// Whether non-power-of-2 textures should be packed together.
             bool        packNonPow2;
 
+            /// Textures with a higher AR (whether width / height or height / width) than
+            /// this value won't be packed.
+            /// Example: packMaxRatio = 2; textures with a resolution of 1024x512 or 512x2048
+            /// won't be packed because 1024 / 512 >= 2 and 2048 / 512 >= 2
+            float       packMaxRatio;
+
             /// Only used when packingMethod == TextureArrays
             ThresholdVec    textureArraysTresholds;
 
@@ -110,7 +116,7 @@ namespace Ogre
                 pixelFormat( PF_UNKNOWN ), maxTexturesPerArray( 16 ),
                 mipmaps( true ), hwGammaCorrection( false ),
                 packingMethod( TextureArrays ), isNormalMap( false ),
-                packNonPow2( false )
+                packNonPow2( false ), packMaxRatio( 3.0f )
             {
                 //This vector must be sorted!
                 textureArraysTresholds.push_back( Threshold( 1024 * 1024 / 2, 40 ) );
