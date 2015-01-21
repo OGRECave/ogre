@@ -291,11 +291,6 @@ namespace Ogre
         return createOrRetrieveTexture( texName, texName, mapType );
     }
     //-----------------------------------------------------------------------------------
-    inline bool isPow2( uint32 x )
-    {
-        return !(x & (x-1));
-    }
-    //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture(
                                                                         const String &aliasName,
                                                                         const String &texName,
@@ -435,7 +430,7 @@ namespace Ogre
 
                 if( !packNonPow2 )
                 {
-                    if( !isPow2( width ) || !isPow2( height ) )
+                    if( !Bitwise::isPO2( width ) || !Bitwise::isPO2( height ) )
                         limit = limitSquared = 1;
                 }
 
@@ -471,7 +466,7 @@ namespace Ogre
                                         textureArraysTresholds.end() - 1;
                         }
 
-                        limitSquared = itThres->maxTexturesPerArray;
+                        limitSquared = std::min<uint16>( limitSquared, itThres->maxTexturesPerArray );
                         depth = limitSquared;
                     }
                 }

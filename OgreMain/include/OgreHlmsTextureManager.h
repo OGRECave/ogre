@@ -77,7 +77,7 @@ namespace Ogre
 
         /// Textures whose size are less or equal to minTextureSize
         /// (without considering mipmaps) will have their maxTexturesPerArray
-        /// set to the value given in this threshold structure
+        /// clamped to the value given in this threshold structure
         struct Threshold
         {
             uint32      minTextureSize;
