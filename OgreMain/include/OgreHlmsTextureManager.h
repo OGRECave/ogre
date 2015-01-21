@@ -75,6 +75,22 @@ namespace Ogre
             Atlas           //Mobile
         };
 
+        /// Textures whose size are less or equal to minTextureSize
+        /// (without considering mipmaps) will have their maxTexturesPerArray
+        /// set to the value given in this threshold structure
+        struct Threshold
+        {
+            uint32      minTextureSize;
+            uint16      maxTexturesPerArray;
+
+            Threshold( uint32 _minTextureSize, uint16 _maxTexturesPerArray ) :
+                minTextureSize( _minTextureSize ),
+                maxTexturesPerArray( _maxTexturesPerArray )
+            {}
+        };
+
+        typedef vector<Threshold>::type ThresholdVec;
+
         struct DefaultTextureParameters
         {
             PixelFormat pixelFormat;    /// Unknown means assign based on the individual texture
@@ -84,10 +100,25 @@ namespace Ogre
             PackingMethod packingMethod;
             bool        isNormalMap;
 
+            /// Whether non-power-of-2 textures should be packed together.
+            bool        packNonPow2;
+
+            /// Only used when packingMethod == TextureArrays
+            ThresholdVec    textureArraysTresholds;
+
             DefaultTextureParameters() :
                 pixelFormat( PF_UNKNOWN ), maxTexturesPerArray( 16 ),
                 mipmaps( true ), hwGammaCorrection( false ),
-                packingMethod( TextureArrays ), isNormalMap( false ) {}
+                packingMethod( TextureArrays ), isNormalMap( false ),
+                packNonPow2( false )
+            {
+                //This vector must be sorted!
+                textureArraysTresholds.push_back( Threshold( 1024 * 1024 / 2, 40 ) );
+                textureArraysTresholds.push_back( Threshold( 1024 * 1024 * 1, 20 ) );
+                textureArraysTresholds.push_back( Threshold( 1024 * 1024 * 4, 10 ) );
+                textureArraysTresholds.push_back( Threshold( 2048 * 2048 * 4, 2 ) );
+                textureArraysTresholds.push_back( Threshold( 4096 * 4096 * 4, 1 ) );
+            }
         };
 
         enum TextureMapType
@@ -240,9 +271,9 @@ namespace Ogre
 
         DefaultTextureParameters* getDefaultTextureParameters(void) { return mDefaultTextureParameters; }
     };
-    /** @} */
-    /** @} */
 
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

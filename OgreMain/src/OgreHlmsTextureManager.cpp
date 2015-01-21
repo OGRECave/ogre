@@ -291,6 +291,11 @@ namespace Ogre
         return createOrRetrieveTexture( texName, texName, mapType );
     }
     //-----------------------------------------------------------------------------------
+    inline bool isPow2( uint32 x )
+    {
+        return !(x & (x-1));
+    }
+    //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture(
                                                                         const String &aliasName,
                                                                         const String &texName,
@@ -426,19 +431,48 @@ namespace Ogre
                 PixelFormat defaultPixelFormat = mDefaultTextureParameters[mapType].pixelFormat;
                 uint limit          = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                 uint limitSquared   = mDefaultTextureParameters[mapType].maxTexturesPerArray;
+                bool packNonPow2    = mDefaultTextureParameters[mapType].packNonPow2;
+
+                if( !packNonPow2 )
+                {
+                    if( !isPow2( width ) || !isPow2( height ) )
+                        limit = limitSquared = 1;
+                }
 
                 if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                 {
+                    limit = 1;
+
                     //Texture Arrays
                     if( texType == TEX_TYPE_3D || texType == TEX_TYPE_CUBE_MAP )
                     {
                         //APIs don't support arrays + 3D textures
                         //TODO: Cubemap arrays supported since D3D10.1
-                        limit = 1;
+                        limitSquared = 1;
                     }
                     else if( texType == TEX_TYPE_2D_ARRAY )
                     {
-                        depth = limit;
+                        PixelFormat pf = defaultPixelFormat == PF_UNKNOWN ? imageFormat :
+                                                                            defaultPixelFormat;
+
+                        size_t textureSizeNoMips = PixelUtil::getMemorySize( width, height, 1, pf );
+
+                        ThresholdVec::const_iterator itThres =  mDefaultTextureParameters[mapType].
+                                                                    textureArraysTresholds.begin();
+                        ThresholdVec::const_iterator enThres =  mDefaultTextureParameters[mapType].
+                                                                    textureArraysTresholds.end();
+
+                        while( itThres != enThres && textureSizeNoMips > itThres->minTextureSize )
+                            ++itThres;
+
+                        if( itThres == enThres )
+                        {
+                            itThres = mDefaultTextureParameters[mapType].
+                                        textureArraysTresholds.end() - 1;
+                        }
+
+                        limitSquared = itThres->maxTexturesPerArray;
+                        depth = limitSquared;
                     }
                 }
                 else
@@ -464,9 +498,6 @@ namespace Ogre
 
                     limitSquared = limit * limit;
                 }
-
-                if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
-                    limit = 1;
 
                 TextureArray textureArray( limit, limitSquared, true,
                                            mDefaultTextureParameters[mapType].isNormalMap );

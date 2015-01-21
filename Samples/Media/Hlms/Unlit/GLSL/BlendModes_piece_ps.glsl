@@ -105,7 +105,7 @@
 @foreach( diffuse_map, n )
     @property( diffuse_map@n_array )
         @piece( SamplerOrigin@n )textureMapsArray[@value(diffuse_map@n_idx)]@end
-        @piece( SamplerUV@n )vec3( inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), @insertpiece( diffuseIdx@n ) )@end
+		@piece( SamplerUV@n )vec3( inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), @insertpiece( diffuseIdx@n ) )@end
     @end @property( !diffuse_map@n_array )
         @piece( SamplerOrigin@n )textureMaps[@value(diffuse_map@n_idx)]@end
         @piece( SamplerUV@n )inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n )@end
