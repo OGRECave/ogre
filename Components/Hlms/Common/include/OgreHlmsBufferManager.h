@@ -32,6 +32,26 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 #include "OgreHeaderPrefix.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   if defined( OGRE_STATIC_LIB ) || defined( OGRE_PBS_STATIC_LIB ) || defined( OGRE_UNLIT_STATIC_LIB )
+#       define _OgreHlmsCommonExport
+#   else
+#       if defined( OgreHlmsPbs_EXPORTS ) || defined( OgreHlmsUnlit_EXPORTS )
+#           define _OgreHlmsCommonExport __declspec( dllexport )
+#       else
+#           if defined( __MINGW32__ )
+#               define _OgreHlmsCommonExport
+#           else
+#               define _OgreHlmsCommonExport __declspec( dllimport )
+#           endif
+#       endif
+#   endif
+#elif defined ( OGRE_GCC_VISIBILITY )
+#   define _OgreHlmsCommonExport __attribute__ ((visibility("default")))
+#else
+#   define _OgreHlmsCommonExport
+#endif
+
 namespace Ogre
 {
     /** \addtogroup Component
@@ -48,7 +68,7 @@ namespace Ogre
             2. Requesting more memory.
             3. Mapping it.
     */
-    class HlmsBufferManager : public Hlms
+    class _OgreHlmsCommonExport HlmsBufferManager : public Hlms
     {
     protected:
         typedef vector<ConstBufferPacked*>::type ConstBufferPackedVec;
