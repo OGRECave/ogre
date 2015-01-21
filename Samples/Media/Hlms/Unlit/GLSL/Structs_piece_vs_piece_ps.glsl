@@ -1,8 +1,8 @@
 @piece( MaterialDecl )
 struct Material
 {
-	vec4 diffuse;
 	vec4 alpha_test_threshold;
+	vec4 diffuse;
 
 	uvec4 indices0_3;
 	uvec4 indices4_7;

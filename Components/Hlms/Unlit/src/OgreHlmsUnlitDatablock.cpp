@@ -254,6 +254,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsUnlitDatablock::uploadToConstBuffer( char *dstPtr )
     {
+        memcpy( dstPtr, &mAlphaTestThreshold, sizeof( float ) );
+        dstPtr += 4 * sizeof(float);
         memcpy( dstPtr, &mR, MaterialSizeInGpu );
     }
     //-----------------------------------------------------------------------------------
