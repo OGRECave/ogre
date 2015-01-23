@@ -137,6 +137,10 @@ namespace Ogre {
     {
     public:
         // No methods, must just override all methods inherited from FactoryObj
+        ParticleSystemRendererFactory() : mCurrentSceneManager(0) {}
+
+        /// Needs to be set directly before calling createInstance
+        SceneManager *mCurrentSceneManager;
     };
     /** @} */
     /** @} */

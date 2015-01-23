@@ -334,7 +334,8 @@ namespace Ogre {
         pFact->second->destroyAffector(affector);
     }
     //-----------------------------------------------------------------------
-    ParticleSystemRenderer* ParticleSystemManager::_createRenderer(const String& rendererType)
+    ParticleSystemRenderer* ParticleSystemManager::_createRenderer(const String& rendererType,
+                                                                   SceneManager *sceneManager)
     {
         OGRE_LOCK_AUTO_MUTEX;
         // Locate affector type
@@ -346,6 +347,7 @@ namespace Ogre {
                 "ParticleSystemManager::_createRenderer");
         }
 
+        pFact->second->mCurrentSceneManager = sceneManager;
         return pFact->second->createInstance(rendererType);
     }
     //-----------------------------------------------------------------------

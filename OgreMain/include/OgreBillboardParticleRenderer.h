@@ -55,7 +55,8 @@ namespace v1 {
         /// The billboard set that's doing the rendering
         BillboardSet* mBillboardSet;
     public:
-        BillboardParticleRenderer( IdType id, ObjectMemoryManager *objectMemoryManager );
+        BillboardParticleRenderer( IdType id, ObjectMemoryManager *objectMemoryManager,
+                                   SceneManager *sceneManager );
         ~BillboardParticleRenderer();
 
         /** Command object for billboard type (see ParamCommand).*/

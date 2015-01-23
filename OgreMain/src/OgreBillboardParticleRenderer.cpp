@@ -49,7 +49,8 @@ namespace v1 {
     BillboardParticleRenderer::CmdAccurateFacing BillboardParticleRenderer::msAccurateFacingCmd;
     //-----------------------------------------------------------------------
     BillboardParticleRenderer::BillboardParticleRenderer( IdType id,
-                                                            ObjectMemoryManager *objectMemoryManager )
+                                                          ObjectMemoryManager *objectMemoryManager,
+                                                          SceneManager *sceneManager )
     {
         if (createParamDictionary("BillboardParticleRenderer"))
         {
@@ -110,7 +111,7 @@ namespace v1 {
         }
 
         // Create billboard set
-        mBillboardSet = OGRE_NEW BillboardSet( id, objectMemoryManager, 0, 0, true, 0 );
+        mBillboardSet = OGRE_NEW BillboardSet( id, objectMemoryManager, sceneManager, 0, true, 0 );
         // World-relative axes
         mBillboardSet->setBillboardsInWorldSpace(true);
     }
@@ -319,7 +320,8 @@ namespace v1 {
     ParticleSystemRenderer* BillboardParticleRendererFactory::createInstance( const String &name )
     {
         return OGRE_NEW BillboardParticleRenderer( Id::generateNewId<ParticleSystemRenderer>(),
-                                                    mDummyObjectMemoryManager );
+                                                   mDummyObjectMemoryManager,
+                                                   mCurrentSceneManager );
     }
     //-----------------------------------------------------------------------
     void BillboardParticleRendererFactory::destroyInstance( 

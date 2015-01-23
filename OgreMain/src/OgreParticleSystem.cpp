@@ -1013,7 +1013,7 @@ namespace Ogre {
 
         if (!rendererName.empty())
         {
-            mRenderer = ParticleSystemManager::getSingleton()._createRenderer(rendererName);
+            mRenderer = ParticleSystemManager::getSingleton()._createRenderer(rendererName, mManager);
             mIsRendererConfigured = false;
         }
     }

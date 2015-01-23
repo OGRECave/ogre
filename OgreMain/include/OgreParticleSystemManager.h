@@ -301,7 +301,7 @@ namespace Ogre {
         @param rendererType
             String name of the renderer type to be created. A factory of this type must have been registered.
         */
-        ParticleSystemRenderer* _createRenderer(const String& rendererType);
+        ParticleSystemRenderer* _createRenderer(const String& rendererType, SceneManager *sceneManager);
 
         /** Internal method for destroying a renderer.
         @remarks

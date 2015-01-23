@@ -71,7 +71,7 @@ namespace v1 {
         mBillboardType(BBT_POINT),
         mCommonDirection(Ogre::Vector3::UNIT_Z),
         mCommonUpVector(Vector3::UNIT_Y),
-        mVaoManager(manager->getDestinationRenderSystem()->getVaoManager()),
+        mVaoManager(0),
         mPointRendering(false),
         mBuffersCreated(false),
         mPoolSize(poolSize),
@@ -712,6 +712,8 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void BillboardSet::_createBuffers(void)
     {
+        mVaoManager = mManager->getDestinationRenderSystem()->getVaoManager();
+
         /* Allocate / reallocate vertex data
            Note that we allocate enough space for ALL the billboards in the pool, but only issue
            rendering operations for the sections relating to the active billboards
