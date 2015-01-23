@@ -252,7 +252,8 @@ namespace Ogre
 
             //Add a new binding command.
             shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
-            *shaderBufferCmd = CbShaderBuffer( 0, mTexBuffers[mCurrentTexBuffer], bindOffset, 0 );
+            *shaderBufferCmd = CbShaderBuffer( 0, mTexBuffers[mCurrentTexBuffer],
+                                               mTexLastOffset + bindOffset, 0 );
             mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
         }
     }

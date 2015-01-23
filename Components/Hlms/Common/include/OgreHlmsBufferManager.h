@@ -85,15 +85,38 @@ namespace Ogre
         uint32  *mCurrentMappedConstBuffer;
         size_t  mCurrentConstBufferSize;
 
+        /// Holds ptr to the start of the mapped region
         float   *mRealStartMappedTexBuffer;
+        /// Holds ptr to the start of the **bound** region to the shader slot.
+        /// It is always mStartMappedTexBuffer >= mRealStartMappedTexBuffer
         float   *mStartMappedTexBuffer;
         float   *mCurrentMappedTexBuffer;
+        /// Bindable size left.
         size_t  mCurrentTexBufferSize;
 
-        /// Resets every to zero every new buffer (@see unmapTexBuffer and @see mapNextTexBuffer).
+        /** Holds the offset at which all tex. binds should start from.
+            Resets every to zero every new buffer (@see unmapTexBuffer
+            and @see mapNextTexBuffer).
+        @remarks
+            The texture buffer has three location we need to track for:
+                * Where the buffer mapping starts (i.e. beginning of each render_pass)
+                  Tracked via mRealStartMappedTexBuffer
+                * Where the buffer latest bind point starts (i.e. each time we exceed
+                  the HW limit for const buffers, usually 64kb; or rendering between
+                  render queue IDs). Tracked via mStartMappedTexBuffer.
+                * How much data we've written so far for the current texture buffer,
+                  tracked via mTexLastOffset.
+        */
         size_t  mTexLastOffset;
+
+        /// Stores the offset to the last command buffer's binding command so we can
+        /// write the amount of bytes that should be bound (which is only known after
+        /// we've written them).
         size_t  mLastTexBufferCmdOffset;
 
+        /// The tex. buffer's size. Try raising this number if your API traces/profilers
+        /// show we're constantly binding new textures. Should only be relevant if you
+        /// have many skeletally animated meshes with lots of bones.
         size_t mTextureBufferDefaultSize;
 
         /// For compatibility reasons with D3D11 and GLES3, Const buffers are mapped.
