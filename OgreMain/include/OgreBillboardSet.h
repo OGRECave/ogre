@@ -171,8 +171,15 @@ namespace v1 {
 
         /// The vertex position data for all billboards in this set.
         VertexData* mVertexData;
-        /// Shortcut to main buffer (positions, colours, texture coords)
+        /// Shortcut to current main buffer (positions, colours, texture coords)
         HardwareVertexBufferSharedPtr mMainBuf;
+        typedef vector<HardwareVertexBufferSharedPtr>::type HardwareVertexBufferSharedPtrVec;
+        typedef vector<HardwareVertexBufferSharedPtrVec>::type HardwareVertexBufferSharedPtrVecVec;
+        HardwareVertexBufferSharedPtrVecVec mMainBuffers;
+        uint32 mLastLockedBuffer;
+        /// Frame number in which we did the last lock. We use it to know which buffer to
+        /// lock (we can't lock the same buffer twice with HBL_NO_OVERWRITE in the same frame)
+        uint32 mLastLockedFrame;
         /// Locked pointer to buffer
         float* mLockPtr;
         /// Boundary offsets based on origin and camera orientation
@@ -206,6 +213,10 @@ namespace v1 {
         Vector3 mCommonDirection;
         /// Common up-vector for billboards of type BBT_PERPENDICULAR_SELF and BBT_PERPENDICULAR_COMMON
         Vector3 mCommonUpVector;
+
+        /// Ugly dependency from a v1 object to a v2 object. The VaoManager is used to properly
+        /// synchronize HBU_NO_OVERWRITE and avoid expensive stalls (specially on GL)
+        VaoManager *mVaoManager;
 
         /// Internal method for culling individual billboards
         inline bool billboardVisible(const Camera* cam, const Billboard& bill);
@@ -289,6 +300,8 @@ namespace v1 {
         bool mAutoUpdate;
         /// True if the billboard data changed. Will cause vertex buffer update.
         bool mBillboardDataChanged;
+
+        void createExtraVertexBuffer( size_t vertexSize );
 
         /** Internal method creates vertex and index buffers.
         */

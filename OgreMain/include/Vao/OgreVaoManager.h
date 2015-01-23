@@ -368,6 +368,11 @@ namespace Ogre
 
         uint8 _getDynamicBufferCurrentFrameNoWait(void) const   { return mDynamicBufferCurrentFrame; }
         uint8 getDynamicBufferMultiplier(void) const            { return mDynamicBufferMultiplier; }
+
+        /// Returns the current frame # (which wraps to 0 every mDynamicBufferMultiplier
+        /// times). But first stalls until that mDynamicBufferMultiplier-1 frame behind
+        /// is finished.
+        virtual uint8 waitForTailFrameToFinish(void) = 0;
     };
 }
 

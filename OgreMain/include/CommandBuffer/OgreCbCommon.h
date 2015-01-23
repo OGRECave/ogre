@@ -48,6 +48,7 @@ namespace Ogre
         CB_SET_HLMS_BLOCK,
         CB_SET_TEXTURE,
         CB_TEXTURE_DISABLE_FROM,
+        CB_START_V1_LEGACY_RENDERING,
         CB_SET_V1_RENDER_OP,
         CB_DRAW_V1_INDEXED,
         CB_DRAW_V1_STRIP,

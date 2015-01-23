@@ -102,7 +102,8 @@ namespace v1 {
             access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
         //FIXME Is this correct usage for shader storage buffers?
-        access |= GL_MAP_UNSYNCHRONIZED_BIT;
+        if( options == HBL_NO_OVERWRITE )
+            access |= GL_MAP_UNSYNCHRONIZED_BIT;
 
         void* pBuffer = 0;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, offset, length, access));

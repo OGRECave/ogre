@@ -44,6 +44,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include <algorithm>
 
+#include "Vao/OgreVaoManager.h"
+
 namespace Ogre {
 namespace v1 {
     // Init statics
@@ -63,11 +65,13 @@ namespace v1 {
         mAllDefaultRotation(true),
         mWorldSpace(false),
         mVertexData(0),
+        mLastLockedFrame( (uint32)-1 ),
         mIndexData(0),
         mCullIndividual( false ),
         mBillboardType(BBT_POINT),
         mCommonDirection(Ogre::Vector3::UNIT_Z),
         mCommonUpVector(Vector3::UNIT_Y),
+        mVaoManager(manager->getDestinationRenderSystem()->getVaoManager()),
         mPointRendering(false),
         mBuffersCreated(false),
         mPoolSize(poolSize),
@@ -369,6 +373,20 @@ namespace v1 {
         if(!mBuffersCreated)
             _createBuffers();
 
+        if( mLastLockedFrame == mVaoManager->getFrameCount() )
+        {
+            createExtraVertexBuffer( mMainBuffers[0][0]->getVertexSize() );
+            ++mLastLockedBuffer;
+        }
+        else
+        {
+            mLastLockedBuffer = 0;
+            mLastLockedFrame  = mVaoManager->getFrameCount();
+        }
+
+        mMainBuf = mMainBuffers[mVaoManager->waitForTailFrameToFinish()][mLastLockedBuffer];
+        mVertexData->vertexBufferBinding->setBinding(0, mMainBuf);
+
         // Only calculate vertex offets et al if we're not point rendering
         if (!mPointRendering)
         {
@@ -416,15 +434,16 @@ namespace v1 {
             assert (numBillboards * billboardSize <= mMainBuf->getSizeInBytes());
 
             mLockPtr = static_cast<float*>(
-                mMainBuf->lock(0, numBillboards * billboardSize, 
-                mMainBuf->getUsage() & HardwareBuffer::HBU_DYNAMIC ?
-                HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL) );
+                mMainBuf->lock( 0, numBillboards * billboardSize,
+                                mMainBuf->getUsage() & HardwareBuffer::HBU_DYNAMIC ?
+                                    HardwareBuffer::HBL_NO_OVERWRITE : HardwareBuffer::HBL_NORMAL) );
         }
         else // lock the entire thing
+        {
             mLockPtr = static_cast<float*>(
-            mMainBuf->lock(mMainBuf->getUsage() & HardwareBuffer::HBU_DYNAMIC ?
-            HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL) );
-
+                        mMainBuf->lock( mMainBuf->getUsage() & HardwareBuffer::HBU_DYNAMIC ?
+                                HardwareBuffer::HBL_NO_OVERWRITE : HardwareBuffer::HBL_NORMAL) );
+        }
     }
     //-----------------------------------------------------------------------
     void BillboardSet::injectBillboard(const Billboard& bb, const Camera *camera)
@@ -658,7 +677,38 @@ namespace v1 {
 
         _destroyBuffers();
     }
+    //-----------------------------------------------------------------------
+    void BillboardSet::createExtraVertexBuffer( size_t vertexSize )
+    {
+        if( mAutoUpdate )
+        {
+            const size_t dynamicBufferMultiplier = mVaoManager->getDynamicBufferMultiplier();
 
+            if( mMainBuffers.size() != dynamicBufferMultiplier )
+                mMainBuffers.resize( dynamicBufferMultiplier );
+
+            for( size_t i=0; i<dynamicBufferMultiplier; ++i )
+            {
+                mMainBuffers[i].push_back(
+                            HardwareBufferManager::getSingleton().createVertexBuffer(
+                                vertexSize,
+                                mVertexData->vertexCount * dynamicBufferMultiplier,
+                                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE) );
+            }
+        }
+        else
+        {
+            if( mMainBuffers.empty() )
+                mMainBuffers.resize( 1 );
+
+            assert( mMainBuffers[0].empty() );
+
+            mMainBuffers[0].push_back(
+                        HardwareBufferManager::getSingleton().createVertexBuffer(
+                            vertexSize, mVertexData->vertexCount,
+                            HardwareBuffer::HBU_STATIC_WRITE_ONLY) );
+        }
+    }
     //-----------------------------------------------------------------------
     void BillboardSet::_createBuffers(void)
     {
@@ -708,14 +758,14 @@ namespace v1 {
             decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
         }
 
-        mMainBuf =
-            HardwareBufferManager::getSingleton().createVertexBuffer(
-                decl->getVertexSize(0),
-                mVertexData->vertexCount,
-                mAutoUpdate ? HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE : 
-                HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        createExtraVertexBuffer( decl->getVertexSize(0) );
+
+        mLastLockedBuffer   = 0;
+        mLastLockedFrame    = mVaoManager->getFrameCount() - 1;
+        mMainBuf = mMainBuffers[0][0];
+
         // bind position and diffuses
-        binding->setBinding(0, mMainBuf);
+        binding->setBinding(0, mMainBuffers[0][0]);
 
         if (!mPointRendering)
         {

@@ -377,10 +377,10 @@ namespace Ogre {
         writeData(&numSources, 1, 1);
         {
             // Vertex declaration
-            size_t size = calcVertexDeclSize( vertexData );
+            size_t vertexDeclChunkSize = calcVertexDeclSize( vertexData );
 
             pushInnerChunk(mStream);
-            writeChunkHeader(M_SUBMESH_M_GEOMETRY_VERTEX_DECLARATION, size);
+            writeChunkHeader(M_SUBMESH_M_GEOMETRY_VERTEX_DECLARATION, vertexDeclChunkSize);
 
             {
                 //Go through all the sources

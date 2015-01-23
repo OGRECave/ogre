@@ -135,7 +135,7 @@ namespace Ogre
         mBufferInterface->upload( data, elementStart, elementCount );
     }
     //-----------------------------------------------------------------------------------
-    DECL_MALLOC void* BufferPacked::map( size_t elementStart, size_t elementCount, bool advanceFrame )
+    DECL_MALLOC void* BufferPacked::map( size_t elementStart, size_t elementCount, bool bAdvanceFrame )
     {
         if( mBufferType < BT_DYNAMIC_DEFAULT )
         {
@@ -172,17 +172,17 @@ namespace Ogre
 
             if( //This is a different frame from the last time we called map
                 mLastFrameMapped != currentFrame &&
-                //map was called, but advanceFrame was not.
+                //map was called, but bAdvanceFrame was not.
                 (int)(mLastFrameMapped - mLastFrameMappedAndAdvanced) > 0 )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                             "Last frame called map( advanceFrame = false ) but "
+                             "Last frame called map( bAdvanceFrame = false ) but "
                              "didn't call advanceFrame!!!.", "BufferPacked::map" );
             }
 
             mLastFrameMapped = currentFrame;
 
-            if( advanceFrame )
+            if( bAdvanceFrame )
                 mLastFrameMappedAndAdvanced = currentFrame;
         }
 #endif
@@ -190,7 +190,7 @@ namespace Ogre
         MappingState prevMappingState = mMappingState;
         mMappingState = MS_MAPPED;
 
-        return mBufferInterface->map( elementStart, elementCount, prevMappingState, advanceFrame );
+        return mBufferInterface->map( elementStart, elementCount, prevMappingState, bAdvanceFrame );
     }
     //-----------------------------------------------------------------------------------
     void BufferPacked::unmap( UnmapOptions unmapOption, size_t flushStartElem, size_t flushSizeElem )

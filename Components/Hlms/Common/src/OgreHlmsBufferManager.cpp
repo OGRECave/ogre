@@ -42,9 +42,9 @@ namespace Ogre
 {
     HlmsBufferManager::HlmsBufferManager( HlmsTypes type, IdString typeName, Archive *dataFolder ) :
         Hlms( type, typeName, dataFolder ),
+        mVaoManager( 0 ),
         mCurrentConstBuffer( 0 ),
         mCurrentTexBuffer( 0 ),
-        mVaoManager( 0 ),
         mStartMappedConstBuffer( 0 ),
         mCurrentMappedConstBuffer( 0 ),
         mCurrentConstBufferSize( 0 ),

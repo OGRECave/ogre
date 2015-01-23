@@ -113,8 +113,8 @@ namespace Ogre
                          "StagingBuffer::unmap" );
         }
 
-        assert( (!mUploadOnly && !destinations && !numDestinations ||
-                mUploadOnly && destinations && numDestinations) &&
+        assert( ( (!mUploadOnly && !destinations && !numDestinations) ||
+                  (mUploadOnly && destinations && numDestinations) ) &&
                 "Using an upload staging-buffer for downloads or vice-versa." );
 
         unmapImpl( destinations, numDestinations );

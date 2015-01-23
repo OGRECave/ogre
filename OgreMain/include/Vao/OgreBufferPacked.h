@@ -181,13 +181,13 @@ namespace Ogre
         @param elementCount
             Length of the region to map, in elements. @see getNumElements to map the whole range.
             Can't be 0.
-        @param advanceFrame
+        @param bAdvanceFrame
             When true, the Buffer will be usable after unmapping it (or earlier if persistent mapped).
             However you won't be able to call map() again until the next frame.
             Calling this with false allows to call map multiple times. However ater calling unmap,
             you must call advanceFrame. THIS IS ONLY FOR VERY ADVANCED USERS.
         */
-        DECL_MALLOC void* map( size_t elementStart, size_t elementCount, bool advanceFrame=true );
+        DECL_MALLOC void* map( size_t elementStart, size_t elementCount, bool bAdvanceFrame=true );
 
         /** Unmaps or flushes the region mapped with @see map. Alternatively, you can flush a smaller region
             (i.e. you didn't know which regions you were to update when mapping, but now that you're done,

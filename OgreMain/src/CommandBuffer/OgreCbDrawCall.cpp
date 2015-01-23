@@ -101,6 +101,17 @@ namespace Ogre
 
     //-----------------------------------------------------------------------------------
 
+    v1::CbStartV1LegacyRendering::CbStartV1LegacyRendering() :
+        CbBase( CB_START_V1_LEGACY_RENDERING )
+    {
+    }
+
+    void CommandBuffer::execute_startV1LegacyRendering( CommandBuffer *_this,
+                                                        const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        _this->mRenderSystem->_startLegacyV1Rendering();
+    }
+
     v1::CbRenderOp::CbRenderOp( const v1::RenderOperation &renderOp ) :
         CbBase( CB_SET_V1_RENDER_OP )
     {

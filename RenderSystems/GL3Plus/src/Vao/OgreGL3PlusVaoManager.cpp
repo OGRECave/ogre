@@ -73,8 +73,9 @@ namespace Ogre
         14, // VES_BLEND_INDICES2 - 1
     };
 
-    GL3PlusVaoManager::GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers ) :
-        mArbBufferStorage( supportsArbBufferStorage ),
+    GL3PlusVaoManager::GL3PlusVaoManager( bool _supportsArbBufferStorage,
+                                          bool _supportsIndirectBuffers ) :
+        mArbBufferStorage( _supportsArbBufferStorage ),
         mDrawId( 0 )
     {
         //Keep pools of 128MB each for static meshes
@@ -99,7 +100,7 @@ namespace Ogre
         mTexBufferMaxSize = static_cast<size_t>( maxBufferSize );
 
         mSupportsPersistentMapping  = mArbBufferStorage;
-        mSupportsIndirectBuffers    = supportsIndirectBuffers;
+        mSupportsIndirectBuffers    = _supportsIndirectBuffers;
 
         VertexElement2Vec vertexElements;
         vertexElements.push_back( VertexElement2( VET_UINT1, VES_COUNT ) );

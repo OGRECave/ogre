@@ -413,7 +413,8 @@ namespace Ogre
             {
                 if( mLastVaoName )
                 {
-                    rs->_startLegacyV1Rendering();
+                    *mCommandBuffer->addCommand<v1::CbStartV1LegacyRendering>() =
+                                                                    v1::CbStartV1LegacyRendering();
                     mLastVaoName = 0;
                 }
                 renderGL3V1( casterPass, dualParaboloid, passCache, mRenderQueues[i] );

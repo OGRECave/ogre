@@ -253,10 +253,8 @@ namespace Ogre
 
         virtual void _update(void);
 
-        /// Returns the current frame # (which wraps to 0 every mDynamicBufferMultiplier
-        /// times). But first stalls until that mDynamicBufferMultiplier-1 frame behind
-        /// is finished.
-        uint8 waitForTailFrameToFinish(void);
+        /// @see VaoManager::waitForTailFrameToFinish
+        virtual uint8 waitForTailFrameToFinish(void);
 
         /** Will stall undefinitely until GPU finishes (signals the sync object).
         @param fenceName

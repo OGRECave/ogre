@@ -124,12 +124,12 @@ namespace Ogre {
         : mDepthWrite(true),
           mScissorsEnabled(false),
           mStencilWriteMask(0xFFFFFFFF),
-          mShaderManager(0),
-          mGLSLShaderFactory(0),
-          mHardwareBufferManager(0),
           mGlobalVao( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
+          mShaderManager(0),
+          mGLSLShaderFactory(0),
+          mHardwareBufferManager(0),
           mRTTManager(0),
           mActiveTextureUnit(0)
     {
@@ -2593,7 +2593,7 @@ namespace Ogre {
                 break;
             };
 
-            assert( semantic != VES_TEXTURE_COORDINATES || elem.getIndex() < 8 &&
+            assert( (semantic != VES_TEXTURE_COORDINATES || elem.getIndex() < 8) &&
                     "Up to 8 UVs are supported." );
 
             if( semantic == VES_BINORMAL )

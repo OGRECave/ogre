@@ -80,6 +80,11 @@ namespace Ogre
 
 namespace v1
 {
+    struct CbStartV1LegacyRendering : public CbBase
+    {
+        CbStartV1LegacyRendering();
+    };
+
     struct CbRenderOp : public CbBase
     {
         v1::VertexData  *vertexData;

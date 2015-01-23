@@ -101,7 +101,8 @@ namespace v1 {
         else
             access |= GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
-        access |= GL_MAP_UNSYNCHRONIZED_BIT;
+        if( options == HBL_NO_OVERWRITE )
+            access |= GL_MAP_UNSYNCHRONIZED_BIT;
 
         void* pBuffer = 0;
         OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_UNIFORM_BUFFER, offset, length, access));
