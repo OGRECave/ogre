@@ -32,6 +32,10 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 
+#if __OGRE_HAVE_NEON
+#define STBI_NEON
+#endif
+
 #define STBI_NO_STDIO
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
@@ -46,10 +50,10 @@ namespace Ogre {
         stbi_convert_iphone_png_to_rgb(1);
         stbi_set_unpremultiply_on_load(1);
 
-        LogManager::getSingleton().logMessage(LML_NORMAL, "stb_image - v1.46 - public domain JPEG/PNG reader");
+        LogManager::getSingleton().logMessage(LML_NORMAL, "stb_image - v2.02 - public domain JPEG/PNG reader");
         
         // Register codecs
-        String exts = "jpeg,jpg,png,bmp,psd,tga,gif,pic";
+        String exts = "jpeg,jpg,png,bmp,psd,tga,gif,pic,ppm,pgm";
         StringVector extsVector = StringUtil::split(exts, ",");
         for (StringVector::iterator v = extsVector.begin(); v != extsVector.end(); ++v)
         {
