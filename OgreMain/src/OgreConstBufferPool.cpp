@@ -145,6 +145,8 @@ namespace Ogre
             (*itor)->uploadToConstBuffer( data );
             data += materialSizeInGpu;
 
+            (*itor)->mDirty = false;
+
             const BufferPool *usersPool = (*itor)->getAssignedPool();
 
             StagingBuffer::Destination dst( usersPool->materialBuffer, dstOffset,
