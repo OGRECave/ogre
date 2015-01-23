@@ -148,12 +148,12 @@ namespace Ogre {
             
             if((opt = miscParams->find("externalWindowHandle")) != end)
             {
-                mWindow = (ANativeWindow*)(Ogre::StringConverter::parseInt(opt->second));
+                mWindow = (ANativeWindow*)(Ogre::StringConverter::parseSizeT(opt->second));
             }
             
             if((opt = miscParams->find("androidConfig")) != end)
             {
-                config = (AConfiguration*)(Ogre::StringConverter::parseInt(opt->second));
+                config = (AConfiguration*)(Ogre::StringConverter::parseSizeT(opt->second));
             }
             
             int ctxHandle = -1;
