@@ -170,8 +170,6 @@ else ()
 endif ()
 
 endif ()
-
-
   
 # Install sample sources
 if (OGRE_INSTALL_SAMPLES_SOURCE)
@@ -230,3 +228,7 @@ if (MSVC)
 	add_dependencies(demo_installer SampleBrowser)
   endif()
 endif()
+
+if( OGRE_BUILD_SAMPLES2 )
+    add_subdirectory(2.0)
+endif ()
