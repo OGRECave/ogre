@@ -1,7 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "MyGameState.h"
-#include "YieldTimer.h"
+#include "Threading/YieldTimer.h"
 
 #include "OgreRenderWindow.h"
 #include "OgreTimer.h"

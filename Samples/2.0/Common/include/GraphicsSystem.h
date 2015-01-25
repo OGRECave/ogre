@@ -11,7 +11,6 @@
 
 namespace Demo
 {
-    class GameState;
     class SdlInputHandler;
 
     class GraphicsSystem : public BaseSystem

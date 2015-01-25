@@ -282,6 +282,14 @@ std::string macBundlePath()
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::processIncomingMessage( Mq::MessageId messageId, Mq::SendData data )
     {
+        switch( messageId )
+        {
+        case Mq::SDL_EVENT_BUFFER_ID_USED:
+            mInputHandler->_releaseEventBufferId( data.udata.iData );
+            break;
+        default:
+            break;
+        }
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::setupResources(void)

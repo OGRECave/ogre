@@ -11,6 +11,11 @@ namespace Mq
 {
     enum MessageId
     {
+        //Graphics  -> Logic
+        SDL_EVENT,
+        //Graphics <-> Logic
+        SDL_EVENT_BUFFER_ID_USED,
+
         NUM_MESSAGE_IDS
     };
 

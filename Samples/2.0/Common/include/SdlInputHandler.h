@@ -17,9 +17,17 @@ namespace Demo
     {
         SDL_Window  *mSdlWindow;
 
+        BaseSystem          *mGraphicsSystem;
+        BaseSystem          *mLogicSystem;
         MouseListener       *mMouseListener;
         KeyboardListener    *mKeyboardListener;
         JoystickListener    *mJoystickListener;
+
+        /// @see encapsulateEvent
+        int                                     mCurrentEventBuffer;
+        size_t                                  mEventBufferOffset;
+        std::vector<std::vector<unsigned char>*>mEventBuffers;
+        std::vector<int>                        mFreeEventBuffers;
 
         // User settings
         /// User setting. From the SDL docs: While the mouse is in relative mode, the
@@ -58,6 +66,22 @@ namespace Demo
         /// motions as a side effect of warpMouse()
         bool handleWarpMotion( const SDL_MouseMotionEvent& evt );
 
+        /** This handler will redirect all input events to the LogicSystem (if there is one) so that
+            it can process it too. This message needs its own heap memory. We don't call new/malloc
+            per event because this could damage scalability. Instead we preallocate pools in
+            mEventBuffers and use that memory instead. Once the pool has been used for the entire
+            frame or is full, we won't use it again until the LogicSystem tells us it's done with it.
+        @par
+            This function takes an SDL_Event, copies it into the pool, and returns a pointer to it
+            ready to be sent to the LogicSystem.
+        @remarks
+            LogicSystem must send a message back telling us it is done with that ID, so that we can
+            call _releaseEventBufferId.
+            WARNING: Failing to do so will cause us to continously allocate new pools until RAM goes
+            out.
+        */
+        SDL_Event* encapsulateEvent( const SDL_Event& evt );
+
     public:
         SdlInputHandler( SDL_Window *sdlWindow,
                          MouseListener *mouseListener,
@@ -80,6 +104,8 @@ namespace Demo
 
         /// Shows or hides the mouse cursor.
         void setMouseVisible( bool visible );
+
+        void _releaseEventBufferId( int id );
     };
 }
 

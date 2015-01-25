@@ -2,7 +2,7 @@
 #ifndef _BaseSystem_H_
 #define _BaseSystem_H_
 
-#include "MessageQueueSystem.h"
+#include "Threading/MessageQueueSystem.h"
 
 namespace Demo
 {
