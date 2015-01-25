@@ -67,4 +67,12 @@ namespace Ogre
         if( !threadHandles.empty() )
             Threads::WaitForThreads( threadHandles.size(), &threadHandles[0] );
     }
+    //-----------------------------------------------------------------------------------
+    void Threads::Sleep( uint32 milliseconds )
+    {
+        timespec timeToSleep;
+        timeToSleep.tv_nsec = (milliseconds % 1000) * 1000000;
+        timeToSleep.tv_sec  = milliseconds / 1000;
+        nanosleep( &timeToSleep, 0 );
+    }
 }

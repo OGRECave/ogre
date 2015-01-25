@@ -17,6 +17,8 @@
 
 #include "Compositor/OgreCompositorManager2.h"
 
+#include "OgreOverlaySystem.h"
+
 #include <SDL_syswm.h>
 
 namespace Demo
@@ -59,6 +61,7 @@ std::string macBundlePath()
         mSceneManager( 0 ),
         mCamera( 0 ),
         mWorkspace( 0 ),
+        mOverlaySystem( 0 ),
         mQuit( false ),
         mBackgroundColour( backgroundColour )
     {
@@ -179,13 +182,16 @@ std::string macBundlePath()
         mRenderWindow = Ogre::Root::getSingleton().createRenderWindow( title, width, height,
                                                                        fullscreen, &params );
 
+        mOverlaySystem = OGRE_NEW Ogre::v1::OverlaySystem();
+
         setupResources();
         loadResources();
         chooseSceneManager();
         createCamera();
         mWorkspace = setupCompositor();
 
-        mInputHandler = new SdlInputHandler( mSdlWindow );
+        mInputHandler = new SdlInputHandler( mSdlWindow, mCurrentGameState,
+                                             mCurrentGameState, mCurrentGameState );
 
         BaseSystem::initialize();
     }
@@ -193,6 +199,12 @@ std::string macBundlePath()
     void GraphicsSystem::deinitialize(void)
     {
         BaseSystem::deinitialize();
+
+        if( mSceneManager )
+            mSceneManager->removeRenderQueueListener( mOverlaySystem );
+
+        OGRE_DELETE mOverlaySystem;
+        mOverlaySystem = 0;
 
         delete mInputHandler;
         mInputHandler = 0;
@@ -231,7 +243,10 @@ std::string macBundlePath()
             mInputHandler->_handleSdlEvents( evt );
         }
 
-        mQuit |= !mRoot->renderOneFrame();
+        BaseSystem::update( timeSinceLast );
+
+        if( mRenderWindow->isVisible() )
+            mQuit |= !mRoot->renderOneFrame();
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::handleWindowEvent( const SDL_Event& evt )
@@ -305,14 +320,14 @@ std::string macBundlePath()
     void GraphicsSystem::registerHlms(void)
     {
         Ogre::Archive *archiveUnlit = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        "/home/matias/Ogre2-Hlms-private/Samples/Media/Hlms/Unlit/GLSL",
+                        "/home/matias/Projects/SDK/Ogre2-Hlms-private/Samples/Media/Hlms/Unlit/GLSL",
                         "FileSystem", true );
 
         Ogre::HlmsUnlit *hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit( archiveUnlit );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsUnlit );
 
         Ogre::Archive *archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        "/home/matias/Ogre2-Hlms-private/Samples/Media/Hlms/Pbs/GLSL",
+                        "/home/matias/Projects/SDK/Ogre2-Hlms-private/Samples/Media/Hlms/Pbs/GLSL",
                         "FileSystem", true );
         Ogre::HlmsPbs *hlmsPbs = OGRE_NEW Ogre::HlmsPbs( archivePbs );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsPbs );
@@ -346,6 +361,8 @@ std::string macBundlePath()
                                                    numThreads,
                                                    threadedCullingMethod,
                                                    "ExampleSMInstance" );
+
+        mSceneManager->addRenderQueueListener( mOverlaySystem );
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::createCamera(void)

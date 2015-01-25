@@ -11,17 +11,17 @@ namespace Demo
     public:
         ~GameState() {}
 
-        void initialize(void) {}
-        void deinitialize(void) {}
+        virtual void initialize(void) {}
+        virtual void deinitialize(void) {}
 
         virtual void createScene01(void) {}
         virtual void createScene02(void) {}
 
-        void destroyScene(void) {}
+        virtual void destroyScene(void) {}
 
-        void update( float timeSinceLast ) {}
-        void finishFrameParallel(void) {}
-        void finishFrame(void) {}
+        virtual void update( float timeSinceLast ) {}
+        virtual void finishFrameParallel(void) {}
+        virtual void finishFrame(void) {}
     };
 }
 

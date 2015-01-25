@@ -59,7 +59,10 @@ namespace Demo
         bool handleWarpMotion( const SDL_MouseMotionEvent& evt );
 
     public:
-        SdlInputHandler( SDL_Window *sdlWindow );
+        SdlInputHandler( SDL_Window *sdlWindow,
+                         MouseListener *mouseListener,
+                         KeyboardListener *keyboardListener,
+                         JoystickListener *joystickListener );
         virtual ~SdlInputHandler();
 
         void _handleSdlEvents( const SDL_Event& evt );

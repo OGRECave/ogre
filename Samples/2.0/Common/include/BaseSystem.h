@@ -10,6 +10,7 @@ namespace Demo
 
     class BaseSystem : public MessageQueueSystem
     {
+    protected:
         GameState   *mCurrentGameState;
 
     public:

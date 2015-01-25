@@ -15,7 +15,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_recursive( ./ SOURCE_FILES )
 
-ogre_add_executable(Sample_V2Mesh ${SOURCE_FILES})
+ogre_add_executable(Sample_Tutorial03_DeterministicLoop ${SOURCE_FILES})
 
-target_link_libraries(Sample_V2Mesh ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
-ogre_config_sample_lib(Sample_V2Mesh)
+target_link_libraries(Sample_Tutorial03_DeterministicLoop ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
+ogre_config_sample_lib(Sample_Tutorial03_DeterministicLoop)

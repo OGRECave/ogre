@@ -177,6 +177,10 @@ namespace Ogre
         */
         static void WaitForThreads( size_t numThreadHandles, const ThreadHandlePtr *threadHandles );
         static void WaitForThreads( const ThreadHandleVec &threadHandles );
+
+        /// Sleeps for a **minimum** of the specified time of milliseconds. Actual time spent
+        /// sleeping may vary widely depending on OS and other variables. Do not feed 0.
+        static void Sleep( uint32 milliseconds );
     };
 }
 

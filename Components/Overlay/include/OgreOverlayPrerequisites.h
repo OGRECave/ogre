@@ -43,6 +43,7 @@ namespace Ogre
         class OverlayElement;
         class OverlayElementFactory;
         class OverlayManager;
+        class OverlaySystem;
     }
 
     typedef SharedPtr<Font> FontPtr;

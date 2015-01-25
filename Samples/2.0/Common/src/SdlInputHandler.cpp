@@ -6,11 +6,14 @@
 
 namespace Demo
 {
-    SdlInputHandler::SdlInputHandler( SDL_Window *sdlWindow ) :
+    SdlInputHandler::SdlInputHandler( SDL_Window *sdlWindow,
+                                      MouseListener *mouseListener,
+                                      KeyboardListener *keyboardListener,
+                                      JoystickListener *joystickListener ) :
         mSdlWindow( sdlWindow ),
-        mMouseListener( 0 ),
-        mKeyboardListener( 0 ),
-        mJoystickListener( 0 ),
+        mMouseListener( mouseListener ),
+        mKeyboardListener( keyboardListener ),
+        mJoystickListener( joystickListener ),
         mWantRelative( false ),
         mWantMouseGrab( false ),
         mWantMouseVisible( false ),

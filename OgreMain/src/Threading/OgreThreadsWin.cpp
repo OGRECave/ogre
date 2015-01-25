@@ -76,4 +76,9 @@ namespace Ogre
         if( !threadHandles.empty() )
             Threads::WaitForThreads( threadHandles.size(), &threadHandles[0] );
     }
+    //-----------------------------------------------------------------------------------
+    void Threads::Sleep( uint32 milliseconds )
+    {
+        Sleep( milliseconds );
+    }
 }

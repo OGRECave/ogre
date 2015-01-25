@@ -5,6 +5,7 @@
 #include "BaseSystem.h"
 #include "OgrePrerequisites.h"
 #include "OgreColourValue.h"
+#include "OgreOverlayPrerequisites.h"
 
 #include <SDL.h>
 
@@ -26,6 +27,8 @@ namespace Demo
         Ogre::Camera                *mCamera;
         Ogre::CompositorWorkspace   *mWorkspace;
         Ogre::String                mResourcePath;
+
+        Ogre::v1::OverlaySystem     *mOverlaySystem;
 
         bool                mQuit;
 
@@ -64,6 +67,13 @@ namespace Demo
         SdlInputHandler* getInputHandler(void)                  { return mInputHandler; }
 
         bool getQuit(void) const                                { return mQuit; }
+
+        Ogre::Root* getRoot(void) const                         { return mRoot; }
+        Ogre::RenderWindow* getRenderWindow(void) const         { return mRenderWindow; }
+        Ogre::SceneManager* getSceneManager(void) const         { return mSceneManager; }
+        Ogre::Camera* getCamera(void) const                     { return mCamera; }
+        Ogre::CompositorWorkspace* getCompositorWorkspace(void) const { return mWorkspace; }
+        Ogre::v1::OverlaySystem* getOverlaySystem(void) const   { return mOverlaySystem; }
     };
 }
 

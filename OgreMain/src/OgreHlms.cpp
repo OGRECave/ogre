@@ -165,6 +165,25 @@ namespace Ogre
         if( !mDataFolder )
             return; //Some Hlms implementations may not use template files at all
 
+        bool hasValidFile = false;
+
+        //Check this folder can at least generate one valid type of shader.
+        for( size_t i=0; i<NumShaderTypes; ++i )
+        {
+             //Generate the shader file. TODO: Identify the file extension at runtime
+            const String filename = ShaderFiles[i] + ".glsl";
+            hasValidFile |= mDataFolder->exists( filename );
+        }
+
+        if( !hasValidFile )
+        {
+            OGRE_EXCEPT( Exception::ERR_FILE_NOT_FOUND,
+                         "Data folder provided contains no valid template shader files. "
+                         "Did you provide the right folder location? Check you have the "
+                         "right read pemissions. Folder: " + mDataFolder->getName(),
+                         "Hlms::Hlms" );
+        }
+
         StringVectorPtr stringVectorPtr = mDataFolder->list( false, false );
 
         StringVector stringVectorLowerCase( *stringVectorPtr );
