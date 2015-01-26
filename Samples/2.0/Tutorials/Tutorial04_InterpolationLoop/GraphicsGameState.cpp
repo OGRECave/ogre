@@ -1,5 +1,5 @@
 
-#include "MyGameState.h"
+#include "GraphicsGameState.h"
 #include "GraphicsSystem.h"
 
 #include "OgreSceneManager.h"
@@ -9,18 +9,20 @@
 
 using namespace Demo;
 
-extern int gCurrentFrameTimeIdx;
+extern const double cFrametime;
 extern bool gFakeSlowmo;
+extern bool gFakeFrameskip;
 
 namespace Demo
 {
-    MyGameState::MyGameState( const Ogre::String &helpDescription ) :
+    GraphicsGameState::GraphicsGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
-        mDisplacement( 0 )
+        mLastPosition( Ogre::Vector3::ZERO ),
+        mCurrentPosition( Ogre::Vector3::ZERO )
     {
     }
     //-----------------------------------------------------------------------------------
-    void MyGameState::createScene01(void)
+    void GraphicsGameState::createScene01(void)
     {
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
@@ -37,31 +39,32 @@ namespace Demo
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
-    void MyGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
+    void GraphicsGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
     {
         TutorialGameState::generateDebugText( timeSinceLast, outText );
-        outText += "\nPress F2 to toggle fixed framerate.";
-        outText += "\nPress F3 to fake slow motion. ";
+        outText += "\nPress F2 to fake a GPU bottleneck (frame skip). ";
+        outText += gFakeFrameskip ? "[On]" : "[Off]";
+        outText += "\nPress F3 to fake a CPU Logic bottleneck. ";
         outText += gFakeSlowmo ? "[On]" : "[Off]";
     }
     //-----------------------------------------------------------------------------------
-    void MyGameState::update( float timeSinceLast )
+    void GraphicsGameState::update( float timeSinceLast )
     {
-        const Ogre::Vector3 origin( -5.0f, 0.0f, 0.0f );
+        float weight = mGraphicsSystem->getAccumTimeSinceLastLogicFrame() / cFrametime;
+        weight = std::min( 1.0f, weight );
 
-        mDisplacement += timeSinceLast * 4.0f;
-        mDisplacement = fmodf( mDisplacement, 10.0f );
+        Ogre::Vector3 interpPosition = Ogre::Math::lerp( mLastPosition, mCurrentPosition, weight );
 
-        mSceneNode->setPosition( origin + Ogre::Vector3::UNIT_X * mDisplacement );
+        mSceneNode->setPosition( interpPosition );
 
         TutorialGameState::update( timeSinceLast );
     }
     //-----------------------------------------------------------------------------------
-    void MyGameState::keyReleased( const SDL_KeyboardEvent &arg )
+    void GraphicsGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
         if( arg.keysym.sym == SDLK_F2 )
         {
-            gCurrentFrameTimeIdx = !gCurrentFrameTimeIdx;
+            gFakeFrameskip = !gFakeFrameskip;
         }
         if( arg.keysym.sym == SDLK_F3 )
         {

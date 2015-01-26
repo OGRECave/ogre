@@ -7,14 +7,17 @@
 
 namespace Demo
 {
-    class MyGameState : public TutorialGameState
+    class GraphicsGameState;
+
+    class LogicGameState : public GameState
     {
         float               mDisplacement;
+        GraphicsGameState   *mGraphicsGameState;
 
     public:
-        MyGameState( const Ogre::String &helpDescription );
+        LogicGameState();
 
-        virtual void createScene01(void);
+        void _notifyGraphicsGameState( GraphicsGameState *graphicsGameState );
 
         virtual void update( float timeSinceLast );
     };

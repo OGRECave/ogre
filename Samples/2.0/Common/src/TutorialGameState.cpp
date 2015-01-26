@@ -92,7 +92,7 @@ namespace Demo
         }
     }
     //-----------------------------------------------------------------------------------
-    void TutorialGameState::keyReleased (const SDL_KeyboardEvent &arg )
+    void TutorialGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
         if( arg.keysym.sym == SDLK_F1 )
         {

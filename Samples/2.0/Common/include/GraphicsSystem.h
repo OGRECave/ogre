@@ -29,6 +29,10 @@ namespace Demo
 
         Ogre::v1::OverlaySystem     *mOverlaySystem;
 
+        /// Tracks the amount of elapsed time since we last
+        /// heard from the LogicSystem finishing a frame
+        float               mAccumTimeSinceLastLogicFrame;
+
         bool                mQuit;
 
         Ogre::ColourValue   mBackgroundColour;
@@ -66,6 +70,8 @@ namespace Demo
         SdlInputHandler* getInputHandler(void)                  { return mInputHandler; }
 
         bool getQuit(void) const                                { return mQuit; }
+
+        float getAccumTimeSinceLastLogicFrame(void) const       { return mAccumTimeSinceLastLogicFrame; }
 
         Ogre::Root* getRoot(void) const                         { return mRoot; }
         Ogre::RenderWindow* getRenderWindow(void) const         { return mRenderWindow; }

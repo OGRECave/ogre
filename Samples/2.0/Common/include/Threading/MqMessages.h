@@ -11,6 +11,8 @@ namespace Mq
 {
     enum MessageId
     {
+        //Graphics <-  Logic
+        LOGICFRAME_FINISHED,
         //Graphics  -> Logic
         SDL_EVENT,
         //Graphics <-> Logic

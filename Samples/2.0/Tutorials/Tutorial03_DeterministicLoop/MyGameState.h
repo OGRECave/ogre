@@ -5,18 +5,8 @@
 #include "OgrePrerequisites.h"
 #include "TutorialGameState.h"
 
-namespace Ogre
-{
-    namespace v1
-    {
-        class TextAreaOverlayElement;
-    }
-}
-
 namespace Demo
 {
-    class GraphicsSystem;
-
     class MyGameState : public TutorialGameState
     {
         float               mDisplacement;
@@ -30,7 +20,7 @@ namespace Demo
 
         virtual void update( float timeSinceLast );
 
-        virtual void keyReleased (const SDL_KeyboardEvent &arg );
+        virtual void keyReleased( const SDL_KeyboardEvent &arg );
     };
 }
 

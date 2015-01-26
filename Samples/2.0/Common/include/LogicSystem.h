@@ -17,6 +17,8 @@ namespace Demo
     public:
         LogicSystem( GameState *gameState );
         virtual ~LogicSystem();
+
+        void finishFrameParallel(void);
     };
 }
 

@@ -62,6 +62,7 @@ std::string macBundlePath()
         mCamera( 0 ),
         mWorkspace( 0 ),
         mOverlaySystem( 0 ),
+        mAccumTimeSinceLastLogicFrame( 0 ),
         mQuit( false ),
         mBackgroundColour( backgroundColour )
     {
@@ -247,6 +248,8 @@ std::string macBundlePath()
 
         if( mRenderWindow->isVisible() )
             mQuit |= !mRoot->renderOneFrame();
+
+        mAccumTimeSinceLastLogicFrame += timeSinceLast;
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::handleWindowEvent( const SDL_Event& evt )
@@ -286,6 +289,9 @@ std::string macBundlePath()
         {
         case Mq::SDL_EVENT_BUFFER_ID_USED:
             mInputHandler->_releaseEventBufferId( data.udata.iData );
+            break;
+        case Mq::LOGICFRAME_FINISHED:
+            mAccumTimeSinceLastLogicFrame = 0;
             break;
         default:
             break;
