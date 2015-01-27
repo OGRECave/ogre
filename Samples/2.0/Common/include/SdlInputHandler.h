@@ -1,4 +1,7 @@
 
+//Thanks to Jordan Milne and Scrawl for allowing to use their
+//sdlinputwrapper files as base under the MIT license
+
 #ifndef _SdlInputHandler_H_
 #define _SdlInputHandler_H_
 
