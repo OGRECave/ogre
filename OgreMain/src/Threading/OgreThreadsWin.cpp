@@ -79,6 +79,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Threads::Sleep( uint32 milliseconds )
     {
-        Sleep( milliseconds );
+        ::Sleep( milliseconds );
     }
 }
