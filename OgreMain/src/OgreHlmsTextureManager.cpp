@@ -164,7 +164,7 @@ namespace Ogre
                                                                    pixelBufferBuf->getHeight(),
                                                                    entryIdx + 1 ),
                                                               v1::HardwareBuffer::HBL_DISCARD );
-            if( isNormalMap )
+            if( isNormalMap && srcImage.getFormat() != dst->getFormat() )
                 PixelUtil::convertForNormalMapping( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
             else
                 PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
@@ -214,7 +214,7 @@ namespace Ogre
                                                                    nextY * pixelBufferBuf->getHeight(),
                                                                    dst->getDepth() ),
                                                               v1::HardwareBuffer::HBL_DISCARD );
-            if( isNormalMap )
+            if( isNormalMap && srcImage.getFormat() != dst->getFormat() )
                 PixelUtil::convertForNormalMapping( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
             else
                 PixelUtil::bulkPixelConversion( srcImage.getPixelBox(0, j + srcBaseMip), currImage );
@@ -568,11 +568,12 @@ namespace Ogre
         }
         catch( Exception &e )
         {
+            LogManager::getSingleton().logMessage( LML_CRITICAL, e.getFullDescription() );
+
             if( e.getNumber() != Exception::ERR_FILE_NOT_FOUND )
                 throw e;
             else
             {
-                LogManager::getSingleton().logMessage( LML_CRITICAL, e.getFullDescription() );
                 retVal.texture  = mBlankTexture;
                 retVal.xIdx     = 0;
                 retVal.yIdx     = 0;

@@ -975,10 +975,10 @@ namespace Ogre {
                          "PixelUtil::convertForNormalMapping" );
         }
 
-        if( srcDesc.componentType & PCT_SINT )
+        if( srcDesc.flags & PFF_SIGNED )
         {
             OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-                         "Signed formats formats for normal maps is not tested",
+                         "Signed format origins for normal maps is not tested",
                          "PixelUtil::convertForNormalMapping" );
         }
 

@@ -281,7 +281,9 @@ namespace Ogre {
             replaces R,G and B. (but not A) */
         PFF_LUMINANCE       = 0x00000020,
         /// This is an integer format
-        PFF_INTEGER         = 0x00000040
+        PFF_INTEGER         = 0x00000040,
+        /// This integer format is signed.
+        PFF_SIGNED         = 0x00000080
     };
     
     /** Pixel component format */

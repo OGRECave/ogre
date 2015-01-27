@@ -1033,7 +1033,7 @@ namespace Ogre {
             /* Bytes per element */
             0,
             /* Flags */
-            PFF_COMPRESSED,
+            PFF_COMPRESSED | PFF_SIGNED | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 1, // Red only
             /* rbits, gbits, bbits, abits */
@@ -1059,7 +1059,7 @@ namespace Ogre {
             /* Bytes per element */
             0,
             /* Flags */
-            PFF_COMPRESSED,
+            PFF_COMPRESSED | PFF_SIGNED | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 2, // Red-Green only
             /* rbits, gbits, bbits, abits */
@@ -1152,7 +1152,7 @@ namespace Ogre {
             /* Bytes per element */
             1,
             /* Flags */
-            PFF_NATIVEENDIAN,
+            PFF_NATIVEENDIAN | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 1,
             /* rbits, gbits, bbits, abits */
@@ -1166,7 +1166,7 @@ namespace Ogre {
             /* Bytes per element */
             2,
             /* Flags */
-            PFF_NATIVEENDIAN,
+            PFF_NATIVEENDIAN | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 2,
             /* rbits, gbits, bbits, abits */
@@ -1180,7 +1180,7 @@ namespace Ogre {
             /* Bytes per element */
             3,
             /* Flags */
-            PFF_NATIVEENDIAN,
+            PFF_NATIVEENDIAN | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 3,
             /* rbits, gbits, bbits, abits */
@@ -1194,7 +1194,7 @@ namespace Ogre {
             /* Bytes per element */
             4,
             /* Flags */
-            PFF_HASALPHA | PFF_NATIVEENDIAN,
+            PFF_HASALPHA | PFF_NATIVEENDIAN | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 4,
             /* rbits, gbits, bbits, abits */
@@ -1208,7 +1208,7 @@ namespace Ogre {
             /* Bytes per element */
             2,
             /* Flags */
-            PFF_NATIVEENDIAN,
+            PFF_NATIVEENDIAN | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 1,
             /* rbits, gbits, bbits, abits */
@@ -1222,7 +1222,7 @@ namespace Ogre {
             /* Bytes per element */
             4,
             /* Flags */
-            PFF_NATIVEENDIAN,
+            PFF_NATIVEENDIAN | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 2,
             /* rbits, gbits, bbits, abits */
@@ -1236,7 +1236,7 @@ namespace Ogre {
             /* Bytes per element */
             6,
             /* Flags */
-            PFF_NATIVEENDIAN,
+            PFF_NATIVEENDIAN | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 3,
             /* rbits, gbits, bbits, abits */
@@ -1250,7 +1250,7 @@ namespace Ogre {
             /* Bytes per element */
             8,
             /* Flags */
-            PFF_HASALPHA | PFF_NATIVEENDIAN,
+            PFF_HASALPHA | PFF_NATIVEENDIAN | PFF_SIGNED,
             /* Component type and count */
             PCT_BYTE, 4,
             /* rbits, gbits, bbits, abits */

@@ -170,106 +170,106 @@ namespace Ogre {
         height = mHeight;
         depth = mDepth;
 
-        // Allocate texture storage so that glTexSubImageXD can be
-        // used to upload the texture.
-        if (PixelUtil::isCompressed(mFormat))
+        if (mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
         {
-            // Compressed formats
-            GLsizei size;
-
-            for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
+            switch(mTextureType)
             {
-                size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
-                // std::stringstream str;
-                // str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
-                // << " bytes: " << StringConverter::toString(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat))
-                // << " Mip: " + StringConverter::toString(mip)
-                // << " Width: " << StringConverter::toString(width)
-                // << " Height: " << StringConverter::toString(height)
-                // << " Format " << PixelUtil::getFormatName(mFormat)
-                // << " Internal Format: 0x" << std::hex << format
-                // << " Origin Format: 0x" << std::hex << GL3PlusPixelUtil::getGLOriginFormat(mFormat)
-                // << " Data type: 0x" << std::hex << datatype;
-                // LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
-
-                switch(mTextureType)
-                {
-                case TEX_TYPE_1D:
-                    OGRE_CHECK_GL_ERROR(glCompressedTexImage1D(GL_TEXTURE_1D, mip, format,
-                                                               width, 0,
-                                                               size, NULL));
-                    break;
-                case TEX_TYPE_2D:
-                    OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_2D,
-                                                               mip,
-                                                               format,
-                                                               width, height,
-                                                               0,
-                                                               size,
-                                                               NULL));
-                    break;
-                case TEX_TYPE_2D_RECT:
-                    OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_RECTANGLE,
-                                                               mip,
-                                                               format,
-                                                               width, height,
-                                                               0,
-                                                               size,
-                                                               NULL));
-                    break;
-                case TEX_TYPE_2D_ARRAY:
-                case TEX_TYPE_3D:
-                    OGRE_CHECK_GL_ERROR(glCompressedTexImage3D(texTarget, mip, format,
-                                                               width, height, depth, 0,
-                                                               size, NULL));
-                    break;
-                case TEX_TYPE_CUBE_MAP:
-                    for(int face = 0; face < 6; face++) {
-                        OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
-                                                                   width, height, 0,
-                                                                   size / depth, NULL));
-                    }
-                    break;
-                default:
-                    break;
-                };
-
-                if (width > 1)
-                {
-                    width = width / 2;
-                }
-                if (height > 1)
-                {
-                    height = height / 2;
-                }
-                if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
-                {
-                    depth = depth / 2;
-                }
+            case TEX_TYPE_1D:
+                OGRE_CHECK_GL_ERROR(glTexStorage1D(GL_TEXTURE_1D, GLsizei(mNumMipmaps+1), format, GLsizei(width)));
+                break;
+            case TEX_TYPE_2D:
+            case TEX_TYPE_2D_RECT:
+                OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                break;
+            case TEX_TYPE_CUBE_MAP:
+                OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                break;
+            case TEX_TYPE_2D_ARRAY:
+                OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                break;
+            case TEX_TYPE_3D:
+                OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                break;
             }
         }
         else
         {
-            if (mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
+            // Allocate texture storage so that glTexSubImageXD can be
+            // used to upload the texture.
+            if (PixelUtil::isCompressed(mFormat) && false)
             {
-                switch(mTextureType)
+                // Compressed formats
+                GLsizei size;
+
+                for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
                 {
-                case TEX_TYPE_1D:
-                    OGRE_CHECK_GL_ERROR(glTexStorage1D(GL_TEXTURE_1D, GLsizei(mNumMipmaps+1), format, GLsizei(width)));
-                    break;
-                case TEX_TYPE_2D:
-                case TEX_TYPE_2D_RECT:
-                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
-                    break;
-                case TEX_TYPE_CUBE_MAP:
-                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
-                    break;
-                case TEX_TYPE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
-                    break;
-                case TEX_TYPE_3D:
-                    OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLsizei(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
-                    break;
+                    size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
+                    // std::stringstream str;
+                    // str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
+                    // << " bytes: " << StringConverter::toString(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat))
+                    // << " Mip: " + StringConverter::toString(mip)
+                    // << " Width: " << StringConverter::toString(width)
+                    // << " Height: " << StringConverter::toString(height)
+                    // << " Format " << PixelUtil::getFormatName(mFormat)
+                    // << " Internal Format: 0x" << std::hex << format
+                    // << " Origin Format: 0x" << std::hex << GL3PlusPixelUtil::getGLOriginFormat(mFormat)
+                    // << " Data type: 0x" << std::hex << datatype;
+                    // LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+
+                    switch(mTextureType)
+                    {
+                    case TEX_TYPE_1D:
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage1D(GL_TEXTURE_1D, mip, format,
+                                                                   width, 0,
+                                                                   size, NULL));
+                        break;
+                    case TEX_TYPE_2D:
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_2D,
+                                                                   mip,
+                                                                   format,
+                                                                   width, height,
+                                                                   0,
+                                                                   size,
+                                                                   NULL));
+                        break;
+                    case TEX_TYPE_2D_RECT:
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_RECTANGLE,
+                                                                   mip,
+                                                                   format,
+                                                                   width, height,
+                                                                   0,
+                                                                   size,
+                                                                   NULL));
+                        break;
+                    case TEX_TYPE_2D_ARRAY:
+                    case TEX_TYPE_3D:
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage3D(texTarget, mip, format,
+                                                                   width, height, depth, 0,
+                                                                   size, NULL));
+                        break;
+                    case TEX_TYPE_CUBE_MAP:
+                        for(int face = 0; face < 6; face++) {
+                            OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+                                                                       width, height, 0,
+                                                                       size / depth, NULL));
+                        }
+                        break;
+                    default:
+                        break;
+                    };
+
+                    if (width > 1)
+                    {
+                        width = width / 2;
+                    }
+                    if (height > 1)
+                    {
+                        height = height / 2;
+                    }
+                    if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    {
+                        depth = depth / 2;
+                    }
                 }
             }
             else
