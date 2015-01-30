@@ -40,7 +40,7 @@ namespace Demo
         void handleWindowEvent( const SDL_Event& evt );
 
         /// @see MessageQueueSystem::processIncomingMessage
-        virtual void processIncomingMessage( Mq::MessageId messageId, Mq::SendData data );
+        virtual void processIncomingMessage( Mq::MessageId messageId, const void *data );
 
         virtual void setupResources(void);
         virtual void registerHlms(void);
@@ -61,6 +61,8 @@ namespace Demo
         GraphicsSystem( GameState *gameState,
                         Ogre::ColourValue backgroundColour = Ogre::ColourValue( 0.2f, 0.4f, 0.6f ) );
         virtual ~GraphicsSystem();
+
+        void _notifyLogicSystem( BaseSystem *logicSystem )      { mLogicSystem = logicSystem; }
 
         void initialize(void);
         void deinitialize(void);

@@ -12,11 +12,13 @@ namespace Demo
         BaseSystem          *mGraphicsSystem;
 
         /// @see MessageQueueSystem::processIncomingMessage
-        virtual void processIncomingMessage( Mq::MessageId messageId, Mq::SendData data );
+        virtual void processIncomingMessage( Mq::MessageId messageId, const void *data );
 
     public:
         LogicSystem( GameState *gameState );
         virtual ~LogicSystem();
+
+        void _notifyGraphicsSystem( BaseSystem *graphicsSystem )    { mGraphicsSystem = graphicsSystem; }
 
         void finishFrameParallel(void);
     };

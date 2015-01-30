@@ -8,7 +8,7 @@ namespace Demo
 {
     class GameState;
 
-    class BaseSystem : public MessageQueueSystem
+    class BaseSystem : public Mq::MessageQueueSystem
     {
     protected:
         GameState   *mCurrentGameState;

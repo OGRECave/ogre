@@ -18,7 +18,8 @@ namespace Demo
     GraphicsGameState::GraphicsGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mLastPosition( Ogre::Vector3::ZERO ),
-        mCurrentPosition( Ogre::Vector3::ZERO )
+        mCurrentPosition( Ogre::Vector3::ZERO ),
+        mEnableInterpolation( true )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -46,12 +47,32 @@ namespace Demo
         outText += gFakeFrameskip ? "[On]" : "[Off]";
         outText += "\nPress F3 to fake a CPU Logic bottleneck. ";
         outText += gFakeSlowmo ? "[On]" : "[Off]";
+        outText += "\nPress F4 to enable interpolation. ";
+        outText += mEnableInterpolation ? "[On]" : "[Off]";
+
+        //Show the current weight.
+        //The text doesn't get updated every frame while displaying
+        //help, so don't show the weight as it is inaccurate.
+        if( !mDisplayHelp )
+        {
+            float weight = mGraphicsSystem->getAccumTimeSinceLastLogicFrame() / cFrametime;
+            weight = std::min( 2.0f, weight );
+
+            if( !mEnableInterpolation )
+                weight = 0;
+
+            outText += "\nBlend weight: ";
+            outText += Ogre::StringConverter::toString( weight );
+        }
     }
     //-----------------------------------------------------------------------------------
     void GraphicsGameState::update( float timeSinceLast )
     {
         float weight = mGraphicsSystem->getAccumTimeSinceLastLogicFrame() / cFrametime;
-        weight = std::min( 1.0f, weight );
+        weight = std::min( 2.0f, weight );
+
+        if( !mEnableInterpolation )
+            weight = 0;
 
         Ogre::Vector3 interpPosition = Ogre::Math::lerp( mLastPosition, mCurrentPosition, weight );
 
@@ -66,9 +87,13 @@ namespace Demo
         {
             gFakeFrameskip = !gFakeFrameskip;
         }
-        if( arg.keysym.sym == SDLK_F3 )
+        else if( arg.keysym.sym == SDLK_F3 )
         {
             gFakeSlowmo = !gFakeSlowmo;
+        }
+        else if( arg.keysym.sym == SDLK_F4 )
+        {
+            mEnableInterpolation = !mEnableInterpolation;
         }
         else
         {

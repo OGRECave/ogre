@@ -18,8 +18,6 @@ namespace Demo
         mMouseListener( mouseListener ),
         mKeyboardListener( keyboardListener ),
         mJoystickListener( joystickListener ),
-        mCurrentEventBuffer( 0 ),
-        mEventBufferOffset( 0 ),
         mWantRelative( false ),
         mWantMouseGrab( false ),
         mWantMouseVisible( false ),
@@ -36,16 +34,6 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     SdlInputHandler::~SdlInputHandler()
     {
-        assert( mFreeEventBuffers.size() == mEventBuffers.size() &&
-                "Race condition! Other threads may still be processing Mq::SDL_EVENT messages!" );
-
-        std::vector<std::vector<unsigned char>*>::iterator itor = mEventBuffers.begin();
-        std::vector<std::vector<unsigned char>*>::iterator end  = mEventBuffers.end();
-
-        while( itor != end )
-            delete *itor++;
-
-        mEventBuffers.clear();
     }
     //-----------------------------------------------------------------------------------
     void SdlInputHandler::handleWindowEvent( const SDL_Event& evt )
@@ -88,10 +76,7 @@ namespace Demo
                         wrapMousePointer( evt.motion );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_MOUSEWHEEL:
@@ -100,10 +85,7 @@ namespace Demo
                         mMouseListener->mouseMoved( evt );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -112,10 +94,7 @@ namespace Demo
                         mMouseListener->mousePressed( evt.button, evt.button.button );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_MOUSEBUTTONUP:
@@ -124,10 +103,7 @@ namespace Demo
                         mMouseListener->mouseReleased( evt.button, evt.button.button );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_KEYDOWN:
@@ -136,10 +112,7 @@ namespace Demo
                         mKeyboardListener->keyPressed( evt.key );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_KEYUP:
@@ -148,10 +121,7 @@ namespace Demo
                         mKeyboardListener->keyReleased( evt.key );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_TEXTINPUT:
@@ -160,10 +130,7 @@ namespace Demo
                         mKeyboardListener->textInput( evt.text );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_JOYAXISMOTION:
@@ -172,10 +139,7 @@ namespace Demo
                         mJoystickListener->joyAxisMoved( evt.jaxis, evt.jaxis.axis );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_JOYBUTTONDOWN:
@@ -184,10 +148,7 @@ namespace Demo
                         mJoystickListener->joyButtonPressed( evt.jbutton, evt.jbutton.button );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_JOYBUTTONUP:
@@ -196,10 +157,7 @@ namespace Demo
                         mJoystickListener->joyButtonReleased( evt.jbutton, evt.jbutton.button );
 
                     if( mLogicSystem )
-                    {
-                        Mq::Message msg( Mq::SDL_EVENT, encapsulateEvent( evt ), false );
-                        mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-                    }
+                        mGraphicsSystem->queueSendMessage( mLogicSystem, Mq::SDL_EVENT, evt );
                 }
                 break;
             case SDL_JOYDEVICEADDED:
@@ -216,8 +174,6 @@ namespace Demo
                 std::cerr << "Unhandled SDL event of type " << evt.type << std::endl;
                 break;*/
         }
-
-        mCurrentEventBuffer = mEventBuffers.size();
     }
     //-----------------------------------------------------------------------------------
     void SdlInputHandler::setGrabMousePointer( bool grab )
@@ -307,40 +263,5 @@ namespace Demo
         }
 
         return false;
-    }
-    //-----------------------------------------------------------------------------------
-    SDL_Event* SdlInputHandler::encapsulateEvent( const SDL_Event& evt )
-    {
-        if( (size_t)mCurrentEventBuffer >= mEventBuffers.size() ||
-            mEventBufferOffset >= mEventBuffers[mCurrentEventBuffer]->size() )
-        {
-            if( mFreeEventBuffers.empty() )
-            {
-                mFreeEventBuffers.push_back( mEventBuffers.size() );
-                mEventBuffers.push_back( new std::vector<unsigned char>() );
-                mEventBuffers.back()->resize( 70 * sizeof(SDL_Event) );
-            }
-
-            mCurrentEventBuffer = mFreeEventBuffers.back();
-            mFreeEventBuffers.pop_back();
-            mEventBufferOffset = 0;
-
-            Mq::Message msg( Mq::SDL_EVENT_BUFFER_ID_USED, mCurrentEventBuffer, false );
-            mGraphicsSystem->queueSendMessage( mLogicSystem, msg );
-        }
-
-        std::vector<unsigned char> &eventBuffer = *mEventBuffers[mCurrentEventBuffer];
-        unsigned char *rawData = &eventBuffer[mEventBufferOffset];
-
-        memcpy( rawData, &evt, sizeof( SDL_Event ) );
-
-        mEventBufferOffset += sizeof( SDL_Event );
-
-        return reinterpret_cast<SDL_Event*>( rawData );
-    }
-    //-----------------------------------------------------------------------------------
-    void SdlInputHandler::_releaseEventBufferId( int id )
-    {
-        mFreeEventBuffers.push_back( id );
     }
 }

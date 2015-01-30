@@ -283,13 +283,10 @@ std::string macBundlePath()
         }
     }
     //-----------------------------------------------------------------------------------
-    void GraphicsSystem::processIncomingMessage( Mq::MessageId messageId, Mq::SendData data )
+    void GraphicsSystem::processIncomingMessage( Mq::MessageId messageId, const void *data )
     {
         switch( messageId )
         {
-        case Mq::SDL_EVENT_BUFFER_ID_USED:
-            mInputHandler->_releaseEventBufferId( data.udata.iData );
-            break;
         case Mq::LOGICFRAME_FINISHED:
             mAccumTimeSinceLastLogicFrame = 0;
             break;

@@ -16,6 +16,8 @@ namespace Demo
         Ogre::Vector3 mLastPosition;
         Ogre::Vector3 mCurrentPosition;
 
+        bool        mEnableInterpolation;
+
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
     public:

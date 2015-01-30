@@ -29,8 +29,15 @@ int main()
                "When OGRE or the GPU is taking too long, you will see a 'frame skip' effect, when\n"
                "the CPU is taking too long to process the Logic code, you will see a 'slow motion'\n"
                "effect.\n"
-               "This combines the best of both worlds and is the recommended approach in serious\n"
-               "games\n"
+               "This combines the best of both worlds and is the recommended approach for serious\n"
+               "game development.\n"
+               "\n"
+               "The only two disadvantages from this technique are:\n"
+               " * We introduce 1 frame of latency.\n"
+               " * Teleporting may be shown as very fast movement; as the graphics state will try to\n"
+               "   blend between the last and current position. This can be solved though, by writing\n"
+               "   to both the previous and current position in case of teleportation. We purposedly\n"
+               "   don't do this to show the effect/'glitch'.\n"
                "\n"
                "This approach needs to copy all the transform data from the logic side to the\n"
                "graphics side (i.e. Ogre SceneNodes). This is very common however, since a physics\n"
@@ -45,6 +52,9 @@ int main()
 
     logicGameState._notifyGraphicsGameState( &graphicsGameState );
     graphicsGameState._notifyGraphicsSystem( &graphicsSystem );
+
+    graphicsSystem._notifyLogicSystem( &logicSystem );
+    logicSystem._notifyGraphicsSystem( &graphicsSystem );
 
     graphicsSystem.initialize();
     logicSystem.initialize();
@@ -68,6 +78,13 @@ int main()
         while( accumulator >= cFrametime )
         {
             logicSystem.update( static_cast<float>( cFrametime ) );
+            logicSystem.finishFrameParallel();
+
+            graphicsSystem.finishFrameParallel();
+
+            logicSystem.finishFrame();
+            graphicsSystem.finishFrame();
+
             accumulator -= cFrametime;
 
             if( gFakeSlowmo )
@@ -75,6 +92,7 @@ int main()
         }
 
         graphicsSystem.update( timeSinceLast );
+        graphicsSystem.finishFrameParallel();
 
         if( !renderWindow->isVisible() )
         {
