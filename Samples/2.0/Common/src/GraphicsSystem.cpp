@@ -21,6 +21,8 @@
 
 #include "OgreOverlaySystem.h"
 
+#include "OgreWindowEventUtilities.h"
+
 #include <SDL_syswm.h>
 
 namespace Demo
@@ -181,9 +183,8 @@ std::string macBundlePath()
         //params.insert( std::make_pair("FSAA", ) );
         //params.insert( std::make_pair("vsync", vsync ? "true" : "false") );
 
-        /// \todo externalWindowHandle is deprecated according to the source code. Figure out a way to get parentWindowHandle
-        /// to work properly. On Linux/X11 it causes an occasional GLXBadDrawable error.
-        params.insert( std::make_pair("externalWindowHandle",  winHandle) );
+        //params.insert( std::make_pair("externalWindowHandle",  winHandle) );
+        params.insert( std::make_pair("parentWindowHandle",  winHandle) );
 
         mRenderWindow = Ogre::Root::getSingleton().createRenderWindow( title, width, height,
                                                                        fullscreen, &params );
@@ -215,6 +216,9 @@ std::string macBundlePath()
         delete mInputHandler;
         mInputHandler = 0;
 
+        OGRE_DELETE mRoot;
+        mRoot = 0;
+
         if( mSdlWindow )
         {
             // Restore desktop resolution on exit
@@ -223,14 +227,13 @@ std::string macBundlePath()
             mSdlWindow = 0;
         }
 
-        OGRE_DELETE mRoot;
-        mRoot = 0;
-
         SDL_Quit();
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::update( float timeSinceLast )
     {
+        Ogre::WindowEventUtilities::messagePump();
+
         SDL_Event evt;
         while( SDL_PollEvent( &evt ) )
         {
