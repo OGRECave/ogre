@@ -116,7 +116,7 @@ namespace Demo
         if( mAvailableTransforms.empty() )
         {
             GameEntityTransform *buffer = reinterpret_cast<GameEntityTransform*>( OGRE_MALLOC_SIMD(
-                        sizeof(GameEntityTransform*) * cNumTransforms * NUM_GAME_ENTITY_BUFFERS,
+                        sizeof(GameEntityTransform) * cNumTransforms * NUM_GAME_ENTITY_BUFFERS,
                         Ogre::MEMCATEGORY_SCENE_OBJECTS ) );
             mTransformBuffers.push_back( buffer );
             mAvailableTransforms.push_back( Region( 0, cNumTransforms, mTransformBuffers.size() - 1 ) );
