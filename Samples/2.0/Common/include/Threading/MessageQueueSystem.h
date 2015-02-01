@@ -34,7 +34,7 @@ namespace Mq
             //Enlarge the queue. Preserve alignment.
             const size_t totalSize = Ogre::alignToNextMultiple( cSizeOfHeader + sizeof(T),
                                                                 sizeof(size_t) );
-            queue.resize( totalSize );
+            queue.resize( queue.size() + totalSize );
 
             //Write the header: the Size and the MessageId
             *reinterpret_cast<Ogre::uint32*>( queue.begin() + startOffset ) = totalSize;
@@ -72,8 +72,8 @@ namespace Mq
         /// Must be called from the thread that owns 'this'
         void flushQueuedMessages(void)
         {
-            PendingMessageMap::const_iterator itMap = mPendingOutgoingMessages.begin();
-            PendingMessageMap::const_iterator enMap = mPendingOutgoingMessages.end();
+            PendingMessageMap::iterator itMap = mPendingOutgoingMessages.begin();
+            PendingMessageMap::iterator enMap = mPendingOutgoingMessages.end();
 
             while( itMap != enMap )
             {
@@ -87,10 +87,12 @@ namespace Mq
 
                 dstSystem->mMessageQueueMutex.unlock();
 
+                itMap->second.clear();
+
                 ++itMap;
             }
 
-            mPendingOutgoingMessages.clear();
+            //mPendingOutgoingMessages.clear();
         }
 
         /// Sends a message to 'this' base system immediately. Use it only for

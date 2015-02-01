@@ -408,6 +408,11 @@ namespace Ogre {
         uint32 getHlmsCasterHash(void) const    { return mHlmsCasterHash; }
         HlmsDatablock* getDatablock(void) const { return mHlmsDatablock; }
 
+        /** First tries to see if an HLMS datablock exist with the given name,
+            if not, tries to search among low level materials.
+        */
+        void setDatablockOrMaterialName( String materialName, String groupName );
+
         /** Assigns a datablock (i.e. HLMS material) based on its unique name.
         @remarks
             An null IdString() is valid, it will use the default material

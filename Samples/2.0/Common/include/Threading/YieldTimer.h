@@ -18,11 +18,11 @@ namespace Demo
 
         unsigned long yield( double frameTime, unsigned long startTime )
         {
-            unsigned long endTime = mExternalTimer->getMilliseconds();
+            unsigned long endTime = mExternalTimer->getMicroseconds();
 
-            while( frameTime * 1000.0 > (endTime - startTime) )
+            while( frameTime * 1000000.0 > (endTime - startTime) )
             {
-                endTime = mExternalTimer->getMilliseconds();
+                endTime = mExternalTimer->getMicroseconds();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
                 SwitchToThread();

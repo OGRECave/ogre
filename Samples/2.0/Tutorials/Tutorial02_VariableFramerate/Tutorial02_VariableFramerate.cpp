@@ -35,7 +35,7 @@ int main()
     graphicsSystem.createScene02();
 
     Ogre::Timer timer;
-    unsigned long startTime = timer.getMilliseconds();
+    unsigned long startTime = timer.getMicroseconds();
 
     double timeSinceLast = 1.0 / 60.0;
 
@@ -49,8 +49,8 @@ int main()
             Ogre::Threads::Sleep( 500 );
         }
 
-        unsigned long endTime = timer.getMilliseconds();
-        timeSinceLast = (endTime - startTime) / 1000.0;
+        unsigned long endTime = timer.getMicroseconds();
+        timeSinceLast = (endTime - startTime) / 1000000.0;
         timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
         startTime = endTime;
     }

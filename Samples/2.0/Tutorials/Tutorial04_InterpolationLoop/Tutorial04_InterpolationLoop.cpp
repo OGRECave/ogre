@@ -68,7 +68,7 @@ int main()
 
     Ogre::Timer timer;
 
-    unsigned long startTime = timer.getMilliseconds();
+    unsigned long startTime = timer.getMicroseconds();
     double accumulator = cFrametime;
 
     double timeSinceLast = 1.0 / 60.0;
@@ -103,14 +103,16 @@ int main()
         if( gFakeFrameskip )
             Ogre::Threads::Sleep( 40 );
 
-        unsigned long endTime = timer.getMilliseconds();
-        timeSinceLast = (endTime - startTime) / 1000.0;
+        unsigned long endTime = timer.getMicroseconds();
+        timeSinceLast = (endTime - startTime) / 1000000.0;
         timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
         accumulator += timeSinceLast;
         startTime = endTime;
     }
 
     graphicsSystem.destroyScene();
+    logicSystem.destroyScene();
+    logicSystem.deinitialize();
     graphicsSystem.deinitialize();
 
     return 0;

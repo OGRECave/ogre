@@ -21,7 +21,6 @@ namespace Demo
     class TutorialGameState : public GameState
     {
     protected:
-        Ogre::SceneNode     *mSceneNode;
         GraphicsSystem      *mGraphicsSystem;
 
         Ogre::String        mHelpDescription;

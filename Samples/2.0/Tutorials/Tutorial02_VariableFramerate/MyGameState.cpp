@@ -13,6 +13,7 @@ namespace Demo
 {
     MyGameState::MyGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
+        mSceneNode( 0 ),
         mDisplacement( 0 )
     {
     }

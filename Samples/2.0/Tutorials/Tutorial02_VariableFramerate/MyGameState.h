@@ -9,6 +9,7 @@ namespace Demo
 {
     class MyGameState : public TutorialGameState
     {
+        Ogre::SceneNode     *mSceneNode;
         float               mDisplacement;
 
     public:

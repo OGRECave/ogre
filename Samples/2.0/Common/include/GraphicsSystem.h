@@ -3,9 +3,12 @@
 #define _GraphicsSystem_H_
 
 #include "BaseSystem.h"
+#include "GameEntityManager.h"
 #include "OgrePrerequisites.h"
 #include "OgreColourValue.h"
 #include "OgreOverlayPrerequisites.h"
+
+#include "Threading/OgreUniformScalableTask.h"
 
 #include <SDL.h>
 
@@ -13,7 +16,7 @@ namespace Demo
 {
     class SdlInputHandler;
 
-    class GraphicsSystem : public BaseSystem
+    class GraphicsSystem : public BaseSystem, public Ogre::UniformScalableTask
     {
         BaseSystem          *mLogicSystem;
 
@@ -32,6 +35,10 @@ namespace Demo
         /// Tracks the amount of elapsed time since we last
         /// heard from the LogicSystem finishing a frame
         float               mAccumTimeSinceLastLogicFrame;
+        Ogre::uint32        mCurrentTransformIdx;
+        GameEntityVec       mGameEntities[Ogre::NUM_SCENE_MEMORY_MANAGER_TYPES];
+        GameEntityVec const *mThreadGameEntityToUpdate;
+        float               mThreadWeight;
 
         bool                mQuit;
 
@@ -57,6 +64,8 @@ namespace Demo
         /// Optional override method where you can create resource listeners (e.g. for loading screens)
         virtual void createResourceListener(void) {}
 
+        void gameEntityAdded( const GameEntityManager::CreatedGameEntity *createdGameEntity );
+        void gameEntityRemoved( GameEntity *toRemove );
     public:
         GraphicsSystem( GameState *gameState,
                         Ogre::ColourValue backgroundColour = Ogre::ColourValue( 0.2f, 0.4f, 0.6f ) );
@@ -68,6 +77,24 @@ namespace Demo
         void deinitialize(void);
 
         void update( float timeSinceLast );
+
+        /** Updates the SceneNodes of all the game entities in the container,
+            interpolating them according to weight, reading the transforms from
+            mCurrentTransformIdx and mCurrentTransformIdx-1.
+        @param gameEntities
+            The container with entities to update.
+        @param weight
+            The interpolation weight, ideally in range [0; 1]
+        */
+        void updateGameEntities( const GameEntityVec &gameEntities, float weight );
+
+        /// Overload Ogre::UniformScalableTask. @see updateGameEntities
+        virtual void execute( size_t threadId, size_t numThreads );
+
+        /// Returns the GameEntities that are ready to be rendered. May include entities
+        /// that are scheduled to be removed (i.e. they are no longer updated by logic)
+        const GameEntityVec& getGameEntities( Ogre::SceneMemoryMgrTypes type ) const
+                                                                { return mGameEntities[type]; }
 
         SdlInputHandler* getInputHandler(void)                  { return mInputHandler; }
 

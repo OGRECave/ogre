@@ -17,7 +17,6 @@ using namespace Demo;
 namespace Demo
 {
     TutorialGameState::TutorialGameState( const Ogre::String &helpDescription ) :
-        mSceneNode( 0 ),
         mGraphicsSystem( 0 ),
         mHelpDescription( helpDescription ),
         mDisplayHelp( false ),

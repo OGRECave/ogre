@@ -1,23 +1,24 @@
 
-#ifndef _Demo_MyGameState_H_
-#define _Demo_MyGameState_H_
+#ifndef _Demo_GraphicsGameState_H_
+#define _Demo_GraphicsGameState_H_
 
 #include "OgrePrerequisites.h"
 #include "TutorialGameState.h"
 
+#include "OgreVector3.h"
+
 namespace Demo
 {
-    class MyGameState : public TutorialGameState
+    class GraphicsSystem;
+
+    class GraphicsGameState : public TutorialGameState
     {
-        Ogre::SceneNode     *mSceneNode;
-        float               mDisplacement;
+        bool        mEnableInterpolation;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
     public:
-        MyGameState( const Ogre::String &helpDescription );
-
-        virtual void createScene01(void);
+        GraphicsGameState( const Ogre::String &helpDescription );
 
         virtual void update( float timeSinceLast );
 

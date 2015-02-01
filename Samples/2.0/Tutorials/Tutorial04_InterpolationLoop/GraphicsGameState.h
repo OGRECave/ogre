@@ -13,6 +13,7 @@ namespace Demo
 
     class GraphicsGameState : public TutorialGameState
     {
+        Ogre::SceneNode *mSceneNode;
         Ogre::Vector3 mLastPosition;
         Ogre::Vector3 mCurrentPosition;
 

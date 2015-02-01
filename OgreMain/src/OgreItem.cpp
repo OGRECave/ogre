@@ -222,6 +222,16 @@ namespace Ogre {
     }
 #endif
     //-----------------------------------------------------------------------
+    void Item::setDatablockOrMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
+    {
+        // Set for all subentities
+        SubItemVec::iterator i;
+        for (i = mSubItems.begin(); i != mSubItems.end(); ++i)
+        {
+            i->setDatablockOrMaterialName(name, groupName);
+        }
+    }
+    //-----------------------------------------------------------------------
     void Item::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
         // Set for all subentities
@@ -260,13 +270,7 @@ namespace Ogre {
             if( !subMesh->mMaterialName.empty() )
             {
                 //Try first Hlms materials, then the low level ones.
-                HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-                HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault( subMesh->mMaterialName );
-
-                if( datablock )
-                    mSubItems.back().setDatablock( datablock );
-                else
-                    mSubItems.back().setMaterialName( subMesh->mMaterialName, mMesh->getGroup() );
+                mSubItems.back().setDatablockOrMaterialName( subMesh->mMaterialName, mMesh->getGroup() );
             }
         }
     }

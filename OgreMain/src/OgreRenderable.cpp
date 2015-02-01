@@ -70,6 +70,18 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void Renderable::setDatablockOrMaterialName( String materialName, String resourceGroup )
+    {
+        //Try first Hlms materials, then the low level ones.
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        HlmsDatablock *datablock = hlmsManager->getDatablockNoDefault( materialName );
+
+        if( datablock )
+            this->setDatablock( datablock );
+        else
+            this->setMaterialName( materialName, resourceGroup );
+    }
+    //-----------------------------------------------------------------------------------
     void Renderable::setDatablock( IdString datablockName )
     {
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();

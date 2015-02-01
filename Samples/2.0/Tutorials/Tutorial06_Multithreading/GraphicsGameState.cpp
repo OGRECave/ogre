@@ -17,28 +17,8 @@ namespace Demo
 {
     GraphicsGameState::GraphicsGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
-        mSceneNode( 0 ),
-        mLastPosition( Ogre::Vector3::ZERO ),
-        mCurrentPosition( Ogre::Vector3::ZERO ),
         mEnableInterpolation( true )
     {
-    }
-    //-----------------------------------------------------------------------------------
-    void GraphicsGameState::createScene01(void)
-    {
-        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-
-        Ogre::Item *item = sceneManager->createItem( "Cube_d.mesh",
-                                                     Ogre::ResourceGroupManager::
-                                                     AUTODETECT_RESOURCE_GROUP_NAME,
-                                                     Ogre::SCENE_DYNAMIC );
-
-        mSceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
-                createChildSceneNode( Ogre::SCENE_DYNAMIC );
-
-        mSceneNode->attachObject( item );
-
-        TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
     void GraphicsGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
@@ -75,9 +55,8 @@ namespace Demo
         if( !mEnableInterpolation )
             weight = 0;
 
-        Ogre::Vector3 interpPosition = Ogre::Math::lerp( mLastPosition, mCurrentPosition, weight );
-
-        mSceneNode->setPosition( interpPosition );
+        mGraphicsSystem->updateGameEntities( mGraphicsSystem->getGameEntities( Ogre::SCENE_DYNAMIC ),
+                                             weight );
 
         TutorialGameState::update( timeSinceLast );
     }

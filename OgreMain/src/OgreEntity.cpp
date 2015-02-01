@@ -399,6 +399,17 @@ namespace v1 {
         return newEnt;
     }
     //-----------------------------------------------------------------------
+    void Entity::setDatablockOrMaterialName( const String& name,
+                                             const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
+    {
+        // Set for all subentities
+        SubEntityList::iterator i;
+        for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i)
+        {
+            i->setDatablockOrMaterialName(name, groupName);
+        }
+    }
+    //-----------------------------------------------------------------------
     void Entity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
         // Set for all subentities

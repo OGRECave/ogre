@@ -2,6 +2,7 @@
 #include "GraphicsSystem.h"
 #include "GameState.h"
 #include "SdlInputHandler.h"
+#include "GameEntity.h"
 
 #include "OgreRoot.h"
 #include "OgreException.h"
@@ -9,6 +10,7 @@
 
 #include "OgreRenderWindow.h"
 #include "OgreCamera.h"
+#include "OgreItem.h"
 
 #include "OgreHlmsUnlit.h"
 #include "OgreHlmsPbs.h"
@@ -63,6 +65,9 @@ std::string macBundlePath()
         mWorkspace( 0 ),
         mOverlaySystem( 0 ),
         mAccumTimeSinceLastLogicFrame( 0 ),
+        mCurrentTransformIdx( 0 ),
+        mThreadGameEntityToUpdate( 0 ),
+        mThreadWeight( 0 ),
         mQuit( false ),
         mBackgroundColour( backgroundColour )
     {
@@ -250,12 +255,24 @@ std::string macBundlePath()
             mQuit |= !mRoot->renderOneFrame();
 
         mAccumTimeSinceLastLogicFrame += timeSinceLast;
+
+        //SDL_SetWindowPosition( mSdlWindow, 0, 0 );
+        /*SDL_Rect rect;
+        SDL_GetDisplayBounds( 0, &rect );
+        SDL_GetDisplayBounds( 0, &rect );*/
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::handleWindowEvent( const SDL_Event& evt )
     {
         switch( evt.window.event )
         {
+            /*case SDL_WINDOWEVENT_MAXIMIZED:
+                SDL_SetWindowBordered( mSdlWindow, SDL_FALSE );
+                break;
+            case SDL_WINDOWEVENT_MINIMIZED:
+            case SDL_WINDOWEVENT_RESTORED:
+                SDL_SetWindowBordered( mSdlWindow, SDL_TRUE );
+                break;*/
             case SDL_WINDOWEVENT_SIZE_CHANGED:
                 int w,h;
                 SDL_GetWindowSize( mSdlWindow, &w, &h );
@@ -289,6 +306,28 @@ std::string macBundlePath()
         {
         case Mq::LOGICFRAME_FINISHED:
             mAccumTimeSinceLastLogicFrame = 0;
+            //Tell the LogicSystem we're no longer using the index previous to the current one.
+            this->queueSendMessage( mLogicSystem, Mq::LOGICFRAME_FINISHED,
+                                    (mCurrentTransformIdx + NUM_GAME_ENTITY_BUFFERS + 1) %
+                                    NUM_GAME_ENTITY_BUFFERS );
+
+            assert( (mCurrentTransformIdx + 1 % NUM_GAME_ENTITY_BUFFERS) ==
+                    *reinterpret_cast<const Ogre::uint32*>( data ) &&
+                    "Graphics is receiving indices out of order!!!" );
+
+            //Get the new index the LogicSystem is telling us to use.
+            mCurrentTransformIdx = *reinterpret_cast<const Ogre::uint32*>( data );
+            break;
+        case Mq::GAME_ENTITY_ADDED:
+            gameEntityAdded( reinterpret_cast<const GameEntityManager::CreatedGameEntity*>( data ) );
+            break;
+        case Mq::GAME_ENTITY_REMOVED:
+            gameEntityRemoved( *reinterpret_cast<GameEntity * const *>( data ) );
+            break;
+        case Mq::GAME_ENTITY_SCHEDULED_FOR_REMOVAL_SLOT:
+            //Acknowledge/notify back that we're done with this slot.
+            this->queueSendMessage( mLogicSystem, Mq::GAME_ENTITY_SCHEDULED_FOR_REMOVAL_SLOT,
+                                    *reinterpret_cast<const Ogre::uint32*>( data ) );
             break;
         default:
             break;
@@ -356,7 +395,7 @@ std::string macBundlePath()
     {
         Ogre::InstancingTheadedCullingMethod threadedCullingMethod =
                 Ogre::INSTANCING_CULLING_SINGLETHREAD;
-#ifdef _DEBUG
+#if OGRE_DEBUG_MODE
         //Debugging multithreaded code is a PITA, disable it.
         const size_t numThreads = 1;
 #else
@@ -401,5 +440,127 @@ std::string macBundlePath()
 
         return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
                                                 workspaceName, true );
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    struct GameEntityCmp
+    {
+        bool operator () ( const GameEntity *_l, const Ogre::Matrix4 * RESTRICT_ALIAS _r ) const
+        {
+            const Ogre::Transform &transform = _l->mSceneNode->_getTransform();
+            return &transform.mDerivedTransform[transform.mIndex] < _r;
+        }
+
+        bool operator () ( const Ogre::Matrix4 * RESTRICT_ALIAS _r, const GameEntity *_l ) const
+        {
+            const Ogre::Transform &transform = _l->mSceneNode->_getTransform();
+            return _r < &transform.mDerivedTransform[transform.mIndex];
+        }
+    };
+    //-----------------------------------------------------------------------------------
+    void GraphicsSystem::gameEntityAdded( const GameEntityManager::CreatedGameEntity *cge )
+    {
+        Ogre::SceneNode *sceneNode = mSceneManager->getRootSceneNode( cge->gameEntity->mType )->
+                createChildSceneNode( cge->gameEntity->mType,
+                                      cge->initialTransform.vPos,
+                                      cge->initialTransform.qRot );
+
+        sceneNode->setScale( cge->initialTransform.vScale );
+
+        cge->gameEntity->mSceneNode = sceneNode;
+
+        if( cge->gameEntity->mMoDefinition->moType == MoTypeItem )
+        {
+            Ogre::Item *item = mSceneManager->createItem( cge->gameEntity->mMoDefinition->meshName,
+                                                          cge->gameEntity->mMoDefinition->resourceGroup,
+                                                          cge->gameEntity->mType );
+
+            Ogre::StringVector materialNames = cge->gameEntity->mMoDefinition->submeshMaterials;
+            size_t minMaterials = std::min( materialNames.size(), item->getNumSubItems() );
+
+            for( size_t i=0; i<minMaterials; ++i )
+            {
+                item->getSubItem(i)->setDatablockOrMaterialName( materialNames[i],
+                                                                 cge->gameEntity->mMoDefinition->
+                                                                                    resourceGroup );
+            }
+
+            cge->gameEntity->mMovableObject = item;
+        }
+
+        sceneNode->attachObject( cge->gameEntity->mMovableObject );
+
+        //Keep them sorted on how Ogre's internal memory manager assigned them memory,
+        //to avoid false cache sharing when we update the nodes concurrently.
+        const Ogre::Transform &transform = sceneNode->_getTransform();
+        GameEntityVec::iterator itGameEntity = std::lower_bound(
+                    mGameEntities[cge->gameEntity->mType].begin(),
+                    mGameEntities[cge->gameEntity->mType].end(),
+                    &transform.mDerivedTransform[transform.mIndex],
+                    GameEntityCmp() );
+        mGameEntities[cge->gameEntity->mType].insert( itGameEntity, cge->gameEntity );
+    }
+    //-----------------------------------------------------------------------------------
+    void GraphicsSystem::gameEntityRemoved( GameEntity *toRemove )
+    {
+        const Ogre::Transform &transform = toRemove->mSceneNode->_getTransform();
+        GameEntityVec::iterator itGameEntity = std::lower_bound(
+                    mGameEntities[toRemove->mType].begin(),
+                    mGameEntities[toRemove->mType].end(),
+                    &transform.mDerivedTransform[transform.mIndex],
+                    GameEntityCmp() );
+
+        assert( itGameEntity != mGameEntities[toRemove->mType].end() && *itGameEntity == toRemove );
+        mGameEntities[toRemove->mType].erase( itGameEntity );
+
+        toRemove->mSceneNode->getParentSceneNode()->removeAndDestroyChild( toRemove->mSceneNode );
+        toRemove->mSceneNode = 0;
+
+        assert( dynamic_cast<Ogre::Item*>( toRemove->mMovableObject ) );
+
+        mSceneManager->destroyItem( static_cast<Ogre::Item*>( toRemove->mMovableObject ) );
+        toRemove->mMovableObject = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void GraphicsSystem::updateGameEntities( const GameEntityVec &gameEntities, float weight )
+    {
+        mThreadGameEntityToUpdate   = &gameEntities;
+        mThreadWeight               = weight;
+
+        //Note: You could execute a non-blocking scalable task and do something else, you should
+        //wait for the task to finish right before calling renderOneFrame or before trying to
+        //execute another UserScalableTask (you would have to be careful, but it could work).
+        mSceneManager->executeUserScalableTask( this, true );
+    }
+    //-----------------------------------------------------------------------------------
+    void GraphicsSystem::execute( size_t threadId, size_t numThreads )
+    {
+        size_t currIdx = mCurrentTransformIdx;
+        size_t prevIdx = (mCurrentTransformIdx + NUM_GAME_ENTITY_BUFFERS + 1) % NUM_GAME_ENTITY_BUFFERS;
+
+        const size_t objsPerThread = (mThreadGameEntityToUpdate->size() + (numThreads - 1)) / numThreads;
+        const size_t toAdvance = std::min( threadId * objsPerThread, mThreadGameEntityToUpdate->size() );
+
+        GameEntityVec::const_iterator itor = mThreadGameEntityToUpdate->begin() + toAdvance;
+        GameEntityVec::const_iterator end  = mThreadGameEntityToUpdate->begin() +
+                                                                std::min( toAdvance + objsPerThread,
+                                                                          mThreadGameEntityToUpdate->size() );
+        while( itor != end )
+        {
+            GameEntity *gEnt = *itor;
+            Ogre::Vector3 interpVec = Ogre::Math::lerp( gEnt->mTransform[prevIdx]->vPos,
+                                                        gEnt->mTransform[currIdx]->vPos, mThreadWeight );
+            gEnt->mSceneNode->setPosition( interpVec );
+
+            interpVec = Ogre::Math::lerp( gEnt->mTransform[prevIdx]->vScale,
+                                          gEnt->mTransform[currIdx]->vScale, mThreadWeight );
+            gEnt->mSceneNode->setScale( interpVec );
+
+            Ogre::Quaternion interpQ = Ogre::Math::lerp( gEnt->mTransform[prevIdx]->qRot,
+                                                         gEnt->mTransform[currIdx]->qRot, mThreadWeight );
+            gEnt->mSceneNode->setOrientation( interpQ );
+
+            ++itor;
+        }
     }
 }
