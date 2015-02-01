@@ -47,29 +47,39 @@ namespace Demo
 
         //Notify the GraphicsSystem we're done rendering this frame.
         if( mGraphicsSystem )
-            this->queueSendMessage( mGraphicsSystem, Mq::LOGICFRAME_FINISHED, mCurrentTransformIdx );
+        {
+            size_t idxToSend = mCurrentTransformIdx;
+
+            if( mAvailableTransformIdx.empty() )
+            {
+                //Don't relinquish our only ID left.
+                //If you end up here too often, Graphics' thread is too slow,
+                //or you need to increase NUM_GAME_ENTITY_BUFFERS
+                idxToSend = std::numeric_limits<Ogre::uint32>::max();
+            }
+            else
+            {
+                //Until Graphics constantly releases the indices we send them, to avoid writing
+                //to transform data that may be in use by the other thread (race condition)
+                mCurrentTransformIdx = mAvailableTransformIdx.front();
+                mAvailableTransformIdx.pop_front();
+            }
+
+            this->queueSendMessage( mGraphicsSystem, Mq::LOGICFRAME_FINISHED, idxToSend );
+        }
 
         BaseSystem::finishFrameParallel();
 
         //We need to do this after BaseSystem::finishFrameParallel
         //so that our messages to GraphicsSystem get flush/sent and
         //also process all incoming messages.
-        if( mGraphicsSystem )
+        /*if( mGraphicsSystem && !mAvailableTransformIdx.empty() )
         {
-            while( mAvailableTransformIdx.empty() )
-            {
-                //Wait until Graphics releases one of the indices, to avoid writing
-                //to transform data that may be in use by the other thread (race condition)
-                //
-                //If you end up here too often, Graphics' thread is too slow,
-                //or you need to increase NUM_GAME_ENTITY_BUFFERS
-                this->processIncomingMessages();
-                Ogre::Threads::Sleep( 1 );
-            }
-
+            //Until Graphics constantly releases the indices we send them, to avoid writing
+            //to transform data that may be in use by the other thread (race condition)
             mCurrentTransformIdx = mAvailableTransformIdx.front();
             mAvailableTransformIdx.pop_front();
-        }
+        }*/
     }
     //-----------------------------------------------------------------------------------
     void LogicSystem::processIncomingMessage( Mq::MessageId messageId, const void *data )

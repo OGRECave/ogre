@@ -38,6 +38,11 @@ namespace Demo
         mCurrentGameState->destroyScene();
     }
     //-----------------------------------------------------------------------------------
+    void BaseSystem::beginFrameParallel(void)
+    {
+        this->processIncomingMessages();
+    }
+    //-----------------------------------------------------------------------------------
     void BaseSystem::update( float timeSinceLast )
     {
         mCurrentGameState->update( timeSinceLast );
@@ -48,7 +53,6 @@ namespace Demo
         mCurrentGameState->finishFrameParallel();
 
         this->flushQueuedMessages();
-        this->processIncomingMessages();
     }
     //-----------------------------------------------------------------------------------
     void BaseSystem::finishFrame(void)

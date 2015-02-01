@@ -41,7 +41,10 @@ int main()
 
     while( !graphicsSystem.getQuit() )
     {
+        graphicsSystem.beginFrameParallel();
         graphicsSystem.update( static_cast<float>( timeSinceLast ) );
+        graphicsSystem.finishFrameParallel();
+        graphicsSystem.finishFrame();
 
         if( !renderWindow->isVisible() )
         {

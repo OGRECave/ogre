@@ -122,6 +122,7 @@ unsigned long renderThread( Ogre::ThreadHandle *threadHandle )
 
     while( !graphicsSystem->getQuit() )
     {
+        graphicsSystem->beginFrameParallel();
         graphicsSystem->update( timeSinceLast );
         graphicsSystem->finishFrameParallel();
 
@@ -176,6 +177,7 @@ unsigned long logicThread( Ogre::ThreadHandle *threadHandle )
 
     while( !graphicsSystem->getQuit() )
     {
+        logicSystem->beginFrameParallel();
         logicSystem->update( static_cast<float>( cFrametime ) );
         logicSystem->finishFrameParallel();
 

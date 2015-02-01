@@ -77,6 +77,9 @@ int main()
     {
         while( accumulator >= cFrametime )
         {
+            graphicsSystem.beginFrameParallel();
+
+            logicSystem.beginFrameParallel();
             logicSystem.update( static_cast<float>( cFrametime ) );
             logicSystem.finishFrameParallel();
 
@@ -91,6 +94,7 @@ int main()
                 Ogre::Threads::Sleep( 40 );
         }
 
+        graphicsSystem.beginFrameParallel();
         graphicsSystem.update( timeSinceLast );
         graphicsSystem.finishFrameParallel();
 

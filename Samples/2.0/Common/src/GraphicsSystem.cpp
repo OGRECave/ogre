@@ -305,18 +305,24 @@ std::string macBundlePath()
         switch( messageId )
         {
         case Mq::LOGICFRAME_FINISHED:
-            mAccumTimeSinceLastLogicFrame = 0;
-            //Tell the LogicSystem we're no longer using the index previous to the current one.
-            this->queueSendMessage( mLogicSystem, Mq::LOGICFRAME_FINISHED,
-                                    (mCurrentTransformIdx + NUM_GAME_ENTITY_BUFFERS - 1) %
-                                    NUM_GAME_ENTITY_BUFFERS );
+            {
+                Ogre::uint32 newIdx = *reinterpret_cast<const Ogre::uint32*>( data );
 
-            assert( (mCurrentTransformIdx + 1) % NUM_GAME_ENTITY_BUFFERS ==
-                    *reinterpret_cast<const Ogre::uint32*>( data ) &&
-                    "Graphics is receiving indices out of order!!!" );
+                if( newIdx != std::numeric_limits<Ogre::uint32>::max() )
+                {
+                    mAccumTimeSinceLastLogicFrame = 0;
+                    //Tell the LogicSystem we're no longer using the index previous to the current one.
+                    this->queueSendMessage( mLogicSystem, Mq::LOGICFRAME_FINISHED,
+                                            (mCurrentTransformIdx + NUM_GAME_ENTITY_BUFFERS - 1) %
+                                            NUM_GAME_ENTITY_BUFFERS );
 
-            //Get the new index the LogicSystem is telling us to use.
-            mCurrentTransformIdx = *reinterpret_cast<const Ogre::uint32*>( data );
+                    assert( (mCurrentTransformIdx + 1) % NUM_GAME_ENTITY_BUFFERS == newIdx &&
+                            "Graphics is receiving indices out of order!!!" );
+
+                    //Get the new index the LogicSystem is telling us to use.
+                    mCurrentTransformIdx = newIdx;
+                }
+            }
             break;
         case Mq::GAME_ENTITY_ADDED:
             gameEntityAdded( reinterpret_cast<const GameEntityManager::CreatedGameEntity*>( data ) );

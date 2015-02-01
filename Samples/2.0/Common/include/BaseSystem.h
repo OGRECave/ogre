@@ -25,6 +25,7 @@ namespace Demo
 
         void destroyScene(void);
 
+        void beginFrameParallel(void);
         void update( float timeSinceLast );
         void finishFrameParallel(void);
         void finishFrame(void);

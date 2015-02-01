@@ -30,7 +30,7 @@ namespace Demo
             outText += "\nSEE HELP DESCRIPTION!";
 
             float weight = mGraphicsSystem->getAccumTimeSinceLastLogicFrame() / cFrametime;
-            weight = std::min( 2.0f, weight );
+            weight = std::min( 1.0f, weight );
 
             outText += "\nBlend weight: ";
             outText += Ogre::StringConverter::toString( weight );
