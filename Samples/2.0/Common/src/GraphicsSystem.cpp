@@ -308,10 +308,10 @@ std::string macBundlePath()
             mAccumTimeSinceLastLogicFrame = 0;
             //Tell the LogicSystem we're no longer using the index previous to the current one.
             this->queueSendMessage( mLogicSystem, Mq::LOGICFRAME_FINISHED,
-                                    (mCurrentTransformIdx + NUM_GAME_ENTITY_BUFFERS + 1) %
+                                    (mCurrentTransformIdx + NUM_GAME_ENTITY_BUFFERS - 1) %
                                     NUM_GAME_ENTITY_BUFFERS );
 
-            assert( (mCurrentTransformIdx + 1 % NUM_GAME_ENTITY_BUFFERS) ==
+            assert( (mCurrentTransformIdx + 1) % NUM_GAME_ENTITY_BUFFERS ==
                     *reinterpret_cast<const Ogre::uint32*>( data ) &&
                     "Graphics is receiving indices out of order!!!" );
 
@@ -536,7 +536,7 @@ std::string macBundlePath()
     void GraphicsSystem::execute( size_t threadId, size_t numThreads )
     {
         size_t currIdx = mCurrentTransformIdx;
-        size_t prevIdx = (mCurrentTransformIdx + NUM_GAME_ENTITY_BUFFERS + 1) % NUM_GAME_ENTITY_BUFFERS;
+        size_t prevIdx = (mCurrentTransformIdx + NUM_GAME_ENTITY_BUFFERS - 1) % NUM_GAME_ENTITY_BUFFERS;
 
         const size_t objsPerThread = (mThreadGameEntityToUpdate->size() + (numThreads - 1)) / numThreads;
         const size_t toAdvance = std::min( threadId * objsPerThread, mThreadGameEntityToUpdate->size() );

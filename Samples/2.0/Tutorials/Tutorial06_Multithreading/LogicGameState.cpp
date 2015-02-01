@@ -48,7 +48,7 @@ namespace Demo
         mDisplacement = fmodf( mDisplacement, 10.0f );
 
         const size_t currIdx = mLogicSystem->getCurrentTransformIdx();
-        //const size_t prevIdx = (currIdx + NUM_GAME_ENTITY_BUFFERS + 1) % NUM_GAME_ENTITY_BUFFERS;
+        //const size_t prevIdx = (currIdx + NUM_GAME_ENTITY_BUFFERS - 1) % NUM_GAME_ENTITY_BUFFERS;
 
         mCubeEntity->mTransform[currIdx]->vPos = origin + Ogre::Vector3::UNIT_X * mDisplacement;
 

@@ -67,7 +67,7 @@ namespace Demo
         gameEntity->mTransformBufferIdx = bufferIdx;
         for( int i=0; i<NUM_GAME_ENTITY_BUFFERS; ++i )
         {
-            gameEntity->mTransform[i] = mTransformBuffers[bufferIdx] + slot * cNumTransforms * i;
+            gameEntity->mTransform[i] = mTransformBuffers[bufferIdx] + slot + cNumTransforms * i;
             memcpy( gameEntity->mTransform[i], &cge.initialTransform, sizeof(GameEntityTransform) );
         }
 
