@@ -4782,6 +4782,15 @@ MovableObject* SceneManager::createMovableObject( const String& typeName,
 
 }
 //---------------------------------------------------------------------
+bool SceneManager::hasMovableObject( MovableObject *m )
+{
+    if(!m)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot look for a null object", "SceneManager::hasMovableObject");
+
+    MovableObjectVec objects = getMovableObjectCollection(m->getMovableType())->movableObjects;
+    return (m->mGlobalIndex < objects.size() && m == *(objects.begin() + m->mGlobalIndex));
+}
+//---------------------------------------------------------------------
 void SceneManager::destroyMovableObject( MovableObject *m, const String& typeName )
 {
     // Nasty hack to make generalised Camera functions work without breaking add-on SMs
