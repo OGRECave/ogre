@@ -61,66 +61,80 @@ namespace Ogre
         OGRE_CHECK_GL_ERROR(glBindProgramPipelineEXT(mGLProgramPipelineHandle));
 
         // Compile and attach Vertex Program
-        if(mVertexProgram && !mVertexProgram->isLinked())
+        if(mVertexProgram)
         {
-            try
+            if(mVertexProgram->isLinked())
             {
-                mVertexProgram->getGLSLProgram()->compile(true);
-            }
-            catch (Exception& e)
-            {
-                LogManager::getSingleton().stream() << e.getDescription();
-                mTriedToLinkAndFailed = true;
-                return;
-            }
-            GLuint programHandle = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
-            OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-            mVertexProgram->getGLSLProgram()->attachToProgramObject(programHandle);
-            OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
-            OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-            
-            if(linkStatus)
-            {
-                mVertexProgram->setLinked(linkStatus);
                 mLinked |= VERTEX_PROGRAM_LINKED;
             }
-            
-            mTriedToLinkAndFailed = !linkStatus;
-            
-            logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
+            else
+            {
+                try
+                {
+                    mVertexProgram->getGLSLProgram()->compile(true);
+                }
+                catch (Exception& e)
+                {
+                    LogManager::getSingleton().stream() << e.getDescription();
+                    mTriedToLinkAndFailed = true;
+                    return;
+                }
+                GLuint programHandle = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
+                OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
+                mVertexProgram->getGLSLProgram()->attachToProgramObject(programHandle);
+                OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
+                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+                
+                if(linkStatus)
+                {
+                    mVertexProgram->setLinked(linkStatus);
+                    mLinked |= VERTEX_PROGRAM_LINKED;
+                }
+                
+                mTriedToLinkAndFailed = !linkStatus;
+                
+                logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
 
-            setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
+                setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
+            }
         }
         
         // Compile and attach Fragment Program
-        if(mFragmentProgram && !mFragmentProgram->isLinked())
+        if(mFragmentProgram)
         {
-            try
+            if(mFragmentProgram->isLinked())
             {
-                mFragmentProgram->getGLSLProgram()->compile(true);
-            }
-            catch (Exception& e)
-            {
-                LogManager::getSingleton().stream() << e.getDescription();
-                mTriedToLinkAndFailed = true;
-                return;
-            }
-
-            GLuint programHandle = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
-            OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
-            mFragmentProgram->getGLSLProgram()->attachToProgramObject(programHandle);
-            OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
-            OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-            
-            if(linkStatus)
-            {
-                mFragmentProgram->setLinked(linkStatus);
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
             }
-            
-            mTriedToLinkAndFailed = !linkStatus;
-            
-            logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
+            else
+            {
+                try
+                {
+                    mFragmentProgram->getGLSLProgram()->compile(true);
+                }
+                catch (Exception& e)
+                {
+                    LogManager::getSingleton().stream() << e.getDescription();
+                    mTriedToLinkAndFailed = true;
+                    return;
+                }
+
+                GLuint programHandle = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
+                OGRE_CHECK_GL_ERROR(glProgramParameteriEXT(programHandle, GL_PROGRAM_SEPARABLE_EXT, GL_TRUE));
+                mFragmentProgram->getGLSLProgram()->attachToProgramObject(programHandle);
+                OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
+                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+                
+                if(linkStatus)
+                {
+                    mFragmentProgram->setLinked(linkStatus);
+                    mLinked |= FRAGMENT_PROGRAM_LINKED;
+                }
+                
+                mTriedToLinkAndFailed = !linkStatus;
+                
+                logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
+            }
         }
         
         if(mLinked)
