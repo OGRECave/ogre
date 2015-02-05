@@ -18,6 +18,7 @@ namespace Demo
 
     class GraphicsSystem : public BaseSystem, public Ogre::UniformScalableTask
     {
+    protected:
         BaseSystem          *mLogicSystem;
 
         SDL_Window          *mSdlWindow;
@@ -59,7 +60,7 @@ namespace Demo
         /// Virtual so that advanced samples such as Sample_Compositor can override this
         /// method to change the default behavior if setupCompositor() is overridden, be
         /// aware @mBackgroundColour will be ignored
-        virtual Ogre::CompositorWorkspace* setupCompositor();
+        virtual Ogre::CompositorWorkspace* setupCompositor(void);
 
         /// Optional override method where you can create resource listeners (e.g. for loading screens)
         virtual void createResourceListener(void) {}

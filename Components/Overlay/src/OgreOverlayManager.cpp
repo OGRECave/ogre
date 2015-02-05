@@ -54,7 +54,7 @@ namespace v1
     }
     //---------------------------------------------------------------------
     OverlayManager::OverlayManager() 
-      : mDefaultRenderQueueId(1),
+      : mDefaultRenderQueueId(254),
         mLastViewportWidth(0),
         mLastViewportHeight(0), 
         mViewportDimensionsChanged(false),

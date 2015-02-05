@@ -11,6 +11,7 @@ namespace Demo
 
     class LogicSystem : public BaseSystem
     {
+    protected:
         BaseSystem          *mGraphicsSystem;
         GameEntityManager   *mGameEntityManager;
 

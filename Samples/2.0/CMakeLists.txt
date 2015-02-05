@@ -17,6 +17,8 @@ if( OGRE_BUILD_SAMPLES2 )
 	set( OGRE_SAMPLES_LIBRARIES "OgreSamplesCommon" "OgreOverlay" )
 
     add_subdirectory(ApiUsage/V2Mesh)
+	add_subdirectory(ApiUsage/StereoRendering)
+
 	add_subdirectory(Tutorials/Tutorial01_Initialization)
 	add_subdirectory(Tutorials/Tutorial02_VariableFramerate)
 	add_subdirectory(Tutorials/Tutorial03_DeterministicLoop)

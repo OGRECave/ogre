@@ -436,7 +436,7 @@ std::string macBundlePath()
         mCamera->setFarClipDistance( 1000.0f );
     }
     //-----------------------------------------------------------------------------------
-    Ogre::CompositorWorkspace* GraphicsSystem::setupCompositor()
+    Ogre::CompositorWorkspace* GraphicsSystem::setupCompositor(void)
     {
         Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
 
