@@ -1213,8 +1213,6 @@ namespace Ogre {
                 their position from the parent node. Either way, they are created
                 using this method so that the SceneManager manages their
                 existence.
-            @param
-                name The name of the new light, to identify it later.
         */
         virtual Light* createLight();
 
