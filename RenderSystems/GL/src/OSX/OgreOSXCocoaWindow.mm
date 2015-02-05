@@ -292,16 +292,18 @@ namespace Ogre {
                 LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external plain NSView*");
                 NSView *nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
                 mView = nsview;
+                
             } else {
                 LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreView*");
                 OgreView *view = (OgreView*)StringConverter::parseUnsignedLong(opt->second);
                 [view setOgreWindow:this];
                 mView = view;
             
-                NSRect b = [mView bounds];
-                mWidth = _getPixelFromPoint((int)b.size.width);
-                mHeight = _getPixelFromPoint((int)b.size.height);
             }
+            
+            NSRect b = [mView bounds];
+            mWidth = _getPixelFromPoint((int)b.size.width);
+            mHeight = _getPixelFromPoint((int)b.size.height);
 
             mWindow = [mView window];
             mIsExternal = true;
