@@ -1,0 +1,14 @@
+# Resources required by the sample browser and most samples.
+[Essential]
+Zip=@OGRE_MEDIA_DIR_REL@/packs/DebugPack.zip
+
+# Common sample resources needed by many of the samples.
+# Rarely used resources should be separately loaded by the
+# samples which require them.
+[Popular]
+FileSystem=/home/matias/Projects/SDK/Ogre2-Hlms-private/Samples/Media/2.0/scripts/Compositors
+
+# Do not load this as a resource. It's here merely to tell the code where
+# the Hlms templates are located
+[Hlms]
+DoNotUseAsResource=@OGRE_MEDIA_DIR_REL@

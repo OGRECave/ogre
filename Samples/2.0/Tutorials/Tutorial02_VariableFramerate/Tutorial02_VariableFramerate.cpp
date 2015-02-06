@@ -22,7 +22,9 @@ int main()
         "\n"
         "Despite what it seems, this is the most basic form of updating, and a horrible way\n"
         "to update your objects if you want to do any kind of serious game development.\n"
-        "Keep going through the Tutorials for superior methods of updating the rendering loop." );
+        "Keep going through the Tutorials for superior methods of updating the rendering loop.\n"
+        "\n"
+        "Note: The cube is black because there is no lighting. We are not focusing on that." );
     GraphicsSystem graphicsSystem( &myGameState );
 
     myGameState._notifyGraphicsSystem( &graphicsSystem );

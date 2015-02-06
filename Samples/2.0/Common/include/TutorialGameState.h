@@ -40,7 +40,7 @@ namespace Demo
 
         virtual void update( float timeSinceLast );
 
-        virtual void keyReleased (const SDL_KeyboardEvent &arg );
+        virtual void keyReleased( const SDL_KeyboardEvent &arg );
     };
 }
 

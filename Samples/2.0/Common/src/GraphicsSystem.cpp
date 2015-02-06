@@ -347,7 +347,7 @@ std::string macBundlePath()
     {
         // Load resource paths from config file
         Ogre::ConfigFile cf;
-        cf.load(mResourcePath + "resources.cfg");
+        cf.load(mResourcePath + "resources2.cfg");
 
         // Go through all sections & settings in the file
         Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
@@ -357,36 +357,50 @@ std::string macBundlePath()
         {
             secName = seci.peekNextKey();
             Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-            Ogre::ConfigFile::SettingsMultiMap::iterator i;
-            for (i = settings->begin(); i != settings->end(); ++i)
+
+            if( secName != "Hlms" )
             {
-                typeName = i->first;
-                archName = i->second;
+                Ogre::ConfigFile::SettingsMultiMap::iterator i;
+                for (i = settings->begin(); i != settings->end(); ++i)
+                {
+                    typeName = i->first;
+                    archName = i->second;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-                // OS X does not set the working directory relative to the app,
-                // In order to make things portable on OS X we need to provide
-                // the loading with it's own bundle path location
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                    Ogre::String(macBundlePath() + "/" + archName), typeName, secName);
+                    // OS X does not set the working directory relative to the app,
+                    // In order to make things portable on OS X we need to provide
+                    // the loading with it's own bundle path location
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+                                Ogre::String(macBundlePath() + "/" + archName), typeName, secName);
 #else
-                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                    archName, typeName, secName);
+                    Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+                                archName, typeName, secName);
 #endif
+                }
             }
         }
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::registerHlms(void)
     {
+        Ogre::ConfigFile cf;
+        cf.load(mResourcePath + "resources2.cfg");
+
+        Ogre::String dataFolder = cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+
+        if( dataFolder.empty() )
+            dataFolder = "./";
+        else if( *(dataFolder.end() - 1) != '/' )
+            dataFolder += "/";
+
         Ogre::Archive *archiveUnlit = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        "/home/matias/Projects/SDK/Ogre2-Hlms-private/Samples/Media/Hlms/Unlit/GLSL",
+                        dataFolder + "Hlms/Unlit/GLSL",
                         "FileSystem", true );
 
         Ogre::HlmsUnlit *hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit( archiveUnlit );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsUnlit );
 
         Ogre::Archive *archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        "/home/matias/Projects/SDK/Ogre2-Hlms-private/Samples/Media/Hlms/Pbs/GLSL",
+                        dataFolder + "Hlms/Pbs/GLSL",
                         "FileSystem", true );
         Ogre::HlmsPbs *hlmsPbs = OGRE_NEW Ogre::HlmsPbs( archivePbs );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsPbs );

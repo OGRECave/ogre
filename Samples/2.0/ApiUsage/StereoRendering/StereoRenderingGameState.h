@@ -19,6 +19,9 @@ namespace Demo
         virtual void createScene01(void);
 
         virtual void update( float timeSinceLast );
+
+        virtual void keyPressed( const SDL_KeyboardEvent &arg );
+        virtual void keyReleased( const SDL_KeyboardEvent &arg );
     };
 }
 

@@ -60,6 +60,13 @@ using namespace std;
 
 int main( int numargs, char** args )
 {
+    return 0;
+}
+
+#if 0
+
+int main( int numargs, char** args )
+{
     /*if (numargs < 2)
     {
         help();
@@ -450,3 +457,4 @@ bool HlmsCmd::setup(void)
     return true;
 };
 //-------------------------------------------------------------------------------------
+#endif

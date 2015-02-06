@@ -22,6 +22,11 @@ namespace Demo
         //-------------------------------------------------------------------------------
         virtual void createCamera(void)
         {
+            //Use one node to control both cameras
+            Ogre::SceneNode *camerasNode = mSceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
+                    createChildSceneNode( Ogre::SCENE_DYNAMIC );
+            camerasNode->setName( "Cameras Node" );
+
             mEyeCameras[0] = mSceneManager->createCamera( "Left Eye" );
             mEyeCameras[1] = mSceneManager->createCamera( "Right Eye" );
 
@@ -40,6 +45,10 @@ namespace Demo
                 mEyeCameras[i]->lookAt( lookAt );
                 mEyeCameras[i]->setNearClipDistance( 0.2f );
                 mEyeCameras[i]->setFarClipDistance( 1000.0f );
+
+                //By default cameras are attached to the Root Scene Node.
+                mEyeCameras[i]->detachFromParent();
+                camerasNode->attachObject( mEyeCameras[i] );
             }
 
             mCamera = mEyeCameras[0];
