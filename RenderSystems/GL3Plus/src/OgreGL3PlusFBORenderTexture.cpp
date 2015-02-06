@@ -126,7 +126,7 @@ namespace Ogre {
         };
 #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
-    GL3PlusFBOManager::GL3PlusFBOManager()
+    GL3PlusFBOManager::GL3PlusFBOManager(const GL3PlusSupport& support) : mGLSupport(support)
     {
         detectFBOFormats();
 
@@ -290,8 +290,7 @@ namespace Ogre {
     {
         // is glGetInternalformativ supported?
         // core since GL 4.2: see https://www.opengl.org/wiki/GLAPI/glGetInternalformat
-        // TODO also look for GL_ARB_internalformat_query
-        bool hasInternalFormatQuery = gl3wIsSupported(4,2);
+        bool hasInternalFormatQuery = gl3wIsSupported(4,2) || mGLSupport.checkExtension("GL_ARB_internalformat_query");
 
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
