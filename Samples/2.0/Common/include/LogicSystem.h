@@ -1,6 +1,6 @@
 
-#ifndef _LogicSystem_H_
-#define _LogicSystem_H_
+#ifndef _Demo_LogicSystem_H_
+#define _Demo_LogicSystem_H_
 
 #include "BaseSystem.h"
 #include "OgrePrerequisites.h"

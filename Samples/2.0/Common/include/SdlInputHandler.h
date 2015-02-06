@@ -2,8 +2,8 @@
 //Thanks to Jordan Milne and Scrawl for allowing to use their
 //sdlinputwrapper files as base under the MIT license
 
-#ifndef _SdlInputHandler_H_
-#define _SdlInputHandler_H_
+#ifndef _Demo_SdlInputHandler_H_
+#define _Demo_SdlInputHandler_H_
 
 #include "BaseSystem.h"
 #include "OgrePrerequisites.h"

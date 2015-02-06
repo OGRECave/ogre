@@ -1,6 +1,6 @@
 
-#ifndef _GameEntityManager_H_
-#define _GameEntityManager_H_
+#ifndef _Demo_GameEntityManager_H_
+#define _Demo_GameEntityManager_H_
 
 #include "Threading/MessageQueueSystem.h"
 #include "GameEntity.h"

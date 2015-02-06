@@ -1,6 +1,6 @@
 
-#ifndef _InputListeners_H_
-#define _InputListeners_H_
+#ifndef _Demo_InputListeners_H_
+#define _Demo_InputListeners_H_
 
 union SDL_Event;
 struct SDL_MouseButtonEvent;

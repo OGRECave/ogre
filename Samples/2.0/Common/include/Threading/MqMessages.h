@@ -1,6 +1,6 @@
 
-#ifndef _MqMessages_H_
-#define _MqMessages_H_
+#ifndef _Mq_MqMessages_H_
+#define _Mq_MqMessages_H_
 
 #include <vector>
 #include <assert.h>

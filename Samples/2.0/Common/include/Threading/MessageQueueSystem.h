@@ -1,6 +1,6 @@
 
-#ifndef _MessageQueueSystem_H_
-#define _MessageQueueSystem_H_
+#ifndef _Mq_MessageQueueSystem_H_
+#define _Mq_MessageQueueSystem_H_
 
 #include "Threading/OgreLightweightMutex.h"
 #include "OgreCommon.h"

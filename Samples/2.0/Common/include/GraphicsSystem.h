@@ -1,6 +1,6 @@
 
-#ifndef _GraphicsSystem_H_
-#define _GraphicsSystem_H_
+#ifndef _Demo_GraphicsSystem_H_
+#define _Demo_GraphicsSystem_H_
 
 #include "BaseSystem.h"
 #include "GameEntityManager.h"

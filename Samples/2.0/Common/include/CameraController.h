@@ -1,6 +1,6 @@
 
-#ifndef _CameraController_H_
-#define _CameraController_H_
+#ifndef _Demo_CameraController_H_
+#define _Demo_CameraController_H_
 
 #include "OgrePrerequisites.h"
 #include "TutorialGameState.h"

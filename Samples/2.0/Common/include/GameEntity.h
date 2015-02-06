@@ -1,6 +1,6 @@
 
-#ifndef _GameEntity_H_
-#define _GameEntity_H_
+#ifndef _Demo_GameEntity_H_
+#define _Demo_GameEntity_H_
 
 #include "OgreVector3.h"
 #include "OgreQuaternion.h"

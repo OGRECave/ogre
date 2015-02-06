@@ -1,6 +1,6 @@
 
-#ifndef _YieldTimer_H_
-#define _YieldTimer_H_
+#ifndef _Demo_YieldTimer_H_
+#define _Demo_YieldTimer_H_
 
 #include "OgreTimer.h"
 
