@@ -122,7 +122,7 @@ std::string macBundlePath()
         int posX = SDL_WINDOWPOS_CENTERED_DISPLAY(screen);
         int posY = SDL_WINDOWPOS_CENTERED_DISPLAY(screen);
 
-        bool fullscreen = false;
+        bool fullscreen = true;
         if(fullscreen)
         {
             posX = SDL_WINDOWPOS_UNDEFINED_DISPLAY(screen);
@@ -448,6 +448,7 @@ std::string macBundlePath()
         mCamera->lookAt( Ogre::Vector3( 0, 0, 0 ) );
         mCamera->setNearClipDistance( 0.2f );
         mCamera->setFarClipDistance( 1000.0f );
+        mCamera->setAutoAspectRatio( true );
     }
     //-----------------------------------------------------------------------------------
     Ogre::CompositorWorkspace* GraphicsSystem::setupCompositor(void)

@@ -27,6 +27,8 @@ namespace Demo
                     createChildSceneNode( Ogre::SCENE_DYNAMIC );
             camerasNode->setName( "Cameras Node" );
 
+            camerasNode->setPosition( 0, 5, 15 );
+
             mEyeCameras[0] = mSceneManager->createCamera( "Left Eye" );
             mEyeCameras[1] = mSceneManager->createCamera( "Right Eye" );
 
@@ -35,16 +37,17 @@ namespace Demo
 
             for( int i=0; i<2; ++i )
             {
-                const Ogre::Vector3 camPos( eyeDistance * (i * 2 - 1), 5, 15 );
+                const Ogre::Vector3 camPos( eyeDistance * (i * 2 - 1), 0, 0 );
                 mEyeCameras[i]->setPosition( camPos );
 
-                Ogre::Vector3 lookAt( eyeFocusDistance * (i * 2 - 1), 0, 0 );
+                Ogre::Vector3 lookAt( eyeFocusDistance * (i * 2 - 1), -5, -15 );
                 //Ogre::Vector3 lookAt( 0, 0, 0 );
 
                 // Look back along -Z
                 mEyeCameras[i]->lookAt( lookAt );
                 mEyeCameras[i]->setNearClipDistance( 0.2f );
                 mEyeCameras[i]->setFarClipDistance( 1000.0f );
+                mEyeCameras[i]->setAutoAspectRatio( true );
 
                 //By default cameras are attached to the Root Scene Node.
                 mEyeCameras[i]->detachFromParent();

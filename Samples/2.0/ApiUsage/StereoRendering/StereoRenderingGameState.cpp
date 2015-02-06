@@ -1,11 +1,13 @@
 
 #include "StereoRenderingGameState.h"
+#include "CameraController.h"
 #include "GraphicsSystem.h"
 
 #include "OgreSceneManager.h"
 #include "OgreItem.h"
 
 #include "OgreCamera.h"
+#include "OgreRenderWindow.h"
 
 using namespace Demo;
 
@@ -15,7 +17,6 @@ namespace Demo
         TutorialGameState( helpDescription )
     {
         memset( mSceneNode, 0, sizeof(mSceneNode) );
-        memset( mWASD, 0, sizeof(mWASD) );
     }
     //-----------------------------------------------------------------------------------
     void StereoRenderingGameState::createScene01(void)
@@ -55,6 +56,8 @@ namespace Demo
         light->setType( Ogre::Light::LT_DIRECTIONAL );
         light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
 
+        mCameraController = new CameraController( mGraphicsSystem, true );
+
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
@@ -63,47 +66,6 @@ namespace Demo
         for( int i=0; i<16; ++i )
             mSceneNode[i]->yaw( Ogre::Radian(timeSinceLast * i * 0.25f) );
 
-        int camMovementZ = mWASD[2] - mWASD[0];
-        int camMovementX = mWASD[3] - mWASD[1];
-
-        if( camMovementZ || camMovementX )
-        {
-            Ogre::Vector3 camMovementDir( camMovementX, 0, camMovementZ );
-            camMovementDir.normalise();
-            camMovementDir *= timeSinceLast * 10.0f;
-
-            Ogre::Node *cameraNode = mGraphicsSystem->getCamera()->getParentNode();
-            cameraNode->translate( camMovementDir, Ogre::Node::TS_LOCAL );
-        }
-
         TutorialGameState::update( timeSinceLast );
-    }
-    //-----------------------------------------------------------------------------------
-    void StereoRenderingGameState::keyPressed( const SDL_KeyboardEvent &arg )
-    {
-        if( arg.keysym.sym == SDLK_w )
-            mWASD[0] = true;
-        else if( arg.keysym.sym == SDLK_a )
-            mWASD[1] = true;
-        else if( arg.keysym.sym == SDLK_s )
-            mWASD[2] = true;
-        else if( arg.keysym.sym == SDLK_d )
-            mWASD[3] = true;
-        else
-            TutorialGameState::keyPressed( arg );
-    }
-    //-----------------------------------------------------------------------------------
-    void StereoRenderingGameState::keyReleased( const SDL_KeyboardEvent &arg )
-    {
-        if( arg.keysym.sym == SDLK_w )
-            mWASD[0] = false;
-        else if( arg.keysym.sym == SDLK_a )
-            mWASD[1] = false;
-        else if( arg.keysym.sym == SDLK_s )
-            mWASD[2] = false;
-        else if( arg.keysym.sym == SDLK_d )
-            mWASD[3] = false;
-        else
-            TutorialGameState::keyReleased( arg );
     }
 }

@@ -16,12 +16,16 @@ namespace Ogre
 namespace Demo
 {
     class GraphicsSystem;
+    class CameraController;
 
     /// Base game state for the tutorials. All it does is show a little text on screen :)
     class TutorialGameState : public GameState
     {
     protected:
         GraphicsSystem      *mGraphicsSystem;
+
+        /// Optional, for controlling the camera with WASD and the mouse
+        CameraController    *mCameraController;
 
         Ogre::String        mHelpDescription;
         bool                mDisplayHelp;
@@ -40,7 +44,10 @@ namespace Demo
 
         virtual void update( float timeSinceLast );
 
+        virtual void keyPressed( const SDL_KeyboardEvent &arg );
         virtual void keyReleased( const SDL_KeyboardEvent &arg );
+
+        virtual void mouseMoved( const SDL_Event &arg );
     };
 }
 

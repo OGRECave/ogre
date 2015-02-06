@@ -11,17 +11,12 @@ namespace Demo
     {
         Ogre::SceneNode     *mSceneNode[16];
 
-        bool                mWASD[4];
-
     public:
         StereoRenderingGameState( const Ogre::String &helpDescription );
 
         virtual void createScene01(void);
 
         virtual void update( float timeSinceLast );
-
-        virtual void keyPressed( const SDL_KeyboardEvent &arg );
-        virtual void keyReleased( const SDL_KeyboardEvent &arg );
     };
 }
 

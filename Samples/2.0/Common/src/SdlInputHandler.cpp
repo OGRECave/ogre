@@ -20,8 +20,8 @@ namespace Demo
         mJoystickListener( joystickListener ),
         mWantRelative( false ),
         mWantMouseGrab( false ),
-        mWantMouseVisible( false ),
-        mIsMouseRelative( false ),
+        mWantMouseVisible( true ),
+        mIsMouseRelative( !mWantRelative ),
         mWrapPointerManually( false ),
         mGrabPointer( false ),
         mMouseInWindow( true ),
@@ -211,7 +211,7 @@ namespace Demo
 
         //Input driver doesn't support relative positioning. Do it manually.
         int success = SDL_SetRelativeMouseMode( relative ? SDL_TRUE : SDL_FALSE );
-        if( relative && success != 0 )
+        if( !relative || (relative && success != 0) )
             mWrapPointerManually = true;
 
         //Remove all pending mouse events that were queued with the old settings.
@@ -231,7 +231,7 @@ namespace Demo
     {
         //Don't wrap if we don't want relative movements, support
         //relative movements natively, or aren't grabbing anyways
-        if( !mIsMouseRelative || !mWrapPointerManually || !mGrabPointer )
+        if( mIsMouseRelative || !mWrapPointerManually || !mGrabPointer )
             return;
 
         int width = 0;

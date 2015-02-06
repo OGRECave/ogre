@@ -1,5 +1,6 @@
 
 #include "TutorialGameState.h"
+#include "CameraController.h"
 #include "GraphicsSystem.h"
 
 #include "OgreSceneManager.h"
@@ -18,6 +19,7 @@ namespace Demo
 {
     TutorialGameState::TutorialGameState( const Ogre::String &helpDescription ) :
         mGraphicsSystem( 0 ),
+        mCameraController( 0 ),
         mHelpDescription( helpDescription ),
         mDisplayHelp( false ),
         mDebugText( 0 )
@@ -89,6 +91,20 @@ namespace Demo
             generateDebugText( timeSinceLast, finalText );
             mDebugText->setCaption( finalText );
         }
+
+        if( mCameraController )
+            mCameraController->update( timeSinceLast );
+    }
+    //-----------------------------------------------------------------------------------
+    void TutorialGameState::keyPressed( const SDL_KeyboardEvent &arg )
+    {
+        bool handledEvent = false;
+
+        if( mCameraController )
+            handledEvent = mCameraController->keyPressed( arg );
+
+        if( !handledEvent )
+            GameState::keyPressed( arg );
     }
     //-----------------------------------------------------------------------------------
     void TutorialGameState::keyReleased( const SDL_KeyboardEvent &arg )
@@ -101,5 +117,23 @@ namespace Demo
             generateDebugText( 0, finalText );
             mDebugText->setCaption( finalText );
         }
+        else
+        {
+            bool handledEvent = false;
+
+            if( mCameraController )
+                handledEvent = mCameraController->keyReleased( arg );
+
+            if( !handledEvent )
+                GameState::keyReleased( arg );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void TutorialGameState::mouseMoved( const SDL_Event &arg )
+    {
+        if( mCameraController )
+            mCameraController->mouseMoved( arg );
+
+        GameState::mouseMoved( arg );
     }
 }
