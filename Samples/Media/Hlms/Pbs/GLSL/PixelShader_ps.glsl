@@ -327,7 +327,7 @@ void main()
 		float spotAtten = clamp( (spotCosAngle - pass.lights[@n].spotParams.y) * pass.lights[@n].spotParams.x, 0.0, 1.0 );
 		spotAtten = pow( spotAtten, pass.lights[@n].spotParams.z );
 	@end
-		tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );
+		tmpColour = cookTorrance( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
 		float atten = 1.0 / (1.0 + pass.lights[@n].attenuation.y * fDistance + pass.lights[@n].attenuation.z * fDistance * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end

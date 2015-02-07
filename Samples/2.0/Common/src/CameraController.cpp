@@ -12,11 +12,13 @@ namespace Demo
 {
     CameraController::CameraController( GraphicsSystem *graphicsSystem, bool useSceneNode ) :
         mUseSceneNode( useSceneNode ),
+        mSpeedMofifier( false ),
         mCameraYaw( 0 ),
         mCameraPitch( 0 ),
         mGraphicsSystem( graphicsSystem )
     {
         memset( mWASD, 0, sizeof(mWASD) );
+        memset( mSlideUpDown, 0, sizeof(mSlideUpDown) );
     }
     //-----------------------------------------------------------------------------------
     void CameraController::update( float timeSinceLast )
@@ -46,12 +48,13 @@ namespace Demo
 
         int camMovementZ = mWASD[2] - mWASD[0];
         int camMovementX = mWASD[3] - mWASD[1];
+        int slideUpDown = mSlideUpDown[0] - mSlideUpDown[1];
 
-        if( camMovementZ || camMovementX )
+        if( camMovementZ || camMovementX || slideUpDown )
         {
-            Ogre::Vector3 camMovementDir( camMovementX, 0, camMovementZ );
+            Ogre::Vector3 camMovementDir( camMovementX, slideUpDown, camMovementZ );
             camMovementDir.normalise();
-            camMovementDir *= timeSinceLast * 10.0f;
+            camMovementDir *= timeSinceLast * 10.0f * (1 + mSpeedMofifier * 5);
 
             if( mUseSceneNode )
             {
@@ -67,6 +70,9 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     bool CameraController::keyPressed( const SDL_KeyboardEvent &arg )
     {
+        if( arg.keysym.sym == SDLK_LSHIFT )
+            mSpeedMofifier = true;
+
         if( arg.keysym.sym == SDLK_w )
             mWASD[0] = true;
         else if( arg.keysym.sym == SDLK_a )
@@ -75,6 +81,10 @@ namespace Demo
             mWASD[2] = true;
         else if( arg.keysym.sym == SDLK_d )
             mWASD[3] = true;
+        else if( arg.keysym.sym == SDLK_PAGEUP )
+            mSlideUpDown[0] = true;
+        else if( arg.keysym.sym == SDLK_PAGEDOWN )
+            mSlideUpDown[1] = true;
         else
             return false;
 
@@ -83,6 +93,9 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     bool CameraController::keyReleased( const SDL_KeyboardEvent &arg )
     {
+        if( arg.keysym.sym == SDLK_LSHIFT )
+            mSpeedMofifier = false;
+
         if( arg.keysym.sym == SDLK_w )
             mWASD[0] = false;
         else if( arg.keysym.sym == SDLK_a )
@@ -91,6 +104,10 @@ namespace Demo
             mWASD[2] = false;
         else if( arg.keysym.sym == SDLK_d )
             mWASD[3] = false;
+        else if( arg.keysym.sym == SDLK_PAGEUP )
+            mSlideUpDown[0] = false;
+        else if( arg.keysym.sym == SDLK_PAGEDOWN )
+            mSlideUpDown[1] = false;
         else
             return false;
 

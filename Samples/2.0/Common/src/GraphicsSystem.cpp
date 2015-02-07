@@ -179,6 +179,7 @@ std::string macBundlePath()
         }
 
         params.insert( std::make_pair("title", windowTitle) );
+        params.insert( std::make_pair("gamma", "true") );
         //params.insert( std::make_pair("FSAA", ) );
         //params.insert( std::make_pair("vsync", vsync ? "true" : "false") );
 
@@ -435,6 +436,10 @@ std::string macBundlePath()
                                                    "ExampleSMInstance" );
 
         mSceneManager->addRenderQueueListener( mOverlaySystem );
+
+        //Set sane defaults for proper shadow mapping
+        mSceneManager->setShadowDirectionalLightExtrusionDistance( 500.0f );
+        mSceneManager->setShadowFarDistance( 500.0f );
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::createCamera(void)

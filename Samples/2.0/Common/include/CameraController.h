@@ -11,7 +11,9 @@ namespace Demo
     {
         bool                mUseSceneNode;
 
+        bool                mSpeedMofifier;
         bool                mWASD[4];
+        bool                mSlideUpDown[2];
         float               mCameraYaw;
         float               mCameraPitch;
 

@@ -111,14 +111,16 @@ int main()
     stereoGameState._notifyGraphicsSystem( &graphicsSystem );
 
     graphicsSystem.initialize( "Stereo Rendering Sample" );
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
     graphicsSystem.createScene01();
     graphicsSystem.createScene02();
+
+    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
+    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
+    inputHandler->setGrabMousePointer( true );
+    inputHandler->setMouseVisible( false );
 
     Ogre::Timer timer;
     unsigned long startTime = timer.getMicroseconds();

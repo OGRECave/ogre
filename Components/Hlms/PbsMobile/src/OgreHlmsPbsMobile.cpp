@@ -641,7 +641,12 @@ namespace Ogre
                 for( int32 i=0; i<numLights; ++i )
                 {
                     Vector4 lightPos4 = lights[i].light->getAs4DVector();
-                    Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+                    Vector3 lightPos;
+
+                    if( lights[i].light->getType() == Light::LT_DIRECTIONAL )
+                        lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+                    else
+                        lightPos = viewMatrix * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.x );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.y );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.z );
@@ -707,7 +712,11 @@ namespace Ogre
                 for( int32 i=0; i<numLights; ++i )
                 {
                     Vector4 lightPos4 = globalLightList.lights[i]->getAs4DVector();
-                    Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+                    Vector3 lightPos;
+                    if( globalLightList.lights[i]->getType() == Light::LT_DIRECTIONAL )
+                        lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
+                    else
+                        lightPos = viewMatrix * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.x );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.y );
                     mPreparedPass.pixelShaderSharedBuffer.push_back( lightPos.z );

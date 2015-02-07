@@ -46,14 +46,16 @@ int main()
     v2MeshGameState._notifyGraphicsSystem( &graphicsSystem );
 
     graphicsSystem.initialize( "Importing V1 meshes into V2 objects (convert v1 objects to v2 format)" );
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    //inputHandler->setGrabMousePointer( true );
-    //inputHandler->setMouseVisible( false );
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
     graphicsSystem.createScene01();
     graphicsSystem.createScene02();
+
+    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
+    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
+    inputHandler->setGrabMousePointer( true );
+    inputHandler->setMouseVisible( false );
 
     Ogre::Timer timer;
     unsigned long startTime = timer.getMicroseconds();
