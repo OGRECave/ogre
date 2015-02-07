@@ -28,6 +28,9 @@ namespace Demo
             if( mUseSceneNode )
             {
                 Ogre::Node *cameraNode = camera->getParentNode();
+
+                // Update now as yaw needs the derived orientation.
+                cameraNode->_getFullTransformUpdated();
                 cameraNode->yaw( Ogre::Radian( mCameraYaw ), Ogre::Node::TS_WORLD );
                 cameraNode->pitch( Ogre::Radian( mCameraPitch ) );
             }

@@ -69,17 +69,6 @@ namespace Demo
         }
 
         BaseSystem::finishFrameParallel();
-
-        //We need to do this after BaseSystem::finishFrameParallel
-        //so that our messages to GraphicsSystem get flush/sent and
-        //also process all incoming messages.
-        /*if( mGraphicsSystem && !mAvailableTransformIdx.empty() )
-        {
-            //Until Graphics constantly releases the indices we send them, to avoid writing
-            //to transform data that may be in use by the other thread (race condition)
-            mCurrentTransformIdx = mAvailableTransformIdx.front();
-            mAvailableTransformIdx.pop_front();
-        }*/
     }
     //-----------------------------------------------------------------------------------
     void LogicSystem::processIncomingMessage( Mq::MessageId messageId, const void *data )
