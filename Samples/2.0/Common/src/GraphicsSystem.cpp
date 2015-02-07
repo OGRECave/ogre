@@ -80,7 +80,7 @@ std::string macBundlePath()
         assert( !mRoot && "deinitialize() not called!!!" );
     }
     //-----------------------------------------------------------------------------------
-    void GraphicsSystem::initialize(void)
+    void GraphicsSystem::initialize( const Ogre::String &windowTitle )
     {
         if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
         {
@@ -114,7 +114,6 @@ std::string macBundlePath()
         mRoot->getRenderSystem()->setConfigOption( "sRGB Gamma Conversion", "Yes" );
         mRoot->initialise(false);
 
-        Ogre::String title = "Ogre SDK Demo";
         int width   = 1280;
         int height  = 720;
 
@@ -122,7 +121,7 @@ std::string macBundlePath()
         int posX = SDL_WINDOWPOS_CENTERED_DISPLAY(screen);
         int posY = SDL_WINDOWPOS_CENTERED_DISPLAY(screen);
 
-        bool fullscreen = true;
+        bool fullscreen = false;
         if(fullscreen)
         {
             posX = SDL_WINDOWPOS_UNDEFINED_DISPLAY(screen);
@@ -130,7 +129,7 @@ std::string macBundlePath()
         }
 
         mSdlWindow = SDL_CreateWindow(
-                    title.c_str(),    // window title
+                    windowTitle.c_str(),    // window title
                     posX,               // initial x position
                     posY,               // initial y position
                     width,              // width, in pixels
@@ -179,14 +178,14 @@ std::string macBundlePath()
             break;
         }
 
-        params.insert( std::make_pair("title", title) );
+        params.insert( std::make_pair("title", windowTitle) );
         //params.insert( std::make_pair("FSAA", ) );
         //params.insert( std::make_pair("vsync", vsync ? "true" : "false") );
 
         //params.insert( std::make_pair("externalWindowHandle",  winHandle) );
         params.insert( std::make_pair("parentWindowHandle",  winHandle) );
 
-        mRenderWindow = Ogre::Root::getSingleton().createRenderWindow( title, width, height,
+        mRenderWindow = Ogre::Root::getSingleton().createRenderWindow( windowTitle, width, height,
                                                                        fullscreen, &params );
 
         mOverlaySystem = OGRE_NEW Ogre::v1::OverlaySystem();

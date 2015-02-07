@@ -56,7 +56,7 @@ int main()
     graphicsSystem._notifyLogicSystem( &logicSystem );
     logicSystem._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize();
+    graphicsSystem.initialize( "Tutorial 04: Interpolation Loop" );
     logicSystem.initialize();
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();

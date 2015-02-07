@@ -9,7 +9,7 @@ int main()
     GameState gameState;
     GraphicsSystem graphicsSystem( &gameState );
 
-    graphicsSystem.initialize();
+    graphicsSystem.initialize( "V2 Mesh importing from V1 sample" );
 
     graphicsSystem.createScene01();
     graphicsSystem.createScene02();

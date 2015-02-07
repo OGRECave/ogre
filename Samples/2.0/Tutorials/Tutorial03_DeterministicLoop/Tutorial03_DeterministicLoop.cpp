@@ -54,7 +54,7 @@ int main()
 
     myGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize();
+    graphicsSystem.initialize( "Tutorial 03: Deterministic Loop" );
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 

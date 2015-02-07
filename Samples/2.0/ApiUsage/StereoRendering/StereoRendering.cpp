@@ -1,6 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "StereoRenderingGameState.h"
+#include "SdlInputHandler.h"
 
 #include "OgreTimer.h"
 #include "OgreSceneManager.h"
@@ -109,7 +110,10 @@ int main()
 
     stereoGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize();
+    graphicsSystem.initialize( "Stereo Rendering Sample" );
+    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
+    inputHandler->setGrabMousePointer( true );
+    inputHandler->setMouseVisible( false );
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 

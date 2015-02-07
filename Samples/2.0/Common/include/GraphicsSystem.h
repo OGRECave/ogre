@@ -74,7 +74,7 @@ namespace Demo
 
         void _notifyLogicSystem( BaseSystem *logicSystem )      { mLogicSystem = logicSystem; }
 
-        void initialize(void);
+        void initialize( const Ogre::String &windowTitle );
         void deinitialize(void);
 
         void update( float timeSinceLast );

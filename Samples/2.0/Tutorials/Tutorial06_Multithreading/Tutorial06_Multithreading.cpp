@@ -103,7 +103,7 @@ unsigned long renderThread( Ogre::ThreadHandle *threadHandle )
     GraphicsSystem *graphicsSystem  = threadData->graphicsSystem;
     Ogre::Barrier *barrier          = threadData->barrier;
 
-    graphicsSystem->initialize();
+    graphicsSystem->initialize( "Tutorial 06: Multithreading" );
     barrier->sync();
 
     graphicsSystem->createScene01();

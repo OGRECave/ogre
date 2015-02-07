@@ -38,7 +38,7 @@ int main()
     GameState gameState;
     MyGraphicsSystem graphicsSystem( &gameState );
 
-    graphicsSystem.initialize();
+    graphicsSystem.initialize( "Tutorial 01: Initialization" );
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 

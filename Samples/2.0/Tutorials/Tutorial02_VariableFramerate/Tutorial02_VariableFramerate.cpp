@@ -29,7 +29,7 @@ int main()
 
     myGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize();
+    graphicsSystem.initialize( "Tutorial 02: Variable Framerate" );
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
