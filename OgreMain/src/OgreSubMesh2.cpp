@@ -239,7 +239,7 @@ namespace Ogre {
                 OGRE_FREE_SIMD( ptr, MEMCATEGORY_GEOMETRY );
         }
     };
-    void SubMesh::importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords )
+    void SubMesh::importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords, bool qTangents )
     {
         mMaterialName = subMesh->getMaterialName();
 
@@ -262,7 +262,7 @@ namespace Ogre {
         mBoneAssignmentsOutOfDate = false;
 
         VertexElement2Vec vertexElements;
-        char *data = arrangeEfficient( subMesh, halfPos, halfTexCoords, &vertexElements );
+        char *data = arrangeEfficient( subMesh, halfPos, halfTexCoords, qTangents, &vertexElements );
 
         //Wrap the ptrs around these, because the VaoManager's call
         //can throw thus causing a leak if we don't free them.
@@ -343,7 +343,7 @@ namespace Ogre {
     }
 
     char* SubMesh::arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
-                                     VertexElement2Vec *outVertexElements )
+                                     bool qTangents, VertexElement2Vec *outVertexElements )
     {
         typedef FastArray<v1::VertexElement> VertexElementArray;
 
@@ -405,7 +405,7 @@ namespace Ogre {
             }
 
             //If it has tangents, prepare the normal to hold QTangents.
-            if( hasTangents == true )
+            if( hasTangents == true && qTangents )
             {
                 VertexElement2Vec::iterator it = std::find( vertexElements.begin(),
                                                             vertexElements.end(),

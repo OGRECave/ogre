@@ -367,7 +367,37 @@ namespace Ogre {
 
         const LodValueArray* _getLodValueArray(void) const                      { return &mLodValues; }
 
-        void importV1( v1::Mesh *mesh, bool halfPos, bool halfTexCoords );
+        /** Imports a v1 mesh to this mesh, with optional optimization conversions.
+            This mesh must be in unloaded state.
+        @remarks
+            The vertex stream will be converted to a single interleaved buffer; i.e.
+            if the original mesh had 3 vertex buffers:
+                [1] = POSITION, POSITION, POSITION, POSITION, ...
+                [2] = NORMALS, NORMALS, NORMALS, NORMALS, ...
+                [3] = UV, UV, UV, UV, ...
+            then the v2 mesh will have only 1 vertex buffer:
+                [1] = POSITION NORMALS UV, POS NORM UV, POS NORM UV, POS NORM UV, ...
+        @param mesh
+            The source v1 mesh to convert from. You can unload or delete this pointer
+            afterwards.
+        @param halfPos
+            True if you want to convert the position data to VET_HALF4 format.
+            Recommended on desktop to reduce memory and bandwidth requirements.
+            Rarely the extra precision is needed.
+            Unfortuntately on mobile, not all ES2 devices support VET_HALF4.
+        @param halfTexCoords
+            True if you want to convert the position data to VET_HALF2 or VET_HALF4 format.
+            Same recommendations as halfPos.
+        @param qTangents
+            True if you want to generate tangent and reflection information (modifying
+            the original v1 mesh) and convert this data to a QTangent, requiring
+            VET_SHORT4_SNORM (8 bytes vs 28 bytes to store normals, tangents and
+            reflection). Needs much less space, trading for more ALU ops in the
+            vertex shader for decoding the QTangent.
+            Highly recommended on both desktop and mobile if you need tangents (i.e.
+            normal mapping).
+        */
+        void importV1( v1::Mesh *mesh, bool halfPos, bool halfTexCoords, bool qTangents );
     };
 
     /** @} */

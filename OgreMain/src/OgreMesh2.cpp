@@ -517,19 +517,30 @@ namespace Ogre {
         return retVal;
     }
     //---------------------------------------------------------------------
-    void Mesh::importV1( v1::Mesh *mesh, bool halfPos, bool halfTexCoords )
+    void Mesh::importV1( v1::Mesh *mesh, bool halfPos, bool halfTexCoords, bool qTangents )
     {
+        if( mLoadingState.get() != LOADSTATE_UNLOADED )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "To import a v1 mesh, the v2 mesh must be in unloaded state!",
+                         "Mesh::importV1" );
+        }
+
         mAabb.setExtents( mesh->getBounds().getMinimum(), mesh->getBounds().getMaximum() );
         mBoundRadius = mesh->getBoundingSphereRadius();
 
         try
         {
-            unsigned short sourceCoordSet;
-            unsigned short index;
-            bool alreadyHasTangents = mesh->suggestTangentVectorBuildParams( VES_TANGENT,
-                                                                             sourceCoordSet, index );
-            if( !alreadyHasTangents )
-                mesh->buildTangentVectors( VES_TANGENT, sourceCoordSet, index, false, false, true );
+            if( qTangents )
+            {
+                unsigned short sourceCoordSet;
+                unsigned short index;
+                bool alreadyHasTangents = mesh->suggestTangentVectorBuildParams( VES_TANGENT,
+                                                                                 sourceCoordSet,
+                                                                                 index );
+                if( !alreadyHasTangents )
+                    mesh->buildTangentVectors( VES_TANGENT, sourceCoordSet, index, false, false, true );
+            }
         }
         catch( Exception &e )
         {
@@ -538,7 +549,7 @@ namespace Ogre {
         for( size_t i=0; i<mesh->getNumSubMeshes(); ++i )
         {
             SubMesh *subMesh = createSubMesh();
-            subMesh->importFromV1( mesh->getSubMesh( i ), halfPos, halfTexCoords );
+            subMesh->importFromV1( mesh->getSubMesh( i ), halfPos, halfTexCoords, qTangents );
         }
 
         v1::SkeletonPtr v1Skeleton = mesh->getOldSkeleton();

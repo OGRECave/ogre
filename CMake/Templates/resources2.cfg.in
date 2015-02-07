@@ -6,7 +6,8 @@ Zip=@OGRE_MEDIA_DIR_REL@/packs/DebugPack.zip
 # Rarely used resources should be separately loaded by the
 # samples which require them.
 [Popular]
-FileSystem=/home/matias/Projects/SDK/Ogre2-Hlms-private/Samples/Media/2.0/scripts/Compositors
+FileSystem=@OGRE_MEDIA_DIR_REL@/2.0/scripts/Compositors
+FileSystem=@OGRE_MEDIA_DIR_REL@/models
 
 # Do not load this as a resource. It's here merely to tell the code where
 # the Hlms templates are located

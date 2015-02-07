@@ -149,7 +149,7 @@ namespace Ogre {
         String getMaterialName(void) const                  { return mMaterialName; }
 
         /// @See arrangeEfficient
-        void importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords );
+        void importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords, bool qTangents );
 
     protected:
 
@@ -162,9 +162,11 @@ namespace Ogre {
             is destroyed. Caller must reallocate the vertex buffer filled with the returned
             pointer
         @param halfPos
-            @See Mesh::arrangeEfficientFor
+            @See Mesh::importV1
         @param halfTexCoords
-            @See Mesh::arrangeEfficientFor
+            @See Mesh::importV1
+        @param qTangents
+            @See Mesh::importV1
         @param outVertexElements [out]
             Description of the buffer in the new Vao system. Matches the same as
             vertexData->vertexDeclaration, provided as out param as convenience.
@@ -174,7 +176,7 @@ namespace Ogre {
             Caller MUST free the pointer with OGRE_FREE_SIMD( MEMCATEGORY_GEOMETRY ).
         */
         char* arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
-                                VertexElement2Vec *outVertexElements );
+                                bool qTangents, VertexElement2Vec *outVertexElements );
     };
     /** @} */
     /** @} */
