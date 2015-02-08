@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __LightweightMutex_H__
 
 #include "OgrePlatform.h"
+#include "OgrePlatformInformation.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     //No need to include the heavy windows.h header for something like this!
