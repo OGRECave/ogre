@@ -61,7 +61,7 @@ namespace Ogre {
         mVaoManager( vaoManager )
     {
         // Version number
-        mVersion = "[MeshSerializer_v2.0]";
+        mVersion = "[MeshSerializer_v2.1]";
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl::~MeshSerializerImpl()
