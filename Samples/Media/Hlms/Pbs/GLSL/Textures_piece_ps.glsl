@@ -1,7 +1,10 @@
 @property( diffuse_map )
 	@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map_idx )], vec3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) );
 @property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end @end
-	@piece( MulDiffuseMapValue )* diffuseCol.xyz@end
+@end
+
+@property( diffuse_map || detail_maps_diffuse )
+    @piece( MulDiffuseMapValue )* diffuseCol.xyz@end
 @end
 
 @property( specular_map )

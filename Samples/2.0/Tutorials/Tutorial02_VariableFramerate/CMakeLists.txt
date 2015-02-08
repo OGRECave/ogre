@@ -15,7 +15,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_recursive( ./ SOURCE_FILES )
 
-ogre_add_executable(Sample_Tutorial02_VariableFramerate ${SOURCE_FILES})
+ogre_add_executable(Sample_Tutorial02_VariableFramerate WIN32 ${SOURCE_FILES})
 
 target_link_libraries(Sample_Tutorial02_VariableFramerate ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_Tutorial02_VariableFramerate)

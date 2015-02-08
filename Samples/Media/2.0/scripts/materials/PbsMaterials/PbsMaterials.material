@@ -67,8 +67,7 @@ hlms Rocks pbs
 hlms Marble pbs
 {
 	roughness	1.0
-	//detail_map0		MRAMOR6X6.jpg
-	detail_map0		Rocks_Diffuse.tga
-	//detail_offset_scale0 0 0 5 5
-	//roughness_map	MRAMOR-bump.jpg
+	detail_map0				MRAMOR6X6.jpg
+	detail_offset_scale0 	0 0 5 5
+	roughness_map			MRAMOR-bump.jpg
 }
