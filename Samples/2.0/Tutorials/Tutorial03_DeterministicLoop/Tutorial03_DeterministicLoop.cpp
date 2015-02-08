@@ -18,7 +18,11 @@ int gCurrentFrameTimeIdx = 0;
 extern bool gFakeSlowmo;
 bool gFakeSlowmo = false;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+#else
 int main()
+#endif
 {
     MyGameState myGameState(
                "This tutorial is very similar to Tutorial02; however it uses a fixed framerate instead\n"

@@ -51,7 +51,11 @@ namespace Demo
     };
 }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+#else
 int main()
+#endif
 {
     PbsMaterialsGameState pbsMaterialsGameState(
         "This sample depends on the media files:\n"

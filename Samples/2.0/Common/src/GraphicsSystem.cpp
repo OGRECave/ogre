@@ -183,8 +183,11 @@ std::string macBundlePath()
         //params.insert( std::make_pair("FSAA", ) );
         //params.insert( std::make_pair("vsync", vsync ? "true" : "false") );
 
-        //params.insert( std::make_pair("externalWindowHandle",  winHandle) );
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        params.insert( std::make_pair("externalWindowHandle",  winHandle) );
+#else
         params.insert( std::make_pair("parentWindowHandle",  winHandle) );
+#endif
 
         mRenderWindow = Ogre::Root::getSingleton().createRenderWindow( windowTitle, width, height,
                                                                        fullscreen, &params );
@@ -489,6 +492,13 @@ std::string macBundlePath()
         {
             const Ogre::Transform &transform = _l->mSceneNode->_getTransform();
             return _r < &transform.mDerivedTransform[transform.mIndex];
+        }
+
+        bool operator () ( const GameEntity *_l, const GameEntity *_r ) const
+        {
+            const Ogre::Transform &lTransform = _l->mSceneNode->_getTransform();
+            const Ogre::Transform &rTransform = _r->mSceneNode->_getTransform();
+            return &lTransform.mDerivedTransform[lTransform.mIndex] < &rTransform.mDerivedTransform[rTransform.mIndex];
         }
     };
     //-----------------------------------------------------------------------------------

@@ -96,7 +96,11 @@ namespace Demo
     };
 }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+#else
 int main()
+#endif
 {
     StereoRenderingGameState stereoGameState(
         "Shows the flexibility of the Compositor. Creates one workspace for each eye, using\n"

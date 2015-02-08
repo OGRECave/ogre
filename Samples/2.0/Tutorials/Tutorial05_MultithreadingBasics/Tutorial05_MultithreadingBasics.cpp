@@ -34,7 +34,11 @@ struct ThreadData
     Ogre::Barrier   *barrier;
 };
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+#else
 int main()
+#endif
 {
     GraphicsGameState graphicsGameState(
                 "This tutorial shows how to setup two update loops: One for Graphics, another for\n"

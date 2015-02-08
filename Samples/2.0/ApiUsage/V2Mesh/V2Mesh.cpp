@@ -9,7 +9,11 @@
 
 using namespace Demo;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+#else
 int main()
+#endif
 {
     V2MeshGameState v2MeshGameState(
         "The mesh file format for v2 objects (i.e. Items) is currently WIP. You can easily\n"

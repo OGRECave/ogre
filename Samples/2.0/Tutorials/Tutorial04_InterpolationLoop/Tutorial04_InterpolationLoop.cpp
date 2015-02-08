@@ -20,7 +20,11 @@ bool gFakeSlowmo = false;
 extern bool gFakeFrameskip;
 bool gFakeFrameskip = false;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+#else
 int main()
+#endif
 {
     GraphicsGameState graphicsGameState(
                "This tutorial combines fixed and variable framerate: Logic is executed at 25hz, while\n"

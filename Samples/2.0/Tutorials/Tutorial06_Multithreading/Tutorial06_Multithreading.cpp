@@ -36,7 +36,11 @@ struct ThreadData
     Ogre::Barrier   *barrier;
 };
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+#else
 int main()
+#endif
 {
     GraphicsGameState graphicsGameState(
                 "This is an advanced multithreading tutorial. For the simple version see Tutorial 05\n"

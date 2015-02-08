@@ -9,7 +9,11 @@
 
 using namespace Demo;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+#else
 int main()
+#endif
 {
     MyGameState myGameState(
         "This tutorial demonstrates the most basic rendering loop: Variable framerate.\n"
