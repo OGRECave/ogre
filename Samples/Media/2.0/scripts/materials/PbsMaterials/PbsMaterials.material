@@ -1,0 +1,74 @@
+//See the documentation of HlmsPbsDatablock::HlmsPbsDatablock and HlmsPbsMobileDatablock::HlmsPbsMobileDatablock
+//for all available settings; what they mean and what they do..
+hlms AllSettings pbs
+{
+	//Note: Internally the diffuse colour is divided by PI.
+	diffuse		1 1 1
+
+	specular	1 1 1
+
+	//Valid values are in range (0; inf]; but the range (0; 1] is physically correct.
+	//Note: Values extremely close to zero could cause NaNs and
+	//INFs in the pixel shader, also depends on the GPU's precision.
+	roughness	0.4
+	
+	//Fresnel as IOR (index of refraction)
+	fresnel		1.33
+	
+	//Fresnel as IOR (index of refraction), seperate per RGB component
+	//fresnel		1.33 1.33 1.2
+
+	//Directly set the "F0" term, instead of using IOR
+	//fresnel_coeff	0.1
+	
+	//Directly set the "F0" term, instead of using IOR, separate per RGB component
+	//fresnel_coeff	0.1 0.1 0.2
+	
+	diffuse_map		Rocks_Diffuse.tga
+	normal_map		Rocks_Normal.tga
+	roughness_map	Rocks_Spec.tga
+	specular_map	Rocks_Diffuse.tga
+	
+	detail_map0			1d_debug.png
+	detail_blend_mode0	Multiply2x
+	//detail_normal_map0	NMBumpsOut.png
+	
+	detail_map1			MRAMOR6X6.jpg
+	detail_blend_mode1	Overlay
+	//detail_normal_map1	NMBumpsOut.png
+	detail_offset_scale1 0 0 5 5
+	
+	detail_map2			nm_bk.png
+	detail_blend_mode2	Add
+	detail_normal_map2	NMBumpsOut.png
+	
+	detail_map3			MtlPlat2.jpg
+	detail_blend_mode3	Overlay
+	detail_normal_map3	NMBalls.png
+
+	//Red	channel controls the masks on detail_map0 and detail_normal_map0
+	//Green	channel controls the masks on detail_map1 and detail_normal_map1
+	//Blue	channel controls the masks on detail_map2 and detail_normal_map2
+	//Alpha	channel controls the masks on detail_map3 and detail_normal_map3
+	detail_weight_map	nm_up.png
+}
+
+hlms Rocks pbs
+{
+	roughness	0.4
+	fresnel		1.33
+	
+	diffuse_map		Rocks_Diffuse.tga
+	normal_map		Rocks_Normal.tga
+	roughness_map	Rocks_Spec.tga
+	specular_map	Rocks_Diffuse.tga
+}
+
+hlms Marble pbs
+{
+	roughness	1.0
+	//detail_map0		MRAMOR6X6.jpg
+	detail_map0		Rocks_Diffuse.tga
+	//detail_offset_scale0 0 0 5 5
+	//roughness_map	MRAMOR-bump.jpg
+}

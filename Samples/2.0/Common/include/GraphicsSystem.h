@@ -50,6 +50,8 @@ namespace Demo
         /// @see MessageQueueSystem::processIncomingMessage
         virtual void processIncomingMessage( Mq::MessageId messageId, const void *data );
 
+        static void addResourceLocation( const Ogre::String &archName, const Ogre::String &typeName,
+                                         const Ogre::String &secName );
         virtual void setupResources(void);
         virtual void registerHlms(void);
         /// Optional override method where you can perform resource group loading

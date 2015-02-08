@@ -1,0 +1,50 @@
+compositor_node PbsMaterialsRenderingNode
+{
+	in 0 rt_renderwindow
+
+	target rt_renderwindow
+	{
+		
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		pass render_scene
+		{
+			overlays	on
+			shadows		PbsMaterialsShadowNode
+		}
+	}
+}
+
+compositor_node_shadow PbsMaterialsShadowNode
+{
+	technique pssm
+
+	num_splits		3
+	pssm_lambda		0.5
+	shadow_map 0 2048 2048 PF_FLOAT32_R light 0 split 0 depth_pool 2
+	shadow_map 1 1024 1024 PF_FLOAT32_R light 0 split 1 depth_pool 2
+	shadow_map 2 1024 1024 PF_FLOAT32_R light 0 split 2 depth_pool 2
+
+	technique focused
+	shadow_map 4 2048 2048 PF_FLOAT32_R light 1 depth_pool 2
+	shadow_map 5 2048 2048 PF_FLOAT32_R light 2 depth_pool 2
+
+	shadow_map 0 1 2 4 5
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+		pass render_scene
+		{
+		}
+	}
+}
+
+workspace PbsMaterialsWorkspace
+{
+	connect_output PbsMaterialsRenderingNode 0
+}

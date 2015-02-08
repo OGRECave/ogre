@@ -238,6 +238,20 @@ namespace Ogre
                 }
             }
 
+            key = "detail_offset_scale" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                mDetailsOffsetScale[i] = StringConverter::parseVector4( paramVal,
+                                                                        mDetailsOffsetScale[i] );
+            }
+
+            key = "detail_normal_offset_scale" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                mDetailsOffsetScale[i+4] = StringConverter::parseVector4( paramVal,
+                                                                          mDetailsOffsetScale[i+4] );
+            }
+
             key = "uv_detail_map" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
@@ -412,6 +426,12 @@ namespace Ogre
     void HlmsPbsDatablock::setRoughness( float roughness )
     {
         mRoughness = roughness;
+        if( mRoughness <= 1e-6f )
+        {
+            LogManager::getSingleton().logMessage( "WARNING: PBS Datablock '" +
+                        mName.getFriendlyText() + "' Very low roughness values can "
+                                                  "cause NaNs in the pixel shader!" );
+        }
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------

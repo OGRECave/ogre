@@ -214,6 +214,20 @@ namespace Ogre
                 }
             }
 
+            key = "detail_offset_scale" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                mShaderCreationData->mDetailsOffsetScale[i] = StringConverter::parseVector4(
+                            paramVal, mShaderCreationData->mDetailsOffsetScale[i] );
+            }
+
+            key = "detail_normal_offset_scale" + StringConverter::toString( i );
+            if( Hlms::findParamInVec( params, key, paramVal ) )
+            {
+                mShaderCreationData->mDetailsOffsetScale[i+4] = StringConverter::parseVector4(
+                            paramVal, mShaderCreationData->mDetailsOffsetScale[i+4] );
+            }
+
             key = "uv_detail_map" + StringConverter::toString( i );
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {

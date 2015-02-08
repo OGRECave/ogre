@@ -149,31 +149,40 @@ namespace Ogre
                 This affects both the diffuse and normal-mapped detail maps.
 
             * detail_map0 <texture name>
-            * Similar: detail_map1, detail_map2, detail_map3
+              Similar: detail_map1, detail_map2, detail_map3
                 Name of the detail map to be used on top of the diffuse colour.
                 There can be gaps (i.e. set detail maps 0 and 2 but not 1)
 
             * detail_blend_mode0 <blend_mode>
-            * Similar: detail_blend_mode1, detail_blend_mode2, detail_blend_mode3
+              Similar: detail_blend_mode1, detail_blend_mode2, detail_blend_mode3
                 Blend mode to use for each detail map. Valid values are:
                     "NormalNonPremul", "NormalPremul", "Add", "Subtract", "Multiply",
                     "Multiply2x", "Screen", "Overlay", "Lighten", "Darken",
                     "GrainExtract", "GrainMerge", "Difference"
 
+            * detail_offset_scale0 <offset_u> <offset_v> <scale_u> <scale_v>
+              Similar: detail_offset_scale1, detail_offset_scale2, detail_offset_scale3
+                Sets the UV offset and scale of the detail maps.
+
             * detail_normal_map0 <texture name>
-            * Similar: detail_normal_map1, detail_normal_map2, detail_normal_map3
+              Similar: detail_normal_map1, detail_normal_map2, detail_normal_map3
                 Name of the detail map's normal map to be used.
                 It's not affected by blend mode. May be used even if
                 there is no detail_map
+
+            * detail_normal_offset_scale0 <offset_u> <offset_v> <scale_u> <scale_v>
+              Similar: detail_normal_offset_scale1, detail_normal_offset_scale2,
+                       detail_normal_offset_scale3
+                Sets the UV offset and scale of the detail normal maps.
 
             * reflection_map <texture name>
                 Name of the reflection map. Must be a cubemap. Doesn't use an UV set because
                 the tex. coords are automatically calculated.
 
             * uv_diffuse_map <uv>
-            * Similar: uv_specular_map, uv_normal_map, uv_detail_mapN, uv_detail_normal_mapN,
-            *          uv_detail_weight_map
-            * where N is a number between 0 and 3.
+              Similar: uv_specular_map, uv_normal_map, uv_detail_mapN, uv_detail_normal_mapN,
+                       uv_detail_weight_map
+              where N is a number between 0 and 3.
                 UV set to use for the particular texture map.
                 The UV value must be in range [0; 8)
         */
