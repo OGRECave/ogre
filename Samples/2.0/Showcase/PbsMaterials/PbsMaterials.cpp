@@ -87,7 +87,10 @@ int main()
         " * Spot lights must be casting shadow to work in the desktop PBS implementation.\n"
         " * The previous two issues will be fixed when an advanced lighting algorithm is\n"
         "   implemented, that will overcome forward lighting limitations.\n"
-        " * Mobile version only supports forward lighting." );
+        " * Mobile version only supports forward lighting.\n"
+        "\n"
+        "LEGAL: Uses Saint Peter's Basilica (C) by Emil Persson under CC Attrib 3.0 Unported\n"
+        "See Samples/Media/materials/textures/Cubemaps/License.txt for more information.");
     PbsMaterialsGraphicsSystem graphicsSystem( &pbsMaterialsGameState );
 
     pbsMaterialsGameState._notifyGraphicsSystem( &graphicsSystem );
