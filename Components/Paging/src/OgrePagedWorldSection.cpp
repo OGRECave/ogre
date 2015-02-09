@@ -128,7 +128,7 @@ namespace Ogre
         ser.read(&smInstanceName);
         Root& root = Root::getSingleton();
 
-        InstancingTheadedCullingMethod threadedCullingMethod = INSTANCING_CULLING_SINGLETHREAD;
+        InstancingThreadedCullingMethod threadedCullingMethod = INSTANCING_CULLING_SINGLETHREAD;
         const size_t numThreads = std::max<size_t>( 1, PlatformInformation::getNumLogicalCores() );
         if( numThreads > 1 )
             threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
