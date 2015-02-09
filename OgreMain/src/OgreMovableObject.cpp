@@ -143,7 +143,7 @@ namespace Ogre {
             }
 
             if( mManager && isStatic() )
-                mManager->notifyStaticDirty( this );
+                mManager->notifyStaticAabbDirty( this );
         }
 
         if( mSkeletonInstance )
@@ -179,7 +179,7 @@ namespace Ogre {
                 mParentNode->setStatic( bStatic );
 
             if( mManager && bStatic )
-                mManager->notifyStaticDirty( this );
+                mManager->notifyStaticAabbDirty( this );
 
             retVal = true;
         }

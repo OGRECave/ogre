@@ -719,8 +719,7 @@ SceneNode* SceneManager::getSceneNode( IdType id )
     SceneNodeList::reverse_iterator ritor = mSceneNodes.rbegin();
     SceneNodeList::reverse_iterator rend  = mSceneNodes.rend();
 
-    IdCmp idCmp;
-    while( ritor != rend && !idCmp( *ritor, id ) )
+    while( ritor != rend && (*ritor)->getId() != id )
         ++ritor;
 
     if( ritor != mSceneNodes.rend() )
@@ -736,8 +735,7 @@ const SceneNode* SceneManager::getSceneNode( IdType id ) const
     SceneNodeList::const_reverse_iterator ritor = mSceneNodes.rbegin();
     SceneNodeList::const_reverse_iterator rend  = mSceneNodes.rend();
 
-    IdCmp idCmp;
-    while( ritor != rend && !idCmp( *ritor, id ) )
+    while( ritor != rend && (*ritor)->getId() != id )
         ++ritor;
 
     if( ritor != mSceneNodes.rend() )
@@ -1128,7 +1126,10 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
                     realLastRq  = std::max<uint8>( realLastRq, (*itor)->_getTotalRenderQueues() );
                     ++itor;
                 }
-                realLastRq = std::min( realLastRq, lastRq );
+
+                //clamp RQ values to the real RQ range
+                realFirstRq = std::min(realLastRq, std::max(realFirstRq, firstRq));
+                realLastRq = std::min(realLastRq, std::max(realFirstRq, lastRq));
             }
 
             camera->_setRenderedRqs( realFirstRq, realLastRq );
@@ -1915,7 +1916,7 @@ v1::MeshPtr SceneManager::createSkydomePlane(
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::notifyStaticDirty( MovableObject *movableObject )
+void SceneManager::notifyStaticAabbDirty( MovableObject *movableObject )
 {
     mStaticEntitiesDirty = true;
     movableObject->_notifyStaticDirty();
@@ -4450,6 +4451,15 @@ MovableObject* SceneManager::createMovableObject( const String& typeName,
 
 }
 //---------------------------------------------------------------------
+bool SceneManager::hasMovableObject( MovableObject *m )
+{
+    if(!m)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Cannot look for a null object", "SceneManager::hasMovableObject");
+
+    MovableObjectVec objects = getMovableObjectCollection(m->getMovableType())->movableObjects;
+    return (m->mGlobalIndex < objects.size() && m == *(objects.begin() + m->mGlobalIndex));
+}
+//---------------------------------------------------------------------
 void SceneManager::destroyMovableObject( MovableObject *m, const String& typeName )
 {
     // Nasty hack to make generalised Camera functions work without breaking add-on SMs
@@ -4647,6 +4657,7 @@ RenderSystem *SceneManager::getDestinationRenderSystem()
 //---------------------------------------------------------------------
 uint32 SceneManager::_getCombinedVisibilityMask(void) const
 {
+    //Always preserve the settings of the reserved visibility flags in the viewport.
     return mCurrentViewport ?
         (mCurrentViewport->getVisibilityMask() & mVisibilityMask) |
         (mCurrentViewport->getVisibilityMask() & ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS) :

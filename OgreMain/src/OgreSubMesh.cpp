@@ -82,7 +82,7 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void SubMesh::_getRenderOperation(RenderOperation& ro, ushort lodIndex)
     {
-        assert( !lodIndex || (lodIndex-1) < mLodFaceList.size() );
+        assert( !lodIndex || (lodIndex - 1) < (ushort)mLodFaceList.size() );
 
         ro.useIndexes = indexData->indexCount != 0;
         if (lodIndex > 0)

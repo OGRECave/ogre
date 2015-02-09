@@ -1080,7 +1080,6 @@ namespace OgreBites
             if(mWindow == NULL)
             {
                 mWindow = createWindow();
-                mRoot->initialiseCompositor();
             }
             
             setupInput(mNoGrabInput);

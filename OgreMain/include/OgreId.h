@@ -83,29 +83,6 @@ namespace Ogre
             return left.mId < right.mId;
         }
     };
-
-    struct _OgreExport IdCmp
-    {
-        bool operator()( const IdObject *left, const IdType rightId )
-        {
-            return left->mId < rightId;
-        }
-
-        bool operator()( const IdType leftId, const IdObject *right )
-        {
-            return leftId < right->mId;
-        }
-
-        bool operator()( const IdObject *left, const IdObject *right )
-        {
-            return left->mId < right->mId;
-        }
-
-        bool operator()( const IdObject &left, const IdObject &right )
-        {
-            return left.mId < right.mId;
-        }
-    };
 }
 
 #endif

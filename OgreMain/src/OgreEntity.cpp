@@ -370,7 +370,7 @@ namespace v1 {
         setDatablock( datablock );
     }
     //-----------------------------------------------------------------------
-    Entity* Entity::clone( const String& newName) const
+    Entity* Entity::clone(void) const
     {
         if (!mManager)
         {
@@ -378,7 +378,8 @@ namespace v1 {
                         "Cannot clone an Entity that wasn't created through a "
                         "SceneManager", "Entity::clone");
         }
-        Entity* newEnt = mManager->createEntity(newName, getMesh()->getName() );
+        Entity* newEnt = mManager->createEntity( getMesh(),
+                                                 mObjectMemoryManager->getMemoryManagerType() );
 
         if (mInitialised)
         {

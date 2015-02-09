@@ -58,7 +58,9 @@ public:
         , mFly(true)
         , mFallVelocity(0)
         , mTerrainPos(0,0,0)
-
+        , mTerrainGlobals(NULL)
+        , mLodInfoOverlay(NULL)
+        , mLodInfoOverlayContainer(NULL)
     {
         mInfo["Title"] = "Endless World";
         mInfo["Description"] = "Demonstrates use of the terrain plugin with paging option.";
@@ -475,8 +477,10 @@ protected:
         }
         mLodStatusLabelList.clear();
 
-        OverlayManager::getSingleton().destroy(mLodInfoOverlay);
-        OverlayManager::getSingleton().destroyOverlayElement(mLodInfoOverlayContainer);
+        if (mLodInfoOverlay)
+            OverlayManager::getSingleton().destroy(mLodInfoOverlay);
+        if (mLodInfoOverlayContainer)
+            OverlayManager::getSingleton().destroyOverlayElement(mLodInfoOverlayContainer);
 
         SdkSample::_shutdown();
     }

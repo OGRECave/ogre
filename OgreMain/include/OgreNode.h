@@ -228,7 +228,8 @@ namespace Ogre {
         Transform& _getTransform()                                      { return mTransform; }
 
         /// Called by SceneManager when it is telling we're a static node being dirty
-        virtual void _notifyStaticDirty(void) const {}
+        /// Don't call this directly. @see SceneManager::notifyStaticDirty
+        virtual void _notifyStaticDirty(void) const;
 
         /** Returns a quaternion representing the nodes orientation.
             @remarks

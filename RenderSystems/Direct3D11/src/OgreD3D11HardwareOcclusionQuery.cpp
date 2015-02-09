@@ -102,8 +102,8 @@ namespace Ogre {
                     continue;
                 if  (hr == S_OK)
                 {
-                    mPixelCount = pixels;
-                    *NumOfFragments = pixels;
+                    mPixelCount = (unsigned int)pixels;
+                    *NumOfFragments = (unsigned int)pixels;
                     break;
                 }
                 //in directx10 the device will never be lost
@@ -148,7 +148,7 @@ namespace Ogre {
             mDevice->CreateQuery(&queryDesc, &mQuery);
         }
         */
-        mPixelCount = pixels;
+        mPixelCount = (unsigned int)pixels;
         mIsQueryResultStillOutstanding = false;
         return false;
     

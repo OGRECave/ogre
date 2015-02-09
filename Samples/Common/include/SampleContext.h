@@ -569,7 +569,6 @@ namespace OgreBites
         virtual void setup()
         {
             mWindow = createWindow();
-            mRoot->initialiseCompositor();
             setupInput();
             locateResources();
             loadResources();

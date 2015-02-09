@@ -5976,19 +5976,19 @@ namespace Ogre{
                 switch(baseType)
                 {
                 case BCT_FLOAT:
-                    values.push_back((float)StringConverter::parseReal(atom->value));
+                    values.push_back((T)(float)StringConverter::parseReal(atom->value));
                     break;
                 case BCT_INT:
-                    values.push_back(StringConverter::parseInt(atom->value));
+                    values.push_back((T)StringConverter::parseInt(atom->value));
                     break;
                 case BCT_DOUBLE:
-                    values.push_back((double)StringConverter::parseReal(atom->value));
+                    values.push_back((T)(double)StringConverter::parseReal(atom->value));
                     break;
                 case BCT_UINT:
-                    values.push_back(StringConverter::parseUnsignedInt(atom->value));
+                    values.push_back((T)StringConverter::parseUnsignedInt(atom->value));
                     break;
                 case BCT_BOOL:
-                    values.push_back((uint)StringConverter::parseBool(atom->value));
+                    values.push_back((T)(uint)StringConverter::parseBool(atom->value));
                     break;
                 default:
                     // This should never be reached.
@@ -7949,6 +7949,21 @@ namespace Ogre{
                         }
                     }
                     break;
+                    case ID_MATERIAL_SCHEME:
+                        {
+                            if (prop->values.empty())
+                            {
+                                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                                return;
+                            }
+
+                            AbstractNodeList::const_iterator it0 = prop->values.begin();
+                            if (!getString(*it0, &passScene->mMaterialScheme))
+                            {
+                                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            }
+                        }
+                        break;
                 case ID_VIEWPORT:
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:

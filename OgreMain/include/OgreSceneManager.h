@@ -1098,7 +1098,7 @@ namespace Ogre {
         */
         virtual Camera* findCamera( IdString name ) const;
 
-        /** Finds the camera with the given name. Returns null if not found.
+        /** Finds the camera with the given name. Returns null pointer if not found.
         @param name
             Hash of the name of the camera to find
         @return
@@ -1684,8 +1684,24 @@ namespace Ogre {
         InstancingTheadedCullingMethod getInstancingThreadedCullingMethod() const
                                                             { return mInstancingThreadedCullingMethod; }
 
-        void notifyStaticDirty( MovableObject *movableObject );
+        /** Notifies that the given MovableObject is dirty (i.e. the AABBs have changed).
+            Note that the parent SceneNodes of this/these objects are not updated and you will
+            have to call @see notifyStaticDirty on the SceneNode if the position/rotation/scale
+            have changed.
+        */
+        void notifyStaticAabbDirty( MovableObject *movableObject );
 
+        /** Notifies that the given Node is dirty (i.e. the position, orientation and/or scale has
+            changed). The call will cascade to all children of the input node.
+        @remarks
+            Implies a call to @see notifyStaticAabbDirty if the node or any of its children has
+            a MovableObject attached.
+        @par
+            Calling notifyStaticDirty( getRootSceneNode( SCENE_STATIC ) ) should flush the entire
+            static system. It might be slower, but it is useful when you're witnessing artifacts
+            after making changes to the static environment and don't know for sure which objects
+            need to be updated.
+        */
         void notifyStaticDirty( Node *node );
 
         /** Updates all skeletal animations in the scene. This is typically called once
@@ -2740,6 +2756,10 @@ namespace Ogre {
         virtual MovableObject* createMovableObject(const String& typeName,
                                                     ObjectMemoryManager *objectMemMgr,
                                                     const NameValuePairList* params = 0);
+        /**
+        Returns if this SceneManager contains the specified MovableObject
+        */
+        virtual bool hasMovableObject( MovableObject *m );
         /** Destroys a MovableObject with the name specified, of the type specified.
         @remarks
             The MovableObject will automatically detach itself from any nodes

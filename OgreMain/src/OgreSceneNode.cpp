@@ -109,7 +109,7 @@ namespace Ogre {
             ObjectVec::const_iterator end  = mAttachments.end();
 
             while( itor != end )
-                mCreator->notifyStaticDirty( *itor++ );
+                mCreator->notifyStaticAabbDirty( *itor++ );
         }
     }
     //-----------------------------------------------------------------------

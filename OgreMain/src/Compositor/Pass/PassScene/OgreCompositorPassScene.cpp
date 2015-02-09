@@ -101,6 +101,10 @@ namespace Ogre
         if( lodCamera && mCamera == mLodCamera )
             usedLodCamera = lodCamera;
 
+        //store the viewports current material scheme and use the one set in the scene pass def
+        String oldViewportMatScheme = mViewport->getMaterialScheme();
+        mViewport->setMaterialScheme(mDefinition->mMaterialScheme);
+
         //Let the code receive valid camera->getLastViewport() return values.
         mCamera->_notifyViewport( mViewport );
         const_cast<Camera*>(usedLodCamera)->_notifyViewport( mViewport ); //TODO: Ugly const_cast
@@ -165,6 +169,9 @@ namespace Ogre
             //Restore orientation
             mCamera->setOrientation( oldCameraOrientation );
         }
+
+        //restore viewport material scheme
+        mViewport->setMaterialScheme(oldViewportMatScheme);
 
         if( listener )
             listener->passPosExecute( this );

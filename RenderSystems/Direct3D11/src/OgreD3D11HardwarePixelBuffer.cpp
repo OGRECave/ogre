@@ -620,7 +620,7 @@ namespace Ogre {
             byte *src = (byte*)converted.data;
             byte *dst = (byte*)locked.data;
 
-            for (int row = 0 ; row < converted.getHeight() ; row ++ )
+            for (uint32 row = 0 ; row < converted.getHeight() ; row ++ )
             {
                 memcpy((void*)dst,(void*)src,srcRowPitch);
                 src += srcRowPitch;
