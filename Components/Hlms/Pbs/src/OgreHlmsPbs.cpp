@@ -388,7 +388,9 @@ namespace Ogre
 
         setDetailMapProperties( datablock, inOutPieces );
 
-        setProperty( PbsProperty::NumTextures, datablock->mBakedTextures.size() );
+        bool envMap = datablock->getBakedTextureIdx( PBSM_REFLECTION ) != NUM_PBSM_TEXTURE_TYPES;
+
+        setProperty( PbsProperty::NumTextures, datablock->mBakedTextures.size() - envMap );
 
         setTextureProperty( PbsProperty::DiffuseMap,    datablock,  PBSM_DIFFUSE );
         setTextureProperty( PbsProperty::NormalMapTex,  datablock,  PBSM_NORMAL );

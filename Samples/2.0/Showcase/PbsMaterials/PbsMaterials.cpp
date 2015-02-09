@@ -58,8 +58,36 @@ int main()
 #endif
 {
     PbsMaterialsGameState pbsMaterialsGameState(
+        "Shows how to use the PBS material system. There's nothing really fancy,\n"
+        "it's just programmer art. The PBS materials can be setup from script or\n"
+        "code. This sample does both. At the time being, not all settings from the\n"
+        "PBS implementation can be tweaked with scripts. See PbsDatablock::PbsDatablock\n"
+        "constructor documentation. Also see the Hlms section of the porting guide in\n"
+        "the Docs/2.0 folder.\n"
+        "\n"
+        "The sphere palette shows what happens when tweaking the roughness around the\n"
+        "X axis; and the fresnel term around the Z axis.\n"
+        "The scene is being lit by a white directional light (3-split PSSM) and two spot\n"
+        "lights, one of warm colour, one cold. Both are also shadowed."
+        "\n"
+        "Of all the features supported by the PBS implementation, perhaps the hardest to\n"
+        "to understand is the Detail Weight Map. It allows you to 'paint' the detail maps\n"
+        "over the mesh, by controlling weight of each of the 4 maps via the RGBA channels\n"
+        "of the weight map. 'R' controls the detail map 0, 'G' the detail map 1,\n"
+        "'B' the detail map 2, and 'A' the detail map 3.\n"
+        "\n"
         "This sample depends on the media files:\n"
-        "   * Samples/Media/2.0/scripts/Compositors/PbsMaterials.compositor\n" );
+        "   * Samples/Media/2.0/scripts/Compositors/PbsMaterials.compositor\n"
+        "   * Samples/Media/2.0/materials/PbsMaterials/PbsMaterials.material\n"
+        "\n"
+        "Known issues:\n"
+        " * There is some flickering on the directional lights' shadow map due to\n"
+        "   a bug in the PSSM or the focused implementation it relies on.\n"
+        " * Point lights aren't working in the desktop PBS implementation.\n"
+        " * Spot lights must be casting shadow to work in the desktop PBS implementation.\n"
+        " * The previous two issues will be fixed when an advanced lighting algorithm is\n"
+        "   implemented, that will overcome forward lighting limitations.\n"
+        " * Mobile version only supports forward lighting." );
     PbsMaterialsGraphicsSystem graphicsSystem( &pbsMaterialsGameState );
 
     pbsMaterialsGameState._notifyGraphicsSystem( &graphicsSystem );

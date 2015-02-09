@@ -16,12 +16,18 @@
 #include "OgreHlmsPbsDatablock.h"
 #include "OgreHlmsSamplerblock.h"
 
+#include "OgreRoot.h"
+#include "OgreHlmsManager.h"
+#include "OgreHlmsTextureManager.h"
+#include "OgreHlmsPbs.h"
+
 using namespace Demo;
 
 namespace Demo
 {
     PbsMaterialsGameState::PbsMaterialsGameState( const Ogre::String &helpDescription ) :
-        TutorialGameState( helpDescription )
+        TutorialGameState( helpDescription ),
+        mAnimateObjects( true )
     {
         memset( mSceneNode, 0, sizeof(mSceneNode) );
     }
@@ -71,7 +77,7 @@ namespace Demo
             {
                 Ogre::String meshName;
 
-                if( i % i == 2 )
+                if( i == j )
                     meshName = "Sphere1000.mesh";
                 else
                     meshName = "Cube_d.mesh";
@@ -81,9 +87,11 @@ namespace Demo
                                                              AUTODETECT_RESOURCE_GROUP_NAME,
                                                              Ogre::SCENE_DYNAMIC );
                 if( i % 2 == 0 )
-                    item->setDatablock( "Marble" );
-                else
                     item->setDatablock( "Rocks" );
+                else
+                    item->setDatablock( "Marble" );
+
+                item->setVisibilityFlags( 0x000000001 );
 
                 size_t idx = i * 4 + j;
 
@@ -93,11 +101,66 @@ namespace Demo
                 mSceneNode[idx]->setPosition( (i - 1.5f) * armsLength,
                                               2.0f,
                                               (j - 1.5f) * armsLength );
-                mSceneNode[idx]->setScale( 0.5f, 0.5f, 0.5f );
+                mSceneNode[idx]->setScale( 0.65f, 0.65f, 0.65f );
 
-                mSceneNode[idx]->roll( Ogre::Radian( idx ) );
+                mSceneNode[idx]->roll( Ogre::Radian( (Ogre::Real)idx ) );
 
                 mSceneNode[idx]->attachObject( item );
+            }
+        }
+
+        {
+            size_t numItems = 0;
+            Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+            Ogre::HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
+
+            assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+
+            Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+
+            const int numX = 8;
+            const int numZ = 8;
+
+            const float armsLength = 1.0f;
+            const float startX = (numX-1) / 2.0f;
+            const float startZ = (numZ-1) / 2.0f;
+
+            for( int x=0; x<numX; ++x )
+            {
+                for( int z=0; z<numZ; ++z )
+                {
+                    Ogre::String datablockName = "Test" + Ogre::StringConverter::toString( numItems++ );
+                    Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                                hlmsPbs->createDatablock( datablockName,
+                                                          datablockName,
+                                                          Ogre::HlmsMacroblock(),
+                                                          Ogre::HlmsBlendblock(),
+                                                          Ogre::HlmsParamVec() ) );
+
+                    Ogre::HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
+                            createOrRetrieveTexture( "SaintPetersBasilica.dds",
+                                                     Ogre::HlmsTextureManager::TEXTURE_TYPE_ENV_MAP );
+
+                    datablock->setTexture( Ogre::PBSM_REFLECTION, texLocation.xIdx, texLocation.texture );
+                    datablock->setDiffuse( Ogre::Vector3( 0.0f, 1.0f, 0.0f ) );
+
+                    datablock->setRoughness( std::max( 0.02f, x / (float)numX ) );
+                    datablock->setFresnel( Ogre::Vector3( z / (float)numZ ), false );
+
+                    Ogre::Item *item = sceneManager->createItem( "Sphere1000.mesh",
+                                                                 Ogre::ResourceGroupManager::
+                                                                 AUTODETECT_RESOURCE_GROUP_NAME,
+                                                                 Ogre::SCENE_DYNAMIC );
+                    item->setDatablock( datablock );
+                    item->setVisibilityFlags( 0x000000002 );
+
+                    Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
+                            createChildSceneNode( Ogre::SCENE_DYNAMIC );
+                    sceneNode->setPosition( Ogre::Vector3( armsLength * x - startX,
+                                                           1.0f,
+                                                           armsLength * z - startZ ) );
+                    sceneNode->attachObject( item );
+                }
             }
         }
 
@@ -143,9 +206,55 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void PbsMaterialsGameState::update( float timeSinceLast )
     {
-        for( int i=0; i<16; ++i )
-            mSceneNode[i]->yaw( Ogre::Radian(timeSinceLast * i * 0.25f) );
+        if( mAnimateObjects )
+        {
+            for( int i=0; i<16; ++i )
+                mSceneNode[i]->yaw( Ogre::Radian(timeSinceLast * i * 0.125f) );
+        }
 
         TutorialGameState::update( timeSinceLast );
+    }
+    //-----------------------------------------------------------------------------------
+    void PbsMaterialsGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
+    {
+        Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
+
+        TutorialGameState::generateDebugText( timeSinceLast, outText );
+        outText += "\nPress F2 to toggle animation. ";
+        outText += mAnimateObjects ? "[On]" : "[Off]";
+        outText += "\nPress F3 to show/hide animated objects. ";
+        outText += (visibilityMask & 0x000000001) ? "[On]" : "[Off]";
+        outText += "\nPress F4 to show/hide palette of spheres. ";
+        outText += (visibilityMask & 0x000000002) ? "[On]" : "[Off]";
+    }
+    //-----------------------------------------------------------------------------------
+    void PbsMaterialsGameState::keyReleased( const SDL_KeyboardEvent &arg )
+    {
+        if( arg.keysym.sym == SDLK_F2 )
+        {
+            mAnimateObjects = !mAnimateObjects;
+        }
+        else if( arg.keysym.sym == SDLK_F3 )
+        {
+            Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
+            bool showMovingObjects = (visibilityMask & 0x00000001);
+            showMovingObjects = !showMovingObjects;
+            visibilityMask &= ~0x00000001;
+            visibilityMask |= (Ogre::uint32)showMovingObjects;
+            mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
+        }
+        else if( arg.keysym.sym == SDLK_F4 )
+        {
+            Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
+            bool showPalette = (visibilityMask & 0x00000002) != 0;
+            showPalette = !showPalette;
+            visibilityMask &= ~0x00000002;
+            visibilityMask |= (Ogre::uint32)(showPalette) << 1;
+            mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
+        }
+        else
+        {
+            TutorialGameState::keyReleased( arg );
+        }
     }
 }

@@ -334,7 +334,7 @@ void main()
 
 @property( envprobe_map )
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	vec3 envColour = textureLod( texEnvProbeMap, invViewMatCubemap * reflDir, ROUGHNESS * 12.0 ).xyz;
+	vec3 envColour = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz;
 	@property( !hw_gamma_read )//Gamma to linear space
 	envColour = envColour * envColour;@end
 	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS) );@end
