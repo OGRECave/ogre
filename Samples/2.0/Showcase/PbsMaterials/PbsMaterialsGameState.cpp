@@ -6,8 +6,15 @@
 #include "OgreSceneManager.h"
 #include "OgreItem.h"
 
+#include "OgreMeshManager.h"
+#include "OgreMeshManager2.h"
+#include "OgreMesh2.h"
+
 #include "OgreCamera.h"
 #include "OgreRenderWindow.h"
+
+#include "OgreHlmsPbsDatablock.h"
+#include "OgreHlmsSamplerblock.h"
 
 using namespace Demo;
 
@@ -25,16 +32,58 @@ namespace Demo
 
         const float armsLength = 2.5f;
 
+        Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
+                                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                            Ogre::Plane( Ogre::Vector3::UNIT_Y, 1.0f ), 50.0f, 50.0f,
+                                            1, 1, true, 1, 4.0f, 4.0f, Ogre::Vector3::UNIT_Z );
+
+        Ogre::MeshPtr planeMesh = Ogre::MeshManager::getSingleton().createManual(
+                    "Plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+
+        planeMesh->importV1( planeMeshV1.get(), true, true, true );
+
+        {
+            Ogre::Item *item = sceneManager->createItem( planeMesh, Ogre::SCENE_DYNAMIC );
+            item->setDatablock( "Marble" );
+            Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
+                                                    createChildSceneNode( Ogre::SCENE_DYNAMIC );
+            sceneNode->setPosition( 0, -1, 0 );
+            sceneNode->attachObject( item );
+
+            //Change the addressing mode of the roughness map to wrap via code.
+            //Detail maps default to wrap, but the rest to clamp.
+            assert( dynamic_cast<Ogre::HlmsPbsDatablock*>( item->getSubItem(0)->getDatablock() ) );
+            Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                                                            item->getSubItem(0)->getDatablock() );
+            //Make a hard copy of the sampler block
+            Ogre::HlmsSamplerblock samplerblock( *datablock->getSamplerblock( Ogre::PBSM_ROUGHNESS ) );
+            samplerblock.mU = Ogre::TAM_WRAP;
+            samplerblock.mV = Ogre::TAM_WRAP;
+            samplerblock.mW = Ogre::TAM_WRAP;
+            //Set the new samplerblock. The Hlms system will
+            //automatically create the API block if necessary
+            datablock->setSamplerblock( Ogre::PBSM_ROUGHNESS, samplerblock );
+        }
+
         for( int i=0; i<4; ++i )
         {
             for( int j=0; j<4; ++j )
             {
-                Ogre::Item *item = sceneManager->createItem( "Cube_d.mesh",
+                Ogre::String meshName;
+
+                if( i % i == 2 )
+                    meshName = "Sphere1000.mesh";
+                else
+                    meshName = "Cube_d.mesh";
+
+                Ogre::Item *item = sceneManager->createItem( meshName,
                                                              Ogre::ResourceGroupManager::
                                                              AUTODETECT_RESOURCE_GROUP_NAME,
                                                              Ogre::SCENE_DYNAMIC );
-
-                item->setDatablock( "Marble" );
+                if( i % 2 == 0 )
+                    item->setDatablock( "Marble" );
+                else
+                    item->setDatablock( "Rocks" );
 
                 size_t idx = i * 4 + j;
 
@@ -42,8 +91,9 @@ namespace Demo
                         createChildSceneNode( Ogre::SCENE_DYNAMIC );
 
                 mSceneNode[idx]->setPosition( (i - 1.5f) * armsLength,
-                                              0.0f,
+                                              2.0f,
                                               (j - 1.5f) * armsLength );
+                mSceneNode[idx]->setScale( 0.5f, 0.5f, 0.5f );
 
                 mSceneNode[idx]->roll( Ogre::Radian( idx ) );
 

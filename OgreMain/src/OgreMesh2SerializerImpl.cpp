@@ -889,6 +889,8 @@ namespace Ogre {
 
         pushInnerChunk(stream);
 
+        subLod->operationType = v1::RenderOperation::OT_TRIANGLE_LIST;
+
         uint16 streamID = readChunk(stream);
         while( !stream->eof() &&
                (streamID == M_SUBMESH_M_GEOMETRY ||

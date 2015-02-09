@@ -153,11 +153,6 @@ namespace v1
         */
         void applySettingToBatches( BatchSettingId id, bool value, const InstanceBatchVec &container );
 
-        /** Called when we you use a mesh which has shared vertices, the function creates separate
-            vertex/index buffers and also recreates the bone assignments.
-        */
-        void unshareVertices(const Ogre::v1::MeshPtr &mesh);
-
     public:
         InstanceManager( IdString customName, SceneManager *sceneManager,
                          const String &meshName, const String &groupName,

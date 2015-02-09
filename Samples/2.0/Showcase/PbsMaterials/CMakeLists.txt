@@ -13,6 +13,8 @@ endmacro()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+ogre_add_component_include_dir(Hlms/Pbs)
+
 add_recursive( ./ SOURCE_FILES )
 
 ogre_add_executable(Sample_PbsMaterials WIN32 ${SOURCE_FILES})

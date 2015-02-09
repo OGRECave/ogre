@@ -38,7 +38,7 @@ namespace Ogre {
         : MovableObject( id, objectMemoryManager, manager, 1 ),
           mLightType(LT_POINT),
           mDiffuse(ColourValue::White),
-          mSpecular(ColourValue::Black),
+          mSpecular(ColourValue::White),
           mSpotOuter(Degree(40.0f)),
           mSpotInner(Degree(30.0f)),
           mSpotFalloff(1.0f),

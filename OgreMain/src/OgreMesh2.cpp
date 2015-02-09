@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreMesh2Serializer.h"
 #include "OgreMeshManager2.h"
+#include "OgreMeshManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreException.h"
@@ -519,11 +520,21 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Mesh::importV1( v1::Mesh *mesh, bool halfPos, bool halfTexCoords, bool qTangents )
     {
+        mesh->load();
+
         if( mLoadingState.get() != LOADSTATE_UNLOADED )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "To import a v1 mesh, the v2 mesh must be in unloaded state!",
                          "Mesh::importV1" );
+        }
+
+        if( mesh->sharedVertexData )
+        {
+            LogManager::getSingleton().logMessage( "WARNING: Mesh '" + mesh->getName() +
+                                                   "' has shared vertices. They're being "
+                                                   "'unshared' for importing to v2" );
+            v1::MeshManager::unshareVertices( mesh );
         }
 
         mAabb.setExtents( mesh->getBounds().getMinimum(), mesh->getBounds().getMaximum() );

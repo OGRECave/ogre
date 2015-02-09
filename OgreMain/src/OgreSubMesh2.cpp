@@ -243,7 +243,9 @@ namespace Ogre {
     {
         mMaterialName = subMesh->getMaterialName();
 
-        subMesh->_compileBoneAssignments();
+        if( subMesh->parent->hasSkeleton() )
+            subMesh->_compileBoneAssignments();
+
         const v1::SubMesh::VertexBoneAssignmentList& v1BoneAssignments = subMesh->getBoneAssignments();
         mBoneAssignments.reserve( v1BoneAssignments.size() );
 

@@ -974,6 +974,129 @@ namespace v1
         mBoundsPaddingFactor = paddingFactor;
     }
     //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    // Helper functions to unshare the vertices
+    //-----------------------------------------------------------------------
+    typedef map<uint32, uint32>::type IndicesMap;
+
+    template< typename TIndexType >
+    IndicesMap getUsedIndices(IndexData* idxData)
+    {
+        TIndexType *data = (TIndexType*)idxData->indexBuffer->lock(idxData->indexStart * sizeof(TIndexType),
+            idxData->indexCount * sizeof(TIndexType), HardwareBuffer::HBL_READ_ONLY);
+
+        IndicesMap indicesMap;
+        for (size_t i = 0; i < idxData->indexCount; i++)
+        {
+            TIndexType index = data[i];
+            if (indicesMap.find(index) == indicesMap.end())
+            {
+                uint32 val = (uint32)(indicesMap.size());
+                indicesMap[index] = val;
+            }
+        }
+
+        idxData->indexBuffer->unlock();
+        return indicesMap;
+    }
+    //-----------------------------------------------------------------------
+    template< typename TIndexType >
+    void copyIndexBuffer(IndexData* idxData, IndicesMap& indicesMap)
+    {
+        TIndexType *data = (TIndexType*)idxData->indexBuffer->lock(idxData->indexStart * sizeof(TIndexType),
+            idxData->indexCount * sizeof(TIndexType), HardwareBuffer::HBL_NORMAL);
+
+        for (uint32 i = 0; i < idxData->indexCount; i++)
+        {
+            data[i] = (TIndexType)indicesMap[data[i]];
+        }
+
+        idxData->indexBuffer->unlock();
+    }
+    //-----------------------------------------------------------------------
+    void MeshManager::unshareVertices( Mesh *mesh )
+    {
+        // Retrieve data to copy bone assignments
+        const Mesh::VertexBoneAssignmentList& boneAssignments = mesh->getBoneAssignments();
+        Mesh::VertexBoneAssignmentList::const_iterator it = boneAssignments.begin();
+        Mesh::VertexBoneAssignmentList::const_iterator end = boneAssignments.end();
+        size_t curVertexOffset = 0;
+
+        // Access shared vertices
+        VertexData* sharedVertexData = mesh->sharedVertexData;
+
+        for (size_t subMeshIdx = 0; subMeshIdx < mesh->getNumSubMeshes(); subMeshIdx++)
+        {
+            SubMesh *subMesh = mesh->getSubMesh(subMeshIdx);
+
+            IndexData *indexData = subMesh->indexData;
+            HardwareIndexBuffer::IndexType idxType = indexData->indexBuffer->getType();
+            IndicesMap indicesMap = (idxType == HardwareIndexBuffer::IT_16BIT) ? getUsedIndices<uint16>(indexData) :
+                                                                                 getUsedIndices<uint32>(indexData);
+
+
+            VertexData *newVertexData = new VertexData();
+            newVertexData->vertexCount = indicesMap.size();
+            newVertexData->vertexDeclaration = sharedVertexData->vertexDeclaration->clone();
+
+            for (size_t bufIdx = 0; bufIdx < sharedVertexData->vertexBufferBinding->getBufferCount(); bufIdx++)
+            {
+                HardwareVertexBufferSharedPtr sharedVertexBuffer = sharedVertexData->vertexBufferBinding->getBuffer(bufIdx);
+                size_t vertexSize = sharedVertexBuffer->getVertexSize();
+
+                HardwareVertexBufferSharedPtr newVertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer
+                    (vertexSize, newVertexData->vertexCount, sharedVertexBuffer->getUsage(), sharedVertexBuffer->hasShadowBuffer());
+
+                uint8 *oldLock = (uint8*)sharedVertexBuffer->lock(0, sharedVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_READ_ONLY);
+                uint8 *newLock = (uint8*)newVertexBuffer->lock(0, newVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_NORMAL);
+
+                IndicesMap::iterator indIt = indicesMap.begin();
+                IndicesMap::iterator endIndIt = indicesMap.end();
+                for (; indIt != endIndIt; ++indIt)
+                {
+                    memcpy(newLock + vertexSize * indIt->second, oldLock + vertexSize * indIt->first, vertexSize);
+                }
+
+                sharedVertexBuffer->unlock();
+                newVertexBuffer->unlock();
+
+                newVertexData->vertexBufferBinding->setBinding(bufIdx, newVertexBuffer);
+            }
+
+            if (idxType == HardwareIndexBuffer::IT_16BIT)
+            {
+                copyIndexBuffer<uint16>(indexData, indicesMap);
+            }
+            else
+            {
+                copyIndexBuffer<uint32>(indexData, indicesMap);
+            }
+
+            // Store new attributes
+            subMesh->useSharedVertices = false;
+            subMesh->vertexData = newVertexData;
+
+            // Transfer bone assignments to the submesh
+            size_t offset = curVertexOffset + newVertexData->vertexCount;
+            for (; it != end; ++it)
+            {
+                size_t vertexIdx = (*it).first;
+                if (vertexIdx > offset)
+                    break;
+
+                VertexBoneAssignment boneAssignment = (*it).second;
+                boneAssignment.vertexIndex = static_cast<unsigned int>(boneAssignment.vertexIndex - curVertexOffset);
+                subMesh->addBoneAssignment(boneAssignment);
+            }
+            curVertexOffset = newVertexData->vertexCount + 1;
+        }
+
+        // Release shared vertex data
+        delete mesh->sharedVertexData;
+        mesh->sharedVertexData = NULL;
+        mesh->clearBoneAssignments();
+    }
+    //-----------------------------------------------------------------------
     Resource* MeshManager::createImpl(const String& name, ResourceHandle handle, 
         const String& group, bool isManual, ManualResourceLoader* loader, 
         const NameValuePairList* createParams)

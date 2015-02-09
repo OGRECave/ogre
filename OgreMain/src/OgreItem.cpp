@@ -267,11 +267,8 @@ namespace Ogre {
             SubMesh *subMesh = mMesh->getSubMesh(i);
             mSubItems.push_back( SubItem( this, subMesh ) );
 
-            if( !subMesh->mMaterialName.empty() )
-            {
-                //Try first Hlms materials, then the low level ones.
-                mSubItems.back().setDatablockOrMaterialName( subMesh->mMaterialName, mMesh->getGroup() );
-            }
+            //Try first Hlms materials, then the low level ones.
+            mSubItems.back().setDatablockOrMaterialName( subMesh->mMaterialName, mMesh->getGroup() );
         }
     }
     //-----------------------------------------------------------------------
