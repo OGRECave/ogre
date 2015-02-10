@@ -196,7 +196,7 @@ namespace Ogre {
         {
             // Allocate texture storage so that glTexSubImageXD can be
             // used to upload the texture.
-            if (PixelUtil::isCompressed(mFormat) && false)
+            if (PixelUtil::isCompressed(mFormat))
             {
                 // Compressed formats
                 GLsizei size;
