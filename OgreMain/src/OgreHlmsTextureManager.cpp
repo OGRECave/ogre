@@ -305,7 +305,7 @@ namespace Ogre
         {
         if( it == mEntries.end() || it->name != searchName.name )
         {
-            LogManager::getSingleton().logMessage( "Texture: loading " + texNam + " as " + aliasName );
+            LogManager::getSingleton().logMessage( "Texture: loading " + texName + " as " + aliasName );
 
             Image image;
             image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
