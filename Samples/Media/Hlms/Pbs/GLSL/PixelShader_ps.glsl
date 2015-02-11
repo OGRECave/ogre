@@ -219,7 +219,7 @@ void main()
 	vec3 vTangent = normalize( inPs.tangent );
 
 	//Get the TBN matrix
-	vec3 vBinormal	= cross( vTangent, geomNormal )@insertpiece( tbnApplyReflection );
+	vec3 vBinormal	= normalize( cross( vTangent, geomNormal )@insertpiece( tbnApplyReflection ) );
 	mat3 TBN		= mat3( vTangent, vBinormal, geomNormal );
 
 	@property( normal_map_tex )nNormal = getTSNormal( vec3( inPs.uv@value(uv_normal).xy, normalIdx ) );@end

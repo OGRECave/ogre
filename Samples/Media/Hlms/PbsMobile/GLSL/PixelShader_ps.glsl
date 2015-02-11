@@ -296,7 +296,7 @@ void main()
 	vTangent = normalize( psTangent );
 
 	//Get the TBN matrix
-	@insertpiece( mediump ) vec3 vBinormal	= cross( vTangent, geomNormal );
+	@insertpiece( mediump ) vec3 vBinormal	= normalize( cross( vTangent, geomNormal ) );
 	@insertpiece( mediump ) mat3 TBN		= mat3( vTangent, vBinormal, geomNormal );
 
 	@property( normal_map_tex )nNormal = getTSNormal( texNormalMap, psUv@value(uv_normal).xy );@end
