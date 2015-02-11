@@ -113,12 +113,15 @@ namespace Ogre
         unsigned char mSceneAlphaRejectValue; // should be merged with - mBlendDesc
         bool mSceneAlphaToCoverage;
 
-        D3D11_BLEND_DESC mBlendDesc;
+        D3D11_BLEND_DESC    mBlendDesc;
+        bool                mBlendDescChanged;
 
-        D3D11_RASTERIZER_DESC mRasterizerDesc;
+        D3D11_RASTERIZER_DESC   mRasterizerDesc;
+        bool                    mRasterizerDescChanged;
 
         UINT mStencilRef;
-        D3D11_DEPTH_STENCIL_DESC mDepthStencilDesc; 
+        D3D11_DEPTH_STENCIL_DESC    mDepthStencilDesc; 
+        bool                        mDepthStencilDescChanged;
 
         PolygonMode mPolygonMode;
 
@@ -174,6 +177,9 @@ namespace Ogre
             D3D11_SAMPLER_DESC  samplerDesc;
             bool used;
         } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];
+
+        size_t     mLastTextureUnitState;
+		bool       mSamplerStatesChanged;
 
 
 

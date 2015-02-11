@@ -1916,9 +1916,11 @@ namespace Ogre {
     ID3D11Buffer* D3D11HLSLProgram::getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask)
     {
         // Update the Constant Buffer
-        BufferInfoIterator it = mBufferInfoMap.find(0);
-        if (it != mBufferInfoMap.end())
+        
+		if(!mBufferInfoMap.empty())
         {
+			BufferInfoIterator it = mBufferInfoMap.begin();
+            
             if (!it->mUniformBuffer.isNull())
             {
                 void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);

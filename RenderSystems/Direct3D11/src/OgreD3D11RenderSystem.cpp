@@ -1827,11 +1827,16 @@ bail:
             mTexStageDesc[stage].pTex = pTex;
             mTexStageDesc[stage].used = true;
             mTexStageDesc[stage].type = dt->getTextureType();
+
+            mLastTextureUnitState = stage+1;
         }
         else
         {
             mTexStageDesc[stage].used = false;
+            // now we now what's the last texture unit set
+			mLastTextureUnitState = std::min(mLastTextureUnitState,stage);
         }
+        mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
@@ -1900,6 +1905,7 @@ bail:
     void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
     {
         mTexStageDesc[unit].samplerDesc.MipLODBias = bias;
+        mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMatrix( size_t stage, const Matrix4& xForm )
@@ -1913,12 +1919,14 @@ bail:
         mTexStageDesc[stage].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);
         mTexStageDesc[stage].samplerDesc.AddressV = D3D11Mappings::get(uvw.v);
         mTexStageDesc[stage].samplerDesc.AddressW = D3D11Mappings::get(uvw.w);
+        mSamplerStatesChanged = true;
     }
     //-----------------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureBorderColour(size_t stage,
         const ColourValue& colour)
     {
         D3D11Mappings::get(colour, mTexStageDesc[stage].samplerDesc.BorderColor);
+        mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureBlendMode( size_t stage, const LayerBlendModeEx& bm )
@@ -1947,7 +1955,8 @@ bail:
                 mBlendDesc.AlphaToCoverageEnable = mSceneAlphaToCoverage;
 
             mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
-        }  
+        }
+        mBlendDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op /*= SBO_ADD*/, SceneBlendOperation alphaOp /*= SBO_ADD*/ )
@@ -1969,6 +1978,7 @@ bail:
 
             mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
         }
+        mBlendDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage )
@@ -1977,6 +1987,7 @@ bail:
         mSceneAlphaRejectValue  = value;
         mSceneAlphaToCoverage   = alphaToCoverage;
         mBlendDesc.AlphaToCoverageEnable = alphaToCoverage;
+        mBlendDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setCullingMode( CullingMode mode )
@@ -1987,6 +1998,7 @@ bail:
 					!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
 
 		mRasterizerDesc.CullMode = D3D11Mappings::get(mode, flip);
+        mRasterizerDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setDepthBufferParams( bool depthTest, bool depthWrite, CompareFunction depthFunction )
@@ -1999,6 +2011,7 @@ bail:
     void D3D11RenderSystem::_setDepthBufferCheckEnabled( bool enabled )
     {
         mDepthStencilDesc.DepthEnable = enabled;
+        mDepthStencilDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setDepthBufferWriteEnabled( bool enabled )
@@ -2011,11 +2024,13 @@ bail:
         {
             mDepthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
         }
+        mDepthStencilDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setDepthBufferFunction( CompareFunction func )
     {
         mDepthStencilDesc.DepthFunc = D3D11Mappings::get(func);
+        mDepthStencilDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
@@ -2023,6 +2038,7 @@ bail:
 		const float nearFarFactor = 10.0; 
 		mRasterizerDesc.DepthBias = static_cast<int>(-constantBias * nearFarFactor);
 		mRasterizerDesc.SlopeScaledDepthBias = -slopeScaleBias;
+        mRasterizerDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setColourBufferWriteEnabled(bool red, bool green, 
@@ -2039,6 +2055,7 @@ bail:
             val |= D3D11_COLOR_WRITE_ENABLE_ALPHA;
 
         mBlendDesc.RenderTarget[0].RenderTargetWriteMask = val; 
+        mBlendDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setFog( FogMode mode, const ColourValue& colour, Real densitiy, Real start, Real end )
@@ -2047,13 +2064,18 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setPolygonMode(PolygonMode level)
     {
-        mPolygonMode = level;
-        mRasterizerDesc.FillMode = D3D11Mappings::get(mPolygonMode);
+        if(mPolygonMode != level)
+        {
+            mPolygonMode = level;
+            mRasterizerDesc.FillMode = D3D11Mappings::get(mPolygonMode);
+            mRasterizerDescChanged = true;
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setStencilCheckEnabled(bool enabled)
     {
         mDepthStencilDesc.StencilEnable = enabled;
+        mDepthStencilDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setStencilBufferParams(CompareFunction func, 
@@ -2083,6 +2105,7 @@ bail:
 		mDepthStencilDesc.FrontFace.StencilFunc = D3D11Mappings::get(func);
 		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
         mReadBackAsTexture = readBackAsTexture;
+        mDepthStencilDescChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, 
@@ -2101,16 +2124,19 @@ bail:
         }
 
         mTexStageDesc[unit].samplerDesc.Filter = D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit],CompareEnabled);
+        mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
         CompareEnabled = compare;
+        mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
     {
         mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(function);
+        mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
     DWORD D3D11RenderSystem::_getCurrentAnisotropy(size_t unit)
@@ -2121,6 +2147,7 @@ bail:
     void D3D11RenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
     {
         mTexStageDesc[unit].samplerDesc.MaxAnisotropy = maxAnisotropy;
+        mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setRenderTarget(RenderTarget *target)
@@ -2380,9 +2407,10 @@ bail:
         D3D11RenderOperationState stackOpState;
         D3D11RenderOperationState * opState = &stackOpState;
 
-        //if(!opState)
+        if(mBlendDescChanged)
         {
-            //opState = new D3D11RenderOperationState;
+            mBlendDescChanged = false;
+            mBoundBlendState = 0;
 
             HRESULT hr = mDevice->CreateBlendState(&mBlendDesc, &opState->mBlendState) ;
             if (FAILED(hr))
@@ -2392,8 +2420,18 @@ bail:
                     "Failed to create blend state\nError Description:" + errorDescription, 
                     "D3D11RenderSystem::_render" );
             }
+        }
+        else
+        {
+            opState->mBlendState = mBoundBlendState;
+        }
 
-            hr = mDevice->CreateRasterizerState(&mRasterizerDesc, &opState->mRasterizer) ;
+        if(mRasterizerDescChanged)
+		{
+			mRasterizerDescChanged=false;
+			mBoundRasterizer = 0;
+
+            HRESULT hr = mDevice->CreateRasterizerState(&mRasterizerDesc, &opState->mRasterizer) ;
             if (FAILED(hr))
             {
 				String errorDescription = mDevice.getErrorDescription(hr);
@@ -2401,8 +2439,18 @@ bail:
                     "Failed to create rasterizer state\nError Description:" + errorDescription, 
                     "D3D11RenderSystem::_render" );
             }
+        }
+        else
+        {
+            opState->mRasterizer = mBoundRasterizer;
+        }
 
-            hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, &opState->mDepthStencilState) ;
+        if(mDepthStencilDescChanged)
+		{
+			mBoundDepthStencilState = 0;
+			mDepthStencilDescChanged=false;
+
+            HRESULT hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, &opState->mDepthStencilState) ;
             if (FAILED(hr))
             {
 				String errorDescription = mDevice.getErrorDescription(hr);
@@ -2410,18 +2458,20 @@ bail:
                     "Failed to create depth stencil state\nError Description:" + errorDescription, 
                     "D3D11RenderSystem::_render" );
             }
+        }
+        else
+		{
+			opState->mDepthStencilState = mBoundDepthStencilState;
+		}
 
+        if(mSamplerStatesChanged)
+		{
             // samplers mapping
-            size_t numberOfSamplers = OGRE_MAX_TEXTURE_LAYERS + 1;
+            size_t numberOfSamplers = std::min(mLastTextureUnitState,(size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
             
-            //find the maximum number of samplers
-            while (--numberOfSamplers >= 1 && mTexStageDesc[numberOfSamplers - 1].used == false) ;
-
             opState->mSamplerStatesCount = numberOfSamplers;
             opState->mTexturesCount = numberOfSamplers;
-            
-            
-                
+                            
             for (size_t n = 0; n < numberOfSamplers; n++)
             {
                 ID3D11SamplerState * samplerState  = NULL;
@@ -2457,14 +2507,13 @@ bail:
                 opState->mSamplerStates[n]  = samplerState;
                 opState->mTextures[n]       = texture;
             }
+            for (size_t n = opState->mTexturesCount; n < OGRE_MAX_TEXTURE_LAYERS; n++)
+			{
+				opState->mTextures[n] = NULL;
+			}
         }
 
-        for (size_t n = opState->mTexturesCount; n < OGRE_MAX_TEXTURE_LAYERS; n++)
-        {
-            opState->mTextures[n] = NULL;
-        }
-
-        //if (opState->mBlendState != mBoundBlendState)
+        if (opState->mBlendState != mBoundBlendState)
         {
             mBoundBlendState = opState->mBlendState ;
             mDevice.GetImmediateContext()->OMSetBlendState(opState->mBlendState, 0, 0xffffffff); // TODO - find out where to get the parameters
@@ -2475,7 +2524,7 @@ bail:
                     "D3D11 device cannot set blend state\nError Description:" + errorDescription,
                     "D3D11RenderSystem::_render");
             }
-            if (mBoundGeometryProgram && mBindingType == TextureUnitState::BT_GEOMETRY)
+            if (mSamplerStatesChanged && mBoundGeometryProgram && mBindingType == TextureUnitState::BT_GEOMETRY)
             {
                 {
                     mDevice.GetImmediateContext()->GSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
@@ -2498,7 +2547,7 @@ bail:
             }
         }
 
-        //if (opState->mRasterizer != mBoundRasterizer)
+        if (opState->mRasterizer != mBoundRasterizer)
         {
             mBoundRasterizer = opState->mRasterizer ;
 
@@ -2513,7 +2562,7 @@ bail:
         }
         
 
-        //if (opState->mDepthStencilState != mBoundDepthStencilState)
+        if (opState->mDepthStencilState != mBoundDepthStencilState)
         {
             mBoundDepthStencilState = opState->mDepthStencilState ;
 
@@ -2527,8 +2576,9 @@ bail:
             }
         }
 
-        if (opState->mSamplerStatesCount > 0 ) //  if the NumSamplers is 0, the operation effectively does nothing.
+        if (mSamplerStatesChanged && opState->mSamplerStatesCount > 0 ) //  if the NumSamplers is 0, the operation effectively does nothing.
         {
+            mSamplerStatesChanged = false; // now it's time to set it to false
             /// Pixel Shader binding
             {
                 // Assaf: seem I have better performance without this check... TODO - remove?
@@ -3005,7 +3055,8 @@ bail:
         }
 
 
-        if (true) // for now - clear the render state
+        // Crashy : commented this, 99% sure it's useless but really time consuming
+        /*if (true) // for now - clear the render state
         {
             mDevice.GetImmediateContext()->OMSetBlendState(0, 0, 0xffffffff); 
             mDevice.GetImmediateContext()->RSSetState(0);
@@ -3015,7 +3066,7 @@ bail:
             // Clear class instance storage
             memset(mClassInstances, 0, sizeof(mClassInstances));
             memset(mNumClassInstances, 0, sizeof(mNumClassInstances));      
-        }
+        }*/
 
     }
     //---------------------------------------------------------------------
@@ -3577,6 +3628,7 @@ bail:
                 "D3D11 device cannot set scissor rects\nError Description:" + errorDescription,
                 "D3D11RenderSystem::setScissorTest");
         }   
+        mRasterizerDescChanged=true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::clearFrameBuffer(unsigned int buffers, 
@@ -3920,6 +3972,14 @@ bail:
         }
 
         mPolygonMode = PM_SOLID;
+        mRasterizerDesc.FillMode = D3D11Mappings::get(mPolygonMode);
+
+        //sets the modification trackers to true
+        mBlendDescChanged = true;
+		mRasterizerDescChanged = true;
+		mDepthStencilDescChanged = true;
+		mSamplerStatesChanged = true;
+		mLastTextureUnitState = 0;
 
         ZeroMemory(mTexStageDesc, OGRE_MAX_TEXTURE_LAYERS * sizeof(sD3DTextureStageDesc));
 
