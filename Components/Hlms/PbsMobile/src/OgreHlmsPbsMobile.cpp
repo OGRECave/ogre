@@ -632,7 +632,7 @@ namespace Ogre
             }
             //float pssmSplitPoints
             for( int32 i=0; i<numPssmSplits; ++i )
-                mPreparedPass.pixelShaderSharedBuffer.push_back( (*shadowNode->getPssmSplits(0))[i] );
+                mPreparedPass.pixelShaderSharedBuffer.push_back( (*shadowNode->getPssmSplits(0))[i+1] );
 
             if( shadowNode )
             {

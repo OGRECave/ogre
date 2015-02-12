@@ -81,8 +81,6 @@ int main()
         "   * Samples/Media/2.0/materials/PbsMaterials/PbsMaterials.material\n"
         "\n"
         "Known issues:\n"
-        " * There is some flickering on the directional lights' shadow map due to\n"
-        "   a bug in the PSSM or the focused implementation it relies on.\n"
         " * Point lights aren't working in the desktop PBS implementation.\n"
         " * Spot lights must be casting shadow to work in the desktop PBS implementation.\n"
         " * The previous two issues will be fixed when an advanced lighting algorithm is\n"

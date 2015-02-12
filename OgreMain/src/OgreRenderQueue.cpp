@@ -537,9 +537,9 @@ namespace Ogre
 
         bool supportsIndirectBuffers = mVaoManager->supportsIndirectBuffers();
 
+        uint32 instanceCount = 1;
+
         CbDrawCall *drawCmd = 0;
-        CbDrawIndexed   *drawIndexedPtr = 0;
-        CbDrawStrip     *drawStripPtr = 0;
         CbSharedDraw    *drawCountPtr = 0;
 
         const QueuedRenderableArray &queuedRenderables = renderQueueGroup.mQueuedRenderables;
@@ -627,8 +627,7 @@ namespace Ogre
 
                 if( vao->mIndexBuffer )
                 {
-                    drawStripPtr = 0;
-                    drawIndexedPtr = reinterpret_cast<CbDrawIndexed*>( indirectDraw );
+                    CbDrawIndexed *drawIndexedPtr = reinterpret_cast<CbDrawIndexed*>( indirectDraw );
                     indirectDraw += sizeof( CbDrawIndexed );
 
                     drawCountPtr = drawIndexedPtr;
@@ -637,11 +636,12 @@ namespace Ogre
                     drawIndexedPtr->firstVertexIndex= vao->mIndexBuffer->_getFinalBufferStart();
                     drawIndexedPtr->baseVertex      = vao->mVertexBuffers[0]->_getFinalBufferStart();
                     drawIndexedPtr->baseInstance    = baseInstance;
+
+                    instanceCount = 1;
                 }
                 else
                 {
-                    drawIndexedPtr = 0;
-                    drawStripPtr = reinterpret_cast<CbDrawStrip*>( indirectDraw );
+                    CbDrawStrip *drawStripPtr = reinterpret_cast<CbDrawStrip*>( indirectDraw );
                     indirectDraw += sizeof( CbDrawStrip );
 
                     drawCountPtr = drawStripPtr;
@@ -649,14 +649,17 @@ namespace Ogre
                     drawStripPtr->instanceCount     = 1;
                     drawStripPtr->firstVertexIndex  = vao->mVertexBuffers[0]->_getFinalBufferStart();
                     drawStripPtr->baseInstance      = baseInstance;
+
+                    instanceCount = 1;
                 }
 
                 lastVao = vao;
             }
             else
             {
-                //Same mesh. Just go with instancing.
-                ++drawCountPtr->instanceCount;
+                //Same mesh. Just go with instancing. Keep the counter in
+                //an external variable, as the region can be write-combined
+                drawCountPtr->instanceCount = instanceCount++;
             }
 
             ++itor;
@@ -679,6 +682,8 @@ namespace Ogre
         v1::RenderOperation lastRenderOp;
         HlmsCache const *lastHlmsCache = &c_dummyCache;
         uint32 lastHlmsCacheHash = 0;
+
+        uint32 instanceCount = 1;
 
         v1::CbDrawCall *drawCmd = 0;
 
@@ -760,6 +765,8 @@ namespace Ogre
                     drawCall->firstVertexIndex  = renderOp.indexData->indexStart;
                     drawCall->baseInstance      = baseInstance;
 
+                    instanceCount = renderOp.numberOfInstances;
+
                     drawCmd = drawCall;
                 }
                 else
@@ -776,13 +783,16 @@ namespace Ogre
                     drawCall->firstVertexIndex  = renderOp.vertexData->vertexStart;
                     drawCall->baseInstance      = baseInstance;
 
+                    instanceCount = renderOp.numberOfInstances;
+
                     drawCmd = drawCall;
                 }
             }
             else
             {
-                //Same mesh. Just go with instancing.
-                ++drawCmd->instanceCount;
+                //Same mesh. Just go with instancing. Keep the counter in
+                //an external variable, as the region can be write-combined
+                drawCmd->instanceCount = instanceCount++;
             }
 
             ++itor;

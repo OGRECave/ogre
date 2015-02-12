@@ -1,4 +1,4 @@
-compositor_node PbsMaterialsRenderingNode
+compositor_node ShadowMapDebuggingRenderingNode
 {
 	in 0 rt_renderwindow
 
@@ -13,12 +13,12 @@ compositor_node PbsMaterialsRenderingNode
 		pass render_scene
 		{
 			overlays	on
-			shadows		PbsMaterialsShadowNode
+			shadows		ShadowMapDebuggingShadowNode
 		}
 	}
 }
 
-compositor_node_shadow PbsMaterialsShadowNode
+compositor_node_shadow ShadowMapDebuggingShadowNode
 {
 	technique pssm
 
@@ -44,7 +44,7 @@ compositor_node_shadow PbsMaterialsShadowNode
 	}
 }
 
-workspace PbsMaterialsWorkspace
+workspace ShadowMapDebuggingWorkspace
 {
-	connect_output PbsMaterialsRenderingNode 0
+	connect_output ShadowMapDebuggingRenderingNode 0
 }

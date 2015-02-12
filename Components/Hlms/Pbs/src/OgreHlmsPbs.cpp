@@ -604,7 +604,7 @@ namespace Ogre
 
             //float pssmSplitPoints
             for( int32 i=0; i<numPssmSplits; ++i )
-                *passBufferPtr++ = (*shadowNode->getPssmSplits(0))[i];
+                *passBufferPtr++ = (*shadowNode->getPssmSplits(0))[i+1];
 
             passBufferPtr += alignToNextMultiple( numPssmSplits, 4 ) - numPssmSplits;
 

@@ -116,7 +116,7 @@ namespace Ogre
                     {
                         PSSMShadowCameraSetup *setup = OGRE_NEW PSSMShadowCameraSetup();
                         shadowMapCamera.shadowCameraSetup = ShadowCameraSetupPtr( setup );
-                        setup->calculateSplitPoints( itor->numSplits, 0.0f, 100.0f, 0.95f );
+                        setup->calculateSplitPoints( itor->numSplits, 0.1f, 100.0f, 0.95f );
                         setup->setSplitPadding( itor->splitPadding );
                     }
                     break;

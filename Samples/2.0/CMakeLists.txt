@@ -18,6 +18,7 @@ if( OGRE_BUILD_SAMPLES2 )
 
     add_subdirectory(ApiUsage/V2Mesh)
 	add_subdirectory(ApiUsage/StereoRendering)
+	add_subdirectory(ApiUsage/ShadowMapDebugging)
 
 	add_subdirectory(Showcase/PbsMaterials)
 
