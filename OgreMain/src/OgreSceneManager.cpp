@@ -173,6 +173,8 @@ mGpuParamsDirty((uint16)GPV_ALL)
     // create the auto param data source instance
     mAutoParamDataSource = createAutoParamDataSource();
 
+    mGlobalLightListPerThread.resize( mNumWorkerThreads );
+    mBuildLightListRequestPerThread.resize( mNumWorkerThreads );
     mVisibleObjects.resize( mNumWorkerThreads );
     mVisibleObjectsBackup.resize( mNumWorkerThreads );
     mTmpVisibleObjects.resize( mNumWorkerThreads );
@@ -2280,6 +2282,115 @@ void SceneManager::buildLightList()
 {
     mGlobalLightList.lights.clear();
 
+    //Perform frustum culling against the lights to build the light list,
+    //but first, calculate the startLightIdx for each thread.
+    size_t accumStartLightIdx = 0;
+    for( size_t threadIdx=0; threadIdx<mNumWorkerThreads; ++threadIdx )
+    {
+        ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
+        ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
+
+        while( it != en )
+        {
+            ObjectMemoryManager *objMemoryManager = *it;
+            const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
+
+            //Cull the lights against all cameras to build the list of visible lights.
+            for( size_t i=0; i<numRenderQueues; ++i )
+            {
+                ObjectData objData;
+                const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, i );
+
+                //Distribute the work evenly across all threads (not perfect), taking into
+                //account we need to distribute in multiples of ARRAY_PACKED_REALS
+                size_t numObjs  = ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+                numObjs         = ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+                                    ARRAY_PACKED_REALS;
+
+                const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+                //Prevent going out of bounds (usually in the last threadIdx, or
+                //when there are less entities than ARRAY_PACKED_REALS
+                numObjs = std::min( numObjs, totalObjs - toAdvance );
+
+                mBuildLightListRequestPerThread[i].startLightIdx = accumStartLightIdx;
+                accumStartLightIdx += numObjs;
+            }
+
+            ++it;
+        }
+    }
+
+    mRequestType = BUILD_LIGHT_LIST01;
+    {
+        //This is where I figuratively kill whoever made mutable variables inside a
+        //const function, silencing a race condition: Update the frustum planes now
+        //in case they weren't up to date.
+        FrustumVec::const_iterator itor = mVisibleCameras.begin();
+        FrustumVec::const_iterator end  = mVisibleCameras.end();
+
+        while( itor != end )
+        {
+            (*itor)->getFrustumPlanes();
+            ++itor;
+        }
+
+        itor = mCubeMapCameras.begin();
+        end  = mCubeMapCameras.end();
+
+        while( itor != end )
+        {
+            (*itor)->getFrustumPlanes();
+            ++itor;
+        }
+    }
+    mWorkerThreadsBarrier->sync(); //Fire threads
+    mWorkerThreadsBarrier->sync(); //Wait them to complete
+
+    //Now merge the results into a single list.
+
+    size_t dstOffset = 0;
+    for( size_t i=0; i<mNumWorkerThreads; ++i )
+    {
+        mGlobalLightList.lights.appendPOD( mGlobalLightListPerThread[i].begin(),
+                                           mGlobalLightListPerThread[i].end() );
+
+        size_t srcOffset = mBuildLightListRequestPerThread[i].startLightIdx;
+
+        if( dstOffset != srcOffset )
+        {
+            //Make it contiguous
+            size_t numCollectedLights = mGlobalLightListPerThread[i].size();
+            memmove( mGlobalLightList.visibilityMask + dstOffset,
+                     mGlobalLightList.visibilityMask + srcOffset,
+                     sizeof( uint32 ) * numCollectedLights );
+            memmove( mGlobalLightList.boundingSphere + dstOffset,
+                     mGlobalLightList.boundingSphere + srcOffset,
+                     sizeof( Sphere ) * numCollectedLights );
+
+            dstOffset += numCollectedLights;
+        }
+    }
+
+    //Now fire the threads again, to build the per-MovableObject lists
+    mRequestType = BUILD_LIGHT_LIST02;
+    mWorkerThreadsBarrier->sync(); //Fire threads
+    mWorkerThreadsBarrier->sync(); //Wait them to complete
+}
+//-----------------------------------------------------------------------
+void SceneManager::buildLightListThread01( const BuildLightListRequest &buildLightListRequest,
+                                           size_t threadIdx )
+{
+    LightArray &outVisibleLights = *(mGlobalLightListPerThread.begin() + threadIdx);
+    outVisibleLights.clear();
+
+    LightListInfo threadLocalLightList;
+    threadLocalLightList.lights.swap( outVisibleLights );
+    threadLocalLightList.boundingSphere = mGlobalLightList.boundingSphere +
+                                            buildLightListRequest.startLightIdx;
+    threadLocalLightList.visibilityMask = mGlobalLightList.visibilityMask +
+                                            buildLightListRequest.startLightIdx;
+
     ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
     ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
 
@@ -2288,23 +2399,42 @@ void SceneManager::buildLightList()
         ObjectMemoryManager *objMemoryManager = *it;
         const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
 
-        //TODO: Send this to worker threads (dark_sylinc)
-
         //Cull the lights against all cameras to build the list of visible lights.
         for( size_t i=0; i<numRenderQueues; ++i )
         {
             ObjectData objData;
-            const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
+            const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, i );
 
-            Light::cullLights( numObjs, objData, mGlobalLightList, mVisibleCameras, mCubeMapCameras );
+            //Distribute the work evenly across all threads (not perfect), taking into
+            //account we need to distribute in multiples of ARRAY_PACKED_REALS
+            size_t numObjs  = ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+            numObjs         = ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+                                ARRAY_PACKED_REALS;
+
+            const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+            //Prevent going out of bounds (usually in the last threadIdx, or
+            //when there are less entities than ARRAY_PACKED_REALS
+            numObjs = std::min( numObjs, totalObjs - toAdvance );
+            objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+            Light::cullLights( numObjs, objData, threadLocalLightList,
+                               mVisibleCameras, mCubeMapCameras );
         }
 
         ++it;
     }
 
+    threadLocalLightList.lights.swap( outVisibleLights );
+    threadLocalLightList.visibilityMask = 0;
+    threadLocalLightList.boundingSphere = 0;
+}
+//-----------------------------------------------------------------------
+void SceneManager::buildLightListThread02( size_t threadIdx )
+{
     //Global light list built. Now build a per-movable object light list
-    it = mEntitiesMemoryManagerCulledList.begin();
-    en = mEntitiesMemoryManagerCulledList.end();
+    ObjectMemoryManagerVec::const_iterator it = mEntitiesMemoryManagerCulledList.begin();
+    ObjectMemoryManagerVec::const_iterator en = mEntitiesMemoryManagerCulledList.end();
     while( it != en )
     {
         ObjectMemoryManager *objMemoryManager = *it;
@@ -2313,7 +2443,20 @@ void SceneManager::buildLightList()
         for( size_t i=0; i<numRenderQueues; ++i )
         {
             ObjectData objData;
-            const size_t numObjs = objMemoryManager->getFirstObjectData( objData, i );
+            const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, i );
+
+            //Distribute the work evenly across all threads (not perfect), taking into
+            //account we need to distribute in multiples of ARRAY_PACKED_REALS
+            size_t numObjs  = ( totalObjs + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+            numObjs         = ( (numObjs + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+                                ARRAY_PACKED_REALS;
+
+            const size_t toAdvance = std::min( threadIdx * numObjs, totalObjs );
+
+            //Prevent going out of bounds (usually in the last threadIdx, or
+            //when there are less entities than ARRAY_PACKED_REALS
+            numObjs = std::min( numObjs, totalObjs - toAdvance );
+            objData.advancePack( toAdvance / ARRAY_PACKED_REALS );
 
             MovableObject::buildLightList( numObjs, objData, mGlobalLightList );
         }
@@ -5027,8 +5170,11 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
             case UPDATE_INSTANCE_MANAGERS:
                 updateInstanceManagersThread( threadIdx );
                 break;
-            case CULL_FRUSTUM_INSTANCEDENTS:
-                instanceBatchCullFrustumThread( mInstanceBatchCullRequest, threadIdx );
+            case BUILD_LIGHT_LIST01:
+                buildLightListThread01( mBuildLightListRequestPerThread[threadIdx], threadIdx );
+                break;
+            case BUILD_LIGHT_LIST02:
+                buildLightListThread02( threadIdx );
                 break;
             case USER_UNIFORM_SCALABLE_TASK:
                 mUserTask->execute( threadIdx, mNumWorkerThreads );

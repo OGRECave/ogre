@@ -229,6 +229,18 @@ namespace Ogre {
         }
     };
 
+    struct BuildLightListRequest
+    {
+        size_t startLightIdx;
+
+        BuildLightListRequest() :
+            startLightIdx( 0 ) {}
+        BuildLightListRequest( size_t _startLightIdx ) :
+            startLightIdx( _startLightIdx )
+        {
+        }
+    };
+
     /** Manages the organisation and rendering of a 'scene' i.e. a collection 
         of objects and potentially world geometry.
     @remarks
@@ -451,7 +463,13 @@ namespace Ogre {
         RenderQueue* mRenderQueue;
 
         /// Updated every frame, has enough memory to hold all lights.
+        /// The order is not deterministic, it depends on the number
+        /// of worker threads.
         LightListInfo mGlobalLightList;
+        typedef FastArray<LightArray> LightArrayPerThread;
+        typedef FastArray<BuildLightListRequest> BuildLightListRequestPerThread;
+        LightArrayPerThread             mGlobalLightListPerThread;
+        BuildLightListRequestPerThread  mBuildLightListRequestPerThread;
 
         /// Current ambient light, cached for RenderSystem
         ColourValue mAmbientLight;
@@ -875,6 +893,8 @@ namespace Ogre {
             UPDATE_ALL_LODS,
             UPDATE_INSTANCE_MANAGERS,
             CULL_FRUSTUM_INSTANCEDENTS,
+            BUILD_LIGHT_LIST01,
+            BUILD_LIGHT_LIST02,
             USER_UNIFORM_SCALABLE_TASK,
             NUM_REQUESTS
         };
@@ -1022,6 +1042,10 @@ namespace Ogre {
             @See MovableObject::buildLightList()
         */
         void buildLightList();
+
+        void buildLightListThread01( const BuildLightListRequest &buildLightListRequest,
+                                     size_t threadIdx );
+        void buildLightListThread02( size_t threadIdx );
 
     public:
         /** Constructor.

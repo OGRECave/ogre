@@ -599,7 +599,7 @@ namespace Ogre {
         {
             assert( dynamic_cast<const Camera*>(*itor) );
             const Camera *c = static_cast<const Camera*>(*itor);
-            aabbsIt->setAll( Aabb( c->getDerivedPosition(), Vector3(c->getFarClipDistance() * 0.5f) ) );
+            aabbsIt->setAll( Aabb( c->_getCachedDerivedPosition(), Vector3(c->getFarClipDistance() * 0.5f) ) );
             ++aabbsIt;
             ++itor;
         }
