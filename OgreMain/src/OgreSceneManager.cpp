@@ -2304,7 +2304,7 @@ void SceneManager::buildLightList()
                 //when there are less entities than ARRAY_PACKED_REALS
                 numObjs = std::min( numObjs, totalObjs - toAdvance );
 
-                mBuildLightListRequestPerThread[i].startLightIdx = accumStartLightIdx;
+                mBuildLightListRequestPerThread[threadIdx].startLightIdx = accumStartLightIdx;
                 accumStartLightIdx += numObjs;
             }
 
