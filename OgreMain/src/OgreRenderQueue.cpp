@@ -659,7 +659,7 @@ namespace Ogre
             {
                 //Same mesh. Just go with instancing. Keep the counter in
                 //an external variable, as the region can be write-combined
-                drawCountPtr->instanceCount = instanceCount++;
+                drawCountPtr->instanceCount = ++instanceCount;
             }
 
             ++itor;
@@ -792,7 +792,7 @@ namespace Ogre
             {
                 //Same mesh. Just go with instancing. Keep the counter in
                 //an external variable, as the region can be write-combined
-                drawCmd->instanceCount = instanceCount++;
+                drawCmd->instanceCount = ++instanceCount;
             }
 
             ++itor;
