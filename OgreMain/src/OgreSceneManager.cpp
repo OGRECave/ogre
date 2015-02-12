@@ -2313,7 +2313,7 @@ void SceneManager::buildLightList()
                 //when there are less entities than ARRAY_PACKED_REALS
                 numObjs = std::min( numObjs, totalObjs - toAdvance );
 
-                mBuildLightListRequestPerThread[i].startLightIdx = accumStartLightIdx;
+                mBuildLightListRequestPerThread[threadIdx].startLightIdx = accumStartLightIdx;
                 accumStartLightIdx += numObjs;
             }
 
@@ -2344,8 +2344,12 @@ void SceneManager::buildLightList()
             ++itor;
         }
     }
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    _updateWorkerThread( NULL );
+#else
     mWorkerThreadsBarrier->sync(); //Fire threads
     mWorkerThreadsBarrier->sync(); //Wait them to complete
+#endif
 
     //Now merge the results into a single list.
 
@@ -2374,8 +2378,12 @@ void SceneManager::buildLightList()
 
     //Now fire the threads again, to build the per-MovableObject lists
     mRequestType = BUILD_LIGHT_LIST02;
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    _updateWorkerThread( NULL );
+#else
     mWorkerThreadsBarrier->sync(); //Fire threads
     mWorkerThreadsBarrier->sync(); //Wait them to complete
+#endif
 }
 //-----------------------------------------------------------------------
 void SceneManager::buildLightListThread01( const BuildLightListRequest &buildLightListRequest,
