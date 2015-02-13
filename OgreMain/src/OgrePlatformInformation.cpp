@@ -54,6 +54,10 @@ THE SOFTWARE.
     #endif
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+    #include "windows.h"
+#endif
+
 // Yes, I know, this file looks very ugly, but there aren't other ways to do it better.
 
 namespace Ogre {
@@ -622,7 +626,7 @@ namespace Ogre {
 
         if( logicalCores > 0 )
             numLogicalCores = (uint32)logicalCores;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM_APPLE_IOS
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         size_t size = sizeof( numLogicalCores );
         sysctlbyname( "hw.logicalcpu", &numLogicalCores, &size, NULL, 0 );
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
