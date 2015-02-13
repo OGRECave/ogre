@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreViewport.h"
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGLES2RenderSystem.h"
