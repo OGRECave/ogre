@@ -274,7 +274,7 @@ namespace Ogre
 
         calculateHash();
 
-        creator->requestSlot( mTextureHash, this, false );
+        creator->requestSlot( /*mTextureHash*/0, this, false );
     }
     //-----------------------------------------------------------------------------------
     HlmsPbsDatablock::~HlmsPbsDatablock()
@@ -311,7 +311,7 @@ namespace Ogre
         if( mTextureHash != hash.mHash )
         {
             mTextureHash = hash.mHash;
-            static_cast<HlmsPbs*>(mCreator)->requestSlot( mTextureHash, this, false );
+            static_cast<HlmsPbs*>(mCreator)->requestSlot( /*mTextureHash*/0, this, false );
         }
     }
     //-----------------------------------------------------------------------------------

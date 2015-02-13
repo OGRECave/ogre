@@ -66,6 +66,7 @@ namespace Ogre
 
         PassData                mPreparedPass;
         ConstBufferPackedVec    mPassBuffers;
+        HlmsSamplerblock const  *mShadowmapSamplerblock;
 
         uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
 

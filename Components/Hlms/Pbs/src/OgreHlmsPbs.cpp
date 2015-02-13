@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsPbs.h"
 #include "OgreHlmsPbsDatablock.h"
+#include "OgreHlmsManager.h"
 
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
@@ -186,6 +187,7 @@ namespace Ogre
         HlmsBufferManager( HLMS_PBS, "pbs", dataFolder ),
         ConstBufferPool( HlmsPbsDatablock::MaterialSizeInGpuAligned,
                          ConstBufferPool::ExtraBufferParams() ),
+        mShadowmapSamplerblock( 0 ),
         mCurrentPassBuffer( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 )
@@ -217,6 +219,16 @@ namespace Ogre
                 requestSlot( datablock->mTextureHash, datablock, false );
                 ++itor;
             }
+
+            HlmsSamplerblock samplerblock;
+            samplerblock.mMinFilter     = FO_POINT;
+            samplerblock.mMagFilter     = FO_POINT;
+            samplerblock.mMipFilter     = FO_NONE;
+            samplerblock.mU             = TAM_BORDER;
+            samplerblock.mV             = TAM_BORDER;
+            samplerblock.mW             = TAM_CLAMP;
+            samplerblock.mBorderColour  = ColourValue::White;
+            mShadowmapSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -433,17 +445,25 @@ namespace Ogre
 
         while( itor != end )
         {
-            if( itor->keyName != PbsProperty::HwGammaRead &&
-                itor->keyName != PbsProperty::UvDiffuse &&
-                itor->keyName != HlmsBaseProp::Skeleton &&
-                itor->keyName != HlmsBaseProp::BonesPerVertex &&
-                itor->keyName != HlmsBaseProp::DualParaboloidMapping &&
-                itor->keyName != HlmsBaseProp::AlphaTest )
+            if( itor->keyName == PbsProperty::FirstValidDetailMapNm )
             {
                 itor->value = 0;
+                ++itor;
             }
-
-            ++itor;
+            else if( itor->keyName != PbsProperty::HwGammaRead &&
+                     itor->keyName != PbsProperty::UvDiffuse &&
+                     itor->keyName != HlmsBaseProp::Skeleton &&
+                     itor->keyName != HlmsBaseProp::BonesPerVertex &&
+                     itor->keyName != HlmsBaseProp::DualParaboloidMapping &&
+                     itor->keyName != HlmsBaseProp::AlphaTest )
+            {
+                itor = mSetProperties.erase( itor );
+                end  = mSetProperties.end();
+            }
+            else
+            {
+                ++itor;
+            }
         }
 
         String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
@@ -794,7 +814,8 @@ namespace Ogre
                 FastArray<TexturePtr>::const_iterator end  = mPreparedPass.shadowMaps.end();
                 while( itor != end )
                 {
-                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, itor->get() );
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, itor->get(),
+                                                                         mShadowmapSamplerblock );
                     ++texUnit;
                     ++itor;
                 }
