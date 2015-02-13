@@ -150,7 +150,7 @@ bool HlmsCmd::configure(void)
     bool retVal = false;
     if( mOpts.language == "glsl" )
     {
-        RenderSystem *rs = mRoot->getRenderSystemByName("OpenGL 3+ Rendering Subsystem (ALPHA)");
+        RenderSystem *rs = mRoot->getRenderSystemByName("OpenGL 3+ Rendering Subsystem");
         //rs->setConfigOption( "Colour Depth", "32" );
         rs->setConfigOption( "Display Frequency", "N/A" );
         rs->setConfigOption( "FSAA", "0" );
