@@ -408,6 +408,7 @@ namespace Ogre {
         return features;
     }
     //---------------------------------------------------------------------
+#if 0
     static uint32 _detectNumLogicalCores(void)
     {
         uint numLogicalCores = 0;
@@ -443,6 +444,7 @@ namespace Ogre {
 
         return numLogicalCores;
     }
+#endif
     //---------------------------------------------------------------------
     static String _detectCpuIdentifier(void)
     {
