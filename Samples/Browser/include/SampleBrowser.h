@@ -1319,13 +1319,13 @@ namespace OgreBites
 #if OGRE_DEBUG_MODE
             //Debugging multithreaded code is a PITA, disable it.
             const size_t numThreads = 1;
-            Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+            Ogre::InstancingThreadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
 #else
             //getNumLogicalCores() may return 0 if couldn't detect
             const size_t numThreads = std::max<Ogre::uint32>
                                            ( 1, Ogre::PlatformInformation::getNumLogicalCores() );
 
-            Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+            Ogre::InstancingThreadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
 
             //See doxygen documentation regarding culling methods.
             //In some cases you may still want to use single thread.
