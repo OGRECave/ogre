@@ -54,6 +54,10 @@ THE SOFTWARE.
     #endif
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+    #include "windows.h"
+#endif
+
 // Yes, I know, this file looks very ugly, but there aren't other ways to do it better.
 
 namespace Ogre {
@@ -553,12 +557,6 @@ namespace Ogre {
         }
         return cpuID;
     }
-    //---------------------------------------------------------------------
-    static uint32 _detectNumLogicalCores(void)
-    {
-        //TODO
-        return 0;
-    }
     
 #elif OGRE_CPU == OGRE_CPU_ARM  // OGRE_CPU == OGRE_CPU_ARM
 
@@ -618,21 +616,6 @@ namespace Ogre {
 #endif
         return cpuID;
     }
-    //---------------------------------------------------------------------
-    static uint32 _detectNumLogicalCores(void)
-    {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // Get the ARM logical CPU count
-        size_t size = sizeof(size_t);
-        int logicalcpu = 0;
-        sysctlbyname("hw.logicalcpu", &logicalcpu, &size, NULL, 0);
-
-        return logicalcpu;
-#else
-        //TODO
-        return 0;
-#endif
-    }
     
 #elif OGRE_CPU == OGRE_CPU_MIPS  // OGRE_CPU == OGRE_CPU_ARM
 
@@ -666,13 +649,30 @@ namespace Ogre {
     {
         return "Unknown";
     }
+
+#endif  // OGRE_CPU
+
     //---------------------------------------------------------------------
     static uint32 _detectNumLogicalCores(void)
     {
-        return 0;
-    }
+        uint32 numLogicalCores = 0;
 
-#endif  // OGRE_CPU
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        int logicalCores = (uint)sysconf( _SC_NPROCESSORS_ONLN );
+
+        if( logicalCores > 0 )
+            numLogicalCores = (uint32)logicalCores;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        size_t size = sizeof( numLogicalCores );
+        sysctlbyname( "hw.logicalcpu", &numLogicalCores, &size, NULL, 0 );
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+        SYSTEM_INFO info;
+        GetSystemInfo( &info );
+        numLogicalCores = info.dwNumberOfProcessors;
+#endif
+
+        return numLogicalCores;
+    }
 
     //---------------------------------------------------------------------
     // Platform-independent routines, but the returns value are platform-dependent
@@ -708,7 +708,7 @@ namespace Ogre {
         pLog->logMessage(
             " *   CPU ID: " + getCpuIdentifier());
         pLog->logMessage(
-            " *   Logical cores (excluding HyperThreaded): " +
+            " *   Logical cores: " +
                         StringConverter::toString( getNumLogicalCores() ) );
 #if OGRE_CPU == OGRE_CPU_X86
         if(_isSupportCpuid())
