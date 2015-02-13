@@ -85,7 +85,7 @@ uint32 SceneManager::QUERY_LIGHT_DEFAULT_MASK          = 0x10000000;
 uint32 SceneManager::QUERY_FRUSTUM_DEFAULT_MASK        = 0x08000000;
 //-----------------------------------------------------------------------
 SceneManager::SceneManager(const String& name, size_t numWorkerThreads,
-                           InstancingTheadedCullingMethod threadedCullingMethod) :
+                           InstancingThreadedCullingMethod threadedCullingMethod) :
 mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
 mName(name),

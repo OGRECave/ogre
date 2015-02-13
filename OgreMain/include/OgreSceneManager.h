@@ -123,7 +123,7 @@ namespace Ogre {
 
         Note that you can switch between methods at any time at runtime.
     */
-    enum InstancingTheadedCullingMethod
+    enum InstancingThreadedCullingMethod
     {
         INSTANCING_CULLING_SINGLETHREAD,
         INSTANCING_CULLING_THREADED,
@@ -960,7 +960,7 @@ namespace Ogre {
         UpdateLodRequest                mUpdateLodRequest;
         UpdateTransformRequest          mUpdateTransformRequest;
         ObjectMemoryManagerVec const    *mUpdateBoundsRequest;
-        InstancingTheadedCullingMethod  mInstancingThreadedCullingMethod;
+        InstancingThreadedCullingMethod mInstancingThreadedCullingMethod;
         InstanceBatchCullRequest        mInstanceBatchCullRequest;
         UniformScalableTask *mUserTask;
         RequestType         mRequestType;
@@ -1133,7 +1133,7 @@ namespace Ogre {
         /** Constructor.
         */
         SceneManager(const String& instanceName, size_t numWorkerThreads,
-                    InstancingTheadedCullingMethod threadedCullingMethod);
+                    InstancingThreadedCullingMethod threadedCullingMethod);
 
         /** Default destructor.
         */
@@ -1711,7 +1711,7 @@ namespace Ogre {
         /// @See mTmpVisibleObjects
         VisibleObjectsPerThreadArray& _getTmpVisibleObjectsList()           { return mTmpVisibleObjects; }
 
-        InstancingTheadedCullingMethod getInstancingThreadedCullingMethod() const
+        InstancingThreadedCullingMethod getInstancingThreadedCullingMethod() const
                                                             { return mInstancingThreadedCullingMethod; }
 
         /** Notifies that the given MovableObject is dirty (i.e. the AABBs have changed).
@@ -3349,7 +3349,7 @@ namespace Ogre {
         Don't call directly, use SceneManagerEnumerator::createSceneManager.
         */
         virtual SceneManager* createInstance(const String& instanceName, size_t numWorkerThreads,
-                                            InstancingTheadedCullingMethod threadedCullingMethod) = 0;
+                                            InstancingThreadedCullingMethod threadedCullingMethod) = 0;
         /** Destroy an instance of a SceneManager. */
         virtual void destroyInstance(SceneManager* instance) = 0;
 
