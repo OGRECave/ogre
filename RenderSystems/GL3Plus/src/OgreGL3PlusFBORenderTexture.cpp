@@ -126,7 +126,7 @@ namespace Ogre {
         };
 #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
-    GL3PlusFBOManager::GL3PlusFBOManager()
+    GL3PlusFBOManager::GL3PlusFBOManager(const GL3PlusSupport& support) : mGLSupport(support)
     {
         detectFBOFormats();
 
@@ -288,6 +288,10 @@ namespace Ogre {
     */
     void GL3PlusFBOManager::detectFBOFormats()
     {
+        // is glGetInternalformativ supported?
+        // core since GL 4.2: see https://www.opengl.org/wiki/GLAPI/glGetInternalformat
+        bool hasInternalFormatQuery = gl3wIsSupported(4,2) || mGLSupport.checkExtension("GL_ARB_internalformat_query");
+
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
 
@@ -306,17 +310,26 @@ namespace Ogre {
             if(PixelUtil::isCompressed((PixelFormat)x))
                 continue;
 
-            // Create and attach framebuffer
-            _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
+            bool setupOk;
+            GLint params;
 
-            // Check status
-            GLuint status;
-            OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
+            if(hasInternalFormatQuery) {
+                OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, fmt, GL_FRAMEBUFFER_RENDERABLE, 2, &params));
+                setupOk = params == GL_FULL_SUPPORT;
+            } else {
+                // Create and attach framebuffer
+                _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
+
+                // Check status
+                GLuint status;
+                OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
+                setupOk = status == GL_FRAMEBUFFER_COMPLETE;
+            }
 
             // Ignore status in case of fmt==GL_NONE, because no implementation will accept
             // a buffer without *any* attachment. Buffers with only stencil and depth attachment
             // might still be supported, so we must continue probing.
-            if(fmt == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE)
+            if(fmt == GL_NONE || setupOk)
             {
                 mProps[x].valid = true;
                 StringStream str;
@@ -326,6 +339,31 @@ namespace Ogre {
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
+                    if(hasInternalFormatQuery) {
+                        OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, depthFormats[depth],
+                                                                  GL_FRAMEBUFFER_RENDERABLE, 2, &params));
+                        if (params == GL_FULL_SUPPORT)
+                        {
+                            // General depth/stencil combination.
+                            for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
+                            {
+                                OGRE_CHECK_GL_ERROR(glGetInternalformativ(
+                                                        GL_RENDERBUFFER, stencilFormats[stencil],
+                                                        GL_FRAMEBUFFER_RENDERABLE, 2, &params));
+                                if (params == GL_FULL_SUPPORT)
+                                {
+                                    // Add mode to allowed modes.
+                                    str << "D" << depthBits[depth] << "S" << stencilBits[stencil] << " ";
+                                    FormatProperties::Mode mode;
+                                    mode.depth = depth;
+                                    mode.stencil = stencil;
+                                    mProps[x].modes.push_back(mode);
+                                }
+                            }
+                        }
+                        continue;
+                    }
+
                     if ((depthFormats[depth] != GL_DEPTH24_STENCIL8) && (depthFormats[depth] != GL_DEPTH32F_STENCIL8))
                     {
                         // General depth/stencil combination

@@ -545,7 +545,7 @@ namespace Ogre {
         // Use FBO's for RTT, PBuffers and Copy are no longer supported
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL3+: Using FBOs for rendering to textures");
-        mRTTManager = new GL3PlusFBOManager();
+        mRTTManager = new GL3PlusFBOManager(*mGLSupport);
         caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
         Log* defaultLog = LogManager::getSingleton().getDefaultLog();
