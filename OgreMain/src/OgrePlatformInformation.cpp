@@ -408,42 +408,6 @@ namespace Ogre {
         return features;
     }
     //---------------------------------------------------------------------
-    static uint32 _detectNumLogicalCores(void)
-    {
-        uint numLogicalCores = 0;
-
-        // Supports CPUID instruction ?
-        if (_isSupportCpuid())
-        {
-            CpuidResult result;
-
-            // Has standard feature ?
-            if (_performCpuid(0, result))
-            {
-                // Check vendor strings
-                if (memcmp(&result._ebx, "GenuineIntel", 12) == 0)
-                {
-                    _performCpuid(4, result);
-                    numLogicalCores = ((result._eax >> 26) & 0x3f) + 1; // EAX[31:26] + 1
-                }
-                else if (memcmp(&result._ebx, "AuthenticAMD", 12) == 0)
-                {
-                    //Number of CPU cores - 1
-                    _performCpuid( 0x80000008, result );
-                    numLogicalCores = (result._ecx & 0xff) + 1; // EAX[7:0] + 1
-                }
-                else
-                {
-                    // Check standard feature
-                    _performCpuid(1, result);
-                    numLogicalCores = (result._ebx >> 16) & 0xff;
-                }
-            }
-        }
-
-        return numLogicalCores;
-    }
-    //---------------------------------------------------------------------
     static String _detectCpuIdentifier(void)
     {
         // Supports CPUID instruction ?

@@ -190,7 +190,7 @@ namespace Ogre {
         */
         static bool hasCpuFeature(CpuFeatures feature);
 
-        /** Returns the number of logical cores. Hyper Threaded cores do not count
+        /** Returns the number of logical cores, including Hyper Threaded / SMT cores
         @note
             Returns 0 if couldn't detect.
         */
