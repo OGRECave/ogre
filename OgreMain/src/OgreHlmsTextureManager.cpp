@@ -872,7 +872,7 @@ namespace Ogre
                 }
 
                 row += "|";
-                row += StringConverter::toString( itor - mTextureArrays[i].begin() ) + "|";
+                row += StringConverter::toString( (size_t)(itor - mTextureArrays[i].begin()) ) + "|";
                 row += String( typeNames[i] ) + "|";
                 row += StringConverter::toString( itor->texture->getWidth() ) + "|";
                 row += StringConverter::toString( itor->texture->getHeight() ) + "|";
