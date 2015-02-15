@@ -465,6 +465,26 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsUnlitDatablock::setBlendMode( uint8 texType, UnlitBlendModes blendMode )
+    {
+        if( texType >= NUM_UNLIT_TEXTURE_TYPES )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid blendMode",
+                         "HlmsUnlitDatablock::setBlendMode" );
+        }
+
+        if( mBlendModes[texType] != blendMode )
+        {
+            mBlendModes[texType] = blendMode;
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    UnlitBlendModes HlmsUnlitDatablock::getBlendMode( uint8 texType ) const
+    {
+        return static_cast<UnlitBlendModes>( mBlendModes[texType] );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsUnlitDatablock::setEnableAnimationMatrix( uint8 textureUnit, bool bEnable )
     {
         assert( textureUnit < NUM_UNLIT_TEXTURE_TYPES );

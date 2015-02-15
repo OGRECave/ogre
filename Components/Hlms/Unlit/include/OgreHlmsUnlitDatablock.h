@@ -208,6 +208,18 @@ namespace Ogre
         */
         void setTextureUvSource( uint8 sourceType, uint8 uvSet );
 
+        /** Sets the blending mode (how the texture unit gets layered
+            on top of the previous texture units).
+            Calling this function triggers a HlmsDatablock::flushRenderables.
+        @param texType
+            The texture unit. Must be in range [1; NUM_UNLIT_TEXTURE_TYPES)
+            The value 0 is ignored.
+        @param blendMode
+            The blending mode to use.
+        */
+        void setBlendMode( uint8 texType, UnlitBlendModes blendMode );
+        UnlitBlendModes getBlendMode( uint8 texType ) const;
+
         /** Enables the animation of the given texture unit.
             Calling this function triggers a HlmsDatablock::flushRenderables.
         @param textureUnit
