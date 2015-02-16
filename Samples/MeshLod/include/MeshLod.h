@@ -51,6 +51,7 @@ protected:
     void addLodLevel(); /// Adds current work Lod level to the mesh Lod levels.
     void loadLodLevel(int id); /// Loads the Lod levels with id to the work Lod level.
     void removeLodLevel(); /// Removes currently selected Lod level.
+    void removeInitialLodLevel(); /// Removes Lod level #0 and unused vertices.
 
     void addToProfile(Ogre::Real cost); /// Add the currently reduced last vertex to the profile with given cost.
 

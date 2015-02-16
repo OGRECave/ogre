@@ -88,7 +88,7 @@ public:
         GpuConstantType samplerType, Function* function, int groupOrder, int& internalCounter);
 
     
-    static ParameterPtr GetSamplerWrapperParam(GpuConstantType samplerType,Function* function);
+	static ParameterPtr GetSamplerWrapperParam(UniformParameterPtr sampler, Function* function);
 
     static String Type;
 

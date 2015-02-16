@@ -4263,8 +4263,6 @@ namespace Ogre
                 }
             }
 
-            // nfz
-
             //  GPU Vertex and Fragment program references and parameters
             if (pPass->hasVertexProgram())
             {
@@ -4491,10 +4489,7 @@ namespace Ogre
             }
 
             //filtering
-            if (mDefaults ||
-                pTex->getTextureFiltering(FT_MIN) != FO_LINEAR ||
-                pTex->getTextureFiltering(FT_MAG) != FO_LINEAR ||
-                pTex->getTextureFiltering(FT_MIP) != FO_POINT)
+            if (mDefaults || !pTex->isDefaultFiltering())
             {
                 writeAttribute(4, "filtering");
                 writeValue(
@@ -4973,8 +4968,6 @@ namespace Ogre
             break;
         }
     }
-
-    // nfz
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeVertexProgramRef(const Pass* pPass)
     {
@@ -5050,7 +5043,7 @@ namespace Ogre
         }
         endSection(3);
 
-        // add to GpuProgram contatiner
+        // add to GpuProgram container
         mGpuProgramDefinitionContainer.insert(program->getName());
 
         // Fire post section write event.
@@ -5098,7 +5091,7 @@ namespace Ogre
 
             writeGpuProgramParameter("param_named", 
                                      paramName, autoEntry, defaultAutoEntry, 
-                                     def.isFloat(), def.isDouble(), def.isInt(), def.isUnsignedInt(),
+                                     def.isFloat(), def.isDouble(), (def.isInt() || def.isSampler()), def.isUnsignedInt(),
                                      def.physicalIndex, def.elementSize * def.arraySize,
                                      params, defaultParams, level, useMainBuffer);
         }
@@ -5325,17 +5318,17 @@ namespace Ogre
                         defaultParams->getUnsignedIntPointer(physicalIndex),
                         sizeof(uint) * physicalSize) != 0;
                 }
-                else //if (isBool)
-                {
-                    // different = memcmp(
-                    //     params->getBoolPointer(physicalIndex), 
-                    //     defaultParams->getBoolPointer(physicalIndex),
-                    //     sizeof(bool) * physicalSize) != 0;
-                    different = memcmp(
-                        params->getUnsignedIntPointer(physicalIndex), 
-                        defaultParams->getUnsignedIntPointer(physicalIndex),
-                        sizeof(uint) * physicalSize) != 0;
-                }
+                //else if (isBool)
+                //{
+                //    // different = memcmp(
+                //    //     params->getBoolPointer(physicalIndex), 
+                //    //     defaultParams->getBoolPointer(physicalIndex),
+                //    //     sizeof(bool) * physicalSize) != 0;
+                //    different = memcmp(
+                //        params->getUnsignedIntPointer(physicalIndex), 
+                //        defaultParams->getUnsignedIntPointer(physicalIndex),
+                //        sizeof(uint) * physicalSize) != 0;
+                //}
             }
         }
 
@@ -5401,7 +5394,7 @@ namespace Ogre
                     const double* pDouble = params->getDoublePointer(physicalIndex);
 
                     writeValue("double" + countLabel, useMainBuffer);
-                    // iterate through dobule constants
+                    // iterate through double constants
                     for (size_t f = 0; f < physicalSize; ++f)
                     {
                         writeValue(StringConverter::toString(*pDouble++), useMainBuffer);
@@ -5431,24 +5424,21 @@ namespace Ogre
                         writeValue(StringConverter::toString(*pUInt++), useMainBuffer);
                     }
                 }
-                else //if (isBool)
-                {
-                    // Get pointer to start of values
-                    // const bool* pBool = params->getBoolPointer(physicalIndex);
-                    const uint* pBool = params->getUnsignedIntPointer(physicalIndex);
+                //else if (isBool)
+                //{
+                //    // Get pointer to start of values
+                //    // const bool* pBool = params->getBoolPointer(physicalIndex);
+                //    const uint* pBool = params->getUnsignedIntPointer(physicalIndex);
 
-                    writeValue("bool" + countLabel, useMainBuffer);
-                    // iterate through bool constants
-                    for (size_t f = 0; f < physicalSize; ++f)
-                    {
-                        writeValue(StringConverter::toString(*pBool++), useMainBuffer);
-                    }
-                }//// end if (float/int)
-
+                //    writeValue("bool" + countLabel, useMainBuffer);
+                //    // iterate through bool constants
+                //    for (size_t f = 0; f < physicalSize; ++f)
+                //    {
+                //        writeValue(StringConverter::toString(*pBool++), useMainBuffer);
+                //    }
+                //}
             }
-
         }
-
     }
     //-----------------------------------------------------------------------
     void MaterialSerializer::writeGpuPrograms(void)

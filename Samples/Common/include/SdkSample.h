@@ -321,6 +321,7 @@ namespace OgreBites
                 mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
             }   
 #endif // INCLUDE_RTSHADER_SYSTEM
+
 #if OGRE_PROFILING
             // Toggle visibility of profiler window
             else if (evt.key == OIS::KC_P)
@@ -346,38 +347,18 @@ namespace OgreBites
         to filter out any interface-related mouse events before processing them in your scene.
         If the tray manager handler returns true, the event was meant for the trays, not you. */
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-#else
-        virtual bool mouseMoved(const OIS::MouseEvent& evt)
-#endif
+        virtual bool pointerMoved(const OIS::PointerEvent& evt)
         {
-            if (mTrayMgr->injectMouseMove(evt)) return true;
+            if (mTrayMgr->injectPointerMove(evt)) return true;
 
-            mCameraMan->injectMouseMove(evt);
+            mCameraMan->injectPointerMove(evt);
 
             return true;
         }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
+        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-            if (mTrayMgr->injectMouseDown(evt)) return true;
-            
-            if (mDragLook)
-            {
-                mCameraMan->setStyle(CS_FREELOOK);
-                mTrayMgr->hideCursor();
-            }
-                
-            mCameraMan->injectMouseDown(evt);
-            
-            return true;
-        }
-#else
-        virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-        {
-            if (mTrayMgr->injectMouseDown(evt, id)) return true;
+            if (mTrayMgr->injectPointerDown(evt, id)) return true;
             
             if (mDragLook && id == OIS::MB_Left)
             {
@@ -385,31 +366,14 @@ namespace OgreBites
                 mTrayMgr->hideCursor();
             }
 
-            mCameraMan->injectMouseDown(evt, id);
+            mCameraMan->injectPointerDown(evt, id);
 
             return true;
         }
-#endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
+        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
         {
-            if (mTrayMgr->injectMouseUp(evt)) return true;
-            
-            if (mDragLook)
-            {
-                mCameraMan->setStyle(CS_MANUAL);
-                mTrayMgr->showCursor();
-            }
-            
-            mCameraMan->injectMouseUp(evt);
-            
-            return true;
-        }
-#else
-        virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-        {
-            if (mTrayMgr->injectMouseUp(evt, id)) return true;
+            if (mTrayMgr->injectPointerUp(evt, id)) return true;
             
             if (mDragLook && id == OIS::MB_Left)
             {
@@ -417,11 +381,10 @@ namespace OgreBites
                 mTrayMgr->showCursor();
             }
 
-            mCameraMan->injectMouseUp(evt, id);
+            mCameraMan->injectPointerUp(evt, id);
 
             return true;
         }
-#endif
 
         /*-----------------------------------------------------------------------------
         | Extended to setup a default tray interface and camera controller.

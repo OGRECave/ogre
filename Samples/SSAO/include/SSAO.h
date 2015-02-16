@@ -180,7 +180,9 @@ public:
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
                         " programs, so you cannot run this sample. Sorry!", "Sample_SSAO::testCapabilities");
         }
-        if (!(caps->getRenderSystemName() == "OpenGL Rendering Subsystem" || caps->getRenderSystemName() == "Direct3D9 Rendering Subsystem" ||
+		if (!(caps->getRenderSystemName() == "OpenGL Rendering Subsystem" ||
+			caps->getRenderSystemName() == "OpenGL 3+ Rendering Subsystem (EXPERIMENTAL)" || 
+			caps->getRenderSystemName() == "Direct3D9 Rendering Subsystem" ||
             caps->getRenderSystemName() == "Direct3D11 Rendering Subsystem"))
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "This demo currently only supports OpenGL and DirectX9. Sorry!",
@@ -747,12 +749,10 @@ protected:
     }
     
     // The following three methods are for mouse input
-    /** @see Sample::mousePressed. */
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-    
-    bool mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
+    /** @see Sample::pointerPressed. */
+    bool pointerPressed( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
     {
-        if (mTrayMgr->injectMouseDown(evt, id)) 
+        if (mTrayMgr->injectPointerDown(evt, id)) 
             return true;
         if (id == OIS::MB_Left)     
             mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
@@ -760,10 +760,10 @@ protected:
         return true;
     }
     
-    /** @see Sample::mouseReleased. */
-    bool mouseReleased( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
+    /** @see Sample::pointerReleased. */
+    bool pointerReleased( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
     {
-        if (mTrayMgr->injectMouseUp(evt, id)) 
+        if (mTrayMgr->injectPointerUp(evt, id)) 
             return true;
         if (id == OIS::MB_Left) 
             mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
@@ -771,21 +771,21 @@ protected:
         return true;
     }
     
-    /** @see Sample::mouseMoved. */
-    bool mouseMoved( const OIS::MouseEvent& evt )
+    /** @see Sample::pointerMoved. */
+    bool pointerMoved( const OIS::PointerEvent& evt )
     {
         // only rotate the camera if cursor is hidden
         if (mTrayMgr->isCursorVisible())
-            mTrayMgr->injectMouseMove(evt);
+            mTrayMgr->injectPointerMove(evt);
         else 
         {
-            mCameraMan->injectMouseMove(evt);
+            mCameraMan->injectPointerMove(evt);
             static_cast<SelectMenu*>(mTrayMgr->getWidget(SSAO_CAMERA_MENU_NAME))->selectItem(SSAO_USER_CAMERA_ITEM);
         }
         
         return true;
     }
-#endif
+
     /**
      * Set the uniform value in the compositor
      * @param compositor The name of the compositor

@@ -31,34 +31,30 @@ THE SOFTWARE.
 #include "OgreResourceGroupManager.h"
 #include "OgreLogManager.h"
 
+#include "UnitTestSuite.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
 #endif
 
-CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(TerrainTests);
 
+//--------------------------------------------------------------------------
 void TerrainTests::setUp()
 {
-    // set up silent logging to not pollute output
-    if(LogManager::getSingletonPtr())
-        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-
-    if(LogManager::getSingletonPtr() == 0)
-    {
-        LogManager* logManager = OGRE_NEW LogManager();
-        logManager->createLog("testTerrain.log", true, false);
-    }
-    LogManager::getSingleton().setLogDetail(LL_LOW);
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #ifdef OGRE_STATIC_LIB
-    mRoot = OGRE_NEW Root(BLANKSTRING);
-        
+    mRoot = OGRE_NEW Root(BLANKSTRING);        
     mStaticPluginLoader.load();
 #else
     String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
     mRoot = OGRE_NEW Root(pluginsPath);
 #endif
+
     mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
     // Load resource paths from config file
@@ -87,7 +83,6 @@ void TerrainTests::setUp()
             archName = i->second;
             ResourceGroupManager::getSingleton().addResourceLocation(
                 archName, typeName, secName);
-
         }
     }
 
@@ -104,16 +99,18 @@ void TerrainTests::setUp()
 
     mSceneMgr = mRoot->createSceneManager(ST_GENERIC, numThreads, threadedCullingMethod);
 }
-
+//--------------------------------------------------------------------------
 void TerrainTests::tearDown()
 {
     OGRE_DELETE mTerrainOpts;
     OGRE_DELETE mRoot;
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
-
+//--------------------------------------------------------------------------
 void TerrainTests::testCreate()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     Terrain* t = OGRE_NEW Terrain(mSceneMgr);
     Image img;
     img.load("terrain.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
@@ -125,8 +122,10 @@ void TerrainTests::testCreate()
     imp.minBatchSize = 33;
     imp.maxBatchSize = 65;
     t->prepare(imp);
-    // don't load, this requires GPU access
+    
+    // Note: Do not load as this would require GPU access!
     //t->load();
 
     OGRE_DELETE t;
 }
+//--------------------------------------------------------------------------

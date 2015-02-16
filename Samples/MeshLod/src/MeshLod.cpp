@@ -11,6 +11,7 @@ using namespace OgreBites;
 #include "OgreLodInputProviderMesh.h"
 #include "OgreLodOutsideMarker.h"
 #include "OgreLodData.h"
+#include "OgreLod0Stripifier.h"
 #include "OgreLodStrategyManager.h"
 
 #include "OgrePixelCountLodStrategy.h"
@@ -117,19 +118,21 @@ void Sample_MeshLod::setupControls( int uimode /*= 0*/ )
     // Level options:
     mDistanceLabel = mTrayMgr->createLabel(TL_TOPRIGHT, "lblDistance", "Distance: ", 250);
     mLodLevelList = mTrayMgr->createLongSelectMenu(TL_TOPRIGHT, "cmbLodLevels", "Lod level:", 150, 4);
-    mTrayMgr->createButton(TL_TOPRIGHT, "btnRemoveSelectedLodLevel","Remove level", 200);
-    mTrayMgr->createButton(TL_TOPRIGHT, "btnAddLodLevel","Add level", 200);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnAddLodLevel","Add level", 220);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnRemoveSelectedLodLevel","Remove level", 220);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnRemoveInitialLodLevel","Remove level #0", 220);
 
     // Serializer options:
-    mTrayMgr->createButton(TL_TOPRIGHT, "btnShowAll", "Show all levels", 200);
-    mTrayMgr->createButton(TL_TOPRIGHT, "btnSaveMesh", "Save mesh", 200);
-    mTrayMgr->createButton(TL_TOPRIGHT, "btnShowMesh", "Show Lod from mesh", 200);
-    mTrayMgr->createButton(TL_TOPRIGHT, "btnAutoconfigure", "Show autoconfigured mesh", 200);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnShowAll", "Show all levels", 220);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnAutoconfigure", "Show autoconfigured LODs", 220);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnShowMesh", "Show LODs stored in mesh", 220);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnSaveMesh", "Save mesh", 220);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnRestoreMesh", "Restore original mesh", 220);
 
     // Profile options
     mProfileList = mTrayMgr->createLongSelectMenu(TL_TOPRIGHT, "cmbProfiledVertices", "Profile:", 180, 4);
-    mTrayMgr->createButton(TL_TOPRIGHT, "btnRemoveFromProfile","Remove from profile", 200.0);
-    mTrayMgr->createButton(TL_TOPRIGHT, "btnAddToProfile","Add to profile", 200.0);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnRemoveFromProfile","Remove from profile", 220.0);
+    mTrayMgr->createButton(TL_TOPRIGHT, "btnAddToProfile","Add to profile", 220.0);
 
     //mTrayMgr->createTextBox(TL_TOPRIGHT, "Help","Help", 200, 200)
     //  ->setText("The last reduced vertex is the selected vertex. Use the slider to select the vertex, then decide to keep or remove it. You can export the Lod buffers into the .mesh file after configuration.");
@@ -374,6 +377,30 @@ void Sample_MeshLod::removeLodLevel()
     mLodLevelList->removeItem(selectedLevel);
 }
 
+void Sample_MeshLod::removeInitialLodLevel()
+{
+    Ogre::Real stripValue = mLodConfig.levels.empty() ? mWorkLevel.reductionValue : mLodConfig.levels[0].reductionValue;
+    if(mWorkLevel.reductionMethod == LodLevel::VRM_CONSTANT && stripValue > 0.0)
+    {
+        Lod0Stripifier stripifier;
+        if(stripifier.StripLod0Vertices(mLodConfig.mesh))
+        {
+            if(!mLodConfig.levels.empty())
+            {
+                mLodConfig.levels.erase(mLodConfig.levels.begin());
+                mLodLevelList->removeItem(0);
+                loadLodLevel(0);
+            }
+            else
+            {
+                mWorkLevel.reductionValue = 0.0;
+                mReductionSlider->setValue(mWorkLevel.reductionValue, false);
+                loadUserLod();
+            }
+        }
+    }
+}
+
 Real Sample_MeshLod::getCameraDistance()
 {
 	//Technically, the "last viewport" is one frame behind. But viewport's resolution (which is
@@ -588,18 +615,14 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
             profile.erase(profile.begin() + mProfileList->getSelectionIndex());
             mProfileList->removeItem(mProfileList->getSelectionIndex());
             loadUserLod();
-		}
-    }
-	else if(button->getName() == "btnRemoveSelectedLodLevel")
-	{
-        removeLodLevel();
-    }
-	else if(button->getName() == "btnAddLodLevel")
-	{
+        }
+    } else if(button->getName() == "btnAddLodLevel") {
         addLodLevel();
-    }
-	else if(button->getName() == "btnAutoconfigure")
-	{
+    } else if(button->getName() == "btnRemoveSelectedLodLevel") {
+        removeLodLevel();
+    } else if(button->getName() == "btnRemoveInitialLodLevel") {
+        removeInitialLodLevel();
+    } else if(button->getName() == "btnAutoconfigure") {
         mTrayMgr->destroyAllWidgetsInTray(TL_TOP);
         mTrayMgr->createLabel(TL_TOP, "lblWhatYouSee", "Showing autoconfigured LOD", 300);
         loadAutomaticLod();
@@ -644,9 +667,9 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
         if(!getResourceFullPath(mLodConfig.mesh, filename) || filename == "")
 		{
             mTrayMgr->showOkDialog("Error", "'" + filename + "' is not a writable path!");
-        }
-		else
-		{
+        } else {
+            if(!FileSystemLayer::fileExists(filename + ".orig"))
+                FileSystemLayer::renameFile(filename, filename + ".orig");
             MeshSerializer ms;
             ms.exportMesh(mLodConfig.mesh.get(), filename);
             mTrayMgr->showOkDialog("Success", "Mesh saved to: " + filename);
@@ -654,6 +677,15 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
 
         if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible())
             loadUserLod();
+        }
+    }
+    else if(button->getName() == "btnRestoreMesh") {
+        String filename("");
+        if(getResourceFullPath(mLodConfig.mesh, filename) && filename != "") {
+            if(FileSystemLayer::fileExists(filename + ".orig"))
+                FileSystemLayer::renameFile(filename + ".orig", filename);
+        }
+        changeSelectedMesh(mLodConfig.mesh->getName());
     }
 }
 

@@ -82,15 +82,21 @@ namespace Ogre {
         if (mHWnd)
             destroy();
 
-#ifdef OGRE_STATIC_LIB
-        HINSTANCE hInst = GetModuleHandle( NULL );
-#else
-#  if OGRE_DEBUG_MODE == 1
-        HINSTANCE hInst = GetModuleHandle("RenderSystem_GL_d.dll");
-#  else
-        HINSTANCE hInst = GetModuleHandle("RenderSystem_GL.dll");
-#  endif
-#endif
+		HINSTANCE hInst = NULL;
+		#ifdef __MINGW32__
+			#ifdef OGRE_STATIC_LIB
+        		hInst = GetModuleHandle( NULL );
+			#else
+				#if OGRE_DEBUG_MODE == 1
+					hInst = GetModuleHandle("RenderSystem_GL_d.dll");
+				#else
+					hInst = GetModuleHandle("RenderSystem_GL.dll");
+				#endif
+			#endif
+		#else
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+		#endif
 
         mHWnd = 0;
         mName = name;
@@ -149,6 +155,16 @@ namespace Ogre {
 
             if ((opt = miscParams->find("gamma")) != end)
                 hwGamma = StringConverter::parseBool(opt->second);
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+            if ((opt = miscParams->find("stereoMode")) != end)
+            {
+              StereoModeType stereoMode = StringConverter::parseStereoMode(opt->second);
+              if (SMT_NONE != stereoMode)
+                mStereoEnabled = true;
+              mGLSupport.setStereoModeType(stereoMode);
+            }
+#endif
 
             if ((opt = miscParams->find("externalWindowHandle")) != end)
             {
@@ -235,7 +251,17 @@ namespace Ogre {
             // Get the target monitor info      
             memset(&monitorInfoEx, 0, sizeof(MONITORINFOEX));
             monitorInfoEx.cbSize = sizeof(MONITORINFOEX);
-            GetMonitorInfo(hMonitor, &monitorInfoEx);
+
+            if (!GetMonitorInfo(hMonitor, &monitorInfoEx))
+            {
+                DWORD le = GetLastError();
+                LogManager::getSingleton().logMessage(LML_CRITICAL, 
+                    ::Ogre::String("Win32Window::create(): Call to GetMonitorInfo() failed.")
+                    + ::Ogre::String(" GetLastError() returns: ")
+                    + ::Ogre::StringConverter::toString(le)
+                    );
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Call to GetMonitorInfo() failed", "Win32Window::create()");
+            }
 
             size_t devNameLen = strlen(monitorInfoEx.szDevice);
             mDeviceName = new char[devNameLen + 1];
@@ -820,9 +846,9 @@ namespace Ogre {
 
     void Win32Window::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if ((dst.left < 0) || (dst.right > mWidth) ||
-            (dst.top < 0) || (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Invalid box.",

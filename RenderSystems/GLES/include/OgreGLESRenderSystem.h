@@ -49,14 +49,14 @@ namespace Ogre {
     class _OgreGLESExport GLESRenderSystem : public RenderSystem
     {
         private:
-            typedef HashMap<GLenum, GLint>              TexEnviMap;
-            typedef HashMap<GLenum, GLfloat>            TexEnvfMap;
-            typedef HashMap<GLenum, const GLfloat *>    TexEnvfvMap;
-            typedef HashMap<GLenum, GLfloat>            PointParamfMap;
-            typedef HashMap<GLenum, const GLfloat *>    PointParamfvMap;
-            typedef HashMap<GLenum, const GLfloat *>    MaterialfvMap;
-            typedef HashMap<GLenum, GLfloat>            LightfMap;
-            typedef HashMap<GLenum, const GLfloat *>    LightfvMap;
+            typedef OGRE_HashMap<GLenum, GLint>              TexEnviMap;
+            typedef OGRE_HashMap<GLenum, GLfloat>            TexEnvfMap;
+            typedef OGRE_HashMap<GLenum, const GLfloat *>    TexEnvfvMap;
+            typedef OGRE_HashMap<GLenum, GLfloat>            PointParamfMap;
+            typedef OGRE_HashMap<GLenum, const GLfloat *>    PointParamfvMap;
+            typedef OGRE_HashMap<GLenum, const GLfloat *>    MaterialfvMap;
+            typedef OGRE_HashMap<GLenum, GLfloat>            LightfMap;
+            typedef OGRE_HashMap<GLenum, const GLfloat *>    LightfvMap;
 
             /** Array of up to 8 lights, indexed as per API
                 Note that a null value indicates a free slot
@@ -141,6 +141,10 @@ namespace Ogre {
               RenderSystem
              */
             const String& getName(void) const;
+            /** See
+              RenderSystem
+             */
+            const String& getFriendlyName(void) const;
             /** See
               RenderSystem
              */

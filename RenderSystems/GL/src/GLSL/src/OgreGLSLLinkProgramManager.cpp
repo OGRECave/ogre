@@ -508,10 +508,20 @@ namespace Ogre {
                             def.physicalIndex = defs.floatBufferSize;
                             defs.floatBufferSize += def.arraySize * def.elementSize;
                         }
-                        else
+                        else if(def.isDouble())
+                        {
+                            def.physicalIndex = defs.doubleBufferSize;
+                            defs.doubleBufferSize += def.arraySize * def.elementSize;
+                        }
+                        else if (def.isInt() || def.isSampler())
                         {
                             def.physicalIndex = defs.intBufferSize;
                             defs.intBufferSize += def.arraySize * def.elementSize;
+                        }
+                        else if (def.isUnsignedInt())
+                        {
+                            def.physicalIndex = defs.uintBufferSize;
+                            defs.uintBufferSize += def.arraySize * def.elementSize;
                         }
                         defs.map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
 

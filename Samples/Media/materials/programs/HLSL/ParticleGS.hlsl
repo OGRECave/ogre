@@ -277,6 +277,10 @@ VSParticleDrawOut DisplayParticles_VS(VSParticleIn input)
         output.color = float4(1,0.1,0.1,1);
         output.color *= (input.timer / P_EMBER3LIFE );
     }
+    else
+    {
+        output.color = float4(0,0,0,0);
+    }
        
     return output;
 }

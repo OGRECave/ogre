@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreMesh.h"
 #include "OgreSubMesh.h"
+#include "OgreBitwise.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreHardwareBufferManager.h"
@@ -1578,7 +1579,8 @@ namespace Ogre {
             readInts(stream, &bufferIndex, 1);
             if(bufferIndex != (unsigned int)-1) {
                 // copy buffer pointer
-                indexData->indexBuffer = sm->mLodFaceList[bufferIndex]->indexBuffer;
+                indexData->indexBuffer = sm->mLodFaceList[bufferIndex-1]->indexBuffer;
+                assert(!indexData->indexBuffer.isNull());
             } else {
                 // generate buffers
 
@@ -1674,7 +1676,7 @@ namespace Ogre {
                     default:
                         assert(false); // Should never happen
                 };
-                Serializer::flipEndian(pElem, typeSize,
+				Bitwise::bswapChunks(pElem, typeSize,
                     VertexElement::getTypeCount((*ei).getType()));
 
             }

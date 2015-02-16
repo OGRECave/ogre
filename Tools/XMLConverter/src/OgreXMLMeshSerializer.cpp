@@ -341,6 +341,7 @@ namespace Ogre {
                     }
                 }
             }
+            ibuf->unlock();
         }
 
         // M_GEOMETRY chunk (Optional: present only if useSharedVertices = false)
@@ -1561,6 +1562,8 @@ namespace Ogre {
                     }
 
                 }
+
+                ibuf->unlock();
             }
 
         }
@@ -1627,7 +1630,6 @@ namespace Ogre {
             if (usageElem->ValueStr() == "lodmanual")
             {
                 readLodUsageManual(usageElem, i);
-                
             }
             else if (usageElem->ValueStr() == "lodgenerated")
             {

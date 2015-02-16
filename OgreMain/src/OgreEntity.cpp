@@ -361,8 +361,7 @@ namespace Ogre {
         }
 
     }
-
-
+    //-----------------------------------------------------------------------
     void Entity::setMaterial( const MaterialPtr& material )
     {
         // Set for all subentities

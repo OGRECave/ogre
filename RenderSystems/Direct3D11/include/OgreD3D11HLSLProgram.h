@@ -104,7 +104,9 @@ namespace Ogre {
         void processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType);
 
         void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
-
+		
+		void getDefines(String& stringBuffer, vector<D3D_SHADER_MACRO>::type& defines, const String& definesString);
+		
         String mTarget;
         String mEntryPoint;
         String mPreprocessorDefines;

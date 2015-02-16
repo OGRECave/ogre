@@ -77,9 +77,9 @@ namespace Ogre
     //-------------------------------------------------------------------------------------------------//
     void OSXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if ((dst.right > mWidth) ||
-            (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Invalid box.",
@@ -262,6 +262,33 @@ namespace Ogre
         CG_CHECK_ERROR(cgErr)
         
         // Get a pixel format that best matches what we are looking for
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        int attribsSize = 17;
+        if (mStereoEnabled)
+            attribsSize++;
+
+        CGLPixelFormatAttribute* attribs = (CGLPixelFormatAttribute*) malloc(attribsSize * sizeof(CGLPixelFormatAttribute));
+        attribs[0] = kCGLPFADoubleBuffer;
+        attribs[1] = kCGLPFAAlphaSize;
+        attribs[2] = (CGLPixelFormatAttribute)8;
+        attribs[3] = kCGLPFADepthSize;
+        attribs[4] = (CGLPixelFormatAttribute)reqDepth;
+        attribs[5] = kCGLPFAStencilSize;
+        attribs[6] = (CGLPixelFormatAttribute)8;
+        attribs[7] = kCGLPFASampleBuffers;
+        attribs[8] = (CGLPixelFormatAttribute)0;
+        attribs[9] = kCGLPFASamples;
+        attribs[10] = (CGLPixelFormatAttribute)0;
+        attribs[11] = kCGLPFAFullScreen;
+        attribs[12] = kCGLPFASingleRenderer;
+        attribs[13] = kCGLPFAAccelerated;
+        attribs[14] = kCGLPFADisplayMask;
+        attribs[15] = (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay);
+        if (mStereoEnabled)
+            attribs[16] = kCGLPFAStereo;
+
+        attribs[attribsSize - 1] = (CGLPixelFormatAttribute)0;
+#else
         CGLPixelFormatAttribute attribs[] = { 
             kCGLPFADoubleBuffer,
             kCGLPFAAlphaSize,     (CGLPixelFormatAttribute)8,
@@ -275,7 +302,8 @@ namespace Ogre
             kCGLPFADisplayMask,   (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay),
             (CGLPixelFormatAttribute)0
         };
-        
+#endif
+
         // Set up FSAA if it was requested
         if(fsaa > 1)
         {

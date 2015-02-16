@@ -263,7 +263,9 @@ namespace Ogre
         // final loading behaviour
         if (res->succeeded())
         {
-            std::swap(mContentCollections, pres.pageData->collectionsToAdd);
+            if(!pres.pageData->collectionsToAdd.empty())
+                std::swap(mContentCollections, pres.pageData->collectionsToAdd);
+
             loadImpl();
         }
 
@@ -450,9 +452,9 @@ namespace Ogre
     {
         StringStream str;
         if (mParent)
-            str << mParent->getWorld()->getName() << "_" << mParent->getName();
+            str << mParent->getWorld()->getName() << "_" <<    mParent->getName();
 
-        str << std::setw(8) << std::setfill('0') << std::hex << mID << ".page";
+        str    << std::setw(8) << std::setfill('0') << std::hex << mID << ".page";
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // For the iOS we need to prefix the file name with the path to the Caches folder

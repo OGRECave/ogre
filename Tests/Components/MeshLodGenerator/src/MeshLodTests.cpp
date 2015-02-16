@@ -17,43 +17,35 @@
 #include "OgreLodCollapseCostQuadric.h"
 #include "OgreRenderWindow.h"
 #include "OgreLodConfigSerializer.h"
-#include "OgreLogManager.h"
 #include "OgreWorkQueue.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION(MeshLodTests);
+#include "UnitTestSuite.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
 #endif
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(MeshLodTests);
+
+//--------------------------------------------------------------------------
 void MeshLodTests::setUp()
 {
-    if(LogManager::getSingletonPtr())
-        OGRE_DELETE LogManager::getSingletonPtr();
-
-    if(LogManager::getSingletonPtr() == 0)
-    {
-        LogManager* logManager = OGRE_NEW LogManager();
-        logManager->createLog("MeshLodTests.log", true, false);
-    }
-    LogManager::getSingleton().setLogDetail(LL_LOW);
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
-#if OGRE_STATIC
-    mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
-#endif
-
 #ifdef OGRE_STATIC_LIB
-    Root* root = OGRE_NEW Root(BLANKSTRING);
-        
+    mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
+    Root* root = OGRE_NEW Root(BLANKSTRING);        
     mStaticPluginLoader.load();
 #else
     String pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
     Root* root = OGRE_NEW Root(pluginsPath);
 #endif
+
     CPPUNIT_ASSERT(!root->getAvailableRenderers().empty());
     root->setRenderSystem(root->getAvailableRenderers().back());
     root->initialise(false); // Needed for setting up HardwareBufferManager
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     Ogre::NameValuePairList misc;
     // Tell OGRE that we're using cocoa, so it doesn't need to make a window for us
@@ -62,11 +54,13 @@ void MeshLodTests::setUp()
 #else
     root->createRenderWindow("", 320, 240, false, NULL)->setHidden(true);
 #endif
+
     new MeshLodGenerator;
 
     // Load resource paths from config file
     ConfigFile cf;
     String resourcesPath;
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     resourcesPath = mFSLayer->getConfigFilePath("resources.cfg");
 #else
@@ -90,14 +84,10 @@ void MeshLodTests::setUp()
         }
     }
 
-    // +++++++++++++++++++++++++++++++
     // Create the mesh for testing
-    {
-        mMesh = MeshManager::getSingleton().load("Sinbad.mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
-    }
-    // +++++++++++++++++++++++++++++++
+    mMesh = MeshManager::getSingleton().load("Sinbad.mesh", ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 }
-
+//--------------------------------------------------------------------------
 void MeshLodTests::tearDown()
 {
     if (!mMesh.isNull()) {
@@ -108,7 +98,7 @@ void MeshLodTests::tearDown()
     OGRE_DELETE Root::getSingletonPtr();
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
 }
-
+//--------------------------------------------------------------------------
 void MeshLodTests::addProfile(LodConfig& config)
 {
     // Get the first two vertices and put the edge into the profile
@@ -134,8 +124,10 @@ void MeshLodTests::addProfile(LodConfig& config)
     config.advanced.profile.push_back(edge);
     vbuf->unlock();
 }
+//--------------------------------------------------------------------------
 void MeshLodTests::testMeshLodGenerator()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     LodConfig config;
     setTestLodConfig(config);
@@ -154,19 +146,20 @@ void MeshLodTests::testMeshLodGenerator()
     gen.generateLodLevels(config);
     blockedWaitForLodGeneration(config.mesh);
     CPPUNIT_ASSERT(config.levels.size() == config2.levels.size());
-    for (size_t i = 0; i < config.levels.size(); i++) {
+    for (size_t i = 0; i < config.levels.size(); i++) 
+    {
         CPPUNIT_ASSERT(config.levels[i].outSkipped == config2.levels[i].outSkipped);
         CPPUNIT_ASSERT(config.levels[i].outUniqueVertexCount == config2.levels[i].outUniqueVertexCount);
     }
-
 }
-
+//--------------------------------------------------------------------------
 void MeshLodTests::blockedWaitForLodGeneration(const MeshPtr& mesh)
 {
     bool success = false;
     const int timeout = 5000;
     WorkQueue* wq = Root::getSingleton().getWorkQueue();
-    for (int i = 0; i < timeout; i++) {
+    for (int i = 0; i < timeout; i++) 
+    {
         OGRE_THREAD_SLEEP(1);
         wq->processResponses(); // Injects the Lod if ready
         if (mesh->getNumLodLevels() != 1) {
@@ -177,9 +170,11 @@ void MeshLodTests::blockedWaitForLodGeneration(const MeshPtr& mesh)
     // timeout
     CPPUNIT_ASSERT(success);
 }
-
+//--------------------------------------------------------------------------
 void MeshLodTests::testLodConfigSerializer()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     LodConfig config, config2;
     setTestLodConfig(config);
     addProfile(config);
@@ -193,28 +188,34 @@ void MeshLodTests::testLodConfigSerializer()
     CPPUNIT_ASSERT(config.advanced.useBackgroundQueue == config.advanced.useBackgroundQueue);
     CPPUNIT_ASSERT(config.advanced.useCompression == config.advanced.useCompression);
     CPPUNIT_ASSERT(config.advanced.useVertexNormals == config.advanced.useVertexNormals);
+
     {
         // Compare profiles
         LodProfile& p1 = config.advanced.profile;
         LodProfile& p2 = config2.advanced.profile;
         bool isProfileSameSize = (p1.size() == p2.size());
         CPPUNIT_ASSERT(isProfileSameSize);
-        if (isProfileSameSize) {
-            for (size_t i = 0; i < p1.size(); i++) {
+        if (isProfileSameSize) 
+        {
+            for (size_t i = 0; i < p1.size(); i++) 
+            {
                 CPPUNIT_ASSERT(p1[i].src == p2[i].src);
                 CPPUNIT_ASSERT(p1[i].dst == p2[i].dst);
                 CPPUNIT_ASSERT(isEqual(p1[i].cost, p2[i].cost));
             }
         }
     }
+
     {
         // Compare Lod Levels
         LodConfig::LodLevelList& l1 = config.levels;
         LodConfig::LodLevelList& l2 = config2.levels;
         bool isLevelsSameSize = (l1.size() == l2.size());
         CPPUNIT_ASSERT(isLevelsSameSize);
-        if (isLevelsSameSize) {
-            for (size_t i = 0; i < l1.size(); i++) {
+        if (isLevelsSameSize) 
+        {
+            for (size_t i = 0; i < l1.size(); i++) 
+            {
                 CPPUNIT_ASSERT(l1[i].distance == l2[i].distance);
                 CPPUNIT_ASSERT(l1[i].manualMeshName == l2[i].manualMeshName);
                 CPPUNIT_ASSERT(l1[i].reductionMethod == l2[i].reductionMethod);
@@ -223,23 +224,27 @@ void MeshLodTests::testLodConfigSerializer()
         }
     }
 }
-
+//--------------------------------------------------------------------------
 void MeshLodTests::testManualLodLevels()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     LodConfig config;
     setTestLodConfig(config);
     gen.generateLodLevels(config, LodCollapseCostPtr(new LodCollapseCostQuadric()));
 }
-
+//--------------------------------------------------------------------------
 void MeshLodTests::testQuadricError()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     LodConfig config;
     setTestLodConfig(config);
     MeshLodGenerator& gen = MeshLodGenerator::getSingleton();
     gen.generateLodLevels(config, LodCollapseCostPtr(new LodCollapseCostQuadric()));
 }
-
+//--------------------------------------------------------------------------
 void MeshLodTests::setTestLodConfig(LodConfig& config)
 {
     config.mesh = mMesh;
@@ -253,8 +258,10 @@ void MeshLodTests::setTestLodConfig(LodConfig& config)
     config.advanced.useVertexNormals = true;
     config.advanced.useBackgroundQueue = false;
 }
+//--------------------------------------------------------------------------
 bool MeshLodTests::isEqual(Real a, Real b)
 {
-    Real absoluteError = std::abs(a * 0.05);
+    Real absoluteError = static_cast<Real>(std::abs(a * 0.05));
     return ((a - absoluteError) <= b) && ((a + absoluteError) >= b);
 }
+//--------------------------------------------------------------------------

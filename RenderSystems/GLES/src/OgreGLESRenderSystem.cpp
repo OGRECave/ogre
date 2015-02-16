@@ -180,6 +180,12 @@ namespace Ogre {
         return strName;
     }
 
+    const String& GLESRenderSystem::getFriendlyName(void) const
+    {
+        static String strName("OpenGL ES 1.x");
+        return strName;
+    }
+
     ConfigOptionMap& GLESRenderSystem::getConfigOptions(void)
     {
         return mGLSupport->getConfigOptions();

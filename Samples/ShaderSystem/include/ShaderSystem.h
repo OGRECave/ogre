@@ -83,16 +83,14 @@ public:
 
     void updateTargetObjInfo();
 
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-    /** @see Sample::mousePressed. */
-    bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
+    /** @see Sample::pointerPressed. */
+    bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id);
 
-    /** @see Sample::mouseReleased. */
-    bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
+    /** @see Sample::pointerReleased. */
+    bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id);
 
-    /** @see Sample::mouseMoved. */
-    bool mouseMoved(const OIS::MouseEvent& evt);
-#endif
+    /** @see Sample::pointerMoved. */
+    bool pointerMoved(const OIS::PointerEvent& evt);
 
 protected:
 
@@ -180,7 +178,7 @@ protected:
     void destroyPrivateResourceGroup();
 
     /** Pick the target object. */
-    void pickTargetObject( const OIS::MouseEvent &evt );
+    void pickTargetObject( const OIS::PointerEvent &evt );
 
     /** Apply shadow type from the given shadow menu selected index. */
     void applyShadowType(int menuIndex);

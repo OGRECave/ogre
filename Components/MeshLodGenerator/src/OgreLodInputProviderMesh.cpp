@@ -121,7 +121,7 @@ namespace Ogre
         lookup.clear();
 
         HardwareVertexBufferSharedPtr vNormalBuf;
-        unsigned char* vNormal;
+        unsigned char* vNormal = NULL;
         size_t vNormSize;
         const VertexElement* elemNormal = vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
 

@@ -172,6 +172,17 @@ namespace Ogre {
         mEmitters.erase(ei);
     }
     //-----------------------------------------------------------------------
+    void ParticleSystem::removeEmitter(ParticleEmitter* emitter)
+    {
+        ParticleEmitterList::iterator ei =
+            std::find(mEmitters.begin(), mEmitters.end(), emitter);
+        assert(
+            ei != mEmitters.end() &&
+            "Emitter is not a part of ParticleSystem!");
+        ParticleSystemManager::getSingleton()._destroyEmitter(*ei);
+        mEmitters.erase(ei);
+    }
+    //-----------------------------------------------------------------------
     void ParticleSystem::removeAllEmitters(void)
     {
         // DON'T delete directly, we don't know what heap these have been created on
@@ -888,6 +899,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultDimensions( Real width, Real height )
     {
+        assert(width >= 0 && height >= 0 && "Particle dimensions can not be negative");
         mDefaultWidth = width;
         mDefaultHeight = height;
         if (mRenderer)
@@ -898,6 +910,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultWidth(Real width)
     {
+        assert(width >= 0 && "Particle dimensions can not be negative");
         mDefaultWidth = width;
         if (mRenderer)
         {
@@ -912,6 +925,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystem::setDefaultHeight(Real height)
     {
+        assert(height >= 0 && "Particle dimensions can not be negative");
         mDefaultHeight = height;
         if (mRenderer)
         {

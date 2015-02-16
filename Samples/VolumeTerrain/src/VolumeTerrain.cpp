@@ -149,7 +149,7 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
     {
         Real radius = (Real)2.5;
         CSGSphereSource sphere(radius, intersection);
-        CSGOperationSource *operation = doUnion ? reinterpret_cast<CSGOperationSource*>(new CSGUnionSource()) : new CSGDifferenceSource();
+        CSGOperationSource *operation = doUnion ? static_cast<CSGOperationSource*>(new CSGUnionSource()) : new CSGDifferenceSource();
         static_cast<TextureSource*>(mVolumeRoot->getChunkParameters()->src)->combineWithSource(operation, &sphere, intersection, radius * (Real)1.5);
         
         mVolumeRoot->getChunkParameters()->updateFrom = intersection - radius * (Real)1.5;
@@ -162,21 +162,21 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
 //-----------------------------------------------------------------------
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-bool Sample_VolumeTerrain::touchPressed(const OIS::MultiTouchEvent& evt)
+bool Sample_VolumeTerrain::pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
 {
     Real x = (Real)evt.state.X.abs / (Real)evt.state.width;
     Real y = (Real)evt.state.Y.abs / (Real)evt.state.height;
     Ray ray = mCamera->getCameraToViewportRay(x, y);
     shootRay(ray, true);
 
-    return SdkSample::touchPressed(evt);
+    return SdkSample::pointerPressed(evt, id);
 }
 
 #else
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+bool Sample_VolumeTerrain::pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
 {
     if (mMouseState == 0)
     {
@@ -192,12 +192,13 @@ bool Sample_VolumeTerrain::mousePressed(const OIS::MouseEvent& evt, OIS::MouseBu
         }
     }
 
-    return SdkSample::mousePressed(evt, id);
+    return SdkSample::pointerPressed(evt, id);
 }
+#endif
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+bool Sample_VolumeTerrain::pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
 {
     
     if (id == OIS::MB_Middle || id == OIS::MB_Right)
@@ -205,19 +206,18 @@ bool Sample_VolumeTerrain::mouseReleased(const OIS::MouseEvent& evt, OIS::MouseB
         mMouseState = 0;
     }
 
-    return SdkSample::mouseReleased(evt, id);
+    return SdkSample::pointerReleased(evt, id);
 }
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::mouseMoved(const OIS::MouseEvent& evt)
+bool Sample_VolumeTerrain::pointerMoved(const OIS::PointerEvent& evt)
 {
     mMouseX = (Real)evt.state.X.abs / (Real)evt.state.width;
     mMouseY = (Real)evt.state.Y.abs / (Real)evt.state.height;
-    return SdkSample::mouseMoved(evt);
+    return SdkSample::pointerMoved(evt);
 }
 
-#endif
 
 //-----------------------------------------------------------------------
 

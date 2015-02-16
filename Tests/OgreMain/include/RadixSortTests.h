@@ -25,13 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __RadixSortTests_H__
+#define __RadixSortTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 class RadixSortTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( RadixSortTests );
+    CPPUNIT_TEST_SUITE(RadixSortTests);
     CPPUNIT_TEST(testFloatVector);
     CPPUNIT_TEST(testFloatList);
     CPPUNIT_TEST(testUnsignedIntList);
@@ -39,15 +43,19 @@ class RadixSortTests : public CppUnit::TestFixture
     CPPUNIT_TEST(testUnsignedIntVector);
     CPPUNIT_TEST(testIntVector);
     CPPUNIT_TEST_SUITE_END();
+
 protected:
+
 public:
     void setUp();
     void tearDown();
+
     void testFloatVector();
     void testFloatList();
     void testUnsignedIntList();
     void testIntList();
     void testUnsignedIntVector();
     void testIntVector();
-
 };
+
+#endif

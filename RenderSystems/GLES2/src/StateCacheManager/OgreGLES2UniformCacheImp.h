@@ -41,7 +41,7 @@ namespace Ogre
     class _OgreGLES2Export GLES2UniformCacheImp : public UniformCacheAlloc
     {
     private:
-        typedef HashMap<GLint, uint32> UniformMap;
+        typedef OGRE_HashMap<GLint, uint32> UniformMap;
 
         /// A map of uniform names and a hash of their values
         UniformMap mUniformValueMap;

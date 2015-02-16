@@ -62,7 +62,13 @@ namespace Ogre {
             break;            
         case ZZIP_CORRUPTED:
             errorMsg = "Corrupted archive.";
-            break;            
+            break;
+        case ZZIP_DIR_TOO_SHORT:
+            errorMsg = "Zip file is too short.";
+            break;
+        case ZZIP_DIR_EDH_MISSING:
+            errorMsg = "Zip-file's central directory record missing. Is this a 7z file?";
+            break;
         default:
             errorMsg = "Unknown error.";
             break;            
@@ -134,7 +140,7 @@ namespace Ogre {
     
     }
     //-----------------------------------------------------------------------
-    DataStreamPtr ZipArchive::open(const String& filename, bool readOnly) const
+    DataStreamPtr ZipArchive::open(const String& filename, bool readOnly)
     {
         // zziplib is not threadsafe
         OGRE_LOCK_AUTO_MUTEX;
@@ -174,7 +180,7 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    DataStreamPtr ZipArchive::create(const String& filename) const
+    DataStreamPtr ZipArchive::create(const String& filename)
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
             "Modification of zipped archives is not supported", 
@@ -182,8 +188,11 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void ZipArchive::remove(const String& filename) const
+    void ZipArchive::remove(const String& filename)
     {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+            "Modification of zipped archives is not supported", 
+            "ZipArchive::remove");
     }
     //-----------------------------------------------------------------------
     StringVectorPtr ZipArchive::list(bool recursive, bool dirs)
@@ -237,7 +246,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     FileInfoListPtr ZipArchive::findFileInfo(const String& pattern, 
-        bool recursive, bool dirs) const
+        bool recursive, bool dirs)
     {
         OGRE_LOCK_AUTO_MUTEX;
         FileInfoListPtr ret = FileInfoListPtr(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
@@ -347,7 +356,7 @@ namespace Ogre {
         return was_avail + (size_t)r;
     }
     //---------------------------------------------------------------------
-    size_t ZipDataStream::write(void* buf, size_t count)
+    size_t ZipDataStream::write(const void* buf, size_t count)
     {
         // not supported
         return 0;

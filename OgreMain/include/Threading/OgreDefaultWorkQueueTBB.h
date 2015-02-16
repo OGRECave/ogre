@@ -64,7 +64,9 @@ namespace Ogre
         virtual void notifyWorkers();
 
     private:
+#if OGRE_NO_TBB_SCHEDULER == 0
         tbb::task_scheduler_init mTaskScheduler;
+#endif
         tbb::task_group mTaskGroup;
         /// Synchronise registering threads with the RenderSystem
         OGRE_MUTEX(mRegisterRSMutex);

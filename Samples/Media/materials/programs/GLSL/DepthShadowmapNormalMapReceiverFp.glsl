@@ -30,7 +30,7 @@ void main()
 
 	vec4 shadowUV = oUv;
 	// point on shadowmap
-	shadowUV.xy = shadowUV.xy / shadowUV.w;
+	shadowUV = shadowUV / shadowUV.w;
 	float centerdepth = texture2D(shadowMap, shadowUV.xy).x;
     
     // gradient calculation

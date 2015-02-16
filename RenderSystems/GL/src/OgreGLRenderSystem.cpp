@@ -182,6 +182,13 @@ namespace Ogre {
         return strName;
     }
 
+
+	const String& GLRenderSystem::getFriendlyName(void) const
+	{
+		static String strName("OpenGL");
+		return strName;
+	}
+
     void GLRenderSystem::initConfigOptions(void)
     {
         mGLSupport->addConfig();
@@ -1327,7 +1334,7 @@ namespace Ogre {
         if (!lt)
         {
             // Disable in the scene
-            mStateCacheManager-> setEnabled(gl_index, false);
+            mStateCacheManager->setEnabled(gl_index, false);
         }
         else
         {
@@ -2004,10 +2011,11 @@ namespace Ogre {
     {
         bool a2c = false;
         static bool lasta2c = false;
+        bool enable = func != CMPF_ALWAYS_PASS;
 
-        mStateCacheManager->setEnabled(GL_ALPHA_TEST, func == CMPF_ALWAYS_PASS);
+        mStateCacheManager->setEnabled(GL_ALPHA_TEST, enable);
 
-        if(func != CMPF_ALWAYS_PASS)
+        if(enable)
         {
             a2c = alphaToCoverage;
             glAlphaFunc(convertCompareFunction(func), value / 255.0f);
@@ -2076,6 +2084,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_beginFrame(void)
     {
+        mCurrentContext->setCurrent();
         // Activate the viewport clipping
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
     }
@@ -2149,7 +2158,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setDepthBufferCheckEnabled(bool enabled)
     {
-        mStateCacheManager->setClearDepth(1.0f);
+        if (enabled)
+        {
+            mStateCacheManager->setClearDepth(1.0f);
+        }
         mStateCacheManager->setEnabled(GL_DEPTH_TEST, enabled);
     }
     //-----------------------------------------------------------------------------
@@ -2168,11 +2180,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
-        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL, constantBias != 0 || slopeScaleBias != 0);
-        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_POINT, constantBias != 0 || slopeScaleBias != 0);
-        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_LINE, constantBias != 0 || slopeScaleBias != 0);
+        bool enable = constantBias != 0 || slopeScaleBias != 0;
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL, enable);
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_POINT, enable);
+        mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_LINE, enable);
 
-        if (constantBias != 0 || slopeScaleBias != 0)
+        if (enable)
         {
             glPolygonOffset(-slopeScaleBias, -constantBias);
         }
@@ -3297,6 +3310,9 @@ namespace Ogre {
         bool colourMask = !mColourWrite[0] || !mColourWrite[1]
             || !mColourWrite[2] || !mColourWrite[3];
 
+        if(mCurrentContext)
+			mCurrentContext->setCurrent();
+
         GLbitfield flags = 0;
         if (buffers & FBT_COLOUR)
         {
@@ -3563,6 +3579,9 @@ namespace Ogre {
             {
                 // Enable / disable sRGB states
                 mStateCacheManager->setEnabled(GL_FRAMEBUFFER_SRGB_EXT, target->isHardwareGammaEnabled());
+                // Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE_EXT here before
+                // enabling, but GL spec says incapable surfaces ignore the setting
+                // anyway. We test the capability to enable isHardwareGammaEnabled.
             }
         }
     }
@@ -3828,5 +3847,42 @@ namespace Ogre {
             };
         } // isCustomAttrib
     }
+	
+	//---------------------------------------------------------------------
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	bool GLRenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+	{
+		bool result = true;
 
+		switch (colourBuffer)
+		{
+		case CBT_BACK:
+			glDrawBuffer(GL_BACK);
+			break;
+		case CBT_BACK_LEFT:
+			glDrawBuffer(GL_BACK_LEFT);
+			break;
+		case CBT_BACK_RIGHT:
+			glDrawBuffer(GL_BACK_RIGHT);
+			break;
+		default:
+			result = false;
+		}
+
+		// Check for any errors
+		GLenum error = glGetError();
+		if (result && GL_NO_ERROR != error)
+		{		
+			const GLubyte* errorCode = gluErrorString(error);
+			String errorString = "GLRenderSystem::setDrawBuffer(" 
+				+ Ogre::StringConverter::toString(colourBuffer) + "): " + (const char*)errorCode;
+
+			Ogre::LogManager::getSingleton().logMessage(errorString);			
+			result = false;
+		}
+
+		return result;
+	}
+#endif
+	//---------------------------------------------------------------------
 }

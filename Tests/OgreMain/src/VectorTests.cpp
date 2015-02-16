@@ -30,22 +30,27 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreVector4.h"
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( VectorTests );
+#include "UnitTestSuite.h"
 
 using namespace Ogre;
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(VectorTests);
+
+//--------------------------------------------------------------------------
 void VectorTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
 }
-
+//--------------------------------------------------------------------------
 void VectorTests::tearDown()
 {
 }
-
-
+//--------------------------------------------------------------------------
 void VectorTests::testVector2Scaler()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     CPPUNIT_ASSERT_EQUAL(Vector2(1, 1) + Vector2(2, 2), Vector2(3, 3));
     CPPUNIT_ASSERT_EQUAL(1 + Vector2(2), Vector2(3, 3));
     Vector2 v1;
@@ -63,9 +68,11 @@ void VectorTests::testVector2Scaler()
     v1 -= 4;
     CPPUNIT_ASSERT_EQUAL(v1, Vector2(-6));
 }
-
+//--------------------------------------------------------------------------
 void VectorTests::testVector3Scaler()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     CPPUNIT_ASSERT_EQUAL(Vector3(1, 1, 1) + Vector3(2, 2, 2), Vector3(3, 3, 3));
     CPPUNIT_ASSERT_EQUAL(1 + Vector3(2), Vector3(3, 3, 3));
     Vector3 v1;
@@ -83,9 +90,11 @@ void VectorTests::testVector3Scaler()
     v1 -= 4;
     CPPUNIT_ASSERT_EQUAL(v1, Vector3(-6));
 }
-
+//--------------------------------------------------------------------------
 void VectorTests::testVector4Scaler()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     CPPUNIT_ASSERT_EQUAL(Vector4(1, 1, 1, 1) + Vector4(2, 2, 2, 2), Vector4(3, 3, 3, 3));
     CPPUNIT_ASSERT_EQUAL(1 + Vector4(2, 2, 2, 2), Vector4(3, 3, 3, 3));
     Vector4 v1;
@@ -103,3 +112,4 @@ void VectorTests::testVector4Scaler()
     v1 -= 4;
     CPPUNIT_ASSERT_EQUAL(v1, Vector4(-6,-6,-6,-6));
 }
+//--------------------------------------------------------------------------

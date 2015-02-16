@@ -228,15 +228,9 @@ namespace OgreBites
         virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
         virtual bool keyPressed(const OIS::KeyEvent& evt) { return true; }
         virtual bool keyReleased(const OIS::KeyEvent& evt) { return true; }
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-        virtual bool touchMoved(const OIS::MultiTouchEvent& evt) { return true; }
-        virtual bool touchPressed(const OIS::MultiTouchEvent& evt) { return true; }
-        virtual bool touchReleased(const OIS::MultiTouchEvent& evt) { return true; }
-#else
-        virtual bool mouseMoved(const OIS::MouseEvent& evt) { return true; }
-        virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id) { return true; }
-        virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id) { return true; }
-#endif
+        virtual bool pointerMoved(const OIS::PointerEvent& evt) { return true; }
+        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id) { return true; }
+        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id) { return true; }
 
     protected:
 

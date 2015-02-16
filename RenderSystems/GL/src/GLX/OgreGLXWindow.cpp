@@ -183,6 +183,15 @@ namespace Ogre
             if ((opt = miscParams->find("externalGLControl")) != end)
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			if ((opt = miscParams->find("stereoMode")) != end)
+			{
+				StereoModeType stereoMode = StringConverter::parseStereoMode(opt->second);
+				if (SMT_NONE != stereoMode)
+					mStereoEnabled = true;
+			}
+#endif
+
             if((opt = miscParams->find("parentWindowHandle")) != end) 
             {
                 vector<String>::type tokens = StringUtil::split(opt->second, " :");
@@ -283,6 +292,9 @@ namespace Ogre
                 GLX_RED_SIZE,      1,
                 GLX_BLUE_SIZE,    1,
                 GLX_GREEN_SIZE,  1,
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+				GLX_STEREO, mStereoEnabled ? True : False,
+#endif
                 None
             };
             
@@ -722,9 +734,9 @@ namespace Ogre
         if (mClosed)
             return;
         
-        if ((dst.right > mWidth) ||
-            (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "GLXWindow::copyContentsToMemory" );
         }

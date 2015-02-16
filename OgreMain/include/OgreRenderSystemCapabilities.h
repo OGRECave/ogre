@@ -271,9 +271,10 @@ namespace Ogre
         GPU_MS_WARP = 12, // Microsoft WARP (Windows Advanced Rasterization Platform) software device - http://msdn.microsoft.com/en-us/library/dd285359.aspx
         GPU_ARM = 13, // For the Mali chipsets
         GPU_QUALCOMM = 14,
-
+        GPU_MOZILLA = 15, // WebGL on Mozilla/Firefox based browser
+        GPU_WEBKIT = 16, // WebGL on WebKit/Chrome base browser
         /// placeholder
-        GPU_VENDOR_COUNT = 15
+        GPU_VENDOR_COUNT = 17
     };
 
     /** singleton class for storing the capabilities of the graphics card. 

@@ -36,6 +36,35 @@
 #define OIS_WITH_MULTITOUCH     0
 #endif
 
+namespace OIS
+{
+	class PointerState
+	{
+	public:
+		PointerState(const MouseState& state)      : width(state.width), height(state.height), X(state.X), Y(state.Y), Z(state.Z) {}
+#if OIS_WITH_MULTITOUCH
+		PointerState(const MultiTouchState& state) : width(state.width), height(state.height), X(state.X), Y(state.Y), Z(state.Z) {}
+#endif
+	public:
+		int width, height;
+		Axis X, Y, Z;
+	};
+
+	class PointerEvent : public EventArg
+	{
+	public:
+		PointerEvent(Object *obj, const PointerState &state) : EventArg(obj), state(state) {}
+		PointerEvent(const MouseEvent& evt) : EventArg(const_cast<Object*>(evt.device)), state(evt.state) {}
+#if OIS_WITH_MULTITOUCH
+		PointerEvent(const MultiTouchEvent& evt) : EventArg(const_cast<Object*>(evt.device)), state(evt.state) {}
+#endif
+		virtual ~PointerEvent() {}
+
+	public:
+		PointerState state;
+	};
+}
+
 namespace OgreBites
 {
     /*=============================================================================

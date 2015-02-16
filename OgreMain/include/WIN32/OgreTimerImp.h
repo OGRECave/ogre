@@ -28,6 +28,8 @@ THE SOFTWARE.
 #ifndef __Win32Timer_H__
 #define __Win32Timer_H__
 
+#include "../OgrePrerequisites.h"
+
 #ifndef WIN32_LEAN_AND_MEAN
 #   define WIN32_LEAN_AND_MEAN
 #endif

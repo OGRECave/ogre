@@ -99,7 +99,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mMultisampleFB));
     }
     
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     void GLES2FrameBufferObject::notifyOnContextLost()
     {
         mManager->releaseRenderBuffer(mDepth);

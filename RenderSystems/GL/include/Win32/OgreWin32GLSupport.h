@@ -85,6 +85,14 @@ namespace Ogre
         virtual bool supportsPBuffers();
         virtual GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height);
         virtual unsigned int getDisplayMonitorCount() const;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        void setStereoModeType(StereoModeType stereoMode)
+        {
+          mStereoMode = stereoMode;
+        }
+#endif
+
     private:
         // Allowed video modes
         vector<DEVMODE>::type mDevModes;
@@ -93,6 +101,10 @@ namespace Ogre
         bool mHasPixelFormatARB;
         bool mHasMultisample;
         bool mHasHardwareGamma;
+		
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		StereoModeType mStereoMode;
+#endif
 
         struct DisplayMonitorInfo
         {

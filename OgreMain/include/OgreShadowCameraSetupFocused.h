@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreShadowCameraSetup.h"
 
 #include "OgreHeaderPrefix.h"
-
+#include "OgreAxisAlignedBox.h"
 
 namespace Ogre {
 

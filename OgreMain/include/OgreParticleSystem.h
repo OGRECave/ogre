@@ -208,7 +208,14 @@ namespace Ogre {
         /** Removes all the emitters from this system. */
         void removeAllEmitters(void);
 
-
+        /** Removes an emitter from the system.
+        @remarks
+            Drops the emitter from this system.
+        @param
+            emitter Pointer to a particle emitter.
+        */
+        void removeEmitter(ParticleEmitter *emitter);
+        
         /** Adds an affector to this particle system.
         @remarks
             Particles are modified over time in a particle system by affectors - see the ParticleAffector
@@ -477,9 +484,9 @@ namespace Ogre {
                 all the particles in the set are the default size. It is possible to alter the size of individual
                 particles at the expense of extra calculation. See the Particle class for more info.
             @param width
-                The new default width for the particles in this set.
+                The new default width for the particles in this set. Must be non-negative!
             @param height
-                The new default height for the particles in this set.
+                The new default height for the particles in this set. Must be non-negative!
         */
         virtual void setDefaultDimensions(Real width, Real height);
 

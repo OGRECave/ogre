@@ -52,7 +52,7 @@ namespace Ogre {
         NSView *mView;
         NSOpenGLContext *mGLContext;
         NSOpenGLPixelFormat *mGLPixelFormat;
-        NSPoint mWindowOrigin;
+        NSPoint mWindowOriginPt;
         OSXCocoaWindowDelegate *mWindowDelegate;
         OSXCocoaContext* mContext;
 
@@ -67,7 +67,9 @@ namespace Ogre {
         float mContentScalingFactor;
         bool mContentScalingSupported;
 
-        void _setWindowParameters(void);
+        int _getPixelFromPoint(int viewPt) const;
+        void _setWindowParameters(unsigned int widthPt, unsigned int heightPt);
+        
     public:
         OSXCocoaWindow();
         ~OSXCocoaWindow();
@@ -78,7 +80,10 @@ namespace Ogre {
         NSOpenGLPixelFormat* nsopenGLPixelFormat() const { return mGLPixelFormat; };
         void createWithView(OgreView *view);
 
-        void create(const String& name, unsigned int width, unsigned int height,
+        /** @copydoc see RenderWindow::getViewPointToPixelScale */
+        float getViewPointToPixelScale();
+        /** Overridden - see RenderWindow */
+        void create(const String& name, unsigned int widthPt, unsigned int heightPt,
                 bool fullScreen, const NameValuePairList *miscParams);
         /** Overridden - see RenderWindow */
         void destroy(void);
@@ -95,15 +100,15 @@ namespace Ogre {
         /** @copydoc see RenderWindow::isVSyncEnabled */
         bool isVSyncEnabled() const;
         /** Overridden - see RenderWindow */
-        void reposition(int left, int top);
+        void reposition(int leftPt, int topPt);
         /** Overridden - see RenderWindow */
-        void resize(unsigned int width, unsigned int height);
+        void resize(unsigned int widthPt, unsigned int heightPt);
         /** Overridden - see RenderWindow */
         void swapBuffers();
         /** Overridden - see RenderTarget */
         virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
         /** Overridden - see RenderWindow */
-        virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
+        virtual void setFullscreen(bool fullScreen, unsigned int widthPt, unsigned int heightPt);
         /** Overridden - see RenderWindow */
         virtual unsigned int getWidth(void) const;
         /** Overridden - see RenderWindow */

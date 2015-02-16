@@ -44,7 +44,8 @@ namespace Ogre
     class D3D9Device;
     class D3D9DeviceManager;
     class D3D9ResourceManager;
-
+	class D3D9StereoDriverBridge;
+	
     /**
     Implementation of DirectX9 as a rendering system.
     */
@@ -63,8 +64,12 @@ namespace Ogre
         IDirect3D9*  mD3D;      
         // Stored options
         ConfigOptionMap mOptions;
+        // TODO: remove following fields, use values directly from mOptions map as other render systems does
         size_t mFSAASamples;
         String mFSAAHint;
+        bool mVSync; 
+        unsigned int mVSyncInterval;
+        unsigned int mBackBufferCount; // -1 means 2 for vsync and 1 for no vsync
 
         /// instance
         HINSTANCE mhInstance;
@@ -154,7 +159,7 @@ namespace Ogre
         bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
         void detachRenderTargetImpl(const String& name);
         
-        HashMap<IDirect3DDevice9*, unsigned short> mCurrentLights;
+        OGRE_HashMap<IDirect3DDevice9*, unsigned short> mCurrentLights;
         /// Saved last view matrix
         Matrix4 mViewMatrix;
 
@@ -166,10 +171,14 @@ namespace Ogre
         
         /** Mapping of texture format -> DepthStencil. Used as cache by _getDepthStencilFormatFor
         */
-        typedef HashMap<unsigned int, D3DFORMAT> DepthStencilHash;
+        typedef OGRE_HashMap<unsigned int, D3DFORMAT> DepthStencilHash;
         DepthStencilHash mDepthStencilHash;
 
         MultiheadUseType mMultiheadUse;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        D3D9StereoDriverBridge* mStereoDriver;
+#endif
 
     protected:
         void setClipPlanesImpl(const PlaneList& clipPlanes);        
@@ -237,6 +246,9 @@ namespace Ogre
 
         String getErrorDescription( long errorNumber ) const;
         const String& getName() const;
+
+		const String& getFriendlyName() const;
+
         // Low-level overridden members
         void setConfigOption( const String &name, const String &value );
         void reinitialise();
@@ -347,7 +359,9 @@ namespace Ogre
         Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
         */
         virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
-        
+
+		bool IsActiveDeviceLost();
+
         /// Tells whether the system is initialized with DirectX 9Ex driver
         /// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
         static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
@@ -393,6 +407,15 @@ namespace Ogre
 
         /// Returns how multihead should be activated
         MultiheadUseType getMultiheadUse() const { return mMultiheadUse; }
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        /// @copydoc RenderSystem::setDrawBuffer
+        virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+
+        /// Creates a bridge to the Direct3D stereo driver implementation
+        void createStereoDriver(const NameValuePairList* miscParams);
+#endif
+
     protected:  
         /// Returns the sampler id for a given unit texture number
         DWORD getSamplerId(size_t unit);

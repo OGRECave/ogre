@@ -63,6 +63,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLESGpuProgram::~GLSLESGpuProgram()
     {
+		// This workaround is needed otherwise we carry on some dangling pointers
+		GLSLESLinkProgramManager::getSingletonPtr()->destroyAllByProgram(this);
+
         // Have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         unload();

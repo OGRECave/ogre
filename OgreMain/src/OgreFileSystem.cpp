@@ -36,7 +36,7 @@ THE SOFTWARE.
     OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
     OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || \
     OGRE_PLATFORM == OGRE_PLATFORM_NACL || \
-    OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
+    OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 #   include "OgreSearchOps.h"
 #   include <sys/param.h>
 #   define MAX_PATH MAXPATHLEN
@@ -99,7 +99,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void FileSystemArchive::findFiles(const String& pattern, bool recursive, 
-        bool dirs, StringVector* simpleList, FileInfoList* detailList) const
+        bool dirs, StringVector* simpleList, FileInfoList* detailList)
     {
         intptr_t lHandle, res;
         struct _finddata_t tagData;
@@ -200,7 +200,7 @@ namespace Ogre {
         // nothing to see here, move along
     }
     //-----------------------------------------------------------------------
-    DataStreamPtr FileSystemArchive::open(const String& filename, bool readOnly) const
+    DataStreamPtr FileSystemArchive::open(const String& filename, bool readOnly)
     {
         String full_path = concatenate_path(mName, filename);
 
@@ -267,7 +267,7 @@ namespace Ogre {
         return DataStreamPtr(stream);
     }
     //---------------------------------------------------------------------
-    DataStreamPtr FileSystemArchive::create(const String& filename) const
+    DataStreamPtr FileSystemArchive::create(const String& filename)
     {
         if (isReadOnly())
         {
@@ -300,7 +300,7 @@ namespace Ogre {
         return DataStreamPtr(stream);
     }
     //---------------------------------------------------------------------
-    void FileSystemArchive::remove(const String& filename) const
+    void FileSystemArchive::remove(const String& filename)
     {
         if (isReadOnly())
         {
@@ -347,7 +347,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     FileInfoListPtr FileSystemArchive::findFileInfo(const String& pattern, 
-        bool recursive, bool dirs) const
+        bool recursive, bool dirs)
     {
         // Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
         FileInfoListPtr ret(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);

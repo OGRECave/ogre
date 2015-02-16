@@ -9,10 +9,12 @@
 
 set(HEADER_FILES
     include/ParticleTest.h
+    include/TextureBlitTest.h
     include/VTestPlugin.h)
 
 set(SOURCE_FILES
     src/TextureEffectsTest.cpp
+    src/TextureBlitTest.cpp
     src/CubeMappingTest.cpp
     src/TransparencyTest.cpp
     src/ParticleTest.cpp

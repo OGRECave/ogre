@@ -30,25 +30,44 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreCommon.h"
 
-// Register the suite
-//CPPUNIT_TEST_SUITE_REGISTRATION( FileSystemArchiveTests );
+#include "UnitTestSuite.h"
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(FileSystemArchiveTests);
+
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::setUp()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    testPath = "../../../../Tests/OgreMain/misc/ArchiveTest/";
-#else
-    testPath = "../../Tests/OgreMain/misc/ArchiveTest/";
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
+    mFileSizeRoot1 = 0;
+    mFileSizeRoot2 = 0;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+    mTestPath = macBundlePath() + "/Contents/Resources/Media/misc/ArchiveTest";
+    mFileSizeRoot1 = 125;
+    mFileSizeRoot2 = 150;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    mTestPath = "./Tests/OgreMain/misc/ArchiveTest";
+    mFileSizeRoot1 = 130;
+    mFileSizeRoot2 = 156;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    mTestPath = "../../Tests/OgreMain/misc/ArchiveTest";
+    mFileSizeRoot1 = 125;
+    mFileSizeRoot2 = 150;
 #endif
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::tearDown()
 {
 }
-
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testListNonRecursive()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     try {
-        FileSystemArchive arch(testPath, "FileSystem", true);
+        FileSystemArchive arch(mTestPath, "FileSystem", true);
         arch.load();
         StringVectorPtr vec = arch.list(false);
 
@@ -60,63 +79,79 @@ void FileSystemArchiveTests::testListNonRecursive()
     {
         std::cout << e.getFullDescription();
     }
-
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testListRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
     StringVectorPtr vec = arch.list(true);
 
-    CPPUNIT_ASSERT_EQUAL((size_t)48, vec->size()); // 48 including CVS folders!
+    CPPUNIT_ASSERT_EQUAL((size_t)6, vec->size());
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), vec->at(0));
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), vec->at(1));
     CPPUNIT_ASSERT_EQUAL(String("level1/materials/scripts/file.material"), vec->at(2));
     CPPUNIT_ASSERT_EQUAL(String("level1/materials/scripts/file2.material"), vec->at(3));
-    CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file3.material"), vec->at(22));
-    CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file4.material"), vec->at(23));
+    CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file3.material"), vec->at(4));
+    CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file4.material"), vec->at(5));
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testListFileInfoNonRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
     FileInfoListPtr vec = arch.listFileInfo(false);
 
-    //CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
-    //FileInfo& fi1 = vec->at(0);
-    //CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    //CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
-    //CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
-    //CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.compressedSize);
-    //CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
+    // Only execute size checks, if the values have been set for the current platform
+    if(mFileSizeRoot1 >0 && mFileSizeRoot2 > 0) 
+    {
+        CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
+        FileInfo& fi1 = vec->at(0);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
+        CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot1, fi1.compressedSize);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot1, fi1.uncompressedSize);
 
-    //FileInfo& fi2 = vec->at(1);
-    //CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    //CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
-    //CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
-    //CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.compressedSize);
-    //CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
+        FileInfo& fi2 = vec->at(1);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
+        CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot2, fi2.compressedSize);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot2, fi2.uncompressedSize);
+    }
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testListFileInfoRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
     FileInfoListPtr vec = arch.listFileInfo(true);
 
-    CPPUNIT_ASSERT_EQUAL((size_t)48, vec->size()); // 48 including CVS folders!
-    FileInfo& fi1 = vec->at(0);
-    CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
-    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
-    CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.compressedSize);
-    CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
+    // Only execute size checks, if the values have been set for the current platform
+    if(mFileSizeRoot1 >0 && mFileSizeRoot2 > 0) 
+    {
+        CPPUNIT_ASSERT_EQUAL((size_t)6, vec->size()); 
+        FileInfo& fi1 = vec->at(0);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
+        CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot1, fi1.compressedSize);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot1, fi1.uncompressedSize);
 
-    FileInfo& fi2 = vec->at(1);
-    CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
-    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
-    CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.compressedSize);
-    CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
+        FileInfo& fi2 = vec->at(1);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
+        CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot2, fi2.compressedSize);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot2, fi2.uncompressedSize);
+    }
 
     FileInfo& fi3 = vec->at(2);
     CPPUNIT_ASSERT_EQUAL(String("level1/materials/scripts/file.material"), fi3.filename);
@@ -132,24 +167,26 @@ void FileSystemArchiveTests::testListFileInfoRecursive()
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi4.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi4.uncompressedSize);
 
-
-    FileInfo& fi5 = vec->at(22);
+    FileInfo& fi5 = vec->at(4);
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file3.material"), fi5.filename);
     CPPUNIT_ASSERT_EQUAL(String("file3.material"), fi5.basename);
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/"), fi5.path);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi5.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi5.uncompressedSize);
 
-    FileInfo& fi6 = vec->at(23);
+    FileInfo& fi6 = vec->at(5);
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file4.material"), fi6.filename);
     CPPUNIT_ASSERT_EQUAL(String("file4.material"), fi6.basename);
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/"), fi6.path);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi6.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi6.uncompressedSize);
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testFindNonRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
     StringVectorPtr vec = arch.find("*.txt", false);
 
@@ -157,9 +194,12 @@ void FileSystemArchiveTests::testFindNonRecursive()
     CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), vec->at(0));
     CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), vec->at(1));
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testFindRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
     StringVectorPtr vec = arch.find("*.material", true);
 
@@ -169,30 +209,40 @@ void FileSystemArchiveTests::testFindRecursive()
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file3.material"), vec->at(2));
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file4.material"), vec->at(3));
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testFindFileInfoNonRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
     FileInfoListPtr vec = arch.findFileInfo("*.txt", false);
 
-    CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
-    FileInfo& fi1 = vec->at(0);
-    CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
-    CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
-    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
-    CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.compressedSize);
-    CPPUNIT_ASSERT_EQUAL((size_t)130, fi1.uncompressedSize);
+    // Only execute size checks, if the values have been set for the current platform
+    if(mFileSizeRoot1 >0 && mFileSizeRoot2 > 0) 
+    {
+        CPPUNIT_ASSERT_EQUAL((size_t)2, vec->size());
+        FileInfo& fi1 = vec->at(0);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.filename);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile.txt"), fi1.basename);
+        CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi1.path);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot1, fi1.compressedSize);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot1, fi1.uncompressedSize);
 
-    FileInfo& fi2 = vec->at(1);
-    CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
-    CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
-    CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
-    CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.compressedSize);
-    CPPUNIT_ASSERT_EQUAL((size_t)156, fi2.uncompressedSize);
+        FileInfo& fi2 = vec->at(1);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.filename);
+        CPPUNIT_ASSERT_EQUAL(String("rootfile2.txt"), fi2.basename);
+        CPPUNIT_ASSERT_EQUAL(BLANKSTRING, fi2.path);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot2, fi2.compressedSize);
+        CPPUNIT_ASSERT_EQUAL((size_t)mFileSizeRoot2, fi2.uncompressedSize);
+    }
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testFindFileInfoRecursive()
 {
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
     FileInfoListPtr vec = arch.findFileInfo("*.material", true);
 
@@ -212,7 +262,6 @@ void FileSystemArchiveTests::testFindFileInfoRecursive()
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi4.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi4.uncompressedSize);
 
-
     FileInfo& fi5 = vec->at(2);
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/file3.material"), fi5.filename);
     CPPUNIT_ASSERT_EQUAL(String("file3.material"), fi5.basename);
@@ -227,9 +276,12 @@ void FileSystemArchiveTests::testFindFileInfoRecursive()
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi6.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi6.uncompressedSize);
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testFileRead()
 {
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
 
     DataStreamPtr stream = arch.open("rootfile.txt");
@@ -240,13 +292,14 @@ void FileSystemArchiveTests::testFileRead()
     CPPUNIT_ASSERT_EQUAL(String("this is line 5 in file 1"), stream->getLine());
     CPPUNIT_ASSERT_EQUAL(BLANKSTRING, stream->getLine()); // blank at end of file
     CPPUNIT_ASSERT(stream->eof());
-
 }
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testReadInterleave()
 {
-    // Test overlapping reads from same archive
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
-    FileSystemArchive arch(testPath, "FileSystem", true);
+    // Test overlapping reads from same archive
+    FileSystemArchive arch(mTestPath, "FileSystem", true);
     arch.load();
 
     // File 1
@@ -259,8 +312,7 @@ void FileSystemArchiveTests::testReadInterleave()
     CPPUNIT_ASSERT_EQUAL(String("this is line 1 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 2 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 3 in file 2"), stream2->getLine());
-
-
+    
     // File 1
     CPPUNIT_ASSERT_EQUAL(String("this is line 3 in file 1"), stream1->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 4 in file 1"), stream1->getLine());
@@ -268,18 +320,18 @@ void FileSystemArchiveTests::testReadInterleave()
     CPPUNIT_ASSERT_EQUAL(BLANKSTRING, stream1->getLine()); // blank at end of file
     CPPUNIT_ASSERT(stream1->eof());
 
-
     // File 2
     CPPUNIT_ASSERT_EQUAL(String("this is line 4 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 5 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 6 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(BLANKSTRING, stream2->getLine()); // blank at end of file
     CPPUNIT_ASSERT(stream2->eof());
-
 }
-
+//--------------------------------------------------------------------------
 void FileSystemArchiveTests::testCreateAndRemoveFile()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     FileSystemArchive arch("./", "FileSystem", false);
     arch.load();
 
@@ -297,5 +349,5 @@ void FileSystemArchiveTests::testCreateAndRemoveFile()
     arch.remove(fileName);
 
     CPPUNIT_ASSERT(!arch.exists(fileName));
-
 }
+//--------------------------------------------------------------------------

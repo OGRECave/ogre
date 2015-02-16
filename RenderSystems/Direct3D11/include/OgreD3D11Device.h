@@ -36,52 +36,32 @@ namespace Ogre
     class D3D11Device
     {
     private:
-        ID3D11DeviceN * mD3D11Device;
-        ID3D11DeviceContextN * mImmediateContext;
-        ID3D11InfoQueue * mInfoQueue; 
+        ID3D11DeviceN*             mD3D11Device;
+        ID3D11DeviceContextN*      mImmediateContext;
+        ID3D11ClassLinkage*        mClassLinkage;
+        ID3D11InfoQueue*           mInfoQueue;
+#if OGRE_D3D11_PROFILING
+        ID3DUserDefinedAnnotation* mPerf;
+#endif
 
-        // Storing class linkage
-        ID3D11ClassLinkage* mClassLinkage;
+        const D3D11Device& operator=(D3D11Device& device); /* intentionally not implemented */
 
-        struct ThreadInfo
-        {
-            ID3D11DeviceContextN* mContext;
-            void* mEventHandle;
-
-            ThreadInfo(ID3D11DeviceContextN* context)
-                : mContext(context)
-                , mEventHandle(0)
-            {
-                mEventHandle = CreateEventEx(0, TEXT("ThreadContextEvent"), 0, EVENT_ALL_ACCESS);
-            }
-
-            ~ThreadInfo()
-            {
-                SAFE_RELEASE(mContext);
-
-                CloseHandle(mEventHandle);
-            }
-        };
-
-        D3D11Device();
     public:
-
-
-        D3D11Device(ID3D11DeviceN * device);
-
+        D3D11Device();
         ~D3D11Device();
 
-        inline ID3D11DeviceContextN * GetImmediateContext()
-        {
-            return mImmediateContext;
-        }
+        void ReleaseAll();
+        void TransferOwnership(ID3D11DeviceN* device);
+
+        bool isNull()                                { return mD3D11Device == 0; }
+        ID3D11DeviceN* get()                         { return mD3D11Device; }
+        ID3D11DeviceContextN* GetImmediateContext()  { return mImmediateContext; }
+        ID3D11ClassLinkage* GetClassLinkage()        { return mClassLinkage; }
+#if OGRE_D3D11_PROFILING
+        ID3DUserDefinedAnnotation* GetProfiler()     { return mPerf; }
+#endif
         
-        inline ID3D11ClassLinkage* GetClassLinkage()
-        {
-            return mClassLinkage;
-        }
-        
-        inline ID3D11DeviceN * operator->() const
+        ID3D11DeviceN* operator->() const
         {
             assert(mD3D11Device); 
             if (D3D_NO_EXCEPTION != mExceptionsErrorLevel)
@@ -91,25 +71,11 @@ namespace Ogre
             return mD3D11Device;
         }
 
-        const void clearStoredErrorMessages(  ) const;
+        String getErrorDescription(const HRESULT hr = NO_ERROR) const;
+        void clearStoredErrorMessages() const;
+        bool _getErrorsFromQueue() const;
 
-        ID3D11DeviceN * operator=(ID3D11DeviceN * device);
-        const bool isNull();
-        const String getErrorDescription(const HRESULT hr = NO_ERROR) const;
-
-        inline const bool isError(  ) const
-        {
-            if (D3D_NO_EXCEPTION == mExceptionsErrorLevel)
-            {
-                return  false;
-            }
-
-            return _getErrorsFromQueue();
-        }
-
-        const bool _getErrorsFromQueue() const;
-        void release();
-        ID3D11DeviceN * get();
+        bool isError() const                         { return (D3D_NO_EXCEPTION == mExceptionsErrorLevel) ? false : _getErrorsFromQueue(); }
 
         enum eExceptionsErrorLevel
         {
@@ -123,8 +89,6 @@ namespace Ogre
         static eExceptionsErrorLevel mExceptionsErrorLevel;
         static void setExceptionsErrorLevel(const eExceptionsErrorLevel exceptionsErrorLevel);
         static const eExceptionsErrorLevel getExceptionsErrorLevel();
-
-
     };
 }
 #endif

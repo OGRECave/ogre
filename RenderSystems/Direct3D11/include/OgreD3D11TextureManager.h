@@ -46,17 +46,6 @@ namespace Ogre
         D3D11TextureManager( D3D11Device & device );
         ~D3D11TextureManager();
 
-        /** Release all textures in the default memory pool. 
-        @remarks
-        Method for dealing with lost devices.
-        */
-        void releaseDefaultPoolResources(void);
-        /** Recreate all textures in the default memory pool. 
-        @remarks
-        Method for dealing with lost devices.
-        */
-        void recreateDefaultPoolResources(void);
-
         /// @copydoc TextureManager::getNativeFormat
         PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
 

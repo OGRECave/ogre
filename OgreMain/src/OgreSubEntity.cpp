@@ -67,13 +67,10 @@ namespace Ogre {
     const String& SubEntity::getMaterialName(void) const
     {
         return !mMaterialPtr.isNull() ? mMaterialPtr->getName() : BLANKSTRING;
-        //return mMaterialName;
     }
     //-----------------------------------------------------------------------
     void SubEntity::setMaterialName( const String& name, const String& groupName /* = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME */)
     {
-
-
         MaterialPtr material = MaterialManager::getSingleton().getByName(name, groupName);
 
         if( material.isNull() )
@@ -96,7 +93,7 @@ namespace Ogre {
 
         setMaterial( material );
     }
-
+    //-----------------------------------------------------------------------
     void SubEntity::setMaterial( const MaterialPtr& material )
     {
         mMaterialPtr = material;
@@ -128,7 +125,6 @@ namespace Ogre {
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
     }
-
     //-----------------------------------------------------------------------
     const MaterialPtr& SubEntity::getMaterial(void) const
     {

@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgrePolygon.h"
 #include "OgreHeaderPrefix.h"
-
+#include "Threading/OgreThreadHeaders.h"
 
 namespace Ogre
 {

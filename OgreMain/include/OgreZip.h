@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
 #include "OgreHeaderPrefix.h"
+#include "Threading/OgreThreadHeaders.h"
 
 // Forward declaration for zziplib to avoid header file dependency.
 typedef struct zzip_dir     ZZIP_DIR;
@@ -78,13 +79,13 @@ namespace Ogre {
         void unload();
 
         /// @copydoc Archive::open
-        DataStreamPtr open(const String& filename, bool readOnly = true) const;
+        DataStreamPtr open(const String& filename, bool readOnly = true);
 
         /// @copydoc Archive::create
-        DataStreamPtr create(const String& filename) const;
+        DataStreamPtr create(const String& filename);
 
         /// @copydoc Archive::remove
-        void remove(const String& filename) const;
+        void remove(const String& filename);
 
         /// @copydoc Archive::list
         StringVectorPtr list(bool recursive = true, bool dirs = false);
@@ -98,7 +99,7 @@ namespace Ogre {
 
         /// @copydoc Archive::findFileInfo
         FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true,
-            bool dirs = false) const;
+            bool dirs = false);
 
         /// @copydoc Archive::exists
         bool exists(const String& filename);
@@ -177,7 +178,7 @@ namespace Ogre {
         /// @copydoc DataStream::read
         size_t read(void* buf, size_t count);
         /// @copydoc DataStream::write
-        size_t write(void* buf, size_t count);
+        size_t write(const void* buf, size_t count);
         /// @copydoc DataStream::skip
         void skip(long count);
         /// @copydoc DataStream::seek

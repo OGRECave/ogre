@@ -79,8 +79,6 @@ namespace Ogre {
         unsigned short mFixedFunctionTextureUnits;
 
         void initConfigOptions(void);
-        void initInputDevices(void);
-        void processInputDevices(void);
 
         void setGLLight(size_t index, const Light* lt);
         void makeGLMatrix(GLfloat gl_matrix[16], const Matrix4& m);
@@ -155,6 +153,10 @@ namespace Ogre {
         vector<GLuint>::type mRenderAttribsBound;
         vector<GLuint>::type mRenderInstanceAttribsBound;
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		/// @copydoc RenderSystem::setDrawBuffer
+		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+#endif
 
     protected:
         void setClipPlanesImpl(const PlaneList& clipPlanes);
@@ -173,6 +175,9 @@ namespace Ogre {
           RenderSystem
          */
         const String& getName(void) const;
+
+		const String& getFriendlyName(void) const;
+
         /** See
           RenderSystem
          */

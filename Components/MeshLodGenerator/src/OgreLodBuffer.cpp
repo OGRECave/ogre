@@ -70,9 +70,9 @@ namespace Ogre
 
             const VertexElement* elemNormal = 0;
             HardwareVertexBufferSharedPtr vNormalBuf;
-            unsigned char* vNormal;
+            unsigned char* vNormal = NULL;
             Vector3* pNormalOut = NULL;
-            size_t vNormalSize;
+            size_t vNormalSize = 0;
             bool useVertexNormals = true;
             elemNormal = data->vertexDeclaration->findElementBySemantic(VES_NORMAL);
             useVertexNormals = useVertexNormals && (elemNormal != 0);

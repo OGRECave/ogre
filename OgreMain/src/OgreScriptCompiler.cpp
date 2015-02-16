@@ -298,29 +298,29 @@ namespace Ogre
 //      {
 //      case ANT_ATOM:
 //          {
-//              AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(node.get());
+//              AtomAbstractNode *atom = static_cast<AtomAbstractNode*>(node.get());
 //              msg = msg + atom->value;
 //          }
 //          break;
 //      case ANT_PROPERTY:
 //          {
-//              PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>(node.get());
+//              PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>(node.get());
 //              msg = msg + prop->name + " =";
 //              for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
 //              {
 //                  if((*i)->type == ANT_ATOM)
-//                      msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
+//                      msg = msg + " " + static_cast<AtomAbstractNode*>((*i).get())->value;
 //              }
 //          }
 //          break;
 //      case ANT_OBJECT:
 //          {
-//              ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+//              ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 //              msg = msg + node->file + " - " + StringConverter::toString(node->line) + " - " + obj->cls + " \"" + obj->name + "\" =";
 //              for(AbstractNodeList::iterator i = obj->values.begin(); i != obj->values.end(); ++i)
 //              {
 //                  if((*i)->type == ANT_ATOM)
-//                      msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
+//                      msg = msg + " " + static_cast<AtomAbstractNode*>((*i).get())->value;
 //              }
 //          }
 //          break;
@@ -332,7 +332,7 @@ namespace Ogre
 //
 //      if(node->type == ANT_OBJECT)
 //      {
-//          ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+//          ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());
 //          for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
 //          {
 //              logAST(tabs + 1, *i);
@@ -371,9 +371,9 @@ namespace Ogre
         for(AbstractNodeList::iterator i = ast->begin(); i != ast->end(); ++i)
         {
             //logAST(0, *i);
-            if((*i)->type == ANT_OBJECT && reinterpret_cast<ObjectAbstractNode*>((*i).get())->abstract)
+            if((*i)->type == ANT_OBJECT && static_cast<ObjectAbstractNode*>((*i).get())->abstract)
                 continue;
-            //LogManager::getSingleton().logMessage(reinterpret_cast<ObjectAbstractNode*>((*i).get())->name);
+            //LogManager::getSingleton().logMessage(static_cast<ObjectAbstractNode*>((*i).get())->name);
             ScriptTranslator *translator = ScriptCompilerManager::getSingleton().getTranslator(*i);
             if(translator)
                 translator->translate(this, *i);
@@ -437,7 +437,7 @@ namespace Ogre
         for(AbstractNodeList::iterator i = nodes->begin(); i != nodes->end(); ++i)
         {
             //logAST(0, *i);
-            if((*i)->type == ANT_OBJECT && reinterpret_cast<ObjectAbstractNode*>((*i).get())->abstract)
+            if((*i)->type == ANT_OBJECT && static_cast<ObjectAbstractNode*>((*i).get())->abstract)
                 continue;
             ScriptTranslator *translator = ScriptCompilerManager::getSingleton().getTranslator(*i);
             if(translator)
@@ -673,7 +673,7 @@ namespace Ogre
     {
         if(source->type == ANT_OBJECT)
         {
-            ObjectAbstractNode *src = reinterpret_cast<ObjectAbstractNode*>(source.get());
+            ObjectAbstractNode *src = static_cast<ObjectAbstractNode*>(source.get());
 
             // Overlay the environment of one on top the other first
             for(map<String,String>::type::const_iterator i = src->getVariables().begin(); i != src->getVariables().end(); ++i)
@@ -719,7 +719,7 @@ namespace Ogre
                     // Start tracking the override index position for this object
                     size_t overrideIndex = 0;
 
-                    ObjectAbstractNode *node = reinterpret_cast<ObjectAbstractNode*>((*i).get());
+                    ObjectAbstractNode *node = static_cast<ObjectAbstractNode*>((*i).get());
                     indices[node] = maxOverrideIndex;
                     overridden[node] = false;
 
@@ -729,7 +729,7 @@ namespace Ogre
                     // Find the matching name node
                     for(size_t j = 0; j < overrides.size(); ++j)
                     {
-                        ObjectAbstractNode *temp = reinterpret_cast<ObjectAbstractNode*>(overrides[j].first.get());
+                        ObjectAbstractNode *temp = static_cast<ObjectAbstractNode*>(overrides[j].first.get());
                         // Consider a match a node that has a wildcard and matches an input name
                         bool wildcardMatch = nodeHasWildcard && 
                             (StringUtil::match(temp->name,node->name,true) || 
@@ -746,7 +746,7 @@ namespace Ogre
                                     //If wildcard is matched, make a copy of current material and put it before the iterator, matching its name to the parent. Use same reinterpret cast as above when node is set
                                     AbstractNodePtr newNode((*i)->clone());
                                     currentIterator = dest->children.insert(currentIterator, newNode);
-                                    currentNode = reinterpret_cast<ObjectAbstractNode*>((*currentIterator).get());
+                                    currentNode = static_cast<ObjectAbstractNode*>((*currentIterator).get());
                                     currentNode->name = temp->name;//make the regex match its matcher
                                 }
                                 overrides[j] = std::make_pair(overrides[j].first, currentIterator);
@@ -789,7 +789,7 @@ namespace Ogre
             {
                 if((*i)->type == ANT_OBJECT)
                 {
-                    ObjectAbstractNode *node = reinterpret_cast<ObjectAbstractNode*>((*i).get());
+                    ObjectAbstractNode *node = static_cast<ObjectAbstractNode*>((*i).get());
                     if(!overridden[node])
                     {
                         // Retrieve the minimum override index from the map
@@ -800,7 +800,7 @@ namespace Ogre
                             // Search for minimum matching override
                             for(size_t j = overrideIndex; j < overrides.size(); ++j)
                             {
-                                ObjectAbstractNode *temp = reinterpret_cast<ObjectAbstractNode*>(overrides[j].first.get());
+                                ObjectAbstractNode *temp = static_cast<ObjectAbstractNode*>(overrides[j].first.get());
                                 if(temp->name.empty() && temp->cls == node->cls && overrides[j].second == dest->children.end())
                                 {
                                     overrides[j] = std::make_pair(overrides[j].first, i);
@@ -820,7 +820,7 @@ namespace Ogre
                 {
                     // Override the destination with the source (base) object
                     overlayObject(overrides[i].first, 
-                        reinterpret_cast<ObjectAbstractNode*>((*overrides[i].second).get()));
+                        static_cast<ObjectAbstractNode*>((*overrides[i].second).get()));
                     insertPos = overrides[i].second;
                     insertPos++;
                 }
@@ -858,7 +858,7 @@ namespace Ogre
                 // emitters or affectors inside a particle_system are excluded
                 while(parent && parent->type == ANT_OBJECT)
                 {
-                    ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(parent);
+                    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
                     if(obj->cls == "particle_system")
                         return true;
                     parent = obj->parent;
@@ -870,7 +870,7 @@ namespace Ogre
                 // passes inside compositors are excluded
                 while(parent && parent->type == ANT_OBJECT)
                 {
-                    ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(parent);
+                    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
                     if(obj->cls == "compositor")
                         return true;
                     parent = obj->parent;
@@ -882,7 +882,7 @@ namespace Ogre
                 // Parent must be texture_unit
                 while(parent && parent->type == ANT_OBJECT)
                 {
-                    ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(parent);
+                    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(parent);
                     if(obj->cls == "texture_unit")
                         return true;
                     parent = obj->parent;
@@ -1300,6 +1300,23 @@ namespace Ogre
 #endif
 
         mIds["subroutine"] = ID_SUBROUTINE;
+
+		mLargestRegisteredWordId = ID_END_BUILTIN_IDS;
+	}
+
+	uint32 ScriptCompiler::registerCustomWordId(const String &word)
+	{
+		// if the word is already registered, just return the right id
+		IdMap::iterator iter = mIds.find(word);
+		if(iter != mIds.end())
+			return iter->second;
+
+		// As there are no other function changing mIds than registerCustomWordId and initWordMap,
+		// we know that mLargestRegisteredWordId is the largest word id and therefore mLargestRegisteredWordId+1
+		// wasn't used yet.
+		mLargestRegisteredWordId++;
+		mIds[word] = mLargestRegisteredWordId;
+		return mLargestRegisteredWordId;
     }
 
     // AbstractTreeeBuilder
@@ -1549,12 +1566,12 @@ namespace Ogre
             {
                 if(mCurrent->type == ANT_PROPERTY)
                 {
-                    PropertyAbstractNode *impl = reinterpret_cast<PropertyAbstractNode*>(mCurrent);
+                    PropertyAbstractNode *impl = static_cast<PropertyAbstractNode*>(mCurrent);
                     impl->values.push_back(asn);
                 }
                 else
                 {
-                    ObjectAbstractNode *impl = reinterpret_cast<ObjectAbstractNode*>(mCurrent);
+                    ObjectAbstractNode *impl = static_cast<ObjectAbstractNode*>(mCurrent);
                     impl->children.push_back(asn);
                 }
             }
@@ -1659,6 +1676,11 @@ namespace Ogre
             }
         }
         return translator;
+	}
+	//-----------------------------------------------------------------------
+	uint32 ScriptCompilerManager::registerCustomWordId(const String &word)
+	{
+		return OGRE_THREAD_POINTER_GET(mScriptCompiler)->registerCustomWordId(word);
     }
     //-----------------------------------------------------------------------
     void ScriptCompilerManager::addScriptPattern(const String &pattern)

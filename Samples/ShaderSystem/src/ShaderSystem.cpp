@@ -1313,7 +1313,7 @@ void Sample_ShaderSystem::destroyPrivateResourceGroup()
 }
 
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::pickTargetObject( const OIS::MouseEvent &evt )
+void Sample_ShaderSystem::pickTargetObject( const OIS::PointerEvent &evt )
 {
 #ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     int xPos   = evt.state.X.abs;
@@ -1546,12 +1546,10 @@ void Sample_ShaderSystem::updateLayerBlendingCaption( LayeredBlending::BlendMode
     }
 }
 
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-
 //-----------------------------------------------------------------------
-bool Sample_ShaderSystem::mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
+bool Sample_ShaderSystem::pointerPressed( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
 {
-    if (mTrayMgr->injectMouseDown(evt, id)) 
+    if (mTrayMgr->injectPointerDown(evt, id)) 
         return true;
     if (id == OIS::MB_Left)     
         mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
@@ -1562,9 +1560,9 @@ bool Sample_ShaderSystem::mousePressed( const OIS::MouseEvent& evt, OIS::MouseBu
 }
 
 //-----------------------------------------------------------------------
-bool Sample_ShaderSystem::mouseReleased( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
+bool Sample_ShaderSystem::pointerReleased( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
 {
-    if (mTrayMgr->injectMouseUp(evt, id)) 
+    if (mTrayMgr->injectPointerUp(evt, id)) 
         return true;
     if (id == OIS::MB_Left) 
         mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
@@ -1573,18 +1571,18 @@ bool Sample_ShaderSystem::mouseReleased( const OIS::MouseEvent& evt, OIS::MouseB
 }
 
 //-----------------------------------------------------------------------
-bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
+bool Sample_ShaderSystem::pointerMoved( const OIS::PointerEvent& evt )
 {
     // only rotate the camera if cursor is hidden
     if (mTrayMgr->isCursorVisible()) 
-        mTrayMgr->injectMouseMove(evt);
+        mTrayMgr->injectPointerMove(evt);
     else 
-        mCameraMan->injectMouseMove(evt);
+        mCameraMan->injectPointerMove(evt);
 
 
     return true;
 }
-#endif
+
 //-----------------------------------------------------------------------
 
 void Sample_ShaderSystem::destroyInstancedViewports()

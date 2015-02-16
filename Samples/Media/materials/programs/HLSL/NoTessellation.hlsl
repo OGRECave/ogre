@@ -94,7 +94,7 @@ perlight_v2p perlight_color_vs(perlight_a2v In)
 	Out.worldBinormal   = mul(g_WorldInverseTranspose, In.binormal).xyz;
     Out.worldTangent    = mul(g_WorldInverseTranspose, In.tangent).xyz;
 	
-	float3 worldSpacePos 	= mul(g_World, In.position);
+	float3 worldSpacePos 	= mul(g_World, In.position).xyz;
 	float3 worldCameraPos	= float3(g_InverseView[0].w, g_InverseView[1].w, g_InverseView[2].w);
 	
 	Out.eyeVector 	= worldCameraPos - worldSpacePos;
@@ -106,7 +106,7 @@ perlight_v2p perlight_color_vs(perlight_a2v In)
 float4 perlight_color_ps(perlight_v2p In) : SV_TARGET
 {
 	float4 outColor;
-	float3 worldNormal = g_NormalTxt.Sample( g_samLinear, In.texCoord ) * 2 - 1;
+	float3 worldNormal = g_NormalTxt.Sample( g_samLinear, In.texCoord ).xyz * 2 - 1;
 	worldNormal = normalize((worldNormal.x*In.worldTangent)+(worldNormal.y*In.worldBinormal)+(worldNormal.z*In.worldNormal));
 	
 	float3 lightDir = normalize(-g_LightDirection);
@@ -121,7 +121,7 @@ float4 perlight_color_ps(perlight_v2p In) : SV_TARGET
 	float3 fresnel = pow(1- saturate(dot(eyeVector, worldNormal)), g_FresnelPower) * g_FresnelColor;	
 	float3 totalSpec = (fresnel * specularMap.r) + (specular * specularMap.g) ;
 	
-	outColor.rgb = (lambert + g_AmbientLightColour) * (diffuseMap.rgb * g_DiffuseColour) + totalSpec;
+	outColor.rgb = (lambert + g_AmbientLightColour.xyz) * (diffuseMap.rgb * g_DiffuseColour) + totalSpec;
 	outColor.a = 1.0f;
 	
 	return outColor;

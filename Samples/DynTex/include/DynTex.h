@@ -24,7 +24,9 @@ public:
     StringVector getRequiredPlugins()
     {
         StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
             names.push_back("Cg Program Manager");
         return names;
     }
@@ -60,35 +62,21 @@ public:
 
         return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
     }
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    bool touchPressed(const OIS::MultiTouchEvent& evt)
-    {
-        if (mTrayMgr->injectMouseDown(evt)) return true;
-        mWiping = true;  // wipe frost if user left clicks in the scene
-        return true;
-    }
 
-    bool touchReleased(const OIS::MultiTouchEvent& evt)
+    bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
     {
-        if (mTrayMgr->injectMouseUp(evt)) return true;
-        mWiping = false;  // stop wiping frost if user releases LMB
-        return true;
-    }
-#else
-    bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
-    {
-        if (mTrayMgr->injectMouseDown(evt, id)) return true;
+        if (mTrayMgr->injectPointerDown(evt, id)) return true;
         mWiping = true;  // wipe frost if user left clicks in the scene
         return true;
     }
     
-    bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+    bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
     {
-        if (mTrayMgr->injectMouseUp(evt, id)) return true;
+        if (mTrayMgr->injectPointerUp(evt, id)) return true;
         mWiping = false;  // stop wiping frost if user releases LMB
         return true;
     }
-#endif
+
 protected:
 
     void setupContent()

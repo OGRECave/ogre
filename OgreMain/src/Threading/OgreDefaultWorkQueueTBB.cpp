@@ -45,7 +45,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     DefaultWorkQueue::DefaultWorkQueue(const String& name)
         : DefaultWorkQueueBase(name)
+#if OGRE_NO_TBB_SCHEDULER == 0
         , mTaskScheduler(tbb::task_scheduler_init::deferred)
+#endif
     {
     }
     //---------------------------------------------------------------------
@@ -66,7 +68,9 @@ namespace Ogre
         LogManager::getSingleton().stream() <<
             "DefaultWorkQueue('" << mName << "') initialising.";
 
+#if OGRE_NO_TBB_SCHEDULER == 0
         mTaskScheduler.initialize(mWorkerThreadCount);
+#endif
 
         if (mWorkerRenderSystemAccess)
         {
@@ -92,7 +96,7 @@ namespace Ogre
     void DefaultWorkQueue::_registerThreadWithRenderSystem()
     {
         {
-                    OGRE_LOCK_MUTEX(mRegisterRSMutex);;
+                    OGRE_LOCK_MUTEX(mRegisterRSMutex);
             tbb::tbb_thread::id cur = tbb::this_tbb_thread::get_id();
             if (mRegisteredThreads.find(cur) == mRegisteredThreads.end())
             {
@@ -121,8 +125,10 @@ namespace Ogre
         // wait until all tasks have finished.
         mTaskGroup.wait();
 
+#if OGRE_NO_TBB_SCHEDULER == 0
         if (mTaskScheduler.is_active())
             mTaskScheduler.terminate();
+#endif
 
         if (mWorkerFunc)
         {

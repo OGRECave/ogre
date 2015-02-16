@@ -178,7 +178,13 @@ protected:
 
     void cleanupContent()
     {
-        mSceneMgr->destroyCamera(mCubeCamera);
+		for (unsigned int i = 0; i < 6; i++)
+		{
+			mTargets[i]->removeAllViewports();
+			mTargets[i]->removeListener(this);
+		}
+			
+		mSceneMgr->destroyCamera(mCubeCamera);
         MeshManager::getSingleton().remove("floor");
         TextureManager::getSingleton().remove("dyncubemap");
 

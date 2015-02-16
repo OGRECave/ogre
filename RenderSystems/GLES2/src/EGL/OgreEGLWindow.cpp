@@ -189,9 +189,9 @@ namespace Ogre {
 
     void EGLWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if ((dst.left < 0) || (dst.right > mWidth) ||
-            (dst.top < 0) || (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Invalid box.",
@@ -217,6 +217,8 @@ namespace Ogre {
         // Switch context if different from current one
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
         rsys->_setViewport(this->getViewport(0));
+
+		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         if(dst.getWidth() != dst.rowPitch)

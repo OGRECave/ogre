@@ -42,8 +42,8 @@ SGScriptTranslator::SGScriptTranslator() :
 //-----------------------------------------------------------------------------
 void SGScriptTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr &node)
 {
-    ObjectAbstractNode* obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
-    ObjectAbstractNode* parent = reinterpret_cast<ObjectAbstractNode*>(obj->parent);
+    ObjectAbstractNode* obj = static_cast<ObjectAbstractNode*>(node.get());
+    ObjectAbstractNode* parent = static_cast<ObjectAbstractNode*>(obj->parent);
 
     // Translate section within a pass context.
     if (parent->cls == "pass")
@@ -83,7 +83,7 @@ note: we can know the texture unit index by getting parent then finding it in th
 */
 void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const AbstractNodePtr &node)
 {
-    ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());    
+    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());    
     TextureUnitState* texState = any_cast<TextureUnitState*>(obj->parent->context);
     Pass* pass = texState->getParent();
     Technique* technique = pass->getParent();
@@ -127,7 +127,7 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
                 SubRenderState* subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, texState, this);
                 
                 if (subRenderState)
@@ -150,7 +150,7 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 //-----------------------------------------------------------------------------
 void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractNodePtr &node)
 {
-    ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());    
+    ObjectAbstractNode *obj = static_cast<ObjectAbstractNode*>(node.get());    
     Pass* pass = any_cast<Pass*>(obj->parent->context);
     Technique* technique = pass->getParent();
     Material* material = technique->getParent();
@@ -179,7 +179,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
         {
             if((*i)->type == ANT_PROPERTY)
             {
-                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                PropertyAbstractNode *prop = static_cast<PropertyAbstractNode*>((*i).get());
 
                 // Handle light count property.
                 if (prop->name == "light_count")

@@ -13,10 +13,17 @@
 
 if (WIN32)
   set(OGRE_MEDIA_PATH "Media")
-  set(OGRE_MEDIA_DIR_REL "../../${OGRE_MEDIA_PATH}")
-  set(OGRE_MEDIA_DIR_DBG "../../${OGRE_MEDIA_PATH}")
-  set(OGRE_TEST_MEDIA_DIR_REL "../../Tests/${OGRE_MEDIA_PATH}")
-  set(OGRE_TEST_MEDIA_DIR_DBG "../../Tests/${OGRE_MEDIA_PATH}")
+  if (WINDOWS_STORE OR WINDOWS_PHONE)
+    set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
+    set(OGRE_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
+    set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
+    set(OGRE_TEST_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
+  else()
+    set(OGRE_MEDIA_DIR_REL "../../${OGRE_MEDIA_PATH}")
+    set(OGRE_MEDIA_DIR_DBG "../../${OGRE_MEDIA_PATH}")
+    set(OGRE_TEST_MEDIA_DIR_REL "../../Tests/${OGRE_MEDIA_PATH}")
+    set(OGRE_TEST_MEDIA_DIR_DBG "../../Tests/${OGRE_MEDIA_PATH}")
+  endif()
   set(OGRE_PLUGIN_DIR_REL ".")
   set(OGRE_PLUGIN_DIR_DBG ".")
   set(OGRE_SAMPLES_DIR_REL ".")
@@ -160,7 +167,7 @@ endif (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
-if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE))
   set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/Media")
   set(OGRE_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Samples/Media")
   set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Tests/Media")
@@ -191,7 +198,10 @@ elseif (UNIX)
   set(OGRE_SAMPLES_DIR_DBG "${OGRE_BINARY_DIR}/lib")
 endif ()
 
-if (MSVC AND NOT NMAKE)
+if (WINDOWS_STORE OR WINDOWS_PHONE)
+  # These platfroms requires all resources to be packaged inside the application bundle,
+  # therefore install versions of configs would be copied and added as content file to each project.
+elseif (MSVC AND NOT NMAKE)
   # create resources.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/resources_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/resources_d.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/bin/release/resources.cfg)

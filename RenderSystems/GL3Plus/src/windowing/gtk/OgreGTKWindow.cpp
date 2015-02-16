@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -198,9 +198,9 @@ void GTKWindow::swapBuffers()
 
 void GTKWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
 {
-    if ((dst.left < 0) || (dst.right > mWidth) ||
-        (dst.top < 0) || (dst.bottom > mHeight) ||
-        (dst.front != 0) || (dst.back != 1))
+    if (dst.getWidth() > mWidth ||
+        dst.getHeight() > mHeight ||
+        dst.front != 0 || dst.back != 1)
     {
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                     "Invalid box.",

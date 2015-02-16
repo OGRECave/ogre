@@ -84,6 +84,11 @@ VS_OUT main_vp(
     // project position to the screen
     outp.pos = mul(worldViewProj, pos);
 
+    // pass through other texcoords exactly as they were received
+    outp.diffuseUV.xy = uv0.xy;
+    
+    outp.diffuseUV.z = 0;
+
 #if !SHADOWCASTER
 	// Get object space light direction
 	float3 lightDir = normalize(lightPosition.xyz - (pos.xyz * lightPosition.w).xyz);
@@ -93,10 +98,6 @@ VS_OUT main_vp(
 #  endif
 
 #endif
-
-    // pass through other texcoords exactly as they were received
-    outp.diffuseUV.xy = uv0.xy;
-    
 
 #if DEPTH_SHADOWCASTER
 	outp.depth = (BIAS + outp.pos.z - depthRange.x) * depthRange.w;

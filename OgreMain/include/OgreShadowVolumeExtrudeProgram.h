@@ -184,6 +184,16 @@ namespace Ogre {
         static String mGeneralFs_glsl;
         static String mGeneralFs_glsles;
 
+		static String mModulate_Fs_hlsl_4_0;
+		static String mModulate_Vs_hlsl_4_0;
+		static String mModulate_Fs_cg;
+		static String mModulate_Vs_cg;
+		static String mModulate_Fs_glsl;
+		static String mModulate_Vs_glsl;
+		
+		
+
+
         static bool mInitialised;
 
     public:
@@ -213,6 +223,10 @@ namespace Ogre {
 
         /// Initialise the creation of these vertex programs
         static void initialise(void);
+		/// Initialise the creation of these modulation pass programs
+		static void initialiseModulationPassPrograms(void);
+		/// Add and load high level gpu program
+		static void AddInternalProgram(String name, String source, String language, String entryPoint, String target, GpuProgramType type);
         /// Shutdown & destroy the vertex programs
         static void shutdown(void);
         /// Get extruder program source for point lights, compatible with arbvp1

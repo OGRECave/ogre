@@ -29,10 +29,11 @@
 #include "OgreFileSystemLayer.h"
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#if !((OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE))
-#   include <shlobj.h>
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#  include <shlobj.h>
 #endif
 #include <io.h>
+#include <direct.h>
 
 namespace Ogre
 {
@@ -153,15 +154,30 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    bool FileSystemLayer::fileExists(const Ogre::String& path) const
+    bool FileSystemLayer::fileExists(const Ogre::String& path)
     {
-        WIN32_FILE_ATTRIBUTE_DATA attr_data;
-        return GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &attr_data) != 0;
+        return _access(path.c_str(), 04) == 0; // Use CRT API rather than GetFileAttributesExA to pass Windows Store validation
     }
     //---------------------------------------------------------------------
     bool FileSystemLayer::createDirectory(const Ogre::String& path)
     {
-        return CreateDirectoryA(path.c_str(), NULL) != 0 || 
-            GetLastError() == ERROR_ALREADY_EXISTS;
+        return !_mkdir(path.c_str()) || errno == EEXIST; // Use CRT API rather than CreateDirectoryA to pass Windows Store validation
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::removeDirectory(const Ogre::String& path)
+    {
+        return !_rmdir(path.c_str()) || errno == ENOENT; // Use CRT API to pass Windows Store validation
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::removeFile(const Ogre::String& path)
+    {
+        return !_unlink(path.c_str()) || errno == ENOENT; // Use CRT API to pass Windows Store validation
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::renameFile(const Ogre::String& oldname, const Ogre::String& newname)
+    {
+        if(fileExists(oldname) && fileExists(newname))
+            removeFile(newname);
+        return !rename(oldname.c_str(), newname.c_str()); // Use CRT API to pass Windows Store validation
     }
 }

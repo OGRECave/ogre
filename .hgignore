@@ -9,6 +9,7 @@ syntax: glob
 *.obj
 *.rule
 *.sdf
+.DS_Store
 Dependencies/*
 iOSDependencies
 build/*
@@ -25,3 +26,5 @@ Samples/Browser/WinRT.Xaml/Media
 AndroidBuild/
 AndroidDependencies/
 Build/
+EmscriptenDependencies
+EmscriptenBuild

@@ -31,6 +31,10 @@ THE SOFTWARE.
 #include <iomanip>
 #include <iostream>
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#   include <windows.h>
+#endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
 #   include "ppapi/cpp/var.h"
 #   include "ppapi/cpp/instance.h"
@@ -81,6 +85,15 @@ namespace Ogre
 #else
                 if (mDebugOut && !maskDebug)
                 {
+#    if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && OGRE_DEBUG_MODE
+#        if OGRE_WCHAR_T_STRINGS
+                    OutputDebugStringW(message.c_str());
+                    OutputDebugStringW(L"\n");
+#        else
+                    OutputDebugStringA(message.c_str());
+                    OutputDebugStringA("\n");
+#        endif
+#    endif
                     if (lml == LML_CRITICAL)
                         std::cerr << message << std::endl;
                     else

@@ -16,7 +16,18 @@
 set(OGRE_DEPENDENCIES_DIR "" CACHE PATH "Path to prebuilt OGRE dependencies")
 include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
-if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+if(OGRE_BUILD_PLATFORM_EMSCRIPTEN)
+  set(OGRE_DEP_SEARCH_PATH 
+    ${OGRE_DEPENDENCIES_DIR}
+    ${EMSCRIPTEN_ROOT_PATH}/system
+    ${ENV_OGRE_DEPENDENCIES_DIR}
+    "${OGRE_BINARY_DIR}/EmscriptenDependencies"
+    "${OGRE_SOURCE_DIR}/EmscriptenDependencies"
+    "${OGRE_BINARY_DIR}/../EmscriptenDependencies"
+    "${OGRE_SOURCE_DIR}/../EmscriptenDependencies"
+  )
+  set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${OGRE_DEP_SEARCH_PATH})
+elseif(OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}
     ${ENV_OGRE_DEPENDENCIES_DIR}
@@ -48,7 +59,7 @@ endif()
 message(STATUS "Search path: ${OGRE_DEP_SEARCH_PATH}")
 
 # Set hardcoded path guesses for various platforms
-if (UNIX)
+if (UNIX AND NOT EMSCRIPTEN)
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/local)
   # Ubuntu 11.10 has an inconvenient path to OpenGL libraries
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
@@ -81,7 +92,7 @@ find_package(Freetype)
 macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.freetype.org" FALSE "" "")
 
 # Find X11
-if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT FLASHCC)
+if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
   find_package(X11)
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org" TRUE "" "")
   macro_log_feature(X11_Xt_FOUND "Xt" "X Toolkit" "http://www.x.org" TRUE "" "")
@@ -96,7 +107,7 @@ endif ()
 #######################################################################
 
 # Find OpenGL
-if(NOT ANDROID AND NOT FLASHCC)
+if(NOT ANDROID AND NOT EMSCRIPTEN)
   find_package(OpenGL)
   macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
 endif()
@@ -124,6 +135,15 @@ if(WIN32)
 	
 	find_package(DirectX11)
 	macro_log_feature(DirectX11_FOUND "DirectX11" "Support for the DirectX11 render system" "http://msdn.microsoft.com/en-us/directx/" FALSE "" "")
+
+	if(OGRE_CONFIG_ENABLE_QUAD_BUFFER_STEREO)
+		# Find DirectX Stereo Driver Libraries
+		find_package(NVAPI)
+		macro_log_feature(NVAPI_FOUND "NVAPI" "Support NVIDIA stereo with the DirectX render system" "https://developer.nvidia.com/nvapi" FALSE "" "")
+
+		find_package(AMDQBS)
+		macro_log_feature(AMDQBS_FOUND "AMDQBS" "Support AMD stereo with the DirectX render system" "http://developer.amd.com/tools-and-sdks/graphics-development/amd-quad-buffer-sdk/" FALSE "" "")
+	endif()
 endif()
 
 #######################################################################
@@ -131,7 +151,7 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR OGRE_BUILD_PLATFORM_WINRT OR ANDROID OR FLASHCC))
+if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
 endif ()
@@ -147,6 +167,12 @@ endif ()
 if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
     set(Boost_USE_MULTITHREADED OFF)
 endif()
+
+if(ANDROID)
+    # FindBoost needs extra hint on android 
+    set(Boost_COMPILER -gcc)
+endif()
+
 set(Boost_ADDITIONAL_VERSIONS "1.57" "1.57.0" "1.56" "1.56.0" "1.55" "1.55.0" "1.54" "1.54.0" "1.53" "1.53.0" "1.52" "1.52.0" "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
 # Components that need linking (NB does not include header-only components like bind)
 set(OGRE_BOOST_COMPONENTS thread date_time)
@@ -207,13 +233,18 @@ macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http:/
 find_package(HLSL2GLSL)
 macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/" FALSE "" "")
 
+# Python
+if (EMSCRIPTEN)
+  find_package(PythonInterp)
+  macro_log_feature(PYTHONINTERP_FOUND "Python" "Used to generate indices for dynamic file loading" "http://www.python.org/" FALSE "" "")
+endif()
 
 #######################################################################
 # Samples dependencies
 #######################################################################
 
 # Find OIS
-if (OGRE_BUILD_PLATFORM_WINRT)
+if (WINDOWS_STORE OR WINDOWS_PHONE)
 	# for WinRT we need only includes
 	set(OIS_FIND_QUIETLY TRUE)
         find_package(OIS)
