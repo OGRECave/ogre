@@ -51,6 +51,7 @@ THE SOFTWARE.
 #include "OgreD3D11VertexDeclaration.h"
 
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsSamplerblock.h"
 
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
@@ -2389,6 +2390,102 @@ bail:
         ID3D11BlendState *blendState = reinterpret_cast<ID3D11BlendState*>( block->mRsData );
         blendState->Release();
         block->mRsData = 0;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsSamplerblockCreated( HlmsSamplerblock *newBlock )
+    {
+        D3D11_SAMPLER_DESC samplerDesc;
+        ZeroMemory( &samplerDesc, sizeof(D3D11_SAMPLER_DESC) );
+        samplerDesc.Filter = D3D11Mappings::get( newBlock->mMinFilter, newBlock->mMagFilter,
+                                                 newBlock->mMipFilter,
+                                                 newBlock->mCompareFunction != NUM_COMPARE_FUNCTIONS );
+        if( newBlock->mCompareFunction == NUM_COMPARE_FUNCTIONS )
+            samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+        else
+            samplerDesc.ComparisonFunc = D3D11Mappings::get( newBlock->mCompareFunction );
+
+        samplerDesc.AddressU = D3D11Mappings::get( newBlock->mU );
+        samplerDesc.AddressV = D3D11Mappings::get( newBlock->mV );
+        samplerDesc.AddressW = D3D11Mappings::get( newBlock->mW );
+
+        samplerDesc.MipLODBias      = newBlock->mMipLodBias;
+        samplerDesc.MaxAnisotropy   = newBlock->mMaxAnisotropy;
+        samplerDesc.BorderColor[0]  = newBlock->mBorderColour.r;
+        samplerDesc.BorderColor[1]  = newBlock->mBorderColour.g;
+        samplerDesc.BorderColor[2]  = newBlock->mBorderColour.b;
+        samplerDesc.BorderColor[3]  = newBlock->mBorderColour.a;
+        samplerDesc.MinLOD          = newBlock->mMinLod;
+        samplerDesc.MaxLOD          = newBlock->mMaxLod;
+
+        ID3D11SamplerState *samplerState = 0;
+
+        HRESULT hr = mDevice->CreateSamplerState( &samplerDesc, &samplerState ) ;
+        if( FAILED(hr) )
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Failed to create sampler state\nError Description: " + errorDescription,
+                "D3D11RenderSystem::_hlmsSamplerblockCreated" );
+        }
+
+        newBlock->mRsData = samplerState;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsSamplerblockDestroyed( HlmsSamplerblock *block )
+    {
+        ID3D11SamplerState *samplerState = reinterpret_cast<ID3D11SamplerState*>( block->mRsData );
+        samplerState->Release();
+        block->mRsData = 0;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
+    {
+        ID3D11RasterizerState *rasterizerState = reinterpret_cast<ID3D11RasterizerState*>(
+                                                                        macroblock->mRsData );
+
+        mDevice.GetImmediateContext()->RSSetState( rasterizerState );
+        if( mDevice.isError() )
+        {
+            String errorDescription = mDevice.getErrorDescription();
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                "D3D11 device cannot set rasterizer state\nError Description: " + errorDescription,
+                "D3D11RenderSystem::_setHlmsMacroblock");
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
+    {
+        ID3D11BlendState *blendState = reinterpret_cast<ID3D11BlendState*>( blendblock->mRsData );
+
+        // TODO - Add this functionality to Ogre (what's the GL equivalent?)
+        mDevice.GetImmediateContext()->OMSetBlendState( blendState, 0, 0xffffffff );
+        if( mDevice.isError() )
+        {
+            String errorDescription = mDevice.getErrorDescription();
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                "D3D11 device cannot set blend state\nError Description: " + errorDescription,
+                "D3D11RenderSystem::_setHlmsBlendblock");
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
+    {
+        ID3D11SamplerState *samplerState = reinterpret_cast<ID3D11SamplerState*>( samplerblock->mRsData );
+
+        //TODO: Refactor Ogre to:
+        //  a. Separate samplerblocks from textures (GL can emulate the merge).
+        //  b. Set all of them at once.
+        mDevice.GetImmediateContext()->VSSetSamplers( static_cast<UINT>(0), static_cast<UINT>(1),
+                                                      &samplerState );
+        mDevice.GetImmediateContext()->PSSetSamplers( static_cast<UINT>(0), static_cast<UINT>(1),
+                                                      &samplerState );
+        if( mDevice.isError() )
+        {
+            String errorDescription = mDevice.getErrorDescription();
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
+                "D3D11RenderSystem::_render");
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()
