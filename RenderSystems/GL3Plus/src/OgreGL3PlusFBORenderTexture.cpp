@@ -290,7 +290,9 @@ namespace Ogre {
     {
         // is glGetInternalformativ supported?
         // core since GL 4.2: see https://www.opengl.org/wiki/GLAPI/glGetInternalformat
-        bool hasInternalFormatQuery = gl3wIsSupported(4,2) || mGLSupport.checkExtension("GL_ARB_internalformat_query");
+        //TODO: Is broken. Will cause problems when attaching depth buffers to FBOs; saying they're incompatible.
+        //bool hasInternalFormatQuery = gl3wIsSupported(4,2) || mGLSupport.checkExtension("GL_ARB_internalformat_query");
+        bool hasInternalFormatQuery = false;
 
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;

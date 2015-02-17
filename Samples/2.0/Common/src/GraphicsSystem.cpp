@@ -425,7 +425,7 @@ std::string macBundlePath()
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::chooseSceneManager(void)
     {
-        Ogre::InstancingTheadedCullingMethod threadedCullingMethod =
+        Ogre::InstancingThreadedCullingMethod threadedCullingMethod =
                 Ogre::INSTANCING_CULLING_SINGLETHREAD;
 #if OGRE_DEBUG_MODE
         //Debugging multithreaded code is a PITA, disable it.

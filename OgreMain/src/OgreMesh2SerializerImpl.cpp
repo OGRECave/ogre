@@ -1208,9 +1208,7 @@ namespace Ogre {
 
         for( size_t v = 0; v < vertexCount; ++v )
         {
-            //TODO: Merge 1.x enhancements.
-            //Bitwise::bswapChunks( pBase, typeSingleMemberSize, typeCount );
-            Serializer::flipEndian( pBase, typeSingleMemberSize, typeCount );
+            Bitwise::bswapChunks( pBase, typeSingleMemberSize, typeCount );
 
             pBase = static_cast<void*>(
                 static_cast<unsigned char*>(pBase) + vertexSize);

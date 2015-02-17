@@ -254,7 +254,7 @@ namespace v1 {
 
             if (data.format == PF_DEPTH)
             {
-                switch (GL3PlusPixelUtil::getGLInternalFormat(data.format))
+                switch (GL3PlusPixelUtil::getGLInternalFormat(data.format, mHwGamma))
                 {
                     case GL_DEPTH_COMPONENT16:
                         type = GL_UNSIGNED_SHORT;
@@ -314,6 +314,8 @@ namespace v1 {
 
         // Restore defaults.
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
     }
 
@@ -736,7 +738,7 @@ namespace v1 {
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000));
 
-        GLenum internalFormat = GL3PlusPixelUtil::getGLInternalFormat(src.format);
+        GLenum internalFormat = GL3PlusPixelUtil::getGLInternalFormat(src.format, mHwGamma);
 
         GLenum format = GL_RGBA;
 
