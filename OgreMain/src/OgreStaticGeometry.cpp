@@ -392,8 +392,6 @@ namespace Ogre {
         // and while we're at it, build the remap we can use later
         bool use32bitIndexes =
             id->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT;
-        uint16 *p16;
-        uint32 *p32;
         IndexRemap indexRemap;
         if (use32bitIndexes)
         {

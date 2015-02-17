@@ -60,7 +60,6 @@ public:
 		, mFly(true)
 		, mFallVelocity(0)
         , mTerrainPos(0,0,0)
-        , mTerrainGlobals(NULL)
         , mLodInfoOverlay(NULL)
         , mLodInfoOverlayContainer(NULL)
     {
@@ -485,6 +484,7 @@ protected:
                 OverlayManager::getSingleton().destroyOverlayElement(*li);
             }
             mLodStatusLabelList.clear();
+        }
 
         if (mLodInfoOverlay)
             OverlayManager::getSingleton().destroy(mLodInfoOverlay);

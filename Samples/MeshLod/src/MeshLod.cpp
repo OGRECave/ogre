@@ -675,7 +675,7 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
             mTrayMgr->showOkDialog("Success", "Mesh saved to: " + filename);
         }
 
-        if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible())
+        if(!mTrayMgr->getTrayContainer(TL_TOP)->isVisible()) {
             loadUserLod();
         }
     }

@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D11Mappings.h"
+#include "OgrePixelBox.h"
 
 namespace Ogre 
 {

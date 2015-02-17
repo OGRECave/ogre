@@ -34,6 +34,7 @@
 #endif
 #include <io.h>
 #include <direct.h>
+#include <errno.h>
 
 namespace Ogre
 {

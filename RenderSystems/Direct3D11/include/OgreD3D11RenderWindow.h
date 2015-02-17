@@ -123,7 +123,6 @@ namespace Ogre
         unsigned getVSyncInterval() const                       { return mVSyncInterval; }
 
         void swapBuffers();
-        void updateStats(void);
 
     protected:
         DXGI_FORMAT _getSwapChainFormat()                       { return _getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled() && !mUseFlipSequentialMode); }

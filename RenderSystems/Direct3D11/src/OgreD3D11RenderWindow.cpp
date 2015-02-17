@@ -622,12 +622,6 @@ namespace Ogre
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers");
         }
     }
-    //---------------------------------------------------------------------
-    void D3D11RenderWindowSwapChainBased::updateStats( void )
-	{
-		RenderTarget::updateStats();
-		mStats.vBlankMissCount = getVBlankMissCount();
-	}
 	//---------------------------------------------------------------------
 	int D3D11RenderWindowSwapChainBased::getVBlankMissCount()
 	{

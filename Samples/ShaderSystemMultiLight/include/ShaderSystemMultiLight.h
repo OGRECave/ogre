@@ -193,7 +193,7 @@ protected:
         mSceneMgr->setAmbientLight(ColourValue(0.1, 0.1, 0.1));
         // set the single directional light
         Light* light = mSceneMgr->createLight();
-        mSceneMgr->createSceneNode()->attachObject( light );
+        mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject( light );
         light->setType(Light::LT_DIRECTIONAL);
         light->setDirection(Vector3(-1,-1,0).normalisedCopy());
         light->setDiffuseColour(ColourValue(0.1, 0.1, 0.1));

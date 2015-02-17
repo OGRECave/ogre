@@ -344,15 +344,4 @@ namespace Ogre {
         return mColourBuffer;
     }
     //-----------------------------------------------------------------------
-
-    //-----------------------------------------------------------------------
-    void Viewport::Listener::viewportDimensionsChanged(Viewport*)
-    {
-    }
-
-    //-----------------------------------------------------------------------
-    void Viewport::Listener::viewportDestroyed(Viewport*)
-    {
-    }
-
 }
