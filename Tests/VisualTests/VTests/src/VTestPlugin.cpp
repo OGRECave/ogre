@@ -31,12 +31,14 @@ THE SOFTWARE.
 #include "TransparencyTest.h"
 #include "TextureEffectsTest.h"
 #include "CubeMappingTest.h"
+#include "TextureBlitTest.h"
 #include "OgreResourceGroupManager.h"
 
 VTestPlugin::VTestPlugin()
     :SamplePlugin("VTestPlugin")
 {
     // add the playpen tests
+    addSample(new TextureBlitTest());
     addSample(new CubeMappingTest()); // no bg on Win
     addSample(new ParticleTest());
     addSample(new TransparencyTest());

@@ -45,7 +45,7 @@ namespace Ogre
         mHomePath = Ogre::String([[paths objectAtIndex:0] cStringUsingEncoding:NSASCIIStringEncoding]) + "/";
 	}
     //---------------------------------------------------------------------
-    bool FileSystemLayer::fileExists(const Ogre::String& path) const
+    bool FileSystemLayer::fileExists(const Ogre::String& path)
 	{
 		return access(path.c_str(), R_OK) == 0;
 	}
@@ -64,4 +64,19 @@ namespace Ogre
         }
         return true;
 	}
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::removeDirectory(const Ogre::String& path)
+    {
+        return false;
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::removeFile(const Ogre::String& path)
+    {
+        return false;
+    }
+    //---------------------------------------------------------------------
+    bool FileSystemLayer::renameFile(const Ogre::String& oldname, const Ogre::String& newname)
+    {
+        return false;
+    }
 }

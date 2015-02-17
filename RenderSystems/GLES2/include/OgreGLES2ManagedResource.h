@@ -28,14 +28,14 @@ THE SOFTWARE.
 #ifndef __GLES2ManagedResource_H__
 #define __GLES2ManagedResource_H__
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-#   define MANAGED_RESOURCE , public GLES2ManagedResource
-#   define MANAGED_RESOURCE_SINGLE : public GLES2ManagedResource
-
 #include "OgreGLES2Prerequisites.h"
 
 namespace Ogre {
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#   define MANAGED_RESOURCE , public GLES2ManagedResource
+#   define MANAGED_RESOURCE_SINGLE : public GLES2ManagedResource
+    
     class EGLContext;
     
     /** Represents a GLES2 rendering resource.
@@ -58,9 +58,12 @@ namespace Ogre {
         GLES2ManagedResource();
         virtual ~GLES2ManagedResource();
     };
-}
+
 #else
 #   define MANAGED_RESOURCE
 #   define MANAGED_RESOURCE_SINGLE
 #endif
+
+}
+
 #endif

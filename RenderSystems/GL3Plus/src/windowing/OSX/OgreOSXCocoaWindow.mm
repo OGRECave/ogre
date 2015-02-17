@@ -175,7 +175,17 @@ namespace Ogre {
             opt = miscParams->find("contentScalingFactor");
             if(opt != miscParams->end())
                 mContentScalingFactor = StringConverter::parseReal(opt->second);
-        }		
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			opt = miscParams->find("stereoMode");
+			if (opt != miscParams->end())
+			{
+				StereoModeType stereoMode = StringConverter::parseStereoMode(opt->second);
+				if (SMT_NONE != stereoMode)
+					mStereoEnabled = true;
+			}
+#endif
+        }
 
         if(miscParams->find("externalGLContext") == miscParams->end())
         {
@@ -220,7 +230,12 @@ namespace Ogre {
                 attribs[i++] = NSOpenGLPFASamples;
                 attribs[i++] = (NSOpenGLPixelFormatAttribute) fsaa_samples;
             }
-            
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			if (mStereoEnabled)
+				attribs[i++] = NSOpenGLPFAStereo;
+#endif
+
             attribs[i++] = (NSOpenGLPixelFormatAttribute) 0;
 
             mGLPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
@@ -437,9 +452,9 @@ namespace Ogre {
 
     void CocoaWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if ((dst.right > mWidth) ||
-            (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Invalid box.",

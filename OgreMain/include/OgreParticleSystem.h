@@ -208,7 +208,14 @@ namespace Ogre {
         /** Removes all the emitters from this system. */
         void removeAllEmitters(void);
 
-
+        /** Removes an emitter from the system.
+        @remarks
+            Drops the emitter from this system.
+        @param
+            emitter Pointer to a particle emitter.
+        */
+        void removeEmitter(ParticleEmitter *emitter);
+        
         /** Adds an affector to this particle system.
         @remarks
             Particles are modified over time in a particle system by affectors - see the ParticleAffector

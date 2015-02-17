@@ -270,6 +270,30 @@ namespace Ogre {
         /** Checks the String is a valid number value. */
         static bool isNumber(const String& val);
 
+		/** Converts a ColourBufferType to a String.
+		@remarks
+			String output format is "Back", "Back Left", "Back Right", etc.
+		*/
+		static String toString(ColourBufferType val);
+
+		/** Converts a String to a ColourBufferType.
+		@remarks
+			String input format should be "Back", "Back Left", "Back Right", etc.
+		*/
+		static ColourBufferType parseColourBuffer(const String& val, ColourBufferType defaultValue = CBT_BACK);
+
+		/** Converts a StereoModeType to a String
+		@remarks
+			String output format is "None", "Frame Sequential", etc.
+		*/
+		static String toString(StereoModeType val);
+
+		/** Converts a String to a StereoModeType
+		@remarks
+			String input format should be "None", "Frame Sequential", etc.
+		*/
+		static StereoModeType parseStereoMode(const String& val, StereoModeType defaultValue = SMT_NONE);
+		
         //-----------------------------------------------------------------------
         static void setDefaultStringLocale(const String &loc)
         {

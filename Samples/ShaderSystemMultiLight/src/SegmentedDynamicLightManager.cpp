@@ -154,7 +154,7 @@ void SegmentedDynamicLightManager::regenerateActiveLightList(const LightArray& i
 void SegmentedDynamicLightManager::calculateLightBounds(const Light* i_Light, LightData& o_LightData)
 { 
     Real lightRange = i_Light->getAttenuationRange();
-    const Vector3& lightPosition = mManager->getSceneNode(i_Light->getId())->_getDerivedPosition();
+    const Vector3& lightPosition = i_Light->getParentNode()->_getDerivedPosition();
 
     AxisAlignedBox boundBox(lightPosition - lightRange, lightPosition + lightRange);
 
@@ -292,7 +292,7 @@ void SegmentedDynamicLightManager::updateTextureFromSegmentedLists(const Camera*
             {
                 const Light* pLight = mSegmentedLightGrid[j][i];
                     
-                const Vector3& position = mManager->getSceneNode(pLight->getId())->_getDerivedPosition();
+                const Vector3& position = pLight->getParentNode()->_getDerivedPosition();
                 Vector3 direction = -pLight->getDerivedDirection();
                 direction.normalise();
 

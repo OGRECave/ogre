@@ -198,6 +198,12 @@ namespace Ogre {
         return strName;
     }
 
+    const String& GL3PlusRenderSystem::getFriendlyName(void) const
+    {
+        static String strName("OpenGL 3+");
+        return strName;
+    }
+
     void GL3PlusRenderSystem::initConfigOptions(void)
     {
         mGLSupport->addConfig();
@@ -561,7 +567,7 @@ namespace Ogre {
         // Use FBO's for RTT, PBuffers and Copy are no longer supported
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL3+: Using FBOs for rendering to textures");
-        mRTTManager = new GL3PlusFBOManager();
+        mRTTManager = new GL3PlusFBOManager(*mGLSupport);
         caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
         Log* defaultLog = LogManager::getSingleton().getDefaultLog();
@@ -3547,4 +3553,27 @@ namespace Ogre {
             attribsBound.push_back(attrib);
         }
     }
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	bool GL3PlusRenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+	{
+		bool result = true;
+
+		switch (colourBuffer)
+		{
+            case CBT_BACK:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK));
+                break;
+            case CBT_BACK_LEFT:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK_LEFT));
+                break;
+            case CBT_BACK_RIGHT:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK_RIGHT));
+//                break;
+            default:
+                result = false;
+		}
+
+		return result;
+	}
+#endif
 }

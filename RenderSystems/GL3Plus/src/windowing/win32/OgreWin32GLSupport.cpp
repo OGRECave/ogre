@@ -52,6 +52,9 @@ namespace Ogre {
         // immediately test WGL_ARB_pixel_format and FSAA support
         // so we can set configuration options appropriately
         initialiseWGL();
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		mStereoMode = SMT_NONE;
+#endif
     } 
 
     template<class C> void remove_duplicates(C& c)
@@ -82,6 +85,9 @@ namespace Ogre {
         ConfigOption optRTTMode;
         ConfigOption optSRGB;
         ConfigOption optEnableFixedPipeline;
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		ConfigOption optStereoMode;
+#endif
 
         // FS setting possibilities
         optFullScreen.name = "Full Screen";
@@ -164,6 +170,16 @@ namespace Ogre {
         optEnableFixedPipeline.possibleValues.push_back( "No" );
         optEnableFixedPipeline.currentValue = "Yes";
         optEnableFixedPipeline.immutable = false;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		optStereoMode.name = "Stereo Mode";
+		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
+		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+		optStereoMode.currentValue = optStereoMode.possibleValues[0];
+		optStereoMode.immutable = false;
+		
+		mOptions[optStereoMode.name] = optStereoMode;
+#endif
 
         mOptions[optFullScreen.name] = optFullScreen;
         mOptions[optVideoMode.name] = optVideoMode;
@@ -316,6 +332,14 @@ namespace Ogre {
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Fixed Pipeline enabled options!", "Win32GLSupport::createWindow");
             bool enableFixedPipeline = (opt->second.currentValue == "Yes");
             renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			opt = mOptions.find("Stereo Mode");
+			if (opt == mOptions.end())
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "Win32GLSupport::createWindow");
+			winOptions["stereoMode"] = opt->second.currentValue;
+			mStereoMode = StringConverter::parseStereoMode(opt->second.currentValue);
+#endif
 
             winOptions["FSAA"] = StringConverter::toString(multisample);
             winOptions["FSAAHint"] = multisample_hint;
@@ -475,15 +499,22 @@ namespace Ogre {
         // take this opportunity to enumerate the valid FSAA modes.
         
         LPCSTR dummyText = "OgreWglDummy";
-#ifdef OGRE_STATIC_LIB
-        HINSTANCE hinst = GetModuleHandle( NULL );
-#else
-#  if OGRE_DEBUG_MODE == 1
-        HINSTANCE hinst = GetModuleHandle("RenderSystem_GL_d.dll");
-#  else
-        HINSTANCE hinst = GetModuleHandle("RenderSystem_GL.dll");
-#  endif
-#endif
+
+		HINSTANCE hinst = NULL;
+		#ifdef __MINGW32__
+			#ifdef OGRE_STATIC_LIB
+        		hinst = GetModuleHandle( NULL );
+			#else
+				#if OGRE_DEBUG_MODE == 1
+					hinst = GetModuleHandle("RenderSystem_GL3Plus_d.dll");
+				#else
+					hinst = GetModuleHandle("RenderSystem_GL3Plus.dll");
+				#endif
+			#endif
+		#else
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hinst);
+		#endif
         
         WNDCLASS dummyClass;
         memset(&dummyClass, 0, sizeof(WNDCLASS));
@@ -629,6 +660,11 @@ namespace Ogre {
         pfd.cDepthBits = 24;
         pfd.cStencilBits = 8;
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		if (SMT_FRAME_SEQUENTIAL == mStereoMode)
+			pfd.dwFlags |= PFD_STEREO;
+#endif
+
         int format = 0;
 
         int useHwGamma = hwGamma? GL_TRUE : GL_FALSE;
@@ -654,6 +690,12 @@ namespace Ogre {
             attribList.push_back(WGL_DEPTH_BITS_ARB); attribList.push_back(24);
             attribList.push_back(WGL_STENCIL_BITS_ARB); attribList.push_back(8);
             attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
+			
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			if (SMT_FRAME_SEQUENTIAL == mStereoMode)
+				attribList.push_back(WGL_STEREO_ARB); attribList.push_back(GL_TRUE);
+#endif
+
             if (useHwGamma && mHasHardwareGamma)
             {
                 attribList.push_back(WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT); attribList.push_back(GL_TRUE);

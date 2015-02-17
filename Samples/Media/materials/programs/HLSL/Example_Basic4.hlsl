@@ -1,6 +1,6 @@
 struct a2v
 {
-    float4 position : SV_POSITION;
+    float4 position : POSITION;
     float2 uv	: TEXCOORD0;
 };
 

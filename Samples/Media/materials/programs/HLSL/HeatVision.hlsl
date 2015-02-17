@@ -100,14 +100,14 @@ float4 LightToHeat_fp(
    float  depth, heat, interference;
 
    //  Output constant color:
-   depth = Input.Sample(g_samLinear, inp.texCoord );
+   depth = Input.Sample(g_samLinear, inp.texCoord ).r;
    depth *= (depth * depth_modulator.x);
 
    heat  = (depth * heatBiasScale.y);
 
 //   if (depth > 0)
    {
-		interference = -0.5 + NoiseMap.Sample(g_samVolume, inp.texCoord.xy + float2( random_fractions.x, random_fractions.y ) );
+		interference = -0.5 + NoiseMap.Sample(g_samVolume, inp.texCoord.xy + float2( random_fractions.x, random_fractions.y ) ).r;
 		interference *= interference;
 		interference *= 1 - heat;
 		heat += interference;//+ heatBiasScale.x;

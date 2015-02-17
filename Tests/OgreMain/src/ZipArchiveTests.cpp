@@ -30,38 +30,46 @@ THE SOFTWARE.
 #include "OgreZip.h"
 #include "OgreCommon.h"
 
+#include "UnitTestSuite.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "macUtils.h"
 #endif
 
 using namespace Ogre;
 
-// Register the suite
+// Register the test suite
 CPPUNIT_TEST_SUITE_REGISTRATION( ZipArchiveTests );
 
+//--------------------------------------------------------------------------
 void ZipArchiveTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-    testPath = macBundlePath() + "/Contents/Resources/Media/misc/ArchiveTest.zip";
+    mTestPath = macBundlePath() + "/Contents/Resources/Media/misc/ArchiveTest.zip";
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    testPath = "./Tests/OgreMain/misc/ArchiveTest.zip";
+    mTestPath = "../../Tests/OgreMain/misc/ArchiveTest.zip";
 #else
-    testPath = "../Tests/OgreMain/misc/ArchiveTest.zip";
+    mTestPath = "./Tests/OgreMain/misc/ArchiveTest.zip";
 #endif
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::tearDown()
 {
 }
-
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testListNonRecursive()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
     StringVectorPtr vec = arch->list(false);
@@ -72,15 +80,18 @@ void ZipArchiveTests::testListNonRecursive()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testListRecursive()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
     StringVectorPtr vec = arch->list(true);
@@ -95,15 +106,18 @@ void ZipArchiveTests::testListRecursive()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testListFileInfoNonRecursive()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
     FileInfoListPtr vec = arch->listFileInfo(false);
@@ -123,15 +137,18 @@ void ZipArchiveTests::testListFileInfoNonRecursive()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testListFileInfoRecursive()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
-    arch->load();
+        arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
     FileInfoListPtr vec = arch->listFileInfo(true);
@@ -148,7 +165,6 @@ void ZipArchiveTests::testListFileInfoRecursive()
     CPPUNIT_ASSERT_EQUAL(String("level1/materials/scripts/"), fi4.path);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi4.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi4.uncompressedSize);
-
 
     FileInfo& fi5 = vec->at(2);
     CPPUNIT_ASSERT_EQUAL(String("file3.material"), fi5.filename);
@@ -176,15 +192,18 @@ void ZipArchiveTests::testListFileInfoRecursive()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testFindNonRecursive()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
 
@@ -196,15 +215,18 @@ void ZipArchiveTests::testFindNonRecursive()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testFindRecursive()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
 
@@ -218,15 +240,18 @@ void ZipArchiveTests::testFindRecursive()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testFindFileInfoNonRecursive()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
     FileInfoListPtr vec = arch->findFileInfo("*.txt", false);
@@ -246,15 +271,18 @@ void ZipArchiveTests::testFindFileInfoNonRecursive()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testFindFileInfoRecursive()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
     FileInfoListPtr vec = arch->findFileInfo("*.material", true);
@@ -273,7 +301,6 @@ void ZipArchiveTests::testFindFileInfoRecursive()
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi4.compressedSize);
     CPPUNIT_ASSERT_EQUAL((size_t)0, fi4.uncompressedSize);
 
-
     FileInfo& fi5 = vec->at(2);
     CPPUNIT_ASSERT_EQUAL(String("file3.material"), fi5.filename);
     CPPUNIT_ASSERT_EQUAL(String("level2/materials/scripts/"), fi5.path);
@@ -288,15 +315,18 @@ void ZipArchiveTests::testFindFileInfoRecursive()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testFileRead()
 {
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
 
@@ -309,18 +339,20 @@ void ZipArchiveTests::testFileRead()
     CPPUNIT_ASSERT(stream->eof());
 
     OGRE_DELETE arch;
-
 }
+//--------------------------------------------------------------------------
 void ZipArchiveTests::testReadInterleave()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     // Test overlapping reads from same archive
-    ZipArchive* arch = OGRE_NEW ZipArchive(testPath, "Zip");
+    ZipArchive* arch = OGRE_NEW ZipArchive(mTestPath, "Zip");
     try {
         arch->load();
     } catch (Ogre::Exception e) {
         // If it starts in build/bin/debug
         OGRE_DELETE arch;
-        arch = OGRE_NEW ZipArchive("../../../" + testPath, "Zip");
+        arch = OGRE_NEW ZipArchive("../../../" + mTestPath, "Zip");
         arch->load();
     }
 
@@ -335,13 +367,11 @@ void ZipArchiveTests::testReadInterleave()
     CPPUNIT_ASSERT_EQUAL(String("this is line 2 in file 2"), stream2->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 3 in file 2"), stream2->getLine());
 
-
     // File 1
     CPPUNIT_ASSERT_EQUAL(String("this is line 3 in file 1"), stream1->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 4 in file 1"), stream1->getLine());
     CPPUNIT_ASSERT_EQUAL(String("this is line 5 in file 1"), stream1->getLine());
     CPPUNIT_ASSERT(stream1->eof());
-
 
     // File 2
     CPPUNIT_ASSERT_EQUAL(String("this is line 4 in file 2"), stream2->getLine());
@@ -351,3 +381,4 @@ void ZipArchiveTests::testReadInterleave()
 
     OGRE_DELETE arch;
 }
+//--------------------------------------------------------------------------

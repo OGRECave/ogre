@@ -34,6 +34,7 @@ if(ANDROID)
 	file(MAKE_DIRECTORY "${NDKOUT}/src/org/ogre3d/android")	
 	file(COPY "${JNI_PATH}/OgreActivityJNI.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
 	file(COPY "${JNI_PATH}/MainActivity.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
+	file(COPY "${JNI_PATH}/OgreActivityJNI.cpp" DESTINATION "${NDKOUT}/jni")
 	
     configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
@@ -54,6 +55,7 @@ if(ANDROID)
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp "int x = 23;")
     ADD_LIBRARY(OgreJNIDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
     
+    set(JNI_PATH "${NDKOUT}/jni")
     create_android_proj(OgreJNIDummy)
     
     

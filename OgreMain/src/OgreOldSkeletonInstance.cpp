@@ -237,12 +237,11 @@ namespace v1 {
         return mSkeleton->getHandle();
     }
     //-------------------------------------------------------------------------
-    const String& OldSkeletonInstance::getGroup(void)
+    const String& OldSkeletonInstance::getGroup(void) const
     {
         // delegate
         return mSkeleton->getGroup();
     }
 
-}
 }
 

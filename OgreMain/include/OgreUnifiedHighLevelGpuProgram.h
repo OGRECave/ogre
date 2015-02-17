@@ -135,6 +135,7 @@ namespace Ogre {
         bool isMorphAnimationIncluded(void) const;
 
         bool isPoseAnimationIncluded(void) const;
+        ushort getNumberOfPosesIncluded(void) const;
 
         bool isVertexTextureFetchRequired(void) const;
         GpuProgramParametersSharedPtr getDefaultParameters(void);

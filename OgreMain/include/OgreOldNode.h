@@ -74,7 +74,7 @@ namespace v1 {
             /// Transform is relative to world space
             TS_WORLD
         };
-        typedef HashMap<String, OldNode*> ChildOldNodeMap;
+        typedef OGRE_HashMap<String, OldNode*> ChildOldNodeMap;
         typedef MapIterator<ChildOldNodeMap> ChildOldNodeIterator;
         typedef ConstMapIterator<ChildOldNodeMap> ConstChildOldNodeIterator;
 

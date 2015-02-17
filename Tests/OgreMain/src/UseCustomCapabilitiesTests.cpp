@@ -32,29 +32,23 @@ THE SOFTWARE.
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreRenderSystemCapabilitiesManager.h"
 #include "OgreStringConverter.h"
-#include "OgreLogManager.h"
-#include "OgreLog.h"
+
+#include "UnitTestSuite.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
 #endif
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( UseCustomCapabilitiesTests );
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(UseCustomCapabilitiesTests);
 
+//--------------------------------------------------------------------------
 void UseCustomCapabilitiesTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     using namespace Ogre;
 
-    // write cleanup to log
-    if(LogManager::getSingletonPtr() == 0)
-    {
-        LogManager* logManager = OGRE_NEW LogManager();
-        logManager->createLog("testCustomCapabilitiesSetUp.log", true, false);
-    }
-    LogManager::getSingleton().setLogDetail(LL_LOW);
-
-    
     if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
         OGRE_DELETE Ogre::HighLevelGpuProgramManager::getSingletonPtr();
     if(Ogre::GpuProgramManager::getSingletonPtr())
@@ -64,23 +58,20 @@ void UseCustomCapabilitiesTests::setUp()
     if(Ogre::ResourceGroupManager::getSingletonPtr())
         OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
 
-#if OGRE_STATIC
-        mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
+#if OGRE_STATIC_LIB
+    mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
 #endif
 }
-
+//--------------------------------------------------------------------------
 void UseCustomCapabilitiesTests::tearDown()
 {
     using namespace Ogre;
-    // set up silent logging to not pollute output
-    if(LogManager::getSingletonPtr())
-        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
-#if OGRE_STATIC
-        OGRE_DELETE mStaticPluginLoader;
+#if OGRE_STATIC_LIB
+    OGRE_DELETE mStaticPluginLoader;
 #endif
 }
-
+//--------------------------------------------------------------------------
 void checkCaps(const Ogre::RenderSystemCapabilities* caps)
 {
     using namespace Ogre;
@@ -157,7 +148,7 @@ void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbvp1"));
     CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbfp1"));
 }
-
+//--------------------------------------------------------------------------
 void setUpGLRenderSystemOptions(Ogre::RenderSystem* rs)
 {
     using namespace Ogre;
@@ -169,10 +160,10 @@ void setUpGLRenderSystemOptions(Ogre::RenderSystem* rs)
     rs->setConfigOption(String("Full Screen"), String("No"));
     rs->setConfigOption(String("VSync"), String("No"));
     rs->setConfigOption(String("Video Mode"), String("800 x 600"));
-    
+
     // use the best RTT
     ConfigOption optionRTT = options["RTT Preferred Mode"];
-    
+
     if(find(optionRTT.possibleValues.begin(), optionRTT.possibleValues.end(), "FBO") != optionRTT.possibleValues.end())
     {
         rs->setConfigOption(String("RTT Preferred Mode"), String("FBO"));
@@ -184,32 +175,24 @@ void setUpGLRenderSystemOptions(Ogre::RenderSystem* rs)
     else
         rs->setConfigOption(String("RTT Preferred Mode"), String("Copy"));
 }
-
+//--------------------------------------------------------------------------
 void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     using namespace Ogre;
 
-    // set up silent logging to not pollute output
-    if(LogManager::getSingletonPtr())
-        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-    
-    if(LogManager::getSingletonPtr() == 0)
-    {
-        LogManager* logManager = OGRE_NEW LogManager();
-        logManager->createLog("testCustomCapabilitiesGL.log", true, false);
-    }
-    LogManager::getSingleton().setLogDetail(LL_LOW);
-
 #ifdef OGRE_STATIC_LIB
-    Root* root = OGRE_NEW Root(BLANKSTRING);
-        
+    Root* root = OGRE_NEW Root(BLANKSTRING);        
     mStaticPluginLoader.load();
 #else
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     Root* root = OGRE_NEW Root(macBundlePath() + "/Contents/Resources/plugins.cfg");
 #else
     Root* root = OGRE_NEW Root("plugins.cfg");
 #endif
+
 #endif
 
     RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
@@ -222,12 +205,13 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
         try {
             setUpGLRenderSystemOptions(rs);
             root->setRenderSystem(rs);
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
-                             macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+                macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
 #else
             root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
-                             "../Tests/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+                "../../Tests/Media/CustomCapabilities/customCapabilitiesTest.cfg");
 #endif
 
             const RenderSystemCapabilities* caps = rs->getCapabilities();
@@ -241,7 +225,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
     }
     OGRE_DELETE root;
 }
-
+//--------------------------------------------------------------------------
 void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
 {
     using namespace Ogre;
@@ -252,29 +236,19 @@ void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
     rs->setConfigOption(String("Full Screen"), String("No"));
     rs->setConfigOption(String("VSync"), String("No"));
     rs->setConfigOption(String("Video Mode"), String("800 x 600 @ 32-bit colour"));
-    
+
     // pick first available device
     ConfigOption optionDevice = options["Rendering Device"];
 
     rs->setConfigOption(optionDevice.name, optionDevice.currentValue);
 }
-
+//--------------------------------------------------------------------------
 void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 {
-    // set up silent logging to not pollute output
-    if(LogManager::getSingletonPtr())
-        OGRE_DELETE Ogre::LogManager::getSingletonPtr();
-    
-    if(LogManager::getSingletonPtr() == 0)
-    {
-        LogManager* logManager = OGRE_NEW LogManager();
-        logManager->createLog("testCustomCapabilitiesD3D9.log", true, false);
-    }
-    LogManager::getSingleton().setLogDetail(LL_LOW);
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
 #ifdef OGRE_STATIC_LIB
-    Root* root = OGRE_NEW Root(BLANKSTRING);
-        
+    Root* root = OGRE_NEW Root(BLANKSTRING);        
     mStaticPluginLoader.load();
 #else
     Root* root = OGRE_NEW Root("plugins.cfg");
@@ -291,8 +265,8 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
             setUpD3D9RenderSystemOptions(rs);
             root->setRenderSystem(rs);
             root->initialise(true, "OGRE testCustomCapabilitiesD3D9 Window",
-                                            "../../../Media/CustomCapabilities/customCapabilitiesTest.cfg");
-        
+                "../../Tests/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+
             const RenderSystemCapabilities* caps = rs->getCapabilities();
 
             checkCaps(caps);
@@ -305,5 +279,6 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 
     OGRE_DELETE root;
 }
+//--------------------------------------------------------------------------
 
 

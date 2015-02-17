@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgreSerializer.h"
+#include "OgreBitwise.h"
 #include "OgreLogManager.h"
 #include "OgreException.h"
 #include "OgreVector3.h"
@@ -404,7 +405,7 @@ namespace Ogre {
     {
         if(mFlipEndian)
         {
-            flipEndian(pData, size, count);
+			Bitwise::bswapChunks(pData, size, count);
         }
     }
     
@@ -412,28 +413,10 @@ namespace Ogre {
     {
         if(mFlipEndian)
         {
-            flipEndian(pData, size, count);
+	        Bitwise::bswapChunks(pData, size, count);
         }
     }
     
-    void Serializer::flipEndian(void * pData, size_t size, size_t count)
-    {
-        for(unsigned int index = 0; index < count; index++)
-        {
-            flipEndian((void *)((size_t)pData + (index * size)), size);
-        }
-    }
-    
-    void Serializer::flipEndian(void * pData, size_t size)
-    {
-        for(unsigned int byteIndex = 0; byteIndex < size/2; byteIndex++)
-        {
-            char swapByte = *(char *)((size_t)pData + byteIndex);
-            *(char *)((size_t)pData + byteIndex) = *(char *)((size_t)pData + size - byteIndex - 1);
-            *(char *)((size_t)pData + size - byteIndex - 1) = swapByte;
-        }
-    }
-
     size_t Serializer::calcChunkHeaderSize()
     {
         return sizeof(uint16) + sizeof(uint32);

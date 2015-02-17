@@ -144,7 +144,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneManager* SceneManagerEnumerator::createSceneManager(
         const String& typeName, size_t numWorkerThreads,
-        InstancingTheadedCullingMethod threadedCullingMethod, const String& instanceName)
+        InstancingThreadedCullingMethod threadedCullingMethod, const String& instanceName)
     {
         if (mInstances.find(instanceName) != mInstances.end())
         {
@@ -194,7 +194,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneManager* SceneManagerEnumerator::createSceneManager(
         SceneTypeMask typeMask, size_t numWorkerThreads,
-        InstancingTheadedCullingMethod threadedCullingMethod, const String& instanceName)
+        InstancingThreadedCullingMethod threadedCullingMethod, const String& instanceName)
     {
         if (mInstances.find(instanceName) != mInstances.end())
         {
@@ -318,7 +318,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SceneManager* DefaultSceneManagerFactory::createInstance(
         const String& instanceName, size_t numWorkerThreads,
-        InstancingTheadedCullingMethod threadedCullingMethod)
+        InstancingThreadedCullingMethod threadedCullingMethod)
     {
         return OGRE_NEW DefaultSceneManager(instanceName, numWorkerThreads, threadedCullingMethod);
     }
@@ -330,7 +330,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     DefaultSceneManager::DefaultSceneManager(const String& name, size_t numWorkerThreads,
-                                             InstancingTheadedCullingMethod threadedCullingMethod)
+                                             InstancingThreadedCullingMethod threadedCullingMethod)
         : SceneManager(name, numWorkerThreads, threadedCullingMethod)
     {
     }

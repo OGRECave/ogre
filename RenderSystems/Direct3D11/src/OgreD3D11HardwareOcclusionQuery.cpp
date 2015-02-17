@@ -56,7 +56,7 @@ namespace Ogre {
         if (FAILED(hr) || mDevice.isError()) 
         {   
             String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_INTERNAL_ERROR, hr,
                 "Cannot allocate a Hardware query. This video card doesn't supports it, sorry.\nError Description:" + errorDescription, 
                 "D3D11HardwareOcclusionQuery::D3D11HardwareOcclusionQuery");
         }
@@ -102,8 +102,8 @@ namespace Ogre {
                     continue;
                 if  (hr == S_OK)
                 {
-                    mPixelCount = (unsigned int)pixels;
-                    *NumOfFragments = (unsigned int)pixels;
+                    mPixelCount = (unsigned)pixels;
+                    *NumOfFragments = (unsigned)pixels;
                     break;
                 }
                 //in directx10 the device will never be lost
@@ -148,7 +148,7 @@ namespace Ogre {
             mDevice->CreateQuery(&queryDesc, &mQuery);
         }
         */
-        mPixelCount = (unsigned int)pixels;
+        mPixelCount = (unsigned)pixels;
         mIsQueryResultStillOutstanding = false;
         return false;
     

@@ -57,7 +57,7 @@ struct _OgreLodExport LodData {
 
     typedef vector<Vertex>::type VertexList;
     typedef vector<Triangle>::type TriangleList;
-    typedef HashSet<Vertex*, VertexHash, VertexEqual> UniqueVertexSet;
+    typedef OGRE_HashSet<Vertex*, VertexHash, VertexEqual> UniqueVertexSet;
     typedef multimap<Real, Vertex*>::type CollapseCostHeap;
 
     typedef VectorSet<Edge, 8> VEdges;

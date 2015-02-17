@@ -139,9 +139,9 @@ namespace Ogre
 
 }// namespace Ogre
 
-#endif 
-
 #include "OgreHeaderSuffix.h"
+
+#endif 
 
 #endif // __MemoryNedPooling_H__
 

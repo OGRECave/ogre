@@ -402,12 +402,12 @@ namespace Ogre
             set this value to 3. If you intend to fully use 2 cores for your own stuff,
             set this value to 2.
         @param threadedCullingMethod
-            @See InstancingTheadedCullingMethod. Note: When numWorkerThreads is 1,
+            @See InstancingThreadedCullingMethod. Note: When numWorkerThreads is 1,
             this value is forced to INSTANCING_CULLING_SINGLETHREAD (as otherwise
             it would only degrade performance).
         */
         SceneManager* createSceneManager(const String& typeName, size_t numWorkerThreads,
-                                        InstancingTheadedCullingMethod threadedCullingMethod,
+                                        InstancingThreadedCullingMethod threadedCullingMethod,
                                         const String& instanceName = BLANKSTRING);
 
         /** Create a SceneManager instance based on scene type support.
@@ -428,12 +428,12 @@ namespace Ogre
             set this value to 3. If you intend to fully use 2 cores for your own stuff,
             set this value to 2.
         @param threadedCullingMethod
-            @See InstancingTheadedCullingMethod. Note: When numWorkerThreads is 1,
+            @See InstancingThreadedCullingMethod. Note: When numWorkerThreads is 1,
             this value is forced to INSTANCING_CULLING_SINGLETHREAD (as otherwise
             it would only degrade performance).
         */
         SceneManager* createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads, 
-                                        InstancingTheadedCullingMethod threadedCullingMethod,
+                                        InstancingThreadedCullingMethod threadedCullingMethod,
                                         const String& instanceName = BLANKSTRING);
 
         /** Destroy an instance of a SceneManager. */

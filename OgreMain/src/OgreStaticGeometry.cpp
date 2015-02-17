@@ -392,13 +392,11 @@ namespace v1 {
         // and while we're at it, build the remap we can use later
         bool use32bitIndexes =
             id->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT;
-        uint16 *p16;
-        uint32 *p32;
         IndexRemap indexRemap;
         if (use32bitIndexes)
         {
-            p32 = static_cast<uint32*>(id->indexBuffer->lock(
-                id->indexStart, 
+            uint32 *p32 = static_cast<uint32*>(id->indexBuffer->lock(
+                id->indexStart * id->indexBuffer->getIndexSize(), 
                 id->indexCount * id->indexBuffer->getIndexSize(), 
                 HardwareBuffer::HBL_READ_ONLY));
             buildIndexRemap(p32, id->indexCount, indexRemap);
@@ -406,8 +404,8 @@ namespace v1 {
         }
         else
         {
-            p16 = static_cast<uint16*>(id->indexBuffer->lock(
-                id->indexStart, 
+            uint16 *p16 = static_cast<uint16*>(id->indexBuffer->lock(
+                id->indexStart * id->indexBuffer->getIndexSize(), 
                 id->indexCount * id->indexBuffer->getIndexSize(), 
                 HardwareBuffer::HBL_READ_ONLY));
             buildIndexRemap(p16, id->indexCount, indexRemap);
@@ -485,7 +483,7 @@ namespace v1 {
         {
             uint32 *pSrc32, *pDst32;
             pSrc32 = static_cast<uint32*>(id->indexBuffer->lock(
-                id->indexStart, 
+                id->indexStart * id->indexBuffer->getIndexSize(), 
                 id->indexCount * id->indexBuffer->getIndexSize(), 
                 HardwareBuffer::HBL_READ_ONLY));
             pDst32 = static_cast<uint32*>(ibuf->lock(
@@ -498,7 +496,7 @@ namespace v1 {
         {
             uint16 *pSrc16, *pDst16;
             pSrc16 = static_cast<uint16*>(id->indexBuffer->lock(
-                id->indexStart, 
+                id->indexStart * id->indexBuffer->getIndexSize(), 
                 id->indexCount * id->indexBuffer->getIndexSize(), 
                 HardwareBuffer::HBL_READ_ONLY));
             pDst16 = static_cast<uint16*>(ibuf->lock(
@@ -1336,7 +1334,7 @@ namespace v1 {
                 // Lock source indexes
                 uint32* pSrc = static_cast<uint32*>(
                     srcIdxData->indexBuffer->lock(
-                        srcIdxData->indexStart, 
+                        srcIdxData->indexStart * srcIdxData->indexBuffer->getIndexSize(), 
                         srcIdxData->indexCount * srcIdxData->indexBuffer->getIndexSize(),
                         HardwareBuffer::HBL_READ_ONLY));
 
@@ -1349,7 +1347,7 @@ namespace v1 {
                 // Lock source indexes
                 uint16* pSrc = static_cast<uint16*>(
                     srcIdxData->indexBuffer->lock(
-                    srcIdxData->indexStart, 
+                    srcIdxData->indexStart * srcIdxData->indexBuffer->getIndexSize(), 
                     srcIdxData->indexCount * srcIdxData->indexBuffer->getIndexSize(),
                     HardwareBuffer::HBL_READ_ONLY));
 

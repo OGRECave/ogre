@@ -307,8 +307,8 @@ namespace OgreBites
                         if (!mRenderWnd) 
                         {
                             Ogre::NameValuePairList opt;
-                            opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)app->window);
-                            opt["androidConfig"] = Ogre::StringConverter::toString((int)config);
+                            opt["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(app->window));
+                            opt["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(config));
                             
                             mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
                             

@@ -25,21 +25,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __BitwiseTest_H__
+#define __BitwiseTest_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 class BitwiseTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( BitwiseTests );
+    CPPUNIT_TEST_SUITE(BitwiseTests);
     CPPUNIT_TEST(testFixedPointConversion);
     CPPUNIT_TEST(testIntReadWrite);
     CPPUNIT_TEST(testHalf);
     CPPUNIT_TEST_SUITE_END();
+
 public:
     void setUp();
     void tearDown();
+
     void testFixedPointConversion();
     void testIntReadWrite();
     void testHalf();
 };
+
+#endif

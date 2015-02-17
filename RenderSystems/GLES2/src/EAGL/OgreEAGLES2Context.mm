@@ -48,9 +48,9 @@ namespace Ogre {
         mDrawable = [drawable retain];
 
 #if OGRE_NO_GLES3_SUPPORT == 0
-        NSUInteger renderingAPI = kEAGLRenderingAPIOpenGLES3;
+        EAGLRenderingAPI renderingAPI = kEAGLRenderingAPIOpenGLES3;
 #else
-        NSUInteger renderingAPI = kEAGLRenderingAPIOpenGLES2;
+        EAGLRenderingAPI renderingAPI = kEAGLRenderingAPIOpenGLES2;
 #endif
         // If the group argument is not NULL, then we assume that an externally created EAGLSharegroup
         // is to be used and a context is created using that group.

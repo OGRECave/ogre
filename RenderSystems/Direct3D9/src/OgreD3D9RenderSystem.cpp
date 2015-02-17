@@ -55,6 +55,10 @@ THE SOFTWARE.
 #include "OgreRenderOperation.h"
 #include "OgreHlmsDatablock.h"
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+#include "OgreD3D9StereoDriverBridge.h"
+#endif
+
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 
 namespace Ogre 
@@ -63,9 +67,12 @@ namespace Ogre
 
     //---------------------------------------------------------------------
     D3D9RenderSystem::D3D9RenderSystem( HINSTANCE hInstance ) :
-        mMultiheadUse(mutAuto),
-        mAllowDirectX9Ex(false),
-        mIsDirectX9Ex(false)
+        mMultiheadUse(mutAuto)
+        ,mAllowDirectX9Ex(false)
+        ,mIsDirectX9Ex(false)
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        ,mStereoDriver (NULL)
+#endif
     {
         LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " created." );
 
@@ -86,6 +93,15 @@ namespace Ogre
         mHLSLProgramFactory = NULL;     
         mDeviceManager = NULL;  
         mPerStageConstantSupport = false;
+
+		for(int i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
+		{
+			for(int j = 0 ; j < 2 ; j++)
+			{
+				mManualBlendColours[i][j] = ColourValue::ZERO;
+			}
+
+		}
 
         // Create the resource manager.
         mResourceManager = OGRE_NEW D3D9ResourceManager();
@@ -147,6 +163,11 @@ namespace Ogre
             mResourceManager = NULL;
         }
         
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        OGRE_DELETE mStereoDriver;
+        mStereoDriver = NULL;
+#endif
+
         LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " destroyed." );
 
         msD3D9RenderSystem = NULL;
@@ -158,6 +179,12 @@ namespace Ogre
         return strName;
     }
     //---------------------------------------------------------------------
+	const String& D3D9RenderSystem::getFriendlyName(void) const
+	{
+		static String strName = mIsDirectX9Ex ? "Direct3D 9Ex" : "Direct3D 9";
+		return strName;
+	}
+	
     D3D9DriverList* D3D9RenderSystem::getDirect3DDrivers()
     {
         if( !mDriverList )
@@ -195,6 +222,7 @@ namespace Ogre
         ConfigOption optMultihead;
         ConfigOption optVSync;
         ConfigOption optVSyncInterval;
+		ConfigOption optBackBufferCount;
         ConfigOption optAA;
         ConfigOption optFPUMode;
         ConfigOption optNVPerfHUD;
@@ -202,6 +230,9 @@ namespace Ogre
         ConfigOption optResourceCeationPolicy;
         ConfigOption optMultiDeviceMemHint;
         ConfigOption optEnableFixedPipeline;
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        ConfigOption optStereoMode;
+#endif
 
         driverList = this->getDirect3DDrivers();
 
@@ -268,6 +299,13 @@ namespace Ogre
         optVSyncInterval.possibleValues.push_back( "4" );
         optVSyncInterval.currentValue = "1";
 
+		optBackBufferCount.name = "Backbuffer Count";
+		optBackBufferCount.immutable = false;
+		optBackBufferCount.possibleValues.push_back( "Auto" );
+		optBackBufferCount.possibleValues.push_back( "1" );
+		optBackBufferCount.possibleValues.push_back( "2" );
+		optBackBufferCount.currentValue = "Auto";
+
         optAA.name = "FSAA";
         optAA.immutable = false;
         optAA.possibleValues.push_back( "None" );
@@ -311,6 +349,16 @@ namespace Ogre
         optEnableFixedPipeline.currentValue = "Yes";
         optEnableFixedPipeline.immutable = false;
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        optStereoMode.name = "Stereo Mode";
+        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
+        optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+        optStereoMode.currentValue = optStereoMode.possibleValues[0];
+        optStereoMode.immutable = false;
+
+        mOptions[optStereoMode.name] = optStereoMode;
+#endif
+
         mOptions[optDevice.name] = optDevice;
         mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
         mOptions[optVideoMode.name] = optVideoMode;
@@ -318,6 +366,7 @@ namespace Ogre
         mOptions[optMultihead.name] = optMultihead;
         mOptions[optVSync.name] = optVSync;
         mOptions[optVSyncInterval.name] = optVSyncInterval;
+		mOptions[optBackBufferCount.name] = optBackBufferCount;
         mOptions[optAA.name] = optAA;
         mOptions[optFPUMode.name] = optFPUMode;
         mOptions[optNVPerfHUD.name] = optNVPerfHUD;
@@ -455,6 +504,19 @@ namespace Ogre
             else mMultiheadUse = mutAuto;
         }
 
+		if (name == "VSync Interval")
+		{
+			mVSyncInterval = StringConverter::parseUnsignedInt(value);
+		}
+
+		if( name == "VSync" )
+		{
+			if (value == "Yes")
+				mVSync = true;
+			else
+				mVSync = false;
+		}
+		
         if( name == "FSAA" )
         {
             StringVector values = StringUtil::split(value, " ", 1);
@@ -463,6 +525,18 @@ namespace Ogre
                 mFSAAHint = values[1];
 
         }
+		
+		if (name == "Backbuffer Count")
+		{
+			if (value == "Auto")
+			{
+				mBackBufferCount = -1;
+			}
+			else
+			{
+				mBackBufferCount = StringConverter::parseUnsignedInt(value);
+			}
+		}
 
         if( name == "Allow NVPerfHUD" )
         {
@@ -585,6 +659,12 @@ namespace Ogre
                 "the 'Rendering Device' has been changed.";
         }
 
+		it = mOptions.find( "VSync" );
+		if( it->second.currentValue == "Yes" )
+			mVSync = true;
+		else
+			mVSync = false;
+
         return BLANKSTRING;
     }
     //---------------------------------------------------------------------
@@ -691,10 +771,14 @@ namespace Ogre
             miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
             miscParams["FSAA"] = StringConverter::toString(mFSAASamples);
             miscParams["FSAAHint"] = mFSAAHint;
+			miscParams["vsync"] = StringConverter::toString(mVSync);
+			miscParams["vsyncInterval"] = StringConverter::toString(mVSyncInterval);
+
             miscParams["useNVPerfHUD"] = StringConverter::toString(mUseNVPerfHUD);
             miscParams["gamma"] = StringConverter::toString(hwGamma);
             miscParams["monitorIndex"] = StringConverter::toString(static_cast<int>(mActiveD3DDriver->getAdapterNumber()));
-
+			miscParams["Backbuffer Count"] = StringConverter::toString(mBackBufferCount);
+			
             opt = mOptions.find("VSync");
             if (opt == mOptions.end())
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find VSync options!", "D3D9RenderSystem::initialise");
@@ -812,7 +896,12 @@ namespace Ogre
                 "exists.  You cannot create a new window with this name.";
             OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "D3D9RenderSystem::_createRenderWindow" );
         }
-                
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        // Stereo driver must be created before device is created
+        createStereoDriver(miscParams);
+#endif
+
         D3D9RenderWindow* renderWindow = OGRE_NEW D3D9RenderWindow(mhInstance);
         
         renderWindow->create(name, width, height, fullScreen, miscParams);
@@ -841,6 +930,12 @@ namespace Ogre
 
         attachRenderTarget( *renderWindow );
         
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        // Must be called after device has been linked to window
+        D3D9StereoDriverBridge::getSingleton().addRenderWindow(renderWindow);
+        renderWindow->_validateStereo();
+#endif
+
         return renderWindow;
     }   
     //---------------------------------------------------------------------
@@ -1586,6 +1681,10 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D9RenderSystem::destroyRenderTarget(const String& name)
     {       
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        D3D9StereoDriverBridge::getSingleton().removeRenderWindow(name);
+#endif
+
         detachRenderTargetImpl(name);
 
         // Do the real removal
@@ -3016,6 +3115,10 @@ namespace Ogre
                 // also make sure we validate the device; if this never went 
                 // through update() it won't be set
                 window->_validateDevice();
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+                window->_validateStereo();
+#endif
             }
 
             // Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
@@ -4243,6 +4346,11 @@ namespace Ogre
     }
 
     //---------------------------------------------------------------------
+	bool D3D9RenderSystem::IsActiveDeviceLost() 
+	{
+		return D3D9RenderSystem::getDeviceManager()->getActiveDevice()->isDeviceLost();
+	}
+
     unsigned int D3D9RenderSystem::getDisplayMonitorCount() const
     {
         return mD3D->GetAdapterCount();
@@ -4464,4 +4572,27 @@ namespace Ogre
 
         fireEvent(name, &params);
     }
+    //---------------------------------------------------------------------
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+    void D3D9RenderSystem::createStereoDriver(const NameValuePairList* miscParams)
+    {
+        // Get the value used to create the render system.  If none, get the parameter value used to create the window.
+        StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
+        if (stereoMode == SMT_NONE)
+        {
+            NameValuePairList::const_iterator iter = miscParams->find("stereoMode");
+            if (iter != miscParams->end())
+              stereoMode = StringConverter::parseStereoMode((*iter).second);
+        }
+
+        // Always create the stereo bridge regardless of the mode
+        mStereoDriver = OGRE_NEW D3D9StereoDriverBridge(stereoMode);
+    }
+    //---------------------------------------------------------------------
+    bool D3D9RenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+    {
+        return D3D9StereoDriverBridge::getSingleton().setDrawBuffer(colourBuffer);
+    }
+    //---------------------------------------------------------------------
+#endif
 }

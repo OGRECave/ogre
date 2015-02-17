@@ -74,7 +74,7 @@ namespace Ogre {
     {
     }
 
-    Exception & Exception::operator = ( const Exception& rhs )
+    Exception& Exception::operator = ( const Exception& rhs )
     {
         description = rhs.description;
         number = rhs.number;

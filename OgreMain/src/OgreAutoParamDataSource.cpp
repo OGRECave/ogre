@@ -112,6 +112,11 @@ namespace Ogre {
         mNodeMemoryManager = 0;
     }
     //-----------------------------------------------------------------------------
+	const Camera* AutoParamDataSource::getCurrentCamera() const
+	{
+		return mCurrentCamera;
+	}
+	//-----------------------------------------------------------------------------
     const Light& AutoParamDataSource::getLight(size_t index) const
     {
         // If outside light range, return a blank light to ensure zeroised for program

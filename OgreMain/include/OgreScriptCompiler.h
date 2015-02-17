@@ -189,7 +189,7 @@ namespace Ogre
     {
     public: // Externally accessible types
         //typedef map<String,uint32>::type IdMap;
-        typedef HashMap<String,uint32> IdMap;
+        typedef OGRE_HashMap<String,uint32> IdMap;
 
         // The container for errors
         struct Error : public ScriptCompilerAlloc

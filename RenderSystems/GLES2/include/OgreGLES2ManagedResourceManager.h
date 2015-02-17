@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "OgreGLES2Prerequisites.h"
 
 namespace Ogre {
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+
     class EGLContext;
     class GLES2ManagedResource;
     
@@ -70,6 +73,9 @@ namespace Ogre {
     protected:      
         ResourceContainer           mResources;
     };
+
+#endif
+
 }
 
 #endif
