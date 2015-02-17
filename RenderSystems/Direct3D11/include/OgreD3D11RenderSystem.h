@@ -324,6 +324,10 @@ namespace Ogre
         virtual void _hlmsBlendblockDestroyed( HlmsBlendblock *block );
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
+        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
+        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
+        virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
+        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
 
         void _beginFrame(void);
         void _endFrame(void);
