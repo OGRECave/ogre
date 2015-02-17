@@ -48,7 +48,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsMacroblock::HlmsMacroblock() :
         BasicBlock( BLOCK_MACRO ),
-        mAlphaToCoverageEnabled( false ),
         mScissorTestEnabled( false ),
         mDepthCheck( true ),
         mDepthWrite( true ),
@@ -69,7 +68,8 @@ namespace Ogre
         mSourceBlendFactorAlpha( SBF_ONE ),
         mDestBlendFactorAlpha( SBF_ZERO ),
         mBlendOperation( SBO_ADD ),
-        mBlendOperationAlpha( SBO_ADD )
+        mBlendOperationAlpha( SBO_ADD ),
+        mAlphaToCoverageEnabled( false )
     {
     }
     //-----------------------------------------------------------------------------------

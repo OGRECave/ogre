@@ -818,7 +818,7 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(!getBoolean(prop->values.front(), &macroblock.mAlphaToCoverageEnabled))
+                        if(!getBoolean(prop->values.front(), &blendblock.mAlphaToCoverageEnabled))
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                "alpha_to_coverage argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
@@ -2123,7 +2123,7 @@ namespace Ogre{
                     }
                     else
                     {
-                        if(!getBoolean(prop->values.front(), &macroblock.mAlphaToCoverageEnabled))
+                        if(!getBoolean(prop->values.front(), &blendblock.mAlphaToCoverageEnabled))
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                "alpha_to_coverage argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");

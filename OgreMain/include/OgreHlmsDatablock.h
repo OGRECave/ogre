@@ -65,7 +65,6 @@ namespace Ogre
     */
     struct _OgreExport HlmsMacroblock : public BasicBlock
     {
-        bool                mAlphaToCoverageEnabled;
         bool                mScissorTestEnabled;
         bool                mDepthCheck;
         bool                mDepthWrite;
@@ -108,8 +107,7 @@ namespace Ogre
         bool operator != ( const HlmsMacroblock &_r ) const
         {
             //Don't include the ID in the comparision
-            return  mAlphaToCoverageEnabled != _r.mAlphaToCoverageEnabled ||
-                    mScissorTestEnabled     != _r.mScissorTestEnabled ||
+            return  mScissorTestEnabled     != _r.mScissorTestEnabled ||
                     mDepthCheck             != _r.mDepthCheck ||
                     mDepthWrite             != _r.mDepthWrite ||
                     mDepthFunc              != _r.mDepthFunc ||
@@ -144,6 +142,8 @@ namespace Ogre
         SceneBlendOperation mBlendOperation;
         SceneBlendOperation mBlendOperationAlpha;
 
+        bool                mAlphaToCoverageEnabled;
+
         HlmsBlendblock();
 
         bool operator != ( const HlmsBlendblock &_r ) const
@@ -157,7 +157,8 @@ namespace Ogre
                     mSourceBlendFactorAlpha != _r.mSourceBlendFactorAlpha ||
                     mDestBlendFactorAlpha   != _r.mDestBlendFactorAlpha ||
                     mBlendOperation         != _r.mBlendOperation ||
-                    mBlendOperationAlpha    != _r.mBlendOperationAlpha;
+                    mBlendOperationAlpha    != _r.mBlendOperationAlpha ||
+                    mAlphaToCoverageEnabled != _r.mAlphaToCoverageEnabled;
         }
     };
 

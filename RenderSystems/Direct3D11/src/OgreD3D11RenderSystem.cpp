@@ -50,6 +50,8 @@ THE SOFTWARE.
 #include "OgreD3D11HLSLProgram.h"
 #include "OgreD3D11VertexDeclaration.h"
 
+#include "OgreHlmsDatablock.h"
+
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
@@ -2257,6 +2259,136 @@ bail:
             if(static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer())
                 _setRenderTargetViews();
         }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsMacroblockCreated( HlmsMacroblock *newBlock )
+    {
+        D3D11_RASTERIZER_DESC rasterDesc;
+        switch( newBlock->mCullMode )
+        {
+        case CULL_NONE:
+            rasterDesc.CullMode = D3D11_CULL_NONE;
+            break;
+        default:
+        case CULL_CLOCKWISE:
+            rasterDesc.CullMode = D3D11_CULL_BACK;
+            break;
+        case CULL_ANTICLOCKWISE:
+            rasterDesc.CullMode = D3D11_CULL_FRONT;
+            break;
+        }
+
+        // This should/will be done in a geometry shader like in the FixedFuncEMU sample and the shader needs solid
+        rasterDesc.FillMode = newBlock->mPolygonMode == PM_WIREFRAME ? D3D11_FILL_WIREFRAME :
+                                                                       D3D11_FILL_SOLID;
+
+        rasterDesc.FrontCounterClockwise = true;
+
+        const float nearFarFactor = 10.0;
+        rasterDesc.DepthBias        = static_cast<int>(-nearFarFactor * newBlock->mDepthBiasConstant);
+        rasterDesc.DepthBiasClamp   = 0;
+        rasterDesc.SlopeScaledDepthBias = newBlock->mDepthBiasSlopeScale;
+
+        rasterDesc.DepthClipEnable  = true;
+        rasterDesc.ScissorEnable    = newBlock->mScissorTestEnabled;
+
+        rasterDesc.MultisampleEnable     = true;
+        rasterDesc.AntialiasedLineEnable = false;
+
+        ID3D11RasterizerState *rasterizerState = 0;
+
+        HRESULT hr = mDevice->CreateRasterizerState( &rasterDesc, &rasterizerState );
+        if( FAILED(hr) )
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Failed to create rasterizer state\nError Description: " + errorDescription,
+                "D3D11RenderSystem::_hlmsMacroblockCreated" );
+        }
+
+        newBlock->mRsData = rasterizerState;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsMacroblockDestroyed( HlmsMacroblock *block )
+    {
+        ID3D11RasterizerState *rasterizerState = reinterpret_cast<ID3D11RasterizerState*>(
+                                                                        block->mRsData );
+        rasterizerState->Release();
+        block->mRsData = 0;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsBlendblockCreated( HlmsBlendblock *newBlock )
+    {
+        D3D11_BLEND_DESC blendDesc;
+        ZeroMemory( &blendDesc, sizeof(D3D11_BLEND_DESC) );
+        blendDesc.IndependentBlendEnable = false;
+        blendDesc.RenderTarget[0].BlendEnable = newBlock->mBlendOperation;
+
+        if( newBlock->mSeparateBlend )
+        {
+            if( newBlock->mSourceBlendFactor == SBF_ONE &&
+                newBlock->mDestBlendFactor == SBF_ZERO &&
+                newBlock->mSourceBlendFactorAlpha == SBF_ONE &&
+                newBlock->mDestBlendFactorAlpha == SBF_ZERO )
+            {
+                blendDesc.RenderTarget[0].BlendEnable = FALSE;
+            }
+            else
+            {
+                blendDesc.RenderTarget[0].BlendEnable = TRUE;
+                blendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(newBlock->mSourceBlendFactor, false);
+                blendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(newBlock->mDestBlendFactor, false);
+                blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(newBlock->mSourceBlendFactorAlpha, true);
+                blendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(newBlock->mDestBlendFactorAlpha, true);
+                blendDesc.RenderTarget[0].BlendOp = blendDesc.RenderTarget[0].BlendOpAlpha =
+                        D3D11Mappings::get( newBlock->mBlendOperation );
+
+                blendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
+            }
+        }
+        else
+        {
+            if( newBlock->mSourceBlendFactor == SBF_ONE && newBlock->mDestBlendFactor == SBF_ZERO )
+            {
+                blendDesc.RenderTarget[0].BlendEnable = FALSE;
+            }
+            else
+            {
+                blendDesc.RenderTarget[0].BlendEnable = TRUE;
+                blendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(newBlock->mSourceBlendFactor, false);
+                blendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(newBlock->mDestBlendFactor, false);
+                blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(newBlock->mSourceBlendFactor, true);
+                blendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(newBlock->mDestBlendFactor, true);
+                blendDesc.RenderTarget[0].BlendOp = D3D11Mappings::get( newBlock->mBlendOperation );
+                blendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get( newBlock->mBlendOperationAlpha );
+
+                blendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
+            }
+        }
+
+        // feature level 9 and below does not support alpha to coverage.
+        if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
+            blendDesc.AlphaToCoverageEnable = false;
+        else
+            blendDesc.AlphaToCoverageEnable = newBlock->mAlphaToCoverageEnabled;
+
+        ID3D11BlendState *blendState = 0;
+
+        HRESULT hr = mDevice->CreateBlendState( &blendDesc, &blendState );
+        if( FAILED(hr) )
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Failed to create blend state\nError Description: " + errorDescription,
+                "D3D11RenderSystem::_hlmsBlendblockCreated" );
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsBlendblockDestroyed( HlmsBlendblock *block )
+    {
+        ID3D11BlendState *blendState = reinterpret_cast<ID3D11BlendState*>( block->mRsData );
+        blendState->Release();
+        block->mRsData = 0;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()

@@ -317,6 +317,14 @@ namespace Ogre
             SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD);
         void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         void _setViewport( Viewport *vp );
+
+        virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
+        virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
+        virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock );
+        virtual void _hlmsBlendblockDestroyed( HlmsBlendblock *block );
+        virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
+        virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
+
         void _beginFrame(void);
         void _endFrame(void);
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );

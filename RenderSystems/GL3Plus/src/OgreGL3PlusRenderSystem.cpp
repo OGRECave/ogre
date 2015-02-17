@@ -1543,15 +1543,6 @@ namespace Ogre {
         //Polygon mode
         OCGE( glPolygonMode( GL_FRONT_AND_BACK, glMacroblock->mPolygonMode ) );
 
-        if( macroblock->mAlphaToCoverageEnabled )
-        {
-            OCGE( glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
-        }
-        else
-        {
-            OCGE( glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
-        }
-
         if( macroblock->mScissorTestEnabled )
         {
             OCGE( glEnable(GL_SCISSOR_TEST) );
@@ -1578,6 +1569,15 @@ namespace Ogre {
         {
             _setSceneBlending( blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
                                blendblock->mBlendOperation );
+        }
+
+        if( blendblock->mAlphaToCoverageEnabled )
+        {
+            OCGE( glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
+        }
+        else
+        {
+            OCGE( glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
         }
     }
 

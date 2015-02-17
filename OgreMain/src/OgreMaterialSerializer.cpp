@@ -526,6 +526,13 @@ namespace Ogre
                 }
             }
 
+            // alpha_to_coverage
+            if (mDefaults ||blendblock->mAlphaToCoverageEnabled)
+            {
+                writeAttribute(3, "alpha_to_coverage");
+                writeValue(blendblock->mAlphaToCoverageEnabled ? "on" : "off");
+            }
+
             const HlmsMacroblock *macroblock = pPass->getMacroblock();
 
             // alpha_rejection
@@ -536,12 +543,6 @@ namespace Ogre
                 writeAttribute(3, "alpha_rejection");
                 writeCompareFunction(pPass->getAlphaRejectFunction());
                 writeValue(StringConverter::toString(pPass->getAlphaRejectValue()));
-            }
-            // alpha_to_coverage
-            if (mDefaults ||macroblock->mAlphaToCoverageEnabled)
-            {
-                writeAttribute(3, "alpha_to_coverage");
-                writeValue(macroblock->mAlphaToCoverageEnabled ? "on" : "off");
             }
 
             //depth check
