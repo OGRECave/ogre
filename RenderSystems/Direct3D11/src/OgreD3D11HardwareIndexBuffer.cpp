@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareBuffer.h"
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     D3D11HardwareIndexBuffer::D3D11HardwareIndexBuffer(HardwareBufferManagerBase* mgr, HardwareIndexBuffer::IndexType idxType, 
@@ -86,5 +87,5 @@ namespace Ogre {
         return mBufferImpl->getD3DBuffer();
     }
     //---------------------------------------------------------------------
-
+}
 }

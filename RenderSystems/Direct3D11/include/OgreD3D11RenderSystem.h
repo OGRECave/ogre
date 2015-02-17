@@ -88,7 +88,7 @@ namespace Ogre
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
         
-        D3D11HardwareBufferManager* mHardwareBufferManager;
+        v1::D3D11HardwareBufferManager* mHardwareBufferManager;
         D3D11GpuProgramManager* mGpuProgramManager;
         D3D11HLSLProgramFactory* mHLSLProgramFactory;
 
@@ -319,7 +319,6 @@ namespace Ogre
         void _setViewport( Viewport *vp );
         void _beginFrame(void);
         void _endFrame(void);
-        void _setCullingMode( CullingMode mode );
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
         void _setDepthBufferCheckEnabled( bool enabled = true );
         bool _getDepthBufferCheckEnabled( void );
@@ -341,11 +340,11 @@ namespace Ogre
         void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
         void _setTextureUnitCompareEnabled(size_t unit, bool compare);
         void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
-        void setVertexDeclaration(VertexDeclaration* decl);
-        void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
-        void setVertexBufferBinding(VertexBufferBinding* binding);
+        void setVertexDeclaration(v1::VertexDeclaration* decl);
+        void setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding);
+        void setVertexBufferBinding(v1::VertexBufferBinding* binding);
         void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName,unsigned int StartSlot);
-        void _render(const RenderOperation& op);
+        void _render(const v1::RenderOperation& op);
         /** See
           RenderSystem
          */

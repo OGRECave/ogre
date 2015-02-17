@@ -1139,8 +1139,9 @@ namespace Ogre {
                     // Guard to create uniform buffer only once
                     if (it->mUniformBuffer.isNull())
                     {
-                        HardwareUniformBufferSharedPtr uBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(mD3d11ShaderBufferDescs[b].Size, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
-                        it->mUniformBuffer = HardwareUniformBufferSharedPtr(uBuffer);
+                        v1::HardwareUniformBufferSharedPtr uBuffer = v1::HardwareBufferManager::getSingleton().createUniformBuffer(
+                                    mD3d11ShaderBufferDescs[b].Size, v1::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false);
+                        it->mUniformBuffer = v1::HardwareUniformBufferSharedPtr(uBuffer);
                     }
                     else
                     {
@@ -1923,7 +1924,7 @@ namespace Ogre {
             
             if (!it->mUniformBuffer.isNull())
             {
-                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);
+                void* pMappedData = it->mUniformBuffer->lock(v1::HardwareBuffer::HBL_DISCARD);
 
                 // Only iterate through parsed variables (getting size of list)
                 void* src = 0;
@@ -1951,7 +1952,7 @@ namespace Ogre {
 
                 it->mUniformBuffer->unlock();
 
-                return static_cast<D3D11HardwareUniformBuffer*>(it->mUniformBuffer.get())->getD3DConstantBuffer();
+                return static_cast<v1::D3D11HardwareUniformBuffer*>(it->mUniformBuffer.get())->getD3DConstantBuffer();
             }
         }
 
@@ -1969,7 +1970,7 @@ namespace Ogre {
         {
             if (!it->mUniformBuffer.isNull())
             {
-                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);
+                void* pMappedData = it->mUniformBuffer->lock(v1::HardwareBuffer::HBL_DISCARD);
 
                 // Only iterate through parsed variables (getting size of list)
                 void* src = 0;
@@ -1998,7 +1999,7 @@ namespace Ogre {
                 it->mUniformBuffer->unlock();
 
                 // Add buffer to list
-                buffers[numBuffers] = static_cast<D3D11HardwareUniformBuffer*>(it->mUniformBuffer.get())->getD3DConstantBuffer();
+                buffers[numBuffers] = static_cast<v1::D3D11HardwareUniformBuffer*>(it->mUniformBuffer.get())->getD3DConstantBuffer();
                 // Increment number of buffers
                 numBuffers++;
             }

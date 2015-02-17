@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
+namespace v1 {
 
     /// Specialisation of HardwareVertexBuffer for D3D11
     class D3D11HardwareVertexBuffer : public HardwareVertexBuffer 
@@ -63,6 +64,7 @@ namespace Ogre {
         ID3D11Buffer * getD3DVertexBuffer(void) const;
     };
 
+}
 }
 #endif
 

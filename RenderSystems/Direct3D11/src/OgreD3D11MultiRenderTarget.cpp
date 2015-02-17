@@ -55,7 +55,7 @@ namespace Ogre
     {
         assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
         /// Get buffer and surface to bind to
-        D3D11HardwarePixelBuffer *buffer = 0;
+        v1::D3D11HardwarePixelBuffer *buffer = 0;
         target->getCustomAttribute("BUFFER", &buffer);
         assert(buffer);
 

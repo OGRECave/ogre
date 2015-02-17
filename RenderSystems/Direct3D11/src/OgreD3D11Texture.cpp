@@ -806,11 +806,11 @@ namespace Ogre
         unsigned int bufusage;
         if ((mUsage & TU_DYNAMIC))
         {
-            bufusage = HardwareBuffer::HBU_DYNAMIC;
+            bufusage = v1::HardwareBuffer::HBU_DYNAMIC;
         }
         else
         {
-            bufusage = HardwareBuffer::HBU_STATIC;
+            bufusage = v1::HardwareBuffer::HBU_STATIC;
         }
         if (mUsage & TU_RENDERTARGET)
         {
@@ -832,14 +832,14 @@ namespace Ogre
                 for(size_t mip=0; mip<=mNumMipmaps; ++mip)
                 { 
 
-                    D3D11HardwarePixelBuffer *buffer;
+                    v1::D3D11HardwarePixelBuffer *buffer;
                     size_t subresourceIndex = D3D11CalcSubresource(mip, face, mNumMipmaps);
                     if (getNumFaces() > 0)
                     {
                         subresourceIndex = mip;
 
                     }
-                    buffer = new D3D11HardwarePixelBuffer(
+                    buffer = new v1::D3D11HardwarePixelBuffer(
                         this, // parentTexture
                         mDevice, // device
                         subresourceIndex, // subresourceIndex
@@ -848,11 +848,11 @@ namespace Ogre
                         depth,
                         face,
                         format,
-                        (HardwareBuffer::Usage)bufusage // usage
+                        (v1::HardwareBuffer::Usage)bufusage // usage
                         ); 
 
                     mSurfaceList.push_back(
-                        HardwarePixelBufferSharedPtr(buffer)
+                        v1::HardwarePixelBufferSharedPtr(buffer)
                         );
                     width /= 2;
                     height /= 2;
@@ -864,7 +864,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    HardwarePixelBufferSharedPtr D3D11Texture::getBuffer(size_t face, size_t mipmap) 
+    v1::HardwarePixelBufferSharedPtr D3D11Texture::getBuffer(size_t face, size_t mipmap)
     {
         if(face >= getNumFaces())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "A three dimensional cube has six faces",
@@ -997,7 +997,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     // D3D11RenderTexture
     //---------------------------------------------------------------------
-    void D3D11RenderTexture::rebind( D3D11HardwarePixelBuffer *buffer )
+    void D3D11RenderTexture::rebind( v1::D3D11HardwarePixelBuffer *buffer )
     {
         mBuffer = buffer;
         mWidth = (unsigned int) mBuffer->getWidth();
@@ -1062,7 +1062,7 @@ namespace Ogre
         {
             //IDXGISurface ** pSurf = (IDXGISurface **)pData;
             //*pSurf = static_cast<D3D11HardwarePixelBuffer*>(mBuffer)->getSurface();
-            *static_cast<HardwarePixelBuffer**>(pData) = mBuffer;
+            *static_cast<v1::HardwarePixelBuffer**>(pData) = mBuffer;
             return;
         }
 		else if(name == "HWND" || name == "WINDOW")
@@ -1079,13 +1079,13 @@ namespace Ogre
         }
         else if(name == "BUFFER")
         {
-            *static_cast<HardwarePixelBuffer**>(pData) = mBuffer;
+            *static_cast<v1::HardwarePixelBuffer**>(pData) = mBuffer;
             return;
         }
         else if( name == "ID3D11Texture2D" )
         {
             ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
-            *pBackBuffer = static_cast<D3D11HardwarePixelBuffer*>(mBuffer)->getParentTexture()->GetTex2D();
+            *pBackBuffer = static_cast<v1::D3D11HardwarePixelBuffer*>(mBuffer)->getParentTexture()->GetTex2D();
             return;
         }
         else if(name == "ID3D11RenderTargetView")
@@ -1104,8 +1104,10 @@ namespace Ogre
         RenderTexture::getCustomAttribute(name, pData);
     }
     //---------------------------------------------------------------------
-    D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer,  D3D11Device & device ) : mDevice(device),
-    RenderTexture(buffer, 0)
+    D3D11RenderTexture::D3D11RenderTexture( const String &name, v1::D3D11HardwarePixelBuffer *buffer,
+                                            D3D11Device & device ) :
+        mDevice(device),
+        RenderTexture(buffer, 0)
     {
         mName = name;
 

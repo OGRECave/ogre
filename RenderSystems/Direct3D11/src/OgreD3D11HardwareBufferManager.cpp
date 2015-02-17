@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 
 namespace Ogre {
+namespace v1 {
 	//-----------------------------------------------------------------------
 	D3D11HardwareBufferManagerBase::D3D11HardwareBufferManagerBase(D3D11Device & device)
 		: mlpD3DDevice(device)
@@ -155,4 +156,5 @@ namespace Ogre {
 	{
 		delete decl;
 	}
+}
 }

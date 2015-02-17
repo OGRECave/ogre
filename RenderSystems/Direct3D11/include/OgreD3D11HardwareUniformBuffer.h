@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramParams.h"
 
 namespace Ogre {
+namespace v1 {
 
     /// Specialisation of HardwareBuffer for D3D11
     class D3D11HardwareUniformBuffer : public HardwareUniformBuffer 
@@ -63,6 +64,7 @@ namespace Ogre {
         ID3D11Buffer * getD3DConstantBuffer(void) const;
     };
 
+}
 }
 #endif
 

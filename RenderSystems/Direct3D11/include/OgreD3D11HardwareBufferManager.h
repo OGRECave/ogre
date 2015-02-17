@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** Implementation of HardwareBufferManager for D3D11. */
     class D3D11HardwareBufferManagerBase : public HardwareBufferManagerBase
@@ -83,7 +84,7 @@ namespace Ogre {
         }
     };
 
-
+}
 }
 
 

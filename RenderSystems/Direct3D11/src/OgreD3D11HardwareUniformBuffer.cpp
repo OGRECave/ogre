@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     D3D11HardwareUniformBuffer::D3D11HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, 
@@ -97,4 +98,4 @@ namespace Ogre {
 		return mBufferImpl->getD3DBuffer();
 	}
 }
-
+}

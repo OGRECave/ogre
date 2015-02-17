@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     D3D11HardwareVertexBuffer::D3D11HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
@@ -100,4 +101,4 @@ namespace Ogre {
         return mBufferImpl->getD3DBuffer();
     }
 }
-
+}

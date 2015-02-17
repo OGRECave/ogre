@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 
 namespace Ogre { 
+namespace v1 {
 
     /** Specialisation of VertexDeclaration for D3D11 */
     class D3D11VertexDeclaration : public VertexDeclaration
@@ -87,6 +88,7 @@ namespace Ogre {
 
     };
 
+}
 }
 
 #endif

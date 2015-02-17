@@ -57,7 +57,7 @@ namespace Ogre {
 
 
 		/// @copydoc Texture::getBuffer
-		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
+        v1::HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
 		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
 		/// retrieves a pointer to the actual texture
@@ -124,7 +124,7 @@ namespace Ogre {
         // Dynamic textures?
         bool                            mDynamicTextures;
         /// Vector of pointers to subsurfaces
-        typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
+        typedef vector<v1::HardwarePixelBufferSharedPtr>::type SurfaceList;
         SurfaceList                     mSurfaceList;
 
         D3D11_SHADER_RESOURCE_VIEW_DESC mSRVDesc;
@@ -188,10 +188,10 @@ namespace Ogre {
         ID3D11RenderTargetView * mRenderTargetView;
         ID3D11DepthStencilView * mDepthStencilView;
     public:
-        D3D11RenderTexture(const String &name, D3D11HardwarePixelBuffer *buffer, D3D11Device & device );
+        D3D11RenderTexture(const String &name, v1::D3D11HardwarePixelBuffer *buffer, D3D11Device & device );
         virtual ~D3D11RenderTexture();
 
-        void rebind(D3D11HardwarePixelBuffer *buffer);
+        void rebind(v1::D3D11HardwarePixelBuffer *buffer);
 
         virtual void getCustomAttribute( const String& name, void *pData );
 

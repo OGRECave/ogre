@@ -112,14 +112,18 @@ namespace Ogre
     class D3D11VideoModeList;
     class D3D11GpuProgram;
     class D3D11GpuProgramManager;
-    class D3D11HardwareBufferManager;
-    class D3D11HardwareIndexBuffer;
     class D3D11HLSLProgramFactory;
     class D3D11HLSLProgram;
-    class D3D11VertexDeclaration;
     class D3D11Device;
-    class D3D11HardwareBuffer;
-    class D3D11HardwarePixelBuffer;
+
+    namespace v1
+    {
+        class D3D11HardwareBuffer;
+        class D3D11HardwareBufferManager;
+        class D3D11HardwareIndexBuffer;
+        class D3D11HardwarePixelBuffer;
+        class D3D11VertexDeclaration;
+    }
 
     typedef SharedPtr<D3D11GpuProgram>  D3D11GpuProgramPtr;
     typedef SharedPtr<D3D11HLSLProgram> D3D11HLSLProgramPtr;

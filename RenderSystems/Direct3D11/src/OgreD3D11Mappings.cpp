@@ -212,28 +212,28 @@ namespace Ogre
 		return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     }
     //---------------------------------------------------------------------
-    D3D11_MAP D3D11Mappings::get(HardwareBuffer::LockOptions options, HardwareBuffer::Usage usage)
+    D3D11_MAP D3D11Mappings::get(v1::HardwareBuffer::LockOptions options, v1::HardwareBuffer::Usage usage)
     {
         D3D11_MAP ret = D3D11_MAP_READ_WRITE;
-        if (options == HardwareBuffer::HBL_DISCARD)
+        if (options == v1::HardwareBuffer::HBL_DISCARD)
         {
             // D3D doesn't like discard or no_overwrite on non-dynamic buffers
-            if (usage & HardwareBuffer::HBU_DYNAMIC)
+            if (usage & v1::HardwareBuffer::HBU_DYNAMIC)
                 ret = D3D11_MAP_WRITE_DISCARD;
         }
-        if (options == HardwareBuffer::HBL_READ_ONLY)
+        if (options == v1::HardwareBuffer::HBL_READ_ONLY)
         {
             // D3D debug runtime doesn't like you locking managed buffers readonly
             // when they were created with write-only (even though you CAN read
             // from the software backed version)
-            if (!(usage & HardwareBuffer::HBU_WRITE_ONLY))
+            if (!(usage & v1::HardwareBuffer::HBU_WRITE_ONLY))
                 ret = D3D11_MAP_READ;
 
         }
-        if (options == HardwareBuffer::HBL_NO_OVERWRITE)
+        if (options == v1::HardwareBuffer::HBL_NO_OVERWRITE)
         {
             // D3D doesn't like discard or no_overwrite on non-dynamic buffers
-            if (usage & HardwareBuffer::HBU_DYNAMIC)
+            if (usage & v1::HardwareBuffer::HBU_DYNAMIC)
                 ret = D3D11_MAP_WRITE_NO_OVERWRITE;
         }
 
@@ -259,9 +259,9 @@ namespace Ogre
         return box;
     }
     //---------------------------------------------------------------------
-    DXGI_FORMAT D3D11Mappings::getFormat(HardwareIndexBuffer::IndexType itype)
+    DXGI_FORMAT D3D11Mappings::getFormat(v1::HardwareIndexBuffer::IndexType itype)
     {
-		return itype == HardwareIndexBuffer::IT_32BIT ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
+        return itype == v1::HardwareIndexBuffer::IT_32BIT ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
     }
     //---------------------------------------------------------------------
     DXGI_FORMAT D3D11Mappings::get(VertexElementType vType)
@@ -544,17 +544,17 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-	D3D11_USAGE D3D11Mappings::_getUsage(HardwareBuffer::Usage usage)
+    D3D11_USAGE D3D11Mappings::_getUsage(v1::HardwareBuffer::Usage usage)
     {
 		return _isDynamic(usage) ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
     }
     //---------------------------------------------------------------------
-	bool D3D11Mappings::_isDynamic(HardwareBuffer::Usage usage)
+    bool D3D11Mappings::_isDynamic(v1::HardwareBuffer::Usage usage)
     {
-		return (usage & HardwareBuffer::HBU_DYNAMIC) != 0;
+        return (usage & v1::HardwareBuffer::HBU_DYNAMIC) != 0;
     }
     //---------------------------------------------------------------------
-	UINT D3D11Mappings::_getAccessFlags(HardwareBuffer::Usage usage)
+    UINT D3D11Mappings::_getAccessFlags(v1::HardwareBuffer::Usage usage)
     {
 		return _isDynamic(usage) ? D3D11_CPU_ACCESS_WRITE : 0;
     }

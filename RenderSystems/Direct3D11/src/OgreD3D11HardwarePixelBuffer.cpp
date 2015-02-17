@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include <algorithm>
 
 namespace Ogre {
+namespace v1 {
 
     //-----------------------------------------------------------------------------  
 
@@ -894,4 +895,5 @@ namespace Ogre {
             break;
         }
     }
+}
 };

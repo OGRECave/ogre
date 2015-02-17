@@ -65,7 +65,7 @@ namespace Ogre
         if(isTexture)
         {
             ID3D11Texture2D *D3D11texture;
-            D3D11HardwarePixelBuffer *pBuffer;
+            v1::D3D11HardwarePixelBuffer *pBuffer;
             renderTarget->getCustomAttribute( "BUFFER", &pBuffer );
             D3D11texture = static_cast<ID3D11Texture2D*>( pBuffer->getParentTexture()->getTextureResource() );
             D3D11texture->GetDesc(&BBDesc);

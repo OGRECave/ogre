@@ -1046,7 +1046,7 @@ bail:
 			// Create the texture manager for use by others
 			mTextureManager = new D3D11TextureManager(mDevice);
 			// Also create hardware buffer manager
-			mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
+            mHardwareBufferManager = new v1::D3D11HardwareBufferManager(mDevice);
 
 			// Create the GPU program manager
 			mGpuProgramManager = new D3D11GpuProgramManager(mDevice);
@@ -1090,8 +1090,6 @@ bail:
         rsc->setDriverVersion(mDriverVersion);
         rsc->setDeviceName(mActiveD3DDriver->DriverDescription());
         rsc->setRenderSystemName(getName());
-
-		rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 		
         // Does NOT support fixed-function!
         //rsc->setCapability(RSC_FIXED_FUNCTION);
@@ -1121,7 +1119,6 @@ bail:
         // We always support compression, D3DX will decompress if device does not support
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
-        rsc->setCapability(RSC_SCISSOR_TEST);
 
 		if(mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 			rsc->setCapability(RSC_TWO_SIDED_STENCIL);
@@ -1469,7 +1466,7 @@ bail:
     DepthBuffer* D3D11RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
         //Get surface data (mainly to get MSAA data)
-        D3D11HardwarePixelBuffer *pBuffer;
+        v1::D3D11HardwarePixelBuffer *pBuffer;
         renderTarget->getCustomAttribute( "BUFFER", &pBuffer );
         D3D11_TEXTURE2D_DESC BBDesc;
         static_cast<ID3D11Texture2D*>(pBuffer->getParentTexture()->getTextureResource())->GetDesc( &BBDesc );
@@ -1990,17 +1987,6 @@ bail:
         mBlendDescChanged = true;
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setCullingMode( CullingMode mode )
-    {
-        mCullingMode = mode;
-
-		bool flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping() ||
-					!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
-
-		mRasterizerDesc.CullMode = D3D11Mappings::get(mode, flip);
-        mRasterizerDescChanged = true;
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setDepthBufferParams( bool depthTest, bool depthWrite, CompareFunction depthFunction )
     {
         _setDepthBufferCheckEnabled( depthTest );
@@ -2233,7 +2219,6 @@ bail:
             target = vp->getTarget();
 
             _setRenderTarget(target);
-            _setCullingMode( mCullingMode );
 
             // set viewport dimensions
             d3dvp.TopLeftX = static_cast<FLOAT>(vp->getActualLeft());
@@ -2282,31 +2267,31 @@ bail:
     {
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
+    void D3D11RenderSystem::setVertexDeclaration(v1::VertexDeclaration* decl)
     {
             OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                     "Cannot directly call setVertexDeclaration in the d3d11 render system - cast then use 'setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)' .", 
                     "D3D11RenderSystem::setVertexDeclaration" );
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)
+    void D3D11RenderSystem::setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding)
     {
-        D3D11VertexDeclaration* d3ddecl = 
-            static_cast<D3D11VertexDeclaration*>(decl);
+        v1::D3D11VertexDeclaration* d3ddecl =
+            static_cast<v1::D3D11VertexDeclaration*>(decl);
 
         d3ddecl->bindToShader(mBoundVertexProgram, binding);
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setVertexBufferBinding(VertexBufferBinding* binding)
+    void D3D11RenderSystem::setVertexBufferBinding(v1::VertexBufferBinding* binding)
     {
         // TODO: attempt to detect duplicates
-        const VertexBufferBinding::VertexBufferBindingMap& binds = binding->getBindings();
-        VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
+        const v1::VertexBufferBinding::VertexBufferBindingMap& binds = binding->getBindings();
+        v1::VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
         iend = binds.end();
         for (i = binds.begin(); i != iend; ++i)
         {
-            const D3D11HardwareVertexBuffer* d3d11buf = 
-                static_cast<const D3D11HardwareVertexBuffer*>(i->second.get());
+            const v1::D3D11HardwareVertexBuffer* d3d11buf =
+                static_cast<const v1::D3D11HardwareVertexBuffer*>(i->second.get());
 
             UINT stride = static_cast<UINT>(d3d11buf->getVertexSize());
             UINT offset = 0; // no stream offset, this is handled in _render instead
@@ -2375,7 +2360,7 @@ bail:
     };
 
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_render(const RenderOperation& op)
+    void D3D11RenderSystem::_render(const v1::RenderOperation& op)
     {
 
         // Exit immediately if there is nothing to render
@@ -2384,8 +2369,8 @@ bail:
             return;
         }
 
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
-        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
+        v1::HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
+        v1::VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
 
         bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
                     !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 

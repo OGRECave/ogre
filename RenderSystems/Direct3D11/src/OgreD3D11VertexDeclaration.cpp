@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+namespace v1 {
 
     //-----------------------------------------------------------------------
     D3D11VertexDeclaration::D3D11VertexDeclaration(D3D11Device &  device) 
@@ -235,5 +236,5 @@ namespace Ogre {
         mlpD3DDevice.GetImmediateContext()->IASetInputLayout( pVertexLayout);
     }   
 }
-
+}
 

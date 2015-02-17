@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 
 namespace Ogre {
+namespace v1 {
     /**
     An object which renders geometry to a vertex.
     @remarks
@@ -67,5 +68,6 @@ namespace Ogre {
         size_t mFrontBufferIndex;
         D3D11HardwareBufferManagerBase * mBufManager;
     };
+}
 }
 #endif

@@ -33,6 +33,7 @@ THE SOFTWARE.
 
 
 namespace Ogre { 
+namespace v1 {
 
     class D3D11HardwareIndexBuffer : public HardwareIndexBuffer
     {
@@ -63,7 +64,7 @@ namespace Ogre {
     };
 
 }
-
+}
 
 
 #endif

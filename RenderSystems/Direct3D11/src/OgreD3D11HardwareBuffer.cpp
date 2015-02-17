@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 #include "OgreException.h"
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     D3D11HardwareBuffer::D3D11HardwareBuffer(
@@ -317,5 +318,5 @@ namespace Ogre {
         //mDevice.GetImmediateContext()->UpdateSubresource(mlpD3DBuffer, 0, NULL, pSource, offset, length);
     }
     //---------------------------------------------------------------------
-
+}
 }
