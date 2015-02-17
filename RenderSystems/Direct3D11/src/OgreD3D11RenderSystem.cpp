@@ -2604,7 +2604,9 @@ bail:
             }
             
             /// Vertex Shader binding
-            /*if (mBindingType == TextureUnitState::BT_VERTEX)
+			
+			/*if (mBindingType == TextureUnitState::BindingType::BT_VERTEX)*/
+			
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
@@ -3046,7 +3048,7 @@ bail:
 
 
                 } while (updatePassIterationRenderState());
-            } */
+            } 
         }
 
 
