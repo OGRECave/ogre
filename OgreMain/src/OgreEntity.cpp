@@ -236,7 +236,6 @@ namespace Ogre {
 
         mInitialised = true;
         mMeshStateCount = mMesh->getStateCount();
-        setMaterialName("BaseWhite");
     }
     //-----------------------------------------------------------------------
     void Entity::_deinitialise(void)
