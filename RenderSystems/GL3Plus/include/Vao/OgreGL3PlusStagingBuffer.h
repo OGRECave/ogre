@@ -117,7 +117,7 @@ namespace Ogre
 
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
 
-        GLuint getBufferName(void) const            { return mVboName; }
+        GLuint getBufferName(void) const           { return mVboName; }
     };
 }
 

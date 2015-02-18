@@ -221,7 +221,6 @@ namespace Ogre
 
             size_t poolSize = std::max( mDefaultPoolSize[vboFlag], sizeBytes );
 
-            //TODO: Deal with Out of memory errors
             //No luck, allocate a new buffer.
             OCGE( glGenBuffers( 1, &newVbo.vboName ) );
             OCGE( glBindBuffer( GL_ARRAY_BUFFER, newVbo.vboName ) );
@@ -398,7 +397,7 @@ namespace Ogre
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
         Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
@@ -456,7 +455,7 @@ namespace Ogre
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
         Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
@@ -505,7 +504,7 @@ namespace Ogre
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
         Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         ConstBufferPacked *retVal = OGRE_NEW GL3PlusConstBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
@@ -553,7 +552,7 @@ namespace Ogre
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
         Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
@@ -604,7 +603,7 @@ namespace Ogre
             allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
             Vbo &vbo = mVbos[vboFlag][vboIdx];
-            bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName, vbo.dynamicBuffer );
+            bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName, vbo.dynamicBuffer );
         }
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
