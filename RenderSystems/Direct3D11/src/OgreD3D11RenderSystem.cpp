@@ -78,12 +78,12 @@ namespace Ogre
         D3D_DRIVER_TYPE DriverType,
         HMODULE Software,
         UINT Flags,
-        /*_In_reads_opt_( FeatureLevels )*/ CONST D3D_FEATURE_LEVEL* pFeatureLevels,
+        const D3D_FEATURE_LEVEL* pFeatureLevels,
         UINT FeatureLevels,
         UINT SDKVersion,
-        _Out_opt_ ID3D11DeviceN** ppDevice,
-        _Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel,
-        _Out_opt_ ID3D11DeviceContextN** ppImmediateContext )
+        _Out_ ID3D11DeviceN** ppDevice,
+        _Out_ D3D_FEATURE_LEVEL* pFeatureLevel,
+        _Out_ ID3D11DeviceContextN** ppImmediateContext )
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         return D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
