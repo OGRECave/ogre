@@ -300,10 +300,10 @@ namespace Ogre {
             mProps[x].valid = false;
 
             // Fetch GL format token
-            GLenum fmt = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x);
-            GLenum fmt2 = GL3PlusPixelUtil::getGLOriginFormat((PixelFormat)x);
-            GLenum type = GL3PlusPixelUtil::getGLOriginDataType((PixelFormat)x);
-            if(fmt == GL_NONE && x != 0)
+            GLenum internalFormat = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x);
+            GLenum originFormat = GL3PlusPixelUtil::getGLOriginFormat((PixelFormat)x);
+            GLenum dataType = GL3PlusPixelUtil::getGLOriginDataType((PixelFormat)x);
+            if(internalFormat == GL_NONE && x != 0)
                 continue;
 
             // No test for compressed formats
@@ -314,11 +314,11 @@ namespace Ogre {
             GLint params;
 
             if(hasInternalFormatQuery) {
-                OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, fmt, GL_FRAMEBUFFER_RENDERABLE, 2, &params));
+                OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, internalFormat, GL_FRAMEBUFFER_RENDERABLE, 2, &params));
                 setupOk = params == GL_FULL_SUPPORT;
             } else {
                 // Create and attach framebuffer
-                _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
+                _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
 
                 // Check status
                 GLuint status;
@@ -329,7 +329,7 @@ namespace Ogre {
             // Ignore status in case of fmt==GL_NONE, because no implementation will accept
             // a buffer without *any* attachment. Buffers with only stencil and depth attachment
             // might still be supported, so we must continue probing.
-            if(fmt == GL_NONE || setupOk)
+            if(internalFormat == GL_NONE || setupOk)
             {
                 mProps[x].valid = true;
                 StringStream str;
@@ -396,7 +396,7 @@ namespace Ogre {
                                 // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
                                 OGRE_CHECK_GL_ERROR(glFinish());
 
-                                _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
+                                _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
                             }
                         }
                     }
@@ -423,7 +423,7 @@ namespace Ogre {
                             // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
                             OGRE_CHECK_GL_ERROR(glFinish());
 
-                            _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
+                            _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
                         }
                     }
                 }
@@ -434,7 +434,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
             OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
 
-            if (fmt != GL_NONE)
+            if (internalFormat != GL_NONE)
             {
                 OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
                 tid = 0;
