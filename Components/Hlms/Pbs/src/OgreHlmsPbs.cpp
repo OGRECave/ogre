@@ -564,6 +564,8 @@ namespace Ogre
 
         mPreparedPass.viewMatrix        = viewMatrix;
 
+        mPreparedPass.shadowMaps.clear();
+
         if( !casterPass )
         {
             //mat4 view;
@@ -689,7 +691,6 @@ namespace Ogre
                     ++passBufferPtr;
                 }
 
-                mPreparedPass.shadowMaps.clear();
                 mPreparedPass.shadowMaps.reserve( numShadowMaps );
                 for( int32 i=0; i<numShadowMaps; ++i )
                     mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
