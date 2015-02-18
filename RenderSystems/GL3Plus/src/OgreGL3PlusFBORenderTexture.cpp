@@ -295,6 +295,9 @@ namespace Ogre {
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
 
+        bool formatSupported;
+        GLint params;
+
         for(int x = 0; x < PF_COUNT; ++x)
         {
             mProps[x].valid = false;
@@ -310,12 +313,10 @@ namespace Ogre {
             if(PixelUtil::isCompressed((PixelFormat)x))
                 continue;
 
-            bool setupOk;
-            GLint params;
-
-            if(hasInternalFormatQuery) {
-                OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, internalFormat, GL_FRAMEBUFFER_RENDERABLE, 2, &params));
-                setupOk = params == GL_FULL_SUPPORT;
+            if (hasInternalFormatQuery) {
+                OGRE_CHECK_GL_ERROR(
+                        glGetInternalformativ(GL_RENDERBUFFER, internalFormat, GL_FRAMEBUFFER_RENDERABLE, 1, &params));
+                formatSupported = params == GL_FULL_SUPPORT;
             } else {
                 // Create and attach framebuffer
                 _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
@@ -323,13 +324,13 @@ namespace Ogre {
                 // Check status
                 GLuint status;
                 OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
-                setupOk = status == GL_FRAMEBUFFER_COMPLETE;
+                formatSupported = status == GL_FRAMEBUFFER_COMPLETE;
             }
 
             // Ignore status in case of fmt==GL_NONE, because no implementation will accept
             // a buffer without *any* attachment. Buffers with only stencil and depth attachment
             // might still be supported, so we must continue probing.
-            if(internalFormat == GL_NONE || setupOk)
+            if(internalFormat == GL_NONE || formatSupported)
             {
                 mProps[x].valid = true;
                 StringStream str;
@@ -339,34 +340,19 @@ namespace Ogre {
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
-                    if(hasInternalFormatQuery) {
-                        OGRE_CHECK_GL_ERROR(glGetInternalformativ(GL_RENDERBUFFER, depthFormats[depth],
-                                                                  GL_FRAMEBUFFER_RENDERABLE, 2, &params));
-                        if (params == GL_FULL_SUPPORT)
-                        {
-                            // General depth/stencil combination.
-                            for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
-                            {
-                                OGRE_CHECK_GL_ERROR(glGetInternalformativ(
-                                                        GL_RENDERBUFFER, stencilFormats[stencil],
-                                                        GL_FRAMEBUFFER_RENDERABLE, 2, &params));
-                                if (params == GL_FULL_SUPPORT)
-                                {
-                                    // Add mode to allowed modes.
-                                    str << "D" << depthBits[depth] << "S" << stencilBits[stencil] << " ";
-                                    FormatProperties::Mode mode;
-                                    mode.depth = depth;
-                                    mode.stencil = stencil;
-                                    mProps[x].modes.push_back(mode);
-                                }
-                            }
-                        }
-                        continue;
-                    }
-
                     if ((depthFormats[depth] != GL_DEPTH24_STENCIL8) && (depthFormats[depth] != GL_DEPTH32F_STENCIL8))
                     {
                         // General depth/stencil combination
+
+                        if(hasInternalFormatQuery) {
+                            OGRE_CHECK_GL_ERROR(
+                                    glGetInternalformativ(GL_RENDERBUFFER, depthFormats[depth], GL_FRAMEBUFFER_RENDERABLE, 1, &params));
+
+                            // skip unsupported depth unless it is GL_NONE, as we still want D0Sxx formats
+                            if(params != GL_FULL_SUPPORT && depthFormats[depth] != GL_NONE) {
+                                continue;
+                            }
+                        }
 
                         for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
@@ -376,7 +362,30 @@ namespace Ogre {
                             //                                  << "S" << stencilBits[stencil];
                             //                            LogManager::getSingleton().logMessage(l.str());
 
-                            if (_tryFormat(depthFormats[depth], stencilFormats[stencil]))
+                            if (hasInternalFormatQuery) {
+                                OGRE_CHECK_GL_ERROR(
+                                        glGetInternalformativ( GL_RENDERBUFFER, stencilFormats[stencil], GL_FRAMEBUFFER_RENDERABLE, 1, &params));
+
+                                // skip unsupported stencil unless it is GL_NONE, as we still want DxxS0 formats
+                                formatSupported = params == GL_FULL_SUPPORT || stencilFormats[stencil] == GL_NONE;
+                            } else {
+                                formatSupported = _tryFormat(depthFormats[depth], stencilFormats[stencil]);
+
+                                if (!formatSupported) {
+                                    // There is a small edge case that FBO is trashed during the test
+                                    // on some drivers resulting in undefined behavior
+                                    OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+                                    OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
+
+                                    // Workaround for NVIDIA / Linux 169.21 driver problem
+                                    // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
+                                    OGRE_CHECK_GL_ERROR(glFinish());
+
+                                    _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
+                                }
+                            }
+
+                            if (formatSupported)
                             {
                                 // Add mode to allowed modes
                                 str << "D" << depthBits[depth] << "S" << stencilBits[stencil] << " ";
@@ -385,8 +394,20 @@ namespace Ogre {
                                 mode.stencil = stencil;
                                 mProps[x].modes.push_back(mode);
                             }
-                            else
-                            {
+                        }
+                    }
+                    else
+                    {
+                        // Packed depth/stencil format
+                        if (hasInternalFormatQuery) {
+                            OGRE_CHECK_GL_ERROR(
+                                    glGetInternalformativ( GL_RENDERBUFFER, depthFormats[depth], GL_FRAMEBUFFER_RENDERABLE, 1, &params));
+
+                            formatSupported = params == GL_FULL_SUPPORT;
+                        } else {
+                            formatSupported = _tryPackedFormat(depthFormats[depth]);
+
+                            if (!formatSupported) {
                                 // There is a small edge case that FBO is trashed during the test
                                 // on some drivers resulting in undefined behavior
                                 OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -399,11 +420,8 @@ namespace Ogre {
                                 _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
                             }
                         }
-                    }
-                    else
-                    {
-                        // Packed depth/stencil format
-                        if (_tryPackedFormat(depthFormats[depth]))
+
+                        if (formatSupported)
                         {
                             // Add mode to allowed modes
                             str << "Packed-D" << depthBits[depth] << "S" << 8 << " ";
@@ -412,32 +430,20 @@ namespace Ogre {
                             mode.stencil = 0;   // unuse
                             mProps[x].modes.push_back(mode);
                         }
-                        else
-                        {
-                            // There is a small edge case that FBO is trashed during the test
-                            // on some drivers resulting in undefined behavior
-                            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-                            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
-
-                            // Workaround for NVIDIA / Linux 169.21 driver problem
-                            // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                            OGRE_CHECK_GL_ERROR(glFinish());
-
-                            _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
-                        }
                     }
                 }
                 LogManager::getSingleton().logMessage(str.str());
             }
 
-            // Delete texture and framebuffer
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
-            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
+            if (!hasInternalFormatQuery) {
+                // Delete texture and framebuffer
+                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+                OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
 
-            if (internalFormat != GL_NONE)
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
-                tid = 0;
+                if (internalFormat != GL_NONE) {
+                    OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
+                    tid = 0;
+                }
             }
         }
 
