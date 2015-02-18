@@ -107,7 +107,7 @@ namespace Ogre {
         static String toString(size_t val, 
             unsigned short width = 0, char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0));
-        #if OGRE_COMPILER == OGRE_COMPILER_MSVC
+        #if OGRE_COMPILER == OGRE_COMPILER_MSVC || defined(__MINGW32__)
         /** Converts an unsigned long to a String. */
         static String toString(unsigned long val, 
             unsigned short width = 0, char fill = ' ', 
