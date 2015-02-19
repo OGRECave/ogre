@@ -1232,13 +1232,10 @@ namespace Ogre {
 
         /** Creates a light for use in the scene.
             @remarks
-                Lights can either be in a fixed position and independent of the
-                scene graph, or they can be attached to SceneNodes so they derive
-                their position from the parent node. Either way, they are created
-                using this method so that the SceneManager manages their
-                existence.
-            @param
-                name The name of the new light, to identify it later.
+                The direction and position of a light is managed via
+                the scene node it is attached to. Make sure that you have
+                attached the light to a scene node (SceneNode::attachObject)
+                *before* calling Light::setDirection or Light::setPosition.
         */
         virtual Light* createLight();
 
