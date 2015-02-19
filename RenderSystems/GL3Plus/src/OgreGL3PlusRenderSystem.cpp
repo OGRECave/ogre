@@ -1626,11 +1626,11 @@ namespace Ogre {
     {
         GLSLShader::unbindAll();
 
-        mCurrentVertexShader    = static_cast<GLSLShader*>( hlmsCache->vertexShader.get() );
-        mCurrentGeometryShader  = static_cast<GLSLShader*>( hlmsCache->geometryShader.get() );
-        mCurrentHullShader      = static_cast<GLSLShader*>( hlmsCache->tesselationHullShader.get() );
-        mCurrentDomainShader    = static_cast<GLSLShader*>( hlmsCache->tesselationDomainShader.get() );
-        mCurrentFragmentShader  = static_cast<GLSLShader*>( hlmsCache->pixelShader.get() );
+        mCurrentVertexShader    = 0;
+        mCurrentGeometryShader  = 0;
+        mCurrentHullShader      = 0;
+        mCurrentDomainShader    = 0;
+        mCurrentFragmentShader  = 0;
 
         mActiveVertexGpuProgramParameters.setNull();
         mActiveGeometryGpuProgramParameters.setNull();
@@ -1646,34 +1646,44 @@ namespace Ogre {
         mComputeProgramBound            = false;
         mUseAdjacency                   = false;
 
-        if( mCurrentVertexShader )
+        if( !hlmsCache->vertexShader.isNull() )
         {
+            mCurrentVertexShader = static_cast<GLSLShader*>( hlmsCache->vertexShader->
+                                                             _getBindingDelegate() );
             mCurrentVertexShader->bind();
             mActiveVertexGpuProgramParameters = mCurrentVertexShader->getDefaultParameters();
             mVertexProgramBound = true;
         }
-        if( mCurrentGeometryShader )
+        if( !hlmsCache->geometryShader.isNull() )
         {
+            mCurrentGeometryShader = static_cast<GLSLShader*>( hlmsCache->geometryShader->
+                                                               _getBindingDelegate() );
             mCurrentGeometryShader->bind();
             mActiveGeometryGpuProgramParameters = mCurrentGeometryShader->getDefaultParameters();
             mGeometryProgramBound = true;
 
             mUseAdjacency = mCurrentGeometryShader->isAdjacencyInfoRequired();
         }
-        if( mCurrentHullShader )
+        if( !hlmsCache->tesselationHullShader.isNull() )
         {
+            mCurrentHullShader = static_cast<GLSLShader*>( hlmsCache->tesselationHullShader->
+                                                           _getBindingDelegate() );
             mCurrentHullShader->bind();
             mActiveTessellationHullGpuProgramParameters = mCurrentHullShader->getDefaultParameters();
             mTessellationHullProgramBound = true;
         }
-        if( mCurrentDomainShader )
+        if( !hlmsCache->tesselationDomainShader.isNull() )
         {
+            mCurrentDomainShader = static_cast<GLSLShader*>( hlmsCache->tesselationDomainShader->
+                                                             _getBindingDelegate() );
             mCurrentDomainShader->bind();
             mActiveTessellationDomainGpuProgramParameters = mCurrentDomainShader->getDefaultParameters();
             mTessellationDomainProgramBound = true;
         }
-        if( mCurrentFragmentShader )
+        if( !hlmsCache->pixelShader.isNull() )
         {
+            mCurrentFragmentShader = static_cast<GLSLShader*>( hlmsCache->pixelShader->
+                                                               _getBindingDelegate() );
             mCurrentFragmentShader->bind();
             mActiveFragmentGpuProgramParameters = mCurrentFragmentShader->getDefaultParameters();
             mFragmentProgramBound = true;
