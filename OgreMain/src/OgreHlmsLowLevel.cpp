@@ -47,7 +47,7 @@ namespace Ogre
         Hlms( HLMS_LOW_LEVEL, IdString(), 0 ),
         mAutoParamDataSource( 0 ),
         mCurrentSceneManager( 0 ),
-        mId( 0 )
+        mId( 1 )
     {
         mAutoParamDataSource = OGRE_NEW AutoParamDataSource();
     }
