@@ -809,6 +809,12 @@ namespace Ogre
     void RenderQueue::renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                           RenderSystem *rs, bool casterPass, bool dualParaboloid )
     {
+        if( mLastVaoName )
+        {
+            rs->_startLegacyV1Rendering();
+            mLastVaoName = 0;
+        }
+
         if( mLastWasCasterPass != casterPass )
         {
             clearState();

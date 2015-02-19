@@ -46,7 +46,8 @@ namespace Ogre
     HlmsLowLevel::HlmsLowLevel() :
         Hlms( HLMS_LOW_LEVEL, IdString(), 0 ),
         mAutoParamDataSource( 0 ),
-        mCurrentSceneManager( 0 )
+        mCurrentSceneManager( 0 ),
+        mId( 0 )
     {
         mAutoParamDataSource = OGRE_NEW AutoParamDataSource();
     }
@@ -77,7 +78,7 @@ namespace Ogre
 
         //We push into mShaderCache then clear each pass so that we can return unique references.
         //Feels a bit hacky but gets the job done.
-        HlmsCache *cache = new HlmsCache( 0, HLMS_LOW_LEVEL );
+        HlmsCache *cache = new HlmsCache( pass->getId(), HLMS_LOW_LEVEL );
         if( pass->hasVertexProgram() )
             cache->vertexShader             = pass->getVertexProgram();
         if( pass->hasGeometryProgram() )
@@ -117,8 +118,13 @@ namespace Ogre
             }
         }
 
-        outHash         = 0;
-        outCasterHash   = 0;
+        //Each Renderable should use a different hash so that Hlms::getMaterial does not think
+        //that shaders never need to change. It will then lookup the HlmsCache and if the
+        //material pass didn't actually change, the HlmsCache::hash value will be the same
+        //and thus the Hlms shaders will not cause a state change.
+        //Nonetheless, there is a lookup, just avoid low level materials as much as possible.
+        outHash         = mId;
+        outCasterHash   = mId++;
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsLowLevel::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,

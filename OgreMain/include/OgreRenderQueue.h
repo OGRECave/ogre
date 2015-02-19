@@ -226,7 +226,7 @@ namespace Ogre {
         void render( RenderSystem *rs, uint8 firstRq, uint8 lastRq,
                      bool casterPass, bool dualParaboloid );
 
-        /// Don't call this too often.
+        /// Don't call this too often. Only renders v1 objects at the moment.
         void renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                  RenderSystem *rs, bool casterPass, bool dualParaboloid );
 

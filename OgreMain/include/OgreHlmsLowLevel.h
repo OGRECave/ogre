@@ -62,6 +62,8 @@ namespace Ogre
         AutoParamDataSource *mAutoParamDataSource;
         SceneManager    *mCurrentSceneManager;
 
+        uint32  mId;
+
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
                                                          uint32 finalHash,
