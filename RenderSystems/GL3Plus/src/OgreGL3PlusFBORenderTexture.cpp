@@ -370,28 +370,13 @@ namespace Ogre {
                                 formatSupported = params == GL_FULL_SUPPORT || stencilFormats[stencil] == GL_NONE;
                             } else {
                                 formatSupported = _tryFormat(depthFormats[depth], stencilFormats[stencil]);
-
-                                if (!formatSupported) {
-                                    // There is a small edge case that FBO is trashed during the test
-                                    // on some drivers resulting in undefined behavior
-                                    OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-                                    OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
-
-                                    // Workaround for NVIDIA / Linux 169.21 driver problem
-                                    // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                                    OGRE_CHECK_GL_ERROR(glFinish());
-
-                                    _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
-                                }
                             }
 
                             if (formatSupported)
                             {
                                 // Add mode to allowed modes
                                 str << "D" << depthBits[depth] << "S" << stencilBits[stencil] << " ";
-                                FormatProperties::Mode mode;
-                                mode.depth = depth;
-                                mode.stencil = stencil;
+                                FormatProperties::Mode mode = {depth, stencil};
                                 mProps[x].modes.push_back(mode);
                             }
                         }
@@ -406,28 +391,13 @@ namespace Ogre {
                             formatSupported = params == GL_FULL_SUPPORT;
                         } else {
                             formatSupported = _tryPackedFormat(depthFormats[depth]);
-
-                            if (!formatSupported) {
-                                // There is a small edge case that FBO is trashed during the test
-                                // on some drivers resulting in undefined behavior
-                                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-                                OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
-
-                                // Workaround for NVIDIA / Linux 169.21 driver problem
-                                // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                                OGRE_CHECK_GL_ERROR(glFinish());
-
-                                _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
-                            }
                         }
 
                         if (formatSupported)
                         {
                             // Add mode to allowed modes
                             str << "Packed-D" << depthBits[depth] << "S" << 8 << " ";
-                            FormatProperties::Mode mode;
-                            mode.depth = depth;
-                            mode.stencil = 0;   // unuse
+                            FormatProperties::Mode mode = {depth, 0}; // stencil unused
                             mProps[x].modes.push_back(mode);
                         }
                     }
