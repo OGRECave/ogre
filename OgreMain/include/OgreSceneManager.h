@@ -1182,8 +1182,10 @@ namespace Ogre {
 
         /** Creates a camera to be managed by this scene manager.
             @remarks
-                This camera must be added to the scene at a later time using
-                the attachObject method of the SceneNode class.
+                This camera is automatically added to the scene by being attached to the Root
+                Scene Node before returning. If you want to use your own SceneNode for this
+                camera, you'll have to detach it first
+                (can be done via camera->detachFromParent();)
             @param name
                 Name to give the new camera. Must be unique.
             @param notShadowCaster
