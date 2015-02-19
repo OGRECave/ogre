@@ -130,15 +130,17 @@ namespace Ogre {
 
         switch( components )
         {
+            case 1:
+                imgData->format = PF_BYTE_L;
+                break;
+            case 2:
+                imgData->format = PF_BYTE_LA;
+                break;
             case 3:
-                {
-                    imgData->format = PF_BYTE_RGB;
-                }
+                imgData->format = PF_BYTE_RGB;
                 break;
             case 4:
-                {
-                    imgData->format = PF_BYTE_RGBA;
-                }
+                imgData->format = PF_BYTE_RGBA;
                 break;
             default:
                 stbi_image_free(pixelData);
