@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 
 #include "Vao/OgreD3D11DynamicBuffer.h"
-#include "Vao/OgreD3D11VaoManager.h"
 #include "Vao/OgreD3D11StagingBuffer.h"
 
 #include "OgreD3D11Device.h"
@@ -35,7 +34,6 @@ THE SOFTWARE.
 namespace Ogre
 {
     D3D11DynamicBuffer::D3D11DynamicBuffer( ID3D11Buffer *vboName, size_t vboSize,
-                                            D3D11VaoManager *vaoManager,
                                             D3D11Device &device ) :
         mVboName( vboName ),
         mVboSize( vboSize ),

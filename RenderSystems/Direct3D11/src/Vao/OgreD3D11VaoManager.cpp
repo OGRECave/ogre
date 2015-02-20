@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "Vao/OgreD3D11StagingBuffer.h"
 #include "Vao/OgreD3D11VertexArrayObject.h"
 #include "Vao/OgreD3D11BufferInterface.h"
+#include "Vao/OgreD3D11ConstBufferInterface.h"
 #include "Vao/OgreD3D11ConstBufferPacked.h"
 #include "Vao/OgreD3D11TexBufferPacked.h"
 //#include "Vao/OgreD3D11MultiSourceVertexBufferPool.h"
@@ -247,7 +248,7 @@ namespace Ogre
             if( bufferType >= BT_DYNAMIC_DEFAULT )
             {
                 newVbo.dynamicBuffer = new D3D11DynamicBuffer( newVbo.vboName, newVbo.sizeBytes,
-                                                               this, mDevice );
+                                                               mDevice );
             }
 
             mVbos[internalType][bufferType].push_back( newVbo );
@@ -492,12 +493,12 @@ namespace Ogre
             desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         }
 
-        /*D3D11_SUBRESOURCE_DATA subResData;
+        D3D11_SUBRESOURCE_DATA subResData;
         ZeroMemory( &subResData, sizeof(D3D11_SUBRESOURCE_DATA) );
-        subResData.pSysMem;*/
+        subResData.pSysMem = initialData;
         ID3D11Buffer *vboName = 0;
 
-        HRESULT hr = d3dDevice->CreateBuffer( &desc, 0, &vboName );
+        HRESULT hr = d3dDevice->CreateBuffer( &desc, &subResData, &vboName );
 
         if( FAILED( hr ) )
         {
@@ -510,20 +511,14 @@ namespace Ogre
                          "D3D11VaoManager::createConstBufferImpl" );
         }
 
-        D3D11DynamicBuffer *dynamicBuffer = 0;
-        if( bufferType >= BT_DYNAMIC_DEFAULT )
-            dynamicBuffer = new D3D11DynamicBuffer( vboName, sizeBytes, this, mDevice );
-
-        D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( 0, vboName, dynamicBuffer );
+        D3D11ConstBufferInterface *bufferInterface = new D3D11ConstBufferInterface( 0, vboName,
+                                                                                    mDevice );
         ConstBufferPacked *retVal = OGRE_NEW D3D11ConstBufferPacked(
                                                         sizeBytes, 1,
                                                         bufferType,
                                                         initialData, keepAsShadow,
                                                         this, bufferInterface,
                                                         mDevice );
-
-        if( initialData )
-            bufferInterface->_firstUpload( initialData );
 
         return retVal;
     }
@@ -534,7 +529,6 @@ namespace Ogre
                                                         constBuffer->getBufferInterface() );
 
         bufferInterface->getVboName()->Release();
-        delete bufferInterface->getDynamicBuffer();
         delete bufferInterface;
     }
     //-----------------------------------------------------------------------------------
@@ -830,8 +824,6 @@ namespace Ogre
 
         unsigned long currentTimeMs = mTimer->getMilliseconds();
 
-        FastArray<GLuint> bufferNames;
-
         if( currentTimeMs >= mNextStagingBufferTimestampCheckpoint )
         {
             mNextStagingBufferTimestampCheckpoint = (unsigned long)(~0);
@@ -860,8 +852,7 @@ namespace Ogre
                         stagingBuffer->getLifetimeThreshold() )
                     {
                         //Time to delete this buffer.
-                        bufferNames.push_back( static_cast<D3D11StagingBuffer*>(
-                                                    stagingBuffer)->getBufferName() );
+                        static_cast<D3D11StagingBuffer*>(stagingBuffer)->getBufferName()->Release();
 
                         //We have to remove it from two lists.
                         StagingBufferVec::iterator itFullList = std::find( mStagingBuffers[i].begin(),
@@ -879,12 +870,6 @@ namespace Ogre
                     }
                 }
             }
-        }
-
-        if( !bufferNames.empty() )
-        {
-            OCGE( glDeleteBuffers( bufferNames.size(), &bufferNames[0] ) );
-            bufferNames.clear();
         }
 
         if( !mDelayedDestroyBuffers.empty() &&
@@ -915,7 +900,7 @@ namespace Ogre
 
         if( FAILED( hr ) )
         {
-            String errorDescription = mDevice.getErrorDescription(hr);
+            String errorDescription = device.getErrorDescription(hr);
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
                          "Failed to create frame fence.\n"
                          "Error code: " + StringConverter::toString( hr ) + ".\n" +

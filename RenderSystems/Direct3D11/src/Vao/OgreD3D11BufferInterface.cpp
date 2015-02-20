@@ -61,7 +61,6 @@ namespace Ogre
         //when the buffer may be need, and only then gets the D3D11 buffer created and
         //batched together with many other buffers (and mInitialData may be freed then).
 
-        BufferType originalBufferType = mBuffer->mBufferType;
         if( mBuffer->mBufferType == BT_IMMUTABLE )
         {
             if( mBuffer->mShadowCopy )
@@ -80,8 +79,6 @@ namespace Ogre
         {
             upload( data, 0, mBuffer->getNumElements() );
         }
-
-        mBuffer->mBufferType = originalBufferType;
     }
     //-----------------------------------------------------------------------------------
     DECL_MALLOC void* D3D11BufferInterface::map( size_t elementStart, size_t elementCount,
@@ -116,13 +113,11 @@ namespace Ogre
     void D3D11BufferInterface::unmap( UnmapOptions unmapOption,
                                       size_t flushStartElem, size_t flushSizeElem )
     {
+        //All arguments aren't really used by D3D11, these asserts are for the other APIs.
         assert( flushStartElem <= mBuffer->mLastMappingCount &&
                 "Flush starts after the end of the mapped region!" );
         assert( flushStartElem + flushSizeElem <= mBuffer->mLastMappingCount &&
                 "Flush region out of bounds!" );
-
-        if( !flushSizeElem )
-            flushSizeElem = mBuffer->mLastMappingCount - flushStartElem;
 
         mDynamicBuffer->unmap( mUnmapTicket );
         mMappedPtr = 0;

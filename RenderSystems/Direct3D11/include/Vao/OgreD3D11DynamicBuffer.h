@@ -74,8 +74,7 @@ namespace Ogre
         size_t addMappedRange( size_t start, size_t count );
 
     public:
-        D3D11DynamicBuffer( ID3D11Buffer *vboName, size_t vboSize, D3D11VaoManager *vaoManager,
-                            D3D11Device &device );
+        D3D11DynamicBuffer( ID3D11Buffer *vboName, size_t vboSize, D3D11Device &device );
         ~D3D11DynamicBuffer();
 
         ID3D11Buffer* getVboName(void) const        { return mVboName; }
