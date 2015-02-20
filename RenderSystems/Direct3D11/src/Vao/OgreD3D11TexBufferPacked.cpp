@@ -36,7 +36,7 @@ namespace Ogre
     D3D11TexBufferPacked::D3D11TexBufferPacked(
             size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
             BufferType bufferType, void *initialData, bool keepAsShadow,
-            VaoManager *vaoManager, D3D11BufferInterface *bufferInterface, PixelFormat pf,
+            VaoManager *vaoManager, BufferInterface *bufferInterface, PixelFormat pf,
             D3D11Device &device ) :
         TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
                          initialData, keepAsShadow, vaoManager, bufferInterface, pf ),
@@ -69,15 +69,15 @@ namespace Ogre
         if( mCachedResourceViews[cacheIdx].mResourceView )
             mCachedResourceViews[cacheIdx].mResourceView->Release();
 
-        mCachedResourceViews[cacheIdx].mOffset  = offset;
+        mCachedResourceViews[cacheIdx].mOffset  = mFinalBufferStart * mBytesPerElement + offset;
         mCachedResourceViews[cacheIdx].mSize    = sizeBytes;
 
         D3D11_SHADER_RESOURCE_VIEW_DESC srDesc;
 
         srDesc.Format               = mInternalFormat;
         srDesc.ViewDimension        = D3D11_SRV_DIMENSION_BUFFER;
-        srDesc.Buffer.FirstElement  = offset / mNumElements;
-        srDesc.Buffer.NumElements   = sizeBytes / mNumElements;
+        srDesc.Buffer.FirstElement  = mFinalBufferStart + offset / mBytesPerElement;
+        srDesc.Buffer.NumElements   = sizeBytes / mBytesPerElement;
 
         assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
         D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>( mBufferInterface );
@@ -101,7 +101,8 @@ namespace Ogre
         for( int i=0; i<16; ++i )
         {
             //Reuse resource views. Reuse res. views that are bigger than what's requested too.
-            if( mCachedResourceViews[i].mOffset == offset && sizeBytes <= mCachedResourceViews[i].mSize )
+            if( mFinalBufferStart * mBytesPerElement + offset == mCachedResourceViews[i].mOffset &&
+                sizeBytes <= mCachedResourceViews[i].mSize )
             {
                 resourceView = mCachedResourceViews[i].mResourceView;
                 break;

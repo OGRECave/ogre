@@ -30,17 +30,18 @@ THE SOFTWARE.
 #include "Vao/OgreD3D11StagingBuffer.h"
 #include "Vao/OgreD3D11VertexArrayObject.h"
 #include "Vao/OgreD3D11BufferInterface.h"
-#include "Vao/OgreD3D11ConstBufferInterface.h"
+#include "Vao/OgreD3D11CompatBufferInterface.h"
 #include "Vao/OgreD3D11ConstBufferPacked.h"
 #include "Vao/OgreD3D11TexBufferPacked.h"
 //#include "Vao/OgreD3D11MultiSourceVertexBufferPool.h"
 #include "Vao/OgreD3D11DynamicBuffer.h"
-//#include "Vao/OgreD3D11AsyncTicket.h"
+#include "Vao/OgreD3D11AsyncTicket.h"
 
 #include "Vao/OgreIndirectBufferPacked.h"
 
 #include "OgreD3D11Device.h"
 #include "OgreD3D11HLSLProgram.h"
+#include "OgreD3D11RenderSystem.h"
 
 #include "OgreRenderQueue.h"
 
@@ -52,10 +53,12 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-    D3D11VaoManager::D3D11VaoManager( bool _supportsIndirectBuffers, D3D11Device &device ) :
+    D3D11VaoManager::D3D11VaoManager( bool _supportsIndirectBuffers, D3D11Device &device,
+                                      D3D11RenderSystem *renderSystem ) :
         mVaoNames( 1 ),
         mDevice( device ),
-        mDrawId( 0 )
+        mDrawId( 0 ),
+        mD3D11RenderSystem( renderSystem )
     {
         mDefaultPoolSize[VERTEX_BUFFER][BT_IMMUTABLE]   = 32 * 1024 * 1024;
         mDefaultPoolSize[INDEX_BUFFER][BT_IMMUTABLE]    = 16 * 1024 * 1024;
@@ -472,16 +475,17 @@ namespace Ogre
                        indexBuffer->getBufferType(), INDEX_BUFFER );
     }
     //-----------------------------------------------------------------------------------
-    ConstBufferPacked* D3D11VaoManager::createConstBufferImpl( size_t sizeBytes, BufferType bufferType,
-                                                               void *initialData, bool keepAsShadow )
+    D3D11CompatBufferInterface* D3D11VaoManager::createShaderBufferInterface( bool constantBuffer,
+                                                                              size_t sizeBytes,
+                                                                              BufferType bufferType,
+                                                                              void *initialData )
     {
-        //Const buffers don't get batched together since D3D11 doesn't allow binding just a
-        //region and has a 64kb limit. Only D3D11.1 on Windows 8.1 supports this feature.
         ID3D11DeviceN *d3dDevice = mDevice.get();
 
         D3D11_BUFFER_DESC desc;
         ZeroMemory( &desc, sizeof(D3D11_BUFFER_DESC) );
-        desc.ByteWidth = sizeBytes;
+        desc.BindFlags      = constantBuffer ? D3D11_BIND_CONSTANT_BUFFER : D3D11_BIND_SHADER_RESOURCE;
+        desc.ByteWidth      = sizeBytes;
         desc.CPUAccessFlags = 0;
         if( bufferType == BT_IMMUTABLE )
             desc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -511,8 +515,18 @@ namespace Ogre
                          "D3D11VaoManager::createConstBufferImpl" );
         }
 
-        D3D11ConstBufferInterface *bufferInterface = new D3D11ConstBufferInterface( 0, vboName,
-                                                                                    mDevice );
+        return new D3D11CompatBufferInterface( 0, vboName, mDevice );
+    }
+    //-----------------------------------------------------------------------------------
+    ConstBufferPacked* D3D11VaoManager::createConstBufferImpl( size_t sizeBytes, BufferType bufferType,
+                                                               void *initialData, bool keepAsShadow )
+    {
+        //Const buffers don't get batched together since D3D11 doesn't allow binding just a
+        //region and has a 64kb limit. Only D3D11.1 on Windows 8.1 supports this feature.
+        D3D11CompatBufferInterface *bufferInterface = createShaderBufferInterface( true,
+                                                                                   sizeBytes,
+                                                                                   bufferType,
+                                                                                   initialData );
         ConstBufferPacked *retVal = OGRE_NEW D3D11ConstBufferPacked(
                                                         sizeBytes, 1,
                                                         bufferType,
@@ -525,23 +539,18 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::destroyConstBufferImpl( ConstBufferPacked *constBuffer )
     {
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
-                                                        constBuffer->getBufferInterface() );
+        D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
+                                                                constBuffer->getBufferInterface() );
 
         bufferInterface->getVboName()->Release();
-        delete bufferInterface;
     }
     //-----------------------------------------------------------------------------------
     TexBufferPacked* D3D11VaoManager::createTexBufferImpl( PixelFormat pixelFormat, size_t sizeBytes,
                                                            BufferType bufferType,
                                                            void *initialData, bool keepAsShadow )
     {
-        size_t vboIdx;
-        size_t bufferOffset;
-
-        BufferType vboFlag = bufferType;
-        if( vboFlag >= BT_DYNAMIC_DEFAULT )
-            vboFlag = BT_DYNAMIC_DEFAULT;
+        BufferInterface *bufferInterface = 0;
+        size_t bufferOffset = 0;
 
         uint32 alignment = mTexBufferAlignment;
 
@@ -554,36 +563,63 @@ namespace Ogre
             sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
         }
 
-        allocateVbo( sizeBytes, alignment, bufferType, SHADER_BUFFER, vboIdx, bufferOffset );
+        if( mD3D11RenderSystem->_getFeatureLevel() > D3D_FEATURE_LEVEL_11_0 )
+        {
+            //D3D11.1 supports NO_OVERWRITE on shader buffers, use the common pool
+            size_t vboIdx;
+
+            BufferType vboFlag = bufferType;
+            if( vboFlag >= BT_DYNAMIC_DEFAULT )
+                vboFlag = BT_DYNAMIC_DEFAULT;
+
+            allocateVbo( sizeBytes, alignment, bufferType, SHADER_BUFFER, vboIdx, bufferOffset );
+
+            Vbo &vbo = mVbos[SHADER_BUFFER][vboFlag][vboIdx];
+            bufferInterface = new D3D11BufferInterface( vboIdx, vbo.vboName, vbo.dynamicBuffer );
+        }
+        else
+        {
+            //D3D11.0 and below doesn't support NO_OVERWRITE on shader buffers. Use the basic interface.
+            bufferInterface = createShaderBufferInterface( false, sizeBytes, bufferType, initialData );
+        }
 
         const size_t numElements        = sizeBytes / PixelUtil::getNumElemBytes( pixelFormat );
         const size_t bytesPerElement    = PixelUtil::getNumElemBytes( pixelFormat );
 
-
-        Vbo &vbo = mVbos[SHADER_BUFFER][vboFlag][vboIdx];
-        D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vbo.vboName,
-                                                                          vbo.dynamicBuffer );
         D3D11TexBufferPacked *retVal = OGRE_NEW D3D11TexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, pixelFormat, mDevice );
 
-        if( initialData )
-            bufferInterface->_firstUpload( initialData );
+        if( mD3D11RenderSystem->_getFeatureLevel() > D3D_FEATURE_LEVEL_11_0 )
+        {
+            if( initialData )
+                static_cast<D3D11BufferInterface*>( bufferInterface )->_firstUpload( initialData );
+        }
 
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::destroyTexBufferImpl( TexBufferPacked *texBuffer )
     {
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
-                                                        texBuffer->getBufferInterface() );
+        if( mD3D11RenderSystem->_getFeatureLevel() > D3D_FEATURE_LEVEL_11_0 )
+        {
+            D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                        texBuffer->getBufferInterface() );
 
 
-        deallocateVbo( bufferInterface->getVboPoolIndex(),
-                       texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
-                       texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
-                       texBuffer->getBufferType(), SHADER_BUFFER );
+            deallocateVbo( bufferInterface->getVboPoolIndex(),
+                           texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
+                           texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
+                           texBuffer->getBufferType(), SHADER_BUFFER );
+        }
+        else
+        {
+            D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
+                                                                    texBuffer->getBufferInterface() );
+
+            bufferInterface->getVboName()->Release();
+        }
     }
     //-----------------------------------------------------------------------------------
     IndirectBufferPacked* D3D11VaoManager::createIndirectBufferImpl( size_t sizeBytes,
@@ -681,12 +717,12 @@ namespace Ogre
                 vertexBinding.offset            = 0;
                 vertexBinding.instancingDivisor = 0;
 
-                const MultiSourceVertexBufferPool *multiSourcePool = (*itor)->getMultiSourcePool();
+                /*const MultiSourceVertexBufferPool *multiSourcePool = (*itor)->getMultiSourcePool();
                 if( multiSourcePool )
                 {
                     vertexBinding.offset = multiSourcePool->getBytesOffsetToSource(
                                                             (*itor)->_getSourceIndex() );
-                }
+                }*/
 
                 vao.vertexBuffers.push_back( vertexBinding );
 
@@ -776,8 +812,8 @@ namespace Ogre
 
             if( !itor->refCount )
             {
-				GLuint vaoName = glVao->getVaoName();
-                OCGE( glDeleteVertexArrays( 1, &vaoName ) );
+                //TODO: Remove cached ID3D11InputLayout from all D3D11HLSLProgram
+                //(the one generated in D3D11HLSLProgram::getLayoutForVao)
             }
         }
 
@@ -788,34 +824,47 @@ namespace Ogre
     {
         sizeBytes = std::max<size_t>( sizeBytes, 4 * 1024 * 1024 );
 
-        GLuint bufferName;
-        GLenum target = forUpload ? GL_COPY_READ_BUFFER : GL_COPY_WRITE_BUFFER;
-        OCGE( glGenBuffers( 1, &bufferName ) );
-        OCGE( glBindBuffer( target, bufferName ) );
+        ID3D11DeviceN *d3dDevice = mDevice.get();
 
-        if( mArbBufferStorage )
-        {
-            OCGE( glBufferStorage( target, sizeBytes, 0,
-                                    forUpload ? GL_MAP_WRITE_BIT : GL_MAP_READ_BIT ) );
-        }
+        D3D11_BUFFER_DESC desc;
+        ZeroMemory( &desc, sizeof(D3D11_BUFFER_DESC) );
+        desc.ByteWidth  = sizeBytes;
+        desc.Usage      = D3D11_USAGE_STAGING;
+        if( forUpload )
+            desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         else
+            desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+        ID3D11Buffer *bufferName = 0;
+        HRESULT hr = d3dDevice->CreateBuffer( &desc, 0, &bufferName );
+
+        if( FAILED( hr ) )
         {
-            OCGE( glBufferData( target, sizeBytes, 0, forUpload ? GL_STREAM_DRAW : GL_STREAM_READ ) );
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Failed to create buffer. ID3D11Device::CreateBuffer.\n"
+                         "Error code: " + StringConverter::toString( hr ) + ".\n" +
+                         errorDescription +
+                         "Requested: " + StringConverter::toString( sizeBytes ) +
+                         String(" bytes. For ") + (forUpload ? "Uploading" : "Downloading"),
+                         "D3D11VaoManager::createStagingBuffer" );
         }
 
-        D3D11StagingBuffer *stagingBuffer = OGRE_NEW D3D11StagingBuffer( 0, sizeBytes, this,
-                                                                             forUpload, bufferName );
+        D3D11StagingBuffer *stagingBuffer = OGRE_NEW D3D11StagingBuffer( sizeBytes, this,
+                                                                         forUpload, bufferName,
+                                                                         mDevice );
         mStagingBuffers[forUpload].push_back( stagingBuffer );
 
         return stagingBuffer;
     }
     //-----------------------------------------------------------------------------------
     AsyncTicketPtr D3D11VaoManager::createAsyncTicket( BufferPacked *creator,
-                                                         StagingBuffer *stagingBuffer,
-                                                         size_t elementStart, size_t elementCount )
+                                                       StagingBuffer *stagingBuffer,
+                                                       size_t elementStart, size_t elementCount )
     {
         return AsyncTicketPtr( OGRE_NEW D3D11AsyncTicket( creator, stagingBuffer,
-                                                          elementStart, elementCount ) );
+                                                          elementStart, elementCount,
+                                                          mDevice ) );
     }
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::_update(void)
@@ -841,12 +890,6 @@ namespace Ogre
                                                     mNextStagingBufferTimestampCheckpoint,
                                                     stagingBuffer->getLastUsedTimestamp() +
                                                     currentTimeMs );
-
-                    if( stagingBuffer->getLastUsedTimestamp() - currentTimeMs >
-                        stagingBuffer->getUnfencedTimeThreshold() )
-                    {
-                        static_cast<D3D11StagingBuffer*>( stagingBuffer )->cleanUnfencedHazards();
-                    }
 
                     if( stagingBuffer->getLastUsedTimestamp() - currentTimeMs >
                         stagingBuffer->getLifetimeThreshold() )
@@ -904,7 +947,7 @@ namespace Ogre
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
                          "Failed to create frame fence.\n"
                          "Error code: " + StringConverter::toString( hr ) + ".\n" +
-                         errorDescription +,
+                         errorDescription,
                          "D3D11VaoManager::_update" );
         }
 
@@ -949,6 +992,9 @@ namespace Ogre
 
                 return fenceName;
             }
+
+            //Give HyperThreading threads a breath on this spinlock.
+            YieldProcessor();
         } // spin until event is finished
 
         return fenceName;

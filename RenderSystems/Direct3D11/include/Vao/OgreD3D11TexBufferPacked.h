@@ -57,7 +57,7 @@ namespace Ogre
     public:
         D3D11TexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
                               BufferType bufferType, void *initialData, bool keepAsShadow,
-                              VaoManager *vaoManager, D3D11BufferInterface *bufferInterface,
+                              VaoManager *vaoManager, BufferInterface *bufferInterface,
                               Ogre::PixelFormat pf, D3D11Device &device );
         ~D3D11TexBufferPacked();
 

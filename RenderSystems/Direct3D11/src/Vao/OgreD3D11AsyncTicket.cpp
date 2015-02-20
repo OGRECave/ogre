@@ -26,58 +26,66 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGL3PlusPrerequisites.h"
+#include "OgreD3D11Prerequisites.h"
 
-#include "Vao/OgreGL3PlusAsyncTicket.h"
-#include "Vao/OgreGL3PlusVaoManager.h"
+#include "Vao/OgreD3D11AsyncTicket.h"
+#include "Vao/OgreD3D11VaoManager.h"
 
 #include "Vao/OgreStagingBuffer.h"
 
+#include "OgreD3D11Device.h"
+
 namespace Ogre
 {
-    GL3PlusAsyncTicket::GL3PlusAsyncTicket( BufferPacked *creator,
-                                            StagingBuffer *stagingBuffer,
-                                            size_t elementStart,
-                                            size_t elementCount ) :
+    D3D11AsyncTicket::D3D11AsyncTicket( BufferPacked *creator,
+                                        StagingBuffer *stagingBuffer,
+                                        size_t elementStart,
+                                        size_t elementCount,
+                                        D3D11Device &device ) :
         AsyncTicket( creator, stagingBuffer, elementStart, elementCount ),
-        mFenceName( 0 )
+        mFenceName( 0 ),
+        mDevice( device )
     {
         //Base constructor has already called _asyncDownload. We should now place a fence.
-        OCGE( mFenceName = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
+        mFenceName = D3D11VaoManager::createFence( mDevice );
     }
     //-----------------------------------------------------------------------------------
-    GL3PlusAsyncTicket::~GL3PlusAsyncTicket()
+    D3D11AsyncTicket::~D3D11AsyncTicket()
     {
         if( mFenceName )
         {
-            OCGE( glDeleteSync( mFenceName ) );
+            mFenceName->Release();
             mFenceName = 0;
         }
     }
     //-----------------------------------------------------------------------------------
-    const void* GL3PlusAsyncTicket::mapImpl(void)
+    const void* D3D11AsyncTicket::mapImpl(void)
     {
         if( mFenceName )
-            mFenceName = GL3PlusVaoManager::waitFor( mFenceName );
+            mFenceName = D3D11VaoManager::waitFor( mFenceName, mDevice.GetImmediateContext() );
 
         return mStagingBuffer->_mapForRead( mStagingBufferMapOffset,
                                             mElementCount * mCreator->getBytesPerElement() );
     }
     //-----------------------------------------------------------------------------------
-    bool GL3PlusAsyncTicket::queryIsTransferDone(void)
+    bool D3D11AsyncTicket::queryIsTransferDone(void)
     {
         bool retVal = false;
 
         if( mFenceName )
         {
-            //Ask GL API to return immediately and tells us about the fence
-            GLenum waitRet = glClientWaitSync( mFenceName, 0, 0 );
-            if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
+            HRESULT hr = mDevice.GetImmediateContext()->GetData( mFenceName, NULL, 0, 0 );
+
+            if( FAILED( hr ) )
             {
-                OCGE( glDeleteSync( mFenceName ) );
-                mFenceName = 0;
-                retVal = true;
+                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                             "Failure while waiting for a D3D11 Fence. Could be out of GPU memory. "
+                             "Update your video card drivers. If that doesn't help, "
+                             "contact the developers.",
+                             "D3D11VaoManager::queryIsTransferDone" );
             }
+
+            retVal = hr != S_FALSE;
         }
         else
         {

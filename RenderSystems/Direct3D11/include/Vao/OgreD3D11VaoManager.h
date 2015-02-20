@@ -142,6 +142,8 @@ namespace Ogre
 
         VertexBufferPacked  *mDrawId;
 
+        D3D11RenderSystem   *mD3D11RenderSystem;
+
         /** Asks for allocating buffer space in a VBO (Vertex Buffer Object).
             If the VBO doesn't exist, all VBOs are full or can't fit this request,
             then a new VBO will be created.
@@ -227,9 +229,17 @@ namespace Ogre
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 
+        D3D11CompatBufferInterface* createShaderBufferInterface( bool constantBuffer,
+                                                                 size_t sizeBytes,
+                                                                 BufferType bufferType,
+                                                                 void *initialData );
+
     public:
-        D3D11VaoManager( bool supportsIndirectBuffers, D3D11Device &device );
+        D3D11VaoManager( bool supportsIndirectBuffers, D3D11Device &device,
+                         D3D11RenderSystem *renderSystem );
         virtual ~D3D11VaoManager();
+
+        D3D11RenderSystem* getD3D11RenderSystem(void) const              { return mD3D11RenderSystem; }
 
         /// Binds the Draw ID to the currently bound vertex array object.
         void bindDrawId(void);

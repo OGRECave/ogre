@@ -1177,6 +1177,8 @@ namespace Ogre
         /** Part of the low level rendering interface. Tells the RS which VAO will be bound now.
             (i.e. Vertex Formats, buffers being bound, etc.)
             You don't need to rebind if the VAO's mRenderQueueId is the same as previous call.
+        @remarks
+            Assumes _setProgramsFromHlms has already been called.
         */
         virtual void _setVertexArrayObject( const VertexArrayObject *vao ) = 0;
 

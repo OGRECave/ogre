@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_D3D11ConstBufferInterface_H_
-#define _Ogre_D3D11ConstBufferInterface_H_
+#ifndef _Ogre_D3D11CompatBufferInterface_H_
+#define _Ogre_D3D11CompatBufferInterface_H_
 
 #include "OgreD3D11Prerequisites.h"
 
@@ -42,10 +42,17 @@ namespace Ogre
         we treat it the same as D3D11.
     @par
         This limitation prevents us from allocating 3x size for triple buffering.
+    @par
         Therefore we need the traditional scheme of mapping with NO_OVERWRITE
         and then use DISCARD when we've filled the buffer.
+    @par
+        In D3D11.0, only index and vertex buffers can be mapped with NO_OVERWRITE.
+        That leaves only DISCARD to be used on those systems.
+        NO_OVERWRITE is used if used D3D 11.1 though.
+    @par
+        This buffer interface is for compatibility with these systems.
     */
-    class _OgreD3D11Export D3D11ConstBufferInterface : public BufferInterface
+    class _OgreD3D11Export D3D11CompatBufferInterface : public BufferInterface
     {
     protected:
         size_t          mVboPoolIdx;
@@ -55,8 +62,8 @@ namespace Ogre
         D3D11Device     &mDevice;
 
     public:
-        D3D11ConstBufferInterface( size_t vboPoolIdx, ID3D11Buffer *d3dBuffer, D3D11Device &device );
-        ~D3D11ConstBufferInterface();
+        D3D11CompatBufferInterface( size_t vboPoolIdx, ID3D11Buffer *d3dBuffer, D3D11Device &device );
+        ~D3D11CompatBufferInterface();
 
         size_t getVboPoolIndex(void)                { return mVboPoolIdx; }
         ID3D11Buffer* getVboName(void) const        { return mVboName; }

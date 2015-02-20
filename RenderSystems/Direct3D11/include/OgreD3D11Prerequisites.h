@@ -103,6 +103,7 @@ namespace Ogre
     // Predefine classes
     class D3D11RenderSystem;
     class D3D11RenderWindowBase;
+    class D3D11CompatBufferInterface;
     class D3D11Texture;
     class D3D11TextureManager;
     class D3D11DepthBuffer;
