@@ -180,7 +180,7 @@ public:
                         " programs, so you cannot run this sample. Sorry!", "Sample_SSAO::testCapabilities");
         }
 		if (!(caps->getRenderSystemName() == "OpenGL Rendering Subsystem" ||
-			caps->getRenderSystemName() == "OpenGL 3+ Rendering Subsystem (EXPERIMENTAL)" || 
+			caps->getRenderSystemName() == "OpenGL 3+ Rendering Subsystem (ALPHA)" || 
 			caps->getRenderSystemName() == "Direct3D9 Rendering Subsystem" ||
             caps->getRenderSystemName() == "Direct3D11 Rendering Subsystem"))
         {
