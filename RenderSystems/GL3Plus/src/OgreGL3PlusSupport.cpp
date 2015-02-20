@@ -54,18 +54,16 @@ namespace Ogre {
 
     void GL3PlusSupport::initialiseExtensions(void)
     {
-        // Set version string
-        const GLubyte* pcVer = glGetString(GL_VERSION);
+        // get driver version.
+        // this is the recommended way for GL3 see: https://www.opengl.org/wiki/Get_Context_Info
+        glGetIntegerv(GL_MAJOR_VERSION, &mVersion.major);
+        glGetIntegerv(GL_MINOR_VERSION, &mVersion.minor);
 
-        assert(pcVer && "Problems getting GL version string using glGetString");
-
-        String tmpStr = (const char*)pcVer;
-        LogManager::getSingleton().logMessage("GL_VERSION = " + tmpStr);
-        mVersion = tmpStr.substr(0, tmpStr.find(" "));
+        LogManager::getSingleton().logMessage("GL_VERSION = " + mVersion.toString());
 
         // Get vendor
         const GLubyte* pcVendor = glGetString(GL_VENDOR);
-        tmpStr = (const char*)pcVendor;
+        String tmpStr = (const char*)pcVendor;
         LogManager::getSingleton().logMessage("GL_VENDOR = " + tmpStr);
         mVendor = tmpStr.substr(0, tmpStr.find(" "));
 
@@ -92,49 +90,17 @@ namespace Ogre {
         }
     }
 
-    bool GL3PlusSupport::checkMinGLVersion(const String& v) const
+    bool GL3PlusSupport::checkMinGLVersion(int major, int minor) const
     {
-        unsigned int first, second, third;
-        unsigned int cardFirst, cardSecond, cardThird;
-        if(v == mVersion)
-            return true;
-
-        String::size_type pos = v.find(".");
-        if(pos == String::npos)
-            return false;
-
-        String::size_type pos1 = v.rfind(".");
-        if(pos1 == String::npos)
-            return false;
-
-        first = ::atoi(v.substr(0, pos).c_str());
-        second = ::atoi(v.substr(pos + 1, pos1 - (pos + 1)).c_str());
-        third = ::atoi(v.substr(pos1 + 1, v.length()).c_str());
-
-        pos = mVersion.find(".");
-        if(pos == String::npos)
-            return false;
-
-        pos1 = mVersion.rfind(".");
-        if(pos1 == String::npos)
-            return false;
-
-        cardFirst  = ::atoi(mVersion.substr(0, pos).c_str());
-        cardSecond = ::atoi(mVersion.substr(pos + 1, pos1 - (pos + 1)).c_str());
-        cardThird  = ::atoi(mVersion.substr(pos1 + 1, mVersion.length()).c_str());
-
-        if(first <= cardFirst && second <= cardSecond && third <= cardThird)
-            return true;
-
-        return false;
+        if (mVersion.major == major) {
+            return mVersion.minor >= minor;
+        }
+        return mVersion.major >= major;
     }
 
     bool GL3PlusSupport::checkExtension(const String& ext) const
     {
-        if(extensionList.find(ext) == extensionList.end())
-            return false;
-
-        return true;
+        return extensionList.find(ext) != extensionList.end();
     }
 
 
