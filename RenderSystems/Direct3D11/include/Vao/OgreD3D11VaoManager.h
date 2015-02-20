@@ -249,7 +249,7 @@ namespace Ogre
         /// @see VaoManager::waitForTailFrameToFinish
         virtual uint8 waitForTailFrameToFinish(void);
 
-        static ID3D11Query* createFence( ID3D11DeviceContextN *deviceContext );
+        static ID3D11Query* createFence( D3D11Device &device );
         ID3D11Query* createFence(void);
 
         /** Will stall undefinitely until GPU finishes (signals the sync object).

@@ -46,7 +46,7 @@ namespace Ogre
     {
         memset( mCachedResourceViews, 0, sizeof( mCachedResourceViews ) );
 
-        mInternalFormat = D3D11Mappings::get( pf );
+        mInternalFormat = D3D11Mappings::_getPF( pf );
     }
     //-----------------------------------------------------------------------------------
     D3D11TexBufferPacked::~D3D11TexBufferPacked()
@@ -76,8 +76,8 @@ namespace Ogre
 
         srDesc.Format               = mInternalFormat;
         srDesc.ViewDimension        = D3D11_SRV_DIMENSION_BUFFER;
-        srDesc.Buffer.FirstElement  = 0;
-        srDesc.Buffer.NumElements   = N;
+        srDesc.Buffer.FirstElement  = offset / mNumElements;
+        srDesc.Buffer.NumElements   = sizeBytes / mNumElements;
 
         assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
         D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>( mBufferInterface );

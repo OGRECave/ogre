@@ -904,12 +904,14 @@ namespace Ogre
         mDynamicBufferCurrentFrame = (mDynamicBufferCurrentFrame + 1) % mDynamicBufferMultiplier;
     }
     //-----------------------------------------------------------------------------------
-    ID3D11Query* D3D11VaoManager::createFence( ID3D11DeviceContextN *deviceContext )
+    ID3D11Query* D3D11VaoManager::createFence( D3D11Device &device )
     {
+        ID3D11Query *retVal = 0;
+
         D3D11_QUERY_DESC queryDesc;
         queryDesc.Query     = D3D11_QUERY_EVENT;
         queryDesc.MiscFlags = 0;
-        HRESULT hr = deviceContext->CreateQuery( &queryDesc, &mFrameSyncVec[mDynamicBufferCurrentFrame] );
+        HRESULT hr = device.get()->CreateQuery( &queryDesc, &retVal );
 
         if( FAILED( hr ) )
         {
@@ -922,12 +924,14 @@ namespace Ogre
         }
 
         // Insert the fence into D3D's commands
-        deviceContext->End( mFrameSyncVec[mDynamicBufferCurrentFrame] );
+        device.GetImmediateContext()->End( retVal );
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     ID3D11Query* D3D11VaoManager::createFence(void)
     {
-        return D3D11VaoManager::createFence( mDevice.GetImmediateContext() );
+        return D3D11VaoManager::createFence( mDevice );
     }
     //-----------------------------------------------------------------------------------
     uint8 D3D11VaoManager::waitForTailFrameToFinish(void)
