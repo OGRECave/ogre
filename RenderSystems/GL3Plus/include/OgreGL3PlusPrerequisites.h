@@ -65,10 +65,9 @@ namespace Ogre {
 #   include <GL/glext.h>
 #   include <GL/wglext.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#   define GLCOREARB_PROTOTYPES
 #   define GL_GLEXT_PROTOTYPES
 #   define GLX_GLXEXT_PROTOTYPES
-#   include <GL/glcorearb.h>
+#   include <GL/gl3w.h>
 #   include <GL/glext.h>
 #   include <GL/glx.h>
 #   include <GL/glxext.h>

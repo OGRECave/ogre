@@ -2312,15 +2312,12 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_LINUX
         // Initialise GL3W
         if (gl3wInit()) { // gl3wInit() fails if GL3.0 is not supported
-        // if (!gl3wIsSupported(3, 0))
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 3.0 is not supported",
                         "GL3PlusRenderSystem::initialiseContext");
         }
-#endif
 
         // Setup GL3PlusSupport
         mGLSupport->initialiseExtensions();
