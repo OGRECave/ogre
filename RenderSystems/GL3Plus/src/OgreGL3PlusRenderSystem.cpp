@@ -229,25 +229,13 @@ namespace Ogre {
         rsc->setDriverVersion(mDriverVersion);
 
         const char* deviceName = (const char*)glGetString(GL_RENDERER);
-        const char* vendorName = mGLSupport->getGLVendor().c_str();
         if (deviceName)
         {
             rsc->setDeviceName(deviceName);
         }
 
         rsc->setRenderSystemName(getName());
-
-        // Determine vendor
-        if (strstr(vendorName, "NVIDIA"))
-            rsc->setVendor(GPU_NVIDIA);
-        else if (strstr(vendorName, "ATI"))
-            rsc->setVendor(GPU_AMD);
-        else if (strstr(vendorName, "AMD"))
-            rsc->setVendor(GPU_AMD);
-        else if (strstr(vendorName, "Intel"))
-            rsc->setVendor(GPU_INTEL);
-        else
-            rsc->setVendor(GPU_UNKNOWN);
+        rsc->parseVendorFromString(mGLSupport->getGLVendor());
 
         bool hasGL31 = mGLSupport->checkMinGLVersion(3, 1);
         bool hasGL33 = mGLSupport->checkMinGLVersion(3, 3);
@@ -539,7 +527,7 @@ namespace Ogre {
         mShaderManager = OGRE_NEW GLSLShaderManager();
 
         // Create GLSL shader factory
-        mGLSLShaderFactory = new GLSLShaderFactory();
+        mGLSLShaderFactory = new GLSLShaderFactory(*mGLSupport);
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLShaderFactory);
 
         // Set texture the number of texture units

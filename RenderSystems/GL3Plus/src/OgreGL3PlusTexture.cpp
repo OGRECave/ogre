@@ -143,8 +143,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-        bool hasGL33 = gl3wIsSupported(3, 3);
-        bool hasGL42 = gl3wIsSupported(4, 2);
+        bool hasGL33 = mGLSupport.checkMinGLVersion(3, 3);
+        bool hasGL42 = mGLSupport.checkMinGLVersion(4, 2);
 
         // Set up texture swizzling.
         if (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || hasGL33)
